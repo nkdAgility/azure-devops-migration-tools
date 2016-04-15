@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using System.Diagnostics;
+using Microsoft.ApplicationInsights;
 
 namespace TfsWitMigrator.Core.ComponentContext
 {
@@ -24,8 +25,16 @@ namespace TfsWitMigrator.Core.ComponentContext
             if (source.Fields.Contains(sourceField))
             {
                 // to tag
-                string value = (string)source.Fields[sourceField].Value;
-                target.Fields[targetField].Value = value;
+                Trace.WriteLine(string.Format("  [READY] field map {0}:{1} to {2}:{3}", source.Id, sourceField, target.Id, targetField));
+                try
+                {
+                    target.Fields[targetField].Value = source.Fields[sourceField].Value;
+                } catch (Exception ex)
+                {
+                    Trace.WriteLine(string.Format("  [FAIL] field map {0}:{1} to {2}:{3}", source.Id, sourceField, target.Id, targetField));
+                    TelemetryClient tc = new TelemetryClient();
+                    tc.TrackException(ex);
+                }
                 Trace.WriteLine(string.Format("  [UPDATE] field mapped {0}:{1} to {2}:{3}", source.Id, sourceField, target.Id, targetField ));
             }
         }

@@ -30,10 +30,10 @@ namespace TfsWitMigrator.Core
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
             //////////////////////////////////////////////////
-            WorkItemStoreContext sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.None);
+            WorkItemStoreContext sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.BypassRules);
             TfsQueryContext tfsqc = new TfsQueryContext(sourceStore);
             tfsqc.AddParameter("TeamProject", me.Source.Name);
-            tfsqc.Query = @"SELECT [System.Id] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject AND  [System.WorkItemType] = 'Test Case'  AND  [System.AreaPath] = 'Platform' ";// AND [System.Id] = 188708 ";
+            tfsqc.Query = @"SELECT [System.Id] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject"; // AND  [System.WorkItemType] = 'Test Case'  AND  [System.AreaPath] = 'Platform' ";// AND [System.Id] = 188708 ";
             WorkItemCollection sourceWIS = tfsqc.Execute();
             Trace.WriteLine(string.Format("Migrate {0} work items?", sourceWIS.Count));
             //////////////////////////////////////////////////
@@ -161,6 +161,9 @@ namespace TfsWitMigrator.Core
             ignore.Add("System.HyperLinkCount");
             ignore.Add("System.Watermark");
             ignore.Add("System.AuthorizedDate");
+            ignore.Add("System.BoardColumn");
+            ignore.Add("System.BoardColumnDone");
+            ignore.Add("System.BoardLane");
 
             // WorkItem newwit = oldWi.Copy(destProject.WorkItemTypes[destType]);
             WorkItem newwit = destProject.WorkItemTypes[destType].NewWorkItem();
@@ -182,8 +185,8 @@ namespace TfsWitMigrator.Core
                     newwit.Fields[f.ReferenceName].Value = oldWi.Fields[f.ReferenceName].Value;
                 }
             }
-            newwit.AreaPath = string.Format(@"PRODUCT\Infrastructure\Foundation");//\{0}\{1}", newwit.Project.Name,oldWi.AreaPath);
-            newwit.IterationPath = string.Format(@"PRODUCT\Infrastructure\Foundation"); //oldWi.IterationPath.Replace(oldWi.Project.Name, newwit.Project.Name);
+            newwit.AreaPath = string.Format(@"{0}\{1}", newwit.Project.Name,oldWi.AreaPath);
+            newwit.IterationPath = oldWi.IterationPath.Replace(oldWi.Project.Name, newwit.Project.Name);
             newwit.Fields["System.ChangedDate"].Value = oldWi.Fields["System.ChangedDate"].Value;
 
             switch (destType)
@@ -192,9 +195,9 @@ namespace TfsWitMigrator.Core
                     newwit.Fields["Microsoft.VSTS.TCM.Steps"].Value = oldWi.Fields["Microsoft.VSTS.TCM.Steps"].Value;
                     newwit.Fields["Microsoft.VSTS.Common.Priority"].Value = oldWi.Fields["Microsoft.VSTS.Common.Priority"].Value;
                     break;
-                case "User Story":
-                    newwit.Fields["COMPANY.DEVISION.Analysis"].Value = oldWi.Fields["COMPANY.PRODUCT.AcceptanceCriteria"].Value;
-                    break;
+                //case "User Story":
+                    //newwit.Fields["COMPANY.DEVISION.Analysis"].Value = oldWi.Fields["COMPANY.PRODUCT.AcceptanceCriteria"].Value;
+                    //break;
                 default:
                     break;
             }
@@ -219,7 +222,7 @@ namespace TfsWitMigrator.Core
             StringBuilder history = new StringBuilder();
             BuildCommentTable(oldWi, history);
             BuildFieldTable(oldWi, history);
-            history.Append("<p>Migrated by Martin Hinshelwood from <a href='http://nakedalm.com'>naked ALM Consulting</a></p>");
+            history.Append("<p>Migrated by <a href='http://nkdagility.com'>naked Agility Limited's</a> open source <a href='https://github.com/nkdAgility/VstsMigrator'>VSTS/TFS Migrator</a>.</p>");
             newwit.History = history.ToString();
 
             if (except)

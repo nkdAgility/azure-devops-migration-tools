@@ -83,7 +83,7 @@ namespace TfsWitMigrator.Core
                 {
                     case TestSuiteType.None:
                         throw new NotImplementedException();
-                        break;
+                        //break;
                     case TestSuiteType.DynamicTestSuite:
                         targetSuitChild = CreateNewDynamicTestSuite(sourceSuit);
                         break;
@@ -97,7 +97,7 @@ namespace TfsWitMigrator.Core
                         break;
                     default:
                         throw new NotImplementedException();
-                        break;
+                        //break;
                 }
                 if (targetSuitChild == null) { return; }
                 // Add to tareget and Save

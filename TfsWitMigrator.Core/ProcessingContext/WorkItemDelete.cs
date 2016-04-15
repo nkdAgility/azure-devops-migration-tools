@@ -40,8 +40,8 @@ namespace TfsWitMigrator.Core
             Trace.WriteLine(string.Format("Update {0} work items?", workitems.Count));
             //////////////////////////////////////////////////
             int current = workitems.Count;
-            int count = 0;
-            long elapsedms = 0;
+            //int count = 0;
+            //long elapsedms = 0;
             var tobegone = (from WorkItem wi in workitems where wi.AreaPath.Contains("_DeleteMe")  select wi.Id).ToList();
 
             foreach (int begone in tobegone)
