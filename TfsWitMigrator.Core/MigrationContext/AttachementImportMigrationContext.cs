@@ -1,0 +1,63 @@
+﻿using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Net;
+
+namespace TfsWitMigrator.Core
+{
+    public class AttachementImportMigrationContext : AttachementMigrationContextBase
+    {
+        public override string Name
+        {
+            get
+            {
+                return "AttachementImportMigrationContext";
+            }
+        }
+        public AttachementImportMigrationContext(MigrationEngine me) : base(me)
+        {
+
+        }
+
+        internal override void InternalExecute()
+        {
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            //////////////////////////////////////////////////
+            WorkItemStoreContext targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
+            Project destProject = targetStore.GetProject();
+
+            Trace.WriteLine(string.Format("Found target project as {0}", destProject.Name));
+
+            List<string> files = System.IO.Directory.EnumerateFiles(exportPath).ToList<string>();
+            WorkItem targetWI = null;
+            int current = files.Count;
+            foreach (string file in files)
+            {
+                string fileName = System.IO.Path.GetFileName(file);
+                int wiID = int.Parse(fileName.Split('-')[0]);
+                targetWI = targetStore.FindReflectedWorkItemByReflectedWorkItemId(wiID);
+                if (targetWI != null)
+                {
+                    Trace.WriteLine(string.Format("{0} of {1} - Import {2} to {3}", current, files.Count, fileName, targetWI.Id));
+                    Attachment a = new Attachment(file);
+                    targetWI.Attachments.Add(a);
+                    
+                    targetWI.Save();
+                    System.IO.File.Delete(file);
+                } else
+                {
+                    Trace.WriteLine(string.Format("{0} of {1} - Skipping {2} to {3}", current, files.Count, fileName, 0));
+                }
+                current--;
+            }
+            //////////////////////////////////////////////////
+            stopwatch.Stop();
+            Console.WriteLine(@"EXPORT DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds", stopwatch.Elapsed);
+        }
+
+    }
+}

@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.22609.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TfsWitMigrator.Console", "TfsWitMigrator.Console\TfsWitMigrator.Console.csproj", "{033EB332-4A50-4C73-9B7D-A35D9F3C0513}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "_TfsWitMigrator.Core", "TfsWitMigrator.Core\_TfsWitMigrator.Core.csproj", "{68BAF6BA-2BC0-48D0-B892-1D9F93D7003A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{033EB332-4A50-4C73-9B7D-A35D9F3C0513}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{033EB332-4A50-4C73-9B7D-A35D9F3C0513}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{033EB332-4A50-4C73-9B7D-A35D9F3C0513}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{033EB332-4A50-4C73-9B7D-A35D9F3C0513}.Release|Any CPU.Build.0 = Release|Any CPU
+		{68BAF6BA-2BC0-48D0-B892-1D9F93D7003A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{68BAF6BA-2BC0-48D0-B892-1D9F93D7003A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{68BAF6BA-2BC0-48D0-B892-1D9F93D7003A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{68BAF6BA-2BC0-48D0-B892-1D9F93D7003A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
