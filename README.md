@@ -1,4 +1,3 @@
-**Update this README.md file**.
+**VSTS Migrator**.
 
- A README.md file is intended to quickly orient readers to what your project can do.
- [Learn more](http://go.microsoft.com/fwlink/p/?LinkId=524306) about Markdown.
+VSTS Migrator is a set of migration tools for pushing data around in VSTS and TFS. You can move data between team projects, duplicate data, or do a full migration from one inctance of TFS/VSTS to another. 
