@@ -61,7 +61,7 @@ namespace TfsWitMigrator.Core
                 node = css.GetNodeFromPath(nodePath);
                 Trace.Write("...found");
             }
-            catch (CommonStructureSubsystemException)
+            catch (CommonStructureSubsystemException ex)
             {
                 Trace.Write("...missing");
                 string newPathUri = css.CreateNode(name, parent.Uri);

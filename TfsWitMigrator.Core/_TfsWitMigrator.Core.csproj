@@ -254,10 +254,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ComponentContext\FieldToFieldMap.cs" />
-    <Compile Include="ComponentContext\IFieldMap.cs" />
+    <Compile Include="FieldMaps\FieldMapBase.cs" />
+    <Compile Include="FieldMaps\FieldMergeMap.cs" />
+    <Compile Include="FieldMaps\FieldToFieldMap.cs" />
+    <Compile Include="FieldMaps\FieldValueMap.cs" />
+    <Compile Include="FieldMaps\IFieldMap.cs" />
     <Compile Include="ComponentContext\TestManagementContext.cs" />
-    <Compile Include="ComponentContext\FieldToTagFieldMap.cs" />
+    <Compile Include="FieldMaps\FieldToTagFieldMap.cs" />
     <Compile Include="MigrationContext\LinkMigrationContext.cs" />
     <Compile Include="MigrationContext\AttachementExportMigrationContext.cs" />
     <Compile Include="MigrationContext\MigrationContextBase.cs" />
@@ -289,8 +292,8 @@
     <Compile Include="MigrationContext\WorkItemMigrationContext.cs" />
     <Compile Include="ComponentContext\WorkItemStoreContext.cs" />
     <Compile Include="MigrationContext\TestPlansAndSuitsMigrationContext.cs" />
-    <Compile Include="ComponentContext\RegexFieldMap.cs" />
-    <Compile Include="ComponentContext\TreeToTagFieldMap.cs" />
+    <Compile Include="FieldMaps\RegexFieldMap.cs" />
+    <Compile Include="FieldMaps\TreeToTagFieldMap.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
