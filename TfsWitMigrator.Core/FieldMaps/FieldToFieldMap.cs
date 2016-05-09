@@ -8,7 +8,7 @@ using System.Diagnostics;
 
 namespace TfsWitMigrator.Core.ComponentContext
 {
-    public class FieldToFieldMap : IFieldMap
+    public class FieldToFieldMap : FieldMapBase
     {
         private string sourceField;
         private string targetField;
@@ -19,14 +19,13 @@ namespace TfsWitMigrator.Core.ComponentContext
             this.targetField = targetField;
         }
 
-        public void Execute(WorkItem source, WorkItem target)
+        internal override void InternalExecute(WorkItem source, WorkItem target)
         {
             if (source.Fields.Contains(sourceField))
             {
                 // to tag
-                string value = (string)source.Fields[sourceField].Value;
-                target.Fields[targetField].Value = value;
-                Trace.WriteLine(string.Format("  [UPDATE] field mapped {0}:{1} to {2}:{3}", source.Id, sourceField, target.Id, targetField ));
+                target.Fields[targetField].Value = source.Fields[sourceField].Value;
+                Trace.WriteLine(string.Format("  [UPDATE] field mapped {0}:{1} to {2}:{3}", source.Id, sourceField, target.Id, targetField));
             }
         }
     }

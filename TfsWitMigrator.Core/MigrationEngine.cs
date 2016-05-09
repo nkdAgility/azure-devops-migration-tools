@@ -105,6 +105,18 @@ namespace TfsWitMigrator.Core
             }
         }
 
+        internal void ApplyFieldMappings(WorkItem target)
+        {
+            if (fieldMapps.ContainsKey("*"))
+            {
+                ProcessFieldMapList(target, target, fieldMapps["*"]);
+            }
+            if (fieldMapps.ContainsKey(target.Type.Name))
+            {
+                ProcessFieldMapList(target, target, fieldMapps[target.Type.Name]);
+            }
+        }
+
         private  void ProcessFieldMapList(WorkItem source, WorkItem target, List<IFieldMap> list)
         {
             foreach (IFieldMap map in list)
