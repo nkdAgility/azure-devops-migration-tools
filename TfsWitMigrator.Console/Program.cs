@@ -36,8 +36,8 @@ namespace ConsoleApplication1
             MigrationEngine me = new MigrationEngine();
 
 
-            me.SetSource(new TeamProjectContext(new Uri("http://gb0909tfs01:8080/tfs/RDRCollection"), "Advisor"));
-            me.SetTarget(new TeamProjectContext(new Uri("https://tfs.test.slb.com/tfs/SLB1/"), "Foundation-Guru"));
+            me.SetSource(new TeamProjectContext(new Uri("http://tfs01:8080/tfs/col1n"), "tp2"));
+            me.SetTarget(new TeamProjectContext(new Uri("http://tfs01:8080/tfs/col12"), "tp4"));
 
             //me.AddProcessor<NodeStructuresMigrationContext>();
             //me.AddProcessor<WorkItemMigrationContext>();
