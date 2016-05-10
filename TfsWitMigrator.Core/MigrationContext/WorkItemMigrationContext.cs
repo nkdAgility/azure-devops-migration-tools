@@ -33,7 +33,7 @@ namespace TfsWitMigrator.Core
             WorkItemStoreContext sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.BypassRules);
             TfsQueryContext tfsqc = new TfsQueryContext(sourceStore);
             tfsqc.AddParameter("TeamProject", me.Source.Name);
-            tfsqc.Query = @"SELECT [System.Id] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject"; // AND  [System.WorkItemType] = 'Test Case'  AND  [System.AreaPath] = 'Platform' ";// AND [System.Id] = 188708 ";
+            tfsqc.Query = @"SELECT [System.Id] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject AND  [Microsoft.VSTS.Common.ClosedDate] = '' ORDER BY [System.ChangedDate] desc "; // AND  [System.WorkItemType] = 'Test Case'  AND  [System.AreaPath] = 'Platform' ";// AND [System.Id] = 188708 ";
             WorkItemCollection sourceWIS = tfsqc.Execute();
             Trace.WriteLine(string.Format("Migrate {0} work items?", sourceWIS.Count));
             //////////////////////////////////////////////////
@@ -164,6 +164,8 @@ namespace TfsWitMigrator.Core
             ignore.Add("System.BoardColumn");
             ignore.Add("System.BoardColumnDone");
             ignore.Add("System.BoardLane");
+            ignore.Add("SLB.SWT.DateOfClientFeedback");
+
 
             // WorkItem newwit = oldWi.Copy(destProject.WorkItemTypes[destType]);
             WorkItem newwit = destProject.WorkItemTypes[destType].NewWorkItem();
@@ -172,6 +174,9 @@ namespace TfsWitMigrator.Core
             switch (newwit.State)
             {
                 case "Done":
+                    newwit.Fields["Microsoft.VSTS.Common.ClosedDate"].Value = DateTime.Now;
+                    break;
+                case "Closed":
                     newwit.Fields["Microsoft.VSTS.Common.ClosedDate"].Value = DateTime.Now;
                     break;
                 default:
