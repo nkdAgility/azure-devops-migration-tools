@@ -68,6 +68,7 @@ namespace ConsoleApplication1
 
 
 
+            // me.AddFieldMap("*", new FieldToTagFieldMap("COMPANY.PRODUCT.Release", "{0}"));
             //  me.AddFieldMap("*", new TreeToTagFieldMap(4));
 
             //me.AddFieldMap("Requirement", new FieldToTagFieldMap("COMPANY.PRODUCT.ReqType", "ReqType:{0}"));
