@@ -13,12 +13,12 @@ namespace TfsWitMigrator.Core
     public class WorkItemUpdate : ProcessingContextBase
     {
         string _queryBit;
-        string _newPath;
+        MigrationEngine _me;
 
-        public WorkItemUpdate(MigrationEngine me, string queryBit, string newPath) : base(me)
+        public WorkItemUpdate(MigrationEngine me, string queryBit) : base(me)
         {
+            _me = me;
             _queryBit = queryBit;
-            _newPath = newPath;
         }
 
         public override string Name
@@ -38,7 +38,6 @@ namespace TfsWitMigrator.Core
 
             TfsQueryContext tfsqc = new TfsQueryContext(targetStore);
             tfsqc.AddParameter("TeamProject", me.Target.Name);
-            tfsqc.AddParameter("AreaPath", _queryBit);
             tfsqc.Query = string.Format(@"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject {0}", _queryBit);
             WorkItemCollection  workitems = tfsqc.Execute();
             Trace.WriteLine(string.Format("Update {0} work items?", workitems.Count));
@@ -52,8 +51,13 @@ namespace TfsWitMigrator.Core
                 witstopwatch.Start();
                
                 workitem.Open();
-                workitem.AreaPath = _newPath;
-                workitem.Save();
+
+                _me.ApplyFieldMappings(workitem);
+                if (workitem.IsDirty)
+                {
+                    workitem.Save();
+                }
+                
 
 
 
