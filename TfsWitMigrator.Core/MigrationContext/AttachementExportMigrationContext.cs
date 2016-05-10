@@ -33,7 +33,7 @@ namespace TfsWitMigrator.Core
             WorkItemStoreContext sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.None);
             TfsQueryContext tfsqc = new TfsQueryContext(sourceStore);
             tfsqc.AddParameter("TeamProject", me.Source.Name);
-            tfsqc.Query = @"SELECT [System.Id] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject AND [System.AttachedFileCount] > 0";
+            tfsqc.Query = @"SELECT [System.Id] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject AND [System.AttachedFileCount] > 0 AND  [Microsoft.VSTS.Common.ClosedDate] = '' ORDER BY [System.ChangedDate] desc ";
             WorkItemCollection sourceWIS = tfsqc.Execute();
 
             WebClient webClient = new WebClient();
