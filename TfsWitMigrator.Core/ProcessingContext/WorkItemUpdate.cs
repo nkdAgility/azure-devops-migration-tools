@@ -38,7 +38,7 @@ namespace TfsWitMigrator.Core
 
             TfsQueryContext tfsqc = new TfsQueryContext(targetStore);
             tfsqc.AddParameter("TeamProject", me.Target.Name);
-            tfsqc.Query = string.Format(@"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject {0}", _queryBit);
+            tfsqc.Query = string.Format(@"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE  [System.WorkItemType] = 'Task'  AND  [System.State] = 'To Do'", _queryBit);
             WorkItemCollection  workitems = tfsqc.Execute();
             Trace.WriteLine(string.Format("Update {0} work items?", workitems.Count));
             //////////////////////////////////////////////////
@@ -53,6 +53,7 @@ namespace TfsWitMigrator.Core
                 workitem.Open();
 
                 _me.ApplyFieldMappings(workitem);
+
                 if (workitem.IsDirty)
                 {
                     workitem.Save();

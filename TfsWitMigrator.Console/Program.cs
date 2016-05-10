@@ -35,23 +35,40 @@ namespace ConsoleApplication1
             //////////////////////////////////////////////////
             MigrationEngine me = new MigrationEngine();
 
-            me.SetTarget(new TeamProjectContext(new Uri("http://tfs01:8080/tfs/col1"), "SFA"));
 
-            me.AddFieldMap("*", new FieldToTagFieldMap("System.State", "ScrumState:{0}"));
-            me.AddFieldMap("*", new FieldToFieldMap("Microsoft.VSTS.Common.BacklogPriority", "Microsoft.VSTS.Common.StackRank"));
-            me.AddFieldMap("*", new FieldToFieldMap("Microsoft.VSTS.Scheduling.Effort", "Microsoft.VSTS.Scheduling.StoryPoints"));
-            me.AddFieldMap("*", new FieldMergeMap("System.Description", "Microsoft.VSTS.Common.AcceptanceCriteria", "System.Description", @"{0} <br/><br/><h3>Acceptance Criteria</h3>{1}"));
-            Dictionary<string, string> stateMapping = new Dictionary<string, string>();
-            stateMapping.Add("New", "New");
-            stateMapping.Add("Approved", "New");
-            stateMapping.Add("Committed", "Active");
-            stateMapping.Add("In Progress", "Active");
-            stateMapping.Add("Done", "Closed");
-            me.AddFieldMap("*", new FieldValueMap("System.State", "System.State", stateMapping));
-            me.AddProcessor(new WorkItemUpdate(me, @" "));
-        
+            me.SetSource(new TeamProjectContext(new Uri("http://tfs01:8080/tfs/col1n"), "tp2"));
+            me.SetTarget(new TeamProjectContext(new Uri("http://tfs01:8080/tfs/col12"), "tp4"));
+
+            //me.AddProcessor<NodeStructuresMigrationContext>();
+            //me.AddProcessor<WorkItemMigrationContext>();
+            me.AddProcessor<LinkMigrationContext>();
+            //me.AddProcessor<AttachementExportMigrationContext>();
+            // me.AddProcessor<AttachementImportMigrationContext>();
 
 
+
+
+            //me.SetTarget(new TeamProjectContext(new Uri("http://tfs01:8080/tfs/col1"), "StructuralGeologyConversion"));
+
+            //me.AddFieldMap("*", new FieldToTagFieldMap("System.State", "ScrumState:{0}"));
+            //me.AddFieldMap("*", new FieldToFieldMap("Microsoft.VSTS.Common.BacklogPriority", "Microsoft.VSTS.Common.StackRank"));
+            //me.AddFieldMap("*", new FieldToFieldMap("Microsoft.VSTS.Scheduling.Effort", "Microsoft.VSTS.Scheduling.StoryPoints"));
+            //me.AddFieldMap("*", new FieldMergeMap("System.Description", "Microsoft.VSTS.Common.AcceptanceCriteria", "System.Description", @"{0} <br/><br/><h3>Acceptance Criteria</h3>{1}"));
+
+            //Dictionary<string, string> stateMapping = new Dictionary<string, string>();
+            //stateMapping.Add("New", "New");
+            //stateMapping.Add("Approved", "New");
+            //stateMapping.Add("Committed", "Active");
+            //stateMapping.Add("In Progress", "Active");
+            //stateMapping.Add("To Do", "New");
+            //stateMapping.Add("Done", "Closed");
+            //me.AddFieldMap("*", new FieldValueMap("System.State", "System.State", stateMapping));
+
+            //me.AddProcessor(new WorkItemUpdate(me, @" "));
+
+
+
+            // me.AddFieldMap("*", new FieldToTagFieldMap("COMPANY.PRODUCT.Release", "{0}"));
             //  me.AddFieldMap("*", new TreeToTagFieldMap(4));
 
             //me.AddFieldMap("Requirement", new FieldToTagFieldMap("COMPANY.PRODUCT.ReqType", "ReqType:{0}"));
