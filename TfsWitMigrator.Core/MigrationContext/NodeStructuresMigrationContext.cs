@@ -34,7 +34,8 @@ namespace TfsWitMigrator.Core
 
             NodeInfo areaParent = CreateNode(targetCss, me.Source.Name, targetCss.GetNodeFromPath(string.Format("\\{0}\\Area", me.Target.Name)));
             CreateNodes(sourceAreaTree.ChildNodes[0].ChildNodes[0].ChildNodes, targetCss, areaParent);
-            CreateNodes(sourceIterationsTree.ChildNodes[0].ChildNodes[0].ChildNodes, targetCss, targetCss.GetNodeFromPath(string.Format("\\{0}\\Iteration", me.Target.Name)));
+            NodeInfo iterationParent = CreateNode(targetCss, me.Source.Name, targetCss.GetNodeFromPath(string.Format("\\{0}\\Iteration", me.Target.Name)));
+            CreateNodes(sourceIterationsTree.ChildNodes[0].ChildNodes[0].ChildNodes, targetCss, iterationParent);
             //////////////////////////////////////////////////
         }
 

@@ -191,7 +191,7 @@ namespace TfsWitMigrator.Core
                 }
             }
             newwit.AreaPath = string.Format(@"{0}\{1}", newwit.Project.Name,oldWi.AreaPath);
-            newwit.IterationPath = oldWi.IterationPath.Replace(oldWi.Project.Name, newwit.Project.Name);
+            newwit.IterationPath = string.Format(@"{0}\{1}", newwit.Project.Name, oldWi.IterationPath);
             newwit.Fields["System.ChangedDate"].Value = oldWi.Fields["System.ChangedDate"].Value;
 
             switch (destType)
