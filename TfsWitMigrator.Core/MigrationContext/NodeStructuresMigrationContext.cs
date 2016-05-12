@@ -1,6 +1,8 @@
 ﻿using Microsoft.TeamFoundation.Server;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Xml;
 
 namespace TfsWitMigrator.Core
@@ -26,8 +28,13 @@ namespace TfsWitMigrator.Core
             ICommonStructureService sourceCss = (ICommonStructureService)me.Source.Collection.GetService(typeof(ICommonStructureService));
             ProjectInfo sourceProjectInfo = sourceCss.GetProjectFromName(me.Source.Name);
             NodeInfo[] sourceNodes = sourceCss.ListStructures(sourceProjectInfo.Uri);
-            XmlElement sourceAreaTree = sourceCss.GetNodesXml(new string[] { sourceNodes[1].Uri }, true);
-            XmlElement sourceIterationsTree = sourceCss.GetNodesXml(new string[] { sourceNodes[0].Uri }, true);
+
+            NodeInfo sourceAreaNode = (from n in sourceNodes where n.Path.Contains("Area") select n).Single();
+
+            XmlElement sourceAreaTree = sourceCss.GetNodesXml(new string[] { sourceAreaNode.Uri }, true);
+
+            NodeInfo sourceIterationNode = (from n in sourceNodes where n.Path.Contains("Iteration") select n).Single();
+            XmlElement sourceIterationsTree = sourceCss.GetNodesXml(new string[] { sourceIterationNode.Uri }, true);
             //////////////////////////////////////////////////
             ICommonStructureService targetCss = (ICommonStructureService)me.Target.Collection.GetService(typeof(ICommonStructureService));
             //////////////////////////////////////////////////
