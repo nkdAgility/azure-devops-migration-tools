@@ -38,8 +38,8 @@ namespace TfsWitMigrator.Core
             foreach (string file in files)
             {
                 string fileName = System.IO.Path.GetFileName(file);
-                int wiID = int.Parse(fileName.Split('-')[0]);
-                targetWI = targetStore.FindReflectedWorkItemByReflectedWorkItemId(wiID);
+                string reflectedID =fileName.Split('#')[0];
+                 targetWI = targetStore.FindReflectedWorkItemByReflectedWorkItemId(reflectedID);
                 if (targetWI != null)
                 {
                     Trace.WriteLine(string.Format("{0} of {1} - Import {2} to {3}", current, files.Count, fileName, targetWI.Id));

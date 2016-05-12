@@ -44,7 +44,8 @@ namespace TfsWitMigrator.Core
                 Trace.Write(string.Format("Attachement Export: {0} of {1} - {2}", current, sourceWIS.Count, wi.Id));
                 foreach (Attachment wia in wi.Attachments)
                 {
-                    string fname = string.Format("{0}-{1}", wi.Id, wia.Name);
+                    string reflectedId = sourceStore.CreateReflectedWorkItemId(wi);
+                    string fname = string.Format("{0}#{1}", reflectedId.Replace("/", "-"), wia.Name);
                     Trace.Write("-");
                     Trace.Write(fname);
                     string fpath = Path.Combine(exportPath, fname);

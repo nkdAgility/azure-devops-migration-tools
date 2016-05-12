@@ -33,7 +33,7 @@ namespace TfsWitMigrator.Core
             WorkItemStoreContext sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.BypassRules);
             TfsQueryContext tfsqc = new TfsQueryContext(sourceStore);
             tfsqc.AddParameter("TeamProject", me.Source.Name);
-            tfsqc.Query = @"SELECT [System.Id] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject ORDER BY [System.ChangedDate] desc "; // AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND  [System.WorkItemType] = 'Test Case'  AND  [System.AreaPath] = 'Platform' ";// AND [System.Id] = 188708 ";
+            tfsqc.Query = @"SELECT [System.Id] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject AND [TfsMigrationTool.ReflectedWorkItemId] = '' ORDER BY [System.ChangedDate] desc "; // AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND  [System.WorkItemType] = 'Test Case'  AND  [System.AreaPath] = 'Platform' ";// AND [System.Id] = 452603 ";
             WorkItemCollection sourceWIS = tfsqc.Execute();
             Trace.WriteLine(string.Format("Migrate {0} work items?", sourceWIS.Count));
             //////////////////////////////////////////////////
@@ -66,7 +66,7 @@ namespace TfsWitMigrator.Core
                     if (witdmap.ContainsKey(sourceWI.Type.Name))
                     {
                         newwit = CreateAndPopulateWorkItem(sourceWI, destProject, witdmap[sourceWI.Type.Name].Map(sourceWI));
-                        newwit.Fields["TfsMigrationTool.ReflectedWorkItemId"].Value = sourceWI.Id;
+                        newwit.Fields["TfsMigrationTool.ReflectedWorkItemId"].Value = sourceStore.CreateReflectedWorkItemId(sourceWI);
                         me.ApplyFieldMappings(sourceWI, newwit);
                         ArrayList fails = newwit.Validate();
                         foreach (Field f in fails)
@@ -91,7 +91,7 @@ namespace TfsWitMigrator.Core
                             Trace.WriteLine(string.Format("...And Date Created Updated"));
                             if (sourceWI.Fields.Contains("TfsMigrationTool.ReflectedWorkItemId"))
                             {
-                                sourceWI.Fields["TfsMigrationTool.ReflectedWorkItemId"].Value = newwit.Id;
+                                sourceWI.Fields["TfsMigrationTool.ReflectedWorkItemId"].Value = targetStore.CreateReflectedWorkItemId(newwit);
                                 sourceWI.Save();
                             }
 

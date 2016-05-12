@@ -92,7 +92,8 @@ namespace TfsWitMigrator.Core
                         break;
                     case TestSuiteType.RequirementTestSuite:
                         int sourceRid = ((IRequirementTestSuite)sourceSuit).RequirementId;
-                        WorkItem targetReq = targetWitStore.FindReflectedWorkItemByReflectedWorkItemId(sourceRid);
+                        WorkItem sourceReq = sourceWitStore.Store.GetWorkItem(sourceRid);
+                        WorkItem targetReq = targetWitStore.FindReflectedWorkItemByReflectedWorkItemId(sourceReq);
                         targetSuitChild = CreateNewRequirementTestSuite(sourceSuit, targetReq);
                         break;
                     default:

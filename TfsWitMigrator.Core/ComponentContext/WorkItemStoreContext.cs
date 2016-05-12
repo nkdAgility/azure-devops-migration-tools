@@ -27,10 +27,14 @@ namespace TfsWitMigrator.Core
             return (from Project x in wistore.Projects where x.Name == targetTfs.Name select x).SingleOrDefault();
         }
 
-        
+        public string CreateReflectedWorkItemId(WorkItem wi)
+        {
+            return string.Format("{0}/{1}/{2}", wi.Store.TeamProjectCollection.Uri, wi.Project.Name, wi.Id);
+        }
 
         public WorkItem FindReflectedWorkItem(WorkItem workItemToFind)
         {
+            string ReflectedWorkItemId = CreateReflectedWorkItemId(workItemToFind);
             WorkItem found = null;
             if (foundWis.ContainsKey(workItemToFind.Id))
             {
@@ -38,10 +42,16 @@ namespace TfsWitMigrator.Core
             }
             if (workItemToFind.Fields.Contains("TfsMigrationTool.ReflectedWorkItemId") && !string.IsNullOrEmpty( workItemToFind.Fields["TfsMigrationTool.ReflectedWorkItemId"].Value.ToString()))
             {
-                found = Store.GetWorkItem(int.Parse(workItemToFind.Fields["TfsMigrationTool.ReflectedWorkItemId"].Value.ToString()));
+                string rwiid = workItemToFind.Fields["TfsMigrationTool.ReflectedWorkItemId"].Value.ToString();
+                int idToFind = int.Parse(rwiid.Substring(rwiid.LastIndexOf(@"/")));
+                found = Store.GetWorkItem(idToFind);
+                if (!(found.Fields["TfsMigrationTool.ReflectedWorkItemId"].Value.ToString() == rwiid))
+                {
+                    found = null;
+                }
             }
-            if (found == null) { found = FindReflectedWorkItemByReflectedWorkItemId(workItemToFind.Id); }
-            if (found == null) { found = FindReflectedWorkItemByMigrationRef(workItemToFind.Id); }
+            if (found == null) { found = FindReflectedWorkItemByReflectedWorkItemId(ReflectedWorkItemId); }
+            if (found == null) { found = FindReflectedWorkItemByMigrationRef(ReflectedWorkItemId); }
             //if (found == null) { found = FindReflectedWorkItemByTitle(workItemToFind.Title); }
             if (found != null) 
             {
@@ -51,7 +61,12 @@ namespace TfsWitMigrator.Core
             return found;
         }
 
-        public WorkItem FindReflectedWorkItemByReflectedWorkItemId(int refId)
+        public WorkItem FindReflectedWorkItemByReflectedWorkItemId(WorkItem refWi)
+        {
+            return FindReflectedWorkItemByReflectedWorkItemId(CreateReflectedWorkItemId(refWi));
+        }
+
+        public WorkItem FindReflectedWorkItemByReflectedWorkItemId(string refId)
         {
             TfsQueryContext query = new TfsQueryContext(this);
             query.Query = @"SELECT [System.Id] FROM WorkItems  WHERE [System.TeamProject]=@TeamProject AND [TfsMigrationTool.ReflectedWorkItemId] = @idToFind";
@@ -60,7 +75,7 @@ namespace TfsWitMigrator.Core
             return FindWorkItemByQuery(query);
         }
 
-        public WorkItem FindReflectedWorkItemByMigrationRef(int refId)
+        public WorkItem FindReflectedWorkItemByMigrationRef(string refId)
         {
             TfsQueryContext query = new TfsQueryContext(this);
             query.Query = @"SELECT [System.Id] FROM WorkItems  WHERE [System.TeamProject]=@TeamProject AND [System.Description] Contains @KeyToFind";
