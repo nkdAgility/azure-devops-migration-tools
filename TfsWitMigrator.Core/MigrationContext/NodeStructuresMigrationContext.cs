@@ -26,16 +26,22 @@ namespace TfsWitMigrator.Core
             ICommonStructureService sourceCss = (ICommonStructureService)me.Source.Collection.GetService(typeof(ICommonStructureService));
             ProjectInfo sourceProjectInfo = sourceCss.GetProjectFromName(me.Source.Name);
             NodeInfo[] sourceNodes = sourceCss.ListStructures(sourceProjectInfo.Uri);
-            XmlElement sourceAreaTree = sourceCss.GetNodesXml(new string[] { sourceNodes[0].Uri }, true);
-            XmlElement sourceIterationsTree = sourceCss.GetNodesXml(new string[] { sourceNodes[1].Uri }, true);
+            XmlElement sourceAreaTree = sourceCss.GetNodesXml(new string[] { sourceNodes[1].Uri }, true);
+            XmlElement sourceIterationsTree = sourceCss.GetNodesXml(new string[] { sourceNodes[0].Uri }, true);
             //////////////////////////////////////////////////
             ICommonStructureService targetCss = (ICommonStructureService)me.Target.Collection.GetService(typeof(ICommonStructureService));
             //////////////////////////////////////////////////
 
             NodeInfo areaParent = CreateNode(targetCss, me.Source.Name, targetCss.GetNodeFromPath(string.Format("\\{0}\\Area", me.Target.Name)));
+            if (sourceAreaTree.ChildNodes[0].ChildNodes[0].HasChildNodes)
+            { 
             CreateNodes(sourceAreaTree.ChildNodes[0].ChildNodes[0].ChildNodes, targetCss, areaParent);
+            }
             NodeInfo iterationParent = CreateNode(targetCss, me.Source.Name, targetCss.GetNodeFromPath(string.Format("\\{0}\\Iteration", me.Target.Name)));
-            CreateNodes(sourceIterationsTree.ChildNodes[0].ChildNodes[0].ChildNodes, targetCss, iterationParent);
+            if (sourceIterationsTree.ChildNodes[0].ChildNodes[0].HasChildNodes)
+            {
+                CreateNodes(sourceIterationsTree.ChildNodes[0].ChildNodes[0].ChildNodes, targetCss, iterationParent);
+            }
             //////////////////////////////////////////////////
         }
 
