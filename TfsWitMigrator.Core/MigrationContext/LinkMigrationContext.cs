@@ -33,7 +33,7 @@ namespace TfsWitMigrator.Core
             WorkItemStoreContext sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.None);
             TfsQueryContext tfsqc = new TfsQueryContext(sourceStore);
             tfsqc.AddParameter("TeamProject", me.Source.Name);
-            tfsqc.Query = @"SELECT [System.Id] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject AND [System.RelatedLinkCount] > 0 ORDER BY [System.ChangedDate] desc "; // AND  [Microsoft.VSTS.Common.ClosedDate] = ''
+            tfsqc.Query = @"SELECT [System.Id] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject AND [System.RelatedLinkCount] > 0 AND  [System.Description] NOT CONTAINS '##LINKS-DONE##' ORDER BY [System.ChangedDate] desc "; // AND  [Microsoft.VSTS.Common.ClosedDate] = ''
             WorkItemCollection sourceWIS = tfsqc.Execute();
             //////////////////////////////////////////////////
 
