@@ -38,7 +38,7 @@ namespace TfsWitMigrator.Core
             foreach (string file in files)
             {
                 string fileName = System.IO.Path.GetFileName(file);
-                string reflectedID =fileName.Split('#')[0];
+                string reflectedID =fileName.Split('#')[0].Replace('+', ':').Replace('-','/');
                  targetWI = targetStore.FindReflectedWorkItemByReflectedWorkItemId(reflectedID);
                 if (targetWI != null)
                 {
