@@ -43,7 +43,7 @@ namespace TfsWitMigrator.Core
             if (workItemToFind.Fields.Contains("TfsMigrationTool.ReflectedWorkItemId") && !string.IsNullOrEmpty( workItemToFind.Fields["TfsMigrationTool.ReflectedWorkItemId"].Value.ToString()))
             {
                 string rwiid = workItemToFind.Fields["TfsMigrationTool.ReflectedWorkItemId"].Value.ToString();
-                int idToFind = int.Parse(rwiid.Substring(rwiid.LastIndexOf(@"/")));
+                int idToFind = int.Parse(rwiid.Substring(rwiid.LastIndexOf(@"/")+1));
                 found = Store.GetWorkItem(idToFind);
                 if (!(found.Fields["TfsMigrationTool.ReflectedWorkItemId"].Value.ToString() == rwiid))
                 {

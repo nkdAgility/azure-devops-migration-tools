@@ -73,6 +73,8 @@ namespace TfsWitMigrator.Core
                         }
                     }
                 }
+                wiSourceL.Description = wiSourceL.Description + "<br />##LINKS-DONE##";
+                wiSourceL.Save();
                 current--;
             }
 
@@ -130,7 +132,7 @@ namespace TfsWitMigrator.Core
                     {
                         Trace.WriteLine(string.Format("  [CREATE-FAIL] Adding Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id));
                         Trace.TraceError(ex.ToString());
-                        return;
+                        throw ex;
                     }
                 }
                 else
