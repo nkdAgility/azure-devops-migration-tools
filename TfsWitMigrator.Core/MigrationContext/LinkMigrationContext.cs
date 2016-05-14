@@ -43,6 +43,7 @@ namespace TfsWitMigrator.Core
             WorkItemStoreContext targetWitsc = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
             Project targetProj = targetWitsc.GetProject();
             //////////////////////////////////////////////////
+            
             foreach (WorkItem wiSourceL in sourceWIS)
             {
                 WorkItem wiTargetL = targetWitsc.FindReflectedWorkItem(wiSourceL);
