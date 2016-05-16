@@ -43,7 +43,6 @@ namespace TfsWitMigrator.Core
             WorkItemStoreContext targetWitsc = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
             Project targetProj = targetWitsc.GetProject();
             //////////////////////////////////////////////////
-            
             foreach (WorkItem wiSourceL in sourceWIS)
             {
                 WorkItem wiTargetL = targetWitsc.FindReflectedWorkItem(wiSourceL);
@@ -62,35 +61,37 @@ namespace TfsWitMigrator.Core
                 }
                 else
                 {
-                    foreach (Link item in wiSourceL.Links)
+                    try
                     {
-                        if (IsHyperlink(item))
+                        foreach (Link item in wiSourceL.Links)
                         {
-                            CreateHyperlink((Hyperlink)item, wiTargetL);
-                        }
-                        if (IsRelatedLink(item))
-                        {
-                            RelatedLink rl = (RelatedLink)item;
-                            try
+                            if (IsHyperlink(item))
                             {
+                                CreateHyperlink((Hyperlink)item, wiTargetL);
+                            }
+                            if (IsRelatedLink(item))
+                            {
+                                RelatedLink rl = (RelatedLink)item;
                                 CreateRelatedLink(wiSourceL, rl, wiTargetL, sourceStore, targetWitsc);
-                                wiSourceL.Description = wiSourceL.Description + "<br />##LINKS-DONE##";
-                                wiSourceL.Save();
                             }
-                            catch (WorkItemLinkValidationException ex)
-                            {
-                                Trace.WriteLine(string.Format("  [CREATE-FAIL] Adding Link of type {0} where wiSourceL={1}", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id));
-                                Trace.TraceError(ex.ToString());
-                                //throw ex;
-                            }
-                            catch (Exception ex)
-                            {
-                                Trace.WriteLine(string.Format("  [CREATE-FAIL] Adding Link of type {0} where wiSourceL={1}", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id));
-                                Trace.TraceError(ex.ToString());
-                            }
-                            
                         }
+                       wiSourceL.Description = wiSourceL.Description + "<br />##LINKS-DONE##";
+                        wiSourceL.Save();
                     }
+                    catch (WorkItemLinkValidationException ex)
+                    {
+                        wiSourceL.Reset();
+                        wiTargetL.Reset();
+                        Trace.WriteLine(string.Format("  [WorkItemLinkValidationException] Adding link for wiSourceL={0}", wiSourceL.Id));
+                        Trace.TraceError(ex.ToString());
+                        //throw ex;
+                    }
+                    catch (Exception ex)
+                    {
+                        Trace.WriteLine(string.Format("  [CREATE-FAIL] Adding Link for wiSourceL={0}", wiSourceL.Id));
+                        Trace.TraceError(ex.ToString());
+                    }
+
                 }
                 current--;
             }
@@ -133,19 +134,33 @@ namespace TfsWitMigrator.Core
                     return;
                 }
 
-                if (!IsExisting)
+                if (!IsExisting && !wiTargetR.IsAccessDenied)
                 {
                     Trace.WriteLine(string.Format("  [CREATE-START] Adding Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id));
                     WorkItemLinkTypeEnd linkTypeEnd = targetStore.Store.WorkItemLinkTypes.LinkTypeEnds[rl.LinkTypeEnd.ImmutableName];
                     RelatedLink newRl = new RelatedLink(linkTypeEnd, wiTargetR.Id);
-                    wiTargetL.Links.Add(newRl);
-                    wiTargetL.Save();
+                    try
+                    {
+                        wiTargetL.Links.Add(newRl);
+                        wiTargetL.Save();
+                    }
+                    catch (Exception ex)
+                    {
+                        throw ex;
+                    }
+
                     Trace.WriteLine(string.Format("  [CREATE-SUCESS] Adding Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id));
                 }
                 else
                 {
-                    // Yes Link
-                    Trace.WriteLine(string.Format("  [SKIP] Already Exists a Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id));
+                    if (IsExisting) 
+                    {
+                        Trace.WriteLine(string.Format("  [SKIP] Already Exists a Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id));
+                    }
+                    if (wiTargetR.IsAccessDenied)
+                    {
+                        Trace.WriteLine(string.Format("  [AccessDenied] The Target  work item is inaccessable to create a Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id));
+                    }
                 }
 
             }
