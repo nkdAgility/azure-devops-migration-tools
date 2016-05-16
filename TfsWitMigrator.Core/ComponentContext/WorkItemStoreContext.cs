@@ -31,6 +31,11 @@ namespace TfsWitMigrator.Core
         {
             return string.Format("{0}/{1}/{2}", wi.Store.TeamProjectCollection.Uri, wi.Project.Name, wi.Id);
         }
+        public int GetReflectedWorkItemId(WorkItem wi)
+        {
+            string rwiid = wi.Fields["TfsMigrationTool.ReflectedWorkItemId"].Value.ToString();
+            return int.Parse(rwiid.Substring(rwiid.LastIndexOf(@"/") + 1));
+        }
 
         public WorkItem FindReflectedWorkItem(WorkItem workItemToFind)
         {
@@ -43,7 +48,7 @@ namespace TfsWitMigrator.Core
             if (workItemToFind.Fields.Contains("TfsMigrationTool.ReflectedWorkItemId") && !string.IsNullOrEmpty( workItemToFind.Fields["TfsMigrationTool.ReflectedWorkItemId"].Value.ToString()))
             {
                 string rwiid = workItemToFind.Fields["TfsMigrationTool.ReflectedWorkItemId"].Value.ToString();
-                int idToFind = int.Parse(rwiid.Substring(rwiid.LastIndexOf(@"/")+1));
+                int idToFind = GetReflectedWorkItemId(workItemToFind);
                 found = Store.GetWorkItem(idToFind);
                 if (!(found.Fields["TfsMigrationTool.ReflectedWorkItemId"].Value.ToString() == rwiid))
                 {
