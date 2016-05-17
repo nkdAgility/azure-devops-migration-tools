@@ -45,7 +45,7 @@ namespace TfsWitMigrator.Core
             //////////////////////////////////////////////////
             foreach (WorkItem wiSourceL in sourceWIS)
             {
-                WorkItem wiTargetL = targetWitsc.FindReflectedWorkItem(wiSourceL);
+                WorkItem wiTargetL = targetWitsc.FindReflectedWorkItem(wiSourceL, me.ReflectedWorkItemIdFieldName);
                 if (wiTargetL == null)
                 {
                     //wiSourceL was not migrated, or the migrated work item has been deleted. 
@@ -183,7 +183,7 @@ namespace TfsWitMigrator.Core
             else
             {
                 // Moving to Other Team Project from SOurceR
-                wiTargetR = targetStore.FindReflectedWorkItem(wiSourceR);
+                wiTargetR = targetStore.FindReflectedWorkItem(wiSourceR, me.ReflectedWorkItemIdFieldName);
                 if (wiTargetR == null) // Assume source only (other team projkect)
                 {
                     wiTargetR = wiSourceR;

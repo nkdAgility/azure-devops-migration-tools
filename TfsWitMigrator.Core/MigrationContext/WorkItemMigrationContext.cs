@@ -33,7 +33,7 @@ namespace TfsWitMigrator.Core
             WorkItemStoreContext sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.BypassRules);
             TfsQueryContext tfsqc = new TfsQueryContext(sourceStore);
             tfsqc.AddParameter("TeamProject", me.Source.Name);
-            tfsqc.Query = @"SELECT [System.Id] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug') ORDER BY [System.ChangedDate] desc "; // AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND  [System.WorkItemType] = 'Test Case'  AND  [System.AreaPath] = 'Platform' ";// AND [System.Id] = 452603 ";
+            tfsqc.Query = @"SELECT [System.Id] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject  ORDER BY [System.ChangedDate] desc "; // AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug') AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND  [System.WorkItemType] = 'Test Case'  AND  [System.AreaPath] = 'Platform' ";// AND [System.Id] = 452603 ";
             WorkItemCollection sourceWIS = tfsqc.Execute();
             Trace.WriteLine(string.Format("Migrate {0} work items?", sourceWIS.Count));
             //////////////////////////////////////////////////
@@ -41,14 +41,22 @@ namespace TfsWitMigrator.Core
             Project destProject = targetStore.GetProject();
             Trace.WriteLine(string.Format("Found target project as {0}", destProject.Name));
             Dictionary<string, IWitdMapper> witdmap = new Dictionary<string, IWitdMapper>();
-            witdmap.Add("User Story", new DescreteWitdMapper("User Story"));
-            witdmap.Add("Requirement", new DescreteWitdMapper("Requirement"));
+            //witdmap.Add("User Story", new DescreteWitdMapper("User Story"));
+            //witdmap.Add("Requirement", new DescreteWitdMapper("Requirement"));
+            //witdmap.Add("Task", new DescreteWitdMapper("Task"));
+            //witdmap.Add("Bug", new DescreteWitdMapper("Bug"));
+            //witdmap.Add("Issue", new DescreteWitdMapper("Issue"));
+            //witdmap.Add("Test Case", new DescreteWitdMapper("Test Case"));
+            //witdmap.Add("Shared Steps", new DescreteWitdMapper("Shared Steps"));
+            //witdmap.Add("Stakeholder", new DescreteWitdMapper("Stakeholder"));
+            witdmap.Add("Product Backlog Item", new DescreteWitdMapper("Product Backlog Itemy"));
+            //witdmap.Add("Requirement", new DescreteWitdMapper("Requirement"));
             witdmap.Add("Task", new DescreteWitdMapper("Task"));
             witdmap.Add("Bug", new DescreteWitdMapper("Bug"));
-            witdmap.Add("Issue", new DescreteWitdMapper("Issue"));
-            witdmap.Add("Test Case", new DescreteWitdMapper("Test Case"));
-            witdmap.Add("Shared Steps", new DescreteWitdMapper("Shared Steps"));
-            witdmap.Add("Stakeholder", new DescreteWitdMapper("Stakeholder"));
+            //witdmap.Add("Issue", new DescreteWitdMapper("Issue"));
+            //witdmap.Add("Test Case", new DescreteWitdMapper("Test Case"));
+            //witdmap.Add("Shared Steps", new DescreteWitdMapper("Shared Steps"));
+            //witdmap.Add("Stakeholder", new DescreteWitdMapper("Stakeholder"));
             int current = sourceWIS.Count;
             int count = 0;
             long elapsedms = 0;
@@ -57,7 +65,7 @@ namespace TfsWitMigrator.Core
                 Stopwatch witstopwatch = new Stopwatch();
                 witstopwatch.Start();
                 WorkItem targetFound;
-                targetFound = targetStore.FindReflectedWorkItem(sourceWI);
+                targetFound = targetStore.FindReflectedWorkItem(sourceWI, me.ReflectedWorkItemIdFieldName);
                 Trace.WriteLine(string.Format("{0} - Migrating: {1}-{2}", current, sourceWI.Id, sourceWI.Type.Name));
                 if (targetFound == null)
                 {
@@ -66,7 +74,10 @@ namespace TfsWitMigrator.Core
                     if (witdmap.ContainsKey(sourceWI.Type.Name))
                     {
                         newwit = CreateAndPopulateWorkItem(sourceWI, destProject, witdmap[sourceWI.Type.Name].Map(sourceWI));
-                        newwit.Fields["TfsMigrationTool.ReflectedWorkItemId"].Value = sourceStore.CreateReflectedWorkItemId(sourceWI);
+                        if (newwit.Fields.Contains(me.ReflectedWorkItemIdFieldName))
+                        {
+                            newwit.Fields[me.ReflectedWorkItemIdFieldName].Value = sourceStore.CreateReflectedWorkItemId(sourceWI);
+                        }
                         me.ApplyFieldMappings(sourceWI, newwit);
                         ArrayList fails = newwit.Validate();
                         foreach (Field f in fails)
@@ -89,9 +100,9 @@ namespace TfsWitMigrator.Core
                             newwit.Fields["System.CreatedDate"].Value = sourceWI.Fields["System.CreatedDate"].Value;
                             newwit.Save();
                             Trace.WriteLine(string.Format("...And Date Created Updated"));
-                            if (sourceWI.Fields.Contains("TfsMigrationTool.ReflectedWorkItemId"))
+                            if (sourceWI.Fields.Contains(me.ReflectedWorkItemIdFieldName))
                             {
-                                sourceWI.Fields["TfsMigrationTool.ReflectedWorkItemId"].Value = targetStore.CreateReflectedWorkItemId(newwit);
+                                sourceWI.Fields[me.ReflectedWorkItemIdFieldName].Value = targetStore.CreateReflectedWorkItemId(newwit);
                                 sourceWI.Save();
                             }
 

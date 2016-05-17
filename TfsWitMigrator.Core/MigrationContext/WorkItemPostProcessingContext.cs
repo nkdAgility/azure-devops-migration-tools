@@ -74,7 +74,7 @@ namespace TfsWitMigrator.Core
                 Stopwatch witstopwatch = new Stopwatch();
                 witstopwatch.Start();
                 WorkItem targetFound;
-                targetFound = targetStore.FindReflectedWorkItem(sourceWI);
+                targetFound = targetStore.FindReflectedWorkItem(sourceWI, me.ReflectedWorkItemIdFieldName);
                 Trace.WriteLine(string.Format("{0} - Updating: {1}-{2}", current, sourceWI.Id, sourceWI.Type.Name));
                 if (targetFound == null)
                 {

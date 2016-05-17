@@ -51,7 +51,7 @@ namespace TfsWitMigrator.Core
             {
                 Stopwatch witstopwatch = new Stopwatch();
                 witstopwatch.Start();
-                int wid = targetStore.GetReflectedWorkItemId(sourceWI);
+                int wid = targetStore.GetReflectedWorkItemId(sourceWI, me.ReflectedWorkItemIdFieldName);
                 int windex = targetWIS.IndexOf(wid);
                 WorkItem targetFound = targetWIS[windex];
                 if (targetFound == null)

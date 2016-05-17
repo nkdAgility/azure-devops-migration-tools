@@ -39,7 +39,7 @@ namespace TfsWitMigrator.Core
             {
                 string fileName = System.IO.Path.GetFileName(file);
                 string reflectedID =fileName.Split('#')[0].Replace('+', ':').Replace('-','/');
-                 targetWI = targetStore.FindReflectedWorkItemByReflectedWorkItemId(reflectedID);
+                 targetWI = targetStore.FindReflectedWorkItemByReflectedWorkItemId(reflectedID, me.ReflectedWorkItemIdFieldName);
                 if (targetWI != null)
                 {
                     Trace.WriteLine(string.Format("{0} of {1} - Import {2} to {3}", current, files.Count, fileName, targetWI.Id));
