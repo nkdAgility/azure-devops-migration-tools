@@ -45,7 +45,7 @@ namespace TfsWitMigrator.Core
             {
                 return foundWis[workItemToFind.Id];
             }
-            if (workItemToFind.Fields.Contains(reflectedWotkItemIdField) && !string.IsNullOrEmpty( workItemToFind.Fields["TfsMigrationTool.ReflectedWorkItemId"].Value.ToString()))
+            if (workItemToFind.Fields.Contains(reflectedWotkItemIdField) && !string.IsNullOrEmpty( workItemToFind.Fields[reflectedWotkItemIdField].Value.ToString()))
             {
                 string rwiid = workItemToFind.Fields[reflectedWotkItemIdField].Value.ToString();
                 int idToFind = GetReflectedWorkItemId(workItemToFind, reflectedWotkItemIdField);
