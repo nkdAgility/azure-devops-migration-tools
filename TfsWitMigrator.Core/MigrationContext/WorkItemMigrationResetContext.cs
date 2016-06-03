@@ -10,17 +10,17 @@ using System.Text.RegularExpressions;
 
 namespace TfsWitMigrator.Core
 {
-    public class WorkItemMigrationContext : MigrationContextBase
+    public class WorkItemMigrationResetContext : MigrationContextBase
     {
         public override string Name
         {
             get
             {
-                return "WorkItemMigrationContext";
+                return "WorkItemMigrationResetContext";
             }
         }
 
-        public WorkItemMigrationContext(MigrationEngine me) : base(me)
+        public WorkItemMigrationResetContext(MigrationEngine me) : base(me)
         {
 
         }
@@ -33,30 +33,17 @@ namespace TfsWitMigrator.Core
             WorkItemStoreContext sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.BypassRules);
             TfsQueryContext tfsqc = new TfsQueryContext(sourceStore);
             tfsqc.AddParameter("TeamProject", me.Source.Name);
-            tfsqc.Query = @"SELECT [System.Id] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug') ORDER BY [System.ChangedDate] ass "; // AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND  [System.WorkItemType] = 'Test Case'  AND  [System.AreaPath] = 'Platform' ";// AND [System.Id] = 452603 ";
+            tfsqc.Query = @"SELECT [System.Id], [TfsMigrationTool.ReflectedWorkItemId] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject AND [TfsMigrationTool.ReflectedWorkItemId] <> '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug') ORDER BY [System.ChangedDate] desc "; 
             WorkItemCollection sourceWIS = tfsqc.Execute();
-            Trace.WriteLine(string.Format("Migrate {0} work items?", sourceWIS.Count));
+            Trace.WriteLine(string.Format("Source {0} work items?", sourceWIS.Count));
             //////////////////////////////////////////////////
             WorkItemStoreContext targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
             Project destProject = targetStore.GetProject();
-            Trace.WriteLine(string.Format("Found target project as {0}", destProject.Name));
-            Dictionary<string, IWitdMapper> witdmap = new Dictionary<string, IWitdMapper>();
-            //witdmap.Add("User Story", new DescreteWitdMapper("User Story"));
-            //witdmap.Add("Requirement", new DescreteWitdMapper("Requirement"));
-            //witdmap.Add("Task", new DescreteWitdMapper("Task"));
-            //witdmap.Add("Bug", new DescreteWitdMapper("Bug"));
-            //witdmap.Add("Issue", new DescreteWitdMapper("Issue"));
-            //witdmap.Add("Test Case", new DescreteWitdMapper("Test Case"));
-            //witdmap.Add("Shared Steps", new DescreteWitdMapper("Shared Steps"));
-            //witdmap.Add("Stakeholder", new DescreteWitdMapper("Stakeholder"));
-            witdmap.Add("Product Backlog Item", new DescreteWitdMapper("Product Backlog Itemy"));
-            //witdmap.Add("Requirement", new DescreteWitdMapper("Requirement"));
-            witdmap.Add("Task", new DescreteWitdMapper("Task"));
-            witdmap.Add("Bug", new DescreteWitdMapper("Bug"));
-            //witdmap.Add("Issue", new DescreteWitdMapper("Issue"));
-            //witdmap.Add("Test Case", new DescreteWitdMapper("Test Case"));
-            //witdmap.Add("Shared Steps", new DescreteWitdMapper("Shared Steps"));
-            //witdmap.Add("Stakeholder", new DescreteWitdMapper("Stakeholder"));
+            TfsQueryContext tfstqc = new TfsQueryContext(targetStore);
+            tfstqc.AddParameter("TeamProject", me.Target.Name);
+            tfstqc.Query = @"SELECT [System.Id], [TfsMigrationTool.ReflectedWorkItemId] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject AND [TfsMigrationTool.ReflectedWorkItemId] <> '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug') ORDER BY [System.ChangedDate] desc ";
+            WorkItemCollection targetWIS = tfstqc.Execute();
+            Trace.WriteLine(string.Format("Target {0} work items?", targetWIS.Count));
             int current = sourceWIS.Count;
             int count = 0;
             long elapsedms = 0;
@@ -64,69 +51,18 @@ namespace TfsWitMigrator.Core
             {
                 Stopwatch witstopwatch = new Stopwatch();
                 witstopwatch.Start();
-                WorkItem targetFound;
-                targetFound = targetStore.FindReflectedWorkItem(sourceWI, me.ReflectedWorkItemIdFieldName);
-                Trace.WriteLine(string.Format("{0} - Migrating: {1}-{2}", current, sourceWI.Id, sourceWI.Type.Name));
+                int wid = targetStore.GetReflectedWorkItemId(sourceWI, me.ReflectedWorkItemIdFieldName);
+                int windex = targetWIS.IndexOf(wid);
+                WorkItem targetFound = targetWIS[windex];
                 if (targetFound == null)
                 {
-                    WorkItem newwit = null;
-                    // Deside on WIT
-                    if (witdmap.ContainsKey(sourceWI.Type.Name))
-                    {
-                        newwit = CreateAndPopulateWorkItem(sourceWI, destProject, witdmap[sourceWI.Type.Name].Map(sourceWI));
-                        if (newwit.Fields.Contains(me.ReflectedWorkItemIdFieldName))
-                        {
-                            newwit.Fields[me.ReflectedWorkItemIdFieldName].Value = sourceStore.CreateReflectedWorkItemId(sourceWI);
-                        }
-                        me.ApplyFieldMappings(sourceWI, newwit);
-                        ArrayList fails = newwit.Validate();
-                        foreach (Field f in fails)
-                        {
-                            Trace.WriteLine(string.Format("{0} - Invalid: {1}-{2}-{3}", current, sourceWI.Id, sourceWI.Type.Name, f.ReferenceName));
-                        }
-                    }
-                    else
-                    {
-                        Trace.WriteLine("...not supported");
-                    }
-
-                    if (newwit != null)
-                    {
-
-                        try
-                        {
-                            newwit.Save();
-                            Trace.WriteLine(string.Format("...Saved as {0}", newwit.Id));
-                            newwit.Fields["System.CreatedDate"].Value = sourceWI.Fields["System.CreatedDate"].Value;
-                            newwit.Save();
-                            Trace.WriteLine(string.Format("...And Date Created Updated"));
-                            if (sourceWI.Fields.Contains(me.ReflectedWorkItemIdFieldName))
-                            {
-                                sourceWI.Fields[me.ReflectedWorkItemIdFieldName].Value = targetStore.CreateReflectedWorkItemId(newwit);
-                                sourceWI.Save();
-                            }
-
-                        }
-                        catch (Exception ex)
-                        {
-                            Trace.WriteLine("...FAILED to Save");
-                            foreach (Field f in newwit.Fields)
-                            {
-                                Trace.WriteLine(string.Format("{0} | {1}", f.ReferenceName, f.Value));
-                            }
-                            Trace.WriteLine(ex.ToString());
-                        }
-                    }
+                    Console.WriteLine("Reseting Source: {0}", sourceWI.Id);
+                    sourceWI.Fields["TfsMigrationTool.ReflectedWorkItemId"].Value = "";
+                    sourceWI.Save();
                 }
                 else
                 {
-                    Console.WriteLine("...Exists");
-
-                    //  sourceWI.Open();
-                    //  sourceWI.SyncToLatest();
-                    //  sourceWI.Fields["TfsMigrationTool.ReflectedWorkItemId"].Value = destWIFound[0].Id;
-
-                    sourceWI.Save();
+                    Console.WriteLine("Target Exists for: {0}", sourceWI.Id);
                 }
                 witstopwatch.Stop();
                 elapsedms = elapsedms + witstopwatch.ElapsedMilliseconds;

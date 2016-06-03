@@ -52,8 +52,17 @@ namespace TfsWitMigrator.Core
                     if (!File.Exists(fpath))
                     {
                         Trace.Write("...downloading");
-                        webClient.DownloadFile(wia.Uri, fpath);
-                        Trace.Write("...done");
+                        try
+                        {
+                            webClient.DownloadFile(wia.Uri, fpath);
+                            Trace.Write("...done");
+                        }
+                        catch (Exception ex)
+                        {
+
+                            Trace.Write("...failed");
+                        }
+                     
                     }
                     else
                     {

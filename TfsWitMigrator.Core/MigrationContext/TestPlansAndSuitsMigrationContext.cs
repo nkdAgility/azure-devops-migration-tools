@@ -93,7 +93,7 @@ namespace TfsWitMigrator.Core
                     case TestSuiteType.RequirementTestSuite:
                         int sourceRid = ((IRequirementTestSuite)sourceSuit).RequirementId;
                         WorkItem sourceReq = sourceWitStore.Store.GetWorkItem(sourceRid);
-                        WorkItem targetReq = targetWitStore.FindReflectedWorkItemByReflectedWorkItemId(sourceReq);
+                        WorkItem targetReq = targetWitStore.FindReflectedWorkItemByReflectedWorkItemId(sourceReq, me.ReflectedWorkItemIdFieldName);
                         targetSuitChild = CreateNewRequirementTestSuite(sourceSuit, targetReq);
                         break;
                     default:
@@ -138,7 +138,7 @@ namespace TfsWitMigrator.Core
                 foreach (ITestSuiteEntry sourceTestCaseEntry in source.TestCases)
                 {
                     Trace.WriteLine(string.Format("    Processing {0} : {1} - {2} ", sourceTestCaseEntry.EntryType.ToString(), sourceTestCaseEntry.Id, sourceTestCaseEntry.Title), "TestPlansAndSuites");
-                    WorkItem wi = targetWitStore.FindReflectedWorkItem(sourceTestCaseEntry.TestCase.WorkItem);
+                    WorkItem wi = targetWitStore.FindReflectedWorkItem(sourceTestCaseEntry.TestCase.WorkItem, me.ReflectedWorkItemIdFieldName);
                     if (wi == null)
                     {
                         Trace.WriteLine(string.Format("    ERROR NOT FOUND {0} : {1} - {2} ", sourceTestCaseEntry.EntryType.ToString(), sourceTestCaseEntry.Id, sourceTestCaseEntry.Title), "TestPlansAndSuites");

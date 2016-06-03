@@ -17,6 +17,8 @@ namespace TfsWitMigrator.Core
         Dictionary<string, List<IFieldMap>> fieldMapps = new Dictionary<string, List<IFieldMap>>();
         ITeamProjectContext source;
         ITeamProjectContext target;
+        string reflectedWorkItemIdFieldName = "TfsMigrationTool.ReflectedWorkItemId";
+
 
         public ITeamProjectContext Source
         {
@@ -32,6 +34,10 @@ namespace TfsWitMigrator.Core
             {
                 return target;
             }
+        }
+        public string ReflectedWorkItemIdFieldName
+        {
+            get { return reflectedWorkItemIdFieldName;}
         }
 
         public ProcessingStatus Run()
@@ -71,6 +77,12 @@ namespace TfsWitMigrator.Core
         public void AddProcessor(ITfsProcessingContext processor)
         {
             processors.Add(processor);
+        }
+
+
+        public void SetReflectedWorkItemIdFieldName(string fieldName)
+        {
+            reflectedWorkItemIdFieldName = fieldName;
         }
 
         public void SetSource(ITeamProjectContext teamProjectContext)

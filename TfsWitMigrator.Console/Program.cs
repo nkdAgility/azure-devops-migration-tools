@@ -23,8 +23,7 @@ namespace ConsoleApplication1
         {
             //C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\CommonExtensions\Microsoft\TeamFoundation\Team Explorer
 
-            ((InProcessTelemetryChannel)TelemetryConfiguration.Active.TelemetryChannel).DeveloperMode = true;
-            ((InProcessTelemetryChannel)TelemetryConfiguration.Active.TelemetryChannel).DataUploadIntervalInSeconds = 5;
+
 
             ////////////////////////////
             Trace.Listeners.Add(new TextWriterTraceListener(Console.Out));
@@ -36,12 +35,12 @@ namespace ConsoleApplication1
             MigrationEngine me = new MigrationEngine();
 
 
-            me.SetSource(new TeamProjectContext(new Uri("http://tfs01:8080/tfs/col1n"), "tp2"));
-            me.SetTarget(new TeamProjectContext(new Uri("http://tfs01:8080/tfs/col12"), "tp4"));
-
-            //me.AddProcessor<NodeStructuresMigrationContext>();
-            //me.AddProcessor<WorkItemMigrationContext>();
-            me.AddProcessor<LinkMigrationContext>();
+            me.SetSource(new TeamProjectContext(new Uri("https://sdd2016.visualstudio.com/"), "DemoProj1"));
+            me.SetTarget(new TeamProjectContext(new Uri("https://sdd2016.visualstudio.com/"), "test1"));
+            me.SetReflectedWorkItemIdFieldName("ReflectedWorkItemId");
+            me.AddProcessor<NodeStructuresMigrationContext>();
+            me.AddProcessor<WorkItemMigrationContext>();
+           // me.AddProcessor<LinkMigrationContext>();
             //me.AddProcessor<AttachementExportMigrationContext>();
             // me.AddProcessor<AttachementImportMigrationContext>();
 
