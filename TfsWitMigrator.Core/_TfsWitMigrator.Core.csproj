@@ -276,6 +276,7 @@
     <Compile Include="ProcessingContext\ExportTeamList.cs" />
     <Compile Include="ProcessingContext\FixGitCommitLinks.cs" />
     <Compile Include="ProcessingContext\WorkItemDelete.cs" />
+    <Compile Include="ProcessingContext\CreateTeamFolders.cs" />
     <Compile Include="ProcessingEngine.cs" />
     <Compile Include="MigrationEngine.cs" />
     <Compile Include="ProcessingContext\ImportProfilePictureContext.cs" />

@@ -13,6 +13,7 @@ namespace TfsWitMigrator.Core
     {
         internal MigrationEngine me;
         ProcessingStatus status = ProcessingStatus.None;
+        public MigrationEngine Engine { get { return me; } }
 
         public ProcessingContextBase(MigrationEngine me)
         {

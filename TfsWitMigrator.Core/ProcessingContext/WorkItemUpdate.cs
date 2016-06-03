@@ -14,11 +14,13 @@ namespace TfsWitMigrator.Core
     {
         string _queryBit;
         MigrationEngine _me;
+        bool _whatIf;
 
-        public WorkItemUpdate(MigrationEngine me, string queryBit) : base(me)
+        public WorkItemUpdate(MigrationEngine me, string queryBit, bool whatIf = false) : base(me)
         {
             _me = me;
             _queryBit = queryBit;
+            _whatIf = whatIf;
         }
 
         public override string Name
@@ -38,7 +40,7 @@ namespace TfsWitMigrator.Core
 
             TfsQueryContext tfsqc = new TfsQueryContext(targetStore);
             tfsqc.AddParameter("TeamProject", me.Target.Name);
-            tfsqc.Query = string.Format(@"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE  [System.WorkItemType] = 'Task'  AND  [System.State] = 'To Do'", _queryBit);
+            tfsqc.Query = string.Format(@"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY [System.ChangedDate] desc", _queryBit);
             WorkItemCollection  workitems = tfsqc.Execute();
             Trace.WriteLine(string.Format("Update {0} work items?", workitems.Count));
             //////////////////////////////////////////////////
@@ -48,15 +50,24 @@ namespace TfsWitMigrator.Core
             foreach (WorkItem workitem in workitems)
             {
                 Stopwatch witstopwatch = new Stopwatch();
-                witstopwatch.Start();
-               
+                witstopwatch.Start();                
                 workitem.Open();
-
+                Trace.WriteLine(string.Format("Processing work item {0} - Type:{1} - ChangedDate:{2} - CreatedDate:{3}", workitem.Id, workitem.Type.Name, workitem.ChangedDate.ToShortDateString(), workitem.CreatedDate.ToShortDateString()));
                 _me.ApplyFieldMappings(workitem);
 
                 if (workitem.IsDirty)
                 {
-                    workitem.Save();
+                    if (!_whatIf)
+                    {
+                        workitem.Save();
+                    } else
+                    {
+                        Trace.WriteLine("No save done: (What IF: enabled)");
+                    }
+                    
+                } else
+                {
+                    Trace.WriteLine("No save done: (IsDirty: false)");
                 }
                 
 
