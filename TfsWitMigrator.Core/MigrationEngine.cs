@@ -15,10 +15,18 @@ namespace TfsWitMigrator.Core
         List<ITfsProcessingContext> processors = new List<ITfsProcessingContext>();
         List<Action<WorkItem, WorkItem>> processorActions = new List<Action<WorkItem, WorkItem>>();
         Dictionary<string, List<IFieldMap>> fieldMapps = new Dictionary<string, List<IFieldMap>>();
+        Dictionary<string, IWitdMapper> workItemTypeDefinitions = new Dictionary<string, IWitdMapper>();
         ITeamProjectContext source;
         ITeamProjectContext target;
         string reflectedWorkItemIdFieldName = "TfsMigrationTool.ReflectedWorkItemId";
 
+        public Dictionary<string, IWitdMapper> WorkItemTypeDefinitions
+        {
+            get
+            {
+                return workItemTypeDefinitions;
+            }
+        }
 
         public ITeamProjectContext Source
         {
@@ -103,7 +111,13 @@ namespace TfsWitMigrator.Core
             }
             fieldMapps[workItemTypeName].Add(fieldToTagFieldMap);
         }
-
+         public void AddWorkItemTypeDefinition(string workItemTypeName, IWitdMapper workItemTypeDefinitionMap = null)
+        {
+            if (!witdMap.ContainsKey(workItemTypeName))
+            {
+                witdMap.Add(workItemTypeName, workItemTypeDefinitionMap);
+            }
+        }
 
         internal void ApplyFieldMappings(WorkItem source, WorkItem target)
         { 

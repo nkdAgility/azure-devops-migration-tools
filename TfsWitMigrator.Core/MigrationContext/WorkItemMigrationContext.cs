@@ -40,23 +40,7 @@ namespace TfsWitMigrator.Core
             WorkItemStoreContext targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
             Project destProject = targetStore.GetProject();
             Trace.WriteLine(string.Format("Found target project as {0}", destProject.Name));
-            Dictionary<string, IWitdMapper> witdmap = new Dictionary<string, IWitdMapper>();
-            //witdmap.Add("User Story", new DescreteWitdMapper("User Story"));
-            //witdmap.Add("Requirement", new DescreteWitdMapper("Requirement"));
-            //witdmap.Add("Task", new DescreteWitdMapper("Task"));
-            //witdmap.Add("Bug", new DescreteWitdMapper("Bug"));
-            //witdmap.Add("Issue", new DescreteWitdMapper("Issue"));
-            //witdmap.Add("Test Case", new DescreteWitdMapper("Test Case"));
-            //witdmap.Add("Shared Steps", new DescreteWitdMapper("Shared Steps"));
-            //witdmap.Add("Stakeholder", new DescreteWitdMapper("Stakeholder"));
-            witdmap.Add("Product Backlog Item", new DescreteWitdMapper("Product Backlog Itemy"));
-            //witdmap.Add("Requirement", new DescreteWitdMapper("Requirement"));
-            witdmap.Add("Task", new DescreteWitdMapper("Task"));
-            witdmap.Add("Bug", new DescreteWitdMapper("Bug"));
-            //witdmap.Add("Issue", new DescreteWitdMapper("Issue"));
-            //witdmap.Add("Test Case", new DescreteWitdMapper("Test Case"));
-            //witdmap.Add("Shared Steps", new DescreteWitdMapper("Shared Steps"));
-            //witdmap.Add("Stakeholder", new DescreteWitdMapper("Stakeholder"));
+           
             int current = sourceWIS.Count;
             int count = 0;
             long elapsedms = 0;
@@ -71,9 +55,9 @@ namespace TfsWitMigrator.Core
                 {
                     WorkItem newwit = null;
                     // Deside on WIT
-                    if (witdmap.ContainsKey(sourceWI.Type.Name))
+                    if (me.WorkItemTypeDefinitions.ContainsKey(sourceWI.Type.Name))
                     {
-                        newwit = CreateAndPopulateWorkItem(sourceWI, destProject, witdmap[sourceWI.Type.Name].Map(sourceWI));
+                        newwit = CreateAndPopulateWorkItem(sourceWI, destProject, me.WorkItemTypeDefinitions[sourceWI.Type.Name].Map(sourceWI));
                         if (newwit.Fields.Contains(me.ReflectedWorkItemIdFieldName))
                         {
                             newwit.Fields[me.ReflectedWorkItemIdFieldName].Value = sourceStore.CreateReflectedWorkItemId(sourceWI);

@@ -38,6 +38,11 @@ namespace ConsoleApplication1
             me.SetSource(new TeamProjectContext(new Uri("https://sdd2016.visualstudio.com/"), "DemoProj1"));
             me.SetTarget(new TeamProjectContext(new Uri("https://sdd2016.visualstudio.com/"), "test1"));
             me.SetReflectedWorkItemIdFieldName("ReflectedWorkItemId");
+            me.AddWorkItemTypeDefinition("User Story", new DescreteWitdMapper("User Story"));
+            me.AddWorkItemTypeDefinition("Product Backlog Item", new DescreteWitdMapper("Product Backlog Itemy"));
+            me.AddWorkItemTypeDefinition("Task", new DescreteWitdMapper("Task"));
+            me.AddWorkItemTypeDefinition("Bug", new DescreteWitdMapper("Bug"));
+
             me.AddProcessor<NodeStructuresMigrationContext>();
             me.AddProcessor<WorkItemMigrationContext>();
            // me.AddProcessor<LinkMigrationContext>();
