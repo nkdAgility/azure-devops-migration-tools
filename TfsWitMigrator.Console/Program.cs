@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 using VSTS.DataBulkEditor.Core;
 using VSTS.DataBulkEditor.Core.ComponentContext;
 
-namespace VSTS.DataBulkEditor.Console
+namespace VSTS.DataBulkEditor.ConsoleApp
 {
     class Program
     {
@@ -23,7 +23,7 @@ namespace VSTS.DataBulkEditor.Console
         {
             //C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\CommonExtensions\Microsoft\TeamFoundation\Team Explorer
 
-
+          
 
             ////////////////////////////
             Trace.Listeners.Add(new TextWriterTraceListener(Console.Out));
