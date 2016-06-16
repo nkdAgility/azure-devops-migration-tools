@@ -32,12 +32,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.ApplicationInsights, Version=1.2.3.490, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.ApplicationInsights.1.2.3\lib\net45\Microsoft.ApplicationInsights.dll</HintPath>
+    <Reference Include="Microsoft.ApplicationInsights, Version=2.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ApplicationInsights.2.1.0\lib\net45\Microsoft.ApplicationInsights.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.ApplicationInsights.TraceListener, Version=1.2.6.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.ApplicationInsights.TraceListener.1.2.6\lib\net45\Microsoft.ApplicationInsights.TraceListener.dll</HintPath>
+    <Reference Include="Microsoft.ApplicationInsights.TraceListener, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ApplicationInsights.TraceListener.2.0.0\lib\net45\Microsoft.ApplicationInsights.TraceListener.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Diagnostics.Instrumentation.Extensions.Intercept">
@@ -47,16 +47,16 @@
       <HintPath>..\packages\Microsoft.Diagnostics.Tracing.EventSource.Redist.1.1.28\lib\net40\Microsoft.Diagnostics.Tracing.EventSource.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.IdentityModel.Clients.ActiveDirectory, Version=2.26.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.IdentityModel.Clients.ActiveDirectory.2.26.305100852\lib\net45\Microsoft.IdentityModel.Clients.ActiveDirectory.dll</HintPath>
+    <Reference Include="Microsoft.IdentityModel.Clients.ActiveDirectory, Version=3.10.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.Clients.ActiveDirectory.3.10.305231913\lib\net45\Microsoft.IdentityModel.Clients.ActiveDirectory.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.IdentityModel.Clients.ActiveDirectory.WindowsForms, Version=2.26.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.IdentityModel.Clients.ActiveDirectory.2.26.305100852\lib\net45\Microsoft.IdentityModel.Clients.ActiveDirectory.WindowsForms.dll</HintPath>
+    <Reference Include="Microsoft.IdentityModel.Clients.ActiveDirectory.Platform, Version=3.10.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.Clients.ActiveDirectory.3.10.305231913\lib\net45\Microsoft.IdentityModel.Clients.ActiveDirectory.Platform.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.ServiceBus, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\WindowsAzure.ServiceBus.3.2.0\lib\net45-full\Microsoft.ServiceBus.dll</HintPath>
+      <HintPath>..\packages\WindowsAzure.ServiceBus.3.2.2\lib\net45-full\Microsoft.ServiceBus.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.TeamFoundation.Build.Client, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
