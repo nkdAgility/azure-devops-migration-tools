@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Microsoft.TeamFoundation.TestManagement.Client;
 using System.Linq;
 
-namespace TfsWitMigrator.Core.ComponentContext
+namespace VSTS.DataBulkEditor.Core.ComponentContext
 {
     public class TestManagementContext
     {

@@ -6,9 +6,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TfsWitMigrator.Core.ComponentContext;
+using VSTS.DataBulkEditor.Core.ComponentContext;
 
-namespace TfsWitMigrator.Core
+namespace VSTS.DataBulkEditor.Core
 {
    public class MigrationEngine
     {

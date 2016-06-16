@@ -4,17 +4,18 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{68BAF6BA-2BC0-48D0-B892-1D9F93D7003A}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{033EB332-4A50-4C73-9B7D-A35D9F3C0513}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TfsWitMigrator.Core</RootNamespace>
-    <AssemblyName>TfsWitMigrator.Core</AssemblyName>
+    <RootNamespace>VSTS.DataBulkEditor.Console</RootNamespace>
+    <AssemblyName>VSTS.DataBulkEditor.Console</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -24,6 +25,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -31,7 +33,22 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>VSTS.DataBulkEditor.Console.Program</StartupObject>
+  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="GalaSoft.MvvmLight, Version=5.3.0.19026, Culture=neutral, PublicKeyToken=e7570ab207bcb616, processorArchitecture=MSIL">
+      <HintPath>..\packages\MvvmLightLibs.5.3.0.0\lib\net45\GalaSoft.MvvmLight.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="GalaSoft.MvvmLight.Extras, Version=5.3.0.19032, Culture=neutral, PublicKeyToken=669f0b5e8f868abf, processorArchitecture=MSIL">
+      <HintPath>..\packages\MvvmLightLibs.5.3.0.0\lib\net45\GalaSoft.MvvmLight.Extras.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="GalaSoft.MvvmLight.Platform, Version=5.3.0.19032, Culture=neutral, PublicKeyToken=5f873c45e98af8a1, processorArchitecture=MSIL">
+      <HintPath>..\packages\MvvmLightLibs.5.3.0.0\lib\net45\GalaSoft.MvvmLight.Platform.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.ApplicationInsights, Version=2.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.ApplicationInsights.2.1.0\lib\net45\Microsoft.ApplicationInsights.dll</HintPath>
       <Private>True</Private>
@@ -51,6 +68,9 @@
     <Reference Include="Microsoft.IdentityModel.Clients.ActiveDirectory.Platform, Version=3.10.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.IdentityModel.Clients.ActiveDirectory.3.10.305231913\lib\net45\Microsoft.IdentityModel.Clients.ActiveDirectory.Platform.dll</HintPath>
       <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Practices.ServiceLocation">
+      <HintPath>..\packages\CommonServiceLocator.1.3\lib\portable-net4+sl5+netcore45+wpa81+wp8\Microsoft.Practices.ServiceLocation.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ServiceBus, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\WindowsAzure.ServiceBus.3.2.2\lib\net45-full\Microsoft.ServiceBus.dll</HintPath>
@@ -223,9 +243,6 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.DirectoryServices" />
-    <Reference Include="System.DirectoryServices.AccountManagement" />
-    <Reference Include="System.Drawing" />
     <Reference Include="System.IdentityModel.Tokens.Jwt, Version=4.0.20622.1351, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\System.IdentityModel.Tokens.Jwt.4.0.2.206221351\lib\net45\System.IdentityModel.Tokens.Jwt.dll</HintPath>
       <Private>True</Private>
@@ -242,6 +259,10 @@
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.5.2.3\lib\net45\System.Web.Http.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\MvvmLightLibs.5.3.0.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -249,53 +270,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FieldMaps\FieldMapBase.cs" />
-    <Compile Include="FieldMaps\FieldMergeMap.cs" />
-    <Compile Include="FieldMaps\FieldToFieldMap.cs" />
-    <Compile Include="FieldMaps\FieldValueMap.cs" />
-    <Compile Include="FieldMaps\IFieldMap.cs" />
-    <Compile Include="ComponentContext\TestManagementContext.cs" />
-    <Compile Include="FieldMaps\FieldToTagFieldMap.cs" />
-    <Compile Include="MigrationContext\LinkMigrationContext.cs" />
-    <Compile Include="MigrationContext\AttachementExportMigrationContext.cs" />
-    <Compile Include="MigrationContext\MigrationContextBase.cs" />
-    <Compile Include="MigrationContext\AttachementMigrationContextBase.cs" />
-    <Compile Include="MigrationContext\AttachementImportMigrationContext.cs" />
-    <Compile Include="ComponentContext\ITeamProjectContext.cs" />
-    <Compile Include="ComponentContext\IWitdMapper.cs" />
-    <Compile Include="ComponentContext\DescreteWitdMapper.cs" />
-    <Compile Include="MigrationContext\NodeStructuresMigrationContext.cs" />
-    <Compile Include="MigrationContext\TestConfigurationsMigrationContext.cs" />
-    <Compile Include="MigrationContext\TestRunsMigrationContext.cs" />
-    <Compile Include="MigrationContext\TestVeriablesMigrationContext.cs" />
-    <Compile Include="MigrationContext\FakeProcessor.cs" />
-    <Compile Include="MigrationContext\WorkItemMigrationResetContext.cs" />
-    <Compile Include="MigrationContext\WorkItemPostProcessingContext.cs" />
-    <Compile Include="ProcessingContext\ExportTeamList.cs" />
-    <Compile Include="ProcessingContext\FixGitCommitLinks.cs" />
-    <Compile Include="ProcessingContext\WorkItemDelete.cs" />
-    <Compile Include="ProcessingContext\CreateTeamFolders.cs" />
-    <Compile Include="ProcessingEngine.cs" />
-    <Compile Include="MigrationEngine.cs" />
-    <Compile Include="ProcessingContext\ImportProfilePictureContext.cs" />
-    <Compile Include="ProcessingContext\ITfsProcessingContext.cs" />
-    <Compile Include="ProcessingContext\ProcessingContextBase.cs" />
-    <Compile Include="ProcessingContext\ExportProfilePictureFromADContext.cs" />
-    <Compile Include="ProcessingContext\WorkItemUpdate.cs" />
-    <Compile Include="ProcessingContext\WorkItemUpdateAreasAsTagsContext.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ComponentContext\TeamProjectContext.cs" />
-    <Compile Include="ComponentContext\TfsQueryContext.cs" />
-    <Compile Include="MigrationContext\WorkItemMigrationContext.cs" />
-    <Compile Include="ComponentContext\WorkItemStoreContext.cs" />
-    <Compile Include="MigrationContext\TestPlansAndSuitsMigrationContext.cs" />
-    <Compile Include="FieldMaps\RegexFieldMap.cs" />
-    <Compile Include="FieldMaps\TreeToTagFieldMap.cs" />
+    <Compile Include="ViewModel\MainViewModel.cs" />
+    <Compile Include="ViewModel\ViewModelLocator.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
+    <None Include="App.config" />
     <None Include="ApplicationInsights.config" />
     <None Include="packages.config" />
+    <None Include="_EventRegisterUsersGuide.docx" />
+    <None Include="_EventSourceUsersGuide.docx" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TfsWitMigrator.Core\_VSTS.DataBulkEditor.Core.csproj">
+      <Project>{68baf6ba-2bc0-48d0-b892-1d9f93d7003a}</Project>
+      <Name>_VSTS.DataBulkEditor.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
@@ -303,9 +294,11 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.Diagnostics.Tracing.EventRegister.1.1.28\build\Microsoft.Diagnostics.Tracing.EventRegister.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Diagnostics.Tracing.EventRegister.1.1.28\build\Microsoft.Diagnostics.Tracing.EventRegister.targets'))" />
     <Error Condition="!Exists('..\packages\Microsoft.TeamFoundationServer.ExtendedClient.14.95.3\build\Microsoft.TeamFoundationServer.ExtendedClient.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.TeamFoundationServer.ExtendedClient.14.95.3\build\Microsoft.TeamFoundationServer.ExtendedClient.targets'))" />
   </Target>
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
+  <Import Project="..\packages\Microsoft.Diagnostics.Tracing.EventRegister.1.1.28\build\Microsoft.Diagnostics.Tracing.EventRegister.targets" Condition="Exists('..\packages\Microsoft.Diagnostics.Tracing.EventRegister.1.1.28\build\Microsoft.Diagnostics.Tracing.EventRegister.targets')" />
   <Import Project="..\packages\Microsoft.TeamFoundationServer.ExtendedClient.14.95.3\build\Microsoft.TeamFoundationServer.ExtendedClient.targets" Condition="Exists('..\packages\Microsoft.TeamFoundationServer.ExtendedClient.14.95.3\build\Microsoft.TeamFoundationServer.ExtendedClient.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

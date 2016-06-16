@@ -3,10 +3,10 @@ using Microsoft.TeamFoundation.TestManagement.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using System;
 using System.Diagnostics;
-using TfsWitMigrator.Core.ComponentContext;
+using VSTS.DataBulkEditor.Core.ComponentContext;
 using System.Linq;
 
-namespace TfsWitMigrator.Core
+namespace VSTS.DataBulkEditor.Core
 {
     public class TestConfigurationsMigrationContext : MigrationContextBase
     {

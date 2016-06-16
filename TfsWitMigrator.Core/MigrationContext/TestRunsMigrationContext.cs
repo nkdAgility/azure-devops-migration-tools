@@ -3,12 +3,12 @@ using Microsoft.TeamFoundation.TestManagement.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using System;
 using System.Diagnostics;
-using TfsWitMigrator.Core.ComponentContext;
+using VSTS.DataBulkEditor.Core.ComponentContext;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 
-namespace TfsWitMigrator.Core
+namespace VSTS.DataBulkEditor.Core
 {
     //http://stackoverflow.com/questions/6505812/how-to-create-a-test-run-and-result-using-the-team-foundation-server-api
     public class TestRunsMigrationContext : MigrationContextBase

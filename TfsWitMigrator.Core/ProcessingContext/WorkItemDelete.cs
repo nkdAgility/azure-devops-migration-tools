@@ -8,7 +8,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Linq;
 
-namespace TfsWitMigrator.Core
+namespace VSTS.DataBulkEditor.Core
 {
     public class WorkItemDelete : ProcessingContextBase
     {

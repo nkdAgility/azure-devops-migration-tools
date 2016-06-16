@@ -11,7 +11,7 @@ using Microsoft.TeamFoundation.Server;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.Framework.Common;
 
-namespace TfsWitMigrator.Core
+namespace VSTS.DataBulkEditor.Core
 {
     public class ExportTeamList : ProcessingContextBase
     {

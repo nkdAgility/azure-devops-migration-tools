@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 
-namespace TfsWitMigrator.Core
+namespace VSTS.DataBulkEditor.Core
 {
     public interface IWitdMapper
     {

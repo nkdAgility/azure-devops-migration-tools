@@ -10,7 +10,7 @@ using System.Linq;
 using Microsoft.TeamFoundation.Git.Client;
 using Microsoft.TeamFoundation;
 
-namespace TfsWitMigrator.Core
+namespace VSTS.DataBulkEditor.Core
 {
     public class FixGitCommitLinks : ProcessingContextBase
     {

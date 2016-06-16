@@ -9,7 +9,7 @@ using System.Text.RegularExpressions;
 using System.Linq;
 using Microsoft.TeamFoundation.Client;
 
-namespace TfsWitMigrator.Core
+namespace VSTS.DataBulkEditor.Core
 {
     public class CreateTeamFolders : ProcessingContextBase
     {

@@ -12,10 +12,10 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using TfsWitMigrator.Core;
-using TfsWitMigrator.Core.ComponentContext;
+using VSTS.DataBulkEditor.Core;
+using VSTS.DataBulkEditor.Core.ComponentContext;
 
-namespace ConsoleApplication1
+namespace VSTS.DataBulkEditor.Console
 {
     class Program
     {

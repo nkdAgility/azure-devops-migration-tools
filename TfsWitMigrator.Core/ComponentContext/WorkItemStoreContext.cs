@@ -3,7 +3,7 @@ using System.Linq;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using System.Collections.Generic;
 
-namespace TfsWitMigrator.Core
+namespace VSTS.DataBulkEditor.Core
 {
     public class WorkItemStoreContext
     {

@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Xml;
 
-namespace TfsWitMigrator.Core
+namespace VSTS.DataBulkEditor.Core
 {
     public class NodeStructuresMigrationContext : MigrationContextBase
     {

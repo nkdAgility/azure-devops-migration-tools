@@ -2,7 +2,7 @@
 using System;
 using System.Diagnostics;
 
-namespace TfsWitMigrator.Core
+namespace VSTS.DataBulkEditor.Core
 {
     public class TeamProjectContext : ITeamProjectContext
     {

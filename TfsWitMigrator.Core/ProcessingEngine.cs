@@ -6,12 +6,14 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TfsWitMigrator.Core.ComponentContext;
+using VSTS.DataBulkEditor.Core.ComponentContext;
 
-namespace TfsWitMigrator.Core
+namespace VSTS.DataBulkEditor.Core
 {
    public class ProcessingEngine
     {
+        string _applicationInsightsKey = "6a59fbae-e6a1-4df4-9316-37b4db0fadde";
+
         List<ITfsProcessingContext> processors = new List<ITfsProcessingContext>();
         List<Action<WorkItem, WorkItem>> processorActions = new List<Action<WorkItem, WorkItem>>();
         Dictionary<string, List<IFieldMap>> fieldMapps = new Dictionary<string, List<IFieldMap>>();
@@ -27,7 +29,8 @@ namespace TfsWitMigrator.Core
 
         public ProcessingStatus Run()
         {
-            var measurements = new Dictionary<string, double>();
+            InitiliseTelemetry();
+             var measurements = new Dictionary<string, double>();
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
             TelemetryClient tc = new TelemetryClient();
@@ -51,6 +54,12 @@ namespace TfsWitMigrator.Core
             stopwatch.Stop();
             tc.TrackMetric("RunTime", stopwatch.ElapsedMilliseconds);
             return ps;
+        }
+
+        public void InitiliseTelemetry()
+        {
+            Microsoft.ApplicationInsights.Extensibility.TelemetryConfiguration.Active.InstrumentationKey = _applicationInsightsKey;
+
         }
 
         public void AddProcessor<TProcessor>()

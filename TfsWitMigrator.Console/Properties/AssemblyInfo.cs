@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("TfsWitMigrator.Console")]
+[assembly: AssemblyTitle("VSTS Data Bulk Editor Console")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("TfsWitMigrator.Console")]
-[assembly: AssemblyCopyright("Copyright ©  2014")]
+[assembly: AssemblyCompany("naked Agility Limited")]
+[assembly: AssemblyProduct("VSTS.DataBulkEditor.Console")]
+[assembly: AssemblyCopyright("Copyright © naked Agility Limited 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

@@ -1,11 +1,11 @@
 ﻿using System;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using TfsWitMigrator.Core.ComponentContext;
+using VSTS.DataBulkEditor.Core.ComponentContext;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-namespace TfsWitMigrator.Core
+namespace VSTS.DataBulkEditor.Core
 {
     public class FieldToTagFieldMap : IFieldMap
     {

@@ -8,7 +8,7 @@ using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
 
-namespace TfsWitMigrator.Core
+namespace VSTS.DataBulkEditor.Core
 {
     public abstract class MigrationContextBase : ITfsProcessingContext
     {

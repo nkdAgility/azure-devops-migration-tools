@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Microsoft.ApplicationInsights;
 using System.Diagnostics;
 
-namespace TfsWitMigrator.Core
+namespace VSTS.DataBulkEditor.Core
 {
     public class TfsQueryContext
     {

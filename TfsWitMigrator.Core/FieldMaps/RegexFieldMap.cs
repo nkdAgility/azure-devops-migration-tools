@@ -1,10 +1,10 @@
 ﻿using System;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using TfsWitMigrator.Core.ComponentContext;
+using VSTS.DataBulkEditor.Core.ComponentContext;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
 
-namespace TfsWitMigrator.Core
+namespace VSTS.DataBulkEditor.Core
 {
     public class RegexFieldMap : IFieldMap
     {

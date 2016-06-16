@@ -13,7 +13,7 @@ using System.DirectoryServices.ActiveDirectory;
 using System.DirectoryServices.AccountManagement;
 using System.Net;
 
-namespace TfsWitMigrator.Core
+namespace VSTS.DataBulkEditor.Core
 {
     public class ExportProfilePictureFromADContext : ProcessingContextBase
     {

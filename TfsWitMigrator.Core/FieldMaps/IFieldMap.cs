@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TfsWitMigrator.Core.ComponentContext
+namespace VSTS.DataBulkEditor.Core.ComponentContext
 {
    public interface IFieldMap
     {

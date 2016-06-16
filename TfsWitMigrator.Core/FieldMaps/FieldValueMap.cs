@@ -7,7 +7,7 @@ using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using System.Diagnostics;
 using Microsoft.ApplicationInsights;
 
-namespace TfsWitMigrator.Core.ComponentContext
+namespace VSTS.DataBulkEditor.Core.ComponentContext
 {
     public class FieldValueMap : FieldMapBase
     {

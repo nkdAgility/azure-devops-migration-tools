@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using System.Diagnostics;
 
-namespace TfsWitMigrator.Core.ComponentContext
+namespace VSTS.DataBulkEditor.Core.ComponentContext
 {
     public class FieldToFieldMap : FieldMapBase
     {

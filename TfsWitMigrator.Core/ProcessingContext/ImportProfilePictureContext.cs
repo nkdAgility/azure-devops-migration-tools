@@ -15,7 +15,7 @@ using System.Net;
 using System.Drawing.Imaging;
 using System.Text.RegularExpressions;
 
-namespace TfsWitMigrator.Core
+namespace VSTS.DataBulkEditor.Core
 {
     public class ImportProfilePictureContext : ProcessingContextBase
     {
