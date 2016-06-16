@@ -113,9 +113,9 @@ namespace TfsWitMigrator.Core
         }
          public void AddWorkItemTypeDefinition(string workItemTypeName, IWitdMapper workItemTypeDefinitionMap = null)
         {
-            if (!witdMap.ContainsKey(workItemTypeName))
+            if (!workItemTypeDefinitions.ContainsKey(workItemTypeName))
             {
-                witdMap.Add(workItemTypeName, workItemTypeDefinitionMap);
+                workItemTypeDefinitions.Add(workItemTypeName, workItemTypeDefinitionMap);
             }
         }
 
