@@ -15,7 +15,7 @@ using System.Net;
 using System.Drawing.Imaging;
 using System.Text.RegularExpressions;
 
-namespace VSTS.DataBulkEditor.Core
+namespace _VSTS.DataBulkEditor.Engine
 {
     public class ImportProfilePictureContext : ProcessingContextBase
     {

@@ -11,7 +11,7 @@ using Microsoft.TeamFoundation.Server;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.Framework.Common;
 
-namespace VSTS.DataBulkEditor.Core
+namespace _VSTS.DataBulkEditor.Engine
 {
     public class ExportTeamList : ProcessingContextBase
     {

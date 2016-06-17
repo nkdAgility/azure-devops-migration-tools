@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-namespace VSTS.DataBulkEditor.Core
+namespace _VSTS.DataBulkEditor.Engine
 {
     public class LinkMigrationContext : MigrationContextBase
     {

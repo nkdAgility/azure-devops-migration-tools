@@ -5,7 +5,7 @@ VisualStudioVersion = 14.0.25401.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VSTS.DataBulkEditor.Console", "TfsWitMigrator.Console\VSTS.DataBulkEditor.Console.csproj", "{033EB332-4A50-4C73-9B7D-A35D9F3C0513}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "_VSTS.DataBulkEditor.Core", "TfsWitMigrator.Core\_VSTS.DataBulkEditor.Core.csproj", "{68BAF6BA-2BC0-48D0-B892-1D9F93D7003A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "_VSTS.DataBulkEditor.Engine", "TfsWitMigrator.Core\_VSTS.DataBulkEditor.Engine.csproj", "{68BAF6BA-2BC0-48D0-B892-1D9F93D7003A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

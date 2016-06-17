@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace VSTS.DataBulkEditor.Core
+namespace _VSTS.DataBulkEditor.Engine
 {
    public enum ProcessingStatus { Running, Failed, Complete, None };
 

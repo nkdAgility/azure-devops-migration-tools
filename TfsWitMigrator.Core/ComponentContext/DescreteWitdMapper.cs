@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 
-namespace VSTS.DataBulkEditor.Core
+namespace _VSTS.DataBulkEditor.Engine
 {
     public class DescreteWitdMapper : IWitdMapper
     {

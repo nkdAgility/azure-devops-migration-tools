@@ -9,7 +9,7 @@ using System.Text.RegularExpressions;
 using System.Linq;
 using Microsoft.TeamFoundation.Client;
 
-namespace VSTS.DataBulkEditor.Core
+namespace _VSTS.DataBulkEditor.Engine
 {
     public class CreateTeamFolders : ProcessingContextBase
     {

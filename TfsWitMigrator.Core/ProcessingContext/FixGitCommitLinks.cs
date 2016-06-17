@@ -10,7 +10,7 @@ using System.Linq;
 using Microsoft.TeamFoundation.Git.Client;
 using Microsoft.TeamFoundation;
 
-namespace VSTS.DataBulkEditor.Core
+namespace _VSTS.DataBulkEditor.Engine
 {
     public class FixGitCommitLinks : ProcessingContextBase
     {

@@ -3,10 +3,10 @@ using Microsoft.TeamFoundation.TestManagement.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using System;
 using System.Diagnostics;
-using VSTS.DataBulkEditor.Core.ComponentContext;
+using _VSTS.DataBulkEditor.Engine.ComponentContext;
 using System.Linq;
 
-namespace VSTS.DataBulkEditor.Core
+namespace _VSTS.DataBulkEditor.Engine
 {
     public class TestConfigurationsMigrationContext : MigrationContextBase
     {

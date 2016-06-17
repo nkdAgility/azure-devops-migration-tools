@@ -6,9 +6,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using VSTS.DataBulkEditor.Core.ComponentContext;
+using _VSTS.DataBulkEditor.Engine.ComponentContext;
 
-namespace VSTS.DataBulkEditor.Core
+namespace _VSTS.DataBulkEditor.Engine
 {
    public class ProcessingEngine
     {

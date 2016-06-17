@@ -283,9 +283,9 @@
     <None Include="_EventSourceUsersGuide.docx" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\TfsWitMigrator.Core\_VSTS.DataBulkEditor.Core.csproj">
+    <ProjectReference Include="..\TfsWitMigrator.Core\_VSTS.DataBulkEditor.Engine.csproj">
       <Project>{68baf6ba-2bc0-48d0-b892-1d9f93d7003a}</Project>
-      <Name>_VSTS.DataBulkEditor.Core</Name>
+      <Name>_VSTS.DataBulkEditor.Engine</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

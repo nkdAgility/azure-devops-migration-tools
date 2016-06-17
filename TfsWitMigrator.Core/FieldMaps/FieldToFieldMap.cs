@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using System.Diagnostics;
 
-namespace VSTS.DataBulkEditor.Core.ComponentContext
+namespace _VSTS.DataBulkEditor.Engine.ComponentContext
 {
     public class FieldToFieldMap : FieldMapBase
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Microsoft.TeamFoundation.TestManagement.Client;
 using System.Linq;
 
-namespace VSTS.DataBulkEditor.Core.ComponentContext
+namespace _VSTS.DataBulkEditor.Engine.ComponentContext
 {
     public class TestManagementContext
     {

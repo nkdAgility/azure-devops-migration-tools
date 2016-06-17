@@ -1,10 +1,10 @@
 ﻿using System;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using VSTS.DataBulkEditor.Core.ComponentContext;
+using _VSTS.DataBulkEditor.Engine.ComponentContext;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace VSTS.DataBulkEditor.Core
+namespace _VSTS.DataBulkEditor.Engine
 {
     public class TreeToTagFieldMap : IFieldMap
     {
