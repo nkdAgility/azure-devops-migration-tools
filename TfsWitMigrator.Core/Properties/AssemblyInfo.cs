@@ -5,8 +5,8 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("VSTS Bulk Data Editor Core API")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Visual Studio Team Services Bulk Data Editor Engine")]
+[assembly: AssemblyDescription("naked Agility Visual Studio Team Services Bulk Data Editor Engine allows you to bulk edit data in Microsoft Team Foundation Server (TFS) and Visual Studio Team Services (VSTS). You can migrate work items, area & iterations, & test data from one Team Project to another. You can builk update work items and apply processing rules against your server or account.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("naked Agility Limited")]
 [assembly: AssemblyProduct("VSTS.DataBulkEditor.Core")]
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion("0.0.0.0")]
+[assembly: AssemblyFileVersion("0.0.0.0")]
