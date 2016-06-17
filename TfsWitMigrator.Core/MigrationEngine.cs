@@ -6,9 +6,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using _VSTS.DataBulkEditor.Engine.ComponentContext;
+using VSTS.DataBulkEditor.Engine.ComponentContext;
 
-namespace _VSTS.DataBulkEditor.Engine
+namespace VSTS.DataBulkEditor.Engine
 {
    public class MigrationEngine
     {

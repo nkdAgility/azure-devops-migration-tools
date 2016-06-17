@@ -12,8 +12,8 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using _VSTS.DataBulkEditor.Engine;
-using _VSTS.DataBulkEditor.Engine.ComponentContext;
+using VSTS.DataBulkEditor.Engine;
+using VSTS.DataBulkEditor.Engine.ComponentContext;
 
 namespace VSTS.DataBulkEditor.ConsoleApp
 {

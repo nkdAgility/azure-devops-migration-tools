@@ -13,7 +13,7 @@ using System.DirectoryServices.ActiveDirectory;
 using System.DirectoryServices.AccountManagement;
 using System.Net;
 
-namespace _VSTS.DataBulkEditor.Engine
+namespace VSTS.DataBulkEditor.Engine
 {
     public class ExportProfilePictureFromADContext : ProcessingContextBase
     {

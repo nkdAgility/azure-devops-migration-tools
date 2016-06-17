@@ -3,11 +3,11 @@ using Microsoft.TeamFoundation.TestManagement.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using System;
 using System.Diagnostics;
-using _VSTS.DataBulkEditor.Engine.ComponentContext;
+using VSTS.DataBulkEditor.Engine.ComponentContext;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace _VSTS.DataBulkEditor.Engine
+namespace VSTS.DataBulkEditor.Engine
 {
     public class TestVeriablesMigrationContext : MigrationContextBase
     {

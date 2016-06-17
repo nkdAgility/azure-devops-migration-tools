@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Microsoft.ApplicationInsights;
 using System.Diagnostics;
 
-namespace _VSTS.DataBulkEditor.Engine
+namespace VSTS.DataBulkEditor.Engine
 {
     public class TfsQueryContext
     {

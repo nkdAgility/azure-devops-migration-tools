@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 
-namespace _VSTS.DataBulkEditor.Engine
+namespace VSTS.DataBulkEditor.Engine
 {
     public class AttachementExportMigrationContext : AttachementMigrationContextBase
     {

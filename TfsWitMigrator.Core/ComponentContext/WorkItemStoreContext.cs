@@ -3,7 +3,7 @@ using System.Linq;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using System.Collections.Generic;
 
-namespace _VSTS.DataBulkEditor.Engine
+namespace VSTS.DataBulkEditor.Engine
 {
     public class WorkItemStoreContext
     {

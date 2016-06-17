@@ -7,7 +7,7 @@ using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using System.Diagnostics;
 using Microsoft.ApplicationInsights;
 
-namespace _VSTS.DataBulkEditor.Engine.ComponentContext
+namespace VSTS.DataBulkEditor.Engine.ComponentContext
 {
     public class FieldValueMap : FieldMapBase
     {

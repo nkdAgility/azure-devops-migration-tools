@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Xml;
 
-namespace _VSTS.DataBulkEditor.Engine
+namespace VSTS.DataBulkEditor.Engine
 {
     public class NodeStructuresMigrationContext : MigrationContextBase
     {

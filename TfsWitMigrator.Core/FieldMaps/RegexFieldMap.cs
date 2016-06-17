@@ -1,10 +1,10 @@
 ﻿using System;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using _VSTS.DataBulkEditor.Engine.ComponentContext;
+using VSTS.DataBulkEditor.Engine.ComponentContext;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
 
-namespace _VSTS.DataBulkEditor.Engine
+namespace VSTS.DataBulkEditor.Engine
 {
     public class RegexFieldMap : IFieldMap
     {

@@ -2,7 +2,7 @@
 using System;
 using System.Diagnostics;
 
-namespace _VSTS.DataBulkEditor.Engine
+namespace VSTS.DataBulkEditor.Engine
 {
     public class TeamProjectContext : ITeamProjectContext
     {

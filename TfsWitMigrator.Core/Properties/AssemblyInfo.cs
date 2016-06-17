@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("naked Agility Visual Studio Team Services Bulk Data Editor Engine allows you to bulk edit data in Microsoft Team Foundation Server (TFS) and Visual Studio Team Services (VSTS). You can migrate work items, area & iterations, & test data from one Team Project to another. You can builk update work items and apply processing rules against your server or account.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("naked Agility Limited")]
-[assembly: AssemblyProduct("_VSTS.DataBulkEditor.Engine")]
+[assembly: AssemblyProduct("VSTS.DataBulkEditor.Engine")]
 [assembly: AssemblyCopyright("Copyright © naked Agility Limited 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

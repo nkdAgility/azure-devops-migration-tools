@@ -8,7 +8,7 @@ using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
 
-namespace _VSTS.DataBulkEditor.Engine
+namespace VSTS.DataBulkEditor.Engine
 {
     public abstract class MigrationContextBase : ITfsProcessingContext
     {

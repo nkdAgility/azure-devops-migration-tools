@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace _VSTS.DataBulkEditor.Engine.ComponentContext
+namespace VSTS.DataBulkEditor.Engine.ComponentContext
 {
    public interface IFieldMap
     {

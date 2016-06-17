@@ -7,8 +7,8 @@
     <ProjectGuid>{68BAF6BA-2BC0-48D0-B892-1D9F93D7003A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>_VSTS.DataBulkEditor.Engine</RootNamespace>
-    <AssemblyName>_VSTS.DataBulkEditor.Engine</AssemblyName>
+    <RootNamespace>VSTS.DataBulkEditor.Engine</RootNamespace>
+    <AssemblyName>VSTS.DataBulkEditor.Engine</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>

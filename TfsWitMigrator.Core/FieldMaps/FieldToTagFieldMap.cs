@@ -1,11 +1,11 @@
 ﻿using System;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using _VSTS.DataBulkEditor.Engine.ComponentContext;
+using VSTS.DataBulkEditor.Engine.ComponentContext;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-namespace _VSTS.DataBulkEditor.Engine
+namespace VSTS.DataBulkEditor.Engine
 {
     public class FieldToTagFieldMap : IFieldMap
     {
