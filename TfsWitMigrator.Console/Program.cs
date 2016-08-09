@@ -26,7 +26,7 @@ namespace VSTS.DataBulkEditor.ConsoleApp
 
 
             MigrationEngine me = new MigrationEngine();
-            me.SetTarget(new TeamProjectContext(new Uri("https://tfs.test.slb.com/tfs/Drilling/"), "TaiJi"));
+            me.SetTarget(new TeamProjectContext(new Uri("https://tfs.test.company.com/tfs/collection/"), "project"));
             me.SetReflectedWorkItemIdFieldName("ReflectedWorkItemId");
             Dictionary<string, string> stateMapping = new Dictionary<string, string>();
             stateMapping.Add("New", "New");
@@ -38,7 +38,7 @@ namespace VSTS.DataBulkEditor.ConsoleApp
 
 
             me.AddFieldMap("*", new FieldToTagFieldMap("System.State", "OriginalState:{0}"));
-            me.AddFieldMap("*", new FieldMergeMap("System.Description", "Slb.BGC.TaiJi.ComponentName", "System.Description", @"Component Name: {1} <br/><br/>{0}"));
+            me.AddFieldMap("*", new FieldMergeMap("System.Description", "company.department.project.ComponentName", "System.Description", @"Component Name: {1} <br/><br/>{0}"));
             me.AddFieldMap("*", new FieldMergeMap("System.Description", "Microsoft.VSTS.Common.BusinessValue", "System.Description", @"Business Value: {1} <br/><br/>{0}"));
             me.AddFieldMap("*", new FieldMergeMap("System.Description", "Microsoft.VSTS.Common.AcceptanceCriteria", "System.Description", @"{0} <br/><br/><h3>Acceptance Criteria</h3>{1}"));
             me.AddFieldMap("*", new FieldValueMap("System.State", "System.State", stateMapping));
@@ -46,10 +46,10 @@ namespace VSTS.DataBulkEditor.ConsoleApp
             me.AddFieldMap("*", new FieldToFieldMap("Microsoft.VSTS.Scheduling.Effort", "Microsoft.VSTS.Scheduling.StoryPoints"));
             me.AddFieldMap("*", new FieldToFieldMap("Microsoft.VSTS.CMMI.AcceptanceCriteria", "Slb.SIS.Analysis"));
 
-            me.AddFieldMap("Bug", new FieldMergeMap("Microsoft.VSTS.TCM.ReproSteps", "Slb.BGC.TaiJi.ComponentName", "Microsoft.VSTS.TCM.ReproSteps", @"Component Name: {1} <br/><br/>{0}"));
+            me.AddFieldMap("Bug", new FieldMergeMap("Microsoft.VSTS.TCM.ReproSteps", "company.department.TaiJi.ComponentName", "Microsoft.VSTS.TCM.ReproSteps", @"Component Name: {1} <br/><br/>{0}"));
             me.AddFieldMap("Bug", new FieldMergeMap("Microsoft.VSTS.TCM.ReproSteps", "Microsoft.VSTS.Common.BusinessValue", "Microsoft.VSTS.TCM.ReproSteps", @"Business Value: {1} <br/><br/>{0}"));
             me.AddFieldMap("Bug", new FieldMergeMap("Microsoft.VSTS.TCM.ReproSteps", "Microsoft.VSTS.Common.AcceptanceCriteria", "Microsoft.VSTS.TCM.ReproSteps", @"{0} <br/><br/><h3>Acceptance Criteria</h3>{1}"));
-            me.AddFieldMap("Bug", new FieldMergeMap("System.Area", "Slb.BGC.TaiJi.ComponentName", "System.Area", @"{0}\{1}"));
+            me.AddFieldMap("Bug", new FieldMergeMap("System.Area", "company.department.TaiJi.ComponentName", "System.Area", @"{0}\{1}"));
 
             me.AddProcessor(new WorkItemUpdate(me, @" AND [System.Id]=26204"));
 
