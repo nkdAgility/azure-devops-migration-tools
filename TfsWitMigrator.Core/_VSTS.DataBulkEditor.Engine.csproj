@@ -298,6 +298,7 @@
     <None Include="app.config" />
     <None Include="ApplicationInsights.config" />
     <None Include="packages.config" />
+    <None Include="_VSTS.DataBulkEditor.Engine.nuspec" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
