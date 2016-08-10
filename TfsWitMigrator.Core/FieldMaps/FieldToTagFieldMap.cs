@@ -24,18 +24,22 @@ namespace VSTS.DataBulkEditor.Engine
             {
                 List<string> newTags = target.Tags.Split(char.Parse(@";")).ToList();
                 // to tag
-                string value = (string)source.Fields[sourceField].Value;
-                if (string.IsNullOrEmpty(formatExpression))
+                if (source.Fields[sourceField].Value != null)
                 {
-                    newTags.Add(value);
-                }
-                else
-                {
-                    newTags.Add(string.Format(formatExpression, value));
-                }
+                    string value = source.Fields[sourceField].Value.ToString();
+                    if (string.IsNullOrEmpty(formatExpression))
+                    {
+                        newTags.Add(value);
+                    }
+                    else
+                    {
+                        newTags.Add(string.Format(formatExpression, value));
+                    }
 
-                target.Tags = string.Join(";", newTags.ToArray());
-                Trace.WriteLine(string.Format("  [UPDATE] field tagged {0}:{1} to {2}:Tag with foramt of {3}", source.Id, sourceField, target.Id, formatExpression));
+                    target.Tags = string.Join(";", newTags.ToArray());
+                    Trace.WriteLine(string.Format("  [UPDATE] field tagged {0}:{1} to {2}:Tag with foramt of {3}", source.Id, sourceField, target.Id, formatExpression));
+                }
+                
             }
         }
     }

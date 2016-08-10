@@ -59,7 +59,16 @@ namespace VSTS.DataBulkEditor.Engine
                 {
                     if (!_whatIf)
                     {
-                        workitem.Save();
+                        try
+                        {
+                            workitem.Save();
+                        }
+                        catch (Exception)
+                        {
+                            System.Threading.Thread.Sleep(5000);
+                            workitem.Save();
+                        }
+                       
                     } else
                     {
                         Trace.WriteLine("No save done: (What IF: enabled)");
