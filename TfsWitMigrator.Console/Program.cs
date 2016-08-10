@@ -22,7 +22,13 @@ namespace VSTS.DataBulkEditor.ConsoleApp
         static void Main(string[] args)
         {
             //C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\CommonExtensions\Microsoft\TeamFoundation\Team Explorer
-
+            ////////////////////////////
+            Trace.Listeners.Add(new TextWriterTraceListener(Console.Out));
+            Trace.Listeners.Add(new TextWriterTraceListener(string.Format(@"{0}-{1}.log", DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss"), "MigrationRun"), "myListener"));
+            //////////////////////////////////////////////////
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            //////////////////////////////////////////////////
 
 
             MigrationEngine me = new MigrationEngine();

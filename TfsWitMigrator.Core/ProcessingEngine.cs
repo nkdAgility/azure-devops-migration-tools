@@ -1,4 +1,5 @@
 ﻿using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.TraceListener;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ namespace VSTS.DataBulkEditor.Engine
 {
    public class ProcessingEngine
     {
-        string _applicationInsightsKey = "6a59fbae-e6a1-4df4-9316-37b4db0fadde";
+        string _applicationInsightsKey = "a7622e0a-0b81-4be1-9e85-81d500642b6f";
 
         List<ITfsProcessingContext> processors = new List<ITfsProcessingContext>();
         List<Action<WorkItem, WorkItem>> processorActions = new List<Action<WorkItem, WorkItem>>();
@@ -58,8 +59,8 @@ namespace VSTS.DataBulkEditor.Engine
 
         public void InitiliseTelemetry()
         {
+            Trace.Listeners.Add(new ApplicationInsightsTraceListener(_applicationInsightsKey));
             Microsoft.ApplicationInsights.Extensibility.TelemetryConfiguration.Active.InstrumentationKey = _applicationInsightsKey;
-
         }
 
         public void AddProcessor<TProcessor>()

@@ -1,6 +1,8 @@
 ﻿using Microsoft.TeamFoundation.Client;
 using System;
 using System.Diagnostics;
+using Microsoft.TeamFoundation;
+using Microsoft.ApplicationInsights;
 
 namespace VSTS.DataBulkEditor.Engine
 {
@@ -40,8 +42,18 @@ namespace VSTS.DataBulkEditor.Engine
             {
                 Trace.WriteLine("Creating TfsTeamProjectCollection Object ");
                 _Collection = new TfsTeamProjectCollection(_CollectionUrl);
+                try
+                {
+                    _Collection.EnsureAuthenticated();
+                }
+                catch (TeamFoundationServiceUnavailableException ex)
+                {
+                    TelemetryClient tc = new TelemetryClient();
+                    tc.TrackException(ex);
+                    Trace.TraceWarning(string.Format("  [EXCEPTION] {0}", ex.Message));
+                    throw ex;
+                }                
                 Trace.WriteLine(string.Format("validating security for {0} ", _Collection.AuthorizedIdentity.ToString()));
-                _Collection.EnsureAuthenticated();
                 Trace.WriteLine(string.Format("Connected to {0} ", _Collection.Uri.ToString()));
             }            
         }

@@ -1,5 +1,6 @@
 assembly-versioning-scheme: None
 mode: ContinuousDeployment
+next-version: 0.4.2
 branches: {}
 ignore:
   sha: []
