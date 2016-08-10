@@ -21,9 +21,8 @@ namespace VSTS.DataBulkEditor.Engine.ComponentContext
 
         internal override void InternalExecute(WorkItem source, WorkItem target)
         {
-            if (source.Fields.Contains(sourceField))
+            if (source.Fields.Contains(sourceField) && target.Fields.Contains(targetField))
             {
-                // to tag
                 target.Fields[targetField].Value = source.Fields[sourceField].Value;
                 Trace.WriteLine(string.Format("  [UPDATE] field mapped {0}:{1} to {2}:{3}", source.Id, sourceField, target.Id, targetField));
             }

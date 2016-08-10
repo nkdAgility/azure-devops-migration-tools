@@ -22,7 +22,7 @@ namespace VSTS.DataBulkEditor.Engine.ComponentContext
                 TelemetryClient tc = new TelemetryClient();
                 tc.TrackException(ex);
                 Trace.TraceWarning(string.Format("  [EXCEPTION] {0}", ex.Message));
-                throw;
+                //throw;
             }            
         }
 
