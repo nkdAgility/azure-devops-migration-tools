@@ -28,7 +28,7 @@ namespace VSTS.DataBulkEditor.Engine.ComponentContext
         {
             if (source.Fields.Contains(sourceField1) && source.Fields.Contains(sourceField2))
             {
-                  target.Fields[targetField].Value = string.Format(format, (string)source.Fields[sourceField1].Value, (string)source.Fields[sourceField2].Value);
+                  target.Fields[targetField].Value = string.Format(format, (string)source.Fields[sourceField1].Value.ToString(), (string)source.Fields[sourceField2].Value.ToString());
                   Trace.WriteLine(string.Format("  [UPDATE] field merged {0}:{1}+{2} to {3}:{4}", source.Id, sourceField1, sourceField2, target.Id, targetField));
             }
         }
