@@ -1,0 +1,5 @@
+assembly-versioning-scheme: None
+mode: ContinuousDeployment
+branches: {}
+ignore:
+  sha: []
