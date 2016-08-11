@@ -12,6 +12,11 @@ namespace VSTS.DataBulkEditor.Engine
 {
     public class WorkItemMigrationContext : MigrationContextBase
     {
+
+        string _queryBit;
+        MigrationEngine _me;
+        bool _whatIf;
+
         public override string Name
         {
             get
@@ -20,9 +25,11 @@ namespace VSTS.DataBulkEditor.Engine
             }
         }
 
-        public WorkItemMigrationContext(MigrationEngine me) : base(me)
+        public WorkItemMigrationContext(MigrationEngine me, string queryBit, bool whatIf = false) : base(me)
         {
-
+            _me = me;
+            _queryBit = queryBit;
+            _whatIf = whatIf;
         }
 
         internal override void InternalExecute()
@@ -33,14 +40,14 @@ namespace VSTS.DataBulkEditor.Engine
             WorkItemStoreContext sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.BypassRules);
             TfsQueryContext tfsqc = new TfsQueryContext(sourceStore);
             tfsqc.AddParameter("TeamProject", me.Source.Name);
-            tfsqc.Query = @"SELECT [System.Id] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug') ORDER BY [System.ChangedDate] ass "; // AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND  [System.WorkItemType] = 'Test Case'  AND  [System.AreaPath] = 'Platform' ";// AND [System.Id] = 452603 ";
+            tfsqc.Query = string.Format(@"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY [System.ChangedDate] desc", _queryBit);
             WorkItemCollection sourceWIS = tfsqc.Execute();
             Trace.WriteLine(string.Format("Migrate {0} work items?", sourceWIS.Count));
             //////////////////////////////////////////////////
             WorkItemStoreContext targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
             Project destProject = targetStore.GetProject();
             Trace.WriteLine(string.Format("Found target project as {0}", destProject.Name));
-           
+
             int current = sourceWIS.Count;
             int count = 0;
             long elapsedms = 0;
@@ -185,7 +192,7 @@ namespace VSTS.DataBulkEditor.Engine
                     newwit.Fields[f.ReferenceName].Value = oldWi.Fields[f.ReferenceName].Value;
                 }
             }
-            newwit.AreaPath = string.Format(@"{0}\{1}", newwit.Project.Name,oldWi.AreaPath);
+            newwit.AreaPath = string.Format(@"{0}\{1}", newwit.Project.Name, oldWi.AreaPath);
             newwit.IterationPath = string.Format(@"{0}\{1}", newwit.Project.Name, oldWi.IterationPath);
             newwit.Fields["System.ChangedDate"].Value = oldWi.Fields["System.ChangedDate"].Value;
 
@@ -196,8 +203,8 @@ namespace VSTS.DataBulkEditor.Engine
                     newwit.Fields["Microsoft.VSTS.Common.Priority"].Value = oldWi.Fields["Microsoft.VSTS.Common.Priority"].Value;
                     break;
                 //case "User Story":
-                    //newwit.Fields["COMPANY.DEVISION.Analysis"].Value = oldWi.Fields["COMPANY.PRODUCT.AcceptanceCriteria"].Value;
-                    //break;
+                //newwit.Fields["COMPANY.DEVISION.Analysis"].Value = oldWi.Fields["COMPANY.PRODUCT.AcceptanceCriteria"].Value;
+                //break;
                 default:
                     break;
             }

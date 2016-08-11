@@ -1,6 +1,7 @@
 assembly-versioning-scheme: None
 mode: ContinuousDeployment
-next-version: 0.4.8
+continuous-delivery-fallback-tag: ''
+next-version: 0.5.1
 branches:
   master:
     mode: ContinuousDeployment
