@@ -1,6 +1,9 @@
 assembly-versioning-scheme: None
 mode: ContinuousDeployment
-next-version: 0.4.7
-branches: {}
+next-version: 0.4.8
+branches:
+  master:
+    mode: ContinuousDeployment
+    tag: ''
 ignore:
   sha: []
