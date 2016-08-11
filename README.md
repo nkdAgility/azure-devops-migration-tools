@@ -2,10 +2,13 @@
 
 
 
-| Location        | Build           | Sync           |
-| ------------- |:-------------:|:-------------:|
-| VSTS      | ![Build on VSTS](https://nkdagility.visualstudio.com/_apis/public/build/definitions/1b52ce63-eccc-41c8-88f9-ae6ebeefdc63/57/badge) | ![Build on VSTS](https://nkdagility.visualstudio.com/_apis/public/build/definitions/1b52ce63-eccc-41c8-88f9-ae6ebeefdc63/58/badge) |
-| GITHUB      | ![Build on VSTS](https://nkdagility.visualstudio.com/_apis/public/build/definitions/1b52ce63-eccc-41c8-88f9-ae6ebeefdc63/60/badge)     | ![Build on VSTS](https://nkdagility.visualstudio.com/_apis/public/build/definitions/1b52ce63-eccc-41c8-88f9-ae6ebeefdc63/59/badge)      |
+| Location        | Build           | Sync           | Nuget | NuGet Pre Release |
+| ------------- |:-------------:|:-------------:|:-------------:|:-------------:|
+| VSTS      | ![Build on VSTS](https://nkdagility.visualstudio.com/_apis/public/build/definitions/1b52ce63-eccc-41c8-88f9-ae6ebeefdc63/57/badge) | ![Build on VSTS](https://nkdagility.visualstudio.com/_apis/public/build/definitions/1b52ce63-eccc-41c8-88f9-ae6ebeefdc63/58/badge) | [![NuGet](https://img.shields.io/nuget/v/VSTS.DataBulkEditor.Engine.svg?maxAge=2592000)]() | [![NuGet Pre Release](https://img.shields.io/nuget/vpre/VSTS.DataBulkEditor.Engine.svg?maxAge=2592000)]() |
+| GITHUB      | ![Build on VSTS](https://nkdagility.visualstudio.com/_apis/public/build/definitions/1b52ce63-eccc-41c8-88f9-ae6ebeefdc63/60/badge)     | ![Build on VSTS](https://nkdagility.visualstudio.com/_apis/public/build/definitions/1b52ce63-eccc-41c8-88f9-ae6ebeefdc63/59/badge)      | | |
+
+
+
 
 
 
