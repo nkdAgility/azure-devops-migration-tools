@@ -1,18 +1,20 @@
 # Visual Studio Team Services Bulk Data Editor Engine
 
+Visual Studio Team Services Bulk Data Editor Engine allows you to bulk edit data in Microsoft Team Foundation Server (TFS) and Visual Studio Team Services (VSTS).
 
+##BUILD
+|         | Build           | Sync           |
+| ------------- |:-------------:|:-------------:|
+| VSTS      | ![Build on VSTS](https://nkdagility.visualstudio.com/_apis/public/build/definitions/1b52ce63-eccc-41c8-88f9-ae6ebeefdc63/57/badge) | ![Build on VSTS](https://nkdagility.visualstudio.com/_apis/public/build/definitions/1b52ce63-eccc-41c8-88f9-ae6ebeefdc63/58/badge) | 
+| GITHUB      | ![Build on VSTS](https://nkdagility.visualstudio.com/_apis/public/build/definitions/1b52ce63-eccc-41c8-88f9-ae6ebeefdc63/60/badge)     | ![Build on VSTS](https://nkdagility.visualstudio.com/_apis/public/build/definitions/1b52ce63-eccc-41c8-88f9-ae6ebeefdc63/59/badge)      |
 
-| Location        | Build           | Sync           | Nuget | NuGet Pre Release |
+##RELEASE
+
+|         |  |  |
 | ------------- |:-------------:|:-------------:|:-------------:|:-------------:|
-| VSTS      | ![Build on VSTS](https://nkdagility.visualstudio.com/_apis/public/build/definitions/1b52ce63-eccc-41c8-88f9-ae6ebeefdc63/57/badge) | ![Build on VSTS](https://nkdagility.visualstudio.com/_apis/public/build/definitions/1b52ce63-eccc-41c8-88f9-ae6ebeefdc63/58/badge) | [![NuGet](https://img.shields.io/nuget/v/VSTS.DataBulkEditor.Engine.svg?maxAge=2592000)]() | [![NuGet Pre Release](https://img.shields.io/nuget/vpre/VSTS.DataBulkEditor.Engine.svg?maxAge=2592000)]() |
-| GITHUB      | ![Build on VSTS](https://nkdagility.visualstudio.com/_apis/public/build/definitions/1b52ce63-eccc-41c8-88f9-ae6ebeefdc63/60/badge)     | ![Build on VSTS](https://nkdagility.visualstudio.com/_apis/public/build/definitions/1b52ce63-eccc-41c8-88f9-ae6ebeefdc63/59/badge)      | | |
+| Nuget      | [![NuGet](https://img.shields.io/nuget/v/VSTS.DataBulkEditor.Engine.svg?maxAge=2592000)]() | [![NuGet Pre Release](https://img.shields.io/nuget/vpre/VSTS.DataBulkEditor.Engine.svg?maxAge=2592000)]() |
 
-
-
-
-
-
-Visual Studio Team Services Bulk Data Editor Engine allows you to bulk edit data in Microsoft Team Foundation Server (TFS) and Visual Studio Team Services (VSTS). There are two main purposes for this tooling:
+ There are two main purposes for this tooling:
 
 - **Bulk Update** - You can builk update work items and apply processing rules against your server or account. Use the `WorkItemUpdate` class that takes only a target Team Project. 
 - **Migration** - You can migrate work items, area & iterations, & test data from one Team Project to another. Use the `WorkItemMigrationContext` calss that takes both a Source and a Target Team Project
