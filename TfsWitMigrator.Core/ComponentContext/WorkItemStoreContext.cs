@@ -2,6 +2,7 @@
 using System.Linq;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace VSTS.DataBulkEditor.Engine
 {
@@ -34,8 +35,14 @@ namespace VSTS.DataBulkEditor.Engine
         public int GetReflectedWorkItemId(WorkItem wi, string reflectedWotkItemIdField)
         {
             string rwiid = wi.Fields[reflectedWotkItemIdField].Value.ToString();
-            return int.Parse(rwiid.Substring(rwiid.LastIndexOf(@"/") + 1));
+            if (Regex.IsMatch(rwiid, @"(http(s)?://)?([\w-]+\.)+[\w-]+(/[\w- ;,./?%&=]*)?"))
+            {
+                return int.Parse(rwiid.Substring(rwiid.LastIndexOf(@"/") + 1));
+            }
+            return 0;
         }
+
+  
 
         public WorkItem FindReflectedWorkItem(WorkItem workItemToFind, string reflectedWotkItemIdField)
         {
@@ -49,11 +56,18 @@ namespace VSTS.DataBulkEditor.Engine
             {
                 string rwiid = workItemToFind.Fields[reflectedWotkItemIdField].Value.ToString();
                 int idToFind = GetReflectedWorkItemId(workItemToFind, reflectedWotkItemIdField);
-                found = Store.GetWorkItem(idToFind);
-                if (!(found.Fields[reflectedWotkItemIdField].Value.ToString() == rwiid))
+                if (idToFind == 0)
                 {
                     found = null;
                 }
+                else
+                {
+                    found = Store.GetWorkItem(idToFind);
+                    if (!(found.Fields[reflectedWotkItemIdField].Value.ToString() == rwiid))
+                    {
+                        found = null;
+                    }
+                }                
             }
             if (found == null) { found = FindReflectedWorkItemByReflectedWorkItemId(ReflectedWorkItemId, reflectedWotkItemIdField); }
             if (found == null) { found = FindReflectedWorkItemByMigrationRef(ReflectedWorkItemId); }
