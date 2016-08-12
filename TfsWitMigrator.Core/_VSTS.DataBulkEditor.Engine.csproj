@@ -293,6 +293,7 @@
     <Compile Include="MigrationContext\TestPlansAndSuitsMigrationContext.cs" />
     <Compile Include="FieldMaps\RegexFieldMap.cs" />
     <Compile Include="FieldMaps\TreeToTagFieldMap.cs" />
+    <Compile Include="Telemetry.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

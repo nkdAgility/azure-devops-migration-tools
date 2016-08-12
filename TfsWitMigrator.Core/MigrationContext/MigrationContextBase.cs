@@ -18,7 +18,7 @@ namespace VSTS.DataBulkEditor.Engine
 
         public MigrationContextBase(MigrationEngine me)
         {
-            
+
             this.me = me;
         }
 
@@ -34,41 +34,55 @@ namespace VSTS.DataBulkEditor.Engine
 
         public void Execute()
         {
-
-            TelemetryClient tc = new TelemetryClient();
-            tc.TrackPageView(this.Name);
-
-            tc.TrackEvent(string.Format("{0}", this.Name));
-            var properties = new Dictionary<string, string> {
-                    { "Processing Engine", this.Name},
-                    { "Target Project", me.Target.Name},
-                    { "Target Collection", me.Target.Collection.Name },
-                     { "Source Project", me.Source.Name},
-                    { "Source Collection", me.Source.Collection.Name }
-                };
-            var measurements = new Dictionary<string, double>();
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
+            Telemetry.Current.TrackEvent("MigrationContextExecute",
+                      new Dictionary<string, string> {
+                          { "Name", Name},
+                          { "Target Project", me.Target.Name},
+                          { "Target Collection", me.Target.Collection.Name },
+                          { "Source Project", me.Source.Name},
+                          { "Source Collection", me.Source.Collection.Name }
+                      });
+            Trace.TraceInformation(string.Format(" Migration Context Start {0} ", Name));
+            Stopwatch executeTimer = new Stopwatch();
+            executeTimer.Start();
             //////////////////////////////////////////////////
             try
             {
                 status = ProcessingStatus.Running;
                 InternalExecute();
                 status = ProcessingStatus.Complete;
-                stopwatch.Stop();
-                tc.TrackMetric("ExecutionTime", stopwatch.ElapsedMilliseconds);
-                measurements.Add("ExecutionTime-Milliseconds", stopwatch.ElapsedMilliseconds);
-                tc.TrackEvent(string.Format("{0}:{1}", this.GetType().Name, status.ToString()), properties, measurements);
-              
+                executeTimer.Stop();
+                Telemetry.Current.TrackEvent("MigrationContextComplete",
+                    new Dictionary<string, string> {
+                        { "Name", Name},
+                        { "Target Project", me.Target.Name},
+                        { "Target Collection", me.Target.Collection.Name },
+                        { "Source Project", me.Source.Name},
+                        { "Source Collection", me.Source.Collection.Name },
+                        { "Status", Status.ToString() }
+                    },
+                    new Dictionary<string, double> {
+                        { "MigrationContextTime", executeTimer.ElapsedMilliseconds }
+                    });
+                Trace.TraceInformation(string.Format(" Migration Context Complete {0} ", Name));
             }
             catch (Exception ex)
             {
                 status = ProcessingStatus.Failed;
-                stopwatch.Stop();
-                measurements.Add("ExecutionTime-Milliseconds", stopwatch.ElapsedMilliseconds);
-                // Send the exception telemetry:
-                tc.TrackException(ex, properties, measurements);
-                Trace.TraceError(ex.ToString());
+                executeTimer.Stop();
+                Telemetry.Current.TrackException(ex,
+                      new Dictionary<string, string> {
+                          { "Name", Name},
+                          { "Target Project", me.Target.Name},
+                          { "Target Collection", me.Target.Collection.Name },
+                          { "Source Project", me.Source.Name},
+                          { "Source Collection", me.Source.Collection.Name },
+                          { "Status", Status.ToString() }
+                      },
+                      new Dictionary<string, double> {
+                            { "MigrationContextTime", executeTimer.ElapsedMilliseconds }
+                      });
+                Trace.TraceWarning(string.Format("  [EXCEPTION] {0}", ex.Message));
             }
         }
 

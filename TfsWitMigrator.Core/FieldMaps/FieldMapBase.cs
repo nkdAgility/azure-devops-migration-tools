@@ -19,10 +19,12 @@ namespace VSTS.DataBulkEditor.Engine.ComponentContext
             }
             catch (Exception ex)
             {
-                TelemetryClient tc = new TelemetryClient();
-                tc.TrackException(ex);
-                Trace.TraceWarning(string.Format("  [EXCEPTION] {0}", ex.Message));
-                //throw;
+                Telemetry.Current.TrackException(ex,
+                       new Dictionary<string, string> {
+                            { "Source", source.Id.ToString() },
+                            { "Target",  target.Id.ToString()}
+                       });
+                Trace.TraceError(string.Format("  [EXCEPTION] {0}", ex.Message));
             }            
         }
 

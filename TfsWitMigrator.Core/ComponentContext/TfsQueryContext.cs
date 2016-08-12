@@ -27,21 +27,40 @@ namespace VSTS.DataBulkEditor.Engine
         public WorkItemCollection Execute()
         {
             WorkItemCollection wc;
-            var ai = new TelemetryClient();
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
+            var startTime = DateTime.UtcNow;
+            Stopwatch queryTimer = new Stopwatch();
+
+            queryTimer.Start();
             try
             {
                 wc = storeContext.Store.Query(Query, parameters);
-                ai.TrackMetric("QueryCount", wc.Count);
-                sw.Stop();
-                ai.TrackRequest("TFS Query", DateTime.Now, sw.Elapsed, "200", true);
-            }
+                queryTimer.Stop();
+                Telemetry.Current.TrackDependency("TeamService", "Query", startTime, queryTimer.Elapsed, true);
+                // Add additional bits to reuse the paramiters dictionary for telemitery
+                parameters.Add("CollectionUrl", storeContext.Store.TeamProjectCollection.Uri.ToString());
+                parameters.Add("Query", Query);
+                Telemetry.Current.TrackEvent("QueryComplete",
+                      parameters,
+                      new Dictionary<string, double> {
+                            { "QueryTime", queryTimer.ElapsedMilliseconds },
+                          { "QueryCount", wc.Count }
+                      });
+                Trace.TraceInformation(string.Format(" Query Complete: found {0} work items ", wc.Count));
+         
+        }
             catch (Exception ex)
             {
-                ai.TrackRequest("TFS Query", DateTime.Now, sw.Elapsed, "500", false);
-                ai.TrackException(ex);
-                throw;
+                queryTimer.Stop();
+                Telemetry.Current.TrackDependency("TeamService", "Query", startTime, queryTimer.Elapsed, false);
+                Telemetry.Current.TrackException(ex,
+                       new Dictionary<string, string> {
+                            { "CollectionUrl", storeContext.Store.TeamProjectCollection.Uri.ToString() }
+                       },
+                       new Dictionary<string, double> {
+                            { "QueryTime",queryTimer.ElapsedMilliseconds }
+                       });
+                Trace.TraceWarning(string.Format("  [EXCEPTION] {0}", ex.Message));
+                throw ex;
             }
             return wc;
         }

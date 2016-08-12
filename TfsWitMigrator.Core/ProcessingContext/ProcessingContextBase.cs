@@ -32,36 +32,49 @@ namespace VSTS.DataBulkEditor.Engine
 
         public void Execute()
         {
-            TelemetryClient tc = new TelemetryClient();
-            tc.TrackEvent(string.Format("Execute: {0}", this.Name));
-            var properties = new Dictionary<string, string> {
-                    { "Processing Engine", this.Name},
-                    { "Target Project", me.Target.Name},
-                    { "Target Collection", me.Target.Collection.Name }
-                };
-            var measurements = new Dictionary<string, double>();
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
-            Trace.WriteLine("");
+            Telemetry.Current.TrackEvent("ProcessingContextExecute",
+                     new Dictionary<string, string> {
+                          { "Name", Name},
+                          { "Target Project", me.Target.Name},
+                          { "Target Collection", me.Target.Collection.Name }
+                     });
+            Trace.TraceInformation(string.Format("ProcessingContext Start {0} ", Name));
+            Stopwatch executeTimer = new Stopwatch();
+            executeTimer.Start();
             //////////////////////////////////////////////////
             try
             {
                 status = ProcessingStatus.Running;
                 InternalExecute();
                 status = ProcessingStatus.Complete;
-                stopwatch.Stop();
-                Trace.WriteLine(string.Format(@"EXECUTE DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds", stopwatch.Elapsed));
-                measurements.Add("ExecutionTime-Milliseconds", stopwatch.ElapsedMilliseconds);
-                tc.TrackEvent(string.Format("Complete: {0}", this.GetType().Name), properties, measurements);
+                executeTimer.Stop();
+                Telemetry.Current.TrackEvent("ProcessingContextComplete",
+                    new Dictionary<string, string> {
+                        { "Name", Name},
+                        { "Target Project", me.Target.Name},
+                        { "Target Collection", me.Target.Collection.Name },
+                        { "Status", Status.ToString() }
+                    },
+                    new Dictionary<string, double> {
+                        { "ProcessingContextTime", executeTimer.ElapsedMilliseconds }
+                    });
+                Trace.TraceInformation(string.Format("ProcessingContext Complete {0} ", Name));
             }
             catch (Exception ex)
             {
                 status = ProcessingStatus.Failed;
-                stopwatch.Stop();
-                measurements.Add("ExecutionTime-Milliseconds", stopwatch.ElapsedMilliseconds);
-                // Send the exception telemetry:
-                tc.TrackException(ex, properties, measurements);
-                Trace.TraceError(ex.ToString());
+                executeTimer.Stop();
+                Telemetry.Current.TrackException(ex,
+                      new Dictionary<string, string> {
+                          { "Name", Name},
+                          { "Target Project", me.Target.Name},
+                          { "Target Collection", me.Target.Collection.Name },
+                          { "Status", Status.ToString() }
+                      },
+                      new Dictionary<string, double> {
+                            { "ProcessingContextTime", executeTimer.ElapsedMilliseconds }
+                      });
+                Trace.TraceWarning(string.Format("  [EXCEPTION] {0}", ex.Message));
             }
         }
 

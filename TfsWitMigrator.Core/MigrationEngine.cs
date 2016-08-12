@@ -50,20 +50,25 @@ namespace VSTS.DataBulkEditor.Engine
 
         public ProcessingStatus Run()
         {
-            var measurements = new Dictionary<string, double>();
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
-            TelemetryClient tc = new TelemetryClient();
-            tc.Context.User.Id = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
-            tc.Context.Session.Id = Guid.NewGuid().ToString();
-            measurements.Add("Processors", processors.Count);
-            measurements.Add("Actions", processorActions.Count);
-            measurements.Add("Mappings", fieldMapps.Count);
-            tc.TrackEvent("MigrationEngine:Run", null, measurements);
+            Telemetry.Current.TrackEvent("EngineStart",
+                new Dictionary<string, string> {
+                    { "Engine", "Migration" }
+                },
+                new Dictionary<string, double> {
+                    { "Processors", processors.Count },
+                    { "Actions",  processorActions.Count},
+                    { "Mappings", fieldMapps.Count }
+                });
+            Stopwatch engineTimer = new Stopwatch();
+            engineTimer.Start();
             ProcessingStatus ps = ProcessingStatus.Complete;
             foreach (ITfsProcessingContext process in processors)
             {
+                Stopwatch processorTimer = new Stopwatch();
+                processorTimer.Start();
                 process.Execute();
+                processorTimer.Stop();
+                Telemetry.Current.TrackEvent("ProcessorComplete", new Dictionary<string, string> { { "Processor", process.Name }, { "Status", process.Status.ToString() } }, new Dictionary<string, double> { { "ProcessingTime", processorTimer.ElapsedMilliseconds } });
                 if (process.Status == ProcessingStatus.Failed)
                 {
                     ps = ProcessingStatus.Failed;
@@ -71,8 +76,14 @@ namespace VSTS.DataBulkEditor.Engine
                     break;
                 }
             }
-            stopwatch.Stop();
-            tc.TrackMetric("RunTime", stopwatch.ElapsedMilliseconds);
+            engineTimer.Stop();
+            Telemetry.Current.TrackEvent("EngineComplete", 
+                new Dictionary<string, string> {
+                    { "Engine", "Migration" }
+                },
+                new Dictionary<string, double> {
+                    { "EngineTime", engineTimer.ElapsedMilliseconds }
+                });
             return ps;
         }
 

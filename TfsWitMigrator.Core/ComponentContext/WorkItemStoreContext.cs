@@ -3,6 +3,7 @@ using System.Linq;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Diagnostics;
 
 namespace VSTS.DataBulkEditor.Engine
 {
@@ -17,9 +18,31 @@ namespace VSTS.DataBulkEditor.Engine
 
         public WorkItemStoreContext(ITeamProjectContext targetTfs, WorkItemStoreFlags bypassRules)
         {
+            var startTime = DateTime.UtcNow;
+            var timer = System.Diagnostics.Stopwatch.StartNew();
             this.targetTfs = targetTfs;
             this.bypassRules = bypassRules;
-            wistore = new WorkItemStore(targetTfs.Collection, bypassRules);
+            try
+            {
+                wistore = new WorkItemStore(targetTfs.Collection, bypassRules);
+                timer.Stop();
+                Telemetry.Current.TrackDependency("TeamService", "GetWorkItemStore", startTime, timer.Elapsed, true);
+            }
+            catch (Exception ex)
+            {
+                timer.Stop();
+                Telemetry.Current.TrackDependency("TeamService", "GetWorkItemStore", startTime, timer.Elapsed, false);
+                Telemetry.Current.TrackException(ex,
+                       new Dictionary<string, string> {
+                            { "CollectionUrl", targetTfs.Collection.Uri.ToString() }
+                       },
+                       new Dictionary<string, double> {
+                            { "Time",timer.ElapsedMilliseconds }
+                       });
+                Trace.TraceWarning(string.Format("  [EXCEPTION] {0}", ex.Message));
+                throw ex;
+            }
+           
             foundWis = new Dictionary<int, WorkItem>();
         }
 
