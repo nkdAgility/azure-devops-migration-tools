@@ -24,12 +24,14 @@ namespace VSTS.DataBulkEditor.Engine
 
         public static void InitiliseTelemetry()
         {
-            Trace.Listeners.Add(new ApplicationInsightsTraceListener(applicationInsightsKey));
+           // Performance? Trace.Listeners.Add(new ApplicationInsightsTraceListener(applicationInsightsKey));
             Microsoft.ApplicationInsights.Extensibility.TelemetryConfiguration.Active.InstrumentationKey = applicationInsightsKey;
             telemetryClient = new TelemetryClient();
             telemetryClient.InstrumentationKey = applicationInsightsKey;
             telemetryClient.Context.User.Id = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
             telemetryClient.Context.Session.Id = Guid.NewGuid().ToString();
+            Trace.WriteLine(string.Format("SessionID: {0}", telemetryClient.Context.Session.Id));
+
         }
     }
 }

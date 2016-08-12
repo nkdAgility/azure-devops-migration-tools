@@ -170,7 +170,14 @@ namespace VSTS.DataBulkEditor.Engine
 
 
             // WorkItem newwit = oldWi.Copy(destProject.WorkItemTypes[destType]);
+            var NewWorkItemstartTime = DateTime.UtcNow;
+            Stopwatch NewWorkItemTimer = new Stopwatch();
             WorkItem newwit = destProject.WorkItemTypes[destType].NewWorkItem();
+            NewWorkItemTimer.Stop();
+            Telemetry.Current.TrackDependency("TeamService", "NewWorkItem", NewWorkItemstartTime, NewWorkItemTimer.Elapsed, true);
+            Trace.WriteLine(string.Format("Dependnacy: {0} - {1} - {2} - {3} - {4}", "TeamService", "NewWorkItem", NewWorkItemstartTime, NewWorkItemTimer.Elapsed, true));
+
+
             newwit.Title = oldWi.Title;
             newwit.State = oldWi.State;
             switch (newwit.State)
@@ -253,25 +260,42 @@ namespace VSTS.DataBulkEditor.Engine
         }
 
 
-        private static void BuildFieldTable(WorkItem oldWi, StringBuilder history)
+        private static void BuildFieldTable(WorkItem oldWi, StringBuilder history, bool useHTML = false)
         {
-            history.Append("<p>&nbsp;</p>");
-            history.Append("<table border='1' cellpadding='2' style='width:100%;border-color:#C0C0C0;'><tr><td><b>Field</b></td><td><b>Value</b></td></tr>");
+            if (useHTML) {
+                history.Append("<p>&nbsp;</p>");
+                history.Append("<table border='1' cellpadding='2' style='width:100%;border-color:#C0C0C0;'><tr><td><b>Field</b></td><td><b>Value</b></td></tr>");
+            }
             foreach (Field f in oldWi.Fields)
             {
                 if (f.Value == null)
                 {
-                    history.AppendFormat("<tr><td style='text-align:right;white-space:nowrap;'><b>{0}</b></td><td>n/a</td></tr>", f.Name);
-
+                    if (useHTML)
+                    {
+                        history.AppendFormat("<tr><td style='text-align:right;white-space:nowrap;'><b>{0}</b></td><td>n/a</td></tr>", f.Name);
+                    } else
+                    {
+                        history.AppendLine(string.Format("{0}: null", f.Name));
+                    }
                 }
                 else
                 {
-                    history.AppendFormat("<tr><td style='text-align:right;white-space:nowrap;'><b>{0}</b></td><td style='width:100%'>{1}</td></tr>", f.Name, f.Value.ToString());
+                    if (useHTML)
+                    {
+                        history.AppendFormat("<tr><td style='text-align:right;white-space:nowrap;'><b>{0}</b></td><td style='width:100%'>{1}</td></tr>", f.Name, f.Value.ToString());
+
+                    }else
+                    {
+                        history.AppendLine(string.Format("{0}: {1}", f.Name, f.Value.ToString()));
+                    }
                 }
 
             }
-            history.Append("</table>");
-            history.Append("<p>&nbsp;</p>");
+            if (useHTML)
+            {
+                history.Append("</table>");
+                history.Append("<p>&nbsp;</p>");
+            }
         }
 
         private static void BuildCommentTable(WorkItem oldWi, StringBuilder history)

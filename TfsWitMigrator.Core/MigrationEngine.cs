@@ -19,6 +19,7 @@ namespace VSTS.DataBulkEditor.Engine
         ITeamProjectContext source;
         ITeamProjectContext target;
         string reflectedWorkItemIdFieldName = "TfsMigrationTool.ReflectedWorkItemId";
+        
 
         public Dictionary<string, IWitdMapper> WorkItemTypeDefinitions
         {

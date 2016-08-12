@@ -45,7 +45,7 @@ namespace VSTS.DataBulkEditor.Engine
                             { "QueryTime", queryTimer.ElapsedMilliseconds },
                           { "QueryCount", wc.Count }
                       });
-                Trace.TraceInformation(string.Format(" Query Complete: found {0} work items ", wc.Count));
+                Trace.TraceInformation(string.Format(" Query Complete: found {0} work items in {1}ms ", wc.Count, queryTimer.ElapsedMilliseconds));
          
         }
             catch (Exception ex)

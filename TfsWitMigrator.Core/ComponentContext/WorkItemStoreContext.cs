@@ -93,11 +93,14 @@ namespace VSTS.DataBulkEditor.Engine
                 }                
             }
             if (found == null) { found = FindReflectedWorkItemByReflectedWorkItemId(ReflectedWorkItemId, reflectedWotkItemIdField); }
-            if (found == null) { found = FindReflectedWorkItemByMigrationRef(ReflectedWorkItemId); }
-            //if (found == null) { found = FindReflectedWorkItemByTitle(workItemToFind.Title); }
+            if (!workItemToFind.Fields.Contains(reflectedWotkItemIdField))
+            {
+                if (found == null) { found = FindReflectedWorkItemByMigrationRef(ReflectedWorkItemId); } // Too slow!
+                //if (found == null) { found = FindReflectedWorkItemByTitle(workItemToFind.Title); }
+            }
             if (found != null) 
             {
-                foundWis.Add(workItemToFind.Id, found);
+                foundWis.Add(workItemToFind.Id, found); /// TODO MENORY LEEK! LEAK
             }
 
             return found;
