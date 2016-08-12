@@ -13,6 +13,7 @@ namespace VSTS.DataBulkEditor.Engine
     {
         private const string applicationInsightsKey = "a7622e0a-0b81-4be1-9e85-81d500642b6f";
         private static TelemetryClient telemetryClient;
+        public static bool EnableTrace = false;
 
         public static TelemetryClient Current { get {
                 if (telemetryClient == null)
@@ -24,7 +25,7 @@ namespace VSTS.DataBulkEditor.Engine
 
         public static void InitiliseTelemetry()
         {
-           // Performance? Trace.Listeners.Add(new ApplicationInsightsTraceListener(applicationInsightsKey));
+            if (EnableTrace) { Trace.Listeners.Add(new ApplicationInsightsTraceListener(applicationInsightsKey)); }
             Microsoft.ApplicationInsights.Extensibility.TelemetryConfiguration.Active.InstrumentationKey = applicationInsightsKey;
             telemetryClient = new TelemetryClient();
             telemetryClient.InstrumentationKey = applicationInsightsKey;

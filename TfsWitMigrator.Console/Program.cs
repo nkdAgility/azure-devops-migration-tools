@@ -32,32 +32,59 @@ namespace VSTS.DataBulkEditor.ConsoleApp
 
 
             MigrationEngine me = new MigrationEngine();
-            me.SetTarget(new TeamProjectContext(new Uri("https://tfs.test.company.com/tfs/collection/"), "project"));
-            me.SetReflectedWorkItemIdFieldName("ReflectedWorkItemId");
-            Dictionary<string, string> stateMapping = new Dictionary<string, string>();
-            stateMapping.Add("New", "New");
-            stateMapping.Add("Approved", "New");
-            stateMapping.Add("Committed", "Active");
-            stateMapping.Add("In Progress", "Active");
-            stateMapping.Add("To Do", "New");
-            stateMapping.Add("Done", "Closed");
+            Telemetry.EnableTrace = true;
 
+            me.SetSource(new TeamProjectContext(new Uri("https://tfs.test.slb.com/tfs/Drilling/"), "TaiJi"));
+            me.SetTarget(new TeamProjectContext(new Uri("https://tfs.test.slb.com/tfs/SLB1/"), "Taiji_New"));
+            me.SetReflectedWorkItemIdFieldName("TfsMigrationTool.ReflectedWorkItemId");
+            me.AddWorkItemTypeDefinition("User Story", new DescreteWitdMapper("User Story"));
+            me.AddWorkItemTypeDefinition("Requirement", new DescreteWitdMapper("Requirement"));
+            me.AddWorkItemTypeDefinition("Task", new DescreteWitdMapper("Task"));
+            me.AddWorkItemTypeDefinition("Bug", new DescreteWitdMapper("Bug"));
+            me.AddWorkItemTypeDefinition("Shared Steps", new DescreteWitdMapper("Shared Steps"));
+            me.AddWorkItemTypeDefinition("Shared Parameter", new DescreteWitdMapper("Shared Parameter"));
+            me.AddWorkItemTypeDefinition("Test Case", new DescreteWitdMapper("Test Case"));
 
-            me.AddFieldMap("*", new FieldToTagFieldMap("System.State", "OriginalState:{0}"));
-            me.AddFieldMap("*", new FieldMergeMap("System.Description", "company.department.project.ComponentName", "System.Description", @"Component Name: {1} <br/><br/>{0}"));
-            me.AddFieldMap("*", new FieldMergeMap("System.Description", "Microsoft.VSTS.Common.BusinessValue", "System.Description", @"Business Value: {1} <br/><br/>{0}"));
-            me.AddFieldMap("*", new FieldMergeMap("System.Description", "Microsoft.VSTS.Common.AcceptanceCriteria", "System.Description", @"{0} <br/><br/><h3>Acceptance Criteria</h3>{1}"));
-            me.AddFieldMap("*", new FieldValueMap("System.State", "System.State", stateMapping));
-            me.AddFieldMap("*", new FieldToFieldMap("Microsoft.VSTS.Common.BacklogPriority", "Microsoft.VSTS.Common.StackRank"));
-            me.AddFieldMap("*", new FieldToFieldMap("Microsoft.VSTS.Scheduling.Effort", "Microsoft.VSTS.Scheduling.StoryPoints"));
-            me.AddFieldMap("*", new FieldToFieldMap("Microsoft.VSTS.CMMI.AcceptanceCriteria", "Slb.SIS.Analysis"));
+           // me.AddProcessor<NodeStructuresMigrationContext>();
+            me.AddProcessor(new WorkItemMigrationContext(me, @"AND NOT [TfsMigrationTool.ReflectedWorkItemId] contains 'http' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug') "));
 
-            me.AddFieldMap("Bug", new FieldMergeMap("Microsoft.VSTS.TCM.ReproSteps", "company.department.TaiJi.ComponentName", "Microsoft.VSTS.TCM.ReproSteps", @"Component Name: {1} <br/><br/>{0}"));
-            me.AddFieldMap("Bug", new FieldMergeMap("Microsoft.VSTS.TCM.ReproSteps", "Microsoft.VSTS.Common.BusinessValue", "Microsoft.VSTS.TCM.ReproSteps", @"Business Value: {1} <br/><br/>{0}"));
-            me.AddFieldMap("Bug", new FieldMergeMap("Microsoft.VSTS.TCM.ReproSteps", "Microsoft.VSTS.Common.AcceptanceCriteria", "Microsoft.VSTS.TCM.ReproSteps", @"{0} <br/><br/><h3>Acceptance Criteria</h3>{1}"));
-            me.AddFieldMap("Bug", new FieldMergeMap("System.Area", "company.department.TaiJi.ComponentName", "System.Area", @"{0}\{1}"));
+            //AND [TfsMigrationTool.ReflectedWorkItemId] = ''
 
-            me.AddProcessor(new WorkItemUpdate(me, @" AND [System.Id]=26204"));
+            //Dictionary<string, string> stateMapping = new Dictionary<string, string>();
+            //stateMapping.Add("New", "New");
+            //stateMapping.Add("Approved", "New");
+            //stateMapping.Add("Committed", "Active");
+            //stateMapping.Add("In Progress", "Active");
+            //stateMapping.Add("To Do", "New");
+            //stateMapping.Add("Done", "Closed");
+
+            //Dictionary<string, string> testPlanMapping = new Dictionary<string, string>();
+            //testPlanMapping.Add("Yes", "End-User Functionality");
+            //testPlanMapping.Add("No", "");
+            //testPlanMapping.Add("", "");
+            //testPlanMapping.Add("Blank", "");
+            //me.AddFieldMap("User Story", new FieldValueMap("Slb.Drilling.NeedTestPlan", "Slb.SIS.UserStoryType", testPlanMapping));
+
+            //me.AddFieldMap("*", new FieldToTagFieldMap("System.State", "OriginalState:{0}"));
+            ////me.AddFieldMap("*", new FieldMergeMap("System.Description", "Microsoft.VSTS.Common.BusinessValue", "System.Description", @"Business Value: {1} <br/><br/>{0}"));
+            ////me.AddFieldMap("*", new FieldMergeMap("System.Description", "Microsoft.VSTS.Common.AcceptanceCriteria", "System.Description", @"{0} <br/><br/><h3>Acceptance Criteria</h3>{1}"));
+            //me.AddFieldMap("*", new FieldValueMap("System.State", "System.State", stateMapping));
+            //me.AddFieldMap("*", new FieldToFieldMap("Microsoft.VSTS.Common.BacklogPriority", "Microsoft.VSTS.Common.StackRank"));
+            //me.AddFieldMap("*", new FieldToFieldMap("Microsoft.VSTS.Scheduling.Effort", "Microsoft.VSTS.Scheduling.StoryPoints"));
+            //me.AddFieldMap("*", new FieldToFieldMap("Microsoft.VSTS.Common.AcceptanceCriteria", "Slb.SIS.Analysis"));
+            //me.AddFieldMap("*", new FieldToFieldMap("Microsoft.VSTS.Common.AcceptanceCriteria", "SLB.SWT.VerifyDetails"));
+
+            //me.AddFieldMap("Bug", new FieldMergeMap("System.Area", "Slb.BGC.TaiJi.ComponentName", "System.Area", @"{0}\{1}"));
+            //me.AddFieldMap("Bug", new FieldMergeMap("Microsoft.VSTS.TCM.ReproSteps", "Slb.BGC.TaiJi.ComponentName", "Microsoft.VSTS.TCM.ReproSteps", @"Component Name: {1} <br/><br/>{0}"));
+            //me.AddFieldMap("Bug", new FieldMergeMap("Microsoft.VSTS.TCM.ReproSteps", "Microsoft.VSTS.Common.BusinessValue", "Microsoft.VSTS.TCM.ReproSteps", @"Business Value: {1} <br/><br/>{0}"));
+            //me.AddFieldMap("*", new FieldToFieldMap("Slb.BGC.Regression", "Slb.SWT.Regression"));
+            //me.AddFieldMap("*", new FieldToTagFieldMap("Microsoft.VSTS.Common.BusinessValue", "BV:{0}"));
+            //me.AddFieldMap("*", new FieldToTagFieldMap("Slb.BGC.TaiJi.ComponentName", "CN:{0}"));
+            //me.AddFieldMap("*", new FieldToFieldMap("Slb.BGC.MustFixBy", "Slb.SWT.MajorTargetedForVersion"));
+            //me.AddFieldMap("*", new FieldToFieldMap("Microsoft.VSTS.Common.Severity", "Slb.SWT.UserImpact"));
+
+            //me.AddProcessor(new WorkItemUpdate(me, @" "));// AND [System.Id]=24125")); //
+
 
             //me.AddFieldMap("Requirement", new FieldToTagFieldMap("COMPANY.PRODUCT.ReqType", "ReqType:{0}"));
             //me.AddFieldMap("Requirement", new FieldToTagFieldMap("COMPANY.PRODUCT.Theme", "Theme:{0}"));
@@ -89,7 +116,8 @@ namespace VSTS.DataBulkEditor.ConsoleApp
             // me.AddWorkItemTypeDefinition("Bug", new DescreteWitdMapper("Bug"));
 
             // me.AddProcessor<NodeStructuresMigrationContext>();
-            // me.AddProcessor<WorkItemMigrationContext>();
+            //tfsqc.Query = @"AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug') ORDER BY [System.ChangedDate] ass "; // AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND  [System.WorkItemType] = 'Test Case'  AND  [System.AreaPath] = 'Platform' ";// AND [System.Id] = 452603 ";
+
             // me.AddProcessor<LinkMigrationContext>();
             //me.AddProcessor<AttachementExportMigrationContext>();
             // me.AddProcessor<AttachementImportMigrationContext>();
