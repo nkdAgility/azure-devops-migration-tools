@@ -38,10 +38,13 @@ namespace VSTS.DataBulkEditor.Engine
             this.SetSource(new TeamProjectContext(config.Source.Collection, config.Source.Name));
             this.SetTarget(new TeamProjectContext(config.Target.Collection, config.Target.Name));
             this.SetReflectedWorkItemIdFieldName(config.ReflectedWorkItemIDFieldName);
-            foreach (IFieldMapConfig fieldmapConfig in config.FieldMaps)
+            if (config.FieldMaps != null)
             {
-                this.AddFieldMap(fieldmapConfig.WorkItemTypeName, (IFieldMap)Activator.CreateInstance(fieldmapConfig.FieldMap, fieldmapConfig));
-            }
+                foreach (IFieldMapConfig fieldmapConfig in config.FieldMaps)
+                {
+                    this.AddFieldMap(fieldmapConfig.WorkItemTypeName, (IFieldMap)Activator.CreateInstance(fieldmapConfig.FieldMap, fieldmapConfig));
+                }
+            }            
             foreach (string key in config.WorkItemTypeDefinition.Keys)
             {
                 this.AddWorkItemTypeDefinition(key, new DescreteWitdMapper(config.WorkItemTypeDefinition[key]));

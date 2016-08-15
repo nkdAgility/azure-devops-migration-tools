@@ -12,8 +12,8 @@ namespace VSTS.DataBulkEditor.Engine.Configuration
     public class EngineConfiguration
     {
         public bool TelemetryEnableTrace { get; set; }
-        public TeamProjectConfig Target { get; set; }
         public TeamProjectConfig Source { get; set; }
+        public TeamProjectConfig Target { get; set; }
         public string ReflectedWorkItemIDFieldName { get; set; }
         public List<IFieldMapConfig> FieldMaps { get; set; }
         public Dictionary<string, string> WorkItemTypeDefinition { get; set; }
@@ -23,8 +23,8 @@ namespace VSTS.DataBulkEditor.Engine.Configuration
         {
             EngineConfiguration ec = new EngineConfiguration();
             ec.TelemetryEnableTrace = true;
-            ec.Target = new TeamProjectConfig() { Name = "DemoProjt", Collection = new Uri("https://sdd2016.visualstudio.com/") };
             ec.Source = new TeamProjectConfig() { Name = "DemoProjs", Collection = new Uri("https://sdd2016.visualstudio.com/") };
+            ec.Target = new TeamProjectConfig() { Name = "DemoProjt", Collection = new Uri("https://sdd2016.visualstudio.com/") };
             ec.ReflectedWorkItemIDFieldName = "TfsMigrationTool.ReflectedWorkItemId";
             ec.FieldMaps = new List<IFieldMapConfig>();
             ec.FieldMaps.Add(new FieldValueMapConfig()

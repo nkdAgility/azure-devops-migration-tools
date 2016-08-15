@@ -88,13 +88,12 @@ namespace VSTS.DataBulkEditor.Engine
                             newwit.Save();
                             Trace.WriteLine(string.Format("...Saved as {0}", newwit.Id));
                             newwit.Fields["System.CreatedDate"].Value = sourceWI.Fields["System.CreatedDate"].Value;
-                            newwit.Save();
                             Trace.WriteLine(string.Format("...And Date Created Updated"));
                             if (sourceWI.Fields.Contains(me.ReflectedWorkItemIdFieldName))
                             {
                                 sourceWI.Fields[me.ReflectedWorkItemIdFieldName].Value = targetStore.CreateReflectedWorkItemId(newwit);
-                                sourceWI.Save();
                             }
+                            newwit.Save();
 
                         }
                         catch (Exception ex)
@@ -115,8 +114,7 @@ namespace VSTS.DataBulkEditor.Engine
                     //  sourceWI.Open();
                     //  sourceWI.SyncToLatest();
                     //  sourceWI.Fields["TfsMigrationTool.ReflectedWorkItemId"].Value = destWIFound[0].Id;
-
-                    sourceWI.Save();
+                    //sourceWI.Save();
                 }
                 witstopwatch.Stop();
                 elapsedms = elapsedms + witstopwatch.ElapsedMilliseconds;
@@ -261,8 +259,8 @@ namespace VSTS.DataBulkEditor.Engine
 
         private static void BuildFieldTable(WorkItem oldWi, StringBuilder history, bool useHTML = false)
         {
+            history.Append("<p>&nbsp;</p>");
             if (useHTML) {
-                history.Append("<p>&nbsp;</p>");
                 history.Append("<table border='1' cellpadding='2' style='width:100%;border-color:#C0C0C0;'><tr><td><b>Field</b></td><td><b>Value</b></td></tr>");
             }
             foreach (Field f in oldWi.Fields)
@@ -274,7 +272,7 @@ namespace VSTS.DataBulkEditor.Engine
                         history.AppendFormat("<tr><td style='text-align:right;white-space:nowrap;'><b>{0}</b></td><td>n/a</td></tr>", f.Name);
                     } else
                     {
-                        history.AppendLine(string.Format("{0}: null", f.Name));
+                        history.AppendLine(string.Format("{0}: null<br />", f.Name));
                     }
                 }
                 else
@@ -285,7 +283,7 @@ namespace VSTS.DataBulkEditor.Engine
 
                     }else
                     {
-                        history.AppendLine(string.Format("{0}: {1}", f.Name, f.Value.ToString()));
+                        history.AppendLine(string.Format("{0}: {1}<br />", f.Name, f.Value.ToString()));
                     }
                 }
 
@@ -293,8 +291,8 @@ namespace VSTS.DataBulkEditor.Engine
             if (useHTML)
             {
                 history.Append("</table>");
-                history.Append("<p>&nbsp;</p>");
             }
+            history.Append("<p>&nbsp;</p>");
         }
 
         private static void BuildCommentTable(WorkItem oldWi, StringBuilder history)
