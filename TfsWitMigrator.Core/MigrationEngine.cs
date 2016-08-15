@@ -7,6 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VSTS.DataBulkEditor.Engine.ComponentContext;
+using VSTS.DataBulkEditor.Engine.Configuration;
+using VSTS.DataBulkEditor.Engine.Configuration.FieldMap;
+using VSTS.DataBulkEditor.Engine.Configuration.Processing;
 
 namespace VSTS.DataBulkEditor.Engine
 {
@@ -20,6 +23,37 @@ namespace VSTS.DataBulkEditor.Engine
         ITeamProjectContext target;
         string reflectedWorkItemIdFieldName = "TfsMigrationTool.ReflectedWorkItemId";
         
+        public MigrationEngine()
+        {
+
+        }
+        public MigrationEngine(EngineConfiguration config)
+        {
+            ProcessConfiguration(config);
+        }
+
+        private void ProcessConfiguration(EngineConfiguration config)
+        {
+            Telemetry.EnableTrace = config.TelemetryEnableTrace;
+            this.SetSource(new TeamProjectContext(config.Source.Collection, config.Source.Name));
+            this.SetTarget(new TeamProjectContext(config.Target.Collection, config.Target.Name));
+            this.SetReflectedWorkItemIdFieldName(config.ReflectedWorkItemIDFieldName);
+            foreach (IFieldMapConfig fieldmapConfig in config.FieldMaps)
+            {
+                this.AddFieldMap(fieldmapConfig.WorkItemTypeName, (IFieldMap)Activator.CreateInstance(fieldmapConfig.FieldMap, fieldmapConfig));
+            }
+            foreach (string key in config.WorkItemTypeDefinition.Keys)
+            {
+                this.AddWorkItemTypeDefinition(key, new DescreteWitdMapper(config.WorkItemTypeDefinition[key]));
+            }
+            foreach (ITfsProcessingConfig processorConfig in config.Processors)
+            {
+                if (!processorConfig.Disabled)
+                {
+                    this.AddProcessor((ITfsProcessingContext)Activator.CreateInstance(processorConfig.Processor, this, processorConfig));
+                }
+            }
+        }
 
         public Dictionary<string, IWitdMapper> WorkItemTypeDefinitions
         {
@@ -162,7 +196,6 @@ namespace VSTS.DataBulkEditor.Engine
                 map.Execute(source, target);
             }
         }
-
 
     }
 }
