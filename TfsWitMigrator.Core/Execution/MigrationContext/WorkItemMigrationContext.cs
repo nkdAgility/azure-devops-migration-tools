@@ -85,16 +85,15 @@ namespace VSTS.DataBulkEditor.Engine
 
                         try
                         {
+                            newwit.Fields["System.CreatedDate"].Value = sourceWI.Fields["System.CreatedDate"].Value;
                             newwit.Save();
                             Trace.WriteLine(string.Format("...Saved as {0}", newwit.Id));
-                            newwit.Fields["System.CreatedDate"].Value = sourceWI.Fields["System.CreatedDate"].Value;
-                            Trace.WriteLine(string.Format("...And Date Created Updated"));
                             if (sourceWI.Fields.Contains(me.ReflectedWorkItemIdFieldName))
                             {
                                 sourceWI.Fields[me.ReflectedWorkItemIdFieldName].Value = targetStore.CreateReflectedWorkItemId(newwit);
                             }
-                            newwit.Save();
-
+                            sourceWI.Save();
+                            Trace.WriteLine(string.Format("...and Source Updated {0}", sourceWI.Id));
                         }
                         catch (Exception ex)
                         {
