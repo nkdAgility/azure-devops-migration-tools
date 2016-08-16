@@ -13,6 +13,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionFiles", "SolutionFi
 		README.md = README.md
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "configurations", "configurations", "{89434800-3004-4621-8677-C14C1D1AA4AF}"
+	ProjectSection(SolutionItems) = preProject
+		configurations\demo-mapping-scrum2Agile.json = configurations\demo-mapping-scrum2Agile.json
+		configurations\demo-migration-reset.json = configurations\demo-migration-reset.json
+		configurations\demo-migration.json = configurations\demo-migration.json
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
