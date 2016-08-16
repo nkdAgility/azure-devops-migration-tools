@@ -93,6 +93,7 @@ namespace VSTS.DataBulkEditor.ConsoleApp
             }
             else
             {
+                Trace.WriteLine("Loading Config");
                 StreamReader sr = new StreamReader(opts.ConfigFile);
                 string vstsbulkeditorjson = sr.ReadToEnd();
                 sr.Close();
@@ -100,9 +101,11 @@ namespace VSTS.DataBulkEditor.ConsoleApp
                     new FieldMapConfigJsonConverter(),
                     new ProcessorConfigJsonConverter());
             }
-
+            Trace.WriteLine("Config Loaded, creating engine");
             MigrationEngine me = new MigrationEngine(ec);
+            Trace.WriteLine("Engine created, running...");
             me.Run();
+            Trace.WriteLine("Run complete...");
             return 0;
         }
 

@@ -100,6 +100,7 @@ namespace VSTS.DataBulkEditor.Engine
             Stopwatch engineTimer = new Stopwatch();
             engineTimer.Start();
             ProcessingStatus ps = ProcessingStatus.Complete;
+            Trace.WriteLine("Beginning run of {0} processors", processors.Count.ToString());
             foreach (ITfsProcessingContext process in processors)
             {
                 Stopwatch processorTimer = new Stopwatch();
