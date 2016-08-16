@@ -19,8 +19,8 @@ namespace VSTS.DataBulkEditor.Engine
     public class ExportProfilePictureFromADContext : ProcessingContextBase
     {
 
-        private readonly TfsTeamService teamService;
-        private readonly ProjectInfo projectInfo;
+        //private readonly TfsTeamService teamService;
+        //private readonly ProjectInfo projectInfo;
         private readonly IIdentityManagementService2 ims2;
         ExportProfilePictureFromADConfig config;
 
@@ -90,7 +90,7 @@ namespace VSTS.DataBulkEditor.Engine
                             {
                                 DirectoryEntry deUser = new DirectoryEntry(sresult.Path, config.Username, config.Password);
                                 Trace.WriteLine(string.Format("{0} [PROCESS] {1}: {2}", current, deUser.Name, newImage));
-                                string empPic = string.Format("http://directory.COMPANY.com/misc/pictures/{0}.jpg", deUser.Properties["employeeNumber"].Value);
+                                string empPic = string.Format(config.PictureEmpIDFormat, deUser.Properties["employeeNumber"].Value);
                                 try
                                 {
 

@@ -21,8 +21,8 @@ namespace VSTS.DataBulkEditor.Engine
     public class ImportProfilePictureContext : ProcessingContextBase
     {
 
-        private readonly TfsTeamService teamService;
-        private readonly ProjectInfo projectInfo;
+        //private readonly TfsTeamService teamService;
+        //private readonly ProjectInfo projectInfo;
         private readonly IIdentityManagementService2 ims2;
 
         public override string Name

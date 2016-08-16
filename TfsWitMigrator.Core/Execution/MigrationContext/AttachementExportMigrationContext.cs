@@ -60,7 +60,7 @@ namespace VSTS.DataBulkEditor.Engine
                         }
                         catch (Exception ex)
                         {
-
+                            Telemetry.Current.TrackException(ex);
                             Trace.Write("...failed");
                         }
                      

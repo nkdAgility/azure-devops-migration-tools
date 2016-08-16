@@ -41,8 +41,6 @@ namespace VSTS.DataBulkEditor.Engine
             //////////////////////////////////////////////////
             
             int current = sourceWIS.Count;
-            int count = 0;
-            long elapsedms = 0;
             foreach (WorkItem sourceWI in sourceWIS)
             {
                 System.Threading.Thread.Sleep(10);

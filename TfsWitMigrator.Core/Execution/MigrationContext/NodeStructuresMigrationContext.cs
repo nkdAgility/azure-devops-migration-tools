@@ -78,6 +78,7 @@ namespace VSTS.DataBulkEditor.Engine
             }
             catch (CommonStructureSubsystemException ex)
             {
+                Telemetry.Current.TrackException(ex);
                 Trace.Write("...missing");
                 string newPathUri = css.CreateNode(name, parent.Uri);
                 Trace.Write("...created");
