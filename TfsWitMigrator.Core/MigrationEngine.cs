@@ -35,8 +35,14 @@ namespace VSTS.DataBulkEditor.Engine
         private void ProcessConfiguration(EngineConfiguration config)
         {
             Telemetry.EnableTrace = config.TelemetryEnableTrace;
-            this.SetSource(new TeamProjectContext(config.Source.Collection, config.Source.Name));
-            this.SetTarget(new TeamProjectContext(config.Target.Collection, config.Target.Name));
+            if (config.Source != null)
+            {
+                this.SetSource(new TeamProjectContext(config.Source.Collection, config.Source.Name));
+            }
+            if (config.Target != null)
+            {
+                this.SetTarget(new TeamProjectContext(config.Target.Collection, config.Target.Name));
+            }           
             this.SetReflectedWorkItemIdFieldName(config.ReflectedWorkItemIDFieldName);
             if (config.FieldMaps != null)
             {

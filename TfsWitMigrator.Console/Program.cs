@@ -80,6 +80,7 @@ namespace VSTS.DataBulkEditor.ConsoleApp
 
         private static object RunExecuteAndReturnExitCode(RunOptions opts)
         {
+            Telemetry.Current.TrackEvent("ExecuteCommand");
             EngineConfiguration ec;
             if (opts.ConfigFile == string.Empty)
             {
@@ -111,6 +112,7 @@ namespace VSTS.DataBulkEditor.ConsoleApp
 
         private static object RunInitAndReturnExitCode(InitOptions opts)
         {
+            Telemetry.Current.TrackEvent("InitCommand");
             if (!File.Exists("vstsbulkeditor.json"))
             {
                 string json = JsonConvert.SerializeObject(EngineConfiguration.GetDefault(),

@@ -12,7 +12,6 @@ namespace VSTS.DataBulkEditor.Engine.ComponentContext
     public class FieldToFieldMap : FieldMapBase
     {
         private FieldtoFieldMapConfig config;
-        private string targetField;
 
         public FieldToFieldMap(FieldtoFieldMapConfig config)
         {
@@ -21,10 +20,10 @@ namespace VSTS.DataBulkEditor.Engine.ComponentContext
 
         internal override void InternalExecute(WorkItem source, WorkItem target)
         {
-            if (source.Fields.Contains(config.sourceField) && target.Fields.Contains(targetField))
+            if (source.Fields.Contains(config.sourceField) && target.Fields.Contains(config.targetField))
             {
-                target.Fields[targetField].Value = source.Fields[config.sourceField].Value;
-                Trace.WriteLine(string.Format("  [UPDATE] field mapped {0}:{1} to {2}:{3}", source.Id, config.sourceField, target.Id, targetField));
+                target.Fields[config.targetField].Value = source.Fields[config.sourceField].Value;
+                Trace.WriteLine(string.Format("  [UPDATE] field mapped {0}:{1} to {2}:{3}", source.Id, config.sourceField, target.Id, config.targetField));
             }
         }
     }
