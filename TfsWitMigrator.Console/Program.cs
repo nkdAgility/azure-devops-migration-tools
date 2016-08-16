@@ -40,20 +40,41 @@ namespace VSTS.DataBulkEditor.ConsoleApp
 
         static int Main(string[] args)
         {
+            Telemetry.Current.TrackEvent("ApplicationStart");
+            DateTime startTime = DateTime.Now;
+            Stopwatch mainTimer = new Stopwatch();
+            mainTimer.Start();
+            //////////////////////////////////////////////////
             Trace.Listeners.Add(new TextWriterTraceListener(Console.Out));
             Trace.Listeners.Add(new TextWriterTraceListener(string.Format(@"{0}-{1}.log", DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss"), "MigrationRun"), "myListener"));
             //////////////////////////////////////////////////
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
+            Trace.WriteLine(System.Reflection.Assembly.GetExecutingAssembly().GetName().Name);
+            Trace.WriteLine(System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString());
+            Trace.WriteLine(string.Format("Telemitery Enabled: {0}", Telemetry.Current.IsEnabled().ToString()));
+            Trace.WriteLine(string.Format("SessionID: {0}", Telemetry.Current.Context.Session.Id));
+            Trace.WriteLine(string.Format("User: {0}", Telemetry.Current.Context.User.Id));
+            Trace.WriteLine(string.Format("Start Time: {0}", startTime.ToUniversalTime()));
+            Trace.WriteLine("----------------------------------------------------------------");
+            Trace.WriteLine("------------------------------START-----------------------------");
+            Trace.WriteLine("----------------------------------------------------------------");
             //////////////////////////////////////////////////
             int result = (int)Parser.Default.ParseArguments<InitOptions, RunOptions>(args).MapResult(
                 (InitOptions opts) => RunInitAndReturnExitCode(opts),
                 (RunOptions opts) => RunExecuteAndReturnExitCode(opts),
                 errs => 1);
             //////////////////////////////////////////////////
-            Console.WriteLine();
-            Console.WriteLine("Freedom");
-            Console.ReadKey();
+            Trace.WriteLine("----------------------------------------------------------------");
+            Trace.WriteLine("-------------------------------END------------------------------");
+            Trace.WriteLine("----------------------------------------------------------------");
+            mainTimer.Stop();
+            Telemetry.Current.TrackEvent("ApplicationEnd", null,
+                new Dictionary<string, double> {
+                        { "ApplicationDuration", mainTimer.ElapsedMilliseconds }
+                });
+            Telemetry.Current.Flush();
+            
+            Trace.WriteLine(string.Format("Duration: {0}", mainTimer.Elapsed.ToString("c")));
+            Trace.WriteLine(string.Format("End Time: {0}", startTime.ToUniversalTime()));
             return result;
         }
 
