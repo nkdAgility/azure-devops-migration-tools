@@ -27,6 +27,7 @@ namespace VSTS.DataBulkEditor.Engine.Configuration
             ec.Target = new TeamProjectConfig() { Name = "DemoProjt", Collection = new Uri("https://sdd2016.visualstudio.com/") };
             ec.ReflectedWorkItemIDFieldName = "TfsMigrationTool.ReflectedWorkItemId";
             ec.FieldMaps = new List<IFieldMapConfig>();
+            ec.FieldMaps.Add(new FieldBlankMapConfig() { WorkItemTypeName = "*", targetField = "TfsMigrationTool.ReflectedWorkItemId" });
             ec.FieldMaps.Add(new FieldValueMapConfig()
             {
                 WorkItemTypeName = "*",

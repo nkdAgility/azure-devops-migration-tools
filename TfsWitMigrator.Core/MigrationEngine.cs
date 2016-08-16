@@ -35,8 +35,14 @@ namespace VSTS.DataBulkEditor.Engine
         private void ProcessConfiguration(EngineConfiguration config)
         {
             Telemetry.EnableTrace = config.TelemetryEnableTrace;
-            this.SetSource(new TeamProjectContext(config.Source.Collection, config.Source.Name));
-            this.SetTarget(new TeamProjectContext(config.Target.Collection, config.Target.Name));
+            if (config.Source != null)
+            {
+                this.SetSource(new TeamProjectContext(config.Source.Collection, config.Source.Name));
+            }
+            if (config.Target != null)
+            {
+                this.SetTarget(new TeamProjectContext(config.Target.Collection, config.Target.Name));
+            }           
             this.SetReflectedWorkItemIdFieldName(config.ReflectedWorkItemIDFieldName);
             if (config.FieldMaps != null)
             {
@@ -100,6 +106,7 @@ namespace VSTS.DataBulkEditor.Engine
             Stopwatch engineTimer = new Stopwatch();
             engineTimer.Start();
             ProcessingStatus ps = ProcessingStatus.Complete;
+            Trace.WriteLine("Beginning run of {0} processors", processors.Count.ToString());
             foreach (ITfsProcessingContext process in processors)
             {
                 Stopwatch processorTimer = new Stopwatch();
