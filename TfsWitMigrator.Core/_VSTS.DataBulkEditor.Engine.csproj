@@ -262,6 +262,7 @@
     <Compile Include="Configuration\FieldMap\FieldValueMapConfig.cs" />
     <Compile Include="Configuration\FieldMap\IFieldMapConfig.cs" />
     <Compile Include="Configuration\JsonCreationConverter.cs" />
+    <Compile Include="Configuration\Processing\TeamMigrationConfig.cs" />
     <Compile Include="Configuration\Processing\WorkItemUpdateAreasAsTagsConfig.cs" />
     <Compile Include="Configuration\Processing\FakeProcessorConfig.cs" />
     <Compile Include="Configuration\Processing\ExportProfilePictureFromADConfig.cs" />
@@ -302,6 +303,7 @@
     <Compile Include="Execution\MigrationContext\TestRunsMigrationContext.cs" />
     <Compile Include="Execution\MigrationContext\TestVeriablesMigrationContext.cs" />
     <Compile Include="Execution\MigrationContext\FakeProcessor.cs" />
+    <Compile Include="Execution\MigrationContext\TeamMigrationContext.cs" />
     <Compile Include="Execution\MigrationContext\WorkItemPostProcessingContext.cs" />
     <Compile Include="Execution\ProcessingContext\ExportTeamList.cs" />
     <Compile Include="Execution\ProcessingContext\FixGitCommitLinks.cs" />
