@@ -326,7 +326,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="ApplicationInsights.config" />
+    <None Include="ApplicationInsights.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
     <None Include="_VSTS.DataBulkEditor.Engine.nuspec" />
   </ItemGroup>
