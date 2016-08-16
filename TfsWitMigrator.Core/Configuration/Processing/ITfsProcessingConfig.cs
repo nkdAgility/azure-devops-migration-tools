@@ -9,7 +9,7 @@ namespace VSTS.DataBulkEditor.Engine.Configuration.Processing
 {
     public interface ITfsProcessingConfig
     {
-        bool Disabled { get; set; }
+        bool Enabled { get; set; }
         [JsonIgnoreAttribute]
         Type Processor { get; }
     }

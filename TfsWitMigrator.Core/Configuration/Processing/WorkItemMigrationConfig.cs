@@ -8,8 +8,10 @@ namespace VSTS.DataBulkEditor.Engine.Configuration.Processing
 {
     public class WorkItemMigrationConfig : ITfsProcessingConfig
     {
-        public bool Disabled { get; set; }
-
+        public bool Enabled { get; set; }
+        public bool UpdateCreatedDate { get; set; }
+        public bool UpdateCreatedBy { get; set; }
+public bool UpdateSoureReflectedId { get; set; }
         public Type Processor
         {
             get

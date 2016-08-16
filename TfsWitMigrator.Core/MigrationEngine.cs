@@ -57,7 +57,7 @@ namespace VSTS.DataBulkEditor.Engine
             }
             foreach (ITfsProcessingConfig processorConfig in config.Processors)
             {
-                if (!processorConfig.Disabled)
+                if (processorConfig.Enabled)
                 {
                     this.AddProcessor((ITfsProcessingContext)Activator.CreateInstance(processorConfig.Processor, this, processorConfig));
                 }

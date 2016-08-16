@@ -81,20 +81,20 @@ namespace VSTS.DataBulkEditor.Engine.Configuration
                     { "Product Backlog Item", "Product Backlog Item" }
             };
             ec.Processors = new List<ITfsProcessingConfig>();
-            ec.Processors.Add(new WorkItemMigrationConfig() { Disabled = true, QueryBit = @"AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')" });
-            ec.Processors.Add(new WorkItemUpdateConfig() { Disabled = true, QueryBit = @"AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')" });
-            ec.Processors.Add(new NodeStructuresMigrationConfig() { Disabled = true });
-            ec.Processors.Add(new LinkMigrationConfig() { Disabled = true });
-            ec.Processors.Add(new WorkItemPostProcessingConfig() { Disabled = true });
-            ec.Processors.Add(new WorkItemDeleteConfig() { Disabled = true });
-            ec.Processors.Add(new AttachementExportMigrationConfig() { Disabled = true, QueryBit = @"AND [System.AttachedFileCount] > 0" });
-            ec.Processors.Add(new AttachementImportMigrationConfig() { Disabled = true });
-            ec.Processors.Add(new TestVeriablesMigrationConfig() { Disabled = true });
-ec.Processors.Add(new TestConfigurationsMigrationConfig() { Disabled = true });
-ec.Processors.Add(new TestPlansAndSuitsMigrationConfig() { Disabled = true });
-ec.Processors.Add(new TestRunsMigrationConfig() { Disabled = true });
-ec.Processors.Add(new ImportProfilePictureConfig() { Disabled = true });
-ec.Processors.Add(new ExportProfilePictureFromADConfig() { Disabled = true });
+            ec.Processors.Add(new WorkItemMigrationConfig() { Enabled = false, UpdateCreatedBy=true, UpdateCreatedDate=true, UpdateSoureReflectedId=true, QueryBit = @"AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')" });
+            ec.Processors.Add(new WorkItemUpdateConfig() { Enabled = false, QueryBit = @"AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')" });
+            ec.Processors.Add(new NodeStructuresMigrationConfig() { Enabled = false });
+            ec.Processors.Add(new LinkMigrationConfig() { Enabled = false });
+            ec.Processors.Add(new WorkItemPostProcessingConfig() { Enabled = false });
+            ec.Processors.Add(new WorkItemDeleteConfig() { Enabled = false });
+            ec.Processors.Add(new AttachementExportMigrationConfig() { Enabled = false, QueryBit = @"AND [System.AttachedFileCount] > 0" });
+            ec.Processors.Add(new AttachementImportMigrationConfig() { Enabled = false });
+            ec.Processors.Add(new TestVeriablesMigrationConfig() { Enabled = false });
+            ec.Processors.Add(new TestConfigurationsMigrationConfig() { Enabled = false });
+            ec.Processors.Add(new TestPlansAndSuitsMigrationConfig() { Enabled = false });
+            ec.Processors.Add(new TestRunsMigrationConfig() { Enabled = false });
+            ec.Processors.Add(new ImportProfilePictureConfig() { Enabled = false });
+            ec.Processors.Add(new ExportProfilePictureFromADConfig() { Enabled = false });
             return ec;
         }
 

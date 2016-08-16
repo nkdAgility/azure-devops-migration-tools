@@ -85,10 +85,11 @@ namespace VSTS.DataBulkEditor.Engine
 
                         try
                         {
-                            newwit.Fields["System.CreatedDate"].Value = sourceWI.Fields["System.CreatedDate"].Value;
+                            if (_config.UpdateCreatedDate) { newwit.Fields["System.CreatedDate"].Value = sourceWI.Fields["System.CreatedDate"].Value; }
+                            if (_config.UpdateCreatedBy) { newwit.Fields["System.CreatedBy"].Value = sourceWI.Fields["System.CreatedBy"].Value; }
                             newwit.Save();
                             Trace.WriteLine(string.Format("...Saved as {0}", newwit.Id));
-                            if (sourceWI.Fields.Contains(me.ReflectedWorkItemIdFieldName))
+                            if (sourceWI.Fields.Contains(me.ReflectedWorkItemIdFieldName) && _config.UpdateSoureReflectedId)
                             {
                                 sourceWI.Fields[me.ReflectedWorkItemIdFieldName].Value = targetStore.CreateReflectedWorkItemId(newwit);
                             }
@@ -136,6 +137,9 @@ namespace VSTS.DataBulkEditor.Engine
 
         private static WorkItem CreateAndPopulateWorkItem(WorkItem oldWi, Project destProject, String destType)
         {
+            var fieldMappingStartTime = DateTime.UtcNow;
+            Stopwatch fieldMappingTimer = new Stopwatch();
+
             bool except = false;
             Trace.Write("... Building");
             List<String> ignore = new List<string>();
@@ -172,8 +176,6 @@ namespace VSTS.DataBulkEditor.Engine
             NewWorkItemTimer.Stop();
             Telemetry.Current.TrackDependency("TeamService", "NewWorkItem", NewWorkItemstartTime, NewWorkItemTimer.Elapsed, true);
             Trace.WriteLine(string.Format("Dependnacy: {0} - {1} - {2} - {3} - {4}", "TeamService", "NewWorkItem", NewWorkItemstartTime, NewWorkItemTimer.Elapsed, true));
-
-
             newwit.Title = oldWi.Title;
             newwit.State = oldWi.State;
             switch (newwit.State)
@@ -188,6 +190,7 @@ namespace VSTS.DataBulkEditor.Engine
                     break;
             }
             newwit.Reason = oldWi.Reason;
+            
             foreach (Field f in oldWi.Fields)
             {
                 if (newwit.Fields.Contains(f.ReferenceName) && !ignore.Contains(f.ReferenceName))
@@ -205,9 +208,6 @@ namespace VSTS.DataBulkEditor.Engine
                     newwit.Fields["Microsoft.VSTS.TCM.Steps"].Value = oldWi.Fields["Microsoft.VSTS.TCM.Steps"].Value;
                     newwit.Fields["Microsoft.VSTS.Common.Priority"].Value = oldWi.Fields["Microsoft.VSTS.Common.Priority"].Value;
                     break;
-                //case "User Story":
-                //newwit.Fields["COMPANY.DEVISION.Analysis"].Value = oldWi.Fields["COMPANY.PRODUCT.AcceptanceCriteria"].Value;
-                //break;
                 default:
                     break;
             }
@@ -218,15 +218,12 @@ namespace VSTS.DataBulkEditor.Engine
                 && newwit.Fields["Microsoft.VSTS.Common.BacklogPriority"].Value != null
                 && !isNumeric(newwit.Fields["Microsoft.VSTS.Common.BacklogPriority"].Value.ToString(),
                 NumberStyles.Any))
-            {
-                newwit.Fields["Microsoft.VSTS.Common.BacklogPriority"].Value = 10;
-            }
+                {
+                    newwit.Fields["Microsoft.VSTS.Common.BacklogPriority"].Value = 10;
+                }
 
             StringBuilder description = new StringBuilder();
             description.Append(oldWi.Description);
-            description.AppendLine();
-            description.AppendLine();
-            description.AppendFormat("##REF##{0}##", oldWi.Id);
             newwit.Description = description.ToString();
 
             StringBuilder history = new StringBuilder();
@@ -245,7 +242,9 @@ namespace VSTS.DataBulkEditor.Engine
             {
                 Trace.Write("...buildComplete");
             }
-
+            fieldMappingTimer.Stop();
+            Telemetry.Current.TrackMetric( "FieldMappingTime", fieldMappingTimer.ElapsedMilliseconds);
+            Trace.WriteLine(string.Format("FieldMapOnNewWorkItem: {0} - {1}", NewWorkItemstartTime, fieldMappingTimer.Elapsed.ToString("c")));
             return newwit;
         }
 
@@ -258,45 +257,25 @@ namespace VSTS.DataBulkEditor.Engine
 
         private static void BuildFieldTable(WorkItem oldWi, StringBuilder history, bool useHTML = false)
         {
-            history.Append("<p>&nbsp;</p>");
-            if (useHTML) {
-                history.Append("<table border='1' cellpadding='2' style='width:100%;border-color:#C0C0C0;'><tr><td><b>Field</b></td><td><b>Value</b></td></tr>");
-            }
+            history.Append("<p>Fields from previous Work Item:</p>");
             foreach (Field f in oldWi.Fields)
             {
                 if (f.Value == null)
                 {
-                    if (useHTML)
-                    {
-                        history.AppendFormat("<tr><td style='text-align:right;white-space:nowrap;'><b>{0}</b></td><td>n/a</td></tr>", f.Name);
-                    } else
-                    {
-                        history.AppendLine(string.Format("{0}: null<br />", f.Name));
-                    }
+                    history.AppendLine(string.Format("{0}: null<br />", f.Name));
                 }
                 else
                 {
-                    if (useHTML)
-                    {
-                        history.AppendFormat("<tr><td style='text-align:right;white-space:nowrap;'><b>{0}</b></td><td style='width:100%'>{1}</td></tr>", f.Name, f.Value.ToString());
-
-                    }else
-                    {
                         history.AppendLine(string.Format("{0}: {1}<br />", f.Name, f.Value.ToString()));
-                    }
                 }
 
-            }
-            if (useHTML)
-            {
-                history.Append("</table>");
             }
             history.Append("<p>&nbsp;</p>");
         }
 
         private static void BuildCommentTable(WorkItem oldWi, StringBuilder history)
         {
-            history.Append("<p>&nbsp;</p>");
+            history.Append("<p>Comments from previous work item:</p>");
             history.Append("<table border='1' style='width:100%;border-color:#C0C0C0;'>");
             foreach (Revision r in oldWi.Revisions)
             {

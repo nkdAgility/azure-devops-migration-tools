@@ -8,7 +8,7 @@ namespace VSTS.DataBulkEditor.Engine.Configuration.Processing
 {
     public class ExportProfilePictureFromADConfig : ITfsProcessingConfig
     {
-        public bool Disabled { get; set; }
+        public bool Enabled { get; set; }
 
         public string Domain { get; set; }
         public string Username { get; set; }

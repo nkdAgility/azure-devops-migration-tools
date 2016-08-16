@@ -10,7 +10,7 @@ namespace VSTS.DataBulkEditor.Engine.Configuration.Processing
     {
         public bool WhatIf { get; set; }
 
-        public bool Disabled { get; set; }
+        public bool Enabled { get; set; }
 
         public Type Processor
         {

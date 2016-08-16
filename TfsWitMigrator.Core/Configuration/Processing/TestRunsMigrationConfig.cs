@@ -8,7 +8,7 @@ namespace VSTS.DataBulkEditor.Engine.Configuration.Processing
 {
     public class TestRunsMigrationConfig : ITfsProcessingConfig
     {
-        public bool Disabled { get; set; }
+        public bool Enabled { get; set; }
         public string Status { get { return "Experimental"; } }
 
         public Type Processor

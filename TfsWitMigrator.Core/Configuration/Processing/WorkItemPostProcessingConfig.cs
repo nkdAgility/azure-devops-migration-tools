@@ -8,7 +8,7 @@ namespace VSTS.DataBulkEditor.Engine.Configuration.Processing
 {
     public class WorkItemPostProcessingConfig : ITfsProcessingConfig
     {
-        public bool Disabled { get; set; }
+        public bool Enabled { get; set; }
 
         public Type Processor
         {

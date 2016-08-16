@@ -8,7 +8,7 @@ namespace VSTS.DataBulkEditor.Engine.Configuration.Processing
 {
     public class WorkItemUpdateAreasAsTagsConfig : ITfsProcessingConfig
     {
-        public bool Disabled { get; set; }
+        public bool Enabled { get; set; }
         public string AreaIterationPath { get; set; }
 
         public Type Processor
