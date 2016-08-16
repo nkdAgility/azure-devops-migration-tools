@@ -300,7 +300,7 @@ namespace VSTS.DataBulkEditor.Engine
             history.Append("<table border='1' style='width:100%;border-color:#C0C0C0;'>");
             foreach (Revision r in oldWi.Revisions)
             {
-                if (r.Fields["System.History"].Value != "" && r.Fields["System.ChangedBy"].Value != "Martin Hinshelwood (Adm)")
+                if ((string)r.Fields["System.History"].Value != "" && (string)r.Fields["System.ChangedBy"].Value != "Martin Hinshelwood (Adm)")
                 {
                     r.WorkItem.Open();
                     history.AppendFormat("<tr><td style='align:right;width:100%'><p><b>{0} on {1}:</b></p><p>{2}</p></td></tr>", r.Fields["System.ChangedBy"].Value, DateTime.Parse(r.Fields["System.ChangedDate"].Value.ToString()).ToLongDateString(), r.Fields["System.History"].Value);

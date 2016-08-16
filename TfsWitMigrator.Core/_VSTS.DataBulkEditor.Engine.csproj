@@ -302,7 +302,6 @@
     <Compile Include="Execution\MigrationContext\TestRunsMigrationContext.cs" />
     <Compile Include="Execution\MigrationContext\TestVeriablesMigrationContext.cs" />
     <Compile Include="Execution\MigrationContext\FakeProcessor.cs" />
-    <Compile Include="Execution\MigrationContext\WorkItemMigrationResetContext.cs" />
     <Compile Include="Execution\MigrationContext\WorkItemPostProcessingContext.cs" />
     <Compile Include="Execution\ProcessingContext\ExportTeamList.cs" />
     <Compile Include="Execution\ProcessingContext\FixGitCommitLinks.cs" />
