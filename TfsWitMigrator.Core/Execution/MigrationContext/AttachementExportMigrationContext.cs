@@ -11,6 +11,9 @@ namespace VSTS.DataBulkEditor.Engine
 {
     public class AttachementExportMigrationContext : AttachementMigrationContextBase
     {
+
+        AttachementExportMigrationConfig _config;
+
         public override string Name
         {
             get
@@ -20,7 +23,7 @@ namespace VSTS.DataBulkEditor.Engine
         }
         public AttachementExportMigrationContext(MigrationEngine me, AttachementExportMigrationConfig config) : base(me, config)
         {
-     
+            this._config = config;
         }
 
         internal override void InternalExecute()
@@ -34,7 +37,7 @@ namespace VSTS.DataBulkEditor.Engine
             WorkItemStoreContext sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.None);
             TfsQueryContext tfsqc = new TfsQueryContext(sourceStore);
             tfsqc.AddParameter("TeamProject", me.Source.Name);
-            tfsqc.Query = @"SELECT [System.Id] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject AND [System.AttachedFileCount] > 0 AND  [Microsoft.VSTS.Common.ClosedDate] = '' ORDER BY [System.ChangedDate] desc ";
+            tfsqc.Query = string.Format(@"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY [System.ChangedDate] desc", _config.QueryBit);
             WorkItemCollection sourceWIS = tfsqc.Execute();
 
             WebClient webClient = new WebClient();

@@ -9,6 +9,7 @@ namespace VSTS.DataBulkEditor.Engine.Configuration.Processing
     public class AttachementExportMigrationConfig : ITfsProcessingConfig
     {
         public bool Disabled { get; set; }
+        public string QueryBit { get; set; }
 
         public Type Processor
         {

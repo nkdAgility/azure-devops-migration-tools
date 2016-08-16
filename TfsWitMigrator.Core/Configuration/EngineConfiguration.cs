@@ -87,7 +87,7 @@ namespace VSTS.DataBulkEditor.Engine.Configuration
             ec.Processors.Add(new LinkMigrationConfig() { Disabled = true });
             ec.Processors.Add(new WorkItemPostProcessingConfig() { Disabled = true });
             ec.Processors.Add(new WorkItemDeleteConfig() { Disabled = true });
-            ec.Processors.Add(new AttachementExportMigrationConfig() { Disabled = true });
+            ec.Processors.Add(new AttachementExportMigrationConfig() { Disabled = true, QueryBit = @"AND [System.AttachedFileCount] > 0" });
             ec.Processors.Add(new AttachementImportMigrationConfig() { Disabled = true });
             ec.Processors.Add(new TestVeriablesMigrationConfig() { Disabled = true });
 ec.Processors.Add(new TestConfigurationsMigrationConfig() { Disabled = true });
