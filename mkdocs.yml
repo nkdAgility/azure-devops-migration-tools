@@ -1,4 +1,10 @@
 site_name: VSTS Data Bulk Editor
 pages:
 - Home: index.md
+- Usage:
+  - Usage: usage/usage.md
+  - Command Line: usage/command-line.md
+  - NuGet Library: usage/nuget-library.md
+- Configuration: configuration.md
+- Server Configuration: server-configuration.md 
 theme: readthedocs
