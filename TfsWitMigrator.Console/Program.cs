@@ -75,6 +75,9 @@ namespace VSTS.DataBulkEditor.ConsoleApp
             
             Trace.WriteLine(string.Format("Duration: {0}", mainTimer.Elapsed.ToString("c")), "vstsbulkeditor");
             Trace.WriteLine(string.Format("End Time: {0}", startTime.ToUniversalTime()), "vstsbulkeditor");
+#if DEBUG
+            Console.ReadKey();
+#endif
             return result;
         }
 
