@@ -7,4 +7,5 @@ pages:
   - NuGet Library: usage/nuget-library.md
 - Configuration: configuration.md
 - Server Configuration: server-configuration.md 
+- Why: why.md 
 theme: readthedocs
