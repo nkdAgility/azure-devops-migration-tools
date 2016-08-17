@@ -34,7 +34,7 @@ namespace VSTS.DataBulkEditor.Engine
             WorkItemStoreContext sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.BypassRules);
             TfsQueryContext tfsqc = new TfsQueryContext(sourceStore);
             tfsqc.AddParameter("TeamProject", me.Source.Name);
-            tfsqc.Query = @"SELECT [System.Id] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject AND [System.RelatedLinkCount] > 0 AND  [System.Description] NOT CONTAINS '##LINKS-DONE##' ORDER BY [System.ChangedDate] desc "; // AND  [Microsoft.VSTS.Common.ClosedDate] = ''
+            tfsqc.Query = @"SELECT [System.Id] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject AND [System.RelatedLinkCount] > 0 ORDER BY [System.ChangedDate] desc "; // AND  [Microsoft.VSTS.Common.ClosedDate] = ''
             WorkItemCollection sourceWIS = tfsqc.Execute();
             //////////////////////////////////////////////////
 
@@ -76,7 +76,6 @@ namespace VSTS.DataBulkEditor.Engine
                                 CreateRelatedLink(wiSourceL, rl, wiTargetL, sourceStore, targetWitsc);
                             }
                         }
-                       wiSourceL.Description = wiSourceL.Description + "<br />##LINKS-DONE##";
                         wiSourceL.Save();
                     }
                     catch (WorkItemLinkValidationException ex)
