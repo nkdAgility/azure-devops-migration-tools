@@ -83,6 +83,7 @@ namespace VSTS.DataBulkEditor.Engine
                             { "MigrationContextTime", executeTimer.ElapsedMilliseconds }
                       });
                 Trace.TraceWarning(string.Format("  [EXCEPTION] {0}", ex.Message));
+                throw ex;
             }
         }
 

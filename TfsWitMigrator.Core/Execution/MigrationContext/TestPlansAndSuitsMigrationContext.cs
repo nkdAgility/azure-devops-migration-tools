@@ -19,6 +19,7 @@ namespace VSTS.DataBulkEditor.Engine
 
         WorkItemStoreContext targetWitStore;
         TestManagementContext targetTestStore;
+        ITestConfigurationCollection targetTestConfigs;
 
         TestPlansAndSuitsMigrationConfig config;
 
@@ -36,6 +37,7 @@ namespace VSTS.DataBulkEditor.Engine
             sourceTestStore = new TestManagementContext(me.Source);
             targetWitStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
             targetTestStore = new TestManagementContext(me.Target);
+            targetTestConfigs = targetTestStore.Project.TestConfigurations.Query("Select * From TestConfiguration");
             this.config = config;
         }
 
@@ -169,6 +171,40 @@ namespace VSTS.DataBulkEditor.Engine
             }
         }
 
+        private void ApplyConfigurations(ITestSuiteBase source, ITestSuiteBase target)
+        {
+            if (source.DefaultConfigurations != null)
+            {
+                //if (source.DefaultConfigurations != null && source.DefaultConfigurations.Count != target.DefaultConfigurations.Count)
+                //{
+                    Trace.WriteLine(string.Format("   CONFIG MNISSMATCH FOUND --- FIX AATTEMPTING"), "TestPlansAndSuites");
+                    target.ClearDefaultConfigurations();
+                    IList<IdAndName> targetConfigs = new List<IdAndName>();
+                    foreach (var config in source.DefaultConfigurations)
+                    {
+                        var targetFound = (from tc in targetTestConfigs
+                                           where tc.Name == config.Name
+                                           select tc).SingleOrDefault();
+                        if (!(targetFound == null))
+                        {
+
+                            targetConfigs.Add(new IdAndName(targetFound.Id, targetFound.Name));
+                        }
+                    }
+                    try
+                    {
+                        target.SetDefaultConfigurations(targetConfigs);
+                    }
+                    catch (Exception)
+                    {
+                        // SOmetimes this will error out for no reason.
+                    }
+
+               // }
+
+            }
+        }
+
         private void ApplyConfigurations(ITestSuiteEntry sourceEntry, ITestSuiteEntry targetEntry)
         {
             if (sourceEntry.Configurations != null)
@@ -178,16 +214,15 @@ namespace VSTS.DataBulkEditor.Engine
                     Trace.WriteLine(string.Format("   CONFIG MNISSMATCH FOUND --- FIX AATTEMPTING"), "TestPlansAndSuites");
                     targetEntry.Configurations.Clear();
                     IList<IdAndName> targetConfigs = new List<IdAndName>();
-
-                    ITestConfigurationCollection tcc = targetTestStore.Project.TestConfigurations.Query("Select * From TestConfiguration");
                     foreach (var config in sourceEntry.Configurations)
                     {
-                        var found = (from tc in tcc
-                                     where tc.Name == config.Name
-                                     select tc).SingleOrDefault();
-                        if (!(found == null))
+                        var targetFound = (from tc in targetTestConfigs
+                                           where tc.Name == config.Name
+                                           select tc).SingleOrDefault();
+                        if (!(targetFound == null))
                         {
-                            targetConfigs.Add(new IdAndName(found.Id, found.Name));
+
+                            targetConfigs.Add(new IdAndName(targetFound.Id, targetFound.Name));
                         }
                     }
                     try
@@ -215,7 +250,7 @@ namespace VSTS.DataBulkEditor.Engine
             IDynamicTestSuite targetSuitChild = targetTestStore.Project.TestSuites.CreateDynamic();
             if (source.TestSuiteEntry.Configurations != null)
             {
-                // TODO targetSuitChild.TestSuiteEntry.SetConfigurations(source.TestSuiteEntry.Configurations);
+                ApplyConfigurations(source, targetSuitChild);
             }
             targetSuitChild.TestSuiteEntry.Title = source.TestSuiteEntry.Title;
             targetSuitChild.Query = ((IDynamicTestSuite)source).Query;
@@ -237,7 +272,7 @@ namespace VSTS.DataBulkEditor.Engine
 
             if (source.TestSuiteEntry.Configurations != null)
             {
-                // TODO targetSuitChild.TestSuiteEntry.SetConfigurations(source.TestSuiteEntry.Configurations);
+                ApplyConfigurations(source, targetSuitChild);
             }
             targetSuitChild.Title = source.Title;
             return targetSuitChild;
@@ -255,12 +290,13 @@ namespace VSTS.DataBulkEditor.Engine
             ITestSuiteBase targetSuitChild = targetTestStore.Project.TestSuites.CreateStatic();
             if (source.TestSuiteEntry.Configurations != null)
             {
-                targetSuitChild.TestSuiteEntry.SetConfigurations(source.TestSuiteEntry.Configurations);
+                ApplyConfigurations(source,targetSuitChild);
             }
             targetSuitChild.TestSuiteEntry.Title = source.TestSuiteEntry.Title;
             return targetSuitChild;
         }
 
+    
 
         private ITestSuiteBase FindSuiteEntry(IStaticTestSuite staticSuit, string titleToFind)
         {
