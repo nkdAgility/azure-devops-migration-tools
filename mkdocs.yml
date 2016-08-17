@@ -6,4 +6,5 @@ pages:
   - Command Line: usage/command-line.md
   - NuGet Library: usage/nuget-library.md
 - Configuration: configuration.md
+- Server Configuration: server-configuration.md 
 theme: readthedocs
