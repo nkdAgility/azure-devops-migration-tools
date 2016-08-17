@@ -9,6 +9,7 @@ namespace VSTS.DataBulkEditor.Engine.Configuration.Processing
     public class TestPlansAndSuitsMigrationConfig : ITfsProcessingConfig
     {
         public bool Enabled { get; set; }
+        public string AreaIterationPath { get; set; }
 
         public Type Processor
         {

@@ -48,24 +48,24 @@ namespace VSTS.DataBulkEditor.ConsoleApp
             Trace.Listeners.Add(new TextWriterTraceListener(Console.Out));
             Trace.Listeners.Add(new TextWriterTraceListener(string.Format(@"{0}-{1}.log", DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss"), "MigrationRun"), "myListener"));
             //////////////////////////////////////////////////
-            Trace.WriteLine(System.Reflection.Assembly.GetExecutingAssembly().GetName().Name);
-            Trace.WriteLine(System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString());
-            Trace.WriteLine(string.Format("Telemitery Enabled: {0}", Telemetry.Current.IsEnabled().ToString()));
-            Trace.WriteLine(string.Format("SessionID: {0}", Telemetry.Current.Context.Session.Id));
-            Trace.WriteLine(string.Format("User: {0}", Telemetry.Current.Context.User.Id));
-            Trace.WriteLine(string.Format("Start Time: {0}", startTime.ToUniversalTime()));
-            Trace.WriteLine("----------------------------------------------------------------");
-            Trace.WriteLine("------------------------------START-----------------------------");
-            Trace.WriteLine("----------------------------------------------------------------");
+            Trace.WriteLine(System.Reflection.Assembly.GetExecutingAssembly().GetName().Name, "vstsbulkeditor");
+            Trace.WriteLine(System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(), "vstsbulkeditor");
+            Trace.WriteLine(string.Format("Telemitery Enabled: {0}", Telemetry.Current.IsEnabled().ToString()), "vstsbulkeditor");
+            Trace.WriteLine(string.Format("SessionID: {0}", Telemetry.Current.Context.Session.Id), "vstsbulkeditor");
+            Trace.WriteLine(string.Format("User: {0}", Telemetry.Current.Context.User.Id), "vstsbulkeditor");
+            Trace.WriteLine(string.Format("Start Time: {0}", startTime.ToUniversalTime()), "vstsbulkeditor");
+            Trace.WriteLine("----------------------------------------------------------------", "vstsbulkeditor");
+            Trace.WriteLine("------------------------------START-----------------------------", "vstsbulkeditor");
+            Trace.WriteLine("----------------------------------------------------------------", "vstsbulkeditor");
             //////////////////////////////////////////////////
             int result = (int)Parser.Default.ParseArguments<InitOptions, RunOptions>(args).MapResult(
                 (InitOptions opts) => RunInitAndReturnExitCode(opts),
                 (RunOptions opts) => RunExecuteAndReturnExitCode(opts),
                 errs => 1);
             //////////////////////////////////////////////////
-            Trace.WriteLine("----------------------------------------------------------------");
-            Trace.WriteLine("-------------------------------END------------------------------");
-            Trace.WriteLine("----------------------------------------------------------------");
+            Trace.WriteLine("----------------------------------------------------------------", "vstsbulkeditor");
+            Trace.WriteLine("-------------------------------END------------------------------", "vstsbulkeditor");
+            Trace.WriteLine("----------------------------------------------------------------", "vstsbulkeditor");
             mainTimer.Stop();
             Telemetry.Current.TrackEvent("ApplicationEnd", null,
                 new Dictionary<string, double> {
@@ -73,8 +73,8 @@ namespace VSTS.DataBulkEditor.ConsoleApp
                 });
             Telemetry.Current.Flush();
             
-            Trace.WriteLine(string.Format("Duration: {0}", mainTimer.Elapsed.ToString("c")));
-            Trace.WriteLine(string.Format("End Time: {0}", startTime.ToUniversalTime()));
+            Trace.WriteLine(string.Format("Duration: {0}", mainTimer.Elapsed.ToString("c")), "vstsbulkeditor");
+            Trace.WriteLine(string.Format("End Time: {0}", startTime.ToUniversalTime()), "vstsbulkeditor");
             return result;
         }
 
@@ -89,7 +89,7 @@ namespace VSTS.DataBulkEditor.ConsoleApp
 
             if (!File.Exists(opts.ConfigFile))
             {
-                Trace.WriteLine("The config file does not exist, nor doe the default 'vstsbulkeditor.json'. Use 'init' to create a configuration file first");
+                Trace.WriteLine("The config file does not exist, nor doe the default 'vstsbulkeditor.json'. Use 'init' to create a configuration file first", "vstsbulkeditor");
                 return 1;
             }
             else
@@ -102,11 +102,11 @@ namespace VSTS.DataBulkEditor.ConsoleApp
                     new FieldMapConfigJsonConverter(),
                     new ProcessorConfigJsonConverter());
             }
-            Trace.WriteLine("Config Loaded, creating engine");
+            Trace.WriteLine("Config Loaded, creating engine", "vstsbulkeditor");
             MigrationEngine me = new MigrationEngine(ec);
-            Trace.WriteLine("Engine created, running...");
+            Trace.WriteLine("Engine created, running...", "vstsbulkeditor");
             me.Run();
-            Trace.WriteLine("Run complete...");
+            Trace.WriteLine("Run complete...", "vstsbulkeditor");
             return 0;
         }
 
@@ -121,7 +121,7 @@ namespace VSTS.DataBulkEditor.ConsoleApp
                 StreamWriter sw = new StreamWriter("vstsbulkeditor.json");
                 sw.WriteLine(json);
                 sw.Close();
-                Trace.WriteLine("New vstsbulkeditor.json file has been created");
+                Trace.WriteLine("New vstsbulkeditor.json file has been created", "vstsbulkeditor");
             }
             return 0;
         }

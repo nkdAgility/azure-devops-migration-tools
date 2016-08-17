@@ -48,17 +48,20 @@ namespace VSTS.DataBulkEditor.Engine
             {
                 foreach (IFieldMapConfig fieldmapConfig in config.FieldMaps)
                 {
+                    Trace.WriteLine(string.Format("Adding FieldMap {0}", fieldmapConfig.FieldMap.Name), "MigrationEngine");
                     this.AddFieldMap(fieldmapConfig.WorkItemTypeName, (IFieldMap)Activator.CreateInstance(fieldmapConfig.FieldMap, fieldmapConfig));
                 }
             }            
             foreach (string key in config.WorkItemTypeDefinition.Keys)
             {
+                Trace.WriteLine(string.Format("Adding Work Item Type {0}", key), "MigrationEngine");
                 this.AddWorkItemTypeDefinition(key, new DescreteWitdMapper(config.WorkItemTypeDefinition[key]));
             }
             foreach (ITfsProcessingConfig processorConfig in config.Processors)
             {
                 if (processorConfig.Enabled)
                 {
+                    Trace.WriteLine(string.Format("Adding Processor {0}", processorConfig.Processor.Name), "MigrationEngine");
                     this.AddProcessor((ITfsProcessingContext)Activator.CreateInstance(processorConfig.Processor, this, processorConfig));
                 }
             }
@@ -106,7 +109,7 @@ namespace VSTS.DataBulkEditor.Engine
             Stopwatch engineTimer = new Stopwatch();
             engineTimer.Start();
             ProcessingStatus ps = ProcessingStatus.Complete;
-            Trace.WriteLine("Beginning run of {0} processors", processors.Count.ToString());
+            Trace.WriteLine(string.Format("Beginning run of {0} processors", processors.Count.ToString()), "MigrationEngine");
             foreach (ITfsProcessingContext process in processors)
             {
                 Stopwatch processorTimer = new Stopwatch();
@@ -117,7 +120,7 @@ namespace VSTS.DataBulkEditor.Engine
                 if (process.Status == ProcessingStatus.Failed)
                 {
                     ps = ProcessingStatus.Failed;
-                    Trace.WriteLine("The Processor {0} entered the failed state...stopping run", process.Name);
+                    Trace.WriteLine(string.Format("The Processor {0} entered the failed state...stopping run", process.Name), "MigrationEngine");
                     break;
                 }
             }

@@ -20,7 +20,7 @@ namespace VSTS.DataBulkEditor.Engine
         WorkItemStoreContext targetWitStore;
         TestManagementContext targetTestStore;
 
-        WorkItemUpdateAreasAsTagsConfig config;
+        TestPlansAndSuitsMigrationConfig config;
 
         public override string Name
         {
@@ -30,7 +30,7 @@ namespace VSTS.DataBulkEditor.Engine
             }
         }
 
-        public TestPlansAndSuitsMigrationContext(MigrationEngine me, WorkItemUpdateAreasAsTagsConfig config) : base(me, config)
+        public TestPlansAndSuitsMigrationContext(MigrationEngine me, TestPlansAndSuitsMigrationConfig config) : base(me, config)
         {
             sourceWitStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.None);
             sourceTestStore = new TestManagementContext(me.Source);

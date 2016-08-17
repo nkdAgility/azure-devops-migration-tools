@@ -41,11 +41,11 @@ namespace VSTS.DataBulkEditor.Engine
             tfsqc.AddParameter("TeamProject", me.Source.Name);
             tfsqc.Query = string.Format(@"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY [System.ChangedDate] desc", _config.QueryBit);
             WorkItemCollection sourceWIS = tfsqc.Execute();
-            Trace.WriteLine(string.Format("Migrate {0} work items?", sourceWIS.Count));
+            Trace.WriteLine(string.Format("Migrate {0} work items?", sourceWIS.Count),this.Name);
             //////////////////////////////////////////////////
             WorkItemStoreContext targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
             Project destProject = targetStore.GetProject();
-            Trace.WriteLine(string.Format("Found target project as {0}", destProject.Name));
+            Trace.WriteLine(string.Format("Found target project as {0}", destProject.Name), this.Name);
 
             int current = sourceWIS.Count;
             int count = 0;
@@ -56,7 +56,7 @@ namespace VSTS.DataBulkEditor.Engine
                 witstopwatch.Start();
                 WorkItem targetFound;
                 targetFound = targetStore.FindReflectedWorkItem(sourceWI, me.ReflectedWorkItemIdFieldName);
-                Trace.WriteLine(string.Format("{0} - Migrating: {1}-{2}", current, sourceWI.Id, sourceWI.Type.Name));
+                Trace.WriteLine(string.Format("{0} - Migrating: {1}-{2}", current, sourceWI.Id, sourceWI.Type.Name), this.Name);
                 if (targetFound == null)
                 {
                     WorkItem newwit = null;
@@ -72,12 +72,12 @@ namespace VSTS.DataBulkEditor.Engine
                         ArrayList fails = newwit.Validate();
                         foreach (Field f in fails)
                         {
-                            Trace.WriteLine(string.Format("{0} - Invalid: {1}-{2}-{3}", current, sourceWI.Id, sourceWI.Type.Name, f.ReferenceName));
+                            Trace.WriteLine(string.Format("{0} - Invalid: {1}-{2}-{3}", current, sourceWI.Id, sourceWI.Type.Name, f.ReferenceName), this.Name);
                         }
                     }
                     else
                     {
-                        Trace.WriteLine("...not supported");
+                        Trace.WriteLine("...not supported", this.Name);
                     }
 
                     if (newwit != null)
@@ -88,22 +88,22 @@ namespace VSTS.DataBulkEditor.Engine
                             if (_config.UpdateCreatedDate) { newwit.Fields["System.CreatedDate"].Value = sourceWI.Fields["System.CreatedDate"].Value; }
                             if (_config.UpdateCreatedBy) { newwit.Fields["System.CreatedBy"].Value = sourceWI.Fields["System.CreatedBy"].Value; }
                             newwit.Save();
-                            Trace.WriteLine(string.Format("...Saved as {0}", newwit.Id));
+                            Trace.WriteLine(string.Format("...Saved as {0}", newwit.Id), this.Name);
                             if (sourceWI.Fields.Contains(me.ReflectedWorkItemIdFieldName) && _config.UpdateSoureReflectedId)
                             {
                                 sourceWI.Fields[me.ReflectedWorkItemIdFieldName].Value = targetStore.CreateReflectedWorkItemId(newwit);
                             }
                             sourceWI.Save();
-                            Trace.WriteLine(string.Format("...and Source Updated {0}", sourceWI.Id));
+                            Trace.WriteLine(string.Format("...and Source Updated {0}", sourceWI.Id), this.Name);
                         }
                         catch (Exception ex)
                         {
-                            Trace.WriteLine("...FAILED to Save");
+                            Trace.WriteLine("...FAILED to Save", this.Name);
                             foreach (Field f in newwit.Fields)
                             {
-                                Trace.WriteLine(string.Format("{0} | {1}", f.ReferenceName, f.Value));
+                                Trace.WriteLine(string.Format("{0} | {1}", f.ReferenceName, f.Value), this.Name);
                             }
-                            Trace.WriteLine(ex.ToString());
+                            Trace.WriteLine(ex.ToString(), this.Name);
                         }
                     }
                 }
@@ -122,7 +122,7 @@ namespace VSTS.DataBulkEditor.Engine
                 count++;
                 TimeSpan average = new TimeSpan(0, 0, 0, 0, (int)(elapsedms / count));
                 TimeSpan remaining = new TimeSpan(0, 0, 0, 0, (int)(average.TotalMilliseconds * current));
-                Trace.WriteLine(string.Format("Average time of {0} per work item and {1} estimated to completion", string.Format(@"{0:s\:fff} seconds", average), string.Format(@"{0:%h} hours {0:%m} minutes {0:s\:fff} seconds", remaining)));
+                Trace.WriteLine(string.Format("Average time of {0} per work item and {1} estimated to completion", string.Format(@"{0:s\:fff} seconds", average), string.Format(@"{0:%h} hours {0:%m} minutes {0:s\:fff} seconds", remaining)), this.Name);
             }
             //////////////////////////////////////////////////
             stopwatch.Stop();
@@ -141,7 +141,7 @@ namespace VSTS.DataBulkEditor.Engine
             Stopwatch fieldMappingTimer = new Stopwatch();
 
             bool except = false;
-            Trace.Write("... Building");
+            Trace.Write("... Building", "WorkItemMigrationContext");
             List<String> ignore = new List<string>();
             ignore.Add("System.CreatedDate");
             ignore.Add("System.CreatedBy");
@@ -175,7 +175,7 @@ namespace VSTS.DataBulkEditor.Engine
             WorkItem newwit = destProject.WorkItemTypes[destType].NewWorkItem();
             NewWorkItemTimer.Stop();
             Telemetry.Current.TrackDependency("TeamService", "NewWorkItem", NewWorkItemstartTime, NewWorkItemTimer.Elapsed, true);
-            Trace.WriteLine(string.Format("Dependnacy: {0} - {1} - {2} - {3} - {4}", "TeamService", "NewWorkItem", NewWorkItemstartTime, NewWorkItemTimer.Elapsed, true));
+            Trace.WriteLine(string.Format("Dependnacy: {0} - {1} - {2} - {3} - {4}", "TeamService", "NewWorkItem", NewWorkItemstartTime, NewWorkItemTimer.Elapsed, true), "WorkItemMigrationContext");
             newwit.Title = oldWi.Title;
             newwit.State = oldWi.State;
             switch (newwit.State)
@@ -234,17 +234,17 @@ namespace VSTS.DataBulkEditor.Engine
 
             if (except)
             {
-                Trace.Write("...buildErrors");
+                Trace.WriteLine("...buildErrors", "WorkItemMigrationContext");
                 System.Threading.Thread.Sleep(1000);
 
             }
             else
             {
-                Trace.Write("...buildComplete");
+                Trace.WriteLine("...buildComplete", "WorkItemMigrationContext");
             }
             fieldMappingTimer.Stop();
             Telemetry.Current.TrackMetric( "FieldMappingTime", fieldMappingTimer.ElapsedMilliseconds);
-            Trace.WriteLine(string.Format("FieldMapOnNewWorkItem: {0} - {1}", NewWorkItemstartTime, fieldMappingTimer.Elapsed.ToString("c")));
+            Trace.WriteLine(string.Format("FieldMapOnNewWorkItem: {0} - {1}", NewWorkItemstartTime, fieldMappingTimer.Elapsed.ToString("c")), "WorkItemMigrationContext");
             return newwit;
         }
 
