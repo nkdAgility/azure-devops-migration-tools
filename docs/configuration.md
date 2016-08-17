@@ -164,6 +164,6 @@ Both the `Source` and `Target` entries hold the collection URL and the Team Proj
 
 ### ReflectedWorkItemIDFieldName
 
-This is the field that will be used to store the state for the migration. See [Server Configuration](../server-configuration.md)
+This is the field that will be used to store the state for the migration. See [Server Configuration](server-configuration.md)
 
 ...
