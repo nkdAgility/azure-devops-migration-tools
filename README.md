@@ -16,7 +16,7 @@ Visual Studio Team Services Bulk Data Editor Engine allows you to bulk edit data
 ## Quick Links
  - [Documentation](http://vsts-bulk-editor.readthedocs.io/en/latest)
  - [Contributing](http://vsts-bulk-editor.readthedocs.io/en/latest/#contributing)
- - [Why GitVersion](http://gitversion.readthedocs.org/en/latest/why)
+ - [Why VSTS Bulk Data Editor](http://vsts-bulk-editor.readthedocs.io/en/latest/why)
  - [Usage](http://vsts-bulk-editor.readthedocs.io/en/latest/usage/usage/)
 
 You are seeing:
