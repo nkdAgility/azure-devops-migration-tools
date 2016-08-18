@@ -84,7 +84,7 @@ namespace VSTS.DataBulkEditor.Engine.Configuration
             ec.Processors.Add(new WorkItemMigrationConfig() { Enabled = false, UpdateCreatedBy=true, UpdateCreatedDate=true, UpdateSoureReflectedId=true, QueryBit = @"AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')" });
             ec.Processors.Add(new WorkItemUpdateConfig() { Enabled = false, QueryBit = @"AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')" });
             ec.Processors.Add(new NodeStructuresMigrationConfig() { Enabled = false });
-            ec.Processors.Add(new LinkMigrationConfig() { Enabled = false });
+            ec.Processors.Add(new LinkMigrationConfig() { Enabled = false, QueryBit= @"AND [System.ExternalLinkCount] > 0 AND [System.RelatedLinkCount] > 0" });
             ec.Processors.Add(new WorkItemPostProcessingConfig() { Enabled = false });
             ec.Processors.Add(new WorkItemDeleteConfig() { Enabled = false });
             ec.Processors.Add(new AttachementExportMigrationConfig() { Enabled = false, QueryBit = @"AND [System.AttachedFileCount] > 0" });
@@ -95,6 +95,7 @@ namespace VSTS.DataBulkEditor.Engine.Configuration
             ec.Processors.Add(new TestRunsMigrationConfig() { Enabled = false });
             ec.Processors.Add(new ImportProfilePictureConfig() { Enabled = false });
             ec.Processors.Add(new ExportProfilePictureFromADConfig() { Enabled = false });
+            ec.Processors.Add(new FixGitCommitLinksConfig() { Enabled = false });
             return ec;
         }
 

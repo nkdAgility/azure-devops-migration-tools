@@ -21,6 +21,7 @@ using System.IO;
 using VSTS.DataBulkEditor.Engine.Configuration;
 using VSTS.DataBulkEditor.Engine.Configuration.FieldMap;
 using VSTS.DataBulkEditor.Engine.Configuration.Processing;
+using Microsoft.ApplicationInsights.DataContracts;
 
 namespace VSTS.DataBulkEditor.ConsoleApp
 {
@@ -41,6 +42,7 @@ namespace VSTS.DataBulkEditor.ConsoleApp
         static int Main(string[] args)
         {
             Telemetry.Current.TrackEvent("ApplicationStart");
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
             DateTime startTime = DateTime.Now;
             Stopwatch mainTimer = new Stopwatch();
             mainTimer.Start();
@@ -71,14 +73,28 @@ namespace VSTS.DataBulkEditor.ConsoleApp
                 new Dictionary<string, double> {
                         { "ApplicationDuration", mainTimer.ElapsedMilliseconds }
                 });
-            Telemetry.Current.Flush();
-            
+            if (Telemetry.Current != null)
+            {
+                Telemetry.Current.Flush();
+                // Allow time for flushing:
+                System.Threading.Thread.Sleep(1000);
+            }
             Trace.WriteLine(string.Format("Duration: {0}", mainTimer.Elapsed.ToString("c")), "vstsbulkeditor");
             Trace.WriteLine(string.Format("End Time: {0}", startTime.ToUniversalTime()), "vstsbulkeditor");
 #if DEBUG
             Console.ReadKey();
 #endif
             return result;
+        }
+
+        private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            ExceptionTelemetry excTelemetry = new ExceptionTelemetry((Exception)e.ExceptionObject);
+            excTelemetry.SeverityLevel = SeverityLevel.Critical;
+            excTelemetry.HandledAt = ExceptionHandledAt.Unhandled;
+            Telemetry.Current.TrackException(excTelemetry);
+            Telemetry.Current.Flush();
+            System.Threading.Thread.Sleep(1000);
         }
 
         private static object RunExecuteAndReturnExitCode(RunOptions opts)

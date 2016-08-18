@@ -26,9 +26,14 @@ namespace VSTS.DataBulkEditor.Engine
 
         public WorkItemCollection Execute()
         {
+            Trace.WriteLine(string.Format("TfsQueryContext: {0}: {1}", "TeamProjectCollection", storeContext.Store.TeamProjectCollection.Uri.ToString()), "TfsQueryContext");
             WorkItemCollection wc;
             var startTime = DateTime.UtcNow;
             Stopwatch queryTimer = new Stopwatch();
+            foreach (var item in parameters)
+            {
+                Trace.WriteLine(string.Format("TfsQueryContext: {0}: {1}", item.Key, item.Value), "TfsQueryContext");
+            }           
 
             queryTimer.Start();
             try

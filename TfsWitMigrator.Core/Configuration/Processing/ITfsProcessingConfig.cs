@@ -12,5 +12,6 @@ namespace VSTS.DataBulkEditor.Engine.Configuration.Processing
         bool Enabled { get; set; }
         [JsonIgnoreAttribute]
         Type Processor { get; }
+
     }
 }

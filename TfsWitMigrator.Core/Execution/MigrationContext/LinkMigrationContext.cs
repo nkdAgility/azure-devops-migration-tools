@@ -4,11 +4,14 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using VSTS.DataBulkEditor.Engine.Configuration.Processing;
+using VSTS.DataBulkEditor.Engine.Execution.Exceptions;
 
 namespace VSTS.DataBulkEditor.Engine
 {
     public class LinkMigrationContext : MigrationContextBase
     {
+
+        LinkMigrationConfig config;
         public override string Name
         {
             get
@@ -19,6 +22,7 @@ namespace VSTS.DataBulkEditor.Engine
 
         public LinkMigrationContext(MigrationEngine me, LinkMigrationConfig config) : base(me, config)
         {
+            this.config = config;
         }
 
         public void AddTagToWit(WorkItem w, string tag)
@@ -34,11 +38,11 @@ namespace VSTS.DataBulkEditor.Engine
             WorkItemStoreContext sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.BypassRules);
             TfsQueryContext tfsqc = new TfsQueryContext(sourceStore);
             tfsqc.AddParameter("TeamProject", me.Source.Name);
-            tfsqc.Query = @"SELECT [System.Id] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject AND [System.RelatedLinkCount] > 0 ORDER BY [System.ChangedDate] desc "; // AND  [Microsoft.VSTS.Common.ClosedDate] = ''
+            tfsqc.Query = string.Format(@"SELECT [System.Id] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject {0} ORDER BY [System.ChangedDate] desc ", config.QueryBit); // AND  [Microsoft.VSTS.Common.ClosedDate] = ''
             WorkItemCollection sourceWIS = tfsqc.Execute();
             //////////////////////////////////////////////////
 
-            Trace.WriteLine(string.Format("Migrate {0} work items links?", sourceWIS.Count));
+            Trace.WriteLine(string.Format("Migrate {0} work items links?", sourceWIS.Count), "LinkMigrationContext");
             int current = sourceWIS.Count;
             //////////////////////////////////////////////////
             WorkItemStoreContext targetWitsc = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
@@ -46,56 +50,92 @@ namespace VSTS.DataBulkEditor.Engine
             //////////////////////////////////////////////////
             foreach (WorkItem wiSourceL in sourceWIS)
             {
+                Trace.WriteLine(string.Format("Migrating Links for wiSourceL={0}",
+                                                   wiSourceL.Id), "LinkMigrationContext");
                 WorkItem wiTargetL = targetWitsc.FindReflectedWorkItem(wiSourceL, me.ReflectedWorkItemIdFieldName);
                 if (wiTargetL == null)
                 {
                     //wiSourceL was not migrated, or the migrated work item has been deleted. 
                     Trace.WriteLine(string.Format("[SKIP] Unable to migrate links where wiSourceL={0}, wiTargetL=NotFound",
-                                                   wiSourceL.Id));
+                                                   wiSourceL.Id), "LinkMigrationContext");
                     continue;
                 }
-
-                ///
+                Trace.WriteLine(string.Format("Found Target Left wiSourceL={0}, wiTargetL=NotFound",
+                                                   wiSourceL.Id), "LinkMigrationContext");
                 if (wiTargetL.Links.Count == wiSourceL.Links.Count)
                 {
-                    Trace.WriteLine(string.Format("[SKIP] SOurce and Target have same number of links  {0} - {1}", wiSourceL.Id, wiSourceL.Type.ToString()));
+                    Trace.WriteLine(string.Format("[SKIP] SOurce and Target have same number of links  {0} - {1}", wiSourceL.Id, wiSourceL.Type.ToString()), "LinkMigrationContext");
                 }
                 else
                 {
                     try
                     {
+                        Trace.Indent();
                         foreach (Link item in wiSourceL.Links)
                         {
+                            Trace.WriteLine(string.Format("Migrating link for {0} of type {1}",
+                                                   wiSourceL.Id, item.GetType().Name), "LinkMigrationContext");
                             if (IsHyperlink(item))
                             {
                                 CreateHyperlink((Hyperlink)item, wiTargetL);
-                            }
-                            if (IsRelatedLink(item))
-                            {
+                            } else if (IsRelatedLink(item)) {
                                 RelatedLink rl = (RelatedLink)item;
                                 CreateRelatedLink(wiSourceL, rl, wiTargetL, sourceStore, targetWitsc);
                             }
+                            else if (IsExternalLink(item))
+                            {
+                                ExternalLink rl = (ExternalLink)item;
+                                CreateExternalLink((ExternalLink)item, wiTargetL);
+                            } else {
+                                UnknownLinkTypeException ex = new UnknownLinkTypeException(string.Format("  [UnknownLinkType] Unable to {0}",item.GetType().Name));
+                                Telemetry.Current.TrackException(ex);
+                                Trace.WriteLine(ex.ToString(), "LinkMigrationContext");
+                                throw ex;
+                            }
                         }
-                        wiSourceL.Save();
                     }
                     catch (WorkItemLinkValidationException ex)
                     {
                         wiSourceL.Reset();
                         wiTargetL.Reset();
-                        Trace.WriteLine(string.Format("  [WorkItemLinkValidationException] Adding link for wiSourceL={0}", wiSourceL.Id));
-                        Trace.TraceError(ex.ToString());
-                        //throw ex;
+                        Telemetry.Current.TrackException(ex);
+                        Trace.WriteLine(string.Format("  [WorkItemLinkValidationException] Adding link for wiSourceL={0}", wiSourceL.Id), "LinkMigrationContext");
+                        Trace.WriteLine(ex.ToString(), "LinkMigrationContext");
                     }
                     catch (Exception ex)
                     {
-                        Trace.WriteLine(string.Format("  [CREATE-FAIL] Adding Link for wiSourceL={0}", wiSourceL.Id));
-                        Trace.TraceError(ex.ToString());
+                        Telemetry.Current.TrackException(ex);
+                        Trace.WriteLine(string.Format("  [CREATE-FAIL] Adding Link for wiSourceL={0}", wiSourceL.Id), "LinkMigrationContext");
+                        Trace.WriteLine(ex.ToString(), "LinkMigrationContext");
                     }
 
                 }
                 current--;
             }
 
+        }
+
+        private void CreateExternalLink(ExternalLink sourceLink, WorkItem target)
+        {
+            var exist = (from Link l in target.Links where l is ExternalLink && ((ExternalLink)l).LinkedArtifactUri == ((ExternalLink)sourceLink).LinkedArtifactUri select (ExternalLink)l).SingleOrDefault();
+            if (exist == null)
+            {
+
+                Trace.WriteLine(string.Format("Creating new {0} on {1}",
+                                                   sourceLink.GetType().Name, target.Id), "LinkMigrationContext");
+                ExternalLink el = new ExternalLink(sourceLink.ArtifactLinkType, sourceLink.LinkedArtifactUri);
+                el.Comment = sourceLink.Comment;
+                target.Links.Add(el);
+                target.Save();
+            } else {
+                Trace.WriteLine(string.Format("Link {0} on {1} already exists",
+                                                  sourceLink.GetType().Name, target.Id), "LinkMigrationContext");
+            }
+        }
+
+        private bool IsExternalLink(Link item)
+        {
+            return item is ExternalLink;
         }
 
         private void CreateRelatedLink(WorkItem wiSourceL, RelatedLink item, WorkItem wiTargetL, WorkItemStoreContext sourceStore, WorkItemStoreContext targetStore)
@@ -203,7 +243,7 @@ namespace VSTS.DataBulkEditor.Engine
 
         private void CreateHyperlink(Hyperlink sourceLink, WorkItem target)
         {
-            var exist = from Link l in target.Links where l is Hyperlink && ((Hyperlink)l).Location == ((Hyperlink)sourceLink).Location select (Hyperlink)l;
+            var exist = (from Link l in target.Links where l is Hyperlink && ((Hyperlink)l).Location == ((Hyperlink)sourceLink).Location select (Hyperlink)l).SingleOrDefault();
             if (exist == null)
             {
                 Hyperlink hl = new Hyperlink(sourceLink.Location);

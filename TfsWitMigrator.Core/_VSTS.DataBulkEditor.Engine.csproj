@@ -32,6 +32,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.AI.PerfCounterCollector, Version=2.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ApplicationInsights.PerfCounterCollector.2.1.0\lib\net45\Microsoft.AI.PerfCounterCollector.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.ApplicationInsights, Version=2.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.ApplicationInsights.2.1.0\lib\net45\Microsoft.ApplicationInsights.dll</HintPath>
       <Private>True</Private>
@@ -262,6 +266,7 @@
     <Compile Include="Configuration\FieldMap\FieldValueMapConfig.cs" />
     <Compile Include="Configuration\FieldMap\IFieldMapConfig.cs" />
     <Compile Include="Configuration\JsonCreationConverter.cs" />
+    <Compile Include="Configuration\Processing\FixGitCommitLinksConfig.cs" />
     <Compile Include="Configuration\Processing\TeamMigrationConfig.cs" />
     <Compile Include="Configuration\Processing\WorkItemUpdateAreasAsTagsConfig.cs" />
     <Compile Include="Configuration\Processing\FakeProcessorConfig.cs" />
@@ -282,6 +287,7 @@
     <Compile Include="Configuration\Processing\WorkItemUpdateConfig.cs" />
     <Compile Include="Configuration\Processing\WorkItemMigrationConfig.cs" />
     <Compile Include="Configuration\TeamProjectConfig.cs" />
+    <Compile Include="Execution\Exceptions\UnknownLinkTypeException.cs" />
     <Compile Include="Execution\FieldMaps\FieldMapBase.cs" />
     <Compile Include="Execution\FieldMaps\FieldMergeMap.cs" />
     <Compile Include="Execution\FieldMaps\FieldBlankMap.cs" />
