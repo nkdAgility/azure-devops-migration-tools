@@ -23,6 +23,7 @@ namespace VSTS.DataBulkEditor.Engine
                     InitiliseTelemetry();
                 }
                 return telemetryClient;
+                // No change
             } }
 
         public static void InitiliseTelemetry()
