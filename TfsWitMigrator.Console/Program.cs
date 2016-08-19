@@ -25,7 +25,7 @@ using Microsoft.ApplicationInsights.DataContracts;
 
 namespace VSTS.DataBulkEditor.ConsoleApp
 {
-    class Program
+    public class Program
     {
         [Verb("init", HelpText = "Creates initial config file")]
         class InitOptions
@@ -39,7 +39,7 @@ namespace VSTS.DataBulkEditor.ConsoleApp
             public string ConfigFile { get; set; }
         }
 
-        static int Main(string[] args)
+        public static int Main(string[] args)
         {
             Telemetry.Current.TrackEvent("ApplicationStart");
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
