@@ -70,6 +70,13 @@ namespace VSTS.DataBulkEditor.Engine.Configuration
                 pattern = @"PRODUCT \d{4}.(\d{1})",
                 replacement = "$1"
             });
+            ec.FieldMaps.Add(new FieldValuetoTagMapConfig()
+            {
+                WorkItemTypeName = "*",
+                sourceField = "Microsoft.VSTS.CMMI.Blocked",
+                pattern = @"Yes",
+                formatExpression = "{0}"
+            });
             ec.FieldMaps.Add(new TreeToTagMapConfig()
             {
                 WorkItemTypeName = "*",
