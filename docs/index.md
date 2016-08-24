@@ -1,45 +1,62 @@
 # VSTS Bulk Data Editor Engine Docs
 
-Visual Studio Team Services Bulk Data Editor Engine allows you to bulk edit data in Microsoft Team Foundation Server (TFS) and Visual Studio Team Services (VSTS). It has many names depending on what you are trying to achive. You might call it a migration tool, or a bulk update tool, and both are correct. 
+Visual Studio Team Services Bulk Data Editor Engine allows you to bulk edit data in Microsoft Team Foundation Server (TFS) and Visual Studio Team Services (VSTS). It has many names depending on what you are trying to achieve. You might call it a migration tool, or a bulk update tool, and both are correct. 
 
 ## Overview
 
 ### Main Purpose
 
-- **Bulk Update** - You can builk update work items and apply processing rules against your server or account. Use the `WorkItemUpdate` class that takes only a target Team Project. 
-- **Migration** - You can migrate work items, area & iterations, & test data from one Team Project to another. Use the `WorkItemMigrationContext` calss that takes both a Source and a Target Team Project
+- **Bulk Update** - You can bulk update work items and apply processing rules against your server or account. Use the `WorkItemUpdate` class that takes only a target Team Project. 
+- **Migration** - You can migrate work items, area & iterations, & test data from one Team Project to another. Use the `WorkItemMigrationContext` class that takes both a Source and a Target Team Project
 
 ### Field Mapps
 
-There are for field mapping systems available:
+By default, when you are moving from source to target the system will map all of the fields that exist in source to the same field in the target. However sometimes you want to move data to another field, or use a regex to parse out just the bits that you want. To help we have built a number of mapping tools that should give you the versatility you need.
 
-- FieldValueMap
-- FieldToTagFieldMap
-- FieldToTagFieldMap
-- RegexFieldMap
+- **FieldtoFieldMap** - Just want to map one field to another? This is the one for you.
+- **FieldMergeMap** - Ever wanted to merge two fields? This mapping will let you do just that.
+- **FieldBlankMap** - Allows you to set an already populated field to empty
+- **FieldtoTagMap** - Want to take a field and convert its value to a tag? Done...
+- **FieldValueMap** - Need to map not just the field but also values? This is the default value mapper.
+- **FieldValuetoTagMap** - Need to create a Tag based on a field value? Just create a regex match and choose how to populate the target.
+- **RegexFieldMap** - I just need that bit of a field... need to send "2016.2" to two fields, one for year and one for releae? Done.
+- **TreeToTagMap** - Need to clear out those nasty Area tree hierarchies? This creates Tags for each node in the Area Path...
 
 ### Processors
 
-There are other processors that can be used to migrate, or process, different sorts of data:
+There are other processors that can be used to migrate, or process, different sorts of data in diferent ways. Which one is right for you depends on the situation at hand.
 
-- AttachementExportMigrationContext
-- AttachementImportMigrationContext
-- LinkMigrationContext
-- NodeStructuresMigrationContext
-- TestConfigurationsMigrationContext
-- TestPlansAndSuitsMigrationContext
-- TestVeriablesMigrationContext
-- TestRunsMigrationContext
-- WorkItemMigrationContext
+####In-Place Processors
+
+- **WorkItemUpdate** - Need to just update work items in place, use this and only set the Target. All field mappings work...
+- **WorkItemDelete** - Woops... Can I just start again? Feed this a query and watch those items vanish ***WARNING***
+
+####Migrators
+
+Most of thise processors need to be run in order. If you try to migrate work items before you have migrated Area and Iterations then ***bang*** you need to go back.
+
+#####Work Items
+1. **NodeStructuresMigrationContext** - 
+1. **WorkItemMigrationContext** - The work horse...push tip from one location to another while maintining context. Make sure that you add a ReflectedWorkItemID and you can restart the service at any time...
+1. **AttachementExportMigrationContext** - 
+1. **AttachementImportMigrationContext** - 
+1. **LinkMigrationContext** - 
+
+#####Test Plans & Suites
+
+1. TestVeriablesMigrationContext
+1. TestConfigurationsMigrationContext
+1. TestPlansAndSuitsMigrationContext
+1. TestRunsMigrationContext [BETA]
+
+#####Misc
+
 - ImportProfilePictureContext
-- WorkItemDelete
-
-### Processors (Beta)
-
-- CreateTeamFolders
 - ExportProfilePictureFromADContext
-- ExportTeamList
+- WorkItemDelete
 - FixGitCommitLinks
+- CreateTeamFolders
+- ExportTeamList
 
 ## Contributing
 
