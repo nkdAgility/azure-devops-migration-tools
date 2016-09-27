@@ -13,6 +13,7 @@ namespace VSTS.DataBulkEditor.Engine
 {
     public class TestPlansAndSuitsMigrationContext : MigrationContextBase
     {
+        MigrationEngine engine;
 
         WorkItemStoreContext sourceWitStore;
         TestManagementContext sourceTestStore;
@@ -33,6 +34,7 @@ namespace VSTS.DataBulkEditor.Engine
 
         public TestPlansAndSuitsMigrationContext(MigrationEngine me, TestPlansAndSuitsMigrationConfig config) : base(me, config)
         {
+            this.engine = me;
             sourceWitStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.None);
             sourceTestStore = new TestManagementContext(me.Source);
             targetWitStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
@@ -321,8 +323,14 @@ namespace VSTS.DataBulkEditor.Engine
             targetPlan.Name = newPlanName;
             targetPlan.StartDate = sourcePlan.StartDate;
             targetPlan.EndDate = sourcePlan.EndDate;
-            targetPlan.AreaPath = this.config.AreaIterationPath;
-            targetPlan.Iteration = this.config.AreaIterationPath;
+            if (this.config.AreaIterationPath == null){
+                targetPlan.AreaPath = sourcePlan.AreaPath.Replace(engine.Source.Name, string.Format(@"{0}\{1}", engine.Target.Name, engine.Source.Name));
+                targetPlan.Iteration = sourcePlan.Iteration.Replace(engine.Source.Name, string.Format(@"{0}\{1}", engine.Target.Name, engine.Source.Name));
+            } else
+            {
+                targetPlan.AreaPath = this.config.AreaIterationPath;
+                targetPlan.Iteration = this.config.AreaIterationPath;
+            }
             targetPlan.ManualTestSettingsId = 0;
             return targetPlan;
         }

@@ -44,31 +44,34 @@ namespace VSTS.DataBulkEditor.Engine
             {
                 Trace.WriteLine(string.Format("Copy: {0}", sourceVar.Name));
                 ITestVariable targetVar= GetVar(targetTmc.Project.TestVariables, sourceVar.Name);
-                if (targetVar != null)
+                if (targetVar == null)
                 {
-                    Trace.WriteLine(string.Format("    Exists: {0}", sourceVar.Name));
-                    // match values
-                    foreach (var sourceVal in sourceVar.AllowedValues)
-                    {
-                        Trace.WriteLine(string.Format("    Seeking: {0}", sourceVal.Value));
-                        ITestVariableValue targetVal = GetVal(targetVar, sourceVal.Value);
-                        if (targetVal != null)
-                        {
-                            Trace.WriteLine(string.Format("    Exists: {0}", targetVal.Value));
-
-                        } else
-                        {
-                            Trace.WriteLine(string.Format("    Need to create: {0}", targetVal.Value));
-                            throw new NotImplementedException();
-                        }
-                    }
+                    Trace.WriteLine(string.Format("    Need to create: {0}", sourceVar.Name));
+                    targetVar = targetTmc.Project.TestVariables.Create();
+                    targetVar.Name = sourceVar.Name;
+                    targetVar.Save();
                 }
                 else
                 {
-                    Trace.WriteLine(string.Format("    Need to create: {0}", sourceVar.Name));
-                    throw new NotImplementedException();
+                    Trace.WriteLine(string.Format("    Exists: {0}", sourceVar.Name));
                 }
-
+                // match values
+                foreach (var sourceVal in sourceVar.AllowedValues)
+                {
+                    Trace.WriteLine(string.Format("    Seeking: {0}", sourceVal.Value));
+                    ITestVariableValue targetVal = GetVal(targetVar, sourceVal.Value);
+                    if (targetVal == null)
+                    {
+                        Trace.WriteLine(string.Format("    Need to create: {0}", sourceVal.Value));
+                        targetVal = targetTmc.Project.TestVariables.CreateVariableValue(sourceVal.Value);
+                        targetVar.AllowedValues.Add(targetVal);
+                       targetVar.Save();
+                    }
+                    else
+                    {
+                        Trace.WriteLine(string.Format("    Exists: {0}", targetVal.Value));
+                    }
+                }
 
             }
         }
