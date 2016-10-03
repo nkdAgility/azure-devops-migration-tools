@@ -9,6 +9,7 @@ namespace VSTS.DataBulkEditor.Engine.Configuration.Processing
     public class WorkItemMigrationConfig : ITfsProcessingConfig
     {
         public bool Enabled { get; set; }
+        public bool PrefixProjectToNodes { get; set; }
         public bool UpdateCreatedDate { get; set; }
         public bool UpdateCreatedBy { get; set; }
 public bool UpdateSoureReflectedId { get; set; }

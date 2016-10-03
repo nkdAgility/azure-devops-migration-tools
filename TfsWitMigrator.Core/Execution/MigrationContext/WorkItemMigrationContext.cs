@@ -63,7 +63,7 @@ namespace VSTS.DataBulkEditor.Engine
                     // Deside on WIT
                     if (me.WorkItemTypeDefinitions.ContainsKey(sourceWI.Type.Name))
                     {
-                        newwit = CreateAndPopulateWorkItem(sourceWI, destProject, me.WorkItemTypeDefinitions[sourceWI.Type.Name].Map(sourceWI));
+                        newwit = CreateAndPopulateWorkItem(_config,sourceWI, destProject, me.WorkItemTypeDefinitions[sourceWI.Type.Name].Map(sourceWI));
                         if (newwit.Fields.Contains(me.ReflectedWorkItemIdFieldName))
                         {
                             newwit.Fields[me.ReflectedWorkItemIdFieldName].Value = sourceStore.CreateReflectedWorkItemId(sourceWI);
@@ -135,7 +135,7 @@ namespace VSTS.DataBulkEditor.Engine
             return sourceWI.Title.ToLower().StartsWith("epic") || sourceWI.Title.ToLower().StartsWith("theme");
         }
 
-        private static WorkItem CreateAndPopulateWorkItem(WorkItem oldWi, Project destProject, String destType)
+        private static WorkItem CreateAndPopulateWorkItem(WorkItemMigrationConfig config , WorkItem oldWi, Project destProject, String destType)
         {
             var fieldMappingStartTime = DateTime.UtcNow;
             Stopwatch fieldMappingTimer = new Stopwatch();
@@ -198,8 +198,17 @@ namespace VSTS.DataBulkEditor.Engine
                     newwit.Fields[f.ReferenceName].Value = oldWi.Fields[f.ReferenceName].Value;
                 }
             }
-            newwit.AreaPath = string.Format(@"{0}\{1}", newwit.Project.Name, oldWi.AreaPath);
-            newwit.IterationPath = string.Format(@"{0}\{1}", newwit.Project.Name, oldWi.IterationPath);
+            if (config.PrefixProjectToNodes)
+            {
+                newwit.AreaPath = string.Format(@"{0}\{1}", newwit.Project.Name, oldWi.AreaPath);
+                newwit.IterationPath = string.Format(@"{0}\{1}", newwit.Project.Name, oldWi.IterationPath);
+            } else
+            {
+                var regex = new Regex(Regex.Escape(oldWi.Project.Name));
+                newwit.AreaPath = regex.Replace(oldWi.AreaPath, "newwit.Project.Name", 1);
+                newwit.IterationPath = regex.Replace(oldWi.IterationPath, "newwit.Project.Name", 1);
+            }
+            
             newwit.Fields["System.ChangedDate"].Value = oldWi.Fields["System.ChangedDate"].Value;
 
             switch (destType)

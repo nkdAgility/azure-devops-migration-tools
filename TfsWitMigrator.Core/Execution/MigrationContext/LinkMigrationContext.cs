@@ -215,7 +215,9 @@ namespace VSTS.DataBulkEditor.Engine
         private WorkItem GetRightHandSideTargitWi(WorkItem wiSourceL, WorkItem wiSourceR, WorkItem wiTargetL, WorkItemStoreContext targetStore)
         {
             WorkItem wiTargetR;
-            if (!(wiTargetL == null) && wiSourceR.Project.Name == wiTargetL.Project.Name)
+            if (!(wiTargetL == null) 
+                && wiSourceR.Project.Name == wiTargetL.Project.Name 
+                && wiSourceR.Project.Store.TeamProjectCollection.Uri.ToString() == wiTargetL.Project.Store.TeamProjectCollection.Uri.ToString())
             {
                 // Moving to same team project as SourceR
                 wiTargetR = wiSourceR;
