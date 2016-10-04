@@ -205,8 +205,8 @@ namespace VSTS.DataBulkEditor.Engine
             } else
             {
                 var regex = new Regex(Regex.Escape(oldWi.Project.Name));
-                newwit.AreaPath = regex.Replace(oldWi.AreaPath, "newwit.Project.Name", 1);
-                newwit.IterationPath = regex.Replace(oldWi.IterationPath, "newwit.Project.Name", 1);
+                newwit.AreaPath = regex.Replace(oldWi.AreaPath, newwit.Project.Name, 1);
+                newwit.IterationPath = regex.Replace(oldWi.IterationPath, newwit.Project.Name, 1);
             }
             
             newwit.Fields["System.ChangedDate"].Value = oldWi.Fields["System.ChangedDate"].Value;
