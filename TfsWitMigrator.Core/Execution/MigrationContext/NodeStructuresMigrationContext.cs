@@ -10,6 +10,7 @@ namespace VSTS.DataBulkEditor.Engine
 {
     public class NodeStructuresMigrationContext : MigrationContextBase
     {
+        NodeStructuresMigrationConfig config;
 
         public override string Name
         {
@@ -21,6 +22,7 @@ namespace VSTS.DataBulkEditor.Engine
 
         public NodeStructuresMigrationContext(MigrationEngine me, NodeStructuresMigrationConfig config) : base(me, config)
         {
+            this.config = config;
         }
 
         internal override void InternalExecute()
@@ -29,28 +31,28 @@ namespace VSTS.DataBulkEditor.Engine
             ICommonStructureService sourceCss = (ICommonStructureService)me.Source.Collection.GetService(typeof(ICommonStructureService));
             ProjectInfo sourceProjectInfo = sourceCss.GetProjectFromName(me.Source.Name);
             NodeInfo[] sourceNodes = sourceCss.ListStructures(sourceProjectInfo.Uri);
-
-            NodeInfo sourceAreaNode = (from n in sourceNodes where n.Path.Contains("Area") select n).Single();
-
-            XmlElement sourceAreaTree = sourceCss.GetNodesXml(new string[] { sourceAreaNode.Uri }, true);
-
-            NodeInfo sourceIterationNode = (from n in sourceNodes where n.Path.Contains("Iteration") select n).Single();
-            XmlElement sourceIterationsTree = sourceCss.GetNodesXml(new string[] { sourceIterationNode.Uri }, true);
             //////////////////////////////////////////////////
             ICommonStructureService targetCss = (ICommonStructureService)me.Target.Collection.GetService(typeof(ICommonStructureService));
             //////////////////////////////////////////////////
-
-            NodeInfo areaParent = CreateNode(targetCss, me.Source.Name, targetCss.GetNodeFromPath(string.Format("\\{0}\\Area", me.Target.Name)));
-            if (sourceAreaTree.ChildNodes[0].HasChildNodes)
-            { 
-            CreateNodes(sourceAreaTree.ChildNodes[0].ChildNodes[0].ChildNodes, targetCss, areaParent);
-            }
-            NodeInfo iterationParent = CreateNode(targetCss, me.Source.Name, targetCss.GetNodeFromPath(string.Format("\\{0}\\Iteration", me.Target.Name)));
-            if (sourceIterationsTree.ChildNodes[0].HasChildNodes)
-            {
-                CreateNodes(sourceIterationsTree.ChildNodes[0].ChildNodes[0].ChildNodes, targetCss, iterationParent);
-            }
+            ProcessCommonStructure("Area", sourceNodes, targetCss, sourceCss);
             //////////////////////////////////////////////////
+            ProcessCommonStructure("Iteration", sourceNodes, targetCss, sourceCss);
+            //////////////////////////////////////////////////
+        }
+
+        private void ProcessCommonStructure(string treeType, NodeInfo[] sourceNodes, ICommonStructureService targetCss, ICommonStructureService sourceCss)
+        {
+            NodeInfo sourceNode = (from n in sourceNodes where n.Path.Contains(treeType) select n).Single();
+            XmlElement sourceTree = sourceCss.GetNodesXml(new string[] { sourceNode.Uri }, true);
+            NodeInfo structureParent = targetCss.GetNodeFromPath(string.Format("\\{0}\\{1}", me.Target.Name, treeType));
+            if (config.PrefixProjectToNodes)
+            {
+                structureParent = CreateNode(targetCss, me.Source.Name, structureParent);
+            }
+            if (sourceTree.ChildNodes[0].HasChildNodes)
+            {
+                CreateNodes(sourceTree.ChildNodes[0].ChildNodes[0].ChildNodes, targetCss, structureParent);
+            }
         }
 
         private void CreateNodes(XmlNodeList nodeList, ICommonStructureService css, NodeInfo parentPath)

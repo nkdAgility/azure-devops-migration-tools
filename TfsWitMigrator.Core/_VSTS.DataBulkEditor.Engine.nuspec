@@ -6,12 +6,12 @@
     <title>$title$</title>
     <authors>nkdAgility, MrHinsh</authors>
     <owners>nkdAgility, MrHinsh</owners>
-    <licenseUrl>https://github.com/nkdAgility/vsts-data-bulk-editor</licenseUrl>
-    <projectUrl>https://github.com/nkdAgility/vsts-data-bulk-editor</projectUrl>
+    <licenseUrl>https://github.com/nkdAgility/vsts-sync-migration</licenseUrl>
+    <projectUrl>https://github.com/nkdAgility/vsts-sync-migration</projectUrl>
     <iconUrl>http://nkdagility.com/wp-content/uploads/2014/03/cropped-nakedalm-logo-260.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>naked Agility Visual Studio Team Services Bulk Data Editor Engine allows you to bulk edit data in Microsoft Team Foundation Server (TFS) and Visual Studio Team Services (VSTS). You can migrate work items, area &amp; iterations, &amp; test data from one Team Project to another. You can builk update work items and apply processing rules against your server or account. While the code is managed on Visual Studio Team Services all commits and releases are synched to https://github.com/nkdAgility/vsts-data-bulk-editor/ </description>
-    <releaseNotes>Summary of changes made in this release of the package.</releaseNotes>
+    <description>naked Agility Visual Studio Team Services Sync &amp; Migration Engine allows you to bulk edit data in Microsoft Team Foundation Server (TFS) and Visual Studio Team Services (VSTS). You can migrate work items, area &amp; iterations, &amp; test data from one Team Project to another. You can builk update work items and apply processing rules against your server or account. While the code is managed on Visual Studio Team Services all commits and releases are synched to https://github.com/nkdAgility/vsts-data-bulk-editor/ </description>
+    <releaseNotes>If you are looking for the migration tool, not just the API then use https://github.com/nkdAgility/vsts-sync-migration/releases. </releaseNotes>
     <copyright>Copyright © naked Agility Limited 2016</copyright>
     <tags>VS-TeamServices, VSTS, Visual Studio, TFS, Team Foundation Server</tags>
   </metadata>

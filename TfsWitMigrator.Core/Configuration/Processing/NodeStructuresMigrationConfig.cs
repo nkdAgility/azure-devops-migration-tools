@@ -9,6 +9,7 @@ namespace VSTS.DataBulkEditor.Engine.Configuration.Processing
     public class NodeStructuresMigrationConfig : ITfsProcessingConfig
     {
         public bool Enabled { get; set; }
+        public bool PrefixProjectToNodes { get; set; }
 
         public Type Processor
         {
