@@ -323,13 +323,16 @@ namespace VSTS.DataBulkEditor.Engine
             targetPlan.Name = newPlanName;
             targetPlan.StartDate = sourcePlan.StartDate;
             targetPlan.EndDate = sourcePlan.EndDate;
-            if (this.config.AreaIterationPath == null){
-                targetPlan.AreaPath = sourcePlan.AreaPath.Replace(engine.Source.Name, string.Format(@"{0}\{1}", engine.Target.Name, engine.Source.Name));
-                targetPlan.Iteration = sourcePlan.Iteration.Replace(engine.Source.Name, string.Format(@"{0}\{1}", engine.Target.Name, engine.Source.Name));
-            } else
+            if (config.PrefixProjectToNodes)
             {
-                targetPlan.AreaPath = this.config.AreaIterationPath;
-                targetPlan.Iteration = this.config.AreaIterationPath;
+                targetPlan.AreaPath = string.Format(@"{0}\{1}", engine.Target.Name, sourcePlan.AreaPath);
+                targetPlan.Iteration = string.Format(@"{0}\{1}", engine.Target.Name, sourcePlan.Iteration);
+            }
+            else
+            {
+                var regex = new Regex(Regex.Escape(engine.Source.Name));
+                targetPlan.AreaPath = regex.Replace(sourcePlan.AreaPath, engine.Target.Name, 1);
+                targetPlan.Iteration = regex.Replace(sourcePlan.Iteration, engine.Target.Name, 1);
             }
             targetPlan.ManualTestSettingsId = 0;
             return targetPlan;

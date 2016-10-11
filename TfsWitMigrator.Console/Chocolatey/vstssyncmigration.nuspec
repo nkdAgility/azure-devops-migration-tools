@@ -1,0 +1,23 @@
+﻿<?xml version="1.0"?>
+<package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <metadata>
+    <id>vstssyncmigrator</id>
+    <title>VSTS Sync Migrator</title>
+    <version>0.0.0</version>
+    <authors>MrHinsh</authors>
+    <owners>nkdAgility, MrHinsh</owners>
+    <summary>VSTS Data Migrator</summary>
+    <description>Visual Studio Team Services Sync &amp; Migration Engine allows you to bulk edit data in Microsoft Team Foundation Server (TFS) and Visual Studio Team Services (VSTS). Supports both migration and bulk update scenarios.</description>
+    <projectUrl>https://github.com/nkdAgility/vsts-sync-migration</projectUrl>
+    <packageSourceUrl>https://github.com/nkdAgility/vsts-sync-migration/releases</packageSourceUrl>
+    <docsUrl>http://vsts-bulk-editor.readthedocs.io</docsUrl>
+    <bugTrackerUrl>https://github.com/nkdAgility/vsts-sync-migration/issues</bugTrackerUrl>
+    <tags>git tfs git-tfs sourceControl</tags>
+    <releaseNotes></releaseNotes>
+    <licenseUrl>https://github.com/nkdAgility/vsts-sync-migration/blob/master/LICENSE</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+  </metadata>
+  <files>
+    <file src="chocolateyInstall.ps1" target="tools\chocolateyInstall.ps1" />
+  </files>
+</package>
