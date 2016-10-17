@@ -2,6 +2,14 @@
 
 Visual Studio Team Services Bulk Data Editor Engine allows you to bulk edit data in Microsoft Team Foundation Server (TFS) and Visual Studio Team Services (VSTS). It has many names depending on what you are trying to achieve. You might call it a migration tool, or a bulk update tool, and both are correct. 
 
+##Getting the Tools
+
+There are three ways to use these tools:
+
+- Create your own tools by using the [VSTS Bulk Data Editor Engine](https://www.nuget.org/packages/VSTS.DataBulkEditor.Engine/) on nuget
+- Download the [latest release from GitHub](https://github.com/nkdAgility/vsts-sync-migration/releases) and unzip
+- (recomended)[Install with Chocolatey](https://chocolatey.org/packages/vstssyncmigrator/)
+
 ## Overview
 
 ### Main Purpose

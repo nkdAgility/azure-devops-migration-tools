@@ -1,6 +1,6 @@
 try {
   $sysDrive = $env:SystemDrive
-  $vstssyncmigrationpath = "$sysDrive\tools\VSTSSyncMigration"
+  $vstssyncmigrationpath =Join-Path -Path "\VSTSSyncMigration" -ChildPath Get-ToolsLocation
 
   if(test-path $vstssyncmigrationpath) {
     write-host "Cleaning out the contents of $vstssyncmigrationpath"
@@ -8,7 +8,6 @@ try {
   }
   
   Install-ChocolateyZipPackage 'vstssyncmigration' 'https://github.com/nkdAgility/vsts-sync-migration/releases/download/#{GITVERSION.FULLSEMVER}#/vstsbulkeditor-#{GITVERSION.FULLSEMVER}#.zip' $vstssyncmigrationpath
-  Install-ChocolateyPath $vstssyncmigrationpath
 
   write-host 'VSTS Sync Migration has been installed. Call `vstssyncmigration` from the command line to see options. You may need to close and reopen the command shell.'
   Write-ChocolateySuccess 'vstssyncmigration'
