@@ -1,6 +1,6 @@
 # Using the Command Line
 
-Download from [executable](https://github.com/nkdAgility/vsts-data-bulk-editor/releases) and extract. Use `vstsbulkeditor.exe init` to create a reference `vstsbulkeditor.json` configration file.
+Download from [executable](https://github.com/nkdAgility/vsts-data-bulk-editor/releases) and extract. Use `vstsbulkeditor.exe init` to create a reference `vstsbulkeditor.json` configration file, Or you can [install from Chocolatey](https://chocolatey.org/packages/vsts-sync-migrator/).
 
 ```json
 {
