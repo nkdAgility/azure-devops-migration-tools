@@ -19,6 +19,14 @@ Visual Studio Team Services Bulk Data Editor Engine allows you to bulk edit data
  - [Why VSTS Bulk Data Editor](http://vsts-bulk-editor.readthedocs.io/en/latest/why)
  - [Usage](http://vsts-bulk-editor.readthedocs.io/en/latest/usage/usage/)
 
+ ## Getting the Tools
+
+There are three ways to use these tools:
+
+- (recomended)[Install from Chocolatey](https://chocolatey.org/packages/vsts-sync-migrator/)
+- Download the [latest release from GitHub](https://github.com/nkdAgility/vsts-sync-migration/releases) and unzip
+- Create your own tools by using the [VSTS Bulk Data Editor Engine](https://www.nuget.org/packages/VSTS.DataBulkEditor.Engine/) on nuget
+
 You are seeing:
 
  - All work is done is [Visual Studio Team Services](https://www.visualstudio.com/products/what-is-visual-studio-online-vs) and then synched to GitHub

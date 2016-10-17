@@ -2,13 +2,13 @@
 
 Visual Studio Team Services Bulk Data Editor Engine allows you to bulk edit data in Microsoft Team Foundation Server (TFS) and Visual Studio Team Services (VSTS). It has many names depending on what you are trying to achieve. You might call it a migration tool, or a bulk update tool, and both are correct. 
 
-##Getting the Tools
+## Getting the Tools
 
 There are three ways to use these tools:
 
 - Create your own tools by using the [VSTS Bulk Data Editor Engine](https://www.nuget.org/packages/VSTS.DataBulkEditor.Engine/) on nuget
 - Download the [latest release from GitHub](https://github.com/nkdAgility/vsts-sync-migration/releases) and unzip
-- (recomended)[Install with Chocolatey](https://chocolatey.org/packages/vstssyncmigrator/)
+- (recomended)[Install from Chocolatey](https://chocolatey.org/packages/vsts-sync-migrator/)
 
 ## Overview
 
@@ -34,30 +34,30 @@ By default, when you are moving from source to target the system will map all of
 
 There are other processors that can be used to migrate, or process, different sorts of data in diferent ways. Which one is right for you depends on the situation at hand.
 
-####In-Place Processors
+#### In-Place Processors
 
 - **WorkItemUpdate** - Need to just update work items in place, use this and only set the Target. All field mappings work...
 - **WorkItemDelete** - Woops... Can I just start again? Feed this a query and watch those items vanish ***WARNING***
 
-####Migrators
+#### Migrators
 
 Most of thise processors need to be run in order. If you try to migrate work items before you have migrated Area and Iterations then ***bang*** you need to go back.
 
-#####Work Items
+##### Work Items
 1. **NodeStructuresMigrationContext** - 
 1. **WorkItemMigrationContext** - The work horse...push tip from one location to another while maintining context. Make sure that you add a ReflectedWorkItemID and you can restart the service at any time...
 1. **AttachementExportMigrationContext** - 
 1. **AttachementImportMigrationContext** - 
 1. **LinkMigrationContext** - 
 
-#####Test Plans & Suites
+##### Test Plans & Suites
 
 1. TestVeriablesMigrationContext
 1. TestConfigurationsMigrationContext
 1. TestPlansAndSuitsMigrationContext
 1. TestRunsMigrationContext [BETA]
 
-#####Misc
+##### Misc
 
 - ImportProfilePictureContext
 - ExportProfilePictureFromADContext
