@@ -75,7 +75,7 @@ namespace VSTS.DataBulkEditor.Engine
                 Stopwatch witstopwatch = new Stopwatch();
                 witstopwatch.Start();
                 WorkItem targetFound;
-                targetFound = targetStore.FindReflectedWorkItem(sourceWI, me.ReflectedWorkItemIdFieldName);
+                targetFound = targetStore.FindReflectedWorkItem(sourceWI, me.ReflectedWorkItemIdFieldName, false);
                 Trace.WriteLine(string.Format("{0} - Updating: {1}-{2}", current, sourceWI.Id, sourceWI.Type.Name));
                 if (targetFound == null)
                 {
@@ -104,7 +104,7 @@ namespace VSTS.DataBulkEditor.Engine
                     {
                         Trace.WriteLine(string.Format("          No changes"));
                     }
-                    
+                    sourceWI.Close();
                 }
                 witstopwatch.Stop();
                 elapsedms = elapsedms + witstopwatch.ElapsedMilliseconds;
@@ -118,40 +118,6 @@ namespace VSTS.DataBulkEditor.Engine
             stopwatch.Stop();
             Console.WriteLine(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds", stopwatch.Elapsed);
         }
-
-        //TODO: Can be removed
-        //private string CreateTypeOrIdContraints()
-        //{
-        //    string idContraints = string.Empty;
-        //    if (_workItemIDs != null && _workItemIDs.Count > 0)
-        //    {
-        //        if (_workItemIDs.Count == 1)
-        //        {
-        //            idContraints = string.Format(" AND [System.Id] = {0} ", _workItemIDs[0]);
-        //        }
-        //        else
-        //        {
-        //            idContraints = string.Format(" AND [System.Id] IN ({0}) ", string.Join(",", _workItemIDs));
-        //        }
-        //        return idContraints;
-        //    }
-
-        //    string typeConstraints = string.Empty;
-        //    if (_workItemTypes != null && _workItemTypes.Count > 0)
-        //    {
-        //        if (_workItemTypes.Count == 1)
-        //        {
-        //            typeConstraints = string.Format(" AND [System.WorkItemType] = '{0}' ", _workItemTypes[0]);
-        //        }
-        //        else
-        //        {
-        //            typeConstraints = string.Format(" AND [System.WorkItemType] IN ('{0}') ", string.Join("','", _workItemTypes));
-        //        }
-        //        return typeConstraints;
-        //    }
-
-        //    return string.Empty;            
-        //}
 
         private string CreateConstraints()
         {
