@@ -1,5 +1,4 @@
 try {
-  Import-Module "$env:ChocolateyInstall\helpers\chocolateyInstaller.psm1" -Force;
   $toolsLoc = Get-ToolsLocation
   $vstssyncmigrationpath =Join-Path -Path $toolsLoc -ChildPath "\VSTSSyncMigration"
 
