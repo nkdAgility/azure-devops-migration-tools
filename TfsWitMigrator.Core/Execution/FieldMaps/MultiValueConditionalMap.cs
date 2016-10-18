@@ -27,7 +27,7 @@ namespace VSTS.DataBulkEditor.Engine.ComponentContext
                 {
                     fieldsUpdate(config.targetFieldsAndValues, target);
                 }                
-                Trace.WriteLine(string.Format("  [UPDATE] field mapped {0}:{1} to {2}:{3}", source.Id, config.sourceFieldsAndValues.Keys.ToString(), target.Id, config.targetFieldsAndValues.Keys.ToString());
+                Trace.WriteLine(string.Format("  [UPDATE] field mapped {0}:{1} to {2}:{3}", source.Id, config.sourceFieldsAndValues.Keys.ToString(), target.Id, config.targetFieldsAndValues.Keys.ToString()));
             } else
             {
                 Trace.WriteLine(string.Format("  [SKIPPED] Not all source and target fields exist", source.Id, config.sourceFieldsAndValues.Keys.ToString(), target.Id, config.targetFieldsAndValues.Keys.ToString()));
