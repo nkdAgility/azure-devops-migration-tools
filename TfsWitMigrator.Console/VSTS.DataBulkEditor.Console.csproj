@@ -262,6 +262,7 @@
     <None Include="App.config" />
     <None Include="ApplicationInsights.config" />
     <None Include="Chocolatey\chocolateyInstall.ps1" />
+    <None Include="Chocolatey\chocolateyUninstall.ps1" />
     <None Include="Chocolatey\vstssyncmigration.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
