@@ -8,7 +8,7 @@
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>VSTS.DataBulkEditor.ConsoleApp</RootNamespace>
-    <AssemblyName>vstsbulkeditor</AssemblyName>
+    <AssemblyName>vsts-sm</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>
