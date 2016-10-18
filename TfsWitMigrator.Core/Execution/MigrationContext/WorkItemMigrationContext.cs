@@ -16,6 +16,7 @@ namespace VSTS.DataBulkEditor.Engine
 
         WorkItemMigrationConfig _config;
         MigrationEngine _me;
+        List<String> _ignore;
 
         public override string Name
         {
@@ -29,6 +30,36 @@ namespace VSTS.DataBulkEditor.Engine
         {
             _me = me;
             _config = config;
+            PopulateIgnoreList();
+        }
+
+        private void PopulateIgnoreList()
+        {
+           _ignore = new List<string>();
+            //ignore.Add("System.CreatedDate");
+            //ignore.Add("System.CreatedBy");
+            _ignore.Add("System.Rev");
+            _ignore.Add("System.AreaId");
+            _ignore.Add("System.IterationId");
+            _ignore.Add("System.Id");
+            //ignore.Add("System.ChangedDate");
+            //ignore.Add("System.ChangedBy");
+            _ignore.Add("System.RevisedDate");
+            _ignore.Add("System.AttachedFileCount");
+            _ignore.Add("System.TeamProject");
+            _ignore.Add("System.NodeName");
+            _ignore.Add("System.RelatedLinkCount");
+            _ignore.Add("System.WorkItemType");
+            _ignore.Add("Microsoft.VSTS.Common.ActivatedDate");
+            _ignore.Add("Microsoft.VSTS.Common.StateChangeDate");
+            _ignore.Add("System.ExternalLinkCount");
+            _ignore.Add("System.HyperLinkCount");
+            _ignore.Add("System.Watermark");
+            _ignore.Add("System.AuthorizedDate");
+            _ignore.Add("System.BoardColumn");
+            _ignore.Add("System.BoardColumnDone");
+            _ignore.Add("System.BoardLane");
+            _ignore.Add("SLB.SWT.DateOfClientFeedback");
         }
 
         internal override void InternalExecute()
@@ -55,7 +86,7 @@ namespace VSTS.DataBulkEditor.Engine
                 Stopwatch witstopwatch = new Stopwatch();
                 witstopwatch.Start();
                 WorkItem targetFound;
-                targetFound = targetStore.FindReflectedWorkItem(sourceWI, me.ReflectedWorkItemIdFieldName);
+                targetFound = targetStore.FindReflectedWorkItem(sourceWI, me.ReflectedWorkItemIdFieldName, false);
                 Trace.WriteLine(string.Format("{0} - Migrating: {1}-{2}", current, sourceWI.Id, sourceWI.Type.Name), this.Name);
                 if (targetFound == null)
                 {
@@ -88,6 +119,7 @@ namespace VSTS.DataBulkEditor.Engine
                             if (_config.UpdateCreatedDate) { newwit.Fields["System.CreatedDate"].Value = sourceWI.Fields["System.CreatedDate"].Value; }
                             if (_config.UpdateCreatedBy) { newwit.Fields["System.CreatedBy"].Value = sourceWI.Fields["System.CreatedBy"].Value; }
                             newwit.Save();
+                            newwit.Close();
                             Trace.WriteLine(string.Format("...Saved as {0}", newwit.Id), this.Name);
                             if (sourceWI.Fields.Contains(me.ReflectedWorkItemIdFieldName) && _config.UpdateSoureReflectedId)
                             {
@@ -116,6 +148,7 @@ namespace VSTS.DataBulkEditor.Engine
                     //  sourceWI.Fields["TfsMigrationTool.ReflectedWorkItemId"].Value = destWIFound[0].Id;
                     //sourceWI.Save();
                 }
+                sourceWI.Close();
                 witstopwatch.Stop();
                 elapsedms = elapsedms + witstopwatch.ElapsedMilliseconds;
                 current--;
@@ -123,6 +156,7 @@ namespace VSTS.DataBulkEditor.Engine
                 TimeSpan average = new TimeSpan(0, 0, 0, 0, (int)(elapsedms / count));
                 TimeSpan remaining = new TimeSpan(0, 0, 0, 0, (int)(average.TotalMilliseconds * current));
                 Trace.WriteLine(string.Format("Average time of {0} per work item and {1} estimated to completion", string.Format(@"{0:s\:fff} seconds", average), string.Format(@"{0:%h} hours {0:%m} minutes {0:s\:fff} seconds", remaining)), this.Name);
+                Trace.Flush();
             }
             //////////////////////////////////////////////////
             stopwatch.Stop();
@@ -135,38 +169,14 @@ namespace VSTS.DataBulkEditor.Engine
             return sourceWI.Title.ToLower().StartsWith("epic") || sourceWI.Title.ToLower().StartsWith("theme");
         }
 
-        private static WorkItem CreateAndPopulateWorkItem(WorkItemMigrationConfig config , WorkItem oldWi, Project destProject, String destType)
+        private WorkItem CreateAndPopulateWorkItem(WorkItemMigrationConfig config , WorkItem oldWi, Project destProject, String destType)
         {
             var fieldMappingStartTime = DateTime.UtcNow;
             Stopwatch fieldMappingTimer = new Stopwatch();
 
             bool except = false;
             Trace.Write("... Building", "WorkItemMigrationContext");
-            List<String> ignore = new List<string>();
-            ignore.Add("System.CreatedDate");
-            ignore.Add("System.CreatedBy");
-            ignore.Add("System.Rev");
-            ignore.Add("System.AreaId");
-            ignore.Add("System.IterationId");
-            ignore.Add("System.Id");
-            ignore.Add("System.ChangedDate");
-            ignore.Add("System.ChangedBy");
-            ignore.Add("System.RevisedDate");
-            ignore.Add("System.AttachedFileCount");
-            ignore.Add("System.TeamProject");
-            ignore.Add("System.NodeName");
-            ignore.Add("System.RelatedLinkCount");
-            ignore.Add("System.WorkItemType");
-            ignore.Add("Microsoft.VSTS.Common.ActivatedDate");
-            ignore.Add("Microsoft.VSTS.Common.StateChangeDate");
-            ignore.Add("System.ExternalLinkCount");
-            ignore.Add("System.HyperLinkCount");
-            ignore.Add("System.Watermark");
-            ignore.Add("System.AuthorizedDate");
-            ignore.Add("System.BoardColumn");
-            ignore.Add("System.BoardColumnDone");
-            ignore.Add("System.BoardLane");
-            ignore.Add("SLB.SWT.DateOfClientFeedback");
+          
 
 
             // WorkItem newwit = oldWi.Copy(destProject.WorkItemTypes[destType]);
@@ -193,7 +203,7 @@ namespace VSTS.DataBulkEditor.Engine
             
             foreach (Field f in oldWi.Fields)
             {
-                if (newwit.Fields.Contains(f.ReferenceName) && !ignore.Contains(f.ReferenceName))
+                if (newwit.Fields.Contains(f.ReferenceName) && !_ignore.Contains(f.ReferenceName))
                 {
                     newwit.Fields[f.ReferenceName].Value = oldWi.Fields[f.ReferenceName].Value;
                 }
@@ -210,6 +220,7 @@ namespace VSTS.DataBulkEditor.Engine
             }
             
             newwit.Fields["System.ChangedDate"].Value = oldWi.Fields["System.ChangedDate"].Value;
+
 
             switch (destType)
             {
