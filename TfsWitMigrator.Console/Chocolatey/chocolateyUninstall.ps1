@@ -6,8 +6,6 @@ try {
   Uninstall-ChocolateyZipPackage 'vstssyncmigration' 'vstsbulkeditor-#{GITVERSION.FULLSEMVER}#.zip'
 
   write-host 'VSTS Sync Migration has been uninstalled.'
-  Write-ChocolateySuccess 'vstssyncmigration'
 } catch {
-  Write-ChocolateyFailure 'vstssyncmigration' $($_.Exception.Message)
   throw 
 }

@@ -52,7 +52,7 @@ namespace VSTS.DataBulkEditor.Engine
             {
                 Trace.WriteLine(string.Format("Migrating Links for wiSourceL={0}",
                                                    wiSourceL.Id), "LinkMigrationContext");
-                WorkItem wiTargetL = targetWitsc.FindReflectedWorkItem(wiSourceL, me.ReflectedWorkItemIdFieldName);
+                WorkItem wiTargetL = targetWitsc.FindReflectedWorkItem(wiSourceL, me.ReflectedWorkItemIdFieldName, true);
                 if (wiTargetL == null)
                 {
                     //wiSourceL was not migrated, or the migrated work item has been deleted. 
@@ -225,7 +225,7 @@ namespace VSTS.DataBulkEditor.Engine
             else
             {
                 // Moving to Other Team Project from SOurceR
-                wiTargetR = targetStore.FindReflectedWorkItem(wiSourceR, me.ReflectedWorkItemIdFieldName);
+                wiTargetR = targetStore.FindReflectedWorkItem(wiSourceR, me.ReflectedWorkItemIdFieldName, true);
                 if (wiTargetR == null) // Assume source only (other team projkect)
                 {
                     wiTargetR = wiSourceR;

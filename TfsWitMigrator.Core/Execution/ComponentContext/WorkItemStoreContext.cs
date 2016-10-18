@@ -67,7 +67,7 @@ namespace VSTS.DataBulkEditor.Engine
 
   
 
-        public WorkItem FindReflectedWorkItem(WorkItem workItemToFind, string reflectedWotkItemIdField)
+        public WorkItem FindReflectedWorkItem(WorkItem workItemToFind, string reflectedWotkItemIdField, bool cache)
         {
             string ReflectedWorkItemId = CreateReflectedWorkItemId(workItemToFind);
             WorkItem found = null;
@@ -98,11 +98,10 @@ namespace VSTS.DataBulkEditor.Engine
                 if (found == null) { found = FindReflectedWorkItemByMigrationRef(ReflectedWorkItemId); } // Too slow!
                 //if (found == null) { found = FindReflectedWorkItemByTitle(workItemToFind.Title); }
             }
-            if (found != null) 
+            if (found != null && cache) 
             {
                 foundWis.Add(workItemToFind.Id, found); /// TODO MENORY LEEK! LEAK
             }
-
             return found;
         }
 
