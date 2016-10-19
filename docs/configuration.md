@@ -1,13 +1,13 @@
 # Configuration
-VSTS Bulk Data Editor is mainly powered by configuration which allows you to control most aspects of the execution flow.
+VSTS Sync Migration Tools are mainly powered by configuration which allows you to control most aspects of the execution flow.
 
 ## Configuration tool
-If you run `vstsbulkeditor.exe init` you will be launched into a configuration tool that will generate a default file. Using the `init` command will create a `vstsbulkeditor.yml` file in the
+If you run `vsts-sm.exe init` you will be launched into a configuration tool that will generate a default file. Using the `init` command will create a `vstsbulkeditor.yml` file in the
 working directory. At run time you can specify the configuration file to use.
 
-**Note:** VstsBulkEditor does not ship with internal default configuration and will not function without one.
+**Note:** VSTS Sync Migration Tools do not ship with internal default configuration and will not function without one.
 
-To create your config file just type `vstsbulkeditor init` in the directory that you unziped the tools and a minimal `VstsBulkEditor.yml` configuration
+To create your config file just type `vsts-sm init` in the directory that you unziped the tools and a minimal `VstsBulkEditor.json` configuration
 file will be created. Modify this as you need.
 
 ## Global configuration
@@ -17,15 +17,27 @@ The global configuration look like this:
 {
   "TelemetryEnableTrace": true,
   "Source": {
-    "Collection": "https://tfs.mycompany.com/tfs/collection1/",
-    "Name": "MyProduct"
+    "Collection": "https://sdd2016.visualstudio.com/",
+    "Name": "DemoProjs"
   },
   "Target": {
-    "Collection": "https://mycompany.visualstudio.com/",
-    "Name": "MyProduct"
+    "Collection": "https://sdd2016.visualstudio.com/",
+    "Name": "DemoProjt"
   },
   "ReflectedWorkItemIDFieldName": "TfsMigrationTool.ReflectedWorkItemId",
   "FieldMaps": [
+    {
+      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.FieldMap.MultiValueConditionalMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceFieldsAndValues": {
+        "Field1": "Value1",
+        "Field2": "Value2"
+      },
+      "targetFieldsAndValues": {
+        "Field1": "Value1",
+        "Field2": "Value2"
+      }
+    },
     {
       "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.FieldMap.FieldBlankMapConfig",
       "WorkItemTypeName": "*",
@@ -74,6 +86,13 @@ The global configuration look like this:
       "replacement": "$1"
     },
     {
+      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.FieldMap.FieldValuetoTagMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceField": "Microsoft.VSTS.CMMI.Blocked",
+      "pattern": "Yes",
+      "formatExpression": "{0}"
+    },
+    {
       "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.FieldMap.TreeToTagMapConfig",
       "WorkItemTypeName": "*",
       "toSkip": 3,
@@ -87,66 +106,79 @@ The global configuration look like this:
   "Processors": [
     {
       "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.Processing.WorkItemMigrationConfig",
-      "Disabled": true,
+      "Enabled": false,
+      "PrefixProjectToNodes": true,
+      "UpdateCreatedDate": true,
+      "UpdateCreatedBy": true,
+      "UpdateSoureReflectedId": true,
       "QueryBit": "AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')"
     },
     {
       "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.Processing.WorkItemUpdateConfig",
       "WhatIf": false,
-      "Disabled": true,
+      "Enabled": false,
       "QueryBit": "AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')"
     },
     {
       "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.Processing.NodeStructuresMigrationConfig",
-      "Disabled": true
+      "Enabled": false,
+      "PrefixProjectToNodes": false
     },
     {
       "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.Processing.LinkMigrationConfig",
-      "Disabled": true
+      "Enabled": false,
+      "QueryBit": "AND [System.ExternalLinkCount] > 0 AND [System.RelatedLinkCount] > 0"
     },
     {
       "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.Processing.WorkItemPostProcessingConfig",
-      "Disabled": true
+      "Enabled": false
     },
     {
       "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.Processing.WorkItemDeleteConfig",
-      "Disabled": true
+      "Enabled": false
     },
     {
       "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.Processing.AttachementExportMigrationConfig",
-      "Disabled": true
+      "Enabled": false,
+      "QueryBit": "AND [System.AttachedFileCount] > 0"
     },
     {
       "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.Processing.AttachementImportMigrationConfig",
-      "Disabled": true
+      "Enabled": false
     },
     {
       "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.Processing.TestVeriablesMigrationConfig",
-      "Disabled": true
+      "Enabled": false
     },
     {
       "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.Processing.TestConfigurationsMigrationConfig",
-      "Disabled": true
+      "Enabled": false
     },
     {
       "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.Processing.TestPlansAndSuitsMigrationConfig",
-      "Disabled": true
+      "Enabled": false,
+      "PrefixProjectToNodes": true
     },
     {
       "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.Processing.TestRunsMigrationConfig",
-      "Disabled": true,
+      "Enabled": false,
       "Status": "Experimental"
     },
     {
       "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.Processing.ImportProfilePictureConfig",
-      "Disabled": true
+      "Enabled": false
     },
     {
       "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.Processing.ExportProfilePictureFromADConfig",
-      "Disabled": true,
+      "Enabled": false,
       "Domain": null,
       "Username": null,
-      "Password": null
+      "Password": null,
+      "PictureEmpIDFormat": null
+    },
+    {
+      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.Processing.FixGitCommitLinksConfig",
+      "Enabled": false
     }
   ]
 }
@@ -166,4 +198,4 @@ Both the `Source` and `Target` entries hold the collection URL and the Team Proj
 
 This is the field that will be used to store the state for the migration. See [Server Configuration](server-configuration.md)
 
-...
+...TBD

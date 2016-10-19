@@ -24,6 +24,22 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "_VSTS.DataBulkEditor.Engine
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VSTS.DataBulkEditor.Console.Tests", "VSTS.DataBulkEditor.Console.Tests\VSTS.DataBulkEditor.Console.Tests.csproj", "{985259EA-C475-4918-9342-50AB744F52AF}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{9C11B428-74CE-494B-88A9-8175D77A184C}"
+	ProjectSection(SolutionItems) = preProject
+		docs\configuration.md = docs\configuration.md
+		docs\getting-started.md = docs\getting-started.md
+		docs\index.md = docs\index.md
+		docs\server-configuration.md = docs\server-configuration.md
+		docs\why.md = docs\why.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "usage", "usage", "{2AB682CB-D93A-4331-9EB9-21FB7FB88F55}"
+	ProjectSection(SolutionItems) = preProject
+		docs\usage\command-line.md = docs\usage\command-line.md
+		docs\usage\nuget-library.md = docs\usage\nuget-library.md
+		docs\usage\usage.md = docs\usage\usage.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,6 +65,10 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{9C11B428-74CE-494B-88A9-8175D77A184C} = {C0309D38-76D4-486D-89A6-D08DAC9D71C9}
+		{2AB682CB-D93A-4331-9EB9-21FB7FB88F55} = {9C11B428-74CE-494B-88A9-8175D77A184C}
 	EndGlobalSection
 	GlobalSection(CodealikeProperties) = postSolution
 		SolutionGuid = 51c92075-0694-476b-8366-efd65c9a9b77

@@ -1,5 +1,6 @@
-# VSTS Bulk Data Editor & Migrator 
-Visual Studio Team Services Bulk Data Editor Engine allows you to bulk edit data in Microsoft Team Foundation Server (TFS) and Visual Studio Team Services (VSTS).
+# VSTS Sync Migration Tools
+
+The VSTS Sync Migration tools allow you to bulk edit and migrate data between Team Projects on both Microsoft Team Foundation Server (TFS) and Visual Studio Team Services (VSTS). You can find out [why](http://vsts-bulk-editor.readthedocs.io/en/latest/why) this tooling exists and you can access the [documentation](http://vsts-bulk-editor.readthedocs.io) to find out how. THis project is published as [code on GitHub](https://github.com/nkdAgility/vsts-sync-migration/) as well as a [VSTS Sync Migration Tools on Chocolaty](https://chocolatey.org/packages/vsts-sync-migrator/) and [VSTS Bulk Data Editor Engine on NuGet](https://www.nuget.org/packages/VSTS.DataBulkEditor.Engine/). This allows you to build your own tooling as well as just use it out of the box with a configuration file.
 
 |         | Build           | Sync           |
 | ------------- |:-------------:|:-------------:|
@@ -11,10 +12,14 @@ Visual Studio Team Services Bulk Data Editor Engine allows you to bulk edit data
 |:--:|:--:|:--:|
 |Docs|[![Documentation Status](https://readthedocs.org/projects/vsts-bulk-editor/badge/?version=stable)](http://vsts-bulk-editor.readthedocs.org/en/stable/)|[![Documentation Status](https://readthedocs.org/projects/vsts-bulk-editor/badge/?version=latest)](http://vsts-bulk-editor.readthedocs.org/en/latest/)|
 |GitHub Release|-|[![GitHub release](https://img.shields.io/github/release/nkdAgility/vsts-data-bulk-editor.svg?maxAge=2592000)](https://github.com/nkdAgility/vsts-data-bulk-editor/releases)|
-|NuGet (VSTS Bulk Editor)|[![NuGet](https://img.shields.io/nuget/v/VSTS.DataBulkEditor.Engine.svg)](https://www.nuget.org/packages/VSTS.DataBulkEditor.Engine)|[![NuGet](https://img.shields.io/nuget/vpre/VSTS.DataBulkEditor.Engine.svg)](https://www.nuget.org/packages/VSTS.DataBulkEditor.Engine)|
+|NuGet |[![NuGet](https://img.shields.io/nuget/v/VSTS.DataBulkEditor.Engine.svg)](https://www.nuget.org/packages/VSTS.DataBulkEditor.Engine)|[![NuGet](https://img.shields.io/nuget/vpre/VSTS.DataBulkEditor.Engine.svg)](https://www.nuget.org/packages/VSTS.DataBulkEditor.Engine)|
+|Chocolatey|[![Chocolatey](https://img.shields.io/chocolatey/v/vsts-sync-migrator.svg)](https://chocolatey.org/packages/vsts-sync-migrator/)|-|
+
+
 
 ## Quick Links
- - [Documentation](http://vsts-bulk-editor.readthedocs.io/en/latest)
+ - [Getting Started](http://vsts-bulk-editor.readthedocs.io/en/latest/getting-started)
+ - [Documentation](http://vsts-bulk-editor.readthedocs.io)
  - [Contributing](http://vsts-bulk-editor.readthedocs.io/en/latest/#contributing)
  - [Why VSTS Bulk Data Editor](http://vsts-bulk-editor.readthedocs.io/en/latest/why)
  - [Usage](http://vsts-bulk-editor.readthedocs.io/en/latest/usage/usage/)
@@ -27,8 +32,8 @@ There are three ways to use these tools:
 - Download the [latest release from GitHub](https://github.com/nkdAgility/vsts-sync-migration/releases) and unzip
 - Create your own tools by using the [VSTS Bulk Data Editor Engine](https://www.nuget.org/packages/VSTS.DataBulkEditor.Engine/) on nuget
 
-You are seeing:
+## You are seeing:
 
- - All work is done is [Visual Studio Team Services](https://www.visualstudio.com/products/what-is-visual-studio-online-vs) and then synched to GitHub
+ - All work is done is [Visual Studio Team Services](https://www.visualstudio.com/products/what-is-visual-studio-online-vs) and then synched to GitHub for publication
  - All Branches are published as pre-release builds
 
