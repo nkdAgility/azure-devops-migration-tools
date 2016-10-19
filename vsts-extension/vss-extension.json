@@ -13,7 +13,7 @@
             "id": "Microsoft.VisualStudio.Services.Integration"
         }
     ],    
-    "description": "VSTS Sync Migration Tools allow you to bulk edit data in Microsoft Team Foundation Server (TFS) and Visual Studio Team Services (VSTS). You can bulk edit work items in place, or even migrate Teams, Backlogs, Tasks, Test Cases, and Plans & Suits to another TFS or VSTS instace.",
+    "description": "VSTS Sync Migration Tools allow you to bulk edit data in TFS & VSTS. You can bulk edit work items in place, or even migrate Teams, Backlogs, Tasks, Test Cases, and Plans & Suits.",
     "categories": [
         "Build and release"
     ],
