@@ -41,7 +41,7 @@
         "default": "images/extension-icon.png"
     },
     "branding": {
-        "color": "#1C3272",
+        "color": "#1E1E1E",
         "theme": "dark"
     },
     "screenshots": [
