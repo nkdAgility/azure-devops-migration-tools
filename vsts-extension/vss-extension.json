@@ -1,6 +1,6 @@
 {
     "manifestVersion": 1,
-    "id": "vsts-sync-migration#{GitVersion.PreReleaseLabel}#",
+    "id": "vsts-sync-migration#{GitVersion.PreReleaseLabelWithDash}#",
     "name": "VSTS Sync Migration #{GitVersion.PreReleaseLabel}#",
     "version": "#{GitVersion.Major}#.#{GitVersion.Minor}#.#{GitVersion.Patch}#",
     "public": false,
