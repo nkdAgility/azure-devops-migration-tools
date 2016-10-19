@@ -15,7 +15,7 @@
     ],    
     "description": "VSTS Sync Migration Tools allow you to bulk edit data in TFS & VSTS. You can bulk edit work items in place, or even migrate Teams, Backlogs, Tasks, Test Cases, and Plans & Suits.",
     "categories": [
-        "Build and release"
+        "Integrate"
     ],
     "tags": [
         "migration",
