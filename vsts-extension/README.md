@@ -1,0 +1,20 @@
+# VSTS Sync Migration Tools
+
+The VSTS Sync Migration tools allow you to bulk edit and migrate data between Team Projects on both Microsoft Team Foundation Server (TFS) and Visual Studio Team Services (VSTS). You can find out [why](http://vsts-bulk-editor.readthedocs.io/en/latest/why) this tooling exists and you can access the [documentation](http://vsts-bulk-editor.readthedocs.io) to find out how. THis project is published as [code on GitHub](https://github.com/nkdAgility/vsts-sync-migration/) as well as a [VSTS Sync Migration Tools on Chocolaty](https://chocolatey.org/packages/vsts-sync-migrator/).
+
+## Quick Links
+
+ - [Getting Started](http://vsts-bulk-editor.readthedocs.io/en/latest/getting-started)
+ - [Documentation](http://vsts-bulk-editor.readthedocs.io)
+ - [Contributing](http://vsts-bulk-editor.readthedocs.io/en/latest/#contributing)
+ - [Why VSTS Bulk Data Editor](http://vsts-bulk-editor.readthedocs.io/en/latest/why)
+ - [Usage](http://vsts-bulk-editor.readthedocs.io/en/latest/usage/usage/)
+
+ ## Getting the Tools
+
+There are three ways to use these tools:
+
+- (recomended)[Install from Chocolatey](https://chocolatey.org/packages/vsts-sync-migrator/)
+- Download the [latest release from GitHub](https://github.com/nkdAgility/vsts-sync-migration/releases) and unzip
+- Create your own tools by using the [VSTS Bulk Data Editor Engine](https://www.nuget.org/packages/VSTS.DataBulkEditor.Engine/) on nuget
+

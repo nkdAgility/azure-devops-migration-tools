@@ -1,0 +1,57 @@
+{
+    "manifestVersion": 1,
+    "id": "vsts-sync-migration#{GitVersion.PreReleaseLabel}#",
+    "name": "VSTS Sync Migration #{GitVersion.PreReleaseLabel}#",
+    "version": "#{GitVersion.Major}#.#{GitVersion.Minor}#.#{GitVersion.Patch}#",
+    "public": false,
+    "publisher": "nkdAgility",
+    "galleryFlags": [
+        "#{Extension.galleryFlags}#"
+    ],
+    "targets": [
+        {
+            "id": "Microsoft.VisualStudio.Services.Integration"
+        }
+    ],    
+    "description": "Visual Studio Team Services Bulk Data Editor Engine allows you to bulk edit data in Microsoft Team Foundation Server (TFS) and Visual Studio Team Services (VSTS).",
+    "categories": [
+        "Build and release"
+    ],
+    "tags": [
+        "migration",
+        "bulk edit",
+        "edit",
+        "upgrade"
+    ],
+    "links": {
+        "learn": {
+            "uri": "http://vsts-bulk-editor.readthedocs.io"
+        },
+        "support": {
+            "uri": "https://github.com/nkdAgility/vsts-sync-migration/issues"  
+        },
+        "Getstarted": {
+            "uri": "http://vsts-bulk-editor.readthedocs.io/en/latest/getting-started"  
+        }
+    },
+    "icons": {
+        "default": "images/extension-icon.png"
+    },
+    "branding": {
+        "color": "#1C3272",
+        "theme": "dark"
+    },
+    "screenshots": [
+        {
+            "path": "images/screenshot-01.png"
+        }
+    ],
+    "content": {
+        "details": {
+            "path": "README.md"
+        },
+        "license": {
+            "path": "LICENSE.txt"
+        }
+    }
+}
