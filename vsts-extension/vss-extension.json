@@ -34,7 +34,7 @@
             "uri": "https://github.com/nkdAgility/vsts-sync-migration/issues"  
         },
         "Getstarted": {
-            "uri": "http://vsts-bulk-editor.readthedocs.io/en/latest/getting-started"  
+            "uri": "http://vsts-bulk-editor.readthedocs.io"  
         }
     },
     "icons": {
