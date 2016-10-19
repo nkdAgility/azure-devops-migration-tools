@@ -1,7 +1,7 @@
 {
     "manifestVersion": 1,
     "id": "vsts-sync-migration#{GitVersion.PreReleaseLabelWithDash}#",
-    "name": "VSTS Sync Migration #{GitVersion.PreReleaseLabel}#",
+    "name": "VSTS Sync Migration Tools #{GitVersion.PreReleaseLabel}#",
     "version": "#{GitVersion.Major}#.#{GitVersion.Minor}#.#{GitVersion.Patch}#",
     "public": false,
     "publisher": "nkdAgility",
@@ -21,7 +21,10 @@
         "migration",
         "bulk edit",
         "edit",
-        "upgrade"
+        "upgrade",
+        "migrate",
+        "merge",
+        "team project"      
     ],
     "links": {
         "learn": {
