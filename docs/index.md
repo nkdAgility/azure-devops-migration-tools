@@ -1,6 +1,6 @@
-# VSTS Sync Migration Tools Docs
+# VSTS Sync Migration Tools Docs 
 
-VSTS Sync Migration Tools allow you to bulk edit data in Microsoft Team Foundation Server (TFS) and Visual Studio Team Services (VSTS). It has many names depending on what you are trying to achieve. You might call it a migration tool, or a bulk update tool, and both are correct. 
+VSTS Sync Migration Tools allow you to bulk edit data in Microsoft Team Foundation Server (TFS) and Visual Studio Team Services (VSTS). It has many names depending on what you are trying to achieve. You might call it a migration tool, or a bulk update tool, and both are correct.. 
 
 ## Getting the Tools
 
