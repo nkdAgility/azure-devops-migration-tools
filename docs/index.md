@@ -1,20 +1,22 @@
-# VSTS Bulk Data Editor Engine Docs
+# VSTS Sync Migration Tools Docs 
 
-Visual Studio Team Services Bulk Data Editor Engine allows you to bulk edit data in Microsoft Team Foundation Server (TFS) and Visual Studio Team Services (VSTS). It has many names depending on what you are trying to achieve. You might call it a migration tool, or a bulk update tool, and both are correct. 
+VSTS Sync Migration Tools allow you to bulk edit data in Microsoft Team Foundation Server (TFS) and Visual Studio Team Services (VSTS). It has many names depending on what you are trying to achieve. You might call it a migration tool, or a bulk update tool, and both are correct.. 
 
 ## Getting the Tools
 
 There are three ways to use these tools:
 
+- [Install from Chocolatey](https://chocolatey.org/packages/vsts-sync-migrator/) **(recomended)**
+- Manually download the [latest release from GitHub](https://github.com/nkdAgility/vsts-sync-migration/releases) and unzip
 - Create your own tools by using the [VSTS Bulk Data Editor Engine](https://www.nuget.org/packages/VSTS.DataBulkEditor.Engine/) on nuget
-- Download the [latest release from GitHub](https://github.com/nkdAgility/vsts-sync-migration/releases) and unzip
-- (recomended)[Install from Chocolatey](https://chocolatey.org/packages/vsts-sync-migrator/)
 
 ## Overview
 
+These tools are build by naked Agility Limited's DevOps & Agility consultants to do real world migrations on a daily basis. We always work in [Visual Studio Team Services](http://tfs.visualstudio.com) and sync the code to GitHub for visibility. We use Work Item Tracking and a Git Repository inside of TFS to manage the work and Team Build to create our package output. We then have a Release Pipeline in Release Management to publish a [GitHub Release](https://github.com/nkdAgility/vsts-sync-migration/releases) and, if successful, automatically deploy a new version to NuGet and to Chocolatey.
+
 ### Main Purpose
 
-- **Bulk Update** - You can bulk update work items and apply processing rules against your server or account. Use the `WorkItemUpdate` class that takes only a target Team Project. 
+- **Bulk Update** - You can bulk update work items and apply processing rules against your server or account. Use the `WorkItemUpdate` class that takes only a target Team Project. The team does a lot of Process Template migrations and we need these tools to fix the data after the migration.
 - **Migration** - You can migrate work items, area & iterations, & test data from one Team Project to another. Use the `WorkItemMigrationContext` class that takes both a Source and a Target Team Project
 
 ### Field Mapps

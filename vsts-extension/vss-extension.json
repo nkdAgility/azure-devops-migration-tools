@@ -1,0 +1,60 @@
+{
+    "manifestVersion": 1,
+    "id": "vsts-sync-migration#{GitVersion.PreReleaseLabelWithDash}#",
+    "name": "VSTS Sync Migration Tools #{GitVersion.PreReleaseLabel}#",
+    "version": "#{GitVersion.Major}#.#{GitVersion.Minor}#.#{GitVersion.Patch}#",
+    "public": false,
+    "publisher": "nkdAgility",
+    "galleryFlags": [
+        "#{Extension.galleryFlags}#"
+    ],
+    "targets": [
+        {
+            "id": "Microsoft.VisualStudio.Services.Integration"
+        }
+    ],    
+    "description": "VSTS Sync Migration Tools allow you to bulk edit data in TFS & VSTS. You can bulk edit work items in place, or even migrate Teams, Backlogs, Tasks, Test Cases, and Plans & Suits.",
+    "categories": [
+        "Integrate"
+    ],
+    "tags": [
+        "migration",
+        "bulk edit",
+        "edit",
+        "upgrade",
+        "migrate",
+        "merge",
+        "team project"      
+    ],
+    "links": {
+        "learn": {
+            "uri": "http://vsts-bulk-editor.readthedocs.io"
+        },
+        "support": {
+            "uri": "https://github.com/nkdAgility/vsts-sync-migration/issues"  
+        },
+        "Getstarted": {
+            "uri": "http://vsts-bulk-editor.readthedocs.io"  
+        }
+    },
+    "icons": {
+        "default": "images/extension-icon.png"
+    },
+    "branding": {
+        "color": "#1E1E1E",
+        "theme": "dark"
+    },
+    "screenshots": [
+        {
+            "path": "images/screenshot-01.png"
+        }
+    ],
+    "content": {
+        "details": {
+            "path": "README.md"
+        },
+        "license": {
+            "path": "LICENSE.txt"
+        }
+    }
+}
