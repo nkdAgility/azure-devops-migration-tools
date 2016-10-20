@@ -25,8 +25,13 @@ namespace VSTS.DataBulkEditor.Engine.ComponentContext
             {
                 if (source.Fields[config.sourceField1].Value != null)
                 {
-                    target.Fields[config.targetField].Value = string.Format(config.formatExpression, (string)source.Fields[config.sourceField1].Value.ToString(), (string)source.Fields[config.sourceField2].Value.ToString());
-                    Trace.WriteLine(string.Format("  [UPDATE] field merged {0}:{1}+{2} to {3}:{4}", source.Id, config.sourceField1, config.sourceField2, target.Id, config.targetField));
+                    if (target.Fields[config.targetField].Value.ToString().Contains("##DONE##") || target.Fields[config.targetField].Value.ToString().Contains(config.doneMatch))
+                    {
+                        Trace.WriteLine(string.Format("  [SKIP] field already merged {0}:{1}+{2} to {3}:{4}", source.Id, config.sourceField1, config.sourceField2, target.Id, config.targetField));
+                    } else { 
+                        target.Fields[config.targetField].Value = string.Format(config.formatExpression, source.Fields[config.sourceField1].Value.ToString(), source.Fields[config.sourceField2].Value.ToString()) + "##DONE##";
+                        Trace.WriteLine(string.Format("  [UPDATE] field merged {0}:{1}+{2} to {3}:{4}", source.Id, config.sourceField1, config.sourceField2, target.Id, config.targetField));
+                    }
                 }
             }
         }

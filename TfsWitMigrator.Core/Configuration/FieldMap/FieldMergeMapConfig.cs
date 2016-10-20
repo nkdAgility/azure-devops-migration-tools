@@ -14,6 +14,7 @@ namespace VSTS.DataBulkEditor.Engine.Configuration.FieldMap
         public string sourceField2 { get; set; }
         public string targetField { get; set; }
         public string formatExpression { get; set; }
+        public string doneMatch { get; set; }
         public Type FieldMap
         {
             get

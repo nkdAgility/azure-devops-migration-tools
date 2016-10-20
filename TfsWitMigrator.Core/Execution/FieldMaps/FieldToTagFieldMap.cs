@@ -17,6 +17,14 @@ namespace VSTS.DataBulkEditor.Engine
             this.config = config;
         }
 
+        public string Name
+        {
+            get
+            {
+                return "FieldToTagFieldMap";
+            }
+        }
+
         public void Execute(WorkItem source, WorkItem target)
         {
             if (source.Fields.Contains(this.config.sourceField))

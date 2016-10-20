@@ -206,6 +206,7 @@ namespace VSTS.DataBulkEditor.Engine
         {
             foreach (IFieldMap map in list)
             {
+                Trace.WriteLine(string.Format("Runnin Field Map: {0}", map.Name));
                 map.Execute(source, target);
             }
         }
