@@ -15,7 +15,13 @@ namespace VSTS.DataBulkEditor.Engine
         {
             this.config = config;
         }
-
+        public string Name
+        {
+            get
+            {
+                return "TreeToTagFieldMap";
+            }
+        }
         public void Execute(WorkItem source, WorkItem target)
         {
 

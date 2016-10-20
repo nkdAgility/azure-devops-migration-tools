@@ -9,6 +9,8 @@ namespace VSTS.DataBulkEditor.Engine.ComponentContext
 {
    public interface IFieldMap
     {
+        string Name { get; }
+
         void Execute(WorkItem source, WorkItem target);
     }
 }

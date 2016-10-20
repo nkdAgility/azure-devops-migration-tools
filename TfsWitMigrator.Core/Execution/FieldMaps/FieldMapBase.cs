@@ -11,6 +11,7 @@ namespace VSTS.DataBulkEditor.Engine.ComponentContext
 {
     public abstract class FieldMapBase : IFieldMap
     {
+
         public void Execute(WorkItem source, WorkItem target)
         {
             try
@@ -26,6 +27,13 @@ namespace VSTS.DataBulkEditor.Engine.ComponentContext
                        });
                 Trace.TraceError(string.Format("  [EXCEPTION] {0}", ex.Message));
             }            
+        }
+        public string Name
+        {
+            get
+            {
+                return this.GetType().Name;
+            }
         }
 
         internal abstract void InternalExecute(WorkItem source, WorkItem target);
