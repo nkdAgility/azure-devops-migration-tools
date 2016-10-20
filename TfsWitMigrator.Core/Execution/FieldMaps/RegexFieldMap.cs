@@ -18,7 +18,7 @@ namespace VSTS.DataBulkEditor.Engine
 
         public void Execute(WorkItem source, WorkItem target)
         {
-            if (source.Fields.Contains(config.sourceField) && !string.IsNullOrEmpty(source.Fields[config.sourceField].Value.ToString()))
+            if (source.Fields.Contains(config.sourceField) && !string.IsNullOrEmpty(source.Fields[config.sourceField].Value.ToString()) && target.Fields.Contains(config.targetField))
             {
                 if (Regex.IsMatch((string)source.Fields[config.sourceField].Value, config.pattern))
                 {
