@@ -1,6 +1,7 @@
 site_name: VSTS Data Bulk Editor
 pages:
 - Home: index.md
+- Getting Started: getting-started.md
 - Usage:
   - Usage: usage/usage.md
   - Command Line: usage/command-line.md
