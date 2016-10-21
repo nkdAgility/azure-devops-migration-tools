@@ -283,7 +283,31 @@ namespace VSTS.DataBulkEditor.Engine
         private void SaveNewTestSuitToPlan(ITestPlan testPlan, IStaticTestSuite parent, ITestSuiteBase newTestSuite)
         {
             Trace.WriteLine(string.Format("       Saving {0} : {1} - {2} ", newTestSuite.TestSuiteType.ToString(), newTestSuite.Id, newTestSuite.Title), "TestPlansAndSuites");
-            ((IStaticTestSuite)parent).Entries.Add(newTestSuite);
+            try
+            {
+                ((IStaticTestSuite)parent).Entries.Add(newTestSuite);
+            }
+            catch (TestManagementServerException ex)
+            {
+                Telemetry.Current.TrackException(ex,
+                      new Dictionary<string, string> {
+                          { "Name", Name},
+                          { "Target Project", me.Target.Name},
+                          { "Target Collection", me.Target.Collection.Name },
+                          { "Source Project", me.Source.Name},
+                          { "Source Collection", me.Source.Collection.Name },
+                          { "Status", Status.ToString() },
+                          { "Task", "SaveNewTestSuitToPlan" },
+                          { "Id", newTestSuite.Id.ToString()},
+                          { "Title", newTestSuite.Title},
+                          { "TestSuiteType", newTestSuite.TestSuiteType.ToString()}
+                      });
+                Trace.WriteLine(string.Format("       FAILED {0} : {1} - {2} | {3}", newTestSuite.TestSuiteType.ToString(), newTestSuite.Id, newTestSuite.Title, ex.Message), "TestPlansAndSuites");
+                ITestSuiteBase ErrorSuitChild = targetTestStore.Project.TestSuites.CreateStatic();
+                    ErrorSuitChild.TestSuiteEntry.Title = string.Format(@"BROKEN: {0} | {1}", newTestSuite.Title, ex.Message);
+                    ((IStaticTestSuite)parent).Entries.Add(ErrorSuitChild);
+            }
+         
             testPlan.Save();
         }
 
