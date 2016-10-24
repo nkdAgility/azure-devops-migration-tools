@@ -70,8 +70,9 @@ namespace VSTS.DataBulkEditor.Engine
                     {
                         ProcessStaticSuite(sourcerSuiteChild, targetPlan.RootSuite, targetPlan);
                     }
-                    
-                        
+                    // Add Test Cases
+                    ProcessChildTestCases(sourcePlan.RootSuite, targetPlan.RootSuite, targetPlan);
+
                 }
             }
 
