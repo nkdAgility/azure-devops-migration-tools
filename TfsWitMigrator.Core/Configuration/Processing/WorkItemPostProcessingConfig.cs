@@ -9,7 +9,8 @@ namespace VSTS.DataBulkEditor.Engine.Configuration.Processing
     public class WorkItemPostProcessingConfig : ITfsProcessingConfig
     {
         public bool Enabled { get; set; }
-
+        public string QueryBit { get; set; }
+        public IList<int> WorkItemIDs { get; set; }
         public Type Processor
         {
             get
@@ -20,4 +21,3 @@ namespace VSTS.DataBulkEditor.Engine.Configuration.Processing
 
     }
     }
-
