@@ -74,7 +74,7 @@ If you wish to contribute then feel free to fork this repository and submit a pu
 
 This project is primarily managed and maintained on Visual Studio Team Services and code checked into MASTER is automatically synched between VSTS and GitHub. There is no hidden published code, but not all branches are published.
 
-If you want to sync your GitHub repository the check out [Open-source with VSTS or TFS and Github for better DevOps
+If you want to sync your GitHub repository then check out [Open-source with VSTS or TFS and Github for better DevOps
 ](https://nkdagility.com/open-source-vsts-tfs-github-better-devops/).
 
 ## Terms

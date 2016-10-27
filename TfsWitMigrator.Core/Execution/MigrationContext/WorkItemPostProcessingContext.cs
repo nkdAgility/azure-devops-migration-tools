@@ -14,13 +14,16 @@ namespace VSTS.DataBulkEditor.Engine
     public class WorkItemPostProcessingContext : MigrationContextBase
     {
 
-        private IList<string> _workItemTypes;
-        private IList<int> _workItemIDs;
-        private string _queryBit;
-        
+        private WorkItemPostProcessingConfig _config;
+        private MigrationEngine _me;
+        //private IList<string> _workItemTypes;
+        //private IList<int> _workItemIDs;
+        // private string _queryBit;
+
         public WorkItemPostProcessingContext(MigrationEngine me, WorkItemPostProcessingConfig config) : base(me, config)
         {
-            
+            _me = me;
+            _config = config;
         }
 
         public override string Name
@@ -30,20 +33,20 @@ namespace VSTS.DataBulkEditor.Engine
                 return "WorkItemPostProcessingContext";
             }
         }
-        public WorkItemPostProcessingContext(MigrationEngine me, WorkItemPostProcessingConfig config, IList<string> wiTypes) : this(me, config)
-        {
-            _workItemTypes = wiTypes;
-        }
+        //public WorkItemPostProcessingContext(MigrationEngine me, WorkItemPostProcessingConfig config, IList<string> wiTypes) : this(me, config)
+        //{
+        //    _workItemTypes = wiTypes;
+        //}
 
-        public WorkItemPostProcessingContext(MigrationEngine me, WorkItemPostProcessingConfig config, IList<int> wiIDs) : this(me, config)
-        {
-            _workItemIDs = wiIDs;
-        }
+        //public WorkItemPostProcessingContext(MigrationEngine me, WorkItemPostProcessingConfig config, IList<int> wiIDs) : this(me, config)
+        //{
+        //    _workItemIDs = wiIDs;
+        //}
 
-        public WorkItemPostProcessingContext(MigrationEngine me, WorkItemPostProcessingConfig config, string queryBit) : this (me, config)
-        {
-            _queryBit = queryBit;
-        }
+        //public WorkItemPostProcessingContext(MigrationEngine me, WorkItemPostProcessingConfig config, string queryBit) : this (me, config)
+        //{
+        //    _queryBit = queryBit;
+        //}
 
         internal override void InternalExecute()
         {
@@ -55,7 +58,7 @@ namespace VSTS.DataBulkEditor.Engine
             tfsqc.AddParameter("TeamProject", me.Source.Name);
 
             //Builds the constraint part of the query
-            string constraints = CreateConstraints();
+            string constraints = BuildQueryBitConstraints();
             
             tfsqc.Query = string.Format(@"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY [System.Id] ", constraints); 
             
@@ -119,44 +122,40 @@ namespace VSTS.DataBulkEditor.Engine
             Console.WriteLine(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds", stopwatch.Elapsed);
         }
 
-        private string CreateConstraints()
+        private string BuildQueryBitConstraints()
         {
-            if (_workItemIDs != null && _workItemIDs.Count > 0)
+            string constraints = "";
+
+            if (_config.WorkItemIDs != null && _config.WorkItemIDs.Count > 0)
             {
-                string idContraints;
-                if (_workItemIDs.Count == 1)
+                if (_config.WorkItemIDs.Count == 1)
                 {
-                    idContraints = string.Format (" AND [System.Id] = {0} ", _workItemIDs [0]);
+                    constraints += string.Format (" AND [System.Id] = {0} ", _config.WorkItemIDs[0]);
                 }
                 else
                 {
-                    idContraints = string.Format (" AND [System.Id] IN ({0}) ", string.Join (",", _workItemIDs));
+                    constraints += string.Format (" AND [System.Id] IN ({0}) ", string.Join (",", _config.WorkItemIDs));
                 }
-                return idContraints;
             }
 
-            
-            if (_workItemTypes != null && _workItemTypes.Count > 0)
+            if (_me.WorkItemTypeDefinitions != null && _me.WorkItemTypeDefinitions.Count > 0)
             {
-                string typeConstraints;
-                if (_workItemTypes.Count == 1)
+                if (_me.WorkItemTypeDefinitions.Count == 1)
                 {
-                    typeConstraints = string.Format (" AND [System.WorkItemType] = '{0}' ", _workItemTypes [0]);
+                    constraints += string.Format (" AND [System.WorkItemType] = '{0}' ", _me.WorkItemTypeDefinitions.Keys.First());
                 }
                 else
                 {
-                    typeConstraints = string.Format (" AND [System.WorkItemType] IN ('{0}') ", string.Join ("','", _workItemTypes));
+                    constraints += string.Format (" AND [System.WorkItemType] IN ('{0}') ", string.Join ("','", _me.WorkItemTypeDefinitions.Keys));
                 }
-                return typeConstraints;
             }
 
             
-            if (!String.IsNullOrEmpty (_queryBit))
+            if (!String.IsNullOrEmpty (_config.QueryBit))
             {
-                var queryConstraints = _queryBit;
-                return queryConstraints;
+                constraints += _config.QueryBit;
             }
-            return string.Empty;      
+            return constraints;
         }
     }
 }
