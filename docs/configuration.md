@@ -27,7 +27,7 @@ The global configuration look like this:
   "ReflectedWorkItemIDFieldName": "TfsMigrationTool.ReflectedWorkItemId",
   "FieldMaps": [
     {
-      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.FieldMap.MultiValueConditionalMapConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.FieldMap.MultiValueConditionalMapConfig",
       "WorkItemTypeName": "*",
       "sourceFieldsAndValues": {
         "Field1": "Value1",
@@ -39,12 +39,12 @@ The global configuration look like this:
       }
     },
     {
-      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.FieldMap.FieldBlankMapConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.FieldMap.FieldBlankMapConfig",
       "WorkItemTypeName": "*",
       "targetField": "TfsMigrationTool.ReflectedWorkItemId"
     },
     {
-      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.FieldMap.FieldValueMapConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.FieldMap.FieldValueMapConfig",
       "WorkItemTypeName": "*",
       "sourceField": "System.State",
       "targetField": "System.State",
@@ -58,19 +58,19 @@ The global configuration look like this:
       }
     },
     {
-      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.FieldMap.FieldtoFieldMapConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.FieldMap.FieldtoFieldMapConfig",
       "WorkItemTypeName": "*",
       "sourceField": "Microsoft.VSTS.Common.BacklogPriority",
       "targetField": "Microsoft.VSTS.Common.StackRank"
     },
     {
-      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.FieldMap.FieldtoTagMapConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.FieldMap.FieldtoTagMapConfig",
       "WorkItemTypeName": "*",
       "sourceField": "System.State",
       "formatExpression": "ScrumState:{0}"
     },
     {
-      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.FieldMap.FieldMergeMapConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.FieldMap.FieldMergeMapConfig",
       "WorkItemTypeName": "*",
       "sourceField1": "System.Description",
       "sourceField2": "Microsoft.VSTS.Common.AcceptanceCriteria",
@@ -78,7 +78,7 @@ The global configuration look like this:
       "formatExpression": "{0} <br/><br/><h3>Acceptance Criteria</h3>{1}"
     },
     {
-      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.FieldMap.RegexFieldMapConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.FieldMap.RegexFieldMapConfig",
       "WorkItemTypeName": "*",
       "sourceField": "COMPANY.PRODUCT.Release",
       "targetField": "COMPANY.DEVISION.MinorReleaseVersion",
@@ -86,14 +86,14 @@ The global configuration look like this:
       "replacement": "$1"
     },
     {
-      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.FieldMap.FieldValuetoTagMapConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.FieldMap.FieldValuetoTagMapConfig",
       "WorkItemTypeName": "*",
       "sourceField": "Microsoft.VSTS.CMMI.Blocked",
       "pattern": "Yes",
       "formatExpression": "{0}"
     },
     {
-      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.FieldMap.TreeToTagMapConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.FieldMap.TreeToTagMapConfig",
       "WorkItemTypeName": "*",
       "toSkip": 3,
       "timeTravel": 1
@@ -105,7 +105,7 @@ The global configuration look like this:
   },
   "Processors": [
     {
-      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.Processing.WorkItemMigrationConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.WorkItemMigrationConfig",
       "Enabled": false,
       "PrefixProjectToNodes": true,
       "UpdateCreatedDate": true,
@@ -114,62 +114,62 @@ The global configuration look like this:
       "QueryBit": "AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')"
     },
     {
-      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.Processing.WorkItemUpdateConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.WorkItemUpdateConfig",
       "WhatIf": false,
       "Enabled": false,
       "QueryBit": "AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')"
     },
     {
-      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.Processing.NodeStructuresMigrationConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.NodeStructuresMigrationConfig",
       "Enabled": false,
       "PrefixProjectToNodes": false
     },
     {
-      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.Processing.LinkMigrationConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.LinkMigrationConfig",
       "Enabled": false,
       "QueryBit": "AND [System.ExternalLinkCount] > 0 AND [System.RelatedLinkCount] > 0"
     },
     {
-      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.Processing.WorkItemPostProcessingConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.WorkItemPostProcessingConfig",
       "Enabled": false
     },
     {
-      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.Processing.WorkItemDeleteConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.WorkItemDeleteConfig",
       "Enabled": false
     },
     {
-      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.Processing.AttachementExportMigrationConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.AttachementExportMigrationConfig",
       "Enabled": false,
       "QueryBit": "AND [System.AttachedFileCount] > 0"
     },
     {
-      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.Processing.AttachementImportMigrationConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.AttachementImportMigrationConfig",
       "Enabled": false
     },
     {
-      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.Processing.TestVeriablesMigrationConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.TestVeriablesMigrationConfig",
       "Enabled": false
     },
     {
-      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.Processing.TestConfigurationsMigrationConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.TestConfigurationsMigrationConfig",
       "Enabled": false
     },
     {
-      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.Processing.TestPlansAndSuitsMigrationConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.TestPlansAndSuitsMigrationConfig",
       "Enabled": false,
       "PrefixProjectToNodes": true
     },
     {
-      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.Processing.TestRunsMigrationConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.TestRunsMigrationConfig",
       "Enabled": false,
       "Status": "Experimental"
     },
     {
-      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.Processing.ImportProfilePictureConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.ImportProfilePictureConfig",
       "Enabled": false
     },
     {
-      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.Processing.ExportProfilePictureFromADConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.ExportProfilePictureFromADConfig",
       "Enabled": false,
       "Domain": null,
       "Username": null,
@@ -177,7 +177,7 @@ The global configuration look like this:
       "PictureEmpIDFormat": null
     },
     {
-      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.Processing.FixGitCommitLinksConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.FixGitCommitLinksConfig",
       "Enabled": false
     }
   ]

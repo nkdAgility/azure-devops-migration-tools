@@ -16,7 +16,7 @@ Download from [executable](https://github.com/nkdAgility/vsts-data-bulk-editor/r
   "ReflectedWorkItemIDFieldName": "TfsMigrationTool.ReflectedWorkItemId",
   "FieldMaps": [
     {
-      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.FieldMap.FieldValueMapConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.FieldMap.FieldValueMapConfig",
       "WorkItemTypeName": "*",
       "sourceField": "System.State",
       "targetField": "System.State",
@@ -30,19 +30,19 @@ Download from [executable](https://github.com/nkdAgility/vsts-data-bulk-editor/r
       }
     },
     {
-      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.FieldMap.FieldtoFieldMapConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.FieldMap.FieldtoFieldMapConfig",
       "WorkItemTypeName": "*",
       "sourceField": "Microsoft.VSTS.Common.BacklogPriority",
       "targetField": "Microsoft.VSTS.Common.StackRank"
     },
     {
-      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.FieldMap.FieldtoTagMapConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.FieldMap.FieldtoTagMapConfig",
       "WorkItemTypeName": "*",
       "sourceField": "System.State",
       "formatExpression": "ScrumState:{0}"
     },
     {
-      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.FieldMap.FieldMergeMapConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.FieldMap.FieldMergeMapConfig",
       "WorkItemTypeName": "*",
       "sourceField1": "System.Description",
       "sourceField2": "Microsoft.VSTS.Common.AcceptanceCriteria",
@@ -50,7 +50,7 @@ Download from [executable](https://github.com/nkdAgility/vsts-data-bulk-editor/r
       "formatExpression": "{0} <br/><br/><h3>Acceptance Criteria</h3>{1}"
     },
     {
-      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.FieldMap.RegexFieldMapConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.FieldMap.RegexFieldMapConfig",
       "WorkItemTypeName": "*",
       "sourceField": "COMPANY.PRODUCT.Release",
       "targetField": "COMPANY.DEVISION.MinorReleaseVersion",
@@ -58,7 +58,7 @@ Download from [executable](https://github.com/nkdAgility/vsts-data-bulk-editor/r
       "replacement": "$1"
     },
     {
-      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.FieldMap.TreeToTagMapConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.FieldMap.TreeToTagMapConfig",
       "WorkItemTypeName": "*",
       "toSkip": 3,
       "timeTravel": 1
@@ -70,63 +70,63 @@ Download from [executable](https://github.com/nkdAgility/vsts-data-bulk-editor/r
   },
   "Processors": [
     {
-      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.Processing.WorkItemMigrationConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.WorkItemMigrationConfig",
       "Disabled": true,
       "QueryBit": "AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')"
     },
     {
-      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.Processing.WorkItemUpdateConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.WorkItemUpdateConfig",
       "WhatIf": false,
       "Disabled": true,
       "QueryBit": "AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')"
     },
     {
-      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.Processing.NodeStructuresMigrationConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.NodeStructuresMigrationConfig",
       "Disabled": true
     },
     {
-      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.Processing.LinkMigrationConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.LinkMigrationConfig",
       "Disabled": true
     },
     {
-      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.Processing.WorkItemPostProcessingConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.WorkItemPostProcessingConfig",
       "Disabled": true
     },
     {
-      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.Processing.WorkItemDeleteConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.WorkItemDeleteConfig",
       "Disabled": true
     },
     {
-      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.Processing.AttachementExportMigrationConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.AttachementExportMigrationConfig",
       "Disabled": true
     },
     {
-      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.Processing.AttachementImportMigrationConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.AttachementImportMigrationConfig",
       "Disabled": true
     },
     {
-      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.Processing.TestVeriablesMigrationConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.TestVeriablesMigrationConfig",
       "Disabled": true
     },
     {
-      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.Processing.TestConfigurationsMigrationConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.TestConfigurationsMigrationConfig",
       "Disabled": true
     },
     {
-      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.Processing.TestPlansAndSuitsMigrationConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.TestPlansAndSuitsMigrationConfig",
       "Disabled": true
     },
     {
-      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.Processing.TestRunsMigrationConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.TestRunsMigrationConfig",
       "Disabled": true,
       "Status": "Experimental"
     },
     {
-      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.Processing.ImportProfilePictureConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.ImportProfilePictureConfig",
       "Disabled": true
     },
     {
-      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.Processing.ExportProfilePictureFromADConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.ExportProfilePictureFromADConfig",
       "Disabled": true,
       "Domain": null,
       "Username": null,

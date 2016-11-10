@@ -43,12 +43,12 @@ You can now customise the configuration depending on what you need to do. Howeve
   },
   "Processors": [
     {
-      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.Processing.NodeStructuresMigrationConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.NodeStructuresMigrationConfig",
       "Enabled": false,
       "PrefixProjectToNodes": false
     },
     {
-      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.Processing.WorkItemMigrationConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.WorkItemMigrationConfig",
       "Enabled": false,
       "PrefixProjectToNodes": true,
       "UpdateCreatedDate": true,
@@ -57,17 +57,17 @@ You can now customise the configuration depending on what you need to do. Howeve
       "QueryBit": "AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Product Backlog Item', 'Task', 'Feature', 'Epic', 'Bug')"
     },
     {
-      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.Processing.LinkMigrationConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.LinkMigrationConfig",
       "Enabled": false,
       "QueryBit": "AND [System.ExternalLinkCount] > 0 AND [System.RelatedLinkCount] > 0"
     },
     {
-      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.Processing.AttachementExportMigrationConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.AttachementExportMigrationConfig",
       "Enabled": false,
       "QueryBit": "AND [System.AttachedFileCount] > 0"
     },
     {
-      "ObjectType": "VSTS.DataBulkEditor.Engine.Configuration.Processing.AttachementImportMigrationConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.AttachementImportMigrationConfig",
       "Enabled": false
     }
   ]

@@ -1,4 +1,4 @@
-site_name: VSTS Data Bulk Editor
+site_name: VSTS Sync Migrator
 pages:
 - Home: index.md
 - Getting Started: getting-started.md

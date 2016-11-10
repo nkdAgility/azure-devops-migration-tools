@@ -4,7 +4,7 @@ The VSTS Bulk Data Editor tool has a public API that is available on Nuget as a 
 
 ## Getting Started
 
-In order to use these tool you can create a new application in Visual Studio and add a reference to the [Nuget Package](https://www.nuget.org/packages/VSTS.DataBulkEditor.Engine/) that is available. If you want a simple bulk update of your code then try:
+In order to use these tool you can create a new application in Visual Studio and add a reference to the [Nuget Package](https://www.nuget.org/packages/VstsSyncMigrator.Engine/) that is available. If you want a simple bulk update of your code then try:
 
 ```csharp
 MigrationEngine engine = new MigrationEngine();

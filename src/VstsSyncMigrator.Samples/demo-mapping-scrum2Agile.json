@@ -1,0 +1,65 @@
+{
+  "TelemetryEnableTrace": true,
+  "Target": {
+    "Collection": "https://tfs.test.company.com/tfs/col2/",
+    "Name": "ProjectName"
+  },
+  "ReflectedWorkItemIDFieldName": "TfsMigrationTool.ReflectedWorkItemId",
+  "WorkItemTypeDefinition": {
+    "Bug": "Bug",
+    "User Story": "User Story",
+    "Requirement": "Requirement",
+    "Task": "Task",
+    "Test Case": "Test Case",
+    "Shared Steps": "Shared Steps",
+    "Shared Parameter": "Shared Parameter"
+  },
+  "FieldMaps": [
+    {
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.FieldMap.FieldtoTagMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceField": "System.State",
+      "formatExpression": "OriginalState:{0}"
+    },
+    {
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.FieldMap.FieldValueMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceField": "System.State",
+      "targetField": "System.State",
+      "valueMapping": {
+        "Approved": "New",
+        "New": "New",
+        "Committed": "Active",
+        "In Progress": "Active",
+        "To Do": "New",
+        "Done": "Closed"
+      }
+    },
+    {
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.FieldMap.FieldtoTagMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceField": "Microsoft.VSTS.Common.BusinessValue",
+      "formatExpression": "BV:{0}"
+    },
+    {
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.FieldMap.FieldtoFieldMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceField": "Microsoft.VSTS.Common.BacklogPriority",
+      "targetField": "Microsoft.VSTS.Common.StackRank"
+    },
+    {
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.FieldMap.FieldtoFieldMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceField": "Microsoft.VSTS.Scheduling.Effort",
+      "targetField": "Microsoft.VSTS.Scheduling.StoryPoints"
+    }
+  ],
+  "Processors": [
+    {
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.WorkItemUpdateConfig",
+      "WhatIf": false,
+      "Disabled": false,
+      "QueryBit": "AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')"
+    }
+  ]
+}

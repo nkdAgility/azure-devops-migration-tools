@@ -8,7 +8,7 @@ There are three ways to use these tools:
 
 - [Install from Chocolatey](https://chocolatey.org/packages/vsts-sync-migrator/) **(recomended)**
 - Manually download the [latest release from GitHub](https://github.com/nkdAgility/vsts-sync-migration/releases) and unzip
-- Create your own tools by using the [VSTS Bulk Data Editor Engine](https://www.nuget.org/packages/VSTS.DataBulkEditor.Engine/) on nuget
+- Create your own tools by using the [VSTS Bulk Data Editor Engine](https://www.nuget.org/packages/VstsSyncMigrator.Engine/) on nuget
 
 ## Overview
 
