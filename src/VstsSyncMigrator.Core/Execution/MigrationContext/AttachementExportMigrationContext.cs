@@ -49,7 +49,7 @@ namespace VstsSyncMigrator.Engine
                 foreach (Attachment wia in wi.Attachments)
                 {
                     string reflectedId = sourceStore.CreateReflectedWorkItemId(wi);
-                    string fname = string.Format("{0}#{1}", reflectedId.Replace("/", "-").Replace(":", "+"), wia.Name);
+                    string fname = string.Format("{0}#{1}", reflectedId.Replace("/", "--").Replace(":", "+"), wia.Name);
                     Trace.Write("-");
                     Trace.Write(fname);
                     string fpath = Path.Combine(exportPath, fname);

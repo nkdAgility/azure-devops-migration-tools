@@ -39,7 +39,7 @@ namespace VstsSyncMigrator.Engine
             foreach (string file in files)
             {
                 string fileName = System.IO.Path.GetFileName(file);
-                string reflectedID =fileName.Split('#')[0].Replace('+', ':').Replace('-','/');
+                string reflectedID =fileName.Split('#')[0].Replace('+', ':').Replace("--","/");
                  targetWI = targetStore.FindReflectedWorkItemByReflectedWorkItemId(reflectedID, me.ReflectedWorkItemIdFieldName);
                 if (targetWI != null)
                 {
