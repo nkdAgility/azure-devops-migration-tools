@@ -346,6 +346,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
+    <None Include="VstsSyncMigrator.Core.nuspec" />
     <None Include="_VSTS.DataBulkEditor.Engine.nuspec" />
   </ItemGroup>
   <ItemGroup>

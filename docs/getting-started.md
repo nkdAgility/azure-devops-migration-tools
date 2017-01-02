@@ -9,12 +9,12 @@ In order to run the migration you will need to install the tools first.
 1. Install Chocolatey from [https://chocolatey.org/install](https://chocolatey.org/install)
 1. Run "**choco install vsts-sync-migrator**" to install the tools [source](https://chocolatey.org/packages/vsts-sync-migrator)
 
-The tools are now installed and calling "vsts-sm" from any command line will run the tools.
+The tools are now installed and calling "vstssyncmigrator" from any command line will run the tools.
 
 ## Create a default configuration file
 
 1. Open a command prompt or PowerShell window
-2. Run "vsts-sm init" to create a default configuration
+2. Run "vstssyncmigrator init" to create a default configuration
 3. Open "vstsbulkeditor.json" from the current directory
 
 You can now customise the configuration depending on what you need to do. However a basic config that you can use to migrate from one team project to another with the same process template is:
