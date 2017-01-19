@@ -23,7 +23,8 @@ You can now customise the configuration depending on what you need to do. Howeve
 {
   "TelemetryEnableTrace": true,
   "Source": {
-    "Collection": "https://sdd2016.visualstudio.com/",
+    "
+    Collection": "https://sdd2016.visualstudio.com/",
     "Name": "DemoProjs"
   },
   "Target": {
@@ -44,12 +45,12 @@ You can now customise the configuration depending on what you need to do. Howeve
   "Processors": [
     {
       "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.NodeStructuresMigrationConfig",
-      "Enabled": false,
+      "Enabled": true,
       "PrefixProjectToNodes": false
     },
     {
       "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.WorkItemMigrationConfig",
-      "Enabled": false,
+      "Enabled": true,
       "PrefixProjectToNodes": true,
       "UpdateCreatedDate": true,
       "UpdateCreatedBy": true,
@@ -58,17 +59,17 @@ You can now customise the configuration depending on what you need to do. Howeve
     },
     {
       "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.LinkMigrationConfig",
-      "Enabled": false,
-      "QueryBit": "AND [System.ExternalLinkCount] > 0 AND [System.RelatedLinkCount] > 0"
+      "Enabled": true,
+      "QueryBit": "AND ([System.ExternalLinkCount] > 0 OR [System.RelatedLinkCount] > 0)"
     },
     {
       "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.AttachementExportMigrationConfig",
-      "Enabled": false,
+      "Enabled": true,
       "QueryBit": "AND [System.AttachedFileCount] > 0"
     },
     {
       "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.AttachementImportMigrationConfig",
-      "Enabled": false
+      "Enabled": true
     }
   ]
 }
@@ -83,6 +84,8 @@ Here we are performing the following operations:
 1. Work Item Migration - Move the work items. Use the QueryBit to scope to only the items that you want.
 1. Link Migration - Once all of the work items are across you can then migrate the links. Links will only be re-created if both ends of the link are in the new system. The "ReflectedWorkItemId" field value is used to find the new work items easily.
 1. Attachment Export & Import - Now we can export and then re-import the attachments. This just done separately to prevent errors
+
+**Rememeber** if you want a processor to run it's `Enabled` property must be set to true. 
 
 If you have Test Suits & Plans you can also migrate them using other processors.
 

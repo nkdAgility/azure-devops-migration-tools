@@ -19,9 +19,11 @@ These tools are build by naked Agility Limited's DevOps & Agility consultants to
 - **Bulk Update** - You can bulk update work items and apply processing rules against your server or account. Use the `WorkItemUpdate` class that takes only a target Team Project. The team does a lot of Process Template migrations and we need these tools to fix the data after the migration.
 - **Migration** - You can migrate work items, area & iterations, & test data from one Team Project to another. Use the `WorkItemMigrationContext` class that takes both a Source and a Target Team Project
 
-### Field Mapps
+### Field Maps
 
-By default, when you are moving from source to target the system will map all of the fields that exist in source to the same field in the target. However sometimes you want to move data to another field, or use a regex to parse out just the bits that you want. To help we have built a number of mapping tools that should give you the versatility you need.
+By default, when you are moving from source to target the system will map all of the fields that exist in source to the same field in the target. This is be behaviour if the **FieldMaps** section is not present.  
+
+However sometimes you want to move data to another field, or use a regex to parse out just the bits that you want. To help we have built a number of mapping tools that should give you the versatility you need.
 
 - **FieldtoFieldMap** - Just want to map one field to another? This is the one for you.
 - **FieldMergeMap** - Ever wanted to merge two fields? This mapping will let you do just that.
@@ -29,12 +31,12 @@ By default, when you are moving from source to target the system will map all of
 - **FieldtoTagMap** - Want to take a field and convert its value to a tag? Done...
 - **FieldValueMap** - Need to map not just the field but also values? This is the default value mapper.
 - **FieldValuetoTagMap** - Need to create a Tag based on a field value? Just create a regex match and choose how to populate the target.
-- **RegexFieldMap** - I just need that bit of a field... need to send "2016.2" to two fields, one for year and one for releae? Done.
+- **RegexFieldMap** - I just need that bit of a field... need to send "2016.2" to two fields, one for year and one for release? Done.
 - **TreeToTagMap** - Need to clear out those nasty Area tree hierarchies? This creates Tags for each node in the Area Path...
 
 ### Processors
 
-There are other processors that can be used to migrate, or process, different sorts of data in diferent ways. Which one is right for you depends on the situation at hand.
+There are other processors that can be used to migrate, or process, different sorts of data in different ways. Which one is right for you depends on the situation at hand.
 
 #### In-Place Processors
 
@@ -43,7 +45,7 @@ There are other processors that can be used to migrate, or process, different so
 
 #### Migrators
 
-Most of thise processors need to be run in order. If you try to migrate work items before you have migrated Area and Iterations then ***bang*** you need to go back.
+Most of these processors need to be run in order. If you try to migrate work items before you have migrated Area and Iterations then ***bang*** you need to go back.
 
 ##### Work Items
 1. **NodeStructuresMigrationContext** - 
