@@ -5,4 +5,4 @@ There are two main ways to consume VSTS Bulk Data Editor, the first is by runnin
  - [Using the Command Line tool](command-line.md)
  - [Using the NuGet Library package](nuget-library.md)
  
-The recomendation would be to start with the [command line tool](command-line.md) and only use the API if absolutly nessesery.
+The recommendation would be to start with the [command line tool](command-line.md) and only use the API if absolutely necessary.
