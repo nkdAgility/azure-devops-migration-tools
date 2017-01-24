@@ -23,8 +23,7 @@ You can now customise the configuration depending on what you need to do. Howeve
 {
   "TelemetryEnableTrace": true,
   "Source": {
-    "
-    Collection": "https://sdd2016.visualstudio.com/",
+    "Collection": "https://sdd2016.visualstudio.com/",
     "Name": "DemoProjs"
   },
   "Target": {
