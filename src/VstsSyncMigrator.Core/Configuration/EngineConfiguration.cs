@@ -113,6 +113,7 @@ namespace VstsSyncMigrator.Engine.Configuration
             ec.Processors.Add(new WorkItemDeleteConfig() { Enabled = false });
             ec.Processors.Add(new AttachementExportMigrationConfig() { Enabled = false, QueryBit = @"AND [System.AttachedFileCount] > 0" });
             ec.Processors.Add(new AttachementImportMigrationConfig() { Enabled = false });
+            ec.Processors.Add(new WorkItemQueryMigrationConfig() { Enabled = false, PrefixProjectToNodes = false });
             ec.Processors.Add(new TestVeriablesMigrationConfig() { Enabled = false });
             ec.Processors.Add(new TestConfigurationsMigrationConfig() { Enabled = false });
             ec.Processors.Add(new TestPlansAndSuitsMigrationConfig() { Enabled = false, PrefixProjectToNodes = true });
