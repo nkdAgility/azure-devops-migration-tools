@@ -46,35 +46,35 @@ namespace VstsSyncMigrator.Engine
         internal override void InternalExecute()
         {
 
-            ITestPlanCollection sourcePlans = sourceTestStore.GetTestPlans();
-            Trace.WriteLine(string.Format("Plan to copy {0} Plans?", sourcePlans.Count), "TestPlansAndSuites");
-            foreach (ITestPlan sourcePlan in sourcePlans)
-            {
-                string newPlanName = string.Format("{0}-{1}", sourceWitStore.GetProject().Name, sourcePlan.Name);
-                Trace.WriteLine(string.Format("Process Plan {0} - ", newPlanName), "TestPlansAndSuites");
-                ITestPlan targetPlan = FindTestPlan(targetTestStore, newPlanName);
-                if (targetPlan == null)
+                ITestPlanCollection sourcePlans = sourceTestStore.GetTestPlans();
+                Trace.WriteLine(string.Format("Plan to copy {0} Plans?", sourcePlans.Count), "TestPlansAndSuites");
+                foreach (ITestPlan sourcePlan in sourcePlans)
                 {
-                    Trace.WriteLine(string.Format("    Plan missing...creating"), "TestPlansAndSuites");
-                    targetPlan = CreateNewTestPlanFromSource(sourcePlan, newPlanName);
-                    targetPlan.Save();
-                }
-                else
-                {
-                    Trace.WriteLine(string.Format("    Plan found"), "TestPlansAndSuites");
-                }
-                if (HasChildSuits(sourcePlan.RootSuite))
-                {
-                    Trace.WriteLine(string.Format("    Source Plan has {0} Suites", sourcePlan.RootSuite.Entries.Count), "TestPlansAndSuites");
-                    foreach (ITestSuiteBase sourcerSuiteChild in sourcePlan.RootSuite.SubSuites)
+                    string newPlanName = string.Format("{0}-{1}", sourceWitStore.GetProject().Name, sourcePlan.Name);
+                    Trace.WriteLine(string.Format("Process Plan {0} - ", newPlanName), "TestPlansAndSuites");
+                    ITestPlan targetPlan = FindTestPlan(targetTestStore, newPlanName);
+                    if (targetPlan == null)
                     {
-                        ProcessStaticSuite(sourcerSuiteChild, targetPlan.RootSuite, targetPlan);
+                        Trace.WriteLine(string.Format("    Plan missing...creating"), "TestPlansAndSuites");
+                        targetPlan = CreateNewTestPlanFromSource(sourcePlan, newPlanName);
+                        targetPlan.Save();
                     }
-                    // Add Test Cases
-                    ProcessChildTestCases(sourcePlan.RootSuite, targetPlan.RootSuite, targetPlan);
+                    else
+                    {
+                        Trace.WriteLine(string.Format("    Plan found"), "TestPlansAndSuites");
+                    }
+                    if (HasChildSuits(sourcePlan.RootSuite))
+                    {
+                        Trace.WriteLine(string.Format("    Source Plan has {0} Suites", sourcePlan.RootSuite.Entries.Count), "TestPlansAndSuites");
+                        foreach (ITestSuiteBase sourcerSuiteChild in sourcePlan.RootSuite.SubSuites)
+                        {
+                            ProcessStaticSuite(sourcerSuiteChild, targetPlan.RootSuite, targetPlan);
+                        }
+                        // Add Test Cases
+                        ProcessChildTestCases(sourcePlan.RootSuite, targetPlan.RootSuite, targetPlan);
 
+                    }
                 }
-            }
 
         }
 
@@ -89,7 +89,7 @@ namespace VstsSyncMigrator.Engine
                 {
                     case TestSuiteType.None:
                         throw new NotImplementedException();
-                        //break;
+                    //break;
                     case TestSuiteType.DynamicTestSuite:
                         targetSuitChild = CreateNewDynamicTestSuite(sourceSuit);
                         break;
@@ -98,13 +98,31 @@ namespace VstsSyncMigrator.Engine
                         break;
                     case TestSuiteType.RequirementTestSuite:
                         int sourceRid = ((IRequirementTestSuite)sourceSuit).RequirementId;
-                        WorkItem sourceReq = sourceWitStore.Store.GetWorkItem(sourceRid);
-                        WorkItem targetReq = targetWitStore.FindReflectedWorkItemByReflectedWorkItemId(sourceReq, me.ReflectedWorkItemIdFieldName);
+                        WorkItem sourceReq = null;
+                        WorkItem targetReq = null;
+                        try
+                        {
+                            sourceReq = sourceWitStore.Store.GetWorkItem(sourceRid);
+                        }
+                        catch (Exception)
+                        {
+                            Trace.WriteLine(string.Format("            Source workitem does not exist"), "TestPlansAndSuites");
+                            break;
+                        }
+                        try
+                        {
+                            Trace.WriteLine(string.Format("            Source workitem not migrated to target, cannot be found"), "TestPlansAndSuites");
+                            targetReq = targetWitStore.FindReflectedWorkItemByReflectedWorkItemId(sourceReq, me.ReflectedWorkItemIdFieldName);
+                        }
+                        catch (Exception)
+                        {
+                            break;
+                        }
                         targetSuitChild = CreateNewRequirementTestSuite(sourceSuit, targetReq);
                         break;
                     default:
                         throw new NotImplementedException();
-                        //break;
+                    //break;
                 }
                 if (targetSuitChild == null) { return; }
                 // Add to tareget and Save
@@ -180,30 +198,30 @@ namespace VstsSyncMigrator.Engine
             {
                 //if (source.DefaultConfigurations != null && source.DefaultConfigurations.Count != target.DefaultConfigurations.Count)
                 //{
-                    Trace.WriteLine(string.Format("   CONFIG MNISSMATCH FOUND --- FIX AATTEMPTING"), "TestPlansAndSuites");
-                    target.ClearDefaultConfigurations();
-                    IList<IdAndName> targetConfigs = new List<IdAndName>();
-                    foreach (var config in source.DefaultConfigurations)
+                Trace.WriteLine(string.Format("   CONFIG MNISSMATCH FOUND --- FIX AATTEMPTING"), "TestPlansAndSuites");
+                target.ClearDefaultConfigurations();
+                IList<IdAndName> targetConfigs = new List<IdAndName>();
+                foreach (var config in source.DefaultConfigurations)
+                {
+                    var targetFound = (from tc in targetTestConfigs
+                                       where tc.Name == config.Name
+                                       select tc).SingleOrDefault();
+                    if (!(targetFound == null))
                     {
-                        var targetFound = (from tc in targetTestConfigs
-                                           where tc.Name == config.Name
-                                           select tc).SingleOrDefault();
-                        if (!(targetFound == null))
-                        {
 
-                            targetConfigs.Add(new IdAndName(targetFound.Id, targetFound.Name));
-                        }
+                        targetConfigs.Add(new IdAndName(targetFound.Id, targetFound.Name));
                     }
-                    try
-                    {
-                        target.SetDefaultConfigurations(targetConfigs);
-                    }
-                    catch (Exception)
-                    {
-                        // SOmetimes this will error out for no reason.
-                    }
+                }
+                try
+                {
+                    target.SetDefaultConfigurations(targetConfigs);
+                }
+                catch (Exception)
+                {
+                    // SOmetimes this will error out for no reason.
+                }
 
-               // }
+                // }
 
             }
         }
@@ -236,7 +254,7 @@ namespace VstsSyncMigrator.Engine
                     {
                         // SOmetimes this will error out for no reason.
                     }
-                    
+
                 }
 
             }
@@ -305,10 +323,10 @@ namespace VstsSyncMigrator.Engine
                       });
                 Trace.WriteLine(string.Format("       FAILED {0} : {1} - {2} | {3}", newTestSuite.TestSuiteType.ToString(), newTestSuite.Id, newTestSuite.Title, ex.Message), "TestPlansAndSuites");
                 ITestSuiteBase ErrorSuitChild = targetTestStore.Project.TestSuites.CreateStatic();
-                    ErrorSuitChild.TestSuiteEntry.Title = string.Format(@"BROKEN: {0} | {1}", newTestSuite.Title, ex.Message);
-                    ((IStaticTestSuite)parent).Entries.Add(ErrorSuitChild);
+                ErrorSuitChild.TestSuiteEntry.Title = string.Format(@"BROKEN: {0} | {1}", newTestSuite.Title, ex.Message);
+                ((IStaticTestSuite)parent).Entries.Add(ErrorSuitChild);
             }
-         
+
             testPlan.Save();
         }
 
@@ -323,7 +341,7 @@ namespace VstsSyncMigrator.Engine
             return targetSuitChild;
         }
 
-    
+
 
         private ITestSuiteBase FindSuiteEntry(IStaticTestSuite staticSuit, string titleToFind)
         {

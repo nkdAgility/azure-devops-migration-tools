@@ -50,18 +50,27 @@ namespace VstsSyncMigrator.Engine
             //////////////////////////////////////////////////
             foreach (WorkItem wiSourceL in sourceWIS)
             {
-                Trace.WriteLine(string.Format("Migrating Links for wiSourceL={0}",
-                                                   wiSourceL.Id), "LinkMigrationContext");
-                WorkItem wiTargetL = targetWitsc.FindReflectedWorkItem(wiSourceL, me.ReflectedWorkItemIdFieldName, true);
+
+                Trace.WriteLine(string.Format("Migrating Links for wiSourceL={0}", wiSourceL.Id), "LinkMigrationContext");
+                WorkItem wiTargetL = null;
+                try
+                {
+                    wiTargetL = targetWitsc.FindReflectedWorkItem(wiSourceL, me.ReflectedWorkItemIdFieldName, true);
+                }
+                catch (Exception)
+                {
+                    Trace.WriteLine(string.Format("Cannot find twiTargetL matching wiSourceL={0} probably due to missing ReflectedWorkItemID", wiSourceL.Id), "LinkMigrationContext");
+                }
+
                 if (wiTargetL == null)
                 {
                     //wiSourceL was not migrated, or the migrated work item has been deleted. 
                     Trace.WriteLine(string.Format("[SKIP] Unable to migrate links where wiSourceL={0}, wiTargetL=NotFound",
-                                                   wiSourceL.Id), "LinkMigrationContext");
+                            wiSourceL.Id), "LinkMigrationContext");
                     continue;
                 }
                 Trace.WriteLine(string.Format("Found Target Left wiSourceL={0}, wiTargetL=NotFound",
-                                                   wiSourceL.Id), "LinkMigrationContext");
+                    wiSourceL.Id), "LinkMigrationContext");
                 if (wiTargetL.Links.Count == wiSourceL.Links.Count)
                 {
                     Trace.WriteLine(string.Format("[SKIP] SOurce and Target have same number of links  {0} - {1}", wiSourceL.Id, wiSourceL.Type.ToString()), "LinkMigrationContext");
@@ -74,7 +83,7 @@ namespace VstsSyncMigrator.Engine
                         foreach (Link item in wiSourceL.Links)
                         {
                             Trace.WriteLine(string.Format("Migrating link for {0} of type {1}",
-                                                   wiSourceL.Id, item.GetType().Name), "LinkMigrationContext");
+                                wiSourceL.Id, item.GetType().Name), "LinkMigrationContext");
                             if (IsHyperlink(item))
                             {
                                 CreateHyperlink((Hyperlink)item, wiTargetL);
@@ -142,6 +151,7 @@ namespace VstsSyncMigrator.Engine
         {
             RelatedLink rl = (RelatedLink)item;
             WorkItem wiSourceR = null;
+            WorkItem wiTargetR = null;
             try
             {
                 wiSourceR = sourceStore.Store.GetWorkItem(rl.RelatedWorkItemId);
@@ -152,7 +162,17 @@ namespace VstsSyncMigrator.Engine
                 Trace.TraceError(ex.ToString());
                 return;
             }
-            WorkItem wiTargetR = GetRightHandSideTargitWi(wiSourceL, wiSourceR, wiTargetL, targetStore);
+            try
+            {
+                wiTargetR = GetRightHandSideTargitWi(wiSourceL, wiSourceR, wiTargetL, targetStore);
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine(string.Format("  [FIND-FAIL] Adding Link of type {0} where wiSourceL={1}, wiTargetL={2} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiTargetL.Id));
+                Trace.TraceError(ex.ToString());
+                return;
+
+            }
             if (wiTargetR != null)
             {
                 bool IsExisting = false;
@@ -176,24 +196,38 @@ namespace VstsSyncMigrator.Engine
 
                 if (!IsExisting && !wiTargetR.IsAccessDenied)
                 {
-                    Trace.WriteLine(string.Format("  [CREATE-START] Adding Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id));
-                    WorkItemLinkTypeEnd linkTypeEnd = targetStore.Store.WorkItemLinkTypes.LinkTypeEnds[rl.LinkTypeEnd.ImmutableName];
-                    RelatedLink newRl = new RelatedLink(linkTypeEnd, wiTargetR.Id);
-                    try
-                    {
-                        wiTargetL.Links.Add(newRl);
-                        wiTargetL.Save();
-                    }
-                    catch (Exception ex)
-                    {
-                        throw ex;
-                    }
 
-                    Trace.WriteLine(string.Format("  [CREATE-SUCESS] Adding Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id));
+                    if (wiSourceR.Id != wiTargetR.Id)
+                    {
+                        Trace.WriteLine(
+                            string.Format("  [CREATE-START] Adding Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id));
+                        WorkItemLinkTypeEnd linkTypeEnd = targetStore.Store.WorkItemLinkTypes.LinkTypeEnds[rl.LinkTypeEnd.ImmutableName];
+                        RelatedLink newRl = new RelatedLink(linkTypeEnd, wiTargetR.Id);
+                        try
+                        {
+                            wiTargetL.Links.Add(newRl);
+                            wiTargetL.Save();
+                            Trace.WriteLine(
+                                string.Format(
+                                    "  [CREATE-SUCCESS] Adding Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} ",
+                                    rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id));
+                        }
+                        catch (Exception ex)
+                        {
+                            throw ex;
+                        }
+                    }
+                    else
+                    {
+                        Trace.WriteLine(
+                              string.Format(
+                                  "  [SKIP] Unable to migrate link where Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} as target WI has not been migrated",
+                                  rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id));
+                    }
                 }
                 else
                 {
-                    if (IsExisting) 
+                    if (IsExisting)
                     {
                         Trace.WriteLine(string.Format("  [SKIP] Already Exists a Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id));
                     }
@@ -215,8 +249,8 @@ namespace VstsSyncMigrator.Engine
         private WorkItem GetRightHandSideTargitWi(WorkItem wiSourceL, WorkItem wiSourceR, WorkItem wiTargetL, WorkItemStoreContext targetStore)
         {
             WorkItem wiTargetR;
-            if (!(wiTargetL == null) 
-                && wiSourceR.Project.Name == wiTargetL.Project.Name 
+            if (!(wiTargetL == null)
+                && wiSourceR.Project.Name == wiTargetL.Project.Name
                 && wiSourceR.Project.Store.TeamProjectCollection.Uri.ToString() == wiTargetL.Project.Store.TeamProjectCollection.Uri.ToString())
             {
                 // Moving to same team project as SourceR
