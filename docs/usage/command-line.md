@@ -5,7 +5,9 @@ Download from [executable](https://github.com/nkdAgility/vsts-data-bulk-editor/r
 Note that:
 
 - The created reference `vstsbulkeditor.json` shows all the various options available, so is probably more complex than the final edited version you will use.
-- All the `Processors` have their `Enabled` property set to `false`. **This means they are not run. So the default behavior of the generate template is to do nothing. You need to enable the processors you require**.
+- All the `Processors` have their `Enabled` property set to `false`.
+ 
+ **This means they are not run. So the default behavior of the generate template is to do nothing. You need to enable the processors you require.**.
 
 
 ```json

@@ -84,9 +84,9 @@ Here we are performing the following operations:
 1. Link Migration - Once all of the work items are across you can then migrate the links. Links will only be re-created if both ends of the link are in the new system. The "ReflectedWorkItemId" field value is used to find the new work items easily.
 1. Attachment Export & Import - Now we can export and then re-import the attachments. This just done separately to prevent errors
 
-**Rememeber** if you want a processor to run it's `Enabled` property must be set to true. 
+**Remember** if you want a processor to run it's `Enabled` property must be set to true. 
 
-If you have Test Suits & Plans you can also migrate them using other processors.
+If you have Test Suits & Plans you can also migrate them using other processors, you would need to add them to your configuration file.
 
 
 
