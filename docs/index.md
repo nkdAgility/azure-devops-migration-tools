@@ -53,6 +53,7 @@ Most of these processors need to be run in order. If you try to migrate work ite
 1. **AttachementExportMigrationContext** - 
 1. **AttachementImportMigrationContext** - 
 1. **LinkMigrationContext** - 
+1. **WorkItemQueryMigrationContext** - 
 
 ##### Test Plans & Suites
 
