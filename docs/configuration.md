@@ -10,6 +10,8 @@ working directory. At run time you can specify the configuration file to use.
 To create your config file just type `vstssyncmigrator init` in the directory that you unziped the tools and a minimal `VstsBulkEditor.json` configuration
 file will be created. Modify this as you need.
 
+Note that the generated file show all the possible options, you configuration file will probably only need a subset of those shown.
+
 ## Global configuration
 The global configuration created by the `init` command look like this:
 
@@ -176,6 +178,5 @@ Both the `Source` and `Target` entries hold the collection URL and the Team Proj
 
 ### ReflectedWorkItemIDFieldName
 
-This is the field that will be used to store the state for the migration. See [Server Configuration](server-configuration.md)
+This is the field that will be used to store the state for the migration . See [Server Configuration](server-configuration.md) 
 
-...TBD

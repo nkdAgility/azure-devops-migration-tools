@@ -1,6 +1,6 @@
 # VSTS Sync Migration Tools Docs 
 
-VSTS Sync Migration Tools allow you to bulk edit data in Microsoft Team Foundation Server (TFS) and Visual Studio Team Services (VSTS). It has many names depending on what you are trying to achieve. You might call it a migration tool, or a bulk update tool, and both are correct.. 
+VSTS Sync Migration Tools allow you to bulk edit data in Microsoft Team Foundation Server (TFS) and Visual Studio Team Services (VSTS). It has many names depending on what you are trying to achieve. You might call it a migration tool, or a bulk update tool, and both are correct.
 
 ## Getting the Tools
 
@@ -21,7 +21,7 @@ These tools are build by naked Agility Limited's DevOps & Agility consultants to
 
 ### Field Maps
 
-By default, when you are moving from source to target the system will map all of the fields that exist in source to the same field in the target. This is be behaviour if the **FieldMaps** section is not present.  
+By default, when you are moving from source to target the system will map all of the fields that exist in source to the same field in the target. This is the behaviour if the **FieldMaps** section is not present in the configuration file.  
 
 However sometimes you want to move data to another field, or use a regex to parse out just the bits that you want. To help we have built a number of mapping tools that should give you the versatility you need.
 
@@ -48,28 +48,30 @@ There are other processors that can be used to migrate, or process, different so
 Most of these processors need to be run in order. If you try to migrate work items before you have migrated Area and Iterations then ***bang*** you need to go back.
 
 ##### Work Items
-1. **NodeStructuresMigrationContext** - 
-1. **WorkItemMigrationContext** - The work horse...push tip from one location to another while maintining context. Make sure that you add a ReflectedWorkItemID and you can restart the service at any time...
-1. **AttachementExportMigrationContext** - 
-1. **AttachementImportMigrationContext** - 
-1. **LinkMigrationContext** - 
-1. **WorkItemQueryMigrationContext** - 
+1. **NodeStructuresMigrationContext** - Moves over the structure of area and iteration paths, you have the option to inject a new root node by setting the `PrefixProjectToNodes` property. 
+1. **WorkItemMigrationContext** - **The work horse...** push the tip from one location to another while maintaining context. Make sure that you add a ReflectedWorkItemID and you can restart the service at any time...
+1. **AttachementExportMigrationContext** - Exports all work items attachments to the migration machine. This is used in partnership with the **AttachmentImportMigrationContext**   
+1. **AttachementImportMigrationContext** - Imports all work items attachments from the migration machine. This is used in partnership with the **AttachementExportMigrationContext**
+1. **LinkMigrationContext** - Migrates all the work item links, both between work items and external links.
+1. **WorkItemQueryMigrationContext** - Migrate all shared work item queries
 
 ##### Test Plans & Suites
 
-1. TestVeriablesMigrationContext
-1. TestConfigurationsMigrationContext
-1. TestPlansAndSuitsMigrationContext
-1. TestRunsMigrationContext [BETA]
+1. **TestVeriablesMigrationContext** - Migrates test variables
+1. **TestConfigurationsMigrationContext** - Migrate test configurations
+1. **TestPlansAndSuitsMigrationContext** - Migrate test plans and suites, this does assume that the actual test cases and shared steps are migrated using the **WorkItemMigrationContext**
+1. **TestRunsMigrationContext** [BETA] - Migrates past test run results
 
 ##### Misc
 
-- ImportProfilePictureContext
-- ExportProfilePictureFromADContext
-- WorkItemDelete
-- FixGitCommitLinks
-- CreateTeamFolders
-- ExportTeamList
+The following misc processors do as their names suggest
+
+- **ImportProfilePictureContext** 
+- **ExportProfilePictureFromADContext**
+- **WorkItemDelete**
+- **FixGitCommitLinks**
+- **CreateTeamFolders**
+- **ExportTeamList**
 
 ## Contributing
 
@@ -79,6 +81,10 @@ This project is primarily managed and maintained on Visual Studio Team Services 
 
 If you want to sync your GitHub repository then check out [Open-source with VSTS or TFS and Github for better DevOps
 ](https://nkdagility.com/open-source-vsts-tfs-github-better-devops/).
+
+## FAQ
+
+Check out the [FAQ pages](faq.md)
 
 ## Terms
 
