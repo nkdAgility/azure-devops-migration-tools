@@ -38,9 +38,11 @@ That said it is often a good idea to build up your configuration processor by pr
 
 ## No work items get migrate
 
+Maybe you see a `TF237124: Work Item is not ready to save` error when you atempt to do a migration.
+
 A number of processors have a setting `"PrefixProjectToNodes": false`. If set to true this inserts the name of the source Team Project into the created structure e.g. Area path, Iteration path, or Work Item queries. It is also used by the migration processor. 
 
-This setting needs to be consistent across all processors in a configuration file. If it not it can often cause migrations to fail as expected paths are not present.
+This setting **must** be consistent across all processors in a configuration file. If it not it can often cause migrations to fail as expected paths are not present.
 
 ## My test migration are skipping items
 
