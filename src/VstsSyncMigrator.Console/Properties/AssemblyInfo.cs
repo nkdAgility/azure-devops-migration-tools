@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Visual Studio Team Services Bulk Data Editor Example")]
-[assembly: AssemblyDescription("naked Agility Visual Studio Team Services Bulk Data Editor Example allows you to bulk edit data in Microsoft Team Foundation Server (TFS) and Visual Studio Team Services (VSTS). You can migrate work items, area & iterations, & test data from one Team Project to another. You can builk update work items and apply processing rules against your server or account.")]
+[assembly: AssemblyTitle("VSTS Sync Migrator")]
+[assembly: AssemblyDescription("naked Agility VSTS Sync Migrator allows you to bulk edit data in Microsoft Team Foundation Server (TFS) and Visual Studio Team Services (VSTS). You can migrate work items, area & iterations, & test data from one Team Project to another. You can builk update work items and apply processing rules against your server or account.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("naked Agility Limited")]
-[assembly: AssemblyProduct("Visual Studio Team Services Bulk Data Editor Example")]
+[assembly: AssemblyProduct("VSTS Sync Migrator")]
 [assembly: AssemblyCopyright("Copyright © naked Agility Limited 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
