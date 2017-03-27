@@ -41,7 +41,7 @@ There are other processors that can be used to migrate, or process, different so
 #### In-Place Processors
 
 - **WorkItemUpdate** - Need to just update work items in place, use this and only set the Target. All field mappings work...
-- **WorkItemDelete** - Woops... Can I just start again? Feed this a query and watch those items vanish ***WARNING***
+- **WorkItemDelete** - Woops... Can I just start again? Feed this a query and watch those items vanish. ***WARNING*** Work items need to be under an Area Path named `_DeleteMe` to be removed.
 
 #### Migrators
 

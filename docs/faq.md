@@ -36,7 +36,7 @@ You do have to be careful with this process, it does assume that you are not cle
 
 That said it is often a good idea to build up your configuration processor by processor. Proving each one works as required before adding the next one.
 
-## No work items get migrate
+## No work items get migrated
 
 A number of processors have a setting `"PrefixProjectToNodes": false`. If set to true this inserts the name of the source Team Project into the created structure e.g. Area path, Iteration path, or Work Item queries. It is also used by the migration processor. 
 
@@ -63,3 +63,7 @@ How the `ReflectedWorkItemId` field is added depends on whether the system, ther
 - VSTS when the instance has been imported using the  [VSTS Migration Tool](https://blogs.msdn.microsoft.com/visualstudioalm/2016/11/16/import-your-tfs-database-into-visual-studio-team-services/)
 
 For details on how to add the field in each case, and trouble shooting check the [server configuration page](server-configuration.md)
+
+## My work items aren't being deleted when using WorkItemDeleteConfig
+
+This tool looks for an Area Path called `_DeleteMe` before applying any extra queries specified in the configuration json file. Ensure the area path exists and that you've moved the work items into it which you want to delete before running.
