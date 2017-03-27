@@ -83,3 +83,7 @@ Once you have created the `ReflectedWorkItemId` field and confirmed you have the
     
 }
 ```
+
+## Work Item Delete Area Path
+
+The WorkItemDeleteConfig processor requires that an Area Path named `_DeleteMe` exists, to create it you must be modifying the project level settings and create it as a child of the project level area path. [More information about area path creation](https://www.visualstudio.com/en-us/docs/work/customize/modify-areas-iterations).

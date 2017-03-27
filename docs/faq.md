@@ -66,4 +66,4 @@ For details on how to add the field in each case, and trouble shooting check the
 
 ## My work items aren't being deleted when using WorkItemDeleteConfig
 
-This tool looks for an Area Path called `_DeleteMe` before applying any extra queries specified in the configuration json file. Ensure the area path exists and that you've moved the work items into it which you want to delete before running.
+This tool looks for an Area Path called `_DeleteMe` before applying any extra queries specified in the configuration json file. Ensure the area path exists and that you've moved the work items into it which you want to delete before running. Further details on creating this can be found on [Server Configuration page](server-configuration.md).
