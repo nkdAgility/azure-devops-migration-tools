@@ -240,7 +240,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\VstsSyncMigrator.Core\VstsSyncMigrator.Core.csproj">
-      <Project>{68baf6ba-2bc0-48d0-b892-1d9f93d7003a}</Project>
+      <Project>{68BAF6BA-2BC0-48D0-B892-1D9F93D7003A}</Project>
       <Name>VstsSyncMigrator.Core</Name>
     </ProjectReference>
   </ItemGroup>
