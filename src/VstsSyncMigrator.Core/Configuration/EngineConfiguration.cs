@@ -121,7 +121,7 @@ namespace VstsSyncMigrator.Engine.Configuration
             ec.Processors.Add(new TestRunsMigrationConfig() { Enabled = false });
             ec.Processors.Add(new ImportProfilePictureConfig() { Enabled = false });
             ec.Processors.Add(new ExportProfilePictureFromADConfig() { Enabled = false });
-            ec.Processors.Add(new FixGitCommitLinksConfig() { Enabled = false });
+            ec.Processors.Add(new FixGitCommitLinksConfig() { Enabled = false, TargetRepository = ec.Target.Name });
             return ec;
         }
 

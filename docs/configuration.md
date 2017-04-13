@@ -159,6 +159,7 @@ The global configuration created by the `init` command look like this:
 			"PictureEmpIDFormat": null
 		}, {
 			"ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.FixGitCommitLinksConfig",
+			"TargetRepository" : "TargetRepositoryNameIfNotTheSameAsOnSource",
 			"Enabled": false
 		}
 	]

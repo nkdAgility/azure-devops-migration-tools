@@ -69,7 +69,7 @@ The following misc processors do as their names suggest
 - **ImportProfilePictureContext** 
 - **ExportProfilePictureFromADContext**
 - **WorkItemDelete**
-- **FixGitCommitLinks**
+- **FixGitCommitLinks** - Allows you to fix the migrated Git commit hooks (and thus external links) to point to the new repository in the target project. If the source and target repository names are the same, this will work out of the box. If the target repository has a different name, you can specify that name via the "TargetRepository" property.
 - **CreateTeamFolders**
 - **ExportTeamList**
 
