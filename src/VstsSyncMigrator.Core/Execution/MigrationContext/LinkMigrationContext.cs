@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+
 using VstsSyncMigrator.Engine.Configuration.Processing;
 using VstsSyncMigrator.Engine.Execution.Exceptions;
 
@@ -38,7 +39,7 @@ namespace VstsSyncMigrator.Engine
             WorkItemStoreContext sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.BypassRules);
             TfsQueryContext tfsqc = new TfsQueryContext(sourceStore);
             tfsqc.AddParameter("TeamProject", me.Source.Name);
-            tfsqc.Query = string.Format(@"SELECT [System.Id] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject {0} ORDER BY [System.ChangedDate] desc ", config.QueryBit); // AND  [Microsoft.VSTS.Common.ClosedDate] = ''
+            tfsqc.Query = string.Format(@"SELECT [System.Id] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject {0} ORDER BY [System.ChangedDate] desc ", config.QueryBit);
             WorkItemCollection sourceWIS = tfsqc.Execute();
             //////////////////////////////////////////////////
 
@@ -50,7 +51,6 @@ namespace VstsSyncMigrator.Engine
             //////////////////////////////////////////////////
             foreach (WorkItem wiSourceL in sourceWIS)
             {
-
                 Trace.WriteLine(string.Format("Migrating Links for wiSourceL={0}", wiSourceL.Id), "LinkMigrationContext");
                 WorkItem wiTargetL = null;
                 try
@@ -119,14 +119,48 @@ namespace VstsSyncMigrator.Engine
                     }
 
                 }
+
+                if (wiSourceL.Type.Name == "Test Case")
+                {
+                    MigrateSharedSteps(wiSourceL, wiTargetL, sourceStore, targetWitsc);
+                }
+
                 current--;
             }
 
         }
 
+        private void MigrateSharedSteps(WorkItem wiSourceL, WorkItem wiTargetL, WorkItemStoreContext sourceStore, WorkItemStoreContext targetStore)
+        {
+            const string microsoftVstsTcmSteps = "Microsoft.VSTS.TCM.Steps";
+            var oldSteps = wiTargetL.Fields[microsoftVstsTcmSteps].Value.ToString();
+            var newSteps = oldSteps;
+
+            var sourceSharedStepLinks = wiSourceL.Links.OfType<RelatedLink>().Where(x => x.LinkTypeEnd.Name == "Shared Steps").ToList();
+            var sourceSharedSteps = sourceSharedStepLinks.Select(x => sourceStore.Store.GetWorkItem(x.RelatedWorkItemId));
+
+            foreach (WorkItem sourceSharedStep in sourceSharedSteps)
+            {
+                WorkItem matchingTargetSharedStep =
+                    targetStore.FindReflectedWorkItemByReflectedWorkItemId(sourceSharedStep,
+                        me.ReflectedWorkItemIdFieldName);
+
+                if (matchingTargetSharedStep != null)
+                {
+                    newSteps = newSteps.Replace($"ref=\"{sourceSharedStep.Id}\"", $"ref=\"{matchingTargetSharedStep.Id}\"");
+                    wiTargetL.Fields[microsoftVstsTcmSteps].Value = newSteps;
+                }
+            }
+
+            if (wiTargetL.IsDirty)
+                wiTargetL.Save();
+        }
+
         private void CreateExternalLink(ExternalLink sourceLink, WorkItem target)
         {
-            var exist = (from Link l in target.Links where l is ExternalLink && ((ExternalLink)l).LinkedArtifactUri == ((ExternalLink)sourceLink).LinkedArtifactUri select (ExternalLink)l).SingleOrDefault();
+            var exist = (from Link l in target.Links
+                         where l is ExternalLink && ((ExternalLink)l).LinkedArtifactUri == ((ExternalLink)sourceLink).LinkedArtifactUri
+                         select (ExternalLink)l).SingleOrDefault();
             if (exist == null)
             {
 
@@ -260,7 +294,7 @@ namespace VstsSyncMigrator.Engine
             {
                 // Moving to Other Team Project from SOurceR
                 wiTargetR = targetStore.FindReflectedWorkItem(wiSourceR, me.ReflectedWorkItemIdFieldName, true);
-                if (wiTargetR == null) // Assume source only (other team projkect)
+                if (wiTargetR == null) // Assume source only (other team project)
                 {
                     wiTargetR = wiSourceR;
                     if (wiTargetR.Project.Store.TeamProjectCollection.Uri != wiSourceR.Project.Store.TeamProjectCollection.Uri)
