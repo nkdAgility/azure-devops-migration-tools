@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 
 namespace VstsSyncMigrator.Engine.Configuration.Processing
 {
@@ -13,5 +16,12 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
         public bool Enabled { get; set; }
 
         public Type Processor => typeof(WorkItemMigrationContext);
+
+        /// <inheritdoc />
+        public bool IsProcessorCompatible(IReadOnlyList<ITfsProcessingConfig> otherProcessors)
+        {
+            Trace.WriteLine($"Note: {GetType().Name} is not compatible with {typeof(WorkItemRevisionReplayMigrationConfig).Name}");
+            return !otherProcessors.Any(x => x is WorkItemRevisionReplayMigrationConfig);
+        }
     }
 }
