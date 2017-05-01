@@ -148,6 +148,10 @@ namespace VstsSyncMigrator.Engine
             return newFound[0];
         }
 
+        public WorkItem GetRevision(WorkItem workItem, int revision)
+        {
+            return Store.GetWorkItem(workItem.Id, revision);
+        }
 
     }
 }
