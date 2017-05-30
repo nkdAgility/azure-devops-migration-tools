@@ -40,6 +40,7 @@ namespace VstsSyncMigrator.Engine
                             { "Time",timer.ElapsedMilliseconds }
                        });
                 Trace.TraceWarning(string.Format("  [EXCEPTION] {0}", ex.Message));
+                Trace.TraceWarning(string.Format("  [EXCEPTION] {0}", ex.StackTrace));
                 throw ex;
             }
            
@@ -86,10 +87,6 @@ namespace VstsSyncMigrator.Engine
                 else
                 {
                     found = Store.GetWorkItem(idToFind);
-                    if (!(found.Fields[reflectedWotkItemIdField].Value.ToString() == rwiid))
-                    {
-                        found = null;
-                    }
                 }                
             }
             if (found == null) { found = FindReflectedWorkItemByReflectedWorkItemId(ReflectedWorkItemId, reflectedWotkItemIdField); }
