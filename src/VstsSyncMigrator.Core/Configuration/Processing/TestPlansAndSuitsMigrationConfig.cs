@@ -11,6 +11,8 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
         public bool Enabled { get; set; }
         public bool PrefixProjectToNodes { get; set; }
 
+        public bool PrefixProjectToPlan { get; set; }
+
         public Type Processor
         {
             get

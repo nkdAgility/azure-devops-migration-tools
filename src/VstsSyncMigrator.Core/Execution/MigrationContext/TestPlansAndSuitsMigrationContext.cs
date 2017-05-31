@@ -50,7 +50,10 @@ namespace VstsSyncMigrator.Engine
                 Trace.WriteLine(string.Format("Plan to copy {0} Plans?", sourcePlans.Count), "TestPlansAndSuites");
                 foreach (ITestPlan sourcePlan in sourcePlans)
                 {
-                    string newPlanName = string.Format("{0}-{1}", sourceWitStore.GetProject().Name, sourcePlan.Name);
+                    string newPlanName = string.Format("{1}", sourceWitStore.GetProject().Name, sourcePlan.Name);
+                    if (config.PrefixProjectToPlan) {
+                        newPlanName = string.Format("{0}-{1}", sourceWitStore.GetProject().Name, sourcePlan.Name);
+                    }
                     Trace.WriteLine(string.Format("Process Plan {0} - ", newPlanName), "TestPlansAndSuites");
                     ITestPlan targetPlan = FindTestPlan(targetTestStore, newPlanName);
                     if (targetPlan == null)
@@ -134,8 +137,7 @@ namespace VstsSyncMigrator.Engine
                 // found
                 Trace.WriteLine(string.Format("            Suite Exists"), "TestPlansAndSuites");
                 ApplyConfigurations(sourceSuit.TestSuiteEntry, targetSuitChild.TestSuiteEntry);
-                if (targetSuitChild.IsDirty)
-                {
+                if (targetSuitChild.IsDirty) {
                     targetPlan.Save();
                 }
             }
@@ -230,33 +232,25 @@ namespace VstsSyncMigrator.Engine
         {
             if (sourceEntry.Configurations != null)
             {
-                if (sourceEntry.Configurations.Count != targetEntry.Configurations.Count)
-                {
+                if (targetEntry.Configurations == null || sourceEntry.Configurations.Count != targetEntry.Configurations.Count) {
                     Trace.WriteLine(string.Format("   CONFIG MNISSMATCH FOUND --- FIX AATTEMPTING"), "TestPlansAndSuites");
-                    targetEntry.Configurations.Clear();
+                    if(targetEntry.Configurations != null) targetEntry.Configurations.Clear();
                     IList<IdAndName> targetConfigs = new List<IdAndName>();
-                    foreach (var config in sourceEntry.Configurations)
-                    {
+                    foreach (var config in sourceEntry.Configurations) {
                         var targetFound = (from tc in targetTestConfigs
-                                           where tc.Name == config.Name
-                                           select tc).SingleOrDefault();
-                        if (!(targetFound == null))
-                        {
+                                            where tc.Name == config.Name
+                                            select tc).SingleOrDefault();
+                        if (!(targetFound == null)) {
 
                             targetConfigs.Add(new IdAndName(targetFound.Id, targetFound.Name));
                         }
                     }
-                    try
-                    {
+                    try {
                         targetEntry.SetConfigurations(targetConfigs);
-                    }
-                    catch (Exception)
-                    {
+                    } catch (Exception) {
                         // SOmetimes this will error out for no reason.
                     }
-
                 }
-
             }
         }
 
