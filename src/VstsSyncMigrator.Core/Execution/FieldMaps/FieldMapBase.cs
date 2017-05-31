@@ -11,6 +11,9 @@ namespace VstsSyncMigrator.Engine.ComponentContext
 {
     public abstract class FieldMapBase : IFieldMap
     {
+        private MigrationEngine _me;
+        private WorkItemStoreContext _targetStore;
+        private WorkItemStoreContext _sourceStore;
 
         public void Execute(WorkItem source, WorkItem target)
         {
@@ -26,7 +29,8 @@ namespace VstsSyncMigrator.Engine.ComponentContext
                             { "Target",  target.Id.ToString()}
                        });
                 Trace.TraceError(string.Format("  [EXCEPTION] {0}", ex.Message));
-            }            
+                Trace.TraceError(string.Format("  [EXCEPTION] {0}", ex.StackTrace));
+            }
         }
         public string Name
         {
@@ -34,6 +38,12 @@ namespace VstsSyncMigrator.Engine.ComponentContext
             {
                 return this.GetType().Name;
             }
+        }
+
+        public void Init(MigrationEngine me, WorkItemStoreContext sourceStore, WorkItemStoreContext targetStore) {
+            _me = me;
+            _targetStore = targetStore;
+            _sourceStore = sourceStore;
         }
 
         internal abstract void InternalExecute(WorkItem source, WorkItem target);

@@ -70,7 +70,7 @@ namespace VstsSyncMigrator.Engine
             WorkItemStoreContext sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.BypassRules);
             TfsQueryContext tfsqc = new TfsQueryContext(sourceStore);
             tfsqc.AddParameter("TeamProject", me.Source.Name);
-            tfsqc.Query = string.Format(@"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY [System.ChangedDate] desc", _config.QueryBit);
+            tfsqc.Query = string.Format(@"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY [System.WorkItemType], [System.ChangedDate] desc", _config.QueryBit);
             WorkItemCollection sourceWIS = tfsqc.Execute();
             Trace.WriteLine(string.Format("Migrate {0} work items?", sourceWIS.Count),this.Name);
             //////////////////////////////////////////////////
@@ -78,6 +78,7 @@ namespace VstsSyncMigrator.Engine
             Project destProject = targetStore.GetProject();
             Trace.WriteLine(string.Format("Found target project as {0}", destProject.Name), this.Name);
 
+            me.SetStores(sourceStore,targetStore);
             int current = sourceWIS.Count;
             int count = 0;
             long elapsedms = 0;
