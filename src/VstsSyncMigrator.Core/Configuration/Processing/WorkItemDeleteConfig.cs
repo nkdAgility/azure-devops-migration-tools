@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace VstsSyncMigrator.Engine.Configuration.Processing
 {
@@ -12,12 +9,13 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
 
         public Type Processor
         {
-            get
-            {
-                return typeof(WorkItemDelete);
-            }
+            get { return typeof(WorkItemDelete); }
         }
 
+        /// <inheritdoc />
+        public bool IsProcessorCompatible(IReadOnlyList<ITfsProcessingConfig> otherProcessors)
+        {
+            return true;
+        }
     }
-    }
-
+}
