@@ -40,8 +40,11 @@ namespace VstsSyncMigrator.Engine
                 "System.RelatedLinkCount",
                 "System.WorkItemType",
                 "Microsoft.VSTS.Common.ActivatedDate",
+                "Microsoft.VSTS.Common.ActivatedBy",
                 "Microsoft.VSTS.Common.ResolvedDate",
+                "Microsoft.VSTS.Common.ResolvedBy",
                 "Microsoft.VSTS.Common.ClosedDate",
+                "Microsoft.VSTS.Common.ClosedBy",
                 "Microsoft.VSTS.Common.StateChangeDate",
                 "System.ExternalLinkCount",
                 "System.HyperLinkCount",
@@ -128,6 +131,7 @@ namespace VstsSyncMigrator.Engine
                 var sortedRevisions = sourceWorkItem.Revisions.Cast<Revision>().Select(x =>
                         new
                         {
+                            x.Index,
                             Number =  Convert.ToInt32(x.Fields["System.Rev"].Value)
                         }
                     )
@@ -157,6 +161,9 @@ namespace VstsSyncMigrator.Engine
                             Trace.WriteLine(
                                 string.Format("Dependency: {0} - {1} - {2} - {3} - {4}", "TeamService", "NewWorkItem",
                                     newWorkItemstartTime, newWorkItemTimer.Elapsed, true), Name);
+
+                            newwit.Fields["System.CreatedBy"].Value = currentRevisionWorkItem.Revisions[0].Fields["System.CreatedBy"].Value;
+                            newwit.Fields["System.CreatedDate"].Value = currentRevisionWorkItem.Revisions[0].Fields["System.CreatedDate"].Value;
                         }
 
                         PopulateWorkItem(currentRevisionWorkItem, newwit, destType);
@@ -170,12 +177,8 @@ namespace VstsSyncMigrator.Engine
                                 Name);
                         }
 
-                        if (_config.UpdateCreatedDate)
-                            newwit.Fields["System.CreatedDate"].Value =
-                                currentRevisionWorkItem.Fields["System.CreatedDate"].Value;
-                        if (_config.UpdateCreatedBy)
-                            newwit.Fields["System.CreatedBy"].Value =
-                                currentRevisionWorkItem.Fields["System.CreatedBy"].Value;
+                        newwit.Fields["System.ChangedBy"].Value = 
+                            currentRevisionWorkItem.Revisions[revision.Index].Fields["System.ChangedBy"].Value;
 
                         newwit.Save();
                         Trace.WriteLine(
@@ -224,7 +227,7 @@ namespace VstsSyncMigrator.Engine
                 if (newwit != null)
                 {
                     foreach (Field f in newwit.Fields)
-                        Trace.WriteLine($"{f.ReferenceName} | {f.Value}", Name);
+                        Trace.WriteLine($"{f.ReferenceName} ({f.Name}) | {f.Value}", Name);
                 }
                 Trace.WriteLine(ex.ToString(), Name);
             }
