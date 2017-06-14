@@ -145,7 +145,8 @@ Note that:
 		}, {
 			"ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.TestPlansAndSuitsMigrationConfig",
 			"Enabled": false,
-			"PrefixProjectToNodes": true
+			"PrefixProjectToNodes": true,
+			"OnlyElementsWithTag" : "tag"
 		}, {
 			"ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.TestRunsMigrationConfig",
 			"Enabled": false,
