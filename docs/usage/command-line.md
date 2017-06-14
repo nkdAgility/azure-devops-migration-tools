@@ -163,6 +163,7 @@ Note that:
 			"PictureEmpIDFormat": null
 		}, {
 			"ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.FixGitCommitLinksConfig",
+			"TargetRepository" : "TargetRepositoryNameIfNotTheSameAsOnSource",
 			"Enabled": false
 		}
 	]
