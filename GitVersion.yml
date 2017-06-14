@@ -1,7 +1,7 @@
 assembly-versioning-scheme: MajorMinorPatch
 mode: ContinuousDeployment
 continuous-delivery-fallback-tag: ''
-next-version: 7.1.4
+next-version: 7.1.5
 branches:
   master:
     mode: ContinuousDeployment
