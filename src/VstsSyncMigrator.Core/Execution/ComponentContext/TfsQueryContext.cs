@@ -64,8 +64,8 @@ namespace VstsSyncMigrator.Engine
                        new Dictionary<string, double> {
                             { "QueryTime",queryTimer.ElapsedMilliseconds }
                        });
-                Trace.TraceWarning(string.Format("  [EXCEPTION] {0}", ex.Message));
-                Trace.TraceWarning(string.Format("  [EXCEPTION] {0}", ex.StackTrace));
+                //Trace.TraceWarning(string.Format("  [EXCEPTION] {0}", ex.Message));
+                //Trace.TraceWarning(string.Format("  [EXCEPTION] {0}", ex.StackTrace));
                 throw ex;
             }
             return wc;

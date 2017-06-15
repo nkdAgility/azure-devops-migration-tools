@@ -50,8 +50,8 @@ namespace VstsSyncMigrator.Engine
                         foreach (Match match in Regex.Matches(source.Fields[config.sourceField].Value.ToString(), config.pattern)) {
                             int OldSharedStepId = Int32.Parse(match.Groups[1].ToString());
                             WorkItem SharedStep = source.Store.GetWorkItem(OldSharedStepId);
-                            WorkItem targetSharedStep = _targetStore.FindReflectedWorkItem(SharedStep, _me.ReflectedWorkItemIdFieldName, false);
-                            if(targetSharedStep == null) {
+                            WorkItem targetSharedStep = _targetStore.FindReflectedWorkItem(SharedStep, "", false);  // _me.ReflectedWorkItemIdFieldName
+                            if (targetSharedStep == null) {
                                 throw new Exception(String.Format("Regex convert of {0}: cannot convert WorkItem.Id = {1}. New referenced Id does not exist on target",source.Id,OldSharedStepId));
                             }
                             target.Fields[config.targetField].Value = (target.Fields[config.targetField].Value).ToString().Replace("\""+OldSharedStepId.ToString()+ "\"", "\""+targetSharedStep.Fields["Id"].Value.ToString()+ "\"");
