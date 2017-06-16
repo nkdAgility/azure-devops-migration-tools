@@ -50,6 +50,11 @@ namespace VstsSyncMigrator.Engine
                 Trace.WriteLine(string.Format("Plan to copy {0} Plans?", sourcePlans.Count), "TestPlansAndSuites");
                 foreach (ITestPlan sourcePlan in sourcePlans)
                 {
+                    if(!String.IsNullOrEmpty(config.TestPlanFilterRegex) && !Regex.IsMatch("(?i)" + config.TestPlanFilterRegex,sourcePlan.Name)) {
+                        Trace.WriteLine(string.Format("    Skipping: Plan {0} does not match Regex filter",sourcePlan.Name), "TestPlansAndSuites");
+                        continue;
+                    }
+
                     string newPlanName = string.Format("{1}", sourceWitStore.GetProject().Name, sourcePlan.Name);
                     if (config.PrefixProjectToPlan) {
                         newPlanName = string.Format("{0}-{1}", sourceWitStore.GetProject().Name, sourcePlan.Name);
@@ -115,9 +120,8 @@ namespace VstsSyncMigrator.Engine
                         try
                         {
                             Trace.WriteLine(string.Format("            Source workitem not migrated to target, cannot be found"), "TestPlansAndSuites");
-                            targetReq = targetWitStore.FindReflectedWorkItemByReflectedWorkItemId(sourceReq, me.ReflectedWorkItemIdFieldName);
-                        }
-                        catch (Exception)
+                            targetReq = targetWitStore.FindReflectedWorkItem(sourceReq, me.ReflectedWorkItemIdFieldName,false);
+                        } catch (Exception)
                         {
                             break;
                         }

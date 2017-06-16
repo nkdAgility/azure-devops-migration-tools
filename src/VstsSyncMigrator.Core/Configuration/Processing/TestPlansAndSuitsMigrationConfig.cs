@@ -13,6 +13,8 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
 
         public bool PrefixProjectToPlan { get; set; }
 
+        public string TestPlanFilterRegex { get; set; }
+
         public Type Processor
         {
             get
