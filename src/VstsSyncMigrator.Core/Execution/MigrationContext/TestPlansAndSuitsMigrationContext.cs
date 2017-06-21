@@ -274,8 +274,11 @@ namespace VstsSyncMigrator.Engine
             targetSuitChild.TestSuiteEntry.Title = source.TestSuiteEntry.Title;
             targetSuitChild.Query = ((IDynamicTestSuite)source).Query;
 
-            if (targetSuitChild.Query.QueryText.Contains("[System.AreaPath] under '" + sourceWitStore.GetProject().Name)) {
-                targetSuitChild.Query = targetTestStore.Project.CreateTestQuery(targetSuitChild.Query.Name.Replace("[System.AreaPath] under '" + sourceWitStore.GetProject().Name, "[System.AreaPath] under '" + targetWitStore.GetProject().Name));
+            if (targetSuitChild.Query.QueryText.Contains("[System.AreaPath]")) {
+                var regex = new Regex(Regex.Escape("[System.AreaPath]") + " ([^ ]*) '" + sourceWitStore.GetProject().Name);
+                string newAreaPath = regex.Replace(targetSuitChild.Query.QueryText, "[System.AreaPath] $1 '" + targetWitStore.GetProject().Name);
+
+                targetSuitChild.Query = targetTestStore.Project.CreateTestQuery(newAreaPath);
             }
             return targetSuitChild;
         }
