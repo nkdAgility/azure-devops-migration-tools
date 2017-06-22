@@ -1,89 +1,82 @@
-﻿using Microsoft.ApplicationInsights;
-using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Net;
 using System.Text.RegularExpressions;
+
 using VstsSyncMigrator.Engine.Configuration.Processing;
 
 namespace VstsSyncMigrator.Engine
 {
     public abstract class MigrationContextBase : ITfsProcessingContext
     {
-        internal MigrationEngine me;
-        ProcessingStatus status = ProcessingStatus.None;
+        internal readonly MigrationEngine me;
 
 
-        public MigrationContextBase(MigrationEngine me, ITfsProcessingConfig config)
+        protected MigrationContextBase(MigrationEngine me, ITfsProcessingConfig config)
         {
             this.me = me;
         }
 
         public abstract string Name { get; }
 
-        public ProcessingStatus Status
-        {
-            get
-            {
-                return status;
-            }
-        }
+        public ProcessingStatus Status { get; private set; } = ProcessingStatus.None;
 
         public void Execute()
         {
             Telemetry.Current.TrackEvent("MigrationContextExecute",
-                      new Dictionary<string, string> {
-                          { "Name", Name},
-                          { "Target Project", me.Target.Name},
-                          { "Target Collection", me.Target.Collection.Name },
-                          { "Source Project", me.Source.Name},
-                          { "Source Collection", me.Source.Collection.Name }
-                      });
-            Trace.TraceInformation(string.Format(" Migration Context Start {0} ", Name));
-            Stopwatch executeTimer = new Stopwatch();
+                new Dictionary<string, string>
+                {
+                    {"Name", Name},
+                    {"Target Project", me.Target.Name},
+                    {"Target Collection", me.Target.Collection.Name},
+                    {"Source Project", me.Source.Name},
+                    {"Source Collection", me.Source.Collection.Name}
+                });
+            Trace.TraceInformation(" Migration Context Start {0} ", Name);
+            var executeTimer = new Stopwatch();
             executeTimer.Start();
             //////////////////////////////////////////////////
             try
             {
-                status = ProcessingStatus.Running;
+                Status = ProcessingStatus.Running;
                 InternalExecute();
-                status = ProcessingStatus.Complete;
+                Status = ProcessingStatus.Complete;
                 executeTimer.Stop();
                 Telemetry.Current.TrackEvent("MigrationContextComplete",
-                    new Dictionary<string, string> {
-                        { "Name", Name},
-                        { "Target Project", me.Target.Name},
-                        { "Target Collection", me.Target.Collection.Name },
-                        { "Source Project", me.Source.Name},
-                        { "Source Collection", me.Source.Collection.Name },
-                        { "Status", Status.ToString() }
+                    new Dictionary<string, string>
+                    {
+                        {"Name", Name},
+                        {"Target Project", me.Target.Name},
+                        {"Target Collection", me.Target.Collection.Name},
+                        {"Source Project", me.Source.Name},
+                        {"Source Collection", me.Source.Collection.Name},
+                        {"Status", Status.ToString()}
                     },
-                    new Dictionary<string, double> {
-                        { "MigrationContextTime", executeTimer.ElapsedMilliseconds }
+                    new Dictionary<string, double>
+                    {
+                        {"MigrationContextTime", executeTimer.ElapsedMilliseconds}
                     });
-                Trace.TraceInformation(string.Format(" Migration Context Complete {0} ", Name));
+                Trace.TraceInformation(" Migration Context Complete {0} ", Name);
             }
             catch (Exception ex)
             {
-                status = ProcessingStatus.Failed;
+                Status = ProcessingStatus.Failed;
                 executeTimer.Stop();
                 Telemetry.Current.TrackException(ex,
-                      new Dictionary<string, string> {
-                          { "Name", Name},
-                          { "Target Project", me.Target.Name},
-                          { "Target Collection", me.Target.Collection.Name },
-                          { "Source Project", me.Source.Name},
-                          { "Source Collection", me.Source.Collection.Name },
-                          { "Status", Status.ToString() }
-                      },
-                      new Dictionary<string, double> {
-                            { "MigrationContextTime", executeTimer.ElapsedMilliseconds }
-                      });
-                Trace.TraceWarning(string.Format("  [EXCEPTION] {0}", ex.Message));
-                Trace.TraceWarning(string.Format("  [EXCEPTION] {0}", ex.StackTrace));
+                    new Dictionary<string, string>
+                    {
+                        {"Name", Name},
+                        {"Target Project", me.Target.Name},
+                        {"Target Collection", me.Target.Collection.Name},
+                        {"Source Project", me.Source.Name},
+                        {"Source Collection", me.Source.Collection.Name},
+                        {"Status", Status.ToString()}
+                    },
+                    new Dictionary<string, double>
+                    {
+                        {"MigrationContextTime", executeTimer.ElapsedMilliseconds}
+                    });
+                Trace.TraceWarning("  [EXCEPTION] {0}", ex.Message);
                 throw ex;
             }
         }
@@ -101,19 +94,14 @@ namespace VstsSyncMigrator.Engine
 
             //// Output = [targetTeamProject]\[sourceTeamProject]\[AreaPath]
             //return r.Replace(input, target.Name, 1);
-
         }
 
         internal string ReplaceFirstInstanceOf(string input)
         {
             //input = [sourceTeamProject]\[AreaPath]
-            Regex r = new Regex(me.Source.Name, RegexOptions.IgnoreCase);
+            var r = new Regex(me.Source.Name, RegexOptions.IgnoreCase);
             //// Output = [targetTeamProject]\[sourceTeamProject]\[AreaPath]
             return r.Replace(input, me.Target.Name, 1);
-
         }
     }
-
-
-
 }

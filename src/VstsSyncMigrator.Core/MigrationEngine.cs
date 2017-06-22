@@ -59,12 +59,22 @@ namespace VstsSyncMigrator.Engine
                 Trace.WriteLine(string.Format("Adding Work Item Type {0}", key), "MigrationEngine");
                 this.AddWorkItemTypeDefinition(key, new DescreteWitdMapper(config.WorkItemTypeDefinition[key]));
             }
-            foreach (ITfsProcessingConfig processorConfig in config.Processors)
+            var enabledProcessors = config.Processors.Where(x => x.Enabled).ToList();
+            foreach (ITfsProcessingConfig processorConfig in enabledProcessors)
             {
-                if (processorConfig.Enabled)
+                if (processorConfig.IsProcessorCompatible(enabledProcessors))
                 {
-                    Trace.WriteLine(string.Format("Adding Processor {0}", processorConfig.Processor.Name), "MigrationEngine");
-                    this.AddProcessor((ITfsProcessingContext)Activator.CreateInstance(processorConfig.Processor, this, processorConfig));
+                    Trace.WriteLine($"Adding Processor {processorConfig.Processor.Name}", "MigrationEngine");
+                    this.AddProcessor(
+                        (ITfsProcessingContext)
+                        Activator.CreateInstance(processorConfig.Processor, this, processorConfig));
+                }
+                else
+                {
+                    var message = $"[ERROR] Cannot add Processor {processorConfig.Processor.Name}. " +
+                                  "Processor is not compatible with other enabled processors in configuration.";
+                    Trace.WriteLine(message, "MigrationEngine");
+                    throw new InvalidOperationException(message);
                 }
             }
         }

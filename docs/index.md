@@ -47,9 +47,12 @@ There are other processors that can be used to migrate, or process, different so
 
 Most of these processors need to be run in order. If you try to migrate work items before you have migrated Area and Iterations then ***bang*** you need to go back.
 
+Note: **WorkItemMigrationContext** and **WorkItemRevisionReplayMigrationContext** are exclusive, you can only run either of the options, but not both!
+
 ##### Work Items
 1. **NodeStructuresMigrationContext** - Moves over the structure of area and iteration paths, you have the option to inject a new root node by setting the `PrefixProjectToNodes` property. 
 1. **WorkItemMigrationContext** - **The work horse...** push the tip from one location to another while maintaining context. Make sure that you add a ReflectedWorkItemID and you can restart the service at any time...
+1. **WorkItemRevisionReplayMigrationContext** - **The second work horse...** push all revisions of work items from one location to another while maintaining context. Make sure that you add a ReflectedWorkItemID and you can restart the service at any time. This context will move replay all the revisions of work items in the source system in the exact same order on the target system, thus resulting in the very same history and state graph on the target system.
 1. **AttachementExportMigrationContext** - Exports all work items attachments to the migration machine. This is used in partnership with the **AttachmentImportMigrationContext**   
 1. **AttachementImportMigrationContext** - Imports all work items attachments from the migration machine. This is used in partnership with the **AttachementExportMigrationContext**
 1. **LinkMigrationContext** - Migrates all the work item links, both between work items and external links.
@@ -69,7 +72,7 @@ The following misc processors do as their names suggest
 - **ImportProfilePictureContext** 
 - **ExportProfilePictureFromADContext**
 - **WorkItemDelete**
-- **FixGitCommitLinks**
+- **FixGitCommitLinks** - Allows you to fix the migrated Git commit hooks (and thus external links) to point to the new repository in the target project. If the source and target repository names are the same, this will work out of the box. If the target repository has a different name, you can specify that name via the "TargetRepository" property.
 - **CreateTeamFolders**
 - **ExportTeamList**
 
