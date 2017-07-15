@@ -37,32 +37,30 @@ namespace VstsSyncMigrator.Engine
 
                 // only proceed if value is available
                 var value = source.Fields[config.sourceField].Value;
-                var apply = false;
+                var match = false;
                 if (value != null)
                 {
                     if (!string.IsNullOrEmpty(config.pattern))
                     {
                         // regular expression matching is being used
-                        if (Regex.IsMatch(value.ToString(), config.pattern))
-                        {
-                            apply = true;
-                        }
+                        match = Regex.IsMatch(value.ToString(), config.pattern);
                     }
                     else
                     {
                         // always apply tag if value exists
-                        apply = true;
+                        match = true;
                     }
+                }
 
-                    // tag will be added
-                    if (apply)
-                    {
-                        var newTag = string.IsNullOrEmpty(config.formatExpression) ? value.ToString() : string.Format(config.formatExpression, value);
-                        if (!string.IsNullOrWhiteSpace(newTag))
-                            tags.Add(newTag);
-                    }
+                // add new tag if available
+                if (match)
+                {
+                    // format or simple to string
+                    var newTag = string.IsNullOrEmpty(config.formatExpression) ? value.ToString() : string.Format(config.formatExpression, value);
+                    if (!string.IsNullOrWhiteSpace(newTag))
+                        tags.Add(newTag);
 
-                    // rewrite tag values if change
+                    // rewrite tag values if changed
                     var newTags = string.Join(";", tags.Distinct());
                     if (newTags != target.Tags)
                     {
