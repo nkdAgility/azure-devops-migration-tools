@@ -14,7 +14,7 @@ namespace VstsSyncMigrator.Engine
     public class FieldValuetoTagMap : IFieldMap
     {
 
-        FieldValuetoTagMapConfig config;
+        readonly FieldValuetoTagMapConfig config;
 
         public FieldValuetoTagMap(FieldValuetoTagMapConfig config)
         {
