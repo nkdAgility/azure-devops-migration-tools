@@ -171,48 +171,35 @@ namespace VstsSyncMigrator.Engine
 
         private WorkItem CreateAndPopulateWorkItem(WorkItemMigrationConfig config , WorkItem oldWi, Project destProject, String destType)
         {
-            var fieldMappingStartTime = DateTime.UtcNow;
             Stopwatch fieldMappingTimer = new Stopwatch();
 
             bool except = false;
             Trace.Write("... Building", "WorkItemMigrationContext");
           
-
-
-            // WorkItem newwit = oldWi.Copy(destProject.WorkItemTypes[destType]);
             var NewWorkItemstartTime = DateTime.UtcNow;
             Stopwatch NewWorkItemTimer = new Stopwatch();
             WorkItem newwit = destProject.WorkItemTypes[destType].NewWorkItem();
             NewWorkItemTimer.Stop();
             Telemetry.Current.TrackDependency("TeamService", "NewWorkItem", NewWorkItemstartTime, NewWorkItemTimer.Elapsed, true);
-            Trace.WriteLine(string.Format("Dependnacy: {0} - {1} - {2} - {3} - {4}", "TeamService", "NewWorkItem", NewWorkItemstartTime, NewWorkItemTimer.Elapsed, true), "WorkItemMigrationContext");
+            Trace.WriteLine(string.Format("Dependancy: {0} - {1} - {2} - {3} - {4}", "TeamService", "NewWorkItem", NewWorkItemstartTime, NewWorkItemTimer.Elapsed, true), "WorkItemMigrationContext");
             newwit.Title = oldWi.Title;
             newwit.State = oldWi.State;
-            switch (newwit.State)
-            {
-                case "Done":
-                    newwit.Fields["Microsoft.VSTS.Common.ClosedDate"].Value = DateTime.Now;
-                    break;
-                case "Closed":
-                    newwit.Fields["Microsoft.VSTS.Common.ClosedDate"].Value = DateTime.Now;
-                    break;
-                default:
-                    break;
-            }
             newwit.Reason = oldWi.Reason;
             
             foreach (Field f in oldWi.Fields)
             {
-                if (newwit.Fields.Contains(f.ReferenceName) && !_ignore.Contains(f.ReferenceName))
+                if (newwit.Fields.Contains(f.ReferenceName) && !_ignore.Contains(f.ReferenceName) && newwit.Fields[f.ReferenceName].IsEditable)
                 {
                     newwit.Fields[f.ReferenceName].Value = oldWi.Fields[f.ReferenceName].Value;
                 }
             }
+
             if (config.PrefixProjectToNodes)
             {
                 newwit.AreaPath = string.Format(@"{0}\{1}", newwit.Project.Name, oldWi.AreaPath);
                 newwit.IterationPath = string.Format(@"{0}\{1}", newwit.Project.Name, oldWi.IterationPath);
-            } else
+            }
+            else
             {
                 var regex = new Regex(Regex.Escape(oldWi.Project.Name));
                 newwit.AreaPath = regex.Replace(oldWi.AreaPath, newwit.Project.Name, 1);

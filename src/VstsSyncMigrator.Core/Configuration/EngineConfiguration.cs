@@ -106,6 +106,7 @@ namespace VstsSyncMigrator.Engine.Configuration
             };
             ec.Processors = new List<ITfsProcessingConfig>();
             ec.Processors.Add(new WorkItemMigrationConfig() { Enabled = false, UpdateCreatedBy=true, PrefixProjectToNodes = true, UpdateCreatedDate=true, UpdateSoureReflectedId=true, QueryBit = @"AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')" });
+            ec.Processors.Add(new WorkItemRevisionReplayMigrationConfig() { Enabled = false, PrefixProjectToNodes = true, UpdateSoureReflectedId=true, QueryBit = @"AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')" });
             ec.Processors.Add(new WorkItemUpdateConfig() { Enabled = false, QueryBit = @"AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')" });
             ec.Processors.Add(new NodeStructuresMigrationConfig() { Enabled = false });
             ec.Processors.Add(new LinkMigrationConfig() { Enabled = false, QueryBit= @"AND ([System.ExternalLinkCount] > 0 OR [System.RelatedLinkCount] > 0)" });
@@ -120,7 +121,7 @@ namespace VstsSyncMigrator.Engine.Configuration
             ec.Processors.Add(new TestRunsMigrationConfig() { Enabled = false });
             ec.Processors.Add(new ImportProfilePictureConfig() { Enabled = false });
             ec.Processors.Add(new ExportProfilePictureFromADConfig() { Enabled = false });
-            ec.Processors.Add(new FixGitCommitLinksConfig() { Enabled = false });
+            ec.Processors.Add(new FixGitCommitLinksConfig() { Enabled = false, TargetRepository = ec.Target.Name });
             return ec;
         }
 

@@ -100,7 +100,15 @@ Note that:
 			"UpdateCreatedBy": true,
 			"UpdateSoureReflectedId": true,
 			"QueryBit": "AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')"
-		}, {
+		},{		
+			"ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.WorkItemRevisionReplayMigrationConfig",
+			"Enabled": false,
+			"PrefixProjectToNodes": false,
+			"UpdateCreatedDate": true,
+			"UpdateCreatedBy": true,
+			"UpdateSoureReflectedId": false,
+			"QueryBit": "AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND [System.Tags] Contains 'Xyz'"
+	    },{
 			"ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.WorkItemUpdateConfig",
 			"WhatIf": false,
 			"Enabled": false,
@@ -137,7 +145,8 @@ Note that:
 		}, {
 			"ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.TestPlansAndSuitsMigrationConfig",
 			"Enabled": false,
-			"PrefixProjectToNodes": true
+			"PrefixProjectToNodes": true,
+			"OnlyElementsWithTag" : "tag"
 		}, {
 			"ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.TestRunsMigrationConfig",
 			"Enabled": false,
@@ -154,6 +163,7 @@ Note that:
 			"PictureEmpIDFormat": null
 		}, {
 			"ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.FixGitCommitLinksConfig",
+			"TargetRepository" : "TargetRepositoryNameIfNotTheSameAsOnSource",
 			"Enabled": false
 		}
 	]
