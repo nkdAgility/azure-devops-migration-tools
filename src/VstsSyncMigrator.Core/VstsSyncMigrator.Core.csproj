@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>VstsSyncMigrator.Core</RootNamespace>
     <AssemblyName>VstsSyncMigrator.Core</AssemblyName>
-    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
@@ -314,7 +314,6 @@
     </None>
     <None Include="packages.config" />
     <None Include="VstsSyncMigrator.Core.nuspec" />
-    <None Include="_VSTS.DataBulkEditor.Engine.nuspec" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Configuration\WorkItemTypes\" />
