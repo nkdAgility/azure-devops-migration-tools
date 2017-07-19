@@ -11,9 +11,6 @@ namespace VstsSyncMigrator.Engine
     public class FieldToTagFieldMap : IFieldMap
     {
         private FieldtoTagMapConfig config;
-        private MigrationEngine _me;
-        private WorkItemStoreContext _targetStore;
-        private WorkItemStoreContext _sourceStore;
 
         public FieldToTagFieldMap(FieldtoTagMapConfig config)
         {
@@ -26,12 +23,6 @@ namespace VstsSyncMigrator.Engine
             {
                 return "FieldToTagFieldMap";
             }
-        }
-
-        public void Init(MigrationEngine me, WorkItemStoreContext sourceStore, WorkItemStoreContext targetStore) {
-            _me = me;
-            _targetStore = targetStore;
-            _sourceStore = sourceStore;
         }
 
         public void Execute(WorkItem source, WorkItem target)

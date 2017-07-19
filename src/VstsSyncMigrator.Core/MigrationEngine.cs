@@ -22,9 +22,7 @@ namespace VstsSyncMigrator.Engine
         ITeamProjectContext source;
         ITeamProjectContext target;
         string reflectedWorkItemIdFieldName = "TfsMigrationTool.ReflectedWorkItemId";
-        private WorkItemStoreContext _sourceStore;
-        private WorkItemStoreContext _targetStore;
-
+        
         public MigrationEngine()
         {
 
@@ -93,11 +91,6 @@ namespace VstsSyncMigrator.Engine
             {
                 return source;
             }
-        }
-
-        public void SetStores(WorkItemStoreContext sourceStore, WorkItemStoreContext targetStore) {
-            _sourceStore = sourceStore;
-            _targetStore = targetStore;
         }
 
         public ITeamProjectContext Target
@@ -224,7 +217,6 @@ namespace VstsSyncMigrator.Engine
             foreach (IFieldMap map in list)
             {
                 Trace.WriteLine(string.Format("Runnin Field Map: {0}", map.Name));
-                map.Init(this, _sourceStore, _targetStore);
                 map.Execute(source, target);
             }
         }

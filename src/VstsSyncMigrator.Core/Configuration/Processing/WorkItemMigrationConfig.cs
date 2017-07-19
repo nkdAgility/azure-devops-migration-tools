@@ -10,15 +10,7 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
         public bool PrefixProjectToNodes { get; set; }
         public bool UpdateCreatedDate { get; set; }
         public bool UpdateCreatedBy { get; set; }
-        public bool UpdateTargetReflectedId { get; set; }
         public bool UpdateSoureReflectedId { get; set; }
-        public Type Processor
-        {
-            get
-            {
-                return typeof(WorkItemMigrationContext);
-            }
-        }
 
         public string QueryBit { get; set; }
         public bool Enabled { get; set; }
