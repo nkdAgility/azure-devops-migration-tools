@@ -10,9 +10,6 @@ namespace VstsSyncMigrator.Engine
     public class TreeToTagFieldMap : IFieldMap
     {
         private TreeToTagMapConfig config;
-        private MigrationEngine _me;
-        private WorkItemStoreContext _targetStore;
-        private WorkItemStoreContext _sourceStore;
 
         public TreeToTagFieldMap(TreeToTagMapConfig config)
         {
@@ -25,13 +22,6 @@ namespace VstsSyncMigrator.Engine
                 return "TreeToTagFieldMap";
             }
         }
-
-        public void Init(MigrationEngine me, WorkItemStoreContext sourceStore, WorkItemStoreContext targetStore) {
-            _me = me;
-            _targetStore = targetStore;
-            _sourceStore = sourceStore;
-        }
-
         public void Execute(WorkItem source, WorkItem target)
         {
 

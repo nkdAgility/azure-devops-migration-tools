@@ -67,6 +67,7 @@ namespace VstsSyncMigrator.ConsoleApp
                         ),
                         "[Warning]");
 #if !DEBUG
+
                     Console.WriteLine("Do you want to continue? (y/n)");
                     if (Console.ReadKey().Key != ConsoleKey.Y)
                     {
@@ -101,7 +102,7 @@ namespace VstsSyncMigrator.ConsoleApp
             }
             Trace.WriteLine(string.Format("Duration: {0}", mainTimer.Elapsed.ToString("c")), "[Info]");
             Trace.WriteLine(string.Format("End Time: {0}", startTime.ToUniversalTime()), "[Info]");
-#if RELEASE
+#if DEBUG
             Console.ReadKey();
 #endif
             return result;

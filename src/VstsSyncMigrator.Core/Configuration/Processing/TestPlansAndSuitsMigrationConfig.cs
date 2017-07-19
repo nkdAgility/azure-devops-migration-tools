@@ -9,10 +9,6 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
         public bool Enabled { get; set; }
         public string OnlyElementsWithTag { get; set; }
 
-        public bool PrefixProjectToPlan { get; set; }
-
-        public string TestPlanFilterRegex { get; set; }
-
         public Type Processor
         {
             get { return typeof(TestPlansAndSuitsMigrationContext); }

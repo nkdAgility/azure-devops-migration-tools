@@ -43,27 +43,19 @@ namespace VstsSyncMigrator.Engine
                 try
                 {
                     string reflectedID = fileName.Split('#')[0].Replace('+', ':').Replace("--", "/");
-                    if(reflectedID.Substring(0, me.Source.Collection.Uri.OriginalString.Length) != me.Source.Collection.Uri.OriginalString) {
-                        Trace.WriteLine(string.Format("{0} of {1} - Skipping {2} - the file is not export from source site", current, files.Count, fileName));
-                    } else {
-                        try {
-                            targetWI = targetStore.FindReflectedWorkItemByReflectedWorkItemId(reflectedID, me.ReflectedWorkItemIdFieldName);
-                        } catch (Exception) {
-                            WorkItemStoreContext sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.None);
-                            int WIid = Int32.Parse(reflectedID.Split('/')[reflectedID.Split('/').Count() - 1]);
-                            WorkItem sourceWI = sourceStore.Store.GetWorkItem(WIid);
-                            targetWI = targetStore.FindReflectedWorkItemByTitleAndCreatedDate(sourceWI.Title, sourceWI.CreatedDate);
-                        }
-                        if (targetWI != null) {
-                            Trace.WriteLine(string.Format("{0} of {1} - Import {2} to {3}", current, files.Count, fileName, targetWI.Id));
-                            Attachment a = new Attachment(file);
-                            targetWI.Attachments.Add(a);
+                    targetWI = targetStore.FindReflectedWorkItemByReflectedWorkItemId(reflectedID, me.ReflectedWorkItemIdFieldName);
+                    if (targetWI != null)
+                    {
+                        Trace.WriteLine(string.Format("{0} of {1} - Import {2} to {3}", current, files.Count, fileName, targetWI.Id));
+                        Attachment a = new Attachment(file);
+                        targetWI.Attachments.Add(a);
 
-                            targetWI.Save();
-                            System.IO.File.Delete(file);
-                        } else {
-                            Trace.WriteLine(string.Format("{0} of {1} - Skipping {2} to {3}", current, files.Count, fileName, 0));
-                        }
+                        targetWI.Save();
+                        System.IO.File.Delete(file);
+                    }
+                    else
+                    {
+                        Trace.WriteLine(string.Format("{0} of {1} - Skipping {2} to {3}", current, files.Count, fileName, 0));
                     }
                 } catch (FileAttachmentException ex)
                 {

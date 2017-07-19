@@ -72,7 +72,6 @@ namespace VstsSyncMigrator.Engine
                             { "ConnectionTimer", connectionTimer.ElapsedMilliseconds }
                        });
                     Trace.TraceWarning(string.Format("  [EXCEPTION] {0}", ex.Message));
-                    Trace.TraceWarning(string.Format("  [EXCEPTION] {0}", ex.StackTrace));
                     throw ex;
                 }
             }            

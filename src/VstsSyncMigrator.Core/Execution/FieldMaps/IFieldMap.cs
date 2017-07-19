@@ -11,8 +11,6 @@ namespace VstsSyncMigrator.Engine.ComponentContext
     {
         string Name { get; }
 
-        void Init(MigrationEngine me, WorkItemStoreContext sourceStore, WorkItemStoreContext targetStore);
-
         void Execute(WorkItem source, WorkItem target);
     }
 }
