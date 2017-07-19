@@ -52,8 +52,13 @@ namespace VstsSyncMigrator.Engine
             {
                 if (CanSkipElementBecauseOfTags(sourcePlan.Id))
                     continue;
+                
+                if(!String.IsNullOrEmpty(config.TestPlanFilterRegex) && !Regex.IsMatch("(?i)" + config.TestPlanFilterRegex,sourcePlan.Name)) {
+                    Trace.WriteLine(string.Format("    Skipping: Plan {0} does not match Regex filter",sourcePlan.Name), "TestPlansAndSuites");
+                    continue;
+                }
 
-                var newPlanName = config.PrefixProjectToNodes
+                var newPlanName = config.PrefixProjectToPlan
                     ? $"{sourceWitStore.GetProject().Name}-{sourcePlan.Name}"
                     : $"{sourcePlan.Name}";
 
@@ -129,16 +134,9 @@ namespace VstsSyncMigrator.Engine
                         }
                         try
                         {
-                            targetReq = targetWitStore.FindReflectedWorkItemByReflectedWorkItemId(sourceReq,
-                                me.ReflectedWorkItemIdFieldName);
-
-                            if (targetReq == null)
-                            {
-                                Trace.WriteLine("            Target work item not found", Name);
-                                break;
-                            }
-                        }
-                        catch (Exception)
+                            Trace.WriteLine(string.Format("            Source workitem not migrated to target, cannot be found"), "TestPlansAndSuites");
+                            targetReq = targetWitStore.FindReflectedWorkItem(sourceReq, me.ReflectedWorkItemIdFieldName,false);
+                        } catch (Exception)
                         {
                             Trace.WriteLine("            Source work item not migrated to target, cannot be found", Name);
                             break;
@@ -159,8 +157,7 @@ namespace VstsSyncMigrator.Engine
                 // found
                 Trace.WriteLine("            Suite Exists", Name);
                 ApplyConfigurations(sourceSuit.TestSuiteEntry, targetSuitChild.TestSuiteEntry);
-                if (targetSuitChild.IsDirty)
-                {
+                if (targetSuitChild.IsDirty) {
                     targetPlan.Save();
                 }
             }
@@ -255,33 +252,25 @@ namespace VstsSyncMigrator.Engine
         {
             if (sourceEntry.Configurations != null)
             {
-                if (sourceEntry.Configurations.Count != targetEntry.Configurations.Count)
-                {
+                if (targetEntry.Configurations == null || sourceEntry.Configurations.Count != targetEntry.Configurations.Count) {
                     Trace.WriteLine(string.Format("   CONFIG MNISSMATCH FOUND --- FIX AATTEMPTING"), "TestPlansAndSuites");
-                    targetEntry.Configurations.Clear();
+                    if(targetEntry.Configurations != null) targetEntry.Configurations.Clear();
                     IList<IdAndName> targetConfigs = new List<IdAndName>();
-                    foreach (var config in sourceEntry.Configurations)
-                    {
+                    foreach (var config in sourceEntry.Configurations) {
                         var targetFound = (from tc in targetTestConfigs
-                                           where tc.Name == config.Name
-                                           select tc).SingleOrDefault();
-                        if (!(targetFound == null))
-                        {
+                                            where tc.Name == config.Name
+                                            select tc).SingleOrDefault();
+                        if (!(targetFound == null)) {
 
                             targetConfigs.Add(new IdAndName(targetFound.Id, targetFound.Name));
                         }
                     }
-                    try
-                    {
+                    try {
                         targetEntry.SetConfigurations(targetConfigs);
-                    }
-                    catch (Exception)
-                    {
+                    } catch (Exception) {
                         // SOmetimes this will error out for no reason.
                     }
-
                 }
-
             }
         }
 
@@ -300,6 +289,13 @@ namespace VstsSyncMigrator.Engine
             }
             targetSuitChild.TestSuiteEntry.Title = source.TestSuiteEntry.Title;
             targetSuitChild.Query = ((IDynamicTestSuite)source).Query;
+
+            if (targetSuitChild.Query.QueryText.Contains("[System.AreaPath]")) {
+                var regex = new Regex(Regex.Escape("[System.AreaPath]") + " ([^ ]*) '" + sourceWitStore.GetProject().Name);
+                string newAreaPath = regex.Replace(targetSuitChild.Query.QueryText, "[System.AreaPath] $1 '" + targetWitStore.GetProject().Name);
+
+                targetSuitChild.Query = targetTestStore.Project.CreateTestQuery(newAreaPath);
+            }
             return targetSuitChild;
         }
 
