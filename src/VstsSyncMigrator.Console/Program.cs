@@ -66,7 +66,7 @@ namespace VstsSyncMigrator.ConsoleApp
                         thisVersion, latestVersion
                         ),
                         "[Warning]");
-#if DEBUG
+#if !DEBUG
 
                     Console.WriteLine("Do you want to continue? (y/n)");
                     if (Console.ReadKey().Key != ConsoleKey.Y)
