@@ -24,6 +24,7 @@ using VstsSyncMigrator.Engine.Configuration.Processing;
 using Microsoft.ApplicationInsights.DataContracts;
 using NuGet;
 using System.Net.NetworkInformation;
+using VstsSyncMigrator.Commands;
 
 namespace VstsSyncMigrator.ConsoleApp
 {
@@ -48,9 +49,11 @@ namespace VstsSyncMigrator.ConsoleApp
             DateTime startTime = DateTime.Now;
             Stopwatch mainTimer = new Stopwatch();
             mainTimer.Start();
+            /////////////////////////////////////////////////
+            string logsPath = CreateLogsPath();
             //////////////////////////////////////////////////
             Trace.Listeners.Add(new TextWriterTraceListener(Console.Out));
-            Trace.Listeners.Add(new TextWriterTraceListener(string.Format(@"{0}-{1}.log", DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss"), "Run"), "myListener"));
+            Trace.Listeners.Add(new TextWriterTraceListener(Path.Combine(logsPath, "VstsSyncMigrator.log"), "myListener"));
             //////////////////////////////////////////////////
             Trace.WriteLine(System.Reflection.Assembly.GetExecutingAssembly().GetName().Name, "[Info]");
             Version thisVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
@@ -77,15 +80,17 @@ namespace VstsSyncMigrator.ConsoleApp
 #endif
                 }
             }
+         
             Trace.WriteLine(string.Format("Telemitery Enabled: {0}", Telemetry.Current.IsEnabled().ToString()), "[Info]");
             Trace.WriteLine(string.Format("SessionID: {0}", Telemetry.Current.Context.Session.Id), "[Info]");
             Trace.WriteLine(string.Format("User: {0}", Telemetry.Current.Context.User.Id), "[Info]");
             Trace.WriteLine(string.Format("Start Time: {0}", startTime.ToUniversalTime()), "[Info]");
             Trace.WriteLine("------------------------------START-----------------------------", "[Info]");
             //////////////////////////////////////////////////
-            int result = (int)Parser.Default.ParseArguments<InitOptions, RunOptions>(args).MapResult(
+            int result = (int)Parser.Default.ParseArguments<InitOptions, RunOptions, ExportADGroupsOptions>(args).MapResult(
                 (InitOptions opts) => RunInitAndReturnExitCode(opts),
                 (RunOptions opts) => RunExecuteAndReturnExitCode(opts),
+                (ExportADGroupsOptions opts) => ExportADGroupsCommand.Run(opts, logsPath),
                 errs => 1);
             //////////////////////////////////////////////////
             Trace.WriteLine("-------------------------------END------------------------------", "[Info]");
@@ -178,17 +183,39 @@ namespace VstsSyncMigrator.ConsoleApp
 
         private static bool IsOnline()
         {
-            Ping myPing = new Ping();
-            String host = "8.8.4.4";
-            byte[] buffer = new byte[32];
-            int timeout = 1000;
-            PingOptions pingOptions = new PingOptions();
-            PingReply reply = myPing.Send(host, timeout, buffer, pingOptions);
-            if (reply.Status == IPStatus.Success)
+            try
             {
-                return true;
+                Ping myPing = new Ping();
+                String host = "8.8.4.4";
+                byte[] buffer = new byte[32];
+                int timeout = 1000;
+                PingOptions pingOptions = new PingOptions();
+                PingReply reply = myPing.Send(host, timeout, buffer, pingOptions);
+                if (reply.Status == IPStatus.Success)
+                {
+                    return true;
+                }
+                return false;
             }
-            return false;
+            catch (Exception)
+            {
+                // Likley no network is even available
+                return false;
+            }
+           
+        }
+
+        private static string CreateLogsPath()
+        {
+            string exportPath;
+            string assPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            exportPath = Path.Combine(Path.GetDirectoryName(assPath), "logs", DateTime.Now.ToString("yyyyMMddHHmmss"));
+            if (!Directory.Exists(exportPath))
+            {
+                Directory.CreateDirectory(exportPath);
+            }
+
+            return exportPath;
         }
     }
 }
