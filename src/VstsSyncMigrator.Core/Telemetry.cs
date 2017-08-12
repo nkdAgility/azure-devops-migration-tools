@@ -13,7 +13,7 @@ namespace VstsSyncMigrator.Engine
 {
    public static class Telemetry
     {
-        private const string applicationInsightsKey = "126d794f-7e75-4aad-90af-9b261bd9620b";
+        private const string applicationInsightsKey = "4b9bb17b-c7ee-43e5-b220-ec6db2c33373";
         private static TelemetryClient telemetryClient;
         public static bool EnableTrace = false;
 
