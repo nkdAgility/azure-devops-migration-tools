@@ -1,4 +1,5 @@
 ﻿using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using Microsoft.TeamFoundation.WorkItemTracking.Proxy;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -40,9 +41,9 @@ namespace VstsSyncMigrator.Engine
             tfsqc.Query = string.Format(@"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY [System.ChangedDate] desc", _config.QueryBit);
             WorkItemCollection sourceWIS = tfsqc.Execute();
 
-            WebClient webClient = new WebClient();
-            webClient.Credentials = CredentialCache.DefaultNetworkCredentials;
             int current = sourceWIS.Count;
+            var workItemServer = me.Source.Collection.GetService<WorkItemServer>();
+
             foreach (WorkItem wi in sourceWIS)
             {
                 Trace.Write(string.Format("Attachement Export: {0} of {1} - {2}", current, sourceWIS.Count, wi.Id));
@@ -58,13 +59,14 @@ namespace VstsSyncMigrator.Engine
                         Trace.Write("...downloading");
                         try
                         {
-                            webClient.DownloadFile(wia.Uri, fpath);
+                            var fileLocation = workItemServer.DownloadFile(wia.Id);
+                            File.Copy(fileLocation, fpath, true);
                             Trace.Write("...done");
                         }
                         catch (Exception ex)
                         {
                             Telemetry.Current.TrackException(ex);
-                            Trace.Write("...failed");
+                            Trace.Write($"\r\nException downloading attachements {ex.Message}");
                         }
                      
                     }
