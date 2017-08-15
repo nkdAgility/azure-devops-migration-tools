@@ -1,7 +1,7 @@
 {
   "manifestVersion": 1,
-  "id": "vsts-sync-migration#{GitVersion.PreReleaseLabelWithDash}#",
-  "name": "VSTS Sync Migration Tools #{GitVersion.PreReleaseLabel}#",
+  "id": "vsts-sync-migration",
+  "name": "VSTS Sync Migration Tools",
   "version": "#{GitVersion.Major}#.#{GitVersion.Minor}#.#{GitVersion.Patch}#",
   "public": false,
   "publisher": "nkdAgility",
