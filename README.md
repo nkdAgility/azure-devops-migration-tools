@@ -1,4 +1,4 @@
-# VSTS Sync Migration Tools
+# VSTS Sync Migration Tools [![Chocolatey](https://img.shields.io/chocolatey/dt/vsts-sync-migrator.svg)](https://chocolatey.org/packages/vsts-sync-migrator/)
 
 The VSTS Sync Migration tools allow you to bulk edit and migrate data between Team Projects on both Microsoft Team Foundation Server (TFS) and Visual Studio Team Services (VSTS). You can find out [why](http://vsts-bulk-editor.readthedocs.io/en/latest/why) this tooling exists and you can access the [documentation](http://vsts-bulk-editor.readthedocs.io) to find out how. THis project is published as [code on GitHub](https://github.com/nkdAgility/vsts-sync-migration/) as well as a [VSTS Sync Migration Tools on Chocolaty](https://chocolatey.org/packages/vsts-sync-migrator/) and [VSTS Bulk Data Editor Engine on NuGet](https://www.nuget.org/packages/VSTS.DataBulkEditor.Engine/). This allows you to build your own tooling as well as just use it out of the box with a configuration file.
 
@@ -11,8 +11,7 @@ The VSTS Sync Migration tools allow you to bulk edit and migrate data between Te
 ||Stable|Pre-release|
 |:--:|:--:|:--:|
 |Docs|[![Documentation Status](https://readthedocs.org/projects/vsts-bulk-editor/badge/?version=stable)](http://vsts-bulk-editor.readthedocs.org/en/stable/)|[![Documentation Status](https://readthedocs.org/projects/vsts-bulk-editor/badge/?version=latest)](http://vsts-bulk-editor.readthedocs.org/en/latest/)|
-|GitHub Release|-|[![GitHub release](https://img.shields.io/github/release/nkdAgility/vsts-data-bulk-editor.svg?maxAge=2592000)](https://github.com/nkdAgility/vsts-data-bulk-editor/releases)|
-|NuGet |[![NuGet](https://img.shields.io/nuget/v/VSTS.DataBulkEditor.Engine.svg)](https://www.nuget.org/packages/VSTS.DataBulkEditor.Engine)|[![NuGet](https://img.shields.io/nuget/vpre/VSTS.DataBulkEditor.Engine.svg)](https://www.nuget.org/packages/VSTS.DataBulkEditor.Engine)|
+|GitHub Release|-|[![GitHub release](https://img.shields.io/github/release/nkdAgility/vsts-sync-migrator.svg?maxAge=2592000)](https://github.com/nkdAgility/vsts-sync-migrator/releases)|
 |Chocolatey|[![Chocolatey](https://img.shields.io/chocolatey/v/vsts-sync-migrator.svg)](https://chocolatey.org/packages/vsts-sync-migrator/)|-|
 
 
