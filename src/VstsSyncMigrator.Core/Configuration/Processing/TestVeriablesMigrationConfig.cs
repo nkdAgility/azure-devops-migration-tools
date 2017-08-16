@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace VstsSyncMigrator.Engine.Configuration.Processing
 {
-    public class TestVeriablesMigrationConfig : ITfsProcessingConfig
+    public class TestVariablesMigrationConfig : ITfsProcessingConfig
     {
         public bool Enabled { get; set; }
 

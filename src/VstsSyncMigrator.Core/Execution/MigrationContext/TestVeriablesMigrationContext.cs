@@ -24,7 +24,7 @@ namespace VstsSyncMigrator.Engine
         // http://blogs.microsoft.co.il/shair/2015/02/02/tfs-api-part-56-test-configurations/
 
 
-        public TestVeriablesMigrationContext(MigrationEngine me, TestVeriablesMigrationConfig config) : base(me, config)
+        public TestVeriablesMigrationContext(MigrationEngine me, TestVariablesMigrationConfig config) : base(me, config)
         {
 
         }
