@@ -82,6 +82,10 @@ namespace VstsSyncMigrator.Engine
 
         private bool CanSkipElementBecauseOfTags(int workItemId)
         {
+            if (config.OnlyElementsWithTag == null)
+            {
+                return false;
+            }
             var sourcePlanWorkItem = sourceWitStore.Store.GetWorkItem(workItemId);
             var tagWhichMustBePresent = config.OnlyElementsWithTag;
             return !sourcePlanWorkItem.Tags.Contains(tagWhichMustBePresent);
