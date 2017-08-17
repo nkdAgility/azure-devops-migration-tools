@@ -13,16 +13,13 @@ namespace VstsSyncMigrator.Engine
 {
     public class TestPlansAndSuitsMigrationContext : MigrationContextBase
     {
-        MigrationEngine engine;
-
-        WorkItemStoreContext sourceWitStore;
-        TestManagementContext sourceTestStore;
-
-        WorkItemStoreContext targetWitStore;
-        TestManagementContext targetTestStore;
-        ITestConfigurationCollection targetTestConfigs;
-
-        TestPlansAndSuitsMigrationConfig config;
+        private readonly MigrationEngine engine;
+        private readonly WorkItemStoreContext sourceWitStore;
+        private readonly TestManagementContext sourceTestStore;
+        private readonly WorkItemStoreContext targetWitStore;
+        private readonly TestManagementContext targetTestStore;
+        private readonly ITestConfigurationCollection targetTestConfigs;
+        private readonly TestPlansAndSuitsMigrationConfig config;
 
         public override string Name
         {
@@ -34,7 +31,7 @@ namespace VstsSyncMigrator.Engine
 
         public TestPlansAndSuitsMigrationContext(MigrationEngine me, TestPlansAndSuitsMigrationConfig config) : base(me, config)
         {
-            this.engine = me;
+            engine = me;
             sourceWitStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.None);
             sourceTestStore = new TestManagementContext(me.Source);
             targetWitStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
@@ -45,7 +42,6 @@ namespace VstsSyncMigrator.Engine
 
         internal override void InternalExecute()
         {
-
             ITestPlanCollection sourcePlans = sourceTestStore.GetTestPlans();
             Trace.WriteLine(string.Format("Plan to copy {0} Plans?", sourcePlans.Count), "TestPlansAndSuites");
             foreach (ITestPlan sourcePlan in sourcePlans)
@@ -94,7 +90,9 @@ namespace VstsSyncMigrator.Engine
         private void ProcessStaticSuite(ITestSuiteBase sourceSuit, ITestSuiteBase targetParent, ITestPlan targetPlan)
         {
             if (CanSkipElementBecauseOfTags(sourceSuit.Id))
+            {
                 return;
+            }
 
             Trace.WriteLine($"    Processing {sourceSuit.TestSuiteType} : {sourceSuit.Id} - {sourceSuit.Title} ", Name);
             var targetSuitChild = FindSuiteEntry((IStaticTestSuite) targetParent, sourceSuit.Title);
@@ -104,15 +102,14 @@ namespace VstsSyncMigrator.Engine
                 // Should create
                 switch (sourceSuit.TestSuiteType)
                 {
-                    case TestSuiteType.None:
-                        throw new NotImplementedException();
-                    //break;
                     case TestSuiteType.DynamicTestSuite:
-                        targetSuitChild = CreateNewDynamicTestSuite(sourceSuit);
+                        targetSuitChild = CreateNewDynamicTestSuite((IDynamicTestSuite)sourceSuit);
                         break;
+
                     case TestSuiteType.StaticTestSuite:
                         targetSuitChild = CreateNewStaticTestSuit(sourceSuit);
                         break;
+
                     case TestSuiteType.RequirementTestSuite:
                         int sourceRid = ((IRequirementTestSuite)sourceSuit).RequirementId;
                         WorkItem sourceReq = null;
@@ -151,9 +148,13 @@ namespace VstsSyncMigrator.Engine
                         break;
                     default:
                         throw new NotImplementedException();
-                    //break;
                 }
-                if (targetSuitChild == null) { return; }
+
+                if (targetSuitChild == null)
+                {
+                    return;
+                }
+
                 // Add to tareget and Save
                 ApplyConfigurations(sourceSuit.TestSuiteEntry, targetSuitChild.TestSuiteEntry);
                 SaveNewTestSuitToPlan(targetPlan, (IStaticTestSuite)targetParent, targetSuitChild);
@@ -175,9 +176,9 @@ namespace VstsSyncMigrator.Engine
                 foreach (var sourceSuitChild in ((IStaticTestSuite) sourceSuit).SubSuites)
                 {
                     ProcessStaticSuite(sourceSuitChild, targetSuitChild, targetPlan);
-
                 }
             }
+
             // Add Test Cases
             ProcessChildTestCases(sourceSuit, targetSuitChild, targetPlan);
         }
@@ -223,7 +224,6 @@ namespace VstsSyncMigrator.Engine
                 target.TestCases.AddCases(tcs);
                 targetPlan.Save();
                 Trace.WriteLine(string.Format("    SAVED {0} : {1} - {2} ", target.TestSuiteType.ToString(), target.Id, target.Title), "TestPlansAndSuites");
-
             }
         }
 
@@ -283,9 +283,7 @@ namespace VstsSyncMigrator.Engine
                     {
                         // SOmetimes this will error out for no reason.
                     }
-
                 }
-
             }
         }
 
@@ -294,17 +292,28 @@ namespace VstsSyncMigrator.Engine
             return sourceSuit.TestCaseCount > 0;
         }
 
-        private ITestSuiteBase CreateNewDynamicTestSuite(ITestSuiteBase source)
+        private ITestSuiteBase CreateNewDynamicTestSuite(IDynamicTestSuite source)
         {
+            IDynamicTestSuite targetSuiteChild = targetTestStore.Project.TestSuites.CreateDynamic();
+            targetSuiteChild.TestSuiteEntry.Title = source.TestSuiteEntry.Title;
 
-            IDynamicTestSuite targetSuitChild = targetTestStore.Project.TestSuites.CreateDynamic();
             if (source.TestSuiteEntry.Configurations != null)
             {
-                ApplyConfigurations(source, targetSuitChild);
+                ApplyConfigurations(source, targetSuiteChild);
             }
-            targetSuitChild.TestSuiteEntry.Title = source.TestSuiteEntry.Title;
-            targetSuitChild.Query = ((IDynamicTestSuite)source).Query;
-            return targetSuitChild;
+
+            if (config.PrefixProjectToNodes)
+            {
+                var queryText = ReplaceAreaIterationPaths(source.Query.QueryText);
+                var newQuery = targetTestStore.Project.CreateTestQuery(queryText);
+                targetSuiteChild.Query = newQuery;
+            }
+            else
+            {
+                targetSuiteChild.Query = source.Query;
+            }
+
+            return targetSuiteChild;
         }
 
         private ITestSuiteBase CreateNewRequirementTestSuite(ITestSuiteBase source, WorkItem requirement)
@@ -371,8 +380,6 @@ namespace VstsSyncMigrator.Engine
             return targetSuitChild;
         }
 
-
-
         private ITestSuiteBase FindSuiteEntry(IStaticTestSuite staticSuit, string titleToFind)
         {
             return (from s in staticSuit.SubSuites where s.Title == titleToFind select s).SingleOrDefault();
@@ -414,6 +421,20 @@ namespace VstsSyncMigrator.Engine
         private ITestPlan FindTestPlan(TestManagementContext tmc, string name)
         {
             return (from p in tmc.Project.TestPlans.Query("Select * From TestPlan") where p.Name == name select p).SingleOrDefault();
+        }
+
+        private string ReplaceAreaIterationPaths(string text)
+        {
+            var regex = new Regex(@"(\[System.(AreaPath|IterationPath)])[ ]*([Uu][Nn][Dd][Ee][Rr]|[Nn][Oo][Tt] [Uu][Nn][Dd][Ee][Rr]|=|<>|[Ii][Nn])[ ]*'([^\']*)'");
+            if (regex.IsMatch(text))
+            {
+                return regex.Replace(text, match =>
+                {
+                    return match.Value.Replace(" '", $" '{engine.Target.Name}\\");
+                });
+            }
+
+            return text;
         }
     }
 }
