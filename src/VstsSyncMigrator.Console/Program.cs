@@ -42,13 +42,15 @@ namespace VstsSyncMigrator.ConsoleApp
             public string ConfigFile { get; set; }
         }
 
+        static DateTime startTime = DateTime.Now;
+        static Stopwatch mainTimer = new Stopwatch();
+
+
         public static int Main(string[] args)
         {
-            Telemetry.Current.TrackEvent("ApplicationStart");
-            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
-            DateTime startTime = DateTime.Now;
-            Stopwatch mainTimer = new Stopwatch();
             mainTimer.Start();
+            Telemetry.Current.TrackEvent("ApplicationStart");
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;            
             /////////////////////////////////////////////////
             string logsPath = CreateLogsPath();
             //////////////////////////////////////////////////
@@ -113,6 +115,7 @@ namespace VstsSyncMigrator.ConsoleApp
             return result;
         }
 
+
         private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             ExceptionTelemetry excTelemetry = new ExceptionTelemetry((Exception)e.ExceptionObject);
@@ -173,16 +176,39 @@ namespace VstsSyncMigrator.ConsoleApp
 
         private static Version GetLatestVersion()
         {
+            DateTime startTime = DateTime.Now;
+            Stopwatch mainTimer = new Stopwatch();
+            mainTimer.Start();
+            //////////////////////////////////
             string packageID = "vsts-sync-migrator";
-
-            //Connect to the official package repository
-            IPackageRepository repo = PackageRepositoryFactory.Default.CreateRepository("https://chocolatey.org/api/v2/");
-            var version = repo.FindPackagesById(packageID).Max(p => p.Version);
+            SemanticVersion version = null;
+            bool sucess = false;
+            try
+            {
+                //Connect to the official package repository
+                IPackageRepository repo = PackageRepositoryFactory.Default.CreateRepository("https://chocolatey.org/api/v2/");
+                version = repo.FindPackagesById(packageID).Max(p => p.Version);
+                sucess = true;
+            }
+            catch (Exception ex)
+            {
+                Telemetry.Current.TrackException(ex);
+                sucess = false;
+            }
+            /////////////////
+            mainTimer.Stop();
+            Telemetry.Current.TrackDependency(new DependencyTelemetry("PackageRepository", "chocolatey.org", "vsts-sync-migrator", version.ToString(), startTime, mainTimer.Elapsed, null, sucess));
             return new Version(version.ToString());
         }
 
         private static bool IsOnline()
         {
+            DateTime startTime = DateTime.Now;
+            Stopwatch mainTimer = new Stopwatch();
+            mainTimer.Start();
+            //////////////////////////////////
+            bool isOnline = false;
+            string responce = "none";
             try
             {
                 Ping myPing = new Ping();
@@ -191,18 +217,24 @@ namespace VstsSyncMigrator.ConsoleApp
                 int timeout = 1000;
                 PingOptions pingOptions = new PingOptions();
                 PingReply reply = myPing.Send(host, timeout, buffer, pingOptions);
+                responce = reply.Status.ToString();
                 if (reply.Status == IPStatus.Success)
                 {
-                    return true;
+                    isOnline = true;
                 }
-                return false;
+                isOnline= false;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 // Likley no network is even available
-                return false;
+                Telemetry.Current.TrackException(ex);
+                responce = "error";
+                isOnline = false;
             }
-           
+            /////////////////
+            mainTimer.Stop();
+            Telemetry.Current.TrackDependency(new DependencyTelemetry("Ping","GoogleDNS", "IsOnline", null, startTime, mainTimer.Elapsed, responce, true));
+            return isOnline;
         }
 
         private static string CreateLogsPath()

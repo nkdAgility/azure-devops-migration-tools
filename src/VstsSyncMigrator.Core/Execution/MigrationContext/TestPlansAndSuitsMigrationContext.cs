@@ -257,9 +257,10 @@ namespace VstsSyncMigrator.Engine
 
         private void ApplyConfigurations(ITestSuiteEntry sourceEntry, ITestSuiteEntry targetEntry)
         {
-            if (sourceEntry.Configurations != null)
-            {
-                if (sourceEntry.Configurations.Count != targetEntry.Configurations.Count)
+            int SourceConfigCount = sourceEntry.Configurations != null ? sourceEntry.Configurations.Count : 0;
+            int TargetConfigCount = targetEntry.Configurations != null ? targetEntry.Configurations.Count : 0;
+            
+                if (SourceConfigCount != TargetConfigCount)
                 {
                     Trace.WriteLine(string.Format("   CONFIG MNISSMATCH FOUND --- FIX AATTEMPTING"), "TestPlansAndSuites");
                     targetEntry.Configurations.Clear();
@@ -279,14 +280,14 @@ namespace VstsSyncMigrator.Engine
                     {
                         targetEntry.SetConfigurations(targetConfigs);
                     }
-                    catch (Exception)
+                    catch (Exception ex) 
                     {
-                        // SOmetimes this will error out for no reason.
+                    // SOmetimes this will error out for no reason.
+                    Telemetry.Current.TrackException(ex);
                     }
 
                 }
-
-            }
+            
         }
 
         private bool HasChildTestCases(ITestSuiteBase sourceSuit)
