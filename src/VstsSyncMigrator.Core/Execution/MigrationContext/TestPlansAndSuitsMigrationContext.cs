@@ -263,7 +263,10 @@ namespace VstsSyncMigrator.Engine
                 if (SourceConfigCount != TargetConfigCount)
                 {
                     Trace.WriteLine(string.Format("   CONFIG MNISSMATCH FOUND --- FIX AATTEMPTING"), "TestPlansAndSuites");
-                    targetEntry.Configurations.Clear();
+                    if (targetEntry.Configurations != null)
+                    {
+                        targetEntry.Configurations.Clear();
+                    }
                     IList<IdAndName> targetConfigs = new List<IdAndName>();
                     foreach (var config in sourceEntry.Configurations)
                     {
