@@ -60,8 +60,15 @@ namespace VstsSyncMigrator.Engine
             foreach (XmlNode item in nodeList)
             {
                 string newNodeName = item.Attributes["Name"].Value;
-                DateTime startDate = DateTime.Parse(item.Attributes["StartDate"].Value);
-                DateTime finishDate = DateTime.Parse(item.Attributes["FinishDate"].Value);
+                DateTime? startDate = null;
+                DateTime? finishDate = null;
+                if (item.Attributes["StartDate"] != null) {
+                    startDate = DateTime.Parse(item.Attributes["StartDate"].Value);
+                }
+                if (item.Attributes["FinishDate"] != null)
+                {
+                    finishDate = DateTime.Parse(item.Attributes["FinishDate"].Value);
+                }
                 NodeInfo targetNode = CreateNode(css, newNodeName, parentPath, startDate, finishDate);
                 if (item.HasChildNodes)
                 {
@@ -91,7 +98,7 @@ namespace VstsSyncMigrator.Engine
             return node;
         }
 
-        private NodeInfo CreateNode(ICommonStructureService css, string name, NodeInfo parent, DateTime startDate, DateTime finishDate)
+        private NodeInfo CreateNode(ICommonStructureService css, string name, NodeInfo parent, DateTime? startDate, DateTime? finishDate)
         {
             string nodePath = string.Format(@"{0}\{1}", parent.Path, name);
             NodeInfo node = null;
