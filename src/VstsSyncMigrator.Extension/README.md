@@ -22,7 +22,7 @@ The VSTS Sync Migration tools allow you to bulk edit and migrate data between Te
   - [TFS 2017 Migration To VSTS with VSTS Sync Migrator from Mohamed Radwan](http://mohamedradwan.com/2017/09/15/tfs-2017-migration-to-vsts-with-vsts-sync-migrator/)
   - [Options migrating TFS to VSTS from Richard Fennell](https://blogs.blackmarble.co.uk/blogs/rfennell/post/2017/05/10/Options-migrating-TFS-to-VSTS)
 
- ## Getting the Tools
+## Getting the Tools
 
 There are three ways to use these tools:
 
