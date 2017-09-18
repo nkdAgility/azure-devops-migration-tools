@@ -14,22 +14,25 @@ The VSTS Sync Migration tools allow you to bulk edit and migrate data between Te
 |GitHub Release|-|[![GitHub release](https://img.shields.io/github/release/nkdAgility/vsts-sync-migrator.svg?maxAge=2592000)](https://github.com/nkdAgility/vsts-sync-migrator/releases)|
 |Chocolatey|[![Chocolatey](https://img.shields.io/chocolatey/v/vsts-sync-migrator.svg)](https://chocolatey.org/packages/vsts-sync-migrator/)|-|
 
-
-
 ## Quick Links
+
  - [Getting Started](http://vsts-bulk-editor.readthedocs.io/en/latest/getting-started)
  - [Documentation](http://vsts-bulk-editor.readthedocs.io)
  - [Contributing](http://vsts-bulk-editor.readthedocs.io/en/latest/#contributing)
  - [Why VSTS Bulk Data Editor](http://vsts-bulk-editor.readthedocs.io/en/latest/why)
  - [Usage](http://vsts-bulk-editor.readthedocs.io/en/latest/usage/usage/)
 
- ## Getting the Tools
+### External Walkthroughs and Reviews
+
+  - [TFS 2017 Migration To VSTS with VSTS Sync Migrator from Mohamed Radwan](http://mohamedradwan.com/2017/09/15/tfs-2017-migration-to-vsts-with-vsts-sync-migrator/)
+  - [Options migrating TFS to VSTS from Richard Fennell](https://blogs.blackmarble.co.uk/blogs/rfennell/post/2017/05/10/Options-migrating-TFS-to-VSTS)
+
+## Getting the Tools
 
 There are three ways to use these tools:
 
 - (recomended)[Install from Chocolatey](https://chocolatey.org/packages/vsts-sync-migrator/)
 - Download the [latest release from GitHub](https://github.com/nkdAgility/vsts-sync-migration/releases) and unzip
-- Create your own tools by using the [VSTS Bulk Data Editor Engine](https://www.nuget.org/packages/VSTS.DataBulkEditor.Engine/) on nuget
 
 ## You are seeing:
 
