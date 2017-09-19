@@ -51,28 +51,38 @@ namespace VstsSyncMigrator.Engine
             }
             if (sourceTree.ChildNodes[0].HasChildNodes)
             {
-                CreateNodes(sourceTree.ChildNodes[0].ChildNodes[0].ChildNodes, targetCss, structureParent);
+                CreateNodes(sourceTree.ChildNodes[0].ChildNodes[0].ChildNodes, targetCss, structureParent, treeType);
             }
         }
 
-        private void CreateNodes(XmlNodeList nodeList, ICommonStructureService css, NodeInfo parentPath)
+        private void CreateNodes(XmlNodeList nodeList, ICommonStructureService css, NodeInfo parentPath, string treeType)
         {
             foreach (XmlNode item in nodeList)
             {
                 string newNodeName = item.Attributes["Name"].Value;
-                DateTime? startDate = null;
-                DateTime? finishDate = null;
-                if (item.Attributes["StartDate"] != null) {
-                    startDate = DateTime.Parse(item.Attributes["StartDate"].Value);
-                }
-                if (item.Attributes["FinishDate"] != null)
+                NodeInfo targetNode;
+                if (treeType == "Iteration")
                 {
-                    finishDate = DateTime.Parse(item.Attributes["FinishDate"].Value);
+                    DateTime? startDate = null;
+                    DateTime? finishDate = null;
+                    if (item.Attributes["StartDate"] != null)
+                    {
+                        startDate = DateTime.Parse(item.Attributes["StartDate"].Value);
+                    }
+                    if (item.Attributes["FinishDate"] != null)
+                    {
+                        finishDate = DateTime.Parse(item.Attributes["FinishDate"].Value);
+                    }
+
+                    targetNode = CreateNode(css, newNodeName, parentPath, startDate, finishDate);
                 }
-                NodeInfo targetNode = CreateNode(css, newNodeName, parentPath, startDate, finishDate);
+                else
+                {
+                    targetNode = CreateNode(css, newNodeName, parentPath);
+                }
                 if (item.HasChildNodes)
                 {
-                    CreateNodes(item.ChildNodes[0].ChildNodes, css, targetNode);
+                    CreateNodes(item.ChildNodes[0].ChildNodes, css, targetNode, treeType);
                 }
             }
         }
@@ -114,7 +124,7 @@ namespace VstsSyncMigrator.Engine
                 Trace.Write("...missing");
                 string newPathUri = css.CreateNode(name, parent.Uri);
                 Trace.Write("...created");
-                node = css.GetNode(newPathUri);               
+                node = css.GetNode(newPathUri);
                 ((ICommonStructureService4)css).SetIterationDates(node.Uri, startDate, finishDate);
                 Trace.Write("...dates assigned");
             }
