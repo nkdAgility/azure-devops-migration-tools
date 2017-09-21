@@ -107,6 +107,7 @@ namespace VstsSyncMigrator.Engine
                                 Trace.WriteLine(string.Format("{0} [SKIP] Exists {1}", current, newImage));
                             }
                         }
+                        webClient.Dispose();
                     }
 
                 }

@@ -181,7 +181,7 @@ namespace VstsSyncMigrator.ConsoleApp
             mainTimer.Start();
             //////////////////////////////////
             string packageID = "vsts-sync-migrator";
-            SemanticVersion version = null;
+            SemanticVersion version = SemanticVersion.Parse("0.0.0.0");
             bool sucess = false;
             try
             {
