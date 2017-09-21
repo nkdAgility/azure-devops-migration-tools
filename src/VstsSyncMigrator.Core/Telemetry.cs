@@ -15,7 +15,9 @@ namespace VstsSyncMigrator.Engine
     {
         private const string applicationInsightsKey = "4b9bb17b-c7ee-43e5-b220-ec6db2c33373";
         private static TelemetryClient telemetryClient;
-        public static bool EnableTrace = false;
+        private static bool enableTrace = false;
+
+        public static bool EnableTrace { get { return enableTrace; } set { enableTrace = value; } }
 
         public static TelemetryClient Current { get {
                 if (telemetryClient == null)
@@ -28,7 +30,7 @@ namespace VstsSyncMigrator.Engine
 
         public static void InitiliseTelemetry()
         {
-            if (EnableTrace) { Trace.Listeners.Add(new ApplicationInsightsTraceListener(applicationInsightsKey)); }
+            if (enableTrace) { Trace.Listeners.Add(new ApplicationInsightsTraceListener(applicationInsightsKey)); }
             TelemetryConfiguration.Active.InstrumentationKey = applicationInsightsKey;
             telemetryClient = new TelemetryClient();
             telemetryClient.InstrumentationKey = applicationInsightsKey;

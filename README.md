@@ -14,6 +14,8 @@ The VSTS Sync Migration tools allow you to bulk edit and migrate data between Te
 |GitHub Release|-|[![GitHub release](https://img.shields.io/github/release/nkdAgility/vsts-sync-migrator.svg?maxAge=2592000)](https://github.com/nkdAgility/vsts-sync-migrator/releases)|
 |Chocolatey|[![Chocolatey](https://img.shields.io/chocolatey/v/vsts-sync-migrator.svg)](https://chocolatey.org/packages/vsts-sync-migrator/)|-|
 
+[Sonar Cube Analysis](https://sonarcloud.io/dashboard?id=vsts-sync-migrator%3Amaster)
+
 ## Quick Links
 
  - [Getting Started](http://vsts-bulk-editor.readthedocs.io/en/latest/getting-started)

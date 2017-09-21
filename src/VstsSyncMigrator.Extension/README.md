@@ -8,6 +8,7 @@ The VSTS Sync Migration tools allow you to bulk edit and migrate data between Te
 - Migrate Work Items & Test Management from one Team Project to another
 - Merge Team Projects
 - Migrate Work Items & Test Management from one account or collection to another
+- Assist in changing process templates
 
 ## Quick Links
 
