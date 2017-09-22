@@ -47,10 +47,18 @@ namespace VstsSyncMigrator.Engine
                     if (targetWI != null)
                     {
                         Trace.WriteLine(string.Format("{0} of {1} - Import {2} to {3}", current, files.Count, fileName, targetWI.Id));
-                        Attachment a = new Attachment(file);
-                        targetWI.Attachments.Add(a);
-
-                        targetWI.Save();
+                        var attachments = targetWI.Attachments.Cast<Attachment>();
+                        var attachment = attachments.Where(a => a.Name == fileName).FirstOrDefault();
+                        if (attachment == null)
+                        {
+                            Attachment a = new Attachment(file);
+                            targetWI.Attachments.Add(a);
+                            targetWI.Save();
+                        }
+                        else
+                        {
+                            Trace.WriteLine(string.Format(" [SKIP] WorkItem {0} already contains attachment {1}", targetWI.Id, fileName));
+                        }
                         System.IO.File.Delete(file);
                     }
                     else
