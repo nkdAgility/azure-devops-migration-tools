@@ -164,7 +164,7 @@ namespace VstsSyncMigrator.Engine
             }
             //////////////////////////////////////////////////
             stopwatch.Stop();
-            Console.WriteLine(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds - {1} Items, {2} Imported, {3} Failures", stopwatch.Elapsed, sourceWIS.Count, imported, failures);
+            Trace.WriteLine(string.Format(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds - {1} Items, {2} Imported, {3} Failures", stopwatch.Elapsed, sourceWIS.Count, imported, failures), this.Name);
         }
 
 
