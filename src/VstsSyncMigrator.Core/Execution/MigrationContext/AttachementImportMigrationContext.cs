@@ -37,6 +37,7 @@ namespace VstsSyncMigrator.Engine
             WorkItem targetWI = null;
             int current = files.Count;
             int failures = 0;
+            int skipped = 0;
             foreach (string file in files)
             {
                 string fileName = System.IO.Path.GetFileName(file);
@@ -58,6 +59,7 @@ namespace VstsSyncMigrator.Engine
                         else
                         {
                             Trace.WriteLine(string.Format(" [SKIP] WorkItem {0} already contains attachment {1}", targetWI.Id, fileName));
+                            skipped++;
                         }
                         System.IO.File.Delete(file);
                     }
@@ -75,7 +77,7 @@ namespace VstsSyncMigrator.Engine
             }
             //////////////////////////////////////////////////
             stopwatch.Stop();
-            Console.WriteLine(@"IMPORT DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds - {1} Files imported, {2} Failures", stopwatch.Elapsed, (files.Count- failures), failures);
+            Console.WriteLine(@"IMPORT DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds - {1} Files imported, {2} Failures, {3} Skipped", stopwatch.Elapsed, (files.Count- failures), failures, skipped);
         }
 
     }
