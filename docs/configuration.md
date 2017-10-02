@@ -72,7 +72,7 @@ The global configuration created by the `init` command look like this:
 			"sourceField2": "Microsoft.VSTS.Common.AcceptanceCriteria",
 			"targetField": "System.Description",
 			"formatExpression": "{0} <br/><br/><h3>Acceptance Criteria</h3>{1}",
-			"doneMatch": null
+			"doneMatch": "##DONE##"
 		}, {
 			"ObjectType": "VstsSyncMigrator.Engine.Configuration.FieldMap.RegexFieldMapConfig",
 			"WorkItemTypeName": "*",

@@ -8,6 +8,7 @@ The VSTS Sync Migration tools allow you to bulk edit and migrate data between Te
 - Migrate Work Items & Test Management from one Team Project to another
 - Merge Team Projects
 - Migrate Work Items & Test Management from one account or collection to another
+- Assist in changing process templates
 
 ## Quick Links
 
@@ -17,7 +18,12 @@ The VSTS Sync Migration tools allow you to bulk edit and migrate data between Te
  - [Why VSTS Bulk Data Editor](http://vsts-bulk-editor.readthedocs.io/en/latest/why)
  - [Usage](http://vsts-bulk-editor.readthedocs.io/en/latest/usage/usage/)
 
- ## Getting the Tools
+### External Walkthroughs and Reviews
+
+  - [TFS 2017 Migration To VSTS with VSTS Sync Migrator from Mohamed Radwan](http://mohamedradwan.com/2017/09/15/tfs-2017-migration-to-vsts-with-vsts-sync-migrator/)
+  - [Options migrating TFS to VSTS from Richard Fennell](https://blogs.blackmarble.co.uk/blogs/rfennell/post/2017/05/10/Options-migrating-TFS-to-VSTS)
+
+## Getting the Tools
 
 There are three ways to use these tools:
 
