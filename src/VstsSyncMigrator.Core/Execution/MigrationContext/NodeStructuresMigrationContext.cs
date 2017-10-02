@@ -32,7 +32,7 @@ namespace VstsSyncMigrator.Engine
             ProjectInfo sourceProjectInfo = sourceCss.GetProjectFromName(me.Source.Name);
             NodeInfo[] sourceNodes = sourceCss.ListStructures(sourceProjectInfo.Uri);
             //////////////////////////////////////////////////
-            ICommonStructureService targetCss = (ICommonStructureService)me.Target.Collection.GetService(typeof(ICommonStructureService));
+            ICommonStructureService targetCss = (ICommonStructureService)me.Target.Collection.GetService(typeof(ICommonStructureService4));
             //////////////////////////////////////////////////
             ProcessCommonStructure("Area", sourceNodes, targetCss, sourceCss);
             //////////////////////////////////////////////////
@@ -60,7 +60,9 @@ namespace VstsSyncMigrator.Engine
             foreach (XmlNode item in nodeList)
             {
                 string newNodeName = item.Attributes["Name"].Value;
-                NodeInfo targetNode = CreateNode(css, newNodeName, parentPath);
+                DateTime startDate = DateTime.Parse(item.Attributes["StartDate"].Value);
+                DateTime finishDate = DateTime.Parse(item.Attributes["FinishDate"].Value);
+                NodeInfo targetNode = CreateNode(css, newNodeName, parentPath, startDate, finishDate);
                 if (item.HasChildNodes)
                 {
                     CreateNodes(item.ChildNodes[0].ChildNodes, css, targetNode);
@@ -88,6 +90,28 @@ namespace VstsSyncMigrator.Engine
             }
             return node;
         }
-    
+
+        private NodeInfo CreateNode(ICommonStructureService css, string name, NodeInfo parent, DateTime startDate, DateTime finishDate)
+        {
+            string nodePath = string.Format(@"{0}\{1}", parent.Path, name);
+            NodeInfo node = null;
+            Trace.Write(string.Format("--CreateNode: {0}, start date: {1}, finish date: {2}", nodePath, startDate, finishDate));
+            try
+            {
+                node = css.GetNodeFromPath(nodePath);
+                Trace.Write("...found");
+            }
+            catch (CommonStructureSubsystemException ex)
+            {
+                Telemetry.Current.TrackException(ex);
+                Trace.Write("...missing");
+                string newPathUri = css.CreateNode(name, parent.Uri);
+                Trace.Write("...created");
+                node = css.GetNode(newPathUri);               
+                ((ICommonStructureService4)css).SetIterationDates(node.Uri, startDate, finishDate);
+                Trace.Write("...dates assigned");
+            }
+            return node;
+        }
     }
 }
