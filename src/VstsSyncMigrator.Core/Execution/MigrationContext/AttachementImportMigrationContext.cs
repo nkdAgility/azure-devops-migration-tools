@@ -66,6 +66,7 @@ namespace VstsSyncMigrator.Engine
                     else
                     {
                         Trace.WriteLine(string.Format("{0} of {1} - Skipping {2} to {3}", current, files.Count, fileName, 0));
+                        skipped++;
                     }
                 } catch (FileAttachmentException ex)
                 {
