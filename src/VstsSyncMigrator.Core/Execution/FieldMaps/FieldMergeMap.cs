@@ -17,6 +17,11 @@ namespace VstsSyncMigrator.Engine.ComponentContext
         public FieldMergeMap(FieldMergeMapConfig config)
         {
             this.config = config;
+
+            if(string.IsNullOrWhiteSpace(this.config.doneMatch))
+            {
+                throw new ArgumentNullException($"The {nameof(config.doneMatch)} configuration parameter cannot be null or empty.");
+            }
         }
 
         internal override void InternalExecute(WorkItem source, WorkItem target)
@@ -25,11 +30,11 @@ namespace VstsSyncMigrator.Engine.ComponentContext
             {
                 if (source.Fields[config.sourceField1].Value != null)
                 {
-                    if (target.Fields[config.targetField].Value.ToString().Contains("##DONE##") || target.Fields[config.targetField].Value.ToString().Contains(config.doneMatch))
+                    if (target.Fields[config.targetField].Value.ToString().Contains(config.doneMatch))
                     {
                         Trace.WriteLine(string.Format("  [SKIP] field already merged {0}:{1}+{2} to {3}:{4}", source.Id, config.sourceField1, config.sourceField2, target.Id, config.targetField));
                     } else { 
-                        target.Fields[config.targetField].Value = string.Format(config.formatExpression, source.Fields[config.sourceField1].Value.ToString(), source.Fields[config.sourceField2].Value.ToString()) + "##DONE##";
+                        target.Fields[config.targetField].Value = string.Format(config.formatExpression, source.Fields[config.sourceField1].Value.ToString(), source.Fields[config.sourceField2].Value.ToString()) + config.doneMatch;
                         Trace.WriteLine(string.Format("  [UPDATE] field merged {0}:{1}+{2} to {3}:{4}", source.Id, config.sourceField1, config.sourceField2, target.Id, config.targetField));
                     }
                 }
