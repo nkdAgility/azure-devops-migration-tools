@@ -37,6 +37,7 @@ namespace VstsSyncMigrator.Engine
             WorkItem targetWI = null;
             int current = files.Count;
             int failures = 0;
+            int skipped = 0;
             foreach (string file in files)
             {
                 string fileName = System.IO.Path.GetFileName(file);
@@ -47,15 +48,25 @@ namespace VstsSyncMigrator.Engine
                     if (targetWI != null)
                     {
                         Trace.WriteLine(string.Format("{0} of {1} - Import {2} to {3}", current, files.Count, fileName, targetWI.Id));
-                        Attachment a = new Attachment(file);
-                        targetWI.Attachments.Add(a);
-
-                        targetWI.Save();
+                        var attachments = targetWI.Attachments.Cast<Attachment>();
+                        var attachment = attachments.Where(a => a.Name == fileName).FirstOrDefault();
+                        if (attachment == null)
+                        {
+                            Attachment a = new Attachment(file);
+                            targetWI.Attachments.Add(a);
+                            targetWI.Save();
+                        }
+                        else
+                        {
+                            Trace.WriteLine(string.Format(" [SKIP] WorkItem {0} already contains attachment {1}", targetWI.Id, fileName));
+                            skipped++;
+                        }
                         System.IO.File.Delete(file);
                     }
                     else
                     {
                         Trace.WriteLine(string.Format("{0} of {1} - Skipping {2} to {3}", current, files.Count, fileName, 0));
+                        skipped++;
                     }
                 } catch (FileAttachmentException ex)
                 {
@@ -67,7 +78,7 @@ namespace VstsSyncMigrator.Engine
             }
             //////////////////////////////////////////////////
             stopwatch.Stop();
-            Console.WriteLine(@"IMPORT DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds - {1} Files imported, {2} Failures", stopwatch.Elapsed, (files.Count- failures), failures);
+            Console.WriteLine(@"IMPORT DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds - {1} Files imported, {2} Failures, {3} Skipped", stopwatch.Elapsed, (files.Count- failures), failures, skipped);
         }
 
     }
