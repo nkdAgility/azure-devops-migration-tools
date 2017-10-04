@@ -80,6 +80,8 @@ namespace VstsSyncMigrator.Engine
 
             int current = sourceWIS.Count;
             int count = 0;
+            int failures = 0;
+            int imported = 0;
             long elapsedms = 0;
             foreach (WorkItem sourceWI in sourceWIS)
             {
@@ -127,10 +129,12 @@ namespace VstsSyncMigrator.Engine
                             }
                             sourceWI.Save();
                             Trace.WriteLine(string.Format("...and Source Updated {0}", sourceWI.Id), this.Name);
+                            imported++;
                         }
                         catch (Exception ex)
                         {
                             Trace.WriteLine("...FAILED to Save", this.Name);
+                            failures++;
                             foreach (Field f in newwit.Fields)
                             {
                                 Trace.WriteLine(string.Format("{0} | {1}", f.ReferenceName, f.Value), this.Name);
@@ -160,7 +164,7 @@ namespace VstsSyncMigrator.Engine
             }
             //////////////////////////////////////////////////
             stopwatch.Stop();
-            Console.WriteLine(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds", stopwatch.Elapsed);
+            Trace.WriteLine(string.Format(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds - {1} Items, {2} Imported, {3} Failures", stopwatch.Elapsed, sourceWIS.Count, imported, failures), this.Name);
         }
 
 
