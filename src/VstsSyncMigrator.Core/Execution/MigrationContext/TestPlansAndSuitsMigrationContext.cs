@@ -417,7 +417,7 @@ namespace VstsSyncMigrator.Engine
 
         private ITestPlan FindTestPlan(TestManagementContext tmc, string name)
         {
-            return (from p in tmc.Project.TestPlans.Query("Select * From TestPlan") where p.Name == name select p).SingleOrDefault();
+            return (from p in tmc.Project.TestPlans.Query("Select * From TestPlan") where p.Name == name select p).FirstOrDefault();
         }
     }
 }
