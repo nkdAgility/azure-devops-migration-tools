@@ -82,6 +82,7 @@ namespace VstsSyncMigrator.Engine
             int count = 0;
             int failures = 0;
             int imported = 0;
+            int skipped = 0;
             long elapsedms = 0;
             foreach (WorkItem sourceWI in sourceWIS)
             {
@@ -146,7 +147,7 @@ namespace VstsSyncMigrator.Engine
                 else
                 {
                     Console.WriteLine("...Exists");
-
+                    skipped++;
                     //  sourceWI.Open();
                     //  sourceWI.SyncToLatest();
                     //  sourceWI.Fields["TfsMigrationTool.ReflectedWorkItemId"].Value = destWIFound[0].Id;
@@ -164,7 +165,7 @@ namespace VstsSyncMigrator.Engine
             }
             //////////////////////////////////////////////////
             stopwatch.Stop();
-            Trace.WriteLine(string.Format(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds - {1} Items, {2} Imported, {3} Failures", stopwatch.Elapsed, sourceWIS.Count, imported, failures), this.Name);
+            Trace.WriteLine(string.Format(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds - {1} Items, {2} Imported, {3} Skipped, {4} Failures", stopwatch.Elapsed, sourceWIS.Count, imported, skipped, failures), this.Name);
         }
 
 
