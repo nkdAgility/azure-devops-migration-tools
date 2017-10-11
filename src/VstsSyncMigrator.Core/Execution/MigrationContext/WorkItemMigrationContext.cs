@@ -112,6 +112,7 @@ namespace VstsSyncMigrator.Engine
                     else
                     {
                         Trace.WriteLine("...not supported", this.Name);
+                        skipped++;
                     }
 
                     if (newwit != null)
@@ -146,7 +147,7 @@ namespace VstsSyncMigrator.Engine
                 }
                 else
                 {
-                    Console.WriteLine("...Exists");
+                    Trace.WriteLine("...Exists", this.Name);
                     skipped++;
                     //  sourceWI.Open();
                     //  sourceWI.SyncToLatest();
