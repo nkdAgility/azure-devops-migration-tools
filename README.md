@@ -8,6 +8,7 @@ The VSTS Sync Migration tools allow you to bulk edit and migrate data between Te
 | GITHUB      | ![Build on VSTS](https://nkdagility.visualstudio.com/_apis/public/build/definitions/1b52ce63-eccc-41c8-88f9-ae6ebeefdc63/60/badge)     | ![Build on VSTS](https://nkdagility.visualstudio.com/_apis/public/build/definitions/1b52ce63-eccc-41c8-88f9-ae6ebeefdc63/59/badge)      |
 
 
+
 ||Stable|Pre-release|
 |:--:|:--:|:--:|
 |Docs|[![Documentation Status](https://readthedocs.org/projects/vsts-bulk-editor/badge/?version=stable)](http://vsts-bulk-editor.readthedocs.org/en/stable/)|[![Documentation Status](https://readthedocs.org/projects/vsts-bulk-editor/badge/?version=latest)](http://vsts-bulk-editor.readthedocs.org/en/latest/)|
