@@ -64,6 +64,7 @@ namespace VstsSyncMigrator.Engine
                     Trace.WriteLine("    Plan missing... creating", Name);
                     targetPlan = CreateNewTestPlanFromSource(sourcePlan, newPlanName);
                     targetPlan.Save();
+                    AssignReflectedWorkItemId(sourcePlan, targetPlan);
                 }
                 else
                 {
@@ -78,6 +79,14 @@ namespace VstsSyncMigrator.Engine
                     ProcessChildTestCases(sourcePlan.RootSuite, targetPlan.RootSuite, targetPlan);
                 }
             }
+        }
+
+        private void AssignReflectedWorkItemId(ITestPlan sourcePlan, ITestPlan targetPlan)
+        {
+            var sourceWI = sourceWitStore.Store.GetWorkItem(sourcePlan.Id);
+            var targetWI = targetWitStore.Store.GetWorkItem(targetPlan.Id);
+            targetWI.Fields[me.ReflectedWorkItemIdFieldName].Value = sourceWitStore.CreateReflectedWorkItemId(sourceWI);
+            targetWI.Save();
         }
 
         private bool CanSkipElementBecauseOfTags(int workItemId)
@@ -400,6 +409,11 @@ namespace VstsSyncMigrator.Engine
             targetPlan.Name = newPlanName;
             targetPlan.StartDate = sourcePlan.StartDate;
             targetPlan.EndDate = sourcePlan.EndDate;
+            TeamFoundationIdentity user = ims2.ReadIdentity(IdentitySearchFactor.DisplayName, sourcePlan.OwnerName, MembershipQuery.Direct, ReadIdentityOptions.IncludeReadFromSource);
+            if (user != null)
+            {
+                targetPlan.Owner = user;
+            }
             if (config.PrefixProjectToNodes)
             {
                 targetPlan.AreaPath = string.Format(@"{0}\{1}", engine.Target.Name, sourcePlan.AreaPath);
@@ -412,6 +426,7 @@ namespace VstsSyncMigrator.Engine
                 targetPlan.Iteration = regex.Replace(sourcePlan.Iteration, engine.Target.Name, 1);
             }
             targetPlan.ManualTestSettingsId = 0;
+
             return targetPlan;
         }
 
