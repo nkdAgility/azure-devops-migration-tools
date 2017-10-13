@@ -64,7 +64,7 @@ namespace VstsSyncMigrator.Engine
                     Trace.WriteLine("    Plan missing... creating", Name);
                     targetPlan = CreateNewTestPlanFromSource(sourcePlan, newPlanName);
                     targetPlan.Save();
-                    AssignReflectedWorkItemId(sourcePlan, targetPlan);
+                    AssignReflectedWorkItemId(sourcePlan.Id, targetPlan.Id);
                 }
                 else
                 {
@@ -81,10 +81,10 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        private void AssignReflectedWorkItemId(ITestPlan sourcePlan, ITestPlan targetPlan)
+        private void AssignReflectedWorkItemId(int sourceWIId, int targetWIId)
         {
-            var sourceWI = sourceWitStore.Store.GetWorkItem(sourcePlan.Id);
-            var targetWI = targetWitStore.Store.GetWorkItem(targetPlan.Id);
+            var sourceWI = sourceWitStore.Store.GetWorkItem(sourceWIId);
+            var targetWI = targetWitStore.Store.GetWorkItem(targetWIId);
             targetWI.Fields[me.ReflectedWorkItemIdFieldName].Value = sourceWitStore.CreateReflectedWorkItemId(sourceWI);
             targetWI.Save();
         }
@@ -163,9 +163,12 @@ namespace VstsSyncMigrator.Engine
                     //break;
                 }
                 if (targetSuitChild == null) { return; }
-                // Add to tareget and Save
+                // Add to target and Save
                 ApplyConfigurations(sourceSuit.TestSuiteEntry, targetSuitChild.TestSuiteEntry);
-                SaveNewTestSuitToPlan(targetPlan, (IStaticTestSuite)targetParent, targetSuitChild);
+                if (targetSuitChild.Plan == null)
+                {
+                    SaveNewTestSuitToPlan(targetPlan, (IStaticTestSuite)targetParent, targetSuitChild);
+                }
             }
             else
             {
