@@ -65,6 +65,9 @@ namespace VstsSyncMigrator.Engine
                     targetPlan = CreateNewTestPlanFromSource(sourcePlan, newPlanName);
                     targetPlan.Save();
                     AssignReflectedWorkItemId(sourcePlan.Id, targetPlan.Id);
+                    FixAssignedToValue(sourcePlan.Id, targetPlan.Id);
+                    AssignReflectedWorkItemId(sourcePlan.RootSuite.Id, targetPlan.RootSuite.Id);
+                    FixAssignedToValue(sourcePlan.RootSuite.Id, targetPlan.RootSuite.Id);
                 }
                 else
                 {
@@ -169,6 +172,8 @@ namespace VstsSyncMigrator.Engine
                 {
                     SaveNewTestSuitToPlan(targetPlan, (IStaticTestSuite)targetParent, targetSuitChild);
                 }
+                AssignReflectedWorkItemId(sourceSuit.Id, targetSuitChild.Id);
+                FixAssignedToValue(sourceSuit.Id, targetSuitChild.Id);
             }
             else
             {
@@ -192,6 +197,14 @@ namespace VstsSyncMigrator.Engine
             }
             // Add Test Cases
             ProcessChildTestCases(sourceSuit, targetSuitChild, targetPlan);
+        }
+
+        private void FixAssignedToValue(int sourceWIId, int targetWIId)
+        {
+            var sourceWI = sourceWitStore.Store.GetWorkItem(sourceWIId);
+            var targetWI = targetWitStore.Store.GetWorkItem(targetWIId);
+            targetWI.Fields["System.AssignedTo"].Value = sourceWI.Fields["System.AssignedTo"].Value;
+            targetWI.Save();
         }
 
         private void ProcessChildTestCases(ITestSuiteBase source, ITestSuiteBase target, ITestPlan targetPlan)
@@ -412,11 +425,7 @@ namespace VstsSyncMigrator.Engine
             targetPlan.Name = newPlanName;
             targetPlan.StartDate = sourcePlan.StartDate;
             targetPlan.EndDate = sourcePlan.EndDate;
-            TeamFoundationIdentity user = ims2.ReadIdentity(IdentitySearchFactor.DisplayName, sourcePlan.OwnerName, MembershipQuery.Direct, ReadIdentityOptions.IncludeReadFromSource);
-            if (user != null)
-            {
-                targetPlan.Owner = user;
-            }
+            targetPlan.Description = sourcePlan.Description;
             if (config.PrefixProjectToNodes)
             {
                 targetPlan.AreaPath = string.Format(@"{0}\{1}", engine.Target.Name, sourcePlan.AreaPath);
