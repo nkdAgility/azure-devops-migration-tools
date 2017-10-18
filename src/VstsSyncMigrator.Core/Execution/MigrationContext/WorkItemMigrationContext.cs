@@ -35,7 +35,7 @@ namespace VstsSyncMigrator.Engine
 
         private void PopulateIgnoreList()
         {
-           _ignore = new List<string>();
+            _ignore = new List<string>();
             //ignore.Add("System.CreatedDate");
             //ignore.Add("System.CreatedBy");
             _ignore.Add("System.Rev");
@@ -72,7 +72,7 @@ namespace VstsSyncMigrator.Engine
             tfsqc.AddParameter("TeamProject", me.Source.Name);
             tfsqc.Query = string.Format(@"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY [System.ChangedDate] desc", _config.QueryBit);
             WorkItemCollection sourceWIS = tfsqc.Execute();
-            Trace.WriteLine(string.Format("Migrate {0} work items?", sourceWIS.Count),this.Name);
+            Trace.WriteLine(string.Format("Migrate {0} work items?", sourceWIS.Count), this.Name);
             //////////////////////////////////////////////////
             WorkItemStoreContext targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
             Project destProject = targetStore.GetProject();
@@ -97,7 +97,7 @@ namespace VstsSyncMigrator.Engine
                     // Deside on WIT
                     if (me.WorkItemTypeDefinitions.ContainsKey(sourceWI.Type.Name))
                     {
-                        newwit = CreateAndPopulateWorkItem(_config,sourceWI, destProject, me.WorkItemTypeDefinitions[sourceWI.Type.Name].Map(sourceWI));
+                        newwit = CreateAndPopulateWorkItem(_config, sourceWI, destProject, me.WorkItemTypeDefinitions[sourceWI.Type.Name].Map(sourceWI));
                         if (newwit.Fields.Contains(me.ReflectedWorkItemIdFieldName))
                         {
                             newwit.Fields[me.ReflectedWorkItemIdFieldName].Value = sourceStore.CreateReflectedWorkItemId(sourceWI);
@@ -175,13 +175,13 @@ namespace VstsSyncMigrator.Engine
             return sourceWI.Title.ToLower().StartsWith("epic") || sourceWI.Title.ToLower().StartsWith("theme");
         }
 
-        private WorkItem CreateAndPopulateWorkItem(WorkItemMigrationConfig config , WorkItem oldWi, Project destProject, String destType)
+        private WorkItem CreateAndPopulateWorkItem(WorkItemMigrationConfig config, WorkItem oldWi, Project destProject, String destType)
         {
             Stopwatch fieldMappingTimer = new Stopwatch();
 
             bool except = false;
             Trace.Write("... Building", "WorkItemMigrationContext");
-          
+
             var NewWorkItemstartTime = DateTime.UtcNow;
             Stopwatch NewWorkItemTimer = new Stopwatch();
             WorkItem newwit = destProject.WorkItemTypes[destType].NewWorkItem();
@@ -191,7 +191,7 @@ namespace VstsSyncMigrator.Engine
             newwit.Title = oldWi.Title;
             newwit.State = oldWi.State;
             newwit.Reason = oldWi.Reason;
-            
+
             foreach (Field f in oldWi.Fields)
             {
                 if (newwit.Fields.Contains(f.ReferenceName) && !_ignore.Contains(f.ReferenceName) && newwit.Fields[f.ReferenceName].IsEditable)
@@ -211,7 +211,7 @@ namespace VstsSyncMigrator.Engine
                 newwit.AreaPath = regex.Replace(oldWi.AreaPath, newwit.Project.Name, 1);
                 newwit.IterationPath = regex.Replace(oldWi.IterationPath, newwit.Project.Name, 1);
             }
-            
+
             newwit.Fields["System.ChangedDate"].Value = oldWi.Fields["System.ChangedDate"].Value;
 
 
@@ -256,7 +256,7 @@ namespace VstsSyncMigrator.Engine
                 Trace.WriteLine("...buildComplete", "WorkItemMigrationContext");
             }
             fieldMappingTimer.Stop();
-            Telemetry.Current.TrackMetric( "FieldMappingTime", fieldMappingTimer.ElapsedMilliseconds);
+            Telemetry.Current.TrackMetric("FieldMappingTime", fieldMappingTimer.ElapsedMilliseconds);
             Trace.WriteLine(string.Format("FieldMapOnNewWorkItem: {0} - {1}", NewWorkItemstartTime, fieldMappingTimer.Elapsed.ToString("c")), "WorkItemMigrationContext");
             return newwit;
         }
