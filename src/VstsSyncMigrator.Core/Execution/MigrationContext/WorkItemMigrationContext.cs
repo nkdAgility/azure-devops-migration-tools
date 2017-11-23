@@ -242,7 +242,7 @@ namespace VstsSyncMigrator.Engine
             StringBuilder history = new StringBuilder();
             BuildCommentTable(oldWi, history);
             BuildFieldTable(oldWi, history);
-            history.Append("<p>Migrated by <a href='http://nkdagility.com'>naked Agility Limited's</a> open source <a href='https://github.com/nkdAgility/VstsMigrator'>VSTS/TFS Migrator</a>.</p>");
+            history.Append("<p>Migrated by <a href='https://github.com/nkdAgility/VstsMigrator'>VSTS/TFS Sync Migration Tool</a> open source.</p>");
             newwit.History = history.ToString();
 
             if (except)
