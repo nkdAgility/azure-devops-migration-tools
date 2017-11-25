@@ -61,13 +61,13 @@ namespace VstsSyncMigrator.Engine
                             Trace.WriteLine(string.Format(" [SKIP] WorkItem {0} already contains attachment {1}", targetWI.Id, fileName));
                             skipped++;
                         }
-                        System.IO.File.Delete(file);
                     }
                     else
                     {
                         Trace.WriteLine(string.Format("{0} of {1} - Skipping {2} to {3}", current, files.Count, fileName, 0));
                         skipped++;
                     }
+                    System.IO.File.Delete(file);
                 } catch (FileAttachmentException ex)
                 {
                     // Probably due to attachment being over size limit
