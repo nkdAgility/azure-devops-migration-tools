@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using VstsSyncMigrator.Engine.Configuration.Processing;
+using Microsoft.TeamFoundation.Common;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -437,8 +438,21 @@ namespace VstsSyncMigrator.Engine
                 targetPlan.AreaPath = regex.Replace(sourcePlan.AreaPath, engine.Target.Name, 1);
                 targetPlan.Iteration = regex.Replace(sourcePlan.Iteration, engine.Target.Name, 1);
             }
-            targetPlan.ManualTestSettingsId = 0;
 
+            // Remove testsettings reference because VSTS Sync doesnt support migrating these artifacts
+            if (targetPlan.ManualTestSettingsId != 0 && targetPlan.ManualTestSettingsId != 0)
+            {
+                targetPlan.ManualTestSettingsId = 0;
+                targetPlan.AutomatedTestSettingsId = 0;
+                Trace.WriteLine("Ignoring migration of Testsettings. VSTS Sync Migration Tools dont support migration of this artifact type.");
+            }
+
+            // Remove reference to build uri because VSTS Sync doesnt support migrating these artifacts
+            if (targetPlan.BuildUri != null)
+            {
+                targetPlan.BuildUri = null;
+                Trace.WriteLine(string.Format("Ignoring migration of assigned Build artifact {0}. VSTS Sync Migration Tools dont support migration of this artifact type.", sourcePlan.BuildUri));
+            }
             return targetPlan;
         }
 
