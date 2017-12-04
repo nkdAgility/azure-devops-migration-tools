@@ -9,6 +9,7 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using VstsSyncMigrator.Engine.Configuration.Processing;
 using Microsoft.TeamFoundation.Common;
+using Microsoft.TeamFoundation.TestImpact.Client;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -110,7 +111,7 @@ namespace VstsSyncMigrator.Engine
                 return;
 
             Trace.WriteLine($"    Processing {sourceSuit.TestSuiteType} : {sourceSuit.Id} - {sourceSuit.Title} ", Name);
-            var targetSuitChild = FindSuiteEntry((IStaticTestSuite) targetParent, sourceSuit.Title);
+            var targetSuitChild = FindSuiteEntry((IStaticTestSuite)targetParent, sourceSuit.Title);
 
             if (targetSuitChild == null)
             {
@@ -164,7 +165,7 @@ namespace VstsSyncMigrator.Engine
                         break;
                     default:
                         throw new NotImplementedException();
-                    //break;
+                        //break;
                 }
                 if (targetSuitChild == null) { return; }
                 // Add to target and Save
@@ -189,8 +190,8 @@ namespace VstsSyncMigrator.Engine
             // Recurse if Static Suite
             if (sourceSuit.TestSuiteType == TestSuiteType.StaticTestSuite && HasChildSuits(sourceSuit))
             {
-                Trace.WriteLine($"            Suite has {((IStaticTestSuite) sourceSuit).Entries.Count} children", Name);
-                foreach (var sourceSuitChild in ((IStaticTestSuite) sourceSuit).SubSuites)
+                Trace.WriteLine($"            Suite has {((IStaticTestSuite)sourceSuit).Entries.Count} children", Name);
+                foreach (var sourceSuitChild in ((IStaticTestSuite)sourceSuit).SubSuites)
                 {
                     ProcessStaticSuite(sourceSuitChild, targetSuitChild, targetPlan);
 
@@ -285,38 +286,38 @@ namespace VstsSyncMigrator.Engine
         {
             int SourceConfigCount = sourceEntry.Configurations != null ? sourceEntry.Configurations.Count : 0;
             int TargetConfigCount = targetEntry.Configurations != null ? targetEntry.Configurations.Count : 0;
-            
-                if (SourceConfigCount != TargetConfigCount)
-                {
-                    Trace.WriteLine(string.Format("   CONFIG MNISSMATCH FOUND --- FIX AATTEMPTING"), "TestPlansAndSuites");
-                    if (targetEntry.Configurations != null)
-                    {
-                        targetEntry.Configurations.Clear();
-                    }
-                    IList<IdAndName> targetConfigs = new List<IdAndName>();
-                    foreach (var config in sourceEntry.Configurations)
-                    {
-                        var targetFound = (from tc in targetTestConfigs
-                                           where tc.Name == config.Name
-                                           select tc).SingleOrDefault();
-                        if (!(targetFound == null))
-                        {
 
-                            targetConfigs.Add(new IdAndName(targetFound.Id, targetFound.Name));
-                        }
-                    }
-                    try
+            if (SourceConfigCount != TargetConfigCount)
+            {
+                Trace.WriteLine(string.Format("   CONFIG MNISSMATCH FOUND --- FIX AATTEMPTING"), "TestPlansAndSuites");
+                if (targetEntry.Configurations != null)
+                {
+                    targetEntry.Configurations.Clear();
+                }
+                IList<IdAndName> targetConfigs = new List<IdAndName>();
+                foreach (var config in sourceEntry.Configurations)
+                {
+                    var targetFound = (from tc in targetTestConfigs
+                                       where tc.Name == config.Name
+                                       select tc).SingleOrDefault();
+                    if (!(targetFound == null))
                     {
-                        targetEntry.SetConfigurations(targetConfigs);
+
+                        targetConfigs.Add(new IdAndName(targetFound.Id, targetFound.Name));
                     }
-                    catch (Exception ex) 
-                    {
+                }
+                try
+                {
+                    targetEntry.SetConfigurations(targetConfigs);
+                }
+                catch (Exception ex)
+                {
                     // SOmetimes this will error out for no reason.
                     Telemetry.Current.TrackException(ex);
-                    }
-
                 }
-            
+
+            }
+
         }
 
         private bool HasChildTestCases(ITestSuiteBase sourceSuit)
@@ -333,7 +334,8 @@ namespace VstsSyncMigrator.Engine
                 ApplyConfigurations(source, targetSuitChild);
             }
             targetSuitChild.TestSuiteEntry.Title = source.TestSuiteEntry.Title;
-            targetSuitChild.Query = ((IDynamicTestSuite)source).Query;
+            ApplyTestSuiteQuery(source, targetSuitChild);
+
             return targetSuitChild;
         }
 
@@ -418,7 +420,7 @@ namespace VstsSyncMigrator.Engine
             return hasChildren;
         }
 
-        private ITestPlan CreateNewTestPlanFromSource(ITestPlan sourcePlan,  string newPlanName)
+        private ITestPlan CreateNewTestPlanFromSource(ITestPlan sourcePlan, string newPlanName)
         {
             ITestPlan targetPlan;
             targetPlan = targetTestStore.CreateTestPlan();
@@ -459,6 +461,26 @@ namespace VstsSyncMigrator.Engine
         private ITestPlan FindTestPlan(TestManagementContext tmc, string name)
         {
             return (from p in tmc.Project.TestPlans.Query("Select * From TestPlan") where p.Name == name select p).SingleOrDefault();
+        }
+
+        private static void ApplyTestSuiteQuery(ITestSuiteBase source, IDynamicTestSuite targetSuitChild)
+        {
+            targetSuitChild.Query = ((IDynamicTestSuite)source).Query;
+
+            // Replacing old projectname in queries with new projectname
+            if (!source.Plan.Project.TeamProjectName.Equals(targetSuitChild.Plan.Project.TeamProjectName))
+            {
+                Trace.WriteLine("Team Project dont match. We need to fix the query in dynamic test suite.");
+                Trace.WriteLine(string.Format("Replacing old project name {1} in query {0} with new project name {2}",
+                    targetSuitChild.Query.QueryText,
+                    source.Plan.Project.TeamProjectName,
+                    targetSuitChild.Plan.Project.TeamProjectName
+                ));
+
+                targetSuitChild.Query = targetSuitChild.Project.CreateTestQuery(
+                    targetSuitChild.Query.QueryText.Replace(source.Plan.Project.TeamProjectName,
+                        targetSuitChild.Plan.Project.TeamProjectName));
+            }
         }
     }
 }
