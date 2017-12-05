@@ -334,7 +334,7 @@ namespace VstsSyncMigrator.Engine
                 ApplyConfigurations(source, targetSuitChild);
             }
             targetSuitChild.TestSuiteEntry.Title = source.TestSuiteEntry.Title;
-            ApplyTestSuiteQuery(source, targetSuitChild);
+            ApplyTestSuiteQuery(source, targetSuitChild, targetTestStore );
 
             return targetSuitChild;
         }
@@ -463,24 +463,25 @@ namespace VstsSyncMigrator.Engine
             return (from p in tmc.Project.TestPlans.Query("Select * From TestPlan") where p.Name == name select p).SingleOrDefault();
         }
 
-        private static void ApplyTestSuiteQuery(ITestSuiteBase source, IDynamicTestSuite targetSuitChild)
+        private static void ApplyTestSuiteQuery(ITestSuiteBase source, IDynamicTestSuite targetSuitChild, TestManagementContext targetTestStore)
         {
             targetSuitChild.Query = ((IDynamicTestSuite)source).Query;
 
             // Replacing old projectname in queries with new projectname
-            if (!source.Plan.Project.TeamProjectName.Equals(targetSuitChild.Plan.Project.TeamProjectName))
+            // The target team project name is only available via target test store because the dyn. testsuite isnt saved at this point in time
+            if (!source.Plan.Project.TeamProjectName.Equals(targetTestStore.Project.TeamProjectName))
             {
-                Trace.WriteLine(string.Format("Team Project names dont match. We need to fix the query in dynamic test suite {0} - {1}.", source.Id), source.Title);
-                Trace.WriteLine(string.Format("Replacing old project name {1} in query {0} with new project name {2}",
+                Trace.WriteLine(string.Format(@"Team Project names dont match. We need to fix the query in dynamic test suite {0} - {1}.", source.Id, source.Title));
+                Trace.WriteLine(string.Format(@"Replacing old project name {1} in query {0} with new team project name {2}",
                     targetSuitChild.Query.QueryText,
                     source.Plan.Project.TeamProjectName,
-                    targetSuitChild.Plan.Project.TeamProjectName
+                    targetTestStore.Project.TeamProjectName
                 ));
 
                 targetSuitChild.Query = targetSuitChild.Project.CreateTestQuery(
                     targetSuitChild.Query.QueryText.Replace(
-                        string.Format("\'{0}\\", source.Plan.Project.TeamProjectName),
-                        string.Format("\'{0}\\", targetSuitChild.Plan.Project.TeamProjectName)
+                        string.Format(@"'{0}\", source.Plan.Project.TeamProjectName),
+                        string.Format(@"'{0}\", targetTestStore.Project.TeamProjectName)
                         ));
 
                 Trace.WriteLine(string.Format("New query is now {0}", targetSuitChild.Query.QueryText));
