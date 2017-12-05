@@ -470,7 +470,7 @@ namespace VstsSyncMigrator.Engine
             // Replacing old projectname in queries with new projectname
             if (!source.Plan.Project.TeamProjectName.Equals(targetSuitChild.Plan.Project.TeamProjectName))
             {
-                Trace.WriteLine("Team Project dont match. We need to fix the query in dynamic test suite.");
+                Trace.WriteLine(string.Format("Team Project names dont match. We need to fix the query in dynamic test suite {0} - {1}.", source.Id), source.Title);
                 Trace.WriteLine(string.Format("Replacing old project name {1} in query {0} with new project name {2}",
                     targetSuitChild.Query.QueryText,
                     source.Plan.Project.TeamProjectName,
@@ -478,8 +478,12 @@ namespace VstsSyncMigrator.Engine
                 ));
 
                 targetSuitChild.Query = targetSuitChild.Project.CreateTestQuery(
-                    targetSuitChild.Query.QueryText.Replace(source.Plan.Project.TeamProjectName,
-                        targetSuitChild.Plan.Project.TeamProjectName));
+                    targetSuitChild.Query.QueryText.Replace(
+                        string.Format("\'{0}\\", source.Plan.Project.TeamProjectName),
+                        string.Format("\'{0}\\", targetSuitChild.Plan.Project.TeamProjectName)
+                        ));
+
+                Trace.WriteLine(string.Format("New query is now {0}", targetSuitChild.Query.QueryText));
             }
         }
     }
