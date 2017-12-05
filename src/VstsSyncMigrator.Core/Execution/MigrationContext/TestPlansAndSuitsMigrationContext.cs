@@ -478,11 +478,21 @@ namespace VstsSyncMigrator.Engine
                     targetTestStore.Project.TeamProjectName
                 ));
 
+                // it is possible that user has used project name in query values. we try only to change iteration + area path values
+                // A child level is selected in area / iteration path
                 targetSuitChild.Query = targetSuitChild.Project.CreateTestQuery(
                     targetSuitChild.Query.QueryText.Replace(
                         string.Format(@"'{0}\", source.Plan.Project.TeamProjectName),
                         string.Format(@"'{0}\", targetTestStore.Project.TeamProjectName)
                         ));
+
+                // Only root level is selected in area / iteration path
+                targetSuitChild.Query = targetSuitChild.Project.CreateTestQuery(
+                    targetSuitChild.Query.QueryText.Replace(
+                        string.Format(@"'{0}'", source.Plan.Project.TeamProjectName),
+                        string.Format(@"'{0}'", targetTestStore.Project.TeamProjectName)
+                    ));
+
 
                 Trace.WriteLine(string.Format("New query is now {0}", targetSuitChild.Query.QueryText));
             }
