@@ -334,7 +334,7 @@ namespace VstsSyncMigrator.Engine
                 ApplyConfigurations(source, targetSuitChild);
             }
             targetSuitChild.TestSuiteEntry.Title = source.TestSuiteEntry.Title;
-            ApplyTestSuiteQuery(source, targetSuitChild, targetTestStore );
+            ApplyTestSuiteQuery(source, targetSuitChild, targetTestStore);
 
             return targetSuitChild;
         }
@@ -463,7 +463,7 @@ namespace VstsSyncMigrator.Engine
             return (from p in tmc.Project.TestPlans.Query("Select * From TestPlan") where p.Name == name select p).SingleOrDefault();
         }
 
-        private static void ApplyTestSuiteQuery(ITestSuiteBase source, IDynamicTestSuite targetSuitChild, TestManagementContext targetTestStore)
+        private void ApplyTestSuiteQuery(ITestSuiteBase source, IDynamicTestSuite targetSuitChild, TestManagementContext targetTestStore)
         {
             targetSuitChild.Query = ((IDynamicTestSuite)source).Query;
 
@@ -493,8 +493,45 @@ namespace VstsSyncMigrator.Engine
                         string.Format(@"'{0}'", targetTestStore.Project.TeamProjectName)
                     ));
 
+                try
+                {
+                    // Verifying that the query is valid 
+                    targetSuitChild.Query.Execute();
+                }
+                catch (Exception e)
+                {
+                    FixIterationNotFound(e, source, targetSuitChild, targetTestStore);
+                }
+
 
                 Trace.WriteLine(string.Format("New query is now {0}", targetSuitChild.Query.QueryText));
+            }
+        }
+
+        private void FixIterationNotFound(Exception exception, ITestSuiteBase source, IDynamicTestSuite targetSuitChild, TestManagementContext targetTestStore)
+        {
+            if (exception.Message.Contains("The specified iteration path does not exist."))
+            {
+                Regex regEx = new Regex(@"'(.*?)'");
+
+                var missingIterationPath = regEx.Match(exception.Message).Groups[0].Value;
+                missingIterationPath = missingIterationPath.Substring(missingIterationPath.IndexOf(@"\") + 1, missingIterationPath.Length - missingIterationPath.IndexOf(@"\")-2);
+
+                Trace.WriteLine("Found a orphaned iteration path in test suite query.");
+                Trace.WriteLine(string.Format("Invalid iteration path {0}:", missingIterationPath));
+                Trace.WriteLine("Replacing the orphaned iteration path from query with root iteration path. Please fix the query after the migration.");
+
+                targetSuitChild.Query = targetSuitChild.Project.CreateTestQuery(
+                    targetSuitChild.Query.QueryText.Replace(
+                        string.Format(@"'{0}\{1}'", source.Plan.Project.TeamProjectName, missingIterationPath),
+                        string.Format(@"'{0}'", targetTestStore.Project.TeamProjectName)
+                    ));
+
+                targetSuitChild.Query = targetSuitChild.Project.CreateTestQuery(
+                    targetSuitChild.Query.QueryText.Replace(
+                        string.Format(@"'{0}\{1}'", targetTestStore.Project.TeamProjectName, missingIterationPath),
+                        string.Format(@"'{0}'", targetTestStore.Project.TeamProjectName)
+                    ));
             }
         }
     }
