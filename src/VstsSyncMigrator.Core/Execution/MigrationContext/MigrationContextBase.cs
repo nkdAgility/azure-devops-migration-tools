@@ -77,7 +77,7 @@ namespace VstsSyncMigrator.Engine
                         {"MigrationContextTime", executeTimer.ElapsedMilliseconds}
                     });
                 Trace.TraceWarning("  [EXCEPTION] {0}", ex.Message);
-                throw ex;
+                throw;
             }
         }
 

@@ -237,19 +237,13 @@ namespace VstsSyncMigrator.Engine
                             string.Format("  [CREATE-START] Adding Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id));
                         WorkItemLinkTypeEnd linkTypeEnd = targetStore.Store.WorkItemLinkTypes.LinkTypeEnds[rl.LinkTypeEnd.ImmutableName];
                         RelatedLink newRl = new RelatedLink(linkTypeEnd, wiTargetR.Id);
-                        try
-                        {
-                            wiTargetL.Links.Add(newRl);
-                            wiTargetL.Save();
-                            Trace.WriteLine(
-                                string.Format(
-                                    "  [CREATE-SUCCESS] Adding Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} ",
-                                    rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id));
-                        }
-                        catch (Exception ex)
-                        {
-                            throw ex;
-                        }
+
+                        wiTargetL.Links.Add(newRl);
+                        wiTargetL.Save();
+                        Trace.WriteLine(
+                            string.Format(
+                                "  [CREATE-SUCCESS] Adding Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} ",
+                                rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id));
                     }
                     else
                     {

@@ -65,7 +65,7 @@ namespace VstsSyncMigrator.Engine
                             { "QueryTime",queryTimer.ElapsedMilliseconds }
                        });
                 Trace.TraceWarning(string.Format("  [EXCEPTION] {0}", ex.Message));
-                throw ex;
+                throw;
             }
             return wc;
         }

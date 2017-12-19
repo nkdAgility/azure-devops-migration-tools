@@ -40,7 +40,7 @@ namespace VstsSyncMigrator.Engine
                             { "Time",timer.ElapsedMilliseconds }
                        });
                 Trace.TraceWarning(string.Format("  [EXCEPTION] {0}", ex.Message));
-                throw ex;
+                throw;
             }
            
             foundWis = new Dictionary<int, WorkItem>();

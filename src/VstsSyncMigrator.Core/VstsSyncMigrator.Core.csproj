@@ -275,6 +275,7 @@
     <Compile Include="Configuration\FieldMap\FieldValueMapConfig.cs" />
     <Compile Include="Configuration\FieldMap\IFieldMapConfig.cs" />
     <Compile Include="Configuration\JsonCreationConverter.cs" />
+    <Compile Include="Configuration\Processing\HtmlFieldEmbeddedImageMigrationConfig.cs" />
     <Compile Include="Configuration\Processing\WorkItemQueryMigrationConfig.cs" />
     <Compile Include="Configuration\Processing\FixGitCommitLinksConfig.cs" />
     <Compile Include="Configuration\Processing\TeamMigrationConfig.cs" />
@@ -309,6 +310,7 @@
     <Compile Include="Execution\FieldMaps\IFieldMap.cs" />
     <Compile Include="Execution\ComponentContext\TestManagementContext.cs" />
     <Compile Include="Execution\FieldMaps\FieldToTagFieldMap.cs" />
+    <Compile Include="Execution\MigrationContext\HtmlFieldEmbeddedImageMigrationContext.cs" />
     <Compile Include="Execution\MigrationContext\WorkItemRevisionReplayMigrationContext.cs" />
     <Compile Include="Execution\MigrationContext\WorkItemQueryMigrationContext.cs" />
     <Compile Include="Execution\MigrationContext\LinkMigrationContext.cs" />
@@ -349,9 +351,12 @@
     <Compile Include="Telemetry.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="ApplicationInsights.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </None>
     <None Include="packages.config" />
     <None Include="VstsSyncMigrator.Core.nuspec" />

@@ -44,7 +44,7 @@ namespace VstsSyncMigrator.Engine
                 Stopwatch connectionTimer = new Stopwatch();
                 connectionTimer.Start();
                 Trace.WriteLine("Creating TfsTeamProjectCollection Object ");
-                _Collection = new TfsTeamProjectCollection(_CollectionUrl);
+                    _Collection = new TfsTeamProjectCollection(_CollectionUrl);
                 try
                 {
                     Trace.WriteLine(string.Format("Connected to {0} ", _Collection.Uri.ToString()));
@@ -72,7 +72,7 @@ namespace VstsSyncMigrator.Engine
                             { "ConnectionTimer", connectionTimer.ElapsedMilliseconds }
                        });
                     Trace.TraceWarning(string.Format("  [EXCEPTION] {0}", ex.Message));
-                    throw ex;
+                    throw;
                 }
             }            
         }
