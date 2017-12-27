@@ -168,6 +168,13 @@ namespace VstsSyncMigrator.Engine
 
                         PopulateWorkItem(currentRevisionWorkItem, newwit, destType);
                         me.ApplyFieldMappings(currentRevisionWorkItem, newwit);
+
+                        newwit.Fields["System.ChangedBy"].Value =
+                            currentRevisionWorkItem.Revisions[revision.Index].Fields["System.ChangedBy"].Value;
+
+                        newwit.Fields["System.History"].Value =
+                            currentRevisionWorkItem.Revisions[revision.Index].Fields["System.History"].Value;
+
                         var fails = newwit.Validate();
 
                         foreach (Field f in fails)
@@ -176,9 +183,6 @@ namespace VstsSyncMigrator.Engine
                                 $"{current} - Invalid: {currentRevisionWorkItem.Id}-{currentRevisionWorkItem.Type.Name}-{f.ReferenceName}",
                                 Name);
                         }
-
-                        newwit.Fields["System.ChangedBy"].Value = 
-                            currentRevisionWorkItem.Revisions[revision.Index].Fields["System.ChangedBy"].Value;
 
                         newwit.Save();
                         Trace.WriteLine(
