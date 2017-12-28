@@ -76,6 +76,14 @@ namespace VstsSyncMigrator.Engine
          */
         private void FixHtmlAttachmentLinks(WorkItem wi, string oldTfsurl, string newTfsurl)
         {
+            bool wiUpdated = false;
+            string oldTfsurl2;
+            Uri sourceUrl = new Uri(oldTfsurl);
+            if (sourceUrl.Scheme == Uri.UriSchemeHttp)
+                oldTfsurl2 = new UriBuilder("https", sourceUrl.Host + sourceUrl.AbsolutePath).ToString();
+            else
+                oldTfsurl2 = new UriBuilder("http", sourceUrl.Host + sourceUrl.AbsolutePath).ToString();
+
             string regExSearchForImageUrl = "(?<=<img.*src=\")[^\"]*";
 
             foreach (Field field in wi.Fields)
@@ -84,19 +92,17 @@ namespace VstsSyncMigrator.Engine
                 {
                     MatchCollection matches = Regex.Matches((string) field.Value, regExSearchForImageUrl);
 
-                    if (matches.Count > 0)
-                        Trace.WriteLine(String.Format("field {0} has {1} mathes", field.Name, matches.Count));
-
                     string regExSearchFileName = "(?<=FileName=)[^=]*";
                     foreach (Match match in matches)
                     {
                         //todo server aliases....
-                        if (match.Value.Contains(oldTfsurl) || match.Value.Contains("http://server01-tfs15:8080"))
+                        if (match.Value.Contains(oldTfsurl) || match.Value.Contains(oldTfsurl2) || match.Value.Contains("http://server01-tfs15:8080"))
                         {
                             //save image locally and upload as attachment
                             Match newFileNameMatch = Regex.Match(match.Value, regExSearchFileName);
                             if (newFileNameMatch.Success)
                             {
+                                Trace.WriteLine(String.Format("field '{0}' has match: {1}", field.Name, match.Value));
                                 string fullImageFilePath = Path.GetTempPath() + newFileNameMatch.Value;
 
                                 var webClient = new WebClient();
@@ -127,13 +133,17 @@ namespace VstsSyncMigrator.Engine
                                 field.Value = field.Value.ToString().Replace(match.Value, newImageLink);
                                 wi.Attachments.RemoveAt(attachmentIndex);
                                 wi.Save();
-                                updated++;
+                                wiUpdated = true;
                             }
                         }
                     }
                 }
             }
+
+            if (wiUpdated)
+                updated++;
         }
+
     }
 }
 
