@@ -97,8 +97,8 @@ namespace VstsSyncMigrator.Engine
                                 var webClient = new WebClient();
 
                                 // When alternate credentials are given, use basic authentication with the given credentials
-                                if (_config.AlternateCredentialsUsername.Length > 0 &&
-                                    _config.AlternateCredentialsPassword.Length > 0)
+                                if (!String.IsNullOrWhiteSpace(_config.AlternateCredentialsUsername) &&
+                                    !String.IsNullOrWhiteSpace(_config.AlternateCredentialsPassword))
                                 {
                                     string credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes(_config.AlternateCredentialsUsername + ":" + _config.AlternateCredentialsPassword));
                                     webClient.Headers[HttpRequestHeader.Authorization] = string.Format("Basic {0}", credentials);
