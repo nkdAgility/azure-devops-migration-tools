@@ -77,12 +77,8 @@ namespace VstsSyncMigrator.Engine
         private void FixHtmlAttachmentLinks(WorkItem wi, string oldTfsurl, string newTfsurl)
         {
             bool wiUpdated = false;
-            string oldTfsurl2;
-            Uri sourceUrl = new Uri(oldTfsurl);
-            if (sourceUrl.Scheme == Uri.UriSchemeHttp)
-                oldTfsurl2 = new UriBuilder("https", sourceUrl.Host + sourceUrl.AbsolutePath).ToString();
-            else
-                oldTfsurl2 = new UriBuilder("http", sourceUrl.Host + sourceUrl.AbsolutePath).ToString();
+
+            var oldTfsurlOppositeSchema = GetUrlWithOppositeSchema(oldTfsurl);
 
             string regExSearchForImageUrl = "(?<=<img.*src=\")[^\"]*";
 
@@ -96,7 +92,7 @@ namespace VstsSyncMigrator.Engine
                     foreach (Match match in matches)
                     {
                         //todo server aliases....
-                        if (match.Value.Contains(oldTfsurl) || match.Value.Contains(oldTfsurl2) || match.Value.Contains("http://server01-tfs15:8080"))
+                        if (match.Value.Contains(oldTfsurl) || match.Value.Contains(oldTfsurlOppositeSchema) || match.Value.Contains("http://server01-tfs15:8080"))
                         {
                             //save image locally and upload as attachment
                             Match newFileNameMatch = Regex.Match(match.Value, regExSearchFileName);
@@ -144,6 +140,17 @@ namespace VstsSyncMigrator.Engine
                 updated++;
         }
 
+        private string GetUrlWithOppositeSchema(string url)
+        {
+            string oppositeUrl;
+            Uri sourceUrl = new Uri(url);
+            if (sourceUrl.Scheme == Uri.UriSchemeHttp)
+                oppositeUrl = new UriBuilder("https", sourceUrl.Host + sourceUrl.AbsolutePath).ToString();
+            else
+                oppositeUrl = new UriBuilder("http", sourceUrl.Host + sourceUrl.AbsolutePath).ToString();
+
+            return oppositeUrl;
+        }
     }
 }
 
