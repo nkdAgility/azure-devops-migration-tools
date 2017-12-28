@@ -39,7 +39,7 @@ namespace VstsSyncMigrator.Engine
             WorkItemStoreContext targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
             TfsQueryContext tfsqc = new TfsQueryContext(targetStore);
             tfsqc.AddParameter("TeamProject", me.Target.Name);
-            tfsqc.Query = string.Format(@"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject ORDER BY [System.ChangedDate] desc");
+            tfsqc.Query = string.Format(@"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY [System.ChangedDate] desc", _config.QueryBit);
             WorkItemCollection targetWIS = tfsqc.Execute();
             Trace.WriteLine(string.Format("Found {0} work items...", targetWIS.Count), Name);
 

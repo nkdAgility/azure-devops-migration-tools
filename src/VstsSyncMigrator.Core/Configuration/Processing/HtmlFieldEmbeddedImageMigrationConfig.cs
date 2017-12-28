@@ -11,6 +11,7 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
         }
 
         public bool Enabled { get; set; }
+        public string QueryBit { get; set; }
 
         public Type Processor
         {
