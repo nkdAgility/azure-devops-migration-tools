@@ -14,6 +14,12 @@ namespace VstsSyncMigrator.Engine
     {
         readonly HtmlFieldEmbeddedImageMigrationConfig _config;
 
+        int current;
+        int count = 0;
+        int failures = 0;
+        int updated = 0;
+        int skipped = 0;
+
         public override string Name
         {
             get { return "HtmlFieldEmbeddedImageMigrationContext"; }
@@ -37,11 +43,7 @@ namespace VstsSyncMigrator.Engine
             WorkItemCollection targetWIS = tfsqc.Execute();
             Trace.WriteLine(string.Format("Found {0} work items...", targetWIS.Count), Name);
 
-            int current = targetWIS.Count;
-            int count = 0;
-            int failures = 0;
-            int imported = 0;
-            int skipped = 0;
+            current = targetWIS.Count;
 
             foreach (WorkItem targetWi in targetWIS)
             {
@@ -65,7 +67,7 @@ namespace VstsSyncMigrator.Engine
             }
             //////////////////////////////////////////////////
             stopwatch.Stop();
-            Trace.WriteLine(string.Format(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds - {1} Items, {2} Imported, {3} Skipped, {4} Failures", stopwatch.Elapsed, targetWIS.Count, imported, skipped, failures), this.Name);
+            Trace.WriteLine(string.Format(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds - {1} Items, {2} Updated, {3} Skipped, {4} Failures", stopwatch.Elapsed, targetWIS.Count, updated, skipped, failures), this.Name);
         }
 
 
@@ -81,6 +83,9 @@ namespace VstsSyncMigrator.Engine
                 if (field.FieldDefinition.FieldType == FieldType.Html)
                 {
                     MatchCollection matches = Regex.Matches((string) field.Value, regExSearchForImageUrl);
+
+                    if (matches.Count > 0)
+                        Trace.WriteLine(String.Format("field {0} has {1} mathes", field.Name, matches.Count));
 
                     string regExSearchFileName = "(?<=FileName=)[^=]*";
                     foreach (Match match in matches)
@@ -122,6 +127,7 @@ namespace VstsSyncMigrator.Engine
                                 field.Value = field.Value.ToString().Replace(match.Value, newImageLink);
                                 wi.Attachments.RemoveAt(attachmentIndex);
                                 wi.Save();
+                                updated++;
                             }
                         }
                     }
