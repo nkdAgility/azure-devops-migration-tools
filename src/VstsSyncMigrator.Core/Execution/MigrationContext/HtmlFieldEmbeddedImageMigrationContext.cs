@@ -14,6 +14,12 @@ namespace VstsSyncMigrator.Engine
     {
         readonly HtmlFieldEmbeddedImageMigrationConfig _config;
 
+        int current;
+        int count = 0;
+        int failures = 0;
+        int updated = 0;
+        int skipped = 0;
+
         public override string Name
         {
             get { return "HtmlFieldEmbeddedImageMigrationContext"; }
@@ -33,15 +39,11 @@ namespace VstsSyncMigrator.Engine
             WorkItemStoreContext targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
             TfsQueryContext tfsqc = new TfsQueryContext(targetStore);
             tfsqc.AddParameter("TeamProject", me.Target.Name);
-            tfsqc.Query = string.Format(@"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject ORDER BY [System.ChangedDate] desc");
+            tfsqc.Query = string.Format(@"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY [System.ChangedDate] desc", _config.QueryBit);
             WorkItemCollection targetWIS = tfsqc.Execute();
             Trace.WriteLine(string.Format("Found {0} work items...", targetWIS.Count), Name);
 
-            int current = targetWIS.Count;
-            int count = 0;
-            int failures = 0;
-            int imported = 0;
-            int skipped = 0;
+            current = targetWIS.Count;
 
             foreach (WorkItem targetWi in targetWIS)
             {
@@ -65,7 +67,7 @@ namespace VstsSyncMigrator.Engine
             }
             //////////////////////////////////////////////////
             stopwatch.Stop();
-            Trace.WriteLine(string.Format(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds - {1} Items, {2} Imported, {3} Skipped, {4} Failures", stopwatch.Elapsed, targetWIS.Count, imported, skipped, failures), this.Name);
+            Trace.WriteLine(string.Format(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds - {1} Items, {2} Updated, {3} Skipped, {4} Failures", stopwatch.Elapsed, targetWIS.Count, updated, skipped, failures), this.Name);
         }
 
 
@@ -74,6 +76,10 @@ namespace VstsSyncMigrator.Engine
          */
         private void FixHtmlAttachmentLinks(WorkItem wi, string oldTfsurl, string newTfsurl)
         {
+            bool wiUpdated = false;
+
+            var oldTfsurlOppositeSchema = GetUrlWithOppositeSchema(oldTfsurl);
+
             string regExSearchForImageUrl = "(?<=<img.*src=\")[^\"]*";
 
             foreach (Field field in wi.Fields)
@@ -86,19 +92,20 @@ namespace VstsSyncMigrator.Engine
                     foreach (Match match in matches)
                     {
                         //todo server aliases....
-                        if (match.Value.Contains(oldTfsurl) || match.Value.Contains("http://server01-tfs15:8080"))
+                        if (match.Value.Contains(oldTfsurl) || match.Value.Contains(oldTfsurlOppositeSchema) || match.Value.Contains("http://server01-tfs15:8080"))
                         {
                             //save image locally and upload as attachment
                             Match newFileNameMatch = Regex.Match(match.Value, regExSearchFileName);
                             if (newFileNameMatch.Success)
                             {
+                                Trace.WriteLine(String.Format("field '{0}' has match: {1}", field.Name, match.Value));
                                 string fullImageFilePath = Path.GetTempPath() + newFileNameMatch.Value;
 
                                 var webClient = new WebClient();
 
                                 // When alternate credentials are given, use basic authentication with the given credentials
-                                if (_config.AlternateCredentialsUsername.Length > 0 &&
-                                    _config.AlternateCredentialsPassword.Length > 0)
+                                if (!String.IsNullOrWhiteSpace(_config.AlternateCredentialsUsername) &&
+                                    !String.IsNullOrWhiteSpace(_config.AlternateCredentialsPassword))
                                 {
                                     string credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes(_config.AlternateCredentialsUsername + ":" + _config.AlternateCredentialsPassword));
                                     webClient.Headers[HttpRequestHeader.Authorization] = string.Format("Basic {0}", credentials);
@@ -122,11 +129,27 @@ namespace VstsSyncMigrator.Engine
                                 field.Value = field.Value.ToString().Replace(match.Value, newImageLink);
                                 wi.Attachments.RemoveAt(attachmentIndex);
                                 wi.Save();
+                                wiUpdated = true;
                             }
                         }
                     }
                 }
             }
+
+            if (wiUpdated)
+                updated++;
+        }
+
+        private string GetUrlWithOppositeSchema(string url)
+        {
+            string oppositeUrl;
+            Uri sourceUrl = new Uri(url);
+            if (sourceUrl.Scheme == Uri.UriSchemeHttp)
+                oppositeUrl = new UriBuilder("https", sourceUrl.Host + sourceUrl.AbsolutePath).ToString();
+            else
+                oppositeUrl = new UriBuilder("http", sourceUrl.Host + sourceUrl.AbsolutePath).ToString();
+
+            return oppositeUrl;
         }
     }
 }
