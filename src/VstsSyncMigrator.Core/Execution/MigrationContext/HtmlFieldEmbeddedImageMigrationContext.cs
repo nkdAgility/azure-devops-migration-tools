@@ -116,7 +116,7 @@ namespace VstsSyncMigrator.Engine
                                 }
 
                                 webClient.DownloadFile(match.Value, fullImageFilePath);
-
+                                webClient.Dispose();
                                 int attachmentIndex = wi.Attachments.Add(new Attachment(fullImageFilePath));
                                 wi.Save();
                                 string attachmentGuid = wi.Attachments[attachmentIndex].FileGuid;

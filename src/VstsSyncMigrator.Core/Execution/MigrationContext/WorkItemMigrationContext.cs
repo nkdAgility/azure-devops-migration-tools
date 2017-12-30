@@ -179,7 +179,6 @@ namespace VstsSyncMigrator.Engine
         {
             Stopwatch fieldMappingTimer = new Stopwatch();
 
-            bool except = false;
             Trace.Write("... Building", "WorkItemMigrationContext");
 
             var NewWorkItemstartTime = DateTime.UtcNow;
@@ -245,16 +244,6 @@ namespace VstsSyncMigrator.Engine
             history.Append("<p>Migrated by <a href='https://github.com/nkdAgility/VstsMigrator'>VSTS/TFS Sync Migration Tool</a> open source.</p>");
             newwit.History = history.ToString();
 
-            if (except)
-            {
-                Trace.WriteLine("...buildErrors", "WorkItemMigrationContext");
-                System.Threading.Thread.Sleep(1000);
-
-            }
-            else
-            {
-                Trace.WriteLine("...buildComplete", "WorkItemMigrationContext");
-            }
             fieldMappingTimer.Stop();
             Telemetry.Current.TrackMetric("FieldMappingTime", fieldMappingTimer.ElapsedMilliseconds);
             Trace.WriteLine(string.Format("FieldMapOnNewWorkItem: {0} - {1}", NewWorkItemstartTime, fieldMappingTimer.Elapsed.ToString("c")), "WorkItemMigrationContext");

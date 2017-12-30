@@ -494,7 +494,7 @@ namespace VstsSyncMigrator.Engine
             }
 
             // Remove testsettings reference because VSTS Sync doesnt support migrating these artifacts
-            if (targetPlan.ManualTestSettingsId != 0 && targetPlan.ManualTestSettingsId != 0)
+            if (targetPlan.ManualTestSettingsId != 0)
             {
                 targetPlan.ManualTestSettingsId = 0;
                 targetPlan.AutomatedTestSettingsId = 0;
