@@ -1,4 +1,4 @@
-# VSTS Sync Migration Tools [![Chocolatey](https://img.shields.io/chocolatey/dt/vsts-sync-migrator.svg)](https://chocolatey.org/packages/vsts-sync-migrator/)
+# VSTS Sync Migration Tools [![Chocolatey](https://img.shields.io/chocolatey/dt/vsts-sync-migrator.svg)](https://chocolatey.org/packages/vsts-sync-migrator/) [![GitHub release](https://img.shields.io/github/release/nkdAgility/vsts-sync-migration.svg)](https://github.com/nkdAgility/vsts-sync-migrator/releases) ![Build on VSTS](https://nkdagility.visualstudio.com/_apis/public/build/definitions/1b52ce63-eccc-41c8-88f9-ae6ebeefdc63/94/badge) 
 
 The VSTS Sync Migration tools allow you to bulk edit and migrate data between Team Projects on both Microsoft Team Foundation Server (TFS) and Visual Studio Team Services (VSTS). You can find out [why](http://vsts-bulk-editor.readthedocs.io/en/latest/why) this tooling exists and you can access the [documentation](http://vsts-bulk-editor.readthedocs.io) to find out how. This project is published as [code on GitHub](https://github.com/nkdAgility/vsts-sync-migration/) as well as a [VSTS Sync Migration Tools on Chocolaty](https://chocolatey.org/packages/vsts-sync-migrator/).
 
@@ -42,16 +42,13 @@ There are two ways to use these tools:
 
 ## The Technical Details
 
-|         | Build           | 
-| ------------- |:-------------:|
-| VSTS      | ![Build on VSTS](https://nkdagility.visualstudio.com/_apis/public/build/definitions/1b52ce63-eccc-41c8-88f9-ae6ebeefdc63/94/badge) | 
-| GITHUB      | ![Build on VSTS](https://nkdagility.visualstudio.com/_apis/public/build/definitions/1b52ce63-eccc-41c8-88f9-ae6ebeefdc63/95/badge)      |
-
-
-||Stable|Pre-release|
-|:--:|:--:|:--:|
-|Docs|[![Documentation Status](https://readthedocs.org/projects/vsts-bulk-editor/badge/?version=stable)](http://vsts-bulk-editor.readthedocs.org/en/stable/)|[![Documentation Status](https://readthedocs.org/projects/vsts-bulk-editor/badge/?version=latest)](http://vsts-bulk-editor.readthedocs.org/en/latest/)|
-|GitHub Release|-|[![GitHub release](https://img.shields.io/github/release/nkdAgility/vsts-sync-migrator.svg?maxAge=2592000)](https://github.com/nkdAgility/vsts-sync-migrator/releases)|
+|-| MASTER | PREVIEW |
+|-------------:|:-------------|:-------------|
+| Quality Gate | [![Quality Gate](https://sonarcloud.io/api/badges/gate?key=vsts-sync-migrator%3Amaster)](https://sonarcloud.io/dashboard/index/vsts-sync-migrator%3Amaster) | - |
+| VSTS Build | ![Build on VSTS](https://nkdagility.visualstudio.com/_apis/public/build/definitions/1b52ce63-eccc-41c8-88f9-ae6ebeefdc63/94/badge) | - |
+| Github Build| ![Build on VSTS](https://nkdagility.visualstudio.com/_apis/public/build/definitions/1b52ce63-eccc-41c8-88f9-ae6ebeefdc63/95/badge) | - |
+| Coverage | [![Code Coverage](https://sonarcloud.io/api/badges/measure?key=vsts-sync-migrator%3Amaster&metric=coverage)](https://sonarcloud.io/dashboard/?id=vsts-sync-migrator%3master) |  - |
+| Analysis | [![Lines of Code](https://sonarcloud.io/api/badges/measure?key=vsts-sync-migrator%3Amaster&metric=ncloc)](https://sonarcloud.io/dashboard/?id=vsts-sync-migrator%3master)<br />[![Bugs](https://sonarcloud.io/api/badges/measure?key=vsts-sync-migrator%3Amaster&metric=bugs)](https://sonarcloud.io/dashboard/?id=vsts-sync-migrator%3master)<br />[![Vulnerabilities](https://sonarcloud.io/api/badges/measure?key=vsts-sync-migrator%3Amaster&metric=vulnerabilities)](https://sonarcloud.io/dashboard/?id=vsts-sync-migrator%3master)<br />[![Code Smells](https://sonarcloud.io/api/badges/measure?key=vsts-sync-migrator%3Amaster&metric=code_smells)](https://sonarcloud.io/project/issues?id=vsts-sync-migrator%3master&resolved=false&types=CODE_SMELL)<br />[![Duplicated Lines](https://sonarcloud.io/api/badges/measure?key=vsts-sync-migrator%3Amaster&metric=duplicated_lines_density)](https://sonarcloud.io/component_measures/domain/Duplications?id=vsts-sync-migrator%3master)<br />[![Technical Dept Ratio](https://sonarcloud.io/api/badges/measure?key=vsts-sync-migrator%3Amaster&metric=sqale_debt_ratio)](https://sonarcloud.io/dashboard/?id=vsts-sync-migrator%3master) | - |
+| Docs |[![Documentation Status](https://readthedocs.org/projects/vsts-bulk-editor/badge/?version=stable)](http://vsts-bulk-editor.readthedocs.org/en/stable/)|[![Documentation Status](https://readthedocs.org/projects/vsts-bulk-editor/badge/?version=latest)](http://vsts-bulk-editor.readthedocs.org/en/latest/)|
+| Release |[![GitHub release](https://img.shields.io/github/release/nkdAgility/vsts-sync-migration.svg)](https://github.com/nkdAgility/vsts-sync-migrator/releases)| - |
 |Chocolatey|[![Chocolatey](https://img.shields.io/chocolatey/v/vsts-sync-migrator.svg)](https://chocolatey.org/packages/vsts-sync-migrator/)|-|
-
-[Sonar Cube Analysis](https://sonarcloud.io/dashboard?id=vsts-sync-migrator%3Amaster)
