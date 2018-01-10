@@ -1,4 +1,5 @@
-﻿using Microsoft.TeamFoundation.TestManagement.Client;
+﻿using System;
+using Microsoft.TeamFoundation.TestManagement.Client;
 using System.Diagnostics;
 using System.Linq;
 using VstsSyncMigrator.Engine.ComponentContext;
@@ -65,7 +66,8 @@ namespace VstsSyncMigrator.Engine
 
         private ITestConfiguration GetCon(ITestConfigurationHelper tch, string configToFind)
         {
-            return (from tv in tch.Query("Select * From TestConfiguration") where tv.Name == configToFind select tv).SingleOrDefault();
+            // Test configurations are case insensitive in VSTS so need ignore case in comparison
+            return tch.Query("Select * From TestConfiguration").FirstOrDefault(variable => string.Equals(variable.Name, configToFind, StringComparison.OrdinalIgnoreCase));
         }
     }
 }

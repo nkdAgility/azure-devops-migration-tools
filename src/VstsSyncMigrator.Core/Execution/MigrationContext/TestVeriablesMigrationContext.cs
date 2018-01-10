@@ -14,15 +14,11 @@ namespace VstsSyncMigrator.Engine
     {
         public override string Name
         {
-            get
-            {
-                return "TestVeriablesMigrationContext";
-            }
+            get { return "TestVeriablesMigrationContext"; }
         }
 
 
         // http://blogs.microsoft.co.il/shair/2015/02/02/tfs-api-part-56-test-configurations/
-
 
         public TestVeriablesMigrationContext(MigrationEngine me, TestVariablesMigrationConfig config) : base(me, config)
         {
@@ -43,7 +39,7 @@ namespace VstsSyncMigrator.Engine
             foreach (var sourceVar in sourceVars)
             {
                 Trace.WriteLine(string.Format("Copy: {0}", sourceVar.Name));
-                ITestVariable targetVar= GetVar(targetTmc.Project.TestVariables, sourceVar.Name);
+                ITestVariable targetVar = GetVar(targetTmc.Project.TestVariables, sourceVar.Name);
                 if (targetVar == null)
                 {
                     Trace.WriteLine(string.Format("    Need to create: {0}", sourceVar.Name));
@@ -65,7 +61,7 @@ namespace VstsSyncMigrator.Engine
                         Trace.WriteLine(string.Format("    Need to create: {0}", sourceVal.Value));
                         targetVal = targetTmc.Project.TestVariables.CreateVariableValue(sourceVal.Value);
                         targetVar.AllowedValues.Add(targetVal);
-                       targetVar.Save();
+                        targetVar.Save();
                     }
                     else
                     {
@@ -79,14 +75,18 @@ namespace VstsSyncMigrator.Engine
 
         internal ITestVariable GetVar(ITestVariableHelper tvh, string variableToFind)
         {
-            return (from tv in tvh.Query() where tv.Name == variableToFind select tv).SingleOrDefault();
+            // Test Variables are case insensitive in VSTS so need ignore case in comparison
+            return tvh.Query()
+                .FirstOrDefault(variable => string.Equals(variable.Name, variableToFind,
+                    StringComparison.OrdinalIgnoreCase));
         }
 
         internal ITestVariableValue GetVal(ITestVariable targetVar, string valueToFind)
         {
-            return (from tv in targetVar.AllowedValues where tv.Value == valueToFind select tv).SingleOrDefault();
+            // Test Variable values are case insensitive in VSTS so need ignore case in comparison
+            return targetVar.AllowedValues.FirstOrDefault(
+                variable => string.Equals(variable.Value, valueToFind, StringComparison.OrdinalIgnoreCase));
         }
 
     }
-
-    }
+}
