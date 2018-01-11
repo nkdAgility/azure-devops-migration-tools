@@ -46,7 +46,14 @@ namespace VstsSyncMigrator.Engine
 
             current = targetWIS.Count;
 
-            Trace.WriteLine(String.Format("Searching for urls: {0} and {1}", me.Source.Collection.Uri.ToString(), GetUrlWithOppositeSchema(me.Source.Collection.Uri.ToString())));
+            string urlForMatch = me.Source.Collection.Uri.ToString();
+            if (_config.FromAnyCollection)
+            {
+                var url = new Uri(me.Source.Collection.Uri.ToString());
+                urlForMatch = url.GetLeftPart(UriPartial.Authority);
+            }
+
+            Trace.WriteLine(String.Format("Searching for urls: {0} and {1}", urlForMatch, GetUrlWithOppositeSchema(urlForMatch)));
            
             foreach (WorkItem targetWi in targetWIS)
             {
@@ -55,7 +62,7 @@ namespace VstsSyncMigrator.Engine
                 // Deside on WIT
                 if (me.WorkItemTypeDefinitions.ContainsKey(targetWi.Type.Name))
                 {
-                    FixHtmlAttachmentLinks(targetWi, me.Source.Collection.Uri.ToString(), me.Target.Collection.Uri.ToString());
+                    FixHtmlAttachmentLinks(targetWi, urlForMatch, me.Target.Collection.Uri.ToString());
                 }
                 else
                 {
@@ -80,6 +87,7 @@ namespace VstsSyncMigrator.Engine
         private void FixHtmlAttachmentLinks(WorkItem wi, string oldTfsurl, string newTfsurl)
         {
             bool wiUpdated = false;
+            bool hasCandidates = false;
 
             var oldTfsurlOppositeSchema = GetUrlWithOppositeSchema(oldTfsurl);
             string regExSearchForImageUrl = "(?<=<img.*src=\")[^\"]*";
@@ -93,10 +101,10 @@ namespace VstsSyncMigrator.Engine
                     string regExSearchFileName = "(?<=FileName=)[^=]*";
                     foreach (Match match in matches)
                     {
-                        CheckForPresenceOfSourceImages(match, field);
+                        
                         //todo server aliases....
-                        if (match.Value.Contains(oldTfsurl) || match.Value.Contains(oldTfsurlOppositeSchema) || match.Value.Contains("http://server01-tfs15:8080"))
-                        {
+                        if (match.Value.ToLower().Contains(oldTfsurl.ToLower()) || match.Value.ToLower().Contains(oldTfsurlOppositeSchema.ToLower()) || match.Value.Contains("http://server01-tfs15:8080"))
+                        {                     
                             //save image locally and upload as attachment
                             Match newFileNameMatch = Regex.Match(match.Value, regExSearchFileName);
                             if (newFileNameMatch.Success)
@@ -135,12 +143,16 @@ namespace VstsSyncMigrator.Engine
                                 wiUpdated = true;
                             }
                         }
+                        else
+                            hasCandidates = CheckForPossibleCandidates(match, field);
                     }
                 }
             }
 
             if (wiUpdated)
                 updated++;
+            if (hasCandidates)
+                candidates++;
         }
 
         private string GetUrlWithOppositeSchema(string url)
@@ -161,12 +173,11 @@ namespace VstsSyncMigrator.Engine
             return oppositeUrl;
         }
 
-        private bool CheckForPresenceOfSourceImages(Match match, Field field)
+        private bool CheckForPossibleCandidates(Match match, Field field)
         {
             if (match.Value.Contains(me.Source.Collection.Uri.Host))
             {
-                Trace.WriteLine(String.Format("field '{0}' has match: {1}", field.Name, match.Value));
-                candidates++;
+                Trace.WriteLine(String.Format("field '{0}' has match: {1}", field.Name, match.Value), "Possible Candidate");               
                 return true;
             }
             else
