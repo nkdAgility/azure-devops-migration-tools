@@ -19,6 +19,7 @@ namespace VstsSyncMigrator.Engine
         int failures = 0;
         int updated = 0;
         int skipped = 0;
+        int candidates = 0;
 
         public override string Name
         {
@@ -45,6 +46,8 @@ namespace VstsSyncMigrator.Engine
 
             current = targetWIS.Count;
 
+            Trace.WriteLine(String.Format("Searching for urls: {0} and {1}", me.Source.Collection.Uri.ToString(), GetUrlWithOppositeSchema(me.Source.Collection.Uri.ToString())));
+           
             foreach (WorkItem targetWi in targetWIS)
             {
                 Trace.WriteLine(string.Format("{0} - Fixing: {1}-{2}", current, targetWi.Id, targetWi.Type.Name), Name);
@@ -67,7 +70,7 @@ namespace VstsSyncMigrator.Engine
             }
             //////////////////////////////////////////////////
             stopwatch.Stop();
-            Trace.WriteLine(string.Format(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds - {1} Items, {2} Updated, {3} Skipped, {4} Failures", stopwatch.Elapsed, targetWIS.Count, updated, skipped, failures), this.Name);
+            Trace.WriteLine(string.Format(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds - {1} Items, {2} Updated, {3} Skipped, {4} Failures, {5} Possible Candidates", stopwatch.Elapsed, targetWIS.Count, updated, skipped, failures, candidates), this.Name);
         }
 
 
@@ -79,7 +82,6 @@ namespace VstsSyncMigrator.Engine
             bool wiUpdated = false;
 
             var oldTfsurlOppositeSchema = GetUrlWithOppositeSchema(oldTfsurl);
-
             string regExSearchForImageUrl = "(?<=<img.*src=\")[^\"]*";
 
             foreach (Field field in wi.Fields)
@@ -91,6 +93,7 @@ namespace VstsSyncMigrator.Engine
                     string regExSearchFileName = "(?<=FileName=)[^=]*";
                     foreach (Match match in matches)
                     {
+                        CheckForPresenceOfSourceImages(match, field);
                         //todo server aliases....
                         if (match.Value.Contains(oldTfsurl) || match.Value.Contains(oldTfsurlOppositeSchema) || match.Value.Contains("http://server01-tfs15:8080"))
                         {
@@ -143,13 +146,31 @@ namespace VstsSyncMigrator.Engine
         private string GetUrlWithOppositeSchema(string url)
         {
             string oppositeUrl;
-            Uri sourceUrl = new Uri(url);
+            var sourceUrl = new Uri(url);
             if (sourceUrl.Scheme == Uri.UriSchemeHttp)
-                oppositeUrl = new UriBuilder("https", sourceUrl.Host + sourceUrl.AbsolutePath).ToString();
+            {
+                oppositeUrl = "https://" + sourceUrl.Host + sourceUrl.AbsolutePath;
+            }
+            else if (sourceUrl.Scheme == Uri.UriSchemeHttps)
+            {
+                oppositeUrl = "http://" + sourceUrl.Host + sourceUrl.AbsolutePath;
+            }
             else
-                oppositeUrl = new UriBuilder("http", sourceUrl.Host + sourceUrl.AbsolutePath).ToString();
+                oppositeUrl = url;
 
             return oppositeUrl;
+        }
+
+        private bool CheckForPresenceOfSourceImages(Match match, Field field)
+        {
+            if (match.Value.Contains(me.Source.Collection.Uri.Host))
+            {
+                Trace.WriteLine(String.Format("field '{0}' has match: {1}", field.Name, match.Value));
+                candidates++;
+                return true;
+            }
+            else
+                return false;
         }
     }
 }
