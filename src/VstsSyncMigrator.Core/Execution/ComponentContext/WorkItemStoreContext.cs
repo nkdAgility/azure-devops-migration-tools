@@ -53,7 +53,8 @@ namespace VstsSyncMigrator.Engine
 
         public string CreateReflectedWorkItemId(WorkItem wi)
         {
-            return string.Format("{0}/{1}/{2}", wi.Store.TeamProjectCollection.Uri, wi.Project.Name, wi.Id);
+            return string.Format("{0}/{1}/_workitems/edit/{2}", wi.Store.TeamProjectCollection.Uri, wi.Project.Name, wi.Id);
+
         }
         public int GetReflectedWorkItemId(WorkItem wi, string reflectedWotkItemIdField)
         {
