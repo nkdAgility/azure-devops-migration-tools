@@ -19,6 +19,7 @@ namespace VstsSyncMigrator.Engine
         int failures = 0;
         int updated = 0;
         int skipped = 0;
+        int candidates = 0;
 
         public override string Name
         {
@@ -45,6 +46,15 @@ namespace VstsSyncMigrator.Engine
 
             current = targetWIS.Count;
 
+            string urlForMatch = me.Source.Collection.Uri.ToString();
+            if (_config.FromAnyCollection)
+            {
+                var url = new Uri(me.Source.Collection.Uri.ToString());
+                urlForMatch = url.GetLeftPart(UriPartial.Authority);
+            }
+
+            Trace.WriteLine(String.Format("Searching for urls: {0} and {1}", urlForMatch, GetUrlWithOppositeSchema(urlForMatch)));
+           
             foreach (WorkItem targetWi in targetWIS)
             {
                 Trace.WriteLine(string.Format("{0} - Fixing: {1}-{2}", current, targetWi.Id, targetWi.Type.Name), Name);
@@ -52,7 +62,7 @@ namespace VstsSyncMigrator.Engine
                 // Deside on WIT
                 if (me.WorkItemTypeDefinitions.ContainsKey(targetWi.Type.Name))
                 {
-                    FixHtmlAttachmentLinks(targetWi, me.Source.Collection.Uri.ToString(), me.Target.Collection.Uri.ToString());
+                    FixHtmlAttachmentLinks(targetWi, urlForMatch, me.Target.Collection.Uri.ToString());
                 }
                 else
                 {
@@ -67,7 +77,7 @@ namespace VstsSyncMigrator.Engine
             }
             //////////////////////////////////////////////////
             stopwatch.Stop();
-            Trace.WriteLine(string.Format(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds - {1} Items, {2} Updated, {3} Skipped, {4} Failures", stopwatch.Elapsed, targetWIS.Count, updated, skipped, failures), this.Name);
+            Trace.WriteLine(string.Format(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds - {1} Items, {2} Updated, {3} Skipped, {4} Failures, {5} Possible Candidates", stopwatch.Elapsed, targetWIS.Count, updated, skipped, failures, candidates), this.Name);
         }
 
 
@@ -77,9 +87,9 @@ namespace VstsSyncMigrator.Engine
         private void FixHtmlAttachmentLinks(WorkItem wi, string oldTfsurl, string newTfsurl)
         {
             bool wiUpdated = false;
+            bool hasCandidates = false;
 
             var oldTfsurlOppositeSchema = GetUrlWithOppositeSchema(oldTfsurl);
-
             string regExSearchForImageUrl = "(?<=<img.*src=\")[^\"]*";
 
             foreach (Field field in wi.Fields)
@@ -91,9 +101,10 @@ namespace VstsSyncMigrator.Engine
                     string regExSearchFileName = "(?<=FileName=)[^=]*";
                     foreach (Match match in matches)
                     {
+                        
                         //todo server aliases....
-                        if (match.Value.Contains(oldTfsurl) || match.Value.Contains(oldTfsurlOppositeSchema) || match.Value.Contains("http://server01-tfs15:8080"))
-                        {
+                        if (match.Value.ToLower().Contains(oldTfsurl.ToLower()) || match.Value.ToLower().Contains(oldTfsurlOppositeSchema.ToLower()) || match.Value.Contains("http://server01-tfs15:8080"))
+                        {                     
                             //save image locally and upload as attachment
                             Match newFileNameMatch = Regex.Match(match.Value, regExSearchFileName);
                             if (newFileNameMatch.Success)
@@ -132,24 +143,45 @@ namespace VstsSyncMigrator.Engine
                                 wiUpdated = true;
                             }
                         }
+                        else
+                            hasCandidates = CheckForPossibleCandidates(match, field);
                     }
                 }
             }
 
             if (wiUpdated)
                 updated++;
+            if (hasCandidates)
+                candidates++;
         }
 
         private string GetUrlWithOppositeSchema(string url)
         {
             string oppositeUrl;
-            Uri sourceUrl = new Uri(url);
+            var sourceUrl = new Uri(url);
             if (sourceUrl.Scheme == Uri.UriSchemeHttp)
-                oppositeUrl = new UriBuilder("https", sourceUrl.Host + sourceUrl.AbsolutePath).ToString();
+            {
+                oppositeUrl = "https://" + sourceUrl.Host + sourceUrl.AbsolutePath;
+            }
+            else if (sourceUrl.Scheme == Uri.UriSchemeHttps)
+            {
+                oppositeUrl = "http://" + sourceUrl.Host + sourceUrl.AbsolutePath;
+            }
             else
-                oppositeUrl = new UriBuilder("http", sourceUrl.Host + sourceUrl.AbsolutePath).ToString();
+                oppositeUrl = url;
 
             return oppositeUrl;
+        }
+
+        private bool CheckForPossibleCandidates(Match match, Field field)
+        {
+            if (match.Value.Contains(me.Source.Collection.Uri.Host))
+            {
+                Trace.WriteLine(String.Format("field '{0}' has match: {1}", field.Name, match.Value), "Possible Candidate");               
+                return true;
+            }
+            else
+                return false;
         }
     }
 }
