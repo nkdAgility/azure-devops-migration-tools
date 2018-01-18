@@ -49,7 +49,8 @@ namespace VstsSyncMigrator.Engine
 
                     string reflectedID = fileNameParts[0].Replace('+', ':').Replace("--", "/");
                     string targetFileName = fileNameParts[1];
-                    File.Move(file, Path.Combine(Path.GetDirectoryName(file), targetFileName));
+                    var renamedFilePath = Path.Combine(Path.GetDirectoryName(file), targetFileName);
+                    File.Move(file, renamedFilePath);
                     targetWI = targetStore.FindReflectedWorkItemByReflectedWorkItemId(reflectedID, me.ReflectedWorkItemIdFieldName);
                     if (targetWI != null)
                     {
@@ -58,7 +59,7 @@ namespace VstsSyncMigrator.Engine
                         var attachment = attachments.Where(a => a.Name == targetFileName).FirstOrDefault();
                         if (attachment == null)
                         {
-                            Attachment a = new Attachment(file);
+                            Attachment a = new Attachment(renamedFilePath);
                             targetWI.Attachments.Add(a);
                             targetWI.Save();
                         }
@@ -73,7 +74,7 @@ namespace VstsSyncMigrator.Engine
                         Trace.WriteLine(string.Format("{0} of {1} - Skipping {2} to {3}", current, files.Count, fileName, 0));
                         skipped++;
                     }
-                    System.IO.File.Delete(file);
+                    System.IO.File.Delete(renamedFilePath);
                 } catch (FileAttachmentException ex)
                 {
                     // Probably due to attachment being over size limit
