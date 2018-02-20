@@ -118,7 +118,7 @@ namespace VstsSyncMigrator.Engine.Configuration
             ec.Processors.Add(new TestVariablesMigrationConfig() { Enabled = false });
             ec.Processors.Add(new TestConfigurationsMigrationConfig() { Enabled = false });
             ec.Processors.Add(new TestPlansAndSuitsMigrationConfig() { Enabled = false, PrefixProjectToNodes = true });
-            ec.Processors.Add(new TestRunsMigrationConfig() { Enabled = false });
+            //ec.Processors.Add(new TestRunsMigrationConfig() { Enabled = false });
             ec.Processors.Add(new ImportProfilePictureConfig() { Enabled = false });
             ec.Processors.Add(new ExportProfilePictureFromADConfig() { Enabled = false });
             ec.Processors.Add(new FixGitCommitLinksConfig() { Enabled = false, TargetRepository = ec.Target.Name });

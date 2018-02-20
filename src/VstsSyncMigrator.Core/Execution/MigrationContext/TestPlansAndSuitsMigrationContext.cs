@@ -494,7 +494,7 @@ namespace VstsSyncMigrator.Engine
             }
 
             // Remove testsettings reference because VSTS Sync doesnt support migrating these artifacts
-            if (targetPlan.ManualTestSettingsId != 0 && targetPlan.ManualTestSettingsId != 0)
+            if (targetPlan.ManualTestSettingsId != 0)
             {
                 targetPlan.ManualTestSettingsId = 0;
                 targetPlan.AutomatedTestSettingsId = 0;
@@ -524,40 +524,30 @@ namespace VstsSyncMigrator.Engine
             FixWorkItemIdInQuery(targetSuitChild);
         }
 
-        private void FixQueryForTeamProjectNameChange(ITestSuiteBase source, IDynamicTestSuite targetSuitChild,
-            TestManagementContext targetTestStore)
+        private void FixQueryForTeamProjectNameChange(ITestSuiteBase source, IDynamicTestSuite targetSuitChild, TestManagementContext targetTestStore)
         {
             // Replacing old projectname in queries with new projectname
             // The target team project name is only available via target test store because the dyn. testsuite isnt saved at this point in time
             if (!source.Plan.Project.TeamProjectName.Equals(targetTestStore.Project.TeamProjectName))
             {
-                Trace.WriteLine(string.Format(
-                    @"Team Project names dont match. We need to fix the query in dynamic test suite {0} - {1}.", source.Id,
-                    source.Title));
-                Trace.WriteLine(string.Format(@"Replacing old project name {1} in query {0} with new team project name {2}",
-                    targetSuitChild.Query.QueryText,
-                    source.Plan.Project.TeamProjectName,
-                    targetTestStore.Project.TeamProjectName
-                ));
-
-                // it is possible that user has used project name in query values. we try only to change iteration + area path values
-                // A child level is selected in area / iteration path
-                targetSuitChild.Query = targetSuitChild.Project.CreateTestQuery(
-                    targetSuitChild.Query.QueryText.Replace(
-                        string.Format(@"'{0}\", source.Plan.Project.TeamProjectName),
-                        string.Format(@"'{0}\", targetTestStore.Project.TeamProjectName)
-                    ));
-
-                // Only root level is selected in area / iteration path
-                targetSuitChild.Query = targetSuitChild.Project.CreateTestQuery(
-                    targetSuitChild.Query.QueryText.Replace(
-                        string.Format(@"'{0}'", source.Plan.Project.TeamProjectName),
-                        string.Format(@"'{0}'", targetTestStore.Project.TeamProjectName)
-                    ));
-
-                ValidateAndFixTestSuiteQuery(source, targetSuitChild, targetTestStore);
-
-                targetSuitChild.Repopulate();
+                Trace.WriteLine(string.Format(@"Team Project names dont match. We need to fix the query in dynamic test suite {0} - {1}.", source.Id, source.Title));
+                Trace.WriteLine(string.Format(@"Replacing old project name {1} in query {0} with new team project name {2}", targetSuitChild.Query.QueryText, source.Plan.Project.TeamProjectName, targetTestStore.Project.TeamProjectName));
+                // First need to check is prefix project nodes has been applied for the migration
+                if (config.PrefixProjectToNodes)
+                {
+                    // if prefix project nodes has been applied we need to take the original area/iteration value and prefix
+                    targetSuitChild.Query =
+                        targetSuitChild.Project.CreateTestQuery(targetSuitChild.Query.QueryText.Replace(
+                            string.Format(@"'{0}", source.Plan.Project.TeamProjectName),
+                            string.Format(@"'{0}\{1}", targetTestStore.Project.TeamProjectName, source.Plan.Project.TeamProjectName)));
+                }
+                else
+                {
+                    // If we are not profixing project nodes then we just need to take the old value for the project and replace it with the new project value
+                    targetSuitChild.Query = targetSuitChild.Project.CreateTestQuery(targetSuitChild.Query.QueryText.Replace(
+                            string.Format(@"'{0}", source.Plan.Project.TeamProjectName),
+                            string.Format(@"'{0}", targetTestStore.Project.TeamProjectName)));
+                }
                 Trace.WriteLine(string.Format("New query is now {0}", targetSuitChild.Query.QueryText));
             }
         }

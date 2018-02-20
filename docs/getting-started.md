@@ -2,6 +2,8 @@
 
 If you want to perform a bulk edit or a migration then you need to start here. This tool has been tested on updating from 100 to 250,000 work items by its users.
 
+Watch the [Video Overview](https://youtu.be/ZxDktQae10M) to get you started in 30 minutes. This tool is complicated and its not always easy to discover what you need to do.
+
 ## Install
 
 In order to run the migration you will need to install the tools first.
