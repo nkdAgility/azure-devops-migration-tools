@@ -48,7 +48,7 @@ namespace VstsSyncMigrator.Engine
 
         public Project GetProject()
         {
-            return (from Project x in wistore.Projects where x.Name == targetTfs.Name select x).SingleOrDefault();
+            return (from Project x in wistore.Projects where x.Name.ToUpper() == targetTfs.Name.ToUpper() select x).SingleOrDefault();
         }
 
         public string CreateReflectedWorkItemId(WorkItem wi)
