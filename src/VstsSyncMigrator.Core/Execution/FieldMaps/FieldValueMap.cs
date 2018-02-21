@@ -23,11 +23,13 @@ namespace VstsSyncMigrator.Engine.ComponentContext
         {
                 if (source.Fields.Contains(config.sourceField))
                 {
-                    // to tag
-                    string value = (string)source.Fields[config.sourceField].Value;
-                    if (config.valueMapping.ContainsKey(value))
+                    string sourceValue = source.Fields[config.sourceField].Value != null 
+                        ? source.Fields[config.sourceField].Value.ToString()
+                        : null;
+
+                    if (sourceValue != null && config.valueMapping.ContainsKey(sourceValue))
                     {
-                        target.Fields[config.targetField].Value = config.valueMapping[value];
+                        target.Fields[config.targetField].Value = config.valueMapping[sourceValue];
                         Trace.WriteLine(string.Format("  [UPDATE] field value mapped {0}:{1} to {2}:{3}", source.Id, config.sourceField, target.Id, config.targetField));
                     }
                 }
