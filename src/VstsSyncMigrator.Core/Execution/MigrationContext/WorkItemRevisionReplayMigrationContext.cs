@@ -213,10 +213,9 @@ namespace VstsSyncMigrator.Engine
                     newwit.Close();
                     Trace.WriteLine($"...Saved as {newwit.Id}", Name);
 
-                    if (sourceWorkItem.Fields.Contains(me.ReflectedWorkItemIdFieldName) &&
-                        _config.UpdateSoureReflectedId)
+                    if (_config.UpdateSoureReflectedId && sourceWorkItem.Fields.Contains(me.SourceReflectedWorkItemIdFieldName))
                     {
-                        sourceWorkItem.Fields[me.ReflectedWorkItemIdFieldName].Value =
+                        sourceWorkItem.Fields[me.SourceReflectedWorkItemIdFieldName].Value =
                             targetStore.CreateReflectedWorkItemId(newwit);
                         sourceWorkItem.Save();
                         Trace.WriteLine($"...and Source Updated {sourceWorkItem.Id}", Name);

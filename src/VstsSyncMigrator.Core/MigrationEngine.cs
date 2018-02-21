@@ -22,7 +22,8 @@ namespace VstsSyncMigrator.Engine
         ITeamProjectContext source;
         ITeamProjectContext target;
         string reflectedWorkItemIdFieldName = "TfsMigrationTool.ReflectedWorkItemId";
-        
+        private string sourceReflectedWorkItemIdFieldName = "ProcessName.ReflectedWorkItemId";
+
         public MigrationEngine()
         {
 
@@ -44,6 +45,7 @@ namespace VstsSyncMigrator.Engine
                 this.SetTarget(new TeamProjectContext(config.Target.Collection, config.Target.Name));
             }           
             this.SetReflectedWorkItemIdFieldName(config.ReflectedWorkItemIDFieldName);
+            this.SetSourceReflectedWorkItemIdFieldName(config.SourceReflectedWorkItemIDFieldName);
             if (config.FieldMaps != null)
             {
                 foreach (IFieldMapConfig fieldmapConfig in config.FieldMaps)
@@ -105,6 +107,12 @@ namespace VstsSyncMigrator.Engine
             get { return reflectedWorkItemIdFieldName;}
         }
 
+        public string SourceReflectedWorkItemIdFieldName
+        {
+            get { return sourceReflectedWorkItemIdFieldName; }
+        }
+
+
         public ProcessingStatus Run()
         {
             Telemetry.Current.TrackEvent("EngineStart",
@@ -161,6 +169,12 @@ namespace VstsSyncMigrator.Engine
         {
             reflectedWorkItemIdFieldName = fieldName;
         }
+
+        public void SetSourceReflectedWorkItemIdFieldName(string fieldName)
+        {
+            sourceReflectedWorkItemIdFieldName = fieldName;
+        }
+
 
         public void SetSource(ITeamProjectContext teamProjectContext)
         {
