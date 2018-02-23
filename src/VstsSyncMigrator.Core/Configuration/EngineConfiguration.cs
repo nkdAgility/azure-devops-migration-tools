@@ -12,6 +12,7 @@ namespace VstsSyncMigrator.Engine.Configuration
     public class EngineConfiguration
     {
         public bool TelemetryEnableTrace { get; set; }
+        public bool workaroundForQuerySOAPBugEnabled { get; set; }
         public TeamProjectConfig Source { get; set; }
         public TeamProjectConfig Target { get; set; }
         public string ReflectedWorkItemIDFieldName { get; set; }

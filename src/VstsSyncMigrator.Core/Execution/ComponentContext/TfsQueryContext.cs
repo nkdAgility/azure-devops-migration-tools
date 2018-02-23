@@ -19,9 +19,33 @@ namespace VstsSyncMigrator.Engine
 
         public string Query { get; set; }
 
+
         public void AddParameter(string name, string value)
         {
             parameters.Add(name, value);
+        }
+
+        // Fix for Query SOAP error when passing parameters
+        [Obsolete("Temporary work aorund for SOAP issue https://nkdagility.visualstudio.com/vsts-sync-migration/_workitems/edit/5066")]
+        string WorkAroundForSOAPError(string query, IDictionary<string, string> parameters)
+        {
+            foreach (string key in parameters.Keys)
+            {
+                string pattern = "'{0}'";
+                if (IsInteger(parameters[key]))
+                {
+                    pattern = "{0}";
+                }
+                query = query.Replace(string.Format("@{0}", key), string.Format(pattern, parameters[key]));
+            }
+            return query;
+        }
+
+        public bool IsInteger(string maybeInt)
+        {
+            int testNumber = 0;
+            //Check whether 'first' is integer
+            return int.TryParse(maybeInt, out testNumber);
         }
 
         public WorkItemCollection Execute()
@@ -38,7 +62,8 @@ namespace VstsSyncMigrator.Engine
             queryTimer.Start();
             try
             {
-                wc = storeContext.Store.Query(Query, parameters);
+                Query = WorkAroundForSOAPError(Query, parameters); // TODO: Remove this once bug fixed... https://nkdagility.visualstudio.com/vsts-sync-migration/_workitems/edit/5066 
+                wc = storeContext.Store.Query(Query); //, parameters);
                 queryTimer.Stop();
                 Telemetry.Current.TrackDependency("TeamService", "Query", startTime, queryTimer.Elapsed, true);
                 // Add additional bits to reuse the paramiters dictionary for telemitery
