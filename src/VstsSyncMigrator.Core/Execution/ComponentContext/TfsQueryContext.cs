@@ -50,6 +50,7 @@ namespace VstsSyncMigrator.Engine
 
         public WorkItemCollection Execute()
         {
+            Telemetry.Current.TrackEvent("TfsQueryContext.Execute",parameters);
             Trace.WriteLine(string.Format("TfsQueryContext: {0}: {1}", "TeamProjectCollection", storeContext.Store.TeamProjectCollection.Uri.ToString()), "TfsQueryContext");
             WorkItemCollection wc;
             var startTime = DateTime.UtcNow;

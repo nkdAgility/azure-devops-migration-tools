@@ -33,15 +33,11 @@ namespace VstsSyncMigrator.Engine
 
         public void Execute()
         {
-            Telemetry.Current.TrackEvent("ProcessingContextExecute",
-                     new Dictionary<string, string> {
-                          { "Name", Name},
-                          { "Target Project", me.Target.Name},
-                          { "Target Collection", me.Target.Collection.Name }
-                     });
+            Telemetry.Current.TrackPageView(this.Name);
             Trace.TraceInformation(string.Format("ProcessingContext Start {0} ", Name));
             Stopwatch executeTimer = new Stopwatch();
             executeTimer.Start();
+            DateTime start = DateTime.Now;
             //////////////////////////////////////////////////
             try
             {
@@ -76,7 +72,10 @@ namespace VstsSyncMigrator.Engine
                             { "ProcessingContextTime", executeTimer.ElapsedMilliseconds }
                       });
                 Trace.TraceWarning(string.Format("  [EXCEPTION] {0}", ex.Message));
-                throw;
+            }
+            finally
+            {
+                Telemetry.Current.TrackRequest(this.Name, start, executeTimer.Elapsed, Status.ToString(), (Status == ProcessingStatus.Complete));
             }
         }
 
