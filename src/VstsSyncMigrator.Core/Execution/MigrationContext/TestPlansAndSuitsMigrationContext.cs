@@ -80,7 +80,7 @@ namespace VstsSyncMigrator.Engine
                 {
                     Trace.WriteLine($"    Source Plan has {sourcePlan.RootSuite.Entries.Count} Suites", Name);
                     foreach (var sourcerSuiteChild in sourcePlan.RootSuite.SubSuites)
-                        ProcessStaticSuite(sourcerSuiteChild, targetPlan.RootSuite, targetPlan);
+                        ProcessTestSuite(sourcerSuiteChild, targetPlan.RootSuite, targetPlan);
                     // Add Test Cases
                     ProcessChildTestCases(sourcePlan.RootSuite, targetPlan.RootSuite, targetPlan);
                 }
@@ -127,7 +127,7 @@ namespace VstsSyncMigrator.Engine
             return !sourcePlanWorkItem.Tags.Contains(tagWhichMustBePresent);
         }
 
-        private void ProcessStaticSuite(ITestSuiteBase sourceSuit, ITestSuiteBase targetParent, ITestPlan targetPlan)
+        private void ProcessTestSuite(ITestSuiteBase sourceSuit, ITestSuiteBase targetParent, ITestPlan targetPlan)
         {
             if (CanSkipElementBecauseOfTags(sourceSuit.Id))
                 return;
@@ -217,7 +217,7 @@ namespace VstsSyncMigrator.Engine
                 Trace.WriteLine($"            Suite has {((IStaticTestSuite)sourceSuit).Entries.Count} children", Name);
                 foreach (var sourceSuitChild in ((IStaticTestSuite)sourceSuit).SubSuites)
                 {
-                    ProcessStaticSuite(sourceSuitChild, targetSuitChild, targetPlan);
+                    ProcessTestSuite(sourceSuitChild, targetSuitChild, targetPlan);
 
                 }
             }
