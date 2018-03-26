@@ -68,9 +68,12 @@ namespace VstsSyncMigrator.Engine
                     ApplyFieldMappings(sourcePlan.Id, targetPlan.Id);
                     AssignReflectedWorkItemId(sourcePlan.Id, targetPlan.Id);
                     FixAssignedToValue(sourcePlan.Id, targetPlan.Id);
+
+                    ApplyDefaultConfigurations(sourcePlan.RootSuite, targetPlan.RootSuite, targetPlan);
                     ApplyFieldMappings(sourcePlan.RootSuite.Id, targetPlan.RootSuite.Id);
                     AssignReflectedWorkItemId(sourcePlan.RootSuite.Id, targetPlan.RootSuite.Id);
                     FixAssignedToValue(sourcePlan.RootSuite.Id, targetPlan.RootSuite.Id);
+                    
                 }
                 else
                 {
@@ -84,6 +87,33 @@ namespace VstsSyncMigrator.Engine
                     // Add Test Cases
                     ProcessChildTestCases(sourcePlan.RootSuite, targetPlan.RootSuite, targetPlan);
                 }
+            }
+        }
+
+        private void ApplyDefaultConfigurations(ITestSuiteBase source, ITestSuiteBase target, ITestPlan targetPlan)
+        {
+            if(source.DefaultConfigurations == null)
+            {
+                target.ClearDefaultConfigurations();
+            } else
+            {
+                TestManagementContext targetTmc = new TestManagementContext(me.Target);
+                ITestConfigurationCollection existingConfigurations = targetTmc.Project.TestConfigurations.Query("Select * From TestConfiguration");
+
+                List<IdAndName> newDefaultConfigs = new List<IdAndName>();
+                foreach (IdAndName oldDefaultConfig in source.DefaultConfigurations)
+                {
+                    ITestConfiguration existingConfig = existingConfigurations.FirstOrDefault(c => c.Name == oldDefaultConfig.Name);
+                    if (existingConfig != null)
+                    {
+                        IdAndName config = new IdAndName(existingConfig.Id, existingConfig.Name);
+                        newDefaultConfigs.Add(config);
+                    } else
+                    {
+                        Trace.WriteLine($"Couldn't find configuration {oldDefaultConfig.Name} in target system. Not adding as default configuration for suite ${target.Title}.");
+                    }
+                }
+                target.SetDefaultConfigurations(newDefaultConfigs);
             }
         }
 
@@ -196,6 +226,7 @@ namespace VstsSyncMigrator.Engine
                 {
                     SaveNewTestSuitToPlan(targetPlan, (IStaticTestSuite)targetParent, targetSuiteChild);
                 }
+                ApplyDefaultConfigurations(sourceSuite, targetSuiteChild, targetPlan);
                 ApplyFieldMappings(sourceSuite.Id, targetSuiteChild.Id);
                 AssignReflectedWorkItemId(sourceSuite.Id, targetSuiteChild.Id);
                 FixAssignedToValue(sourceSuite.Id, targetSuiteChild.Id);
