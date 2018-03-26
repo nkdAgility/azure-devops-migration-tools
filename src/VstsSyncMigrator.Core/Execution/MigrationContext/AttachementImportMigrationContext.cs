@@ -43,16 +43,23 @@ namespace VstsSyncMigrator.Engine
                 string fileName = System.IO.Path.GetFileName(file);
                 try
                 {
-                    string reflectedID = fileName.Split('#')[0].Replace('+', ':').Replace("--", "/");
+                    var fileNameParts = fileName.Split('#');
+                    if (fileNameParts.Length != 2)
+                        continue;
+
+                    string reflectedID = fileNameParts[0].Replace('+', ':').Replace("--", "/");
+                    string targetFileName = fileNameParts[1];
+                    var renamedFilePath = Path.Combine(Path.GetDirectoryName(file), targetFileName);
+                    File.Move(file, renamedFilePath);
                     targetWI = targetStore.FindReflectedWorkItemByReflectedWorkItemId(reflectedID, me.ReflectedWorkItemIdFieldName);
                     if (targetWI != null)
                     {
                         Trace.WriteLine(string.Format("{0} of {1} - Import {2} to {3}", current, files.Count, fileName, targetWI.Id));
                         var attachments = targetWI.Attachments.Cast<Attachment>();
-                        var attachment = attachments.Where(a => a.Name == fileName).FirstOrDefault();
+                        var attachment = attachments.Where(a => a.Name == targetFileName).FirstOrDefault();
                         if (attachment == null)
                         {
-                            Attachment a = new Attachment(file);
+                            Attachment a = new Attachment(renamedFilePath);
                             targetWI.Attachments.Add(a);
                             targetWI.Save();
                         }
@@ -67,7 +74,7 @@ namespace VstsSyncMigrator.Engine
                         Trace.WriteLine(string.Format("{0} of {1} - Skipping {2} to {3}", current, files.Count, fileName, 0));
                         skipped++;
                     }
-                    System.IO.File.Delete(file);
+                    System.IO.File.Delete(renamedFilePath);
                 } catch (FileAttachmentException ex)
                 {
                     // Probably due to attachment being over size limit

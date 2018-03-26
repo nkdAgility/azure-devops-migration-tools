@@ -41,8 +41,15 @@ namespace VstsSyncMigrator.Engine
         {
             if (_Collection == null)
             {
+                Telemetry.Current.TrackEvent("TeamProjectContext.Connect",
+                    new Dictionary<string, string> {
+                          { "Name", Name},
+                          { "Target Project", this._TeamProjectName},
+                          { "Target Collection", this._CollectionUrl.ToString() }
+                    });
                 Stopwatch connectionTimer = new Stopwatch();
                 connectionTimer.Start();
+                DateTime start = DateTime.Now;
                 Trace.WriteLine("Creating TfsTeamProjectCollection Object ");
                     _Collection = new TfsTeamProjectCollection(_CollectionUrl);
                 try
@@ -51,18 +58,12 @@ namespace VstsSyncMigrator.Engine
                     Trace.WriteLine(string.Format("validating security for {0} ", _Collection.AuthorizedIdentity.ToString()));
                     _Collection.EnsureAuthenticated();
                     connectionTimer.Stop();
-                    Telemetry.Current.TrackEvent("ConnectionEstablished",
-                      new Dictionary<string, string> {
-                            { "CollectionUrl", _CollectionUrl.ToString() },
-                            { "TeamProjectName",  _TeamProjectName}
-                      },
-                      new Dictionary<string, double> {
-                            { "ConnectionTimer", connectionTimer.ElapsedMilliseconds }
-                      });
+                    Telemetry.Current.TrackDependency("TeamService", "EnsureAuthenticated", start, connectionTimer.Elapsed, true);
                     Trace.TraceInformation(string.Format(" Access granted "));
                 }
                 catch (TeamFoundationServiceUnavailableException ex)
                 {
+                    Telemetry.Current.TrackDependency("TeamService", "EnsureAuthenticated", start, connectionTimer.Elapsed, false);
                     Telemetry.Current.TrackException(ex,
                        new Dictionary<string, string> {
                             { "CollectionUrl", _CollectionUrl.ToString() },

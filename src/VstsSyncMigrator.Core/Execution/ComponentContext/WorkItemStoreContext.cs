@@ -48,12 +48,12 @@ namespace VstsSyncMigrator.Engine
 
         public Project GetProject()
         {
-            return (from Project x in wistore.Projects where x.Name == targetTfs.Name select x).SingleOrDefault();
+            return (from Project x in wistore.Projects where x.Name.ToUpper() == targetTfs.Name.ToUpper() select x).SingleOrDefault();
         }
 
         public string CreateReflectedWorkItemId(WorkItem wi)
         {
-            return string.Format("{0}/{1}/_workitems/edit/{2}", wi.Store.TeamProjectCollection.Uri, wi.Project.Name, wi.Id);
+            return string.Format("{0}/{1}/_workitems/edit/{2}", wi.Store.TeamProjectCollection.Uri.ToString().TrimEnd('/'), wi.Project.Name, wi.Id);
 
         }
         public int GetReflectedWorkItemId(WorkItem wi, string reflectedWotkItemIdField)
@@ -76,7 +76,7 @@ namespace VstsSyncMigrator.Engine
             {
                 return foundWis[workItemToFind.Id];
             }
-            if (workItemToFind.Fields.Contains(reflectedWotkItemIdField) && !string.IsNullOrEmpty( workItemToFind.Fields[reflectedWotkItemIdField].Value.ToString()))
+            if (workItemToFind.Fields.Contains(reflectedWotkItemIdField) && !string.IsNullOrEmpty( workItemToFind.Fields[reflectedWotkItemIdField]?.Value?.ToString()))
             {
                 string rwiid = workItemToFind.Fields[reflectedWotkItemIdField].Value.ToString();
                 int idToFind = GetReflectedWorkItemId(workItemToFind, reflectedWotkItemIdField);

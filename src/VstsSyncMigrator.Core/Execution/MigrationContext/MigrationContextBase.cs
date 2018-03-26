@@ -23,17 +23,10 @@ namespace VstsSyncMigrator.Engine
 
         public void Execute()
         {
-            Telemetry.Current.TrackEvent("MigrationContextExecute",
-                new Dictionary<string, string>
-                {
-                    {"Name", Name},
-                    {"Target Project", me.Target.Name},
-                    {"Target Collection", me.Target.Collection.Name},
-                    {"Source Project", me.Source.Name},
-                    {"Source Collection", me.Source.Collection.Name}
-                });
+            Telemetry.Current.TrackPageView(this.Name);
             Trace.TraceInformation(" Migration Context Start {0} ", Name);
             var executeTimer = new Stopwatch();
+            DateTime start = DateTime.Now;
             executeTimer.Start();
             //////////////////////////////////////////////////
             try
@@ -42,20 +35,7 @@ namespace VstsSyncMigrator.Engine
                 InternalExecute();
                 Status = ProcessingStatus.Complete;
                 executeTimer.Stop();
-                Telemetry.Current.TrackEvent("MigrationContextComplete",
-                    new Dictionary<string, string>
-                    {
-                        {"Name", Name},
-                        {"Target Project", me.Target.Name},
-                        {"Target Collection", me.Target.Collection.Name},
-                        {"Source Project", me.Source.Name},
-                        {"Source Collection", me.Source.Collection.Name},
-                        {"Status", Status.ToString()}
-                    },
-                    new Dictionary<string, double>
-                    {
-                        {"MigrationContextTime", executeTimer.ElapsedMilliseconds}
-                    });
+
                 Trace.TraceInformation(" Migration Context Complete {0} ", Name);
             }
             catch (Exception ex)
@@ -77,8 +57,12 @@ namespace VstsSyncMigrator.Engine
                         {"MigrationContextTime", executeTimer.ElapsedMilliseconds}
                     });
                 Trace.TraceWarning("  [EXCEPTION] {0}", ex.Message);
-                throw;
             }
+            finally
+            {
+                Telemetry.Current.TrackRequest(this.Name, start, executeTimer.Elapsed, Status.ToString(), (Status== ProcessingStatus.Complete));
+            }
+
         }
 
         internal abstract void InternalExecute();

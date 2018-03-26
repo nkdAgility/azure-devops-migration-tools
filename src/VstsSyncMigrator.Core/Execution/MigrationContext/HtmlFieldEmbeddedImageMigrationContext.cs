@@ -135,7 +135,7 @@ namespace VstsSyncMigrator.Engine
                                 string newImageLink =
                                     String.Format(
                                         "{0}/WorkItemTracking/v1.0/AttachFileHandler.ashx?FileNameGuid={1}&amp;FileName={2}",
-                                        newTfsurl, attachmentGuid, newFileNameMatch.Value);
+                                        newTfsurl.TrimEnd('/'), attachmentGuid, newFileNameMatch.Value);
 
                                 field.Value = field.Value.ToString().Replace(match.Value, newImageLink);
                                 wi.Attachments.RemoveAt(attachmentIndex);

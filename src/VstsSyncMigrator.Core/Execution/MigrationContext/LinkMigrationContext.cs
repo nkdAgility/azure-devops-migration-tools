@@ -279,7 +279,7 @@ namespace VstsSyncMigrator.Engine
             WorkItem wiTargetR;
             if (!(wiTargetL == null)
                 && wiSourceR.Project.Name == wiTargetL.Project.Name
-                && wiSourceR.Project.Store.TeamProjectCollection.Uri.ToString() == wiTargetL.Project.Store.TeamProjectCollection.Uri.ToString())
+                && wiSourceR.Project.Store.TeamProjectCollection.Uri.ToString().Replace("/", "") == wiTargetL.Project.Store.TeamProjectCollection.Uri.ToString().Replace("/", ""))
             {
                 // Moving to same team project as SourceR
                 wiTargetR = wiSourceR;
@@ -291,7 +291,7 @@ namespace VstsSyncMigrator.Engine
                 if (wiTargetR == null) // Assume source only (other team projkect)
                 {
                     wiTargetR = wiSourceR;
-                    if (wiTargetR.Project.Store.TeamProjectCollection.Uri != wiSourceR.Project.Store.TeamProjectCollection.Uri)
+                    if (wiTargetR.Project.Store.TeamProjectCollection.Uri.ToString().Replace("/", "") != wiSourceR.Project.Store.TeamProjectCollection.Uri.ToString().Replace("/", ""))
                     {
                         wiTargetR = null; // Totally bogus break! as not same team collection
                     }
