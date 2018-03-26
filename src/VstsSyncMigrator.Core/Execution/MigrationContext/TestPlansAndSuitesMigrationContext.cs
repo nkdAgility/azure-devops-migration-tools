@@ -12,7 +12,7 @@ using WorkItem = Microsoft.TeamFoundation.WorkItemTracking.Client.WorkItem;
 
 namespace VstsSyncMigrator.Engine
 {
-    public class TestPlansAndSuitsMigrationContext : MigrationContextBase
+    public class TestPlandsAndSuitesMigrationContext : MigrationContextBase
     {
         MigrationEngine engine;
 
@@ -23,17 +23,17 @@ namespace VstsSyncMigrator.Engine
         TestManagementContext targetTestStore;
         ITestConfigurationCollection targetTestConfigs;
 
-        TestPlansAndSuitsMigrationConfig config;
+        TestPlansAndSuitesMigrationConfig config;
 
         public override string Name
         {
             get
             {
-                return "TestPlansAndSuitsMigrationContext";
+                return "TestPlansAndSuitesMigrationContext";
             }
         }
 
-        public TestPlansAndSuitsMigrationContext(MigrationEngine me, TestPlansAndSuitsMigrationConfig config) : base(me, config)
+        public TestPlandsAndSuitesMigrationContext(MigrationEngine me, TestPlansAndSuitesMigrationConfig config) : base(me, config)
         {
             this.engine = me;
             sourceWitStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.None);
@@ -76,11 +76,11 @@ namespace VstsSyncMigrator.Engine
                 {
                     Trace.WriteLine("    Plan found", Name);
                 }
-                if (HasChildSuits(sourcePlan.RootSuite))
+                if (HasChildSuites(sourcePlan.RootSuite))
                 {
                     Trace.WriteLine($"    Source Plan has {sourcePlan.RootSuite.Entries.Count} Suites", Name);
-                    foreach (var sourcerSuiteChild in sourcePlan.RootSuite.SubSuites)
-                        ProcessTestSuite(sourcerSuiteChild, targetPlan.RootSuite, targetPlan);
+                    foreach (var sourceSuiteChild in sourcePlan.RootSuite.SubSuites)
+                        ProcessTestSuite(sourceSuiteChild, targetPlan.RootSuite, targetPlan);
                     // Add Test Cases
                     ProcessChildTestCases(sourcePlan.RootSuite, targetPlan.RootSuite, targetPlan);
                 }
@@ -127,30 +127,30 @@ namespace VstsSyncMigrator.Engine
             return !sourcePlanWorkItem.Tags.Contains(tagWhichMustBePresent);
         }
 
-        private void ProcessTestSuite(ITestSuiteBase sourceSuit, ITestSuiteBase targetParent, ITestPlan targetPlan)
+        private void ProcessTestSuite(ITestSuiteBase sourceSuite, ITestSuiteBase targetParent, ITestPlan targetPlan)
         {
-            if (CanSkipElementBecauseOfTags(sourceSuit.Id))
+            if (CanSkipElementBecauseOfTags(sourceSuite.Id))
                 return;
 
-            Trace.WriteLine($"    Processing {sourceSuit.TestSuiteType} : {sourceSuit.Id} - {sourceSuit.Title} ", Name);
-            var targetSuitChild = FindSuiteEntry((IStaticTestSuite)targetParent, sourceSuit.Title);
+            Trace.WriteLine($"    Processing {sourceSuite.TestSuiteType} : {sourceSuite.Id} - {sourceSuite.Title} ", Name);
+            var targetSuiteChild = FindSuiteEntry((IStaticTestSuite)targetParent, sourceSuite.Title);
 
-            if (targetSuitChild == null)
+            if (targetSuiteChild == null)
             {
                 // Should create
-                switch (sourceSuit.TestSuiteType)
+                switch (sourceSuite.TestSuiteType)
                 {
                     case TestSuiteType.None:
                         throw new NotImplementedException();
                     //break;
                     case TestSuiteType.DynamicTestSuite:
-                        targetSuitChild = CreateNewDynamicTestSuite(sourceSuit);
+                        targetSuiteChild = CreateNewDynamicTestSuite(sourceSuite);
                         break;
                     case TestSuiteType.StaticTestSuite:
-                        targetSuitChild = CreateNewStaticTestSuit(sourceSuit);
+                        targetSuiteChild = CreateNewStaticTestSuit(sourceSuite);
                         break;
                     case TestSuiteType.RequirementTestSuite:
-                        int sourceRid = ((IRequirementTestSuite)sourceSuit).RequirementId;
+                        int sourceRid = ((IRequirementTestSuite)sourceSuite).RequirementId;
                         WorkItem sourceReq = null;
                         WorkItem targetReq = null;
                         try
@@ -183,46 +183,46 @@ namespace VstsSyncMigrator.Engine
                             Trace.WriteLine("            Source work item not migrated to target, cannot be found", Name);
                             break;
                         }
-                        targetSuitChild = CreateNewRequirementTestSuite(sourceSuit, targetReq);
+                        targetSuiteChild = CreateNewRequirementTestSuite(sourceSuite, targetReq);
                         break;
                     default:
                         throw new NotImplementedException();
                         //break;
                 }
-                if (targetSuitChild == null) { return; }
+                if (targetSuiteChild == null) { return; }
                 // Add to target and Save
-                ApplyConfigurations(sourceSuit.TestSuiteEntry, targetSuitChild.TestSuiteEntry);
-                if (targetSuitChild.Plan == null)
+                ApplyConfigurations(sourceSuite.TestSuiteEntry, targetSuiteChild.TestSuiteEntry);
+                if (targetSuiteChild.Plan == null)
                 {
-                    SaveNewTestSuitToPlan(targetPlan, (IStaticTestSuite)targetParent, targetSuitChild);
+                    SaveNewTestSuitToPlan(targetPlan, (IStaticTestSuite)targetParent, targetSuiteChild);
                 }
-                ApplyFieldMappings(sourceSuit.Id, targetSuitChild.Id);
-                AssignReflectedWorkItemId(sourceSuit.Id, targetSuitChild.Id);
-                FixAssignedToValue(sourceSuit.Id, targetSuitChild.Id);
+                ApplyFieldMappings(sourceSuite.Id, targetSuiteChild.Id);
+                AssignReflectedWorkItemId(sourceSuite.Id, targetSuiteChild.Id);
+                FixAssignedToValue(sourceSuite.Id, targetSuiteChild.Id);
             }
             else
             {
                 // found
                 Trace.WriteLine("            Suite Exists", Name);
-                ApplyConfigurations(sourceSuit.TestSuiteEntry, targetSuitChild.TestSuiteEntry);
-                if (targetSuitChild.IsDirty)
+                ApplyConfigurations(sourceSuite.TestSuiteEntry, targetSuiteChild.TestSuiteEntry);
+                if (targetSuiteChild.IsDirty)
                 {
                     targetPlan.Save();
                 }
             }
 
             // Recurse if Static Suite
-            if (sourceSuit.TestSuiteType == TestSuiteType.StaticTestSuite && HasChildSuits(sourceSuit))
+            if (sourceSuite.TestSuiteType == TestSuiteType.StaticTestSuite && HasChildSuites(sourceSuite))
             {
-                Trace.WriteLine($"            Suite has {((IStaticTestSuite)sourceSuit).Entries.Count} children", Name);
-                foreach (var sourceSuitChild in ((IStaticTestSuite)sourceSuit).SubSuites)
+                Trace.WriteLine($"            Suite has {((IStaticTestSuite)sourceSuite).Entries.Count} children", Name);
+                foreach (var sourceSuitChild in ((IStaticTestSuite)sourceSuite).SubSuites)
                 {
-                    ProcessTestSuite(sourceSuitChild, targetSuitChild, targetPlan);
+                    ProcessTestSuite(sourceSuitChild, targetSuiteChild, targetPlan);
 
                 }
             }
             // Add Test Cases
-            ProcessChildTestCases(sourceSuit, targetSuitChild, targetPlan);
+            ProcessChildTestCases(sourceSuite, targetSuiteChild, targetPlan);
         }
 
         /// <summary>
@@ -486,7 +486,7 @@ namespace VstsSyncMigrator.Engine
             return (from s in staticSuit.SubSuites where s.Title == titleToFind select s).SingleOrDefault();
         }
 
-        private bool HasChildSuits(ITestSuiteBase sourceSuit)
+        private bool HasChildSuites(ITestSuiteBase sourceSuit)
         {
             bool hasChildren = false;
             if (sourceSuit != null && sourceSuit.TestSuiteType == TestSuiteType.StaticTestSuite)
