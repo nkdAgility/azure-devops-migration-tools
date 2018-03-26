@@ -65,8 +65,10 @@ namespace VstsSyncMigrator.Engine
                     Trace.WriteLine("    Plan missing... creating", Name);
                     targetPlan = CreateNewTestPlanFromSource(sourcePlan, newPlanName);
                     targetPlan.Save();
+                    ApplyFieldMappings(sourcePlan.Id, targetPlan.Id);
                     AssignReflectedWorkItemId(sourcePlan.Id, targetPlan.Id);
                     FixAssignedToValue(sourcePlan.Id, targetPlan.Id);
+                    ApplyFieldMappings(sourcePlan.RootSuite.Id, targetPlan.RootSuite.Id);
                     AssignReflectedWorkItemId(sourcePlan.RootSuite.Id, targetPlan.RootSuite.Id);
                     FixAssignedToValue(sourcePlan.RootSuite.Id, targetPlan.RootSuite.Id);
                 }
@@ -90,6 +92,27 @@ namespace VstsSyncMigrator.Engine
             var sourceWI = sourceWitStore.Store.GetWorkItem(sourceWIId);
             var targetWI = targetWitStore.Store.GetWorkItem(targetWIId);
             targetWI.Fields[me.ReflectedWorkItemIdFieldName].Value = sourceWitStore.CreateReflectedWorkItemId(sourceWI);
+            targetWI.Save();
+        }
+
+        private void ApplyFieldMappings(int sourceWIId, int targetWIId)
+        {
+            var sourceWI = sourceWitStore.Store.GetWorkItem(sourceWIId);
+            var targetWI = targetWitStore.Store.GetWorkItem(targetWIId);
+
+            if (config.PrefixProjectToNodes)
+            {
+                targetWI.AreaPath = string.Format(@"{0}\{1}", engine.Target.Name, sourceWI.AreaPath);
+                targetWI.IterationPath = string.Format(@"{0}\{1}", engine.Target.Name, sourceWI.IterationPath);
+            }
+            else
+            {
+                var regex = new Regex(Regex.Escape(engine.Source.Name));
+                targetWI.AreaPath = regex.Replace(sourceWI.AreaPath, engine.Target.Name, 1);
+                targetWI.IterationPath = regex.Replace(sourceWI.IterationPath, engine.Target.Name, 1);
+            }
+
+            me.ApplyFieldMappings(sourceWI, targetWI);
             targetWI.Save();
         }
 
@@ -173,6 +196,7 @@ namespace VstsSyncMigrator.Engine
                 {
                     SaveNewTestSuitToPlan(targetPlan, (IStaticTestSuite)targetParent, targetSuitChild);
                 }
+                ApplyFieldMappings(sourceSuit.Id, targetSuitChild.Id);
                 AssignReflectedWorkItemId(sourceSuit.Id, targetSuitChild.Id);
                 FixAssignedToValue(sourceSuit.Id, targetSuitChild.Id);
             }
@@ -481,17 +505,22 @@ namespace VstsSyncMigrator.Engine
             targetPlan.StartDate = sourcePlan.StartDate;
             targetPlan.EndDate = sourcePlan.EndDate;
             targetPlan.Description = sourcePlan.Description;
-            if (config.PrefixProjectToNodes)
-            {
-                targetPlan.AreaPath = string.Format(@"{0}\{1}", engine.Target.Name, sourcePlan.AreaPath);
-                targetPlan.Iteration = string.Format(@"{0}\{1}", engine.Target.Name, sourcePlan.Iteration);
-            }
-            else
-            {
-                var regex = new Regex(Regex.Escape(engine.Source.Name));
-                targetPlan.AreaPath = regex.Replace(sourcePlan.AreaPath, engine.Target.Name, 1);
-                targetPlan.Iteration = regex.Replace(sourcePlan.Iteration, engine.Target.Name, 1);
-            }
+            //if (config.PrefixProjectToNodes)
+            //{
+            //    targetPlan.AreaPath = string.Format(@"{0}\{1}", engine.Target.Name, sourcePlan.AreaPath);
+            //    targetPlan.Iteration = string.Format(@"{0}\{1}", engine.Target.Name, sourcePlan.Iteration);
+            //}
+            //else
+            //{
+            //    var regex = new Regex(Regex.Escape(engine.Source.Name));
+            //    targetPlan.AreaPath = regex.Replace(sourcePlan.AreaPath, engine.Target.Name, 1);
+            //    targetPlan.Iteration = regex.Replace(sourcePlan.Iteration, engine.Target.Name, 1);
+            //}
+
+            // Set area and iteration to root of the target project. 
+            // We will set the correct values later, when we actually have a work item available
+            targetPlan.Iteration = engine.Target.Name;
+            targetPlan.AreaPath = engine.Target.Name;
 
             // Remove testsettings reference because VSTS Sync doesnt support migrating these artifacts
             if (targetPlan.ManualTestSettingsId != 0)
