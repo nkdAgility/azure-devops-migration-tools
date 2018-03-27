@@ -69,7 +69,8 @@ namespace VstsSyncMigrator.Engine
                     AssignReflectedWorkItemId(sourcePlan.Id, targetPlan.Id);
                     FixAssignedToValue(sourcePlan.Id, targetPlan.Id);
 
-                    ApplyDefaultConfigurations(sourcePlan.RootSuite, targetPlan.RootSuite, targetPlan);
+                    //ApplyDefaultConfigurations(sourcePlan.RootSuite, targetPlan.RootSuite, targetPlan);
+                    ApplyConfigurations(sourcePlan.RootSuite, targetPlan.RootSuite);
                     ApplyFieldMappings(sourcePlan.RootSuite.Id, targetPlan.RootSuite.Id);
                     AssignReflectedWorkItemId(sourcePlan.RootSuite.Id, targetPlan.RootSuite.Id);
                     FixAssignedToValue(sourcePlan.RootSuite.Id, targetPlan.RootSuite.Id);
@@ -87,33 +88,6 @@ namespace VstsSyncMigrator.Engine
                     // Add Test Cases
                     ProcessChildTestCases(sourcePlan.RootSuite, targetPlan.RootSuite, targetPlan);
                 }
-            }
-        }
-
-        private void ApplyDefaultConfigurations(ITestSuiteBase source, ITestSuiteBase target, ITestPlan targetPlan)
-        {
-            if(source.DefaultConfigurations == null)
-            {
-                target.ClearDefaultConfigurations();
-            } else
-            {
-                TestManagementContext targetTmc = new TestManagementContext(me.Target);
-                ITestConfigurationCollection existingConfigurations = targetTmc.Project.TestConfigurations.Query("Select * From TestConfiguration");
-
-                List<IdAndName> newDefaultConfigs = new List<IdAndName>();
-                foreach (IdAndName oldDefaultConfig in source.DefaultConfigurations)
-                {
-                    ITestConfiguration existingConfig = existingConfigurations.FirstOrDefault(c => c.Name == oldDefaultConfig.Name);
-                    if (existingConfig != null)
-                    {
-                        IdAndName config = new IdAndName(existingConfig.Id, existingConfig.Name);
-                        newDefaultConfigs.Add(config);
-                    } else
-                    {
-                        Trace.WriteLine($"Couldn't find configuration {oldDefaultConfig.Name} in target system. Not adding as default configuration for suite ${target.Title}.");
-                    }
-                }
-                target.SetDefaultConfigurations(newDefaultConfigs);
             }
         }
 
@@ -177,7 +151,7 @@ namespace VstsSyncMigrator.Engine
                         targetSuiteChild = CreateNewDynamicTestSuite(sourceSuite);
                         break;
                     case TestSuiteType.StaticTestSuite:
-                        targetSuiteChild = CreateNewStaticTestSuit(sourceSuite);
+                        targetSuiteChild = CreateNewStaticTestSuite(sourceSuite);
                         break;
                     case TestSuiteType.RequirementTestSuite:
                         int sourceRid = ((IRequirementTestSuite)sourceSuite).RequirementId;
@@ -220,13 +194,12 @@ namespace VstsSyncMigrator.Engine
                         //break;
                 }
                 if (targetSuiteChild == null) { return; }
-                // Add to target and Save
-                ApplyConfigurations(sourceSuite.TestSuiteEntry, targetSuiteChild.TestSuiteEntry);
+                // Apply default configurations, Add to target and Save
+                ApplyConfigurations(sourceSuite, targetSuiteChild);
                 if (targetSuiteChild.Plan == null)
                 {
                     SaveNewTestSuitToPlan(targetPlan, (IStaticTestSuite)targetParent, targetSuiteChild);
                 }
-                ApplyDefaultConfigurations(sourceSuite, targetSuiteChild, targetPlan);
                 ApplyFieldMappings(sourceSuite.Id, targetSuiteChild.Id);
                 AssignReflectedWorkItemId(sourceSuite.Id, targetSuiteChild.Id);
                 FixAssignedToValue(sourceSuite.Id, targetSuiteChild.Id);
@@ -235,7 +208,7 @@ namespace VstsSyncMigrator.Engine
             {
                 // found
                 Trace.WriteLine("            Suite Exists", Name);
-                ApplyConfigurations(sourceSuite.TestSuiteEntry, targetSuiteChild.TestSuiteEntry);
+                ApplyConfigurations(sourceSuite, targetSuiteChild);
                 if (targetSuiteChild.IsDirty)
                 {
                     targetPlan.Save();
@@ -365,8 +338,7 @@ namespace VstsSyncMigrator.Engine
         {
             if (source.DefaultConfigurations != null)
             {
-                Trace.WriteLine("   CONFIG MNISSMATCH FOUND --- FIX AATTEMPTING", "TestPlansAndSuites");
-                target.ClearDefaultConfigurations();
+                Trace.WriteLine($"   Setting default configurations for suite {target.Title}", "TestPlansAndSuites");
                 IList<IdAndName> targetConfigs = new List<IdAndName>();
                 foreach (var config in source.DefaultConfigurations)
                 {
@@ -386,6 +358,9 @@ namespace VstsSyncMigrator.Engine
                 {
                     // SOmetimes this will error out for no reason.
                 }
+            } else
+            {
+                target.ClearDefaultConfigurations();
             }
         }
 
@@ -434,12 +409,7 @@ namespace VstsSyncMigrator.Engine
 
         private ITestSuiteBase CreateNewDynamicTestSuite(ITestSuiteBase source)
         {
-
             IDynamicTestSuite targetSuitChild = targetTestStore.Project.TestSuites.CreateDynamic();
-            if (source.TestSuiteEntry.Configurations != null)
-            {
-                ApplyConfigurations(source, targetSuitChild);
-            }
             targetSuitChild.TestSuiteEntry.Title = source.TestSuiteEntry.Title;
             ApplyTestSuiteQuery(source, targetSuitChild, targetTestStore);
 
@@ -457,11 +427,6 @@ namespace VstsSyncMigrator.Engine
             {
                 Trace.WriteLine(string.Format("            Unable to Create Requirement based Test Suit: {0}", ex.Message), "TestPlansAndSuites");
                 return null;
-            }
-
-            if (source.TestSuiteEntry.Configurations != null)
-            {
-                ApplyConfigurations(source, targetSuitChild);
             }
             targetSuitChild.Title = source.Title;
             return targetSuitChild;
@@ -499,13 +464,9 @@ namespace VstsSyncMigrator.Engine
             testPlan.Save();
         }
 
-        private ITestSuiteBase CreateNewStaticTestSuit(ITestSuiteBase source)
+        private ITestSuiteBase CreateNewStaticTestSuite(ITestSuiteBase source)
         {
             ITestSuiteBase targetSuitChild = targetTestStore.Project.TestSuites.CreateStatic();
-            if (source.TestSuiteEntry.Configurations != null)
-            {
-                ApplyConfigurations(source, targetSuitChild);
-            }
             targetSuitChild.TestSuiteEntry.Title = source.TestSuiteEntry.Title;
             return targetSuitChild;
         }
