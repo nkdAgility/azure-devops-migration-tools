@@ -68,12 +68,12 @@ namespace VstsSyncMigrator.Engine
                     AssignReflectedWorkItemId(sourcePlan.Id, targetPlan.Id);
                     FixAssignedToValue(sourcePlan.Id, targetPlan.Id);
 
-                    ApplyConfigurations(sourcePlan.RootSuite, targetPlan.RootSuite);
+                    ApplyDefaultConfigurations(sourcePlan.RootSuite, targetPlan.RootSuite);
 
                     ApplyFieldMappings(sourcePlan.RootSuite.Id, targetPlan.RootSuite.Id);
                     AssignReflectedWorkItemId(sourcePlan.RootSuite.Id, targetPlan.RootSuite.Id);
                     FixAssignedToValue(sourcePlan.RootSuite.Id, targetPlan.RootSuite.Id);
-                    // Add Test Cases
+                    // Add Test Cases & apply configurations
                     AddChildTestCases(sourcePlan.RootSuite, targetPlan.RootSuite, targetPlan);
                 }
                 else
@@ -88,6 +88,11 @@ namespace VstsSyncMigrator.Engine
                         ProcessTestSuite(sourceSuiteChild, targetPlan.RootSuite, targetPlan);
                     }
                 }
+
+                targetPlan.Save();
+                ITestPlan targetPlan2 = FindTestPlan(targetTestStore, targetPlan.Name);
+                ApplyConfigurations(sourcePlan.RootSuite, targetPlan2.RootSuite);
+
             }
         }
 
@@ -195,7 +200,7 @@ namespace VstsSyncMigrator.Engine
                 }
                 if (targetSuiteChild == null) { return; }
                 // Apply default configurations, Add to target and Save
-                ApplyConfigurations(sourceSuite, targetSuiteChild);
+                ApplyDefaultConfigurations(sourceSuite, targetSuiteChild);
                 if (targetSuiteChild.Plan == null)
                 {
                     SaveNewTestSuiteToPlan(targetPlan, (IStaticTestSuite)targetParent, targetSuiteChild);
@@ -208,7 +213,7 @@ namespace VstsSyncMigrator.Engine
             {
                 // The target suite already exists, take it from here
                 Trace.WriteLine("            Suite Exists", Name);
-                ApplyConfigurations(sourceSuite, targetSuiteChild);
+                ApplyDefaultConfigurations(sourceSuite, targetSuiteChild);
                 if (targetSuiteChild.IsDirty)
                 {
                     targetPlan.Save();
@@ -230,7 +235,6 @@ namespace VstsSyncMigrator.Engine
                     }
                 }
             }
-            
         }
 
         /// <summary>
@@ -309,7 +313,6 @@ namespace VstsSyncMigrator.Engine
                 if (exists != null)
                 {
                     Trace.WriteLine(string.Format("    Test case already in suite {0} : {1} - {2} ", sourceTestCaseEntry.EntryType.ToString(), sourceTestCaseEntry.Id, sourceTestCaseEntry.Title), "TestPlansAndSuites");
-                    //ApplyConfigurations(sourceTestCaseEntry, exists);
                 }
                 else
                 {
@@ -320,7 +323,6 @@ namespace VstsSyncMigrator.Engine
                     }
                     else
                     {
-                        //ApplyConfigurations(sourceTestCaseEntry, targetTestCase.TestSuiteEntry);
                         tcs.Add(targetTestCase);
                         Trace.WriteLine(string.Format("    Adding {0} : {1} - {2} ", sourceTestCaseEntry.EntryType.ToString(), sourceTestCaseEntry.Id, sourceTestCaseEntry.Title), "TestPlansAndSuites");
                     }
@@ -339,7 +341,7 @@ namespace VstsSyncMigrator.Engine
         /// </summary>
         /// <param name="source">The test suite to take as a source.</param>
         /// <param name="target">The test suite to apply the default configurations to.</param>
-        private void ApplyConfigurations(ITestSuiteBase source, ITestSuiteBase target)
+        private void ApplyDefaultConfigurations(ITestSuiteBase source, ITestSuiteBase target)
         {
             if (source.DefaultConfigurations != null)
             {
@@ -366,6 +368,39 @@ namespace VstsSyncMigrator.Engine
             } else
             {
                 target.ClearDefaultConfigurations();
+            }
+        }
+
+        private void ApplyConfigurations(ITestSuiteBase sourceSuite, ITestSuiteBase targetSuite)
+        {
+            Trace.Write($"Applying configurations for test cases in source suite {sourceSuite.Title}");
+            foreach (ITestSuiteEntry sourceTce in sourceSuite.TestCases)
+            {
+                WorkItem wi = targetWitStore.FindReflectedWorkItem(sourceTce.TestCase.WorkItem, me.ReflectedWorkItemIdFieldName, false);
+                ITestSuiteEntry targetTce = (from tc in targetSuite.TestCases
+                                where tc.TestCase.WorkItem.Id == wi.Id
+                                select tc).SingleOrDefault();
+                ApplyConfigurations(sourceTce, targetTce);
+            }
+
+            if(HasChildSuites(sourceSuite))
+            {
+                foreach(ITestSuiteEntry sourceSuiteChild in ((IStaticTestSuite)sourceSuite).Entries.Where(
+                    e => e.EntryType == TestSuiteEntryType.DynamicTestSuite
+                    || e.EntryType == TestSuiteEntryType.RequirementTestSuite
+                    || e.EntryType == TestSuiteEntryType.StaticTestSuite))
+                {
+                    //Find migrated suite in target
+                    WorkItem sourceSuiteWi = sourceWitStore.Store.GetWorkItem(sourceSuiteChild.Id);
+                    WorkItem targetSuiteWi = targetWitStore.FindReflectedWorkItem(sourceSuiteWi, me.ReflectedWorkItemIdFieldName, false);
+                    ITestSuiteEntry targetSuiteChild = (from tc in ((IStaticTestSuite)targetSuite).Entries
+                                                        where tc.Id == targetSuiteWi.Id
+                                                        select tc).FirstOrDefault();
+                    if(targetSuiteChild != null)
+                    {
+                        ApplyConfigurations(sourceSuiteChild.TestSuite, targetSuiteChild.TestSuite);
+                    }
+                }
             }
         }
 
@@ -472,11 +507,9 @@ namespace VstsSyncMigrator.Engine
             return targetSuitChild;
         }
 
-
-
-        private ITestSuiteBase FindSuiteEntry(IStaticTestSuite staticSuit, string titleToFind)
+        private ITestSuiteBase FindSuiteEntry(IStaticTestSuite staticSuite, string titleToFind)
         {
-            return (from s in staticSuit.SubSuites where s.Title == titleToFind select s).SingleOrDefault();
+            return (from s in staticSuite.SubSuites where s.Title == titleToFind select s).SingleOrDefault();
         }
 
         private bool HasChildSuites(ITestSuiteBase sourceSuit)
@@ -498,17 +531,6 @@ namespace VstsSyncMigrator.Engine
             targetPlan.StartDate = sourcePlan.StartDate;
             targetPlan.EndDate = sourcePlan.EndDate;
             targetPlan.Description = sourcePlan.Description;
-            //if (config.PrefixProjectToNodes)
-            //{
-            //    targetPlan.AreaPath = string.Format(@"{0}\{1}", engine.Target.Name, sourcePlan.AreaPath);
-            //    targetPlan.Iteration = string.Format(@"{0}\{1}", engine.Target.Name, sourcePlan.Iteration);
-            //}
-            //else
-            //{
-            //    var regex = new Regex(Regex.Escape(engine.Source.Name));
-            //    targetPlan.AreaPath = regex.Replace(sourcePlan.AreaPath, engine.Target.Name, 1);
-            //    targetPlan.Iteration = regex.Replace(sourcePlan.Iteration, engine.Target.Name, 1);
-            //}
 
             // Set area and iteration to root of the target project. 
             // We will set the correct values later, when we actually have a work item available
