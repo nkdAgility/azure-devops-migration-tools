@@ -9,6 +9,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using VstsSyncMigrator.Engine.Configuration.Processing;
 using WorkItem = Microsoft.TeamFoundation.WorkItemTracking.Client.WorkItem;
+using Microsoft.TeamFoundation.Framework.Client;
+using Microsoft.TeamFoundation.Framework.Common;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -18,12 +20,16 @@ namespace VstsSyncMigrator.Engine
 
         WorkItemStoreContext sourceWitStore;
         TestManagementContext sourceTestStore;
+        ITestConfigurationCollection sourceTestConfigs;
 
         WorkItemStoreContext targetWitStore;
         TestManagementContext targetTestStore;
         ITestConfigurationCollection targetTestConfigs;
 
         TestPlansAndSuitesMigrationConfig config;
+
+        IIdentityManagementService sourceIdentityManagementService;
+        IIdentityManagementService targetIdentityManagementService;
 
         public override string Name
         {
@@ -40,7 +46,10 @@ namespace VstsSyncMigrator.Engine
             sourceTestStore = new TestManagementContext(me.Source);
             targetWitStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
             targetTestStore = new TestManagementContext(me.Target);
+            sourceTestConfigs = sourceTestStore.Project.TestConfigurations.Query("Select * From TestConfiguration");
             targetTestConfigs = targetTestStore.Project.TestConfigurations.Query("Select * From TestConfiguration");
+            sourceIdentityManagementService = me.Source.Collection.GetService<IIdentityManagementService>();
+            targetIdentityManagementService = me.Target.Collection.GetService<IIdentityManagementService>();
             this.config = config;
         }
 
@@ -92,7 +101,7 @@ namespace VstsSyncMigrator.Engine
                 targetPlan.Save();
                 // Load the plan again, because somehow it doesn't let me set configurations on the already loaded plan
                 ITestPlan targetPlan2 = FindTestPlan(targetTestStore, targetPlan.Name);
-                ApplyConfigurations(sourcePlan.RootSuite, targetPlan2.RootSuite);
+                ApplyConfigurationsAndAssignTesters(sourcePlan.RootSuite, targetPlan2.RootSuite);
 
             }
         }
@@ -372,7 +381,7 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        private void ApplyConfigurations(ITestSuiteBase sourceSuite, ITestSuiteBase targetSuite)
+        private void ApplyConfigurationsAndAssignTesters(ITestSuiteBase sourceSuite, ITestSuiteBase targetSuite)
         {
             Trace.Write($"Applying configurations for test cases in source suite {sourceSuite.Title}");
             foreach (ITestSuiteEntry sourceTce in sourceSuite.TestCases)
@@ -398,8 +407,10 @@ namespace VstsSyncMigrator.Engine
                 
             }
 
+            AssignTesters(sourceSuite, targetSuite);
+
             //Loop over child suites and set configurations for test case entries there
-            if(HasChildSuites(sourceSuite))
+            if (HasChildSuites(sourceSuite))
             {
                 foreach(ITestSuiteEntry sourceSuiteChild in ((IStaticTestSuite)sourceSuite).Entries.Where(
                     e => e.EntryType == TestSuiteEntryType.DynamicTestSuite
@@ -416,7 +427,7 @@ namespace VstsSyncMigrator.Engine
                                                             select tc).FirstOrDefault();
                         if (targetSuiteChild != null)
                         {
-                            ApplyConfigurations(sourceSuiteChild.TestSuite, targetSuiteChild.TestSuite);
+                            ApplyConfigurationsAndAssignTesters(sourceSuiteChild.TestSuite, targetSuiteChild.TestSuite);
                         }
                         else
                         {
@@ -428,6 +439,78 @@ namespace VstsSyncMigrator.Engine
                     }
                 }
             }
+        }
+
+        private void AssignTesters(ITestSuiteBase sourceSuite, ITestSuiteBase targetSuite)
+        { 
+            List<ITestPointAssignment> assignmentsToAdd = new List<ITestPointAssignment>();
+            //loop over all source test case entries
+            foreach(ITestSuiteEntry sourceTce in sourceSuite.TestCases)
+            {
+                // find target testcase id for this source tce
+                WorkItem targetTc = targetWitStore.FindReflectedWorkItem(sourceTce.TestCase.WorkItem, me.ReflectedWorkItemIdFieldName, false);
+
+                //figure out test point assignments for each source tce
+                foreach(ITestPointAssignment tpa in sourceTce.PointAssignments)
+                {
+                    string sourceAssignedToName = tpa.AssignedToName;
+                    int sourceConfigurationId = tpa.ConfigurationId;
+
+                    var sourceIdentity = sourceIdentityManagementService.ReadIdentity(
+                        tpa.AssignedTo.Descriptor,
+                        MembershipQuery.Direct,
+                        ReadIdentityOptions.ExtendedProperties);
+                    string sourceIdentityMail = sourceIdentity.GetProperty("Mail") as string;
+
+                    if (!string.IsNullOrEmpty(sourceIdentityMail))
+                    {
+                        //translate source assignedtoname to target identity
+                        var targetIdentity = targetIdentityManagementService.ReadIdentity(
+                            IdentitySearchFactor.MailAddress,
+                            sourceIdentityMail,
+                            MembershipQuery.Direct,
+                            ReadIdentityOptions.None);
+
+                        if (targetIdentity != null)
+                        {
+                            //translate source configuration id to target configuration id and name
+                            //// Get source configuration name
+                            string sourceConfigName = (from tc in sourceTestConfigs
+                                                       where tc.Id == sourceConfigurationId
+                                                       select tc.Name).FirstOrDefault();
+                            //// Find source configuration name in target and get the id for it
+                            int targetConfigId = (from tc in targetTestConfigs
+                                                  where tc.Name == sourceConfigName
+                                                  select tc.Id).FirstOrDefault();
+
+                            if (targetConfigId != 0)
+                            {
+                                IdAndName targetConfiguration = new IdAndName(targetConfigId, sourceConfigName);
+
+                                // Create a test point assignment with target test case id, target configuration (id and name) and target identity
+                                ITestPointAssignment newAssignment = targetSuite.CreateTestPointAssignment(
+                                    targetTc.Id,
+                                    targetConfiguration,
+                                    targetIdentity);
+
+                                // add the test point assignment to the list
+                                assignmentsToAdd.Add(newAssignment);
+                            } else
+                            {
+                                Trace.Write($"Cannot find configuration with name [{sourceConfigName}] in target. Cannot assign tester to it.", "TestPlansAndSuites");
+                            }
+                        } else
+                        {
+                            Trace.Write($"Cannot find tester with e-mail [{sourceIdentityMail}] in target system. Cannot assign.", "TestPlansAndSuites");
+                        }
+                    } else
+                    {
+                        Trace.Write($"No e-mail address known in source system for [{sourceIdentity.DisplayName}]. Cannot translate to target.", "TestPlansAndSuites");
+                    }
+                }
+            }
+            // assign the list to the suite
+            targetSuite.AssignTestPoints(assignmentsToAdd);
         }
 
         /// <summary>
