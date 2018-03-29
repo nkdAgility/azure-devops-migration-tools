@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace VstsSyncMigrator.Engine.Configuration.Processing
 {
-    public class TestPlansAndSuitsMigrationConfig : ITfsProcessingConfig
+    public class TestPlansAndSuitesMigrationConfig : ITfsProcessingConfig
     {
         public bool PrefixProjectToNodes { get; set; }
         public bool Enabled { get; set; }
@@ -11,7 +11,7 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
 
         public Type Processor
         {
-            get { return typeof(TestPlansAndSuitsMigrationContext); }
+            get { return typeof(TestPlandsAndSuitesMigrationContext); }
         }
 
         /// <inheritdoc />

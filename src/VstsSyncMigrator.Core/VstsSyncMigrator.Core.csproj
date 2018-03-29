@@ -290,7 +290,7 @@
     <Compile Include="Configuration\Processing\ExportProfilePictureFromADConfig.cs" />
     <Compile Include="Configuration\Processing\ImportProfilePictureConfig.cs" />
     <Compile Include="Configuration\Processing\TestRunsMigrationConfig.cs" />
-    <Compile Include="Configuration\Processing\TestPlansAndSuitsMigrationConfig.cs" />
+    <Compile Include="Configuration\Processing\TestPlansAndSuitesMigrationConfig.cs" />
     <Compile Include="Configuration\Processing\TestConfigurationsMigrationConfig.cs" />
     <Compile Include="Configuration\Processing\TestVeriablesMigrationConfig.cs" />
     <Compile Include="Configuration\Processing\WorkItemDeleteConfig.cs" />
@@ -350,7 +350,7 @@
     <Compile Include="Execution\ComponentContext\TfsQueryContext.cs" />
     <Compile Include="Execution\MigrationContext\WorkItemMigrationContext.cs" />
     <Compile Include="Execution\ComponentContext\WorkItemStoreContext.cs" />
-    <Compile Include="Execution\MigrationContext\TestPlansAndSuitsMigrationContext.cs" />
+    <Compile Include="Execution\MigrationContext\TestPlansAndSuitesMigrationContext.cs" />
     <Compile Include="Execution\FieldMaps\RegexFieldMap.cs" />
     <Compile Include="Execution\FieldMaps\TreeToTagFieldMap.cs" />
     <Compile Include="Telemetry.cs" />

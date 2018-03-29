@@ -64,7 +64,7 @@ Note: **WorkItemMigrationContext** and **WorkItemRevisionReplayMigrationContext*
 
 1. **TestVeriablesMigrationContext** - Migrates test variables
 1. **TestConfigurationsMigrationContext** - Migrate test configurations
-1. **TestPlansAndSuitsMigrationContext** - Migrate test plans and suites, this does assume that the actual test cases and shared steps are migrated using the **WorkItemMigrationContext**
+1. **TestPlansAndSuitesMigrationContext** - Migrate test plans and suites, this does assume that the actual test cases and shared steps are migrated using the **WorkItemMigrationContext**
 1. **TestRunsMigrationContext** [BETA] - Migrates past test run results
 
 ##### Misc

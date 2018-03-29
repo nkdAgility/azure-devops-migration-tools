@@ -9,44 +9,52 @@ using System.Collections.Generic;
 using System.Globalization;
 using VstsSyncMigrator.Engine.Configuration.Processing;
 using WorkItem = Microsoft.TeamFoundation.WorkItemTracking.Client.WorkItem;
+using Microsoft.TeamFoundation.Framework.Client;
+using Microsoft.TeamFoundation.Framework.Common;
 
 namespace VstsSyncMigrator.Engine
 {
-    public class TestPlansAndSuitsMigrationContext : MigrationContextBase
+    public class TestPlandsAndSuitesMigrationContext : MigrationContextBase
     {
         MigrationEngine engine;
 
         WorkItemStoreContext sourceWitStore;
         TestManagementContext sourceTestStore;
+        ITestConfigurationCollection sourceTestConfigs;
 
         WorkItemStoreContext targetWitStore;
         TestManagementContext targetTestStore;
         ITestConfigurationCollection targetTestConfigs;
 
-        TestPlansAndSuitsMigrationConfig config;
+        TestPlansAndSuitesMigrationConfig config;
+
+        IIdentityManagementService sourceIdentityManagementService;
+        IIdentityManagementService targetIdentityManagementService;
 
         public override string Name
         {
             get
             {
-                return "TestPlansAndSuitsMigrationContext";
+                return "TestPlansAndSuitesMigrationContext";
             }
         }
 
-        public TestPlansAndSuitsMigrationContext(MigrationEngine me, TestPlansAndSuitsMigrationConfig config) : base(me, config)
+        public TestPlandsAndSuitesMigrationContext(MigrationEngine me, TestPlansAndSuitesMigrationConfig config) : base(me, config)
         {
             this.engine = me;
             sourceWitStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.None);
             sourceTestStore = new TestManagementContext(me.Source);
             targetWitStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
             targetTestStore = new TestManagementContext(me.Target);
+            sourceTestConfigs = sourceTestStore.Project.TestConfigurations.Query("Select * From TestConfiguration");
             targetTestConfigs = targetTestStore.Project.TestConfigurations.Query("Select * From TestConfiguration");
+            sourceIdentityManagementService = me.Source.Collection.GetService<IIdentityManagementService>();
+            targetIdentityManagementService = me.Target.Collection.GetService<IIdentityManagementService>();
             this.config = config;
         }
 
         internal override void InternalExecute()
         {
-
             ITestPlanCollection sourcePlans = sourceTestStore.GetTestPlans();
             Trace.WriteLine(string.Format("Plan to copy {0} Plans?", sourcePlans.Count), "TestPlansAndSuites");
             foreach (ITestPlan sourcePlan in sourcePlans)
@@ -65,23 +73,36 @@ namespace VstsSyncMigrator.Engine
                     Trace.WriteLine("    Plan missing... creating", Name);
                     targetPlan = CreateNewTestPlanFromSource(sourcePlan, newPlanName);
                     targetPlan.Save();
+                    ApplyFieldMappings(sourcePlan.Id, targetPlan.Id);
                     AssignReflectedWorkItemId(sourcePlan.Id, targetPlan.Id);
                     FixAssignedToValue(sourcePlan.Id, targetPlan.Id);
+
+                    ApplyDefaultConfigurations(sourcePlan.RootSuite, targetPlan.RootSuite);
+
+                    ApplyFieldMappings(sourcePlan.RootSuite.Id, targetPlan.RootSuite.Id);
                     AssignReflectedWorkItemId(sourcePlan.RootSuite.Id, targetPlan.RootSuite.Id);
                     FixAssignedToValue(sourcePlan.RootSuite.Id, targetPlan.RootSuite.Id);
+                    // Add Test Cases & apply configurations
+                    AddChildTestCases(sourcePlan.RootSuite, targetPlan.RootSuite, targetPlan);
                 }
                 else
                 {
-                    Trace.WriteLine("    Plan found", Name);
+                    Trace.WriteLine("    Plan already found, not creating", Name);
                 }
-                if (HasChildSuits(sourcePlan.RootSuite))
+                if (HasChildSuites(sourcePlan.RootSuite))
                 {
                     Trace.WriteLine($"    Source Plan has {sourcePlan.RootSuite.Entries.Count} Suites", Name);
-                    foreach (var sourcerSuiteChild in sourcePlan.RootSuite.SubSuites)
-                        ProcessStaticSuite(sourcerSuiteChild, targetPlan.RootSuite, targetPlan);
-                    // Add Test Cases
-                    ProcessChildTestCases(sourcePlan.RootSuite, targetPlan.RootSuite, targetPlan);
+                    foreach (var sourceSuiteChild in sourcePlan.RootSuite.SubSuites)
+                    {
+                        ProcessTestSuite(sourceSuiteChild, targetPlan.RootSuite, targetPlan);
+                    }
                 }
+
+                targetPlan.Save();
+                // Load the plan again, because somehow it doesn't let me set configurations on the already loaded plan
+                ITestPlan targetPlan2 = FindTestPlan(targetTestStore, targetPlan.Name);
+                ApplyConfigurationsAndAssignTesters(sourcePlan.RootSuite, targetPlan2.RootSuite);
+
             }
         }
 
@@ -90,6 +111,27 @@ namespace VstsSyncMigrator.Engine
             var sourceWI = sourceWitStore.Store.GetWorkItem(sourceWIId);
             var targetWI = targetWitStore.Store.GetWorkItem(targetWIId);
             targetWI.Fields[me.ReflectedWorkItemIdFieldName].Value = sourceWitStore.CreateReflectedWorkItemId(sourceWI);
+            targetWI.Save();
+        }
+
+        private void ApplyFieldMappings(int sourceWIId, int targetWIId)
+        {
+            var sourceWI = sourceWitStore.Store.GetWorkItem(sourceWIId);
+            var targetWI = targetWitStore.Store.GetWorkItem(targetWIId);
+
+            if (config.PrefixProjectToNodes)
+            {
+                targetWI.AreaPath = string.Format(@"{0}\{1}", engine.Target.Name, sourceWI.AreaPath);
+                targetWI.IterationPath = string.Format(@"{0}\{1}", engine.Target.Name, sourceWI.IterationPath);
+            }
+            else
+            {
+                var regex = new Regex(Regex.Escape(engine.Source.Name));
+                targetWI.AreaPath = regex.Replace(sourceWI.AreaPath, engine.Target.Name, 1);
+                targetWI.IterationPath = regex.Replace(sourceWI.IterationPath, engine.Target.Name, 1);
+            }
+
+            me.ApplyFieldMappings(sourceWI, targetWI);
             targetWI.Save();
         }
 
@@ -104,30 +146,30 @@ namespace VstsSyncMigrator.Engine
             return !sourcePlanWorkItem.Tags.Contains(tagWhichMustBePresent);
         }
 
-        private void ProcessStaticSuite(ITestSuiteBase sourceSuit, ITestSuiteBase targetParent, ITestPlan targetPlan)
+        private void ProcessTestSuite(ITestSuiteBase sourceSuite, ITestSuiteBase targetParent, ITestPlan targetPlan)
         {
-            if (CanSkipElementBecauseOfTags(sourceSuit.Id))
+            if (CanSkipElementBecauseOfTags(sourceSuite.Id))
                 return;
 
-            Trace.WriteLine($"    Processing {sourceSuit.TestSuiteType} : {sourceSuit.Id} - {sourceSuit.Title} ", Name);
-            var targetSuitChild = FindSuiteEntry((IStaticTestSuite)targetParent, sourceSuit.Title);
+            Trace.WriteLine($"    Processing {sourceSuite.TestSuiteType} : {sourceSuite.Id} - {sourceSuite.Title} ", Name);
+            var targetSuiteChild = FindSuiteEntry((IStaticTestSuite)targetParent, sourceSuite.Title);
 
-            if (targetSuitChild == null)
+            // Target suite is not found in target system. We should create it.
+            if (targetSuiteChild == null)
             {
-                // Should create
-                switch (sourceSuit.TestSuiteType)
+                switch (sourceSuite.TestSuiteType)
                 {
                     case TestSuiteType.None:
                         throw new NotImplementedException();
                     //break;
                     case TestSuiteType.DynamicTestSuite:
-                        targetSuitChild = CreateNewDynamicTestSuite(sourceSuit);
+                        targetSuiteChild = CreateNewDynamicTestSuite(sourceSuite);
                         break;
                     case TestSuiteType.StaticTestSuite:
-                        targetSuitChild = CreateNewStaticTestSuit(sourceSuit);
+                        targetSuiteChild = CreateNewStaticTestSuite(sourceSuite);
                         break;
                     case TestSuiteType.RequirementTestSuite:
-                        int sourceRid = ((IRequirementTestSuite)sourceSuit).RequirementId;
+                        int sourceRid = ((IRequirementTestSuite)sourceSuite).RequirementId;
                         WorkItem sourceReq = null;
                         WorkItem targetReq = null;
                         try
@@ -160,45 +202,49 @@ namespace VstsSyncMigrator.Engine
                             Trace.WriteLine("            Source work item not migrated to target, cannot be found", Name);
                             break;
                         }
-                        targetSuitChild = CreateNewRequirementTestSuite(sourceSuit, targetReq);
+                        targetSuiteChild = CreateNewRequirementTestSuite(sourceSuite, targetReq);
                         break;
                     default:
                         throw new NotImplementedException();
                         //break;
                 }
-                if (targetSuitChild == null) { return; }
-                // Add to target and Save
-                ApplyConfigurations(sourceSuit.TestSuiteEntry, targetSuitChild.TestSuiteEntry);
-                if (targetSuitChild.Plan == null)
+                if (targetSuiteChild == null) { return; }
+                // Apply default configurations, Add to target and Save
+                ApplyDefaultConfigurations(sourceSuite, targetSuiteChild);
+                if (targetSuiteChild.Plan == null)
                 {
-                    SaveNewTestSuitToPlan(targetPlan, (IStaticTestSuite)targetParent, targetSuitChild);
+                    SaveNewTestSuiteToPlan(targetPlan, (IStaticTestSuite)targetParent, targetSuiteChild);
                 }
-                AssignReflectedWorkItemId(sourceSuit.Id, targetSuitChild.Id);
-                FixAssignedToValue(sourceSuit.Id, targetSuitChild.Id);
+                ApplyFieldMappings(sourceSuite.Id, targetSuiteChild.Id);
+                AssignReflectedWorkItemId(sourceSuite.Id, targetSuiteChild.Id);
+                FixAssignedToValue(sourceSuite.Id, targetSuiteChild.Id);
             }
             else
             {
-                // found
+                // The target suite already exists, take it from here
                 Trace.WriteLine("            Suite Exists", Name);
-                ApplyConfigurations(sourceSuit.TestSuiteEntry, targetSuitChild.TestSuiteEntry);
-                if (targetSuitChild.IsDirty)
+                ApplyDefaultConfigurations(sourceSuite, targetSuiteChild);
+                if (targetSuiteChild.IsDirty)
                 {
                     targetPlan.Save();
                 }
             }
 
             // Recurse if Static Suite
-            if (sourceSuit.TestSuiteType == TestSuiteType.StaticTestSuite && HasChildSuits(sourceSuit))
+            if (sourceSuite.TestSuiteType == TestSuiteType.StaticTestSuite)
             {
-                Trace.WriteLine($"            Suite has {((IStaticTestSuite)sourceSuit).Entries.Count} children", Name);
-                foreach (var sourceSuitChild in ((IStaticTestSuite)sourceSuit).SubSuites)
-                {
-                    ProcessStaticSuite(sourceSuitChild, targetSuitChild, targetPlan);
+                // Add Test Cases 
+                AddChildTestCases(sourceSuite, targetSuiteChild, targetPlan);
 
+                if (HasChildSuites(sourceSuite))
+                {
+                    Trace.WriteLine($"            Suite has {((IStaticTestSuite)sourceSuite).Entries.Count} children", Name);
+                    foreach (var sourceSuitChild in ((IStaticTestSuite)sourceSuite).SubSuites)
+                    {
+                        ProcessTestSuite(sourceSuitChild, targetSuiteChild, targetPlan);
+                    }
                 }
             }
-            // Add Test Cases
-            ProcessChildTestCases(sourceSuit, targetSuitChild, targetPlan);
         }
 
         /// <summary>
@@ -251,11 +297,10 @@ namespace VstsSyncMigrator.Engine
             targetWI.Save();
         }
 
-        private void ProcessChildTestCases(ITestSuiteBase source, ITestSuiteBase target, ITestPlan targetPlan)
+        private void AddChildTestCases(ITestSuiteBase source, ITestSuiteBase target, ITestPlan targetPlan)
         {
             if (CanSkipElementBecauseOfTags(source.Id))
                 return;
-
 
             Trace.WriteLine(string.Format("            Suite has {0} test cases", source.TestCases.Count), "TestPlansAndSuites");
             List<ITestCase> tcs = new List<ITestCase>();
@@ -268,7 +313,7 @@ namespace VstsSyncMigrator.Engine
                 WorkItem wi = targetWitStore.FindReflectedWorkItem(sourceTestCaseEntry.TestCase.WorkItem, me.ReflectedWorkItemIdFieldName, false);
                 if (wi == null)
                 {
-                    Trace.WriteLine(string.Format("    ERROR NOT FOUND {0} : {1} - {2} ", sourceTestCaseEntry.EntryType.ToString(), sourceTestCaseEntry.Id, sourceTestCaseEntry.Title), "TestPlansAndSuites");
+                    Trace.WriteLine(string.Format("    Can't find work item for Test Case. Has it been migrated? {0} : {1} - {2} ", sourceTestCaseEntry.EntryType.ToString(), sourceTestCaseEntry.Id, sourceTestCaseEntry.Title), "TestPlansAndSuites");
                     break;
                 }
                 var exists = (from tc in target.TestCases
@@ -277,41 +322,40 @@ namespace VstsSyncMigrator.Engine
 
                 if (exists != null)
                 {
-                    Trace.WriteLine(string.Format("    EXISTS {0} : {1} - {2} ", sourceTestCaseEntry.EntryType.ToString(), sourceTestCaseEntry.Id, sourceTestCaseEntry.Title), "TestPlansAndSuites");
-                    ApplyConfigurations(sourceTestCaseEntry, exists);
+                    Trace.WriteLine(string.Format("    Test case already in suite {0} : {1} - {2} ", sourceTestCaseEntry.EntryType.ToString(), sourceTestCaseEntry.Id, sourceTestCaseEntry.Title), "TestPlansAndSuites");
                 }
                 else
                 {
                     ITestCase targetTestCase = targetTestStore.Project.TestCases.Find(wi.Id);
                     if (targetTestCase == null)
                     {
-                        Trace.WriteLine(string.Format("    ERROR TEST CASE NOT FOUND {0} : {1} - {2} ", sourceTestCaseEntry.EntryType, sourceTestCaseEntry.Id, sourceTestCaseEntry.Title), "TestPlansAndSuites");
+                        Trace.WriteLine(string.Format("    ERROR: Test case not found {0} : {1} - {2} ", sourceTestCaseEntry.EntryType, sourceTestCaseEntry.Id, sourceTestCaseEntry.Title), "TestPlansAndSuites");
                     }
                     else
                     {
-                        ApplyConfigurations(sourceTestCaseEntry, targetTestCase.TestSuiteEntry);
                         tcs.Add(targetTestCase);
-                        Trace.WriteLine(string.Format("    ADDING {0} : {1} - {2} ", sourceTestCaseEntry.EntryType.ToString(), sourceTestCaseEntry.Id, sourceTestCaseEntry.Title), "TestPlansAndSuites");
+                        Trace.WriteLine(string.Format("    Adding {0} : {1} - {2} ", sourceTestCaseEntry.EntryType.ToString(), sourceTestCaseEntry.Id, sourceTestCaseEntry.Title), "TestPlansAndSuites");
                     }
                 }
             }
 
-            if (source.TestSuiteType == TestSuiteType.StaticTestSuite && HasChildTestCases(source))
-            {
-                target.TestCases.AddCases(tcs);
-            }
+            target.TestCases.AddCases(tcs);
 
             targetPlan.Save();
             Trace.WriteLine(string.Format("    SAVED {0} : {1} - {2} ", target.TestSuiteType.ToString(), target.Id, target.Title), "TestPlansAndSuites");
 
         }
 
-        private void ApplyConfigurations(ITestSuiteBase source, ITestSuiteBase target)
+        /// <summary>
+        /// Sets default configurations on migrated test suites.
+        /// </summary>
+        /// <param name="source">The test suite to take as a source.</param>
+        /// <param name="target">The test suite to apply the default configurations to.</param>
+        private void ApplyDefaultConfigurations(ITestSuiteBase source, ITestSuiteBase target)
         {
             if (source.DefaultConfigurations != null)
             {
-                Trace.WriteLine("   CONFIG MNISSMATCH FOUND --- FIX AATTEMPTING", "TestPlansAndSuites");
-                target.ClearDefaultConfigurations();
+                Trace.WriteLine($"   Setting default configurations for suite {target.Title}", "TestPlansAndSuites");
                 IList<IdAndName> targetConfigs = new List<IdAndName>();
                 foreach (var config in source.DefaultConfigurations)
                 {
@@ -331,9 +375,149 @@ namespace VstsSyncMigrator.Engine
                 {
                     // SOmetimes this will error out for no reason.
                 }
+            } else
+            {
+                target.ClearDefaultConfigurations();
             }
         }
 
+        private void ApplyConfigurationsAndAssignTesters(ITestSuiteBase sourceSuite, ITestSuiteBase targetSuite)
+        {
+            Trace.Write($"Applying configurations for test cases in source suite {sourceSuite.Title}");
+            foreach (ITestSuiteEntry sourceTce in sourceSuite.TestCases)
+            {
+                WorkItem wi = targetWitStore.FindReflectedWorkItem(sourceTce.TestCase.WorkItem, me.ReflectedWorkItemIdFieldName, false);
+                ITestSuiteEntry targetTce;
+                if (wi != null)
+                {
+                    targetTce = (from tc in targetSuite.TestCases
+                                                 where tc.TestCase.WorkItem.Id == wi.Id
+                                                 select tc).SingleOrDefault();
+                    if(targetTce != null)
+                    {
+                        ApplyConfigurations(sourceTce, targetTce);
+                    } else
+                    {
+                        Trace.Write($"Test Case ${sourceTce.Title} from source is not included in target. Cannot apply configuration for it.", "TestPlansAndSuites");
+                    }
+                } else
+                {
+                    Trace.Write($"Work Item for Test Case {sourceTce.Title} cannot be found in target. Has it been migrated?", "TestPlansAndSuites");
+                }
+                
+            }
+
+            AssignTesters(sourceSuite, targetSuite);
+
+            //Loop over child suites and set configurations for test case entries there
+            if (HasChildSuites(sourceSuite))
+            {
+                foreach(ITestSuiteEntry sourceSuiteChild in ((IStaticTestSuite)sourceSuite).Entries.Where(
+                    e => e.EntryType == TestSuiteEntryType.DynamicTestSuite
+                    || e.EntryType == TestSuiteEntryType.RequirementTestSuite
+                    || e.EntryType == TestSuiteEntryType.StaticTestSuite))
+                {
+                    //Find migrated suite in target
+                    WorkItem sourceSuiteWi = sourceWitStore.Store.GetWorkItem(sourceSuiteChild.Id);
+                    WorkItem targetSuiteWi = targetWitStore.FindReflectedWorkItem(sourceSuiteWi, me.ReflectedWorkItemIdFieldName, false);
+                    if (targetSuiteWi != null)
+                    {
+                        ITestSuiteEntry targetSuiteChild = (from tc in ((IStaticTestSuite)targetSuite).Entries
+                                                            where tc.Id == targetSuiteWi.Id
+                                                            select tc).FirstOrDefault();
+                        if (targetSuiteChild != null)
+                        {
+                            ApplyConfigurationsAndAssignTesters(sourceSuiteChild.TestSuite, targetSuiteChild.TestSuite);
+                        }
+                        else
+                        {
+                            Trace.Write($"Test Suite {sourceSuiteChild.Title} from source cannot be found in target. Has it been migrated?", "TestPlansAndSuites");
+                        }
+                    } else
+                    {
+                        Trace.Write($"Test Suite {sourceSuiteChild.Title} from source cannot be found in target. Has it been migrated?", "TestPlansAndSuites");
+                    }
+                }
+            }
+        }
+
+        private void AssignTesters(ITestSuiteBase sourceSuite, ITestSuiteBase targetSuite)
+        { 
+            List<ITestPointAssignment> assignmentsToAdd = new List<ITestPointAssignment>();
+            //loop over all source test case entries
+            foreach(ITestSuiteEntry sourceTce in sourceSuite.TestCases)
+            {
+                // find target testcase id for this source tce
+                WorkItem targetTc = targetWitStore.FindReflectedWorkItem(sourceTce.TestCase.WorkItem, me.ReflectedWorkItemIdFieldName, false);
+
+                //figure out test point assignments for each source tce
+                foreach(ITestPointAssignment tpa in sourceTce.PointAssignments)
+                {
+                    string sourceAssignedToName = tpa.AssignedToName;
+                    int sourceConfigurationId = tpa.ConfigurationId;
+
+                    var sourceIdentity = sourceIdentityManagementService.ReadIdentity(
+                        tpa.AssignedTo.Descriptor,
+                        MembershipQuery.Direct,
+                        ReadIdentityOptions.ExtendedProperties);
+                    string sourceIdentityMail = sourceIdentity.GetProperty("Mail") as string;
+
+                    if (!string.IsNullOrEmpty(sourceIdentityMail))
+                    {
+                        //translate source assignedtoname to target identity
+                        var targetIdentity = targetIdentityManagementService.ReadIdentity(
+                            IdentitySearchFactor.MailAddress,
+                            sourceIdentityMail,
+                            MembershipQuery.Direct,
+                            ReadIdentityOptions.None);
+
+                        if (targetIdentity != null)
+                        {
+                            //translate source configuration id to target configuration id and name
+                            //// Get source configuration name
+                            string sourceConfigName = (from tc in sourceTestConfigs
+                                                       where tc.Id == sourceConfigurationId
+                                                       select tc.Name).FirstOrDefault();
+                            //// Find source configuration name in target and get the id for it
+                            int targetConfigId = (from tc in targetTestConfigs
+                                                  where tc.Name == sourceConfigName
+                                                  select tc.Id).FirstOrDefault();
+
+                            if (targetConfigId != 0)
+                            {
+                                IdAndName targetConfiguration = new IdAndName(targetConfigId, sourceConfigName);
+
+                                // Create a test point assignment with target test case id, target configuration (id and name) and target identity
+                                ITestPointAssignment newAssignment = targetSuite.CreateTestPointAssignment(
+                                    targetTc.Id,
+                                    targetConfiguration,
+                                    targetIdentity);
+
+                                // add the test point assignment to the list
+                                assignmentsToAdd.Add(newAssignment);
+                            } else
+                            {
+                                Trace.Write($"Cannot find configuration with name [{sourceConfigName}] in target. Cannot assign tester to it.", "TestPlansAndSuites");
+                            }
+                        } else
+                        {
+                            Trace.Write($"Cannot find tester with e-mail [{sourceIdentityMail}] in target system. Cannot assign.", "TestPlansAndSuites");
+                        }
+                    } else
+                    {
+                        Trace.Write($"No e-mail address known in source system for [{sourceIdentity.DisplayName}]. Cannot translate to target.", "TestPlansAndSuites");
+                    }
+                }
+            }
+            // assign the list to the suite
+            targetSuite.AssignTestPoints(assignmentsToAdd);
+        }
+
+        /// <summary>
+        /// Apply configurations to a single test case entry on the target, by copying from the source
+        /// </summary>
+        /// <param name="sourceEntry"></param>
+        /// <param name="targetEntry"></param>
         private void ApplyConfigurations(ITestSuiteEntry sourceEntry, ITestSuiteEntry targetEntry)
         {
             int sourceConfigCount = sourceEntry.Configurations != null ? sourceEntry.Configurations.Count : 0;
@@ -343,10 +527,6 @@ namespace VstsSyncMigrator.Engine
             if ((sourceConfigCount != targetConfigCount) || deviations)
             {
                 Trace.WriteLine(string.Format("   CONFIG MISMATCH FOUND --- FIX ATTEMPTING"), "TestPlansAndSuites");
-                if (targetEntry.Configurations != null)
-                {
-                    targetEntry.Configurations.Clear();
-                }
                 IList<IdAndName> targetConfigs = new List<IdAndName>();
                 foreach (var config in sourceEntry.Configurations)
                 {
@@ -372,47 +552,37 @@ namespace VstsSyncMigrator.Engine
 
         }
 
-        private bool HasChildTestCases(ITestSuiteBase sourceSuit)
+        private bool HasChildTestCases(ITestSuiteBase sourceSuite)
         {
-            return sourceSuit.TestCaseCount > 0;
+            return sourceSuite.TestCaseCount > 0;
         }
 
         private ITestSuiteBase CreateNewDynamicTestSuite(ITestSuiteBase source)
         {
+            IDynamicTestSuite targetSuiteChild = targetTestStore.Project.TestSuites.CreateDynamic();
+            targetSuiteChild.TestSuiteEntry.Title = source.TestSuiteEntry.Title;
+            ApplyTestSuiteQuery(source, targetSuiteChild, targetTestStore);
 
-            IDynamicTestSuite targetSuitChild = targetTestStore.Project.TestSuites.CreateDynamic();
-            if (source.TestSuiteEntry.Configurations != null)
-            {
-                ApplyConfigurations(source, targetSuitChild);
-            }
-            targetSuitChild.TestSuiteEntry.Title = source.TestSuiteEntry.Title;
-            ApplyTestSuiteQuery(source, targetSuitChild, targetTestStore);
-
-            return targetSuitChild;
+            return targetSuiteChild;
         }
 
         private ITestSuiteBase CreateNewRequirementTestSuite(ITestSuiteBase source, WorkItem requirement)
         {
-            IRequirementTestSuite targetSuitChild;
+            IRequirementTestSuite targetSuiteChild;
             try
             {
-                targetSuitChild = targetTestStore.Project.TestSuites.CreateRequirement(requirement);
+                targetSuiteChild = targetTestStore.Project.TestSuites.CreateRequirement(requirement);
             }
             catch (TestManagementValidationException ex)
             {
-                Trace.WriteLine(string.Format("            Unable to Create Requirement based Test Suit: {0}", ex.Message), "TestPlansAndSuites");
+                Trace.WriteLine(string.Format("            Unable to Create Requirement based Test Suite: {0}", ex.Message), "TestPlansAndSuites");
                 return null;
             }
-
-            if (source.TestSuiteEntry.Configurations != null)
-            {
-                ApplyConfigurations(source, targetSuitChild);
-            }
-            targetSuitChild.Title = source.Title;
-            return targetSuitChild;
+            targetSuiteChild.Title = source.Title;
+            return targetSuiteChild;
         }
 
-        private void SaveNewTestSuitToPlan(ITestPlan testPlan, IStaticTestSuite parent, ITestSuiteBase newTestSuite)
+        private void SaveNewTestSuiteToPlan(ITestPlan testPlan, IStaticTestSuite parent, ITestSuiteBase newTestSuite)
         {
             Trace.WriteLine(
                 $"       Saving {newTestSuite.TestSuiteType} : {newTestSuite.Id} - {newTestSuite.Title} ", "TestPlansAndSuites");
@@ -436,38 +606,32 @@ namespace VstsSyncMigrator.Engine
                           { "TestSuiteType", newTestSuite.TestSuiteType.ToString()}
                       });
                 Trace.WriteLine(string.Format("       FAILED {0} : {1} - {2} | {3}", newTestSuite.TestSuiteType.ToString(), newTestSuite.Id, newTestSuite.Title, ex.Message), "TestPlansAndSuites");
-                ITestSuiteBase ErrorSuitChild = targetTestStore.Project.TestSuites.CreateStatic();
-                ErrorSuitChild.TestSuiteEntry.Title = string.Format(@"BROKEN: {0} | {1}", newTestSuite.Title, ex.Message);
-                ((IStaticTestSuite)parent).Entries.Add(ErrorSuitChild);
+                ITestSuiteBase ErrorSuiteChild = targetTestStore.Project.TestSuites.CreateStatic();
+                ErrorSuiteChild.TestSuiteEntry.Title = string.Format(@"BROKEN: {0} | {1}", newTestSuite.Title, ex.Message);
+                ((IStaticTestSuite)parent).Entries.Add(ErrorSuiteChild);
             }
 
             testPlan.Save();
         }
 
-        private ITestSuiteBase CreateNewStaticTestSuit(ITestSuiteBase source)
+        private ITestSuiteBase CreateNewStaticTestSuite(ITestSuiteBase source)
         {
-            ITestSuiteBase targetSuitChild = targetTestStore.Project.TestSuites.CreateStatic();
-            if (source.TestSuiteEntry.Configurations != null)
-            {
-                ApplyConfigurations(source, targetSuitChild);
-            }
-            targetSuitChild.TestSuiteEntry.Title = source.TestSuiteEntry.Title;
-            return targetSuitChild;
+            ITestSuiteBase targetSuiteChild = targetTestStore.Project.TestSuites.CreateStatic();
+            targetSuiteChild.TestSuiteEntry.Title = source.TestSuiteEntry.Title;
+            return targetSuiteChild;
         }
 
-
-
-        private ITestSuiteBase FindSuiteEntry(IStaticTestSuite staticSuit, string titleToFind)
+        private ITestSuiteBase FindSuiteEntry(IStaticTestSuite staticSuite, string titleToFind)
         {
-            return (from s in staticSuit.SubSuites where s.Title == titleToFind select s).SingleOrDefault();
+            return (from s in staticSuite.SubSuites where s.Title == titleToFind select s).SingleOrDefault();
         }
 
-        private bool HasChildSuits(ITestSuiteBase sourceSuit)
+        private bool HasChildSuites(ITestSuiteBase sourceSuite)
         {
             bool hasChildren = false;
-            if (sourceSuit != null && sourceSuit.TestSuiteType == TestSuiteType.StaticTestSuite)
+            if (sourceSuite != null && sourceSuite.TestSuiteType == TestSuiteType.StaticTestSuite)
             {
-                hasChildren = (((IStaticTestSuite)sourceSuit).Entries.Count > 0);
+                hasChildren = (((IStaticTestSuite)sourceSuite).Entries.Count > 0);
             }
             return hasChildren;
         }
@@ -481,17 +645,11 @@ namespace VstsSyncMigrator.Engine
             targetPlan.StartDate = sourcePlan.StartDate;
             targetPlan.EndDate = sourcePlan.EndDate;
             targetPlan.Description = sourcePlan.Description;
-            if (config.PrefixProjectToNodes)
-            {
-                targetPlan.AreaPath = string.Format(@"{0}\{1}", engine.Target.Name, sourcePlan.AreaPath);
-                targetPlan.Iteration = string.Format(@"{0}\{1}", engine.Target.Name, sourcePlan.Iteration);
-            }
-            else
-            {
-                var regex = new Regex(Regex.Escape(engine.Source.Name));
-                targetPlan.AreaPath = regex.Replace(sourcePlan.AreaPath, engine.Target.Name, 1);
-                targetPlan.Iteration = regex.Replace(sourcePlan.Iteration, engine.Target.Name, 1);
-            }
+
+            // Set area and iteration to root of the target project. 
+            // We will set the correct values later, when we actually have a work item available
+            targetPlan.Iteration = engine.Target.Name;
+            targetPlan.AreaPath = engine.Target.Name;
 
             // Remove testsettings reference because VSTS Sync doesnt support migrating these artifacts
             if (targetPlan.ManualTestSettingsId != 0)
@@ -515,63 +673,63 @@ namespace VstsSyncMigrator.Engine
             return (from p in tmc.Project.TestPlans.Query("Select * From TestPlan") where p.Name == name select p).SingleOrDefault();
         }
 
-        private void ApplyTestSuiteQuery(ITestSuiteBase source, IDynamicTestSuite targetSuitChild, TestManagementContext targetTestStore)
+        private void ApplyTestSuiteQuery(ITestSuiteBase source, IDynamicTestSuite targetSuiteChild, TestManagementContext targetTestStore)
         {
-            targetSuitChild.Query = ((IDynamicTestSuite)source).Query;
+            targetSuiteChild.Query = ((IDynamicTestSuite)source).Query;
 
             // Postprocessing common errors
-            FixQueryForTeamProjectNameChange(source, targetSuitChild, targetTestStore);
-            FixWorkItemIdInQuery(targetSuitChild);
+            FixQueryForTeamProjectNameChange(source, targetSuiteChild, targetTestStore);
+            FixWorkItemIdInQuery(targetSuiteChild);
         }
 
-        private void FixQueryForTeamProjectNameChange(ITestSuiteBase source, IDynamicTestSuite targetSuitChild, TestManagementContext targetTestStore)
+        private void FixQueryForTeamProjectNameChange(ITestSuiteBase source, IDynamicTestSuite targetSuiteChild, TestManagementContext targetTestStore)
         {
             // Replacing old projectname in queries with new projectname
             // The target team project name is only available via target test store because the dyn. testsuite isnt saved at this point in time
             if (!source.Plan.Project.TeamProjectName.Equals(targetTestStore.Project.TeamProjectName))
             {
                 Trace.WriteLine(string.Format(@"Team Project names dont match. We need to fix the query in dynamic test suite {0} - {1}.", source.Id, source.Title));
-                Trace.WriteLine(string.Format(@"Replacing old project name {1} in query {0} with new team project name {2}", targetSuitChild.Query.QueryText, source.Plan.Project.TeamProjectName, targetTestStore.Project.TeamProjectName));
+                Trace.WriteLine(string.Format(@"Replacing old project name {1} in query {0} with new team project name {2}", targetSuiteChild.Query.QueryText, source.Plan.Project.TeamProjectName, targetTestStore.Project.TeamProjectName));
                 // First need to check is prefix project nodes has been applied for the migration
                 if (config.PrefixProjectToNodes)
                 {
                     // if prefix project nodes has been applied we need to take the original area/iteration value and prefix
-                    targetSuitChild.Query =
-                        targetSuitChild.Project.CreateTestQuery(targetSuitChild.Query.QueryText.Replace(
+                    targetSuiteChild.Query =
+                        targetSuiteChild.Project.CreateTestQuery(targetSuiteChild.Query.QueryText.Replace(
                             string.Format(@"'{0}", source.Plan.Project.TeamProjectName),
                             string.Format(@"'{0}\{1}", targetTestStore.Project.TeamProjectName, source.Plan.Project.TeamProjectName)));
                 }
                 else
                 {
                     // If we are not profixing project nodes then we just need to take the old value for the project and replace it with the new project value
-                    targetSuitChild.Query = targetSuitChild.Project.CreateTestQuery(targetSuitChild.Query.QueryText.Replace(
+                    targetSuiteChild.Query = targetSuiteChild.Project.CreateTestQuery(targetSuiteChild.Query.QueryText.Replace(
                             string.Format(@"'{0}", source.Plan.Project.TeamProjectName),
                             string.Format(@"'{0}", targetTestStore.Project.TeamProjectName)));
                 }
-                Trace.WriteLine(string.Format("New query is now {0}", targetSuitChild.Query.QueryText));
+                Trace.WriteLine(string.Format("New query is now {0}", targetSuiteChild.Query.QueryText));
             }
         }
 
-        private void ValidateAndFixTestSuiteQuery(ITestSuiteBase source, IDynamicTestSuite targetSuitChild,
+        private void ValidateAndFixTestSuiteQuery(ITestSuiteBase source, IDynamicTestSuite targetSuiteChild,
             TestManagementContext targetTestStore)
         {
             try
             {
                 // Verifying that the query is valid 
-                targetSuitChild.Query.Execute();
+                targetSuiteChild.Query.Execute();
 
             }
             catch (Exception e)
             {
-                FixIterationNotFound(e, source, targetSuitChild, targetTestStore);
+                FixIterationNotFound(e, source, targetSuiteChild, targetTestStore);
             }
             finally
             {
-                targetSuitChild.Repopulate();
+                targetSuiteChild.Repopulate();
             }
         }
 
-        private void FixIterationNotFound(Exception exception, ITestSuiteBase source, IDynamicTestSuite targetSuitChild, TestManagementContext targetTestStore)
+        private void FixIterationNotFound(Exception exception, ITestSuiteBase source, IDynamicTestSuite targetSuiteChild, TestManagementContext targetTestStore)
         {
             if (exception.Message.Contains("The specified iteration path does not exist."))
             {
@@ -584,14 +742,14 @@ namespace VstsSyncMigrator.Engine
                 Trace.WriteLine(string.Format("Invalid iteration path {0}:", missingIterationPath));
                 Trace.WriteLine("Replacing the orphaned iteration path from query with root iteration path. Please fix the query after the migration.");
 
-                targetSuitChild.Query = targetSuitChild.Project.CreateTestQuery(
-                    targetSuitChild.Query.QueryText.Replace(
+                targetSuiteChild.Query = targetSuiteChild.Project.CreateTestQuery(
+                    targetSuiteChild.Query.QueryText.Replace(
                         string.Format(@"'{0}\{1}'", source.Plan.Project.TeamProjectName, missingIterationPath),
                         string.Format(@"'{0}'", targetTestStore.Project.TeamProjectName)
                     ));
 
-                targetSuitChild.Query = targetSuitChild.Project.CreateTestQuery(
-                    targetSuitChild.Query.QueryText.Replace(
+                targetSuiteChild.Query = targetSuiteChild.Project.CreateTestQuery(
+                    targetSuiteChild.Query.QueryText.Replace(
                         string.Format(@"'{0}\{1}'", targetTestStore.Project.TeamProjectName, missingIterationPath),
                         string.Format(@"'{0}'", targetTestStore.Project.TeamProjectName)
                     ));
