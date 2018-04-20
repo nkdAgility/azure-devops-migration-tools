@@ -21,18 +21,23 @@ namespace VstsSyncMigrator.Engine.ComponentContext
 
         internal override void InternalExecute(WorkItem source, WorkItem target)
         {
-                if (source.Fields.Contains(config.sourceField))
-                {
-                    string sourceValue = source.Fields[config.sourceField].Value != null 
-                        ? source.Fields[config.sourceField].Value.ToString()
-                        : null;
+            if (source.Fields.Contains(config.sourceField))
+            {
+                string sourceValue = source.Fields[config.sourceField].Value != null 
+                    ? source.Fields[config.sourceField].Value.ToString()
+                    : null;
 
-                    if (sourceValue != null && config.valueMapping.ContainsKey(sourceValue))
-                    {
-                        target.Fields[config.targetField].Value = config.valueMapping[sourceValue];
-                        Trace.WriteLine(string.Format("  [UPDATE] field value mapped {0}:{1} to {2}:{3}", source.Id, config.sourceField, target.Id, config.targetField));
-                    }
+                if (sourceValue != null && config.valueMapping.ContainsKey(sourceValue))
+                {
+                    target.Fields[config.targetField].Value = config.valueMapping[sourceValue];
+                    Trace.WriteLine($"  [UPDATE] field value mapped {source.Id}:{config.sourceField} to {target.Id}:{config.targetField}");
                 }
+                else if (sourceValue != null && !string.IsNullOrEmpty(config.defaultValue))
+                {
+                    target.Fields[config.targetField].Value = config.defaultValue;
+                    Trace.WriteLine($"  [UPDATE] field set to default value {source.Id}:{config.sourceField} to {target.Id}:{config.targetField}");
+                }
+            }
 
         }
     }
