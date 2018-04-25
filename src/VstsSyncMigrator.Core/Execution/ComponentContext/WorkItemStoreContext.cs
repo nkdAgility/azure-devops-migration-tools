@@ -4,6 +4,7 @@ using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
+using Microsoft.TeamFoundation.Server;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -65,8 +66,6 @@ namespace VstsSyncMigrator.Engine
             }
             return 0;
         }
-
-  
 
         public WorkItem FindReflectedWorkItem(WorkItem workItemToFind, string reflectedWotkItemIdField, bool cache)
         {
@@ -153,6 +152,8 @@ namespace VstsSyncMigrator.Engine
         {
             return Store.GetWorkItem(workItem.Id, revision);
         }
+
+
 
     }
 }

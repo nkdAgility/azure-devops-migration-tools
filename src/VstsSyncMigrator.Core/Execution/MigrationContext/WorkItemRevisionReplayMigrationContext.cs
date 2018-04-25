@@ -5,7 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-
+using Microsoft.TeamFoundation.Server;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 
 using VstsSyncMigrator.Engine.Configuration.Processing;
@@ -255,17 +255,8 @@ namespace VstsSyncMigrator.Engine
                 }
             }
 
-            if (_config.PrefixProjectToNodes)
-            {
-                newwit.AreaPath = $@"{newwit.Project.Name}\{oldWi.AreaPath}";
-                newwit.IterationPath = $@"{newwit.Project.Name}\{oldWi.IterationPath}";
-            }
-            else
-            {
-                var regex = new Regex(Regex.Escape(oldWi.Project.Name));
-                newwit.AreaPath = regex.Replace(oldWi.AreaPath, newwit.Project.Name, 1);
-                newwit.IterationPath = regex.Replace(oldWi.IterationPath, newwit.Project.Name, 1);
-            }
+            newwit.AreaPath = GetNewNodeName(oldWi.AreaPath, oldWi.Project.Name, newwit.Project.Name, newwit.Store);
+            newwit.IterationPath = GetNewNodeName(oldWi.IterationPath, oldWi.Project.Name, newwit.Project.Name, newwit.Store);
 
             switch (destType)
             {
@@ -292,12 +283,48 @@ namespace VstsSyncMigrator.Engine
             Trace.WriteLine(
                 $"FieldMapOnNewWorkItem: {newWorkItemstartTime} - {fieldMappingTimer.Elapsed.ToString("c")}", Name);
         }
+
+        private string GetNewNodeName(string oldNodeName, string oldProjectName, string newProjectName, WorkItemStore newStore)
+        {
+            string newNodeName = "";
+            if (_config.PrefixProjectToNodes)
+            {
+                newNodeName = $@"{newProjectName}\{oldNodeName}";
+            } else
+            {
+                var regex = new Regex(Regex.Escape(oldProjectName));
+                newNodeName = regex.Replace(oldNodeName, newProjectName, 1);
+            }
+
+            if (!NodeExists(newNodeName, newStore))
+            {
+                Trace.WriteLine(string.Format("The Node '{0}' does not exist, leaving as '{1}'. This may be because it has been renamed or moved and no longer exists, or that you have not migrateed the Node Structure yet.", newNodeName, newProjectName));
+                newNodeName = newProjectName;
+            }
+            return newNodeName;
+        }
+
         
         private static bool IsNumeric(string val, NumberStyles numberStyle)
         {
             double result;
             return double.TryParse(val, numberStyle,
                 CultureInfo.CurrentCulture, out result);
+        }
+
+        public bool NodeExists(string nodePath, WorkItemStore store)
+        {
+            ICommonStructureService commonStructure = (ICommonStructureService4)store.TeamProjectCollection.GetService(typeof(ICommonStructureService4));
+            NodeInfo node = null;
+            try
+            {
+                node = commonStructure.GetNodeFromPath(nodePath);
+            }
+            catch
+            {
+                return false;
+            }
+            return true;
         }
     }
 }

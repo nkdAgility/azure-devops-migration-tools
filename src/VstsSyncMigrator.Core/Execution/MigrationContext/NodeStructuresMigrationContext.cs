@@ -33,6 +33,7 @@ namespace VstsSyncMigrator.Engine
             NodeInfo[] sourceNodes = sourceCss.ListStructures(sourceProjectInfo.Uri);
             //////////////////////////////////////////////////
             ICommonStructureService targetCss = (ICommonStructureService)me.Target.Collection.GetService(typeof(ICommonStructureService4));
+
             //////////////////////////////////////////////////
             ProcessCommonStructure("Area", sourceNodes, targetCss, sourceCss);
             //////////////////////////////////////////////////
