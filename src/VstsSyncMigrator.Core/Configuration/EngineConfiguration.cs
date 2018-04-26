@@ -53,6 +53,7 @@ namespace VstsSyncMigrator.Engine.Configuration
                 WorkItemTypeName = "*",
                 sourceField = "System.State",
                 targetField = "System.State",
+                defaultValue = "New",
                 valueMapping = new Dictionary<string, string> {
                     { "Approved", "New" },
                     { "New", "New" },
