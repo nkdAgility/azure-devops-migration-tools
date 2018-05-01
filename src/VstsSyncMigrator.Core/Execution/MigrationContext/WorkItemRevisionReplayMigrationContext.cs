@@ -123,7 +123,6 @@ namespace VstsSyncMigrator.Engine
             WorkItemStoreContext targetStore)
         {
             WorkItem newwit = null;
-
             try
             {
                 // just to make sure, we replay the events in the same order as they appeared
@@ -284,8 +283,14 @@ namespace VstsSyncMigrator.Engine
                 $"FieldMapOnNewWorkItem: {newWorkItemstartTime} - {fieldMappingTimer.Elapsed.ToString("c")}", Name);
         }
 
+        NodeDetecomatic _nodeOMatic;
+
         private string GetNewNodeName(string oldNodeName, string oldProjectName, string newProjectName, WorkItemStore newStore)
         {
+            if (_nodeOMatic == null)
+            {
+                _nodeOMatic = new NodeDetecomatic(newStore);
+            }
             string newNodeName = "";
             if (_config.PrefixProjectToNodes)
             {
@@ -296,7 +301,7 @@ namespace VstsSyncMigrator.Engine
                 newNodeName = regex.Replace(oldNodeName, newProjectName, 1);
             }
 
-            if (!NodeExists(newNodeName, newStore))
+            if (!_nodeOMatic.NodeExists(newNodeName))
             {
                 Trace.WriteLine(string.Format("The Node '{0}' does not exist, leaving as '{1}'. This may be because it has been renamed or moved and no longer exists, or that you have not migrateed the Node Structure yet.", newNodeName, newProjectName));
                 newNodeName = newProjectName;
@@ -312,19 +317,41 @@ namespace VstsSyncMigrator.Engine
                 CultureInfo.CurrentCulture, out result);
         }
 
-        public bool NodeExists(string nodePath, WorkItemStore store)
+    }
+
+    public class NodeDetecomatic
+    {
+        ICommonStructureService _commonStructure;
+        List<string> _foundNodes = new List<string>();
+        WorkItemStore _store;
+
+        public NodeDetecomatic(WorkItemStore store)
         {
-            ICommonStructureService commonStructure = (ICommonStructureService4)store.TeamProjectCollection.GetService(typeof(ICommonStructureService4));
-            NodeInfo node = null;
-            try
+            _store = store;
+            if (_commonStructure == null)
             {
-                node = commonStructure.GetNodeFromPath(nodePath);
+                _commonStructure = (ICommonStructureService4)store.TeamProjectCollection.GetService(typeof(ICommonStructureService4));
             }
-            catch
+        }
+
+        public bool NodeExists(string nodePath)
+        {
+            if (_foundNodes.Contains(nodePath))
             {
-                return false;
+                NodeInfo node = null;
+                try
+                {
+                    node = _commonStructure.GetNodeFromPath(nodePath);
+                }
+                catch
+                {
+                    return false;
+                }
+                _foundNodes.Add(nodePath);
             }
             return true;
         }
+
+
     }
 }
