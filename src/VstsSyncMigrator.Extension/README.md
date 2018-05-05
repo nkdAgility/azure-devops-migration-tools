@@ -37,7 +37,7 @@ There are two ways to use these tools:
 
 ## You are seeing:
 
- - All work is done is [Visual Studio Team Services](https://www.visualstudio.com/products/what-is-visual-studio-online-vs) and then synched to GitHub for publication
+ - All work is done is [Visual Studio Team Services](https://www.visualstudio.com/products/what-is-visual-studio-online-vs) under https://nkdagility.visualstudio.com/vsts-sync-migration/ and then synched to GitHub
  - All Branches are published as pre-release builds
 
 ## The Technical Details

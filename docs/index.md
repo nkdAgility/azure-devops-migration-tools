@@ -11,7 +11,7 @@ There are three ways to use these tools:
 
 ## Overview
 
-These tools are build by naked Agility Limited's DevOps & Agility consultants to do real world migrations on a daily basis. We always work in [Visual Studio Team Services](http://tfs.visualstudio.com) and sync the code to GitHub for visibility. We use Work Item Tracking and a Git Repository inside of TFS to manage the work and Team Build to create our package output. We then have a Release Pipeline in Release Management to publish a [GitHub Release](https://github.com/nkdAgility/vsts-sync-migration/releases) and, if successful, automatically deploy a new version to NuGet and to Chocolatey.
+These tools are build by naked Agility Limited's DevOps & Agility consultants to do real world migrations on a daily basis. We always work in [Visual Studio Team Services](http://tfs.visualstudio.com) on https://nkdagility.visualstudio.com/vsts-sync-migration/ and sync the code to GitHub for visibility. We use Work Item Tracking and a Git Repository inside of TFS to manage the work and Team Build to create our package output. We then have a Release Pipeline in Release Management to publish a [GitHub Release](https://github.com/nkdAgility/vsts-sync-migration/releases) and, if successful, automatically deploy a new version to NuGet and to Chocolatey.
 
 Watch the [Video Overview](https://youtu.be/ZxDktQae10M) to get you started in 30 minutes. This tool is complicated and its not always easy to discover what you need to do.
 

@@ -28,18 +28,18 @@
   ],
   "links": {
     "learn": {
-      "uri": "http://vsts-bulk-editor.readthedocs.io"
+      "uri": "https://nkdagility.visualstudio.com/vsts-sync-migration/_wiki/wikis/VSTS-Sync-Migrator-Docs?pagePath=%2Findex"
     },
     "support": {
-      "uri": "https://github.com/nkdAgility/vsts-sync-migration/issues"
+      "uri": "https://nkdagility.visualstudio.com/vsts-sync-migration/_workitems"
     },
     "Getstarted": {
-      "uri": "http://vsts-bulk-editor.readthedocs.io"
+      "uri": "https://nkdagility.visualstudio.com/vsts-sync-migration/_wiki/wikis/VSTS-Sync-Migrator-Docs?pagePath=%2Fgetting%20started"
     }
   },
   "repository": {
     "type": "git",
-    "uri": "https://github.com/nkdAgility/vsts-sync-migration"
+    "uri": "https://nkdagility.visualstudio.com/DefaultCollection/vsts-sync-migration/_git/vsts-sync-migrator"
   },
   "icons": {
     "default": "images/extension-icon.png"

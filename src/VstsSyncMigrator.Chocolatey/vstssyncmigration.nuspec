@@ -8,13 +8,13 @@
     <owners>nkdAgility, MrHinsh</owners>
     <summary>VSTS Data Migrator</summary>
     <description>Visual Studio Team Services Sync &amp; Migration Engine allows you to bulk edit data in Microsoft Team Foundation Server (TFS) and Visual Studio Team Services (VSTS). Supports both migration and bulk update scenarios.</description>
-    <projectUrl>https://github.com/nkdAgility/vsts-sync-migration</projectUrl>
-    <packageSourceUrl>https://github.com/nkdAgility/vsts-sync-migration/releases</packageSourceUrl>
+    <projectUrl>https://nkdagility.visualstudio.com/vsts-sync-migration/</projectUrl>
+    <packageSourceUrl>https://chocolatey.org/packages/vsts-sync-migrator/</packageSourceUrl>
     <docsUrl>http://vsts-bulk-editor.readthedocs.io</docsUrl>
-    <bugTrackerUrl>https://github.com/nkdAgility/vsts-sync-migration/issues</bugTrackerUrl>
+    <bugTrackerUrl>https://nkdagility.visualstudio.com/vsts-sync-migration/_workitems</bugTrackerUrl>
     <tags>git tfs git-tfs sourceControl</tags>
-    <releaseNotes>https://github.com/nkdAgility/vsts-sync-migration/</releaseNotes>
-    <licenseUrl>https://github.com/nkdAgility/vsts-sync-migration/blob/master/LICENSE</licenseUrl>
+    <releaseNotes>https://nkdagility.visualstudio.com/vsts-sync-migration/</releaseNotes>
+    <licenseUrl>https://nkdagility.visualstudio.com/vsts-sync-migration/_git/vsts-sync-migrator?path=%2FLICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <iconUrl>http://nkdagility.com/wp-content/uploads/2014/03/cropped-nakedalm-logo-260.png</iconUrl>
   </metadata>
