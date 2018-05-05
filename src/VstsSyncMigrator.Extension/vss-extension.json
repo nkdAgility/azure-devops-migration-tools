@@ -27,16 +27,41 @@
     "team project"
   ],
   "links": {
+    "home": {
+      "uri": "https://nkdagility.visualstudio.com/vsts-sync-migration/"
+    },
+    "getstarted": {
+      "uri": "https://nkdagility.visualstudio.com/vsts-sync-migration/_wiki/wikis/VSTS-Sync-Migrator-Docs?pagePath=%2Fgetting%20started"
+    },
     "learn": {
       "uri": "https://nkdagility.visualstudio.com/vsts-sync-migration/_wiki/wikis/VSTS-Sync-Migrator-Docs?pagePath=%2Findex"
     },
     "support": {
       "uri": "https://nkdagility.visualstudio.com/vsts-sync-migration/_workitems"
     },
-    "Getstarted": {
-      "uri": "https://nkdagility.visualstudio.com/vsts-sync-migration/_wiki/wikis/VSTS-Sync-Migrator-Docs?pagePath=%2Fgetting%20started"
+    "repository": {
+      "uri": "https://nkdagility.visualstudio.com/DefaultCollection/vsts-sync-migration/_git/vsts-sync-migrator"
+    },
+    "issues": {
+      "uri": "https://nkdagility.visualstudio.com/vsts-sync-migration/_workitems"
     }
   },
+  "CustomerQnASupport": {
+    "enableqna": "true",
+    "url": "https://nkdagility.visualstudio.com/vsts-sync-migration/_workitems"
+  },
+  "badges": [
+    {
+      "href": "https://nkdagility.visualstudio.com/vsts-sync-migration/_build/index?path=%5C&definitionId=94",
+      "uri": "https://nkdagility.visualstudio.com/_apis/public/build/definitions/1b52ce63-eccc-41c8-88f9-ae6ebeefdc63/94/badge",
+      "description": "VSTS CI for this project"
+    },
+    {
+      "href": "https://nkdagility.visualstudio.com/vsts-sync-migration/_releases2?definitionId=6",
+      "uri": "https://nkdagility.vsrm.visualstudio.com/_apis/public/Release/badge/1b52ce63-eccc-41c8-88f9-ae6ebeefdc63/6/11",
+      "description": "Release for the project"
+    }
+  ],
   "repository": {
     "type": "git",
     "uri": "https://nkdagility.visualstudio.com/DefaultCollection/vsts-sync-migration/_git/vsts-sync-migrator"
