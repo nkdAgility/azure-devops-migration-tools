@@ -78,7 +78,7 @@ namespace VstsSyncMigrator.Engine
                             (from g in sourceGitRepos where g.Id.ToString() == oldGitRepoId select g)
                             .SingleOrDefault();
 
-                        if (oldGitRepo != null && oldGitRepo.ProjectReference.Name != me.Target.Name)
+                        if (oldGitRepo != null && oldGitRepo.ProjectReference.Name == me.Target.Name)
                         {
                             var repoNameToLookFor = !string.IsNullOrEmpty(_config.TargetRepository)
                                 ? _config.TargetRepository
@@ -87,7 +87,7 @@ namespace VstsSyncMigrator.Engine
                             var newGitRepo = (from g in targetGitRepos
                                 where
                                 g.Name == repoNameToLookFor &&
-                                g.ProjectReference.Name != oldGitRepo.ProjectReference.Name
+                                g.ProjectReference.Name == oldGitRepo.ProjectReference.Name
                                 select g).SingleOrDefault();
 
                             if (newGitRepo != null)
