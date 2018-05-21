@@ -8,6 +8,7 @@ using Microsoft.TeamFoundation.Git.Client;
 using Microsoft.TeamFoundation;
 
 using VstsSyncMigrator.Engine.Configuration.Processing;
+using Microsoft.TeamFoundation.SourceControl.WebApi;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -78,30 +79,46 @@ namespace VstsSyncMigrator.Engine
                             (from g in sourceGitRepos where g.Id.ToString() == oldGitRepoId select g)
                             .SingleOrDefault();
 
-                        if (oldGitRepo != null && oldGitRepo.ProjectReference.Name == me.Target.Name)
+                        if(oldGitRepo != null)
                         {
+                            // Find the target git repo
+                            GitRepository newGitRepo = null;
                             var repoNameToLookFor = !string.IsNullOrEmpty(_config.TargetRepository)
                                 ? _config.TargetRepository
                                 : oldGitRepo.Name;
 
-                            var newGitRepo = (from g in targetGitRepos
-                                where
-                                g.Name == repoNameToLookFor &&
-                                g.ProjectReference.Name == oldGitRepo.ProjectReference.Name
-                                select g).SingleOrDefault();
+                            // Source and Target project names match
+                            if (oldGitRepo.ProjectReference.Name == me.Target.Name)
+                            {
+                                newGitRepo = (from g in targetGitRepos
+                                                  where
+                                                  g.Name == repoNameToLookFor &&
+                                                  g.ProjectReference.Name == oldGitRepo.ProjectReference.Name
+                                                  select g).SingleOrDefault();
+                            }
+                            // Source and Target project names do not match
+                            else
+                            {
+                                newGitRepo = (from g in targetGitRepos
+                                              where
+                                              g.Name == repoNameToLookFor &&
+                                              g.ProjectReference.Name != oldGitRepo.ProjectReference.Name
+                                              select g).SingleOrDefault();
+                            }
 
+                            // Fix commit links if target repo has been found
                             if (newGitRepo != null)
                             {
                                 Trace.WriteLine($"Fixing {oldGitRepo.RemoteUrl} to {newGitRepo.RemoteUrl}?");
                                 string link =
                                     $"vstfs:///git/commit/{newGitRepo.ProjectReference.Id}%2f{newGitRepo.Id}%2f{oldCommitId}";
                                 var elinks = from Link lq in workitem.Links
-                                    where lq.ArtifactLinkType.Name == "Fixed in Commit"
-                                    select (ExternalLink) lq;
+                                             where lq.ArtifactLinkType.Name == "Fixed in Commit"
+                                             select (ExternalLink)lq;
                                 var found =
                                 (from Link lq in elinks
-                                    where (((ExternalLink) lq).LinkedArtifactUri.ToLower() == link.ToLower())
-                                    select lq).SingleOrDefault();
+                                 where (((ExternalLink)lq).LinkedArtifactUri.ToLower() == link.ToLower())
+                                 select lq).SingleOrDefault();
                                 if (found == null)
                                 {
                                     var newGitCommitLink = new ExternalLink(
@@ -118,7 +135,7 @@ namespace VstsSyncMigrator.Engine
                         }
                         else
                         {
-                            Trace.WriteLine($"FAIL {oldGitRepoId} to ???");
+                            Trace.WriteLine($"FAIL could not find source git repo");
                             noteFound++;
                         }
                     }
