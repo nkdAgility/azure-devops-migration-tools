@@ -8,6 +8,7 @@ using Microsoft.TeamFoundation.Git.Client;
 using Microsoft.TeamFoundation;
 
 using VstsSyncMigrator.Engine.Configuration.Processing;
+using Microsoft.TeamFoundation.SourceControl.WebApi;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -59,10 +60,15 @@ namespace VstsSyncMigrator.Engine
                 List<ExternalLink> newEL = new List<ExternalLink>();
                 List<ExternalLink> removeEL = new List<ExternalLink>();
                 Trace.WriteLine(string.Format("WI: {0}?", workitem.Id));
+                List<string> gitWits = new List<string>
+                {
+                    "Branch",
+                    "Fixed in Commit"
+                };
 
                 foreach (Link l in workitem.Links)
                 {
-                    if (l is ExternalLink && l.ArtifactLinkType.Name == "Fixed in Commit")
+                    if (l is ExternalLink && gitWits.Contains(l.ArtifactLinkType.Name))
                     {
                         ExternalLink el = (ExternalLink) l;
                         //vstfs:///Git/Commit/25f94570-e3e7-4b79-ad19-4b434787fd5a%2f50477259-3058-4dff-ba4c-e8c179ec5327%2f41dd2754058348d72a6417c0615c2543b9b55535
@@ -78,38 +84,72 @@ namespace VstsSyncMigrator.Engine
                             (from g in sourceGitRepos where g.Id.ToString() == oldGitRepoId select g)
                             .SingleOrDefault();
 
-                        if (oldGitRepo != null && oldGitRepo.ProjectReference.Name != me.Target.Name)
+                        if(oldGitRepo != null)
                         {
+                            // Find the target git repo
+                            GitRepository newGitRepo = null;
                             var repoNameToLookFor = !string.IsNullOrEmpty(_config.TargetRepository)
                                 ? _config.TargetRepository
                                 : oldGitRepo.Name;
 
-                            var newGitRepo = (from g in targetGitRepos
-                                where
-                                g.Name == repoNameToLookFor &&
-                                g.ProjectReference.Name != oldGitRepo.ProjectReference.Name
-                                select g).SingleOrDefault();
+                            // Source and Target project names match
+                            if (oldGitRepo.ProjectReference.Name == me.Target.Name)
+                            {
+                                newGitRepo = (from g in targetGitRepos
+                                                  where
+                                                  g.Name == repoNameToLookFor &&
+                                                  g.ProjectReference.Name == oldGitRepo.ProjectReference.Name
+                                                  select g).SingleOrDefault();
+                            }
+                            // Source and Target project names do not match
+                            else
+                            {
+                                newGitRepo = (from g in targetGitRepos
+                                              where
+                                              g.Name == repoNameToLookFor &&
+                                              g.ProjectReference.Name != oldGitRepo.ProjectReference.Name
+                                              select g).SingleOrDefault();
+                            }
 
+                            // Fix commit links if target repo has been found
                             if (newGitRepo != null)
                             {
                                 Trace.WriteLine($"Fixing {oldGitRepo.RemoteUrl} to {newGitRepo.RemoteUrl}?");
-                                string link =
-                                    $"vstfs:///git/commit/{newGitRepo.ProjectReference.Id}%2f{newGitRepo.Id}%2f{oldCommitId}";
-                                var elinks = from Link lq in workitem.Links
-                                    where lq.ArtifactLinkType.Name == "Fixed in Commit"
-                                    select (ExternalLink) lq;
-                                var found =
-                                (from Link lq in elinks
-                                    where (((ExternalLink) lq).LinkedArtifactUri.ToLower() == link.ToLower())
-                                    select lq).SingleOrDefault();
-                                if (found == null)
+
+                                // Create External Link object
+                                ExternalLink newLink = null;
+                                switch(l.ArtifactLinkType.Name)
                                 {
-                                    var newGitCommitLink = new ExternalLink(
-                                        targetStore.Store.RegisteredLinkTypes[ArtifactLinkIds.Commit],
-                                        link);
-                                    newEL.Add(newGitCommitLink);
+                                    case "Branch":
+                                        newLink = new ExternalLink(targetStore.Store.RegisteredLinkTypes[ArtifactLinkIds.Branch],
+                                            $"vstfs:///git/ref/{newGitRepo.ProjectReference.Id}%2f{newGitRepo.Id}%2f{oldCommitId}");
+                                        break;
+
+                                    case "Fixed in Commit":
+                                        newLink = new ExternalLink(targetStore.Store.RegisteredLinkTypes[ArtifactLinkIds.Commit],
+                                            $"vstfs:///git/commit/{newGitRepo.ProjectReference.Id}%2f{newGitRepo.Id}%2f{oldCommitId}");
+                                        break;
+
+                                    default:
+                                        Trace.WriteLine(String.Format("Skipping unsupported link type {0}", l.ArtifactLinkType.Name));
+                                        break;
                                 }
-                                removeEL.Add(el);
+
+                               if(newLink != null)
+                               {
+                                    var elinks = from Link lq in workitem.Links
+                                                 where gitWits.Contains(lq.ArtifactLinkType.Name)
+                                                 select (ExternalLink)lq;
+                                    var found =
+                                    (from Link lq in elinks
+                                     where (((ExternalLink)lq).LinkedArtifactUri.ToLower() == newLink.LinkedArtifactUri.ToLower())
+                                     select lq).SingleOrDefault();
+                                    if (found == null)
+                                    {
+                                        newEL.Add(newLink);
+                                    }
+                                    removeEL.Add(el);
+                               }
                             }
                             else
                             {
@@ -118,7 +158,7 @@ namespace VstsSyncMigrator.Engine
                         }
                         else
                         {
-                            Trace.WriteLine($"FAIL {oldGitRepoId} to ???");
+                            Trace.WriteLine($"FAIL could not find source git repo");
                             noteFound++;
                         }
                     }
