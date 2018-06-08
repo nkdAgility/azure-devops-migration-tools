@@ -125,11 +125,16 @@ namespace VstsSyncMigrator.Engine
                             newwit.Save();
                             newwit.Close();
                             Trace.WriteLine(string.Format("...Saved as {0}", newwit.Id), this.Name);
-                            if (sourceWI.Fields.Contains(me.SourceReflectedWorkItemIdFieldName) && _config.UpdateSoureReflectedId)
+
+                            if (me.SourceReflectedWorkItemIdFieldName != null)
                             {
-                                sourceWI.Fields[me.SourceReflectedWorkItemIdFieldName].Value = targetStore.CreateReflectedWorkItemId(newwit);
+                                if (sourceWI.Fields.Contains(me.SourceReflectedWorkItemIdFieldName) && _config.UpdateSoureReflectedId)
+                                {
+                                    sourceWI.Fields[me.SourceReflectedWorkItemIdFieldName].Value = targetStore.CreateReflectedWorkItemId(newwit);
+                                }
+                                sourceWI.Save();
                             }
-                            sourceWI.Save();
+
                             Trace.WriteLine(string.Format("...and Source Updated {0}", sourceWI.Id), this.Name);
                             imported++;
                         }
