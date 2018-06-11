@@ -1,10 +1,17 @@
 # VSTS Sync Migration Tools Docs 
 
-VSTS Sync Migration Tools allow you to bulk edit data in Microsoft Team Foundation Server (TFS) and Visual Studio Team Services (VSTS). It has many names depending on what you are trying to achieve. You might call it a migration tool, or a bulk update tool, and both are correct.
+VSTS Sync Migration Tools allow you to bulk edit data in Microsoft Team Foundation Server (TFS) and Visual Studio Team Services (VSTS). It has many names depending on what you are trying to achieve. You might call it a migration tool, or a bulk update tool, and both are correct. It can be used to:
+
+ - Migrate data from TFS to TFS
+ - Migrate data from TFS to VSTS
+ - Migrate data from VSTS to TFS
+ - Bulk update in TFS or VSTS
+
+ This is an advanced tool and is not designed to be used by those not intimatly familure with TFS, VSTS, and their API's.
 
 ## Getting the Tools
 
-There are three ways to use these tools:
+The most effective way to get a copy of the tools is to use Chocolatey to install them:
 
 - [Install from Chocolatey](https://chocolatey.org/packages/vsts-sync-migrator/) **(recomended)**
 - Manually download the [latest release from GitHub](https://github.com/nkdAgility/vsts-sync-migration/releases) and unzip
@@ -59,6 +66,8 @@ Note: **WorkItemMigrationContext** and **WorkItemRevisionReplayMigrationContext*
 1. **AttachementImportMigrationContext** - Imports all work items attachments from the migration machine. This is used in partnership with the **AttachementExportMigrationContext**
 1. **LinkMigrationContext** - Migrates all the work item links, both between work items and external links.
 1. **WorkItemQueryMigrationContext** - Migrate all shared work item queries
+1. **WorkItemDelete**
+
 
 ##### Test Plans & Suites
 
@@ -73,10 +82,22 @@ The following misc processors do as their names suggest
 
 - **ImportProfilePictureContext** 
 - **ExportProfilePictureFromADContext**
-- **WorkItemDelete**
-- **FixGitCommitLinks** - Allows you to fix the migrated Git commit hooks (and thus external links) to point to the new repository in the target project. If the source and target repository names are the same, this will work out of the box. If the target repository has a different name, you can specify that name via the "TargetRepository" property.
 - **CreateTeamFolders**
 - **ExportTeamList**
+
+##### Code (TFVC)
+
+There are no good tools for migrating TFVC code. All of them suffer from "time-dilation" as one cant control the dates of the Check-ins. While you can use tools like TaskTop, TFS Intergration Tools, or others there is no support. We prefer to recommned that you use Git-TFS and migrate from TFVC to Git with full history and branches. If your resulting repository is too large we recommend creating a full clone of TFVC for posterity, and then create a limited branch clone with limited history for work.
+
+##### Code (Git)
+
+When moving Git repos between Projects and Accounts you are able to maintain full history. However you will need to have all of the links to 
+
+- **FixGitCommitLinks** - Allows you to fix the migrated Git commit hooks (and thus external links) to point to the new repository in the target project. If the source and target repository names are the same, this will work out of the box. If the target repository has a different name, you can specify that name via the "TargetRepository" property.
+
+##### Build & Releases
+
+When you import a build or release defenition into VSTS you need to fill out some of the data to allow that new definition to be saved. Things like connections and other require fields usually dont have matching GUIDS and need manual intervention. For builds & Releases we recommend that you use the built in Export/Import tools provided in the UI to move then to a new Team Project.
 
 ## Contributing
 
@@ -93,6 +114,6 @@ Check out the [FAQ pages](faq.md)
 
 ## Terms
 
-naked Agility Limited creates and maintains the "Visual Studio Team Services Bulk Data Editor Engine" project under its [terms of business](https://nkdagility.com/company/consulting-terms-of-business/) and allows full access to the source code for customers and the general public. 
+naked Agility Limited & our contibutors creates and maintains the "VSTS Sync Migration" project under its [terms of business](https://nkdagility.com/company/consulting-terms-of-business/) and allows full access to the source code for customers and the general public. 
 
 
