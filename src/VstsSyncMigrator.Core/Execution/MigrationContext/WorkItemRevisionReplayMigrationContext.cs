@@ -336,7 +336,7 @@ namespace VstsSyncMigrator.Engine
 
         public bool NodeExists(string nodePath)
         {
-            if (_foundNodes.Contains(nodePath))
+            if (!_foundNodes.Contains(nodePath))
             {
                 NodeInfo node = null;
                 try
