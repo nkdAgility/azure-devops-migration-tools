@@ -235,9 +235,9 @@ namespace VstsSyncMigrator.Engine
                 && newwit.Fields["Microsoft.VSTS.Common.BacklogPriority"].Value != null
                 && !isNumeric(newwit.Fields["Microsoft.VSTS.Common.BacklogPriority"].Value.ToString(),
                 NumberStyles.Any))
-                {
-                    newwit.Fields["Microsoft.VSTS.Common.BacklogPriority"].Value = 10;
-                }
+            {
+                newwit.Fields["Microsoft.VSTS.Common.BacklogPriority"].Value = 10;
+            }
 
             StringBuilder description = new StringBuilder();
             description.Append(oldWi.Description);
@@ -245,8 +245,17 @@ namespace VstsSyncMigrator.Engine
 
             StringBuilder history = new StringBuilder();
             BuildCommentTable(oldWi, history);
-            BuildFieldTable(oldWi, history);
-            history.Append("<p>Migrated by <a href='https://nkdagility.visualstudio.com/vsts-sync-migration/'>VSTS/TFS Sync Migration Tool</a> open source.</p>");
+
+            if (_config.BuildFieldTable)
+            {
+                BuildFieldTable(oldWi, history);
+            }
+
+            if (_config.AppendMigrationToolSignatureFooter)
+            {
+                AppendMigratedByFooter(history);
+            }
+
             newwit.History = history.ToString();
 
             fieldMappingTimer.Stop();
@@ -262,6 +271,11 @@ namespace VstsSyncMigrator.Engine
         }
 
 
+        private static void AppendMigratedByFooter(StringBuilder history)
+        {
+            history.Append("<p>Migrated by <a href='https://nkdagility.visualstudio.com/vsts-sync-migration/'>VSTS/TFS Sync Migration Tool</a> open source.</p>");
+        }
+
         private static void BuildFieldTable(WorkItem oldWi, StringBuilder history, bool useHTML = false)
         {
             history.Append("<p>Fields from previous Work Item:</p>");
@@ -273,7 +287,7 @@ namespace VstsSyncMigrator.Engine
                 }
                 else
                 {
-                        history.AppendLine(string.Format("{0}: {1}<br />", f.Name, f.Value.ToString()));
+                    history.AppendLine(string.Format("{0}: {1}<br />", f.Name, f.Value.ToString()));
                 }
 
             }
