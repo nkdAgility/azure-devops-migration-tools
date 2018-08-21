@@ -49,8 +49,9 @@ namespace VstsSyncMigrator.Engine
                 Trace.Write(string.Format("Attachement Export: {0} of {1} - {2}", current, sourceWIS.Count, wi.Id));
                 foreach (Attachment wia in wi.Attachments)
                 {
-                    string reflectedId = sourceStore.CreateReflectedWorkItemId(wi);
-                    string fname = string.Format("{0}#{1}", reflectedId.Replace("/", "--").Replace(":", "+"), wia.Name);
+                    string reflectedId = wi.Fields[me.ReflectedWorkItemIdFieldName].Value.ToString(); 
+                    reflectedId = int.Parse(reflectedId.Substring(reflectedId.LastIndexOf(@"/") + 1)).ToString();
+                    string fname = string.Format("{0}#{1}", reflectedId, wia.Name);
                     Trace.Write("-");
                     Trace.Write(fname);
                     string fpath = Path.Combine(exportPath, fname);

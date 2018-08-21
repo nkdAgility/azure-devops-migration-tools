@@ -47,11 +47,11 @@ namespace VstsSyncMigrator.Engine
                     if (fileNameParts.Length != 2)
                         continue;
 
-                    string reflectedID = fileNameParts[0].Replace('+', ':').Replace("--", "/");
+                    int reflectedID = int.Parse(fileNameParts[0]);
                     string targetFileName = fileNameParts[1];
                     var renamedFilePath = Path.Combine(Path.GetDirectoryName(file), targetFileName);
                     File.Move(file, renamedFilePath);
-                    targetWI = targetStore.FindReflectedWorkItemByReflectedWorkItemId(reflectedID, me.ReflectedWorkItemIdFieldName);
+                    targetWI = targetStore.Store.GetWorkItem(reflectedID);
                     if (targetWI != null)
                     {
                         Trace.WriteLine(string.Format("{0} of {1} - Import {2} to {3}", current, files.Count, fileName, targetWI.Id));

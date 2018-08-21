@@ -199,10 +199,10 @@ namespace VstsSyncMigrator.Engine
                 {
                     if (newwit.Fields.Contains(me.ReflectedWorkItemIdFieldName))
                     {
+                        newwit.Fields["System.ChangedBy"].Value = "your name";
                         newwit.Fields[me.ReflectedWorkItemIdFieldName].Value =
                             sourceStore.CreateReflectedWorkItemId(sourceWorkItem);
                     }
-
                     var history = new StringBuilder();
                     history.Append(
                         "Migrated by <a href='https://nkdagility.visualstudio.com/vsts-sync-migration/'>VSTS/TFS Sync Migration Tool</a> open source.'>VSTS/TFS Migrator</a>.");
@@ -254,9 +254,8 @@ namespace VstsSyncMigrator.Engine
                 }
             }
 
-            newwit.AreaPath = GetNewNodeName(oldWi.AreaPath, oldWi.Project.Name, newwit.Project.Name, newwit.Store);
-            newwit.IterationPath = GetNewNodeName(oldWi.IterationPath, oldWi.Project.Name, newwit.Project.Name, newwit.Store);
-
+            newwit.AreaPath = GetNewNodeName(oldWi.AreaPath, oldWi.Project.Name, newwit.Project.Name, newwit.Store, "Area");
+            newwit.IterationPath = GetNewNodeName(oldWi.IterationPath, oldWi.Project.Name, newwit.Project.Name, newwit.Store, "Iteration");
             switch (destType)
             {
                 case "Test Case":
@@ -285,7 +284,7 @@ namespace VstsSyncMigrator.Engine
 
         NodeDetecomatic _nodeOMatic;
 
-        private string GetNewNodeName(string oldNodeName, string oldProjectName, string newProjectName, WorkItemStore newStore)
+        private string GetNewNodeName(string oldNodeName, string oldProjectName, string newProjectName, WorkItemStore newStore, string nodePath)
         {
             if (_nodeOMatic == null)
             {
@@ -294,7 +293,7 @@ namespace VstsSyncMigrator.Engine
             string newNodeName = "";
             if (_config.PrefixProjectToNodes)
             {
-                newNodeName = $@"{newProjectName}\{oldNodeName}";
+                newNodeName = $@"{newProjectName}\{nodePath}\{oldNodeName}";
             } else
             {
                 var regex = new Regex(Regex.Escape(oldProjectName));
@@ -306,10 +305,16 @@ namespace VstsSyncMigrator.Engine
                 Trace.WriteLine(string.Format("The Node '{0}' does not exist, leaving as '{1}'. This may be because it has been renamed or moved and no longer exists, or that you have not migrateed the Node Structure yet.", newNodeName, newProjectName));
                 newNodeName = newProjectName;
             }
-            return newNodeName;
+            if (newNodeName.StartsWith(newProjectName + '\\' + nodePath + '\\'))
+            {
+                return newNodeName.Remove(newNodeName.IndexOf($@"{nodePath}\"), $@"{nodePath}\".Length);
+            } else
+            {
+                return newNodeName;
+            }
         }
 
-        
+
         private static bool IsNumeric(string val, NumberStyles numberStyle)
         {
             double result;
