@@ -235,9 +235,9 @@ namespace VstsSyncMigrator.Engine
                 && newwit.Fields["Microsoft.VSTS.Common.BacklogPriority"].Value != null
                 && !isNumeric(newwit.Fields["Microsoft.VSTS.Common.BacklogPriority"].Value.ToString(),
                 NumberStyles.Any))
-                {
-                    newwit.Fields["Microsoft.VSTS.Common.BacklogPriority"].Value = 10;
-                }
+            {
+                newwit.Fields["Microsoft.VSTS.Common.BacklogPriority"].Value = 10;
+            }
 
             StringBuilder description = new StringBuilder();
             description.Append(oldWi.Description);
@@ -245,8 +245,17 @@ namespace VstsSyncMigrator.Engine
 
             StringBuilder history = new StringBuilder();
             BuildCommentTable(oldWi, history);
-            BuildFieldTable(oldWi, history);
-            history.Append("<p>Migrated by <a href='https://nkdagility.visualstudio.com/vsts-sync-migration/'>VSTS/TFS Sync Migration Tool</a> open source.</p>");
+
+            if (_config.BuildFieldTable)
+            {
+                BuildFieldTable(oldWi, history);
+            }
+
+            if (_config.AppendMigrationToolSignatureFooter)
+            {
+                AppendMigratedByFooter(history);
+            }
+
             newwit.History = history.ToString();
 
             fieldMappingTimer.Stop();
@@ -262,6 +271,11 @@ namespace VstsSyncMigrator.Engine
         }
 
 
+        private static void AppendMigratedByFooter(StringBuilder history)
+        {
+            history.Append("<p>Migrated by <a href='https://nkdagility.visualstudio.com/vsts-sync-migration/'>VSTS/TFS Sync Migration Tool</a> open source.</p>");
+        }
+
         private static void BuildFieldTable(WorkItem oldWi, StringBuilder history, bool useHTML = false)
         {
             history.Append("<p>Fields from previous Work Item:</p>");
@@ -273,7 +287,7 @@ namespace VstsSyncMigrator.Engine
                 }
                 else
                 {
-                        history.AppendLine(string.Format("{0}: {1}<br />", f.Name, f.Value.ToString()));
+                    history.AppendLine(string.Format("{0}: {1}<br />", f.Name, f.Value.ToString()));
                 }
 
             }
@@ -282,18 +296,21 @@ namespace VstsSyncMigrator.Engine
 
         private static void BuildCommentTable(WorkItem oldWi, StringBuilder history)
         {
-            history.Append("<p>Comments from previous work item:</p>");
-            history.Append("<table border='1' style='width:100%;border-color:#C0C0C0;'>");
-            foreach (Revision r in oldWi.Revisions)
+            if (oldWi.Revisions != null && oldWi.Revisions.Count > 0)
             {
-                if ((string)r.Fields["System.History"].Value != "" && (string)r.Fields["System.ChangedBy"].Value != "Martin Hinshelwood (Adm)")
+                history.Append("<p>Comments from previous work item:</p>");
+                history.Append("<table border='1' style='width:100%;border-color:#C0C0C0;'>");
+                foreach (Revision r in oldWi.Revisions)
                 {
-                    r.WorkItem.Open();
-                    history.AppendFormat("<tr><td style='align:right;width:100%'><p><b>{0} on {1}:</b></p><p>{2}</p></td></tr>", r.Fields["System.ChangedBy"].Value, DateTime.Parse(r.Fields["System.ChangedDate"].Value.ToString()).ToLongDateString(), r.Fields["System.History"].Value);
+                    if ((string)r.Fields["System.History"].Value != "" && (string)r.Fields["System.ChangedBy"].Value != "Martin Hinshelwood (Adm)")
+                    {
+                        r.WorkItem.Open();
+                        history.AppendFormat("<tr><td style='align:right;width:100%'><p><b>{0} on {1}:</b></p><p>{2}</p></td></tr>", r.Fields["System.ChangedBy"].Value, DateTime.Parse(r.Fields["System.ChangedDate"].Value.ToString()).ToLongDateString(), r.Fields["System.History"].Value);
+                    }
                 }
+                history.Append("</table>");
+                history.Append("<p>&nbsp;</p>");
             }
-            history.Append("</table>");
-            history.Append("<p>&nbsp;</p>");
         }
 
         static bool isNumeric(string val, NumberStyles NumberStyle)
