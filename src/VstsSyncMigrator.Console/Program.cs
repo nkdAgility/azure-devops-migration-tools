@@ -55,7 +55,7 @@ namespace VstsSyncMigrator.ConsoleApp
             string logsPath = CreateLogsPath();
             //////////////////////////////////////////////////
             Trace.Listeners.Add(new TextWriterTraceListener(Console.Out));
-            Trace.Listeners.Add(new TextWriterTraceListener(Path.Combine(logsPath, $"{Path.GetFileNameWithoutExtension(args[2])}.log"), "myListener"));
+            Trace.Listeners.Add(new TextWriterTraceListener(Path.Combine(logsPath, "VstsSyncMigrator.log"), "myListener"));
             //////////////////////////////////////////////////
             Trace.WriteLine(System.Reflection.Assembly.GetExecutingAssembly().GetName().Name, "[Info]");
             Version thisVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
