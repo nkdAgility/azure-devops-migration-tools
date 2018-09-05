@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using System.Collections.Generic;
@@ -60,7 +60,11 @@ namespace VstsSyncMigrator.Engine
         public int GetReflectedWorkItemId(WorkItem wi, string reflectedWotkItemIdField)
         {
             string rwiid = wi.Fields[reflectedWotkItemIdField].Value.ToString();
-            return int.Parse(rwiid.Substring(rwiid.LastIndexOf(@"/") + 1));
+            if (Regex.IsMatch(rwiid, @"(http(s)?://)?([\w-]+\.)+[\w-]+(/[\w- ;,./?%&=]*)?"))
+            {
+                return int.Parse(rwiid.Substring(rwiid.LastIndexOf(@"/") + 1));
+            }
+            return 0;
         }
 
         public WorkItem FindReflectedWorkItem(WorkItem workItemToFind, string reflectedWotkItemIdField, bool cache)
@@ -82,7 +86,11 @@ namespace VstsSyncMigrator.Engine
                 else
                 {
                     found = Store.GetWorkItem(idToFind);
-                }
+                    if (!(found.Fields[reflectedWotkItemIdField].Value.ToString() == rwiid))
+                    {
+                        found = null;
+                    }
+                }                
             }
             if (found == null) { found = FindReflectedWorkItemByReflectedWorkItemId(ReflectedWorkItemId, reflectedWotkItemIdField); }
             if (!workItemToFind.Fields.Contains(reflectedWotkItemIdField))
