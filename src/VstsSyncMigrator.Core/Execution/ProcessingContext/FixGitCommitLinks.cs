@@ -43,7 +43,7 @@ namespace VstsSyncMigrator.Engine
             WorkItemStoreContext targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
             TfsQueryContext tfsqc = new TfsQueryContext(targetStore);
             tfsqc.AddParameter("TeamProject", me.Target.Name);
-            tfsqc.Query = string.Format(@"SELECT [System.Id] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject {0}", _config.QueryBit);
+            tfsqc.Query = string.Format(@"SELECT [System.Id] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject");
             WorkItemCollection workitems = tfsqc.Execute();
             Trace.WriteLine(string.Format("Update {0} work items?", workitems.Count));
             //////////////////////////////////////////////////
@@ -78,7 +78,7 @@ namespace VstsSyncMigrator.Engine
                         string oldGitRepoId = bits[1];
                         if (bits.Count() >= 3)
                         {
-                            oldCommitId = $"{bits[2]}}";
+                            oldCommitId = $"{bits[2]}";
                             for (int i = 2; i < bits.Count(); i++)
                             {
                                 oldCommitId += $"%2f{bits[i]}";
