@@ -86,7 +86,7 @@ namespace VstsSyncMigrator.ConsoleApp
             Trace.WriteLine(string.Format("Telemitery Enabled: {0}", Telemetry.Current.IsEnabled().ToString()), "[Info]");
             Trace.WriteLine(string.Format("SessionID: {0}", Telemetry.Current.Context.Session.Id), "[Info]");
             Trace.WriteLine(string.Format("User: {0}", Telemetry.Current.Context.User.Id), "[Info]");
-            Trace.WriteLine(string.Format("Start Time: {0}", startTime.ToUniversalTime()), "[Info]");
+            Trace.WriteLine(string.Format("Start Time: {0}", startTime.ToUniversalTime().ToLocalTime()), "[Info]");
             Trace.WriteLine("------------------------------START-----------------------------", "[Info]");
             //////////////////////////////////////////////////
             int result = (int)Parser.Default.ParseArguments<InitOptions, RunOptions, ExportADGroupsOptions>(args).MapResult(
@@ -108,7 +108,7 @@ namespace VstsSyncMigrator.ConsoleApp
                 System.Threading.Thread.Sleep(1000);
             }
             Trace.WriteLine(string.Format("Duration: {0}", mainTimer.Elapsed.ToString("c")), "[Info]");
-            Trace.WriteLine(string.Format("End Time: {0}", startTime.ToUniversalTime()), "[Info]");
+            Trace.WriteLine(string.Format("End Time: {0}", DateTime.Now), "[Info]");
 #if DEBUG
             Console.ReadKey();
 #endif

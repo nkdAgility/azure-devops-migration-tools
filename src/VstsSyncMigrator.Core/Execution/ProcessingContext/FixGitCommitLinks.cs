@@ -43,8 +43,7 @@ namespace VstsSyncMigrator.Engine
             WorkItemStoreContext targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
             TfsQueryContext tfsqc = new TfsQueryContext(targetStore);
             tfsqc.AddParameter("TeamProject", me.Target.Name);
-            tfsqc.Query =
-                "SELECT [System.Id] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject AND  [System.ExternalLinkCount] > 0 ";
+            tfsqc.Query = string.Format(@"SELECT [System.Id] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject {0}", _config.QueryBit);
             WorkItemCollection workitems = tfsqc.Execute();
             Trace.WriteLine(string.Format("Update {0} work items?", workitems.Count));
             //////////////////////////////////////////////////
@@ -63,7 +62,8 @@ namespace VstsSyncMigrator.Engine
                 List<string> gitWits = new List<string>
                 {
                     "Branch",
-                    "Fixed in Commit"
+                    "Fixed in Commit",
+                    "Pull Request"
                 };
 
                 foreach (Link l in workitem.Links)
@@ -74,12 +74,19 @@ namespace VstsSyncMigrator.Engine
                         //vstfs:///Git/Commit/25f94570-e3e7-4b79-ad19-4b434787fd5a%2f50477259-3058-4dff-ba4c-e8c179ec5327%2f41dd2754058348d72a6417c0615c2543b9b55535
                         string guidbits = el.LinkedArtifactUri.Substring(el.LinkedArtifactUri.LastIndexOf('/') + 1);
                         string[] bits = Regex.Split(guidbits, "%2f", RegexOptions.IgnoreCase);
-                        if (bits.Count() != 3)
-                        {
-                            throw new Exception("Regex to split bits in url is not working too great");
-                        }
+                        string oldCommitId = null;
                         string oldGitRepoId = bits[1];
-                        string oldCommitId = bits[2];
+                        if (bits.Count() >= 3)
+                        {
+                            oldCommitId = $"{bits[2]}}";
+                            for (int i = 2; i < bits.Count(); i++)
+                            {
+                                oldCommitId += $"%2f{bits[i]}";
+                            }
+                        } else
+                        {
+                            oldCommitId = bits[2];
+                        }
                         var oldGitRepo =
                             (from g in sourceGitRepos where g.Id.ToString() == oldGitRepoId select g)
                             .SingleOrDefault();
@@ -128,6 +135,10 @@ namespace VstsSyncMigrator.Engine
                                     case "Fixed in Commit":
                                         newLink = new ExternalLink(targetStore.Store.RegisteredLinkTypes[ArtifactLinkIds.Commit],
                                             $"vstfs:///git/commit/{newGitRepo.ProjectReference.Id}%2f{newGitRepo.Id}%2f{oldCommitId}");
+                                        break;
+                                    case "Pull Request":
+                                        newLink = new ExternalLink(targetStore.Store.RegisteredLinkTypes[ArtifactLinkIds.PullRequest],
+                                            $"vstfs:///Git/PullRequestId/{newGitRepo.ProjectReference.Id}%2f{newGitRepo.Id}%2f{oldCommitId}");
                                         break;
 
                                     default:
