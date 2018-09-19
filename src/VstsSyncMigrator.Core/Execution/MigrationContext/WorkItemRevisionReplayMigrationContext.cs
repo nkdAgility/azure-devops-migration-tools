@@ -205,7 +205,7 @@ namespace VstsSyncMigrator.Engine
                     }
                     var history = new StringBuilder();
                     history.Append(
-                        "Migrated by <a href='https://nkdagility.visualstudio.com/vsts-sync-migration/'>VSTS/TFS Sync Migration Tool</a> open source.'>VSTS/TFS Migrator</a>.");
+                        "Migrated by <a href='https://dev.azure.com/nkdagility/vsts-sync-migration/'>Azure DevOps Migration Tools</a> open source.'>Azure DevOps Migration Tools</a>.");
                     newwit.History = history.ToString();
 
                     newwit.Save();

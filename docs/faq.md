@@ -1,4 +1,4 @@
-# VSTS Sync Migration Tools FAQ
+# Azure DevOps Migration Tools FAQ
 
 ## What is this tool for?
 
@@ -61,7 +61,7 @@ This field needs to be added to both the source and target team projects. On bot
 How the `ReflectedWorkItemId` field is added depends on whether the system, there are three options
 
 - TFS
-- VSTS using the new process customisation process
-- VSTS when the instance has been imported using the  [VSTS Migration Tool](https://blogs.msdn.microsoft.com/visualstudioalm/2016/11/16/import-your-tfs-database-into-visual-studio-team-services/)
+- Azure DevOps Services using the new process customisation process
+- Azure DevOps Services when the instance has been imported using the  [VSTS Migration Tool](https://blogs.msdn.microsoft.com/visualstudioalm/2016/11/16/import-your-tfs-database-into-visual-studio-team-services/)
 
 For details on how to add the field in each case, and trouble shooting check the [server configuration page](server-configuration.md)

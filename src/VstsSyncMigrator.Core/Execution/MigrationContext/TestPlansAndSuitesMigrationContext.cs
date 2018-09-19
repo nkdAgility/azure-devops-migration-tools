@@ -656,14 +656,14 @@ namespace VstsSyncMigrator.Engine
             {
                 targetPlan.ManualTestSettingsId = 0;
                 targetPlan.AutomatedTestSettingsId = 0;
-                Trace.WriteLine("Ignoring migration of Testsettings. VSTS Sync Migration Tools dont support migration of this artifact type.");
+                Trace.WriteLine("Ignoring migration of Testsettings. Azure DevOps Migration Tools dont support migration of this artifact type.");
             }
 
             // Remove reference to build uri because VSTS Sync doesnt support migrating these artifacts
             if (targetPlan.BuildUri != null)
             {
                 targetPlan.BuildUri = null;
-                Trace.WriteLine(string.Format("Ignoring migration of assigned Build artifact {0}. VSTS Sync Migration Tools dont support migration of this artifact type.", sourcePlan.BuildUri));
+                Trace.WriteLine(string.Format("Ignoring migration of assigned Build artifact {0}. Azure DevOps Migration Tools dont support migration of this artifact type.", sourcePlan.BuildUri));
             }
             return targetPlan;
         }

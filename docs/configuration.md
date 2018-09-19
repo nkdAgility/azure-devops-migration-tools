@@ -1,11 +1,11 @@
 # Configuration
-VSTS Sync Migration Tools are mainly powered by configuration which allows you to control most aspects of the execution flow.
+Azure DevOps Migration Tools are mainly powered by configuration which allows you to control most aspects of the execution flow.
 
 ## Configuration tool
 If you run `vstssyncmigrator.exe init` you will be launched into a configuration tool that will generate a default file. Using the `init` command will create a `vstsbulkeditor.yml` file in the
 working directory. At run time you can specify the configuration file to use.
 
-**Note:** VSTS Sync Migration Tools do not ship with internal default configuration and will not function without one.
+**Note:** Azure DevOps Migration Tools do not ship with internal default configuration and will not function without one.
 
 To create your config file just type `vstssyncmigrator init` in the directory that you unziped the tools and a minimal `VstsBulkEditor.json` configuration
 file will be created. Modify this as you need.

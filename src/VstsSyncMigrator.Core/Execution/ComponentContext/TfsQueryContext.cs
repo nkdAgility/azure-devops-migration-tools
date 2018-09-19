@@ -26,7 +26,7 @@ namespace VstsSyncMigrator.Engine
         }
 
         // Fix for Query SOAP error when passing parameters
-        [Obsolete("Temporary work aorund for SOAP issue https://nkdagility.visualstudio.com/vsts-sync-migration/_workitems/edit/5066")]
+        [Obsolete("Temporary work aorund for SOAP issue https://dev.azure.com/nkdagility/vsts-sync-migration/_workitems/edit/5066")]
         string WorkAroundForSOAPError(string query, IDictionary<string, string> parameters)
         {
             foreach (string key in parameters.Keys)
@@ -63,7 +63,7 @@ namespace VstsSyncMigrator.Engine
             queryTimer.Start();
             try
             {
-                Query = WorkAroundForSOAPError(Query, parameters); // TODO: Remove this once bug fixed... https://nkdagility.visualstudio.com/vsts-sync-migration/_workitems/edit/5066 
+                Query = WorkAroundForSOAPError(Query, parameters); // TODO: Remove this once bug fixed... https://dev.azure.com/nkdagility/vsts-sync-migration/_workitems/edit/5066 
                 wc = storeContext.Store.Query(Query); //, parameters);
                 queryTimer.Stop();
                 Telemetry.Current.TrackDependency("TeamService", "Query", startTime, queryTimer.Elapsed, true);

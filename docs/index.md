@@ -1,13 +1,13 @@
-# VSTS Sync Migration Tools Docs 
+# Azure DevOps Migration Tools Docs 
 
-VSTS Sync Migration Tools allow you to bulk edit data in Microsoft Team Foundation Server (TFS) and Visual Studio Team Services (VSTS). It has many names depending on what you are trying to achieve. You might call it a migration tool, or a bulk update tool, and both are correct. It can be used to:
+Azure DevOps Migration Tools allow you to bulk edit data in Microsoft Team Foundation Server (TFS) and Azure DevOps Services. It has many names depending on what you are trying to achieve. You might call it a migration tool, or a bulk update tool, and both are correct. It can be used to:
 
  - Migrate data from TFS to TFS
- - Migrate data from TFS to VSTS
- - Migrate data from VSTS to TFS
- - Bulk update in TFS or VSTS
+ - Migrate data from TFS to Azure DevOps Services
+ - Migrate data from Azure Devops Services to TFS
+ - Bulk update in TFS or Azure DevOps Services
 
- This is an advanced tool and is not designed to be used by those not intimatly familure with TFS, VSTS, and their API's.
+ This is an advanced tool and is not designed to be used by those not intimatly familure with TFS, Azure DevOps Services, and their API's.
 
 ## Getting the Tools
 
@@ -18,7 +18,7 @@ The most effective way to get a copy of the tools is to use Chocolatey to instal
 
 ## Overview
 
-These tools are build by naked Agility Limited's DevOps & Agility consultants to do real world migrations on a daily basis. We always work in [Visual Studio Team Services](http://tfs.visualstudio.com) on https://nkdagility.visualstudio.com/vsts-sync-migration/ and sync the code to GitHub for visibility. We use Work Item Tracking and a Git Repository inside of TFS to manage the work and Team Build to create our package output. We then have a Release Pipeline in Release Management to publish a [GitHub Release](https://github.com/nkdAgility/vsts-sync-migration/releases) and, if successful, automatically deploy a new version to NuGet and to Chocolatey.
+These tools are build by naked Agility Limited's DevOps & Agility consultants to do real world migrations on a daily basis. We always work in [Azure Devops Services](http://dev.azure.com) on https://dev.azure.com/nkdagility/vsts-sync-migration/ and sync the code to GitHub for visibility. We use Work Item Tracking and a Git Repository inside of TFS to manage the work and Team Build to create our package output. We then have a Release Pipeline in Release Management to publish a [GitHub Release](https://github.com/nkdAgility/vsts-sync-migration/releases) and, if successful, automatically deploy a new version to NuGet and to Chocolatey.
 
 Watch the [Video Overview](https://youtu.be/ZxDktQae10M) to get you started in 30 minutes. This tool is complicated and its not always easy to discover what you need to do.
 
