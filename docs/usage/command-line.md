@@ -1,10 +1,10 @@
 # Using the Command Line
 
-Download from [executable](https://github.com/nkdAgility/vsts-data-bulk-editor/releases) and extract. Use `vstsbulkeditor.exe init` to create a reference `vstsbulkeditor.json` configuration file, Or you can [install from Chocolatey](https://chocolatey.org/packages/vsts-sync-migrator/).
+Download from [executable](https://github.com/nkdAgility/azure-devops-migration-tools/releases) and extract. Use `migration.exe init` to create a reference `configuration.json` configuration file, Or you can [install from Chocolatey](https://chocolatey.org/packages/vsts-sync-migrator/).
 
 Note that:
 
-- The created reference `vstsbulkeditor.json` shows all the various options available, so is probably more complex than the final edited version you will use.
+- The created reference `configuration.json` shows all the various options available, so is probably more complex than the final edited version you will use.
 - All the `Processors` have their `Enabled` property set to `false`.
  
  **This means they are not run. So the default behavior of the generate template is to do nothing. You need to enable the processors you require.**.
@@ -14,11 +14,11 @@ Note that:
 {
 	"TelemetryEnableTrace": true,
 	"Source": {
-		"Collection": "https://sdd2016.visualstudio.com/",
+		"Collection": "https://dev.azure.com/sdd2016",
 		"Name": "DemoProjs"
 	},
 	"Target": {
-		"Collection": "https://sdd2016.visualstudio.com/",
+		"Collection": "https://dev.azure.com/sdd2016",
 		"Name": "DemoProjt"
 	},
 	"ReflectedWorkItemIDFieldName": "TfsMigrationTool.ReflectedWorkItemId",

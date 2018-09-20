@@ -8,13 +8,13 @@
     <owners>nkdAgility, MrHinsh</owners>
     <summary>VSTS Data Migrator</summary>
     <description>Azure Devops Migration Tools allow you to bulk edit data in Microsoft Team Foundation Server (TFS) and Azure DevOps Services. Supports both migration and bulk update scenarios.</description>
-    <projectUrl>https://dev.azure.com/nkdagility/vsts-sync-migration/</projectUrl>
+    <projectUrl>https://dev.azure.com/nkdagility/migration-tools/</projectUrl>
     <packageSourceUrl>https://chocolatey.org/packages/vsts-sync-migrator/</packageSourceUrl>
-    <docsUrl>http://vsts-bulk-editor.readthedocs.io</docsUrl>
-    <bugTrackerUrl>https://dev.azure.com/nkdagility/vsts-sync-migration/_workitems</bugTrackerUrl>
+    <docsUrl>https://dev.azure.com/nkdagility/migration-tools/_wiki/wikis/docs</docsUrl>
+    <bugTrackerUrl>https://dev.azure.com/nkdagility/migration-tools/_workitems</bugTrackerUrl>
     <tags>git tfs git-tfs sourceControl</tags>
-    <releaseNotes>https://dev.azure.com/nkdagility/vsts-sync-migration/</releaseNotes>
-    <licenseUrl>https://dev.azure.com/nkdagility/vsts-sync-migration/_git/vsts-sync-migrator?path=%2FLICENSE</licenseUrl>
+    <releaseNotes>https://dev.azure.com/nkdagility/migration-tools/_releases2</releaseNotes>
+    <licenseUrl>https://dev.azure.com/nkdagility/_git/migration-tools?path=%2FLICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <iconUrl>http://nkdagility.com/wp-content/uploads/2014/03/cropped-nakedalm-logo-260.png</iconUrl>
   </metadata>
