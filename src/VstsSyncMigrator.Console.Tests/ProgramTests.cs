@@ -16,7 +16,7 @@ namespace VstsSyncMigrator.Console.Tests
             string json = JsonConvert.SerializeObject(EngineConfiguration.GetDefault(),
                     new FieldMapConfigJsonConverter(),
                     new ProcessorConfigJsonConverter());
-            StreamWriter sw = new StreamWriter("vstsbulkeditor.json");
+            StreamWriter sw = new StreamWriter("configuration.json");
             sw.WriteLine(json);
             sw.Close();
 
@@ -26,10 +26,10 @@ namespace VstsSyncMigrator.Console.Tests
         public void TestDeseraliseFromJson()
         {
             EngineConfiguration ec;
-            StreamReader sr = new StreamReader("vstsbulkeditor.json");
-            string vstsbulkeditorjson = sr.ReadToEnd();
+            StreamReader sr = new StreamReader("configuration.json");
+            string configurationjson = sr.ReadToEnd();
             sr.Close();
-            ec = JsonConvert.DeserializeObject<EngineConfiguration>(vstsbulkeditorjson,
+            ec = JsonConvert.DeserializeObject<EngineConfiguration>(configurationjson,
                 new FieldMapConfigJsonConverter(),
                 new ProcessorConfigJsonConverter());
 

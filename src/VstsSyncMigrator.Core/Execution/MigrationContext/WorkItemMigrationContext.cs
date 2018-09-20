@@ -274,7 +274,7 @@ namespace VstsSyncMigrator.Engine
 
         private static void AppendMigratedByFooter(StringBuilder history)
         {
-            history.Append("<p>Migrated by <a href='https://dev.azure.com/nkdagility/vsts-sync-migration/'>Azure DevOps Migration Tools</a> open source.</p>");
+            history.Append("<p>Migrated by <a href='https://dev.azure.com/nkdagility/migration-tools/'>Azure DevOps Migration Tools</a> open source.</p>");
         }
 
         private static void BuildFieldTable(WorkItem oldWi, StringBuilder history, bool useHTML = false)

@@ -12,21 +12,21 @@ As this is an active project the list of processors is ever changing. The curren
 
 No, this tools has no processors for source code migration. You need to use other tools to do that.
 
-## I run 'vstssyncmigrator execute -c VstsBulkEditor.json` but nothing happens
+## I run 'migrator execute -c configuration.json` but nothing happens
 
-If you have generated the default `VstsBulkEditor.json` configuration file using the `vstssyncmigrator init` command then the chances are nothing is happening because all the processors are set to `"Enabled": false`. 
+If you have generated the default `configuration.json` configuration file using the `migrator init` command then the chances are nothing is happening because all the processors are set to `"Enabled": false`. 
 
 You need to enable at least one processor before anything will happen. 
 
 ## Wow that configuration file looks complex!
 
-Chances are you will not need all the section in the default generated `VstsBulkEditor.json` configuration file.
+Chances are you will not need all the section in the default generated `configuration.json` configuration file.
 
 It is often best to use this file as ane example and to build up your own configuration file up from scratch with just the settings you need.
 
 ## The processors are not running in the order I need.
 
-If you find processors are running in an incorrect order for your needs just re-order their declarations in the `VstsBulkEditor.json` configuration file. The processsors are run in the order they are shown.
+If you find processors are running in an incorrect order for your needs just re-order their declarations in the `configuration.json` configuration file. The processsors are run in the order they are shown.
 
 ## Every test migration I do is slow
 
