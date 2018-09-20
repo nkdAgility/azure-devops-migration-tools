@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Xml;
-using Microsoft.ServiceBus.Messaging;
 using VstsSyncMigrator.Engine.Configuration.Processing;
 
 namespace VstsSyncMigrator.Engine
@@ -62,12 +61,6 @@ namespace VstsSyncMigrator.Engine
             foreach (XmlNode item in nodeList)
             {
                 string newNodeName = item.Attributes["Name"].Value;
-
-                if (!ShouldCreateNode(parentPath, newNodeName))
-                {
-                    continue;
-                }
-
                 NodeInfo targetNode;
                 if (treeType == "Iteration")
                 {
@@ -81,7 +74,7 @@ namespace VstsSyncMigrator.Engine
                     {
                         finishDate = DateTime.Parse(item.Attributes["FinishDate"].Value);
                     }
-                    
+
                     targetNode = CreateNode(css, newNodeName, parentPath, startDate, finishDate);
                 }
                 else
@@ -95,51 +88,10 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        /// <summary>
-        /// Checks node-to-be-created with allowed BasePath's
-        /// </summary>
-        /// <param name="parentPath">Parent Node</param>
-        /// <param name="newNodeName">Node to be created</param>
-        /// <returns>true/false</returns>
-        private bool ShouldCreateNode(NodeInfo parentPath, string newNodeName)
-        {
-            string nodePath = string.Format(@"{0}\{1}", parentPath.Path, newNodeName);
-
-            if (config.BasePaths != null && config.BasePaths.Any())
-            {
-                var split = nodePath.Split('\\');
-                var removeProjectAndType = split.Skip(3);
-                var path = string.Join(@"\", removeProjectAndType);
-                
-                // We need to check if the path is a parent path of one of the base paths, as we need those
-                foreach (var basePath in config.BasePaths)
-                {
-                    var splitBase = basePath.Split('\\');
-
-                    for (int i = 0; i < splitBase.Length; i++)
-                    {
-                        if (string.Equals(path, string.Join(@"\", splitBase.Take(i)), StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            return true;
-                        }
-                    }
-                }
-
-                if (!config.BasePaths.Any(p => path.StartsWith(p, StringComparison.InvariantCultureIgnoreCase)))
-                {
-                    Trace.WriteLine(string.Format("--IgnoreNode: {0}", nodePath));
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
         private NodeInfo CreateNode(ICommonStructureService css, string name, NodeInfo parent)
         {
             string nodePath = string.Format(@"{0}\{1}", parent.Path, name);
             NodeInfo node = null;
-            
             Trace.Write(string.Format("--CreateNode: {0}", nodePath));
             try
             {
@@ -154,8 +106,6 @@ namespace VstsSyncMigrator.Engine
                 Trace.Write("...created");
                 node = css.GetNode(newPathUri);
             }
-
-            Trace.WriteLine(String.Empty);
             return node;
         }
 
@@ -179,8 +129,6 @@ namespace VstsSyncMigrator.Engine
                 ((ICommonStructureService4)css).SetIterationDates(node.Uri, startDate, finishDate);
                 Trace.Write("...dates assigned");
             }
-
-            Trace.WriteLine(String.Empty);
             return node;
         }
     }

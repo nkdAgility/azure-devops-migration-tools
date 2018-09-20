@@ -121,7 +121,6 @@ The global configuration created by the `init` command look like this:
 		}, {
 			"ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.NodeStructuresMigrationConfig",
 			"Enabled": false,
-			"BasePaths": ["Product\\Area\\Path1", "Product\\Area\\Path2"]
 			"PrefixProjectToNodes": false
 		}, {
 			"ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.LinkMigrationConfig",
@@ -189,15 +188,5 @@ Both the `Source` and `Target` entries hold the collection URL and the Team Proj
 
 ### ReflectedWorkItemIDFieldName
 
-This is the field that will be used to store the state for the migration . See [Server Configuration](server-configuration.md) 
+This is the field that will be used to store the state for the migration . See [Server Configuration](server-configuration.md)  
 
-### NodeStructuresMigrationConfig
-You can specify BasePaths for Areas/Iterations to migrate. The area/iteration has to start with that string to be eligible for migration.
-E.g. BasePath = "Product\\Area\\Path1"
-
-With existing areas:
-"Product\\Area\\Path1\\TestArea"
-"SomeOtherProduct\\Area\\Path1\TestArea"
-"Product\\OtherArea\\Path1\\TestArea"
-
-only the first one matches the BasePath "Product\\Area\\Path1" and would be migrated, the other ones are ignored.
