@@ -55,7 +55,7 @@ namespace VstsSyncMigrator.ConsoleApp
             string logsPath = CreateLogsPath();
             //////////////////////////////////////////////////
             Trace.Listeners.Add(new TextWriterTraceListener(Console.Out));
-            Trace.Listeners.Add(new TextWriterTraceListener(Path.Combine(logsPath, "VstsSyncMigrator.log"), "myListener"));
+            Trace.Listeners.Add(new TextWriterTraceListener(Path.Combine(logsPath, "migration.log"), "myListener"));
             //////////////////////////////////////////////////
             Trace.WriteLine(System.Reflection.Assembly.GetExecutingAssembly().GetName().Name, "[Info]");
             Version thisVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
@@ -132,21 +132,21 @@ namespace VstsSyncMigrator.ConsoleApp
             EngineConfiguration ec;
             if (opts.ConfigFile == string.Empty)
             {
-                opts.ConfigFile = "vstsbulkeditor.json";
+                opts.ConfigFile = "configuration.json";
             }
 
             if (!File.Exists(opts.ConfigFile))
             {
-                Trace.WriteLine("The config file does not exist, nor doe the default 'vstsbulkeditor.json'. Use 'init' to create a configuration file first", "[Error]");
+                Trace.WriteLine("The config file does not exist, nor doe the default 'configuration.json'. Use 'init' to create a configuration file first", "[Error]");
                 return 1;
             }
             else
             {
                 Trace.WriteLine("Loading Config");
                 StreamReader sr = new StreamReader(opts.ConfigFile);
-                string vstsbulkeditorjson = sr.ReadToEnd();
+                string configurationjson = sr.ReadToEnd();
                 sr.Close();
-                ec = JsonConvert.DeserializeObject<EngineConfiguration>(vstsbulkeditorjson, 
+                ec = JsonConvert.DeserializeObject<EngineConfiguration>(configurationjson, 
                     new FieldMapConfigJsonConverter(),
                     new ProcessorConfigJsonConverter());
             }
@@ -161,15 +161,15 @@ namespace VstsSyncMigrator.ConsoleApp
         private static object RunInitAndReturnExitCode(InitOptions opts)
         {
             Telemetry.Current.TrackEvent("InitCommand");
-            if (!File.Exists("vstsbulkeditor.json"))
+            if (!File.Exists("configuration.json"))
             {
                 string json = JsonConvert.SerializeObject(EngineConfiguration.GetDefault(),
                     new FieldMapConfigJsonConverter(),
                     new ProcessorConfigJsonConverter());
-                StreamWriter sw = new StreamWriter("vstsbulkeditor.json");
+                StreamWriter sw = new StreamWriter("configuration.json");
                 sw.WriteLine(json);
                 sw.Close();
-                Trace.WriteLine("New vstsbulkeditor.json file has been created", "[Info]");
+                Trace.WriteLine("New configuration.json file has been created", "[Info]");
             }
             return 0;
         }

@@ -17,7 +17,7 @@ The tools are now installed and calling "vstssyncmigrator" from any command line
 
 1. Open a command prompt or PowerShell window
 2. Run "vstssyncmigrator init" to create a default configuration
-3. Open "vstsbulkeditor.json" from the current directory
+3. Open "configuration.json" from the current directory
 
 You can now customise the configuration depending on what you need to do. However a basic config that you can use to migrate from one team project to another with the same process template is:
 

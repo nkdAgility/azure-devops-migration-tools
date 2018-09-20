@@ -8,7 +8,7 @@
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>VstsSyncMigrator.ConsoleApp</RootNamespace>
-    <AssemblyName>vstssyncmigrator</AssemblyName>
+    <AssemblyName>migration</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>

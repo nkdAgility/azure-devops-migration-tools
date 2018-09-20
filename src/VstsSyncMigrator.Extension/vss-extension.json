@@ -1,7 +1,7 @@
 {
   "manifestVersion": 1,
   "id": "vsts-sync-migration",
-  "name": "Azure DevOps Migration Tools",
+  "name": "Migration Tools",
   "version": "#{GitVersion.Major}#.#{GitVersion.Minor}#.#{GitVersion.Patch}#",
   "public": false,
   "publisher": "nkdAgility",
@@ -28,43 +28,43 @@
   ],
   "links": {
     "home": {
-      "uri": "https://dev.azure.com/nkdagility/vsts-sync-migration/"
+      "uri": "https://dev.azure.com/nkdagility/migration-tools/"
     },
     "getstarted": {
-      "uri": "https://dev.azure.com/nkdagility/vsts-sync-migration/_wiki/wikis/VSTS-Sync-Migrator-Docs?pagePath=%2Fgetting%20started"
+      "uri": "https://dev.azure.com/nkdagility/migration-tools/_wiki/wikis/VSTS-Sync-Migrator-Docs?pagePath=%2Fgetting%20started"
     },
     "learn": {
-      "uri": "https://dev.azure.com/nkdagility/vsts-sync-migration/_wiki/wikis/VSTS-Sync-Migrator-Docs?pagePath=%2Findex"
+      "uri": "https://dev.azure.com/nkdagility/migration-tools/_wiki/wikis/VSTS-Sync-Migrator-Docs?pagePath=%2Findex"
     },
     "support": {
-      "uri": "https://dev.azure.com/nkdagility/vsts-sync-migration/_workitems"
+      "uri": "https://dev.azure.com/nkdagility/migration-tools/_workitems"
     },
     "repository": {
-      "uri": "https://nkdagility.visualstudio.com/DefaultCollection/vsts-sync-migration/_git/vsts-sync-migrator"
+      "uri": "https://dev.azure.com/nkdagility/_git/migration-tools"
     },
     "issues": {
-      "uri": "https://dev.azure.com/nkdagility/vsts-sync-migration/_workitems"
+      "uri": "https://dev.azure.com/nkdagility/migration-tools/_workitems"
     }
   },
   "CustomerQnASupport": {
     "enableqna": "true",
-    "url": "https://dev.azure.com/nkdagility/vsts-sync-migration/_workitems"
+    "url": "https://dev.azure.com/nkdagility/migration-tools/_workitems"
   },
   "badges": [
     {
-      "href": "https://dev.azure.com/nkdagility/vsts-sync-migration/_build/index?path=%5C&definitionId=94",
-      "uri": "https://dev.azure.com/nkdagility/vsts-sync-migration/_apis/build/status/vsts-sync-migration",
+      "href": "https://dev.azure.com/nkdagility/migration-tools/_build/index?path=%5C&definitionId=94",
+      "uri": "https://dev.azure.com/nkdagility/migration-tools/_apis/build/status/vsts-sync-migration",
       "description": "Azure Pipline CI for this project"
     },
     {
-      "href": "https://dev.azure.com/nkdagility/vsts-sync-migration/_releases2?definitionId=6",
+      "href": "https://dev.azure.com/nkdagility/migration-tools/_releases2?definitionId=6",
       "uri": "https://vsrm.dev.azure.com/nkdagility/_apis/public/Release/badge/1b52ce63-eccc-41c8-88f9-ae6ebeefdc63/6/14",
       "description": "Azure Pipeline CD for the project"
     }
   ],
   "repository": {
     "type": "git",
-    "uri": "https://nkdagility.visualstudio.com/DefaultCollection/vsts-sync-migration/_git/vsts-sync-migrator"
+    "uri": "https://github.com/nkdAgility/azure-devops-migration-tools.git"
   },
   "icons": {
     "default": "images/extension-icon.png"

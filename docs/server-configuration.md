@@ -36,7 +36,7 @@ With the advent of the [VSTS Migration Tool](https://blogs.msdn.microsoft.com/vi
 
 If you created the Team Project via the web based VSTS UI. You need to [add a custom field through the VSTS UI](https://blogs.msdn.microsoft.com/visualstudioalm/2015/12/10/adding-a-custom-field-to-a-work-item/) to be able to use the tool.
 
-The name you should use for the custom field on a VSTS instance is not `TfsMigrationTool.ReflectedWorkItemId` as .(period) are not valid characters for field name. Instead just use `ReflectedWorkItemId` but note that in the `VstsBulkEditor.json` file the name you need to enter is `NameOfYourCustomisedTemplate.ReflectedWorkItemId`. Where`NameOfYourCustomisedTemplate` is the name of your customised template, any spaces in the name will be replaced by _ (underscore). 
+The name you should use for the custom field on a VSTS instance is not `TfsMigrationTool.ReflectedWorkItemId` as .(period) are not valid characters for field name. Instead just use `ReflectedWorkItemId` but note that in the `configuration.json` file the name you need to enter is `NameOfYourCustomisedTemplate.ReflectedWorkItemId`. Where`NameOfYourCustomisedTemplate` is the name of your customised template, any spaces in the name will be replaced by _ (underscore). 
 
 #### Custom Templates ####
 
@@ -57,7 +57,7 @@ If you are in any doubt over the full name in use for the `ReflectWorkItemID` fi
 
 ### Editing the configuration ###
 
-Once you have created the `ReflectedWorkItemId` field and confirmed you have the correct full name, you will need to edit `VstsBulkEditor.json` to match your values, you need to set the 
+Once you have created the `ReflectedWorkItemId` field and confirmed you have the correct full name, you will need to edit `configuration.json` to match your values, you need to set the 
 
 
 ```json
