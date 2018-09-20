@@ -61,6 +61,7 @@ namespace VstsSyncMigrator.Engine
             _ignore.Add("System.BoardColumnDone");
             _ignore.Add("System.BoardLane");
             _ignore.Add("SLB.SWT.DateOfClientFeedback");
+            _ignore.Add("System.CommentCount");
         }
 
         internal override void InternalExecute()
