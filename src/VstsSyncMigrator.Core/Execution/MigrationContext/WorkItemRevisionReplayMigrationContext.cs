@@ -179,8 +179,7 @@ namespace VstsSyncMigrator.Engine
                         foreach (Field f in fails)
                         {
                             Trace.WriteLine(
-                                $"{current} - Invalid: {currentRevisionWorkItem.Id}-{currentRevisionWorkItem.Type.Name}-{f.ReferenceName}",
-                                Name);
+                                $"{current} - Invalid: {currentRevisionWorkItem.Id}-{currentRevisionWorkItem.Type.Name}-{f.ReferenceName}-{sourceWorkItem.Title} Value: {f.Value}", Name);
                         }
 
                         newwit.Save();

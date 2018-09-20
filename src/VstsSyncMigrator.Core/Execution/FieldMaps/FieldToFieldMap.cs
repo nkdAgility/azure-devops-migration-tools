@@ -18,6 +18,8 @@ namespace VstsSyncMigrator.Engine.ComponentContext
             this.config = config;
         }
 
+        public override string MappingDisplayName => $"{config.sourceField} {config.targetField}";
+
         internal override void InternalExecute(WorkItem source, WorkItem target)
         {
             if (source.Fields.Contains(config.sourceField) && target.Fields.Contains(config.targetField))

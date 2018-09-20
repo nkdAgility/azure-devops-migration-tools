@@ -25,6 +25,8 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
+        public string MappingDisplayName => config.sourceField;
+
         public void Execute(WorkItem source, WorkItem target)
         {
             if (source.Fields.Contains(this.config.sourceField))

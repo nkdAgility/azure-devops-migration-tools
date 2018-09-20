@@ -26,6 +26,8 @@ namespace VstsSyncMigrator.Engine
             get { return "FieldValuetoTagMap"; }
         }
 
+        public string MappingDisplayName => $"{config.sourceField}";
+
         public void Execute(WorkItem source, WorkItem target)
         {
             if (source.Fields.Contains(config.sourceField))

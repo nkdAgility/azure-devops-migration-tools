@@ -230,7 +230,7 @@ namespace VstsSyncMigrator.Engine
         {
             foreach (IFieldMap map in list)
             {
-                Trace.WriteLine(string.Format("Runnin Field Map: {0}", map.Name));
+                Trace.WriteLine(string.Format("Running Field Map: {0} {1}", map.Name, map.MappingDisplayName));
                 map.Execute(source, target);
             }
         }

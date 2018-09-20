@@ -22,6 +22,9 @@ namespace VstsSyncMigrator.Engine
                 return "TreeToTagFieldMap";
             }
         }
+
+        public string MappingDisplayName => string.Empty;
+
         public void Execute(WorkItem source, WorkItem target)
         {
 

@@ -7,6 +7,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using Microsoft.TeamFoundation.Core.WebApi;
 using VstsSyncMigrator.Engine.Configuration.Processing;
 
 namespace VstsSyncMigrator.Engine
@@ -106,7 +107,7 @@ namespace VstsSyncMigrator.Engine
                         ArrayList fails = newwit.Validate();
                         foreach (Field f in fails)
                         {
-                            Trace.WriteLine(string.Format("{0} - Invalid: {1}-{2}-{3}", current, sourceWI.Id, sourceWI.Type.Name, f.ReferenceName), this.Name);
+                            Trace.WriteLine(string.Format("{0} - Invalid: {1}-{2}-{3}-{4} Status: {5} Value: {6}", current, sourceWI.Id, sourceWI.Type.Name, f.ReferenceName, sourceWI.Title, f.Status, f.Value), this.Name);
                         }
                     }
                     else
