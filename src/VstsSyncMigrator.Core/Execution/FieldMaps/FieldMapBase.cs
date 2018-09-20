@@ -36,6 +36,8 @@ namespace VstsSyncMigrator.Engine.ComponentContext
             }
         }
 
+        public abstract string MappingDisplayName { get; }
+
         internal abstract void InternalExecute(WorkItem source, WorkItem target);
     }
 }

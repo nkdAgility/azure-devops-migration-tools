@@ -19,6 +19,8 @@ namespace VstsSyncMigrator.Engine.ComponentContext
             this.config = config;
         }
 
+        public override string MappingDisplayName => string.Empty;
+
         internal override void InternalExecute(WorkItem source, WorkItem target)
         {
             if (fieldsExist(config.sourceFieldsAndValues, source) && fieldsExist(config.targetFieldsAndValues, target))

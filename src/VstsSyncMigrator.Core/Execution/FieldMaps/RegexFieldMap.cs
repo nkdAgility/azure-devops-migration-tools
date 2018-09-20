@@ -24,6 +24,8 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
+        public string MappingDisplayName => $"{config.sourceField} {config.targetField}";
+
         public void Execute(WorkItem source, WorkItem target)
         {
             if (source.Fields.Contains(config.sourceField) && source.Fields[config.sourceField].Value != null && target.Fields.Contains(config.targetField))
