@@ -61,6 +61,7 @@ namespace VstsSyncMigrator.Engine
             _ignore.Add("System.BoardColumnDone");
             _ignore.Add("System.BoardLane");
             _ignore.Add("SLB.SWT.DateOfClientFeedback");
+            _ignore.Add("System.CommentCount");
         }
 
         internal override void InternalExecute()
@@ -112,7 +113,7 @@ namespace VstsSyncMigrator.Engine
                     }
                     else
                     {
-                        Trace.WriteLine("...not supported", this.Name);
+                        Trace.WriteLine(string.Format("...the WITD named {0} is not in the list provided in the configuration.json under WorkItemTypeDefinitions. Add it to the list to enable migration of this work item type.", sourceWI.Type.Name), Name);
                         skipped++;
                     }
 

@@ -53,7 +53,8 @@ namespace VstsSyncMigrator.Engine
                 "System.BoardColumn",
                 "System.BoardColumnDone",
                 "System.BoardLane",
-                "SLB.SWT.DateOfClientFeedback"
+                "SLB.SWT.DateOfClientFeedback",
+                "System.CommentCount"
             };
         }
 
@@ -189,7 +190,7 @@ namespace VstsSyncMigrator.Engine
                     }
                     else
                     {
-                        Trace.WriteLine("...not supported", Name);
+                        Trace.WriteLine(string.Format("...the WITD named {0} is not in the list provided in the configuration.json under WorkItemTypeDefinitions. Add it to the list to enable migration of this work item type.", currentRevisionWorkItem.Type.Name), Name);
                         break;
                     }
                 }
