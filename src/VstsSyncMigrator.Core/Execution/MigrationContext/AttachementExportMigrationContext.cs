@@ -49,7 +49,7 @@ namespace VstsSyncMigrator.Engine
                 Trace.Write(string.Format("Attachement Export: {0} of {1} - {2}", current, sourceWIS.Count, wi.Id));
                 foreach (Attachment wia in wi.Attachments)
                 {
-                    string reflectedId = wi.Fields[me.ReflectedWorkItemIdFieldName].Value.ToString(); 
+                    string reflectedId = wi.Fields[me.SourceReflectedWorkItemIdFieldName].Value.ToString(); 
                     reflectedId = int.Parse(reflectedId.Substring(reflectedId.LastIndexOf(@"/") + 1)).ToString();
                     string fname = string.Format("{0}#{1}", reflectedId, wia.Name);
                     Trace.Write("-");
