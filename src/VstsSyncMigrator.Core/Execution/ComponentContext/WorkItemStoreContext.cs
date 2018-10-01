@@ -129,6 +129,7 @@ namespace VstsSyncMigrator.Engine
 
             var foundWorkItem = QueryWorkItems().FirstOrDefault(wi => wi.Fields[reflectedWotkItemIdField].Value.ToString().EndsWith("/" + refId));
             if (cache && foundWorkItem != null) foundWis[sourceIdKey] = foundWorkItem;
+            return foundWorkItem;
         }
 
         public WorkItem FindReflectedWorkItemByReflectedWorkItemId(string refId, string reflectedWotkItemIdField)
