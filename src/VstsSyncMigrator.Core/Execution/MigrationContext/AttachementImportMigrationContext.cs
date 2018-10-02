@@ -44,14 +44,14 @@ namespace VstsSyncMigrator.Engine
                 try
                 {
                     var fileNameParts = fileName.Split('#');
-                    if (fileNameParts.Length != 2)
+                    if (fileNameParts.Length != 2
+                        || !int.TryParse(fileNameParts[0], out var sourceReflectedID))
                         continue;
 
-                    int reflectedID = int.Parse(fileNameParts[0]);
-                    string targetFileName = fileNameParts[1];
+                    var targetFileName = fileNameParts[1];
                     var renamedFilePath = Path.Combine(Path.GetDirectoryName(file), targetFileName);
                     File.Move(file, renamedFilePath);
-                    targetWI = targetStore.Store.GetWorkItem(reflectedID);
+                    targetWI = targetStore.FindReflectedWorkItemByReflectedWorkItemId(sourceReflectedID,  me.ReflectedWorkItemIdFieldName, true);
                     if (targetWI != null)
                     {
                         Trace.WriteLine(string.Format("{0} of {1} - Import {2} to {3}", current, files.Count, fileName, targetWI.Id));
