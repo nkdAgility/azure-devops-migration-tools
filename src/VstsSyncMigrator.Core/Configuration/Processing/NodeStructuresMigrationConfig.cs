@@ -7,6 +7,7 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
     {
         public bool PrefixProjectToNodes { get; set; }
         public bool Enabled { get; set; }
+        public string[] BasePaths { get; set; }
 
         public Type Processor
         {
