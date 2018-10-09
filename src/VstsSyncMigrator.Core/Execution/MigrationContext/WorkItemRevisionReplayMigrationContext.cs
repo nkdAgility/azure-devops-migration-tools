@@ -290,6 +290,8 @@ namespace VstsSyncMigrator.Engine
             {
                 _nodeOMatic = new NodeDetecomatic(newStore);
             }
+
+            // Replace project name with new name (if necessary) and inject nodePath (Area or Iteration) into path for node validation
             string newNodeName = "";
             if (_config.PrefixProjectToNodes)
             {
@@ -297,18 +299,33 @@ namespace VstsSyncMigrator.Engine
             } else
             {
                 var regex = new Regex(Regex.Escape(oldProjectName));
-                newNodeName = regex.Replace(oldNodeName, newProjectName, 1);
+                if (oldNodeName.StartsWith($@"{oldProjectName}\{nodePath}"))
+                {
+                    newNodeName = regex.Replace(oldNodeName, newProjectName, 1);
+                }
+                else
+                {
+                    newNodeName = regex.Replace(oldNodeName, $@"{newProjectName}\{nodePath}", 1);
+                }
             }
 
+            // Validate the node exists
             if (!_nodeOMatic.NodeExists(newNodeName))
             {
                 Trace.WriteLine(string.Format("The Node '{0}' does not exist, leaving as '{1}'. This may be because it has been renamed or moved and no longer exists, or that you have not migrateed the Node Structure yet.", newNodeName, newProjectName));
                 newNodeName = newProjectName;
             }
+
+            // Remove nodePath (Area or Iteration) from path for correct population in work item
             if (newNodeName.StartsWith(newProjectName + '\\' + nodePath + '\\'))
             {
                 return newNodeName.Remove(newNodeName.IndexOf($@"{nodePath}\"), $@"{nodePath}\".Length);
-            } else
+            }
+            else if (newNodeName.StartsWith(newProjectName + '\\' + nodePath))
+            {
+                return newNodeName.Remove(newNodeName.IndexOf($@"{nodePath}"), $@"{nodePath}".Length);
+            }
+            else
             {
                 return newNodeName;
             }
