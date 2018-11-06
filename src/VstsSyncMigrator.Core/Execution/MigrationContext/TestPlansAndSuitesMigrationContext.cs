@@ -445,12 +445,22 @@ namespace VstsSyncMigrator.Engine
 
         private void AssignTesters(ITestSuiteBase sourceSuite, ITestSuiteBase targetSuite)
         {
+            if (targetSuite == null)
+            {
+                Trace.TraceError($"Target Suite is NULL");
+            }
+            
             List<ITestPointAssignment> assignmentsToAdd = new List<ITestPointAssignment>();
             //loop over all source test case entries
             foreach (ITestSuiteEntry sourceTce in sourceSuite.TestCases)
             {
                 // find target testcase id for this source tce
                 WorkItem targetTc = targetWitStore.FindReflectedWorkItem(sourceTce.TestCase.WorkItem, me.ReflectedWorkItemIdFieldName, false);
+
+                if (targetTc == null)
+                {
+                    Trace.TraceError($"Target Reflected Work Item Not found for source WorkItem ID: {sourceTce.TestCase.WorkItem.Id}");
+                }
 
                 //figure out test point assignments for each source tce
                 foreach (ITestPointAssignment tpa in sourceTce.PointAssignments)
@@ -469,7 +479,7 @@ namespace VstsSyncMigrator.Engine
 
                         if (!string.IsNullOrEmpty(sourceIdentityMail))
                         {
-                            //translate source assignedtoname to target identity
+                            // translate source assignedtoname to target identity
                             targetIdentity = targetIdentityManagementService.ReadIdentity(
                                 IdentitySearchFactor.MailAddress,
                                 sourceIdentityMail,
@@ -490,11 +500,12 @@ namespace VstsSyncMigrator.Engine
                         }
                     }
 
-                    //translate source configuration id to target configuration id and name
+                    // translate source configuration id to target configuration id and name
                     //// Get source configuration name
                     string sourceConfigName = (from tc in sourceTestConfigs
                         where tc.Id == sourceConfigurationId
                         select tc.Name).FirstOrDefault();
+
                     //// Find source configuration name in target and get the id for it
                     int targetConfigId = (from tc in targetTestConfigs
                         where tc.Name == sourceConfigName
