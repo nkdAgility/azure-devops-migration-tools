@@ -79,7 +79,7 @@ namespace VstsSyncMigrator.Engine
                         if (bits.Count() >= 3)
                         {
                             oldCommitId = $"{bits[2]}";
-                            for (int i = 2; i < bits.Count(); i++)
+                            for (int i = 3; i < bits.Count(); i++)
                             {
                                 oldCommitId += $"%2f{bits[i]}";
                             }
