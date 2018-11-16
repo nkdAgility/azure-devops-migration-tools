@@ -306,6 +306,8 @@ namespace VstsSyncMigrator.Engine
             List<ITestCase> tcs = new List<ITestCase>();
             foreach (ITestSuiteEntry sourceTestCaseEntry in source.TestCases)
             {
+                Trace.WriteLine($"Work item: {sourceTestCaseEntry.Id}");
+
                 if (CanSkipElementBecauseOfTags(sourceTestCaseEntry.Id))
                     return;
 
@@ -442,70 +444,95 @@ namespace VstsSyncMigrator.Engine
         }
 
         private void AssignTesters(ITestSuiteBase sourceSuite, ITestSuiteBase targetSuite)
-        { 
+        {
+            if (targetSuite == null)
+            {
+                Trace.TraceError($"Target Suite is NULL");
+            }
+            
             List<ITestPointAssignment> assignmentsToAdd = new List<ITestPointAssignment>();
             //loop over all source test case entries
-            foreach(ITestSuiteEntry sourceTce in sourceSuite.TestCases)
+            foreach (ITestSuiteEntry sourceTce in sourceSuite.TestCases)
             {
                 // find target testcase id for this source tce
                 WorkItem targetTc = targetWitStore.FindReflectedWorkItem(sourceTce.TestCase.WorkItem, me.ReflectedWorkItemIdFieldName, false);
 
-                //figure out test point assignments for each source tce
-                foreach(ITestPointAssignment tpa in sourceTce.PointAssignments)
+                if (targetTc == null)
                 {
-                    string sourceAssignedToName = tpa.AssignedToName;
+                    Trace.TraceError($"Target Reflected Work Item Not found for source WorkItem ID: {sourceTce.TestCase.WorkItem.Id}");
+                }
+
+                //figure out test point assignments for each source tce
+                foreach (ITestPointAssignment tpa in sourceTce.PointAssignments)
+                {
                     int sourceConfigurationId = tpa.ConfigurationId;
 
-                    var sourceIdentity = sourceIdentityManagementService.ReadIdentity(
-                        tpa.AssignedTo.Descriptor,
-                        MembershipQuery.Direct,
-                        ReadIdentityOptions.ExtendedProperties);
-                    string sourceIdentityMail = sourceIdentity.GetProperty("Mail") as string;
+                    TeamFoundationIdentity targetIdentity = null;
 
-                    if (!string.IsNullOrEmpty(sourceIdentityMail))
+                    if (tpa.AssignedTo != null)
                     {
-                        //translate source assignedtoname to target identity
-                        var targetIdentity = targetIdentityManagementService.ReadIdentity(
-                            IdentitySearchFactor.MailAddress,
-                            sourceIdentityMail,
+                        var sourceIdentity = sourceIdentityManagementService.ReadIdentity(
+                            tpa.AssignedTo.Descriptor,
                             MembershipQuery.Direct,
-                            ReadIdentityOptions.None);
+                            ReadIdentityOptions.ExtendedProperties);
+                        string sourceIdentityMail = sourceIdentity.GetProperty("Mail") as string;
 
+                        if (!string.IsNullOrEmpty(sourceIdentityMail))
+                        {
+                            // translate source assignedtoname to target identity
+                            targetIdentity = targetIdentityManagementService.ReadIdentity(
+                                IdentitySearchFactor.MailAddress,
+                                sourceIdentityMail,
+                                MembershipQuery.Direct,
+                                ReadIdentityOptions.None);
+
+                            if (targetIdentity == null)
+                            {
+                                Trace.Write($"Cannot find tester with e-mail [{sourceIdentityMail}] in target system. Cannot assign.", "TestPlansAndSuites");
+                                continue;
+                            }
+                        }
+                        else
+                        {
+                            Trace.Write($"No e-mail address known in source system for [{sourceIdentity.DisplayName}]. Cannot translate to target.",
+                                "TestPlansAndSuites");
+                            continue;
+                        }
+                    }
+
+                    // translate source configuration id to target configuration id and name
+                    //// Get source configuration name
+                    string sourceConfigName = (from tc in sourceTestConfigs
+                        where tc.Id == sourceConfigurationId
+                        select tc.Name).FirstOrDefault();
+
+                    //// Find source configuration name in target and get the id for it
+                    int targetConfigId = (from tc in targetTestConfigs
+                        where tc.Name == sourceConfigName
+                        select tc.Id).FirstOrDefault();
+
+                    if (targetConfigId != 0)
+                    {
+                        IdAndName targetConfiguration = new IdAndName(targetConfigId, sourceConfigName);
+
+                        var targetUserId = Guid.Empty;
                         if (targetIdentity != null)
                         {
-                            //translate source configuration id to target configuration id and name
-                            //// Get source configuration name
-                            string sourceConfigName = (from tc in sourceTestConfigs
-                                                       where tc.Id == sourceConfigurationId
-                                                       select tc.Name).FirstOrDefault();
-                            //// Find source configuration name in target and get the id for it
-                            int targetConfigId = (from tc in targetTestConfigs
-                                                  where tc.Name == sourceConfigName
-                                                  select tc.Id).FirstOrDefault();
-
-                            if (targetConfigId != 0)
-                            {
-                                IdAndName targetConfiguration = new IdAndName(targetConfigId, sourceConfigName);
-
-                                // Create a test point assignment with target test case id, target configuration (id and name) and target identity
-                                ITestPointAssignment newAssignment = targetSuite.CreateTestPointAssignment(
-                                    targetTc.Id,
-                                    targetConfiguration,
-                                    targetIdentity);
-
-                                // add the test point assignment to the list
-                                assignmentsToAdd.Add(newAssignment);
-                            } else
-                            {
-                                Trace.Write($"Cannot find configuration with name [{sourceConfigName}] in target. Cannot assign tester to it.", "TestPlansAndSuites");
-                            }
-                        } else
-                        {
-                            Trace.Write($"Cannot find tester with e-mail [{sourceIdentityMail}] in target system. Cannot assign.", "TestPlansAndSuites");
+                            targetUserId = targetIdentity.TeamFoundationId;
                         }
-                    } else
+
+                        // Create a test point assignment with target test case id, target configuration (id and name) and target identity
+                        var newAssignment = targetSuite.CreateTestPointAssignment(
+                            targetTc.Id,
+                            targetConfiguration,
+                            targetUserId);
+
+                        // add the test point assignment to the list
+                        assignmentsToAdd.Add(newAssignment);
+                    }
+                    else
                     {
-                        Trace.Write($"No e-mail address known in source system for [{sourceIdentity.DisplayName}]. Cannot translate to target.", "TestPlansAndSuites");
+                        Trace.Write($"Cannot find configuration with name [{sourceConfigName}] in target. Cannot assign tester to it.", "TestPlansAndSuites");
                     }
                 }
             }
