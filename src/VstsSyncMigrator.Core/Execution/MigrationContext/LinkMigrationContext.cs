@@ -72,7 +72,7 @@ namespace VstsSyncMigrator.Engine
                     wiSourceL.Id), "LinkMigrationContext");
                 if (wiTargetL.Links.Count == wiSourceL.Links.Count)
                 {
-                    Trace.WriteLine(string.Format("[SKIP] SOurce and Target have same number of links  {0} - {1}", wiSourceL.Id, wiSourceL.Type.ToString()), "LinkMigrationContext");
+                    Trace.WriteLine(string.Format("[SKIP] Source and Target have same number of links  {0} - {1}", wiSourceL.Id, wiSourceL.Type.ToString()), "LinkMigrationContext");
                 }
                 else
                 {
@@ -286,9 +286,9 @@ namespace VstsSyncMigrator.Engine
             }
             else
             {
-                // Moving to Other Team Project from SOurceR
+                // Moving to Other Team Project from Source
                 wiTargetR = targetStore.FindReflectedWorkItem(wiSourceR, me.ReflectedWorkItemIdFieldName, true);
-                if (wiTargetR == null) // Assume source only (other team projkect)
+                if (wiTargetR == null) // Assume source only (other team project)
                 {
                     wiTargetR = wiSourceR;
                     if (wiTargetR.Project.Store.TeamProjectCollection.Uri.ToString().Replace("/", "") != wiSourceR.Project.Store.TeamProjectCollection.Uri.ToString().Replace("/", ""))
