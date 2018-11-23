@@ -12,7 +12,7 @@ using VstsSyncMigrator.Engine.Configuration.Processing;
 
 namespace VstsSyncMigrator.Engine
 {
-    public class WorkItemMigrationContext : MigrationContextBase
+    public class ExcelMigrationContext : MigrationContextBase
     {
 
         WorkItemMigrationConfig _config;
@@ -27,7 +27,7 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        public WorkItemMigrationContext(MigrationEngine me, WorkItemMigrationConfig config) : base(me, config)
+        public ExcelMigrationContext(MigrationEngine me, WorkItemMigrationConfig config) : base(me, config)
         {
             _me = me;
             _config = config;
@@ -124,20 +124,6 @@ namespace VstsSyncMigrator.Engine
                         {
                             if (_config.UpdateCreatedDate) { newwit.Fields["System.CreatedDate"].Value = sourceWI.Fields["System.CreatedDate"].Value; }
                             if (_config.UpdateCreatedBy) { newwit.Fields["System.CreatedBy"].Value = sourceWI.Fields["System.CreatedBy"].Value; }
-
-                            var invalidFields = newwit.Validate();
-                            if (invalidFields.Count > 0)
-                            {
-                                Trace.WriteLine("...FAILED validation. Invalid fields:");
-                                foreach (Field invalidField in invalidFields)
-                                {
-                                    Trace.WriteLine($" -NAME: {invalidField.Name} STATUS: {invalidField.Status} VALUE: {invalidField.Value}");
-                                }
-
-                                failures++;
-                                continue;
-                            }
-
                             newwit.Save();
                             newwit.Close();
                             Trace.WriteLine(string.Format("...Saved as {0}", newwit.Id), this.Name);

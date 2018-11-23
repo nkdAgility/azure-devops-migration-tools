@@ -1,7 +1,7 @@
 {
   "manifestVersion": 1,
   "id": "vsts-sync-migration",
-  "name": "Migration Tools",
+  "name": "Migration Tools for Azure DevOps",
   "version": "#{GitVersion.Major}#.#{GitVersion.Minor}#.#{GitVersion.Patch}#",
   "public": false,
   "publisher": "nkdAgility",
@@ -48,7 +48,7 @@
   },
   "CustomerQnASupport": {
     "enableqna": "true",
-    "url": "https://dev.azure.com/nkdagility/migration-tools/_workitems"
+    "url": "https://github.com/nkdAgility/azure-devops-migration-tools/issues"
   },
   "badges": [
     {
@@ -58,7 +58,7 @@
     },
     {
       "href": "https://dev.azure.com/nkdagility/migration-tools/_releases2?definitionId=6",
-      "uri": "https://vsrm.dev.azure.com/nkdagility/_apis/public/Release/badge/1b52ce63-eccc-41c8-88f9-ae6ebeefdc63/6/14",
+      "uri": "https://vsrm.dev.azure.com/nkdagility/_apis/public/Release/badge/1b52ce63-eccc-41c8-88f9-ae6ebeefdc63/6/11",
       "description": "Azure Pipeline CD for the project"
     }
   ],
