@@ -3,7 +3,7 @@ $vstssyncmigrationpath =Join-Path -Path $toolsLoc -ChildPath "\VSTSSyncMigration
 
 if(test-path $vstssyncmigrationpath) {
   write-host "Cleaning out the contents of $vstssyncmigrationpath"
-  Remove-Item "$($vstssyncmigrationpath)\*" -recurse -force
+  Remove-Item "$($vstssyncmigrationpath)\*" -recurse -force -exclude *.json
 }
 
 Install-ChocolateyZipPackage 'vstssyncmigrator' 'https://github.com/nkdAgility/azure-devops-migration-tools/releases/download/#{GITVERSION.FULLSEMVER}#/vstssyncmigrator-#{GITVERSION.FULLSEMVER}#.zip' $vstssyncmigrationpath -Checksum #{Chocolatey.FileHash}# -ChecksumType SHA256
