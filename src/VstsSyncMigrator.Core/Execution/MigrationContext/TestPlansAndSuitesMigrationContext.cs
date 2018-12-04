@@ -72,7 +72,10 @@ namespace VstsSyncMigrator.Engine
                 {
                     Trace.WriteLine("    Plan missing... creating", Name);
                     targetPlan = CreateNewTestPlanFromSource(sourcePlan, newPlanName);
+                    RemoveInvalidLinks(targetPlan);
+
                     targetPlan.Save();
+
                     ApplyFieldMappings(sourcePlan.Id, targetPlan.Id);
                     AssignReflectedWorkItemId(sourcePlan.Id, targetPlan.Id);
                     FixAssignedToValue(sourcePlan.Id, targetPlan.Id);
@@ -102,7 +105,45 @@ namespace VstsSyncMigrator.Engine
                 // Load the plan again, because somehow it doesn't let me set configurations on the already loaded plan
                 ITestPlan targetPlan2 = FindTestPlan(targetTestStore, targetPlan.Name);
                 ApplyConfigurationsAndAssignTesters(sourcePlan.RootSuite, targetPlan2.RootSuite);
+            }
+        }
 
+        /// <summary>
+        /// Remove invalid links
+        /// </summary>
+        /// <remarks>
+        /// VSTS cannot store some links which have an invalid URI Scheme. You will get errors like "The URL specified has a potentially unsafe URL protocol"
+        /// For myself, the issue were urls that pointed to TFVC:    "vstfs:///VersionControl/Changeset/19415"
+        /// Unfortunately the API does not seem to allow access to the "raw" data, so there's nowhere to retrieve this as far as I can find.
+        /// Should take care of https://github.com/nkdAgility/azure-devops-migration-tools/issues/178
+        /// </remarks>
+        /// <param name="targetPlan">The plan to remove invalid links drom</param>
+        private void RemoveInvalidLinks(ITestPlan targetPlan)
+        {
+            var linksToRemove = new List<ITestExternalLink>();
+            foreach (var link in targetPlan.Links)
+            {
+                try
+                {
+                    link.Uri.ToString();
+                }
+                catch (UriFormatException e)
+                {
+                    linksToRemove.Add(link);
+                }
+            }
+
+            if (linksToRemove.Any())
+            {
+                Trace.WriteLine($"Link count before removal of invalid: [{targetPlan.Links.Count}]");
+                foreach (var link in linksToRemove)
+                {
+                    Trace.WriteLine(
+                        $"Link with Description [{link.Description}] could not be migrated, as the URI is invalid. (We can't display the URI because of limitations in the TFS/VSTS/DevOps API.) Removing link.");
+                    targetPlan.Links.Remove(link);
+                }
+
+                Trace.WriteLine($"Link count after removal of invalid: [{targetPlan.Links.Count}]");
             }
         }
 
@@ -299,6 +340,10 @@ namespace VstsSyncMigrator.Engine
 
         private void AddChildTestCases(ITestSuiteBase source, ITestSuiteBase target, ITestPlan targetPlan)
         {
+            target.Refresh();
+            targetPlan.Refresh();
+            targetPlan.RefreshRootSuite();
+
             if (CanSkipElementBecauseOfTags(source.Id))
                 return;
 
@@ -398,15 +443,18 @@ namespace VstsSyncMigrator.Engine
                     if(targetTce != null)
                     {
                         ApplyConfigurations(sourceTce, targetTce);
-                    } else
-                    {
-                        Trace.Write($"Test Case ${sourceTce.Title} from source is not included in target. Cannot apply configuration for it.", "TestPlansAndSuites");
                     }
-                } else
+                    else
+                    {
+                        Trace.Write($"Test Case ${sourceTce.Title} from source is not included in target. Cannot apply configuration for it.",
+                            "TestPlansAndSuites");
+                    }
+                }
+                else
                 {
                     Trace.Write($"Work Item for Test Case {sourceTce.Title} cannot be found in target. Has it been migrated?", "TestPlansAndSuites");
                 }
-                
+
             }
 
             AssignTesters(sourceSuite, targetSuite);
@@ -471,33 +519,13 @@ namespace VstsSyncMigrator.Engine
 
                     if (tpa.AssignedTo != null)
                     {
-                        var sourceIdentity = sourceIdentityManagementService.ReadIdentity(
-                            tpa.AssignedTo.Descriptor,
-                            MembershipQuery.Direct,
-                            ReadIdentityOptions.ExtendedProperties);
-                        string sourceIdentityMail = sourceIdentity.GetProperty("Mail") as string;
-
-                        if (!string.IsNullOrEmpty(sourceIdentityMail))
+                        targetIdentity = GetTargetIdentity(tpa.AssignedTo.Descriptor);
+                        if (targetIdentity == null)
                         {
-                            // translate source assignedtoname to target identity
-                            targetIdentity = targetIdentityManagementService.ReadIdentity(
-                                IdentitySearchFactor.MailAddress,
-                                sourceIdentityMail,
-                                MembershipQuery.Direct,
-                                ReadIdentityOptions.None);
+                            sourceIdentityManagementService.RefreshIdentity(tpa.AssignedTo.Descriptor);
+                        }
 
-                            if (targetIdentity == null)
-                            {
-                                Trace.Write($"Cannot find tester with e-mail [{sourceIdentityMail}] in target system. Cannot assign.", "TestPlansAndSuites");
-                                continue;
-                            }
-                        }
-                        else
-                        {
-                            Trace.Write($"No e-mail address known in source system for [{sourceIdentity.DisplayName}]. Cannot translate to target.",
-                                "TestPlansAndSuites");
-                            continue;
-                        }
+                        targetIdentity = GetTargetIdentity(tpa.AssignedTo.Descriptor);
                     }
 
                     // translate source configuration id to target configuration id and name
@@ -536,8 +564,67 @@ namespace VstsSyncMigrator.Engine
                     }
                 }
             }
+
             // assign the list to the suite
             targetSuite.AssignTestPoints(assignmentsToAdd);
+        }
+
+        /// <summary>
+        /// Retrieve the target identity for a given source descriptor
+        /// </summary>
+        /// <param name="sourceIdentityDescriptor">Source identity Descriptor</param>
+        /// <returns>Target Identity</returns>
+        private TeamFoundationIdentity GetTargetIdentity(IdentityDescriptor sourceIdentityDescriptor)
+        {
+            var sourceIdentity = sourceIdentityManagementService.ReadIdentity(
+                sourceIdentityDescriptor,
+                MembershipQuery.Direct,
+                ReadIdentityOptions.ExtendedProperties);
+            string sourceIdentityMail = sourceIdentity.GetProperty("Mail") as string;
+
+            // Try refresh the Identity if we are missing the Mail property
+            if (string.IsNullOrEmpty(sourceIdentityMail))
+            {
+                sourceIdentity = sourceIdentityManagementService.ReadIdentity(
+                    sourceIdentityDescriptor,
+                    MembershipQuery.Direct,
+                    ReadIdentityOptions.ExtendedProperties);
+
+                sourceIdentityMail = sourceIdentity.GetProperty("Mail") as string;
+            }
+
+            if (!string.IsNullOrEmpty(sourceIdentityMail))
+            {
+                // translate source assignedto name to target identity
+                var targetIdentity = targetIdentityManagementService.ReadIdentity(
+                    IdentitySearchFactor.MailAddress,
+                    sourceIdentityMail,
+                    MembershipQuery.Direct,
+                    ReadIdentityOptions.None);
+
+                if (targetIdentity == null)
+                {
+                    targetIdentity = targetIdentityManagementService.ReadIdentity(
+                        IdentitySearchFactor.AccountName,
+                        sourceIdentityMail,
+                        MembershipQuery.Direct,
+                        ReadIdentityOptions.None);
+                }
+
+                if (targetIdentity == null)
+                {
+                    Trace.Write($"Cannot find tester with e-mail [{sourceIdentityMail}] in target system. Cannot assign.", "TestPlansAndSuites");
+                    return null;
+                }
+
+                return targetIdentity;
+            }
+            else
+            {
+                Trace.Write($"No e-mail address known in source system for [{sourceIdentity.DisplayName}]. Cannot translate to target.",
+                    "TestPlansAndSuites");
+                return null;
+            }
         }
 
         /// <summary>
@@ -678,19 +765,19 @@ namespace VstsSyncMigrator.Engine
             targetPlan.Iteration = engine.Target.Name;
             targetPlan.AreaPath = engine.Target.Name;
 
-            // Remove testsettings reference because VSTS Sync doesnt support migrating these artifacts
+            // Remove testsettings reference because VSTS Sync doesn't support migrating these artifacts
             if (targetPlan.ManualTestSettingsId != 0)
             {
                 targetPlan.ManualTestSettingsId = 0;
                 targetPlan.AutomatedTestSettingsId = 0;
-                Trace.WriteLine("Ignoring migration of Testsettings. Azure DevOps Migration Tools dont support migration of this artifact type.");
+                Trace.WriteLine("Ignoring migration of Testsettings. Azure DevOps Migration Tools don't support migration of this artifact type.");
             }
 
-            // Remove reference to build uri because VSTS Sync doesnt support migrating these artifacts
+            // Remove reference to build uri because VSTS Sync doesn't support migrating these artifacts
             if (targetPlan.BuildUri != null)
             {
                 targetPlan.BuildUri = null;
-                Trace.WriteLine(string.Format("Ignoring migration of assigned Build artifact {0}. Azure DevOps Migration Tools dont support migration of this artifact type.", sourcePlan.BuildUri));
+                Trace.WriteLine(string.Format("Ignoring migration of assigned Build artifact {0}. Azure DevOps Migration Tools don't support migration of this artifact type.", sourcePlan.BuildUri));
             }
             return targetPlan;
         }
