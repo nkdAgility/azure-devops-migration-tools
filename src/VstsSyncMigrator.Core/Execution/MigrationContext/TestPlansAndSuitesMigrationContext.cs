@@ -72,6 +72,7 @@ namespace VstsSyncMigrator.Engine
                 {
                     Trace.WriteLine("    Plan missing... creating", Name);
                     targetPlan = CreateNewTestPlanFromSource(sourcePlan, newPlanName);
+
                     RemoveInvalidLinks(targetPlan);
 
                     targetPlan.Save();
@@ -135,15 +136,23 @@ namespace VstsSyncMigrator.Engine
 
             if (linksToRemove.Any())
             {
-                Trace.WriteLine($"Link count before removal of invalid: [{targetPlan.Links.Count}]");
-                foreach (var link in linksToRemove)
+                if (!config.RemoveInvalidTestSuiteLinks)
                 {
-                    Trace.WriteLine(
-                        $"Link with Description [{link.Description}] could not be migrated, as the URI is invalid. (We can't display the URI because of limitations in the TFS/VSTS/DevOps API.) Removing link.");
-                    targetPlan.Links.Remove(link);
+                    Trace.WriteLine("We have detected test suite links that probably can't be migrated. You might receive an error 'The URL specified has a potentially unsafe URL protocol' when migrating to VSTS.");
+                    Trace.WriteLine("Please see https://github.com/nkdAgility/azure-devops-migration-tools/issues/178 for more details.");
                 }
+                else
+                {
+                    Trace.WriteLine($"Link count before removal of invalid: [{targetPlan.Links.Count}]");
+                    foreach (var link in linksToRemove)
+                    {
+                        Trace.WriteLine(
+                            $"Link with Description [{link.Description}] could not be migrated, as the URI is invalid. (We can't display the URI because of limitations in the TFS/VSTS/DevOps API.) Removing link.");
+                        targetPlan.Links.Remove(link);
+                    }
 
-                Trace.WriteLine($"Link count after removal of invalid: [{targetPlan.Links.Count}]");
+                    Trace.WriteLine($"Link count after removal of invalid: [{targetPlan.Links.Count}]");
+                }
             }
         }
 
