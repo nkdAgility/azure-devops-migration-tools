@@ -22,6 +22,7 @@ namespace VstsSyncMigrator.Engine
         private int updated = 0;
         private int skipped = 0;
         private int candidates = 0;
+        private int notfound = 0;
 
         private readonly HttpClientHandler _httpClientHandler;
 
@@ -56,7 +57,7 @@ namespace VstsSyncMigrator.Engine
                 urlForMatch = url.GetLeftPart(UriPartial.Authority);
             }
 
-            Trace.WriteLine($"Searching for urls: {urlForMatch} and {GetUrlWithOppositeSchema(urlForMatch)}");
+            Trace.WriteLine($"Searching for urls: {urlForMatch} and {GetUrlWithOppositeSchema(urlForMatch)} {_config.SourceServerAliases?.Select(alias => "and " + alias)}");
            
             foreach (WorkItem targetWi in targetWIS)
             {
@@ -79,9 +80,9 @@ namespace VstsSyncMigrator.Engine
 
                 Trace.Flush();
             }
-            //////////////////////////////////////////////////
+
             stopwatch.Stop();
-            Trace.WriteLine(string.Format(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds - {1} Items, {2} Updated, {3} Skipped, {4} Failures, {5} Possible Candidates", stopwatch.Elapsed, targetWIS.Count, updated, skipped, failures, candidates), this.Name);
+            Trace.WriteLine($@"DONE in {stopwatch.Elapsed:%h} hours {stopwatch.Elapsed:%m} minutes {stopwatch.Elapsed:s\:fff} seconds - {targetWIS.Count} Items, {updated} Updated, {skipped} Skipped, {failures} Failures, {candidates} Possible Candidates, {notfound} Not Found", this.Name);
         }
 
         /**
@@ -104,11 +105,9 @@ namespace VstsSyncMigrator.Engine
                     string regExSearchFileName = "(?<=FileName=)[^=]*";
                     foreach (Match match in matches)
                     {
-                        
-                        //todo server aliases....
-                        if (match.Value.ToLower().Contains(oldTfsurl.ToLower()) || match.Value.ToLower().Contains(oldTfsurlOppositeSchema.ToLower()) || match.Value.Contains("http://server01-tfs15:8080"))
+                        if (match.Value.ToLower().Contains(oldTfsurl.ToLower()) || match.Value.ToLower().Contains(oldTfsurlOppositeSchema.ToLower()) || (_config.SourceServerAliases != null && _config.SourceServerAliases.Any(i => match.Value.ToLower().Contains(i.ToLower()))))
                         {                     
-                            //save image locally and upload as attachment
+                            // save image locally and upload as attachment
                             Match newFileNameMatch = Regex.Match(match.Value, regExSearchFileName);
                             if (newFileNameMatch.Success)
                             {
@@ -118,7 +117,21 @@ namespace VstsSyncMigrator.Engine
                                 using (var httpClient = new HttpClient(_httpClientHandler, false))
                                 {
                                     SetAuthorization(httpClient);
-                                    DownloadFile(httpClient, match.Value, fullImageFilePath);
+
+                                    var result = DownloadFile(httpClient, match.Value, fullImageFilePath);
+                                    if (!result.IsSuccessStatusCode)
+                                    {
+                                        if (_config.Ignore404Errors && result.StatusCode == HttpStatusCode.NotFound)
+                                        {
+                                            notfound++;
+                                            Trace.WriteLine($"Image {match.Value} could not be found in WorkItem {wi.Id}, Field {field.Name}");
+                                            continue;
+                                        }
+                                        else
+                                        {
+                                            result.EnsureSuccessStatusCode();
+                                        }
+                                    }
                                 }
 
                                 if (GetImageFormat(File.ReadAllBytes(fullImageFilePath)) == ImageFormat.unknown)
@@ -128,15 +141,18 @@ namespace VstsSyncMigrator.Engine
 
                                 int attachmentIndex = wi.Attachments.Add(new Attachment(fullImageFilePath));
                                 wi.Save();
-                                string attachmentGuid = wi.Attachments[attachmentIndex].FileGuid;
 
-                                string newImageLink =
-                                    $"{newTfsurl.TrimEnd('/')}/WorkItemTracking/v1.0/AttachFileHandler.ashx?FileNameGuid={attachmentGuid}&amp;FileName={newFileNameMatch.Value}";
+                                var newImageLink = wi.Attachments[attachmentIndex].Uri.ToString();
 
                                 field.Value = field.Value.ToString().Replace(match.Value, newImageLink);
                                 wi.Attachments.RemoveAt(attachmentIndex);
                                 wi.Save();
                                 wiUpdated = true;
+
+                                if (_config.DeleteTemporaryImageFiles)
+                                {
+                                    File.Delete(fullImageFilePath);
+                                }
                             }
                         }
                         else
@@ -158,8 +174,6 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        
-
         private void SetAuthorization(HttpClient httpClient)
         {
             // When alternate credentials are given, use basic authentication with the given credentials
@@ -170,15 +184,22 @@ namespace VstsSyncMigrator.Engine
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(credentials));
         }
 
-        private void DownloadFile(HttpClient httpClient, string fileUrl, string destinationPath)
+        private static HttpResponseMessage DownloadFile(HttpClient httpClient, string url, string destinationPath)
         {
-            using (var stream = httpClient.GetStreamAsync(fileUrl).ConfigureAwait(false).GetAwaiter().GetResult())
+            var response = httpClient.GetAsync(url).ConfigureAwait(false).GetAwaiter().GetResult();
+
+            if (response.IsSuccessStatusCode)
             {
-                using (var fileStream = new FileStream(destinationPath, FileMode.Create))
+                using (var stream = response.Content.ReadAsStreamAsync().ConfigureAwait(false).GetAwaiter().GetResult())
                 {
-                    stream.CopyTo(fileStream);
+                    using (var fileWriter = new FileStream(destinationPath, FileMode.Create))
+                    {
+                        stream.CopyTo(fileWriter);
+                    }
                 }
             }
+
+            return response;
         }
 
         /// <summary>
@@ -274,4 +295,3 @@ namespace VstsSyncMigrator.Engine
         }
     }
 }
-
