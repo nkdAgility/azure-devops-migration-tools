@@ -90,7 +90,7 @@ namespace VstsSyncMigrator.Engine
                        new Dictionary<string, double> {
                             { "QueryTime",queryTimer.ElapsedMilliseconds }
                        });
-                Trace.TraceWarning(string.Format("  [EXCEPTION] {0}", ex.Message));
+                Trace.TraceWarning($"  [EXCEPTION] {ex}");
                 throw;
             }
             return wc;

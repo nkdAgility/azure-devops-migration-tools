@@ -25,7 +25,7 @@ namespace VstsSyncMigrator.Engine.ComponentContext
                             { "Source", source.Id.ToString() },
                             { "Target",  target.Id.ToString()}
                        });
-                Trace.TraceError(string.Format("  [EXCEPTION] {0}", ex.Message));
+                Trace.TraceError($"  [EXCEPTION] {ex}");
             }            
         }
         public string Name
