@@ -71,7 +71,7 @@ namespace VstsSyncMigrator.Engine
                       new Dictionary<string, double> {
                             { "ProcessingContextTime", executeTimer.ElapsedMilliseconds }
                       });
-                Trace.TraceWarning(string.Format("  [EXCEPTION] {0}", ex.Message));
+                Trace.TraceWarning($"  [EXCEPTION] {ex}");
             }
             finally
             {
