@@ -5,20 +5,14 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
 {
     public class HtmlFieldEmbeddedImageMigrationConfig : ITfsProcessingConfig
     {
-        public string Status
-        {
-            get { return "Experimental"; }
-        }
+        public string Status => "Experimental";
 
         public bool Enabled { get; set; }
         public string QueryBit { get; set; }
 
         public bool FromAnyCollection { get; set; }
 
-        public Type Processor
-        {
-            get { return typeof(HtmlFieldEmbeddedImageMigrationContext); }
-        }
+        public Type Processor => typeof(HtmlFieldEmbeddedImageMigrationContext);
 
         /// <summary>
         /// Username used for VSTS basic authentication using alternate credentials. Leave empty for default credentials 
@@ -29,6 +23,21 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
         /// Password used for VSTS basic authentication using alternate credentials. Leave empty for default credentials 
         /// </summary>
         public string AlternateCredentialsPassword { get; set; }
+
+        /// <summary>
+        /// Ignore 404 errors and continue on images that don't exist anymore
+        /// </summary>
+        public bool Ignore404Errors { get; set; }
+
+        /// <summary>
+        /// Delete temporary files that were downloaded
+        /// </summary>
+        public bool DeleteTemporaryImageFiles { get; set; }
+
+        /// <summary>
+        /// TFS Aliases to use to match source images (e.g. https://myserver.company.com)
+        /// </summary>
+        public string[] SourceServerAliases { get; set; }
 
         /// <inheritdoc />
         public bool IsProcessorCompatible(IReadOnlyList<ITfsProcessingConfig> otherProcessors)
