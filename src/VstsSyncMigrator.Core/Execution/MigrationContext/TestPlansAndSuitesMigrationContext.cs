@@ -346,8 +346,8 @@ namespace VstsSyncMigrator.Engine
             targetWI.Fields["System.AssignedTo"].Value = sourceWI.Fields["System.AssignedTo"].Value;
             targetWI.Save();
         }
-
-        private void AddChildTestCases(ITestSuiteBase source, ITestSuiteBase target, ITestPlan targetPlan)
+        
+        private void AddChildTestCases(ITestSuiteBase source, ITestSuiteBase target, ITestPlan targetPlan, bool isFirstAttempt = true)
         {
             target.Refresh();
             targetPlan.Refresh();
@@ -395,7 +395,20 @@ namespace VstsSyncMigrator.Engine
                 }
             }
 
-            target.TestCases.AddCases(tcs);
+            try
+            {
+                target.TestCases.AddCases(tcs);
+            }
+            //A NullReferenceException is often thrown when a user doesn't exist in the domain.
+            //This error is thrown but the TestCases are assigned anyway.
+            //A second attempt to do the same operation does not seem to throw an error, but if the
+            //error is persistent then throw it back up the stack and come to a hard stop.
+            catch (NullReferenceException nullEx) when(isFirstAttempt)
+            {
+                Trace.WriteLine(
+                    $"    ERROR, will re-attempt once: {nullEx.Message} : Plan {target?.Plan?.Id}: {target?.Plan?.Name} --> Suite {target?.TestSuiteEntry?.Id}: {target?.TestSuiteEntry?.Title} ", "TestPlansAndSuites");
+                AddChildTestCases(source, target, targetPlan, false);
+            }
 
             targetPlan.Save();
             Trace.WriteLine(string.Format("    SAVED {0} : {1} - {2} ", target.TestSuiteType.ToString(), target.Id, target.Title), "TestPlansAndSuites");
