@@ -1,16 +1,16 @@
-﻿using Microsoft.TeamFoundation.TestManagement.Client;
-using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
-using VstsSyncMigrator.Engine.ComponentContext;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Collections.Generic;
-using System.Globalization;
-using VstsSyncMigrator.Engine.Configuration.Processing;
-using WorkItem = Microsoft.TeamFoundation.WorkItemTracking.Client.WorkItem;
 using Microsoft.TeamFoundation.Framework.Client;
 using Microsoft.TeamFoundation.Framework.Common;
+using Microsoft.TeamFoundation.TestManagement.Client;
+using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using VstsSyncMigrator.Engine.ComponentContext;
+using VstsSyncMigrator.Engine.Configuration.Processing;
+using WorkItem = Microsoft.TeamFoundation.WorkItemTracking.Client.WorkItem;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -43,7 +43,7 @@ namespace VstsSyncMigrator.Engine
         {
             this.engine = me;
             sourceWitStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.None);
-            sourceTestStore = new TestManagementContext(me.Source);
+            sourceTestStore = new TestManagementContext(me.Source, config.TestPlanQueryBit);
             targetWitStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
             targetTestStore = new TestManagementContext(me.Target);
             sourceTestConfigs = sourceTestStore.Project.TestConfigurations.Query("Select * From TestConfiguration");
