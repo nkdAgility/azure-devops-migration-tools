@@ -67,7 +67,7 @@ namespace VstsSyncMigrator.ConsoleApp
                 if (latestVersion > thisVersion)
                 {
                     Trace.WriteLine(
-                        string.Format("You are currently running version {0} and a newer version ({1}) is available. You should upgrade now using Chocolatey command 'choco update vsts-sync-migrator' from the command line.",
+                        string.Format("You are currently running version {0} and a newer version ({1}) is available. You should upgrade now using Chocolatey command 'choco upgrade vsts-sync-migrator' from the command line.",
                         thisVersion, latestVersion
                         ),
                         "[Warning]");
@@ -222,7 +222,6 @@ namespace VstsSyncMigrator.ConsoleApp
                 {
                     isOnline = true;
                 }
-                isOnline= false;
             }
             catch (Exception ex)
             {
