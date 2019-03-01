@@ -5,8 +5,6 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
 {
     public class HtmlFieldEmbeddedImageMigrationConfig : ITfsProcessingConfig
     {
-        public string Status => "Experimental";
-
         public bool Enabled { get; set; }
         public string QueryBit { get; set; }
 
