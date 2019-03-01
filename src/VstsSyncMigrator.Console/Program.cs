@@ -108,7 +108,7 @@ namespace VstsSyncMigrator.ConsoleApp
                 System.Threading.Thread.Sleep(1000);
             }
             Trace.WriteLine(string.Format("Duration: {0}", mainTimer.Elapsed.ToString("c")), "[Info]");
-            Trace.WriteLine(string.Format("End Time: {0}", DateTime.Now), "[Info]");
+            Trace.WriteLine(string.Format("End Time: {0}", DateTime.Now.ToUniversalTime().ToLocalTime()), "[Info]");
 #if DEBUG
             Console.ReadKey();
 #endif
