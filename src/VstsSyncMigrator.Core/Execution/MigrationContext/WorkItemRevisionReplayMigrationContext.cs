@@ -299,7 +299,7 @@ namespace VstsSyncMigrator.Engine
             } else
             {
                 var regex = new Regex(Regex.Escape(oldProjectName));
-                if (oldNodeName.StartsWith($@"{oldProjectName}\{nodePath}"))
+                if (oldNodeName.StartsWith($@"{oldProjectName}\{nodePath}\"))
                 {
                     newNodeName = regex.Replace(oldNodeName, newProjectName, 1);
                 }
