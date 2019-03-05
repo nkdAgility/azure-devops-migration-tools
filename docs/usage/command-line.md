@@ -165,6 +165,15 @@ Note that:
 			"ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.FixGitCommitLinksConfig",
 			"TargetRepository" : "TargetRepositoryNameIfNotTheSameAsOnSource",
 			"Enabled": false
+		}, {
+			"ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.HtmlFieldEmbeddedImageMigrationConfig",
+			"Enabled": false,
+			"QueryBit": " AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')",
+			"FromAnyCollection": false,
+			"AlternateCredentialsUsername": null,
+			"AlternateCredentialsPassword": null,
+			"Ignore404Errors": true,
+			"DeleteTemporaryImageFiles": true
 		}
 	]
 }
