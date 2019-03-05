@@ -67,7 +67,7 @@ Note: **WorkItemMigrationContext** and **WorkItemRevisionReplayMigrationContext*
 1. **LinkMigrationContext** - Migrates all the work item links, both between work items and external links.
 1. **WorkItemQueryMigrationContext** - Migrate all shared work item queries
 1. **WorkItemDelete**
-
+1. **HtmlFieldEmbeddedImageMigrationContext** - Migrate embedded images in work items
 
 ##### Test Plans & Suites
 
