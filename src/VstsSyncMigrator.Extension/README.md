@@ -2,20 +2,21 @@
 
 The Azure DevOps Migration Tools allow you to bulk edit and migrate data between Team Projects on both Microsoft Team Foundation Server (TFS) and Azure DevOps Services. You can find out [why](https://dev.azure.com/nkdagility/migration-tools/_wiki/wikis/docs?pagePath=%2Fwhy) this tooling exists and you can access the [documentation](https://dev.azure.com/nkdagility/migration-tools/_wiki/wikis/docs) to find out how. This project is published as [code on GitHub](https://github.com/nkdAgility/azure-devops-migration-tools/) as well as a [Azure DevOps Migration Tools on Chocolatey](https://chocolatey.org/packages/vsts-sync-migrator/).
 
-**WARNING: This tool is not designed for a novice to use. This was developed to support the senarios above and work for the cases that the folks running and supporting it have encountered. If you encounter an edge case you may need to work around or fix it yourself. We are really happy to accept pull requests. You should be comfortable with the TFS/Azure DevOps object model, as well as debugging code in Visual Studio.**
+**WARNING: This tool is not designed for a novice. This tool was developed to support the senarios below, and the edge cases that have been encountered by the 30+ contributers from around the Azure DevOps community. You should be comfortable with the TFS/Azure DevOps object model, as well as debugging code in Visual Studio.**
 
 ## What can you do with this tool?
 
-- Migrate Work Items from one Team Project to another Team Project*
-- Merge many Team Projects into a single Team Project*
-- Split one Team Project into many Team Projects*
-- Assistance in changing Process Templates**
-- Bulk edit of Work Items*
-- Migration of Test Suits & Test Plans***
+- Migrate Work Items from one Team Project to another Team Project
+- Merge many Team Projects into a single Team Project
+- Split one Team Project into many Team Projects
+- Assistance in changing Process Templates
+- Bulk edit of Work Items
+- Migration of Test Suits & Test Plans
 
-* Supports all versions of TFS 2013+ and all versions of Azure DevOps
-** Supports only TFS 2013+ and Azure DevOps Server
-*** Not all edge cases are supporte
+## What versions of Azure DevOps & TFS do you support?
+
+- Work Item Migration Supports all versions of TFS 2013+ and all versions of Azure DevOps
+- Process Template migration only supports XML based Projects
 
 **NOTE: If you are able to migrate your entire Collection to Azure DevOps Services you should use [Azure DevOps Migration Service](https://www.visualstudio.com/team-services/migrate-tfs-vsts/) from Microsoft. If you have a requirement to change Process Template then you will need to do that before you move to Azure DevOps Services.**
 
@@ -27,8 +28,6 @@ The Azure DevOps Migration Tools allow you to bulk edit and migrate data between
  - [Contributing](https://dev.azure.com/nkdagility/migration-tools/_wiki/wikis/docs?pagePath=%2Findex&anchor=contributing)
  - [Why VSTS Bulk Data Editor](https://dev.azure.com/nkdagility/migration-tools/_wiki/wikis/docs?pagePath=%2Fwhy)
  - [Usage](https://dev.azure.com/nkdagility/migration-tools/_wiki/wikis/docs?pagePath=%2Fusage%2Fusage)
-
-
 
 ### External Walkthroughs and Reviews
 
