@@ -2,15 +2,22 @@
 
 The Azure DevOps Migration Tools allow you to bulk edit and migrate data between Team Projects on both Microsoft Team Foundation Server (TFS) and Azure DevOps Services. You can find out [why](https://dev.azure.com/nkdagility/migration-tools/_wiki/wikis/docs?pagePath=%2Fwhy) this tooling exists and you can access the [documentation](https://dev.azure.com/nkdagility/migration-tools/_wiki/wikis/docs) to find out how. This project is published as [code on GitHub](https://github.com/nkdAgility/azure-devops-migration-tools/) as well as a [Azure DevOps Migration Tools on Chocolatey](https://chocolatey.org/packages/vsts-sync-migrator/).
 
+**WARNING: This tool is not designed for a novice to use. This was developed to support the senarios above and work for the cases that the folks running and supporting it have encountered. If you encounter an edge case you may need to work around or fix it yourself. We are really happy to accept pull requests. You should be comfortable with the TFS/Azure DevOps object model, as well as debugging code in Visual Studio.**
+
 ## What can you do with this tool?
 
-- Assist in Bulk Editing of Work Items
-- Migrate Work Items & Test Management from one Team Project to another
-- Merge Team Projects
-- Migrate Work Items & Test Management from one account or collection to another
-- Assist in changing process templates
+- Migrate Work Items from one Team Project to another Team Project*
+- Merge many Team Projects into a single Team Project*
+- Split one Team Project into many Team Projects*
+- Assistance in changing Process Templates**
+- Bulk edit of Work Items*
+- Migration of Test Suits & Test Plans***
 
-There are many other uses that you might put the tools to but migrating your entire TFS\Azure DevOps Server Collection to Azure DevOps Services is not one of them. You should also consider the [Azure DevOps Migration Service](https://www.visualstudio.com/team-services/migrate-tfs-vsts/) from Microsoft.
+* Supports all versions of TFS 2013+ and all versions of Azure DevOps
+** Supports only TFS 2013+ and Azure DevOps Server
+*** Not all edge cases are supporte
+
+**NOTE: If you are able to migrate your entire Collection to Azure DevOps Services you should use [Azure DevOps Migration Service](https://www.visualstudio.com/team-services/migrate-tfs-vsts/) from Microsoft. If you have a requirement to change Process Template then you will need to do that before you move to Azure DevOps Services.**
 
 ## Quick Links
 
@@ -35,19 +42,15 @@ There are two ways to use these tools:
 - (recommended)[Install from Chocolatey](https://chocolatey.org/packages/vsts-sync-migrator/)
 - Download the [latest release from GitHub](https://github.com/nkdAgility/azure-devops-migration-tools/releases) and unzip
 
-## You are seeing:
-
- - All work is done is [Azure DevOps Services](https://www.visualstudio.com/products/what-is-visual-studio-online-vs) and then synched to GitHub for publication
- - All Branches are published as pre-release builds
-
 ## The Technical Details
 
-|-| MASTER | PREVIEW |
-|-------------:|:-------------|:-------------|
-| Quality Gate | [![Quality Gate](https://sonarcloud.io/api/badges/gate?key=vsts-sync-migrator%3Amaster)](https://sonarcloud.io/dashboard/index/vsts-sync-migrator%3Amaster) | - |
-| Azure Pipeline | ![Build on VSTS](https://nkdagility.visualstudio.com/_apis/public/build/definitions/1b52ce63-eccc-41c8-88f9-ae6ebeefdc63/94/badge) | - |
-| Github Build| ![Build on VSTS](https://nkdagility.visualstudio.com/_apis/public/build/definitions/1b52ce63-eccc-41c8-88f9-ae6ebeefdc63/95/badge) | - |
-| Coverage | [![Code Coverage](https://sonarcloud.io/api/badges/measure?key=vsts-sync-migrator%3Amaster&metric=coverage)](https://sonarcloud.io/dashboard/?id=vsts-sync-migrator%3master) |  - |
-| Analysis | [![Lines of Code](https://sonarcloud.io/api/badges/measure?key=vsts-sync-migrator%3Amaster&metric=ncloc)](https://sonarcloud.io/dashboard/?id=vsts-sync-migrator%3master)<br />[![Bugs](https://sonarcloud.io/api/badges/measure?key=vsts-sync-migrator%3Amaster&metric=bugs)](https://sonarcloud.io/dashboard/?id=vsts-sync-migrator%3master)<br />[![Vulnerabilities](https://sonarcloud.io/api/badges/measure?key=vsts-sync-migrator%3Amaster&metric=vulnerabilities)](https://sonarcloud.io/dashboard/?id=vsts-sync-migrator%3master)<br />[![Code Smells](https://sonarcloud.io/api/badges/measure?key=vsts-sync-migrator%3Amaster&metric=code_smells)](https://sonarcloud.io/project/issues?id=vsts-sync-migrator%3master&resolved=false&types=CODE_SMELL)<br />[![Duplicated Lines](https://sonarcloud.io/api/badges/measure?key=vsts-sync-migrator%3Amaster&metric=duplicated_lines_density)](https://sonarcloud.io/component_measures/domain/Duplications?id=vsts-sync-migrator%3master)<br />[![Technical Dept Ratio](https://sonarcloud.io/api/badges/measure?key=vsts-sync-migrator%3Amaster&metric=sqale_debt_ratio)](https://sonarcloud.io/dashboard/?id=vsts-sync-migrator%3master) | - |
-| Release |[![GitHub release](https://img.shields.io/github/release/nkdAgility/vsts-sync-migration.svg)](https://github.com/nkdAgility/vsts-sync-migrator/releases)| - |
-|Chocolatey|[![Chocolatey](https://img.shields.io/chocolatey/v/vsts-sync-migrator.svg)](https://chocolatey.org/packages/vsts-sync-migrator/)|-|
+|-| Technical Overview |
+|-------------:|:-------------|
+| Quality Gate | [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=vsts-sync-migrator%3Amaster&metric=alert_status)](https://sonarcloud.io/dashboard?id=vsts-sync-migrator%3Amaster) |
+| Azure Pipeline | ![Build on VSTS](https://nkdagility.visualstudio.com/_apis/public/build/definitions/1b52ce63-eccc-41c8-88f9-ae6ebeefdc63/94/badge) |
+| Coverage | [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=vsts-sync-migrator%3Amaster&metric=coverage)](https://sonarcloud.io/dashboard?id=vsts-sync-migrator%3Amaster) |
+| Maintainability | [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=vsts-sync-migrator%3Amaster&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=vsts-sync-migrator%3Amaster) |
+| Security Rating | [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=vsts-sync-migrator%3Amaster&metric=security_rating)](https://sonarcloud.io/dashboard?id=vsts-sync-migrator%3Amaster) |
+| Vulnerabilities | [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=vsts-sync-migrator%3Amaster&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=vsts-sync-migrator%3Amaster) |
+| Release |[![GitHub release](https://img.shields.io/github/release/nkdAgility/vsts-sync-migration.svg)](https://github.com/nkdAgility/vsts-sync-migrator/releases)|
+| Chocolatey |[![Chocolatey](https://img.shields.io/chocolatey/v/vsts-sync-migrator.svg)](https://chocolatey.org/packages/vsts-sync-migrator/)|
