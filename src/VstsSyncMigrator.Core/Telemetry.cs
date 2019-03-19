@@ -30,7 +30,7 @@ namespace VstsSyncMigrator.Engine
 
         public static void InitiliseTelemetry()
         {
-            if (enableTrace) { Trace.Listeners.Add(new ApplicationInsightsTraceListener(applicationInsightsKey)); }
+            //if (enableTrace) { Trace.Listeners.Add(new ApplicationInsightsTraceListener(applicationInsightsKey)); }
             TelemetryConfiguration.Active.InstrumentationKey = applicationInsightsKey;
             telemetryClient = new TelemetryClient();
             telemetryClient.InstrumentationKey = applicationInsightsKey;

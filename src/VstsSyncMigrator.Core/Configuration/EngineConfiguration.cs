@@ -24,7 +24,7 @@ namespace VstsSyncMigrator.Engine.Configuration
         public static EngineConfiguration GetDefault()
         {
             EngineConfiguration ec = new EngineConfiguration();
-            ec.TelemetryEnableTrace = true;
+            ec.TelemetryEnableTrace = false;
             ec.Source = new TeamProjectConfig() { Name = "DemoProjs", Collection = new Uri("https://sdd2016.visualstudio.com/") };
             ec.Target = new TeamProjectConfig() { Name = "DemoProjt", Collection = new Uri("https://sdd2016.visualstudio.com/") };
             ec.ReflectedWorkItemIDFieldName = "TfsMigrationTool.ReflectedWorkItemId";
