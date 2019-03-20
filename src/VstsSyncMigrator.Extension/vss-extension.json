@@ -60,6 +60,16 @@
       "href": "https://dev.azure.com/nkdagility/migration-tools/_releases2?definitionId=6",
       "uri": "https://vsrm.dev.azure.com/nkdagility/_apis/public/Release/badge/1b52ce63-eccc-41c8-88f9-ae6ebeefdc63/6/11",
       "description": "Azure Pipeline CD for the project"
+    },
+    {
+      "href": "https://sonarcloud.io/dashboard?id=vsts-sync-migrator%3Amaster",
+      "uri": "https://sonarcloud.io/api/project_badges/measure?project=vsts-sync-migrator%3Amaster&metric=sqale_rating",
+      "description": "SonarCloud Maintainability Rating"
+    },
+    {
+      "href": "https://sonarcloud.io/dashboard?id=vsts-sync-migrator%3Amaster",
+      "uri": "https://sonarcloud.io/api/project_badges/measure?project=vsts-sync-migrator%3Amaster&metric=security_rating",
+      "description": "Security Rating"
     }
   ],
   "repository": {
