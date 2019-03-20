@@ -57,6 +57,8 @@ namespace VstsSyncMigrator.ConsoleApp
             Trace.Listeners.Add(new TextWriterTraceListener(Console.Out));
             Trace.Listeners.Add(new TextWriterTraceListener(Path.Combine(logsPath, "migration.log"), "myListener"));
             //////////////////////////////////////////////////
+            ///
+            
             Trace.WriteLine(System.Reflection.Assembly.GetExecutingAssembly().GetName().Name, "[Info]");
             Version thisVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
             Trace.WriteLine(string.Format("Running version detected as {0}", thisVersion), "[Info]");
@@ -67,7 +69,7 @@ namespace VstsSyncMigrator.ConsoleApp
                 if (latestVersion > thisVersion)
                 {
                     Trace.WriteLine(
-                        string.Format("You are currently running version {0} and a newer version ({1}) is available. You should upgrade now using Chocolatey command 'choco update vsts-sync-migrator' from the command line.",
+                        string.Format("You are currently running version {0} and a newer version ({1}) is available. You should upgrade now using Chocolatey command 'choco upgrade vsts-sync-migrator' from the command line.",
                         thisVersion, latestVersion
                         ),
                         "[Warning]");
@@ -82,8 +84,9 @@ namespace VstsSyncMigrator.ConsoleApp
 #endif
                 }
             }
-         
+            
             Trace.WriteLine(string.Format("Telemitery Enabled: {0}", Telemetry.Current.IsEnabled().ToString()), "[Info]");
+            Trace.WriteLine("Telemitery Note: We use Application Insights to collect telemitery on perfomance & feature usage for the tools to help our developers target features. This data us tied to a session ID that is generated and shown in the logs. This can help with debugging.");
             Trace.WriteLine(string.Format("SessionID: {0}", Telemetry.Current.Context.Session.Id), "[Info]");
             Trace.WriteLine(string.Format("User: {0}", Telemetry.Current.Context.User.Id), "[Info]");
             Trace.WriteLine(string.Format("Start Time: {0}", startTime.ToUniversalTime().ToLocalTime()), "[Info]");
@@ -108,13 +111,12 @@ namespace VstsSyncMigrator.ConsoleApp
                 System.Threading.Thread.Sleep(1000);
             }
             Trace.WriteLine(string.Format("Duration: {0}", mainTimer.Elapsed.ToString("c")), "[Info]");
-            Trace.WriteLine(string.Format("End Time: {0}", DateTime.Now), "[Info]");
+            Trace.WriteLine(string.Format("End Time: {0}", DateTime.Now.ToUniversalTime().ToLocalTime()), "[Info]");
 #if DEBUG
             Console.ReadKey();
 #endif
             return result;
         }
-
 
         private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
@@ -222,7 +224,6 @@ namespace VstsSyncMigrator.ConsoleApp
                 {
                     isOnline = true;
                 }
-                isOnline= false;
             }
             catch (Exception ex)
             {

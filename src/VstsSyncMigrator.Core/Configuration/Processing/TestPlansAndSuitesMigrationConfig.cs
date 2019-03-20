@@ -14,6 +14,11 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
             get { return typeof(TestPlandsAndSuitesMigrationContext); }
         }
 
+        /// <summary>
+        /// Remove Invalid Links, see https://github.com/nkdAgility/azure-devops-migration-tools/issues/178
+        /// </summary>
+        public bool RemoveInvalidTestSuiteLinks { get; set; }
+
         /// <inheritdoc />
         public bool IsProcessorCompatible(IReadOnlyList<ITfsProcessingConfig> otherProcessors)
         {
