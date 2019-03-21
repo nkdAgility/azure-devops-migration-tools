@@ -206,7 +206,7 @@ namespace VstsSyncMigrator.Engine
             Stopwatch NewWorkItemTimer = new Stopwatch();
             WorkItem newwit = destProject.WorkItemTypes[destType].NewWorkItem();
             NewWorkItemTimer.Stop();
-            Telemetry.Current.TrackDependency("TeamService", "NewWorkItem", NewWorkItemstartTime, NewWorkItemTimer.Elapsed, true);
+            Telemetry.Current.TrackDependency("AzureDevOps", "AzureBoards", "NewWorkItem", NewWorkItemstartTime, NewWorkItemTimer.Elapsed, true);
             Trace.WriteLine(string.Format("Dependancy: {0} - {1} - {2} - {3} - {4}", "TeamService", "NewWorkItem", NewWorkItemstartTime, NewWorkItemTimer.Elapsed, true), "WorkItemMigrationContext");
             newwit.Title = oldWi.Title;
             newwit.State = oldWi.State;

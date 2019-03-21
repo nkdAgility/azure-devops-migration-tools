@@ -27,12 +27,12 @@ namespace VstsSyncMigrator.Engine
             {
                 wistore = new WorkItemStore(targetTfs.Collection, bypassRules);
                 timer.Stop();
-                Telemetry.Current.TrackDependency("TeamService", "GetWorkItemStore", startTime, timer.Elapsed, true);
+                Telemetry.Current.TrackDependency("AzureDevOps", "AzureBoards", "GetWorkItemStore", startTime, timer.Elapsed, true);
             }
             catch (Exception ex)
             {
                 timer.Stop();
-                Telemetry.Current.TrackDependency("TeamService", "GetWorkItemStore", startTime, timer.Elapsed, false);
+                Telemetry.Current.TrackDependency("AzureDevOps", "AzureBoards", "GetWorkItemStore", startTime, timer.Elapsed, false);
                 Telemetry.Current.TrackException(ex,
                        new Dictionary<string, string> {
                             { "CollectionUrl", targetTfs.Collection.Uri.ToString() }

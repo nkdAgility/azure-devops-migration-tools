@@ -156,7 +156,7 @@ namespace VstsSyncMigrator.Engine
                             var newWorkItemTimer = new Stopwatch();
                             newwit = destProject.WorkItemTypes[destType].NewWorkItem();
                             newWorkItemTimer.Stop();
-                            Telemetry.Current.TrackDependency("TeamService", "NewWorkItem", newWorkItemstartTime,
+                            Telemetry.Current.TrackDependency("AzureDevOps", "AzureBoards", "NewWorkItem", newWorkItemstartTime,
                                 newWorkItemTimer.Elapsed, true);
                             Trace.WriteLine(
                                 string.Format("Dependency: {0} - {1} - {2} - {3} - {4}", "TeamService", "NewWorkItem",

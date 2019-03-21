@@ -128,9 +128,10 @@ namespace VstsSyncMigrator.Engine
                 {
                     link.Uri.ToString();
                 }
-                catch (UriFormatException e)
+                catch (UriFormatException)
                 {
                     linksToRemove.Add(link);
+
                 }
             }
 
@@ -312,7 +313,7 @@ namespace VstsSyncMigrator.Engine
                         CompareOptions.IgnoreCase) >= 0)
                 {
                     string regExSearchForSystemId = @"(\[System.Id\]\s*=\s*[\d]*)";
-                    string regExSearchForSystemId2 = @"(\[System.Id\]\s*IN\s*)";
+                    //string regExSearchForSystemId2 = @"(\[System.Id\]\s*IN\s*)";
 
                     MatchCollection matches = Regex.Matches(dynamic.Query.QueryText, regExSearchForSystemId, RegexOptions.IgnoreCase);
 

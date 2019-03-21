@@ -58,12 +58,12 @@ namespace VstsSyncMigrator.Engine
                     Trace.WriteLine(string.Format("validating security for {0} ", _Collection.AuthorizedIdentity.ToString()));
                     _Collection.EnsureAuthenticated();
                     connectionTimer.Stop();
-                    Telemetry.Current.TrackDependency("TeamService", "EnsureAuthenticated", start, connectionTimer.Elapsed, true);
+                    Telemetry.Current.TrackDependency("AzureDevOps", "TfsTeamProjectCollection", "EnsureAuthenticated", start, connectionTimer.Elapsed, true);
                     Trace.TraceInformation(string.Format(" Access granted "));
                 }
                 catch (TeamFoundationServiceUnavailableException ex)
                 {
-                    Telemetry.Current.TrackDependency("TeamService", "EnsureAuthenticated", start, connectionTimer.Elapsed, false);
+                    Telemetry.Current.TrackDependency("AzureDevOps", "TfsTeamProjectCollection", "EnsureAuthenticated", start, connectionTimer.Elapsed, false);
                     Telemetry.Current.TrackException(ex,
                        new Dictionary<string, string> {
                             { "CollectionUrl", _CollectionUrl.ToString() },

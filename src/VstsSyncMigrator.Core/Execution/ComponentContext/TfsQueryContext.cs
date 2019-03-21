@@ -63,10 +63,10 @@ namespace VstsSyncMigrator.Engine
             queryTimer.Start();
             try
             {
-                Query = WorkAroundForSOAPError(Query, parameters); // TODO: Remove this once bug fixed... https://dev.azure.com/nkdagility/migration-tools/_workitems/edit/5066 
-                wc = storeContext.Store.Query(Query); //, parameters);
+                //Query = WorkAroundForSOAPError(Query, parameters); // TODO: Remove this once bug fixed... https://dev.azure.com/nkdagility/migration-tools/_workitems/edit/5066 
+                wc = storeContext.Store.Query(Query, parameters);
                 queryTimer.Stop();
-                Telemetry.Current.TrackDependency("TeamService", "Query", startTime, queryTimer.Elapsed, true);
+                Telemetry.Current.TrackDependency("AzureDevOps", "AzureBoards", "Query", startTime, queryTimer.Elapsed, true);
                 // Add additional bits to reuse the paramiters dictionary for telemitery
                 parameters.Add("CollectionUrl", storeContext.Store.TeamProjectCollection.Uri.ToString());
                 parameters.Add("Query", Query);
@@ -82,7 +82,7 @@ namespace VstsSyncMigrator.Engine
             catch (Exception ex)
             {
                 queryTimer.Stop();
-                Telemetry.Current.TrackDependency("TeamService", "Query", startTime, queryTimer.Elapsed, false);
+                Telemetry.Current.TrackDependency("AzureDevOps", "AzureBoards", "Query", startTime, queryTimer.Elapsed, false);
                 Telemetry.Current.TrackException(ex,
                        new Dictionary<string, string> {
                             { "CollectionUrl", storeContext.Store.TeamProjectCollection.Uri.ToString() }
