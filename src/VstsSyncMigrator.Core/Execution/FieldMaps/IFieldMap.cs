@@ -13,5 +13,7 @@ namespace VstsSyncMigrator.Engine.ComponentContext
         string MappingDisplayName { get; }
 
         void Execute(WorkItem source, WorkItem target);
+
+        void Execute(FieldCollection source, FieldCollection target);
     }
 }

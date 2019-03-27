@@ -172,6 +172,8 @@ namespace VstsSyncMigrator.Engine
                         newwit.Fields["System.ChangedBy"].Value =
                             currentRevisionWorkItem.Revisions[revision.Index].Fields["System.ChangedBy"].Value;
 
+                        me.ApplyFieldMappings(currentRevisionWorkItem.Revisions[revision.Index].Fields, newwit.Fields);
+
                         newwit.Fields["System.History"].Value =
                             currentRevisionWorkItem.Revisions[revision.Index].Fields["System.History"].Value;
 

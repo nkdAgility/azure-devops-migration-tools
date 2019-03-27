@@ -42,5 +42,27 @@ namespace VstsSyncMigrator.Engine.ComponentContext
             }
 
         }
+
+        internal override void InternalExecute(FieldCollection source, FieldCollection target)
+        {
+            if (source.Contains(config.sourceField))
+            {
+                string sourceValue = source[config.sourceField].Value != null
+                    ? source[config.sourceField].Value.ToString()
+                    : null;
+
+                if (sourceValue != null && config.valueMapping.ContainsKey(sourceValue))
+                {
+                    target[config.targetField].Value = config.valueMapping[sourceValue];
+                    Trace.WriteLine($"  [UPDATE] field value mapped {config.sourceField}:{sourceValue} to {config.targetField}{target[config.targetField].Value}");
+                }
+                else if (sourceValue != null && !string.IsNullOrEmpty(config.defaultValue))
+                {
+                    target[config.targetField].Value = config.defaultValue;
+                    Trace.WriteLine($"  [UPDATE] field set to default value {config.sourceField} to {config.targetField}");
+                }
+            }
+
+        }
     }
 }

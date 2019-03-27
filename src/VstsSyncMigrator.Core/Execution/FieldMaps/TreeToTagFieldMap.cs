@@ -44,5 +44,10 @@ namespace VstsSyncMigrator.Engine
             List<string> bits = new List<string>(value.Split(char.Parse(@"\"))).Skip(config.toSkip).ToList();
             target.Tags = string.Join(";", newTags.Union(bits).ToArray());
         }
+
+        public void Execute(FieldCollection source, FieldCollection target)
+        {
+            return;
+        }
     }
 }

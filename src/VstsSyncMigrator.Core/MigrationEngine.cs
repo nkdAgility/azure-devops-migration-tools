@@ -214,6 +214,14 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
+        internal void ApplyFieldMappings(FieldCollection source, FieldCollection target)
+        {
+            if (fieldMapps.ContainsKey("*"))
+            {
+                ProcessFieldMapList(source, target, fieldMapps["*"]);
+            }
+        }
+
         internal void ApplyFieldMappings(WorkItem target)
         {
             if (fieldMapps.ContainsKey("*"))
@@ -235,5 +243,13 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
+        private void ProcessFieldMapList(FieldCollection source, FieldCollection target, List<IFieldMap> list)
+        {
+            foreach (IFieldMap map in list)
+            {
+                Trace.WriteLine(string.Format("Running Field Map: {0} {1}", map.Name, map.MappingDisplayName));
+                map.Execute(source, target);
+            }
+        }
     }
 }

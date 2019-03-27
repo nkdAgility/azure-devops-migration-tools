@@ -39,5 +39,27 @@ namespace VstsSyncMigrator.Engine.ComponentContext
         public abstract string MappingDisplayName { get; }
 
         internal abstract void InternalExecute(WorkItem source, WorkItem target);
+
+        internal virtual void InternalExecute(FieldCollection source, FieldCollection target)
+        {
+            return;
+        }
+
+        public void Execute(FieldCollection source, FieldCollection target)
+        {
+            try
+            {
+                InternalExecute(source, target);
+            }
+            catch (Exception ex)
+            {
+                Telemetry.Current.TrackException(ex,
+                       new Dictionary<string, string> {
+                            { "Source", source.ToString() },
+                            { "Target",  target.ToString()}
+                       });
+                Trace.TraceError($"  [EXCEPTION] {ex}");
+            }
+        }
     }
 }

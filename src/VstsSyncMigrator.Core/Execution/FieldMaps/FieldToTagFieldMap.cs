@@ -51,5 +51,10 @@ namespace VstsSyncMigrator.Engine
                 
             }
         }
+
+        public void Execute(FieldCollection source, FieldCollection target)
+        {
+            return;
+        }
     }
 }
