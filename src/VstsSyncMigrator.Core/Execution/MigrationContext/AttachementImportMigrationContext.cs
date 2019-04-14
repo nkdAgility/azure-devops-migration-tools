@@ -50,6 +50,9 @@ namespace VstsSyncMigrator.Engine
 
                     var targetFileName = fileNameParts[1];
                     var renamedFilePath = Path.Combine(Path.GetDirectoryName(file), targetFileName);
+                    if (File.Exists(renamedFilePath))
+                        File.Delete(renamedFilePath);
+
                     File.Move(file, renamedFilePath);
                     targetWI = targetStore.FindReflectedWorkItemByReflectedWorkItemId(sourceReflectedID,  me.ReflectedWorkItemIdFieldName, true);
                     if (targetWI != null)
