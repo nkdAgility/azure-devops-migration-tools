@@ -1,10 +1,8 @@
 ﻿using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net;
 using VstsSyncMigrator.Engine.Configuration.Processing;
 
 namespace VstsSyncMigrator.Engine
@@ -50,8 +48,11 @@ namespace VstsSyncMigrator.Engine
 
                     var targetFileName = fileNameParts[1];
                     var renamedFilePath = Path.Combine(Path.GetDirectoryName(file), targetFileName);
+                    if (File.Exists(renamedFilePath))
+                        File.Delete(renamedFilePath);
+
                     File.Move(file, renamedFilePath);
-                    targetWI = targetStore.FindReflectedWorkItemByReflectedWorkItemId(sourceReflectedID,  me.ReflectedWorkItemIdFieldName, true);
+                    targetWI = targetStore.FindReflectedWorkItemByReflectedWorkItemId(sourceReflectedID, me.ReflectedWorkItemIdFieldName, true);
                     if (targetWI != null)
                     {
                         Trace.WriteLine(string.Format("{0} of {1} - Import {2} to {3}", current, files.Count, fileName, targetWI.Id));
@@ -74,11 +75,12 @@ namespace VstsSyncMigrator.Engine
                         Trace.WriteLine(string.Format("{0} of {1} - Skipping {2} to {3}", current, files.Count, fileName, 0));
                         skipped++;
                     }
-                    System.IO.File.Delete(renamedFilePath);
-                } catch (FileAttachmentException ex)
+                    File.Delete(renamedFilePath);
+                }
+                catch (FileAttachmentException ex)
                 {
                     // Probably due to attachment being over size limit
-                    Trace.WriteLine(ex.Message) ;
+                    Trace.WriteLine(ex.Message);
                     failures++;
                 }
                 current--;
