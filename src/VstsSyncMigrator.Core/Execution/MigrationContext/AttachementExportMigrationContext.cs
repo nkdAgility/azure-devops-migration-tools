@@ -44,14 +44,19 @@ namespace VstsSyncMigrator.Engine
             int current = sourceWIS.Count;
             var workItemServer = me.Source.Collection.GetService<WorkItemServer>();
 
+            var invalidFileNameChars = Path.GetInvalidFileNameChars();
+
             foreach (WorkItem wi in sourceWIS)
             {
                 Trace.Write(string.Format("Attachement Export: {0} of {1} - {2}", current, sourceWIS.Count, wi.Id));
                 foreach (Attachment wia in wi.Attachments)
                 {
                     string fname = string.Format("{0}#{1}", wi.Id, wia.Name);
+                    fname = GetSafeFilename(fname);
+
                     Trace.Write("-");
                     Trace.Write(fname);
+
                     string fpath = Path.Combine(exportPath, fname);
                     if (!File.Exists(fpath))
                     {
@@ -82,5 +87,10 @@ namespace VstsSyncMigrator.Engine
             Console.WriteLine(@"EXPORT DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds", stopwatch.Elapsed);
         }
 
+
+        public string GetSafeFilename(string filename)
+        {
+            return string.Join("_", filename.Split(Path.GetInvalidFileNameChars()));
+        }
     }
 }
