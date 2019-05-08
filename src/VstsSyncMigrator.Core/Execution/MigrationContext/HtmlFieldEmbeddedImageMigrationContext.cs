@@ -107,8 +107,8 @@ namespace VstsSyncMigrator.Engine
                     {
                         if (match.Value.ToLower().Contains(oldTfsurl.ToLower()) || match.Value.ToLower().Contains(oldTfsurlOppositeSchema.ToLower()) || (_config.SourceServerAliases != null && _config.SourceServerAliases.Any(i => match.Value.ToLower().Contains(i.ToLower()))))
                         {                     
-                            // save image locally and upload as attachment
-                            Match newFileNameMatch = Regex.Match(match.Value, regExSearchFileName);
+                            //save image locally and upload as attachment
+                            Match newFileNameMatch = Regex.Match(match.Value, regExSearchFileName, RegexOptions.IgnoreCase);
                             if (newFileNameMatch.Success)
                             {
                                 Trace.WriteLine($"field '{field.Name}' has match: {match.Value}");
