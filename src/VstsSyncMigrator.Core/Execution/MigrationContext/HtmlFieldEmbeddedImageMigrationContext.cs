@@ -32,7 +32,7 @@ namespace VstsSyncMigrator.Engine
             : base(me, config)
         {
             _config = config;
-            _httpClientHandler = new HttpClientHandler {AllowAutoRedirect = false};
+            _httpClientHandler = new HttpClientHandler {AllowAutoRedirect = false, UseDefaultCredentials=config.UseDefaultCredentials };
         }
 
         internal override void InternalExecute()

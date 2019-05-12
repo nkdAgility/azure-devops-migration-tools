@@ -23,6 +23,11 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
         public string AlternateCredentialsPassword { get; set; }
 
         /// <summary>
+        /// Use default credential for downloading embedded images in source project 
+        /// </summary>
+        public bool UseDefaultCredentials { get; set; }
+
+        /// <summary>
         /// Ignore 404 errors and continue on images that don't exist anymore
         /// </summary>
         public bool Ignore404Errors { get; set; }

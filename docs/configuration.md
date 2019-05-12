@@ -178,6 +178,7 @@ The global configuration created by the `init` command look like this:
 			"FromAnyCollection": false,
 			"AlternateCredentialsUsername": null,
 			"AlternateCredentialsPassword": null,
+			"UseDefaultCredentials": false,
 			"Ignore404Errors": true,
 			"DeleteTemporaryImageFiles": true
 		}
