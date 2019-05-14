@@ -12,7 +12,7 @@ This is not required for VSTS targets.
 
 ## Migration State
 
-In order to store the state for the migration you need to use a custom field, the `reflectedWorkItemId` field. The way you add this depends on the platform you are using.
+In order to store the state for the migration you need to use a custom field, the `ReflectedWorkItemId` field. The way you add this depends on the platform you are using.
 
 ### Team Foundation Server (TFS)
 
@@ -46,9 +46,9 @@ If you migrated a TPC to VSTS using the [VSTS Migration Tool](https://blogs.msdn
 - Once you have the .ZIP file, unpack it and edit the work item type definitions as detailed above for an on-premises installation.
 - Once the fields have been added then zip up the folder structure again and re-import it into your VSTS instance, where it will be applied to the Team Project it was exported from. 
 
-### TIP: Checking the actual name of the 'ReflectWorkItemID' field ###
+### TIP: Checking the actual name of the 'ReflectedWorkItemID' field ###
 
-If you are in any doubt over the full name in use for the `ReflectWorkItemID` field on either the source or target systems, it can vary based on the type of customisation, use the following process to confirm it
+If you are in any doubt over the full name in use for the `ReflectedWorkItemID` field on either the source or target systems, it can vary based on the type of customisation, use the following process to confirm it
 
 - Open Visual Studio, connect to the customised Team Project
 - Via Team Explorer > Work, create a new work item query. Make sure the `ReflectedWorkItemId` is one of the output columns
