@@ -197,15 +197,16 @@ namespace VstsSyncMigrator.Engine
 
                 if (newwit != null)
                 {
-                    if (newwit.Fields.Contains(me.ReflectedWorkItemIdFieldName))
+					string reflectedUri = sourceStore.CreateReflectedWorkItemId(sourceWorkItem);
+					if (newwit.Fields.Contains(me.ReflectedWorkItemIdFieldName))
                     {
-                        newwit.Fields["System.ChangedBy"].Value = "your name";
+                        newwit.Fields["System.ChangedBy"].Value = "Migration";
                         newwit.Fields[me.ReflectedWorkItemIdFieldName].Value =
-                            sourceStore.CreateReflectedWorkItemId(sourceWorkItem);
+							reflectedUri;
                     }
                     var history = new StringBuilder();
                     history.Append(
-                        "Migrated by <a href='https://dev.azure.com/nkdagility/migration-tools/'>Azure DevOps Migration Tools</a> open source.'>Azure DevOps Migration Tools</a>.");
+						$"This work item was migrated from a different project or organization. You can find the old version at <a href=\"{reflectedUri}\">{reflectedUri}</a>.");
                     newwit.History = history.ToString();
 
                     newwit.Save();

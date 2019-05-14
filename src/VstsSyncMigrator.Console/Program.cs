@@ -139,7 +139,7 @@ namespace VstsSyncMigrator.ConsoleApp
 
             if (!File.Exists(opts.ConfigFile))
             {
-                Trace.WriteLine("The config file does not exist, nor doe the default 'configuration.json'. Use 'init' to create a configuration file first", "[Error]");
+                Trace.WriteLine("The config file does not exist, nor does the default 'configuration.json'. Use 'init' to create a configuration file first", "[Error]");
                 return 1;
             }
             else
