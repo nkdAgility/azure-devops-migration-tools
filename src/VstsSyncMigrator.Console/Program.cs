@@ -85,8 +85,8 @@ namespace VstsSyncMigrator.ConsoleApp
                 }
             }
             
-            Trace.WriteLine(string.Format("Telemetery Enabled: {0}", Telemetry.Current.IsEnabled().ToString()), "[Info]");
-            Trace.WriteLine("Telemetery Note: We use Application Insights to collect telemetery on perfomance & feature usage for the tools to help our developers target features. This data us tied to a session ID that is generated and shown in the logs. This can help with debugging.");
+            Trace.WriteLine(string.Format("Telemetry Enabled: {0}", Telemetry.Current.IsEnabled().ToString()), "[Info]");
+            Trace.WriteLine("Telemetry Note: We use Application Insights to collect telemetry on performance & feature usage for the tools to help our developers target features. This data is tied to a session ID that is generated and shown in the logs. This can help with debugging.");
             Trace.WriteLine(string.Format("SessionID: {0}", Telemetry.Current.Context.Session.Id), "[Info]");
             Trace.WriteLine(string.Format("User: {0}", Telemetry.Current.Context.User.Id), "[Info]");
             Trace.WriteLine(string.Format("Start Time: {0}", startTime.ToUniversalTime().ToLocalTime()), "[Info]");
