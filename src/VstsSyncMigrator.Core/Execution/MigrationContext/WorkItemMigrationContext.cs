@@ -66,10 +66,9 @@ namespace VstsSyncMigrator.Engine
 
         internal override void InternalExecute()
         {
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
-            //////////////////////////////////////////////////
-            WorkItemStoreContext sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.BypassRules);
+            Stopwatch stopwatch = Stopwatch.StartNew();
+			//////////////////////////////////////////////////
+			WorkItemStoreContext sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.BypassRules);
             TfsQueryContext tfsqc = new TfsQueryContext(sourceStore);
             tfsqc.AddParameter("TeamProject", me.Source.Name);
             tfsqc.Query = string.Format(@"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY [System.ChangedDate] desc", _config.QueryBit);
@@ -88,9 +87,8 @@ namespace VstsSyncMigrator.Engine
             long elapsedms = 0;
             foreach (WorkItem sourceWI in sourceWIS)
             {
-                Stopwatch witstopwatch = new Stopwatch();
-                witstopwatch.Start();
-                WorkItem targetFound;
+                Stopwatch witstopwatch = Stopwatch.StartNew();
+				WorkItem targetFound;
                 targetFound = targetStore.FindReflectedWorkItem(sourceWI, me.ReflectedWorkItemIdFieldName, false);
                 Trace.WriteLine(string.Format("{0} - Migrating: {1}-{2}", current, sourceWI.Id, sourceWI.Type.Name), this.Name);
                 if (targetFound == null)
@@ -203,8 +201,8 @@ namespace VstsSyncMigrator.Engine
             Trace.Write("... Building", "WorkItemMigrationContext");
 
             var NewWorkItemstartTime = DateTime.UtcNow;
-            Stopwatch NewWorkItemTimer = new Stopwatch();
-            WorkItem newwit = destProject.WorkItemTypes[destType].NewWorkItem();
+            Stopwatch NewWorkItemTimer = Stopwatch.StartNew();
+			WorkItem newwit = destProject.WorkItemTypes[destType].NewWorkItem();
             NewWorkItemTimer.Stop();
             Telemetry.Current.TrackDependency("TeamService", "NewWorkItem", NewWorkItemstartTime, NewWorkItemTimer.Elapsed, true);
             Trace.WriteLine(string.Format("Dependancy: {0} - {1} - {2} - {3} - {4}", "TeamService", "NewWorkItem", NewWorkItemstartTime, NewWorkItemTimer.Elapsed, true), "WorkItemMigrationContext");

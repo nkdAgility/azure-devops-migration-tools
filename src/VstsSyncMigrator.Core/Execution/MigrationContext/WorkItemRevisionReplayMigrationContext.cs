@@ -7,7 +7,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.TeamFoundation.Server;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
-
+using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using VstsSyncMigrator.Engine.Configuration.Processing;
 
 namespace VstsSyncMigrator.Engine
@@ -62,8 +62,7 @@ namespace VstsSyncMigrator.Engine
 
         internal override void InternalExecute()
         {
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
+			var stopwatch = Stopwatch.StartNew();
             //////////////////////////////////////////////////
             var sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.BypassRules);
             var tfsqc = new TfsQueryContext(sourceStore);
@@ -86,8 +85,7 @@ namespace VstsSyncMigrator.Engine
 
             foreach (WorkItem sourceWorkItem in sourceWorkItems)
             {
-                var witstopwatch = new Stopwatch();
-                witstopwatch.Start();
+                var witstopwatch = Stopwatch.StartNew();
                 var targetFound = targetStore.FindReflectedWorkItem(sourceWorkItem, me.ReflectedWorkItemIdFieldName, false);
                 Trace.WriteLine($"{current} - Migrating: {sourceWorkItem.Id} - {sourceWorkItem.Type.Name}", Name);
 
@@ -153,11 +151,10 @@ namespace VstsSyncMigrator.Engine
                         if (newwit == null)
                         {
                             var newWorkItemstartTime = DateTime.UtcNow;
-                            var newWorkItemTimer = new Stopwatch();
+                            var newWorkItemTimer = Stopwatch.StartNew();
                             newwit = destProject.WorkItemTypes[destType].NewWorkItem();
                             newWorkItemTimer.Stop();
-                            Telemetry.Current.TrackDependency("TeamService", "NewWorkItem", newWorkItemstartTime,
-                                newWorkItemTimer.Elapsed, true);
+                            Telemetry.Current.TrackDependency("TeamService", "NewWorkItem", newWorkItemstartTime, newWorkItemTimer.Elapsed, true);
                             Trace.WriteLine(
                                 string.Format("Dependency: {0} - {1} - {2} - {3} - {4}", "TeamService", "NewWorkItem",
                                     newWorkItemstartTime, newWorkItemTimer.Elapsed, true), Name);
@@ -182,12 +179,13 @@ namespace VstsSyncMigrator.Engine
                             Trace.WriteLine(
                                 $"{current} - Invalid: {currentRevisionWorkItem.Id}-{currentRevisionWorkItem.Type.Name}-{f.ReferenceName}-{sourceWorkItem.Title} Value: {f.Value}", Name);
                         }
-
+						
                         newwit.Save();
                         Trace.WriteLine(
                             $" ...Saved as {newwit.Id}. Replayed revision {revision.Number} of {sourceWorkItem.Revisions.Count}",
                             Name);
-                    }
+
+					}
                     else
                     {
                         Trace.WriteLine(string.Format("...the WITD named {0} is not in the list provided in the configuration.json under WorkItemTypeDefinitions. Add it to the list to enable migration of this work item type.", currentRevisionWorkItem.Type.Name), Name);
@@ -201,8 +199,7 @@ namespace VstsSyncMigrator.Engine
 					if (newwit.Fields.Contains(me.ReflectedWorkItemIdFieldName))
                     {
                         newwit.Fields["System.ChangedBy"].Value = "Migration";
-                        newwit.Fields[me.ReflectedWorkItemIdFieldName].Value =
-							reflectedUri;
+                        newwit.Fields[me.ReflectedWorkItemIdFieldName].Value = reflectedUri;
                     }
                     var history = new StringBuilder();
                     history.Append(
@@ -239,7 +236,7 @@ namespace VstsSyncMigrator.Engine
         private void PopulateWorkItem(WorkItem oldWi, WorkItem newwit, string destType)
         {
             var newWorkItemstartTime = DateTime.UtcNow;
-            var fieldMappingTimer = new Stopwatch();
+            var fieldMappingTimer = Stopwatch.StartNew();
             
             Trace.Write("... Building ", Name);
             

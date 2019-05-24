@@ -50,10 +50,9 @@ namespace VstsSyncMigrator.Engine
 
         internal override void InternalExecute()
         {
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
-            //////////////////////////////////////////////////
-            WorkItemStoreContext sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.None);
+            Stopwatch stopwatch = Stopwatch.StartNew();
+			//////////////////////////////////////////////////
+			WorkItemStoreContext sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.None);
             TfsQueryContext tfsqc = new TfsQueryContext(sourceStore);
             tfsqc.AddParameter("TeamProject", me.Source.Name);
 
@@ -75,9 +74,8 @@ namespace VstsSyncMigrator.Engine
             long elapsedms = 0;
             foreach (WorkItem sourceWI in sourceWIS)
             {
-                Stopwatch witstopwatch = new Stopwatch();
-                witstopwatch.Start();
-                WorkItem targetFound;
+                Stopwatch witstopwatch = Stopwatch.StartNew();
+				WorkItem targetFound;
                 targetFound = targetStore.FindReflectedWorkItem(sourceWI, me.ReflectedWorkItemIdFieldName, false);
                 Trace.WriteLine(string.Format("{0} - Updating: {1}-{2}", current, sourceWI.Id, sourceWI.Type.Name));
                 if (targetFound == null)

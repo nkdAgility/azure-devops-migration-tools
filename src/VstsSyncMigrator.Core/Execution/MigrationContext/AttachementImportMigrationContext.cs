@@ -23,10 +23,9 @@ namespace VstsSyncMigrator.Engine
 
         internal override void InternalExecute()
         {
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
-            //////////////////////////////////////////////////
-            WorkItemStoreContext targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
+            Stopwatch stopwatch = Stopwatch.StartNew();
+			//////////////////////////////////////////////////
+			WorkItemStoreContext targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
             Project destProject = targetStore.GetProject();
 
             Trace.WriteLine(string.Format("Found target project as {0}", destProject.Name));

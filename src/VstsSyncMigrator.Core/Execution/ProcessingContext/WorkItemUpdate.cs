@@ -32,10 +32,9 @@ namespace VstsSyncMigrator.Engine
 
         internal override void InternalExecute()
         {
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
-            //////////////////////////////////////////////////
-            WorkItemStoreContext targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
+            Stopwatch stopwatch = Stopwatch.StartNew();
+			//////////////////////////////////////////////////
+			WorkItemStoreContext targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
 
             TfsQueryContext tfsqc = new TfsQueryContext(targetStore);
             tfsqc.AddParameter("TeamProject", me.Target.Name);
@@ -48,9 +47,8 @@ namespace VstsSyncMigrator.Engine
             long elapsedms = 0;
             foreach (WorkItem workitem in workitems)
             {
-                Stopwatch witstopwatch = new Stopwatch();
-                witstopwatch.Start();                
-                workitem.Open();
+                Stopwatch witstopwatch = Stopwatch.StartNew();
+				workitem.Open();
                 Trace.WriteLine(string.Format("Processing work item {0} - Type:{1} - ChangedDate:{2} - CreatedDate:{3}", workitem.Id, workitem.Type.Name, workitem.ChangedDate.ToShortDateString(), workitem.CreatedDate.ToShortDateString()));
                 _me.ApplyFieldMappings(workitem);
 

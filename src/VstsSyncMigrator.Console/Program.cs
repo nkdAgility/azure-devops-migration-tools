@@ -179,8 +179,7 @@ namespace VstsSyncMigrator.ConsoleApp
         private static Version GetLatestVersion()
         {
             DateTime startTime = DateTime.Now;
-            Stopwatch mainTimer = new Stopwatch();
-            mainTimer.Start();
+			Stopwatch mainTimer = Stopwatch.StartNew();
             //////////////////////////////////
             string packageID = "vsts-sync-migrator";
             SemanticVersion version = SemanticVersion.Parse("0.0.0.0");
@@ -206,8 +205,7 @@ namespace VstsSyncMigrator.ConsoleApp
         private static bool IsOnline()
         {
             DateTime startTime = DateTime.Now;
-            Stopwatch mainTimer = new Stopwatch();
-            mainTimer.Start();
+			Stopwatch mainTimer = Stopwatch.StartNew();
             //////////////////////////////////
             bool isOnline = false;
             string responce = "none";
