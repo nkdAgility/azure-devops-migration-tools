@@ -51,13 +51,15 @@ namespace VstsSyncMigrator.ConsoleApp
             mainTimer.Start();
             Telemetry.Current.TrackEvent("ApplicationStart");
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;            
-            /////////////////////////////////////////////////
+            //////////////////////////////////////////////////
             string logsPath = CreateLogsPath();
             //////////////////////////////////////////////////
             Trace.Listeners.Add(new TextWriterTraceListener(Console.Out));
-            Trace.Listeners.Add(new TextWriterTraceListener(Path.Combine(logsPath, "migration.log"), "myListener"));
+			var logPath = Path.Combine(logsPath, "migration.log");
+			Trace.Listeners.Add(new TextWriterTraceListener(logPath, "myListener"));
+			Console.WriteLine("Writing log to " + logPath);
             //////////////////////////////////////////////////
-            ///
+            
             
             Trace.WriteLine(System.Reflection.Assembly.GetExecutingAssembly().GetName().Name, "[Info]");
             Version thisVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
