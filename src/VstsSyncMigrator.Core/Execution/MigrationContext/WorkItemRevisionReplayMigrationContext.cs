@@ -8,7 +8,11 @@ using System.Text.RegularExpressions;
 using Microsoft.TeamFoundation.Server;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
+using Microsoft.VisualStudio.Services.Client;
+using Microsoft.VisualStudio.Services.Common;
+using Microsoft.VisualStudio.Services.WebApi;
 using VstsSyncMigrator.Engine.Configuration.Processing;
+using Microsoft.VisualStudio.Services.WebApi.Patch.Json;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -16,12 +20,16 @@ namespace VstsSyncMigrator.Engine
     {
         private readonly WorkItemRevisionReplayMigrationConfig _config;
         List<String> _ignore;
+		WorkItemTrackingHttpClient witClient;
 
         public WorkItemRevisionReplayMigrationContext(MigrationEngine me, WorkItemRevisionReplayMigrationConfig config)
             : base(me, config)
         {
             _config = config;
             PopulateIgnoreList();
+
+			VssClientCredentials adoCreds = new VssClientCredentials();
+			witClient = new WorkItemTrackingHttpClient(me.Target.Collection.Uri, adoCreds);
         }
 
         private void PopulateIgnoreList()
@@ -147,8 +155,8 @@ namespace VstsSyncMigrator.Engine
                     {
                         var destType =
                             me.WorkItemTypeDefinitions[currentRevisionWorkItem.Type.Name].Map(currentRevisionWorkItem);
-
-                        if (newwit == null)
+						//If work item hasn't been created yet, create a shell
+						if (newwit == null)
                         {
                             var newWorkItemstartTime = DateTime.UtcNow;
                             var newWorkItemTimer = Stopwatch.StartNew();
@@ -162,8 +170,24 @@ namespace VstsSyncMigrator.Engine
                             newwit.Fields["System.CreatedBy"].Value = currentRevisionWorkItem.Revisions[0].Fields["System.CreatedBy"].Value;
                             newwit.Fields["System.CreatedDate"].Value = currentRevisionWorkItem.Revisions[0].Fields["System.CreatedDate"].Value;
                         }
+						
+						//If the work item already exists and its type has changed, update its type. Done this way because there doesn't appear to be a way to do this through the store.
+						else if (newwit.Type.Name != destType)
+						{
+							Debug.WriteLine("TYPE CHANGE");
+							var typePatch = new JsonPatchOperation()
+							{
+								Operation = Microsoft.VisualStudio.Services.WebApi.Patch.Operation.Add,
+								Path = "/fields/System.WorkItemType",
+								Value = destType
+							};
 
-                        PopulateWorkItem(currentRevisionWorkItem, newwit, destType);
+							var patchDoc = new JsonPatchDocument();
+							patchDoc.Add(typePatch);
+							witClient.UpdateWorkItemAsync(patchDoc, newwit.Id).Wait();
+						}
+
+						PopulateWorkItem(currentRevisionWorkItem, newwit, destType);
                         me.ApplyFieldMappings(currentRevisionWorkItem, newwit);
 
                         newwit.Fields["System.ChangedBy"].Value =
@@ -184,7 +208,6 @@ namespace VstsSyncMigrator.Engine
                         Trace.WriteLine(
                             $" ...Saved as {newwit.Id}. Replayed revision {revision.Number} of {sourceWorkItem.Revisions.Count}",
                             Name);
-
 					}
                     else
                     {
@@ -217,7 +240,6 @@ namespace VstsSyncMigrator.Engine
                         sourceWorkItem.Save();
                         Trace.WriteLine($"...and Source Updated {sourceWorkItem.Id}", Name);
                     }
-
                 }
             }
             catch (Exception ex)
