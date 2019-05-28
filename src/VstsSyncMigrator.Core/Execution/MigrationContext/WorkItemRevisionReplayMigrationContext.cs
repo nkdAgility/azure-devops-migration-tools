@@ -100,7 +100,7 @@ namespace VstsSyncMigrator.Engine
 
                 sourceWorkItem.Close();
                 witstopwatch.Stop();
-                elapsedms = elapsedms + witstopwatch.ElapsedMilliseconds;
+                elapsedms += witstopwatch.ElapsedMilliseconds;
                 current--;
                 count++;
                 var average = new TimeSpan(0, 0, 0, 0, (int) (elapsedms / count));
