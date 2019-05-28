@@ -174,17 +174,24 @@ namespace VstsSyncMigrator.Engine
 						//If the work item already exists and its type has changed, update its type. Done this way because there doesn't appear to be a way to do this through the store.
 						else if (newwit.Type.Name != destType)
 						{
-							Debug.WriteLine("TYPE CHANGE");
+							Debug.WriteLine($"TYPE CHANGE: {newwit.Type.Name} to {destType}");
 							var typePatch = new JsonPatchOperation()
 							{
 								Operation = Microsoft.VisualStudio.Services.WebApi.Patch.Operation.Add,
 								Path = "/fields/System.WorkItemType",
 								Value = destType
 							};
+							var datePatch = new JsonPatchOperation()
+							{
+								Operation = Microsoft.VisualStudio.Services.WebApi.Patch.Operation.Add,
+								Path = "/fields/System.ChangedDate",
+								Value = currentRevisionWorkItem.Revisions[revision.Index].Fields["System.ChangedDate"].Value
+							};
 
 							var patchDoc = new JsonPatchDocument();
 							patchDoc.Add(typePatch);
-							witClient.UpdateWorkItemAsync(patchDoc, newwit.Id).Wait();
+							patchDoc.Add(datePatch);
+							witClient.UpdateWorkItemAsync(patchDoc, newwit.Id,bypassRules:true).Wait();
 						}
 
 						PopulateWorkItem(currentRevisionWorkItem, newwit, destType);
@@ -195,6 +202,7 @@ namespace VstsSyncMigrator.Engine
 
                         newwit.Fields["System.History"].Value =
                             currentRevisionWorkItem.Revisions[revision.Index].Fields["System.History"].Value;
+						Debug.WriteLine("Discussion:" + currentRevisionWorkItem.Revisions[revision.Index].Fields["System.History"].Value);
 
                         var fails = newwit.Validate();
 
