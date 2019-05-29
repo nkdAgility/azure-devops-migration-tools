@@ -9,7 +9,7 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
     {
         public bool Enabled { get; set; }
         public bool PrefixProjectToNodes { get; set; }
-        public bool UpdateSoureReflectedId { get; set; }
+        public bool UpdateSourceReflectedId { get; set; }
         public Type Processor
         {
             get

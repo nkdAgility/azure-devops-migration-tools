@@ -204,6 +204,7 @@ namespace VstsSyncMigrator.Engine
                             currentRevisionWorkItem.Revisions[revision.Index].Fields["System.History"].Value;
 						Debug.WriteLine("Discussion:" + currentRevisionWorkItem.Revisions[revision.Index].Fields["System.History"].Value);
 
+
                         var fails = newwit.Validate();
 
                         foreach (Field f in fails)
@@ -241,7 +242,7 @@ namespace VstsSyncMigrator.Engine
                     newwit.Close();
                     Trace.WriteLine($"...Saved as {newwit.Id}", Name);
 
-                    if (_config.UpdateSoureReflectedId && sourceWorkItem.Fields.Contains(me.SourceReflectedWorkItemIdFieldName))
+                    if (_config.UpdateSourceReflectedId && sourceWorkItem.Fields.Contains(me.SourceReflectedWorkItemIdFieldName))
                     {
                         sourceWorkItem.Fields[me.SourceReflectedWorkItemIdFieldName].Value =
                             targetStore.CreateReflectedWorkItemId(newwit);
