@@ -69,30 +69,72 @@ namespace VstsSyncMigrator.Engine
         public override string Name => "WorkItemRevisionReplayMigrationContext";
 
         internal override void InternalExecute()
-        {
+		{
 			var stopwatch = Stopwatch.StartNew();
-            //////////////////////////////////////////////////
-            var sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.BypassRules);
-            var tfsqc = new TfsQueryContext(sourceStore);
-            tfsqc.AddParameter("TeamProject", me.Source.Name);
-            tfsqc.Query =
-                string.Format(
-                    @"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY [System.ChangedDate] desc",
-                    _config.QueryBit);
-            var sourceWorkItems = tfsqc.Execute();
-            Trace.WriteLine($"Replay all revisions of {sourceWorkItems.Count} work items?", Name);
+			//////////////////////////////////////////////////
+			var sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.BypassRules);
+			var tfsqc = new TfsQueryContext(sourceStore);
+			tfsqc.AddParameter("TeamProject", me.Source.Name);
+			tfsqc.Query =
+				string.Format(
+					@"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY [System.ChangedDate] desc",
+					_config.QueryBit);
+			var sourceWorkItems = tfsqc.Execute();
+			Trace.WriteLine($"Replay all revisions of {sourceWorkItems.Count} work items?", Name);
 
-            //////////////////////////////////////////////////
-            var targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
-            var destProject = targetStore.GetProject();
-            Trace.WriteLine($"Found target project as {destProject.Name}", Name);
+			//////////////////////////////////////////////////
+			var targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
+			var destProject = targetStore.GetProject();
+			Trace.WriteLine($"Found target project as {destProject.Name}", Name);
 
-            var current = sourceWorkItems.Count;
-            var count = 0;
-            long elapsedms = 0;
+			var current = sourceWorkItems.Count;
+			var count = 0;
+			long elapsedms = 0;
 
-			//Validation - make sure that the ReflectedWorkItemId field name specified in the config exists in the target process, preferably on each work item type.
-			var fields = witClient.GetFieldsAsync().Result;
+			//Validation: make sure that the ReflectedWorkItemId field name specified in the config exists in the target process, preferably on each work item type.
+			ConfigValidation();
+
+			foreach (WorkItem sourceWorkItem in sourceWorkItems)
+			{
+				var witstopwatch = Stopwatch.StartNew();
+				var targetFound = targetStore.FindReflectedWorkItem(sourceWorkItem, me.ReflectedWorkItemIdFieldName, false);
+				Trace.WriteLine($"{current} - Migrating: {sourceWorkItem.Id} - {sourceWorkItem.Type.Name}", Name);
+
+				if (targetFound == null)
+				{
+					ReplayRevisions(sourceWorkItem, destProject, sourceStore, current, targetStore);
+				}
+				else
+				{
+					Console.WriteLine("...Exists");
+				}
+
+				sourceWorkItem.Close();
+				witstopwatch.Stop();
+				elapsedms += witstopwatch.ElapsedMilliseconds;
+				current--;
+				count++;
+				var average = new TimeSpan(0, 0, 0, 0, (int)(elapsedms / count));
+				var remaining = new TimeSpan(0, 0, 0, 0, (int)(average.TotalMilliseconds * current));
+				Trace.WriteLine(
+					string.Format("Average time of {0} per work item and {1} estimated to completion",
+						string.Format(@"{0:s\:fff} seconds", average),
+						string.Format(@"{0:%h} hours {0:%m} minutes {0:s\:fff} seconds", remaining)), Name);
+				Trace.Flush();
+			}
+			//////////////////////////////////////////////////
+			stopwatch.Stop();
+
+			Console.WriteLine(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds", stopwatch.Elapsed);
+		}
+
+		/// <summary>
+		/// Validate the current configuration of the both the migrator and the target project
+		/// </summary>
+		private void ConfigValidation()
+		{
+			//Make sure that the ReflectedWorkItemId field name specified in the config exists in the target process, preferably on each work item type
+			var fields = witClient.GetFieldsAsync(me.Target.Name).Result;
 			bool rwiidFieldExists = fields.Any(x => x.ReferenceName == me.ReflectedWorkItemIdFieldName || x.Name == me.ReflectedWorkItemIdFieldName);
 			Trace.WriteLine($"Found {fields.Count.ToString("n0")} work item fields.");
 			if (rwiidFieldExists)
@@ -102,47 +144,12 @@ namespace VstsSyncMigrator.Engine
 				Trace.WriteLine($"Config file specifies '{me.ReflectedWorkItemIdFieldName}', which wasn't found.");
 				Trace.WriteLine("Instead, found:");
 				foreach (var field in fields.OrderBy(x => x.Name))
-					Trace.WriteLine($"{field.Type.ToString().PadLeft(15)} - {field.Name.PadRight(20)} {field.Description??""}");
+					Trace.WriteLine($"{field.Type.ToString().PadLeft(15)} - {field.Name.PadRight(20)} {field.Description ?? ""}");
 				throw new Exception("Running a replay migration requires a ReflectedWorkItemId field to be defined in the target project's process.");
 			}
-			
+		}
 
-
-            foreach (WorkItem sourceWorkItem in sourceWorkItems)
-            {
-                var witstopwatch = Stopwatch.StartNew();
-                var targetFound = targetStore.FindReflectedWorkItem(sourceWorkItem, me.ReflectedWorkItemIdFieldName, false);
-                Trace.WriteLine($"{current} - Migrating: {sourceWorkItem.Id} - {sourceWorkItem.Type.Name}", Name);
-
-                if (targetFound == null)
-                {
-                    ReplayRevisions(sourceWorkItem, destProject, sourceStore, current, targetStore);
-                }
-                else
-                {
-                    Console.WriteLine("...Exists");
-                }
-
-                sourceWorkItem.Close();
-                witstopwatch.Stop();
-                elapsedms += witstopwatch.ElapsedMilliseconds;
-                current--;
-                count++;
-                var average = new TimeSpan(0, 0, 0, 0, (int) (elapsedms / count));
-                var remaining = new TimeSpan(0, 0, 0, 0, (int) (average.TotalMilliseconds * current));
-                Trace.WriteLine(
-                    string.Format("Average time of {0} per work item and {1} estimated to completion",
-                        string.Format(@"{0:s\:fff} seconds", average),
-                        string.Format(@"{0:%h} hours {0:%m} minutes {0:s\:fff} seconds", remaining)), Name);
-                Trace.Flush();
-            }
-            //////////////////////////////////////////////////
-            stopwatch.Stop();
-
-            Console.WriteLine(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds", stopwatch.Elapsed);
-        }
-
-        private void ReplayRevisions(WorkItem sourceWorkItem, Project destProject, WorkItemStoreContext sourceStore,
+		private void ReplayRevisions(WorkItem sourceWorkItem, Project destProject, WorkItemStoreContext sourceStore,
             int current,
             WorkItemStoreContext targetStore)
         {
