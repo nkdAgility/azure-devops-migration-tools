@@ -45,7 +45,7 @@ namespace VstsSyncMigrator.Engine
             }
            
             foundWis = new Dictionary<int, WorkItem>();
-        }
+		}
 
         public Project GetProject()
         {
@@ -174,8 +174,6 @@ namespace VstsSyncMigrator.Engine
         {
             return Store.GetWorkItem(workItem.Id, revision);
         }
-
-
 
     }
 }

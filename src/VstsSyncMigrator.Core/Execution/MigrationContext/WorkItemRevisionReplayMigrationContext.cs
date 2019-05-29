@@ -91,6 +91,22 @@ namespace VstsSyncMigrator.Engine
             var count = 0;
             long elapsedms = 0;
 
+			//Validation - make sure that the ReflectedWorkItemId field name specified in the config exists in the target process, preferably on each work item type.
+			var fields = witClient.GetFieldsAsync().Result;
+			bool rwiidFieldExists = fields.Any(x => x.ReferenceName == me.ReflectedWorkItemIdFieldName || x.Name == me.ReflectedWorkItemIdFieldName);
+			Trace.WriteLine($"Found {fields.Count.ToString("n0")} work item fields.");
+			if (rwiidFieldExists)
+				Trace.WriteLine($"Found '{me.ReflectedWorkItemIdFieldName}' in this project, proceeding.");
+			else
+			{
+				Trace.WriteLine($"Config file specifies '{me.ReflectedWorkItemIdFieldName}', which wasn't found.");
+				Trace.WriteLine("Instead, found:");
+				foreach (var field in fields.OrderBy(x => x.Name))
+					Trace.WriteLine($"{field.Type.ToString().PadLeft(15)} - {field.Name.PadRight(20)} {field.Description??""}");
+			}
+			
+
+
             foreach (WorkItem sourceWorkItem in sourceWorkItems)
             {
                 var witstopwatch = Stopwatch.StartNew();
