@@ -103,6 +103,7 @@ namespace VstsSyncMigrator.Engine
 				Trace.WriteLine("Instead, found:");
 				foreach (var field in fields.OrderBy(x => x.Name))
 					Trace.WriteLine($"{field.Type.ToString().PadLeft(15)} - {field.Name.PadRight(20)} {field.Description??""}");
+				throw new Exception("Running a replay migration requires a ReflectedWorkItemId field to be defined in the target project's process.");
 			}
 			
 
@@ -190,7 +191,7 @@ namespace VstsSyncMigrator.Engine
 						//If the work item already exists and its type has changed, update its type. Done this way because there doesn't appear to be a way to do this through the store.
 						else if (newwit.Type.Name != destType)
 						{
-							Debug.WriteLine($"TYPE CHANGE: {newwit.Type.Name} to {destType}");
+							Debug.WriteLine($"Work Item type change! '{newwit.Title}': From {newwit.Type.Name} to {destType}");
 							var typePatch = new JsonPatchOperation()
 							{
 								Operation = Microsoft.VisualStudio.Services.WebApi.Patch.Operation.Add,
