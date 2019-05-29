@@ -74,7 +74,7 @@ Once you have created the `ReflectedWorkItemId` field and confirmed you have the
 			"PrefixProjectToNodes": true,
 			"UpdateCreatedDate": true,
 			"UpdateCreatedBy": true,
-			"UpdateSoureReflectedId": true,
+			"UpdateSourceReflectedId": true,
 			"QueryBit": "AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')"
       },
       

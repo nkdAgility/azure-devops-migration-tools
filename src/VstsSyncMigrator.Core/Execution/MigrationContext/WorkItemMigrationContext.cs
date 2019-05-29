@@ -142,7 +142,7 @@ namespace VstsSyncMigrator.Engine
 
                             if (me.SourceReflectedWorkItemIdFieldName != null)
                             {
-                                if (sourceWI.Fields.Contains(me.SourceReflectedWorkItemIdFieldName) && _config.UpdateSoureReflectedId)
+                                if (sourceWI.Fields.Contains(me.SourceReflectedWorkItemIdFieldName) && _config.UpdateSourceReflectedId)
                                 {
                                     sourceWI.Fields[me.SourceReflectedWorkItemIdFieldName].Value = targetStore.CreateReflectedWorkItemId(newwit);
                                 }
