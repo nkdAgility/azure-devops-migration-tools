@@ -100,7 +100,7 @@ namespace VstsSyncMigrator.Engine
             }
             if (found != null && cache) 
             {
-                foundWis.Add(workItemToFind.Id, found); /// TODO MENORY LEEK! LEAK
+                foundWis.Add(workItemToFind.Id, found); /// TODO MEMORY LEAK
             }
             return found;
         }
