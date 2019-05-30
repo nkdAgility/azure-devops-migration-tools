@@ -297,8 +297,8 @@
   <Import Project="..\..\packages\Microsoft.Azure.Services.AppAuthentication.1.0.3\build\Microsoft.Azure.Services.AppAuthentication.targets" Condition="Exists('..\..\packages\Microsoft.Azure.Services.AppAuthentication.1.0.3\build\Microsoft.Azure.Services.AppAuthentication.targets')" />
   <Import Project="..\..\packages\Microsoft.TeamFoundationServer.ExtendedClient.15.131.1\build\Microsoft.TeamFoundationServer.ExtendedClient.targets" Condition="Exists('..\..\packages\Microsoft.TeamFoundationServer.ExtendedClient.15.131.1\build\Microsoft.TeamFoundationServer.ExtendedClient.targets')" />
   <PropertyGroup>
-    <PostBuildEvent>move /Y *.xml lib/
-move /Y *.dll lib/</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
