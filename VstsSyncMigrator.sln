@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.25909.2
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29006.145
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VstsSyncMigrator.Console", "src\VstsSyncMigrator.Console\VstsSyncMigrator.Console.csproj", "{033EB332-4A50-4C73-9B7D-A35D9F3C0513}"
 EndProject
@@ -22,7 +22,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{4D45
 	ProjectSection(SolutionItems) = preProject
 		src\VstsSyncMigrator.Samples\demo-mapping-scrum2Agile.json = src\VstsSyncMigrator.Samples\demo-mapping-scrum2Agile.json
 		src\VstsSyncMigrator.Samples\demo-migration-reset.json = src\VstsSyncMigrator.Samples\demo-migration-reset.json
-		src\VstsSyncMigrator.Samples\demo-migration.json = src\VstsSyncMigrator.Samples\demo-migration.json
+		src\VstsSyncMigrator.Samples\demo-migration.json = src\VstsSyncMigrator.Samples\demo-migration.json		
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extension", "Extension", "{243265E4-0E5A-4E95-BE7C-B92B7666FF79}"
