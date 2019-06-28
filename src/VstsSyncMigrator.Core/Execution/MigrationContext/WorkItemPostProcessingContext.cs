@@ -59,17 +59,17 @@ namespace VstsSyncMigrator.Engine
 
             //Builds the constraint part of the query
             string constraints = BuildQueryBitConstraints();
-            
-            tfsqc.Query = string.Format(@"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY [System.Id] ", constraints); 
-            
+
+            tfsqc.Query = string.Format(@"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY [System.Id] ", constraints);
+
             WorkItemCollection sourceWIS = tfsqc.Execute();
             Trace.WriteLine(string.Format("Migrate {0} work items?", sourceWIS.Count));
             //////////////////////////////////////////////////
             WorkItemStoreContext targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
             Project destProject = targetStore.GetProject();
             Trace.WriteLine(string.Format("Found target project as {0}", destProject.Name));
-           
-           
+
+
             int current = sourceWIS.Count;
             int count = 0;
             long elapsedms = 0;
@@ -92,9 +92,9 @@ namespace VstsSyncMigrator.Engine
                     if (targetFound.IsDirty)
                     {
                         try
-                    {
-                        targetFound.Save();
-                        Trace.WriteLine(string.Format("          Updated"));
+                        {
+                            targetFound.Save();
+                            Trace.WriteLine(string.Format("          Updated"));
                         }
                         catch (ValidationException ve)
                         {
@@ -130,11 +130,11 @@ namespace VstsSyncMigrator.Engine
             {
                 if (_config.WorkItemIDs.Count == 1)
                 {
-                    constraints += string.Format (" AND [System.Id] = {0} ", _config.WorkItemIDs[0]);
+                    constraints += string.Format(" AND [System.Id] = {0} ", _config.WorkItemIDs[0]);
                 }
                 else
                 {
-                    constraints += string.Format (" AND [System.Id] IN ({0}) ", string.Join (",", _config.WorkItemIDs));
+                    constraints += string.Format(" AND [System.Id] IN ({0}) ", string.Join(",", _config.WorkItemIDs));
                 }
             }
 
@@ -142,16 +142,16 @@ namespace VstsSyncMigrator.Engine
             {
                 if (_me.WorkItemTypeDefinitions.Count == 1)
                 {
-                    constraints += string.Format (" AND [System.WorkItemType] = '{0}' ", _me.WorkItemTypeDefinitions.Keys.First());
+                    constraints += string.Format(" AND [System.WorkItemType] = '{0}' ", _me.WorkItemTypeDefinitions.Keys.First());
                 }
                 else
                 {
-                    constraints += string.Format (" AND [System.WorkItemType] IN ('{0}') ", string.Join ("','", _me.WorkItemTypeDefinitions.Keys));
+                    constraints += string.Format(" AND [System.WorkItemType] IN ('{0}') ", string.Join("','", _me.WorkItemTypeDefinitions.Keys));
                 }
             }
 
-            
-            if (!String.IsNullOrEmpty (_config.QueryBit))
+
+            if (!String.IsNullOrEmpty(_config.QueryBit))
             {
                 constraints += _config.QueryBit;
             }
