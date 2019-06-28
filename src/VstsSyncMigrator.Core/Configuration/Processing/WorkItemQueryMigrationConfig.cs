@@ -24,11 +24,10 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
             set { sharedFolderName = value; }
         }
 
-        /// <summary>
-        ///     Is this processor enabled
-        /// </summary>
+        /// <inheritdoc />
         public bool Enabled { get; set; }
 
+        /// <inheritdoc />
         public Type Processor
         {
             get { return typeof(WorkItemQueryMigrationContext); }
