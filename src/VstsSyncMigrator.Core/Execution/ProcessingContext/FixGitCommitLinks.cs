@@ -31,10 +31,9 @@ namespace VstsSyncMigrator.Engine
 
         internal override void InternalExecute()
         {
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
-            //////////////////////////////////////////////////
-            var sourceGitRepoService = me.Source.Collection.GetService<GitRepositoryService>();
+            Stopwatch stopwatch = Stopwatch.StartNew();
+			//////////////////////////////////////////////////
+			var sourceGitRepoService = me.Source.Collection.GetService<GitRepositoryService>();
             var sourceGitRepos = sourceGitRepoService.QueryRepositories(me.Source.Name);
             //////////////////////////////////////////////////
             var targetGitRepoService = me.Target.Collection.GetService<GitRepositoryService>();
@@ -53,9 +52,8 @@ namespace VstsSyncMigrator.Engine
             int noteFound = 0;
             foreach (WorkItem workitem in workitems)
             {
-                Stopwatch witstopwatch = new Stopwatch();
-                witstopwatch.Start();
-                workitem.Open();
+                Stopwatch witstopwatch = Stopwatch.StartNew();
+				workitem.Open();
                 List<ExternalLink> newEL = new List<ExternalLink>();
                 List<ExternalLink> removeEL = new List<ExternalLink>();
                 Trace.WriteLine(string.Format("WI: {0}?", workitem.Id));

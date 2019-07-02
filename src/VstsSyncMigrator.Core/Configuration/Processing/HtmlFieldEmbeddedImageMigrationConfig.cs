@@ -5,11 +5,13 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
 {
     public class HtmlFieldEmbeddedImageMigrationConfig : ITfsProcessingConfig
     {
+        /// <inheritdoc />
         public bool Enabled { get; set; }
         public string QueryBit { get; set; }
 
         public bool FromAnyCollection { get; set; }
 
+        /// <inheritdoc />
         public Type Processor => typeof(HtmlFieldEmbeddedImageMigrationContext);
 
         /// <summary>

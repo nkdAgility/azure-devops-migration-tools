@@ -35,9 +35,8 @@ namespace VstsSyncMigrator.Engine
         {
             Telemetry.Current.TrackPageView(this.Name);
             Trace.TraceInformation(string.Format("ProcessingContext Start {0} ", Name));
-            Stopwatch executeTimer = new Stopwatch();
-            executeTimer.Start();
-            DateTime start = DateTime.Now;
+            Stopwatch executeTimer = Stopwatch.StartNew();
+			DateTime start = DateTime.Now;
             //////////////////////////////////////////////////
             try
             {

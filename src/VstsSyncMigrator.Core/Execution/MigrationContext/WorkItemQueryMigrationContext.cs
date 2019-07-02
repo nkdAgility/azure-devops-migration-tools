@@ -59,10 +59,9 @@ namespace VstsSyncMigrator.Engine
 
         internal override void InternalExecute()
         {
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
-            //////////////////////////////////////////////////
-            var sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.None);
+            Stopwatch stopwatch = Stopwatch.StartNew();
+			//////////////////////////////////////////////////
+			var sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.None);
             var targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.None);
 
             var sourceQueryHierarchy = sourceStore.Store.Projects[me.Source.Name].QueryHierarchy;
