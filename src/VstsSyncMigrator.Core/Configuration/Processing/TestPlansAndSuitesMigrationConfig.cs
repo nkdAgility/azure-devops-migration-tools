@@ -8,6 +8,7 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
         public bool PrefixProjectToNodes { get; set; }
         public bool Enabled { get; set; }
         public string OnlyElementsWithTag { get; set; }
+        public string TestPlanQueryBit { get; set; }
 
         public Type Processor
         {

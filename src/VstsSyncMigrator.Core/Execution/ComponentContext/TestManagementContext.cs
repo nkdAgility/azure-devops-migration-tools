@@ -1,40 +1,44 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.TeamFoundation.TestManagement.Client;
+﻿using System.Collections.Generic;
 using System.Linq;
+using Microsoft.TeamFoundation.TestManagement.Client;
 
 namespace VstsSyncMigrator.Engine.ComponentContext
 {
     public class TestManagementContext
     {
-        private ITeamProjectContext source;
+        private readonly string testPlanQueryBit;
+        private readonly ITeamProjectContext source;
         private ITestManagementService tms;
-        private ITestManagementTeamProject project;
 
-        internal ITestManagementTeamProject Project { get { return project; } }
-  
+        internal ITestManagementTeamProject Project { get; }
 
-        public TestManagementContext(ITeamProjectContext source)
+        public TestManagementContext(ITeamProjectContext source) : this(source, null) { }
+
+        public TestManagementContext(ITeamProjectContext source, string testPlanQueryBit)
         {
+            this.testPlanQueryBit = testPlanQueryBit;
             this.source = source;
             tms = (ITestManagementService)source.Collection.GetService(typeof(ITestManagementService));
-            project = tms.GetTeamProject(source.Name);
+            Project = tms.GetTeamProject(source.Name);
         }
 
         internal ITestPlanCollection GetTestPlans()
         {
-            return project.TestPlans.Query("Select * From TestPlan");
-            
+            var query = (string.IsNullOrWhiteSpace(testPlanQueryBit))
+                ? "Select * From TestPlan"
+                : $"Select * From TestPlan Where {testPlanQueryBit}";
+
+            return Project.TestPlans.Query(query);
         }
 
         internal List<ITestRun> GetTestRuns()
         {
-            return project.TestRuns.Query("Select * From TestRun").ToList();
+            return Project.TestRuns.Query("Select * From TestRun").ToList();
         }
 
         internal ITestPlan CreateTestPlan()
         {
-            return project.TestPlans.Create();
+            return Project.TestPlans.Create();
         }
     }
 }
