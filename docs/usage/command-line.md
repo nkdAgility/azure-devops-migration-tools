@@ -172,6 +172,7 @@ Note that:
 			"FromAnyCollection": false,
 			"AlternateCredentialsUsername": null,
 			"AlternateCredentialsPassword": null,
+			"UseDefaultCredentials": false,
 			"Ignore404Errors": true,
 			"DeleteTemporaryImageFiles": true
 		}
