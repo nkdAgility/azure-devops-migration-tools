@@ -23,8 +23,7 @@ namespace VstsSyncMigrator.Commands
             Telemetry.Current.TrackEvent("Run-ExportADGroupsCommand");
             string exportPath = CreateExportPath(logPath, "ExportADGroups");
             Trace.Listeners.Add(new TextWriterTraceListener(Path.Combine(exportPath, "ExportADGroups.log"), "ExportADGroupsCommand"));
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
+			Stopwatch stopwatch = Stopwatch.StartNew();
             //////////////////////////////////////////////////
 
             StreamWriter sw = File.CreateText(Path.Combine(exportPath, "AzureADGroups.csv"));

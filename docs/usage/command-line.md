@@ -98,7 +98,7 @@ Note that:
 			"PrefixProjectToNodes": true,
 			"UpdateCreatedDate": true,
 			"UpdateCreatedBy": true,
-			"UpdateSoureReflectedId": true,
+			"UpdateSourceReflectedId": true,
 			"QueryBit": "AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')"
 		},{		
 			"ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.WorkItemRevisionReplayMigrationConfig",
@@ -106,7 +106,7 @@ Note that:
 			"PrefixProjectToNodes": false,
 			"UpdateCreatedDate": true,
 			"UpdateCreatedBy": true,
-			"UpdateSoureReflectedId": false,
+			"UpdateSourceReflectedId": false,
 			"QueryBit": "AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND [System.Tags] Contains 'Xyz'"
 	    },{
 			"ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.WorkItemUpdateConfig",

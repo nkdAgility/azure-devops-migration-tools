@@ -31,10 +31,9 @@ namespace VstsSyncMigrator.Engine
 
         internal override void InternalExecute()
         {
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
-            //////////////////////////////////////////////////
-            WorkItemStoreContext targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
+            Stopwatch stopwatch = Stopwatch.StartNew();
+			//////////////////////////////////////////////////
+			WorkItemStoreContext targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
 
             TfsQueryContext tfsqc = new TfsQueryContext(targetStore);
             tfsqc.AddParameter("TeamProject", me.Target.Name);
@@ -48,10 +47,9 @@ namespace VstsSyncMigrator.Engine
             long elapsedms = 0;
             foreach (WorkItem workitem in workitems)
             {
-                Stopwatch witstopwatch = new Stopwatch();
-                witstopwatch.Start();
-               
-                Trace.WriteLine(string.Format("{0} - Updating: {1}-{2}", current, workitem.Id, workitem.Type.Name));
+                Stopwatch witstopwatch = Stopwatch.StartNew();
+
+				Trace.WriteLine(string.Format("{0} - Updating: {1}-{2}", current, workitem.Id, workitem.Type.Name));
                 string areaPath = workitem.AreaPath;
                 List<string> bits = new List<string>(areaPath.Split(char.Parse(@"\"))).Skip(4).ToList();
                 List<string> tags = workitem.Tags.Split(char.Parse(@";")).ToList();

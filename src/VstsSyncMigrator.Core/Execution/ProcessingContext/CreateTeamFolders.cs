@@ -31,10 +31,9 @@ namespace VstsSyncMigrator.Engine
 
         internal override void InternalExecute()
         {
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
-            //////////////////////////////////////////////////
-            WorkItemStoreContext targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
+            Stopwatch stopwatch = Stopwatch.StartNew();
+			//////////////////////////////////////////////////
+			WorkItemStoreContext targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
 
             TfsQueryContext tfsqc = new TfsQueryContext(targetStore);
 
@@ -49,10 +48,9 @@ namespace VstsSyncMigrator.Engine
             long elapsedms = 0;
             foreach (TeamFoundationTeam team in teamList)
             {
-                Stopwatch witstopwatch = new Stopwatch();
-                witstopwatch.Start();
+                Stopwatch witstopwatch = Stopwatch.StartNew();
 
-                Trace.Write(string.Format("Processing team {0}", team.Name));
+				Trace.Write(string.Format("Processing team {0}", team.Name));
                 Regex r = new Regex(@"^Project - ([a-zA-Z ]*)");
                 string path;
                 if (r.IsMatch(team.Name))
