@@ -9,8 +9,10 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
         public string Username { get; set; }
         public string Password { get; set; }
         public string PictureEmpIDFormat { get; set; }
+        /// <inheritdoc />
         public bool Enabled { get; set; }
 
+        /// <inheritdoc />
         public Type Processor
         {
             get { return typeof(ExportProfilePictureFromADContext); }

@@ -24,7 +24,7 @@ namespace VstsSyncMigrator.Engine.Configuration
         public static EngineConfiguration GetDefault()
         {
             EngineConfiguration ec = new EngineConfiguration();
-            ec.TelemetryEnableTrace = true;
+            ec.TelemetryEnableTrace = false;
             ec.Source = new TeamProjectConfig() { Name = "DemoProjs", Collection = new Uri("https://sdd2016.visualstudio.com/") };
             ec.Target = new TeamProjectConfig() { Name = "DemoProjt", Collection = new Uri("https://sdd2016.visualstudio.com/") };
             ec.ReflectedWorkItemIDFieldName = "TfsMigrationTool.ReflectedWorkItemId";
@@ -109,8 +109,8 @@ namespace VstsSyncMigrator.Engine.Configuration
                     { "Product Backlog Item", "Product Backlog Item" }
             };
             ec.Processors = new List<ITfsProcessingConfig>();
-            ec.Processors.Add(new WorkItemMigrationConfig() { Enabled = false, UpdateCreatedBy=true, PrefixProjectToNodes = true, UpdateCreatedDate=true, UpdateSoureReflectedId=true, QueryBit = @"AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')" });
-            ec.Processors.Add(new WorkItemRevisionReplayMigrationConfig() { Enabled = false, PrefixProjectToNodes = true, UpdateSoureReflectedId=true, QueryBit = @"AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')" });
+            ec.Processors.Add(new WorkItemMigrationConfig() { Enabled = false, UpdateCreatedBy=true, PrefixProjectToNodes = true, UpdateCreatedDate=true, UpdateSourceReflectedId=true, QueryBit = @"AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')" });
+            ec.Processors.Add(new WorkItemRevisionReplayMigrationConfig() { Enabled = false, PrefixProjectToNodes = true, UpdateSourceReflectedId=true, QueryBit = @"AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')" });
             ec.Processors.Add(new WorkItemUpdateConfig() { Enabled = false, QueryBit = @"AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')" });
             ec.Processors.Add(new NodeStructuresMigrationConfig() { Enabled = false, BasePaths = new [] { "Product\\Area\\Path1", "Product\\Area\\Path2" } });
             ec.Processors.Add(new LinkMigrationConfig() { Enabled = false, QueryBit= @"AND ([System.ExternalLinkCount] > 0 OR [System.RelatedLinkCount] > 0)" });

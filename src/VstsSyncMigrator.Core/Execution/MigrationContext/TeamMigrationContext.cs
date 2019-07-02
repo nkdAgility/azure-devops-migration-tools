@@ -35,10 +35,9 @@ namespace VstsSyncMigrator.Engine
 
         internal override void InternalExecute()
         {
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
-            //////////////////////////////////////////////////
-            WorkItemStoreContext sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.BypassRules);
+            Stopwatch stopwatch = Stopwatch.StartNew();
+			//////////////////////////////////////////////////
+			WorkItemStoreContext sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.BypassRules);
             TfsTeamService sourceTS = me.Source.Collection.GetService<TfsTeamService>();
             List<TeamFoundationTeam> sourceTL = sourceTS.QueryTeams(me.Source.Name).ToList();
             Trace.WriteLine(string.Format("Found {0} teams in Source?", sourceTL.Count));
@@ -60,9 +59,8 @@ namespace VstsSyncMigrator.Engine
             /// 
             foreach (TeamFoundationTeam sourceTeam in sourceTL)
             {
-                Stopwatch witstopwatch = new Stopwatch();
-                witstopwatch.Start();
-                var foundTargetTeam = (from x in targetTL where x.Name == sourceTeam.Name select x).SingleOrDefault();
+                Stopwatch witstopwatch = Stopwatch.StartNew();
+				var foundTargetTeam = (from x in targetTL where x.Name == sourceTeam.Name select x).SingleOrDefault();
                 if (foundTargetTeam == null)
                 {
                     Trace.WriteLine(string.Format("Processing team {0}", sourceTeam.Name));

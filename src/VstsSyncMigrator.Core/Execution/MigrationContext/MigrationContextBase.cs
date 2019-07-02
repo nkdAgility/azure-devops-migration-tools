@@ -25,9 +25,8 @@ namespace VstsSyncMigrator.Engine
         {
             Telemetry.Current.TrackPageView(this.Name);
             Trace.TraceInformation(" Migration Context Start {0} ", Name);
-            var executeTimer = new Stopwatch();
             DateTime start = DateTime.Now;
-            executeTimer.Start();
+			var executeTimer = Stopwatch.StartNew();
             //////////////////////////////////////////////////
             try
             {

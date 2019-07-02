@@ -22,15 +22,15 @@ namespace VstsSyncMigrator.Engine
         public static TelemetryClient Current { get {
                 if (telemetryClient == null)
                 {
-                    InitiliseTelemetry();
+                    InitializeTelemetry();
                 }
                 return telemetryClient;
                 // No change
             } }
 
-        public static void InitiliseTelemetry()
+        public static void InitializeTelemetry()
         {
-            if (enableTrace) { Trace.Listeners.Add(new ApplicationInsightsTraceListener(applicationInsightsKey)); }
+            //if (enableTrace) { Trace.Listeners.Add(new ApplicationInsightsTraceListener(applicationInsightsKey)); }
             TelemetryConfiguration.Active.InstrumentationKey = applicationInsightsKey;
             telemetryClient = new TelemetryClient();
             telemetryClient.InstrumentationKey = applicationInsightsKey;

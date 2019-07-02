@@ -9,6 +9,9 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
 {
     public interface ITfsProcessingConfig
     {
+        /// <summary>
+        /// Active the processor if it true. 
+        /// </summary>
         bool Enabled { get; set; }
         [JsonIgnoreAttribute]
         Type Processor { get; }

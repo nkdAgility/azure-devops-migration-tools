@@ -5,13 +5,13 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
 {
     public class HtmlFieldEmbeddedImageMigrationConfig : ITfsProcessingConfig
     {
-        public string Status => "Experimental";
-
+        /// <inheritdoc />
         public bool Enabled { get; set; }
         public string QueryBit { get; set; }
 
         public bool FromAnyCollection { get; set; }
 
+        /// <inheritdoc />
         public Type Processor => typeof(HtmlFieldEmbeddedImageMigrationContext);
 
         /// <summary>
@@ -23,6 +23,11 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
         /// Password used for VSTS basic authentication using alternate credentials. Leave empty for default credentials 
         /// </summary>
         public string AlternateCredentialsPassword { get; set; }
+
+        /// <summary>
+        /// Use default credential for downloading embedded images in source project 
+        /// </summary>
+        public bool UseDefaultCredentials { get; set; }
 
         /// <summary>
         /// Ignore 404 errors and continue on images that don't exist anymore
