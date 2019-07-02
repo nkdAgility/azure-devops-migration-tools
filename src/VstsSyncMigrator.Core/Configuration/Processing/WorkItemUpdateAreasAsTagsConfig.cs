@@ -6,8 +6,10 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
     public class WorkItemUpdateAreasAsTagsConfig : ITfsProcessingConfig
     {
         public string AreaIterationPath { get; set; }
+        /// <inheritdoc />
         public bool Enabled { get; set; }
 
+        /// <inheritdoc />
         public Type Processor
         {
             get { return typeof(WorkItemUpdateAreasAsTagsContext); }

@@ -5,8 +5,10 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
 {
     public class TestVariablesMigrationConfig : ITfsProcessingConfig
     {
+        /// <inheritdoc />
         public bool Enabled { get; set; }
 
+        /// <inheritdoc />
         public Type Processor
         {
             get { return typeof(TestVeriablesMigrationContext); }
