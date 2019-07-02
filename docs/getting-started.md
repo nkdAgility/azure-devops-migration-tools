@@ -55,7 +55,7 @@ You can now customise the configuration depending on what you need to do. Howeve
       "PrefixProjectToNodes": true,
       "UpdateCreatedDate": true,
       "UpdateCreatedBy": true,
-      "UpdateSoureReflectedId": true,
+      "UpdateSourceReflectedId": true,
       "QueryBit": "AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Product Backlog Item', 'Task', 'Feature', 'Epic', 'Bug')"
     },
     {

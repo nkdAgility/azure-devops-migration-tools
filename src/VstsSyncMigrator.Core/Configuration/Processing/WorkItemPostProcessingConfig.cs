@@ -7,8 +7,9 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
     {
         public string QueryBit { get; set; }
         public IList<int> WorkItemIDs { get; set; }
+        /// <inheritdoc />
         public bool Enabled { get; set; }
-
+        /// <inheritdoc />
         public Type Processor
         {
             get { return typeof(WorkItemPostProcessingContext); }

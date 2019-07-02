@@ -57,7 +57,7 @@ namespace VstsSyncMigrator.Engine
             foreach (string key in config.WorkItemTypeDefinition.Keys)
             {
                 Trace.WriteLine(string.Format("Adding Work Item Type {0}", key), "MigrationEngine");
-                this.AddWorkItemTypeDefinition(key, new DescreteWitdMapper(config.WorkItemTypeDefinition[key]));
+                this.AddWorkItemTypeDefinition(key, new DiscreteWitMapper(config.WorkItemTypeDefinition[key]));
             }
             var enabledProcessors = config.Processors.Where(x => x.Enabled).ToList();
             foreach (ITfsProcessingConfig processorConfig in enabledProcessors)
@@ -124,15 +124,13 @@ namespace VstsSyncMigrator.Engine
                     { "Actions",  processorActions.Count},
                     { "Mappings", fieldMapps.Count }
                 });
-            Stopwatch engineTimer = new Stopwatch();
-            engineTimer.Start();
-            ProcessingStatus ps = ProcessingStatus.Complete;
+            Stopwatch engineTimer = Stopwatch.StartNew();
+			ProcessingStatus ps = ProcessingStatus.Complete;
             Trace.WriteLine(string.Format("Beginning run of {0} processors", processors.Count.ToString()), "MigrationEngine");
             foreach (ITfsProcessingContext process in processors)
             {
-                Stopwatch processorTimer = new Stopwatch();
-                processorTimer.Start();
-                process.Execute();
+                Stopwatch processorTimer = Stopwatch.StartNew();
+				process.Execute();
                 processorTimer.Stop();
                 Telemetry.Current.TrackEvent("ProcessorComplete", new Dictionary<string, string> { { "Processor", process.Name }, { "Status", process.Status.ToString() } }, new Dictionary<string, double> { { "ProcessingTime", processorTimer.ElapsedMilliseconds } });
                 if (process.Status == ProcessingStatus.Failed)

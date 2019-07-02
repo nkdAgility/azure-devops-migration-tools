@@ -51,13 +51,15 @@ namespace VstsSyncMigrator.ConsoleApp
             mainTimer.Start();
             Telemetry.Current.TrackEvent("ApplicationStart");
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;            
-            /////////////////////////////////////////////////
+            //////////////////////////////////////////////////
             string logsPath = CreateLogsPath();
             //////////////////////////////////////////////////
             Trace.Listeners.Add(new TextWriterTraceListener(Console.Out));
-            Trace.Listeners.Add(new TextWriterTraceListener(Path.Combine(logsPath, "migration.log"), "myListener"));
+			var logPath = Path.Combine(logsPath, "migration.log");
+			Trace.Listeners.Add(new TextWriterTraceListener(logPath, "myListener"));
+			Console.WriteLine("Writing log to " + logPath);
             //////////////////////////////////////////////////
-            ///
+            
             
             Trace.WriteLine(System.Reflection.Assembly.GetExecutingAssembly().GetName().Name, "[Info]");
             Version thisVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
@@ -85,8 +87,8 @@ namespace VstsSyncMigrator.ConsoleApp
                 }
             }
             
-            Trace.WriteLine(string.Format("Telemitery Enabled: {0}", Telemetry.Current.IsEnabled().ToString()), "[Info]");
-            Trace.WriteLine("Telemitery Note: We use Application Insights to collect telemitery on perfomance & feature usage for the tools to help our developers target features. This data us tied to a session ID that is generated and shown in the logs. This can help with debugging.");
+            Trace.WriteLine(string.Format("Telemetry Enabled: {0}", Telemetry.Current.IsEnabled().ToString()), "[Info]");
+            Trace.WriteLine("Telemetry Note: We use Application Insights to collect telemetry on performance & feature usage for the tools to help our developers target features. This data is tied to a session ID that is generated and shown in the logs. This can help with debugging.");
             Trace.WriteLine(string.Format("SessionID: {0}", Telemetry.Current.Context.Session.Id), "[Info]");
             Trace.WriteLine(string.Format("User: {0}", Telemetry.Current.Context.User.Id), "[Info]");
             Trace.WriteLine(string.Format("Start Time: {0}", startTime.ToUniversalTime().ToLocalTime()), "[Info]");
@@ -139,7 +141,7 @@ namespace VstsSyncMigrator.ConsoleApp
 
             if (!File.Exists(opts.ConfigFile))
             {
-                Trace.WriteLine("The config file does not exist, nor doe the default 'configuration.json'. Use 'init' to create a configuration file first", "[Error]");
+                Trace.WriteLine("The config file does not exist, nor does the default 'configuration.json'. Use 'init' to create a configuration file first", "[Error]");
                 return 1;
             }
             else
@@ -179,8 +181,7 @@ namespace VstsSyncMigrator.ConsoleApp
         private static Version GetLatestVersion()
         {
             DateTime startTime = DateTime.Now;
-            Stopwatch mainTimer = new Stopwatch();
-            mainTimer.Start();
+			Stopwatch mainTimer = Stopwatch.StartNew();
             //////////////////////////////////
             string packageID = "vsts-sync-migrator";
             SemanticVersion version = SemanticVersion.Parse("0.0.0.0");
@@ -206,8 +207,7 @@ namespace VstsSyncMigrator.ConsoleApp
         private static bool IsOnline()
         {
             DateTime startTime = DateTime.Now;
-            Stopwatch mainTimer = new Stopwatch();
-            mainTimer.Start();
+			Stopwatch mainTimer = Stopwatch.StartNew();
             //////////////////////////////////
             bool isOnline = false;
             string responce = "none";

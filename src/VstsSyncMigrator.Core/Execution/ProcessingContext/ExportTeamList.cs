@@ -33,11 +33,10 @@ namespace VstsSyncMigrator.Engine
 
         internal override void InternalExecute()
         {
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
-            //////////////////////////////////////////////////
-            // Retrieve the project URI. Needed to enumerate teams.     
-            var css4 = me.Target.Collection.GetService<ICommonStructureService4>();
+            Stopwatch stopwatch = Stopwatch.StartNew();
+			//////////////////////////////////////////////////
+			// Retrieve the project URI. Needed to enumerate teams.     
+			var css4 = me.Target.Collection.GetService<ICommonStructureService4>();
             ProjectInfo projectInfo = css4.GetProjectFromName(me.Target.Name);
             // Retrieve a list of all teams on the project.     
             TfsTeamService teamService = me.Target.Collection.GetService<TfsTeamService>();

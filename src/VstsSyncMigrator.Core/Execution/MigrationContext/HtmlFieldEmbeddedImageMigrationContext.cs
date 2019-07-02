@@ -32,15 +32,14 @@ namespace VstsSyncMigrator.Engine
             : base(me, config)
         {
             _config = config;
-            _httpClientHandler = new HttpClientHandler {AllowAutoRedirect = false};
+            _httpClientHandler = new HttpClientHandler {AllowAutoRedirect = false, UseDefaultCredentials=config.UseDefaultCredentials };
         }
 
         internal override void InternalExecute()
         {
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
+            Stopwatch stopwatch = Stopwatch.StartNew();
 
-            WorkItemStoreContext targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
+			WorkItemStoreContext targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
             TfsQueryContext tfsqc = new TfsQueryContext(targetStore);
             tfsqc.AddParameter("TeamProject", me.Target.Name);
             tfsqc.Query =
@@ -107,8 +106,8 @@ namespace VstsSyncMigrator.Engine
                     {
                         if (match.Value.ToLower().Contains(oldTfsurl.ToLower()) || match.Value.ToLower().Contains(oldTfsurlOppositeSchema.ToLower()) || (_config.SourceServerAliases != null && _config.SourceServerAliases.Any(i => match.Value.ToLower().Contains(i.ToLower()))))
                         {                     
-                            // save image locally and upload as attachment
-                            Match newFileNameMatch = Regex.Match(match.Value, regExSearchFileName);
+                            //save image locally and upload as attachment
+                            Match newFileNameMatch = Regex.Match(match.Value, regExSearchFileName, RegexOptions.IgnoreCase);
                             if (newFileNameMatch.Success)
                             {
                                 Trace.WriteLine($"field '{field.Name}' has match: {match.Value}");

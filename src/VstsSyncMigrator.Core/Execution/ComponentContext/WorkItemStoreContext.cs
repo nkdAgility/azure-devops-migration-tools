@@ -45,7 +45,7 @@ namespace VstsSyncMigrator.Engine
             }
            
             foundWis = new Dictionary<int, WorkItem>();
-        }
+		}
 
         public Project GetProject()
         {
@@ -100,7 +100,7 @@ namespace VstsSyncMigrator.Engine
             }
             if (found != null && cache) 
             {
-                foundWis.Add(workItemToFind.Id, found); /// TODO MENORY LEEK! LEAK
+                foundWis.Add(workItemToFind.Id, found); /// TODO MEMORY LEAK
             }
             return found;
         }
@@ -174,8 +174,6 @@ namespace VstsSyncMigrator.Engine
         {
             return Store.GetWorkItem(workItem.Id, revision);
         }
-
-
 
     }
 }

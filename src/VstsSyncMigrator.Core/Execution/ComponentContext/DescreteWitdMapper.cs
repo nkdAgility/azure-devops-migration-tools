@@ -3,11 +3,11 @@ using Microsoft.TeamFoundation.WorkItemTracking.Client;
 
 namespace VstsSyncMigrator.Engine
 {
-    public class DescreteWitdMapper : IWitdMapper
+    public class DiscreteWitMapper : IWitdMapper
     {
         private string _MapTo;
 
-        public DescreteWitdMapper(string mapTo)
+        public DiscreteWitMapper(string mapTo)
         {
             this._MapTo = mapTo;
         }
