@@ -47,12 +47,6 @@ namespace VstsSyncMigrator.Engine
                 "System.NodeName",
                 "System.RelatedLinkCount",
                 "System.WorkItemType",
-                "Microsoft.VSTS.Common.ActivatedDate",
-                "Microsoft.VSTS.Common.ActivatedBy",
-                "Microsoft.VSTS.Common.ResolvedDate",
-                "Microsoft.VSTS.Common.ResolvedBy",
-                "Microsoft.VSTS.Common.ClosedDate",
-                "Microsoft.VSTS.Common.ClosedBy",
                 "Microsoft.VSTS.Common.StateChangeDate",
                 "System.ExternalLinkCount",
                 "System.HyperLinkCount",
@@ -301,7 +295,7 @@ namespace VstsSyncMigrator.Engine
 
             foreach (Field f in oldWi.Fields)
             {
-                if (newwit.Fields.Contains(f.ReferenceName) && !_ignore.Contains(f.ReferenceName))
+                if (newwit.Fields.Contains(f.ReferenceName) && !_ignore.Contains(f.ReferenceName) && (!newwit.Fields[f.ReferenceName].IsChangedInRevision || newwit.Fields[f.ReferenceName].IsEditable))
                 {
                     newwit.Fields[f.ReferenceName].Value = oldWi.Fields[f.ReferenceName].Value;
                 }
