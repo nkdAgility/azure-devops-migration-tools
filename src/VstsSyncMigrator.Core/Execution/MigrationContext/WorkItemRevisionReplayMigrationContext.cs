@@ -77,7 +77,7 @@ namespace VstsSyncMigrator.Engine
 			tfsqc.AddParameter("TeamProject", me.Source.Name);
 			tfsqc.Query =
 				string.Format(
-					@"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY [System.ChangedDate] desc",
+					@"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY [System.ChangedDate] asc",
 					_config.QueryBit);
 			var sourceWorkItems = tfsqc.Execute();
 			Trace.WriteLine($"Replay all revisions of {sourceWorkItems.Count} work items?", Name);
