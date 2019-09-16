@@ -13,7 +13,7 @@ Azure DevOps Migration Tools allow you to bulk edit data in Microsoft Team Found
 
 The most effective way to get a copy of the tools is to use Chocolatey to install them:
 
-- [Install from Chocolatey](https://chocolatey.org/packages/vsts-sync-migrator/) **(recomended)**
+- [Install from Chocolatey](https://chocolatey.org/packages/vsts-sync-migrator/) **(recommended)**
 - Manually download the [latest release from GitHub](https://github.com/nkdAgility/azure-devops-migration-tools/releases) and unzip
 
 ## Overview
