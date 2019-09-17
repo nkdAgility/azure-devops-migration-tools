@@ -23,8 +23,7 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
         /// <inheritdoc />
         public bool IsProcessorCompatible(IReadOnlyList<ITfsProcessingConfig> otherProcessors)
         {
-            Trace.WriteLine($"Note: {GetType().Name} is not compatible with {typeof(WorkItemRevisionReplayMigrationConfig).Name}");
-            return !otherProcessors.Any(x => x is WorkItemRevisionReplayMigrationConfig);
+            return true;
         }
     }
 }
