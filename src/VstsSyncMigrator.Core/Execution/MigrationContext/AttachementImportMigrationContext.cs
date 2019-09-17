@@ -51,7 +51,7 @@ namespace VstsSyncMigrator.Engine
                         File.Delete(renamedFilePath);
 
                     File.Move(file, renamedFilePath);
-                    targetWI = targetStore.FindReflectedWorkItemByReflectedWorkItemId(sourceReflectedID, me.ReflectedWorkItemIdFieldName, true);
+                    targetWI = targetStore.FindReflectedWorkItemByReflectedWorkItemId(sourceReflectedID, true);
                     if (targetWI != null)
                     {
                         Trace.WriteLine(string.Format("{0} of {1} - Import {2} to {3}", current, files.Count, fileName, targetWI.Id));
