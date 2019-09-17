@@ -36,7 +36,7 @@ namespace VstsSyncMigrator.Engine
 
 			WorkItemStoreContext sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.None);
             TfsQueryContext tfsqc = new TfsQueryContext(sourceStore);
-            tfsqc.AddParameter("TeamProject", me.Source.Name);
+            tfsqc.AddParameter("TeamProject", me.Source.Config.Name);
             tfsqc.Query = string.Format(@"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY [System.ChangedDate] desc", _config.QueryBit);
             WorkItemCollection sourceWIS = tfsqc.Execute();
 

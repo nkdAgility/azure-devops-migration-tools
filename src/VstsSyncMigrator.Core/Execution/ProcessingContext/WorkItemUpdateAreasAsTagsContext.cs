@@ -36,7 +36,7 @@ namespace VstsSyncMigrator.Engine
 			WorkItemStoreContext targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
 
             TfsQueryContext tfsqc = new TfsQueryContext(targetStore);
-            tfsqc.AddParameter("TeamProject", me.Target.Name);
+            tfsqc.AddParameter("TeamProject", me.Target.Config.Name);
             tfsqc.AddParameter("AreaPath", config.AreaIterationPath);
             tfsqc.Query = @"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject and [System.AreaPath] under @AreaPath";
             WorkItemCollection  workitems = tfsqc.Execute();

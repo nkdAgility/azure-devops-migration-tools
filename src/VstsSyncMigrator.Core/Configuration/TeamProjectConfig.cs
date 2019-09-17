@@ -10,5 +10,6 @@ namespace VstsSyncMigrator.Engine.Configuration
     {
         public Uri Collection { get; set; }
         public string Name { get; set; }
+        public string ReflectedWorkItemIDFieldName { get; set; }
     }
 }

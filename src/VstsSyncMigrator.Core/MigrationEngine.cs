@@ -38,14 +38,12 @@ namespace VstsSyncMigrator.Engine
             Telemetry.EnableTrace = config.TelemetryEnableTrace;
             if (config.Source != null)
             {
-                this.SetSource(new TeamProjectContext(config.Source.Collection, config.Source.Name));
+                this.SetSource(new TeamProjectContext(config.Source));
             }
             if (config.Target != null)
             {
-                this.SetTarget(new TeamProjectContext(config.Target.Collection, config.Target.Name));
+                this.SetTarget(new TeamProjectContext(config.Target));
             }           
-            this.SetReflectedWorkItemIdFieldName(config.ReflectedWorkItemIDFieldName);
-            this.SetSourceReflectedWorkItemIdFieldName(config.SourceReflectedWorkItemIDFieldName);
             if (config.FieldMaps != null)
             {
                 foreach (IFieldMapConfig fieldmapConfig in config.FieldMaps)
@@ -161,18 +159,6 @@ namespace VstsSyncMigrator.Engine
         {
             processors.Add(processor);
         }
-
-
-        public void SetReflectedWorkItemIdFieldName(string fieldName)
-        {
-            reflectedWorkItemIdFieldName = fieldName;
-        }
-
-        public void SetSourceReflectedWorkItemIdFieldName(string fieldName)
-        {
-            sourceReflectedWorkItemIdFieldName = fieldName;
-        }
-
 
         public void SetSource(ITeamProjectContext teamProjectContext)
         {

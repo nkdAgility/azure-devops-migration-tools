@@ -64,8 +64,8 @@ namespace VstsSyncMigrator.Engine
 			var sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.None);
             var targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.None);
 
-            var sourceQueryHierarchy = sourceStore.Store.Projects[me.Source.Name].QueryHierarchy;
-            var targetQueryHierarchy = targetStore.Store.Projects[me.Target.Name].QueryHierarchy;
+            var sourceQueryHierarchy = sourceStore.Store.Projects[me.Source.Config.Name].QueryHierarchy;
+            var targetQueryHierarchy = targetStore.Store.Projects[me.Target.Config.Name].QueryHierarchy;
 
             Trace.WriteLine(string.Format("Found {0} root level child WIQ folders", sourceQueryHierarchy.Count));
             //////////////////////////////////////////////////
@@ -99,13 +99,13 @@ namespace VstsSyncMigrator.Engine
                 this.totalFoldersAttempted++;
 
                 // we need to replace the team project name in folder names as it included in query paths
-                var requiredPath = sourceFolder.Path.Replace($"{me.Source.Name}/", $"{me.Target.Name}/");
+                var requiredPath = sourceFolder.Path.Replace($"{me.Source.Config.Name}/", $"{me.Target.Config.Name}/");
 
                 // Is the project name to be used in the migration as an extra folder level?
                 if (config.PrefixProjectToNodes == true)
                 {
                     // we need to inject the team name as a folder in the structure
-                    requiredPath = requiredPath.Replace(config.SharedFolderName, $"{config.SharedFolderName}/{me.Source.Name}");
+                    requiredPath = requiredPath.Replace(config.SharedFolderName, $"{config.SharedFolderName}/{me.Source.Config.Name}");
 
                     // If on the root level we need to check that the extra folder has already been added
                     if (sourceFolder.Path.Count(f => f == '/') == 1)
@@ -115,8 +115,8 @@ namespace VstsSyncMigrator.Engine
                         if (extraFolder == null)
                         {
                             // we are at the root level on the first pass and need to create the extra folder for the team name
-                            Trace.WriteLine($"Adding a folder '{me.Source.Name}'");
-                            extraFolder = new QueryFolder(me.Source.Name);
+                            Trace.WriteLine($"Adding a folder '{me.Source.Config.Name}'");
+                            extraFolder = new QueryFolder(me.Source.Config.Name);
                             targetSharedFolderRoot.Add(extraFolder);
                             targetHierarchy.Save(); // moved the save here a more immediate and relavent error message
                         }
@@ -172,12 +172,12 @@ namespace VstsSyncMigrator.Engine
             else
             {
                 // Sort out any path issues in the quertText
-                var fixedQueryText = query.QueryText.Replace($"'{me.Source.Name}", $"'{me.Target.Name}"); // the ' should only items at the start of areapath etc.
+                var fixedQueryText = query.QueryText.Replace($"'{me.Source.Config.Name}", $"'{me.Target.Config.Name}"); // the ' should only items at the start of areapath etc.
 
                 if (config.PrefixProjectToNodes)
                 {
                     // we need to inject the team name as a folder in the structure too
-                    fixedQueryText = fixedQueryText.Replace($"{me.Target.Name}\\", $"{me.Target.Name}\\{me.Source.Name}\\");
+                    fixedQueryText = fixedQueryText.Replace($"{me.Target.Config.Name}\\", $"{me.Target.Config.Name}\\{me.Source.Config.Name}\\");
                 }
 
                 // you cannot just add an item from one store to another, we need to create a new object

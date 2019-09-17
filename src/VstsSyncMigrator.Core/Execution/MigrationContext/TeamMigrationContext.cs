@@ -39,7 +39,7 @@ namespace VstsSyncMigrator.Engine
 			//////////////////////////////////////////////////
 			WorkItemStoreContext sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.BypassRules);
             TfsTeamService sourceTS = me.Source.Collection.GetService<TfsTeamService>();
-            List<TeamFoundationTeam> sourceTL = sourceTS.QueryTeams(me.Source.Name).ToList();
+            List<TeamFoundationTeam> sourceTL = sourceTS.QueryTeams(me.Source.Config.Name).ToList();
             Trace.WriteLine(string.Format("Found {0} teams in Source?", sourceTL.Count));
             var sourceTSCS = me.Source.Collection.GetService<TeamSettingsConfigurationService>();
             //////////////////////////////////////////////////
@@ -47,7 +47,7 @@ namespace VstsSyncMigrator.Engine
             Project targetProject = targetStore.GetProject();
             Trace.WriteLine(string.Format("Found target project as {0}", targetProject.Name));
             TfsTeamService targetTS = me.Target.Collection.GetService<TfsTeamService>();
-            List<TeamFoundationTeam> targetTL = targetTS.QueryTeams(me.Target.Name).ToList();
+            List<TeamFoundationTeam> targetTL = targetTS.QueryTeams(me.Target.Config.Name).ToList();
             Trace.WriteLine(string.Format("Found {0} teams in Target?", targetTL.Count));
             var targetTSCS = me.Target.Collection.GetService<TeamSettingsConfigurationService>();
             //////////////////////////////////////////////////
@@ -119,11 +119,11 @@ namespace VstsSyncMigrator.Engine
         {
             ///////////////////////////////////////////////////
             TeamSettings newTeamSettings = sourceTCfU.TeamSettings;
-            newTeamSettings.BacklogIterationPath = newTeamSettings.BacklogIterationPath.Replace(me.Source.Name, me.Target.Name);
+            newTeamSettings.BacklogIterationPath = newTeamSettings.BacklogIterationPath.Replace(me.Source.Config.Name, me.Target.Config.Name);
             List<string> newIterationPaths = new List<string>();
             foreach (var ip in newTeamSettings.IterationPaths)
             {
-                newIterationPaths.Add(ip.Replace(me.Source.Name, me.Target.Name));
+                newIterationPaths.Add(ip.Replace(me.Source.Config.Name, me.Target.Config.Name));
             }
             newTeamSettings.IterationPaths = newIterationPaths.ToArray();
 

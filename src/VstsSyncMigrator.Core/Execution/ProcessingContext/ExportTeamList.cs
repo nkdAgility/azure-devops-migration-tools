@@ -37,7 +37,7 @@ namespace VstsSyncMigrator.Engine
 			//////////////////////////////////////////////////
 			// Retrieve the project URI. Needed to enumerate teams.     
 			var css4 = me.Target.Collection.GetService<ICommonStructureService4>();
-            ProjectInfo projectInfo = css4.GetProjectFromName(me.Target.Name);
+            ProjectInfo projectInfo = css4.GetProjectFromName(me.Target.Config.Name);
             // Retrieve a list of all teams on the project.     
             TfsTeamService teamService = me.Target.Collection.GetService<TfsTeamService>();
 

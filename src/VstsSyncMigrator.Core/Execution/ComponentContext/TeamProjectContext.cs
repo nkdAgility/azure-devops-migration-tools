@@ -4,14 +4,14 @@ using System.Diagnostics;
 using Microsoft.TeamFoundation;
 using Microsoft.ApplicationInsights;
 using System.Collections.Generic;
+using VstsSyncMigrator.Engine.Configuration;
 
 namespace VstsSyncMigrator.Engine
 {
     public class TeamProjectContext : ITeamProjectContext
     {
-        private Uri _CollectionUrl;
+        private TeamProjectConfig _config;
         private TfsTeamProjectCollection _Collection;
-        private string _TeamProjectName;
 
         public TfsTeamProjectCollection Collection
         {
@@ -22,19 +22,18 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        public string Name
+        public TeamProjectConfig Config
         {
             get
             {
-                return _TeamProjectName;
+                return _config;
             }
         }
 
-        public TeamProjectContext(Uri collectionUrl  , string teamProjectName)
+        public TeamProjectContext(TeamProjectConfig config)
         {
 
-            this._CollectionUrl = collectionUrl;
-            this._TeamProjectName = teamProjectName;
+            this._config = config;
         }
 
         public void Connect()
@@ -43,14 +42,15 @@ namespace VstsSyncMigrator.Engine
             {
                 Telemetry.Current.TrackEvent("TeamProjectContext.Connect",
                     new Dictionary<string, string> {
-                          { "Name", Name},
-                          { "Target Project", this._TeamProjectName},
-                          { "Target Collection", this._CollectionUrl.ToString() }
+                          { "Name", Config.Name},
+                          { "Target Project", Config.Name},
+                          { "Target Collection",Config.Collection.ToString() },
+                           { "ReflectedWorkItemID Field Name",Config.ReflectedWorkItemIDFieldName }
                     });
                 Stopwatch connectionTimer = Stopwatch.StartNew();
 				DateTime start = DateTime.Now;
                 Trace.WriteLine("Creating TfsTeamProjectCollection Object ");
-                    _Collection = new TfsTeamProjectCollection(_CollectionUrl);
+                    _Collection = new TfsTeamProjectCollection(Config.Collection);
                 try
                 {
                     Trace.WriteLine(string.Format("Connected to {0} ", _Collection.Uri.ToString()));
@@ -65,8 +65,8 @@ namespace VstsSyncMigrator.Engine
                     Telemetry.Current.TrackDependency("TeamService", "EnsureAuthenticated", start, connectionTimer.Elapsed, false);
                     Telemetry.Current.TrackException(ex,
                        new Dictionary<string, string> {
-                            { "CollectionUrl", _CollectionUrl.ToString() },
-                            { "TeamProjectName",  _TeamProjectName}
+                            { "CollectionUrl", Config.Collection.ToString() },
+                            { "TeamProjectName",  Config.Name}
                        },
                        new Dictionary<string, double> {
                             { "ConnectionTimer", connectionTimer.ElapsedMilliseconds }
