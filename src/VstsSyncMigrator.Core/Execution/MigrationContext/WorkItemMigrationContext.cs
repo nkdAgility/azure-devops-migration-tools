@@ -98,9 +98,9 @@ namespace VstsSyncMigrator.Engine
                     if (me.WorkItemTypeDefinitions.ContainsKey(sourceWI.Type.Name))
                     {
                         newwit = CreateAndPopulateWorkItem(_config, sourceWI, destProject, me.WorkItemTypeDefinitions[sourceWI.Type.Name].Map(sourceWI));
-                        if (newwit.Fields.Contains(me.ReflectedWorkItemIdFieldName))
+                        if (newwit.Fields.Contains(me.Target.Config.ReflectedWorkItemIDFieldName))
                         {
-                            newwit.Fields[me.ReflectedWorkItemIdFieldName].Value = sourceStore.CreateReflectedWorkItemId(sourceWI);
+                            newwit.Fields[me.Target.Config.ReflectedWorkItemIDFieldName].Value = sourceStore.CreateReflectedWorkItemId(sourceWI);
                         }
                         me.ApplyFieldMappings(sourceWI, newwit);
                         ArrayList fails = newwit.Validate();
@@ -140,11 +140,11 @@ namespace VstsSyncMigrator.Engine
                             newwit.Close();
                             Trace.WriteLine(string.Format("...Saved as {0}", newwit.Id), this.Name);
 
-                            if (me.SourceReflectedWorkItemIdFieldName != null)
+                            if (me.Source.Config.ReflectedWorkItemIDFieldName != null)
                             {
-                                if (sourceWI.Fields.Contains(me.SourceReflectedWorkItemIdFieldName) && _config.UpdateSourceReflectedId)
+                                if (sourceWI.Fields.Contains(me.Source.Config.ReflectedWorkItemIDFieldName) && _config.UpdateSourceReflectedId)
                                 {
-                                    sourceWI.Fields[me.SourceReflectedWorkItemIdFieldName].Value = targetStore.CreateReflectedWorkItemId(newwit);
+                                    sourceWI.Fields[me.Source.Config.ReflectedWorkItemIDFieldName].Value = targetStore.CreateReflectedWorkItemId(newwit);
                                 }
                                 sourceWI.Save();
                             }

@@ -160,7 +160,7 @@ namespace VstsSyncMigrator.Engine
         {
             var sourceWI = sourceWitStore.Store.GetWorkItem(sourceWIId);
             var targetWI = targetWitStore.Store.GetWorkItem(targetWIId);
-            targetWI.Fields[me.ReflectedWorkItemIdFieldName].Value = sourceWitStore.CreateReflectedWorkItemId(sourceWI);
+            targetWI.Fields[me.Target.Config.ReflectedWorkItemIDFieldName].Value = sourceWitStore.CreateReflectedWorkItemId(sourceWI);
             targetWI.Save();
         }
 
