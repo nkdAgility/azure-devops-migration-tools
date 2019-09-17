@@ -4,13 +4,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using VstsSyncMigrator.Engine.Configuration;
 
 namespace VstsSyncMigrator.Engine
 {
     public interface ITeamProjectContext
     {
         TfsTeamProjectCollection Collection { get; }
-        string Name { get; }
+        TeamProjectConfig Config { get; }
         void Connect();
     }
 }

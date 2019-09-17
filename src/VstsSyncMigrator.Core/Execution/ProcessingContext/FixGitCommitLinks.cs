@@ -34,14 +34,14 @@ namespace VstsSyncMigrator.Engine
             Stopwatch stopwatch = Stopwatch.StartNew();
 			//////////////////////////////////////////////////
 			var sourceGitRepoService = me.Source.Collection.GetService<GitRepositoryService>();
-            var sourceGitRepos = sourceGitRepoService.QueryRepositories(me.Source.Name);
+            var sourceGitRepos = sourceGitRepoService.QueryRepositories(me.Source.Config.Name);
             //////////////////////////////////////////////////
             var targetGitRepoService = me.Target.Collection.GetService<GitRepositoryService>();
-            var targetGitRepos = targetGitRepoService.QueryRepositories(me.Target.Name);
+            var targetGitRepos = targetGitRepoService.QueryRepositories(me.Target.Config.Name);
 
             WorkItemStoreContext targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
             TfsQueryContext tfsqc = new TfsQueryContext(targetStore);
-            tfsqc.AddParameter("TeamProject", me.Target.Name);
+            tfsqc.AddParameter("TeamProject", me.Target.Config.Name);
             tfsqc.Query = string.Format(@"SELECT [System.Id] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject");
             WorkItemCollection workitems = tfsqc.Execute();
             Trace.WriteLine(string.Format("Update {0} work items?", workitems.Count));
@@ -98,7 +98,7 @@ namespace VstsSyncMigrator.Engine
                                 : oldGitRepo.Name;
 
                             // Source and Target project names match
-                            if (oldGitRepo.ProjectReference.Name == me.Target.Name)
+                            if (oldGitRepo.ProjectReference.Name == me.Target.Config.Name)
                             {
                                 newGitRepo = (from g in targetGitRepos
                                                   where
