@@ -57,7 +57,7 @@ If you are in any doubt over the full name in use for the `ReflectedWorkItemID` 
 
 ### Editing the configuration ###
 
-Once you have created the `ReflectedWorkItemId` field and confirmed you have the correct full name, you will need to edit `configuration.json` to match your values, you need to set the 
+Once you have created the `ReflectedWorkItemId` field and confirmed you have the correct full name for both the SOurce and the Target, you will need to edit `configuration.json` to match your values, you need to set the 
 
 
 ```json

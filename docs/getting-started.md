@@ -27,12 +27,13 @@ You can now customise the configuration depending on what you need to do. Howeve
   "Source": {
     "Collection": "https://sdd2016.visualstudio.com/",
     "Name": "DemoProjs"
+	  "ReflectedWorkItemIDFieldName": "TfsMigrationTool.ReflectedWorkItemId"
   },
   "Target": {
     "Collection": "https://sdd2016.visualstudio.com/",
     "Name": "DemoProjt"
+	  "ReflectedWorkItemIDFieldName": "TfsMigrationTool.ReflectedWorkItemId",
   },
-  "ReflectedWorkItemIDFieldName": "TfsMigrationTool.ReflectedWorkItemId",
   "WorkItemTypeDefinition": {
     "Bug": "Bug",
     "Epic": "Epic",
@@ -52,6 +53,7 @@ You can now customise the configuration depending on what you need to do. Howeve
     {
       "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.WorkItemMigrationConfig",
       "Enabled": true,
+	  "ReplayRevisions": true,
       "PrefixProjectToNodes": true,
       "UpdateCreatedDate": true,
       "UpdateCreatedBy": true,
