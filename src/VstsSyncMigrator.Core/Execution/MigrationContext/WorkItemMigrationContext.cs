@@ -88,9 +88,9 @@ namespace VstsSyncMigrator.Engine
             var destProject = targetStore.GetProject();
             Trace.WriteLine($"Found target project as {destProject.Name}", Name);
 
-            var current = sourceWorkItems.Count;
-            var count = 0;
-            long elapsedms = 0;
+            _current = sourceWorkItems.Count;
+            _count = 0;
+            _elapsedms = 0;
 
             //Validation: make sure that the ReflectedWorkItemId field name specified in the config exists in the target process, preferably on each work item type.
             ConfigValidation();
@@ -99,11 +99,17 @@ namespace VstsSyncMigrator.Engine
             {
                 var witstopwatch = Stopwatch.StartNew();
                 var targetFound = targetStore.FindReflectedWorkItem(sourceWorkItem, false);
-                Trace.WriteLine($"{current} - Migrating: {sourceWorkItem.Id} - {sourceWorkItem.Type.Name}", Name);
+                Trace.WriteLine($"{_current} - Migrating: {sourceWorkItem.Id} - {sourceWorkItem.Type.Name}", Name);
 
                 if (targetFound == null)
                 {
-                    CreateWorkItem_ReplayRevisions(sourceWorkItem, destProject, sourceStore, current, targetStore);
+                    if (_config.ReplayRevisions)
+                    {
+                        CreateWorkItem_ReplayRevisions(sourceWorkItem, destProject, sourceStore, _current, targetStore);
+                    } else
+                    {
+                        CreateWorkItem_TipOnly(sourceWorkItem, destProject, sourceStore, _current, targetStore);
+                    }
                 }
                 else
                 {
@@ -112,11 +118,11 @@ namespace VstsSyncMigrator.Engine
 
                 sourceWorkItem.Close();
                 witstopwatch.Stop();
-                elapsedms += witstopwatch.ElapsedMilliseconds;
-                current--;
-                count++;
-                var average = new TimeSpan(0, 0, 0, 0, (int)(elapsedms / count));
-                var remaining = new TimeSpan(0, 0, 0, 0, (int)(average.TotalMilliseconds * current));
+                _elapsedms += witstopwatch.ElapsedMilliseconds;
+                _current--;
+                _count++;
+                var average = new TimeSpan(0, 0, 0, 0, (int)(_elapsedms / _count));
+                var remaining = new TimeSpan(0, 0, 0, 0, (int)(average.TotalMilliseconds * _current));
                 Trace.WriteLine(
                     string.Format("Average time of {0} per work item and {1} estimated to completion",
                         string.Format(@"{0:s\:fff} seconds", average),

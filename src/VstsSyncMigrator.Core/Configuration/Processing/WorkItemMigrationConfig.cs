@@ -7,6 +7,7 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
 {
     public class WorkItemMigrationConfig : ITfsProcessingConfig
     {
+        public bool ReplayRevisions { get; set; }
         public bool PrefixProjectToNodes { get; set; }
         public bool UpdateCreatedDate { get; set; }
         public bool UpdateCreatedBy { get; set; }
