@@ -65,6 +65,15 @@ namespace VstsSyncMigrator.Engine.Configuration
                 sourceField = "Microsoft.VSTS.Common.BacklogPriority",
                 targetField = "Microsoft.VSTS.Common.StackRank"
             });
+            ec.FieldMaps.Add(new FieldtoFieldMultiMapConfig()
+            {
+                WorkItemTypeName = "*",
+                SourceToTargetMappings = new Dictionary<string, string>
+                {
+                    {"SourceField1", "TargetField1" },
+                    {"SourceField2", "TargetField2" }
+                }
+            });
             ec.FieldMaps.Add(new FieldtoTagMapConfig()
             {
                 WorkItemTypeName = "*",

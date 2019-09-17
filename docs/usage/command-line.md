@@ -56,6 +56,13 @@ Note that:
 			"sourceField": "Microsoft.VSTS.Common.BacklogPriority",
 			"targetField": "Microsoft.VSTS.Common.StackRank"
 		}, {
+			"ObjectType": "VstsSyncMigrator.Engine.Configuration.FieldMap.FieldtoFieldMultiMapConfig",
+			"WorkItemTypeName": "*",
+            "SourceToTargetMappings" = {
+                "SourceField1": "TargetField1",
+                "SourceField2": "TargetField2"
+            }
+		}, {
 			"ObjectType": "VstsSyncMigrator.Engine.Configuration.FieldMap.FieldtoTagMapConfig",
 			"WorkItemTypeName": "*",
 			"sourceField": "System.State",
