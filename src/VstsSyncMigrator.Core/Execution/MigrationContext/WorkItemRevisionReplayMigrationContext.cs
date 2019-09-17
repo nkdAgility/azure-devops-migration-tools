@@ -129,13 +129,13 @@ namespace VstsSyncMigrator.Engine
 		{
 			//Make sure that the ReflectedWorkItemId field name specified in the config exists in the target process, preferably on each work item type
 			var fields = witClient.GetFieldsAsync(me.Target.Config.Name).Result;
-			bool rwiidFieldExists = fields.Any(x => x.ReferenceName == me.ReflectedWorkItemIdFieldName || x.Name == me.ReflectedWorkItemIdFieldName);
+			bool rwiidFieldExists = fields.Any(x => x.ReferenceName == me.Target.Config.ReflectedWorkItemIDFieldName || x.Name == me.Target.Config.ReflectedWorkItemIDFieldName);
 			Trace.WriteLine($"Found {fields.Count.ToString("n0")} work item fields.");
 			if (rwiidFieldExists)
-				Trace.WriteLine($"Found '{me.ReflectedWorkItemIdFieldName}' in this project, proceeding.");
+				Trace.WriteLine($"Found '{me.Target.Config.ReflectedWorkItemIDFieldName}' in this project, proceeding.");
 			else
 			{
-				Trace.WriteLine($"Config file specifies '{me.ReflectedWorkItemIdFieldName}', which wasn't found.");
+				Trace.WriteLine($"Config file specifies '{me.Target.Config.ReflectedWorkItemIDFieldName}', which wasn't found.");
 				Trace.WriteLine("Instead, found:");
 				foreach (var field in fields.OrderBy(x => x.Name))
 					Trace.WriteLine($"{field.Type.ToString().PadLeft(15)} - {field.Name.PadRight(20)} {field.Description ?? ""}");
@@ -246,10 +246,10 @@ namespace VstsSyncMigrator.Engine
                 if (newwit != null)
                 {
 					string reflectedUri = sourceStore.CreateReflectedWorkItemId(sourceWorkItem);
-					if (newwit.Fields.Contains(me.ReflectedWorkItemIdFieldName))
+					if (newwit.Fields.Contains(me.Target.Config.ReflectedWorkItemIDFieldName))
                     {
                         newwit.Fields["System.ChangedBy"].Value = "Migration";
-                        newwit.Fields[me.ReflectedWorkItemIdFieldName].Value = reflectedUri;
+                        newwit.Fields[me.Target.Config.ReflectedWorkItemIDFieldName].Value = reflectedUri;
                     }
                     var history = new StringBuilder();
                     history.Append(
@@ -260,9 +260,9 @@ namespace VstsSyncMigrator.Engine
                     newwit.Close();
                     Trace.WriteLine($"...Saved as {newwit.Id}", Name);
 
-                    if (_config.UpdateSourceReflectedId && sourceWorkItem.Fields.Contains(me.SourceReflectedWorkItemIdFieldName))
+                    if (_config.UpdateSourceReflectedId && sourceWorkItem.Fields.Contains(me.Source.Config.ReflectedWorkItemIDFieldName))
                     {
-                        sourceWorkItem.Fields[me.SourceReflectedWorkItemIdFieldName].Value =
+                        sourceWorkItem.Fields[me.Source.Config.ReflectedWorkItemIDFieldName].Value =
                             targetStore.CreateReflectedWorkItemId(newwit);
                         sourceWorkItem.Save();
                         Trace.WriteLine($"...and Source Updated {sourceWorkItem.Id}", Name);
