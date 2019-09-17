@@ -54,7 +54,7 @@ namespace VstsSyncMigrator.Engine
 			//////////////////////////////////////////////////
 			WorkItemStoreContext sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.None);
             TfsQueryContext tfsqc = new TfsQueryContext(sourceStore);
-            tfsqc.AddParameter("TeamProject", me.Source.Name);
+            tfsqc.AddParameter("TeamProject", me.Source.Config.Name);
 
             //Builds the constraint part of the query
             string constraints = BuildQueryBitConstraints();
@@ -76,7 +76,7 @@ namespace VstsSyncMigrator.Engine
             {
                 Stopwatch witstopwatch = Stopwatch.StartNew();
 				WorkItem targetFound;
-                targetFound = targetStore.FindReflectedWorkItem(sourceWI, me.ReflectedWorkItemIdFieldName, false);
+                targetFound = targetStore.FindReflectedWorkItem(sourceWI, false);
                 Trace.WriteLine(string.Format("{0} - Updating: {1}-{2}", current, sourceWI.Id, sourceWI.Type.Name));
                 if (targetFound == null)
                 {

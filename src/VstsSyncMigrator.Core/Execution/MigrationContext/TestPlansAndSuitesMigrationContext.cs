@@ -171,14 +171,14 @@ namespace VstsSyncMigrator.Engine
 
             if (config.PrefixProjectToNodes)
             {
-                targetWI.AreaPath = string.Format(@"{0}\{1}", engine.Target.Name, sourceWI.AreaPath);
-                targetWI.IterationPath = string.Format(@"{0}\{1}", engine.Target.Name, sourceWI.IterationPath);
+                targetWI.AreaPath = string.Format(@"{0}\{1}", engine.Target.Config.Name, sourceWI.AreaPath);
+                targetWI.IterationPath = string.Format(@"{0}\{1}", engine.Target.Config.Name, sourceWI.IterationPath);
             }
             else
             {
-                var regex = new Regex(Regex.Escape(engine.Source.Name));
-                targetWI.AreaPath = regex.Replace(sourceWI.AreaPath, engine.Target.Name, 1);
-                targetWI.IterationPath = regex.Replace(sourceWI.IterationPath, engine.Target.Name, 1);
+                var regex = new Regex(Regex.Escape(engine.Source.Config.Name));
+                targetWI.AreaPath = regex.Replace(sourceWI.AreaPath, engine.Target.Config.Name, 1);
+                targetWI.IterationPath = regex.Replace(sourceWI.IterationPath, engine.Target.Config.Name, 1);
             }
 
             me.ApplyFieldMappings(sourceWI, targetWI);
@@ -238,8 +238,7 @@ namespace VstsSyncMigrator.Engine
                         }
                         try
                         {
-                            targetReq = targetWitStore.FindReflectedWorkItemByReflectedWorkItemId(sourceReq,
-                                me.ReflectedWorkItemIdFieldName);
+                            targetReq = targetWitStore.FindReflectedWorkItemByReflectedWorkItemId(sourceReq);
 
                             if (targetReq == null)
                             {
@@ -319,8 +318,7 @@ namespace VstsSyncMigrator.Engine
                     foreach (Match match in matches)
                     {
                         var qid = match.Value.Split('=')[1].Trim();
-                        var targetWi = targetWitStore.FindReflectedWorkItemByReflectedWorkItemId(qid,
-                            me.ReflectedWorkItemIdFieldName);
+                        var targetWi = targetWitStore.FindReflectedWorkItemByReflectedWorkItemId(qid);
 
                         if (targetWi == null)
                         {
@@ -366,7 +364,7 @@ namespace VstsSyncMigrator.Engine
                     return;
 
                 Trace.WriteLine(string.Format("    Processing {0} : {1} - {2} ", sourceTestCaseEntry.EntryType.ToString(), sourceTestCaseEntry.Id, sourceTestCaseEntry.Title), "TestPlansAndSuites");
-                WorkItem wi = targetWitStore.FindReflectedWorkItem(sourceTestCaseEntry.TestCase.WorkItem, me.ReflectedWorkItemIdFieldName, false);
+                WorkItem wi = targetWitStore.FindReflectedWorkItem(sourceTestCaseEntry.TestCase.WorkItem, false);
                 if (wi == null)
                 {
                     Trace.WriteLine(string.Format("    Can't find work item for Test Case. Has it been migrated? {0} : {1} - {2} ", sourceTestCaseEntry.EntryType.ToString(), sourceTestCaseEntry.Id, sourceTestCaseEntry.Title), "TestPlansAndSuites");
@@ -442,7 +440,7 @@ namespace VstsSyncMigrator.Engine
             Trace.Write($"Applying configurations for test cases in source suite {sourceSuite.Title}");
             foreach (ITestSuiteEntry sourceTce in sourceSuite.TestCases)
             {
-                WorkItem wi = targetWitStore.FindReflectedWorkItem(sourceTce.TestCase.WorkItem, me.ReflectedWorkItemIdFieldName, false);
+                WorkItem wi = targetWitStore.FindReflectedWorkItem(sourceTce.TestCase.WorkItem, false);
                 ITestSuiteEntry targetTce;
                 if (wi != null)
                 {
@@ -478,7 +476,7 @@ namespace VstsSyncMigrator.Engine
                 {
                     //Find migrated suite in target
                     WorkItem sourceSuiteWi = sourceWitStore.Store.GetWorkItem(sourceSuiteChild.Id);
-                    WorkItem targetSuiteWi = targetWitStore.FindReflectedWorkItem(sourceSuiteWi, me.ReflectedWorkItemIdFieldName, false);
+                    WorkItem targetSuiteWi = targetWitStore.FindReflectedWorkItem(sourceSuiteWi, false);
                     if (targetSuiteWi != null)
                     {
                         ITestSuiteEntry targetSuiteChild = (from tc in ((IStaticTestSuite)targetSuite).Entries
@@ -512,7 +510,7 @@ namespace VstsSyncMigrator.Engine
             foreach (ITestSuiteEntry sourceTce in sourceSuite.TestCases)
             {
                 // find target testcase id for this source tce
-                WorkItem targetTc = targetWitStore.FindReflectedWorkItem(sourceTce.TestCase.WorkItem, me.ReflectedWorkItemIdFieldName, false);
+                WorkItem targetTc = targetWitStore.FindReflectedWorkItem(sourceTce.TestCase.WorkItem, false);
 
                 if (targetTc == null)
                 {
@@ -718,9 +716,9 @@ namespace VstsSyncMigrator.Engine
                 Telemetry.Current.TrackException(ex,
                       new Dictionary<string, string> {
                           { "Name", Name},
-                          { "Target Project", me.Target.Name},
+                          { "Target Project", me.Target.Config.Name},
                           { "Target Collection", me.Target.Collection.Name },
-                          { "Source Project", me.Source.Name},
+                          { "Source Project", me.Source.Config.Name},
                           { "Source Collection", me.Source.Collection.Name },
                           { "Status", Status.ToString() },
                           { "Task", "SaveNewTestSuitToPlan" },
@@ -771,8 +769,8 @@ namespace VstsSyncMigrator.Engine
 
             // Set area and iteration to root of the target project. 
             // We will set the correct values later, when we actually have a work item available
-            targetPlan.Iteration = engine.Target.Name;
-            targetPlan.AreaPath = engine.Target.Name;
+            targetPlan.Iteration = engine.Target.Config.Name;
+            targetPlan.AreaPath = engine.Target.Config.Name;
 
             // Remove testsettings reference because VSTS Sync doesn't support migrating these artifacts
             if (targetPlan.ManualTestSettingsId != 0)

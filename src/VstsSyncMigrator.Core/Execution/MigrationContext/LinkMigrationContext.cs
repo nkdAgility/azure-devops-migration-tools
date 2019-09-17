@@ -37,7 +37,7 @@ namespace VstsSyncMigrator.Engine
         {
             WorkItemStoreContext sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.BypassRules);
             TfsQueryContext tfsqc = new TfsQueryContext(sourceStore);
-            tfsqc.AddParameter("TeamProject", me.Source.Name);
+            tfsqc.AddParameter("TeamProject", me.Source.Config.Name);
             tfsqc.Query = string.Format(@"SELECT [System.Id] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject {0} ORDER BY [System.ChangedDate] desc ", config.QueryBit); // AND  [Microsoft.VSTS.Common.ClosedDate] = ''
             WorkItemCollection sourceWIS = tfsqc.Execute();
             //////////////////////////////////////////////////
@@ -54,7 +54,7 @@ namespace VstsSyncMigrator.Engine
                 WorkItem wiTargetL = null;
                 try
                 {
-                    wiTargetL = targetWitsc.FindReflectedWorkItem(wiSourceL, me.ReflectedWorkItemIdFieldName, true);
+                    wiTargetL = targetWitsc.FindReflectedWorkItem(wiSourceL, true);
                 }
                 catch (Exception)
                 {
@@ -141,8 +141,7 @@ namespace VstsSyncMigrator.Engine
             foreach (WorkItem sourceSharedStep in sourceSharedSteps)
             {
                 WorkItem matchingTargetSharedStep =
-                    targetStore.FindReflectedWorkItemByReflectedWorkItemId(sourceSharedStep,
-                        me.ReflectedWorkItemIdFieldName);
+                    targetStore.FindReflectedWorkItemByReflectedWorkItemId(sourceSharedStep);
 
                 if (matchingTargetSharedStep != null)
                 {
@@ -287,7 +286,7 @@ namespace VstsSyncMigrator.Engine
             else
             {
                 // Moving to Other Team Project from Source
-                wiTargetR = targetStore.FindReflectedWorkItem(wiSourceR, me.ReflectedWorkItemIdFieldName, true);
+                wiTargetR = targetStore.FindReflectedWorkItem(wiSourceR, true);
                 if (wiTargetR == null) // Assume source only (other team project)
                 {
                     wiTargetR = wiSourceR;

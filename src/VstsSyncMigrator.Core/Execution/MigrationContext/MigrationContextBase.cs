@@ -45,9 +45,9 @@ namespace VstsSyncMigrator.Engine
                     new Dictionary<string, string>
                     {
                         {"Name", Name},
-                        {"Target Project", me.Target.Name},
+                        {"Target Project", me.Target.Config.Name},
                         {"Target Collection", me.Target.Collection.Name},
-                        {"Source Project", me.Source.Name},
+                        {"Source Project", me.Source.Config.Name},
                         {"Source Collection", me.Source.Collection.Name},
                         {"Status", Status.ToString()}
                     },
@@ -69,7 +69,7 @@ namespace VstsSyncMigrator.Engine
         internal string NodeStructreSourceToTarget(string input)
         {
             //input = [sourceTeamProject]\[AreaPath]
-            return string.Format("{0}\\{1}", me.Target.Name, input);
+            return string.Format("{0}\\{1}", me.Target.Config.Name, input);
 
 
             //Regex r = new Regex(source.Name, RegexOptions.IgnoreCase);
@@ -82,9 +82,9 @@ namespace VstsSyncMigrator.Engine
         internal string ReplaceFirstInstanceOf(string input)
         {
             //input = [sourceTeamProject]\[AreaPath]
-            var r = new Regex(me.Source.Name, RegexOptions.IgnoreCase);
+            var r = new Regex(me.Source.Config.Name, RegexOptions.IgnoreCase);
             //// Output = [targetTeamProject]\[sourceTeamProject]\[AreaPath]
-            return r.Replace(input, me.Target.Name, 1);
+            return r.Replace(input, me.Target.Config.Name, 1);
         }
     }
 }

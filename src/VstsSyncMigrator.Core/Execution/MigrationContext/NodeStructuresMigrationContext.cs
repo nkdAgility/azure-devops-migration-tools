@@ -30,7 +30,7 @@ namespace VstsSyncMigrator.Engine
         {
             //////////////////////////////////////////////////
             ICommonStructureService sourceCss = (ICommonStructureService)me.Source.Collection.GetService(typeof(ICommonStructureService));
-            ProjectInfo sourceProjectInfo = sourceCss.GetProjectFromName(me.Source.Name);
+            ProjectInfo sourceProjectInfo = sourceCss.GetProjectFromName(me.Source.Config.Name);
             NodeInfo[] sourceNodes = sourceCss.ListStructures(sourceProjectInfo.Uri);
             //////////////////////////////////////////////////
             ICommonStructureService targetCss = (ICommonStructureService)me.Target.Collection.GetService(typeof(ICommonStructureService4));
@@ -46,10 +46,10 @@ namespace VstsSyncMigrator.Engine
         {
             NodeInfo sourceNode = (from n in sourceNodes where n.Path.Contains(treeType) select n).Single();
             XmlElement sourceTree = sourceCss.GetNodesXml(new string[] { sourceNode.Uri }, true);
-            NodeInfo structureParent = targetCss.GetNodeFromPath(string.Format("\\{0}\\{1}", me.Target.Name, treeType));
+            NodeInfo structureParent = targetCss.GetNodeFromPath(string.Format("\\{0}\\{1}", me.Target.Config.Name, treeType));
             if (config.PrefixProjectToNodes)
             {
-                structureParent = CreateNode(targetCss, me.Source.Name, structureParent);
+                structureParent = CreateNode(targetCss, me.Source.Config.Name, structureParent);
             }
             if (sourceTree.ChildNodes[0].HasChildNodes)
             {

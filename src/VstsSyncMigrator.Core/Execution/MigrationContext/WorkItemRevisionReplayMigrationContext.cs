@@ -74,7 +74,7 @@ namespace VstsSyncMigrator.Engine
 			//////////////////////////////////////////////////
 			var sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.BypassRules);
 			var tfsqc = new TfsQueryContext(sourceStore);
-			tfsqc.AddParameter("TeamProject", me.Source.Name);
+			tfsqc.AddParameter("TeamProject", me.Source.Config.Name);
 			tfsqc.Query =
 				string.Format(
 					@"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY [System.ChangedDate] desc",
@@ -97,7 +97,7 @@ namespace VstsSyncMigrator.Engine
 			foreach (WorkItem sourceWorkItem in sourceWorkItems)
 			{
 				var witstopwatch = Stopwatch.StartNew();
-				var targetFound = targetStore.FindReflectedWorkItem(sourceWorkItem, me.ReflectedWorkItemIdFieldName, false);
+				var targetFound = targetStore.FindReflectedWorkItem(sourceWorkItem, false);
 				Trace.WriteLine($"{current} - Migrating: {sourceWorkItem.Id} - {sourceWorkItem.Type.Name}", Name);
 
 				if (targetFound == null)
@@ -134,7 +134,7 @@ namespace VstsSyncMigrator.Engine
 		private void ConfigValidation()
 		{
 			//Make sure that the ReflectedWorkItemId field name specified in the config exists in the target process, preferably on each work item type
-			var fields = witClient.GetFieldsAsync(me.Target.Name).Result;
+			var fields = witClient.GetFieldsAsync(me.Target.Config.Name).Result;
 			bool rwiidFieldExists = fields.Any(x => x.ReferenceName == me.ReflectedWorkItemIdFieldName || x.Name == me.ReflectedWorkItemIdFieldName);
 			Trace.WriteLine($"Found {fields.Count.ToString("n0")} work item fields.");
 			if (rwiidFieldExists)
