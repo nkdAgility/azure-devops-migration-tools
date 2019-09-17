@@ -25,22 +25,25 @@ namespace VstsSyncMigrator.Engine.ComponentContext
         {
             if (source.Fields.Contains(config.sourceField))
             {
-                string sourceValue = source.Fields[config.sourceField].Value != null 
-                    ? source.Fields[config.sourceField].Value.ToString()
-                    : null;
+                var sourceVal = source.Fields[config.sourceField].Value;
+                var t = target.Fields[config.targetField].FieldDefinition.SystemType;
 
-                if (sourceValue != null && config.valueMapping.ContainsKey(sourceValue))
+                if (sourceVal is null && config.valueMapping.ContainsKey("null"))
                 {
-                    target.Fields[config.targetField].Value = config.valueMapping[sourceValue];
+                    target.Fields[config.targetField].Value = Convert.ChangeType(config.valueMapping["null"], t);
                     Trace.WriteLine($"  [UPDATE] field value mapped {source.Id}:{config.sourceField} to {target.Id}:{config.targetField}");
                 }
-                else if (sourceValue != null && !string.IsNullOrEmpty(config.defaultValue))
+                else if (sourceVal != null && config.valueMapping.ContainsKey(sourceVal.ToString()))
                 {
-                    target.Fields[config.targetField].Value = config.defaultValue;
+                    target.Fields[config.targetField].Value = Convert.ChangeType(config.valueMapping[sourceVal.ToString()], t);
+                    Trace.WriteLine($"  [UPDATE] field value mapped {source.Id}:{config.sourceField} to {target.Id}:{config.targetField}");
+                }
+                else if (sourceVal != null && !string.IsNullOrWhiteSpace(config.defaultValue))
+                {
+                    target.Fields[config.targetField].Value = Convert.ChangeType(config.defaultValue, t);
                     Trace.WriteLine($"  [UPDATE] field set to default value {source.Id}:{config.sourceField} to {target.Id}:{config.targetField}");
                 }
             }
-
         }
     }
 }

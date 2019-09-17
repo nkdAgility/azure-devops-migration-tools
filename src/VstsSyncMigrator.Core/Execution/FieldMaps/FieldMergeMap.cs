@@ -35,8 +35,11 @@ namespace VstsSyncMigrator.Engine.ComponentContext
                     if (target.Fields[config.targetField].Value.ToString().Contains(config.doneMatch))
                     {
                         Trace.WriteLine(string.Format("  [SKIP] field already merged {0}:{1}+{2} to {3}:{4}", source.Id, config.sourceField1, config.sourceField2, target.Id, config.targetField));
-                    } else { 
-                        target.Fields[config.targetField].Value = string.Format(config.formatExpression, source.Fields[config.sourceField1].Value.ToString(), source.Fields[config.sourceField2].Value.ToString()) + config.doneMatch;
+                    } else {
+                        var val1 = source.Fields[config.sourceField1].Value != null ? source.Fields[config.sourceField1].Value.ToString() : string.Empty;
+                        var val2 = source.Fields[config.sourceField2].Value != null ? source.Fields[config.sourceField2].Value.ToString() : string.Empty;
+
+                        target.Fields[config.targetField].Value = string.Format(config.formatExpression, val1, val2) + config.doneMatch;
                         Trace.WriteLine(string.Format("  [UPDATE] field merged {0}:{1}+{2} to {3}:{4}", source.Id, config.sourceField1, config.sourceField2, target.Id, config.targetField));
                     }
                 }
