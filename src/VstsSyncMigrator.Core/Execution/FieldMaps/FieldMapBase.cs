@@ -20,6 +20,7 @@ namespace VstsSyncMigrator.Engine.ComponentContext
             }
             catch (Exception ex)
             {
+                Trace.WriteLine(string.Format("  [ERROR] {0}", ex.Message));
                 Telemetry.Current.TrackException(ex,
                        new Dictionary<string, string> {
                             { "Source", source.Id.ToString() },
