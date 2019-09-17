@@ -35,6 +35,7 @@ By default, when you are moving from source to target the system will map all of
 However sometimes you want to move data to another field, or use a regex to parse out just the bits that you want. To help we have built a number of mapping tools that should give you the versatility you need.
 
 - **FieldtoFieldMap** - Just want to map one field to another? This is the one for you.
+- **FieldtoFieldMultiMap** - Allows you to create a list of one to one field maps.
 - **FieldMergeMap** - Ever wanted to merge two fields? This mapping will let you do just that.
 - **FieldBlankMap** - Allows you to set an already populated field to empty
 - **FieldtoTagMap** - Want to take a field and convert its value to a tag? Done...
