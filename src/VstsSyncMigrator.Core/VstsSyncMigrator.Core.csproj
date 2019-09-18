@@ -287,7 +287,6 @@
     <Compile Include="Configuration\Processing\WorkItemQueryMigrationConfig.cs" />
     <Compile Include="Configuration\Processing\FixGitCommitLinksConfig.cs" />
     <Compile Include="Configuration\Processing\TeamMigrationConfig.cs" />
-    <Compile Include="Configuration\Processing\WorkItemRevisionReplayMigrationConfig.cs" />
     <Compile Include="Configuration\Processing\WorkItemUpdateAreasAsTagsConfig.cs" />
     <Compile Include="Configuration\Processing\FakeProcessorConfig.cs" />
     <Compile Include="Configuration\Processing\ExportProfilePictureFromADConfig.cs" />
@@ -320,7 +319,7 @@
     <Compile Include="Execution\ComponentContext\TestManagementContext.cs" />
     <Compile Include="Execution\FieldMaps\FieldToTagFieldMap.cs" />
     <Compile Include="Execution\MigrationContext\HtmlFieldEmbeddedImageMigrationContext.cs" />
-    <Compile Include="Execution\MigrationContext\WorkItemRevisionReplayMigrationContext.cs" />
+    <Compile Include="Execution\MigrationContext\WorkItemMigrationContext.cs" />
     <Compile Include="Execution\MigrationContext\WorkItemQueryMigrationContext.cs" />
     <Compile Include="Execution\MigrationContext\LinkMigrationContext.cs" />
     <Compile Include="Execution\MigrationContext\AttachementExportMigrationContext.cs" />
@@ -352,7 +351,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Execution\ComponentContext\TeamProjectContext.cs" />
     <Compile Include="Execution\ComponentContext\TfsQueryContext.cs" />
-    <Compile Include="Execution\MigrationContext\WorkItemMigrationContext.cs" />
     <Compile Include="Execution\ComponentContext\WorkItemStoreContext.cs" />
     <Compile Include="Execution\MigrationContext\TestPlansAndSuitesMigrationContext.cs" />
     <Compile Include="Execution\FieldMaps\RegexFieldMap.cs" />
