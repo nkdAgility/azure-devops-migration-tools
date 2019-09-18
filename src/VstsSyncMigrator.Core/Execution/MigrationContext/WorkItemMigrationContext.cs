@@ -26,6 +26,7 @@ namespace VstsSyncMigrator.Engine
         WorkItemTrackingHttpClient _witClient;
         WorkItemLinkOMatic workItemLinkOMatic = new WorkItemLinkOMatic();
         AttachmentOMatic attachmentOMatic;
+        EmbededImagesRepairOMatic embededImagesRepairOMatic = new EmbededImagesRepairOMatic();
         int _current = 0;
         int _count = 0;
         int _failures = 0;
@@ -138,7 +139,13 @@ namespace VstsSyncMigrator.Engine
                 {
                     Console.WriteLine("...Processing Links");
                    workItemLinkOMatic.MigrateLinks(sourceWorkItem, sourceStore, targetWorkItem, targetStore);
-                } 
+                }
+                Console.WriteLine(string.Format("...Target Work Item may need its HTML field images fixed.}"));
+                embededImagesRepairOMatic.FixHtmlAttachmentLinks(targetWorkItem, me.Source.Collection.Uri.ToString(), me.Target.Collection.Uri.ToString())
+                if (targetWorkItem.IsDirty)
+                {
+                    targetWorkItem.Save();
+                }
                 targetWorkItem.Close();
                 sourceWorkItem.Close();
                 witstopwatch.Stop();

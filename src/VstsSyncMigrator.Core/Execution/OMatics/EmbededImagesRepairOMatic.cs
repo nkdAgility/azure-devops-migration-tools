@@ -18,15 +18,11 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
     {
 
         private readonly HttpClientHandler _httpClientHandler;
-        private readonly string _urlformatch;
-       private string _sourceServerAliases;
         private bool _ignore404Errors = true;
 
-        public EmbededImagesRepairOMatic(string urlForMatch , string sourceServerAliases, bool useDefaultCredentials = true)
+        public EmbededImagesRepairOMatic()
         {
-            _httpClientHandler = new HttpClientHandler { AllowAutoRedirect = false, UseDefaultCredentials = useDefaultCredentials };
-            _urlformatch = urlForMatch;
-            _sourceServerAliases = sourceServerAliases;
+            _httpClientHandler = new HttpClientHandler { AllowAutoRedirect = false, UseDefaultCredentials = true };
         }
 
         /**
@@ -35,7 +31,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
         public void FixHtmlAttachmentLinks(WorkItem wi, string oldTfsurl, string newTfsurl)
         {
 
-            Trace.WriteLine($"Searching for urls: {_urlformatch} and {GetUrlWithOppositeSchema(_urlformatch)} {_sourceServerAliases?.Select(alias => "and " + alias)}");
+            Trace.WriteLine($"Searching for urls: {oldTfsurl} and {GetUrlWithOppositeSchema(oldTfsurl)}");
             bool wiUpdated = false;
             bool hasCandidates = false;
 
@@ -51,7 +47,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                     string regExSearchFileName = "(?<=FileName=)[^=]*";
                     foreach (Match match in matches)
                     {
-                        if (match.Value.ToLower().Contains(oldTfsurl.ToLower()) || match.Value.ToLower().Contains(oldTfsurlOppositeSchema.ToLower()) || (_sourceServerAliases != null && _sourceServerAliases.Any(i => match.Value.ToLower().Contains(i))))
+                        if (match.Value.ToLower().Contains(oldTfsurl.ToLower()) || match.Value.ToLower().Contains(oldTfsurlOppositeSchema.ToLower()) )
                         {
                             //save image locally and upload as attachment
                             Match newFileNameMatch = Regex.Match(match.Value, regExSearchFileName, RegexOptions.IgnoreCase);
