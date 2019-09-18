@@ -426,7 +426,13 @@ namespace VstsSyncMigrator.Engine
             WorkItem newwit;
             var newWorkItemstartTime = DateTime.UtcNow;
             var newWorkItemTimer = Stopwatch.StartNew();
-            newwit = destProject.WorkItemTypes[destType].NewWorkItem();
+            if (destProject.WorkItemTypes.Contains(destType))
+            {
+                newwit = destProject.WorkItemTypes[destType].NewWorkItem();
+            } else
+            {
+                throw new Exception(string.Format("WARNING: Unable to find '{0}' in the target project. Most likley this is due to a typo in the .json configuration under WorkItemTypeDefinition! ", destType));
+            }
             newWorkItemTimer.Stop();
             Telemetry.Current.TrackDependency("TeamService", "NewWorkItem", newWorkItemstartTime, newWorkItemTimer.Elapsed, true);
             Trace.WriteLine(

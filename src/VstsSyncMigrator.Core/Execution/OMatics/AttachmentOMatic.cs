@@ -25,6 +25,11 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
         public void ProcessAttachemnts(WorkItem sourceWorkItem, WorkItem targetWorkItem)
         {
             string exportpath = Path.Combine(_exportBasePath, sourceWorkItem.Id.ToString());
+            if (System.IO.Directory.Exists(exportpath))
+            {
+                System.IO.Directory.Delete(exportpath);
+            }
+            System.IO.Directory.CreateDirectory(exportpath);
             foreach (Attachment wia in sourceWorkItem.Attachments)
             {
                 string filepath = null;
@@ -38,6 +43,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                 }
                 Trace.WriteLine("...done");
             }
+            System.IO.Directory.Delete(exportpath);
         }
 
         private string ExportAttachment(WorkItem wi, Attachment wia, string exportpath)
@@ -73,8 +79,9 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
 
         private void  ImportAttachemnt( WorkItem targetWorkItem,string filepath)
         {
+            var filename = System.IO.Path.GetFileName(filepath);
                 var attachments = targetWorkItem.Attachments.Cast<Attachment>();
-                var attachment = attachments.Where(a => a.Name == filepath).FirstOrDefault();
+                var attachment = attachments.Where(a => a.Name == filename).FirstOrDefault();
                 if (attachment == null)
                 {
                     Attachment a = new Attachment(filepath);

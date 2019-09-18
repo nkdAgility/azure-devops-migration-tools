@@ -67,7 +67,7 @@ namespace VstsSyncMigrator.Engine
                 Trace.Write(fname);
 
                 string fpath = Path.Combine(exportPath, fname);
-                if (!File.Exists(fpath))
+                if (!System.IO.File.Exists(fpath))
                 {
                     Trace.Write("...downloading");
                     try
