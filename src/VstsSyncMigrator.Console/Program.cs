@@ -25,6 +25,8 @@ using Microsoft.ApplicationInsights.DataContracts;
 using NuGet;
 using System.Net.NetworkInformation;
 using VstsSyncMigrator.Commands;
+using Microsoft.VisualStudio.Services.Common;
+using System.Net;
 
 namespace VstsSyncMigrator.ConsoleApp
 {
@@ -40,6 +42,24 @@ namespace VstsSyncMigrator.ConsoleApp
         {
             [Option('c', "config", Required = true, HelpText = "Configuration file to be processed.")]
             public string ConfigFile { get; set; }
+
+            [Option("sourceDomain", Required = false, HelpText = "Domain used to connect to the source TFS instance.")]
+            public string SourceDomain { get; set; }
+
+            [Option("sourceUserName", Required = false, HelpText = "User Name used to connect to the source TFS instance.")]
+            public string SourceUserName { get; set; }
+
+            [Option("sourcePassword", Required = false, HelpText = "Password used to connect to source TFS instance.")]
+            public string SourcePassword { get; set; }
+
+            [Option("targetDomain", Required = false, HelpText = "Domain used to connect to the target TFS instance.")]
+            public string TargetDomain { get; set; }
+
+            [Option("targetUserName", Required = false, HelpText = "User Name used to connect to the target TFS instance.")]
+            public string TargetUserName { get; set; }
+
+            [Option("targetPassword", Required = false, HelpText = "Password used to connect to target TFS instance.")]
+            public string TargetPassword { get; set; }
         }
 
         static DateTime startTime = DateTime.Now;
@@ -147,15 +167,30 @@ namespace VstsSyncMigrator.ConsoleApp
             else
             {
                 Trace.WriteLine("Loading Config");
-                StreamReader sr = new StreamReader(opts.ConfigFile);
-                string configurationjson = sr.ReadToEnd();
-                sr.Close();
+                string configurationjson;
+                using (var sr = new StreamReader(opts.ConfigFile))
+                    configurationjson = sr.ReadToEnd();
+
                 ec = JsonConvert.DeserializeObject<EngineConfiguration>(configurationjson, 
                     new FieldMapConfigJsonConverter(),
                     new ProcessorConfigJsonConverter());
             }
             Trace.WriteLine("Config Loaded, creating engine", "[Info]");
-            MigrationEngine me = new MigrationEngine(ec);
+
+            VssCredentials sourceCredentials = null;
+            VssCredentials targetCredentials = null;
+            if (!string.IsNullOrWhiteSpace(opts.SourceUserName) && !string.IsNullOrWhiteSpace(opts.SourcePassword))
+                sourceCredentials = new VssCredentials(new Microsoft.VisualStudio.Services.Common.WindowsCredential(new NetworkCredential(opts.SourceUserName, opts.SourcePassword, opts.SourceDomain)));
+
+            if (!string.IsNullOrWhiteSpace(opts.TargetUserName) && !string.IsNullOrWhiteSpace(opts.TargetPassword))
+                targetCredentials = new VssCredentials(new Microsoft.VisualStudio.Services.Common.WindowsCredential(new NetworkCredential(opts.TargetUserName, opts.TargetPassword, opts.TargetDomain)));
+
+            MigrationEngine me;
+            if (sourceCredentials == null && targetCredentials == null)
+                me = new MigrationEngine(ec);
+            else
+                me = new MigrationEngine(ec, sourceCredentials, targetCredentials);
+
             Trace.WriteLine("Engine created, running...", "[Info]");
             me.Run();
             Trace.WriteLine("Run complete...", "[Info]");
