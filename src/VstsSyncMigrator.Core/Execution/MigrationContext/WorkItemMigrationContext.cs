@@ -14,6 +14,7 @@ using Microsoft.VisualStudio.Services.WebApi;
 using VstsSyncMigrator.Engine.Configuration.Processing;
 using Microsoft.VisualStudio.Services.WebApi.Patch.Json;
 using System.Collections;
+using VstsSyncMigrator.Core.Execution.OMatics;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -22,6 +23,7 @@ namespace VstsSyncMigrator.Engine
         private readonly WorkItemMigrationConfig _config;
         List<String> _ignore;
         WorkItemTrackingHttpClient _witClient;
+        WorkItemLinkOMatic workItemLinkOMatic = new WorkItemLinkOMatic();
         int _current = 0;
         int _count = 0;
         int _failures = 0;
@@ -87,7 +89,9 @@ namespace VstsSyncMigrator.Engine
             var targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
             var destProject = targetStore.GetProject();
             Trace.WriteLine($"Found target project as {destProject.Name}", Name);
-
+            //////////////////////////////////////////////////////////
+            
+            //////////////////////////////////////////////////
             _current = sourceWorkItems.Count;
             _count = 0;
             _elapsedms = 0;
@@ -98,24 +102,30 @@ namespace VstsSyncMigrator.Engine
             foreach (WorkItem sourceWorkItem in sourceWorkItems)
             {
                 var witstopwatch = Stopwatch.StartNew();
-                var targetFound = targetStore.FindReflectedWorkItem(sourceWorkItem, false);
+                var targetWorkItem = targetStore.FindReflectedWorkItem(sourceWorkItem, false);
                 Trace.WriteLine($"{_current} - Migrating: {sourceWorkItem.Id} - {sourceWorkItem.Type.Name}", Name);
 
-                if (targetFound == null)
+                if (targetWorkItem == null)
                 {
                     if (_config.ReplayRevisions)
                     {
-                        CreateWorkItem_ReplayRevisions(sourceWorkItem, destProject, sourceStore, _current, targetStore);
+                        targetWorkItem = CreateWorkItem_ReplayRevisions(sourceWorkItem, destProject, sourceStore, _current, targetStore);
                     } else
                     {
-                        CreateWorkItem_TipOnly(sourceWorkItem, destProject, sourceStore, _current, targetStore);
+                        targetWorkItem = CreateWorkItem_TipOnly(sourceWorkItem, destProject, sourceStore, _current, targetStore);
                     }
+                    
                 }
                 else
                 {
                     Console.WriteLine("...Exists");
                 }
-
+                if (targetWorkItem != null && _config.LinkMigration)
+                {
+                    Console.WriteLine("...Processing Links");
+                   workItemLinkOMatic.MigrateLinks(sourceWorkItem, sourceStore, targetWorkItem, targetStore);
+                }
+                targetWorkItem.Close();
                 sourceWorkItem.Close();
                 witstopwatch.Stop();
                 _elapsedms += witstopwatch.ElapsedMilliseconds;
@@ -156,7 +166,7 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        private void CreateWorkItem_ReplayRevisions(WorkItem sourceWorkItem, Project destProject, WorkItemStoreContext sourceStore,
+        private WorkItem CreateWorkItem_ReplayRevisions(WorkItem sourceWorkItem, Project destProject, WorkItemStoreContext sourceStore,
             int current,
             WorkItemStoreContext targetStore)
         {
@@ -259,7 +269,7 @@ namespace VstsSyncMigrator.Engine
                     newwit.History = history.ToString();
 
                     newwit.Save();
-                    newwit.Close();
+               
                     Trace.WriteLine($"...Saved as {newwit.Id}", Name);
 
                     if (_config.UpdateSourceReflectedId && sourceWorkItem.Fields.Contains(me.Source.Config.ReflectedWorkItemIDFieldName))
@@ -269,6 +279,7 @@ namespace VstsSyncMigrator.Engine
                         sourceWorkItem.Save();
                         Trace.WriteLine($"...and Source Updated {sourceWorkItem.Id}", Name);
                     }
+         
                 }
             }
             catch (Exception ex)
@@ -282,9 +293,10 @@ namespace VstsSyncMigrator.Engine
                 }
                 Trace.WriteLine(ex.ToString(), Name);
             }
+            return newwit;
         }
 
-        private void CreateWorkItem_TipOnly(WorkItem sourceWorkItem, Project destProject, WorkItemStoreContext sourceStore,
+        private WorkItem CreateWorkItem_TipOnly(WorkItem sourceWorkItem, Project destProject, WorkItemStoreContext sourceStore,
             int current,
             WorkItemStoreContext targetStore)
         {
@@ -353,11 +365,10 @@ namespace VstsSyncMigrator.Engine
                         }
 
                         _failures++;
-                        return;
+                        return null;
                     }
 
                     newwit.Save();
-                    newwit.Close();
                     Trace.WriteLine(string.Format("...Saved as {0}", newwit.Id), this.Name);
 
                     if (me.Source.Config.ReflectedWorkItemIDFieldName != null)
@@ -383,6 +394,7 @@ namespace VstsSyncMigrator.Engine
                     Trace.WriteLine(ex.ToString(), this.Name);
                 }
             }
+            return newwit;
         }
 
         private WorkItem CreateWorkItem_Shell(Project destProject, WorkItem currentRevisionWorkItem, string destType)
@@ -507,19 +519,6 @@ namespace VstsSyncMigrator.Engine
                 CultureInfo.CurrentCulture, out result);
         }
 
-
-        private static bool HasChildPBI(WorkItem sourceWI)
-        {
-            return sourceWI.Title.ToLower().StartsWith("epic") || sourceWI.Title.ToLower().StartsWith("theme");
-        }
-
-        private static string ReplaceFirstOccurence(string wordToReplace, string replaceWith, string input)
-        {
-            Regex r = new Regex(wordToReplace, RegexOptions.IgnoreCase);
-            return r.Replace(input, replaceWith, 1);
-        }
-
-
         private static void AppendMigratedByFooter(StringBuilder history)
         {
             history.Append("<p>Migrated by <a href='https://dev.azure.com/nkdagility/migration-tools/'>Azure DevOps Migration Tools</a> open source.</p>");
@@ -562,14 +561,10 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        static bool isNumeric(string val, NumberStyles NumberStyle)
-        {
-            Double result;
-            return Double.TryParse(val, NumberStyle,
-                System.Globalization.CultureInfo.CurrentCulture, out result);
-        }
 
     }
+
+
 
     public class NodeDetecomatic
     {

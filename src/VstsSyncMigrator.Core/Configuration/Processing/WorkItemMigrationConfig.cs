@@ -20,6 +20,8 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
         /// <inheritdoc />
         public Type Processor => typeof(WorkItemMigrationContext);
 
+        public bool LinkMigration { get; set; }
+
 
         /// <inheritdoc />
         public bool IsProcessorCompatible(IReadOnlyList<ITfsProcessingConfig> otherProcessors)

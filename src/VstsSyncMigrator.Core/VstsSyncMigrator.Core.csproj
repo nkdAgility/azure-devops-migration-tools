@@ -336,6 +336,7 @@
     <Compile Include="Execution\MigrationContext\FakeProcessor.cs" />
     <Compile Include="Execution\MigrationContext\TeamMigrationContext.cs" />
     <Compile Include="Execution\MigrationContext\WorkItemPostProcessingContext.cs" />
+    <Compile Include="Execution\OMatics\WorkItemLinkOMatic.cs" />
     <Compile Include="Execution\ProcessingContext\ExportTeamList.cs" />
     <Compile Include="Execution\ProcessingContext\FixGitCommitLinks.cs" />
     <Compile Include="Execution\ProcessingContext\WorkItemDelete.cs" />
