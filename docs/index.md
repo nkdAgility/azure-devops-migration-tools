@@ -62,9 +62,9 @@ Note: **WorkItemMigrationContext** and **WorkItemRevisionReplayMigrationContext*
 ##### Work Items
 1. **NodeStructuresMigrationContext** - Moves over the structure of area and iteration paths, you have the option to inject a new root node by setting the `PrefixProjectToNodes` property. 
 1. **WorkItemMigrationContext** - **The work horse...** push either the tip or revisions from one location to another while maintaining context. Make sure that you add a ReflectedWorkItemID and you can restart the service at any time...
-1. **AttachementExportMigrationContext** - Exports all work items attachments to the migration machine. This is used in partnership with the **AttachmentImportMigrationContext**   
-1. **AttachementImportMigrationContext** - Imports all work items attachments from the migration machine. This is used in partnership with the **AttachementExportMigrationContext**
-1. **LinkMigrationContext** - Migrates all the work item links, both between work items and external links.
+1. (depricated included in WorkItemMigrationContext)**AttachementExportMigrationContext** - Exports all work items attachments to the migration machine. This is used in partnership with the **AttachmentImportMigrationContext**   
+1. (depricated included in WorkItemMigrationContext)**AttachementImportMigrationContext** - Imports all work items attachments from the migration machine. This is used in partnership with the **AttachementExportMigrationContext**
+1. (depricated included in WorkItemMigrationContext) **LinkMigrationContext** - Migrates all the work item links, both between work items and external links.
 1. **WorkItemQueryMigrationContext** - Migrate all shared work item queries
 1. **WorkItemDelete**
 1. **HtmlFieldEmbeddedImageMigrationContext** - Migrate embedded images in work items
