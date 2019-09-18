@@ -16,6 +16,7 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
         public bool AppendMigrationToolSignatureFooter { get; set; }
         public string QueryBit { get; set; }
         /// <inheritdoc />
+        public string OrderBit { get; set; }
         public bool Enabled { get; set; }
         /// <inheritdoc />
         public Type Processor => typeof(WorkItemMigrationContext);
