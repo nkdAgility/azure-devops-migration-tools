@@ -15,6 +15,7 @@ using VstsSyncMigrator.Engine.Configuration.Processing;
 using Microsoft.VisualStudio.Services.WebApi.Patch.Json;
 using System.Collections;
 using VstsSyncMigrator.Core.Execution.OMatics;
+using Microsoft.TeamFoundation.WorkItemTracking.Proxy;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -24,6 +25,8 @@ namespace VstsSyncMigrator.Engine
         List<String> _ignore;
         WorkItemTrackingHttpClient _witClient;
         WorkItemLinkOMatic workItemLinkOMatic = new WorkItemLinkOMatic();
+        AttachmentOMatic attachmentOMatic;
+        EmbededImagesRepairOMatic embededImagesRepairOMatic = new EmbededImagesRepairOMatic();
         int _current = 0;
         int _count = 0;
         int _failures = 0;
@@ -39,6 +42,10 @@ namespace VstsSyncMigrator.Engine
 
             VssClientCredentials adoCreds = new VssClientCredentials();
             _witClient = new WorkItemTrackingHttpClient(me.Target.Collection.Uri, adoCreds);
+
+            var workItemServer = me.Source.Collection.GetService<WorkItemServer>();
+            attachmentOMatic = new AttachmentOMatic(workItemServer, config.AttachmentWorkingPath);
+
         }
 
         private void PopulateIgnoreList()
@@ -104,7 +111,7 @@ namespace VstsSyncMigrator.Engine
                 var witstopwatch = Stopwatch.StartNew();
                 var targetWorkItem = targetStore.FindReflectedWorkItem(sourceWorkItem, false);
                 Trace.WriteLine($"{_current} - Migrating: {sourceWorkItem.Id} - {sourceWorkItem.Type.Name}", Name);
-
+                Console.WriteLine(string.Format("STATUS: Work Item has {0} revisions and revision migration is set to {1}", sourceWorkItem.Rev, _config.ReplayRevisions));
                 if (targetWorkItem == null)
                 {
                     if (_config.ReplayRevisions)
@@ -120,10 +127,27 @@ namespace VstsSyncMigrator.Engine
                 {
                     Console.WriteLine("...Exists");
                 }
-                if (targetWorkItem != null && _config.LinkMigration)
+                ///////////////////////////////////////////////
+                Console.WriteLine(string.Format("...Source Work Item has {0} attachements and Attachment migration is set to {1}", sourceWorkItem.Attachments.Count, _config.AttachmentMigration));
+                if (targetWorkItem != null && _config.AttachmentMigration && sourceWorkItem.Attachments.Count > 0)
+                {
+                    attachmentOMatic.ProcessAttachemnts(sourceWorkItem, targetWorkItem);
+                }
+                ///////////////////////////////////////////////
+                Console.WriteLine(string.Format("...Source Work Item has {0} links and Link migration is set to {1}", sourceWorkItem.Links.Count, _config.LinkMigration));
+                if (targetWorkItem != null && _config.LinkMigration && sourceWorkItem.Links.Count > 0)
                 {
                     Console.WriteLine("...Processing Links");
                    workItemLinkOMatic.MigrateLinks(sourceWorkItem, sourceStore, targetWorkItem, targetStore);
+                }
+                Console.WriteLine(string.Format("...Target Work Item may need its HTML field images fixed.}"));
+                if (targetWorkItem != null && _config.FixHtmlAttachmentLinks)
+                {
+                    embededImagesRepairOMatic.FixHtmlAttachmentLinks(targetWorkItem, me.Source.Collection.Uri.ToString(), me.Target.Collection.Uri.ToString());
+                }
+                if (targetWorkItem.IsDirty)
+                {
+                    targetWorkItem.Save();
                 }
                 targetWorkItem.Close();
                 sourceWorkItem.Close();
@@ -402,7 +426,13 @@ namespace VstsSyncMigrator.Engine
             WorkItem newwit;
             var newWorkItemstartTime = DateTime.UtcNow;
             var newWorkItemTimer = Stopwatch.StartNew();
-            newwit = destProject.WorkItemTypes[destType].NewWorkItem();
+            if (destProject.WorkItemTypes.Contains(destType))
+            {
+                newwit = destProject.WorkItemTypes[destType].NewWorkItem();
+            } else
+            {
+                throw new Exception(string.Format("WARNING: Unable to find '{0}' in the target project. Most likley this is due to a typo in the .json configuration under WorkItemTypeDefinition! ", destType));
+            }
             newWorkItemTimer.Stop();
             Telemetry.Current.TrackDependency("TeamService", "NewWorkItem", newWorkItemstartTime, newWorkItemTimer.Elapsed, true);
             Trace.WriteLine(
