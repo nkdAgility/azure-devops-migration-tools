@@ -19,6 +19,7 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
         }
 
         public string QueryBit { get; set; }
+        public string OrderBit { get; set; } = "[System.ChangedDate] desc";
 
         /// <inheritdoc />
         public bool IsProcessorCompatible(IReadOnlyList<ITfsProcessingConfig> otherProcessors)
