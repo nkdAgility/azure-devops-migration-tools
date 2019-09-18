@@ -120,7 +120,7 @@ namespace VstsSyncMigrator.Engine
                 {
                     Console.WriteLine("...Exists");
                 }
-                if (targetWorkItem != null)
+                if (targetWorkItem != null && _config.LinkMigration)
                 {
                     Console.WriteLine("...Processing Links");
                    workItemLinkOMatic.MigrateLinks(sourceWorkItem, sourceStore, targetWorkItem, targetStore);
