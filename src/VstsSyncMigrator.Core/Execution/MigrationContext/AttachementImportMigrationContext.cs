@@ -52,29 +52,7 @@ namespace VstsSyncMigrator.Engine
 
                     File.Move(file, renamedFilePath);
                     targetWI = targetStore.FindReflectedWorkItemByReflectedWorkItemId(sourceReflectedID, true);
-                    if (targetWI != null)
-                    {
-                        Trace.WriteLine(string.Format("{0} of {1} - Import {2} to {3}", current, files.Count, fileName, targetWI.Id));
-                        var attachments = targetWI.Attachments.Cast<Attachment>();
-                        var attachment = attachments.Where(a => a.Name == targetFileName).FirstOrDefault();
-                        if (attachment == null)
-                        {
-                            Attachment a = new Attachment(renamedFilePath);
-                            targetWI.Attachments.Add(a);
-                            targetWI.Save();
-                        }
-                        else
-                        {
-                            Trace.WriteLine(string.Format(" [SKIP] WorkItem {0} already contains attachment {1}", targetWI.Id, fileName));
-                            skipped++;
-                        }
-                    }
-                    else
-                    {
-                        Trace.WriteLine(string.Format("{0} of {1} - Skipping {2} to {3}", current, files.Count, fileName, 0));
-                        skipped++;
-                    }
-                    File.Delete(renamedFilePath);
+                    skipped = ImportAttachemnt(files, targetWI, current, skipped, fileName, targetFileName, renamedFilePath);
                 }
                 catch (FileAttachmentException ex)
                 {
@@ -89,5 +67,32 @@ namespace VstsSyncMigrator.Engine
             Trace.WriteLine(string.Format(@"IMPORT DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds - {4} Files, {1} Files imported, {2} Failures, {3} Skipped", stopwatch.Elapsed, (files.Count - failures - skipped), failures, skipped, files.Count));
         }
 
+        private static int ImportAttachemnt(List<string> files, WorkItem targetWI, int current, int skipped, string fileName, string targetFileName, string renamedFilePath)
+        {
+            if (targetWI != null)
+            {
+                Trace.WriteLine(string.Format("{0} of {1} - Import {2} to {3}", current, files.Count, fileName, targetWI.Id));
+                var attachments = targetWI.Attachments.Cast<Attachment>();
+                var attachment = attachments.Where(a => a.Name == targetFileName).FirstOrDefault();
+                if (attachment == null)
+                {
+                    Attachment a = new Attachment(renamedFilePath);
+                    targetWI.Attachments.Add(a);
+                    targetWI.Save();
+                }
+                else
+                {
+                    Trace.WriteLine(string.Format(" [SKIP] WorkItem {0} already contains attachment {1}", targetWI.Id, fileName));
+                    skipped++;
+                }
+            }
+            else
+            {
+                Trace.WriteLine(string.Format("{0} of {1} - Skipping {2} to {3}", current, files.Count, fileName, 0));
+                skipped++;
+            }
+            File.Delete(renamedFilePath);
+            return skipped;
+        }
     }
 }

@@ -47,45 +47,48 @@ namespace VstsSyncMigrator.Engine
 
             foreach (WorkItem wi in sourceWIS)
             {
-                Trace.Write(string.Format("Attachement Export: {0} of {1} - {2}", current, sourceWIS.Count, wi.Id));
-                foreach (Attachment wia in wi.Attachments)
-                {
-                    string fname = string.Format("{0}#{1}", wi.Id, wia.Name);
-                    fname = GetSafeFilename(fname);
-
-                    Trace.Write("-");
-                    Trace.Write(fname);
-
-                    string fpath = Path.Combine(exportPath, fname);
-                    if (!File.Exists(fpath))
-                    {
-                        Trace.Write("...downloading");
-                        try
-                        {
-                            var fileLocation = workItemServer.DownloadFile(wia.Id);
-                            File.Copy(fileLocation, fpath, true);
-                            Trace.Write("...done");
-                        }
-                        catch (Exception ex)
-                        {
-                            Telemetry.Current.TrackException(ex);
-                            Trace.Write($"\r\nException downloading attachements {ex.Message}");
-                        }
-                     
-                    }
-                    else
-                    {
-                        Trace.Write("...skipping");
-                    }
-                    Trace.WriteLine("...done");
-                }
-                current--;
+                WorkItemAttachmentExport( workItemServer, wi);
+                current++;
             }
             //////////////////////////////////////////////////
             stopwatch.Stop();
             Console.WriteLine(@"EXPORT DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds", stopwatch.Elapsed);
         }
 
+        private void WorkItemAttachmentExport(WorkItemServer workItemServer, WorkItem wi)
+        {
+            foreach (Attachment wia in wi.Attachments)
+            {
+                string fname = string.Format("{0}#{1}", wi.Id, wia.Name);
+                fname = GetSafeFilename(fname);
+
+                Trace.Write("-");
+                Trace.Write(fname);
+
+                string fpath = Path.Combine(exportPath, fname);
+                if (!File.Exists(fpath))
+                {
+                    Trace.Write("...downloading");
+                    try
+                    {
+                        var fileLocation = workItemServer.DownloadFile(wia.Id);
+                        File.Copy(fileLocation, fpath, true);
+                        Trace.Write("...done");
+                    }
+                    catch (Exception ex)
+                    {
+                        Telemetry.Current.TrackException(ex);
+                        Trace.Write($"\r\nException downloading attachements {ex.Message}");
+                    }
+
+                }
+                else
+                {
+                    Trace.Write("...skipping");
+                }
+                Trace.WriteLine("...done");
+            }
+        }
 
         public string GetSafeFilename(string filename)
         {

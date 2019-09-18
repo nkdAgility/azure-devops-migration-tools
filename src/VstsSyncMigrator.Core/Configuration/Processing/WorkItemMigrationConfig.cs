@@ -21,6 +21,8 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
         public Type Processor => typeof(WorkItemMigrationContext);
 
         public bool LinkMigration { get; set; }
+        public bool AttachmentMigration { get; set; }
+        public string AttachmentWorkingPath { get; set; }
 
 
         /// <inheritdoc />
