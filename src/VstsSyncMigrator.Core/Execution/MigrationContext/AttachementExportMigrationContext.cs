@@ -10,6 +10,7 @@ using VstsSyncMigrator.Engine.Configuration.Processing;
 
 namespace VstsSyncMigrator.Engine
 {
+    [Obsolete()]
     public class AttachementExportMigrationContext : AttachementMigrationContextBase
     {
 

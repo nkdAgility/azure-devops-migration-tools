@@ -1,4 +1,5 @@
 ﻿using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -7,6 +8,7 @@ using VstsSyncMigrator.Engine.Configuration.Processing;
 
 namespace VstsSyncMigrator.Engine
 {
+    [Obsolete()]
     public class AttachementImportMigrationContext : AttachementMigrationContextBase
     {
         public override string Name

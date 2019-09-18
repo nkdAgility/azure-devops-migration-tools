@@ -9,6 +9,7 @@ using VstsSyncMigrator.Engine.Execution.Exceptions;
 
 namespace VstsSyncMigrator.Engine
 {
+    [Obsolete()]
     public class LinkMigrationContext : MigrationContextBase
     {
 
