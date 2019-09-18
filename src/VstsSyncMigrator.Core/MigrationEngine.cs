@@ -21,8 +21,6 @@ namespace VstsSyncMigrator.Engine
         Dictionary<string, IWitdMapper> workItemTypeDefinitions = new Dictionary<string, IWitdMapper>();
         ITeamProjectContext source;
         ITeamProjectContext target;
-        string reflectedWorkItemIdFieldName = "TfsMigrationTool.ReflectedWorkItemId";
-        private string sourceReflectedWorkItemIdFieldName = "ProcessName.ReflectedWorkItemId";
 
         public MigrationEngine()
         {
@@ -99,15 +97,6 @@ namespace VstsSyncMigrator.Engine
             {
                 return target;
             }
-        }
-        public string ReflectedWorkItemIdFieldName
-        {
-            get { return reflectedWorkItemIdFieldName;}
-        }
-
-        public string SourceReflectedWorkItemIdFieldName
-        {
-            get { return sourceReflectedWorkItemIdFieldName; }
         }
 
 

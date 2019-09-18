@@ -7,6 +7,7 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
 {
     public class WorkItemMigrationConfig : ITfsProcessingConfig
     {
+        public bool ReplayRevisions { get; set; }
         public bool PrefixProjectToNodes { get; set; }
         public bool UpdateCreatedDate { get; set; }
         public bool UpdateCreatedBy { get; set; }
@@ -19,12 +20,13 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
         /// <inheritdoc />
         public Type Processor => typeof(WorkItemMigrationContext);
 
+        public bool LinkMigration { get; set; }
+
 
         /// <inheritdoc />
         public bool IsProcessorCompatible(IReadOnlyList<ITfsProcessingConfig> otherProcessors)
         {
-            Trace.WriteLine($"Note: {GetType().Name} is not compatible with {typeof(WorkItemRevisionReplayMigrationConfig).Name}");
-            return !otherProcessors.Any(x => x is WorkItemRevisionReplayMigrationConfig);
+            return true;
         }
     }
 }

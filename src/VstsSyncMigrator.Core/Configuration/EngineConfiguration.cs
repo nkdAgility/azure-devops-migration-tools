@@ -114,10 +114,9 @@ namespace VstsSyncMigrator.Engine.Configuration
                     { "Product Backlog Item", "Product Backlog Item" }
             };
             ec.Processors = new List<ITfsProcessingConfig>();
-            ec.Processors.Add(new WorkItemMigrationConfig() { Enabled = false, UpdateCreatedBy=true, PrefixProjectToNodes = true, UpdateCreatedDate=true, UpdateSourceReflectedId=true, QueryBit = @"AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')" });
-            ec.Processors.Add(new WorkItemRevisionReplayMigrationConfig() { Enabled = false, PrefixProjectToNodes = true, UpdateSourceReflectedId=true, QueryBit = @"AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')" });
+            ec.Processors.Add(new WorkItemMigrationConfig() { Enabled = false, ReplayRevisions= true, LinkMigration = true, UpdateCreatedBy =true, PrefixProjectToNodes = false, UpdateCreatedDate=true, UpdateSourceReflectedId=true, QueryBit = @"AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')" });
             ec.Processors.Add(new WorkItemUpdateConfig() { Enabled = false, QueryBit = @"AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')" });
-            ec.Processors.Add(new NodeStructuresMigrationConfig() { Enabled = false, BasePaths = new [] { "Product\\Area\\Path1", "Product\\Area\\Path2" } });
+            ec.Processors.Add(new NodeStructuresMigrationConfig() { Enabled = false, PrefixProjectToNodes=false, BasePaths = new [] { "Product\\Area\\Path1", "Product\\Area\\Path2" } });
             ec.Processors.Add(new LinkMigrationConfig() { Enabled = false, QueryBit= @"AND ([System.ExternalLinkCount] > 0 OR [System.RelatedLinkCount] > 0)" });
             ec.Processors.Add(new WorkItemPostProcessingConfig() { Enabled = false, QueryBit= "AND [TfsMigrationTool.ReflectedWorkItemId] = '' ", WorkItemIDs = new List<int> {1,2,3} });
             ec.Processors.Add(new WorkItemDeleteConfig() { Enabled = false });
