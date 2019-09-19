@@ -27,23 +27,36 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
             string exportpath = Path.Combine(_exportBasePath, sourceWorkItem.Id.ToString());
             if (System.IO.Directory.Exists(exportpath))
             {
-                System.IO.Directory.Delete(exportpath);
+                System.IO.Directory.Delete(exportpath, true);
             }
             System.IO.Directory.CreateDirectory(exportpath);
             foreach (Attachment wia in sourceWorkItem.Attachments)
             {
-                string filepath = null;
-                filepath = ExportAttachment(sourceWorkItem, wia, exportpath);
-                if (filepath != null)
-                { 
-                ImportAttachemnt(targetWorkItem, filepath);
-                } else
+                try
                 {
-
+                    string filepath = null;
+                    filepath = ExportAttachment(sourceWorkItem, wia, exportpath);
+                    if (filepath != null)
+                    {
+                        ImportAttachemnt(targetWorkItem, filepath);
+                    }
+                    Trace.WriteLine("...done");
                 }
-                Trace.WriteLine("...done");
+                catch (Exception)
+                {
+                    Trace.WriteLine(string.Format(" ERROR: Unable to process atachment from source wi {0} called {1}", sourceWorkItem.Id, wia.Name));
+                }
+                
             }
-            System.IO.Directory.Delete(exportpath);
+            try
+            {
+                System.IO.Directory.Delete(exportpath, true);
+            }
+            catch (Exception)
+            {
+                Trace.WriteLine(string.Format(" ERROR: Unable to delete folder {0}", targetWorkItem.Id));
+            }
+            
         }
 
         private string ExportAttachment(WorkItem wi, Attachment wia, string exportpath)
@@ -92,7 +105,15 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                 {
                     Trace.WriteLine(string.Format(" [SKIP] WorkItem {0} already contains attachment {1}", targetWorkItem.Id, filepath));
                 }
-            File.Delete(filepath);
+            try
+            {
+                File.Delete(filepath);
+            }
+            catch (Exception)
+            {
+                Trace.WriteLine(string.Format(" ERROR: Unable to delete file {0} from {1}", filepath, targetWorkItem.Id));
+            }
+            
         }
 
         public string GetSafeFilename(string filename)
