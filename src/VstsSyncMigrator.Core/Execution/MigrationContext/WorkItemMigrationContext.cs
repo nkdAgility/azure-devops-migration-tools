@@ -140,7 +140,7 @@ namespace VstsSyncMigrator.Engine
                     Console.WriteLine("...Processing Links");
                    workItemLinkOMatic.MigrateLinks(sourceWorkItem, sourceStore, targetWorkItem, targetStore);
                 }
-                Console.WriteLine(string.Format("...Target Work Item may need its HTML field images fixed.}"));
+                Console.WriteLine(string.Format("...Target Work Item may need its HTML field images fixed."));
                 if (targetWorkItem != null && _config.FixHtmlAttachmentLinks)
                 {
                     embededImagesRepairOMatic.FixHtmlAttachmentLinks(targetWorkItem, me.Source.Collection.Uri.ToString(), me.Target.Collection.Uri.ToString());
