@@ -32,16 +32,21 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
             System.IO.Directory.CreateDirectory(exportpath);
             foreach (Attachment wia in sourceWorkItem.Attachments)
             {
-                string filepath = null;
-                filepath = ExportAttachment(sourceWorkItem, wia, exportpath);
-                if (filepath != null)
-                { 
-                ImportAttachemnt(targetWorkItem, filepath);
-                } else
+                try
                 {
-
+                    string filepath = null;
+                    filepath = ExportAttachment(sourceWorkItem, wia, exportpath);
+                    if (filepath != null)
+                    {
+                        ImportAttachemnt(targetWorkItem, filepath);
+                    }
+                    Trace.WriteLine("...done");
                 }
-                Trace.WriteLine("...done");
+                catch (Exception)
+                {
+                    Trace.WriteLine(string.Format(" ERROR: Unable to process atachment from source wi {0} called {1}", sourceWorkItem.Id, wia.Name));
+                }
+                
             }
             try
             {

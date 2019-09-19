@@ -148,11 +148,14 @@ namespace VstsSyncMigrator.Engine
                     embededImagesRepairOMatic.FixHtmlAttachmentLinks(targetWorkItem, me.Source.Collection.Uri.ToString(), me.Target.Collection.Uri.ToString());
                 }
                 ///////////////////////////////////////////////
-                if (targetWorkItem.IsDirty)
+                if (targetWorkItem != null  && targetWorkItem.IsDirty)
                 {
                     targetWorkItem.Save();
                 }
-                targetWorkItem.Close();
+                if (targetWorkItem != null)
+                {
+                    targetWorkItem.Close();
+                }
                 sourceWorkItem.Close();
                 witstopwatch.Stop();
                 _elapsedms += witstopwatch.ElapsedMilliseconds;
