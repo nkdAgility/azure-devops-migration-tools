@@ -16,6 +16,7 @@ using Microsoft.VisualStudio.Services.WebApi.Patch.Json;
 using System.Collections;
 using VstsSyncMigrator.Core.Execution.OMatics;
 using Microsoft.TeamFoundation.WorkItemTracking.Proxy;
+using System.Net;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -176,7 +177,7 @@ namespace VstsSyncMigrator.Engine
                 }
                
             }
-            catch (Exception ex)
+            catch (WebException ex)
             {
                 Trace.WriteLine("ERROR: Failed to create work item. Will retry untill ");
                 Telemetry.Current.TrackException(ex);
@@ -190,7 +191,6 @@ namespace VstsSyncMigrator.Engine
                 {
                     ProcessWorkItem(sourceStore, targetStore, destProject, sourceWorkItem);
                 }
-                
             }
             witstopwatch.Stop();
             _elapsedms += witstopwatch.ElapsedMilliseconds;
