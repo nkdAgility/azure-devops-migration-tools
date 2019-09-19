@@ -108,7 +108,19 @@ namespace VstsSyncMigrator.Engine
 
             foreach (WorkItem sourceWorkItem in sourceWorkItems)
             {
-                var witstopwatch = Stopwatch.StartNew();
+                ProcessWorkItem(sourceStore, targetStore, destProject, sourceWorkItem, _config.WorkItemCreateRetryLimit);
+            }
+            //////////////////////////////////////////////////
+            stopwatch.Stop();
+
+            Console.WriteLine(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds", stopwatch.Elapsed);
+        }
+
+        private void ProcessWorkItem(WorkItemStoreContext sourceStore, WorkItemStoreContext targetStore, Project destProject, WorkItem sourceWorkItem, int retryLimit = 5, int retrys = 0)
+        {
+            var witstopwatch = Stopwatch.StartNew();
+            try
+            {
                 var targetWorkItem = targetStore.FindReflectedWorkItem(sourceWorkItem, false);
                 Trace.WriteLine($"{_current} - Migrating: {sourceWorkItem.Id} - {sourceWorkItem.Type.Name}", Name);
                 ///////////////////////////////////////////////
@@ -118,15 +130,17 @@ namespace VstsSyncMigrator.Engine
                     if (_config.ReplayRevisions)
                     {
                         targetWorkItem = CreateWorkItem_ReplayRevisions(sourceWorkItem, destProject, sourceStore, _current, targetStore);
-                    } else
+                    }
+                    else
                     {
                         targetWorkItem = CreateWorkItem_TipOnly(sourceWorkItem, destProject, sourceStore, _current, targetStore);
                     }
-                    
+
                 }
                 else
                 {
                     Console.WriteLine("...Exists");
+
                 }
                 ///////////////////////////////////////////////
                 Console.WriteLine(string.Format("...Source Work Item has {0} attachements and Attachment migration is set to {1}", sourceWorkItem.Attachments.Count, _config.AttachmentMigration));
@@ -139,7 +153,7 @@ namespace VstsSyncMigrator.Engine
                 if (targetWorkItem != null && _config.LinkMigration && sourceWorkItem.Links.Count > 0)
                 {
                     Console.WriteLine("...Processing Links");
-                   workItemLinkOMatic.MigrateLinks(sourceWorkItem, sourceStore, targetWorkItem, targetStore);
+                    workItemLinkOMatic.MigrateLinks(sourceWorkItem, sourceStore, targetWorkItem, targetStore);
                 }
                 ///////////////////////////////////////////////
                 Console.WriteLine(string.Format("...Target Work Item may need its HTML field images fixed."));
@@ -148,7 +162,7 @@ namespace VstsSyncMigrator.Engine
                     embededImagesRepairOMatic.FixHtmlAttachmentLinks(targetWorkItem, me.Source.Collection.Uri.ToString(), me.Target.Collection.Uri.ToString());
                 }
                 ///////////////////////////////////////////////
-                if (targetWorkItem != null  && targetWorkItem.IsDirty)
+                if (targetWorkItem != null && targetWorkItem.IsDirty)
                 {
                     targetWorkItem.Save();
                 }
@@ -156,23 +170,39 @@ namespace VstsSyncMigrator.Engine
                 {
                     targetWorkItem.Close();
                 }
-                sourceWorkItem.Close();
-                witstopwatch.Stop();
-                _elapsedms += witstopwatch.ElapsedMilliseconds;
-                _current--;
-                _count++;
-                var average = new TimeSpan(0, 0, 0, 0, (int)(_elapsedms / _count));
-                var remaining = new TimeSpan(0, 0, 0, 0, (int)(average.TotalMilliseconds * _current));
-                Trace.WriteLine(
-                    string.Format("Average time of {0} per work item and {1} estimated to completion",
-                        string.Format(@"{0:s\:fff} seconds", average),
-                        string.Format(@"{0:%h} hours {0:%m} minutes {0:s\:fff} seconds", remaining)), Name);
-                Trace.Flush();
+                if (sourceWorkItem != null)
+                {
+                    sourceWorkItem.Close();
+                }
+               
             }
-            //////////////////////////////////////////////////
-            stopwatch.Stop();
+            catch (Exception ex)
+            {
+                Trace.WriteLine("ERROR: Failed to create work item. Will retry untill ");
+                Telemetry.Current.TrackException(ex);
+                Trace.WriteLine(ex.ToString());
 
-            Console.WriteLine(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds", stopwatch.Elapsed);
+                System.Threading.Thread.Sleep(new TimeSpan(0, 0, retrys));
+                if (retrys > retryLimit)
+                {
+                    return;
+                } else
+                {
+                    ProcessWorkItem(sourceStore, targetStore, destProject, sourceWorkItem);
+                }
+                
+            }
+            witstopwatch.Stop();
+            _elapsedms += witstopwatch.ElapsedMilliseconds;
+            _current--;
+            _count++;
+            var average = new TimeSpan(0, 0, 0, 0, (int)(_elapsedms / _count));
+            var remaining = new TimeSpan(0, 0, 0, 0, (int)(average.TotalMilliseconds * _current));
+            Trace.WriteLine(
+                string.Format("Average time of {0} per work item and {1} estimated to completion",
+                    string.Format(@"{0:s\:fff} seconds", average),
+                    string.Format(@"{0:%h} hours {0:%m} minutes {0:s\:fff} seconds", remaining)), Name);
+            Trace.Flush();
         }
 
         /// <summary>
