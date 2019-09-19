@@ -111,6 +111,7 @@ namespace VstsSyncMigrator.Engine
                 var witstopwatch = Stopwatch.StartNew();
                 var targetWorkItem = targetStore.FindReflectedWorkItem(sourceWorkItem, false);
                 Trace.WriteLine($"{_current} - Migrating: {sourceWorkItem.Id} - {sourceWorkItem.Type.Name}", Name);
+                ///////////////////////////////////////////////
                 Console.WriteLine(string.Format("STATUS: Work Item has {0} revisions and revision migration is set to {1}", sourceWorkItem.Rev, _config.ReplayRevisions));
                 if (targetWorkItem == null)
                 {
@@ -140,11 +141,13 @@ namespace VstsSyncMigrator.Engine
                     Console.WriteLine("...Processing Links");
                    workItemLinkOMatic.MigrateLinks(sourceWorkItem, sourceStore, targetWorkItem, targetStore);
                 }
+                ///////////////////////////////////////////////
                 Console.WriteLine(string.Format("...Target Work Item may need its HTML field images fixed."));
                 if (targetWorkItem != null && _config.FixHtmlAttachmentLinks)
                 {
                     embededImagesRepairOMatic.FixHtmlAttachmentLinks(targetWorkItem, me.Source.Collection.Uri.ToString(), me.Target.Collection.Uri.ToString());
                 }
+                ///////////////////////////////////////////////
                 if (targetWorkItem.IsDirty)
                 {
                     targetWorkItem.Save();
