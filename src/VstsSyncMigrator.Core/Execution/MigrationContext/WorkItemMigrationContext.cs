@@ -98,20 +98,10 @@ namespace VstsSyncMigrator.Engine
             var destProject = targetStore.GetProject();
             Trace.WriteLine($"Found target project as {destProject.Name}", Name);
             //////////////////////////////////////////////////////////FilterCompletedByQuery
-            if (_config.FilterCompletedByQuery)
+            if (_config.FilterWorkItemsThatAlreadyExistInTarget)
             {
-                var targetQuery = new TfsQueryContext(targetStore);
-                targetQuery.AddParameter("TeamProject", me.Source.Config.Name);
-                targetQuery.Query =
-                    string.Format(
-                        @"SELECT [System.Id], [{0}] FROM WorkItems WHERE [System.TeamProject] = @TeamProject ORDER BY [System.ChangedDate] desc", me.Target.Config.ReflectedWorkItemIDFieldName);
-                var targetFoundItems = targetQuery.Execute();
-                var targetFoundIds = (from WorkItem twi in targetFoundItems select targetStore.GetReflectedWorkItemId(twi, me.Target.Config.ReflectedWorkItemIDFieldName)).ToList();
-                //////////////////////////////////////////////////////////
-
-                sourceWorkItems = sourceWorkItems.Where(p => !targetFoundIds.Any(p2 => p2 == p.Id)).ToList();
-            }           
-
+                sourceWorkItems = FilterWorkItemsThatAlreadyExistInTarget(sourceWorkItems, targetStore);
+            }
             //////////////////////////////////////////////////
             _current = sourceWorkItems.Count;
             _count = 0;
@@ -128,6 +118,21 @@ namespace VstsSyncMigrator.Engine
             stopwatch.Stop();
 
             Console.WriteLine(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds", stopwatch.Elapsed);
+        }
+
+        private List<WorkItem> FilterWorkItemsThatAlreadyExistInTarget(List<WorkItem> sourceWorkItems, WorkItemStoreContext targetStore)
+        {
+            var targetQuery = new TfsQueryContext(targetStore);
+            targetQuery.AddParameter("TeamProject", me.Source.Config.Name);
+            targetQuery.Query =
+                string.Format(
+                    @"SELECT [System.Id], [{0}] FROM WorkItems WHERE [System.TeamProject] = @TeamProject ORDER BY [System.ChangedDate] desc", me.Target.Config.ReflectedWorkItemIDFieldName);
+            var targetFoundItems = targetQuery.Execute();
+            var targetFoundIds = (from WorkItem twi in targetFoundItems select targetStore.GetReflectedWorkItemId(twi, me.Target.Config.ReflectedWorkItemIDFieldName)).ToList();
+            //////////////////////////////////////////////////////////
+
+            sourceWorkItems = sourceWorkItems.Where(p => !targetFoundIds.Any(p2 => p2 == p.Id)).ToList();
+            return sourceWorkItems;
         }
 
         private void ProcessWorkItem(WorkItemStoreContext sourceStore, WorkItemStoreContext targetStore, Project destProject, WorkItem sourceWorkItem, int retryLimit = 5, int retrys = 0)
