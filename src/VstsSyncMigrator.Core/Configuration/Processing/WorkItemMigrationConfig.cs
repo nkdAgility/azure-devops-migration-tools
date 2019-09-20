@@ -26,6 +26,10 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
 
         public bool FixHtmlAttachmentLinks { get; set; }
 
+        public int WorkItemCreateRetryLimit { get; set; }
+
+        public bool FilterCompletedByQuery { get; set; }
+
 
         /// <inheritdoc />
         public bool IsProcessorCompatible(IReadOnlyList<ITfsProcessingConfig> otherProcessors)
