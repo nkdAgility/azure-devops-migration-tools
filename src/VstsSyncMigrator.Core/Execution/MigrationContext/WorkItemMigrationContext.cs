@@ -94,23 +94,23 @@ namespace VstsSyncMigrator.Engine
             var sourceWorkItems = (from WorkItem swi in sourceQueryResult select swi).ToList();
             Trace.WriteLine($"Replay all revisions of {sourceWorkItems.Count} work items?", Name);
             //////////////////////////////////////////////////
-            
-
-            //////////////////////////////////////////////////
             var targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
             var destProject = targetStore.GetProject();
             Trace.WriteLine($"Found target project as {destProject.Name}", Name);
-            //////////////////////////////////////////////////////////
-            var targetQuery = new TfsQueryContext(targetStore);
-            targetQuery.AddParameter("TeamProject", me.Source.Config.Name);
-            targetQuery.Query =
-                string.Format(
-                    @"SELECT [System.Id], [{0}] FROM WorkItems WHERE [System.TeamProject] = @TeamProject ORDER BY [System.ChangedDate] desc", me.Target.Config.ReflectedWorkItemIDFieldName);
-            var targetFoundItems = targetQuery.Execute();
-            var targetFoundIds = (from WorkItem twi in targetFoundItems select targetStore.GetReflectedWorkItemId(twi, me.Target.Config.ReflectedWorkItemIDFieldName)).ToList();
-            //////////////////////////////////////////////////////////
+            //////////////////////////////////////////////////////////FilterCompletedByQuery
+            if (_config.FilterCompletedByQuery)
+            {
+                var targetQuery = new TfsQueryContext(targetStore);
+                targetQuery.AddParameter("TeamProject", me.Source.Config.Name);
+                targetQuery.Query =
+                    string.Format(
+                        @"SELECT [System.Id], [{0}] FROM WorkItems WHERE [System.TeamProject] = @TeamProject ORDER BY [System.ChangedDate] desc", me.Target.Config.ReflectedWorkItemIDFieldName);
+                var targetFoundItems = targetQuery.Execute();
+                var targetFoundIds = (from WorkItem twi in targetFoundItems select targetStore.GetReflectedWorkItemId(twi, me.Target.Config.ReflectedWorkItemIDFieldName)).ToList();
+                //////////////////////////////////////////////////////////
 
-            var sourceWorkItemsFiltered = sourceWorkItems.Where(p => !targetFoundIds.Any(p2 => p2 == p.Id));
+                sourceWorkItems = sourceWorkItems.Where(p => !targetFoundIds.Any(p2 => p2 == p.Id)).ToList();
+            }           
 
             //////////////////////////////////////////////////
             _current = sourceWorkItems.Count;
@@ -120,7 +120,7 @@ namespace VstsSyncMigrator.Engine
             //Validation: make sure that the ReflectedWorkItemId field name specified in the config exists in the target process, preferably on each work item type.
             ConfigValidation();
 
-            foreach (WorkItem sourceWorkItem in sourceWorkItemsFiltered)
+            foreach (WorkItem sourceWorkItem in sourceWorkItems)
             {
                 ProcessWorkItem(sourceStore, targetStore, destProject, sourceWorkItem, _config.WorkItemCreateRetryLimit);
             }

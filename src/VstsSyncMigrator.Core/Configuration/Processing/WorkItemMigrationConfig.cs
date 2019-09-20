@@ -28,6 +28,8 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
 
         public int WorkItemCreateRetryLimit { get; set; }
 
+        public bool FilterCompletedByQuery { get; set; }
+
 
         /// <inheritdoc />
         public bool IsProcessorCompatible(IReadOnlyList<ITfsProcessingConfig> otherProcessors)
