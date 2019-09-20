@@ -105,7 +105,7 @@ namespace VstsSyncMigrator.Engine
             targetQuery.AddParameter("TeamProject", me.Source.Config.Name);
             targetQuery.Query =
                 string.Format(
-                    @"SELECT [System.Id], [Custom.ReflectedWorkItemID] FROM WorkItems WHERE [System.TeamProject] = @TeamProject ORDER BY [System.ChangedDate] desc");
+                    @"SELECT [System.Id], [{0}] FROM WorkItems WHERE [System.TeamProject] = @TeamProject ORDER BY [System.ChangedDate] desc", me.Target.Config.ReflectedWorkItemIDFieldName);
             var targetFoundItems = targetQuery.Execute();
             var targetFoundIds = (from WorkItem twi in targetFoundItems select targetStore.GetReflectedWorkItemId(twi, me.Target.Config.ReflectedWorkItemIDFieldName)).ToList();
             //////////////////////////////////////////////////////////
