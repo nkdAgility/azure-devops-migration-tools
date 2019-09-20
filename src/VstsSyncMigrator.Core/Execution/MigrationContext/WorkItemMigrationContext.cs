@@ -90,15 +90,28 @@ namespace VstsSyncMigrator.Engine
                 string.Format(
                     @"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY [System.ChangedDate] desc",
                     _config.QueryBit);
-            var sourceWorkItems = tfsqc.Execute();
+            var sourceQueryResult = tfsqc.Execute();
+            var sourceWorkItems = (from WorkItem swi in sourceQueryResult select swi).ToList();
             Trace.WriteLine($"Replay all revisions of {sourceWorkItems.Count} work items?", Name);
+            //////////////////////////////////////////////////
+            
 
             //////////////////////////////////////////////////
             var targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
             var destProject = targetStore.GetProject();
             Trace.WriteLine($"Found target project as {destProject.Name}", Name);
             //////////////////////////////////////////////////////////
-            
+            var targetQuery = new TfsQueryContext(targetStore);
+            targetQuery.AddParameter("TeamProject", me.Source.Config.Name);
+            targetQuery.Query =
+                string.Format(
+                    @"SELECT [System.Id], [Custom.ReflectedWorkItemID] FROM WorkItems WHERE [System.TeamProject] = @TeamProject ORDER BY [System.ChangedDate] desc");
+            var targetFoundItems = targetQuery.Execute();
+            var targetFoundIds = (from WorkItem twi in targetFoundItems select targetStore.GetReflectedWorkItemId(twi, me.Target.Config.ReflectedWorkItemIDFieldName)).ToList();
+            //////////////////////////////////////////////////////////
+
+            var sourceWorkItemsFiltered = sourceWorkItems.Where(p => !targetFoundIds.Any(p2 => p2 == p.Id));
+
             //////////////////////////////////////////////////
             _current = sourceWorkItems.Count;
             _count = 0;
@@ -107,7 +120,7 @@ namespace VstsSyncMigrator.Engine
             //Validation: make sure that the ReflectedWorkItemId field name specified in the config exists in the target process, preferably on each work item type.
             ConfigValidation();
 
-            foreach (WorkItem sourceWorkItem in sourceWorkItems)
+            foreach (WorkItem sourceWorkItem in sourceWorkItemsFiltered)
             {
                 ProcessWorkItem(sourceStore, targetStore, destProject, sourceWorkItem, _config.WorkItemCreateRetryLimit);
             }
