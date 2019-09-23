@@ -1,11 +1,9 @@
-﻿using Microsoft.ApplicationInsights;
-using Microsoft.TeamFoundation.WorkItemTracking.Client;
+﻿using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using Microsoft.VisualStudio.Services.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using VstsSyncMigrator.Engine.ComponentContext;
 using VstsSyncMigrator.Engine.Configuration;
 using VstsSyncMigrator.Engine.Configuration.FieldMap;
@@ -21,7 +19,9 @@ namespace VstsSyncMigrator.Engine
         Dictionary<string, IWitdMapper> workItemTypeDefinitions = new Dictionary<string, IWitdMapper>();
         ITeamProjectContext source;
         ITeamProjectContext target;
-
+        VssCredentials sourceCreds;
+        VssCredentials targetCreds;
+        
         public MigrationEngine()
         {
 
@@ -31,16 +31,30 @@ namespace VstsSyncMigrator.Engine
             ProcessConfiguration(config);
         }
 
+        public MigrationEngine(EngineConfiguration config, VssCredentials sourceCredentials, VssCredentials targetCredentials)
+        {
+            sourceCreds = sourceCredentials;
+            targetCreds = targetCredentials;
+
+            ProcessConfiguration(config);
+        }
+
         private void ProcessConfiguration(EngineConfiguration config)
         {
             Telemetry.EnableTrace = config.TelemetryEnableTrace;
             if (config.Source != null)
             {
-                this.SetSource(new TeamProjectContext(config.Source));
+                if (sourceCreds == null)
+                    SetSource(new TeamProjectContext(config.Source));
+                else
+                    SetSource(new TeamProjectContext(config.Source, sourceCreds));
             }
             if (config.Target != null)
             {
-                this.SetTarget(new TeamProjectContext(config.Target));
+                if (targetCreds == null)
+                    SetTarget(new TeamProjectContext(config.Target));
+                else
+                    SetTarget(new TeamProjectContext(config.Target, targetCreds));
             }           
             if (config.FieldMaps != null)
             {
