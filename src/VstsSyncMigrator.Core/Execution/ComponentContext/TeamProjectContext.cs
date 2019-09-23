@@ -2,9 +2,10 @@
 using System;
 using System.Diagnostics;
 using Microsoft.TeamFoundation;
-using Microsoft.ApplicationInsights;
+using Microsoft.VisualStudio.Services.Common;
 using System.Collections.Generic;
 using VstsSyncMigrator.Engine.Configuration;
+using System.Net;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -12,6 +13,7 @@ namespace VstsSyncMigrator.Engine
     {
         private TeamProjectConfig _config;
         private TfsTeamProjectCollection _Collection;
+        private VssCredentials _credentials;
 
         public TfsTeamProjectCollection Collection
         {
@@ -36,6 +38,12 @@ namespace VstsSyncMigrator.Engine
             this._config = config;
         }
 
+        public TeamProjectContext(TeamProjectConfig config, VssCredentials credentials)
+        {
+            _config = config;
+            _credentials = credentials;
+        }
+
         public void Connect()
         {
             if (_Collection == null)
@@ -50,7 +58,12 @@ namespace VstsSyncMigrator.Engine
                 Stopwatch connectionTimer = Stopwatch.StartNew();
 				DateTime start = DateTime.Now;
                 Trace.WriteLine("Creating TfsTeamProjectCollection Object ");
+
+                if (_credentials == null)
                     _Collection = new TfsTeamProjectCollection(Config.Collection);
+                else
+                    _Collection = new TfsTeamProjectCollection(Config.Collection, _credentials);
+                
                 try
                 {
                     Trace.WriteLine(string.Format("Connected to {0} ", _Collection.Uri.ToString()));
