@@ -5,9 +5,10 @@ Azure DevOps Migration Tools allow you to bulk edit data in Microsoft Team Found
  - Migrate data from TFS to TFS
  - Migrate data from TFS to Azure DevOps Services
  - Migrate data from Azure Devops Services to TFS
+ - Migrate data from Azure DevOps to Azure DevOps
  - Bulk update in TFS or Azure DevOps Services
 
- This is an advanced tool and is not designed to be used by those not intimatly familure with TFS, Azure DevOps Services, and their API's.
+ This is an advanced tool and is not designed to be used by those not intimatly familure with TFS, Azure DevOps Services, and their API's. It supports all version of TFS & Azure DevOps that can be connected to using https://www.nuget.org/packages/Microsoft.TeamFoundationServer.ExtendedClient 
 
 ## Getting the Tools
 
@@ -18,15 +19,45 @@ The most effective way to get a copy of the tools is to use Chocolatey to instal
 
 ## Overview
 
-These tools are build by naked Agility Limited's DevOps & Agility consultants to do real world migrations on a daily basis. We always work in [Azure Devops Services](http://dev.azure.com) on https://dev.azure.com/nkdagility/migration-tools/ and sync the code to GitHub for visibility. We use Work Item Tracking and a Git Repository inside of TFS to manage the work and Team Build to create our package output. We then have a Release Pipeline in Release Management to publish a [GitHub Release](https://github.com/nkdAgility/azure-devops-migration-tools/releases) and, if successful, automatically deploy a new version to NuGet and to Chocolatey.
+These tools are build by naked Agility Limited's DevOps & Agility consultants to do real world migrations on a daily basis. We always work in [Azure Devops Services](http://dev.azure.com) on https://dev.azure.com/nkdagility/migration-tools/ with code in GitHub and publish as a chocolatey package that pulls from GitGub Releases.
 
-Watch the [Video Overview](https://youtu.be/ZxDktQae10M) to get you started in 30 minutes. This tool is complicated and its not always easy to discover what you need to do.
+| Team Work Items | [Azure Boards](https://dev.azure.com/nkdagility/migration-tools/) |
+| Public Issues | [GitHub Issues](https://github.com/nkdAgility/azure-devops-migration-tools/) |
+| Builds & Releases | [Azure Pipelines](https://dev.azure.com/nkdagility/migration-tools/) |
+| Releases Output | [Github Releases](https://github.com/nkdAgility/azure-devops-migration-tools/releases) |
 
+**Watch the [Video Overview](https://youtu.be/ZxDktQae10M) to get you started in 30 minutes. This tool is complicated and its not always easy to discover what you need to do.**
 
 ### Main Purpose
 
 - **Bulk Update** - You can bulk update work items and apply processing rules against your server or account. Use the `WorkItemUpdate` class that takes only a target Team Project. The team does a lot of Process Template migrations and we need these tools to fix the data after the migration.
 - **Migration** - You can migrate work items, area & iterations, & test data from one Team Project to another. Use the `WorkItemMigrationContext` class that takes both a Source and a Target Team Project
+
+### Processors
+
+There are other processors that can be used to migrate, or process, different sorts of data in different ways. Which one is right for you depends on the situation at hand.
+
+Most of these processors need to be run in order. If you try to migrate work items before you have migrated Area and Iterations then ***bang*** you need to go back.
+
+|Processor |Staus |Target |Usage |
+|---------|---------|---------|---------|
+|NodeStructuresMigrationContext | ready | Area & Iteration | Migrates Area and Iteration Paths |
+|[WorkItemMigrationContext](./Processors/WorkItemMigrationConfig.md) | ready | Work Items | Migrates either tip or history of work items with Links & Attachments based on a query with field mappings |
+|WorkItemRevisionReplayMigrationContext | merged |  Work Items | obsolite - merged into WorkItemMigrationContext |
+|LinkMigrationContext | merged | Work Items | obsolite - merged into WorkItemMigrationContext |
+|AttachementExportMigrationContext | merged | Work Items | obsolite - merged into WorkItemMigrationContext |
+|AttachementImportMigrationContext | merged | Work Items | obsolite - merged into WorkItemMigrationContext |
+|HtmlFieldEmbeddedImageMigrationContext | merged | HTML Fields | obsolite - merged into WorkItemMigrationContext |
+|WorkItemDelete | ready | Work Items | Bulk delete of work items **WARNING DANGERIOUS** |
+|WorkItemUpdate | ready | Work Items | Bulk update of Work Items based on a query and field mappings |
+|WorkItemQueryMigrationContext | ready | Queries | Migrates shared queries |
+|TestVeriablesMigrationContext | Suits & Plans | Migrates Test Variables |
+|TestConfigurationsMigrationContext | Suits & Plans | Migrates Test configurations |
+|TestPlansAndSuitesMigrationContext | Suits & Plans | Rebuilds Suits and plans for Test Cases migrated using the WorkItemMigrationContext |
+|TestRunsMigrationContext | Alfa | Suits & Plans | Migrates the history of Test Runs |
+|ImportProfilePictureContext & ExportProfilePictureFromADContext | Beta | Profiles | Downloads corporate images and updates TFS/Azure DevOps profiles |
+|CreateTeamFolders | ? | ? | ? | 
+|ExportTeamList | ? | ? | ? | 
 
 ### Field Maps
 
@@ -43,47 +74,6 @@ However sometimes you want to move data to another field, or use a regex to pars
 - **FieldValuetoTagMap** - Need to create a Tag based on a field value? Just create a regex match and choose how to populate the target.
 - **RegexFieldMap** - I just need that bit of a field... need to send "2016.2" to two fields, one for year and one for release? Done.
 - **TreeToTagMap** - Need to clear out those nasty Area tree hierarchies? This creates Tags for each node in the Area Path...
-
-### Processors
-
-There are other processors that can be used to migrate, or process, different sorts of data in different ways. Which one is right for you depends on the situation at hand.
-
-#### In-Place Processors
-
-- **WorkItemUpdate** - Need to just update work items in place, use this and only set the Target. All field mappings work...
-- **WorkItemDelete** - Woops... Can I just start again? Feed this a query and watch those items vanish ***WARNING***
-
-#### Migrators
-
-Most of these processors need to be run in order. If you try to migrate work items before you have migrated Area and Iterations then ***bang*** you need to go back.
-
-Note: **WorkItemMigrationContext** and **WorkItemRevisionReplayMigrationContext** are exclusive, you can only run either of the options, but not both!
-
-##### Work Items
-1. **NodeStructuresMigrationContext** - Moves over the structure of area and iteration paths, you have the option to inject a new root node by setting the `PrefixProjectToNodes` property. 
-1. **WorkItemMigrationContext** - **The work horse...** push either the tip or revisions from one location to another while maintaining context. Make sure that you add a ReflectedWorkItemID and you can restart the service at any time...
-1. (depricated included in WorkItemMigrationContext)**AttachementExportMigrationContext** - Exports all work items attachments to the migration machine. This is used in partnership with the **AttachmentImportMigrationContext**   
-1. (depricated included in WorkItemMigrationContext)**AttachementImportMigrationContext** - Imports all work items attachments from the migration machine. This is used in partnership with the **AttachementExportMigrationContext**
-1. (depricated included in WorkItemMigrationContext) **LinkMigrationContext** - Migrates all the work item links, both between work items and external links.
-1. **WorkItemQueryMigrationContext** - Migrate all shared work item queries
-1. **WorkItemDelete**
-1. **HtmlFieldEmbeddedImageMigrationContext** - Migrate embedded images in work items
-
-##### Test Plans & Suites
-
-1. **TestVeriablesMigrationContext** - Migrates test variables
-1. **TestConfigurationsMigrationContext** - Migrate test configurations
-1. **TestPlansAndSuitesMigrationContext** - Migrate test plans and suites, this does assume that the actual test cases and shared steps are migrated using the **WorkItemMigrationContext**
-1. **TestRunsMigrationContext** [BETA] - Migrates past test run results
-
-##### Misc
-
-The following misc processors do as their names suggest
-
-- **ImportProfilePictureContext** 
-- **ExportProfilePictureFromADContext**
-- **CreateTeamFolders**
-- **ExportTeamList**
 
 ##### Code (TFVC)
 

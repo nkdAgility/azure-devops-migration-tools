@@ -19,31 +19,30 @@
   ],
   "tags": [
     "migration",
-    "bulk edit",
-    "edit",
+    "AzureDevOps",
+    "TFS",
     "upgrade",
     "migrate",
-    "merge",
-    "team project"
+    "merge"
   ],
   "links": {
     "home": {
-      "uri": "https://dev.azure.com/nkdagility/migration-tools/"
+      "uri": "https://github.com/nkdAgility/azure-devops-migration-tools"
     },
     "getstarted": {
-      "uri": "https://dev.azure.com/nkdagility/migration-tools/_wiki/wikis/VSTS-Sync-Migrator-Docs?pagePath=%2Fgetting%20started"
+      "uri": "https://github.com/nkdAgility/azure-devops-migration-tools/blob/master/docs/getting-started.md"
     },
     "learn": {
-      "uri": "https://dev.azure.com/nkdagility/migration-tools/_wiki/wikis/VSTS-Sync-Migrator-Docs?pagePath=%2Findex"
+      "uri": "https://github.com/nkdAgility/azure-devops-migration-tools/blob/master/README.md"
     },
     "support": {
-      "uri": "https://dev.azure.com/nkdagility/migration-tools/_workitems"
+      "uri": "https://github.com/nkdAgility/azure-devops-migration-tools/issues"
     },
     "repository": {
-      "uri": "https://dev.azure.com/nkdagility/_git/migration-tools"
+      "uri": "https://github.com/nkdAgility/azure-devops-migration-tools"
     },
     "issues": {
-      "uri": "https://dev.azure.com/nkdagility/migration-tools/_workitems"
+      "uri": "https://github.com/nkdAgility/azure-devops-migration-tools/issues"
     }
   },
   "CustomerQnASupport": {

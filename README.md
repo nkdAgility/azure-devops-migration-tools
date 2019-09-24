@@ -25,11 +25,12 @@ The Azure DevOps Migration Tools allow you to bulk edit and migrate data between
 ## Quick Links
 
  - [Video Overview](https://youtu.be/ZxDktQae10M)
- - [Getting Started](https://dev.azure.com/nkdagility/migration-tools/_wiki/wikis/docs?wikiVersion=GBmaster&pagePath=%2Fgetting%20started)
- - [Documentation](https://dev.azure.com/nkdagility/migration-tools/_wiki/wikis/docs?pagePath=%2Findex)
- - [Contributing](https://dev.azure.com/nkdagility/migration-tools/_wiki/wikis/docs?pagePath=%2Findex&anchor=contributing)
- - [Why VSTS Bulk Data Editor](https://dev.azure.com/nkdagility/migration-tools/_wiki/wikis/docs?pagePath=%2Fwhy)
- - [Usage](https://dev.azure.com/nkdagility/migration-tools/_wiki/wikis/docs?pagePath=%2Fusage%2Fusage)
+ - [Getting Started](./docs/getting-started.md)
+ - [Documentation](./docs/index.md)
+ - [Contributing](./docs/contributing.md)
+ - [Why VSTS Bulk Data Editor](./docs/why.md)
+ - [Usage](./docs/usage.md)
+ - 
 
 ### External Walkthroughs and Reviews
 

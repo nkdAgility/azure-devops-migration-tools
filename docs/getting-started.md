@@ -11,12 +11,12 @@ In order to run the migration you will need to install the tools first.
 1. Install Chocolatey from [https://chocolatey.org/install](https://chocolatey.org/install)
 1. Run "**choco install vsts-sync-migrator**" to install the tools [source](https://chocolatey.org/packages/vsts-sync-migrator)
 
-The tools are now installed and calling "vstssyncmigrator" from any command line will run the tools.
+The tools are now installed and calling "vstssyncmigrator" from any command line will run the tools or it will not and you will need to switch to `c:\tools\vstssyncmigrator\` and run `migrate.exe`.
 
 ## Create a default configuration file
 
-1. Open a command prompt or PowerShell window
-2. Run "vstssyncmigrator init" to create a default configuration
+1. Open a command prompt or PowerShell window at `c:\tools\vstssyncmigrator\`
+2. Run "./migration.exe init" to create a default configuration
 3. Open "configuration.json" from the current directory
 
 You can now customise the configuration depending on what you need to do. However a basic config that you can use to migrate from one team project to another with the same process template is:
@@ -59,20 +59,6 @@ You can now customise the configuration depending on what you need to do. Howeve
       "UpdateCreatedBy": true,
       "UpdateSourceReflectedId": true,
       "QueryBit": "AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Product Backlog Item', 'Task', 'Feature', 'Epic', 'Bug')"
-    },
-    {
-      "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.LinkMigrationConfig",
-      "Enabled": true,
-      "QueryBit": "AND ([System.ExternalLinkCount] > 0 OR [System.RelatedLinkCount] > 0)"
-    },
-    {
-      "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.AttachementExportMigrationConfig",
-      "Enabled": true,
-      "QueryBit": "AND [System.AttachedFileCount] > 0"
-    },
-    {
-      "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.AttachementImportMigrationConfig",
-      "Enabled": true
     }
   ]
 }
