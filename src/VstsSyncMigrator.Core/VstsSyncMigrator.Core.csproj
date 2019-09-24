@@ -283,7 +283,6 @@
     <Compile Include="Configuration\FieldMap\FieldValueMapConfig.cs" />
     <Compile Include="Configuration\FieldMap\IFieldMapConfig.cs" />
     <Compile Include="Configuration\JsonCreationConverter.cs" />
-    <Compile Include="Configuration\Processing\HtmlFieldEmbeddedImageMigrationConfig.cs" />
     <Compile Include="Configuration\Processing\WorkItemQueryMigrationConfig.cs" />
     <Compile Include="Configuration\Processing\FixGitCommitLinksConfig.cs" />
     <Compile Include="Configuration\Processing\TeamMigrationConfig.cs" />
@@ -297,9 +296,6 @@
     <Compile Include="Configuration\Processing\TestVeriablesMigrationConfig.cs" />
     <Compile Include="Configuration\Processing\WorkItemDeleteConfig.cs" />
     <Compile Include="Configuration\Processing\WorkItemPostProcessingConfig.cs" />
-    <Compile Include="Configuration\Processing\AttachementImportMigrationConfig.cs" />
-    <Compile Include="Configuration\Processing\LinkMigrationConfig.cs" />
-    <Compile Include="Configuration\Processing\AttachementExportMigrationConfig.cs" />
     <Compile Include="Configuration\Processing\ProcessorConfigJsonConverter.cs" />
     <Compile Include="Configuration\Processing\ITfsProcessingConfig.cs" />
     <Compile Include="Configuration\Processing\NodeStructuresMigrationConfig.cs" />
@@ -318,14 +314,9 @@
     <Compile Include="Execution\FieldMaps\IFieldMap.cs" />
     <Compile Include="Execution\ComponentContext\TestManagementContext.cs" />
     <Compile Include="Execution\FieldMaps\FieldToTagFieldMap.cs" />
-    <Compile Include="Execution\MigrationContext\HtmlFieldEmbeddedImageMigrationContext.cs" />
     <Compile Include="Execution\MigrationContext\WorkItemMigrationContext.cs" />
     <Compile Include="Execution\MigrationContext\WorkItemQueryMigrationContext.cs" />
-    <Compile Include="Execution\MigrationContext\LinkMigrationContext.cs" />
-    <Compile Include="Execution\MigrationContext\AttachementExportMigrationContext.cs" />
     <Compile Include="Execution\MigrationContext\MigrationContextBase.cs" />
-    <Compile Include="Execution\MigrationContext\AttachementMigrationContextBase.cs" />
-    <Compile Include="Execution\MigrationContext\AttachementImportMigrationContext.cs" />
     <Compile Include="Execution\ComponentContext\ITeamProjectContext.cs" />
     <Compile Include="Execution\ComponentContext\IWitdMapper.cs" />
     <Compile Include="Execution\ComponentContext\DescreteWitdMapper.cs" />

@@ -162,24 +162,11 @@ namespace VstsSyncMigrator.Engine
 
                 }
                 ///////////////////////////////////////////////
-                Console.WriteLine(string.Format("...Source Work Item has {0} attachements and Attachment migration is set to {1}", sourceWorkItem.Attachments.Count, _config.AttachmentMigration));
-                if (targetWorkItem != null && _config.AttachmentMigration && sourceWorkItem.Attachments.Count > 0)
-                {
-                    attachmentOMatic.ProcessAttachemnts(sourceWorkItem, targetWorkItem);
-                }
+                ProcessWorkItemAttachments(sourceWorkItem, targetWorkItem);
                 ///////////////////////////////////////////////
-                Console.WriteLine(string.Format("...Source Work Item has {0} links and Link migration is set to {1}", sourceWorkItem.Links.Count, _config.LinkMigration));
-                if (targetWorkItem != null && _config.LinkMigration && sourceWorkItem.Links.Count > 0)
-                {
-                    Console.WriteLine("...Processing Links");
-                    workItemLinkOMatic.MigrateLinks(sourceWorkItem, sourceStore, targetWorkItem, targetStore);
-                }
+                ProcessWorkItemLinks(sourceStore, targetStore, sourceWorkItem, targetWorkItem);
                 ///////////////////////////////////////////////
-                Console.WriteLine(string.Format("...Target Work Item may need its HTML field images fixed."));
-                if (targetWorkItem != null && _config.FixHtmlAttachmentLinks)
-                {
-                    embededImagesRepairOMatic.FixHtmlAttachmentLinks(targetWorkItem, me.Source.Collection.Uri.ToString(), me.Target.Collection.Uri.ToString());
-                }
+                ProcessHTMLFieldAttachements(targetWorkItem);
                 ///////////////////////////////////////////////
                 if (targetWorkItem != null && targetWorkItem.IsDirty)
                 {
@@ -193,21 +180,24 @@ namespace VstsSyncMigrator.Engine
                 {
                     sourceWorkItem.Close();
                 }
-               
+
             }
             catch (WebException ex)
             {
-                Trace.WriteLine("ERROR: Failed to create work item. Will retry untill ");
+               
                 Telemetry.Current.TrackException(ex);
                 Trace.WriteLine(ex.ToString());
-
-                System.Threading.Thread.Sleep(new TimeSpan(0, 0, retrys));
+                Trace.WriteLine(string.Format("ERROR: Failed to create work item. Retry Limit reached "));
                 if (retrys > retryLimit)
                 {
                     return;
                 } else
                 {
-                    ProcessWorkItem(sourceStore, targetStore, destProject, sourceWorkItem);
+                    Trace.WriteLine(string.Format("ERROR: Failed to create work item. Will retry in {0}s ", retrys));
+                    System.Threading.Thread.Sleep(new TimeSpan(0, 0, retrys));
+                    retrys++;
+                    Trace.WriteLine(string.Format("RETRY: {0} of {1} ",retrys , retrys));
+                    ProcessWorkItem(sourceStore, targetStore, destProject, sourceWorkItem, retryLimit, retrys);
                 }
             }
             witstopwatch.Stop();
@@ -221,6 +211,34 @@ namespace VstsSyncMigrator.Engine
                     string.Format(@"{0:s\:fff} seconds", average),
                     string.Format(@"{0:%h} hours {0:%m} minutes {0:s\:fff} seconds", remaining)), Name);
             Trace.Flush();
+        }
+
+        private void ProcessHTMLFieldAttachements(WorkItem targetWorkItem)
+        {
+            Console.WriteLine(string.Format("...Target Work Item may need its HTML field images fixed."));
+            if (targetWorkItem != null && _config.FixHtmlAttachmentLinks)
+            {
+                embededImagesRepairOMatic.FixHtmlAttachmentLinks(targetWorkItem, me.Source.Collection.Uri.ToString(), me.Target.Collection.Uri.ToString());
+            }
+        }
+
+        private void ProcessWorkItemLinks(WorkItemStoreContext sourceStore, WorkItemStoreContext targetStore, WorkItem sourceWorkItem, WorkItem targetWorkItem)
+        {
+            Console.WriteLine(string.Format("...Source Work Item has {0} links and Link migration is set to {1}", sourceWorkItem.Links.Count, _config.LinkMigration));
+            if (targetWorkItem != null && _config.LinkMigration && sourceWorkItem.Links.Count > 0)
+            {
+                Console.WriteLine("...Processing Links");
+                workItemLinkOMatic.MigrateLinks(sourceWorkItem, sourceStore, targetWorkItem, targetStore);
+            }
+        }
+
+        private void ProcessWorkItemAttachments(WorkItem sourceWorkItem, WorkItem targetWorkItem)
+        {
+            Console.WriteLine(string.Format("...Source Work Item has {0} attachements and Attachment migration is set to {1}", sourceWorkItem.Attachments.Count, _config.AttachmentMigration));
+            if (targetWorkItem != null && _config.AttachmentMigration && sourceWorkItem.Attachments.Count > 0)
+            {
+                attachmentOMatic.ProcessAttachemnts(sourceWorkItem, targetWorkItem);
+            }
         }
 
         /// <summary>
@@ -320,6 +338,8 @@ namespace VstsSyncMigrator.Engine
                             Trace.WriteLine(
                                 $"{current} - Invalid: {currentRevisionWorkItem.Id}-{currentRevisionWorkItem.Type.Name}-{f.ReferenceName}-{sourceWorkItem.Title} Value: {f.Value}", Name);
                         }
+
+
 
                         newwit.Save();
                         Trace.WriteLine(
