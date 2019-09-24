@@ -27,9 +27,10 @@ The Azure DevOps Migration Tools allow you to bulk edit and migrate data between
  - [Video Overview](https://youtu.be/ZxDktQae10M)
  - [Getting Started](./docs/getting-started.md)
  - [Documentation](./docs/index.md)
- - [Contributing](/docs/contributing.md)
+ - [Contributing](./docs/contributing.md)
  - [Why VSTS Bulk Data Editor](./docs/why.md)
- - [Usage](/docs/usage.md)
+ - [Usage](./docs/usage.md)
+ - 
 
 ### External Walkthroughs and Reviews
 

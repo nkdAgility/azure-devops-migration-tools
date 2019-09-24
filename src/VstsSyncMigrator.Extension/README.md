@@ -1,6 +1,6 @@
 # Azure DevOps Migration Tools [![Chocolatey](https://img.shields.io/chocolatey/dt/vsts-sync-migrator.svg)](https://chocolatey.org/packages/vsts-sync-migrator/) [![GitHub release](https://img.shields.io/github/release/nkdAgility/vsts-sync-migration.svg)](https://github.com/nkdAgility/vsts-sync-migrator/releases) ![Build on VSTS](https://nkdagility.visualstudio.com/_apis/public/build/definitions/1b52ce63-eccc-41c8-88f9-ae6ebeefdc63/94/badge) 
 
-The Azure DevOps Migration Tools allow you to bulk edit and migrate data between Team Projects on both Microsoft Team Foundation Server (TFS) and Azure DevOps Services. You can find out [why](https://dev.azure.com/nkdagility/migration-tools/_wiki/wikis/docs?pagePath=%2Fwhy) this tooling exists and you can access the [documentation](https://dev.azure.com/nkdagility/migration-tools/_wiki/wikis/docs) to find out how. This project is published as [code on GitHub](https://github.com/nkdAgility/azure-devops-migration-tools/) as well as a [Azure DevOps Migration Tools on Chocolatey](https://chocolatey.org/packages/vsts-sync-migrator/).
+The Azure DevOps Migration Tools allow you to bulk edit and migrate data between Team Projects on both Microsoft Team Foundation Server (TFS) and Azure DevOps Services. Take a look at the  [documentation](https://github.com/nkdAgility/azure-devops-migration-tools/blob/master/docs/index.md) to find out how. This project is published as [code on GitHub](https://github.com/nkdAgility/azure-devops-migration-tools/) as well as a [Azure DevOps Migration Tools on Chocolatey](https://chocolatey.org/packages/vsts-sync-migrator/).
 
 ![alt text](https://raw.githubusercontent.com/nkdAgility/azure-devops-migration-tools/master/src/VstsSyncMigrator.Extension/images/azure-devops-migration-tools-naked-agility-martin-hinshelwood.png)
 
@@ -25,11 +25,11 @@ The Azure DevOps Migration Tools allow you to bulk edit and migrate data between
 ## Quick Links
 
  - [Video Overview](https://youtu.be/ZxDktQae10M)
- - [Getting Started](https://dev.azure.com/nkdagility/migration-tools/_wiki/wikis/docs?wikiVersion=GBmaster&pagePath=%2Fgetting%20started)
- - [Documentation](https://dev.azure.com/nkdagility/migration-tools/_wiki/wikis/docs?pagePath=%2Findex)
- - [Contributing](https://dev.azure.com/nkdagility/migration-tools/_wiki/wikis/docs?pagePath=%2Findex&anchor=contributing)
- - [Why VSTS Bulk Data Editor](https://dev.azure.com/nkdagility/migration-tools/_wiki/wikis/docs?pagePath=%2Fwhy)
- - [Usage](https://dev.azure.com/nkdagility/migration-tools/_wiki/wikis/docs?pagePath=%2Fusage%2Fusage)
+ - [Getting Started](https://github.com/nkdAgility/azure-devops-migration-tools/docs/getting-started.md)
+ - [Documentation](https://github.com/nkdAgility/azure-devops-migration-tools/docs/index.md)
+ - [Contributing](https://github.com/nkdAgility/azure-devops-migration-tools/docs/contributing.md)
+ - [Why VSTS Bulk Data Editor](https://github.com/nkdAgility/azure-devops-migration-tools/docs/why.md)
+ - [Usage](https://github.com/nkdAgility/azure-devops-migration-tools/docs/usage.md)
 
 ### External Walkthroughs and Reviews
 
@@ -38,7 +38,7 @@ The Azure DevOps Migration Tools allow you to bulk edit and migrate data between
 
 ## Getting the Tools
 
-There are two ways to use these tools:
+There are two ways to get these tools:
 
 - (recommended)[Install from Chocolatey](https://chocolatey.org/packages/vsts-sync-migrator/)
 - Download the [latest release from GitHub](https://github.com/nkdAgility/azure-devops-migration-tools/releases) and unzip
