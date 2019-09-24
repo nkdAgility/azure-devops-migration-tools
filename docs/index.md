@@ -42,7 +42,7 @@ Most of these processors need to be run in order. If you try to migrate work ite
 |Processor |Staus |Target |Usage |
 |---------|---------|---------|---------|
 |NodeStructuresMigrationContext | ready | Area & Iteration | Migrates Area and Iteration Paths |
-|[WorkItemMigrationContext](./processors/WorkItemMigrationConfig.md) | ready | Work Items | Migrates either tip or history of work items with Links & Attachments based on a query with field mappings |
+|[WorkItemMigrationContext](./Processors/WorkItemMigrationConfig.md) | ready | Work Items | Migrates either tip or history of work items with Links & Attachments based on a query with field mappings |
 |WorkItemRevisionReplayMigrationContext | merged |  Work Items | obsolite - merged into WorkItemMigrationContext |
 |LinkMigrationContext | merged | Work Items | obsolite - merged into WorkItemMigrationContext |
 |AttachementExportMigrationContext | merged | Work Items | obsolite - merged into WorkItemMigrationContext |
