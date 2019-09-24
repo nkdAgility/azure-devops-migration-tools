@@ -6,5 +6,5 @@ if(test-path $vstssyncmigrationpath) {
   Remove-Item "$($vstssyncmigrationpath)\*" -recurse -force -exclude *.json
 }
 
-Install-ChocolateyZipPackage 'vstssyncmigrator' 'https://github.com/nkdAgility/azure-devops-migration-tools/releases/download/#{GITVERSION.SEMVER}#/vstssyncmigrator-#{GITVERSION.SEMVER}#.zip' $vstssyncmigrationpath -Checksum #{Chocolatey.FileHash}# -ChecksumType SHA256
+Install-ChocolateyZipPackage 'vstssyncmigrator' 'https://github.com/nkdAgility/azure-devops-migration-tools/releases/download/v#{GITVERSION.SEMVER}#/vstssyncmigrator-#{GITVERSION.SEMVER}#.zip' $vstssyncmigrationpath -Checksum #{Chocolatey.FileHash}# -ChecksumType SHA256
 write-host 'VSTS Sync Migration has been installed. Call `migration` from the command line to see options. You may need to close and reopen the command shell.'
