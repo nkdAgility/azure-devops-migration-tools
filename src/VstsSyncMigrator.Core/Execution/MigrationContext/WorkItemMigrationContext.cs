@@ -88,8 +88,8 @@ namespace VstsSyncMigrator.Engine
             tfsqc.AddParameter("TeamProject", me.Source.Config.Name);
             tfsqc.Query =
                 string.Format(
-                    @"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY [System.ChangedDate] desc",
-                    _config.QueryBit);
+                    @"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY {1}",
+                    _config.QueryBit, _config.OrderBit);
             var sourceQueryResult = tfsqc.Execute();
             var sourceWorkItems = (from WorkItem swi in sourceQueryResult select swi).ToList();
             Trace.WriteLine($"Replay all revisions of {sourceWorkItems.Count} work items?", Name);
@@ -123,7 +123,7 @@ namespace VstsSyncMigrator.Engine
         private List<WorkItem> FilterWorkItemsThatAlreadyExistInTarget(List<WorkItem> sourceWorkItems, WorkItemStoreContext targetStore)
         {
             var targetQuery = new TfsQueryContext(targetStore);
-            targetQuery.AddParameter("TeamProject", me.Source.Config.Name);
+            targetQuery.AddParameter("TeamProject", me.Target.Config.Name);
             targetQuery.Query =
                 string.Format(
                     @"SELECT [System.Id], [{0}] FROM WorkItems WHERE [System.TeamProject] = @TeamProject ORDER BY [System.ChangedDate] desc", me.Target.Config.ReflectedWorkItemIDFieldName);
