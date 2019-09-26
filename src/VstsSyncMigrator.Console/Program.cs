@@ -174,7 +174,7 @@ namespace VstsSyncMigrator.ConsoleApp
                 ec = JsonConvert.DeserializeObject<EngineConfiguration>(configurationjson, 
                     new FieldMapConfigJsonConverter(),
                     new ProcessorConfigJsonConverter());
-                if (ec.Version != System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(3)) ;
+                if (ec.Version != System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(3))
                 {
                     Trace.WriteLine("The config version does not match the current version. There may be compatability issues.", "[Info]");
                     return 1;
