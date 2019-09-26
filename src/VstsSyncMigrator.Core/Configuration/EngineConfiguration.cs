@@ -11,6 +11,7 @@ namespace VstsSyncMigrator.Engine.Configuration
 {
     public class EngineConfiguration
     {
+        public string Version { get; set; }
         public bool TelemetryEnableTrace { get; set; }
         public bool workaroundForQuerySOAPBugEnabled { get; set; }
         public TeamProjectConfig Source { get; set; }
@@ -23,8 +24,9 @@ namespace VstsSyncMigrator.Engine.Configuration
         {
             EngineConfiguration ec = new EngineConfiguration();
             ec.TelemetryEnableTrace = false;
-            ec.Source = new TeamProjectConfig() { Name = "DemoProjs", Collection = new Uri("https://sdd2016.visualstudio.com/"), ReflectedWorkItemIDFieldName = "TfsMigrationTool.ReflectedWorkItemId" };
-            ec.Target = new TeamProjectConfig() { Name = "DemoProjt", Collection = new Uri("https://sdd2016.visualstudio.com/"), ReflectedWorkItemIDFieldName = "ProcessName.ReflectedWorkItemId" };
+            ec.Version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(3);
+            ec.Source = new TeamProjectConfig() { Name = "DemoProjs", Collection = new Uri("https://dev.azure.com/psd45"), ReflectedWorkItemIDFieldName = "TfsMigrationTool.ReflectedWorkItemId" };
+            ec.Target = new TeamProjectConfig() { Name = "DemoProjt", Collection = new Uri("https://dev.azure.com/psd46"), ReflectedWorkItemIDFieldName = "ProcessName.ReflectedWorkItemId" };
             ec.FieldMaps = new List<IFieldMapConfig>();
             ec.FieldMaps.Add(new MultiValueConditionalMapConfig()
             {
