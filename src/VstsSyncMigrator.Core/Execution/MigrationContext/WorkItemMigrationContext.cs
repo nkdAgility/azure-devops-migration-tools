@@ -81,6 +81,8 @@ namespace VstsSyncMigrator.Engine
 
         internal override void InternalExecute()
         {
+
+
             var stopwatch = Stopwatch.StartNew();
             //////////////////////////////////////////////////
             var sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.BypassRules);
@@ -138,6 +140,15 @@ namespace VstsSyncMigrator.Engine
         private void ProcessWorkItem(WorkItemStoreContext sourceStore, WorkItemStoreContext targetStore, Project destProject, WorkItem sourceWorkItem, int retryLimit = 5, int retrys = 0)
         {
             var witstopwatch = Stopwatch.StartNew();
+            IDictionary<string, double> processWorkItemMetrics = new Dictionary<string, double>();
+            IDictionary<string, string> processWorkItemParamiters = new Dictionary<string, string>();
+            AddParameter("SourceURL", processWorkItemParamiters, sourceStore.Store.TeamProjectCollection.Uri.ToString());
+            AddParameter("SourceWorkItem", processWorkItemParamiters, sourceWorkItem.Id.ToString());
+            AddParameter("TargetURL", processWorkItemParamiters, targetStore.Store.TeamProjectCollection.Uri.ToString());
+            AddParameter("TargetProject", processWorkItemParamiters, destProject.Name);
+            AddParameter("RetryLimit", processWorkItemParamiters, retryLimit.ToString());
+            AddParameter("RetryNumber", processWorkItemParamiters, retrys.ToString());
+
             try
             {
                 var targetWorkItem = targetStore.FindReflectedWorkItem(sourceWorkItem, false);
@@ -154,21 +165,26 @@ namespace VstsSyncMigrator.Engine
                     {
                         targetWorkItem = CreateWorkItem_TipOnly(sourceWorkItem, destProject, sourceStore, _current, targetStore);
                     }
-
+                    AddMetric("Revisions", processWorkItemMetrics, targetWorkItem.Revisions.Count);
                 }
                 else
                 {
 
                     Console.WriteLine("...Exists");
+                    processWorkItemMetrics.Add("Revisions", 0);
 
                 }
+                AddParameter("TargetWorkItem", processWorkItemParamiters, targetWorkItem.Revisions.Count.ToString());
                 ///////////////////////////////////////////////
                 ProcessWorkItemAttachments(sourceWorkItem, targetWorkItem);
+                AddMetric("Attachments", processWorkItemMetrics, targetWorkItem.AttachedFileCount);
                 ///////////////////////////////////////////////
                 ProcessWorkItemLinks(sourceStore, targetStore, sourceWorkItem, targetWorkItem);
+                AddMetric("RelatedLinkCount", processWorkItemMetrics, targetWorkItem.Links.Count);
                 ///////////////////////////////////////////////
                 ProcessHTMLFieldAttachements(targetWorkItem);
                 ///////////////////////////////////////////////
+                ///////////////////////////////////////////////////////
                 if (targetWorkItem != null && targetWorkItem.IsDirty)
                 {
                     targetWorkItem.Save();
@@ -205,6 +221,10 @@ namespace VstsSyncMigrator.Engine
             _elapsedms += witstopwatch.ElapsedMilliseconds;
             _current--;
             _count++;
+
+            processWorkItemMetrics.Add("ElapsedTimeMS", _elapsedms);
+            
+
             var average = new TimeSpan(0, 0, 0, 0, (int)(_elapsedms / _count));
             var remaining = new TimeSpan(0, 0, 0, 0, (int)(average.TotalMilliseconds * _current));
             Trace.WriteLine(
@@ -212,6 +232,7 @@ namespace VstsSyncMigrator.Engine
                     string.Format(@"{0:s\:fff} seconds", average),
                     string.Format(@"{0:%h} hours {0:%m} minutes {0:s\:fff} seconds", remaining)), Name);
             Trace.Flush();
+            Telemetry.Current.TrackEvent("WorkItemMigrated", processWorkItemParamiters, processWorkItemMetrics);
         }
 
         private void ProcessHTMLFieldAttachements(WorkItem targetWorkItem)
@@ -562,7 +583,6 @@ namespace VstsSyncMigrator.Engine
 
             Trace.WriteLine("...build complete", Name);
             fieldMappingTimer.Stop();
-            Telemetry.Current.TrackMetric("FieldMappingTime", fieldMappingTimer.ElapsedMilliseconds);
             Trace.WriteLine(
                 $"FieldMapOnNewWorkItem: {newWorkItemstartTime} - {fieldMappingTimer.Elapsed.ToString("c")}", Name);
         }
