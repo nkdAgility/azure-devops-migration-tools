@@ -22,7 +22,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
 
         public EmbededImagesRepairOMatic()
         {
-            _httpClientHandler = new HttpClientHandler { AllowAutoRedirect = false, UseDefaultCredentials = true };
+            _httpClientHandler = new HttpClientHandler { AllowAutoRedirect = false, UseDefaultCredentials = true, AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate };
         }
 
         /**
@@ -53,7 +53,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                             Match newFileNameMatch = Regex.Match(match.Value, regExSearchFileName, RegexOptions.IgnoreCase);
                             if (newFileNameMatch.Success)
                             {
-                                Trace.WriteLine($"field '{field.Name}' has match: {match.Value}");
+                                Trace.WriteLine($"field '{field.Name}' has match: {System.Net.WebUtility.HtmlDecode(match.Value)}");
                                 string fullImageFilePath = Path.GetTempPath() + newFileNameMatch.Value;
 
                                 using (var httpClient = new HttpClient(_httpClientHandler, false))
