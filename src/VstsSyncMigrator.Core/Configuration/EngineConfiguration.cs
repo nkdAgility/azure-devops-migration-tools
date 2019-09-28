@@ -22,12 +22,59 @@ namespace VstsSyncMigrator.Engine.Configuration
 
         public static EngineConfiguration GetDefault()
         {
+            EngineConfiguration ec = CreateEmptyConfig();
+            AddFieldMapps(ec);
+            AddWorkItemMigrationDefault(ec);
+            AddTestPlansMigrationDefault(ec);
+            ec.Processors.Add(new ImportProfilePictureConfig() { Enabled = false });
+            ec.Processors.Add(new ExportProfilePictureFromADConfig() { Enabled = false });
+            ec.Processors.Add(new FixGitCommitLinksConfig() { Enabled = false, TargetRepository = ec.Target.Name });
+            ec.Processors.Add(new WorkItemUpdateConfig() { Enabled = false, QueryBit = @"AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')" });
+            ec.Processors.Add(new WorkItemPostProcessingConfig() { Enabled = false, QueryBit = "AND [TfsMigrationTool.ReflectedWorkItemId] = '' ", WorkItemIDs = new List<int> { 1, 2, 3 } });
+            ec.Processors.Add(new WorkItemDeleteConfig() { Enabled = false });
+            ec.Processors.Add(new WorkItemQueryMigrationConfig() { Enabled = false, PrefixProjectToNodes = false });
+            return ec;
+        }
+
+        public static EngineConfiguration GetWorkItemMigration()
+        {
+            EngineConfiguration ec = CreateEmptyConfig();
+            AddWorkItemMigrationDefault(ec);
+            return ec;
+        }
+
+        private static void AddWorkItemMigrationDefault(EngineConfiguration ec)
+        {
+            ec.Processors.Add(new NodeStructuresMigrationConfig() { Enabled = false, PrefixProjectToNodes = false, BasePaths = new[] { "Product\\Area\\Path1", "Product\\Area\\Path2" } });
+            ec.Processors.Add(new WorkItemMigrationConfig() { Enabled = false, WorkItemCreateRetryLimit = 5, FilterWorkItemsThatAlreadyExistInTarget = true, ReplayRevisions = true, LinkMigration = true, AttachmentMigration = true, FixHtmlAttachmentLinks = false, AttachmentWorkingPath = "c:\\temp\\WorkItemAttachmentWorkingFolder\\", UpdateCreatedBy = true, PrefixProjectToNodes = false, UpdateCreatedDate = true, UpdateSourceReflectedId = true, QueryBit = @"AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')", OrderBit = "[System.ChangedDate] desc" });
+        }
+
+        private static EngineConfiguration CreateEmptyConfig()
+        {
             EngineConfiguration ec = new EngineConfiguration();
             ec.TelemetryEnableTrace = false;
             ec.Version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(3);
             ec.Source = new TeamProjectConfig() { Name = "DemoProjs", Collection = new Uri("https://dev.azure.com/psd45"), ReflectedWorkItemIDFieldName = "TfsMigrationTool.ReflectedWorkItemId" };
             ec.Target = new TeamProjectConfig() { Name = "DemoProjt", Collection = new Uri("https://dev.azure.com/psd46"), ReflectedWorkItemIDFieldName = "ProcessName.ReflectedWorkItemId" };
             ec.FieldMaps = new List<IFieldMapConfig>();
+            ec.WorkItemTypeDefinition = new Dictionary<string, string> {
+                    { "Bug", "Bug" },
+                    { "Product Backlog Item", "Product Backlog Item" }
+            };
+            ec.Processors = new List<ITfsProcessingConfig>();
+            return ec;
+        }
+
+        private static void AddTestPlansMigrationDefault(EngineConfiguration ec)
+        {
+            ec.Processors.Add(new TestVariablesMigrationConfig() { Enabled = false });
+            ec.Processors.Add(new TestConfigurationsMigrationConfig() { Enabled = false });
+            ec.Processors.Add(new TestPlansAndSuitesMigrationConfig() { Enabled = false, PrefixProjectToNodes = true });
+            //ec.Processors.Add(new TestRunsMigrationConfig() { Enabled = false });
+        }
+
+        private static void AddFieldMapps(EngineConfiguration ec)
+        {
             ec.FieldMaps.Add(new MultiValueConditionalMapConfig()
             {
                 WorkItemTypeName = "*",
@@ -42,7 +89,8 @@ namespace VstsSyncMigrator.Engine.Configuration
                      { "Field2", "Value2" }
                  }
             });
-            ec.FieldMaps.Add(new FieldBlankMapConfig() {
+            ec.FieldMaps.Add(new FieldBlankMapConfig()
+            {
                 WorkItemTypeName = "*",
                 targetField = "TfsMigrationTool.ReflectedWorkItemId"
             });
@@ -111,26 +159,8 @@ namespace VstsSyncMigrator.Engine.Configuration
                 timeTravel = 1,
                 toSkip = 3
             });
-            ec.WorkItemTypeDefinition = new Dictionary<string, string> {
-                    { "Bug", "Bug" },
-                    { "Product Backlog Item", "Product Backlog Item" }
-            };
-            ec.Processors = new List<ITfsProcessingConfig>();
-            ec.Processors.Add(new WorkItemMigrationConfig() { Enabled = false, WorkItemCreateRetryLimit = 5, FilterWorkItemsThatAlreadyExistInTarget = true, ReplayRevisions= true, LinkMigration = true, AttachmentMigration = true, FixHtmlAttachmentLinks=false, AttachmentWorkingPath = "c:\\temp\\WorkItemAttachmentWorkingFolder\\", UpdateCreatedBy =true, PrefixProjectToNodes = false, UpdateCreatedDate=true, UpdateSourceReflectedId=true, QueryBit = @"AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')", OrderBit = "[System.ChangedDate] desc" });
-            ec.Processors.Add(new WorkItemUpdateConfig() { Enabled = false, QueryBit = @"AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')" });
-            ec.Processors.Add(new NodeStructuresMigrationConfig() { Enabled = false, PrefixProjectToNodes=false, BasePaths = new [] { "Product\\Area\\Path1", "Product\\Area\\Path2" } });
-            ec.Processors.Add(new WorkItemPostProcessingConfig() { Enabled = false, QueryBit= "AND [TfsMigrationTool.ReflectedWorkItemId] = '' ", WorkItemIDs = new List<int> {1,2,3} });
-            ec.Processors.Add(new WorkItemDeleteConfig() { Enabled = false });
-            ec.Processors.Add(new WorkItemQueryMigrationConfig() { Enabled = false, PrefixProjectToNodes = false });
-            ec.Processors.Add(new TestVariablesMigrationConfig() { Enabled = false });
-            ec.Processors.Add(new TestConfigurationsMigrationConfig() { Enabled = false });
-            ec.Processors.Add(new TestPlansAndSuitesMigrationConfig() { Enabled = false, PrefixProjectToNodes = true });
-            //ec.Processors.Add(new TestRunsMigrationConfig() { Enabled = false });
-            ec.Processors.Add(new ImportProfilePictureConfig() { Enabled = false });
-            ec.Processors.Add(new ExportProfilePictureFromADConfig() { Enabled = false });
-            ec.Processors.Add(new FixGitCommitLinksConfig() { Enabled = false, TargetRepository = ec.Target.Name });
-            return ec;
         }
+
 
     }
 }
