@@ -86,5 +86,15 @@ namespace VstsSyncMigrator.Engine
             //// Output = [targetTeamProject]\[sourceTeamProject]\[AreaPath]
             return r.Replace(input, me.Target.Config.Name, 1);
         }
+
+        internal static void AddParameter(string name, IDictionary<string, string> store, string value)
+        {
+            if (!store.ContainsKey(name)) store.Add(name, value);
+        }
+
+        internal static void AddMetric(string name, IDictionary<string, double> store, double value)
+        {
+            if (!store.ContainsKey(name)) store.Add(name, value);
+        }
     }
 }
