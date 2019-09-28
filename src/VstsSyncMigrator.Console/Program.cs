@@ -35,8 +35,19 @@ namespace VstsSyncMigrator.ConsoleApp
         [Verb("init", HelpText = "Creates initial config file")]
         class InitOptions
         {
-            //normal options here
+            [Option('c', "config", Required = false, HelpText = "Configuration file to be processed.")]
+            public string ConfigFile { get; set; }
+            [Option('o', "options", Required = false, Default = OptionsMode.WorkItemTracking, HelpText = "Configuration file to be processed.")]
+            public OptionsMode Options { get; set; }
         }
+
+       public enum OptionsMode
+        {
+            Full = 0,
+            WorkItemTracking = 1
+
+        }
+
         [Verb("execute", HelpText = "Record changes to the repository.")]
         class RunOptions
         {
@@ -174,9 +185,9 @@ namespace VstsSyncMigrator.ConsoleApp
                 ec = JsonConvert.DeserializeObject<EngineConfiguration>(configurationjson, 
                     new FieldMapConfigJsonConverter(),
                     new ProcessorConfigJsonConverter());
-                if (ec.Version != System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(3)) ;
+                if (ec.Version != System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(3))
                 {
-                    Trace.WriteLine("The config version does not match the current version. There may be compatability issues.", "[Info]");
+                    Trace.WriteLine("The config version does not match the current version. There may be compatability issues and we recommend that you generate a new default config and then tranfer the settings accross.", "[Info]");
                     return 1;
                 }
             }
@@ -205,12 +216,38 @@ namespace VstsSyncMigrator.ConsoleApp
         private static object RunInitAndReturnExitCode(InitOptions opts)
         {
             Telemetry.Current.TrackEvent("InitCommand");
-            if (!File.Exists("configuration.json"))
+            string configFile = opts.ConfigFile;
+            if (configFile.IsEmpty())
             {
-                string json = JsonConvert.SerializeObject(EngineConfiguration.GetDefault(),
+                configFile = "configuration.json";
+            }
+            Telemetry.Current.TrackEvent("InitCommand");
+            Trace.WriteLine(String.Format("ConfigFile: {0}", configFile), "[Info]");
+            if (File.Exists(configFile))
+            {
+                Trace.WriteLine("Deleting old configuration.json reference file", "[Info]");
+                File.Delete(configFile);
+            }
+            if (!File.Exists(configFile))
+            {
+                Trace.WriteLine(string.Format("Populating config with {0}", opts.Options.ToString()), "[Info]");
+                EngineConfiguration config;
+                switch (opts.Options)
+                {
+                    case OptionsMode.Full: 
+                        config = EngineConfiguration.GetDefault();
+                        break;
+                    case OptionsMode.WorkItemTracking: config = EngineConfiguration.GetWorkItemMigration();
+                        break;
+                    default:
+                        config = EngineConfiguration.GetDefault();
+                        break;
+                }             
+
+                string json = JsonConvert.SerializeObject(config,Formatting.Indented ,
                     new FieldMapConfigJsonConverter(),
                     new ProcessorConfigJsonConverter());
-                StreamWriter sw = new StreamWriter("configuration.json");
+                StreamWriter sw = new StreamWriter(configFile);
                 sw.WriteLine(json);
                 sw.Close();
                 Trace.WriteLine("New configuration.json file has been created", "[Info]");
