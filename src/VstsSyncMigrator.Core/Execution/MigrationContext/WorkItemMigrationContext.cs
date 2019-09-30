@@ -73,7 +73,8 @@ namespace VstsSyncMigrator.Engine
                 "System.BoardColumnDone",
                 "System.BoardLane",
                 "SLB.SWT.DateOfClientFeedback",
-                "System.CommentCount"
+                "System.CommentCount",
+				"System.RemoteLinkCount"
             };
         }
 
