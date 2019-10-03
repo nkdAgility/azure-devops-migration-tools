@@ -8,6 +8,8 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
         /// <inheritdoc />
         public bool Enabled { get; set; }
 
+        public bool PrefixProjectToNodes { get; set; }
+
         /// <summary>
         ///     Do we automatically migrate Team Settings after Team creation ?
         /// </summary>

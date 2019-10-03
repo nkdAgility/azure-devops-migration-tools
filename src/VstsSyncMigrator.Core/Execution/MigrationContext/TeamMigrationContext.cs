@@ -83,10 +83,28 @@ namespace VstsSyncMigrator.Engine
                                 continue;
                             }
 
-                            Trace.WriteLine(string.Format("-> Processing team '{0}' settings:", sourceTeam.Name));
-                            targetConfig.TeamSettings.BacklogIterationPath = sourceConfig.TeamSettings.BacklogIterationPath;
-                            targetConfig.TeamSettings.IterationPaths = sourceConfig.TeamSettings.IterationPaths;
-                            targetConfig.TeamSettings.TeamFieldValues = sourceConfig.TeamSettings.TeamFieldValues;
+                            Trace.WriteLine(string.Format("-> Settings found for team '{0}'..", sourceTeam.Name));
+                            if (_config.PrefixProjectToNodes)
+                            {
+                                targetConfig.TeamSettings.BacklogIterationPath = 
+                                    string.Format("{0}\\{1}", me.Source.Config.Name, sourceConfig.TeamSettings.BacklogIterationPath);
+                                targetConfig.TeamSettings.IterationPaths = sourceConfig.TeamSettings.IterationPaths
+                                    .Select(path => string.Format("{0}\\{1}", me.Source.Config.Name, path))
+                                    .ToArray();
+                                targetConfig.TeamSettings.TeamFieldValues = sourceConfig.TeamSettings.TeamFieldValues
+                                    .Select(field => new TeamFieldValue
+                                    {
+                                        IncludeChildren = field.IncludeChildren,
+                                        Value = string.Format("{0}\\{1}", me.Source.Config.Name, field.Value)
+                                    })
+                                    .ToArray();
+                            }
+                            else
+                            {
+                                targetConfig.TeamSettings.BacklogIterationPath = sourceConfig.TeamSettings.BacklogIterationPath;
+                                targetConfig.TeamSettings.IterationPaths = sourceConfig.TeamSettings.IterationPaths;
+                                targetConfig.TeamSettings.TeamFieldValues = sourceConfig.TeamSettings.TeamFieldValues;
+                            }
 
                             targetTSCS.SetTeamSettings(targetConfig.TeamId, targetConfig.TeamSettings);
                             Trace.WriteLine(string.Format("-> Team '{0}' settings... applied", targetConfig.TeamName));
