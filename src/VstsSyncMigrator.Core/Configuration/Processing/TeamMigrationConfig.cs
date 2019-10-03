@@ -8,6 +8,11 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
         /// <inheritdoc />
         public bool Enabled { get; set; }
 
+        /// <summary>
+        ///     Do we automatically migrate Team Settings after Team creation ?
+        /// </summary>
+        public bool EnableTeamSettingsMigration { get; set; } = false;
+
         /// <inheritdoc />
         public Type Processor
         {

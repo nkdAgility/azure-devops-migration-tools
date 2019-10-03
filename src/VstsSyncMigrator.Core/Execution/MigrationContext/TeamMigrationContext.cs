@@ -36,8 +36,8 @@ namespace VstsSyncMigrator.Engine
         internal override void InternalExecute()
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
-			//////////////////////////////////////////////////
-			WorkItemStoreContext sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.BypassRules);
+            //////////////////////////////////////////////////
+            WorkItemStoreContext sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.BypassRules);
             TfsTeamService sourceTS = me.Source.Collection.GetService<TfsTeamService>();
             List<TeamFoundationTeam> sourceTL = sourceTS.QueryTeams(me.Source.Config.Name).ToList();
             Trace.WriteLine(string.Format("Found {0} teams in Source?", sourceTL.Count));
@@ -60,15 +60,42 @@ namespace VstsSyncMigrator.Engine
             foreach (TeamFoundationTeam sourceTeam in sourceTL)
             {
                 Stopwatch witstopwatch = Stopwatch.StartNew();
-				var foundTargetTeam = (from x in targetTL where x.Name == sourceTeam.Name select x).SingleOrDefault();
+                var foundTargetTeam = (from x in targetTL where x.Name == sourceTeam.Name select x).SingleOrDefault();
                 if (foundTargetTeam == null)
                 {
-                    Trace.WriteLine(string.Format("Processing team {0}", sourceTeam.Name));
+                    Trace.WriteLine(string.Format("Processing team '{0}':", sourceTeam.Name));
                     TeamFoundationTeam newTeam = targetTS.CreateTeam(targetProject.Uri.ToString(), sourceTeam.Name, sourceTeam.Description, null);
+                    Trace.WriteLine(string.Format("-> Team '{0}' created", sourceTeam.Name));
+
+                    if (_config.EnableTeamSettingsMigration)
+                    {
+                        /// Duplicate settings
+                        Trace.WriteLine(string.Format("-> Processing team '{0}' settings:", sourceTeam.Name));
+                        var sourceConfigurations = sourceTSCS.GetTeamConfigurations(new List<Guid> { sourceTeam.Identity.TeamFoundationId });
+                        var targetConfigurations = targetTSCS.GetTeamConfigurations(new List<Guid> { newTeam.Identity.TeamFoundationId });
+
+                        foreach (var sourceConfig in sourceConfigurations)
+                        {
+                            var targetConfig = targetConfigurations.FirstOrDefault(t => t.TeamName == sourceConfig.TeamName);
+                            if (targetConfig == null)
+                            {
+                                Trace.WriteLine(string.Format("-> Settings for team '{0}'.. not found", sourceTeam.Name));
+                                continue;
+                            }
+
+                            Trace.WriteLine(string.Format("-> Processing team '{0}' settings:", sourceTeam.Name));
+                            targetConfig.TeamSettings.BacklogIterationPath = sourceConfig.TeamSettings.BacklogIterationPath;
+                            targetConfig.TeamSettings.IterationPaths = sourceConfig.TeamSettings.IterationPaths;
+                            targetConfig.TeamSettings.TeamFieldValues = sourceConfig.TeamSettings.TeamFieldValues;
+
+                            targetTSCS.SetTeamSettings(targetConfig.TeamId, targetConfig.TeamSettings);
+                            Trace.WriteLine(string.Format("-> Team '{0}' settings... applied", targetConfig.TeamName));
+                        }
+                    }
                 }
                 else
                 {
-                    Trace.WriteLine(string.Format("Team found.. skipping"));
+                    Trace.WriteLine(string.Format("Team '{0}' found.. skipping", sourceTeam.Name));
                 }
 
                 witstopwatch.Stop();
