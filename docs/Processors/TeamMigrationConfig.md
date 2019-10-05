@@ -5,7 +5,9 @@ This processor can migrate teams. (I currently don't know how much preview this 
 This should be run after `VstsSyncMigrator.Engine.Configuration.Processing.NodeStructuresMigrationConfig` and before all other processors.
 
 
-| Parameter name | Type    | Description                      | Default Value                            |
-|----------------|---------|----------------------------------|------------------------------------------|
-| `Enabled`      | Boolean | Active the processor if it true. | false                                    |
-| `ObjectType`   | string  | The name of the processor        | VstsSyncMigrator.Engine.Configuration.Processing.TeamMigrationConfig |
+| Parameter name                | Type    | Description                                                                | Default Value                                                        |
+|-------------------------------|---------|----------------------------------------------------------------------------|----------------------------------------------------------------------|
+| `Enabled`                     | Boolean | Active the processor if it true.                                           | false                                                                |
+| `ObjectType`                  | string  | The name of the processor                                                  | VstsSyncMigrator.Engine.Configuration.Processing.TeamMigrationConfig |
+| `EnableTeamSettingsMigration` | Boolean | Migrate original team settings after their creation on target team project | false                                                                |
+| `PrefixProjectToNodes`        | Boolean | Prefix your iterations and areas with the project name. If you have enabled this in `VstsSyncMigrator.Engine.Configuration.Processing.NodeStructuresMigrationConfig` you must do it here too. | false |
