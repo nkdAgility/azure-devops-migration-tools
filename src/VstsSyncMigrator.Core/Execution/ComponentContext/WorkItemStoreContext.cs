@@ -96,10 +96,9 @@ namespace VstsSyncMigrator.Engine
                         {
                             found = null;
                         }
-                    }
-                    catch (Exception)
+                    } 
+                    catch (DeniedOrNotExistException)
                     {
-
                         found = null;
                     }
                 }                
