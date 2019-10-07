@@ -98,7 +98,10 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
             }
 
             if (wiTargetL.IsDirty)
+            {
+                wiTargetL.Fields["System.ChangedBy"].Value = "Migration";
                 wiTargetL.Save();
+            }
         }
 
         private void CreateExternalLink(ExternalLink sourceLink, WorkItem target)
@@ -114,6 +117,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                 ExternalLink el = new ExternalLink(sourceLink.ArtifactLinkType, sourceLink.LinkedArtifactUri);
                 el.Comment = sourceLink.Comment;
                 target.Links.Add(el);
+                target.Fields["System.ChangedBy"].Value = "Migration";
                 target.Save();
             }
             else
@@ -186,6 +190,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                         RelatedLink newRl = new RelatedLink(linkTypeEnd, wiTargetR.Id);
 
                         wiTargetL.Links.Add(newRl);
+                        wiTargetL.Fields["System.ChangedBy"].Value = "Migration";
                         wiTargetL.Save();
                         Trace.WriteLine(
                             string.Format(
@@ -260,6 +265,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                 Hyperlink hl = new Hyperlink(sourceLink.Location);
                 hl.Comment = sourceLink.Comment;
                 target.Links.Add(hl);
+                target.Fields["System.ChangedBy"].Value = "Migration";
                 target.Save();
             }
         }
