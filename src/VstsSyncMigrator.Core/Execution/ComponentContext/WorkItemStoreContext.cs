@@ -89,8 +89,15 @@ namespace VstsSyncMigrator.Engine
                 }
                 else
                 {
-                    found = Store.GetWorkItem(idToFind);
-                    if (!(found.Fields[teamProjectContext.Config.ReflectedWorkItemIDFieldName].Value.ToString() == rwiid))
+                    try
+                    {
+                        found = Store.GetWorkItem(idToFind);
+                        if (!(found.Fields[teamProjectContext.Config.ReflectedWorkItemIDFieldName].Value.ToString() == rwiid))
+                        {
+                            found = null;
+                        }
+                    } 
+                    catch (DeniedOrNotExistException)
                     {
                         found = null;
                     }
