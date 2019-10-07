@@ -186,7 +186,7 @@ namespace VstsSyncMigrator.ConsoleApp
                     new FieldMapConfigJsonConverter(),
                     new ProcessorConfigJsonConverter());
 #if !DEBUG
-                if (ec.Version != System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(3))
+                if (ec.Version != System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(2))
                 {
                     Trace.WriteLine("The config version does not match the current version. There may be compatability issues and we recommend that you generate a new default config and then tranfer the settings accross.", "[Info]");
                     return 1;
