@@ -99,6 +99,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                 {
                     Attachment a = new Attachment(filepath);
                     targetWorkItem.Attachments.Add(a);
+                    targetWorkItem.Fields["System.ChangedBy"].Value = "Migration";
                     targetWorkItem.Save();
                 }
                 else
