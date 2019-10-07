@@ -141,6 +141,7 @@ namespace VstsSyncMigrator.Engine
         private void ProcessWorkItem(WorkItemStoreContext sourceStore, WorkItemStoreContext targetStore, Project destProject, WorkItem sourceWorkItem, int retryLimit = 5, int retrys = 0)
         {
             var witstopwatch = Stopwatch.StartNew();
+            var starttime = DateTime.Now;
             IDictionary<string, double> processWorkItemMetrics = new Dictionary<string, double>();
             IDictionary<string, string> processWorkItemParamiters = new Dictionary<string, string>();
             AddParameter("SourceURL", processWorkItemParamiters, sourceStore.Store.TeamProjectCollection.Uri.ToString());
@@ -158,14 +159,8 @@ namespace VstsSyncMigrator.Engine
                 Console.WriteLine(string.Format("STATUS: Work Item has {0} revisions and revision migration is set to {1}", sourceWorkItem.Rev, _config.ReplayRevisions));
                 if (targetWorkItem == null)
                 {
-                    if (_config.ReplayRevisions)
-                    {
+
                         targetWorkItem = CreateWorkItem_ReplayRevisions(sourceWorkItem, destProject, sourceStore, _current, targetStore);
-                    }
-                    else
-                    {
-                        targetWorkItem = CreateWorkItem_TipOnly(sourceWorkItem, destProject, sourceStore, _current, targetStore);
-                    }
                     AddMetric("Revisions", processWorkItemMetrics, targetWorkItem.Revisions.Count);
                 }
                 else
@@ -206,10 +201,7 @@ namespace VstsSyncMigrator.Engine
                 Telemetry.Current.TrackException(ex);
                 Trace.WriteLine(ex.ToString());
                 Trace.WriteLine(string.Format("ERROR: Failed to create work item. Retry Limit reached "));
-                if (retrys > retryLimit)
-                {
-                    return;
-                } else
+                if (retrys < retryLimit)
                 {
                     Trace.WriteLine(string.Format("ERROR: Failed to create work item. Will retry in {0}s ", retrys));
                     System.Threading.Thread.Sleep(new TimeSpan(0, 0, retrys));
@@ -217,6 +209,13 @@ namespace VstsSyncMigrator.Engine
                     Trace.WriteLine(string.Format("RETRY: {0} of {1} ",retrys , retrys));
                     ProcessWorkItem(sourceStore, targetStore, destProject, sourceWorkItem, retryLimit, retrys);
                 }
+            }
+            catch (Exception ex)
+            {
+                Telemetry.Current.TrackException(ex);
+                Trace.WriteLine(ex.ToString());
+                Telemetry.Current.TrackRequest("ProcessWorkItem", starttime, witstopwatch.Elapsed, "502", false);
+                throw ex;
             }
             witstopwatch.Stop();
             _elapsedms += witstopwatch.ElapsedMilliseconds;
@@ -234,6 +233,7 @@ namespace VstsSyncMigrator.Engine
                     string.Format(@"{0:%h} hours {0:%m} minutes {0:s\:fff} seconds", remaining)), Name);
             Trace.Flush();
             Telemetry.Current.TrackEvent("WorkItemMigrated", processWorkItemParamiters, processWorkItemMetrics);
+            Telemetry.Current.TrackRequest("ProcessWorkItem", starttime, witstopwatch.Elapsed,"200", true);
         }
 
         private void ProcessHTMLFieldAttachements(WorkItem targetWorkItem)
@@ -280,7 +280,7 @@ namespace VstsSyncMigrator.Engine
                 Trace.WriteLine($"Config file specifies '{me.Target.Config.ReflectedWorkItemIDFieldName}', which wasn't found.");
                 Trace.WriteLine("Instead, found:");
                 foreach (var field in fields.OrderBy(x => x.Name))
-                    Trace.WriteLine($"{field.Type.ToString().PadLeft(15)} - {field.Name.PadRight(20)} {field.Description ?? ""}");
+                    Trace.WriteLine($"{field.Type.ToString().PadLeft(15)} - {field.Name.PadRight(20)} - {field.ReferenceName ?? ""}");
                 throw new Exception("Running a replay migration requires a ReflectedWorkItemId field to be defined in the target project's process.");
             }
         }
@@ -303,6 +303,11 @@ namespace VstsSyncMigrator.Engine
                     )
                     .OrderBy(x => x.Number)
                     .ToList();
+
+                if (!_config.ReplayRevisions)
+                {
+                    sortedRevisions.RemoveRange(0, sortedRevisions.Count - 1);
+                }
 
                 Trace.WriteLine($"...Replaying {sourceWorkItem.Revisions.Count} revisions of work item {sourceWorkItem.Id}", Name);
 
@@ -413,107 +418,6 @@ namespace VstsSyncMigrator.Engine
                         Trace.WriteLine($"{f.ReferenceName} ({f.Name}) | {f.Value}", Name);
                 }
                 Trace.WriteLine(ex.ToString(), Name);
-            }
-            return newwit;
-        }
-
-        private WorkItem CreateWorkItem_TipOnly(WorkItem sourceWorkItem, Project destProject, WorkItemStoreContext sourceStore,
-            int current,
-            WorkItemStoreContext targetStore)
-        {
-            WorkItem newwit = null;
-            // Deside on WIT
-            if (me.WorkItemTypeDefinitions.ContainsKey(sourceWorkItem.Type.Name))
-            {
-                var destType = me.WorkItemTypeDefinitions[sourceWorkItem.Type.Name].Map(sourceWorkItem);
-                newwit = CreateWorkItem_Shell(destProject, sourceWorkItem, destType);
-                PopulateWorkItem(sourceWorkItem, newwit, destType);
-
-                if (newwit.Fields.Contains(me.Target.Config.ReflectedWorkItemIDFieldName))
-                {
-                    newwit.Fields[me.Target.Config.ReflectedWorkItemIDFieldName].Value = sourceStore.CreateReflectedWorkItemId(sourceWorkItem);
-                }
-                me.ApplyFieldMappings(sourceWorkItem, newwit);
-
-                StringBuilder history = new StringBuilder();
-
-                BuildCommentTable(sourceWorkItem, history);
-
-                string reflectedUri = sourceStore.CreateReflectedWorkItemId(sourceWorkItem);
-                history.Append(
-                    $"This work item was migrated from a different project or organization. You can find the old version at <a href=\"{reflectedUri}\">{reflectedUri}</a>.");
-                newwit.History = history.ToString();
-
-                if (_config.BuildFieldTable)
-                {
-                    BuildFieldTable(sourceWorkItem, history);
-                }
-
-                if (_config.AppendMigrationToolSignatureFooter)
-                {
-                    AppendMigratedByFooter(history);
-                }
-
-                newwit.History = history.ToString();
-
-
-
-                ArrayList fails = newwit.Validate();
-                foreach (Field f in fails)
-                {
-                    Trace.WriteLine(string.Format("{0} - Invalid: {1}-{2}-{3}-{4} Status: {5} Value: {6}", current, sourceWorkItem.Id, sourceWorkItem.Type.Name, f.ReferenceName, sourceWorkItem.Title, f.Status, f.Value), this.Name);
-                }
-            }
-            else
-            {
-                Trace.WriteLine(string.Format("...the WITD named {0} is not in the list provided in the configuration.json under WorkItemTypeDefinitions. Add it to the list to enable migration of this work item type.", sourceWorkItem.Type.Name), Name);
-            }
-
-            if (newwit != null)
-            {
-
-                try
-                {
-                   
-
-                    var invalidFields = newwit.Validate();
-                    if (invalidFields.Count > 0)
-                    {
-                        Trace.WriteLine("...FAILED validation. Invalid fields:");
-                        foreach (Field invalidField in invalidFields)
-                        {
-                            Trace.WriteLine($" -NAME: {invalidField.Name} STATUS: {invalidField.Status} VALUE: {invalidField.Value}");
-                        }
-
-                        _failures++;
-                        return null;
-                    }
-
-                    newwit.Save();
-                    Trace.WriteLine(string.Format("...Saved as {0}", newwit.Id), this.Name);
-
-                    if (me.Source.Config.ReflectedWorkItemIDFieldName != null)
-                    {
-                        if (sourceWorkItem.Fields.Contains(me.Source.Config.ReflectedWorkItemIDFieldName) && _config.UpdateSourceReflectedId)
-                        {
-                            sourceWorkItem.Fields[me.Source.Config.ReflectedWorkItemIDFieldName].Value = targetStore.CreateReflectedWorkItemId(newwit);
-                        }
-                        sourceWorkItem.Save();
-                    }
-
-                    Trace.WriteLine(string.Format("...and Source Updated {0}", sourceWorkItem.Id), this.Name);
-                    _imported++;
-                }
-                catch (Exception ex)
-                {
-                    Trace.WriteLine("...FAILED to Save", this.Name);
-                    _failures++;
-                    foreach (Field f in newwit.Fields)
-                    {
-                        Trace.WriteLine(string.Format("{0} | {1}", f.ReferenceName, f.Value), this.Name);
-                    }
-                    Trace.WriteLine(ex.ToString(), this.Name);
-                }
             }
             return newwit;
         }
