@@ -53,7 +53,7 @@ namespace VstsSyncMigrator.Engine.Configuration
         {
             EngineConfiguration ec = new EngineConfiguration();
             ec.TelemetryEnableTrace = false;
-            ec.Version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(3);
+            ec.Version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(2);
             ec.Source = new TeamProjectConfig() { Name = "DemoProjs", Collection = new Uri("https://dev.azure.com/psd45"), ReflectedWorkItemIDFieldName = "TfsMigrationTool.ReflectedWorkItemId" };
             ec.Target = new TeamProjectConfig() { Name = "DemoProjt", Collection = new Uri("https://dev.azure.com/psd46"), ReflectedWorkItemIDFieldName = "ProcessName.ReflectedWorkItemId" };
             ec.FieldMaps = new List<IFieldMapConfig>();
