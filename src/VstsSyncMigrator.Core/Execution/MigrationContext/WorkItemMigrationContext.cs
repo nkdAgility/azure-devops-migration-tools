@@ -35,6 +35,7 @@ namespace VstsSyncMigrator.Engine
         int _imported = 0;
         int _skipped = 0;
         long _elapsedms = 0;
+        int _totalWorkItem = 0;
 
         public WorkItemMigrationContext(MigrationEngine me, WorkItemMigrationConfig config)
             : base(me, config)
@@ -107,9 +108,10 @@ namespace VstsSyncMigrator.Engine
                 sourceWorkItems = FilterWorkItemsThatAlreadyExistInTarget(sourceWorkItems, targetStore);
             }
             //////////////////////////////////////////////////
-            _current = 0;
+            _current = 1;
             _count = sourceWorkItems.Count;
             _elapsedms = 0;
+            _totalWorkItem = sourceWorkItems.Count;
 
             //Validation: make sure that the ReflectedWorkItemId field name specified in the config exists in the target process, preferably on each work item type.
             ConfigValidation();
@@ -136,7 +138,7 @@ namespace VstsSyncMigrator.Engine
         private  void TraceWriteLine(WorkItem sourceWorkItem, string message = "", bool header = false)
         {
             if (header) Trace.WriteLine("===============================================================================================");
-            Trace.WriteLine($"Migrating {_current.ToString().PadLeft(5)}/{_count.ToString().PadRight(5)} - sourceid[{sourceWorkItem.Id.ToString().PadRight(6)}][{sourceWorkItem.Type.Name.PadRight(10)}] | {message}", Name);
+            Trace.WriteLine($"Migrating {_current.ToString().PadLeft(5)}/{_totalWorkItem.ToString().PadRight(5)} - sourceid[{sourceWorkItem.Id.ToString().PadRight(6)}][{sourceWorkItem.Type.Name.PadRight(10)}] | {message}", Name);
             if (header) Trace.WriteLine("===============================================================================================");
         }
 
@@ -241,11 +243,8 @@ namespace VstsSyncMigrator.Engine
             }
             witstopwatch.Stop();
             _elapsedms += witstopwatch.ElapsedMilliseconds;
-            _current++;
-            _count--;
-
             processWorkItemMetrics.Add("ElapsedTimeMS", _elapsedms);
-            
+
 
             var average = new TimeSpan(0, 0, 0, 0, (int)(_elapsedms / _current));
             var remaining = new TimeSpan(0, 0, 0, 0, (int)(average.TotalMilliseconds * _count));
@@ -256,7 +255,10 @@ namespace VstsSyncMigrator.Engine
                 );
             Trace.Flush();
             Telemetry.Current.TrackEvent("WorkItemMigrated", processWorkItemParamiters, processWorkItemMetrics);
-            Telemetry.Current.TrackRequest("ProcessWorkItem", starttime, witstopwatch.Elapsed,"200", true);
+            Telemetry.Current.TrackRequest("ProcessWorkItem", starttime, witstopwatch.Elapsed, "200", true);
+
+            _current++;
+            _count--;           
         }
 
         private void ProcessHTMLFieldAttachements(WorkItem targetWorkItem)
