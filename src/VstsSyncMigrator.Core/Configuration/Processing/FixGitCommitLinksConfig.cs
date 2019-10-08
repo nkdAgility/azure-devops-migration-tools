@@ -7,7 +7,10 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
     {
         public string TargetRepository { get; set; }
         public bool Enabled { get; set; }
-        
+        public string QueryBit { get; set; }
+        /// <inheritdoc />
+        public string OrderBit { get; set; }
+
         public Type Processor
         {
             get { return typeof(FixGitCommitLinks); }
