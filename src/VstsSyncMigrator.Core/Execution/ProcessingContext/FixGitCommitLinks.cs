@@ -9,16 +9,19 @@ using Microsoft.TeamFoundation;
 
 using VstsSyncMigrator.Engine.Configuration.Processing;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
+using VstsSyncMigrator.Core.Execution.OMatics;
 
 namespace VstsSyncMigrator.Engine
 {
     public class FixGitCommitLinks : ProcessingContextBase
     {
         private FixGitCommitLinksConfig _config;
+        private RepoOMatic _RepoOMatic;
 
         public FixGitCommitLinks(MigrationEngine me, FixGitCommitLinksConfig config ) : base(me, config)
         {
             _config = config;
+            _RepoOMatic = new RepoOMatic(me);
         }
 
         public override string Name
@@ -33,12 +36,6 @@ namespace VstsSyncMigrator.Engine
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 			//////////////////////////////////////////////////
-			var sourceGitRepoService = me.Source.Collection.GetService<GitRepositoryService>();
-            var sourceGitRepos = sourceGitRepoService.QueryRepositories(me.Source.Config.Name);
-            //////////////////////////////////////////////////
-            var targetGitRepoService = me.Target.Collection.GetService<GitRepositoryService>();
-            var targetGitRepos = targetGitRepoService.QueryRepositories(me.Target.Config.Name);
-
             WorkItemStoreContext targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
             TfsQueryContext tfsqc = new TfsQueryContext(targetStore);
             tfsqc.AddParameter("TeamProject", me.Target.Config.Name);
@@ -52,161 +49,16 @@ namespace VstsSyncMigrator.Engine
             int noteFound = 0;
             foreach (WorkItem workitem in workitems)
             {
+               
                 Stopwatch witstopwatch = Stopwatch.StartNew();
 				workitem.Open();
-                List<ExternalLink> newEL = new List<ExternalLink>();
-                List<ExternalLink> removeEL = new List<ExternalLink>();
-                Trace.WriteLine(string.Format("WI: {0}?", workitem.Id));
-                List<string> gitWits = new List<string>
-                {
-                    "Branch",
-                    "Fixed in Commit",
-                    "Pull Request"
-                };
 
-                foreach (Link l in workitem.Links)
-                {
-                    if (l is ExternalLink && gitWits.Contains(l.ArtifactLinkType.Name))
-                    {
-                        ExternalLink el = (ExternalLink) l;
-                        //vstfs:///Git/Commit/25f94570-e3e7-4b79-ad19-4b434787fd5a%2f50477259-3058-4dff-ba4c-e8c179ec5327%2f41dd2754058348d72a6417c0615c2543b9b55535
-                        string guidbits = el.LinkedArtifactUri.Substring(el.LinkedArtifactUri.LastIndexOf('/') + 1);
-                        string[] bits = Regex.Split(guidbits, "%2f", RegexOptions.IgnoreCase);
-                        string oldCommitId = null;
-                        string oldGitRepoId = bits[1];
-                        if (bits.Count() >= 3)
-                        {
-                            oldCommitId = $"{bits[2]}";
-                            for (int i = 3; i < bits.Count(); i++)
-                            {
-                                oldCommitId += $"%2f{bits[i]}";
-                            }
-                        } else
-                        {
-                            oldCommitId = bits[2];
-                        }
-                        var oldGitRepo =
-                            (from g in sourceGitRepos where g.Id.ToString() == oldGitRepoId select g)
-                            .SingleOrDefault();
-
-                        if(oldGitRepo != null)
-                        {
-                            // Find the target git repo
-                            GitRepository newGitRepo = null;
-                            var repoNameToLookFor = !string.IsNullOrEmpty(_config.TargetRepository)
-                                ? _config.TargetRepository
-                                : oldGitRepo.Name;
-
-                            // Source and Target project names match
-                            if (oldGitRepo.ProjectReference.Name == me.Target.Config.Name)
-                            {
-                                newGitRepo = (from g in targetGitRepos
-                                                  where
-                                                  g.Name == repoNameToLookFor &&
-                                                  g.ProjectReference.Name == oldGitRepo.ProjectReference.Name
-                                                  select g).SingleOrDefault();
-                            }
-                            // Source and Target project names do not match
-                            else
-                            {
-                                newGitRepo = (from g in targetGitRepos
-                                              where
-                                              g.Name == repoNameToLookFor &&
-                                              g.ProjectReference.Name != oldGitRepo.ProjectReference.Name
-                                              select g).SingleOrDefault();
-                            }
-
-                            // Fix commit links if target repo has been found
-                            if (newGitRepo != null)
-                            {
-                                Trace.WriteLine($"Fixing {oldGitRepo.RemoteUrl} to {newGitRepo.RemoteUrl}?");
-
-                                // Create External Link object
-                                ExternalLink newLink = null;
-                                switch(l.ArtifactLinkType.Name)
-                                {
-                                    case "Branch":
-                                        newLink = new ExternalLink(targetStore.Store.RegisteredLinkTypes[ArtifactLinkIds.Branch],
-                                            $"vstfs:///git/ref/{newGitRepo.ProjectReference.Id}%2f{newGitRepo.Id}%2f{oldCommitId}");
-                                        break;
-
-                                    case "Fixed in Commit":
-                                        newLink = new ExternalLink(targetStore.Store.RegisteredLinkTypes[ArtifactLinkIds.Commit],
-                                            $"vstfs:///git/commit/{newGitRepo.ProjectReference.Id}%2f{newGitRepo.Id}%2f{oldCommitId}");
-                                        break;
-                                    case "Pull Request":
-                                        newLink = new ExternalLink(targetStore.Store.RegisteredLinkTypes[ArtifactLinkIds.PullRequest],
-                                            $"vstfs:///Git/PullRequestId/{newGitRepo.ProjectReference.Id}%2f{newGitRepo.Id}%2f{oldCommitId}");
-                                        break;
-
-                                    default:
-                                        Trace.WriteLine(String.Format("Skipping unsupported link type {0}", l.ArtifactLinkType.Name));
-                                        break;
-                                }
-
-                               if(newLink != null)
-                               {
-                                    var elinks = from Link lq in workitem.Links
-                                                 where gitWits.Contains(lq.ArtifactLinkType.Name)
-                                                 select (ExternalLink)lq;
-                                    var found =
-                                    (from Link lq in elinks
-                                     where (((ExternalLink)lq).LinkedArtifactUri.ToLower() == newLink.LinkedArtifactUri.ToLower())
-                                     select lq).SingleOrDefault();
-                                    if (found == null)
-                                    {
-                                        newEL.Add(newLink);
-                                    }
-                                    removeEL.Add(el);
-                               }
-                            }
-                            else
-                            {
-                                Trace.WriteLine($"FAIL: cannot map {oldGitRepo.RemoteUrl} to ???");
-                            }
-                        }
-                        else
-                        {
-                            Trace.WriteLine($"FAIL could not find source git repo");
-                            noteFound++;
-                        }
-                    }
-                }
-                // add and remove
-                foreach (ExternalLink eln in newEL)
-                {
-                    try
-                    {
-                        Trace.WriteLine("Adding " + eln.LinkedArtifactUri, Name);
-                        workitem.Links.Add(eln);
-
-                    }
-                    catch (Exception)
-                    {
-
-                        // eat exception as sometimes TFS thinks this is an attachment
-                    }
-                }
-                foreach (ExternalLink elr in removeEL)
-                {
-                    if (workitem.Links.Contains(elr))
-                    {
-                        try
-                        {
-                            Trace.WriteLine("Removing " + elr.LinkedArtifactUri, Name);
-                            workitem.Links.Remove(elr);
-                        }
-                        catch (Exception)
-                        {
-
-                            // eat exception as sometimes TFS thinks this is an attachment
-                        }
-                    }
-                }
+                _RepoOMatic.FixExternalGitLinks(workitem, targetStore);
 
                 if (workitem.IsDirty)
                 {
                     Trace.WriteLine($"Saving {workitem.Id}");
+
                     workitem.Save();
                 }
 

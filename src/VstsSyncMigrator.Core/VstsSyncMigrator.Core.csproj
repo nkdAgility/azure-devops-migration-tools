@@ -329,6 +329,7 @@
     <Compile Include="Execution\MigrationContext\WorkItemPostProcessingContext.cs" />
     <Compile Include="Execution\OMatics\AttachmentOMatic.cs" />
     <Compile Include="Execution\OMatics\EmbededImagesRepairOMatic.cs" />
+    <Compile Include="Execution\OMatics\RepoOMatic.cs" />
     <Compile Include="Execution\OMatics\WorkItemLinkOMatic.cs" />
     <Compile Include="Execution\ProcessingContext\ExportTeamList.cs" />
     <Compile Include="Execution\ProcessingContext\FixGitCommitLinks.cs" />
