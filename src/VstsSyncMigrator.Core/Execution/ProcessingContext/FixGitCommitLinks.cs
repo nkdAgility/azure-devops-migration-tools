@@ -37,7 +37,6 @@ namespace VstsSyncMigrator.Engine
             Stopwatch stopwatch = Stopwatch.StartNew();
 			//////////////////////////////////////////////////
             WorkItemStoreContext targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
-            TfsQueryContext tfsqc = new TfsQueryContext(targetStore);
             var targetQuery = new TfsQueryContext(targetStore);
             targetQuery.AddParameter("TeamProject", me.Target.Config.Name);
             targetQuery.Query =
@@ -46,7 +45,7 @@ namespace VstsSyncMigrator.Engine
                     _config.QueryBit,
                     _config.OrderBit
                     );
-            WorkItemCollection workitems = tfsqc.Execute();
+            WorkItemCollection workitems = targetQuery.Execute();
             Trace.WriteLine(string.Format("Update {0} work items?", workitems.Count));
             //////////////////////////////////////////////////
             int current = workitems.Count;
