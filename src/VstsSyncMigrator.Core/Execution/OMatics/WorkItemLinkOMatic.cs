@@ -13,7 +13,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
     public class WorkItemLinkOMatic
     {
 
-        public void MigrateLinks(WorkItem sourceWorkItemLinkStart, WorkItemStoreContext sourceWorkItemStore, WorkItem targetWorkItemLinkStart, WorkItemStoreContext targetWorkItemStore)
+        public void MigrateLinks(WorkItem sourceWorkItemLinkStart, WorkItemStoreContext sourceWorkItemStore, WorkItem targetWorkItemLinkStart, WorkItemStoreContext targetWorkItemStore, bool save = true)
         {
             if (targetWorkItemLinkStart.Links.Count == sourceWorkItemLinkStart.Links.Count)
             {
@@ -31,17 +31,17 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                             sourceWorkItemLinkStart.Id, item.GetType().Name), "LinkMigrationContext");
                         if (IsHyperlink(item))
                         {
-                            CreateHyperlink((Hyperlink)item, targetWorkItemLinkStart);
+                            CreateHyperlink((Hyperlink)item, targetWorkItemLinkStart, save);
                         }
                         else if (IsRelatedLink(item))
                         {
                             RelatedLink rl = (RelatedLink)item;
-                            CreateRelatedLink(sourceWorkItemLinkStart, rl, targetWorkItemLinkStart, sourceWorkItemStore, targetWorkItemStore);
+                            CreateRelatedLink(sourceWorkItemLinkStart, rl, targetWorkItemLinkStart, sourceWorkItemStore, targetWorkItemStore, save);
                         }
                         else if (IsExternalLink(item))
                         {
                             ExternalLink rl = (ExternalLink)item;
-                            CreateExternalLink((ExternalLink)item, targetWorkItemLinkStart);
+                            CreateExternalLink((ExternalLink)item, targetWorkItemLinkStart, save);
                         }
                         else
                         {
@@ -72,12 +72,12 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
             }
             if (sourceWorkItemLinkStart.Type.Name == "Test Case")
             {
-                MigrateSharedSteps(sourceWorkItemLinkStart, targetWorkItemLinkStart, sourceWorkItemStore, targetWorkItemStore);
+                MigrateSharedSteps(sourceWorkItemLinkStart, targetWorkItemLinkStart, sourceWorkItemStore, targetWorkItemStore, save);
             }
         }
 
         private void MigrateSharedSteps(WorkItem wiSourceL, WorkItem wiTargetL, WorkItemStoreContext sourceStore,
-            WorkItemStoreContext targetStore)
+            WorkItemStoreContext targetStore, bool save)
         {
             const string microsoftVstsTcmSteps = "Microsoft.VSTS.TCM.Steps";
             var oldSteps = wiTargetL.Fields[microsoftVstsTcmSteps].Value.ToString();
@@ -101,14 +101,14 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                 }
             }
 
-            if (wiTargetL.IsDirty)
+            if (wiTargetL.IsDirty && save)
             {
                 wiTargetL.Fields["System.ChangedBy"].Value = "Migration";
                 wiTargetL.Save();
             }
         }
 
-        private void CreateExternalLink(ExternalLink sourceLink, WorkItem target)
+        private void CreateExternalLink(ExternalLink sourceLink, WorkItem target, bool save )
         {
             var exist = (from Link l in target.Links
                          where l is ExternalLink && ((ExternalLink)l).LinkedArtifactUri == ((ExternalLink)sourceLink).LinkedArtifactUri
@@ -121,8 +121,11 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                 ExternalLink el = new ExternalLink(sourceLink.ArtifactLinkType, sourceLink.LinkedArtifactUri);
                 el.Comment = sourceLink.Comment;
                 target.Links.Add(el);
-                target.Fields["System.ChangedBy"].Value = "Migration";
-                target.Save();
+                if (save)
+                {
+                    target.Fields["System.ChangedBy"].Value = "Migration";
+                    target.Save();
+                }
             }
             else
             {
@@ -136,7 +139,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
             return item is ExternalLink;
         }
 
-        private void CreateRelatedLink(WorkItem wiSourceL, RelatedLink item, WorkItem wiTargetL, WorkItemStoreContext sourceStore, WorkItemStoreContext targetStore)
+        private void CreateRelatedLink(WorkItem wiSourceL, RelatedLink item, WorkItem wiTargetL, WorkItemStoreContext sourceStore, WorkItemStoreContext targetStore, bool save )
         {
             RelatedLink rl = (RelatedLink)item;
             WorkItem wiSourceR = null;
@@ -194,8 +197,11 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                         RelatedLink newRl = new RelatedLink(linkTypeEnd, wiTargetR.Id);
 
                         wiTargetL.Links.Add(newRl);
-                        wiTargetL.Fields["System.ChangedBy"].Value = "Migration";
-                        wiTargetL.Save();
+                        if (save)
+                        {
+                            wiTargetL.Fields["System.ChangedBy"].Value = "Migration";
+                            wiTargetL.Save();
+                        }
                         Trace.WriteLine(
                             string.Format(
                                 "  [CREATE-SUCCESS] Adding Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} ",
@@ -261,7 +267,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
             return item is RelatedLink;
         }
 
-        private void CreateHyperlink(Hyperlink sourceLink, WorkItem target)
+        private void CreateHyperlink(Hyperlink sourceLink, WorkItem target, bool save )
         {
             var exist = (from Link l in target.Links where l is Hyperlink && ((Hyperlink)l).Location == ((Hyperlink)sourceLink).Location select (Hyperlink)l).SingleOrDefault();
             if (exist == null)
@@ -269,8 +275,11 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                 Hyperlink hl = new Hyperlink(sourceLink.Location);
                 hl.Comment = sourceLink.Comment;
                 target.Links.Add(hl);
-                target.Fields["System.ChangedBy"].Value = "Migration";
-                target.Save();
+                if (save)
+                {
+                    target.Fields["System.ChangedBy"].Value = "Migration";
+                    target.Save();
+                }                
             }
         }
 

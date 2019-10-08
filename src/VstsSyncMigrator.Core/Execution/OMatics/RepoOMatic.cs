@@ -38,11 +38,11 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                 };
         }
 
-        public void FixExternalGitLinks(WorkItem targetWorkItem, WorkItemStoreContext targetStore)
+        public int FixExternalGitLinks(WorkItem targetWorkItem, WorkItemStoreContext targetStore, bool save = true)
         {
             List<ExternalLink> newEL = new List<ExternalLink>();
             List<ExternalLink> removeEL = new List<ExternalLink>();
-
+            int count = 0;
             foreach (Link l in targetWorkItem.Links)
             {
                 if (l is ExternalLink && gitWits.Contains(l.ArtifactLinkType.Name))
@@ -140,6 +140,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                     {
                         Trace.WriteLine("Removing " + elr.LinkedArtifactUri);
                         targetWorkItem.Links.Remove(elr);
+                        count++;
                     }
                     catch (Exception)
                     {
@@ -147,15 +148,16 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                         // eat exception as sometimes TFS thinks this is an attachment
                     }
                 }
+
             }
 
-            if (targetWorkItem.IsDirty)
+            if (targetWorkItem.IsDirty && save)
             {
                 Trace.WriteLine($"Saving {targetWorkItem.Id}");
                 targetWorkItem.Fields["System.ChangedBy"].Value = "Migration";
                 targetWorkItem.Save();
             }
-
+            return count;
 
         }
 

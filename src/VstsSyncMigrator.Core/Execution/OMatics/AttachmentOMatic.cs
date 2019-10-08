@@ -15,30 +15,31 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
     {
         private WorkItemServer _server;
         private string _exportBasePath;
+        private string _exportWiPath;
 
-        public AttachmentOMatic(WorkItemServer workItemServer,string exportBasePath)
+        public AttachmentOMatic(WorkItemServer workItemServer, string exportBasePath)
         {
             _server = workItemServer;
             _exportBasePath = exportBasePath;
         }
 
-        public void ProcessAttachemnts(WorkItem sourceWorkItem, WorkItem targetWorkItem)
+        public void ProcessAttachemnts(WorkItem sourceWorkItem, WorkItem targetWorkItem, bool save = true)
         {
-            string exportpath = Path.Combine(_exportBasePath, sourceWorkItem.Id.ToString());
-            if (System.IO.Directory.Exists(exportpath))
+            _exportWiPath = Path.Combine(_exportBasePath, sourceWorkItem.Id.ToString());
+            if (System.IO.Directory.Exists(_exportWiPath))
             {
-                System.IO.Directory.Delete(exportpath, true);
+                System.IO.Directory.Delete(_exportWiPath, true);
             }
-            System.IO.Directory.CreateDirectory(exportpath);
+            System.IO.Directory.CreateDirectory(_exportWiPath);
             foreach (Attachment wia in sourceWorkItem.Attachments)
             {
                 try
                 {
                     string filepath = null;
-                    filepath = ExportAttachment(sourceWorkItem, wia, exportpath);
+                    filepath = ExportAttachment(sourceWorkItem, wia, _exportWiPath);
                     if (filepath != null)
                     {
-                        ImportAttachemnt(targetWorkItem, filepath);
+                        ImportAttachemnt(targetWorkItem, filepath, save);
                     }
                     Trace.WriteLine("...done");
                 }
@@ -46,17 +47,31 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                 {
                     Trace.WriteLine(string.Format(" ERROR: Unable to process atachment from source wi {0} called {1}", sourceWorkItem.Id, wia.Name));
                 }
-                
+
             }
-            try
+            if (save)
             {
-                System.IO.Directory.Delete(exportpath, true);
-            }
-            catch (Exception)
+                targetWorkItem.Fields["System.ChangedBy"].Value = "Migration";
+                targetWorkItem.Save();
+                CleanUpAfterSave(targetWorkItem);
+            }           
+
+        }
+
+        public void CleanUpAfterSave(WorkItem targetWorkItem)
+        {
+            if (_exportWiPath != null && System.IO.Directory.Exists(_exportWiPath))
             {
-                Trace.WriteLine(string.Format(" ERROR: Unable to delete folder {0}", targetWorkItem.Id));
-            }
-            
+                try
+                {
+                    System.IO.Directory.Delete(_exportWiPath, true);
+                    _exportWiPath = null;
+                }
+                catch (Exception)
+                {
+                    Trace.WriteLine(string.Format(" ERROR: Unable to delete folder {0}", targetWorkItem.Id));
+                }
+            }            
         }
 
         private string ExportAttachment(WorkItem wi, Attachment wia, string exportpath)
@@ -90,31 +105,21 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
             return fpath;
         }
 
-        private void  ImportAttachemnt( WorkItem targetWorkItem,string filepath)
+        private void ImportAttachemnt(WorkItem targetWorkItem, string filepath, bool save = true)
         {
             var filename = System.IO.Path.GetFileName(filepath);
-                var attachments = targetWorkItem.Attachments.Cast<Attachment>();
-                var attachment = attachments.Where(a => a.Name == filename).FirstOrDefault();
-                if (attachment == null)
-                {
-                    Attachment a = new Attachment(filepath);
-                    targetWorkItem.Attachments.Add(a);
-                    targetWorkItem.Fields["System.ChangedBy"].Value = "Migration";
-                    targetWorkItem.Save();
-                }
-                else
-                {
-                    Trace.WriteLine(string.Format(" [SKIP] WorkItem {0} already contains attachment {1}", targetWorkItem.Id, filepath));
-                }
-            try
+            var attachments = targetWorkItem.Attachments.Cast<Attachment>();
+            var attachment = attachments.Where(a => a.Name == filename).FirstOrDefault();
+            if (attachment == null)
             {
-                File.Delete(filepath);
+                Attachment a = new Attachment(filepath);
+                targetWorkItem.Attachments.Add(a);
             }
-            catch (Exception)
+            else
             {
-                Trace.WriteLine(string.Format(" ERROR: Unable to delete file {0} from {1}", filepath, targetWorkItem.Id));
+                Trace.WriteLine(string.Format(" [SKIP] WorkItem {0} already contains attachment {1}", targetWorkItem.Id, filepath));
             }
-            
+
         }
 
         public string GetSafeFilename(string filename)
