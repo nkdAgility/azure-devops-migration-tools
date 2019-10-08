@@ -151,7 +151,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
             if (targetWorkItem.IsDirty)
             {
                 Trace.WriteLine($"Saving {targetWorkItem.Id}");
-
+                targetWorkItem.Fields["System.ChangedBy"].Value = "Migration";
                 targetWorkItem.Save();
             }
 
