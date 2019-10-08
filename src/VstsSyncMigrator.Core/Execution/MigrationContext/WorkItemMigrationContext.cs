@@ -117,6 +117,15 @@ namespace VstsSyncMigrator.Engine
             foreach (WorkItem sourceWorkItem in sourceWorkItems)
             {
                 ProcessWorkItem(sourceStore, targetStore, destProject, sourceWorkItem, _config.WorkItemCreateRetryLimit);
+                if (_config.PauseAfterEachWorkItem)
+                {
+                    Console.WriteLine("Do you want to continue? (y/n)");
+                    if (Console.ReadKey().Key != ConsoleKey.Y)
+                    {
+                        Trace.WriteLine("USER ABORTED", "[Warning]");
+                        break;
+                    }
+                }
             }
             //////////////////////////////////////////////////
             stopwatch.Stop();
@@ -124,7 +133,7 @@ namespace VstsSyncMigrator.Engine
             Console.WriteLine(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds", stopwatch.Elapsed);
         }
 
-        private  void TraceMessage(WorkItem sourceWorkItem, string message = "", bool header = false)
+        private  void TraceWriteLine(WorkItem sourceWorkItem, string message = "", bool header = false)
         {
             if (header) Trace.WriteLine("===============================================================================================");
             Trace.WriteLine($"Migrating {_current.ToString().PadLeft(5)}/{_count.ToString().PadRight(5)} - sourceid[{sourceWorkItem.Id.ToString().PadRight(6)}][{sourceWorkItem.Type.Name.PadRight(10)}] | {message}", Name);
@@ -169,9 +178,9 @@ namespace VstsSyncMigrator.Engine
             try
             {
                 var targetWorkItem = targetStore.FindReflectedWorkItem(sourceWorkItem, false);
-                TraceMessage(sourceWorkItem);
+                TraceWriteLine(sourceWorkItem);
                 ///////////////////////////////////////////////
-                TraceMessage(sourceWorkItem, $"Work Item has {sourceWorkItem.Rev} revisions and revision migration is set to {_config.ReplayRevisions}");
+                TraceWriteLine(sourceWorkItem, $"Work Item has {sourceWorkItem.Rev} revisions and revision migration is set to {_config.ReplayRevisions}");
                 if (targetWorkItem == null)
                 {
 
@@ -181,7 +190,7 @@ namespace VstsSyncMigrator.Engine
                 else
                 {
 
-                    TraceMessage(sourceWorkItem, "Skipping as Work Item Already Exists");
+                    TraceWriteLine(sourceWorkItem, "Skipping as Work Item Already Exists");
                     processWorkItemMetrics.Add("Revisions", 0);
 
                 }
@@ -209,24 +218,24 @@ namespace VstsSyncMigrator.Engine
                
                 Telemetry.Current.TrackException(ex);
 
-                TraceMessage(sourceWorkItem, ex.ToString());
+                TraceWriteLine(sourceWorkItem, ex.ToString());
                 if (retrys < retryLimit)
                 {
-                    TraceMessage(sourceWorkItem, $"WebException: Will retry in {retrys}s ");
+                    TraceWriteLine(sourceWorkItem, $"WebException: Will retry in {retrys}s ");
                     System.Threading.Thread.Sleep(new TimeSpan(0, 0, retrys));
                     retrys++;
-                    TraceMessage(sourceWorkItem, $"RETRY {retrys}/{retrys} ");
+                    TraceWriteLine(sourceWorkItem, $"RETRY {retrys}/{retrys} ");
                     ProcessWorkItem(sourceStore, targetStore, destProject, sourceWorkItem, retryLimit, retrys);
                 }
                 else
                 {
-                    TraceMessage(sourceWorkItem, "ERROR: Failed to create work item. Retry Limit reached ");
+                    TraceWriteLine(sourceWorkItem, "ERROR: Failed to create work item. Retry Limit reached ");
                 }
             }
             catch (Exception ex)
             {
                 Telemetry.Current.TrackException(ex);
-                TraceMessage(sourceWorkItem, ex.ToString());
+                TraceWriteLine(sourceWorkItem, ex.ToString());
                 Telemetry.Current.TrackRequest("ProcessWorkItem", starttime, witstopwatch.Elapsed, "502", false);
                 throw ex;
             }
@@ -240,7 +249,7 @@ namespace VstsSyncMigrator.Engine
 
             var average = new TimeSpan(0, 0, 0, 0, (int)(_elapsedms / _current));
             var remaining = new TimeSpan(0, 0, 0, 0, (int)(average.TotalMilliseconds * _count));
-            TraceMessage(sourceWorkItem,
+            TraceWriteLine(sourceWorkItem,
                 string.Format("Average time of {0} per work item and {1} estimated to completion",
                     string.Format(@"{0:s\:fff} seconds", average),
                     string.Format(@"{0:%h} hours {0:%m} minutes {0:s\:fff} seconds", remaining))
@@ -263,7 +272,7 @@ namespace VstsSyncMigrator.Engine
         {
             if (targetWorkItem != null && _config.LinkMigration && sourceWorkItem.Links.Count > 0)
             {
-                TraceMessage(sourceWorkItem, $"Links {sourceWorkItem.Links.Count} | LinkMigrator:{_config.LinkMigration}");
+                TraceWriteLine(sourceWorkItem, $"Links {sourceWorkItem.Links.Count} | LinkMigrator:{_config.LinkMigration}");
                 workItemLinkOMatic.MigrateLinks(sourceWorkItem, sourceStore, targetWorkItem, targetStore, save);
                 AddMetric("RelatedLinkCount", processWorkItemMetrics, targetWorkItem.Links.Count);
                int fixedLinkCount = repoOMatic.FixExternalGitLinks(targetWorkItem, targetStore, save);
@@ -275,7 +284,7 @@ namespace VstsSyncMigrator.Engine
         {
             if (targetWorkItem != null && _config.AttachmentMigration && sourceWorkItem.Attachments.Count > 0)
             {
-                TraceMessage(sourceWorkItem, $"Attachemnts {sourceWorkItem.Attachments.Count} | LinkMigrator:{_config.AttachmentMigration}");
+                TraceWriteLine(sourceWorkItem, $"Attachemnts {sourceWorkItem.Attachments.Count} | LinkMigrator:{_config.AttachmentMigration}");
                 attachmentOMatic.ProcessAttachemnts(sourceWorkItem, targetWorkItem, save);
                 AddMetric("Attachments", processWorkItemMetrics, targetWorkItem.AttachedFileCount);
             }
@@ -289,7 +298,7 @@ namespace VstsSyncMigrator.Engine
             //Make sure that the ReflectedWorkItemId field name specified in the config exists in the target process, preferably on each work item type
             var fields = _witClient.GetFieldsAsync(me.Target.Config.Name).Result;
             bool rwiidFieldExists = fields.Any(x => x.ReferenceName == me.Target.Config.ReflectedWorkItemIDFieldName || x.Name == me.Target.Config.ReflectedWorkItemIDFieldName);
-            Trace.WriteLine($"Found {fields.Count.ToString("n0")} work item fields.");
+            Debug.WriteLine($"Found {fields.Count.ToString("n0")} work item fields.");
             if (rwiidFieldExists)
                 Trace.WriteLine($"Found '{me.Target.Config.ReflectedWorkItemIDFieldName}' in this project, proceeding.");
             else
@@ -325,7 +334,7 @@ namespace VstsSyncMigrator.Engine
                 {
                     sortedRevisions.RemoveRange(0, sortedRevisions.Count - 1);
                 }
-                TraceMessage(sourceWorkItem, $"Replaying  {sourceWorkItem.Revisions.Count} | Work item:{sourceWorkItem.Id}", true);
+                TraceWriteLine(sourceWorkItem, $"Replaying  {sourceWorkItem.Revisions.Count} | Work item:{sourceWorkItem.Id}", true);
 
                 foreach (var revision in sortedRevisions)
                 {
@@ -372,27 +381,26 @@ namespace VstsSyncMigrator.Engine
 
                         targetWorkItem.Fields["System.History"].Value =
                             currentRevisionWorkItem.Revisions[revision.Index].Fields["System.History"].Value;
-                        Debug.WriteLine("Discussion:" + currentRevisionWorkItem.Revisions[revision.Index].Fields["System.History"].Value);
+                        //Debug.WriteLine("Discussion:" + currentRevisionWorkItem.Revisions[revision.Index].Fields["System.History"].Value);
 
 
                         var fails = targetWorkItem.Validate();
 
                         foreach (Field f in fails)
                         {
-                            Trace.WriteLine(
-                                $"{current} - Invalid: {currentRevisionWorkItem.Id}-{currentRevisionWorkItem.Type.Name}-{f.ReferenceName}-{sourceWorkItem.Title} Value: {f.Value}", Name);
+                            TraceWriteLine(sourceWorkItem,
+                                $"{current} - Invalid: {currentRevisionWorkItem.Id}-{currentRevisionWorkItem.Type.Name}-{f.ReferenceName}-{sourceWorkItem.Title} Value: {f.Value}");
                         }
 
 
 
                         targetWorkItem.Save();
-                        Trace.WriteLine(
-                            $" ...Saved as {targetWorkItem.Id}. Replayed revision {revision.Number} of {sourceWorkItem.Revisions.Count}",
-                            Name);
+                        TraceWriteLine(sourceWorkItem, 
+                            $" Saved TargetWorkItem {targetWorkItem.Id}. Replayed revision {revision.Number} of {sourceWorkItem.Revisions.Count}");
                     }
                     else
                     {
-                        Trace.WriteLine(string.Format("...the WITD named {0} is not in the list provided in the configuration.json under WorkItemTypeDefinitions. Add it to the list to enable migration of this work item type.", currentRevisionWorkItem.Type.Name), Name);
+                        TraceWriteLine(sourceWorkItem, string.Format("...the WITD named {0} is not in the list provided in the configuration.json under WorkItemTypeDefinitions. Add it to the list to enable migration of this work item type.", currentRevisionWorkItem.Type.Name));
                         break;
                     }
                 }
@@ -415,28 +423,28 @@ namespace VstsSyncMigrator.Engine
                     targetWorkItem.Save();
 
                     attachmentOMatic.CleanUpAfterSave(targetWorkItem);
-                    Trace.WriteLine($"...Saved as {targetWorkItem.Id}", Name);
+                    TraceWriteLine(sourceWorkItem,$"...Saved as {targetWorkItem.Id}");
 
                     if (_config.UpdateSourceReflectedId && sourceWorkItem.Fields.Contains(me.Source.Config.ReflectedWorkItemIDFieldName))
                     {
                         sourceWorkItem.Fields[me.Source.Config.ReflectedWorkItemIDFieldName].Value =
                             targetStore.CreateReflectedWorkItemId(targetWorkItem);
                         sourceWorkItem.Save();
-                        Trace.WriteLine($"...and Source Updated {sourceWorkItem.Id}", Name);
+                        TraceWriteLine(sourceWorkItem,$"...and Source Updated {sourceWorkItem.Id}");
                     }
          
                 }
             }
             catch (Exception ex)
             {
-                Trace.WriteLine("...FAILED to Save", Name);
+                TraceWriteLine(sourceWorkItem,"...FAILED to Save");
 
                 if (targetWorkItem != null)
                 {
                     foreach (Field f in targetWorkItem.Fields)
-                        Trace.WriteLine($"{f.ReferenceName} ({f.Name}) | {f.Value}", Name);
+                        TraceWriteLine(sourceWorkItem, $"{f.ReferenceName} ({f.Name}) | {f.Value}");
                 }
-                Trace.WriteLine(ex.ToString(), Name);
+                TraceWriteLine(sourceWorkItem, ex.ToString());
             }
             return targetWorkItem;
         }

@@ -30,7 +30,7 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
         public int WorkItemCreateRetryLimit { get; set; }
 
         public bool FilterWorkItemsThatAlreadyExistInTarget { get; set; }
-
+ public bool PauseAfterEachWorkItem { get; set; }
 
         /// <inheritdoc />
         public bool IsProcessorCompatible(IReadOnlyList<ITfsProcessingConfig> otherProcessors)

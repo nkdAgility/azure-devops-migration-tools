@@ -51,13 +51,13 @@ namespace VstsSyncMigrator.Engine
         public WorkItemCollection Execute()
         {
             Telemetry.Current.TrackEvent("TfsQueryContext.Execute",parameters);
-            Trace.WriteLine(string.Format("TfsQueryContext: {0}: {1}", "TeamProjectCollection", storeContext.Store.TeamProjectCollection.Uri.ToString()), "TfsQueryContext");
+            Debug.WriteLine(string.Format("TfsQueryContext: {0}: {1}", "TeamProjectCollection", storeContext.Store.TeamProjectCollection.Uri.ToString()), "TfsQueryContext");
             WorkItemCollection wc;
             var startTime = DateTime.UtcNow;
             Stopwatch queryTimer = new Stopwatch();
             foreach (var item in parameters)
             {
-                Trace.WriteLine(string.Format("TfsQueryContext: {0}: {1}", item.Key, item.Value), "TfsQueryContext");
+                Debug.WriteLine(string.Format("TfsQueryContext: {0}: {1}", item.Key, item.Value), "TfsQueryContext");
             }           
 
             queryTimer.Start();
@@ -76,7 +76,7 @@ namespace VstsSyncMigrator.Engine
                             { "QueryTime", queryTimer.ElapsedMilliseconds },
                           { "QueryCount", wc.Count }
                       });
-                Trace.TraceInformation(string.Format(" Query Complete: found {0} work items in {1}ms ", wc.Count, queryTimer.ElapsedMilliseconds));
+                Debug.WriteLine(string.Format(" Query Complete: found {0} work items in {1}ms ", wc.Count, queryTimer.ElapsedMilliseconds));
          
         }
             catch (Exception ex)
