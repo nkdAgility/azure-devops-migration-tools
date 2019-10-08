@@ -41,7 +41,7 @@ namespace VstsSyncMigrator.ConsoleApp
             public OptionsMode Options { get; set; }
         }
 
-       public enum OptionsMode
+        public enum OptionsMode
         {
             Full = 0,
             WorkItemTracking = 1
@@ -81,19 +81,17 @@ namespace VstsSyncMigrator.ConsoleApp
         {
             mainTimer.Start();
             Telemetry.Current.TrackEvent("ApplicationStart");
-            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;            
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
             //////////////////////////////////////////////////
             string logsPath = CreateLogsPath();
             //////////////////////////////////////////////////
             Trace.Listeners.Add(new TextWriterTraceListener(Console.Out));
-			var logPath = Path.Combine(logsPath, "migration.log");
-			Trace.Listeners.Add(new TextWriterTraceListener(logPath, "myListener"));
-			Console.WriteLine("Writing log to " + logPath);
+            var logPath = Path.Combine(logsPath, "migration.log");
+            Trace.Listeners.Add(new TextWriterTraceListener(logPath, "myListener"));
+            Console.WriteLine("Writing log to " + logPath);
             //////////////////////////////////////////////////
-            
-            
-            Trace.WriteLine(System.Reflection.Assembly.GetExecutingAssembly().GetName().Name, "[Info]");
             Version thisVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+           
             Trace.WriteLine(string.Format("Running version detected as {0}", thisVersion), "[Info]");
             if (IsOnline())
             {
@@ -123,7 +121,7 @@ namespace VstsSyncMigrator.ConsoleApp
             Trace.WriteLine(string.Format("SessionID: {0}", Telemetry.Current.Context.Session.Id), "[Info]");
             Trace.WriteLine(string.Format("User: {0}", Telemetry.Current.Context.User.Id), "[Info]");
             Trace.WriteLine(string.Format("Start Time: {0}", startTime.ToUniversalTime().ToLocalTime()), "[Info]");
-            Trace.WriteLine("------------------------------START-----------------------------", "[Info]");
+            AsciiLogo(thisVersion);
             //////////////////////////////////////////////////
             int result = (int)Parser.Default.ParseArguments<InitOptions, RunOptions, ExportADGroupsOptions>(args).MapResult(
                 (InitOptions opts) => RunInitAndReturnExitCode(opts),
@@ -182,7 +180,7 @@ namespace VstsSyncMigrator.ConsoleApp
                 using (var sr = new StreamReader(opts.ConfigFile))
                     configurationjson = sr.ReadToEnd();
 
-                ec = JsonConvert.DeserializeObject<EngineConfiguration>(configurationjson, 
+                ec = JsonConvert.DeserializeObject<EngineConfiguration>(configurationjson,
                     new FieldMapConfigJsonConverter(),
                     new ProcessorConfigJsonConverter());
 
@@ -238,17 +236,18 @@ namespace VstsSyncMigrator.ConsoleApp
                 EngineConfiguration config;
                 switch (opts.Options)
                 {
-                    case OptionsMode.Full: 
+                    case OptionsMode.Full:
                         config = EngineConfiguration.GetDefault();
                         break;
-                    case OptionsMode.WorkItemTracking: config = EngineConfiguration.GetWorkItemMigration();
+                    case OptionsMode.WorkItemTracking:
+                        config = EngineConfiguration.GetWorkItemMigration();
                         break;
                     default:
                         config = EngineConfiguration.GetDefault();
                         break;
-                }             
+                }
 
-                string json = JsonConvert.SerializeObject(config,Formatting.Indented ,
+                string json = JsonConvert.SerializeObject(config, Formatting.Indented,
                     new FieldMapConfigJsonConverter(),
                     new ProcessorConfigJsonConverter());
                 StreamWriter sw = new StreamWriter(configFile);
@@ -262,7 +261,7 @@ namespace VstsSyncMigrator.ConsoleApp
         private static Version GetLatestVersion()
         {
             DateTime startTime = DateTime.Now;
-			Stopwatch mainTimer = Stopwatch.StartNew();
+            Stopwatch mainTimer = Stopwatch.StartNew();
             //////////////////////////////////
             string packageID = "vsts-sync-migrator";
             SemanticVersion version = SemanticVersion.Parse("0.0.0.0");
@@ -288,7 +287,7 @@ namespace VstsSyncMigrator.ConsoleApp
         private static bool IsOnline()
         {
             DateTime startTime = DateTime.Now;
-			Stopwatch mainTimer = Stopwatch.StartNew();
+            Stopwatch mainTimer = Stopwatch.StartNew();
             //////////////////////////////////
             bool isOnline = false;
             string responce = "none";
@@ -315,7 +314,7 @@ namespace VstsSyncMigrator.ConsoleApp
             }
             /////////////////
             mainTimer.Stop();
-            Telemetry.Current.TrackDependency(new DependencyTelemetry("Ping","GoogleDNS", "IsOnline", null, startTime, mainTimer.Elapsed, responce, true));
+            Telemetry.Current.TrackDependency(new DependencyTelemetry("Ping", "GoogleDNS", "IsOnline", null, startTime, mainTimer.Elapsed, responce, true));
             return isOnline;
         }
 
@@ -330,6 +329,51 @@ namespace VstsSyncMigrator.ConsoleApp
             }
 
             return exportPath;
+        }
+
+        private static void AsciiLogo(Version thisVersion)
+        {
+            Console.WriteLine("                                      &@&                                      ");
+            Console.WriteLine("                                   @@(((((@                                    ");
+            Console.WriteLine("                                  @(((((((((@                                  ");
+            Console.WriteLine("                                @(((((((((((((&                                ");
+            Console.WriteLine("                              ##((((((@ @((((((@@                              ");
+            Console.WriteLine("                             @((((((@     @((((((&                             ");
+            Console.WriteLine("                            @(((((#        @((((((@                            ");
+            Console.WriteLine("                           &(((((&           &(((((@                           ");
+            Console.WriteLine("                          @(((((&             &(((((@                          ");
+            Console.WriteLine("                          &(((((@#&@((.((&@@@(#(((((@                          ");
+            Console.WriteLine("                         #((((#..................#@((&                         ");
+            Console.WriteLine("                       &@(((((&......................(@                        ");
+            Console.WriteLine("                     @.(&((((&...&&        &@&..........&@                     ");
+            Console.WriteLine("                   @...@(((((@                   @#.......((                   ");
+            Console.WriteLine("                 &.....@(((((@                   @((@.......&                  ");
+            Console.WriteLine("                @......@(((((                    #((((&.......&                ");
+            Console.WriteLine("               #.....( &(((((         @@@        ((((((@@......@               ");
+            Console.WriteLine("              &.....@  @(((&@@#(((((((((((((((((#@(((((&  ......@              ");
+            Console.WriteLine("             @.....@  &@&((((((((((((((((((((((((@(((((@#  ......@             ");
+            Console.WriteLine("            @.....&@(((((((((((((((&&@@@@@(((((@((((#(((#@(....&               ");
+            Console.WriteLine("            @.....&((((((((&@@&                 @(((((@(((((((@...#            ");
+            Console.WriteLine("            &....((((((@@(((((@                &@(((((@&((((((((#&&            ");
+            Console.WriteLine("           @(....&((@    @(((((@               @(((((@    @(((((((##           ");
+            Console.WriteLine("         @(#(....&        &(((((@             @(((((&       &@(((((((&         ");
+            Console.WriteLine("       &@(((&.....        @((((((&           @(((((       &.(&((((((@          ");
+            Console.WriteLine("      @(((((@.....&        (((((@        &@(((((&         @....@((((((@        ");
+            Console.WriteLine("     @(((((#@.....(          &(((((@&     ##(((((&         @.....@@((((((@     ");
+            Console.WriteLine("   (&(((((@  &.....@&         @((((((@   @((((((@         @......   @(((((@    ");
+            Console.WriteLine("   &(((((@    @.....#&         @#((((((@((((((#          @......&    @(((((@   ");
+            Console.WriteLine("  @(((((@      &......&          @(((((((@#((@         &@......       @(((((@  ");
+            Console.WriteLine(" @(((((@        @......@&        @@@(((((((&@&        @......(         #(((((@ ");
+            Console.WriteLine(" #((((&           &.......@  &@&(((((@#((((((((@@& &@.......@          ((((&   ");
+            Console.WriteLine("&(((((@@           @(....&@#((((((((((@ @(((((((#@........@            &@(((((@");
+            Console.WriteLine("&(((((((((((((((((((((((((((((((((&@@@@@@@@@&...........@(((((((((((((((((((((@");
+            Console.WriteLine("@(((((((((((((((((((((((((((((&@(....................@#((((((((((((((((((((((#@");
+            Console.WriteLine("      @((((((((((((((&@&  &&...................@   @@#((((((((((((((#@@        ");
+            Console.WriteLine("                                                                               ");
+            Console.WriteLine("===============================================================================");
+            Console.WriteLine("===                       Azure DevOps Migration Tools                       ==");
+            Console.WriteLine($"===                                 v{thisVersion}                                ==");
+            Console.WriteLine("===============================================================================");
         }
     }
 }

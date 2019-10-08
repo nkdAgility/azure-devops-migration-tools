@@ -497,8 +497,7 @@ namespace VstsSyncMigrator.Engine
 
             Trace.WriteLine("...build complete", Name);
             fieldMappingTimer.Stop();
-            Trace.WriteLine(
-                $"FieldMapOnNewWorkItem: {newWorkItemstartTime} - {fieldMappingTimer.Elapsed.ToString("c")}", Name);
+            Trace.TraceInformation($"FieldMapOnNewWorkItem: {newWorkItemstartTime} - {fieldMappingTimer.Elapsed.ToString("c")}");
         }
 
         NodeDetecomatic _nodeOMatic;
