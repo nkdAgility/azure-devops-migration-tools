@@ -79,7 +79,7 @@ namespace VstsSyncMigrator.Engine
             };
         }
 
-        public override string Name => "WorkItemRevisionReplayMigrationContext";
+        public override string Name => "WorkItemMigration";
 
         internal override void InternalExecute()
         {
@@ -107,8 +107,8 @@ namespace VstsSyncMigrator.Engine
                 sourceWorkItems = FilterWorkItemsThatAlreadyExistInTarget(sourceWorkItems, targetStore);
             }
             //////////////////////////////////////////////////
-            _current = sourceWorkItems.Count;
-            _count = 0;
+            _current = 0;
+            _count = sourceWorkItems.Count;
             _elapsedms = 0;
 
             //Validation: make sure that the ReflectedWorkItemId field name specified in the config exists in the target process, preferably on each work item type.
@@ -122,6 +122,13 @@ namespace VstsSyncMigrator.Engine
             stopwatch.Stop();
 
             Console.WriteLine(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds", stopwatch.Elapsed);
+        }
+
+        private  void TraceMessage(WorkItem sourceWorkItem, string message = "", bool header = false)
+        {
+            if (header) Trace.WriteLine("===============================================================================================");
+            Trace.WriteLine($"Migrating {_current.ToString().PadLeft(5)}/{_count.ToString().PadRight(5)} - sourceid[{sourceWorkItem.Id.ToString().PadRight(6)}][{sourceWorkItem.Type.Name.PadRight(10)}] | {message}", Name);
+            if (header) Trace.WriteLine("===============================================================================================");
         }
 
         private List<WorkItem> FilterWorkItemsThatAlreadyExistInTarget(List<WorkItem> sourceWorkItems, WorkItemStoreContext targetStore)
@@ -162,9 +169,9 @@ namespace VstsSyncMigrator.Engine
             try
             {
                 var targetWorkItem = targetStore.FindReflectedWorkItem(sourceWorkItem, false);
-                Trace.WriteLine($"{_current} - Migrating: {sourceWorkItem.Id} - {sourceWorkItem.Type.Name}", Name);
+                TraceMessage(sourceWorkItem);
                 ///////////////////////////////////////////////
-                Console.WriteLine(string.Format("STATUS: Work Item has {0} revisions and revision migration is set to {1}", sourceWorkItem.Rev, _config.ReplayRevisions));
+                TraceMessage(sourceWorkItem, $"Work Item has {sourceWorkItem.Rev} revisions and revision migration is set to {_config.ReplayRevisions}");
                 if (targetWorkItem == null)
                 {
 
@@ -174,7 +181,7 @@ namespace VstsSyncMigrator.Engine
                 else
                 {
 
-                    Console.WriteLine("...Exists");
+                    TraceMessage(sourceWorkItem, "Skipping as Work Item Already Exists");
                     processWorkItemMetrics.Add("Revisions", 0);
 
                 }
@@ -201,38 +208,43 @@ namespace VstsSyncMigrator.Engine
             {
                
                 Telemetry.Current.TrackException(ex);
-                Trace.WriteLine(ex.ToString());
-                Trace.WriteLine(string.Format("ERROR: Failed to create work item. Retry Limit reached "));
+
+                TraceMessage(sourceWorkItem, ex.ToString());
                 if (retrys < retryLimit)
                 {
-                    Trace.WriteLine(string.Format("ERROR: Failed to create work item. Will retry in {0}s ", retrys));
+                    TraceMessage(sourceWorkItem, $"WebException: Will retry in {retrys}s ");
                     System.Threading.Thread.Sleep(new TimeSpan(0, 0, retrys));
                     retrys++;
-                    Trace.WriteLine(string.Format("RETRY: {0} of {1} ",retrys , retrys));
+                    TraceMessage(sourceWorkItem, $"RETRY {retrys}/{retrys} ");
                     ProcessWorkItem(sourceStore, targetStore, destProject, sourceWorkItem, retryLimit, retrys);
+                }
+                else
+                {
+                    TraceMessage(sourceWorkItem, "ERROR: Failed to create work item. Retry Limit reached ");
                 }
             }
             catch (Exception ex)
             {
                 Telemetry.Current.TrackException(ex);
-                Trace.WriteLine(ex.ToString());
+                TraceMessage(sourceWorkItem, ex.ToString());
                 Telemetry.Current.TrackRequest("ProcessWorkItem", starttime, witstopwatch.Elapsed, "502", false);
                 throw ex;
             }
             witstopwatch.Stop();
             _elapsedms += witstopwatch.ElapsedMilliseconds;
-            _current--;
-            _count++;
+            _current++;
+            _count--;
 
             processWorkItemMetrics.Add("ElapsedTimeMS", _elapsedms);
             
 
-            var average = new TimeSpan(0, 0, 0, 0, (int)(_elapsedms / _count));
-            var remaining = new TimeSpan(0, 0, 0, 0, (int)(average.TotalMilliseconds * _current));
-            Trace.WriteLine(
+            var average = new TimeSpan(0, 0, 0, 0, (int)(_elapsedms / _current));
+            var remaining = new TimeSpan(0, 0, 0, 0, (int)(average.TotalMilliseconds * _count));
+            TraceMessage(sourceWorkItem,
                 string.Format("Average time of {0} per work item and {1} estimated to completion",
                     string.Format(@"{0:s\:fff} seconds", average),
-                    string.Format(@"{0:%h} hours {0:%m} minutes {0:s\:fff} seconds", remaining)), Name);
+                    string.Format(@"{0:%h} hours {0:%m} minutes {0:s\:fff} seconds", remaining))
+                );
             Trace.Flush();
             Telemetry.Current.TrackEvent("WorkItemMigrated", processWorkItemParamiters, processWorkItemMetrics);
             Telemetry.Current.TrackRequest("ProcessWorkItem", starttime, witstopwatch.Elapsed,"200", true);
@@ -240,19 +252,18 @@ namespace VstsSyncMigrator.Engine
 
         private void ProcessHTMLFieldAttachements(WorkItem targetWorkItem)
         {
-            Console.WriteLine(string.Format("...Target Work Item may need its HTML field images fixed."));
             if (targetWorkItem != null && _config.FixHtmlAttachmentLinks)
             {
+                
                 embededImagesRepairOMatic.FixHtmlAttachmentLinks(targetWorkItem, me.Source.Collection.Uri.ToString(), me.Target.Collection.Uri.ToString());
             }
         }
 
         private void ProcessWorkItemLinks(WorkItemStoreContext sourceStore, WorkItemStoreContext targetStore, WorkItem sourceWorkItem, WorkItem targetWorkItem, bool save)
         {
-            Console.WriteLine(string.Format("...Source Work Item has {0} links and Link migration is set to {1}", sourceWorkItem.Links.Count, _config.LinkMigration));
             if (targetWorkItem != null && _config.LinkMigration && sourceWorkItem.Links.Count > 0)
             {
-                Console.WriteLine("...Processing Links");
+                TraceMessage(sourceWorkItem, $"Links {sourceWorkItem.Links.Count} | LinkMigrator:{_config.LinkMigration}");
                 workItemLinkOMatic.MigrateLinks(sourceWorkItem, sourceStore, targetWorkItem, targetStore, save);
                 AddMetric("RelatedLinkCount", processWorkItemMetrics, targetWorkItem.Links.Count);
                int fixedLinkCount = repoOMatic.FixExternalGitLinks(targetWorkItem, targetStore, save);
@@ -262,9 +273,9 @@ namespace VstsSyncMigrator.Engine
 
         private void ProcessWorkItemAttachments(WorkItem sourceWorkItem, WorkItem targetWorkItem, bool save = true)
         {
-            Console.WriteLine(string.Format("...Source Work Item has {0} attachements and Attachment migration is set to {1}", sourceWorkItem.Attachments.Count, _config.AttachmentMigration));
             if (targetWorkItem != null && _config.AttachmentMigration && sourceWorkItem.Attachments.Count > 0)
             {
+                TraceMessage(sourceWorkItem, $"Attachemnts {sourceWorkItem.Attachments.Count} | LinkMigrator:{_config.AttachmentMigration}");
                 attachmentOMatic.ProcessAttachemnts(sourceWorkItem, targetWorkItem, save);
                 AddMetric("Attachments", processWorkItemMetrics, targetWorkItem.AttachedFileCount);
             }
@@ -314,8 +325,7 @@ namespace VstsSyncMigrator.Engine
                 {
                     sortedRevisions.RemoveRange(0, sortedRevisions.Count - 1);
                 }
-
-                Trace.WriteLine($"...Replaying {sourceWorkItem.Revisions.Count} revisions of work item {sourceWorkItem.Id}", Name);
+                TraceMessage(sourceWorkItem, $"Replaying  {sourceWorkItem.Revisions.Count} | Work item:{sourceWorkItem.Id}", true);
 
                 foreach (var revision in sortedRevisions)
                 {
@@ -445,10 +455,6 @@ namespace VstsSyncMigrator.Engine
             }
             newWorkItemTimer.Stop();
             Telemetry.Current.TrackDependency("TeamService", "NewWorkItem", newWorkItemstartTime, newWorkItemTimer.Elapsed, true);
-            Trace.WriteLine(
-                string.Format("Dependency: {0} - {1} - {2} - {3} - {4}", "TeamService", "NewWorkItem",
-                    newWorkItemstartTime, newWorkItemTimer.Elapsed, true), Name);
-
             if (_config.UpdateCreatedBy){  newwit.Fields["System.CreatedBy"].Value = currentRevisionWorkItem.Revisions[0].Fields["System.CreatedBy"].Value; }
             if (_config.UpdateCreatedDate) {newwit.Fields["System.CreatedDate"].Value = currentRevisionWorkItem.Revisions[0].Fields["System.CreatedDate"].Value; }
             
@@ -459,8 +465,6 @@ namespace VstsSyncMigrator.Engine
         {
             var newWorkItemstartTime = DateTime.UtcNow;
             var fieldMappingTimer = Stopwatch.StartNew();
-            
-            Trace.Write("... Building ", Name);
             
             newwit.Title = oldWi.Title;
             newwit.State = oldWi.State;
@@ -494,10 +498,9 @@ namespace VstsSyncMigrator.Engine
             var description = new StringBuilder();
             description.Append(oldWi.Description);
             newwit.Description = description.ToString();
-
-            Trace.WriteLine("...build complete", Name);
             fieldMappingTimer.Stop();
-            Trace.TraceInformation($"FieldMapOnNewWorkItem: {newWorkItemstartTime} - {fieldMappingTimer.Elapsed.ToString("c")}");
+           // Trace.WriteLine(
+            //    $"FieldMapOnNewWorkItem: {newWorkItemstartTime} - {fieldMappingTimer.Elapsed.ToString("c")}", Name);
         }
 
         NodeDetecomatic _nodeOMatic;
