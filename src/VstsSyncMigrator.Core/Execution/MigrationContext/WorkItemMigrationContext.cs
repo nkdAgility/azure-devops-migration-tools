@@ -178,9 +178,9 @@ namespace VstsSyncMigrator.Engine
             try
             {
                 var targetWorkItem = targetStore.FindReflectedWorkItem(sourceWorkItem, false);
-                TraceMessage(sourceWorkItem);
+                TraceWriteLine(sourceWorkItem);
                 ///////////////////////////////////////////////
-                TraceMessage(sourceWorkItem, $"Work Item has {sourceWorkItem.Rev} revisions and revision migration is set to {_config.ReplayRevisions}");
+                TraceWriteLine(sourceWorkItem, $"Work Item has {sourceWorkItem.Rev} revisions and revision migration is set to {_config.ReplayRevisions}");
                 if (targetWorkItem == null)
                 {
 
@@ -190,7 +190,7 @@ namespace VstsSyncMigrator.Engine
                 else
                 {
 
-                    TraceMessage(sourceWorkItem, "Skipping as Work Item Already Exists");
+                    TraceWriteLine(sourceWorkItem, "Skipping as Work Item Already Exists");
                     processWorkItemMetrics.Add("Revisions", 0);
 
                 }
@@ -218,24 +218,24 @@ namespace VstsSyncMigrator.Engine
                
                 Telemetry.Current.TrackException(ex);
 
-                TraceMessage(sourceWorkItem, ex.ToString());
+                TraceWriteLine(sourceWorkItem, ex.ToString());
                 if (retrys < retryLimit)
                 {
-                    TraceMessage(sourceWorkItem, $"WebException: Will retry in {retrys}s ");
+                    TraceWriteLine(sourceWorkItem, $"WebException: Will retry in {retrys}s ");
                     System.Threading.Thread.Sleep(new TimeSpan(0, 0, retrys));
                     retrys++;
-                    TraceMessage(sourceWorkItem, $"RETRY {retrys}/{retrys} ");
+                    TraceWriteLine(sourceWorkItem, $"RETRY {retrys}/{retrys} ");
                     ProcessWorkItem(sourceStore, targetStore, destProject, sourceWorkItem, retryLimit, retrys);
                 }
                 else
                 {
-                    TraceMessage(sourceWorkItem, "ERROR: Failed to create work item. Retry Limit reached ");
+                    TraceWriteLine(sourceWorkItem, "ERROR: Failed to create work item. Retry Limit reached ");
                 }
             }
             catch (Exception ex)
             {
                 Telemetry.Current.TrackException(ex);
-                TraceMessage(sourceWorkItem, ex.ToString());
+                TraceWriteLine(sourceWorkItem, ex.ToString());
                 Telemetry.Current.TrackRequest("ProcessWorkItem", starttime, witstopwatch.Elapsed, "502", false);
                 throw ex;
             }
@@ -249,7 +249,7 @@ namespace VstsSyncMigrator.Engine
 
             var average = new TimeSpan(0, 0, 0, 0, (int)(_elapsedms / _current));
             var remaining = new TimeSpan(0, 0, 0, 0, (int)(average.TotalMilliseconds * _count));
-            TraceMessage(sourceWorkItem,
+            TraceWriteLine(sourceWorkItem,
                 string.Format("Average time of {0} per work item and {1} estimated to completion",
                     string.Format(@"{0:s\:fff} seconds", average),
                     string.Format(@"{0:%h} hours {0:%m} minutes {0:s\:fff} seconds", remaining))
