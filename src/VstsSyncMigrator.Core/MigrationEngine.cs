@@ -17,6 +17,7 @@ namespace VstsSyncMigrator.Engine
         List<Action<WorkItem, WorkItem>> processorActions = new List<Action<WorkItem, WorkItem>>();
         Dictionary<string, List<IFieldMap>> fieldMapps = new Dictionary<string, List<IFieldMap>>();
         Dictionary<string, IWitdMapper> workItemTypeDefinitions = new Dictionary<string, IWitdMapper>();
+        Dictionary<string, string> gitRepoMapping = new Dictionary<string, string>();
         ITeamProjectContext source;
         ITeamProjectContext target;
         VssCredentials sourceCreds;
@@ -63,7 +64,11 @@ namespace VstsSyncMigrator.Engine
                     Trace.WriteLine(string.Format("Adding FieldMap {0}", fieldmapConfig.FieldMap.Name), "MigrationEngine");
                     this.AddFieldMap(fieldmapConfig.WorkItemTypeName, (IFieldMap)Activator.CreateInstance(fieldmapConfig.FieldMap, fieldmapConfig));
                 }
-            }            
+            }          
+            if (config.GitRepoMapping != null)
+            {
+                gitRepoMapping = config.GitRepoMapping;
+            }
             foreach (string key in config.WorkItemTypeDefinition.Keys)
             {
                 Trace.WriteLine(string.Format("Adding Work Item Type {0}", key), "MigrationEngine");
@@ -86,6 +91,14 @@ namespace VstsSyncMigrator.Engine
                     Trace.WriteLine(message, "MigrationEngine");
                     throw new InvalidOperationException(message);
                 }
+            }
+        }
+
+        public Dictionary<string, string> GitRepoMappings
+        {
+            get
+            {
+                return gitRepoMapping;
             }
         }
 

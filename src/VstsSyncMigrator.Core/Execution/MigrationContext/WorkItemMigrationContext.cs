@@ -23,10 +23,11 @@ namespace VstsSyncMigrator.Engine
     public class WorkItemMigrationContext : MigrationContextBase
     {
         private readonly WorkItemMigrationConfig _config;
-        List<String> _ignore;
-        WorkItemTrackingHttpClient _witClient;
-        WorkItemLinkOMatic workItemLinkOMatic = new WorkItemLinkOMatic();
-        AttachmentOMatic attachmentOMatic;
+        private List<String> _ignore;
+        private WorkItemTrackingHttpClient _witClient;
+        private WorkItemLinkOMatic workItemLinkOMatic = new WorkItemLinkOMatic();
+        private AttachmentOMatic attachmentOMatic;
+        private RepoOMatic repoOMatic;
         EmbededImagesRepairOMatic embededImagesRepairOMatic = new EmbededImagesRepairOMatic();
         int _current = 0;
         int _count = 0;
@@ -46,7 +47,7 @@ namespace VstsSyncMigrator.Engine
 
             var workItemServer = me.Source.Collection.GetService<WorkItemServer>();
             attachmentOMatic = new AttachmentOMatic(workItemServer, config.AttachmentWorkingPath);
-
+            repoOMatic = new RepoOMatic(me);
         }
 
         private void PopulateIgnoreList()
@@ -181,6 +182,7 @@ namespace VstsSyncMigrator.Engine
                 ///////////////////////////////////////////////
                 ProcessWorkItemLinks(sourceStore, targetStore, sourceWorkItem, targetWorkItem);
                 AddMetric("RelatedLinkCount", processWorkItemMetrics, targetWorkItem.Links.Count);
+
                 ///////////////////////////////////////////////
                 ProcessHTMLFieldAttachements(targetWorkItem);
                 ///////////////////////////////////////////////
@@ -257,6 +259,7 @@ namespace VstsSyncMigrator.Engine
                 Console.WriteLine("...Processing Links");
                 workItemLinkOMatic.MigrateLinks(sourceWorkItem, sourceStore, targetWorkItem, targetStore);
             }
+            repoOMatic.FixExternalGitLinks(targetWorkItem, targetStore);
         }
 
         private void ProcessWorkItemAttachments(WorkItem sourceWorkItem, WorkItem targetWorkItem)

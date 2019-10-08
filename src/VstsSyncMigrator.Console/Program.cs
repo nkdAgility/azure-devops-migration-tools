@@ -185,10 +185,12 @@ namespace VstsSyncMigrator.ConsoleApp
                 ec = JsonConvert.DeserializeObject<EngineConfiguration>(configurationjson, 
                     new FieldMapConfigJsonConverter(),
                     new ProcessorConfigJsonConverter());
+
 #if !DEBUG
-                if (ec.Version != System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(2))
+                string appVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(2);
+                if (ec.Version != appVersion)
                 {
-                    Trace.WriteLine("The config version does not match the current version. There may be compatability issues and we recommend that you generate a new default config and then tranfer the settings accross.", "[Info]");
+                    Trace.WriteLine($"The config version {ec.Version} does not match the current app version {appVersion}. There may be compatability issues and we recommend that you generate a new default config and then tranfer the settings accross.", "[Info]");
                     return 1;
                 }
 #endif

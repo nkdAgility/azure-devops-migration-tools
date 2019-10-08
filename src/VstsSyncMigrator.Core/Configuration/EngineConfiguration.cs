@@ -18,6 +18,7 @@ namespace VstsSyncMigrator.Engine.Configuration
         public TeamProjectConfig Target { get; set; }
         public List<IFieldMapConfig> FieldMaps { get; set; }
         public Dictionary<string, string> WorkItemTypeDefinition { get; set; }
+        public Dictionary<string, string> GitRepoMapping { get; set; }
         public List<ITfsProcessingConfig> Processors { get; set; }
 
         public static EngineConfiguration GetDefault()

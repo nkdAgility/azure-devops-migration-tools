@@ -21,10 +21,11 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
             }
             else
             {
-                try
+
+                Trace.Indent();
+                foreach (Link item in sourceWorkItemLinkStart.Links)
                 {
-                    Trace.Indent();
-                    foreach (Link item in sourceWorkItemLinkStart.Links)
+                    try
                     {
                         Trace.WriteLine(string.Format("Migrating link for {0} of type {1}",
                             sourceWorkItemLinkStart.Id, item.GetType().Name), "LinkMigrationContext");
@@ -50,21 +51,24 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                             throw ex;
                         }
                     }
+                    catch (WorkItemLinkValidationException ex)
+                    {
+                        sourceWorkItemLinkStart.Reset();
+                        targetWorkItemLinkStart.Reset();
+                        Telemetry.Current.TrackException(ex);
+                        Trace.WriteLine(string.Format("  [WorkItemLinkValidationException] Adding link for wiSourceL={0}", sourceWorkItemLinkStart.Id), "LinkMigrationContext");
+                        Trace.WriteLine(ex.ToString(), "LinkMigrationContext");
+                    }
+                    catch (FormatException ex)
+                    {
+                        sourceWorkItemLinkStart.Reset();
+                        targetWorkItemLinkStart.Reset();
+                        Telemetry.Current.TrackException(ex);
+                        Trace.WriteLine(string.Format("  [CREATE-FAIL] Adding Link for wiSourceL={0}", sourceWorkItemLinkStart.Id), "LinkMigrationContext");
+                        Trace.WriteLine(ex.ToString(), "LinkMigrationContext");
+                    }
                 }
-                catch (WorkItemLinkValidationException ex)
-                {
-                    sourceWorkItemLinkStart.Reset();
-                    targetWorkItemLinkStart.Reset();
-                    Telemetry.Current.TrackException(ex);
-                    Trace.WriteLine(string.Format("  [WorkItemLinkValidationException] Adding link for wiSourceL={0}", sourceWorkItemLinkStart.Id), "LinkMigrationContext");
-                    Trace.WriteLine(ex.ToString(), "LinkMigrationContext");
-                }
-                catch (Exception ex)
-                {
-                    Telemetry.Current.TrackException(ex);
-                    Trace.WriteLine(string.Format("  [CREATE-FAIL] Adding Link for wiSourceL={0}", sourceWorkItemLinkStart.Id), "LinkMigrationContext");
-                    Trace.WriteLine(ex.ToString(), "LinkMigrationContext");
-                }
+
             }
             if (sourceWorkItemLinkStart.Type.Name == "Test Case")
             {
