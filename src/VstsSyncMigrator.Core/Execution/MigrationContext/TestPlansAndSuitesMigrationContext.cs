@@ -69,9 +69,9 @@ namespace VstsSyncMigrator.Engine
                 Trace.WriteLine("===============================================================================================".PadLeft(indent));
                 Trace.WriteLine("===============================================================================================".PadLeft(indent));
                 Trace.WriteLine("===============================================================================================".PadLeft(indent));
-                Trace.WriteLine($"==      Suite Name: {sourcePlan.Name.PadRight(30)}=============================".PadLeft(indent));
-                Trace.WriteLine($"==            Date: {sourcePlan.StartDate.ToShortDateString().PadRight(30)}=============================".PadLeft(indent));
-                Trace.WriteLine($"==          Suites: {sourcePlan.RootSuite.Entries.Count.ToString().PadRight(30)}=============================".PadLeft(indent));
+                Trace.WriteLine($"==      Suite Name: {sourcePlan.Name.PadRight(45)}=============================".PadLeft(indent));
+                Trace.WriteLine($"==            Date: {sourcePlan.StartDate.ToShortDateString().PadRight(45)}=============================".PadLeft(indent));
+                Trace.WriteLine($"==          Suites: {sourcePlan.RootSuite.Entries.Count.ToString().PadRight(45)}=============================".PadLeft(indent));
                 Trace.WriteLine("===============================================================================================".PadLeft(indent));
                 Trace.WriteLine("===============================================================================================".PadLeft(indent));
                 Trace.WriteLine("===============================================================================================".PadLeft(indent));
@@ -101,7 +101,7 @@ namespace VstsSyncMigrator.Engine
             {
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Trace.WriteLine("===============================================================================================".PadLeft(indent));
-                Trace.WriteLine($"==      Suite Title: {sourceTestSuite.Title.PadRight(30)}=============================".PadLeft(indent));
+                Trace.WriteLine($"==      Suite Title: {sourceTestSuite.Title.PadRight(45)}=============================".PadLeft(indent));
                 Trace.WriteLine("===============================================================================================".PadLeft(indent));
             }
             Console.ForegroundColor = ConsoleColor.Green;
@@ -130,70 +130,84 @@ namespace VstsSyncMigrator.Engine
             Trace.WriteLine(string.Format("Plan to copy {0} Plans?", toProcess.Count()), "TestPlansAndSuites");
             _currentPlan = 0;
             _totalPlans = toProcess.Count();
+
             foreach (ITestPlan sourcePlan in toProcess)
             {
                 _currentPlan++;
                 if (CanSkipElementBecauseOfTags(sourcePlan.Id))
                     continue;
-    
-                var newPlanName = config.PrefixProjectToNodes
-                    ? $"{sourceWitStore.GetProject().Name}-{sourcePlan.Name}"
-                    : $"{sourcePlan.Name}";
-                TraceWriteLine(sourcePlan, $"Process Plan {newPlanName}", 0,true);
-                var targetPlan = FindTestPlan(targetTestStore, newPlanName);
-                if (targetPlan == null)
-                {
-                    TraceWriteLine(sourcePlan, $" Creating Plan {newPlanName}", 5);
-                    targetPlan = CreateNewTestPlanFromSource(sourcePlan, newPlanName);
-
-                    RemoveInvalidLinks(targetPlan);
-
-                    targetPlan.Save();
-                    
-                    ApplyFieldMappings(sourcePlan.Id, targetPlan.Id);
-                    AssignReflectedWorkItemId(sourcePlan.Id, targetPlan.Id);
-                    FixAssignedToValue(sourcePlan.Id, targetPlan.Id);
-
-                    ApplyDefaultConfigurations(sourcePlan.RootSuite, targetPlan.RootSuite);
-
-                    ApplyFieldMappings(sourcePlan.RootSuite.Id, targetPlan.RootSuite.Id);
-                    AssignReflectedWorkItemId(sourcePlan.RootSuite.Id, targetPlan.RootSuite.Id);
-                    FixAssignedToValue(sourcePlan.RootSuite.Id, targetPlan.RootSuite.Id);
-                    // Add Test Cases & apply configurations
-                    AddChildTestCases(sourcePlan.RootSuite, targetPlan.RootSuite, targetPlan);
-                }
-                else
-                {
-                    TraceWriteLine(sourcePlan, $"Found Plan {newPlanName}", 5);;
-                }
-                if (HasChildSuites(sourcePlan.RootSuite))
-                {
-                    __currentSuite = 0;
-                    __totalSuites = sourcePlan.RootSuite.Entries.Count ;
-                    TraceWriteLine(sourcePlan, $"Source Plan has {__totalSuites} Suites", 5); 
-                    foreach (var sourceSuiteChild in sourcePlan.RootSuite.SubSuites)
-                    {
-                        __currentSuite++;
-                        TraceWriteLine(sourceSuiteChild, $"", 5, true); 
-                        ProcessTestSuite(sourceSuiteChild, targetPlan.RootSuite, targetPlan);
-                        
-                    }
-                    __currentSuite = 0;
-                    __totalSuites = 0;
-                }
-
-                targetPlan.Save();
-                // Load the plan again, because somehow it doesn't let me set configurations on the already loaded plan
-                TraceWriteLine(sourcePlan, $"ApplyConfigurationsAndAssignTesters {targetPlan.Name}", 5); ;
-                ITestPlan targetPlan2 = FindTestPlan(targetTestStore, targetPlan.Name);
-                ApplyConfigurationsAndAssignTesters(sourcePlan.RootSuite, targetPlan2.RootSuite);
-                _currentPlan++;
-                Telemetry.Current.TrackRequest("MigrateTestPlan", starttime, stopwatch.Elapsed, "200", true);
+                ProcessTestPlan( sourcePlan);
             }
             _currentPlan = 0;
             _totalPlans = 0;
             stopwatch.Stop();
             Console.WriteLine(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds", stopwatch.Elapsed);
+        }
+
+        private void ProcessTestPlan( ITestPlan sourcePlan)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            var starttime = DateTime.Now;
+            var metrics = new Dictionary<string, double>();
+            var parameters = new Dictionary<string, string>();
+            AddParameter("PlanId", parameters, sourcePlan.Id.ToString());
+            ////////////////////////////////////
+            var newPlanName = config.PrefixProjectToNodes
+                ? $"{sourceWitStore.GetProject().Name}-{sourcePlan.Name}"
+                : $"{sourcePlan.Name}";
+            TraceWriteLine(sourcePlan, $"Process Plan {newPlanName}", 0, true);
+            var targetPlan = FindTestPlan(targetTestStore, newPlanName);
+            if (targetPlan == null)
+            {
+                TraceWriteLine(sourcePlan, $" Creating Plan {newPlanName}", 5);
+                targetPlan = CreateNewTestPlanFromSource(sourcePlan, newPlanName);
+
+                RemoveInvalidLinks(targetPlan);
+
+                targetPlan.Save();
+
+                ApplyFieldMappings(sourcePlan.Id, targetPlan.Id);
+                AssignReflectedWorkItemId(sourcePlan.Id, targetPlan.Id);
+                FixAssignedToValue(sourcePlan.Id, targetPlan.Id);
+
+                ApplyDefaultConfigurations(sourcePlan.RootSuite, targetPlan.RootSuite);
+
+                ApplyFieldMappings(sourcePlan.RootSuite.Id, targetPlan.RootSuite.Id);
+                AssignReflectedWorkItemId(sourcePlan.RootSuite.Id, targetPlan.RootSuite.Id);
+                FixAssignedToValue(sourcePlan.RootSuite.Id, targetPlan.RootSuite.Id);
+                // Add Test Cases & apply configurations
+                AddChildTestCases(sourcePlan.RootSuite, targetPlan.RootSuite, targetPlan);
+            }
+            else
+            {
+                TraceWriteLine(sourcePlan, $"Found Plan {newPlanName}", 5); ;
+            }
+            if (HasChildSuites(sourcePlan.RootSuite))
+            {
+                __currentSuite = 0;
+                __totalSuites = sourcePlan.RootSuite.Entries.Count;
+                TraceWriteLine(sourcePlan, $"Source Plan has {__totalSuites} Suites", 5);
+                metrics.Add("SubSuites", __totalSuites);
+                foreach (var sourceSuiteChild in sourcePlan.RootSuite.SubSuites)
+                {
+                    __currentSuite++;
+                    TraceWriteLine(sourceSuiteChild, $"", 5, true);
+                    ProcessTestSuite(sourceSuiteChild, targetPlan.RootSuite, targetPlan);
+
+                }
+                __currentSuite = 0;
+                __totalSuites = 0;
+            }
+
+            targetPlan.Save();
+            // Load the plan again, because somehow it doesn't let me set configurations on the already loaded plan
+            TraceWriteLine(sourcePlan, $"ApplyConfigurationsAndAssignTesters {targetPlan.Name}", 5); ;
+            ITestPlan targetPlan2 = FindTestPlan(targetTestStore, targetPlan.Name);
+            ApplyConfigurationsAndAssignTesters(sourcePlan.RootSuite, targetPlan2.RootSuite);
+            ///////////////////////////////////////////////
+            metrics.Add("ElapsedMS", stopwatch.ElapsedMilliseconds);
+            Telemetry.Current.TrackEvent("MigrateTestPlan", parameters, metrics);
+            Telemetry.Current.TrackRequest("MigrateTestPlan", starttime, stopwatch.Elapsed, "200", true);
         }
 
         /// <summary>
@@ -287,8 +301,14 @@ namespace VstsSyncMigrator.Engine
         {
             if (CanSkipElementBecauseOfTags(sourceSuite.Id))
                 return;
+            //////////////////////////////////////////
             var stopwatch = Stopwatch.StartNew();
-                var starttime = DateTime.Now;
+            var starttime = DateTime.Now;
+            var metrics = new Dictionary<string, double>();
+            var parameters = new Dictionary<string, string>();
+            AddParameter("SuiteId", parameters, sourceSuite.Id.ToString());
+            AddParameter("TestSuiteType", parameters, sourceSuite.TestSuiteType.ToString());
+            ////////////////////////////////////
 
             TraceWriteLine(sourceSuite, $"    Processing {sourceSuite.TestSuiteType} : {sourceSuite.Id} - {sourceSuite.Title} ", 5);
             var targetSuiteChild = FindSuiteEntry((IStaticTestSuite)targetParent, sourceSuite.Title);
@@ -346,7 +366,7 @@ namespace VstsSyncMigrator.Engine
                         throw new NotImplementedException();
                         //break;
                 }
-                if (targetSuiteChild == null) { return; }
+                if (targetSuiteChild != null) { 
                 // Apply default configurations, Add to target and Save
                 ApplyDefaultConfigurations(sourceSuite, targetSuiteChild);
                 if (targetSuiteChild.Plan == null)
@@ -356,6 +376,7 @@ namespace VstsSyncMigrator.Engine
                 ApplyFieldMappings(sourceSuite.Id, targetSuiteChild.Id);
                 AssignReflectedWorkItemId(sourceSuite.Id, targetSuiteChild.Id);
                 FixAssignedToValue(sourceSuite.Id, targetSuiteChild.Id);
+                }
             }
             else
             {
@@ -369,7 +390,7 @@ namespace VstsSyncMigrator.Engine
             }
 
             // Recurse if Static Suite
-            if (sourceSuite.TestSuiteType == TestSuiteType.StaticTestSuite)
+            if (sourceSuite.TestSuiteType == TestSuiteType.StaticTestSuite && targetSuiteChild != null)
             {
                 // Add Test Cases 
                 AddChildTestCases(sourceSuite, targetSuiteChild, targetPlan);
@@ -383,6 +404,10 @@ namespace VstsSyncMigrator.Engine
                     }
                 }
             }
+            ///////////////////////////////////////////////
+
+            metrics.Add("ElapsedMS", stopwatch.ElapsedMilliseconds);
+            Telemetry.Current.TrackEvent("MigrateTestSuite", parameters, metrics);
             Telemetry.Current.TrackRequest("MigrateTestSuite", starttime, stopwatch.Elapsed, "200", true);
         }
 
@@ -437,8 +462,14 @@ namespace VstsSyncMigrator.Engine
 
         private void AddChildTestCases(ITestSuiteBase source, ITestSuiteBase target, ITestPlan targetPlan)
         {
+            //////////////////////////////////////////
             var stopwatch = Stopwatch.StartNew();
             var starttime = DateTime.Now;
+            var metrics = new Dictionary<string, double>();
+            var parameters = new Dictionary<string, string>();
+            AddParameter("SuiteId", parameters, source.Id.ToString());
+AddParameter("PlanId", parameters, targetPlan.Id.ToString());
+            ////////////////////////////////////
             target.Refresh();
             targetPlan.Refresh();
             targetPlan.RefreshRootSuite();
@@ -449,6 +480,7 @@ namespace VstsSyncMigrator.Engine
 
             _totalTestCases = source.TestCases.Count;
             _currentTestCases = 0;
+            AddMetric("TestCaseCount", metrics , _totalTestCases);
             TraceWriteLine(source, string.Format("            Suite has {0} test cases", _totalTestCases), 15);            
             List<ITestCase> tcs = new List<ITestCase>();
             foreach (ITestSuiteEntry sourceTestCaseEntry in source.TestCases)
@@ -493,7 +525,10 @@ namespace VstsSyncMigrator.Engine
 
             targetPlan.Save();
             TraceWriteLine(source, string.Format("    SAVED {0} : {1} - {2} ", target.TestSuiteType.ToString(), target.Id, target.Title), 15);
-            Telemetry.Current.TrackRequest("MigrateTestCase", starttime, stopwatch.Elapsed, "200", true);
+
+            metrics.Add("ElapsedMS", stopwatch.ElapsedMilliseconds);
+            Telemetry.Current.TrackEvent("MigrateTestCases", parameters, metrics);
+            Telemetry.Current.TrackRequest("MigrateTestCases", starttime, stopwatch.Elapsed, "200", true);
             stopwatch.Stop();
             _totalTestCases = 0;
             _currentTestCases = 0;
