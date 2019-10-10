@@ -115,6 +115,7 @@ namespace VstsSyncMigrator.Engine
             bool filterByCompleted = false;
 
             var stopwatch = Stopwatch.StartNew();
+            var starttime = DateTime.Now;
             ITestPlanCollection sourcePlans = sourceTestStore.GetTestPlans();
             List<ITestPlan> toProcess;
             if (filterByCompleted)
@@ -187,6 +188,7 @@ namespace VstsSyncMigrator.Engine
                 ITestPlan targetPlan2 = FindTestPlan(targetTestStore, targetPlan.Name);
                 ApplyConfigurationsAndAssignTesters(sourcePlan.RootSuite, targetPlan2.RootSuite);
                 _currentPlan++;
+                Telemetry.Current.TrackRequest("MigrateTestPlan", starttime, stopwatch.Elapsed, "200", true);
             }
             _currentPlan = 0;
             _totalPlans = 0;
@@ -285,6 +287,8 @@ namespace VstsSyncMigrator.Engine
         {
             if (CanSkipElementBecauseOfTags(sourceSuite.Id))
                 return;
+            var stopwatch = Stopwatch.StartNew();
+                var starttime = DateTime.Now;
 
             TraceWriteLine(sourceSuite, $"    Processing {sourceSuite.TestSuiteType} : {sourceSuite.Id} - {sourceSuite.Title} ", 5);
             var targetSuiteChild = FindSuiteEntry((IStaticTestSuite)targetParent, sourceSuite.Title);
@@ -379,6 +383,7 @@ namespace VstsSyncMigrator.Engine
                     }
                 }
             }
+            Telemetry.Current.TrackRequest("MigrateTestSuite", starttime, stopwatch.Elapsed, "200", true);
         }
 
         /// <summary>
@@ -432,12 +437,16 @@ namespace VstsSyncMigrator.Engine
 
         private void AddChildTestCases(ITestSuiteBase source, ITestSuiteBase target, ITestPlan targetPlan)
         {
+            var stopwatch = Stopwatch.StartNew();
+            var starttime = DateTime.Now;
             target.Refresh();
             targetPlan.Refresh();
             targetPlan.RefreshRootSuite();
 
             if (CanSkipElementBecauseOfTags(source.Id))
                 return;
+
+
             _totalTestCases = source.TestCases.Count;
             _currentTestCases = 0;
             TraceWriteLine(source, string.Format("            Suite has {0} test cases", _totalTestCases), 15);            
@@ -484,6 +493,8 @@ namespace VstsSyncMigrator.Engine
 
             targetPlan.Save();
             TraceWriteLine(source, string.Format("    SAVED {0} : {1} - {2} ", target.TestSuiteType.ToString(), target.Id, target.Title), 15);
+            Telemetry.Current.TrackRequest("MigrateTestCase", starttime, stopwatch.Elapsed, "200", true);
+            stopwatch.Stop();
             _totalTestCases = 0;
             _currentTestCases = 0;
         }
@@ -526,10 +537,13 @@ namespace VstsSyncMigrator.Engine
 
         private void ApplyConfigurationsAndAssignTesters(ITestSuiteBase sourceSuite, ITestSuiteBase targetSuite)
         {
+            
             _totalTestCases = sourceSuite.TestCases.Count();
             TraceWriteLine(sourceSuite, $"Applying configurations for test cases in source suite {sourceSuite.Title}", 5);
             foreach (ITestSuiteEntry sourceTce in sourceSuite.TestCases)
             {
+            var stopwatch = Stopwatch.StartNew();
+            var starttime = DateTime.Now;
                 _currentTestCases++;
                 WorkItem wi = targetWitStore.FindReflectedWorkItem(sourceTce.TestCase.WorkItem, false);
                 ITestSuiteEntry targetTce;
@@ -552,6 +566,7 @@ namespace VstsSyncMigrator.Engine
                 {
                     TraceWriteLine(sourceSuite, $"Work Item for Test Case {sourceTce.Title} cannot be found in target. Has it been migrated?", 5);
                 }
+                Telemetry.Current.TrackRequest("ApplyConfigurationsAndAssignTesters", starttime, stopwatch.Elapsed, "200", true);
 
             }
             _totalTestCases = 0;
