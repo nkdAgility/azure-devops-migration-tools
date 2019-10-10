@@ -63,46 +63,68 @@ namespace VstsSyncMigrator.Engine
 
         private void TraceWriteLine(ITestPlan sourcePlan, string message = "", int indent = 0, bool header = false)
         {
-            Console.ForegroundColor = ConsoleColor.Green;
             if (header)
             {
                 Console.ForegroundColor = ConsoleColor.Yellow;
+                Trace.WriteLine("===============================================================================================".PadLeft(indent));
+                Trace.WriteLine("===============================================================================================".PadLeft(indent));
                 Trace.WriteLine("===============================================================================================".PadLeft(indent));
                 Trace.WriteLine($"==      Suite Name: {sourcePlan.Name.PadRight(30)}=============================".PadLeft(indent));
                 Trace.WriteLine($"==            Date: {sourcePlan.StartDate.ToShortDateString().PadRight(30)}=============================".PadLeft(indent));
                 Trace.WriteLine($"==          Suites: {sourcePlan.RootSuite.Entries.Count.ToString().PadRight(30)}=============================".PadLeft(indent));
                 Trace.WriteLine("===============================================================================================".PadLeft(indent));
+                Trace.WriteLine("===============================================================================================".PadLeft(indent));
+                Trace.WriteLine("===============================================================================================".PadLeft(indent));
             }
-            Trace.WriteLine($"== Plan {_currentPlan.ToString().PadLeft(3)}/{_totalPlans.ToString().PadRight(3)} | Suites: {__currentSuite.ToString().PadLeft(3)}/{__totalSuites.ToString().PadRight(3)} | Cases: {_currentTestCases.ToString().PadLeft(3)}/{_totalTestCases.ToString().PadRight(3)} - planid[{sourcePlan.Id.ToString().PadRight(6)}] | {message}".PadLeft(indent));
+            Console.ForegroundColor = ConsoleColor.Green;
+            Trace.WriteLine($"== {GetLogTags()} - planid[{sourcePlan.Id.ToString().PadRight(6)}] | {message}".PadLeft(indent));
             if (header) Trace.WriteLine("===============================================================================================".PadLeft(indent));
             Console.ForegroundColor = ConsoleColor.White;
         }
 
+        private string GetLogTags()
+        {
+            return $"{GetLogTag("Plan", _currentPlan, _totalPlans)} {GetLogTag("Suite", __currentSuite, __totalSuites)} {GetLogTag("Cases", _currentTestCases, _totalTestCases)} ";
+        }
+
+        private string GetLogTag(string name, int current, int total)
+        {
+            var currentString = current.ToString();
+            var totalString = total.ToString();
+            return $"{name}[{currentString.PadLeft(totalString.Length)}/{totalString}]";
+        }
+
         private void TraceWriteLine(ITestSuiteBase sourceTestSuite, string message = "", int indent = 0, bool header = false)
         {
-            Console.ForegroundColor = ConsoleColor.Green;
             indent = indent + 5;
             if (header)
             {
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Trace.WriteLine("===============================================================================================".PadLeft(indent));
-                Trace.WriteLine($"==      Plan Title: {sourceTestSuite.Title.PadRight(30)}=============================".PadLeft(indent));
+                Trace.WriteLine($"==      Suite Title: {sourceTestSuite.Title.PadRight(30)}=============================".PadLeft(indent));
                 Trace.WriteLine("===============================================================================================".PadLeft(indent));
             }
-            Trace.WriteLine($"== Plan {_currentPlan.ToString().PadLeft(3)}/{_totalPlans.ToString().PadRight(3)} | Suites: {__currentSuite.ToString().PadLeft(3)}/{__totalSuites.ToString().PadRight(3)} | Cases: {_currentTestCases.ToString().PadLeft(3)}/{_totalTestCases.ToString().PadRight(3)}- suiteid[{sourceTestSuite.Id.ToString().PadRight(6)}] | {message}".PadLeft(indent));
+            Console.ForegroundColor = ConsoleColor.Green;
+            Trace.WriteLine($"== {GetLogTags()} - suiteid[{sourceTestSuite.Id.ToString().PadRight(6)}] | {message}".PadLeft(indent));
             if (header) Trace.WriteLine("===============================================================================================".PadLeft(indent));
             Console.ForegroundColor = ConsoleColor.White;
         }
 
         internal override void InternalExecute()
         {
+            bool filterByCompleted = false;
+
             var stopwatch = Stopwatch.StartNew();
-
-
             ITestPlanCollection sourcePlans = sourceTestStore.GetTestPlans();
-            var targetPlanNames = (from ITestPlan tp in targetTestStore.GetTestPlans() select tp.Name).ToList();
-
-            var toProcess = (from ITestPlan tp in sourcePlans where !targetPlanNames.Contains(tp.Name) select tp).ToList();
+            List<ITestPlan> toProcess;
+            if (filterByCompleted)
+            {
+                var targetPlanNames = (from ITestPlan tp in targetTestStore.GetTestPlans() select tp.Name).ToList();
+                toProcess = (from ITestPlan tp in sourcePlans where !targetPlanNames.Contains(tp.Name) select tp).ToList();
+            } else
+            {
+                toProcess = sourcePlans.ToList();
+            }
 
             Trace.WriteLine(string.Format("Plan to copy {0} Plans?", toProcess.Count()), "TestPlansAndSuites");
             _currentPlan = 0;
