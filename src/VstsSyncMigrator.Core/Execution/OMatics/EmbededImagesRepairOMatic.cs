@@ -1,16 +1,15 @@
 ﻿using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
+using Microsoft.VisualStudio.Services.Client;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using VstsSyncMigrator.Engine.Configuration.Processing;
 
 namespace VstsSyncMigrator.Core.Execution.OMatics
 {
@@ -26,8 +25,8 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
         }
 
         /**
-      *  from https://gist.github.com/pietergheysens/792ed505f09557e77ddfc1b83531e4fb
-      */
+          *  Originally from https://gist.github.com/pietergheysens/792ed505f09557e77ddfc1b83531e4fb
+          */
         public void FixHtmlAttachmentLinks(WorkItem wi, string oldTfsurl, string newTfsurl)
         {
 
@@ -38,6 +37,13 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
             var oldTfsurlOppositeSchema = GetUrlWithOppositeSchema(oldTfsurl);
             string regExSearchForImageUrl = "(?<=<img.*src=\")[^\"]*";
 
+            // It's true crappy code, but t's the only one i've found to work in order to be able to retrieve data while still being authenticated on the source server ...
+            VssClientCredentials credentials = new VssClientCredentials();
+            var witClient = new WorkItemTrackingHttpClient(new Uri(oldTfsurl), credentials);
+            var witClientType = witClient.GetType();
+            var propertyInfo = witClientType.GetProperty("Client", BindingFlags.Instance | BindingFlags.NonPublic);
+            var vssHttpClient = (HttpClient)propertyInfo.GetValue(witClient);
+
             foreach (Field field in wi.Fields)
             {
                 if (field.FieldDefinition.FieldType == FieldType.Html)
@@ -47,7 +53,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                     string regExSearchFileName = "(?<=FileName=)[^=]*";
                     foreach (Match match in matches)
                     {
-                        if (match.Value.ToLower().Contains(oldTfsurl.ToLower()) || match.Value.ToLower().Contains(oldTfsurlOppositeSchema.ToLower()) )
+                        if (match.Value.ToLower().Contains(oldTfsurl.ToLower()) || match.Value.ToLower().Contains(oldTfsurlOppositeSchema.ToLower()))
                         {
                             //save image locally and upload as attachment
                             Match newFileNameMatch = Regex.Match(match.Value, regExSearchFileName, RegexOptions.IgnoreCase);
@@ -56,21 +62,17 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                                 Trace.WriteLine($"field '{field.Name}' has match: {System.Net.WebUtility.HtmlDecode(match.Value)}");
                                 string fullImageFilePath = Path.GetTempPath() + newFileNameMatch.Value;
 
-                                using (var httpClient = new HttpClient(_httpClientHandler, false))
+                                var result = DownloadFile(vssHttpClient, match.Value, fullImageFilePath);
+                                if (!result.IsSuccessStatusCode)
                                 {
-
-                                    var result = DownloadFile(httpClient, match.Value, fullImageFilePath);
-                                    if (!result.IsSuccessStatusCode)
+                                    if (_ignore404Errors && result.StatusCode == HttpStatusCode.NotFound)
                                     {
-                                        if (_ignore404Errors && result.StatusCode == HttpStatusCode.NotFound)
-                                        {
-                                            Trace.WriteLine($"Image {match.Value} could not be found in WorkItem {wi.Id}, Field {field.Name}");
-                                            continue;
-                                        }
-                                        else
-                                        {
-                                            result.EnsureSuccessStatusCode();
-                                        }
+                                        Trace.WriteLine($"Image {match.Value} could not be found in WorkItem {wi.Id}, Field {field.Name}");
+                                        continue;
+                                    }
+                                    else
+                                    {
+                                        result.EnsureSuccessStatusCode();
                                     }
                                 }
 
