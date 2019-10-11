@@ -34,6 +34,7 @@ namespace VstsSyncMigrator.Engine.Configuration
             ec.Processors.Add(new WorkItemPostProcessingConfig() { Enabled = false, QueryBit = "AND [TfsMigrationTool.ReflectedWorkItemId] = '' ", WorkItemIDs = new List<int> { 1, 2, 3 } });
             ec.Processors.Add(new WorkItemDeleteConfig() { Enabled = false });
             ec.Processors.Add(new WorkItemQueryMigrationConfig() { Enabled = false, PrefixProjectToNodes = false });
+            ec.Processors.Add(new TeamMigrationConfig() { Enabled = false, PrefixProjectToNodes = false, EnableTeamSettingsMigration = true });
             return ec;
         }
 
@@ -47,7 +48,22 @@ namespace VstsSyncMigrator.Engine.Configuration
         private static void AddWorkItemMigrationDefault(EngineConfiguration ec)
         {
             ec.Processors.Add(new NodeStructuresMigrationConfig() { Enabled = false, PrefixProjectToNodes = false, BasePaths = new[] { "Product\\Area\\Path1", "Product\\Area\\Path2" } });
-            ec.Processors.Add(new WorkItemMigrationConfig() { Enabled = false, WorkItemCreateRetryLimit = 5, FilterWorkItemsThatAlreadyExistInTarget = true, ReplayRevisions = true, LinkMigration = true, AttachmentMigration = true, FixHtmlAttachmentLinks = false, AttachmentWorkingPath = "c:\\temp\\WorkItemAttachmentWorkingFolder\\", UpdateCreatedBy = true, PrefixProjectToNodes = false, UpdateCreatedDate = true, UpdateSourceReflectedId = true, QueryBit = @"AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')", OrderBit = "[System.ChangedDate] desc" });
+            ec.Processors.Add(new WorkItemMigrationConfig() { 
+                Enabled = false, 
+                WorkItemCreateRetryLimit = 5, 
+                FilterWorkItemsThatAlreadyExistInTarget = true, 
+                ReplayRevisions = true, 
+                LinkMigration = true, 
+                AttachmentMigration = true, 
+                FixHtmlAttachmentLinks = false, 
+                AttachmentWorkingPath = "c:\\temp\\WorkItemAttachmentWorkingFolder\\", 
+                UpdateCreatedBy = true, 
+                PrefixProjectToNodes = false, 
+                UpdateCreatedDate = true, 
+                UpdateSourceReflectedId = true, 
+                QueryBit = @"AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')", 
+                OrderBit = "[System.ChangedDate] desc" 
+            });
         }
 
         private static EngineConfiguration CreateEmptyConfig()
@@ -59,8 +75,7 @@ namespace VstsSyncMigrator.Engine.Configuration
             ec.Target = new TeamProjectConfig() { Name = "DemoProjt", Collection = new Uri("https://dev.azure.com/psd46"), ReflectedWorkItemIDFieldName = "ProcessName.ReflectedWorkItemId" };
             ec.FieldMaps = new List<IFieldMapConfig>();
             ec.WorkItemTypeDefinition = new Dictionary<string, string> {
-                    { "Bug", "Bug" },
-                    { "Product Backlog Item", "Product Backlog Item" }
+                    { "sourceWorkItemTypeName", "targetWorkItemTypeName" }
             };
             ec.Processors = new List<ITfsProcessingConfig>();
             return ec;
