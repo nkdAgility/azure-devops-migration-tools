@@ -259,8 +259,19 @@ namespace VstsSyncMigrator.Engine
             }
             if (_config.ReplayRevisions && targetWorkItem != null)
             {
-                //TODO: Filter for pre-existing revissions so that we can re-run and sync to latest
-                sortedRevisions = new List<RevisionItem>();
+                if (targetWorkItem.Revisions.Count - 1 == sourceWorkItem.Revisions.Count)
+                {
+                    //TODO: Filter for pre-existing revissions so that we can re-run and sync to latest
+                    TraceWriteLine(sourceWorkItem, "Revision count is differnt between target and source (Yes, excluding the target final update)", ConsoleColor.Red);
+                    TraceWriteLine(sourceWorkItem, "Sync currenlty not supported! But its comming...", ConsoleColor.Red);
+                    sortedRevisions = new List<RevisionItem>();
+                }
+                else
+                {
+                    TraceWriteLine(sourceWorkItem, "Revision count is the same between target and source (Yes, excluding the target final update)");
+                    sortedRevisions = new List<RevisionItem>();
+                }
+               
             }
 
             TraceWriteLine(sourceWorkItem, $"Found {sortedRevisions.Count} revisions to migrate on  Work item:{sourceWorkItem.Id}", ConsoleColor.Gray, true);
