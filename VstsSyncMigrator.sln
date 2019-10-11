@@ -56,6 +56,23 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Processors", "Processors", "{E9399C6D-A5E0-43ED-8412-6C4A6BC86EC8}"
+	ProjectSection(SolutionItems) = preProject
+		docs\Processors\FixGitCommitLinksConfig.md = docs\Processors\FixGitCommitLinksConfig.md
+		docs\Processors\ImportProfilePictureConfig.md = docs\Processors\ImportProfilePictureConfig.md
+		docs\Processors\NodeStructuresMigrationConfig.md = docs\Processors\NodeStructuresMigrationConfig.md
+		docs\Processors\TeamMigrationConfig.md = docs\Processors\TeamMigrationConfig.md
+		docs\Processors\TestConfigurationsMigrationConfig.md = docs\Processors\TestConfigurationsMigrationConfig.md
+		docs\Processors\TestPlansAndSuitesMigrationConfig.md = docs\Processors\TestPlansAndSuitesMigrationConfig.md
+		docs\Processors\TestVeriablesMigrationConfig.md = docs\Processors\TestVeriablesMigrationConfig.md
+		docs\Processors\WorkItemDeleteConfig.md = docs\Processors\WorkItemDeleteConfig.md
+		docs\Processors\WorkItemMigrationConfig.md = docs\Processors\WorkItemMigrationConfig.md
+		docs\Processors\WorkItemPostProcessingConfig.md = docs\Processors\WorkItemPostProcessingConfig.md
+		docs\Processors\WorkItemQueryMigrationConfig.md = docs\Processors\WorkItemQueryMigrationConfig.md
+		docs\Processors\WorkItemUpdateAreasAsTagsConfig.md = docs\Processors\WorkItemUpdateAreasAsTagsConfig.md
+		docs\Processors\WorkItemUpdateConfig.md = docs\Processors\WorkItemUpdateConfig.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -91,6 +108,7 @@ Global
 		{4D45177B-5CEA-406F-8C35-2125278BACA0} = {FA574C5F-498D-4C1B-BA57-FC28E534C6B6}
 		{243265E4-0E5A-4E95-BE7C-B92B7666FF79} = {FA574C5F-498D-4C1B-BA57-FC28E534C6B6}
 		{7EE17369-DAA1-4D40-BA15-2E41D418B895} = {2BC0808B-6F4D-4635-82FE-1118181DD64F}
+		{E9399C6D-A5E0-43ED-8412-6C4A6BC86EC8} = {2BC0808B-6F4D-4635-82FE-1118181DD64F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {62EE0B27-C55A-46EE-8D17-1691DE9BBD50}
