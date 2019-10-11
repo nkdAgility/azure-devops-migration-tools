@@ -8,12 +8,20 @@ The Azure DevOps Migration Tools allow you to bulk edit and migrate data between
 
 ## What can you do with this tool?
 
+
 - Migrate Work Items from one Team Project to another Team Project
+- *new v8.3* Sync changes after a migration
 - Merge many Team Projects into a single Team Project
 - Split one Team Project into many Team Projects
 - Assistance in changing Process Templates
 - Bulk edit of Work Items
 - Migration of Test Suits & Test Plans
+
+## Change Log
+
+- v8.3 - Support for restarting the migration and syncing at the revision level.
+- v8.2 - Merge Git commit Fixing into Work Item migration (requires repos to be migrated first, can be rerun)
+- v8.0 - Merge of Work Item, Link, & attachent migrators into one.
 
 ## What versions of Azure DevOps & TFS do you support?
 

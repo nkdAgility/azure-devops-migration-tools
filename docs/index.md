@@ -2,6 +2,7 @@
 
 Azure DevOps Migration Tools allow you to bulk edit data in Microsoft Team Foundation Server (TFS) and Azure DevOps Services. It has many names depending on what you are trying to achieve. You might call it a migration tool, or a bulk update tool, and both are correct. It can be used to:
 
+
  - Migrate data from TFS to TFS
  - Migrate data from TFS to Azure DevOps Services
  - Migrate data from Azure Devops Services to TFS
@@ -9,6 +10,12 @@ Azure DevOps Migration Tools allow you to bulk edit data in Microsoft Team Found
  - Bulk update in TFS or Azure DevOps Services
 
  This is an advanced tool and is not designed to be used by those not intimatly familure with TFS, Azure DevOps Services, and their API's. It supports all version of TFS & Azure DevOps that can be connected to using https://www.nuget.org/packages/Microsoft.TeamFoundationServer.ExtendedClient 
+
+## Change Log
+
+- v8.3 - Support for restarting the migration and syncing at the revision level.
+- v8.2 - Merge Git commit Fixing into Work Item migration (requires repos to be migrated first, can be rerun)
+- v8.0 - Merge of Work Item, Link, & attachent migrators into one.
 
 ## Getting the Tools
 
@@ -48,6 +55,7 @@ Most of these processors need to be run in order. If you try to migrate work ite
 |AttachementExportMigrationContext | merged | Work Items | obsolite - merged into WorkItemMigrationContext |
 |AttachementImportMigrationContext | merged | Work Items | obsolite - merged into WorkItemMigrationContext |
 |HtmlFieldEmbeddedImageMigrationContext | merged | HTML Fields | obsolite - merged into WorkItemMigrationContext |
+|GitCommitFixContext | merged | Git links | obsolite - merged into WorkItemMigrationContext |
 |WorkItemDelete | ready | Work Items | Bulk delete of work items **WARNING DANGERIOUS** |
 |WorkItemUpdate | ready | Work Items | Bulk update of Work Items based on a query and field mappings |
 |WorkItemQueryMigrationContext | ready | Queries | Migrates shared queries |

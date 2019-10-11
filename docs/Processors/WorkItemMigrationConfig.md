@@ -2,10 +2,18 @@
 
 That is the working horse. This processor migrate all the work items. That should be run after the following pre processors:
 
-* `VstsSyncMigrator.Engine.Configuration.Processing.NodeStructuresMigrationConfig`
-* `VstsSyncMigrator.Engine.Configuration.Processing.TeamMigrationConfig`
+* `NodeStructuresMigrationConfig`
+* `TeamMigrationConfig`
+* `WorkItemQueryMigrationConfig`
  
 It will migrate work items using a tip or replay migrator as well as Attachments, & Links.
+
+## Features
+
+- Migrate Work Items, Links, & Attachments
+- Restart will skip completed work items in Tip, and will filter completed revisions in replay.
+
+##Params
 
 | Parameter name                       | Type    | Description                              | Default Value                            |
 |--------------------------------------|---------|------------------------------------------|------------------------------------------|
