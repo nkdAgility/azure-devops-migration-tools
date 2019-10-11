@@ -187,7 +187,7 @@ namespace VstsSyncMigrator.Engine
                 ///////////////////////////////////////////////////////
                 if (targetWorkItem != null && targetWorkItem.IsDirty)
                 {
-                    targetWorkItem.Save();
+                    SaveWorkItem(targetWorkItem);
                 }
                 if (targetWorkItem != null)
                 {
@@ -350,8 +350,6 @@ namespace VstsSyncMigrator.Engine
                             $"{current} - Invalid: {currentRevisionWorkItem.Id}-{currentRevisionWorkItem.Type.Name}-{f.ReferenceName}-{sourceWorkItem.Title} Value: {f.Value}");
                     }
 
-
-
                     targetWorkItem.Save();
                     TraceWriteLine(currentRevisionWorkItem,
                         $" Saved TargetWorkItem {targetWorkItem.Id}. Replayed revision {revision.Number} of {currentRevisionWorkItem.Revisions.Count}");
@@ -372,8 +370,7 @@ namespace VstsSyncMigrator.Engine
                     history.Append(
                         $"This work item was migrated from a different project or organization. You can find the old version at <a href=\"{reflectedUri}\">{reflectedUri}</a>.");
                     targetWorkItem.History = history.ToString();
-                    targetWorkItem.Fields["System.ChangedBy"].Value = "Migration";
-                    targetWorkItem.Save();
+                    SaveWorkItem(targetWorkItem);
 
                     attachmentOMatic.CleanUpAfterSave(targetWorkItem);
                     TraceWriteLine(sourceWorkItem, $"...Saved as {targetWorkItem.Id}");
@@ -382,7 +379,7 @@ namespace VstsSyncMigrator.Engine
                     {
                         sourceWorkItem.Fields[me.Source.Config.ReflectedWorkItemIDFieldName].Value =
                             targetStore.CreateReflectedWorkItemId(targetWorkItem);
-                        sourceWorkItem.Save();
+                        SaveWorkItem(sourceWorkItem);
                         TraceWriteLine(sourceWorkItem, $"...and Source Updated {sourceWorkItem.Id}");
                     }
 
