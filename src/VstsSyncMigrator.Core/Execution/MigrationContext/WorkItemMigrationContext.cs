@@ -169,14 +169,15 @@ namespace VstsSyncMigrator.Engine
                     {
                         TraceWriteLine(sourceWorkItem, "Skipping as work item exists and no revisions to sync detected", ConsoleColor.Yellow);
                         processWorkItemMetrics.Add("Revisions", 0);
-                    } else
+                    }
+                    else
                     {
                         TraceWriteLine(sourceWorkItem, $"Syncing as there are {revisionsToMigrate.Count} revisons detected", ConsoleColor.Yellow);
                         targetWorkItem = ReplayRevisions(revisionsToMigrate, sourceWorkItem, targetWorkItem, destProject, sourceStore, _current, targetStore);
                         AddMetric("Revisions", processWorkItemMetrics, revisionsToMigrate.Count);
                         AddMetric("SyncRev", processWorkItemMetrics, revisionsToMigrate.Count);
                     }
-                                     
+
 
                 }
                 AddParameter("TargetWorkItem", processWorkItemParamiters, targetWorkItem.Revisions.Count.ToString());
@@ -250,28 +251,27 @@ namespace VstsSyncMigrator.Engine
             // maybe, the Revisions collection is not sorted according to the actual Revision number
             List<RevisionItem> sortedRevisions = null;
             sortedRevisions = sourceWorkItem.Revisions.Cast<Revision>()
-                .Select(x => new RevisionItem { Index = x.Index, Number = Convert.ToInt32(x.Fields["System.Rev"].Value) }).ToList();
-            sortedRevisions = sortedRevisions.OrderBy(x => x.Number).ToList();
+                    .Select(x => new RevisionItem
+                    {
+                        Index = x.Index,
+                        Number = Convert.ToInt32(x.Fields["System.Rev"].Value),
+                        ChangedDate = Convert.ToDateTime(x.Fields["System.ChangedDate"].Value)
 
-            if (!_config.ReplayRevisions && targetWorkItem == null)
+
+                    })
+                    .ToList();
+            if (targetWorkItem != null && _config.ReplayRevisions)
             {
-                sortedRevisions.RemoveRange(0, sortedRevisions.Count - 1);
+                // Target exists so remove any Changed Date matches bwtween them
+                var targetChangedDates = (from Revision x in targetWorkItem.Revisions select Convert.ToDateTime(x.Fields["System.ChangedDate"].Value)).ToList();
+                sortedRevisions = sortedRevisions.Where(x => !targetChangedDates.Contains(x.ChangedDate))
+                    .ToList();
             }
-            if (_config.ReplayRevisions && targetWorkItem != null)
+            sortedRevisions = sortedRevisions.OrderBy(x => x.Number).ToList();
+            if (!_config.ReplayRevisions && sortedRevisions.Count > 0)
             {
-                if (targetWorkItem.Revisions.Count - 1 == sourceWorkItem.Revisions.Count)
-                {
-                    //TODO: Filter for pre-existing revissions so that we can re-run and sync to latest
-                    TraceWriteLine(sourceWorkItem, "Revision count is differnt between target and source (Yes, excluding the target final update)", ConsoleColor.Red);
-                    TraceWriteLine(sourceWorkItem, "Sync currenlty not supported! But its comming...", ConsoleColor.Red);
-                    sortedRevisions = new List<RevisionItem>();
-                }
-                else
-                {
-                    TraceWriteLine(sourceWorkItem, "Revision count is the same between target and source (Yes, excluding the target final update)");
-                    sortedRevisions = new List<RevisionItem>();
-                }
-               
+                // Remove all but the latest revision if we are not replaying reviss=ions
+                sortedRevisions.RemoveRange(0, sortedRevisions.Count - 1);
             }
 
             TraceWriteLine(sourceWorkItem, $"Found {sortedRevisions.Count} revisions to migrate on  Work item:{sourceWorkItem.Id}", ConsoleColor.Gray, true);
@@ -279,9 +279,10 @@ namespace VstsSyncMigrator.Engine
         }
 
         private class RevisionItem
-            {
+        {
             public int Index { get; set; }
             public int Number { get; set; }
+            public DateTime ChangedDate { get; internal set; }
         }
 
         private WorkItem ReplayRevisions(List<RevisionItem> revisionsToMigrate, WorkItem sourceWorkItem, WorkItem targetWorkItem, Project destProject, WorkItemStoreContext sourceStore,
@@ -290,7 +291,7 @@ namespace VstsSyncMigrator.Engine
         {
             try
             {
-                
+
                 foreach (var revision in revisionsToMigrate)
                 {
                     var currentRevisionWorkItem = sourceStore.GetRevision(sourceWorkItem, revision.Number);
