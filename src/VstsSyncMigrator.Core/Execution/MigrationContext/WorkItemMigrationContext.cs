@@ -167,11 +167,14 @@ namespace VstsSyncMigrator.Engine
                 {
                     if (revisionsToMigrate.Count == 0)
                     {
-                        TraceWriteLine(sourceWorkItem, "Skipping as Work Item Already Exists");
+                        TraceWriteLine(sourceWorkItem, "Skipping as work item exists and no revisions to sync detected", ConsoleColor.Yellow);
                         processWorkItemMetrics.Add("Revisions", 0);
                     } else
                     {
-                        TraceWriteLine(sourceWorkItem, "MISSING REVISIONS");
+                        TraceWriteLine(sourceWorkItem, $"Syncing as there are {revisionsToMigrate.Count} revisons detected", ConsoleColor.Yellow);
+                        targetWorkItem = ReplayRevisions(revisionsToMigrate, sourceWorkItem, targetWorkItem, destProject, sourceStore, _current, targetStore);
+                        AddMetric("Revisions", processWorkItemMetrics, revisionsToMigrate.Count);
+                        AddMetric("SyncRev", processWorkItemMetrics, revisionsToMigrate.Count);
                     }
                                      
 
@@ -256,11 +259,11 @@ namespace VstsSyncMigrator.Engine
             }
             if (_config.ReplayRevisions && targetWorkItem != null)
             {
-                //TODO: Filter for pre-existing revissions
+                //TODO: Filter for pre-existing revissions so that we can re-run and sync to latest
                 sortedRevisions = new List<RevisionItem>();
             }
 
-            TraceWriteLine(sourceWorkItem, $"Replaying  {sortedRevisions.Count} | Work item:{sourceWorkItem.Id}", true);
+            TraceWriteLine(sourceWorkItem, $"Found {sortedRevisions.Count} revisions to migrate on  Work item:{sourceWorkItem.Id}", ConsoleColor.Gray, true);
             return sortedRevisions;
         }
 
@@ -280,7 +283,7 @@ namespace VstsSyncMigrator.Engine
                 foreach (var revision in revisionsToMigrate)
                 {
                     var currentRevisionWorkItem = sourceStore.GetRevision(sourceWorkItem, revision.Number);
-
+                    TraceWriteLine(currentRevisionWorkItem, $" Processing Revision[{revision.Number}");
                     // Decide on WIT
                     string destType = currentRevisionWorkItem.Type.Name;
                     if (me.WorkItemTypeDefinitions.ContainsKey(destType))
@@ -291,8 +294,6 @@ namespace VstsSyncMigrator.Engine
                     //If work item hasn't been created yet, create a shell
                     if (targetWorkItem == null)
                     {
-                        //TODO: If we want to update an exiting work item with more revissions then we need to do that here.
-                        // instead of Createing a new work item we need to load the existing work item.
                         targetWorkItem = CreateWorkItem_Shell(destProject, currentRevisionWorkItem, destType);
                     }
                     //If the work item already exists and its type has changed, update its type. Done this way because there doesn't appear to be a way to do this through the store.
@@ -333,15 +334,15 @@ namespace VstsSyncMigrator.Engine
 
                     foreach (Field f in fails)
                     {
-                        TraceWriteLine(sourceWorkItem,
+                        TraceWriteLine(currentRevisionWorkItem,
                             $"{current} - Invalid: {currentRevisionWorkItem.Id}-{currentRevisionWorkItem.Type.Name}-{f.ReferenceName}-{sourceWorkItem.Title} Value: {f.Value}");
                     }
 
 
 
                     targetWorkItem.Save();
-                    TraceWriteLine(sourceWorkItem,
-                        $" Saved TargetWorkItem {targetWorkItem.Id}. Replayed revision {revision.Number} of {sourceWorkItem.Revisions.Count}");
+                    TraceWriteLine(currentRevisionWorkItem,
+                        $" Saved TargetWorkItem {targetWorkItem.Id}. Replayed revision {revision.Number} of {currentRevisionWorkItem.Revisions.Count}");
 
                 }
 
@@ -452,18 +453,18 @@ namespace VstsSyncMigrator.Engine
             //    $"FieldMapOnNewWorkItem: {newWorkItemstartTime} - {fieldMappingTimer.Elapsed.ToString("c")}", Name);
         }
 
-        private void TraceWriteLine(WorkItem sourceWorkItem, string message = "", bool header = false)
+        private void TraceWriteLine(WorkItem sourceWorkItem, string message = "", ConsoleColor colour = ConsoleColor.Green, bool header = false)
         {
             if (header)
             {
-                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.ForegroundColor = ConsoleColor.Gray;
                 Trace.WriteLine("===============================================================================================");
             }
-            Console.ForegroundColor = ConsoleColor.Green;
+            Console.ForegroundColor = colour;
             Trace.WriteLine($"{TraceWriteLineTags(sourceWorkItem)} | {message}");
             if (header)
             {
-                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.ForegroundColor = ConsoleColor.Gray;
                 Trace.WriteLine("===============================================================================================");
             }
             Console.ForegroundColor = ConsoleColor.White;
@@ -474,8 +475,9 @@ namespace VstsSyncMigrator.Engine
             string totalWorkItems = _totalWorkItem.ToString();
             string currentWorkITem = _current.ToString();
             string sourceWorkItemId = sourceWorkItem.Id.ToString();
+            string sourceRevisionInt = sourceWorkItem.Revision.ToString();
             string targetWorkItemId = "null";
-            return $"[{sourceWorkItem.Type.Name.PadLeft(20)}][Complete:{currentWorkITem.PadLeft(totalWorkItems.Length)}/{totalWorkItems}][sid:{sourceWorkItemId.PadRight(6)}][tid:{targetWorkItemId.PadRight(6)}";
+            return $"[{sourceWorkItem.Type.Name.PadLeft(20)}][Complete:{currentWorkITem.PadLeft(totalWorkItems.Length)}/{totalWorkItems}][sid:{sourceWorkItemId.PadRight(6)}|Rev:{sourceRevisionInt.PadRight(3)}][tid:{targetWorkItemId.PadRight(6)}";
         }
 
         private List<WorkItem> FilterWorkItemsThatAlreadyExistInTarget(List<WorkItem> sourceWorkItems, WorkItemStoreContext targetStore)
