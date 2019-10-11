@@ -69,10 +69,13 @@ namespace VstsSyncMigrator.Engine
             {
                 gitRepoMapping = config.GitRepoMapping;
             }
-            foreach (string key in config.WorkItemTypeDefinition.Keys)
-            {
-                Trace.WriteLine(string.Format("Adding Work Item Type {0}", key), "MigrationEngine");
-                this.AddWorkItemTypeDefinition(key, new DiscreteWitMapper(config.WorkItemTypeDefinition[key]));
+            if (config.WorkItemTypeDefinition != null)
+            { 
+                foreach (string key in config.WorkItemTypeDefinition.Keys)
+                {
+                    Trace.WriteLine(string.Format("Adding Work Item Type {0}", key), "MigrationEngine");
+                    this.AddWorkItemTypeDefinition(key, new DiscreteWitMapper(config.WorkItemTypeDefinition[key]));
+                }
             }
             var enabledProcessors = config.Processors.Where(x => x.Enabled).ToList();
             foreach (ITfsProcessingConfig processorConfig in enabledProcessors)

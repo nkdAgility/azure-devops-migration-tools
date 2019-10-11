@@ -31,7 +31,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
         public void FixHtmlAttachmentLinks(WorkItem wi, string oldTfsurl, string newTfsurl)
         {
 
-            Trace.WriteLine($"Searching for urls: {oldTfsurl} and {GetUrlWithOppositeSchema(oldTfsurl)}");
+            Debug.WriteLine($"Searching for urls: {oldTfsurl} and {GetUrlWithOppositeSchema(oldTfsurl)}");
             bool wiUpdated = false;
             bool hasCandidates = false;
 
