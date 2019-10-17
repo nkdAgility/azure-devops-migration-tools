@@ -13,6 +13,11 @@ In order to run the migration you will need to install the tools first.
 
 The tools are now installed and calling "vstssyncmigrator" from any command line will run the tools or it will not and you will need to switch to `c:\tools\vstssyncmigrator\` and run `migrate.exe`.
 
+## Server configuration and setup
+
+Follow the [setup instructions](./server-configuration.md) to make sure that you can run the tool against your enviroments.
+
+
 ## Create a default configuration file
 
 1. Open a command prompt or PowerShell window at `c:\tools\vstssyncmigrator\`
