@@ -3,29 +3,30 @@
 The Azure DevOps Migration Tools allow you to bulk edit and migrate data between Team Projects on both Microsoft Team Foundation Server (TFS) and Azure DevOps Services. Take a look at the  [documentation](http://nkdagility.github.io/azure-devops-migration-tools/) to find out how. This project is published as [code on GitHub](https://github.com/nkdAgility/azure-devops-migration-tools/) as well as a [Azure DevOps Migration Tools on Chocolatey](https://chocolatey.org/packages/vsts-sync-migrator/).
 
 **WARNING: This tool is not designed for a novice. This tool was developed to support the senarios below, and the edge cases that have been encountered by the 30+ contributers from around the Azure DevOps community. You should be comfortable with the TFS/Azure DevOps object model, as well as debugging code in Visual Studio.**
-**Both paied and community support is avilable throug our [recommneded consultants](http://nkdagility.github.io/azure-devops-migration-tools/#support) as well as our contributors and many DevOps consultants around the world.**
+
+_NOTICE: Both paied and community support is avilable throug our [recommneded consultants](http://nkdagility.github.io/azure-devops-migration-tools/#support) as well as our contributors and many DevOps consultants around the world._
 
 ## Quick Links
 
- - [Video Overview](https://youtu.be/ZxDktQae10M)
- - [Getting Started](./getting-started.md)
- - [Documentation](http://nkdagility.github.io/azure-devops-migration-tools/)
- - [Contributing](#contributing)
- - [Why](#why-does-this-exist)
- - [FAQ](./faq.md)
- - [Support](#support)
+ * [Video Overview](https://youtu.be/ZxDktQae10M)
+ * [Getting Started](./getting-started.md)
+ * [Documentation](http://nkdagility.github.io/azure-devops-migration-tools/)
+ * [Contributing](#contributing)
+ * [Why](#why-does-this-exist)
+ * [FAQ](./faq.md)
+ * [Support](#support)
 
 ### External Walkthroughs and Reviews
 
-  - [TFS 2017 Migration To VSTS with VSTS Sync Migrator from Mohamed Radwan](http://mohamedradwan.com/2017/09/15/tfs-2017-migration-to-vsts-with-vsts-sync-migrator/)
-  - [Options migrating TFS to VSTS from Richard Fennell](https://blogs.blackmarble.co.uk/blogs/rfennell/post/2017/05/10/Options-migrating-TFS-to-VSTS)
+ * [TFS 2017 Migration To VSTS with VSTS Sync Migrator from Mohamed Radwan](http://mohamedradwan.com/2017/09/15/tfs-2017-migration-to-vsts-with-vsts-sync-migrator/)
+ * [Options migrating TFS to VSTS from Richard Fennell](https://blogs.blackmarble.co.uk/blogs/rfennell/post/2017/05/10/Options-migrating-TFS-to-VSTS)
 
 ## Getting the Tools
 
 There are two ways to get these tools:
 
-- (recommended)[Install from Chocolatey](https://chocolatey.org/packages/vsts-sync-migrator/)
-- Download the [latest release from GitHub](https://github.com/nkdAgility/azure-devops-migration-tools/releases) and unzip
+* (recommended)[Install from Chocolatey](https://chocolatey.org/packages/vsts-sync-migrator/)
+* Download the [latest release from GitHub](https://github.com/nkdAgility/azure-devops-migration-tools/releases) and unzip
 
 ## The Technical Details
 
@@ -41,24 +42,24 @@ There are two ways to get these tools:
 
 ## What can you do with this tool?
 
-- Migrate Work Items from one Team Project to another Team Project
-- *new v8.3* Sync changes after a migration
-- Merge many Team Projects into a single Team Project
-- Split one Team Project into many Team Projects
-- Assistance in changing Process Templates
-- Bulk edit of Work Items
-- Migration of Test Suits & Test Plans
+* Migrate Work Items from one Team Project to another Team Project
+* *new v8.3* Sync changes after a migration
+* Merge many Team Projects into a single Team Project
+* Split one Team Project into many Team Projects
+* Assistance in changing Process Templates
+* Bulk edit of Work Items
+* Migration of Test Suits & Test Plans
 
 ## Change Log
 
-- v8.3 - Support for restarting the migration and syncing at the revision level.
-- v8.2 - Merge Git commit Fixing into Work Item migration (requires repos to be migrated first, can be rerun)
-- v8.0 - Merge of Work Item, Link, & attachent migrators into one.
+* v8.3 - Support for restarting the migration and syncing at the revision level.
+* v8.2 - Merge Git commit Fixing into Work Item migration (requires repos to be migrated first, can be rerun)
+* v8.0 - Merge of Work Item, Link, & attachent migrators into one.
 
 ## What versions of Azure DevOps & TFS do you support?
 
-- Work Item Migration Supports all versions of TFS 2013+ and all versions of Azure DevOps
-- Process Template migration only supports XML based Projects
+* Work Item Migration Supports all versions of TFS 2013+ and all versions of Azure DevOps
+* Process Template migration only supports XML based Projects
 
 **NOTE: If you are able to migrate your entire Collection to Azure DevOps Services you should use [Azure DevOps Migration Service](https://www.visualstudio.com/team-services/migrate-tfs-vsts/) from Microsoft. If you have a requirement to change Process Template then you will need to do that before you move to Azure DevOps Services.**
 
@@ -108,15 +109,15 @@ By default, when you are moving from source to target the system will map all of
 
 However sometimes you want to move data to another field, or use a regex to parse out just the bits that you want. To help we have built a number of mapping tools that should give you the versatility you need.
 
-- **FieldtoFieldMap** - Just want to map one field to another? This is the one for you.
-- **FieldtoFieldMultiMap** - Allows you to create a list of one to one field maps.
-- **FieldMergeMap** - Ever wanted to merge two fields? This mapping will let you do just that.
-- **FieldBlankMap** - Allows you to set an already populated field to empty
-- **FieldtoTagMap** - Want to take a field and convert its value to a tag? Done...
-- **FieldValueMap** - Need to map not just the field but also values? This is the default value mapper.
-- **FieldValuetoTagMap** - Need to create a Tag based on a field value? Just create a regex match and choose how to populate the target.
-- **RegexFieldMap** - I just need that bit of a field... need to send "2016.2" to two fields, one for year and one for release? Done.
-- **TreeToTagMap** - Need to clear out those nasty Area tree hierarchies? This creates Tags for each node in the Area Path...
+* **FieldtoFieldMap** - Just want to map one field to another? This is the one for you.
+* **FieldtoFieldMultiMap** - Allows you to create a list of one to one field maps.
+* **FieldMergeMap** - Ever wanted to merge two fields? This mapping will let you do just that.
+* **FieldBlankMap** - Allows you to set an already populated field to empty
+* **FieldtoTagMap** - Want to take a field and convert its value to a tag? Done...
+* **FieldValueMap** - Need to map not just the field but also values? This is the default value mapper.
+* **FieldValuetoTagMap** - Need to create a Tag based on a field value? Just create a regex match and choose how to populate the target.
+* **RegexFieldMap** - I just need that bit of a field... need to send "2016.2" to two fields, one for year and one for release? Done.
+* **TreeToTagMap** - Need to clear out those nasty Area tree hierarchies? This creates Tags for each node in the Area Path...
 
 ##### Code (TFVC)
 
@@ -126,7 +127,7 @@ There are no good tools for migrating TFVC code. All of them suffer from "time-d
 
 When moving Git repos between Projects and Accounts you are able to maintain full history. However you will need to have all of the links to 
 
-- **FixGitCommitLinks** - (obsolite) [this is now fixed on the fly if git is migrated first) Allows you to fix the migrated Git commit hooks (and thus external links) to point to the new repository in the target project. If the source and target repository names are the same, this will work out of the box. If the target repository has a different name, you can specify that name via the "TargetRepository" property.
+* **FixGitCommitLinks** - (obsolite) [this is now fixed on the fly if git is migrated first) Allows you to fix the migrated Git commit hooks (and thus external links) to point to the new repository in the target project. If the source and target repository names are the same, this will work out of the box. If the target repository has a different name, you can specify that name via the "TargetRepository" property.
 
 ##### Build & Releases
 
@@ -137,12 +138,12 @@ The main migration tool for TFS has always been the TFS Integration Tools which 
 
 It solves:
 
- - Supports all currenlty supported version of TFS
- - Supports Azure DevOps Services
- - Migrates work items from one instace of TFS or Azure DevOps to another
- - Bulk edits fields in place for both TFS and Azure Devops Services
- - Being able to migrate Test Plans an Suits from one Team Project to another
- - Being able to migrate Teams from one Team Project to another
+ * Supports all currenlty supported version of TFS
+ * Supports Azure DevOps Services 
+ *  Migrates work items from one instace of TFS or Azure DevOps to another
+ * Bulk edits fields in place for both TFS and Azure Devops Services
+ * Being able to migrate Test Plans an Suits from one Team Project to another
+ * Being able to migrate Teams from one Team Project to another
 
 ## Contributing
 
@@ -157,8 +158,8 @@ If you want to sync your GitHub repository then check out [Open-source with VSTS
 
 You can get free support from the community here and on social media on a best effots basis if folks are available. If you are looking for paied support there are a number of consultants that contibute to this project and that are experts in this type of work:
 
-- **Martin Hinshelwood, naked Agility Ltd** - The founder of the Azure DevOps Migration Tools is available worldwide to help organisations plan and enact their migration efforts. You can contact him through [naked Agility Ltd.](https://nkdagility.com).
-- __others comming soon__
+* **Martin Hinshelwood, naked Agility Ltd** - @MrHinsh is the founder of the Azure DevOps Migration Tools is available worldwide to help organisations plan and enact their migration efforts. You can contact him through [naked Agility Ltd.](https://nkdagility.com).
+* _others comming soon_
 
 ## FAQ
 
