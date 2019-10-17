@@ -5,29 +5,6 @@ The Azure DevOps Migration Tools allow you to bulk edit and migrate data between
 **WARNING: This tool is not designed for a novice. This tool was developed to support the senarios below, and the edge cases that have been encountered by the 30+ contributers from around the Azure DevOps community. You should be comfortable with the TFS/Azure DevOps object model, as well as debugging code in Visual Studio.**
 **Both paied and community support is avilable throug our [recommneded consultants](http://nkdagility.github.io/azure-devops-migration-tools/#support) as well as our contributors and many DevOps consultants around the world.**
 
-## What can you do with this tool?
-
-- Migrate Work Items from one Team Project to another Team Project
-- *new v8.3* Sync changes after a migration
-- Merge many Team Projects into a single Team Project
-- Split one Team Project into many Team Projects
-- Assistance in changing Process Templates
-- Bulk edit of Work Items
-- Migration of Test Suits & Test Plans
-
-## Change Log
-
-- v8.3 - Support for restarting the migration and syncing at the revision level.
-- v8.2 - Merge Git commit Fixing into Work Item migration (requires repos to be migrated first, can be rerun)
-- v8.0 - Merge of Work Item, Link, & attachent migrators into one.
-
-## What versions of Azure DevOps & TFS do you support?
-
-- Work Item Migration Supports all versions of TFS 2013+ and all versions of Azure DevOps
-- Process Template migration only supports XML based Projects
-
-**NOTE: If you are able to migrate your entire Collection to Azure DevOps Services you should use [Azure DevOps Migration Service](https://www.visualstudio.com/team-services/migrate-tfs-vsts/) from Microsoft. If you have a requirement to change Process Template then you will need to do that before you move to Azure DevOps Services.**
-
 ## Quick Links
 
  - [Video Overview](https://youtu.be/ZxDktQae10M)
@@ -62,10 +39,34 @@ There are two ways to get these tools:
 | Release |[![GitHub release](https://img.shields.io/github/release/nkdAgility/vsts-sync-migration.svg)](https://github.com/nkdAgility/vsts-sync-migrator/releases)|
 | Chocolatey |[![Chocolatey](https://img.shields.io/chocolatey/v/vsts-sync-migrator.svg)](https://chocolatey.org/packages/vsts-sync-migrator/)|
 
+## What can you do with this tool?
+
+- Migrate Work Items from one Team Project to another Team Project
+- *new v8.3* Sync changes after a migration
+- Merge many Team Projects into a single Team Project
+- Split one Team Project into many Team Projects
+- Assistance in changing Process Templates
+- Bulk edit of Work Items
+- Migration of Test Suits & Test Plans
+
+## Change Log
+
+- v8.3 - Support for restarting the migration and syncing at the revision level.
+- v8.2 - Merge Git commit Fixing into Work Item migration (requires repos to be migrated first, can be rerun)
+- v8.0 - Merge of Work Item, Link, & attachent migrators into one.
+
+## What versions of Azure DevOps & TFS do you support?
+
+- Work Item Migration Supports all versions of TFS 2013+ and all versions of Azure DevOps
+- Process Template migration only supports XML based Projects
+
+**NOTE: If you are able to migrate your entire Collection to Azure DevOps Services you should use [Azure DevOps Migration Service](https://www.visualstudio.com/team-services/migrate-tfs-vsts/) from Microsoft. If you have a requirement to change Process Template then you will need to do that before you move to Azure DevOps Services.**
+
 ## Overview
 
 These tools are build by naked Agility Limited's DevOps & Agility consultants to do real world migrations on a daily basis. We always work in [Azure Devops Services](http://dev.azure.com) on https://dev.azure.com/nkdagility/migration-tools/ with code in GitHub and publish as a chocolatey package that pulls from GitGub Releases.
 
+|-------------:|:-------------|
 | Team Work Items | [Azure Boards](https://dev.azure.com/nkdagility/migration-tools/) |
 | Public Issues | [GitHub Issues](https://github.com/nkdAgility/azure-devops-migration-tools/) |
 | Builds & Releases | [Azure Pipelines](https://dev.azure.com/nkdagility/migration-tools/) |
