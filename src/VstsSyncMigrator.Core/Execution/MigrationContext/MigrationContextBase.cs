@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
@@ -26,7 +27,7 @@ namespace VstsSyncMigrator.Engine
             Telemetry.Current.TrackPageView(this.Name);
             Trace.TraceInformation(" Migration Context Start {0} ", Name);
             DateTime start = DateTime.Now;
-			var executeTimer = Stopwatch.StartNew();
+            var executeTimer = Stopwatch.StartNew();
             //////////////////////////////////////////////////
             try
             {
@@ -59,7 +60,7 @@ namespace VstsSyncMigrator.Engine
             }
             finally
             {
-                Telemetry.Current.TrackRequest(this.Name, start, executeTimer.Elapsed, Status.ToString(), (Status== ProcessingStatus.Complete));
+                Telemetry.Current.TrackRequest(this.Name, start, executeTimer.Elapsed, Status.ToString(), (Status == ProcessingStatus.Complete));
             }
 
         }
@@ -77,6 +78,12 @@ namespace VstsSyncMigrator.Engine
 
             //// Output = [targetTeamProject]\[sourceTeamProject]\[AreaPath]
             //return r.Replace(input, target.Name, 1);
+        }
+
+        internal static void SaveWorkItem(WorkItem workItem)
+        {
+            workItem.Fields["System.ChangedBy"].Value = "Migration";
+            workItem.Save();
         }
 
         internal string ReplaceFirstInstanceOf(string input)

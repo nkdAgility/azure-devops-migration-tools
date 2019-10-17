@@ -136,7 +136,9 @@ namespace VstsSyncMigrator.Engine
                 _currentPlan++;
                 if (CanSkipElementBecauseOfTags(sourcePlan.Id))
                     continue;
+
                 ProcessTestPlan( sourcePlan);
+               
             }
             _currentPlan = 0;
             _totalPlans = 0;
@@ -157,6 +159,10 @@ namespace VstsSyncMigrator.Engine
                 : $"{sourcePlan.Name}";
             TraceWriteLine(sourcePlan, $"Process Plan {newPlanName}", 0, true);
             var targetPlan = FindTestPlan(targetTestStore, newPlanName);
+            if (TargetPlanContansTag(targetPlan.Id))
+            {
+                return;
+            }
             if (targetPlan == null)
             {
                 TraceWriteLine(sourcePlan, $" Creating Plan {newPlanName}", 5);
@@ -204,6 +210,8 @@ namespace VstsSyncMigrator.Engine
             TraceWriteLine(sourcePlan, $"ApplyConfigurationsAndAssignTesters {targetPlan.Name}", 5); ;
             ITestPlan targetPlan2 = FindTestPlan(targetTestStore, targetPlan.Name);
             ApplyConfigurationsAndAssignTesters(sourcePlan.RootSuite, targetPlan2.RootSuite);
+            //////////////////////////////
+          TagCompletedTargetPlan(targetPlan.Id);
             ///////////////////////////////////////////////
             metrics.Add("ElapsedMS", stopwatch.ElapsedMilliseconds);
             Telemetry.Current.TrackEvent("MigrateTestPlan", parameters, metrics);
@@ -285,6 +293,20 @@ namespace VstsSyncMigrator.Engine
             me.ApplyFieldMappings(sourceWI, targetWI);
             targetWI.Save();
         }
+
+        private void TagCompletedTargetPlan(int workItemId)
+        {
+            var targetPlanWorkItem = targetWitStore.Store.GetWorkItem(workItemId);
+            targetPlanWorkItem.Tags = targetPlanWorkItem.Tags + ";migrated";
+            SaveWorkItem(targetPlanWorkItem);
+        }
+
+        private bool TargetPlanContansTag(int workItemId)
+        {
+            var targetPlanWorkItem = targetWitStore.Store.GetWorkItem(workItemId);
+            return targetPlanWorkItem.Tags.Contains("migrated");
+        }
+
 
         private bool CanSkipElementBecauseOfTags(int workItemId)
         {
