@@ -1,15 +1,21 @@
-# Azure DevOps Migration Tools Docs 
+# Azure DevOps Migration Tools [![Chocolatey](https://img.shields.io/chocolatey/dt/vsts-sync-migrator.svg)](https://chocolatey.org/packages/vsts-sync-migrator/) [![GitHub release](https://img.shields.io/github/release/nkdAgility/vsts-sync-migration.svg)](https://github.com/nkdAgility/vsts-sync-migrator/releases) ![Build on VSTS](https://nkdagility.visualstudio.com/_apis/public/build/definitions/1b52ce63-eccc-41c8-88f9-ae6ebeefdc63/94/badge) 
 
-Azure DevOps Migration Tools allow you to bulk edit data in Microsoft Team Foundation Server (TFS) and Azure DevOps Services. It has many names depending on what you are trying to achieve. You might call it a migration tool, or a bulk update tool, and both are correct. It can be used to:
+The Azure DevOps Migration Tools allow you to bulk edit and migrate data between Team Projects on both Microsoft Team Foundation Server (TFS) and Azure DevOps Services. Take a look at the  [documentation](http://nkdagility.github.io/azure-devops-migration-tools/) to find out how. This project is published as [code on GitHub](https://github.com/nkdAgility/azure-devops-migration-tools/) as well as a [Azure DevOps Migration Tools on Chocolatey](https://chocolatey.org/packages/vsts-sync-migrator/).
+
+![alt text](https://raw.githubusercontent.com/nkdAgility/azure-devops-migration-tools/master/src/VstsSyncMigrator.Extension/images/azure-devops-migration-tools-naked-agility-martin-hinshelwood.png)
+
+**WARNING: This tool is not designed for a novice. This tool was developed to support the senarios below, and the edge cases that have been encountered by the 30+ contributers from around the Azure DevOps community. You should be comfortable with the TFS/Azure DevOps object model, as well as debugging code in Visual Studio.**
+
+## What can you do with this tool?
 
 
- - Migrate data from TFS to TFS
- - Migrate data from TFS to Azure DevOps Services
- - Migrate data from Azure Devops Services to TFS
- - Migrate data from Azure DevOps to Azure DevOps
- - Bulk update in TFS or Azure DevOps Services
-
- This is an advanced tool and is not designed to be used by those not intimatly familure with TFS, Azure DevOps Services, and their API's. It supports all version of TFS & Azure DevOps that can be connected to using https://www.nuget.org/packages/Microsoft.TeamFoundationServer.ExtendedClient 
+- Migrate Work Items from one Team Project to another Team Project
+- *new v8.3* Sync changes after a migration
+- Merge many Team Projects into a single Team Project
+- Split one Team Project into many Team Projects
+- Assistance in changing Process Templates
+- Bulk edit of Work Items
+- Migration of Test Suits & Test Plans
 
 ## Change Log
 
@@ -17,12 +23,46 @@ Azure DevOps Migration Tools allow you to bulk edit data in Microsoft Team Found
 - v8.2 - Merge Git commit Fixing into Work Item migration (requires repos to be migrated first, can be rerun)
 - v8.0 - Merge of Work Item, Link, & attachent migrators into one.
 
+## What versions of Azure DevOps & TFS do you support?
+
+- Work Item Migration Supports all versions of TFS 2013+ and all versions of Azure DevOps
+- Process Template migration only supports XML based Projects
+
+**NOTE: If you are able to migrate your entire Collection to Azure DevOps Services you should use [Azure DevOps Migration Service](https://www.visualstudio.com/team-services/migrate-tfs-vsts/) from Microsoft. If you have a requirement to change Process Template then you will need to do that before you move to Azure DevOps Services.**
+
+## Quick Links
+
+ - [Video Overview](https://youtu.be/ZxDktQae10M)
+ - [Getting Started](./getting-started.md)
+ - [Documentation](http://nkdagility.github.io/azure-devops-migration-tools/)
+ - [Contributing](#contributing)
+ - [Why](#why-does-this-exist)
+ - [FAQ](./faq.md)
+ - [Support](#support)
+
+### External Walkthroughs and Reviews
+
+  - [TFS 2017 Migration To VSTS with VSTS Sync Migrator from Mohamed Radwan](http://mohamedradwan.com/2017/09/15/tfs-2017-migration-to-vsts-with-vsts-sync-migrator/)
+  - [Options migrating TFS to VSTS from Richard Fennell](https://blogs.blackmarble.co.uk/blogs/rfennell/post/2017/05/10/Options-migrating-TFS-to-VSTS)
+
 ## Getting the Tools
 
-The most effective way to get a copy of the tools is to use Chocolatey to install them:
+There are two ways to get these tools:
 
-- [Install from Chocolatey](https://chocolatey.org/packages/vsts-sync-migrator/) **(recommended)**
-- Manually download the [latest release from GitHub](https://github.com/nkdAgility/azure-devops-migration-tools/releases) and unzip
+- (recommended)[Install from Chocolatey](https://chocolatey.org/packages/vsts-sync-migrator/)
+- Download the [latest release from GitHub](https://github.com/nkdAgility/azure-devops-migration-tools/releases) and unzip
+
+## The Technical Details
+
+|-| Technical Overview |
+|-------------:|:-------------|
+| Azure Pipeline | ![Build on VSTS](https://nkdagility.visualstudio.com/_apis/public/build/definitions/1b52ce63-eccc-41c8-88f9-ae6ebeefdc63/94/badge) |
+| Coverage | [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=vsts-sync-migrator%3Amaster&metric=coverage)](https://sonarcloud.io/dashboard?id=vsts-sync-migrator%3Amaster) |
+| Maintainability | [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=vsts-sync-migrator%3Amaster&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=vsts-sync-migrator%3Amaster) |
+| Security Rating | [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=vsts-sync-migrator%3Amaster&metric=security_rating)](https://sonarcloud.io/dashboard?id=vsts-sync-migrator%3Amaster) |
+| Vulnerabilities | [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=vsts-sync-migrator%3Amaster&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=vsts-sync-migrator%3Amaster) |
+| Release |[![GitHub release](https://img.shields.io/github/release/nkdAgility/vsts-sync-migration.svg)](https://github.com/nkdAgility/vsts-sync-migrator/releases)|
+| Chocolatey |[![Chocolatey](https://img.shields.io/chocolatey/v/vsts-sync-migrator.svg)](https://chocolatey.org/packages/vsts-sync-migrator/)|
 
 ## Overview
 
@@ -32,13 +72,9 @@ These tools are build by naked Agility Limited's DevOps & Agility consultants to
 | Public Issues | [GitHub Issues](https://github.com/nkdAgility/azure-devops-migration-tools/) |
 | Builds & Releases | [Azure Pipelines](https://dev.azure.com/nkdagility/migration-tools/) |
 | Releases Output | [Github Releases](https://github.com/nkdAgility/azure-devops-migration-tools/releases) |
+| Documentation | [Github Pages](http://nkdagility.github.io/azure-devops-migration-tools/) |
 
 **Watch the [Video Overview](https://youtu.be/ZxDktQae10M) to get you started in 30 minutes. This tool is complicated and its not always easy to discover what you need to do.**
-
-### Main Purpose
-
-- **Bulk Update** - You can bulk update work items and apply processing rules against your server or account. Use the `WorkItemUpdate` class that takes only a target Team Project. The team does a lot of Process Template migrations and we need these tools to fix the data after the migration.
-- **Migration** - You can migrate work items, area & iterations, & test data from one Team Project to another. Use the `WorkItemMigrationContext` class that takes both a Source and a Target Team Project
 
 ### Processors
 
@@ -91,11 +127,23 @@ There are no good tools for migrating TFVC code. All of them suffer from "time-d
 
 When moving Git repos between Projects and Accounts you are able to maintain full history. However you will need to have all of the links to 
 
-- **FixGitCommitLinks** - Allows you to fix the migrated Git commit hooks (and thus external links) to point to the new repository in the target project. If the source and target repository names are the same, this will work out of the box. If the target repository has a different name, you can specify that name via the "TargetRepository" property.
+- **FixGitCommitLinks** - (obsolite) [this is now fixed on the fly if git is migrated first) Allows you to fix the migrated Git commit hooks (and thus external links) to point to the new repository in the target project. If the source and target repository names are the same, this will work out of the box. If the target repository has a different name, you can specify that name via the "TargetRepository" property.
 
 ##### Build & Releases
 
 When you import a build or release defenition into VSTS you need to fill out some of the data to allow that new definition to be saved. Things like connections and other require fields usually dont have matching GUIDS and need manual intervention. For builds & Releases we recommend that you use the built in Export/Import tools provided in the UI to move then to a new Team Project.
+
+## Why does this exist
+The main migration tool for TFS has always been the TFS Integration Tools which is sadly no longer supported. Indeed it only loosely supported versions of TFS after 2010 and had a lot of bugs. It was very difficult to configure and run. This tool hopes to solve some of that by providing support for TFS 2015 and Visual Studio Team Services (VSTS).
+
+It solves:
+
+ - Supports all currenlty supported version of TFS
+ - Supports Azure DevOps Services
+ - Migrates work items from one instace of TFS or Azure DevOps to another
+ - Bulk edits fields in place for both TFS and Azure Devops Services
+ - Being able to migrate Test Plans an Suits from one Team Project to another
+ - Being able to migrate Teams from one Team Project to another
 
 ## Contributing
 
@@ -106,12 +154,19 @@ This project is primarily managed and maintained on Visual Studio Team Services 
 If you want to sync your GitHub repository then check out [Open-source with VSTS or TFS and Github for better DevOps
 ](https://nkdagility.com/open-source-vsts-tfs-github-better-devops/).
 
+## Support
+
+You can get free support from the community here and on social media on a best effots basis if folks are available. If you are looking for paied support there are a number of consultants that contibute to this project and that are experts in this type of work:
+
+- **Martin Hinshelwood, naked Agility Ltd** - The founder of the Azure DevOps Migration Tools is available worldwide to help organisations plan and enact their migration efforts. You can contact him through [naked Agility Ltd.](https://nkdagility.com).
+- __others comming soon__
+
 ## FAQ
 
 Check out the [FAQ pages](faq.md)
 
 ## Terms
 
-naked Agility Limited & our contibutors creates and maintains the "VSTS Sync Migration" project under its [terms of business](https://nkdagility.com/company/consulting-terms-of-business/) and allows full access to the source code for customers and the general public. 
+naked Agility Limited & our contibutors creates and maintains the "Azure DevOps Migration Tools" project under its [terms of business](https://nkdagility.com/terms/) and allows full access to the source code for customers and the general public. 
 
 

@@ -1,19 +1,27 @@
 # Azure DevOps Migration Tools [![Chocolatey](https://img.shields.io/chocolatey/dt/vsts-sync-migrator.svg)](https://chocolatey.org/packages/vsts-sync-migrator/) [![GitHub release](https://img.shields.io/github/release/nkdAgility/vsts-sync-migration.svg)](https://github.com/nkdAgility/vsts-sync-migrator/releases) ![Build on VSTS](https://nkdagility.visualstudio.com/_apis/public/build/definitions/1b52ce63-eccc-41c8-88f9-ae6ebeefdc63/94/badge) 
 
-The Azure DevOps Migration Tools allow you to bulk edit and migrate data between Team Projects on both Microsoft Team Foundation Server (TFS) and Azure DevOps Services. You can find out [why](https://dev.azure.com/nkdagility/migration-tools/_wiki/wikis/docs?pagePath=%2Fwhy) this tooling exists and you can access the [documentation](https://dev.azure.com/nkdagility/migration-tools/_wiki/wikis/docs) to find out how. This project is published as [code on GitHub](https://github.com/nkdAgility/azure-devops-migration-tools/) as well as a [Azure DevOps Migration Tools on Chocolatey](https://chocolatey.org/packages/vsts-sync-migrator/).
+The Azure DevOps Migration Tools allow you to bulk edit and migrate data between Team Projects on both Microsoft Team Foundation Server (TFS) and Azure DevOps Services. Take a look at the  [documentation](http://nkdagility.github.io/azure-devops-migration-tools/) to find out how. This project is published as [code on GitHub](https://github.com/nkdAgility/azure-devops-migration-tools/) as well as a [Azure DevOps Migration Tools on Chocolatey](https://chocolatey.org/packages/vsts-sync-migrator/).
 
 ![alt text](https://raw.githubusercontent.com/nkdAgility/azure-devops-migration-tools/master/src/VstsSyncMigrator.Extension/images/azure-devops-migration-tools-naked-agility-martin-hinshelwood.png)
 
 **WARNING: This tool is not designed for a novice. This tool was developed to support the senarios below, and the edge cases that have been encountered by the 30+ contributers from around the Azure DevOps community. You should be comfortable with the TFS/Azure DevOps object model, as well as debugging code in Visual Studio.**
+**Both paied and community support is avilable throug our [recommneded consultants](http://nkdagility.github.io/azure-devops-migration-tools/#support) as well as our contributors and many DevOps consultants around the world.**
 
 ## What can you do with this tool?
 
-- Migrate Work Items from one Team Project to another Team Project
+
+- Migrate Work Items from one Team Project to another Team Project (*new v8.3*) and Sync changes after a migration
 - Merge many Team Projects into a single Team Project
 - Split one Team Project into many Team Projects
 - Assistance in changing Process Templates
 - Bulk edit of Work Items
 - Migration of Test Suits & Test Plans
+
+## Change Log
+
+- v8.3 - Support for restarting the migration and syncing at the revision level.
+- v8.2 - Merge Git commit Fixing into Work Item migration (requires repos to be migrated first, can be rerun)
+- v8.0 - Merge of Work Item, Link, & attachent migrators into one.
 
 ## What versions of Azure DevOps & TFS do you support?
 
@@ -25,30 +33,14 @@ The Azure DevOps Migration Tools allow you to bulk edit and migrate data between
 ## Quick Links
 
  - [Video Overview](https://youtu.be/ZxDktQae10M)
- - [Getting Started](./docs/getting-started.md)
- - [Documentation](./docs/index.md)
- - [Contributing](./docs/contributing.md)
- - [Why VSTS Bulk Data Editor](./docs/why.md)
- - [Usage](./docs/usage/usage.md)
+ - [Getting Started](http://nkdagility.github.io/azure-devops-migration-tools/getting-started.md)
+ - [Documentation](http://nkdagility.github.io/azure-devops-migration-tools/)
 
-
-### External Walkthroughs and Reviews
-
-  - [TFS 2017 Migration To VSTS with VSTS Sync Migrator from Mohamed Radwan](http://mohamedradwan.com/2017/09/15/tfs-2017-migration-to-vsts-with-vsts-sync-migrator/)
-  - [Options migrating TFS to VSTS from Richard Fennell](https://blogs.blackmarble.co.uk/blogs/rfennell/post/2017/05/10/Options-migrating-TFS-to-VSTS)
-
-## Getting the Tools
-
-There are two ways to use these tools:
-
-- (recommended)[Install from Chocolatey](https://chocolatey.org/packages/vsts-sync-migrator/)
-- Download the [latest release from GitHub](https://github.com/nkdAgility/azure-devops-migration-tools/releases) and unzip
 
 ## The Technical Details
 
 |-| Technical Overview |
 |-------------:|:-------------|
-| Quality Gate | [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=vsts-sync-migrator%3Amaster&metric=alert_status)](https://sonarcloud.io/dashboard?id=vsts-sync-migrator%3Amaster) |
 | Azure Pipeline | ![Build on VSTS](https://nkdagility.visualstudio.com/_apis/public/build/definitions/1b52ce63-eccc-41c8-88f9-ae6ebeefdc63/94/badge) |
 | Coverage | [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=vsts-sync-migrator%3Amaster&metric=coverage)](https://sonarcloud.io/dashboard?id=vsts-sync-migrator%3Amaster) |
 | Maintainability | [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=vsts-sync-migrator%3Amaster&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=vsts-sync-migrator%3Amaster) |

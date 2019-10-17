@@ -37,12 +37,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{2BC0808B-6
 		docs\why.md = docs\why.md
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "usage", "usage", "{7EE17369-DAA1-4D40-BA15-2E41D418B895}"
-	ProjectSection(SolutionItems) = preProject
-		docs\usage\command-line.md = docs\usage\command-line.md
-		docs\usage\usage.md = docs\usage\usage.md
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Engine", "Engine", "{1BC94A7E-4A43-4388-97BE-DCCF62797DA8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Console", "Console", "{FA574C5F-498D-4C1B-BA57-FC28E534C6B6}"
@@ -107,7 +101,6 @@ Global
 		{985259EA-C475-4918-9342-50AB744F52AF} = {FA574C5F-498D-4C1B-BA57-FC28E534C6B6}
 		{4D45177B-5CEA-406F-8C35-2125278BACA0} = {FA574C5F-498D-4C1B-BA57-FC28E534C6B6}
 		{243265E4-0E5A-4E95-BE7C-B92B7666FF79} = {FA574C5F-498D-4C1B-BA57-FC28E534C6B6}
-		{7EE17369-DAA1-4D40-BA15-2E41D418B895} = {2BC0808B-6F4D-4635-82FE-1118181DD64F}
 		{E9399C6D-A5E0-43ED-8412-6C4A6BC86EC8} = {2BC0808B-6F4D-4635-82FE-1118181DD64F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
