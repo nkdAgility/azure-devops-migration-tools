@@ -145,10 +145,11 @@ If you want to sync your GitHub repository then check out [Open-source with VSTS
 
 ## Support
 
-You can get free support from the community here and on social media on a best effots basis if folks are available. If you are looking for paied support there are a number of consultants that contibute to this project and that are experts in this type of work:
+You can get free support from the community here and on social media on a best effort basis if folks are available. If you are looking for paid support there are a number of consultants that contribute to this project and that are experts in this type of work:
 
 * **Martin Hinshelwood, naked Agility Ltd** - @MrHinsh is the founder of the Azure DevOps Migration Tools is available worldwide to help organisations plan and enact their migration efforts. You can contact him through [naked Agility Ltd.](https://nkdagility.com).
-* _others comming soon_
+* **Wes MacDonald, LIKE 10 INC.** - @wesmacdonald is a DevOps Consultant located in Toronto, Canada.  You can reach out to him via [LIKE 10 INC.](http://www.like10.com). 
+* _others coming soon_
 
 ## FAQ
 
