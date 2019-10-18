@@ -3,6 +3,7 @@ using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using System.Collections.Generic;
 using Microsoft.ApplicationInsights;
 using System.Diagnostics;
+using Microsoft.ApplicationInsights.DataContracts;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -50,8 +51,10 @@ namespace VstsSyncMigrator.Engine
 
         public WorkItemCollection Execute()
         {
-            Telemetry.Current.TrackEvent("TfsQueryContext.Execute",parameters);
-            Debug.WriteLine(string.Format("TfsQueryContext: {0}: {1}", "TeamProjectCollection", storeContext.Store.TeamProjectCollection.Uri.ToString()), "TfsQueryContext");
+                Telemetry.Current.TrackEvent("TfsQueryContext.Execute",parameters);
+            
+
+                Debug.WriteLine(string.Format("TfsQueryContext: {0}: {1}", "TeamProjectCollection", storeContext.Store.TeamProjectCollection.Uri.ToString()), "TfsQueryContext");
             WorkItemCollection wc;
             var startTime = DateTime.UtcNow;
             Stopwatch queryTimer = new Stopwatch();

@@ -33,6 +33,8 @@ namespace VstsSyncMigrator.Engine
             //if (enableTrace) { Trace.Listeners.Add(new ApplicationInsightsTraceListener(applicationInsightsKey)); }
             TelemetryConfiguration.Active.InstrumentationKey = applicationInsightsKey;
             telemetryClient = new TelemetryClient();
+
+
             telemetryClient.InstrumentationKey = applicationInsightsKey;
             telemetryClient.Context.User.Id = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
             telemetryClient.Context.Session.Id = Guid.NewGuid().ToString();

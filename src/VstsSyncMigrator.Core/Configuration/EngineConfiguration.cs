@@ -60,7 +60,7 @@ namespace VstsSyncMigrator.Engine.Configuration
                 UpdateCreatedBy = true, 
                 PrefixProjectToNodes = false, 
                 UpdateCreatedDate = true, 
-                UpdateSourceReflectedId = true, 
+                UpdateSourceReflectedId = false, 
                 QueryBit = @"AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')", 
                 OrderBit = "[System.ChangedDate] desc" 
             });
