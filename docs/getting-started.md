@@ -2,7 +2,7 @@
 
 If you want to perform a bulk edit or a migration then you need to start here. This tool has been tested on updating from 100 to 250,000 work items by its users.
 
-Watch the [Video Overview](https://youtu.be/ZxDktQae10M) to get you started in 30 minutes. This tool is complicated and its not always easy to discover what you need to do.
+Watch the [Video Overview](https://youtu.be/RCJsST0xBCE) to get you started in 30 minutes. This tool is complicated and its not always easy to discover what you need to do.
 
 ## Install
 
@@ -28,45 +28,54 @@ You can now customise the configuration depending on what you need to do. Howeve
 
 ```
 {
-  "TelemetryEnableTrace": true,
+  "Version": "8.3",
+  "TelemetryEnableTrace": false,
+  "workaroundForQuerySOAPBugEnabled": false,
   "Source": {
-    "Collection": "https://sdd2016.visualstudio.com/",
-    "Name": "DemoProjs"
-	  "ReflectedWorkItemIDFieldName": "TfsMigrationTool.ReflectedWorkItemId"
+    "Collection": "https://dev.azure.com/psd45",
+    "Name": "DemoProjs",
+    "ReflectedWorkItemIDFieldName": "TfsMigrationTool.ReflectedWorkItemId"
   },
   "Target": {
-    "Collection": "https://sdd2016.visualstudio.com/",
-    "Name": "DemoProjt"
-	  "ReflectedWorkItemIDFieldName": "TfsMigrationTool.ReflectedWorkItemId",
+    "Collection": "https://dev.azure.com/psd46",
+    "Name": "DemoProjt",
+    "ReflectedWorkItemIDFieldName": "ProcessName.ReflectedWorkItemId"
   },
+  "FieldMaps": [],
   "WorkItemTypeDefinition": {
-    "Bug": "Bug",
-    "Epic": "Epic",
-    "Feature": "Feature",
-    "Product Backlog Item": "Product Backlog Item",
-    "Shared Parameter": "Shared Parameter",
-    "Shared Steps": "Shared Steps",
-    "Task": "Task",
-    "Test Case": "Test Case"
+    "sourceWorkItemTypeName": "targetWorkItemTypeName"
   },
+  "GitRepoMapping": null,
   "Processors": [
     {
       "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.NodeStructuresMigrationConfig",
-      "Enabled": true,
-      "PrefixProjectToNodes": false
+      "PrefixProjectToNodes": false,
+      "Enabled": false,
+      "BasePaths": []
     },
     {
       "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.WorkItemMigrationConfig",
-      "Enabled": true,
-	  "ReplayRevisions": true,
-      "PrefixProjectToNodes": true,
+      "ReplayRevisions": true,
+      "PrefixProjectToNodes": false,
       "UpdateCreatedDate": true,
       "UpdateCreatedBy": true,
-      "UpdateSourceReflectedId": true,
-      "QueryBit": "AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Product Backlog Item', 'Task', 'Feature', 'Epic', 'Bug')"
+      "UpdateSourceReflectedId": false,
+      "BuildFieldTable": false,
+      "AppendMigrationToolSignatureFooter": false,
+      "QueryBit": "AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
+      "OrderBit": "[System.ChangedDate] desc",
+      "Enabled": false,
+      "LinkMigration": true,
+      "AttachmentMigration": true,
+      "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
+      "FixHtmlAttachmentLinks": false,
+      "WorkItemCreateRetryLimit": 5,
+      "FilterWorkItemsThatAlreadyExistInTarget": true,
+      "PauseAfterEachWorkItem": false
     }
   ]
 }
+
 ```
 
 Here we are performing the following operations:

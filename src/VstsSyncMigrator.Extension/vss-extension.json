@@ -13,27 +13,31 @@
       "id": "Microsoft.VisualStudio.Services.Integration"
     }
   ],
-  "description": "Azure DevOps Migration Tools allow you to bulk edit data in TFS & Azure DevOps Services. You can bulk edit work items in place, or even migrate Teams, Backlogs, Tasks, Test Cases, and Plans & Suits.",
+  "description": "Azure DevOps Migration Tools allow you to migrate Teams, Work Items, and Plans & Suits from one Project to another in Azure DevOps/TFS both within the same Organisation, and between Organisations.",
   "categories": [
     "Integrate"
   ],
   "tags": [
     "migration",
     "AzureDevOps",
+    "Azure DevOps",
     "TFS",
     "upgrade",
     "migrate",
-    "merge"
+    "merge",
+    "Test Plans",
+    "Backlogs",
+    "Work Items"
   ],
   "links": {
     "home": {
-      "uri": "https://github.com/nkdAgility/azure-devops-migration-tools"
+      "uri": "https://nkdagility.github.io/azure-devops-migration-tools/"
     },
     "getstarted": {
-      "uri": "https://github.com/nkdAgility/azure-devops-migration-tools/blob/master/docs/getting-started.md"
+      "uri": "http://nkdagility.github.io/azure-devops-migration-tools/getting-started.md"
     },
     "learn": {
-      "uri": "https://github.com/nkdAgility/azure-devops-migration-tools/blob/master/README.md"
+      "uri": "https://nkdagility.github.io/azure-devops-migration-tools/"
     },
     "support": {
       "uri": "https://github.com/nkdAgility/azure-devops-migration-tools/issues"

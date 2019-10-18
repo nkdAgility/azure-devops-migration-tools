@@ -31,7 +31,7 @@ _NOTICE: Both paied and community support is avilable through our [recommneded c
 
 ## Quick Links
 
- * [Video Overview](https://youtu.be/ZxDktQae10M)
+ * _{new}_ [Video Overview](https://youtu.be/RCJsST0xBCE)
  * [Getting Started](./getting-started.md)
  * [Documentation](http://nkdagility.github.io/azure-devops-migration-tools/)
  * [Contributing](#contributing)
@@ -63,7 +63,7 @@ These tools are build by naked Agility Limited's DevOps & Agility consultants to
 | Releases Output | [Github Releases](https://github.com/nkdAgility/azure-devops-migration-tools/releases) |
 | Documentation | [Github Pages](http://nkdagility.github.io/azure-devops-migration-tools/) |
 
-**Watch the [Video Overview](https://youtu.be/ZxDktQae10M) to get you started in 30 minutes. This tool is complicated and its not always easy to discover what you need to do.**
+**Watch the [Video Overview](https://youtu.be/RCJsST0xBCE) to get you started in 30 minutes. This tool is complicated and its not always easy to discover what you need to do.**
 
 ### Processors
 
