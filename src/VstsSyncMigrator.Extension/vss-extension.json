@@ -13,7 +13,7 @@
       "id": "Microsoft.VisualStudio.Services.Integration"
     }
   ],
-  "description": "Azure DevOps Migration Tools allow you to migrate Teams, Backlogs, Tasks, Test Cases, and Plans & Suits from one Project to another in Azure DevOps / TFS both within the same Organisation, and between Organisations.",
+  "description": "Azure DevOps Migration Tools allow you to migrate Teams, Work Items, and Plans & Suits from one Project to another in Azure DevOps/TFS both within the same Organisation, and between Organisations.",
   "categories": [
     "Integrate"
   ],
