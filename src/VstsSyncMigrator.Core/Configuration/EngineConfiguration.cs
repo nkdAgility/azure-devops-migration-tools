@@ -29,7 +29,7 @@ namespace VstsSyncMigrator.Engine.Configuration
             AddTestPlansMigrationDefault(ec);
             ec.Processors.Add(new ImportProfilePictureConfig() { Enabled = false });
             ec.Processors.Add(new ExportProfilePictureFromADConfig() { Enabled = false });
-            ec.Processors.Add(new FixGitCommitLinksConfig() { Enabled = false, TargetRepository = ec.Target.Name });
+            ec.Processors.Add(new FixGitCommitLinksConfig() { Enabled = false, TargetRepository = ec.Target.Project });
             ec.Processors.Add(new WorkItemUpdateConfig() { Enabled = false, QueryBit = @"AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')" });
             ec.Processors.Add(new WorkItemPostProcessingConfig() { Enabled = false, QueryBit = "AND [TfsMigrationTool.ReflectedWorkItemId] = '' ", WorkItemIDs = new List<int> { 1, 2, 3 } });
             ec.Processors.Add(new WorkItemDeleteConfig() { Enabled = false });
@@ -71,8 +71,8 @@ namespace VstsSyncMigrator.Engine.Configuration
             EngineConfiguration ec = new EngineConfiguration();
             ec.TelemetryEnableTrace = false;
             ec.Version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(2);
-            ec.Source = new TeamProjectConfig() { Name = "DemoProjs", Collection = new Uri("https://dev.azure.com/psd45"), ReflectedWorkItemIDFieldName = "TfsMigrationTool.ReflectedWorkItemId" };
-            ec.Target = new TeamProjectConfig() { Name = "DemoProjt", Collection = new Uri("https://dev.azure.com/psd46"), ReflectedWorkItemIDFieldName = "ProcessName.ReflectedWorkItemId" };
+            ec.Source = new TeamProjectConfig() { Project = "DemoProjs", AllowCrossProjectLinking = false, Collection = new Uri("https://dev.azure.com/psd45"), ReflectedWorkItemIDFieldName = "TfsMigrationTool.ReflectedWorkItemId" };
+            ec.Target = new TeamProjectConfig() { Project = "DemoProjt", AllowCrossProjectLinking = false, Collection = new Uri("https://dev.azure.com/psd46"), ReflectedWorkItemIDFieldName = "ProcessName.ReflectedWorkItemId" };
             ec.FieldMaps = new List<IFieldMapConfig>();
             ec.WorkItemTypeDefinition = new Dictionary<string, string> {
                     { "sourceWorkItemTypeName", "targetWorkItemTypeName" }

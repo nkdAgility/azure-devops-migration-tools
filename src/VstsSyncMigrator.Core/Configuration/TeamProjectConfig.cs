@@ -9,7 +9,8 @@ namespace VstsSyncMigrator.Engine.Configuration
     public class TeamProjectConfig
     {
         public Uri Collection { get; set; }
-        public string Name { get; set; }
+        public string Project { get; set; }
         public string ReflectedWorkItemIDFieldName { get; set; }
+        public bool AllowCrossProjectLinking { get; set; }
     }
 }

@@ -50,8 +50,8 @@ namespace VstsSyncMigrator.Engine
             {
                 Telemetry.Current.TrackEvent("TeamProjectContext.Connect",
                     new Dictionary<string, string> {
-                          { "Name", Config.Name},
-                          { "Target Project", Config.Name},
+                          { "Name", Config.Project},
+                          { "Target Project", Config.Project},
                           { "Target Collection",Config.Collection.ToString() },
                            { "ReflectedWorkItemID Field Name",Config.ReflectedWorkItemIDFieldName }
                     });
@@ -79,7 +79,7 @@ namespace VstsSyncMigrator.Engine
                     Telemetry.Current.TrackException(ex,
                        new Dictionary<string, string> {
                             { "CollectionUrl", Config.Collection.ToString() },
-                            { "TeamProjectName",  Config.Name}
+                            { "TeamProjectName",  Config.Project}
                        },
                        new Dictionary<string, double> {
                             { "ConnectionTimer", connectionTimer.ElapsedMilliseconds }
