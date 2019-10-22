@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
 using Microsoft.TeamFoundation.Server;
+using System.Text;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -49,7 +50,7 @@ namespace VstsSyncMigrator.Engine
 
         public Project GetProject()
         {
-            return (from Project x in wistore.Projects where x.Name.ToUpper() == teamProjectContext.Config.Name.ToUpper() select x).SingleOrDefault();
+            return (from Project x in wistore.Projects where x.Name.ToUpper() == teamProjectContext.Config.Project.ToUpper() select x).SingleOrDefault();
         }
 
         public string CreateReflectedWorkItemId(WorkItem wi)
@@ -131,7 +132,7 @@ namespace VstsSyncMigrator.Engine
                 TfsQueryContext query = new TfsQueryContext(this);
                 query.Query = string.Format(@"SELECT [System.Id] FROM WorkItems  WHERE [System.TeamProject]=@TeamProject AND [{0}] Contains '@idToFind'", teamProjectContext.Config.ReflectedWorkItemIDFieldName);
                 query.AddParameter("idToFind", refId.ToString());
-                query.AddParameter("TeamProject", this.teamProjectContext.Config.Name);
+                query.AddParameter("TeamProject", this.teamProjectContext.Config.Project);
                 foreach(WorkItem wi in query.Execute())
                 {
                     yield return wi;
@@ -143,21 +144,36 @@ namespace VstsSyncMigrator.Engine
             return foundWorkItem;
         }
 
+        private StringBuilder FindReflectedWorkItemQueryBase(TfsQueryContext query)
+        {
+            StringBuilder s = new StringBuilder();
+            s.Append("SELECT [System.Id] FROM WorkItems");
+            s.Append("WHERE ");
+            if (teamProjectContext.Config.AllowCrossProjectLinking)
+            {
+                s.Append("[System.TeamProject]=@TeamProject AND ");
+                query.AddParameter("TeamProject", this.teamProjectContext.Config.Project);
+            }
+            return s;
+        }
+
         public WorkItem FindReflectedWorkItemByReflectedWorkItemId(string refId)
         {
             TfsQueryContext query = new TfsQueryContext(this);
-            query.Query = string.Format(@"SELECT [System.Id] FROM WorkItems  WHERE [System.TeamProject]=@TeamProject AND [{0}] = @idToFind", teamProjectContext.Config.ReflectedWorkItemIDFieldName);
+            StringBuilder queryBuilder = FindReflectedWorkItemQueryBase(query);
+            queryBuilder.AppendFormat("[{0}] = @idToFind", teamProjectContext.Config.ReflectedWorkItemIDFieldName);
             query.AddParameter("idToFind", refId.ToString());
-            query.AddParameter("TeamProject", this.teamProjectContext.Config.Name);
+            query.Query = queryBuilder.ToString();
             return FindWorkItemByQuery(query);
         }
 
         public WorkItem FindReflectedWorkItemByMigrationRef(string refId)
         {
             TfsQueryContext query = new TfsQueryContext(this);
-            query.Query = @"SELECT [System.Id] FROM WorkItems  WHERE [System.TeamProject]=@TeamProject AND [System.Description] Contains @KeyToFind";
+            StringBuilder queryBuilder  = FindReflectedWorkItemQueryBase(query);
+            queryBuilder.Append(" [System.Description] Contains @KeyToFind");
             query.AddParameter("KeyToFind", string.Format("##REF##{0}##", refId));
-            query.AddParameter("TeamProject", this.teamProjectContext.Config.Name);
+            query.Query = queryBuilder.ToString();
             return FindWorkItemByQuery(query);
         }
 
@@ -166,7 +182,7 @@ namespace VstsSyncMigrator.Engine
             TfsQueryContext query = new TfsQueryContext(this);
             query.Query = @"SELECT [System.Id] FROM WorkItems  WHERE [System.TeamProject]=@TeamProject AND [System.Title] = @TitleToFind";
             query.AddParameter("TitleToFind", title);
-            query.AddParameter("TeamProject", this.teamProjectContext.Config.Name);
+            query.AddParameter("TeamProject", this.teamProjectContext.Config.Project);
             return FindWorkItemByQuery(query);
         }
 

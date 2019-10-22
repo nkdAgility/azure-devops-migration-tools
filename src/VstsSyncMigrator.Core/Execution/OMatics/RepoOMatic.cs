@@ -26,10 +26,10 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
         {
             migrationEngine = me;
             sourceRepoService = me.Source.Collection.GetService<GitRepositoryService>();
-            sourceRepos = sourceRepoService.QueryRepositories(me.Source.Config.Name);
+            sourceRepos = sourceRepoService.QueryRepositories(me.Source.Config.Project);
             //////////////////////////////////////////////////
             targetRepoService = me.Target.Collection.GetService<GitRepositoryService>();
-            targetRepos = targetRepoService.QueryRepositories(me.Target.Config.Name);
+            targetRepos = targetRepoService.QueryRepositories(me.Target.Config.Project);
             gitWits = new List<string>
                 {
                     "Branch",
@@ -56,7 +56,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                         
                         string targetRepoName = GetTargetRepoName(migrationEngine.GitRepoMappings, sourceRepoInfo);
                         string sourceProjectName = sourceRepoInfo.GitRepo.ProjectReference.Name;
-                        string targetProjectName = migrationEngine.Target.Config.Name;
+                        string targetProjectName = migrationEngine.Target.Config.Project;
 
                         GitRepositoryInfo targetRepoInfo = GitRepositoryInfo.Create(targetRepoName, sourceRepoInfo, migrationEngine, targetRepos);
                
@@ -218,12 +218,12 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
         {
             GitRepository gitRepo;
             // Source and Target project names match
-            if (migrationEngine.Source.Config.Name == migrationEngine.Target.Config.Name)
+            if (migrationEngine.Source.Config.Project == migrationEngine.Target.Config.Project)
             {
                 gitRepo = (from g in targetRepos
                               where
                               g.Name == targetRepoName &&
-                              g.ProjectReference.Name == migrationEngine.Source.Config.Name
+                              g.ProjectReference.Name == migrationEngine.Source.Config.Project
                               select g).SingleOrDefault();
             }
             // Source and Target project names do not match
@@ -232,7 +232,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                 gitRepo = (from g in targetRepos
                               where
                               g.Name == targetRepoName &&
-                              g.ProjectReference.Name != migrationEngine.Source.Config.Name
+                              g.ProjectReference.Name != migrationEngine.Source.Config.Project
                               select g).SingleOrDefault();
             }
             return new GitRepositoryInfo(sourceRepoInfo.CommitID, gitRepo.Id.ToString(), gitRepo);

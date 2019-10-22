@@ -280,14 +280,14 @@ namespace VstsSyncMigrator.Engine
 
             if (config.PrefixProjectToNodes)
             {
-                targetWI.AreaPath = string.Format(@"{0}\{1}", engine.Target.Config.Name, sourceWI.AreaPath);
-                targetWI.IterationPath = string.Format(@"{0}\{1}", engine.Target.Config.Name, sourceWI.IterationPath);
+                targetWI.AreaPath = string.Format(@"{0}\{1}", engine.Target.Config.Project, sourceWI.AreaPath);
+                targetWI.IterationPath = string.Format(@"{0}\{1}", engine.Target.Config.Project, sourceWI.IterationPath);
             }
             else
             {
-                var regex = new Regex(Regex.Escape(engine.Source.Config.Name));
-                targetWI.AreaPath = regex.Replace(sourceWI.AreaPath, engine.Target.Config.Name, 1);
-                targetWI.IterationPath = regex.Replace(sourceWI.IterationPath, engine.Target.Config.Name, 1);
+                var regex = new Regex(Regex.Escape(engine.Source.Config.Project));
+                targetWI.AreaPath = regex.Replace(sourceWI.AreaPath, engine.Target.Config.Project, 1);
+                targetWI.IterationPath = regex.Replace(sourceWI.IterationPath, engine.Target.Config.Project, 1);
             }
 
             me.ApplyFieldMappings(sourceWI, targetWI);
@@ -884,9 +884,9 @@ AddParameter("PlanId", parameters, targetPlan.Id.ToString());
                 Telemetry.Current.TrackException(ex,
                       new Dictionary<string, string> {
                           { "Name", Name},
-                          { "Target Project", me.Target.Config.Name},
+                          { "Target Project", me.Target.Config.Project},
                           { "Target Collection", me.Target.Collection.Name },
-                          { "Source Project", me.Source.Config.Name},
+                          { "Source Project", me.Source.Config.Project},
                           { "Source Collection", me.Source.Collection.Name },
                           { "Status", Status.ToString() },
                           { "Task", "SaveNewTestSuitToPlan" },
@@ -937,8 +937,8 @@ AddParameter("PlanId", parameters, targetPlan.Id.ToString());
 
             // Set area and iteration to root of the target project. 
             // We will set the correct values later, when we actually have a work item available
-            targetPlan.Iteration = engine.Target.Config.Name;
-            targetPlan.AreaPath = engine.Target.Config.Name;
+            targetPlan.Iteration = engine.Target.Config.Project;
+            targetPlan.AreaPath = engine.Target.Config.Project;
 
             // Remove testsettings reference because VSTS Sync doesn't support migrating these artifacts
             if (targetPlan.ManualTestSettingsId != 0)
