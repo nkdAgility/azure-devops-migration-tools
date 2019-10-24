@@ -208,7 +208,7 @@ namespace VstsSyncMigrator.ConsoleApp
                 me = new MigrationEngine(ec);
             else
                 me = new MigrationEngine(ec, sourceCredentials, targetCredentials);
-            Console.Title = $"Azure DevOps Migration Tools: {System.IO.Path.GetFileName(opts.ConfigFile)} - {System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(3)} - {ec.Source.Name} - {ec.Target.Name}";
+            Console.Title = $"Azure DevOps Migration Tools: {System.IO.Path.GetFileName(opts.ConfigFile)} - {System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(3)} - {ec.Source.Project} - {ec.Target.Project}";
             Trace.WriteLine("Engine created, running...", "[Info]");
             me.Run();
             Trace.WriteLine("Run complete...", "[Info]");

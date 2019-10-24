@@ -38,8 +38,8 @@ namespace VstsSyncMigrator.Engine
             TfsQueryContext tfsqc = new TfsQueryContext(targetStore);
 
             TfsTeamService teamService = me.Target.Collection.GetService<TfsTeamService>();
-            QueryHierarchy qh = targetStore.Store.Projects[me.Target.Config.Name].QueryHierarchy;
-            List<TeamFoundationTeam> teamList = teamService.QueryTeams(me.Target.Config.Name).ToList();
+            QueryHierarchy qh = targetStore.Store.Projects[me.Target.Config.Project].QueryHierarchy;
+            List<TeamFoundationTeam> teamList = teamService.QueryTeams(me.Target.Config.Project).ToList();
 
             Trace.WriteLine(string.Format("Found {0} teams?", teamList.Count));
             //////////////////////////////////////////////////
