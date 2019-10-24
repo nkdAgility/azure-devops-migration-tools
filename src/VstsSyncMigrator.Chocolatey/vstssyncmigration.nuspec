@@ -12,7 +12,7 @@
     <packageSourceUrl>https://chocolatey.org/packages/vsts-sync-migrator/</packageSourceUrl>
     <docsUrl>http://nkdagility.github.io/azure-devops-migration-tools/</docsUrl>
     <bugTrackerUrl>https://github.com/nkdAgility/azure-devops-migration-tools/issues</bugTrackerUrl>
-    <tags>WIT, Work Item, Azure DevOps, TFS, VSTS, VSO, Visual Studio Online, DevOps, Microsoft, Test Management</tags>
+    <tags>WIT, WorkItem, AzureDevOps, TFS, VSTS, VSO, VisualStudioOnline, DevOps, Microsoft, TestManagement</tags>
     <releaseNotes>http://nkdagility.github.io/azure-devops-migration-tools/</releaseNotes>
     <licenseUrl>https://github.com/nkdAgility/azure-devops-migration-tools/blob/master/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
