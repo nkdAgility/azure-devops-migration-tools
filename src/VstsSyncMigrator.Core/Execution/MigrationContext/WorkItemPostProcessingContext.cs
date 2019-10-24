@@ -54,7 +54,7 @@ namespace VstsSyncMigrator.Engine
 			//////////////////////////////////////////////////
 			WorkItemStoreContext sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.None);
             TfsQueryContext tfsqc = new TfsQueryContext(sourceStore);
-            tfsqc.AddParameter("TeamProject", me.Source.Config.Name);
+            tfsqc.AddParameter("TeamProject", me.Source.Config.Project);
 
             //Builds the constraint part of the query
             string constraints = BuildQueryBitConstraints();

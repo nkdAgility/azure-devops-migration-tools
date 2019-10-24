@@ -38,7 +38,7 @@ namespace VstsSyncMigrator.Engine
 			//////////////////////////////////////////////////
             WorkItemStoreContext targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
             var targetQuery = new TfsQueryContext(targetStore);
-            targetQuery.AddParameter("TeamProject", me.Target.Config.Name);
+            targetQuery.AddParameter("TeamProject", me.Target.Config.Project);
             targetQuery.Query =
                 string.Format(
                     @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY {1}",
