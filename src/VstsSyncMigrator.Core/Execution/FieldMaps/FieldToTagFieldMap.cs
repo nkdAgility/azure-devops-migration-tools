@@ -36,19 +36,22 @@ namespace VstsSyncMigrator.Engine
                 if (source.Fields[this.config.sourceField].Value != null)
                 {
                     string value = source.Fields[this.config.sourceField].Value.ToString();
-                    if (string.IsNullOrEmpty(config.formatExpression))
+                    if (string.IsNullOrEmpty(value))
                     {
-                        newTags.Add(value);
-                    }
-                    else
-                    {
-                        newTags.Add(string.Format(config.formatExpression, value));
+                        if (string.IsNullOrEmpty(config.formatExpression))
+                        {
+                            newTags.Add(value);
+                        }
+                        else
+                        {
+                            newTags.Add(string.Format(config.formatExpression, value));
+                        }
+                        target.Tags = string.Join(";", newTags.ToArray());
+                        Trace.WriteLine(string.Format("  [UPDATE] field tagged {0}:{1} to {2}:Tag with foramt of {3}", source.Id, this.config.sourceField, target.Id, config.formatExpression));
                     }
 
-                    target.Tags = string.Join(";", newTags.ToArray());
-                    Trace.WriteLine(string.Format("  [UPDATE] field tagged {0}:{1} to {2}:Tag with foramt of {3}", source.Id, this.config.sourceField, target.Id, config.formatExpression));
                 }
-                
+
             }
         }
     }
