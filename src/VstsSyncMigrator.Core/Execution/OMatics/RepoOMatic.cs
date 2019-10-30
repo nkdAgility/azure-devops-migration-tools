@@ -2,6 +2,7 @@
 using Microsoft.TeamFoundation.Git.Client;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -20,8 +21,8 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
         IList<GitRepository> sourceRepos;
         GitRepositoryService targetRepoService;
         IList<GitRepository> targetRepos;
-        List<string> gitWits;
-
+        List<string> wits;
+        
         public RepoOMatic(MigrationEngine me)
         {
             migrationEngine = me;
@@ -30,28 +31,28 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
             //////////////////////////////////////////////////
             targetRepoService = me.Target.Collection.GetService<GitRepositoryService>();
             targetRepos = targetRepoService.QueryRepositories(me.Target.Config.Project);
-            gitWits = new List<string>
+            wits = new List<string>
                 {
                     "Branch",
                     "Fixed in Commit",
-                    "Pull Request"
+                    "Pull Request",
+                    "Fixed in Changeset"    //TFVC
                 };
         }
 
-        public int FixExternalGitLinks(WorkItem targetWorkItem, WorkItemStoreContext targetStore, bool save = true)
+        public int FixExternalLinks(WorkItem targetWorkItem, WorkItemStoreContext targetStore, bool save = true)
         {
             List<ExternalLink> newEL = new List<ExternalLink>();
             List<ExternalLink> removeEL = new List<ExternalLink>();
             int count = 0;
             foreach (Link l in targetWorkItem.Links)
             {
-                if (l is ExternalLink && gitWits.Contains(l.ArtifactLinkType.Name))
+                if (l is ExternalLink && wits.Contains(l.ArtifactLinkType.Name))
                 {
-                    ExternalLink el = (ExternalLink)l;
+                    ExternalLink el = (ExternalLink) l;
+                    GitRepositoryInfo sourceRepoInfo = GitRepositoryInfo.Create(el, sourceRepos, migrationEngine.ChangeSetMapping);
 
-                    GitRepositoryInfo sourceRepoInfo = GitRepositoryInfo.Create(el, sourceRepos);
-
-                    if (sourceRepoInfo.GitRepo != null)
+                    if (sourceRepoInfo != null && sourceRepoInfo.GitRepo != null)
                     {
                         
                         string targetRepoName = GetTargetRepoName(migrationEngine.GitRepoMappings, sourceRepoInfo);
@@ -60,7 +61,6 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
 
                         GitRepositoryInfo targetRepoInfo = GitRepositoryInfo.Create(targetRepoName, sourceRepoInfo, migrationEngine, targetRepos);
                
-
                         // Fix commit links if target repo has been found
                         if (targetRepoInfo != null)
                         {
@@ -75,6 +75,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                                         $"vstfs:///git/ref/{targetRepoInfo.GitRepo.ProjectReference.Id}%2f{targetRepoInfo.GitRepo.Id}%2f{sourceRepoInfo.CommitID}");
                                     break;
 
+                                case "Fixed in Changeset":
                                 case "Fixed in Commit":
                                     newLink = new ExternalLink(targetStore.Store.RegisteredLinkTypes[ArtifactLinkIds.Commit],
                                         $"vstfs:///git/commit/{targetRepoInfo.GitRepo.ProjectReference.Id}%2f{targetRepoInfo.GitRepo.Id}%2f{sourceRepoInfo.CommitID}");
@@ -93,7 +94,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                             if (newLink != null)
                             {
                                 var elinks = from Link lq in targetWorkItem.Links
-                                             where gitWits.Contains(lq.ArtifactLinkType.Name)
+                                             where wits.Contains(lq.ArtifactLinkType.Name)
                                              select (ExternalLink)lq;
                                 var found =
                                 (from Link lq in elinks
@@ -113,7 +114,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                     }
                     else
                     {
-                        Trace.WriteLine($"FAIL could not find source git repo");
+                        Trace.WriteLine($"FAIL could not find source git repo when trying to fix external link");
                     }
                 }
             }
@@ -183,12 +184,53 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
         {
             this.CommitID = CommitID;
             this.RepoID = RepoID;
-            this.GitRepo = GitRepo;
+            this.GitRepo = GitRepo;            
         }
 
-        public static GitRepositoryInfo Create(ExternalLink gitExternalLink, IList<GitRepository> possibleRepos)
+        public static GitRepositoryInfo Create(ExternalLink gitExternalLink, IList<GitRepository> possibleRepos, Dictionary<string, string> mapping)
         {
+            var repoType = DetermineFromLink(gitExternalLink.LinkedArtifactUri);
+            switch (repoType)
+            {
+                case RepistoryType.Git:
+                    return CreateFromGit(gitExternalLink, possibleRepos);
+                
+                case RepistoryType.TFVC:
+                    return CreateFromTFVC(gitExternalLink, possibleRepos, mapping);
+            }
 
+            return null;
+        }
+
+        private static GitRepositoryInfo CreateFromTFVC(ExternalLink gitExternalLink, IList<GitRepository> possibleRepos, Dictionary<string, string> changesetMapping)
+        {
+            string commitID;
+            string repoID;
+            GitRepository gitRepo;
+
+            //vstfs:///VersionControl/Changeset/{id}
+            var changeSetIdPart = gitExternalLink.LinkedArtifactUri.Substring(gitExternalLink.LinkedArtifactUri.LastIndexOf('/') + 1);
+            if (!int.TryParse(changeSetIdPart, out int changeSetId))
+            {
+                return null;
+            }
+
+            var commitIDKvPair = changesetMapping.FirstOrDefault(item => item.Key == changeSetId.ToString());
+            if (string.IsNullOrEmpty(commitIDKvPair.Value))
+            {
+                Trace.WriteLine($"Commit Id not found from Changeset Id {changeSetIdPart}.");
+                return null;
+            }
+
+            //todo: get correct repository id
+
+            gitRepo = possibleRepos.SingleOrDefault();
+
+            return new GitRepositoryInfo(commitIDKvPair.Value, gitRepo.Id.ToString(), gitRepo);
+        }
+
+        private static GitRepositoryInfo CreateFromGit(ExternalLink gitExternalLink, IList<GitRepository> possibleRepos)
+        {
             string commitID;
             string repoID;
             GitRepository gitRepo;
@@ -212,6 +254,31 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                 (from g in possibleRepos where g.Id.ToString() == repoID select g)
                 .SingleOrDefault();
             return new GitRepositoryInfo(commitID, repoID, gitRepo);
+        }
+
+        private enum RepistoryType
+        {
+            Unknown,
+            TFVC,
+            Git
+        }
+
+        private static RepistoryType DetermineFromLink(string link)
+        {
+            if (string.IsNullOrEmpty(link))
+                throw new ArgumentNullException("link");
+
+            //vstfs:///Git/Commit/25f94570-e3e7-4b79-ad19-4b434787fd5a%2f50477259-3058-4dff-ba4c-e8c179ec5327%2f41dd2754058348d72a6417c0615c2543b9b55535
+            if (link.ToLowerInvariant().Contains("git/commit"))
+                return RepistoryType.Git;
+
+            //vstfs:///VersionControl/Changeset/{id}
+            if (link.ToLowerInvariant().Contains("versioncontrol/changeset"))
+                return RepistoryType.TFVC;
+
+            Trace.WriteLine($"Cannot determine repository type from external link: {link}");
+
+            return RepistoryType.Unknown;
         }
 
         internal static GitRepositoryInfo Create(string targetRepoName, GitRepositoryInfo sourceRepoInfo , MigrationEngine migrationEngine, IList<GitRepository> targetRepos)

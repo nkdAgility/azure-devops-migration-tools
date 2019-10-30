@@ -71,6 +71,9 @@ namespace VstsSyncMigrator.ConsoleApp
 
             [Option("targetPassword", Required = false, HelpText = "Password used to connect to target TFS instance.")]
             public string TargetPassword { get; set; }
+
+            [Option("changeSetMappingFile", Required = false, HelpText = "Mapping between changeset id and commit id. Used to fix work item changeset links.")]
+            public string ChangeSetMappingFile { get; set; }
         }
 
         static DateTime startTime = DateTime.Now;
@@ -208,6 +211,16 @@ namespace VstsSyncMigrator.ConsoleApp
                 me = new MigrationEngine(ec);
             else
                 me = new MigrationEngine(ec, sourceCredentials, targetCredentials);
+
+            if (!string.IsNullOrWhiteSpace(opts.ChangeSetMappingFile))
+            {
+                using (System.IO.StreamReader file = new System.IO.StreamReader(opts.ChangeSetMappingFile))
+                {
+                    var fileStr = file.ReadToEnd();
+                    me.ChangeSetMapping.AddRange(JsonConvert.DeserializeObject<Dictionary<string, string>>(fileStr));
+                }
+            }
+
             Console.Title = $"Azure DevOps Migration Tools: {System.IO.Path.GetFileName(opts.ConfigFile)} - {System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(3)} - {ec.Source.Project} - {ec.Target.Project}";
             Trace.WriteLine("Engine created, running...", "[Info]");
             me.Run();

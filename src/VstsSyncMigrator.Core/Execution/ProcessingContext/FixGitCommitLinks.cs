@@ -58,7 +58,7 @@ namespace VstsSyncMigrator.Engine
                 Stopwatch witstopwatch = Stopwatch.StartNew();
 				workitem.Open();
 
-                _RepoOMatic.FixExternalGitLinks(workitem, targetStore);
+                _RepoOMatic.FixExternalLinks(workitem, targetStore);
 
                 if (workitem.IsDirty)
                 {

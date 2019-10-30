@@ -22,7 +22,8 @@ namespace VstsSyncMigrator.Engine
         ITeamProjectContext target;
         VssCredentials sourceCreds;
         VssCredentials targetCreds;
-        
+        public readonly Dictionary<string, string> ChangeSetMapping = new Dictionary<string, string>();
+
         public MigrationEngine()
         {
 
