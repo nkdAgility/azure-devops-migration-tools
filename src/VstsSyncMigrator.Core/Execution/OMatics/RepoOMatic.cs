@@ -50,21 +50,18 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                 if (l is ExternalLink && wits.Contains(l.ArtifactLinkType.Name))
                 {
                     ExternalLink el = (ExternalLink) l;
-                    GitRepositoryInfo sourceRepoInfo = GitRepositoryInfo.Create(el, sourceRepos, migrationEngine.ChangeSetMapping);
+                    GitRepositoryInfo sourceRepoInfo = GitRepositoryInfo.Create(el, sourceRepos, migrationEngine);
 
-                    if (sourceRepoInfo != null && sourceRepoInfo.GitRepo != null)
+                    if (sourceRepoInfo != null)
                     {
-                        
                         string targetRepoName = GetTargetRepoName(migrationEngine.GitRepoMappings, sourceRepoInfo);
-                        string sourceProjectName = sourceRepoInfo.GitRepo.ProjectReference.Name;
                         string targetProjectName = migrationEngine.Target.Config.Project;
-
                         GitRepositoryInfo targetRepoInfo = GitRepositoryInfo.Create(targetRepoName, sourceRepoInfo, migrationEngine, targetRepos);
                
                         // Fix commit links if target repo has been found
                         if (targetRepoInfo != null)
                         {
-                            Trace.WriteLine($"Fixing {sourceRepoInfo.GitRepo.RemoteUrl} to {targetRepoInfo.GitRepo.RemoteUrl}?");
+                            Trace.WriteLine($"Fixing {sourceRepoInfo.GitRepo?.RemoteUrl} to {targetRepoInfo.GitRepo.RemoteUrl}?");
 
                             // Create External Link object
                             ExternalLink newLink = null;
@@ -109,7 +106,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                         }
                         else
                         {
-                            Trace.WriteLine($"FAIL: cannot map {sourceRepoInfo.GitRepo.RemoteUrl} to ???");
+                            Trace.WriteLine($"FAIL: cannot map {sourceRepoInfo.GitRepo?.RemoteUrl} to ???");
                         }
                     }
                     else
@@ -177,17 +174,15 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
     public class GitRepositoryInfo
     {
         public string CommitID { get; }
-        public string RepoID { get; }
         public GitRepository GitRepo { get; }
 
-        public GitRepositoryInfo(string CommitID, string RepoID, GitRepository GitRepo)
+        public GitRepositoryInfo(string CommitID, GitRepository GitRepo)
         {
             this.CommitID = CommitID;
-            this.RepoID = RepoID;
             this.GitRepo = GitRepo;            
         }
 
-        public static GitRepositoryInfo Create(ExternalLink gitExternalLink, IList<GitRepository> possibleRepos, Dictionary<string, string> mapping)
+        public static GitRepositoryInfo Create(ExternalLink gitExternalLink, IList<GitRepository> possibleRepos, MigrationEngine migrationEngine)
         {
             var repoType = DetermineFromLink(gitExternalLink.LinkedArtifactUri);
             switch (repoType)
@@ -196,14 +191,18 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                     return CreateFromGit(gitExternalLink, possibleRepos);
                 
                 case RepistoryType.TFVC:
-                    return CreateFromTFVC(gitExternalLink, possibleRepos, mapping);
+                    return CreateFromTFVC(gitExternalLink, possibleRepos, migrationEngine.ChangeSetMapping, migrationEngine.Source.Config.Project);
             }
 
             return null;
         }
 
-        private static GitRepositoryInfo CreateFromTFVC(ExternalLink gitExternalLink, IList<GitRepository> possibleRepos, Dictionary<string, string> changesetMapping)
+        private static GitRepositoryInfo CreateFromTFVC(ExternalLink gitExternalLink, IList<GitRepository> possibleRepos, 
+            Dictionary<string, string> changesetMapping, string sourceProjectName)
         {
+            // Scenario: TFVC => GIT Same Project Link (can fix the changeset link if git repo mapping correct or git repo has same name as tfvc repo)
+            // Scenario: TFVC => GIT Exernal Project Link (cannot fix changeset link currently, because of repository filter on project level)
+
             string commitID;
             string repoID;
             GitRepository gitRepo;
@@ -222,11 +221,21 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                 return null;
             }
 
-            //todo: get correct repository id
+            //https://domain.com/{organization}/{projectname}/_versionControl/changeset/{id}
+            var projectName = string.Empty;
+            var linkedArtifactUriSplitted = gitExternalLink.LinkedArtifactUri.Split('/');
+            if (linkedArtifactUriSplitted != null && linkedArtifactUriSplitted.Length >= 4)
+            {
+                projectName = linkedArtifactUriSplitted.Reverse().ToArray()[3];                
+            }
 
-            gitRepo = possibleRepos.SingleOrDefault();
+            //If project name is not same as Source Project name, than the link cannot be fixed, because it points to external TFVC Project. 
+            if (!projectName.Trim().ToLowerInvariant().Equals(sourceProjectName.Trim().ToLowerInvariant()))
+            {
+                return null;
+            }
 
-            return new GitRepositoryInfo(commitIDKvPair.Value, gitRepo.Id.ToString(), gitRepo);
+            return new GitRepositoryInfo(commitIDKvPair.Value, new GitRepository() { Name = projectName });
         }
 
         private static GitRepositoryInfo CreateFromGit(ExternalLink gitExternalLink, IList<GitRepository> possibleRepos)
@@ -253,7 +262,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
             gitRepo =
                 (from g in possibleRepos where g.Id.ToString() == repoID select g)
                 .SingleOrDefault();
-            return new GitRepositoryInfo(commitID, repoID, gitRepo);
+            return new GitRepositoryInfo(commitID, gitRepo);
         }
 
         private enum RepistoryType
@@ -302,7 +311,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                               g.ProjectReference.Name != migrationEngine.Source.Config.Project
                               select g).SingleOrDefault();
             }
-            return new GitRepositoryInfo(sourceRepoInfo.CommitID, gitRepo.Id.ToString(), gitRepo);
+            return new GitRepositoryInfo(sourceRepoInfo.CommitID, gitRepo);
         }
     }
 }
