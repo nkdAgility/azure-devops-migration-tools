@@ -57,6 +57,7 @@ namespace VstsSyncMigrator.Engine.Configuration
                 AttachmentMigration = true, 
                 FixHtmlAttachmentLinks = false, 
                 AttachmentWorkingPath = "c:\\temp\\WorkItemAttachmentWorkingFolder\\", 
+                AttachmentMazSize = 480000000,
                 UpdateCreatedBy = true, 
                 PrefixProjectToNodes = false, 
                 UpdateCreatedDate = true, 
@@ -71,8 +72,8 @@ namespace VstsSyncMigrator.Engine.Configuration
             EngineConfiguration ec = new EngineConfiguration();
             ec.TelemetryEnableTrace = false;
             ec.Version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(2);
-            ec.Source = new TeamProjectConfig() { Project = "DemoProjs", AllowCrossProjectLinking = false, Collection = new Uri("https://dev.azure.com/psd45"), ReflectedWorkItemIDFieldName = "TfsMigrationTool.ReflectedWorkItemId" };
-            ec.Target = new TeamProjectConfig() { Project = "DemoProjt", AllowCrossProjectLinking = false, Collection = new Uri("https://dev.azure.com/psd46"), ReflectedWorkItemIDFieldName = "ProcessName.ReflectedWorkItemId" };
+            ec.Source = new TeamProjectConfig() { Project = "migrationSource1", AllowCrossProjectLinking = false, Collection = new Uri("https://dev.azure.com/nkdagility-preview/"), ReflectedWorkItemIDFieldName = "Custom.ReflectedWorkItemId" };
+            ec.Target = new TeamProjectConfig() { Project = "migrationTarget1", AllowCrossProjectLinking = false, Collection = new Uri("https://dev.azure.com/nkdagility-preview/"), ReflectedWorkItemIDFieldName = "Custom.ReflectedWorkItemId" };
             ec.FieldMaps = new List<IFieldMapConfig>();
             ec.WorkItemTypeDefinition = new Dictionary<string, string> {
                     { "sourceWorkItemTypeName", "targetWorkItemTypeName" }
