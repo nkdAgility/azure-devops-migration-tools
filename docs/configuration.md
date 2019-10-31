@@ -17,24 +17,26 @@ The global configuration created by the `init` command look like this:
 
 ```json
 {
-  "Version": "0.0.0",
+  "Version": "8.4",
   "TelemetryEnableTrace": false,
   "workaroundForQuerySOAPBugEnabled": false,
   "Source": {
     "Collection": "https://dev.azure.com/psd45",
-    "Name": "DemoProjs",
-    "ReflectedWorkItemIDFieldName": "TfsMigrationTool.ReflectedWorkItemId"
+    "Project": "DemoProjs",
+    "ReflectedWorkItemIDFieldName": "TfsMigrationTool.ReflectedWorkItemId",
+    "AllowCrossProjectLinking": false
   },
   "Target": {
     "Collection": "https://dev.azure.com/psd46",
-    "Name": "DemoProjt",
-    "ReflectedWorkItemIDFieldName": "ProcessName.ReflectedWorkItemId"
+    "Project": "DemoProjt",
+    "ReflectedWorkItemIDFieldName": "ProcessName.ReflectedWorkItemId",
+    "AllowCrossProjectLinking": false
   },
   "FieldMaps": [],
   "WorkItemTypeDefinition": {
-    "Bug": "Bug",
-    "Product Backlog Item": "Product Backlog Item"
+    "sourceWorkItemTypeName": "targetWorkItemTypeName"
   },
+  "GitRepoMapping": null,
   "Processors": [
     {
       "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.NodeStructuresMigrationConfig",
@@ -51,10 +53,10 @@ The global configuration created by the `init` command look like this:
       "PrefixProjectToNodes": false,
       "UpdateCreatedDate": true,
       "UpdateCreatedBy": true,
-      "UpdateSourceReflectedId": true,
+      "UpdateSourceReflectedId": false,
       "BuildFieldTable": false,
       "AppendMigrationToolSignatureFooter": false,
-      "QueryBit": "AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')",
+      "QueryBit": "AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
       "OrderBit": "[System.ChangedDate] desc",
       "Enabled": false,
       "LinkMigration": true,
@@ -62,10 +64,12 @@ The global configuration created by the `init` command look like this:
       "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
       "FixHtmlAttachmentLinks": false,
       "WorkItemCreateRetryLimit": 5,
-      "FilterWorkItemsThatAlreadyExistInTarget": true
+      "FilterWorkItemsThatAlreadyExistInTarget": true,
+      "PauseAfterEachWorkItem": false
     }
   ]
 }
+
 
 
 ```
