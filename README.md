@@ -33,7 +33,7 @@ The Azure DevOps Migration Tools allow you to bulk edit and migrate data between
 ## Quick Links
 
  - [Video Overview](https://youtu.be/ZxDktQae10M)
- - [Getting Started](http://nkdagility.github.io/azure-devops-migration-tools/getting-started.md)
+ - [Getting Started](http://github.com/nkdAgility/azure-devops-migration-tools/blob/master/docs/getting-started.md)
  - [Documentation](http://nkdagility.github.io/azure-devops-migration-tools/)
 
 
