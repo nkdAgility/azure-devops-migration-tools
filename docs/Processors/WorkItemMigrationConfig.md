@@ -33,5 +33,5 @@ It will migrate work items using a tip or replay migrator as well as Attachments
 | _{NEW}_ `WorkItemCreateRetryLimit` | Integer | *beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equil to the retry count. This allows for periodic network glitches not to end the process. | 5 |
 | _{NEW}_ `FilterWorkItemsThatAlreadyExistInTarget` | Boolean | Instad of using the `UpdateSoureReflectedId` setting this load all of the work items already saved to the Target and removes them from the Source work item list prior to commensing the run. While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart. | true |
 | `QueryBit`                           | string  | A work item query to select only important work items. To migrate all leave this empty. |                                          |
-
+| `OrderBit` | string | A work item query to affect the order in which the work items are migrated. Don't leave this empty. | [System.ChangedDate] desc
 
