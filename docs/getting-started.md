@@ -28,18 +28,20 @@ You can now customise the configuration depending on what you need to do. Howeve
 
 ```
 {
-  "Version": "8.3",
+  "Version": "8.4",
   "TelemetryEnableTrace": false,
   "workaroundForQuerySOAPBugEnabled": false,
   "Source": {
     "Collection": "https://dev.azure.com/psd45",
-    "Name": "DemoProjs",
-    "ReflectedWorkItemIDFieldName": "TfsMigrationTool.ReflectedWorkItemId"
+    "Project": "DemoProjs",
+    "ReflectedWorkItemIDFieldName": "TfsMigrationTool.ReflectedWorkItemId",
+    "AllowCrossProjectLinking": false
   },
   "Target": {
     "Collection": "https://dev.azure.com/psd46",
-    "Name": "DemoProjt",
-    "ReflectedWorkItemIDFieldName": "ProcessName.ReflectedWorkItemId"
+    "Project": "DemoProjt",
+    "ReflectedWorkItemIDFieldName": "ProcessName.ReflectedWorkItemId",
+    "AllowCrossProjectLinking": false
   },
   "FieldMaps": [],
   "WorkItemTypeDefinition": {
@@ -51,7 +53,10 @@ You can now customise the configuration depending on what you need to do. Howeve
       "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.NodeStructuresMigrationConfig",
       "PrefixProjectToNodes": false,
       "Enabled": false,
-      "BasePaths": []
+      "BasePaths": [
+        "Product\\Area\\Path1",
+        "Product\\Area\\Path2"
+      ]
     },
     {
       "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.WorkItemMigrationConfig",
@@ -75,7 +80,6 @@ You can now customise the configuration depending on what you need to do. Howeve
     }
   ]
 }
-
 ```
 
 Here we are performing the following operations:
