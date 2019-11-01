@@ -21,5 +21,10 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
         {
             return true;
         }
+
+        public WorkItemUpdateConfig()
+        {
+            QueryBit = @"AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')";
+        }
     }
 }

@@ -20,5 +20,10 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
         {
             return true;
         }
+
+        public WorkItemPostProcessingConfig()
+        {
+            QueryBit = "AND [TfsMigrationTool.ReflectedWorkItemId] = '' ";
+        }
     }
 }
