@@ -30,13 +30,35 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
         public int WorkItemCreateRetryLimit { get; set; }
 
         public bool FilterWorkItemsThatAlreadyExistInTarget { get; set; }
- public bool PauseAfterEachWorkItem { get; set; }
+        public bool PauseAfterEachWorkItem { get; set; }
         public int AttachmentMazSize { get; set; }
 
         /// <inheritdoc />
         public bool IsProcessorCompatible(IReadOnlyList<ITfsProcessingConfig> otherProcessors)
         {
             return true;
+        }
+
+        /// <summary>
+        /// Creates a new workitemmigrationconfig with default values
+        /// </summary>
+        public WorkItemMigrationConfig()
+        {
+            Enabled = false;
+            WorkItemCreateRetryLimit = 5;
+            FilterWorkItemsThatAlreadyExistInTarget = true;
+            ReplayRevisions = true;
+            LinkMigration = true;
+            AttachmentMigration = true;
+            FixHtmlAttachmentLinks = false;
+            AttachmentWorkingPath = "c:\\temp\\WorkItemAttachmentWorkingFolder\\";
+            AttachmentMazSize = 480000000;
+            UpdateCreatedBy = true;
+            PrefixProjectToNodes = false;
+            UpdateCreatedDate = true;
+            UpdateSourceReflectedId = false;
+            QueryBit = @"AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
+            OrderBit = "[System.ChangedDate] desc";
         }
     }
 }

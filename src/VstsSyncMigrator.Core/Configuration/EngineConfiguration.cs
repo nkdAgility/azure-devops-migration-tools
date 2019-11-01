@@ -48,23 +48,7 @@ namespace VstsSyncMigrator.Engine.Configuration
         private static void AddWorkItemMigrationDefault(EngineConfiguration ec)
         {
             ec.Processors.Add(new NodeStructuresMigrationConfig() { Enabled = false, PrefixProjectToNodes = false, BasePaths = new[] { "Product\\Area\\Path1", "Product\\Area\\Path2" } });
-            ec.Processors.Add(new WorkItemMigrationConfig() { 
-                Enabled = false, 
-                WorkItemCreateRetryLimit = 5, 
-                FilterWorkItemsThatAlreadyExistInTarget = true, 
-                ReplayRevisions = true, 
-                LinkMigration = true, 
-                AttachmentMigration = true, 
-                FixHtmlAttachmentLinks = false, 
-                AttachmentWorkingPath = "c:\\temp\\WorkItemAttachmentWorkingFolder\\", 
-                AttachmentMazSize = 480000000,
-                UpdateCreatedBy = true, 
-                PrefixProjectToNodes = false, 
-                UpdateCreatedDate = true, 
-                UpdateSourceReflectedId = false, 
-                QueryBit = @"AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')", 
-                OrderBit = "[System.ChangedDate] desc" 
-            });
+            ec.Processors.Add(new WorkItemMigrationConfig());
         }
 
         private static EngineConfiguration CreateEmptyConfig()
