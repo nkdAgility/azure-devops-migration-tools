@@ -27,14 +27,14 @@ namespace VstsSyncMigrator.Engine.Configuration
             AddFieldMapps(ec);
             AddWorkItemMigrationDefault(ec);
             AddTestPlansMigrationDefault(ec);
-            ec.Processors.Add(new ImportProfilePictureConfig() { Enabled = false });
-            ec.Processors.Add(new ExportProfilePictureFromADConfig() { Enabled = false });
-            ec.Processors.Add(new FixGitCommitLinksConfig() { Enabled = false, TargetRepository = ec.Target.Project });
-            ec.Processors.Add(new WorkItemUpdateConfig() { Enabled = false, QueryBit = @"AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')" });
-            ec.Processors.Add(new WorkItemPostProcessingConfig() { Enabled = false, QueryBit = "AND [TfsMigrationTool.ReflectedWorkItemId] = '' ", WorkItemIDs = new List<int> { 1, 2, 3 } });
-            ec.Processors.Add(new WorkItemDeleteConfig() { Enabled = false });
-            ec.Processors.Add(new WorkItemQueryMigrationConfig() { Enabled = false, PrefixProjectToNodes = false });
-            ec.Processors.Add(new TeamMigrationConfig() { Enabled = false, PrefixProjectToNodes = false, EnableTeamSettingsMigration = true });
+            ec.Processors.Add(new ImportProfilePictureConfig());
+            ec.Processors.Add(new ExportProfilePictureFromADConfig());
+            ec.Processors.Add(new FixGitCommitLinksConfig() { TargetRepository = ec.Target.Project });
+            ec.Processors.Add(new WorkItemUpdateConfig());
+            ec.Processors.Add(new WorkItemPostProcessingConfig() { WorkItemIDs = new List<int> { 1, 2, 3 } });
+            ec.Processors.Add(new WorkItemDeleteConfig());
+            ec.Processors.Add(new WorkItemQueryMigrationConfig());
+            ec.Processors.Add(new TeamMigrationConfig());
             return ec;
         }
 
@@ -47,7 +47,10 @@ namespace VstsSyncMigrator.Engine.Configuration
 
         private static void AddWorkItemMigrationDefault(EngineConfiguration ec)
         {
-            ec.Processors.Add(new NodeStructuresMigrationConfig() { Enabled = false, PrefixProjectToNodes = false, BasePaths = new[] { "Product\\Area\\Path1", "Product\\Area\\Path2" } });
+            ec.Processors.Add(new NodeStructuresMigrationConfig()
+            {
+                BasePaths = new[] { "Product\\Area\\Path1", "Product\\Area\\Path2" }
+            });
             ec.Processors.Add(new WorkItemMigrationConfig());
         }
 
@@ -68,10 +71,10 @@ namespace VstsSyncMigrator.Engine.Configuration
 
         private static void AddTestPlansMigrationDefault(EngineConfiguration ec)
         {
-            ec.Processors.Add(new TestVariablesMigrationConfig() { Enabled = false });
-            ec.Processors.Add(new TestConfigurationsMigrationConfig() { Enabled = false });
-            ec.Processors.Add(new TestPlansAndSuitesMigrationConfig() { Enabled = false, PrefixProjectToNodes = true });
-            //ec.Processors.Add(new TestRunsMigrationConfig() { Enabled = false });
+            ec.Processors.Add(new TestVariablesMigrationConfig());
+            ec.Processors.Add(new TestConfigurationsMigrationConfig());
+            ec.Processors.Add(new TestPlansAndSuitesMigrationConfig());
+            //ec.Processors.Add(new TestRunsMigrationConfig());
         }
 
         private static void AddFieldMapps(EngineConfiguration ec)

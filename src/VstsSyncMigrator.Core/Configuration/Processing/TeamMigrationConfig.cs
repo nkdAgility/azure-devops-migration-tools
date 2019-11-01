@@ -10,10 +10,7 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
 
         public bool PrefixProjectToNodes { get; set; }
 
-        /// <summary>
-        ///     Do we automatically migrate Team Settings after Team creation ?
-        /// </summary>
-        public bool EnableTeamSettingsMigration { get; set; } = false;
+        public bool EnableTeamSettingsMigration { get; set; }
 
         /// <inheritdoc />
         public Type Processor
@@ -25,6 +22,11 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
         public bool IsProcessorCompatible(IReadOnlyList<ITfsProcessingConfig> otherProcessors)
         {
             return true;
+        }
+
+        public TeamMigrationConfig()
+        {
+            EnableTeamSettingsMigration = true;
         }
     }
 }
