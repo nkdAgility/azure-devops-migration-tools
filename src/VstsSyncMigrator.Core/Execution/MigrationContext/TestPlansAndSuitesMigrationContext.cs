@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.TeamFoundation.Framework.Client;
 using Microsoft.TeamFoundation.Framework.Common;
@@ -159,7 +161,7 @@ namespace VstsSyncMigrator.Engine
                 : $"{sourcePlan.Name}";
             TraceWriteLine(sourcePlan, $"Process Plan {newPlanName}", 0, true);
             var targetPlan = FindTestPlan(targetTestStore, newPlanName);
-            if (TargetPlanContansTag(targetPlan.Id))
+            if (targetPlan != null && TargetPlanContansTag(targetPlan.Id))
             {
                 return;
             }
@@ -291,6 +293,23 @@ namespace VstsSyncMigrator.Engine
             }
 
             me.ApplyFieldMappings(sourceWI, targetWI);
+
+            //validate if save operation will work and report issues if found
+            ArrayList validationIssues = targetWI.Validate();
+
+            if (validationIssues.Count > 0)
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendLine("error(s) during validation in work item fields before saving:");
+
+                foreach(Microsoft.TeamFoundation.WorkItemTracking.Client.Field issue in validationIssues)
+                {
+                    sb.AppendLine(issue.ReferenceName + " - value = " + issue.Value);
+                }
+
+                throw new Exception(sb.ToString());
+            }
+
             targetWI.Save();
         }
 
