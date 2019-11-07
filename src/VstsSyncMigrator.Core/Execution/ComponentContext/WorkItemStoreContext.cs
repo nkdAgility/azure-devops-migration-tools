@@ -149,7 +149,7 @@ namespace VstsSyncMigrator.Engine
             StringBuilder s = new StringBuilder();
             s.Append("SELECT [System.Id] FROM WorkItems");
             s.Append(" WHERE ");
-            if (teamProjectContext.Config.AllowCrossProjectLinking)
+            if (!teamProjectContext.Config.AllowCrossProjectLinking)
             {
                 s.Append("[System.TeamProject]=@TeamProject AND ");
                 query.AddParameter("TeamProject", this.teamProjectContext.Config.Project);
