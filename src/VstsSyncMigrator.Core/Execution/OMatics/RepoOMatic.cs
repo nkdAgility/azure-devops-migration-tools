@@ -18,6 +18,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
         MigrationEngine migrationEngine;
         GitRepositoryService sourceRepoService;
         IList<GitRepository> sourceRepos;
+        IList<GitRepository> allSourceRepos;
         GitRepositoryService targetRepoService;
         IList<GitRepository> targetRepos;
         List<string> gitWits;
@@ -27,6 +28,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
             migrationEngine = me;
             sourceRepoService = me.Source.Collection.GetService<GitRepositoryService>();
             sourceRepos = sourceRepoService.QueryRepositories(me.Source.Config.Project);
+            allSourceRepos = sourceRepoService.QueryRepositories("");
             //////////////////////////////////////////////////
             targetRepoService = me.Target.Collection.GetService<GitRepositoryService>();
             targetRepos = targetRepoService.QueryRepositories(me.Target.Config.Project);
@@ -113,7 +115,8 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                     }
                     else
                     {
-                        Trace.WriteLine($"FAIL could not find source git repo");
+                        GitRepositoryInfo anyProjectSourceRepoInfo = GitRepositoryInfo.Create(el, allSourceRepos);
+                        Trace.WriteLine($"FAIL could not find source git repo - repo referenced: {anyProjectSourceRepoInfo?.GitRepo?.ProjectReference?.Name}/{anyProjectSourceRepoInfo?.GitRepo?.Name}");
                     }
                 }
             }
