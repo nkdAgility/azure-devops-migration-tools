@@ -52,6 +52,18 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                     ExternalLink el = (ExternalLink)l;
 
                     GitRepositoryInfo sourceRepoInfo = GitRepositoryInfo.Create(el, sourceRepos);
+                    // if repo was not found in source project, try to find it by repoId in the whole project collection
+                    if (sourceRepoInfo.GitRepo == null) {
+                        var anyProjectSourceRepoInfo = GitRepositoryInfo.Create(el, allSourceRepos);
+                        // if repo is found in a different project and the repo Name is listed in repo mappings, use it
+                        if (anyProjectSourceRepoInfo.GitRepo != null && migrationEngine.GitRepoMappings.ContainsKey(anyProjectSourceRepoInfo.GitRepo.Name)) {
+                            sourceRepoInfo = anyProjectSourceRepoInfo;
+                        }
+                        else
+                        {
+                            Trace.WriteLine($"FAIL could not find source git repo - repo referenced: {anyProjectSourceRepoInfo?.GitRepo?.ProjectReference?.Name}/{anyProjectSourceRepoInfo?.GitRepo?.Name}");
+                        }
+                    }
 
                     if (sourceRepoInfo.GitRepo != null)
                     {
@@ -112,11 +124,6 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                         {
                             Trace.WriteLine($"FAIL: cannot map {sourceRepoInfo.GitRepo.RemoteUrl} to ???");
                         }
-                    }
-                    else
-                    {
-                        GitRepositoryInfo anyProjectSourceRepoInfo = GitRepositoryInfo.Create(el, allSourceRepos);
-                        Trace.WriteLine($"FAIL could not find source git repo - repo referenced: {anyProjectSourceRepoInfo?.GitRepo?.ProjectReference?.Name}/{anyProjectSourceRepoInfo?.GitRepo?.Name}");
                     }
                 }
             }
