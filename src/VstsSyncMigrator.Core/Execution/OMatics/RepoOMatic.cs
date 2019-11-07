@@ -21,6 +21,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
         IList<GitRepository> allSourceRepos;
         GitRepositoryService targetRepoService;
         IList<GitRepository> targetRepos;
+        IList<GitRepository> allTargetRepos;
         List<string> gitWits;
 
         public RepoOMatic(MigrationEngine me)
@@ -32,6 +33,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
             //////////////////////////////////////////////////
             targetRepoService = me.Target.Collection.GetService<GitRepositoryService>();
             targetRepos = targetRepoService.QueryRepositories(me.Target.Config.Project);
+            allTargetRepos = targetRepoService.QueryRepositories("");
             gitWits = new List<string>
                 {
                     "Branch",
@@ -72,11 +74,22 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                         string sourceProjectName = sourceRepoInfo.GitRepo.ProjectReference.Name;
                         string targetProjectName = migrationEngine.Target.Config.Project;
 
-                        GitRepositoryInfo targetRepoInfo = GitRepositoryInfo.Create(targetRepoName, sourceRepoInfo, migrationEngine, targetRepos);
-               
+                        GitRepositoryInfo targetRepoInfo = GitRepositoryInfo.Create(targetRepoName, sourceRepoInfo, targetRepos);
+                        // if repo was not found in the target project, try to find it in the whole target project collection
+                        if (targetRepoInfo.GitRepo == null) 
+                        {
+                            if (migrationEngine.GitRepoMappings.ContainsValue(targetRepoName)) 
+                            {
+                                var anyTargetRepoInCollectionInfo = GitRepositoryInfo.Create(targetRepoName, sourceRepoInfo, allTargetRepos);
+                                if (anyTargetRepoInCollectionInfo.GitRepo != null) 
+                                {
+                                    targetRepoInfo = anyTargetRepoInCollectionInfo;
+                                }
+                            }
+                        }
 
                         // Fix commit links if target repo has been found
-                        if (targetRepoInfo != null)
+                        if (targetRepoInfo.GitRepo != null)
                         {
                             Trace.WriteLine($"Fixing {sourceRepoInfo.GitRepo.RemoteUrl} to {targetRepoInfo.GitRepo.RemoteUrl}?");
 
@@ -224,28 +237,12 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
             return new GitRepositoryInfo(commitID, repoID, gitRepo);
         }
 
-        internal static GitRepositoryInfo Create(string targetRepoName, GitRepositoryInfo sourceRepoInfo , MigrationEngine migrationEngine, IList<GitRepository> targetRepos)
-        {
-            GitRepository gitRepo;
-            // Source and Target project names match
-            if (migrationEngine.Source.Config.Project == migrationEngine.Target.Config.Project)
-            {
-                gitRepo = (from g in targetRepos
-                              where
-                              g.Name == targetRepoName &&
-                              g.ProjectReference.Name == migrationEngine.Source.Config.Project
-                              select g).SingleOrDefault();
-            }
-            // Source and Target project names do not match
-            else
-            {
-                gitRepo = (from g in targetRepos
-                              where
-                              g.Name == targetRepoName &&
-                              g.ProjectReference.Name != migrationEngine.Source.Config.Project
-                              select g).SingleOrDefault();
-            }
-            return new GitRepositoryInfo(sourceRepoInfo.CommitID, gitRepo.Id.ToString(), gitRepo);
+        internal static GitRepositoryInfo Create(string targetRepoName, GitRepositoryInfo sourceRepoInfo, IList<GitRepository> targetRepos) {
+            var gitRepo = (from g in targetRepos
+                                     where
+                                         g.Name == targetRepoName
+                                     select g).SingleOrDefault();
+            return new GitRepositoryInfo(sourceRepoInfo.CommitID, gitRepo?.Id.ToString(), gitRepo);
         }
     }
 }
