@@ -22,7 +22,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
         GitRepositoryService targetRepoService;
         IList<GitRepository> targetRepos;
         List<string> wits;
-        
+
         public RepoOMatic(MigrationEngine me)
         {
             migrationEngine = me;
@@ -40,7 +40,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                 };
         }
 
-        public int FixExternalLinks(WorkItem targetWorkItem, WorkItemStoreContext targetStore, bool save = true)
+        public int FixExternalLinks(WorkItem targetWorkItem, WorkItemStoreContext targetStore, WorkItem sourceWorkItem, bool save = true)
         {
             List<ExternalLink> newEL = new List<ExternalLink>();
             List<ExternalLink> removeEL = new List<ExternalLink>();
@@ -50,7 +50,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                 if (l is ExternalLink && wits.Contains(l.ArtifactLinkType.Name))
                 {
                     ExternalLink el = (ExternalLink) l;
-                    GitRepositoryInfo sourceRepoInfo = GitRepositoryInfo.Create(el, sourceRepos, migrationEngine);
+                    GitRepositoryInfo sourceRepoInfo = GitRepositoryInfo.Create(el, sourceRepos, migrationEngine, sourceWorkItem?.Project?.Name);                    
 
                     if (sourceRepoInfo != null)
                     {
@@ -182,7 +182,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
             this.GitRepo = GitRepo;            
         }
 
-        public static GitRepositoryInfo Create(ExternalLink gitExternalLink, IList<GitRepository> possibleRepos, MigrationEngine migrationEngine)
+        public static GitRepositoryInfo Create(ExternalLink gitExternalLink, IList<GitRepository> possibleRepos, MigrationEngine migrationEngine, string workItemSourceProjectName)
         {
             var repoType = DetermineFromLink(gitExternalLink.LinkedArtifactUri);
             switch (repoType)
@@ -190,19 +190,16 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                 case RepistoryType.Git:
                     return CreateFromGit(gitExternalLink, possibleRepos);
                 
-                case RepistoryType.TFVC:
-                    return CreateFromTFVC(gitExternalLink, possibleRepos, migrationEngine.ChangeSetMapping, migrationEngine.Source.Config.Project);
+                case RepistoryType.TFVC:                    
+                    return CreateFromTFVC(gitExternalLink, possibleRepos, migrationEngine.ChangeSetMapping, migrationEngine.Source.Config.Project, workItemSourceProjectName);
             }
 
             return null;
         }
 
         private static GitRepositoryInfo CreateFromTFVC(ExternalLink gitExternalLink, IList<GitRepository> possibleRepos, 
-            Dictionary<string, string> changesetMapping, string sourceProjectName)
+            Dictionary<int, string> changesetMapping, string sourceProjectName, string workItemSourceProjectName)
         {
-            // Scenario: TFVC => GIT Same Project Link (can fix the changeset link if git repo mapping correct or git repo has same name as tfvc repo)
-            // Scenario: TFVC => GIT Exernal Project Link (cannot fix changeset link currently, because of repository filter on project level)
-
             string commitID;
             string repoID;
             GitRepository gitRepo;
@@ -214,28 +211,15 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                 return null;
             }
 
-            var commitIDKvPair = changesetMapping.FirstOrDefault(item => item.Key == changeSetId.ToString());
+            var commitIDKvPair = changesetMapping.FirstOrDefault(item => item.Key == changeSetId);
             if (string.IsNullOrEmpty(commitIDKvPair.Value))
             {
                 Trace.WriteLine($"Commit Id not found from Changeset Id {changeSetIdPart}.");
                 return null;
             }
 
-            //https://domain.com/{organization}/{projectname}/_versionControl/changeset/{id}
-            var projectName = string.Empty;
-            var linkedArtifactUriSplitted = gitExternalLink.LinkedArtifactUri.Split('/');
-            if (linkedArtifactUriSplitted != null && linkedArtifactUriSplitted.Length >= 4)
-            {
-                projectName = linkedArtifactUriSplitted.Reverse().ToArray()[3];                
-            }
-
-            //If project name is not same as Source Project name, than the link cannot be fixed, because it points to external TFVC Project. 
-            if (!projectName.Trim().ToLowerInvariant().Equals(sourceProjectName.Trim().ToLowerInvariant()))
-            {
-                return null;
-            }
-
-            return new GitRepositoryInfo(commitIDKvPair.Value, new GitRepository() { Name = projectName });
+            //assume the GitRepository source name is the work items project name, which changeset links needs to be fixed
+            return new GitRepositoryInfo(commitIDKvPair.Value, new GitRepository() { Name = workItemSourceProjectName });
         }
 
         private static GitRepositoryInfo CreateFromGit(ExternalLink gitExternalLink, IList<GitRepository> possibleRepos)

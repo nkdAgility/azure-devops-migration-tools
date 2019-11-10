@@ -216,8 +216,24 @@ namespace VstsSyncMigrator.ConsoleApp
             {
                 using (System.IO.StreamReader file = new System.IO.StreamReader(opts.ChangeSetMappingFile))
                 {
-                    var fileStr = file.ReadToEnd();
-                    me.ChangeSetMapping.AddRange(JsonConvert.DeserializeObject<Dictionary<string, string>>(fileStr));
+                    string line = string.Empty;
+                    while ((line = file.ReadLine()) != null)
+                    {
+                        if (string.IsNullOrEmpty(line))
+                        {
+                            continue;
+                        }
+
+                        var split = line.Split('-');
+                        if (split == null
+                            || split.Length != 2
+                            || !int.TryParse(split[0], out int changesetId))
+                        {
+                            continue;
+                        }
+
+                        me.ChangeSetMapping.Add(changesetId, split[1]);
+                    }                    
                 }
             }
 
