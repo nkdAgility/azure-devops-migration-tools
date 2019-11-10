@@ -29,13 +29,13 @@ namespace VstsSyncMigrator.Engine
         private AttachmentOMatic attachmentOMatic;
         private RepoOMatic repoOMatic;
         EmbededImagesRepairOMatic embededImagesRepairOMatic = new EmbededImagesRepairOMatic();
-        int _current = 0;
-        int _count = 0;
-        int _failures = 0;
-        int _imported = 0;
-        int _skipped = 0;
-        long _elapsedms = 0;
-        int _totalWorkItem = 0;
+        static int _current = 0;
+        static int _count = 0;
+        static int _failures = 0;
+        static int _imported = 0;
+        static int _skipped = 0;
+        static long _elapsedms = 0;
+       static int _totalWorkItem = 0;
 
         public WorkItemMigrationContext(MigrationEngine me, WorkItemMigrationConfig config)
             : base(me, config)
@@ -47,7 +47,7 @@ namespace VstsSyncMigrator.Engine
             _witClient = new WorkItemTrackingHttpClient(me.Target.Collection.Uri, adoCreds);
 
             var workItemServer = me.Source.Collection.GetService<WorkItemServer>();
-            attachmentOMatic = new AttachmentOMatic(workItemServer, config.AttachmentWorkingPath);
+            attachmentOMatic = new AttachmentOMatic(workItemServer, config.AttachmentWorkingPath, config.AttachmentMazSize);
             repoOMatic = new RepoOMatic(me);
         }
 
@@ -462,7 +462,7 @@ namespace VstsSyncMigrator.Engine
             //    $"FieldMapOnNewWorkItem: {newWorkItemstartTime} - {fieldMappingTimer.Elapsed.ToString("c")}", Name);
         }
 
-        private void TraceWriteLine(WorkItem sourceWorkItem, string message = "", ConsoleColor colour = ConsoleColor.Green, bool header = false)
+        internal static void TraceWriteLine(WorkItem sourceWorkItem, string message = "", ConsoleColor colour = ConsoleColor.Green, bool header = false)
         {
             if (header)
             {
@@ -479,7 +479,7 @@ namespace VstsSyncMigrator.Engine
             Console.ForegroundColor = ConsoleColor.White;
         }
 
-        private string TraceWriteLineTags(WorkItem sourceWorkItem, WorkItem targetWorkItem = null)
+        private static string TraceWriteLineTags(WorkItem sourceWorkItem, WorkItem targetWorkItem = null)
         {
             string totalWorkItems = _totalWorkItem.ToString();
             string currentWorkITem = _current.ToString();

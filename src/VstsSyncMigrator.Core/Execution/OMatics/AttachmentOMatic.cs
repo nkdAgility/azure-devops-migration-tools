@@ -1,4 +1,5 @@
-﻿using Microsoft.TeamFoundation.WorkItemTracking.Client;
+﻿using Microsoft.TeamFoundation.Framework.Client;
+using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Proxy;
 using System;
 using System.Collections.Generic;
@@ -16,11 +17,13 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
         private WorkItemServer _server;
         private string _exportBasePath;
         private string _exportWiPath;
+        private int _maxAttachmentSize ;
 
-        public AttachmentOMatic(WorkItemServer workItemServer, string exportBasePath)
+        public AttachmentOMatic(WorkItemServer workItemServer, string exportBasePath, int maxAttachmentSize = 480000000)
         {
             _server = workItemServer;
             _exportBasePath = exportBasePath;
+            _maxAttachmentSize = maxAttachmentSize;
         }
 
         public void ProcessAttachemnts(WorkItem sourceWorkItem, WorkItem targetWorkItem, bool save = true)
@@ -37,22 +40,23 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                 {
                     string filepath = null;
                     filepath = ExportAttachment(sourceWorkItem, wia, _exportWiPath);
+                    WorkItemMigrationContext.TraceWriteLine(sourceWorkItem, $"Exported {System.IO.Path.GetFileName(filepath)} to disk");
                     if (filepath != null)
                     {
                         ImportAttachemnt(targetWorkItem, filepath, save);
+                        WorkItemMigrationContext.TraceWriteLine(sourceWorkItem, $"Imported {System.IO.Path.GetFileName(filepath)} from disk");
                     }
-                    Trace.WriteLine("...done");
                 }
                 catch (Exception)
                 {
-                    Trace.WriteLine(string.Format(" ERROR: Unable to process atachment from source wi {0} called {1}", sourceWorkItem.Id, wia.Name));
+                    WorkItemMigrationContext.TraceWriteLine(sourceWorkItem, $"ERROR: Unable to process atachment from source wi {sourceWorkItem.Id} called {wia.Name}");
                 }
 
             }
             if (save)
             {
-                targetWorkItem.Fields["System.ChangedBy"].Value = "Migration";
-                targetWorkItem.Save();
+                WorkItemMigrationContext.SaveWorkItem(targetWorkItem);
+                WorkItemMigrationContext.TraceWriteLine(sourceWorkItem, $" Work iTem now has {sourceWorkItem.Attachments.Count} attachemnts");
                 CleanUpAfterSave(targetWorkItem);
             }           
 
@@ -88,7 +92,6 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                 {
                     var fileLocation = _server.DownloadFile(wia.Id);
                     File.Copy(fileLocation, fpath, true);
-                    Trace.Write("...done");
                 }
                 catch (Exception ex)
                 {
@@ -108,19 +111,29 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
         private void ImportAttachemnt(WorkItem targetWorkItem, string filepath, bool save = true)
         {
             var filename = System.IO.Path.GetFileName(filepath);
-            var attachments = targetWorkItem.Attachments.Cast<Attachment>();
-            var attachment = attachments.Where(a => a.Name == filename).FirstOrDefault();
-            if (attachment == null)
+            FileInfo fi = new FileInfo(filepath);
+            if (_maxAttachmentSize > fi.Length)
             {
-                Attachment a = new Attachment(filepath);
-                targetWorkItem.Attachments.Add(a);
-            }
-            else
+                var attachments = targetWorkItem.Attachments.Cast<Attachment>();
+                var attachment = attachments.Where(a => a.Name == filename).FirstOrDefault();
+                if (attachment == null)
+                {
+                    Attachment a = new Attachment(filepath);
+                    targetWorkItem.Attachments.Add(a);
+                }
+                else
+                {
+                    Trace.WriteLine(string.Format(" [SKIP] WorkItem {0} already contains attachment {1}", targetWorkItem.Id, filepath));
+                }
+            } else
             {
-                Trace.WriteLine(string.Format(" [SKIP] WorkItem {0} already contains attachment {1}", targetWorkItem.Id, filepath));
+                Trace.WriteLine($" [SKIP] Attachemnt {filename} on Work Item {targetWorkItem.Id} is bigger than the limit of {_maxAttachmentSize} bites for Azure DevOps.");
+
             }
 
+
         }
+
 
         public string GetSafeFilename(string filename)
         {
