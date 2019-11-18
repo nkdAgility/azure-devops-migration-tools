@@ -72,9 +72,8 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
 
                     if (sourceRepoInfo.GitRepo != null)
                     {
-
                         string targetRepoName = GetTargetRepoName(migrationEngine.GitRepoMappings, sourceRepoInfo);
-                        string sourceProjectName = sourceRepoInfo.GitRepo.ProjectReference.Name;
+                        string sourceProjectName = sourceRepoInfo?.GitRepo?.ProjectReference?.Name ?? migrationEngine.Target.Config.Project;
                         string targetProjectName = migrationEngine.Target.Config.Project;
 
                         GitRepositoryInfo targetRepoInfo = GitRepositoryInfo.Create(targetRepoName, sourceRepoInfo, targetRepos);
@@ -105,6 +104,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                                         $"vstfs:///git/ref/{targetRepoInfo.GitRepo.ProjectReference.Id}%2f{targetRepoInfo.GitRepo.Id}%2f{sourceRepoInfo.CommitID}");
                                     break;
 
+                                case "Fixed in Changeset":  // TFVC
                                 case "Fixed in Commit":
                                     newLink = new ExternalLink(targetStore.Store.RegisteredLinkTypes[ArtifactLinkIds.Commit],
                                         $"vstfs:///git/commit/{targetRepoInfo.GitRepo.ProjectReference.Id}%2f{targetRepoInfo.GitRepo.Id}%2f{sourceRepoInfo.CommitID}");
