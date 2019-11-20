@@ -30,12 +30,12 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{2BC0808B-6F4D-4635-82FE-1118181DD64F}"
 	ProjectSection(SolutionItems) = preProject
 		docs\_config.yml = docs\_config.yml
+		docs\changeset-migration.md = docs\changeset-migration.md
 		docs\configuration.md = docs\configuration.md
 		docs\faq.md = docs\faq.md
 		docs\getting-started.md = docs\getting-started.md
 		docs\index.md = docs\index.md
 		docs\server-configuration.md = docs\server-configuration.md
-		docs\why.md = docs\why.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Engine", "Engine", "{1BC94A7E-4A43-4388-97BE-DCCF62797DA8}"
@@ -53,7 +53,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Processors", "Processors", "{E9399C6D-A5E0-43ED-8412-6C4A6BC86EC8}"
 	ProjectSection(SolutionItems) = preProject
-		docs\Processors\FixGitCommitLinksConfig.md = docs\Processors\FixGitCommitLinksConfig.md
 		docs\Processors\ImportProfilePictureConfig.md = docs\Processors\ImportProfilePictureConfig.md
 		docs\Processors\NodeStructuresMigrationConfig.md = docs\Processors\NodeStructuresMigrationConfig.md
 		docs\Processors\TeamMigrationConfig.md = docs\Processors\TeamMigrationConfig.md

@@ -18,9 +18,12 @@ _NOTICE: Both paied and community support is avilable through our [recommneded c
 
 ## Change Log
 
-* v8.3 - Support for restarting the migration and syncing at the revision level.
-* v8.2 - Merge Git commit Fixing into Work Item migration (requires repos to be migrated first, can be rerun)
-* v8.0 - Merge of Work Item, Link, & attachent migrators into one.
+- v8.6 - Support for fixing links from TFVC Changesets to Git Commits using a mapping file generated from a Git-TFS migration.
+- v8.5 - Attachment Max size and linking work items to git repos between projects.
+- v8.4 - Support for cross-project linking of work items between projects.
+- v8.3 - Support for restarting the migration and syncing at the revision level.
+- v8.2 - Merge Git commit Fixing into Work Item migration (requires repos to be migrated first, can be rerun)
+- v8.0 - Merge of Work Item, Link, & attachent migrators into one.
 
 ## What versions of Azure DevOps & TFS do you support?
 
@@ -34,6 +37,7 @@ _NOTICE: Both paied and community support is avilable through our [recommneded c
  * _{new}_ [Video Overview](https://youtu.be/RCJsST0xBCE)
  * [Getting Started](./getting-started.md)
  * [Documentation](http://nkdagility.github.io/azure-devops-migration-tools/)
+ * _{NEW}_ [Changeset Migration](./changeset-migration.md)
  * [Contributing](#contributing)
  * [Why](#why-does-this-exist)
  * [FAQ](./faq.md)
@@ -73,20 +77,21 @@ Most of these processors need to be run in order. If you try to migrate work ite
 
 |Processor |Staus |Target |Usage |
 |---------|---------|---------|---------|
-|NodeStructuresMigrationContext | ready | Area & Iteration | Migrates Area and Iteration Paths |
+|[NodeStructuresMigrationContext] | ready | Area & Iteration | Migrates Area and Iteration Paths |
 |[WorkItemMigrationContext](./Processors/WorkItemMigrationConfig.md) | ready | Work Items | Migrates either tip or history of work items with Links & Attachments based on a query with field mappings |
+|[TeamMigrationConfig](./Processors/TeamMigrationConfig.md) | beta | Teams | Migrates Teams and Team Settings |
 |WorkItemRevisionReplayMigrationContext | merged |  Work Items | obsolite - merged into WorkItemMigrationContext |
 |LinkMigrationContext | merged | Work Items | obsolite - merged into WorkItemMigrationContext |
 |AttachementExportMigrationContext | merged | Work Items | obsolite - merged into WorkItemMigrationContext |
 |AttachementImportMigrationContext | merged | Work Items | obsolite - merged into WorkItemMigrationContext |
 |HtmlFieldEmbeddedImageMigrationContext | merged | HTML Fields | obsolite - merged into WorkItemMigrationContext |
 |GitCommitFixContext | merged | Git links | obsolite - merged into WorkItemMigrationContext |
-|WorkItemDelete | ready | Work Items | Bulk delete of work items **WARNING DANGERIOUS** |
-|WorkItemUpdate | ready | Work Items | Bulk update of Work Items based on a query and field mappings |
-|WorkItemQueryMigrationContext | ready | Queries | Migrates shared queries |
-|TestVeriablesMigrationContext | Suits & Plans | Migrates Test Variables |
-|TestConfigurationsMigrationContext | Suits & Plans | Migrates Test configurations |
-|TestPlansAndSuitesMigrationContext | Suits & Plans | Rebuilds Suits and plans for Test Cases migrated using the WorkItemMigrationContext |
+|[WorkItemDelete](./Processors/WorkItemDeleteConfig.md) | ready | Work Items | Bulk delete of work items **WARNING DANGERIOUS** |
+|[WorkItemUpdate](./Processors/WorkItemUpdateConfig.md) | ready | Work Items | Bulk update of Work Items based on a query and field mappings |
+|[WorkItemQueryMigrationContext](./Processors/WorkItemQueryMigrationContext.md) | ready | Queries | Migrates shared queries |
+|[TestVeriablesMigrationContext](./Processors/TestVeriablesMigrationContext.md) | Beta | Suits & Plans | Migrates Test Variables |
+|[TestConfigurationsMigrationContext](./Processors/TestConfigurationsMigrationContext.md) | Beta  | Suits & Plans | Migrates Test configurations |
+|[TestPlansAndSuitesMigrationContext](./Processors/TestPlansAndSuitesMigrationContext.md) | Beta  | Suits & Plans | Rebuilds Suits and plans for Test Cases migrated using the WorkItemMigrationContext |
 |TestRunsMigrationContext | Alfa | Suits & Plans | Migrates the history of Test Runs |
 |ImportProfilePictureContext & ExportProfilePictureFromADContext | Beta | Profiles | Downloads corporate images and updates TFS/Azure DevOps profiles |
 |CreateTeamFolders | ? | ? | ? | 
