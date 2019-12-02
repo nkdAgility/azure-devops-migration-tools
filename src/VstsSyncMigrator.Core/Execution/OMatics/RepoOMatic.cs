@@ -55,6 +55,13 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                     ExternalLink el = (ExternalLink)l;
 
                     GitRepositoryInfo sourceRepoInfo = GitRepositoryInfo.Create(el, sourceRepos, migrationEngine, sourceWorkItem?.Project?.Name);
+                    
+                    // if sourceRepo is null ignore this link and keep processing further links
+                    if (sourceRepoInfo == null) 
+                    {
+                        continue;
+                    }
+
                     // if repo was not found in source project, try to find it by repoId in the whole project collection
                     if (sourceRepoInfo.GitRepo == null)
                     {
