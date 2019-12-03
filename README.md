@@ -19,6 +19,9 @@ The Azure DevOps Migration Tools allow you to bulk edit and migrate data between
 
 ## Change Log
 
+- v8.6 - Support for fixing links from TFVC Changesets to Git Commits using a mapping file generated from a Git-TFS migration.
+- v8.5 - Attachment Max size and linking work items to git repos between projects.
+- v8.4 - Support for cross-project linking of work items between projects.
 - v8.3 - Support for restarting the migration and syncing at the revision level.
 - v8.2 - Merge Git commit Fixing into Work Item migration (requires repos to be migrated first, can be rerun)
 - v8.0 - Merge of Work Item, Link, & attachent migrators into one.

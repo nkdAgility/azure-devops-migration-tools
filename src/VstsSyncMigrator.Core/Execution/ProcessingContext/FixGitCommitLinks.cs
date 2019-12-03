@@ -18,7 +18,7 @@ namespace VstsSyncMigrator.Engine
         private FixGitCommitLinksConfig _config;
         private RepoOMatic _RepoOMatic;
 
-        public FixGitCommitLinks(MigrationEngine me, FixGitCommitLinksConfig config ) : base(me, config)
+        public FixGitCommitLinks(MigrationEngine me, FixGitCommitLinksConfig config, WorkItemStoreContext storeContext) : base(me, config)
         {
             _config = config;
             _RepoOMatic = new RepoOMatic(me);
@@ -58,7 +58,7 @@ namespace VstsSyncMigrator.Engine
                 Stopwatch witstopwatch = Stopwatch.StartNew();
 				workitem.Open();
 
-                _RepoOMatic.FixExternalGitLinks(workitem, targetStore);
+                _RepoOMatic.FixExternalLinks(workitem, targetStore, null);
 
                 if (workitem.IsDirty)
                 {

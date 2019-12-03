@@ -13,7 +13,7 @@ using VstsSyncMigrator.Engine;
 
 namespace VstsSyncMigrator.Core.Execution.OMatics
 {
-   public class RepoOMatic
+    public class RepoOMatic
     {
         MigrationEngine migrationEngine;
         GitRepositoryService sourceRepoService;
@@ -38,11 +38,12 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                 {
                     "Branch",
                     "Fixed in Commit",
-                    "Pull Request"
+                    "Pull Request",
+                    "Fixed in Changeset"    //TFVC
                 };
         }
 
-        public int FixExternalGitLinks(WorkItem targetWorkItem, WorkItemStoreContext targetStore, bool save = true)
+        public int FixExternalLinks(WorkItem targetWorkItem, WorkItemStoreContext targetStore, WorkItem sourceWorkItem, bool save = true)
         {
             List<ExternalLink> newEL = new List<ExternalLink>();
             List<ExternalLink> removeEL = new List<ExternalLink>();
@@ -53,12 +54,14 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                 {
                     ExternalLink el = (ExternalLink)l;
 
-                    GitRepositoryInfo sourceRepoInfo = GitRepositoryInfo.Create(el, sourceRepos);
+                    GitRepositoryInfo sourceRepoInfo = GitRepositoryInfo.Create(el, sourceRepos, migrationEngine, sourceWorkItem?.Project?.Name);
                     // if repo was not found in source project, try to find it by repoId in the whole project collection
-                    if (sourceRepoInfo.GitRepo == null) {
-                        var anyProjectSourceRepoInfo = GitRepositoryInfo.Create(el, allSourceRepos);
+                    if (sourceRepoInfo.GitRepo == null)
+                    {
+                        var anyProjectSourceRepoInfo = GitRepositoryInfo.Create(el, allSourceRepos, migrationEngine, sourceWorkItem?.Project?.Name);
                         // if repo is found in a different project and the repo Name is listed in repo mappings, use it
-                        if (anyProjectSourceRepoInfo.GitRepo != null && migrationEngine.GitRepoMappings.ContainsKey(anyProjectSourceRepoInfo.GitRepo.Name)) {
+                        if (anyProjectSourceRepoInfo.GitRepo != null && migrationEngine.GitRepoMappings.ContainsKey(anyProjectSourceRepoInfo.GitRepo.Name))
+                        {
                             sourceRepoInfo = anyProjectSourceRepoInfo;
                         }
                         else
@@ -69,19 +72,18 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
 
                     if (sourceRepoInfo.GitRepo != null)
                     {
-                        
                         string targetRepoName = GetTargetRepoName(migrationEngine.GitRepoMappings, sourceRepoInfo);
-                        string sourceProjectName = sourceRepoInfo.GitRepo.ProjectReference.Name;
+                        string sourceProjectName = sourceRepoInfo?.GitRepo?.ProjectReference?.Name ?? migrationEngine.Target.Config.Project;
                         string targetProjectName = migrationEngine.Target.Config.Project;
 
                         GitRepositoryInfo targetRepoInfo = GitRepositoryInfo.Create(targetRepoName, sourceRepoInfo, targetRepos);
                         // if repo was not found in the target project, try to find it in the whole target project collection
-                        if (targetRepoInfo.GitRepo == null) 
+                        if (targetRepoInfo.GitRepo == null)
                         {
-                            if (migrationEngine.GitRepoMappings.ContainsValue(targetRepoName)) 
+                            if (migrationEngine.GitRepoMappings.ContainsValue(targetRepoName))
                             {
                                 var anyTargetRepoInCollectionInfo = GitRepositoryInfo.Create(targetRepoName, sourceRepoInfo, allTargetRepos);
-                                if (anyTargetRepoInCollectionInfo.GitRepo != null) 
+                                if (anyTargetRepoInCollectionInfo.GitRepo != null)
                                 {
                                     targetRepoInfo = anyTargetRepoInCollectionInfo;
                                 }
@@ -102,6 +104,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                                         $"vstfs:///git/ref/{targetRepoInfo.GitRepo.ProjectReference.Id}%2f{targetRepoInfo.GitRepo.Id}%2f{sourceRepoInfo.CommitID}");
                                     break;
 
+                                case "Fixed in Changeset":  // TFVC
                                 case "Fixed in Commit":
                                     newLink = new ExternalLink(targetStore.Store.RegisteredLinkTypes[ArtifactLinkIds.Commit],
                                         $"vstfs:///git/commit/{targetRepoInfo.GitRepo.ProjectReference.Id}%2f{targetRepoInfo.GitRepo.Id}%2f{sourceRepoInfo.CommitID}");
@@ -189,7 +192,8 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
             if (gitRepoMappings.ContainsKey(repoInfo.GitRepo.Name))
             {
                 return gitRepoMappings[repoInfo.GitRepo.Name];
-            } else
+            }
+            else
             {
                 return repoInfo.GitRepo.Name;
             }
@@ -209,9 +213,72 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
             this.GitRepo = GitRepo;
         }
 
-        public static GitRepositoryInfo Create(ExternalLink gitExternalLink, IList<GitRepository> possibleRepos)
+        public static GitRepositoryInfo Create(ExternalLink gitExternalLink, IList<GitRepository> possibleRepos, MigrationEngine migrationEngine, string workItemSourceProjectName)
         {
+            var repoType = DetermineFromLink(gitExternalLink.LinkedArtifactUri);
+            switch (repoType)
+            {
+                case RepistoryType.Git:
+                    return CreateFromGit(gitExternalLink, possibleRepos);
 
+                case RepistoryType.TFVC:
+                    return CreateFromTFVC(gitExternalLink, possibleRepos, migrationEngine.ChangeSetMapping, migrationEngine.Source.Config.Project, workItemSourceProjectName);
+            }
+
+            return null;
+        }
+
+        private static GitRepositoryInfo CreateFromTFVC(ExternalLink gitExternalLink, IList<GitRepository> possibleRepos, Dictionary<int, string> changesetMapping, string sourceProjectName, string workItemSourceProjectName)
+        {
+            string commitID;
+            string repoID;
+            GitRepository gitRepo;
+
+            //vstfs:///VersionControl/Changeset/{id}
+            var changeSetIdPart = gitExternalLink.LinkedArtifactUri.Substring(gitExternalLink.LinkedArtifactUri.LastIndexOf('/') + 1);
+            if (!int.TryParse(changeSetIdPart, out int changeSetId))
+            {
+                return null;
+            }
+
+            var commitIDKvPair = changesetMapping.FirstOrDefault(item => item.Key == changeSetId);
+            if (string.IsNullOrEmpty(commitIDKvPair.Value))
+            {
+                Trace.WriteLine($"Commit Id not found from Changeset Id {changeSetIdPart}.");
+                return null;
+            }
+
+            //assume the GitRepository source name is the work items project name, which changeset links needs to be fixed
+            return new GitRepositoryInfo(commitIDKvPair.Value, null, new GitRepository() { Name = workItemSourceProjectName });
+        }
+
+        private enum RepistoryType
+        {
+            Unknown,
+            TFVC,
+            Git
+        }
+
+        private static RepistoryType DetermineFromLink(string link)
+        {
+            if (string.IsNullOrEmpty(link))
+                throw new ArgumentNullException("link");
+
+            //vstfs:///Git/Commit/25f94570-e3e7-4b79-ad19-4b434787fd5a%2f50477259-3058-4dff-ba4c-e8c179ec5327%2f41dd2754058348d72a6417c0615c2543b9b55535
+            if (link.ToLowerInvariant().Contains("git/commit"))
+                return RepistoryType.Git;
+
+            //vstfs:///VersionControl/Changeset/{id}
+            if (link.ToLowerInvariant().Contains("versioncontrol/changeset"))
+                return RepistoryType.TFVC;
+
+            Trace.WriteLine($"Cannot determine repository type from external link: {link}");
+
+            return RepistoryType.Unknown;
+        }
+
+        public static GitRepositoryInfo CreateFromGit(ExternalLink gitExternalLink, IList<GitRepository> possibleRepos)
+        {
             string commitID;
             string repoID;
             GitRepository gitRepo;
@@ -237,11 +304,12 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
             return new GitRepositoryInfo(commitID, repoID, gitRepo);
         }
 
-        internal static GitRepositoryInfo Create(string targetRepoName, GitRepositoryInfo sourceRepoInfo, IList<GitRepository> targetRepos) {
+        internal static GitRepositoryInfo Create(string targetRepoName, GitRepositoryInfo sourceRepoInfo, IList<GitRepository> targetRepos)
+        {
             var gitRepo = (from g in targetRepos
-                                     where
-                                         g.Name == targetRepoName
-                                     select g).SingleOrDefault();
+                           where
+                               g.Name == targetRepoName
+                           select g).SingleOrDefault();
             return new GitRepositoryInfo(sourceRepoInfo.CommitID, gitRepo?.Id.ToString(), gitRepo);
         }
     }
