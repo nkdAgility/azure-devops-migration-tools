@@ -295,14 +295,18 @@ namespace VstsSyncMigrator.ConsoleApp
             string packageID = "vsts-sync-migrator";
             SemanticVersion version = SemanticVersion.Parse("0.0.0.0");
             bool sucess = false;
-            try
-            {
-                //Connect to the official package repository
-                IPackageRepository repo = PackageRepositoryFactory.Default.CreateRepository("https://chocolatey.org/api/v2/");
-                version = repo.FindPackagesById(packageID).Max(p => p.Version);
-                sucess = true;
-            }
-            catch (Exception ex)
+			try
+			{
+				//Connect to the official package repository
+				IPackageRepository repo = PackageRepositoryFactory.Default.CreateRepository("https://chocolatey.org/api/v2/");
+				SemanticVersion latestPackageVersion = repo.FindPackagesById(packageID).Max(p => p.Version);
+				if (latestPackageVersion != null)
+				{
+					version = latestPackageVersion;
+					sucess = true;
+				}
+			}
+			catch (Exception ex)
             {
                 Telemetry.Current.TrackException(ex);
                 sucess = false;
