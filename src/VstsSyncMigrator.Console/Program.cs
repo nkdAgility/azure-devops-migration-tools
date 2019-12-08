@@ -299,8 +299,12 @@ namespace VstsSyncMigrator.ConsoleApp
             {
                 //Connect to the official package repository
                 IPackageRepository repo = PackageRepositoryFactory.Default.CreateRepository("https://chocolatey.org/api/v2/");
-                version = repo.FindPackagesById(packageID).Max(p => p.Version);
-                sucess = true;
+                SemanticVersion latestPackageVersion = repo.FindPackagesById(packageID).Max(p => p.Version);
+                if (latestPackageVersion != null)
+                {
+                    version = latestPackageVersion;
+                    sucess = true;
+                }
             }
             catch (Exception ex)
             {
