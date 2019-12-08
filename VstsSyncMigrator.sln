@@ -74,9 +74,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "images", "images", "{F29B9C
 		src\VstsSyncMigrator.Extension\images\screenshot-01.png = src\VstsSyncMigrator.Extension\images\screenshot-01.png
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureDevOpsMigrationTools.Core", "src\AzureDevOpsMigrationTools.Core\AzureDevOpsMigrationTools.Core.csproj", "{B7CD841B-760E-4016-8DFA-2C0D1B693F48}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureDevOpsMigrationTools.Core", "src\AzureDevOpsMigrationTools.Core\AzureDevOpsMigrationTools.Core.csproj", "{B7CD841B-760E-4016-8DFA-2C0D1B693F48}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureDevOpsMigrationTools.Core.Tests", "src\AzureDevOpsMigrationTools.Core.Tests\AzureDevOpsMigrationTools.Core.Tests.csproj", "{54975EC7-AB69-4479-8983-239C20DF5FC8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureDevOpsMigrationTools.Core.Tests", "src\AzureDevOpsMigrationTools.Core.Tests\AzureDevOpsMigrationTools.Core.Tests.csproj", "{54975EC7-AB69-4479-8983-239C20DF5FC8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -101,11 +101,9 @@ Global
 		{985259EA-C475-4918-9342-50AB744F52AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{985259EA-C475-4918-9342-50AB744F52AF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B7CD841B-760E-4016-8DFA-2C0D1B693F48}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B7CD841B-760E-4016-8DFA-2C0D1B693F48}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B7CD841B-760E-4016-8DFA-2C0D1B693F48}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B7CD841B-760E-4016-8DFA-2C0D1B693F48}.Release|Any CPU.Build.0 = Release|Any CPU
 		{54975EC7-AB69-4479-8983-239C20DF5FC8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{54975EC7-AB69-4479-8983-239C20DF5FC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{54975EC7-AB69-4479-8983-239C20DF5FC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{54975EC7-AB69-4479-8983-239C20DF5FC8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
