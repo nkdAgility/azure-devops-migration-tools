@@ -74,10 +74,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "images", "images", "{F29B9C
 		src\VstsSyncMigrator.Extension\images\screenshot-01.png = src\VstsSyncMigrator.Extension\images\screenshot-01.png
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureDevOpsMigrationTools.Core", "src\AzureDevOpsMigrationTools.Core\AzureDevOpsMigrationTools.Core.csproj", "{B7CD841B-760E-4016-8DFA-2C0D1B693F48}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureDevOpsMigrationTools.Core.Tests", "src\AzureDevOpsMigrationTools.Core.Tests\AzureDevOpsMigrationTools.Core.Tests.csproj", "{54975EC7-AB69-4479-8983-239C20DF5FC8}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -100,14 +96,6 @@ Global
 		{985259EA-C475-4918-9342-50AB744F52AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{985259EA-C475-4918-9342-50AB744F52AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{985259EA-C475-4918-9342-50AB744F52AF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B7CD841B-760E-4016-8DFA-2C0D1B693F48}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B7CD841B-760E-4016-8DFA-2C0D1B693F48}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B7CD841B-760E-4016-8DFA-2C0D1B693F48}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B7CD841B-760E-4016-8DFA-2C0D1B693F48}.Release|Any CPU.Build.0 = Release|Any CPU
-		{54975EC7-AB69-4479-8983-239C20DF5FC8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{54975EC7-AB69-4479-8983-239C20DF5FC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{54975EC7-AB69-4479-8983-239C20DF5FC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{54975EC7-AB69-4479-8983-239C20DF5FC8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -122,8 +110,6 @@ Global
 		{243265E4-0E5A-4E95-BE7C-B92B7666FF79} = {FA574C5F-498D-4C1B-BA57-FC28E534C6B6}
 		{E9399C6D-A5E0-43ED-8412-6C4A6BC86EC8} = {2BC0808B-6F4D-4635-82FE-1118181DD64F}
 		{F29B9C2E-7EE3-49A5-8341-1277FA8BE0DB} = {243265E4-0E5A-4E95-BE7C-B92B7666FF79}
-		{B7CD841B-760E-4016-8DFA-2C0D1B693F48} = {1BC94A7E-4A43-4388-97BE-DCCF62797DA8}
-		{54975EC7-AB69-4479-8983-239C20DF5FC8} = {1BC94A7E-4A43-4388-97BE-DCCF62797DA8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {62EE0B27-C55A-46EE-8D17-1691DE9BBD50}
