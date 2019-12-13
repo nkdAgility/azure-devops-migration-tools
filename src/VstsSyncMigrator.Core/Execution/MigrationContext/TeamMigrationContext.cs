@@ -87,15 +87,15 @@ namespace VstsSyncMigrator.Engine
                             if (_config.PrefixProjectToNodes)
                             {
                                 targetConfig.TeamSettings.BacklogIterationPath = 
-                                    string.Format("{0}\\{1}", me.Source.Config.Project, sourceConfig.TeamSettings.BacklogIterationPath);
+                                    string.Format("{0}\\{1}", me.Target.Config.Project, sourceConfig.TeamSettings.BacklogIterationPath);
                                 targetConfig.TeamSettings.IterationPaths = sourceConfig.TeamSettings.IterationPaths
-                                    .Select(path => string.Format("{0}\\{1}", me.Source.Config.Project, path))
+                                    .Select(path => string.Format("{0}\\{1}", me.Target.Config.Project, path))
                                     .ToArray();
                                 targetConfig.TeamSettings.TeamFieldValues = sourceConfig.TeamSettings.TeamFieldValues
                                     .Select(field => new TeamFieldValue
                                     {
                                         IncludeChildren = field.IncludeChildren,
-                                        Value = string.Format("{0}\\{1}", me.Source.Config.Project, field.Value)
+                                        Value = string.Format("{0}\\{1}", me.Target.Config.Project, field.Value)
                                     })
                                     .ToArray();
                             }
