@@ -272,7 +272,10 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                 throw new ArgumentNullException("link");
 
             //vstfs:///Git/Commit/25f94570-e3e7-4b79-ad19-4b434787fd5a%2f50477259-3058-4dff-ba4c-e8c179ec5327%2f41dd2754058348d72a6417c0615c2543b9b55535
-            if (link.ToLowerInvariant().Contains("git/commit"))
+            //vstfs:///Git/PullRequestId/
+            //ToDo: check only for "git" ?
+            if (link.ToLowerInvariant().Contains("git/commit")
+                || link.ToLowerInvariant().Contains("git/pullrequestid"))
                 return RepistoryType.Git;
 
             //vstfs:///VersionControl/Changeset/{id}
