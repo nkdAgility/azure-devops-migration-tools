@@ -24,4 +24,4 @@ jobs:
         # User email for git commits
         user_email: bot@nkdagility.com
         # Environment variable containing the token to use for push
-        push_token: 2acf8dd28ee622c238b77d6befa78b94c02fcbb6
+        push_token: ${{ secrets.BotToken }} 
