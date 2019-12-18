@@ -17,6 +17,4 @@ jobs:
       with:
         stable_branch: 'master'
         development_branch: 'RestImplementation'
-        user_name: 'nkdBot'
-        user_email: 'nkdbot@nkdagility.com'
         push_token: ${{ secrets.BotToken }} 
