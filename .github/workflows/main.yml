@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+    branches:
+    - master
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1        
+    - name: Nightly Merge
+      uses: robotology/gh-action-nightly-merge@v1.2.0
+      with:
+        # Name of the stable branch
+        stable_branch: master
+        # Name of the development branch
+        development_branch: RestImplementation
+        # User name for git commits
+        user_name: nkdBot
+        # User email for git commits
+        user_email: bot@nkdagility.com
+        # Environment variable containing the token to use for push
+        push_token: 2acf8dd28ee622c238b77d6befa78b94c02fcbb6
