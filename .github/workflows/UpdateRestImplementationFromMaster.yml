@@ -16,12 +16,12 @@ jobs:
       uses: robotology/gh-action-nightly-merge@v1.2.0
       with:
         # Name of the stable branch
-        stable_branch: master
+        stable_branch: 'master'
         # Name of the development branch
-        development_branch: RestImplementation
+        development_branch: 'RestImplementation'
         # User name for git commits
-        user_name: nkdBot
+        user_name: 'nkdBot'
         # User email for git commits
-        user_email: bot@nkdagility.com
+        user_email: 'nkdbot@nkdagility.com'
         # Environment variable containing the token to use for push
         push_token: ${{ secrets.BotToken }} 
