@@ -18,3 +18,5 @@ jobs:
         stable_branch: 'master'
         development_branch: 'RestImplementation'
         push_token: ${{ secrets.BotToken }} 
+      env:
+        GITHUB_TOKEN: ${{ secrets.BotToken }}
