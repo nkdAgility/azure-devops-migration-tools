@@ -17,6 +17,7 @@ jobs:
       with:
         stable_branch: 'master'
         development_branch: 'RestImplementation'
-        push_token: ${{ secrets.BotToken }} 
+        user_name: 'nkdAgility Bot'
+        user_email: 'nkdbot@nkdagility.com'
       env:
         GITHUB_TOKEN: ${{ secrets.BotToken }}
