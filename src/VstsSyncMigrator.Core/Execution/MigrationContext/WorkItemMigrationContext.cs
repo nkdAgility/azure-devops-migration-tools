@@ -633,7 +633,7 @@ namespace VstsSyncMigrator.Engine
             if (targetWorkItem != null && _config.FixHtmlAttachmentLinks)
             {
 
-                embededImagesRepairOMatic.FixHtmlAttachmentLinks(targetWorkItem, me.Source.Collection.Uri.ToString(), me.Target.Collection.Uri.ToString());
+                embededImagesRepairOMatic.FixHtmlAttachmentLinks(targetWorkItem, me.Source.Collection.Uri.ToString(), me.Target.Collection.Uri.ToString(), me.Source.Config.PersonalAccessToken);
             }
         }
 

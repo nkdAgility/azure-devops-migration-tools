@@ -59,8 +59,8 @@ namespace VstsSyncMigrator.Engine.Configuration
             EngineConfiguration ec = new EngineConfiguration();
             ec.TelemetryEnableTrace = false;
             ec.Version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(2);
-            ec.Source = new TeamProjectConfig() { Project = "migrationSource1", AllowCrossProjectLinking = false, Collection = new Uri("https://dev.azure.com/nkdagility-preview/"), ReflectedWorkItemIDFieldName = "Custom.ReflectedWorkItemId" };
-            ec.Target = new TeamProjectConfig() { Project = "migrationTarget1", AllowCrossProjectLinking = false, Collection = new Uri("https://dev.azure.com/nkdagility-preview/"), ReflectedWorkItemIDFieldName = "Custom.ReflectedWorkItemId" };
+            ec.Source = new TeamProjectConfig() { Project = "migrationSource1", AllowCrossProjectLinking = false, Collection = new Uri("https://dev.azure.com/nkdagility-preview/"), ReflectedWorkItemIDFieldName = "Custom.ReflectedWorkItemId", PersonalAccessToken = "" };
+            ec.Target = new TeamProjectConfig() { Project = "migrationTarget1", AllowCrossProjectLinking = false, Collection = new Uri("https://dev.azure.com/nkdagility-preview/"), ReflectedWorkItemIDFieldName = "Custom.ReflectedWorkItemId", PersonalAccessToken = "" };
             ec.FieldMaps = new List<IFieldMapConfig>();
             ec.WorkItemTypeDefinition = new Dictionary<string, string> {
                     { "sourceWorkItemTypeName", "targetWorkItemTypeName" }
