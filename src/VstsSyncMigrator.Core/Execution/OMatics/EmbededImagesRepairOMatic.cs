@@ -28,7 +28,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
         /**
       *  from https://gist.github.com/pietergheysens/792ed505f09557e77ddfc1b83531e4fb
       */
-        public void FixHtmlAttachmentLinks(WorkItem wi, string oldTfsurl, string newTfsurl)
+        public void FixHtmlAttachmentLinks(WorkItem wi, string oldTfsurl, string newTfsurl, string sourcePersonalAccessToken = "")
         {
 
             Debug.WriteLine($"Searching for urls: {oldTfsurl} and {GetUrlWithOppositeSchema(oldTfsurl)}");
@@ -58,7 +58,10 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
 
                                 using (var httpClient = new HttpClient(_httpClientHandler, false))
                                 {
-
+                                    if (!string.IsNullOrEmpty(sourcePersonalAccessToken))
+                                    {
+                                        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(System.Text.ASCIIEncoding.ASCII.GetBytes(string.Format("{0}:{1}", "", sourcePersonalAccessToken))));
+                                    }
                                     var result = DownloadFile(httpClient, match.Value, fullImageFilePath);
                                     if (!result.IsSuccessStatusCode)
                                     {
