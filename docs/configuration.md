@@ -101,3 +101,94 @@ With existing areas:
 "Product\\OtherArea\\Path1\\TestArea"
 
 only the first one matches the BasePath "Product\\Area\\Path1" and would be migrated, the other ones are ignored.
+
+### Field Maps
+
+There are a number of field maps available for when you need to change the data as you are processing it. These mappings work for both in place bulk edit, and for project to project migrations.
+
+```
+"FieldMaps": [
+    {
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.FieldMap.MultiValueConditionalMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceFieldsAndValues": {
+        "Field1": "Value1",
+        "Field2": "Value2"
+      },
+      "targetFieldsAndValues": {
+        "Field1": "Value1",
+        "Field2": "Value2"
+      }
+    },
+    {
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.FieldMap.FieldBlankMapConfig",
+      "WorkItemTypeName": "*",
+      "targetField": "TfsMigrationTool.ReflectedWorkItemId"
+    },
+    {
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.FieldMap.FieldValueMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceField": "System.State",
+      "targetField": "System.State",
+      "defaultValue": "New",
+      "valueMapping": {
+        "Approved": "New",
+        "New": "New",
+        "Committed": "Active",
+        "In Progress": "Active",
+        "To Do": "New",
+        "Done": "Closed"
+      }
+    },
+    {
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.FieldMap.FieldtoFieldMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceField": "Microsoft.VSTS.Common.BacklogPriority",
+      "targetField": "Microsoft.VSTS.Common.StackRank"
+    },
+    {
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.FieldMap.FieldtoFieldMultiMapConfig",
+      "WorkItemTypeName": "*",
+      "SourceToTargetMappings": {
+        "SourceField1": "TargetField1",
+        "SourceField2": "TargetField2"
+      }
+    },
+    {
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.FieldMap.FieldtoTagMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceField": "System.State",
+      "formatExpression": "ScrumState:{0}"
+    },
+    {
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.FieldMap.FieldMergeMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceField1": "System.Description",
+      "sourceField2": "Microsoft.VSTS.Common.AcceptanceCriteria",
+      "targetField": "System.Description",
+      "formatExpression": "{0} <br/><br/><h3>Acceptance Criteria</h3>{1}",
+      "doneMatch": "##DONE##"
+    },
+    {
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.FieldMap.RegexFieldMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceField": "COMPANY.PRODUCT.Release",
+      "targetField": "COMPANY.DEVISION.MinorReleaseVersion",
+      "pattern": "PRODUCT \\d{4}.(\\d{1})",
+      "replacement": "$1"
+    },
+    {
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.FieldMap.FieldValuetoTagMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceField": "Microsoft.VSTS.CMMI.Blocked",
+      "pattern": "Yes",
+      "formatExpression": "{0}"
+    },
+    {
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.FieldMap.TreeToTagMapConfig",
+      "WorkItemTypeName": "*",
+      "toSkip": 3,
+      "timeTravel": 1
+    }
+  ],
+  ```
