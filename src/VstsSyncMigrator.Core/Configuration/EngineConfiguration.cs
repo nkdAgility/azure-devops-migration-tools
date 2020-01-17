@@ -41,6 +41,7 @@ namespace VstsSyncMigrator.Engine.Configuration
         public static EngineConfiguration GetWorkItemMigration()
         {
             EngineConfiguration ec = CreateEmptyConfig();
+            AddFieldMapps(ec);
             AddWorkItemMigrationDefault(ec);
             return ec;
         }
