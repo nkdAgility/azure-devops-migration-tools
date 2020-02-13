@@ -703,58 +703,61 @@ AddParameter("PlanId", parameters, targetPlan.Id.ToString());
                 {
                     Trace.TraceError($"Target Reflected Work Item Not found for source WorkItem ID: {sourceTce.TestCase.WorkItem.Id}");
                 }
-                TraceWriteLine(sourceSuite, $"Test Point Assignement for wi{targetTc.Id}", 15);
-                //figure out test point assignments for each source tce
-                foreach (ITestPointAssignment tpa in sourceTce.PointAssignments)
+                else
                 {
-                    int sourceConfigurationId = tpa.ConfigurationId;
-
-                    TeamFoundationIdentity targetIdentity = null;
-
-                    if (tpa.AssignedTo != null)
+                    TraceWriteLine(sourceSuite, $"Test Point Assignement for wi{targetTc.Id}", 15);
+                    //figure out test point assignments for each source tce
+                    foreach (ITestPointAssignment tpa in sourceTce.PointAssignments)
                     {
-                        targetIdentity = GetTargetIdentity(tpa.AssignedTo.Descriptor);
-                        if (targetIdentity == null)
+                        int sourceConfigurationId = tpa.ConfigurationId;
+
+                        TeamFoundationIdentity targetIdentity = null;
+
+                        if (tpa.AssignedTo != null)
                         {
-                            sourceIdentityManagementService.RefreshIdentity(tpa.AssignedTo.Descriptor);
+                            targetIdentity = GetTargetIdentity(tpa.AssignedTo.Descriptor);
+                            if (targetIdentity == null)
+                            {
+                                sourceIdentityManagementService.RefreshIdentity(tpa.AssignedTo.Descriptor);
+                            }
+
+                            targetIdentity = GetTargetIdentity(tpa.AssignedTo.Descriptor);
                         }
 
-                        targetIdentity = GetTargetIdentity(tpa.AssignedTo.Descriptor);
-                    }
+                        // translate source configuration id to target configuration id and name
+                        //// Get source configuration name
+                        string sourceConfigName = (from tc in sourceTestConfigs
+                                                   where tc.Id == sourceConfigurationId
+                                                   select tc.Name).FirstOrDefault();
 
-                    // translate source configuration id to target configuration id and name
-                    //// Get source configuration name
-                    string sourceConfigName = (from tc in sourceTestConfigs
-                        where tc.Id == sourceConfigurationId
-                        select tc.Name).FirstOrDefault();
+                        //// Find source configuration name in target and get the id for it
+                        int targetConfigId = (from tc in targetTestConfigs
+                                              where tc.Name == sourceConfigName
+                                              select tc.Id).FirstOrDefault();
 
-                    //// Find source configuration name in target and get the id for it
-                    int targetConfigId = (from tc in targetTestConfigs
-                        where tc.Name == sourceConfigName
-                        select tc.Id).FirstOrDefault();
-
-                    if (targetConfigId != 0)
-                    {
-                        IdAndName targetConfiguration = new IdAndName(targetConfigId, sourceConfigName);
-
-                        var targetUserId = Guid.Empty;
-                        if (targetIdentity != null)
+                        if (targetConfigId != 0)
                         {
-                            targetUserId = targetIdentity.TeamFoundationId;
+                            IdAndName targetConfiguration = new IdAndName(targetConfigId, sourceConfigName);
+
+                            var targetUserId = Guid.Empty;
+                            if (targetIdentity != null)
+                            {
+                                targetUserId = targetIdentity.TeamFoundationId;
+                            }
+
+                            // Create a test point assignment with target test case id, target configuration (id and name) and target identity
+                            var newAssignment = targetSuite.CreateTestPointAssignment(
+                                targetTc.Id,
+                                targetConfiguration,
+                                targetUserId);
+
+                            // add the test point assignment to the list
+                            assignmentsToAdd.Add(newAssignment);
                         }
-
-                        // Create a test point assignment with target test case id, target configuration (id and name) and target identity
-                        var newAssignment = targetSuite.CreateTestPointAssignment(
-                            targetTc.Id,
-                            targetConfiguration,
-                            targetUserId);
-
-                        // add the test point assignment to the list
-                        assignmentsToAdd.Add(newAssignment);
-                    }
-                    else
-                    {
-                        Trace.WriteLine($"Cannot find configuration with name [{sourceConfigName}] in target. Cannot assign tester to it.", "TestPlansAndSuites");
+                        else
+                        {
+                            Trace.WriteLine($"Cannot find configuration with name [{sourceConfigName}] in target. Cannot assign tester to it.", "TestPlansAndSuites");
+                        }
                     }
                 }
             }
