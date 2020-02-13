@@ -537,7 +537,7 @@ AddParameter("PlanId", parameters, targetPlan.Id.ToString());
                 if (wi == null)
                 {
                     TraceWriteLine(source, string.Format("    Can't find work item for Test Case. Has it been migrated? {0} : {1} - {2} ", sourceTestCaseEntry.EntryType.ToString(), sourceTestCaseEntry.Id, sourceTestCaseEntry.Title), 15);
-                    break;
+                    continue;
                 }
                 var exists = (from tc in target.TestCases
                               where tc.TestCase.WorkItem.Id == wi.Id
