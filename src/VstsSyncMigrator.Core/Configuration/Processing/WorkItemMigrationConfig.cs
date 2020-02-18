@@ -27,6 +27,8 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
 
         public bool FixHtmlAttachmentLinks { get; set; }
 
+        public bool SkipToFinalRevisedWorkItemType { get; set; }
+
         public int WorkItemCreateRetryLimit { get; set; }
 
         public bool FilterWorkItemsThatAlreadyExistInTarget { get; set; }
