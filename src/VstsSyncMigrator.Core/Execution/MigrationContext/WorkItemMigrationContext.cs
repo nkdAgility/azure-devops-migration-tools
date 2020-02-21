@@ -305,11 +305,24 @@ namespace VstsSyncMigrator.Engine
         {
             try
             {
+                var skipToFinalRevisedWorkItemType = _config.SkipToFinalRevisedWorkItemType;
+
+                var last = sourceStore.GetRevision(sourceWorkItem, revisionsToMigrate.Last().Number);
+                
+                string finalDestType = last.Type.Name;
+
+                if (skipToFinalRevisedWorkItemType && me.WorkItemTypeDefinitions.ContainsKey(finalDestType))
+                {
+                    finalDestType =
+                       me.WorkItemTypeDefinitions[finalDestType].Map(last);
+                }
 
                 foreach (var revision in revisionsToMigrate)
                 {
                     var currentRevisionWorkItem = sourceStore.GetRevision(sourceWorkItem, revision.Number);
-                    TraceWriteLine(currentRevisionWorkItem, $" Processing Revision[{revision.Number}");
+
+                    TraceWriteLine(currentRevisionWorkItem, $" Processing Revision [{revision.Number}]");
+
                     // Decide on WIT
                     string destType = currentRevisionWorkItem.Type.Name;
                     if (me.WorkItemTypeDefinitions.ContainsKey(destType))
@@ -320,10 +333,14 @@ namespace VstsSyncMigrator.Engine
                     //If work item hasn't been created yet, create a shell
                     if (targetWorkItem == null)
                     {
-                        targetWorkItem = CreateWorkItem_Shell(destProject, currentRevisionWorkItem, destType);
+                        if (finalDestType != destType && skipToFinalRevisedWorkItemType)
+                        {
+                            TraceWriteLine(last, $" Found work item type changes later in the revision list. Adjusting work item type on initial commit to [{finalDestType}].");
+                        }
+                        targetWorkItem = CreateWorkItem_Shell(destProject, currentRevisionWorkItem, skipToFinalRevisedWorkItemType ? finalDestType : destType);
                     }
                     //If the work item already exists and its type has changed, update its type. Done this way because there doesn't appear to be a way to do this through the store.
-                    else if (targetWorkItem.Type.Name != destType)
+                    else if (!skipToFinalRevisedWorkItemType && targetWorkItem.Type.Name != finalDestType)
                     {
                         Debug.WriteLine($"Work Item type change! '{targetWorkItem.Title}': From {targetWorkItem.Type.Name} to {destType}");
                         var typePatch = new JsonPatchOperation()
@@ -366,7 +383,7 @@ namespace VstsSyncMigrator.Engine
 
                     targetWorkItem.Save();
                     TraceWriteLine(currentRevisionWorkItem,
-                        $" Saved TargetWorkItem {targetWorkItem.Id}. Replayed revision {revision.Number} of {currentRevisionWorkItem.Revisions.Count}");
+                        $" Saved TargetWorkItem {targetWorkItem.Id}. Replayed revision {revision.Number} of {revisionsToMigrate.Count}");
 
                 }
 
