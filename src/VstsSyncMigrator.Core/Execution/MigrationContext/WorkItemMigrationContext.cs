@@ -20,21 +20,10 @@ using System.Net;
 using System.ServiceModel.Channels;
 using System.IO;
 using Newtonsoft.Json;
+using VstsSyncMigrator.Core;
 
 namespace VstsSyncMigrator.Engine
 {
-    public static class Extensions
-    {
-        public static Dictionary<string, object> AsDictionary(this FieldCollection col)
-        {
-            var dict = new Dictionary<string, object>();
-            for (var ix = 0; ix < col.Count; ix ++)
-            {
-                dict.Add(col[ix].Name, col[ix].Value);
-            }
-            return dict;
-        }
-    }
 
     public class WorkItemMigrationContext : MigrationContextBase
     {
