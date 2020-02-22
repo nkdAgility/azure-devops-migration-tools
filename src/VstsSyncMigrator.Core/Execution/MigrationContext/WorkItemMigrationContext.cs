@@ -17,9 +17,25 @@ using System.Collections;
 using VstsSyncMigrator.Core.Execution.OMatics;
 using Microsoft.TeamFoundation.WorkItemTracking.Proxy;
 using System.Net;
+using System.ServiceModel.Channels;
+using System.IO;
+using Newtonsoft.Json;
 
 namespace VstsSyncMigrator.Engine
 {
+    public static class Extensions
+    {
+        public static Dictionary<string, object> AsDictionary(this FieldCollection col)
+        {
+            var dict = new Dictionary<string, object>();
+            for (var ix = 0; ix < col.Count; ix ++)
+            {
+                dict.Add(col[ix].Name, col[ix].Value);
+            }
+            return dict;
+        }
+    }
+
     public class WorkItemMigrationContext : MigrationContextBase
     {
         private readonly WorkItemMigrationConfig _config;
@@ -157,6 +173,9 @@ namespace VstsSyncMigrator.Engine
                 TraceWriteLine(sourceWorkItem);
                 ///////////////////////////////////////////////
                 TraceWriteLine(sourceWorkItem, $"Work Item has {sourceWorkItem.Rev} revisions and revision migration is set to {_config.ReplayRevisions}");
+
+
+
                 List<RevisionItem> revisionsToMigrate = RevisionsToMigrate(sourceWorkItem, targetWorkItem);
                 if (targetWorkItem == null)
                 {
@@ -175,7 +194,9 @@ namespace VstsSyncMigrator.Engine
                     else
                     {
                         TraceWriteLine(sourceWorkItem, $"Syncing as there are {revisionsToMigrate.Count} revisons detected", ConsoleColor.Yellow);
+
                         targetWorkItem = ReplayRevisions(revisionsToMigrate, sourceWorkItem, targetWorkItem, destProject, sourceStore, _current, targetStore);
+                        
                         AddMetric("Revisions", processWorkItemMetrics, revisionsToMigrate.Count);
                         AddMetric("SyncRev", processWorkItemMetrics, revisionsToMigrate.Count);
                     }
@@ -246,8 +267,9 @@ namespace VstsSyncMigrator.Engine
             _current++;
             _count--;
         }
+        
 
-        private List<RevisionItem> RevisionsToMigrate(WorkItem sourceWorkItem, WorkItem targetWorkItem)
+        private List<RevisionItem> RevisionsToMigrate(WorkItem sourceWorkItem, WorkItem targetWorkItem, bool skipConfig = false)
         {
             // just to make sure, we replay the events in the same order as they appeared
             // maybe, the Revisions collection is not sorted according to the actual Revision number
@@ -267,7 +289,7 @@ namespace VstsSyncMigrator.Engine
             {
                 // Target exists so remove any Changed Date matches bwtween them
                 var targetChangedDates = (from Revision x in targetWorkItem.Revisions select Convert.ToDateTime(x.Fields["System.ChangedDate"].Value)).ToList();
-                if (_config.ReplayRevisions)
+                if (skipConfig || _config.ReplayRevisions)
                 {
                     sortedRevisions = sortedRevisions.Where(x => !targetChangedDates.Contains(x.ChangedDate)).ToList();
                 }
@@ -277,7 +299,7 @@ namespace VstsSyncMigrator.Engine
             }
 
             sortedRevisions = sortedRevisions.OrderBy(x => x.Number).ToList();
-            if (!_config.ReplayRevisions && sortedRevisions.Count > 0)
+            if (!(_config.ReplayRevisions || skipConfig) && sortedRevisions.Count > 0)
             {
                 // Remove all but the latest revision if we are not replaying reviss=ions
                 sortedRevisions.RemoveRange(0, sortedRevisions.Count - 1);
@@ -303,18 +325,46 @@ namespace VstsSyncMigrator.Engine
             int current,
             WorkItemStoreContext targetStore)
         {
+
             try
             {
                 var skipToFinalRevisedWorkItemType = _config.SkipToFinalRevisedWorkItemType;
 
                 var last = sourceStore.GetRevision(sourceWorkItem, revisionsToMigrate.Last().Number);
-                
+
                 string finalDestType = last.Type.Name;
 
                 if (skipToFinalRevisedWorkItemType && me.WorkItemTypeDefinitions.ContainsKey(finalDestType))
                 {
                     finalDestType =
                        me.WorkItemTypeDefinitions[finalDestType].Map(last);
+                }
+
+                //If work item hasn't been created yet, create a shell
+                if (targetWorkItem == null)
+                {
+                    targetWorkItem = CreateWorkItem_Shell(destProject, sourceWorkItem, skipToFinalRevisedWorkItemType ? finalDestType : sourceStore.GetRevision(sourceWorkItem, revisionsToMigrate.First().Number).Type.Name);
+                }
+
+                if (_config.CollapseRevisions)
+                {
+                    var data = revisionsToMigrate.Select(rev => sourceStore.GetRevision(sourceWorkItem, rev.Number)).Select(rev => new
+                    {
+                        rev.Id,
+                        rev.Rev,
+                        rev.RevisedDate,
+                        Fields = rev.Fields.AsDictionary()
+                    });
+
+                    var fileData = JsonConvert.SerializeObject(data, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                    var filePath = Path.Combine(Path.GetTempPath(), $"{sourceWorkItem.Id}_PreMigrationHistory.json");
+
+                    File.WriteAllText(filePath, fileData);
+                    targetWorkItem.Attachments.Add(new Attachment(filePath, "History has been consolidated into the attached file."));
+
+                    revisionsToMigrate = revisionsToMigrate.GetRange(revisionsToMigrate.Count - 1, 1);
+
+                    TraceWriteLine(targetWorkItem, $" Attached a consolidated set of {data.Count()} revisions.");
                 }
 
                 foreach (var revision in revisionsToMigrate)
@@ -330,17 +380,8 @@ namespace VstsSyncMigrator.Engine
                         destType =
                            me.WorkItemTypeDefinitions[destType].Map(currentRevisionWorkItem);
                     }
-                    //If work item hasn't been created yet, create a shell
-                    if (targetWorkItem == null)
-                    {
-                        if (finalDestType != destType && skipToFinalRevisedWorkItemType)
-                        {
-                            TraceWriteLine(last, $" Found work item type changes later in the revision list. Adjusting work item type on initial commit to [{finalDestType}].");
-                        }
-                        targetWorkItem = CreateWorkItem_Shell(destProject, currentRevisionWorkItem, skipToFinalRevisedWorkItemType ? finalDestType : destType);
-                    }
                     //If the work item already exists and its type has changed, update its type. Done this way because there doesn't appear to be a way to do this through the store.
-                    else if (!skipToFinalRevisedWorkItemType && targetWorkItem.Type.Name != finalDestType)
+                    if (!skipToFinalRevisedWorkItemType && targetWorkItem.Type.Name != finalDestType)
                     {
                         Debug.WriteLine($"Work Item type change! '{targetWorkItem.Title}': From {targetWorkItem.Type.Name} to {destType}");
                         var typePatch = new JsonPatchOperation()
@@ -388,7 +429,7 @@ namespace VstsSyncMigrator.Engine
                 }
 
                 if (targetWorkItem != null)
-                {                 
+                {
                     ProcessWorkItemAttachments(sourceWorkItem, targetWorkItem, false);
                     ProcessWorkItemLinks(sourceStore, targetStore, sourceWorkItem, targetWorkItem, false);
                     string reflectedUri = sourceStore.CreateReflectedWorkItemId(sourceWorkItem);
@@ -427,6 +468,7 @@ namespace VstsSyncMigrator.Engine
                 }
                 TraceWriteLine(sourceWorkItem, ex.ToString());
             }
+
             return targetWorkItem;
         }
 
