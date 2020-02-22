@@ -40,7 +40,7 @@ namespace VstsSyncMigrator.Engine
         static int _imported = 0;
         static int _skipped = 0;
         static long _elapsedms = 0;
-       static int _totalWorkItem = 0;
+        static int _totalWorkItem = 0;
 
         public WorkItemMigrationContext(MigrationEngine me, WorkItemMigrationConfig config)
             : base(me, config)
@@ -185,7 +185,7 @@ namespace VstsSyncMigrator.Engine
                         TraceWriteLine(sourceWorkItem, $"Syncing as there are {revisionsToMigrate.Count} revisons detected", ConsoleColor.Yellow);
 
                         targetWorkItem = ReplayRevisions(revisionsToMigrate, sourceWorkItem, targetWorkItem, destProject, sourceStore, _current, targetStore);
-                        
+
                         AddMetric("Revisions", processWorkItemMetrics, revisionsToMigrate.Count);
                         AddMetric("SyncRev", processWorkItemMetrics, revisionsToMigrate.Count);
                     }
@@ -256,7 +256,7 @@ namespace VstsSyncMigrator.Engine
             _current++;
             _count--;
         }
-        
+
 
         private List<RevisionItem> RevisionsToMigrate(WorkItem sourceWorkItem, WorkItem targetWorkItem)
         {
@@ -294,7 +294,7 @@ namespace VstsSyncMigrator.Engine
                 sortedRevisions.RemoveRange(0, sortedRevisions.Count - 1);
             }
 
-            
+
 
 
 
@@ -328,7 +328,6 @@ namespace VstsSyncMigrator.Engine
                     finalDestType =
                        me.WorkItemTypeDefinitions[finalDestType].Map(last);
                 }
-
                 //If work item hasn't been created yet, create a shell
                 if (targetWorkItem == null)
                 {
@@ -369,6 +368,7 @@ namespace VstsSyncMigrator.Engine
                         destType =
                            me.WorkItemTypeDefinitions[destType].Map(currentRevisionWorkItem);
                     }
+
                     //If the work item already exists and its type has changed, update its type. Done this way because there doesn't appear to be a way to do this through the store.
                     if (!skipToFinalRevisedWorkItemType && targetWorkItem.Type.Name != finalDestType)
                     {
