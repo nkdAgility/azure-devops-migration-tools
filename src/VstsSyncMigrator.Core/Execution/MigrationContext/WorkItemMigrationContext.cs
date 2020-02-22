@@ -328,6 +328,7 @@ namespace VstsSyncMigrator.Engine
                     finalDestType =
                        me.WorkItemTypeDefinitions[finalDestType].Map(last);
                 }
+                
                 //If work item hasn't been created yet, create a shell
                 if (targetWorkItem == null)
                 {
@@ -371,6 +372,7 @@ namespace VstsSyncMigrator.Engine
 
                     //If the work item already exists and its type has changed, update its type. Done this way because there doesn't appear to be a way to do this through the store.
                     if (!skipToFinalRevisedWorkItemType && targetWorkItem.Type.Name != finalDestType)
+
                     {
                         Debug.WriteLine($"Work Item type change! '{targetWorkItem.Title}': From {targetWorkItem.Type.Name} to {destType}");
                         var typePatch = new JsonPatchOperation()
