@@ -269,7 +269,7 @@ namespace VstsSyncMigrator.Engine
         }
         
 
-        private List<RevisionItem> RevisionsToMigrate(WorkItem sourceWorkItem, WorkItem targetWorkItem, bool skipConfig = false)
+        private List<RevisionItem> RevisionsToMigrate(WorkItem sourceWorkItem, WorkItem targetWorkItem)
         {
             // just to make sure, we replay the events in the same order as they appeared
             // maybe, the Revisions collection is not sorted according to the actual Revision number
@@ -289,7 +289,7 @@ namespace VstsSyncMigrator.Engine
             {
                 // Target exists so remove any Changed Date matches bwtween them
                 var targetChangedDates = (from Revision x in targetWorkItem.Revisions select Convert.ToDateTime(x.Fields["System.ChangedDate"].Value)).ToList();
-                if (skipConfig || _config.ReplayRevisions)
+                if (_config.ReplayRevisions)
                 {
                     sortedRevisions = sortedRevisions.Where(x => !targetChangedDates.Contains(x.ChangedDate)).ToList();
                 }
@@ -299,7 +299,7 @@ namespace VstsSyncMigrator.Engine
             }
 
             sortedRevisions = sortedRevisions.OrderBy(x => x.Number).ToList();
-            if (!(_config.ReplayRevisions || skipConfig) && sortedRevisions.Count > 0)
+            if (!_config.ReplayRevisions && sortedRevisions.Count > 0)
             {
                 // Remove all but the latest revision if we are not replaying reviss=ions
                 sortedRevisions.RemoveRange(0, sortedRevisions.Count - 1);
