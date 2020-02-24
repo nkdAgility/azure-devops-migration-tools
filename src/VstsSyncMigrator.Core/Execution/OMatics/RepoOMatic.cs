@@ -275,7 +275,8 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
             //vstfs:///Git/PullRequestId/
             //ToDo: check only for "git" ?
             if (link.ToLowerInvariant().Contains("git/commit")
-                || link.ToLowerInvariant().Contains("git/pullrequestid"))
+                || link.ToLowerInvariant().Contains("git/pullrequestid")
+                || link.ToLowerInvariant().Contains("git/ref"))
                 return RepistoryType.Git;
 
             //vstfs:///VersionControl/Changeset/{id}
