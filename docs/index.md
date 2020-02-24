@@ -18,6 +18,7 @@ _NOTICE: Both paied and community support is avilable through our [recommneded c
 
 ## Change Log
 
+- v8.7 - Support for inline images using a Personal Access Token added to the Source Project
 - v8.6 - Support for fixing links from TFVC Changesets to Git Commits using a mapping file generated from a Git-TFS migration.
 - v8.5 - Attachment Max size and linking work items to git repos between projects.
 - v8.4 - Support for cross-project linking of work items between projects.
