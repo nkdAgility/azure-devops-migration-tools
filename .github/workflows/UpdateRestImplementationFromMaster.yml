@@ -1,0 +1,23 @@
+name: UpdateRestImplementationFromMaster
+
+on:
+  push:
+    branches:
+    - master
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1        
+    - name: Nightly Merge
+      uses: robotology/gh-action-nightly-merge@v1.2.0
+      with:
+        stable_branch: 'master'
+        development_branch: 'RestImplementation'
+        user_name: 'nkdAgility Bot'
+        user_email: 'nkdbot@nkdagility.com'
+      env:
+        GITHUB_TOKEN: ${{ secrets.BotToken }}

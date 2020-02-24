@@ -30,9 +30,10 @@ It will migrate work items using a tip or replay migrator as well as Attachments
 | _{NEW}_ `AttachmentMigration` | Boolean | If enabled this will migrate all of the attachements at the same time as the work item | true |
 | _{NEW}_ `AttachmentWorkingPath` | String | `AttachmentMigration` is set to true then you need to specify a working path for attachemnts to be saved localy. | `C:\temp\Migration\` |
 | _{NEW}_ `AttachmentMaxSize` | int | `AttachmentMigration` is set to true then you need to specify a max file size for upload in bites. For Azure DevOps Services the default is 480,000,000 bites (60mb), for TFS its 32,000,000 bites (4mb). | `480000000` |
-| _{NEW}_ `FixHtmlAttachmentLinks` | Boolean | **beta** If enabled this will fix any image attachments URL's in the HTML fields. |
+| _{NEW}_ `FixHtmlAttachmentLinks` | Boolean | **beta** If enabled this will fix any image attachments URL's in the HTML fields. You must specify a PersonalAccessToken in the Source project for Azure DevOps; TFS should use integrated authentication.  |
 | _{NEW}_ `WorkItemCreateRetryLimit` | Integer | *beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equil to the retry count. This allows for periodic network glitches not to end the process. | 5 |
 | _{NEW}_ `FilterWorkItemsThatAlreadyExistInTarget` | Boolean | Instad of using the `UpdateSoureReflectedId` setting this load all of the work items already saved to the Target and removes them from the Source work item list prior to commensing the run. While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart. | true |
 | `QueryBit`                           | string  | A work item query to select only important work items. To migrate all leave this empty. |                                          |
 | `OrderBit` | string | A work item query to affect the order in which the work items are migrated. Don't leave this empty. | [System.ChangedDate] desc
+| `SkipToFinalRevisedWorkItemType` | Boolean | If enabled, when a revision is found that changes the work item type it will use the most recent revision work item type when migrating the initial work item. This should only be enabled for migrations from Azure DevOps Service to Azure DevOps Server. | false
 

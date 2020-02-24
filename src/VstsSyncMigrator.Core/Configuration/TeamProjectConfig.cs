@@ -12,5 +12,6 @@ namespace VstsSyncMigrator.Engine.Configuration
         public string Project { get; set; }
         public string ReflectedWorkItemIDFieldName { get; set; }
         public bool AllowCrossProjectLinking { get; set; }
+        public string PersonalAccessToken { get; set; }
     }
 }

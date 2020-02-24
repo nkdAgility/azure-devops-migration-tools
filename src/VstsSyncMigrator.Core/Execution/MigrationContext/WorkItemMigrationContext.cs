@@ -167,6 +167,8 @@ namespace VstsSyncMigrator.Engine
                 {
                     if (revisionsToMigrate.Count == 0)
                     {
+                        ProcessWorkItemAttachments(sourceWorkItem, targetWorkItem, false);
+                        ProcessWorkItemLinks(sourceStore, targetStore, sourceWorkItem, targetWorkItem, false);
                         TraceWriteLine(sourceWorkItem, "Skipping as work item exists and no revisions to sync detected", ConsoleColor.Yellow);
                         processWorkItemMetrics.Add("Revisions", 0);
                     }
@@ -260,19 +262,31 @@ namespace VstsSyncMigrator.Engine
 
                     })
                     .ToList();
-            if (targetWorkItem != null && _config.ReplayRevisions)
+
+            if (targetWorkItem != null)
             {
                 // Target exists so remove any Changed Date matches bwtween them
                 var targetChangedDates = (from Revision x in targetWorkItem.Revisions select Convert.ToDateTime(x.Fields["System.ChangedDate"].Value)).ToList();
-                sortedRevisions = sortedRevisions.Where(x => !targetChangedDates.Contains(x.ChangedDate))
-                    .ToList();
+                if (_config.ReplayRevisions)
+                {
+                    sortedRevisions = sortedRevisions.Where(x => !targetChangedDates.Contains(x.ChangedDate)).ToList();
+                }
+                // Find Max target date and remove all source revisions that are newer
+                var targetLatestDate = targetChangedDates.Max();
+                sortedRevisions = sortedRevisions.Where(x => x.ChangedDate > targetLatestDate).ToList();
             }
+
             sortedRevisions = sortedRevisions.OrderBy(x => x.Number).ToList();
             if (!_config.ReplayRevisions && sortedRevisions.Count > 0)
             {
                 // Remove all but the latest revision if we are not replaying reviss=ions
                 sortedRevisions.RemoveRange(0, sortedRevisions.Count - 1);
             }
+
+            
+
+
+
 
             TraceWriteLine(sourceWorkItem, $"Found {sortedRevisions.Count} revisions to migrate on  Work item:{sourceWorkItem.Id}", ConsoleColor.Gray, true);
             return sortedRevisions;
@@ -291,11 +305,24 @@ namespace VstsSyncMigrator.Engine
         {
             try
             {
+                var skipToFinalRevisedWorkItemType = _config.SkipToFinalRevisedWorkItemType;
+
+                var last = sourceStore.GetRevision(sourceWorkItem, revisionsToMigrate.Last().Number);
+                
+                string finalDestType = last.Type.Name;
+
+                if (skipToFinalRevisedWorkItemType && me.WorkItemTypeDefinitions.ContainsKey(finalDestType))
+                {
+                    finalDestType =
+                       me.WorkItemTypeDefinitions[finalDestType].Map(last);
+                }
 
                 foreach (var revision in revisionsToMigrate)
                 {
                     var currentRevisionWorkItem = sourceStore.GetRevision(sourceWorkItem, revision.Number);
-                    TraceWriteLine(currentRevisionWorkItem, $" Processing Revision[{revision.Number}");
+
+                    TraceWriteLine(currentRevisionWorkItem, $" Processing Revision [{revision.Number}]");
+
                     // Decide on WIT
                     string destType = currentRevisionWorkItem.Type.Name;
                     if (me.WorkItemTypeDefinitions.ContainsKey(destType))
@@ -306,10 +333,14 @@ namespace VstsSyncMigrator.Engine
                     //If work item hasn't been created yet, create a shell
                     if (targetWorkItem == null)
                     {
-                        targetWorkItem = CreateWorkItem_Shell(destProject, currentRevisionWorkItem, destType);
+                        if (finalDestType != destType && skipToFinalRevisedWorkItemType)
+                        {
+                            TraceWriteLine(last, $" Found work item type changes later in the revision list. Adjusting work item type on initial commit to [{finalDestType}].");
+                        }
+                        targetWorkItem = CreateWorkItem_Shell(destProject, currentRevisionWorkItem, skipToFinalRevisedWorkItemType ? finalDestType : destType);
                     }
                     //If the work item already exists and its type has changed, update its type. Done this way because there doesn't appear to be a way to do this through the store.
-                    else if (targetWorkItem.Type.Name != destType)
+                    else if (!skipToFinalRevisedWorkItemType && targetWorkItem.Type.Name != finalDestType)
                     {
                         Debug.WriteLine($"Work Item type change! '{targetWorkItem.Title}': From {targetWorkItem.Type.Name} to {destType}");
                         var typePatch = new JsonPatchOperation()
@@ -352,12 +383,12 @@ namespace VstsSyncMigrator.Engine
 
                     targetWorkItem.Save();
                     TraceWriteLine(currentRevisionWorkItem,
-                        $" Saved TargetWorkItem {targetWorkItem.Id}. Replayed revision {revision.Number} of {currentRevisionWorkItem.Revisions.Count}");
+                        $" Saved TargetWorkItem {targetWorkItem.Id}. Replayed revision {revision.Number} of {revisionsToMigrate.Count}");
 
                 }
 
                 if (targetWorkItem != null)
-                {
+                {                 
                     ProcessWorkItemAttachments(sourceWorkItem, targetWorkItem, false);
                     ProcessWorkItemLinks(sourceStore, targetStore, sourceWorkItem, targetWorkItem, false);
                     string reflectedUri = sourceStore.CreateReflectedWorkItemId(sourceWorkItem);
@@ -424,6 +455,11 @@ namespace VstsSyncMigrator.Engine
         {
             var newWorkItemstartTime = DateTime.UtcNow;
             var fieldMappingTimer = Stopwatch.StartNew();
+
+            if (newwit.IsPartialOpen || !newwit.IsOpen)
+            {
+                newwit.Open();
+            }
 
             newwit.Title = oldWi.Title;
             newwit.State = oldWi.State;
@@ -614,7 +650,7 @@ namespace VstsSyncMigrator.Engine
             if (targetWorkItem != null && _config.FixHtmlAttachmentLinks)
             {
 
-                embededImagesRepairOMatic.FixHtmlAttachmentLinks(targetWorkItem, me.Source.Collection.Uri.ToString(), me.Target.Collection.Uri.ToString());
+                embededImagesRepairOMatic.FixHtmlAttachmentLinks(targetWorkItem, me.Source.Collection.Uri.ToString(), me.Target.Collection.Uri.ToString(), me.Source.Config.PersonalAccessToken);
             }
         }
 
