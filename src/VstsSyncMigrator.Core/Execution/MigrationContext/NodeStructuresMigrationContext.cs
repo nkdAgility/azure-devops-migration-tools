@@ -117,14 +117,14 @@ namespace VstsSyncMigrator.Engine
 
                     for (int i = 0; i < splitBase.Length; i++)
                     {
-                        if (string.Equals(path, string.Join(@"\", splitBase.Take(i)), StringComparison.InvariantCultureIgnoreCase))
+                        if (string.Equals(nodePath, string.Join(@"\", splitBase.Take(i)), StringComparison.InvariantCultureIgnoreCase))
                         {
                             return true;
                         }
                     }
                 }
 
-                if (!config.BasePaths.Any(p => path.StartsWith(p, StringComparison.InvariantCultureIgnoreCase)))
+                if (!config.BasePaths.Any(p => nodePath.StartsWith(p, StringComparison.InvariantCultureIgnoreCase)))
                 {
                     Trace.WriteLine(string.Format("--IgnoreNode: {0}", nodePath));
                     return false;
