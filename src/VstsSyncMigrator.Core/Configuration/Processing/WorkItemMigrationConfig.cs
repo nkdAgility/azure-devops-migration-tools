@@ -34,6 +34,7 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
         public bool FilterWorkItemsThatAlreadyExistInTarget { get; set; }
         public bool PauseAfterEachWorkItem { get; set; }
         public int AttachmentMazSize { get; set; }
+        public bool CollapseRevisions { get; set; }
 
         /// <inheritdoc />
         public bool IsProcessorCompatible(IReadOnlyList<ITfsProcessingConfig> otherProcessors)
