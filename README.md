@@ -19,7 +19,8 @@ The Azure DevOps Migration Tools allow you to bulk edit and migrate data between
 
 ## Change Log
 
-- v8.8 - Added 'Collapse Revisions' feature to collapse and attache revisions instead of replaying them
+- v8.9 - Added 'Collapse Revisions' feature to collapse and attache revisions instead of replaying them
+- v8.8 - 'SkipToFinalRevisedWorkItemType' feature added to handle scenario when changing Work Item Type
 - v8.7 - Support for inline images using a Personal Access Token added to the Source Project
 - v8.6 - Support for fixing links from TFVC Changesets to Git Commits using a mapping file generated from a Git-TFS migration.
 - v8.5 - Attachment Max size and linking work items to git repos between projects.
