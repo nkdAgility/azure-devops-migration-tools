@@ -111,7 +111,8 @@ namespace VstsSyncMigrator.Engine.Configuration
                     { "Committed", "Active" },
                     { "In Progress", "Active" },
                     { "To Do", "New" },
-                    { "Done", "Closed" }
+                    { "Done", "Closed" },
+                    { "Removed", "Removed" }
                 }
             });
             ec.FieldMaps.Add(new FieldtoFieldMapConfig()
