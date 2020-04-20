@@ -426,22 +426,20 @@ namespace VstsSyncMigrator.Engine
                     string reflectedUri = sourceStore.CreateReflectedWorkItemId(sourceWorkItem);
                     if (targetWorkItem.Fields.Contains(me.Target.Config.ReflectedWorkItemIDFieldName))
                     {
-
                         targetWorkItem.Fields[me.Target.Config.ReflectedWorkItemIDFieldName].Value = reflectedUri;
                     }
-                    var history = new StringBuilder();
-                    history.Append(
-                        $"This work item was migrated from a different project or organization. You can find the old version at <a href=\"{reflectedUri}\">{reflectedUri}</a>.");
-                    targetWorkItem.History = history.ToString();
+                    else
+                    {
+                        var history = new StringBuilder();
+                        history.Append($"This work item was migrated from a different project or organization. You can find the old version at <a href=\"{reflectedUri}\">{reflectedUri}</a>.");
+                        targetWorkItem.History = history.ToString();
+                    }
                     SaveWorkItem(targetWorkItem);
-
                     attachmentOMatic.CleanUpAfterSave(targetWorkItem);
                     TraceWriteLine(sourceWorkItem, $"...Saved as {targetWorkItem.Id}");
-
                     if (_config.UpdateSourceReflectedId && sourceWorkItem.Fields.Contains(me.Source.Config.ReflectedWorkItemIDFieldName))
                     {
-                        sourceWorkItem.Fields[me.Source.Config.ReflectedWorkItemIDFieldName].Value =
-                            targetStore.CreateReflectedWorkItemId(targetWorkItem);
+                        sourceWorkItem.Fields[me.Source.Config.ReflectedWorkItemIDFieldName].Value = targetStore.CreateReflectedWorkItemId(targetWorkItem);
                         SaveWorkItem(sourceWorkItem);
                         TraceWriteLine(sourceWorkItem, $"...and Source Updated {sourceWorkItem.Id}");
                     }
