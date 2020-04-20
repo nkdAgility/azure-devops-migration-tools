@@ -1,10 +1,4 @@
-﻿//New COmment
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.TeamFoundation.WorkItemTracking.Client;
+﻿using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using System.Diagnostics;
 using VstsSyncMigrator.Engine.Configuration.FieldMap;
 
@@ -23,9 +17,10 @@ namespace VstsSyncMigrator.Engine.ComponentContext
 
         internal override void InternalExecute(WorkItem source, WorkItem target)
         {
-            if (target.Fields.Contains(config.targetField))
-            { 
-                target.Fields[config.targetField].Value = "";
+            var targetField = target.Fields[config.targetField];
+            if (targetField != null)
+            {
+                target.Fields[config.targetField].Value = null;
                 Trace.WriteLine(string.Format("  [UPDATE] field mapped {0}:{1} to {2} blanked", source.Id, target.Id, this.config.targetField));
             }
         }
