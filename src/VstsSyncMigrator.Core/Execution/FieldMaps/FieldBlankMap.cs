@@ -17,8 +17,7 @@ namespace VstsSyncMigrator.Engine.ComponentContext
 
         internal override void InternalExecute(WorkItem source, WorkItem target)
         {
-            var targetField = target.Fields[config.targetField];
-            if (targetField != null)
+            if (target.Fields.Contains(config.targetField))
             {
                 target.Fields[config.targetField].Value = null;
                 Trace.WriteLine(string.Format("  [UPDATE] field mapped {0}:{1} to {2} blanked", source.Id, target.Id, this.config.targetField));
