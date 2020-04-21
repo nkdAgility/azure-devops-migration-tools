@@ -58,16 +58,18 @@ namespace VstsSyncMigrator.Engine
             return string.Format("{0}/{1}/_workitems/edit/{2}", wi.Store.TeamProjectCollection.Uri.ToString().TrimEnd('/'), wi.Project.Name, wi.Id);
 
         }
-        public int GetReflectedWorkItemId(WorkItem wi, string reflectedWotkItemIdField)
+        public int GetReflectedWorkItemId(WorkItem wi, string reflectedWorkItemIdField)
         {
-            if (!wi.Fields.Contains(reflectedWotkItemIdField))
+            if (!wi.Fields.Contains(reflectedWorkItemIdField))
             {
                 return 0;
             }
-            string rwiid = wi.Fields[reflectedWotkItemIdField].Value.ToString();
+            string rwiid = wi.Fields[reflectedWorkItemIdField].Value.ToString();
             if (Regex.IsMatch(rwiid, @"(http(s)?://)?([\w-]+\.)+[\w-]+(/[\w- ;,./?%&=]*)?"))
             {
-                return int.Parse(rwiid.Substring(rwiid.LastIndexOf(@"/") + 1));
+                if (int.TryParse(rwiid.Substring(rwiid.LastIndexOf(@"/") + 1), out int id))
+                    return id;
+                return 0;
             }
             return 0;
         }
