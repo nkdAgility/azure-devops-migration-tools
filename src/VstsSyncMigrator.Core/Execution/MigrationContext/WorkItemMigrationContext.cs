@@ -228,7 +228,34 @@ namespace VstsSyncMigrator.Engine
                 else
                 {
                     TraceWriteLine(sourceWorkItem, "ERROR: Failed to create work item. Retry Limit reached ");
+                    throw ex;
                 }
+            }
+            catch (Microsoft.TeamFoundation.TeamFoundationServiceUnavailableException ex)
+            {
+
+                Telemetry.Current.TrackException(ex);
+
+                TraceWriteLine(sourceWorkItem, ex.ToString());
+                if (retrys < retryLimit)
+                {
+                    TraceWriteLine(sourceWorkItem, $"Service Unavailable Exception: Will retry in {retrys}s ");
+                    System.Threading.Thread.Sleep(new TimeSpan(0, 0, retrys));
+                    retrys++;
+                    TraceWriteLine(sourceWorkItem, $"RETRY {retrys}/{retrys} ");
+                    ProcessWorkItem(sourceStore, targetStore, destProject, sourceWorkItem, retryLimit, retrys);
+                }
+                else
+                {
+                    TraceWriteLine(sourceWorkItem, "ERROR: Failed to create work item. Retry Limit reached ");
+                    throw ex;
+                }
+            }
+            catch (WorkItemLinkValidationException ve)
+            {
+                Telemetry.Current.TrackException(ve);
+                TraceWriteLine(sourceWorkItem, ve.ToString());
+                Telemetry.Current.TrackRequest("ProcessWorkItem", starttime, witstopwatch.Elapsed, "502", false);
             }
             catch (Exception ex)
             {
@@ -502,7 +529,7 @@ namespace VstsSyncMigrator.Engine
             {
                 if (newwit.Fields.Contains(f.ReferenceName) && !_ignore.Contains(f.ReferenceName) && (!newwit.Fields[f.ReferenceName].IsChangedInRevision || newwit.Fields[f.ReferenceName].IsEditable))
                 {
-                    newwit.Fields[f.ReferenceName].Value = oldWi.Fields[f.ReferenceName].Value;
+                    newwit.Fields[f.ReferenceName].Value = oldWi.Fields[f.ReferenceName].Value ?? newwit.Fields[f.ReferenceName].Value;
                 }
             }
 
