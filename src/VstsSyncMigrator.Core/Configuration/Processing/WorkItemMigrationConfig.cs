@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 
 namespace VstsSyncMigrator.Engine.Configuration.Processing
 {
@@ -12,6 +10,7 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
         public bool UpdateCreatedDate { get; set; }
         public bool UpdateCreatedBy { get; set; }
         public bool UpdateSourceReflectedId { get; set; }
+        public bool AppendSourceReflectedUri { get; set; }
         public bool BuildFieldTable { get; set; }
         public bool AppendMigrationToolSignatureFooter { get; set; }
         public string QueryBit { get; set; }
@@ -60,8 +59,10 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
             PrefixProjectToNodes = false;
             UpdateCreatedDate = true;
             UpdateSourceReflectedId = false;
+            AppendSourceReflectedUri = false;
             QueryBit = @"AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
             OrderBit = "[System.ChangedDate] desc";
+            AppendMigrationToolSignatureFooter = false;
         }
     }
 }

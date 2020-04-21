@@ -423,15 +423,22 @@ namespace VstsSyncMigrator.Engine
                 {
                     ProcessWorkItemAttachments(sourceWorkItem, targetWorkItem, false);
                     ProcessWorkItemLinks(sourceStore, targetStore, sourceWorkItem, targetWorkItem, false);
+                    var history = new StringBuilder();
                     string reflectedUri = sourceStore.CreateReflectedWorkItemId(sourceWorkItem);
                     if (targetWorkItem.Fields.Contains(me.Target.Config.ReflectedWorkItemIDFieldName))
                     {
                         targetWorkItem.Fields[me.Target.Config.ReflectedWorkItemIDFieldName].Value = reflectedUri;
                     }
-                    else
+                    if (_config.AppendSourceReflectedUri)
                     {
-                        var history = new StringBuilder();
-                        history.Append($"This work item was migrated from a different project or organization. You can find the old version at <a href=\"{reflectedUri}\">{reflectedUri}</a>.");
+                        history.Append($"This work item was migrated from: <a href=\"{reflectedUri}\">{reflectedUri}</a>");
+                    }
+                    if (_config.AppendMigrationToolSignatureFooter)
+                    {
+                        history.Append("Migrated by <a href='https://github.com/nkdAgility/azure-devops-migration-tools'>Azure DevOps Migration Tools</a>");
+                    }
+                    if (!string.IsNullOrWhiteSpace(history.ToString()))
+                    {
                         targetWorkItem.History = history.ToString();
                     }
                     SaveWorkItem(targetWorkItem);
@@ -443,7 +450,6 @@ namespace VstsSyncMigrator.Engine
                         SaveWorkItem(sourceWorkItem);
                         TraceWriteLine(sourceWorkItem, $"...and Source Updated {sourceWorkItem.Id}");
                     }
-
                 }
             }
             catch (Exception ex)
@@ -631,11 +637,6 @@ namespace VstsSyncMigrator.Engine
             double result;
             return double.TryParse(val, numberStyle,
                 CultureInfo.CurrentCulture, out result);
-        }
-
-        private static void AppendMigratedByFooter(StringBuilder history)
-        {
-            history.Append("<p>Migrated by <a href='https://dev.azure.com/nkdagility/migration-tools/'>Azure DevOps Migration Tools</a> open source.</p>");
         }
 
         private static void BuildFieldTable(WorkItem oldWi, StringBuilder history, bool useHTML = false)
