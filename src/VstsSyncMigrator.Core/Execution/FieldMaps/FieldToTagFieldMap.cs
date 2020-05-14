@@ -36,7 +36,7 @@ namespace VstsSyncMigrator.Engine
                 if (source.Fields[this.config.sourceField].Value != null)
                 {
                     string value = source.Fields[this.config.sourceField].Value.ToString();
-                    if (string.IsNullOrEmpty(value))
+                    if (!string.IsNullOrEmpty(value))
                     {
                         if (string.IsNullOrEmpty(config.formatExpression))
                         {
