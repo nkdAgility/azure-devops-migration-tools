@@ -35,10 +35,10 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                         }
                         else if (IsExternalLink(item))
                         {
-                            ExternalLink rl = (ExternalLink)item;
-                            if (!IsBuildLink(rl))
+                            var el = (ExternalLink)item;
+                            if (!IsBuildLink(el))
                             {
-                                CreateExternalLink((ExternalLink)item, targetWorkItemLinkStart, save);
+                                CreateExternalLink(el, targetWorkItemLinkStart, save);
                             }
                         }
                         else
@@ -137,7 +137,8 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
 
         private bool IsBuildLink(ExternalLink link)
         {
-            return link.LinkedArtifactUri.StartsWith("vstfs:///Build/Build/", StringComparison.InvariantCultureIgnoreCase);
+            return link.LinkedArtifactUri != null &&
+                   link.LinkedArtifactUri.StartsWith("vstfs:///Build/Build/", StringComparison.InvariantCultureIgnoreCase);
         }
 
         private void CreateRelatedLink(WorkItem wiSourceL, RelatedLink item, WorkItem wiTargetL, WorkItemStoreContext sourceStore, WorkItemStoreContext targetStore, bool save )
