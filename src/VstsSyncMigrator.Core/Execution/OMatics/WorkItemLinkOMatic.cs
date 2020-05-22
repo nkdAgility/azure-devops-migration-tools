@@ -1,10 +1,7 @@
 ﻿using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using VstsSyncMigrator.Engine;
 using VstsSyncMigrator.Engine.Execution.Exceptions;
 
@@ -12,7 +9,6 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
 {
     public class WorkItemLinkOMatic
     {
-
         public void MigrateLinks(WorkItem sourceWorkItemLinkStart, WorkItemStoreContext sourceWorkItemStore, WorkItem targetWorkItemLinkStart, WorkItemStoreContext targetWorkItemStore, bool save = true)
         {
             if (targetWorkItemLinkStart.Links.Count == sourceWorkItemLinkStart.Links.Count)
@@ -21,7 +17,6 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
             }
             else
             {
-
                 Trace.Indent();
                 foreach (Link item in sourceWorkItemLinkStart.Links)
                 {
@@ -41,7 +36,10 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                         else if (IsExternalLink(item))
                         {
                             ExternalLink rl = (ExternalLink)item;
-                            CreateExternalLink((ExternalLink)item, targetWorkItemLinkStart, save);
+                            if (!IsBuildLink(rl))
+                            {
+                                CreateExternalLink((ExternalLink)item, targetWorkItemLinkStart, save);
+                            }
                         }
                         else
                         {
@@ -68,7 +66,6 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                         Trace.WriteLine(ex.ToString(), "LinkMigrationContext");
                     }
                 }
-
             }
             if (sourceWorkItemLinkStart.Type.Name == "Test Case")
             {
@@ -115,7 +112,6 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                          select (ExternalLink)l).SingleOrDefault();
             if (exist == null)
             {
-
                 Trace.WriteLine(string.Format("Creating new {0} on {1}",
                                                    sourceLink.GetType().Name, target.Id), "LinkMigrationContext");
                 ExternalLink el = new ExternalLink(sourceLink.ArtifactLinkType, sourceLink.LinkedArtifactUri);
@@ -137,6 +133,11 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
         private bool IsExternalLink(Link item)
         {
             return item is ExternalLink;
+        }
+
+        private bool IsBuildLink(ExternalLink link)
+        {
+            return link.LinkedArtifactUri.StartsWith("vstfs:///Build/Build/", StringComparison.InvariantCultureIgnoreCase);
         }
 
         private void CreateRelatedLink(WorkItem wiSourceL, RelatedLink item, WorkItem wiTargetL, WorkItemStoreContext sourceStore, WorkItemStoreContext targetStore, bool save )
@@ -188,7 +189,6 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
 
                 if (!IsExisting && !wiTargetR.IsAccessDenied)
                 {
-
                     if (wiSourceR.Id != wiTargetR.Id)
                     {
                         Trace.WriteLine(
@@ -226,14 +226,11 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                         Trace.WriteLine(string.Format("  [AccessDenied] The Target  work item is inaccessable to create a Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id));
                     }
                 }
-
             }
             else
             {
                 Trace.WriteLine(string.Format("  [SKIP] Cant find wiTargetR where wiSourceL={0}, wiSourceR={1}, wiTargetL={2}", wiSourceL.Id, wiSourceR.Id, wiTargetL.Id));
             }
-
-
         }
 
         private WorkItem GetRightHandSideTargitWi(WorkItem wiSourceL, WorkItem wiSourceR, WorkItem wiTargetL, WorkItemStoreContext targetStore)
@@ -288,5 +285,4 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
             return item is Hyperlink;
         }
     }
-
 }
