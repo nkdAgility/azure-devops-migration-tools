@@ -13,7 +13,7 @@ It will migrate work items using a tip or replay migrator as well as Attachments
 - Migrate Work Items, Links, & Attachments
 - Restart will skip completed work items in Tip, and will filter completed revisions in replay.
 
-##Params
+## Params
 
 | Parameter name                       | Type    | Description                              | Default Value                            |
 |--------------------------------------|---------|------------------------------------------|------------------------------------------|
