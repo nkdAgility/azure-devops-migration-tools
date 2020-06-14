@@ -7,6 +7,10 @@ The Azure DevOps Migration Tools allow you to bulk edit and migrate data between
 **WARNING: This tool is not designed for a novice. This tool was developed to support the senarios below, and the edge cases that have been encountered by the 30+ contributers from around the Azure DevOps community. You should be comfortable with the TFS/Azure DevOps object model, as well as debugging code in Visual Studio.**
 **Both paid and community support is available through our [recommneded consultants](http://nkdagility.github.io/azure-devops-migration-tools/#support) as well as our contributors and many DevOps consultants around the world.**
 
+<a href="https://stackoverflow.com/questions/tagged/azure-devops-migration-tools" title="Ask Questions on StackOverflow"><img src="http://cdn.sstatic.net/stackexchange/img/logos/so/so-logo.png" width="250"></a>
+
+**Ask Questions on StackOverflow: https://stackoverflow.com/questions/tagged/azure-devops-migration-tools**
+
 ## What can you do with this tool?
 
 
