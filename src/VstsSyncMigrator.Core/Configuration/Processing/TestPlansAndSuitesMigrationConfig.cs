@@ -28,7 +28,6 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
 
         public TestPlansAndSuitesMigrationConfig()
         {
-            PrefixProjectToNodes = true;
         }
     }
 }
