@@ -80,23 +80,23 @@ Most of these processors need to be run in order. If you try to migrate work ite
 
 |Processor |Staus |Target |Usage |
 |---------|---------|---------|---------|
-|[NodeStructuresMigrationContext] | ready | Area & Iteration | Migrates Area and Iteration Paths |
-|[WorkItemMigrationContext](./Processors/WorkItemMigrationConfig.md) | ready | Work Items | Migrates either tip or history of work items with Links & Attachments based on a query with field mappings |
-|[TeamMigrationConfig](./Processors/TeamMigrationConfig.md) | beta | Teams | Migrates Teams and Team Settings |
-|WorkItemRevisionReplayMigrationContext | merged |  Work Items | obsolite - merged into WorkItemMigrationContext |
-|LinkMigrationContext | merged | Work Items | obsolite - merged into WorkItemMigrationContext |
-|AttachementExportMigrationContext | merged | Work Items | obsolite - merged into WorkItemMigrationContext |
-|AttachementImportMigrationContext | merged | Work Items | obsolite - merged into WorkItemMigrationContext |
-|HtmlFieldEmbeddedImageMigrationContext | merged | HTML Fields | obsolite - merged into WorkItemMigrationContext |
-|GitCommitFixContext | merged | Git links | obsolite - merged into WorkItemMigrationContext |
+|[NodeStructuresMigration](./Processors/NodeStructuresMigrationConfig.md) | ready | Area & Iteration | Migrates Area and Iteration Paths |
+|[WorkItemMigration](./Processors/WorkItemMigrationConfig.md) | ready | Work Items | Migrates either tip or history of work items with Links & Attachments based on a query with field mappings |
+|[TeamMigration](./Processors/TeamMigrationConfig.md) | beta | Teams | Migrates Teams and Team Settings |
+|WorkItemRevisionReplayMigration | merged |  Work Items | obsolite - merged into WorkItemMigration |
+|LinkMigration | merged | Work Items | obsolite - merged into WorkItemMigration |
+|AttachementExportMigration | merged | Work Items | obsolite - merged into WorkItemMigration |
+|AttachementImportMigration | merged | Work Items | obsolite - merged into WorkItemMigration |
+|HtmlFieldEmbeddedImageMigration | merged | HTML Fields | obsolite - merged into WorkItemMigration |
+|GitCommitFix | merged | Git links | obsolite - merged into WorkItemMigration |
 |[WorkItemDelete](./Processors/WorkItemDeleteConfig.md) | ready | Work Items | Bulk delete of work items **WARNING DANGERIOUS** |
 |[WorkItemUpdate](./Processors/WorkItemUpdateConfig.md) | ready | Work Items | Bulk update of Work Items based on a query and field mappings |
-|[WorkItemQueryMigrationContext](./Processors/WorkItemQueryMigrationContext.md) | ready | Queries | Migrates shared queries |
-|[TestVeriablesMigrationContext](./Processors/TestVeriablesMigrationContext.md) | Beta | Suits & Plans | Migrates Test Variables |
-|[TestConfigurationsMigrationContext](./Processors/TestConfigurationsMigrationContext.md) | Beta  | Suits & Plans | Migrates Test configurations |
-|[TestPlansAndSuitesMigrationContext](./Processors/TestPlansAndSuitesMigrationContext.md) | Beta  | Suits & Plans | Rebuilds Suits and plans for Test Cases migrated using the WorkItemMigrationContext |
-|TestRunsMigrationContext | Alfa | Suits & Plans | Migrates the history of Test Runs |
-|ImportProfilePictureContext & ExportProfilePictureFromADContext | Beta | Profiles | Downloads corporate images and updates TFS/Azure DevOps profiles |
+|[WorkItemQueryMigration](./Processors/WorkItemQueryMigrationConfig.md) | ready | Queries | Migrates shared queries |
+|[TestVeriablesMigration](./Processors/TestVeriablesMigrationConfig.md) | Beta | Suits & Plans | Migrates Test Variables |
+|[TestConfigurationsMigration](./Processors/TestConfigurationsMigrationConfig.md) | Beta  | Suits & Plans | Migrates Test configurations |
+|[TestPlansAndSuitesMigration](./Processors/TestPlansAndSuitesMigrationConfig.md) | Beta  | Suits & Plans | Rebuilds Suits and plans for Test Cases migrated using the WorkItemMigration |
+|TestRunsMigration | Alfa | Suits & Plans | Migrates the history of Test Runs |
+|ImportProfilePicture & ExportProfilePictureFromAD | Beta | Profiles | Downloads corporate images and updates TFS/Azure DevOps profiles |
 |CreateTeamFolders | ? | ? | ? | 
 |ExportTeamList | ? | ? | ? | 
 
