@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Microsoft.ApplicationInsights;
 using System.Diagnostics;
 using Microsoft.ApplicationInsights.DataContracts;
+using System.Text.RegularExpressions;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -28,25 +29,26 @@ namespace VstsSyncMigrator.Engine
 
         // Fix for Query SOAP error when passing parameters
         [Obsolete("Temporary work aorund for SOAP issue https://dev.azure.com/nkdagility/migration-tools/_workitems/edit/5066")]
-        string WorkAroundForSOAPError(string query, IDictionary<string, string> parameters)
+        static string WorkAroundForSOAPError(string query, IDictionary<string, string> parameters)
         {
-            foreach (string key in parameters.Keys)
+            foreach (var parameter in parameters)
             {
-                string pattern = "'{0}'";
-                if (IsInteger(parameters[key]))
+                if (!IsInteger(parameter.Value))
                 {
-                    pattern = "{0}";
+                    // only replace with pattern when not part of a larger string like an area path which is already quoted.
+                    query = Regex.Replace(query, $@"(?<=[=\s])@{parameter.Key}(?=$|\s)", $"'{parameter.Value}'");
                 }
-                query = query.Replace(string.Format("@{0}", key), string.Format(pattern, parameters[key]));
+
+                // replace the other occurences of this key
+                query = query.Replace(string.Format($"@{parameter.Key}"), parameter.Value);
             }
             return query;
         }
 
-        public bool IsInteger(string maybeInt)
+        private static bool IsInteger(string maybeInt)
         {
-            int testNumber = 0;
             //Check whether 'first' is integer
-            return int.TryParse(maybeInt, out testNumber);
+            return int.TryParse(maybeInt, out _);
         }
 
         public WorkItemCollection Execute()

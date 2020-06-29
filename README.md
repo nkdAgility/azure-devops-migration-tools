@@ -2,9 +2,9 @@
 
 The Azure DevOps Migration Tools allow you to bulk edit and migrate data between Team Projects on both Microsoft Team Foundation Server (TFS) and Azure DevOps Services. Take a look at the  [documentation](http://nkdagility.github.io/azure-devops-migration-tools/) to find out how. This project is published as [code on GitHub](https://github.com/nkdAgility/azure-devops-migration-tools/) as well as a [Azure DevOps Migration Tools on Chocolatey](https://chocolatey.org/packages/vsts-sync-migrator/).
 
-<a href="https://stackoverflow.com/tags/vsts-sync-migrator" title="Ask Questions on StackOverflow"><img src="http://cdn.sstatic.net/stackexchange/img/logos/so/so-logo.png" width="250"></a>
+<a href="https://stackoverflow.com/questions/tagged/azure-devops-migration-tools" title="Ask Questions on StackOverflow"><img src="http://cdn.sstatic.net/stackexchange/img/logos/so/so-logo.png" width="250"></a>
 
-**Ask Questions on StackOverflow: https://stackoverflow.com/tags/vsts-sync-migrator**
+**Ask Questions on StackOverflow: https://stackoverflow.com/questions/tagged/azure-devops-migration-tools**
 
 ![alt text](https://raw.githubusercontent.com/nkdAgility/azure-devops-migration-tools/master/src/VstsSyncMigrator.Extension/images/azure-devops-migration-tools-naked-agility-martin-hinshelwood.png)
 
@@ -45,7 +45,7 @@ The Azure DevOps Migration Tools allow you to bulk edit and migrate data between
  - [Video Overview](https://youtu.be/ZxDktQae10M)
  - [Getting Started](http://nkdagility.github.io/azure-devops-migration-tools/getting-started.md)
  - [Documentation](http://nkdagility.github.io/azure-devops-migration-tools/)
- - [Questions on Usage](https://stackoverflow.com/tags/vsts-sync-migrator)
+ - [Questions on Usage](https://stackoverflow.com/questions/tagged/azure-devops-migration-tools)
 
 ## The Technical Details
 
