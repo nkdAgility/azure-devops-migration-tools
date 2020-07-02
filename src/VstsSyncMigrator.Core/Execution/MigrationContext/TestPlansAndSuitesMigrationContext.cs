@@ -793,11 +793,19 @@ AddParameter("PlanId", parameters, targetPlan.Id.ToString());
             if (!string.IsNullOrEmpty(sourceIdentityMail))
             {
                 // translate source assignedto name to target identity
-                var targetIdentity = targetIdentityManagementService.ReadIdentity(
-                    IdentitySearchFactor.MailAddress,
-                    sourceIdentityMail,
-                    MembershipQuery.Direct,
-                    ReadIdentityOptions.None);
+                TeamFoundationIdentity targetIdentity = null;
+                try
+                {
+                    targetIdentity = targetIdentityManagementService.ReadIdentity(
+                        IdentitySearchFactor.MailAddress,
+                        sourceIdentityMail,
+                        MembershipQuery.Direct,
+                        ReadIdentityOptions.None);
+                }
+                catch (MultipleIdentitiesFoundException)
+                {
+                    Trace.WriteLine($"Multiple identities found with email [{sourceIdentityMail}] in target system. Trying Account Name.", "TestPlansAndSuites");
+                }
 
                 if (targetIdentity == null)
                 {
