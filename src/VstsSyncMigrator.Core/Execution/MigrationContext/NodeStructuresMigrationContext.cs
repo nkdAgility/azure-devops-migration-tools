@@ -1,6 +1,5 @@
 ﻿using Microsoft.TeamFoundation.Server;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Xml;
@@ -80,7 +79,7 @@ namespace VstsSyncMigrator.Engine
                     {
                         finishDate = DateTime.Parse(item.Attributes["FinishDate"].Value);
                     }
-                    
+
                     targetNode = CreateNode(css, newNodeName, parentPath, startDate, finishDate);
                 }
                 else
@@ -109,7 +108,7 @@ namespace VstsSyncMigrator.Engine
                 var split = nodePath.Split('\\');
                 var removeProjectAndType = split.Skip(3);
                 var path = string.Join(@"\", removeProjectAndType);
-                
+
                 // We need to check if the path is a parent path of one of the base paths, as we need those
                 foreach (var basePath in config.BasePaths)
                 {
@@ -138,7 +137,7 @@ namespace VstsSyncMigrator.Engine
         {
             string nodePath = string.Format(@"{0}\{1}", parent.Path, name);
             NodeInfo node = null;
-            
+
             Trace.Write(string.Format("--CreateNode: {0}", nodePath));
             try
             {
@@ -175,8 +174,17 @@ namespace VstsSyncMigrator.Engine
                 string newPathUri = css.CreateNode(name, parent.Uri);
                 Trace.Write("...created");
                 node = css.GetNode(newPathUri);
+            }
+
+            try
+            {
                 ((ICommonStructureService4)css).SetIterationDates(node.Uri, startDate, finishDate);
                 Trace.Write("...dates assigned");
+            }
+            catch (CommonStructureSubsystemException ex)
+            {
+                Telemetry.Current.TrackException(ex);
+                Trace.Write("...dates not set");
             }
 
             Trace.WriteLine(String.Empty);

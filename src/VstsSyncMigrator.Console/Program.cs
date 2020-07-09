@@ -1,32 +1,19 @@
-﻿using CommandLine.Text;
-using CommandLine;
-using Microsoft.ApplicationInsights;
-using Microsoft.ApplicationInsights.Channel;
-using Microsoft.ApplicationInsights.Extensibility;
-using Microsoft.TeamFoundation.Client;
-using Microsoft.TeamFoundation.WorkItemTracking.Client;
+﻿using CommandLine;
+using Microsoft.ApplicationInsights.DataContracts;
+using Microsoft.VisualStudio.Services.Common;
 using Newtonsoft.Json;
+using NuGet;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using VstsSyncMigrator.Engine;
-using VstsSyncMigrator.Engine.ComponentContext;
 using System.IO;
-using VstsSyncMigrator.Engine.Configuration;
-using VstsSyncMigrator.Engine.Configuration.FieldMap;
-using VstsSyncMigrator.Engine.Configuration.Processing;
-using Microsoft.ApplicationInsights.DataContracts;
-using NuGet;
+using System.Linq;
+using System.Net;
 using System.Net.NetworkInformation;
 using VstsSyncMigrator.Commands;
-using Microsoft.VisualStudio.Services.Common;
-using System.Net;
+using VstsSyncMigrator.Engine;
+using VstsSyncMigrator.Engine.Configuration;
+using VstsSyncMigrator.Engine.Configuration.FieldMap;
 
 namespace VstsSyncMigrator.ConsoleApp
 {
@@ -94,7 +81,7 @@ namespace VstsSyncMigrator.ConsoleApp
             Console.WriteLine("Writing log to " + logPath);
             //////////////////////////////////////////////////
             Version thisVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
-           
+
             Trace.WriteLine(string.Format("Running version detected as {0}", thisVersion), "[Info]");
             if (IsOnline())
             {
@@ -118,7 +105,7 @@ namespace VstsSyncMigrator.ConsoleApp
 #endif
                 }
             }
-            
+
             Trace.WriteLine(string.Format("Telemetry Enabled: {0}", Telemetry.Current.IsEnabled().ToString()), "[Info]");
             Trace.WriteLine("Telemetry Note: We use Application Insights to collect telemetry on performance & feature usage for the tools to help our developers target features. This data is tied to a session ID that is generated and shown in the logs. This can help with debugging.");
             Trace.WriteLine(string.Format("SessionID: {0}", Telemetry.Current.Context.Session.Id), "[Info]");
@@ -147,6 +134,7 @@ namespace VstsSyncMigrator.ConsoleApp
             Trace.WriteLine(string.Format("Duration: {0}", mainTimer.Elapsed.ToString("c")), "[Info]");
             Trace.WriteLine(string.Format("End Time: {0}", DateTime.Now.ToUniversalTime().ToLocalTime()), "[Info]");
 #if DEBUG
+            Trace.WriteLine("App paused so you can check the output.  Press a key to close.");
             Console.ReadKey();
 #endif
             return result;
@@ -233,7 +221,7 @@ namespace VstsSyncMigrator.ConsoleApp
                         }
 
                         me.ChangeSetMapping.Add(changesetId, split[1]);
-                    }                    
+                    }
                 }
             }
 
