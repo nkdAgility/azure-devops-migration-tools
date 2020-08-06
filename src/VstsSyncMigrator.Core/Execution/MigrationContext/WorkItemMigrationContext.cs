@@ -176,7 +176,7 @@ namespace VstsSyncMigrator.Engine
                     if (revisionsToMigrate.Count == 0)
                     {
                         ProcessWorkItemAttachments(sourceWorkItem, targetWorkItem, false);
-                        ProcessWorkItemLinks(sourceStore, targetStore, sourceWorkItem, targetWorkItem, false);
+                        ProcessWorkItemLinks(sourceStore, targetStore, sourceWorkItem, targetWorkItem);
                         TraceWriteLine(sourceWorkItem, "Skipping as work item exists and no revisions to sync detected", ConsoleColor.Yellow);
                         processWorkItemMetrics.Add("Revisions", 0);
                     }
@@ -422,7 +422,7 @@ namespace VstsSyncMigrator.Engine
                 if (targetWorkItem != null)
                 {
                     ProcessWorkItemAttachments(sourceWorkItem, targetWorkItem, false);
-                    ProcessWorkItemLinks(sourceStore, targetStore, sourceWorkItem, targetWorkItem, false);
+                    ProcessWorkItemLinks(sourceStore, targetStore, sourceWorkItem, targetWorkItem);
                     string reflectedUri = sourceStore.CreateReflectedWorkItemId(sourceWorkItem);
                     if (targetWorkItem.Fields.Contains(me.Target.Config.ReflectedWorkItemIDFieldName))
                     {
@@ -437,15 +437,6 @@ namespace VstsSyncMigrator.Engine
 
                     attachmentOMatic.CleanUpAfterSave(targetWorkItem);
                     TraceWriteLine(sourceWorkItem, $"...Saved as {targetWorkItem.Id}");
-
-                    if (_config.UpdateSourceReflectedId && sourceWorkItem.Fields.Contains(me.Source.Config.ReflectedWorkItemIDFieldName))
-                    {
-                        sourceWorkItem.Fields[me.Source.Config.ReflectedWorkItemIDFieldName].Value =
-                            targetStore.CreateReflectedWorkItemId(targetWorkItem);
-                        SaveWorkItem(sourceWorkItem);
-                        TraceWriteLine(sourceWorkItem, $"...and Source Updated {sourceWorkItem.Id}");
-                    }
-
                 }
             }
             catch (Exception ex)

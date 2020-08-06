@@ -11,7 +11,6 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
         public bool PrefixProjectToNodes { get; set; }
         public bool UpdateCreatedDate { get; set; }
         public bool UpdateCreatedBy { get; set; }
-        public bool UpdateSourceReflectedId { get; set; }
         public bool BuildFieldTable { get; set; }
         public bool AppendMigrationToolSignatureFooter { get; set; }
         public string QueryBit { get; set; }
@@ -61,7 +60,6 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
             PrefixProjectToNodes = false;
             UpdateCreatedDate = true;
             LinkMigrationSaveEachAsAdded = false;
-            UpdateSourceReflectedId = false;
             QueryBit = @"AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
             OrderBit = "[System.ChangedDate] desc";
         }
