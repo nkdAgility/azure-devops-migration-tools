@@ -11,7 +11,6 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
         public bool PrefixProjectToNodes { get; set; }
         public bool UpdateCreatedDate { get; set; }
         public bool UpdateCreatedBy { get; set; }
-        public bool UpdateSourceReflectedId { get; set; }
         public bool BuildFieldTable { get; set; }
         public bool AppendMigrationToolSignatureFooter { get; set; }
         public string QueryBit { get; set; }
@@ -35,6 +34,7 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
         public bool PauseAfterEachWorkItem { get; set; }
         public int AttachmentMazSize { get; set; }
         public bool CollapseRevisions { get; set; }
+        public bool LinkMigrationSaveEachAsAdded { get; set; }
 
         /// <inheritdoc />
         public bool IsProcessorCompatible(IReadOnlyList<ITfsProcessingConfig> otherProcessors)
@@ -59,7 +59,7 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
             UpdateCreatedBy = true;
             PrefixProjectToNodes = false;
             UpdateCreatedDate = true;
-            UpdateSourceReflectedId = false;
+            LinkMigrationSaveEachAsAdded = false;
             QueryBit = @"AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
             OrderBit = "[System.ChangedDate] desc";
         }
