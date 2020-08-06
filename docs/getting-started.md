@@ -64,7 +64,6 @@ You can now customise the configuration depending on what you need to do. Howeve
       "PrefixProjectToNodes": false,
       "UpdateCreatedDate": true,
       "UpdateCreatedBy": true,
-      "UpdateSourceReflectedId": false,
       "BuildFieldTable": false,
       "AppendMigrationToolSignatureFooter": false,
       "QueryBit": "AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
