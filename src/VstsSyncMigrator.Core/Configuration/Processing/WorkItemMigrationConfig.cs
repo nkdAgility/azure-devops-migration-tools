@@ -35,6 +35,7 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
         public bool PauseAfterEachWorkItem { get; set; }
         public int AttachmentMazSize { get; set; }
         public bool CollapseRevisions { get; set; }
+        public bool LinkMigrationSaveEachAsAdded { get; set; }
 
         /// <inheritdoc />
         public bool IsProcessorCompatible(IReadOnlyList<ITfsProcessingConfig> otherProcessors)
@@ -59,6 +60,7 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
             UpdateCreatedBy = true;
             PrefixProjectToNodes = false;
             UpdateCreatedDate = true;
+            LinkMigrationSaveEachAsAdded = false;
             UpdateSourceReflectedId = false;
             QueryBit = @"AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
             OrderBit = "[System.ChangedDate] desc";
