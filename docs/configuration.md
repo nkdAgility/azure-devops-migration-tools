@@ -27,13 +27,21 @@ The global configuration created by the `init` command look like this:
     "Collection": "https://dev.azure.com/psd45",
     "Project": "DemoProjs",
     "ReflectedWorkItemIDFieldName": "TfsMigrationTool.ReflectedWorkItemId",
-    "AllowCrossProjectLinking": false
+    "AllowCrossProjectLinking": false,
+    "LanguageMap": {
+        "AreaPath": "Area",
+        "AreaPath": "Iteration",
+	}
   },
   "Target": {
     "Collection": "https://dev.azure.com/psd46",
     "Project": "DemoProjt",
     "ReflectedWorkItemIDFieldName": "ProcessName.ReflectedWorkItemId",
-    "AllowCrossProjectLinking": false
+    "AllowCrossProjectLinking": false,
+    "LanguageMap": {
+        "AreaPath": "Area",
+        "AreaPath": "Iteration",
+	}
   },
   "FieldMaps": [],
   "WorkItemTypeDefinition": {
@@ -86,6 +94,8 @@ Allows you to submit trace to Application Insights to allow the devellpment team
 
 ### Source & Target
 Both the `Source` and `Target` entries hold the collection URL and the Team Project name that you are connecting to. The `Source` is where the tool will read the data to migrate. The `Target` is where the tool will write the data.
+
+For multi Language support you can add the name used in the source and target for both 'Area' and 'Iteration'. This allows a migration from one language version of TFS / Azure DevOps to another.
 
 ### ReflectedWorkItemIDFieldName
 
