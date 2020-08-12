@@ -294,11 +294,6 @@ namespace VstsSyncMigrator.Engine
                 sortedRevisions.RemoveRange(0, sortedRevisions.Count - 1);
             }
 
-
-
-
-
-
             TraceWriteLine(sourceWorkItem, $"Found {sortedRevisions.Count} revisions to migrate on  Work item:{sourceWorkItem.Id}", ConsoleColor.Gray, true);
             return sortedRevisions;
         }
@@ -506,8 +501,9 @@ namespace VstsSyncMigrator.Engine
                 }
             }
 
-            newwit.AreaPath = GetNewNodeName(oldWi.AreaPath, oldWi.Project.Name, newwit.Project.Name, newwit.Store, "Area");
-            newwit.IterationPath = GetNewNodeName(oldWi.IterationPath, oldWi.Project.Name, newwit.Project.Name, newwit.Store, "Iteration");
+            newwit.AreaPath = GetNewNodeName(oldWi.AreaPath, oldWi.Project.Name, newwit.Project.Name, newwit.Store, me.Target.Config.LanguageMaps.AreaPath);
+            newwit.IterationPath = GetNewNodeName(oldWi.IterationPath, oldWi.Project.Name, newwit.Project.Name, newwit.Store, me.Target.Config.LanguageMaps.IterationPath);
+
             switch (destType)
             {
                 case "Test Case":
