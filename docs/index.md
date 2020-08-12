@@ -17,8 +17,8 @@ _NOTICE: Both paied and community support is avilable through our [recommneded c
 - Migrate from one Language version of TFS / Azure Devops to another (*new v9.0*)
 
 ## Change Log
-
 - v9.0 - Added support for migration between other language versions of Azure DevOps. Developed for German -> English
+- v8.10 - Added `LinkMigrationSaveEachAsAdded` to help mitigate `TF26194: unable to change the value of the 'Parent' field` error. Remvoved `UpdateSourceReflectedId`
 - v8.9 - Added 'Collapse Revisions' feature to collapse and attache revisions instead of replaying them
 - v8.8 - 'SkipToFinalRevisedWorkItemType' feature added to handle scenario when changing Work Item Type
 - v8.7 - Support for inline images using a Personal Access Token added to the Source Project

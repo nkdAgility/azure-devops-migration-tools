@@ -64,7 +64,6 @@ The global configuration created by the `init` command look like this:
       "PrefixProjectToNodes": false,
       "UpdateCreatedDate": true,
       "UpdateCreatedBy": true,
-      "UpdateSourceReflectedId": false,
       "BuildFieldTable": false,
       "AppendMigrationToolSignatureFooter": false,
       "QueryBit": "AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",

@@ -474,7 +474,7 @@ namespace VstsSyncMigrator.Engine
                     foreach (Match match in matches)
                     {
                         var qid = match.Value.Split('=')[1].Trim();
-                        var targetWi = targetWitStore.FindReflectedWorkItemByReflectedWorkItemId(qid);
+                        var targetWi = targetWitStore.FindReflectedWorkItemByReflectedWorkItemId(Convert.ToInt32(qid),false);
 
                         if (targetWi == null)
                         {
@@ -483,10 +483,14 @@ namespace VstsSyncMigrator.Engine
                         else
                         {
                             TraceWriteLine(targetSuitChild, "Fixing [System.Id] in query in test suite '" + dynamic.Title + "' from " + qid + " to " + targetWi.Id, 10);
-                            dynamic.Refresh();
-                            dynamic.Repopulate();
+                            if (targetPlan != null) {
+                                dynamic.Refresh();
+                                dynamic.Repopulate();
+                            }
                             dynamic.Query = targetTestStore.Project.CreateTestQuery(dynamic.Query.QueryText.Replace(match.Value, string.Format("[System.Id] = {0}", targetWi.Id)));
-                            targetPlan.Save();
+                            if (targetPlan != null) {
+                                targetPlan.Save();
+                            }
                         }
                     }
                 }
