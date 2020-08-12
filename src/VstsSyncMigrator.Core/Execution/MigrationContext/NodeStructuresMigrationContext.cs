@@ -34,24 +34,24 @@ namespace VstsSyncMigrator.Engine
             ICommonStructureService targetCss = (ICommonStructureService)me.Target.Collection.GetService(typeof(ICommonStructureService4));
 
             //////////////////////////////////////////////////
-            ProcessCommonStructure("Area", sourceNodes, targetCss, sourceCss);
+            ProcessCommonStructure(me.Source.Config.LanguageMaps.MapArea, me.Target.Config.LanguageMaps.MapArea, sourceNodes, targetCss, sourceCss);
             //////////////////////////////////////////////////
-            ProcessCommonStructure("Iteration", sourceNodes, targetCss, sourceCss);
+            ProcessCommonStructure(me.Source.Config.LanguageMaps.IterationPath, me.Target.Config.LanguageMaps.IterationPath, sourceNodes, targetCss, sourceCss);
             //////////////////////////////////////////////////
         }
 
-        private void ProcessCommonStructure(string treeType, NodeInfo[] sourceNodes, ICommonStructureService targetCss, ICommonStructureService sourceCss)
+        private void ProcessCommonStructure(string treeTypeSpurce,string treeTypeTarget, NodeInfo[] sourceNodes, ICommonStructureService targetCss, ICommonStructureService sourceCss)
         {
-            NodeInfo sourceNode = (from n in sourceNodes where n.Path.Contains(treeType) select n).Single();
+            NodeInfo sourceNode = (from n in sourceNodes where n.Path.Contains(treeTypeSpurce) select n).Single();
             XmlElement sourceTree = sourceCss.GetNodesXml(new string[] { sourceNode.Uri }, true);
-            NodeInfo structureParent = targetCss.GetNodeFromPath(string.Format("\\{0}\\{1}", me.Target.Config.Project, treeType));
+            NodeInfo structureParent = targetCss.GetNodeFromPath(string.Format("\\{0}\\{1}", me.Target.Config.Project, treeTypeTarget));
             if (config.PrefixProjectToNodes)
             {
                 structureParent = CreateNode(targetCss, me.Source.Config.Project, structureParent);
             }
             if (sourceTree.ChildNodes[0].HasChildNodes)
             {
-                CreateNodes(sourceTree.ChildNodes[0].ChildNodes[0].ChildNodes, targetCss, structureParent, treeType);
+                CreateNodes(sourceTree.ChildNodes[0].ChildNodes[0].ChildNodes, targetCss, structureParent, treeTypeTarget);
             }
         }
 
