@@ -8,16 +8,16 @@ _NOTICE: Both paied and community support is avilable through our [recommneded c
 
 ## What can you do with this tool?
 
-* Migrate Work Items from one Team Project to another Team Project
-* *new v8.3* Sync changes after a migration
-* Merge many Team Projects into a single Team Project
-* Split one Team Project into many Team Projects
-* Assistance in changing Process Templates
-* Bulk edit of Work Items
-* Migration of Test Suits & Test Plans
+- Migrate Work Items from one Team Project to another Team Project (*new v8.3*) and Sync changes after a migration
+- Merge many Team Projects into a single Team Project
+- Split one Team Project into many Team Projects
+- Assistance in changing Process Templates
+- Bulk edit of Work Items
+- Migration of Test Suites & Test Plans
+- Migrate from one Language version of TFS / Azure Devops to another (*new v9.0*)
 
 ## Change Log
-
+- v9.0 - Added support for migration between other language versions of Azure DevOps. Developed for German -> English
 - v8.10 - Added `LinkMigrationSaveEachAsAdded` to help mitigate `TF26194: unable to change the value of the 'Parent' field` error. Remvoved `UpdateSourceReflectedId`
 - v8.9 - Added 'Collapse Revisions' feature to collapse and attache revisions instead of replaying them
 - v8.8 - 'SkipToFinalRevisedWorkItemType' feature added to handle scenario when changing Work Item Type

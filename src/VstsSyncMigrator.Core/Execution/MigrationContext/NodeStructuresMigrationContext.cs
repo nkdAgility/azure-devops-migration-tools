@@ -34,24 +34,40 @@ namespace VstsSyncMigrator.Engine
             ICommonStructureService targetCss = (ICommonStructureService)me.Target.Collection.GetService(typeof(ICommonStructureService4));
 
             //////////////////////////////////////////////////
-            ProcessCommonStructure("Area", sourceNodes, targetCss, sourceCss);
+            ProcessCommonStructure(me.Source.Config.LanguageMaps.AreaPath, me.Target.Config.LanguageMaps.AreaPath, sourceNodes, targetCss, sourceCss);
             //////////////////////////////////////////////////
-            ProcessCommonStructure("Iteration", sourceNodes, targetCss, sourceCss);
+            ProcessCommonStructure(me.Source.Config.LanguageMaps.IterationPath, me.Target.Config.LanguageMaps.IterationPath, sourceNodes, targetCss, sourceCss);
             //////////////////////////////////////////////////
         }
 
-        private void ProcessCommonStructure(string treeType, NodeInfo[] sourceNodes, ICommonStructureService targetCss, ICommonStructureService sourceCss)
+        private void ProcessCommonStructure(string treeTypeSource,string treeTypeTarget, NodeInfo[] sourceNodes, ICommonStructureService targetCss, ICommonStructureService sourceCss)
         {
-            NodeInfo sourceNode = (from n in sourceNodes where n.Path.Contains(treeType) select n).Single();
+            NodeInfo sourceNode = (from n in sourceNodes where n.Path.Contains(treeTypeSource) select n).Single();
+            if (sourceNode == null) // May run into language problems!!! This is to try and detect that
+            {
+                Exception ex = new Exception(string.Format("Unable to load Common Structure for Source. This is usually due to diferent language versions. Validate that '{0}' is the correct name in your version. ", treeTypeSource));
+                Telemetry.Current.TrackException(ex);
+                throw ex;
+            }
             XmlElement sourceTree = sourceCss.GetNodesXml(new string[] { sourceNode.Uri }, true);
-            NodeInfo structureParent = targetCss.GetNodeFromPath(string.Format("\\{0}\\{1}", me.Target.Config.Project, treeType));
+            NodeInfo structureParent;
+            try // May run into language problems!!! This is to try and detect that
+            {
+                structureParent = targetCss.GetNodeFromPath(string.Format("\\{0}\\{1}", me.Target.Config.Project, treeTypeTarget));
+            }
+            catch (Exception ex)
+            {
+                Exception ex2 = new Exception(string.Format("Unable to load Common Structure for Target.This is usually due to diferent language versions. Validate that '{0}' is the correct name in your version. ", treeTypeTarget), ex);
+                Telemetry.Current.TrackException(ex2);
+                throw ex2;
+            }
             if (config.PrefixProjectToNodes)
             {
                 structureParent = CreateNode(targetCss, me.Source.Config.Project, structureParent);
             }
             if (sourceTree.ChildNodes[0].HasChildNodes)
             {
-                CreateNodes(sourceTree.ChildNodes[0].ChildNodes[0].ChildNodes, targetCss, structureParent, treeType);
+                CreateNodes(sourceTree.ChildNodes[0].ChildNodes[0].ChildNodes, targetCss, structureParent, treeTypeTarget);
             }
         }
 
