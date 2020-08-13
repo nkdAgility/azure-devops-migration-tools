@@ -33,7 +33,7 @@ namespace VstsSyncMigrator.Engine.Configuration
             ec.Processors.Add(new WorkItemUpdateConfig());
             ec.Processors.Add(new WorkItemPostProcessingConfig() { WorkItemIDs = new List<int> { 1, 2, 3 } });
             ec.Processors.Add(new WorkItemDeleteConfig());
-            ec.Processors.Add(new WorkItemQueryMigrationConfig());
+            ec.Processors.Add(new WorkItemQueryMigrationConfig() { SourceToTargetFieldMappings = new Dictionary<string, string>() { {"SourceFieldRef", "TargetFieldRef" } } });
             ec.Processors.Add(new TeamMigrationConfig());
             return ec;
         }
