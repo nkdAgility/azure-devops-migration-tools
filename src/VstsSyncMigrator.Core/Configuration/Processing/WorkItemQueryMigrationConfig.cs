@@ -24,6 +24,8 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
             set { sharedFolderName = value; }
         }
 
+        public Dictionary<string, string> SourceToTargetFieldMappings { get; set; }
+
         /// <inheritdoc />
         public bool Enabled { get; set; }
 
