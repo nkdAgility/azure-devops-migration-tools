@@ -17,9 +17,9 @@ namespace VstsSyncMigrator.Engine.ComponentContext
         public FieldMergeMap(FieldMergeMapConfig config)
         {
             this.config = config;
-            if (config.targetField == config.sourceField1 || config.targetField == config.sourceField2)
+            if (config.targetField == config.sourceField2)
             {
-                throw new ArgumentNullException($"The source fields `{config.sourceField1}` or `{config.sourceField2}` can not match target field `{config.targetField}`. Please use 3 diferent fields.");
+                throw new ArgumentNullException($"The source field `{config.sourceField2}` can not match target field `{config.targetField}`. Please use diferent fields.");
             }
         }
 
@@ -33,16 +33,17 @@ namespace VstsSyncMigrator.Engine.ComponentContext
                 var val2 = source.Fields[config.sourceField2].Value != null ? source.Fields[config.sourceField2].Value.ToString() : string.Empty;
                 var valT = target.Fields[config.targetField].Value != null ? target.Fields[config.targetField].Value.ToString() : string.Empty;
                 var newValT = string.Format(config.formatExpression, val1, val2);
-
-                if (valT.Equals(newValT))
+                if (valT.Contains(val2))
                 {
+                    Trace.WriteLine(string.Format("  [SKIP] field already merged {0}:{1}+{2} to {3}:{4}", source.Id, config.sourceField1, config.sourceField2, target.Id, config.targetField));
+                } else if (valT.Equals(newValT))
+                    {
                     Trace.WriteLine(string.Format("  [SKIP] field already merged {0}:{1}+{2} to {3}:{4}", source.Id, config.sourceField1, config.sourceField2, target.Id, config.targetField));
                 } else
                 {
                     target.Fields[config.targetField].Value = newValT;
                     Trace.WriteLine(string.Format("  [UPDATE] field merged {0}:{1}+{2} to {3}:{4}", source.Id, config.sourceField1, config.sourceField2, target.Id, config.targetField));
                 }
-
             }
         }
     }
