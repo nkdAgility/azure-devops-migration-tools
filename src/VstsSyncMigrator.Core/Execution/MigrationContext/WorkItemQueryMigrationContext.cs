@@ -180,6 +180,14 @@ namespace VstsSyncMigrator.Engine
                     fixedQueryText = fixedQueryText.Replace($"{me.Target.Config.Project}\\", $"{me.Target.Config.Project}\\{me.Source.Config.Project}\\");
                 }
 
+                if (config.SourceToTargetFieldMappings != null)
+                {
+                    foreach (var sourceField in config.SourceToTargetFieldMappings.Keys)
+                    {
+                        fixedQueryText = query.QueryText.Replace($"{sourceField}", $"'{config.SourceToTargetFieldMappings[sourceField]}");
+                    }
+                }
+
                 // you cannot just add an item from one store to another, we need to create a new object
                 var queryCopy = new QueryDefinition(query.Name, fixedQueryText);
                 this.totalQueriesAttempted++;
