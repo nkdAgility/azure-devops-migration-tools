@@ -202,6 +202,8 @@ namespace VstsSyncMigrator.Engine
                 {
                     this.totalQueryFailed++;
                     Trace.WriteLine($"Error saving query '{query.Name}', probably due to invalid area or iteration paths");
+                    Trace.WriteLine($"Source Query: '{query}'");
+                    Trace.WriteLine($"Target Query: '{fixedQueryText}'");
                     Trace.WriteLine(ex.Message);
                     targetHierarchy.Refresh(); // get the tree without the last edit
                 }
