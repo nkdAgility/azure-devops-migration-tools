@@ -28,9 +28,9 @@ The global configuration created by the `init` command look like this:
     "Project": "DemoProjs",
     "ReflectedWorkItemIDFieldName": "TfsMigrationTool.ReflectedWorkItemId",
     "AllowCrossProjectLinking": false,
-    "LanguageMap": {
+    "LanguageMaps": {
         "AreaPath": "Area",
-        "AreaPath": "Iteration",
+        "IterationPath": "Iteration"
 	}
   },
   "Target": {
@@ -38,9 +38,9 @@ The global configuration created by the `init` command look like this:
     "Project": "DemoProjt",
     "ReflectedWorkItemIDFieldName": "ProcessName.ReflectedWorkItemId",
     "AllowCrossProjectLinking": false,
-    "LanguageMap": {
+    "LanguageMaps": {
         "AreaPath": "Area",
-        "AreaPath": "Iteration",
+        "IterationPath": "Iteration"
 	}
   },
   "FieldMaps": [],
