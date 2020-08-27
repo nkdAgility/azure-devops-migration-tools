@@ -121,7 +121,7 @@ namespace VstsSyncMigrator.Engine
 
             foreach (WorkItem sourceWorkItem in sourceWorkItems)
             {
-                ProcessWorkItem(sourceStore, targetStore, destProject, sourceWorkItem, _config.WorkItemCreateRetryLimit);
+                ProcessWorkItem(sourceStore, targetStore, destProject, sourceWorkItem, _config);
                 if (_config.PauseAfterEachWorkItem)
                 {
                     Console.WriteLine("Do you want to continue? (y/n)");
@@ -143,10 +143,11 @@ namespace VstsSyncMigrator.Engine
         private IDictionary<string, double> processWorkItemMetrics = null;
         private IDictionary<string, string> processWorkItemParamiters = null;
 
-        private void ProcessWorkItem(WorkItemStoreContext sourceStore, WorkItemStoreContext targetStore, Project destProject, WorkItem sourceWorkItem, int retryLimit = 5, int retrys = 0)
+        private void ProcessWorkItem(WorkItemStoreContext sourceStore, WorkItemStoreContext targetStore, Project destProject, WorkItem sourceWorkItem, WorkItemMigrationConfig workItemMigrationConfig, int retrys = 0)
         {
             var witstopwatch = Stopwatch.StartNew();
             var starttime = DateTime.Now;
+            var retryLimit = workItemMigrationConfig.WorkItemCreateRetryLimit;
             processWorkItemMetrics = new Dictionary<string, double>();
             processWorkItemParamiters = new Dictionary<string, string>();
             AddParameter("SourceURL", processWorkItemParamiters, sourceStore.Store.TeamProjectCollection.Uri.ToString());
@@ -170,7 +171,7 @@ namespace VstsSyncMigrator.Engine
                     List<RevisionItem> revisionsToMigrate = RevisionsToMigrate(sourceWorkItem, targetWorkItem);
                     if (targetWorkItem == null)
                     {
-                        targetWorkItem = ReplayRevisions(revisionsToMigrate, sourceWorkItem, null, destProject, sourceStore, _current, targetStore);
+                        targetWorkItem = ReplayRevisions(revisionsToMigrate, sourceWorkItem, null, destProject, sourceStore, _current, targetStore, workItemMigrationConfig);
                         AddMetric("Revisions", processWorkItemMetrics, revisionsToMigrate.Count);
                     }
                     else
@@ -186,7 +187,7 @@ namespace VstsSyncMigrator.Engine
                         {
                             TraceWriteLine(sourceWorkItem, $"Syncing as there are {revisionsToMigrate.Count} revisons detected", ConsoleColor.Yellow);
 
-                            targetWorkItem = ReplayRevisions(revisionsToMigrate, sourceWorkItem, targetWorkItem, destProject, sourceStore, _current, targetStore);
+                            targetWorkItem = ReplayRevisions(revisionsToMigrate, sourceWorkItem, targetWorkItem, destProject, sourceStore, _current, targetStore, workItemMigrationConfig);
 
                             AddMetric("Revisions", processWorkItemMetrics, revisionsToMigrate.Count);
                             AddMetric("SyncRev", processWorkItemMetrics, revisionsToMigrate.Count);
@@ -229,7 +230,7 @@ namespace VstsSyncMigrator.Engine
                     System.Threading.Thread.Sleep(new TimeSpan(0, 0, retrys));
                     retrys++;
                     TraceWriteLine(sourceWorkItem, $"RETRY {retrys}/{retrys} ");
-                    ProcessWorkItem(sourceStore, targetStore, destProject, sourceWorkItem, retryLimit, retrys);
+                    ProcessWorkItem(sourceStore, targetStore, destProject, sourceWorkItem, workItemMigrationConfig, retrys);
                 }
                 else
                 {
@@ -313,7 +314,8 @@ namespace VstsSyncMigrator.Engine
 
         private WorkItem ReplayRevisions(List<RevisionItem> revisionsToMigrate, WorkItem sourceWorkItem, WorkItem targetWorkItem, Project destProject, WorkItemStoreContext sourceStore,
             int current,
-            WorkItemStoreContext targetStore)
+            WorkItemStoreContext targetStore,
+            WorkItemMigrationConfig workItemMigrationConfig)
         {
 
             try
@@ -427,13 +429,16 @@ namespace VstsSyncMigrator.Engine
                     string reflectedUri = sourceStore.CreateReflectedWorkItemId(sourceWorkItem);
                     if (targetWorkItem.Fields.Contains(me.Target.Config.ReflectedWorkItemIDFieldName))
                     {
-
                         targetWorkItem.Fields[me.Target.Config.ReflectedWorkItemIDFieldName].Value = reflectedUri;
                     }
-                    var history = new StringBuilder();
-                    history.Append(
-                        $"This work item was migrated from a different project or organization. You can find the old version at <a href=\"{reflectedUri}\">{reflectedUri}</a>.");
-                    targetWorkItem.History = history.ToString();
+
+                    if (workItemMigrationConfig.AppendMigrationToolSignatureFooter)
+                    {
+                        var history = new StringBuilder();
+                        history.Append(
+                            $"This work item was migrated from a different project or organization. You can find the old version at <a href=\"{reflectedUri}\">{reflectedUri}</a>.");
+                        targetWorkItem.History = history.ToString();
+                    }
                     SaveWorkItem(targetWorkItem);
 
                     attachmentOMatic.CleanUpAfterSave(targetWorkItem);

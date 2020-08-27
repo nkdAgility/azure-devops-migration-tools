@@ -11,6 +11,7 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
         public bool PrefixProjectToNodes { get; set; }
         public bool UpdateCreatedDate { get; set; }
         public bool UpdateCreatedBy { get; set; }
+        public bool UpdateChangedByToMigration { get; set; }
         public bool BuildFieldTable { get; set; }
         public bool AppendMigrationToolSignatureFooter { get; set; }
         public string QueryBit { get; set; }
@@ -48,6 +49,8 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
         public WorkItemMigrationConfig()
         {
             Enabled = false;
+            AppendMigrationToolSignatureFooter = true;
+            UpdateChangedByToMigration = true;
             WorkItemCreateRetryLimit = 5;
             FilterWorkItemsThatAlreadyExistInTarget = true;
             ReplayRevisions = true;

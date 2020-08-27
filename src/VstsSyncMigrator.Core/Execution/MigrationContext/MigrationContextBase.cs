@@ -80,9 +80,12 @@ namespace VstsSyncMigrator.Engine
             //return r.Replace(input, target.Name, 1);
         }
 
-        internal static void SaveWorkItem(WorkItem workItem)
+        internal static void SaveWorkItem(WorkItem workItem, WorkItemMigrationConfig workItemMigrationConfig)
         {
-            workItem.Fields["System.ChangedBy"].Value = "Migration";
+            if (workItemMigrationConfig.UpdateChangedByToMigration)
+            {
+                workItem.Fields["System.ChangedBy"].Value = "Migration";
+            }
             workItem.Save();
         }
 
