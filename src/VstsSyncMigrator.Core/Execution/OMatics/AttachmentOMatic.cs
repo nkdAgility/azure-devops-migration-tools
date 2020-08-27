@@ -56,7 +56,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
             }
             if (save)
             {
-                WorkItemMigrationContext.SaveWorkItem(targetWorkItem, workItemMigrationConfig);
+                WorkItemMigrationContext.SaveWorkItem(targetWorkItem, workItemMigrationConfig.UpdateChangedByToMigration);
                 WorkItemMigrationContext.TraceWriteLine(sourceWorkItem, $" Work iTem now has {sourceWorkItem.Attachments.Count} attachemnts");
                 CleanUpAfterSave(targetWorkItem);
             }           

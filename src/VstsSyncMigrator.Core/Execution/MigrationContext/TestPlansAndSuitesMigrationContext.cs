@@ -139,7 +139,7 @@ namespace VstsSyncMigrator.Engine
                 if (CanSkipElementBecauseOfTags(sourcePlan.Id))
                     continue;
 
-                ProcessTestPlan( sourcePlan);
+                ProcessTestPlan(sourcePlan);
                
             }
             _currentPlan = 0;
@@ -317,7 +317,7 @@ namespace VstsSyncMigrator.Engine
         {
             var targetPlanWorkItem = targetWitStore.Store.GetWorkItem(workItemId);
             targetPlanWorkItem.Tags = targetPlanWorkItem.Tags + ";migrated";
-            SaveWorkItem(targetPlanWorkItem);
+            SaveWorkItem(targetPlanWorkItem, config.UpdateChangedByToMigration);
         }
 
         private bool TargetPlanContansTag(int workItemId)

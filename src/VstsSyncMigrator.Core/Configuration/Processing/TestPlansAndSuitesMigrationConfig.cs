@@ -10,6 +10,8 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
         public string OnlyElementsWithTag { get; set; }
         public string TestPlanQueryBit { get; set; }
 
+        public bool UpdateChangedByToMigration { get; set; }
+
         public Type Processor
         {
             get { return typeof(TestPlandsAndSuitesMigrationContext); }
@@ -28,6 +30,7 @@ namespace VstsSyncMigrator.Engine.Configuration.Processing
 
         public TestPlansAndSuitesMigrationConfig()
         {
+            UpdateChangedByToMigration = true;
         }
     }
 }
