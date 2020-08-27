@@ -178,7 +178,7 @@ namespace VstsSyncMigrator.Engine
                     {
                         if (revisionsToMigrate.Count == 0)
                         {
-                            ProcessWorkItemAttachments(sourceWorkItem, targetWorkItem, false);
+                            ProcessWorkItemAttachments(sourceWorkItem, targetWorkItem, workItemMigrationConfig, false);
                             ProcessWorkItemLinks(sourceStore, targetStore, sourceWorkItem, targetWorkItem);
                             TraceWriteLine(sourceWorkItem, "Skipping as work item exists and no revisions to sync detected", ConsoleColor.Yellow);
                             processWorkItemMetrics.Add("Revisions", 0);
@@ -202,7 +202,7 @@ namespace VstsSyncMigrator.Engine
                     ///////////////////////////////////////////////////////
                     if (targetWorkItem != null && targetWorkItem.IsDirty)
                     {
-                        SaveWorkItem(targetWorkItem);
+                        SaveWorkItem(targetWorkItem, workItemMigrationConfig);
                     }
                     if (targetWorkItem != null)
                     {
@@ -424,7 +424,7 @@ namespace VstsSyncMigrator.Engine
 
                 if (targetWorkItem != null)
                 {
-                    ProcessWorkItemAttachments(sourceWorkItem, targetWorkItem, false);
+                    ProcessWorkItemAttachments(sourceWorkItem, targetWorkItem, workItemMigrationConfig, false);
                     ProcessWorkItemLinks(sourceStore, targetStore, sourceWorkItem, targetWorkItem);
                     string reflectedUri = sourceStore.CreateReflectedWorkItemId(sourceWorkItem);
                     if (targetWorkItem.Fields.Contains(me.Target.Config.ReflectedWorkItemIDFieldName))
@@ -439,7 +439,7 @@ namespace VstsSyncMigrator.Engine
                             $"This work item was migrated from a different project or organization. You can find the old version at <a href=\"{reflectedUri}\">{reflectedUri}</a>.");
                         targetWorkItem.History = history.ToString();
                     }
-                    SaveWorkItem(targetWorkItem);
+                    SaveWorkItem(targetWorkItem, workItemMigrationConfig);
 
                     attachmentOMatic.CleanUpAfterSave(targetWorkItem);
                     TraceWriteLine(sourceWorkItem, $"...Saved as {targetWorkItem.Id}");
@@ -697,12 +697,12 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        private void ProcessWorkItemAttachments(WorkItem sourceWorkItem, WorkItem targetWorkItem, bool save = true)
+        private void ProcessWorkItemAttachments(WorkItem sourceWorkItem, WorkItem targetWorkItem, WorkItemMigrationConfig workItemMigrationConfig, bool save = true)
         {
             if (targetWorkItem != null && _config.AttachmentMigration && sourceWorkItem.Attachments.Count > 0)
             {
                 TraceWriteLine(sourceWorkItem, $"Attachemnts {sourceWorkItem.Attachments.Count} | LinkMigrator:{_config.AttachmentMigration}");
-                attachmentOMatic.ProcessAttachemnts(sourceWorkItem, targetWorkItem, save);
+                attachmentOMatic.ProcessAttachemnts(sourceWorkItem, targetWorkItem, workItemMigrationConfig, save);
                 AddMetric("Attachments", processWorkItemMetrics, targetWorkItem.AttachedFileCount);
             }
         }

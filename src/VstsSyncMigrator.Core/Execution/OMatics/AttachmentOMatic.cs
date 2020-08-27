@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VstsSyncMigrator.Engine;
+using VstsSyncMigrator.Engine.Configuration.Processing;
 
 namespace VstsSyncMigrator.Core.Execution.OMatics
 {
@@ -26,7 +27,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
             _maxAttachmentSize = maxAttachmentSize;
         }
 
-        public void ProcessAttachemnts(WorkItem sourceWorkItem, WorkItem targetWorkItem, bool save = true)
+        public void ProcessAttachemnts(WorkItem sourceWorkItem, WorkItem targetWorkItem, WorkItemMigrationConfig workItemMigrationConfig, bool save = true)
         {
             _exportWiPath = Path.Combine(_exportBasePath, sourceWorkItem.Id.ToString());
             if (System.IO.Directory.Exists(_exportWiPath))
@@ -55,7 +56,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
             }
             if (save)
             {
-                WorkItemMigrationContext.SaveWorkItem(targetWorkItem);
+                WorkItemMigrationContext.SaveWorkItem(targetWorkItem, workItemMigrationConfig);
                 WorkItemMigrationContext.TraceWriteLine(sourceWorkItem, $" Work iTem now has {sourceWorkItem.Attachments.Count} attachemnts");
                 CleanUpAfterSave(targetWorkItem);
             }           
