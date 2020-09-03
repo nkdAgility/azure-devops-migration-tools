@@ -5,6 +5,7 @@ using Microsoft.VisualStudio.Services.Common;
 using Newtonsoft.Json;
 using NuGet;
 using Serilog;
+using Serilog.Context;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -116,6 +117,7 @@ namespace VstsSyncMigrator.ConsoleApp
             Log.Information("Telemetry Enabled: {TelemetryIsEnabled}", Telemetry.Current.IsEnabled().ToString());
             Log.Information("Telemetry Note: We use Application Insights to collect telemetry on performance & feature usage for the tools to help our developers target features. This data is tied to a session ID that is generated and shown in the logs. This can help with debugging.");
             Log.Information("SessionID: {SessionID}", Telemetry.Current.Context.Session.Id);
+            LogContext.PushProperty("SessionID", Telemetry.Current.Context.Session.Id);
             Log.Information("User: {UserId}", Telemetry.Current.Context.User.Id);
             Log.Information("Start Time: {StartTime}", startTime.ToUniversalTime().ToLocalTime());
             Log.Information("Running with {@Args}", args);
