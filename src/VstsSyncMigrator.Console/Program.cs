@@ -76,7 +76,7 @@ namespace VstsSyncMigrator.ConsoleApp
             mainTimer.Start();
             string logsPath = CreateLogsPath();
             var logPath = Path.Combine(logsPath, "migration.log");
-            var log = new LoggerConfiguration()
+            var log = new LoggerConfiguration().Enrich.FromLogContext()
                 .WriteTo.Console()
                 .WriteTo.ApplicationInsights(Telemetry.Current, TelemetryConverter.Traces)
                 .WriteTo.File(logPath, rollingInterval: RollingInterval.Infinite)
