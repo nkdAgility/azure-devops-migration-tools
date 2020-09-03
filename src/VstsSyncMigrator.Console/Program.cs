@@ -85,6 +85,12 @@ namespace VstsSyncMigrator.ConsoleApp
             Log.Information("Writing log to {logPath}", logPath);
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
             //////////////////////////////////////////////////
+            /////////////////////////////////////////////////////////
+            Trace.Listeners.Add(new TextWriterTraceListener(Console.Out)); // TODO: Remove once Trace replaced with log
+            var oldlogPath = Path.Combine(logsPath, "old-migration.log"); // TODO: Remove once Trace replaced with log
+            Trace.Listeners.Add(new TextWriterTraceListener(logPath, "myListener")); // TODO: Remove once Trace replaced with log
+            ///////////////////////////////////////////////////////////////////////////
+            //////////////////////////////////////////////////
             Version thisVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
             AsciiLogo(thisVersion);
             Log.Information("Running version detected as {Version}", thisVersion);

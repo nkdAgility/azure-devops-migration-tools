@@ -21,6 +21,7 @@ using System.ServiceModel.Channels;
 using System.IO;
 using Newtonsoft.Json;
 using VstsSyncMigrator.Core;
+using Serilog;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -100,11 +101,11 @@ namespace VstsSyncMigrator.Engine
                     _config.QueryBit, _config.OrderBit);
             var sourceQueryResult = tfsqc.Execute();
             var sourceWorkItems = (from WorkItem swi in sourceQueryResult select swi).ToList();
-            Trace.WriteLine($"Replay all revisions of {sourceWorkItems.Count} work items?", Name);
+            Log.Information("{context} Replay all revisions of {sourceWorkItemsCount} work items?", Name, sourceWorkItems.Count);
             //////////////////////////////////////////////////
             var targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
             var destProject = targetStore.GetProject();
-            Trace.WriteLine($"Found target project as {destProject.Name}", Name);
+            Log.Information("{context} Found target project as {@destProject}", Name, destProject);
             //////////////////////////////////////////////////////////FilterCompletedByQuery
             if (_config.FilterWorkItemsThatAlreadyExistInTarget)
             {
@@ -127,7 +128,7 @@ namespace VstsSyncMigrator.Engine
                     Console.WriteLine("Do you want to continue? (y/n)");
                     if (Console.ReadKey().Key != ConsoleKey.Y)
                     {
-                        Trace.WriteLine("USER ABORTED", "[Warning]");
+                        Log.Warning("{context} USER ABORTED", Name);
                         break;
                     }
                 }
@@ -135,7 +136,7 @@ namespace VstsSyncMigrator.Engine
             //////////////////////////////////////////////////
             stopwatch.Stop();
 
-            Console.WriteLine(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds", stopwatch.Elapsed);
+            Log.Information("{context} DONE in {Elapsed:%h} hours {Elapsed:%m} minutes {Elapsed:s/:fff} seconds", Name,  stopwatch.Elapsed);
         }
 
 

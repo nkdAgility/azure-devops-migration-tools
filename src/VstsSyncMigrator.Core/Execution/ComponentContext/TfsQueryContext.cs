@@ -5,6 +5,7 @@ using Microsoft.ApplicationInsights;
 using System.Diagnostics;
 using Microsoft.ApplicationInsights.DataContracts;
 using System.Text.RegularExpressions;
+using Serilog;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -81,7 +82,7 @@ namespace VstsSyncMigrator.Engine
                             { "QueryTime", queryTimer.ElapsedMilliseconds },
                           { "QueryCount", wc.Count }
                       });
-                Debug.WriteLine(string.Format(" Query Complete: found {0} work items in {1}ms ", wc.Count, queryTimer.ElapsedMilliseconds));
+                Log.Debug("Query Complete: found {WorkItemCount} work items in {QueryTimer}ms ", wc.Count, queryTimer.ElapsedMilliseconds);
          
         }
             catch (Exception ex)
