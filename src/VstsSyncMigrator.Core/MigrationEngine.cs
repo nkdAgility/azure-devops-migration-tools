@@ -1,5 +1,6 @@
 ﻿using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using Microsoft.VisualStudio.Services.Common;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -62,7 +63,7 @@ namespace VstsSyncMigrator.Engine
             {
                 foreach (IFieldMapConfig fieldmapConfig in config.FieldMaps)
                 {
-                    Trace.WriteLine(string.Format("Adding FieldMap {0}", fieldmapConfig.FieldMap.Name), "MigrationEngine");
+                    Log.Information("{Context}: Adding FieldMap {FieldMapName}", fieldmapConfig.FieldMap.Name, "MigrationEngine");
                     this.AddFieldMap(fieldmapConfig.WorkItemTypeName, (IFieldMap)Activator.CreateInstance(fieldmapConfig.FieldMap, fieldmapConfig));
                 }
             }          
@@ -74,7 +75,7 @@ namespace VstsSyncMigrator.Engine
             { 
                 foreach (string key in config.WorkItemTypeDefinition.Keys)
                 {
-                    Trace.WriteLine(string.Format("Adding Work Item Type {0}", key), "MigrationEngine");
+                    Log.Information("{Context}: Adding Work Item Type {WorkItemType}", key, "MigrationEngine");
                     this.AddWorkItemTypeDefinition(key, new DiscreteWitMapper(config.WorkItemTypeDefinition[key]));
                 }
             }
@@ -83,17 +84,16 @@ namespace VstsSyncMigrator.Engine
             {
                 if (processorConfig.IsProcessorCompatible(enabledProcessors))
                 {
-                    Trace.WriteLine($"Adding Processor {processorConfig.Processor.Name}", "MigrationEngine");
+                    Log.Information("{Context}: Adding Processor {ProcessorName}", processorConfig.Processor.Name, "MigrationEngine");
                     this.AddProcessor(
                         (ITfsProcessingContext)
                         Activator.CreateInstance(processorConfig.Processor, this, processorConfig));
                 }
                 else
                 {
-                    var message = $"[ERROR] Cannot add Processor {processorConfig.Processor.Name}. " +
-                                  "Processor is not compatible with other enabled processors in configuration.";
-                    Trace.WriteLine(message, "MigrationEngine");
-                    throw new InvalidOperationException(message);
+                    var message = "{Context}: Cannot add Processor {ProcessorName}. Processor is not compatible with other enabled processors in configuration.";
+                    Log.Error(message, processorConfig.Processor.Name, "MigrationEngine");
+                    throw new InvalidOperationException(string.Format(message, processorConfig.Processor.Name, "MigrationEngine"));
                 }
             }
         }
@@ -144,17 +144,18 @@ namespace VstsSyncMigrator.Engine
                 });
             Stopwatch engineTimer = Stopwatch.StartNew();
 			ProcessingStatus ps = ProcessingStatus.Complete;
-            Trace.WriteLine(string.Format("Beginning run of {0} processors", processors.Count.ToString()), "MigrationEngine");
+            Log.Error("{Context} Beginning run of {ProcessorCount} processors", processors.Count.ToString(), "MigrationEngine");
             foreach (ITfsProcessingContext process in processors)
             {
                 Stopwatch processorTimer = Stopwatch.StartNew();
 				process.Execute();
                 processorTimer.Stop();
                 Telemetry.Current.TrackEvent("ProcessorComplete", new Dictionary<string, string> { { "Processor", process.Name }, { "Status", process.Status.ToString() } }, new Dictionary<string, double> { { "ProcessingTime", processorTimer.ElapsedMilliseconds } });
+
                 if (process.Status == ProcessingStatus.Failed)
                 {
                     ps = ProcessingStatus.Failed;
-                    Trace.WriteLine(string.Format("The Processor {0} entered the failed state...stopping run", process.Name), "MigrationEngine");
+                    Log.Error("{Context} The Processor {ProcessorName} entered the failed state...stopping run", process.Name, "MigrationEngine");
                     break;
                 }
             }
@@ -234,7 +235,7 @@ namespace VstsSyncMigrator.Engine
         {
             foreach (IFieldMap map in list)
             {
-                Trace.WriteLine(string.Format("Running Field Map: {0} {1}", map.Name, map.MappingDisplayName));
+                Log.Debug("{Context} Running Field Map: {MapName} {MappingDisplayName}", map.Name, map.MappingDisplayName);
                 map.Execute(source, target);
             }
         }

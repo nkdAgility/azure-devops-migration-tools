@@ -1,6 +1,8 @@
 ﻿using Microsoft.TeamFoundation.Framework.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Proxy;
+using Serilog;
+using Serilog.Events;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -40,23 +42,23 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                 {
                     string filepath = null;
                     filepath = ExportAttachment(sourceWorkItem, wia, _exportWiPath);
-                    WorkItemMigrationContext.TraceWriteLine(sourceWorkItem, $"Exported {System.IO.Path.GetFileName(filepath)} to disk");
+                    Log.Information("Exported {Filename} to disk", System.IO.Path.GetFileName(filepath));
                     if (filepath != null)
                     {
                         ImportAttachemnt(targetWorkItem, filepath, save);
-                        WorkItemMigrationContext.TraceWriteLine(sourceWorkItem, $"Imported {System.IO.Path.GetFileName(filepath)} from disk");
+                        Log.Information("Imported {Filename} from disk", System.IO.Path.GetFileName(filepath));
                     }
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    WorkItemMigrationContext.TraceWriteLine(sourceWorkItem, $"ERROR: Unable to process atachment from source wi {sourceWorkItem.Id} called {wia.Name}");
+                    Log.Error("ERROR: Unable to process atachment from source wi {SourceWorkItemId} called {AttachmentName}", sourceWorkItem.Id, wia.Name,ex);
                 }
 
             }
             if (save)
             {
                 WorkItemMigrationContext.SaveWorkItem(targetWorkItem);
-                WorkItemMigrationContext.TraceWriteLine(sourceWorkItem, $" Work iTem now has {sourceWorkItem.Attachments.Count} attachemnts");
+                Log.Information("Work iTem now has {AttachmentCount} attachemnts", sourceWorkItem.Attachments.Count);
                 CleanUpAfterSave(targetWorkItem);
             }           
 
