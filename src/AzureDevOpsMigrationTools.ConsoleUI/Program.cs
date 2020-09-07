@@ -141,6 +141,7 @@ namespace AzureDevOpsMigrationTools.ConsoleUI
 #endif
                 }
             }
+            return 0;
         }
 
         static void BuildAppConfig(IConfigurationBuilder builder)
