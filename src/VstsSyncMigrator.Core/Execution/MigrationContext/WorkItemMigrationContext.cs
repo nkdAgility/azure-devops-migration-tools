@@ -24,6 +24,7 @@ using VstsSyncMigrator.Core;
 using Serilog;
 using Serilog.Events;
 using Serilog.Context;
+using Microsoft.ApplicationInsights.DataContracts;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -494,7 +495,7 @@ namespace VstsSyncMigrator.Engine
                 throw new Exception(string.Format("WARNING: Unable to find '{0}' in the target project. Most likley this is due to a typo in the .json configuration under WorkItemTypeDefinition! ", destType));
             }
             newWorkItemTimer.Stop();
-            Telemetry.Current.TrackDependency("TeamService", "NewWorkItem", newWorkItemstartTime, newWorkItemTimer.Elapsed, true);
+            Telemetry.Current.TrackDependency(new DependencyTelemetry("TeamService", "NewWorkItem", newWorkItemstartTime, newWorkItemTimer.Elapsed, true));
             if (_config.UpdateCreatedBy) { newwit.Fields["System.CreatedBy"].Value = currentRevisionWorkItem.Revisions[0].Fields["System.CreatedBy"].Value; }
             if (_config.UpdateCreatedDate) { newwit.Fields["System.CreatedDate"].Value = currentRevisionWorkItem.Revisions[0].Fields["System.CreatedDate"].Value; }
 

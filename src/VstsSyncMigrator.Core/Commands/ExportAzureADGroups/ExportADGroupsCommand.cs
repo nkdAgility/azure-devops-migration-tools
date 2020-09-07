@@ -7,6 +7,7 @@ using Microsoft.TeamFoundation.Framework.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -28,7 +29,7 @@ namespace VstsSyncMigrator.Commands
 
             StreamWriter sw = File.CreateText(Path.Combine(exportPath, "AzureADGroups.csv"));
             sw.AutoFlush = true;
-            using (var csv = new CsvWriter(sw))
+            using (var csv = new CsvWriter(sw, CultureInfo.InvariantCulture))
             {
                 csv.WriteHeader<AzureAdGroupItem>();
 
