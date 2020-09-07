@@ -19,7 +19,7 @@ namespace AzureDevOpsMigrationTools.ConsoleUI
         static DateTime _startTime = DateTime.Now;
         static Stopwatch _mainTimer = new Stopwatch();
 
-        static void Main(string[] args)
+        static int Main(string[] args)
         {
             _mainTimer.Start();
             var InstrumentationKey = "4b9bb17b-c7ee-43e5-b220-ec6db2c33373";
@@ -114,6 +114,7 @@ namespace AzureDevOpsMigrationTools.ConsoleUI
             Log.Information("The application ran in {Application_Elapsed} and finished at {Application_EndTime}", _mainTimer.Elapsed.ToString("c"), DateTime.Now.ToUniversalTime().ToLocalTime());
             Log.CloseAndFlush();
             System.Threading.Thread.Sleep(1000);
+            return 0;
         }
 
         static void BuildAppConfig(IConfigurationBuilder builder)
