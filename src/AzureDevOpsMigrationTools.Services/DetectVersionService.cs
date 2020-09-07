@@ -58,7 +58,7 @@ namespace AzureDevOpsMigrationTools.Services
             }
             /////////////////
             mainTimer.Stop();
-            _Telemetry.TrackDependency(new DependencyTelemetry("PackageRepository", "chocolatey.org", "vsts-sync-migrator", latestPackageVersion.ToString(), startTime, mainTimer.Elapsed, null, sucess));
+            _Telemetry.TrackDependency(new DependencyTelemetry("PackageRepository", "chocolatey.org", "vsts-sync-migrator", latestPackageVersion == null ? "nullVersion" : latestPackageVersion.ToString(), startTime, mainTimer.Elapsed, null, sucess));
             return latestPackageVersion;
         }
 
