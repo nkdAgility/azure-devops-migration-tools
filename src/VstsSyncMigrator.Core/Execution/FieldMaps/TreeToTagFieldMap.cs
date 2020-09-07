@@ -3,9 +3,9 @@ using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using VstsSyncMigrator.Engine.ComponentContext;
 using System.Collections.Generic;
 using System.Linq;
-using VstsSyncMigrator.Engine.Configuration.FieldMap;
+using AzureDevOpsMigrationTools.Core.Configuration.FieldMap;
 
-namespace VstsSyncMigrator.Engine
+namespace VstsSyncMigrator.Engine.ComponentContext
 {
     public class TreeToTagFieldMap : IFieldMap
     {

@@ -4,8 +4,8 @@ using System.Diagnostics;
 using Microsoft.TeamFoundation;
 using Microsoft.VisualStudio.Services.Common;
 using System.Collections.Generic;
-using VstsSyncMigrator.Engine.Configuration;
 using System.Net;
+using AzureDevOpsMigrationTools.Core.Configuration;
 
 namespace VstsSyncMigrator.Engine
 {

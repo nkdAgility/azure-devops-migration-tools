@@ -6,7 +6,7 @@ using System.Diagnostics;
 using VstsSyncMigrator.Engine.ComponentContext;
 using System.Linq;
 using System.Collections.Generic;
-using VstsSyncMigrator.Engine.Configuration.Processing;
+using AzureDevOpsMigrationTools.Core.Configuration.Processing;
 
 namespace VstsSyncMigrator.Engine
 {

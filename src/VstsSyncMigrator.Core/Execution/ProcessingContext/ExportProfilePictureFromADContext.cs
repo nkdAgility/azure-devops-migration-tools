@@ -12,7 +12,7 @@ using System.DirectoryServices;
 using System.DirectoryServices.ActiveDirectory;
 using System.DirectoryServices.AccountManagement;
 using System.Net;
-using VstsSyncMigrator.Engine.Configuration.Processing;
+using AzureDevOpsMigrationTools.Core.Configuration.Processing;
 
 namespace VstsSyncMigrator.Engine
 {

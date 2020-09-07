@@ -8,7 +8,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Linq;
 using Microsoft.TeamFoundation.Client;
-using VstsSyncMigrator.Engine.Configuration.Processing;
+using AzureDevOpsMigrationTools.Core.Configuration.Processing;
 
 namespace VstsSyncMigrator.Engine
 {

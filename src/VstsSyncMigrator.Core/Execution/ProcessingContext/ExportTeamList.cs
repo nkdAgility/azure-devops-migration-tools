@@ -10,7 +10,7 @@ using System.Linq;
 using Microsoft.TeamFoundation.Server;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.Framework.Common;
-using VstsSyncMigrator.Engine.Configuration.Processing;
+using AzureDevOpsMigrationTools.Core.Configuration.Processing;
 
 namespace VstsSyncMigrator.Engine
 {

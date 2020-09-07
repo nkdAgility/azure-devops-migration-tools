@@ -1,6 +1,6 @@
 ﻿using System;
+using AzureDevOpsMigrationTools.Core.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using VstsSyncMigrator.Engine.Configuration;
 
 namespace _VstsSyncMigrator.Engine.Tests
 {

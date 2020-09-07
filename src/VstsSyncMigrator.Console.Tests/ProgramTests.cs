@@ -1,9 +1,9 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
-using VstsSyncMigrator.Engine.Configuration;
-using VstsSyncMigrator.Engine.Configuration.FieldMap;
 using System.IO;
+using AzureDevOpsMigrationTools.Core.Configuration.FieldMap;
+using AzureDevOpsMigrationTools.Core.Configuration;
 
 namespace VstsSyncMigrator.Console.Tests
 {

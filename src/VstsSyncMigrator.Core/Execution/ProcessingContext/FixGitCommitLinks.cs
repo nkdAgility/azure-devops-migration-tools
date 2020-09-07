@@ -7,7 +7,7 @@ using System.Linq;
 using Microsoft.TeamFoundation.Git.Client;
 using Microsoft.TeamFoundation;
 
-using VstsSyncMigrator.Engine.Configuration.Processing;
+using AzureDevOpsMigrationTools.Core.Configuration.Processing;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
 using VstsSyncMigrator.Core.Execution.OMatics;
 

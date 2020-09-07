@@ -6,9 +6,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using VstsSyncMigrator.Engine.ComponentContext;
-using VstsSyncMigrator.Engine.Configuration;
-using VstsSyncMigrator.Engine.Configuration.FieldMap;
-using VstsSyncMigrator.Engine.Configuration.Processing;
+using AzureDevOpsMigrationTools.Core.Configuration;
+using AzureDevOpsMigrationTools.Core.Configuration.FieldMap;
+using AzureDevOpsMigrationTools.Core.Configuration.Processing;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -63,8 +63,15 @@ namespace VstsSyncMigrator.Engine
             {
                 foreach (IFieldMapConfig fieldmapConfig in config.FieldMaps)
                 {
-                    Log.Information("{Context}: Adding FieldMap {FieldMapName}", fieldmapConfig.FieldMap.Name, "MigrationEngine");
-                    this.AddFieldMap(fieldmapConfig.WorkItemTypeName, (IFieldMap)Activator.CreateInstance(fieldmapConfig.FieldMap, fieldmapConfig));
+                    Log.Information("{Context}: Adding FieldMap {FieldMapName}", fieldmapConfig.FieldMap, "MigrationEngine");
+                    string typePattern = $"VstsSyncMigrator.Engine.ComponentContext.{fieldmapConfig.FieldMap}";
+                    Type t = Type.GetType(typePattern);
+                    if (t == null)
+                    {
+                        Log.Error("Type " + typePattern + " not found.", typePattern);
+                        throw new Exception("Type " + typePattern + " not found.");
+                    }
+                    this.AddFieldMap(fieldmapConfig.WorkItemTypeName, (IFieldMap)Activator.CreateInstance(t, fieldmapConfig));
                 }
             }          
             if (config.GitRepoMapping != null)
@@ -84,16 +91,23 @@ namespace VstsSyncMigrator.Engine
             {
                 if (processorConfig.IsProcessorCompatible(enabledProcessors))
                 {
-                    Log.Information("{Context}: Adding Processor {ProcessorName}", processorConfig.Processor.Name, "MigrationEngine");
+                    Log.Information("{Context}: Adding Processor {ProcessorName}", processorConfig.Processor, "MigrationEngine");
+                    string typePattern = $"{processorConfig.Processor}";
+                    Type t = Type.GetType(typePattern);
+                    if (t == null)
+                    {
+                        Log.Error("Type " + typePattern + " not found.", typePattern);
+                        throw new Exception("Type " + typePattern + " not found.");
+                    }
                     this.AddProcessor(
                         (ITfsProcessingContext)
-                        Activator.CreateInstance(processorConfig.Processor, this, processorConfig));
+                        Activator.CreateInstance(t, this, processorConfig));
                 }
                 else
                 {
                     var message = "{Context}: Cannot add Processor {ProcessorName}. Processor is not compatible with other enabled processors in configuration.";
-                    Log.Error(message, processorConfig.Processor.Name, "MigrationEngine");
-                    throw new InvalidOperationException(string.Format(message, processorConfig.Processor.Name, "MigrationEngine"));
+                    Log.Error(message, processorConfig.Processor, "MigrationEngine");
+                    throw new InvalidOperationException(string.Format(message, processorConfig.Processor, "MigrationEngine"));
                 }
             }
         }
