@@ -1,4 +1,7 @@
-﻿using AzureDevOpsMigrationTools.CustomDiagnostics;
+﻿using AzureDevOpsMigrationTools.CommandLine;
+using AzureDevOpsMigrationTools.CustomDiagnostics;
+using AzureDevOpsMigrationTools.Services;
+using CommandLine;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.ApplicationInsights.WorkerService;
@@ -11,6 +14,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 
 namespace AzureDevOpsMigrationTools.ConsoleUI
 {
@@ -48,11 +53,12 @@ namespace AzureDevOpsMigrationTools.ConsoleUI
 
             LogContext.PushProperty("SessionID", sessionID);
             Log.Information("Application Starting");
+            AsciiLogo(ApplicationVersion);
             Log.Information("Telemetry Note: We use Application Insights to collect telemetry on performance & feature usage for the tools to help our developers target features. This data is tied to a session ID that is generated and shown in the logs. This can help with debugging.");
             Log.Information("Start Time: {StartTime}", _startTime.ToUniversalTime().ToLocalTime());
             Log.Information("Running with args: {@Args}", args);
             Log.Information("OSVersion: {OSVersion}", Environment.OSVersion.ToString());
-            Log.Information("Version: {CurrentVersion}", System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString());
+            Log.Information("Version: {CurrentVersion}", ApplicationVersion);
             Log.Information("userID: {UserId}", System.Security.Principal.WindowsIdentity.GetCurrent().Name);
             ///////////////////////////////////////////////////////
             /// Setup Host
@@ -65,15 +71,54 @@ namespace AzureDevOpsMigrationTools.ConsoleUI
                 })
                 .UseSerilog()
                 .Build();
-            var telemetryClient = host.Services.GetRequiredService<TelemetryClient>();
+            TelemetryClient telemetryClient = SetupTelemetry(host);
+            CheckVersion(ApplicationVersion, host);
+            //////////////////////////////////////////////////
+            /// Setup Command Line
+            int result = (int)Parser.Default.ParseArguments<InitOptions, ExecuteOptions>(args).MapResult(
+                (InitOptions opts) => RunInitAndReturnExitCode(opts),
+                (ExecuteOptions opts) => RunExecuteAndReturnExitCode(opts),
+                errs => 1);
+            ///////////////////////////////////////////////////////
+            Log.Information("Application Ending");
+            _mainTimer.Stop();
+            telemetryClient.TrackEvent("ApplicationEnd", null,
+                new Dictionary<string, double> {
+                        { "Application_Elapsed", _mainTimer.ElapsedMilliseconds }
+                });
+            if (telemetryClient != null)
+            {
+                telemetryClient.Flush();
+            }
+            Log.Information("The application ran in {Application_Elapsed} and finished at {Application_EndTime}", _mainTimer.Elapsed.ToString("c"), DateTime.Now.ToUniversalTime().ToLocalTime());
+            Log.CloseAndFlush();
+            System.Threading.Thread.Sleep(1000);
+            return result;
+        }
 
+        private static int RunExecuteAndReturnExitCode(ExecuteOptions opts)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static int RunInitAndReturnExitCode(InitOptions opts)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static TelemetryClient SetupTelemetry(IHost host)
+        {
+            var telemetryClient = host.Services.GetRequiredService<TelemetryClient>();
             telemetryClient.Context.User.Id = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
             telemetryClient.Context.Session.Id = Guid.NewGuid().ToString();
             telemetryClient.Context.Device.OperatingSystem = Environment.OSVersion.ToString();
             telemetryClient.Context.Component.Version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            //////////////////////////////////////////////////
-            /// Checks
-            var doService = ActivatorUtilities.GetServiceOrCreateInstance<DetectOnlineService>(host.Services);
+            return telemetryClient;
+        }
+
+        private static void CheckVersion(Version ApplicationVersion, IHost host)
+        {
+            var doService = ActivatorUtilities.GetServiceOrCreateInstance<IDetectOnlineService>(host.Services);
             if (doService.IsOnline())
             {
                 var dvService = ActivatorUtilities.GetServiceOrCreateInstance<IDetectVersionService>(host.Services);
@@ -92,29 +137,6 @@ namespace AzureDevOpsMigrationTools.ConsoleUI
 #endif
                 }
             }
-
-            //////////////////////////////////////////////////
-            /// Setup Command Line
-
-            //////////////////////////////////////////////////
-            /// Execute
-
-            ///////////////////////////////////////////////////////
-            Log.Information("Application Ending");
-            _mainTimer.Stop();
-
-            telemetryClient.TrackEvent("ApplicationEnd", null,
-                new Dictionary<string, double> {
-                        { "Application_Elapsed", _mainTimer.ElapsedMilliseconds }
-                });
-            if (telemetryClient != null)
-            {
-                telemetryClient.Flush();
-            }
-            Log.Information("The application ran in {Application_Elapsed} and finished at {Application_EndTime}", _mainTimer.Elapsed.ToString("c"), DateTime.Now.ToUniversalTime().ToLocalTime());
-            Log.CloseAndFlush();
-            System.Threading.Thread.Sleep(1000);
-            return 0;
         }
 
         static void BuildAppConfig(IConfigurationBuilder builder)
@@ -125,7 +147,50 @@ namespace AzureDevOpsMigrationTools.ConsoleUI
                 .AddEnvironmentVariables();
         }
 
-
+        private static void AsciiLogo(Version thisVersion)
+        {
+            Log.Information("                                      &@&                                      ");
+            Log.Information("                                   @@(((((@                                    ");
+            Log.Information("                                  @(((((((((@                                  ");
+            Log.Information("                                @(((((((((((((&                                ");
+            Log.Information("                              ##((((((@ @((((((@@                              ");
+            Log.Information("                             @((((((@     @((((((&                             ");
+            Log.Information("                            @(((((#        @((((((@                            ");
+            Log.Information("                           &(((((&           &(((((@                           ");
+            Log.Information("                          @(((((&             &(((((@                          ");
+            Log.Information("                          &(((((@#&@((.((&@@@(#(((((@                          ");
+            Log.Information("                         #((((#..................#@((&                         ");
+            Log.Information("                       &@(((((&......................(@                        ");
+            Log.Information("                     @.(&((((&...&&        &@&..........&@                     ");
+            Log.Information("                   @...@(((((@                   @#.......((                   ");
+            Log.Information("                 &.....@(((((@                   @((@.......&                  ");
+            Log.Information("                @......@(((((                    #((((&.......&                ");
+            Log.Information("               #.....( &(((((         @@@        ((((((@@......@               ");
+            Log.Information("              &.....@  @(((&@@#(((((((((((((((((#@(((((&  ......@              ");
+            Log.Information("             @.....@  &@&((((((((((((((((((((((((@(((((@#  ......@             ");
+            Log.Information("            @.....&@(((((((((((((((&&@@@@@(((((@((((#(((#@(....&               ");
+            Log.Information("            @.....&((((((((&@@&                 @(((((@(((((((@...#            ");
+            Log.Information("            &....((((((@@(((((@                &@(((((@&((((((((#&&            ");
+            Log.Information("           @(....&((@    @(((((@               @(((((@    @(((((((##           ");
+            Log.Information("         @(#(....&        &(((((@             @(((((&       &@(((((((&         ");
+            Log.Information("       &@(((&.....        @((((((&           @(((((       &.(&((((((@          ");
+            Log.Information("      @(((((@.....&        (((((@        &@(((((&         @....@((((((@        ");
+            Log.Information("     @(((((#@.....(          &(((((@&     ##(((((&         @.....@@((((((@     ");
+            Log.Information("   (&(((((@  &.....@&         @((((((@   @((((((@         @......   @(((((@    ");
+            Log.Information("   &(((((@    @.....#&         @#((((((@((((((#          @......&    @(((((@   ");
+            Log.Information("  @(((((@      &......&          @(((((((@#((@         &@......       @(((((@  ");
+            Log.Information(" @(((((@        @......@&        @@@(((((((&@&        @......(         #(((((@ ");
+            Log.Information(" #((((&           &.......@  &@&(((((@#((((((((@@& &@.......@          ((((&   ");
+            Log.Information("&(((((@@           @(....&@#((((((((((@ @(((((((#@........@            &@(((((@");
+            Log.Information("&(((((((((((((((((((((((((((((((((&@@@@@@@@@&...........@(((((((((((((((((((((@");
+            Log.Information("@(((((((((((((((((((((((((((((&@(....................@#((((((((((((((((((((((#@");
+            Log.Information("      @((((((((((((((&@&  &&...................@   @@#((((((((((((((#@@        ");
+            Log.Information("                                                                               ");
+            Log.Information("===============================================================================");
+            Log.Information("===                       Azure DevOps Migration Tools                       ==");
+            Log.Information($"===                                 v{thisVersion}                                ==");
+            Log.Information("===============================================================================");
+        }
 
     }
 }

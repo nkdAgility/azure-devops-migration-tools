@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AzureDevOpsMigrationTools
+namespace AzureDevOpsMigrationTools.Services
 {
     public interface IDetectVersionService
     {

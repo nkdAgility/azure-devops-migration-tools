@@ -6,7 +6,7 @@ using System;
 using System.Diagnostics;
 using System.Net.NetworkInformation;
 
-namespace AzureDevOpsMigrationTools
+namespace AzureDevOpsMigrationTools.Services
 {
     public class DetectOnlineService : IDetectOnlineService
     {
