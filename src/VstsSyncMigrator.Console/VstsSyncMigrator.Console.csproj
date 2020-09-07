@@ -349,6 +349,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AzureDevOpsMigrationTools.Core.Configuration\AzureDevOpsMigrationTools.Core.Configuration.csproj">
+      <Project>{1F86C637-E734-4C94-9D82-AE4B50664FFD}</Project>
+      <Name>AzureDevOpsMigrationTools.Core.Configuration</Name>
+    </ProjectReference>
     <ProjectReference Include="..\VstsSyncMigrator.Core\VstsSyncMigrator.Core.csproj">
       <Project>{68BAF6BA-2BC0-48D0-B892-1D9F93D7003A}</Project>
       <Name>VstsSyncMigrator.Core</Name>

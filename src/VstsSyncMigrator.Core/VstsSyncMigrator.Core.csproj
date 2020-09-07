@@ -337,39 +337,6 @@
     <Compile Include="Commands\ExportAzureADGroups\ExportADGroupsCommand.cs" />
     <Compile Include="Commands\ExportAzureADGroups\ExportADGroupsOptions.cs" />
     <Compile Include="Commands\OptionsBase.cs" />
-    <Compile Include="Configuration\EngineConfiguration.cs" />
-    <Compile Include="Configuration\FieldMap\FieldMapConfigJsonConverter.cs" />
-    <Compile Include="Configuration\FieldMap\FieldBlankMapConfig.cs" />
-    <Compile Include="Configuration\FieldMap\FieldtoFieldMultiMapConfig.cs" />
-    <Compile Include="Configuration\FieldMap\MultiValueConditionalMapConfig.cs" />
-    <Compile Include="Configuration\FieldMap\FieldValuetoTagMapConfig.cs" />
-    <Compile Include="Configuration\FieldMap\TreeToTagMapConfig.cs" />
-    <Compile Include="Configuration\FieldMap\FieldMergeMapConfig.cs" />
-    <Compile Include="Configuration\FieldMap\RegexFieldMapConfig.cs" />
-    <Compile Include="Configuration\FieldMap\FieldtoTagMapConfig.cs" />
-    <Compile Include="Configuration\FieldMap\FieldtoFieldMapConfig.cs" />
-    <Compile Include="Configuration\FieldMap\FieldValueMapConfig.cs" />
-    <Compile Include="Configuration\FieldMap\IFieldMapConfig.cs" />
-    <Compile Include="Configuration\JsonCreationConverter.cs" />
-    <Compile Include="Configuration\Processing\WorkItemQueryMigrationConfig.cs" />
-    <Compile Include="Configuration\Processing\FixGitCommitLinksConfig.cs" />
-    <Compile Include="Configuration\Processing\TeamMigrationConfig.cs" />
-    <Compile Include="Configuration\Processing\WorkItemUpdateAreasAsTagsConfig.cs" />
-    <Compile Include="Configuration\Processing\FakeProcessorConfig.cs" />
-    <Compile Include="Configuration\Processing\ExportProfilePictureFromADConfig.cs" />
-    <Compile Include="Configuration\Processing\ImportProfilePictureConfig.cs" />
-    <Compile Include="Configuration\Processing\TestRunsMigrationConfig.cs" />
-    <Compile Include="Configuration\Processing\TestPlansAndSuitesMigrationConfig.cs" />
-    <Compile Include="Configuration\Processing\TestConfigurationsMigrationConfig.cs" />
-    <Compile Include="Configuration\Processing\TestVeriablesMigrationConfig.cs" />
-    <Compile Include="Configuration\Processing\WorkItemDeleteConfig.cs" />
-    <Compile Include="Configuration\Processing\WorkItemPostProcessingConfig.cs" />
-    <Compile Include="Configuration\Processing\ProcessorConfigJsonConverter.cs" />
-    <Compile Include="Configuration\Processing\ITfsProcessingConfig.cs" />
-    <Compile Include="Configuration\Processing\NodeStructuresMigrationConfig.cs" />
-    <Compile Include="Configuration\Processing\WorkItemUpdateConfig.cs" />
-    <Compile Include="Configuration\Processing\WorkItemMigrationConfig.cs" />
-    <Compile Include="Configuration\TeamProjectConfig.cs" />
     <Compile Include="Execution\Exceptions\UnknownLinkTypeException.cs" />
     <Compile Include="Execution\FieldMaps\FieldMapBase.cs" />
     <Compile Include="Execution\FieldMaps\FieldMergeMap.cs" />
@@ -432,8 +399,12 @@
     <None Include="packages.config" />
     <None Include="VstsSyncMigrator.Core.nuspec" />
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
-    <Folder Include="Configuration\WorkItemTypes\" />
+    <ProjectReference Include="..\AzureDevOpsMigrationTools.Core.Configuration\AzureDevOpsMigrationTools.Core.Configuration.csproj">
+      <Project>{1f86c637-e734-4c94-9d82-ae4b50664ffd}</Project>
+      <Name>AzureDevOpsMigrationTools.Core.Configuration</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

@@ -1,4 +1,6 @@
-﻿using CommandLine;
+﻿using AzureDevOpsMigrationTools.Core.Configuration;
+using AzureDevOpsMigrationTools.Core.Configuration.FieldMap;
+using CommandLine;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.VisualStudio.Services.Common;
@@ -15,8 +17,6 @@ using System.Net;
 using System.Net.NetworkInformation;
 using VstsSyncMigrator.Commands;
 using VstsSyncMigrator.Engine;
-using VstsSyncMigrator.Engine.Configuration;
-using VstsSyncMigrator.Engine.Configuration.FieldMap;
 
 namespace VstsSyncMigrator.ConsoleApp
 {

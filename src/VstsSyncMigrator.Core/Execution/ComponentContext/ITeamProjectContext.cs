@@ -1,10 +1,10 @@
-﻿using Microsoft.TeamFoundation.Client;
+﻿using AzureDevOpsMigrationTools.Core.Configuration;
+using Microsoft.TeamFoundation.Client;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using VstsSyncMigrator.Engine.Configuration;
 
 namespace VstsSyncMigrator.Engine
 {

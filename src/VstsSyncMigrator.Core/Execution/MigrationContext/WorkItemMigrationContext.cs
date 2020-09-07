@@ -11,7 +11,7 @@ using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using Microsoft.VisualStudio.Services.Client;
 using Microsoft.VisualStudio.Services.Common;
 using Microsoft.VisualStudio.Services.WebApi;
-using VstsSyncMigrator.Engine.Configuration.Processing;
+using AzureDevOpsMigrationTools.Core.Configuration.Processing;
 using Microsoft.VisualStudio.Services.WebApi.Patch.Json;
 using System.Collections;
 using VstsSyncMigrator.Core.Execution.OMatics;

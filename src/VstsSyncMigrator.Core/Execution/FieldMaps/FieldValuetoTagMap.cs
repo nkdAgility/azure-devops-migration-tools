@@ -2,13 +2,11 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
-
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
-
+using AzureDevOpsMigrationTools.Core.Configuration.FieldMap;
 using VstsSyncMigrator.Engine.ComponentContext;
-using VstsSyncMigrator.Engine.Configuration.FieldMap;
 
-namespace VstsSyncMigrator.Engine
+namespace VstsSyncMigrator.Engine.ComponentContext
 {
 
     public class FieldValuetoTagMap : IFieldMap
