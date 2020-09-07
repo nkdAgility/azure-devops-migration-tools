@@ -16,7 +16,7 @@ namespace AzureDevOpsMigrationTools.Core.Configuration.FieldMap
             get
             {
                 return "FieldToTagFieldMap";
-            }
+            } 
         }
     }
 }
