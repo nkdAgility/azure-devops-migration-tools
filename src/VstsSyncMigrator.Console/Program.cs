@@ -73,7 +73,6 @@ namespace VstsSyncMigrator.ConsoleApp
         public static int Main(string[] args)
         {
             Telemetry.Current.TrackEvent("ApplicationStart");
-
             mainTimer.Start();
             string logsPath = CreateLogsPath();
             var logPath = Path.Combine(logsPath, "migration.log");
