@@ -72,7 +72,11 @@ namespace AzureDevOpsMigrationTools.ConsoleUI
                 .UseSerilog()
                 .Build();
             TelemetryClient telemetryClient = SetupTelemetry(host);
-            CheckVersion(ApplicationVersion, host);
+            var chk = CheckVersion(ApplicationVersion, host);
+            if (chk != 0)
+            {
+                return chk;
+            }
             //////////////////////////////////////////////////
             /// Setup Command Line
             int result = (int)Parser.Default.ParseArguments<InitOptions, ExecuteOptions>(args).MapResult(
@@ -116,7 +120,7 @@ namespace AzureDevOpsMigrationTools.ConsoleUI
             return telemetryClient;
         }
 
-        private static void CheckVersion(Version ApplicationVersion, IHost host)
+        private static int CheckVersion(Version ApplicationVersion, IHost host)
         {
             var doService = ActivatorUtilities.GetServiceOrCreateInstance<IDetectOnlineService>(host.Services);
             if (doService.IsOnline())
