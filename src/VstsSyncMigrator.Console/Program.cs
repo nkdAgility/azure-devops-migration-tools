@@ -31,7 +31,6 @@ namespace VstsSyncMigrator.ConsoleApp
         static DateTime startTime = DateTime.Now;
         static Stopwatch mainTimer = new Stopwatch();
 
-
         public static int Main(string[] args)
         {
             Telemetry.Current.TrackEvent("ApplicationStart");
