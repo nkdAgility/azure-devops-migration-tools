@@ -5,12 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace VstsSyncMigrator.Commands
+namespace AzureDevOpsMigrationTools.CommandLine
 {
     public class CommandBase
     {
 
-        internal static string CreateExportPath(string logPath, string CommandName)
+        public static string CreateExportPath(string logPath, string CommandName)
         {
             string exportPath = Path.Combine(logPath, CommandName);
             if (!Directory.Exists(exportPath))

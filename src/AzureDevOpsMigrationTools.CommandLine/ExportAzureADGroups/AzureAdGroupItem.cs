@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace VstsSyncMigrator.Commands
+namespace AzureDevOpsMigrationTools.CommandLine
 {
-   internal class AzureAdGroupItem
+   public class AzureAdGroupItem
     {
 
         public string TeamProject { get; set; }
