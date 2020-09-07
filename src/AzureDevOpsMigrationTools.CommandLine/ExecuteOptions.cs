@@ -6,7 +6,7 @@ using System.Text;
 namespace AzureDevOpsMigrationTools.CommandLine
 {
     [Verb("execute", HelpText = "Record changes to the repository.")]
-    class ExecuteOptions
+   public class ExecuteOptions
     {
         [Option('c', "config", Required = true, HelpText = "Configuration file to be processed.")]
         public string ConfigFile { get; set; }

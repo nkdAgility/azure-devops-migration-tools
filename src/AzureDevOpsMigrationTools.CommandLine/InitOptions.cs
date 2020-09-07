@@ -6,7 +6,7 @@ using System.Text;
 namespace AzureDevOpsMigrationTools.CommandLine
 {
     [Verb("init", HelpText = "Creates initial config file")]
-    class InitOptions
+    public class InitOptions
     {
         [Option('c', "config", Required = false, HelpText = "Configuration file to be processed.")]
         public string ConfigFile { get; set; }

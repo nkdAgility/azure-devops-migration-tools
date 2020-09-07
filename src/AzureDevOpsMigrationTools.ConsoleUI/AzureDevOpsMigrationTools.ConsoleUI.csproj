@@ -25,6 +25,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AzureDevOpsMigrationTools.CommandLine\AzureDevOpsMigrationTools.CommandLine.csproj" />
+    <ProjectReference Include="..\AzureDevOpsMigrationTools.Services\AzureDevOpsMigrationTools.Services.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

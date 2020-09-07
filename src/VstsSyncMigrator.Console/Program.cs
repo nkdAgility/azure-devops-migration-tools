@@ -1,4 +1,5 @@
-﻿using AzureDevOpsMigrationTools.Core.Configuration;
+﻿using AzureDevOpsMigrationTools.CommandLine;
+using AzureDevOpsMigrationTools.Core.Configuration;
 using AzureDevOpsMigrationTools.Core.Configuration.FieldMap;
 using CommandLine;
 using Microsoft.ApplicationInsights.DataContracts;
@@ -22,50 +23,6 @@ namespace VstsSyncMigrator.ConsoleApp
 {
     public class Program
     {
-        [Verb("init", HelpText = "Creates initial config file")]
-        class InitOptions
-        {
-            [Option('c', "config", Required = false, HelpText = "Configuration file to be processed.")]
-            public string ConfigFile { get; set; }
-            [Option('o', "options", Required = false, Default = OptionsMode.WorkItemTracking, HelpText = "Configuration file to be processed.")]
-            public OptionsMode Options { get; set; }
-        }
-
-        public enum OptionsMode
-        {
-            Full = 0,
-            WorkItemTracking = 1
-
-        }
-
-        [Verb("execute", HelpText = "Record changes to the repository.")]
-        class RunOptions
-        {
-            [Option('c', "config", Required = true, HelpText = "Configuration file to be processed.")]
-            public string ConfigFile { get; set; }
-
-            [Option("sourceDomain", Required = false, HelpText = "Domain used to connect to the source TFS instance.")]
-            public string SourceDomain { get; set; }
-
-            [Option("sourceUserName", Required = false, HelpText = "User Name used to connect to the source TFS instance.")]
-            public string SourceUserName { get; set; }
-
-            [Option("sourcePassword", Required = false, HelpText = "Password used to connect to source TFS instance.")]
-            public string SourcePassword { get; set; }
-
-            [Option("targetDomain", Required = false, HelpText = "Domain used to connect to the target TFS instance.")]
-            public string TargetDomain { get; set; }
-
-            [Option("targetUserName", Required = false, HelpText = "User Name used to connect to the target TFS instance.")]
-            public string TargetUserName { get; set; }
-
-            [Option("targetPassword", Required = false, HelpText = "Password used to connect to target TFS instance.")]
-            public string TargetPassword { get; set; }
-
-            [Option("changeSetMappingFile", Required = false, HelpText = "Mapping between changeset id and commit id. Used to fix work item changeset links.")]
-            public string ChangeSetMappingFile { get; set; }
-        }
-
         static DateTime startTime = DateTime.Now;
         static Stopwatch mainTimer = new Stopwatch();
 
@@ -121,9 +78,9 @@ namespace VstsSyncMigrator.ConsoleApp
             Log.Information("Start Time: {StartTime}", startTime.ToUniversalTime().ToLocalTime());
             Log.Information("Running with {@Args}", args);
             //////////////////////////////////////////////////
-            int result = (int)Parser.Default.ParseArguments<InitOptions, RunOptions, ExportADGroupsOptions>(args).MapResult(
+            int result = (int)Parser.Default.ParseArguments<InitOptions, ExecuteOptions, ExportADGroupsOptions>(args).MapResult(
                 (InitOptions opts) => RunInitAndReturnExitCode(opts),
-                (RunOptions opts) => RunExecuteAndReturnExitCode(opts),
+                (ExecuteOptions opts) => RunExecuteAndReturnExitCode(opts),
                 (ExportADGroupsOptions opts) => ExportADGroupsCommand.Run(opts, logsPath),
                 errs => 1);
             //////////////////////////////////////////////////
@@ -157,7 +114,7 @@ namespace VstsSyncMigrator.ConsoleApp
             System.Threading.Thread.Sleep(1000);
         }
 
-        private static object RunExecuteAndReturnExitCode(RunOptions opts)
+        private static object RunExecuteAndReturnExitCode(ExecuteOptions opts)
         {
             Telemetry.Current.TrackEvent("ExecuteCommand");
             EngineConfiguration ec;

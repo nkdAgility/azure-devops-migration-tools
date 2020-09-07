@@ -85,9 +85,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureDevOpsMigrationTools.C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureDevOpsMigrationTools.Core", "src\AzureDevOpsMigrationTools.Core\AzureDevOpsMigrationTools.Core.csproj", "{6E744F3F-2CE3-4369-B1C8-E1AB09C4E41E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureDevOpsMigrationTools.Core.Configuration", "src\AzureDevOpsMigrationTools.Core.Configuration\AzureDevOpsMigrationTools.Core.Configuration.csproj", "{1F86C637-E734-4C94-9D82-AE4B50664FFD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureDevOpsMigrationTools.Core.Configuration", "src\AzureDevOpsMigrationTools.Core.Configuration\AzureDevOpsMigrationTools.Core.Configuration.csproj", "{1F86C637-E734-4C94-9D82-AE4B50664FFD}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{5C05DA7B-B70F-4A87-920B-DCD14EA7670D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureDevOpsMigrationTools.CommandLine", "src\AzureDevOpsMigrationTools.CommandLine\AzureDevOpsMigrationTools.CommandLine.csproj", "{00305A77-37BD-4CB3-B829-098ADDD564B9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureDevOpsMigrationTools.Services", "src\AzureDevOpsMigrationTools.Services\AzureDevOpsMigrationTools.Services.csproj", "{041BE34B-205A-4A4F-9F12-C7E33A059010}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -123,6 +127,14 @@ Global
 		{1F86C637-E734-4C94-9D82-AE4B50664FFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1F86C637-E734-4C94-9D82-AE4B50664FFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1F86C637-E734-4C94-9D82-AE4B50664FFD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{00305A77-37BD-4CB3-B829-098ADDD564B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00305A77-37BD-4CB3-B829-098ADDD564B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00305A77-37BD-4CB3-B829-098ADDD564B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00305A77-37BD-4CB3-B829-098ADDD564B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{041BE34B-205A-4A4F-9F12-C7E33A059010}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{041BE34B-205A-4A4F-9F12-C7E33A059010}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{041BE34B-205A-4A4F-9F12-C7E33A059010}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{041BE34B-205A-4A4F-9F12-C7E33A059010}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -142,6 +154,8 @@ Global
 		{A314A07F-1D5E-44B8-9973-3AB2C41F17D5} = {937E4E21-A6CB-42D8-8F66-B9CD6963F0BE}
 		{6E744F3F-2CE3-4369-B1C8-E1AB09C4E41E} = {937E4E21-A6CB-42D8-8F66-B9CD6963F0BE}
 		{1F86C637-E734-4C94-9D82-AE4B50664FFD} = {5C05DA7B-B70F-4A87-920B-DCD14EA7670D}
+		{00305A77-37BD-4CB3-B829-098ADDD564B9} = {5C05DA7B-B70F-4A87-920B-DCD14EA7670D}
+		{041BE34B-205A-4A4F-9F12-C7E33A059010} = {5C05DA7B-B70F-4A87-920B-DCD14EA7670D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {62EE0B27-C55A-46EE-8D17-1691DE9BBD50}
