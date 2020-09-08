@@ -35,6 +35,14 @@ namespace _VstsSyncMigrator.Engine.Tests
             me.Run();
         }
 
+        [TestMethod]
+        public void TestEngineExecuteProcessors()
+        {
+            EngineConfiguration ec = EngineConfiguration.GetDefault();
+            ec.FieldMaps.Clear();
+            MigrationEngine me = new MigrationEngine(ec);
+            me.Run();
+        }
 
     }
 }
