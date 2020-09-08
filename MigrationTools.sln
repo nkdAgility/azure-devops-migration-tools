@@ -1,0 +1,173 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29006.145
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VstsSyncMigrator.Console", "src\VstsSyncMigrator.Console\VstsSyncMigrator.Console.csproj", "{033EB332-4A50-4C73-9B7D-A35D9F3C0513}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VstsSyncMigrator.Core", "src\VstsSyncMigrator.Core\VstsSyncMigrator.Core.csproj", "{68BAF6BA-2BC0-48D0-B892-1D9F93D7003A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Chocolatey", "Chocolatey", "{89434800-3004-4621-8677-C14C1D1AA4AF}"
+	ProjectSection(SolutionItems) = preProject
+		src\VstsSyncMigrator.Chocolatey\chocolateyInstall.ps1 = src\VstsSyncMigrator.Chocolatey\chocolateyInstall.ps1
+		src\VstsSyncMigrator.Chocolatey\chocolateyUninstall.ps1 = src\VstsSyncMigrator.Chocolatey\chocolateyUninstall.ps1
+		src\VstsSyncMigrator.Chocolatey\vstssyncmigration.nuspec = src\VstsSyncMigrator.Chocolatey\vstssyncmigration.nuspec
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VstsSyncMigrator.Core.Tests", "src\VstsSyncMigrator.Core.Tests\VstsSyncMigrator.Core.Tests.csproj", "{AB3922F0-E801-474A-A498-892C3EA99799}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VstsSyncMigrator.Console.Tests", "src\VstsSyncMigrator.Console.Tests\VstsSyncMigrator.Console.Tests.csproj", "{985259EA-C475-4918-9342-50AB744F52AF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{4D45177B-5CEA-406F-8C35-2125278BACA0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extension", "Extension", "{243265E4-0E5A-4E95-BE7C-B92B7666FF79}"
+	ProjectSection(SolutionItems) = preProject
+		src\VstsSyncMigrator.Extension\LICENSE.txt = src\VstsSyncMigrator.Extension\LICENSE.txt
+		src\VstsSyncMigrator.Extension\README.md = src\VstsSyncMigrator.Extension\README.md
+		src\VstsSyncMigrator.Extension\vss-extension.json = src\VstsSyncMigrator.Extension\vss-extension.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{2BC0808B-6F4D-4635-82FE-1118181DD64F}"
+	ProjectSection(SolutionItems) = preProject
+		docs\_config.yml = docs\_config.yml
+		docs\changeset-migration.md = docs\changeset-migration.md
+		docs\configuration.md = docs\configuration.md
+		docs\faq.md = docs\faq.md
+		docs\getting-started.md = docs\getting-started.md
+		docs\index.md = docs\index.md
+		docs\server-configuration.md = docs\server-configuration.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Engine", "Engine", "{1BC94A7E-4A43-4388-97BE-DCCF62797DA8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Console", "Console", "{FA574C5F-498D-4C1B-BA57-FC28E534C6B6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A05A7847-4C75-4E92-B156-F529483688CC}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		GitVersion.yml = GitVersion.yml
+		mkdocs.yml = mkdocs.yml
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Processors", "Processors", "{E9399C6D-A5E0-43ED-8412-6C4A6BC86EC8}"
+	ProjectSection(SolutionItems) = preProject
+		docs\Processors\ImportProfilePictureConfig.md = docs\Processors\ImportProfilePictureConfig.md
+		docs\Processors\NodeStructuresMigrationConfig.md = docs\Processors\NodeStructuresMigrationConfig.md
+		docs\Processors\TeamMigrationConfig.md = docs\Processors\TeamMigrationConfig.md
+		docs\Processors\TestConfigurationsMigrationConfig.md = docs\Processors\TestConfigurationsMigrationConfig.md
+		docs\Processors\TestPlansAndSuitesMigrationConfig.md = docs\Processors\TestPlansAndSuitesMigrationConfig.md
+		docs\Processors\TestVeriablesMigrationConfig.md = docs\Processors\TestVeriablesMigrationConfig.md
+		docs\Processors\WorkItemDeleteConfig.md = docs\Processors\WorkItemDeleteConfig.md
+		docs\Processors\WorkItemMigrationConfig.md = docs\Processors\WorkItemMigrationConfig.md
+		docs\Processors\WorkItemPostProcessingConfig.md = docs\Processors\WorkItemPostProcessingConfig.md
+		docs\Processors\WorkItemQueryMigrationConfig.md = docs\Processors\WorkItemQueryMigrationConfig.md
+		docs\Processors\WorkItemUpdateAreasAsTagsConfig.md = docs\Processors\WorkItemUpdateAreasAsTagsConfig.md
+		docs\Processors\WorkItemUpdateConfig.md = docs\Processors\WorkItemUpdateConfig.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "images", "images", "{F29B9C2E-7EE3-49A5-8341-1277FA8BE0DB}"
+	ProjectSection(SolutionItems) = preProject
+		src\VstsSyncMigrator.Extension\images\azure-devops-migration-tools-naked-agility-martin-hinshelwood.png = src\VstsSyncMigrator.Extension\images\azure-devops-migration-tools-naked-agility-martin-hinshelwood.png
+		src\VstsSyncMigrator.Extension\images\extension-icon.png = src\VstsSyncMigrator.Extension\images\extension-icon.png
+		src\VstsSyncMigrator.Extension\images\screenshot-01.png = src\VstsSyncMigrator.Extension\images\screenshot-01.png
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Distribution", "Distribution", "{32E2956A-9056-4D9D-8018-14DFD0E6CA41}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExtendedClient", "ExtendedClient", "{C2D43320-C71B-42AF-B458-A2D33D772362}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RestClient", "RestClient", "{937E4E21-A6CB-42D8-8F66-B9CD6963F0BE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.ConsoleUI", "src\MigrationTools.ConsoleUI\MigrationTools.ConsoleUI.csproj", "{A314A07F-1D5E-44B8-9973-3AB2C41F17D5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Core.Configuration", "src\MigrationTools.Core.Configuration\MigrationTools.Core.Configuration.csproj", "{1F86C637-E734-4C94-9D82-AE4B50664FFD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{5C05DA7B-B70F-4A87-920B-DCD14EA7670D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.CommandLine", "src\MigrationTools.CommandLine\MigrationTools.CommandLine.csproj", "{00305A77-37BD-4CB3-B829-098ADDD564B9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Services", "src\MigrationTools.Services\MigrationTools.Services.csproj", "{041BE34B-205A-4A4F-9F12-C7E33A059010}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MigrationTools.Sinks.AzureDevOps", "src\MigrationTools.Sinks.AzureDevOps\MigrationTools.Sinks.AzureDevOps.csproj", "{7CE6D8B2-920C-43F6-95E8-F2682B029DB8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MigrationTools", "src\MigrationTools\MigrationTools.csproj", "{EBDB3038-9081-41B5-B82A-D0BC8F96859F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{033EB332-4A50-4C73-9B7D-A35D9F3C0513}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{033EB332-4A50-4C73-9B7D-A35D9F3C0513}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{033EB332-4A50-4C73-9B7D-A35D9F3C0513}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{033EB332-4A50-4C73-9B7D-A35D9F3C0513}.Release|Any CPU.Build.0 = Release|Any CPU
+		{68BAF6BA-2BC0-48D0-B892-1D9F93D7003A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{68BAF6BA-2BC0-48D0-B892-1D9F93D7003A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{68BAF6BA-2BC0-48D0-B892-1D9F93D7003A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{68BAF6BA-2BC0-48D0-B892-1D9F93D7003A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB3922F0-E801-474A-A498-892C3EA99799}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB3922F0-E801-474A-A498-892C3EA99799}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB3922F0-E801-474A-A498-892C3EA99799}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB3922F0-E801-474A-A498-892C3EA99799}.Release|Any CPU.Build.0 = Release|Any CPU
+		{985259EA-C475-4918-9342-50AB744F52AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{985259EA-C475-4918-9342-50AB744F52AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{985259EA-C475-4918-9342-50AB744F52AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{985259EA-C475-4918-9342-50AB744F52AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A314A07F-1D5E-44B8-9973-3AB2C41F17D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A314A07F-1D5E-44B8-9973-3AB2C41F17D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A314A07F-1D5E-44B8-9973-3AB2C41F17D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A314A07F-1D5E-44B8-9973-3AB2C41F17D5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F86C637-E734-4C94-9D82-AE4B50664FFD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F86C637-E734-4C94-9D82-AE4B50664FFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F86C637-E734-4C94-9D82-AE4B50664FFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F86C637-E734-4C94-9D82-AE4B50664FFD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{00305A77-37BD-4CB3-B829-098ADDD564B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00305A77-37BD-4CB3-B829-098ADDD564B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00305A77-37BD-4CB3-B829-098ADDD564B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00305A77-37BD-4CB3-B829-098ADDD564B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{041BE34B-205A-4A4F-9F12-C7E33A059010}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{041BE34B-205A-4A4F-9F12-C7E33A059010}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{041BE34B-205A-4A4F-9F12-C7E33A059010}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{041BE34B-205A-4A4F-9F12-C7E33A059010}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7CE6D8B2-920C-43F6-95E8-F2682B029DB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7CE6D8B2-920C-43F6-95E8-F2682B029DB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7CE6D8B2-920C-43F6-95E8-F2682B029DB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7CE6D8B2-920C-43F6-95E8-F2682B029DB8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EBDB3038-9081-41B5-B82A-D0BC8F96859F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EBDB3038-9081-41B5-B82A-D0BC8F96859F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EBDB3038-9081-41B5-B82A-D0BC8F96859F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EBDB3038-9081-41B5-B82A-D0BC8F96859F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{033EB332-4A50-4C73-9B7D-A35D9F3C0513} = {FA574C5F-498D-4C1B-BA57-FC28E534C6B6}
+		{68BAF6BA-2BC0-48D0-B892-1D9F93D7003A} = {1BC94A7E-4A43-4388-97BE-DCCF62797DA8}
+		{89434800-3004-4621-8677-C14C1D1AA4AF} = {32E2956A-9056-4D9D-8018-14DFD0E6CA41}
+		{AB3922F0-E801-474A-A498-892C3EA99799} = {1BC94A7E-4A43-4388-97BE-DCCF62797DA8}
+		{985259EA-C475-4918-9342-50AB744F52AF} = {FA574C5F-498D-4C1B-BA57-FC28E534C6B6}
+		{4D45177B-5CEA-406F-8C35-2125278BACA0} = {FA574C5F-498D-4C1B-BA57-FC28E534C6B6}
+		{243265E4-0E5A-4E95-BE7C-B92B7666FF79} = {32E2956A-9056-4D9D-8018-14DFD0E6CA41}
+		{1BC94A7E-4A43-4388-97BE-DCCF62797DA8} = {C2D43320-C71B-42AF-B458-A2D33D772362}
+		{FA574C5F-498D-4C1B-BA57-FC28E534C6B6} = {C2D43320-C71B-42AF-B458-A2D33D772362}
+		{E9399C6D-A5E0-43ED-8412-6C4A6BC86EC8} = {2BC0808B-6F4D-4635-82FE-1118181DD64F}
+		{F29B9C2E-7EE3-49A5-8341-1277FA8BE0DB} = {243265E4-0E5A-4E95-BE7C-B92B7666FF79}
+		{A314A07F-1D5E-44B8-9973-3AB2C41F17D5} = {937E4E21-A6CB-42D8-8F66-B9CD6963F0BE}
+		{1F86C637-E734-4C94-9D82-AE4B50664FFD} = {5C05DA7B-B70F-4A87-920B-DCD14EA7670D}
+		{00305A77-37BD-4CB3-B829-098ADDD564B9} = {5C05DA7B-B70F-4A87-920B-DCD14EA7670D}
+		{041BE34B-205A-4A4F-9F12-C7E33A059010} = {5C05DA7B-B70F-4A87-920B-DCD14EA7670D}
+		{7CE6D8B2-920C-43F6-95E8-F2682B029DB8} = {5C05DA7B-B70F-4A87-920B-DCD14EA7670D}
+		{EBDB3038-9081-41B5-B82A-D0BC8F96859F} = {5C05DA7B-B70F-4A87-920B-DCD14EA7670D}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {62EE0B27-C55A-46EE-8D17-1691DE9BBD50}
+	EndGlobalSection
+	GlobalSection(CodealikeProperties) = postSolution
+		SolutionGuid = 51c92075-0694-476b-8366-efd65c9a9b77
+	EndGlobalSection
+EndGlobal

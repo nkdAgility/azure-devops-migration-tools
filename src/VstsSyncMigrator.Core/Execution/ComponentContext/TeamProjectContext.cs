@@ -5,7 +5,7 @@ using Microsoft.TeamFoundation;
 using Microsoft.VisualStudio.Services.Common;
 using System.Collections.Generic;
 using System.Net;
-using AzureDevOpsMigrationTools.Core.Configuration;
+using MigrationTools.Core.Configuration;
 
 namespace VstsSyncMigrator.Engine
 {

@@ -3,7 +3,7 @@ using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using VstsSyncMigrator.Engine.ComponentContext;
 using System.Collections.Generic;
 using System.Linq;
-using AzureDevOpsMigrationTools.Core.Configuration.FieldMap;
+using MigrationTools.Core.Configuration.FieldMap;
 
 namespace VstsSyncMigrator.Engine.ComponentContext
 {

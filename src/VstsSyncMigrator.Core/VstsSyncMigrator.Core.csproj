@@ -397,13 +397,13 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <ProjectReference Include="..\AzureDevOpsMigrationTools.CommandLine\AzureDevOpsMigrationTools.CommandLine.csproj">
+    <ProjectReference Include="..\MigrationTools.CommandLine\MigrationTools.CommandLine.csproj">
       <Project>{00305A77-37BD-4CB3-B829-098ADDD564B9}</Project>
-      <Name>AzureDevOpsMigrationTools.CommandLine</Name>
+      <Name>MigrationTools.CommandLine</Name>
     </ProjectReference>
-    <ProjectReference Include="..\AzureDevOpsMigrationTools.Core.Configuration\AzureDevOpsMigrationTools.Core.Configuration.csproj">
+    <ProjectReference Include="..\MigrationTools.Core.Configuration\MigrationTools.Core.Configuration.csproj">
       <Project>{1f86c637-e734-4c94-9d82-ae4b50664ffd}</Project>
-      <Name>AzureDevOpsMigrationTools.Core.Configuration</Name>
+      <Name>MigrationTools.Core.Configuration</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
