@@ -1,4 +1,4 @@
-﻿using AzureDevOpsMigrationTools.Core.Configuration;
+﻿using MigrationTools.Core.Configuration;
 using Microsoft.TeamFoundation.Client;
 using System;
 using System.Collections.Generic;

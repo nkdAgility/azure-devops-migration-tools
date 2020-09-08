@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
-namespace AzureDevOpsMigrationTools.Core.Configuration.FieldMap
+namespace MigrationTools.Core.Configuration.FieldMap
 {
     public interface IFieldMapConfig
     {

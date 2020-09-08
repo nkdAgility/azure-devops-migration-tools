@@ -1,4 +1,4 @@
-﻿using AzureDevOpsMigrationTools.CommandLine;
+﻿using MigrationTools.CommandLine;
 using CsvHelper;
 using Microsoft.Azure.ActiveDirectory.GraphClient;
 using Microsoft.Azure.ActiveDirectory.GraphClient.Extensions;

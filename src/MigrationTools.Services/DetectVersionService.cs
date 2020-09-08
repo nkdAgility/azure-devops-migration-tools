@@ -16,7 +16,7 @@ using System.Net.NetworkInformation;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace AzureDevOpsMigrationTools.Services
+namespace MigrationTools.Services
 {
     public class DetectVersionService : IDetectVersionService
     {

@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace AzureDevOpsMigrationTools.CommandLine
+namespace MigrationTools.CommandLine
 {
     [Verb("execute", HelpText = "Record changes to the repository.")]
    public class ExecuteOptions

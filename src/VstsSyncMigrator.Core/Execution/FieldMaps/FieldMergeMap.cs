@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using System.Diagnostics;
 using Microsoft.ApplicationInsights;
-using AzureDevOpsMigrationTools.Core.Configuration.FieldMap;
+using MigrationTools.Core.Configuration.FieldMap;
 
 namespace VstsSyncMigrator.Engine.ComponentContext
 {

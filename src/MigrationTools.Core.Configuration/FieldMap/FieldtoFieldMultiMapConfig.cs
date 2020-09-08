@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 
-namespace AzureDevOpsMigrationTools.Core.Configuration.FieldMap
+namespace MigrationTools.Core.Configuration.FieldMap
 {
     public class FieldtoFieldMultiMapConfig : IFieldMapConfig
     {

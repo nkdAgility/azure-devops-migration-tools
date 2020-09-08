@@ -1,4 +1,4 @@
-﻿namespace AzureDevOpsMigrationTools.Services
+﻿namespace MigrationTools.Services
 {
     public interface IDetectOnlineService
     {

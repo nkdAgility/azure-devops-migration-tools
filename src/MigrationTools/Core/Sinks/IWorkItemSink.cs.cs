@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace AzureDevOpsMigrationTools.Core.Sinks
+namespace MigrationTools.Core.Sinks
 {
     interface IWorkItemSink
     {

@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AzureDevOpsMigrationTools.CustomDiagnostics
+namespace MigrationTools.CustomDiagnostics
 {
     public class CustomConverter : TraceTelemetryConverter
     {

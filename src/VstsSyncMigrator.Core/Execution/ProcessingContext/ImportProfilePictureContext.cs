@@ -14,7 +14,7 @@ using System.DirectoryServices.AccountManagement;
 using System.Net;
 using System.Drawing.Imaging;
 using System.Text.RegularExpressions;
-using AzureDevOpsMigrationTools.Core.Configuration.Processing;
+using MigrationTools.Core.Configuration.Processing;
 
 namespace VstsSyncMigrator.Engine
 {

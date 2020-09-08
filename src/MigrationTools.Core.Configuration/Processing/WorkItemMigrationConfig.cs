@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-namespace AzureDevOpsMigrationTools.Core.Configuration.Processing
+namespace MigrationTools.Core.Configuration.Processing
 {
     public class WorkItemMigrationConfig : ITfsProcessingConfig
     {

@@ -1,4 +1,4 @@
-﻿using AzureDevOpsMigrationTools.Core.Configuration.Processing;
+﻿using MigrationTools.Core.Configuration.Processing;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AzureDevOpsMigrationTools.Core.Configuration.FieldMap
+namespace MigrationTools.Core.Configuration.FieldMap
 {
     public class ProcessorConfigJsonConverter : JsonCreationConverter<ITfsProcessingConfig>
     {

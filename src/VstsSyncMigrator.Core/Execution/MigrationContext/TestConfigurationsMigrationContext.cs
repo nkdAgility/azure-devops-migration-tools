@@ -3,7 +3,7 @@ using Microsoft.TeamFoundation.TestManagement.Client;
 using System.Diagnostics;
 using System.Linq;
 using VstsSyncMigrator.Engine.ComponentContext;
-using AzureDevOpsMigrationTools.Core.Configuration.Processing;
+using MigrationTools.Core.Configuration.Processing;
 
 namespace VstsSyncMigrator.Engine
 {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace AzureDevOpsMigrationTools.Core.Configuration.Processing
+namespace MigrationTools.Core.Configuration.Processing
 {
     public class FakeProcessorConfig : ITfsProcessingConfig
     {

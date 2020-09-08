@@ -1,9 +1,9 @@
-﻿using AzureDevOpsMigrationTools.Core.Configuration.FieldMap;
-using AzureDevOpsMigrationTools.Core.Configuration.Processing;
+﻿using MigrationTools.Core.Configuration.FieldMap;
+using MigrationTools.Core.Configuration.Processing;
 using System;
 using System.Collections.Generic;
 
-namespace AzureDevOpsMigrationTools.Core.Configuration
+namespace MigrationTools.Core.Configuration
 {
     public class EngineConfiguration
     {

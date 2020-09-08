@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AzureDevOpsMigrationTools.Core.Configuration.FieldMap
+namespace MigrationTools.Core.Configuration.FieldMap
 {
    public class FieldBlankMapConfig : IFieldMapConfig
     {

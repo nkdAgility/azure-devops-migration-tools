@@ -1,6 +1,6 @@
-﻿using AzureDevOpsMigrationTools.CommandLine;
-using AzureDevOpsMigrationTools.CustomDiagnostics;
-using AzureDevOpsMigrationTools.Services;
+﻿using MigrationTools.CommandLine;
+using MigrationTools.CustomDiagnostics;
+using MigrationTools.Services;
 using CommandLine;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
@@ -17,7 +17,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-namespace AzureDevOpsMigrationTools.ConsoleUI
+namespace MigrationTools.ConsoleUI
 {
     class Program
     {

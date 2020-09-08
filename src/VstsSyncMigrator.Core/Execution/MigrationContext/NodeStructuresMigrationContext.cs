@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Xml;
-using AzureDevOpsMigrationTools.Core.Configuration.Processing;
+using MigrationTools.Core.Configuration.Processing;
 
 namespace VstsSyncMigrator.Engine
 {

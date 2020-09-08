@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace AzureDevOpsMigrationTools.CommandLine
+namespace MigrationTools.CommandLine
 {
     public enum OptionsMode
     {

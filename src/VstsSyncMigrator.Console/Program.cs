@@ -1,7 +1,7 @@
-﻿using AzureDevOpsMigrationTools.CommandLine;
-using AzureDevOpsMigrationTools.Core.Configuration;
-using AzureDevOpsMigrationTools.Core.Configuration.FieldMap;
-using AzureDevOpsMigrationTools.Services;
+﻿using MigrationTools.CommandLine;
+using MigrationTools.Core.Configuration;
+using MigrationTools.Core.Configuration.FieldMap;
+using MigrationTools.Services;
 using CommandLine;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
