@@ -92,7 +92,7 @@ namespace VstsSyncMigrator.Engine
                 if (processorConfig.IsProcessorCompatible(enabledProcessors))
                 {
                     Log.Information("{Context}: Adding Processor {ProcessorName}", processorConfig.Processor, "MigrationEngine");
-                    string typePattern = $"{processorConfig.Processor}";
+                    string typePattern = $"VstsSyncMigrator.Engine.{processorConfig.Processor}";
                     Type t = Type.GetType(typePattern);
                     if (t == null)
                     {
