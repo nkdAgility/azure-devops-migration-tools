@@ -158,64 +158,58 @@ namespace VstsSyncMigrator.Engine
 
             try
             {
-                if (sourceWorkItem.Type.Name != "Test Plan" || sourceWorkItem.Type.Name != "Test Suite")
+                var targetWorkItem = targetStore.FindReflectedWorkItem(sourceWorkItem, false);
+                TraceWriteLine(sourceWorkItem);
+                ///////////////////////////////////////////////
+                TraceWriteLine(sourceWorkItem, $"Work Item has {sourceWorkItem.Rev} revisions and revision migration is set to {_config.ReplayRevisions}");
+
+
+
+                List<RevisionItem> revisionsToMigrate = RevisionsToMigrate(sourceWorkItem, targetWorkItem);
+                if (targetWorkItem == null)
                 {
-                    var targetWorkItem = targetStore.FindReflectedWorkItem(sourceWorkItem, false);
-                    TraceWriteLine(sourceWorkItem);
-                    ///////////////////////////////////////////////
-                    TraceWriteLine(sourceWorkItem, $"Work Item has {sourceWorkItem.Rev} revisions and revision migration is set to {_config.ReplayRevisions}");
-
-
-
-                    List<RevisionItem> revisionsToMigrate = RevisionsToMigrate(sourceWorkItem, targetWorkItem);
-                    if (targetWorkItem == null)
-                    {
-                        targetWorkItem = ReplayRevisions(revisionsToMigrate, sourceWorkItem, null, destProject, sourceStore, _current, targetStore);
-                        AddMetric("Revisions", processWorkItemMetrics, revisionsToMigrate.Count);
-                    }
-                    else
-                    {
-                        if (revisionsToMigrate.Count == 0)
-                        {
-                            ProcessWorkItemAttachments(sourceWorkItem, targetWorkItem, false);
-                            ProcessWorkItemLinks(sourceStore, targetStore, sourceWorkItem, targetWorkItem);
-                            TraceWriteLine(sourceWorkItem, "Skipping as work item exists and no revisions to sync detected", ConsoleColor.Yellow);
-                            processWorkItemMetrics.Add("Revisions", 0);
-                        }
-                        else
-                        {
-                            TraceWriteLine(sourceWorkItem, $"Syncing as there are {revisionsToMigrate.Count} revisons detected", ConsoleColor.Yellow);
-
-                            targetWorkItem = ReplayRevisions(revisionsToMigrate, sourceWorkItem, targetWorkItem, destProject, sourceStore, _current, targetStore);
-
-                            AddMetric("Revisions", processWorkItemMetrics, revisionsToMigrate.Count);
-                            AddMetric("SyncRev", processWorkItemMetrics, revisionsToMigrate.Count);
-                        }
-
-
-                    }
-                    AddParameter("TargetWorkItem", processWorkItemParamiters, targetWorkItem.Revisions.Count.ToString());
-                    ///////////////////////////////////////////////
-                    ProcessHTMLFieldAttachements(targetWorkItem);
-                    ///////////////////////////////////////////////
-                    ///////////////////////////////////////////////////////
-                    if (targetWorkItem != null && targetWorkItem.IsDirty)
-                    {
-                        SaveWorkItem(targetWorkItem);
-                    }
-                    if (targetWorkItem != null)
-                    {
-                        targetWorkItem.Close();
-                    }
-                    if (sourceWorkItem != null)
-                    {
-                        sourceWorkItem.Close();
-                    }
+                    targetWorkItem = ReplayRevisions(revisionsToMigrate, sourceWorkItem, null, destProject, sourceStore, _current, targetStore);
+                    AddMetric("Revisions", processWorkItemMetrics, revisionsToMigrate.Count);
                 }
                 else
                 {
-                    TraceWriteLine(sourceWorkItem, $"SKIP: Unable to migrate {sourceWorkItem.Type.Name}/{sourceWorkItem.Id}. Use the TestPlansAndSuitesMigrationContext after you have migrated all Test Cases. ");
+                    if (revisionsToMigrate.Count == 0)
+                    {
+                        ProcessWorkItemAttachments(sourceWorkItem, targetWorkItem, false);
+                        ProcessWorkItemLinks(sourceStore, targetStore, sourceWorkItem, targetWorkItem);
+                        TraceWriteLine(sourceWorkItem, "Skipping as work item exists and no revisions to sync detected", ConsoleColor.Yellow);
+                        processWorkItemMetrics.Add("Revisions", 0);
+                    }
+                    else
+                    {
+                        TraceWriteLine(sourceWorkItem, $"Syncing as there are {revisionsToMigrate.Count} revisons detected", ConsoleColor.Yellow);
+
+                        targetWorkItem = ReplayRevisions(revisionsToMigrate, sourceWorkItem, targetWorkItem, destProject, sourceStore, _current, targetStore);
+
+                        AddMetric("Revisions", processWorkItemMetrics, revisionsToMigrate.Count);
+                        AddMetric("SyncRev", processWorkItemMetrics, revisionsToMigrate.Count);
+                    }
+
+
                 }
+                AddParameter("TargetWorkItem", processWorkItemParamiters, targetWorkItem.Revisions.Count.ToString());
+                ///////////////////////////////////////////////
+                ProcessHTMLFieldAttachements(targetWorkItem);
+                ///////////////////////////////////////////////
+                ///////////////////////////////////////////////////////
+                if (targetWorkItem != null && targetWorkItem.IsDirty)
+                {
+                    SaveWorkItem(targetWorkItem);
+                }
+                if (targetWorkItem != null)
+                {
+                    targetWorkItem.Close();
+                }
+                if (sourceWorkItem != null)
+                {
+                    sourceWorkItem.Close();
+                }
+
             }
             catch (WebException ex)
             {
@@ -300,6 +294,11 @@ namespace VstsSyncMigrator.Engine
                 sortedRevisions.RemoveRange(0, sortedRevisions.Count - 1);
             }
 
+
+
+
+
+
             TraceWriteLine(sourceWorkItem, $"Found {sortedRevisions.Count} revisions to migrate on  Work item:{sourceWorkItem.Id}", ConsoleColor.Gray, true);
             return sortedRevisions;
         }
@@ -329,7 +328,7 @@ namespace VstsSyncMigrator.Engine
                     finalDestType =
                        me.WorkItemTypeDefinitions[finalDestType].Map(last);
                 }
-
+                
                 //If work item hasn't been created yet, create a shell
                 if (targetWorkItem == null)
                 {
@@ -498,9 +497,8 @@ namespace VstsSyncMigrator.Engine
                 }
             }
 
-            newwit.AreaPath = GetNewNodeName(oldWi.AreaPath, oldWi.Project.Name, newwit.Project.Name, newwit.Store, me.Target.Config.LanguageMaps.AreaPath);
-            newwit.IterationPath = GetNewNodeName(oldWi.IterationPath, oldWi.Project.Name, newwit.Project.Name, newwit.Store, me.Target.Config.LanguageMaps.IterationPath);
-
+            newwit.AreaPath = GetNewNodeName(oldWi.AreaPath, oldWi.Project.Name, newwit.Project.Name, newwit.Store, "Area");
+            newwit.IterationPath = GetNewNodeName(oldWi.IterationPath, oldWi.Project.Name, newwit.Project.Name, newwit.Store, "Iteration");
             switch (destType)
             {
                 case "Test Case":
@@ -685,7 +683,7 @@ namespace VstsSyncMigrator.Engine
             if (targetWorkItem != null && _config.LinkMigration && sourceWorkItem.Links.Count > 0)
             {
                 TraceWriteLine(sourceWorkItem, $"Links {sourceWorkItem.Links.Count} | LinkMigrator:{_config.LinkMigration}");
-                workItemLinkOMatic.MigrateLinks(sourceWorkItem, sourceStore, targetWorkItem, targetStore, _config.LinkMigrationSaveEachAsAdded);
+                workItemLinkOMatic.MigrateLinks(sourceWorkItem, sourceStore, targetWorkItem, targetStore, _config.LinkMigrationSaveEachAsAdded, me.Source.Config.ReflectedWorkItemIDFieldName);
                 AddMetric("RelatedLinkCount", processWorkItemMetrics, targetWorkItem.Links.Count);
                 int fixedLinkCount = repoOMatic.FixExternalLinks(targetWorkItem, targetStore, sourceWorkItem, _config.LinkMigrationSaveEachAsAdded);
                 AddMetric("FixedGitLinkCount", processWorkItemMetrics, fixedLinkCount);

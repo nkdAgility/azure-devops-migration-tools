@@ -72,7 +72,7 @@ namespace VstsSyncMigrator.Engine
             return 0;
         }
 
-        public WorkItem FindReflectedWorkItem(WorkItem workItemToFind, bool cache)
+        public WorkItem FindReflectedWorkItem(WorkItem workItemToFind, bool cache, string sourceReflectedWIIdField = null)
         {
             string ReflectedWorkItemId = CreateReflectedWorkItemId(workItemToFind);
             WorkItem found = null;
@@ -80,10 +80,12 @@ namespace VstsSyncMigrator.Engine
             {
                 return foundWis[workItemToFind.Id];
             }
-            if (workItemToFind.Fields.Contains(teamProjectContext.Config.ReflectedWorkItemIDFieldName) && !string.IsNullOrEmpty( workItemToFind.Fields[teamProjectContext.Config.ReflectedWorkItemIDFieldName]?.Value?.ToString()))
+
+            // If we have a Reflected WorkItem ID field on the source store, assume it is pointing to the desired work item on the target store
+            if (sourceReflectedWIIdField != null && workItemToFind.Fields.Contains(sourceReflectedWIIdField) && !string.IsNullOrEmpty( workItemToFind.Fields[sourceReflectedWIIdField]?.Value?.ToString()))
             {
-                string rwiid = workItemToFind.Fields[teamProjectContext.Config.ReflectedWorkItemIDFieldName].Value.ToString();
-                int idToFind = GetReflectedWorkItemId(workItemToFind, teamProjectContext.Config.ReflectedWorkItemIDFieldName);
+                string rwiid = workItemToFind.Fields[sourceReflectedWIIdField].Value.ToString();
+                int idToFind = GetReflectedWorkItemId(workItemToFind, sourceReflectedWIIdField);
                 if (idToFind == 0)
                 {
                     found = null;
@@ -93,24 +95,20 @@ namespace VstsSyncMigrator.Engine
                     try
                     {
                         found = Store.GetWorkItem(idToFind);
-                        if (!(found.Fields[teamProjectContext.Config.ReflectedWorkItemIDFieldName].Value.ToString() == rwiid))
-                        {
-                            found = null;
-                        }
-                    } 
+                    }
                     catch (DeniedOrNotExistException)
                     {
                         found = null;
                     }
-                }                
+                }
             }
             if (found == null) { found = FindReflectedWorkItemByReflectedWorkItemId(ReflectedWorkItemId); }
-            if (!workItemToFind.Fields.Contains(teamProjectContext.Config.ReflectedWorkItemIDFieldName))
+            if (sourceReflectedWIIdField != null && !workItemToFind.Fields.Contains(sourceReflectedWIIdField))
             {
                 if (found == null) { found = FindReflectedWorkItemByMigrationRef(ReflectedWorkItemId); } // Too slow!
                 //if (found == null) { found = FindReflectedWorkItemByTitle(workItemToFind.Title); }
             }
-            if (found != null && cache) 
+            if (found != null && cache)
             {
                 foundWis.Add(workItemToFind.Id, found); /// TODO MEMORY LEAK
             }

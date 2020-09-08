@@ -9,7 +9,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
 {
     public class WorkItemLinkOMatic
     {
-        public void MigrateLinks(WorkItem sourceWorkItemLinkStart, WorkItemStoreContext sourceWorkItemStore, WorkItem targetWorkItemLinkStart, WorkItemStoreContext targetWorkItemStore, bool save = true)
+        public void MigrateLinks(WorkItem sourceWorkItemLinkStart, WorkItemStoreContext sourceWorkItemStore, WorkItem targetWorkItemLinkStart, WorkItemStoreContext targetWorkItemStore, bool save = true, string sourceReflectedWIIdField = null)
         {
             if (targetWorkItemLinkStart.Links.Count == sourceWorkItemLinkStart.Links.Count)
             {
@@ -31,7 +31,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                         else if (IsRelatedLink(item))
                         {
                             RelatedLink rl = (RelatedLink)item;
-                            CreateRelatedLink(sourceWorkItemLinkStart, rl, targetWorkItemLinkStart, sourceWorkItemStore, targetWorkItemStore, save);
+                            CreateRelatedLink(sourceWorkItemLinkStart, rl, targetWorkItemLinkStart, sourceWorkItemStore, targetWorkItemStore, save, sourceReflectedWIIdField);
                         }
                         else if (IsExternalLink(item))
                         {
@@ -141,7 +141,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                    link.LinkedArtifactUri.StartsWith("vstfs:///Build/Build/", StringComparison.InvariantCultureIgnoreCase);
         }
 
-        private void CreateRelatedLink(WorkItem wiSourceL, RelatedLink item, WorkItem wiTargetL, WorkItemStoreContext sourceStore, WorkItemStoreContext targetStore, bool save )
+        private void CreateRelatedLink(WorkItem wiSourceL, RelatedLink item, WorkItem wiTargetL, WorkItemStoreContext sourceStore, WorkItemStoreContext targetStore, bool save, string sourceReflectedWIIdField)
         {
             RelatedLink rl = (RelatedLink)item;
             WorkItem wiSourceR = null;
@@ -158,7 +158,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
             }
             try
             {
-                wiTargetR = GetRightHandSideTargitWi(wiSourceL, wiSourceR, wiTargetL, targetStore);
+                wiTargetR = GetRightHandSideTargetWi(wiSourceL, wiSourceR, wiTargetL, targetStore, sourceStore, sourceReflectedWIIdField);
             }
             catch (Exception ex)
             {
@@ -234,7 +234,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
             }
         }
 
-        private WorkItem GetRightHandSideTargitWi(WorkItem wiSourceL, WorkItem wiSourceR, WorkItem wiTargetL, WorkItemStoreContext targetStore)
+        private WorkItem GetRightHandSideTargetWi(WorkItem wiSourceL, WorkItem wiSourceR, WorkItem wiTargetL, WorkItemStoreContext targetStore, WorkItemStoreContext sourceStore, string sourceReflectedWIIdField)
         {
             WorkItem wiTargetR;
             if (!(wiTargetL == null)
@@ -247,7 +247,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
             else
             {
                 // Moving to Other Team Project from Source
-                wiTargetR = targetStore.FindReflectedWorkItem(wiSourceR, true);
+                wiTargetR = targetStore.FindReflectedWorkItem(wiSourceR, true, sourceReflectedWIIdField);
                 if (wiTargetR == null) // Assume source only (other team project)
                 {
                     wiTargetR = wiSourceR;
