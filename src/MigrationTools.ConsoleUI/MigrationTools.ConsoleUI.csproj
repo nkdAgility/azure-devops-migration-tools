@@ -25,8 +25,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AzureDevOpsMigrationTools.CommandLine\AzureDevOpsMigrationTools.CommandLine.csproj" />
-    <ProjectReference Include="..\AzureDevOpsMigrationTools.Services\AzureDevOpsMigrationTools.Services.csproj" />
+    <ProjectReference Include="..\MigrationTools.CommandLine\MigrationTools.CommandLine.csproj" />
+    <ProjectReference Include="..\MigrationTools.Services\MigrationTools.Services.csproj" />
   </ItemGroup>
 
   <ItemGroup>

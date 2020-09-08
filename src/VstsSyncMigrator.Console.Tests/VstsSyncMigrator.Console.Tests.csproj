@@ -288,9 +288,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AzureDevOpsMigrationTools.Core.Configuration\AzureDevOpsMigrationTools.Core.Configuration.csproj">
+    <ProjectReference Include="..\MigrationTools.Core.Configuration\MigrationTools.Core.Configuration.csproj">
       <Project>{1F86C637-E734-4C94-9D82-AE4B50664FFD}</Project>
-      <Name>AzureDevOpsMigrationTools.Core.Configuration</Name>
+      <Name>MigrationTools.Core.Configuration</Name>
     </ProjectReference>
     <ProjectReference Include="..\VstsSyncMigrator.Console\VstsSyncMigrator.Console.csproj">
       <Project>{033eb332-4a50-4c73-9b7d-a35d9f3c0513}</Project>

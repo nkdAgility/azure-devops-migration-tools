@@ -299,9 +299,9 @@
     <Compile Include="QueryContextTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AzureDevOpsMigrationTools.Core.Configuration\AzureDevOpsMigrationTools.Core.Configuration.csproj">
+    <ProjectReference Include="..\MigrationTools.Core.Configuration\MigrationTools.Core.Configuration.csproj">
       <Project>{1F86C637-E734-4C94-9D82-AE4B50664FFD}</Project>
-      <Name>AzureDevOpsMigrationTools.Core.Configuration</Name>
+      <Name>MigrationTools.Core.Configuration</Name>
     </ProjectReference>
     <ProjectReference Include="..\VstsSyncMigrator.Core\VstsSyncMigrator.Core.csproj">
       <Project>{68baf6ba-2bc0-48d0-b892-1d9f93d7003a}</Project>

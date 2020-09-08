@@ -483,17 +483,17 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AzureDevOpsMigrationTools.CommandLine\AzureDevOpsMigrationTools.CommandLine.csproj">
+    <ProjectReference Include="..\MigrationTools.CommandLine\MigrationTools.CommandLine.csproj">
       <Project>{00305A77-37BD-4CB3-B829-098ADDD564B9}</Project>
-      <Name>AzureDevOpsMigrationTools.CommandLine</Name>
+      <Name>MigrationTools.CommandLine</Name>
     </ProjectReference>
-    <ProjectReference Include="..\AzureDevOpsMigrationTools.Core.Configuration\AzureDevOpsMigrationTools.Core.Configuration.csproj">
+    <ProjectReference Include="..\MigrationTools.Core.Configuration\MigrationTools.Core.Configuration.csproj">
       <Project>{1F86C637-E734-4C94-9D82-AE4B50664FFD}</Project>
-      <Name>AzureDevOpsMigrationTools.Core.Configuration</Name>
+      <Name>MigrationTools.Core.Configuration</Name>
     </ProjectReference>
-    <ProjectReference Include="..\AzureDevOpsMigrationTools.Services\AzureDevOpsMigrationTools.Services.csproj">
+    <ProjectReference Include="..\MigrationTools.Services\MigrationTools.Services.csproj">
       <Project>{041BE34B-205A-4A4F-9F12-C7E33A059010}</Project>
-      <Name>AzureDevOpsMigrationTools.Services</Name>
+      <Name>MigrationTools.Services</Name>
     </ProjectReference>
     <ProjectReference Include="..\VstsSyncMigrator.Core\VstsSyncMigrator.Core.csproj">
       <Project>{68BAF6BA-2BC0-48D0-B892-1D9F93D7003A}</Project>
