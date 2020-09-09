@@ -195,7 +195,7 @@ namespace VstsSyncMigrator.Engine
                         {
                             ProcessWorkItemAttachments(sourceWorkItem, targetWorkItem, false);
                             ProcessWorkItemLinks(sourceStore, targetStore, sourceWorkItem, targetWorkItem);
-                            TraceWriteLine(sourceWorkItem, "Skipping as work item exists and no revisions to sync detected", ConsoleColor.Yellow);
+                            TraceWriteLine(LogEventLevel.Information, "Skipping as work item exists and no revisions to sync detected");
                             processWorkItemMetrics.Add("Revisions", 0);
                         }
                         else
