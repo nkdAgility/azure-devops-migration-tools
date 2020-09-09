@@ -114,7 +114,7 @@ namespace VstsSyncMigrator.Engine
             //////////////////////////////////////////////////
             var targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
             var destProject = targetStore.GetProject();
-            contextLog.Information("Found target project as {@destProject}", destProject);
+            contextLog.Information("Found target project as {@destProject}", destProject.Name);
             //////////////////////////////////////////////////////////FilterCompletedByQuery
             if (_config.FilterWorkItemsThatAlreadyExistInTarget)
             {
