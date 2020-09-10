@@ -1,6 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools;
-using MigrationTools.Core.Configuration;
+using MigrationTools.Core.Configuration.Tests;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -19,25 +19,5 @@ namespace MigrationTools.Tests
         }
 
 
-    }
-
-    public class EngineConfigurationBuilderStub : IEngineConfigurationBuilder
-    {
-        IEngineConfigurationBuilder ecb = new EngineConfigurationBuilder();
-
-        public EngineConfiguration BuildDefault()
-        {
-           return  ecb.BuildDefault();
-        }
-
-        public EngineConfiguration BuildFromFile()
-        {
-            return ecb.BuildDefault();
-        }
-
-        public EngineConfiguration BuildWorkItemMigration()
-        {
-            return ecb.BuildWorkItemMigration();
-        }
     }
 }

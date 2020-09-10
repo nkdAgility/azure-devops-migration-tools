@@ -10,7 +10,6 @@
 
   <ItemGroup>
     <Folder Include="Core\Enrichers\" />
-    <Folder Include="Core\Configuration\" />
   </ItemGroup>
 
   <ItemGroup>
