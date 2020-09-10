@@ -6,6 +6,8 @@
 
   <ItemGroup>
     <Folder Include="Core\Enrichers\" />
+    <Folder Include="Core\Configuration\" />
+    <Folder Include="Core\Sinks\" />
   </ItemGroup>
 
 </Project>
