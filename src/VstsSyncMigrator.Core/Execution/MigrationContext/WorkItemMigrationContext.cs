@@ -38,7 +38,7 @@ namespace VstsSyncMigrator.Engine
         private AttachmentOMatic attachmentOMatic;
         private RepoOMatic repoOMatic;
         private ILogger contextLog;
-       private ILogger workItemLog;
+        private ILogger workItemLog;
         EmbededImagesRepairOMatic embededImagesRepairOMatic = new EmbededImagesRepairOMatic();
         static int _current = 0;
         static int _count = 0;
@@ -149,12 +149,12 @@ namespace VstsSyncMigrator.Engine
                             break;
                         }
                     }
-                }               
+                }
             }
             //////////////////////////////////////////////////
             stopwatch.Stop();
 
-            contextLog.Information("DONE in {Elapsed:%h} hours {Elapsed:%m} minutes {Elapsed:s/:fff} seconds",  stopwatch.Elapsed);
+            contextLog.Information("DONE in {Elapsed:%h} hours {Elapsed:%m} minutes {Elapsed:s/:fff} seconds", stopwatch.Elapsed);
         }
 
 
@@ -230,7 +230,7 @@ namespace VstsSyncMigrator.Engine
                 }
                 else
                 {
-                    TraceWriteLine(LogEventLevel.Warning, "SKIP: Unable to migrate {sourceWorkItemTypeName}/{sourceWorkItemId}. Use the TestPlansAndSuitesMigrationContext after you have migrated all Test Cases. ", sourceWorkItem.Type.Name,sourceWorkItem.Id);
+                    TraceWriteLine(LogEventLevel.Warning, "SKIP: Unable to migrate {sourceWorkItemTypeName}/{sourceWorkItemId}. Use the TestPlansAndSuitesMigrationContext after you have migrated all Test Cases. ", sourceWorkItem.Type.Name, sourceWorkItem.Id);
                 }
             }
             catch (WebException ex)
@@ -366,7 +366,7 @@ namespace VstsSyncMigrator.Engine
 
                     revisionsToMigrate = revisionsToMigrate.GetRange(revisionsToMigrate.Count - 1, 1);
 
-                    TraceWriteLine( LogEventLevel.Information, " Attached a consolidated set of {RevisionCount} revisions.", data.Count());
+                    TraceWriteLine(LogEventLevel.Information, " Attached a consolidated set of {RevisionCount} revisions.", data.Count());
                 }
 
                 foreach (var revision in revisionsToMigrate)
@@ -422,7 +422,7 @@ namespace VstsSyncMigrator.Engine
 
                     foreach (Field f in fails)
                     {
-                        TraceWriteLine( LogEventLevel.Information,
+                        TraceWriteLine(LogEventLevel.Information,
                             "{Current} - Invalid: {CurrentRevisionWorkItemId}-{CurrentRevisionWorkItemTypeName}-{FieldReferenceName}-{SourceWorkItemTitle} Value: {FieldValue}",
                             current,
                             currentRevisionWorkItem.Id,
@@ -438,10 +438,10 @@ namespace VstsSyncMigrator.Engine
                     //}
 
                     targetWorkItem.Save();
-                    TraceWriteLine( LogEventLevel.Information,
-                        " Saved TargetWorkItem {TargetWorkItemId}. Replayed revision {RevisionNumber} of {RevisionsToMigrateCount}", 
-                        targetWorkItem.Id, 
-                        revision.Number, 
+                    TraceWriteLine(LogEventLevel.Information,
+                        " Saved TargetWorkItem {TargetWorkItemId}. Replayed revision {RevisionNumber} of {RevisionsToMigrateCount}",
+                        targetWorkItem.Id,
+                        revision.Number,
                         revisionsToMigrate.Count);
 
                 }
@@ -463,7 +463,7 @@ namespace VstsSyncMigrator.Engine
                     SaveWorkItem(targetWorkItem);
 
                     attachmentOMatic.CleanUpAfterSave(targetWorkItem);
-                    TraceWriteLine (LogEventLevel.Information, "...Saved as {TargetWorkItemId}", targetWorkItem.Id);
+                    TraceWriteLine(LogEventLevel.Information, "...Saved as {TargetWorkItemId}", targetWorkItem.Id);
                 }
             }
             catch (Exception ex)
@@ -524,9 +524,8 @@ namespace VstsSyncMigrator.Engine
                 }
             }
 
-            newwit.AreaPath = GetNewNodeName(oldWi.AreaPath, oldWi.Project.Name, newwit.Project.Name, newwit.Store, me.Target.Config.LanguageMaps.AreaPath);
-            newwit.IterationPath = GetNewNodeName(oldWi.IterationPath, oldWi.Project.Name, newwit.Project.Name, newwit.Store, me.Target.Config.LanguageMaps.IterationPath);
-
+            newwit.AreaPath = GetNewNodeName(oldWi.AreaPath, oldWi.Project.Name, newwit.Project.Name, newwit.Store, "Area");
+            newwit.IterationPath = GetNewNodeName(oldWi.IterationPath, oldWi.Project.Name, newwit.Project.Name, newwit.Store, "Iteration");
             switch (destType)
             {
                 case "Test Case":
@@ -552,7 +551,7 @@ namespace VstsSyncMigrator.Engine
 
         internal void TraceWriteLine(LogEventLevel level, string message = "", params object[] propertyValues)
         {
-            workItemLog.Write(level, workItemLogTeamplate + message,propertyValues);
+            workItemLog.Write(level, workItemLogTeamplate + message, propertyValues);
         }
 
         private List<WorkItem> FilterWorkItemsThatAlreadyExistInTarget(List<WorkItem> sourceWorkItems, WorkItemStoreContext targetStore)
@@ -688,8 +687,8 @@ namespace VstsSyncMigrator.Engine
         {
             if (targetWorkItem != null && _config.LinkMigration && sourceWorkItem.Links.Count > 0)
             {
-                TraceWriteLine(LogEventLevel.Information, "Links {SourceWorkItemLinkCount} | LinkMigrator:{LinkMigration}", sourceWorkItem.Links.Count,_config.LinkMigration);
-                workItemLinkOMatic.MigrateLinks(sourceWorkItem, sourceStore, targetWorkItem, targetStore, _config.LinkMigrationSaveEachAsAdded);
+                TraceWriteLine(LogEventLevel.Information, "Links {SourceWorkItemLinkCount} | LinkMigrator:{LinkMigration}", sourceWorkItem.Links.Count, _config.LinkMigration);
+                workItemLinkOMatic.MigrateLinks(sourceWorkItem, sourceStore, targetWorkItem, targetStore, _config.LinkMigrationSaveEachAsAdded, me.Source.Config.ReflectedWorkItemIDFieldName);
                 AddMetric("RelatedLinkCount", processWorkItemMetrics, targetWorkItem.Links.Count);
                 int fixedLinkCount = repoOMatic.FixExternalLinks(targetWorkItem, targetStore, sourceWorkItem, _config.LinkMigrationSaveEachAsAdded);
                 AddMetric("FixedGitLinkCount", processWorkItemMetrics, fixedLinkCount);
