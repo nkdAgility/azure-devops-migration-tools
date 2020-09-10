@@ -26,8 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MigrationTools.CommandLine\MigrationTools.CommandLine.csproj" />
-    <ProjectReference Include="..\MigrationTools.Services\MigrationTools.Services.csproj" />
+    <ProjectReference Include="..\MigrationTools\MigrationTools.csproj" />
   </ItemGroup>
 
   <ItemGroup>

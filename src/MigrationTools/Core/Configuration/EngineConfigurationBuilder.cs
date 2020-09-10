@@ -1,23 +1,26 @@
-﻿using MigrationTools.Core.Configuration.FieldMap;
+﻿using Microsoft.Extensions.Configuration;
+using MigrationTools.Core.Configuration.FieldMap;
 using MigrationTools.Core.Configuration.Processing;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
 
 namespace MigrationTools.Core.Configuration
 {
-    public class EngineConfiguration
+    public class EngineConfigurationBuilder : IEngineConfigurationBuilder
     {
-        public string Version { get; set; }
-        public bool TelemetryEnableTrace { get; set; }
-        public bool workaroundForQuerySOAPBugEnabled { get; set; }
-        public TeamProjectConfig Source { get; set; }
-        public TeamProjectConfig Target { get; set; }
-        public List<IFieldMapConfig> FieldMaps { get; set; }
-        public Dictionary<string, string> WorkItemTypeDefinition { get; set; }
-        public Dictionary<string, string> GitRepoMapping { get; set; }
-        public List<ITfsProcessingConfig> Processors { get; set; }
-
-        public static EngineConfiguration GetDefault()
+        public EngineConfiguration BuildFromFile()
+        {
+            var builder = new ConfigurationBuilder();
+            builder.SetBasePath(Directory.GetCurrentDirectory());
+            builder.AddJsonFile("configuration.json", optional: false, reloadOnChange: true);
+            IConfigurationRoot configuration = builder.Build();
+            var settings = new EngineConfiguration();
+            configuration.Bind(settings);
+            return settings;
+        }
+        public EngineConfiguration BuildDefault()
         {
             EngineConfiguration ec = CreateEmptyConfig();
             AddFieldMapps(ec);
@@ -29,12 +32,12 @@ namespace MigrationTools.Core.Configuration
             ec.Processors.Add(new WorkItemUpdateConfig());
             ec.Processors.Add(new WorkItemPostProcessingConfig() { WorkItemIDs = new List<int> { 1, 2, 3 } });
             ec.Processors.Add(new WorkItemDeleteConfig());
-            ec.Processors.Add(new WorkItemQueryMigrationConfig() { SourceToTargetFieldMappings = new Dictionary<string, string>() { {"SourceFieldRef", "TargetFieldRef" } } });
+            ec.Processors.Add(new WorkItemQueryMigrationConfig() { SourceToTargetFieldMappings = new Dictionary<string, string>() { { "SourceFieldRef", "TargetFieldRef" } } });
             ec.Processors.Add(new TeamMigrationConfig());
             return ec;
         }
 
-        public static EngineConfiguration GetWorkItemMigration()
+        public EngineConfiguration BuildWorkItemMigration()
         {
             EngineConfiguration ec = CreateEmptyConfig();
             AddFieldMapps(ec);
@@ -42,7 +45,7 @@ namespace MigrationTools.Core.Configuration
             return ec;
         }
 
-        private static void AddWorkItemMigrationDefault(EngineConfiguration ec)
+        private void AddWorkItemMigrationDefault(EngineConfiguration ec)
         {
             ec.Processors.Add(new NodeStructuresMigrationConfig()
             {
@@ -51,24 +54,28 @@ namespace MigrationTools.Core.Configuration
             ec.Processors.Add(new WorkItemMigrationConfig());
         }
 
-        private static EngineConfiguration CreateEmptyConfig()
+        private EngineConfiguration CreateEmptyConfig()
         {
             EngineConfiguration ec = new EngineConfiguration();
             ec.TelemetryEnableTrace = false;
             ec.Version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(2);
-            ec.Source = new TeamProjectConfig() { Project = "migrationSource1", 
-                AllowCrossProjectLinking = false, 
-                Collection = new Uri("https://dev.azure.com/nkdagility-preview/"), 
-                ReflectedWorkItemIDFieldName = "Custom.ReflectedWorkItemId", 
+            ec.Source = new TeamProjectConfig()
+            {
+                Project = "migrationSource1",
+                AllowCrossProjectLinking = false,
+                Collection = new Uri("https://dev.azure.com/nkdagility-preview/"),
+                ReflectedWorkItemIDFieldName = "Custom.ReflectedWorkItemId",
                 PersonalAccessToken = "",
                 LanguageMaps = new LanguageMaps() { AreaPath = "Area", IterationPath = "Iteration" }
             };
-            ec.Target = new TeamProjectConfig() { Project = "migrationTarget1", 
-                AllowCrossProjectLinking = false, 
-                Collection = new Uri("https://dev.azure.com/nkdagility-preview/"), 
-                ReflectedWorkItemIDFieldName = "Custom.ReflectedWorkItemId", 
+            ec.Target = new TeamProjectConfig()
+            {
+                Project = "migrationTarget1",
+                AllowCrossProjectLinking = false,
+                Collection = new Uri("https://dev.azure.com/nkdagility-preview/"),
+                ReflectedWorkItemIDFieldName = "Custom.ReflectedWorkItemId",
                 PersonalAccessToken = "",
-                LanguageMaps = new LanguageMaps() { AreaPath ="Area", IterationPath ="Iteration"}
+                LanguageMaps = new LanguageMaps() { AreaPath = "Area", IterationPath = "Iteration" }
             };
             ec.FieldMaps = new List<IFieldMapConfig>();
             ec.WorkItemTypeDefinition = new Dictionary<string, string> {
@@ -78,7 +85,7 @@ namespace MigrationTools.Core.Configuration
             return ec;
         }
 
-        private static void AddTestPlansMigrationDefault(EngineConfiguration ec)
+        private void AddTestPlansMigrationDefault(EngineConfiguration ec)
         {
             ec.Processors.Add(new TestVariablesMigrationConfig());
             ec.Processors.Add(new TestConfigurationsMigrationConfig());
@@ -86,7 +93,7 @@ namespace MigrationTools.Core.Configuration
             //ec.Processors.Add(new TestRunsMigrationConfig());
         }
 
-        private static void AddFieldMapps(EngineConfiguration ec)
+        private void AddFieldMapps(EngineConfiguration ec)
         {
             ec.FieldMaps.Add(new MultiValueConditionalMapConfig()
             {
@@ -174,7 +181,5 @@ namespace MigrationTools.Core.Configuration
                 toSkip = 3
             });
         }
-
-
     }
 }

@@ -397,13 +397,9 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <ProjectReference Include="..\MigrationTools.CommandLine\MigrationTools.CommandLine.csproj">
-      <Project>{00305A77-37BD-4CB3-B829-098ADDD564B9}</Project>
-      <Name>MigrationTools.CommandLine</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\MigrationTools.Core.Configuration\MigrationTools.Core.Configuration.csproj">
-      <Project>{1f86c637-e734-4c94-9d82-ae4b50664ffd}</Project>
-      <Name>MigrationTools.Core.Configuration</Name>
+    <ProjectReference Include="..\MigrationTools\MigrationTools.csproj">
+      <Project>{EBDB3038-9081-41B5-B82A-D0BC8F96859F}</Project>
+      <Name>MigrationTools</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

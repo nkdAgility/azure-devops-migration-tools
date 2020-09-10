@@ -22,7 +22,8 @@ namespace _VstsSyncMigrator.Engine.Tests
         [TestMethod]
         public void EngineConfigurationCreateDefault()
         {
-            EngineConfiguration ec = EngineConfiguration.GetDefault();
+            IEngineConfigurationBuilder ecb = new EngineConfigurationBuilder();
+            EngineConfiguration ec = ecb.BuildDefault();
             Assert.IsNotNull(ec);
             Assert.IsNotNull(ec.Source);
             Assert.AreEqual(ec.Source.Project, "migrationSource1");

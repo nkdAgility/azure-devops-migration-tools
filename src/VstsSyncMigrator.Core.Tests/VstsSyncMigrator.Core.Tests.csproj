@@ -299,9 +299,9 @@
     <Compile Include="QueryContextTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MigrationTools.Core.Configuration\MigrationTools.Core.Configuration.csproj">
-      <Project>{1F86C637-E734-4C94-9D82-AE4B50664FFD}</Project>
-      <Name>MigrationTools.Core.Configuration</Name>
+    <ProjectReference Include="..\MigrationTools\MigrationTools.csproj">
+      <Project>{EBDB3038-9081-41B5-B82A-D0BC8F96859F}</Project>
+      <Name>MigrationTools</Name>
     </ProjectReference>
     <ProjectReference Include="..\VstsSyncMigrator.Core\VstsSyncMigrator.Core.csproj">
       <Project>{68baf6ba-2bc0-48d0-b892-1d9f93d7003a}</Project>

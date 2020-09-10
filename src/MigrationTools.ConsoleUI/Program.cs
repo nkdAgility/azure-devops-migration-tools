@@ -16,6 +16,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using MigrationTools.Core.Configuration;
 
 namespace MigrationTools.ConsoleUI
 {
@@ -23,6 +24,7 @@ namespace MigrationTools.ConsoleUI
     {
         static DateTime _startTime = DateTime.Now;
         static Stopwatch _mainTimer = new Stopwatch();
+        static IHost host;
 
         static int Main(string[] args)
         {
@@ -62,16 +64,18 @@ namespace MigrationTools.ConsoleUI
             Log.Information("userID: {UserId}", System.Security.Principal.WindowsIdentity.GetCurrent().Name);
             ///////////////////////////////////////////////////////
             /// Setup Host
-            var host = Host.CreateDefaultBuilder()
+            host = Host.CreateDefaultBuilder()
                 .ConfigureServices((context, services) =>
                 {
                     services.AddSingleton<IDetectOnlineService, DetectOnlineService>();
                     services.AddSingleton<IDetectVersionService, DetectVersionService>();
                     services.AddApplicationInsightsTelemetryWorkerService(aiServiceOptions);
+                    services.AddTransient<IEngineConfigurationBuilder, EngineConfigurationBuilder>();
+                    services.AddSingleton<MigrationHost>();
                 })
                 .UseSerilog()
                 .Build();
-            TelemetryClient telemetryClient = SetupTelemetry(host);
+            TelemetryClient telemetryClient = SetupTelemetry();
             var chk = CheckVersion(ApplicationVersion, host);
             if (chk != 0)
             {
@@ -102,7 +106,8 @@ namespace MigrationTools.ConsoleUI
 
         private static int RunExecuteAndReturnExitCode(ExecuteOptions opts)
         {
-            throw new NotImplementedException();
+            var migration = host.Services.GetRequiredService<MigrationHost>();
+            return 0;
         }
 
         private static int RunInitAndReturnExitCode(InitOptions opts)
@@ -110,7 +115,7 @@ namespace MigrationTools.ConsoleUI
             throw new NotImplementedException();
         }
 
-        private static TelemetryClient SetupTelemetry(IHost host)
+        private static TelemetryClient SetupTelemetry()
         {
             var telemetryClient = host.Services.GetRequiredService<TelemetryClient>();
             telemetryClient.Context.User.Id = System.Security.Principal.WindowsIdentity.GetCurrent().Name;

@@ -206,6 +206,7 @@ namespace VstsSyncMigrator.ConsoleApp
         private static object RunInitAndReturnExitCode(InitOptions opts)
         {
             Telemetry.Current.TrackEvent("InitCommand");
+
             string configFile = opts.ConfigFile;
             if (configFile.IsEmpty())
             {
@@ -220,17 +221,18 @@ namespace VstsSyncMigrator.ConsoleApp
             if (!File.Exists(configFile))
             {
                 Log.Information("Populating config with {Options}", opts.Options.ToString());
+                IEngineConfigurationBuilder cbuilder = new EngineConfigurationBuilder();
                 EngineConfiguration config;
                 switch (opts.Options)
                 {
                     case OptionsMode.Full:
-                        config = EngineConfiguration.GetDefault();
+                        config = cbuilder.BuildDefault();
                         break;
                     case OptionsMode.WorkItemTracking:
-                        config = EngineConfiguration.GetWorkItemMigration();
+                        config = cbuilder.BuildWorkItemMigration();
                         break;
                     default:
-                        config = EngineConfiguration.GetDefault();
+                        config = cbuilder.BuildDefault();
                         break;
                 }
 
