@@ -7,6 +7,7 @@
     <Authors>Martin Hinshelwood</Authors>
     <Company>naked Agility with Martin Hinshelwood</Company>
     <Product>Azure DevOps Migration Tools</Product>
+    <AssemblyName>migration</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
