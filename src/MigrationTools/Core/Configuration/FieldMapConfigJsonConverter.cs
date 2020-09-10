@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MigrationTools.Core.Configuration.FieldMap
+namespace MigrationTools.Core.Configuration
 {
     public class FieldMapConfigJsonConverter : JsonCreationConverter<IFieldMapConfig>
     {

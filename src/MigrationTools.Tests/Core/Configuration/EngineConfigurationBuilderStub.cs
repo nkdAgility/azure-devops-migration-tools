@@ -11,7 +11,7 @@ namespace MigrationTools.Core.Configuration.Tests
            return  ecb.BuildDefault();
         }
 
-        public EngineConfiguration BuildFromFile()
+        public EngineConfiguration BuildFromFile(string configFile = "configuration.json")
         {
             return ecb.BuildDefault();
         }

@@ -10,16 +10,19 @@ namespace MigrationTools.Core.Configuration
 {
     public class EngineConfigurationBuilder : IEngineConfigurationBuilder
     {
-        public EngineConfiguration BuildFromFile()
+        public EngineConfiguration BuildFromFile(string configFile = "configuration.json")
         {
             var builder = new ConfigurationBuilder();
             builder.SetBasePath(Directory.GetCurrentDirectory());
-            builder.AddJsonFile("configuration.json", optional: false, reloadOnChange: true);
+            builder.AddJsonFile(configFile, optional: false, reloadOnChange: true);
             IConfigurationRoot configuration = builder.Build();
             var settings = new EngineConfiguration();
             configuration.Bind(settings);
             return settings;
         }
+
+
+
         public EngineConfiguration BuildDefault()
         {
             EngineConfiguration ec = CreateEmptyConfig();
