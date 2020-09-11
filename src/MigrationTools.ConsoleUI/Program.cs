@@ -16,6 +16,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using MigrationTools.Core.Configuration;
+using Newtonsoft.Json;
+using MigrationTools.Core.Configuration.FieldMap;
 
 namespace MigrationTools.ConsoleUI
 {
@@ -23,6 +26,8 @@ namespace MigrationTools.ConsoleUI
     {
         static DateTime _startTime = DateTime.Now;
         static Stopwatch _mainTimer = new Stopwatch();
+        static IHost host;
+        static TelemetryClient tc;
 
         static int Main(string[] args)
         {
@@ -62,17 +67,19 @@ namespace MigrationTools.ConsoleUI
             Log.Information("userID: {UserId}", System.Security.Principal.WindowsIdentity.GetCurrent().Name);
             ///////////////////////////////////////////////////////
             /// Setup Host
-            var host = Host.CreateDefaultBuilder()
+            host = Host.CreateDefaultBuilder()
                 .ConfigureServices((context, services) =>
                 {
                     services.AddSingleton<IDetectOnlineService, DetectOnlineService>();
                     services.AddSingleton<IDetectVersionService, DetectVersionService>();
                     services.AddApplicationInsightsTelemetryWorkerService(aiServiceOptions);
+                    services.AddTransient<IEngineConfigurationBuilder, EngineConfigurationBuilder>();
+                    services.AddSingleton<MigrationHost>();
                 })
                 .UseSerilog()
                 .Build();
-            TelemetryClient telemetryClient = SetupTelemetry(host);
-            var chk = CheckVersion(ApplicationVersion, host);
+            SetupTelemetry();
+            var chk = CheckVersion(ApplicationVersion);
             if (chk != 0)
             {
                 return chk;
@@ -80,19 +87,19 @@ namespace MigrationTools.ConsoleUI
             //////////////////////////////////////////////////
             /// Setup Command Line
             int result = (int)Parser.Default.ParseArguments<InitOptions, ExecuteOptions>(args).MapResult(
-                (InitOptions opts) => RunInitAndReturnExitCode(opts),
-                (ExecuteOptions opts) => RunExecuteAndReturnExitCode(opts),
+                (InitOptions opts) => RunInitAndReturnExitCode(opts, tc),
+                (ExecuteOptions opts) => RunExecuteAndReturnExitCode(opts, tc),
                 errs => 1);
             ///////////////////////////////////////////////////////
             Log.Information("Application Ending");
             _mainTimer.Stop();
-            telemetryClient.TrackEvent("ApplicationEnd", null,
+            tc.TrackEvent("ApplicationEnd", null,
                 new Dictionary<string, double> {
                         { "Application_Elapsed", _mainTimer.ElapsedMilliseconds }
                 });
-            if (telemetryClient != null)
+            if (tc != null)
             {
-                telemetryClient.Flush();
+                tc.Flush();
             }
             Log.Information("The application ran in {Application_Elapsed} and finished at {Application_EndTime}", _mainTimer.Elapsed.ToString("c"), DateTime.Now.ToUniversalTime().ToLocalTime());
             Log.CloseAndFlush();
@@ -100,27 +107,118 @@ namespace MigrationTools.ConsoleUI
             return result;
         }
 
-        private static int RunExecuteAndReturnExitCode(ExecuteOptions opts)
+        private static int RunExecuteAndReturnExitCode(ExecuteOptions opts, TelemetryClient telemetryClient)
         {
-            throw new NotImplementedException();
+            tc.TrackEvent("ExecuteCommand");
+
+            if (opts.ConfigFile == string.Empty)
+            {
+                opts.ConfigFile = "configuration.json";
+            }
+
+            if (!File.Exists(opts.ConfigFile))
+            {
+                Log.Information("The config file {ConfigFile} does not exist, nor does the default 'configuration.json'. Use '{ExecutableName}.exe init' to create a configuration file first", opts.ConfigFile, System.Reflection.Assembly.GetExecutingAssembly().GetName().Name);
+                return 1;
+            }
+            else
+            {
+                Log.Information("Loading Config");
+                IEngineConfigurationBuilder ecb = new EngineConfigurationBuilder();
+                var ec = ecb.BuildFromFile(opts.ConfigFile);
+
+#if !DEBUG
+                string appVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(2);
+                if (ec.Version != appVersion)
+                {
+                    Log.Information("The config version {Version} does not match the current app version {appVersion}. There may be compatability issues and we recommend that you generate a new default config and then tranfer the settings accross.", ec.Version, appVersion);
+                    return 1;
+                }
+#endif
+            }
+            Log.Information("Config Loaded, creating engine");
+
+            //VssCredentials sourceCredentials = null;
+            //VssCredentials targetCredentials = null;
+            //if (!string.IsNullOrWhiteSpace(opts.SourceUserName) && !string.IsNullOrWhiteSpace(opts.SourcePassword))
+            //    sourceCredentials = new VssCredentials(new Microsoft.VisualStudio.Services.Common.WindowsCredential(new NetworkCredential(opts.SourceUserName, opts.SourcePassword, opts.SourceDomain)));
+
+            //if (!string.IsNullOrWhiteSpace(opts.TargetUserName) && !string.IsNullOrWhiteSpace(opts.TargetPassword))
+            //    targetCredentials = new VssCredentials(new Microsoft.VisualStudio.Services.Common.WindowsCredential(new NetworkCredential(opts.TargetUserName, opts.TargetPassword, opts.TargetDomain)));
+
+            //MigrationEngine me;
+            //if (sourceCredentials == null && targetCredentials == null)
+            //    me = new MigrationEngine(ec);
+            //else
+            //    me = new MigrationEngine(ec, sourceCredentials, targetCredentials);
+
+            if (!string.IsNullOrWhiteSpace(opts.ChangeSetMappingFile))
+            {
+                IChangeSetMappingProvider csmp = new ChangeSetMappingProvider(opts.ChangeSetMappingFile);
+                //csmp.ImportMappings(me.ChangeSetMapping);
+            }
+
+            //Console.Title = $"Azure DevOps Migration Tools: {System.IO.Path.GetFileName(opts.ConfigFile)} - {System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(3)} - {ec.Source.Project} - {ec.Target.Project}";
+            Log.Information("Engine created, running...");
+            //me.Run();
+            Log.Information("Run complete...");
+            return 0;
         }
 
-        private static int RunInitAndReturnExitCode(InitOptions opts)
+        private static int RunInitAndReturnExitCode(InitOptions opts, TelemetryClient telemetryClient)
         {
-            throw new NotImplementedException();
+            telemetryClient.TrackEvent("InitCommand");
+
+            string configFile = opts.ConfigFile;
+            if (string.IsNullOrEmpty(configFile))
+            {
+                configFile = "configuration.json";
+            }
+            Log.Information("ConfigFile: {configFile}", configFile);
+            if (File.Exists(configFile))
+            {
+                Log.Information("Deleting old configuration.json reference file");
+                File.Delete(configFile);
+            }
+            if (!File.Exists(configFile))
+            {
+                Log.Information("Populating config with {Options}", opts.Options.ToString());
+                IEngineConfigurationBuilder cbuilder = new EngineConfigurationBuilder();
+                EngineConfiguration config;
+                switch (opts.Options)
+                {
+                    case OptionsMode.Full:
+                        config = cbuilder.BuildDefault();
+                        break;
+                    case OptionsMode.WorkItemTracking:
+                        config = cbuilder.BuildWorkItemMigration();
+                        break;
+                    default:
+                        config = cbuilder.BuildDefault();
+                        break;
+                }
+
+                string json = JsonConvert.SerializeObject(config, Formatting.Indented,
+                    new FieldMapConfigJsonConverter(),
+                    new ProcessorConfigJsonConverter());
+                StreamWriter sw = new StreamWriter(configFile);
+                sw.WriteLine(json);
+                sw.Close();
+                Log.Information("New configuration.json file has been created");
+            }
+            return 0;
         }
 
-        private static TelemetryClient SetupTelemetry(IHost host)
+        private static void SetupTelemetry()
         {
-            var telemetryClient = host.Services.GetRequiredService<TelemetryClient>();
-            telemetryClient.Context.User.Id = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
-            telemetryClient.Context.Session.Id = Guid.NewGuid().ToString();
-            telemetryClient.Context.Device.OperatingSystem = Environment.OSVersion.ToString();
-            telemetryClient.Context.Component.Version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            return telemetryClient;
+            tc = host.Services.GetRequiredService<TelemetryClient>();
+            tc.Context.User.Id = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+            tc.Context.Session.Id = Guid.NewGuid().ToString();
+            tc.Context.Device.OperatingSystem = Environment.OSVersion.ToString();
+            tc.Context.Component.Version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
         }
 
-        private static int CheckVersion(Version ApplicationVersion, IHost host)
+        private static int CheckVersion(Version ApplicationVersion)
         {
             var doService = ActivatorUtilities.GetServiceOrCreateInstance<IDetectOnlineService>(host.Services);
             if (doService.IsOnline())

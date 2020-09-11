@@ -7,7 +7,7 @@ using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Linq;
-using MigrationTools.Core.Configuration.Processing;
+using MigrationTools.Core.Configuration;
 
 namespace VstsSyncMigrator.Engine
 {

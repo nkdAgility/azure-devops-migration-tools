@@ -5,11 +5,11 @@
     <Version>0.0.0.0</Version>
     <Authors>Martin Hinshelwood</Authors>
     <Company>naked Agility with martin Hinshelwood</Company>
-    <Product>MigrationTools.CommandLine</Product>
+    <Product>MigrationTools.Sinks.FileSystem</Product>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CommandLineParser" Version="2.8.0" />
+    <ProjectReference Include="..\MigrationTools\MigrationTools.csproj" />
   </ItemGroup>
 
 </Project>

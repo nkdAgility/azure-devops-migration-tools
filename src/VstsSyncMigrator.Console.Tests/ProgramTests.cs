@@ -7,13 +7,19 @@ using MigrationTools.Core.Configuration;
 
 namespace VstsSyncMigrator.Console.Tests
 {
+    
+
     [TestClass]
     public class ProgramTests
     {
+
+IEngineConfigurationBuilder ecb = new EngineConfigurationBuilder();
+        
         [TestMethod]
         public void TestSeraliseToJson()
         {
-            string json = JsonConvert.SerializeObject(EngineConfiguration.GetDefault(),
+
+            string json = JsonConvert.SerializeObject(ecb.BuildDefault(),
                     new FieldMapConfigJsonConverter(),
                     new ProcessorConfigJsonConverter());
             StreamWriter sw = new StreamWriter("configuration.json");

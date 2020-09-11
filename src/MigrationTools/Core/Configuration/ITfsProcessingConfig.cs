@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MigrationTools.Core.Configuration.Processing
+namespace MigrationTools.Core.Configuration
 {
     public interface ITfsProcessingConfig
     {

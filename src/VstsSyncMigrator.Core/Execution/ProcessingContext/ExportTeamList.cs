@@ -11,6 +11,7 @@ using Microsoft.TeamFoundation.Server;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.Framework.Common;
 using MigrationTools.Core.Configuration.Processing;
+using MigrationTools.Core.Configuration;
 
 namespace VstsSyncMigrator.Engine
 {

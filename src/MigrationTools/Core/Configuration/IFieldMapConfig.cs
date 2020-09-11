@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
-namespace MigrationTools.Core.Configuration.FieldMap
+namespace MigrationTools.Core.Configuration
 {
     public interface IFieldMapConfig
     {

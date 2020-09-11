@@ -171,29 +171,11 @@ namespace VstsSyncMigrator.ConsoleApp
             else
                 me = new MigrationEngine(ec, sourceCredentials, targetCredentials);
 
+            
             if (!string.IsNullOrWhiteSpace(opts.ChangeSetMappingFile))
             {
-                using (System.IO.StreamReader file = new System.IO.StreamReader(opts.ChangeSetMappingFile))
-                {
-                    string line = string.Empty;
-                    while ((line = file.ReadLine()) != null)
-                    {
-                        if (string.IsNullOrEmpty(line))
-                        {
-                            continue;
-                        }
-
-                        var split = line.Split('-');
-                        if (split == null
-                            || split.Length != 2
-                            || !int.TryParse(split[0], out int changesetId))
-                        {
-                            continue;
-                        }
-
-                        me.ChangeSetMapping.Add(changesetId, split[1]);
-                    }
-                }
+                IChangeSetMappingProvider csmp = new ChangeSetMappingProvider(opts.ChangeSetMappingFile);
+                csmp.ImportMappings(me.ChangeSetMapping);
             }
 
             Console.Title = $"Azure DevOps Migration Tools: {System.IO.Path.GetFileName(opts.ConfigFile)} - {System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(3)} - {ec.Source.Project} - {ec.Target.Project}";
@@ -206,6 +188,7 @@ namespace VstsSyncMigrator.ConsoleApp
         private static object RunInitAndReturnExitCode(InitOptions opts)
         {
             Telemetry.Current.TrackEvent("InitCommand");
+
             string configFile = opts.ConfigFile;
             if (configFile.IsEmpty())
             {
@@ -220,17 +203,18 @@ namespace VstsSyncMigrator.ConsoleApp
             if (!File.Exists(configFile))
             {
                 Log.Information("Populating config with {Options}", opts.Options.ToString());
+                IEngineConfigurationBuilder cbuilder = new EngineConfigurationBuilder();
                 EngineConfiguration config;
                 switch (opts.Options)
                 {
                     case OptionsMode.Full:
-                        config = EngineConfiguration.GetDefault();
+                        config = cbuilder.BuildDefault();
                         break;
                     case OptionsMode.WorkItemTracking:
-                        config = EngineConfiguration.GetWorkItemMigration();
+                        config = cbuilder.BuildWorkItemMigration();
                         break;
                     default:
-                        config = EngineConfiguration.GetDefault();
+                        config = cbuilder.BuildDefault();
                         break;
                 }
 
