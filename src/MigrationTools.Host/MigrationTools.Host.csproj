@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Version>0.0.0.0</Version>
+    <Authors>Martin Hinshelwood</Authors>
+    <Company>naked Agility with martin Hinshelwood</Company>
+    <Product>MigrationTools.CommandLine</Product>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MigrationTools.Sinks.AzureDevOps\MigrationTools.Sinks.AzureDevOps.csproj" />
+    <ProjectReference Include="..\MigrationTools\MigrationTools.csproj" />
+  </ItemGroup>
+
+</Project>

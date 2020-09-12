@@ -19,6 +19,8 @@ using System.Reflection;
 using MigrationTools.Core.Configuration;
 using Newtonsoft.Json;
 using MigrationTools.Core.Configuration.FieldMap;
+using MigrationTools.Sinks.AzureDevOps;
+using MigrationTools.Core.Sinks;
 
 namespace MigrationTools.ConsoleUI
 {
@@ -27,7 +29,6 @@ namespace MigrationTools.ConsoleUI
         static DateTime _startTime = DateTime.Now;
         static Stopwatch _mainTimer = new Stopwatch();
         static IHost host;
-        static TelemetryClient tc;
 
         static int Main(string[] args)
         {
@@ -73,12 +74,13 @@ namespace MigrationTools.ConsoleUI
                     services.AddSingleton<IDetectOnlineService, DetectOnlineService>();
                     services.AddSingleton<IDetectVersionService, DetectVersionService>();
                     services.AddApplicationInsightsTelemetryWorkerService(aiServiceOptions);
-                    services.AddTransient<IEngineConfigurationBuilder, EngineConfigurationBuilder>();
-                    services.AddSingleton<MigrationHost>();
+                    services.AddSingleton<IEngineConfigurationBuilder, EngineConfigurationBuilder>();
+                    services.AddSingleton<MigrationEngine>();
+                    services.AddTransient<IWorkItemSink, WorkItemSink>();
                 })
                 .UseSerilog()
                 .Build();
-            SetupTelemetry();
+           var tc = SetupTelemetry();
             var chk = CheckVersion(ApplicationVersion);
             if (chk != 0)
             {
@@ -107,7 +109,7 @@ namespace MigrationTools.ConsoleUI
             return result;
         }
 
-        private static int RunExecuteAndReturnExitCode(ExecuteOptions opts, TelemetryClient telemetryClient)
+        private static int RunExecuteAndReturnExitCode(ExecuteOptions opts, TelemetryClient tc)
         {
             tc.TrackEvent("ExecuteCommand");
 
@@ -121,22 +123,8 @@ namespace MigrationTools.ConsoleUI
                 Log.Information("The config file {ConfigFile} does not exist, nor does the default 'configuration.json'. Use '{ExecutableName}.exe init' to create a configuration file first", opts.ConfigFile, System.Reflection.Assembly.GetExecutingAssembly().GetName().Name);
                 return 1;
             }
-            else
-            {
-                Log.Information("Loading Config");
-                IEngineConfigurationBuilder ecb = new EngineConfigurationBuilder();
-                var ec = ecb.BuildFromFile(opts.ConfigFile);
-
-#if !DEBUG
-                string appVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(2);
-                if (ec.Version != appVersion)
-                {
-                    Log.Information("The config version {Version} does not match the current app version {appVersion}. There may be compatability issues and we recommend that you generate a new default config and then tranfer the settings accross.", ec.Version, appVersion);
-                    return 1;
-                }
-#endif
-            }
             Log.Information("Config Loaded, creating engine");
+            var me = host.Services.GetRequiredService<MigrationEngine>();
 
             //VssCredentials sourceCredentials = null;
             //VssCredentials targetCredentials = null;
@@ -160,7 +148,7 @@ namespace MigrationTools.ConsoleUI
 
             //Console.Title = $"Azure DevOps Migration Tools: {System.IO.Path.GetFileName(opts.ConfigFile)} - {System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(3)} - {ec.Source.Project} - {ec.Target.Project}";
             Log.Information("Engine created, running...");
-            //me.Run();
+            me.Run();
             Log.Information("Run complete...");
             return 0;
         }
@@ -209,13 +197,14 @@ namespace MigrationTools.ConsoleUI
             return 0;
         }
 
-        private static void SetupTelemetry()
+        private static TelemetryClient SetupTelemetry()
         {
-            tc = host.Services.GetRequiredService<TelemetryClient>();
+            var tc = host.Services.GetRequiredService<TelemetryClient>();
             tc.Context.User.Id = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
             tc.Context.Session.Id = Guid.NewGuid().ToString();
             tc.Context.Device.OperatingSystem = Environment.OSVersion.ToString();
             tc.Context.Component.Version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            return tc;
         }
 
         private static int CheckVersion(Version ApplicationVersion)
@@ -290,7 +279,7 @@ namespace MigrationTools.ConsoleUI
             Log.Information("      @((((((((((((((&@&  &&...................@   @@#((((((((((((((#@@        ");
             Log.Information("                                                                               ");
             Log.Information("===============================================================================");
-            Log.Information("===                       Azure DevOps Migration Tools                       ==");
+            Log.Information("===                       Azure DevOps Migration Tools  (REST EDITION)      ==");
             Log.Information($"===                                 v{thisVersion}                                ==");
             Log.Information("===============================================================================");
         }
