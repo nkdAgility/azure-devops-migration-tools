@@ -110,7 +110,9 @@ namespace VstsSyncMigrator.Engine
                     _config.QueryBit, _config.OrderBit);
             var sourceQueryResult = tfsqc.Execute();
             var sourceWorkItems = (from WorkItem swi in sourceQueryResult select swi).ToList();
-            contextLog.Information("Replay all revisions of {sourceWorkItemsCount} work items?", sourceWorkItems.Count);
+            contextLog.Information("Found {sourceWorkItemsCount} work items from query?", sourceWorkItems.Count);
+            Log.Information("Query Breakdown:");
+            DisplayQueryBreakdown(sourceWorkItems);
             //////////////////////////////////////////////////
             var targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
             var destProject = targetStore.GetProject();
@@ -120,6 +122,9 @@ namespace VstsSyncMigrator.Engine
             {
                 sourceWorkItems = FilterWorkItemsThatAlreadyExistInTarget(sourceWorkItems, targetStore);
             }
+            Log.Information("Query Breakdown after Filter of Existing:");
+            DisplayQueryBreakdown(sourceWorkItems);
+            contextLog.Information("Replay all revisions of {sourceWorkItemsCount} work items?", sourceWorkItems.Count);
             //////////////////////////////////////////////////
             _current = 1;
             _count = sourceWorkItems.Count;
@@ -157,7 +162,18 @@ namespace VstsSyncMigrator.Engine
             contextLog.Information("DONE in {Elapsed:%h} hours {Elapsed:%m} minutes {Elapsed:s/:fff} seconds", stopwatch.Elapsed);
         }
 
-
+        private void DisplayQueryBreakdown(List<WorkItem> WorkItems)
+        {
+            var data = new Dictionary<string, int>();
+            var wits = WorkItems.Select(x => x.Type.Name).Distinct();
+            foreach (var wit in wits)
+            {
+                var count = WorkItems.Where(x => x.Type.Name == wit).Count();
+                data.Add(wit, count);
+                Log.Information("[{WorkItemType}]: {WorkItemTypeCount]", wit, count);
+            }
+            Log.Information("There are {WorkItemTypesCount} work item types from {WorkItemCount} ", wits.Count(), WorkItems.Count(), data); ;
+        }
 
         private IDictionary<string, double> processWorkItemMetrics = null;
         private IDictionary<string, string> processWorkItemParamiters = null;

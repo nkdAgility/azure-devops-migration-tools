@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace VstsSyncMigrator.Engine
 {
+    [Obsolete]
    public static class Telemetry
     {
         private const string applicationInsightsKey = "4b9bb17b-c7ee-43e5-b220-ec6db2c33373";
@@ -19,6 +20,7 @@ namespace VstsSyncMigrator.Engine
 
         public static bool EnableTrace { get { return enableTrace; } set { enableTrace = value; } }
 
+        [Obsolete]
         public static TelemetryClient Current { get {
                 if (telemetryClient == null)
                 {
