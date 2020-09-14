@@ -18,12 +18,11 @@ namespace MigrationTools.Sinks.TfsObjectModel
         private readonly TelemetryClient _Telemetry;
         private TfsTeamProjectCollection _Collection;
         private bool bypassRules = true;
-        private ITeamProjectContext teamProjectContext;
         private WorkItemStore wistore;
         private Dictionary<int, WorkItem> foundWis;
         private VssCredentials _credentials;
 
-        public WorkItemStore Store { get { return wistore; } }
+        private WorkItemStore Store { get { return wistore; } }
         public TeamProjectConfig Config { get { return _config; } }
 
         public TeamProjectContext(TeamProjectConfig config, TelemetryClient telemetry)
@@ -113,6 +112,7 @@ namespace MigrationTools.Sinks.TfsObjectModel
             }
             foundWis = new Dictionary<int, WorkItem>();
         }
+
 
 
     }
