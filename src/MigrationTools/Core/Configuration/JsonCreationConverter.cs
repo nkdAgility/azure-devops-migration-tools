@@ -54,7 +54,7 @@ namespace MigrationTools.Core.Configuration
             else
             {
                 JObject o = (JObject)jt;
-                o.AddFirst(new JProperty("ObjectType", value.GetType().FullName));
+                o.AddFirst(new JProperty("ObjectType", value.GetType().Name));
                 o.WriteTo(writer);
             }
         }

@@ -23,8 +23,9 @@ The Azure DevOps Migration Tools allow you to bulk edit and migrate data between
 
 ## Change Log
 
+- v10.1 - Changed config design to have only the Name and not FullName of the class. Remove `MigrationTools.Core.Configuration.FieldMap.` and `MigrationTools.Core.Configuration.Processing.` from the config leaving only the Name of the class in ObjectType field.
+- v10.0 - Start of the greate refactor over to .NET Core and the REST API as the Object Model has been retired.
 - v9.0 - Added support for migration between other language versions of Azure DevOps. Developed for German -> English
-- v8.10 - Added `LinkMigrationSaveEachAsAdded` to help mitigate `TF26194: unable to change the value of the 'Parent' field` error. Remvoved `UpdateSourceReflectedId`
 - v8.9 - Added 'Collapse Revisions' feature to collapse and attache revisions instead of replaying them
 - v8.8 - 'SkipToFinalRevisedWorkItemType' feature added to handle scenario when changing Work Item Type
 - v8.7 - Support for inline images using a Personal Access Token added to the Source Project
