@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 using MigrationTools.Core.Configuration;
 using MigrationTools.Core.DataContracts;
 using MigrationTools.Core.Sinks;

@@ -142,6 +142,7 @@ namespace MigrationTools.ConsoleUI
                     services.AddSingleton<IDetectOnlineService, DetectOnlineService>();
                     services.AddSingleton<IDetectVersionService, DetectVersionService>();
                     services.AddSingleton(tc);
+                    services.AddSingleton<IEngineConfigurationBuilder, EngineConfigurationBuilder>();
                     services.AddSingleton<EngineConfiguration>(config);
                     services.AddSingleton<MigrationEngine>();
                     services.AzureDevOpsWorkerServices(config);                    

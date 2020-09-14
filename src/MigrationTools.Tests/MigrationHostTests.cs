@@ -14,8 +14,7 @@ namespace MigrationTools.Tests
         [TestMethod()]
         public void MigrationHostTest()
         {
-            Assert.Fail();
-            //MigrationEngine mh = new MigrationEngine(null, null, new EngineConfigurationBuilderStub());
+            MigrationEngine mh = new MigrationEngine(null, null, null, new EngineConfigurationBuilderStub());
 
         }
 
