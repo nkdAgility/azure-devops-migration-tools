@@ -14,7 +14,10 @@ namespace MigrationTools.Core.Configuration
             if (FieldExists("ObjectType", jObject))
             {
                 string typename = jObject.GetValue("ObjectType").ToString();
-                Type type = Type.GetType(typename, true);
+                Type type = AppDomain.CurrentDomain.GetAssemblies()
+                   .Where(a => !a.IsDynamic)
+                   .SelectMany(a => a.GetTypes())
+                   .FirstOrDefault(t => t.Name.Equals(typename) || t.FullName.Equals(typename));
                 return (IFieldMapConfig)Activator.CreateInstance(type);
             }
             else
