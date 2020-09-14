@@ -2,6 +2,7 @@
 using MigrationTools.Core.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using VstsSyncMigrator.Engine;
+using Microsoft.Extensions.Hosting;
 
 namespace _VstsSyncMigrator.Engine.Tests
 {
@@ -9,12 +10,14 @@ namespace _VstsSyncMigrator.Engine.Tests
     public class MigrationEngineTests
     {
         IEngineConfigurationBuilder ecb = new EngineConfigurationBuilder();
+        IHost host = new HostBuilder().Build();
 
         [TestMethod]
         public void TestEngineCreation()
         {
+
             EngineConfiguration ec = ecb.BuildDefault();
-            MigrationEngine me = new MigrationEngine(ec);
+            MigrationEngine me = new MigrationEngine(host, ec);
         }
 
         [TestMethod]
@@ -22,7 +25,7 @@ namespace _VstsSyncMigrator.Engine.Tests
         {
             EngineConfiguration ec = ecb.BuildDefault();
             ec.Processors.Clear();
-            MigrationEngine me = new MigrationEngine(ec);
+            MigrationEngine me = new MigrationEngine(host, ec);
             me.Run();
 
         }
@@ -33,7 +36,7 @@ namespace _VstsSyncMigrator.Engine.Tests
             EngineConfiguration ec = ecb.BuildDefault();
             ec.Processors.Clear();
             ec.FieldMaps.Clear();
-            MigrationEngine me = new MigrationEngine(ec);
+            MigrationEngine me = new MigrationEngine(host, ec);
             me.Run();
         }
 
@@ -42,7 +45,7 @@ namespace _VstsSyncMigrator.Engine.Tests
         {
             EngineConfiguration ec = ecb.BuildDefault();
             ec.FieldMaps.Clear();
-            MigrationEngine me = new MigrationEngine(ec);
+            MigrationEngine me = new MigrationEngine(host, ec);
             me.Run();
         }
 

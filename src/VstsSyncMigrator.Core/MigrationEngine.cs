@@ -18,7 +18,6 @@ namespace VstsSyncMigrator.Engine
    public class MigrationEngine
     {
         List<ITfsProcessingContext> processors = new List<ITfsProcessingContext>();
-        List<Action<WorkItem, WorkItem>> processorActions = new List<Action<WorkItem, WorkItem>>();
         Dictionary<string, List<IFieldMap>> fieldMapps = new Dictionary<string, List<IFieldMap>>();
         Dictionary<string, IWitdMapper> workItemTypeDefinitions = new Dictionary<string, IWitdMapper>();
         Dictionary<string, string> gitRepoMapping = new Dictionary<string, string>();
@@ -156,7 +155,6 @@ namespace VstsSyncMigrator.Engine
                 },
                 new Dictionary<string, double> {
                     { "Processors", processors.Count },
-                    { "Actions",  processorActions.Count},
                     { "Mappings", fieldMapps.Count }
                 });
             Stopwatch engineTimer = Stopwatch.StartNew();
