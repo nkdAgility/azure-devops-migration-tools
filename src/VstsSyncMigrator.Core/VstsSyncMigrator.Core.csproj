@@ -368,7 +368,6 @@
     <Compile Include="Execution\ProcessingContext\CreateTeamFolders.cs" />
     <Compile Include="MigrationContextExtensions.cs" />
     <Compile Include="ObjectModelExtensions.cs" />
-    <Compile Include="ProcessingEngine.cs" />
     <Compile Include="MigrationEngine.cs" />
     <Compile Include="Execution\ProcessingContext\ImportProfilePictureContext.cs" />
     <Compile Include="Execution\ProcessingContext\ProcessingContextBase.cs" />
