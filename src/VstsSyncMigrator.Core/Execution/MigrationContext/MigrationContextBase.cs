@@ -3,8 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
-
-using MigrationTools.Core.Configuration.Processing;
+using MigrationTools.Core.Engine;
 using MigrationTools.Core.Configuration;
 
 namespace VstsSyncMigrator.Engine
@@ -72,19 +71,9 @@ namespace VstsSyncMigrator.Engine
         {
             //input = [sourceTeamProject]\[AreaPath]
             return string.Format("{0}\\{1}", me.Target.Config.Project, input);
-
-
             //Regex r = new Regex(source.Name, RegexOptions.IgnoreCase);
-
-
             //// Output = [targetTeamProject]\[sourceTeamProject]\[AreaPath]
             //return r.Replace(input, target.Name, 1);
-        }
-
-        internal static void SaveWorkItem(WorkItem workItem)
-        {
-            workItem.Fields["System.ChangedBy"].Value = "Migration";
-            workItem.Save();
         }
 
         internal string ReplaceFirstInstanceOf(string input)

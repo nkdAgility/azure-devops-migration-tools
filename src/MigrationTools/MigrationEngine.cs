@@ -25,12 +25,12 @@ namespace MigrationTools
         private readonly TelemetryClient _Telemetry;
         private readonly EngineConfiguration _Config;
 
-        public MigrationEngine(IHost host, ILogger<MigrationEngine> log, TelemetryClient telemetry, IEngineConfigurationBuilder configBuilder)
+        public MigrationEngine(IHost host, ILogger<MigrationEngine> log, TelemetryClient telemetry, EngineConfiguration config)
         {
             _Host = host;
             _Log = log;
             _Telemetry = telemetry;
-            _Config = configBuilder.BuildFromFile();
+            _Config = config;
         }
 
         public void Run()

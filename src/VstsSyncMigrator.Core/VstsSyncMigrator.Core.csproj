@@ -345,6 +345,7 @@
     <Compile Include="Execution\FieldMaps\IFieldMap.cs" />
     <Compile Include="Execution\ComponentContext\TestManagementContext.cs" />
     <Compile Include="Execution\FieldMaps\FieldToTagFieldMap.cs" />
+    <Compile Include="Execution\MigrationContext\MigrationContextBaseExtensions.cs" />
     <Compile Include="Execution\MigrationContext\WorkItemMigrationContext.cs" />
     <Compile Include="Execution\MigrationContext\WorkItemQueryMigrationContext.cs" />
     <Compile Include="Execution\MigrationContext\MigrationContextBase.cs" />
@@ -370,7 +371,6 @@
     <Compile Include="ProcessingEngine.cs" />
     <Compile Include="MigrationEngine.cs" />
     <Compile Include="Execution\ProcessingContext\ImportProfilePictureContext.cs" />
-    <Compile Include="Execution\ProcessingContext\ITfsProcessingContext.cs" />
     <Compile Include="Execution\ProcessingContext\ProcessingContextBase.cs" />
     <Compile Include="Execution\ProcessingContext\ExportProfilePictureFromADContext.cs" />
     <Compile Include="Execution\ProcessingContext\WorkItemUpdate.cs" />

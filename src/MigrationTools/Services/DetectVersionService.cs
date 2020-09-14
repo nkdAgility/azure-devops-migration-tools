@@ -20,17 +20,12 @@ namespace MigrationTools.Services
 {
     public class DetectVersionService : IDetectVersionService
     {
-        private readonly ILogger<DetectOnlineService> _Log;
-        private readonly IConfiguration _Config;
         private readonly TelemetryClient _Telemetry;
-        private readonly IDetectOnlineService _Dos;
 
-        public DetectVersionService(ILogger<DetectOnlineService> log, IConfiguration config, TelemetryClient telemetry, IDetectOnlineService dos)
+
+        public DetectVersionService(TelemetryClient telemetry)
         {
-            _Log = log;
-            _Config = config;
             _Telemetry = telemetry;
-            _Dos = dos;
         }
 
         public Version GetLatestVersion()

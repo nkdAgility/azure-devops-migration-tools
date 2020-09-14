@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.ApplicationInsights.WindowsServer;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools;
 using MigrationTools.Core.Configuration.Tests;
 using System;
@@ -13,8 +14,8 @@ namespace MigrationTools.Tests
         [TestMethod()]
         public void MigrationHostTest()
         {
-            
-            MigrationHost mh = new MigrationHost(null, null, new EngineConfigurationBuilderStub());
+            Assert.Fail();
+            //MigrationEngine mh = new MigrationEngine(null, null, new EngineConfigurationBuilderStub());
 
         }
 
