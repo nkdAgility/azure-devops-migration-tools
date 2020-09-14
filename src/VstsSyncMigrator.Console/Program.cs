@@ -142,6 +142,12 @@ namespace VstsSyncMigrator.ConsoleApp
                 using (var sr = new StreamReader(opts.ConfigFile))
                     configurationjson = sr.ReadToEnd();
 
+                if (configurationjson.Contains("VstsSyncMigrator.Engine.Configuration"))
+                {
+                    Log.Error(new Exception("From v10 we are refactoring code. Note that the namespace 'VstsSyncMigrator.Engine.Configuration' has changed to 'MigrationTools.Engine.Configuration'"), "Exiting");
+                    return 1;
+                }
+
                 ec = JsonConvert.DeserializeObject<EngineConfiguration>(configurationjson,
                     new FieldMapConfigJsonConverter(),
                     new ProcessorConfigJsonConverter());
