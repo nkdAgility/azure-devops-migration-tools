@@ -339,7 +339,7 @@ namespace VstsSyncMigrator.Engine
                 if (skipToFinalRevisedWorkItemType && me.WorkItemTypeDefinitions.ContainsKey(finalDestType))
                 {
                     finalDestType =
-                       me.WorkItemTypeDefinitions[finalDestType].Map(last);
+                       me.WorkItemTypeDefinitions[finalDestType].Map();
                 }
 
                 //If work item hasn't been created yet, create a shell
@@ -380,7 +380,7 @@ namespace VstsSyncMigrator.Engine
                     if (me.WorkItemTypeDefinitions.ContainsKey(destType))
                     {
                         destType =
-                           me.WorkItemTypeDefinitions[destType].Map(currentRevisionWorkItem);
+                           me.WorkItemTypeDefinitions[destType].Map();
                     }
 
                     //If the work item already exists and its type has changed, update its type. Done this way because there doesn't appear to be a way to do this through the store.

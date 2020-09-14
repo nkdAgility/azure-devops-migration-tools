@@ -6,50 +6,46 @@ using Microsoft.VisualStudio.Services.Common;
 using System.Collections.Generic;
 using System.Net;
 using MigrationTools.Core.Configuration;
+using MigrationTools.Core.Engine;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using Microsoft.ApplicationInsights;
 
-namespace VstsSyncMigrator.Engine
+namespace MigrationTools.Sinks.TfsObjectModel
 {
     public class TeamProjectContext : ITeamProjectContext
     {
         private TeamProjectConfig _config;
+        private readonly TelemetryClient _Telemetry;
         private TfsTeamProjectCollection _Collection;
-        private NetworkCredential _credentials;
+        private bool bypassRules = true;
+        private ITeamProjectContext teamProjectContext;
+        private WorkItemStore wistore;
+        private Dictionary<int, WorkItem> foundWis;
+        private VssCredentials _credentials;
 
-        public TfsTeamProjectCollection Collection
-        {
-            get
-            {
-                Connect();
-                return _Collection;
-            }
-        }
+        public WorkItemStore Store { get { return wistore; } }
+        public TeamProjectConfig Config { get { return _config; } }
 
-        public TeamProjectConfig Config
-        {
-            get
-            {
-                return _config;
-            }
-        }
-
-        public TeamProjectContext(TeamProjectConfig config)
+        public TeamProjectContext(TeamProjectConfig config, TelemetryClient telemetry)
         {
 
             this._config = config;
+            _Telemetry = telemetry;
+            Connect();
         }
 
         public TeamProjectContext(TeamProjectConfig config, NetworkCredential credentials)
         {
             _config = config;
-            _credentials = credentials;
+            _credentials = new VssCredentials(new Microsoft.VisualStudio.Services.Common.WindowsCredential(credentials)); ;
+            Connect();
         }
 
         public void Connect()
         {
             if (_Collection == null)
             {
-                Telemetry.Current.TrackEvent("TeamProjectContext.Connect",
+                _Telemetry.TrackEvent("TeamProjectContext.Connect",
                     new Dictionary<string, string> {
                           { "Name", Config.Project},
                           { "Target Project", Config.Project},
@@ -63,7 +59,7 @@ namespace VstsSyncMigrator.Engine
                 if (_credentials == null)
                     _Collection = new TfsTeamProjectCollection(Config.Collection);
                 else
-                    _Collection = new TfsTeamProjectCollection(Config.Collection, new VssCredentials(new Microsoft.VisualStudio.Services.Common.WindowsCredential(_credentials)));
+                    _Collection = new TfsTeamProjectCollection(Config.Collection, _credentials);
                 
                 try
                 {
@@ -71,13 +67,13 @@ namespace VstsSyncMigrator.Engine
                     Trace.WriteLine(string.Format("validating security for {0} ", _Collection.AuthorizedIdentity.ToString()));
                     _Collection.EnsureAuthenticated();
                     connectionTimer.Stop();
-                    Telemetry.Current.TrackDependency("TeamService", "EnsureAuthenticated", start, connectionTimer.Elapsed, true);
+                    _Telemetry.TrackDependency("TeamService", "EnsureAuthenticated", start, connectionTimer.Elapsed, true);
                     Trace.TraceInformation(string.Format(" Access granted "));
                 }
                 catch (TeamFoundationServiceUnavailableException ex)
                 {
-                    Telemetry.Current.TrackDependency("TeamService", "EnsureAuthenticated", start, connectionTimer.Elapsed, false);
-                    Telemetry.Current.TrackException(ex,
+                    _Telemetry.TrackDependency("TeamService", "EnsureAuthenticated", start, connectionTimer.Elapsed, false);
+                    _Telemetry.TrackException(ex,
                        new Dictionary<string, string> {
                             { "CollectionUrl", Config.Collection.ToString() },
                             { "TeamProjectName",  Config.Project}
@@ -88,7 +84,36 @@ namespace VstsSyncMigrator.Engine
                     Trace.TraceWarning($"  [EXCEPTION] {ex}");
                     throw;
                 }
-            }            
+            }
+            ConnectStore();
         }
+        private void ConnectStore()
+        {
+            var startTime = DateTime.UtcNow;
+            var timer = System.Diagnostics.Stopwatch.StartNew();
+            try
+            {
+                wistore = new WorkItemStore(_Collection, bypassRules ? WorkItemStoreFlags.BypassRules : WorkItemStoreFlags.None);
+                timer.Stop();
+                _Telemetry.TrackDependency("TeamService", "GetWorkItemStore", startTime, timer.Elapsed, true);
+            }
+            catch (Exception ex)
+            {
+                timer.Stop();
+                _Telemetry.TrackDependency("TeamService", "GetWorkItemStore", startTime, timer.Elapsed, false);
+                _Telemetry.TrackException(ex,
+                       new Dictionary<string, string> {
+                            { "CollectionUrl", _Collection.Uri.ToString() }
+                       },
+                       new Dictionary<string, double> {
+                            { "Time",timer.ElapsedMilliseconds }
+                       });
+                Trace.TraceWarning($"  [EXCEPTION] {ex}");
+                throw;
+            }
+            foundWis = new Dictionary<int, WorkItem>();
+        }
+
+
     }
 }

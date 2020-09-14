@@ -10,6 +10,8 @@ using MigrationTools.Core.Configuration;
 using MigrationTools.Core.Configuration.FieldMap;
 using MigrationTools.Core.Configuration.Processing;
 using MigrationTools.Core.Engine;
+using Microsoft.Extensions.Hosting;
+using System.Net;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -22,20 +24,20 @@ namespace VstsSyncMigrator.Engine
         Dictionary<string, string> gitRepoMapping = new Dictionary<string, string>();
         ITeamProjectContext source;
         ITeamProjectContext target;
-        VssCredentials sourceCreds;
-        VssCredentials targetCreds;
+        NetworkCredential sourceCreds;
+        NetworkCredential targetCreds;
         public readonly Dictionary<int, string> ChangeSetMapping = new Dictionary<int, string>();
 
-        public MigrationEngine()
+        public MigrationEngine(IHost host)
         {
 
         }
-        public MigrationEngine(EngineConfiguration config)
+        public MigrationEngine(IHost host, EngineConfiguration config)
         {
             ProcessConfiguration(config);
         }
 
-        public MigrationEngine(EngineConfiguration config, VssCredentials sourceCredentials, VssCredentials targetCredentials)
+        public MigrationEngine(IHost host,EngineConfiguration config, NetworkCredential sourceCredentials, NetworkCredential targetCredentials)
         {
             sourceCreds = sourceCredentials;
             targetCreds = targetCredentials;
@@ -84,7 +86,7 @@ namespace VstsSyncMigrator.Engine
                 foreach (string key in config.WorkItemTypeDefinition.Keys)
                 {
                     Log.Information("{Context}: Adding Work Item Type {WorkItemType}", key, "MigrationEngine");
-                    this.AddWorkItemTypeDefinition(key, new DiscreteWitMapper(config.WorkItemTypeDefinition[key]));
+                    this.AddWorkItemTypeDefinition(key, new WitMapper(config.WorkItemTypeDefinition[key]));
                 }
             }
             var enabledProcessors = config.Processors.Where(x => x.Enabled).ToList();

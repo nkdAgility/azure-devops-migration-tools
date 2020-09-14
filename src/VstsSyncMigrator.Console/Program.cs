@@ -86,8 +86,8 @@ namespace VstsSyncMigrator.ConsoleApp
             //////////////////////////////////////////////////
             //////////////////////////////////////////////////
             int result = (int)Parser.Default.ParseArguments<InitOptions, ExecuteOptions, ExportADGroupsOptions>(args).MapResult(
-                (InitOptions opts) => RunInitAndReturnExitCode(opts),
-                (ExecuteOptions opts) => RunExecuteAndReturnExitCode(opts),
+                (InitOptions opts) => RunInitAndReturnExitCode(opts, host),
+                (ExecuteOptions opts) => RunExecuteAndReturnExitCode(opts, host),
                 (ExportADGroupsOptions opts) => ExportADGroupsCommand.Run(opts, logsPath),
                 errs => 1);
             //////////////////////////////////////////////////
@@ -121,7 +121,7 @@ namespace VstsSyncMigrator.ConsoleApp
             System.Threading.Thread.Sleep(1000);
         }
 
-        private static object RunExecuteAndReturnExitCode(ExecuteOptions opts)
+        private static object RunExecuteAndReturnExitCode(ExecuteOptions opts, IHost host)
         {
             Telemetry.Current.TrackEvent("ExecuteCommand");
             EngineConfiguration ec;
@@ -163,19 +163,19 @@ namespace VstsSyncMigrator.ConsoleApp
             }
             Log.Information("Config Loaded, creating engine");
 
-            VssCredentials sourceCredentials = null;
-            VssCredentials targetCredentials = null;
+            NetworkCredential sourceCredentials = null;
+            NetworkCredential targetCredentials = null;
             if (!string.IsNullOrWhiteSpace(opts.SourceUserName) && !string.IsNullOrWhiteSpace(opts.SourcePassword))
-                sourceCredentials = new VssCredentials(new Microsoft.VisualStudio.Services.Common.WindowsCredential(new NetworkCredential(opts.SourceUserName, opts.SourcePassword, opts.SourceDomain)));
+                sourceCredentials = new NetworkCredential(opts.SourceUserName, opts.SourcePassword, opts.SourceDomain);//new VssCredentials(new Microsoft.VisualStudio.Services.Common.WindowsCredential(new NetworkCredential(opts.SourceUserName, opts.SourcePassword, opts.SourceDomain)));
 
             if (!string.IsNullOrWhiteSpace(opts.TargetUserName) && !string.IsNullOrWhiteSpace(opts.TargetPassword))
-                targetCredentials = new VssCredentials(new Microsoft.VisualStudio.Services.Common.WindowsCredential(new NetworkCredential(opts.TargetUserName, opts.TargetPassword, opts.TargetDomain)));
+                targetCredentials = new NetworkCredential(opts.TargetUserName, opts.TargetPassword, opts.TargetDomain);//new VssCredentials(new Microsoft.VisualStudio.Services.Common.WindowsCredential(new NetworkCredential(opts.TargetUserName, opts.TargetPassword, opts.TargetDomain)));
 
             MigrationEngine me;
             if (sourceCredentials == null && targetCredentials == null)
-                me = new MigrationEngine(ec);
+                me = new MigrationEngine(host, ec);
             else
-                me = new MigrationEngine(ec, sourceCredentials, targetCredentials);
+                me = new MigrationEngine(host, ec, sourceCredentials, targetCredentials);
 
             
             if (!string.IsNullOrWhiteSpace(opts.ChangeSetMappingFile))
@@ -191,7 +191,7 @@ namespace VstsSyncMigrator.ConsoleApp
             return 0;
         }
 
-        private static object RunInitAndReturnExitCode(InitOptions opts)
+        private static object RunInitAndReturnExitCode(InitOptions opts, IHost host)
         {
             Telemetry.Current.TrackEvent("InitCommand");
 
