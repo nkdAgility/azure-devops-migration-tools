@@ -11,14 +11,10 @@ namespace MigrationTools.Services
 {
     public class DetectOnlineService : IDetectOnlineService
     {
-        private readonly ILogger<DetectOnlineService> _Log;
-        private readonly IConfiguration _Config;
         private readonly TelemetryClient _Telemetry;
 
-        public DetectOnlineService(ILogger<DetectOnlineService> log, IConfiguration config, TelemetryClient telemetry)
+        public DetectOnlineService(TelemetryClient telemetry)
         {
-            _Log = log;
-            _Config = config;
             _Telemetry = telemetry;
         }
 
@@ -46,7 +42,7 @@ namespace MigrationTools.Services
             catch (Exception ex)
             {
                 // Likley no network is even available
-                _Log.LogError(ex, "Error checking if we are online.");
+                Log.Error(ex, "Error checking if we are online.");
                 responce = "error";
                 isOnline = false;
             }

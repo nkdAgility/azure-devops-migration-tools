@@ -19,6 +19,9 @@ using System.Reflection;
 using MigrationTools.Core.Configuration;
 using Newtonsoft.Json;
 using MigrationTools.Core.Configuration.FieldMap;
+using MigrationTools.Sinks.AzureDevOps;
+using MigrationTools.Core.Sinks;
+using Microsoft.ApplicationInsights.Extensibility.PerfCounterCollector;
 
 namespace MigrationTools.ConsoleUI
 {
@@ -26,37 +29,26 @@ namespace MigrationTools.ConsoleUI
     {
         static DateTime _startTime = DateTime.Now;
         static Stopwatch _mainTimer = new Stopwatch();
-        static IHost host;
-        static TelemetryClient tc;
 
         static int Main(string[] args)
         {
             _mainTimer.Start();
-            var InstrumentationKey = "4b9bb17b-c7ee-43e5-b220-ec6db2c33373";
-            var sessionID = Guid.NewGuid();
             var ApplicationVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
-
+          
             var builder = new ConfigurationBuilder();
             BuildAppConfig(builder);
 
-            var aiServiceOptions = new ApplicationInsightsServiceOptions();
-            aiServiceOptions.InstrumentationKey = InstrumentationKey;
-            aiServiceOptions.ApplicationVersion = ApplicationVersion.ToString();
-
-            var telemetryConfiguration = TelemetryConfiguration.CreateDefault();
-            telemetryConfiguration.InstrumentationKey = InstrumentationKey;
-
+            var telemetryClient = GetTelemiteryClient();
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(builder.Build())
                 .Enrich.FromLogContext()
                 .Enrich.WithMachineName()
                 .Enrich.WithProcessId()
                 .WriteTo.Console()
-                .WriteTo.ApplicationInsights(telemetryConfiguration, new CustomConverter())
+                .WriteTo.ApplicationInsights(telemetryClient, new CustomConverter())
                 .WriteTo.File("log/migrate-core.log")
                 .CreateLogger();
 
-            LogContext.PushProperty("SessionID", sessionID);
             Log.Information("Application Starting");
             AsciiLogo(ApplicationVersion);
             Log.Information("Telemetry Note: We use Application Insights to collect telemetry on performance & feature usage for the tools to help our developers target features. This data is tied to a session ID that is generated and shown in the logs. This can help with debugging.");
@@ -65,32 +57,38 @@ namespace MigrationTools.ConsoleUI
             Log.Information("OSVersion: {OSVersion}", Environment.OSVersion.ToString());
             Log.Information("Version: {CurrentVersion}", ApplicationVersion);
             Log.Information("userID: {UserId}", System.Security.Principal.WindowsIdentity.GetCurrent().Name);
-            ///////////////////////////////////////////////////////
-            /// Setup Host
-            host = Host.CreateDefaultBuilder()
-                .ConfigureServices((context, services) =>
-                {
-                    services.AddSingleton<IDetectOnlineService, DetectOnlineService>();
-                    services.AddSingleton<IDetectVersionService, DetectVersionService>();
-                    services.AddApplicationInsightsTelemetryWorkerService(aiServiceOptions);
-                    services.AddTransient<IEngineConfigurationBuilder, EngineConfigurationBuilder>();
-                    services.AddSingleton<MigrationHost>();
-                })
-                .UseSerilog()
-                .Build();
-            SetupTelemetry();
-            var chk = CheckVersion(ApplicationVersion);
-            if (chk != 0)
+
+            var doService = new DetectOnlineService(telemetryClient);
+
+            if (doService.IsOnline())
             {
-                return chk;
+                var dvService = new DetectVersionService(telemetryClient);
+                Version latestVersion = dvService.GetLatestVersion();
+                Log.Information("Latest version detected as {Version_Latest}", latestVersion);
+                if (latestVersion > ApplicationVersion)
+                {
+                    Log.Warning("You are currently running version {Version_Current} and a newer version ({Version_Latest}) is available. You should upgrade now using Chocolatey command 'choco upgrade vsts-sync-migrator' from the command line.", ApplicationVersion, latestVersion);
+#if !DEBUG
+                    Console.WriteLine("Do you want to continue? (y/n)");
+                    if (Console.ReadKey().Key != ConsoleKey.Y)
+                    {
+                        Log.Warning("User aborted to update version");
+                        return 2;
+                    }
+#endif
+                }
             }
-            //////////////////////////////////////////////////
-            /// Setup Command Line
+
             int result = (int)Parser.Default.ParseArguments<InitOptions, ExecuteOptions>(args).MapResult(
-                (InitOptions opts) => RunInitAndReturnExitCode(opts, tc),
-                (ExecuteOptions opts) => RunExecuteAndReturnExitCode(opts, tc),
+                (InitOptions opts) => RunInitAndReturnExitCode(opts, telemetryClient),
+                (ExecuteOptions opts) => RunExecuteAndReturnExitCode(opts, telemetryClient),
                 errs => 1);
-            ///////////////////////////////////////////////////////
+
+            return result;
+        }
+
+        private static void NewMethod(TelemetryClient tc)
+        {
             Log.Information("Application Ending");
             _mainTimer.Stop();
             tc.TrackEvent("ApplicationEnd", null,
@@ -104,10 +102,9 @@ namespace MigrationTools.ConsoleUI
             Log.Information("The application ran in {Application_Elapsed} and finished at {Application_EndTime}", _mainTimer.Elapsed.ToString("c"), DateTime.Now.ToUniversalTime().ToLocalTime());
             Log.CloseAndFlush();
             System.Threading.Thread.Sleep(1000);
-            return result;
         }
 
-        private static int RunExecuteAndReturnExitCode(ExecuteOptions opts, TelemetryClient telemetryClient)
+        private static int RunExecuteAndReturnExitCode(ExecuteOptions opts, TelemetryClient tc)
         {
             tc.TrackEvent("ExecuteCommand");
 
@@ -121,46 +118,43 @@ namespace MigrationTools.ConsoleUI
                 Log.Information("The config file {ConfigFile} does not exist, nor does the default 'configuration.json'. Use '{ExecutableName}.exe init' to create a configuration file first", opts.ConfigFile, System.Reflection.Assembly.GetExecutingAssembly().GetName().Name);
                 return 1;
             }
-            else
-            {
-                Log.Information("Loading Config");
-                IEngineConfigurationBuilder ecb = new EngineConfigurationBuilder();
-                var ec = ecb.BuildFromFile(opts.ConfigFile);
-
-#if !DEBUG
-                string appVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(2);
-                if (ec.Version != appVersion)
+            Log.Information("Config Found, creating engine host");
+           var config = new EngineConfigurationBuilder().BuildFromFile();
+            // Setup Host
+            var host = Host.CreateDefaultBuilder()
+                .ConfigureHostConfiguration(configHost =>
                 {
-                    Log.Information("The config version {Version} does not match the current app version {appVersion}. There may be compatability issues and we recommend that you generate a new default config and then tranfer the settings accross.", ec.Version, appVersion);
-                    return 1;
-                }
-#endif
-            }
-            Log.Information("Config Loaded, creating engine");
-
-            //VssCredentials sourceCredentials = null;
-            //VssCredentials targetCredentials = null;
-            //if (!string.IsNullOrWhiteSpace(opts.SourceUserName) && !string.IsNullOrWhiteSpace(opts.SourcePassword))
-            //    sourceCredentials = new VssCredentials(new Microsoft.VisualStudio.Services.Common.WindowsCredential(new NetworkCredential(opts.SourceUserName, opts.SourcePassword, opts.SourceDomain)));
-
-            //if (!string.IsNullOrWhiteSpace(opts.TargetUserName) && !string.IsNullOrWhiteSpace(opts.TargetPassword))
-            //    targetCredentials = new VssCredentials(new Microsoft.VisualStudio.Services.Common.WindowsCredential(new NetworkCredential(opts.TargetUserName, opts.TargetPassword, opts.TargetDomain)));
-
-            //MigrationEngine me;
-            //if (sourceCredentials == null && targetCredentials == null)
-            //    me = new MigrationEngine(ec);
-            //else
-            //    me = new MigrationEngine(ec, sourceCredentials, targetCredentials);
-
-            if (!string.IsNullOrWhiteSpace(opts.ChangeSetMappingFile))
-            {
-                IChangeSetMappingProvider csmp = new ChangeSetMappingProvider(opts.ChangeSetMappingFile);
-                //csmp.ImportMappings(me.ChangeSetMapping);
-            }
-
-            //Console.Title = $"Azure DevOps Migration Tools: {System.IO.Path.GetFileName(opts.ConfigFile)} - {System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(3)} - {ec.Source.Project} - {ec.Target.Project}";
+                    configHost.SetBasePath(Directory.GetCurrentDirectory());
+                    configHost.AddJsonFile("appsettings.json", optional: true);
+                    configHost.AddEnvironmentVariables();
+                })
+                .ConfigureAppConfiguration((hostContext, configApp) =>
+                {
+                    configApp.SetBasePath(Directory.GetCurrentDirectory());
+                    configApp.AddJsonFile(opts.ConfigFile, optional: false);
+                    configApp.AddJsonFile(
+                        $"{opts.ConfigFile}.{hostContext.HostingEnvironment.EnvironmentName}.json",
+                        optional: true);
+                })
+                .ConfigureServices((context, services) =>
+                {
+                    services.AddOptions();
+                    services.AddSingleton<IDetectOnlineService, DetectOnlineService>();
+                    services.AddSingleton<IDetectVersionService, DetectVersionService>();
+                    services.AddSingleton(tc);
+                    services.AddSingleton<IEngineConfigurationBuilder, EngineConfigurationBuilder>();
+                    services.AddSingleton<EngineConfiguration>(config);
+                    services.AddSingleton<MigrationEngine>();
+                    services.AzureDevOpsWorkerServices(config);                    
+                })
+                .UseConsoleLifetime()
+                .UseSerilog()
+                .Build();
+            
+            var me = host.Services.GetRequiredService<MigrationEngine>();
+            Console.Title = $"Azure DevOps Migration Tools: {System.IO.Path.GetFileName(opts.ConfigFile)} - {System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(3)} - {config.Source.Project} - {config.Target.Project}";
             Log.Information("Engine created, running...");
-            //me.Run();
+            me.Run();
             Log.Information("Run complete...");
             return 0;
         }
@@ -209,38 +203,22 @@ namespace MigrationTools.ConsoleUI
             return 0;
         }
 
-        private static void SetupTelemetry()
+        private static TelemetryClient GetTelemiteryClient()
         {
-            tc = host.Services.GetRequiredService<TelemetryClient>();
+            var telemetryConfiguration = TelemetryConfiguration.CreateDefault();
+            telemetryConfiguration.InstrumentationKey = "4b9bb17b-c7ee-43e5-b220-ec6db2c33373";
+            var tc = new TelemetryClient(telemetryConfiguration);
             tc.Context.User.Id = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
             tc.Context.Session.Id = Guid.NewGuid().ToString();
             tc.Context.Device.OperatingSystem = Environment.OSVersion.ToString();
             tc.Context.Component.Version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            var perfCollectorModule = new PerformanceCollectorModule();
+            perfCollectorModule.Counters.Add(new PerformanceCounterCollectionRequest(
+              string.Format(@"\.NET CLR Memory({0})\# GC Handles", System.AppDomain.CurrentDomain.FriendlyName), "GC Handles"));
+            perfCollectorModule.Initialize(telemetryConfiguration);
+            return tc;
         }
 
-        private static int CheckVersion(Version ApplicationVersion)
-        {
-            var doService = ActivatorUtilities.GetServiceOrCreateInstance<IDetectOnlineService>(host.Services);
-            if (doService.IsOnline())
-            {
-                var dvService = ActivatorUtilities.GetServiceOrCreateInstance<IDetectVersionService>(host.Services);
-                Version latestVersion = dvService.GetLatestVersion();
-                Log.Information("Latest version detected as {Version_Latest}", latestVersion);
-                if (latestVersion > ApplicationVersion)
-                {
-                    Log.Warning("You are currently running version {Version_Current} and a newer version ({Version_Latest}) is available. You should upgrade now using Chocolatey command 'choco upgrade vsts-sync-migrator' from the command line.", ApplicationVersion, latestVersion);
-#if !DEBUG
-                    Console.WriteLine("Do you want to continue? (y/n)");
-                    if (Console.ReadKey().Key != ConsoleKey.Y)
-                    {
-                        Log.Warning("User aborted to update version");
-                        return 2;
-                    }
-#endif
-                }
-            }
-            return 0;
-        }
 
         static void BuildAppConfig(IConfigurationBuilder builder)
         {
@@ -290,7 +268,7 @@ namespace MigrationTools.ConsoleUI
             Log.Information("      @((((((((((((((&@&  &&...................@   @@#((((((((((((((#@@        ");
             Log.Information("                                                                               ");
             Log.Information("===============================================================================");
-            Log.Information("===                       Azure DevOps Migration Tools                       ==");
+            Log.Information("===                       Azure DevOps Migration Tools  (REST EDITION)      ==");
             Log.Information($"===                                 v{thisVersion}                                ==");
             Log.Information("===============================================================================");
         }

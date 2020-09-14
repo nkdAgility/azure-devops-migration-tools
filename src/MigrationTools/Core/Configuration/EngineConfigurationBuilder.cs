@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using MigrationTools.Core.Configuration.FieldMap;
 using MigrationTools.Core.Configuration.Processing;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,10 +19,16 @@ namespace MigrationTools.Core.Configuration
             IConfigurationRoot configuration = builder.Build();
             var settings = new EngineConfiguration();
             configuration.Bind(settings);
+//#if !DEBUG
+                string appVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(2);
+                if (settings.Version != appVersion)
+                {
+                    Log.Error("The config version {Version} does not match the current app version {appVersion}. There may be compatability issues and we recommend that you generate a new default config and then tranfer the settings accross.", settings.Version, appVersion);
+                    throw new Exception("Version in Config does not match X.X in Application. Please check and revert.");
+                }
+//#endif
             return settings;
         }
-
-
 
         public EngineConfiguration BuildDefault()
         {

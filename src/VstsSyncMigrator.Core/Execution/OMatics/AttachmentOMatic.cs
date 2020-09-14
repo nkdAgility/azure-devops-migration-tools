@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VstsSyncMigrator.Engine;
+using VstsSyncMigrator.Core;
 
 namespace VstsSyncMigrator.Core.Execution.OMatics
 {
@@ -57,7 +58,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
             }
             if (save)
             {
-                WorkItemMigrationContext.SaveWorkItem(targetWorkItem);
+                this.SaveWorkItem(targetWorkItem);
                 Log.Information("Work iTem now has {AttachmentCount} attachemnts", sourceWorkItem.Attachments.Count);
                 CleanUpAfterSave(targetWorkItem);
             }           

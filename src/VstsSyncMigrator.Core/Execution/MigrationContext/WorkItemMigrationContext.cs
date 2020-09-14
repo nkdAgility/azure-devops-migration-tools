@@ -217,7 +217,7 @@ namespace VstsSyncMigrator.Engine
                     ///////////////////////////////////////////////////////
                     if (targetWorkItem != null && targetWorkItem.IsDirty)
                     {
-                        SaveWorkItem(targetWorkItem);
+                        this.SaveWorkItem(targetWorkItem);
                     }
                     if (targetWorkItem != null)
                     {
@@ -460,7 +460,7 @@ namespace VstsSyncMigrator.Engine
                     history.Append(
                         $"This work item was migrated from a different project or organization. You can find the old version at <a href=\"{reflectedUri}\">{reflectedUri}</a>.");
                     targetWorkItem.History = history.ToString();
-                    SaveWorkItem(targetWorkItem);
+                    this.SaveWorkItem(targetWorkItem);
 
                     attachmentOMatic.CleanUpAfterSave(targetWorkItem);
                     TraceWriteLine(LogEventLevel.Information, "...Saved as {TargetWorkItemId}", targetWorkItem.Id);

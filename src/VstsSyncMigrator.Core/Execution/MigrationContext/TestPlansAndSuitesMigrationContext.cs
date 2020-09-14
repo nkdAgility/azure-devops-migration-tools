@@ -13,6 +13,7 @@ using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using VstsSyncMigrator.Engine.ComponentContext;
 using MigrationTools.Core.Configuration.Processing;
 using WorkItem = Microsoft.TeamFoundation.WorkItemTracking.Client.WorkItem;
+using VstsSyncMigrator.Core;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -317,7 +318,7 @@ namespace VstsSyncMigrator.Engine
         {
             var targetPlanWorkItem = targetWitStore.Store.GetWorkItem(workItemId);
             targetPlanWorkItem.Tags = targetPlanWorkItem.Tags + ";migrated";
-            SaveWorkItem(targetPlanWorkItem);
+            this.SaveWorkItem(targetPlanWorkItem);
         }
 
         private bool TargetPlanContansTag(int workItemId)

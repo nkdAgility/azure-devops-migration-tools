@@ -26,6 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MigrationTools.Sinks.AzureDevOps\MigrationTools.Sinks.AzureDevOps.csproj" />
     <ProjectReference Include="..\MigrationTools\MigrationTools.csproj" />
   </ItemGroup>
 
