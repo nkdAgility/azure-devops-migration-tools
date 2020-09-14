@@ -28,29 +28,123 @@ You can now customise the configuration depending on what you need to do. Howeve
 
 ```
 {
-  "Version": "8.4",
+  "Version": "0.0",
   "TelemetryEnableTrace": false,
   "workaroundForQuerySOAPBugEnabled": false,
   "Source": {
-    "Collection": "https://dev.azure.com/psd45",
-    "Project": "DemoProjs",
-    "ReflectedWorkItemIDFieldName": "TfsMigrationTool.ReflectedWorkItemId",
-    "AllowCrossProjectLinking": false
+    "Collection": "https://dev.azure.com/nkdagility-preview/",
+    "Project": "migrationSource1",
+    "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
+    "AllowCrossProjectLinking": false,
+    "PersonalAccessToken": "",
+    "LanguageMaps": {
+      "AreaPath": "Area",
+      "IterationPath": "Iteration"
+    }
   },
   "Target": {
-    "Collection": "https://dev.azure.com/psd46",
-    "Project": "DemoProjt",
-    "ReflectedWorkItemIDFieldName": "ProcessName.ReflectedWorkItemId",
-    "AllowCrossProjectLinking": false
+    "Collection": "https://dev.azure.com/nkdagility-preview/",
+    "Project": "migrationTarget1",
+    "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
+    "AllowCrossProjectLinking": false,
+    "PersonalAccessToken": "",
+    "LanguageMaps": {
+      "AreaPath": "Area",
+      "IterationPath": "Iteration"
+    }
   },
-  "FieldMaps": [],
+  "FieldMaps": [
+    {
+      "ObjectType": "MultiValueConditionalMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceFieldsAndValues": {
+        "Field1": "Value1",
+        "Field2": "Value2"
+      },
+      "targetFieldsAndValues": {
+        "Field1": "Value1",
+        "Field2": "Value2"
+      }
+    },
+    {
+      "ObjectType": "FieldBlankMapConfig",
+      "WorkItemTypeName": "*",
+      "targetField": "TfsMigrationTool.ReflectedWorkItemId"
+    },
+    {
+      "ObjectType": "FieldValueMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceField": "System.State",
+      "targetField": "System.State",
+      "defaultValue": "New",
+      "valueMapping": {
+        "Approved": "New",
+        "New": "New",
+        "Committed": "Active",
+        "In Progress": "Active",
+        "To Do": "New",
+        "Done": "Closed",
+        "Removed": "Removed"
+      }
+    },
+    {
+      "ObjectType": "FieldtoFieldMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceField": "Microsoft.VSTS.Common.BacklogPriority",
+      "targetField": "Microsoft.VSTS.Common.StackRank"
+    },
+    {
+      "ObjectType": "FieldtoFieldMultiMapConfig",
+      "WorkItemTypeName": "*",
+      "SourceToTargetMappings": {
+        "SourceField1": "TargetField1",
+        "SourceField2": "TargetField2"
+      }
+    },
+    {
+      "ObjectType": "FieldtoTagMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceField": "System.State",
+      "formatExpression": "ScrumState:{0}"
+    },
+    {
+      "ObjectType": "FieldMergeMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceField1": "System.Description",
+      "sourceField2": "Microsoft.VSTS.Common.AcceptanceCriteria",
+      "targetField": "System.Description",
+      "formatExpression": "{0} <br/><br/><h3>Acceptance Criteria</h3>{1}",
+      "doneMatch": "##DONE##"
+    },
+    {
+      "ObjectType": "RegexFieldMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceField": "COMPANY.PRODUCT.Release",
+      "targetField": "COMPANY.DEVISION.MinorReleaseVersion",
+      "pattern": "PRODUCT \\d{4}.(\\d{1})",
+      "replacement": "$1"
+    },
+    {
+      "ObjectType": "FieldValuetoTagMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceField": "Microsoft.VSTS.CMMI.Blocked",
+      "pattern": "Yes",
+      "formatExpression": "{0}"
+    },
+    {
+      "ObjectType": "TreeToTagMapConfig",
+      "WorkItemTypeName": "*",
+      "toSkip": 3,
+      "timeTravel": 1
+    }
+  ],
   "WorkItemTypeDefinition": {
     "sourceWorkItemTypeName": "targetWorkItemTypeName"
   },
   "GitRepoMapping": null,
   "Processors": [
     {
-      "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.NodeStructuresMigrationConfig",
+      "ObjectType": "NodeStructuresMigrationConfig",
       "PrefixProjectToNodes": false,
       "Enabled": false,
       "BasePaths": [
@@ -59,7 +153,7 @@ You can now customise the configuration depending on what you need to do. Howeve
       ]
     },
     {
-      "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.WorkItemMigrationConfig",
+      "ObjectType": "WorkItemMigrationConfig",
       "ReplayRevisions": true,
       "PrefixProjectToNodes": false,
       "UpdateCreatedDate": true,
@@ -73,12 +167,17 @@ You can now customise the configuration depending on what you need to do. Howeve
       "AttachmentMigration": true,
       "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
       "FixHtmlAttachmentLinks": false,
+      "SkipToFinalRevisedWorkItemType": false,
       "WorkItemCreateRetryLimit": 5,
       "FilterWorkItemsThatAlreadyExistInTarget": true,
-      "PauseAfterEachWorkItem": false
+      "PauseAfterEachWorkItem": false,
+      "AttachmentMazSize": 480000000,
+      "CollapseRevisions": false,
+      "LinkMigrationSaveEachAsAdded": false
     }
   ]
 }
+
 ```
 
 Here we are performing the following operations:
