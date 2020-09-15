@@ -31,6 +31,7 @@ namespace MigrationTools.Sinks.TfsObjectModel
             this._config = config;
             _Telemetry = telemetry;
             Connect();
+
         }
 
         public TeamProjectContext(TeamProjectConfig config, NetworkCredential credentials)

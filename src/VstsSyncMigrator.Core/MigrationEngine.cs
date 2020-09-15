@@ -26,22 +26,22 @@ namespace VstsSyncMigrator.Engine
         NetworkCredential sourceCreds;
         NetworkCredential targetCreds;
         public readonly Dictionary<int, string> ChangeSetMapping = new Dictionary<int, string>();
+        private readonly IHost _Host;
 
         public MigrationEngine(IHost host)
         {
-
+            _Host = host;
         }
         public MigrationEngine(IHost host, EngineConfiguration config)
         {
             ProcessConfiguration(config);
+            _Host = host;
         }
 
-        public MigrationEngine(IHost host,EngineConfiguration config, NetworkCredential sourceCredentials, NetworkCredential targetCredentials)
+        public void AddNetworkCredentials(NetworkCredential sourceCredentials, NetworkCredential targetCredentials)
         {
             sourceCreds = sourceCredentials;
             targetCreds = targetCredentials;
-
-            ProcessConfiguration(config);
         }
 
         private void ProcessConfiguration(EngineConfiguration config)
@@ -113,7 +113,6 @@ namespace VstsSyncMigrator.Engine
                 }
             }
         }
-
         public Dictionary<string, string> GitRepoMappings
         {
             get

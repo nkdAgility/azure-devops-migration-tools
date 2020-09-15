@@ -31,6 +31,7 @@ IEngineConfigurationBuilder ecb = new EngineConfigurationBuilder();
         [TestMethod]
         public void TestDeseraliseFromJson()
         {
+            TestSeraliseToJson();
             EngineConfiguration ec;
             StreamReader sr = new StreamReader("configuration.json");
             string configurationjson = sr.ReadToEnd();
@@ -38,7 +39,8 @@ IEngineConfigurationBuilder ecb = new EngineConfigurationBuilder();
             ec = JsonConvert.DeserializeObject<EngineConfiguration>(configurationjson,
                 new FieldMapConfigJsonConverter(),
                 new ProcessorConfigJsonConverter());
-
+            Assert.AreEqual(10, ec.FieldMaps.Count);
+            Assert.AreEqual(13, ec.Processors.Count);
         }
     }
 }
