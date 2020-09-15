@@ -20,6 +20,7 @@ using Newtonsoft.Json;
 using MigrationTools.Core.Configuration.FieldMap;
 using MigrationTools.Core.Sinks;
 using Microsoft.ApplicationInsights.Extensibility.PerfCounterCollector;
+using System.Net;
 
 namespace MigrationTools
 {
@@ -28,6 +29,62 @@ namespace MigrationTools
         protected static TelemetryClient _TelemetryClient;
         protected static DateTime _startTime = DateTime.Now;
         protected static Stopwatch _mainTimer = new Stopwatch();
+
+        public delegate IServiceCollection PlatformSpecificServices(IServiceCollection services);
+        public delegate void EngineEntryPoint(IHost host, ExecuteOptions opts);
+
+        protected static int RunExecuteAndReturnExitCode(ExecuteOptions opts, TelemetryClient tc, PlatformSpecificServices AddPlatformSpecificServices, EngineEntryPoint StartEngine)
+        {
+            tc.TrackEvent("ExecuteCommand");
+
+            if (opts.ConfigFile == string.Empty)
+            {
+                opts.ConfigFile = "configuration.json";
+            }
+
+            if (!File.Exists(opts.ConfigFile))
+            {
+                Log.Information("The config file {ConfigFile} does not exist, nor does the default 'configuration.json'. Use '{ExecutableName}.exe init' to create a configuration file first", opts.ConfigFile, System.Reflection.Assembly.GetExecutingAssembly().GetName().Name);
+                return 1;
+            }
+            Log.Information("Config Found, creating engine host");
+            var config = new EngineConfigurationBuilder().BuildFromFile(opts.ConfigFile);
+            Console.Title = $"Azure DevOps Migration Tools: {System.IO.Path.GetFileName(opts.ConfigFile)} - {System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(3)} - {config.Source.Project} - {config.Target.Project}";
+            // Setup Host
+            var host = Host.CreateDefaultBuilder()
+                .ConfigureHostConfiguration(configHost =>
+                {
+                    configHost.SetBasePath(Directory.GetCurrentDirectory());
+                    configHost.AddJsonFile("appsettings.json", optional: true);
+                    configHost.AddEnvironmentVariables();
+                })
+                .ConfigureAppConfiguration((hostContext, configApp) =>
+                {
+                    configApp.SetBasePath(Directory.GetCurrentDirectory());
+                    configApp.AddJsonFile(opts.ConfigFile, optional: false);
+                    configApp.AddJsonFile(
+                        $"{opts.ConfigFile}.{hostContext.HostingEnvironment.EnvironmentName}.json",
+                        optional: true);
+                })
+                .ConfigureServices((context, services) =>
+                {
+                    services.AddOptions();
+                    services.AddSingleton<IDetectOnlineService, DetectOnlineService>();
+                    services.AddSingleton<IDetectVersionService, DetectVersionService>();
+                    services.AddSingleton(tc);
+                    services.AddSingleton<IEngineConfigurationBuilder, EngineConfigurationBuilder>();
+                    services.AddSingleton<EngineConfiguration>(config);
+                    AddPlatformSpecificServices(services);
+                })
+                .UseConsoleLifetime()
+                .UseSerilog()
+                .Build();
+            StartEngine(host, opts);
+            Log.Information("Run complete...");
+            return 0;
+        }
+
+
 
         protected static object RunInitAndReturnExitCode(InitOptions opts, TelemetryClient telemetryClient)
         {

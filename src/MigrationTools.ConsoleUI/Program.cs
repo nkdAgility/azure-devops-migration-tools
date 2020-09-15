@@ -23,6 +23,7 @@ using MigrationTools.Sinks.AzureDevOps;
 using MigrationTools.Core.Sinks;
 using Microsoft.ApplicationInsights.Extensibility.PerfCounterCollector;
 using Microsoft.TeamFoundation.Build.WebApi;
+using System.Net;
 
 namespace MigrationTools.ConsoleUI
 {
@@ -57,67 +58,41 @@ namespace MigrationTools.ConsoleUI
             }
             int result = (int)Parser.Default.ParseArguments<InitOptions, ExecuteOptions>(args).MapResult(
                 (InitOptions opts) => RunInitAndReturnExitCode(opts, telemetryClient),
-                (ExecuteOptions opts) => RunExecuteAndReturnExitCode(opts, telemetryClient),
+                (ExecuteOptions opts) => RunExecuteAndReturnExitCode(opts, telemetryClient, AddPlatformSpecificServices, StartEngine),
                 errs => 1);
             ApplicationShutdown();
             return result;
         }
 
-
-        private static int RunExecuteAndReturnExitCode(ExecuteOptions opts, TelemetryClient tc)
+        public static void StartEngine(IHost host, ExecuteOptions opts)
         {
-            tc.TrackEvent("ExecuteCommand");
-
-            if (opts.ConfigFile == string.Empty)
-            {
-                opts.ConfigFile = "configuration.json";
-            }
-
-            if (!File.Exists(opts.ConfigFile))
-            {
-                Log.Information("The config file {ConfigFile} does not exist, nor does the default 'configuration.json'. Use '{ExecutableName}.exe init' to create a configuration file first", opts.ConfigFile, System.Reflection.Assembly.GetExecutingAssembly().GetName().Name);
-                return 1;
-            }
-            Log.Information("Config Found, creating engine host");
-           var config = new EngineConfigurationBuilder().BuildFromFile();
-           Console.Title = $"Azure DevOps Migration Tools: {System.IO.Path.GetFileName(opts.ConfigFile)} - {System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(3)} - {config.Source.Project} - {config.Target.Project}";
-            // Setup Host
-            var host = Host.CreateDefaultBuilder()
-                .ConfigureHostConfiguration(configHost =>
-                {
-                    configHost.SetBasePath(Directory.GetCurrentDirectory());
-                    configHost.AddJsonFile("appsettings.json", optional: true);
-                    configHost.AddEnvironmentVariables();
-                })
-                .ConfigureAppConfiguration((hostContext, configApp) =>
-                {
-                    configApp.SetBasePath(Directory.GetCurrentDirectory());
-                    configApp.AddJsonFile(opts.ConfigFile, optional: false);
-                    configApp.AddJsonFile(
-                        $"{opts.ConfigFile}.{hostContext.HostingEnvironment.EnvironmentName}.json",
-                        optional: true);
-                })
-                .ConfigureServices((context, services) =>
-                {
-                    services.AddOptions();
-                    services.AddSingleton<IDetectOnlineService, DetectOnlineService>();
-                    services.AddSingleton<IDetectVersionService, DetectVersionService>();
-                    services.AddSingleton(tc);
-                    services.AddSingleton<IEngineConfigurationBuilder, EngineConfigurationBuilder>();
-                    services.AddSingleton<EngineConfiguration>(config);
-                    services.AddSingleton<MigrationEngine>();
-                    services.AzureDevOpsWorkerServices(config);                    
-                })
-                .UseConsoleLifetime()
-                .UseSerilog()
-                .Build();
-            
             var me = host.Services.GetRequiredService<MigrationEngine>();
+            NetworkCredential sourceCredentials = null;
+            NetworkCredential targetCredentials = null;
+
+            if (!string.IsNullOrWhiteSpace(opts.SourceUserName) && !string.IsNullOrWhiteSpace(opts.SourcePassword))
+                sourceCredentials = new NetworkCredential(opts.SourceUserName, opts.SourcePassword, opts.SourceDomain);//new VssCredentials(new Microsoft.VisualStudio.Services.Common.WindowsCredential(new NetworkCredential(opts.SourceUserName, opts.SourcePassword, opts.SourceDomain)));
+
+            if (!string.IsNullOrWhiteSpace(opts.TargetUserName) && !string.IsNullOrWhiteSpace(opts.TargetPassword))
+                targetCredentials = new NetworkCredential(opts.TargetUserName, opts.TargetPassword, opts.TargetDomain);//new VssCredentials(new Microsoft.VisualStudio.Services.Common.WindowsCredential(new NetworkCredential(opts.TargetUserName, opts.TargetPassword, opts.TargetDomain)));
+
+           //// me.AddNetworkCredentials(sourceCredentials, targetCredentials);
+            if (!string.IsNullOrWhiteSpace(opts.ChangeSetMappingFile))
+            {
+                IChangeSetMappingProvider csmp = new ChangeSetMappingProvider(opts.ChangeSetMappingFile);
+                csmp.ImportMappings(me.ChangeSetMapping);
+            }
+
             Log.Information("Engine created, running...");
             me.Run();
-            Log.Information("Run complete...");
-            return 0;
         }
+
+        public static IServiceCollection AddPlatformSpecificServices(IServiceCollection services)
+        {
+            services.AddSingleton<MigrationEngine>();
+            return services;
+        }
+
 
     }
 }
