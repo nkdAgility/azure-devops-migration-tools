@@ -92,7 +92,7 @@ namespace VstsSyncMigrator.Engine
 
         public override void Configure(ITfsProcessingConfig config)
         {
-            throw new NotImplementedException();
+            
         }
     }
 }
