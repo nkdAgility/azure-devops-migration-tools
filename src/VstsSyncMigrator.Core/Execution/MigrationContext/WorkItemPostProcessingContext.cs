@@ -8,6 +8,8 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using MigrationTools.Core.Configuration.Processing;
+using Microsoft.Extensions.Hosting;
+using MigrationTools.Core.Configuration;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -15,15 +17,17 @@ namespace VstsSyncMigrator.Engine
     {
 
         private WorkItemPostProcessingConfig _config;
-        private MigrationEngine _me;
         //private IList<string> _workItemTypes;
         //private IList<int> _workItemIDs;
         // private string _queryBit;
 
-        public WorkItemPostProcessingContext(MigrationEngine me, WorkItemPostProcessingConfig config) : base(me, config)
+        public WorkItemPostProcessingContext(IHost host) : base(host)
         {
-            _me = me;
-            _config = config;
+        }
+
+        public override void Configure(ITfsProcessingConfig config)
+        {
+            _config = (WorkItemPostProcessingConfig)config;
         }
 
         public override string Name
@@ -136,15 +140,15 @@ namespace VstsSyncMigrator.Engine
                 }
             }
 
-            if (_me.WorkItemTypeDefinitions != null && _me.WorkItemTypeDefinitions.Count > 0)
+            if (me.TypeDefinitionMaps.Items != null && me.TypeDefinitionMaps.Items.Count > 0)
             {
-                if (_me.WorkItemTypeDefinitions.Count == 1)
+                if (me.TypeDefinitionMaps.Items.Count == 1)
                 {
-                    constraints += string.Format(" AND [System.WorkItemType] = '{0}' ", _me.WorkItemTypeDefinitions.Keys.First());
+                    constraints += string.Format(" AND [System.WorkItemType] = '{0}' ", me.TypeDefinitionMaps.Items.Keys.First());
                 }
                 else
                 {
-                    constraints += string.Format(" AND [System.WorkItemType] IN ('{0}') ", string.Join("','", _me.WorkItemTypeDefinitions.Keys));
+                    constraints += string.Format(" AND [System.WorkItemType] IN ('{0}') ", string.Join("','", me.TypeDefinitionMaps.Items.Keys));
                 }
             }
 

@@ -7,6 +7,8 @@ using VstsSyncMigrator.Engine.ComponentContext;
 using System.Linq;
 using System.Collections.Generic;
 using MigrationTools.Core.Configuration.Processing;
+using Microsoft.Extensions.Hosting;
+using MigrationTools.Core.Configuration;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -20,7 +22,7 @@ namespace VstsSyncMigrator.Engine
 
         // http://blogs.microsoft.co.il/shair/2015/02/02/tfs-api-part-56-test-configurations/
 
-        public TestVeriablesMigrationContext(MigrationEngine me, TestVariablesMigrationConfig config) : base(me, config)
+        public TestVeriablesMigrationContext(IHost host) : base(host)
         {
 
         }
@@ -88,5 +90,9 @@ namespace VstsSyncMigrator.Engine
                 variable => string.Equals(variable.Value, valueToFind, StringComparison.OrdinalIgnoreCase));
         }
 
+        public override void Configure(ITfsProcessingConfig config)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

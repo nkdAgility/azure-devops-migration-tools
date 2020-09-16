@@ -21,12 +21,12 @@ using MigrationTools.Core.Configuration.FieldMap;
 using MigrationTools.Core.Sinks;
 using Microsoft.ApplicationInsights.Extensibility.PerfCounterCollector;
 using System.Net;
+using MigrationTools.Core.Engine.Containers;
 
 namespace MigrationTools
 {
-   public class ProgramManager
+    public class ProgramManager
     {
-        protected static TelemetryClient _TelemetryClient;
         protected static DateTime _startTime = DateTime.Now;
         protected static Stopwatch _mainTimer = new Stopwatch();
 
@@ -74,6 +74,10 @@ namespace MigrationTools
                     services.AddSingleton(tc);
                     services.AddSingleton<IEngineConfigurationBuilder, EngineConfigurationBuilder>();
                     services.AddSingleton<EngineConfiguration>(config);
+                    services.AddSingleton<ProcessorContainer>();
+                    services.AddSingleton<TypeDefinitionMapContainer>();
+                    services.AddSingleton<GitRepoMapContainer>();
+                    services.AddSingleton<ChangeSetMappingContainer>();
                     AddPlatformSpecificServices(services);
                 })
                 .UseConsoleLifetime()
@@ -84,11 +88,9 @@ namespace MigrationTools
             return 0;
         }
 
-
-
         protected static object RunInitAndReturnExitCode(InitOptions opts, TelemetryClient telemetryClient)
         {
-            _TelemetryClient.TrackEvent("InitCommand");
+            Telemetry.Current.TrackEvent("InitCommand");
 
             string configFile = opts.ConfigFile;
             if (string.IsNullOrEmpty(configFile))
@@ -138,13 +140,13 @@ namespace MigrationTools
             string logsPath = CreateLogsPath();
             var logPath = Path.Combine(logsPath, "migration.log");
 
-            var logconf= new LoggerConfiguration()
+            var logconf = new LoggerConfiguration()
                 .ReadFrom.Configuration(builder.Build())
                 .Enrich.FromLogContext()
                 .Enrich.WithMachineName()
                 .Enrich.WithProcessId()
                 .WriteTo.Console()
-                .WriteTo.ApplicationInsights(GetTelemiteryClient(), new CustomConverter())
+                .WriteTo.ApplicationInsights(Telemetry.GetTelemiteryClient(), new CustomConverter())
                 .WriteTo.File(logPath)
                 .CreateLogger();
             Log.Information("Writing log to {logPath}", logPath);
@@ -170,13 +172,13 @@ namespace MigrationTools
         {
             Log.Information("Application Ending");
             _mainTimer.Stop();
-            _TelemetryClient.TrackEvent("ApplicationEnd", null,
+            Telemetry.Current.TrackEvent("ApplicationEnd", null,
                 new Dictionary<string, double> {
                         { "Application_Elapsed", _mainTimer.ElapsedMilliseconds }
                 });
-            if (_TelemetryClient != null)
+            if (Telemetry.Current != null)
             {
-                _TelemetryClient.Flush();
+                Telemetry.Current.Flush();
             }
             Log.Information("The application ran in {Application_Elapsed} and finished at {Application_EndTime}", _mainTimer.Elapsed.ToString("c"), DateTime.Now.ToUniversalTime().ToLocalTime());
             Log.CloseAndFlush();
@@ -188,7 +190,7 @@ namespace MigrationTools
             //ExceptionTelemetry excTelemetry = new ExceptionTelemetry((Exception)e.ExceptionObject);
             //excTelemetry.SeverityLevel = SeverityLevel.Critical;
             //excTelemetry.HandledAt = ExceptionHandledAt.Unhandled;
-            Log.Error((Exception)e.ExceptionObject, "An Unhandled exception occured.");
+            Log.Fatal((Exception)e.ExceptionObject, "An Unhandled exception occured.");
             Log.CloseAndFlush();
             System.Threading.Thread.Sleep(5000);
         }
@@ -199,26 +201,6 @@ namespace MigrationTools
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", optional: true, reloadOnChange: true)
                 .AddEnvironmentVariables();
-        }
-
-        protected static TelemetryClient GetTelemiteryClient()
-        {
-            if (_TelemetryClient is null)
-            {
-                var telemetryConfiguration = TelemetryConfiguration.CreateDefault();
-                telemetryConfiguration.InstrumentationKey = "4b9bb17b-c7ee-43e5-b220-ec6db2c33373";
-                var tc = new TelemetryClient(telemetryConfiguration);
-                tc.Context.User.Id = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
-                tc.Context.Session.Id = Guid.NewGuid().ToString();
-                tc.Context.Device.OperatingSystem = Environment.OSVersion.ToString();
-                tc.Context.Component.Version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
-                var perfCollectorModule = new PerformanceCollectorModule();
-                perfCollectorModule.Counters.Add(new PerformanceCounterCollectionRequest(
-                  string.Format(@"\.NET CLR Memory({0})\# GC Handles", System.AppDomain.CurrentDomain.FriendlyName), "GC Handles"));
-                perfCollectorModule.Initialize(telemetryConfiguration);
-                _TelemetryClient = tc;
-            }
-            return _TelemetryClient;
         }
 
         protected static void AsciiLogo(Version thisVersion)

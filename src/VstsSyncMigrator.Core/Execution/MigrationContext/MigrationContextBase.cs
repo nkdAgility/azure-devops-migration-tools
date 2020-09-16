@@ -5,18 +5,25 @@ using System.Diagnostics;
 using System.Text.RegularExpressions;
 using MigrationTools.Core.Engine;
 using MigrationTools.Core.Configuration;
+using MigrationTools;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 
 namespace VstsSyncMigrator.Engine
 {
     public abstract class MigrationContextBase : ITfsProcessingContext
     {
-        internal readonly MigrationEngine me;
+        protected MigrationEngine me;
+        protected IHost _host;
 
-
-        protected MigrationContextBase(MigrationEngine me, ITfsProcessingConfig config)
+        protected MigrationContextBase(IHost host)
         {
-            this.me = me;
+            _host = host;
+           
         }
+
+        public abstract void Configure(ITfsProcessingConfig config);
 
         public abstract string Name { get; }
 
@@ -24,8 +31,9 @@ namespace VstsSyncMigrator.Engine
 
         public void Execute()
         {
+            this.me = _host.Services.GetService<MigrationEngine>();
             Telemetry.Current.TrackPageView(this.Name);
-            Trace.TraceInformation(" Migration Context Start {0} ", Name);
+            Log.Information("Migration Context Start: {MigrationContextname} ", Name);
             DateTime start = DateTime.Now;
             var executeTimer = Stopwatch.StartNew();
             //////////////////////////////////////////////////
@@ -36,12 +44,13 @@ namespace VstsSyncMigrator.Engine
                 Status = ProcessingStatus.Complete;
                 executeTimer.Stop();
 
-                Trace.TraceInformation(" Migration Context Complete {0} ", Name);
+                Log.Information(" Migration Context Complete {MigrationContextname} ", Name);
             }
             catch (Exception ex)
             {
                 Status = ProcessingStatus.Failed;
                 executeTimer.Stop();
+                
                 Telemetry.Current.TrackException(ex,
                     new Dictionary<string, string>
                     {
@@ -56,7 +65,7 @@ namespace VstsSyncMigrator.Engine
                     {
                         {"MigrationContextTime", executeTimer.ElapsedMilliseconds}
                     });
-                Trace.TraceWarning($"  [EXCEPTION] {ex}");
+                Log.Fatal(ex, "Error while running {MigrationContextname}", Name);
             }
             finally
             {

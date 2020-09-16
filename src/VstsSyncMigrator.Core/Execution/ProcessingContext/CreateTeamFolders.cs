@@ -9,6 +9,7 @@ using System.Text.RegularExpressions;
 using System.Linq;
 using Microsoft.TeamFoundation.Client;
 using MigrationTools.Core.Configuration;
+using Microsoft.Extensions.Hosting;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -16,7 +17,7 @@ namespace VstsSyncMigrator.Engine
     {
 
 
-        public CreateTeamFolders(MigrationEngine me, ITfsProcessingConfig config) : base(me, config)
+        public CreateTeamFolders(IHost host) : base(host)
         {
          
         }
@@ -27,6 +28,11 @@ namespace VstsSyncMigrator.Engine
             {
                 return "CreateTeamFolders";
             }
+        }
+
+        public override void Configure(ITfsProcessingConfig config)
+        {
+           
         }
 
         internal override void InternalExecute()

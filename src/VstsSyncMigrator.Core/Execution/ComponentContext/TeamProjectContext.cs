@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.Net;
 using MigrationTools.Core.Configuration;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using MigrationTools;
+using Serilog;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -58,7 +60,7 @@ namespace VstsSyncMigrator.Engine
                     });
                 Stopwatch connectionTimer = Stopwatch.StartNew();
 				DateTime start = DateTime.Now;
-                Trace.WriteLine("Creating TfsTeamProjectCollection Object ");
+                Log.Information("Connecting to {@Config}", Config);
 
                 if (_credentials == null)
                     _Collection = new TfsTeamProjectCollection(Config.Collection);
@@ -67,12 +69,12 @@ namespace VstsSyncMigrator.Engine
                 
                 try
                 {
-                    Trace.WriteLine(string.Format("Connected to {0} ", _Collection.Uri.ToString()));
-                    Trace.WriteLine(string.Format("validating security for {0} ", _Collection.AuthorizedIdentity.ToString()));
+                    Log.Debug("Connected to {CollectionUrl} ", _Collection.Uri.ToString());
+                    Log.Debug("validating security for {@AuthorizedIdentity} ", _Collection.AuthorizedIdentity);
                     _Collection.EnsureAuthenticated();
                     connectionTimer.Stop();
                     Telemetry.Current.TrackDependency("TeamService", "EnsureAuthenticated", start, connectionTimer.Elapsed, true);
-                    Trace.TraceInformation(string.Format(" Access granted "));
+                    Log.Information(" Access granted ");
                 }
                 catch (TeamFoundationServiceUnavailableException ex)
                 {
@@ -85,7 +87,7 @@ namespace VstsSyncMigrator.Engine
                        new Dictionary<string, double> {
                             { "ConnectionTimer", connectionTimer.ElapsedMilliseconds }
                        });
-                    Trace.TraceWarning($"  [EXCEPTION] {ex}");
+                    Log.Error(ex, "Unable to connect to {@Config}", Config);
                     throw;
                 }
             }            

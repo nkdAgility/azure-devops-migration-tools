@@ -35,8 +35,9 @@ namespace VstsSyncMigrator.ConsoleApp
 
         public static int Main(string[] args)
         {
-            var telemetryClient = GetTelemiteryClient();
+            var telemetryClient = Telemetry.GetTelemiteryClient();
             Log.Logger = BuildLogger();
+
             /////////////////////////////////////////////////////////
             Trace.Listeners.Add(new TextWriterTraceListener(Console.Out)); // TODO: Remove once Trace replaced with log
             var oldlogPath = Path.Combine(CreateLogsPath(), "old-migration.log"); // TODO: Remove once Trace replaced with log
@@ -79,6 +80,7 @@ namespace VstsSyncMigrator.ConsoleApp
         public static void ExecuteEntryPoint(IHost host, ExecuteOptions opts)
         {
             var me = host.Services.GetRequiredService<Engine.MigrationEngine>();
+
             NetworkCredential sourceCredentials = null;
             NetworkCredential targetCredentials = null;
 
@@ -89,11 +91,6 @@ namespace VstsSyncMigrator.ConsoleApp
                 targetCredentials = new NetworkCredential(opts.TargetUserName, opts.TargetPassword, opts.TargetDomain);//new VssCredentials(new Microsoft.VisualStudio.Services.Common.WindowsCredential(new NetworkCredential(opts.TargetUserName, opts.TargetPassword, opts.TargetDomain)));
 
             me.AddNetworkCredentials(sourceCredentials, targetCredentials);
-            if (!string.IsNullOrWhiteSpace(opts.ChangeSetMappingFile))
-            {
-                IChangeSetMappingProvider csmp = new ChangeSetMappingProvider(opts.ChangeSetMappingFile);
-                csmp.ImportMappings(me.ChangeSetMapping);
-            }
 
             Log.Information("Engine created, running...");
             me.Run();
@@ -102,6 +99,8 @@ namespace VstsSyncMigrator.ConsoleApp
       public static IServiceCollection AddPlatformSpecificServices(IServiceCollection services)
         {
             services.AddSingleton<Engine.MigrationEngine>();
+            services.AddSingleton<WorkItemMigrationContext>();
+            services.AddSingleton<NodeStructuresMigrationContext>();
             return services;
         }
 

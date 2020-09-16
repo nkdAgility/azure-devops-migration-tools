@@ -24,16 +24,16 @@ using MigrationTools.Core.Sinks;
 using Microsoft.ApplicationInsights.Extensibility.PerfCounterCollector;
 using Microsoft.TeamFoundation.Build.WebApi;
 using System.Net;
+using MigrationTools.Core.Engine;
 
 namespace MigrationTools.ConsoleUI
 {
     class Program : ProgramManager
     {
         
-
         static int Main(string[] args)
         {
-            var telemetryClient = GetTelemiteryClient();
+            var telemetryClient = Telemetry.GetTelemiteryClient();
             Log.Logger = BuildLogger();
             ApplicationStartup(args);
             var doService = new DetectOnlineService(telemetryClient);
@@ -66,7 +66,7 @@ namespace MigrationTools.ConsoleUI
 
         public static void StartEngine(IHost host, ExecuteOptions opts)
         {
-            var me = host.Services.GetRequiredService<MigrationEngine>();
+            var me = host.Services.GetRequiredService<MigrationEngineCore>();
             NetworkCredential sourceCredentials = null;
             NetworkCredential targetCredentials = null;
 
@@ -75,21 +75,18 @@ namespace MigrationTools.ConsoleUI
 
             if (!string.IsNullOrWhiteSpace(opts.TargetUserName) && !string.IsNullOrWhiteSpace(opts.TargetPassword))
                 targetCredentials = new NetworkCredential(opts.TargetUserName, opts.TargetPassword, opts.TargetDomain);//new VssCredentials(new Microsoft.VisualStudio.Services.Common.WindowsCredential(new NetworkCredential(opts.TargetUserName, opts.TargetPassword, opts.TargetDomain)));
-
-           //// me.AddNetworkCredentials(sourceCredentials, targetCredentials);
-            if (!string.IsNullOrWhiteSpace(opts.ChangeSetMappingFile))
-            {
-                IChangeSetMappingProvider csmp = new ChangeSetMappingProvider(opts.ChangeSetMappingFile);
-                csmp.ImportMappings(me.ChangeSetMapping);
-            }
+            //me.AddNetworkCredentials(sourceCredentials, targetCredentials);
 
             Log.Information("Engine created, running...");
+            
             me.Run();
         }
 
         public static IServiceCollection AddPlatformSpecificServices(IServiceCollection services)
         {
-            services.AddSingleton<MigrationEngine>();
+            services.AddSingleton<MigrationEngineCore>();
+            services.AddTransient<ITeamProjectContext, TeamProjectContext>();
+            
             return services;
         }
 

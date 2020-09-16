@@ -25,13 +25,16 @@ using Serilog;
 using Serilog.Events;
 using Serilog.Context;
 using Microsoft.ApplicationInsights.DataContracts;
+using MigrationTools;
+using Microsoft.Extensions.Hosting;
+using MigrationTools.Core.Configuration;
 
 namespace VstsSyncMigrator.Engine
 {
 
     public class WorkItemMigrationContext : MigrationContextBase
     {
-        private readonly WorkItemMigrationConfig _config;
+        private WorkItemMigrationConfig _config;
         private List<String> _ignore;
         private WorkItemTrackingHttpClient _witClient;
         private WorkItemLinkOMatic workItemLinkOMatic = new WorkItemLinkOMatic();
@@ -49,21 +52,16 @@ namespace VstsSyncMigrator.Engine
         static int _totalWorkItem = 0;
         static string workItemLogTeamplate = "[{sourceWorkItemTypeName,20}][Complete:{currentWorkItem,6}/{totalWorkItems}][sid:{sourceWorkItemId,6}|Rev:{sourceRevisionInt,3}][tid:{targetWorkItemId,6} | ";
 
-        public WorkItemMigrationContext(MigrationEngine me, WorkItemMigrationConfig config)
-            : base(me, config)
+        public WorkItemMigrationContext(IHost host)
+            : base(host)
         {
             contextLog = Log.ForContext<WorkItemMigrationContext>();
-            _config = config;
-            PopulateIgnoreList();
-
-            VssClientCredentials adoCreds = new VssClientCredentials();
-            _witClient = new WorkItemTrackingHttpClient(me.Target.Collection.Uri, adoCreds);
-
-            var workItemServer = me.Source.Collection.GetService<WorkItemServer>();
-            attachmentOMatic = new AttachmentOMatic(workItemServer, config.AttachmentWorkingPath, config.AttachmentMazSize);
-            repoOMatic = new RepoOMatic(me);
-
-
+        }
+        
+        public override void Configure(ITfsProcessingConfig config)
+        {
+            _config = (WorkItemMigrationConfig)config;
+           
         }
 
         private void PopulateIgnoreList()
@@ -99,6 +97,19 @@ namespace VstsSyncMigrator.Engine
 
         internal override void InternalExecute()
         {
+            if (_config == null)
+            {
+                throw new Exception("You must call Configure() first");
+            }
+            var workItemServer = me.Source.Collection.GetService<WorkItemServer>();
+            attachmentOMatic = new AttachmentOMatic(workItemServer, _config.AttachmentWorkingPath, _config.AttachmentMazSize);
+            repoOMatic = new RepoOMatic(me);
+            VssClientCredentials adoCreds = new VssClientCredentials();
+            _witClient = new WorkItemTrackingHttpClient(me.Target.Collection.Uri, adoCreds);
+            //Validation: make sure that the ReflectedWorkItemId field name specified in the config exists in the target process, preferably on each work item type.
+            ConfigValidation();
+            PopulateIgnoreList();
+
             var stopwatch = Stopwatch.StartNew();
             //////////////////////////////////////////////////
             var sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.BypassRules);
@@ -125,10 +136,6 @@ namespace VstsSyncMigrator.Engine
             _count = sourceWorkItems.Count;
             _elapsedms = 0;
             _totalWorkItem = sourceWorkItems.Count;
-
-            //Validation: make sure that the ReflectedWorkItemId field name specified in the config exists in the target process, preferably on each work item type.
-            ConfigValidation();
-
             foreach (WorkItem sourceWorkItem in sourceWorkItems)
             {
                 workItemLog = contextLog.ForContext("SourceWorkItemId", sourceWorkItem.Id);
@@ -336,10 +343,10 @@ namespace VstsSyncMigrator.Engine
 
                 string finalDestType = last.Type.Name;
 
-                if (skipToFinalRevisedWorkItemType && me.WorkItemTypeDefinitions.ContainsKey(finalDestType))
+                if (skipToFinalRevisedWorkItemType && me.TypeDefinitionMaps.Items.ContainsKey(finalDestType))
                 {
                     finalDestType =
-                       me.WorkItemTypeDefinitions[finalDestType].Map();
+                       me.TypeDefinitionMaps.Items[finalDestType].Map();
                 }
 
                 //If work item hasn't been created yet, create a shell
@@ -377,10 +384,10 @@ namespace VstsSyncMigrator.Engine
 
                     // Decide on WIT
                     string destType = currentRevisionWorkItem.Type.Name;
-                    if (me.WorkItemTypeDefinitions.ContainsKey(destType))
+                    if (me.TypeDefinitionMaps.Items.ContainsKey(destType))
                     {
                         destType =
-                           me.WorkItemTypeDefinitions[destType].Map();
+                           me.TypeDefinitionMaps.Items[destType].Map();
                     }
 
                     //If the work item already exists and its type has changed, update its type. Done this way because there doesn't appear to be a way to do this through the store.
@@ -713,21 +720,20 @@ namespace VstsSyncMigrator.Engine
             //Make sure that the ReflectedWorkItemId field name specified in the config exists in the target process, preferably on each work item type
             var fields = _witClient.GetFieldsAsync(me.Target.Config.Project).Result;
             bool rwiidFieldExists = fields.Any(x => x.ReferenceName == me.Target.Config.ReflectedWorkItemIDFieldName || x.Name == me.Target.Config.ReflectedWorkItemIDFieldName);
-            Debug.WriteLine($"Found {fields.Count.ToString("n0")} work item fields.");
+            contextLog.Information("Found {FieldsFoundCount} work item fields.", fields.Count.ToString("n0"));
             if (rwiidFieldExists)
-                Trace.WriteLine($"Found '{me.Target.Config.ReflectedWorkItemIDFieldName}' in this project, proceeding.");
+                contextLog.Information("Found '{ReflectedWorkItemIDFieldName}' in this project, proceeding.", me.Target.Config.ReflectedWorkItemIDFieldName);
             else
             {
-                Trace.WriteLine($"Config file specifies '{me.Target.Config.ReflectedWorkItemIDFieldName}', which wasn't found.");
-                Trace.WriteLine("Instead, found:");
+                contextLog.Information("Config file specifies '{ReflectedWorkItemIDFieldName}', which wasn't found.", me.Target.Config.ReflectedWorkItemIDFieldName);
+                contextLog.Information("Instead, found:");
                 foreach (var field in fields.OrderBy(x => x.Name))
-                    Trace.WriteLine($"{field.Type.ToString().PadLeft(15)} - {field.Name.PadRight(20)} - {field.ReferenceName ?? ""}");
+                    contextLog.Information("{FieldType} - {FieldName} - {FieldRefName}", field.Type.ToString().PadLeft(15), field.Name.PadRight(20), field.ReferenceName ?? "");
                 throw new Exception("Running a replay migration requires a ReflectedWorkItemId field to be defined in the target project's process.");
             }
         }
 
-
-
+  
     }
 
 

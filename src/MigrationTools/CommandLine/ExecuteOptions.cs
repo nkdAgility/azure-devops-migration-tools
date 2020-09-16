@@ -29,7 +29,5 @@ namespace MigrationTools.CommandLine
         [Option("targetPassword", Required = false, HelpText = "Password used to connect to target TFS instance.")]
         public string TargetPassword { get; set; }
 
-        [Option("changeSetMappingFile", Required = false, HelpText = "Mapping between changeset id and commit id. Used to fix work item changeset links.")]
-        public string ChangeSetMappingFile { get; set; }
     }
 }

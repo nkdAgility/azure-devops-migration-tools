@@ -18,30 +18,32 @@ namespace MigrationTools.Sinks.TfsObjectModel
         private readonly TelemetryClient _Telemetry;
         private TfsTeamProjectCollection _Collection;
         private bool bypassRules = true;
-        private WorkItemStore wistore;
+        private WorkItemStore _wistore;
         private Dictionary<int, WorkItem> foundWis;
         private VssCredentials _credentials;
 
-        private WorkItemStore Store { get { return wistore; } }
+        private WorkItemStore Store { get { return _wistore; } }
         public TeamProjectConfig Config { get { return _config; } }
 
-        public TeamProjectContext(TeamProjectConfig config, TelemetryClient telemetry)
+        public TeamProjectContext(TelemetryClient telemetry)
         {
-
-            this._config = config;
-            _Telemetry = telemetry;
-            Connect();
-
+          _Telemetry = telemetry;
         }
 
-        public TeamProjectContext(TeamProjectConfig config, NetworkCredential credentials)
+        public void Connect(TeamProjectConfig config)
+        {
+            _config = config;
+            Connect();
+        }
+
+        public void Connect(TeamProjectConfig config, NetworkCredential credentials)
         {
             _config = config;
             _credentials = new VssCredentials(new Microsoft.VisualStudio.Services.Common.WindowsCredential(credentials)); ;
             Connect();
         }
 
-        public void Connect()
+        private void Connect()
         {
             if (_Collection == null)
             {
@@ -87,13 +89,14 @@ namespace MigrationTools.Sinks.TfsObjectModel
             }
             ConnectStore();
         }
+
         private void ConnectStore()
         {
             var startTime = DateTime.UtcNow;
             var timer = System.Diagnostics.Stopwatch.StartNew();
             try
             {
-                wistore = new WorkItemStore(_Collection, bypassRules ? WorkItemStoreFlags.BypassRules : WorkItemStoreFlags.None);
+                _wistore = new WorkItemStore(_Collection, bypassRules ? WorkItemStoreFlags.BypassRules : WorkItemStoreFlags.None);
                 timer.Stop();
                 _Telemetry.TrackDependency("TeamService", "GetWorkItemStore", startTime, timer.Elapsed, true);
             }

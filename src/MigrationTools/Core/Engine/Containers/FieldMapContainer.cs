@@ -4,30 +4,31 @@ using MigrationTools.Core.DataContracts;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text;
 
-namespace MigrationTools.Core.Engine.FieldMaps
+namespace MigrationTools.Core.Engine.Containers
 {
-   public class FieldMapManager
+   public class FieldMapContainer : EngineContainer<Dictionary<string, List<IFieldMap>>>
     {
-        private readonly IHost _Host;
-        private readonly EngineConfiguration _config;
-       public Dictionary<string, List<IFieldMap>> fieldMapps = new Dictionary<string, List<IFieldMap>>();
+       public  Dictionary<string, List<IFieldMap>> fieldMapps = new Dictionary<string, List<IFieldMap>>();
 
-        public FieldMapManager(IHost host, EngineConfiguration config)
-        {
-            _Host = host;
-            _config = config;
-            ImportFieldMaps();
+        public FieldMapContainer(IHost host, EngineConfiguration config) : base(host, config)
+        {            
         }
 
          public int Count { get { return fieldMapps.Count; } }
 
-        private void ImportFieldMaps()
+        public override Dictionary<string, List<IFieldMap>> Items
         {
-            if (_config.FieldMaps != null)
+            get { return fieldMapps; }
+        }
+
+        protected override void Configure()
+        {
+            if (Config.FieldMaps != null)
             {
-                foreach (IFieldMapConfig fieldmapConfig in _config.FieldMaps)
+                foreach (IFieldMapConfig fieldmapConfig in Config.FieldMaps)
                 {
                     Log.Information("{Context}: Adding FieldMap {FieldMapName}", fieldmapConfig.FieldMap, "MigrationEngine");
                     string typePattern = $"VstsSyncMigrator.Engine.ComponentContext.{fieldmapConfig.FieldMap}";
@@ -41,8 +42,6 @@ namespace MigrationTools.Core.Engine.FieldMaps
                 }
             }
         }
-
-
 
         public void AddFieldMap(string workItemTypeName, IFieldMap fieldToTagFieldMap)
         {

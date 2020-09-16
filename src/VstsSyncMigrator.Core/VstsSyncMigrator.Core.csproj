@@ -400,7 +400,6 @@
     <Compile Include="Execution\MigrationContext\TestPlansAndSuitesMigrationContext.cs" />
     <Compile Include="Execution\FieldMaps\RegexFieldMap.cs" />
     <Compile Include="Execution\FieldMaps\TreeToTagFieldMap.cs" />
-    <Compile Include="Telemetry.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config">

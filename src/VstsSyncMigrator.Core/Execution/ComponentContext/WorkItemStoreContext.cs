@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Diagnostics;
 using Microsoft.TeamFoundation.Server;
 using System.Text;
+using MigrationTools;
 
 namespace VstsSyncMigrator.Engine
 {

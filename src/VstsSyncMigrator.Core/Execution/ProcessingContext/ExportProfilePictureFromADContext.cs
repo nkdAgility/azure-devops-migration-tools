@@ -13,15 +13,15 @@ using System.DirectoryServices.ActiveDirectory;
 using System.DirectoryServices.AccountManagement;
 using System.Net;
 using MigrationTools.Core.Configuration.Processing;
+using MigrationTools.Core.Configuration;
+using Microsoft.Extensions.Hosting;
 
 namespace VstsSyncMigrator.Engine
 {
     public class ExportProfilePictureFromADContext : ProcessingContextBase
     {
 
-        //private readonly TfsTeamService teamService;
-        //private readonly ProjectInfo projectInfo;
-        private readonly IIdentityManagementService2 ims2;
+        private IIdentityManagementService2 ims2;
         ExportProfilePictureFromADConfig config;
 
         public override string Name
@@ -32,11 +32,16 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        public ExportProfilePictureFromADContext(MigrationEngine me, ExportProfilePictureFromADConfig config) : base(me, config)
+        public ExportProfilePictureFromADContext(IHost Host) : base(Host)
+        {
+
+        }
+
+        public override void Configure(ITfsProcessingConfig config)
         {
             //http://www.codeproject.com/Articles/18102/Howto-Almost-Everything-In-Active-Directory-via-C
             ims2 = (IIdentityManagementService2)me.Target.Collection.GetService(typeof(IIdentityManagementService2));
-            this.config = config;
+            this.config = (ExportProfilePictureFromADConfig)config;
         }
 
         internal override void InternalExecute()

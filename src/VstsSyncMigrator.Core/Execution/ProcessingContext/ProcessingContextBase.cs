@@ -8,6 +8,10 @@ using System.Linq;
 using System.Net;
 using MigrationTools.Core.Configuration;
 using MigrationTools.Core.Engine;
+using MigrationTools;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -15,12 +19,17 @@ namespace VstsSyncMigrator.Engine
     {
         internal MigrationEngine me;
         ProcessingStatus status = ProcessingStatus.None;
+        private readonly IHost _Host;
+
         public MigrationEngine Engine { get { return me; } }
 
-        public ProcessingContextBase(MigrationEngine me, ITfsProcessingConfig config)
+        public ProcessingContextBase(IHost host)
         {
-            this.me = me;
+            _Host = host;
+            this.me = _Host.Services.GetService<MigrationEngine>();
         }
+
+        public abstract void Configure(ITfsProcessingConfig config);
 
         public abstract string Name { get; }
 
@@ -71,7 +80,7 @@ namespace VstsSyncMigrator.Engine
                       new Dictionary<string, double> {
                             { "ProcessingContextTime", executeTimer.ElapsedMilliseconds }
                       });
-                Trace.TraceWarning($"  [EXCEPTION] {ex}");
+                Log.Fatal(ex, "Processing Context failed.");
             }
             finally
             {
@@ -81,5 +90,6 @@ namespace VstsSyncMigrator.Engine
 
         internal abstract void InternalExecute();
 
+        
     }
 }

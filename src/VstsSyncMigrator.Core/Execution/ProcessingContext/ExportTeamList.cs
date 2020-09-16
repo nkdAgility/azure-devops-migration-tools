@@ -12,6 +12,7 @@ using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.Framework.Common;
 using MigrationTools.Core.Configuration.Processing;
 using MigrationTools.Core.Configuration;
+using Microsoft.Extensions.Hosting;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -19,7 +20,7 @@ namespace VstsSyncMigrator.Engine
     {
 
 
-        public ExportTeamList(MigrationEngine me, ITfsProcessingConfig config) : base(me, config)
+        public ExportTeamList(IHost Host) : base(Host)
         {
 
         }
@@ -30,6 +31,11 @@ namespace VstsSyncMigrator.Engine
             {
                 return "ExportTeamList";
             }
+        }
+
+        public override void Configure(ITfsProcessingConfig config)
+        {
+         
         }
 
         internal override void InternalExecute()

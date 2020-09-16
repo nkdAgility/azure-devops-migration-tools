@@ -11,18 +11,6 @@ namespace VstsSyncMigrator
     {
         public static string TokenForUser;
 
-        /// <summary>
-        /// Get Active Directory Client for User.
-        /// </summary>
-        /// <returns>ActiveDirectoryClient for User.</returns>
-        public static ActiveDirectoryClient GetActiveDirectoryClientAsUser(string tenantName)
-        {
-            Uri servicePointUri = new Uri(GlobalConstants.ResourceUrl);
-            Uri serviceRoot = new Uri(servicePointUri, tenantName);
-            ActiveDirectoryClient activeDirectoryClient = new ActiveDirectoryClient(serviceRoot,
-                async () => await AcquireTokenAsyncForUser());
-            return activeDirectoryClient;
-        }
 
         /// <summary>
         /// Async task to acquire token for User.

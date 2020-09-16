@@ -10,6 +10,7 @@ namespace MigrationTools.Core.Configuration
         public string Version { get; set; }
         public bool TelemetryEnableTrace { get; set; }
         public bool workaroundForQuerySOAPBugEnabled { get; set; }
+        public string ChangeSetMappingFile { get; set; }
         public TeamProjectConfig Source { get; set; }
         public TeamProjectConfig Target { get; set; }
         public List<IFieldMapConfig> FieldMaps { get; set; }
