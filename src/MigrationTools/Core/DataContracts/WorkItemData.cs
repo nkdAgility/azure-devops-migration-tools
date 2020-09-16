@@ -8,6 +8,7 @@ namespace MigrationTools.Core.DataContracts
     {
         public string id { get; set; }
         public string title { get; set; }
+        public String Type { get; set; }
         public IDictionary<string, object> Fields { get; set; }
 
     }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using MigrationTools.Core.Configuration.FieldMap;
 using MigrationTools.Core.Configuration.Processing;
+using Newtonsoft.Json;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -13,21 +14,28 @@ namespace MigrationTools.Core.Configuration
     {
         public EngineConfiguration BuildFromFile(string configFile = "configuration.json")
         {
-            var builder = new ConfigurationBuilder();
-            builder.SetBasePath(Directory.GetCurrentDirectory());
-            builder.AddJsonFile(configFile, optional: false, reloadOnChange: true);
-            IConfigurationRoot configuration = builder.Build();
-            var settings = new EngineConfiguration();
-            configuration.Bind(settings);
+            string configurationjson;
+            using (var sr = new StreamReader(configFile))
+                configurationjson = sr.ReadToEnd();
+            var ec = JsonConvert.DeserializeObject<EngineConfiguration>(configurationjson,
+                    new FieldMapConfigJsonConverter(),
+                    new ProcessorConfigJsonConverter());
+
+            //var builder = new ConfigurationBuilder();
+            //builder.SetBasePath(Directory.GetCurrentDirectory());
+            //builder.AddJsonFile(configFile, optional: false, reloadOnChange: true);
+            //IConfigurationRoot configuration = builder.Build();
+            //var settings = new EngineConfiguration();
+            //configuration.Bind(settings);
 //#if !DEBUG
                 string appVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(2);
-                if (settings.Version != appVersion)
+                if (ec.Version != appVersion)
                 {
-                    Log.Error("The config version {Version} does not match the current app version {appVersion}. There may be compatability issues and we recommend that you generate a new default config and then tranfer the settings accross.", settings.Version, appVersion);
+                    Log.Error("The config version {Version} does not match the current app version {appVersion}. There may be compatability issues and we recommend that you generate a new default config and then tranfer the settings accross.", ec.Version, appVersion);
                     throw new Exception("Version in Config does not match X.X in Application. Please check and revert.");
                 }
 //#endif
-            return settings;
+            return ec;
         }
 
         public EngineConfiguration BuildDefault()

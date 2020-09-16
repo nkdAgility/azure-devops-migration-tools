@@ -5,12 +5,11 @@ using System.IO;
 using MigrationTools.Core.Configuration.FieldMap;
 using MigrationTools.Core.Configuration;
 
-namespace VstsSyncMigrator.Console.Tests
+namespace MigrationTools.Tests
 {
     
-
     [TestClass]
-    public class ProgramTests
+    public class EngineConfigurationTests
     {
 
 IEngineConfigurationBuilder ecb = new EngineConfigurationBuilder();

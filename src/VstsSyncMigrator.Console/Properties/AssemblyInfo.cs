@@ -9,9 +9,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Azure DevOps Migration Tools")]
 [assembly: AssemblyDescription("Azure DevOps Migration Tools allows you to bulk edit data in Microsoft Team Foundation Server (TFS) and Azure DevOps Services. You can migrate work items, area & iterations, & test data from one Team Project to another. You can builk update work items and apply processing rules against your server or account.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("naked Agility Limited")]
-[assembly: AssemblyProduct("Azure DevOps Migration Tools")]
-[assembly: AssemblyCopyright("Copyright © naked Agility Limited 2016")]
+[assembly: AssemblyCompany("naked Agility with Martin Hinshelwood")]
+[assembly: AssemblyProduct("Azure DevOps Migration Tools  [ObjectModel]")]
+[assembly: AssemblyCopyright("Copyright © naked Agility Limited 2020")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

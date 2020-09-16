@@ -5,7 +5,7 @@ using System.Text;
 
 namespace MigrationTools.Core.Engine
 {
-    interface IFieldMap
+   public interface IFieldMap
     {
         string Name { get; }
         string MappingDisplayName { get; }

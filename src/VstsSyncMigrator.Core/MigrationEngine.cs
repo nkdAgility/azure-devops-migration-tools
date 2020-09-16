@@ -10,37 +10,38 @@ using MigrationTools.Core.Configuration;
 using MigrationTools.Core.Configuration.FieldMap;
 using MigrationTools.Core.Configuration.Processing;
 using MigrationTools.Core.Engine;
+using Microsoft.Extensions.Hosting;
+using System.Net;
 
 namespace VstsSyncMigrator.Engine
 {
    public class MigrationEngine
     {
         List<ITfsProcessingContext> processors = new List<ITfsProcessingContext>();
-        List<Action<WorkItem, WorkItem>> processorActions = new List<Action<WorkItem, WorkItem>>();
-        Dictionary<string, List<IFieldMap>> fieldMapps = new Dictionary<string, List<IFieldMap>>();
+        Dictionary<string, List<ComponentContext.IFieldMap>> fieldMapps = new Dictionary<string, List<ComponentContext.IFieldMap>>();
         Dictionary<string, IWitdMapper> workItemTypeDefinitions = new Dictionary<string, IWitdMapper>();
         Dictionary<string, string> gitRepoMapping = new Dictionary<string, string>();
         ITeamProjectContext source;
         ITeamProjectContext target;
-        VssCredentials sourceCreds;
-        VssCredentials targetCreds;
+        NetworkCredential sourceCreds;
+        NetworkCredential targetCreds;
         public readonly Dictionary<int, string> ChangeSetMapping = new Dictionary<int, string>();
+        private readonly IHost _Host;
 
-        public MigrationEngine()
+        public MigrationEngine(IHost host)
         {
-
+            _Host = host;
         }
-        public MigrationEngine(EngineConfiguration config)
+        public MigrationEngine(IHost host, EngineConfiguration config)
         {
             ProcessConfiguration(config);
+            _Host = host;
         }
 
-        public MigrationEngine(EngineConfiguration config, VssCredentials sourceCredentials, VssCredentials targetCredentials)
+        public void AddNetworkCredentials(NetworkCredential sourceCredentials, NetworkCredential targetCredentials)
         {
             sourceCreds = sourceCredentials;
             targetCreds = targetCredentials;
-
-            ProcessConfiguration(config);
         }
 
         private void ProcessConfiguration(EngineConfiguration config)
@@ -72,7 +73,7 @@ namespace VstsSyncMigrator.Engine
                         Log.Error("Type " + typePattern + " not found.", typePattern);
                         throw new Exception("Type " + typePattern + " not found.");
                     }
-                    this.AddFieldMap(fieldmapConfig.WorkItemTypeName, (IFieldMap)Activator.CreateInstance(t, fieldmapConfig));
+                    this.AddFieldMap(fieldmapConfig.WorkItemTypeName, (ComponentContext.IFieldMap)Activator.CreateInstance(t, fieldmapConfig));
                 }
             }          
             if (config.GitRepoMapping != null)
@@ -84,7 +85,7 @@ namespace VstsSyncMigrator.Engine
                 foreach (string key in config.WorkItemTypeDefinition.Keys)
                 {
                     Log.Information("{Context}: Adding Work Item Type {WorkItemType}", key, "MigrationEngine");
-                    this.AddWorkItemTypeDefinition(key, new DiscreteWitMapper(config.WorkItemTypeDefinition[key]));
+                    this.AddWorkItemTypeDefinition(key, new WitMapper(config.WorkItemTypeDefinition[key]));
                 }
             }
             var enabledProcessors = config.Processors.Where(x => x.Enabled).ToList();
@@ -112,7 +113,6 @@ namespace VstsSyncMigrator.Engine
                 }
             }
         }
-
         public Dictionary<string, string> GitRepoMappings
         {
             get
@@ -154,7 +154,6 @@ namespace VstsSyncMigrator.Engine
                 },
                 new Dictionary<string, double> {
                     { "Processors", processors.Count },
-                    { "Actions",  processorActions.Count},
                     { "Mappings", fieldMapps.Count }
                 });
             Stopwatch engineTimer = Stopwatch.StartNew();
@@ -206,11 +205,11 @@ namespace VstsSyncMigrator.Engine
             target = teamProjectContext;
         }
 
-        public void AddFieldMap(string workItemTypeName, IFieldMap fieldToTagFieldMap)
+        public void AddFieldMap(string workItemTypeName, ComponentContext.IFieldMap fieldToTagFieldMap)
         {
             if (!fieldMapps.ContainsKey(workItemTypeName))
             {
-                fieldMapps.Add(workItemTypeName, new List<IFieldMap>());
+                fieldMapps.Add(workItemTypeName, new List<ComponentContext.IFieldMap>());
             }
             fieldMapps[workItemTypeName].Add(fieldToTagFieldMap);
         }
@@ -246,9 +245,9 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        private  void ProcessFieldMapList(WorkItem source, WorkItem target, List<IFieldMap> list)
+        private  void ProcessFieldMapList(WorkItem source, WorkItem target, List<ComponentContext.IFieldMap> list)
         {
-            foreach (IFieldMap map in list)
+            foreach (ComponentContext.IFieldMap map in list)
             {
                 Log.Debug("{Context} Running Field Map: {MapName} {MappingDisplayName}", map.Name, map.MappingDisplayName);
                 map.Execute(source, target);
