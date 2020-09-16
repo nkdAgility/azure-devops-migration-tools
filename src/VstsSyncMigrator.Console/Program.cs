@@ -37,6 +37,7 @@ namespace VstsSyncMigrator.ConsoleApp
         {
             var telemetryClient = Telemetry.GetTelemiteryClient();
             Log.Logger = BuildLogger();
+
             /////////////////////////////////////////////////////////
             Trace.Listeners.Add(new TextWriterTraceListener(Console.Out)); // TODO: Remove once Trace replaced with log
             var oldlogPath = Path.Combine(CreateLogsPath(), "old-migration.log"); // TODO: Remove once Trace replaced with log

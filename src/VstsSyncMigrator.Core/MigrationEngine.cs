@@ -37,12 +37,11 @@ namespace VstsSyncMigrator.Engine
         {
             Log.Information("Creating Migration Engine {Guid}", _Guid);
             _Host = host;
-            
-            //TypeDefinitionMaps = _Host.Services.GetRequiredService<TypeDefinitionMapContainer>();
+            TypeDefinitionMaps = _Host.Services.GetRequiredService<TypeDefinitionMapContainer>();
             Processors = _Host.Services.GetRequiredService<ProcessorContainer>();
-            //GitRepoMaps = _Host.Services.GetRequiredService<GitRepoMapContainer>();
-            //ChangeSetMapps = _Host.Services.GetRequiredService<ChangeSetMappingContainer>();
-            //ProcessConfiguration(config);
+            GitRepoMaps = _Host.Services.GetRequiredService<GitRepoMapContainer>();
+            ChangeSetMapps = _Host.Services.GetRequiredService<ChangeSetMappingContainer>();
+            ProcessConfiguration(config);
         }
 
         public void AddNetworkCredentials(NetworkCredential sourceCredentials, NetworkCredential targetCredentials)
@@ -82,7 +81,8 @@ namespace VstsSyncMigrator.Engine
                     }
                     this.AddFieldMap(fieldmapConfig.WorkItemTypeName, (ComponentContext.IFieldMap)Activator.CreateInstance(t, fieldmapConfig));
                 }
-            }          
+            }
+ 
         }
 
         public ITeamProjectContext Source { get; private set; }
@@ -102,9 +102,10 @@ namespace VstsSyncMigrator.Engine
                 });
             Stopwatch engineTimer = Stopwatch.StartNew();
 			ProcessingStatus ps = ProcessingStatus.Complete;
-            Log.Error("{Context} Beginning run of {ProcessorCount} processors", Processors.Count.ToString(), "MigrationEngine");
+            Log.Information("Beginning run of {ProcessorCount} processors", Processors.Count.ToString());
             foreach (ITfsProcessingContext process in Processors.Items)
             {
+                Log.Information("Processor: {ProcessorName}", process.Name);
                 Stopwatch processorTimer = Stopwatch.StartNew();
 				process.Execute();
                 processorTimer.Stop();

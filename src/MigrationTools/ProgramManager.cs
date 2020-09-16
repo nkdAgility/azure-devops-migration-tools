@@ -88,8 +88,6 @@ namespace MigrationTools
             return 0;
         }
 
-
-
         protected static object RunInitAndReturnExitCode(InitOptions opts, TelemetryClient telemetryClient)
         {
             Telemetry.Current.TrackEvent("InitCommand");
@@ -192,7 +190,7 @@ namespace MigrationTools
             //ExceptionTelemetry excTelemetry = new ExceptionTelemetry((Exception)e.ExceptionObject);
             //excTelemetry.SeverityLevel = SeverityLevel.Critical;
             //excTelemetry.HandledAt = ExceptionHandledAt.Unhandled;
-            Log.Error((Exception)e.ExceptionObject, "An Unhandled exception occured.");
+            Log.Fatal((Exception)e.ExceptionObject, "An Unhandled exception occured.");
             Log.CloseAndFlush();
             System.Threading.Thread.Sleep(5000);
         }

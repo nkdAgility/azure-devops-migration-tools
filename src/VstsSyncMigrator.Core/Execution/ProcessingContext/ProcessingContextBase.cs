@@ -11,6 +11,7 @@ using MigrationTools.Core.Engine;
 using MigrationTools;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -79,7 +80,7 @@ namespace VstsSyncMigrator.Engine
                       new Dictionary<string, double> {
                             { "ProcessingContextTime", executeTimer.ElapsedMilliseconds }
                       });
-                Trace.TraceWarning($"  [EXCEPTION] {ex}");
+                Log.Fatal(ex, "Processing Context failed.");
             }
             finally
             {
