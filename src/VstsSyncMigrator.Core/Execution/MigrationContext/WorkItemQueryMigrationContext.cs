@@ -8,6 +8,8 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using MigrationTools.Core.Configuration.Processing;
+using Microsoft.Extensions.Hosting;
+using MigrationTools.Core.Configuration;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -51,11 +53,14 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        public WorkItemQueryMigrationContext(MigrationEngine me, WorkItemQueryMigrationConfig config) : base(me, config)
+        public WorkItemQueryMigrationContext(IHost host) : base(host)
         {
-            this.config = config;
         }
 
+        public override void Configure(ITfsProcessingConfig config)
+        {
+            this.config = (WorkItemQueryMigrationConfig)config;
+        }
 
         internal override void InternalExecute()
         {

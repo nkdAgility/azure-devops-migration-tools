@@ -8,18 +8,23 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Linq;
 using MigrationTools.Core.Configuration.Processing;
+using MigrationTools.Core.Configuration;
+using Microsoft.Extensions.Hosting;
 
 namespace VstsSyncMigrator.Engine
 {
     public class WorkItemUpdate : ProcessingContextBase
     {
         WorkItemUpdateConfig _config;
-        MigrationEngine _me;
 
-        public WorkItemUpdate(MigrationEngine me, WorkItemUpdateConfig config) : base(me, config)
+        public WorkItemUpdate(IHost Host) : base(Host)
         {
-            _me = me;
-            _config = config;
+            
+        }
+
+        public override void Configure(ITfsProcessingConfig config)
+        {
+            _config = (WorkItemUpdateConfig) config;
         }
 
         public override string Name
@@ -50,7 +55,7 @@ namespace VstsSyncMigrator.Engine
                 Stopwatch witstopwatch = Stopwatch.StartNew();
 				workitem.Open();
                 Trace.WriteLine(string.Format("Processing work item {0} - Type:{1} - ChangedDate:{2} - CreatedDate:{3}", workitem.Id, workitem.Type.Name, workitem.ChangedDate.ToShortDateString(), workitem.CreatedDate.ToShortDateString()));
-                _me.ApplyFieldMappings(workitem);
+                me.ApplyFieldMappings(workitem);
 
                 if (workitem.IsDirty)
                 {

@@ -4,6 +4,7 @@ using Microsoft.TeamFoundation.SourceControl.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -67,7 +68,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                     {
                         var anyProjectSourceRepoInfo = GitRepositoryInfo.Create(el, allSourceRepos, migrationEngine, sourceWorkItem?.Project?.Name);
                         // if repo is found in a different project and the repo Name is listed in repo mappings, use it
-                        if (anyProjectSourceRepoInfo.GitRepo != null && migrationEngine.GitRepoMappings.ContainsKey(anyProjectSourceRepoInfo.GitRepo.Name))
+                        if (anyProjectSourceRepoInfo.GitRepo != null && migrationEngine.GitRepoMaps.Items.ContainsKey(anyProjectSourceRepoInfo.GitRepo.Name))
                         {
                             sourceRepoInfo = anyProjectSourceRepoInfo;
                         }
@@ -79,7 +80,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
 
                     if (sourceRepoInfo.GitRepo != null)
                     {
-                        string targetRepoName = GetTargetRepoName(migrationEngine.GitRepoMappings, sourceRepoInfo);
+                        string targetRepoName = GetTargetRepoName(migrationEngine.GitRepoMaps.Items, sourceRepoInfo);
                         string sourceProjectName = sourceRepoInfo?.GitRepo?.ProjectReference?.Name ?? migrationEngine.Target.Config.Project;
                         string targetProjectName = migrationEngine.Target.Config.Project;
 
@@ -87,7 +88,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                         // if repo was not found in the target project, try to find it in the whole target project collection
                         if (targetRepoInfo.GitRepo == null)
                         {
-                            if (migrationEngine.GitRepoMappings.ContainsValue(targetRepoName))
+                            if (migrationEngine.GitRepoMaps.Items.Values.Contains(targetRepoName))
                             {
                                 var anyTargetRepoInCollectionInfo = GitRepositoryInfo.Create(targetRepoName, sourceRepoInfo, allTargetRepos);
                                 if (anyTargetRepoInCollectionInfo.GitRepo != null)
@@ -194,7 +195,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
 
         }
 
-        private string GetTargetRepoName(Dictionary<string, string> gitRepoMappings, GitRepositoryInfo repoInfo)
+        private string GetTargetRepoName(ReadOnlyDictionary<string, string> gitRepoMappings, GitRepositoryInfo repoInfo)
         {
             if (gitRepoMappings.ContainsKey(repoInfo.GitRepo.Name))
             {
@@ -229,13 +230,13 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                     return CreateFromGit(gitExternalLink, possibleRepos);
 
                 case RepistoryType.TFVC:
-                    return CreateFromTFVC(gitExternalLink, possibleRepos, migrationEngine.ChangeSetMapping, migrationEngine.Source.Config.Project, workItemSourceProjectName);
+                    return CreateFromTFVC(gitExternalLink, possibleRepos, migrationEngine.ChangeSetMapps.Items, migrationEngine.Source.Config.Project, workItemSourceProjectName);
             }
 
             return null;
         }
 
-        private static GitRepositoryInfo CreateFromTFVC(ExternalLink gitExternalLink, IList<GitRepository> possibleRepos, Dictionary<int, string> changesetMapping, string sourceProjectName, string workItemSourceProjectName)
+        private static GitRepositoryInfo CreateFromTFVC(ExternalLink gitExternalLink, IList<GitRepository> possibleRepos, ReadOnlyDictionary<int, string> changesetMapping, string sourceProjectName, string workItemSourceProjectName)
         {
             string commitID;
             string repoID;

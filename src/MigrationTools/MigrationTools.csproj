@@ -9,6 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Folder Include="Core\Engine\FieldMaps\" />
+    <Folder Include="Core\Engine\Processors\" />
     <Folder Include="Core\Enrichers\" />
   </ItemGroup>
 

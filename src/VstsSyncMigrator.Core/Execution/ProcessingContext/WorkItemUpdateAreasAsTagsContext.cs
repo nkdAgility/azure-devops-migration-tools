@@ -8,6 +8,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Linq;
 using MigrationTools.Core.Configuration.Processing;
+using MigrationTools.Core.Configuration;
+using Microsoft.Extensions.Hosting;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -16,9 +18,13 @@ namespace VstsSyncMigrator.Engine
 
         WorkItemUpdateAreasAsTagsConfig config;
 
-        public WorkItemUpdateAreasAsTagsContext(MigrationEngine me, WorkItemUpdateAreasAsTagsConfig config) : base(me, config)
+        public WorkItemUpdateAreasAsTagsContext(IHost Host) : base(Host)
         {
-            this.config = config;
+        }
+
+        public override void Configure(ITfsProcessingConfig config)
+        {
+            this.config = (WorkItemUpdateAreasAsTagsConfig)config;
         }
 
         public override string Name

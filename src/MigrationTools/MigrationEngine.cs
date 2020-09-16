@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using MigrationTools.Core;
 using MigrationTools.Core.Configuration;
 using MigrationTools.Core.Engine;
+using MigrationTools.Core.Engine.Containers;
 using MigrationTools.Core.Sinks;
 using Serilog;
 using Serilog.Context;
@@ -20,34 +21,65 @@ using System.Threading.Tasks;
 
 namespace MigrationTools
 {
-    public class MigrationEngine
+    public class MigrationEngineCore
     {
         private readonly IHost _Host;
-        private readonly ILogger<MigrationEngine> _Log;
+        private readonly ILogger<MigrationEngineCore> _Log;
         private readonly TelemetryClient _Telemetry;
         private readonly EngineConfiguration _Config;
 
-        List<ITfsProcessingContext> processors = new List<ITfsProcessingContext>();
-        //List<Action<WorkItem, WorkItem>> processorActions = new List<Action<WorkItem, WorkItem>>();
-        Dictionary<string, List<IFieldMap>> fieldMapps = new Dictionary<string, List<IFieldMap>>();
-        Dictionary<string, IWitdMapper> workItemTypeDefinitions = new Dictionary<string, IWitdMapper>();
-        Dictionary<string, string> gitRepoMapping = new Dictionary<string, string>();
-        ITeamProjectContext source;
-        ITeamProjectContext target;
-        NetworkCredential sourceCreds;
-        NetworkCredential targetCreds;
-        public readonly Dictionary<int, string> ChangeSetMapping = new Dictionary<int, string>();
+        ProcessorContainer _pContainer;
+        TypeDefinitionMapContainer _witdContainer;
+        GitRepoMapContainer _grmContainer;
 
-        public MigrationEngine(IHost host, ILogger<MigrationEngine> log, TelemetryClient telemetry, IEngineConfigurationBuilder configBuilder)
+        ITeamProjectContext _Source;
+        ITeamProjectContext _Target;
+        NetworkCredential _SourceCreds;
+        NetworkCredential _TargetCreds;
+
+        Dictionary<string, IWitdMapper> _workItemTypeDefinitions = new Dictionary<string, IWitdMapper>();
+        Dictionary<string, string> _gitRepoMapping = new Dictionary<string, string>();
+        public readonly Dictionary<int, string> _ChangeSetMapping = new Dictionary<int, string>();
+
+        public MigrationEngineCore(IHost host, ILogger<MigrationEngineCore> log, TelemetryClient telemetry, IEngineConfigurationBuilder configBuilder)
         {
             _Host = host;
             _Log = log;
             _Telemetry = telemetry;
             _Config = configBuilder.BuildFromFile();
+            _witdContainer = _Host.Services.GetRequiredService<TypeDefinitionMapContainer>();
+            _pContainer = _Host.Services.GetRequiredService<ProcessorContainer>();
+            _grmContainer = _Host.Services.GetRequiredService<GitRepoMapContainer>();
+            ProcessConfiguration();
         }
+
+        private void ProcessConfiguration()
+        {
+            Telemetry.EnableTrace = _Config.TelemetryEnableTrace;
+            if (_Config.Source != null)
+            {
+                ITeamProjectContext tpc= _Host.Services.GetRequiredService<ITeamProjectContext>();
+                if (_SourceCreds == null)
+                    tpc.Connect(_Config.Source);
+                else
+                    tpc.Connect(_Config.Source, _SourceCreds);
+                _Source = tpc;
+            }
+            if (_Config.Target != null)
+            {
+                ITeamProjectContext tpc = _Host.Services.GetRequiredService<ITeamProjectContext>();
+                if (_TargetCreds == null)
+                    tpc.Connect(_Config.Target);
+                else
+                    tpc.Connect(_Config.Target, _TargetCreds);
+                _Source = tpc;
+            }
+        }
+
 
         public void Run()
         {
+
             Log.Error("Running but no implementation :) ");
         }
         

@@ -8,6 +8,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Linq;
 using MigrationTools.Core.Configuration;
+using Microsoft.Extensions.Hosting;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -15,7 +16,7 @@ namespace VstsSyncMigrator.Engine
     {
 
 
-        public WorkItemDelete(MigrationEngine me, ITfsProcessingConfig config) : base(me, config)
+        public WorkItemDelete(IHost Host) : base(Host)
         {
 
         }
@@ -26,6 +27,11 @@ namespace VstsSyncMigrator.Engine
             {
                 return "WorkItemDelete";
             }
+        }
+
+        public override void Configure(ITfsProcessingConfig config)
+        {
+         
         }
 
         internal override void InternalExecute()

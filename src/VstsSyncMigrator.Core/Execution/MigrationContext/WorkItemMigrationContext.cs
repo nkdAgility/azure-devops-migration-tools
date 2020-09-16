@@ -26,13 +26,15 @@ using Serilog.Events;
 using Serilog.Context;
 using Microsoft.ApplicationInsights.DataContracts;
 using MigrationTools;
+using Microsoft.Extensions.Hosting;
+using MigrationTools.Core.Configuration;
 
 namespace VstsSyncMigrator.Engine
 {
 
     public class WorkItemMigrationContext : MigrationContextBase
     {
-        private readonly WorkItemMigrationConfig _config;
+        private WorkItemMigrationConfig _config;
         private List<String> _ignore;
         private WorkItemTrackingHttpClient _witClient;
         private WorkItemLinkOMatic workItemLinkOMatic = new WorkItemLinkOMatic();
@@ -50,21 +52,23 @@ namespace VstsSyncMigrator.Engine
         static int _totalWorkItem = 0;
         static string workItemLogTeamplate = "[{sourceWorkItemTypeName,20}][Complete:{currentWorkItem,6}/{totalWorkItems}][sid:{sourceWorkItemId,6}|Rev:{sourceRevisionInt,3}][tid:{targetWorkItemId,6} | ";
 
-        public WorkItemMigrationContext(MigrationEngine me, WorkItemMigrationConfig config)
-            : base(me, config)
+        public WorkItemMigrationContext(IHost host)
+            : base(host)
         {
             contextLog = Log.ForContext<WorkItemMigrationContext>();
-            _config = config;
+        }
+        
+        public override void Configure(ITfsProcessingConfig config)
+        {
+            _config = (WorkItemMigrationConfig)config;
             PopulateIgnoreList();
 
             VssClientCredentials adoCreds = new VssClientCredentials();
             _witClient = new WorkItemTrackingHttpClient(me.Target.Collection.Uri, adoCreds);
 
             var workItemServer = me.Source.Collection.GetService<WorkItemServer>();
-            attachmentOMatic = new AttachmentOMatic(workItemServer, config.AttachmentWorkingPath, config.AttachmentMazSize);
+            attachmentOMatic = new AttachmentOMatic(workItemServer, _config.AttachmentWorkingPath, _config.AttachmentMazSize);
             repoOMatic = new RepoOMatic(me);
-
-
         }
 
         private void PopulateIgnoreList()
@@ -100,6 +104,10 @@ namespace VstsSyncMigrator.Engine
 
         internal override void InternalExecute()
         {
+            if (_config == null)
+            {
+                throw new Exception("You must call Configure() first");
+            }
             var stopwatch = Stopwatch.StartNew();
             //////////////////////////////////////////////////
             var sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.BypassRules);
@@ -337,10 +345,10 @@ namespace VstsSyncMigrator.Engine
 
                 string finalDestType = last.Type.Name;
 
-                if (skipToFinalRevisedWorkItemType && me.WorkItemTypeDefinitions.ContainsKey(finalDestType))
+                if (skipToFinalRevisedWorkItemType && me.TypeDefinitionMaps.Items.ContainsKey(finalDestType))
                 {
                     finalDestType =
-                       me.WorkItemTypeDefinitions[finalDestType].Map();
+                       me.TypeDefinitionMaps.Items[finalDestType].Map();
                 }
 
                 //If work item hasn't been created yet, create a shell
@@ -378,10 +386,10 @@ namespace VstsSyncMigrator.Engine
 
                     // Decide on WIT
                     string destType = currentRevisionWorkItem.Type.Name;
-                    if (me.WorkItemTypeDefinitions.ContainsKey(destType))
+                    if (me.TypeDefinitionMaps.Items.ContainsKey(destType))
                     {
                         destType =
-                           me.WorkItemTypeDefinitions[destType].Map();
+                           me.TypeDefinitionMaps.Items[destType].Map();
                     }
 
                     //If the work item already exists and its type has changed, update its type. Done this way because there doesn't appear to be a way to do this through the store.
@@ -727,8 +735,7 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-
-
+  
     }
 
 

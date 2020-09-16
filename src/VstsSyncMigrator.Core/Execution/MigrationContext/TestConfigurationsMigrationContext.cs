@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.Linq;
 using VstsSyncMigrator.Engine.ComponentContext;
 using MigrationTools.Core.Configuration.Processing;
+using Microsoft.Extensions.Hosting;
+using MigrationTools.Core.Configuration;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -19,7 +21,7 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        public TestConfigurationsMigrationContext(MigrationEngine me, TestConfigurationsMigrationConfig config) : base(me, config)
+        public TestConfigurationsMigrationContext(IHost host) : base(host)
         {
 
         }
@@ -68,6 +70,11 @@ namespace VstsSyncMigrator.Engine
         {
             // Test configurations are case insensitive in VSTS so need ignore case in comparison
             return tch.Query("Select * From TestConfiguration").FirstOrDefault(variable => string.Equals(variable.Name, configToFind, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public override void Configure(ITfsProcessingConfig config)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -10,6 +10,8 @@ using Microsoft.TeamFoundation;
 using MigrationTools.Core.Configuration.Processing;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
 using VstsSyncMigrator.Core.Execution.OMatics;
+using MigrationTools.Core.Configuration;
+using Microsoft.Extensions.Hosting;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -18,10 +20,10 @@ namespace VstsSyncMigrator.Engine
         private FixGitCommitLinksConfig _config;
         private RepoOMatic _RepoOMatic;
 
-        public FixGitCommitLinks(MigrationEngine me, FixGitCommitLinksConfig config, WorkItemStoreContext storeContext) : base(me, config)
+        public FixGitCommitLinks(IHost Host, WorkItemStoreContext storeContext) : base(Host)
         {
-            _config = config;
-            _RepoOMatic = new RepoOMatic(me);
+
+           
         }
 
         public override string Name
@@ -30,6 +32,12 @@ namespace VstsSyncMigrator.Engine
             {
                 return "FixGitCommitLinks";
             }
+        }
+
+        public override void Configure(ITfsProcessingConfig config)
+        {
+            _config = (FixGitCommitLinksConfig)config;
+            _RepoOMatic = new RepoOMatic(me);
         }
 
         internal override void InternalExecute()

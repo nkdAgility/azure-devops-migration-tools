@@ -13,30 +13,36 @@ using MigrationTools.Core.Engine;
 using Microsoft.Extensions.Hosting;
 using System.Net;
 using MigrationTools;
+using Microsoft.Extensions.DependencyInjection;
+using MigrationTools.Core.Engine.Containers;
 
 namespace VstsSyncMigrator.Engine
 {
    public class MigrationEngine
     {
-        List<ITfsProcessingContext> processors = new List<ITfsProcessingContext>();
         Dictionary<string, List<ComponentContext.IFieldMap>> fieldMapps = new Dictionary<string, List<ComponentContext.IFieldMap>>();
-        Dictionary<string, IWitdMapper> workItemTypeDefinitions = new Dictionary<string, IWitdMapper>();
-        Dictionary<string, string> gitRepoMapping = new Dictionary<string, string>();
-        ITeamProjectContext source;
-        ITeamProjectContext target;
+        
         NetworkCredential sourceCreds;
         NetworkCredential targetCreds;
-        public readonly Dictionary<int, string> ChangeSetMapping = new Dictionary<int, string>();
+        
         private readonly IHost _Host;
+        private readonly Guid _Guid = Guid.NewGuid();
 
-        public MigrationEngine(IHost host)
-        {
-            _Host = host;
-        }
+        public ProcessorContainer Processors { get; }
+        public TypeDefinitionMapContainer TypeDefinitionMaps { get; }
+        public GitRepoMapContainer GitRepoMaps { get; }
+        public ChangeSetMappingContainer ChangeSetMapps { get; }
+
         public MigrationEngine(IHost host, EngineConfiguration config)
         {
-            ProcessConfiguration(config);
+            Log.Information("Creating Migration Engine {Guid}", _Guid);
             _Host = host;
+            
+            //TypeDefinitionMaps = _Host.Services.GetRequiredService<TypeDefinitionMapContainer>();
+            Processors = _Host.Services.GetRequiredService<ProcessorContainer>();
+            //GitRepoMaps = _Host.Services.GetRequiredService<GitRepoMapContainer>();
+            //ChangeSetMapps = _Host.Services.GetRequiredService<ChangeSetMappingContainer>();
+            //ProcessConfiguration(config);
         }
 
         public void AddNetworkCredentials(NetworkCredential sourceCredentials, NetworkCredential targetCredentials)
@@ -77,74 +83,11 @@ namespace VstsSyncMigrator.Engine
                     this.AddFieldMap(fieldmapConfig.WorkItemTypeName, (ComponentContext.IFieldMap)Activator.CreateInstance(t, fieldmapConfig));
                 }
             }          
-            if (config.GitRepoMapping != null)
-            {
-                gitRepoMapping = config.GitRepoMapping;
-            }
-            if (config.WorkItemTypeDefinition != null)
-            { 
-                foreach (string key in config.WorkItemTypeDefinition.Keys)
-                {
-                    Log.Information("{Context}: Adding Work Item Type {WorkItemType}", key, "MigrationEngine");
-                    this.AddWorkItemTypeDefinition(key, new WitMapper(config.WorkItemTypeDefinition[key]));
-                }
-            }
-            var enabledProcessors = config.Processors.Where(x => x.Enabled).ToList();
-            foreach (ITfsProcessingConfig processorConfig in enabledProcessors)
-            {
-                if (processorConfig.IsProcessorCompatible(enabledProcessors))
-                {
-                    Log.Information("{Context}: Adding Processor {ProcessorName}", processorConfig.Processor, "MigrationEngine");
-                    string typePattern = $"VstsSyncMigrator.Engine.{processorConfig.Processor}";
-                    Type t = Type.GetType(typePattern);
-                    if (t == null)
-                    {
-                        Log.Error("Type " + typePattern + " not found.", typePattern);
-                        throw new Exception("Type " + typePattern + " not found.");
-                    }
-                    this.AddProcessor(
-                        (ITfsProcessingContext)
-                        Activator.CreateInstance(t, this, processorConfig));
-                }
-                else
-                {
-                    var message = "{Context}: Cannot add Processor {ProcessorName}. Processor is not compatible with other enabled processors in configuration.";
-                    Log.Error(message, processorConfig.Processor, "MigrationEngine");
-                    throw new InvalidOperationException(string.Format(message, processorConfig.Processor, "MigrationEngine"));
-                }
-            }
-        }
-        public Dictionary<string, string> GitRepoMappings
-        {
-            get
-            {
-                return gitRepoMapping;
-            }
         }
 
-        public Dictionary<string, IWitdMapper> WorkItemTypeDefinitions
-        {
-            get
-            {
-                return workItemTypeDefinitions;
-            }
-        }
+        public ITeamProjectContext Source { get; private set; }
 
-        public ITeamProjectContext Source
-        {
-            get
-            {
-                return source;
-            }
-        }
-
-        public ITeamProjectContext Target
-        {
-            get
-            {
-                return target;
-            }
-        }
+        public ITeamProjectContext Target { get; private set; }
 
 
         public ProcessingStatus Run()
@@ -154,13 +97,13 @@ namespace VstsSyncMigrator.Engine
                     { "Engine", "Migration" }
                 },
                 new Dictionary<string, double> {
-                    { "Processors", processors.Count },
+                    { "Processors", Processors.Count },
                     { "Mappings", fieldMapps.Count }
                 });
             Stopwatch engineTimer = Stopwatch.StartNew();
 			ProcessingStatus ps = ProcessingStatus.Complete;
-            Log.Error("{Context} Beginning run of {ProcessorCount} processors", processors.Count.ToString(), "MigrationEngine");
-            foreach (ITfsProcessingContext process in processors)
+            Log.Error("{Context} Beginning run of {ProcessorCount} processors", Processors.Count.ToString(), "MigrationEngine");
+            foreach (ITfsProcessingContext process in Processors.Items)
             {
                 Stopwatch processorTimer = Stopwatch.StartNew();
 				process.Execute();
@@ -185,25 +128,14 @@ namespace VstsSyncMigrator.Engine
             return ps;
         }
 
-        public void AddProcessor<TProcessor>()
-        {
-            ITfsProcessingContext pc = (ITfsProcessingContext)Activator.CreateInstance(typeof(TProcessor), new object[] { this });
-            AddProcessor(pc);
-        }
-
-        public void AddProcessor(ITfsProcessingContext processor)
-        {
-            processors.Add(processor);
-        }
-
         public void SetSource(ITeamProjectContext teamProjectContext)
         {
-            source = teamProjectContext;
+            Source = teamProjectContext;
         }
 
         public void SetTarget(ITeamProjectContext teamProjectContext)
         {
-            target = teamProjectContext;
+            Target = teamProjectContext;
         }
 
         public void AddFieldMap(string workItemTypeName, ComponentContext.IFieldMap fieldToTagFieldMap)
@@ -214,13 +146,7 @@ namespace VstsSyncMigrator.Engine
             }
             fieldMapps[workItemTypeName].Add(fieldToTagFieldMap);
         }
-         public void AddWorkItemTypeDefinition(string workItemTypeName, IWitdMapper workItemTypeDefinitionMap = null)
-        {
-            if (!workItemTypeDefinitions.ContainsKey(workItemTypeName))
-            {
-                workItemTypeDefinitions.Add(workItemTypeName, workItemTypeDefinitionMap);
-            }
-        }
+
 
         internal void ApplyFieldMappings(WorkItem source, WorkItem target)
         { 

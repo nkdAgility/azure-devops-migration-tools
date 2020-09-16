@@ -5,12 +5,14 @@ using System.Linq;
 using System.Xml;
 using MigrationTools.Core.Configuration.Processing;
 using MigrationTools;
+using Microsoft.Extensions.Hosting;
+using MigrationTools.Core.Configuration;
 
 namespace VstsSyncMigrator.Engine
 {
     public class NodeStructuresMigrationContext : MigrationContextBase
     {
-        NodeStructuresMigrationConfig config;
+        NodeStructuresMigrationConfig _config;
 
         public override string Name
         {
@@ -20,13 +22,21 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        public NodeStructuresMigrationContext(MigrationEngine me, NodeStructuresMigrationConfig config) : base(me, config)
+        public NodeStructuresMigrationContext(IHost host) : base(host)
         {
-            this.config = config;
+        }
+
+        public override void Configure(ITfsProcessingConfig config)
+        {
+            _config = (NodeStructuresMigrationConfig)config;
         }
 
         internal override void InternalExecute()
         {
+            if (_config == null)
+            {
+                throw new Exception("You must call Configure() first");
+            }
             //////////////////////////////////////////////////
             ICommonStructureService sourceCss = (ICommonStructureService)me.Source.Collection.GetService(typeof(ICommonStructureService));
             ProjectInfo sourceProjectInfo = sourceCss.GetProjectFromName(me.Source.Config.Project);
@@ -62,7 +72,7 @@ namespace VstsSyncMigrator.Engine
                 Telemetry.Current.TrackException(ex2);
                 throw ex2;
             }
-            if (config.PrefixProjectToNodes)
+            if (_config.PrefixProjectToNodes)
             {
                 structureParent = CreateNode(targetCss, me.Source.Config.Project, structureParent);
             }
@@ -120,14 +130,14 @@ namespace VstsSyncMigrator.Engine
         {
             string nodePath = string.Format(@"{0}\{1}", parentPath.Path, newNodeName);
 
-            if (config.BasePaths != null && config.BasePaths.Any())
+            if (_config.BasePaths != null && _config.BasePaths.Any())
             {
                 var split = nodePath.Split('\\');
                 var removeProjectAndType = split.Skip(3);
                 var path = string.Join(@"\", removeProjectAndType);
 
                 // We need to check if the path is a parent path of one of the base paths, as we need those
-                foreach (var basePath in config.BasePaths)
+                foreach (var basePath in _config.BasePaths)
                 {
                     var splitBase = basePath.Split('\\');
 
@@ -140,7 +150,7 @@ namespace VstsSyncMigrator.Engine
                     }
                 }
 
-                if (!config.BasePaths.Any(p => path.StartsWith(p, StringComparison.InvariantCultureIgnoreCase)))
+                if (!_config.BasePaths.Any(p => path.StartsWith(p, StringComparison.InvariantCultureIgnoreCase)))
                 {
                     Trace.WriteLine(string.Format("--IgnoreNode: {0}", nodePath));
                     return false;

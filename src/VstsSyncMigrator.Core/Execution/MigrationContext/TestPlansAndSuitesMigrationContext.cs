@@ -15,13 +15,13 @@ using MigrationTools.Core.Configuration.Processing;
 using WorkItem = Microsoft.TeamFoundation.WorkItemTracking.Client.WorkItem;
 using VstsSyncMigrator.Core;
 using MigrationTools;
+using Microsoft.Extensions.Hosting;
+using MigrationTools.Core.Configuration;
 
 namespace VstsSyncMigrator.Engine
 {
     public class TestPlandsAndSuitesMigrationContext : MigrationContextBase
     {
-        MigrationEngine engine;
-
         WorkItemStoreContext sourceWitStore;
         TestManagementContext sourceTestStore;
         ITestConfigurationCollection sourceTestConfigs;
@@ -51,9 +51,14 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        public TestPlandsAndSuitesMigrationContext(MigrationEngine me, TestPlansAndSuitesMigrationConfig config) : base(me, config)
+        public TestPlandsAndSuitesMigrationContext(IHost host) : base(host)
         {
-            this.engine = me;
+      
+        }
+
+        public override void Configure(ITfsProcessingConfig configx)
+        {
+            config = (TestPlansAndSuitesMigrationConfig)configx;
             sourceWitStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.None);
             sourceTestStore = new TestManagementContext(me.Source, config.TestPlanQueryBit);
             targetWitStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
@@ -62,7 +67,7 @@ namespace VstsSyncMigrator.Engine
             targetTestConfigs = targetTestStore.Project.TestConfigurations.Query("Select * From TestConfiguration");
             sourceIdentityManagementService = me.Source.Collection.GetService<IIdentityManagementService>();
             targetIdentityManagementService = me.Target.Collection.GetService<IIdentityManagementService>();
-            this.config = config;
+
         }
 
         private void TraceWriteLine(ITestPlan sourcePlan, string message = "", int indent = 0, bool header = false)
@@ -284,14 +289,14 @@ namespace VstsSyncMigrator.Engine
 
             if (config.PrefixProjectToNodes)
             {
-                targetWI.AreaPath = string.Format(@"{0}\{1}", engine.Target.Config.Project, sourceWI.AreaPath);
-                targetWI.IterationPath = string.Format(@"{0}\{1}", engine.Target.Config.Project, sourceWI.IterationPath);
+                targetWI.AreaPath = string.Format(@"{0}\{1}", me.Target.Config.Project, sourceWI.AreaPath);
+                targetWI.IterationPath = string.Format(@"{0}\{1}", me.Target.Config.Project, sourceWI.IterationPath);
             }
             else
             {
-                var regex = new Regex(Regex.Escape(engine.Source.Config.Project));
-                targetWI.AreaPath = regex.Replace(sourceWI.AreaPath, engine.Target.Config.Project, 1);
-                targetWI.IterationPath = regex.Replace(sourceWI.IterationPath, engine.Target.Config.Project, 1);
+                var regex = new Regex(Regex.Escape(me.Source.Config.Project));
+                targetWI.AreaPath = regex.Replace(sourceWI.AreaPath, me.Target.Config.Project, 1);
+                targetWI.IterationPath = regex.Replace(sourceWI.IterationPath, me.Target.Config.Project, 1);
             }
 
             me.ApplyFieldMappings(sourceWI, targetWI);
@@ -973,8 +978,8 @@ AddParameter("PlanId", parameters, targetPlan.Id.ToString());
 
             // Set area and iteration to root of the target project. 
             // We will set the correct values later, when we actually have a work item available
-            targetPlan.Iteration = engine.Target.Config.Project;
-            targetPlan.AreaPath = engine.Target.Config.Project;
+            targetPlan.Iteration = me.Target.Config.Project;
+            targetPlan.AreaPath = me.Target.Config.Project;
 
             // Remove testsettings reference because VSTS Sync doesn't support migrating these artifacts
             if (targetPlan.ManualTestSettingsId != 0)

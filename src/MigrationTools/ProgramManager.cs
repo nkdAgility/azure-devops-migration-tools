@@ -21,10 +21,11 @@ using MigrationTools.Core.Configuration.FieldMap;
 using MigrationTools.Core.Sinks;
 using Microsoft.ApplicationInsights.Extensibility.PerfCounterCollector;
 using System.Net;
+using MigrationTools.Core.Engine.Containers;
 
 namespace MigrationTools
 {
-   public class ProgramManager
+    public class ProgramManager
     {
         protected static DateTime _startTime = DateTime.Now;
         protected static Stopwatch _mainTimer = new Stopwatch();
@@ -73,6 +74,10 @@ namespace MigrationTools
                     services.AddSingleton(tc);
                     services.AddSingleton<IEngineConfigurationBuilder, EngineConfigurationBuilder>();
                     services.AddSingleton<EngineConfiguration>(config);
+                    services.AddSingleton<ProcessorContainer>();
+                    services.AddSingleton<TypeDefinitionMapContainer>();
+                    services.AddSingleton<GitRepoMapContainer>();
+                    services.AddSingleton<ChangeSetMappingContainer>();
                     AddPlatformSpecificServices(services);
                 })
                 .UseConsoleLifetime()
@@ -137,7 +142,7 @@ namespace MigrationTools
             string logsPath = CreateLogsPath();
             var logPath = Path.Combine(logsPath, "migration.log");
 
-            var logconf= new LoggerConfiguration()
+            var logconf = new LoggerConfiguration()
                 .ReadFrom.Configuration(builder.Build())
                 .Enrich.FromLogContext()
                 .Enrich.WithMachineName()

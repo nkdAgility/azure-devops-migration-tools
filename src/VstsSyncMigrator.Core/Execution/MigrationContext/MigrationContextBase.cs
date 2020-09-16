@@ -6,18 +6,23 @@ using System.Text.RegularExpressions;
 using MigrationTools.Core.Engine;
 using MigrationTools.Core.Configuration;
 using MigrationTools;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace VstsSyncMigrator.Engine
 {
     public abstract class MigrationContextBase : ITfsProcessingContext
     {
         internal readonly MigrationEngine me;
+        internal readonly IHost _host;
 
-
-        protected MigrationContextBase(MigrationEngine me, ITfsProcessingConfig config)
+        protected MigrationContextBase(IHost host)
         {
-            this.me = me;
+            _host = host;
+            this.me = _host.Services.GetService<MigrationEngine>();
         }
+
+        public abstract void Configure(ITfsProcessingConfig config);
 
         public abstract string Name { get; }
 

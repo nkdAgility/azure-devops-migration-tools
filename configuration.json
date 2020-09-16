@@ -4,7 +4,7 @@
   "workaroundForQuerySOAPBugEnabled": false,
   "Source": {
     "Collection": "https://dev.azure.com/nkdagility-preview/",
-    "Project": "migrationSource1-moo",
+    "Project": "migrationSource1",
     "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
     "AllowCrossProjectLinking": false,
     "PersonalAccessToken": "",

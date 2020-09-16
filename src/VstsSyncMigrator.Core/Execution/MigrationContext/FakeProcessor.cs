@@ -8,6 +8,8 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using MigrationTools.Core.Configuration.Processing;
+using Microsoft.Extensions.Hosting;
+using MigrationTools.Core.Configuration;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -21,7 +23,7 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        public FakeProcessor(MigrationEngine me, FakeProcessorConfig config) : base(me, config)
+        public FakeProcessor(IHost host) : base(host)
         {
 
         }
@@ -48,5 +50,9 @@ namespace VstsSyncMigrator.Engine
             Console.WriteLine(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds", stopwatch.Elapsed);
         }
 
+        public override void Configure(ITfsProcessingConfig config)
+        {
+          // FakeProcessorConfig config
+        }
     }
 }

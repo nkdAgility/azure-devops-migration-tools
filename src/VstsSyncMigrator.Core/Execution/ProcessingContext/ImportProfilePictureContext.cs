@@ -15,6 +15,7 @@ using System.Net;
 using System.Drawing.Imaging;
 using System.Text.RegularExpressions;
 using MigrationTools.Core.Configuration;
+using Microsoft.Extensions.Hosting;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -33,7 +34,7 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        public ImportProfilePictureContext(MigrationEngine me, ITfsProcessingConfig config ) : base(me, config)
+        public ImportProfilePictureContext(IHost Host) : base(Host)
         {
             //http://www.codeproject.com/Articles/18102/Howto-Almost-Everything-In-Active-Directory-via-C
             ims2 = (IIdentityManagementService2)me.Target.Collection.GetService(typeof(IIdentityManagementService2));
@@ -237,5 +238,9 @@ namespace VstsSyncMigrator.Engine
             return ldapPath;
         }
 
+        public override void Configure(ITfsProcessingConfig config)
+        {
+     
+        }
     }
 }

@@ -10,6 +10,8 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using MigrationTools.Core.Configuration.Processing;
+using Microsoft.Extensions.Hosting;
+using MigrationTools.Core.Configuration;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -17,7 +19,6 @@ namespace VstsSyncMigrator.Engine
     {
 
         TeamMigrationConfig _config;
-        MigrationEngine _me;
 
         public override string Name
         {
@@ -27,14 +28,21 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        public TeamMigrationContext(MigrationEngine me, TeamMigrationConfig config) : base(me, config)
+        public TeamMigrationContext(IHost host) : base(host)
         {
-            _me = me;
-            _config = config;
+        }
+
+        public override void Configure(ITfsProcessingConfig config)
+        {
+            _config = (TeamMigrationConfig)config;
         }
 
         internal override void InternalExecute()
         {
+            if (_config == null)
+            {
+                throw new Exception("You must call Configure() first");
+            }
             Stopwatch stopwatch = Stopwatch.StartNew();
             //////////////////////////////////////////////////
             WorkItemStoreContext sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.BypassRules);
