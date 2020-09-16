@@ -35,7 +35,7 @@ namespace VstsSyncMigrator.ConsoleApp
 
         public static int Main(string[] args)
         {
-            var telemetryClient = GetTelemiteryClient();
+            var telemetryClient = Telemetry.GetTelemiteryClient();
             Log.Logger = BuildLogger();
             /////////////////////////////////////////////////////////
             Trace.Listeners.Add(new TextWriterTraceListener(Console.Out)); // TODO: Remove once Trace replaced with log

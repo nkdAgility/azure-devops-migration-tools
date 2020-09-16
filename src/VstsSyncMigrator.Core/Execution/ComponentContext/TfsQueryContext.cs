@@ -6,6 +6,7 @@ using System.Diagnostics;
 using Microsoft.ApplicationInsights.DataContracts;
 using System.Text.RegularExpressions;
 using Serilog;
+using MigrationTools;
 
 namespace VstsSyncMigrator.Engine
 {

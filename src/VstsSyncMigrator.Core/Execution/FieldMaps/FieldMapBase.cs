@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using Microsoft.ApplicationInsights;
 using System.Diagnostics;
+using MigrationTools;
 
 namespace VstsSyncMigrator.Engine.ComponentContext
 {

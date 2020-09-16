@@ -14,6 +14,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VstsSyncMigrator.Engine;
+using MigrationTools;
 
 namespace VstsSyncMigrator.Commands
 {

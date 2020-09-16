@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Xml;
 using MigrationTools.Core.Configuration.Processing;
+using MigrationTools;
 
 namespace VstsSyncMigrator.Engine
 {

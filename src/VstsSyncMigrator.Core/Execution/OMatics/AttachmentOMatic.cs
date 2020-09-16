@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using VstsSyncMigrator.Engine;
 using VstsSyncMigrator.Core;
+using MigrationTools;
 
 namespace VstsSyncMigrator.Core.Execution.OMatics
 {

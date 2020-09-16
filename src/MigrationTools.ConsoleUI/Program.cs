@@ -24,7 +24,6 @@ using MigrationTools.Core.Sinks;
 using Microsoft.ApplicationInsights.Extensibility.PerfCounterCollector;
 using Microsoft.TeamFoundation.Build.WebApi;
 using System.Net;
-
 namespace MigrationTools.ConsoleUI
 {
     class Program : ProgramManager
@@ -33,7 +32,7 @@ namespace MigrationTools.ConsoleUI
 
         static int Main(string[] args)
         {
-            var telemetryClient = GetTelemiteryClient();
+            var telemetryClient = Telemetry.GetTelemiteryClient();
             Log.Logger = BuildLogger();
             ApplicationStartup(args);
             var doService = new DetectOnlineService(telemetryClient);

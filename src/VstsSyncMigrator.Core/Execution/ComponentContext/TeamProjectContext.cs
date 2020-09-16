@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Net;
 using MigrationTools.Core.Configuration;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using MigrationTools;
 
 namespace VstsSyncMigrator.Engine
 {

@@ -12,6 +12,7 @@ using MigrationTools.Core.Configuration.Processing;
 using MigrationTools.Core.Engine;
 using Microsoft.Extensions.Hosting;
 using System.Net;
+using MigrationTools;
 
 namespace VstsSyncMigrator.Engine
 {

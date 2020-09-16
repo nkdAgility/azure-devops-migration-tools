@@ -14,6 +14,7 @@ using VstsSyncMigrator.Engine.ComponentContext;
 using MigrationTools.Core.Configuration.Processing;
 using WorkItem = Microsoft.TeamFoundation.WorkItemTracking.Client.WorkItem;
 using VstsSyncMigrator.Core;
+using MigrationTools;
 
 namespace VstsSyncMigrator.Engine
 {

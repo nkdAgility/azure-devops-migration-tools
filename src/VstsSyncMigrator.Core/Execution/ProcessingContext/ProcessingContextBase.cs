@@ -8,6 +8,7 @@ using System.Linq;
 using System.Net;
 using MigrationTools.Core.Configuration;
 using MigrationTools.Core.Engine;
+using MigrationTools;
 
 namespace VstsSyncMigrator.Engine
 {

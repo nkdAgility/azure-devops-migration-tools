@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Text.RegularExpressions;
 using MigrationTools.Core.Engine;
 using MigrationTools.Core.Configuration;
+using MigrationTools;
 
 namespace VstsSyncMigrator.Engine
 {

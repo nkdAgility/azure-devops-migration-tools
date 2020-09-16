@@ -25,6 +25,7 @@ using Serilog;
 using Serilog.Events;
 using Serilog.Context;
 using Microsoft.ApplicationInsights.DataContracts;
+using MigrationTools;
 
 namespace VstsSyncMigrator.Engine
 {
