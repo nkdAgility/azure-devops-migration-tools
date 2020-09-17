@@ -355,6 +355,7 @@
     <Compile Include="AzureAD\Constants.cs" />
     <Compile Include="Commands\ExportADGroupsCommand.cs" />
     <Compile Include="Execution\Exceptions\UnknownLinkTypeException.cs" />
+    <Compile Include="Execution\FieldMaps\FieldLiteralMap.cs" />
     <Compile Include="Execution\FieldMaps\FieldMapBase.cs" />
     <Compile Include="Execution\FieldMaps\FieldMergeMap.cs" />
     <Compile Include="Execution\FieldMaps\FieldBlankMap.cs" />
