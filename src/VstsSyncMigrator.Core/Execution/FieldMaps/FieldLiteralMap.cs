@@ -1,11 +1,10 @@
 ﻿using MigrationTools.Core.Configuration.FieldMap;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using VstsSyncMigrator.Engine.ComponentContext;
 using System;
 
 namespace VstsSyncMigrator.Engine.ComponentContext
 {
-    class FieldLiteralMap : FieldMapBase
+    public class FieldLiteralMap : FieldMapBase
     {
         private FieldLiteralMapConfig config;
 
