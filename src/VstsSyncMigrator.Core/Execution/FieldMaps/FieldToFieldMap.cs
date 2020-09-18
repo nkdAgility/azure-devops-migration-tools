@@ -24,7 +24,12 @@ namespace VstsSyncMigrator.Engine.ComponentContext
         {
             if (source.Fields.Contains(config.sourceField) && target.Fields.Contains(config.targetField))
             {
-                target.Fields[config.targetField].Value = source.Fields[config.sourceField].Value;
+                var value = source.Fields[config.sourceField].Value;
+                if ((value as string is null || value as string == "") && config.defaultValue != null)
+                {
+                    value = config.defaultValue;
+                }
+                target.Fields[config.targetField].Value = value;
                 Trace.WriteLine(string.Format("  [UPDATE] field mapped {0}:{1} to {2}:{3}", source.Id, config.sourceField, target.Id, config.targetField));
             }
         }
