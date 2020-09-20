@@ -13,8 +13,8 @@ namespace MigrationTools.Core.Engine.Containers
     {
        public  Dictionary<string, List<IFieldMap>> fieldMapps = new Dictionary<string, List<IFieldMap>>();
 
-        public FieldMapContainer(IHost host, EngineConfiguration config) : base(host, config)
-        {            
+        public FieldMapContainer(IServiceProvider services, EngineConfiguration config) : base(services, config)
+        {
         }
 
          public int Count { get { return fieldMapps.Count; } }

@@ -17,7 +17,7 @@ namespace MigrationTools.Core.Engine.Containers
         public override ReadOnlyCollection<ITfsProcessingContext> Items { get { return _Processors.AsReadOnly(); } }
         public int Count { get { return _Processors.Count; } }
 
-        public ProcessorContainer(IHost host, EngineConfiguration config) : base(host, config)
+        public ProcessorContainer(IServiceProvider services, EngineConfiguration config) : base(services, config)
         {
         }
 
@@ -44,7 +44,7 @@ namespace MigrationTools.Core.Engine.Containers
                             throw new Exception("Type " + typePattern + " not found.");
                         }
 
-                        ITfsProcessingContext pc = (ITfsProcessingContext)Host.Services.GetService(type);
+                        ITfsProcessingContext pc = (ITfsProcessingContext)Services.GetService(type);
                         pc.Configure(processorConfig);
                         // ITfsProcessingContext pc = (ITfsProcessingContext)Activator.CreateInstance(type, Host, processorConfig);
                          _Processors.Add(pc);

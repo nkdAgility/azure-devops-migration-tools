@@ -9,7 +9,7 @@ namespace MigrationTools.Core.Engine.Containers
 {
     public abstract class EngineContainer<TItemType>
     {
-        private readonly IHost _Host;
+        private readonly IServiceProvider _services;
         private readonly EngineConfiguration _Config;
 
         public abstract TItemType Items
@@ -20,9 +20,9 @@ namespace MigrationTools.Core.Engine.Containers
             return ecType.Items;
         }
 
-        protected IHost Host
+        protected IServiceProvider Services
         {
-            get { return _Host; }
+            get { return _services; }
         }
 
         protected EngineConfiguration Config
@@ -31,9 +31,9 @@ namespace MigrationTools.Core.Engine.Containers
         }
 
 
-        public EngineContainer(IHost host, EngineConfiguration config)
+        public EngineContainer(IServiceProvider services, EngineConfiguration config)
         {
-            _Host = host;
+            _services = services;
             _Config = config;
             Configure();
         }

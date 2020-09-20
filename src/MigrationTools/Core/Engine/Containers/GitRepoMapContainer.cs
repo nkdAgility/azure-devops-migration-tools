@@ -15,7 +15,7 @@ namespace MigrationTools.Core.Engine.Containers
 
         public override ReadOnlyDictionary<string, string> Items { get { return new ReadOnlyDictionary<string, string>(_GitRepoMaps); } }
 
-        public GitRepoMapContainer(IHost host, EngineConfiguration config) : base(host, config)
+        public GitRepoMapContainer(IServiceProvider services, EngineConfiguration config) : base(services, config)
         {
         }
 
