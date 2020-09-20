@@ -101,6 +101,24 @@ namespace VstsSyncMigrator.ConsoleApp
             services.AddSingleton<Engine.MigrationEngine>();
             services.AddSingleton<WorkItemMigrationContext>();
             services.AddSingleton<NodeStructuresMigrationContext>();
+
+            services.AddSingleton<TeamMigrationContext>();
+            services.AddSingleton<TestConfigurationsMigrationContext>();
+            services.AddSingleton<TestPlandsAndSuitesMigrationContext>();
+            services.AddSingleton<TestVeriablesMigrationContext>();
+            services.AddSingleton<WorkItemPostProcessingContext>();
+            services.AddSingleton<WorkItemQueryMigrationContext>();
+
+            services.AddSingleton<CreateTeamFolders>();
+            services.AddSingleton<ExportProfilePictureFromADContext>();
+            services.AddSingleton<ExportTeamList>();
+            services.AddSingleton<FixGitCommitLinks>();
+            services.AddSingleton<ImportProfilePictureContext>();
+            services.AddSingleton<WorkItemDelete>();
+            services.AddSingleton<WorkItemUpdate>();
+            services.AddSingleton<WorkItemUpdateAreasAsTagsContext>();
+
+
             return services;
         }
 
