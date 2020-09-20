@@ -15,7 +15,7 @@ namespace MigrationTools.Core.Engine.Containers
 
         public override ReadOnlyDictionary<string, IWitdMapper> Items { get { return new ReadOnlyDictionary<string, IWitdMapper>(_TypeDefinitions); } }
 
-        public TypeDefinitionMapContainer(IHost host, EngineConfiguration config) : base(host, config)
+        public TypeDefinitionMapContainer(IServiceProvider services, EngineConfiguration config) : base(services, config)
         {
         }
 

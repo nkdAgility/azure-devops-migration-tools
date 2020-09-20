@@ -24,8 +24,8 @@ namespace VstsSyncMigrator.Engine
         
         NetworkCredential sourceCreds;
         NetworkCredential targetCreds;
-        
-        private readonly IHost _Host;
+
+        private readonly IServiceProvider _services;
         private readonly Guid _Guid = Guid.NewGuid();
 
         public ProcessorContainer Processors { get; }
@@ -33,14 +33,14 @@ namespace VstsSyncMigrator.Engine
         public GitRepoMapContainer GitRepoMaps { get; }
         public ChangeSetMappingContainer ChangeSetMapps { get; }
 
-        public MigrationEngine(IHost host, EngineConfiguration config)
+        public MigrationEngine(IServiceProvider services, EngineConfiguration config)
         {
             Log.Information("Creating Migration Engine {Guid}", _Guid);
-            _Host = host;
-            TypeDefinitionMaps = _Host.Services.GetRequiredService<TypeDefinitionMapContainer>();
-            Processors = _Host.Services.GetRequiredService<ProcessorContainer>();
-            GitRepoMaps = _Host.Services.GetRequiredService<GitRepoMapContainer>();
-            ChangeSetMapps = _Host.Services.GetRequiredService<ChangeSetMappingContainer>();
+            _services = services;
+            TypeDefinitionMaps = _services.GetRequiredService<TypeDefinitionMapContainer>();
+            Processors = _services.GetRequiredService<ProcessorContainer>();
+            GitRepoMaps = _services.GetRequiredService<GitRepoMapContainer>();
+            ChangeSetMapps = _services.GetRequiredService<ChangeSetMappingContainer>();
             ProcessConfiguration(config);
         }
 

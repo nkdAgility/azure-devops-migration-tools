@@ -45,7 +45,7 @@ namespace _VstsSyncMigrator.Engine.Tests
         {
             EngineConfiguration ec = ecb.BuildDefault();
             ec.Processors.Clear();
-            MigrationEngine me = new MigrationEngine(host, ec);
+            MigrationEngine me = new MigrationEngine(host.Services, ec);
             me.Run();
 
         }
@@ -56,7 +56,7 @@ namespace _VstsSyncMigrator.Engine.Tests
             EngineConfiguration ec = ecb.BuildDefault();
             ec.Processors.Clear();
             ec.FieldMaps.Clear();
-            MigrationEngine me = new MigrationEngine(host, ec);
+            MigrationEngine me = new MigrationEngine(host.Services, ec);
             me.Run();
         }
 
@@ -65,7 +65,7 @@ namespace _VstsSyncMigrator.Engine.Tests
         {
             EngineConfiguration ec = ecb.BuildDefault();
             ec.FieldMaps.Clear();
-            MigrationEngine me = new MigrationEngine(host, ec);
+            MigrationEngine me = new MigrationEngine(host.Services, ec);
             me.Run();
         }
 

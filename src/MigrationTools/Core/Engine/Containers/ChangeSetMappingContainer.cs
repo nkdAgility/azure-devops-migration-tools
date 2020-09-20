@@ -16,7 +16,7 @@ namespace MigrationTools.Core.Engine.Containers
         public override ReadOnlyDictionary<int,string> Items { get { return new ReadOnlyDictionary<int, string>(_ChangeSetMappings); } }
         public int Count { get { return _ChangeSetMappings.Count; } }
 
-        public ChangeSetMappingContainer(IHost host, EngineConfiguration config) : base(host, config)
+        public ChangeSetMappingContainer(IServiceProvider services, EngineConfiguration config) : base(services, config)
         {
         }        
 
