@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net461</TargetFramework>
+    <TargetFramework>net472</TargetFramework>
     <Version>0.0.0.0</Version>
     <Authors>Martin Hinshelwood</Authors>
     <Company>naked Agility with martin Hinshelwood</Company>
