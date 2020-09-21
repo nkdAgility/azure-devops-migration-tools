@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "VstsSyncMigrator.Console": {
+      "commandName": "Project"
+    }
+  }
+}
