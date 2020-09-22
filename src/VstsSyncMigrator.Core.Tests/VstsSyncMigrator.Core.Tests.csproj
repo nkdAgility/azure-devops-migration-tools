@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
-
+    <Version>0.0.0.0</Version>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
