@@ -52,8 +52,8 @@ namespace VstsSyncMigrator.Engine
         static int _totalWorkItem = 0;
         static string workItemLogTeamplate = "[{sourceWorkItemTypeName,20}][Complete:{currentWorkItem,6}/{totalWorkItems}][sid:{sourceWorkItemId,6}|Rev:{sourceRevisionInt,3}][tid:{targetWorkItemId,6} | ";
 
-        public WorkItemMigrationContext(IHost host)
-            : base(host)
+        public WorkItemMigrationContext(IServiceProvider services)
+            : base(services)
         {
             contextLog = Log.ForContext<WorkItemMigrationContext>();
         }

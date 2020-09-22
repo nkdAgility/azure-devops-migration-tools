@@ -20,7 +20,7 @@ namespace VstsSyncMigrator.Engine
         private FixGitCommitLinksConfig _config;
         private RepoOMatic _RepoOMatic;
 
-        public FixGitCommitLinks(IHost Host, WorkItemStoreContext storeContext) : base(Host)
+        public FixGitCommitLinks(IServiceProvider services, MigrationEngine me) : base(services, me)
         {
 
            

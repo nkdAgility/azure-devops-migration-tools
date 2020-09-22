@@ -23,7 +23,7 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        public FakeProcessor(IHost host) : base(host)
+        public FakeProcessor(IServiceProvider services) : base(services)
         {
 
         }

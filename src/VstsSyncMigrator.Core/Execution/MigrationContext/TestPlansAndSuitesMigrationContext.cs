@@ -51,7 +51,7 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        public TestPlandsAndSuitesMigrationContext(IHost host) : base(host)
+        public TestPlandsAndSuitesMigrationContext(IServiceProvider services) : base(services)
         {
       
         }

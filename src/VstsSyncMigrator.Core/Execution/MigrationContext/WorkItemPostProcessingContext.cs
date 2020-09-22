@@ -21,7 +21,7 @@ namespace VstsSyncMigrator.Engine
         //private IList<int> _workItemIDs;
         // private string _queryBit;
 
-        public WorkItemPostProcessingContext(IHost host) : base(host)
+        public WorkItemPostProcessingContext(IServiceProvider services) : base(services)
         {
         }
 

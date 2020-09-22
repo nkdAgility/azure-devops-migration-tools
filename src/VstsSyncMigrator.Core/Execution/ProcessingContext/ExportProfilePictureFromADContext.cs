@@ -32,7 +32,7 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        public ExportProfilePictureFromADContext(IHost Host) : base(Host)
+        public ExportProfilePictureFromADContext(IServiceProvider services, MigrationEngine me) : base(services, me)
         {
 
         }

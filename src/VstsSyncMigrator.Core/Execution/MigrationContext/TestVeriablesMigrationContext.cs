@@ -22,7 +22,7 @@ namespace VstsSyncMigrator.Engine
 
         // http://blogs.microsoft.co.il/shair/2015/02/02/tfs-api-part-56-test-configurations/
 
-        public TestVeriablesMigrationContext(IHost host) : base(host)
+        public TestVeriablesMigrationContext(IServiceProvider services) : base(services)
         {
 
         }

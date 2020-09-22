@@ -53,7 +53,7 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        public WorkItemQueryMigrationContext(IHost host) : base(host)
+        public WorkItemQueryMigrationContext(IServiceProvider services) : base(services)
         {
         }
 

@@ -34,7 +34,7 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        public ImportProfilePictureContext(IHost Host) : base(Host)
+        public ImportProfilePictureContext(IServiceProvider services, MigrationEngine me) : base(services, me)
         {
             //http://www.codeproject.com/Articles/18102/Howto-Almost-Everything-In-Active-Directory-via-C
             ims2 = (IIdentityManagementService2)me.Target.Collection.GetService(typeof(IIdentityManagementService2));

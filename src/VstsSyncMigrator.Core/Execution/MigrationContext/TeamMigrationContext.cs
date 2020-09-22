@@ -28,7 +28,7 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        public TeamMigrationContext(IHost host) : base(host)
+        public TeamMigrationContext(IServiceProvider services) : base(services)
         {
         }
 

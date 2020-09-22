@@ -20,7 +20,7 @@ namespace VstsSyncMigrator.Engine
     {
 
 
-        public ExportTeamList(IHost Host) : base(Host)
+        public ExportTeamList(IServiceProvider services, MigrationEngine me) : base(services, me)
         {
 
         }

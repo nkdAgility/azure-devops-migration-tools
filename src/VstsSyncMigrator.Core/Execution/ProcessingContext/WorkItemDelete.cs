@@ -16,7 +16,7 @@ namespace VstsSyncMigrator.Engine
     {
 
 
-        public WorkItemDelete(IHost Host) : base(Host)
+        public WorkItemDelete(IServiceProvider services, MigrationEngine me) : base(services, me)
         {
 
         }

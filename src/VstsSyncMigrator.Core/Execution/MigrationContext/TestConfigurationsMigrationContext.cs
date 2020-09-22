@@ -21,7 +21,7 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        public TestConfigurationsMigrationContext(IHost host) : base(host)
+        public TestConfigurationsMigrationContext(IServiceProvider services) : base(services)
         {
 
         }

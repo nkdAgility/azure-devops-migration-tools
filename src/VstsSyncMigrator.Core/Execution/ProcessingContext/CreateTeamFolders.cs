@@ -17,7 +17,7 @@ namespace VstsSyncMigrator.Engine
     {
 
 
-        public CreateTeamFolders(IHost host) : base(host)
+        public CreateTeamFolders(IServiceProvider services, MigrationEngine me) : base(services, me)
         {
          
         }

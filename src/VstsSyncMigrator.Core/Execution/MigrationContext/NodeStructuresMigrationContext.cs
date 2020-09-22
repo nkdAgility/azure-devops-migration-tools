@@ -22,7 +22,7 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        public NodeStructuresMigrationContext(IHost host) : base(host)
+        public NodeStructuresMigrationContext(IServiceProvider services) : base(services)
         {
         }
 

@@ -19,14 +19,14 @@ namespace VstsSyncMigrator.Engine
     {
         internal MigrationEngine me;
         ProcessingStatus status = ProcessingStatus.None;
-        private readonly IHost _Host;
+        private readonly IServiceProvider _services;
 
         public MigrationEngine Engine { get { return me; } }
 
-        public ProcessingContextBase(IHost host)
+        public ProcessingContextBase(IServiceProvider services, MigrationEngine me)
         {
-            _Host = host;
-            this.me = _Host.Services.GetService<MigrationEngine>();
+            _services = services;
+            this.me = me;
         }
 
         public abstract void Configure(ITfsProcessingConfig config);

@@ -17,7 +17,7 @@ namespace VstsSyncMigrator.Engine
     {
         WorkItemUpdateConfig _config;
 
-        public WorkItemUpdate(IHost Host) : base(Host)
+        public WorkItemUpdate(IServiceProvider services, MigrationEngine me) : base(services, me)
         {
             
         }

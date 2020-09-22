@@ -15,11 +15,11 @@ namespace VstsSyncMigrator.Engine
     public abstract class MigrationContextBase : ITfsProcessingContext
     {
         protected MigrationEngine me;
-        protected IHost _host;
+        protected IServiceProvider _services;
 
-        protected MigrationContextBase(IHost host)
+        protected MigrationContextBase(IServiceProvider services)
         {
-            _host = host;
+            _services = services;
            
         }
 
@@ -31,7 +31,7 @@ namespace VstsSyncMigrator.Engine
 
         public void Execute()
         {
-            this.me = _host.Services.GetService<MigrationEngine>();
+            this.me = _services.GetService<MigrationEngine>();
             Telemetry.Current.TrackPageView(this.Name);
             Log.Information("Migration Context Start: {MigrationContextname} ", Name);
             DateTime start = DateTime.Now;

@@ -18,7 +18,7 @@ namespace VstsSyncMigrator.Engine
 
         WorkItemUpdateAreasAsTagsConfig config;
 
-        public WorkItemUpdateAreasAsTagsContext(IHost Host) : base(Host)
+        public WorkItemUpdateAreasAsTagsContext(IServiceProvider services, MigrationEngine me) : base(services, me)
         {
         }
 
