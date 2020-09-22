@@ -6,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using MigrationTools.Core.Engine.Containers;
 using MigrationTools.Services;
+using Microsoft.ApplicationInsights;
 
 namespace _VstsSyncMigrator.Engine.Tests
 {
@@ -13,39 +14,40 @@ namespace _VstsSyncMigrator.Engine.Tests
     public class MigrationEngineTests
     {
         IEngineConfigurationBuilder ecb;
-        IHost host;
+        IServiceProvider services;
 
         [TestInitialize]
         public void Setup()
         {
             ecb = new EngineConfigurationBuilder();
-            host= new HostBuilder().ConfigureServices((context, services) =>
-            {
-                services.AddSingleton<IDetectOnlineService, DetectOnlineService>();
-                services.AddSingleton<IDetectVersionService, DetectVersionService>();
-                services.AddSingleton<IEngineConfigurationBuilder, EngineConfigurationBuilder>();
-                services.AddSingleton<EngineConfiguration>(ecb.BuildDefault());
-                services.AddSingleton<ProcessorContainer>();
-                services.AddSingleton<TypeDefinitionMapContainer>();
-                services.AddSingleton<GitRepoMapContainer>();
-                services.AddSingleton<ChangeSetMappingContainer>();
-                services.AddSingleton<MigrationEngine>();
-            }).Build();
-        }
+            var serviceColl = new ServiceCollection();
+                serviceColl.AddSingleton<IDetectOnlineService, DetectOnlineService>();
+            serviceColl.AddSingleton<IDetectVersionService, DetectVersionService>();
+            serviceColl.AddSingleton<IEngineConfigurationBuilder, EngineConfigurationBuilder>();
+            serviceColl.AddSingleton<EngineConfiguration>(ecb.BuildDefault());
+            serviceColl.AddSingleton<TelemetryClient>(new TelemetryClient());
+            serviceColl.AddSingleton<ProcessorContainer>();
+            serviceColl.AddSingleton<TypeDefinitionMapContainer>();
+            serviceColl.AddSingleton<GitRepoMapContainer>();
+            serviceColl.AddSingleton<ChangeSetMappingContainer>();
+            serviceColl.AddSingleton<MigrationEngine>();
+            services = serviceColl.BuildServiceProvider();
+
+    }
 
         [TestMethod]
         public void TestEngineCreation()
         {
 
-            MigrationEngine me = host.Services.GetRequiredService<MigrationEngine>();
+            MigrationEngine me = services.GetRequiredService<MigrationEngine>();
         }
 
         [TestMethod]
         public void TestEngineExecuteEmptyProcessors()
         {
-            EngineConfiguration ec = ecb.BuildDefault();
+            EngineConfiguration ec = services.GetRequiredService<EngineConfiguration>();
             ec.Processors.Clear();
-            MigrationEngine me = new MigrationEngine(host.Services, ec);
+            MigrationEngine me = services.GetRequiredService<MigrationEngine>();
             me.Run();
 
         }
@@ -53,19 +55,19 @@ namespace _VstsSyncMigrator.Engine.Tests
         [TestMethod]
         public void TestEngineExecuteEmptyFieldMaps()
         {
-            EngineConfiguration ec = ecb.BuildDefault();
+            EngineConfiguration ec = services.GetRequiredService<EngineConfiguration>();
             ec.Processors.Clear();
             ec.FieldMaps.Clear();
-            MigrationEngine me = new MigrationEngine(host.Services, ec);
+            MigrationEngine me = services.GetRequiredService<MigrationEngine>();
             me.Run();
         }
 
         [TestMethod]
         public void TestEngineExecuteProcessors()
         {
-            EngineConfiguration ec = ecb.BuildDefault();
+            EngineConfiguration ec = services.GetRequiredService<EngineConfiguration>();
             ec.FieldMaps.Clear();
-            MigrationEngine me = new MigrationEngine(host.Services, ec);
+            MigrationEngine me = services.GetRequiredService<MigrationEngine>();
             me.Run();
         }
 

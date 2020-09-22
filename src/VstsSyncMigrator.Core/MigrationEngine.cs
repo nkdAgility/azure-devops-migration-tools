@@ -34,15 +34,13 @@ namespace VstsSyncMigrator.Engine
         public GitRepoMapContainer GitRepoMaps { get; }
         public ChangeSetMappingContainer ChangeSetMapps { get; }
         public TelemetryClient Telemetry { get; }
-        public FieldMapContainer FieldMapContainer { get; }
 
         public MigrationEngine(EngineConfiguration config, 
             TypeDefinitionMapContainer typeDefinitionMaps, 
             ProcessorContainer processors, 
             GitRepoMapContainer gitRepoMaps,
             ChangeSetMappingContainer changeSetMapps,
-            TelemetryClient telemetry,
-            FieldMapContainer fieldMapContainer)
+            TelemetryClient telemetry)
         {
             Log.Information("Creating Migration Engine {Guid}", _Guid);
             TypeDefinitionMaps = typeDefinitionMaps;
@@ -50,7 +48,6 @@ namespace VstsSyncMigrator.Engine
             GitRepoMaps = gitRepoMaps;
             ChangeSetMapps = changeSetMapps;
             Telemetry = telemetry;
-            FieldMapContainer = fieldMapContainer;
             ProcessConfiguration(config);
         }
 
