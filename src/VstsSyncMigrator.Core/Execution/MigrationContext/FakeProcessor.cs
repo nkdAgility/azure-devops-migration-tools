@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using MigrationTools.Core.Configuration.Processing;
 using Microsoft.Extensions.Hosting;
 using MigrationTools.Core.Configuration;
+using MigrationTools;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -23,7 +24,7 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        public FakeProcessor(IHost host) : base(host)
+        public FakeProcessor(IServiceProvider services, ITelemetryLogger telemetry) : base(services, telemetry)
         {
 
         }
@@ -33,8 +34,8 @@ namespace VstsSyncMigrator.Engine
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 			//////////////////////////////////////////////////
-			WorkItemStoreContext sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.None);
-            TfsQueryContext tfsqc = new TfsQueryContext(sourceStore);
+			WorkItemStoreContext sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.None, Telemetry);
+            TfsQueryContext tfsqc = new TfsQueryContext(sourceStore, Telemetry);
             tfsqc.AddParameter("TeamProject", me.Source.Config.Project);
             tfsqc.Query = @"SELECT [System.Id] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject ";// AND [System.Id] = 188708 ";
             WorkItemCollection sourceWIS = tfsqc.Execute();

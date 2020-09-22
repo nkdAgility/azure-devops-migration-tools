@@ -15,9 +15,9 @@ namespace VstsSyncMigrator.Commands
     public class ExportADGroupsCommand : CommandBase
     {
 
-        public static object Run(ExportADGroupsOptions opts, string logPath)
+        public static object Run(ExportADGroupsOptions opts, string logPath, ITelemetryLogger telemetry)
         {
-            Telemetry.Current.TrackEvent("Run-ExportADGroupsCommand");
+            telemetry.TrackEvent("Run-ExportADGroupsCommand");
             string exportPath = CreateExportPath(logPath, "ExportADGroups");
             Trace.Listeners.Add(new TextWriterTraceListener(Path.Combine(exportPath, "ExportADGroups.log"), "ExportADGroupsCommand"));
 			Stopwatch stopwatch = Stopwatch.StartNew();

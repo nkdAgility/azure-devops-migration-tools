@@ -1,5 +1,6 @@
 ﻿using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools;
+using Serilog;
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -14,7 +15,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
         {
             if (targetWorkItemLinkStart.Links.Count == sourceWorkItemLinkStart.Links.Count)
             {
-                Trace.WriteLine(string.Format("[SKIP] Source and Target have same number of links  {0} - {1}", sourceWorkItemLinkStart.Id, sourceWorkItemLinkStart.Type.ToString()), "LinkMigrationContext");
+                Log.Information("[SKIP] Source and Target have same number of links  {sourceWorkItemLinkStartId} - {sourceWorkItemLinkStartType}", sourceWorkItemLinkStart.Id, sourceWorkItemLinkStart.Type.ToString());
             }
             else
             {
@@ -23,8 +24,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                 {
                     try
                     {
-                        Trace.WriteLine(string.Format("Migrating link for {0} of type {1}",
-                            sourceWorkItemLinkStart.Id, item.GetType().Name), "LinkMigrationContext");
+                        Log.Information("Migrating link for {sourceWorkItemLinkStartId} of type {ItemGetTypeName}", sourceWorkItemLinkStart.Id, item.GetType().Name);
                         if (IsHyperlink(item))
                         {
                             CreateHyperlink((Hyperlink)item, targetWorkItemLinkStart, save);
@@ -45,8 +45,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                         else
                         {
                             UnknownLinkTypeException ex = new UnknownLinkTypeException(string.Format("  [UnknownLinkType] Unable to {0}", item.GetType().Name));
-                            Telemetry.Current.TrackException(ex);
-                            Trace.WriteLine(ex.ToString(), "LinkMigrationContext");
+                            Log.Error(ex, "LinkMigrationContext");
                             throw ex;
                         }
                     }
@@ -54,17 +53,13 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                     {
                         sourceWorkItemLinkStart.Reset();
                         targetWorkItemLinkStart.Reset();
-                        Telemetry.Current.TrackException(ex);
-                        Trace.WriteLine(string.Format("  [WorkItemLinkValidationException] Adding link for wiSourceL={0}", sourceWorkItemLinkStart.Id), "LinkMigrationContext");
-                        Trace.WriteLine(ex.ToString(), "LinkMigrationContext");
+                        Log.Error(ex, "[WorkItemLinkValidationException] Adding link for wiSourceL={sourceWorkItemLinkStartId}", sourceWorkItemLinkStart.Id);
                     }
                     catch (FormatException ex)
                     {
                         sourceWorkItemLinkStart.Reset();
                         targetWorkItemLinkStart.Reset();
-                        Telemetry.Current.TrackException(ex);
-                        Trace.WriteLine(string.Format("  [CREATE-FAIL] Adding Link for wiSourceL={0}", sourceWorkItemLinkStart.Id), "LinkMigrationContext");
-                        Trace.WriteLine(ex.ToString(), "LinkMigrationContext");
+                        Log.Error(ex, "[CREATE-FAIL] Adding Link for wiSourceL={sourceWorkItemLinkStartId}", sourceWorkItemLinkStart.Id);
                     }
                 }
             }
@@ -113,8 +108,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                          select (ExternalLink)l).SingleOrDefault();
             if (exist == null)
             {
-                Trace.WriteLine(string.Format("Creating new {0} on {1}",
-                                                   sourceLink.GetType().Name, target.Id), "LinkMigrationContext");
+                Log.Information("Creating new {SourceLinkType} on {TargetId}",sourceLink.GetType().Name, target.Id);
                 ExternalLink el = new ExternalLink(sourceLink.ArtifactLinkType, sourceLink.LinkedArtifactUri);
                 el.Comment = sourceLink.Comment;
                 target.Links.Add(el);
@@ -126,8 +120,8 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
             }
             else
             {
-                Trace.WriteLine(string.Format("Link {0} on {1} already exists",
-                                                  sourceLink.GetType().Name, target.Id), "LinkMigrationContext");
+                Log.Information("Link {SourceLinkType} on {TargetId} already exists", 
+                                                  sourceLink.GetType().Name, target.Id);
             }
         }
 
@@ -153,8 +147,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
             }
             catch (Exception ex)
             {
-                Trace.WriteLine(string.Format("  [FIND-FAIL] Adding Link of type {0} where wiSourceL={1}, wiTargetL={2} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiTargetL.Id));
-                Trace.TraceError(ex.ToString());
+                Log.Error(ex, "  [FIND-FAIL] Adding Link of type {0} where wiSourceL={1}, wiTargetL={2} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiTargetL.Id);
                 return;
             }
             try
@@ -163,8 +156,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
             }
             catch (Exception ex)
             {
-                Trace.WriteLine(string.Format("  [FIND-FAIL] Adding Link of type {0} where wiSourceL={1}, wiTargetL={2} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiTargetL.Id));
-                Trace.TraceError(ex.ToString());
+                Log.Error(ex, "  [FIND-FAIL] Adding Link of type {0} where wiSourceL={1}, wiTargetL={2} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiTargetL.Id);
                 return;
 
             }
@@ -184,8 +176,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                 catch (Exception ex)
                 {
 
-                    Trace.WriteLine(string.Format("  [SKIP] Unable to migrate links where wiSourceL={0}, wiSourceR={1}, wiTargetL={2}", ((wiSourceL != null) ? wiSourceL.Id.ToString() : "NotFound"), ((wiSourceR != null) ? wiSourceR.Id.ToString() : "NotFound"), ((wiTargetL != null) ? wiTargetL.Id.ToString() : "NotFound")));
-                    Trace.TraceError(ex.ToString());
+                    Log.Error(ex, "  [SKIP] Unable to migrate links where wiSourceL={0}, wiSourceR={1}, wiTargetL={2}", ((wiSourceL != null) ? wiSourceL.Id.ToString() : "NotFound"), ((wiSourceR != null) ? wiSourceR.Id.ToString() : "NotFound"), ((wiTargetL != null) ? wiTargetL.Id.ToString() : "NotFound"));
                     return;
                 }
 
@@ -193,8 +184,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                 {
                     if (wiSourceR.Id != wiTargetR.Id)
                     {
-                        Trace.WriteLine(
-                            string.Format("  [CREATE-START] Adding Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id));
+                        Log.Information("  [CREATE-START] Adding Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id);
                         WorkItemLinkTypeEnd linkTypeEnd = targetStore.Store.WorkItemLinkTypes.LinkTypeEnds[rl.LinkTypeEnd.ImmutableName];
                         RelatedLink newRl = new RelatedLink(linkTypeEnd, wiTargetR.Id);
 
@@ -204,34 +194,32 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                             wiTargetL.Fields["System.ChangedBy"].Value = "Migration";
                             wiTargetL.Save();
                         }
-                        Trace.WriteLine(
-                            string.Format(
+                        Log.Information(
                                 "  [CREATE-SUCCESS] Adding Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} ",
-                                rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id));
+                                rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id);
                     }
                     else
                     {
-                        Trace.WriteLine(
-                              string.Format(
+                        Log.Information(
                                   "  [SKIP] Unable to migrate link where Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} as target WI has not been migrated",
-                                  rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id));
+                                  rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id);
                     }
                 }
                 else
                 {
                     if (IsExisting)
                     {
-                        Trace.WriteLine(string.Format("  [SKIP] Already Exists a Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id));
+                        Log.Information("  [SKIP] Already Exists a Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id);
                     }
                     if (wiTargetR.IsAccessDenied)
                     {
-                        Trace.WriteLine(string.Format("  [AccessDenied] The Target  work item is inaccessable to create a Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id));
+                        Log.Information("  [AccessDenied] The Target  work item is inaccessable to create a Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id);
                     }
                 }
             }
             else
             {
-                Trace.WriteLine(string.Format("  [SKIP] Cant find wiTargetR where wiSourceL={0}, wiSourceR={1}, wiTargetL={2}", wiSourceL.Id, wiSourceR.Id, wiTargetL.Id));
+                Log.Information("  [SKIP] Cant find wiTargetR where wiSourceL={0}, wiSourceR={1}, wiTargetL={2}", wiSourceL.Id, wiSourceR.Id, wiTargetL.Id);
             }
         }
 

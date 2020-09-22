@@ -9,6 +9,7 @@ using MigrationTools.Core.Configuration;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools;
 using Serilog;
+using Microsoft.ApplicationInsights.DataContracts;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -35,29 +36,33 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        public TeamProjectContext(TeamProjectConfig config)
+        public ITelemetryLogger Telemetry { get; }
+
+        public TeamProjectContext(TeamProjectConfig config, ITelemetryLogger telemetry)
         {
 
             this._config = config;
+            Telemetry = telemetry;
         }
 
-        public TeamProjectContext(TeamProjectConfig config, NetworkCredential credentials)
+        public TeamProjectContext(TeamProjectConfig config, NetworkCredential credentials, ITelemetryLogger telemetry)
         {
             _config = config;
             _credentials = credentials;
+            Telemetry = telemetry;
         }
 
         public void Connect()
         {
             if (_Collection == null)
             {
-                Telemetry.Current.TrackEvent("TeamProjectContext.Connect",
+                Telemetry.TrackEvent("TeamProjectContext.Connect",
                     new Dictionary<string, string> {
                           { "Name", Config.Project},
                           { "Target Project", Config.Project},
                           { "Target Collection",Config.Collection.ToString() },
                            { "ReflectedWorkItemID Field Name",Config.ReflectedWorkItemIDFieldName }
-                    });
+                    }, null);
                 Stopwatch connectionTimer = Stopwatch.StartNew();
 				DateTime start = DateTime.Now;
                 Log.Information("Connecting to {@Config}", Config);
@@ -73,13 +78,13 @@ namespace VstsSyncMigrator.Engine
                     Log.Debug("validating security for {@AuthorizedIdentity} ", _Collection.AuthorizedIdentity);
                     _Collection.EnsureAuthenticated();
                     connectionTimer.Stop();
-                    Telemetry.Current.TrackDependency("TeamService", "EnsureAuthenticated", start, connectionTimer.Elapsed, true);
+                    Telemetry.TrackDependency(new DependencyTelemetry("TeamService", "EnsureAuthenticated", start, connectionTimer.Elapsed, true));
                     Log.Information(" Access granted ");
                 }
                 catch (TeamFoundationServiceUnavailableException ex)
                 {
-                    Telemetry.Current.TrackDependency("TeamService", "EnsureAuthenticated", start, connectionTimer.Elapsed, false);
-                    Telemetry.Current.TrackException(ex,
+                    Telemetry.TrackDependency(new DependencyTelemetry("TeamService", "EnsureAuthenticated", start, connectionTimer.Elapsed, false));
+                    Telemetry.TrackException(ex,
                        new Dictionary<string, string> {
                             { "CollectionUrl", Config.Collection.ToString() },
                             { "TeamProjectName",  Config.Project}

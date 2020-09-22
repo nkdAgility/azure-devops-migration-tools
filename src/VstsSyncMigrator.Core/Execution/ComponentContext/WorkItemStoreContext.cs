@@ -7,6 +7,7 @@ using System.Diagnostics;
 using Microsoft.TeamFoundation.Server;
 using System.Text;
 using MigrationTools;
+using Microsoft.ApplicationInsights.DataContracts;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -19,23 +20,26 @@ namespace VstsSyncMigrator.Engine
 
         public WorkItemStore Store { get { return wistore; }}
 
-        public WorkItemStoreContext(ITeamProjectContext teamProjectContext, WorkItemStoreFlags bypassRules)
+        public ITelemetryLogger Telemetry { get; }
+
+        public WorkItemStoreContext(ITeamProjectContext teamProjectContext, WorkItemStoreFlags bypassRules, ITelemetryLogger telemetry)
         {
             var startTime = DateTime.UtcNow;
             var timer = System.Diagnostics.Stopwatch.StartNew();
             this.teamProjectContext = teamProjectContext;
             this.bypassRules = bypassRules;
+            Telemetry = telemetry;
             try
             {
                 wistore = new WorkItemStore(teamProjectContext.Collection, bypassRules);
                 timer.Stop();
-                Telemetry.Current.TrackDependency("TeamService", "GetWorkItemStore", startTime, timer.Elapsed, true);
+                Telemetry.TrackDependency(new DependencyTelemetry("TeamService", "GetWorkItemStore", startTime, timer.Elapsed, true));
             }
             catch (Exception ex)
             {
                 timer.Stop();
-                Telemetry.Current.TrackDependency("TeamService", "GetWorkItemStore", startTime, timer.Elapsed, false);
-                Telemetry.Current.TrackException(ex,
+                Telemetry.TrackDependency(new DependencyTelemetry("TeamService", "GetWorkItemStore", startTime, timer.Elapsed, false));
+                Telemetry.TrackException(ex,
                        new Dictionary<string, string> {
                             { "CollectionUrl", teamProjectContext.Collection.Uri.ToString() }
                        },
@@ -128,7 +132,7 @@ namespace VstsSyncMigrator.Engine
 
             IEnumerable<WorkItem> QueryWorkItems()
             {
-                TfsQueryContext query = new TfsQueryContext(this);
+                TfsQueryContext query = new TfsQueryContext(this, Telemetry);
                 query.Query = string.Format(@"SELECT [System.Id] FROM WorkItems  WHERE [System.TeamProject]=@TeamProject AND [{0}] Contains '@idToFind'", teamProjectContext.Config.ReflectedWorkItemIDFieldName);
                 query.AddParameter("idToFind", refId.ToString());
                 query.AddParameter("TeamProject", this.teamProjectContext.Config.Project);
@@ -158,7 +162,7 @@ namespace VstsSyncMigrator.Engine
 
         public WorkItem FindReflectedWorkItemByReflectedWorkItemId(string refId)
         {
-            TfsQueryContext query = new TfsQueryContext(this);
+            TfsQueryContext query = new TfsQueryContext(this, Telemetry);
             StringBuilder queryBuilder = FindReflectedWorkItemQueryBase(query);
             queryBuilder.AppendFormat("[{0}] = @idToFind", teamProjectContext.Config.ReflectedWorkItemIDFieldName);
             query.AddParameter("idToFind", refId.ToString());
@@ -168,7 +172,7 @@ namespace VstsSyncMigrator.Engine
 
         public WorkItem FindReflectedWorkItemByMigrationRef(string refId)
         {
-            TfsQueryContext query = new TfsQueryContext(this);
+            TfsQueryContext query = new TfsQueryContext(this, Telemetry);
             StringBuilder queryBuilder  = FindReflectedWorkItemQueryBase(query);
             queryBuilder.Append(" [System.Description] Contains @KeyToFind");
             query.AddParameter("KeyToFind", string.Format("##REF##{0}##", refId));
@@ -178,7 +182,7 @@ namespace VstsSyncMigrator.Engine
 
         public WorkItem FindReflectedWorkItemByTitle(string title)
         {
-            TfsQueryContext query = new TfsQueryContext(this);
+            TfsQueryContext query = new TfsQueryContext(this, Telemetry);
             query.Query = @"SELECT [System.Id] FROM WorkItems  WHERE [System.TeamProject]=@TeamProject AND [System.Title] = @TitleToFind";
             query.AddParameter("TitleToFind", title);
             query.AddParameter("TeamProject", this.teamProjectContext.Config.Project);

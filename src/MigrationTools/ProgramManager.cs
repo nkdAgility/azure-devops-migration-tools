@@ -22,6 +22,7 @@ using MigrationTools.Core.Sinks;
 using Microsoft.ApplicationInsights.Extensibility.PerfCounterCollector;
 using System.Net;
 using MigrationTools.Core.Engine.Containers;
+using Microsoft.ApplicationInsights.DataContracts;
 
 namespace MigrationTools
 {
@@ -29,13 +30,14 @@ namespace MigrationTools
     {
         protected static DateTime _startTime = DateTime.Now;
         protected static Stopwatch _mainTimer = new Stopwatch();
+        protected static ITelemetryLogger TelemetryLogger;
 
         public delegate IServiceCollection PlatformSpecificServices(IServiceCollection services);
         public delegate void EngineEntryPoint(IHost host, ExecuteOptions opts);
 
-        protected static int RunExecuteAndReturnExitCode(ExecuteOptions opts, TelemetryClient tc, PlatformSpecificServices AddPlatformSpecificServices, EngineEntryPoint StartEngine)
+        protected static int RunExecuteAndReturnExitCode(ExecuteOptions opts, ITelemetryLogger telemetryLogger, PlatformSpecificServices AddPlatformSpecificServices, EngineEntryPoint StartEngine)
         {
-            tc.TrackEvent("ExecuteCommand");
+            telemetryLogger.TrackEvent("ExecuteCommand");
 
             if (opts.ConfigFile == string.Empty)
             {
@@ -71,7 +73,7 @@ namespace MigrationTools
                     services.AddOptions();
                     services.AddSingleton<IDetectOnlineService, DetectOnlineService>();
                     services.AddSingleton<IDetectVersionService, DetectVersionService>();
-                    services.AddSingleton(tc);
+                    services.AddSingleton<ITelemetryLogger>(telemetryLogger);
                     services.AddSingleton<IEngineConfigurationBuilder, EngineConfigurationBuilder>();
                     services.AddSingleton<EngineConfiguration>(config);
                     services.AddSingleton<ProcessorContainer>();
@@ -88,9 +90,9 @@ namespace MigrationTools
             return 0;
         }
 
-        protected static object RunInitAndReturnExitCode(InitOptions opts, TelemetryClient telemetryClient)
+        protected static object RunInitAndReturnExitCode(InitOptions opts, ITelemetryLogger telemetryLogger)
         {
-            Telemetry.Current.TrackEvent("InitCommand");
+            telemetryLogger.TrackEvent(new EventTelemetry("InitCommand"));
 
             string configFile = opts.ConfigFile;
             if (string.IsNullOrEmpty(configFile))
@@ -132,7 +134,14 @@ namespace MigrationTools
             return 0;
         }
 
-        protected static ILogger BuildLogger()
+
+        protected static ITelemetryLogger BuildTelemetryLogger()
+        {
+            TelemetryLogger = new TelemetryClientAdapter();
+            return TelemetryLogger;
+        }
+
+        protected static ILogger BuildLogger(ITelemetryLogger telemetryLogger)
         {
             var builder = new ConfigurationBuilder();
             BuildAppConfig(builder);
@@ -146,7 +155,7 @@ namespace MigrationTools
                 .Enrich.WithMachineName()
                 .Enrich.WithProcessId()
                 .WriteTo.Console()
-                .WriteTo.ApplicationInsights(Telemetry.GetTelemiteryClient(), new CustomConverter())
+                .WriteTo.ApplicationInsights(telemetryLogger.Configuration, new CustomConverter())
                 .WriteTo.File(logPath)
                 .CreateLogger();
             Log.Information("Writing log to {logPath}", logPath);
@@ -172,13 +181,13 @@ namespace MigrationTools
         {
             Log.Information("Application Ending");
             _mainTimer.Stop();
-            Telemetry.Current.TrackEvent("ApplicationEnd", null,
+            TelemetryLogger.TrackEvent("ApplicationEnd", null,
                 new Dictionary<string, double> {
                         { "Application_Elapsed", _mainTimer.ElapsedMilliseconds }
                 });
-            if (Telemetry.Current != null)
+            if (TelemetryLogger != null)
             {
-                Telemetry.Current.Flush();
+                TelemetryLogger.CloseAndFlush();
             }
             Log.Information("The application ran in {Application_Elapsed} and finished at {Application_EndTime}", _mainTimer.Elapsed.ToString("c"), DateTime.Now.ToUniversalTime().ToLocalTime());
             Log.CloseAndFlush();

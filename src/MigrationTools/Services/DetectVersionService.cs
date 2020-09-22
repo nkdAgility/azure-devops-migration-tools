@@ -8,6 +8,7 @@ using NuGet.Configuration;
 using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
 using NuGet.Versioning;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -20,10 +21,10 @@ namespace MigrationTools.Services
 {
     public class DetectVersionService : IDetectVersionService
     {
-        private readonly TelemetryClient _Telemetry;
+        private readonly ITelemetryLogger _Telemetry;
 
 
-        public DetectVersionService(TelemetryClient telemetry)
+        public DetectVersionService(ITelemetryLogger telemetry)
         {
             _Telemetry = telemetry;
         }
@@ -48,7 +49,7 @@ namespace MigrationTools.Services
             }
             catch (Exception ex)
             {
-                _Telemetry.TrackException(ex);
+                Log.Error(ex, "DetectVersionService");
                 sucess = false;
             }
             /////////////////

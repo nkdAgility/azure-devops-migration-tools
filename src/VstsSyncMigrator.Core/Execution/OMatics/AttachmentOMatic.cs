@@ -99,15 +99,14 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                 }
                 catch (Exception ex)
                 {
-                    Telemetry.Current.TrackException(ex);
-                    Trace.Write($"\r\nException downloading attachements {ex.Message}");
+                    Log.Error(ex, "Exception downloading attachements");
                     return null;
                 }
 
             }
             else
             {
-                Trace.Write("...already downloaded");
+                Log.Information("...already downloaded");
             }
             return fpath;
         }
@@ -127,11 +126,11 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                 }
                 else
                 {
-                    Trace.WriteLine(string.Format(" [SKIP] WorkItem {0} already contains attachment {1}", targetWorkItem.Id, filepath));
+                    Log.Information(" [SKIP] WorkItem {0} already contains attachment {1}", targetWorkItem.Id, filepath);
                 }
             } else
             {
-                Trace.WriteLine($" [SKIP] Attachemnt {filename} on Work Item {targetWorkItem.Id} is bigger than the limit of {_maxAttachmentSize} bites for Azure DevOps.");
+                Log.Information(" [SKIP] Attachemnt {filename} on Work Item {targetWorkItemId} is bigger than the limit of {maxAttachmentSize} bites for Azure DevOps.", filename, targetWorkItem.Id, _maxAttachmentSize);
 
             }
 

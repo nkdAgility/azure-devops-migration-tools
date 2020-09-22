@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using MigrationTools.Core.Configuration.Processing;
 using Microsoft.Extensions.Hosting;
 using MigrationTools.Core.Configuration;
+using MigrationTools;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -53,7 +54,7 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        public WorkItemQueryMigrationContext(IHost host) : base(host)
+        public WorkItemQueryMigrationContext(IServiceProvider services, ITelemetryLogger telemetry) : base(services, telemetry)
         {
         }
 
@@ -66,8 +67,8 @@ namespace VstsSyncMigrator.Engine
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 			//////////////////////////////////////////////////
-			var sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.None);
-            var targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.None);
+			var sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.None, Telemetry);
+            var targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.None, Telemetry);
 
             var sourceQueryHierarchy = sourceStore.Store.Projects[me.Source.Config.Project].QueryHierarchy;
             var targetQueryHierarchy = targetStore.Store.Projects[me.Target.Config.Project].QueryHierarchy;

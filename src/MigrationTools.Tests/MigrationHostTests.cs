@@ -34,7 +34,7 @@ namespace MigrationTools.Tests
                 services.AddSingleton<TypeDefinitionMapContainer>();
                 services.AddSingleton<GitRepoMapContainer>();
                 services.AddSingleton<ChangeSetMappingContainer>();
-                services.AddSingleton(Telemetry.Current);
+                services.AddSingleton<ITelemetryLogger, TelemetryClientAdapter>();
                 services.AddSingleton<ITeamProjectContext, TeamProjectContextMoc>();
                 services.AddSingleton<MigrationEngineCore>();
             }).Build();

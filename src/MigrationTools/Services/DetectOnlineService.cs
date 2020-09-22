@@ -11,9 +11,9 @@ namespace MigrationTools.Services
 {
     public class DetectOnlineService : IDetectOnlineService
     {
-        private readonly TelemetryClient _Telemetry;
+        private readonly ITelemetryLogger _Telemetry;
 
-        public DetectOnlineService(TelemetryClient telemetry)
+        public DetectOnlineService(ITelemetryLogger telemetry)
         {
             _Telemetry = telemetry;
         }

@@ -15,6 +15,7 @@ using System.Net;
 using MigrationTools;
 using Microsoft.Extensions.DependencyInjection;
 using MigrationTools.Core.Engine.Containers;
+using Microsoft.ApplicationInsights;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -32,15 +33,21 @@ namespace VstsSyncMigrator.Engine
         public TypeDefinitionMapContainer TypeDefinitionMaps { get; }
         public GitRepoMapContainer GitRepoMaps { get; }
         public ChangeSetMappingContainer ChangeSetMapps { get; }
+        public ITelemetryLogger Telemetry { get; }
 
-        public MigrationEngine(IServiceProvider services, EngineConfiguration config)
+        public MigrationEngine(EngineConfiguration config, 
+            TypeDefinitionMapContainer typeDefinitionMaps, 
+            ProcessorContainer processors, 
+            GitRepoMapContainer gitRepoMaps,
+            ChangeSetMappingContainer changeSetMapps,
+            ITelemetryLogger telemetry)
         {
             Log.Information("Creating Migration Engine {Guid}", _Guid);
-            _services = services;
-            TypeDefinitionMaps = _services.GetRequiredService<TypeDefinitionMapContainer>();
-            Processors = _services.GetRequiredService<ProcessorContainer>();
-            GitRepoMaps = _services.GetRequiredService<GitRepoMapContainer>();
-            ChangeSetMapps = _services.GetRequiredService<ChangeSetMappingContainer>();
+            TypeDefinitionMaps = typeDefinitionMaps;
+            Processors = processors;
+            GitRepoMaps = gitRepoMaps;
+            ChangeSetMapps = changeSetMapps;
+            Telemetry = telemetry;
             ProcessConfiguration(config);
         }
 
@@ -52,20 +59,19 @@ namespace VstsSyncMigrator.Engine
 
         private void ProcessConfiguration(EngineConfiguration config)
         {
-            Telemetry.EnableTrace = config.TelemetryEnableTrace;
             if (config.Source != null)
             {
                 if (sourceCreds == null)
-                    SetSource(new TeamProjectContext(config.Source));
+                    SetSource(new TeamProjectContext(config.Source, Telemetry));
                 else
-                    SetSource(new TeamProjectContext(config.Source, sourceCreds));
+                    SetSource(new TeamProjectContext(config.Source, sourceCreds, Telemetry));
             }
             if (config.Target != null)
             {
                 if (targetCreds == null)
-                    SetTarget(new TeamProjectContext(config.Target));
+                    SetTarget(new TeamProjectContext(config.Target, Telemetry));
                 else
-                    SetTarget(new TeamProjectContext(config.Target, targetCreds));
+                    SetTarget(new TeamProjectContext(config.Target, targetCreds, Telemetry));
             }           
             if (config.FieldMaps != null)
             {
@@ -92,7 +98,7 @@ namespace VstsSyncMigrator.Engine
 
         public ProcessingStatus Run()
         {
-            Telemetry.Current.TrackEvent("EngineStart",
+            Telemetry.TrackEvent("EngineStart",
                 new Dictionary<string, string> {
                     { "Engine", "Migration" }
                 },
@@ -109,7 +115,7 @@ namespace VstsSyncMigrator.Engine
                 Stopwatch processorTimer = Stopwatch.StartNew();
 				process.Execute();
                 processorTimer.Stop();
-                Telemetry.Current.TrackEvent("ProcessorComplete", new Dictionary<string, string> { { "Processor", process.Name }, { "Status", process.Status.ToString() } }, new Dictionary<string, double> { { "ProcessingTime", processorTimer.ElapsedMilliseconds } });
+                Telemetry.TrackEvent("ProcessorComplete", new Dictionary<string, string> { { "Processor", process.Name }, { "Status", process.Status.ToString() } }, new Dictionary<string, double> { { "ProcessingTime", processorTimer.ElapsedMilliseconds } });
 
                 if (process.Status == ProcessingStatus.Failed)
                 {
@@ -119,7 +125,7 @@ namespace VstsSyncMigrator.Engine
                 }
             }
             engineTimer.Stop();
-            Telemetry.Current.TrackEvent("EngineComplete", 
+            Telemetry.TrackEvent("EngineComplete", 
                 new Dictionary<string, string> {
                     { "Engine", "Migration" }
                 },

@@ -16,7 +16,7 @@
   "Target": {
     "Collection": "https://dev.azure.com/nkdagility-preview/",
     "Project": "migrationTarget1",
-    "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
+    "ReflectedWorkItemIDFieldName": "nkdScrum.ReflectedWorkItemId",
     "AllowCrossProjectLinking": false,
     "PersonalAccessToken": "",
     "LanguageMaps": {

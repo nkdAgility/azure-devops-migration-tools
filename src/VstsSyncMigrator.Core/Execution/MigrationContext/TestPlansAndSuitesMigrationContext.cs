@@ -17,6 +17,7 @@ using VstsSyncMigrator.Core;
 using MigrationTools;
 using Microsoft.Extensions.Hosting;
 using MigrationTools.Core.Configuration;
+using Serilog;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -51,17 +52,17 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        public TestPlandsAndSuitesMigrationContext(IHost host) : base(host)
+
+        public TestPlandsAndSuitesMigrationContext(IServiceProvider services, ITelemetryLogger telemetry) : base(services, telemetry)
         {
-      
         }
 
         public override void Configure(ITfsProcessingConfig configx)
         {
             config = (TestPlansAndSuitesMigrationConfig)configx;
-            sourceWitStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.None);
+            sourceWitStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.None, Telemetry);
             sourceTestStore = new TestManagementContext(me.Source, config.TestPlanQueryBit);
-            targetWitStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
+            targetWitStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules, Telemetry);
             targetTestStore = new TestManagementContext(me.Target);
             sourceTestConfigs = sourceTestStore.Project.TestConfigurations.Query("Select * From TestConfiguration");
             targetTestConfigs = targetTestStore.Project.TestConfigurations.Query("Select * From TestConfiguration");
@@ -223,8 +224,8 @@ namespace VstsSyncMigrator.Engine
           TagCompletedTargetPlan(targetPlan.Id);
             ///////////////////////////////////////////////
             metrics.Add("ElapsedMS", stopwatch.ElapsedMilliseconds);
-            Telemetry.Current.TrackEvent("MigrateTestPlan", parameters, metrics);
-            Telemetry.Current.TrackRequest("MigrateTestPlan", starttime, stopwatch.Elapsed, "200", true);
+            Telemetry.TrackEvent("MigrateTestPlan", parameters, metrics);
+            Telemetry.TrackRequest("MigrateTestPlan", starttime, stopwatch.Elapsed, "200", true);
         }
 
         /// <summary>
@@ -455,8 +456,8 @@ namespace VstsSyncMigrator.Engine
             ///////////////////////////////////////////////
 
             metrics.Add("ElapsedMS", stopwatch.ElapsedMilliseconds);
-            Telemetry.Current.TrackEvent("MigrateTestSuite", parameters, metrics);
-            Telemetry.Current.TrackRequest("MigrateTestSuite", starttime, stopwatch.Elapsed, "200", true);
+            Telemetry.TrackEvent("MigrateTestSuite", parameters, metrics);
+            Telemetry.TrackRequest("MigrateTestSuite", starttime, stopwatch.Elapsed, "200", true);
         }
 
         /// <summary>
@@ -579,8 +580,8 @@ AddParameter("PlanId", parameters, targetPlan.Id.ToString());
             TraceWriteLine(source, string.Format("    SAVED {0} : {1} - {2} ", target.TestSuiteType.ToString(), target.Id, target.Title), 15);
 
             metrics.Add("ElapsedMS", stopwatch.ElapsedMilliseconds);
-            Telemetry.Current.TrackEvent("MigrateTestCases", parameters, metrics);
-            Telemetry.Current.TrackRequest("MigrateTestCases", starttime, stopwatch.Elapsed, "200", true);
+            Telemetry.TrackEvent("MigrateTestCases", parameters, metrics);
+            Telemetry.TrackRequest("MigrateTestCases", starttime, stopwatch.Elapsed, "200", true);
             stopwatch.Stop();
             _totalTestCases = 0;
             _currentTestCases = 0;
@@ -653,7 +654,7 @@ AddParameter("PlanId", parameters, targetPlan.Id.ToString());
                 {
                     TraceWriteLine(sourceSuite, $"Work Item for Test Case {sourceTce.Title} cannot be found in target. Has it been migrated?", 5);
                 }
-                Telemetry.Current.TrackRequest("ApplyConfigurationsAndAssignTesters", starttime, stopwatch.Elapsed, "200", true);
+                Telemetry.TrackRequest("ApplyConfigurationsAndAssignTesters", starttime, stopwatch.Elapsed, "200", true);
 
             }
             _totalTestCases = 0;
@@ -876,7 +877,7 @@ AddParameter("PlanId", parameters, targetPlan.Id.ToString());
                 catch (Exception ex)
                 {
                     // SOmetimes this will error out for no reason.
-                    Telemetry.Current.TrackException(ex);
+                    Log.Error(ex, "Applying Configurations");
                 }
             }
 
@@ -922,7 +923,7 @@ AddParameter("PlanId", parameters, targetPlan.Id.ToString());
             }
             catch (TestManagementServerException ex)
             {
-                Telemetry.Current.TrackException(ex,
+                Log.Error(ex, " FAILED {TestSuiteType} : {Id} - {Title}",
                       new Dictionary<string, string> {
                           { "Name", Name},
                           { "Target Project", me.Target.Config.Project},
@@ -935,7 +936,6 @@ AddParameter("PlanId", parameters, targetPlan.Id.ToString());
                           { "Title", newTestSuite.Title},
                           { "TestSuiteType", newTestSuite.TestSuiteType.ToString()}
                       });
-                TraceWriteLine(newTestSuite, string.Format("       FAILED {0} : {1} - {2} | {3}", newTestSuite.TestSuiteType.ToString(), newTestSuite.Id, newTestSuite.Title, ex.Message), 10);
                 ITestSuiteBase ErrorSuiteChild = targetTestStore.Project.TestSuites.CreateStatic();
                 ErrorSuiteChild.TestSuiteEntry.Title = string.Format(@"BROKEN: {0} | {1}", newTestSuite.Title, ex.Message);
                 ((IStaticTestSuite)parent).Entries.Add(ErrorSuiteChild);

@@ -13,6 +13,7 @@ using Microsoft.TeamFoundation.Framework.Common;
 using MigrationTools.Core.Configuration.Processing;
 using MigrationTools.Core.Configuration;
 using Microsoft.Extensions.Hosting;
+using MigrationTools;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -20,7 +21,7 @@ namespace VstsSyncMigrator.Engine
     {
 
 
-        public ExportTeamList(IHost Host) : base(Host)
+        public ExportTeamList(IServiceProvider services, MigrationEngine me, ITelemetryLogger telemetry) : base(services, me, telemetry)
         {
 
         }

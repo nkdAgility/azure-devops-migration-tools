@@ -16,6 +16,7 @@ using System.Drawing.Imaging;
 using System.Text.RegularExpressions;
 using MigrationTools.Core.Configuration;
 using Microsoft.Extensions.Hosting;
+using MigrationTools;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -34,7 +35,7 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        public ImportProfilePictureContext(IHost Host) : base(Host)
+        public ImportProfilePictureContext(IServiceProvider services, MigrationEngine me, ITelemetryLogger telemetry) : base(services, me, telemetry)
         {
             //http://www.codeproject.com/Articles/18102/Howto-Almost-Everything-In-Active-Directory-via-C
             ims2 = (IIdentityManagementService2)me.Target.Collection.GetService(typeof(IIdentityManagementService2));

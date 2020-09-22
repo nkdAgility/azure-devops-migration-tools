@@ -25,7 +25,7 @@ namespace MigrationTools
     {
         private readonly IHost _Host;
         private readonly ILogger<MigrationEngineCore> _Log;
-        private readonly TelemetryClient _Telemetry;
+        private readonly ITelemetryLogger _Telemetry;
         private readonly EngineConfiguration _Config;
 
         ProcessorContainer _pContainer;
@@ -41,7 +41,7 @@ namespace MigrationTools
         Dictionary<string, string> _gitRepoMapping = new Dictionary<string, string>();
         public readonly Dictionary<int, string> _ChangeSetMapping = new Dictionary<int, string>();
 
-        public MigrationEngineCore(IHost host, ILogger<MigrationEngineCore> log, TelemetryClient telemetry, IEngineConfigurationBuilder configBuilder)
+        public MigrationEngineCore(IHost host, ILogger<MigrationEngineCore> log, ITelemetryLogger telemetry, IEngineConfigurationBuilder configBuilder)
         {
             _Host = host;
             _Log = log;
@@ -55,7 +55,7 @@ namespace MigrationTools
 
         private void ProcessConfiguration()
         {
-            Telemetry.EnableTrace = _Config.TelemetryEnableTrace;
+            _Telemetry.EnableTrace = _Config.TelemetryEnableTrace;
             if (_Config.Source != null)
             {
                 ITeamProjectContext tpc= _Host.Services.GetRequiredService<ITeamProjectContext>();

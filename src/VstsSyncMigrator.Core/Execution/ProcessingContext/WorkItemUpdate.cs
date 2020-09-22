@@ -10,6 +10,7 @@ using System.Linq;
 using MigrationTools.Core.Configuration.Processing;
 using MigrationTools.Core.Configuration;
 using Microsoft.Extensions.Hosting;
+using MigrationTools;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -17,7 +18,7 @@ namespace VstsSyncMigrator.Engine
     {
         WorkItemUpdateConfig _config;
 
-        public WorkItemUpdate(IHost Host) : base(Host)
+        public WorkItemUpdate(IServiceProvider services, MigrationEngine me, ITelemetryLogger telemetry) : base(services, me, telemetry)
         {
             
         }
@@ -39,9 +40,9 @@ namespace VstsSyncMigrator.Engine
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 			//////////////////////////////////////////////////
-			WorkItemStoreContext targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
+			WorkItemStoreContext targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules, Telemetry);
 
-            TfsQueryContext tfsqc = new TfsQueryContext(targetStore);
+            TfsQueryContext tfsqc = new TfsQueryContext(targetStore, Telemetry);
             tfsqc.AddParameter("TeamProject", me.Target.Config.Project);
             tfsqc.Query = string.Format(@"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY [System.ChangedDate] desc", _config.QueryBit);
             WorkItemCollection  workitems = tfsqc.Execute();

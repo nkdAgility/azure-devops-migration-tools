@@ -33,8 +33,8 @@ namespace MigrationTools.ConsoleUI
         
         static int Main(string[] args)
         {
-            var telemetryClient = Telemetry.GetTelemiteryClient();
-            Log.Logger = BuildLogger();
+            var telemetryClient = BuildTelemetryLogger();
+            Log.Logger = BuildLogger(telemetryClient);
             ApplicationStartup(args);
             var doService = new DetectOnlineService(telemetryClient);
             if (doService.IsOnline())
