@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="chocolatey" Version="0.10.14" />
     <PackageReference Include="Microsoft.ApplicationInsights.TraceListener" Version="2.15.0" />
   </ItemGroup>
 
