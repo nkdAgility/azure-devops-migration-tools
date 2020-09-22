@@ -164,7 +164,7 @@ namespace VstsSyncMigrator.Engine
             //////////////////////////////////////////////////
             stopwatch.Stop();
 
-            contextLog.Information("DONE in {Elapsed:%h} hours {Elapsed:%m} minutes {Elapsed:s/:fff} seconds", stopwatch.Elapsed);
+            contextLog.Information("DONE in {Elapsed}", stopwatch.Elapsed.ToString("c"));
         }
 
 
@@ -594,7 +594,11 @@ namespace VstsSyncMigrator.Engine
 
         internal void TraceWriteLine(LogEventLevel level, string message = "", Dictionary<string, object> properties = null)
         {
-            workItemLog.Write(level, workItemLogTeamplate + message, properties);
+            foreach (var item in properties)
+            {
+                workItemLog = workItemLog.ForContext(item.Key, item.Value);
+            }            
+            workItemLog.Write(level, workItemLogTeamplate + message);
         }
 
         private List<WorkItem> FilterWorkItemsThatAlreadyExistInTarget(List<WorkItem> sourceWorkItems, WorkItemStoreContext targetStore)
