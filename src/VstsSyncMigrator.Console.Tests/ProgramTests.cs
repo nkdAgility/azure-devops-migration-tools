@@ -1,20 +1,16 @@
-﻿using System;
+﻿using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Newtonsoft.Json;
-using System.IO;
-using MigrationTools.Core.Configuration.FieldMap;
 using MigrationTools.Core.Configuration;
+using Newtonsoft.Json;
 
 namespace VstsSyncMigrator.Console.Tests
 {
-    
-
     [TestClass]
     public class ProgramTests
     {
 
-IEngineConfigurationBuilder ecb = new EngineConfigurationBuilder();
-        
+        IEngineConfigurationBuilder ecb = new EngineConfigurationBuilder();
+
         [TestMethod]
         public void TestSeraliseToJson()
         {
