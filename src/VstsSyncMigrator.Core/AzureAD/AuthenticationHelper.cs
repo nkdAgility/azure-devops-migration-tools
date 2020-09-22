@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Threading.Tasks;
-using Microsoft.Azure.ActiveDirectory.GraphClient;
-using Microsoft.IdentityModel.Clients.ActiveDirectory;
-using VstsSyncMigrator;
 using System.Diagnostics;
+using System.Threading.Tasks;
+using Microsoft.IdentityModel.Clients.ActiveDirectory;
 
 namespace VstsSyncMigrator
 {
