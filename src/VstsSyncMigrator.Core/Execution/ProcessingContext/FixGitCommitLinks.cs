@@ -12,6 +12,7 @@ using Microsoft.TeamFoundation.SourceControl.WebApi;
 using VstsSyncMigrator.Core.Execution.OMatics;
 using MigrationTools.Core.Configuration;
 using Microsoft.Extensions.Hosting;
+using MigrationTools;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -20,7 +21,7 @@ namespace VstsSyncMigrator.Engine
         private FixGitCommitLinksConfig _config;
         private RepoOMatic _RepoOMatic;
 
-        public FixGitCommitLinks(IServiceProvider services, MigrationEngine me) : base(services, me)
+        public FixGitCommitLinks(IServiceProvider services, MigrationEngine me, ITelemetryLogger telemetry) : base(services, me, telemetry)
         {
 
            
@@ -44,8 +45,8 @@ namespace VstsSyncMigrator.Engine
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 			//////////////////////////////////////////////////
-            WorkItemStoreContext targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
-            var targetQuery = new TfsQueryContext(targetStore);
+            WorkItemStoreContext targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules, Telemetry);
+            var targetQuery = new TfsQueryContext(targetStore, Telemetry);
             targetQuery.AddParameter("TeamProject", me.Target.Config.Project);
             targetQuery.Query =
                 string.Format(

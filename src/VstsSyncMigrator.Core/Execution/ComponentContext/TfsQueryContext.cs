@@ -15,14 +15,15 @@ namespace VstsSyncMigrator.Engine
         private WorkItemStoreContext storeContext;
         private Dictionary<string, string> parameters;
 
-        public TfsQueryContext(WorkItemStoreContext storeContext)
+        public TfsQueryContext(WorkItemStoreContext storeContext, ITelemetryLogger telemetry)
         {
             this.storeContext = storeContext;
+            Telemetry = telemetry;
             parameters = new Dictionary<string, string>();
         }
 
         public string Query { get; set; }
-
+        public ITelemetryLogger Telemetry { get; }
 
         public void AddParameter(string name, string value)
         {
@@ -55,7 +56,7 @@ namespace VstsSyncMigrator.Engine
 
         public WorkItemCollection Execute()
         {
-                Telemetry.Current.TrackEvent("TfsQueryContext.Execute",parameters);
+            Telemetry.TrackEvent("TfsQueryContext.Execute",parameters, null);
             
 
                 Debug.WriteLine(string.Format("TfsQueryContext: {0}: {1}", "TeamProjectCollection", storeContext.Store.TeamProjectCollection.Uri.ToString()), "TfsQueryContext");
@@ -73,11 +74,11 @@ namespace VstsSyncMigrator.Engine
                 Query = WorkAroundForSOAPError(Query, parameters); // TODO: Remove this once bug fixed... https://dev.azure.com/nkdagility/migration-tools/_workitems/edit/5066 
                 wc = storeContext.Store.Query(Query); //, parameters);
                 queryTimer.Stop();
-                Telemetry.Current.TrackDependency("TeamService", "Query", startTime, queryTimer.Elapsed, true);
+                Telemetry.TrackDependency(new DependencyTelemetry("TeamService", "Query", startTime, queryTimer.Elapsed, true));
                 // Add additional bits to reuse the paramiters dictionary for telemitery
                 parameters.Add("CollectionUrl", storeContext.Store.TeamProjectCollection.Uri.ToString());
                 parameters.Add("Query", Query);
-                Telemetry.Current.TrackEvent("QueryComplete",
+                Telemetry.TrackEvent("QueryComplete",
                       parameters,
                       new Dictionary<string, double> {
                             { "QueryTime", queryTimer.ElapsedMilliseconds },
@@ -89,8 +90,8 @@ namespace VstsSyncMigrator.Engine
             catch (Exception ex)
             {
                 queryTimer.Stop();
-                Telemetry.Current.TrackDependency("TeamService", "Query", startTime, queryTimer.Elapsed, false);
-                Telemetry.Current.TrackException(ex,
+                Telemetry.TrackDependency(new DependencyTelemetry("TeamService", "Query", startTime, queryTimer.Elapsed, false));
+                Telemetry.TrackException(ex,
                        new Dictionary<string, string> {
                             { "CollectionUrl", storeContext.Store.TeamProjectCollection.Uri.ToString() }
                        },

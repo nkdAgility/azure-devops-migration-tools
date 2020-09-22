@@ -10,6 +10,7 @@ using System.Linq;
 using Microsoft.TeamFoundation.Client;
 using MigrationTools.Core.Configuration;
 using Microsoft.Extensions.Hosting;
+using MigrationTools;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -17,7 +18,7 @@ namespace VstsSyncMigrator.Engine
     {
 
 
-        public CreateTeamFolders(IServiceProvider services, MigrationEngine me) : base(services, me)
+        public CreateTeamFolders(IServiceProvider services, MigrationEngine me, ITelemetryLogger telemetry) : base(services, me, telemetry)
         {
          
         }
@@ -39,9 +40,9 @@ namespace VstsSyncMigrator.Engine
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 			//////////////////////////////////////////////////
-			WorkItemStoreContext targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
+			WorkItemStoreContext targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules, Telemetry);
 
-            TfsQueryContext tfsqc = new TfsQueryContext(targetStore);
+            TfsQueryContext tfsqc = new TfsQueryContext(targetStore, Telemetry);
 
             TfsTeamService teamService = me.Target.Collection.GetService<TfsTeamService>();
             QueryHierarchy qh = targetStore.Store.Projects[me.Target.Config.Project].QueryHierarchy;

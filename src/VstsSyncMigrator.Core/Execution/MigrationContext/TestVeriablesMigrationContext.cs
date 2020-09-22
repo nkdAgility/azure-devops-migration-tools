@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using MigrationTools.Core.Configuration.Processing;
 using Microsoft.Extensions.Hosting;
 using MigrationTools.Core.Configuration;
+using MigrationTools;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -22,17 +23,17 @@ namespace VstsSyncMigrator.Engine
 
         // http://blogs.microsoft.co.il/shair/2015/02/02/tfs-api-part-56-test-configurations/
 
-        public TestVeriablesMigrationContext(IServiceProvider services) : base(services)
+        public TestVeriablesMigrationContext(IServiceProvider services, ITelemetryLogger telemetry) : base(services, telemetry)
         {
 
         }
 
         internal override void InternalExecute()
         {
-            WorkItemStoreContext sourceWisc = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.None);
+            WorkItemStoreContext sourceWisc = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.None, Telemetry);
             TestManagementContext SourceTmc = new TestManagementContext(me.Source);
 
-            WorkItemStoreContext targetWisc = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
+            WorkItemStoreContext targetWisc = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules, Telemetry);
             TestManagementContext targetTmc = new TestManagementContext(me.Target);
 
             List<ITestVariable> sourceVars = SourceTmc.Project.TestVariables.Query().ToList();

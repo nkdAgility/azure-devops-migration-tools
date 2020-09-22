@@ -33,14 +33,14 @@ namespace VstsSyncMigrator.Engine
         public TypeDefinitionMapContainer TypeDefinitionMaps { get; }
         public GitRepoMapContainer GitRepoMaps { get; }
         public ChangeSetMappingContainer ChangeSetMapps { get; }
-        public TelemetryClient Telemetry { get; }
+        public ITelemetryLogger Telemetry { get; }
 
         public MigrationEngine(EngineConfiguration config, 
             TypeDefinitionMapContainer typeDefinitionMaps, 
             ProcessorContainer processors, 
             GitRepoMapContainer gitRepoMaps,
             ChangeSetMappingContainer changeSetMapps,
-            TelemetryClient telemetry)
+            ITelemetryLogger telemetry)
         {
             Log.Information("Creating Migration Engine {Guid}", _Guid);
             TypeDefinitionMaps = typeDefinitionMaps;
@@ -62,16 +62,16 @@ namespace VstsSyncMigrator.Engine
             if (config.Source != null)
             {
                 if (sourceCreds == null)
-                    SetSource(new TeamProjectContext(config.Source));
+                    SetSource(new TeamProjectContext(config.Source, Telemetry));
                 else
-                    SetSource(new TeamProjectContext(config.Source, sourceCreds));
+                    SetSource(new TeamProjectContext(config.Source, sourceCreds, Telemetry));
             }
             if (config.Target != null)
             {
                 if (targetCreds == null)
-                    SetTarget(new TeamProjectContext(config.Target));
+                    SetTarget(new TeamProjectContext(config.Target, Telemetry));
                 else
-                    SetTarget(new TeamProjectContext(config.Target, targetCreds));
+                    SetTarget(new TeamProjectContext(config.Target, targetCreds, Telemetry));
             }           
             if (config.FieldMaps != null)
             {

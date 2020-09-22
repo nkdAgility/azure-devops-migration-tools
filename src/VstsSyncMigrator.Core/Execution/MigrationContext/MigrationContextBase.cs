@@ -9,6 +9,7 @@ using MigrationTools;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
+using Microsoft.ApplicationInsights.DataContracts;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -17,10 +18,10 @@ namespace VstsSyncMigrator.Engine
         protected MigrationEngine me;
         protected IServiceProvider _services;
 
-        protected MigrationContextBase(IServiceProvider services)
+        protected MigrationContextBase(IServiceProvider services, ITelemetryLogger telemetry)
         {
             _services = services;
-           
+            Telemetry = telemetry;
         }
 
         public abstract void Configure(ITfsProcessingConfig config);
@@ -28,11 +29,12 @@ namespace VstsSyncMigrator.Engine
         public abstract string Name { get; }
 
         public ProcessingStatus Status { get; private set; } = ProcessingStatus.None;
+        public ITelemetryLogger Telemetry { get; }
 
         public void Execute()
         {
             this.me = _services.GetService<MigrationEngine>();
-            Telemetry.Current.TrackPageView(this.Name);
+            Telemetry.TrackEvent(this.Name);
             Log.Information("Migration Context Start: {MigrationContextname} ", Name);
             DateTime start = DateTime.Now;
             var executeTimer = Stopwatch.StartNew();
@@ -51,7 +53,7 @@ namespace VstsSyncMigrator.Engine
                 Status = ProcessingStatus.Failed;
                 executeTimer.Stop();
                 
-                Telemetry.Current.TrackException(ex,
+                Telemetry.TrackException(ex,
                     new Dictionary<string, string>
                     {
                         {"Name", Name},
@@ -69,7 +71,7 @@ namespace VstsSyncMigrator.Engine
             }
             finally
             {
-                Telemetry.Current.TrackRequest(this.Name, start, executeTimer.Elapsed, Status.ToString(), (Status == ProcessingStatus.Complete));
+                Telemetry.TrackRequest( this.Name, start, executeTimer.Elapsed, Status.ToString(), (Status == ProcessingStatus.Complete));
             }
 
         }

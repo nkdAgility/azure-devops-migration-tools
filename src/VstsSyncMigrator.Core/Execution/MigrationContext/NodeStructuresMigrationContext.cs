@@ -7,6 +7,7 @@ using MigrationTools.Core.Configuration.Processing;
 using MigrationTools;
 using Microsoft.Extensions.Hosting;
 using MigrationTools.Core.Configuration;
+using Serilog;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -22,7 +23,7 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        public NodeStructuresMigrationContext(IServiceProvider services) : base(services)
+        public NodeStructuresMigrationContext(IServiceProvider services, ITelemetryLogger telemetry) : base(services, telemetry)
         {
         }
 
@@ -57,7 +58,7 @@ namespace VstsSyncMigrator.Engine
             if (sourceNode == null) // May run into language problems!!! This is to try and detect that
             {
                 Exception ex = new Exception(string.Format("Unable to load Common Structure for Source. This is usually due to diferent language versions. Validate that '{0}' is the correct name in your version. ", treeTypeSource));
-                Telemetry.Current.TrackException(ex);
+                Log.Error(ex, "Unable to load Common Structure for Source.");
                 throw ex;
             }
             XmlElement sourceTree = sourceCss.GetNodesXml(new string[] { sourceNode.Uri }, true);
@@ -69,7 +70,7 @@ namespace VstsSyncMigrator.Engine
             catch (Exception ex)
             {
                 Exception ex2 = new Exception(string.Format("Unable to load Common Structure for Target.This is usually due to diferent language versions. Validate that '{0}' is the correct name in your version. ", treeTypeTarget), ex);
-                Telemetry.Current.TrackException(ex2);
+                Log.Error(ex2, "Unable to load Common Structure for Target.");
                 throw ex2;
             }
             if (_config.PrefixProjectToNodes)
@@ -173,7 +174,7 @@ namespace VstsSyncMigrator.Engine
             }
             catch (CommonStructureSubsystemException ex)
             {
-                Telemetry.Current.TrackException(ex);
+                Log.Error(ex, "Creating Node");
                 Trace.Write("...missing");
                 string newPathUri = css.CreateNode(name, parent.Uri);
                 Trace.Write("...created");
@@ -196,10 +197,9 @@ namespace VstsSyncMigrator.Engine
             }
             catch (CommonStructureSubsystemException ex)
             {
-                Telemetry.Current.TrackException(ex);
-                Trace.Write("...missing");
+               Log.Warning(ex, "Missing ");
                 string newPathUri = css.CreateNode(name, parent.Uri);
-                Trace.Write("...created");
+               Log.Information("...created");
                 node = css.GetNode(newPathUri);
             }
 
@@ -210,8 +210,7 @@ namespace VstsSyncMigrator.Engine
             }
             catch (CommonStructureSubsystemException ex)
             {
-                Telemetry.Current.TrackException(ex);
-                Trace.Write("...dates not set");
+                Log.Warning(ex, "Dates not set ");
             }
 
             Trace.WriteLine(String.Empty);

@@ -12,6 +12,7 @@ using MigrationTools;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
+using Microsoft.ApplicationInsights.DataContracts;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -23,10 +24,11 @@ namespace VstsSyncMigrator.Engine
 
         public MigrationEngine Engine { get { return me; } }
 
-        public ProcessingContextBase(IServiceProvider services, MigrationEngine me)
+        public ProcessingContextBase(IServiceProvider services, MigrationEngine me, ITelemetryLogger telemetry)
         {
             _services = services;
             this.me = me;
+            Telemetry = telemetry;
         }
 
         public abstract void Configure(ITfsProcessingConfig config);
@@ -41,9 +43,11 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
+        public ITelemetryLogger Telemetry { get; }
+
         public void Execute()
         {
-            Telemetry.Current.TrackPageView(this.Name);
+            Telemetry.TrackEvent(this.Name);
             Trace.TraceInformation(string.Format("ProcessingContext Start {0} ", Name));
             Stopwatch executeTimer = Stopwatch.StartNew();
 			DateTime start = DateTime.Now;
@@ -54,7 +58,7 @@ namespace VstsSyncMigrator.Engine
                 InternalExecute();
                 status = ProcessingStatus.Complete;
                 executeTimer.Stop();
-                Telemetry.Current.TrackEvent("ProcessingContextComplete",
+                Telemetry.TrackEvent("ProcessingContextComplete",
                     new Dictionary<string, string> {
                         { "Name", Name},
                         { "Target Project", me.Target.Config.Project},
@@ -70,7 +74,7 @@ namespace VstsSyncMigrator.Engine
             {
                 status = ProcessingStatus.Failed;
                 executeTimer.Stop();
-                Telemetry.Current.TrackException(ex,
+                Telemetry.TrackException(ex,
                       new Dictionary<string, string> {
                           { "Name", Name},
                           { "Target Project", me.Target.Config.Project},
@@ -84,7 +88,7 @@ namespace VstsSyncMigrator.Engine
             }
             finally
             {
-                Telemetry.Current.TrackRequest(this.Name, start, executeTimer.Elapsed, Status.ToString(), (Status == ProcessingStatus.Complete));
+                Telemetry.TrackRequest( this.Name, start, executeTimer.Elapsed, Status.ToString(), (Status == ProcessingStatus.Complete));
             }
         }
 

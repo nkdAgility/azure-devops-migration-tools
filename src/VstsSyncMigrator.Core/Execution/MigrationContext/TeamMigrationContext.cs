@@ -12,6 +12,7 @@ using System.Text.RegularExpressions;
 using MigrationTools.Core.Configuration.Processing;
 using Microsoft.Extensions.Hosting;
 using MigrationTools.Core.Configuration;
+using MigrationTools;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -28,7 +29,7 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        public TeamMigrationContext(IServiceProvider services) : base(services)
+        public TeamMigrationContext(IServiceProvider services, ITelemetryLogger telemetry) : base(services, telemetry)
         {
         }
 
@@ -45,13 +46,13 @@ namespace VstsSyncMigrator.Engine
             }
             Stopwatch stopwatch = Stopwatch.StartNew();
             //////////////////////////////////////////////////
-            WorkItemStoreContext sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.BypassRules);
+            WorkItemStoreContext sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.BypassRules, Telemetry);
             TfsTeamService sourceTS = me.Source.Collection.GetService<TfsTeamService>();
             List<TeamFoundationTeam> sourceTL = sourceTS.QueryTeams(me.Source.Config.Project).ToList();
             Trace.WriteLine(string.Format("Found {0} teams in Source?", sourceTL.Count));
             var sourceTSCS = me.Source.Collection.GetService<TeamSettingsConfigurationService>();
             //////////////////////////////////////////////////
-            WorkItemStoreContext targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
+            WorkItemStoreContext targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules, Telemetry);
             Project targetProject = targetStore.GetProject();
             Trace.WriteLine(string.Format("Found target project as {0}", targetProject.Name));
             TfsTeamService targetTS = me.Target.Collection.GetService<TfsTeamService>();

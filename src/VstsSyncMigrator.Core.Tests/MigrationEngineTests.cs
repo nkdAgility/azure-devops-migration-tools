@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using MigrationTools.Core.Engine.Containers;
 using MigrationTools.Services;
 using Microsoft.ApplicationInsights;
+using MigrationTools;
 
 namespace _VstsSyncMigrator.Engine.Tests
 {
@@ -30,6 +31,7 @@ namespace _VstsSyncMigrator.Engine.Tests
             serviceColl.AddSingleton<TypeDefinitionMapContainer>();
             serviceColl.AddSingleton<GitRepoMapContainer>();
             serviceColl.AddSingleton<ChangeSetMappingContainer>();
+            serviceColl.AddSingleton<ITelemetryLogger, TestTelemetryLogger>();
             serviceColl.AddSingleton<MigrationEngine>();
             services = serviceColl.BuildServiceProvider();
 

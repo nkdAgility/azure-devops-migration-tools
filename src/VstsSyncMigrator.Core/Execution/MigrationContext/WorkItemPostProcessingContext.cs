@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using MigrationTools.Core.Configuration.Processing;
 using Microsoft.Extensions.Hosting;
 using MigrationTools.Core.Configuration;
+using MigrationTools;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -21,7 +22,7 @@ namespace VstsSyncMigrator.Engine
         //private IList<int> _workItemIDs;
         // private string _queryBit;
 
-        public WorkItemPostProcessingContext(IServiceProvider services) : base(services)
+        public WorkItemPostProcessingContext(IServiceProvider services, ITelemetryLogger telemetry) : base(services, telemetry)
         {
         }
 
@@ -56,8 +57,8 @@ namespace VstsSyncMigrator.Engine
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 			//////////////////////////////////////////////////
-			WorkItemStoreContext sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.None);
-            TfsQueryContext tfsqc = new TfsQueryContext(sourceStore);
+			WorkItemStoreContext sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.None, Telemetry);
+            TfsQueryContext tfsqc = new TfsQueryContext(sourceStore, Telemetry);
             tfsqc.AddParameter("TeamProject", me.Source.Config.Project);
 
             //Builds the constraint part of the query
@@ -68,7 +69,7 @@ namespace VstsSyncMigrator.Engine
             WorkItemCollection sourceWIS = tfsqc.Execute();
             Trace.WriteLine(string.Format("Migrate {0} work items?", sourceWIS.Count));
             //////////////////////////////////////////////////
-            WorkItemStoreContext targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
+            WorkItemStoreContext targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules, Telemetry);
             Project destProject = targetStore.GetProject();
             Trace.WriteLine(string.Format("Found target project as {0}", destProject.Name));
 

@@ -35,8 +35,8 @@ namespace VstsSyncMigrator.ConsoleApp
 
         public static int Main(string[] args)
         {
-            var telemetryClient = Telemetry.GetTelemiteryClient();
-            Log.Logger = BuildLogger();
+            var telemetryClient = BuildTelemetryLogger();
+            Log.Logger = BuildLogger(telemetryClient);
 
             /////////////////////////////////////////////////////////
             Trace.Listeners.Add(new TextWriterTraceListener(Console.Out)); // TODO: Remove once Trace replaced with log
@@ -67,7 +67,7 @@ namespace VstsSyncMigrator.ConsoleApp
             int result = (int)Parser.Default.ParseArguments<InitOptions, ExecuteOptions>(args).MapResult(
                 (InitOptions opts) => RunInitAndReturnExitCode(opts, telemetryClient),
                 (ExecuteOptions opts) => RunExecuteAndReturnExitCode(opts, telemetryClient, AddPlatformSpecificServices, ExecuteEntryPoint),
-                (ExportADGroupsOptions opts) => ExportADGroupsCommand.Run(opts, oldlogPath),
+                (ExportADGroupsOptions opts) => ExportADGroupsCommand.Run(opts, oldlogPath, telemetryClient),
                 errs => 1);
             ApplicationShutdown();
 #if DEBUG

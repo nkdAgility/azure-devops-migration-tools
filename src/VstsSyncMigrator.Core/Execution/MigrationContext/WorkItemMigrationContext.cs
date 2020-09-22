@@ -52,10 +52,11 @@ namespace VstsSyncMigrator.Engine
         static int _totalWorkItem = 0;
         static string workItemLogTeamplate = "[{sourceWorkItemTypeName,20}][Complete:{currentWorkItem,6}/{totalWorkItems}][sid:{sourceWorkItemId,6}|Rev:{sourceRevisionInt,3}][tid:{targetWorkItemId,6} | ";
 
-        public WorkItemMigrationContext(IServiceProvider services)
-            : base(services)
+        public WorkItemMigrationContext(IServiceProvider services, ITelemetryLogger telemetry)
+            : base(services, telemetry)
         {
-            contextLog = Log.ForContext<WorkItemMigrationContext>();
+            contextLog = Log.ForContext<WorkItemMigrationContext>( );
+            Telemetry = telemetry;
         }
         
         public override void Configure(ITfsProcessingConfig config)
@@ -95,6 +96,8 @@ namespace VstsSyncMigrator.Engine
 
         public override string Name => "WorkItemMigration";
 
+        public ITelemetryLogger Telemetry { get; }
+
         internal override void InternalExecute()
         {
             if (_config == null)
@@ -112,8 +115,8 @@ namespace VstsSyncMigrator.Engine
 
             var stopwatch = Stopwatch.StartNew();
             //////////////////////////////////////////////////
-            var sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.BypassRules);
-            var tfsqc = new TfsQueryContext(sourceStore);
+            var sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.BypassRules, Telemetry);
+            var tfsqc = new TfsQueryContext(sourceStore, Telemetry);
             tfsqc.AddParameter("TeamProject", me.Source.Config.Project);
             tfsqc.Query =
                 string.Format(
@@ -123,7 +126,7 @@ namespace VstsSyncMigrator.Engine
             var sourceWorkItems = (from WorkItem swi in sourceQueryResult select swi).ToList();
             contextLog.Information("Replay all revisions of {sourceWorkItemsCount} work items?", sourceWorkItems.Count);
             //////////////////////////////////////////////////
-            var targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
+            var targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules, Telemetry);
             var destProject = targetStore.GetProject();
             contextLog.Information("Found target project as {@destProject}", destProject.Name);
             //////////////////////////////////////////////////////////FilterCompletedByQuery
@@ -242,8 +245,7 @@ namespace VstsSyncMigrator.Engine
             }
             catch (WebException ex)
             {
-
-                Telemetry.Current.TrackException(ex);
+                Log.Error(ex, "Some kind of internet pipe blockage");
 
                 TraceWriteLine(LogEventLevel.Error, ex.ToString(), ex);
                 if (retrys < retryLimit)
@@ -261,9 +263,9 @@ namespace VstsSyncMigrator.Engine
             }
             catch (Exception ex)
             {
-                Telemetry.Current.TrackException(ex);
+                Log.Error(ex, ex.ToString());
                 TraceWriteLine(LogEventLevel.Error, ex.ToString(), ex);
-                Telemetry.Current.TrackRequest("ProcessWorkItem", starttime, witstopwatch.Elapsed, "502", false);
+                Telemetry.TrackRequest("ProcessWorkItem", starttime, witstopwatch.Elapsed, "502", false);
                 throw ex;
             }
             witstopwatch.Stop();
@@ -275,8 +277,8 @@ namespace VstsSyncMigrator.Engine
             var remaining = new TimeSpan(0, 0, 0, 0, (int)(average.TotalMilliseconds * _count));
             TraceWriteLine(LogEventLevel.Information, "Average time of {average:s/:fff} per work item and {remaining:%h} hours {remaining:%m} minutes {remaining:s/:fff} seconds estimated to completion", average, remaining);
             Trace.Flush();
-            Telemetry.Current.TrackEvent("WorkItemMigrated", processWorkItemParamiters, processWorkItemMetrics);
-            Telemetry.Current.TrackRequest("ProcessWorkItem", starttime, witstopwatch.Elapsed, "200", true);
+            Telemetry.TrackEvent("WorkItemMigrated", processWorkItemParamiters, processWorkItemMetrics);
+            Telemetry.TrackRequest("ProcessWorkItem", starttime, witstopwatch.Elapsed, "200", true);
 
             _current++;
             _count--;
@@ -502,7 +504,7 @@ namespace VstsSyncMigrator.Engine
                 throw new Exception(string.Format("WARNING: Unable to find '{0}' in the target project. Most likley this is due to a typo in the .json configuration under WorkItemTypeDefinition! ", destType));
             }
             newWorkItemTimer.Stop();
-            Telemetry.Current.TrackDependency(new DependencyTelemetry("TeamService", "NewWorkItem", newWorkItemstartTime, newWorkItemTimer.Elapsed, true));
+            Telemetry.TrackDependency(new DependencyTelemetry("TeamService", "NewWorkItem", newWorkItemstartTime, newWorkItemTimer.Elapsed, true));
             if (_config.UpdateCreatedBy) { newwit.Fields["System.CreatedBy"].Value = currentRevisionWorkItem.Revisions[0].Fields["System.CreatedBy"].Value; }
             if (_config.UpdateCreatedDate) { newwit.Fields["System.CreatedDate"].Value = currentRevisionWorkItem.Revisions[0].Fields["System.CreatedDate"].Value; }
 
@@ -563,7 +565,7 @@ namespace VstsSyncMigrator.Engine
 
         private List<WorkItem> FilterWorkItemsThatAlreadyExistInTarget(List<WorkItem> sourceWorkItems, WorkItemStoreContext targetStore)
         {
-            var targetQuery = new TfsQueryContext(targetStore);
+            var targetQuery = new TfsQueryContext(targetStore, Telemetry);
             targetQuery.AddParameter("TeamProject", me.Target.Config.Project);
             targetQuery.Query =
                 string.Format(

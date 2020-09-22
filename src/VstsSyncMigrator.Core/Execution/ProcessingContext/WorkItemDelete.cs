@@ -9,6 +9,7 @@ using System.Text.RegularExpressions;
 using System.Linq;
 using MigrationTools.Core.Configuration;
 using Microsoft.Extensions.Hosting;
+using MigrationTools;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -16,7 +17,7 @@ namespace VstsSyncMigrator.Engine
     {
 
 
-        public WorkItemDelete(IServiceProvider services, MigrationEngine me) : base(services, me)
+        public WorkItemDelete(IServiceProvider services, MigrationEngine me, ITelemetryLogger telemetry) : base(services, me, telemetry)
         {
 
         }
@@ -38,8 +39,8 @@ namespace VstsSyncMigrator.Engine
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 			//////////////////////////////////////////////////
-			WorkItemStoreContext targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
-            TfsQueryContext tfsqc = new TfsQueryContext(targetStore);
+			WorkItemStoreContext targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules, Telemetry);
+            TfsQueryContext tfsqc = new TfsQueryContext(targetStore, Telemetry);
             tfsqc.AddParameter("TeamProject", me.Target.Config.Project);
             tfsqc.Query = string.Format(@"SELECT [System.Id] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject  AND [System.AreaPath] UNDER '{0}\_DeleteMe'", me.Target.Config.Project);
             WorkItemCollection  workitems = tfsqc.Execute();

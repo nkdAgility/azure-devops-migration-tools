@@ -7,11 +7,13 @@ using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using Microsoft.ApplicationInsights;
 using System.Diagnostics;
 using MigrationTools;
+using Serilog;
 
 namespace VstsSyncMigrator.Engine.ComponentContext
 {
     public abstract class FieldMapBase : IFieldMap
     {
+
 
         public void Execute(WorkItem source, WorkItem target)
         {
@@ -22,12 +24,11 @@ namespace VstsSyncMigrator.Engine.ComponentContext
             catch (Exception ex)
             {
                 Trace.WriteLine(string.Format("  [ERROR] {0}", ex.Message));
-                Telemetry.Current.TrackException(ex,
+                Log.Error(ex, "Field mapp fault", 
                        new Dictionary<string, string> {
                             { "Source", source.Id.ToString() },
                             { "Target",  target.Id.ToString()}
                        });
-                Trace.TraceError($"  [EXCEPTION] {ex}");
             }            
         }
         public string Name

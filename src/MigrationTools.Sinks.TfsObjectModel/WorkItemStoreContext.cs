@@ -35,7 +35,7 @@
 //            {
 //                timer.Stop();
 //                Telemetry.Current.TrackDependency("TeamService", "GetWorkItemStore", startTime, timer.Elapsed, false);
-//                Telemetry.Current.TrackException(ex,
+//                TelemetryLogger.TrackException(ex,
 //                       new Dictionary<string, string> {
 //                            { "CollectionUrl", teamProjectContext.Collection.Uri.ToString() }
 //                       },

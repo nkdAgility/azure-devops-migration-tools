@@ -6,6 +6,8 @@ using VstsSyncMigrator.Engine.ComponentContext;
 using MigrationTools.Core.Configuration.Processing;
 using Microsoft.Extensions.Hosting;
 using MigrationTools.Core.Configuration;
+using Microsoft.ApplicationInsights.Channel;
+using MigrationTools;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -21,7 +23,7 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        public TestConfigurationsMigrationContext(IServiceProvider services) : base(services)
+        public TestConfigurationsMigrationContext(IServiceProvider services, ITelemetryLogger telemetry) : base(services, telemetry)
         {
 
         }
