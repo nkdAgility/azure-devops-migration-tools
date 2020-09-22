@@ -10,6 +10,7 @@ namespace VstsSyncMigrator.Engine
 {
     public interface ITeamProjectContext
     {
+        [Obsolete()]
         TfsTeamProjectCollection Collection { get; }
         TeamProjectConfig Config { get; }
         void Connect();

@@ -18,6 +18,7 @@ namespace MigrationTools
 
         public static bool EnableTrace { get { return enableTrace; } set { enableTrace = value; } }
 
+        [Obsolete()]
         public static TelemetryClient Current { get {
                 return telemetryClient = GetTelemiteryClient(); 
             } }
