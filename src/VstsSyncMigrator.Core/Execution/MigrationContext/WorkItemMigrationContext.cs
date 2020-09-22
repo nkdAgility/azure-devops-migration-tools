@@ -192,7 +192,11 @@ namespace VstsSyncMigrator.Engine
                 {
                     var targetWorkItem = targetStore.FindReflectedWorkItem(sourceWorkItem, false);
                     ///////////////////////////////////////////////
-                    TraceWriteLine(LogEventLevel.Information, "Work Item has {sourceWorkItemRev} revisions and revision migration is set to {ReplayRevisions}", sourceWorkItem.Rev, _config.ReplayRevisions);
+                    TraceWriteLine(LogEventLevel.Information, "Work Item has {sourceWorkItemRev} revisions and revision migration is set to {ReplayRevisions}", 
+                        new Dictionary<string, object>(){
+                            { "sourceWorkItemRev", sourceWorkItem.Rev },
+                            { "ReplayRevisions", _config.ReplayRevisions }}
+                        );
                     List<RevisionItem> revisionsToMigrate = RevisionsToMigrate(sourceWorkItem, targetWorkItem);
                     if (targetWorkItem == null)
                     {
@@ -210,7 +214,10 @@ namespace VstsSyncMigrator.Engine
                         }
                         else
                         {
-                            TraceWriteLine(LogEventLevel.Information, "Syncing as there are {revisionsToMigrateCount} revisons detected", revisionsToMigrate.Count);
+                            TraceWriteLine(LogEventLevel.Information, "Syncing as there are {revisionsToMigrateCount} revisons detected",
+                                new Dictionary<string, object>(){
+                                    { "revisionsToMigrateCount", revisionsToMigrate.Count }
+                                });
 
                             targetWorkItem = ReplayRevisions(revisionsToMigrate, sourceWorkItem, targetWorkItem, destProject, sourceStore, _current, targetStore);
 
@@ -240,20 +247,29 @@ namespace VstsSyncMigrator.Engine
                 }
                 else
                 {
-                    TraceWriteLine(LogEventLevel.Warning, "SKIP: Unable to migrate {sourceWorkItemTypeName}/{sourceWorkItemId}. Use the TestPlansAndSuitesMigrationContext after you have migrated all Test Cases. ", sourceWorkItem.Type.Name, sourceWorkItem.Id);
+                    TraceWriteLine(LogEventLevel.Warning, "SKIP: Unable to migrate {sourceWorkItemTypeName}/{sourceWorkItemId}. Use the TestPlansAndSuitesMigrationContext after you have migrated all Test Cases. ",
+                        new Dictionary<string, object>() {
+                            {"sourceWorkItemTypeName", sourceWorkItem.Type.Name },
+                            {"sourceWorkItemId", sourceWorkItem.Id }
+                        });
                 }
             }
             catch (WebException ex)
             {
                 Log.Error(ex, "Some kind of internet pipe blockage");
-
-                TraceWriteLine(LogEventLevel.Error, ex.ToString(), ex);
                 if (retrys < retryLimit)
                 {
-                    TraceWriteLine(LogEventLevel.Warning, "WebException: Will retry in {retrys}s ", retrys);
+                    TraceWriteLine(LogEventLevel.Warning, "WebException: Will retry in {retrys}s ",
+                        new Dictionary<string, object>() {
+                            {"retrys", retrys }
+                        }); 
                     System.Threading.Thread.Sleep(new TimeSpan(0, 0, retrys));
                     retrys++;
-                    TraceWriteLine(LogEventLevel.Warning, "RETRY {retrys}/{retrys} ", retrys, retrys);
+                    TraceWriteLine(LogEventLevel.Warning, "RETRY {Retrys}/{RetryLimit} ",
+                        new Dictionary<string, object>() {
+                            {"Retrys", retrys },
+                            {"RetryLimit", retryLimit }
+                        });
                     ProcessWorkItem(sourceStore, targetStore, destProject, sourceWorkItem, retryLimit, retrys);
                 }
                 else
@@ -264,7 +280,6 @@ namespace VstsSyncMigrator.Engine
             catch (Exception ex)
             {
                 Log.Error(ex, ex.ToString());
-                TraceWriteLine(LogEventLevel.Error, ex.ToString(), ex);
                 Telemetry.TrackRequest("ProcessWorkItem", starttime, witstopwatch.Elapsed, "502", false);
                 throw ex;
             }
@@ -275,7 +290,12 @@ namespace VstsSyncMigrator.Engine
 
             var average = new TimeSpan(0, 0, 0, 0, (int)(_elapsedms / _current));
             var remaining = new TimeSpan(0, 0, 0, 0, (int)(average.TotalMilliseconds * _count));
-            TraceWriteLine(LogEventLevel.Information, "Average time of {average:s/:fff} per work item and {remaining:%h} hours {remaining:%m} minutes {remaining:s/:fff} seconds estimated to completion", average, remaining);
+            TraceWriteLine(LogEventLevel.Information,
+                "Average time of {average:s/:fff} per work item and {remaining:%h} hours {remaining:%m} minutes {remaining:s/:fff} seconds estimated to completion",
+                new Dictionary<string, object>() {
+                    {"average", average},
+                    {"remaining", remaining}
+                });
             Trace.Flush();
             Telemetry.TrackEvent("WorkItemMigrated", processWorkItemParamiters, processWorkItemMetrics);
             Telemetry.TrackRequest("ProcessWorkItem", starttime, witstopwatch.Elapsed, "200", true);
@@ -321,7 +341,11 @@ namespace VstsSyncMigrator.Engine
                 sortedRevisions.RemoveRange(0, sortedRevisions.Count - 1);
             }
 
-            TraceWriteLine(LogEventLevel.Information, "Found {RevisionsCount} revisions to migrate on  Work item:{sourceWorkItemId}", sortedRevisions.Count, sourceWorkItem.Id);
+            TraceWriteLine(LogEventLevel.Information, "Found {RevisionsCount} revisions to migrate on  Work item:{sourceWorkItemId}",
+                new Dictionary<string, object>() {
+                    {"RevisionsCount", sortedRevisions.Count},
+                    {"sourceWorkItemId", sourceWorkItem.Id}
+                } );
             return sortedRevisions;
         }
 
@@ -375,14 +399,20 @@ namespace VstsSyncMigrator.Engine
 
                     revisionsToMigrate = revisionsToMigrate.GetRange(revisionsToMigrate.Count - 1, 1);
 
-                    TraceWriteLine(LogEventLevel.Information, " Attached a consolidated set of {RevisionCount} revisions.", data.Count());
+                    TraceWriteLine(LogEventLevel.Information, " Attached a consolidated set of {RevisionCount} revisions.",
+                        new Dictionary<string, object>() {
+                            {"RevisionCount", data.Count() }
+                        });
                 }
 
                 foreach (var revision in revisionsToMigrate)
                 {
                     var currentRevisionWorkItem = sourceStore.GetRevision(sourceWorkItem, revision.Number);
 
-                    TraceWriteLine(LogEventLevel.Information, " Processing Revision [{RevisionNumber}]", revision.Number);
+                    TraceWriteLine(LogEventLevel.Information, " Processing Revision [{RevisionNumber}]",
+                        new Dictionary<string, object>() {
+                            {"RevisionNumber", revision.Number }
+                        });
 
                     // Decide on WIT
                     string destType = currentRevisionWorkItem.Type.Name;
@@ -433,12 +463,14 @@ namespace VstsSyncMigrator.Engine
                     {
                         TraceWriteLine(LogEventLevel.Information,
                             "{Current} - Invalid: {CurrentRevisionWorkItemId}-{CurrentRevisionWorkItemTypeName}-{FieldReferenceName}-{SourceWorkItemTitle} Value: {FieldValue}",
-                            current,
-                            currentRevisionWorkItem.Id,
-                            currentRevisionWorkItem.Type.Name,
-                            f.ReferenceName,
-                            sourceWorkItem.Title,
-                            f.Value);
+                           new Dictionary<string, object>() { 
+                               {"Current", current },
+                               {"CurrentRevisionWorkItemId", currentRevisionWorkItem.Id },
+                               {"CurrentRevisionWorkItemTypeName",  currentRevisionWorkItem.Type.Name},
+                               {"FieldReferenceName", f.ReferenceName },
+                               {"SourceWorkItemTitle", sourceWorkItem.Title },
+                               {"FieldValue", f.Value }
+                           });
                     }
                     //if (fails.Count > 0) // TODO Do we want to stop or continue?
                     //{
@@ -449,9 +481,11 @@ namespace VstsSyncMigrator.Engine
                     targetWorkItem.Save();
                     TraceWriteLine(LogEventLevel.Information,
                         " Saved TargetWorkItem {TargetWorkItemId}. Replayed revision {RevisionNumber} of {RevisionsToMigrateCount}",
-                        targetWorkItem.Id,
-                        revision.Number,
-                        revisionsToMigrate.Count);
+                       new Dictionary<string, object>() {
+                               {"TargetWorkItemId", targetWorkItem.Id },
+                               {"RevisionNumber", revision.Number },
+                               {"RevisionsToMigrateCount",  revisionsToMigrate.Count}
+                           }); 
 
                 }
 
@@ -472,7 +506,7 @@ namespace VstsSyncMigrator.Engine
                     this.SaveWorkItem(targetWorkItem);
 
                     attachmentOMatic.CleanUpAfterSave(targetWorkItem);
-                    TraceWriteLine(LogEventLevel.Information, "...Saved as {TargetWorkItemId}", targetWorkItem.Id);
+                    TraceWriteLine(LogEventLevel.Information, "...Saved as {TargetWorkItemId}", new Dictionary<string, object> { {"TargetWorkItemId" , targetWorkItem.Id } } );
                 }
             }
             catch (Exception ex)
@@ -482,9 +516,9 @@ namespace VstsSyncMigrator.Engine
                 if (targetWorkItem != null)
                 {
                     foreach (Field f in targetWorkItem.Fields)
-                        TraceWriteLine(LogEventLevel.Information, "{FieldReferenceName} ({FieldName}) | {FieldValue}", f.ReferenceName, f.Name, f.Value);
+                        TraceWriteLine(LogEventLevel.Information, "{FieldReferenceName} ({FieldName}) | {FieldValue}", new Dictionary<string, object>() { { "FieldReferenceName", f.ReferenceName }, { "FieldName", f.Name } ,{ "FieldValue", f.Value } } );
                 }
-                TraceWriteLine(LogEventLevel.Information, ex.ToString(), ex);
+                Log.Error(ex.ToString(), ex);
             }
 
             return targetWorkItem;
@@ -558,9 +592,9 @@ namespace VstsSyncMigrator.Engine
             //    $"FieldMapOnNewWorkItem: {newWorkItemstartTime} - {fieldMappingTimer.Elapsed.ToString("c")}", Name);
         }
 
-        internal void TraceWriteLine(LogEventLevel level, string message = "", params object[] propertyValues)
+        internal void TraceWriteLine(LogEventLevel level, string message = "", Dictionary<string, object> properties = null)
         {
-            workItemLog.Write(level, workItemLogTeamplate + message, propertyValues);
+            workItemLog.Write(level, workItemLogTeamplate + message, properties);
         }
 
         private List<WorkItem> FilterWorkItemsThatAlreadyExistInTarget(List<WorkItem> sourceWorkItems, WorkItemStoreContext targetStore)
@@ -696,7 +730,7 @@ namespace VstsSyncMigrator.Engine
         {
             if (targetWorkItem != null && _config.LinkMigration && sourceWorkItem.Links.Count > 0)
             {
-                TraceWriteLine(LogEventLevel.Information, "Links {SourceWorkItemLinkCount} | LinkMigrator:{LinkMigration}", sourceWorkItem.Links.Count, _config.LinkMigration);
+                TraceWriteLine(LogEventLevel.Information, "Links {SourceWorkItemLinkCount} | LinkMigrator:{LinkMigration}", new Dictionary<string, object>() { { "SourceWorkItemLinkCount", sourceWorkItem.Links.Count } ,{ "LinkMigration", _config.LinkMigration } });
                 workItemLinkOMatic.MigrateLinks(sourceWorkItem, sourceStore, targetWorkItem, targetStore, _config.LinkMigrationSaveEachAsAdded, me.Source.Config.ReflectedWorkItemIDFieldName);
                 AddMetric("RelatedLinkCount", processWorkItemMetrics, targetWorkItem.Links.Count);
                 int fixedLinkCount = repoOMatic.FixExternalLinks(targetWorkItem, targetStore, sourceWorkItem, _config.LinkMigrationSaveEachAsAdded);
@@ -708,7 +742,7 @@ namespace VstsSyncMigrator.Engine
         {
             if (targetWorkItem != null && _config.AttachmentMigration && sourceWorkItem.Attachments.Count > 0)
             {
-                TraceWriteLine(LogEventLevel.Information, "Attachemnts {SourceWorkItemAttachmentCount} | LinkMigrator:{AttachmentMigration}", sourceWorkItem.Attachments.Count, _config.AttachmentMigration);
+                TraceWriteLine(LogEventLevel.Information, "Attachemnts {SourceWorkItemAttachmentCount} | LinkMigrator:{AttachmentMigration}", new Dictionary<string, object>() { { "SourceWorkItemAttachmentCount", sourceWorkItem.Attachments.Count }, { "AttachmentMigration", _config.AttachmentMigration } });
                 attachmentOMatic.ProcessAttachemnts(sourceWorkItem, targetWorkItem, save);
                 AddMetric("Attachments", processWorkItemMetrics, targetWorkItem.AttachedFileCount);
             }
