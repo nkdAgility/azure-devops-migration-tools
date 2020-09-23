@@ -587,17 +587,14 @@ namespace VstsSyncMigrator.Engine
             //    $"FieldMapOnNewWorkItem: {newWorkItemstartTime} - {fieldMappingTimer.Elapsed.ToString("c")}", Name);
         }
 
-        internal void TraceWriteLine(LogEventLevel level, string message = "", Dictionary<string, object> properties = null)
+        internal void TraceWriteLine(LogEventLevel level, string message, Dictionary<string, object> properties = null)
         {
-            try /// Temp fix to eat error and unblock folks
+            if(properties != null)
             {
                 foreach (var item in properties)
                 {
                     workItemLog = workItemLog.ForContext(item.Key, item.Value);
                 }
-            }
-            catch (Exception)
-            {
             }
             workItemLog.Write(level, workItemLogTeamplate + message);
         }
