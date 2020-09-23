@@ -286,7 +286,7 @@ namespace VstsSyncMigrator.Engine
             var average = new TimeSpan(0, 0, 0, 0, (int)(_elapsedms / _current));
             var remaining = new TimeSpan(0, 0, 0, 0, (int)(average.TotalMilliseconds * _count));
             TraceWriteLine(LogEventLevel.Information,
-                "Average time of {average:s/:fff} per work item and {remaining:%h} hours {remaining:%m} minutes {remaining:s/:fff} seconds estimated to completion",
+                "Average time of {average:%s}.{average:%fff} per work item and {remaining:%h} hours {remaining:%m} minutes {remaining:%s}.{remaining:%fff} seconds estimated to completion",
                 new Dictionary<string, object>() {
                     {"average", average},
                     {"remaining", remaining}
