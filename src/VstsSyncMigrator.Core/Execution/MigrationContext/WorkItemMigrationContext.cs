@@ -594,10 +594,16 @@ namespace VstsSyncMigrator.Engine
 
         internal void TraceWriteLine(LogEventLevel level, string message = "", Dictionary<string, object> properties = null)
         {
-            foreach (var item in properties)
+            try /// Temp fix to eat error and unblock folks
             {
-                workItemLog = workItemLog.ForContext(item.Key, item.Value);
-            }            
+                foreach (var item in properties)
+                {
+                    workItemLog = workItemLog.ForContext(item.Key, item.Value);
+                }
+            }
+            catch (Exception)
+            {
+            }
             workItemLog.Write(level, workItemLogTeamplate + message);
         }
 
