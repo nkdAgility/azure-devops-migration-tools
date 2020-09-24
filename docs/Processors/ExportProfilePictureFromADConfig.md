@@ -8,7 +8,7 @@ This processor can extract the profile pictures of the user from the AD. The use
 | Parameter name       | Type    | Description                              | Default Value                            |
 |----------------------|---------|------------------------------------------|------------------------------------------|
 | `Enabled`            | Boolean | Active the processor if it true.         | false                                    |
-| `ObjectType`         | string  | The name of the processor                | VstsSyncMigrator.Engine.Configuration.Processing.ExportProfilePictureFromADConfig |
+| `ObjectType`         | string  | The name of the processor                | ExportProfilePictureFromADConfig |
 | `Domain`             | string  | The source domain where the pictures should be exported. |                                          |
 | `Username`           | string  | The user name of the user that is used to export the pictures. |                                          |
 | `Password`           | string  | The password of the user that is used to export the pictures. |                                          |
