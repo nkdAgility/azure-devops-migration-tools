@@ -155,7 +155,6 @@ namespace MigrationTools
                 .Enrich.WithMachineName()
                 .Enrich.WithProcessId()
                 .WriteTo.Console()
-                .WriteTo.ApplicationInsights(telemetryLogger.Configuration, new CustomConverter())
                 .WriteTo.File(logPath)
                 .CreateLogger();
             Log.Information("Writing log to {logPath}", logPath);
@@ -196,9 +195,6 @@ namespace MigrationTools
 
         protected static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            //ExceptionTelemetry excTelemetry = new ExceptionTelemetry((Exception)e.ExceptionObject);
-            //excTelemetry.SeverityLevel = SeverityLevel.Critical;
-            //excTelemetry.HandledAt = ExceptionHandledAt.Unhandled;
             Log.Fatal((Exception)e.ExceptionObject, "An Unhandled exception occured.");
             Log.CloseAndFlush();
             System.Threading.Thread.Sleep(5000);
