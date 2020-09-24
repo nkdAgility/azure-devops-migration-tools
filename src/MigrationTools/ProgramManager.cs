@@ -155,6 +155,7 @@ namespace MigrationTools
                 .Enrich.WithMachineName()
                 .Enrich.WithProcessId()
                 .WriteTo.Console()
+                .WriteTo.ApplicationInsights(telemetryLogger.Configuration, new CustomConverter(), Serilog.Events.LogEventLevel.Error)
                 .WriteTo.File(logPath)
                 .CreateLogger();
             Log.Information("Writing log to {logPath}", logPath);
