@@ -1,13 +1,13 @@
 # HTML field embedded image migration
 
-This processor migrate all images in all text fields. This must run after `VstsSyncMigrator.Engine.Configuration.Processing.WorkItemMigrationConfig`.
+This processor migrate all images in all text fields. This must run after `WorkItemMigrationConfig`.
 
 
 
 | Parameter name                 | Type          | Description                              | Default Value                            |
 |--------------------------------|---------------|------------------------------------------|------------------------------------------|
 | `Enabled`                      | Boolean       | Active the processor if it true.         | false                                    |
-| `ObjectType`                   | string        | The name of the processor                | VstsSyncMigrator.Engine.Configuration.Processing.HtmlFieldEmbeddedImageMigrationConfig |
+| `ObjectType`                   | string        | The name of the processor                | HtmlFieldEmbeddedImageMigrationConfig |
 | `QueryBit`                     | string        | A query to select work items that can have images |                                          |
 | `FromAnyCollection`            | Boolean       | Define if the images can retrieved from collection instead of the collection. This can be use full if you have moved work items. | false                                    |
 | `AlternateCredentialsUsername` | string        | Username used for VSTS basic authentication using alternate credentials. Leave empty for default credentials  |                                          |
