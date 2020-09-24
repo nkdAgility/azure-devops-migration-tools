@@ -50,7 +50,7 @@ The global configuration created by the `init` command look like this:
   "GitRepoMapping": null,
   "Processors": [
     {
-      "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.NodeStructuresMigrationConfig",
+      "ObjectType": "NodeStructuresMigrationConfig",
       "PrefixProjectToNodes": false,
       "Enabled": false,
       "BasePaths": [
@@ -59,7 +59,7 @@ The global configuration created by the `init` command look like this:
       ]
     },
     {
-      "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.WorkItemMigrationConfig",
+      "ObjectType": "WorkItemMigrationConfig",
       "ReplayRevisions": true,
       "PrefixProjectToNodes": false,
       "UpdateCreatedDate": true,

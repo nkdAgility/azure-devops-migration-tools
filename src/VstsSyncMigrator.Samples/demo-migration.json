@@ -1,61 +1,60 @@
 {
-  "TelemetryEnableTrace": true,
-  "Source": {
-    "Collection": "https://tfs.test.company.com/tfs/coll2/",
-    "Name": "ProjectName"
-  },
-  "Target": {
-    "Collection": "https://tfs.test.company.com/tfs/coll1/",
-    "Name": "ProjectName_New"
-  },
-  "ReflectedWorkItemIDFieldName": "TfsMigrationTool.ReflectedWorkItemId",
-  "WorkItemTypeDefinition": {
-    "Bug": "Bug",
-    "User Story": "User Story",
-    "Requirement": "Requirement",
-    "Task": "Task",
-    "Test Case": "Test Case",
-    "Shared Steps": "Shared Steps",
-    "Shared Parameter": "Shared Parameter"
-  },
-  "Processors": [
-    {
-      "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.TeamMigrationConfig",
-      "Enabled": true
+    "TelemetryEnableTrace": true,
+    "Source": {
+        "Collection": "https://tfs.test.company.com/tfs/coll2/",
+        "Name": "ProjectName"
     },
-    {
-      "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.NodeStructuresMigrationConfig",
-      "Enabled": false
+    "Target": {
+        "Collection": "https://tfs.test.company.com/tfs/coll1/",
+        "Name": "ProjectName_New"
     },
-    {
-      "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.WorkItemMigrationConfig",
-      "Enabled": false,
-      "QueryBit": "AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')"
+    "ReflectedWorkItemIDFieldName": "TfsMigrationTool.ReflectedWorkItemId",
+    "WorkItemTypeDefinition": {
+        "Bug": "Bug",
+        "User Story": "User Story",
+        "Requirement": "Requirement",
+        "Task": "Task",
+        "Test Case": "Test Case",
+        "Shared Steps": "Shared Steps",
+        "Shared Parameter": "Shared Parameter"
     },
-    {
-      "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.LinkMigrationConfig",
-      "Enabled": false
-    },
-    {
-      "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.AttachementExportMigrationConfig",
-      "Enabled": false,
-      "QueryBit": "AND [System.AttachedFileCount] > 0"
-    },
-    {
-      "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.AttachementImportMigrationConfig",
-      "Enabled": false
-    },
-    {
-      "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.TestVeriablesMigrationConfig",
-      "Enabled": false
-    },
-    {
-      "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.TestConfigurationsMigrationConfig",
-      "Enabled": false
-    },
-    {
-      "ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.TestPlansAndSuitsMigrationConfig",
-      "Enabled": false
-    }
-  ]
+    "Processors": [{
+            "ObjectType": "TeamMigrationConfig",
+            "Enabled": true
+        },
+        {
+            "ObjectType": "NodeStructuresMigrationConfig",
+            "Enabled": false
+        },
+        {
+            "ObjectType": "WorkItemMigrationConfig",
+            "Enabled": false,
+            "QueryBit": "AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')"
+        },
+        {
+            "ObjectType": "LinkMigrationConfig",
+            "Enabled": false
+        },
+        {
+            "ObjectType": "AttachementExportMigrationConfig",
+            "Enabled": false,
+            "QueryBit": "AND [System.AttachedFileCount] > 0"
+        },
+        {
+            "ObjectType": "AttachementImportMigrationConfig",
+            "Enabled": false
+        },
+        {
+            "ObjectType": "TestVeriablesMigrationConfig",
+            "Enabled": false
+        },
+        {
+            "ObjectType": "TestConfigurationsMigrationConfig",
+            "Enabled": false
+        },
+        {
+            "ObjectType": "TestPlansAndSuitsMigrationConfig",
+            "Enabled": false
+        }
+    ]
 }
