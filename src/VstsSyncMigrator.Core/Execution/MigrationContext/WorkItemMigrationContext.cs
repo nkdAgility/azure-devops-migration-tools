@@ -2,32 +2,27 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
+using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.TeamFoundation.Server;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using Microsoft.TeamFoundation.WorkItemTracking.Proxy;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using Microsoft.VisualStudio.Services.Client;
-using Microsoft.VisualStudio.Services.Common;
-using Microsoft.VisualStudio.Services.WebApi;
-using MigrationTools.Core.Configuration.Processing;
 using Microsoft.VisualStudio.Services.WebApi.Patch.Json;
-using System.Collections;
-using VstsSyncMigrator.Core.Execution.OMatics;
-using Microsoft.TeamFoundation.WorkItemTracking.Proxy;
-using System.Net;
-using System.ServiceModel.Channels;
-using System.IO;
-using Newtonsoft.Json;
-using VstsSyncMigrator.Core;
-using Serilog;
-using Serilog.Events;
-using Serilog.Context;
-using Microsoft.ApplicationInsights.DataContracts;
 using MigrationTools;
-using Microsoft.Extensions.Hosting;
 using MigrationTools.Core.Configuration;
+using MigrationTools.Core.Configuration.Processing;
+using Newtonsoft.Json;
+using Serilog;
+using Serilog.Context;
+using Serilog.Events;
+using VstsSyncMigrator.Core;
+using VstsSyncMigrator.Core.Execution.OMatics;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -55,14 +50,14 @@ namespace VstsSyncMigrator.Engine
         public WorkItemMigrationContext(IServiceProvider services, ITelemetryLogger telemetry)
             : base(services, telemetry)
         {
-            contextLog = Log.ForContext<WorkItemMigrationContext>( );
+            contextLog = Log.ForContext<WorkItemMigrationContext>();
             Telemetry = telemetry;
         }
-        
+
         public override void Configure(ITfsProcessingConfig config)
         {
             _config = (WorkItemMigrationConfig)config;
-           
+
         }
 
         private void PopulateIgnoreList()
@@ -192,7 +187,7 @@ namespace VstsSyncMigrator.Engine
                 {
                     var targetWorkItem = targetStore.FindReflectedWorkItem(sourceWorkItem, false);
                     ///////////////////////////////////////////////
-                    TraceWriteLine(LogEventLevel.Information, "Work Item has {sourceWorkItemRev} revisions and revision migration is set to {ReplayRevisions}", 
+                    TraceWriteLine(LogEventLevel.Information, "Work Item has {sourceWorkItemRev} revisions and revision migration is set to {ReplayRevisions}",
                         new Dictionary<string, object>(){
                             { "sourceWorkItemRev", sourceWorkItem.Rev },
                             { "ReplayRevisions", _config.ReplayRevisions }}
@@ -262,7 +257,7 @@ namespace VstsSyncMigrator.Engine
                     TraceWriteLine(LogEventLevel.Warning, "WebException: Will retry in {retrys}s ",
                         new Dictionary<string, object>() {
                             {"retrys", retrys }
-                        }); 
+                        });
                     System.Threading.Thread.Sleep(new TimeSpan(0, 0, retrys));
                     retrys++;
                     TraceWriteLine(LogEventLevel.Warning, "RETRY {Retrys}/{RetryLimit} ",
@@ -291,7 +286,7 @@ namespace VstsSyncMigrator.Engine
             var average = new TimeSpan(0, 0, 0, 0, (int)(_elapsedms / _current));
             var remaining = new TimeSpan(0, 0, 0, 0, (int)(average.TotalMilliseconds * _count));
             TraceWriteLine(LogEventLevel.Information,
-                "Average time of {average:s/:fff} per work item and {remaining:%h} hours {remaining:%m} minutes {remaining:s/:fff} seconds estimated to completion",
+                "Average time of {average:%s}.{average:%fff} per work item and {remaining:%h} hours {remaining:%m} minutes {remaining:%s}.{remaining:%fff} seconds estimated to completion",
                 new Dictionary<string, object>() {
                     {"average", average},
                     {"remaining", remaining}
@@ -345,7 +340,7 @@ namespace VstsSyncMigrator.Engine
                 new Dictionary<string, object>() {
                     {"RevisionsCount", sortedRevisions.Count},
                     {"sourceWorkItemId", sourceWorkItem.Id}
-                } );
+                });
             return sortedRevisions;
         }
 
@@ -463,7 +458,7 @@ namespace VstsSyncMigrator.Engine
                     {
                         TraceWriteLine(LogEventLevel.Information,
                             "{Current} - Invalid: {CurrentRevisionWorkItemId}-{CurrentRevisionWorkItemTypeName}-{FieldReferenceName}-{SourceWorkItemTitle} Value: {FieldValue}",
-                           new Dictionary<string, object>() { 
+                           new Dictionary<string, object>() {
                                {"Current", current },
                                {"CurrentRevisionWorkItemId", currentRevisionWorkItem.Id },
                                {"CurrentRevisionWorkItemTypeName",  currentRevisionWorkItem.Type.Name},
@@ -485,7 +480,7 @@ namespace VstsSyncMigrator.Engine
                                {"TargetWorkItemId", targetWorkItem.Id },
                                {"RevisionNumber", revision.Number },
                                {"RevisionsToMigrateCount",  revisionsToMigrate.Count}
-                           }); 
+                           });
 
                 }
 
@@ -506,7 +501,7 @@ namespace VstsSyncMigrator.Engine
                     this.SaveWorkItem(targetWorkItem);
 
                     attachmentOMatic.CleanUpAfterSave(targetWorkItem);
-                    TraceWriteLine(LogEventLevel.Information, "...Saved as {TargetWorkItemId}", new Dictionary<string, object> { {"TargetWorkItemId" , targetWorkItem.Id } } );
+                    TraceWriteLine(LogEventLevel.Information, "...Saved as {TargetWorkItemId}", new Dictionary<string, object> { { "TargetWorkItemId", targetWorkItem.Id } });
                 }
             }
             catch (Exception ex)
@@ -516,7 +511,7 @@ namespace VstsSyncMigrator.Engine
                 if (targetWorkItem != null)
                 {
                     foreach (Field f in targetWorkItem.Fields)
-                        TraceWriteLine(LogEventLevel.Information, "{FieldReferenceName} ({FieldName}) | {FieldValue}", new Dictionary<string, object>() { { "FieldReferenceName", f.ReferenceName }, { "FieldName", f.Name } ,{ "FieldValue", f.Value } } );
+                        TraceWriteLine(LogEventLevel.Information, "{FieldReferenceName} ({FieldName}) | {FieldValue}", new Dictionary<string, object>() { { "FieldReferenceName", f.ReferenceName }, { "FieldName", f.Name }, { "FieldValue", f.Value } });
                 }
                 Log.Error(ex.ToString(), ex);
             }
@@ -592,17 +587,14 @@ namespace VstsSyncMigrator.Engine
             //    $"FieldMapOnNewWorkItem: {newWorkItemstartTime} - {fieldMappingTimer.Elapsed.ToString("c")}", Name);
         }
 
-        internal void TraceWriteLine(LogEventLevel level, string message = "", Dictionary<string, object> properties = null)
+        internal void TraceWriteLine(LogEventLevel level, string message, Dictionary<string, object> properties = null)
         {
-            try /// Temp fix to eat error and unblock folks
+            if(properties != null)
             {
                 foreach (var item in properties)
                 {
                     workItemLog = workItemLog.ForContext(item.Key, item.Value);
                 }
-            }
-            catch (Exception)
-            {
             }
             workItemLog.Write(level, workItemLogTeamplate + message);
         }
@@ -740,7 +732,7 @@ namespace VstsSyncMigrator.Engine
         {
             if (targetWorkItem != null && _config.LinkMigration && sourceWorkItem.Links.Count > 0)
             {
-                TraceWriteLine(LogEventLevel.Information, "Links {SourceWorkItemLinkCount} | LinkMigrator:{LinkMigration}", new Dictionary<string, object>() { { "SourceWorkItemLinkCount", sourceWorkItem.Links.Count } ,{ "LinkMigration", _config.LinkMigration } });
+                TraceWriteLine(LogEventLevel.Information, "Links {SourceWorkItemLinkCount} | LinkMigrator:{LinkMigration}", new Dictionary<string, object>() { { "SourceWorkItemLinkCount", sourceWorkItem.Links.Count }, { "LinkMigration", _config.LinkMigration } });
                 workItemLinkOMatic.MigrateLinks(sourceWorkItem, sourceStore, targetWorkItem, targetStore, _config.LinkMigrationSaveEachAsAdded, me.Source.Config.ReflectedWorkItemIDFieldName);
                 AddMetric("RelatedLinkCount", processWorkItemMetrics, targetWorkItem.Links.Count);
                 int fixedLinkCount = repoOMatic.FixExternalLinks(targetWorkItem, targetStore, sourceWorkItem, _config.LinkMigrationSaveEachAsAdded);
@@ -779,7 +771,7 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-  
+
     }
 
 
