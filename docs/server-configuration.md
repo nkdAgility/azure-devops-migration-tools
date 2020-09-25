@@ -69,7 +69,7 @@ Once you have created the `ReflectedWorkItemId` field and confirmed you have the
     ...... other stuff
 
  	"Processors": [{
-			"ObjectType": "VstsSyncMigrator.Engine.Configuration.Processing.WorkItemMigrationConfig",
+			"ObjectType": "WorkItemMigrationConfig",
 			"Enabled": false,
 			"PrefixProjectToNodes": true,
 			"UpdateCreatedDate": true,

@@ -11,7 +11,7 @@ In order to run the migration you will need to install the tools first.
 1. Install Chocolatey from [https://chocolatey.org/install](https://chocolatey.org/install)
 1. Run "**choco install vsts-sync-migrator**" to install the tools [source](https://chocolatey.org/packages/vsts-sync-migrator)
 
-The tools are now installed and calling "vstssyncmigrator" from any command line will run the tools or it will not and you will need to switch to `c:\tools\vstssyncmigrator\` and run `migrate.exe`.
+The tools are now installed and calling "vstssyncmigrator" from any command line will run the tools or it will not and you will need to switch to `c:\tools\vstssyncmigration\` and run `migrate.exe`.
 
 ## Server configuration and setup
 
@@ -20,7 +20,7 @@ Follow the [setup instructions](./server-configuration.md) to make sure that you
 
 ## Create a default configuration file
 
-1. Open a command prompt or PowerShell window at `c:\tools\vstssyncmigrator\`
+1. Open a command prompt or PowerShell window at `c:\tools\vstssyncmigration\`
 2. Run "./migration.exe init" to create a default configuration
 3. Open "configuration.json" from the current directory
 
