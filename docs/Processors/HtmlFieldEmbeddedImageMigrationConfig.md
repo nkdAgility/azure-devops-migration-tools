@@ -14,4 +14,4 @@ This processor migrate all images in all text fields. This must run after `WorkI
 | `AlternateCredentialsPassword` | string        | Username used for VSTS basic authentication using alternate credentials. Leave empty for default credentials  |                                          |
 | `Ignore404Errors`              | Boolean       | Ignore 404 errors and continue on images that don't exist anymore | false                                    |
 | `DeleteTemporaryImageFiles`    | Boolean       | Delete temporary files that were downloaded | false                                    |
-| `SourceServerAliases`          | Array<string> | All servers you trust so the image will be copied. The source TFS / Azure DevOps (Server) are allways trusted. |                                          |
+| `SourceServerAliases`          | Array<string> | All servers you trust so the image will be copied. The source TFS / Azure DevOps (Server) are always trusted. |                                          |
