@@ -68,6 +68,7 @@ namespace VstsSyncMigrator.Engine
                 "System.AreaId",
                 "System.IterationId",
                 "System.Id",
+                "System.Parent",
                 "System.RevisedDate",
                 "System.AuthorizedAs",
                 "System.AttachedFileCount",
@@ -589,7 +590,7 @@ namespace VstsSyncMigrator.Engine
 
         internal void TraceWriteLine(LogEventLevel level, string message, Dictionary<string, object> properties = null)
         {
-            if(properties != null)
+            if (properties != null)
             {
                 foreach (var item in properties)
                 {
