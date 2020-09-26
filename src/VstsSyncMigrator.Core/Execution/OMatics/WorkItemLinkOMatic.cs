@@ -1,9 +1,8 @@
-﻿using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using MigrationTools;
-using Serilog;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using Serilog;
 using VstsSyncMigrator.Engine;
 using VstsSyncMigrator.Engine.Execution.Exceptions;
 
@@ -101,14 +100,14 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
             }
         }
 
-        private void CreateExternalLink(ExternalLink sourceLink, WorkItem target, bool save )
+        private void CreateExternalLink(ExternalLink sourceLink, WorkItem target, bool save)
         {
             var exist = (from Link l in target.Links
                          where l is ExternalLink && ((ExternalLink)l).LinkedArtifactUri == ((ExternalLink)sourceLink).LinkedArtifactUri
                          select (ExternalLink)l).SingleOrDefault();
             if (exist == null)
             {
-                Log.Information("Creating new {SourceLinkType} on {TargetId}",sourceLink.GetType().Name, target.Id);
+                Log.Information("Creating new {SourceLinkType} on {TargetId}", sourceLink.GetType().Name, target.Id);
                 ExternalLink el = new ExternalLink(sourceLink.ArtifactLinkType, sourceLink.LinkedArtifactUri);
                 el.Comment = sourceLink.Comment;
                 target.Links.Add(el);
@@ -120,7 +119,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
             }
             else
             {
-                Log.Information("Link {SourceLinkType} on {TargetId} already exists", 
+                Log.Information("Link {SourceLinkType} on {TargetId} already exists",
                                                   sourceLink.GetType().Name, target.Id);
             }
         }
@@ -187,16 +186,40 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                         Log.Information("  [CREATE-START] Adding Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id);
                         WorkItemLinkTypeEnd linkTypeEnd = targetStore.Store.WorkItemLinkTypes.LinkTypeEnds[rl.LinkTypeEnd.ImmutableName];
                         RelatedLink newRl = new RelatedLink(linkTypeEnd, wiTargetR.Id);
-
-                        wiTargetL.Links.Add(newRl);
                         if (save)
                         {
-                            wiTargetL.Fields["System.ChangedBy"].Value = "Migration";
-                            wiTargetL.Save();
+                            if (linkTypeEnd.ImmutableName == "System.LinkTypes.Hierarchy-Forward")
+                            {
+                                var potentialParentConflictLink = ( // TF201036: You cannot add a Child link between work items xxx and xxx because a work item can have only one Parent link.
+                                        from Link l in wiTargetR.Links
+                                        where l is RelatedLink
+                                            && ((RelatedLink)l).LinkTypeEnd.ImmutableName == "System.LinkTypes.Hierarchy-Reverse"
+                                        select (RelatedLink)l).SingleOrDefault();
+                                if (potentialParentConflictLink != null)
+                                {
+                                    wiTargetR.Links.Remove(potentialParentConflictLink);
+                                }
+                                linkTypeEnd = targetStore.Store.WorkItemLinkTypes.LinkTypeEnds["System.LinkTypes.Hierarchy-Reverse"];
+                                RelatedLink newLl = new RelatedLink(linkTypeEnd, wiTargetL.Id);
+                                wiTargetR.Links.Add(newLl);
+                                wiTargetR.Fields["System.ChangedBy"].Value = "Migration";
+                                wiTargetR.Save();
+                            }
+                            else
+                            {
+                                wiTargetL.Links.Add(newRl);
+                                wiTargetL.Fields["System.ChangedBy"].Value = "Migration";
+                                wiTargetL.Save();
+                            }
+                        }
+                        else
+                        {
+                            wiTargetL.Links.Add(newRl);
                         }
                         Log.Information(
                                 "  [CREATE-SUCCESS] Adding Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} ",
                                 rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id);
+
                     }
                     else
                     {
@@ -254,7 +277,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
             return item is RelatedLink;
         }
 
-        private void CreateHyperlink(Hyperlink sourceLink, WorkItem target, bool save )
+        private void CreateHyperlink(Hyperlink sourceLink, WorkItem target, bool save)
         {
             var exist = (from Link l in target.Links where l is Hyperlink && ((Hyperlink)l).Location == ((Hyperlink)sourceLink).Location select (Hyperlink)l).SingleOrDefault();
             if (exist == null)
@@ -266,7 +289,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                 {
                     target.Fields["System.ChangedBy"].Value = "Migration";
                     target.Save();
-                }                
+                }
             }
         }
 
