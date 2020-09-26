@@ -1,8 +1,7 @@
 {
   "profiles": {
     "VstsSyncMigrator.Console": {
-      "commandName": "Project",
-      "commandLineArgs": "execute --config \"migrate-testplans.json\""
+      "commandName": "Project"
     }
   }
 }
