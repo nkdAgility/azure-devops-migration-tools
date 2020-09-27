@@ -25,7 +25,6 @@ using VstsSyncMigrator.Commands;
 using VstsSyncMigrator.Engine;
 using MigrationTools;
 using Microsoft.Extensions.Configuration;
-using MigrationTools.Engine;
 using MigrationTools.Sinks.TfsObjectModel;
 
 namespace VstsSyncMigrator.ConsoleApp

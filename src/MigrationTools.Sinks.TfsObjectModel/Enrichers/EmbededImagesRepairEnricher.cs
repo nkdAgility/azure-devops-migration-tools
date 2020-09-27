@@ -69,7 +69,7 @@ namespace MigrationTools.Sinks.TfsObjectModel.Enrichers
                                     {
                                         if (_ignore404Errors && result.StatusCode == HttpStatusCode.NotFound)
                                         {
-                                            Trace.WriteLine($"Image {match.Value} could not be found in WorkItem {wi.Id}, Field {field.Name}");
+                                            Trace.WriteLine($"Image {match.Value} could not be found in WorkItem {wi.ToWorkItem().Id}, Field {field.Name}");
                                             continue;
                                         }
                                         else
