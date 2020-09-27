@@ -21,7 +21,7 @@ namespace VstsSyncMigrator.Engine
 {
    public class MigrationEngine
     {
-        Dictionary<string, List<ComponentContext.FieldMapBase>> fieldMapps = new Dictionary<string, List<ComponentContext.FieldMapBase>>();
+        Dictionary<string, List<ComponentContext.IFieldMap>> fieldMapps = new Dictionary<string, List<ComponentContext.IFieldMap>>();
         
         NetworkCredential sourceCreds;
         NetworkCredential targetCreds;
@@ -85,7 +85,9 @@ namespace VstsSyncMigrator.Engine
                         Log.Error("Type " + typePattern + " not found.", typePattern);
                         throw new Exception("Type " + typePattern + " not found.");
                     }
-                    this.AddFieldMap(fieldmapConfig.WorkItemTypeName, (ComponentContext.FieldMapBase)Activator.CreateInstance(t, fieldmapConfig));
+                    ComponentContext.IFieldMap fm = (ComponentContext.IFieldMap)_services.GetRequiredService(t);
+                    fm.Configure(fieldmapConfig);
+                    this.AddFieldMap(fieldmapConfig.WorkItemTypeName, fm);
                 }
             }
  
@@ -145,11 +147,11 @@ namespace VstsSyncMigrator.Engine
             Target = teamProjectContext;
         }
 
-        public void AddFieldMap(string workItemTypeName, ComponentContext.FieldMapBase fieldToTagFieldMap)
+        public void AddFieldMap(string workItemTypeName,  ComponentContext.IFieldMap fieldToTagFieldMap)
         {
             if (!fieldMapps.ContainsKey(workItemTypeName))
             {
-                fieldMapps.Add(workItemTypeName, new List<ComponentContext.FieldMapBase>());
+                fieldMapps.Add(workItemTypeName, new List<ComponentContext.IFieldMap>());
             }
             fieldMapps[workItemTypeName].Add(fieldToTagFieldMap);
         }
@@ -179,9 +181,9 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        private  void ProcessFieldMapList(WorkItem source, WorkItem target, List<ComponentContext.FieldMapBase> list)
+        private  void ProcessFieldMapList(WorkItem source, WorkItem target, List<ComponentContext.IFieldMap> list)
         {
-            foreach (ComponentContext.FieldMapBase map in list)
+            foreach (ComponentContext.IFieldMap map in list)
             {
                 Log.Debug("{Context} Running Field Map: {MapName} {MappingDisplayName}", map.Name, map.MappingDisplayName);
                 map.Execute(source, target);

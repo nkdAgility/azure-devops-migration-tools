@@ -40,7 +40,7 @@ namespace VstsSyncMigrator.Engine.ComponentContext
                             newTags.Add(string.Format(Config.formatExpression, value));
                         }
                         target.Tags = string.Join(";", newTags.ToArray());
-                        Trace.WriteLine(string.Format("  [UPDATE] field tagged {0}:{1} to {2}:Tag with foramt of {3}", source.Id, this.config.sourceField, target.Id, config.formatExpression));
+                        Trace.WriteLine(string.Format("  [UPDATE] field tagged {0}:{1} to {2}:Tag with foramt of {3}", source.Id, Config.sourceField, target.Id, Config.formatExpression));
                     }
 
                 }
