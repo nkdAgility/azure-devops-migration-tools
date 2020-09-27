@@ -25,6 +25,9 @@ using VstsSyncMigrator.Commands;
 using VstsSyncMigrator.Engine;
 using MigrationTools;
 using Microsoft.Extensions.Configuration;
+using MigrationTools.Sinks.TfsObjectModel;
+using MigrationTools.Sinks.TfsObjectModel.FieldMaps;
+using MigrationTools.Core.Engine.Containers;
 
 namespace VstsSyncMigrator.ConsoleApp
 {
@@ -98,17 +101,35 @@ namespace VstsSyncMigrator.ConsoleApp
 
       public static IServiceCollection AddPlatformSpecificServices(IServiceCollection services)
         {
+            // Field Mapps
+            services.AddTransient<FieldBlankMap>();
+            services.AddTransient<FieldLiteralMap>();
+            services.AddTransient<FieldMergeMap>();
+            services.AddTransient<FieldToFieldMap>();
+            services.AddTransient<FieldtoFieldMultiMap>();
+            services.AddTransient<FieldToTagFieldMap>();
+            services.AddTransient<FieldValuetoTagMap>();
+            services.AddTransient<FieldToFieldMap>();
+            services.AddTransient<FieldValueMap>();
+            services.AddTransient<MultiValueConditionalMap>();
+            services.AddTransient<RegexFieldMap>();
+            services.AddTransient<TreeToTagFieldMap>();
+
+            //Containers
+            services.AddSingleton<FieldMapContainer>();
+
+            //Engine
             services.AddSingleton<Engine.MigrationEngine>();
+
+            //Processors
             services.AddSingleton<WorkItemMigrationContext>();
             services.AddSingleton<NodeStructuresMigrationContext>();
-
             services.AddSingleton<TeamMigrationContext>();
             services.AddSingleton<TestConfigurationsMigrationContext>();
             services.AddSingleton<TestPlandsAndSuitesMigrationContext>();
             services.AddSingleton<TestVeriablesMigrationContext>();
             services.AddSingleton<WorkItemPostProcessingContext>();
             services.AddSingleton<WorkItemQueryMigrationContext>();
-
             services.AddSingleton<CreateTeamFolders>();
             services.AddSingleton<ExportProfilePictureFromADContext>();
             services.AddSingleton<ExportTeamList>();
@@ -117,6 +138,7 @@ namespace VstsSyncMigrator.ConsoleApp
             services.AddSingleton<WorkItemDelete>();
             services.AddSingleton<WorkItemUpdate>();
             services.AddSingleton<WorkItemUpdateAreasAsTagsContext>();
+
 
 
             return services;

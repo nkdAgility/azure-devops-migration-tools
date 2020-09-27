@@ -6,7 +6,7 @@ using System.Text;
 
 namespace MigrationTools.Sinks.FileSystem
 {
-    public class WorkItemSink : IWorkItemSink
+    public class WorkItemSink : IWorkItemMigrationSink
     {
         public IEnumerable<WorkItemData> GetWorkItems()
         {

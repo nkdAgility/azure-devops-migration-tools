@@ -10,63 +10,64 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using VstsSyncMigrator.Engine;
-using VstsSyncMigrator.Core;
 using MigrationTools;
+using MigrationTools.Core.DataContracts;
+using MigrationTools.Core.Engine.Enrichers;
 
-namespace VstsSyncMigrator.Core.Execution.OMatics
+namespace MigrationTools.Sinks.TfsObjectModel.Enrichers
 {
-    public class AttachmentOMatic
+    public class AttachmentMigrationEnricher : IAttachmentMigrationEnricher
     {
         private WorkItemServer _server;
         private string _exportBasePath;
         private string _exportWiPath;
-        private int _maxAttachmentSize ;
+        private int _maxAttachmentSize;
 
-        public AttachmentOMatic(WorkItemServer workItemServer, string exportBasePath, int maxAttachmentSize = 480000000)
+        public AttachmentMigrationEnricher(WorkItemServer workItemServer, string exportBasePath, int maxAttachmentSize = 480000000)
         {
             _server = workItemServer;
             _exportBasePath = exportBasePath;
             _maxAttachmentSize = maxAttachmentSize;
         }
 
-        public void ProcessAttachemnts(WorkItem sourceWorkItem, WorkItem targetWorkItem, bool save = true)
+        public void ProcessAttachemnts(WorkItemData source, WorkItemData target, bool save = true)
         {
-            _exportWiPath = Path.Combine(_exportBasePath, sourceWorkItem.Id.ToString());
+
+            _exportWiPath = Path.Combine(_exportBasePath, source.ToWorkItem().Id.ToString());
             if (System.IO.Directory.Exists(_exportWiPath))
             {
                 System.IO.Directory.Delete(_exportWiPath, true);
             }
             System.IO.Directory.CreateDirectory(_exportWiPath);
-            foreach (Attachment wia in sourceWorkItem.Attachments)
+            foreach (Attachment wia in source.ToWorkItem().Attachments)
             {
                 try
                 {
                     string filepath = null;
-                    filepath = ExportAttachment(sourceWorkItem, wia, _exportWiPath);
+                    filepath = ExportAttachment(source.ToWorkItem(), wia, _exportWiPath);
                     Log.Information("Exported {Filename} to disk", System.IO.Path.GetFileName(filepath));
                     if (filepath != null)
                     {
-                        ImportAttachemnt(targetWorkItem, filepath, save);
+                        ImportAttachemnt(target.ToWorkItem(), filepath, save);
                         Log.Information("Imported {Filename} from disk", System.IO.Path.GetFileName(filepath));
                     }
                 }
                 catch (Exception ex)
                 {
-                    Log.Error("ERROR: Unable to process atachment from source wi {SourceWorkItemId} called {AttachmentName}", sourceWorkItem.Id, wia.Name,ex);
+                    Log.Error("ERROR: Unable to process atachment from source wi {SourceWorkItemId} called {AttachmentName}", source.ToWorkItem().Id, wia.Name, ex);
                 }
 
             }
             if (save)
             {
-                this.SaveWorkItem(targetWorkItem);
-                Log.Information("Work iTem now has {AttachmentCount} attachemnts", sourceWorkItem.Attachments.Count);
-                CleanUpAfterSave(targetWorkItem);
-            }           
+                this.SaveMigratedWorkItem(target);
+                Log.Information("Work iTem now has {AttachmentCount} attachemnts", source.ToWorkItem().Attachments.Count);
+                CleanUpAfterSave();
+            }
 
         }
 
-        public void CleanUpAfterSave(WorkItem targetWorkItem)
+        public void CleanUpAfterSave()
         {
             if (_exportWiPath != null && System.IO.Directory.Exists(_exportWiPath))
             {
@@ -77,9 +78,9 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                 }
                 catch (Exception)
                 {
-                    Trace.WriteLine(string.Format(" ERROR: Unable to delete folder {0}", targetWorkItem.Id));
+                    Trace.WriteLine(string.Format(" ERROR: Unable to delete folder {0}", _exportWiPath));
                 }
-            }            
+            }
         }
 
         private string ExportAttachment(WorkItem wi, Attachment wia, string exportpath)
@@ -128,7 +129,8 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                 {
                     Log.Information(" [SKIP] WorkItem {0} already contains attachment {1}", targetWorkItem.Id, filepath);
                 }
-            } else
+            }
+            else
             {
                 Log.Information(" [SKIP] Attachemnt {filename} on Work Item {targetWorkItemId} is bigger than the limit of {maxAttachmentSize} bites for Azure DevOps.", filename, targetWorkItem.Id, _maxAttachmentSize);
 
@@ -136,7 +138,6 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
 
 
         }
-
 
         public string GetSafeFilename(string filename)
         {

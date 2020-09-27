@@ -2,25 +2,27 @@
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using MigrationTools.Core.Configuration;
 using MigrationTools.Core.Configuration.FieldMap;
 
-namespace VstsSyncMigrator.Engine.ComponentContext
+namespace MigrationTools.Sinks.TfsObjectModel.FieldMaps
 {
     public class FieldtoFieldMultiMap : FieldMapBase
     {
-        private FieldtoFieldMultiMapConfig config;
 
-        public FieldtoFieldMultiMap(FieldtoFieldMultiMapConfig config)
+        private FieldtoFieldMultiMapConfig Config { get { return (FieldtoFieldMultiMapConfig)_Config; } }
+
+        public override void Configure(IFieldMapConfig config)
         {
-            this.config = config;
+            base.Configure(config);
         }
 
         public override string MappingDisplayName => string.Empty;
 
         internal override void InternalExecute(WorkItem source, WorkItem target)
         {
-            if (fieldsExist(config.SourceToTargetMappings, source, target))
-                mapFields(config.SourceToTargetMappings, source, target);
+            if (fieldsExist(Config.SourceToTargetMappings, source, target))
+                mapFields(Config.SourceToTargetMappings, source, target);
             else
                 Trace.WriteLine("  [SKIPPED] Not all source and target fields exist.");
         }

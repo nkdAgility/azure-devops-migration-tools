@@ -11,6 +11,7 @@ using MigrationTools.Core.Configuration.Processing;
 using MigrationTools.Core.Configuration;
 using Microsoft.Extensions.Hosting;
 using MigrationTools;
+using MigrationTools.Sinks.TfsObjectModel;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -56,7 +57,7 @@ namespace VstsSyncMigrator.Engine
                 Stopwatch witstopwatch = Stopwatch.StartNew();
 				workitem.Open();
                 Trace.WriteLine(string.Format("Processing work item {0} - Type:{1} - ChangedDate:{2} - CreatedDate:{3}", workitem.Id, workitem.Type.Name, workitem.ChangedDate.ToShortDateString(), workitem.CreatedDate.ToShortDateString()));
-                me.ApplyFieldMappings(workitem);
+                me.FieldMaps.ApplyFieldMappings(workitem.ToWorkItemData());
 
                 if (workitem.IsDirty)
                 {

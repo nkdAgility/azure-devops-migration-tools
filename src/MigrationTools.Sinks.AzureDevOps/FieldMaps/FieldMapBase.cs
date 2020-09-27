@@ -3,31 +3,39 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using Microsoft.ApplicationInsights;
 using System.Diagnostics;
 using MigrationTools;
 using Serilog;
+using MigrationTools.Core.Configuration;
+using MigrationTools.Core.Engine;
+using MigrationTools.Core.DataContracts;
+using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
+using MigrationTools.Sinks.AzureDevOps;
 
-namespace VstsSyncMigrator.Engine.ComponentContext
+namespace MigrationTools.Sinks.AzureDevOps.FieldMaps
 {
     public abstract class FieldMapBase : IFieldMap
     {
+        protected IFieldMapConfig _Config;
 
+        public virtual void Configure(IFieldMapConfig config)
+        {
+            _Config = config;
+        }
 
-        public void Execute(WorkItem source, WorkItem target)
+        public void Execute(WorkItemData source, WorkItemData target)
         {
             try
             {
-                InternalExecute(source, target);
+                InternalExecute(source.ToWorkItem(), target.ToWorkItem());
             }
             catch (Exception ex)
             {
-                Trace.WriteLine(string.Format("  [ERROR] {0}", ex.Message));
                 Log.Error(ex, "Field mapp fault", 
                        new Dictionary<string, string> {
-                            { "Source", source.Id.ToString() },
-                            { "Target",  target.Id.ToString()}
+                            { "Source", source.ToWorkItem().Id.ToString() },
+                            { "Target",  target.ToWorkItem().Id.ToString()}
                        });
             }            
         }
@@ -42,5 +50,7 @@ namespace VstsSyncMigrator.Engine.ComponentContext
         public abstract string MappingDisplayName { get; }
 
         internal abstract void InternalExecute(WorkItem source, WorkItem target);
+
+
     }
 }

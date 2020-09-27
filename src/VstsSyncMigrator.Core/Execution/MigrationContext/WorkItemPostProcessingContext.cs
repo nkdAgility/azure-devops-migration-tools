@@ -11,6 +11,7 @@ using MigrationTools.Core.Configuration.Processing;
 using Microsoft.Extensions.Hosting;
 using MigrationTools.Core.Configuration;
 using MigrationTools;
+using MigrationTools.Sinks.TfsObjectModel;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -91,7 +92,7 @@ namespace VstsSyncMigrator.Engine
                 {
                     Console.WriteLine("...Exists");
                     targetFound.Open();
-                    me.ApplyFieldMappings(sourceWI, targetFound);
+                    me.FieldMaps.ApplyFieldMappings(sourceWI.ToWorkItemData(), targetFound.ToWorkItemData());
                     if (targetFound.IsDirty)
                     {
                         try

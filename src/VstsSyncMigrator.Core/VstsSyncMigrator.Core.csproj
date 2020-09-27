@@ -21,12 +21,17 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MigrationTools.Sinks.TfsObjectModel\MigrationTools.Sinks.TfsObjectModel.csproj" />
     <ProjectReference Include="..\MigrationTools\MigrationTools.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Reference Include="System.DirectoryServices" />
     <Reference Include="System.DirectoryServices.AccountManagement" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Execution\FieldMaps\" />
   </ItemGroup>
 
 </Project>

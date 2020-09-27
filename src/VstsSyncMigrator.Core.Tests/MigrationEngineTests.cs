@@ -8,6 +8,7 @@ using MigrationTools.Core.Engine.Containers;
 using MigrationTools.Services;
 using Microsoft.ApplicationInsights;
 using MigrationTools;
+using MigrationTools.Sinks.TfsObjectModel.FieldMaps;
 
 namespace _VstsSyncMigrator.Engine.Tests
 {
@@ -15,25 +16,49 @@ namespace _VstsSyncMigrator.Engine.Tests
     public class MigrationEngineTests
     {
         IEngineConfigurationBuilder ecb;
-        IServiceProvider services;
+        IServiceProvider _services;
 
         [TestInitialize]
         public void Setup()
         {
             ecb = new EngineConfigurationBuilder();
-            var serviceColl = new ServiceCollection();
-                serviceColl.AddSingleton<IDetectOnlineService, DetectOnlineService>();
-            serviceColl.AddSingleton<IDetectVersionService, DetectVersionService>();
-            serviceColl.AddSingleton<IEngineConfigurationBuilder, EngineConfigurationBuilder>();
-            serviceColl.AddSingleton<EngineConfiguration>(ecb.BuildDefault());
-            serviceColl.AddSingleton<TelemetryClient>(new TelemetryClient());
-            serviceColl.AddSingleton<ProcessorContainer>();
-            serviceColl.AddSingleton<TypeDefinitionMapContainer>();
-            serviceColl.AddSingleton<GitRepoMapContainer>();
-            serviceColl.AddSingleton<ChangeSetMappingContainer>();
-            serviceColl.AddSingleton<ITelemetryLogger, TestTelemetryLogger>();
-            serviceColl.AddSingleton<MigrationEngine>();
-            services = serviceColl.BuildServiceProvider();
+            var services = new ServiceCollection();
+
+            // Field Mapps
+            services.AddTransient<FieldBlankMap>();
+            services.AddTransient<FieldLiteralMap>();
+            services.AddTransient<FieldMergeMap>();
+            services.AddTransient<FieldValueMap>();
+            services.AddTransient<FieldToFieldMap>();
+            services.AddTransient<FieldtoFieldMultiMap>();
+            services.AddTransient<FieldToTagFieldMap>();
+            services.AddTransient<FieldValuetoTagMap>();
+            services.AddTransient<MultiValueConditionalMap>();
+            services.AddTransient<RegexFieldMap>();
+            services.AddTransient<TreeToTagFieldMap>();
+
+            //Services
+            services.AddSingleton<IDetectOnlineService, DetectOnlineService>();
+            services.AddSingleton<IDetectVersionService, DetectVersionService>();
+
+
+
+            //Containers
+            services.AddSingleton<FieldMapContainer>();
+            services.AddSingleton<ProcessorContainer>();
+            services.AddSingleton<TypeDefinitionMapContainer>();
+            services.AddSingleton<GitRepoMapContainer>();
+            services.AddSingleton<ChangeSetMappingContainer>();
+
+            // 
+            services.AddSingleton<IEngineConfigurationBuilder, EngineConfigurationBuilder>();
+            services.AddSingleton<EngineConfiguration>(ecb.BuildDefault());
+            services.AddSingleton<TelemetryClient>(new TelemetryClient());    
+            services.AddSingleton<ITelemetryLogger, TestTelemetryLogger>();
+            services.AddSingleton<MigrationEngine>();
+
+
+            _services = services.BuildServiceProvider();
 
     }
 
@@ -41,15 +66,15 @@ namespace _VstsSyncMigrator.Engine.Tests
         public void TestEngineCreation()
         {
 
-            MigrationEngine me = services.GetRequiredService<MigrationEngine>();
+            MigrationEngine me = _services.GetRequiredService<MigrationEngine>();
         }
 
         [TestMethod]
         public void TestEngineExecuteEmptyProcessors()
         {
-            EngineConfiguration ec = services.GetRequiredService<EngineConfiguration>();
+            EngineConfiguration ec = _services.GetRequiredService<EngineConfiguration>();
             ec.Processors.Clear();
-            MigrationEngine me = services.GetRequiredService<MigrationEngine>();
+            MigrationEngine me = _services.GetRequiredService<MigrationEngine>();
             me.Run();
 
         }
@@ -57,19 +82,19 @@ namespace _VstsSyncMigrator.Engine.Tests
         [TestMethod]
         public void TestEngineExecuteEmptyFieldMaps()
         {
-            EngineConfiguration ec = services.GetRequiredService<EngineConfiguration>();
+            EngineConfiguration ec = _services.GetRequiredService<EngineConfiguration>();
             ec.Processors.Clear();
             ec.FieldMaps.Clear();
-            MigrationEngine me = services.GetRequiredService<MigrationEngine>();
+            MigrationEngine me = _services.GetRequiredService<MigrationEngine>();
             me.Run();
         }
 
         [TestMethod]
         public void TestEngineExecuteProcessors()
         {
-            EngineConfiguration ec = services.GetRequiredService<EngineConfiguration>();
+            EngineConfiguration ec = _services.GetRequiredService<EngineConfiguration>();
             ec.FieldMaps.Clear();
-            MigrationEngine me = services.GetRequiredService<MigrationEngine>();
+            MigrationEngine me = _services.GetRequiredService<MigrationEngine>();
             me.Run();
         }
 

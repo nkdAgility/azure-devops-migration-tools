@@ -13,6 +13,7 @@ using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools;
 using MigrationTools.Core.Configuration;
 using MigrationTools.Core.Configuration.Processing;
+using MigrationTools.Sinks.TfsObjectModel;
 using Serilog;
 using VstsSyncMigrator.Core;
 using VstsSyncMigrator.Engine.ComponentContext;
@@ -300,7 +301,7 @@ namespace VstsSyncMigrator.Engine
                 targetWI.IterationPath = regex.Replace(sourceWI.IterationPath, me.Target.Config.Project, 1);
             }
 
-            me.ApplyFieldMappings(sourceWI, targetWI);
+            me.FieldMaps.ApplyFieldMappings(sourceWI.ToWorkItemData(), targetWI.ToWorkItemData());
 
             //validate if save operation will work and report issues if found
             ArrayList validationIssues = targetWI.Validate();

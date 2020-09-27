@@ -23,8 +23,11 @@ using MigrationTools.Sinks.AzureDevOps;
 using MigrationTools.Core.Sinks;
 using Microsoft.ApplicationInsights.Extensibility.PerfCounterCollector;
 using Microsoft.TeamFoundation.Build.WebApi;
+using MigrationTools.Sinks.AzureDevOps;
+
 using System.Net;
 using MigrationTools.Core.Engine;
+using MigrationTools.Sinks.AzureDevOps.FieldMaps;
 
 namespace MigrationTools.ConsoleUI
 {
@@ -84,6 +87,19 @@ namespace MigrationTools.ConsoleUI
 
         public static IServiceCollection AddPlatformSpecificServices(IServiceCollection services)
         {
+            // Field Mapps
+            services.AddTransient<FieldBlankMap>();
+            services.AddTransient<FieldLiteralMap>();
+            services.AddTransient<FieldMergeMap>();
+            services.AddTransient<FieldToFieldMap>();
+            services.AddTransient<FieldtoFieldMultiMap>();
+            services.AddTransient<FieldToTagFieldMap>();
+            services.AddTransient<FieldValuetoTagMap>();
+            services.AddTransient<MultiValueConditionalMap>();
+            services.AddTransient<RegexFieldMap>();
+            services.AddTransient<TreeToTagFieldMap>();
+
+
             services.AddSingleton<MigrationEngineCore>();
             services.AddTransient<ITeamProjectContext, TeamProjectContext>();
             

@@ -17,6 +17,9 @@ using Microsoft.VisualStudio.Services.WebApi.Patch.Json;
 using MigrationTools;
 using MigrationTools.Core.Configuration;
 using MigrationTools.Core.Configuration.Processing;
+using MigrationTools.Core.Engine.Enrichers;
+using MigrationTools.Sinks.TfsObjectModel;
+using MigrationTools.Sinks.TfsObjectModel.Enrichers;
 using Newtonsoft.Json;
 using Serilog;
 using Serilog.Context;
@@ -33,11 +36,11 @@ namespace VstsSyncMigrator.Engine
         private List<String> _ignore;
         private WorkItemTrackingHttpClient _witClient;
         private WorkItemLinkOMatic workItemLinkOMatic = new WorkItemLinkOMatic();
-        private AttachmentOMatic attachmentOMatic;
+        private IAttachmentMigrationEnricher attachmentEnricher;
         private RepoOMatic repoOMatic;
         private ILogger contextLog;
         private ILogger workItemLog;
-        EmbededImagesRepairOMatic embededImagesRepairOMatic = new EmbededImagesRepairOMatic();
+        private IEmbededImagesRepairEnricher embededImagesEnricher;
         static int _current = 0;
         static int _count = 0;
         static int _failures = 0;
@@ -101,7 +104,8 @@ namespace VstsSyncMigrator.Engine
                 throw new Exception("You must call Configure() first");
             }
             var workItemServer = me.Source.Collection.GetService<WorkItemServer>();
-            attachmentOMatic = new AttachmentOMatic(workItemServer, _config.AttachmentWorkingPath, _config.AttachmentMazSize);
+            attachmentEnricher = new AttachmentMigrationEnricher(workItemServer, _config.AttachmentWorkingPath, _config.AttachmentMazSize);
+            embededImagesEnricher = new EmbededImagesRepairEnricher();
             repoOMatic = new RepoOMatic(me);
             VssClientCredentials adoCreds = new VssClientCredentials();
             _witClient = new WorkItemTrackingHttpClient(me.Target.Collection.Uri, adoCreds);
@@ -443,7 +447,7 @@ namespace VstsSyncMigrator.Engine
                     }
 
                     PopulateWorkItem(currentRevisionWorkItem, targetWorkItem, destType);
-                    me.ApplyFieldMappings(currentRevisionWorkItem, targetWorkItem);
+                    me.FieldMaps.ApplyFieldMappings(currentRevisionWorkItem.ToWorkItemData(), targetWorkItem.ToWorkItemData());
 
                     targetWorkItem.Fields["System.ChangedBy"].Value =
                         currentRevisionWorkItem.Revisions[revision.Index].Fields["System.ChangedBy"].Value;
@@ -501,7 +505,7 @@ namespace VstsSyncMigrator.Engine
                     targetWorkItem.History = history.ToString();
                     this.SaveWorkItem(targetWorkItem);
 
-                    attachmentOMatic.CleanUpAfterSave(targetWorkItem);
+                    attachmentEnricher.CleanUpAfterSave();
                     TraceWriteLine(LogEventLevel.Information, "...Saved as {TargetWorkItemId}", new Dictionary<string, object> { { "TargetWorkItemId", targetWorkItem.Id } });
                 }
             }
@@ -724,8 +728,7 @@ namespace VstsSyncMigrator.Engine
         {
             if (targetWorkItem != null && _config.FixHtmlAttachmentLinks)
             {
-
-                embededImagesRepairOMatic.FixHtmlAttachmentLinks(targetWorkItem, me.Source.Collection.Uri.ToString(), me.Target.Collection.Uri.ToString(), me.Source.Config.PersonalAccessToken);
+                embededImagesEnricher.FixEmbededImages(targetWorkItem.ToWorkItemData(), me.Source.Collection.Uri.ToString(), me.Target.Collection.Uri.ToString(), me.Source.Config.PersonalAccessToken);
             }
         }
 
@@ -746,7 +749,7 @@ namespace VstsSyncMigrator.Engine
             if (targetWorkItem != null && _config.AttachmentMigration && sourceWorkItem.Attachments.Count > 0)
             {
                 TraceWriteLine(LogEventLevel.Information, "Attachemnts {SourceWorkItemAttachmentCount} | LinkMigrator:{AttachmentMigration}", new Dictionary<string, object>() { { "SourceWorkItemAttachmentCount", sourceWorkItem.Attachments.Count }, { "AttachmentMigration", _config.AttachmentMigration } });
-                attachmentOMatic.ProcessAttachemnts(sourceWorkItem, targetWorkItem, save);
+                attachmentEnricher.ProcessAttachemnts(sourceWorkItem.ToWorkItemData(), targetWorkItem.ToWorkItemData(), save);
                 AddMetric("Attachments", processWorkItemMetrics, targetWorkItem.AttachedFileCount);
             }
         }

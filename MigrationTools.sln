@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29006.145
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VstsSyncMigrator.Console", "src\VstsSyncMigrator.Console\VstsSyncMigrator.Console.csproj", "{033EB332-4A50-4C73-9B7D-A35D9F3C0513}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VstsSyncMigrator.Console", "src\VstsSyncMigrator.Console\VstsSyncMigrator.Console.csproj", "{033EB332-4A50-4C73-9B7D-A35D9F3C0513}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VstsSyncMigrator.Core", "src\VstsSyncMigrator.Core\VstsSyncMigrator.Core.csproj", "{68BAF6BA-2BC0-48D0-B892-1D9F93D7003A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VstsSyncMigrator.Core", "src\VstsSyncMigrator.Core\VstsSyncMigrator.Core.csproj", "{68BAF6BA-2BC0-48D0-B892-1D9F93D7003A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Chocolatey", "Chocolatey", "{89434800-3004-4621-8677-C14C1D1AA4AF}"
 	ProjectSection(SolutionItems) = preProject
@@ -14,9 +14,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Chocolatey", "Chocolatey", 
 		src\VstsSyncMigrator.Chocolatey\vstssyncmigration.nuspec = src\VstsSyncMigrator.Chocolatey\vstssyncmigration.nuspec
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VstsSyncMigrator.Core.Tests", "src\VstsSyncMigrator.Core.Tests\VstsSyncMigrator.Core.Tests.csproj", "{AB3922F0-E801-474A-A498-892C3EA99799}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VstsSyncMigrator.Core.Tests", "src\VstsSyncMigrator.Core.Tests\VstsSyncMigrator.Core.Tests.csproj", "{AB3922F0-E801-474A-A498-892C3EA99799}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VstsSyncMigrator.Console.Tests", "src\VstsSyncMigrator.Console.Tests\VstsSyncMigrator.Console.Tests.csproj", "{985259EA-C475-4918-9342-50AB744F52AF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VstsSyncMigrator.Console.Tests", "src\VstsSyncMigrator.Console.Tests\VstsSyncMigrator.Console.Tests.csproj", "{985259EA-C475-4918-9342-50AB744F52AF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extension", "Extension", "{243265E4-0E5A-4E95-BE7C-B92B7666FF79}"
 	ProjectSection(SolutionItems) = preProject
@@ -87,9 +87,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Sinks.FileSy
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Tests", "src\MigrationTools.Tests\MigrationTools.Tests.csproj", "{A679B3FF-1355-455F-853F-433A9CB1BE60}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MigrationTools.Sinks.TfsObjectModel", "src\MigrationTools.Sinks.TfsObjectModel\MigrationTools.Sinks.TfsObjectModel.csproj", "{D58EEDFA-D74C-4E84-9C26-6D69521382FD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Sinks.TfsObjectModel", "src\MigrationTools.Sinks.TfsObjectModel\MigrationTools.Sinks.TfsObjectModel.csproj", "{D58EEDFA-D74C-4E84-9C26-6D69521382FD}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RestAPI", "RestAPI", "{57DC27F4-CB74-43B3-B2CE-78CDE320F74F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_RefactorToZero", "_RefactorToZero", "{E5294FF3-167A-49A5-A453-19332DA32B01}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -143,9 +145,9 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{033EB332-4A50-4C73-9B7D-A35D9F3C0513} = {C2D43320-C71B-42AF-B458-A2D33D772362}
-		{68BAF6BA-2BC0-48D0-B892-1D9F93D7003A} = {C2D43320-C71B-42AF-B458-A2D33D772362}
+		{68BAF6BA-2BC0-48D0-B892-1D9F93D7003A} = {E5294FF3-167A-49A5-A453-19332DA32B01}
 		{89434800-3004-4621-8677-C14C1D1AA4AF} = {32E2956A-9056-4D9D-8018-14DFD0E6CA41}
-		{AB3922F0-E801-474A-A498-892C3EA99799} = {C2D43320-C71B-42AF-B458-A2D33D772362}
+		{AB3922F0-E801-474A-A498-892C3EA99799} = {E5294FF3-167A-49A5-A453-19332DA32B01}
 		{985259EA-C475-4918-9342-50AB744F52AF} = {C2D43320-C71B-42AF-B458-A2D33D772362}
 		{243265E4-0E5A-4E95-BE7C-B92B7666FF79} = {32E2956A-9056-4D9D-8018-14DFD0E6CA41}
 		{E9399C6D-A5E0-43ED-8412-6C4A6BC86EC8} = {2BC0808B-6F4D-4635-82FE-1118181DD64F}
