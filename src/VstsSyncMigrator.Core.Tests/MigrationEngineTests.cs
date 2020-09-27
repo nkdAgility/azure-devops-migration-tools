@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools;
+using MigrationTools.CommandLine;
 using MigrationTools.Core.Configuration;
 using MigrationTools.Core.Engine.Containers;
 using MigrationTools.Services;
@@ -57,6 +58,7 @@ namespace _VstsSyncMigrator.Engine.Tests
             services.AddSingleton<ITelemetryLogger, TestTelemetryLogger>();
             services.AddSingleton<MigrationEngine>();
 
+            services.AddSingleton<ExecuteOptions>((p) => null);
 
             _services = services.BuildServiceProvider();
 
