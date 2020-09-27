@@ -1,27 +1,29 @@
 ﻿using MigrationTools.Core.Configuration.FieldMap;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using System;
+using MigrationTools.Core.Configuration;
 
 namespace VstsSyncMigrator.Engine.ComponentContext
 {
     public class FieldLiteralMap : FieldMapBase
     {
-        private FieldLiteralMapConfig config;
+        private FieldLiteralMapConfig Config { get { return (FieldLiteralMapConfig)_Config; } }
 
-        public FieldLiteralMap(FieldLiteralMapConfig config)
+        public override void Configure(IFieldMapConfig config)
         {
-            this.config = config;
-            if (config.targetField == null)
+            base.Configure(config);
+
+            if (Config.targetField == null)
             {
-                throw new ArgumentNullException($"The target field `{config.targetField}` must be specified. Please use diferent fields.");
+                throw new ArgumentNullException($"The target field `{Config.targetField}` must be specified. Please use diferent fields.");
             }
         }
 
-        public override string MappingDisplayName => $"{config.value} -> {config.targetField}";
+        public override string MappingDisplayName => $"{Config.value} -> {Config.targetField}";
 
         internal override void InternalExecute(WorkItem source, WorkItem target)
         {
-            target.Fields[config.targetField].Value = config.value;
+            target.Fields[Config.targetField].Value = Config.value;
         }
     }
 }

@@ -6,31 +6,33 @@ using System.Threading.Tasks;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using System.Diagnostics;
 using MigrationTools.Core.Configuration.FieldMap;
+using MigrationTools.Core.Configuration;
 
 namespace VstsSyncMigrator.Engine.ComponentContext
 {
     public class FieldToFieldMap : FieldMapBase
     {
-        private FieldtoFieldMapConfig config;
+        private FieldtoFieldMapConfig Config { get { return (FieldtoFieldMapConfig)_Config; } }
 
-        public FieldToFieldMap(FieldtoFieldMapConfig config)
+        public override void Configure(IFieldMapConfig config)
         {
-            this.config = config;
+            base.Configure(config);
+
         }
 
-        public override string MappingDisplayName => $"{config.sourceField} {config.targetField}";
+        public override string MappingDisplayName => $"{Config.sourceField} {Config.targetField}";
 
         internal override void InternalExecute(WorkItem source, WorkItem target)
         {
-            if (source.Fields.Contains(config.sourceField) && target.Fields.Contains(config.targetField))
+            if (source.Fields.Contains(Config.sourceField) && target.Fields.Contains(Config.targetField))
             {
-                var value = source.Fields[config.sourceField].Value;
-                if ((value as string is null || value as string == "") && config.defaultValue != null)
+                var value = source.Fields[Config.sourceField].Value;
+                if ((value as string is null || value as string == "") && Config.defaultValue != null)
                 {
-                    value = config.defaultValue;
+                    value = Config.defaultValue;
                 }
-                target.Fields[config.targetField].Value = value;
-                Trace.WriteLine(string.Format("  [UPDATE] field mapped {0}:{1} to {2}:{3}", source.Id, config.sourceField, target.Id, config.targetField));
+                target.Fields[Config.targetField].Value = value;
+                Trace.WriteLine(string.Format("  [UPDATE] field mapped {0}:{1} to {2}:{3}", source.Id, Config.sourceField, target.Id, Config.targetField));
             }
         }
     }

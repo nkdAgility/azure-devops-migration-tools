@@ -7,32 +7,34 @@ using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using System.Diagnostics;
 using Microsoft.ApplicationInsights;
 using MigrationTools.Core.Configuration.FieldMap;
+using MigrationTools.Core.Configuration;
 
 namespace VstsSyncMigrator.Engine.ComponentContext
 {
     public class MultiValueConditionalMap : FieldMapBase
     {
-        private MultiValueConditionalMapConfig config;
 
-        public MultiValueConditionalMap(MultiValueConditionalMapConfig config)
+        private MultiValueConditionalMapConfig Config { get { return (MultiValueConditionalMapConfig)_Config; } }
+
+        public override void Configure(IFieldMapConfig config)
         {
-            this.config = config;
+            base.Configure(config);
         }
 
         public override string MappingDisplayName => string.Empty;
 
         internal override void InternalExecute(WorkItem source, WorkItem target)
         {
-            if (fieldsExist(config.sourceFieldsAndValues, source) && fieldsExist(config.targetFieldsAndValues, target))
+            if (fieldsExist(Config.sourceFieldsAndValues, source) && fieldsExist(Config.targetFieldsAndValues, target))
             {
-                if (fieldsValueMatch(config.sourceFieldsAndValues, source))
+                if (fieldsValueMatch(Config.sourceFieldsAndValues, source))
                 {
-                    fieldsUpdate(config.targetFieldsAndValues, target);
+                    fieldsUpdate(Config.targetFieldsAndValues, target);
                 }                
-                Trace.WriteLine(string.Format("  [UPDATE] field mapped {0}:{1} to {2}:{3}", source.Id, config.sourceFieldsAndValues.Keys.ToString(), target.Id, config.targetFieldsAndValues.Keys.ToString()));
+                Trace.WriteLine(string.Format("  [UPDATE] field mapped {0}:{1} to {2}:{3}", source.Id, Config.sourceFieldsAndValues.Keys.ToString(), target.Id, Config.targetFieldsAndValues.Keys.ToString()));
             } else
             {
-                Trace.WriteLine(string.Format("  [SKIPPED] Not all source and target fields exist", source.Id, config.sourceFieldsAndValues.Keys.ToString(), target.Id, config.targetFieldsAndValues.Keys.ToString()));
+                Trace.WriteLine(string.Format("  [SKIPPED] Not all source and target fields exist", source.Id, Config.sourceFieldsAndValues.Keys.ToString(), target.Id, Config.targetFieldsAndValues.Keys.ToString()));
             }
         }
 

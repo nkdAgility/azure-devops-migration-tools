@@ -12,21 +12,17 @@ namespace VstsSyncMigrator.Engine.ComponentContext
 {
     public class FieldBlankMap : FieldMapBase
     {
-        private FieldBlankMapConfig config;
+        private FieldBlankMapConfig Config { get { return (FieldBlankMapConfig)_Config; } }
 
-        public FieldBlankMap(FieldBlankMapConfig config)
-        {
-            this.config = config;
-        }
 
-        public override string MappingDisplayName => $"{config.targetField}";
+        public override string MappingDisplayName => $"{Config.targetField}";
 
         internal override void InternalExecute(WorkItem source, WorkItem target)
         {
-            if (target.Fields.Contains(config.targetField))
+            if (target.Fields.Contains(Config.targetField))
             { 
-                target.Fields[config.targetField].Value = "";
-                Trace.WriteLine(string.Format("  [UPDATE] field mapped {0}:{1} to {2} blanked", source.Id, target.Id, this.config.targetField));
+                target.Fields[Config.targetField].Value = "";
+                Trace.WriteLine(string.Format("  [UPDATE] field mapped {0}:{1} to {2} blanked", source.Id, target.Id, this.Config.targetField));
             }
         }
     }

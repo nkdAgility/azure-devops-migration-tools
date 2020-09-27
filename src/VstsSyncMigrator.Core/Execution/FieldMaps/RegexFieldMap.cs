@@ -4,36 +4,29 @@ using VstsSyncMigrator.Engine.ComponentContext;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
 using MigrationTools.Core.Configuration.FieldMap;
+using MigrationTools.Core.Configuration;
 
 namespace VstsSyncMigrator.Engine.ComponentContext
 {
-    public class RegexFieldMap : IFieldMap
+    public class RegexFieldMap : FieldMapBase
     {
-        private RegexFieldMapConfig config;
+        private RegexFieldMapConfig Config { get { return (RegexFieldMapConfig)_Config; } }
 
-        public RegexFieldMap(RegexFieldMapConfig config)
+        public override void Configure(IFieldMapConfig config)
         {
-            this.config = config;
+            base.Configure(config);
         }
 
-        public string Name
-        {
-            get
-            {
-                return "RegexFieldMap";
-            }
-        }
+        public override string MappingDisplayName => $"{Config.sourceField} {Config.targetField}";
 
-        public string MappingDisplayName => $"{config.sourceField} {config.targetField}";
-
-        public void Execute(WorkItem source, WorkItem target)
+        internal override void InternalExecute(WorkItem source, WorkItem target)
         {
-            if (source.Fields.Contains(config.sourceField) && source.Fields[config.sourceField].Value != null && target.Fields.Contains(config.targetField))
+            if (source.Fields.Contains(Config.sourceField) && source.Fields[Config.sourceField].Value != null && target.Fields.Contains(Config.targetField))
             {
-                if (Regex.IsMatch(source.Fields[config.sourceField].Value.ToString(), config.pattern))
+                if (Regex.IsMatch(source.Fields[Config.sourceField].Value.ToString(), Config.pattern))
                 {
-                    target.Fields[config.targetField].Value = Regex.Replace(source.Fields[config.sourceField].Value.ToString(), config.pattern, config.replacement);
-                    Trace.WriteLine(string.Format("  [UPDATE] field tagged {0}:{1} to {2}:{3} with regex pattern of {4} resulting in {5}", source.Id, config.sourceField, target.Id, config.targetField, config.pattern, target.Fields[config.targetField].Value));
+                    target.Fields[Config.targetField].Value = Regex.Replace(source.Fields[Config.sourceField].Value.ToString(), Config.pattern, Config.replacement);
+                    Trace.WriteLine(string.Format("  [UPDATE] field tagged {0}:{1} to {2}:{3} with regex pattern of {4} resulting in {5}", source.Id, Config.sourceField, target.Id, Config.targetField, Config.pattern, target.Fields[Config.targetField].Value));
                 }
             }
         }

@@ -3,32 +3,27 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using MigrationTools.Core.Configuration;
 using MigrationTools.Core.Configuration.FieldMap;
 using VstsSyncMigrator.Engine.ComponentContext;
 
 namespace VstsSyncMigrator.Engine.ComponentContext
 {
 
-    public class FieldValuetoTagMap : IFieldMap
+    public class FieldValuetoTagMap : FieldMapBase
     {
 
-        readonly FieldValuetoTagMapConfig config;
+        private FieldValuetoTagMapConfig Config { get { return (FieldValuetoTagMapConfig)_Config; } }
 
-        public FieldValuetoTagMap(FieldValuetoTagMapConfig config)
+        public override void Configure(IFieldMapConfig config)
         {
-            this.config = config;
+            base.Configure(config);
         }
+        public override string MappingDisplayName => $"{Config.sourceField}";
 
-        public string Name
+        internal override void InternalExecute(WorkItem source, WorkItem target)
         {
-            get { return "FieldValuetoTagMap"; }
-        }
-
-        public string MappingDisplayName => $"{config.sourceField}";
-
-        public void Execute(WorkItem source, WorkItem target)
-        {
-            if (source.Fields.Contains(config.sourceField))
+             if (source.Fields.Contains(Config.sourceField))
             {
                 // parse existing tags entry
                 var tags = target.Tags
@@ -36,14 +31,14 @@ namespace VstsSyncMigrator.Engine.ComponentContext
                     .ToList();
 
                 // only proceed if value is available
-                var value = source.Fields[config.sourceField].Value;
+                var value = source.Fields[Config.sourceField].Value;
                 var match = false;
                 if (value != null)
                 {
-                    if (!string.IsNullOrEmpty(config.pattern))
+                    if (!string.IsNullOrEmpty(Config.pattern))
                     {
                         // regular expression matching is being used
-                        match = Regex.IsMatch(value.ToString(), config.pattern);
+                        match = Regex.IsMatch(value.ToString(), Config.pattern);
                     }
                     else
                     {
@@ -56,7 +51,7 @@ namespace VstsSyncMigrator.Engine.ComponentContext
                 if (match)
                 {
                     // format or simple to string
-                    var newTag = string.IsNullOrEmpty(config.formatExpression) ? value.ToString() : string.Format(config.formatExpression, value);
+                    var newTag = string.IsNullOrEmpty(Config.formatExpression) ? value.ToString() : string.Format(Config.formatExpression, value);
                     if (!string.IsNullOrWhiteSpace(newTag))
                         tags.Add(newTag);
 
@@ -65,12 +60,11 @@ namespace VstsSyncMigrator.Engine.ComponentContext
                     if (newTags != target.Tags)
                     {
                         target.Tags = newTags;
-                        Trace.WriteLine(string.Format("  [UPDATE] field tagged {0}:{1} to {2}:Tag with format of {3}", source.Id, config.sourceField, target.Id, config.formatExpression));
+                        Trace.WriteLine(string.Format("  [UPDATE] field tagged {0}:{1} to {2}:Tag with format of {3}", source.Id, Config.sourceField, target.Id, Config.formatExpression));
                     }
                 }
             }
         }
-
     }
 
 }

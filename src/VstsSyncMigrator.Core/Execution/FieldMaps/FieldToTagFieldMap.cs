@@ -5,46 +5,39 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using MigrationTools.Core.Configuration.FieldMap;
+using MigrationTools.Core.Configuration;
 
 namespace VstsSyncMigrator.Engine.ComponentContext
 {
-    public class FieldToTagFieldMap : IFieldMap
+    public class FieldToTagFieldMap : FieldMapBase
     {
-        private FieldtoTagMapConfig config;
+        private FieldtoTagMapConfig Config { get { return (FieldtoTagMapConfig)_Config; } }
 
-        public FieldToTagFieldMap(FieldtoTagMapConfig config)
+        public override void Configure(IFieldMapConfig config)
         {
-            this.config = config;
+            base.Configure(config);
         }
 
-        public string Name
-        {
-            get
-            {
-                return "FieldToTagFieldMap";
-            }
-        }
+        public override string MappingDisplayName => Config.sourceField;
 
-        public string MappingDisplayName => config.sourceField;
-
-        public void Execute(WorkItem source, WorkItem target)
+        internal override void InternalExecute(WorkItem source, WorkItem target)
         {
-            if (source.Fields.Contains(this.config.sourceField))
+            if (source.Fields.Contains(this.Config.sourceField))
             {
                 List<string> newTags = target.Tags.Split(char.Parse(@";")).ToList();
                 // to tag
-                if (source.Fields[this.config.sourceField].Value != null)
+                if (source.Fields[this.Config.sourceField].Value != null)
                 {
-                    string value = source.Fields[this.config.sourceField].Value.ToString();
+                    string value = source.Fields[this.Config.sourceField].Value.ToString();
                     if (!string.IsNullOrEmpty(value))
                     {
-                        if (string.IsNullOrEmpty(config.formatExpression))
+                        if (string.IsNullOrEmpty(Config.formatExpression))
                         {
                             newTags.Add(value);
                         }
                         else
                         {
-                            newTags.Add(string.Format(config.formatExpression, value));
+                            newTags.Add(string.Format(Config.formatExpression, value));
                         }
                         target.Tags = string.Join(";", newTags.ToArray());
                         Trace.WriteLine(string.Format("  [UPDATE] field tagged {0}:{1} to {2}:Tag with foramt of {3}", source.Id, this.config.sourceField, target.Id, config.formatExpression));

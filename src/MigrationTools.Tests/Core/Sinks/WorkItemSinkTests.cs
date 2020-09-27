@@ -14,7 +14,7 @@ namespace MigrationTools.Core.Sinks.Tests
         [TestMethod()]
         public void TestGetWorkItems()
         {
-            IWorkItemSink sink = new WorkItemSinkStub();
+            IWorkItemMigrationSink sink = new WorkItemSinkStub();
             var list = sink.GetWorkItems();
             //
             Assert.IsTrue(list.Count() == 5);
@@ -23,7 +23,7 @@ namespace MigrationTools.Core.Sinks.Tests
         [TestMethod()]
         public void TestPersistNewWorkItem()
         {
-            IWorkItemSink sink = new WorkItemSinkStub();
+            IWorkItemMigrationSink sink = new WorkItemSinkStub();
             sink.PersistWorkItem(new WorkItemData { title = "Item 6" });
             //
             var list = sink.GetWorkItems();
@@ -33,7 +33,7 @@ namespace MigrationTools.Core.Sinks.Tests
         [TestMethod()]
         public void TestpersistExistingItem()
         {
-            IWorkItemSink sink = new WorkItemSinkStub();
+            IWorkItemMigrationSink sink = new WorkItemSinkStub();
             var workItem = sink.GetWorkItems().First();
             workItem.title = "New Title";
             sink.PersistWorkItem(workItem);

@@ -8,12 +8,18 @@ using Microsoft.ApplicationInsights;
 using System.Diagnostics;
 using MigrationTools;
 using Serilog;
+using MigrationTools.Core.Configuration;
 
 namespace VstsSyncMigrator.Engine.ComponentContext
 {
     public abstract class FieldMapBase : IFieldMap
     {
+        protected IFieldMapConfig _Config;
 
+        public virtual void Configure(IFieldMapConfig config)
+        {
+            _Config = config;
+        }
 
         public void Execute(WorkItem source, WorkItem target)
         {
@@ -23,7 +29,6 @@ namespace VstsSyncMigrator.Engine.ComponentContext
             }
             catch (Exception ex)
             {
-                Trace.WriteLine(string.Format("  [ERROR] {0}", ex.Message));
                 Log.Error(ex, "Field mapp fault", 
                        new Dictionary<string, string> {
                             { "Source", source.Id.ToString() },
@@ -42,5 +47,7 @@ namespace VstsSyncMigrator.Engine.ComponentContext
         public abstract string MappingDisplayName { get; }
 
         internal abstract void InternalExecute(WorkItem source, WorkItem target);
+
+
     }
 }

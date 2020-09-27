@@ -5,7 +5,7 @@ using System.Text;
 
 namespace MigrationTools.Core.Sinks
 {
-   public  interface IWorkItemSink
+   public  interface IWorkItemMigrationSink
     {
         IEnumerable<WorkItemData> GetWorkItems();
         WorkItemData PersistWorkItem(WorkItemData workItem);

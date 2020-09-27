@@ -4,44 +4,38 @@ using VstsSyncMigrator.Engine.ComponentContext;
 using System.Collections.Generic;
 using System.Linq;
 using MigrationTools.Core.Configuration.FieldMap;
+using MigrationTools.Core.Configuration;
 
 namespace VstsSyncMigrator.Engine.ComponentContext
 {
-    public class TreeToTagFieldMap : IFieldMap
+    public class TreeToTagFieldMap : FieldMapBase
     {
-        private TreeToTagMapConfig config;
 
-        public TreeToTagFieldMap(TreeToTagMapConfig config)
+        private TreeToTagMapConfig Config { get { return (TreeToTagMapConfig)_Config; } }
+
+        public override void Configure(IFieldMapConfig config)
         {
-            this.config = config;
-        }
-        public string Name
-        {
-            get
-            {
-                return "TreeToTagFieldMap";
-            }
+            base.Configure(config);
         }
 
-        public string MappingDisplayName => string.Empty;
+        public override string MappingDisplayName => string.Empty;
 
-        public void Execute(WorkItem source, WorkItem target)
+        internal override void InternalExecute(WorkItem source, WorkItem target)
         {
-
             List<string> newTags = target.Tags.Split(char.Parse(@";")).ToList();
 
             string value;
 
-            if (config.timeTravel > 0)
+            if (Config.timeTravel > 0)
             {
-                value = (string)source.Revisions[source.Revision - config.timeTravel].Fields["System.AreaPath"].Value;
+                value = (string)source.Revisions[source.Revision - Config.timeTravel].Fields["System.AreaPath"].Value;
             }
             else
             {
                 value = source.AreaPath;
             }
 
-            List<string> bits = new List<string>(value.Split(char.Parse(@"\"))).Skip(config.toSkip).ToList();
+            List<string> bits = new List<string>(value.Split(char.Parse(@"\"))).Skip(Config.toSkip).ToList();
             target.Tags = string.Join(";", newTags.Union(bits).ToArray());
         }
     }
