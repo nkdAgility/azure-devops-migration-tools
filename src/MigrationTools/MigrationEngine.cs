@@ -1,27 +1,21 @@
-﻿using Microsoft.ApplicationInsights;
-using Microsoft.ApplicationInsights.WorkerService;
-using Microsoft.Extensions.Configuration;
+﻿using System.Collections.Generic;
+using System.Net;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using MigrationTools.Core;
 using MigrationTools.Core.Configuration;
 using MigrationTools.Core.Engine;
 using MigrationTools.Core.Engine.Containers;
-using MigrationTools.Core.Sinks;
 using Serilog;
-using Serilog.Context;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace MigrationTools
 {
-    public class MigrationEngineCore
+    public interface IMigrationEngine
+    {
+        ProcessingStatus Run();
+    }
+
+    public class MigrationEngineCore : IMigrationEngine
     {
         private readonly IHost _Host;
         private readonly ILogger<MigrationEngineCore> _Log;
@@ -77,11 +71,12 @@ namespace MigrationTools
         }
 
 
-        public void Run()
+        public ProcessingStatus Run()
         {
 
             Log.Error("Running but no implementation :) ");
+            return ProcessingStatus.None;
         }
-        
+
     }
 }

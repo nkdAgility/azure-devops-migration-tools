@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MigrationTools.Host\MigrationTools.Host.csproj" />
     <ProjectReference Include="..\MigrationTools.Sinks.TfsObjectModel\MigrationTools.Sinks.TfsObjectModel.csproj" />
     <ProjectReference Include="..\VstsSyncMigrator.Core\VstsSyncMigrator.Core.csproj" />
   </ItemGroup>

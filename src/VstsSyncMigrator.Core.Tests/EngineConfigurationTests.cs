@@ -1,6 +1,7 @@
 ﻿using System;
 using MigrationTools.Core.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace _VstsSyncMigrator.Engine.Tests
 {
@@ -22,7 +23,7 @@ namespace _VstsSyncMigrator.Engine.Tests
         [TestMethod]
         public void EngineConfigurationCreateDefault()
         {
-            IEngineConfigurationBuilder ecb = new EngineConfigurationBuilder();
+            IEngineConfigurationBuilder ecb = new EngineConfigurationBuilder(new NullLogger<EngineConfigurationBuilder>());
             EngineConfiguration ec = ecb.BuildDefault();
             Assert.IsNotNull(ec);
             Assert.IsNotNull(ec.Source);

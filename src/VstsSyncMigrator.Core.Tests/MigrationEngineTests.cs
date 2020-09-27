@@ -1,14 +1,15 @@
 ﻿using System;
-using MigrationTools.Core.Configuration;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using VstsSyncMigrator.Engine;
-using Microsoft.Extensions.Hosting;
+using Microsoft.ApplicationInsights;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MigrationTools;
+using MigrationTools.CommandLine;
+using MigrationTools.Core.Configuration;
 using MigrationTools.Core.Engine.Containers;
 using MigrationTools.Services;
-using Microsoft.ApplicationInsights;
-using MigrationTools;
 using MigrationTools.Sinks.TfsObjectModel.FieldMaps;
+using VstsSyncMigrator.Engine;
 
 namespace _VstsSyncMigrator.Engine.Tests
 {
@@ -21,7 +22,7 @@ namespace _VstsSyncMigrator.Engine.Tests
         [TestInitialize]
         public void Setup()
         {
-            ecb = new EngineConfigurationBuilder();
+            ecb = new EngineConfigurationBuilder(new NullLogger<EngineConfigurationBuilder>());
             var services = new ServiceCollection();
 
             // Field Mapps
@@ -50,13 +51,14 @@ namespace _VstsSyncMigrator.Engine.Tests
             services.AddSingleton<GitRepoMapContainer>();
             services.AddSingleton<ChangeSetMappingContainer>();
 
-            // 
+            //
             services.AddSingleton<IEngineConfigurationBuilder, EngineConfigurationBuilder>();
             services.AddSingleton<EngineConfiguration>(ecb.BuildDefault());
-            services.AddSingleton<TelemetryClient>(new TelemetryClient());    
+            services.AddSingleton<TelemetryClient>(new TelemetryClient());
             services.AddSingleton<ITelemetryLogger, TestTelemetryLogger>();
             services.AddSingleton<MigrationEngine>();
 
+            services.AddSingleton<ExecuteOptions>((p) => null);
 
             _services = services.BuildServiceProvider();
 
