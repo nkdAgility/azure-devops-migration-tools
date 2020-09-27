@@ -201,6 +201,18 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                         }
                         else
                         {
+                            if (linkTypeEnd.ImmutableName == "System.LinkTypes.Hierarchy-Reverse")
+                            {
+                                var potentialParentConflictLink = ( // TF201065: You can not add a Parent link to this work item because a work item can have only one link of this type.
+                                    from Link l in wiTargetL.Links
+                                    where l is RelatedLink
+                                        && ((RelatedLink)l).LinkTypeEnd.ImmutableName == "System.LinkTypes.Hierarchy-Reverse"
+                                    select (RelatedLink)l).SingleOrDefault();
+                                if (potentialParentConflictLink != null)
+                                {
+                                    wiTargetL.Links.Remove(potentialParentConflictLink);
+                                }
+                            }
                             wiTargetL.Links.Add(newRl);
                             if (save)
                             {
