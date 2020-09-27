@@ -25,6 +25,8 @@ using VstsSyncMigrator.Commands;
 using VstsSyncMigrator.Engine;
 using MigrationTools;
 using Microsoft.Extensions.Configuration;
+using MigrationTools.Engine;
+using MigrationTools.Sinks.TfsObjectModel;
 
 namespace VstsSyncMigrator.ConsoleApp
 {
@@ -103,6 +105,7 @@ namespace VstsSyncMigrator.ConsoleApp
             services.AddSingleton<NodeStructuresMigrationContext>();
 
             services.AddSingleton<TeamMigrationContext>();
+
             services.AddSingleton<TestConfigurationsMigrationContext>();
             services.AddSingleton<TestPlandsAndSuitesMigrationContext>();
             services.AddSingleton<TestVeriablesMigrationContext>();

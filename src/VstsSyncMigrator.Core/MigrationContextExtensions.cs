@@ -13,12 +13,7 @@ namespace VstsSyncMigrator.Core
             workItem.Fields["System.ChangedBy"].Value = "Migration";
             workItem.Save();
         }
- public static void SaveWorkItem(this AttachmentOMatic context, WorkItem workItem)
-        {
-            if (workItem == null) throw new ArgumentNullException(nameof(workItem));
-            workItem.Fields["System.ChangedBy"].Value = "Migration";
-            workItem.Save();
-        }
+
 
 
     }
