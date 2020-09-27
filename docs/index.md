@@ -53,6 +53,7 @@ _NOTICE: Both paied and community support is avilable through our [recommneded c
 
  * [TFS 2017 Migration To VSTS with VSTS Sync Migrator from Mohamed Radwan](http://mohamedradwan.com/2017/09/15/tfs-2017-migration-to-vsts-with-vsts-sync-migrator/)
  * [Options migrating TFS to VSTS from Richard Fennell](https://blogs.blackmarble.co.uk/blogs/rfennell/post/2017/05/10/Options-migrating-TFS-to-VSTS)
+ * [Migrating Test artifacts and all other work item types using the Azure DevOps from Gordon Beeming](https://youtu.be/jU6E0k0eXXw)
 
 ## Getting the Tools
 
@@ -159,8 +160,9 @@ If you want to sync your GitHub repository then check out [Open-source with VSTS
 You can get free support from the community here and on social media on a best effort basis if folks are available. If you are looking for paid support there are a number of consultants that contribute to this project and that are experts in this type of work:
 
 * **Martin Hinshelwood, naked Agility Ltd** - @MrHinsh is the founder of the Azure DevOps Migration Tools is available worldwide to help organisations plan and enact their migration efforts. You can contact him through [naked Agility Ltd.](https://nkdagility.com).
-* **Wes MacDonald, LIKE 10 INC.** - @wesmacdonald is a DevOps Consultant located in Toronto, Canada.  You can reach out to him via [LIKE 10 INC.](http://www.like10.com). 
-* _others coming soon_
+* **Wes MacDonald, LIKE 10 INC.** - @wesmacdonald is a DevOps Consultant located in Toronto, Canada.  You can reach out to him via [LIKE 10 INC.](http://www.like10.com).
+* **Ove Bastiansen** - @ovebastiansen is a DevOps Consultant located in Norway. You can reach out to him via his [GitHub Profile](https://github.com/ovebastiansen). 
+* **Gordon Beeming** - @Gordon-Beeming is a DevOps Consultant located in South Africa. You can reach out to him via [Gordon Beeming](https://gordonbeeming.xyz/). 
 
 ## FAQ
 
