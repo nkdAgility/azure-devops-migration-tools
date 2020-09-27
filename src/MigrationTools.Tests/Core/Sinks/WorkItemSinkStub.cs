@@ -24,13 +24,13 @@ namespace MigrationTools.Core.Sinks.Tests
             if (found != null)
             {
                 // Add Revission
-                found.title = workItem.title;
+                found.Title = workItem.Title;
                 return workItem;
             } else
             {
                 // Create new
                 var newid = list.Max(s => int.Parse(s.id)) + 1;
-                list.Add(new WorkItemData { id = newid.ToString(), title = workItem.title });
+                list.Add(new WorkItemData { id = newid.ToString(), Title = workItem.Title });
                 return workItem;
             }
         }
@@ -38,11 +38,11 @@ namespace MigrationTools.Core.Sinks.Tests
         private void PopulateList()
         {
             list.Clear();
-            list.Add(new WorkItemData { id = "1", title = "Item 1" });
-            list.Add(new WorkItemData { id = "2", title = "Item 2" });
-            list.Add(new WorkItemData { id = "3", title = "Item 3" });
-            list.Add(new WorkItemData { id = "4", title = "Item 4" });
-            list.Add(new WorkItemData { id = "5", title = "Item 5" });
+            list.Add(new WorkItemData { id = "1", Title = "Item 1" });
+            list.Add(new WorkItemData { id = "2", Title = "Item 2" });
+            list.Add(new WorkItemData { id = "3", Title = "Item 3" });
+            list.Add(new WorkItemData { id = "4", Title = "Item 4" });
+            list.Add(new WorkItemData { id = "5", Title = "Item 5" });
         }
     }
 }

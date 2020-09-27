@@ -25,8 +25,8 @@ namespace MigrationTools.Sinks.TfsObjectModel
         {
             var internalWorkItem = new WorkItemData();
             internalWorkItem.id = workItem.Id.ToString();
-            internalWorkItem.title = workItem.Title;
             internalWorkItem.Type = workItem.Type.Name;
+            internalWorkItem.Title = workItem.Title;
             internalWorkItem.InternalWorkItem = workItem;
             return internalWorkItem;
         }

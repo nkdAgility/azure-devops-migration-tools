@@ -7,9 +7,8 @@ namespace MigrationTools.Core.DataContracts
    public class WorkItemData
     {
         public string id { get; set; }
-        public string title { get; set; }
-        public String Type { get; set; }
-        //public IDictionary<string, object> Fields { get; set; }
+        public string Type { get; set; }
+        public string Title { get; set; }
 
         public object InternalWorkItem { get; set; }
 
