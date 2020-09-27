@@ -1,12 +1,11 @@
-﻿using Microsoft.TeamFoundation.Server;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Xml;
-using MigrationTools.Core.Configuration.Processing;
+using Microsoft.TeamFoundation.Server;
 using MigrationTools;
-using Microsoft.Extensions.Hosting;
 using MigrationTools.Core.Configuration;
+using MigrationTools.Core.Configuration.Processing;
 using Serilog;
 
 namespace VstsSyncMigrator.Engine
@@ -52,7 +51,7 @@ namespace VstsSyncMigrator.Engine
             //////////////////////////////////////////////////
         }
 
-        private void ProcessCommonStructure(string treeTypeSource,string treeTypeTarget, NodeInfo[] sourceNodes, ICommonStructureService targetCss, ICommonStructureService sourceCss)
+        private void ProcessCommonStructure(string treeTypeSource, string treeTypeTarget, NodeInfo[] sourceNodes, ICommonStructureService targetCss, ICommonStructureService sourceCss)
         {
             NodeInfo sourceNode = (from n in sourceNodes where n.Path.Contains(treeTypeSource) select n).Single();
             if (sourceNode == null) // May run into language problems!!! This is to try and detect that
@@ -174,11 +173,18 @@ namespace VstsSyncMigrator.Engine
             }
             catch (CommonStructureSubsystemException ex)
             {
-                Log.Error(ex, "Creating Node");
-                Trace.Write("...missing");
-                string newPathUri = css.CreateNode(name, parent.Uri);
-                Trace.Write("...created");
-                node = css.GetNode(newPathUri);
+                try
+                {
+                    string newPathUri = css.CreateNode(name, parent.Uri);
+                    Trace.Write("...created");
+                    node = css.GetNode(newPathUri);
+                }
+                catch
+                {
+                    Log.Error(ex, "Creating Node");
+                    Trace.Write("...missing");
+                    throw;
+                }
             }
 
             Trace.WriteLine(String.Empty);
@@ -197,10 +203,17 @@ namespace VstsSyncMigrator.Engine
             }
             catch (CommonStructureSubsystemException ex)
             {
-               Log.Warning(ex, "Missing ");
-                string newPathUri = css.CreateNode(name, parent.Uri);
-               Log.Information("...created");
-                node = css.GetNode(newPathUri);
+                try
+                {
+                    string newPathUri = css.CreateNode(name, parent.Uri);
+                    Log.Information("...created");
+                    node = css.GetNode(newPathUri);
+                }
+                catch
+                {
+                    Log.Warning(ex, "Missing ");
+                    throw;
+                }
             }
 
             try
