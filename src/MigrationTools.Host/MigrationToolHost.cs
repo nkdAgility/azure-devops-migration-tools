@@ -51,6 +51,11 @@ namespace MigrationTools.Host
                         {
                             services.AddSingleton(opts);
                             services.AddSingleton<InitOptions>((p) => null);
+                        })
+                        .WithNotParsed(error =>
+                        {
+                            services.AddSingleton<InitOptions>((p) => null);
+                            services.AddSingleton<ExecuteOptions>((p) => null);
                         });
                     services.AddOptions();
                     services.AddTransient<IDetectOnlineService, DetectOnlineService>();

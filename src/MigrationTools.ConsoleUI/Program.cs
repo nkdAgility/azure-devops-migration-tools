@@ -32,6 +32,10 @@ namespace MigrationTools.ConsoleUI
                 });
             var host = hostBuilder.Build();
             var startupService = host.InitializeMigrationSetup(args);
+            if (startupService == null)
+            {
+                return;
+            }
             await host.RunAsync();
             startupService.RunExitLogic();
         }

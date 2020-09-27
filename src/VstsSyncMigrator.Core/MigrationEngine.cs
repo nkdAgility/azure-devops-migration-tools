@@ -52,10 +52,10 @@ namespace VstsSyncMigrator.Engine
         {
             NetworkCredential sourceCredentials = null;
             NetworkCredential targetCredentials = null;
-            if (!string.IsNullOrWhiteSpace(executeOptions.SourceUserName) && !string.IsNullOrWhiteSpace(executeOptions.SourcePassword))
+            if (!string.IsNullOrWhiteSpace(executeOptions?.SourceUserName) && !string.IsNullOrWhiteSpace(executeOptions.SourcePassword))
                 sourceCredentials = new NetworkCredential(executeOptions.SourceUserName, executeOptions.SourcePassword, executeOptions.SourceDomain);
 
-            if (!string.IsNullOrWhiteSpace(executeOptions.TargetUserName) && !string.IsNullOrWhiteSpace(executeOptions.TargetPassword))
+            if (!string.IsNullOrWhiteSpace(executeOptions?.TargetUserName) && !string.IsNullOrWhiteSpace(executeOptions.TargetPassword))
                 targetCredentials = new NetworkCredential(executeOptions.TargetUserName, executeOptions.TargetPassword, executeOptions.TargetDomain);
 
             return (sourceCredentials, targetCredentials);

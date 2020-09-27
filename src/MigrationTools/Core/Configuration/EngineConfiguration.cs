@@ -23,6 +23,11 @@ namespace MigrationTools.Core.Configuration
 
         public EngineConfigurationWrapper(IEngineConfigurationBuilder engineConfigurationBuilder, ExecuteOptions opts, ILogger<EngineConfigurationWrapper> logger)
         {
+            if (opts == null) //means that we are in init command and not execute
+            {
+                _engineConfiguration = engineConfigurationBuilder.BuildDefault();
+                return;
+            }
             if (opts.ConfigFile == string.Empty)
             {
                 opts.ConfigFile = "configuration.json";

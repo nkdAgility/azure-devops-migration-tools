@@ -7,10 +7,8 @@ using MigrationTools;
 using MigrationTools.Core.Configuration;
 using MigrationTools.Core.Engine.Containers;
 using MigrationTools.Services;
-using VstsSyncMigrator.Engine;
-using Microsoft.ApplicationInsights;
-using MigrationTools;
 using MigrationTools.Sinks.TfsObjectModel.FieldMaps;
+using VstsSyncMigrator.Engine;
 
 namespace _VstsSyncMigrator.Engine.Tests
 {
