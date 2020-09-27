@@ -1,16 +1,12 @@
-﻿using Microsoft.ApplicationInsights.WindowsServer;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MigrationTools;
 using MigrationTools.Core.Configuration;
 using MigrationTools.Core.Configuration.Tests;
 using MigrationTools.Core.Engine;
 using MigrationTools.Core.Engine.Containers;
 using MigrationTools.Services;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace MigrationTools.Tests
 {
@@ -23,7 +19,8 @@ namespace MigrationTools.Tests
         [TestInitialize]
         public void Setup()
         {
-            ecb = new EngineConfigurationBuilder();
+            var logger = new NullLogger<EngineConfigurationBuilder>();
+            ecb = new EngineConfigurationBuilder(logger);
             host = new HostBuilder().ConfigureServices((context, services) =>
             {
                 services.AddSingleton<IDetectOnlineService, DetectOnlineService>();

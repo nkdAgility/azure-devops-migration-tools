@@ -1,29 +1,20 @@
-﻿using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using Microsoft.VisualStudio.Services.Common;
-using Serilog;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using VstsSyncMigrator.Engine.ComponentContext;
-using MigrationTools.Core.Configuration;
-using MigrationTools.Core.Configuration.FieldMap;
-using MigrationTools.Core.Configuration.Processing;
-using MigrationTools.Core.Engine;
-using Microsoft.Extensions.Hosting;
 using System.Net;
+using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools;
-using Microsoft.Extensions.DependencyInjection;
+using MigrationTools.CommandLine;
+using MigrationTools.Core.Configuration;
+using MigrationTools.Core.Engine;
 using MigrationTools.Core.Engine.Containers;
-using Microsoft.ApplicationInsights;
+using Serilog;
 
 namespace VstsSyncMigrator.Engine
 {
-   public class MigrationEngine
+    public class MigrationEngine : IMigrationEngine
     {
-
-        NetworkCredential sourceCreds;
-        NetworkCredential targetCreds;
+        ExecuteOptions executeOptions;
 
         private readonly IServiceProvider _services;
         private readonly Guid _Guid = Guid.NewGuid();
@@ -36,9 +27,11 @@ namespace VstsSyncMigrator.Engine
 
         public ITelemetryLogger Telemetry { get; }
 
-        public MigrationEngine(EngineConfiguration config, 
-            TypeDefinitionMapContainer typeDefinitionMaps, 
-            ProcessorContainer processors, 
+        public MigrationEngine(
+            ExecuteOptions executeOptions,
+            EngineConfiguration config,
+            TypeDefinitionMapContainer typeDefinitionMaps,
+            ProcessorContainer processors,
             GitRepoMapContainer gitRepoMaps,
             ChangeSetMappingContainer changeSetMapps,
             FieldMapContainer fieldMaps,
@@ -46,6 +39,7 @@ namespace VstsSyncMigrator.Engine
         {
             Log.Information("Creating Migration Engine {Guid}", _Guid);
             FieldMaps = fieldMaps;
+            this.executeOptions = executeOptions;
             TypeDefinitionMaps = typeDefinitionMaps;
             Processors = processors;
             GitRepoMaps = gitRepoMaps;
@@ -54,28 +48,36 @@ namespace VstsSyncMigrator.Engine
             ProcessConfiguration(config);
         }
 
-        public void AddNetworkCredentials(NetworkCredential sourceCredentials, NetworkCredential targetCredentials)
+        public (NetworkCredential source, NetworkCredential target) CheckForNetworkCredentials()
         {
-            sourceCreds = sourceCredentials;
-            targetCreds = targetCredentials;
+            NetworkCredential sourceCredentials = null;
+            NetworkCredential targetCredentials = null;
+            if (!string.IsNullOrWhiteSpace(executeOptions?.SourceUserName) && !string.IsNullOrWhiteSpace(executeOptions.SourcePassword))
+                sourceCredentials = new NetworkCredential(executeOptions.SourceUserName, executeOptions.SourcePassword, executeOptions.SourceDomain);
+
+            if (!string.IsNullOrWhiteSpace(executeOptions?.TargetUserName) && !string.IsNullOrWhiteSpace(executeOptions.TargetPassword))
+                targetCredentials = new NetworkCredential(executeOptions.TargetUserName, executeOptions.TargetPassword, executeOptions.TargetDomain);
+
+            return (sourceCredentials, targetCredentials);
         }
 
         private void ProcessConfiguration(EngineConfiguration config)
         {
+            var credentials = CheckForNetworkCredentials();
             if (config.Source != null)
             {
-                if (sourceCreds == null)
+                if (credentials.source == null)
                     SetSource(new TeamProjectContext(config.Source, Telemetry));
                 else
-                    SetSource(new TeamProjectContext(config.Source, sourceCreds, Telemetry));
+                    SetSource(new TeamProjectContext(config.Source, credentials.source, Telemetry));
             }
             if (config.Target != null)
             {
-                if (targetCreds == null)
+                if (credentials.target == null)
                     SetTarget(new TeamProjectContext(config.Target, Telemetry));
                 else
-                    SetTarget(new TeamProjectContext(config.Target, targetCreds, Telemetry));
-            } 
+                    SetTarget(new TeamProjectContext(config.Target, credentials.target, Telemetry));
+            }
         }
 
         public ITeamProjectContext Source { get; private set; }
@@ -112,7 +114,7 @@ namespace VstsSyncMigrator.Engine
                 }
             }
             engineTimer.Stop();
-            Telemetry.TrackEvent("EngineComplete", 
+            Telemetry.TrackEvent("EngineComplete",
                 new Dictionary<string, string> {
                     { "Engine", "Migration" }
                 },

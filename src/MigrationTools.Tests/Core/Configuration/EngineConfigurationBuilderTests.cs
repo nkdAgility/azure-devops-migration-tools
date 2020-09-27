@@ -1,12 +1,7 @@
-﻿using Microsoft.ApplicationInsights;
+﻿using System.IO;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MigrationTools.Core.Configuration;
-using MigrationTools.Core.Configuration.FieldMap;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
 
 namespace MigrationTools.Core.Configuration.Tests
 {
@@ -14,9 +9,16 @@ namespace MigrationTools.Core.Configuration.Tests
     public class EngineConfigurationBuilderTests
     {
 
+        private EngineConfigurationBuilder CreateEngine()
+        {
+            var logger = new NullLogger<EngineConfigurationBuilder>();
+            var ecb = new EngineConfigurationBuilder(logger);
+            return ecb;
+        }
+
         private void HelperCreateDefaultConfigFile()
         {
-            var ecb = new EngineConfigurationBuilder();
+            var ecb = CreateEngine();
             EngineConfiguration ec = ecb.BuildDefault();
             string json = JsonConvert.SerializeObject(ecb.BuildDefault(),
                      new FieldMapConfigJsonConverter(),
@@ -30,21 +32,21 @@ namespace MigrationTools.Core.Configuration.Tests
         public void BuildFromFileTest()
         {
             HelperCreateDefaultConfigFile();
-            var ecb = new EngineConfigurationBuilder();
+            var ecb = CreateEngine();
             ecb.BuildFromFile();
         }
 
         [TestMethod()]
         public void BuildDefaultTest()
         {
-            var ecb = new EngineConfigurationBuilder();
+            var ecb = CreateEngine();
             ecb.BuildDefault();
         }
 
         [TestMethod()]
         public void BuildWorkItemMigrationTest()
         {
-            var ecb = new EngineConfigurationBuilder();
+            var ecb = CreateEngine();
             ecb.BuildWorkItemMigration();
         }
     }

@@ -1,17 +1,22 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using Microsoft.Extensions.Logging;
 using MigrationTools.Core.Configuration.FieldMap;
 using MigrationTools.Core.Configuration.Processing;
 using Newtonsoft.Json;
-using Serilog;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
 
 namespace MigrationTools.Core.Configuration
 {
     public class EngineConfigurationBuilder : IEngineConfigurationBuilder
     {
+        private readonly ILogger<EngineConfigurationBuilder> _logger;
+
+        public EngineConfigurationBuilder(ILogger<EngineConfigurationBuilder> logger)
+        {
+            _logger = logger;
+        }
+
         public EngineConfiguration BuildFromFile(string configFile = "configuration.json")
         {
             string configurationjson;
@@ -31,7 +36,7 @@ namespace MigrationTools.Core.Configuration
                 string appVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(2);
                 if (ec.Version != appVersion)
                 {
-                    Log.Error("The config version {Version} does not match the current app version {appVersion}. There may be compatability issues and we recommend that you generate a new default config and then tranfer the settings accross.", ec.Version, appVersion);
+                    _logger.LogError("The config version {@Version} does not match the current app version {@appVersion}. There may be compatability issues and we recommend that you generate a new default config and then tranfer the settings accross.", ec.Version, appVersion);
                     throw new Exception("Version in Config does not match X.X in Application. Please check and revert.");
                 }
 //#endif

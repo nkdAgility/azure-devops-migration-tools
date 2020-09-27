@@ -1,19 +1,18 @@
-﻿using System;
+﻿using System.IO;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Newtonsoft.Json;
-using System.IO;
-using MigrationTools.Core.Configuration.FieldMap;
 using MigrationTools.Core.Configuration;
+using Newtonsoft.Json;
 
 namespace MigrationTools.Tests
 {
-    
+
     [TestClass]
     public class EngineConfigurationTests
     {
 
-IEngineConfigurationBuilder ecb = new EngineConfigurationBuilder();
-        
+        IEngineConfigurationBuilder ecb = new EngineConfigurationBuilder(new NullLogger<EngineConfigurationBuilder>());
+
         [TestMethod]
         public void TestSeraliseToJson()
         {

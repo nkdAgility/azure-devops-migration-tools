@@ -33,7 +33,7 @@ namespace VstsSyncMigrator.Engine
 
         public void Execute()
         {
-            this.me = _services.GetService<MigrationEngine>();
+            this.me = _services.GetService<IMigrationEngine>() as MigrationEngine;
             Telemetry.TrackEvent(this.Name);
             Log.Information("Migration Context Start: {MigrationContextname} ", Name);
             DateTime start = DateTime.Now;
@@ -52,7 +52,7 @@ namespace VstsSyncMigrator.Engine
             {
                 Status = ProcessingStatus.Failed;
                 executeTimer.Stop();
-                
+
                 Telemetry.TrackException(ex,
                     new Dictionary<string, string>
                     {
