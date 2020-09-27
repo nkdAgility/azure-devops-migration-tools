@@ -71,6 +71,7 @@ namespace VstsSyncMigrator.Engine
                 "System.AreaId",
                 "System.IterationId",
                 "System.Id",
+                "System.Parent",
                 "System.RevisedDate",
                 "System.AuthorizedAs",
                 "System.AttachedFileCount",
@@ -593,7 +594,7 @@ namespace VstsSyncMigrator.Engine
 
         internal void TraceWriteLine(LogEventLevel level, string message, Dictionary<string, object> properties = null)
         {
-            if(properties != null)
+            if (properties != null)
             {
                 foreach (var item in properties)
                 {
@@ -736,7 +737,7 @@ namespace VstsSyncMigrator.Engine
             if (targetWorkItem != null && _config.LinkMigration && sourceWorkItem.Links.Count > 0)
             {
                 TraceWriteLine(LogEventLevel.Information, "Links {SourceWorkItemLinkCount} | LinkMigrator:{LinkMigration}", new Dictionary<string, object>() { { "SourceWorkItemLinkCount", sourceWorkItem.Links.Count }, { "LinkMigration", _config.LinkMigration } });
-                workItemLinkOMatic.MigrateLinks(sourceWorkItem, sourceStore, targetWorkItem, targetStore, _config.LinkMigrationSaveEachAsAdded, me.Source.Config.ReflectedWorkItemIDFieldName);
+                workItemLinkOMatic.MigrateLinks(sourceWorkItem, sourceStore, targetWorkItem, targetStore, _config.LinkMigrationSaveEachAsAdded, _config.FilterWorkItemsThatAlreadyExistInTarget, me.Source.Config.ReflectedWorkItemIDFieldName);
                 AddMetric("RelatedLinkCount", processWorkItemMetrics, targetWorkItem.Links.Count);
                 int fixedLinkCount = repoOMatic.FixExternalLinks(targetWorkItem, targetStore, sourceWorkItem, _config.LinkMigrationSaveEachAsAdded);
                 AddMetric("FixedGitLinkCount", processWorkItemMetrics, fixedLinkCount);
