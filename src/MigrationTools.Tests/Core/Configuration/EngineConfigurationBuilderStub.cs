@@ -1,10 +1,15 @@
-﻿using MigrationTools.Core.Configuration;
+﻿using Microsoft.Extensions.Logging;
 
 namespace MigrationTools.Core.Configuration.Tests
 {
     public class EngineConfigurationBuilderStub : IEngineConfigurationBuilder
     {
-        IEngineConfigurationBuilder ecb = new EngineConfigurationBuilder();
+        IEngineConfigurationBuilder ecb;
+
+        public EngineConfigurationBuilderStub(ILogger<EngineConfigurationBuilder> logger)
+        {
+            ecb = new EngineConfigurationBuilder(logger);
+        }
 
         public EngineConfiguration BuildDefault()
         {

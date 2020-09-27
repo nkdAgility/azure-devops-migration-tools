@@ -31,6 +31,7 @@
   <ItemGroup>
     <ProjectReference Include="..\MigrationTools.Sinks.AzureDevOps\MigrationTools.Sinks.AzureDevOps.csproj" />
     <ProjectReference Include="..\MigrationTools\MigrationTools.csproj" />
+    <ProjectReference Include="..\MigrationTools.Host\MigrationTools.Host.csproj" />
   </ItemGroup>
 
   <ItemGroup>
