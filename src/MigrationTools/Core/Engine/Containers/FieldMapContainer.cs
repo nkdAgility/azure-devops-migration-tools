@@ -5,6 +5,7 @@ using MigrationTools.Core.DataContracts;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -31,15 +32,20 @@ namespace MigrationTools.Core.Engine.Containers
             {
                 foreach (IFieldMapConfig fieldmapConfig in Config.FieldMaps)
                 {
-                    Log.Information("{Context}: Adding FieldMap {FieldMapName}", fieldmapConfig.FieldMap, "MigrationEngine");
-                    string typePattern = $"VstsSyncMigrator.Engine.ComponentContext.{fieldmapConfig.FieldMap}";
-                    Type t = Type.GetType(typePattern);
-                    if (t == null)
+                    Log.Information("Adding FieldMap {FieldMapName}", fieldmapConfig.FieldMap);
+                    string typePattern = $"MigrationTools.Sinks.*.FieldMaps.{fieldmapConfig.FieldMap}";
+
+                    Type type = AppDomain.CurrentDomain.GetAssemblies()
+                             .Where(a => !a.IsDynamic)
+                             .SelectMany(a => a.GetTypes())
+                             .FirstOrDefault(t => t.Name.Equals(fieldmapConfig.FieldMap) || t.FullName.Equals(typePattern));
+
+                    if (type == null)
                     {
                         Log.Error("Type " + typePattern + " not found.", typePattern);
                         throw new Exception("Type " + typePattern + " not found.");
                     }
-                    IFieldMap fm = (IFieldMap)Services.GetRequiredService(t);
+                    IFieldMap fm = (IFieldMap)Services.GetRequiredService(type);
                     fm.Configure(fieldmapConfig);
                     this.AddFieldMap(fieldmapConfig.WorkItemTypeName, fm);
                 }

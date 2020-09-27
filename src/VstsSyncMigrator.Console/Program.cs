@@ -27,6 +27,7 @@ using MigrationTools;
 using Microsoft.Extensions.Configuration;
 using MigrationTools.Sinks.TfsObjectModel;
 using MigrationTools.Sinks.TfsObjectModel.FieldMaps;
+using MigrationTools.Core.Engine.Containers;
 
 namespace VstsSyncMigrator.ConsoleApp
 {
@@ -108,10 +109,14 @@ namespace VstsSyncMigrator.ConsoleApp
             services.AddTransient<FieldtoFieldMultiMap>();
             services.AddTransient<FieldToTagFieldMap>();
             services.AddTransient<FieldValuetoTagMap>();
+            services.AddTransient<FieldToFieldMap>();
+            services.AddTransient<FieldValueMap>();
             services.AddTransient<MultiValueConditionalMap>();
             services.AddTransient<RegexFieldMap>();
             services.AddTransient<TreeToTagFieldMap>();
 
+            //Containers
+            services.AddSingleton<FieldMapContainer>();
 
             //Engine
             services.AddSingleton<Engine.MigrationEngine>();
