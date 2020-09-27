@@ -45,7 +45,7 @@ namespace MigrationTools.Host
                     if (Console.ReadKey().Key != ConsoleKey.Y)
                     {
                         _logger.LogWarning("User aborted to update version");
-                        return 2;
+                        throw new Exception("User Abort");
                     }
 #endif
                 }
