@@ -446,7 +446,7 @@ namespace VstsSyncMigrator.Engine
                     }
 
                     PopulateWorkItem(currentRevisionWorkItem, targetWorkItem, destType);
-                    me.ApplyFieldMappings(currentRevisionWorkItem, targetWorkItem);
+                    me.FieldMaps.ApplyFieldMappings(currentRevisionWorkItem.ToWorkItemData(), targetWorkItem.ToWorkItemData());
 
                     targetWorkItem.Fields["System.ChangedBy"].Value =
                         currentRevisionWorkItem.Revisions[revision.Index].Fields["System.ChangedBy"].Value;

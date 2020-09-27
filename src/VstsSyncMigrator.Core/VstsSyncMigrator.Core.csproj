@@ -30,4 +30,8 @@
     <Reference Include="System.DirectoryServices.AccountManagement" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Execution\FieldMaps\" />
+  </ItemGroup>
+
 </Project>

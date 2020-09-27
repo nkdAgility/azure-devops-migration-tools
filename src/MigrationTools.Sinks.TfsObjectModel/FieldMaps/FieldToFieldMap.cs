@@ -8,7 +8,7 @@ using System.Diagnostics;
 using MigrationTools.Core.Configuration.FieldMap;
 using MigrationTools.Core.Configuration;
 
-namespace VstsSyncMigrator.Engine.ComponentContext
+namespace MigrationTools.Sinks.TfsObjectModel.FieldMaps
 {
     public class FieldToFieldMap : FieldMapBase
     {

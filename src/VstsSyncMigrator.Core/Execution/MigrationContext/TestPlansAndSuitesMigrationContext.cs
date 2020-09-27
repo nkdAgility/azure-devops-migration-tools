@@ -18,6 +18,7 @@ using MigrationTools;
 using Microsoft.Extensions.Hosting;
 using MigrationTools.Core.Configuration;
 using Serilog;
+using MigrationTools.Sinks.TfsObjectModel;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -300,7 +301,7 @@ namespace VstsSyncMigrator.Engine
                 targetWI.IterationPath = regex.Replace(sourceWI.IterationPath, me.Target.Config.Project, 1);
             }
 
-            me.ApplyFieldMappings(sourceWI, targetWI);
+            me.FieldMaps.ApplyFieldMappings(sourceWI.ToWorkItemData(), targetWI.ToWorkItemData());
 
             //validate if save operation will work and report issues if found
             ArrayList validationIssues = targetWI.Validate();

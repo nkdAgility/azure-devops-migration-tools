@@ -5,9 +5,8 @@ using System.Text.RegularExpressions;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools.Core.Configuration;
 using MigrationTools.Core.Configuration.FieldMap;
-using VstsSyncMigrator.Engine.ComponentContext;
 
-namespace VstsSyncMigrator.Engine.ComponentContext
+namespace MigrationTools.Sinks.TfsObjectModel.FieldMaps
 {
 
     public class FieldValuetoTagMap : FieldMapBase

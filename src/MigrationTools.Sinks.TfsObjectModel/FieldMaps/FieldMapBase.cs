@@ -9,8 +9,10 @@ using System.Diagnostics;
 using MigrationTools;
 using Serilog;
 using MigrationTools.Core.Configuration;
+using MigrationTools.Core.Engine;
+using MigrationTools.Core.DataContracts;
 
-namespace VstsSyncMigrator.Engine.ComponentContext
+namespace MigrationTools.Sinks.TfsObjectModel.FieldMaps
 {
     public abstract class FieldMapBase : IFieldMap
     {
@@ -21,18 +23,18 @@ namespace VstsSyncMigrator.Engine.ComponentContext
             _Config = config;
         }
 
-        public void Execute(WorkItem source, WorkItem target)
+        public void Execute(WorkItemData source, WorkItemData target)
         {
             try
             {
-                InternalExecute(source, target);
+                InternalExecute(source.ToWorkItem(), target.ToWorkItem());
             }
             catch (Exception ex)
             {
                 Log.Error(ex, "Field mapp fault", 
                        new Dictionary<string, string> {
-                            { "Source", source.Id.ToString() },
-                            { "Target",  target.Id.ToString()}
+                            { "Source", source.ToWorkItem().Id.ToString() },
+                            { "Target",  target.ToWorkItem().Id.ToString()}
                        });
             }            
         }

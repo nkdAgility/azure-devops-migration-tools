@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using MigrationTools.Core.Configuration;
 using MigrationTools.Core.DataContracts;
 using Serilog;
@@ -38,7 +39,9 @@ namespace MigrationTools.Core.Engine.Containers
                         Log.Error("Type " + typePattern + " not found.", typePattern);
                         throw new Exception("Type " + typePattern + " not found.");
                     }
-                    this.AddFieldMap(fieldmapConfig.WorkItemTypeName, (IFieldMap)Activator.CreateInstance(t, fieldmapConfig));
+                    IFieldMap fm = (IFieldMap)Services.GetRequiredService(t);
+                    fm.Configure(fieldmapConfig);
+                    this.AddFieldMap(fieldmapConfig.WorkItemTypeName, fm);
                 }
             }
         }

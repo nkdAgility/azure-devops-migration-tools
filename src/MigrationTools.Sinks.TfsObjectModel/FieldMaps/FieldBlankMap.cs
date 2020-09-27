@@ -8,7 +8,7 @@ using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using System.Diagnostics;
 using MigrationTools.Core.Configuration.FieldMap;
 
-namespace VstsSyncMigrator.Engine.ComponentContext
+namespace MigrationTools.Sinks.TfsObjectModel.FieldMaps
 {
     public class FieldBlankMap : FieldMapBase
     {

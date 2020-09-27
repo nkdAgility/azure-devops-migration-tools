@@ -1,13 +1,12 @@
 ﻿using System;
-using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using VstsSyncMigrator.Engine.ComponentContext;
+using Microsoft.TeamFoundation.WorkItemTracking.Client;d
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using MigrationTools.Core.Configuration.FieldMap;
 using MigrationTools.Core.Configuration;
 
-namespace VstsSyncMigrator.Engine.ComponentContext
+namespace MigrationTools.Sinks.TfsObjectModel.FieldMaps
 {
     public class FieldToTagFieldMap : FieldMapBase
     {

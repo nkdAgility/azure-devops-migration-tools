@@ -26,6 +26,7 @@ using VstsSyncMigrator.Engine;
 using MigrationTools;
 using Microsoft.Extensions.Configuration;
 using MigrationTools.Sinks.TfsObjectModel;
+using MigrationTools.Sinks.TfsObjectModel.FieldMaps;
 
 namespace VstsSyncMigrator.ConsoleApp
 {
@@ -100,16 +101,16 @@ namespace VstsSyncMigrator.ConsoleApp
       public static IServiceCollection AddPlatformSpecificServices(IServiceCollection services)
         {
             // Field Mapps
-            services.AddTransient<Engine.ComponentContext.FieldBlankMap>();
-            services.AddTransient<Engine.ComponentContext.FieldLiteralMap>();
-            services.AddTransient<Engine.ComponentContext.FieldMergeMap>();
-            services.AddTransient<Engine.ComponentContext.FieldToFieldMap>();
-            services.AddTransient<Engine.ComponentContext.FieldtoFieldMultiMap>();
-            services.AddTransient<Engine.ComponentContext.FieldToTagFieldMap>();
-            services.AddTransient<Engine.ComponentContext.FieldValuetoTagMap>();
-            services.AddTransient<Engine.ComponentContext.MultiValueConditionalMap>();
-            services.AddTransient<Engine.ComponentContext.RegexFieldMap>();
-            services.AddTransient<Engine.ComponentContext.TreeToTagFieldMap>();
+            services.AddTransient<FieldBlankMap>();
+            services.AddTransient<FieldLiteralMap>();
+            services.AddTransient<FieldMergeMap>();
+            services.AddTransient<FieldToFieldMap>();
+            services.AddTransient<FieldtoFieldMultiMap>();
+            services.AddTransient<FieldToTagFieldMap>();
+            services.AddTransient<FieldValuetoTagMap>();
+            services.AddTransient<MultiValueConditionalMap>();
+            services.AddTransient<RegexFieldMap>();
+            services.AddTransient<TreeToTagFieldMap>();
 
 
             //Engine

@@ -21,8 +21,7 @@ namespace VstsSyncMigrator.Engine
 {
    public class MigrationEngine
     {
-        Dictionary<string, List<ComponentContext.IFieldMap>> fieldMapps = new Dictionary<string, List<ComponentContext.IFieldMap>>();
-        
+
         NetworkCredential sourceCreds;
         NetworkCredential targetCreds;
 
@@ -33,6 +32,8 @@ namespace VstsSyncMigrator.Engine
         public TypeDefinitionMapContainer TypeDefinitionMaps { get; }
         public GitRepoMapContainer GitRepoMaps { get; }
         public ChangeSetMappingContainer ChangeSetMapps { get; }
+        public FieldMapContainer FieldMaps { get; }
+
         public ITelemetryLogger Telemetry { get; }
 
         public MigrationEngine(EngineConfiguration config, 
@@ -40,9 +41,11 @@ namespace VstsSyncMigrator.Engine
             ProcessorContainer processors, 
             GitRepoMapContainer gitRepoMaps,
             ChangeSetMappingContainer changeSetMapps,
+            FieldMapContainer fieldMaps,
             ITelemetryLogger telemetry)
         {
             Log.Information("Creating Migration Engine {Guid}", _Guid);
+            FieldMaps = fieldMaps;
             TypeDefinitionMaps = typeDefinitionMaps;
             Processors = processors;
             GitRepoMaps = gitRepoMaps;
@@ -72,25 +75,7 @@ namespace VstsSyncMigrator.Engine
                     SetTarget(new TeamProjectContext(config.Target, Telemetry));
                 else
                     SetTarget(new TeamProjectContext(config.Target, targetCreds, Telemetry));
-            }           
-            if (config.FieldMaps != null)
-            {
-                foreach (IFieldMapConfig fieldmapConfig in config.FieldMaps)
-                {
-                    Log.Information("{Context}: Adding FieldMap {FieldMapName}", fieldmapConfig.FieldMap, "MigrationEngine");
-                    string typePattern = $"VstsSyncMigrator.Engine.ComponentContext.{fieldmapConfig.FieldMap}";
-                    Type t = Type.GetType(typePattern);
-                    if (t == null)
-                    {
-                        Log.Error("Type " + typePattern + " not found.", typePattern);
-                        throw new Exception("Type " + typePattern + " not found.");
-                    }
-                    ComponentContext.IFieldMap fm = (ComponentContext.IFieldMap)_services.GetRequiredService(t);
-                    fm.Configure(fieldmapConfig);
-                    this.AddFieldMap(fieldmapConfig.WorkItemTypeName, fm);
-                }
-            }
- 
+            } 
         }
 
         public ITeamProjectContext Source { get; private set; }
@@ -106,7 +91,7 @@ namespace VstsSyncMigrator.Engine
                 },
                 new Dictionary<string, double> {
                     { "Processors", Processors.Count },
-                    { "Mappings", fieldMapps.Count }
+                    { "Mappings", FieldMaps.Count }
                 });
             Stopwatch engineTimer = Stopwatch.StartNew();
 			ProcessingStatus ps = ProcessingStatus.Complete;
@@ -145,49 +130,6 @@ namespace VstsSyncMigrator.Engine
         public void SetTarget(ITeamProjectContext teamProjectContext)
         {
             Target = teamProjectContext;
-        }
-
-        public void AddFieldMap(string workItemTypeName,  ComponentContext.IFieldMap fieldToTagFieldMap)
-        {
-            if (!fieldMapps.ContainsKey(workItemTypeName))
-            {
-                fieldMapps.Add(workItemTypeName, new List<ComponentContext.IFieldMap>());
-            }
-            fieldMapps[workItemTypeName].Add(fieldToTagFieldMap);
-        }
-
-
-        internal void ApplyFieldMappings(WorkItem source, WorkItem target)
-        { 
-            if (fieldMapps.ContainsKey("*"))
-            {
-                ProcessFieldMapList(source, target, fieldMapps["*"]);
-            }
-            if (fieldMapps.ContainsKey(source.Type.Name))
-            {
-                ProcessFieldMapList(source, target, fieldMapps[source.Type.Name]);
-            }
-        }
-
-        internal void ApplyFieldMappings(WorkItem target)
-        {
-            if (fieldMapps.ContainsKey("*"))
-            {
-                ProcessFieldMapList(target, target, fieldMapps["*"]);
-            }
-            if (fieldMapps.ContainsKey(target.Type.Name))
-            {
-                ProcessFieldMapList(target, target, fieldMapps[target.Type.Name]);
-            }
-        }
-
-        private  void ProcessFieldMapList(WorkItem source, WorkItem target, List<ComponentContext.IFieldMap> list)
-        {
-            foreach (ComponentContext.IFieldMap map in list)
-            {
-                Log.Debug("{Context} Running Field Map: {MapName} {MappingDisplayName}", map.Name, map.MappingDisplayName);
-                map.Execute(source, target);
-            }
         }
 
     }

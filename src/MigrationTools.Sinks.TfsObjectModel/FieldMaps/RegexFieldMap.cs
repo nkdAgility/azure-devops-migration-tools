@@ -1,12 +1,11 @@
 ﻿using System;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using VstsSyncMigrator.Engine.ComponentContext;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
 using MigrationTools.Core.Configuration.FieldMap;
 using MigrationTools.Core.Configuration;
 
-namespace VstsSyncMigrator.Engine.ComponentContext
+namespace MigrationTools.Sinks.TfsObjectModel.FieldMaps
 {
     public class RegexFieldMap : FieldMapBase
     {
