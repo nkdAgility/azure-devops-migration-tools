@@ -2,9 +2,9 @@
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools.Core.Configuration;
 using MigrationTools.Core.DataContracts;
+using MigrationTools.Core.Engine.Enrichers;
 using MigrationTools.Core.Sinks;
-using MigrationTools.Engine;
-using MigrationTools.Engine.Enrichers;
+using MigrationTools.Sinks.TfsObjectModel.Enrichers;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -40,12 +40,17 @@ namespace MigrationTools.Sinks.TfsObjectModel
             return (WorkItem)workItemData.InternalWorkItem;
         }
 
-        public static void SaveWorkItem(this IAttachmentMigrationEnricher context, WorkItemData workItem)
+        public static void SaveMigratedWorkItem(this IAttachmentMigrationEnricher context, WorkItemData workItem)
         {
             if (workItem == null) throw new ArgumentNullException(nameof(workItem));
             workItem.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
             workItem.ToWorkItem().Save();
         }
-
+        public static void SaveMigratedWorkItem(this IEmbededImagesRepairEnricher context, WorkItemData workItem)
+        {
+            if (workItem == null) throw new ArgumentNullException(nameof(workItem));
+            workItem.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
+            workItem.ToWorkItem().Save();
+        }
     }
 }

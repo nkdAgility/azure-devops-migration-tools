@@ -11,16 +11,18 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using MigrationTools.Core.Configuration.Processing;
+using MigrationTools.Core.DataContracts;
+using MigrationTools.Core.Engine.Enrichers;
 
-namespace VstsSyncMigrator.Core.Execution.OMatics
+namespace MigrationTools.Sinks.TfsObjectModel.Enrichers
 {
-    class EmbededImagesRepairOMatic
+   public class EmbededImagesRepairEnricher : IEmbededImagesRepairEnricher
     {
 
         private readonly HttpClientHandler _httpClientHandler;
         private bool _ignore404Errors = true;
 
-        public EmbededImagesRepairOMatic()
+        public EmbededImagesRepairEnricher()
         {
             _httpClientHandler = new HttpClientHandler { AllowAutoRedirect = false, UseDefaultCredentials = true, AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate };
         }
@@ -28,7 +30,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
         /**
       *  from https://gist.github.com/pietergheysens/792ed505f09557e77ddfc1b83531e4fb
       */
-        public void FixHtmlAttachmentLinks(WorkItem wi, string oldTfsurl, string newTfsurl, string sourcePersonalAccessToken = "")
+        public void FixEmbededImages(WorkItemData wi, string oldTfsurl, string newTfsurl, string sourcePersonalAccessToken = "")
         {
 
             Debug.WriteLine($"Searching for urls: {oldTfsurl} and {GetUrlWithOppositeSchema(oldTfsurl)}");
@@ -38,7 +40,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
             var oldTfsurlOppositeSchema = GetUrlWithOppositeSchema(oldTfsurl);
             string regExSearchForImageUrl = "(?<=<img.*src=\")[^\"]*";
 
-            foreach (Field field in wi.Fields)
+            foreach (Field field in wi.ToWorkItem().Fields)
             {
                 if (field.FieldDefinition.FieldType == FieldType.Html)
                 {
@@ -47,7 +49,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                     string regExSearchFileName = "(?<=FileName=)[^=]*";
                     foreach (Match match in matches)
                     {
-                        if (match.Value.ToLower().Contains(oldTfsurl.ToLower()) || match.Value.ToLower().Contains(oldTfsurlOppositeSchema.ToLower()) )
+                        if (match.Value.ToLower().Contains(oldTfsurl.ToLower()) || match.Value.ToLower().Contains(oldTfsurlOppositeSchema.ToLower()))
                         {
                             //save image locally and upload as attachment
                             Match newFileNameMatch = Regex.Match(match.Value, regExSearchFileName, RegexOptions.IgnoreCase);
@@ -79,17 +81,17 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
 
                                 if (GetImageFormat(File.ReadAllBytes(fullImageFilePath)) == ImageFormat.unknown)
                                 {
-                                    throw new Exception($"Downloaded image [{fullImageFilePath}] from Work Item [{wi.Id}] Field: [{field.Name}] could not be identified as an image. Authentication issue?");
+                                    throw new Exception($"Downloaded image [{fullImageFilePath}] from Work Item [{wi.ToWorkItem().Id}] Field: [{field.Name}] could not be identified as an image. Authentication issue?");
                                 }
 
-                                int attachmentIndex = wi.Attachments.Add(new Attachment(fullImageFilePath));
-                                wi.Save();
+                                int attachmentIndex = wi.ToWorkItem().Attachments.Add(new Attachment(fullImageFilePath));
+                                this.SaveMigratedWorkItem(wi);
 
-                                var newImageLink = wi.Attachments[attachmentIndex].Uri.ToString();
+                                var newImageLink = wi.ToWorkItem().Attachments[attachmentIndex].Uri.ToString();
 
                                 field.Value = field.Value.ToString().Replace(match.Value, newImageLink);
-                                wi.Attachments.RemoveAt(attachmentIndex);
-                                wi.Save();
+                                wi.ToWorkItem().Attachments.RemoveAt(attachmentIndex);
+                                wi.ToWorkItem().Save();
                                 wiUpdated = true;
                                 File.Delete(fullImageFilePath);
                             }

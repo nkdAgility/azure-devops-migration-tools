@@ -17,8 +17,7 @@ using Microsoft.VisualStudio.Services.WebApi.Patch.Json;
 using MigrationTools;
 using MigrationTools.Core.Configuration;
 using MigrationTools.Core.Configuration.Processing;
-using MigrationTools.Engine;
-using MigrationTools.Engine.Enrichers;
+using MigrationTools.Core.Engine.Enrichers;
 using MigrationTools.Sinks.TfsObjectModel;
 using MigrationTools.Sinks.TfsObjectModel.Enrichers;
 using Newtonsoft.Json;
@@ -41,7 +40,7 @@ namespace VstsSyncMigrator.Engine
         private RepoOMatic repoOMatic;
         private ILogger contextLog;
         private ILogger workItemLog;
-        EmbededImagesRepairOMatic embededImagesRepairOMatic = new EmbededImagesRepairOMatic();
+        private IEmbededImagesRepairEnricher embededImagesEnricher;
         static int _current = 0;
         static int _count = 0;
         static int _failures = 0;
@@ -105,6 +104,7 @@ namespace VstsSyncMigrator.Engine
             }
             var workItemServer = me.Source.Collection.GetService<WorkItemServer>();
             attachmentEnricher = new AttachmentMigrationEnricher(workItemServer, _config.AttachmentWorkingPath, _config.AttachmentMazSize);
+            embededImagesEnricher = new EmbededImagesRepairEnricher();
             repoOMatic = new RepoOMatic(me);
             VssClientCredentials adoCreds = new VssClientCredentials();
             _witClient = new WorkItemTrackingHttpClient(me.Target.Collection.Uri, adoCreds);
@@ -727,8 +727,7 @@ namespace VstsSyncMigrator.Engine
         {
             if (targetWorkItem != null && _config.FixHtmlAttachmentLinks)
             {
-
-                embededImagesRepairOMatic.FixHtmlAttachmentLinks(targetWorkItem, me.Source.Collection.Uri.ToString(), me.Target.Collection.Uri.ToString(), me.Source.Config.PersonalAccessToken);
+                embededImagesEnricher.FixEmbededImages(targetWorkItem.ToWorkItemData(), me.Source.Collection.Uri.ToString(), me.Target.Collection.Uri.ToString(), me.Source.Config.PersonalAccessToken);
             }
         }
 

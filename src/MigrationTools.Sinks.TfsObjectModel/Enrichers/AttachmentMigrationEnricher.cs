@@ -12,8 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MigrationTools;
 using MigrationTools.Core.DataContracts;
-using MigrationTools.Engine;
-using MigrationTools.Engine.Enrichers;
+using MigrationTools.Core.Engine.Enrichers;
 
 namespace MigrationTools.Sinks.TfsObjectModel.Enrichers
 {
@@ -61,7 +60,7 @@ namespace MigrationTools.Sinks.TfsObjectModel.Enrichers
             }
             if (save)
             {
-                this.SaveWorkItem(target);
+                this.SaveMigratedWorkItem(target);
                 Log.Information("Work iTem now has {AttachmentCount} attachemnts", source.ToWorkItem().Attachments.Count);
                 CleanUpAfterSave();
             }
