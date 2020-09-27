@@ -13,6 +13,7 @@ using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools;
 using MigrationTools.Core.Configuration;
 using MigrationTools.Core.Configuration.Processing;
+using MigrationTools.Sinks.TfsObjectModel;
 using Serilog;
 using VstsSyncMigrator.Core;
 using VstsSyncMigrator.Engine.ComponentContext;
