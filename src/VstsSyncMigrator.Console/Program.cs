@@ -99,6 +99,19 @@ namespace VstsSyncMigrator.ConsoleApp
 
       public static IServiceCollection AddPlatformSpecificServices(IServiceCollection services)
         {
+
+            services.AddTransient<Engine.ComponentContext.FieldBlankMap>();
+            services.AddTransient<Engine.ComponentContext.FieldLiteralMap>();
+            services.AddTransient<Engine.ComponentContext.FieldMergeMap>();
+            services.AddTransient<Engine.ComponentContext.FieldToFieldMap>();
+            services.AddTransient<Engine.ComponentContext.FieldtoFieldMultiMap>();
+            services.AddTransient<Engine.ComponentContext.FieldToTagFieldMap>();
+            services.AddTransient<Engine.ComponentContext.FieldValuetoTagMap>();
+            services.AddTransient<Engine.ComponentContext.MultiValueConditionalMap>();
+            services.AddTransient<Engine.ComponentContext.RegexFieldMap>();
+            services.AddTransient<Engine.ComponentContext.TreeToTagFieldMap>();
+
+
             services.AddSingleton<Engine.MigrationEngine>();
             services.AddSingleton<WorkItemMigrationContext>();
             services.AddSingleton<NodeStructuresMigrationContext>();
