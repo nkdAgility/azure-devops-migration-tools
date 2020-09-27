@@ -10,13 +10,9 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
 {
     public class WorkItemLinkOMatic
     {
-        public void MigrateLinks(WorkItem sourceWorkItemLinkStart, WorkItemStoreContext sourceWorkItemStore, WorkItem targetWorkItemLinkStart, WorkItemStoreContext targetWorkItemStore, bool save = true, string sourceReflectedWIIdField = null)
+        public void MigrateLinks(WorkItem sourceWorkItemLinkStart, WorkItemStoreContext sourceWorkItemStore, WorkItem targetWorkItemLinkStart, WorkItemStoreContext targetWorkItemStore, bool save = true, bool filterWorkItemsThatAlreadyExistInTarget = true, string sourceReflectedWIIdField = null)
         {
-            if (targetWorkItemLinkStart.Links.Count == sourceWorkItemLinkStart.Links.Count)
-            {
-                Log.Information("[SKIP] Source and Target have same number of links  {sourceWorkItemLinkStartId} - {sourceWorkItemLinkStartType}", sourceWorkItemLinkStart.Id, sourceWorkItemLinkStart.Type.ToString());
-            }
-            else
+            if (ShouldCopyLinks(sourceWorkItemLinkStart, targetWorkItemLinkStart, filterWorkItemsThatAlreadyExistInTarget))
             {
                 Trace.Indent();
                 foreach (Link item in sourceWorkItemLinkStart.Links)
@@ -186,35 +182,31 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                         Log.Information("  [CREATE-START] Adding Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id);
                         WorkItemLinkTypeEnd linkTypeEnd = targetStore.Store.WorkItemLinkTypes.LinkTypeEnds[rl.LinkTypeEnd.ImmutableName];
                         RelatedLink newRl = new RelatedLink(linkTypeEnd, wiTargetR.Id);
-                        if (save)
+                        if (linkTypeEnd.ImmutableName == "System.LinkTypes.Hierarchy-Forward")
                         {
-                            if (linkTypeEnd.ImmutableName == "System.LinkTypes.Hierarchy-Forward")
+                            var potentialParentConflictLink = ( // TF201036: You cannot add a Child link between work items xxx and xxx because a work item can have only one Parent link.
+                                    from Link l in wiTargetR.Links
+                                    where l is RelatedLink
+                                        && ((RelatedLink)l).LinkTypeEnd.ImmutableName == "System.LinkTypes.Hierarchy-Reverse"
+                                    select (RelatedLink)l).SingleOrDefault();
+                            if (potentialParentConflictLink != null)
                             {
-                                var potentialParentConflictLink = ( // TF201036: You cannot add a Child link between work items xxx and xxx because a work item can have only one Parent link.
-                                        from Link l in wiTargetR.Links
-                                        where l is RelatedLink
-                                            && ((RelatedLink)l).LinkTypeEnd.ImmutableName == "System.LinkTypes.Hierarchy-Reverse"
-                                        select (RelatedLink)l).SingleOrDefault();
-                                if (potentialParentConflictLink != null)
-                                {
-                                    wiTargetR.Links.Remove(potentialParentConflictLink);
-                                }
-                                linkTypeEnd = targetStore.Store.WorkItemLinkTypes.LinkTypeEnds["System.LinkTypes.Hierarchy-Reverse"];
-                                RelatedLink newLl = new RelatedLink(linkTypeEnd, wiTargetL.Id);
-                                wiTargetR.Links.Add(newLl);
-                                wiTargetR.Fields["System.ChangedBy"].Value = "Migration";
-                                wiTargetR.Save();
+                                wiTargetR.Links.Remove(potentialParentConflictLink);
                             }
-                            else
-                            {
-                                wiTargetL.Links.Add(newRl);
-                                wiTargetL.Fields["System.ChangedBy"].Value = "Migration";
-                                wiTargetL.Save();
-                            }
+                            linkTypeEnd = targetStore.Store.WorkItemLinkTypes.LinkTypeEnds["System.LinkTypes.Hierarchy-Reverse"];
+                            RelatedLink newLl = new RelatedLink(linkTypeEnd, wiTargetL.Id);
+                            wiTargetR.Links.Add(newLl);
+                            wiTargetR.Fields["System.ChangedBy"].Value = "Migration";
+                            wiTargetR.Save();
                         }
                         else
                         {
                             wiTargetL.Links.Add(newRl);
+                            if (save)
+                            {
+                                wiTargetL.Fields["System.ChangedBy"].Value = "Migration";
+                                wiTargetL.Save();
+                            }
                         }
                         Log.Information(
                                 "  [CREATE-SUCCESS] Adding Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} ",
@@ -291,6 +283,19 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                     target.Save();
                 }
             }
+        }
+
+        private static bool ShouldCopyLinks(WorkItem sourceWorkItemLinkStart, WorkItem targetWorkItemLinkStart, bool filterWorkItemsThatAlreadyExistInTarget)
+        {
+            if (filterWorkItemsThatAlreadyExistInTarget)
+            {
+                if (targetWorkItemLinkStart.Links.Count == sourceWorkItemLinkStart.Links.Count) // we should never have this as the target should not have existed in this path
+                {
+                    Log.Information("[SKIP] Source and Target have same number of links  {sourceWorkItemLinkStartId} - {sourceWorkItemLinkStartType}", sourceWorkItemLinkStart.Id, sourceWorkItemLinkStart.Type.ToString());
+                    return false;
+                }
+            }
+            return true;
         }
 
         private bool IsHyperlink(Link item)
