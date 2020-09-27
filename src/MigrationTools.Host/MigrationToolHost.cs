@@ -63,6 +63,7 @@ namespace MigrationTools.Host
                     services.AddSingleton<ITelemetryLogger, TelemetryClientAdapter>();
                     services.AddSingleton<IEngineConfigurationBuilder, EngineConfigurationBuilder>();
                     services.AddSingleton<EngineConfiguration, EngineConfigurationWrapper>();
+                    services.AddSingleton<FieldMapContainer>();
                     services.AddSingleton<ProcessorContainer>();
                     services.AddSingleton<TypeDefinitionMapContainer>();
                     services.AddSingleton<GitRepoMapContainer>();

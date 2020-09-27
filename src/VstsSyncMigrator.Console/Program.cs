@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MigrationTools;
-using MigrationTools.Core.Engine.Containers;
 using MigrationTools.Host;
 using MigrationTools.Sinks.TfsObjectModel.FieldMaps;
 using VstsSyncMigrator.Engine;
@@ -33,12 +32,6 @@ namespace VstsSyncMigrator.ConsoleApp
                     services.AddTransient<RegexFieldMap>();
                     services.AddTransient<TreeToTagFieldMap>();
 
-                    //Containers
-                    services.AddSingleton<FieldMapContainer>();
-
-                    //Engine
-                    services.AddSingleton<IMigrationEngine, MigrationEngine>();
-
                     //Processors
                     services.AddSingleton<WorkItemMigrationContext>();
                     services.AddSingleton<NodeStructuresMigrationContext>();
@@ -56,6 +49,11 @@ namespace VstsSyncMigrator.ConsoleApp
                     services.AddSingleton<WorkItemDelete>();
                     services.AddSingleton<WorkItemUpdate>();
                     services.AddSingleton<WorkItemUpdateAreasAsTagsContext>();
+
+                    //Engine
+                    services.AddSingleton<IMigrationEngine, MigrationEngine>();
+
+                   
                 });
                 var host = hostBuilder.Build();
             var startupService = host.InitializeMigrationSetup(args);

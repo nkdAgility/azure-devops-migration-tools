@@ -27,8 +27,12 @@ namespace MigrationTools.ConsoleUI
                     services.AddTransient<RegexFieldMap>();
                     services.AddTransient<TreeToTagFieldMap>();
 
+                    // Processors
+
+                    //Engine
                     services.AddSingleton<IMigrationEngine, MigrationEngineCore>();
                     services.AddTransient<ITeamProjectContext, TeamProjectContext>();
+
                 });
             var host = hostBuilder.Build();
             var startupService = host.InitializeMigrationSetup(args);
