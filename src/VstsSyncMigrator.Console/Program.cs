@@ -99,7 +99,7 @@ namespace VstsSyncMigrator.ConsoleApp
 
       public static IServiceCollection AddPlatformSpecificServices(IServiceCollection services)
         {
-
+            // Field Mapps
             services.AddTransient<Engine.ComponentContext.FieldBlankMap>();
             services.AddTransient<Engine.ComponentContext.FieldLiteralMap>();
             services.AddTransient<Engine.ComponentContext.FieldMergeMap>();
@@ -112,18 +112,18 @@ namespace VstsSyncMigrator.ConsoleApp
             services.AddTransient<Engine.ComponentContext.TreeToTagFieldMap>();
 
 
+            //Engine
             services.AddSingleton<Engine.MigrationEngine>();
+
+            //Processors
             services.AddSingleton<WorkItemMigrationContext>();
             services.AddSingleton<NodeStructuresMigrationContext>();
-
             services.AddSingleton<TeamMigrationContext>();
-
             services.AddSingleton<TestConfigurationsMigrationContext>();
             services.AddSingleton<TestPlandsAndSuitesMigrationContext>();
             services.AddSingleton<TestVeriablesMigrationContext>();
             services.AddSingleton<WorkItemPostProcessingContext>();
             services.AddSingleton<WorkItemQueryMigrationContext>();
-
             services.AddSingleton<CreateTeamFolders>();
             services.AddSingleton<ExportProfilePictureFromADContext>();
             services.AddSingleton<ExportTeamList>();
@@ -132,6 +132,7 @@ namespace VstsSyncMigrator.ConsoleApp
             services.AddSingleton<WorkItemDelete>();
             services.AddSingleton<WorkItemUpdate>();
             services.AddSingleton<WorkItemUpdateAreasAsTagsContext>();
+
 
 
             return services;
