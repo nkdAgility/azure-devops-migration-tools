@@ -13,4 +13,8 @@
     <ProjectReference Include="..\MigrationTools\MigrationTools.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="FieldMaps\" />
+  </ItemGroup>
+
 </Project>

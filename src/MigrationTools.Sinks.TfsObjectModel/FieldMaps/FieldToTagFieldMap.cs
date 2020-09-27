@@ -1,5 +1,5 @@
 ﻿using System;
-using Microsoft.TeamFoundation.WorkItemTracking.Client;d
+using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
