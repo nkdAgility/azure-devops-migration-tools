@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MigrationTools.Core.Engine
+namespace MigrationTools.Core.Engine.Containers
 {
     public interface IWitdMapper
     {
