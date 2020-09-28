@@ -12,6 +12,7 @@ using MigrationTools.Core.Engine;
 using MigrationTools.Core.DataContracts;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 using MigrationTools.Sinks.AzureDevOps;
+using MigrationTools.Core.Engine.Containers;
 
 namespace MigrationTools.Sinks.AzureDevOps.FieldMaps
 {

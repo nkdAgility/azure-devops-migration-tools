@@ -5,7 +5,7 @@ using System.Text;
 
 namespace MigrationTools.Core.Engine.Containers
 {
-   public interface ITfsProcessingContext
+   public interface IProcessor
     {
         string Name { get; }
         ProcessingStatus Status { get; }

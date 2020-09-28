@@ -10,10 +10,11 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Microsoft.ApplicationInsights.DataContracts;
+using MigrationTools.Core.Engine.Containers;
 
 namespace VstsSyncMigrator.Engine
 {
-    public abstract class MigrationContextBase : ITfsProcessingContext
+    public abstract class MigrationContextBase : IProcessor
     {
         protected MigrationEngine me;
         protected IServiceProvider _services;

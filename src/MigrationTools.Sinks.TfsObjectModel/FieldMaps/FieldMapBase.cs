@@ -11,6 +11,7 @@ using Serilog;
 using MigrationTools.Core.Configuration;
 using MigrationTools.Core.Engine;
 using MigrationTools.Core.DataContracts;
+using MigrationTools.Core.Engine.Containers;
 
 namespace MigrationTools.Sinks.TfsObjectModel.FieldMaps
 {
