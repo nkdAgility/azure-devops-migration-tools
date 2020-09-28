@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace VstsSyncMigrator.Engine.Execution.Exceptions
+namespace MigrationTools.Core.Exceptions
 {
     public class UnknownLinkTypeException : Exception
     {

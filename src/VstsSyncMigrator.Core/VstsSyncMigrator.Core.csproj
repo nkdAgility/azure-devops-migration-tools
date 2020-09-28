@@ -6,6 +6,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Execution\FieldMaps\**" />
+    <EmbeddedResource Remove="Execution\FieldMaps\**" />
+    <None Remove="Execution\FieldMaps\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="Execution\MigrationContext\ExcelMigrationContext.cs" />
   </ItemGroup>
 
@@ -31,7 +37,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Execution\FieldMaps\" />
+    <Folder Include="Execution\Exceptions\" />
   </ItemGroup>
 
 </Project>
