@@ -3,9 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace MigrationTools.Core.Sinks
+namespace MigrationTools.Core.Clients
 {
-   public  interface IWorkItemMigrationSink
+   public  interface IWorkItemMigrationClients
     {
         IEnumerable<WorkItemData> GetWorkItems();
         WorkItemData PersistWorkItem(WorkItemData workItem);

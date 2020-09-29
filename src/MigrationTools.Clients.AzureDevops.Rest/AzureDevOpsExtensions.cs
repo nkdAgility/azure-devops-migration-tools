@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 using MigrationTools.Core.Configuration;
 using MigrationTools.Core.DataContracts;
-using MigrationTools.Core.Sinks;
+using MigrationTools.Core.Clients;
 using System;
 using System.Collections.Generic;
 using System.Text;

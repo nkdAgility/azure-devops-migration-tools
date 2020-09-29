@@ -3,7 +3,7 @@ using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools.Core.Configuration;
 using MigrationTools.Core.DataContracts;
 using MigrationTools.Core.Engine.Enrichers;
-using MigrationTools.Core.Sinks;
+using MigrationTools.Core.Clients;
 using MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers;
 using System;
 using System.Collections.Generic;

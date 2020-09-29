@@ -6,7 +6,7 @@ using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 using MigrationTools.Core.Configuration;
 using MigrationTools.Core.DataContracts;
 using MigrationTools.Core.Engine;
-using MigrationTools.Core.Sinks;
+using MigrationTools.Core.Clients;
 using System;
 using System.Collections.Generic;
 using System.Net;

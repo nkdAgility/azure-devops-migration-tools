@@ -1,12 +1,12 @@
 ﻿using MigrationTools.Core.DataContracts;
-using MigrationTools.Core.Sinks;
+using MigrationTools.Core.Clients;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace MigrationTools.Sinks.FileSystem
 {
-    public class WorkItemSink : IWorkItemMigrationSink
+    public class WorkItemSink : IWorkItemMigrationClients
     {
         public IEnumerable<WorkItemData> GetWorkItems()
         {
