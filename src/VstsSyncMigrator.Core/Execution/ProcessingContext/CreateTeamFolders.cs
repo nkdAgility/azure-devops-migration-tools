@@ -11,6 +11,8 @@ using Microsoft.TeamFoundation.Client;
 using MigrationTools.Core.Configuration;
 using Microsoft.Extensions.Hosting;
 using MigrationTools;
+using MigrationTools.Core.Clients;
+using MigrationTools.Core;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -18,7 +20,7 @@ namespace VstsSyncMigrator.Engine
     {
 
 
-        public CreateTeamFolders(IServiceProvider services, MigrationEngine me, ITelemetryLogger telemetry) : base(services, me, telemetry)
+        public CreateTeamFolders(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry) : base(services, me, telemetry)
         {
          
         }

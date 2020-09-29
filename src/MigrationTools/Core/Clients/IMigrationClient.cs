@@ -12,5 +12,7 @@ namespace MigrationTools.Core.Clients
 
         TeamProjectConfig Config { get; }
         void Configure(TeamProjectConfig config, NetworkCredential credentials = null);
+
+
     }
 }

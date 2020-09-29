@@ -14,18 +14,19 @@ using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Microsoft.ApplicationInsights.DataContracts;
 using MigrationTools.Core.Engine.Containers;
+using MigrationTools.Core;
 
 namespace VstsSyncMigrator.Engine
 {
     public abstract class ProcessingContextBase : IProcessor
     {
-        internal MigrationEngine me;
+        internal IMigrationEngine me;
         ProcessingStatus status = ProcessingStatus.None;
         private readonly IServiceProvider _services;
 
-        public MigrationEngine Engine { get { return me; } }
+        public IMigrationEngine Engine { get { return me; } }
 
-        public ProcessingContextBase(IServiceProvider services, MigrationEngine me, ITelemetryLogger telemetry)
+        public ProcessingContextBase(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry)
         {
             _services = services;
             this.me = me;
@@ -63,7 +64,7 @@ namespace VstsSyncMigrator.Engine
                     new Dictionary<string, string> {
                         { "Name", Name},
                         { "Target Project", me.Target.Config.Project},
-                        { "Target Collection", me.Target.Collection.Name },
+                        { "Target Collection", me.Target.Config.Collection.ToString()},
                         { "Status", Status.ToString() }
                     },
                     new Dictionary<string, double> {

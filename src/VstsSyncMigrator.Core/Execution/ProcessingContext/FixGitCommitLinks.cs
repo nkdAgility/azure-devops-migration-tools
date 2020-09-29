@@ -13,6 +13,7 @@ using VstsSyncMigrator.Core.Execution.OMatics;
 using MigrationTools.Core.Configuration;
 using Microsoft.Extensions.Hosting;
 using MigrationTools;
+using MigrationTools.Core;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -21,7 +22,7 @@ namespace VstsSyncMigrator.Engine
         private FixGitCommitLinksConfig _config;
         private RepoOMatic _RepoOMatic;
 
-        public FixGitCommitLinks(IServiceProvider services, MigrationEngine me, ITelemetryLogger telemetry) : base(services, me, telemetry)
+        public FixGitCommitLinks(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry) : base(services, me, telemetry)
         {
 
            

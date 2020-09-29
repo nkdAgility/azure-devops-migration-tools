@@ -1,5 +1,4 @@
-﻿using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
@@ -11,12 +10,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Microsoft.ApplicationInsights.DataContracts;
 using MigrationTools.Core.Engine.Containers;
+using MigrationTools.Core;
 
 namespace VstsSyncMigrator.Engine
 {
     public abstract class MigrationContextBase : IProcessor
     {
-        protected MigrationEngine me;
+        protected IMigrationEngine me;
         protected IServiceProvider _services;
 
         protected MigrationContextBase(IServiceProvider services, ITelemetryLogger telemetry)
@@ -34,7 +34,7 @@ namespace VstsSyncMigrator.Engine
 
         public void Execute()
         {
-            this.me = _services.GetService<IMigrationEngine>() as MigrationEngine;
+            this.me = _services.GetService<IMigrationEngine>();
             Telemetry.TrackEvent(this.Name);
             Log.Information("Migration Context Start: {MigrationContextname} ", Name);
             DateTime start = DateTime.Now;

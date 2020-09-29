@@ -72,7 +72,7 @@ namespace MigrationTools.Host
                     services.AddSingleton<TypeDefinitionMapContainer>();
                     services.AddSingleton<GitRepoMapContainer>();
                     services.AddSingleton<ChangeSetMappingContainer>();
-                    services.AddSingleton<MigrationEngine>();
+                    services.AddSingleton<IMigrationEngine, MigrationEngine>();
                     // Host Services
                     services.AddTransient<IStartupService, StartupService>();
                     services.AddHostedService<ExecuteHostedService>();

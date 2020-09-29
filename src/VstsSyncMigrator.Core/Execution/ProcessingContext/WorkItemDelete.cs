@@ -10,6 +10,7 @@ using System.Linq;
 using MigrationTools.Core.Configuration;
 using Microsoft.Extensions.Hosting;
 using MigrationTools;
+using MigrationTools.Core;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -17,7 +18,7 @@ namespace VstsSyncMigrator.Engine
     {
 
 
-        public WorkItemDelete(IServiceProvider services, MigrationEngine me, ITelemetryLogger telemetry) : base(services, me, telemetry)
+        public WorkItemDelete(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry) : base(services, me, telemetry)
         {
 
         }

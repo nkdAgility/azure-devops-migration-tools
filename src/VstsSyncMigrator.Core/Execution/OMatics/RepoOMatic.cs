@@ -2,6 +2,7 @@
 using Microsoft.TeamFoundation.Git.Client;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using MigrationTools.Core;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -10,7 +11,6 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using VstsSyncMigrator.Engine;
 
 namespace VstsSyncMigrator.Core.Execution.OMatics
 {
