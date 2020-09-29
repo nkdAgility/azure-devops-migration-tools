@@ -8,7 +8,7 @@ namespace MigrationTools.Core.Engine.Containers.Tests
 
         public ProcessingStatus Status => ProcessingStatus.None;
 
-        public void Configure(ITfsProcessingConfig config)
+        public void Configure(IProcessorConfig config)
         {
             
         }

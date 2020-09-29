@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace MigrationTools.Core.Configuration.Processing
 {
-    public class WorkItemQueryMigrationConfig : ITfsProcessingConfig
+    public class WorkItemQueryMigrationConfig : IProcessorConfig
     {
         /// <summary>
         ///     The name of the shared folder, setting the default name
@@ -36,7 +36,7 @@ namespace MigrationTools.Core.Configuration.Processing
         }
 
         /// <inheritdoc />
-        public bool IsProcessorCompatible(IReadOnlyList<ITfsProcessingConfig> otherProcessors)
+        public bool IsProcessorCompatible(IReadOnlyList<IProcessorConfig> otherProcessors)
         {
             return true;
         }

@@ -57,7 +57,7 @@ namespace VstsSyncMigrator.Engine
         {
         }
 
-        public override void Configure(ITfsProcessingConfig configx)
+        public override void Configure(IProcessorConfig configx)
         {
             config = (TestPlansAndSuitesMigrationConfig)configx;
         }

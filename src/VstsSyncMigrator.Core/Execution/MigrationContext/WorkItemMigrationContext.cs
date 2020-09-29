@@ -57,7 +57,7 @@ namespace VstsSyncMigrator.Engine
             Telemetry = telemetry;
         }
 
-        public override void Configure(ITfsProcessingConfig config)
+        public override void Configure(IProcessorConfig config)
         {
             _config = (WorkItemMigrationConfig)config;
 

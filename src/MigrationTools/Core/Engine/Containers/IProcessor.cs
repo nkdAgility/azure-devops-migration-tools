@@ -10,6 +10,6 @@ namespace MigrationTools.Core.Engine.Containers
         string Name { get; }
         ProcessingStatus Status { get; }
         void Execute();
-        void Configure(ITfsProcessingConfig config);
+        void Configure(IProcessorConfig config);
     }
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace MigrationTools.Core.Configuration.Processing
 {
-    public class TestPlansAndSuitesMigrationConfig : ITfsProcessingConfig
+    public class TestPlansAndSuitesMigrationConfig : IProcessorConfig
     {
         public bool PrefixProjectToNodes { get; set; }
         public bool Enabled { get; set; }
@@ -21,7 +21,7 @@ namespace MigrationTools.Core.Configuration.Processing
         public bool RemoveInvalidTestSuiteLinks { get; set; }
 
         /// <inheritdoc />
-        public bool IsProcessorCompatible(IReadOnlyList<ITfsProcessingConfig> otherProcessors)
+        public bool IsProcessorCompatible(IReadOnlyList<IProcessorConfig> otherProcessors)
         {
             return true;
         }

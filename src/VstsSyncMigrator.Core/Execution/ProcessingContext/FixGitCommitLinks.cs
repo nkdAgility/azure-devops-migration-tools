@@ -35,7 +35,7 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        public override void Configure(ITfsProcessingConfig config)
+        public override void Configure(IProcessorConfig config)
         {
             _config = (FixGitCommitLinksConfig)config;
             _RepoOMatic = new RepoOMatic(me);

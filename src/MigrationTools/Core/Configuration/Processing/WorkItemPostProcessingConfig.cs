@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace MigrationTools.Core.Configuration.Processing
 {
-    public class WorkItemPostProcessingConfig : ITfsProcessingConfig
+    public class WorkItemPostProcessingConfig : IProcessorConfig
     {
         public string QueryBit { get; set; }
         public IList<int> WorkItemIDs { get; set; }
@@ -16,7 +16,7 @@ namespace MigrationTools.Core.Configuration.Processing
         }
 
         /// <inheritdoc />
-        public bool IsProcessorCompatible(IReadOnlyList<ITfsProcessingConfig> otherProcessors)
+        public bool IsProcessorCompatible(IReadOnlyList<IProcessorConfig> otherProcessors)
         {
             return true;
         }

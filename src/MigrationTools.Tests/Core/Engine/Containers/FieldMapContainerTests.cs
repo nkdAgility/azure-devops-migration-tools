@@ -3,13 +3,15 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools.Core.Configuration;
 using MigrationTools.Core.Engine.Containers;
+using NuGet.Protocol;
 using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace MigrationTools.Core.Engine.Containers.Tests
 {
     [TestClass()]
-    public class ProcessorContainerTests
+    public class FieldMapContainerTests
     {
 
         private EngineConfiguration CreateEngineConfiguration()
@@ -22,28 +24,30 @@ namespace MigrationTools.Core.Engine.Containers.Tests
         private IServiceProvider CreateServiceProvider()
         {
             ServiceCollection sc = new ServiceCollection();
-            sc.AddTransient<SimpleProcessorMock>();
+            sc.AddTransient<SimpleFieldMapMock>();
             IServiceProvider sp = sc.BuildServiceProvider();
             return sp;
         }
 
+
         [TestMethod()]
-        public void ProcessorContainerTest()
+        public void FieldMapContainerTest()
         {
             var config = CreateEngineConfiguration();
-            var testSimple = new SimpleProcessorConfigMock();
+            
+            Assert.AreEqual(0, config.FieldMaps.Count);
 
-            Assert.AreEqual(0, config.Processors.Count);
+            var testSimple = new SimpleFieldMapConfigMock();
+            testSimple.WorkItemTypeName = "*";
+            config.FieldMaps.Add(testSimple);
 
-            testSimple.Enabled = true;
-            config.Processors.Add(testSimple);
+            Assert.AreEqual(1, config.FieldMaps.Count);
 
-            Assert.AreEqual(1, config.Processors.Count);
+            var fieldMapContainer = new FieldMapContainer(CreateServiceProvider(), config);
 
-            var processorContainer = new ProcessorContainer(CreateServiceProvider(), config);
-
-            Assert.AreEqual(1, processorContainer.Count);
+            Assert.AreEqual(1, fieldMapContainer.Count);
         }
 
+       
     }
 }

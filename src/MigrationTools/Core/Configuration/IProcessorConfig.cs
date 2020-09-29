@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MigrationTools.Core.Configuration
 {
-    public interface ITfsProcessingConfig
+    public interface IProcessorConfig
     {
         /// <summary>
         /// Active the processor if it true. 
@@ -21,6 +21,6 @@ namespace MigrationTools.Core.Configuration
         /// Some processors are not compatible with each other.
         /// </summary>
         /// <param name="otherProcessors">List of already configured processors.</param>
-        bool IsProcessorCompatible(IReadOnlyList<ITfsProcessingConfig> otherProcessors);
+        bool IsProcessorCompatible(IReadOnlyList<IProcessorConfig> otherProcessors);
     }
 }

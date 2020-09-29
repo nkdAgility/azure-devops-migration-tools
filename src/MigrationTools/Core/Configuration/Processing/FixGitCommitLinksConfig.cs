@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace MigrationTools.Core.Configuration.Processing
 {
-    public class FixGitCommitLinksConfig : ITfsProcessingConfig
+    public class FixGitCommitLinksConfig : IProcessorConfig
     {
         public string TargetRepository { get; set; }
         public bool Enabled { get; set; }
@@ -17,7 +17,7 @@ namespace MigrationTools.Core.Configuration.Processing
         }
 
         /// <inheritdoc />
-        public bool IsProcessorCompatible(IReadOnlyList<ITfsProcessingConfig> otherProcessors)
+        public bool IsProcessorCompatible(IReadOnlyList<IProcessorConfig> otherProcessors)
         {
             return true;
         }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace MigrationTools.Core.Configuration.Processing
 {
-    public class NodeStructuresMigrationConfig : ITfsProcessingConfig
+    public class NodeStructuresMigrationConfig : IProcessorConfig
     {
         public bool PrefixProjectToNodes { get; set; }
         /// <inheritdoc />
@@ -15,7 +15,7 @@ namespace MigrationTools.Core.Configuration.Processing
             get { return "NodeStructuresMigrationContext"; }
         }                         
         /// <inheritdoc />
-        public bool IsProcessorCompatible(IReadOnlyList<ITfsProcessingConfig> otherProcessors)
+        public bool IsProcessorCompatible(IReadOnlyList<IProcessorConfig> otherProcessors)
         {
             return true;
         }

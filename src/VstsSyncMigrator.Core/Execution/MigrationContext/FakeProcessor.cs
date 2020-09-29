@@ -51,7 +51,7 @@ namespace VstsSyncMigrator.Engine
             Console.WriteLine(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds", stopwatch.Elapsed);
         }
 
-        public override void Configure(ITfsProcessingConfig config)
+        public override void Configure(IProcessorConfig config)
         {
           // FakeProcessorConfig config
         }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace MigrationTools.Core.Engine.Containers.Tests
 {
-    public class SimpleConfigMock : ITfsProcessingConfig
+    public class SimpleProcessorConfigMock : IProcessorConfig
     {
         /// <inheritdoc />
         public bool Enabled { get; set; }
@@ -15,7 +15,7 @@ namespace MigrationTools.Core.Engine.Containers.Tests
         }
 
         /// <inheritdoc />
-        public bool IsProcessorCompatible(IReadOnlyList<ITfsProcessingConfig> otherProcessors)
+        public bool IsProcessorCompatible(IReadOnlyList<IProcessorConfig> otherProcessors)
         {
             return true;
         }

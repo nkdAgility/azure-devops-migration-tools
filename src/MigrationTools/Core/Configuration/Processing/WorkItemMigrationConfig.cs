@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace MigrationTools.Core.Configuration.Processing
 {
-    public class WorkItemMigrationConfig : ITfsProcessingConfig
+    public class WorkItemMigrationConfig : IProcessorConfig
     {
         public bool ReplayRevisions { get; set; }
         public bool PrefixProjectToNodes { get; set; }
@@ -37,7 +37,7 @@ namespace MigrationTools.Core.Configuration.Processing
         public bool LinkMigrationSaveEachAsAdded { get; set; }
 
         /// <inheritdoc />
-        public bool IsProcessorCompatible(IReadOnlyList<ITfsProcessingConfig> otherProcessors)
+        public bool IsProcessorCompatible(IReadOnlyList<IProcessorConfig> otherProcessors)
         {
             return true;
         }

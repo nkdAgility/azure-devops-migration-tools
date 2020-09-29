@@ -32,7 +32,7 @@ namespace VstsSyncMigrator.Engine
             Telemetry = telemetry;
         }
 
-        public abstract void Configure(ITfsProcessingConfig config);
+        public abstract void Configure(IProcessorConfig config);
 
         public abstract string Name { get; }
 
