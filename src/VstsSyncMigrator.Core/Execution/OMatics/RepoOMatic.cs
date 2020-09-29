@@ -11,12 +11,13 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using VstsSyncMigrator.Engine;
 
 namespace VstsSyncMigrator.Core.Execution.OMatics
 {
     public class RepoOMatic
     {
-        MigrationEngine migrationEngine;
+        IMigrationEngine migrationEngine;
         GitRepositoryService sourceRepoService;
         IList<GitRepository> sourceRepos;
         IList<GitRepository> allSourceRepos;
@@ -25,14 +26,14 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
         IList<GitRepository> allTargetRepos;
         List<string> gitWits;
 
-        public RepoOMatic(MigrationEngine me)
+        public RepoOMatic(IMigrationEngine me)
         {
             migrationEngine = me;
-            sourceRepoService = me.Source.Collection.GetService<GitRepositoryService>();
+            sourceRepoService = me.Source.GetService<GitRepositoryService>();
             sourceRepos = sourceRepoService.QueryRepositories(me.Source.Config.Project);
             allSourceRepos = sourceRepoService.QueryRepositories("");
             //////////////////////////////////////////////////
-            targetRepoService = me.Target.Collection.GetService<GitRepositoryService>();
+            targetRepoService = me.Target.GetService<GitRepositoryService>();
             targetRepos = targetRepoService.QueryRepositories(me.Target.Config.Project);
             allTargetRepos = targetRepoService.QueryRepositories("");
             gitWits = new List<string>
@@ -221,7 +222,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
             this.GitRepo = GitRepo;
         }
 
-        public static GitRepositoryInfo Create(ExternalLink gitExternalLink, IList<GitRepository> possibleRepos, MigrationEngine migrationEngine, string workItemSourceProjectName)
+        public static GitRepositoryInfo Create(ExternalLink gitExternalLink, IList<GitRepository> possibleRepos, IMigrationEngine migrationEngine, string workItemSourceProjectName)
         {
             var repoType = DetermineFromLink(gitExternalLink.LinkedArtifactUri);
             switch (repoType)

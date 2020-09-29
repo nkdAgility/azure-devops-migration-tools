@@ -11,17 +11,18 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
+using MigrationTools.Core;
 
 namespace MigrationTools.Clients.AzureDevops.Rest
 {
     public class TeamProjectContext : ITeamProjectContext
     {
         private readonly IHost _Host;
-        private readonly ILogger<MigrationEngineCore> _Log;
+        private readonly ILogger<MigrationEngine> _Log;
         private readonly TelemetryClient _Telemetry;
         private readonly EngineConfiguration _Config;
 
-        public TeamProjectContext(IHost host, ILogger<MigrationEngineCore> log, TelemetryClient telemetry, EngineConfiguration config)
+        public TeamProjectContext(IHost host, ILogger<MigrationEngine> log, TelemetryClient telemetry, EngineConfiguration config)
         {
             _Host = host;
             _Log = log;

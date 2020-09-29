@@ -40,16 +40,16 @@ namespace VstsSyncMigrator.Engine
                 throw new Exception("You must call Configure() first");
             }
             //////////////////////////////////////////////////
-            ICommonStructureService sourceCss = (ICommonStructureService)Engine.Source.Collection.GetService(typeof(ICommonStructureService));
+            ICommonStructureService sourceCss = (ICommonStructureService)Engine.Source.GetService<ICommonStructureService>();
             ProjectInfo sourceProjectInfo = sourceCss.GetProjectFromName(Engine.Source.Config.Project);
             NodeInfo[] sourceNodes = sourceCss.ListStructures(sourceProjectInfo.Uri);
             //////////////////////////////////////////////////
-            ICommonStructureService targetCss = (ICommonStructureService)Engine.Target.Collection.GetService(typeof(ICommonStructureService4));
+            ICommonStructureService targetCss = (ICommonStructureService)Engine.Target.GetService<ICommonStructureService4>();
 
             //////////////////////////////////////////////////
-            ProcessCommonStructure(me.Source.Config.LanguageMaps.AreaPath, Engine.Target.Config.LanguageMaps.AreaPath, sourceNodes, targetCss, sourceCss);
+            ProcessCommonStructure(Engine.Source.Config.LanguageMaps.AreaPath, Engine.Target.Config.LanguageMaps.AreaPath, sourceNodes, targetCss, sourceCss);
             //////////////////////////////////////////////////
-            ProcessCommonStructure(me.Source.Config.LanguageMaps.IterationPath, Engine.Target.Config.LanguageMaps.IterationPath, sourceNodes, targetCss, sourceCss);
+            ProcessCommonStructure(Engine.Source.Config.LanguageMaps.IterationPath, Engine.Target.Config.LanguageMaps.IterationPath, sourceNodes, targetCss, sourceCss);
             //////////////////////////////////////////////////
         }
 
@@ -76,7 +76,7 @@ namespace VstsSyncMigrator.Engine
             }
             if (_config.PrefixProjectToNodes)
             {
-                structureParent = CreateNode(targetCss, me.Source.Config.Project, structureParent);
+                structureParent = CreateNode(targetCss, Engine.Source.Config.Project, structureParent);
             }
             if (sourceTree.ChildNodes[0].HasChildNodes)
             {

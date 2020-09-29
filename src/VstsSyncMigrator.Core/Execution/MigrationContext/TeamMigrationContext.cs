@@ -49,18 +49,18 @@ namespace VstsSyncMigrator.Engine
             Stopwatch stopwatch = Stopwatch.StartNew();
             //////////////////////////////////////////////////
             WorkItemStoreContext sourceStore = new WorkItemStoreContext(Engine.Source, WorkItemStoreFlags.BypassRules, Telemetry);
-            TfsTeamService sourceTS = Engine.Source.Collection.GetService<TfsTeamService>();
+            TfsTeamService sourceTS = Engine.Source.GetService<TfsTeamService>();
             List<TeamFoundationTeam> sourceTL = sourceTS.QueryTeams(Engine.Source.Config.Project).ToList();
             Trace.WriteLine(string.Format("Found {0} teams in Source?", sourceTL.Count));
-            var sourceTSCS = Engine.Source.Collection.GetService<TeamSettingsConfigurationService>();
+            var sourceTSCS = Engine.Source.GetService<TeamSettingsConfigurationService>();
             //////////////////////////////////////////////////
             WorkItemStoreContext targetStore = new WorkItemStoreContext(Engine.Target, WorkItemStoreFlags.BypassRules, Telemetry);
             Project targetProject = targetStore.GetProject();
             Trace.WriteLine(string.Format("Found target project as {0}", targetProject.Name));
-            TfsTeamService targetTS = Engine.Target.Collection.GetService<TfsTeamService>();
+            TfsTeamService targetTS = Engine.Target.GetService<TfsTeamService>();
             List<TeamFoundationTeam> targetTL = targetTS.QueryTeams(Engine.Target.Config.Project).ToList();
             Trace.WriteLine(string.Format("Found {0} teams in Target?", targetTL.Count));
-            var targetTSCS = Engine.Target.Collection.GetService<TeamSettingsConfigurationService>();
+            var targetTSCS = Engine.Target.GetService<TeamSettingsConfigurationService>();
             //////////////////////////////////////////////////
             int current = sourceTL.Count;
             int count = 0;

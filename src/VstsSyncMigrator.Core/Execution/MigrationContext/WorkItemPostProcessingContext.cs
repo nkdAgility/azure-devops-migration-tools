@@ -60,9 +60,9 @@ namespace VstsSyncMigrator.Engine
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 			//////////////////////////////////////////////////
-			WorkItemStoreContext sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.None, Telemetry);
+			WorkItemStoreContext sourceStore = new WorkItemStoreContext(Engine.Source, WorkItemStoreFlags.None, Telemetry);
             TfsQueryContext tfsqc = new TfsQueryContext(sourceStore, Telemetry);
-            tfsqc.AddParameter("TeamProject", me.Source.Config.Project);
+            tfsqc.AddParameter("TeamProject", Engine.Source.Config.Project);
 
             //Builds the constraint part of the query
             string constraints = BuildQueryBitConstraints();
@@ -72,7 +72,7 @@ namespace VstsSyncMigrator.Engine
             WorkItemCollection sourceWIS = tfsqc.Execute();
             Trace.WriteLine(string.Format("Migrate {0} work items?", sourceWIS.Count));
             //////////////////////////////////////////////////
-            WorkItemStoreContext targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules, Telemetry);
+            WorkItemStoreContext targetStore = new WorkItemStoreContext(Engine.Target, WorkItemStoreFlags.BypassRules, Telemetry);
             Project destProject = targetStore.GetProject();
             Trace.WriteLine(string.Format("Found target project as {0}", destProject.Name));
 
@@ -94,7 +94,7 @@ namespace VstsSyncMigrator.Engine
                 {
                     Console.WriteLine("...Exists");
                     targetFound.Open();
-                    me.FieldMaps.ApplyFieldMappings(sourceWI.ToWorkItemData(), targetFound.ToWorkItemData());
+                    Engine.FieldMaps.ApplyFieldMappings(sourceWI.ToWorkItemData(), targetFound.ToWorkItemData());
                     if (targetFound.IsDirty)
                     {
                         try
@@ -144,15 +144,15 @@ namespace VstsSyncMigrator.Engine
                 }
             }
 
-            if (me.TypeDefinitionMaps.Items != null && me.TypeDefinitionMaps.Items.Count > 0)
+            if (Engine.TypeDefinitionMaps.Items != null && Engine.TypeDefinitionMaps.Items.Count > 0)
             {
-                if (me.TypeDefinitionMaps.Items.Count == 1)
+                if (Engine.TypeDefinitionMaps.Items.Count == 1)
                 {
-                    constraints += string.Format(" AND [System.WorkItemType] = '{0}' ", me.TypeDefinitionMaps.Items.Keys.First());
+                    constraints += string.Format(" AND [System.WorkItemType] = '{0}' ", Engine.TypeDefinitionMaps.Items.Keys.First());
                 }
                 else
                 {
-                    constraints += string.Format(" AND [System.WorkItemType] IN ('{0}') ", string.Join("','", me.TypeDefinitionMaps.Items.Keys));
+                    constraints += string.Format(" AND [System.WorkItemType] IN ('{0}') ", string.Join("','", Engine.TypeDefinitionMaps.Items.Keys));
                 }
             }
 

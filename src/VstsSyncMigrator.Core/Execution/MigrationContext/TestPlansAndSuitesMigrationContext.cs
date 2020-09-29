@@ -121,8 +121,8 @@ namespace VstsSyncMigrator.Engine
             targetTestStore = new TestManagementContext(Engine.Target);
             sourceTestConfigs = sourceTestStore.Project.TestConfigurations.Query("Select * From TestConfiguration");
             targetTestConfigs = targetTestStore.Project.TestConfigurations.Query("Select * From TestConfiguration");
-            sourceIdentityManagementService = Engine.Source.Collection.GetService<IIdentityManagementService>();
-            targetIdentityManagementService = Engine.Target.Collection.GetService<IIdentityManagementService>();
+            sourceIdentityManagementService = Engine.Source.GetService<IIdentityManagementService>();
+            targetIdentityManagementService = Engine.Target.GetService<IIdentityManagementService>();
 
             bool filterByCompleted = false;
 

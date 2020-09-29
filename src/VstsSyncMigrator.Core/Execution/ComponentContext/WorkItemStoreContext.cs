@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using System.Collections.Generic;
@@ -8,13 +8,14 @@ using Microsoft.TeamFoundation.Server;
 using System.Text;
 using MigrationTools;
 using Microsoft.ApplicationInsights.DataContracts;
+using MigrationTools.Core.Clients;
 
 namespace VstsSyncMigrator.Engine
 {
     public class WorkItemStoreContext
     {
+        private readonly IMigrationClient _MigrationClient;
         private WorkItemStoreFlags bypassRules;
-        private ITeamProjectContext teamProjectContext;
         private WorkItemStore wistore;
         private Dictionary<int, WorkItem> foundWis;
 
@@ -22,16 +23,16 @@ namespace VstsSyncMigrator.Engine
 
         public ITelemetryLogger Telemetry { get; }
 
-        public WorkItemStoreContext(ITeamProjectContext teamProjectContext, WorkItemStoreFlags bypassRules, ITelemetryLogger telemetry)
+        public WorkItemStoreContext(IMigrationClient migrationClient, WorkItemStoreFlags bypassRules, ITelemetryLogger telemetry)
         {
             var startTime = DateTime.UtcNow;
             var timer = System.Diagnostics.Stopwatch.StartNew();
-            this.teamProjectContext = teamProjectContext;
+            _MigrationClient = migrationClient;
             this.bypassRules = bypassRules;
             Telemetry = telemetry;
             try
             {
-                wistore = new WorkItemStore(teamProjectContext.Collection, bypassRules);
+                wistore = new WorkItemStore(migrationClient.Config.Collection.ToString(), bypassRules);
                 timer.Stop();
                 Telemetry.TrackDependency(new DependencyTelemetry("TeamService", "GetWorkItemStore", startTime, timer.Elapsed, true));
             }
@@ -41,7 +42,7 @@ namespace VstsSyncMigrator.Engine
                 Telemetry.TrackDependency(new DependencyTelemetry("TeamService", "GetWorkItemStore", startTime, timer.Elapsed, false));
                 Telemetry.TrackException(ex,
                        new Dictionary<string, string> {
-                            { "CollectionUrl", teamProjectContext.Collection.Uri.ToString() }
+                            { "CollectionUrl", _MigrationClient.Config.Collection.ToString() }
                        },
                        new Dictionary<string, double> {
                             { "Time",timer.ElapsedMilliseconds }
@@ -55,7 +56,7 @@ namespace VstsSyncMigrator.Engine
 
         public Project GetProject()
         {
-            return (from Project x in wistore.Projects where x.Name.ToUpper() == teamProjectContext.Config.Project.ToUpper() select x).SingleOrDefault();
+            return (from Project x in wistore.Projects where x.Name.ToUpper() == _MigrationClient.Config.Project.ToUpper() select x).SingleOrDefault();
         }
 
         public string CreateReflectedWorkItemId(WorkItem wi)
@@ -133,16 +134,16 @@ namespace VstsSyncMigrator.Engine
             IEnumerable<WorkItem> QueryWorkItems()
             {
                 TfsQueryContext query = new TfsQueryContext(this, Telemetry);
-                query.Query = string.Format(@"SELECT [System.Id] FROM WorkItems  WHERE [System.TeamProject]=@TeamProject AND [{0}] Contains '@idToFind'", teamProjectContext.Config.ReflectedWorkItemIDFieldName);
+                query.Query = string.Format(@"SELECT [System.Id] FROM WorkItems  WHERE [System.TeamProject]=@TeamProject AND [{0}] Contains '@idToFind'", _MigrationClient.Config.ReflectedWorkItemIDFieldName);
                 query.AddParameter("idToFind", refId.ToString());
-                query.AddParameter("TeamProject", this.teamProjectContext.Config.Project);
+                query.AddParameter("TeamProject", this._MigrationClient.Config.Project);
                 foreach(WorkItem wi in query.Execute())
                 {
                     yield return wi;
                 }
             }
 
-            var foundWorkItem = QueryWorkItems().FirstOrDefault(wi => wi.Fields[teamProjectContext.Config.ReflectedWorkItemIDFieldName].Value.ToString().EndsWith("/" + refId));
+            var foundWorkItem = QueryWorkItems().FirstOrDefault(wi => wi.Fields[_MigrationClient.Config.ReflectedWorkItemIDFieldName].Value.ToString().EndsWith("/" + refId));
             if (cache && foundWorkItem != null) foundWis[sourceIdKey] = foundWorkItem;
             return foundWorkItem;
         }
@@ -152,10 +153,10 @@ namespace VstsSyncMigrator.Engine
             StringBuilder s = new StringBuilder();
             s.Append("SELECT [System.Id] FROM WorkItems");
             s.Append(" WHERE ");
-            if (!teamProjectContext.Config.AllowCrossProjectLinking)
+            if (!_MigrationClient.Config.AllowCrossProjectLinking)
             {
                 s.Append("[System.TeamProject]=@TeamProject AND ");
-                query.AddParameter("TeamProject", this.teamProjectContext.Config.Project);
+                query.AddParameter("TeamProject", this._MigrationClient.Config.Project);
             }
             return s;
         }
@@ -164,7 +165,7 @@ namespace VstsSyncMigrator.Engine
         {
             TfsQueryContext query = new TfsQueryContext(this, Telemetry);
             StringBuilder queryBuilder = FindReflectedWorkItemQueryBase(query);
-            queryBuilder.AppendFormat("[{0}] = @idToFind", teamProjectContext.Config.ReflectedWorkItemIDFieldName);
+            queryBuilder.AppendFormat("[{0}] = @idToFind", _MigrationClient.Config.ReflectedWorkItemIDFieldName);
             query.AddParameter("idToFind", refId.ToString());
             query.Query = queryBuilder.ToString();
             return FindWorkItemByQuery(query);
@@ -185,7 +186,7 @@ namespace VstsSyncMigrator.Engine
             TfsQueryContext query = new TfsQueryContext(this, Telemetry);
             query.Query = @"SELECT [System.Id] FROM WorkItems  WHERE [System.TeamProject]=@TeamProject AND [System.Title] = @TitleToFind";
             query.AddParameter("TitleToFind", title);
-            query.AddParameter("TeamProject", this.teamProjectContext.Config.Project);
+            query.AddParameter("TeamProject", this._MigrationClient.Config.Project);
             return FindWorkItemByQuery(query);
         }
 
