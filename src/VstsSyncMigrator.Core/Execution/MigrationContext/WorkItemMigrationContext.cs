@@ -614,7 +614,7 @@ namespace VstsSyncMigrator.Engine
                     _config.OrderBit
                     );
             var targetFoundItems = targetQuery.Execute();
-            var targetFoundIds = (from WorkItem twi in targetFoundItems select targetStore.GetReflectedWorkItemId(twi, me.Target.Config.ReflectedWorkItemIDFieldName)).ToList();
+            var targetFoundIds = (from WorkItem twi in targetFoundItems select targetStore.GetReflectedWorkItemId(twi, Engine.Target.Config.ReflectedWorkItemIDFieldName)).ToList();
             //////////////////////////////////////////////////////////
 
             sourceWorkItems = sourceWorkItems.Where(p => !targetFoundIds.Any(p2 => p2 == p.Id)).ToList();
@@ -726,7 +726,7 @@ namespace VstsSyncMigrator.Engine
         {
             if (targetWorkItem != null && _config.FixHtmlAttachmentLinks)
             {
-                embededImagesEnricher.FixEmbededImages(targetWorkItem.ToWorkItemData(), me.Source.Collection.Uri.ToString(), me.Target.Collection.Uri.ToString(), me.Source.Config.PersonalAccessToken);
+                embededImagesEnricher.FixEmbededImages(targetWorkItem.ToWorkItemData(), Engine.Source.Config.Collection.ToString(), Engine.Target.Config.Collection.ToString(), Engine.Source.Config.PersonalAccessToken);
             }
         }
 

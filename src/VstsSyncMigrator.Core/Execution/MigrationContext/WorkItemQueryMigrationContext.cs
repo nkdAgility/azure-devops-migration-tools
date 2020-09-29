@@ -113,7 +113,7 @@ namespace VstsSyncMigrator.Engine
                 if (config.PrefixProjectToNodes == true)
                 {
                     // we need to inject the team name as a folder in the structure
-                    requiredPath = requiredPath.Replace(config.SharedFolderName, $"{config.SharedFolderName}/{me.Source.Config.Project}");
+                    requiredPath = requiredPath.Replace(config.SharedFolderName, $"{config.SharedFolderName}/{Engine.Source.Config.Project}");
 
                     // If on the root level we need to check that the extra folder has already been added
                     if (sourceFolder.Path.Count(f => f == '/') == 1)

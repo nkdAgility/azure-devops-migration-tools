@@ -6,8 +6,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Execution\Exceptions\**" />
     <Compile Remove="Execution\FieldMaps\**" />
+    <EmbeddedResource Remove="Execution\Exceptions\**" />
     <EmbeddedResource Remove="Execution\FieldMaps\**" />
+    <None Remove="Execution\Exceptions\**" />
     <None Remove="Execution\FieldMaps\**" />
   </ItemGroup>
 
@@ -34,10 +37,6 @@
   <ItemGroup>
     <Reference Include="System.DirectoryServices" />
     <Reference Include="System.DirectoryServices.AccountManagement" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Execution\Exceptions\" />
   </ItemGroup>
 
 </Project>

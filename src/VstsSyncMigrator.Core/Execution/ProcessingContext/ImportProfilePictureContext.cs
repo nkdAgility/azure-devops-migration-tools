@@ -39,7 +39,7 @@ namespace VstsSyncMigrator.Engine
         public ImportProfilePictureContext(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry) : base(services, me, telemetry)
         {
             //http://www.codeproject.com/Articles/18102/Howto-Almost-Everything-In-Active-Directory-via-C
-            ims2 = (IIdentityManagementService2)me.Target.Collection.GetService(typeof(IIdentityManagementService2));
+            ims2 = (IIdentityManagementService2)me.Target.GetService<IIdentityManagementService2>();
 
         }
 

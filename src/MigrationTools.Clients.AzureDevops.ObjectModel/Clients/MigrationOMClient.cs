@@ -12,6 +12,7 @@ using Microsoft.VisualStudio.Services.Common;
 using MigrationTools.Core;
 using MigrationTools.Core.Clients;
 using MigrationTools.Core.Configuration;
+using MigrationTools.Core.DataContracts;
 using Serilog;
 
 namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
@@ -32,7 +33,8 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
                 return _config;
             }
         }
-        
+
+
         public MigrationOMClient(IMigrationEngine me, IServiceProvider services, ITelemetryLogger telemetry)
         {
             _Me = me;
@@ -48,6 +50,13 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
         }
 
         private TfsTeamProjectCollection _collection;
+        public object InternalCollection
+        {
+            get
+            {
+                return _collection;
+            }
+        }
 
         private void EnsureCollection()
         {
@@ -99,6 +108,16 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
         {
             EnsureCollection();
             return _collection.GetService<T>();
+        }
+
+        public IEnumerable<WorkItemData> GetWorkItems()
+        {
+            throw new NotImplementedException();
+        }
+
+        public WorkItemData PersistWorkItem(WorkItemData workItem)
+        {
+            throw new NotImplementedException();
         }
     }
 }

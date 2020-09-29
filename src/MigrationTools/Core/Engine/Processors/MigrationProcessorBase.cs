@@ -38,7 +38,6 @@ namespace MigrationTools.Core.Engine.Processors
 
         public void Execute()
         {
-            this.me = _services.GetService<IMigrationEngine>();
             Telemetry.TrackEvent(this.Name);
             Log.Information("Migration Context Start: {MigrationContextname} ", Name);
             DateTime start = DateTime.Now;

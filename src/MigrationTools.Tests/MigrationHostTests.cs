@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MigrationTools.Core;
 using MigrationTools.Core.Configuration;
 using MigrationTools.Core.Configuration.Tests;
 using MigrationTools.Core.Engine;
@@ -32,15 +33,14 @@ namespace MigrationTools.Tests
                 services.AddSingleton<GitRepoMapContainer>();
                 services.AddSingleton<ChangeSetMappingContainer>();
                 services.AddSingleton<ITelemetryLogger, TelemetryClientAdapter>();
-                services.AddSingleton<ITeamProjectContext, TeamProjectContextMoc>();
-                services.AddSingleton<MigrationEngineCore>();
+                services.AddSingleton<IMigrationEngine, MigrationEngine>();
             }).Build();
         }
 
         [TestMethod()]
         public void MigrationHostTest()
         {
-            MigrationEngineCore mh = host.Services.GetRequiredService<MigrationEngineCore>();
+            IMigrationEngine mh = host.Services.GetRequiredService<IMigrationEngine>();
 
 
         }

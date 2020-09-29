@@ -43,7 +43,7 @@ namespace VstsSyncMigrator.Engine
 			WorkItemStoreContext targetStore = new WorkItemStoreContext(Engine.Target, WorkItemStoreFlags.BypassRules, Telemetry);
             TfsQueryContext tfsqc = new TfsQueryContext(targetStore, Telemetry);
             tfsqc.AddParameter("TeamProject", Engine.Target.Config.Project);
-            tfsqc.Query = string.Format(@"SELECT [System.Id] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject  AND [System.AreaPath] UNDER '{0}\_DeleteMe'", me.Target.Config.Project);
+            tfsqc.Query = string.Format(@"SELECT [System.Id] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject  AND [System.AreaPath] UNDER '{0}\_DeleteMe'", Engine.Target.Config.Project);
             WorkItemCollection  workitems = tfsqc.Execute();
             Trace.WriteLine(string.Format("Update {0} work items?", workitems.Count));
             //////////////////////////////////////////////////

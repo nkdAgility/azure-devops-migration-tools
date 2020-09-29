@@ -15,6 +15,11 @@ namespace MigrationTools.Core.Clients
 
           T GetService<T>();
 
+        [Obsolete]
+        object InternalCollection { get; }
+
+        IEnumerable<WorkItemData> GetWorkItems();
+        WorkItemData PersistWorkItem(WorkItemData workItem);
 
     }
 }

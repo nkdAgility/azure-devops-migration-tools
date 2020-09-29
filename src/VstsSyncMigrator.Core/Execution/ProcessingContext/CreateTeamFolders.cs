@@ -46,7 +46,7 @@ namespace VstsSyncMigrator.Engine
 
             TfsQueryContext tfsqc = new TfsQueryContext(targetStore, Telemetry);
 
-            TfsTeamService teamService = Engine.Target.Collection.GetService<TfsTeamService>();
+            TfsTeamService teamService = Engine.Target.GetService<TfsTeamService>();
             QueryHierarchy qh = targetStore.Store.Projects[Engine.Target.Config.Project].QueryHierarchy;
             List<TeamFoundationTeam> teamList = teamService.QueryTeams(Engine.Target.Config.Project).ToList();
 

@@ -31,7 +31,7 @@ namespace MigrationTools.ConsoleCore
                     // Processors
 
                     // Core
-                    services.AddTransient<ITeamProjectContext, TeamProjectContext>();
+                    // services.AddTransient<IMigrationClient, MigrationRestClient>();
 
                 });
             var host = hostBuilder.Build();

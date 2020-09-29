@@ -10,6 +10,7 @@ using MigrationTools.Core.Engine.Containers;
 using MigrationTools.Services;
 using MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps;
 using VstsSyncMigrator.Engine;
+using MigrationTools.Core;
 
 namespace _VstsSyncMigrator.Engine.Tests
 {
