@@ -59,9 +59,9 @@ namespace VstsSyncMigrator.Engine
                     {
                         {"Name", Name},
                         {"Target Project", me.Target.Config.Project},
-                        {"Target Collection", me.Target.Collection.Name},
+                        {"Target Collection", me.Target.Config.Collection.ToString()},
                         {"Source Project", me.Source.Config.Project},
-                        {"Source Collection", me.Source.Collection.Name},
+                        {"Source Collection", me.Source.Config.Collection.ToString()},
                         {"Status", Status.ToString()}
                     },
                     new Dictionary<string, double>

@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools;
 using MigrationTools.CommandLine;
+using MigrationTools.Core.Clients;
 using MigrationTools.Core.Configuration;
 using MigrationTools.Core.Engine;
 using MigrationTools.Core.Engine.Containers;
@@ -28,6 +30,7 @@ namespace VstsSyncMigrator.Engine
         public ITelemetryLogger Telemetry { get; }
 
         public MigrationEngine(
+            IServiceProvider services,
             ExecuteOptions executeOptions,
             EngineConfiguration config,
             TypeDefinitionMapContainer typeDefinitionMaps,
@@ -38,6 +41,7 @@ namespace VstsSyncMigrator.Engine
             ITelemetryLogger telemetry)
         {
             Log.Information("Creating Migration Engine {Guid}", _Guid);
+            _services = services;
             FieldMaps = fieldMaps;
             this.executeOptions = executeOptions;
             TypeDefinitionMaps = typeDefinitionMaps;
@@ -66,23 +70,21 @@ namespace VstsSyncMigrator.Engine
             var credentials = CheckForNetworkCredentials();
             if (config.Source != null)
             {
-                if (credentials.source == null)
-                    SetSource(new TeamProjectContext(config.Source, Telemetry));
-                else
-                    SetSource(new TeamProjectContext(config.Source, credentials.source, Telemetry));
+                    IMigrationClient s = _services.GetRequiredService<IMigrationClient>();
+                    s.Configure(config.Source, credentials.source);
+                    Source = s;
             }
             if (config.Target != null)
             {
-                if (credentials.target == null)
-                    SetTarget(new TeamProjectContext(config.Target, Telemetry));
-                else
-                    SetTarget(new TeamProjectContext(config.Target, credentials.target, Telemetry));
+                IMigrationClient t = _services.GetRequiredService<IMigrationClient>();
+                t.Configure(config.Target, credentials.target);
+                Target = t;
             }
         }
 
-        public ITeamProjectContext Source { get; private set; }
+        public IMigrationClient Source { get; private set; }
 
-        public ITeamProjectContext Target { get; private set; }
+        public IMigrationClient Target { get; private set; }
 
 
         public ProcessingStatus Run()
@@ -122,16 +124,6 @@ namespace VstsSyncMigrator.Engine
                     { "EngineTime", engineTimer.ElapsedMilliseconds }
                 });
             return ps;
-        }
-
-        public void SetSource(ITeamProjectContext teamProjectContext)
-        {
-            Source = teamProjectContext;
-        }
-
-        public void SetTarget(ITeamProjectContext teamProjectContext)
-        {
-            Target = teamProjectContext;
         }
 
     }

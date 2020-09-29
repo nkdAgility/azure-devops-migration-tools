@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace MigrationTools.Core.Clients.Tests
 {
-    class WorkItemSinkStub : IWorkItemMigrationClients
+    class WorkItemSinkStub : IMigrationClient
     {
         List<WorkItemData> list = new List<WorkItemData>();
 

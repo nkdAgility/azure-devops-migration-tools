@@ -8,6 +8,8 @@ using MigrationTools;
 using MigrationTools.Host;
 using MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps;
 using VstsSyncMigrator.Engine;
+using MigrationTools.Core.Clients;
+using MigrationTools.Clients.AzureDevops.ObjectModel.Clients;
 
 namespace VstsSyncMigrator.ConsoleApp
 {
@@ -52,7 +54,8 @@ namespace VstsSyncMigrator.ConsoleApp
 
                     //Engine
                     services.AddSingleton<IMigrationEngine, MigrationEngine>();
-
+                    // Core
+                    services.AddSingleton<IMigrationClient, MigrationOMClient>();
                    
                 });
                 var host = hostBuilder.Build();
