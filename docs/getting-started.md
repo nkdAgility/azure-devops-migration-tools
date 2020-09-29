@@ -171,7 +171,7 @@ You can now customise the configuration depending on what you need to do. Howeve
       "WorkItemCreateRetryLimit": 5,
       "FilterWorkItemsThatAlreadyExistInTarget": true,
       "PauseAfterEachWorkItem": false,
-      "AttachmentMazSize": 480000000,
+      "AttachmentMaxSize": 480000000,
       "CollapseRevisions": false,
       "LinkMigrationSaveEachAsAdded": false
     }

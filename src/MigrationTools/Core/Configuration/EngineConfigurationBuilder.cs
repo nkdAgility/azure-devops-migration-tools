@@ -46,7 +46,7 @@ namespace MigrationTools.Core.Configuration
         public EngineConfiguration BuildDefault()
         {
             EngineConfiguration ec = CreateEmptyConfig();
-            AddFieldMapps(ec);
+            AddExampleFieldMapps(ec);
             AddWorkItemMigrationDefault(ec);
             AddTestPlansMigrationDefault(ec);
             ec.Processors.Add(new ImportProfilePictureConfig());
@@ -63,7 +63,7 @@ namespace MigrationTools.Core.Configuration
         public EngineConfiguration BuildWorkItemMigration()
         {
             EngineConfiguration ec = CreateEmptyConfig();
-            AddFieldMapps(ec);
+            AddExampleFieldMapps(ec);
             AddWorkItemMigrationDefault(ec);
             return ec;
         }
@@ -116,7 +116,9 @@ namespace MigrationTools.Core.Configuration
             //ec.Processors.Add(new TestRunsMigrationConfig());
         }
 
-        private void AddFieldMapps(EngineConfiguration ec)
+
+
+        private void AddExampleFieldMapps(EngineConfiguration ec)
         {
             ec.FieldMaps.Add(new MultiValueConditionalMapConfig()
             {

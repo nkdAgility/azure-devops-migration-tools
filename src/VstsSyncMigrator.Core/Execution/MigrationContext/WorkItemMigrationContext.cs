@@ -104,7 +104,7 @@ namespace VstsSyncMigrator.Engine
                 throw new Exception("You must call Configure() first");
             }
             var workItemServer = me.Source.Collection.GetService<WorkItemServer>();
-            attachmentEnricher = new AttachmentMigrationEnricher(workItemServer, _config.AttachmentWorkingPath, _config.AttachmentMazSize);
+            attachmentEnricher = new AttachmentMigrationEnricher(workItemServer, _config.AttachmentWorkingPath, _config.AttachmentMaxSize);
             embededImagesEnricher = new EmbededImagesRepairEnricher();
             repoOMatic = new RepoOMatic(me);
             VssClientCredentials adoCreds = new VssClientCredentials();
