@@ -44,9 +44,8 @@ namespace MigrationTools.Core.Engine.Containers
                             throw new Exception("Type " + typePattern + " not found.");
                         }
 
-                        IProcessor pc = (IProcessor)Services.GetService(type);
+                        IProcessor pc = (IProcessor)Services.GetRequiredService(type);
                         pc.Configure(processorConfig);
-                        // ITfsProcessingContext pc = (ITfsProcessingContext)Activator.CreateInstance(type, Host, processorConfig);
                          _Processors.Add(pc);
                     }
                     else

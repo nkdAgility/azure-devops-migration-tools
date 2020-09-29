@@ -77,7 +77,7 @@ namespace MigrationTools.Core.Configuration
             ec.Processors.Add(new WorkItemMigrationConfig());
         }
 
-        private EngineConfiguration CreateEmptyConfig()
+        public EngineConfiguration CreateEmptyConfig()
         {
             EngineConfiguration ec = new EngineConfiguration();
             ec.TelemetryEnableTrace = false;
