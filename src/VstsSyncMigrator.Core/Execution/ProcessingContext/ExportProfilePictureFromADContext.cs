@@ -20,7 +20,7 @@ using MigrationTools.Core;
 
 namespace VstsSyncMigrator.Engine
 {
-    public class ExportProfilePictureFromADContext : ProcessingContextBase
+    public class ExportProfilePictureFromADContext : StaticProcessorBase
     {
 
         private IIdentityManagementService2 ims2;

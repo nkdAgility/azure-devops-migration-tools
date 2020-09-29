@@ -11,10 +11,11 @@ using MigrationTools.Core.Configuration.Processing;
 using Microsoft.Extensions.Hosting;
 using MigrationTools.Core.Configuration;
 using MigrationTools;
+using MigrationTools.Core.Engine.Processors;
 
 namespace VstsSyncMigrator.Engine
 {
-    public class FakeProcessor : MigrationContextBase
+    public class FakeProcessor : MigrationProcessorBase
     {
         public override string Name
         {
@@ -30,7 +31,7 @@ namespace VstsSyncMigrator.Engine
         }
 
 
-        internal override void InternalExecute()
+        protected override void InternalExecute()
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 			//////////////////////////////////////////////////

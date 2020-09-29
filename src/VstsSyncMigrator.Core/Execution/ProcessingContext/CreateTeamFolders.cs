@@ -16,7 +16,7 @@ using MigrationTools.Core;
 
 namespace VstsSyncMigrator.Engine
 {
-    public class CreateTeamFolders : ProcessingContextBase
+    public class CreateTeamFolders : StaticProcessorBase
     {
 
 

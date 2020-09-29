@@ -21,7 +21,7 @@ using WorkItem = Microsoft.TeamFoundation.WorkItemTracking.Client.WorkItem;
 
 namespace VstsSyncMigrator.Engine
 {
-    public class TestPlandsAndSuitesMigrationContext : MigrationContextBase
+    public class TestPlandsAndSuitesMigrationContext : MigrationProcessorBase
     {
         WorkItemStoreContext sourceWitStore;
         TestManagementContext sourceTestStore;
@@ -111,7 +111,7 @@ namespace VstsSyncMigrator.Engine
             Console.ForegroundColor = ConsoleColor.White;
         }
 
-        internal override void InternalExecute()
+        protected override void InternalExecute()
         {
             sourceWitStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.None, Telemetry);
             sourceTestStore = new TestManagementContext(me.Source, config.TestPlanQueryBit);

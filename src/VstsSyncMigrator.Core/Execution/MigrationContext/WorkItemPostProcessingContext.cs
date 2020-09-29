@@ -12,10 +12,11 @@ using Microsoft.Extensions.Hosting;
 using MigrationTools.Core.Configuration;
 using MigrationTools;
 using MigrationTools.Clients.AzureDevops.ObjectModel;
+using MigrationTools.Core.Engine.Processors;
 
 namespace VstsSyncMigrator.Engine
 {
-    public class WorkItemPostProcessingContext : MigrationContextBase
+    public class WorkItemPostProcessingContext : MigrationProcessorBase
     {
 
         private WorkItemPostProcessingConfig _config;
@@ -54,7 +55,7 @@ namespace VstsSyncMigrator.Engine
         //    _queryBit = queryBit;
         //}
 
-        internal override void InternalExecute()
+        protected override void InternalExecute()
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 			//////////////////////////////////////////////////

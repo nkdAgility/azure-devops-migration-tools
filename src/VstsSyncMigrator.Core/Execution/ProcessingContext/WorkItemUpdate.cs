@@ -16,7 +16,7 @@ using MigrationTools.Core;
 
 namespace VstsSyncMigrator.Engine
 {
-    public class WorkItemUpdate : ProcessingContextBase
+    public class WorkItemUpdate : StaticProcessorBase
     {
         WorkItemUpdateConfig _config;
 

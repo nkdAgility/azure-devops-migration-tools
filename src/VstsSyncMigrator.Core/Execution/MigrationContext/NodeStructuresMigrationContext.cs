@@ -6,11 +6,12 @@ using Microsoft.TeamFoundation.Server;
 using MigrationTools;
 using MigrationTools.Core.Configuration;
 using MigrationTools.Core.Configuration.Processing;
+using MigrationTools.Core.Engine.Processors;
 using Serilog;
 
 namespace VstsSyncMigrator.Engine
 {
-    public class NodeStructuresMigrationContext : MigrationContextBase
+    public class NodeStructuresMigrationContext : MigrationProcessorBase
     {
         NodeStructuresMigrationConfig _config;
 
@@ -31,7 +32,7 @@ namespace VstsSyncMigrator.Engine
             _config = (NodeStructuresMigrationConfig)config;
         }
 
-        internal override void InternalExecute()
+        protected override void InternalExecute()
         {
             if (_config == null)
             {
@@ -229,5 +230,6 @@ namespace VstsSyncMigrator.Engine
             Trace.WriteLine(String.Empty);
             return node;
         }
+
     }
 }

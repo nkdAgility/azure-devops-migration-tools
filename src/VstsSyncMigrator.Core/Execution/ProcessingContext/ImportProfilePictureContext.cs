@@ -21,7 +21,7 @@ using MigrationTools.Core;
 
 namespace VstsSyncMigrator.Engine
 {
-    public class ImportProfilePictureContext : ProcessingContextBase
+    public class ImportProfilePictureContext : StaticProcessorBase
     {
 
         //private readonly TfsTeamService teamService;

@@ -1,24 +1,15 @@
-﻿using Microsoft.ApplicationInsights;
-using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Net;
 using MigrationTools.Core.Configuration;
-using MigrationTools.Core.Engine;
 using MigrationTools;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.DependencyInjection;
 using Serilog;
-using Microsoft.ApplicationInsights.DataContracts;
 using MigrationTools.Core.Engine.Containers;
 using MigrationTools.Core;
 
 namespace VstsSyncMigrator.Engine
 {
-    public abstract class ProcessingContextBase : IProcessor
+    public abstract class StaticProcessorBase : IProcessor
     {
         internal IMigrationEngine me;
         ProcessingStatus status = ProcessingStatus.None;
@@ -26,7 +17,7 @@ namespace VstsSyncMigrator.Engine
 
         public IMigrationEngine Engine { get { return me; } }
 
-        public ProcessingContextBase(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry)
+        public StaticProcessorBase(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry)
         {
             _services = services;
             this.me = me;
@@ -80,7 +71,7 @@ namespace VstsSyncMigrator.Engine
                       new Dictionary<string, string> {
                           { "Name", Name},
                           { "Target Project", me.Target.Config.Project},
-                          { "Target Collection", me.Target.Collection.Name },
+                          { "Target Collection", me.Target.Config.Collection.ToString() },
                           { "Status", Status.ToString() }
                       },
                       new Dictionary<string, double> {
@@ -94,7 +85,7 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        internal abstract void InternalExecute();
+        protected abstract void InternalExecute();
 
         
     }

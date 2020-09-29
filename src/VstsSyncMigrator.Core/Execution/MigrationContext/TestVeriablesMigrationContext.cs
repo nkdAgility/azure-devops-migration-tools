@@ -13,7 +13,7 @@ using MigrationTools;
 
 namespace VstsSyncMigrator.Engine
 {
-    public class TestVeriablesMigrationContext : MigrationContextBase
+    public class TestVeriablesMigrationContext : MigrationProcessorBase
     {
         public override string Name
         {
@@ -28,7 +28,7 @@ namespace VstsSyncMigrator.Engine
 
         }
 
-        internal override void InternalExecute()
+        protected override void InternalExecute()
         {
             WorkItemStoreContext sourceWisc = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.None, Telemetry);
             TestManagementContext SourceTmc = new TestManagementContext(me.Source);

@@ -14,7 +14,7 @@ using MigrationTools.Core;
 
 namespace VstsSyncMigrator.Engine
 {
-    public class WorkItemDelete : ProcessingContextBase
+    public class WorkItemDelete : StaticProcessorBase
     {
 
 

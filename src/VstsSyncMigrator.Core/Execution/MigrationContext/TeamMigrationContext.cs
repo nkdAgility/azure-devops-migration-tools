@@ -13,10 +13,11 @@ using MigrationTools.Core.Configuration.Processing;
 using Microsoft.Extensions.Hosting;
 using MigrationTools.Core.Configuration;
 using MigrationTools;
+using MigrationTools.Core.Engine.Processors;
 
 namespace VstsSyncMigrator.Engine
 {
-    public class TeamMigrationContext : MigrationContextBase
+    public class TeamMigrationContext : MigrationProcessorBase
     {
 
         TeamMigrationConfig _config;
@@ -38,7 +39,7 @@ namespace VstsSyncMigrator.Engine
             _config = (TeamMigrationConfig)config;
         }
 
-        internal override void InternalExecute()
+        protected override void InternalExecute()
         {
             if (_config == null)
             {

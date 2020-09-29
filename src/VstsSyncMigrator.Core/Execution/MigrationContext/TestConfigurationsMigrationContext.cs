@@ -8,10 +8,11 @@ using Microsoft.Extensions.Hosting;
 using MigrationTools.Core.Configuration;
 using Microsoft.ApplicationInsights.Channel;
 using MigrationTools;
+using MigrationTools.Core.Engine.Processors;
 
 namespace VstsSyncMigrator.Engine
 {
-    public class TestConfigurationsMigrationContext : MigrationContextBase
+    public class TestConfigurationsMigrationContext : MigrationProcessorBase
     {
         // http://blogs.microsoft.co.il/shair/2015/02/02/tfs-api-part-56-test-configurations/
 
@@ -28,7 +29,7 @@ namespace VstsSyncMigrator.Engine
 
         }
 
-        internal override void InternalExecute()
+        protected override void InternalExecute()
         {
             TestManagementContext SourceTmc = new TestManagementContext(me.Source);
             TestManagementContext targetTmc = new TestManagementContext(me.Target);

@@ -12,14 +12,14 @@ using Microsoft.ApplicationInsights.DataContracts;
 using MigrationTools.Core.Engine.Containers;
 using MigrationTools.Core;
 
-namespace VstsSyncMigrator.Engine
+namespace MigrationTools.Core.Engine.Processors
 {
-    public abstract class MigrationContextBase : IProcessor
+    public abstract class MigrationProcessorBase : IProcessor
     {
         protected IMigrationEngine me;
         protected IServiceProvider _services;
 
-        protected MigrationContextBase(IServiceProvider services, ITelemetryLogger telemetry)
+        protected MigrationProcessorBase(IServiceProvider services, ITelemetryLogger telemetry)
         {
             _services = services;
             Telemetry = telemetry;
@@ -77,9 +77,9 @@ namespace VstsSyncMigrator.Engine
 
         }
 
-        internal abstract void InternalExecute();
+        protected abstract void InternalExecute();
 
-        internal string NodeStructreSourceToTarget(string input)
+        protected string NodeStructreSourceToTarget(string input)
         {
             //input = [sourceTeamProject]\[AreaPath]
             return string.Format("{0}\\{1}", me.Target.Config.Project, input);
@@ -88,7 +88,7 @@ namespace VstsSyncMigrator.Engine
             //return r.Replace(input, target.Name, 1);
         }
 
-        internal string ReplaceFirstInstanceOf(string input)
+        protected string ReplaceFirstInstanceOf(string input)
         {
             //input = [sourceTeamProject]\[AreaPath]
             var r = new Regex(me.Source.Config.Project, RegexOptions.IgnoreCase);
@@ -96,12 +96,12 @@ namespace VstsSyncMigrator.Engine
             return r.Replace(input, me.Target.Config.Project, 1);
         }
 
-        internal static void AddParameter(string name, IDictionary<string, string> store, string value)
+        protected static void AddParameter(string name, IDictionary<string, string> store, string value)
         {
             if (!store.ContainsKey(name)) store.Add(name, value);
         }
 
-        internal static void AddMetric(string name, IDictionary<string, double> store, double value)
+        protected static void AddMetric(string name, IDictionary<string, double> store, double value)
         {
             if (!store.ContainsKey(name)) store.Add(name, value);
         }

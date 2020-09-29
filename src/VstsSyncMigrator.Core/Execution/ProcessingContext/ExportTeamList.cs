@@ -18,7 +18,7 @@ using MigrationTools.Core;
 
 namespace VstsSyncMigrator.Engine
 {
-    public class ExportTeamList : ProcessingContextBase
+    public class ExportTeamList : StaticProcessorBase
     {
 
 

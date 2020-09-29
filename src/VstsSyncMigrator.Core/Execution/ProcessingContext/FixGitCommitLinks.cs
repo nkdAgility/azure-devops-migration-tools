@@ -17,7 +17,7 @@ using MigrationTools.Core;
 
 namespace VstsSyncMigrator.Engine
 {
-    public class FixGitCommitLinks : ProcessingContextBase
+    public class FixGitCommitLinks : StaticProcessorBase
     {
         private FixGitCommitLinksConfig _config;
         private RepoOMatic _RepoOMatic;

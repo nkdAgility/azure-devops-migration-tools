@@ -26,11 +26,12 @@ using Serilog.Context;
 using Serilog.Events;
 using VstsSyncMigrator.Core;
 using VstsSyncMigrator.Core.Execution.OMatics;
+using MigrationTools.Core.Engine.Processors;
 
 namespace VstsSyncMigrator.Engine
 {
 
-    public class WorkItemMigrationContext : MigrationContextBase
+    public class WorkItemMigrationContext : MigrationProcessorBase
     {
         private WorkItemMigrationConfig _config;
         private List<String> _ignore;
@@ -97,7 +98,7 @@ namespace VstsSyncMigrator.Engine
 
         public ITelemetryLogger Telemetry { get; }
 
-        internal override void InternalExecute()
+        protected override void InternalExecute()
         {
             if (_config == null)
             {

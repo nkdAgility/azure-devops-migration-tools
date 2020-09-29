@@ -14,7 +14,7 @@ using MigrationTools;
 
 namespace VstsSyncMigrator.Engine
 {
-    public class WorkItemUpdateAreasAsTagsContext : ProcessingContextBase
+    public class WorkItemUpdateAreasAsTagsContext : StaticProcessorBase
     {
 
         WorkItemUpdateAreasAsTagsConfig config;
