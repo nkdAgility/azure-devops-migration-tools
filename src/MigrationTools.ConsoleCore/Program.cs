@@ -6,7 +6,7 @@ using MigrationTools.Host;
 using MigrationTools.Clients.AzureDevops.Rest;
 using MigrationTools.Clients.AzureDevops.Rest.FieldMaps;
 
-namespace MigrationTools.ConsoleUI
+namespace MigrationTools.ConsoleCore
 {
     class Program
     {
