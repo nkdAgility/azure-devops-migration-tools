@@ -1,6 +1,4 @@
-$toolsLoc = Get-ToolsLocation
-$vstssyncmigrationpath =Join-Path -Path $toolsLoc -ChildPath "\VSTSSyncMigration"
-
 Uninstall-ChocolateyZipPackage 'vstssyncmigrator' 'vstssyncmigrator-#{GITVERSION.SEMVER}#.zip'
+Uninstall-ChocolateyZipPackage 'MigrationTools' 'MigrationTools-#{GITVERSION.SEMVER}#.zip'
 
-write-host 'VSTS Sync Migration has been uninstalled.'
+write-host 'Azure DevOps Migration Tools has been uninstalled.'
