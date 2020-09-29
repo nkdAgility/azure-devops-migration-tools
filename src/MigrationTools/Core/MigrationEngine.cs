@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools;
 using MigrationTools.CommandLine;
 using MigrationTools.Core.Clients;
@@ -12,7 +11,7 @@ using MigrationTools.Core.Engine;
 using MigrationTools.Core.Engine.Containers;
 using Serilog;
 
-namespace VstsSyncMigrator.Engine
+namespace MigrationTools.Core
 {
     public class MigrationEngine : IMigrationEngine
     {

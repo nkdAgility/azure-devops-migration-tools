@@ -5,6 +5,7 @@ using MigrationTools.Core.Engine;
 using MigrationTools.Host;
 using MigrationTools.Clients.AzureDevops.Rest;
 using MigrationTools.Clients.AzureDevops.Rest.FieldMaps;
+using MigrationTools.Core;
 
 namespace MigrationTools.ConsoleCore
 {
@@ -29,8 +30,7 @@ namespace MigrationTools.ConsoleCore
 
                     // Processors
 
-                    //Engine
-                    services.AddSingleton<IMigrationEngine, MigrationEngineCore>();
+                    // Core
                     services.AddTransient<ITeamProjectContext, TeamProjectContext>();
 
                 });

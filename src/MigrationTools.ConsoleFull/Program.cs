@@ -10,6 +10,7 @@ using MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps;
 using VstsSyncMigrator.Engine;
 using MigrationTools.Core.Clients;
 using MigrationTools.Clients.AzureDevops.ObjectModel.Clients;
+using MigrationTools.Core;
 
 namespace VstsSyncMigrator.ConsoleApp
 {
@@ -52,8 +53,6 @@ namespace VstsSyncMigrator.ConsoleApp
                     services.AddSingleton<WorkItemUpdate>();
                     services.AddSingleton<WorkItemUpdateAreasAsTagsContext>();
 
-                    //Engine
-                    services.AddSingleton<IMigrationEngine, MigrationEngine>();
                     // Core
                     services.AddSingleton<IMigrationClient, MigrationOMClient>();
                    

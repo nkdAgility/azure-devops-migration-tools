@@ -5,6 +5,7 @@ using CommandLine;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MigrationTools.CommandLine;
+using MigrationTools.Core;
 using MigrationTools.Core.Configuration;
 using MigrationTools.Core.Engine.Containers;
 using MigrationTools.CustomDiagnostics;
@@ -58,16 +59,21 @@ namespace MigrationTools.Host
                             services.AddSingleton<ExecuteOptions>((p) => null);
                         });
                     services.AddOptions();
+                    // Services
                     services.AddTransient<IDetectOnlineService, DetectOnlineService>();
                     services.AddTransient<IDetectVersionService, DetectVersionService>();
                     services.AddSingleton<ITelemetryLogger, TelemetryClientAdapter>();
+                    // Config
                     services.AddSingleton<IEngineConfigurationBuilder, EngineConfigurationBuilder>();
                     services.AddSingleton<EngineConfiguration, EngineConfigurationWrapper>();
+                    //Engine
                     services.AddSingleton<FieldMapContainer>();
                     services.AddSingleton<ProcessorContainer>();
                     services.AddSingleton<TypeDefinitionMapContainer>();
                     services.AddSingleton<GitRepoMapContainer>();
                     services.AddSingleton<ChangeSetMappingContainer>();
+                    services.AddSingleton<MigrationEngine>();
+                    // Host Services
                     services.AddTransient<IStartupService, StartupService>();
                     services.AddHostedService<ExecuteHostedService>();
                     services.AddHostedService<InitHostedService>();
