@@ -4,6 +4,7 @@ using System.Linq;
 using System.Xml;
 using Microsoft.TeamFoundation.Server;
 using MigrationTools;
+using MigrationTools.Core;
 using MigrationTools.Core.Configuration;
 using MigrationTools.Core.Configuration.Processing;
 using MigrationTools.Core.Engine.Processors;
@@ -23,7 +24,7 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        public NodeStructuresMigrationContext(IServiceProvider services, ITelemetryLogger telemetry) : base(services, telemetry)
+        public NodeStructuresMigrationContext(IMigrationEngine me, IServiceProvider services, ITelemetryLogger telemetry) : base(me, services, telemetry)
         {
         }
 
@@ -39,16 +40,16 @@ namespace VstsSyncMigrator.Engine
                 throw new Exception("You must call Configure() first");
             }
             //////////////////////////////////////////////////
-            ICommonStructureService sourceCss = (ICommonStructureService)me.Source.Collection.GetService(typeof(ICommonStructureService));
-            ProjectInfo sourceProjectInfo = sourceCss.GetProjectFromName(me.Source.Config.Project);
+            ICommonStructureService sourceCss = (ICommonStructureService)Engine.Source.Collection.GetService(typeof(ICommonStructureService));
+            ProjectInfo sourceProjectInfo = sourceCss.GetProjectFromName(Engine.Source.Config.Project);
             NodeInfo[] sourceNodes = sourceCss.ListStructures(sourceProjectInfo.Uri);
             //////////////////////////////////////////////////
-            ICommonStructureService targetCss = (ICommonStructureService)me.Target.Collection.GetService(typeof(ICommonStructureService4));
+            ICommonStructureService targetCss = (ICommonStructureService)Engine.Target.Collection.GetService(typeof(ICommonStructureService4));
 
             //////////////////////////////////////////////////
-            ProcessCommonStructure(me.Source.Config.LanguageMaps.AreaPath, me.Target.Config.LanguageMaps.AreaPath, sourceNodes, targetCss, sourceCss);
+            ProcessCommonStructure(me.Source.Config.LanguageMaps.AreaPath, Engine.Target.Config.LanguageMaps.AreaPath, sourceNodes, targetCss, sourceCss);
             //////////////////////////////////////////////////
-            ProcessCommonStructure(me.Source.Config.LanguageMaps.IterationPath, me.Target.Config.LanguageMaps.IterationPath, sourceNodes, targetCss, sourceCss);
+            ProcessCommonStructure(me.Source.Config.LanguageMaps.IterationPath, Engine.Target.Config.LanguageMaps.IterationPath, sourceNodes, targetCss, sourceCss);
             //////////////////////////////////////////////////
         }
 
@@ -65,7 +66,7 @@ namespace VstsSyncMigrator.Engine
             NodeInfo structureParent;
             try // May run into language problems!!! This is to try and detect that
             {
-                structureParent = targetCss.GetNodeFromPath(string.Format("\\{0}\\{1}", me.Target.Config.Project, treeTypeTarget));
+                structureParent = targetCss.GetNodeFromPath(string.Format("\\{0}\\{1}", Engine.Target.Config.Project, treeTypeTarget));
             }
             catch (Exception ex)
             {

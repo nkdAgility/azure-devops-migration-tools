@@ -11,16 +11,17 @@ namespace VstsSyncMigrator.Engine
 {
     public abstract class StaticProcessorBase : IProcessor
     {
-        internal IMigrationEngine me;
+        internal IMigrationEngine _me;
         ProcessingStatus status = ProcessingStatus.None;
         private readonly IServiceProvider _services;
 
-        public IMigrationEngine Engine { get { return me; } }
+        public IMigrationEngine Engine { get { return _me; } }
+        public IServiceProvider Services { get { return _services; } }
 
         public StaticProcessorBase(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry)
         {
             _services = services;
-            this.me = me;
+            _me = me;
             Telemetry = telemetry;
         }
 
@@ -54,8 +55,8 @@ namespace VstsSyncMigrator.Engine
                 Telemetry.TrackEvent("ProcessingContextComplete",
                     new Dictionary<string, string> {
                         { "Name", Name},
-                        { "Target Project", me.Target.Config.Project},
-                        { "Target Collection", me.Target.Config.Collection.ToString()},
+                        { "Target Project", Engine.Target.Config.Project},
+                        { "Target Collection", Engine.Target.Config.Collection.ToString()},
                         { "Status", Status.ToString() }
                     },
                     new Dictionary<string, double> {
@@ -70,8 +71,8 @@ namespace VstsSyncMigrator.Engine
                 Telemetry.TrackException(ex,
                       new Dictionary<string, string> {
                           { "Name", Name},
-                          { "Target Project", me.Target.Config.Project},
-                          { "Target Collection", me.Target.Config.Collection.ToString() },
+                          { "Target Project", Engine.Target.Config.Project},
+                          { "Target Collection", Engine.Target.Config.Collection.ToString() },
                           { "Status", Status.ToString() }
                       },
                       new Dictionary<string, double> {

@@ -11,6 +11,7 @@ using MigrationTools.Core.Configuration.Processing;
 using MigrationTools.Core.Configuration;
 using Microsoft.Extensions.Hosting;
 using MigrationTools;
+using MigrationTools.Core;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -19,7 +20,7 @@ namespace VstsSyncMigrator.Engine
 
         WorkItemUpdateAreasAsTagsConfig config;
 
-        public WorkItemUpdateAreasAsTagsContext(IServiceProvider services, MigrationEngine me, ITelemetryLogger telemetry) : base(services, me, telemetry)
+        public WorkItemUpdateAreasAsTagsContext(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry) : base(services, me, telemetry)
         {
         }
 
@@ -36,14 +37,14 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        internal override void InternalExecute()
+        protected override void InternalExecute()
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 			//////////////////////////////////////////////////
-			WorkItemStoreContext targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules, Telemetry);
+			WorkItemStoreContext targetStore = new WorkItemStoreContext(Engine.Target, WorkItemStoreFlags.BypassRules, Telemetry);
 
             TfsQueryContext tfsqc = new TfsQueryContext(targetStore, Telemetry);
-            tfsqc.AddParameter("TeamProject", me.Target.Config.Project);
+            tfsqc.AddParameter("TeamProject", Engine.Target.Config.Project);
             tfsqc.AddParameter("AreaPath", config.AreaIterationPath);
             tfsqc.Query = @"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject and [System.AreaPath] under @AreaPath";
             WorkItemCollection  workitems = tfsqc.Execute();

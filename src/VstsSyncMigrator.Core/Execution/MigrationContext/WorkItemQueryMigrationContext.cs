@@ -12,6 +12,7 @@ using Microsoft.Extensions.Hosting;
 using MigrationTools.Core.Configuration;
 using MigrationTools;
 using MigrationTools.Core.Engine.Processors;
+using MigrationTools.Core;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -55,7 +56,7 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        public WorkItemQueryMigrationContext(IServiceProvider services, ITelemetryLogger telemetry) : base(services, telemetry)
+        public WorkItemQueryMigrationContext(IMigrationEngine me, IServiceProvider services, ITelemetryLogger telemetry) : base(me, services, telemetry)
         {
         }
 
@@ -68,11 +69,11 @@ namespace VstsSyncMigrator.Engine
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 			//////////////////////////////////////////////////
-			var sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.None, Telemetry);
-            var targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.None, Telemetry);
+			var sourceStore = new WorkItemStoreContext(Engine.Source, WorkItemStoreFlags.None, Telemetry);
+            var targetStore = new WorkItemStoreContext(Engine.Target, WorkItemStoreFlags.None, Telemetry);
 
-            var sourceQueryHierarchy = sourceStore.Store.Projects[me.Source.Config.Project].QueryHierarchy;
-            var targetQueryHierarchy = targetStore.Store.Projects[me.Target.Config.Project].QueryHierarchy;
+            var sourceQueryHierarchy = sourceStore.Store.Projects[Engine.Source.Config.Project].QueryHierarchy;
+            var targetQueryHierarchy = targetStore.Store.Projects[Engine.Target.Config.Project].QueryHierarchy;
 
             Trace.WriteLine(string.Format("Found {0} root level child WIQ folders", sourceQueryHierarchy.Count));
             //////////////////////////////////////////////////
@@ -106,7 +107,7 @@ namespace VstsSyncMigrator.Engine
                 this.totalFoldersAttempted++;
 
                 // we need to replace the team project name in folder names as it included in query paths
-                var requiredPath = sourceFolder.Path.Replace($"{me.Source.Config.Project}/", $"{me.Target.Config.Project}/");
+                var requiredPath = sourceFolder.Path.Replace($"{Engine.Source.Config.Project}/", $"{Engine.Target.Config.Project}/");
 
                 // Is the project name to be used in the migration as an extra folder level?
                 if (config.PrefixProjectToNodes == true)
@@ -122,8 +123,8 @@ namespace VstsSyncMigrator.Engine
                         if (extraFolder == null)
                         {
                             // we are at the root level on the first pass and need to create the extra folder for the team name
-                            Trace.WriteLine($"Adding a folder '{me.Source.Config.Project}'");
-                            extraFolder = new QueryFolder(me.Source.Config.Project);
+                            Trace.WriteLine($"Adding a folder '{Engine.Source.Config.Project}'");
+                            extraFolder = new QueryFolder(Engine.Source.Config.Project);
                             targetSharedFolderRoot.Add(extraFolder);
                             targetHierarchy.Save(); // moved the save here a more immediate and relavent error message
                         }
@@ -179,12 +180,12 @@ namespace VstsSyncMigrator.Engine
             else
             {
                 // Sort out any path issues in the quertText
-                var fixedQueryText = query.QueryText.Replace($"'{me.Source.Config.Project}", $"'{me.Target.Config.Project}"); // the ' should only items at the start of areapath etc.
+                var fixedQueryText = query.QueryText.Replace($"'{Engine.Source.Config.Project}", $"'{Engine.Target.Config.Project}"); // the ' should only items at the start of areapath etc.
 
                 if (config.PrefixProjectToNodes)
                 {
                     // we need to inject the team name as a folder in the structure too
-                    fixedQueryText = fixedQueryText.Replace($"{me.Target.Config.Project}\\", $"{me.Target.Config.Project}\\{me.Source.Config.Project}\\");
+                    fixedQueryText = fixedQueryText.Replace($"{Engine.Target.Config.Project}\\", $"{Engine.Target.Config.Project}\\{Engine.Source.Config.Project}\\");
                 }
 
                 if (config.SourceToTargetFieldMappings != null)

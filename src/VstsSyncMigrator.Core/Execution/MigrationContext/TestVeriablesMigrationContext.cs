@@ -10,6 +10,8 @@ using MigrationTools.Core.Configuration.Processing;
 using Microsoft.Extensions.Hosting;
 using MigrationTools.Core.Configuration;
 using MigrationTools;
+using MigrationTools.Core.Engine.Processors;
+using MigrationTools.Core;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -23,18 +25,18 @@ namespace VstsSyncMigrator.Engine
 
         // http://blogs.microsoft.co.il/shair/2015/02/02/tfs-api-part-56-test-configurations/
 
-        public TestVeriablesMigrationContext(IServiceProvider services, ITelemetryLogger telemetry) : base(services, telemetry)
+        public TestVeriablesMigrationContext(IMigrationEngine me, IServiceProvider services, ITelemetryLogger telemetry) : base(me, services, telemetry)
         {
 
         }
 
         protected override void InternalExecute()
         {
-            WorkItemStoreContext sourceWisc = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.None, Telemetry);
-            TestManagementContext SourceTmc = new TestManagementContext(me.Source);
+            WorkItemStoreContext sourceWisc = new WorkItemStoreContext(Engine.Source, WorkItemStoreFlags.None, Telemetry);
+            TestManagementContext SourceTmc = new TestManagementContext(Engine.Source);
 
-            WorkItemStoreContext targetWisc = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules, Telemetry);
-            TestManagementContext targetTmc = new TestManagementContext(me.Target);
+            WorkItemStoreContext targetWisc = new WorkItemStoreContext(Engine.Target, WorkItemStoreFlags.BypassRules, Telemetry);
+            TestManagementContext targetTmc = new TestManagementContext(Engine.Target);
 
             List<ITestVariable> sourceVars = SourceTmc.Project.TestVariables.Query().ToList();
             Trace.WriteLine(string.Format("Plan to copy {0} Veriables?", sourceVars.Count));

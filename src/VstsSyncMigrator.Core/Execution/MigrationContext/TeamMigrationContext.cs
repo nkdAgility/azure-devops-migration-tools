@@ -14,6 +14,7 @@ using Microsoft.Extensions.Hosting;
 using MigrationTools.Core.Configuration;
 using MigrationTools;
 using MigrationTools.Core.Engine.Processors;
+using MigrationTools.Core;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -30,7 +31,7 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        public TeamMigrationContext(IServiceProvider services, ITelemetryLogger telemetry) : base(services, telemetry)
+        public TeamMigrationContext(IMigrationEngine me, IServiceProvider services, ITelemetryLogger telemetry) : base(me, services, telemetry)
         {
         }
 
@@ -47,19 +48,19 @@ namespace VstsSyncMigrator.Engine
             }
             Stopwatch stopwatch = Stopwatch.StartNew();
             //////////////////////////////////////////////////
-            WorkItemStoreContext sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.BypassRules, Telemetry);
-            TfsTeamService sourceTS = me.Source.Collection.GetService<TfsTeamService>();
-            List<TeamFoundationTeam> sourceTL = sourceTS.QueryTeams(me.Source.Config.Project).ToList();
+            WorkItemStoreContext sourceStore = new WorkItemStoreContext(Engine.Source, WorkItemStoreFlags.BypassRules, Telemetry);
+            TfsTeamService sourceTS = Engine.Source.Collection.GetService<TfsTeamService>();
+            List<TeamFoundationTeam> sourceTL = sourceTS.QueryTeams(Engine.Source.Config.Project).ToList();
             Trace.WriteLine(string.Format("Found {0} teams in Source?", sourceTL.Count));
-            var sourceTSCS = me.Source.Collection.GetService<TeamSettingsConfigurationService>();
+            var sourceTSCS = Engine.Source.Collection.GetService<TeamSettingsConfigurationService>();
             //////////////////////////////////////////////////
-            WorkItemStoreContext targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules, Telemetry);
+            WorkItemStoreContext targetStore = new WorkItemStoreContext(Engine.Target, WorkItemStoreFlags.BypassRules, Telemetry);
             Project targetProject = targetStore.GetProject();
             Trace.WriteLine(string.Format("Found target project as {0}", targetProject.Name));
-            TfsTeamService targetTS = me.Target.Collection.GetService<TfsTeamService>();
-            List<TeamFoundationTeam> targetTL = targetTS.QueryTeams(me.Target.Config.Project).ToList();
+            TfsTeamService targetTS = Engine.Target.Collection.GetService<TfsTeamService>();
+            List<TeamFoundationTeam> targetTL = targetTS.QueryTeams(Engine.Target.Config.Project).ToList();
             Trace.WriteLine(string.Format("Found {0} teams in Target?", targetTL.Count));
-            var targetTSCS = me.Target.Collection.GetService<TeamSettingsConfigurationService>();
+            var targetTSCS = Engine.Target.Collection.GetService<TeamSettingsConfigurationService>();
             //////////////////////////////////////////////////
             int current = sourceTL.Count;
             int count = 0;
@@ -97,15 +98,15 @@ namespace VstsSyncMigrator.Engine
                             if (_config.PrefixProjectToNodes)
                             {
                                 targetConfig.TeamSettings.BacklogIterationPath = 
-                                    string.Format("{0}\\{1}", me.Target.Config.Project, sourceConfig.TeamSettings.BacklogIterationPath);
+                                    string.Format("{0}\\{1}", Engine.Target.Config.Project, sourceConfig.TeamSettings.BacklogIterationPath);
                                 targetConfig.TeamSettings.IterationPaths = sourceConfig.TeamSettings.IterationPaths
-                                    .Select(path => string.Format("{0}\\{1}", me.Target.Config.Project, path))
+                                    .Select(path => string.Format("{0}\\{1}", Engine.Target.Config.Project, path))
                                     .ToArray();
                                 targetConfig.TeamSettings.TeamFieldValues = sourceConfig.TeamSettings.TeamFieldValues
                                     .Select(field => new TeamFieldValue
                                     {
                                         IncludeChildren = field.IncludeChildren,
-                                        Value = string.Format("{0}\\{1}", me.Target.Config.Project, field.Value)
+                                        Value = string.Format("{0}\\{1}", Engine.Target.Config.Project, field.Value)
                                     })
                                     .ToArray();
                             }
@@ -174,11 +175,11 @@ namespace VstsSyncMigrator.Engine
         {
             ///////////////////////////////////////////////////
             TeamSettings newTeamSettings = sourceTCfU.TeamSettings;
-            newTeamSettings.BacklogIterationPath = newTeamSettings.BacklogIterationPath.Replace(me.Source.Config.Project, me.Target.Config.Project);
+            newTeamSettings.BacklogIterationPath = newTeamSettings.BacklogIterationPath.Replace(Engine.Source.Config.Project, Engine.Target.Config.Project);
             List<string> newIterationPaths = new List<string>();
             foreach (var ip in newTeamSettings.IterationPaths)
             {
-                newIterationPaths.Add(ip.Replace(me.Source.Config.Project, me.Target.Config.Project));
+                newIterationPaths.Add(ip.Replace(Engine.Source.Config.Project, Engine.Target.Config.Project));
             }
             newTeamSettings.IterationPaths = newIterationPaths.ToArray();
 

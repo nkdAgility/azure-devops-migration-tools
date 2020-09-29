@@ -36,13 +36,13 @@ namespace VstsSyncMigrator.Engine
          
         }
 
-        internal override void InternalExecute()
+        protected override void InternalExecute()
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 			//////////////////////////////////////////////////
-			WorkItemStoreContext targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules, Telemetry);
+			WorkItemStoreContext targetStore = new WorkItemStoreContext(Engine.Target, WorkItemStoreFlags.BypassRules, Telemetry);
             TfsQueryContext tfsqc = new TfsQueryContext(targetStore, Telemetry);
-            tfsqc.AddParameter("TeamProject", me.Target.Config.Project);
+            tfsqc.AddParameter("TeamProject", Engine.Target.Config.Project);
             tfsqc.Query = string.Format(@"SELECT [System.Id] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject  AND [System.AreaPath] UNDER '{0}\_DeleteMe'", me.Target.Config.Project);
             WorkItemCollection  workitems = tfsqc.Execute();
             Trace.WriteLine(string.Format("Update {0} work items?", workitems.Count));

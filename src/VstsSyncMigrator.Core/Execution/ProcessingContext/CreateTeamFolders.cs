@@ -38,17 +38,17 @@ namespace VstsSyncMigrator.Engine
            
         }
 
-        internal override void InternalExecute()
+        protected override void InternalExecute()
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 			//////////////////////////////////////////////////
-			WorkItemStoreContext targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules, Telemetry);
+			WorkItemStoreContext targetStore = new WorkItemStoreContext(Engine.Target, WorkItemStoreFlags.BypassRules, Telemetry);
 
             TfsQueryContext tfsqc = new TfsQueryContext(targetStore, Telemetry);
 
-            TfsTeamService teamService = me.Target.Collection.GetService<TfsTeamService>();
-            QueryHierarchy qh = targetStore.Store.Projects[me.Target.Config.Project].QueryHierarchy;
-            List<TeamFoundationTeam> teamList = teamService.QueryTeams(me.Target.Config.Project).ToList();
+            TfsTeamService teamService = Engine.Target.Collection.GetService<TfsTeamService>();
+            QueryHierarchy qh = targetStore.Store.Projects[Engine.Target.Config.Project].QueryHierarchy;
+            List<TeamFoundationTeam> teamList = teamService.QueryTeams(Engine.Target.Config.Project).ToList();
 
             Trace.WriteLine(string.Format("Found {0} teams?", teamList.Count));
             //////////////////////////////////////////////////

@@ -12,5 +12,11 @@ namespace MigrationTools.Core
         IMigrationClient Source { get;  }
 
         IMigrationClient Target { get;  }
+
+        ProcessorContainer Processors { get; }
+        TypeDefinitionMapContainer TypeDefinitionMaps { get; }
+        GitRepoMapContainer GitRepoMaps { get; }
+        ChangeSetMappingContainer ChangeSetMapps { get; }
+        FieldMapContainer FieldMaps { get; }
     }
 }

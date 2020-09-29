@@ -18,6 +18,8 @@ using Serilog;
 using VstsSyncMigrator.Core;
 using VstsSyncMigrator.Engine.ComponentContext;
 using WorkItem = Microsoft.TeamFoundation.WorkItemTracking.Client.WorkItem;
+using MigrationTools.Core;
+using MigrationTools.Core.Engine.Processors;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -53,7 +55,7 @@ namespace VstsSyncMigrator.Engine
         }
 
 
-        public TestPlandsAndSuitesMigrationContext(IServiceProvider services, ITelemetryLogger telemetry) : base(services, telemetry)
+        public TestPlandsAndSuitesMigrationContext(IMigrationEngine me, IServiceProvider services, ITelemetryLogger telemetry) : base(me, services, telemetry)
         {
         }
 
@@ -113,14 +115,14 @@ namespace VstsSyncMigrator.Engine
 
         protected override void InternalExecute()
         {
-            sourceWitStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.None, Telemetry);
-            sourceTestStore = new TestManagementContext(me.Source, config.TestPlanQueryBit);
-            targetWitStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules, Telemetry);
-            targetTestStore = new TestManagementContext(me.Target);
+            sourceWitStore = new WorkItemStoreContext(Engine.Source, WorkItemStoreFlags.None, Telemetry);
+            sourceTestStore = new TestManagementContext(Engine.Source, config.TestPlanQueryBit);
+            targetWitStore = new WorkItemStoreContext(Engine.Target, WorkItemStoreFlags.BypassRules, Telemetry);
+            targetTestStore = new TestManagementContext(Engine.Target);
             sourceTestConfigs = sourceTestStore.Project.TestConfigurations.Query("Select * From TestConfiguration");
             targetTestConfigs = targetTestStore.Project.TestConfigurations.Query("Select * From TestConfiguration");
-            sourceIdentityManagementService = me.Source.Collection.GetService<IIdentityManagementService>();
-            targetIdentityManagementService = me.Target.Collection.GetService<IIdentityManagementService>();
+            sourceIdentityManagementService = Engine.Source.Collection.GetService<IIdentityManagementService>();
+            targetIdentityManagementService = Engine.Target.Collection.GetService<IIdentityManagementService>();
 
             bool filterByCompleted = false;
 
@@ -280,7 +282,7 @@ namespace VstsSyncMigrator.Engine
         {
             var sourceWI = sourceWitStore.Store.GetWorkItem(sourceWIId);
             var targetWI = targetWitStore.Store.GetWorkItem(targetWIId);
-            targetWI.Fields[me.Target.Config.ReflectedWorkItemIDFieldName].Value = sourceWitStore.CreateReflectedWorkItemId(sourceWI);
+            targetWI.Fields[Engine.Target.Config.ReflectedWorkItemIDFieldName].Value = sourceWitStore.CreateReflectedWorkItemId(sourceWI);
             targetWI.Save();
         }
 
@@ -291,17 +293,17 @@ namespace VstsSyncMigrator.Engine
 
             if (config.PrefixProjectToNodes)
             {
-                targetWI.AreaPath = string.Format(@"{0}\{1}", me.Target.Config.Project, sourceWI.AreaPath);
-                targetWI.IterationPath = string.Format(@"{0}\{1}", me.Target.Config.Project, sourceWI.IterationPath);
+                targetWI.AreaPath = string.Format(@"{0}\{1}", Engine.Target.Config.Project, sourceWI.AreaPath);
+                targetWI.IterationPath = string.Format(@"{0}\{1}", Engine.Target.Config.Project, sourceWI.IterationPath);
             }
             else
             {
-                var regex = new Regex(Regex.Escape(me.Source.Config.Project));
-                targetWI.AreaPath = regex.Replace(sourceWI.AreaPath, me.Target.Config.Project, 1);
-                targetWI.IterationPath = regex.Replace(sourceWI.IterationPath, me.Target.Config.Project, 1);
+                var regex = new Regex(Regex.Escape(Engine.Source.Config.Project));
+                targetWI.AreaPath = regex.Replace(sourceWI.AreaPath, Engine.Target.Config.Project, 1);
+                targetWI.IterationPath = regex.Replace(sourceWI.IterationPath, Engine.Target.Config.Project, 1);
             }
 
-            me.FieldMaps.ApplyFieldMappings(sourceWI.ToWorkItemData(), targetWI.ToWorkItemData());
+            Engine.FieldMaps.ApplyFieldMappings(sourceWI.ToWorkItemData(), targetWI.ToWorkItemData());
 
             //validate if save operation will work and report issues if found
             ArrayList validationIssues = targetWI.Validate();
@@ -549,7 +551,7 @@ namespace VstsSyncMigrator.Engine
                     return;
 
                 TraceWriteLine(source, string.Format("    Processing {0} : {1} - {2} ", sourceTestCaseEntry.EntryType.ToString(), sourceTestCaseEntry.Id, sourceTestCaseEntry.Title), 15);
-                WorkItem wi = targetWitStore.FindReflectedWorkItem(sourceTestCaseEntry.TestCase.WorkItem, false, me.Source.Config.ReflectedWorkItemIDFieldName);
+                WorkItem wi = targetWitStore.FindReflectedWorkItem(sourceTestCaseEntry.TestCase.WorkItem, false, Engine.Source.Config.ReflectedWorkItemIDFieldName);
                 if (wi == null)
                 {
                     TraceWriteLine(source, string.Format("    Can't find work item for Test Case. Has it been migrated? {0} : {1} - {2} ", sourceTestCaseEntry.EntryType.ToString(), sourceTestCaseEntry.Id, sourceTestCaseEntry.Title), 15);
@@ -932,10 +934,10 @@ namespace VstsSyncMigrator.Engine
                 Log.Error(ex, " FAILED {TestSuiteType} : {Id} - {Title}",
                       new Dictionary<string, string> {
                           { "Name", Name},
-                          { "Target Project", me.Target.Config.Project},
-                          { "Target Collection", me.Target.Collection.Name },
-                          { "Source Project", me.Source.Config.Project},
-                          { "Source Collection", me.Source.Collection.Name },
+                          { "Target Project", Engine.Target.Config.Project},
+                          { "Target Collection", Engine.Target.Config.Collection.ToString() },
+                          { "Source Project", Engine.Source.Config.Project},
+                          { "Source Collection", Engine.Source.Config.Collection.ToString() },
                           { "Status", Status.ToString() },
                           { "Task", "SaveNewTestSuitToPlan" },
                           { "Id", newTestSuite.Id.ToString()},
@@ -984,8 +986,8 @@ namespace VstsSyncMigrator.Engine
 
             // Set area and iteration to root of the target project. 
             // We will set the correct values later, when we actually have a work item available
-            targetPlan.Iteration = me.Target.Config.Project;
-            targetPlan.AreaPath = me.Target.Config.Project;
+            targetPlan.Iteration = Engine.Target.Config.Project;
+            targetPlan.AreaPath = Engine.Target.Config.Project;
 
             // Remove testsettings reference because VSTS Sync doesn't support migrating these artifacts
             if (targetPlan.ManualTestSettingsId != 0)

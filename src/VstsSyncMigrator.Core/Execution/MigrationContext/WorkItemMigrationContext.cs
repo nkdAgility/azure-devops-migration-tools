@@ -27,6 +27,7 @@ using Serilog.Events;
 using VstsSyncMigrator.Core;
 using VstsSyncMigrator.Core.Execution.OMatics;
 using MigrationTools.Core.Engine.Processors;
+using MigrationTools.Core;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -51,11 +52,9 @@ namespace VstsSyncMigrator.Engine
         static int _totalWorkItem = 0;
         static string workItemLogTeamplate = "[{sourceWorkItemTypeName,20}][Complete:{currentWorkItem,6}/{totalWorkItems}][sid:{sourceWorkItemId,6}|Rev:{sourceRevisionInt,3}][tid:{targetWorkItemId,6} | ";
 
-        public WorkItemMigrationContext(IServiceProvider services, ITelemetryLogger telemetry)
-            : base(services, telemetry)
+        public WorkItemMigrationContext(IMigrationEngine me, IServiceProvider services, ITelemetryLogger telemetry) : base(me, services, telemetry)
         {
             contextLog = Log.ForContext<WorkItemMigrationContext>();
-            Telemetry = telemetry;
         }
 
         public override void Configure(IProcessorConfig config)
@@ -96,29 +95,27 @@ namespace VstsSyncMigrator.Engine
 
         public override string Name => "WorkItemMigration";
 
-        public ITelemetryLogger Telemetry { get; }
-
         protected override void InternalExecute()
         {
             if (_config == null)
             {
                 throw new Exception("You must call Configure() first");
             }
-            var workItemServer = me.Source.Collection.GetService<WorkItemServer>();
+            var workItemServer = Engine.Source.Collection.GetService<WorkItemServer>();
             attachmentEnricher = new AttachmentMigrationEnricher(workItemServer, _config.AttachmentWorkingPath, _config.AttachmentMaxSize);
             embededImagesEnricher = new EmbededImagesRepairEnricher();
-            repoOMatic = new RepoOMatic(me);
+            repoOMatic = new RepoOMatic(Engine);
             VssClientCredentials adoCreds = new VssClientCredentials();
-            _witClient = new WorkItemTrackingHttpClient(me.Target.Collection.Uri, adoCreds);
+            _witClient = new WorkItemTrackingHttpClient(Engine.Target.Config.Collection, adoCreds);
             //Validation: make sure that the ReflectedWorkItemId field name specified in the config exists in the target process, preferably on each work item type.
             ConfigValidation();
             PopulateIgnoreList();
 
             var stopwatch = Stopwatch.StartNew();
             //////////////////////////////////////////////////
-            var sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.BypassRules, Telemetry);
+            var sourceStore = new WorkItemStoreContext(Engine.Source, WorkItemStoreFlags.BypassRules, Telemetry);
             var tfsqc = new TfsQueryContext(sourceStore, Telemetry);
-            tfsqc.AddParameter("TeamProject", me.Source.Config.Project);
+            tfsqc.AddParameter("TeamProject", Engine.Source.Config.Project);
             tfsqc.Query =
                 string.Format(
                     @"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY {1}",
@@ -127,7 +124,7 @@ namespace VstsSyncMigrator.Engine
             var sourceWorkItems = (from WorkItem swi in sourceQueryResult select swi).ToList();
             contextLog.Information("Replay all revisions of {sourceWorkItemsCount} work items?", sourceWorkItems.Count);
             //////////////////////////////////////////////////
-            var targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules, Telemetry);
+            var targetStore = new WorkItemStoreContext(Engine.Target, WorkItemStoreFlags.BypassRules, Telemetry);
             var destProject = targetStore.GetProject();
             contextLog.Information("Found target project as {@destProject}", destProject.Name);
             //////////////////////////////////////////////////////////FilterCompletedByQuery
@@ -370,10 +367,10 @@ namespace VstsSyncMigrator.Engine
 
                 string finalDestType = last.Type.Name;
 
-                if (skipToFinalRevisedWorkItemType && me.TypeDefinitionMaps.Items.ContainsKey(finalDestType))
+                if (skipToFinalRevisedWorkItemType && Engine.TypeDefinitionMaps.Items.ContainsKey(finalDestType))
                 {
                     finalDestType =
-                       me.TypeDefinitionMaps.Items[finalDestType].Map();
+                       Engine.TypeDefinitionMaps.Items[finalDestType].Map();
                 }
 
                 //If work item hasn't been created yet, create a shell
@@ -417,10 +414,10 @@ namespace VstsSyncMigrator.Engine
 
                     // Decide on WIT
                     string destType = currentRevisionWorkItem.Type.Name;
-                    if (me.TypeDefinitionMaps.Items.ContainsKey(destType))
+                    if (Engine.TypeDefinitionMaps.Items.ContainsKey(destType))
                     {
                         destType =
-                           me.TypeDefinitionMaps.Items[destType].Map();
+                           Engine.TypeDefinitionMaps.Items[destType].Map();
                     }
 
                     //If the work item already exists and its type has changed, update its type. Done this way because there doesn't appear to be a way to do this through the store.
@@ -448,7 +445,7 @@ namespace VstsSyncMigrator.Engine
                     }
 
                     PopulateWorkItem(currentRevisionWorkItem, targetWorkItem, destType);
-                    me.FieldMaps.ApplyFieldMappings(currentRevisionWorkItem.ToWorkItemData(), targetWorkItem.ToWorkItemData());
+                    Engine.FieldMaps.ApplyFieldMappings(currentRevisionWorkItem.ToWorkItemData(), targetWorkItem.ToWorkItemData());
 
                     targetWorkItem.Fields["System.ChangedBy"].Value =
                         currentRevisionWorkItem.Revisions[revision.Index].Fields["System.ChangedBy"].Value;
@@ -495,10 +492,10 @@ namespace VstsSyncMigrator.Engine
                     ProcessWorkItemAttachments(sourceWorkItem, targetWorkItem, false);
                     ProcessWorkItemLinks(sourceStore, targetStore, sourceWorkItem, targetWorkItem);
                     string reflectedUri = sourceStore.CreateReflectedWorkItemId(sourceWorkItem);
-                    if (targetWorkItem.Fields.Contains(me.Target.Config.ReflectedWorkItemIDFieldName))
+                    if (targetWorkItem.Fields.Contains(Engine.Target.Config.ReflectedWorkItemIDFieldName))
                     {
 
-                        targetWorkItem.Fields[me.Target.Config.ReflectedWorkItemIDFieldName].Value = reflectedUri;
+                        targetWorkItem.Fields[Engine.Target.Config.ReflectedWorkItemIDFieldName].Value = reflectedUri;
                     }
                     var history = new StringBuilder();
                     history.Append(
@@ -608,11 +605,11 @@ namespace VstsSyncMigrator.Engine
         private List<WorkItem> FilterWorkItemsThatAlreadyExistInTarget(List<WorkItem> sourceWorkItems, WorkItemStoreContext targetStore)
         {
             var targetQuery = new TfsQueryContext(targetStore, Telemetry);
-            targetQuery.AddParameter("TeamProject", me.Target.Config.Project);
+            targetQuery.AddParameter("TeamProject", Engine.Target.Config.Project);
             targetQuery.Query =
                 string.Format(
                     @"SELECT [System.Id], [{0}] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {1} ORDER BY {2}",
-                     me.Target.Config.ReflectedWorkItemIDFieldName,
+                     Engine.Target.Config.ReflectedWorkItemIDFieldName,
                     _config.QueryBit,
                     _config.OrderBit
                     );
@@ -738,7 +735,7 @@ namespace VstsSyncMigrator.Engine
             if (targetWorkItem != null && _config.LinkMigration && sourceWorkItem.Links.Count > 0)
             {
                 TraceWriteLine(LogEventLevel.Information, "Links {SourceWorkItemLinkCount} | LinkMigrator:{LinkMigration}", new Dictionary<string, object>() { { "SourceWorkItemLinkCount", sourceWorkItem.Links.Count }, { "LinkMigration", _config.LinkMigration } });
-                workItemLinkOMatic.MigrateLinks(sourceWorkItem, sourceStore, targetWorkItem, targetStore, _config.LinkMigrationSaveEachAsAdded, _config.FilterWorkItemsThatAlreadyExistInTarget, me.Source.Config.ReflectedWorkItemIDFieldName);
+                workItemLinkOMatic.MigrateLinks(sourceWorkItem, sourceStore, targetWorkItem, targetStore, _config.LinkMigrationSaveEachAsAdded, _config.FilterWorkItemsThatAlreadyExistInTarget, Engine.Source.Config.ReflectedWorkItemIDFieldName);
                 AddMetric("RelatedLinkCount", processWorkItemMetrics, targetWorkItem.Links.Count);
                 int fixedLinkCount = repoOMatic.FixExternalLinks(targetWorkItem, targetStore, sourceWorkItem, _config.LinkMigrationSaveEachAsAdded);
                 AddMetric("FixedGitLinkCount", processWorkItemMetrics, fixedLinkCount);
@@ -761,14 +758,14 @@ namespace VstsSyncMigrator.Engine
         private void ConfigValidation()
         {
             //Make sure that the ReflectedWorkItemId field name specified in the config exists in the target process, preferably on each work item type
-            var fields = _witClient.GetFieldsAsync(me.Target.Config.Project).Result;
-            bool rwiidFieldExists = fields.Any(x => x.ReferenceName == me.Target.Config.ReflectedWorkItemIDFieldName || x.Name == me.Target.Config.ReflectedWorkItemIDFieldName);
+            var fields = _witClient.GetFieldsAsync(Engine.Target.Config.Project).Result;
+            bool rwiidFieldExists = fields.Any(x => x.ReferenceName == Engine.Target.Config.ReflectedWorkItemIDFieldName || x.Name == Engine.Target.Config.ReflectedWorkItemIDFieldName);
             contextLog.Information("Found {FieldsFoundCount} work item fields.", fields.Count.ToString("n0"));
             if (rwiidFieldExists)
-                contextLog.Information("Found '{ReflectedWorkItemIDFieldName}' in this project, proceeding.", me.Target.Config.ReflectedWorkItemIDFieldName);
+                contextLog.Information("Found '{ReflectedWorkItemIDFieldName}' in this project, proceeding.", Engine.Target.Config.ReflectedWorkItemIDFieldName);
             else
             {
-                contextLog.Information("Config file specifies '{ReflectedWorkItemIDFieldName}', which wasn't found.", me.Target.Config.ReflectedWorkItemIDFieldName);
+                contextLog.Information("Config file specifies '{ReflectedWorkItemIDFieldName}', which wasn't found.", Engine.Target.Config.ReflectedWorkItemIDFieldName);
                 contextLog.Information("Instead, found:");
                 foreach (var field in fields.OrderBy(x => x.Name))
                     contextLog.Information("{FieldType} - {FieldName} - {FieldRefName}", field.Type.ToString().PadLeft(15), field.Name.PadRight(20), field.ReferenceName ?? "");

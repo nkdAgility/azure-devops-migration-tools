@@ -43,7 +43,7 @@ namespace VstsSyncMigrator.Engine
 
         }
 
-        internal override void InternalExecute()
+        protected override void InternalExecute()
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 			//////////////////////////////////////////////////

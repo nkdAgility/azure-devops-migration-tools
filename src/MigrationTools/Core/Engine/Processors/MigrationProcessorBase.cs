@@ -16,11 +16,15 @@ namespace MigrationTools.Core.Engine.Processors
 {
     public abstract class MigrationProcessorBase : IProcessor
     {
-        protected IMigrationEngine me;
-        protected IServiceProvider _services;
+        internal IMigrationEngine _me;
+        internal IServiceProvider _services;
 
-        protected MigrationProcessorBase(IServiceProvider services, ITelemetryLogger telemetry)
+        public IMigrationEngine Engine { get { return _me; } }
+        public IServiceProvider Services { get { return _services; } }
+
+        protected MigrationProcessorBase(IMigrationEngine me, IServiceProvider services, ITelemetryLogger telemetry)
         {
+            _me = me;
             _services = services;
             Telemetry = telemetry;
         }
@@ -58,10 +62,10 @@ namespace MigrationTools.Core.Engine.Processors
                     new Dictionary<string, string>
                     {
                         {"Name", Name},
-                        {"Target Project", me.Target.Config.Project},
-                        {"Target Collection", me.Target.Config.Collection.ToString()},
-                        {"Source Project", me.Source.Config.Project},
-                        {"Source Collection", me.Source.Config.Collection.ToString()},
+                        {"Target Project", Engine.Target.Config.Project},
+                        {"Target Collection", Engine.Target.Config.Collection.ToString()},
+                        {"Source Project", Engine.Source.Config.Project},
+                        {"Source Collection", Engine.Source.Config.Collection.ToString()},
                         {"Status", Status.ToString()}
                     },
                     new Dictionary<string, double>
@@ -82,7 +86,7 @@ namespace MigrationTools.Core.Engine.Processors
         protected string NodeStructreSourceToTarget(string input)
         {
             //input = [sourceTeamProject]\[AreaPath]
-            return string.Format("{0}\\{1}", me.Target.Config.Project, input);
+            return string.Format("{0}\\{1}", Engine.Target.Config.Project, input);
             //Regex r = new Regex(source.Name, RegexOptions.IgnoreCase);
             //// Output = [targetTeamProject]\[sourceTeamProject]\[AreaPath]
             //return r.Replace(input, target.Name, 1);
@@ -91,9 +95,9 @@ namespace MigrationTools.Core.Engine.Processors
         protected string ReplaceFirstInstanceOf(string input)
         {
             //input = [sourceTeamProject]\[AreaPath]
-            var r = new Regex(me.Source.Config.Project, RegexOptions.IgnoreCase);
+            var r = new Regex(Engine.Source.Config.Project, RegexOptions.IgnoreCase);
             //// Output = [targetTeamProject]\[sourceTeamProject]\[AreaPath]
-            return r.Replace(input, me.Target.Config.Project, 1);
+            return r.Replace(input, Engine.Target.Config.Project, 1);
         }
 
         protected static void AddParameter(string name, IDictionary<string, string> store, string value)

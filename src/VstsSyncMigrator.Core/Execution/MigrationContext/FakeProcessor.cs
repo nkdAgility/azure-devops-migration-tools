@@ -12,6 +12,7 @@ using Microsoft.Extensions.Hosting;
 using MigrationTools.Core.Configuration;
 using MigrationTools;
 using MigrationTools.Core.Engine.Processors;
+using MigrationTools.Core;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -25,7 +26,7 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        public FakeProcessor(IServiceProvider services, ITelemetryLogger telemetry) : base(services, telemetry)
+        public FakeProcessor(IMigrationEngine me, IServiceProvider services, ITelemetryLogger telemetry) : base(me, services, telemetry)
         {
 
         }
@@ -35,9 +36,9 @@ namespace VstsSyncMigrator.Engine
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 			//////////////////////////////////////////////////
-			WorkItemStoreContext sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.None, Telemetry);
+			WorkItemStoreContext sourceStore = new WorkItemStoreContext(Engine.Source, WorkItemStoreFlags.None, Telemetry);
             TfsQueryContext tfsqc = new TfsQueryContext(sourceStore, Telemetry);
-            tfsqc.AddParameter("TeamProject", me.Source.Config.Project);
+            tfsqc.AddParameter("TeamProject", Engine.Source.Config.Project);
             tfsqc.Query = @"SELECT [System.Id] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject ";// AND [System.Id] = 188708 ";
             WorkItemCollection sourceWIS = tfsqc.Execute();
             Trace.WriteLine(string.Format("Migrate {0} work items?", sourceWIS.Count));

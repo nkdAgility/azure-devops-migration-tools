@@ -42,11 +42,11 @@ namespace VstsSyncMigrator.Engine
         public override void Configure(IProcessorConfig config)
         {
             //http://www.codeproject.com/Articles/18102/Howto-Almost-Everything-In-Active-Directory-via-C
-            ims2 = (IIdentityManagementService2)me.Target.Collection.GetService(typeof(IIdentityManagementService2));
+            ims2 = (IIdentityManagementService2)Engine.Target.Collection.GetService(typeof(IIdentityManagementService2));
             this.config = (ExportProfilePictureFromADConfig)config;
         }
 
-        internal override void InternalExecute()
+        protected override void InternalExecute()
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 			//////////////////////////////////////////////////

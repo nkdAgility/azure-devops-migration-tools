@@ -9,6 +9,7 @@ using MigrationTools.Core.Configuration;
 using Microsoft.ApplicationInsights.Channel;
 using MigrationTools;
 using MigrationTools.Core.Engine.Processors;
+using MigrationTools.Core;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -24,15 +25,15 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        public TestConfigurationsMigrationContext(IServiceProvider services, ITelemetryLogger telemetry) : base(services, telemetry)
+        public TestConfigurationsMigrationContext(IMigrationEngine me, IServiceProvider services, ITelemetryLogger telemetry) : base(me, services, telemetry)
         {
 
         }
 
         protected override void InternalExecute()
         {
-            TestManagementContext SourceTmc = new TestManagementContext(me.Source);
-            TestManagementContext targetTmc = new TestManagementContext(me.Target);
+            TestManagementContext SourceTmc = new TestManagementContext(Engine.Source);
+            TestManagementContext targetTmc = new TestManagementContext(Engine.Target);
 
             ITestConfigurationCollection tc = SourceTmc.Project.TestConfigurations.Query("Select * From TestConfiguration");
             Trace.WriteLine($"Plan to copy {tc.Count} Configurations", Name);
@@ -50,7 +51,7 @@ namespace VstsSyncMigrator.Engine
                 {
                     Trace.WriteLine($"{sourceTestConf.Name} - Create new", Name);
                     targetTc = targetTmc.Project.TestConfigurations.Create();
-                    targetTc.AreaPath = sourceTestConf.AreaPath.Replace(me.Source.Config.Project, me.Target.Config.Project);
+                    targetTc.AreaPath = sourceTestConf.AreaPath.Replace(Engine.Source.Config.Project, Engine.Target.Config.Project);
                     targetTc.Description = sourceTestConf.Description;
                     targetTc.IsDefault = sourceTestConf.IsDefault;
                     targetTc.Name = sourceTestConf.Name;

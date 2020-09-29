@@ -13,6 +13,7 @@ using MigrationTools.Core.Configuration;
 using MigrationTools;
 using MigrationTools.Clients.AzureDevops.ObjectModel;
 using MigrationTools.Core.Engine.Processors;
+using MigrationTools.Core;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -24,7 +25,7 @@ namespace VstsSyncMigrator.Engine
         //private IList<int> _workItemIDs;
         // private string _queryBit;
 
-        public WorkItemPostProcessingContext(IServiceProvider services, ITelemetryLogger telemetry) : base(services, telemetry)
+        public WorkItemPostProcessingContext(IMigrationEngine me, IServiceProvider services, ITelemetryLogger telemetry) : base(me, services, telemetry)
         {
         }
 

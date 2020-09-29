@@ -39,16 +39,16 @@ namespace VstsSyncMigrator.Engine
         public override void Configure(IProcessorConfig config)
         {
             _config = (FixGitCommitLinksConfig)config;
-            _RepoOMatic = new RepoOMatic(me);
+            _RepoOMatic = new RepoOMatic(Engine);
         }
 
-        internal override void InternalExecute()
+        protected override void InternalExecute()
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 			//////////////////////////////////////////////////
-            WorkItemStoreContext targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules, Telemetry);
+            WorkItemStoreContext targetStore = new WorkItemStoreContext(Engine.Target, WorkItemStoreFlags.BypassRules, Telemetry);
             var targetQuery = new TfsQueryContext(targetStore, Telemetry);
-            targetQuery.AddParameter("TeamProject", me.Target.Config.Project);
+            targetQuery.AddParameter("TeamProject", Engine.Target.Config.Project);
             targetQuery.Query =
                 string.Format(
                     @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY {1}",
