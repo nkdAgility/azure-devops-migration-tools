@@ -6,7 +6,7 @@ using System.Text;
 
 namespace MigrationTools.Services
 {
-    public class TestTelemetryLogger : ITelemetryLogger
+    public class TelemetryLoggerMock : ITelemetryLogger
     {
         public bool EnableTrace { get; set; }
 
