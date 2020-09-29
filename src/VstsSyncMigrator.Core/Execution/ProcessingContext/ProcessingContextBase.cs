@@ -13,10 +13,11 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Microsoft.ApplicationInsights.DataContracts;
+using MigrationTools.Core.Engine.Containers;
 
 namespace VstsSyncMigrator.Engine
 {
-    public abstract class ProcessingContextBase : ITfsProcessingContext
+    public abstract class ProcessingContextBase : IProcessor
     {
         internal MigrationEngine me;
         ProcessingStatus status = ProcessingStatus.None;
@@ -31,7 +32,7 @@ namespace VstsSyncMigrator.Engine
             Telemetry = telemetry;
         }
 
-        public abstract void Configure(ITfsProcessingConfig config);
+        public abstract void Configure(IProcessorConfig config);
 
         public abstract string Name { get; }
 

@@ -11,10 +11,10 @@ using System.Text;
 
 namespace MigrationTools.Core.Engine.Containers
 {
-    public class ProcessorContainer : EngineContainer<ReadOnlyCollection<ITfsProcessingContext>>
+    public class ProcessorContainer : EngineContainer<ReadOnlyCollection<IProcessor>>
     {
-        List<ITfsProcessingContext> _Processors = new List<ITfsProcessingContext>();
-        public override ReadOnlyCollection<ITfsProcessingContext> Items { get { return _Processors.AsReadOnly(); } }
+        List<IProcessor> _Processors = new List<IProcessor>();
+        public override ReadOnlyCollection<IProcessor> Items { get { return _Processors.AsReadOnly(); } }
         public int Count { get { return _Processors.Count; } }
 
         public ProcessorContainer(IServiceProvider services, EngineConfiguration config) : base(services, config)
@@ -26,7 +26,7 @@ namespace MigrationTools.Core.Engine.Containers
             if (Config.Processors != null)
             {
                 var enabledProcessors = Config.Processors.Where(x => x.Enabled).ToList();
-                foreach (ITfsProcessingConfig processorConfig in enabledProcessors)
+                foreach (IProcessorConfig processorConfig in enabledProcessors)
                 {
                     if (processorConfig.IsProcessorCompatible(enabledProcessors))
                     {
@@ -44,9 +44,8 @@ namespace MigrationTools.Core.Engine.Containers
                             throw new Exception("Type " + typePattern + " not found.");
                         }
 
-                        ITfsProcessingContext pc = (ITfsProcessingContext)Services.GetService(type);
+                        IProcessor pc = (IProcessor)Services.GetRequiredService(type);
                         pc.Configure(processorConfig);
-                        // ITfsProcessingContext pc = (ITfsProcessingContext)Activator.CreateInstance(type, Host, processorConfig);
                          _Processors.Add(pc);
                     }
                     else

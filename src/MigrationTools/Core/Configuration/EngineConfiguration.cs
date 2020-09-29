@@ -19,7 +19,7 @@ namespace MigrationTools.Core.Configuration
         public override List<IFieldMapConfig> FieldMaps { get { return _engineConfiguration.FieldMaps; } set { _engineConfiguration.FieldMaps = value; } }
         public override Dictionary<string, string> WorkItemTypeDefinition { get { return _engineConfiguration.WorkItemTypeDefinition; } set { _engineConfiguration.WorkItemTypeDefinition = value; } }
         public override Dictionary<string, string> GitRepoMapping { get { return _engineConfiguration.GitRepoMapping; } set { _engineConfiguration.GitRepoMapping = value; } }
-        public override List<ITfsProcessingConfig> Processors { get { return _engineConfiguration.Processors; } set { _engineConfiguration.Processors = value; } }
+        public override List<IProcessorConfig> Processors { get { return _engineConfiguration.Processors; } set { _engineConfiguration.Processors = value; } }
 
         public EngineConfigurationWrapper(IEngineConfigurationBuilder engineConfigurationBuilder, ExecuteOptions opts, ILogger<EngineConfigurationWrapper> logger)
         {
@@ -52,7 +52,7 @@ namespace MigrationTools.Core.Configuration
         public virtual List<IFieldMapConfig> FieldMaps { get; set; }
         public virtual Dictionary<string, string> WorkItemTypeDefinition { get; set; }
         public virtual Dictionary<string, string> GitRepoMapping { get; set; }
-        public virtual List<ITfsProcessingConfig> Processors { get; set; }
+        public virtual List<IProcessorConfig> Processors { get; set; }
 
     }
 }

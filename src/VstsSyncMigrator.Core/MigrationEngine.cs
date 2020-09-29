@@ -98,7 +98,7 @@ namespace VstsSyncMigrator.Engine
             Stopwatch engineTimer = Stopwatch.StartNew();
 			ProcessingStatus ps = ProcessingStatus.Complete;
             Log.Information("Beginning run of {ProcessorCount} processors", Processors.Count.ToString());
-            foreach (ITfsProcessingContext process in Processors.Items)
+            foreach (IProcessor process in Processors.Items)
             {
                 Log.Information("Processor: {ProcessorName}", process.Name);
                 Stopwatch processorTimer = Stopwatch.StartNew();

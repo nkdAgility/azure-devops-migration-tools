@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace MigrationTools.Core.Configuration
 {
-    public class ProcessorConfigJsonConverter : JsonCreationConverter<ITfsProcessingConfig>
+    public class ProcessorConfigJsonConverter : JsonCreationConverter<IProcessorConfig>
     {
-        protected override ITfsProcessingConfig Create(Type objectType, JObject jObject)
+        protected override IProcessorConfig Create(Type objectType, JObject jObject)
         {
             if (FieldExists("ObjectType", jObject))
             {
@@ -19,7 +19,7 @@ namespace MigrationTools.Core.Configuration
                   .Where(a => !a.IsDynamic)
                   .SelectMany(a => a.GetTypes())
                   .FirstOrDefault(t => t.Name.Equals(typename) || t.FullName.Equals(typename));
-                return (ITfsProcessingConfig)Activator.CreateInstance(type);
+                return (IProcessorConfig)Activator.CreateInstance(type);
             }
             else
             {

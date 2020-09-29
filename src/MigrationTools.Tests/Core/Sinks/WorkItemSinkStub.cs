@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MigrationTools.Core.Sinks.Tests
+namespace MigrationTools.Core.Clients.Tests
 {
-    class WorkItemSinkStub : IWorkItemMigrationSink
+    class WorkItemSinkStub : IWorkItemMigrationClients
     {
         List<WorkItemData> list = new List<WorkItemData>();
 

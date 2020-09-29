@@ -18,8 +18,8 @@ using MigrationTools;
 using MigrationTools.Core.Configuration;
 using MigrationTools.Core.Configuration.Processing;
 using MigrationTools.Core.Engine.Enrichers;
-using MigrationTools.Sinks.TfsObjectModel;
-using MigrationTools.Sinks.TfsObjectModel.Enrichers;
+using MigrationTools.Clients.AzureDevops.ObjectModel;
+using MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers;
 using Newtonsoft.Json;
 using Serilog;
 using Serilog.Context;
@@ -57,7 +57,7 @@ namespace VstsSyncMigrator.Engine
             Telemetry = telemetry;
         }
 
-        public override void Configure(ITfsProcessingConfig config)
+        public override void Configure(IProcessorConfig config)
         {
             _config = (WorkItemMigrationConfig)config;
 

@@ -11,7 +11,7 @@ using MigrationTools.Core.Configuration.Processing;
 using MigrationTools.Core.Configuration;
 using Microsoft.Extensions.Hosting;
 using MigrationTools;
-using MigrationTools.Sinks.TfsObjectModel;
+using MigrationTools.Clients.AzureDevops.ObjectModel;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -24,7 +24,7 @@ namespace VstsSyncMigrator.Engine
             
         }
 
-        public override void Configure(ITfsProcessingConfig config)
+        public override void Configure(IProcessorConfig config)
         {
             _config = (WorkItemUpdateConfig) config;
         }

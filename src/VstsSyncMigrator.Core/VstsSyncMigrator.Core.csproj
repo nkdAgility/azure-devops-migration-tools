@@ -6,6 +6,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Execution\FieldMaps\**" />
+    <EmbeddedResource Remove="Execution\FieldMaps\**" />
+    <None Remove="Execution\FieldMaps\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="Execution\MigrationContext\ExcelMigrationContext.cs" />
   </ItemGroup>
 
@@ -21,7 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MigrationTools.Sinks.TfsObjectModel\MigrationTools.Sinks.TfsObjectModel.csproj" />
+    <ProjectReference Include="..\MigrationTools.Clients.AzureDevops.ObjectModel\MigrationTools.Clients.AzureDevops.ObjectModel.csproj" />
     <ProjectReference Include="..\MigrationTools\MigrationTools.csproj" />
   </ItemGroup>
 
@@ -31,7 +37,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Execution\FieldMaps\" />
+    <Folder Include="Execution\Exceptions\" />
   </ItemGroup>
 
 </Project>

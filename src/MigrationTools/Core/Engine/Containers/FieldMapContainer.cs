@@ -54,6 +54,10 @@ namespace MigrationTools.Core.Engine.Containers
 
         public void AddFieldMap(string workItemTypeName, IFieldMap fieldToTagFieldMap)
         {
+            if (string.IsNullOrEmpty(workItemTypeName))
+            {
+                throw new IndexOutOfRangeException("workItemTypeName on all fieldmaps must be set to at least '*'.");
+            }
             if (!fieldMapps.ContainsKey(workItemTypeName))
             {
                 fieldMapps.Add(workItemTypeName, new List<IFieldMap>());

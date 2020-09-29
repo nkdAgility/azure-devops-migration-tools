@@ -74,7 +74,7 @@ namespace VstsSyncMigrator.Engine
             return tch.Query("Select * From TestConfiguration").FirstOrDefault(variable => string.Equals(variable.Name, configToFind, StringComparison.OrdinalIgnoreCase));
         }
 
-        public override void Configure(ITfsProcessingConfig config)
+        public override void Configure(IProcessorConfig config)
         {
            
         }

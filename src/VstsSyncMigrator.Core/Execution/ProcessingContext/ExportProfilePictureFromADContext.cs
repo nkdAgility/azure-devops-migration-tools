@@ -38,7 +38,7 @@ namespace VstsSyncMigrator.Engine
 
         }
 
-        public override void Configure(ITfsProcessingConfig config)
+        public override void Configure(IProcessorConfig config)
         {
             //http://www.codeproject.com/Articles/18102/Howto-Almost-Everything-In-Active-Directory-via-C
             ims2 = (IIdentityManagementService2)me.Target.Collection.GetService(typeof(IIdentityManagementService2));

@@ -8,7 +8,7 @@ using MigrationTools.CommandLine;
 using MigrationTools.Core.Configuration;
 using MigrationTools.Core.Engine.Containers;
 using MigrationTools.Services;
-using MigrationTools.Sinks.TfsObjectModel.FieldMaps;
+using MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps;
 using VstsSyncMigrator.Engine;
 
 namespace _VstsSyncMigrator.Engine.Tests
@@ -55,7 +55,7 @@ namespace _VstsSyncMigrator.Engine.Tests
             services.AddSingleton<IEngineConfigurationBuilder, EngineConfigurationBuilder>();
             services.AddSingleton<EngineConfiguration>(ecb.BuildDefault());
             services.AddSingleton<TelemetryClient>(new TelemetryClient());
-            services.AddSingleton<ITelemetryLogger, TestTelemetryLogger>();
+            services.AddSingleton<ITelemetryLogger, TelemetryLoggerMock>();
             services.AddSingleton<MigrationEngine>();
 
             services.AddSingleton<ExecuteOptions>((p) => null);

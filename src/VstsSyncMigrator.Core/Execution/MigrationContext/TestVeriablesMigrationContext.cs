@@ -91,7 +91,7 @@ namespace VstsSyncMigrator.Engine
                 variable => string.Equals(variable.Value, valueToFind, StringComparison.OrdinalIgnoreCase));
         }
 
-        public override void Configure(ITfsProcessingConfig config)
+        public override void Configure(IProcessorConfig config)
         {
             
         }

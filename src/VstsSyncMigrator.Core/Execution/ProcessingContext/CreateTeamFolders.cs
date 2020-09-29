@@ -31,7 +31,7 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        public override void Configure(ITfsProcessingConfig config)
+        public override void Configure(IProcessorConfig config)
         {
            
         }

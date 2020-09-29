@@ -2,9 +2,9 @@
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using MigrationTools.Core.Exceptions;
 using Serilog;
 using VstsSyncMigrator.Engine;
-using VstsSyncMigrator.Engine.Execution.Exceptions;
 
 namespace VstsSyncMigrator.Core.Execution.OMatics
 {

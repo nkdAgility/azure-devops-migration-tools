@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace MigrationTools.Core.Configuration.Processing
 {
-    public class TestVariablesMigrationConfig : ITfsProcessingConfig
+    public class TestVariablesMigrationConfig : IProcessorConfig
     {
         /// <inheritdoc />
         public bool Enabled { get; set; }
@@ -15,7 +15,7 @@ namespace MigrationTools.Core.Configuration.Processing
         }
 
         /// <inheritdoc />
-        public bool IsProcessorCompatible(IReadOnlyList<ITfsProcessingConfig> otherProcessors)
+        public bool IsProcessorCompatible(IReadOnlyList<IProcessorConfig> otherProcessors)
         {
             return true;
         }

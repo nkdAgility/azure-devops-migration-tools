@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace MigrationTools.Core.Configuration.Processing
 {
-    public class ExportProfilePictureFromADConfig : ITfsProcessingConfig
+    public class ExportProfilePictureFromADConfig : IProcessorConfig
     {
         public string Domain { get; set; }
         public string Username { get; set; }
@@ -19,7 +19,7 @@ namespace MigrationTools.Core.Configuration.Processing
         }
 
         /// <inheritdoc />
-        public bool IsProcessorCompatible(IReadOnlyList<ITfsProcessingConfig> otherProcessors)
+        public bool IsProcessorCompatible(IReadOnlyList<IProcessorConfig> otherProcessors)
         {
             return true;
         }

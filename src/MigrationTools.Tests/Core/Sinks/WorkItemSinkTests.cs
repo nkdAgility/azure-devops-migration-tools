@@ -1,12 +1,12 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools.Core.DataContracts;
-using MigrationTools.Core.Sinks;
+using MigrationTools.Core.Clients;
 using System;
 using System.Text;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 
-namespace MigrationTools.Core.Sinks.Tests
+namespace MigrationTools.Core.Clients.Tests
 {
     [TestClass()]
     public class WorkItemSinkTests
@@ -14,7 +14,7 @@ namespace MigrationTools.Core.Sinks.Tests
         [TestMethod()]
         public void TestGetWorkItems()
         {
-            IWorkItemMigrationSink sink = new WorkItemSinkStub();
+            IWorkItemMigrationClients sink = new WorkItemSinkStub();
             var list = sink.GetWorkItems();
             //
             Assert.IsTrue(list.Count() == 5);
@@ -23,7 +23,7 @@ namespace MigrationTools.Core.Sinks.Tests
         [TestMethod()]
         public void TestPersistNewWorkItem()
         {
-            IWorkItemMigrationSink sink = new WorkItemSinkStub();
+            IWorkItemMigrationClients sink = new WorkItemSinkStub();
             sink.PersistWorkItem(new WorkItemData { Title = "Item 6" });
             //
             var list = sink.GetWorkItems();
@@ -33,7 +33,7 @@ namespace MigrationTools.Core.Sinks.Tests
         [TestMethod()]
         public void TestpersistExistingItem()
         {
-            IWorkItemMigrationSink sink = new WorkItemSinkStub();
+            IWorkItemMigrationClients sink = new WorkItemSinkStub();
             var workItem = sink.GetWorkItems().First();
             workItem.Title = "New Title";
             sink.PersistWorkItem(workItem);

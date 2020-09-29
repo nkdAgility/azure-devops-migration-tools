@@ -13,7 +13,7 @@ using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools;
 using MigrationTools.Core.Configuration;
 using MigrationTools.Core.Configuration.Processing;
-using MigrationTools.Sinks.TfsObjectModel;
+using MigrationTools.Clients.AzureDevops.ObjectModel;
 using Serilog;
 using VstsSyncMigrator.Core;
 using VstsSyncMigrator.Engine.ComponentContext;
@@ -57,7 +57,7 @@ namespace VstsSyncMigrator.Engine
         {
         }
 
-        public override void Configure(ITfsProcessingConfig configx)
+        public override void Configure(IProcessorConfig configx)
         {
             config = (TestPlansAndSuitesMigrationConfig)configx;
         }

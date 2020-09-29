@@ -77,7 +77,7 @@ namespace MigrationTools.Core.Configuration
             ec.Processors.Add(new WorkItemMigrationConfig());
         }
 
-        private EngineConfiguration CreateEmptyConfig()
+        public EngineConfiguration CreateEmptyConfig()
         {
             EngineConfiguration ec = new EngineConfiguration();
             ec.TelemetryEnableTrace = false;
@@ -104,7 +104,7 @@ namespace MigrationTools.Core.Configuration
             ec.WorkItemTypeDefinition = new Dictionary<string, string> {
                     { "sourceWorkItemTypeName", "targetWorkItemTypeName" }
             };
-            ec.Processors = new List<ITfsProcessingConfig>();
+            ec.Processors = new List<IProcessorConfig>();
             return ec;
         }
 
