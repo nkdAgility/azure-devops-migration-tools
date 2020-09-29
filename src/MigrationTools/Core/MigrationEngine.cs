@@ -97,7 +97,15 @@ namespace MigrationTools.Core
                     { "Mappings", FieldMaps.Count }
                 });
             Stopwatch engineTimer = Stopwatch.StartNew();
-			ProcessingStatus ps = ProcessingStatus.Complete;
+
+			ProcessingStatus ps = ProcessingStatus.Running;
+
+            Processors.EnsureConfigured();
+            TypeDefinitionMaps.EnsureConfigured();
+            GitRepoMaps.EnsureConfigured();
+            ChangeSetMapps.EnsureConfigured();
+            FieldMaps.EnsureConfigured();
+
             Log.Information("Beginning run of {ProcessorCount} processors", Processors.Count.ToString());
             foreach (IProcessor process in Processors.Items)
             {

@@ -22,7 +22,6 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
         private TeamProjectConfig _config;
         private NetworkCredential _credentials;
 
-        private readonly IMigrationEngine _Me;
         private readonly IServiceProvider _Services;
         private readonly ITelemetryLogger _Telemetry;
 
@@ -34,10 +33,9 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
             }
         }
 
-
-        public MigrationOMClient(IMigrationEngine me, IServiceProvider services, ITelemetryLogger telemetry)
+        // if you add Migration Engine in here you will have to fix the infinate loop
+        public MigrationOMClient(IServiceProvider services, ITelemetryLogger telemetry)
         {
-            _Me = me;
             _Services = services;
             _Telemetry = telemetry;
         }

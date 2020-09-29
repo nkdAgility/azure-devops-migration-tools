@@ -2,6 +2,7 @@
 using MigrationTools.Core.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -11,12 +12,17 @@ namespace MigrationTools.Core.Engine.Containers
     {
         private readonly IServiceProvider _services;
         private readonly EngineConfiguration _Config;
+        private bool _configured = false;
 
         public abstract TItemType Items
         { get; }
 
         public static implicit operator TItemType(EngineContainer<TItemType> ecType)
         {
+            if (!ecType._configured)
+            {
+                throw new Exception($"You must call EnsureConfigured(); on {ecType.GetType().Name}");
+            }
             return ecType.Items;
         }
 
@@ -35,8 +41,16 @@ namespace MigrationTools.Core.Engine.Containers
         {
             _services = services;
             _Config = config;
-            Configure();
         }
         protected abstract void Configure();
+
+        public void EnsureConfigured()
+        {
+            if (!_configured)
+            {
+                Configure();
+                _configured = true;
+            }
+        }
     }
 }
