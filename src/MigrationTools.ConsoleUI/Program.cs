@@ -3,8 +3,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MigrationTools.Core.Engine;
 using MigrationTools.Host;
-using MigrationTools.Sinks.AzureDevOps;
-using MigrationTools.Sinks.AzureDevOps.FieldMaps;
+using MigrationTools.Clients.AzureDevops.Rest;
+using MigrationTools.Clients.AzureDevops.Rest.FieldMaps;
 
 namespace MigrationTools.ConsoleUI
 {

@@ -11,7 +11,7 @@ using MigrationTools.Core.Configuration.Processing;
 using Microsoft.Extensions.Hosting;
 using MigrationTools.Core.Configuration;
 using MigrationTools;
-using MigrationTools.Sinks.TfsObjectModel;
+using MigrationTools.Clients.AzureDevops.ObjectModel;
 
 namespace VstsSyncMigrator.Engine
 {

@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MigrationTools;
 using MigrationTools.Host;
-using MigrationTools.Sinks.TfsObjectModel.FieldMaps;
+using MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps;
 using VstsSyncMigrator.Engine;
 
 namespace VstsSyncMigrator.ConsoleApp

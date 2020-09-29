@@ -79,15 +79,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.ConsoleUI", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{5C05DA7B-B70F-4A87-920B-DCD14EA7670D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Sinks.AzureDevOps", "src\MigrationTools.Sinks.AzureDevOps\MigrationTools.Sinks.AzureDevOps.csproj", "{7CE6D8B2-920C-43F6-95E8-F2682B029DB8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Clients.AzureDevops.Rest", "src\MigrationTools.Clients.AzureDevops.Rest\MigrationTools.Clients.AzureDevops.Rest.csproj", "{7CE6D8B2-920C-43F6-95E8-F2682B029DB8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools", "src\MigrationTools\MigrationTools.csproj", "{EBDB3038-9081-41B5-B82A-D0BC8F96859F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Sinks.FileSystem", "src\MigrationTools.Sinks.FileSystem\MigrationTools.Sinks.FileSystem.csproj", "{6F97F030-162D-49BF-A45C-1CF12E7ABA88}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Clients.FileSystem", "src\MigrationTools.Clients.FileSystem\MigrationTools.Clients.FileSystem.csproj", "{6F97F030-162D-49BF-A45C-1CF12E7ABA88}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Tests", "src\MigrationTools.Tests\MigrationTools.Tests.csproj", "{A679B3FF-1355-455F-853F-433A9CB1BE60}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Sinks.TfsObjectModel", "src\MigrationTools.Sinks.TfsObjectModel\MigrationTools.Sinks.TfsObjectModel.csproj", "{D58EEDFA-D74C-4E84-9C26-6D69521382FD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Clients.AzureDevops.ObjectModel", "src\MigrationTools.Clients.AzureDevops.ObjectModel\MigrationTools.Clients.AzureDevops.ObjectModel.csproj", "{D58EEDFA-D74C-4E84-9C26-6D69521382FD}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RestAPI", "RestAPI", "{57DC27F4-CB74-43B3-B2CE-78CDE320F74F}"
 EndProject

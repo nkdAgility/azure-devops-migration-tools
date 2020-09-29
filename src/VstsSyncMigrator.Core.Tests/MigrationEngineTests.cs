@@ -8,7 +8,7 @@ using MigrationTools.CommandLine;
 using MigrationTools.Core.Configuration;
 using MigrationTools.Core.Engine.Containers;
 using MigrationTools.Services;
-using MigrationTools.Sinks.TfsObjectModel.FieldMaps;
+using MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps;
 using VstsSyncMigrator.Engine;
 
 namespace _VstsSyncMigrator.Engine.Tests
