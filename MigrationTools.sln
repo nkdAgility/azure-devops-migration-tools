@@ -9,18 +9,18 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VstsSyncMigrator.Core", "sr
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Chocolatey", "Chocolatey", "{89434800-3004-4621-8677-C14C1D1AA4AF}"
 	ProjectSection(SolutionItems) = preProject
-		src\VstsSyncMigrator.Chocolatey\chocolateyInstall.ps1 = src\VstsSyncMigrator.Chocolatey\chocolateyInstall.ps1
-		src\VstsSyncMigrator.Chocolatey\chocolateyUninstall.ps1 = src\VstsSyncMigrator.Chocolatey\chocolateyUninstall.ps1
-		src\VstsSyncMigrator.Chocolatey\vstssyncmigration.nuspec = src\VstsSyncMigrator.Chocolatey\vstssyncmigration.nuspec
+		src\MigrationTools.Chocolatey\chocolateyInstall.ps1 = src\MigrationTools.Chocolatey\chocolateyInstall.ps1
+		src\MigrationTools.Chocolatey\chocolateyUninstall.ps1 = src\MigrationTools.Chocolatey\chocolateyUninstall.ps1
+		src\MigrationTools.Chocolatey\vstssyncmigration.nuspec = src\MigrationTools.Chocolatey\vstssyncmigration.nuspec
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VstsSyncMigrator.Core.Tests", "src\VstsSyncMigrator.Core.Tests\VstsSyncMigrator.Core.Tests.csproj", "{AB3922F0-E801-474A-A498-892C3EA99799}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extension", "Extension", "{243265E4-0E5A-4E95-BE7C-B92B7666FF79}"
 	ProjectSection(SolutionItems) = preProject
-		src\VstsSyncMigrator.Extension\LICENSE.txt = src\VstsSyncMigrator.Extension\LICENSE.txt
-		src\VstsSyncMigrator.Extension\README.md = src\VstsSyncMigrator.Extension\README.md
-		src\VstsSyncMigrator.Extension\vss-extension.json = src\VstsSyncMigrator.Extension\vss-extension.json
+		src\MigrationTools.Extension\LICENSE.txt = src\MigrationTools.Extension\LICENSE.txt
+		src\MigrationTools.Extension\README.md = src\MigrationTools.Extension\README.md
+		src\MigrationTools.Extension\vss-extension.json = src\MigrationTools.Extension\vss-extension.json
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{2BC0808B-6F4D-4635-82FE-1118181DD64F}"
@@ -64,9 +64,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Processors", "Processors", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "images", "images", "{F29B9C2E-7EE3-49A5-8341-1277FA8BE0DB}"
 	ProjectSection(SolutionItems) = preProject
-		src\VstsSyncMigrator.Extension\images\azure-devops-migration-tools-naked-agility-martin-hinshelwood.png = src\VstsSyncMigrator.Extension\images\azure-devops-migration-tools-naked-agility-martin-hinshelwood.png
-		src\VstsSyncMigrator.Extension\images\extension-icon.png = src\VstsSyncMigrator.Extension\images\extension-icon.png
-		src\VstsSyncMigrator.Extension\images\screenshot-01.png = src\VstsSyncMigrator.Extension\images\screenshot-01.png
+		src\MigrationTools.Extension\images\azure-devops-migration-tools-naked-agility-martin-hinshelwood.png = src\MigrationTools.Extension\images\azure-devops-migration-tools-naked-agility-martin-hinshelwood.png
+		src\MigrationTools.Extension\images\extension-icon.png = src\MigrationTools.Extension\images\extension-icon.png
+		src\MigrationTools.Extension\images\screenshot-01.png = src\MigrationTools.Extension\images\screenshot-01.png
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Distribution", "Distribution", "{32E2956A-9056-4D9D-8018-14DFD0E6CA41}"

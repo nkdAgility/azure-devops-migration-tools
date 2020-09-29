@@ -32,7 +32,7 @@ namespace MigrationTools.Core.Configuration.Processing
 
         public bool FilterWorkItemsThatAlreadyExistInTarget { get; set; }
         public bool PauseAfterEachWorkItem { get; set; }
-        public int AttachmentMazSize { get; set; }
+        public int AttachmentMaxSize { get; set; }
         public bool CollapseRevisions { get; set; }
         public bool LinkMigrationSaveEachAsAdded { get; set; }
 
@@ -55,7 +55,7 @@ namespace MigrationTools.Core.Configuration.Processing
             AttachmentMigration = true;
             FixHtmlAttachmentLinks = false;
             AttachmentWorkingPath = "c:\\temp\\WorkItemAttachmentWorkingFolder\\";
-            AttachmentMazSize = 480000000;
+            AttachmentMaxSize = 480000000;
             UpdateCreatedBy = true;
             PrefixProjectToNodes = false;
             UpdateCreatedDate = true;
