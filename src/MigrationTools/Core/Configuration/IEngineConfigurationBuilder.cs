@@ -9,6 +9,7 @@ namespace MigrationTools.Core.Configuration
         EngineConfiguration BuildFromFile(string configFile = "configuration.json");
         EngineConfiguration BuildDefault();
         EngineConfiguration BuildWorkItemMigration();
+        EngineConfiguration CreateEmptyConfig();
 
     }
 }

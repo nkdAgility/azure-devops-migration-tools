@@ -25,5 +25,10 @@ namespace MigrationTools.Core.Configuration.Tests
         {
             return ecb.BuildWorkItemMigration();
         }
+
+        public EngineConfiguration CreateEmptyConfig()
+        {
+            return ecb.CreateEmptyConfig();
+        }
     }
 }

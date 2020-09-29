@@ -11,6 +11,8 @@ using MigrationTools.Services;
 using MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps;
 using VstsSyncMigrator.Engine;
 using MigrationTools.Core;
+using MigrationTools.Core.Clients;
+using MigrationTools.Clients.AzureDevops.ObjectModel.Clients;
 
 namespace _VstsSyncMigrator.Engine.Tests
 {
@@ -57,7 +59,9 @@ namespace _VstsSyncMigrator.Engine.Tests
             services.AddSingleton<EngineConfiguration>(ecb.BuildDefault());
             services.AddSingleton<TelemetryClient>(new TelemetryClient());
             services.AddSingleton<ITelemetryLogger, TelemetryLoggerMock>();
-            services.AddSingleton<MigrationEngine>();
+            services.AddSingleton<IMigrationClient, MigrationOMClient>();
+            
+            services.AddSingleton<IMigrationEngine, MigrationEngine>();
 
             services.AddSingleton<ExecuteOptions>((p) => null);
 
@@ -69,7 +73,7 @@ namespace _VstsSyncMigrator.Engine.Tests
         public void TestEngineCreation()
         {
 
-            MigrationEngine me = _services.GetRequiredService<MigrationEngine>();
+            IMigrationEngine me = _services.GetRequiredService<IMigrationEngine>();
         }
 
         [TestMethod]
@@ -77,7 +81,7 @@ namespace _VstsSyncMigrator.Engine.Tests
         {
             EngineConfiguration ec = _services.GetRequiredService<EngineConfiguration>();
             ec.Processors.Clear();
-            MigrationEngine me = _services.GetRequiredService<MigrationEngine>();
+            IMigrationEngine me = _services.GetRequiredService<IMigrationEngine>();
             me.Run();
 
         }
@@ -88,7 +92,7 @@ namespace _VstsSyncMigrator.Engine.Tests
             EngineConfiguration ec = _services.GetRequiredService<EngineConfiguration>();
             ec.Processors.Clear();
             ec.FieldMaps.Clear();
-            MigrationEngine me = _services.GetRequiredService<MigrationEngine>();
+            IMigrationEngine me = _services.GetRequiredService<IMigrationEngine>();
             me.Run();
         }
 
@@ -97,7 +101,7 @@ namespace _VstsSyncMigrator.Engine.Tests
         {
             EngineConfiguration ec = _services.GetRequiredService<EngineConfiguration>();
             ec.FieldMaps.Clear();
-            MigrationEngine me = _services.GetRequiredService<MigrationEngine>();
+            IMigrationEngine me = _services.GetRequiredService<IMigrationEngine>();
             me.Run();
         }
 

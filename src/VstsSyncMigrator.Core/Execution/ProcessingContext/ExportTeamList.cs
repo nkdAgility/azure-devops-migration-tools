@@ -22,7 +22,7 @@ namespace VstsSyncMigrator.Engine
     {
 
 
-        public ExportTeamList(IServiceProvider services, MigrationEngine me, ITelemetryLogger telemetry) : base(services, me, telemetry)
+        public ExportTeamList(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry) : base(services, me, telemetry)
         {
 
         }
