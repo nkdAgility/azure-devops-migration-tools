@@ -11,6 +11,8 @@ namespace MigrationTools.Core.Clients
     {
 
         TeamProjectConfig Config { get; }
+         IWorkItemMigrationClient WorkItems { get; }
+
         void Configure(TeamProjectConfig config, NetworkCredential credentials = null);
 
           T GetService<T>();
@@ -18,8 +20,7 @@ namespace MigrationTools.Core.Clients
         [Obsolete]
         object InternalCollection { get; }
 
-        IEnumerable<WorkItemData> GetWorkItems();
-        WorkItemData PersistWorkItem(WorkItemData workItem);
+
 
     }
 }

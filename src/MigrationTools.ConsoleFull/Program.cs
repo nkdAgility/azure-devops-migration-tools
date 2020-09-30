@@ -54,7 +54,7 @@ namespace VstsSyncMigrator.ConsoleApp
                     services.AddSingleton<WorkItemUpdateAreasAsTagsContext>();
 
                     // Core
-                    services.AddSingleton<IMigrationClient, MigrationOMClient>();
+                    services.AddSingleton<IMigrationClient, MigrationClient>();
                    
                 });
                 var host = hostBuilder.Build();

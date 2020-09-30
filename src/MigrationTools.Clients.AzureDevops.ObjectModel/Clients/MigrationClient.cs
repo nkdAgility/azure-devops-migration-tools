@@ -17,10 +17,11 @@ using Serilog;
 
 namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
 {
-    public class MigrationOMClient : IMigrationClient
+    public class MigrationClient : IMigrationClient
     {
         private TeamProjectConfig _config;
         private NetworkCredential _credentials;
+        private IWorkItemMigrationClient _workItemClient;
 
         private readonly IServiceProvider _Services;
         private readonly ITelemetryLogger _Telemetry;
@@ -33,9 +34,18 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
             }
         }
 
-        // if you add Migration Engine in here you will have to fix the infinate loop
-        public MigrationOMClient(IServiceProvider services, ITelemetryLogger telemetry)
+        public IWorkItemMigrationClient WorkItems
         {
+            get
+            {
+                return _workItemClient;
+            }
+        }
+
+        // if you add Migration Engine in here you will have to fix the infinate loop
+        public MigrationClient(IWorkItemMigrationClient workItemClient, IServiceProvider services, ITelemetryLogger telemetry)
+        {
+            _workItemClient = workItemClient;
             _Services = services;
             _Telemetry = telemetry;
         }
@@ -44,10 +54,13 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
         public void Configure(TeamProjectConfig config, NetworkCredential credentials = null)
         {
             _config = config;
-            _credentials = credentials;          
+            _credentials = credentials;
+            EnsureCollection();
+            _workItemClient.Configure(this);
         }
 
         private TfsTeamProjectCollection _collection;
+        [Obsolete]
         public object InternalCollection
         {
             get
@@ -108,14 +121,5 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
             return _collection.GetService<T>();
         }
 
-        public IEnumerable<WorkItemData> GetWorkItems()
-        {
-            throw new NotImplementedException();
-        }
-
-        public WorkItemData PersistWorkItem(WorkItemData workItem)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

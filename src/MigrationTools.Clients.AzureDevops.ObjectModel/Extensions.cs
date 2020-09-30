@@ -8,6 +8,7 @@ using MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Microsoft.VisualStudio.Services.Common;
 
 namespace MigrationTools.Clients.AzureDevops.ObjectModel
 {
@@ -24,7 +25,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel
         public static WorkItemData ToWorkItemData(this WorkItem workItem)
         {
             var internalWorkItem = new WorkItemData();
-            internalWorkItem.id = workItem.Id.ToString();
+            internalWorkItem.Id = workItem.Id.ToString();
             internalWorkItem.Type = workItem.Type.Name;
             internalWorkItem.Title = workItem.Title;
             internalWorkItem.InternalWorkItem = workItem;
@@ -38,6 +39,16 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel
                 throw new InvalidCastException($"The Work Item stored in the inner field must be of type {(typeof (WorkItem)).FullName}");
             }
             return (WorkItem)workItemData.InternalWorkItem;
+        }
+
+        public static IEnumerable<WorkItemData> ToWorkItemDataList(this WorkItemCollection collection)
+        {
+            List<WorkItemData> list = new List<WorkItemData>();
+            foreach (WorkItem wi in collection)
+            {
+                list.Add(wi.ToWorkItemData());
+            }
+            return list;
         }
 
         public static void SaveMigratedWorkItem(this IAttachmentMigrationEnricher context, WorkItemData workItem)
