@@ -117,7 +117,7 @@
     {
       "ObjectType": "WorkItemDeleteConfig",
       "Enabled": true,
-      "QueryBit": "AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
+      "QueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
       "OrderBit": "[System.ChangedDate] desc"
     },
     {
@@ -137,7 +137,7 @@
       "UpdateCreatedBy": true,
       "BuildFieldTable": false,
       "AppendMigrationToolSignatureFooter": false,
-      "QueryBit": "AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
+      "QueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
       "OrderBit": "[System.ChangedDate] desc",
       "Enabled": true,
       "LinkMigration": true,

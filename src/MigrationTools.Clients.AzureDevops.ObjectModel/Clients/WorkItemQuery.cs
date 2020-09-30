@@ -21,7 +21,10 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
         {
             var wiClient = (WorkItemMigrationClient)MigrationClient.WorkItems;
             Telemetry.TrackEvent("WorkItemQuery.Execute", Parameters, null);
-            Log.Information(string.Format("TfsQueryContext: {0}: {1}", "TeamProjectCollection", wiClient.Store.TeamProjectCollection.Uri.ToString()), "TfsQueryContext");
+            Log.Information("WorkItemQuery: TeamProjectCollection: {QueryTarget}",  wiClient.Store.TeamProjectCollection.Uri.ToString());
+            Log.Information("WorkItemQuery: Query: {QueryText}",  Query);
+            Log.Information("WorkItemQuery: Paramiters: {@QueryParams}",  Parameters);
+
             WorkItemCollection wc;
             var startTime = DateTime.UtcNow;
             Stopwatch queryTimer = new Stopwatch();

@@ -24,6 +24,11 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel
 
         public static WorkItemData ToWorkItemData(this WorkItem workItem)
         {
+            if (workItem is null)
+            {
+                throw new ArgumentNullException(nameof(workItem));
+            }
+
             var internalWorkItem = new WorkItemData();
             internalWorkItem.Id = workItem.Id.ToString();
             internalWorkItem.Type = workItem.Type.Name;

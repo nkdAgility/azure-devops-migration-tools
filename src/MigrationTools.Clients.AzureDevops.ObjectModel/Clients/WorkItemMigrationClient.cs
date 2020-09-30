@@ -121,10 +121,10 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
                     }
                 }
             }
-            if (found == null) { found = FindReflectedWorkItemByReflectedWorkItemId(ReflectedWorkItemId).ToWorkItem(); }
+            if (found == null) { found = FindReflectedWorkItemByReflectedWorkItemId(ReflectedWorkItemId)?.ToWorkItem(); }
             if (sourceReflectedWIIdField != null && !workItemToFind.Fields.Contains(sourceReflectedWIIdField))
             {
-                if (found == null) { found = FindReflectedWorkItemByMigrationRef(ReflectedWorkItemId).ToWorkItem(); } // Too slow!
+                if (found == null) { found = FindReflectedWorkItemByMigrationRef(ReflectedWorkItemId)?.ToWorkItem(); } // Too slow!
                 //if (found == null) { found = FindReflectedWorkItemByTitle(workItemToFind.Title); }
             }
             if (found != null && cache)
