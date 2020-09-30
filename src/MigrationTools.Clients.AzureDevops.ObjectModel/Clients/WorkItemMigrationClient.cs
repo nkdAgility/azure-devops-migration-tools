@@ -131,7 +131,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
             {
                 AddToCache(workItemToFind.Id, found.ToWorkItemData());/// TODO MEMORY LEAK
             }
-            return found.ToWorkItemData();
+            return found?.ToWorkItemData();
         }
 
         public override WorkItemData FindReflectedWorkItemByReflectedWorkItemId(WorkItemData refWi)
@@ -226,12 +226,12 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
 
         public override WorkItemData GetWorkItem(string id)
         {
-            throw new NotImplementedException();
+            return GetWorkItem(int.Parse(id));
         }
 
         public override WorkItemData GetWorkItem(int id)
         {
-            throw new NotImplementedException();
+            return Store.GetWorkItem(id)?.ToWorkItemData();
         }
     }
 }
