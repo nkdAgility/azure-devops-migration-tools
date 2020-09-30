@@ -77,7 +77,7 @@ namespace MigrationTools.Host
             _logger.LogInformation("Start Time: {StartTime}", DateTime.Now.ToUniversalTime().ToLocalTime());
             _logger.LogInformation("Running with args: {@Args}", args);
             _logger.LogInformation("OSVersion: {OSVersion}", Environment.OSVersion.ToString());
-            _logger.LogInformation("Version: {version}", version);
+            _logger.LogInformation($"Version: {{{nameof(version)}}}", version);
             _logger.LogInformation("userID: {UserId}", System.Security.Principal.WindowsIdentity.GetCurrent().Name);
         }
 
