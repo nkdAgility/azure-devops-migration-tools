@@ -8,11 +8,17 @@ using System.Diagnostics;
 using Microsoft.ApplicationInsights;
 using MigrationTools.Configuration.FieldMap;
 using MigrationTools.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
 {
     public class MultiValueConditionalMap : FieldMapBase
     {
+
+        public MultiValueConditionalMap(ILogger<MultiValueConditionalMap> logger) : base(logger)
+        {
+
+        }
 
         private MultiValueConditionalMapConfig Config { get { return (MultiValueConditionalMapConfig)_Config; } }
 

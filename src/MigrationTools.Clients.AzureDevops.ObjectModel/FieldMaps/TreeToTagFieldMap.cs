@@ -4,12 +4,16 @@ using System.Collections.Generic;
 using System.Linq;
 using MigrationTools.Configuration.FieldMap;
 using MigrationTools.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
 {
     public class TreeToTagFieldMap : FieldMapBase
     {
+        public TreeToTagFieldMap(ILogger<TreeToTagFieldMap> logger) : base(logger)
+        {
 
+        }
         private TreeToTagMapConfig Config { get { return (TreeToTagMapConfig)_Config; } }
 
         public override void Configure(IFieldMapConfig config)

@@ -1,10 +1,10 @@
 {
   "profiles": {
-    "MigrationTools.ConsoleFull": {
+    "execute": {
       "commandName": "Project",
       "commandLineArgs": "execute -c configuration.json"
     },
-    "Init": {
+    "init": {
       "commandName": "Project",
       "commandLineArgs": "Init"
     }

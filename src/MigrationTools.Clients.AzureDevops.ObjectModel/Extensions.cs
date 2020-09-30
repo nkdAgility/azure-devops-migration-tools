@@ -54,7 +54,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel
         {
             if (!(projectdata.InternalProject is Project))
             {
-                throw new InvalidCastException($"The Work Item stored in the inner field must be of type {(typeof(Project)).FullName}");
+                throw new InvalidCastException($"The Work Item stored in the inner field must be of type {(nameof(Project))}");
             }
             return (Project)projectdata.InternalProject;
         }
@@ -63,7 +63,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel
         {
             if (!(workItemData.InternalWorkItem is WorkItem))
             {
-                throw new InvalidCastException($"The Work Item stored in the inner field must be of type {(typeof (WorkItem)).FullName}");
+                throw new InvalidCastException($"The Work Item stored in the inner field must be of type {(nameof(WorkItem))}");
             }
             return (WorkItem)workItemData.InternalWorkItem;
         }

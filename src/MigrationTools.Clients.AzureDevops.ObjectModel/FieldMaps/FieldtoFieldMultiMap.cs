@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools.Configuration;
 using MigrationTools.Configuration.FieldMap;
@@ -10,6 +11,11 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
 {
     public class FieldtoFieldMultiMap : FieldMapBase
     {
+
+        public FieldtoFieldMultiMap(ILogger<FieldtoFieldMultiMap> logger) : base(logger)
+        {
+
+        }
 
         private FieldtoFieldMultiMapConfig Config { get { return (FieldtoFieldMultiMapConfig)_Config; } }
 
@@ -25,7 +31,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
             if (fieldsExist(Config.SourceToTargetMappings, source, target))
                 mapFields(Config.SourceToTargetMappings, source, target);
             else
-                Trace.WriteLine("  [SKIPPED] Not all source and target fields exist.");
+                Log.Information("  [SKIPPED] Not all source and target fields exist.");
 
         }
 

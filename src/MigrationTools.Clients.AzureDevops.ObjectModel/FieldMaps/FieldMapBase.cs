@@ -12,12 +12,18 @@ using MigrationTools.Configuration;
 using MigrationTools.Engine;
 using MigrationTools.DataContracts;
 using MigrationTools.Engine.Containers;
+using Microsoft.Extensions.Logging;
 
 namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
 {
     public abstract class FieldMapBase : IFieldMap
     {
         protected IFieldMapConfig _Config;
+
+        public FieldMapBase(ILogger<FieldMapBase> logger)
+        {
+            Logger = logger;
+        }
 
         public virtual void Configure(IFieldMapConfig config)
         {
@@ -48,6 +54,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
         }
 
         public abstract string MappingDisplayName { get; }
+        public ILogger<FieldtoFieldMultiMap> Logger { get; }
 
         internal abstract void InternalExecute(WorkItem source, WorkItem target);
 

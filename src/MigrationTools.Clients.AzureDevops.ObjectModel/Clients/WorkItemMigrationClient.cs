@@ -25,14 +25,14 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
 
         public override TeamProjectConfig Config => _config;
 
-        public WorkItemMigrationClient( IServiceProvider services, ITelemetryLogger telemetry) : base(services, telemetry)
+        public WorkItemMigrationClient(IServiceProvider services, ITelemetryLogger telemetry) : base(services, telemetry)
         {
-            
+
         }
 
         public override void InnerConfigure(IMigrationClient migrationClient, bool bypassRules = true)
         {
-           _config = MigrationClient.Config;
+            _config = MigrationClient.Config;
             _bypassRules = bypassRules ? WorkItemStoreFlags.BypassRules : WorkItemStoreFlags.None;
             _wistore = new WorkItemStore(MigrationClient.Config.Collection.ToString(), _bypassRules);
         }
@@ -63,6 +63,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
 
         public override ProjectData GetProject()
         {
+
             Project y = (from Project x in Store.Projects where x.Name.ToUpper() == MigrationClient.Config.Project.ToUpper() select x).SingleOrDefault();
             return y.ToProjectData();
         }
@@ -142,7 +143,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
         public override WorkItemData FindReflectedWorkItemByReflectedWorkItemId(int refId, bool cache)
         {
             var sourceIdKey = ~refId;
-            if (Cache.TryGetValue(sourceIdKey, out var workItem)) return workItem ;
+            if (Cache.TryGetValue(sourceIdKey, out var workItem)) return workItem;
 
             IEnumerable<WorkItemData> QueryWorkItems()
             {
@@ -150,8 +151,8 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
                 wiqb.Query = string.Format(@"SELECT [System.Id] FROM WorkItems  WHERE [System.TeamProject]=@TeamProject AND [{0}] Contains '@idToFind'", MigrationClient.Config.ReflectedWorkItemIDFieldName);
                 wiqb.AddParameter("idToFind", refId.ToString());
                 wiqb.AddParameter("TeamProject", MigrationClient.Config.Project);
-                
-                foreach (WorkItemData wi in wiqb.Build( MigrationClient).GetWorkItems())
+
+                foreach (WorkItemData wi in wiqb.Build(MigrationClient).GetWorkItems())
                 {
                     yield return wi;
                 }
@@ -210,7 +211,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
         private WorkItemData FindWorkItemByQuery(IWorkItemQueryBuilder query)
         {
             List<WorkItemData> newFound;
-            newFound = query.Build( MigrationClient ).GetWorkItems();
+            newFound = query.Build(MigrationClient).GetWorkItems();
             if (newFound.Count == 0)
             {
                 return null;
@@ -220,7 +221,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
 
         public override WorkItemData GetRevision(WorkItemData workItem, int revision)
         {
-            return Store.GetWorkItem(int.Parse(workItem.Id), revision).ToWorkItemData() ;
+            return Store.GetWorkItem(int.Parse(workItem.Id), revision).ToWorkItemData();
         }
 
 

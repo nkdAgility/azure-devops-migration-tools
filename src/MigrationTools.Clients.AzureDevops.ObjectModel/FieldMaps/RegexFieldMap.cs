@@ -4,11 +4,17 @@ using System.Text.RegularExpressions;
 using System.Diagnostics;
 using MigrationTools.Configuration.FieldMap;
 using MigrationTools.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
 {
     public class RegexFieldMap : FieldMapBase
     {
+
+        public RegexFieldMap(ILogger<RegexFieldMap> logger) : base(logger)
+        {
+
+        }
         private RegexFieldMapConfig Config { get { return (RegexFieldMapConfig)_Config; } }
 
         public override void Configure(IFieldMapConfig config)

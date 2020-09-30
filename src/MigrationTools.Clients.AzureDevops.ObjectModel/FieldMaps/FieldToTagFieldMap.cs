@@ -5,11 +5,17 @@ using System.Diagnostics;
 using System.Linq;
 using MigrationTools.Configuration.FieldMap;
 using MigrationTools.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
 {
     public class FieldToTagFieldMap : FieldMapBase
     {
+
+        public FieldToTagFieldMap(ILogger<FieldToTagFieldMap> logger) : base(logger)
+        {
+
+        }
         private FieldtoTagMapConfig Config { get { return (FieldtoTagMapConfig)_Config; } }
 
         public override void Configure(IFieldMapConfig config)
