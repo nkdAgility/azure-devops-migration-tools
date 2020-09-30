@@ -10,7 +10,7 @@
 
   <ItemGroup>
     <Content Include="..\..\configuration.json" Link="configuration.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 

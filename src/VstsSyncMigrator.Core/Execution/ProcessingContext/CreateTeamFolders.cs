@@ -44,7 +44,7 @@ namespace VstsSyncMigrator.Engine
             Stopwatch stopwatch = Stopwatch.StartNew();
 			//////////////////////////////////////////////////
             TfsTeamService teamService = Engine.Target.GetService<TfsTeamService>();
-            QueryHierarchy qh = ((WorkItemMigrationClient)Engine.Target).Store.Projects[Engine.Target.Config.Project].QueryHierarchy;
+            QueryHierarchy qh = ((WorkItemMigrationClient)Engine.Target.WorkItems).Store.Projects[Engine.Target.Config.Project].QueryHierarchy;
             List<TeamFoundationTeam> teamList = teamService.QueryTeams(Engine.Target.Config.Project).ToList();
 
             Trace.WriteLine(string.Format("Found {0} teams?", teamList.Count));

@@ -2,7 +2,7 @@
   "profiles": {
     "MigrationTools.ConsoleFull": {
       "commandName": "Project",
-      "commandLineArgs": "init"
+      "commandLineArgs": "execute -c configuration.json"
     }
   }
 }

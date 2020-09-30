@@ -12,6 +12,17 @@ namespace MigrationTools.Configuration.Processing
             get { return "WorkItemDelete"; }
         }
 
+        public WorkItemDeleteConfig()
+        {
+            Enabled = false;
+            QueryBit = @"AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
+            OrderBit = "[System.ChangedDate] desc";
+        }
+
+        public string QueryBit { get; set; }
+        /// <inheritdoc />
+        public string OrderBit { get; set; }
+
         /// <inheritdoc />
         public bool IsProcessorCompatible(IReadOnlyList<IProcessorConfig> otherProcessors)
         {
