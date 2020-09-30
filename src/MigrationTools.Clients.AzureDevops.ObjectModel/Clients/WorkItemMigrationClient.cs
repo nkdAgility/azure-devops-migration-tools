@@ -19,8 +19,11 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
     {
         private WorkItemStoreFlags _bypassRules;
         private WorkItemStore _wistore;
+        private TeamProjectConfig _config;
 
-        internal WorkItemStore Store { get { return _wistore; } }
+        public WorkItemStore Store { get { return _wistore; } }
+
+        public override TeamProjectConfig Config => _config;
 
         public WorkItemMigrationClient( IServiceProvider services, ITelemetryLogger telemetry) : base(services, telemetry)
         {
@@ -29,6 +32,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
 
         public override void InnerConfigure(IMigrationClient migrationClient, bool bypassRules = true)
         {
+           _config = MigrationClient.Config;
             _bypassRules = bypassRules ? WorkItemStoreFlags.BypassRules : WorkItemStoreFlags.None;
             _wistore = new WorkItemStore(MigrationClient.Config.Collection.ToString(), _bypassRules);
         }
@@ -219,6 +223,9 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
             throw new NotImplementedException();
         }
 
-   
+        public override WorkItemData GetWorkItem(string id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

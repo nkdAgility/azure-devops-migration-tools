@@ -2,7 +2,6 @@
 using MigrationTools.DataContracts;
 using MigrationTools.Engine.Containers;
 using System;
-using VstsSyncMigrator.Core.Execution.OMatics;
 using VstsSyncMigrator.Engine;
 
 namespace VstsSyncMigrator.Core

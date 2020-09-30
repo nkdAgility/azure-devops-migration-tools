@@ -11,6 +11,8 @@ using MigrationTools.Configuration;
 using Microsoft.Extensions.Hosting;
 using MigrationTools;
 using MigrationTools;
+using MigrationTools.DataContracts;
+using MigrationTools.Clients.AzureDevops.ObjectModel.Clients;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -40,11 +42,8 @@ namespace VstsSyncMigrator.Engine
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 			//////////////////////////////////////////////////
-			WorkItemStoreContext targetStore = new WorkItemStoreContext(Engine.Target, WorkItemStoreFlags.BypassRules, Telemetry);
-            TfsQueryContext tfsqc = new TfsQueryContext(targetStore, Telemetry);
-            tfsqc.AddParameter("TeamProject", Engine.Target.Config.Project);
-            tfsqc.Query = string.Format(@"SELECT [System.Id] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject  AND [System.AreaPath] UNDER '{0}\_DeleteMe'", Engine.Target.Config.Project);
-            WorkItemCollection  workitems = tfsqc.Execute();
+            var Query = string.Format(@"SELECT [System.Id] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject  AND [System.AreaPath] UNDER '{0}\_DeleteMe'", Engine.Target.Config.Project);
+            List<WorkItemData> workitems = Engine.Target.WorkItems.GetWorkItems(Query);
             Trace.WriteLine(string.Format("Update {0} work items?", workitems.Count));
             //////////////////////////////////////////////////
             int current = workitems.Count;
@@ -54,7 +53,7 @@ namespace VstsSyncMigrator.Engine
 
             foreach (int begone in tobegone)
             {
-                targetStore.Store.DestroyWorkItems(new List<int>() { begone });
+                ((WorkItemMigrationClient)Engine.Target).Store.DestroyWorkItems(new List<int>() { begone });
                 Trace.WriteLine(string.Format("Deleted {0}", begone));
             }
 

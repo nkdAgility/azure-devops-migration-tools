@@ -15,6 +15,8 @@ using MigrationTools.Configuration;
 using MigrationTools;
 using MigrationTools.Engine.Processors;
 using MigrationTools;
+using MigrationTools.DataContracts;
+using MigrationTools.Clients.AzureDevops.ObjectModel;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -48,14 +50,12 @@ namespace VstsSyncMigrator.Engine
             }
             Stopwatch stopwatch = Stopwatch.StartNew();
             //////////////////////////////////////////////////
-            WorkItemStoreContext sourceStore = new WorkItemStoreContext(Engine.Source, WorkItemStoreFlags.BypassRules, Telemetry);
             TfsTeamService sourceTS = Engine.Source.GetService<TfsTeamService>();
             List<TeamFoundationTeam> sourceTL = sourceTS.QueryTeams(Engine.Source.Config.Project).ToList();
             Trace.WriteLine(string.Format("Found {0} teams in Source?", sourceTL.Count));
             var sourceTSCS = Engine.Source.GetService<TeamSettingsConfigurationService>();
             //////////////////////////////////////////////////
-            WorkItemStoreContext targetStore = new WorkItemStoreContext(Engine.Target, WorkItemStoreFlags.BypassRules, Telemetry);
-            Project targetProject = targetStore.GetProject();
+            ProjectData targetProject = Engine.Target.WorkItems.GetProject();
             Trace.WriteLine(string.Format("Found target project as {0}", targetProject.Name));
             TfsTeamService targetTS = Engine.Target.GetService<TfsTeamService>();
             List<TeamFoundationTeam> targetTL = targetTS.QueryTeams(Engine.Target.Config.Project).ToList();
@@ -75,7 +75,7 @@ namespace VstsSyncMigrator.Engine
                 if (foundTargetTeam == null)
                 {
                     Trace.WriteLine(string.Format("Processing team '{0}':", sourceTeam.Name));
-                    TeamFoundationTeam newTeam = targetTS.CreateTeam(targetProject.Uri.ToString(), sourceTeam.Name, sourceTeam.Description, null);
+                    TeamFoundationTeam newTeam = targetTS.CreateTeam(targetProject.ToProject().Uri.ToString(), sourceTeam.Name, sourceTeam.Description, null);
                     Trace.WriteLine(string.Format("-> Team '{0}' created", sourceTeam.Name));
 
                     if (_config.EnableTeamSettingsMigration)
