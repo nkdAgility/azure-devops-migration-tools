@@ -126,7 +126,7 @@ namespace VstsSyncMigrator.Engine
             //////////////////////////////////////////////////////////FilterCompletedByQuery
             if (_config.FilterWorkItemsThatAlreadyExistInTarget)
             {
-                sourceWorkItems = Engine.Source.WorkItems.FilterWorkItemsThatAlreadyExist(sourceWorkItems, Engine.Target.WorkItems);
+                sourceWorkItems = FilterWorkItemsThatAlreadyExistInTarget(sourceWorkItems);
             }
             //////////////////////////////////////////////////
             _current = 1;

@@ -1,7 +1,8 @@
 {
   "profiles": {
-    "VstsSyncMigrator.Console": {
-      "commandName": "Project"
+    "MigrationTools.ConsoleFull": {
+      "commandName": "Project",
+      "commandLineArgs": "init"
     }
   }
 }
