@@ -637,12 +637,12 @@ namespace VstsSyncMigrator.Engine
                 var stopwatch = Stopwatch.StartNew();
                 var starttime = DateTime.Now;
                 _currentTestCases++;
-                WorkItem wi = Engine.Target.WorkItems.FindReflectedWorkItem(sourceTce.TestCase.WorkItem, false);
+                WorkItemData wi = Engine.Target.WorkItems.FindReflectedWorkItem(sourceTce.TestCase.WorkItem.ToWorkItemData(), false);
                 ITestSuiteEntry targetTce;
                 if (wi != null)
                 {
                     targetTce = (from tc in targetSuite.TestCases
-                                 where tc.TestCase.WorkItem.Id == wi.Id
+                                 where tc.TestCase.WorkItem.Id.ToString() == wi.Id
                                  select tc).SingleOrDefault();
                     if (targetTce != null)
                     {
@@ -675,7 +675,7 @@ namespace VstsSyncMigrator.Engine
                     || e.EntryType == TestSuiteEntryType.StaticTestSuite))
                 {
                     //Find migrated suite in target
-                    WorkItem sourceSuiteWi = sourceWitStore.Store.GetWorkItem(sourceSuiteChild.Id);
+                    WorkItem sourceSuiteWi = Engine.Source.WorkItems.GetWorkItem(sourceSuiteChild.Id.ToString());
                     WorkItem targetSuiteWi = targetWitStore.FindReflectedWorkItem(sourceSuiteWi, false);
                     if (targetSuiteWi != null)
                     {

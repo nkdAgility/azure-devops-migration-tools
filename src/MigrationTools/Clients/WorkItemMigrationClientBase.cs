@@ -89,7 +89,7 @@ namespace MigrationTools.Clients
         public abstract ProjectData GetProject();
         public abstract List<WorkItemData> FilterWorkItemsThatAlreadyExist(List<WorkItemData> sourceWorkItems, IWorkItemMigrationClient target);
         public abstract WorkItemData GetWorkItem(string id);
+        public abstract WorkItemData GetWorkItem(int id);
 
-        
     }
 }

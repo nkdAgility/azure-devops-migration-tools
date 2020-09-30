@@ -225,7 +225,18 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
 
         public override List<WorkItemData> FilterWorkItemsThatAlreadyExist(List<WorkItemData> sourceWorkItems, IWorkItemMigrationClient target)
         {
-            throw new NotImplementedException();
+            var targetQuery =
+                string.Format(
+                    @"SELECT [System.Id], [{0}] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {1} ORDER BY {2}",
+                     Config.ReflectedWorkItemIDFieldName,
+                    _config.QueryBit,
+                    _config.OrderBit
+                    );
+            var targetFoundItems = Engine.Target.WorkItems.GetWorkItems(targetQuery);
+            var targetFoundIds = (from WorkItemData twi in targetFoundItems select Engine.Target.WorkItems.GetReflectedWorkItemId(twi, Engine.Target.Config.ReflectedWorkItemIDFieldName)).ToList();
+            //////////////////////////////////////////////////////////
+            sourceWorkItems = sourceWorkItems.Where(p => !targetFoundIds.Any(p2 => p2.ToString() == p.Id)).ToList();
+            return sourceWorkItems;
         }
 
         public override WorkItemData GetWorkItem(string id)
@@ -233,6 +244,9 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
             throw new NotImplementedException();
         }
 
-    
+        public override WorkItemData GetWorkItem(int id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
