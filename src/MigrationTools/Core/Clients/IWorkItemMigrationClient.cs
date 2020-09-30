@@ -9,11 +9,17 @@ namespace MigrationTools.Core.Clients
 {
     public interface IWorkItemMigrationClient
     {
+        TeamProjectConfig Config { get; }
+
         void Configure(IMigrationClient migrationClient, bool bypassRules = true);
-        IEnumerable<WorkItemData> GetWorkItems();
-        IEnumerable<WorkItemData> GetWorkItems(string query);
+
+        ProjectData GetProject();
+        List<WorkItemData> GetWorkItems();
+        WorkItemData GetWorkItem(string id);
+        List<WorkItemData> GetWorkItems(string query);
         WorkItemData PersistWorkItem(WorkItemData workItem);
         WorkItemData GetRevision(WorkItemData workItem, int revision);
+        List<WorkItemData> FilterWorkItemsThatAlreadyExist(List<WorkItemData> sourceWorkItems, IWorkItemMigrationClient target);
         WorkItemData FindReflectedWorkItem(WorkItemData workItem, bool cache, string sourceReflectedWIIdField = null);
         WorkItemData FindReflectedWorkItemByTitle(string title);
         WorkItemData FindReflectedWorkItemByMigrationRef(string refId);

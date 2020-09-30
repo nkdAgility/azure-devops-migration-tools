@@ -28,8 +28,30 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel
             internalWorkItem.Id = workItem.Id.ToString();
             internalWorkItem.Type = workItem.Type.Name;
             internalWorkItem.Title = workItem.Title;
+            internalWorkItem.Rev = workItem.Rev;
+            internalWorkItem.RevisedDate = workItem.RevisedDate;
+            internalWorkItem.Revision = workItem.Revision;
+            internalWorkItem.ProjectName = workItem?.Project?.Name;
             internalWorkItem.InternalWorkItem = workItem;
             return internalWorkItem;
+        }
+
+        public static ProjectData ToProjectData(this Project project)
+        {
+            var internalproject = new ProjectData();
+            internalproject.Id = project.Id.ToString();
+            internalproject.Name = project.Name;
+            internalproject.InternalProject = project;
+            return internalproject;
+        }
+
+        public static Project ToProject(this ProjectData projectdata)
+        {
+            if (!(projectdata.InternalProject is Project))
+            {
+                throw new InvalidCastException($"The Work Item stored in the inner field must be of type {(typeof(Project)).FullName}");
+            }
+            return (Project)projectdata.InternalProject;
         }
 
         public static WorkItem ToWorkItem(this WorkItemData  workItemData)

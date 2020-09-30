@@ -2,20 +2,23 @@
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using MigrationTools.Clients.AzureDevops.ObjectModel.Clients;
+using MigrationTools.Core.Clients;
+using MigrationTools.Core.DataContracts;
 using MigrationTools.Core.Exceptions;
 using Serilog;
 using VstsSyncMigrator.Engine;
 
-namespace VstsSyncMigrator.Core.Execution.OMatics
+namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
 {
-    public class WorkItemLinkOMatic
+    public class WorkItemLinkEnricher
     {
-        public void MigrateLinks(WorkItem sourceWorkItemLinkStart, WorkItemStoreContext sourceWorkItemStore, WorkItem targetWorkItemLinkStart, WorkItemStoreContext targetWorkItemStore, bool save = true, bool filterWorkItemsThatAlreadyExistInTarget = true, string sourceReflectedWIIdField = null)
+        public void MigrateLinks(WorkItemData sourceWorkItemLinkStart, IWorkItemMigrationClient sourceWorkItemStore, WorkItemData targetWorkItemLinkStart, IWorkItemMigrationClient targetWorkItemStore, bool save = true, bool filterWorkItemsThatAlreadyExistInTarget = true, string sourceReflectedWIIdField = null)
         {
             if (ShouldCopyLinks(sourceWorkItemLinkStart, targetWorkItemLinkStart, filterWorkItemsThatAlreadyExistInTarget))
             {
                 Trace.Indent();
-                foreach (Link item in sourceWorkItemLinkStart.Links)
+                foreach (Link item in sourceWorkItemLinkStart.ToWorkItem().Links)
                 {
                     try
                     {
@@ -46,59 +49,59 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                     }
                     catch (WorkItemLinkValidationException ex)
                     {
-                        sourceWorkItemLinkStart.Reset();
-                        targetWorkItemLinkStart.Reset();
+                        sourceWorkItemLinkStart.ToWorkItem().Reset();
+                        targetWorkItemLinkStart.ToWorkItem().Reset();
                         Log.Error(ex, "[WorkItemLinkValidationException] Adding link for wiSourceL={sourceWorkItemLinkStartId}", sourceWorkItemLinkStart.Id);
                     }
                     catch (FormatException ex)
                     {
-                        sourceWorkItemLinkStart.Reset();
-                        targetWorkItemLinkStart.Reset();
+                        sourceWorkItemLinkStart.ToWorkItem().Reset();
+                        targetWorkItemLinkStart.ToWorkItem().Reset();
                         Log.Error(ex, "[CREATE-FAIL] Adding Link for wiSourceL={sourceWorkItemLinkStartId}", sourceWorkItemLinkStart.Id);
                     }
                 }
             }
-            if (sourceWorkItemLinkStart.Type.Name == "Test Case")
+            if (sourceWorkItemLinkStart.Type == "Test Case")
             {
                 MigrateSharedSteps(sourceWorkItemLinkStart, targetWorkItemLinkStart, sourceWorkItemStore, targetWorkItemStore, save);
             }
         }
 
-        private void MigrateSharedSteps(WorkItem wiSourceL, WorkItem wiTargetL, WorkItemStoreContext sourceStore,
-            WorkItemStoreContext targetStore, bool save)
+        private void MigrateSharedSteps(WorkItemData wiSourceL, WorkItemData wiTargetL, IWorkItemMigrationClient sourceStore,
+            IWorkItemMigrationClient targetStore, bool save)
         {
             const string microsoftVstsTcmSteps = "Microsoft.VSTS.TCM.Steps";
-            var oldSteps = wiTargetL.Fields[microsoftVstsTcmSteps].Value.ToString();
+            var oldSteps = wiTargetL.ToWorkItem().Fields[microsoftVstsTcmSteps].Value.ToString();
             var newSteps = oldSteps;
 
-            var sourceSharedStepLinks = wiSourceL.Links.OfType<RelatedLink>()
+            var sourceSharedStepLinks = wiSourceL.ToWorkItem().Links.OfType<RelatedLink>()
                 .Where(x => x.LinkTypeEnd.Name == "Shared Steps").ToList();
             var sourceSharedSteps =
-                sourceSharedStepLinks.Select(x => sourceStore.Store.GetWorkItem(x.RelatedWorkItemId));
+                sourceSharedStepLinks.Select(x => sourceStore.GetWorkItem(x.RelatedWorkItemId.ToString()));
 
-            foreach (WorkItem sourceSharedStep in sourceSharedSteps)
+            foreach (WorkItemData sourceSharedStep in sourceSharedSteps)
             {
-                WorkItem matchingTargetSharedStep =
+                WorkItemData matchingTargetSharedStep =
                     targetStore.FindReflectedWorkItemByReflectedWorkItemId(sourceSharedStep);
 
                 if (matchingTargetSharedStep != null)
                 {
                     newSteps = newSteps.Replace($"ref=\"{sourceSharedStep.Id}\"",
                         $"ref=\"{matchingTargetSharedStep.Id}\"");
-                    wiTargetL.Fields[microsoftVstsTcmSteps].Value = newSteps;
+                    wiTargetL.ToWorkItem().Fields[microsoftVstsTcmSteps].Value = newSteps;
                 }
             }
 
-            if (wiTargetL.IsDirty && save)
+            if (wiTargetL.ToWorkItem().IsDirty && save)
             {
-                wiTargetL.Fields["System.ChangedBy"].Value = "Migration";
-                wiTargetL.Save();
+                wiTargetL.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
+                wiTargetL.ToWorkItem().Save();
             }
         }
 
-        private void CreateExternalLink(ExternalLink sourceLink, WorkItem target, bool save)
+        private void CreateExternalLink(ExternalLink sourceLink, WorkItemData target, bool save)
         {
-            var exist = (from Link l in target.Links
+            var exist = (from Link l in target.ToWorkItem().Links
                          where l is ExternalLink && ((ExternalLink)l).LinkedArtifactUri == ((ExternalLink)sourceLink).LinkedArtifactUri
                          select (ExternalLink)l).SingleOrDefault();
             if (exist == null)
@@ -106,11 +109,11 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                 Log.Information("Creating new {SourceLinkType} on {TargetId}", sourceLink.GetType().Name, target.Id);
                 ExternalLink el = new ExternalLink(sourceLink.ArtifactLinkType, sourceLink.LinkedArtifactUri);
                 el.Comment = sourceLink.Comment;
-                target.Links.Add(el);
+                target.ToWorkItem().Links.Add(el);
                 if (save)
                 {
-                    target.Fields["System.ChangedBy"].Value = "Migration";
-                    target.Save();
+                    target.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
+                    target.ToWorkItem().Save();
                 }
             }
             else
@@ -131,14 +134,14 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                    link.LinkedArtifactUri.StartsWith("vstfs:///Build/Build/", StringComparison.InvariantCultureIgnoreCase);
         }
 
-        private void CreateRelatedLink(WorkItem wiSourceL, RelatedLink item, WorkItem wiTargetL, WorkItemStoreContext sourceStore, WorkItemStoreContext targetStore, bool save, string sourceReflectedWIIdField)
+        private void CreateRelatedLink(WorkItemData wiSourceL, RelatedLink item, WorkItemData wiTargetL, IWorkItemMigrationClient sourceStore, IWorkItemMigrationClient targetStore, bool save, string sourceReflectedWIIdField)
         {
             RelatedLink rl = (RelatedLink)item;
-            WorkItem wiSourceR = null;
-            WorkItem wiTargetR = null;
+            WorkItemData wiSourceR = null;
+            WorkItemData wiTargetR = null;
             try
             {
-                wiSourceR = sourceStore.Store.GetWorkItem(rl.RelatedWorkItemId);
+                wiSourceR = sourceStore.GetWorkItem(rl.RelatedWorkItemId.ToString());
             }
             catch (Exception ex)
             {
@@ -161,9 +164,9 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                 try
                 {
                     var exist = (
-                        from Link l in wiTargetL.Links
+                        from Link l in wiTargetL.ToWorkItem().Links
                         where l is RelatedLink
-                            && ((RelatedLink)l).RelatedWorkItemId == wiTargetR.Id
+                            && ((RelatedLink)l).RelatedWorkItemId.ToString() == wiTargetR.Id
                             && ((RelatedLink)l).LinkTypeEnd.ImmutableName == item.LinkTypeEnd.ImmutableName
                         select (RelatedLink)l).SingleOrDefault();
                     IsExisting = (exist != null);
@@ -175,49 +178,49 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                     return;
                 }
 
-                if (!IsExisting && !wiTargetR.IsAccessDenied)
+                if (!IsExisting && !wiTargetR.ToWorkItem().IsAccessDenied)
                 {
                     if (wiSourceR.Id != wiTargetR.Id)
                     {
                         Log.Information("  [CREATE-START] Adding Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id);
-                        WorkItemLinkTypeEnd linkTypeEnd = targetStore.Store.WorkItemLinkTypes.LinkTypeEnds[rl.LinkTypeEnd.ImmutableName];
-                        RelatedLink newRl = new RelatedLink(linkTypeEnd, wiTargetR.Id);
+                        WorkItemLinkTypeEnd linkTypeEnd = ((WorkItemMigrationClient)targetStore).Store.WorkItemLinkTypes.LinkTypeEnds[rl.LinkTypeEnd.ImmutableName];
+                        RelatedLink newRl = new RelatedLink(linkTypeEnd, int.Parse(wiTargetR.Id));
                         if (linkTypeEnd.ImmutableName == "System.LinkTypes.Hierarchy-Forward")
                         {
                             var potentialParentConflictLink = ( // TF201036: You cannot add a Child link between work items xxx and xxx because a work item can have only one Parent link.
-                                    from Link l in wiTargetR.Links
+                                    from Link l in wiTargetR.ToWorkItem().Links
                                     where l is RelatedLink
                                         && ((RelatedLink)l).LinkTypeEnd.ImmutableName == "System.LinkTypes.Hierarchy-Reverse"
                                     select (RelatedLink)l).SingleOrDefault();
                             if (potentialParentConflictLink != null)
                             {
-                                wiTargetR.Links.Remove(potentialParentConflictLink);
+                                wiTargetR.ToWorkItem().Links.Remove(potentialParentConflictLink);
                             }
-                            linkTypeEnd = targetStore.Store.WorkItemLinkTypes.LinkTypeEnds["System.LinkTypes.Hierarchy-Reverse"];
-                            RelatedLink newLl = new RelatedLink(linkTypeEnd, wiTargetL.Id);
-                            wiTargetR.Links.Add(newLl);
-                            wiTargetR.Fields["System.ChangedBy"].Value = "Migration";
-                            wiTargetR.Save();
+                            linkTypeEnd = ((WorkItemMigrationClient)targetStore).Store.WorkItemLinkTypes.LinkTypeEnds["System.LinkTypes.Hierarchy-Reverse"];
+                            RelatedLink newLl = new RelatedLink(linkTypeEnd,int.Parse( wiTargetL.Id));
+                            wiTargetR.ToWorkItem().Links.Add(newLl);
+                            wiTargetR.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
+                            wiTargetR.ToWorkItem().Save();
                         }
                         else
                         {
                             if (linkTypeEnd.ImmutableName == "System.LinkTypes.Hierarchy-Reverse")
                             {
                                 var potentialParentConflictLink = ( // TF201065: You can not add a Parent link to this work item because a work item can have only one link of this type.
-                                    from Link l in wiTargetL.Links
+                                    from Link l in wiTargetL.ToWorkItem().Links
                                     where l is RelatedLink
                                         && ((RelatedLink)l).LinkTypeEnd.ImmutableName == "System.LinkTypes.Hierarchy-Reverse"
                                     select (RelatedLink)l).SingleOrDefault();
                                 if (potentialParentConflictLink != null)
                                 {
-                                    wiTargetL.Links.Remove(potentialParentConflictLink);
+                                    wiTargetL.ToWorkItem().Links.Remove(potentialParentConflictLink);
                                 }
                             }
-                            wiTargetL.Links.Add(newRl);
+                            wiTargetL.ToWorkItem().Links.Add(newRl);
                             if (save)
                             {
-                                wiTargetL.Fields["System.ChangedBy"].Value = "Migration";
-                                wiTargetL.Save();
+                                wiTargetL.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
+                                wiTargetL.ToWorkItem().Save();
                             }
                         }
                         Log.Information(
@@ -238,7 +241,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                     {
                         Log.Information("  [SKIP] Already Exists a Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id);
                     }
-                    if (wiTargetR.IsAccessDenied)
+                    if (wiTargetR.ToWorkItem().IsAccessDenied)
                     {
                         Log.Information("  [AccessDenied] The Target  work item is inaccessable to create a Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id);
                     }
@@ -250,12 +253,12 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
             }
         }
 
-        private WorkItem GetRightHandSideTargetWi(WorkItem wiSourceL, WorkItem wiSourceR, WorkItem wiTargetL, WorkItemStoreContext targetStore, WorkItemStoreContext sourceStore, string sourceReflectedWIIdField)
+        private WorkItemData GetRightHandSideTargetWi(WorkItemData wiSourceL, WorkItemData wiSourceR, WorkItemData wiTargetL, IWorkItemMigrationClient targetStore, IWorkItemMigrationClient sourceStore, string sourceReflectedWIIdField)
         {
-            WorkItem wiTargetR;
+            WorkItemData wiTargetR;
             if (!(wiTargetL == null)
-                && wiSourceR.Project.Name == wiTargetL.Project.Name
-                && wiSourceR.Project.Store.TeamProjectCollection.Uri.ToString().Replace("/", "") == wiTargetL.Project.Store.TeamProjectCollection.Uri.ToString().Replace("/", ""))
+                && wiSourceR.ToWorkItem().Project.Name == wiTargetL.ToWorkItem().Project.Name
+                && wiSourceR.ToWorkItem().Project.Store.TeamProjectCollection.Uri.ToString().Replace("/", "") == wiTargetL.ToWorkItem().Project.Store.TeamProjectCollection.Uri.ToString().Replace("/", ""))
             {
                 // Moving to same team project as SourceR
                 wiTargetR = wiSourceR;
@@ -267,7 +270,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                 if (wiTargetR == null) // Assume source only (other team project)
                 {
                     wiTargetR = wiSourceR;
-                    if (wiTargetR.Project.Store.TeamProjectCollection.Uri.ToString().Replace("/", "") != wiSourceR.Project.Store.TeamProjectCollection.Uri.ToString().Replace("/", ""))
+                    if (wiTargetR.ToWorkItem().Project.Store.TeamProjectCollection.Uri.ToString().Replace("/", "") != wiSourceR.ToWorkItem().Project.Store.TeamProjectCollection.Uri.ToString().Replace("/", ""))
                     {
                         wiTargetR = null; // Totally bogus break! as not same team collection
                     }
@@ -281,27 +284,27 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
             return item is RelatedLink;
         }
 
-        private void CreateHyperlink(Hyperlink sourceLink, WorkItem target, bool save)
+        private void CreateHyperlink(Hyperlink sourceLink, WorkItemData target, bool save)
         {
-            var exist = (from Link l in target.Links where l is Hyperlink && ((Hyperlink)l).Location == ((Hyperlink)sourceLink).Location select (Hyperlink)l).SingleOrDefault();
+            var exist = (from Link l in target.ToWorkItem().Links where l is Hyperlink && ((Hyperlink)l).Location == ((Hyperlink)sourceLink).Location select (Hyperlink)l).SingleOrDefault();
             if (exist == null)
             {
                 Hyperlink hl = new Hyperlink(sourceLink.Location);
                 hl.Comment = sourceLink.Comment;
-                target.Links.Add(hl);
+                target.ToWorkItem().Links.Add(hl);
                 if (save)
                 {
-                    target.Fields["System.ChangedBy"].Value = "Migration";
-                    target.Save();
+                    target.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
+                    target.ToWorkItem().Save();
                 }
             }
         }
 
-        private static bool ShouldCopyLinks(WorkItem sourceWorkItemLinkStart, WorkItem targetWorkItemLinkStart, bool filterWorkItemsThatAlreadyExistInTarget)
+        private static bool ShouldCopyLinks(WorkItemData sourceWorkItemLinkStart, WorkItemData targetWorkItemLinkStart, bool filterWorkItemsThatAlreadyExistInTarget)
         {
             if (filterWorkItemsThatAlreadyExistInTarget)
             {
-                if (targetWorkItemLinkStart.Links.Count == sourceWorkItemLinkStart.Links.Count) // we should never have this as the target should not have existed in this path
+                if (targetWorkItemLinkStart.ToWorkItem().Links.Count == sourceWorkItemLinkStart.ToWorkItem().Links.Count) // we should never have this as the target should not have existed in this path
                 {
                     Log.Information("[SKIP] Source and Target have same number of links  {sourceWorkItemLinkStartId} - {sourceWorkItemLinkStartType}", sourceWorkItemLinkStart.Id, sourceWorkItemLinkStart.Type.ToString());
                     return false;

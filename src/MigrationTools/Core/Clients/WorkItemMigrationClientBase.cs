@@ -72,8 +72,8 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
         }
 
         public abstract void InnerConfigure(IMigrationClient migrationClient, bool bypassRules = true);
-        public abstract IEnumerable<WorkItemData> GetWorkItems();
-        public abstract IEnumerable<WorkItemData> GetWorkItems(string query);
+        public abstract List<WorkItemData> GetWorkItems();
+        public abstract List<WorkItemData> GetWorkItems(string query);
         public abstract WorkItemData PersistWorkItem(WorkItemData workItem);
         public abstract WorkItemData GetRevision(WorkItemData workItem, int revision);
         public abstract WorkItemData FindReflectedWorkItemByTitle(string title);
@@ -84,5 +84,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
         public abstract string CreateReflectedWorkItemId(WorkItemData wi);
         public abstract int GetReflectedWorkItemId(WorkItemData workItem, string reflectedWotkItemIdField);
         public abstract WorkItemData FindReflectedWorkItem(WorkItemData workItem, bool cache, string sourceReflectedWIIdField = null);
+        public abstract ProjectData GetProject();
+        public abstract List<WorkItemData> FilterWorkItemsThatAlreadyExist(List<WorkItemData> sourceWorkItems, IWorkItemMigrationClient target);
     }
 }

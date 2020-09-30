@@ -34,14 +34,17 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
         }
 
 
-        public override IEnumerable<WorkItemData> GetWorkItems()
+        public override List<WorkItemData> GetWorkItems()
         {
             throw new NotImplementedException();
         }
 
-        public override IEnumerable<WorkItemData> GetWorkItems(string query)
+        public override List<WorkItemData> GetWorkItems(string query)
         {
-            throw new NotImplementedException();
+            IWorkItemQueryBuilder wiqb = Services.GetRequiredService<IWorkItemQueryBuilder>();
+            wiqb.Query = query;
+            wiqb.AddParameter("TeamProject", MigrationClient.Config.Project);
+            return wiqb.Build(MigrationClient).GetWorkItems();
         }
 
         public override WorkItemData PersistWorkItem(WorkItemData workItem)
@@ -49,9 +52,10 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
             throw new NotImplementedException();
         }
 
-        public Project GetProject()
+        public override ProjectData GetProject()
         {
-            return (from Project x in Store.Projects where x.Name.ToUpper() == MigrationClient.Config.Project.ToUpper() select x).SingleOrDefault();
+            Project y = (from Project x in Store.Projects where x.Name.ToUpper() == MigrationClient.Config.Project.ToUpper() select x).SingleOrDefault();
+            return y.ToProjectData();
         }
 
         public override string CreateReflectedWorkItemId(WorkItemData workItem)
@@ -210,6 +214,11 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
             return Store.GetWorkItem(int.Parse(workItem.Id), revision).ToWorkItemData() ;
         }
 
-     
+        public override List<WorkItemData> FilterWorkItemsThatAlreadyExist(List<WorkItemData> sourceWorkItems, IWorkItemMigrationClient target)
+        {
+            throw new NotImplementedException();
+        }
+
+   
     }
 }

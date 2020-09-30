@@ -2,7 +2,11 @@
 using Microsoft.TeamFoundation.Git.Client;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using MigrationTools.Clients.AzureDevops.ObjectModel;
+using MigrationTools.Clients.AzureDevops.ObjectModel.Clients;
 using MigrationTools.Core;
+using MigrationTools.Core.Clients;
+using MigrationTools.Core.DataContracts;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -13,9 +17,9 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using VstsSyncMigrator.Engine;
 
-namespace VstsSyncMigrator.Core.Execution.OMatics
+namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
 {
-    public class RepoOMatic
+    public class GitRepositoryEnricher
     {
         IMigrationEngine migrationEngine;
         GitRepositoryService sourceRepoService;
@@ -26,7 +30,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
         IList<GitRepository> allTargetRepos;
         List<string> gitWits;
 
-        public RepoOMatic(IMigrationEngine me)
+        public GitRepositoryEnricher(IMigrationEngine me)
         {
             migrationEngine = me;
             sourceRepoService = me.Source.GetService<GitRepositoryService>();
@@ -45,18 +49,18 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                 };
         }
 
-        public int FixExternalLinks(WorkItem targetWorkItem, WorkItemStoreContext targetStore, WorkItem sourceWorkItem, bool save = true)
+        public int FixExternalLinks(WorkItemData targetWorkItem, IWorkItemMigrationClient targetStore, WorkItemData sourceWorkItem, bool save = true)
         {
             List<ExternalLink> newEL = new List<ExternalLink>();
             List<ExternalLink> removeEL = new List<ExternalLink>();
             int count = 0;
-            foreach (Link l in targetWorkItem.Links)
+            foreach (Link l in targetWorkItem.ToWorkItem().Links)
             {
                 if (l is ExternalLink && gitWits.Contains(l.ArtifactLinkType.Name))
                 {
                     ExternalLink el = (ExternalLink)l;
 
-                    GitRepositoryInfo sourceRepoInfo = GitRepositoryInfo.Create(el, sourceRepos, migrationEngine, sourceWorkItem?.Project?.Name);
+                    GitRepositoryInfo sourceRepoInfo = GitRepositoryInfo.Create(el, sourceRepos, migrationEngine, sourceWorkItem?.ProjectName);
                     
                     // if sourceRepo is null ignore this link and keep processing further links
                     if (sourceRepoInfo == null) 
@@ -67,7 +71,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                     // if repo was not found in source project, try to find it by repoId in the whole project collection
                     if (sourceRepoInfo.GitRepo == null)
                     {
-                        var anyProjectSourceRepoInfo = GitRepositoryInfo.Create(el, allSourceRepos, migrationEngine, sourceWorkItem?.Project?.Name);
+                        var anyProjectSourceRepoInfo = GitRepositoryInfo.Create(el, allSourceRepos, migrationEngine, sourceWorkItem?.ProjectName);
                         // if repo is found in a different project and the repo Name is listed in repo mappings, use it
                         if (anyProjectSourceRepoInfo.GitRepo != null && migrationEngine.GitRepoMaps.Items.ContainsKey(anyProjectSourceRepoInfo.GitRepo.Name))
                         {
@@ -109,13 +113,13 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                             switch (l.ArtifactLinkType.Name)
                             {
                                 case "Branch":
-                                    newLink = new ExternalLink(targetStore.Store.RegisteredLinkTypes[ArtifactLinkIds.Branch],
+                                    newLink = new ExternalLink(((WorkItemMigrationClient)targetStore).Store.RegisteredLinkTypes[ArtifactLinkIds.Branch],
                                         $"vstfs:///git/ref/{targetRepoInfo.GitRepo.ProjectReference.Id}%2f{targetRepoInfo.GitRepo.Id}%2f{sourceRepoInfo.CommitID}");
                                     break;
 
                                 case "Fixed in Changeset":  // TFVC
                                 case "Fixed in Commit":
-                                    newLink = new ExternalLink(targetStore.Store.RegisteredLinkTypes[ArtifactLinkIds.Commit],
+                                    newLink = new ExternalLink(((WorkItemMigrationClient)targetStore).Store.RegisteredLinkTypes[ArtifactLinkIds.Commit],
                                         $"vstfs:///git/commit/{targetRepoInfo.GitRepo.ProjectReference.Id}%2f{targetRepoInfo.GitRepo.Id}%2f{sourceRepoInfo.CommitID}");
                                     break;
                                 case "Pull Request":
@@ -131,7 +135,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
 
                             if (newLink != null)
                             {
-                                var elinks = from Link lq in targetWorkItem.Links
+                                var elinks = from Link lq in targetWorkItem.ToWorkItem().Links
                                              where gitWits.Contains(lq.ArtifactLinkType.Name)
                                              select (ExternalLink)lq;
                                 var found =
@@ -158,7 +162,7 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
                 try
                 {
                     Trace.WriteLine("Adding " + eln.LinkedArtifactUri);
-                    targetWorkItem.Links.Add(eln);
+                    targetWorkItem.ToWorkItem().Links.Add(eln);
 
                 }
                 catch (Exception)
@@ -169,12 +173,12 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
             }
             foreach (ExternalLink elr in removeEL)
             {
-                if (targetWorkItem.Links.Contains(elr))
+                if (targetWorkItem.ToWorkItem().Links.Contains(elr))
                 {
                     try
                     {
                         Trace.WriteLine("Removing " + elr.LinkedArtifactUri);
-                        targetWorkItem.Links.Remove(elr);
+                        targetWorkItem.ToWorkItem().Links.Remove(elr);
                         count++;
                     }
                     catch (Exception)
@@ -186,11 +190,11 @@ namespace VstsSyncMigrator.Core.Execution.OMatics
 
             }
 
-            if (targetWorkItem.IsDirty && save)
+            if (targetWorkItem.ToWorkItem().IsDirty && save)
             {
                 Trace.WriteLine($"Saving {targetWorkItem.Id}");
-                targetWorkItem.Fields["System.ChangedBy"].Value = "Migration";
-                targetWorkItem.Save();
+                targetWorkItem.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
+                targetWorkItem.ToWorkItem().Save();
             }
             return count;
 
