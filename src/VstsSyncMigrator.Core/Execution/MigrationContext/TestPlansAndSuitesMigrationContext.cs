@@ -675,12 +675,12 @@ namespace VstsSyncMigrator.Engine
                     || e.EntryType == TestSuiteEntryType.StaticTestSuite))
                 {
                     //Find migrated suite in target
-                    WorkItem sourceSuiteWi = Engine.Source.WorkItems.GetWorkItem(sourceSuiteChild.Id.ToString());
-                    WorkItem targetSuiteWi = targetWitStore.FindReflectedWorkItem(sourceSuiteWi, false);
+                    WorkItemData sourceSuiteWi = Engine.Source.WorkItems.GetWorkItem(sourceSuiteChild.Id.ToString());
+                    WorkItemData targetSuiteWi = Engine.Target.WorkItems.FindReflectedWorkItem(sourceSuiteWi, false);
                     if (targetSuiteWi != null)
                     {
                         ITestSuiteEntry targetSuiteChild = (from tc in ((IStaticTestSuite)targetSuite).Entries
-                                                            where tc.Id == targetSuiteWi.Id
+                                                            where tc.Id.ToString() == targetSuiteWi.Id
                                                             select tc).FirstOrDefault();
                         if (targetSuiteChild != null)
                         {
@@ -714,7 +714,7 @@ namespace VstsSyncMigrator.Engine
             {
                 _currentTestCases++;
                 // find target testcase id for this source tce
-                WorkItem targetTc = targetWitStore.FindReflectedWorkItem(sourceTce.TestCase.WorkItem, false);
+                WorkItemData targetTc = Engine.Target.WorkItems.FindReflectedWorkItem(sourceTce.TestCase.WorkItem.ToWorkItemData(), false);
 
                 if (targetTc == null)
                 {
@@ -764,7 +764,7 @@ namespace VstsSyncMigrator.Engine
 
                             // Create a test point assignment with target test case id, target configuration (id and name) and target identity
                             var newAssignment = targetSuite.CreateTestPointAssignment(
-                                targetTc.Id,
+                                int.Parse(targetTc.Id),
                                 targetConfiguration,
                                 targetUserId);
 

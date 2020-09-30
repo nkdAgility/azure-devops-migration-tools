@@ -223,21 +223,6 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
             return Store.GetWorkItem(int.Parse(workItem.Id), revision).ToWorkItemData() ;
         }
 
-        public override List<WorkItemData> FilterWorkItemsThatAlreadyExist(List<WorkItemData> sourceWorkItems, IWorkItemMigrationClient target)
-        {
-            var targetQuery =
-                string.Format(
-                    @"SELECT [System.Id], [{0}] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {1} ORDER BY {2}",
-                     Config.ReflectedWorkItemIDFieldName,
-                    _config.QueryBit,
-                    _config.OrderBit
-                    );
-            var targetFoundItems = Engine.Target.WorkItems.GetWorkItems(targetQuery);
-            var targetFoundIds = (from WorkItemData twi in targetFoundItems select Engine.Target.WorkItems.GetReflectedWorkItemId(twi, Engine.Target.Config.ReflectedWorkItemIDFieldName)).ToList();
-            //////////////////////////////////////////////////////////
-            sourceWorkItems = sourceWorkItems.Where(p => !targetFoundIds.Any(p2 => p2.ToString() == p.Id)).ToList();
-            return sourceWorkItems;
-        }
 
         public override WorkItemData GetWorkItem(string id)
         {

@@ -87,7 +87,6 @@ namespace MigrationTools.Clients
         public abstract int GetReflectedWorkItemId(WorkItemData workItem, string reflectedWotkItemIdField);
         public abstract WorkItemData FindReflectedWorkItem(WorkItemData workItem, bool cache, string sourceReflectedWIIdField = null);
         public abstract ProjectData GetProject();
-        public abstract List<WorkItemData> FilterWorkItemsThatAlreadyExist(List<WorkItemData> sourceWorkItems, IWorkItemMigrationClient target);
         public abstract WorkItemData GetWorkItem(string id);
         public abstract WorkItemData GetWorkItem(int id);
 

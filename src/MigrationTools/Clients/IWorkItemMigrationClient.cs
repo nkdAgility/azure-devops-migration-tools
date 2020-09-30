@@ -21,7 +21,6 @@ namespace MigrationTools.Clients
         List<WorkItemData> GetWorkItems(IWorkItemQueryBuilder queryBuilder);
         WorkItemData PersistWorkItem(WorkItemData workItem);
         WorkItemData GetRevision(WorkItemData workItem, int revision);
-        List<WorkItemData> FilterWorkItemsThatAlreadyExist(List<WorkItemData> sourceWorkItems, IWorkItemMigrationClient target);
         WorkItemData FindReflectedWorkItem(WorkItemData workItem, bool cache, string sourceReflectedWIIdField = null);
         WorkItemData FindReflectedWorkItemByTitle(string title);
         WorkItemData FindReflectedWorkItemByMigrationRef(string refId);

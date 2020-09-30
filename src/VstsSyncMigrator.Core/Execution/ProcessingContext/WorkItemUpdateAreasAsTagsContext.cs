@@ -58,7 +58,7 @@ namespace VstsSyncMigrator.Engine
             {
                 Stopwatch witstopwatch = Stopwatch.StartNew();
 
-				Trace.WriteLine(string.Format("{0} - Updating: {1}-{2}", current, workitem.Id, workitem.Type.Name));
+				Trace.WriteLine(string.Format("{0} - Updating: {1}-{2}", current, workitem.Id, workitem.Type));
                 string areaPath = workitem.ToWorkItem().AreaPath;
                 List<string> bits = new List<string>(areaPath.Split(char.Parse(@"\"))).Skip(4).ToList();
                 List<string> tags = workitem.ToWorkItem().Tags.Split(char.Parse(@";")).ToList();

@@ -128,5 +128,15 @@ namespace MigrationTools.Clients.Tests
         {
             throw new System.NotImplementedException();
         }
+
+        public WorkItemData GetWorkItem(int id)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public List<WorkItemData> GetWorkItems(IWorkItemQueryBuilder queryBuilder)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }
