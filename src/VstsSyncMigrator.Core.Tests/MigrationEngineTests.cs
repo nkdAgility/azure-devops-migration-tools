@@ -81,34 +81,34 @@ namespace _VstsSyncMigrator.Engine.Tests
             IMigrationEngine me = _services.GetRequiredService<IMigrationEngine>();
         }
 
-        [TestMethod]
-        public void TestEngineExecuteEmptyProcessors()
-        {
-            EngineConfiguration ec = _services.GetRequiredService<EngineConfiguration>();
-            ec.Processors.Clear();
-            IMigrationEngine me = _services.GetRequiredService<IMigrationEngine>();
-            me.Run();
+        //[TestMethod]
+        //public void TestEngineExecuteEmptyProcessors()
+        //{
+        //    EngineConfiguration ec = _services.GetRequiredService<EngineConfiguration>();
+        //    ec.Processors.Clear();
+        //    IMigrationEngine me = _services.GetRequiredService<IMigrationEngine>();
+        //    me.Run();
 
-        }
+        //}
 
-        [TestMethod]
-        public void TestEngineExecuteEmptyFieldMaps()
-        {
-            EngineConfiguration ec = _services.GetRequiredService<EngineConfiguration>();
-            ec.Processors.Clear();
-            ec.FieldMaps.Clear();
-            IMigrationEngine me = _services.GetRequiredService<IMigrationEngine>();
-            me.Run();
-        }
+        //[TestMethod]
+        //public void TestEngineExecuteEmptyFieldMaps()
+        //{
+        //    EngineConfiguration ec = _services.GetRequiredService<EngineConfiguration>();
+        //    ec.Processors.Clear();
+        //    ec.FieldMaps.Clear();
+        //    IMigrationEngine me = _services.GetRequiredService<IMigrationEngine>();
+        //    me.Run();
+        //}
 
-        [TestMethod]
-        public void TestEngineExecuteProcessors()
-        {
-            EngineConfiguration ec = _services.GetRequiredService<EngineConfiguration>();
-            ec.FieldMaps.Clear();
-            IMigrationEngine me = _services.GetRequiredService<IMigrationEngine>();
-            me.Run();
-        }
+        //[TestMethod]
+        //public void TestEngineExecuteProcessors()
+        //{
+        //    EngineConfiguration ec = _services.GetRequiredService<EngineConfiguration>();
+        //    ec.FieldMaps.Clear();
+        //    IMigrationEngine me = _services.GetRequiredService<IMigrationEngine>();
+        //    me.Run();
+        //}
 
     }
 }
