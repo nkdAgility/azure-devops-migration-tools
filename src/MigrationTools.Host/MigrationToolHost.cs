@@ -75,8 +75,15 @@ namespace MigrationTools.Host
                     services.AddSingleton<IMigrationEngine, MigrationEngine>();
                     // Host Services
                     services.AddTransient<IStartupService, StartupService>();
-                    services.AddHostedService<ExecuteHostedService>();
-                    services.AddHostedService<InitHostedService>();
+
+                    if (string.Join("|", args).ToLowerInvariant().Contains("init"))
+                    {
+                        services.AddHostedService<InitHostedService>();
+                    }
+                    else
+                    {
+                        services.AddHostedService<ExecuteHostedService>();
+                    }
                 })
                 .UseConsoleLifetime();
             return hostBuilder;
