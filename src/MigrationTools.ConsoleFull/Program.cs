@@ -54,7 +54,6 @@ namespace VstsSyncMigrator.ConsoleApp
                     services.AddSingleton<WorkItemUpdateAreasAsTagsContext>();
 
                     // Core
-                    services.AddSingleton<IMigrationClient, MigrationClient>();
                     services.AddTransient<IMigrationClient, MigrationClient>();
                     services.AddTransient<IWorkItemMigrationClient, WorkItemMigrationClient>();
                     services.AddTransient<IWorkItemQueryBuilder, WorkItemQueryBuilder>();
