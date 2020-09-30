@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using CommandLine;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -75,8 +76,15 @@ namespace MigrationTools.Host
                     services.AddSingleton<IMigrationEngine, MigrationEngine>();
                     // Host Services
                     services.AddTransient<IStartupService, StartupService>();
-                    services.AddHostedService<ExecuteHostedService>();
-                    services.AddHostedService<InitHostedService>();
+
+                    if (args.Any(o => o.Equals("init", StringComparison.InvariantCultureIgnoreCase)))
+                    {
+                        services.AddHostedService<InitHostedService>();
+                    }
+                    else
+                    {
+                        services.AddHostedService<ExecuteHostedService>();
+                    }
                 })
                 .UseConsoleLifetime();
             return hostBuilder;
