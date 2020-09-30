@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using MigrationTools.Core.Configuration;
+using MigrationTools.Configuration;
 
-namespace MigrationTools.Core.Engine.Containers.Tests
+namespace MigrationTools.Engine.Containers.Tests
 {
     public class SimpleFieldMapConfigMock : IFieldMapConfig
     {

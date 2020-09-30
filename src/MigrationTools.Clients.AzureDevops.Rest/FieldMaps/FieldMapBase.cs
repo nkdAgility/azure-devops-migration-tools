@@ -7,12 +7,12 @@ using Microsoft.ApplicationInsights;
 using System.Diagnostics;
 using MigrationTools;
 using Serilog;
-using MigrationTools.Core.Configuration;
-using MigrationTools.Core.Engine;
-using MigrationTools.Core.DataContracts;
+using MigrationTools.Configuration;
+using MigrationTools.Engine;
+using MigrationTools.DataContracts;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 using MigrationTools.Clients.AzureDevops.Rest;
-using MigrationTools.Core.Engine.Containers;
+using MigrationTools.Engine.Containers;
 
 namespace MigrationTools.Clients.AzureDevops.Rest.FieldMaps
 {

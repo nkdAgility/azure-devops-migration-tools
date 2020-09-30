@@ -8,9 +8,9 @@ using MigrationTools;
 using MigrationTools.Host;
 using MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps;
 using VstsSyncMigrator.Engine;
-using MigrationTools.Core.Clients;
+using MigrationTools.Clients;
 using MigrationTools.Clients.AzureDevops.ObjectModel.Clients;
-using MigrationTools.Core;
+using MigrationTools;
 
 namespace VstsSyncMigrator.ConsoleApp
 {
@@ -57,6 +57,7 @@ namespace VstsSyncMigrator.ConsoleApp
                     services.AddTransient<IMigrationClient, MigrationClient>();
                     services.AddTransient<IWorkItemMigrationClient, WorkItemMigrationClient>();
                     services.AddTransient<IWorkItemQueryBuilder, WorkItemQueryBuilder>();
+                    services.AddTransient<IWorkItemQuery, WorkItemQuery>();
 
 
                 });

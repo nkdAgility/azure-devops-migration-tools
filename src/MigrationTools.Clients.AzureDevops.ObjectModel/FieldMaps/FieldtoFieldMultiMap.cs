@@ -1,14 +1,21 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using MigrationTools.Core.Configuration;
-using MigrationTools.Core.Configuration.FieldMap;
+using MigrationTools.Configuration;
+using MigrationTools.Configuration.FieldMap;
+using Serilog;
 
 namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
 {
     public class FieldtoFieldMultiMap : FieldMapBase
     {
+
+        public FieldtoFieldMultiMap(ILogger<FieldtoFieldMultiMap> logger) : base(logger)
+        {
+
+        }
 
         private FieldtoFieldMultiMapConfig Config { get { return (FieldtoFieldMultiMapConfig)_Config; } }
 
@@ -24,16 +31,26 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
             if (fieldsExist(Config.SourceToTargetMappings, source, target))
                 mapFields(Config.SourceToTargetMappings, source, target);
             else
-                Trace.WriteLine("  [SKIPPED] Not all source and target fields exist.");
+                Log.Information("  [SKIPPED] Not all source and target fields exist.");
+
         }
 
         private bool fieldsExist(Dictionary<string, string> fieldMap, WorkItem source, WorkItem target)
         {
             bool exists = true;
             foreach (var map in fieldMap)
-                if (!source.Fields.Contains(map.Key) || !target.Fields.Contains(map.Value))
+            { 
+                if (!source.Fields.Contains(map.Key) )
+                {
                     exists = false;
-
+                    Log.Warning("Configured Field {Field} does not exist in the source on FieldtoFieldMultiMap", map.Key);
+                }
+            if (!target.Fields.Contains(map.Value))
+            {
+                    exists = false;
+                    Log.Warning("Configured Field {Field} does not exist in the target on FieldtoFieldMultiMap", map.Key);
+                }
+            }
             return exists;
         }
 

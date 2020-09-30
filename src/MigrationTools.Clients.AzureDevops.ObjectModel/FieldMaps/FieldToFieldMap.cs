@@ -5,13 +5,19 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using System.Diagnostics;
-using MigrationTools.Core.Configuration.FieldMap;
-using MigrationTools.Core.Configuration;
+using MigrationTools.Configuration.FieldMap;
+using MigrationTools.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
 {
     public class FieldToFieldMap : FieldMapBase
     {
+
+        public FieldToFieldMap(ILogger<FieldToFieldMap> logger) : base(logger)
+        {
+
+        }
         private FieldtoFieldMapConfig Config { get { return (FieldtoFieldMapConfig)_Config; } }
 
         public override void Configure(IFieldMapConfig config)

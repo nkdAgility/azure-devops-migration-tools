@@ -8,16 +8,22 @@ using Microsoft.ApplicationInsights;
 using System.Diagnostics;
 using MigrationTools;
 using Serilog;
-using MigrationTools.Core.Configuration;
-using MigrationTools.Core.Engine;
-using MigrationTools.Core.DataContracts;
-using MigrationTools.Core.Engine.Containers;
+using MigrationTools.Configuration;
+using MigrationTools.Engine;
+using MigrationTools.DataContracts;
+using MigrationTools.Engine.Containers;
+using Microsoft.Extensions.Logging;
 
 namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
 {
     public abstract class FieldMapBase : IFieldMap
     {
         protected IFieldMapConfig _Config;
+
+        public FieldMapBase(ILogger<FieldMapBase> logger)
+        {
+            Logger = logger;
+        }
 
         public virtual void Configure(IFieldMapConfig config)
         {
@@ -32,7 +38,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "Field mapp fault", 
+                Logger.LogError(ex, "Field mapp fault", 
                        new Dictionary<string, string> {
                             { "Source", source.ToWorkItem().Id.ToString() },
                             { "Target",  target.ToWorkItem().Id.ToString()}
@@ -48,6 +54,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
         }
 
         public abstract string MappingDisplayName { get; }
+        public ILogger<FieldMapBase> Logger { get; }
 
         internal abstract void InternalExecute(WorkItem source, WorkItem target);
 

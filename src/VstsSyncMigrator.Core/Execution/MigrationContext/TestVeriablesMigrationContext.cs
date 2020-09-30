@@ -6,12 +6,12 @@ using System.Diagnostics;
 using VstsSyncMigrator.Engine.ComponentContext;
 using System.Linq;
 using System.Collections.Generic;
-using MigrationTools.Core.Configuration.Processing;
+using MigrationTools.Configuration.Processing;
 using Microsoft.Extensions.Hosting;
-using MigrationTools.Core.Configuration;
+using MigrationTools.Configuration;
 using MigrationTools;
-using MigrationTools.Core.Engine.Processors;
-using MigrationTools.Core;
+using MigrationTools.Engine.Processors;
+using MigrationTools;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -32,12 +32,8 @@ namespace VstsSyncMigrator.Engine
 
         protected override void InternalExecute()
         {
-            WorkItemStoreContext sourceWisc = new WorkItemStoreContext(Engine.Source, WorkItemStoreFlags.None, Telemetry);
             TestManagementContext SourceTmc = new TestManagementContext(Engine.Source);
-
-            WorkItemStoreContext targetWisc = new WorkItemStoreContext(Engine.Target, WorkItemStoreFlags.BypassRules, Telemetry);
             TestManagementContext targetTmc = new TestManagementContext(Engine.Target);
-
             List<ITestVariable> sourceVars = SourceTmc.Project.TestVariables.Query().ToList();
             Trace.WriteLine(string.Format("Plan to copy {0} Veriables?", sourceVars.Count));
 

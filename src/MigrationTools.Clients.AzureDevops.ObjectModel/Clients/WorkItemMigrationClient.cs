@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using MigrationTools.Core.Clients;
-using MigrationTools.Core.Configuration;
-using MigrationTools.Core.DataContracts;
+using MigrationTools.Clients;
+using MigrationTools.Configuration;
+using MigrationTools.DataContracts;
 using Serilog;
 
 namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
@@ -19,39 +19,53 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
     {
         private WorkItemStoreFlags _bypassRules;
         private WorkItemStore _wistore;
+        private TeamProjectConfig _config;
 
-        internal WorkItemStore Store { get { return _wistore; } }
+        public WorkItemStore Store { get { return _wistore; } }
 
-        public WorkItemMigrationClient( IServiceProvider services, ITelemetryLogger telemetry) : base(services, telemetry)
+        public override TeamProjectConfig Config => _config;
+
+        public WorkItemMigrationClient(IServiceProvider services, ITelemetryLogger telemetry) : base(services, telemetry)
         {
-            
+
         }
 
         public override void InnerConfigure(IMigrationClient migrationClient, bool bypassRules = true)
         {
+            _config = MigrationClient.Config;
             _bypassRules = bypassRules ? WorkItemStoreFlags.BypassRules : WorkItemStoreFlags.None;
             _wistore = new WorkItemStore(MigrationClient.Config.Collection.ToString(), _bypassRules);
         }
 
 
-        public override IEnumerable<WorkItemData> GetWorkItems()
+        public override List<WorkItemData> GetWorkItems()
         {
             throw new NotImplementedException();
         }
 
-        public override IEnumerable<WorkItemData> GetWorkItems(string query)
+        public override List<WorkItemData> GetWorkItems(string query)
         {
-            throw new NotImplementedException();
+            IWorkItemQueryBuilder wiqb = Services.GetRequiredService<IWorkItemQueryBuilder>();
+            wiqb.Query = query;
+            return GetWorkItems(wiqb);
         }
+        public override List<WorkItemData> GetWorkItems(IWorkItemQueryBuilder queryBuilder)
+        {
+            queryBuilder.AddParameter("TeamProject", MigrationClient.Config.Project);
+            return queryBuilder.Build(MigrationClient).GetWorkItems();
+        }
+
 
         public override WorkItemData PersistWorkItem(WorkItemData workItem)
         {
             throw new NotImplementedException();
         }
 
-        public Project GetProject()
+        public override ProjectData GetProject()
         {
-            return (from Project x in Store.Projects where x.Name.ToUpper() == MigrationClient.Config.Project.ToUpper() select x).SingleOrDefault();
+
+            Project y = (from Project x in Store.Projects where x.Name.ToUpper() == MigrationClient.Config.Project.ToUpper() select x).SingleOrDefault();
+            return y.ToProjectData();
         }
 
         public override string CreateReflectedWorkItemId(WorkItemData workItem)
@@ -108,17 +122,17 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
                     }
                 }
             }
-            if (found == null) { found = FindReflectedWorkItemByReflectedWorkItemId(ReflectedWorkItemId).ToWorkItem(); }
+            if (found == null) { found = FindReflectedWorkItemByReflectedWorkItemId(ReflectedWorkItemId)?.ToWorkItem(); }
             if (sourceReflectedWIIdField != null && !workItemToFind.Fields.Contains(sourceReflectedWIIdField))
             {
-                if (found == null) { found = FindReflectedWorkItemByMigrationRef(ReflectedWorkItemId).ToWorkItem(); } // Too slow!
+                if (found == null) { found = FindReflectedWorkItemByMigrationRef(ReflectedWorkItemId)?.ToWorkItem(); } // Too slow!
                 //if (found == null) { found = FindReflectedWorkItemByTitle(workItemToFind.Title); }
             }
             if (found != null && cache)
             {
                 AddToCache(workItemToFind.Id, found.ToWorkItemData());/// TODO MEMORY LEAK
             }
-            return found.ToWorkItemData();
+            return found?.ToWorkItemData();
         }
 
         public override WorkItemData FindReflectedWorkItemByReflectedWorkItemId(WorkItemData refWi)
@@ -129,7 +143,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
         public override WorkItemData FindReflectedWorkItemByReflectedWorkItemId(int refId, bool cache)
         {
             var sourceIdKey = ~refId;
-            if (Cache.TryGetValue(sourceIdKey, out var workItem)) return workItem ;
+            if (Cache.TryGetValue(sourceIdKey, out var workItem)) return workItem;
 
             IEnumerable<WorkItemData> QueryWorkItems()
             {
@@ -137,8 +151,8 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
                 wiqb.Query = string.Format(@"SELECT [System.Id] FROM WorkItems  WHERE [System.TeamProject]=@TeamProject AND [{0}] Contains '@idToFind'", MigrationClient.Config.ReflectedWorkItemIDFieldName);
                 wiqb.AddParameter("idToFind", refId.ToString());
                 wiqb.AddParameter("TeamProject", MigrationClient.Config.Project);
-                
-                foreach (WorkItemData wi in wiqb.Build( MigrationClient).GetWorkItems())
+
+                foreach (WorkItemData wi in wiqb.Build(MigrationClient).GetWorkItems())
                 {
                     yield return wi;
                 }
@@ -197,7 +211,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
         private WorkItemData FindWorkItemByQuery(IWorkItemQueryBuilder query)
         {
             List<WorkItemData> newFound;
-            newFound = query.Build( MigrationClient ).GetWorkItems();
+            newFound = query.Build(MigrationClient).GetWorkItems();
             if (newFound.Count == 0)
             {
                 return null;
@@ -207,9 +221,18 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
 
         public override WorkItemData GetRevision(WorkItemData workItem, int revision)
         {
-            return Store.GetWorkItem(int.Parse(workItem.Id), revision).ToWorkItemData() ;
+            return Store.GetWorkItem(int.Parse(workItem.Id), revision).ToWorkItemData();
         }
 
-     
+
+        public override WorkItemData GetWorkItem(string id)
+        {
+            return GetWorkItem(int.Parse(id));
+        }
+
+        public override WorkItemData GetWorkItem(int id)
+        {
+            return Store.GetWorkItem(id)?.ToWorkItemData();
+        }
     }
 }

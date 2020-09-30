@@ -6,12 +6,18 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using System.Diagnostics;
-using MigrationTools.Core.Configuration.FieldMap;
+using MigrationTools.Configuration.FieldMap;
+using Microsoft.Extensions.Logging;
 
 namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
 {
     public class FieldBlankMap : FieldMapBase
     {
+
+        public FieldBlankMap(ILogger<FieldBlankMap> logger) : base(logger)
+        {
+           
+        }
         private FieldBlankMapConfig Config { get { return (FieldBlankMapConfig)_Config; } }
 
 

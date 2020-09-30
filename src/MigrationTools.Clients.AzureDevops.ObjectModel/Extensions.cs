@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using MigrationTools.Core.Configuration;
-using MigrationTools.Core.DataContracts;
-using MigrationTools.Core.Engine.Enrichers;
-using MigrationTools.Core.Clients;
+using MigrationTools.Configuration;
+using MigrationTools.DataContracts;
+using MigrationTools.Engine.Enrichers;
+using MigrationTools.Clients;
 using MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers;
 using System;
 using System.Collections.Generic;
@@ -24,19 +24,46 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel
 
         public static WorkItemData ToWorkItemData(this WorkItem workItem)
         {
+            if (workItem is null)
+            {
+                throw new ArgumentNullException(nameof(workItem));
+            }
+
             var internalWorkItem = new WorkItemData();
             internalWorkItem.Id = workItem.Id.ToString();
             internalWorkItem.Type = workItem.Type.Name;
             internalWorkItem.Title = workItem.Title;
+            internalWorkItem.Rev = workItem.Rev;
+            internalWorkItem.RevisedDate = workItem.RevisedDate;
+            internalWorkItem.Revision = workItem.Revision;
+            internalWorkItem.ProjectName = workItem?.Project?.Name;
             internalWorkItem.InternalWorkItem = workItem;
             return internalWorkItem;
+        }
+
+        public static ProjectData ToProjectData(this Project project)
+        {
+            var internalproject = new ProjectData();
+            internalproject.Id = project.Id.ToString();
+            internalproject.Name = project.Name;
+            internalproject.InternalProject = project;
+            return internalproject;
+        }
+
+        public static Project ToProject(this ProjectData projectdata)
+        {
+            if (!(projectdata.InternalProject is Project))
+            {
+                throw new InvalidCastException($"The Work Item stored in the inner field must be of type {(nameof(Project))}");
+            }
+            return (Project)projectdata.InternalProject;
         }
 
         public static WorkItem ToWorkItem(this WorkItemData  workItemData)
         {
             if (!(workItemData.InternalWorkItem is WorkItem))
             {
-                throw new InvalidCastException($"The Work Item stored in the inner field must be of type {(typeof (WorkItem)).FullName}");
+                throw new InvalidCastException($"The Work Item stored in the inner field must be of type {(nameof(WorkItem))}");
             }
             return (WorkItem)workItemData.InternalWorkItem;
         }

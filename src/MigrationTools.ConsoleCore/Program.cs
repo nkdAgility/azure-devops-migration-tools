@@ -1,11 +1,11 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using MigrationTools.Core.Engine;
+using MigrationTools.Engine;
 using MigrationTools.Host;
 using MigrationTools.Clients.AzureDevops.Rest;
 using MigrationTools.Clients.AzureDevops.Rest.FieldMaps;
-using MigrationTools.Core;
+using MigrationTools;
 
 namespace MigrationTools.ConsoleCore
 {

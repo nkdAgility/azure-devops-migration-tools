@@ -10,10 +10,10 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using MigrationTools.Core.Configuration.Processing;
-using MigrationTools.Core.DataContracts;
-using MigrationTools.Core.Engine.Enrichers;
-using MigrationTools.Core.Enrichers;
+using MigrationTools.Configuration.Processing;
+using MigrationTools.DataContracts;
+using MigrationTools.Engine.Enrichers;
+using MigrationTools.Enrichers;
 
 namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
 {

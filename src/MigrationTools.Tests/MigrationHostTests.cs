@@ -3,14 +3,15 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools.CommandLine;
-using MigrationTools.Core;
-using MigrationTools.Core.Clients;
-using MigrationTools.Core.Configuration;
-using MigrationTools.Core.Configuration.Tests;
-using MigrationTools.Core.Engine;
-using MigrationTools.Core.Engine.Containers;
+using MigrationTools;
+using MigrationTools.Clients;
+using MigrationTools.Configuration;
+using MigrationTools.Configuration.Tests;
+using MigrationTools.Engine;
+using MigrationTools.Engine.Containers;
 using MigrationTools.Services;
 using MigrationTools.Tests.Core.Clients;
+using MigrationTools.Clients.Tests;
 
 namespace MigrationTools.Tests
 {
@@ -44,7 +45,9 @@ namespace MigrationTools.Tests
                 services.AddSingleton<ExecuteOptions>();
                 services.AddSingleton<IMigrationEngine, MigrationEngine>();
 
-                services.AddSingleton<IMigrationClient, MigrationClientMock>();
+                services.AddTransient<IMigrationClient, MigrationClientMock>();
+                services.AddTransient<IWorkItemMigrationClient, WorkItemMigrationClientMock>();
+                services.AddTransient<IWorkItemQueryBuilder, WorkItemQueryBuilder>();
 
             }).Build();
         }
