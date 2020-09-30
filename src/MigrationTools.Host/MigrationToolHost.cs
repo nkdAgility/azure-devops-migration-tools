@@ -77,14 +77,8 @@ namespace MigrationTools.Host
                     // Host Services
                     services.AddTransient<IStartupService, StartupService>();
 
-                    if (args.Any(o => o.Equals("init", StringComparison.InvariantCultureIgnoreCase)))
-                    {
-                        services.AddHostedService<InitHostedService>();
-                    }
-                    else
-                    {
-                        services.AddHostedService<ExecuteHostedService>();
-                    }
+                    services.AddHostedService<InitHostedService>();
+                    services.AddHostedService<ExecuteHostedService>();
                 })
                 .UseConsoleLifetime();
             return hostBuilder;
