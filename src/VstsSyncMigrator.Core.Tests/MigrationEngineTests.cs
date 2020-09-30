@@ -59,9 +59,14 @@ namespace _VstsSyncMigrator.Engine.Tests
             services.AddSingleton<EngineConfiguration>(ecb.BuildDefault());
             services.AddSingleton<TelemetryClient>(new TelemetryClient());
             services.AddSingleton<ITelemetryLogger, TelemetryLoggerMock>();
-            services.AddSingleton<IMigrationClient, MigrationClient>();
-            
+
+            services.AddTransient<IMigrationClient, MigrationClient>();
+            services.AddTransient<IWorkItemMigrationClient, WorkItemMigrationClient>();
+            services.AddTransient<IWorkItemQueryBuilder, WorkItemQueryBuilder>();
+
+
             services.AddSingleton<IMigrationEngine, MigrationEngine>();
+
 
             services.AddSingleton<ExecuteOptions>((p) => null);
 

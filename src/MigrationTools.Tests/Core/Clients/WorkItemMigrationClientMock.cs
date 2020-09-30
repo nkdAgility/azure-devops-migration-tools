@@ -5,7 +5,7 @@ using MigrationTools.DataContracts;
 
 namespace MigrationTools.Clients.Tests
 {
-    internal class WorkItemMigrationClientStub : IWorkItemMigrationClient
+    internal class WorkItemMigrationClientMock : IWorkItemMigrationClient
     {
         List<WorkItemData> list = new List<WorkItemData>();
 
@@ -16,7 +16,7 @@ namespace MigrationTools.Clients.Tests
 
         }
 
-        public IEnumerable<WorkItemData> GetWorkItems()
+        public List<WorkItemData> GetWorkItems()
         {
             if (list.Count == 0)
             {
@@ -24,6 +24,7 @@ namespace MigrationTools.Clients.Tests
             }
             return list;
         }
+
 
         public WorkItemData PersistWorkItem(WorkItemData workItem)
         {
@@ -105,11 +106,6 @@ namespace MigrationTools.Clients.Tests
         }
 
         public ProjectData GetProject()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        List<WorkItemData> IWorkItemMigrationClient.GetWorkItems()
         {
             throw new System.NotImplementedException();
         }

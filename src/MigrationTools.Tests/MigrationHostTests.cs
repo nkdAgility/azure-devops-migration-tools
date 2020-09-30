@@ -11,6 +11,7 @@ using MigrationTools.Engine;
 using MigrationTools.Engine.Containers;
 using MigrationTools.Services;
 using MigrationTools.Tests.Core.Clients;
+using MigrationTools.Clients.Tests;
 
 namespace MigrationTools.Tests
 {
@@ -44,7 +45,9 @@ namespace MigrationTools.Tests
                 services.AddSingleton<ExecuteOptions>();
                 services.AddSingleton<IMigrationEngine, MigrationEngine>();
 
-                services.AddSingleton<IMigrationClient, MigrationClientMock>();
+                services.AddTransient<IMigrationClient, MigrationClientMock>();
+                services.AddTransient<IWorkItemMigrationClient, WorkItemMigrationClientMock>();
+                services.AddTransient<IWorkItemQueryBuilder, WorkItemQueryBuilder>();
 
             }).Build();
         }
