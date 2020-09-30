@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace MigrationTools.Core.Clients
+namespace MigrationTools.Clients
 {
    public interface IWorkItemQueryBuilder
     {

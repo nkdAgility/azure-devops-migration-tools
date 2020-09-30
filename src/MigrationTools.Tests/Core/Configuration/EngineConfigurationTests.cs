@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MigrationTools.Core.Configuration;
+using MigrationTools.Configuration;
 using Newtonsoft.Json;
 
 namespace MigrationTools.Tests

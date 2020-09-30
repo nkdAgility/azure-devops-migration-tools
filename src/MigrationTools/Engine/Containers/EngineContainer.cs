@@ -1,12 +1,12 @@
 ﻿using Microsoft.Extensions.Hosting;
-using MigrationTools.Core.Configuration;
+using MigrationTools.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
 using System.Text;
 
-namespace MigrationTools.Core.Engine.Containers
+namespace MigrationTools.Engine.Containers
 {
     public abstract class EngineContainer<TItemType>
     {

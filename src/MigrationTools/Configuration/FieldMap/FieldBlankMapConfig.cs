@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MigrationTools.Core.Configuration.FieldMap
+namespace MigrationTools.Configuration.FieldMap
 {
    public class FieldBlankMapConfig : IFieldMapConfig
     {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace MigrationTools.Core.Engine.Containers
+namespace MigrationTools.Engine.Containers
 {
     public enum ProcessingStatus { Running, Failed, Complete, None };
 }

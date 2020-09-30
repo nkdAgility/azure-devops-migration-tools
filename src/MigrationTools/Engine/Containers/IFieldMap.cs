@@ -1,10 +1,10 @@
-﻿using MigrationTools.Core.Configuration;
-using MigrationTools.Core.DataContracts;
+﻿using MigrationTools.Configuration;
+using MigrationTools.DataContracts;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace MigrationTools.Core.Engine.Containers
+namespace MigrationTools.Engine.Containers
 {
    public interface IFieldMap
     {

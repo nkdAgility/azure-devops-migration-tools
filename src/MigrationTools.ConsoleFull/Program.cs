@@ -8,9 +8,9 @@ using MigrationTools;
 using MigrationTools.Host;
 using MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps;
 using VstsSyncMigrator.Engine;
-using MigrationTools.Core.Clients;
+using MigrationTools.Clients;
 using MigrationTools.Clients.AzureDevops.ObjectModel.Clients;
-using MigrationTools.Core;
+using MigrationTools;
 
 namespace VstsSyncMigrator.ConsoleApp
 {

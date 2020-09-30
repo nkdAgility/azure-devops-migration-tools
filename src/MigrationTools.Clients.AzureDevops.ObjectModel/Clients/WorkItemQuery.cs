@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using MigrationTools.Core.Clients;
-using MigrationTools.Core.DataContracts;
+using MigrationTools.Clients;
+using MigrationTools.DataContracts;
 using Serilog;
 
 namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients

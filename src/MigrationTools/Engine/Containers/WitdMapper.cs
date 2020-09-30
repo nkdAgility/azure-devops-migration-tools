@@ -1,7 +1,7 @@
 ﻿using System;
-using MigrationTools.Core.Engine;
+using MigrationTools.Engine;
 
-namespace MigrationTools.Core.Engine.Containers
+namespace MigrationTools.Engine.Containers
 {
     public class WitMapper : IWitdMapper
     {

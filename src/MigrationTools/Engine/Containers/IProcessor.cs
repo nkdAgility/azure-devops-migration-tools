@@ -1,9 +1,9 @@
-﻿using MigrationTools.Core.Configuration;
+﻿using MigrationTools.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace MigrationTools.Core.Engine.Containers
+namespace MigrationTools.Engine.Containers
 {
    public interface IProcessor
     {

@@ -5,13 +5,13 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools;
 using MigrationTools.CommandLine;
-using MigrationTools.Core.Configuration;
-using MigrationTools.Core.Engine.Containers;
+using MigrationTools.Configuration;
+using MigrationTools.Engine.Containers;
 using MigrationTools.Services;
 using MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps;
 using VstsSyncMigrator.Engine;
-using MigrationTools.Core;
-using MigrationTools.Core.Clients;
+using MigrationTools;
+using MigrationTools.Clients;
 using MigrationTools.Clients.AzureDevops.ObjectModel.Clients;
 
 namespace _VstsSyncMigrator.Engine.Tests

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-namespace MigrationTools.Core.Configuration.Processing
+namespace MigrationTools.Configuration.Processing
 {
     public class WorkItemMigrationConfig : IProcessorConfig
     {

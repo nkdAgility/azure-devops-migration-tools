@@ -6,12 +6,12 @@ using System.Diagnostics;
 using VstsSyncMigrator.Engine.ComponentContext;
 using System.Linq;
 using System.Collections.Generic;
-using MigrationTools.Core.Configuration.Processing;
+using MigrationTools.Configuration.Processing;
 using Microsoft.Extensions.Hosting;
-using MigrationTools.Core.Configuration;
+using MigrationTools.Configuration;
 using MigrationTools;
-using MigrationTools.Core.Engine.Processors;
-using MigrationTools.Core;
+using MigrationTools.Engine.Processors;
+using MigrationTools;
 
 namespace VstsSyncMigrator.Engine
 {

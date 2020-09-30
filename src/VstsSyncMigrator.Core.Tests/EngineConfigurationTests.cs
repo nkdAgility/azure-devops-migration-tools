@@ -1,5 +1,5 @@
 ﻿using System;
-using MigrationTools.Core.Configuration;
+using MigrationTools.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Extensions.Logging.Abstractions;
 

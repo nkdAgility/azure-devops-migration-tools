@@ -1,10 +1,10 @@
-﻿using MigrationTools.Core.Configuration;
+﻿using MigrationTools.Configuration;
 using System.IO;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 
-namespace MigrationTools.Core.Configuration.Tests
+namespace MigrationTools.Configuration.Tests
 {
     [TestClass()]
     public class EngineConfigurationBuilderTests

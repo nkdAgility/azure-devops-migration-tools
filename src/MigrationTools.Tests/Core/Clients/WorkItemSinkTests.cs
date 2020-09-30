@@ -1,12 +1,12 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MigrationTools.Core.DataContracts;
-using MigrationTools.Core.Clients;
+using MigrationTools.DataContracts;
+using MigrationTools.Clients;
 using System;
 using System.Text;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 
-namespace MigrationTools.Core.Clients.Tests
+namespace MigrationTools.Clients.Tests
 {
     [TestClass()]
     public class WorkItemMigrationClientTests

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace MigrationTools.Core.DataContracts
+namespace MigrationTools.DataContracts
 {
    public class WorkItemData
     {

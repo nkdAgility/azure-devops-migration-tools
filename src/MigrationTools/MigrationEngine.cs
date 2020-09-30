@@ -5,13 +5,13 @@ using System.Net;
 using Microsoft.Extensions.DependencyInjection;
 using MigrationTools;
 using MigrationTools.CommandLine;
-using MigrationTools.Core.Clients;
-using MigrationTools.Core.Configuration;
-using MigrationTools.Core.Engine;
-using MigrationTools.Core.Engine.Containers;
+using MigrationTools.Clients;
+using MigrationTools.Configuration;
+using MigrationTools.Engine;
+using MigrationTools.Engine.Containers;
 using Serilog;
 
-namespace MigrationTools.Core
+namespace MigrationTools
 {
     public class MigrationEngine : IMigrationEngine
     {

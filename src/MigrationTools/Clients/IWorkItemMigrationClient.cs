@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
-using MigrationTools.Core.Configuration;
-using MigrationTools.Core.DataContracts;
+using MigrationTools.Configuration;
+using MigrationTools.DataContracts;
 
-namespace MigrationTools.Core.Clients
+namespace MigrationTools.Clients
 {
     public interface IWorkItemMigrationClient
     {

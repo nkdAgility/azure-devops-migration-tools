@@ -3,13 +3,13 @@ using Microsoft.TeamFoundation.TestManagement.Client;
 using System.Diagnostics;
 using System.Linq;
 using VstsSyncMigrator.Engine.ComponentContext;
-using MigrationTools.Core.Configuration.Processing;
+using MigrationTools.Configuration.Processing;
 using Microsoft.Extensions.Hosting;
-using MigrationTools.Core.Configuration;
+using MigrationTools.Configuration;
 using Microsoft.ApplicationInsights.Channel;
 using MigrationTools;
-using MigrationTools.Core.Engine.Processors;
-using MigrationTools.Core;
+using MigrationTools.Engine.Processors;
+using MigrationTools;
 
 namespace VstsSyncMigrator.Engine
 {

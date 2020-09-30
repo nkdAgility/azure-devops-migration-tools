@@ -4,7 +4,7 @@ using System.IO;
 using Microsoft.Extensions.Logging;
 using MigrationTools.CommandLine;
 
-namespace MigrationTools.Core.Configuration
+namespace MigrationTools.Configuration
 {
     public class EngineConfigurationWrapper : EngineConfiguration
     {

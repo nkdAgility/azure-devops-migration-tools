@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using Microsoft.Extensions.Logging;
-using MigrationTools.Core.Configuration.FieldMap;
-using MigrationTools.Core.Configuration.Processing;
+using MigrationTools.Configuration.FieldMap;
+using MigrationTools.Configuration.Processing;
 using Newtonsoft.Json;
 
-namespace MigrationTools.Core.Configuration
+namespace MigrationTools.Configuration
 {
     public class EngineConfigurationBuilder : IEngineConfigurationBuilder
     {

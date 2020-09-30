@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using Microsoft.ApplicationInsights;
-using MigrationTools.Core.Configuration.FieldMap;
+using MigrationTools.Configuration.FieldMap;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 
 namespace MigrationTools.Clients.AzureDevops.Rest.FieldMaps

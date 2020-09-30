@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MigrationTools.Core.Configuration
+namespace MigrationTools.Configuration
 {
     public abstract class JsonCreationConverter<T> : JsonConverter
     {

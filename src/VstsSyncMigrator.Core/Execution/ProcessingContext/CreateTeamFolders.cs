@@ -8,11 +8,11 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Linq;
 using Microsoft.TeamFoundation.Client;
-using MigrationTools.Core.Configuration;
+using MigrationTools.Configuration;
 using Microsoft.Extensions.Hosting;
 using MigrationTools;
-using MigrationTools.Core.Clients;
-using MigrationTools.Core;
+using MigrationTools.Clients;
+using MigrationTools;
 
 namespace VstsSyncMigrator.Engine
 {

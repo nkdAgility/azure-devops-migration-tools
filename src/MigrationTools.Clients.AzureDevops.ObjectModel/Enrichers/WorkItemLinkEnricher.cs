@@ -3,9 +3,9 @@ using System.Diagnostics;
 using System.Linq;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools.Clients.AzureDevops.ObjectModel.Clients;
-using MigrationTools.Core.Clients;
-using MigrationTools.Core.DataContracts;
-using MigrationTools.Core.Exceptions;
+using MigrationTools.Clients;
+using MigrationTools.DataContracts;
+using MigrationTools.Exceptions;
 using Serilog;
 using VstsSyncMigrator.Engine;
 

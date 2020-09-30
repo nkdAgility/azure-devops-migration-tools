@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using MigrationTools.Core.Clients;
-using MigrationTools.Core.Engine.Containers;
+using MigrationTools.Clients;
+using MigrationTools.Engine.Containers;
 
-namespace MigrationTools.Core
+namespace MigrationTools
 {
     public interface IMigrationEngine
     {

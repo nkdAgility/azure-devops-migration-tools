@@ -8,10 +8,10 @@ using Microsoft.ApplicationInsights;
 using System.Diagnostics;
 using MigrationTools;
 using Serilog;
-using MigrationTools.Core.Configuration;
-using MigrationTools.Core.Engine;
-using MigrationTools.Core.DataContracts;
-using MigrationTools.Core.Engine.Containers;
+using MigrationTools.Configuration;
+using MigrationTools.Engine;
+using MigrationTools.DataContracts;
+using MigrationTools.Engine.Containers;
 
 namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
 {

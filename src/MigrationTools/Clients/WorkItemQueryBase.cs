@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using MigrationTools.Core.Clients;
-using MigrationTools.Core.DataContracts;
+using MigrationTools.Clients;
+using MigrationTools.DataContracts;
 using Serilog;
 
-namespace MigrationTools.Core.Clients
+namespace MigrationTools.Clients
 {
     public abstract class WorkItemQueryBase : IWorkItemQuery
     {

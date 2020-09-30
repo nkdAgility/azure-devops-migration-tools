@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using MigrationTools.Core.Configuration;
-using MigrationTools.Core.DataContracts;
+using MigrationTools.Configuration;
+using MigrationTools.DataContracts;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 
-namespace MigrationTools.Core.Engine.Containers
+namespace MigrationTools.Engine.Containers
 {
     public class ProcessorContainer : EngineContainer<ReadOnlyCollection<IProcessor>>
     {

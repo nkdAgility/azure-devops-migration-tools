@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using MigrationTools.Core.Configuration;
+using MigrationTools.Configuration;
 using MigrationTools;
 using Serilog;
-using MigrationTools.Core.Engine.Containers;
-using MigrationTools.Core;
+using MigrationTools.Engine.Containers;
+using MigrationTools;
 
 namespace VstsSyncMigrator.Engine
 {

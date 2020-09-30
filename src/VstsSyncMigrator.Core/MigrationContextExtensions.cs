@@ -1,6 +1,6 @@
 ﻿using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using MigrationTools.Core.DataContracts;
-using MigrationTools.Core.Engine.Containers;
+using MigrationTools.DataContracts;
+using MigrationTools.Engine.Containers;
 using System;
 using VstsSyncMigrator.Core.Execution.OMatics;
 using VstsSyncMigrator.Engine;

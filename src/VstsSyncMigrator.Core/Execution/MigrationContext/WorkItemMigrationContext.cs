@@ -15,9 +15,9 @@ using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using Microsoft.VisualStudio.Services.Client;
 using Microsoft.VisualStudio.Services.WebApi.Patch.Json;
 using MigrationTools;
-using MigrationTools.Core.Configuration;
-using MigrationTools.Core.Configuration.Processing;
-using MigrationTools.Core.Engine.Enrichers;
+using MigrationTools.Configuration;
+using MigrationTools.Configuration.Processing;
+using MigrationTools.Engine.Enrichers;
 using MigrationTools.Clients.AzureDevops.ObjectModel;
 using MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers;
 using Newtonsoft.Json;
@@ -25,10 +25,10 @@ using Serilog;
 using Serilog.Context;
 using Serilog.Events;
 using VstsSyncMigrator.Core;
-using MigrationTools.Core.Engine.Processors;
-using MigrationTools.Core;
-using MigrationTools.Core.DataContracts;
-using MigrationTools.Core.Clients;
+using MigrationTools.Engine.Processors;
+using MigrationTools;
+using MigrationTools.DataContracts;
+using MigrationTools.Clients;
 
 namespace VstsSyncMigrator.Engine
 {

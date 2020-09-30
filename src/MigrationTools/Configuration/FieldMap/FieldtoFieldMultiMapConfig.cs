@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 
-namespace MigrationTools.Core.Configuration.FieldMap
+namespace MigrationTools.Configuration.FieldMap
 {
     public class FieldtoFieldMultiMapConfig : IFieldMapConfig
     {

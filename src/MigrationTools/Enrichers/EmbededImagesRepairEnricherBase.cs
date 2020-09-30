@@ -1,5 +1,5 @@
-﻿using MigrationTools.Core.DataContracts;
-using MigrationTools.Core.Engine.Enrichers;
+﻿using MigrationTools.DataContracts;
+using MigrationTools.Engine.Enrichers;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,7 +8,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 
-namespace MigrationTools.Core.Enrichers
+namespace MigrationTools.Enrichers
 {
     public abstract class EmbededImagesRepairEnricherBase : IEmbededImagesRepairEnricher
     {

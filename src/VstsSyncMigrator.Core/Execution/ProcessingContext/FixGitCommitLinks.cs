@@ -7,13 +7,13 @@ using System.Linq;
 using Microsoft.TeamFoundation.Git.Client;
 using Microsoft.TeamFoundation;
 
-using MigrationTools.Core.Configuration.Processing;
+using MigrationTools.Configuration.Processing;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
 using VstsSyncMigrator.Core.Execution.OMatics;
-using MigrationTools.Core.Configuration;
+using MigrationTools.Configuration;
 using Microsoft.Extensions.Hosting;
 using MigrationTools;
-using MigrationTools.Core;
+using MigrationTools;
 
 namespace VstsSyncMigrator.Engine
 {

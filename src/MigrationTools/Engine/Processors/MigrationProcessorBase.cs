@@ -2,17 +2,17 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
-using MigrationTools.Core.Engine;
-using MigrationTools.Core.Configuration;
+using MigrationTools.Engine;
+using MigrationTools.Configuration;
 using MigrationTools;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Microsoft.ApplicationInsights.DataContracts;
-using MigrationTools.Core.Engine.Containers;
-using MigrationTools.Core;
+using MigrationTools.Engine.Containers;
+using MigrationTools;
 
-namespace MigrationTools.Core.Engine.Processors
+namespace MigrationTools.Engine.Processors
 {
     public abstract class MigrationProcessorBase : IProcessor
     {

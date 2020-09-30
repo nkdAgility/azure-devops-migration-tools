@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace MigrationTools.Core.Configuration.Processing
+namespace MigrationTools.Configuration.Processing
 {
     public class TestConfigurationsMigrationConfig : IProcessorConfig
     {

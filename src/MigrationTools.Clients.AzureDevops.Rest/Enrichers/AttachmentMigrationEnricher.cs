@@ -8,8 +8,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MigrationTools;
-using MigrationTools.Core.DataContracts;
-using MigrationTools.Core.Engine.Enrichers;
+using MigrationTools.DataContracts;
+using MigrationTools.Engine.Enrichers;
 
 namespace MigrationTools.Clients.AzureDevops.Rest.Enrichers
 {

@@ -9,10 +9,10 @@ using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.TeamFoundation;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.VisualStudio.Services.Common;
-using MigrationTools.Core;
-using MigrationTools.Core.Clients;
-using MigrationTools.Core.Configuration;
-using MigrationTools.Core.DataContracts;
+using MigrationTools;
+using MigrationTools.Clients;
+using MigrationTools.Configuration;
+using MigrationTools.DataContracts;
 using Serilog;
 
 namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients

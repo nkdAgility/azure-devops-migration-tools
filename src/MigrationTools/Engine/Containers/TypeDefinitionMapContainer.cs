@@ -1,12 +1,12 @@
 ﻿using Microsoft.Extensions.Hosting;
-using MigrationTools.Core.Configuration;
+using MigrationTools.Configuration;
 using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
 
-namespace MigrationTools.Core.Engine.Containers
+namespace MigrationTools.Engine.Containers
 {
    public class TypeDefinitionMapContainer : EngineContainer<ReadOnlyDictionary<string, IWitdMapper>>
     {

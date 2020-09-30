@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
-using MigrationTools.Core.Configuration;
-using MigrationTools.Core.DataContracts;
-using MigrationTools.Core.Clients;
+using MigrationTools.Configuration;
+using MigrationTools.DataContracts;
+using MigrationTools.Clients;
 using System;
 using System.Collections.Generic;
 using System.Text;

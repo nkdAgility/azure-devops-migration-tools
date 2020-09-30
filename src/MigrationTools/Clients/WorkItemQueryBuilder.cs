@@ -4,7 +4,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace MigrationTools.Core.Clients
+namespace MigrationTools.Clients
 {
     public class WorkItemQueryBuilder : IWorkItemQueryBuilder
     {

@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using MigrationTools.Core.Clients;
-using MigrationTools.Core.Configuration;
-using MigrationTools.Core.DataContracts;
+using MigrationTools.Clients;
+using MigrationTools.Configuration;
+using MigrationTools.DataContracts;
 using Serilog;
 
 namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients

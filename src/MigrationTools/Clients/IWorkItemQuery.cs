@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Text;
-using MigrationTools.Core.DataContracts;
+using MigrationTools.DataContracts;
 
-namespace MigrationTools.Core.Clients
+namespace MigrationTools.Clients
 {
     public interface IWorkItemQuery
     {

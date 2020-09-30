@@ -11,15 +11,15 @@ using Microsoft.TeamFoundation.Framework.Common;
 using Microsoft.TeamFoundation.TestManagement.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools;
-using MigrationTools.Core.Configuration;
-using MigrationTools.Core.Configuration.Processing;
+using MigrationTools.Configuration;
+using MigrationTools.Configuration.Processing;
 using MigrationTools.Clients.AzureDevops.ObjectModel;
 using Serilog;
 using VstsSyncMigrator.Core;
 using VstsSyncMigrator.Engine.ComponentContext;
 using WorkItem = Microsoft.TeamFoundation.WorkItemTracking.Client.WorkItem;
-using MigrationTools.Core;
-using MigrationTools.Core.Engine.Processors;
+using MigrationTools;
+using MigrationTools.Engine.Processors;
 
 namespace VstsSyncMigrator.Engine
 {

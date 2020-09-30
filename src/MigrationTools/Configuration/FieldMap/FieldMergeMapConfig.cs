@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-namespace MigrationTools.Core.Configuration.FieldMap
+namespace MigrationTools.Configuration.FieldMap
 {
    public class FieldMergeMapConfig : IFieldMapConfig
     {

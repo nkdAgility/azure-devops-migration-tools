@@ -1,12 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using MigrationTools.Core.DataContracts;
+using MigrationTools.Configuration;
+using MigrationTools.DataContracts;
 
-namespace MigrationTools.Core.Clients.Tests
+namespace MigrationTools.Clients.Tests
 {
     internal class WorkItemMigrationClientStub : IWorkItemMigrationClient
     {
         List<WorkItemData> list = new List<WorkItemData>();
+
+        public TeamProjectConfig Config => throw new System.NotImplementedException();
 
         public void Configure(IMigrationClient migrationClient, bool bypassRules = true)
         {
@@ -101,6 +104,29 @@ namespace MigrationTools.Core.Clients.Tests
             throw new System.NotImplementedException();
         }
 
+        public ProjectData GetProject()
+        {
+            throw new System.NotImplementedException();
+        }
 
+        List<WorkItemData> IWorkItemMigrationClient.GetWorkItems()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public WorkItemData GetWorkItem(string id)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        List<WorkItemData> IWorkItemMigrationClient.GetWorkItems(string query)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public List<WorkItemData> FilterWorkItemsThatAlreadyExist(List<WorkItemData> sourceWorkItems, IWorkItemMigrationClient target)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

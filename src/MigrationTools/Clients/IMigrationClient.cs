@@ -1,11 +1,11 @@
-﻿using MigrationTools.Core.Configuration;
-using MigrationTools.Core.DataContracts;
+﻿using MigrationTools.Configuration;
+using MigrationTools.DataContracts;
 using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
 
-namespace MigrationTools.Core.Clients
+namespace MigrationTools.Clients
 {
    public  interface IMigrationClient
     {

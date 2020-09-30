@@ -8,12 +8,12 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.DependencyInjection;
-using MigrationTools.Core.Clients;
-using MigrationTools.Core.Configuration;
-using MigrationTools.Core.DataContracts;
+using MigrationTools.Clients;
+using MigrationTools.Configuration;
+using MigrationTools.DataContracts;
 using Serilog;
 
-namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
+namespace MigrationTools.Clients
 {
     public abstract class WorkItemMigrationClientBase : IWorkItemMigrationClient
     {
@@ -27,6 +27,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
 
         protected ReadOnlyDictionary<int, WorkItemData> Cache { get { return new ReadOnlyDictionary<int, WorkItemData>(_Cache); } }
 
+        public abstract TeamProjectConfig Config { get; }
 
         public WorkItemMigrationClientBase(IServiceProvider services, ITelemetryLogger telemetry)
         {
@@ -86,5 +87,6 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
         public abstract WorkItemData FindReflectedWorkItem(WorkItemData workItem, bool cache, string sourceReflectedWIIdField = null);
         public abstract ProjectData GetProject();
         public abstract List<WorkItemData> FilterWorkItemsThatAlreadyExist(List<WorkItemData> sourceWorkItems, IWorkItemMigrationClient target);
+        public abstract WorkItemData GetWorkItem(string id);
     }
 }

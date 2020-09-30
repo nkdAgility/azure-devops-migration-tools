@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MigrationTools.Core.Exceptions
+namespace MigrationTools.Exceptions
 {
     public class UnknownLinkTypeException : Exception
     {
