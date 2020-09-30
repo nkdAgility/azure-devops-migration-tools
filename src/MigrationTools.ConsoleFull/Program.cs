@@ -55,7 +55,11 @@ namespace VstsSyncMigrator.ConsoleApp
 
                     // Core
                     services.AddSingleton<IMigrationClient, MigrationClient>();
-                   
+                    services.AddTransient<IMigrationClient, MigrationClient>();
+                    services.AddTransient<IWorkItemMigrationClient, WorkItemMigrationClient>();
+                    services.AddTransient<IWorkItemQueryBuilder, WorkItemQueryBuilder>();
+
+
                 });
                 var host = hostBuilder.Build();
             var startupService = host.InitializeMigrationSetup(args);
