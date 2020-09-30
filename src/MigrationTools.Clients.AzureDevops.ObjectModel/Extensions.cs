@@ -41,7 +41,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel
             return (WorkItem)workItemData.InternalWorkItem;
         }
 
-        public static IEnumerable<WorkItemData> ToWorkItemDataList(this WorkItemCollection collection)
+        public static List<WorkItemData> ToWorkItemDataList(this WorkItemCollection collection)
         {
             List<WorkItemData> list = new List<WorkItemData>();
             foreach (WorkItem wi in collection)

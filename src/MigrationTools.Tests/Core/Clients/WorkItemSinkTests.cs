@@ -9,12 +9,12 @@ using System.Security.Cryptography.X509Certificates;
 namespace MigrationTools.Core.Clients.Tests
 {
     [TestClass()]
-    public class WorkItemSinkTests
+    public class WorkItemMigrationClientTests
     {
         [TestMethod()]
         public void TestGetWorkItems()
         {
-            IMigrationClient sink = new WorkItemSinkStub();
+            IWorkItemMigrationClient sink = new WorkItemMigrationClientStub();
             var list = sink.GetWorkItems();
             //
             Assert.IsTrue(list.Count() == 5);
@@ -23,7 +23,7 @@ namespace MigrationTools.Core.Clients.Tests
         [TestMethod()]
         public void TestPersistNewWorkItem()
         {
-            IMigrationClient sink = new WorkItemSinkStub();
+            IWorkItemMigrationClient sink = new WorkItemMigrationClientStub();
             sink.PersistWorkItem(new WorkItemData { Title = "Item 6" });
             //
             var list = sink.GetWorkItems();
@@ -33,7 +33,7 @@ namespace MigrationTools.Core.Clients.Tests
         [TestMethod()]
         public void TestpersistExistingItem()
         {
-            IMigrationClient sink = new WorkItemSinkStub();
+            IWorkItemMigrationClient sink = new WorkItemMigrationClientStub();
             var workItem = sink.GetWorkItems().First();
             workItem.Title = "New Title";
             sink.PersistWorkItem(workItem);

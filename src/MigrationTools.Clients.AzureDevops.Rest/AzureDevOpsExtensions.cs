@@ -16,7 +16,7 @@ namespace MigrationTools.Clients.AzureDevops.Rest
         public static WorkItemData ToWorkItemData(this WorkItem workItem)
         {
             var internalWorkItem = new WorkItemData();
-            internalWorkItem.id = workItem.Id.ToString();
+            internalWorkItem.Id = workItem.Id.ToString();
             internalWorkItem.Type = "unknown";
             internalWorkItem.Title = "unknown";
             internalWorkItem.InternalWorkItem = workItem;

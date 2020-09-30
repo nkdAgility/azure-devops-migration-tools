@@ -17,7 +17,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
 
         }
 
-        public override IEnumerable<WorkItemData> GetWorkItems()
+        public override List<WorkItemData> GetWorkItems()
         {
             var wiClient = (WorkItemMigrationClient)MigrationClient.WorkItems;
             Telemetry.TrackEvent("WorkItemQuery.Execute", Parameters, null);
