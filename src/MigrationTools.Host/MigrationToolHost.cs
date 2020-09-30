@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using CommandLine;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -76,7 +77,7 @@ namespace MigrationTools.Host
                     // Host Services
                     services.AddTransient<IStartupService, StartupService>();
 
-                    if (string.Join("|", args).ToLowerInvariant().Contains("init"))
+                    if (args.Any(o => o.Equals("init", StringComparison.InvariantCultureIgnoreCase)))
                     {
                         services.AddHostedService<InitHostedService>();
                     }
