@@ -26,7 +26,13 @@ namespace MigrationTools.Clients
 
         public void AddParameter(string name, string value)
         {
-            throw new NotImplementedException();
+            if (!Parameters.ContainsKey(name))
+            {
+                Parameters.Add(name, value);
+            } else
+            {
+                throw new Exception("You cant add the same key twice to the query builder properties.");
+            }           
         }
 
         public IWorkItemQuery Build(IMigrationClient migrationClient)

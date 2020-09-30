@@ -9,7 +9,7 @@ using Serilog;
 
 namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
 {
-    internal class WorkItemQuery : WorkItemQueryBase
+    public class WorkItemQuery : WorkItemQueryBase
     {
 
         public WorkItemQuery(IServiceProvider services, ITelemetryLogger telemetry) : base(services, telemetry)
