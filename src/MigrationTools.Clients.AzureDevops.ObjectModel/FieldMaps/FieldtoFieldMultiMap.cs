@@ -25,7 +25,8 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
             if (fieldsExist(Config.SourceToTargetMappings, source, target))
                 mapFields(Config.SourceToTargetMappings, source, target);
             else
-               
+                Trace.WriteLine("  [SKIPPED] Not all source and target fields exist.");
+
         }
 
         private bool fieldsExist(Dictionary<string, string> fieldMap, WorkItem source, WorkItem target)

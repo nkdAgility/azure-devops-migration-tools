@@ -3,6 +3,10 @@
     "MigrationTools.ConsoleFull": {
       "commandName": "Project",
       "commandLineArgs": "execute -c configuration.json"
+    },
+    "Init": {
+      "commandName": "Project",
+      "commandLineArgs": "Init"
     }
   }
 }
