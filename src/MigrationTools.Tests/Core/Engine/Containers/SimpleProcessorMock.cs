@@ -1,6 +1,6 @@
-﻿using MigrationTools.Core.Configuration;
+﻿using MigrationTools.Configuration;
 
-namespace MigrationTools.Core.Engine.Containers.Tests
+namespace MigrationTools.Engine.Containers.Tests
 {
     public class SimpleProcessorMock : IProcessor
     {

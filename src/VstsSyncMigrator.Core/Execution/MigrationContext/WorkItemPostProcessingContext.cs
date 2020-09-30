@@ -7,13 +7,16 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using MigrationTools.Core.Configuration.Processing;
+using MigrationTools.Configuration.Processing;
 using Microsoft.Extensions.Hosting;
-using MigrationTools.Core.Configuration;
+using MigrationTools.Configuration;
 using MigrationTools;
 using MigrationTools.Clients.AzureDevops.ObjectModel;
-using MigrationTools.Core.Engine.Processors;
-using MigrationTools.Core;
+using MigrationTools.Engine.Processors;
+using MigrationTools;
+using MigrationTools.Clients;
+using Microsoft.Extensions.DependencyInjection;
+using MigrationTools.DataContracts;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -59,47 +62,42 @@ namespace VstsSyncMigrator.Engine
         protected override void InternalExecute()
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
-			//////////////////////////////////////////////////
-			WorkItemStoreContext sourceStore = new WorkItemStoreContext(Engine.Source, WorkItemStoreFlags.None, Telemetry);
-            TfsQueryContext tfsqc = new TfsQueryContext(sourceStore, Telemetry);
-            tfsqc.AddParameter("TeamProject", Engine.Source.Config.Project);
-
+            //////////////////////////////////////////////////
+            IWorkItemQueryBuilder wiqb = Services.GetRequiredService<IWorkItemQueryBuilder>();
             //Builds the constraint part of the query
             string constraints = BuildQueryBitConstraints();
+            wiqb.Query = string.Format(@"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY [System.Id] ", constraints);
 
-            tfsqc.Query = string.Format(@"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY [System.Id] ", constraints);
-
-            WorkItemCollection sourceWIS = tfsqc.Execute();
+            List<WorkItemData> sourceWIS = Engine.Target.WorkItems.GetWorkItems(wiqb);
             Trace.WriteLine(string.Format("Migrate {0} work items?", sourceWIS.Count));
             //////////////////////////////////////////////////
-            WorkItemStoreContext targetStore = new WorkItemStoreContext(Engine.Target, WorkItemStoreFlags.BypassRules, Telemetry);
-            Project destProject = targetStore.GetProject();
+            ProjectData destProject = Engine.Target.WorkItems.GetProject();
             Trace.WriteLine(string.Format("Found target project as {0}", destProject.Name));
 
 
             int current = sourceWIS.Count;
             int count = 0;
             long elapsedms = 0;
-            foreach (WorkItem sourceWI in sourceWIS)
+            foreach (WorkItemData sourceWI in sourceWIS)
             {
                 Stopwatch witstopwatch = Stopwatch.StartNew();
-				WorkItem targetFound;
-                targetFound = targetStore.FindReflectedWorkItem(sourceWI, false);
-                Trace.WriteLine(string.Format("{0} - Updating: {1}-{2}", current, sourceWI.Id, sourceWI.Type.Name));
+				WorkItemData targetFound;
+                targetFound = Engine.Target.WorkItems.FindReflectedWorkItem(sourceWI, false);
+                Trace.WriteLine(string.Format("{0} - Updating: {1}-{2}", current, sourceWI.Id, sourceWI.Type));
                 if (targetFound == null)
                 {
-                    Trace.WriteLine(string.Format("{0} - WARNING: does not exist {1}-{2}", current, sourceWI.Id, sourceWI.Type.Name));
+                    Trace.WriteLine(string.Format("{0} - WARNING: does not exist {1}-{2}", current, sourceWI.Id, sourceWI.Type));
                 }
                 else
                 {
                     Console.WriteLine("...Exists");
-                    targetFound.Open();
-                    Engine.FieldMaps.ApplyFieldMappings(sourceWI.ToWorkItemData(), targetFound.ToWorkItemData());
-                    if (targetFound.IsDirty)
+                    targetFound.ToWorkItem().Open();
+                    Engine.FieldMaps.ApplyFieldMappings(sourceWI, targetFound);
+                    if (targetFound.ToWorkItem().IsDirty)
                     {
                         try
                         {
-                            targetFound.Save();
+                            targetFound.ToWorkItem().Save();
                             Trace.WriteLine(string.Format("          Updated"));
                         }
                         catch (ValidationException ve)
@@ -113,7 +111,7 @@ namespace VstsSyncMigrator.Engine
                     {
                         Trace.WriteLine(string.Format("          No changes"));
                     }
-                    sourceWI.Close();
+                    sourceWI.ToWorkItem().Close();
                 }
                 witstopwatch.Stop();
                 elapsedms = elapsedms + witstopwatch.ElapsedMilliseconds;

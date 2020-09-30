@@ -1,26 +1,23 @@
 ﻿using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text.RegularExpressions;
-using System.Linq;
-using Microsoft.TeamFoundation.Git.Client;
-using Microsoft.TeamFoundation;
 
-using MigrationTools.Core.Configuration.Processing;
-using Microsoft.TeamFoundation.SourceControl.WebApi;
-using VstsSyncMigrator.Core.Execution.OMatics;
-using MigrationTools.Core.Configuration;
-using Microsoft.Extensions.Hosting;
+using System.Diagnostics;
+
+using MigrationTools.Configuration.Processing;
+
+using MigrationTools.Configuration;
 using MigrationTools;
-using MigrationTools.Core;
+using MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers;
+using System.Collections.Generic;
+using MigrationTools.DataContracts;
+using MigrationTools.Clients.AzureDevops.ObjectModel;
 
 namespace VstsSyncMigrator.Engine
 {
     public class FixGitCommitLinks : StaticProcessorBase
     {
         private FixGitCommitLinksConfig _config;
-        private RepoOMatic _RepoOMatic;
+        private GitRepositoryEnricher _GitRepositoryEnricher;
 
         public FixGitCommitLinks(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry) : base(services, me, telemetry)
         {
@@ -39,42 +36,39 @@ namespace VstsSyncMigrator.Engine
         public override void Configure(IProcessorConfig config)
         {
             _config = (FixGitCommitLinksConfig)config;
-            _RepoOMatic = new RepoOMatic(Engine);
+            _GitRepositoryEnricher = new GitRepositoryEnricher(Engine);
         }
 
         protected override void InternalExecute()
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 			//////////////////////////////////////////////////
-            WorkItemStoreContext targetStore = new WorkItemStoreContext(Engine.Target, WorkItemStoreFlags.BypassRules, Telemetry);
-            var targetQuery = new TfsQueryContext(targetStore, Telemetry);
-            targetQuery.AddParameter("TeamProject", Engine.Target.Config.Project);
-            targetQuery.Query =
+            var query =
                 string.Format(
                     @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY {1}",
                     _config.QueryBit,
                     _config.OrderBit
                     );
-            WorkItemCollection workitems = targetQuery.Execute();
+            List<WorkItemData> workitems = Engine.Target.WorkItems.GetWorkItems(query);
             Trace.WriteLine(string.Format("Update {0} work items?", workitems.Count));
             //////////////////////////////////////////////////
             int current = workitems.Count;
             int count = 0;
             long elapsedms = 0;
             int noteFound = 0;
-            foreach (WorkItem workitem in workitems)
+            foreach (WorkItemData workitem in workitems)
             {
                
                 Stopwatch witstopwatch = Stopwatch.StartNew();
-				workitem.Open();
+				workitem.ToWorkItem().Open();
 
-                _RepoOMatic.FixExternalLinks(workitem, targetStore, null);
+                _GitRepositoryEnricher.FixExternalLinks(workitem, Engine.Target.WorkItems, null);
 
-                if (workitem.IsDirty)
+                if (workitem.ToWorkItem().IsDirty)
                 {
                     Trace.WriteLine($"Saving {workitem.Id}");
 
-                    workitem.Save();
+                    workitem.ToWorkItem().Save();
                 }
 
                 witstopwatch.Stop();

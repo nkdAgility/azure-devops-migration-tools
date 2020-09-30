@@ -6,12 +6,18 @@ using System.Threading.Tasks;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using System.Diagnostics;
 using Microsoft.ApplicationInsights;
-using MigrationTools.Core.Configuration.FieldMap;
+using MigrationTools.Configuration.FieldMap;
+using Microsoft.Extensions.Logging;
 
 namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
 {
     public class FieldValueMap : FieldMapBase
     {
+        public FieldValueMap(ILogger<FieldValueMap> logger) : base(logger)
+        {
+
+        }
+
         private FieldValueMapConfig Config { get { return (FieldValueMapConfig)_Config; } }
 
         public override string MappingDisplayName => $"{Config.sourceField} {Config.targetField}";

@@ -6,9 +6,9 @@ using CommandLine;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MigrationTools.CommandLine;
-using MigrationTools.Core;
-using MigrationTools.Core.Configuration;
-using MigrationTools.Core.Engine.Containers;
+using MigrationTools;
+using MigrationTools.Configuration;
+using MigrationTools.Engine.Containers;
 using MigrationTools.CustomDiagnostics;
 using MigrationTools.Services;
 using Serilog;
@@ -77,14 +77,8 @@ namespace MigrationTools.Host
                     // Host Services
                     services.AddTransient<IStartupService, StartupService>();
 
-                    if (args.Any(o => o.Equals("init", StringComparison.InvariantCultureIgnoreCase)))
-                    {
-                        services.AddHostedService<InitHostedService>();
-                    }
-                    else
-                    {
-                        services.AddHostedService<ExecuteHostedService>();
-                    }
+                    services.AddHostedService<InitHostedService>();
+                    services.AddHostedService<ExecuteHostedService>();
                 })
                 .UseConsoleLifetime();
             return hostBuilder;

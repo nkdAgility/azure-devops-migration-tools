@@ -6,7 +6,7 @@ using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MigrationTools.CommandLine;
-using MigrationTools.Core.Configuration;
+using MigrationTools.Configuration;
 using Newtonsoft.Json;
 
 namespace MigrationTools

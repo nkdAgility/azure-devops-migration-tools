@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using MigrationTools.Core.Configuration;
-using MigrationTools.Core.DataContracts;
-using MigrationTools.Core.Engine.Containers;
+using MigrationTools.Configuration;
+using MigrationTools.DataContracts;
+using MigrationTools.Engine.Containers;
 
-namespace MigrationTools.Core.Engine.Containers.Tests
+namespace MigrationTools.Engine.Containers.Tests
 {
    public class SimpleFieldMapMock : IFieldMap
     {

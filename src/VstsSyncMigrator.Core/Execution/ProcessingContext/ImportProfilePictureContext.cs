@@ -14,10 +14,10 @@ using System.DirectoryServices.AccountManagement;
 using System.Net;
 using System.Drawing.Imaging;
 using System.Text.RegularExpressions;
-using MigrationTools.Core.Configuration;
+using MigrationTools.Configuration;
 using Microsoft.Extensions.Hosting;
 using MigrationTools;
-using MigrationTools.Core;
+using MigrationTools;
 
 namespace VstsSyncMigrator.Engine
 {

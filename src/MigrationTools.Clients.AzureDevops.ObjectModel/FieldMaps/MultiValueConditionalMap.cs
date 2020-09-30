@@ -6,13 +6,19 @@ using System.Threading.Tasks;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using System.Diagnostics;
 using Microsoft.ApplicationInsights;
-using MigrationTools.Core.Configuration.FieldMap;
-using MigrationTools.Core.Configuration;
+using MigrationTools.Configuration.FieldMap;
+using MigrationTools.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
 {
     public class MultiValueConditionalMap : FieldMapBase
     {
+
+        public MultiValueConditionalMap(ILogger<MultiValueConditionalMap> logger) : base(logger)
+        {
+
+        }
 
         private MultiValueConditionalMapConfig Config { get { return (MultiValueConditionalMapConfig)_Config; } }
 

@@ -1,14 +1,14 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MigrationTools.Core.Configuration;
-using MigrationTools.Core.Engine.Containers;
+using MigrationTools.Configuration;
+using MigrationTools.Engine.Containers;
 using NuGet.Protocol;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace MigrationTools.Core.Engine.Containers.Tests
+namespace MigrationTools.Engine.Containers.Tests
 {
     [TestClass()]
     public class FieldMapContainerTests

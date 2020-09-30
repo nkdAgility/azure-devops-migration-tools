@@ -10,11 +10,11 @@ using System.Linq;
 using Microsoft.TeamFoundation.Server;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.Framework.Common;
-using MigrationTools.Core.Configuration.Processing;
-using MigrationTools.Core.Configuration;
+using MigrationTools.Configuration.Processing;
+using MigrationTools.Configuration;
 using Microsoft.Extensions.Hosting;
 using MigrationTools;
-using MigrationTools.Core;
+using MigrationTools;
 
 namespace VstsSyncMigrator.Engine
 {

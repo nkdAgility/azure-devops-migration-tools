@@ -4,10 +4,10 @@ using System.Linq;
 using System.Xml;
 using Microsoft.TeamFoundation.Server;
 using MigrationTools;
-using MigrationTools.Core;
-using MigrationTools.Core.Configuration;
-using MigrationTools.Core.Configuration.Processing;
-using MigrationTools.Core.Engine.Processors;
+using MigrationTools;
+using MigrationTools.Configuration;
+using MigrationTools.Configuration.Processing;
+using MigrationTools.Engine.Processors;
 using Serilog;
 
 namespace VstsSyncMigrator.Engine

@@ -7,12 +7,13 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using MigrationTools.Core.Configuration.Processing;
+using MigrationTools.Configuration.Processing;
 using Microsoft.Extensions.Hosting;
-using MigrationTools.Core.Configuration;
+using MigrationTools.Configuration;
 using MigrationTools;
-using MigrationTools.Core.Engine.Processors;
-using MigrationTools.Core;
+using MigrationTools.Engine.Processors;
+using MigrationTools;
+using MigrationTools.Clients.AzureDevops.ObjectModel.Clients;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -69,11 +70,9 @@ namespace VstsSyncMigrator.Engine
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 			//////////////////////////////////////////////////
-			var sourceStore = new WorkItemStoreContext(Engine.Source, WorkItemStoreFlags.None, Telemetry);
-            var targetStore = new WorkItemStoreContext(Engine.Target, WorkItemStoreFlags.None, Telemetry);
 
-            var sourceQueryHierarchy = sourceStore.Store.Projects[Engine.Source.Config.Project].QueryHierarchy;
-            var targetQueryHierarchy = targetStore.Store.Projects[Engine.Target.Config.Project].QueryHierarchy;
+            var sourceQueryHierarchy = ((WorkItemMigrationClient)Engine.Source.WorkItems).Store.Projects[Engine.Source.Config.Project].QueryHierarchy;
+            var targetQueryHierarchy = ((WorkItemMigrationClient)Engine.Target.WorkItems).Store.Projects[Engine.Target.Config.Project].QueryHierarchy;
 
             Trace.WriteLine(string.Format("Found {0} root level child WIQ folders", sourceQueryHierarchy.Count));
             //////////////////////////////////////////////////

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 
-namespace MigrationTools.Core.Configuration.Tests
+namespace MigrationTools.Configuration.Tests
 {
     public class EngineConfigurationBuilderStub : IEngineConfigurationBuilder
     {

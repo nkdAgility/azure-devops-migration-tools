@@ -1,7 +1,12 @@
 {
   "profiles": {
-    "VstsSyncMigrator.Console": {
-      "commandName": "Project"
+    "execute": {
+      "commandName": "Project",
+      "commandLineArgs": "execute -c configuration.json"
+    },
+    "init": {
+      "commandName": "Project",
+      "commandLineArgs": "Init"
     }
   }
 }

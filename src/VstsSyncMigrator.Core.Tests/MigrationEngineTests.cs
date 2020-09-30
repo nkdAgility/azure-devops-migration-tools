@@ -5,14 +5,15 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools;
 using MigrationTools.CommandLine;
-using MigrationTools.Core.Configuration;
-using MigrationTools.Core.Engine.Containers;
+using MigrationTools.Configuration;
+using MigrationTools.Engine.Containers;
 using MigrationTools.Services;
 using MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps;
 using VstsSyncMigrator.Engine;
-using MigrationTools.Core;
-using MigrationTools.Core.Clients;
+using MigrationTools;
+using MigrationTools.Clients;
 using MigrationTools.Clients.AzureDevops.ObjectModel.Clients;
+using Serilog;
 
 namespace _VstsSyncMigrator.Engine.Tests
 {
@@ -25,9 +26,11 @@ namespace _VstsSyncMigrator.Engine.Tests
         [TestInitialize]
         public void Setup()
         {
+            Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
+
             ecb = new EngineConfigurationBuilder(new NullLogger<EngineConfigurationBuilder>());
             var services = new ServiceCollection();
-
+        
             // Field Mapps
             services.AddTransient<FieldBlankMap>();
             services.AddTransient<FieldLiteralMap>();
@@ -40,13 +43,9 @@ namespace _VstsSyncMigrator.Engine.Tests
             services.AddTransient<MultiValueConditionalMap>();
             services.AddTransient<RegexFieldMap>();
             services.AddTransient<TreeToTagFieldMap>();
-
             //Services
             services.AddSingleton<IDetectOnlineService, DetectOnlineService>();
             services.AddSingleton<IDetectVersionService, DetectVersionService>();
-
-
-
             //Containers
             services.AddSingleton<FieldMapContainer>();
             services.AddSingleton<ProcessorContainer>();
@@ -57,11 +56,17 @@ namespace _VstsSyncMigrator.Engine.Tests
             //
             services.AddSingleton<IEngineConfigurationBuilder, EngineConfigurationBuilder>();
             services.AddSingleton<EngineConfiguration>(ecb.BuildDefault());
-            services.AddSingleton<TelemetryClient>(new TelemetryClient());
             services.AddSingleton<ITelemetryLogger, TelemetryLoggerMock>();
-            services.AddSingleton<IMigrationClient, MigrationClient>();
-            
+            services.AddLogging();
+
+            //Clients
+            services.AddTransient<IMigrationClient, MigrationClient>();
+            services.AddTransient<IWorkItemMigrationClient, WorkItemMigrationClient>();
+            services.AddTransient<IWorkItemQueryBuilder, WorkItemQueryBuilder>();
+
+
             services.AddSingleton<IMigrationEngine, MigrationEngine>();
+
 
             services.AddSingleton<ExecuteOptions>((p) => null);
 

@@ -7,12 +7,13 @@ using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Linq;
-using MigrationTools.Core.Configuration.Processing;
-using MigrationTools.Core.Configuration;
+using MigrationTools.Configuration.Processing;
+using MigrationTools.Configuration;
 using Microsoft.Extensions.Hosting;
 using MigrationTools;
 using MigrationTools.Clients.AzureDevops.ObjectModel;
-using MigrationTools.Core;
+using MigrationTools;
+using MigrationTools.DataContracts;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -42,36 +43,32 @@ namespace VstsSyncMigrator.Engine
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 			//////////////////////////////////////////////////
-			WorkItemStoreContext targetStore = new WorkItemStoreContext(Engine.Target, WorkItemStoreFlags.BypassRules, Telemetry);
-
-            TfsQueryContext tfsqc = new TfsQueryContext(targetStore, Telemetry);
-            tfsqc.AddParameter("TeamProject", Engine.Target.Config.Project);
-            tfsqc.Query = string.Format(@"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY [System.ChangedDate] desc", _config.QueryBit);
-            WorkItemCollection  workitems = tfsqc.Execute();
+            var Query = string.Format(@"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY [System.ChangedDate] desc", _config.QueryBit);
+            List<WorkItemData> workitems = Engine.Target.WorkItems.GetWorkItems(Query);
             Trace.WriteLine(string.Format("Update {0} work items?", workitems.Count));
             //////////////////////////////////////////////////
             int current = workitems.Count;
             int count = 0;
             long elapsedms = 0;
-            foreach (WorkItem workitem in workitems)
+            foreach (WorkItemData workitem in workitems)
             {
                 Stopwatch witstopwatch = Stopwatch.StartNew();
-				workitem.Open();
-                Trace.WriteLine(string.Format("Processing work item {0} - Type:{1} - ChangedDate:{2} - CreatedDate:{3}", workitem.Id, workitem.Type.Name, workitem.ChangedDate.ToShortDateString(), workitem.CreatedDate.ToShortDateString()));
-                Engine.FieldMaps.ApplyFieldMappings(workitem.ToWorkItemData());
+				workitem.ToWorkItem().Open();
+                Trace.WriteLine(string.Format("Processing work item {0} - Type:{1} - ChangedDate:{2} - CreatedDate:{3}", workitem.Id, workitem.Type, workitem.ToWorkItem().ChangedDate.ToShortDateString(), workitem.ToWorkItem().CreatedDate.ToShortDateString()));
+                Engine.FieldMaps.ApplyFieldMappings(workitem);
 
-                if (workitem.IsDirty)
+                if (workitem.ToWorkItem().IsDirty)
                 {
                     if (!_config.WhatIf)
                     {
                         try
                         {
-                            workitem.Save();
+                            workitem.ToWorkItem().Save();
                         }
                         catch (Exception)
                         {
                             System.Threading.Thread.Sleep(5000);
-                            workitem.Save();
+                            workitem.ToWorkItem().Save();
                         }
                        
                     } else

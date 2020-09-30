@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
-using MigrationTools.Core.Configuration.FieldMap;
-using MigrationTools.Core.Configuration;
+using MigrationTools.Configuration.FieldMap;
+using MigrationTools.Configuration;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 
 namespace MigrationTools.Clients.AzureDevops.Rest.FieldMaps

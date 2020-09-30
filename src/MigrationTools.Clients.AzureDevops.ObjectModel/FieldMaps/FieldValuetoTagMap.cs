@@ -2,9 +2,10 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using MigrationTools.Core.Configuration;
-using MigrationTools.Core.Configuration.FieldMap;
+using MigrationTools.Configuration;
+using MigrationTools.Configuration.FieldMap;
 
 namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
 {
@@ -12,6 +13,10 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
     public class FieldValuetoTagMap : FieldMapBase
     {
 
+        public FieldValuetoTagMap(ILogger<FieldValuetoTagMap> logger) : base(logger)
+        {
+
+        }
         private FieldValuetoTagMapConfig Config { get { return (FieldValuetoTagMapConfig)_Config; } }
 
         public override void Configure(IFieldMapConfig config)

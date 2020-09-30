@@ -12,11 +12,11 @@ using System.DirectoryServices;
 using System.DirectoryServices.ActiveDirectory;
 using System.DirectoryServices.AccountManagement;
 using System.Net;
-using MigrationTools.Core.Configuration.Processing;
-using MigrationTools.Core.Configuration;
+using MigrationTools.Configuration.Processing;
+using MigrationTools.Configuration;
 using Microsoft.Extensions.Hosting;
 using MigrationTools;
-using MigrationTools.Core;
+using MigrationTools;
 
 namespace VstsSyncMigrator.Engine
 {
