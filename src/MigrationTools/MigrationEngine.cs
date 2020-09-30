@@ -25,6 +25,7 @@ namespace MigrationTools
         public GitRepoMapContainer GitRepoMaps { get; }
         public ChangeSetMappingContainer ChangeSetMapps { get; }
         public FieldMapContainer FieldMaps { get; }
+        public EngineConfiguration Config { get; }
 
         public ITelemetryLogger Telemetry { get; }
 
@@ -48,7 +49,7 @@ namespace MigrationTools
             GitRepoMaps = gitRepoMaps;
             ChangeSetMapps = changeSetMapps;
             Telemetry = telemetry;
-            ProcessConfiguration(config);
+            Config = config;
         }
 
         public (NetworkCredential source, NetworkCredential target) CheckForNetworkCredentials()
@@ -64,26 +65,51 @@ namespace MigrationTools
             return (sourceCredentials, targetCredentials);
         }
 
-        private void ProcessConfiguration(EngineConfiguration config)
+        private IMigrationClient _Source;
+
+        public IMigrationClient Source { get {
+                return GetSource();
+            } }
+
+
+        private IMigrationClient GetSource()
         {
-            var credentials = CheckForNetworkCredentials();
-            if (config.Source != null)
+            if (_Source is null)
             {
-                    IMigrationClient s = _services.GetRequiredService<IMigrationClient>();
-                    s.Configure(config.Source, credentials.source);
-                    Source = s;
+                var credentials = CheckForNetworkCredentials();
+                if (Config.Source != null)
+                {
+                    _Source = _services.GetRequiredService<IMigrationClient>();
+                    _Source.Configure(Config.Source, credentials.source);
+                }
             }
-            if (config.Target != null)
+            return _Source;
+        }
+
+        private IMigrationClient _Target;
+
+        public IMigrationClient Target
+        {
+            get
             {
-                IMigrationClient t = _services.GetRequiredService<IMigrationClient>();
-                t.Configure(config.Target, credentials.target);
-                Target = t;
+                return GetTarget();
             }
         }
 
-        public IMigrationClient Source { get; private set; }
 
-        public IMigrationClient Target { get; private set; }
+        private IMigrationClient GetTarget()
+        {
+            if (_Target is null)
+            {
+                var credentials = CheckForNetworkCredentials();
+                if (Config.Target != null)
+                {
+                    _Target = _services.GetRequiredService<IMigrationClient>();
+                    _Target.Configure(Config.Target, credentials.target);
+                }
+            }
+            return _Target;
+        }
 
 
         public ProcessingStatus Run()

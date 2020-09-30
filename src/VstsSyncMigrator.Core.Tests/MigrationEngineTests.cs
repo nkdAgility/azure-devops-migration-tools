@@ -13,6 +13,7 @@ using VstsSyncMigrator.Engine;
 using MigrationTools;
 using MigrationTools.Clients;
 using MigrationTools.Clients.AzureDevops.ObjectModel.Clients;
+using Serilog;
 
 namespace _VstsSyncMigrator.Engine.Tests
 {
@@ -25,9 +26,11 @@ namespace _VstsSyncMigrator.Engine.Tests
         [TestInitialize]
         public void Setup()
         {
+            Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
+
             ecb = new EngineConfigurationBuilder(new NullLogger<EngineConfigurationBuilder>());
             var services = new ServiceCollection();
-
+        
             // Field Mapps
             services.AddTransient<FieldBlankMap>();
             services.AddTransient<FieldLiteralMap>();
@@ -40,13 +43,9 @@ namespace _VstsSyncMigrator.Engine.Tests
             services.AddTransient<MultiValueConditionalMap>();
             services.AddTransient<RegexFieldMap>();
             services.AddTransient<TreeToTagFieldMap>();
-
             //Services
             services.AddSingleton<IDetectOnlineService, DetectOnlineService>();
             services.AddSingleton<IDetectVersionService, DetectVersionService>();
-
-
-
             //Containers
             services.AddSingleton<FieldMapContainer>();
             services.AddSingleton<ProcessorContainer>();
@@ -57,9 +56,10 @@ namespace _VstsSyncMigrator.Engine.Tests
             //
             services.AddSingleton<IEngineConfigurationBuilder, EngineConfigurationBuilder>();
             services.AddSingleton<EngineConfiguration>(ecb.BuildDefault());
-            services.AddSingleton<TelemetryClient>(new TelemetryClient());
             services.AddSingleton<ITelemetryLogger, TelemetryLoggerMock>();
+            services.AddLogging();
 
+            //Clients
             services.AddTransient<IMigrationClient, MigrationClient>();
             services.AddTransient<IWorkItemMigrationClient, WorkItemMigrationClient>();
             services.AddTransient<IWorkItemQueryBuilder, WorkItemQueryBuilder>();
@@ -74,41 +74,41 @@ namespace _VstsSyncMigrator.Engine.Tests
 
     }
 
-        //[TestMethod]
-        //public void TestEngineCreation()
-        //{
+        [TestMethod]
+        public void TestEngineCreation()
+        {
 
-        //    IMigrationEngine me = _services.GetRequiredService<IMigrationEngine>();
-        //}
+            IMigrationEngine me = _services.GetRequiredService<IMigrationEngine>();
+        }
 
-        //[TestMethod]
-        //public void TestEngineExecuteEmptyProcessors()
-        //{
-        //    EngineConfiguration ec = _services.GetRequiredService<EngineConfiguration>();
-        //    ec.Processors.Clear();
-        //    IMigrationEngine me = _services.GetRequiredService<IMigrationEngine>();
-        //    me.Run();
+        [TestMethod]
+        public void TestEngineExecuteEmptyProcessors()
+        {
+            EngineConfiguration ec = _services.GetRequiredService<EngineConfiguration>();
+            ec.Processors.Clear();
+            IMigrationEngine me = _services.GetRequiredService<IMigrationEngine>();
+            me.Run();
 
-        //}
+        }
 
-        //[TestMethod]
-        //public void TestEngineExecuteEmptyFieldMaps()
-        //{
-        //    EngineConfiguration ec = _services.GetRequiredService<EngineConfiguration>();
-        //    ec.Processors.Clear();
-        //    ec.FieldMaps.Clear();
-        //    IMigrationEngine me = _services.GetRequiredService<IMigrationEngine>();
-        //    me.Run();
-        //}
+        [TestMethod]
+        public void TestEngineExecuteEmptyFieldMaps()
+        {
+            EngineConfiguration ec = _services.GetRequiredService<EngineConfiguration>();
+            ec.Processors.Clear();
+            ec.FieldMaps.Clear();
+            IMigrationEngine me = _services.GetRequiredService<IMigrationEngine>();
+            me.Run();
+        }
 
-        //[TestMethod]
-        //public void TestEngineExecuteProcessors()
-        //{
-        //    EngineConfiguration ec = _services.GetRequiredService<EngineConfiguration>();
-        //    ec.FieldMaps.Clear();
-        //    IMigrationEngine me = _services.GetRequiredService<IMigrationEngine>();
-        //    me.Run();
-        //}
+        [TestMethod]
+        public void TestEngineExecuteProcessors()
+        {
+            EngineConfiguration ec = _services.GetRequiredService<EngineConfiguration>();
+            ec.FieldMaps.Clear();
+            IMigrationEngine me = _services.GetRequiredService<IMigrationEngine>();
+            me.Run();
+        }
 
     }
 }
