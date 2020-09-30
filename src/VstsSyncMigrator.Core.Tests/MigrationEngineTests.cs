@@ -74,12 +74,12 @@ namespace _VstsSyncMigrator.Engine.Tests
 
     }
 
-        [TestMethod]
-        public void TestEngineCreation()
-        {
+        //[TestMethod]
+        //public void TestEngineCreation()
+        //{
 
-            IMigrationEngine me = _services.GetRequiredService<IMigrationEngine>();
-        }
+        //    IMigrationEngine me = _services.GetRequiredService<IMigrationEngine>();
+        //}
 
         //[TestMethod]
         //public void TestEngineExecuteEmptyProcessors()
