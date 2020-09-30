@@ -13,6 +13,7 @@ using Microsoft.Extensions.Hosting;
 using MigrationTools;
 using MigrationTools.Clients;
 using MigrationTools;
+using MigrationTools.Clients.AzureDevops.ObjectModel.Clients;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -42,12 +43,8 @@ namespace VstsSyncMigrator.Engine
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 			//////////////////////////////////////////////////
-			WorkItemStoreContext targetStore = new WorkItemStoreContext(Engine.Target, WorkItemStoreFlags.BypassRules, Telemetry);
-
-            TfsQueryContext tfsqc = new TfsQueryContext(targetStore, Telemetry);
-
             TfsTeamService teamService = Engine.Target.GetService<TfsTeamService>();
-            QueryHierarchy qh = targetStore.Store.Projects[Engine.Target.Config.Project].QueryHierarchy;
+            QueryHierarchy qh = ((WorkItemMigrationClient)Engine.Target).Store.Projects[Engine.Target.Config.Project].QueryHierarchy;
             List<TeamFoundationTeam> teamList = teamService.QueryTeams(Engine.Target.Config.Project).ToList();
 
             Trace.WriteLine(string.Format("Found {0} teams?", teamList.Count));

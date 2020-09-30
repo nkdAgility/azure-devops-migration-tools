@@ -47,9 +47,14 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
         {
             IWorkItemQueryBuilder wiqb = Services.GetRequiredService<IWorkItemQueryBuilder>();
             wiqb.Query = query;
-            wiqb.AddParameter("TeamProject", MigrationClient.Config.Project);
-            return wiqb.Build(MigrationClient).GetWorkItems();
+            return GetWorkItems(wiqb);
         }
+        public override List<WorkItemData> GetWorkItems(IWorkItemQueryBuilder queryBuilder)
+        {
+            queryBuilder.AddParameter("TeamProject", MigrationClient.Config.Project);
+            return queryBuilder.Build(MigrationClient).GetWorkItems();
+        }
+
 
         public override WorkItemData PersistWorkItem(WorkItemData workItem)
         {
@@ -227,5 +232,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
         {
             throw new NotImplementedException();
         }
+
+    
     }
 }

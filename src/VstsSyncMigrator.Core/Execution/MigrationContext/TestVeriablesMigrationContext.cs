@@ -32,12 +32,8 @@ namespace VstsSyncMigrator.Engine
 
         protected override void InternalExecute()
         {
-            WorkItemStoreContext sourceWisc = new WorkItemStoreContext(Engine.Source, WorkItemStoreFlags.None, Telemetry);
             TestManagementContext SourceTmc = new TestManagementContext(Engine.Source);
-
-            WorkItemStoreContext targetWisc = new WorkItemStoreContext(Engine.Target, WorkItemStoreFlags.BypassRules, Telemetry);
             TestManagementContext targetTmc = new TestManagementContext(Engine.Target);
-
             List<ITestVariable> sourceVars = SourceTmc.Project.TestVariables.Query().ToList();
             Trace.WriteLine(string.Format("Plan to copy {0} Veriables?", sourceVars.Count));
 

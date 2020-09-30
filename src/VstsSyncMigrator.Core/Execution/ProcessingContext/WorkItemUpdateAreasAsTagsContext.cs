@@ -11,7 +11,10 @@ using MigrationTools.Configuration.Processing;
 using MigrationTools.Configuration;
 using Microsoft.Extensions.Hosting;
 using MigrationTools;
-using MigrationTools;
+using MigrationTools.Clients;
+using Microsoft.Extensions.DependencyInjection;
+using MigrationTools.DataContracts;
+using MigrationTools.Clients.AzureDevops.ObjectModel;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -41,33 +44,31 @@ namespace VstsSyncMigrator.Engine
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 			//////////////////////////////////////////////////
-			WorkItemStoreContext targetStore = new WorkItemStoreContext(Engine.Target, WorkItemStoreFlags.BypassRules, Telemetry);
-
-            TfsQueryContext tfsqc = new TfsQueryContext(targetStore, Telemetry);
-            tfsqc.AddParameter("TeamProject", Engine.Target.Config.Project);
-            tfsqc.AddParameter("AreaPath", config.AreaIterationPath);
-            tfsqc.Query = @"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject and [System.AreaPath] under @AreaPath";
-            WorkItemCollection  workitems = tfsqc.Execute();
+            
+            IWorkItemQueryBuilder wiqb = Services.GetRequiredService<IWorkItemQueryBuilder>();
+            wiqb.AddParameter("AreaPath", config.AreaIterationPath);
+            wiqb.Query = @"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject and [System.AreaPath] under @AreaPath";
+            List<WorkItemData> workitems = Engine.Target.WorkItems.GetWorkItems(wiqb);
             Trace.WriteLine(string.Format("Update {0} work items?", workitems.Count));
             //////////////////////////////////////////////////
             int current = workitems.Count;
             int count = 0;
             long elapsedms = 0;
-            foreach (WorkItem workitem in workitems)
+            foreach (WorkItemData workitem in workitems)
             {
                 Stopwatch witstopwatch = Stopwatch.StartNew();
 
 				Trace.WriteLine(string.Format("{0} - Updating: {1}-{2}", current, workitem.Id, workitem.Type.Name));
-                string areaPath = workitem.AreaPath;
+                string areaPath = workitem.ToWorkItem().AreaPath;
                 List<string> bits = new List<string>(areaPath.Split(char.Parse(@"\"))).Skip(4).ToList();
-                List<string> tags = workitem.Tags.Split(char.Parse(@";")).ToList();
+                List<string> tags = workitem.ToWorkItem().Tags.Split(char.Parse(@";")).ToList();
                 List<string> newTags = tags.Union(bits).ToList();
                 string newTagList = string.Join(";", newTags.ToArray());
-                if (newTagList != workitem.Tags)
+                if (newTagList != workitem.ToWorkItem().Tags)
                 { 
-                workitem.Open();
-                workitem.Tags = newTagList;
-                workitem.Save();
+                workitem.ToWorkItem().Open();
+                workitem.ToWorkItem().Tags = newTagList;
+                workitem.ToWorkItem().Save();
 
             }
 

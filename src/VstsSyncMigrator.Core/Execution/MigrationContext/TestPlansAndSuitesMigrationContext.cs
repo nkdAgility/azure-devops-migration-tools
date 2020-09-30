@@ -20,16 +20,15 @@ using VstsSyncMigrator.Engine.ComponentContext;
 using WorkItem = Microsoft.TeamFoundation.WorkItemTracking.Client.WorkItem;
 using MigrationTools;
 using MigrationTools.Engine.Processors;
+using MigrationTools.DataContracts;
 
 namespace VstsSyncMigrator.Engine
 {
     public class TestPlandsAndSuitesMigrationContext : MigrationProcessorBase
     {
-        WorkItemStoreContext sourceWitStore;
         TestManagementContext sourceTestStore;
         ITestConfigurationCollection sourceTestConfigs;
 
-        WorkItemStoreContext targetWitStore;
         TestManagementContext targetTestStore;
         ITestConfigurationCollection targetTestConfigs;
 
@@ -115,9 +114,7 @@ namespace VstsSyncMigrator.Engine
 
         protected override void InternalExecute()
         {
-            sourceWitStore = new WorkItemStoreContext(Engine.Source, WorkItemStoreFlags.None, Telemetry);
             sourceTestStore = new TestManagementContext(Engine.Source, config.TestPlanQueryBit);
-            targetWitStore = new WorkItemStoreContext(Engine.Target, WorkItemStoreFlags.BypassRules, Telemetry);
             targetTestStore = new TestManagementContext(Engine.Target);
             sourceTestConfigs = sourceTestStore.Project.TestConfigurations.Query("Select * From TestConfiguration");
             targetTestConfigs = targetTestStore.Project.TestConfigurations.Query("Select * From TestConfiguration");
@@ -168,7 +165,7 @@ namespace VstsSyncMigrator.Engine
             AddParameter("PlanId", parameters, sourcePlan.Id.ToString());
             ////////////////////////////////////
             var newPlanName = config.PrefixProjectToNodes
-                ? $"{sourceWitStore.GetProject().Name}-{sourcePlan.Name}"
+                ? $"{Engine.Source.WorkItems.GetProject().Name}-{sourcePlan.Name}"
                 : $"{sourcePlan.Name}";
             TraceWriteLine(sourcePlan, $"Process Plan {newPlanName}", 0, true);
             var targetPlan = FindTestPlan(targetTestStore, newPlanName);
@@ -280,33 +277,33 @@ namespace VstsSyncMigrator.Engine
 
         private void AssignReflectedWorkItemId(int sourceWIId, int targetWIId)
         {
-            var sourceWI = sourceWitStore.Store.GetWorkItem(sourceWIId);
-            var targetWI = targetWitStore.Store.GetWorkItem(targetWIId);
-            targetWI.Fields[Engine.Target.Config.ReflectedWorkItemIDFieldName].Value = sourceWitStore.CreateReflectedWorkItemId(sourceWI);
-            targetWI.Save();
+            var sourceWI = Engine.Source.WorkItems.GetWorkItem(sourceWIId.ToString());
+            var targetWI = Engine.Target.WorkItems.GetWorkItem(targetWIId.ToString());
+            targetWI.ToWorkItem().Fields[Engine.Target.Config.ReflectedWorkItemIDFieldName].Value = Engine.Source.WorkItems.CreateReflectedWorkItemId(sourceWI);
+            targetWI.ToWorkItem().Save();
         }
 
         private void ApplyFieldMappings(int sourceWIId, int targetWIId)
         {
-            var sourceWI = sourceWitStore.Store.GetWorkItem(sourceWIId);
-            var targetWI = targetWitStore.Store.GetWorkItem(targetWIId);
+            var sourceWI = Engine.Source.WorkItems.GetWorkItem(sourceWIId.ToString());
+            var targetWI = Engine.Target.WorkItems.GetWorkItem(targetWIId.ToString());
 
             if (config.PrefixProjectToNodes)
             {
-                targetWI.AreaPath = string.Format(@"{0}\{1}", Engine.Target.Config.Project, sourceWI.AreaPath);
-                targetWI.IterationPath = string.Format(@"{0}\{1}", Engine.Target.Config.Project, sourceWI.IterationPath);
+                targetWI.ToWorkItem().AreaPath = string.Format(@"{0}\{1}", Engine.Target.Config.Project, sourceWI.ToWorkItem().AreaPath);
+                targetWI.ToWorkItem().IterationPath = string.Format(@"{0}\{1}", Engine.Target.Config.Project, sourceWI.ToWorkItem().IterationPath);
             }
             else
             {
                 var regex = new Regex(Regex.Escape(Engine.Source.Config.Project));
-                targetWI.AreaPath = regex.Replace(sourceWI.AreaPath, Engine.Target.Config.Project, 1);
-                targetWI.IterationPath = regex.Replace(sourceWI.IterationPath, Engine.Target.Config.Project, 1);
+                targetWI.ToWorkItem().AreaPath = regex.Replace(sourceWI.ToWorkItem().AreaPath, Engine.Target.Config.Project, 1);
+                targetWI.ToWorkItem().IterationPath = regex.Replace(sourceWI.ToWorkItem().IterationPath, Engine.Target.Config.Project, 1);
             }
 
-            Engine.FieldMaps.ApplyFieldMappings(sourceWI.ToWorkItemData(), targetWI.ToWorkItemData());
+            Engine.FieldMaps.ApplyFieldMappings(sourceWI, targetWI);
 
             //validate if save operation will work and report issues if found
-            ArrayList validationIssues = targetWI.Validate();
+            ArrayList validationIssues = targetWI.ToWorkItem().Validate();
 
             if (validationIssues.Count > 0)
             {
@@ -321,20 +318,20 @@ namespace VstsSyncMigrator.Engine
                 throw new Exception(sb.ToString());
             }
 
-            targetWI.Save();
+            targetWI.ToWorkItem().Save();
         }
 
         private void TagCompletedTargetPlan(int workItemId)
         {
-            var targetPlanWorkItem = targetWitStore.Store.GetWorkItem(workItemId);
-            targetPlanWorkItem.Tags = targetPlanWorkItem.Tags + ";migrated";
+            var targetPlanWorkItem = Engine.Target.WorkItems.GetWorkItem(workItemId.ToString()) ;
+            targetPlanWorkItem.ToWorkItem().Tags = targetPlanWorkItem.ToWorkItem().Tags + ";migrated";
             this.SaveWorkItem(targetPlanWorkItem);
         }
 
         private bool TargetPlanContansTag(int workItemId)
         {
-            var targetPlanWorkItem = targetWitStore.Store.GetWorkItem(workItemId);
-            return targetPlanWorkItem.Tags.Contains("migrated");
+            var targetPlanWorkItem = Engine.Target.WorkItems.GetWorkItem(workItemId.ToString());
+            return targetPlanWorkItem.ToWorkItem().Tags.Contains("migrated");
         }
 
 
@@ -344,9 +341,9 @@ namespace VstsSyncMigrator.Engine
             {
                 return false;
             }
-            var sourcePlanWorkItem = sourceWitStore.Store.GetWorkItem(workItemId);
+            var sourcePlanWorkItem = Engine.Source.WorkItems.GetWorkItem(workItemId.ToString());
             var tagWhichMustBePresent = config.OnlyElementsWithTag;
-            return !sourcePlanWorkItem.Tags.Contains(tagWhichMustBePresent);
+            return !sourcePlanWorkItem.ToWorkItem().Tags.Contains(tagWhichMustBePresent);
         }
 
         private void ProcessTestSuite(ITestSuiteBase sourceSuite, ITestSuiteBase targetParent, ITestPlan targetPlan)
@@ -381,11 +378,11 @@ namespace VstsSyncMigrator.Engine
                         break;
                     case TestSuiteType.RequirementTestSuite:
                         int sourceRid = ((IRequirementTestSuite)sourceSuite).RequirementId;
-                        WorkItem sourceReq = null;
-                        WorkItem targetReq = null;
+                        WorkItemData sourceReq = null;
+                        WorkItemData targetReq = null;
                         try
                         {
-                            sourceReq = sourceWitStore.Store.GetWorkItem(sourceRid);
+                            sourceReq = Engine.Source.WorkItems.GetWorkItem(sourceRid.ToString()) ;
                             if (sourceReq == null)
                             {
                                 TraceWriteLine(sourceSuite, "            Source work item not found", 5);
@@ -399,7 +396,7 @@ namespace VstsSyncMigrator.Engine
                         }
                         try
                         {
-                            targetReq = targetWitStore.FindReflectedWorkItemByReflectedWorkItemId(sourceReq);
+                            targetReq = Engine.Target.WorkItems.FindReflectedWorkItemByReflectedWorkItemId(sourceReq);
 
                             if (targetReq == null)
                             {
@@ -486,7 +483,7 @@ namespace VstsSyncMigrator.Engine
                     foreach (Match match in matches)
                     {
                         var qid = match.Value.Split('=')[1].Trim();
-                        var targetWi = targetWitStore.FindReflectedWorkItemByReflectedWorkItemId(Convert.ToInt32(qid), false);
+                        var targetWi = Engine.Target.WorkItems.FindReflectedWorkItemByReflectedWorkItemId(Convert.ToInt32(qid), false);
 
                         if (targetWi == null)
                         {
@@ -513,10 +510,10 @@ namespace VstsSyncMigrator.Engine
 
         private void FixAssignedToValue(int sourceWIId, int targetWIId)
         {
-            var sourceWI = sourceWitStore.Store.GetWorkItem(sourceWIId);
-            var targetWI = targetWitStore.Store.GetWorkItem(targetWIId);
-            targetWI.Fields["System.AssignedTo"].Value = sourceWI.Fields["System.AssignedTo"].Value;
-            targetWI.Save();
+            var sourceWI = Engine.Source.WorkItems.GetWorkItem(sourceWIId.ToString());
+            var targetWI = Engine.Target.WorkItems.GetWorkItem(targetWIId.ToString());
+            targetWI.ToWorkItem().Fields["System.AssignedTo"].Value = sourceWI.ToWorkItem().Fields["System.AssignedTo"].Value;
+            targetWI.ToWorkItem().Save();
         }
 
         private void AddChildTestCases(ITestSuiteBase source, ITestSuiteBase target, ITestPlan targetPlan)
@@ -551,14 +548,14 @@ namespace VstsSyncMigrator.Engine
                     return;
 
                 TraceWriteLine(source, string.Format("    Processing {0} : {1} - {2} ", sourceTestCaseEntry.EntryType.ToString(), sourceTestCaseEntry.Id, sourceTestCaseEntry.Title), 15);
-                WorkItem wi = targetWitStore.FindReflectedWorkItem(sourceTestCaseEntry.TestCase.WorkItem, false, Engine.Source.Config.ReflectedWorkItemIDFieldName);
+                WorkItemData wi = Engine.Target.WorkItems.FindReflectedWorkItem(sourceTestCaseEntry.TestCase.WorkItem.ToWorkItemData(), false, Engine.Source.Config.ReflectedWorkItemIDFieldName);
                 if (wi == null)
                 {
                     TraceWriteLine(source, string.Format("    Can't find work item for Test Case. Has it been migrated? {0} : {1} - {2} ", sourceTestCaseEntry.EntryType.ToString(), sourceTestCaseEntry.Id, sourceTestCaseEntry.Title), 15);
                     continue;
                 }
                 var exists = (from tc in target.TestCases
-                              where tc.TestCase.WorkItem.Id == wi.Id
+                              where tc.TestCase.WorkItem.Id.ToString() == wi.Id
                               select tc).SingleOrDefault();
 
                 if (exists != null)
@@ -567,7 +564,7 @@ namespace VstsSyncMigrator.Engine
                 }
                 else
                 {
-                    ITestCase targetTestCase = targetTestStore.Project.TestCases.Find(wi.Id);
+                    ITestCase targetTestCase = targetTestStore.Project.TestCases.Find(int.Parse(wi.Id));
                     if (targetTestCase == null)
                     {
                         TraceWriteLine(source, string.Format("    ERROR: Test case not found {0} : {1} - {2} ", sourceTestCaseEntry.EntryType, sourceTestCaseEntry.Id, sourceTestCaseEntry.Title), 15);
@@ -640,7 +637,7 @@ namespace VstsSyncMigrator.Engine
                 var stopwatch = Stopwatch.StartNew();
                 var starttime = DateTime.Now;
                 _currentTestCases++;
-                WorkItem wi = targetWitStore.FindReflectedWorkItem(sourceTce.TestCase.WorkItem, false);
+                WorkItem wi = Engine.Target.WorkItems.FindReflectedWorkItem(sourceTce.TestCase.WorkItem, false);
                 ITestSuiteEntry targetTce;
                 if (wi != null)
                 {
@@ -905,12 +902,12 @@ namespace VstsSyncMigrator.Engine
             return targetSuiteChild;
         }
 
-        private ITestSuiteBase CreateNewRequirementTestSuite(ITestSuiteBase source, WorkItem requirement)
+        private ITestSuiteBase CreateNewRequirementTestSuite(ITestSuiteBase source, WorkItemData requirement)
         {
             IRequirementTestSuite targetSuiteChild;
             try
             {
-                targetSuiteChild = targetTestStore.Project.TestSuites.CreateRequirement(requirement);
+                targetSuiteChild = targetTestStore.Project.TestSuites.CreateRequirement(requirement.ToWorkItem());
             }
             catch (TestManagementValidationException ex)
             {
