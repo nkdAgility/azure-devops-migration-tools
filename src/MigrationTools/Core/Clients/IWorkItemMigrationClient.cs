@@ -14,6 +14,7 @@ namespace MigrationTools.Core.Clients
         IEnumerable<WorkItemData> GetWorkItems(string query);
         WorkItemData PersistWorkItem(WorkItemData workItem);
         WorkItemData GetRevision(WorkItemData workItem, int revision);
+        WorkItemData FindReflectedWorkItem(WorkItemData workItem, bool cache, string sourceReflectedWIIdField = null);
         WorkItemData FindReflectedWorkItemByTitle(string title);
         WorkItemData FindReflectedWorkItemByMigrationRef(string refId);
         WorkItemData FindReflectedWorkItemByReflectedWorkItemId(string refId);

@@ -31,7 +31,7 @@ namespace MigrationTools.Core.Clients
             _Parameters = parameters ?? throw new ArgumentNullException(nameof(parameters));
         }
 
-        public abstract IEnumerable<WorkItemData> GetWorkItems();
+        public abstract List<WorkItemData> GetWorkItems();
 
     }
 }
