@@ -35,6 +35,7 @@ namespace MigrationTools.Configuration.Processing
         public int AttachmentMaxSize { get; set; }
         public bool CollapseRevisions { get; set; }
         public bool LinkMigrationSaveEachAsAdded { get; set; }
+        public string[] NodeBasePaths { get; set; }
 
         /// <inheritdoc />
         public bool IsProcessorCompatible(IReadOnlyList<IProcessorConfig> otherProcessors)
@@ -62,6 +63,8 @@ namespace MigrationTools.Configuration.Processing
             LinkMigrationSaveEachAsAdded = false;
             QueryBit = @"AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
             OrderBit = "[System.ChangedDate] desc";
+            NodeBasePaths = new[] { "Product\\Area\\Path1", "Product\\Area\\Path2" };
+
         }
     }
 }

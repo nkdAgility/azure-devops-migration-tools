@@ -13,7 +13,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
 
         public void Configure(IMigrationClient migrationClient, bool bypassRules = true)
         {
-            throw new NotImplementedException();
+            // No current config
         }
 
         public TestPlanData CreateTestPlan()
