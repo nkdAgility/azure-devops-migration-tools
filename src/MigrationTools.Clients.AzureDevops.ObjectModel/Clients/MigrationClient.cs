@@ -22,6 +22,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
         private TeamProjectConfig _config;
         private NetworkCredential _credentials;
         private IWorkItemMigrationClient _workItemClient;
+        private ITestPlanMigrationClient _testPlanClient;
 
         private readonly IServiceProvider _Services;
         private readonly ITelemetryLogger _Telemetry;
@@ -41,10 +42,17 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
                 return _workItemClient;
             }
         }
-
-        // if you add Migration Engine in here you will have to fix the infinate loop
-        public MigrationClient(IWorkItemMigrationClient workItemClient, IServiceProvider services, ITelemetryLogger telemetry)
+        public ITestPlanMigrationClient TestPlans
         {
+            get
+            {
+                return _testPlanClient;
+            }
+        }
+        // if you add Migration Engine in here you will have to fix the infinate loop
+        public MigrationClient(ITestPlanMigrationClient testPlanClient,IWorkItemMigrationClient workItemClient, IServiceProvider services, ITelemetryLogger telemetry)
+        {
+            _testPlanClient = testPlanClient;
             _workItemClient = workItemClient;
             _Services = services;
             _Telemetry = telemetry;
@@ -57,6 +65,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
             _credentials = credentials;
             EnsureCollection();
             _workItemClient.Configure(this);
+            _testPlanClient.Configure(this);
         }
 
         private TfsTeamProjectCollection _collection;
@@ -67,7 +76,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
             {
                 return _collection;
             }
-        }
+        }        
 
         private void EnsureCollection()
         {

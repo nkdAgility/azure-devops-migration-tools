@@ -29,43 +29,43 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel
                 throw new ArgumentNullException(nameof(workItem));
             }
 
-            var internalWorkItem = new WorkItemData();
-            internalWorkItem.Id = workItem.Id.ToString();
-            internalWorkItem.Type = workItem.Type.Name;
-            internalWorkItem.Title = workItem.Title;
-            internalWorkItem.Rev = workItem.Rev;
-            internalWorkItem.RevisedDate = workItem.RevisedDate;
-            internalWorkItem.Revision = workItem.Revision;
-            internalWorkItem.ProjectName = workItem?.Project?.Name;
-            internalWorkItem.InternalWorkItem = workItem;
-            return internalWorkItem;
+            var internalObject = new WorkItemData();
+            internalObject.Id = workItem.Id.ToString();
+            internalObject.Type = workItem.Type.Name;
+            internalObject.Title = workItem.Title;
+            internalObject.Rev = workItem.Rev;
+            internalObject.RevisedDate = workItem.RevisedDate;
+            internalObject.Revision = workItem.Revision;
+            internalObject.ProjectName = workItem?.Project?.Name;
+            internalObject.internalObject = workItem;
+            return internalObject;
         }
 
         public static ProjectData ToProjectData(this Project project)
         {
-            var internalproject = new ProjectData();
-            internalproject.Id = project.Id.ToString();
-            internalproject.Name = project.Name;
-            internalproject.InternalProject = project;
-            return internalproject;
+            var internalObject = new ProjectData();
+            internalObject.Id = project.Id.ToString();
+            internalObject.Name = project.Name;
+            internalObject.internalObject = project;
+            return internalObject;
         }
 
         public static Project ToProject(this ProjectData projectdata)
         {
-            if (!(projectdata.InternalProject is Project))
+            if (!(projectdata.internalObject is Project))
             {
                 throw new InvalidCastException($"The Work Item stored in the inner field must be of type {(nameof(Project))}");
             }
-            return (Project)projectdata.InternalProject;
+            return (Project)projectdata.internalObject;
         }
 
         public static WorkItem ToWorkItem(this WorkItemData  workItemData)
         {
-            if (!(workItemData.InternalWorkItem is WorkItem))
+            if (!(workItemData.internalObject is WorkItem))
             {
                 throw new InvalidCastException($"The Work Item stored in the inner field must be of type {(nameof(WorkItem))}");
             }
-            return (WorkItem)workItemData.InternalWorkItem;
+            return (WorkItem)workItemData.internalObject;
         }
 
         public static List<WorkItemData> ToWorkItemDataList(this WorkItemCollection collection)

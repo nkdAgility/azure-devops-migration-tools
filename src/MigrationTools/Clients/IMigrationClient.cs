@@ -7,15 +7,16 @@ using System.Text;
 
 namespace MigrationTools.Clients
 {
-   public  interface IMigrationClient
+    public interface IMigrationClient
     {
 
         TeamProjectConfig Config { get; }
-         IWorkItemMigrationClient WorkItems { get; }
+        IWorkItemMigrationClient WorkItems { get; }
+        ITestPlanMigrationClient TestPlans { get; }
 
         void Configure(TeamProjectConfig config, NetworkCredential credentials = null);
 
-          T GetService<T>();
+        T GetService<T>();
 
         [Obsolete]
         object InternalCollection { get; }
