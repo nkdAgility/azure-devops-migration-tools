@@ -4,69 +4,70 @@ using System.Linq;
 using System.Xml;
 using Microsoft.TeamFoundation.Server;
 using MigrationTools;
-using MigrationTools;
 using MigrationTools.Configuration;
 using MigrationTools.Configuration.Processing;
+using MigrationTools.DataContracts;
 using MigrationTools.Engine.Processors;
+using MigrationTools.Enrichers;
 using Serilog;
 
-namespace VstsSyncMigrator.Engine
+namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
 {
-    public class NodeStructuresMigrationContext : MigrationProcessorBase
+    public class NodeStructureEnricher : IWorkItemEnricher
     {
-        NodeStructuresMigrationConfig _config;
+        private bool _prefixProjectToNodes = false;
+        private ICommonStructureService _sourceCommonStructureService;
+        private ICommonStructureService _targetCommonStructureService;
+        private ProjectInfo _sourceProjectInfo;
+        private NodeInfo[] _sourceRootNodes;
+        private string[] _nodeBasePaths;
 
-        public override string Name
+        public IMigrationEngine Engine { get; }
+
+        public void Configure(bool save = true, bool filterWorkItemsThatAlreadyExistInTarget = true)
         {
-            get
-            {
-                return "NodeStructuresMigrationContext";
-            }
+            
         }
 
-        public NodeStructuresMigrationContext(IMigrationEngine me, IServiceProvider services, ITelemetryLogger telemetry) : base(me, services, telemetry)
+        public void Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
         {
+   
         }
 
-        public override void Configure(IProcessorConfig config)
+        public NodeStructureEnricher(IMigrationEngine engine)
         {
-            _config = (NodeStructuresMigrationConfig)config;
+            Engine = engine;
+            _sourceCommonStructureService = (ICommonStructureService)Engine.Source.GetService<ICommonStructureService>();
+            _targetCommonStructureService = (ICommonStructureService)Engine.Target.GetService<ICommonStructureService4>();
+            _sourceProjectInfo = _sourceCommonStructureService.GetProjectFromName(Engine.Source.Config.Project);
+            _sourceRootNodes = _sourceCommonStructureService.ListStructures(_sourceProjectInfo.Uri);
         }
 
-        protected override void InternalExecute()
+        public void MigrateAllNodeStructures(bool prefixProjectToNodes, string[] nodeBasePaths)
         {
-            if (_config == null)
-            {
-                throw new Exception("You must call Configure() first");
-            }
+            _prefixProjectToNodes = prefixProjectToNodes;
+            _nodeBasePaths = nodeBasePaths;
             //////////////////////////////////////////////////
-            ICommonStructureService sourceCss = (ICommonStructureService)Engine.Source.GetService<ICommonStructureService>();
-            ProjectInfo sourceProjectInfo = sourceCss.GetProjectFromName(Engine.Source.Config.Project);
-            NodeInfo[] sourceNodes = sourceCss.ListStructures(sourceProjectInfo.Uri);
+            ProcessCommonStructure( Engine.Source.Config.LanguageMaps.AreaPath, Engine.Target.Config.LanguageMaps.AreaPath);
             //////////////////////////////////////////////////
-            ICommonStructureService targetCss = (ICommonStructureService)Engine.Target.GetService<ICommonStructureService4>();
-
-            //////////////////////////////////////////////////
-            ProcessCommonStructure(Engine.Source.Config.LanguageMaps.AreaPath, Engine.Target.Config.LanguageMaps.AreaPath, sourceNodes, targetCss, sourceCss);
-            //////////////////////////////////////////////////
-            ProcessCommonStructure(Engine.Source.Config.LanguageMaps.IterationPath, Engine.Target.Config.LanguageMaps.IterationPath, sourceNodes, targetCss, sourceCss);
+            ProcessCommonStructure( Engine.Source.Config.LanguageMaps.IterationPath, Engine.Target.Config.LanguageMaps.IterationPath);
             //////////////////////////////////////////////////
         }
 
-        private void ProcessCommonStructure(string treeTypeSource, string treeTypeTarget, NodeInfo[] sourceNodes, ICommonStructureService targetCss, ICommonStructureService sourceCss)
+        private void ProcessCommonStructure(string treeTypeSource, string treeTypeTarget)
         {
-            NodeInfo sourceNode = (from n in sourceNodes where n.Path.Contains(treeTypeSource) select n).Single();
+            NodeInfo sourceNode = (from n in _sourceRootNodes where n.Path.Contains(treeTypeSource) select n).Single();
             if (sourceNode == null) // May run into language problems!!! This is to try and detect that
             {
                 Exception ex = new Exception(string.Format("Unable to load Common Structure for Source. This is usually due to diferent language versions. Validate that '{0}' is the correct name in your version. ", treeTypeSource));
                 Log.Error(ex, "Unable to load Common Structure for Source.");
                 throw ex;
             }
-            XmlElement sourceTree = sourceCss.GetNodesXml(new string[] { sourceNode.Uri }, true);
+            XmlElement sourceTree = _sourceCommonStructureService.GetNodesXml(new string[] { sourceNode.Uri }, true);
             NodeInfo structureParent;
             try // May run into language problems!!! This is to try and detect that
             {
-                structureParent = targetCss.GetNodeFromPath(string.Format("\\{0}\\{1}", Engine.Target.Config.Project, treeTypeTarget));
+                structureParent = _targetCommonStructureService.GetNodeFromPath(string.Format("\\{0}\\{1}", Engine.Target.Config.Project, treeTypeTarget));
             }
             catch (Exception ex)
             {
@@ -74,17 +75,17 @@ namespace VstsSyncMigrator.Engine
                 Log.Error(ex2, "Unable to load Common Structure for Target.");
                 throw ex2;
             }
-            if (_config.PrefixProjectToNodes)
+            if (_prefixProjectToNodes)
             {
-                structureParent = CreateNode(targetCss, Engine.Source.Config.Project, structureParent);
+                structureParent = CreateNode( Engine.Source.Config.Project, structureParent);
             }
             if (sourceTree.ChildNodes[0].HasChildNodes)
             {
-                CreateNodes(sourceTree.ChildNodes[0].ChildNodes[0].ChildNodes, targetCss, structureParent, treeTypeTarget);
+                CreateNodes(sourceTree.ChildNodes[0].ChildNodes[0].ChildNodes, structureParent, treeTypeTarget);
             }
         }
 
-        private void CreateNodes(XmlNodeList nodeList, ICommonStructureService css, NodeInfo parentPath, string treeType)
+        private void CreateNodes(XmlNodeList nodeList, NodeInfo parentPath, string treeType)
         {
             foreach (XmlNode item in nodeList)
             {
@@ -109,15 +110,15 @@ namespace VstsSyncMigrator.Engine
                         finishDate = DateTime.Parse(item.Attributes["FinishDate"].Value);
                     }
 
-                    targetNode = CreateNode(css, newNodeName, parentPath, startDate, finishDate);
+                    targetNode = CreateNode(newNodeName, parentPath, startDate, finishDate);
                 }
                 else
                 {
-                    targetNode = CreateNode(css, newNodeName, parentPath);
+                    targetNode = CreateNode( newNodeName, parentPath);
                 }
                 if (item.HasChildNodes)
                 {
-                    CreateNodes(item.ChildNodes[0].ChildNodes, css, targetNode, treeType);
+                    CreateNodes(item.ChildNodes[0].ChildNodes, targetNode, treeType);
                 }
             }
         }
@@ -132,14 +133,14 @@ namespace VstsSyncMigrator.Engine
         {
             string nodePath = string.Format(@"{0}\{1}", parentPath.Path, newNodeName);
 
-            if (_config.BasePaths != null && _config.BasePaths.Any())
+            if (_nodeBasePaths != null && _nodeBasePaths.Any())
             {
                 var split = nodePath.Split('\\');
                 var removeProjectAndType = split.Skip(3);
                 var path = string.Join(@"\", removeProjectAndType);
 
                 // We need to check if the path is a parent path of one of the base paths, as we need those
-                foreach (var basePath in _config.BasePaths)
+                foreach (var basePath in _nodeBasePaths)
                 {
                     var splitBase = basePath.Split('\\');
 
@@ -152,7 +153,7 @@ namespace VstsSyncMigrator.Engine
                     }
                 }
 
-                if (!_config.BasePaths.Any(p => path.StartsWith(p, StringComparison.InvariantCultureIgnoreCase)))
+                if (!_nodeBasePaths.Any(p => path.StartsWith(p, StringComparison.InvariantCultureIgnoreCase)))
                 {
                     Trace.WriteLine(string.Format("--IgnoreNode: {0}", nodePath));
                     return false;
@@ -162,7 +163,7 @@ namespace VstsSyncMigrator.Engine
             return true;
         }
 
-        private NodeInfo CreateNode(ICommonStructureService css, string name, NodeInfo parent)
+        private NodeInfo CreateNode(string name, NodeInfo parent)
         {
             string nodePath = string.Format(@"{0}\{1}", parent.Path, name);
             NodeInfo node = null;
@@ -170,16 +171,16 @@ namespace VstsSyncMigrator.Engine
             Trace.Write(string.Format("--CreateNode: {0}", nodePath));
             try
             {
-                node = css.GetNodeFromPath(nodePath);
+                node = _targetCommonStructureService.GetNodeFromPath(nodePath);
                 Trace.Write("...found");
             }
             catch (CommonStructureSubsystemException ex)
             {
                 try
                 {
-                    string newPathUri = css.CreateNode(name, parent.Uri);
+                    string newPathUri = _targetCommonStructureService.CreateNode(name, parent.Uri);
                     Trace.Write("...created");
-                    node = css.GetNode(newPathUri);
+                    node = _targetCommonStructureService.GetNode(newPathUri);
                 }
                 catch
                 {
@@ -193,23 +194,23 @@ namespace VstsSyncMigrator.Engine
             return node;
         }
 
-        private NodeInfo CreateNode(ICommonStructureService css, string name, NodeInfo parent, DateTime? startDate, DateTime? finishDate)
+        private NodeInfo CreateNode(string name, NodeInfo parent, DateTime? startDate, DateTime? finishDate)
         {
             string nodePath = string.Format(@"{0}\{1}", parent.Path, name);
             NodeInfo node = null;
             Trace.Write(string.Format("--CreateNode: {0}, start date: {1}, finish date: {2}", nodePath, startDate, finishDate));
             try
             {
-                node = css.GetNodeFromPath(nodePath);
+                node = _targetCommonStructureService.GetNodeFromPath(nodePath);
                 Trace.Write("...found");
             }
             catch (CommonStructureSubsystemException ex)
             {
                 try
                 {
-                    string newPathUri = css.CreateNode(name, parent.Uri);
+                    string newPathUri = _targetCommonStructureService.CreateNode(name, parent.Uri);
                     Log.Information("...created");
-                    node = css.GetNode(newPathUri);
+                    node = _targetCommonStructureService.GetNode(newPathUri);
                 }
                 catch
                 {
@@ -220,7 +221,7 @@ namespace VstsSyncMigrator.Engine
 
             try
             {
-                ((ICommonStructureService4)css).SetIterationDates(node.Uri, startDate, finishDate);
+                ((ICommonStructureService4)_targetCommonStructureService).SetIterationDates(node.Uri, startDate, finishDate);
                 Trace.Write("...dates assigned");
             }
             catch (CommonStructureSubsystemException ex)
@@ -231,6 +232,7 @@ namespace VstsSyncMigrator.Engine
             Trace.WriteLine(String.Empty);
             return node;
         }
+
 
     }
 }

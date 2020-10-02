@@ -10,7 +10,7 @@ namespace MigrationTools.Clients
         string Query { get; set; }
         void AddParameter(string name, string value);
 
-        IWorkItemQuery Build(IMigrationClient migrationClient);
+        IWorkItemQuery BuildWIQLQuery(IMigrationClient migrationClient);
 
     }
 }

@@ -97,7 +97,7 @@ namespace VstsSyncMigrator.Engine
                     {
                         try
                         {
-                            targetFound.ToWorkItem().Save();
+                            targetFound.SaveToAzureDevOps();
                             Trace.WriteLine(string.Format("          Updated"));
                         }
                         catch (ValidationException ve)
@@ -155,9 +155,9 @@ namespace VstsSyncMigrator.Engine
             }
 
 
-            if (!String.IsNullOrEmpty(_config.QueryBit))
+            if (!String.IsNullOrEmpty(_config.WIQLQueryBit))
             {
-                constraints += _config.QueryBit;
+                constraints += _config.WIQLQueryBit;
             }
             return constraints;
         }

@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace MigrationTools.Configuration.Processing
 {
-    public class WorkItemMigrationConfig : IProcessorConfig
+    public class WorkItemMigrationConfig : IWorkItemProcessorConfig
     {
         public bool ReplayRevisions { get; set; }
         public bool PrefixProjectToNodes { get; set; }
@@ -13,9 +13,9 @@ namespace MigrationTools.Configuration.Processing
         public bool UpdateCreatedBy { get; set; }
         public bool BuildFieldTable { get; set; }
         public bool AppendMigrationToolSignatureFooter { get; set; }
-        public string QueryBit { get; set; }
+        public string WIQLQueryBit { get; set; }
         /// <inheritdoc />
-        public string OrderBit { get; set; }
+        public string WIQLOrderBit { get; set; } 
         public bool Enabled { get; set; }
         /// <inheritdoc />
         public string Processor => "WorkItemMigrationContext";
@@ -35,6 +35,8 @@ namespace MigrationTools.Configuration.Processing
         public int AttachmentMaxSize { get; set; }
         public bool CollapseRevisions { get; set; }
         public bool LinkMigrationSaveEachAsAdded { get; set; }
+        public string[] NodeBasePaths { get; set; }
+        public IList<int> WorkItemIDs { get; set; }
 
         /// <inheritdoc />
         public bool IsProcessorCompatible(IReadOnlyList<IProcessorConfig> otherProcessors)
@@ -60,8 +62,9 @@ namespace MigrationTools.Configuration.Processing
             PrefixProjectToNodes = false;
             UpdateCreatedDate = true;
             LinkMigrationSaveEachAsAdded = false;
-            QueryBit = @"AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
-            OrderBit = "[System.ChangedDate] desc";
+            WIQLQueryBit = @"AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
+            WIQLOrderBit = "[System.ChangedDate] desc";
+            NodeBasePaths = new[] { "Product\\Area\\Path1", "Product\\Area\\Path2" };
         }
     }
 }

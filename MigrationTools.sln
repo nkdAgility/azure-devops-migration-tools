@@ -49,7 +49,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Processors", "Processors", "{E9399C6D-A5E0-43ED-8412-6C4A6BC86EC8}"
 	ProjectSection(SolutionItems) = preProject
 		docs\Processors\ImportProfilePictureConfig.md = docs\Processors\ImportProfilePictureConfig.md
-		docs\Processors\NodeStructuresMigrationConfig.md = docs\Processors\NodeStructuresMigrationConfig.md
 		docs\Processors\TeamMigrationConfig.md = docs\Processors\TeamMigrationConfig.md
 		docs\Processors\TestConfigurationsMigrationConfig.md = docs\Processors\TestConfigurationsMigrationConfig.md
 		docs\Processors\TestPlansAndSuitesMigrationConfig.md = docs\Processors\TestPlansAndSuitesMigrationConfig.md
@@ -92,6 +91,14 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EntryPoints", "EntryPoints", "{D0EE5917-21B2-49FA-9506-69857EE82DCD}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Clients", "Clients", "{13FE9FE2-9C6E-4866-BBAD-106F5BF765F1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SampleConfigs", "SampleConfigs", "{A6831354-6128-4F1A-A1F3-C6E598B0925F}"
+	ProjectSection(SolutionItems) = preProject
+		src\MigrationTools.Samples\configuration.json = src\MigrationTools.Samples\configuration.json
+		src\MigrationTools.Samples\demo-mapping-scrum2Agile.json = src\MigrationTools.Samples\demo-mapping-scrum2Agile.json
+		src\MigrationTools.Samples\demo-migration-reset.json = src\MigrationTools.Samples\demo-migration-reset.json
+		src\MigrationTools.Samples\demo-migration.json = src\MigrationTools.Samples\demo-migration.json
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -160,6 +167,7 @@ Global
 		{A679B3FF-1355-455F-853F-433A9CB1BE60} = {5C05DA7B-B70F-4A87-920B-DCD14EA7670D}
 		{D58EEDFA-D74C-4E84-9C26-6D69521382FD} = {13FE9FE2-9C6E-4866-BBAD-106F5BF765F1}
 		{B400FC37-A4B7-4526-85DD-36784E3B56EC} = {5C05DA7B-B70F-4A87-920B-DCD14EA7670D}
+		{A6831354-6128-4F1A-A1F3-C6E598B0925F} = {32E2956A-9056-4D9D-8018-14DFD0E6CA41}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {62EE0B27-C55A-46EE-8D17-1691DE9BBD50}

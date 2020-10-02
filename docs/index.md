@@ -2,9 +2,9 @@
 
 The Azure DevOps Migration Tools allow you to bulk edit and migrate data between Team Projects on both Microsoft Team Foundation Server (TFS) and Azure DevOps Services. Take a look at the  [documentation](http://nkdagility.github.io/azure-devops-migration-tools/) to find out how. This project is published as [code on GitHub](https://github.com/nkdAgility/azure-devops-migration-tools/) as well as a [Azure DevOps Migration Tools on Chocolatey](https://chocolatey.org/packages/vsts-sync-migrator/).
 
-**WARNING: This tool is not designed for a novice. This tool was developed to support the senarios below, and the edge cases that have been encountered by the 30+ contributers from around the Azure DevOps community. You should be comfortable with the TFS/Azure DevOps object model, as well as debugging code in Visual Studio.**
+**WARNING: This tool is not designed for a novice. This tool was developed to support the scenarios below, and the edge cases that have been encountered by the 30+ contributors from around the Azure DevOps community. You should be comfortable with the TFS/Azure DevOps object model, as well as debugging code in Visual Studio.**
 
-_NOTICE: Both paied and community support is avilable through our [recommneded consultants](#support) as well as our contributors and many DevOps consultants around the world._
+_NOTICE: Both paid and community support is available through our [recommended consultants](#support) as well as our contributors and many DevOps consultants around the world._
 
 ## What can you do with this tool?
 
@@ -14,10 +14,11 @@ _NOTICE: Both paied and community support is avilable through our [recommneded c
 - Assistance in changing Process Templates
 - Bulk edit of Work Items
 - Migration of Test Suites & Test Plans
-- Migrate from one Language version of TFS / Azure Devops to another (*new v9.0*)
+- Migrate from one Language version of TFS / Azure DevOps to another (*new v9.0*)
 
 ## Change Log
 
+- v11.2.1 - Removed NodeMogrationContext and converted it to an enricher for Work Items. Still needs work, so that it migrates individual nodes, but currently migrates all.
 - v10.1 - Changed config design to have only the Name and not FullName of the class. Remove `MigrationTools.Core.Configuration.FieldMap.` and `MigrationTools.Core.Configuration.Processing.` from the config leaving only the Name of the class in ObjectType field.
 - v10.0 - Start of the greate refactor over to .NET Core and the REST API as the Object Model has been retired.
 - v9.0 - Added support for migration between other language versions of Azure DevOps. Developed for German -> English
@@ -29,7 +30,7 @@ _NOTICE: Both paied and community support is avilable through our [recommneded c
 - v8.4 - Support for cross-project linking of work items between projects.
 - v8.3 - Support for restarting the migration and syncing at the revision level.
 - v8.2 - Merge Git commit Fixing into Work Item migration (requires repos to be migrated first, can be rerun)
-- v8.0 - Merge of Work Item, Link, & attachent migrators into one.
+- v8.0 - Merge of Work Item, Link, & attachment migrators into one.
 
 ## What versions of Azure DevOps & TFS do you support?
 
@@ -64,7 +65,7 @@ There are two ways to get these tools:
 
 ## Overview
 
-These tools are build by naked Agility Limited's DevOps & Agility consultants to do real world migrations on a daily basis. We always work in [Azure Devops Services](http://dev.azure.com) on https://dev.azure.com/nkdagility/migration-tools/ with code in GitHub and publish as a chocolatey package that pulls from GitGub Releases.
+These tools are build by naked Agility Limited's DevOps & Agility consultants to do real world migrations on a daily basis. We always work in [Azure DevOps Services](http://dev.azure.com) on https://dev.azure.com/nkdagility/migration-tools/ with code in GitHub and publish as a chocolatey package that pulls from GitGub Releases.
 
 |-|-|
 |-------------:|:-------------|
@@ -82,19 +83,12 @@ There are other processors that can be used to migrate, or process, different so
 
 Most of these processors need to be run in order. If you try to migrate work items before you have migrated Area and Iterations then ***bang*** you need to go back.
 
-|Processor |Staus |Target |Usage |
+|Processor | Status |Target |Usage |
 |---------|---------|---------|---------|
-|[NodeStructuresMigration](./Processors/NodeStructuresMigrationConfig.md) | ready | Area & Iteration | Migrates Area and Iteration Paths |
-|[WorkItemMigration](./Processors/WorkItemMigrationConfig.md) | ready | Work Items | Migrates either tip or history of work items with Links & Attachments based on a query with field mappings |
-|[TeamMigration](./Processors/TeamMigrationConfig.md) | beta | Teams | Migrates Teams and Team Settings |
-|WorkItemRevisionReplayMigration | merged |  Work Items | obsolite - merged into WorkItemMigration |
-|LinkMigration | merged | Work Items | obsolite - merged into WorkItemMigration |
-|AttachementExportMigration | merged | Work Items | obsolite - merged into WorkItemMigration |
-|AttachementImportMigration | merged | Work Items | obsolite - merged into WorkItemMigration |
-|HtmlFieldEmbeddedImageMigration | merged | HTML Fields | obsolite - merged into WorkItemMigration |
-|GitCommitFix | merged | Git links | obsolite - merged into WorkItemMigration |
-|[WorkItemDelete](./Processors/WorkItemDeleteConfig.md) | ready | Work Items | Bulk delete of work items **WARNING DANGERIOUS** |
-|[WorkItemUpdate](./Processors/WorkItemUpdateConfig.md) | ready | Work Items | Bulk update of Work Items based on a query and field mappings |
+| [WorkItemMigration](./Processors/WorkItemMigrationConfig.md) | ready | Work Items | Migrates either tip or history of work items with Links & Attachments based on a query with field mappings |
+| [TeamMigration](./Processors/TeamMigrationConfig.md) | beta | Teams | Migrates Teams and Team Settings |
+| [WorkItemDelete](./Processors/WorkItemDeleteConfig.md) | ready | Work Items | Bulk delete of work items **WARNING DANGEROUS** |
+| [WorkItemUpdate](./Processors/WorkItemUpdateConfig.md) | ready | Work Items | Bulk update of Work Items based on a query and field mappings |
 |[WorkItemQueryMigration](./Processors/WorkItemQueryMigrationConfig.md) | ready | Queries | Migrates shared queries |
 |[TestVeriablesMigration](./Processors/TestVeriablesMigrationConfig.md) | Beta | Suits & Plans | Migrates Test Variables |
 |[TestConfigurationsMigration](./Processors/TestConfigurationsMigrationConfig.md) | Beta  | Suits & Plans | Migrates Test configurations |
@@ -103,6 +97,13 @@ Most of these processors need to be run in order. If you try to migrate work ite
 |ImportProfilePicture & ExportProfilePictureFromAD | Beta | Profiles | Downloads corporate images and updates TFS/Azure DevOps profiles |
 |CreateTeamFolders | ? | ? | ? | 
 |ExportTeamList | ? | ? | ? | 
+|[NodeStructuresMigration](./Processors/NodeStructuresMigrationConfig.md) | merged | Area & Iteration | obsolite - merged into WorkItemMigration |
+|AttachementExportMigration | merged | Work Items | obsolite - merged into WorkItemMigration |
+|AttachementImportMigration | merged | Work Items | obsolite - merged into WorkItemMigration |
+|LinkMigration | merged | Work Items | obsolite - merged into WorkItemMigration |
+|HtmlFieldEmbeddedImageMigration | merged | HTML Fields | obsolite - merged into WorkItemMigration |
+|WorkItemRevisionReplayMigration | merged |  Work Items | obsolite - merged into WorkItemMigration |
+|GitCommitFix | merged | Git links | obsolite - merged into WorkItemMigration |
 
 ### Field Maps
 
@@ -122,7 +123,7 @@ However sometimes you want to move data to another field, or use a regex to pars
 
 ##### Code (TFVC)
 
-There are no good tools for migrating TFVC code. All of them suffer from "time-dilation" as one can't control the dates of the Check-ins. While you can use tools like TaskTop, TFS Integration Tools, or others there is no support. We prefer to recommned that you use Git-TFS and migrate from TFVC to Git with full history and branches. If your resulting repository is too large we recommend creating a full clone of TFVC for posterity, and then create a limited branch clone with limited history for work.
+There are no good tools for migrating TFVC code. All of them suffer from "time-dilation" as one can't control the dates of the Check-ins. While you can use tools like TaskTop, TFS Integration Tools, or others there is no support. We prefer to recommend that you use Git-TFS and migrate from TFVC to Git with full history and branches. If your resulting repository is too large we recommend creating a full clone of TFVC for posterity, and then create a limited branch clone with limited history for work.
 
 ##### Code (Git)
 
@@ -132,17 +133,17 @@ When moving Git repos between Projects and Accounts you are able to maintain ful
 
 ##### Build & Releases
 
-When you import a build or release defenition into VSTS you need to fill out some of the data to allow that new definition to be saved. Things like connections and other require fields usually dont have matching GUIDS and need manual intervention. For builds & Releases we recommend that you use the built in Export/Import tools provided in the UI to move then to a new Team Project.
+When you import a build or release definition into VSTS you need to fill out some of the data to allow that new definition to be saved. Things like connections and other require fields usually don't have matching GUIDS and need manual intervention. For builds & Releases we recommend that you use the built in Export/Import tools provided in the UI to move then to a new Team Project.
 
 ## Why does this exist
 The main migration tool for TFS has always been the TFS Integration Tools which is sadly no longer supported. Indeed it only loosely supported versions of TFS after 2010 and had a lot of bugs. It was very difficult to configure and run. This tool hopes to solve some of that by providing support for TFS 2015 and Visual Studio Team Services (VSTS).
 
 It solves:
 
- * Supports all currenlty supported version of TFS
+ * Supports all currently supported version of TFS
  * Supports Azure DevOps Services 
- *  Migrates work items from one instace of TFS or Azure DevOps to another
- * Bulk edits fields in place for both TFS and Azure Devops Services
+ * Migrates work items from one instance of TFS or Azure DevOps to another
+ * Bulk edits fields in place for both TFS and Azure DevOps Services
  * Being able to migrate Test Plans an Suits from one Team Project to another
  * Being able to migrate Teams from one Team Project to another
 
@@ -159,10 +160,10 @@ If you want to sync your GitHub repository then check out [Open-source with VSTS
 
 You can get free support from the community here and on social media on a best effort basis if folks are available. If you are looking for paid support there are a number of consultants that contribute to this project and that are experts in this type of work:
 
-* **Martin Hinshelwood, naked Agility Ltd** - @MrHinsh is the founder of the Azure DevOps Migration Tools is available worldwide to help organisations plan and enact their migration efforts. You can contact him through [naked Agility Ltd.](https://nkdagility.com).
-* **Wes MacDonald, LIKE 10 INC.** - @wesmacdonald is a DevOps Consultant located in Toronto, Canada.  You can reach out to him via [LIKE 10 INC.](http://www.like10.com).
-* **Ove Bastiansen** - @ovebastiansen is a DevOps Consultant located in Norway. You can reach out to him via his [GitHub Profile](https://github.com/ovebastiansen). 
-* **Gordon Beeming** - @Gordon-Beeming is a DevOps Consultant located in South Africa. You can reach out to him via [Gordon Beeming](https://gordonbeeming.xyz/). 
+* **Martin Hinshelwood, naked Agility Ltd** - [@MrHinsh](https://github.com/MrHinsh) is the founder of the Azure DevOps Migration Tools is available worldwide to help organisations plan and enact their migration efforts. You can contact him through [naked Agility Ltd.](https://nkdagility.com).
+* **Wes MacDonald, LIKE 10 INC.** - [@wesmacdonald](https://github.com/wesmacdonald) is a DevOps Consultant located in Toronto, Canada.  You can reach out to him via [LIKE 10 INC.](http://www.like10.com).
+* **Ove Bastiansen** - [@ovebastiansen](https://github.com/ovebastiansen) is a DevOps Consultant located in Norway. You can reach out to him via his [GitHub Profile](https://github.com/ovebastiansen). 
+* **Gordon Beeming** - [@Gordon-Beeming](https://github.com/Gordon-Beeming) is a DevOps Consultant located in South Africa. You can reach out to him via [profile page](https://beeming.dev/). 
 
 ## FAQ
 
@@ -170,7 +171,7 @@ Check out the [FAQ pages](faq.md)
 
 ## Terms
 
-naked Agility Limited & our contibutors creates and maintains the "Azure DevOps Migration Tools" project under its [terms of business](https://nkdagility.com/terms/) and allows full access to the source code for customers and the general public. 
+naked Agility Limited & our contributors creates and maintains the "Azure DevOps Migration Tools" project under its [terms of business](https://nkdagility.com/terms/) and allows full access to the source code for customers and the general public. 
 
 ## The Technical Details
 

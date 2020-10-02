@@ -12,7 +12,6 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using MigrationTools.Configuration.Processing;
 using MigrationTools.DataContracts;
-using MigrationTools.Engine.Enrichers;
 using MigrationTools.Enrichers;
 
 namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
@@ -78,13 +77,13 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                                 }
 
                                 int attachmentIndex = wi.ToWorkItem().Attachments.Add(new Attachment(fullImageFilePath));
-                                this.SaveMigratedWorkItem(wi);
+                                wi.SaveToAzureDevOps();
 
                                 var newImageLink = wi.ToWorkItem().Attachments[attachmentIndex].Uri.ToString();
 
                                 field.Value = field.Value.ToString().Replace(match.Value, newImageLink);
                                 wi.ToWorkItem().Attachments.RemoveAt(attachmentIndex);
-                                wi.ToWorkItem().Save();
+                                wi.SaveToAzureDevOps();
                                 wiUpdated = true;
                                 File.Delete(fullImageFilePath);
                             }

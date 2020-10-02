@@ -121,15 +121,6 @@
       "OrderBit": "[System.ChangedDate] desc"
     },
     {
-      "ObjectType": "NodeStructuresMigrationConfig",
-      "PrefixProjectToNodes": false,
-      "Enabled": false,
-      "BasePaths": [
-        "Product\\Area\\Path1",
-        "Product\\Area\\Path2"
-      ]
-    },
-    {
       "ObjectType": "WorkItemMigrationConfig",
       "ReplayRevisions": true,
       "PrefixProjectToNodes": false,
@@ -150,7 +141,7 @@
       "PauseAfterEachWorkItem": false,
       "AttachmentMaxSize": 480000000,
       "CollapseRevisions": false,
-      "LinkMigrationSaveEachAsAdded": false
+      "LinkMigrationSaveEachAsAdded": true
     }
   ]
 }

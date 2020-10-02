@@ -13,8 +13,8 @@ namespace MigrationTools.DataContracts
         public DateTime RevisedDate { get; set; }
         public int Revision { get; set; }
         public string ProjectName { get; set; }
-        public object InternalWorkItem { get; set; }
-
+        public object internalObject { get; set; }
+        public object Fields { get; set; }
     }
 
 }

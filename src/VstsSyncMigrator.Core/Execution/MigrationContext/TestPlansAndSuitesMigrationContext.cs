@@ -15,7 +15,6 @@ using MigrationTools.Configuration;
 using MigrationTools.Configuration.Processing;
 using MigrationTools.Clients.AzureDevops.ObjectModel;
 using Serilog;
-using VstsSyncMigrator.Core;
 using VstsSyncMigrator.Engine.ComponentContext;
 using WorkItem = Microsoft.TeamFoundation.WorkItemTracking.Client.WorkItem;
 using MigrationTools;
@@ -280,7 +279,7 @@ namespace VstsSyncMigrator.Engine
             var sourceWI = Engine.Source.WorkItems.GetWorkItem(sourceWIId.ToString());
             var targetWI = Engine.Target.WorkItems.GetWorkItem(targetWIId.ToString());
             targetWI.ToWorkItem().Fields[Engine.Target.Config.ReflectedWorkItemIDFieldName].Value = Engine.Source.WorkItems.CreateReflectedWorkItemId(sourceWI);
-            targetWI.ToWorkItem().Save();
+            targetWI.SaveToAzureDevOps();
         }
 
         private void ApplyFieldMappings(int sourceWIId, int targetWIId)
@@ -318,14 +317,14 @@ namespace VstsSyncMigrator.Engine
                 throw new Exception(sb.ToString());
             }
 
-            targetWI.ToWorkItem().Save();
+            targetWI.SaveToAzureDevOps();
         }
 
         private void TagCompletedTargetPlan(int workItemId)
         {
             var targetPlanWorkItem = Engine.Target.WorkItems.GetWorkItem(workItemId.ToString()) ;
             targetPlanWorkItem.ToWorkItem().Tags = targetPlanWorkItem.ToWorkItem().Tags + ";migrated";
-            this.SaveWorkItem(targetPlanWorkItem);
+            targetPlanWorkItem.SaveToAzureDevOps();
         }
 
         private bool TargetPlanContansTag(int workItemId)
@@ -513,7 +512,7 @@ namespace VstsSyncMigrator.Engine
             var sourceWI = Engine.Source.WorkItems.GetWorkItem(sourceWIId.ToString());
             var targetWI = Engine.Target.WorkItems.GetWorkItem(targetWIId.ToString());
             targetWI.ToWorkItem().Fields["System.AssignedTo"].Value = sourceWI.ToWorkItem().Fields["System.AssignedTo"].Value;
-            targetWI.ToWorkItem().Save();
+            targetWI.SaveToAzureDevOps();
         }
 
         private void AddChildTestCases(ITestSuiteBase source, ITestSuiteBase target, ITestPlan targetPlan)
@@ -548,7 +547,7 @@ namespace VstsSyncMigrator.Engine
                     return;
 
                 TraceWriteLine(source, string.Format("    Processing {0} : {1} - {2} ", sourceTestCaseEntry.EntryType.ToString(), sourceTestCaseEntry.Id, sourceTestCaseEntry.Title), 15);
-                WorkItemData wi = Engine.Target.WorkItems.FindReflectedWorkItem(sourceTestCaseEntry.TestCase.WorkItem.ToWorkItemData(), false, Engine.Source.Config.ReflectedWorkItemIDFieldName);
+                WorkItemData wi = Engine.Target.WorkItems.FindReflectedWorkItem(sourceTestCaseEntry.TestCase.WorkItem.AsWorkItemData(), false);
                 if (wi == null)
                 {
                     TraceWriteLine(source, string.Format("    Can't find work item for Test Case. Has it been migrated? {0} : {1} - {2} ", sourceTestCaseEntry.EntryType.ToString(), sourceTestCaseEntry.Id, sourceTestCaseEntry.Title), 15);
@@ -637,7 +636,7 @@ namespace VstsSyncMigrator.Engine
                 var stopwatch = Stopwatch.StartNew();
                 var starttime = DateTime.Now;
                 _currentTestCases++;
-                WorkItemData wi = Engine.Target.WorkItems.FindReflectedWorkItem(sourceTce.TestCase.WorkItem.ToWorkItemData(), false);
+                WorkItemData wi = Engine.Target.WorkItems.FindReflectedWorkItem(sourceTce.TestCase.WorkItem.AsWorkItemData(), false);
                 ITestSuiteEntry targetTce;
                 if (wi != null)
                 {
@@ -714,7 +713,7 @@ namespace VstsSyncMigrator.Engine
             {
                 _currentTestCases++;
                 // find target testcase id for this source tce
-                WorkItemData targetTc = Engine.Target.WorkItems.FindReflectedWorkItem(sourceTce.TestCase.WorkItem.ToWorkItemData(), false);
+                WorkItemData targetTc = Engine.Target.WorkItems.FindReflectedWorkItem(sourceTce.TestCase.WorkItem.AsWorkItemData(), false);
 
                 if (targetTc == null)
                 {

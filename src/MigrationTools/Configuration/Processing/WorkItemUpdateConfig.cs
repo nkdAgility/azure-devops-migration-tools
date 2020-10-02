@@ -3,11 +3,9 @@ using System.Collections.Generic;
 
 namespace MigrationTools.Configuration.Processing
 {
-    public class WorkItemUpdateConfig : IProcessorConfig
+    public class WorkItemUpdateConfig : IWorkItemProcessorConfig
     {
         public bool WhatIf { get; set; }
-
-        public string QueryBit { get; set; }
 
         public bool Enabled { get; set; }
 
@@ -15,6 +13,13 @@ namespace MigrationTools.Configuration.Processing
         {
             get { return "WorkItemUpdate"; }
         }
+
+        public string WIQLQueryBit { get; set; }
+        public string WIQLOrderBit { get; set; }
+        public IList<int> WorkItemIDs { get; set; }
+        public bool FilterWorkItemsThatAlreadyExistInTarget { get; set; }
+        public bool PauseAfterEachWorkItem { get; set; }
+        public int WorkItemCreateRetryLimit { get; set; }
 
         /// <inheritdoc />
         public bool IsProcessorCompatible(IReadOnlyList<IProcessorConfig> otherProcessors)
@@ -24,7 +29,7 @@ namespace MigrationTools.Configuration.Processing
 
         public WorkItemUpdateConfig()
         {
-            QueryBit = @"AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')";
+            WIQLQueryBit = @"AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')";
         }
     }
 }

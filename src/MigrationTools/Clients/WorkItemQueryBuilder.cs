@@ -26,16 +26,14 @@ namespace MigrationTools.Clients
 
         public void AddParameter(string name, string value)
         {
-            if (!Parameters.ContainsKey(name))
+            if (Parameters.ContainsKey(name))
             {
-                Parameters.Add(name, value);
-            } else
-            {
-                throw new Exception("You cant add the same key twice to the query builder properties.");
-            }           
+                throw new ArgumentException("The paramiter key you are tring to add to the query already exists.");
+            }
+            Parameters.Add(name, value);
         }
 
-        public IWorkItemQuery Build(IMigrationClient migrationClient)
+        public IWorkItemQuery BuildWIQLQuery(IMigrationClient migrationClient)
         {
             if (string.IsNullOrEmpty(Query))
             {

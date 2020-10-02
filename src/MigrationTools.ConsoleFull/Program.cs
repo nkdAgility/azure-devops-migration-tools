@@ -11,6 +11,7 @@ using VstsSyncMigrator.Engine;
 using MigrationTools.Clients;
 using MigrationTools.Clients.AzureDevops.ObjectModel.Clients;
 using MigrationTools;
+using MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers;
 
 namespace VstsSyncMigrator.ConsoleApp
 {
@@ -37,7 +38,6 @@ namespace VstsSyncMigrator.ConsoleApp
 
                     //Processors
                     services.AddSingleton<WorkItemMigrationContext>();
-                    services.AddSingleton<NodeStructuresMigrationContext>();
                     services.AddSingleton<TeamMigrationContext>();
                     services.AddSingleton<TestConfigurationsMigrationContext>();
                     services.AddSingleton<TestPlandsAndSuitesMigrationContext>();
@@ -53,9 +53,13 @@ namespace VstsSyncMigrator.ConsoleApp
                     services.AddSingleton<WorkItemUpdate>();
                     services.AddSingleton<WorkItemUpdateAreasAsTagsContext>();
 
+                    // Enrichers
+                    services.AddSingleton<WorkItemLinkEnricher>();
+
                     // Core
                     services.AddTransient<IMigrationClient, MigrationClient>();
                     services.AddTransient<IWorkItemMigrationClient, WorkItemMigrationClient>();
+                    services.AddTransient<ITestPlanMigrationClient, TestPlanMigrationClient>();
                     services.AddTransient<IWorkItemQueryBuilder, WorkItemQueryBuilder>();
                     services.AddTransient<IWorkItemQuery, WorkItemQuery>();
 

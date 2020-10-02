@@ -8,14 +8,46 @@ using MigrationTools.DataContracts;
 using MigrationTools.Exceptions;
 using Serilog;
 using VstsSyncMigrator.Engine;
+using MigrationTools.Enrichers;
 
 namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
 {
-    public class WorkItemLinkEnricher
+    public class WorkItemLinkEnricher : IWorkItemEnricher
     {
-        public void MigrateLinks(WorkItemData sourceWorkItemLinkStart, IWorkItemMigrationClient sourceWorkItemStore, WorkItemData targetWorkItemLinkStart, IWorkItemMigrationClient targetWorkItemStore, bool save = true, bool filterWorkItemsThatAlreadyExistInTarget = true, string sourceReflectedWIIdField = null)
+
+        private bool _save = true;
+        private bool _filterWorkItemsThatAlreadyExistInTarget = true;
+        public IMigrationEngine Engine { get; }
+
+        public WorkItemLinkEnricher(IMigrationEngine engine)
         {
-            if (ShouldCopyLinks(sourceWorkItemLinkStart, targetWorkItemLinkStart, filterWorkItemsThatAlreadyExistInTarget))
+            Engine = engine;
+        }
+
+        public void Configure(
+            bool save = true,
+            bool filterWorkItemsThatAlreadyExistInTarget = true)
+        {
+            _save = save;
+            _filterWorkItemsThatAlreadyExistInTarget = filterWorkItemsThatAlreadyExistInTarget;
+        }
+
+        public void Enrich(WorkItemData sourceWorkItemLinkStart, WorkItemData targetWorkItemLinkStart)
+        {
+            if (sourceWorkItemLinkStart is null)
+            {
+                throw new ArgumentNullException(nameof(sourceWorkItemLinkStart));
+            }
+            if (targetWorkItemLinkStart is null)
+            {
+                throw new ArgumentNullException(nameof(targetWorkItemLinkStart));
+            }
+            if (targetWorkItemLinkStart.Id == "0")
+            {
+                throw new IndexOutOfRangeException("Target work item must be saved before you can add a link");
+            }
+
+            if (ShouldCopyLinks(sourceWorkItemLinkStart, targetWorkItemLinkStart))
             {
                 Trace.Indent();
                 foreach (Link item in sourceWorkItemLinkStart.ToWorkItem().Links)
@@ -25,19 +57,19 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                         Log.Information("Migrating link for {sourceWorkItemLinkStartId} of type {ItemGetTypeName}", sourceWorkItemLinkStart.Id, item.GetType().Name);
                         if (IsHyperlink(item))
                         {
-                            CreateHyperlink((Hyperlink)item, targetWorkItemLinkStart, save);
+                            CreateHyperlink((Hyperlink)item, targetWorkItemLinkStart);
                         }
                         else if (IsRelatedLink(item))
                         {
                             RelatedLink rl = (RelatedLink)item;
-                            CreateRelatedLink(sourceWorkItemLinkStart, rl, targetWorkItemLinkStart, sourceWorkItemStore, targetWorkItemStore, save, sourceReflectedWIIdField);
+                            CreateRelatedLink(sourceWorkItemLinkStart, rl, targetWorkItemLinkStart);
                         }
                         else if (IsExternalLink(item))
                         {
                             var el = (ExternalLink)item;
                             if (!IsBuildLink(el))
                             {
-                                CreateExternalLink(el, targetWorkItemLinkStart, save);
+                                CreateExternalLink(el, targetWorkItemLinkStart);
                             }
                         }
                         else
@@ -63,12 +95,11 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             }
             if (sourceWorkItemLinkStart.Type == "Test Case")
             {
-                MigrateSharedSteps(sourceWorkItemLinkStart, targetWorkItemLinkStart, sourceWorkItemStore, targetWorkItemStore, save);
+                MigrateSharedSteps(sourceWorkItemLinkStart, targetWorkItemLinkStart);
             }
         }
 
-        private void MigrateSharedSteps(WorkItemData wiSourceL, WorkItemData wiTargetL, IWorkItemMigrationClient sourceStore,
-            IWorkItemMigrationClient targetStore, bool save)
+        private void MigrateSharedSteps(WorkItemData wiSourceL, WorkItemData wiTargetL)
         {
             const string microsoftVstsTcmSteps = "Microsoft.VSTS.TCM.Steps";
             var oldSteps = wiTargetL.ToWorkItem().Fields[microsoftVstsTcmSteps].Value.ToString();
@@ -77,12 +108,12 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             var sourceSharedStepLinks = wiSourceL.ToWorkItem().Links.OfType<RelatedLink>()
                 .Where(x => x.LinkTypeEnd.Name == "Shared Steps").ToList();
             var sourceSharedSteps =
-                sourceSharedStepLinks.Select(x => sourceStore.GetWorkItem(x.RelatedWorkItemId.ToString()));
+                sourceSharedStepLinks.Select(x => Engine.Source.WorkItems.GetWorkItem(x.RelatedWorkItemId.ToString()));
 
             foreach (WorkItemData sourceSharedStep in sourceSharedSteps)
             {
                 WorkItemData matchingTargetSharedStep =
-                    targetStore.FindReflectedWorkItemByReflectedWorkItemId(sourceSharedStep);
+                    Engine.Target.WorkItems.FindReflectedWorkItemByReflectedWorkItemId(sourceSharedStep);
 
                 if (matchingTargetSharedStep != null)
                 {
@@ -92,14 +123,14 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                 }
             }
 
-            if (wiTargetL.ToWorkItem().IsDirty && save)
+            if (wiTargetL.ToWorkItem().IsDirty && _save)
             {
                 wiTargetL.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
-                wiTargetL.ToWorkItem().Save();
+                wiTargetL.SaveToAzureDevOps();
             }
         }
 
-        private void CreateExternalLink(ExternalLink sourceLink, WorkItemData target, bool save)
+        private void CreateExternalLink(ExternalLink sourceLink, WorkItemData target)
         {
             var exist = (from Link l in target.ToWorkItem().Links
                          where l is ExternalLink && ((ExternalLink)l).LinkedArtifactUri == ((ExternalLink)sourceLink).LinkedArtifactUri
@@ -110,10 +141,9 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                 ExternalLink el = new ExternalLink(sourceLink.ArtifactLinkType, sourceLink.LinkedArtifactUri);
                 el.Comment = sourceLink.Comment;
                 target.ToWorkItem().Links.Add(el);
-                if (save)
+                if (_save)
                 {
-                    target.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
-                    target.ToWorkItem().Save();
+                    target.SaveToAzureDevOps();
                 }
             }
             else
@@ -134,14 +164,14 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                    link.LinkedArtifactUri.StartsWith("vstfs:///Build/Build/", StringComparison.InvariantCultureIgnoreCase);
         }
 
-        private void CreateRelatedLink(WorkItemData wiSourceL, RelatedLink item, WorkItemData wiTargetL, IWorkItemMigrationClient sourceStore, IWorkItemMigrationClient targetStore, bool save, string sourceReflectedWIIdField)
+        private void CreateRelatedLink(WorkItemData wiSourceL, RelatedLink item, WorkItemData wiTargetL)
         {
             RelatedLink rl = (RelatedLink)item;
             WorkItemData wiSourceR = null;
             WorkItemData wiTargetR = null;
             try
             {
-                wiSourceR = sourceStore.GetWorkItem(rl.RelatedWorkItemId.ToString());
+                wiSourceR = Engine.Source.WorkItems.GetWorkItem(rl.RelatedWorkItemId.ToString());
             }
             catch (Exception ex)
             {
@@ -150,7 +180,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             }
             try
             {
-                wiTargetR = GetRightHandSideTargetWi(wiSourceL, wiSourceR, wiTargetL, targetStore, sourceStore, sourceReflectedWIIdField);
+                wiTargetR = GetRightHandSideTargetWi(wiSourceL, wiSourceR, wiTargetL);
             }
             catch (Exception ex)
             {
@@ -183,7 +213,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                     if (wiSourceR.Id != wiTargetR.Id)
                     {
                         Log.Information("  [CREATE-START] Adding Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id);
-                        WorkItemLinkTypeEnd linkTypeEnd = ((WorkItemMigrationClient)targetStore).Store.WorkItemLinkTypes.LinkTypeEnds[rl.LinkTypeEnd.ImmutableName];
+                        WorkItemLinkTypeEnd linkTypeEnd = ((WorkItemMigrationClient)Engine.Target.WorkItems).Store.WorkItemLinkTypes.LinkTypeEnds[rl.LinkTypeEnd.ImmutableName];
                         RelatedLink newRl = new RelatedLink(linkTypeEnd, int.Parse(wiTargetR.Id));
                         if (linkTypeEnd.ImmutableName == "System.LinkTypes.Hierarchy-Forward")
                         {
@@ -196,11 +226,11 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                             {
                                 wiTargetR.ToWorkItem().Links.Remove(potentialParentConflictLink);
                             }
-                            linkTypeEnd = ((WorkItemMigrationClient)targetStore).Store.WorkItemLinkTypes.LinkTypeEnds["System.LinkTypes.Hierarchy-Reverse"];
-                            RelatedLink newLl = new RelatedLink(linkTypeEnd,int.Parse( wiTargetL.Id));
+                            linkTypeEnd = ((WorkItemMigrationClient)Engine.Target.WorkItems).Store.WorkItemLinkTypes.LinkTypeEnds["System.LinkTypes.Hierarchy-Reverse"];
+                            RelatedLink newLl = new RelatedLink(linkTypeEnd, int.Parse(wiTargetL.Id));
                             wiTargetR.ToWorkItem().Links.Add(newLl);
                             wiTargetR.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
-                            wiTargetR.ToWorkItem().Save();
+                            wiTargetR.SaveToAzureDevOps();
                         }
                         else
                         {
@@ -217,10 +247,10 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                                 }
                             }
                             wiTargetL.ToWorkItem().Links.Add(newRl);
-                            if (save)
+                            if (_save)
                             {
                                 wiTargetL.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
-                                wiTargetL.ToWorkItem().Save();
+                                wiTargetL.SaveToAzureDevOps();
                             }
                         }
                         Log.Information(
@@ -253,7 +283,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             }
         }
 
-        private WorkItemData GetRightHandSideTargetWi(WorkItemData wiSourceL, WorkItemData wiSourceR, WorkItemData wiTargetL, IWorkItemMigrationClient targetStore, IWorkItemMigrationClient sourceStore, string sourceReflectedWIIdField)
+        private WorkItemData GetRightHandSideTargetWi(WorkItemData wiSourceL, WorkItemData wiSourceR, WorkItemData wiTargetL)
         {
             WorkItemData wiTargetR;
             if (!(wiTargetL == null)
@@ -266,7 +296,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             else
             {
                 // Moving to Other Team Project from Source
-                wiTargetR = targetStore.FindReflectedWorkItem(wiSourceR, true, sourceReflectedWIIdField);
+                wiTargetR = Engine.Target.WorkItems.FindReflectedWorkItem(wiSourceR, true);
                 if (wiTargetR == null) // Assume source only (other team project)
                 {
                     wiTargetR = wiSourceR;
@@ -284,7 +314,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             return item is RelatedLink;
         }
 
-        private void CreateHyperlink(Hyperlink sourceLink, WorkItemData target, bool save)
+        private void CreateHyperlink(Hyperlink sourceLink, WorkItemData target)
         {
             var exist = (from Link l in target.ToWorkItem().Links where l is Hyperlink && ((Hyperlink)l).Location == ((Hyperlink)sourceLink).Location select (Hyperlink)l).SingleOrDefault();
             if (exist == null)
@@ -292,17 +322,16 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                 Hyperlink hl = new Hyperlink(sourceLink.Location);
                 hl.Comment = sourceLink.Comment;
                 target.ToWorkItem().Links.Add(hl);
-                if (save)
+                if (_save)
                 {
-                    target.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
-                    target.ToWorkItem().Save();
+                    target.SaveToAzureDevOps();
                 }
             }
         }
 
-        private static bool ShouldCopyLinks(WorkItemData sourceWorkItemLinkStart, WorkItemData targetWorkItemLinkStart, bool filterWorkItemsThatAlreadyExistInTarget)
+        private bool ShouldCopyLinks(WorkItemData sourceWorkItemLinkStart, WorkItemData targetWorkItemLinkStart)
         {
-            if (filterWorkItemsThatAlreadyExistInTarget)
+            if (_filterWorkItemsThatAlreadyExistInTarget)
             {
                 if (targetWorkItemLinkStart.ToWorkItem().Links.Count == sourceWorkItemLinkStart.ToWorkItem().Links.Count) // we should never have this as the target should not have existed in this path
                 {

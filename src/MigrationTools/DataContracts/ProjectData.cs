@@ -8,7 +8,7 @@ namespace MigrationTools.DataContracts
     {
         public string Id { get; set; }
         public string Name { get; set; }
-        public object InternalProject { get; set; }
+        public object internalObject { get; set; }
 
     }
 

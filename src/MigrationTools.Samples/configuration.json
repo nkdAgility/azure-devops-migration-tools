@@ -1,16 +1,147 @@
 {
-        "sourceAccountUrl": "Required in 'export'/'migrate' mode, source account url.",
-        "sourceAccountToken": "!!TREAT THIS AS PASSWORD!! Required in 'export'/'migrate' mode, personal access token for source account.",
-        "targetAccountUrl": "Required in 'import'/'migrate' mode, target account url.",
-        "targetAccountToken": "!!TREAT THIS AS PASSWORD!! Required in 'import'/'migrate' mode, personal access token for target account.",
-        "sourceProcessName": "Required in 'export'/'migrate' mode, source process name.",
-        // "targetProcessName": "Optional, set to override process name in 'import'/'migrate' mode.",
-        "options": {
-            // "processFilename": "Required in 'import' mode, optional in 'export'/'migrate' mode to override default value './output/process.json'.",
-            // "logLevel":"Optional, default as 'Information'. Logs at or higher than this level are outputed to console and rest in log file. Possiblee values are 'Verbose'/'Information'/'Warning'/'Error'.",
-            // "logFilename":"Optional, default as 'output/processMigrator.log' - Set to override default log file name.",
-            // "overwritePicklist": "Optional, default is 'false'. Set true to overwrite picklist if exists on target. Import will fail if picklist exists but different from source.",
-            // "continueOnRuleImportFailure": "Optional, default is 'false', set true to continue import on failure importing rules, warning will be provided.",
-            // "skipImportFormContributions": "Optional, default is 'false', set true to skip import control/group/form contributions on work item form.",
-        }
+  "Version": "0.0",
+  "TelemetryEnableTrace": false,
+  "workaroundForQuerySOAPBugEnabled": false,
+  "Source": {
+    "Collection": "https://dev.azure.com/nkdagility-preview/",
+    "Project": "migrationSource1",
+    "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
+    "AllowCrossProjectLinking": false,
+    "PersonalAccessToken": "",
+    "LanguageMaps": {
+      "AreaPath": "Area",
+      "IterationPath": "Iteration"
     }
+  },
+  "Target": {
+    "Collection": "https://dev.azure.com/nkdagility-preview/",
+    "Project": "migrationTarget1",
+    "ReflectedWorkItemIDFieldName": "nkdScrum.ReflectedWorkItemId",
+    "AllowCrossProjectLinking": false,
+    "PersonalAccessToken": "",
+    "LanguageMaps": {
+      "AreaPath": "Area",
+      "IterationPath": "Iteration"
+    }
+  },
+  "FieldMaps": [
+    {
+      "ObjectType": "MultiValueConditionalMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceFieldsAndValues": {
+        "Field1": "Value1",
+        "Field2": "Value2"
+      },
+      "targetFieldsAndValues": {
+        "Field1": "Value1",
+        "Field2": "Value2"
+      }
+    },
+    {
+      "ObjectType": "FieldBlankMapConfig",
+      "WorkItemTypeName": "*",
+      "targetField": "TfsMigrationTool.ReflectedWorkItemId"
+    },
+    {
+      "ObjectType": "FieldValueMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceField": "System.State",
+      "targetField": "System.State",
+      "defaultValue": "New",
+      "valueMapping": {
+        "Approved": "New",
+        "New": "New",
+        "Committed": "Active",
+        "In Progress": "Active",
+        "To Do": "New",
+        "Done": "Closed",
+        "Removed": "Removed"
+      }
+    },
+    {
+      "ObjectType": "FieldtoFieldMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceField": "Microsoft.VSTS.Common.BacklogPriority",
+      "targetField": "Microsoft.VSTS.Common.StackRank"
+    },
+    {
+      "ObjectType": "FieldtoFieldMultiMapConfig",
+      "WorkItemTypeName": "*",
+      "SourceToTargetMappings": {
+        "SourceField1": "TargetField1",
+        "SourceField2": "TargetField2"
+      }
+    },
+    {
+      "ObjectType": "FieldtoTagMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceField": "System.State",
+      "formatExpression": "ScrumState:{0}"
+    },
+    {
+      "ObjectType": "FieldMergeMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceField1": "System.Description",
+      "sourceField2": "Microsoft.VSTS.Common.AcceptanceCriteria",
+      "targetField": "System.Description",
+      "formatExpression": "{0} <br/><br/><h3>Acceptance Criteria</h3>{1}",
+      "doneMatch": "##DONE##"
+    },
+    {
+      "ObjectType": "RegexFieldMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceField": "COMPANY.PRODUCT.Release",
+      "targetField": "COMPANY.DEVISION.MinorReleaseVersion",
+      "pattern": "PRODUCT \\d{4}.(\\d{1})",
+      "replacement": "$1"
+    },
+    {
+      "ObjectType": "FieldValuetoTagMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceField": "Microsoft.VSTS.CMMI.Blocked",
+      "pattern": "Yes",
+      "formatExpression": "{0}"
+    },
+    {
+      "ObjectType": "TreeToTagMapConfig",
+      "WorkItemTypeName": "*",
+      "toSkip": 3,
+      "timeTravel": 1
+    }
+  ],
+  "WorkItemTypeDefinition": {
+    "sourceWorkItemTypeName": "targetWorkItemTypeName"
+  },
+  "GitRepoMapping": null,
+  "Processors": [
+    {
+      "ObjectType": "WorkItemDeleteConfig",
+      "Enabled": true,
+      "QueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
+      "OrderBit": "[System.ChangedDate] desc"
+    },
+    {
+      "ObjectType": "WorkItemMigrationConfig",
+      "ReplayRevisions": true,
+      "PrefixProjectToNodes": false,
+      "UpdateCreatedDate": true,
+      "UpdateCreatedBy": true,
+      "BuildFieldTable": false,
+      "AppendMigrationToolSignatureFooter": false,
+      "QueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
+      "OrderBit": "[System.ChangedDate] desc",
+      "Enabled": true,
+      "LinkMigration": true,
+      "AttachmentMigration": true,
+      "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
+      "FixHtmlAttachmentLinks": false,
+      "SkipToFinalRevisedWorkItemType": false,
+      "WorkItemCreateRetryLimit": 5,
+      "FilterWorkItemsThatAlreadyExistInTarget": true,
+      "PauseAfterEachWorkItem": false,
+      "AttachmentMaxSize": 480000000,
+      "CollapseRevisions": false,
+      "LinkMigrationSaveEachAsAdded": false
+    }
+  ]
+}
