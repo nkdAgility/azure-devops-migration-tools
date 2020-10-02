@@ -32,7 +32,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             _filterWorkItemsThatAlreadyExistInTarget = filterWorkItemsThatAlreadyExistInTarget;
         }
 
-        public void Enritch(WorkItemData sourceWorkItemLinkStart, WorkItemData targetWorkItemLinkStart)
+        public void Enrich(WorkItemData sourceWorkItemLinkStart, WorkItemData targetWorkItemLinkStart)
         {
             if (sourceWorkItemLinkStart is null)
             {

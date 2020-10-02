@@ -706,7 +706,7 @@ namespace VstsSyncMigrator.Engine
             if (targetWorkItem != null && _config.LinkMigration && sourceWorkItem.ToWorkItem().Links.Count > 0)
             {
                 TraceWriteLine(LogEventLevel.Information, "Links {SourceWorkItemLinkCount} | LinkMigrator:{LinkMigration}", new Dictionary<string, object>() { { "SourceWorkItemLinkCount", sourceWorkItem.ToWorkItem().Links.Count }, { "LinkMigration", _config.LinkMigration } });
-                workItemLinkEnricher.Enritch(sourceWorkItem, targetWorkItem);
+                workItemLinkEnricher.Enrich(sourceWorkItem, targetWorkItem);
                 AddMetric("RelatedLinkCount", processWorkItemMetrics, targetWorkItem.ToWorkItem().Links.Count);
                 int fixedLinkCount = gitRepositoryEnricher.FixExternalLinks(targetWorkItem, targetStore, sourceWorkItem, _config.LinkMigrationSaveEachAsAdded);
                 AddMetric("FixedGitLinkCount", processWorkItemMetrics, fixedLinkCount);

@@ -29,7 +29,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             
         }
 
-        public void Enritch(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
+        public void Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
         {
    
         }
