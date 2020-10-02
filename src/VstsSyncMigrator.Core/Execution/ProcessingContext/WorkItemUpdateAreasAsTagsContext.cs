@@ -68,9 +68,9 @@ namespace VstsSyncMigrator.Engine
                 { 
                 workitem.ToWorkItem().Open();
                 workitem.ToWorkItem().Tags = newTagList;
-                workitem.ToWorkItem().Save();
+                workitem.SaveToAzureDevOps();
 
-            }
+                }
 
             witstopwatch.Stop();
                 elapsedms = elapsedms + witstopwatch.ElapsedMilliseconds;

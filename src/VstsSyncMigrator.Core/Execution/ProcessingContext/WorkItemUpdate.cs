@@ -43,7 +43,7 @@ namespace VstsSyncMigrator.Engine
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 			//////////////////////////////////////////////////
-            var Query = string.Format(@"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY [System.ChangedDate] desc", _config.QueryBit);
+            var Query = string.Format(@"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY [System.ChangedDate] desc", _config.WIQLQueryBit);
             List<WorkItemData> workitems = Engine.Target.WorkItems.GetWorkItems(Query);
             Trace.WriteLine(string.Format("Update {0} work items?", workitems.Count));
             //////////////////////////////////////////////////
@@ -63,12 +63,12 @@ namespace VstsSyncMigrator.Engine
                     {
                         try
                         {
-                            workitem.ToWorkItem().Save();
+                            workitem.SaveToAzureDevOps();
                         }
                         catch (Exception)
                         {
                             System.Threading.Thread.Sleep(5000);
-                            workitem.ToWorkItem().Save();
+                            workitem.SaveToAzureDevOps();
                         }
                        
                     } else

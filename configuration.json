@@ -141,7 +141,7 @@
       "PauseAfterEachWorkItem": false,
       "AttachmentMaxSize": 480000000,
       "CollapseRevisions": false,
-      "LinkMigrationSaveEachAsAdded": false
+      "LinkMigrationSaveEachAsAdded": true
     }
   ]
 }

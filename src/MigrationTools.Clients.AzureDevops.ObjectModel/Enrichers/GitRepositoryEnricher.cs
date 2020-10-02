@@ -194,7 +194,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             {
                 Trace.WriteLine($"Saving {targetWorkItem.Id}");
                 targetWorkItem.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
-                targetWorkItem.ToWorkItem().Save();
+                targetWorkItem.SaveToAzureDevOps();
             }
             return count;
 

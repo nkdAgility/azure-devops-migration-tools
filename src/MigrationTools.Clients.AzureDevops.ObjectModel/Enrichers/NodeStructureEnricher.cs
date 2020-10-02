@@ -6,12 +6,14 @@ using Microsoft.TeamFoundation.Server;
 using MigrationTools;
 using MigrationTools.Configuration;
 using MigrationTools.Configuration.Processing;
+using MigrationTools.DataContracts;
 using MigrationTools.Engine.Processors;
+using MigrationTools.Enrichers;
 using Serilog;
 
 namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
 {
-    public class NodeStructureEnricher
+    public class NodeStructureEnricher : IWorkItemEnricher
     {
         private bool _prefixProjectToNodes = false;
         private ICommonStructureService _sourceCommonStructureService;
@@ -21,6 +23,16 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
         private string[] _nodeBasePaths;
 
         public IMigrationEngine Engine { get; }
+
+        public void Configure(bool save = true, bool filterWorkItemsThatAlreadyExistInTarget = true)
+        {
+            
+        }
+
+        public void Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
+        {
+   
+        }
 
         public NodeStructureEnricher(IMigrationEngine engine)
         {
@@ -220,6 +232,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             Trace.WriteLine(String.Empty);
             return node;
         }
+
 
     }
 }

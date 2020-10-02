@@ -11,6 +11,8 @@ namespace MigrationTools.Clients.Tests
 
         public TeamProjectConfig Config => throw new System.NotImplementedException();
 
+        public ProjectData Project => throw new System.NotImplementedException();
+
         public void Configure(IMigrationClient migrationClient, bool bypassRules = true)
         {
 
@@ -65,7 +67,7 @@ namespace MigrationTools.Clients.Tests
             throw new System.NotImplementedException();
         }
 
-        public WorkItemData FindReflectedWorkItem(WorkItemData workItem, bool cache, string sourceReflectedWIIdField = null)
+        public WorkItemData FindReflectedWorkItem(WorkItemData workItem, bool cache)
         {
             throw new System.NotImplementedException();
         }
@@ -95,7 +97,7 @@ namespace MigrationTools.Clients.Tests
             throw new System.NotImplementedException();
         }
 
-        public int GetReflectedWorkItemId(WorkItemData workItem, string reflectedWotkItemIdField)
+        public int GetReflectedWorkItemId(WorkItemData workItem)
         {
             throw new System.NotImplementedException();
         }

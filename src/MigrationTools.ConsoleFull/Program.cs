@@ -11,6 +11,7 @@ using VstsSyncMigrator.Engine;
 using MigrationTools.Clients;
 using MigrationTools.Clients.AzureDevops.ObjectModel.Clients;
 using MigrationTools;
+using MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers;
 
 namespace VstsSyncMigrator.ConsoleApp
 {
@@ -51,6 +52,9 @@ namespace VstsSyncMigrator.ConsoleApp
                     services.AddSingleton<WorkItemDelete>();
                     services.AddSingleton<WorkItemUpdate>();
                     services.AddSingleton<WorkItemUpdateAreasAsTagsContext>();
+
+                    // Enrichers
+                    services.AddSingleton<WorkItemLinkEnricher>();
 
                     // Core
                     services.AddTransient<IMigrationClient, MigrationClient>();

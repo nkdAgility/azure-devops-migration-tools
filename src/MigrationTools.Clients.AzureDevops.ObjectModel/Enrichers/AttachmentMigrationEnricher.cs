@@ -12,7 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MigrationTools;
 using MigrationTools.DataContracts;
-using MigrationTools.Engine.Enrichers;
+using MigrationTools.Enrichers;
 
 namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
 {
@@ -60,7 +60,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             }
             if (save)
             {
-                this.SaveMigratedWorkItem(target);
+                target.SaveToAzureDevOps();
                 Log.Information("Work iTem now has {AttachmentCount} attachemnts", source.ToWorkItem().Attachments.Count);
                 CleanUpAfterSave();
             }

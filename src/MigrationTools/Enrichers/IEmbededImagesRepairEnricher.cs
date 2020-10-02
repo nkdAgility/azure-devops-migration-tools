@@ -1,6 +1,6 @@
 ﻿using MigrationTools.DataContracts;
 
-namespace MigrationTools.Engine.Enrichers
+namespace MigrationTools.Enrichers
 {
    public interface IEmbededImagesRepairEnricher
     {

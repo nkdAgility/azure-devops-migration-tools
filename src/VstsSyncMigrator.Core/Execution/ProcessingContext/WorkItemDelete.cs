@@ -41,7 +41,7 @@ namespace VstsSyncMigrator.Engine
             string sourceQuery =
                 string.Format(
                     @"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY {1}",
-                    _config.QueryBit, _config.OrderBit);
+                    _config.WIQLQueryBit, _config.WIQLOrderBit);
             var workItems = Engine.Target.WorkItems.GetWorkItems(sourceQuery);
 
             if (workItems.Count > 0)

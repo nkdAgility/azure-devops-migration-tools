@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace MigrationTools.Configuration.Processing
 {
-    public class WorkItemDeleteConfig : IProcessorConfig
+    public class WorkItemDeleteConfig : IWorkItemProcessorConfig
     {
         public bool Enabled { get; set; }
 
@@ -15,13 +15,16 @@ namespace MigrationTools.Configuration.Processing
         public WorkItemDeleteConfig()
         {
             Enabled = false;
-            QueryBit = @"AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
-            OrderBit = "[System.ChangedDate] desc";
+            WIQLQueryBit = @"AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
+            WIQLOrderBit = "[System.ChangedDate] desc";
         }
 
-        public string QueryBit { get; set; }
-        /// <inheritdoc />
-        public string OrderBit { get; set; }
+        public string WIQLQueryBit { get; set; }
+        public string WIQLOrderBit { get; set; }
+        public IList<int> WorkItemIDs { get; set; }
+        public bool FilterWorkItemsThatAlreadyExistInTarget { get; set; }
+        public bool PauseAfterEachWorkItem { get; set; }
+        public int WorkItemCreateRetryLimit { get; set; }
 
         /// <inheritdoc />
         public bool IsProcessorCompatible(IReadOnlyList<IProcessorConfig> otherProcessors)

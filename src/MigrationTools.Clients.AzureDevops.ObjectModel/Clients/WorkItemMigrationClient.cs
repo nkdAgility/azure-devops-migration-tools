@@ -20,10 +20,13 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
         private WorkItemStoreFlags _bypassRules;
         private WorkItemStore _wistore;
         private TeamProjectConfig _config;
+        private ProjectData _project;
 
         public WorkItemStore Store { get { return _wistore; } }
 
         public override TeamProjectConfig Config => _config;
+
+        public override ProjectData Project { get { return _project; } }
 
         public WorkItemMigrationClient(IServiceProvider services, ITelemetryLogger telemetry) : base(services, telemetry)
         {
@@ -35,6 +38,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
             _config = MigrationClient.Config;
             _bypassRules = bypassRules ? WorkItemStoreFlags.BypassRules : WorkItemStoreFlags.None;
             _wistore = new WorkItemStore(MigrationClient.Config.Collection.ToString(), _bypassRules);
+            _project = migrationClient.WorkItems.GetProject();
         }
 
 
@@ -74,14 +78,14 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
             return string.Format("{0}/{1}/_workitems/edit/{2}", wi.Store.TeamProjectCollection.Uri.ToString().TrimEnd('/'), wi.Project.Name, wi.Id);
 
         }
-        public override int GetReflectedWorkItemId(WorkItemData workItem, string reflectedWotkItemIdField)
+        public override int GetReflectedWorkItemId(WorkItemData workItem)
         {
             var local = workItem.ToWorkItem();
-            if (!local.Fields.Contains(reflectedWotkItemIdField))
+            if (!local.Fields.Contains(Config.ReflectedWorkItemIDFieldName))
             {
                 return 0;
             }
-            string rwiid = local.Fields[reflectedWotkItemIdField].Value.ToString();
+            string rwiid = local.Fields[Config.ReflectedWorkItemIDFieldName].Value.ToString();
             if (Regex.IsMatch(rwiid, @"(http(s)?://)?([\w-]+\.)+[\w-]+(/[\w- ;,./?%&=]*)?"))
             {
                 return int.Parse(rwiid.Substring(rwiid.LastIndexOf(@"/") + 1));
@@ -89,7 +93,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
             return 0;
         }
 
-        public override WorkItemData FindReflectedWorkItem(WorkItemData workItem, bool cache, string sourceReflectedWIIdField = null)
+        public override WorkItemData FindReflectedWorkItem(WorkItemData workItem, bool cache)
         {
             string ReflectedWorkItemId = CreateReflectedWorkItemId(workItem);
 
@@ -102,10 +106,10 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
             }
 
             // If we have a Reflected WorkItem ID field on the source store, assume it is pointing to the desired work item on the target store
-            if (sourceReflectedWIIdField != null && workItemToFind.Fields.Contains(sourceReflectedWIIdField) && !string.IsNullOrEmpty(workItemToFind.Fields[sourceReflectedWIIdField]?.Value?.ToString()))
+            if (Config.ReflectedWorkItemIDFieldName != null && workItemToFind.Fields.Contains(Config.ReflectedWorkItemIDFieldName) && !string.IsNullOrEmpty(workItemToFind.Fields[Config.ReflectedWorkItemIDFieldName]?.Value?.ToString()))
             {
-                string rwiid = workItemToFind.Fields[sourceReflectedWIIdField].Value.ToString();
-                int idToFind = GetReflectedWorkItemId(workItem, sourceReflectedWIIdField);
+                string rwiid = workItemToFind.Fields[Config.ReflectedWorkItemIDFieldName].Value.ToString();
+                int idToFind = GetReflectedWorkItemId(workItem);
                 if (idToFind == 0)
                 {
                     found = null;
@@ -123,16 +127,16 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
                 }
             }
             if (found == null) { found = FindReflectedWorkItemByReflectedWorkItemId(ReflectedWorkItemId)?.ToWorkItem(); }
-            if (sourceReflectedWIIdField != null && !workItemToFind.Fields.Contains(sourceReflectedWIIdField))
+            if (Config.ReflectedWorkItemIDFieldName != null && !workItemToFind.Fields.Contains(Config.ReflectedWorkItemIDFieldName))
             {
                 if (found == null) { found = FindReflectedWorkItemByMigrationRef(ReflectedWorkItemId)?.ToWorkItem(); } // Too slow!
                 //if (found == null) { found = FindReflectedWorkItemByTitle(workItemToFind.Title); }
             }
             if (found != null && cache)
             {
-                AddToCache(workItemToFind.Id, found.ToWorkItemData());/// TODO MEMORY LEAK
+                AddToCache(workItemToFind.Id, found.AsWorkItemData());/// TODO MEMORY LEAK
             }
-            return found?.ToWorkItemData();
+            return found?.AsWorkItemData();
         }
 
         public override WorkItemData FindReflectedWorkItemByReflectedWorkItemId(WorkItemData refWi)
@@ -142,8 +146,8 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
 
         public override WorkItemData FindReflectedWorkItemByReflectedWorkItemId(int refId, bool cache)
         {
-            var sourceIdKey = ~refId;
-            if (Cache.TryGetValue(sourceIdKey, out var workItem)) return workItem;
+            var IdKey = ~refId;
+            if (Cache.TryGetValue(IdKey, out var workItem)) return workItem;
 
             IEnumerable<WorkItemData> QueryWorkItems()
             {
@@ -161,7 +165,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
             var foundWorkItem = QueryWorkItems().FirstOrDefault(wi => wi.ToWorkItem().Fields[MigrationClient.Config.ReflectedWorkItemIDFieldName].Value.ToString().EndsWith("/" + refId));
             if (cache && foundWorkItem != null)
             {
-                AddToCache(sourceIdKey, foundWorkItem);
+                AddToCache(IdKey, foundWorkItem);
             }
             return foundWorkItem;
         }
@@ -221,7 +225,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
 
         public override WorkItemData GetRevision(WorkItemData workItem, int revision)
         {
-            return Store.GetWorkItem(int.Parse(workItem.Id), revision).ToWorkItemData();
+            return Store.GetWorkItem(int.Parse(workItem.Id), revision).AsWorkItemData();
         }
 
 
@@ -232,7 +236,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
 
         public override WorkItemData GetWorkItem(int id)
         {
-            return Store.GetWorkItem(id)?.ToWorkItemData();
+            return Store.GetWorkItem(id)?.AsWorkItemData();
         }
     }
 }
