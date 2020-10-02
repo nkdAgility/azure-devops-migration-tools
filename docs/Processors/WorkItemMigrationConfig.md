@@ -56,24 +56,24 @@ Typical way that queris are built:
          Engine.Target.Config.ReflectedWorkItemIDFieldName,
          _config.WIQLQueryBit,
          _config.WIQLOrderBit
-                    );
+      );
 var targetFoundItems = Engine.Target.WorkItems.GetWorkItems(targetQuery);
 ```
 
 A simple example config:
 
 ```
-"QueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
-"OrderBit": "[System.ChangedDate] desc",
+"WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
+"WIQLOrderBit": "[System.ChangedDate] desc",
 ```
 Scope to Area Path (Team data):
 
 ```
-"QueryBit": "AND [System.AreaPath] UNDER 'project\Team 1\' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
-"OrderBit": "[System.ChangedDate] desc",
+"WIQLQueryBit": "AND [System.AreaPath] UNDER 'project\Team 1\' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
+"WIQLOrderBit": "[System.ChangedDate] desc",
 ```
 
 ```
-"QueryBit": "AND [System.ChangedDate] > 'project\Team 1\' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
-"OrderBit": "[System.ChangedDate] desc",
+"WIQLQueryBit": "AND [System.ChangedDate] > 'project\Team 1\' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
+"WIQLOrderBit": "[System.ChangedDate] desc",
 ```
