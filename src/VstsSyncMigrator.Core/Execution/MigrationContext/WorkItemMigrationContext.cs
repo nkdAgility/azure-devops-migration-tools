@@ -27,6 +27,7 @@ using Serilog.Events;
 using MigrationTools.Engine.Processors;
 using MigrationTools.DataContracts;
 using MigrationTools.Clients;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -36,7 +37,7 @@ namespace VstsSyncMigrator.Engine
         private WorkItemMigrationConfig _config;
         private List<String> _ignore;
         private WorkItemTrackingHttpClient _witClient;
-        private WorkItemLinkEnricher workItemLinkEnricher = new WorkItemLinkEnricher();
+        private WorkItemLinkEnricher workItemLinkEnricher;
         private NodeStructureEnricher nodeStructureEnricher;
         private IAttachmentMigrationEnricher attachmentEnricher;
         private GitRepositoryEnricher gitRepositoryEnricher;
@@ -102,6 +103,7 @@ namespace VstsSyncMigrator.Engine
                 throw new Exception("You must call Configure() first");
             }
             var workItemServer = Engine.Source.GetService<WorkItemServer>();
+            workItemLinkEnricher = Services.GetRequiredService<WorkItemLinkEnricher>();
             attachmentEnricher = new AttachmentMigrationEnricher(workItemServer, _config.AttachmentWorkingPath, _config.AttachmentMaxSize);
             embededImagesEnricher = new EmbededImagesRepairEnricher();
             gitRepositoryEnricher = new GitRepositoryEnricher(Engine);
