@@ -125,7 +125,7 @@ namespace VstsSyncMigrator.Engine
             var sourceWorkItems = Engine.Source.WorkItems.GetWorkItems(sourceQuery);
             contextLog.Information("Replay all revisions of {sourceWorkItemsCount} work items?", sourceWorkItems.Count);
             //////////////////////////////////////////////////
-            var destProject = Engine.Source.WorkItems.GetProject();
+            var destProject = Engine.Target.WorkItems.GetProject();
             contextLog.Information("Found target project as {@destProject}", destProject.Name);
             //////////////////////////////////////////////////////////FilterCompletedByQuery
             if (_config.FilterWorkItemsThatAlreadyExistInTarget)
