@@ -35,7 +35,7 @@ namespace MigrationTools.Clients
             }           
         }
 
-        public IWorkItemQuery Build(IMigrationClient migrationClient)
+        public IWorkItemQuery BuildWIQLQuery(IMigrationClient migrationClient)
         {
             if (string.IsNullOrEmpty(Query))
             {
