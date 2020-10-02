@@ -14,7 +14,7 @@ namespace MigrationTools.DataContracts
         public int Revision { get; set; }
         public string ProjectName { get; set; }
         public object InternalWorkItem { get; set; }
-
+        public object Fields { get; set; }
     }
 
 }

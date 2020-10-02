@@ -11,6 +11,8 @@ namespace MigrationTools.Clients.Tests
 
         public TeamProjectConfig Config => throw new System.NotImplementedException();
 
+        public ProjectData Project => throw new System.NotImplementedException();
+
         public void Configure(IMigrationClient migrationClient, bool bypassRules = true)
         {
 

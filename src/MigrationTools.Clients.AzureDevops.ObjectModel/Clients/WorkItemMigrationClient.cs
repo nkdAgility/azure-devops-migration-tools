@@ -20,10 +20,13 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
         private WorkItemStoreFlags _bypassRules;
         private WorkItemStore _wistore;
         private TeamProjectConfig _config;
+        private ProjectData _project;
 
         public WorkItemStore Store { get { return _wistore; } }
 
         public override TeamProjectConfig Config => _config;
+
+        public override ProjectData Project { get { return _project; } }
 
         public WorkItemMigrationClient(IServiceProvider services, ITelemetryLogger telemetry) : base(services, telemetry)
         {
@@ -35,6 +38,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
             _config = MigrationClient.Config;
             _bypassRules = bypassRules ? WorkItemStoreFlags.BypassRules : WorkItemStoreFlags.None;
             _wistore = new WorkItemStore(MigrationClient.Config.Collection.ToString(), _bypassRules);
+            _project = migrationClient.WorkItems.GetProject();
         }
 
 

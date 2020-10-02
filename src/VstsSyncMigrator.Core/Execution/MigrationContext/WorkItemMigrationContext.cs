@@ -24,7 +24,6 @@ using Newtonsoft.Json;
 using Serilog;
 using Serilog.Context;
 using Serilog.Events;
-using VstsSyncMigrator.Core;
 using MigrationTools.Engine.Processors;
 using MigrationTools;
 using MigrationTools.DataContracts;
@@ -121,8 +120,7 @@ namespace VstsSyncMigrator.Engine
             var sourceWorkItems = Engine.Source.WorkItems.GetWorkItems(sourceQuery);
             contextLog.Information("Replay all revisions of {sourceWorkItemsCount} work items?", sourceWorkItems.Count);
             //////////////////////////////////////////////////
-            var destProject = Engine.Source.WorkItems.GetProject();
-            contextLog.Information("Found target project as {@destProject}", destProject.Name);
+            contextLog.Information("Found target project as {@destProject}", Engine.Target.WorkItems.Project.Name);
             //////////////////////////////////////////////////////////FilterCompletedByQuery
             if (_config.FilterWorkItemsThatAlreadyExistInTarget)
             {
@@ -144,7 +142,7 @@ namespace VstsSyncMigrator.Engine
                 using (LogContext.PushProperty("sourceRevisionInt", sourceWorkItem.Revision))
                 using (LogContext.PushProperty("targetWorkItemId", null))
                 {
-                    ProcessWorkItem(destProject, sourceWorkItemData, _config.WorkItemCreateRetryLimit);
+                    ProcessWorkItem(sourceWorkItemData, _config.WorkItemCreateRetryLimit);
                     if (_config.PauseAfterEachWorkItem)
                     {
                         Console.WriteLine("Do you want to continue? (y/n)");
@@ -167,7 +165,7 @@ namespace VstsSyncMigrator.Engine
         private IDictionary<string, double> processWorkItemMetrics = null;
         private IDictionary<string, string> processWorkItemParamiters = null;
 
-        private void ProcessWorkItem(ProjectData destProject, WorkItemData sourceWorkItem, int retryLimit = 5, int retrys = 0)
+        private void ProcessWorkItem(WorkItemData sourceWorkItem, int retryLimit = 5, int retrys = 0)
         {
 
             var witstopwatch = Stopwatch.StartNew();
@@ -177,7 +175,7 @@ namespace VstsSyncMigrator.Engine
             AddParameter("SourceURL", processWorkItemParamiters, Engine.Source.WorkItems.Config.Collection.ToString());
             AddParameter("SourceWorkItem", processWorkItemParamiters, sourceWorkItem.Id.ToString());
             AddParameter("TargetURL", processWorkItemParamiters, Engine.Target.WorkItems.Config.Collection.ToString());
-            AddParameter("TargetProject", processWorkItemParamiters, destProject.Name);
+            AddParameter("TargetProject", processWorkItemParamiters, Engine.Target.WorkItems.Project.Name);
             AddParameter("RetryLimit", processWorkItemParamiters, retryLimit.ToString());
             AddParameter("RetryNumber", processWorkItemParamiters, retrys.ToString());
 
@@ -195,7 +193,7 @@ namespace VstsSyncMigrator.Engine
                     List<RevisionItem> revisionsToMigrate = RevisionsToMigrate(sourceWorkItem, targetWorkItem);
                     if (targetWorkItem == null)
                     {
-                        targetWorkItem = ReplayRevisions(revisionsToMigrate, sourceWorkItem, null, destProject, _current);
+                        targetWorkItem = ReplayRevisions(revisionsToMigrate, sourceWorkItem, null, _current);
                         AddMetric("Revisions", processWorkItemMetrics, revisionsToMigrate.Count);
                     }
                     else
@@ -214,7 +212,7 @@ namespace VstsSyncMigrator.Engine
                                     { "revisionsToMigrateCount", revisionsToMigrate.Count }
                                 });
 
-                            targetWorkItem = ReplayRevisions(revisionsToMigrate, sourceWorkItem, targetWorkItem, destProject, _current);
+                            targetWorkItem = ReplayRevisions(revisionsToMigrate, sourceWorkItem, targetWorkItem, _current);
 
                             AddMetric("Revisions", processWorkItemMetrics, revisionsToMigrate.Count);
                             AddMetric("SyncRev", processWorkItemMetrics, revisionsToMigrate.Count);
@@ -265,7 +263,7 @@ namespace VstsSyncMigrator.Engine
                             {"Retrys", retrys },
                             {"RetryLimit", retryLimit }
                         });
-                    ProcessWorkItem(destProject, sourceWorkItem, retryLimit, retrys);
+                    ProcessWorkItem(sourceWorkItem, retryLimit, retrys);
                 }
                 else
                 {
@@ -346,9 +344,9 @@ namespace VstsSyncMigrator.Engine
 
        
 
-        private WorkItemData ReplayRevisions(List<RevisionItem> revisionsToMigrate, WorkItemData sourceWorkItem, WorkItemData targetWorkItem, ProjectData destProject, int current)
+        private WorkItemData ReplayRevisions(List<RevisionItem> revisionsToMigrate, WorkItemData sourceWorkItem, WorkItemData targetWorkItem, int current)
         {
-
+            
             try
             {
                 var skipToFinalRevisedWorkItemType = _config.SkipToFinalRevisedWorkItemType;
@@ -366,7 +364,7 @@ namespace VstsSyncMigrator.Engine
                 //If work item hasn't been created yet, create a shell
                 if (targetWorkItem == null)
                 {
-                    targetWorkItem = CreateWorkItem_Shell(destProject, sourceWorkItem, skipToFinalRevisedWorkItemType ? finalDestType : Engine.Source.WorkItems.GetRevision(sourceWorkItem, revisionsToMigrate.First().Number).Type);
+                    targetWorkItem = CreateWorkItem_Shell(Engine.Target.WorkItems.Project, sourceWorkItem, skipToFinalRevisedWorkItemType ? finalDestType : Engine.Source.WorkItems.GetRevision(sourceWorkItem, revisionsToMigrate.First().Number).Type);
                 }
 
                 if (_config.CollapseRevisions)
@@ -465,8 +463,7 @@ namespace VstsSyncMigrator.Engine
                     //    contextLog.Error("Unable to save revission due to the error in validation");
                     //    break;
                     //}
-
-                    targetWorkItem.ToWorkItem().Save();
+                    this.SaveWorkItem(targetWorkItem);
                     TraceWriteLine(LogEventLevel.Information,
                         " Saved TargetWorkItem {TargetWorkItemId}. Replayed revision {RevisionNumber} of {RevisionsToMigrateCount}",
                        new Dictionary<string, object>() {

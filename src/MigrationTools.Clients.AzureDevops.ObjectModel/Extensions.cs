@@ -9,18 +9,44 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.VisualStudio.Services.Common;
+using MigrationTools.Engine.Containers;
 
 namespace MigrationTools.Clients.AzureDevops.ObjectModel
 {
    public static class TfsObjectModelExtensions
     {
-            //public static IServiceCollection TfsObjectModelWorkerServices(this IServiceCollection collection, EngineConfiguration config)
-            //{
-            //    if (collection == null) throw new ArgumentNullException(nameof(collection));
-            //    if (config == null) throw new ArgumentNullException(nameof(config));
+        //public static IServiceCollection TfsObjectModelWorkerServices(this IServiceCollection collection, EngineConfiguration config)
+        //{
+        //    if (collection == null) throw new ArgumentNullException(nameof(collection));
+        //    if (config == null) throw new ArgumentNullException(nameof(config));
 
-            //   // return collection.AddTransient<IWorkItemSink, AzureDevOpsWorkItemSink>();
-            //}
+        //   // return collection.AddTransient<IWorkItemSink, AzureDevOpsWorkItemSink>();
+        //}
+
+        public static void SaveWorkItem(this IProcessor context, WorkItem workItem)
+        {
+            if (workItem == null) throw new ArgumentNullException(nameof(workItem));
+            workItem.Fields["System.ChangedBy"].Value = "Migration";
+            workItem.Save();
+        }
+
+        public static void SaveWorkItem(this IProcessor context, WorkItemData workItem)
+        {
+            if (workItem == null) throw new ArgumentNullException(nameof(workItem));
+            var wi = (WorkItem)workItem.InternalWorkItem;
+            wi.Fields["System.ChangedBy"].Value = "Migration";
+            wi.Save();
+        }
+
+        public static Dictionary<string, object> AsDictionary(this FieldCollection col)
+        {
+            var dict = new Dictionary<string, object>();
+            for (var ix = 0; ix < col.Count; ix++)
+            {
+                dict.Add(col[ix].Name, col[ix].Value);
+            }
+            return dict;
+        }
 
         public static WorkItemData ToWorkItemData(this WorkItem workItem)
         {
@@ -37,6 +63,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel
             internalWorkItem.RevisedDate = workItem.RevisedDate;
             internalWorkItem.Revision = workItem.Revision;
             internalWorkItem.ProjectName = workItem?.Project?.Name;
+            internalWorkItem.Fields = workItem.Fields.AsDictionary();
             internalWorkItem.InternalWorkItem = workItem;
             return internalWorkItem;
         }
