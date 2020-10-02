@@ -56,7 +56,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
         public override List<WorkItemData> GetWorkItems(IWorkItemQueryBuilder queryBuilder)
         {
             queryBuilder.AddParameter("TeamProject", MigrationClient.Config.Project);
-            return queryBuilder.Build(MigrationClient).GetWorkItems();
+            return queryBuilder.BuildWIQLQuery(MigrationClient).GetWorkItems();
         }
 
 
@@ -156,7 +156,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
                 wiqb.AddParameter("idToFind", refId.ToString());
                 wiqb.AddParameter("TeamProject", MigrationClient.Config.Project);
 
-                foreach (WorkItemData wi in wiqb.Build(MigrationClient).GetWorkItems())
+                foreach (WorkItemData wi in wiqb.BuildWIQLQuery(MigrationClient).GetWorkItems())
                 {
                     yield return wi;
                 }
@@ -215,7 +215,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
         private WorkItemData FindWorkItemByQuery(IWorkItemQueryBuilder query)
         {
             List<WorkItemData> newFound;
-            newFound = query.Build(MigrationClient).GetWorkItems();
+            newFound = query.BuildWIQLQuery(MigrationClient).GetWorkItems();
             if (newFound.Count == 0)
             {
                 return null;
