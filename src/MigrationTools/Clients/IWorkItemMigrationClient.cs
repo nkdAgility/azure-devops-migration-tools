@@ -17,7 +17,7 @@ namespace MigrationTools.Clients
         List<WorkItemData> GetWorkItems();
         WorkItemData GetWorkItem(string id);
         WorkItemData GetWorkItem(int id);
-        List<WorkItemData> GetWorkItems(string query);
+        List<WorkItemData> GetWorkItems(string wiqlQuery);
         List<WorkItemData> GetWorkItems(IWorkItemQueryBuilder queryBuilder);
         WorkItemData PersistWorkItem(WorkItemData workItem);
         WorkItemData GetRevision(WorkItemData workItem, int revision);

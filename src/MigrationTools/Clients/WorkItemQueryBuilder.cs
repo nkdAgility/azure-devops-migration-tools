@@ -33,7 +33,7 @@ namespace MigrationTools.Clients
             Parameters.Add(name, value);
         }
 
-        public IWorkItemQuery Build(IMigrationClient migrationClient)
+        public IWorkItemQuery BuildWIQLQuery(IMigrationClient migrationClient)
         {
             if (string.IsNullOrEmpty(Query))
             {

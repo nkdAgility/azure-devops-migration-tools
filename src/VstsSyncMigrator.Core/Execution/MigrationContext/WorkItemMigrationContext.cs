@@ -121,7 +121,7 @@ namespace VstsSyncMigrator.Engine
             string sourceQuery =
                 string.Format(
                     @"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY {1}",
-                    _config.QueryBit, _config.OrderBit);
+                    _config.WIQLQueryBit, _config.WIQLOrderBit);
             var sourceWorkItems = Engine.Source.WorkItems.GetWorkItems(sourceQuery);
             contextLog.Information("Replay all revisions of {sourceWorkItemsCount} work items?", sourceWorkItems.Count);
             //////////////////////////////////////////////////
@@ -608,8 +608,8 @@ namespace VstsSyncMigrator.Engine
                 string.Format(
                     @"SELECT [System.Id], [{0}] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {1} ORDER BY {2}",
                      Engine.Target.Config.ReflectedWorkItemIDFieldName,
-                    _config.QueryBit,
-                    _config.OrderBit
+                    _config.WIQLQueryBit,
+                    _config.WIQLOrderBit
                     );
             var targetFoundItems = Engine.Target.WorkItems.GetWorkItems(targetQuery);
             var targetFoundIds = (from WorkItemData twi in targetFoundItems select Engine.Target.WorkItems.GetReflectedWorkItemId(twi, Engine.Target.Config.ReflectedWorkItemIDFieldName)).ToList();
