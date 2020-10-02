@@ -230,7 +230,7 @@ namespace VstsSyncMigrator.Engine
                     ///////////////////////////////////////////////////////
                     if (targetWorkItem != null && targetWorkItem.ToWorkItem().IsDirty)
                     {
-                        this.SaveWorkItem(targetWorkItem);
+                        targetWorkItem.SaveToAzureDevOps();
                     }
                     if (targetWorkItem != null)
                     {
@@ -444,7 +444,7 @@ namespace VstsSyncMigrator.Engine
                     //    contextLog.Error("Unable to save revission due to the error in validation");
                     //    break;
                     //}
-                    this.SaveWorkItem(targetWorkItem);
+                    targetWorkItem.SaveToAzureDevOps();
                     TraceWriteLine(LogEventLevel.Information,
                         " Saved TargetWorkItem {TargetWorkItemId}. Replayed revision {RevisionNumber} of {RevisionsToMigrateCount}",
                        new Dictionary<string, object>() {
@@ -469,7 +469,7 @@ namespace VstsSyncMigrator.Engine
                     history.Append(
                         $"This work item was migrated from a different project or organization. You can find the old version at <a href=\"{reflectedUri}\">{reflectedUri}</a>.");
                     targetWorkItem.ToWorkItem().History = history.ToString();
-                    this.SaveWorkItem(targetWorkItem);
+                    targetWorkItem.SaveToAzureDevOps();
 
                     attachmentEnricher.CleanUpAfterSave();
                     TraceWriteLine(LogEventLevel.Information, "...Saved as {TargetWorkItemId}", new Dictionary<string, object> { { "TargetWorkItemId", targetWorkItem.Id } });
@@ -510,7 +510,7 @@ namespace VstsSyncMigrator.Engine
             if (_config.UpdateCreatedBy) { newwit.Fields["System.CreatedBy"].Value = currentRevisionWorkItem.ToWorkItem().Revisions[0].Fields["System.CreatedBy"].Value; }
             if (_config.UpdateCreatedDate) { newwit.Fields["System.CreatedDate"].Value = currentRevisionWorkItem.ToWorkItem().Revisions[0].Fields["System.CreatedDate"].Value; }
 
-            return newwit.ToWorkItemData();
+            return newwit.AsWorkItemData();
         }
 
 
@@ -586,7 +586,7 @@ namespace VstsSyncMigrator.Engine
                     _config.WIQLOrderBit
                     );
             var targetFoundItems = Engine.Target.WorkItems.GetWorkItems(targetQuery);
-            var targetFoundIds = (from WorkItemData twi in targetFoundItems select Engine.Target.WorkItems.GetReflectedWorkItemId(twi, Engine.Target.Config.ReflectedWorkItemIDFieldName)).ToList();
+            var targetFoundIds = (from WorkItemData twi in targetFoundItems select Engine.Target.WorkItems.GetReflectedWorkItemId(twi)).ToList();
             //////////////////////////////////////////////////////////
             sourceWorkItems = sourceWorkItems.Where(p => !targetFoundIds.Any(p2 => p2.ToString() == p.Id)).ToList();
             return sourceWorkItems;

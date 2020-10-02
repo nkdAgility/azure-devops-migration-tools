@@ -23,20 +23,66 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel
         //   // return collection.AddTransient<IWorkItemSink, AzureDevOpsWorkItemSink>();
         //}
 
-        public static void SaveWorkItem(this IProcessor context, WorkItem workItem)
-        {
-            if (workItem == null) throw new ArgumentNullException(nameof(workItem));
-            workItem.Fields["System.ChangedBy"].Value = "Migration";
-            workItem.Save();
-        }
+        //public static void SaveWorkItem(this IProcessor context, WorkItem workItem)
+        //{
+        //    if (workItem == null) throw new ArgumentNullException(nameof(workItem));
+        //    workItem.Fields["System.ChangedBy"].Value = "Migration";
+        //    workItem.Save();
+        //}
 
-        public static void SaveWorkItem(this IProcessor context, WorkItemData workItem)
+        public static void SaveToAzureDevOps(this WorkItemData context)
         {
-            if (workItem == null) throw new ArgumentNullException(nameof(workItem));
-            var wi = (WorkItem)workItem.internalObject;
+            if (context == null) throw new ArgumentNullException(nameof(context));
+            var wi = (WorkItem)context.internalObject;
             wi.Fields["System.ChangedBy"].Value = "Migration";
             wi.Save();
+            context.RefreshWorkItem();
         }
+        public static void RefreshWorkItem(this WorkItemData context)
+        {
+            var workItem = (WorkItem)context.internalObject;
+            context.Id = workItem.Id.ToString();
+            context.Type = workItem.Type.Name;
+            context.Title = workItem.Title;
+            context.Rev = workItem.Rev;
+            context.RevisedDate = workItem.RevisedDate;
+            context.Revision = workItem.Revision;
+            context.ProjectName = workItem?.Project?.Name;
+            context.Fields = workItem.Fields.AsDictionary();
+        }
+
+        public static WorkItemData AsWorkItemData(this WorkItem context)
+        {
+            if (context is null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
+            var internalWorkItem = new WorkItemData();
+            internalWorkItem.internalObject = context;
+            internalWorkItem.RefreshWorkItem();
+            return internalWorkItem;
+        }
+
+        public static WorkItem ToWorkItem(this WorkItemData workItemData)
+        {
+            if (!(workItemData.internalObject is WorkItem))
+            {
+                throw new InvalidCastException($"The Work Item stored in the inner field must be of type {(nameof(WorkItem))}");
+            }
+            return (WorkItem)workItemData.internalObject;
+        }
+
+        public static List<WorkItemData> ToWorkItemDataList(this WorkItemCollection collection)
+        {
+            List<WorkItemData> list = new List<WorkItemData>();
+            foreach (WorkItem wi in collection)
+            {
+                list.Add(wi.AsWorkItemData());
+            }
+            return list;
+        }
+
 
         public static Dictionary<string, object> AsDictionary(this FieldCollection col)
         {
@@ -46,27 +92,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel
                 dict.Add(col[ix].Name, col[ix].Value);
             }
             return dict;
-        }
-
-        public static WorkItemData ToWorkItemData(this WorkItem workItem)
-        {
-            if (workItem is null)
-            {
-                throw new ArgumentNullException(nameof(workItem));
-            }
-
-            var internalWorkItem = new WorkItemData();
-            internalWorkItem.Id = workItem.Id.ToString();
-            internalWorkItem.Type = workItem.Type.Name;
-            internalWorkItem.Title = workItem.Title;
-            internalWorkItem.Rev = workItem.Rev;
-            internalWorkItem.RevisedDate = workItem.RevisedDate;
-            internalWorkItem.Revision = workItem.Revision;
-            internalWorkItem.ProjectName = workItem?.Project?.Name;
-            internalWorkItem.Fields = workItem.Fields.AsDictionary();
-            internalWorkItem.internalObject = workItem;
-            return internalWorkItem;
-        }
+        }        
 
         public static ProjectData ToProjectData(this Project project)
         {
@@ -86,36 +112,6 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel
             return (Project)projectdata.internalObject;
         }
 
-        public static WorkItem ToWorkItem(this WorkItemData  workItemData)
-        {
-            if (!(workItemData.internalObject is WorkItem))
-            {
-                throw new InvalidCastException($"The Work Item stored in the inner field must be of type {(nameof(WorkItem))}");
-            }
-            return (WorkItem)workItemData.internalObject;
-        }
-
-        public static List<WorkItemData> ToWorkItemDataList(this WorkItemCollection collection)
-        {
-            List<WorkItemData> list = new List<WorkItemData>();
-            foreach (WorkItem wi in collection)
-            {
-                list.Add(wi.ToWorkItemData());
-            }
-            return list;
-        }
-
-        public static void SaveMigratedWorkItem(this IAttachmentMigrationEnricher context, WorkItemData workItem)
-        {
-            if (workItem == null) throw new ArgumentNullException(nameof(workItem));
-            workItem.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
-            workItem.ToWorkItem().Save();
-        }
-        public static void SaveMigratedWorkItem(this IEmbededImagesRepairEnricher context, WorkItemData workItem)
-        {
-            if (workItem == null) throw new ArgumentNullException(nameof(workItem));
-            workItem.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
-            workItem.ToWorkItem().Save();
-        }
+     
     }
 }

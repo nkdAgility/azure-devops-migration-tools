@@ -68,7 +68,7 @@ namespace VstsSyncMigrator.Engine
                 {
                     Trace.WriteLine($"Saving {workitem.Id}");
 
-                    workitem.ToWorkItem().Save();
+                    workitem.SaveToAzureDevOps();
                 }
 
                 witstopwatch.Stop();

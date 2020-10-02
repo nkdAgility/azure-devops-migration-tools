@@ -63,12 +63,12 @@ namespace VstsSyncMigrator.Engine
                     {
                         try
                         {
-                            workitem.ToWorkItem().Save();
+                            workitem.SaveToAzureDevOps();
                         }
                         catch (Exception)
                         {
                             System.Threading.Thread.Sleep(5000);
-                            workitem.ToWorkItem().Save();
+                            workitem.SaveToAzureDevOps();
                         }
                        
                     } else

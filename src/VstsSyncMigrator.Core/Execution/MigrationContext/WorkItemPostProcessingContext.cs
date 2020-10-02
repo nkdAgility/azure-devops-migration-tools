@@ -97,7 +97,7 @@ namespace VstsSyncMigrator.Engine
                     {
                         try
                         {
-                            targetFound.ToWorkItem().Save();
+                            targetFound.SaveToAzureDevOps();
                             Trace.WriteLine(string.Format("          Updated"));
                         }
                         catch (ValidationException ve)

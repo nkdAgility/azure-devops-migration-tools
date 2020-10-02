@@ -134,9 +134,9 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
             }
             if (found != null && cache)
             {
-                AddToCache(workItemToFind.Id, found.ToWorkItemData());/// TODO MEMORY LEAK
+                AddToCache(workItemToFind.Id, found.AsWorkItemData());/// TODO MEMORY LEAK
             }
-            return found?.ToWorkItemData();
+            return found?.AsWorkItemData();
         }
 
         public override WorkItemData FindReflectedWorkItemByReflectedWorkItemId(WorkItemData refWi)
@@ -225,7 +225,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
 
         public override WorkItemData GetRevision(WorkItemData workItem, int revision)
         {
-            return Store.GetWorkItem(int.Parse(workItem.Id), revision).ToWorkItemData();
+            return Store.GetWorkItem(int.Parse(workItem.Id), revision).AsWorkItemData();
         }
 
 
@@ -236,7 +236,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
 
         public override WorkItemData GetWorkItem(int id)
         {
-            return Store.GetWorkItem(id)?.ToWorkItemData();
+            return Store.GetWorkItem(id)?.AsWorkItemData();
         }
     }
 }

@@ -42,7 +42,10 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             {
                 throw new ArgumentNullException(nameof(targetWorkItemLinkStart));
             }
-
+            if (targetWorkItemLinkStart.Id == "0")
+            {
+                throw new IndexOutOfRangeException("Target work item must be saved before you can add a link");
+            }
 
             if (ShouldCopyLinks(sourceWorkItemLinkStart, targetWorkItemLinkStart))
             {
@@ -123,7 +126,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             if (wiTargetL.ToWorkItem().IsDirty && _save)
             {
                 wiTargetL.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
-                wiTargetL.ToWorkItem().Save();
+                wiTargetL.SaveToAzureDevOps();
             }
         }
 
@@ -140,8 +143,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                 target.ToWorkItem().Links.Add(el);
                 if (_save)
                 {
-                    target.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
-                    target.ToWorkItem().Save();
+                    target.SaveToAzureDevOps();
                 }
             }
             else
@@ -228,7 +230,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                             RelatedLink newLl = new RelatedLink(linkTypeEnd, int.Parse(wiTargetL.Id));
                             wiTargetR.ToWorkItem().Links.Add(newLl);
                             wiTargetR.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
-                            wiTargetR.ToWorkItem().Save();
+                            wiTargetR.SaveToAzureDevOps();
                         }
                         else
                         {
@@ -248,7 +250,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                             if (_save)
                             {
                                 wiTargetL.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
-                                wiTargetL.ToWorkItem().Save();
+                                wiTargetL.SaveToAzureDevOps();
                             }
                         }
                         Log.Information(
@@ -322,8 +324,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                 target.ToWorkItem().Links.Add(hl);
                 if (_save)
                 {
-                    target.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
-                    target.ToWorkItem().Save();
+                    target.SaveToAzureDevOps();
                 }
             }
         }
