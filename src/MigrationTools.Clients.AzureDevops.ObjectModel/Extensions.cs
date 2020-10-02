@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.VisualStudio.Services.Common;
 using MigrationTools.Engine.Containers;
+using Serilog;
 
 namespace MigrationTools.Clients.AzureDevops.ObjectModel
 {
@@ -53,6 +54,11 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel
 
         public static WorkItemData AsWorkItemData(this WorkItem context)
         {
+            if (context.AreaPath == "migrationTarget1")
+            {
+                //stop here
+                Log.Information(context.AreaPath);
+            }
             if (context is null)
             {
                 throw new ArgumentNullException(nameof(context));
