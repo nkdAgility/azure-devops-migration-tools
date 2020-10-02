@@ -25,7 +25,6 @@ using Serilog;
 using Serilog.Context;
 using Serilog.Events;
 using MigrationTools.Engine.Processors;
-using MigrationTools;
 using MigrationTools.DataContracts;
 using MigrationTools.Clients;
 
@@ -53,7 +52,7 @@ namespace VstsSyncMigrator.Engine
         static int _totalWorkItem = 0;
         static string workItemLogTeamplate = "[{sourceWorkItemTypeName,20}][Complete:{currentWorkItem,6}/{totalWorkItems}][sid:{sourceWorkItemId,6}|Rev:{sourceRevisionInt,3}][tid:{targetWorkItemId,6} | ";
 
-        public WorkItemMigrationContext(IMigrationEngine me, IServiceProvider services, ITelemetryLogger telemetry) : base(me, services, telemetry)
+        public WorkItemMigrationContext(IMigrationEngine engine, IServiceProvider services, ITelemetryLogger telemetry) : base(engine, services, telemetry)
         {
             contextLog = Log.ForContext<WorkItemMigrationContext>();
         }
@@ -163,8 +162,6 @@ namespace VstsSyncMigrator.Engine
 
             contextLog.Information("DONE in {Elapsed}", stopwatch.Elapsed.ToString("c"));
         }
-
-
 
         private IDictionary<string, double> processWorkItemMetrics = null;
         private IDictionary<string, string> processWorkItemParamiters = null;
@@ -412,29 +409,7 @@ namespace VstsSyncMigrator.Engine
                            Engine.TypeDefinitionMaps.Items[destType].Map();
                     }
 
-                    //If the work item already exists and its type has changed, update its type. Done this way because there doesn't appear to be a way to do this through the store.
-                    if (!skipToFinalRevisedWorkItemType && targetWorkItem.Type != finalDestType)
-
-                    {
-                        Debug.WriteLine($"Work Item type change! '{targetWorkItem.Title}': From {targetWorkItem.Type} to {destType}");
-                        var typePatch = new JsonPatchOperation()
-                        {
-                            Operation = Microsoft.VisualStudio.Services.WebApi.Patch.Operation.Add,
-                            Path = "/fields/System.WorkItemType",
-                            Value = destType
-                        };
-                        var datePatch = new JsonPatchOperation()
-                        {
-                            Operation = Microsoft.VisualStudio.Services.WebApi.Patch.Operation.Add,
-                            Path = "/fields/System.ChangedDate",
-                            Value = currentRevisionWorkItem.ToWorkItem().Revisions[revision.Index].Fields["System.ChangedDate"].Value
-                        };
-
-                        var patchDoc = new JsonPatchDocument();
-                        patchDoc.Add(typePatch);
-                        patchDoc.Add(datePatch);
-                        _witClient.UpdateWorkItemAsync(patchDoc, int.Parse( targetWorkItem.Id), bypassRules: true).Wait();
-                    }
+                    WorkItemTypeChange(targetWorkItem, skipToFinalRevisedWorkItemType, finalDestType, revision, currentRevisionWorkItem, destType);
 
                     PopulateWorkItem(currentRevisionWorkItem, targetWorkItem, destType);
                     Engine.FieldMaps.ApplyFieldMappings(currentRevisionWorkItem, targetWorkItem);
@@ -512,6 +487,8 @@ namespace VstsSyncMigrator.Engine
 
             return targetWorkItem;
         }
+
+        
 
         private WorkItemData CreateWorkItem_Shell(ProjectData destProject, WorkItemData currentRevisionWorkItem, string destType)
         {
@@ -762,6 +739,33 @@ namespace VstsSyncMigrator.Engine
                 foreach (var field in fields.OrderBy(x => x.Name))
                     contextLog.Information("{FieldType} - {FieldName} - {FieldRefName}", field.Type.ToString().PadLeft(15), field.Name.PadRight(20), field.ReferenceName ?? "");
                 throw new Exception("Running a replay migration requires a ReflectedWorkItemId field to be defined in the target project's process.");
+            }
+        }
+
+        private void WorkItemTypeChange(WorkItemData targetWorkItem, bool skipToFinalRevisedWorkItemType, string finalDestType, RevisionItem revision, WorkItemData currentRevisionWorkItem, string destType)
+        {
+            //If the work item already exists and its type has changed, update its type. Done this way because there doesn't appear to be a way to do this through the store.
+            if (!skipToFinalRevisedWorkItemType && targetWorkItem.Type != finalDestType)
+
+            {
+                Debug.WriteLine($"Work Item type change! '{targetWorkItem.Title}': From {targetWorkItem.Type} to {destType}");
+                var typePatch = new JsonPatchOperation()
+                {
+                    Operation = Microsoft.VisualStudio.Services.WebApi.Patch.Operation.Add,
+                    Path = "/fields/System.WorkItemType",
+                    Value = destType
+                };
+                var datePatch = new JsonPatchOperation()
+                {
+                    Operation = Microsoft.VisualStudio.Services.WebApi.Patch.Operation.Add,
+                    Path = "/fields/System.ChangedDate",
+                    Value = currentRevisionWorkItem.ToWorkItem().Revisions[revision.Index].Fields["System.ChangedDate"].Value
+                };
+
+                var patchDoc = new JsonPatchDocument();
+                patchDoc.Add(typePatch);
+                patchDoc.Add(datePatch);
+                _witClient.UpdateWorkItemAsync(patchDoc, int.Parse(targetWorkItem.Id), bypassRules: true).Wait();
             }
         }
 
