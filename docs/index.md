@@ -18,6 +18,7 @@ _NOTICE: Both paied and community support is avilable through our [recommneded c
 
 ## Change Log
 
+- v11.2.1 - Remvoed NodeMogrationContext and converted it to an enricher for Work Items. Still needs work, so that it migrates indevidual nodes, but currently migrates all.
 - v10.1 - Changed config design to have only the Name and not FullName of the class. Remove `MigrationTools.Core.Configuration.FieldMap.` and `MigrationTools.Core.Configuration.Processing.` from the config leaving only the Name of the class in ObjectType field.
 - v10.0 - Start of the greate refactor over to .NET Core and the REST API as the Object Model has been retired.
 - v9.0 - Added support for migration between other language versions of Azure DevOps. Developed for German -> English
@@ -84,15 +85,9 @@ Most of these processors need to be run in order. If you try to migrate work ite
 
 |Processor |Staus |Target |Usage |
 |---------|---------|---------|---------|
-|[NodeStructuresMigration](./Processors/NodeStructuresMigrationConfig.md) | ready | Area & Iteration | Migrates Area and Iteration Paths |
+
 |[WorkItemMigration](./Processors/WorkItemMigrationConfig.md) | ready | Work Items | Migrates either tip or history of work items with Links & Attachments based on a query with field mappings |
 |[TeamMigration](./Processors/TeamMigrationConfig.md) | beta | Teams | Migrates Teams and Team Settings |
-|WorkItemRevisionReplayMigration | merged |  Work Items | obsolite - merged into WorkItemMigration |
-|LinkMigration | merged | Work Items | obsolite - merged into WorkItemMigration |
-|AttachementExportMigration | merged | Work Items | obsolite - merged into WorkItemMigration |
-|AttachementImportMigration | merged | Work Items | obsolite - merged into WorkItemMigration |
-|HtmlFieldEmbeddedImageMigration | merged | HTML Fields | obsolite - merged into WorkItemMigration |
-|GitCommitFix | merged | Git links | obsolite - merged into WorkItemMigration |
 |[WorkItemDelete](./Processors/WorkItemDeleteConfig.md) | ready | Work Items | Bulk delete of work items **WARNING DANGERIOUS** |
 |[WorkItemUpdate](./Processors/WorkItemUpdateConfig.md) | ready | Work Items | Bulk update of Work Items based on a query and field mappings |
 |[WorkItemQueryMigration](./Processors/WorkItemQueryMigrationConfig.md) | ready | Queries | Migrates shared queries |
@@ -103,6 +98,13 @@ Most of these processors need to be run in order. If you try to migrate work ite
 |ImportProfilePicture & ExportProfilePictureFromAD | Beta | Profiles | Downloads corporate images and updates TFS/Azure DevOps profiles |
 |CreateTeamFolders | ? | ? | ? | 
 |ExportTeamList | ? | ? | ? | 
+|[NodeStructuresMigration](./Processors/NodeStructuresMigrationConfig.md) | merged | Area & Iteration | obsolite - merged into WorkItemMigration |
+|AttachementExportMigration | merged | Work Items | obsolite - merged into WorkItemMigration |
+|AttachementImportMigration | merged | Work Items | obsolite - merged into WorkItemMigration |
+|LinkMigration | merged | Work Items | obsolite - merged into WorkItemMigration |
+|HtmlFieldEmbeddedImageMigration | merged | HTML Fields | obsolite - merged into WorkItemMigration |
+|WorkItemRevisionReplayMigration | merged |  Work Items | obsolite - merged into WorkItemMigration |
+|GitCommitFix | merged | Git links | obsolite - merged into WorkItemMigration |
 
 ### Field Maps
 

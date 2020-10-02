@@ -49,7 +49,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Processors", "Processors", "{E9399C6D-A5E0-43ED-8412-6C4A6BC86EC8}"
 	ProjectSection(SolutionItems) = preProject
 		docs\Processors\ImportProfilePictureConfig.md = docs\Processors\ImportProfilePictureConfig.md
-		docs\Processors\NodeStructuresMigrationConfig.md = docs\Processors\NodeStructuresMigrationConfig.md
 		docs\Processors\TeamMigrationConfig.md = docs\Processors\TeamMigrationConfig.md
 		docs\Processors\TestConfigurationsMigrationConfig.md = docs\Processors\TestConfigurationsMigrationConfig.md
 		docs\Processors\TestPlansAndSuitesMigrationConfig.md = docs\Processors\TestPlansAndSuitesMigrationConfig.md
