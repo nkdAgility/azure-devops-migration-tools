@@ -15,7 +15,6 @@ using MigrationTools.Configuration;
 using MigrationTools.Configuration.Processing;
 using MigrationTools.Clients.AzureDevops.ObjectModel;
 using Serilog;
-using VstsSyncMigrator.Core;
 using VstsSyncMigrator.Engine.ComponentContext;
 using WorkItem = Microsoft.TeamFoundation.WorkItemTracking.Client.WorkItem;
 using MigrationTools;

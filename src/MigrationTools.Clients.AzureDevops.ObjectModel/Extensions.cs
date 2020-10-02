@@ -33,7 +33,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel
         public static void SaveWorkItem(this IProcessor context, WorkItemData workItem)
         {
             if (workItem == null) throw new ArgumentNullException(nameof(workItem));
-            var wi = (WorkItem)workItem.InternalWorkItem;
+            var wi = (WorkItem)workItem.internalObject;
             wi.Fields["System.ChangedBy"].Value = "Migration";
             wi.Save();
         }
@@ -64,7 +64,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel
             internalWorkItem.Revision = workItem.Revision;
             internalWorkItem.ProjectName = workItem?.Project?.Name;
             internalWorkItem.Fields = workItem.Fields.AsDictionary();
-            internalObject.internalObject = workItem;
+            internalWorkItem.internalObject = workItem;
             return internalWorkItem;
         }
 
