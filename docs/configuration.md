@@ -50,15 +50,6 @@ The global configuration created by the `init` command look like this:
   "GitRepoMapping": null,
   "Processors": [
     {
-      "ObjectType": "NodeStructuresMigrationConfig",
-      "PrefixProjectToNodes": false,
-      "Enabled": false,
-      "BasePaths": [
-        "Product\\Area\\Path1",
-        "Product\\Area\\Path2"
-      ]
-    },
-    {
       "ObjectType": "WorkItemMigrationConfig",
       "ReplayRevisions": true,
       "PrefixProjectToNodes": false,
@@ -75,7 +66,10 @@ The global configuration created by the `init` command look like this:
       "FixHtmlAttachmentLinks": false,
       "WorkItemCreateRetryLimit": 5,
       "FilterWorkItemsThatAlreadyExistInTarget": true,
-      "PauseAfterEachWorkItem": false
+      "PauseAfterEachWorkItem": false,
+      "BasePaths": [
+        "Product\\Area\\Path1",
+        "Product\\Area\\Path2"
     }
   ]
 }
@@ -100,7 +94,7 @@ For multi Language support you can add the name used in the source and target fo
 
 This is the field that will be used to store the state for the migration . See [Server Configuration](server-configuration.md)  
 
-### NodeStructuresMigrationConfig
+### WorkItemMigrationConfig
 You can specify BasePaths for Areas/Iterations to migrate. The area/iteration has to start with that string to be eligible for migration.
 E.g. BasePath = "Product\\Area\\Path1"
 
