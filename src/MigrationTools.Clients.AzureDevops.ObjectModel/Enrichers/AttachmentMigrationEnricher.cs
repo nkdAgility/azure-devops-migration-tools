@@ -12,7 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MigrationTools;
 using MigrationTools.DataContracts;
-using MigrationTools.Engine.Enrichers;
+using MigrationTools.Enrichers;
 
 namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
 {

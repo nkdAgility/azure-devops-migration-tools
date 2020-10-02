@@ -17,7 +17,7 @@ using Microsoft.VisualStudio.Services.WebApi.Patch.Json;
 using MigrationTools;
 using MigrationTools.Configuration;
 using MigrationTools.Configuration.Processing;
-using MigrationTools.Engine.Enrichers;
+using MigrationTools.Enrichers;
 using MigrationTools.Clients.AzureDevops.ObjectModel;
 using MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers;
 using Newtonsoft.Json;
@@ -706,7 +706,7 @@ namespace VstsSyncMigrator.Engine
             if (targetWorkItem != null && _config.LinkMigration && sourceWorkItem.ToWorkItem().Links.Count > 0)
             {
                 TraceWriteLine(LogEventLevel.Information, "Links {SourceWorkItemLinkCount} | LinkMigrator:{LinkMigration}", new Dictionary<string, object>() { { "SourceWorkItemLinkCount", sourceWorkItem.ToWorkItem().Links.Count }, { "LinkMigration", _config.LinkMigration } });
-                workItemLinkEnricher.MigrateLinks(sourceWorkItem, sourceStore, targetWorkItem, targetStore, _config.LinkMigrationSaveEachAsAdded, _config.FilterWorkItemsThatAlreadyExistInTarget, Engine.Source.Config.ReflectedWorkItemIDFieldName);
+                workItemLinkEnricher.Enritch(sourceWorkItem, targetWorkItem);
                 AddMetric("RelatedLinkCount", processWorkItemMetrics, targetWorkItem.ToWorkItem().Links.Count);
                 int fixedLinkCount = gitRepositoryEnricher.FixExternalLinks(targetWorkItem, targetStore, sourceWorkItem, _config.LinkMigrationSaveEachAsAdded);
                 AddMetric("FixedGitLinkCount", processWorkItemMetrics, fixedLinkCount);

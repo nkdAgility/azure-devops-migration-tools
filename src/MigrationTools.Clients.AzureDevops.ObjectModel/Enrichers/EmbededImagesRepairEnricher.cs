@@ -12,7 +12,6 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using MigrationTools.Configuration.Processing;
 using MigrationTools.DataContracts;
-using MigrationTools.Engine.Enrichers;
 using MigrationTools.Enrichers;
 
 namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers

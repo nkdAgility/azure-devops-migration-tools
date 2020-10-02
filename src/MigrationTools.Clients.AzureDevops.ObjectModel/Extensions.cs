@@ -2,7 +2,7 @@
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools.Configuration;
 using MigrationTools.DataContracts;
-using MigrationTools.Engine.Enrichers;
+using MigrationTools.Enrichers;
 using MigrationTools.Clients;
 using MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers;
 using System;
