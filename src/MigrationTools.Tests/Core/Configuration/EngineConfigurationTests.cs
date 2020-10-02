@@ -38,7 +38,7 @@ namespace MigrationTools.Tests
                 new FieldMapConfigJsonConverter(),
                 new ProcessorConfigJsonConverter());
             Assert.AreEqual(10, ec.FieldMaps.Count);
-            Assert.AreEqual(13, ec.Processors.Count);
+            Assert.AreEqual(12, ec.Processors.Count);
         }
     }
 }
