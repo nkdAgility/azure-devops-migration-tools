@@ -38,6 +38,7 @@ namespace VstsSyncMigrator.Engine
         private List<String> _ignore;
         private WorkItemTrackingHttpClient _witClient;
         private WorkItemLinkEnricher workItemLinkEnricher = new WorkItemLinkEnricher();
+        private NodeStructureEnricher nodeStructureEnricher;
         private IAttachmentMigrationEnricher attachmentEnricher;
         private GitRepositoryEnricher gitRepositoryEnricher;
         private ILogger contextLog;
@@ -105,11 +106,14 @@ namespace VstsSyncMigrator.Engine
             attachmentEnricher = new AttachmentMigrationEnricher(workItemServer, _config.AttachmentWorkingPath, _config.AttachmentMaxSize);
             embededImagesEnricher = new EmbededImagesRepairEnricher();
             gitRepositoryEnricher = new GitRepositoryEnricher(Engine);
+            nodeStructureEnricher = new NodeStructureEnricher(Engine);
             VssClientCredentials adoCreds = new VssClientCredentials();
             _witClient = new WorkItemTrackingHttpClient(Engine.Target.Config.Collection, adoCreds);
             //Validation: make sure that the ReflectedWorkItemId field name specified in the config exists in the target process, preferably on each work item type.
             ConfigValidation();
             PopulateIgnoreList();
+
+            nodeStructureEnricher.MigrateAllNodeStructures(_config.PrefixProjectToNodes, _config.NodeBasePaths);
 
             var stopwatch = Stopwatch.StartNew();
             //////////////////////////////////////////////////

@@ -37,7 +37,6 @@ namespace VstsSyncMigrator.ConsoleApp
 
                     //Processors
                     services.AddSingleton<WorkItemMigrationContext>();
-                    services.AddSingleton<NodeStructuresMigrationContext>();
                     services.AddSingleton<TeamMigrationContext>();
                     services.AddSingleton<TestConfigurationsMigrationContext>();
                     services.AddSingleton<TestPlandsAndSuitesMigrationContext>();
@@ -56,6 +55,7 @@ namespace VstsSyncMigrator.ConsoleApp
                     // Core
                     services.AddTransient<IMigrationClient, MigrationClient>();
                     services.AddTransient<IWorkItemMigrationClient, WorkItemMigrationClient>();
+                    services.AddTransient<ITestPlanMigrationClient, TestPlanMigrationClient>();
                     services.AddTransient<IWorkItemQueryBuilder, WorkItemQueryBuilder>();
                     services.AddTransient<IWorkItemQuery, WorkItemQuery>();
 

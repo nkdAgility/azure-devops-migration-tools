@@ -23,6 +23,8 @@ namespace MigrationTools.Tests.Core.Clients
 
         public IWorkItemMigrationClient WorkItems => workItemMigrationClient;
 
+        public ITestPlanMigrationClient TestPlans => throw new NotImplementedException();
+
         public void Configure( TeamProjectConfig config, NetworkCredential credentials = null)
         {
            

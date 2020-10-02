@@ -64,35 +64,35 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel
             internalWorkItem.Revision = workItem.Revision;
             internalWorkItem.ProjectName = workItem?.Project?.Name;
             internalWorkItem.Fields = workItem.Fields.AsDictionary();
-            internalWorkItem.InternalWorkItem = workItem;
+            internalObject.internalObject = workItem;
             return internalWorkItem;
         }
 
         public static ProjectData ToProjectData(this Project project)
         {
-            var internalproject = new ProjectData();
-            internalproject.Id = project.Id.ToString();
-            internalproject.Name = project.Name;
-            internalproject.InternalProject = project;
-            return internalproject;
+            var internalObject = new ProjectData();
+            internalObject.Id = project.Id.ToString();
+            internalObject.Name = project.Name;
+            internalObject.internalObject = project;
+            return internalObject;
         }
 
         public static Project ToProject(this ProjectData projectdata)
         {
-            if (!(projectdata.InternalProject is Project))
+            if (!(projectdata.internalObject is Project))
             {
                 throw new InvalidCastException($"The Work Item stored in the inner field must be of type {(nameof(Project))}");
             }
-            return (Project)projectdata.InternalProject;
+            return (Project)projectdata.internalObject;
         }
 
         public static WorkItem ToWorkItem(this WorkItemData  workItemData)
         {
-            if (!(workItemData.InternalWorkItem is WorkItem))
+            if (!(workItemData.internalObject is WorkItem))
             {
                 throw new InvalidCastException($"The Work Item stored in the inner field must be of type {(nameof(WorkItem))}");
             }
-            return (WorkItem)workItemData.InternalWorkItem;
+            return (WorkItem)workItemData.internalObject;
         }
 
         public static List<WorkItemData> ToWorkItemDataList(this WorkItemCollection collection)

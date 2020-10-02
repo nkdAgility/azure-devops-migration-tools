@@ -70,10 +70,6 @@ namespace MigrationTools.Configuration
 
         private void AddWorkItemMigrationDefault(EngineConfiguration ec)
         {
-            ec.Processors.Add(new NodeStructuresMigrationConfig()
-            {
-                BasePaths = new[] { "Product\\Area\\Path1", "Product\\Area\\Path2" }
-            });
             ec.Processors.Add(new WorkItemMigrationConfig());
         }
 

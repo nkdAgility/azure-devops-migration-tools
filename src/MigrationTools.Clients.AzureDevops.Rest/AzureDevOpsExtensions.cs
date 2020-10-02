@@ -15,21 +15,21 @@ namespace MigrationTools.Clients.AzureDevops.Rest
 
         public static WorkItemData ToWorkItemData(this WorkItem workItem)
         {
-            var internalWorkItem = new WorkItemData();
-            internalWorkItem.Id = workItem.Id.ToString();
-            internalWorkItem.Type = "unknown";
-            internalWorkItem.Title = "unknown";
-            internalWorkItem.InternalWorkItem = workItem;
-            return internalWorkItem;
+            var internalObject = new WorkItemData();
+            internalObject.Id = workItem.Id.ToString();
+            internalObject.Type = "unknown";
+            internalObject.Title = "unknown";
+            internalObject.internalObject = workItem;
+            return internalObject;
         }
 
         public static WorkItem ToWorkItem(this WorkItemData workItemData)
         {
-            if (!(workItemData.InternalWorkItem is WorkItem))
+            if (!(workItemData.internalObject is WorkItem))
             {
                 throw new InvalidCastException($"The Work Item stored in the inner field must be of type {(typeof(WorkItem)).FullName}");
             }
-            return (WorkItem)workItemData.InternalWorkItem;
+            return (WorkItem)workItemData.internalObject;
         }
 
 
