@@ -294,7 +294,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             else
             {
                 // Moving to Other Team Project from Source
-                wiTargetR = Engine.Target.WorkItems.FindReflectedWorkItem(wiSourceR, true, Engine.Source.Config.ReflectedWorkItemIDFieldName);
+                wiTargetR = Engine.Target.WorkItems.FindReflectedWorkItem(wiSourceR, true);
                 if (wiTargetR == null) // Assume source only (other team project)
                 {
                     wiTargetR = wiSourceR;
