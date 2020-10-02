@@ -30,7 +30,7 @@ namespace MigrationTools.Engine.Containers
             if (Config.Processors != null)
             {
                 var enabledProcessors = Config.Processors.Where(x => x.Enabled).ToList();
-                foreach (IWorkItemProcessorConfig processorConfig in enabledProcessors)
+                foreach (IProcessorConfig processorConfig in enabledProcessors)
                 {
                     if (processorConfig.IsProcessorCompatible(enabledProcessors))
                     {

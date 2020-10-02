@@ -14,11 +14,11 @@ namespace MigrationTools.Configuration.Processing
             get { return "WorkItemPostProcessingContext"; }
         }
 
-        public string WIQLQueryBit { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public string WIQLOrderBit { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public bool FilterWorkItemsThatAlreadyExistInTarget { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public bool PauseAfterEachWorkItem { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public int WorkItemCreateRetryLimit { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public string WIQLQueryBit { get; set; }
+        public string WIQLOrderBit { get; set; }
+        public bool FilterWorkItemsThatAlreadyExistInTarget { get; set; }
+        public bool PauseAfterEachWorkItem { get; set; }
+        public int WorkItemCreateRetryLimit { get; set; }
 
         /// <inheritdoc />
         public bool IsProcessorCompatible(IReadOnlyList<IProcessorConfig> otherProcessors)
