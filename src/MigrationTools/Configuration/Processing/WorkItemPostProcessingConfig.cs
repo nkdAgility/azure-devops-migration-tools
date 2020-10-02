@@ -3,9 +3,8 @@ using System.Collections.Generic;
 
 namespace MigrationTools.Configuration.Processing
 {
-    public class WorkItemPostProcessingConfig : IProcessorConfig
+    public class WorkItemPostProcessingConfig : IWorkItemProcessorConfig
     {
-        public string QueryBit { get; set; }
         public IList<int> WorkItemIDs { get; set; }
         /// <inheritdoc />
         public bool Enabled { get; set; }
@@ -15,6 +14,12 @@ namespace MigrationTools.Configuration.Processing
             get { return "WorkItemPostProcessingContext"; }
         }
 
+        public string WIQLQueryBit { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public string WIQLOrderBit { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public bool FilterWorkItemsThatAlreadyExistInTarget { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public bool PauseAfterEachWorkItem { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public int WorkItemCreateRetryLimit { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
         /// <inheritdoc />
         public bool IsProcessorCompatible(IReadOnlyList<IProcessorConfig> otherProcessors)
         {
@@ -23,7 +28,7 @@ namespace MigrationTools.Configuration.Processing
 
         public WorkItemPostProcessingConfig()
         {
-            QueryBit = "AND [TfsMigrationTool.ReflectedWorkItemId] = '' ";
+            WIQLQueryBit = "AND [TfsMigrationTool.ReflectedWorkItemId] = '' ";
         }
     }
 }

@@ -19,7 +19,7 @@ namespace MigrationTools.Configuration
                   .Where(a => !a.IsDynamic)
                   .SelectMany(a => a.GetTypes())
                   .FirstOrDefault(t => t.Name.Equals(typename) || t.FullName.Equals(typename));
-                return (IProcessorConfig)Activator.CreateInstance(type);
+                return (IWorkItemProcessorConfig)Activator.CreateInstance(type);
             }
             else
             {

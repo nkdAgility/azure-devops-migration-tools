@@ -7,6 +7,6 @@ namespace MigrationTools.Enrichers
         IMigrationEngine Engine { get; }
 
         void Configure(bool save = true, bool filterWorkItemsThatAlreadyExistInTarget = true);
-        void Enritch(WorkItemData sourceWorkItemLinkStart, WorkItemData targetWorkItemLinkStart);
+        void Enritch(WorkItemData sourceWorkItem, WorkItemData targetWorkItem);
     }
 }
