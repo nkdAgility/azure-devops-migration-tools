@@ -28,7 +28,7 @@ namespace MigrationTools.Clients
         WorkItemData FindReflectedWorkItemByReflectedWorkItemId(string refId);
         WorkItemData FindReflectedWorkItemByReflectedWorkItemId(int refId, bool cache);
         WorkItemData FindReflectedWorkItemByReflectedWorkItemId(WorkItemData refWi);
-        string CreateReflectedWorkItemId(WorkItemData wi);
+        string CreateReflectedWorkItemId(WorkItemData workItem);
         int GetReflectedWorkItemId(WorkItemData workItem);
 
     }

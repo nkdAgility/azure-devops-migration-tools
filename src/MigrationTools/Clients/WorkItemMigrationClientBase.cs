@@ -84,7 +84,7 @@ namespace MigrationTools.Clients
         public abstract WorkItemData FindReflectedWorkItemByReflectedWorkItemId(string refId);
         public abstract WorkItemData FindReflectedWorkItemByReflectedWorkItemId(int refId, bool cache);
         public abstract WorkItemData FindReflectedWorkItemByReflectedWorkItemId(WorkItemData refWi);
-        public abstract string CreateReflectedWorkItemId(WorkItemData wi);
+        public abstract string CreateReflectedWorkItemId(WorkItemData workItem);
         public abstract int GetReflectedWorkItemId(WorkItemData workItem);
         public abstract WorkItemData FindReflectedWorkItem(WorkItemData workItem, bool cache);
         public abstract ProjectData GetProject();
