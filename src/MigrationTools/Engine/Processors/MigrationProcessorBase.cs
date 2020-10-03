@@ -5,7 +5,6 @@ using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
 using MigrationTools.Configuration;
 using MigrationTools.Engine.Containers;
-using Serilog;
 
 namespace MigrationTools.Engine.Processors
 {
@@ -16,7 +15,7 @@ namespace MigrationTools.Engine.Processors
             Engine = engine;
             Services = services;
             Telemetry = telemetry;
-            Logger = logger;
+            Log = logger;
         }
 
         public abstract string Name { get; }
@@ -25,7 +24,7 @@ namespace MigrationTools.Engine.Processors
 
         protected IMigrationEngine Engine { get; }
 
-        protected ILogger<MigrationProcessorBase> Logger { get; }
+        protected ILogger<MigrationProcessorBase> Log { get; }
 
         protected IServiceProvider Services { get; }
 
@@ -36,7 +35,7 @@ namespace MigrationTools.Engine.Processors
         public void Execute()
         {
             Telemetry.TrackEvent(this.Name);
-            Log.Information("Migration Context Start: {MigrationContextname} ", Name);
+            Log.LogInformation("Migration Context Start: {MigrationContextname} ", Name);
             DateTime start = DateTime.Now;
             var executeTimer = Stopwatch.StartNew();
             //////////////////////////////////////////////////
@@ -47,7 +46,7 @@ namespace MigrationTools.Engine.Processors
                 Status = ProcessingStatus.Complete;
                 executeTimer.Stop();
 
-                Log.Information(" Migration Context Complete {MigrationContextname} ", Name);
+                Log.LogInformation(" Migration Context Complete {MigrationContextname} ", Name);
             }
             catch (Exception ex)
             {
@@ -68,7 +67,7 @@ namespace MigrationTools.Engine.Processors
                     {
                         {"MigrationContextTime", executeTimer.ElapsedMilliseconds}
                     });
-                Log.Fatal(ex, "Error while running {MigrationContextname}", Name);
+                Log.LogCritical(ex, "Error while running {MigrationContextname}", Name);
             }
             finally
             {

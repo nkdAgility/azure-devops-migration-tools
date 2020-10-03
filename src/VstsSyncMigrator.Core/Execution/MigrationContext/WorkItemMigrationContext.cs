@@ -26,7 +26,6 @@ using MigrationTools.DataContracts;
 using MigrationTools.Engine.Processors;
 using MigrationTools.Enrichers;
 using Newtonsoft.Json;
-using Serilog;
 using Serilog.Context;
 using Serilog.Events;
 using ILogger = Serilog.ILogger;
@@ -88,7 +87,7 @@ namespace VstsSyncMigrator.Engine
 
         public WorkItemMigrationContext(IMigrationEngine engine, IServiceProvider services, ITelemetryLogger telemetry, ILogger<WorkItemMigrationContext> logger) : base(engine, services, telemetry, logger)
         {
-            contextLog = Log.ForContext<WorkItemMigrationContext>();
+            contextLog = Serilog.Log.ForContext<WorkItemMigrationContext>();
         }
 
         public override string Name => "WorkItemMigration";
@@ -112,7 +111,7 @@ namespace VstsSyncMigrator.Engine
 
         protected override void InternalExecute()
         {
-            Log.Information("Starting ");
+            Log.LogInformation("Starting ");
             if (_config == null)
             {
                 throw new Exception("You must call Configure() first");
@@ -511,7 +510,7 @@ namespace VstsSyncMigrator.Engine
             }
             catch (WebException ex)
             {
-                Log.Error(ex, "Some kind of internet pipe blockage");
+                Log.LogError(ex, "Some kind of internet pipe blockage");
                 if (retrys < retryLimit)
                 {
                     TraceWriteLine(LogEventLevel.Warning, "WebException: Will retry in {retrys}s ",
@@ -534,7 +533,7 @@ namespace VstsSyncMigrator.Engine
             }
             catch (Exception ex)
             {
-                Log.Error(ex, ex.ToString());
+                Log.LogError(ex, ex.ToString());
                 Telemetry.TrackRequest("ProcessWorkItem", starttime, witstopwatch.Elapsed, "502", false);
                 throw ex;
             }
@@ -713,7 +712,7 @@ namespace VstsSyncMigrator.Engine
                     foreach (Field f in targetWorkItem.ToWorkItem().Fields)
                         TraceWriteLine(LogEventLevel.Information, "{FieldReferenceName} ({FieldName}) | {FieldValue}", new Dictionary<string, object>() { { "FieldReferenceName", f.ReferenceName }, { "FieldName", f.Name }, { "FieldValue", f.Value } });
                 }
-                Log.Error(ex.ToString(), ex);
+                Log.LogError(ex.ToString(), ex);
             }
 
             return targetWorkItem;
