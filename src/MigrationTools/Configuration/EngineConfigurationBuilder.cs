@@ -76,32 +76,34 @@ namespace MigrationTools.Configuration
 
         public EngineConfiguration CreateEmptyConfig()
         {
-            EngineConfiguration ec = new EngineConfiguration();
-            ec.LogLevel = LogEventLevel.Information;
-            ec.Version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(2);
-            ec.Source = new TeamProjectConfig()
+            EngineConfiguration ec = new EngineConfiguration
             {
-                Project = "migrationSource1",
-                AllowCrossProjectLinking = false,
-                Collection = new Uri("https://dev.azure.com/nkdagility-preview/"),
-                ReflectedWorkItemIDFieldName = "Custom.ReflectedWorkItemId",
-                PersonalAccessToken = "",
-                LanguageMaps = new LanguageMaps() { AreaPath = "Area", IterationPath = "Iteration" }
-            };
-            ec.Target = new TeamProjectConfig()
-            {
-                Project = "migrationTarget1",
-                AllowCrossProjectLinking = false,
-                Collection = new Uri("https://dev.azure.com/nkdagility-preview/"),
-                ReflectedWorkItemIDFieldName = "Custom.ReflectedWorkItemId",
-                PersonalAccessToken = "",
-                LanguageMaps = new LanguageMaps() { AreaPath = "Area", IterationPath = "Iteration" }
-            };
-            ec.FieldMaps = new List<IFieldMapConfig>();
-            ec.WorkItemTypeDefinition = new Dictionary<string, string> {
+                LogLevel = LogEventLevel.Information,
+                Version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(2),
+                Source = new TeamProjectConfig()
+                {
+                    Project = "migrationSource1",
+                    AllowCrossProjectLinking = false,
+                    Collection = new Uri("https://dev.azure.com/nkdagility-preview/"),
+                    ReflectedWorkItemIDFieldName = "Custom.ReflectedWorkItemId",
+                    PersonalAccessToken = "",
+                    LanguageMaps = new LanguageMaps() { AreaPath = "Area", IterationPath = "Iteration" }
+                },
+                Target = new TeamProjectConfig()
+                {
+                    Project = "migrationTarget1",
+                    AllowCrossProjectLinking = false,
+                    Collection = new Uri("https://dev.azure.com/nkdagility-preview/"),
+                    ReflectedWorkItemIDFieldName = "Custom.ReflectedWorkItemId",
+                    PersonalAccessToken = "",
+                    LanguageMaps = new LanguageMaps() { AreaPath = "Area", IterationPath = "Iteration" }
+                },
+                FieldMaps = new List<IFieldMapConfig>(),
+                WorkItemTypeDefinition = new Dictionary<string, string> {
                     { "sourceWorkItemTypeName", "targetWorkItemTypeName" }
+            },
+                Processors = new List<IProcessorConfig>()
             };
-            ec.Processors = new List<IProcessorConfig>();
             return ec;
         }
 
@@ -112,8 +114,6 @@ namespace MigrationTools.Configuration
             ec.Processors.Add(new TestPlansAndSuitesMigrationConfig());
             //ec.Processors.Add(new TestRunsMigrationConfig());
         }
-
-
 
         private void AddExampleFieldMapps(EngineConfiguration ec)
         {

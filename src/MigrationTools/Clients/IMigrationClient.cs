@@ -6,7 +6,6 @@ namespace MigrationTools.Clients
 {
     public interface IMigrationClient
     {
-
         TeamProjectConfig Config { get; }
         IWorkItemMigrationClient WorkItems { get; }
         ITestPlanMigrationClient TestPlans { get; }
@@ -17,8 +16,5 @@ namespace MigrationTools.Clients
 
         [Obsolete]
         object InternalCollection { get; }
-
-
-
     }
 }

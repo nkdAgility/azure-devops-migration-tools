@@ -15,17 +15,17 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
 {
     public class GitRepositoryEnricher : WorkItemEnricher
     {
-        IMigrationEngine _Engine;
+        private IMigrationEngine _Engine;
         private readonly ILogger<GitRepositoryEnricher> _Logger;
-        bool _save = true;
-        bool _filter = true;
-        GitRepositoryService sourceRepoService;
-        IList<GitRepository> sourceRepos;
-        IList<GitRepository> allSourceRepos;
-        GitRepositoryService targetRepoService;
-        IList<GitRepository> targetRepos;
-        IList<GitRepository> allTargetRepos;
-        List<string> gitWits;
+        private bool _save = true;
+        private bool _filter = true;
+        private GitRepositoryService sourceRepoService;
+        private IList<GitRepository> sourceRepos;
+        private IList<GitRepository> allSourceRepos;
+        private GitRepositoryService targetRepoService;
+        private IList<GitRepository> targetRepos;
+        private IList<GitRepository> allTargetRepos;
+        private List<string> gitWits;
 
         public GitRepositoryEnricher(IMigrationEngine engine, ILogger<GitRepositoryEnricher> logger) : base(engine, logger)
         {
@@ -47,7 +47,6 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                     "Fixed in Changeset"    //TFVC
                 };
         }
-
 
         public override void Configure(bool save = true, bool filter = true)
         {
@@ -139,6 +138,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                                     newLink = new ExternalLink(((WorkItemMigrationClient)Engine.Target.WorkItems).Store.RegisteredLinkTypes[ArtifactLinkIds.Commit],
                                         $"vstfs:///git/commit/{targetRepoInfo.GitRepo.ProjectReference.Id}%2f{targetRepoInfo.GitRepo.Id}%2f{sourceRepoInfo.CommitID}");
                                     break;
+
                                 case "Pull Request":
                                     //newLink = new ExternalLink(targetStore.Store.RegisteredLinkTypes[ArtifactLinkIds.PullRequest],
                                     //    $"vstfs:///Git/PullRequestId/{targetRepoInfo.GitRepo.ProjectReference.Id}%2f{targetRepoInfo.GitRepo.Id}%2f{sourceRepoInfo.CommitID}");
@@ -180,11 +180,9 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                 {
                     Log.LogDebug("GitRepositoryEnricher: Adding {LinkedArtifactUri} ", eln.LinkedArtifactUri);
                     targetWorkItem.ToWorkItem().Links.Add(eln);
-
                 }
                 catch (Exception)
                 {
-
                     // eat exception as sometimes TFS thinks this is an attachment
                 }
             }
@@ -200,11 +198,9 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                     }
                     catch (Exception)
                     {
-
                         // eat exception as sometimes TFS thinks this is an attachment
                     }
                 }
-
             }
 
             if (targetWorkItem.ToWorkItem().IsDirty && _save)

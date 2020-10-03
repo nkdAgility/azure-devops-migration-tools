@@ -12,7 +12,6 @@ namespace MigrationTools.Clients.AzureDevops.Rest.FieldMaps
         public override void Configure(IFieldMapConfig config)
         {
             base.Configure(config);
-
         }
 
         public override string MappingDisplayName => $"{Config.sourceField} {Config.targetField}";

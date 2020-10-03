@@ -5,7 +5,6 @@ namespace MigrationTools.Enrichers
 {
     public abstract class WorkItemEnricher : IWorkItemEnricher
     {
-
         protected IMigrationEngine Engine { get; }
         protected ILogger<IWorkItemEnricher> Log { get; }
 
@@ -16,7 +15,7 @@ namespace MigrationTools.Enrichers
         }
 
         public abstract void Configure(bool save = true, bool filter = true);
-        public abstract int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem);
 
+        public abstract int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem);
     }
 }

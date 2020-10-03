@@ -8,17 +8,15 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
 {
     public class FieldToFieldMap : FieldMapBase
     {
-
         public FieldToFieldMap(ILogger<FieldToFieldMap> logger) : base(logger)
         {
-
         }
+
         private FieldtoFieldMapConfig Config { get { return (FieldtoFieldMapConfig)_Config; } }
 
         public override void Configure(IFieldMapConfig config)
         {
             base.Configure(config);
-
         }
 
         public override string MappingDisplayName => $"{Config.sourceField} {Config.targetField}";

@@ -15,8 +15,7 @@ namespace VstsSyncMigrator.Engine
 {
     public class WorkItemUpdateAreasAsTagsContext : StaticProcessorBase
     {
-
-        WorkItemUpdateAreasAsTagsConfig config;
+        private WorkItemUpdateAreasAsTagsConfig config;
 
         public WorkItemUpdateAreasAsTagsContext(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<WorkItemUpdateAreasAsTagsContext> logger) : base(services, me, telemetry, logger)
         {
@@ -64,7 +63,6 @@ namespace VstsSyncMigrator.Engine
                     workitem.ToWorkItem().Open();
                     workitem.ToWorkItem().Tags = newTagList;
                     workitem.SaveToAzureDevOps();
-
                 }
 
                 witstopwatch.Stop();
@@ -79,6 +77,5 @@ namespace VstsSyncMigrator.Engine
             stopwatch.Stop();
             Console.WriteLine(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds", stopwatch.Elapsed);
         }
-
     }
 }

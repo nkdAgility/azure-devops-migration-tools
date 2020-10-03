@@ -7,7 +7,9 @@ namespace MigrationTools
     public interface IMigrationEngine
     {
         EngineConfiguration Config { get; }
+
         ProcessingStatus Run();
+
         IMigrationClient Source { get; }
 
         IMigrationClient Target { get; }

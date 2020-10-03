@@ -12,6 +12,5 @@ namespace MigrationTools.Services.Tests
             var result = dos.GetLatestVersion();
             Assert.IsNotNull(result);
         }
-
     }
 }

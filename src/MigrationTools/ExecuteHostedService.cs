@@ -15,6 +15,7 @@ namespace MigrationTools
         private readonly IHostApplicationLifetime _appLifetime;
 
         private int? _exitCode;
+
         public ExecuteHostedService(
             ExecuteOptions exceuteOptions,
             IMigrationEngine migrationEngine,

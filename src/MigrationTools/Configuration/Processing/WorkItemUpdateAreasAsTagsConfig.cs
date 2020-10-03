@@ -5,6 +5,7 @@ namespace MigrationTools.Configuration.Processing
     public class WorkItemUpdateAreasAsTagsConfig : IProcessorConfig
     {
         public string AreaIterationPath { get; set; }
+
         /// <inheritdoc />
         public bool Enabled { get; set; }
 

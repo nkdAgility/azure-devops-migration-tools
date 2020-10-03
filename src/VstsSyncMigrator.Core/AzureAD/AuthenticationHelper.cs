@@ -9,7 +9,6 @@ namespace VstsSyncMigrator
     {
         public static string TokenForUser;
 
-
         /// <summary>
         /// Async task to acquire token for User.
         /// </summary>
@@ -37,6 +36,5 @@ namespace VstsSyncMigrator
             }
             return TokenForUser;
         }
-
     }
 }

@@ -12,7 +12,5 @@ namespace MigrationTools.Clients
         List<TestPlanData> GetTestPlans();
 
         TestPlanData CreateTestPlan();
-
-
     }
 }

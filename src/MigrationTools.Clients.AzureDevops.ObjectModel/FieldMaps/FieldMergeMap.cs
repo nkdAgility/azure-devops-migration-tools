@@ -9,11 +9,10 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
 {
     public class FieldMergeMap : FieldMapBase
     {
-
         public FieldMergeMap(ILogger<FieldMergeMap> logger) : base(logger)
         {
-
         }
+
         private FieldMergeMapConfig Config { get { return (FieldMergeMapConfig)_Config; } }
 
         public override void Configure(IFieldMapConfig config)

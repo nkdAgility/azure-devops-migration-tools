@@ -6,24 +6,20 @@ using Newtonsoft.Json;
 
 namespace MigrationTools.Tests
 {
-
     [TestClass]
     public class EngineConfigurationTests
     {
-
-        IEngineConfigurationBuilder ecb = new EngineConfigurationBuilder(new NullLogger<EngineConfigurationBuilder>());
+        private IEngineConfigurationBuilder ecb = new EngineConfigurationBuilder(new NullLogger<EngineConfigurationBuilder>());
 
         [TestMethod]
         public void TestSeraliseToJson()
         {
-
             string json = JsonConvert.SerializeObject(ecb.BuildDefault(),
                     new FieldMapConfigJsonConverter(),
                     new ProcessorConfigJsonConverter());
             StreamWriter sw = new StreamWriter("configuration.json");
             sw.WriteLine(json);
             sw.Close();
-
         }
 
         [TestMethod]

@@ -9,6 +9,7 @@ namespace MigrationTools.Engine.Containers
         string MappingDisplayName { get; }
 
         void Configure(IFieldMapConfig config);
+
         void Execute(WorkItemData source, WorkItemData target);
     }
 }

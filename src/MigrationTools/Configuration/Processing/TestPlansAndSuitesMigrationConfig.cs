@@ -18,6 +18,7 @@ namespace MigrationTools.Configuration.Processing
         /// Remove Invalid Links, see https://github.com/nkdAgility/azure-devops-migration-tools/issues/178
         /// </summary>
         public bool RemoveInvalidTestSuiteLinks { get; set; }
+
         public bool FilterCompleted { get; set; }
 
         /// <inheritdoc />

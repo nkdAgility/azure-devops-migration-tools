@@ -7,7 +7,6 @@ namespace MigrationTools.Clients.AzureDevops.Rest.FieldMaps
 {
     public class FieldtoFieldMultiMap : FieldMapBase
     {
-
         private FieldtoFieldMultiMapConfig Config { get { return (FieldtoFieldMultiMapConfig)_Config; } }
 
         public override void Configure(IFieldMapConfig config)
@@ -20,9 +19,6 @@ namespace MigrationTools.Clients.AzureDevops.Rest.FieldMaps
         internal override void InternalExecute(WorkItem source, WorkItem target)
         {
             throw new NotImplementedException();
-
         }
-
-
     }
 }

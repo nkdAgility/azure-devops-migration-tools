@@ -16,9 +16,8 @@ namespace VstsSyncMigrator.Engine
 {
     public class ExportProfilePictureFromADContext : StaticProcessorBase
     {
-
         private IIdentityManagementService2 ims2;
-        ExportProfilePictureFromADConfig config;
+        private ExportProfilePictureFromADConfig config;
 
         public override string Name
         {
@@ -30,7 +29,6 @@ namespace VstsSyncMigrator.Engine
 
         public ExportProfilePictureFromADContext(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<ExportProfilePictureFromADContext> logger) : base(services, me, telemetry, logger)
         {
-
         }
 
         public override void Configure(IProcessorConfig config)
@@ -51,7 +49,6 @@ namespace VstsSyncMigrator.Engine
             {
                 Directory.CreateDirectory(exportPath);
             }
-
 
             TeamFoundationIdentity SIDS = ims2.ReadIdentity(IdentitySearchFactor.AccountName, "Team Foundation Valid Users", MembershipQuery.Expanded, ReadIdentityOptions.None);
 
@@ -78,11 +75,15 @@ namespace VstsSyncMigrator.Engine
                     if (!(i == null) && i.IsContainer == false)
                     {
                         DirectoryEntry d = new DirectoryEntry(ldapName, config.Username, config.Password);
-                        DirectorySearcher dssearch = new DirectorySearcher(d);
-                        dssearch.Filter = string.Format("(sAMAccountName={0})", i.UniqueName.Split(char.Parse(@"\"))[1]);
+                        DirectorySearcher dssearch = new DirectorySearcher(d)
+                        {
+                            Filter = string.Format("(sAMAccountName={0})", i.UniqueName.Split(char.Parse(@"\"))[1])
+                        };
                         SearchResult sresult = dssearch.FindOne();
-                        WebClient webClient = new WebClient();
-                        webClient.Credentials = CredentialCache.DefaultNetworkCredentials;
+                        WebClient webClient = new WebClient
+                        {
+                            Credentials = CredentialCache.DefaultNetworkCredentials
+                        };
                         if (sresult != null)
                         {
                             string newImage = Path.Combine(exportPath, string.Format("{0}.jpg", i.UniqueName.Replace(@"\", "-")));
@@ -93,13 +94,11 @@ namespace VstsSyncMigrator.Engine
                                 string empPic = string.Format(config.PictureEmpIDFormat, deUser.Properties["employeeNumber"].Value);
                                 try
                                 {
-
                                     webClient.DownloadFile(empPic, newImage);
                                 }
                                 catch (Exception ex)
                                 {
                                     Trace.WriteLine(string.Format("      [ERROR] {0}", ex.ToString()));
-
                                 }
                             }
                             else
@@ -109,7 +108,6 @@ namespace VstsSyncMigrator.Engine
                         }
                         webClient.Dispose();
                     }
-
                 }
                 catch (Exception ex)
                 {
@@ -118,8 +116,6 @@ namespace VstsSyncMigrator.Engine
 
                 current--;
             }
-
-
 
             //////////////////////////////////////////////////
             stopwatch.Stop();

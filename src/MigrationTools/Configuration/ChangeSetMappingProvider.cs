@@ -5,6 +5,7 @@ namespace MigrationTools.Configuration
     public class ChangeSetMappingProvider : IChangeSetMappingProvider
     {
         private readonly string _MappingFilePath;
+
         public ChangeSetMappingProvider(string mappingFilePath)
         {
             _MappingFilePath = mappingFilePath;

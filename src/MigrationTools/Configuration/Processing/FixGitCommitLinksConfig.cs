@@ -7,6 +7,7 @@ namespace MigrationTools.Configuration.Processing
         public string TargetRepository { get; set; }
         public bool Enabled { get; set; }
         public string QueryBit { get; set; }
+
         /// <inheritdoc />
         public string OrderBit { get; set; }
 

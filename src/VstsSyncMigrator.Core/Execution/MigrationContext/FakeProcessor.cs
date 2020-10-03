@@ -20,9 +20,7 @@ namespace VstsSyncMigrator.Engine
 
         public FakeProcessor(IMigrationEngine me, IServiceProvider services, ITelemetryLogger telemetry) : base(me, services, telemetry)
         {
-
         }
-
 
         protected override void InternalExecute()
         {

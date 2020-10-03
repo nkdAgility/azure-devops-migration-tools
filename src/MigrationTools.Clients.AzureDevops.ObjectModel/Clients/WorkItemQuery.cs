@@ -10,10 +10,8 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
 {
     public class WorkItemQuery : WorkItemQueryBase
     {
-
         public WorkItemQuery(IServiceProvider services, ITelemetryLogger telemetry) : base(services, telemetry)
         {
-
         }
 
         public override List<WorkItemData> GetWorkItems()
@@ -50,7 +48,6 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
                           { "QueryCount", wc.Count }
                       });
                 Log.Information("WorkItemQuery: Query found {WorkItemCount} work items in {QueryTimer}ms ", wc.Count, queryTimer.ElapsedMilliseconds);
-
             }
             catch (Exception ex)
             {
@@ -68,7 +65,5 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
             }
             return wc.ToWorkItemDataList();
         }
-
-
     }
 }

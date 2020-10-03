@@ -14,7 +14,7 @@ namespace MigrationTools
 {
     public class MigrationEngine : IMigrationEngine
     {
-        ExecuteOptions executeOptions;
+        private ExecuteOptions executeOptions;
 
         private readonly IServiceProvider _services;
         private readonly Guid _Guid = Guid.NewGuid();
@@ -74,7 +74,6 @@ namespace MigrationTools
             }
         }
 
-
         private IMigrationClient GetSource()
         {
             if (_Source is null)
@@ -99,7 +98,6 @@ namespace MigrationTools
             }
         }
 
-
         private IMigrationClient GetTarget()
         {
             if (_Target is null)
@@ -113,7 +111,6 @@ namespace MigrationTools
             }
             return _Target;
         }
-
 
         public ProcessingStatus Run()
         {
@@ -134,7 +131,6 @@ namespace MigrationTools
             Log.Information("                              Max Console: {ConsoleLogLevel}. ", "Debug");
             Log.Information("                 Max Application Insights: {AILogLevel}. ", "Error");
             Log.Information("The Max log levels above show where to go look for extra info. e.g. Even if you set the log level to Verbose you will only see that info in the Log File, however everything up to Debug will be in the Console.");
-
 
             ProcessingStatus ps = ProcessingStatus.Running;
 
@@ -170,6 +166,5 @@ namespace MigrationTools
                 });
             return ps;
         }
-
     }
 }

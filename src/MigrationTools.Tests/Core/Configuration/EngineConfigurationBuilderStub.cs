@@ -4,7 +4,7 @@ namespace MigrationTools.Configuration.Tests
 {
     public class EngineConfigurationBuilderStub : IEngineConfigurationBuilder
     {
-        IEngineConfigurationBuilder ecb;
+        private IEngineConfigurationBuilder ecb;
 
         public EngineConfigurationBuilderStub(ILogger<EngineConfigurationBuilder> logger)
         {

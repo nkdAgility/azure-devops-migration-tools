@@ -59,7 +59,6 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                 {
                     Log.Error(ex, "AttachmentMigrationEnricher:Unable to process atachment from source wi {SourceWorkItemId} called {AttachmentName}", source.ToWorkItem().Id, wia.Name);
                 }
-
             }
             if (save)
             {
@@ -67,7 +66,6 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                 Log.Information("Work iTem now has {AttachmentCount} attachemnts", source.ToWorkItem().Attachments.Count);
                 CleanUpAfterSave();
             }
-
         }
 
         public void CleanUpAfterSave()
@@ -105,7 +103,6 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                     Log.Error(ex, "Exception downloading attachements");
                     return null;
                 }
-
             }
             else
             {
@@ -135,10 +132,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             else
             {
                 Log.Warning(" [SKIP] Attachemnt {filename} on Work Item {targetWorkItemId} is bigger than the limit of {maxAttachmentSize} bites for Azure DevOps.", filename, targetWorkItem.Id, _maxAttachmentSize);
-
             }
-
-
         }
 
         public string GetSafeFilename(string filename)

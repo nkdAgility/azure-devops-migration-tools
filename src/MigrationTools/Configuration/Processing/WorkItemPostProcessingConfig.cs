@@ -5,8 +5,10 @@ namespace MigrationTools.Configuration.Processing
     public class WorkItemPostProcessingConfig : IWorkItemProcessorConfig
     {
         public IList<int> WorkItemIDs { get; set; }
+
         /// <inheritdoc />
         public bool Enabled { get; set; }
+
         /// <inheritdoc />
         public string Processor
         {

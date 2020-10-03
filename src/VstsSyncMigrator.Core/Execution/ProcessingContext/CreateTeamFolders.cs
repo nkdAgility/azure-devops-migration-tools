@@ -14,11 +14,8 @@ namespace VstsSyncMigrator.Engine
 {
     public class CreateTeamFolders : StaticProcessorBase
     {
-
-
         public CreateTeamFolders(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<CreateTeamFolders> logger) : base(services, me, telemetry, logger)
         {
-
         }
 
         public override string Name
@@ -31,7 +28,6 @@ namespace VstsSyncMigrator.Engine
 
         public override void Configure(IProcessorConfig config)
         {
-
         }
 
         protected override void InternalExecute()
@@ -58,7 +54,6 @@ namespace VstsSyncMigrator.Engine
                 {
                     Trace.Write(string.Format(" is a Project"));
                     path = string.Format(@"Projects\{0}", r.Match(team.Name).Groups[1].Value.Replace(" ", "-"));
-
                 }
                 else
                 {
@@ -75,7 +70,6 @@ namespace VstsSyncMigrator.Engine
                 //_me.ApplyFieldMappings(workitem);
                 qh.Save();
 
-
                 witstopwatch.Stop();
                 elapsedms = elapsedms + witstopwatch.ElapsedMilliseconds;
                 current--;
@@ -90,8 +84,7 @@ namespace VstsSyncMigrator.Engine
             Console.WriteLine(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds", stopwatch.Elapsed);
         }
 
-
-        void CreateFolderHyerarchy(string[] toCreate, QueryItem currentItem, int focus = 0)
+        private void CreateFolderHyerarchy(string[] toCreate, QueryItem currentItem, int focus = 0)
         {
             if (currentItem is QueryFolder)
             {

@@ -8,11 +8,8 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
 {
     public class FieldLiteralMap : FieldMapBase
     {
-
         public FieldLiteralMap(ILogger<FieldLiteralMap> logger) : base(logger)
         {
-
-
         }
 
         private FieldLiteralMapConfig Config { get { return (FieldLiteralMapConfig)_Config; } }

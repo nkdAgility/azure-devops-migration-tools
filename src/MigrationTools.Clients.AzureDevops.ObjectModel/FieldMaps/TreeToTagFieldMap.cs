@@ -11,8 +11,8 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
     {
         public TreeToTagFieldMap(ILogger<TreeToTagFieldMap> logger) : base(logger)
         {
-
         }
+
         private TreeToTagMapConfig Config { get { return (TreeToTagMapConfig)_Config; } }
 
         public override void Configure(IFieldMapConfig config)

@@ -13,7 +13,6 @@ namespace MigrationTools.Clients.AzureDevops.Rest.FieldMaps
         internal override void InternalExecute(WorkItem source, WorkItem target)
         {
             throw new NotImplementedException();
-
         }
     }
 }

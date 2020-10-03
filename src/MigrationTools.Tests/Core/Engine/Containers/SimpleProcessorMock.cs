@@ -10,12 +10,10 @@ namespace MigrationTools.Engine.Containers.Tests
 
         public void Configure(IProcessorConfig config)
         {
-
         }
 
         public void Execute()
         {
-
         }
     }
 }

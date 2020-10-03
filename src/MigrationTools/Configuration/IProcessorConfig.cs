@@ -6,9 +6,10 @@ namespace MigrationTools.Configuration
     public interface IProcessorConfig
     {
         /// <summary>
-        /// Active the processor if it true. 
+        /// Active the processor if it true.
         /// </summary>
         bool Enabled { get; set; }
+
         [JsonIgnoreAttribute]
         string Processor { get; }
 

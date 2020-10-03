@@ -8,7 +8,6 @@ namespace MigrationTools.Configuration.Tests
     [TestClass()]
     public class EngineConfigurationBuilderTests
     {
-
         private EngineConfigurationBuilder CreateEngine()
         {
             var logger = new NullLogger<EngineConfigurationBuilder>();
@@ -53,9 +52,7 @@ namespace MigrationTools.Configuration.Tests
         [TestMethod]
         public void TestSeraliseToJson()
         {
-
             HelperCreateDefaultConfigFile();
-
         }
 
         [TestMethod]

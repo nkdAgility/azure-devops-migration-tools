@@ -9,7 +9,6 @@ namespace MigrationTools.Engine.Containers.Tests
     [TestClass()]
     public class FieldMapContainerTests
     {
-
         private EngineConfiguration CreateEngineConfiguration()
         {
             var ecb = new EngineConfigurationBuilder(new NullLogger<EngineConfigurationBuilder>());
@@ -25,7 +24,6 @@ namespace MigrationTools.Engine.Containers.Tests
             return sp;
         }
 
-
         [TestMethod()]
         public void FieldMapContainerTest()
         {
@@ -33,8 +31,10 @@ namespace MigrationTools.Engine.Containers.Tests
 
             Assert.AreEqual(0, config.FieldMaps.Count);
 
-            var testSimple = new SimpleFieldMapConfigMock();
-            testSimple.WorkItemTypeName = "*";
+            var testSimple = new SimpleFieldMapConfigMock
+            {
+                WorkItemTypeName = "*"
+            };
             config.FieldMaps.Add(testSimple);
 
             Assert.AreEqual(1, config.FieldMaps.Count);
@@ -43,7 +43,5 @@ namespace MigrationTools.Engine.Containers.Tests
             fieldMapContainer.EnsureConfigured();
             Assert.AreEqual(1, fieldMapContainer.Count);
         }
-
-
     }
 }

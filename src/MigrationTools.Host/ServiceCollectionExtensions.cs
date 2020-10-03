@@ -14,9 +14,8 @@ namespace MigrationTools
             //return collection.AddTransient<IGreetingService, GreetingService>();
             return collection;
         }
-
-
     }
 }
+
 //https://www.youtube.com/watch?v=kLl2Mt3eYxU
 //https://csharp.christiannagel.com/2016/08/16/diwithconfiguration/

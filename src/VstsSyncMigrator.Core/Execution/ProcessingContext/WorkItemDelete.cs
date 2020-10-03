@@ -13,11 +13,10 @@ namespace VstsSyncMigrator.Engine
 {
     public class WorkItemDelete : StaticProcessorBase
     {
-        WorkItemDeleteConfig _config;
+        private WorkItemDeleteConfig _config;
 
         public WorkItemDelete(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<WorkItemUpdate> logger) : base(services, me, telemetry, logger)
         {
-
         }
 
         public override string Name
@@ -73,12 +72,9 @@ namespace VstsSyncMigrator.Engine
                 Log.LogInformation("Nothing to delete");
             }
 
-
-
             //////////////////////////////////////////////////
             stopwatch.Stop();
             Console.WriteLine(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds", stopwatch.Elapsed);
         }
-
     }
 }

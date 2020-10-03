@@ -18,8 +18,8 @@ namespace _VstsSyncMigrator.Engine.Tests
     [TestClass]
     public class MigrationEngineTests
     {
-        IEngineConfigurationBuilder ecb;
-        IServiceProvider _services;
+        private IEngineConfigurationBuilder ecb;
+        private IServiceProvider _services;
 
         [TestInitialize]
         public void Setup()
@@ -64,20 +64,16 @@ namespace _VstsSyncMigrator.Engine.Tests
             services.AddTransient<IWorkItemMigrationClient, WorkItemMigrationClient>();
             services.AddTransient<IWorkItemQueryBuilder, WorkItemQueryBuilder>();
 
-
             services.AddSingleton<IMigrationEngine, MigrationEngine>();
-
 
             services.AddSingleton<ExecuteOptions>((p) => null);
 
             _services = services.BuildServiceProvider();
-
         }
 
         [TestMethod]
         public void TestEngineCreation()
         {
-
             IMigrationEngine me = _services.GetRequiredService<IMigrationEngine>();
         }
 
@@ -88,7 +84,6 @@ namespace _VstsSyncMigrator.Engine.Tests
             ec.Processors.Clear();
             IMigrationEngine me = _services.GetRequiredService<IMigrationEngine>();
             me.Run();
-
         }
 
         [TestMethod]
@@ -109,6 +104,5 @@ namespace _VstsSyncMigrator.Engine.Tests
             IMigrationEngine me = _services.GetRequiredService<IMigrationEngine>();
             me.Run();
         }
-
     }
 }

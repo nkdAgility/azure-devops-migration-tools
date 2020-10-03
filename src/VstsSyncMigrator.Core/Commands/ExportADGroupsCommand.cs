@@ -14,7 +14,6 @@ namespace VstsSyncMigrator.Commands
 {
     public class ExportADGroupsCommand : CommandBase
     {
-
         public static object Run(ExportADGroupsOptions opts, string logPath, ITelemetryLogger telemetry)
         {
             telemetry.TrackEvent("Run-ExportADGroupsCommand");
@@ -50,7 +49,6 @@ namespace VstsSyncMigrator.Commands
                         TeamFoundationIdentity sourceAppGroup = sourceIMS2.ReadIdentity(appGroup.Descriptor, MembershipQuery.Expanded, ReadIdentityOptions.None);
                         foreach (IdentityDescriptor child in sourceAppGroup.Members.Where(x => x.IdentityType == "Microsoft.TeamFoundation.Identity"))
                         {
-
                             TeamFoundationIdentity sourceChildIdentity = sourceIMS2.ReadIdentity(IdentitySearchFactor.Identifier, child.Identifier, MembershipQuery.None, ReadIdentityOptions.ExtendedProperties);
 
                             if ((string)sourceChildIdentity.GetProperty("SpecialType") == "AzureActiveDirectoryApplicationGroup")
@@ -74,8 +72,6 @@ namespace VstsSyncMigrator.Commands
             sw.Close();
             //    current--;
             //}
-
-
 
             //////////////////////////////////////////////////
             stopwatch.Stop();

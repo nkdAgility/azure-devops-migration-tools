@@ -59,12 +59,9 @@ namespace VstsSyncMigrator.ConsoleApp
                     services.AddTransient<ITestPlanMigrationClient, TestPlanMigrationClient>();
                     services.AddTransient<IWorkItemQueryBuilder, WorkItemQueryBuilder>();
                     services.AddTransient<IWorkItemQuery, WorkItemQuery>();
-
-
                 });
 
             await hostBuilder.RunMigrationTools(args);
-
         }
     }
 }

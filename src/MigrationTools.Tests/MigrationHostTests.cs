@@ -16,16 +16,14 @@ namespace MigrationTools.Tests
     [TestClass()]
     public class MigrationHostTests
     {
-        IEngineConfigurationBuilder ecb;
-        IHost host;
+        private IEngineConfigurationBuilder ecb;
+        private IHost host;
 
         [TestInitialize]
         public void Setup()
         {
             var logger = new NullLogger<EngineConfigurationBuilder>();
             ecb = new EngineConfigurationBuilder(logger);
-
-
 
             host = new HostBuilder().ConfigureServices((context, services) =>
             {
@@ -46,7 +44,6 @@ namespace MigrationTools.Tests
                 services.AddTransient<IMigrationClient, MigrationClientMock>();
                 services.AddTransient<IWorkItemMigrationClient, WorkItemMigrationClientMock>();
                 services.AddTransient<IWorkItemQueryBuilder, WorkItemQueryBuilder>();
-
             }).Build();
         }
 
@@ -54,10 +51,6 @@ namespace MigrationTools.Tests
         public void MigrationHostTest()
         {
             IMigrationEngine mh = host.Services.GetRequiredService<IMigrationEngine>();
-
-
         }
-
-
     }
 }

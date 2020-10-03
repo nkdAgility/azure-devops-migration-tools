@@ -10,9 +10,11 @@ namespace MigrationTools.Host
     public interface IStartupService
     {
         void RunStartupLogic(string[] args);
+
         void RunExitLogic();
     }
-    class StartupService : IStartupService
+
+    internal class StartupService : IStartupService
     {
         private readonly IDetectOnlineService _detectOnlineService;
         private readonly IDetectVersionService _detectVersionService;
@@ -86,6 +88,7 @@ namespace MigrationTools.Host
             //_logger.LogCloseAndFlush();
             System.Threading.Thread.Sleep(5000);
         }
+
         private void AsciiLogo(Version thisVersion)
         {
             _logger.LogInformation("                                      &@&                                      ");

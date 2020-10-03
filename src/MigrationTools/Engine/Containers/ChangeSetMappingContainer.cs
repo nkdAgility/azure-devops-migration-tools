@@ -17,7 +17,6 @@ namespace MigrationTools.Engine.Containers
 
         protected override void Configure()
         {
-
             if (Config.ChangeSetMappingFile != null)
             {
                 if (System.IO.File.Exists(Config.ChangeSetMappingFile))
@@ -27,7 +26,5 @@ namespace MigrationTools.Engine.Containers
                 }
             }
         }
-
-
     }
 }

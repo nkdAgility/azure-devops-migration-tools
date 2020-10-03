@@ -27,12 +27,12 @@ namespace MigrationTools.Engine.Containers
             get { return _Config; }
         }
 
-
         public EngineContainer(IServiceProvider services, EngineConfiguration config)
         {
             _services = services;
             _Config = config;
         }
+
         protected abstract void Configure();
 
         public void EnsureConfigured()
