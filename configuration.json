@@ -1,6 +1,6 @@
 {
   "Version": "0.0",
-  "TelemetryEnableTrace": false,
+  "LogLevel": "Verbose",
   "workaroundForQuerySOAPBugEnabled": false,
   "Source": {
     "Collection": "https://dev.azure.com/nkdagility-preview/",

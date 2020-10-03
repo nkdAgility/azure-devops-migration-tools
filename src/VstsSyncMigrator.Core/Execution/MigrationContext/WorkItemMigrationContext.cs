@@ -98,6 +98,7 @@ namespace VstsSyncMigrator.Engine
 
         protected override void InternalExecute()
         {
+            Log.Information("Starting ");
             if (_config == null)
             {
                 throw new Exception("You must call Configure() first");

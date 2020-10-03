@@ -12,7 +12,7 @@ namespace _VstsSyncMigrator.Engine.Tests
         public void EngineConfigurationCreate()
         {
             EngineConfiguration ec = new EngineConfiguration();
-            ec.TelemetryEnableTrace = true;
+            ec.LogLevel = Serilog.Events.LogEventLevel.Verbose;
             ec.Source = new TeamProjectConfig() { Project = "DemoProjs", Collection = new Uri("https://sdd2016.visualstudio.com/"), ReflectedWorkItemIDFieldName = "TfsMigrationTool.ReflectedWorkItemId", PersonalAccessToken="" };
             ec.Target = new TeamProjectConfig() { Project = "DemoProjt", Collection = new Uri("https://sdd2016.visualstudio.com/"), ReflectedWorkItemIDFieldName = "TfsMigrationTool.ReflectedWorkItemId", PersonalAccessToken = "" };
             Assert.IsNotNull(ec);

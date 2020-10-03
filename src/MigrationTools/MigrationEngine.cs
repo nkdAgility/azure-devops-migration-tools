@@ -10,6 +10,7 @@ using MigrationTools.Configuration;
 using MigrationTools.Engine;
 using MigrationTools.Engine.Containers;
 using Serilog;
+using Serilog.Core;
 
 namespace MigrationTools
 {
@@ -124,7 +125,11 @@ namespace MigrationTools
                 });
             Stopwatch engineTimer = Stopwatch.StartNew();
 
-			ProcessingStatus ps = ProcessingStatus.Running;
+            LoggingLevelSwitch logLevel = _services.GetRequiredService<LoggingLevelSwitch>();
+            logLevel.MinimumLevel = Config.LogLevel;
+
+
+            ProcessingStatus ps = ProcessingStatus.Running;
 
             Processors.EnsureConfigured();
             TypeDefinitionMaps.EnsureConfigured();

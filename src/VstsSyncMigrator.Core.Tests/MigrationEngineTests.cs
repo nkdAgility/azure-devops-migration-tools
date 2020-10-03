@@ -14,6 +14,7 @@ using MigrationTools;
 using MigrationTools.Clients;
 using MigrationTools.Clients.AzureDevops.ObjectModel.Clients;
 using Serilog;
+using Serilog.Core;
 
 namespace _VstsSyncMigrator.Engine.Tests
 {
@@ -26,11 +27,13 @@ namespace _VstsSyncMigrator.Engine.Tests
         [TestInitialize]
         public void Setup()
         {
-            Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
-
+            var levelSwitch = new LoggingLevelSwitch();
+            Log.Logger = new LoggerConfiguration().MinimumLevel.ControlledBy(levelSwitch).WriteTo.Console().CreateLogger();
+            
             ecb = new EngineConfigurationBuilder(new NullLogger<EngineConfigurationBuilder>());
             var services = new ServiceCollection();
-        
+            services.AddSingleton<LoggingLevelSwitch>(levelSwitch);
+
             // Field Mapps
             services.AddTransient<FieldBlankMap>();
             services.AddTransient<FieldLiteralMap>();

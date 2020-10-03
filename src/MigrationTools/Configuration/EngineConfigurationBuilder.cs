@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using MigrationTools.Configuration.FieldMap;
 using MigrationTools.Configuration.Processing;
 using Newtonsoft.Json;
+using Serilog.Events;
 
 namespace MigrationTools.Configuration
 {
@@ -76,7 +77,7 @@ namespace MigrationTools.Configuration
         public EngineConfiguration CreateEmptyConfig()
         {
             EngineConfiguration ec = new EngineConfiguration();
-            ec.TelemetryEnableTrace = false;
+            ec.LogLevel = LogEventLevel.Information;
             ec.Version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(2);
             ec.Source = new TeamProjectConfig()
             {
