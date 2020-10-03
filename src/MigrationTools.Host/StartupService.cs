@@ -35,11 +35,11 @@ namespace MigrationTools.Host
             {
                 Version latestVersion = _detectVersionService.GetLatestVersion();
 
-                _logger.LogInformation("Latest version detected as {@Version}", latestVersion);
-                var version = System.Reflection.Assembly.GetEntryAssembly().GetName().Version;
+                _logger.LogInformation($"Latest version detected as {{{nameof(latestVersion)}}}", latestVersion);
+                var version = Assembly.GetEntryAssembly().GetName().Version;
                 if (latestVersion > version)
                 {
-                    _logger.LogWarning("You are currently running version {@Version_Current} and a newer version ({@Version_Latest}) is available. You should upgrade now using Chocolatey command 'choco upgrade vsts-sync-migrator' from the command line.", version, latestVersion);
+                    _logger.LogWarning("You are currently running version {Version} and a newer version ({LatestVersion}) is available. You should upgrade now using Chocolatey command 'choco upgrade vsts-sync-migrator' from the command line.", version, latestVersion);
 #if !DEBUG
                     Console.WriteLine("Do you want to continue? (y/n)");
                     if (Console.ReadKey().Key != ConsoleKey.Y)
@@ -77,7 +77,7 @@ namespace MigrationTools.Host
             _logger.LogInformation("Start Time: {StartTime}", DateTime.Now.ToUniversalTime().ToLocalTime());
             _logger.LogInformation("Running with args: {@Args}", args);
             _logger.LogInformation("OSVersion: {OSVersion}", Environment.OSVersion.ToString());
-            _logger.LogInformation("Version: {CurrentVersion}", version);
+            _logger.LogInformation("Version: {Version}", version);
             _logger.LogInformation("userID: {UserId}", System.Security.Principal.WindowsIdentity.GetCurrent().Name);
         }
 
