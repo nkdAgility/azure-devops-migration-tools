@@ -129,6 +129,11 @@ namespace MigrationTools
 
             LoggingLevelSwitch logLevel = _services.GetRequiredService<LoggingLevelSwitch>();
             logLevel.MinimumLevel = Config.LogLevel;
+            Log.Information("Logging has been configured and is set to: {LogLevel}. ", Config.LogLevel.ToString());
+            Log.Information("                              Max Logfile: {FileLogLevel}. ", "Verbose");
+            Log.Information("                              Max Console: {ConsoleLogLevel}. ", "Debug");
+            Log.Information("                 Max Application Insights: {AILogLevel}. ", "Error");
+            Log.Information("The Max log levels above show where to go look for extra info. e.g. Even if you set the log level to Verbose you will only see that info in the Log File, however everything up to Debug will be in the Console.");
 
 
             ProcessingStatus ps = ProcessingStatus.Running;
