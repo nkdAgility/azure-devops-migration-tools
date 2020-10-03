@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Xml;
+using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.Server;
 using MigrationTools;
 using MigrationTools.Configuration;
@@ -13,7 +14,7 @@ using Serilog;
 
 namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
 {
-    public class NodeStructureEnricher : IWorkItemEnricher
+    public class NodeStructureEnricher : WorkItemEnricher
     {
         private bool _prefixProjectToNodes = false;
         private ICommonStructureService _sourceCommonStructureService;
@@ -22,21 +23,19 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
         private NodeInfo[] _sourceRootNodes;
         private string[] _nodeBasePaths;
 
-        public IMigrationEngine Engine { get; }
-
-        public void Configure(bool save = true, bool filterWorkItemsThatAlreadyExistInTarget = true)
+        public override void Configure(bool save = true, bool filterWorkItemsThatAlreadyExistInTarget = true)
         {
             
         }
 
-        public void Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
+        public override int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
         {
-   
+            throw new NotImplementedException();
+            return 0;
         }
 
-        public NodeStructureEnricher(IMigrationEngine engine)
+        public NodeStructureEnricher(IMigrationEngine engine, ILogger<NodeStructureEnricher> logger) : base(engine, logger)
         {
-            Engine = engine;
             _sourceCommonStructureService = (ICommonStructureService)Engine.Source.GetService<ICommonStructureService>();
             _targetCommonStructureService = (ICommonStructureService)Engine.Target.GetService<ICommonStructureService4>();
             _sourceProjectInfo = _sourceCommonStructureService.GetProjectFromName(Engine.Source.Config.Project);
@@ -60,7 +59,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             if (sourceNode == null) // May run into language problems!!! This is to try and detect that
             {
                 Exception ex = new Exception(string.Format("Unable to load Common Structure for Source. This is usually due to diferent language versions. Validate that '{0}' is the correct name in your version. ", treeTypeSource));
-                Log.Error(ex, "Unable to load Common Structure for Source.");
+                Log.LogError(ex, "Unable to load Common Structure for Source.");
                 throw ex;
             }
             XmlElement sourceTree = _sourceCommonStructureService.GetNodesXml(new string[] { sourceNode.Uri }, true);
@@ -72,7 +71,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             catch (Exception ex)
             {
                 Exception ex2 = new Exception(string.Format("Unable to load Common Structure for Target.This is usually due to diferent language versions. Validate that '{0}' is the correct name in your version. ", treeTypeTarget), ex);
-                Log.Error(ex2, "Unable to load Common Structure for Target.");
+                Log.LogError(ex2, "Unable to load Common Structure for Target.");
                 throw ex2;
             }
             if (_prefixProjectToNodes)
@@ -155,7 +154,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
 
                 if (!_nodeBasePaths.Any(p => path.StartsWith(p, StringComparison.InvariantCultureIgnoreCase)))
                 {
-                    Trace.WriteLine(string.Format("--IgnoreNode: {0}", nodePath));
+                    Log.LogDebug("--IgnoreNode: {0}", nodePath);
                     return false;
                 }
             }
@@ -168,28 +167,27 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             string nodePath = string.Format(@"{0}\{1}", parent.Path, name);
             NodeInfo node = null;
 
-            Trace.Write(string.Format("--CreateNode: {0}", nodePath));
+            Log.LogDebug("--CreateNode: {0}", nodePath);
             try
             {
                 node = _targetCommonStructureService.GetNodeFromPath(nodePath);
-                Trace.Write("...found");
+                Log.LogDebug("...found");
             }
             catch (CommonStructureSubsystemException ex)
             {
                 try
                 {
                     string newPathUri = _targetCommonStructureService.CreateNode(name, parent.Uri);
-                    Trace.Write("...created");
+                    Log.LogDebug("...created");
                     node = _targetCommonStructureService.GetNode(newPathUri);
                 }
                 catch
                 {
-                    Log.Error(ex, "Creating Node");
-                    Trace.Write("...missing");
+                    Log.LogError(ex, "Creating Node");
+                    Log.LogDebug("...missing");
                     throw;
                 }
             }
-
             Trace.WriteLine(String.Empty);
             return node;
         }
@@ -198,23 +196,23 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
         {
             string nodePath = string.Format(@"{0}\{1}", parent.Path, name);
             NodeInfo node = null;
-            Trace.Write(string.Format("--CreateNode: {0}, start date: {1}, finish date: {2}", nodePath, startDate, finishDate));
+            Log.LogDebug("--CreateNode: {0}, start date: {1}, finish date: {2}", nodePath, startDate, finishDate);
             try
             {
                 node = _targetCommonStructureService.GetNodeFromPath(nodePath);
-                Trace.Write("...found");
+                Log.LogDebug("...found");
             }
             catch (CommonStructureSubsystemException ex)
             {
                 try
                 {
                     string newPathUri = _targetCommonStructureService.CreateNode(name, parent.Uri);
-                    Log.Information("...created");
+                    Log.LogDebug("...created");
                     node = _targetCommonStructureService.GetNode(newPathUri);
                 }
                 catch
                 {
-                    Log.Warning(ex, "Missing ");
+                    Log.LogWarning(ex, "Missing ");
                     throw;
                 }
             }
@@ -222,14 +220,14 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             try
             {
                 ((ICommonStructureService4)_targetCommonStructureService).SetIterationDates(node.Uri, startDate, finishDate);
-                Trace.Write("...dates assigned");
+                Log.LogDebug("...dates assigned");
             }
             catch (CommonStructureSubsystemException ex)
             {
-                Log.Warning(ex, "Dates not set ");
+                Log.LogWarning(ex, "Dates not set ");
             }
 
-            Trace.WriteLine(String.Empty);
+            Log.LogDebug(String.Empty);
             return node;
         }
 

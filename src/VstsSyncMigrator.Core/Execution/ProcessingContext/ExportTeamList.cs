@@ -15,6 +15,7 @@ using MigrationTools.Configuration;
 using Microsoft.Extensions.Hosting;
 using MigrationTools;
 using MigrationTools;
+using Microsoft.Extensions.Logging;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -22,7 +23,7 @@ namespace VstsSyncMigrator.Engine
     {
 
 
-        public ExportTeamList(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry) : base(services, me, telemetry)
+        public ExportTeamList(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<ExportTeamList> logger) : base(services, me, telemetry, logger)
         {
 
         }

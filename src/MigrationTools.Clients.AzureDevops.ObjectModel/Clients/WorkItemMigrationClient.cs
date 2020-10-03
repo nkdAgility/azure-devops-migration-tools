@@ -80,16 +80,20 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
         }
         public override int GetReflectedWorkItemId(WorkItemData workItem)
         {
+            Log.Debug("GetReflectedWorkItemId: START");
             var local = workItem.ToWorkItem();
             if (!local.Fields.Contains(Config.ReflectedWorkItemIDFieldName))
             {
+                Log.Debug("GetReflectedWorkItemId: END - no reflected work item id on work item");
                 return 0;
             }
             string rwiid = local.Fields[Config.ReflectedWorkItemIDFieldName].Value.ToString();
             if (Regex.IsMatch(rwiid, @"(http(s)?://)?([\w-]+\.)+[\w-]+(/[\w- ;,./?%&=]*)?"))
             {
+                Log.Debug("GetReflectedWorkItemId: END - Has ReflectedWorkItemIdField and has value");
                 return int.Parse(rwiid.Substring(rwiid.LastIndexOf(@"/") + 1));
             }
+            Log.Debug("GetReflectedWorkItemId: END - Has ReflectedWorkItemIdField but has no value");
             return 0;
         }
 

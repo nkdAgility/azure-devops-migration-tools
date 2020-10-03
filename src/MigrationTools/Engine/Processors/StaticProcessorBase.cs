@@ -6,6 +6,7 @@ using MigrationTools;
 using Serilog;
 using MigrationTools.Engine.Containers;
 using MigrationTools;
+using Microsoft.Extensions.Logging;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -18,11 +19,12 @@ namespace VstsSyncMigrator.Engine
         public IMigrationEngine Engine { get { return _me; } }
         public IServiceProvider Services { get { return _services; } }
 
-        public StaticProcessorBase(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry)
+        public StaticProcessorBase(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<IProcessor> logger)
         {
             _services = services;
-            _me = me;
+            _me = me; 
             Telemetry = telemetry;
+            Log = logger;
         }
 
         public abstract void Configure(IProcessorConfig config);
@@ -38,6 +40,7 @@ namespace VstsSyncMigrator.Engine
         }
 
         public ITelemetryLogger Telemetry { get; }
+        public ILogger<IProcessor> Log { get; }
 
         public void Execute()
         {
@@ -78,7 +81,7 @@ namespace VstsSyncMigrator.Engine
                       new Dictionary<string, double> {
                             { "ProcessingContextTime", executeTimer.ElapsedMilliseconds }
                       });
-                Log.Fatal(ex, "Processing Context failed.");
+                Log.LogCritical(ex, "Processing Context failed.");
             }
             finally
             {

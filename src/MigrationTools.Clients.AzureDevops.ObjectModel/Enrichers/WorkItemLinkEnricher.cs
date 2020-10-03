@@ -6,25 +6,24 @@ using MigrationTools.Clients.AzureDevops.ObjectModel.Clients;
 using MigrationTools.Clients;
 using MigrationTools.DataContracts;
 using MigrationTools.Exceptions;
-using Serilog;
 using VstsSyncMigrator.Engine;
 using MigrationTools.Enrichers;
+using Microsoft.Extensions.Logging;
 
 namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
 {
-    public class WorkItemLinkEnricher : IWorkItemEnricher
+    public class WorkItemLinkEnricher : WorkItemEnricher
     {
 
         private bool _save = true;
         private bool _filterWorkItemsThatAlreadyExistInTarget = true;
-        public IMigrationEngine Engine { get; }
 
-        public WorkItemLinkEnricher(IMigrationEngine engine)
+        public WorkItemLinkEnricher(IMigrationEngine engine, ILogger<WorkItemLinkEnricher> logger) :base(engine, logger)
         {
-            Engine = engine;
+
         }
 
-        public void Configure(
+        public override void Configure(
             bool save = true,
             bool filterWorkItemsThatAlreadyExistInTarget = true)
         {
@@ -32,7 +31,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             _filterWorkItemsThatAlreadyExistInTarget = filterWorkItemsThatAlreadyExistInTarget;
         }
 
-        public void Enrich(WorkItemData sourceWorkItemLinkStart, WorkItemData targetWorkItemLinkStart)
+        public override int Enrich(WorkItemData sourceWorkItemLinkStart, WorkItemData targetWorkItemLinkStart)
         {
             if (sourceWorkItemLinkStart is null)
             {
@@ -54,7 +53,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                 {
                     try
                     {
-                        Log.Information("Migrating link for {sourceWorkItemLinkStartId} of type {ItemGetTypeName}", sourceWorkItemLinkStart.Id, item.GetType().Name);
+                        Log.LogInformation("Migrating link for {sourceWorkItemLinkStartId} of type {ItemGetTypeName}", sourceWorkItemLinkStart.Id, item.GetType().Name);
                         if (IsHyperlink(item))
                         {
                             CreateHyperlink((Hyperlink)item, targetWorkItemLinkStart);
@@ -75,7 +74,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                         else
                         {
                             UnknownLinkTypeException ex = new UnknownLinkTypeException(string.Format("  [UnknownLinkType] Unable to {0}", item.GetType().Name));
-                            Log.Error(ex, "LinkMigrationContext");
+                            Log.LogError(ex, "LinkMigrationContext");
                             throw ex;
                         }
                     }
@@ -83,13 +82,13 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                     {
                         sourceWorkItemLinkStart.ToWorkItem().Reset();
                         targetWorkItemLinkStart.ToWorkItem().Reset();
-                        Log.Error(ex, "[WorkItemLinkValidationException] Adding link for wiSourceL={sourceWorkItemLinkStartId}", sourceWorkItemLinkStart.Id);
+                        Log.LogError(ex, "[WorkItemLinkValidationException] Adding link for wiSourceL={sourceWorkItemLinkStartId}", sourceWorkItemLinkStart.Id);
                     }
                     catch (FormatException ex)
                     {
                         sourceWorkItemLinkStart.ToWorkItem().Reset();
                         targetWorkItemLinkStart.ToWorkItem().Reset();
-                        Log.Error(ex, "[CREATE-FAIL] Adding Link for wiSourceL={sourceWorkItemLinkStartId}", sourceWorkItemLinkStart.Id);
+                        Log.LogError(ex, "[CREATE-FAIL] Adding Link for wiSourceL={sourceWorkItemLinkStartId}", sourceWorkItemLinkStart.Id);
                     }
                 }
             }
@@ -97,6 +96,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             {
                 MigrateSharedSteps(sourceWorkItemLinkStart, targetWorkItemLinkStart);
             }
+            return 0;
         }
 
         private void MigrateSharedSteps(WorkItemData wiSourceL, WorkItemData wiTargetL)
@@ -137,7 +137,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                          select (ExternalLink)l).SingleOrDefault();
             if (exist == null)
             {
-                Log.Information("Creating new {SourceLinkType} on {TargetId}", sourceLink.GetType().Name, target.Id);
+                Log.LogInformation("Creating new {SourceLinkType} on {TargetId}", sourceLink.GetType().Name, target.Id);
                 ExternalLink el = new ExternalLink(sourceLink.ArtifactLinkType, sourceLink.LinkedArtifactUri);
                 el.Comment = sourceLink.Comment;
                 target.ToWorkItem().Links.Add(el);
@@ -148,7 +148,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             }
             else
             {
-                Log.Information("Link {SourceLinkType} on {TargetId} already exists",
+                Log.LogInformation("Link {SourceLinkType} on {TargetId} already exists",
                                                   sourceLink.GetType().Name, target.Id);
             }
         }
@@ -175,7 +175,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "  [FIND-FAIL] Adding Link of type {0} where wiSourceL={1}, wiTargetL={2} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiTargetL.Id);
+                Log.LogError(ex, "  [FIND-FAIL] Adding Link of type {0} where wiSourceL={1}, wiTargetL={2} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiTargetL.Id);
                 return;
             }
             try
@@ -184,7 +184,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "  [FIND-FAIL] Adding Link of type {0} where wiSourceL={1}, wiTargetL={2} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiTargetL.Id);
+                Log.LogError(ex, "  [FIND-FAIL] Adding Link of type {0} where wiSourceL={1}, wiTargetL={2} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiTargetL.Id);
                 return;
 
             }
@@ -204,7 +204,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                 catch (Exception ex)
                 {
 
-                    Log.Error(ex, "  [SKIP] Unable to migrate links where wiSourceL={0}, wiSourceR={1}, wiTargetL={2}", ((wiSourceL != null) ? wiSourceL.Id.ToString() : "NotFound"), ((wiSourceR != null) ? wiSourceR.Id.ToString() : "NotFound"), ((wiTargetL != null) ? wiTargetL.Id.ToString() : "NotFound"));
+                    Log.LogError(ex, "  [SKIP] Unable to migrate links where wiSourceL={0}, wiSourceR={1}, wiTargetL={2}", ((wiSourceL != null) ? wiSourceL.Id.ToString() : "NotFound"), ((wiSourceR != null) ? wiSourceR.Id.ToString() : "NotFound"), ((wiTargetL != null) ? wiTargetL.Id.ToString() : "NotFound"));
                     return;
                 }
 
@@ -212,7 +212,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                 {
                     if (wiSourceR.Id != wiTargetR.Id)
                     {
-                        Log.Information("  [CREATE-START] Adding Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id);
+                        Log.LogInformation("  [CREATE-START] Adding Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id);
                         WorkItemLinkTypeEnd linkTypeEnd = ((WorkItemMigrationClient)Engine.Target.WorkItems).Store.WorkItemLinkTypes.LinkTypeEnds[rl.LinkTypeEnd.ImmutableName];
                         RelatedLink newRl = new RelatedLink(linkTypeEnd, int.Parse(wiTargetR.Id));
                         if (linkTypeEnd.ImmutableName == "System.LinkTypes.Hierarchy-Forward")
@@ -253,14 +253,14 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                                 wiTargetL.SaveToAzureDevOps();
                             }
                         }
-                        Log.Information(
+                        Log.LogInformation(
                                 "  [CREATE-SUCCESS] Adding Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} ",
                                 rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id);
 
                     }
                     else
                     {
-                        Log.Information(
+                        Log.LogInformation(
                                   "  [SKIP] Unable to migrate link where Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} as target WI has not been migrated",
                                   rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id);
                     }
@@ -269,17 +269,17 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                 {
                     if (IsExisting)
                     {
-                        Log.Information("  [SKIP] Already Exists a Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id);
+                        Log.LogInformation("  [SKIP] Already Exists a Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id);
                     }
                     if (wiTargetR.ToWorkItem().IsAccessDenied)
                     {
-                        Log.Information("  [AccessDenied] The Target  work item is inaccessable to create a Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id);
+                        Log.LogInformation("  [AccessDenied] The Target  work item is inaccessable to create a Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id);
                     }
                 }
             }
             else
             {
-                Log.Information("  [SKIP] Cant find wiTargetR where wiSourceL={0}, wiSourceR={1}, wiTargetL={2}", wiSourceL.Id, wiSourceR.Id, wiTargetL.Id);
+                Log.LogInformation("  [SKIP] Cant find wiTargetR where wiSourceL={0}, wiSourceR={1}, wiTargetL={2}", wiSourceL.Id, wiSourceR.Id, wiTargetL.Id);
             }
         }
 
@@ -335,7 +335,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             {
                 if (targetWorkItemLinkStart.ToWorkItem().Links.Count == sourceWorkItemLinkStart.ToWorkItem().Links.Count) // we should never have this as the target should not have existed in this path
                 {
-                    Log.Information("[SKIP] Source and Target have same number of links  {sourceWorkItemLinkStartId} - {sourceWorkItemLinkStartType}", sourceWorkItemLinkStart.Id, sourceWorkItemLinkStart.Type.ToString());
+                    Log.LogInformation("[SKIP] Source and Target have same number of links  {sourceWorkItemLinkStartId} - {sourceWorkItemLinkStartType}", sourceWorkItemLinkStart.Id, sourceWorkItemLinkStart.Type.ToString());
                     return false;
                 }
             }

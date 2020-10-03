@@ -11,6 +11,8 @@ using MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers;
 using System.Collections.Generic;
 using MigrationTools.DataContracts;
 using MigrationTools.Clients.AzureDevops.ObjectModel;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -19,10 +21,9 @@ namespace VstsSyncMigrator.Engine
         private FixGitCommitLinksConfig _config;
         private GitRepositoryEnricher _GitRepositoryEnricher;
 
-        public FixGitCommitLinks(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry) : base(services, me, telemetry)
+        public FixGitCommitLinks(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<FixGitCommitLinks> logger) : base(services, me, telemetry, logger)
         {
-
-           
+            Logger = logger;
         }
 
         public override string Name
@@ -33,10 +34,12 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
+        public ILogger<FixGitCommitLinks> Logger { get; }
+
         public override void Configure(IProcessorConfig config)
         {
             _config = (FixGitCommitLinksConfig)config;
-            _GitRepositoryEnricher = new GitRepositoryEnricher(Engine);
+            _GitRepositoryEnricher = Services.GetRequiredService<GitRepositoryEnricher>();
         }
 
         protected override void InternalExecute()
@@ -62,7 +65,7 @@ namespace VstsSyncMigrator.Engine
                 Stopwatch witstopwatch = Stopwatch.StartNew();
 				workitem.ToWorkItem().Open();
 
-                _GitRepositoryEnricher.FixExternalLinks(workitem, Engine.Target.WorkItems, null);
+                _GitRepositoryEnricher.Enrich(null, workitem);
 
                 if (workitem.ToWorkItem().IsDirty)
                 {

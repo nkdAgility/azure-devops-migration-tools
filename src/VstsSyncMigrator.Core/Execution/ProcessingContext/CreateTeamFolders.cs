@@ -14,6 +14,7 @@ using MigrationTools;
 using MigrationTools.Clients;
 using MigrationTools;
 using MigrationTools.Clients.AzureDevops.ObjectModel.Clients;
+using Microsoft.Extensions.Logging;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -21,7 +22,7 @@ namespace VstsSyncMigrator.Engine
     {
 
 
-        public CreateTeamFolders(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry) : base(services, me, telemetry)
+        public CreateTeamFolders(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<CreateTeamFolders> logger) : base(services, me, telemetry, logger)
         {
          
         }

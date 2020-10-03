@@ -13,19 +13,41 @@ using System.Threading.Tasks;
 using MigrationTools.Configuration.Processing;
 using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
+using Serilog;
+using Microsoft.Extensions.Logging;
 
 namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
 {
    public class EmbededImagesRepairEnricher : EmbededImagesRepairEnricherBase
     {
 
+
+        public EmbededImagesRepairEnricher(IMigrationEngine engine, ILogger<EmbededImagesRepairEnricher> logger) : base(engine, logger)
+        {
+
+        }
+
+
+        public override void Configure(bool save = true, bool filter = true)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
+        {
+
+            FixEmbededImages(targetWorkItem, Engine.Source.Config.Collection.ToString(), Engine.Target.Config.Collection.ToString(), Engine.Source.Config.PersonalAccessToken);
+            return 0;
+        }
+
+
+
         /**
       *  from https://gist.github.com/pietergheysens/792ed505f09557e77ddfc1b83531e4fb
       */
-        public override void FixEmbededImages(WorkItemData wi, string oldTfsurl, string newTfsurl, string sourcePersonalAccessToken = "")
+        protected override void FixEmbededImages(WorkItemData wi, string oldTfsurl, string newTfsurl, string sourcePersonalAccessToken = "")
         {
-
-            Debug.WriteLine($"Searching for urls: {oldTfsurl} and {GetUrlWithOppositeSchema(oldTfsurl)}");
+            Log.LogInformation("EmbededImagesRepairEnricher: Fixing HTML field attachemtnts for work item {Id} from {OldTfsurl} to {NewTfsUrl}", wi.Id, oldTfsurl, GetUrlWithOppositeSchema(oldTfsurl));
             bool wiUpdated = false;
             bool hasCandidates = false;
 
@@ -47,7 +69,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                             Match newFileNameMatch = Regex.Match(match.Value, regExSearchFileName, RegexOptions.IgnoreCase);
                             if (newFileNameMatch.Success)
                             {
-                                Trace.WriteLine($"field '{field.Name}' has match: {System.Net.WebUtility.HtmlDecode(match.Value)}");
+                                Log.LogDebug("EmbededImagesRepairEnricher: field '{fieldName}' has match: {matchValue}", field.Name, System.Net.WebUtility.HtmlDecode(match.Value));
                                 string fullImageFilePath = Path.GetTempPath() + newFileNameMatch.Value;
 
                                 using (var httpClient = new HttpClient(_httpClientHandler, false))
@@ -61,7 +83,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                                     {
                                         if (_ignore404Errors && result.StatusCode == HttpStatusCode.NotFound)
                                         {
-                                            Trace.WriteLine($"Image {match.Value} could not be found in WorkItem {wi.ToWorkItem().Id}, Field {field.Name}");
+                                            Log.LogDebug("EmbededImagesRepairEnricher: Image {MatchValue} could not be found in WorkItem {WorkItemId}, Field {FieldName}", match.Value, wi.Id, field.Name);
                                             continue;
                                         }
                                         else

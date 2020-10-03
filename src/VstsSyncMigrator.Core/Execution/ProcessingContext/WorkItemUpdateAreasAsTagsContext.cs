@@ -15,6 +15,7 @@ using MigrationTools.Clients;
 using Microsoft.Extensions.DependencyInjection;
 using MigrationTools.DataContracts;
 using MigrationTools.Clients.AzureDevops.ObjectModel;
+using Microsoft.Extensions.Logging;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -23,7 +24,7 @@ namespace VstsSyncMigrator.Engine
 
         WorkItemUpdateAreasAsTagsConfig config;
 
-        public WorkItemUpdateAreasAsTagsContext(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry) : base(services, me, telemetry)
+        public WorkItemUpdateAreasAsTagsContext(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<WorkItemUpdateAreasAsTagsContext> logger) : base(services, me, telemetry, logger)
         {
         }
 

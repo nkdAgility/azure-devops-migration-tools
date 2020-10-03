@@ -13,15 +13,19 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using VstsSyncMigrator.Engine;
+using MigrationTools.Enrichers;
+using Microsoft.Extensions.Logging;
 
 namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
 {
-    public class GitRepositoryEnricher
+    public class GitRepositoryEnricher : WorkItemEnricher
     {
-        IMigrationEngine migrationEngine;
+        IMigrationEngine _Engine;
+        private readonly ILogger<GitRepositoryEnricher> _Logger;
+        bool _save = true;
+        bool _filter = true;
         GitRepositoryService sourceRepoService;
         IList<GitRepository> sourceRepos;
         IList<GitRepository> allSourceRepos;
@@ -30,15 +34,17 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
         IList<GitRepository> allTargetRepos;
         List<string> gitWits;
 
-        public GitRepositoryEnricher(IMigrationEngine me)
+        public GitRepositoryEnricher(IMigrationEngine engine, ILogger<GitRepositoryEnricher> logger) :base(engine, logger)
         {
-            migrationEngine = me;
-            sourceRepoService = me.Source.GetService<GitRepositoryService>();
-            sourceRepos = sourceRepoService.QueryRepositories(me.Source.Config.Project);
+            _Engine = engine ?? throw new ArgumentNullException(nameof(engine));
+            _Logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+            sourceRepoService = engine.Source.GetService<GitRepositoryService>();
+            sourceRepos = sourceRepoService.QueryRepositories(engine.Source.Config.Project);
             allSourceRepos = sourceRepoService.QueryRepositories("");
             //////////////////////////////////////////////////
-            targetRepoService = me.Target.GetService<GitRepositoryService>();
-            targetRepos = targetRepoService.QueryRepositories(me.Target.Config.Project);
+            targetRepoService = engine.Target.GetService<GitRepositoryService>();
+            targetRepos = targetRepoService.QueryRepositories(engine.Target.Config.Project);
             allTargetRepos = targetRepoService.QueryRepositories("");
             gitWits = new List<string>
                 {
@@ -49,8 +55,26 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                 };
         }
 
-        public int FixExternalLinks(WorkItemData targetWorkItem, IWorkItemMigrationClient targetStore, WorkItemData sourceWorkItem, bool save = true)
+
+        public override void Configure(bool save = true, bool filter = true)
         {
+            _filter = filter;
+            _save = save;
+        }
+
+        public override int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
+        {
+            if (sourceWorkItem is null)
+            {
+                throw new ArgumentNullException(nameof(sourceWorkItem));
+            }
+
+            if (targetWorkItem is null)
+            {
+                throw new ArgumentNullException(nameof(targetWorkItem));
+            }
+
+            Log.LogInformation("GitRepositoryEnricher: Enriching {Id} To fix Git Repo Links", targetWorkItem.Id);
             List<ExternalLink> newEL = new List<ExternalLink>();
             List<ExternalLink> removeEL = new List<ExternalLink>();
             int count = 0;
@@ -60,7 +84,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                 {
                     ExternalLink el = (ExternalLink)l;
 
-                    GitRepositoryInfo sourceRepoInfo = GitRepositoryInfo.Create(el, sourceRepos, migrationEngine, sourceWorkItem?.ProjectName);
+                    GitRepositoryInfo sourceRepoInfo = GitRepositoryInfo.Create(el, sourceRepos, Engine, sourceWorkItem?.ProjectName);
                     
                     // if sourceRepo is null ignore this link and keep processing further links
                     if (sourceRepoInfo == null) 
@@ -71,29 +95,29 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                     // if repo was not found in source project, try to find it by repoId in the whole project collection
                     if (sourceRepoInfo.GitRepo == null)
                     {
-                        var anyProjectSourceRepoInfo = GitRepositoryInfo.Create(el, allSourceRepos, migrationEngine, sourceWorkItem?.ProjectName);
+                        var anyProjectSourceRepoInfo = GitRepositoryInfo.Create(el, allSourceRepos, Engine, sourceWorkItem?.ProjectName);
                         // if repo is found in a different project and the repo Name is listed in repo mappings, use it
-                        if (anyProjectSourceRepoInfo.GitRepo != null && migrationEngine.GitRepoMaps.Items.ContainsKey(anyProjectSourceRepoInfo.GitRepo.Name))
+                        if (anyProjectSourceRepoInfo.GitRepo != null && Engine.GitRepoMaps.Items.ContainsKey(anyProjectSourceRepoInfo.GitRepo.Name))
                         {
                             sourceRepoInfo = anyProjectSourceRepoInfo;
                         }
                         else
                         {
-                            Trace.WriteLine($"FAIL could not find source git repo - repo referenced: {anyProjectSourceRepoInfo?.GitRepo?.ProjectReference?.Name}/{anyProjectSourceRepoInfo?.GitRepo?.Name}");
+                            Log.LogWarning("GitRepositoryEnricher: Could not find source git repo - repo referenced: {SourceRepoName}/{TargetRepoName}", anyProjectSourceRepoInfo?.GitRepo?.ProjectReference?.Name, anyProjectSourceRepoInfo?.GitRepo?.Name);
                         }
                     }
 
                     if (sourceRepoInfo.GitRepo != null)
                     {
-                        string targetRepoName = GetTargetRepoName(migrationEngine.GitRepoMaps.Items, sourceRepoInfo);
-                        string sourceProjectName = sourceRepoInfo?.GitRepo?.ProjectReference?.Name ?? migrationEngine.Target.Config.Project;
-                        string targetProjectName = migrationEngine.Target.Config.Project;
+                        string targetRepoName = GetTargetRepoName(Engine.GitRepoMaps.Items, sourceRepoInfo);
+                        string sourceProjectName = sourceRepoInfo?.GitRepo?.ProjectReference?.Name ?? Engine.Target.Config.Project;
+                        string targetProjectName = Engine.Target.Config.Project;
 
                         GitRepositoryInfo targetRepoInfo = GitRepositoryInfo.Create(targetRepoName, sourceRepoInfo, targetRepos);
                         // if repo was not found in the target project, try to find it in the whole target project collection
                         if (targetRepoInfo.GitRepo == null)
                         {
-                            if (migrationEngine.GitRepoMaps.Items.Values.Contains(targetRepoName))
+                            if (Engine.GitRepoMaps.Items.Values.Contains(targetRepoName))
                             {
                                 var anyTargetRepoInCollectionInfo = GitRepositoryInfo.Create(targetRepoName, sourceRepoInfo, allTargetRepos);
                                 if (anyTargetRepoInCollectionInfo.GitRepo != null)
@@ -106,20 +130,20 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                         // Fix commit links if target repo has been found
                         if (targetRepoInfo.GitRepo != null)
                         {
-                            Trace.WriteLine($"Fixing {sourceRepoInfo.GitRepo.RemoteUrl} to {targetRepoInfo.GitRepo.RemoteUrl}?");
+                            Log.LogDebug("GitRepositoryEnricher: Fixing {SourceRepoUrl} to {TargetRepoUrl}?", sourceRepoInfo.GitRepo.RemoteUrl, targetRepoInfo.GitRepo.RemoteUrl);
 
                             // Create External Link object
                             ExternalLink newLink = null;
                             switch (l.ArtifactLinkType.Name)
                             {
                                 case "Branch":
-                                    newLink = new ExternalLink(((WorkItemMigrationClient)targetStore).Store.RegisteredLinkTypes[ArtifactLinkIds.Branch],
+                                    newLink = new ExternalLink(((WorkItemMigrationClient)Engine.Target.WorkItems).Store.RegisteredLinkTypes[ArtifactLinkIds.Branch],
                                         $"vstfs:///git/ref/{targetRepoInfo.GitRepo.ProjectReference.Id}%2f{targetRepoInfo.GitRepo.Id}%2f{sourceRepoInfo.CommitID}");
                                     break;
 
                                 case "Fixed in Changeset":  // TFVC
                                 case "Fixed in Commit":
-                                    newLink = new ExternalLink(((WorkItemMigrationClient)targetStore).Store.RegisteredLinkTypes[ArtifactLinkIds.Commit],
+                                    newLink = new ExternalLink(((WorkItemMigrationClient)Engine.Target.WorkItems).Store.RegisteredLinkTypes[ArtifactLinkIds.Commit],
                                         $"vstfs:///git/commit/{targetRepoInfo.GitRepo.ProjectReference.Id}%2f{targetRepoInfo.GitRepo.Id}%2f{sourceRepoInfo.CommitID}");
                                     break;
                                 case "Pull Request":
@@ -129,7 +153,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                                     break;
 
                                 default:
-                                    Trace.WriteLine(String.Format("Skipping unsupported link type {0}", l.ArtifactLinkType.Name));
+                                    Log.LogWarning("Skipping unsupported link type {0}", l.ArtifactLinkType.Name);
                                     break;
                             }
 
@@ -151,7 +175,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                         }
                         else
                         {
-                            Trace.WriteLine($"FAIL: cannot map {sourceRepoInfo.GitRepo.RemoteUrl} to ???");
+                            Log.LogWarning("GitRepositoryEnricher: Target Repo not found. Cannot map {SourceRepoUrl} to ???", sourceRepoInfo.GitRepo.RemoteUrl);
                         }
                     }
                 }
@@ -161,7 +185,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             {
                 try
                 {
-                    Trace.WriteLine("Adding " + eln.LinkedArtifactUri);
+                    Log.LogDebug("GitRepositoryEnricher: Adding {LinkedArtifactUri} ", eln.LinkedArtifactUri);
                     targetWorkItem.ToWorkItem().Links.Add(eln);
 
                 }
@@ -177,7 +201,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                 {
                     try
                     {
-                        Trace.WriteLine("Removing " + elr.LinkedArtifactUri);
+                        Log.LogDebug("GitRepositoryEnricher: Removing {LinkedArtifactUri} ", elr.LinkedArtifactUri);
                         targetWorkItem.ToWorkItem().Links.Remove(elr);
                         count++;
                     }
@@ -190,14 +214,13 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
 
             }
 
-            if (targetWorkItem.ToWorkItem().IsDirty && save)
+            if (targetWorkItem.ToWorkItem().IsDirty && _save)
             {
-                Trace.WriteLine($"Saving {targetWorkItem.Id}");
+                Log.LogDebug("GitRepositoryEnricher: Saving {TargetWorkItemId}", targetWorkItem.Id);
                 targetWorkItem.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
                 targetWorkItem.SaveToAzureDevOps();
             }
             return count;
-
         }
 
         private string GetTargetRepoName(ReadOnlyDictionary<string, string> gitRepoMappings, GitRepositoryInfo repoInfo)
@@ -210,124 +233,6 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             {
                 return repoInfo.GitRepo.Name;
             }
-        }
-    }
-
-    public class GitRepositoryInfo
-    {
-        public string CommitID { get; }
-        public string RepoID { get; }
-        public GitRepository GitRepo { get; }
-
-        public GitRepositoryInfo(string CommitID, string RepoID, GitRepository GitRepo)
-        {
-            this.CommitID = CommitID;
-            this.RepoID = RepoID;
-            this.GitRepo = GitRepo;
-        }
-
-        public static GitRepositoryInfo Create(ExternalLink gitExternalLink, IList<GitRepository> possibleRepos, IMigrationEngine migrationEngine, string workItemSourceProjectName)
-        {
-            var repoType = DetermineFromLink(gitExternalLink.LinkedArtifactUri);
-            switch (repoType)
-            {
-                case RepistoryType.Git:
-                    return CreateFromGit(gitExternalLink, possibleRepos);
-
-                case RepistoryType.TFVC:
-                    return CreateFromTFVC(gitExternalLink, possibleRepos, migrationEngine.ChangeSetMapps.Items, migrationEngine.Source.Config.Project, workItemSourceProjectName);
-            }
-
-            return null;
-        }
-
-        private static GitRepositoryInfo CreateFromTFVC(ExternalLink gitExternalLink, IList<GitRepository> possibleRepos, ReadOnlyDictionary<int, string> changesetMapping, string sourceProjectName, string workItemSourceProjectName)
-        {
-            string commitID;
-            string repoID;
-            GitRepository gitRepo;
-
-            //vstfs:///VersionControl/Changeset/{id}
-            var changeSetIdPart = gitExternalLink.LinkedArtifactUri.Substring(gitExternalLink.LinkedArtifactUri.LastIndexOf('/') + 1);
-            if (!int.TryParse(changeSetIdPart, out int changeSetId))
-            {
-                return null;
-            }
-
-            var commitIDKvPair = changesetMapping.FirstOrDefault(item => item.Key == changeSetId);
-            if (string.IsNullOrEmpty(commitIDKvPair.Value))
-            {
-                Trace.WriteLine($"Commit Id not found from Changeset Id {changeSetIdPart}.");
-                return null;
-            }
-
-            //assume the GitRepository source name is the work items project name, which changeset links needs to be fixed
-            return new GitRepositoryInfo(commitIDKvPair.Value, null, new GitRepository() { Name = workItemSourceProjectName });
-        }
-
-        private enum RepistoryType
-        {
-            Unknown,
-            TFVC,
-            Git
-        }
-
-        private static RepistoryType DetermineFromLink(string link)
-        {
-            if (string.IsNullOrEmpty(link))
-                throw new ArgumentNullException("link");
-
-            //vstfs:///Git/Commit/25f94570-e3e7-4b79-ad19-4b434787fd5a%2f50477259-3058-4dff-ba4c-e8c179ec5327%2f41dd2754058348d72a6417c0615c2543b9b55535
-            //vstfs:///Git/PullRequestId/
-            //ToDo: check only for "git" ?
-            if (link.ToLowerInvariant().Contains("git/commit")
-                || link.ToLowerInvariant().Contains("git/pullrequestid")
-                || link.ToLowerInvariant().Contains("git/ref"))
-                return RepistoryType.Git;
-
-            //vstfs:///VersionControl/Changeset/{id}
-            if (link.ToLowerInvariant().Contains("versioncontrol/changeset"))
-                return RepistoryType.TFVC;
-
-            Trace.WriteLine($"Cannot determine repository type from external link: {link}");
-
-            return RepistoryType.Unknown;
-        }
-
-        public static GitRepositoryInfo CreateFromGit(ExternalLink gitExternalLink, IList<GitRepository> possibleRepos)
-        {
-            string commitID;
-            string repoID;
-            GitRepository gitRepo;
-            //vstfs:///Git/Commit/25f94570-e3e7-4b79-ad19-4b434787fd5a%2f50477259-3058-4dff-ba4c-e8c179ec5327%2f41dd2754058348d72a6417c0615c2543b9b55535
-            string guidbits = gitExternalLink.LinkedArtifactUri.Substring(gitExternalLink.LinkedArtifactUri.LastIndexOf('/') + 1);
-            string[] bits = Regex.Split(guidbits, "%2f", RegexOptions.IgnoreCase);
-            repoID = bits[1];
-            if (bits.Count() >= 3)
-            {
-                commitID = $"{bits[2]}";
-                for (int i = 3; i < bits.Count(); i++)
-                {
-                    commitID += $"%2f{bits[i]}";
-                }
-            }
-            else
-            {
-                commitID = bits[2];
-            }
-            gitRepo =
-                (from g in possibleRepos where g.Id.ToString() == repoID select g)
-                .SingleOrDefault();
-            return new GitRepositoryInfo(commitID, repoID, gitRepo);
-        }
-
-        internal static GitRepositoryInfo Create(string targetRepoName, GitRepositoryInfo sourceRepoInfo, IList<GitRepository> targetRepos)
-        {
-            var gitRepo = (from g in targetRepos
-                           where
-                               g.Name == targetRepoName
-                           select g).SingleOrDefault();
-            return new GitRepositoryInfo(sourceRepoInfo.CommitID, gitRepo?.Id.ToString(), gitRepo);
         }
     }
 }
