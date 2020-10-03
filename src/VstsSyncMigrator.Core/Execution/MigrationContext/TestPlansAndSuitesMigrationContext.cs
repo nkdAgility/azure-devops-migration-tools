@@ -762,7 +762,7 @@ namespace VstsSyncMigrator.Engine
                             }
 
                             // Create a test point assignment with target test case id, target configuration (id and name) and target identity
-                            var newAssignment = targetSuite.CreateTestPointAssignment(
+                            var newAssignment = targetSuite?.CreateTestPointAssignment(
                                 int.Parse(targetTc.Id),
                                 targetConfiguration,
                                 targetUserId);
@@ -779,7 +779,7 @@ namespace VstsSyncMigrator.Engine
             }
 
             // assign the list to the suite
-            targetSuite.AssignTestPoints(assignmentsToAdd);
+            targetSuite?.AssignTestPoints(assignmentsToAdd);
         }
 
         /// <summary>
