@@ -13,7 +13,7 @@ namespace MigrationTools.Engine.Containers
 {
    public class FieldMapContainer : EngineContainer<Dictionary<string, List<IFieldMap>>>
     {
-       public  Dictionary<string, List<IFieldMap>> fieldMapps = new Dictionary<string, List<IFieldMap>>();
+       private  Dictionary<string, List<IFieldMap>> fieldMapps = new Dictionary<string, List<IFieldMap>>();
 
         public FieldMapContainer(IServiceProvider services, EngineConfiguration config) : base(services, config)
         {

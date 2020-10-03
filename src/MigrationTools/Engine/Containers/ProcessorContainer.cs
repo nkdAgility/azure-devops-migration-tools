@@ -13,8 +13,8 @@ namespace MigrationTools.Engine.Containers
 {
     public class ProcessorContainer : EngineContainer<ReadOnlyCollection<IProcessor>>
     {
-        
-        List<IProcessor> _Processors = new List<IProcessor>();
+
+        private List<IProcessor> _Processors = new List<IProcessor>();
         public override ReadOnlyCollection<IProcessor> Items { get {
                 EnsureConfigured();
                 return _Processors.AsReadOnly();
