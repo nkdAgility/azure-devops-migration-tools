@@ -29,7 +29,7 @@ You can now customise the configuration depending on what you need to do. Howeve
 ```
 {
   "Version": "0.0",
-  "TelemetryEnableTrace": false,
+  "LogLevel": "Information",
   "workaroundForQuerySOAPBugEnabled": false,
   "Source": {
     "Collection": "https://dev.azure.com/nkdagility-preview/",

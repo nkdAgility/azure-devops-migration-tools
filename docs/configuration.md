@@ -21,7 +21,7 @@ The global configuration created by the `init` command look like this:
 ```json
 {
   "Version": "8.4",
-  "TelemetryEnableTrace": false,
+  "LogLevel": "Information",
   "workaroundForQuerySOAPBugEnabled": false,
   "Source": {
     "Collection": "https://dev.azure.com/psd45",
