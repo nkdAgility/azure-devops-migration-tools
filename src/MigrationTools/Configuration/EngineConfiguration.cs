@@ -42,6 +42,7 @@ namespace MigrationTools.Configuration
             _engineConfiguration = engineConfigurationBuilder.BuildFromFile(opts.ConfigFile);
         }
     }
+
     public class EngineConfiguration
     {
         public virtual string Version { get; set; }

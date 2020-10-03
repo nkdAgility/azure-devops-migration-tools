@@ -16,7 +16,6 @@ namespace VstsSyncMigrator.Engine
 {
     public class WorkItemPostProcessingContext : MigrationProcessorBase
     {
-
         private WorkItemPostProcessingConfig _config;
         //private IList<string> _workItemTypes;
         //private IList<int> _workItemIDs;
@@ -38,6 +37,7 @@ namespace VstsSyncMigrator.Engine
                 return "WorkItemPostProcessingContext";
             }
         }
+
         //public WorkItemPostProcessingContext(MigrationEngine me, WorkItemPostProcessingConfig config, IList<string> wiTypes) : this(me, config)
         //{
         //    _workItemTypes = wiTypes;
@@ -68,7 +68,6 @@ namespace VstsSyncMigrator.Engine
             ProjectData destProject = Engine.Target.WorkItems.GetProject();
             Trace.WriteLine(string.Format("Found target project as {0}", destProject.Name));
 
-
             int current = sourceWIS.Count;
             int count = 0;
             long elapsedms = 0;
@@ -96,10 +95,8 @@ namespace VstsSyncMigrator.Engine
                         }
                         catch (ValidationException ve)
                         {
-
                             Trace.WriteLine(string.Format("          [FAILED] {0}", ve.ToString()));
                         }
-
                     }
                     else
                     {
@@ -147,7 +144,6 @@ namespace VstsSyncMigrator.Engine
                     constraints += string.Format(" AND [System.WorkItemType] IN ('{0}') ", string.Join("','", Engine.TypeDefinitionMaps.Items.Keys));
                 }
             }
-
 
             if (!String.IsNullOrEmpty(_config.WIQLQueryBit))
             {

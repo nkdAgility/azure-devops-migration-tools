@@ -9,10 +9,8 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
 {
     public class MultiValueConditionalMap : FieldMapBase
     {
-
         public MultiValueConditionalMap(ILogger<MultiValueConditionalMap> logger) : base(logger)
         {
-
         }
 
         private MultiValueConditionalMapConfig Config { get { return (MultiValueConditionalMapConfig)_Config; } }
@@ -73,7 +71,5 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
             }
             return exists;
         }
-
-
     }
 }

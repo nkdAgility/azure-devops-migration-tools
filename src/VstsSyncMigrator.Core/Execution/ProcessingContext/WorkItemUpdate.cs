@@ -12,11 +12,10 @@ namespace VstsSyncMigrator.Engine
 {
     public class WorkItemUpdate : StaticProcessorBase
     {
-        WorkItemUpdateConfig _config;
+        private WorkItemUpdateConfig _config;
 
         public WorkItemUpdate(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<WorkItemUpdate> logger) : base(services, me, telemetry, logger)
         {
-
         }
 
         public override void Configure(IProcessorConfig config)
@@ -63,21 +62,16 @@ namespace VstsSyncMigrator.Engine
                             System.Threading.Thread.Sleep(5000);
                             workitem.SaveToAzureDevOps();
                         }
-
                     }
                     else
                     {
                         Trace.WriteLine("No save done: (What IF: enabled)");
                     }
-
                 }
                 else
                 {
                     Trace.WriteLine("No save done: (IsDirty: false)");
                 }
-
-
-
 
                 witstopwatch.Stop();
                 elapsedms = elapsedms + witstopwatch.ElapsedMilliseconds;
@@ -91,6 +85,5 @@ namespace VstsSyncMigrator.Engine
             stopwatch.Stop();
             Console.WriteLine(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds", stopwatch.Elapsed);
         }
-
     }
 }

@@ -23,7 +23,6 @@ namespace VstsSyncMigrator.Engine
 
         public TestConfigurationsMigrationContext(IMigrationEngine me, IServiceProvider services, ITelemetryLogger telemetry) : base(me, services, telemetry)
         {
-
         }
 
         protected override void InternalExecute()
@@ -75,7 +74,6 @@ namespace VstsSyncMigrator.Engine
 
         public override void Configure(IProcessorConfig config)
         {
-
         }
     }
 }

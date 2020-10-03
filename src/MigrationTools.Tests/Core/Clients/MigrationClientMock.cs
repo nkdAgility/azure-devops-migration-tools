@@ -7,7 +7,7 @@ namespace MigrationTools.Tests.Core.Clients
 {
     public class MigrationClientMock : IMigrationClient
     {
-        IWorkItemMigrationClient workItemMigrationClient;
+        private IWorkItemMigrationClient workItemMigrationClient;
 
         public MigrationClientMock(IWorkItemMigrationClient workItemMigrationClient)
         {
@@ -24,13 +24,11 @@ namespace MigrationTools.Tests.Core.Clients
 
         public void Configure(TeamProjectConfig config, NetworkCredential credentials = null)
         {
-
         }
 
         public T GetService<T>()
         {
             return default(T);
         }
-
     }
 }

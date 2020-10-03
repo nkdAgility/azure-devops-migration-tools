@@ -10,7 +10,6 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
     {
         public FieldValueMap(ILogger<FieldValueMap> logger) : base(logger)
         {
-
         }
 
         private FieldValueMapConfig Config { get { return (FieldValueMapConfig)_Config; } }

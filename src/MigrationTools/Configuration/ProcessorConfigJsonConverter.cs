@@ -29,5 +29,3 @@ namespace MigrationTools.Configuration
         }
     }
 }
-
-

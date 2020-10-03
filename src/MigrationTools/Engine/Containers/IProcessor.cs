@@ -6,7 +6,9 @@ namespace MigrationTools.Engine.Containers
     {
         string Name { get; }
         ProcessingStatus Status { get; }
+
         void Execute();
+
         void Configure(IProcessorConfig config);
     }
 }

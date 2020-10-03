@@ -153,7 +153,6 @@ namespace VstsSyncMigrator.Engine
                     }
                 }
             }
-
         }
 
         /// <summary>
@@ -162,7 +161,7 @@ namespace VstsSyncMigrator.Engine
         /// <param name="targetHierarchy">The object that represents the whole of the target query tree</param>
         /// <param name="query">Query Definition - Contains the Query Details</param>
         /// <param name="QueryFolder">Parent Folder</param>
-        void MigrateQuery(QueryHierarchy targetHierarchy, QueryDefinition query, QueryFolder parentFolder)
+        private void MigrateQuery(QueryHierarchy targetHierarchy, QueryDefinition query, QueryFolder parentFolder)
         {
             if (parentFolder.FirstOrDefault(q => q.Name == query.Name) != null)
             {
@@ -209,6 +208,5 @@ namespace VstsSyncMigrator.Engine
                 }
             }
         }
-
     }
 }

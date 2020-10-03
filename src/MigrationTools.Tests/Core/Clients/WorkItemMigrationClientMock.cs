@@ -7,7 +7,7 @@ namespace MigrationTools.Clients.Tests
 {
     internal class WorkItemMigrationClientMock : IWorkItemMigrationClient
     {
-        List<WorkItemData> list = new List<WorkItemData>();
+        private List<WorkItemData> list = new List<WorkItemData>();
 
         public TeamProjectConfig Config => throw new System.NotImplementedException();
 
@@ -15,7 +15,6 @@ namespace MigrationTools.Clients.Tests
 
         public void Configure(IMigrationClient migrationClient, bool bypassRules = true)
         {
-
         }
 
         public List<WorkItemData> GetWorkItems()
@@ -26,7 +25,6 @@ namespace MigrationTools.Clients.Tests
             }
             return list;
         }
-
 
         public WorkItemData PersistWorkItem(WorkItemData workItem)
         {

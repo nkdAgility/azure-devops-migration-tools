@@ -26,7 +26,6 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
 
         public WorkItemMigrationClient(IServiceProvider services, ITelemetryLogger telemetry) : base(services, telemetry)
         {
-
         }
 
         public override void InnerConfigure(IMigrationClient migrationClient, bool bypassRules = true)
@@ -36,7 +35,6 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
             _wistore = new WorkItemStore(MigrationClient.Config.Collection.ToString(), _bypassRules);
             _project = migrationClient.WorkItems.GetProject();
         }
-
 
         public override List<WorkItemData> GetWorkItems()
         {
@@ -49,12 +47,12 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
             wiqb.Query = WIQLQuery;
             return GetWorkItems(wiqb);
         }
+
         public override List<WorkItemData> GetWorkItems(IWorkItemQueryBuilder queryBuilder)
         {
             queryBuilder.AddParameter("TeamProject", MigrationClient.Config.Project);
             return queryBuilder.BuildWIQLQuery(MigrationClient).GetWorkItems();
         }
-
 
         public override WorkItemData PersistWorkItem(WorkItemData workItem)
         {
@@ -63,7 +61,6 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
 
         public override ProjectData GetProject()
         {
-
             Project y = (from Project x in Store.Projects where x.Name.ToUpper() == MigrationClient.Config.Project.ToUpper() select x).SingleOrDefault();
             return y.ToProjectData();
         }
@@ -72,8 +69,8 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
         {
             var wi = workItem.ToWorkItem();
             return string.Format("{0}/{1}/_workitems/edit/{2}", wi.Store.TeamProjectCollection.Uri.ToString().TrimEnd('/'), wi.Project.Name, wi.Id);
-
         }
+
         public override int GetReflectedWorkItemId(WorkItemData workItem)
         {
             Log.Debug("GetReflectedWorkItemId: START");
@@ -227,7 +224,6 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
         {
             return Store.GetWorkItem(int.Parse(workItem.Id), revision).AsWorkItemData();
         }
-
 
         public override WorkItemData GetWorkItem(string id)
         {

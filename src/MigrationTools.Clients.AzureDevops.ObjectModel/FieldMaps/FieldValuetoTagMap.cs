@@ -9,20 +9,19 @@ using MigrationTools.Configuration.FieldMap;
 
 namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
 {
-
     public class FieldValuetoTagMap : FieldMapBase
     {
-
         public FieldValuetoTagMap(ILogger<FieldValuetoTagMap> logger) : base(logger)
         {
-
         }
+
         private FieldValuetoTagMapConfig Config { get { return (FieldValuetoTagMapConfig)_Config; } }
 
         public override void Configure(IFieldMapConfig config)
         {
             base.Configure(config);
         }
+
         public override string MappingDisplayName => $"{Config.sourceField}";
 
         internal override void InternalExecute(WorkItem source, WorkItem target)
@@ -70,5 +69,4 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
             }
         }
     }
-
 }

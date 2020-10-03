@@ -16,7 +16,6 @@ namespace VstsSyncMigrator.Engine
 {
     public class ImportProfilePictureContext : StaticProcessorBase
     {
-
         //private readonly TfsTeamService teamService;
         //private readonly ProjectInfo projectInfo;
         private readonly IIdentityManagementService2 ims2;
@@ -33,7 +32,6 @@ namespace VstsSyncMigrator.Engine
         {
             //http://www.codeproject.com/Articles/18102/Howto-Almost-Everything-In-Active-Directory-via-C
             ims2 = (IIdentityManagementService2)me.Target.GetService<IIdentityManagementService2>();
-
         }
 
         protected override void InternalExecute()
@@ -65,15 +63,10 @@ namespace VstsSyncMigrator.Engine
                 }
             }
 
-
-
-
             //////////////////////////////////////////////////
             stopwatch.Stop();
             Trace.WriteLine(string.Format(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds", stopwatch.Elapsed));
         }
-
-
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Need to kill all errors")]
         public bool SetProfileImage(string identity, string imagePath, out string message)
@@ -81,8 +74,6 @@ namespace VstsSyncMigrator.Engine
             bool ret = true;
             message = string.Empty;
             byte[] image = new byte[0];
-
-
 
             TeamFoundationIdentity i = ims2.ReadIdentity(IdentitySearchFactor.AccountName, identity, MembershipQuery.Direct, ReadIdentityOptions.None);
 
@@ -128,7 +119,6 @@ namespace VstsSyncMigrator.Engine
                 {
                     // swallow; this exception happens each and every time, but the changes are applied :S.
                 }
-
 
                 message = "Profile image set";
             }
@@ -235,7 +225,6 @@ namespace VstsSyncMigrator.Engine
 
         public override void Configure(IProcessorConfig config)
         {
-
         }
     }
 }

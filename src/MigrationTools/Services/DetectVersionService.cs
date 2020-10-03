@@ -17,7 +17,6 @@ namespace MigrationTools.Services
     {
         private readonly ITelemetryLogger _Telemetry;
 
-
         public DetectVersionService(ITelemetryLogger telemetry)
         {
             _Telemetry = telemetry;

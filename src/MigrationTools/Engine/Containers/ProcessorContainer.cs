@@ -10,8 +10,8 @@ namespace MigrationTools.Engine.Containers
 {
     public class ProcessorContainer : EngineContainer<ReadOnlyCollection<IProcessor>>
     {
-
         private List<IProcessor> _Processors = new List<IProcessor>();
+
         public override ReadOnlyCollection<IProcessor> Items
         {
             get
@@ -20,6 +20,7 @@ namespace MigrationTools.Engine.Containers
                 return _Processors.AsReadOnly();
             }
         }
+
         public int Count { get { EnsureConfigured(); return _Processors.Count; } }
 
         public ProcessorContainer(IServiceProvider services, EngineConfiguration config) : base(services, config)
@@ -63,6 +64,5 @@ namespace MigrationTools.Engine.Containers
                 }
             }
         }
-
     }
 }

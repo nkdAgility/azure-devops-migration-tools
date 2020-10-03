@@ -1,6 +1,6 @@
 ﻿namespace MigrationTools.CommandLine.Execute
 {
-    class ExecuteCommand
+    internal class ExecuteCommand
     {
     }
 }

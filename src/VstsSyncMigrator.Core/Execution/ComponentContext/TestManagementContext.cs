@@ -13,7 +13,9 @@ namespace VstsSyncMigrator.Engine.ComponentContext
 
         internal ITestManagementTeamProject Project { get; }
 
-        public TestManagementContext(IMigrationClient source) : this(source, null) { }
+        public TestManagementContext(IMigrationClient source) : this(source, null)
+        {
+        }
 
         public TestManagementContext(IMigrationClient source, string testPlanQueryBit)
         {

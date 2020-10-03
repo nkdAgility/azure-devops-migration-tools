@@ -8,6 +8,7 @@
         public string targetField { get; set; }
         public string formatExpression { get; set; }
         public string doneMatch { get; set; } = "##DONE##"; //Depricated TODO remove
+
         public string FieldMap
         {
             get

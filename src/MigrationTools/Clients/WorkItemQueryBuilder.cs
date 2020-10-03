@@ -7,13 +7,11 @@ namespace MigrationTools.Clients
 {
     public class WorkItemQueryBuilder : IWorkItemQueryBuilder
     {
-
         internal Dictionary<string, string> _Parameters;
         internal string _Query;
         private readonly IServiceProvider _Services;
 
         public Dictionary<string, string> Parameters => _Parameters;
-
 
         public string Query { get => _Query; set => _Query = value; }
 

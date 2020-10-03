@@ -19,6 +19,7 @@ namespace MigrationTools
         private readonly ITelemetryLogger _telemetryLogger;
         private readonly IHostApplicationLifetime _appLifetime;
         private int? _exitCode;
+
         public InitHostedService(
             IEngineConfigurationBuilder configurationBuilder,
             InitOptions initOptions,
@@ -32,6 +33,7 @@ namespace MigrationTools
             _telemetryLogger = telemetryLogger;
             _appLifetime = appLifetime;
         }
+
         public Task StartAsync(CancellationToken cancellationToken)
         {
             _logger.LogDebug($"Starting with arguments: {string.Join(" ", Environment.GetCommandLineArgs())}");
@@ -66,9 +68,11 @@ namespace MigrationTools
                                 case OptionsMode.Full:
                                     config = _configurationBuilder.BuildDefault();
                                     break;
+
                                 case OptionsMode.WorkItemTracking:
                                     config = _configurationBuilder.BuildWorkItemMigration();
                                     break;
+
                                 default:
                                     config = _configurationBuilder.BuildDefault();
                                     break;
@@ -98,6 +102,7 @@ namespace MigrationTools
             });
             return Task.CompletedTask;
         }
+
         public Task StopAsync(CancellationToken cancellationToken)
         {
             _logger.LogDebug($"Exiting with return code: {_exitCode}");

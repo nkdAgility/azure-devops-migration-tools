@@ -4,6 +4,5 @@
     {
         Full = 0,
         WorkItemTracking = 1
-
     }
 }

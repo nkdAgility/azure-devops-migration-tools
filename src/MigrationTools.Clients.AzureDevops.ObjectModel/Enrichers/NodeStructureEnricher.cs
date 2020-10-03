@@ -20,7 +20,6 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
 
         public override void Configure(bool save = true, bool filterWorkItemsThatAlreadyExistInTarget = true)
         {
-
         }
 
         public override int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
@@ -225,7 +224,5 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             Log.LogDebug(String.Empty);
             return node;
         }
-
-
     }
 }

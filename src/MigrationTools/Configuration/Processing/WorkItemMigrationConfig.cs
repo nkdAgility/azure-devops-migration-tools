@@ -11,9 +11,12 @@ namespace MigrationTools.Configuration.Processing
         public bool BuildFieldTable { get; set; }
         public bool AppendMigrationToolSignatureFooter { get; set; }
         public string WIQLQueryBit { get; set; }
+
         /// <inheritdoc />
         public string WIQLOrderBit { get; set; }
+
         public bool Enabled { get; set; }
+
         /// <inheritdoc />
         public string Processor => "WorkItemMigrationContext";
 

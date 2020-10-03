@@ -57,7 +57,6 @@ namespace VstsSyncMigrator.Engine
             int noteFound = 0;
             foreach (WorkItemData workitem in workitems)
             {
-
                 Stopwatch witstopwatch = Stopwatch.StartNew();
                 workitem.ToWorkItem().Open();
 
@@ -79,13 +78,11 @@ namespace VstsSyncMigrator.Engine
                 Trace.WriteLine(string.Format("Average time of {0} per work item and {1} estimated to completion",
                     string.Format(@"{0:s\:fff} seconds", average),
                     string.Format(@"{0:%h} hours {0:%m} minutes {0:s\:fff} seconds", remaining)));
-
             }
             Trace.WriteLine(string.Format("Did not find old repo for {0} links?", noteFound));
             //////////////////////////////////////////////////
             stopwatch.Stop();
             Console.WriteLine(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds", stopwatch.Elapsed);
         }
-
     }
 }

@@ -30,6 +30,5 @@ namespace MigrationTools.Clients
         }
 
         public abstract List<WorkItemData> GetWorkItems();
-
     }
 }

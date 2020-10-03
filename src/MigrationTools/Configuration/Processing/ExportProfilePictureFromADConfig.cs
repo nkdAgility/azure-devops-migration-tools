@@ -8,6 +8,7 @@ namespace MigrationTools.Configuration.Processing
         public string Username { get; set; }
         public string Password { get; set; }
         public string PictureEmpIDFormat { get; set; }
+
         /// <inheritdoc />
         public bool Enabled { get; set; }
 

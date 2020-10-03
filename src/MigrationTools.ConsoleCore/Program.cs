@@ -5,7 +5,7 @@ using MigrationTools.Host;
 
 namespace MigrationTools.ConsoleCore
 {
-    class Program
+    internal class Program
     {
         public static async Task Main(string[] args)
         {
@@ -28,7 +28,6 @@ namespace MigrationTools.ConsoleCore
 
                     // Core
                     // services.AddTransient<IMigrationClient, MigrationRestClient>();
-
                 });
             await hostBuilder.RunMigrationTools(args);
         }

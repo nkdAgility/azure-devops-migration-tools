@@ -9,7 +9,6 @@ namespace MigrationTools.Engine.Containers.Tests
     [TestClass()]
     public class ProcessorContainerTests
     {
-
         private EngineConfiguration CreateEngineConfiguration()
         {
             var ecb = new EngineConfigurationBuilder(new NullLogger<EngineConfigurationBuilder>());
@@ -42,6 +41,5 @@ namespace MigrationTools.Engine.Containers.Tests
 
             Assert.AreEqual(1, processorContainer.Count);
         }
-
     }
 }

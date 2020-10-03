@@ -17,12 +17,10 @@ namespace VstsSyncMigrator.Engine
             get { return "TestVeriablesMigrationContext"; }
         }
 
-
         // http://blogs.microsoft.co.il/shair/2015/02/02/tfs-api-part-56-test-configurations/
 
         public TestVeriablesMigrationContext(IMigrationEngine me, IServiceProvider services, ITelemetryLogger telemetry) : base(me, services, telemetry)
         {
-
         }
 
         protected override void InternalExecute()
@@ -64,10 +62,8 @@ namespace VstsSyncMigrator.Engine
                         Trace.WriteLine(string.Format("    Exists: {0}", targetVal.Value));
                     }
                 }
-
             }
         }
-
 
         internal ITestVariable GetVar(ITestVariableHelper tvh, string variableToFind)
         {
@@ -86,7 +82,6 @@ namespace VstsSyncMigrator.Engine
 
         public override void Configure(IProcessorConfig config)
         {
-
         }
     }
 }

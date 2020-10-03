@@ -12,13 +12,11 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
 {
     public class WorkItemLinkEnricher : WorkItemEnricher
     {
-
         private bool _save = true;
         private bool _filterWorkItemsThatAlreadyExistInTarget = true;
 
         public WorkItemLinkEnricher(IMigrationEngine engine, ILogger<WorkItemLinkEnricher> logger) : base(engine, logger)
         {
-
         }
 
         public override void Configure(
@@ -136,8 +134,10 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             if (exist == null)
             {
                 Log.LogInformation("Creating new {SourceLinkType} on {TargetId}", sourceLink.GetType().Name, target.Id);
-                ExternalLink el = new ExternalLink(sourceLink.ArtifactLinkType, sourceLink.LinkedArtifactUri);
-                el.Comment = sourceLink.Comment;
+                ExternalLink el = new ExternalLink(sourceLink.ArtifactLinkType, sourceLink.LinkedArtifactUri)
+                {
+                    Comment = sourceLink.Comment
+                };
                 target.ToWorkItem().Links.Add(el);
                 if (_save)
                 {
@@ -184,7 +184,6 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             {
                 Log.LogError(ex, "  [FIND-FAIL] Adding Link of type {0} where wiSourceL={1}, wiTargetL={2} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiTargetL.Id);
                 return;
-
             }
             if (wiTargetR != null)
             {
@@ -201,7 +200,6 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                 }
                 catch (Exception ex)
                 {
-
                     Log.LogError(ex, "  [SKIP] Unable to migrate links where wiSourceL={0}, wiSourceR={1}, wiTargetL={2}", ((wiSourceL != null) ? wiSourceL.Id.ToString() : "NotFound"), ((wiSourceR != null) ? wiSourceR.Id.ToString() : "NotFound"), ((wiTargetL != null) ? wiTargetL.Id.ToString() : "NotFound"));
                     return;
                 }
@@ -254,7 +252,6 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                         Log.LogInformation(
                                 "  [CREATE-SUCCESS] Adding Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} ",
                                 rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id);
-
                     }
                     else
                     {
@@ -317,8 +314,10 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             var exist = (from Link l in target.ToWorkItem().Links where l is Hyperlink && ((Hyperlink)l).Location == ((Hyperlink)sourceLink).Location select (Hyperlink)l).SingleOrDefault();
             if (exist == null)
             {
-                Hyperlink hl = new Hyperlink(sourceLink.Location);
-                hl.Comment = sourceLink.Comment;
+                Hyperlink hl = new Hyperlink(sourceLink.Location)
+                {
+                    Comment = sourceLink.Comment
+                };
                 target.ToWorkItem().Links.Add(hl);
                 if (_save)
                 {

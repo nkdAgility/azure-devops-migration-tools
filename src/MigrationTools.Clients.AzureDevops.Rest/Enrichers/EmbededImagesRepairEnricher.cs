@@ -7,11 +7,10 @@ namespace MigrationTools.Clients.AzureDevops.Rest.Enrichers
 {
     public class EmbededImagesRepairEnricher : EmbededImagesRepairEnricherBase
     {
-
         public EmbededImagesRepairEnricher(IMigrationEngine engine, ILogger<EmbededImagesRepairEnricher> logger) : base(engine, logger)
         {
-
         }
+
         public override void Configure(bool save = true, bool filter = true)
         {
             throw new NotImplementedException();

@@ -22,23 +22,23 @@ namespace VstsSyncMigrator.Engine
 {
     public class TestPlandsAndSuitesMigrationContext : MigrationProcessorBase
     {
-        TestManagementContext _sourceTestStore;
-        ITestConfigurationCollection _sourceTestConfigs;
+        private TestManagementContext _sourceTestStore;
+        private ITestConfigurationCollection _sourceTestConfigs;
 
-        TestManagementContext _targetTestStore;
-        ITestConfigurationCollection _targetTestConfigs;
+        private TestManagementContext _targetTestStore;
+        private ITestConfigurationCollection _targetTestConfigs;
 
-        TestPlansAndSuitesMigrationConfig _config;
+        private TestPlansAndSuitesMigrationConfig _config;
 
-        IIdentityManagementService _sourceIdentityManagementService;
-        IIdentityManagementService _targetIdentityManagementService;
+        private IIdentityManagementService _sourceIdentityManagementService;
+        private IIdentityManagementService _targetIdentityManagementService;
 
-        int _currentPlan = 0;
-        int _totalPlans = 0;
-        int __currentSuite = 0;
-        int __totalSuites = 0;
-        int _currentTestCases = 0;
-        int _totalTestCases = 0;
+        private int _currentPlan = 0;
+        private int _totalPlans = 0;
+        private int __currentSuite = 0;
+        private int __totalSuites = 0;
+        private int _currentTestCases = 0;
+        private int _totalTestCases = 0;
 
         public override string Name
         {
@@ -47,7 +47,6 @@ namespace VstsSyncMigrator.Engine
                 return "TestPlansAndSuitesMigrationContext";
             }
         }
-
 
         public TestPlandsAndSuitesMigrationContext(IMigrationEngine me, IServiceProvider services, ITelemetryLogger telemetry) : base(me, services, telemetry)
         {
@@ -143,7 +142,6 @@ namespace VstsSyncMigrator.Engine
                     continue;
 
                 ProcessTestPlan(sourcePlan);
-
             }
             _currentPlan = 0;
             _totalPlans = 0;
@@ -204,7 +202,6 @@ namespace VstsSyncMigrator.Engine
                     __currentSuite++;
                     TraceWriteLine(sourceSuiteChild, $"", 5, true);
                     ProcessTestSuite(sourceSuiteChild, targetPlan.RootSuite, targetPlan);
-
                 }
                 __currentSuite = 0;
                 __totalSuites = 0;
@@ -329,7 +326,6 @@ namespace VstsSyncMigrator.Engine
             return targetPlanWorkItem.ToWorkItem().Tags.Contains("migrated");
         }
 
-
         private bool CanSkipElementBecauseOfTags(int workItemId)
         {
             if (_config.OnlyElementsWithTag == null)
@@ -368,9 +364,11 @@ namespace VstsSyncMigrator.Engine
                     case TestSuiteType.DynamicTestSuite:
                         targetSuiteChild = CreateNewDynamicTestSuite(sourceSuite);
                         break;
+
                     case TestSuiteType.StaticTestSuite:
                         targetSuiteChild = CreateNewStaticTestSuite(sourceSuite);
                         break;
+
                     case TestSuiteType.RequirementTestSuite:
                         int sourceRid = ((IRequirementTestSuite)sourceSuite).RequirementId;
                         WorkItemData sourceReq = null;
@@ -406,6 +404,7 @@ namespace VstsSyncMigrator.Engine
                         }
                         targetSuiteChild = CreateNewRequirementTestSuite(sourceSuite, targetReq);
                         break;
+
                     default:
                         throw new NotImplementedException();
                         //break;
@@ -437,7 +436,7 @@ namespace VstsSyncMigrator.Engine
             // Recurse if Static Suite
             if (sourceSuite.TestSuiteType == TestSuiteType.StaticTestSuite && targetSuiteChild != null)
             {
-                // Add Test Cases 
+                // Add Test Cases
                 AddChildTestCases(sourceSuite, targetSuiteChild, targetPlan);
 
                 if (HasChildSuites(sourceSuite))
@@ -526,7 +525,6 @@ namespace VstsSyncMigrator.Engine
 
             if (CanSkipElementBecauseOfTags(source.Id))
                 return;
-
 
             _totalTestCases = source.TestCases.Count;
             _currentTestCases = 0;
@@ -620,10 +618,8 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-
         private void ApplyConfigurationsAndAssignTesters(ITestSuiteBase sourceSuite, ITestSuiteBase targetSuite)
         {
-
             _totalTestCases = sourceSuite.TestCases.Count();
             TraceWriteLine(sourceSuite, $"Applying configurations for test cases in source suite {sourceSuite.Title}", 5);
             foreach (ITestSuiteEntry sourceTce in sourceSuite.TestCases)
@@ -653,7 +649,6 @@ namespace VstsSyncMigrator.Engine
                     TraceWriteLine(sourceSuite, $"Work Item for Test Case {sourceTce.Title} cannot be found in target. Has it been migrated?", 5);
                 }
                 Telemetry.TrackRequest("ApplyConfigurationsAndAssignTesters", starttime, stopwatch.Elapsed, "200", true);
-
             }
             _totalTestCases = 0;
             _currentTestCases = 0;
@@ -865,7 +860,6 @@ namespace VstsSyncMigrator.Engine
                                        select tc).SingleOrDefault();
                     if (targetFound != null)
                     {
-
                         targetConfigs.Add(new IdAndName(targetFound.Id, targetFound.Name));
                     }
                 }
@@ -879,7 +873,6 @@ namespace VstsSyncMigrator.Engine
                     Log.Error(ex, "Applying Configurations");
                 }
             }
-
         }
 
         private bool HasChildTestCases(ITestSuiteBase sourceSuite)
@@ -975,7 +968,7 @@ namespace VstsSyncMigrator.Engine
             targetPlan.EndDate = sourcePlan.EndDate;
             targetPlan.Description = sourcePlan.Description;
 
-            // Set area and iteration to root of the target project. 
+            // Set area and iteration to root of the target project.
             // We will set the correct values later, when we actually have a work item available
             targetPlan.Iteration = Engine.Target.Config.Project;
             targetPlan.AreaPath = Engine.Target.Config.Project;
@@ -1044,9 +1037,8 @@ namespace VstsSyncMigrator.Engine
         {
             try
             {
-                // Verifying that the query is valid 
+                // Verifying that the query is valid
                 targetSuiteChild.Query.Execute();
-
             }
             catch (Exception e)
             {

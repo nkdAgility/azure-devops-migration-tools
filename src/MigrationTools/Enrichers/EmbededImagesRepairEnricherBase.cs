@@ -16,16 +16,15 @@ namespace MigrationTools.Enrichers
         /**
       *  from https://gist.github.com/pietergheysens/792ed505f09557e77ddfc1b83531e4fb
       */
+
         public EmbededImagesRepairEnricherBase(IMigrationEngine engine, ILogger<EmbededImagesRepairEnricherBase> logger) : base(engine, logger)
         {
-
             _httpClientHandler = new HttpClientHandler { AllowAutoRedirect = false, UseDefaultCredentials = true, AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate };
         }
 
         public override abstract void Configure(bool save = true, bool filter = true);
 
         public override abstract int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem);
-
 
         protected abstract void FixEmbededImages(WorkItemData wi, string oldTfsurl, string newTfsurl, string sourcePersonalAccessToken = "");
 
@@ -55,7 +54,7 @@ namespace MigrationTools.Enrichers
         /// <returns>Image format</returns>
         protected static ImageFormat GetImageFormat(byte[] bytes)
         {
-            // see http://www.mikekunz.com/image_file_header.html  
+            // see http://www.mikekunz.com/image_file_header.html
             var bmp = Encoding.ASCII.GetBytes("BM");     // BMP
             var gif = Encoding.ASCII.GetBytes("GIF");    // GIF
             var png = new byte[] { 137, 80, 78, 71 };    // PNG
@@ -118,8 +117,6 @@ namespace MigrationTools.Enrichers
             return oppositeUrl;
         }
 
-
-
         protected enum ImageFormat
         {
             unknown,
@@ -129,6 +126,5 @@ namespace MigrationTools.Enrichers
             tiff,
             jpeg
         }
-
     }
 }

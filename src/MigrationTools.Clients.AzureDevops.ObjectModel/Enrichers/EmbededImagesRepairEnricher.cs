@@ -13,13 +13,9 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
 {
     public class EmbededImagesRepairEnricher : EmbededImagesRepairEnricherBase
     {
-
-
         public EmbededImagesRepairEnricher(IMigrationEngine engine, ILogger<EmbededImagesRepairEnricher> logger) : base(engine, logger)
         {
-
         }
-
 
         public override void Configure(bool save = true, bool filter = true)
         {
@@ -28,16 +24,14 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
 
         public override int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
         {
-
             FixEmbededImages(targetWorkItem, Engine.Source.Config.Collection.ToString(), Engine.Target.Config.Collection.ToString(), Engine.Source.Config.PersonalAccessToken);
             return 0;
         }
 
-
-
         /**
       *  from https://gist.github.com/pietergheysens/792ed505f09557e77ddfc1b83531e4fb
       */
+
         protected override void FixEmbededImages(WorkItemData wi, string oldTfsurl, string newTfsurl, string sourcePersonalAccessToken = "")
         {
             Log.LogInformation("EmbededImagesRepairEnricher: Fixing HTML field attachemtnts for work item {Id} from {OldTfsurl} to {NewTfsUrl}", wi.Id, oldTfsurl, GetUrlWithOppositeSchema(oldTfsurl));
@@ -104,6 +98,5 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                 }
             }
         }
-
     }
 }

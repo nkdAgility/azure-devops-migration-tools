@@ -32,6 +32,7 @@ namespace MigrationTools.Clients.AzureDevops.Rest.FieldMaps
                        });
             }
         }
+
         public string Name
         {
             get
@@ -43,7 +44,5 @@ namespace MigrationTools.Clients.AzureDevops.Rest.FieldMaps
         public abstract string MappingDisplayName { get; }
 
         internal abstract void InternalExecute(WorkItem source, WorkItem target);
-
-
     }
 }

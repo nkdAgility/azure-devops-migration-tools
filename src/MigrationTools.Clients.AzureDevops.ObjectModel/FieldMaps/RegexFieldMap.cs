@@ -9,11 +9,10 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
 {
     public class RegexFieldMap : FieldMapBase
     {
-
         public RegexFieldMap(ILogger<RegexFieldMap> logger) : base(logger)
         {
-
         }
+
         private RegexFieldMapConfig Config { get { return (RegexFieldMapConfig)_Config; } }
 
         public override void Configure(IFieldMapConfig config)

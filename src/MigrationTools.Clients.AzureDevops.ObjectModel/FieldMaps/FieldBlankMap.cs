@@ -8,13 +8,11 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
 {
     public class FieldBlankMap : FieldMapBase
     {
-
         public FieldBlankMap(ILogger<FieldBlankMap> logger) : base(logger)
         {
-
         }
-        private FieldBlankMapConfig Config { get { return (FieldBlankMapConfig)_Config; } }
 
+        private FieldBlankMapConfig Config { get { return (FieldBlankMapConfig)_Config; } }
 
         public override string MappingDisplayName => $"{Config.targetField}";
 

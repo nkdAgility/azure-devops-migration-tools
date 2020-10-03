@@ -31,7 +31,6 @@ using Serilog.Events;
 
 namespace VstsSyncMigrator.Engine
 {
-
     public class WorkItemMigrationContext : MigrationProcessorBase
     {
         private WorkItemMigrationConfig _config;
@@ -44,12 +43,12 @@ namespace VstsSyncMigrator.Engine
         private ILogger contextLog;
         private ILogger workItemLog;
         private IWorkItemEnricher embededImagesEnricher;
-        static int _current = 0;
-        static int _count = 0;
+        private static int _current = 0;
+        private static int _count = 0;
 
-        static long _elapsedms = 0;
-        static int _totalWorkItem = 0;
-        static string workItemLogTeamplate = "[{sourceWorkItemTypeName,20}][Complete:{currentWorkItem,6}/{totalWorkItems}][sid:{sourceWorkItemId,6}|Rev:{sourceRevisionInt,3}][tid:{targetWorkItemId,6} | ";
+        private static long _elapsedms = 0;
+        private static int _totalWorkItem = 0;
+        private static string workItemLogTeamplate = "[{sourceWorkItemTypeName,20}][Complete:{currentWorkItem,6}/{totalWorkItems}][sid:{sourceWorkItemId,6}|Rev:{sourceRevisionInt,3}][tid:{targetWorkItemId,6} | ";
 
         public WorkItemMigrationContext(IMigrationEngine engine, IServiceProvider services, ITelemetryLogger telemetry) : base(engine, services, telemetry)
         {
@@ -59,7 +58,6 @@ namespace VstsSyncMigrator.Engine
         public override void Configure(IProcessorConfig config)
         {
             _config = (WorkItemMigrationConfig)config;
-
         }
 
         private void PopulateIgnoreList()
@@ -171,7 +169,6 @@ namespace VstsSyncMigrator.Engine
 
         private void ProcessWorkItem(WorkItemData sourceWorkItem, int retryLimit = 5, int retrys = 0)
         {
-
             var witstopwatch = Stopwatch.StartNew();
             var starttime = DateTime.Now;
             processWorkItemMetrics = new Dictionary<string, double>();
@@ -221,8 +218,6 @@ namespace VstsSyncMigrator.Engine
                             AddMetric("Revisions", processWorkItemMetrics, revisionsToMigrate.Count);
                             AddMetric("SyncRev", processWorkItemMetrics, revisionsToMigrate.Count);
                         }
-
-
                     }
                     AddParameter("TargetWorkItem", processWorkItemParamiters, targetWorkItem.ToWorkItem().Revisions.Count.ToString());
                     ///////////////////////////////////////////////
@@ -284,7 +279,6 @@ namespace VstsSyncMigrator.Engine
             _elapsedms += witstopwatch.ElapsedMilliseconds;
             processWorkItemMetrics.Add("ElapsedTimeMS", _elapsedms);
 
-
             var average = new TimeSpan(0, 0, 0, 0, (int)(_elapsedms / _current));
             var remaining = new TimeSpan(0, 0, 0, 0, (int)(average.TotalMilliseconds * _count));
             TraceWriteLine(LogEventLevel.Information,
@@ -301,7 +295,6 @@ namespace VstsSyncMigrator.Engine
             _count--;
         }
 
-
         private List<RevisionItem> RevisionsToMigrate(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
         {
             // just to make sure, we replay the events in the same order as they appeared
@@ -313,8 +306,6 @@ namespace VstsSyncMigrator.Engine
                         Index = x.Index,
                         Number = Convert.ToInt32(x.Fields["System.Rev"].Value),
                         ChangedDate = Convert.ToDateTime(x.Fields["System.ChangedDate"].Value)
-
-
                     })
                     .ToList();
 
@@ -346,11 +337,8 @@ namespace VstsSyncMigrator.Engine
             return sortedRevisions;
         }
 
-
-
         private WorkItemData ReplayRevisions(List<RevisionItem> revisionsToMigrate, WorkItemData sourceWorkItem, WorkItemData targetWorkItem, int current)
         {
-
             try
             {
                 var skipToFinalRevisedWorkItemType = _config.SkipToFinalRevisedWorkItemType;
@@ -424,7 +412,6 @@ namespace VstsSyncMigrator.Engine
                         currentRevisionWorkItem.ToWorkItem().Revisions[revision.Index].Fields["System.History"].Value;
                     //Debug.WriteLine("Discussion:" + currentRevisionWorkItem.Revisions[revision.Index].Fields["System.History"].Value);
 
-
                     var fails = targetWorkItem.ToWorkItem().Validate();
 
                     foreach (Field f in fails)
@@ -453,7 +440,6 @@ namespace VstsSyncMigrator.Engine
                                {"RevisionNumber", revision.Number },
                                {"RevisionsToMigrateCount",  revisionsToMigrate.Count}
                            });
-
                 }
 
                 if (targetWorkItem != null)
@@ -463,7 +449,6 @@ namespace VstsSyncMigrator.Engine
                     string reflectedUri = Engine.Source.WorkItems.CreateReflectedWorkItemId(sourceWorkItem);
                     if (targetWorkItem.ToWorkItem().Fields.Contains(Engine.Target.Config.ReflectedWorkItemIDFieldName))
                     {
-
                         targetWorkItem.ToWorkItem().Fields[Engine.Target.Config.ReflectedWorkItemIDFieldName].Value = reflectedUri;
                     }
                     var history = new StringBuilder();
@@ -491,8 +476,6 @@ namespace VstsSyncMigrator.Engine
             return targetWorkItem;
         }
 
-
-
         private WorkItemData CreateWorkItem_Shell(ProjectData destProject, WorkItemData currentRevisionWorkItem, string destType)
         {
             WorkItem newwit;
@@ -507,13 +490,12 @@ namespace VstsSyncMigrator.Engine
                 throw new Exception(string.Format("WARNING: Unable to find '{0}' in the target project. Most likley this is due to a typo in the .json configuration under WorkItemTypeDefinition! ", destType));
             }
             newWorkItemTimer.Stop();
-            Telemetry.TrackDependency(new DependencyTelemetry("TeamService",Engine.Target.Config.Collection.ToString(), "NewWorkItem", null, newWorkItemstartTime, newWorkItemTimer.Elapsed, "200", true));
+            Telemetry.TrackDependency(new DependencyTelemetry("TeamService", Engine.Target.Config.Collection.ToString(), "NewWorkItem", null, newWorkItemstartTime, newWorkItemTimer.Elapsed, "200", true));
             if (_config.UpdateCreatedBy) { newwit.Fields["System.CreatedBy"].Value = currentRevisionWorkItem.ToWorkItem().Revisions[0].Fields["System.CreatedBy"].Value; }
             if (_config.UpdateCreatedDate) { newwit.Fields["System.CreatedDate"].Value = currentRevisionWorkItem.ToWorkItem().Revisions[0].Fields["System.CreatedDate"].Value; }
 
             return newwit.AsWorkItemData();
         }
-
 
         // TODO : Make this into the Work Item mapping tool
         private void PopulateWorkItem(WorkItemData oldWi, WorkItemData newwit, string destType)
@@ -599,7 +581,7 @@ namespace VstsSyncMigrator.Engine
             return sourceWorkItems;
         }
 
-        NodeDetecomatic _nodeOMatic;
+        private NodeDetecomatic _nodeOMatic;
 
         private string GetNewNodeName(string oldNodeName, string oldProjectName, string newProjectName, WorkItemStore newStore, string nodePath)
         {
@@ -649,7 +631,6 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-
         private static bool IsNumeric(string val, NumberStyles numberStyle)
         {
             double result;
@@ -675,7 +656,6 @@ namespace VstsSyncMigrator.Engine
                 {
                     history.AppendLine(string.Format("{0}: {1}<br />", f.Name, f.Value.ToString()));
                 }
-
             }
             history.Append("<p>&nbsp;</p>");
         }
@@ -698,7 +678,6 @@ namespace VstsSyncMigrator.Engine
                 history.Append("<p>&nbsp;</p>");
             }
         }
-
 
         private void ProcessHTMLFieldAttachements(WorkItemData targetWorkItem)
         {
@@ -777,16 +756,12 @@ namespace VstsSyncMigrator.Engine
                 _witClient.UpdateWorkItemAsync(patchDoc, int.Parse(targetWorkItem.Id), bypassRules: true).Wait();
             }
         }
-
-
     }
-
-
 
     public class NodeDetecomatic
     {
-        ICommonStructureService _commonStructure;
-        List<string> _foundNodes = new List<string>();
+        private ICommonStructureService _commonStructure;
+        private List<string> _foundNodes = new List<string>();
 
         public NodeDetecomatic(WorkItemStore store)
         {
@@ -813,7 +788,5 @@ namespace VstsSyncMigrator.Engine
             }
             return true;
         }
-
-
     }
 }

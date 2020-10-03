@@ -30,6 +30,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel
             wi.Save();
             context.RefreshWorkItem();
         }
+
         public static void RefreshWorkItem(this WorkItemData context)
         {
             var workItem = (WorkItem)context.internalObject;
@@ -45,8 +46,10 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel
 
         public static WorkItemData AsWorkItemData(this WorkItem context)
         {
-            var internalWorkItem = new WorkItemData();
-            internalWorkItem.internalObject = context;
+            var internalWorkItem = new WorkItemData
+            {
+                internalObject = context
+            };
             internalWorkItem.RefreshWorkItem();
             return internalWorkItem;
         }
@@ -70,7 +73,6 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel
             return list;
         }
 
-
         public static Dictionary<string, object> AsDictionary(this FieldCollection col)
         {
             var dict = new Dictionary<string, object>();
@@ -83,10 +85,12 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel
 
         public static ProjectData ToProjectData(this Project project)
         {
-            var internalObject = new ProjectData();
-            internalObject.Id = project.Id.ToString();
-            internalObject.Name = project.Name;
-            internalObject.internalObject = project;
+            var internalObject = new ProjectData
+            {
+                Id = project.Id.ToString(),
+                Name = project.Name,
+                internalObject = project
+            };
             return internalObject;
         }
 
@@ -98,7 +102,5 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel
             }
             return (Project)projectdata.internalObject;
         }
-
-
     }
 }

@@ -37,6 +37,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
                        });
             }
         }
+
         public string Name
         {
             get
@@ -49,7 +50,5 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
         public ILogger<FieldMapBase> Logger { get; }
 
         internal abstract void InternalExecute(WorkItem source, WorkItem target);
-
-
     }
 }

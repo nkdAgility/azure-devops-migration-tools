@@ -11,7 +11,7 @@ namespace VstsSyncMigrator.Engine
     public abstract class StaticProcessorBase : IProcessor
     {
         internal IMigrationEngine _me;
-        ProcessingStatus status = ProcessingStatus.None;
+        private ProcessingStatus status = ProcessingStatus.None;
         private readonly IServiceProvider _services;
 
         public IMigrationEngine Engine { get { return _me; } }
@@ -88,7 +88,5 @@ namespace VstsSyncMigrator.Engine
         }
 
         protected abstract void InternalExecute();
-
-
     }
 }

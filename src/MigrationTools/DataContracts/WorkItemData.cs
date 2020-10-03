@@ -14,5 +14,4 @@ namespace MigrationTools.DataContracts
         public object internalObject { get; set; }
         public object Fields { get; set; }
     }
-
 }

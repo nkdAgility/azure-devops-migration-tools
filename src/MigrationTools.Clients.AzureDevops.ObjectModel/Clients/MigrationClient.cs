@@ -36,6 +36,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
                 return _workItemClient;
             }
         }
+
         public ITestPlanMigrationClient TestPlans
         {
             get
@@ -43,6 +44,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
                 return _testPlanClient;
             }
         }
+
         // if you add Migration Engine in here you will have to fix the infinate loop
         public MigrationClient(ITestPlanMigrationClient testPlanClient, IWorkItemMigrationClient workItemClient, IServiceProvider services, ITelemetryLogger telemetry)
         {
@@ -51,7 +53,6 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
             _Services = services;
             _Telemetry = telemetry;
         }
-
 
         public void Configure(TeamProjectConfig config, NetworkCredential credentials = null)
         {
@@ -126,6 +127,5 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
             EnsureCollection();
             return _collection.GetService<T>();
         }
-
     }
 }

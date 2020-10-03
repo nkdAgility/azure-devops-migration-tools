@@ -94,6 +94,5 @@ namespace MigrationTools.Engine.Containers
                 map.Execute(source, target);
             }
         }
-
     }
 }

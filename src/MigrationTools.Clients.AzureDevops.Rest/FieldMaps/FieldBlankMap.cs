@@ -9,7 +9,6 @@ namespace MigrationTools.Clients.AzureDevops.Rest.FieldMaps
     {
         private FieldBlankMapConfig Config { get { return (FieldBlankMapConfig)_Config; } }
 
-
         public override string MappingDisplayName => $"{Config.targetField}";
 
         internal override void InternalExecute(WorkItem source, WorkItem target)

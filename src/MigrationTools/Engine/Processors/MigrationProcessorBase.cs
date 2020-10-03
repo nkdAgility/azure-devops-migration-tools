@@ -71,7 +71,6 @@ namespace MigrationTools.Engine.Processors
             {
                 Telemetry.TrackRequest(this.Name, start, executeTimer.Elapsed, Status.ToString(), (Status == ProcessingStatus.Complete));
             }
-
         }
 
         protected abstract void InternalExecute();

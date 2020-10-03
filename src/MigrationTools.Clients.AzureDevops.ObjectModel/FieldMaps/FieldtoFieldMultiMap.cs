@@ -10,10 +10,8 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
 {
     public class FieldtoFieldMultiMap : FieldMapBase
     {
-
         public FieldtoFieldMultiMap(ILogger<FieldtoFieldMultiMap> logger) : base(logger)
         {
-
         }
 
         private FieldtoFieldMultiMapConfig Config { get { return (FieldtoFieldMultiMapConfig)_Config; } }
@@ -31,7 +29,6 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
                 mapFields(Config.SourceToTargetMappings, source, target);
             else
                 Log.Information("  [SKIPPED] Not all source and target fields exist.");
-
         }
 
         private bool fieldsExist(Dictionary<string, string> fieldMap, WorkItem source, WorkItem target)

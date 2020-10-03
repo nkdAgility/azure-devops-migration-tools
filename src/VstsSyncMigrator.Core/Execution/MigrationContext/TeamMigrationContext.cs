@@ -15,8 +15,7 @@ namespace VstsSyncMigrator.Engine
 {
     public class TeamMigrationContext : MigrationProcessorBase
     {
-
-        TeamMigrationConfig _config;
+        private TeamMigrationConfig _config;
 
         public override string Name
         {
@@ -60,7 +59,7 @@ namespace VstsSyncMigrator.Engine
             long elapsedms = 0;
 
             /// Create teams
-            /// 
+            ///
             foreach (TeamFoundationTeam sourceTeam in sourceTL)
             {
                 Stopwatch witstopwatch = Stopwatch.StartNew();
@@ -162,7 +161,6 @@ namespace VstsSyncMigrator.Engine
             stopwatch.Stop();
             Console.WriteLine(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds", stopwatch.Elapsed);
         }
-
 
         private TeamSettings CreateTargetTeamSettings(TeamConfiguration sourceTCfU)
         {

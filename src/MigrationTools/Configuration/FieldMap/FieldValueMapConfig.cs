@@ -10,7 +10,6 @@ namespace MigrationTools.Configuration.FieldMap
         public string defaultValue { get; set; }
         public Dictionary<string, string> valueMapping { get; set; }
 
-
         public string FieldMap
         {
             get
@@ -18,6 +17,5 @@ namespace MigrationTools.Configuration.FieldMap
                 return "FieldValueMap";
             }
         }
-
     }
 }

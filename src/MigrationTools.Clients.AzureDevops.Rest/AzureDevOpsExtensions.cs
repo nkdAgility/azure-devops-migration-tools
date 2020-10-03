@@ -6,14 +6,15 @@ namespace MigrationTools.Clients.AzureDevops.Rest
 {
     public static class AzureDevOpsExtensions
     {
-
         public static WorkItemData ToWorkItemData(this WorkItem workItem)
         {
-            var internalObject = new WorkItemData();
-            internalObject.Id = workItem.Id.ToString();
-            internalObject.Type = "unknown";
-            internalObject.Title = "unknown";
-            internalObject.internalObject = workItem;
+            var internalObject = new WorkItemData
+            {
+                Id = workItem.Id.ToString(),
+                Type = "unknown",
+                Title = "unknown",
+                internalObject = workItem
+            };
             return internalObject;
         }
 
@@ -25,7 +26,5 @@ namespace MigrationTools.Clients.AzureDevops.Rest
             }
             return (WorkItem)workItemData.internalObject;
         }
-
-
     }
 }

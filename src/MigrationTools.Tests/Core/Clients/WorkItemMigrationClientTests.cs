@@ -39,6 +39,5 @@ namespace MigrationTools.Clients.Tests
             var updatedworkItem = sink.GetWorkItems().First();
             Assert.IsTrue(updatedworkItem.Title == workItem.Title);
         }
-
     }
 }
