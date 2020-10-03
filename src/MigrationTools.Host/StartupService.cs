@@ -78,7 +78,6 @@ namespace MigrationTools.Host
             _logger.LogInformation("Running with args: {@Args}", args);
             _logger.LogInformation("OSVersion: {OSVersion}", Environment.OSVersion.ToString());
             _logger.LogInformation("Version: {Version}", version);
-            _logger.LogInformation("userID: {UserId}", System.Security.Principal.WindowsIdentity.GetCurrent().Name);
         }
 
         protected void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
