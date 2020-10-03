@@ -36,7 +36,7 @@ namespace MigrationTools.Host
                 Version latestVersion = _detectVersionService.GetLatestVersion();
 
                 _logger.LogInformation("Latest version detected as {@Version}", latestVersion);
-                var version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+                var version = System.Reflection.Assembly.GetEntryAssembly().GetName().Version;
                 if (latestVersion > version)
                 {
                     _logger.LogWarning("You are currently running version {@Version_Current} and a newer version ({@Version_Latest}) is available. You should upgrade now using Chocolatey command 'choco upgrade vsts-sync-migrator' from the command line.", version, latestVersion);
