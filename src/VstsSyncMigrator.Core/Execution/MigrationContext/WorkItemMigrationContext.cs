@@ -580,7 +580,7 @@ namespace VstsSyncMigrator.Engine
 
         private List<WorkItemData> FilterByTarget(List<WorkItemData> sourceWorkItems)
         {
-            contextLog.Verbose("FilterByTarget: START");
+            contextLog.Debug("FilterByTarget: START");
             var targetQuery = 
                 string.Format(
                     @"SELECT [System.Id], [{0}] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {1} ORDER BY {2}",
@@ -588,15 +588,15 @@ namespace VstsSyncMigrator.Engine
                     _config.WIQLQueryBit,
                     _config.WIQLOrderBit
                     );
-            contextLog.Verbose("FilterByTarget: Query Execute...");
+            contextLog.Debug("FilterByTarget: Query Execute...");
             var targetFoundItems = Engine.Target.WorkItems.GetWorkItems(targetQuery);
-            contextLog.Verbose("FilterByTarget: ... query complete.");
-            contextLog.Verbose("FilterByTarget: Found {TargetWorkItemCount} based on the WIQLQueryBit in the target system.", targetFoundItems.Count());
+            contextLog.Debug("FilterByTarget: ... query complete.");
+            contextLog.Debug("FilterByTarget: Found {TargetWorkItemCount} based on the WIQLQueryBit in the target system.", targetFoundItems.Count());
             var targetFoundIds = (from WorkItemData twi in targetFoundItems select Engine.Target.WorkItems.GetReflectedWorkItemId(twi)).ToList();
             //////////////////////////////////////////////////////////
             sourceWorkItems = sourceWorkItems.Where(p => !targetFoundIds.Any(p2 => p2.ToString() == p.Id)).ToList();
-            contextLog.Verbose("FilterByTarget: After removing all found work items there are {SourceWorkItemCount} remaining to be migrated.", sourceWorkItems.Count());
-            contextLog.Verbose("FilterByTarget: END");
+            contextLog.Debug("FilterByTarget: After removing all found work items there are {SourceWorkItemCount} remaining to be migrated.", sourceWorkItems.Count());
+            contextLog.Debug("FilterByTarget: END");
             return sourceWorkItems;
         }
 

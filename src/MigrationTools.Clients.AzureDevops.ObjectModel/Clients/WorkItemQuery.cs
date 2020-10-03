@@ -19,7 +19,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
 
         public override List<WorkItemData> GetWorkItems()
         {
-            Log.Verbose("WorkItemQuery: ===========GetWorkItems=============");
+            Log.Debug("WorkItemQuery: ===========GetWorkItems=============");
             var wiClient = (WorkItemMigrationClient)MigrationClient.WorkItems;
             Telemetry.TrackEvent("WorkItemQuery.Execute", Parameters, null);
             Log.Debug("WorkItemQuery: TeamProjectCollection: {QueryTarget}",  wiClient.Store.TeamProjectCollection.Uri.ToString());
@@ -31,7 +31,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
             Stopwatch queryTimer = new Stopwatch();
             foreach (var item in Parameters)
             {
-                Log.Verbose("WorkItemQuery: {0}: {1}", item.Key, item.Value);
+                Log.Debug("WorkItemQuery: {0}: {1}", item.Key, item.Value);
             }
 
             queryTimer.Start();
