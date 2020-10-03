@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using MigrationTools.Configuration;
-using MigrationTools;
-using Serilog;
-using MigrationTools.Engine.Containers;
-using MigrationTools;
 using Microsoft.Extensions.Logging;
+using MigrationTools;
+using MigrationTools.Configuration;
+using MigrationTools.Engine.Containers;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -22,7 +20,7 @@ namespace VstsSyncMigrator.Engine
         public StaticProcessorBase(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<IProcessor> logger)
         {
             _services = services;
-            _me = me; 
+            _me = me;
             Telemetry = telemetry;
             Log = logger;
         }
@@ -47,7 +45,7 @@ namespace VstsSyncMigrator.Engine
             Telemetry.TrackEvent(this.Name);
             Trace.TraceInformation(string.Format("ProcessingContext Start {0} ", Name));
             Stopwatch executeTimer = Stopwatch.StartNew();
-			DateTime start = DateTime.Now;
+            DateTime start = DateTime.Now;
             //////////////////////////////////////////////////
             try
             {
@@ -85,12 +83,12 @@ namespace VstsSyncMigrator.Engine
             }
             finally
             {
-                Telemetry.TrackRequest( this.Name, start, executeTimer.Elapsed, Status.ToString(), (Status == ProcessingStatus.Complete));
+                Telemetry.TrackRequest(this.Name, start, executeTimer.Elapsed, Status.ToString(), (Status == ProcessingStatus.Complete));
             }
         }
 
         protected abstract void InternalExecute();
 
-        
+
     }
 }

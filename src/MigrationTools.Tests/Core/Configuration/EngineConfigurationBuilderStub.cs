@@ -13,7 +13,7 @@ namespace MigrationTools.Configuration.Tests
 
         public EngineConfiguration BuildDefault()
         {
-           return  ecb.BuildDefault();
+            return ecb.BuildDefault();
         }
 
         public EngineConfiguration BuildFromFile(string configFile = "configuration.json")

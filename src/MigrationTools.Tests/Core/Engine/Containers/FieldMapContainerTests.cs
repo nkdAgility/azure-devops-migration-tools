@@ -1,12 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools.Configuration;
-using MigrationTools.Engine.Containers;
-using NuGet.Protocol;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace MigrationTools.Engine.Containers.Tests
 {
@@ -34,7 +30,7 @@ namespace MigrationTools.Engine.Containers.Tests
         public void FieldMapContainerTest()
         {
             var config = CreateEngineConfiguration();
-            
+
             Assert.AreEqual(0, config.FieldMaps.Count);
 
             var testSimple = new SimpleFieldMapConfigMock();
@@ -48,6 +44,6 @@ namespace MigrationTools.Engine.Containers.Tests
             Assert.AreEqual(1, fieldMapContainer.Count);
         }
 
-       
+
     }
 }

@@ -2,16 +2,14 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MigrationTools.CommandLine;
-using MigrationTools;
 using MigrationTools.Clients;
+using MigrationTools.Clients.Tests;
+using MigrationTools.CommandLine;
 using MigrationTools.Configuration;
 using MigrationTools.Configuration.Tests;
-using MigrationTools.Engine;
 using MigrationTools.Engine.Containers;
 using MigrationTools.Services;
 using MigrationTools.Tests.Core.Clients;
-using MigrationTools.Clients.Tests;
 
 namespace MigrationTools.Tests
 {
@@ -38,7 +36,7 @@ namespace MigrationTools.Tests
                 services.AddSingleton<ProcessorContainer>();
                 services.AddSingleton<TypeDefinitionMapContainer>();
                 services.AddSingleton<GitRepoMapContainer>();
-                  services.AddSingleton<FieldMapContainer>();
+                services.AddSingleton<FieldMapContainer>();
 
                 services.AddSingleton<ChangeSetMappingContainer>();
                 services.AddSingleton<ITelemetryLogger, TelemetryClientAdapter>();

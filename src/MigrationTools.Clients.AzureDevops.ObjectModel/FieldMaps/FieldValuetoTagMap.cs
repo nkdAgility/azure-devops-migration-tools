@@ -27,7 +27,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
 
         internal override void InternalExecute(WorkItem source, WorkItem target)
         {
-             if (source.Fields.Contains(Config.sourceField))
+            if (source.Fields.Contains(Config.sourceField))
             {
                 // parse existing tags entry
                 var tags = target.Tags

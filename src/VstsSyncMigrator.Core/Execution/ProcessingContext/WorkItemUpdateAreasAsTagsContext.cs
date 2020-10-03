@@ -1,21 +1,15 @@
-﻿using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Linq;
-using MigrationTools.Configuration.Processing;
-using MigrationTools.Configuration;
-using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using MigrationTools;
 using MigrationTools.Clients;
-using Microsoft.Extensions.DependencyInjection;
-using MigrationTools.DataContracts;
 using MigrationTools.Clients.AzureDevops.ObjectModel;
-using Microsoft.Extensions.Logging;
+using MigrationTools.Configuration;
+using MigrationTools.Configuration.Processing;
+using MigrationTools.DataContracts;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -44,8 +38,8 @@ namespace VstsSyncMigrator.Engine
         protected override void InternalExecute()
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
-			//////////////////////////////////////////////////
-            
+            //////////////////////////////////////////////////
+
             IWorkItemQueryBuilder wiqb = Services.GetRequiredService<IWorkItemQueryBuilder>();
             wiqb.AddParameter("AreaPath", config.AreaIterationPath);
             wiqb.Query = @"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject and [System.AreaPath] under @AreaPath";
@@ -59,21 +53,21 @@ namespace VstsSyncMigrator.Engine
             {
                 Stopwatch witstopwatch = Stopwatch.StartNew();
 
-				Trace.WriteLine(string.Format("{0} - Updating: {1}-{2}", current, workitem.Id, workitem.Type));
+                Trace.WriteLine(string.Format("{0} - Updating: {1}-{2}", current, workitem.Id, workitem.Type));
                 string areaPath = workitem.ToWorkItem().AreaPath;
                 List<string> bits = new List<string>(areaPath.Split(char.Parse(@"\"))).Skip(4).ToList();
                 List<string> tags = workitem.ToWorkItem().Tags.Split(char.Parse(@";")).ToList();
                 List<string> newTags = tags.Union(bits).ToList();
                 string newTagList = string.Join(";", newTags.ToArray());
                 if (newTagList != workitem.ToWorkItem().Tags)
-                { 
-                workitem.ToWorkItem().Open();
-                workitem.ToWorkItem().Tags = newTagList;
-                workitem.SaveToAzureDevOps();
+                {
+                    workitem.ToWorkItem().Open();
+                    workitem.ToWorkItem().Tags = newTagList;
+                    workitem.SaveToAzureDevOps();
 
                 }
 
-            witstopwatch.Stop();
+                witstopwatch.Stop();
                 elapsedms = elapsedms + witstopwatch.ElapsedMilliseconds;
                 current--;
                 count++;

@@ -1,23 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using Microsoft.TeamFoundation.Client;
-using Microsoft.TeamFoundation.Framework.Client;
-using Microsoft.TeamFoundation.Framework.Common;
-using Microsoft.TeamFoundation.Server;
 using System.Diagnostics;
 using System.DirectoryServices;
 using System.DirectoryServices.ActiveDirectory;
-using System.DirectoryServices.AccountManagement;
+using System.IO;
+using System.Linq;
 using System.Net;
-using MigrationTools.Configuration.Processing;
-using MigrationTools.Configuration;
-using Microsoft.Extensions.Hosting;
-using MigrationTools;
-using MigrationTools;
 using Microsoft.Extensions.Logging;
+using Microsoft.TeamFoundation.Framework.Client;
+using Microsoft.TeamFoundation.Framework.Common;
+using MigrationTools;
+using MigrationTools.Configuration;
+using MigrationTools.Configuration.Processing;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -50,8 +43,8 @@ namespace VstsSyncMigrator.Engine
         protected override void InternalExecute()
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
-			//////////////////////////////////////////////////
-			string exportPath;
+            //////////////////////////////////////////////////
+            string exportPath;
             string assPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             exportPath = Path.Combine(Path.GetDirectoryName(assPath), "export-pic");
             if (!Directory.Exists(exportPath))

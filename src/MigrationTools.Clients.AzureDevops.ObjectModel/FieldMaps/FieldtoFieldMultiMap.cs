@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools.Configuration;
@@ -39,14 +38,14 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
         {
             bool exists = true;
             foreach (var map in fieldMap)
-            { 
-                if (!source.Fields.Contains(map.Key) )
+            {
+                if (!source.Fields.Contains(map.Key))
                 {
                     exists = false;
                     Log.Warning("Configured Field {Field} does not exist in the source on FieldtoFieldMultiMap", map.Key);
                 }
-            if (!target.Fields.Contains(map.Value))
-            {
+                if (!target.Fields.Contains(map.Value))
+                {
                     exists = false;
                     Log.Warning("Configured Field {Field} does not exist in the target on FieldtoFieldMultiMap", map.Key);
                 }

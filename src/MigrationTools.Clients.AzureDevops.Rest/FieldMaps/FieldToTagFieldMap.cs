@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using MigrationTools.Configuration.FieldMap;
-using MigrationTools.Configuration;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
+using MigrationTools.Configuration;
+using MigrationTools.Configuration.FieldMap;
 
 namespace MigrationTools.Clients.AzureDevops.Rest.FieldMaps
 {

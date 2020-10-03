@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Linq;
-using System.Text.RegularExpressions;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 using MigrationTools.Configuration;
 using MigrationTools.Configuration.FieldMap;
@@ -23,7 +20,7 @@ namespace MigrationTools.Clients.AzureDevops.Rest.FieldMaps
         internal override void InternalExecute(WorkItem source, WorkItem target)
         {
             throw new NotImplementedException();
-          
+
         }
     }
 

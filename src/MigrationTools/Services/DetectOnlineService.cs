@@ -1,11 +1,8 @@
-﻿using Microsoft.ApplicationInsights;
-using Microsoft.ApplicationInsights.DataContracts;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Serilog;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Net.NetworkInformation;
+using Microsoft.ApplicationInsights.DataContracts;
+using Serilog;
 
 namespace MigrationTools.Services
 {

@@ -1,24 +1,17 @@
-﻿using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using MigrationTools.Configuration.Processing;
+using Microsoft.Extensions.Logging;
+using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
-using Serilog;
-using Microsoft.Extensions.Logging;
 
 namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
 {
-   public class EmbededImagesRepairEnricher : EmbededImagesRepairEnricherBase
+    public class EmbededImagesRepairEnricher : EmbededImagesRepairEnricherBase
     {
 
 
@@ -48,8 +41,6 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
         protected override void FixEmbededImages(WorkItemData wi, string oldTfsurl, string newTfsurl, string sourcePersonalAccessToken = "")
         {
             Log.LogInformation("EmbededImagesRepairEnricher: Fixing HTML field attachemtnts for work item {Id} from {OldTfsurl} to {NewTfsUrl}", wi.Id, oldTfsurl, GetUrlWithOppositeSchema(oldTfsurl));
-            bool wiUpdated = false;
-            bool hasCandidates = false;
 
             var oldTfsurlOppositeSchema = GetUrlWithOppositeSchema(oldTfsurl);
             string regExSearchForImageUrl = "(?<=<img.*src=\")[^\"]*";
@@ -106,7 +97,6 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                                 field.Value = field.Value.ToString().Replace(match.Value, newImageLink);
                                 wi.ToWorkItem().Attachments.RemoveAt(attachmentIndex);
                                 wi.SaveToAzureDevOps();
-                                wiUpdated = true;
                                 File.Delete(fullImageFilePath);
                             }
                         }

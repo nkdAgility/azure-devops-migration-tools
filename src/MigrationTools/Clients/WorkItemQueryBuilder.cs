@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -41,7 +40,7 @@ namespace MigrationTools.Clients
             }
             Query = WorkAroundForSOAPError(Query, Parameters); // TODO: Remove this once bug fixed... https://dev.azure.com/nkdagility/migration-tools/_workitems/edit/5066
 
-            IWorkItemQuery wiq =_Services.GetRequiredService<IWorkItemQuery>();
+            IWorkItemQuery wiq = _Services.GetRequiredService<IWorkItemQuery>();
             wiq.Configure(migrationClient, _Query, _Parameters);
             return wiq;
         }

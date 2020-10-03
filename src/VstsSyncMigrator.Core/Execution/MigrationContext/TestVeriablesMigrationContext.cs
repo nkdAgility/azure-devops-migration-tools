@@ -1,17 +1,12 @@
-﻿using Microsoft.TeamFoundation.Client;
-using Microsoft.TeamFoundation.TestManagement.Client;
-using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using System;
-using System.Diagnostics;
-using VstsSyncMigrator.Engine.ComponentContext;
-using System.Linq;
+﻿using System;
 using System.Collections.Generic;
-using MigrationTools.Configuration.Processing;
-using Microsoft.Extensions.Hosting;
+using System.Diagnostics;
+using System.Linq;
+using Microsoft.TeamFoundation.TestManagement.Client;
+using MigrationTools;
 using MigrationTools.Configuration;
-using MigrationTools;
 using MigrationTools.Engine.Processors;
-using MigrationTools;
+using VstsSyncMigrator.Engine.ComponentContext;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -91,7 +86,7 @@ namespace VstsSyncMigrator.Engine
 
         public override void Configure(IProcessorConfig config)
         {
-            
+
         }
     }
 }

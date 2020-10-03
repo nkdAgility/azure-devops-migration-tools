@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace MigrationTools.Clients
 {
-   public interface IWorkItemQueryBuilder
+    public interface IWorkItemQueryBuilder
     {
         Dictionary<string, string> Parameters { get; }
         string Query { get; set; }

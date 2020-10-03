@@ -1,14 +1,11 @@
-﻿using Microsoft.Extensions.Hosting;
-using MigrationTools.Configuration;
-using Serilog;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Text;
+using MigrationTools.Configuration;
 
 namespace MigrationTools.Engine.Containers
 {
-   public class GitRepoMapContainer : EngineContainer<ReadOnlyDictionary<string, string>>
+    public class GitRepoMapContainer : EngineContainer<ReadOnlyDictionary<string, string>>
     {
 
         private Dictionary<string, string> _GitRepoMaps { get; set; }

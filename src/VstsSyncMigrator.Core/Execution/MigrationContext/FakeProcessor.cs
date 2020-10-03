@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using MigrationTools.Configuration;
 using MigrationTools;
-using MigrationTools.Engine.Processors;
+using MigrationTools.Configuration;
 using MigrationTools.DataContracts;
+using MigrationTools.Engine.Processors;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -27,13 +27,13 @@ namespace VstsSyncMigrator.Engine
         protected override void InternalExecute()
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
-			//////////////////////////////////////////////////
-            
+            //////////////////////////////////////////////////
+
             var query = @"SELECT [System.Id] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject ";// AND [System.Id] = 188708 ";
             List<WorkItemData> sourceWIS = Engine.Source.WorkItems.GetWorkItems(query);
             Trace.WriteLine(string.Format("Migrate {0} work items?", sourceWIS.Count));
             //////////////////////////////////////////////////
-            
+
             int current = sourceWIS.Count;
             foreach (WorkItemData sourceWI in sourceWIS)
             {
@@ -45,7 +45,7 @@ namespace VstsSyncMigrator.Engine
 
         public override void Configure(IProcessorConfig config)
         {
-          // FakeProcessorConfig config
+            // FakeProcessorConfig config
         }
     }
 }

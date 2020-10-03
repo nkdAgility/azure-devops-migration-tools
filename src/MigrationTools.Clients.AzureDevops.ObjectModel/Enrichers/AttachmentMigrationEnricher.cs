@@ -1,18 +1,11 @@
-﻿using Microsoft.TeamFoundation.Framework.Client;
-using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using Microsoft.TeamFoundation.WorkItemTracking.Proxy;
-using Serilog;
-using Serilog.Events;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MigrationTools;
+using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using Microsoft.TeamFoundation.WorkItemTracking.Proxy;
 using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
+using Serilog;
 
 namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
 {
@@ -42,7 +35,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                 throw new ArgumentNullException(nameof(target));
             }
 
-            Log.Information("AttachmentMigrationEnricher: Migrating  {AttachmentCount} attachemnts from {SourceWorkItemID} to {TargetWorkItemID}", source.ToWorkItem().Attachments.Count, source.Id,target.Id);
+            Log.Information("AttachmentMigrationEnricher: Migrating  {AttachmentCount} attachemnts from {SourceWorkItemID} to {TargetWorkItemID}", source.ToWorkItem().Attachments.Count, source.Id, target.Id);
             _exportWiPath = Path.Combine(_exportBasePath, source.ToWorkItem().Id.ToString());
             if (System.IO.Directory.Exists(_exportWiPath))
             {

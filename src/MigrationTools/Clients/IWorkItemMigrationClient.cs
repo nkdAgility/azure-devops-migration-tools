@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Text;
+﻿using System.Collections.Generic;
 using MigrationTools.Configuration;
 using MigrationTools.DataContracts;
 

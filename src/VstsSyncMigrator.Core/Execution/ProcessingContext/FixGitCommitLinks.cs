@@ -1,18 +1,14 @@
-﻿using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using System;
-
-using System.Diagnostics;
-
-using MigrationTools.Configuration.Processing;
-
-using MigrationTools.Configuration;
-using MigrationTools;
-using MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers;
+﻿using System;
 using System.Collections.Generic;
-using MigrationTools.DataContracts;
-using MigrationTools.Clients.AzureDevops.ObjectModel;
-using Microsoft.Extensions.Logging;
+using System.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using MigrationTools;
+using MigrationTools.Clients.AzureDevops.ObjectModel;
+using MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers;
+using MigrationTools.Configuration;
+using MigrationTools.Configuration.Processing;
+using MigrationTools.DataContracts;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -45,7 +41,7 @@ namespace VstsSyncMigrator.Engine
         protected override void InternalExecute()
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
-			//////////////////////////////////////////////////
+            //////////////////////////////////////////////////
             var query =
                 string.Format(
                     @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY {1}",
@@ -61,9 +57,9 @@ namespace VstsSyncMigrator.Engine
             int noteFound = 0;
             foreach (WorkItemData workitem in workitems)
             {
-               
+
                 Stopwatch witstopwatch = Stopwatch.StartNew();
-				workitem.ToWorkItem().Open();
+                workitem.ToWorkItem().Open();
 
                 _GitRepositoryEnricher.Enrich(null, workitem);
 
@@ -78,8 +74,8 @@ namespace VstsSyncMigrator.Engine
                 elapsedms = elapsedms + witstopwatch.ElapsedMilliseconds;
                 current--;
                 count++;
-                TimeSpan average = new TimeSpan(0, 0, 0, 0, (int) (elapsedms / count));
-                TimeSpan remaining = new TimeSpan(0, 0, 0, 0, (int) (average.TotalMilliseconds * current));
+                TimeSpan average = new TimeSpan(0, 0, 0, 0, (int)(elapsedms / count));
+                TimeSpan remaining = new TimeSpan(0, 0, 0, 0, (int)(average.TotalMilliseconds * current));
                 Trace.WriteLine(string.Format("Average time of {0} per work item and {1} estimated to completion",
                     string.Format(@"{0:s\:fff} seconds", average),
                     string.Format(@"{0:%h} hours {0:%m} minutes {0:s\:fff} seconds", remaining)));

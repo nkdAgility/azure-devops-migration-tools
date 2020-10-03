@@ -1,22 +1,16 @@
-﻿using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using MigrationTools.Configuration.Processing;
-using Microsoft.Extensions.Hosting;
-using MigrationTools.Configuration;
-using MigrationTools;
-using MigrationTools.Clients.AzureDevops.ObjectModel;
-using MigrationTools.Engine.Processors;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools;
 using MigrationTools.Clients;
-using Microsoft.Extensions.DependencyInjection;
+using MigrationTools.Clients.AzureDevops.ObjectModel;
+using MigrationTools.Configuration;
+using MigrationTools.Configuration.Processing;
 using MigrationTools.DataContracts;
+using MigrationTools.Engine.Processors;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -81,7 +75,7 @@ namespace VstsSyncMigrator.Engine
             foreach (WorkItemData sourceWI in sourceWIS)
             {
                 Stopwatch witstopwatch = Stopwatch.StartNew();
-				WorkItemData targetFound;
+                WorkItemData targetFound;
                 targetFound = Engine.Target.WorkItems.FindReflectedWorkItem(sourceWI, false);
                 Trace.WriteLine(string.Format("{0} - Updating: {1}-{2}", current, sourceWI.Id, sourceWI.Type));
                 if (targetFound == null)

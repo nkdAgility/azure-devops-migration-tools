@@ -10,7 +10,7 @@ namespace MigrationTools.Host
         {
             var initOptions = host.Services.GetService<InitOptions>();
             var executeOptions = host.Services.GetService<ExecuteOptions>();
-            if(initOptions == null && executeOptions == null)
+            if (initOptions == null && executeOptions == null)
             {
                 return null;
             }

@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-
-namespace MigrationTools.Configuration.FieldMap
+﻿namespace MigrationTools.Configuration.FieldMap
 {
-   public class FieldtoFieldMapConfig : IFieldMapConfig
+    public class FieldtoFieldMapConfig : IFieldMapConfig
     {
         public string WorkItemTypeName { get; set; }
         public string sourceField { get; set; }

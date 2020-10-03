@@ -1,18 +1,15 @@
 ﻿using System;
-using Microsoft.ApplicationInsights;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools;
+using MigrationTools.Clients;
+using MigrationTools.Clients.AzureDevops.ObjectModel.Clients;
+using MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps;
 using MigrationTools.CommandLine;
 using MigrationTools.Configuration;
 using MigrationTools.Engine.Containers;
 using MigrationTools.Services;
-using MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps;
-using VstsSyncMigrator.Engine;
-using MigrationTools;
-using MigrationTools.Clients;
-using MigrationTools.Clients.AzureDevops.ObjectModel.Clients;
 using Serilog;
 using Serilog.Core;
 
@@ -29,7 +26,7 @@ namespace _VstsSyncMigrator.Engine.Tests
         {
             var levelSwitch = new LoggingLevelSwitch();
             Log.Logger = new LoggerConfiguration().MinimumLevel.ControlledBy(levelSwitch).WriteTo.Console().CreateLogger();
-            
+
             ecb = new EngineConfigurationBuilder(new NullLogger<EngineConfigurationBuilder>());
             var services = new ServiceCollection();
             services.AddSingleton<LoggingLevelSwitch>(levelSwitch);
@@ -75,7 +72,7 @@ namespace _VstsSyncMigrator.Engine.Tests
 
             _services = services.BuildServiceProvider();
 
-    }
+        }
 
         [TestMethod]
         public void TestEngineCreation()

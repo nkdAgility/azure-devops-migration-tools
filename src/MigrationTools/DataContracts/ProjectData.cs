@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace MigrationTools.DataContracts
+﻿namespace MigrationTools.DataContracts
 {
-   public class ProjectData
+    public class ProjectData
     {
         public string Id { get; set; }
         public string Name { get; set; }

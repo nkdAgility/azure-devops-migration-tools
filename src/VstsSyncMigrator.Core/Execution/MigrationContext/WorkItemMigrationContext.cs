@@ -8,6 +8,7 @@ using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.ApplicationInsights.DataContracts;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.TeamFoundation.Server;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Proxy;
@@ -15,19 +16,18 @@ using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using Microsoft.VisualStudio.Services.Client;
 using Microsoft.VisualStudio.Services.WebApi.Patch.Json;
 using MigrationTools;
-using MigrationTools.Configuration;
-using MigrationTools.Configuration.Processing;
-using MigrationTools.Enrichers;
+using MigrationTools.Clients;
 using MigrationTools.Clients.AzureDevops.ObjectModel;
 using MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers;
+using MigrationTools.Configuration;
+using MigrationTools.Configuration.Processing;
+using MigrationTools.DataContracts;
+using MigrationTools.Engine.Processors;
+using MigrationTools.Enrichers;
 using Newtonsoft.Json;
 using Serilog;
 using Serilog.Context;
 using Serilog.Events;
-using MigrationTools.Engine.Processors;
-using MigrationTools.DataContracts;
-using MigrationTools.Clients;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -106,9 +106,9 @@ namespace VstsSyncMigrator.Engine
             var workItemServer = Engine.Source.GetService<WorkItemServer>();
             workItemLinkEnricher = Services.GetRequiredService<WorkItemLinkEnricher>();
             attachmentEnricher = new AttachmentMigrationEnricher(workItemServer, _config.AttachmentWorkingPath, _config.AttachmentMaxSize);
-            embededImagesEnricher = Services.GetRequiredService<EmbededImagesRepairEnricher>(); 
+            embededImagesEnricher = Services.GetRequiredService<EmbededImagesRepairEnricher>();
             gitRepositoryEnricher = Services.GetRequiredService<GitRepositoryEnricher>();
-            nodeStructureEnricher = Services.GetRequiredService < NodeStructureEnricher>();
+            nodeStructureEnricher = Services.GetRequiredService<NodeStructureEnricher>();
             VssClientCredentials adoCreds = new VssClientCredentials();
             _witClient = new WorkItemTrackingHttpClient(Engine.Target.Config.Collection, adoCreds);
             //Validation: make sure that the ReflectedWorkItemId field name specified in the config exists in the target process, preferably on each work item type.
@@ -348,11 +348,11 @@ namespace VstsSyncMigrator.Engine
             return sortedRevisions;
         }
 
-       
+
 
         private WorkItemData ReplayRevisions(List<RevisionItem> revisionsToMigrate, WorkItemData sourceWorkItem, WorkItemData targetWorkItem, int current)
         {
-            
+
             try
             {
                 var skipToFinalRevisedWorkItemType = _config.SkipToFinalRevisedWorkItemType;
@@ -493,7 +493,7 @@ namespace VstsSyncMigrator.Engine
             return targetWorkItem;
         }
 
-        
+
 
         private WorkItemData CreateWorkItem_Shell(ProjectData destProject, WorkItemData currentRevisionWorkItem, string destType)
         {
@@ -582,7 +582,7 @@ namespace VstsSyncMigrator.Engine
         private List<WorkItemData> FilterByTarget(List<WorkItemData> sourceWorkItems)
         {
             contextLog.Debug("FilterByTarget: START");
-            var targetQuery = 
+            var targetQuery =
                 string.Format(
                     @"SELECT [System.Id], [{0}] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {1} ORDER BY {2}",
                      Engine.Target.Config.ReflectedWorkItemIDFieldName,

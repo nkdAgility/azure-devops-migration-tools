@@ -1,10 +1,5 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using System;
 using MigrationTools.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Net.Http.Headers;
-using System.Runtime.CompilerServices;
-using System.Text;
 
 namespace MigrationTools.Engine.Containers
 {

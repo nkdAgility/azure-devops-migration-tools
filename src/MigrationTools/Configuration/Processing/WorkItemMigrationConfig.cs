@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+﻿using System.Collections.Generic;
 
 namespace MigrationTools.Configuration.Processing
 {
@@ -15,7 +12,7 @@ namespace MigrationTools.Configuration.Processing
         public bool AppendMigrationToolSignatureFooter { get; set; }
         public string WIQLQueryBit { get; set; }
         /// <inheritdoc />
-        public string WIQLOrderBit { get; set; } 
+        public string WIQLOrderBit { get; set; }
         public bool Enabled { get; set; }
         /// <inheritdoc />
         public string Processor => "WorkItemMigrationContext";

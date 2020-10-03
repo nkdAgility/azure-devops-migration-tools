@@ -9,17 +9,14 @@ using System.Text.RegularExpressions;
 using Microsoft.TeamFoundation.Framework.Client;
 using Microsoft.TeamFoundation.Framework.Common;
 using Microsoft.TeamFoundation.TestManagement.Client;
-using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools;
+using MigrationTools.Clients.AzureDevops.ObjectModel;
 using MigrationTools.Configuration;
 using MigrationTools.Configuration.Processing;
-using MigrationTools.Clients.AzureDevops.ObjectModel;
+using MigrationTools.DataContracts;
+using MigrationTools.Engine.Processors;
 using Serilog;
 using VstsSyncMigrator.Engine.ComponentContext;
-using WorkItem = Microsoft.TeamFoundation.WorkItemTracking.Client.WorkItem;
-using MigrationTools;
-using MigrationTools.Engine.Processors;
-using MigrationTools.DataContracts;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -246,7 +243,7 @@ namespace VstsSyncMigrator.Engine
                 {
                     link.Uri.ToString();
                 }
-                catch (UriFormatException e)
+                catch (UriFormatException)
                 {
                     linksToRemove.Add(link);
                 }
@@ -322,7 +319,7 @@ namespace VstsSyncMigrator.Engine
 
         private void TagCompletedTargetPlan(int workItemId)
         {
-            var targetPlanWorkItem = Engine.Target.WorkItems.GetWorkItem(workItemId.ToString()) ;
+            var targetPlanWorkItem = Engine.Target.WorkItems.GetWorkItem(workItemId.ToString());
             targetPlanWorkItem.ToWorkItem().Tags = targetPlanWorkItem.ToWorkItem().Tags + ";migrated";
             targetPlanWorkItem.SaveToAzureDevOps();
         }
@@ -381,7 +378,7 @@ namespace VstsSyncMigrator.Engine
                         WorkItemData targetReq = null;
                         try
                         {
-                            sourceReq = Engine.Source.WorkItems.GetWorkItem(sourceRid.ToString()) ;
+                            sourceReq = Engine.Source.WorkItems.GetWorkItem(sourceRid.ToString());
                             if (sourceReq == null)
                             {
                                 TraceWriteLine(sourceSuite, "            Source work item not found", 5);
@@ -475,7 +472,6 @@ namespace VstsSyncMigrator.Engine
                         CompareOptions.IgnoreCase) >= 0)
                 {
                     string regExSearchForSystemId = @"(\[System.Id\]\s*=\s*[\d]*)";
-                    string regExSearchForSystemId2 = @"(\[System.Id\]\s*IN\s*)";
 
                     MatchCollection matches = Regex.Matches(dynamic.Query.QueryText, regExSearchForSystemId, RegexOptions.IgnoreCase);
 

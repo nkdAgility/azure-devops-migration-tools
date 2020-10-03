@@ -1,11 +1,11 @@
-﻿using Microsoft.TeamFoundation.SourceControl.WebApi;
-using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using Serilog;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Microsoft.TeamFoundation.SourceControl.WebApi;
+using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using Serilog;
 
 namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
 {
@@ -39,9 +39,6 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
 
         private static GitRepositoryInfo CreateFromTFVC(ExternalLink gitExternalLink, IList<GitRepository> possibleRepos, ReadOnlyDictionary<int, string> changesetMapping, string sourceProjectName, string workItemSourceProjectName)
         {
-            string commitID;
-            string repoID;
-            GitRepository gitRepo;
 
             //vstfs:///VersionControl/Changeset/{id}
             var changeSetIdPart = gitExternalLink.LinkedArtifactUri.Substring(gitExternalLink.LinkedArtifactUri.LastIndexOf('/') + 1);
