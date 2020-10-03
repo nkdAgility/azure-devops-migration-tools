@@ -1,11 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using MigrationTools.Engine;
-using MigrationTools.Host;
-using MigrationTools.Clients.AzureDevops.Rest;
 using MigrationTools.Clients.AzureDevops.Rest.FieldMaps;
-using MigrationTools;
+using MigrationTools.Host;
 
 namespace MigrationTools.ConsoleCore
 {
@@ -34,14 +30,7 @@ namespace MigrationTools.ConsoleCore
                     // services.AddTransient<IMigrationClient, MigrationRestClient>();
 
                 });
-            var host = hostBuilder.Build();
-            var startupService = host.InitializeMigrationSetup(args);
-            if (startupService == null)
-            {
-                return;
-            }
-            await host.RunAsync();
-            startupService.RunExitLogic();
+            await hostBuilder.RunMigrationTools(args);
         }
     }
 }

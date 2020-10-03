@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
+using System.Threading.Tasks;
 using CommandLine;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MigrationTools.CommandLine;
-using MigrationTools;
 using MigrationTools.Configuration;
-using MigrationTools.Engine.Containers;
 using MigrationTools.CustomDiagnostics;
+using MigrationTools.Engine.Containers;
 using MigrationTools.Services;
 using Serilog;
 
@@ -82,6 +81,18 @@ namespace MigrationTools.Host
                 })
                 .UseConsoleLifetime();
             return hostBuilder;
+        }
+
+        public static async Task RunMigrationTools(this IHostBuilder hostBuilder, string[] args)
+        {
+            var host = hostBuilder.Build();
+            var startupService = host.InitializeMigrationSetup(args);
+            if (startupService == null)
+            {
+                return;
+            }
+            await host.RunAsync();
+            startupService.RunExitLogic();
         }
 
         private static string CreateLogsPath()

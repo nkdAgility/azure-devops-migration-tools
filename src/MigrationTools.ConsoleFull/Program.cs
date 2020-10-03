@@ -1,17 +1,11 @@
-﻿using System;
-using System.Diagnostics;
-using System.IO;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using MigrationTools;
-using MigrationTools.Host;
-using MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps;
-using VstsSyncMigrator.Engine;
 using MigrationTools.Clients;
 using MigrationTools.Clients.AzureDevops.ObjectModel.Clients;
-using MigrationTools;
 using MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers;
+using MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps;
+using MigrationTools.Host;
+using VstsSyncMigrator.Engine;
 
 namespace VstsSyncMigrator.ConsoleApp
 {
@@ -65,14 +59,9 @@ namespace VstsSyncMigrator.ConsoleApp
 
 
                 });
-                var host = hostBuilder.Build();
-            var startupService = host.InitializeMigrationSetup(args);
-            if(startupService == null)
-            {
-                return;
-            }
-            await host.RunAsync();
-            startupService.RunExitLogic();
+
+            await hostBuilder.RunMigrationTools(args);
+
         }
     }
 }
