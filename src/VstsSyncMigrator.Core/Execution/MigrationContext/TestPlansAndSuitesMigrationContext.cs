@@ -25,16 +25,16 @@ namespace VstsSyncMigrator.Engine
 {
     public class TestPlandsAndSuitesMigrationContext : MigrationProcessorBase
     {
-        TestManagementContext sourceTestStore;
-        ITestConfigurationCollection sourceTestConfigs;
+        TestManagementContext _sourceTestStore;
+        ITestConfigurationCollection _sourceTestConfigs;
 
-        TestManagementContext targetTestStore;
-        ITestConfigurationCollection targetTestConfigs;
+        TestManagementContext _targetTestStore;
+        ITestConfigurationCollection _targetTestConfigs;
 
-        TestPlansAndSuitesMigrationConfig config;
+        TestPlansAndSuitesMigrationConfig _config;
 
-        IIdentityManagementService sourceIdentityManagementService;
-        IIdentityManagementService targetIdentityManagementService;
+        IIdentityManagementService _sourceIdentityManagementService;
+        IIdentityManagementService _targetIdentityManagementService;
 
         int _currentPlan = 0;
         int _totalPlans = 0;
@@ -57,9 +57,9 @@ namespace VstsSyncMigrator.Engine
         {
         }
 
-        public override void Configure(IProcessorConfig configx)
+        public override void Configure(IProcessorConfig config)
         {
-            config = (TestPlansAndSuitesMigrationConfig)configx;
+            _config = (TestPlansAndSuitesMigrationConfig)config;
         }
 
         private void TraceWriteLine(ITestPlan sourcePlan, string message = "", int indent = 0, bool header = false)
@@ -113,22 +113,22 @@ namespace VstsSyncMigrator.Engine
 
         protected override void InternalExecute()
         {
-            sourceTestStore = new TestManagementContext(Engine.Source, config.TestPlanQueryBit);
-            targetTestStore = new TestManagementContext(Engine.Target);
-            sourceTestConfigs = sourceTestStore.Project.TestConfigurations.Query("Select * From TestConfiguration");
-            targetTestConfigs = targetTestStore.Project.TestConfigurations.Query("Select * From TestConfiguration");
-            sourceIdentityManagementService = Engine.Source.GetService<IIdentityManagementService>();
-            targetIdentityManagementService = Engine.Target.GetService<IIdentityManagementService>();
+            _sourceTestStore = new TestManagementContext(Engine.Source, _config.TestPlanQueryBit);
+            _targetTestStore = new TestManagementContext(Engine.Target);
+            _sourceTestConfigs = _sourceTestStore.Project.TestConfigurations.Query("Select * From TestConfiguration");
+            _targetTestConfigs = _targetTestStore.Project.TestConfigurations.Query("Select * From TestConfiguration");
+            _sourceIdentityManagementService = Engine.Source.GetService<IIdentityManagementService>();
+            _targetIdentityManagementService = Engine.Target.GetService<IIdentityManagementService>();
 
-            bool filterByCompleted = config.FilterCompleted;
+            bool filterByCompleted = _config.FilterCompleted;
 
             var stopwatch = Stopwatch.StartNew();
             var starttime = DateTime.Now;
-            ITestPlanCollection sourcePlans = sourceTestStore.GetTestPlans();
+            ITestPlanCollection sourcePlans = _sourceTestStore.GetTestPlans();
             List<ITestPlan> toProcess;
             if (filterByCompleted)
             {
-                var targetPlanNames = (from ITestPlan tp in targetTestStore.GetTestPlans() select tp.Name).ToList();
+                var targetPlanNames = (from ITestPlan tp in _targetTestStore.GetTestPlans() select tp.Name).ToList();
                 toProcess = (from ITestPlan tp in sourcePlans where !targetPlanNames.Contains(tp.Name) select tp).ToList();
             }
             else
@@ -163,11 +163,11 @@ namespace VstsSyncMigrator.Engine
             var parameters = new Dictionary<string, string>();
             AddParameter("PlanId", parameters, sourcePlan.Id.ToString());
             ////////////////////////////////////
-            var newPlanName = config.PrefixProjectToNodes
+            var newPlanName = _config.PrefixProjectToNodes
                 ? $"{Engine.Source.WorkItems.GetProject().Name}-{sourcePlan.Name}"
                 : $"{sourcePlan.Name}";
             TraceWriteLine(sourcePlan, $"Process Plan {newPlanName}", 0, true);
-            var targetPlan = FindTestPlan(targetTestStore, newPlanName);
+            var targetPlan = FindTestPlan(_targetTestStore, newPlanName);
             if (targetPlan != null && TargetPlanContansTag(targetPlan.Id))
             {
                 return;
@@ -217,7 +217,7 @@ namespace VstsSyncMigrator.Engine
             targetPlan.Save();
             // Load the plan again, because somehow it doesn't let me set configurations on the already loaded plan
             TraceWriteLine(sourcePlan, $"ApplyConfigurationsAndAssignTesters {targetPlan.Name}", 5); ;
-            ITestPlan targetPlan2 = FindTestPlan(targetTestStore, targetPlan.Name);
+            ITestPlan targetPlan2 = FindTestPlan(_targetTestStore, targetPlan.Name);
             ApplyConfigurationsAndAssignTesters(sourcePlan.RootSuite, targetPlan2.RootSuite);
             //////////////////////////////
             TagCompletedTargetPlan(targetPlan.Id);
@@ -254,7 +254,7 @@ namespace VstsSyncMigrator.Engine
 
             if (linksToRemove.Any())
             {
-                if (!config.RemoveInvalidTestSuiteLinks)
+                if (!_config.RemoveInvalidTestSuiteLinks)
                 {
                     TraceWriteLine(targetPlan, "We have detected test suite links that probably can't be migrated. You might receive an error 'The URL specified has a potentially unsafe URL protocol' when migrating to VSTS.", 5);
                     TraceWriteLine(targetPlan, "Please see https://github.com/nkdAgility/azure-devops-migration-tools/issues/178 for more details.", 5);
@@ -287,7 +287,7 @@ namespace VstsSyncMigrator.Engine
             var sourceWI = Engine.Source.WorkItems.GetWorkItem(sourceWIId.ToString());
             var targetWI = Engine.Target.WorkItems.GetWorkItem(targetWIId.ToString());
 
-            if (config.PrefixProjectToNodes)
+            if (_config.PrefixProjectToNodes)
             {
                 targetWI.ToWorkItem().AreaPath = string.Format(@"{0}\{1}", Engine.Target.Config.Project, sourceWI.ToWorkItem().AreaPath);
                 targetWI.ToWorkItem().IterationPath = string.Format(@"{0}\{1}", Engine.Target.Config.Project, sourceWI.ToWorkItem().IterationPath);
@@ -336,12 +336,12 @@ namespace VstsSyncMigrator.Engine
 
         private bool CanSkipElementBecauseOfTags(int workItemId)
         {
-            if (config.OnlyElementsWithTag == null)
+            if (_config.OnlyElementsWithTag == null)
             {
                 return false;
             }
             var sourcePlanWorkItem = Engine.Source.WorkItems.GetWorkItem(workItemId.ToString());
-            var tagWhichMustBePresent = config.OnlyElementsWithTag;
+            var tagWhichMustBePresent = _config.OnlyElementsWithTag;
             return !sourcePlanWorkItem.ToWorkItem().Tags.Contains(tagWhichMustBePresent);
         }
 
@@ -496,7 +496,7 @@ namespace VstsSyncMigrator.Engine
                                 dynamic.Refresh();
                                 dynamic.Repopulate();
                             }
-                            dynamic.Query = targetTestStore.Project.CreateTestQuery(dynamic.Query.QueryText.Replace(match.Value, string.Format("[System.Id] = {0}", targetWi.Id)));
+                            dynamic.Query = _targetTestStore.Project.CreateTestQuery(dynamic.Query.QueryText.Replace(match.Value, string.Format("[System.Id] = {0}", targetWi.Id)));
                             if (targetPlan != null)
                             {
                                 targetPlan.Save();
@@ -563,7 +563,7 @@ namespace VstsSyncMigrator.Engine
                 }
                 else
                 {
-                    ITestCase targetTestCase = targetTestStore.Project.TestCases.Find(int.Parse(wi.Id));
+                    ITestCase targetTestCase = _targetTestStore.Project.TestCases.Find(int.Parse(wi.Id));
                     if (targetTestCase == null)
                     {
                         TraceWriteLine(source, string.Format("    ERROR: Test case not found {0} : {1} - {2} ", sourceTestCaseEntry.EntryType, sourceTestCaseEntry.Id, sourceTestCaseEntry.Title), 15);
@@ -602,7 +602,7 @@ namespace VstsSyncMigrator.Engine
                 IList<IdAndName> targetConfigs = new List<IdAndName>();
                 foreach (var config in source.DefaultConfigurations)
                 {
-                    var targetFound = (from tc in targetTestConfigs
+                    var targetFound = (from tc in _targetTestConfigs
                                        where tc.Name == config.Name
                                        select tc).SingleOrDefault();
                     if (targetFound != null)
@@ -734,7 +734,7 @@ namespace VstsSyncMigrator.Engine
                             targetIdentity = GetTargetIdentity(tpa.AssignedTo.Descriptor);
                             if (targetIdentity == null)
                             {
-                                sourceIdentityManagementService.RefreshIdentity(tpa.AssignedTo.Descriptor);
+                                _sourceIdentityManagementService.RefreshIdentity(tpa.AssignedTo.Descriptor);
                             }
 
                             targetIdentity = GetTargetIdentity(tpa.AssignedTo.Descriptor);
@@ -742,12 +742,12 @@ namespace VstsSyncMigrator.Engine
 
                         // translate source configuration id to target configuration id and name
                         //// Get source configuration name
-                        string sourceConfigName = (from tc in sourceTestConfigs
+                        string sourceConfigName = (from tc in _sourceTestConfigs
                                                    where tc.Id == sourceConfigurationId
                                                    select tc.Name).FirstOrDefault();
 
                         //// Find source configuration name in target and get the id for it
-                        int targetConfigId = (from tc in targetTestConfigs
+                        int targetConfigId = (from tc in _targetTestConfigs
                                               where tc.Name == sourceConfigName
                                               select tc.Id).FirstOrDefault();
 
@@ -789,7 +789,7 @@ namespace VstsSyncMigrator.Engine
         /// <returns>Target Identity</returns>
         private TeamFoundationIdentity GetTargetIdentity(IdentityDescriptor sourceIdentityDescriptor)
         {
-            var sourceIdentity = sourceIdentityManagementService.ReadIdentity(
+            var sourceIdentity = _sourceIdentityManagementService.ReadIdentity(
                 sourceIdentityDescriptor,
                 MembershipQuery.Direct,
                 ReadIdentityOptions.ExtendedProperties);
@@ -798,7 +798,7 @@ namespace VstsSyncMigrator.Engine
             // Try refresh the Identity if we are missing the Mail property
             if (string.IsNullOrEmpty(sourceIdentityMail))
             {
-                sourceIdentity = sourceIdentityManagementService.ReadIdentity(
+                sourceIdentity = _sourceIdentityManagementService.ReadIdentity(
                     sourceIdentityDescriptor,
                     MembershipQuery.Direct,
                     ReadIdentityOptions.ExtendedProperties);
@@ -812,7 +812,7 @@ namespace VstsSyncMigrator.Engine
                 TeamFoundationIdentity targetIdentity = null;
                 try
                 {
-                    targetIdentity = targetIdentityManagementService.ReadIdentity(
+                    targetIdentity = _targetIdentityManagementService.ReadIdentity(
                         IdentitySearchFactor.MailAddress,
                         sourceIdentityMail,
                         MembershipQuery.Direct,
@@ -825,7 +825,7 @@ namespace VstsSyncMigrator.Engine
 
                 if (targetIdentity == null)
                 {
-                    targetIdentity = targetIdentityManagementService.ReadIdentity(
+                    targetIdentity = _targetIdentityManagementService.ReadIdentity(
                         IdentitySearchFactor.AccountName,
                         sourceIdentityMail,
                         MembershipQuery.Direct,
@@ -865,7 +865,7 @@ namespace VstsSyncMigrator.Engine
                 IList<IdAndName> targetConfigs = new List<IdAndName>();
                 foreach (var config in sourceEntry.Configurations)
                 {
-                    var targetFound = (from tc in targetTestConfigs
+                    var targetFound = (from tc in _targetTestConfigs
                                        where tc.Name == config.Name
                                        select tc).SingleOrDefault();
                     if (targetFound != null)
@@ -894,9 +894,9 @@ namespace VstsSyncMigrator.Engine
 
         private ITestSuiteBase CreateNewDynamicTestSuite(ITestSuiteBase source)
         {
-            IDynamicTestSuite targetSuiteChild = targetTestStore.Project.TestSuites.CreateDynamic();
+            IDynamicTestSuite targetSuiteChild = _targetTestStore.Project.TestSuites.CreateDynamic();
             targetSuiteChild.TestSuiteEntry.Title = source.TestSuiteEntry.Title;
-            ApplyTestSuiteQuery(source, targetSuiteChild, targetTestStore);
+            ApplyTestSuiteQuery(source, targetSuiteChild, _targetTestStore);
 
             return targetSuiteChild;
         }
@@ -906,7 +906,7 @@ namespace VstsSyncMigrator.Engine
             IRequirementTestSuite targetSuiteChild;
             try
             {
-                targetSuiteChild = targetTestStore.Project.TestSuites.CreateRequirement(requirement.ToWorkItem());
+                targetSuiteChild = _targetTestStore.Project.TestSuites.CreateRequirement(requirement.ToWorkItem());
             }
             catch (TestManagementValidationException ex)
             {
@@ -940,7 +940,7 @@ namespace VstsSyncMigrator.Engine
                           { "Title", newTestSuite.Title},
                           { "TestSuiteType", newTestSuite.TestSuiteType.ToString()}
                       });
-                ITestSuiteBase ErrorSuiteChild = targetTestStore.Project.TestSuites.CreateStatic();
+                ITestSuiteBase ErrorSuiteChild = _targetTestStore.Project.TestSuites.CreateStatic();
                 ErrorSuiteChild.TestSuiteEntry.Title = string.Format(@"BROKEN: {0} | {1}", newTestSuite.Title, ex.Message);
                 ((IStaticTestSuite)parent).Entries.Add(ErrorSuiteChild);
             }
@@ -950,7 +950,7 @@ namespace VstsSyncMigrator.Engine
 
         private ITestSuiteBase CreateNewStaticTestSuite(ITestSuiteBase source)
         {
-            ITestSuiteBase targetSuiteChild = targetTestStore.Project.TestSuites.CreateStatic();
+            ITestSuiteBase targetSuiteChild = _targetTestStore.Project.TestSuites.CreateStatic();
             targetSuiteChild.TestSuiteEntry.Title = source.TestSuiteEntry.Title;
             return targetSuiteChild;
         }
@@ -973,7 +973,7 @@ namespace VstsSyncMigrator.Engine
         private ITestPlan CreateNewTestPlanFromSource(ITestPlan sourcePlan, string newPlanName)
         {
             ITestPlan targetPlan;
-            targetPlan = targetTestStore.CreateTestPlan();
+            targetPlan = _targetTestStore.CreateTestPlan();
             targetPlan.CopyPropertiesFrom(sourcePlan);
             targetPlan.Name = newPlanName;
             targetPlan.StartDate = sourcePlan.StartDate;
@@ -1025,7 +1025,7 @@ namespace VstsSyncMigrator.Engine
                 Trace.WriteLine(string.Format(@"Team Project names dont match. We need to fix the query in dynamic test suite {0} - {1}.", source.Id, source.Title));
                 Trace.WriteLine(string.Format(@"Replacing old project name {1} in query {0} with new team project name {2}", targetSuiteChild.Query.QueryText, source.Plan.Project.TeamProjectName, targetTestStore.Project.TeamProjectName));
                 // First need to check is prefix project nodes has been applied for the migration
-                if (config.PrefixProjectToNodes)
+                if (_config.PrefixProjectToNodes)
                 {
                     // if prefix project nodes has been applied we need to take the original area/iteration value and prefix
                     targetSuiteChild.Query =
