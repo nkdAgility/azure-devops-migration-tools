@@ -21,8 +21,6 @@ namespace MigrationTools.CustomDiagnostics
                 // Add Common Stuff
                 telemetry.Context.Device.OperatingSystem = Environment.OSVersion.ToString();
                 telemetry.Context.Component.Version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
-                telemetry.Context.User.Id = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
-
                 if (logEvent.Properties.ContainsKey("SessionID"))
                 {
                     telemetry.Context.Session.Id = logEvent.Properties["SessionID"].ToString();
