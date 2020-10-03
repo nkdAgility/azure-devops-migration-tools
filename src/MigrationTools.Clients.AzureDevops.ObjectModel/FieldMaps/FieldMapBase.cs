@@ -14,7 +14,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
 
         public FieldMapBase(ILogger<FieldMapBase> logger)
         {
-            Logger = logger;
+            Log = logger;
         }
 
         public virtual void Configure(IFieldMapConfig config)
@@ -30,7 +30,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Field mapp fault",
+                Log.LogError(ex, "Field mapp fault",
                        new Dictionary<string, string> {
                             { "Source", source.ToWorkItem().Id.ToString() },
                             { "Target",  target.ToWorkItem().Id.ToString()}
@@ -47,7 +47,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
         }
 
         public abstract string MappingDisplayName { get; }
-        public ILogger<FieldMapBase> Logger { get; }
+        public ILogger<FieldMapBase> Log { get; }
 
         internal abstract void InternalExecute(WorkItem source, WorkItem target);
     }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.ProcessConfiguration.Client;
 using MigrationTools;
@@ -17,16 +18,16 @@ namespace VstsSyncMigrator.Engine
     {
         private TeamMigrationConfig _config;
 
+        public TeamMigrationContext(IMigrationEngine engine, IServiceProvider services, ITelemetryLogger telemetry, ILogger<TeamMigrationContext> logger) : base(engine, services, telemetry, logger)
+        {
+        }
+
         public override string Name
         {
             get
             {
                 return "TeamMigrationContext";
             }
-        }
-
-        public TeamMigrationContext(IMigrationEngine me, IServiceProvider services, ITelemetryLogger telemetry) : base(me, services, telemetry)
-        {
         }
 
         public override void Configure(IProcessorConfig config)

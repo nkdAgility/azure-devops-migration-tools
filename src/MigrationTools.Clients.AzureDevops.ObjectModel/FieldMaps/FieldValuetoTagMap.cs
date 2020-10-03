@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
@@ -15,14 +14,13 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
         {
         }
 
+        public override string MappingDisplayName => $"{Config.sourceField}";
         private FieldValuetoTagMapConfig Config { get { return (FieldValuetoTagMapConfig)_Config; } }
 
         public override void Configure(IFieldMapConfig config)
         {
             base.Configure(config);
         }
-
-        public override string MappingDisplayName => $"{Config.sourceField}";
 
         internal override void InternalExecute(WorkItem source, WorkItem target)
         {
@@ -63,7 +61,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
                     if (newTags != target.Tags)
                     {
                         target.Tags = newTags;
-                        Trace.WriteLine(string.Format("  [UPDATE] field tagged {0}:{1} to {2}:Tag with format of {3}", source.Id, Config.sourceField, target.Id, Config.formatExpression));
+                        Log.LogDebug("FieldValuetoTagMap: [UPDATE] field tagged {0}:{1} to {2}:Tag with format of {3}", source.Id, Config.sourceField, target.Id, Config.formatExpression);
                     }
                 }
             }

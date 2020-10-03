@@ -43,7 +43,7 @@ namespace VstsSyncMigrator.Engine
         public void Execute()
         {
             Telemetry.TrackEvent(this.Name);
-            Trace.TraceInformation(string.Format("ProcessingContext Start {0} ", Name));
+            Log.LogDebug("StaticProcessorBase: Start {0} ", Name);
             Stopwatch executeTimer = Stopwatch.StartNew();
             DateTime start = DateTime.Now;
             //////////////////////////////////////////////////
@@ -63,7 +63,7 @@ namespace VstsSyncMigrator.Engine
                     new Dictionary<string, double> {
                         { "ProcessingContextTime", executeTimer.ElapsedMilliseconds }
                     });
-                Trace.TraceInformation(string.Format("ProcessingContext Complete {0} ", Name));
+                Log.LogDebug("StaticProcessorBase: ProcessingContext Complete {0} ", Name);
             }
             catch (Exception ex)
             {

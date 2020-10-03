@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.TestManagement.Client;
 using MigrationTools;
 using MigrationTools.Configuration;
@@ -12,17 +13,35 @@ namespace VstsSyncMigrator.Engine
 {
     public class TestVeriablesMigrationContext : MigrationProcessorBase
     {
+        public TestVeriablesMigrationContext(IMigrationEngine engine, IServiceProvider services, ITelemetryLogger telemetry, ILogger<TestVeriablesMigrationContext> logger) : base(engine, services, telemetry, logger)
+        {
+        }
+
         public override string Name
         {
             get { return "TestVeriablesMigrationContext"; }
         }
 
-        // http://blogs.microsoft.co.il/shair/2015/02/02/tfs-api-part-56-test-configurations/
-
-        public TestVeriablesMigrationContext(IMigrationEngine me, IServiceProvider services, ITelemetryLogger telemetry) : base(me, services, telemetry)
+        public override void Configure(IProcessorConfig config)
         {
         }
 
+        internal ITestVariableValue GetVal(ITestVariable targetVar, string valueToFind)
+        {
+            // Test Variable values are case insensitive in VSTS so need ignore case in comparison
+            return targetVar.AllowedValues.FirstOrDefault(
+                variable => string.Equals(variable.Value, valueToFind, StringComparison.OrdinalIgnoreCase));
+        }
+
+        internal ITestVariable GetVar(ITestVariableHelper tvh, string variableToFind)
+        {
+            // Test Variables are case insensitive in VSTS so need ignore case in comparison
+            return tvh.Query()
+                .FirstOrDefault(variable => string.Equals(variable.Name, variableToFind,
+                    StringComparison.OrdinalIgnoreCase));
+        }
+
+        // http://blogs.microsoft.co.il/shair/2015/02/02/tfs-api-part-56-test-configurations/
         protected override void InternalExecute()
         {
             TestManagementContext SourceTmc = new TestManagementContext(Engine.Source);
@@ -63,25 +82,6 @@ namespace VstsSyncMigrator.Engine
                     }
                 }
             }
-        }
-
-        internal ITestVariable GetVar(ITestVariableHelper tvh, string variableToFind)
-        {
-            // Test Variables are case insensitive in VSTS so need ignore case in comparison
-            return tvh.Query()
-                .FirstOrDefault(variable => string.Equals(variable.Name, variableToFind,
-                    StringComparison.OrdinalIgnoreCase));
-        }
-
-        internal ITestVariableValue GetVal(ITestVariable targetVar, string valueToFind)
-        {
-            // Test Variable values are case insensitive in VSTS so need ignore case in comparison
-            return targetVar.AllowedValues.FirstOrDefault(
-                variable => string.Equals(variable.Value, valueToFind, StringComparison.OrdinalIgnoreCase));
-        }
-
-        public override void Configure(IProcessorConfig config)
-        {
         }
     }
 }

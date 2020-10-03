@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.TestManagement.Client;
 using MigrationTools;
 using MigrationTools.Configuration;
@@ -13,6 +14,10 @@ namespace VstsSyncMigrator.Engine
     {
         // http://blogs.microsoft.co.il/shair/2015/02/02/tfs-api-part-56-test-configurations/
 
+        public TestConfigurationsMigrationContext(IMigrationEngine engine, IServiceProvider services, ITelemetryLogger telemetry, ILogger<TestConfigurationsMigrationContext> logger) : base(engine, services, telemetry, logger)
+        {
+        }
+
         public override string Name
         {
             get
@@ -21,7 +26,7 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        public TestConfigurationsMigrationContext(IMigrationEngine me, IServiceProvider services, ITelemetryLogger telemetry) : base(me, services, telemetry)
+        public override void Configure(IProcessorConfig config)
         {
         }
 
@@ -70,10 +75,6 @@ namespace VstsSyncMigrator.Engine
         {
             // Test configurations are case insensitive in VSTS so need ignore case in comparison
             return tch.Query("Select * From TestConfiguration").FirstOrDefault(variable => string.Equals(variable.Name, configToFind, StringComparison.OrdinalIgnoreCase));
-        }
-
-        public override void Configure(IProcessorConfig config)
-        {
         }
     }
 }

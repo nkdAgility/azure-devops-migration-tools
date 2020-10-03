@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools;
 using MigrationTools.Clients;
@@ -21,13 +22,8 @@ namespace VstsSyncMigrator.Engine
         //private IList<int> _workItemIDs;
         // private string _queryBit;
 
-        public WorkItemPostProcessingContext(IMigrationEngine me, IServiceProvider services, ITelemetryLogger telemetry) : base(me, services, telemetry)
+        public WorkItemPostProcessingContext(IMigrationEngine engine, IServiceProvider services, ITelemetryLogger telemetry, ILogger<WorkItemPostProcessingContext> logger) : base(engine, services, telemetry, logger)
         {
-        }
-
-        public override void Configure(IProcessorConfig config)
-        {
-            _config = (WorkItemPostProcessingConfig)config;
         }
 
         public override string Name
@@ -36,6 +32,11 @@ namespace VstsSyncMigrator.Engine
             {
                 return "WorkItemPostProcessingContext";
             }
+        }
+
+        public override void Configure(IProcessorConfig config)
+        {
+            _config = (WorkItemPostProcessingConfig)config;
         }
 
         //public WorkItemPostProcessingContext(MigrationEngine me, WorkItemPostProcessingConfig config, IList<string> wiTypes) : this(me, config)
