@@ -13,6 +13,7 @@ using MigrationTools.Services;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
+using Serilog.Sinks.SystemConsole.Themes;
 
 namespace MigrationTools.Host
 {
@@ -37,7 +38,7 @@ namespace MigrationTools.Host
                      .Enrich.FromLogContext()
                      .Enrich.WithMachineName()
                      .Enrich.WithProcessId()
-                     .WriteTo.Console(LogEventLevel.Debug)
+                     .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Debug, theme: AnsiConsoleTheme.Code)
                      .WriteTo.ApplicationInsights(services.GetService<ITelemetryLogger>().Configuration, new CustomConverter(), LogEventLevel.Error)
                      .WriteTo.File(logPath, LogEventLevel.Verbose);
              })
