@@ -43,7 +43,7 @@ namespace VstsSyncMigrator.Engine
         private GitRepositoryEnricher gitRepositoryEnricher;
         private ILogger contextLog;
         private ILogger workItemLog;
-        private IEmbededImagesRepairEnricher embededImagesEnricher;
+        private IWorkItemEnricher embededImagesEnricher;
         static int _current = 0;
         static int _count = 0;
         static int _failures = 0;
@@ -106,9 +106,9 @@ namespace VstsSyncMigrator.Engine
             var workItemServer = Engine.Source.GetService<WorkItemServer>();
             workItemLinkEnricher = Services.GetRequiredService<WorkItemLinkEnricher>();
             attachmentEnricher = new AttachmentMigrationEnricher(workItemServer, _config.AttachmentWorkingPath, _config.AttachmentMaxSize);
-            embededImagesEnricher = new EmbededImagesRepairEnricher();
-            gitRepositoryEnricher = new GitRepositoryEnricher(Engine);
-            nodeStructureEnricher = new NodeStructureEnricher(Engine);
+            embededImagesEnricher = Services.GetRequiredService<EmbededImagesRepairEnricher>(); 
+            gitRepositoryEnricher = Services.GetRequiredService<GitRepositoryEnricher>();
+            nodeStructureEnricher = Services.GetRequiredService < NodeStructureEnricher>();
             VssClientCredentials adoCreds = new VssClientCredentials();
             _witClient = new WorkItemTrackingHttpClient(Engine.Target.Config.Collection, adoCreds);
             //Validation: make sure that the ReflectedWorkItemId field name specified in the config exists in the target process, preferably on each work item type.
@@ -706,7 +706,7 @@ namespace VstsSyncMigrator.Engine
         {
             if (targetWorkItem != null && _config.FixHtmlAttachmentLinks)
             {
-                embededImagesEnricher.FixEmbededImages(targetWorkItem, Engine.Source.Config.Collection.ToString(), Engine.Target.Config.Collection.ToString(), Engine.Source.Config.PersonalAccessToken);
+                embededImagesEnricher.Enrich(null, targetWorkItem);
             }
         }
 
@@ -717,7 +717,7 @@ namespace VstsSyncMigrator.Engine
                 TraceWriteLine(LogEventLevel.Information, "Links {SourceWorkItemLinkCount} | LinkMigrator:{LinkMigration}", new Dictionary<string, object>() { { "SourceWorkItemLinkCount", sourceWorkItem.ToWorkItem().Links.Count }, { "LinkMigration", _config.LinkMigration } });
                 workItemLinkEnricher.Enrich(sourceWorkItem, targetWorkItem);
                 AddMetric("RelatedLinkCount", processWorkItemMetrics, targetWorkItem.ToWorkItem().Links.Count);
-                int fixedLinkCount = gitRepositoryEnricher.FixExternalLinks(targetWorkItem, targetStore, sourceWorkItem, _config.LinkMigrationSaveEachAsAdded);
+                int fixedLinkCount = gitRepositoryEnricher.Enrich(sourceWorkItem, targetWorkItem);
                 AddMetric("FixedGitLinkCount", processWorkItemMetrics, fixedLinkCount);
             }
         }

@@ -17,6 +17,7 @@ using MigrationTools.Configuration;
 using Microsoft.Extensions.Hosting;
 using MigrationTools;
 using MigrationTools;
+using Microsoft.Extensions.Logging;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -34,7 +35,7 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        public ExportProfilePictureFromADContext(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry) : base(services, me, telemetry)
+        public ExportProfilePictureFromADContext(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<ExportProfilePictureFromADContext> logger) : base(services, me, telemetry, logger)
         {
 
         }

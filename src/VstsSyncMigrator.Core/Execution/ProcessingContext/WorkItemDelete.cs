@@ -9,6 +9,7 @@ using MigrationTools.Clients.AzureDevops.ObjectModel.Clients;
 using MigrationTools.Configuration.Processing;
 using Serilog;
 using MigrationTools.DataContracts;
+using Microsoft.Extensions.Logging;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -16,7 +17,7 @@ namespace VstsSyncMigrator.Engine
     {
         WorkItemDeleteConfig _config;
 
-        public WorkItemDelete(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry) : base(services, me, telemetry)
+        public WorkItemDelete(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<WorkItemUpdate> logger) : base(services, me, telemetry, logger)
         {
 
         }
@@ -46,13 +47,13 @@ namespace VstsSyncMigrator.Engine
 
             if (workItems.Count > 0)
             {
-                Log.Information("We are going to delete {sourceWorkItemsCount} work items?", workItems.Count);
+                Log.LogInformation("We are going to delete {sourceWorkItemsCount} work items?", workItems.Count);
 
                 Console.WriteLine("Enter the number of work Items that we will be deleting! Then hit Enter e.g. 21");
                 string result = Console.ReadLine();
                 if (int.Parse(result) != workItems.Count)
                 {
-                    Log.Warning("USER ABORTED by selecting a number other than {sourceWorkItemsCount}", workItems.Count);
+                    Log.LogWarning("USER ABORTED by selecting a number other than {sourceWorkItemsCount}", workItems.Count);
                     return;
                 }
 
@@ -71,7 +72,7 @@ namespace VstsSyncMigrator.Engine
             }
             else
             {
-                Log.Information("Nothing to delete");
+                Log.LogInformation("Nothing to delete");
             }
 
 

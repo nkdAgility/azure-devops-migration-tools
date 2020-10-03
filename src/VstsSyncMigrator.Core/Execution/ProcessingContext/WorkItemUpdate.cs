@@ -14,6 +14,7 @@ using MigrationTools;
 using MigrationTools.Clients.AzureDevops.ObjectModel;
 using MigrationTools;
 using MigrationTools.DataContracts;
+using Microsoft.Extensions.Logging;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -21,7 +22,7 @@ namespace VstsSyncMigrator.Engine
     {
         WorkItemUpdateConfig _config;
 
-        public WorkItemUpdate(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry) : base(services, me, telemetry)
+        public WorkItemUpdate(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<WorkItemUpdate> logger) : base(services, me, telemetry, logger)
         {
             
         }
