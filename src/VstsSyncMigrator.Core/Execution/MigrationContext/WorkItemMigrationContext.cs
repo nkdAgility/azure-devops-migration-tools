@@ -46,9 +46,7 @@ namespace VstsSyncMigrator.Engine
         private IWorkItemEnricher embededImagesEnricher;
         static int _current = 0;
         static int _count = 0;
-        static int _failures = 0;
-        static int _imported = 0;
-        static int _skipped = 0;
+
         static long _elapsedms = 0;
         static int _totalWorkItem = 0;
         static string workItemLogTeamplate = "[{sourceWorkItemTypeName,20}][Complete:{currentWorkItem,6}/{totalWorkItems}][sid:{sourceWorkItemId,6}|Rev:{sourceRevisionInt,3}][tid:{targetWorkItemId,6} | ";
@@ -509,7 +507,7 @@ namespace VstsSyncMigrator.Engine
                 throw new Exception(string.Format("WARNING: Unable to find '{0}' in the target project. Most likley this is due to a typo in the .json configuration under WorkItemTypeDefinition! ", destType));
             }
             newWorkItemTimer.Stop();
-            Telemetry.TrackDependency(new DependencyTelemetry("TeamService", "NewWorkItem", newWorkItemstartTime, newWorkItemTimer.Elapsed, true));
+            Telemetry.TrackDependency(new DependencyTelemetry("TeamService",Engine.Target.Config.Collection.ToString(), "NewWorkItem", null, newWorkItemstartTime, newWorkItemTimer.Elapsed, "200", true));
             if (_config.UpdateCreatedBy) { newwit.Fields["System.CreatedBy"].Value = currentRevisionWorkItem.ToWorkItem().Revisions[0].Fields["System.CreatedBy"].Value; }
             if (_config.UpdateCreatedDate) { newwit.Fields["System.CreatedDate"].Value = currentRevisionWorkItem.ToWorkItem().Revisions[0].Fields["System.CreatedDate"].Value; }
 

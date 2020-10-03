@@ -35,7 +35,6 @@ namespace VstsSyncMigrator.Engine
 
         int _currentPlan = 0;
         int _totalPlans = 0;
-        long _elapsedms = 0;
         int __currentSuite = 0;
         int __totalSuites = 0;
         int _currentTestCases = 0;
