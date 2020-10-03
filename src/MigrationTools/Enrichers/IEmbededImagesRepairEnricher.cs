@@ -1,9 +1,9 @@
-﻿using MigrationTools.DataContracts;
+﻿//using MigrationTools.DataContracts;
 
-namespace MigrationTools.Enrichers
-{
-   public interface IEmbededImagesRepairEnricher
-    {
-        void FixEmbededImages(WorkItemData wi, string oldTfsurl, string newTfsurl, string sourcePersonalAccessToken = "");
-    }
-}
+//namespace MigrationTools.Enrichers
+//{
+//   public interface IWorkItemEnricher
+//    {
+//        void FixEmbededImages(WorkItemData wi, string oldTfsurl, string newTfsurl, string sourcePersonalAccessToken = "");
+//    }
+//}

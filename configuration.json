@@ -1,6 +1,6 @@
 {
   "Version": "0.0",
-  "TelemetryEnableTrace": false,
+  "LogLevel": "Verbose",
   "workaroundForQuerySOAPBugEnabled": false,
   "Source": {
     "Collection": "https://dev.azure.com/nkdagility-preview/",
@@ -116,7 +116,7 @@
   "Processors": [
     {
       "ObjectType": "WorkItemDeleteConfig",
-      "Enabled": true,
+      "Enabled": false,
       "QueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
       "OrderBit": "[System.ChangedDate] desc"
     },

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Microsoft.Extensions.Logging;
 using MigrationTools.CommandLine;
+using Serilog.Events;
 
 namespace MigrationTools.Configuration
 {
@@ -11,7 +12,7 @@ namespace MigrationTools.Configuration
         private readonly EngineConfiguration _engineConfiguration;
 
         public override string Version { get { return _engineConfiguration.Version; } set { _engineConfiguration.Version = value; } }
-        public override bool TelemetryEnableTrace { get { return _engineConfiguration.TelemetryEnableTrace; } set { _engineConfiguration.TelemetryEnableTrace = value; } }
+        public override LogEventLevel LogLevel { get { return _engineConfiguration.LogLevel; } set { _engineConfiguration.LogLevel = value; } }
         public override bool workaroundForQuerySOAPBugEnabled { get { return _engineConfiguration.workaroundForQuerySOAPBugEnabled; } set { _engineConfiguration.workaroundForQuerySOAPBugEnabled = value; } }
         public override string ChangeSetMappingFile { get { return _engineConfiguration.ChangeSetMappingFile; } set { _engineConfiguration.ChangeSetMappingFile = value; } }
         public override TeamProjectConfig Source { get { return _engineConfiguration.Source; } set { _engineConfiguration.Source = value; } }
@@ -44,7 +45,6 @@ namespace MigrationTools.Configuration
     public class EngineConfiguration
     {
         public virtual string Version { get; set; }
-        public virtual bool TelemetryEnableTrace { get; set; }
         public virtual bool workaroundForQuerySOAPBugEnabled { get; set; }
         public virtual string ChangeSetMappingFile { get; set; }
         public virtual TeamProjectConfig Source { get; set; }
@@ -53,6 +53,6 @@ namespace MigrationTools.Configuration
         public virtual Dictionary<string, string> WorkItemTypeDefinition { get; set; }
         public virtual Dictionary<string, string> GitRepoMapping { get; set; }
         public virtual List<IProcessorConfig> Processors { get; set; }
-
+        public virtual LogEventLevel LogLevel { get; set; }
     }
 }

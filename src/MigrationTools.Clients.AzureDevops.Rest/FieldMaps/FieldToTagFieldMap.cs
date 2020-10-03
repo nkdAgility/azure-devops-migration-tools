@@ -22,30 +22,7 @@ namespace MigrationTools.Clients.AzureDevops.Rest.FieldMaps
         internal override void InternalExecute(WorkItem source, WorkItem target)
         {
             throw new NotImplementedException();
-            //if (source.Fields.Contains(this.Config.sourceField))
-            //{
-            //    List<string> newTags = target.Tags.Split(char.Parse(@";")).ToList();
-            //    // to tag
-            //    if (source.Fields[this.Config.sourceField].Value != null)
-            //    {
-            //        string value = source.Fields[this.Config.sourceField].Value.ToString();
-            //        if (!string.IsNullOrEmpty(value))
-            //        {
-            //            if (string.IsNullOrEmpty(Config.formatExpression))
-            //            {
-            //                newTags.Add(value);
-            //            }
-            //            else
-            //            {
-            //                newTags.Add(string.Format(Config.formatExpression, value));
-            //            }
-            //            target.Tags = string.Join(";", newTags.ToArray());
-            //            Trace.WriteLine(string.Format("  [UPDATE] field tagged {0}:{1} to {2}:Tag with foramt of {3}", source.Id, Config.sourceField, target.Id, Config.formatExpression));
-            //        }
 
-            //    }
-
-            //}
         }
     }
 }

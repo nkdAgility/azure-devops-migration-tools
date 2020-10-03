@@ -32,7 +32,17 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
 
         public void ProcessAttachemnts(WorkItemData source, WorkItemData target, bool save = true)
         {
+            if (source is null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
 
+            if (target is null)
+            {
+                throw new ArgumentNullException(nameof(target));
+            }
+
+            Log.Information("AttachmentMigrationEnricher: Migrating  {AttachmentCount} attachemnts from {SourceWorkItemID} to {TargetWorkItemID}", source.ToWorkItem().Attachments.Count, source.Id,target.Id);
             _exportWiPath = Path.Combine(_exportBasePath, source.ToWorkItem().Id.ToString());
             if (System.IO.Directory.Exists(_exportWiPath))
             {
@@ -45,16 +55,16 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                 {
                     string filepath = null;
                     filepath = ExportAttachment(source.ToWorkItem(), wia, _exportWiPath);
-                    Log.Information("Exported {Filename} to disk", System.IO.Path.GetFileName(filepath));
+                    Log.Debug("AttachmentMigrationEnricher: Exported {Filename} to disk", System.IO.Path.GetFileName(filepath));
                     if (filepath != null)
                     {
                         ImportAttachemnt(target.ToWorkItem(), filepath, save);
-                        Log.Information("Imported {Filename} from disk", System.IO.Path.GetFileName(filepath));
+                        Log.Debug("AttachmentMigrationEnricher: Imported {Filename} from disk", System.IO.Path.GetFileName(filepath));
                     }
                 }
                 catch (Exception ex)
                 {
-                    Log.Error("ERROR: Unable to process atachment from source wi {SourceWorkItemId} called {AttachmentName}", source.ToWorkItem().Id, wia.Name, ex);
+                    Log.Error(ex, "AttachmentMigrationEnricher:Unable to process atachment from source wi {SourceWorkItemId} called {AttachmentName}", source.ToWorkItem().Id, wia.Name);
                 }
 
             }
@@ -78,7 +88,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                 }
                 catch (Exception)
                 {
-                    Trace.WriteLine(string.Format(" ERROR: Unable to delete folder {0}", _exportWiPath));
+                    Log.Warning(" ERROR: Unable to delete folder {0}", _exportWiPath);
                 }
             }
         }
@@ -86,13 +96,12 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
         private string ExportAttachment(WorkItem wi, Attachment wia, string exportpath)
         {
             string fname = GetSafeFilename(wia.Name);
-            Trace.Write("-");
-            Trace.Write(fname);
+            Log.Debug(fname);
 
             string fpath = Path.Combine(exportpath, fname);
             if (!File.Exists(fpath))
             {
-                Trace.Write(string.Format("...downloading {0} to {1}", fname, exportpath));
+                Log.Debug(string.Format("...downloading {0} to {1}", fname, exportpath));
                 try
                 {
                     var fileLocation = _server.DownloadFile(wia.Id);
@@ -107,7 +116,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             }
             else
             {
-                Log.Information("...already downloaded");
+                Log.Debug("...already downloaded");
             }
             return fpath;
         }
@@ -127,12 +136,12 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                 }
                 else
                 {
-                    Log.Information(" [SKIP] WorkItem {0} already contains attachment {1}", targetWorkItem.Id, filepath);
+                    Log.Debug(" [SKIP] WorkItem {0} already contains attachment {1}", targetWorkItem.Id, filepath);
                 }
             }
             else
             {
-                Log.Information(" [SKIP] Attachemnt {filename} on Work Item {targetWorkItemId} is bigger than the limit of {maxAttachmentSize} bites for Azure DevOps.", filename, targetWorkItem.Id, _maxAttachmentSize);
+                Log.Warning(" [SKIP] Attachemnt {filename} on Work Item {targetWorkItemId} is bigger than the limit of {maxAttachmentSize} bites for Azure DevOps.", filename, targetWorkItem.Id, _maxAttachmentSize);
 
             }
 

@@ -30,11 +30,12 @@ namespace MigrationTools.Engine.Containers
             if (Config.Processors != null)
             {
                 var enabledProcessors = Config.Processors.Where(x => x.Enabled).ToList();
+                Log.Information("ProcessorContainer: Of {ProcessorCount} configured Processors only {EnabledProcessorCount} are enabled", Config.Processors.Count, enabledProcessors.Count);
                 foreach (IProcessorConfig processorConfig in enabledProcessors)
                 {
                     if (processorConfig.IsProcessorCompatible(enabledProcessors))
                     {
-                        Log.Information("Adding Processor {ProcessorName}", processorConfig.Processor);
+                        Log.Information("ProcessorContainer: Adding Processor {ProcessorName}", processorConfig.Processor);
                         string typePattern = $"VstsSyncMigrator.Engine.{processorConfig.Processor}";
 
                         Type type = AppDomain.CurrentDomain.GetAssemblies()
@@ -54,9 +55,9 @@ namespace MigrationTools.Engine.Containers
                     }
                     else
                     {
-                        var message = "{Context}: Cannot add Processor {ProcessorName}. Processor is not compatible with other enabled processors in configuration.";
-                        Log.Error(message, processorConfig.Processor, "MigrationEngine");
-                        throw new InvalidOperationException(string.Format(message, processorConfig.Processor, "MigrationEngine"));
+                        var message = "ProcessorContainer: Cannot add Processor {ProcessorName}. Processor is not compatible with other enabled processors in configuration.";
+                        Log.Error(message, processorConfig.Processor);
+                        throw new InvalidOperationException(string.Format(message, processorConfig.Processor, "ProcessorContainer"));
                     }
                 }
             }

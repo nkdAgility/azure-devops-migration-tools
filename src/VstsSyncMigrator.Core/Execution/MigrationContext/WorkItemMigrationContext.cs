@@ -43,7 +43,7 @@ namespace VstsSyncMigrator.Engine
         private GitRepositoryEnricher gitRepositoryEnricher;
         private ILogger contextLog;
         private ILogger workItemLog;
-        private IEmbededImagesRepairEnricher embededImagesEnricher;
+        private IWorkItemEnricher embededImagesEnricher;
         static int _current = 0;
         static int _count = 0;
         static int _failures = 0;
@@ -98,6 +98,7 @@ namespace VstsSyncMigrator.Engine
 
         protected override void InternalExecute()
         {
+            Log.Information("Starting ");
             if (_config == null)
             {
                 throw new Exception("You must call Configure() first");
@@ -105,9 +106,9 @@ namespace VstsSyncMigrator.Engine
             var workItemServer = Engine.Source.GetService<WorkItemServer>();
             workItemLinkEnricher = Services.GetRequiredService<WorkItemLinkEnricher>();
             attachmentEnricher = new AttachmentMigrationEnricher(workItemServer, _config.AttachmentWorkingPath, _config.AttachmentMaxSize);
-            embededImagesEnricher = new EmbededImagesRepairEnricher();
-            gitRepositoryEnricher = new GitRepositoryEnricher(Engine);
-            nodeStructureEnricher = new NodeStructureEnricher(Engine);
+            embededImagesEnricher = Services.GetRequiredService<EmbededImagesRepairEnricher>(); 
+            gitRepositoryEnricher = Services.GetRequiredService<GitRepositoryEnricher>();
+            nodeStructureEnricher = Services.GetRequiredService < NodeStructureEnricher>();
             VssClientCredentials adoCreds = new VssClientCredentials();
             _witClient = new WorkItemTrackingHttpClient(Engine.Target.Config.Collection, adoCreds);
             //Validation: make sure that the ReflectedWorkItemId field name specified in the config exists in the target process, preferably on each work item type.
@@ -129,7 +130,9 @@ namespace VstsSyncMigrator.Engine
             //////////////////////////////////////////////////////////FilterCompletedByQuery
             if (_config.FilterWorkItemsThatAlreadyExistInTarget)
             {
-                sourceWorkItems = FilterWorkItemsThatAlreadyExistInTarget(sourceWorkItems);
+                contextLog.Information("[FilterWorkItemsThatAlreadyExistInTarget] is enabled. Searching for work items that have already been migrated to the target...", sourceWorkItems.Count());
+                sourceWorkItems = FilterByTarget(sourceWorkItems);
+                contextLog.Information("!! After removing all found work items there are {SourceWorkItemCount} remaining to be migrated.", sourceWorkItems.Count());
             }
             //////////////////////////////////////////////////
             _current = 1;
@@ -576,8 +579,9 @@ namespace VstsSyncMigrator.Engine
             workItemLog.Write(level, workItemLogTeamplate + message);
         }
 
-        private List<WorkItemData> FilterWorkItemsThatAlreadyExistInTarget(List<WorkItemData> sourceWorkItems)
+        private List<WorkItemData> FilterByTarget(List<WorkItemData> sourceWorkItems)
         {
+            contextLog.Debug("FilterByTarget: START");
             var targetQuery = 
                 string.Format(
                     @"SELECT [System.Id], [{0}] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {1} ORDER BY {2}",
@@ -585,10 +589,15 @@ namespace VstsSyncMigrator.Engine
                     _config.WIQLQueryBit,
                     _config.WIQLOrderBit
                     );
+            contextLog.Debug("FilterByTarget: Query Execute...");
             var targetFoundItems = Engine.Target.WorkItems.GetWorkItems(targetQuery);
+            contextLog.Debug("FilterByTarget: ... query complete.");
+            contextLog.Debug("FilterByTarget: Found {TargetWorkItemCount} based on the WIQLQueryBit in the target system.", targetFoundItems.Count());
             var targetFoundIds = (from WorkItemData twi in targetFoundItems select Engine.Target.WorkItems.GetReflectedWorkItemId(twi)).ToList();
             //////////////////////////////////////////////////////////
             sourceWorkItems = sourceWorkItems.Where(p => !targetFoundIds.Any(p2 => p2.ToString() == p.Id)).ToList();
+            contextLog.Debug("FilterByTarget: After removing all found work items there are {SourceWorkItemCount} remaining to be migrated.", sourceWorkItems.Count());
+            contextLog.Debug("FilterByTarget: END");
             return sourceWorkItems;
         }
 
@@ -697,7 +706,7 @@ namespace VstsSyncMigrator.Engine
         {
             if (targetWorkItem != null && _config.FixHtmlAttachmentLinks)
             {
-                embededImagesEnricher.FixEmbededImages(targetWorkItem, Engine.Source.Config.Collection.ToString(), Engine.Target.Config.Collection.ToString(), Engine.Source.Config.PersonalAccessToken);
+                embededImagesEnricher.Enrich(null, targetWorkItem);
             }
         }
 
@@ -708,7 +717,7 @@ namespace VstsSyncMigrator.Engine
                 TraceWriteLine(LogEventLevel.Information, "Links {SourceWorkItemLinkCount} | LinkMigrator:{LinkMigration}", new Dictionary<string, object>() { { "SourceWorkItemLinkCount", sourceWorkItem.ToWorkItem().Links.Count }, { "LinkMigration", _config.LinkMigration } });
                 workItemLinkEnricher.Enrich(sourceWorkItem, targetWorkItem);
                 AddMetric("RelatedLinkCount", processWorkItemMetrics, targetWorkItem.ToWorkItem().Links.Count);
-                int fixedLinkCount = gitRepositoryEnricher.FixExternalLinks(targetWorkItem, targetStore, sourceWorkItem, _config.LinkMigrationSaveEachAsAdded);
+                int fixedLinkCount = gitRepositoryEnricher.Enrich(sourceWorkItem, targetWorkItem);
                 AddMetric("FixedGitLinkCount", processWorkItemMetrics, fixedLinkCount);
             }
         }

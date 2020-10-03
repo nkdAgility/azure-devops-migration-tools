@@ -1,4 +1,5 @@
-﻿using MigrationTools.DataContracts;
+﻿using Microsoft.Extensions.Logging;
+using MigrationTools.DataContracts;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,21 +10,25 @@ using System.Text;
 
 namespace MigrationTools.Enrichers
 {
-    public abstract class EmbededImagesRepairEnricherBase : IEmbededImagesRepairEnricher
+    public abstract class EmbededImagesRepairEnricherBase : WorkItemEnricher
     {
         protected readonly HttpClientHandler _httpClientHandler;
         protected bool _ignore404Errors = true;
-
-        public EmbededImagesRepairEnricherBase()
-        {
-            _httpClientHandler = new HttpClientHandler { AllowAutoRedirect = false, UseDefaultCredentials = true, AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate };
-        }
-
         /**
       *  from https://gist.github.com/pietergheysens/792ed505f09557e77ddfc1b83531e4fb
       */
+        public EmbededImagesRepairEnricherBase(IMigrationEngine engine, ILogger<EmbededImagesRepairEnricherBase> logger) :base(engine, logger)
+        {
 
-        public abstract void FixEmbededImages(WorkItemData wi, string oldTfsurl, string newTfsurl, string sourcePersonalAccessToken = "");
+            _httpClientHandler = new HttpClientHandler { AllowAutoRedirect = false, UseDefaultCredentials = true, AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate };
+        }
+
+        public override abstract void Configure(bool save = true, bool filter = true);
+
+        public override abstract int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem);
+
+
+        protected abstract void FixEmbededImages(WorkItemData wi, string oldTfsurl, string newTfsurl, string sourcePersonalAccessToken = "");
 
         protected static HttpResponseMessage DownloadFile(HttpClient httpClient, string url, string destinationPath)
         {
@@ -113,6 +118,8 @@ namespace MigrationTools.Enrichers
 
             return oppositeUrl;
         }
+
+      
 
         protected enum ImageFormat
         {

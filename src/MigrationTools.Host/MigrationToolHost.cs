@@ -11,6 +11,8 @@ using MigrationTools.CustomDiagnostics;
 using MigrationTools.Engine.Containers;
 using MigrationTools.Services;
 using Serilog;
+using Serilog.Core;
+using Serilog.Events;
 
 namespace MigrationTools.Host
 {
@@ -18,7 +20,8 @@ namespace MigrationTools.Host
     {
         public static IHostBuilder CreateDefaultBuilder(string[] args)
         {
-            var hostBuilder = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args)
+               var levelSwitch = new LoggingLevelSwitch();
+               var hostBuilder = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args)
                 .UseSerilog((hostingContext, services, loggerConfiguration) =>
                 {
                     /////////////////////////////////////////////////////////
@@ -29,13 +32,14 @@ namespace MigrationTools.Host
                     string logsPath = CreateLogsPath();
                     var logPath = Path.Combine(logsPath, "migration.log");
                     loggerConfiguration
+                        .MinimumLevel.ControlledBy(levelSwitch)
                         .ReadFrom.Configuration(hostingContext.Configuration)
                         .Enrich.FromLogContext()
                         .Enrich.WithMachineName()
                         .Enrich.WithProcessId()
-                        .WriteTo.Console()
-                        .WriteTo.ApplicationInsights(services.GetService<ITelemetryLogger>().Configuration, new CustomConverter(), Serilog.Events.LogEventLevel.Error)
-                        .WriteTo.File(logPath);
+                        .WriteTo.Console(LogEventLevel.Debug)
+                        .WriteTo.ApplicationInsights( services.GetService<ITelemetryLogger>().Configuration, new CustomConverter(), LogEventLevel.Error)
+                        .WriteTo.File(logPath,  LogEventLevel.Verbose);
                 })
                 .ConfigureLogging((context, logBuilder) =>
                 {
@@ -59,6 +63,8 @@ namespace MigrationTools.Host
                             services.AddSingleton<ExecuteOptions>((p) => null);
                         });
                     services.AddOptions();
+                    // Sieralog
+                    services.AddSingleton<LoggingLevelSwitch>(levelSwitch);
                     // Services
                     services.AddTransient<IDetectOnlineService, DetectOnlineService>();
                     services.AddTransient<IDetectVersionService, DetectVersionService>();

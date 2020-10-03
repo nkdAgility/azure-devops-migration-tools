@@ -29,24 +29,6 @@ namespace MigrationTools.Clients.AzureDevops.Rest.FieldMaps
         internal override void InternalExecute(WorkItem source, WorkItem target)
         {
             throw new NotImplementedException();
-            //if (source.Fields.ContainsKey(Config.sourceField1) && source.Fields.ContainsKey(Config.sourceField2))
-            //{
-            //    var val1 = source.Fields[Config.sourceField1].Value != null ? source.Fields[Config.sourceField1].Value.ToString() : string.Empty;
-            //    var val2 = source.Fields[Config.sourceField2].Value != null ? source.Fields[Config.sourceField2].Value.ToString() : string.Empty;
-            //    var valT = target.Fields[Config.targetField].Value != null ? target.Fields[Config.targetField].Value.ToString() : string.Empty;
-            //    var newValT = string.Format(Config.formatExpression, val1, val2);
-            //    if (valT.Contains(val2) && val2.Trim().Length > 0)
-            //    {
-            //        Trace.WriteLine(string.Format("  [SKIP] field already merged {0}:{1}+{2} to {3}:{4}", source.Id, Config.sourceField1, Config.sourceField2, target.Id, Config.targetField));
-            //    } else if (valT.Equals(newValT))
-            //        {
-            //        Trace.WriteLine(string.Format("  [SKIP] field already merged {0}:{1}+{2} to {3}:{4}", source.Id, Config.sourceField1, Config.sourceField2, target.Id, Config.targetField));
-            //    } else
-            //    {
-            //        target.Fields[Config.targetField].Value = newValT;
-            //        Trace.WriteLine(string.Format("  [UPDATE] field merged {0}:{1}+{2} to {3}:{4}", source.Id, Config.sourceField1, Config.sourceField2, target.Id, Config.targetField));
-            //    }
-            //}
         }
     }
 }

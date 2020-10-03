@@ -32,7 +32,7 @@ namespace MigrationTools.Engine.Containers
             {
                 foreach (IFieldMapConfig fieldmapConfig in Config.FieldMaps)
                 {
-                    Log.Information("Adding FieldMap {FieldMapName}", fieldmapConfig.FieldMap);
+                    Log.Information("FieldMapContainer: Adding FieldMap {FieldMapName} for {WorkItemTypeName}", fieldmapConfig.FieldMap, fieldmapConfig.WorkItemTypeName);
                     string typePattern = $"MigrationTools.Sinks.*.FieldMaps.{fieldmapConfig.FieldMap}";
 
                     Type type = AppDomain.CurrentDomain.GetAssemblies()
