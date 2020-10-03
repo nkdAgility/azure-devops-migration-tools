@@ -19,23 +19,25 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
 
         public override List<WorkItemData> GetWorkItems()
         {
+            Log.Verbose("WorkItemQuery: ===========GetWorkItems=============");
             var wiClient = (WorkItemMigrationClient)MigrationClient.WorkItems;
             Telemetry.TrackEvent("WorkItemQuery.Execute", Parameters, null);
-            Log.Information("WorkItemQuery: TeamProjectCollection: {QueryTarget}",  wiClient.Store.TeamProjectCollection.Uri.ToString());
-            Log.Information("WorkItemQuery: Query: {QueryText}",  Query);
-            Log.Information("WorkItemQuery: Paramiters: {@QueryParams}",  Parameters);
+            Log.Verbose("WorkItemQuery: TeamProjectCollection: {QueryTarget}",  wiClient.Store.TeamProjectCollection.Uri.ToString());
+            Log.Verbose("WorkItemQuery: Query: {QueryText}",  Query);
+            Log.Verbose("WorkItemQuery: Paramiters: {@QueryParams}",  Parameters);
 
             WorkItemCollection wc;
             var startTime = DateTime.UtcNow;
             Stopwatch queryTimer = new Stopwatch();
             foreach (var item in Parameters)
             {
-                Debug.WriteLine(string.Format("TfsQueryContext: {0}: {1}", item.Key, item.Value), "TfsQueryContext");
+                Log.Verbose("WorkItemQuery: {0}: {1}", item.Key, item.Value);
             }
 
             queryTimer.Start();
             try
             {
+                Log.Information("WorkItemQuery: Running query...");
                 wc = wiClient.Store.Query(Query); //, parameters);
                 queryTimer.Stop();
                 Telemetry.TrackDependency(new DependencyTelemetry("TeamService", "Query", startTime, queryTimer.Elapsed, true));
@@ -48,7 +50,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
                             { "QueryTime", queryTimer.ElapsedMilliseconds },
                           { "QueryCount", wc.Count }
                       });
-                Log.Debug("Query Complete: found {WorkItemCount} work items in {QueryTimer}ms ", wc.Count, queryTimer.ElapsedMilliseconds);
+                Log.Information("WorkItemQuery: Query found {WorkItemCount} work items in {QueryTimer}ms ", wc.Count, queryTimer.ElapsedMilliseconds);
 
             }
             catch (Exception ex)
@@ -62,7 +64,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
                        new Dictionary<string, double> {
                             { "QueryTime",queryTimer.ElapsedMilliseconds }
                        });
-                Trace.TraceWarning($"  [EXCEPTION] {ex}");
+                Log.Error(ex, " Error running query");
                 throw;
             }
             return wc.ToWorkItemDataList();

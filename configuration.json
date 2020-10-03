@@ -116,7 +116,7 @@
   "Processors": [
     {
       "ObjectType": "WorkItemDeleteConfig",
-      "Enabled": true,
+      "Enabled": false,
       "QueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
       "OrderBit": "[System.ChangedDate] desc"
     },

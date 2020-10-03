@@ -25,7 +25,6 @@ namespace MigrationTools.Engine.Containers
             {
                 foreach (string key in Config.WorkItemTypeDefinition.Keys)
                 {
-                    Log.Information("{Context}: Adding Work Item Type {WorkItemType}", key, "MigrationEngine");
                     AddWorkItemTypeDefinition(key, new WitMapper(Config.WorkItemTypeDefinition[key]));
                 }
             }
@@ -35,6 +34,7 @@ namespace MigrationTools.Engine.Containers
         {
             if (!_TypeDefinitions.ContainsKey(workItemTypeName))
             {
+                Log.Verbose("TypeDefinitionMapContainer: Adding Work Item Type {WorkItemType}", workItemTypeName);
                 _TypeDefinitions.Add(workItemTypeName, workItemTypeDefinitionMap);
             }
         }

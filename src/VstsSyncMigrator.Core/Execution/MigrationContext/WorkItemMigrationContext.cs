@@ -129,7 +129,9 @@ namespace VstsSyncMigrator.Engine
             //////////////////////////////////////////////////////////FilterCompletedByQuery
             if (_config.FilterWorkItemsThatAlreadyExistInTarget)
             {
-                sourceWorkItems = FilterWorkItemsThatAlreadyExistInTarget(sourceWorkItems);
+                contextLog.Information("[FilterWorkItemsThatAlreadyExistInTarget] is enabled. Searching for work items that have already been migrated to the target...", sourceWorkItems.Count());
+                sourceWorkItems = FilterByTarget(sourceWorkItems);
+                contextLog.Information("!! After removing all found work items there are {SourceWorkItemCount} remaining to be migrated.", sourceWorkItems.Count());
             }
             //////////////////////////////////////////////////
             _current = 1;
@@ -576,8 +578,9 @@ namespace VstsSyncMigrator.Engine
             workItemLog.Write(level, workItemLogTeamplate + message);
         }
 
-        private List<WorkItemData> FilterWorkItemsThatAlreadyExistInTarget(List<WorkItemData> sourceWorkItems)
+        private List<WorkItemData> FilterByTarget(List<WorkItemData> sourceWorkItems)
         {
+            contextLog.Verbose("FilterByTarget: START");
             var targetQuery = 
                 string.Format(
                     @"SELECT [System.Id], [{0}] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {1} ORDER BY {2}",
@@ -585,10 +588,15 @@ namespace VstsSyncMigrator.Engine
                     _config.WIQLQueryBit,
                     _config.WIQLOrderBit
                     );
+            contextLog.Verbose("FilterByTarget: Query Execute...");
             var targetFoundItems = Engine.Target.WorkItems.GetWorkItems(targetQuery);
+            contextLog.Verbose("FilterByTarget: ... query complete.");
+            contextLog.Verbose("FilterByTarget: Found {TargetWorkItemCount} based on the WIQLQueryBit in the target system.", targetFoundItems.Count());
             var targetFoundIds = (from WorkItemData twi in targetFoundItems select Engine.Target.WorkItems.GetReflectedWorkItemId(twi)).ToList();
             //////////////////////////////////////////////////////////
             sourceWorkItems = sourceWorkItems.Where(p => !targetFoundIds.Any(p2 => p2.ToString() == p.Id)).ToList();
+            contextLog.Verbose("FilterByTarget: After removing all found work items there are {SourceWorkItemCount} remaining to be migrated.", sourceWorkItems.Count());
+            contextLog.Verbose("FilterByTarget: END");
             return sourceWorkItems;
         }
 

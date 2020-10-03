@@ -155,7 +155,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
 
                 if (!_nodeBasePaths.Any(p => path.StartsWith(p, StringComparison.InvariantCultureIgnoreCase)))
                 {
-                    Trace.WriteLine(string.Format("--IgnoreNode: {0}", nodePath));
+                    Log.Verbose("--IgnoreNode: {0}", nodePath);
                     return false;
                 }
             }
@@ -168,28 +168,27 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             string nodePath = string.Format(@"{0}\{1}", parent.Path, name);
             NodeInfo node = null;
 
-            Trace.Write(string.Format("--CreateNode: {0}", nodePath));
+            Log.Verbose("--CreateNode: {0}", nodePath);
             try
             {
                 node = _targetCommonStructureService.GetNodeFromPath(nodePath);
-                Trace.Write("...found");
+                Log.Verbose("...found");
             }
             catch (CommonStructureSubsystemException ex)
             {
                 try
                 {
                     string newPathUri = _targetCommonStructureService.CreateNode(name, parent.Uri);
-                    Trace.Write("...created");
+                    Log.Verbose("...created");
                     node = _targetCommonStructureService.GetNode(newPathUri);
                 }
                 catch
                 {
                     Log.Error(ex, "Creating Node");
-                    Trace.Write("...missing");
+                    Log.Verbose("...missing");
                     throw;
                 }
             }
-
             Trace.WriteLine(String.Empty);
             return node;
         }
@@ -198,18 +197,18 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
         {
             string nodePath = string.Format(@"{0}\{1}", parent.Path, name);
             NodeInfo node = null;
-            Trace.Write(string.Format("--CreateNode: {0}, start date: {1}, finish date: {2}", nodePath, startDate, finishDate));
+            Log.Verbose("--CreateNode: {0}, start date: {1}, finish date: {2}", nodePath, startDate, finishDate);
             try
             {
                 node = _targetCommonStructureService.GetNodeFromPath(nodePath);
-                Trace.Write("...found");
+                Log.Verbose("...found");
             }
             catch (CommonStructureSubsystemException ex)
             {
                 try
                 {
                     string newPathUri = _targetCommonStructureService.CreateNode(name, parent.Uri);
-                    Log.Information("...created");
+                    Log.Verbose("...created");
                     node = _targetCommonStructureService.GetNode(newPathUri);
                 }
                 catch
@@ -222,14 +221,14 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             try
             {
                 ((ICommonStructureService4)_targetCommonStructureService).SetIterationDates(node.Uri, startDate, finishDate);
-                Trace.Write("...dates assigned");
+                Log.Verbose("...dates assigned");
             }
             catch (CommonStructureSubsystemException ex)
             {
                 Log.Warning(ex, "Dates not set ");
             }
 
-            Trace.WriteLine(String.Empty);
+            Log.Verbose(String.Empty);
             return node;
         }
 

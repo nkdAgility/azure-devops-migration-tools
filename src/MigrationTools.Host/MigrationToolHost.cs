@@ -11,6 +11,7 @@ using MigrationTools.CustomDiagnostics;
 using MigrationTools.Engine.Containers;
 using MigrationTools.Services;
 using Serilog;
+using Serilog.Events;
 
 namespace MigrationTools.Host
 {
@@ -18,7 +19,7 @@ namespace MigrationTools.Host
     {
         public static IHostBuilder CreateDefaultBuilder(string[] args)
         {
-            var hostBuilder = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args)
+               var hostBuilder = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args)
                 .UseSerilog((hostingContext, services, loggerConfiguration) =>
                 {
                     /////////////////////////////////////////////////////////
@@ -34,8 +35,8 @@ namespace MigrationTools.Host
                         .Enrich.WithMachineName()
                         .Enrich.WithProcessId()
                         .WriteTo.Console()
-                        .WriteTo.ApplicationInsights(services.GetService<ITelemetryLogger>().Configuration, new CustomConverter(), Serilog.Events.LogEventLevel.Error)
-                        .WriteTo.File(logPath);
+                        .WriteTo.ApplicationInsights( services.GetService<ITelemetryLogger>().Configuration, new CustomConverter(), LogEventLevel.Error)
+                        .WriteTo.File(logPath,  LogEventLevel.Verbose);
                 })
                 .ConfigureLogging((context, logBuilder) =>
                 {
