@@ -1,24 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using Microsoft.TeamFoundation.Client;
-using Microsoft.TeamFoundation.Framework.Client;
-using Microsoft.TeamFoundation.Framework.Common;
-using Microsoft.TeamFoundation.Server;
 using System.Diagnostics;
 using System.DirectoryServices;
 using System.DirectoryServices.ActiveDirectory;
-using System.DirectoryServices.AccountManagement;
-using System.Net;
+using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Text.RegularExpressions;
-using MigrationTools.Configuration;
-using Microsoft.Extensions.Hosting;
-using MigrationTools;
-using MigrationTools;
 using Microsoft.Extensions.Logging;
+using Microsoft.TeamFoundation.Framework.Client;
+using Microsoft.TeamFoundation.Framework.Common;
+using MigrationTools;
+using MigrationTools.Configuration;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -47,8 +39,8 @@ namespace VstsSyncMigrator.Engine
         protected override void InternalExecute()
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
-			//////////////////////////////////////////////////
-			string exportPath;
+            //////////////////////////////////////////////////
+            string exportPath;
             string assPath = @"C:\Users\martinh\Downloads\mugshots\mugshots"; //System.Reflection.Assembly.GetExecutingAssembly().Location;
                                                                               // exportPath = Path.Combine(Path.GetDirectoryName(assPath), "export-pic");
             exportPath = assPath;
@@ -60,7 +52,7 @@ namespace VstsSyncMigrator.Engine
             var regex = new Regex(Regex.Escape("-"));
             foreach (string file in files)
             {
-                string ident = regex.Replace( Path.GetFileNameWithoutExtension(file),@"\",1);
+                string ident = regex.Replace(Path.GetFileNameWithoutExtension(file), @"\", 1);
                 string mess;
                 if (SetProfileImage(ident, file, out mess))
                 {
@@ -71,11 +63,11 @@ namespace VstsSyncMigrator.Engine
                 {
                     Trace.WriteLine(string.Format(" [FAIL] Unable to set: {0} ", ident));
                 }
-    }
-            
+            }
 
-            
-            
+
+
+
             //////////////////////////////////////////////////
             stopwatch.Stop();
             Trace.WriteLine(string.Format(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds", stopwatch.Elapsed));
@@ -90,9 +82,9 @@ namespace VstsSyncMigrator.Engine
             message = string.Empty;
             byte[] image = new byte[0];
 
-         
 
-                TeamFoundationIdentity i = ims2.ReadIdentity(IdentitySearchFactor.AccountName, identity, MembershipQuery.Direct, ReadIdentityOptions.None);
+
+            TeamFoundationIdentity i = ims2.ReadIdentity(IdentitySearchFactor.AccountName, identity, MembershipQuery.Direct, ReadIdentityOptions.None);
 
             if (i == null)
             {
@@ -243,7 +235,7 @@ namespace VstsSyncMigrator.Engine
 
         public override void Configure(IProcessorConfig config)
         {
-     
+
         }
     }
 }

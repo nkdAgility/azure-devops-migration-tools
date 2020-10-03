@@ -1,25 +1,22 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using MigrationTools.Configuration;
 using MigrationTools.DataContracts;
 using Serilog;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
 
 namespace MigrationTools.Engine.Containers
 {
-   public class FieldMapContainer : EngineContainer<Dictionary<string, List<IFieldMap>>>
+    public class FieldMapContainer : EngineContainer<Dictionary<string, List<IFieldMap>>>
     {
-       private  Dictionary<string, List<IFieldMap>> fieldMapps = new Dictionary<string, List<IFieldMap>>();
+        private Dictionary<string, List<IFieldMap>> fieldMapps = new Dictionary<string, List<IFieldMap>>();
 
         public FieldMapContainer(IServiceProvider services, EngineConfiguration config) : base(services, config)
         {
         }
 
-         public int Count { get { return fieldMapps.Count; } }
+        public int Count { get { return fieldMapps.Count; } }
 
         public override Dictionary<string, List<IFieldMap>> Items
         {

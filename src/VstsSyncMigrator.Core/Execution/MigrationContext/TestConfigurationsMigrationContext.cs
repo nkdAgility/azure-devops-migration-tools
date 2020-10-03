@@ -1,15 +1,11 @@
 ﻿using System;
-using Microsoft.TeamFoundation.TestManagement.Client;
 using System.Diagnostics;
 using System.Linq;
-using VstsSyncMigrator.Engine.ComponentContext;
-using MigrationTools.Configuration.Processing;
-using Microsoft.Extensions.Hosting;
+using Microsoft.TeamFoundation.TestManagement.Client;
+using MigrationTools;
 using MigrationTools.Configuration;
-using Microsoft.ApplicationInsights.Channel;
-using MigrationTools;
 using MigrationTools.Engine.Processors;
-using MigrationTools;
+using VstsSyncMigrator.Engine.ComponentContext;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -44,7 +40,7 @@ namespace VstsSyncMigrator.Engine
                 ITestConfiguration targetTc = GetCon(targetTmc.Project.TestConfigurations, sourceTestConf.Name);
                 if (targetTc != null)
                 {
-                    Trace.WriteLine($"{sourceTestConf.Name} - Found", Name);  
+                    Trace.WriteLine($"{sourceTestConf.Name} - Found", Name);
                     // Move on
                 }
                 else
@@ -58,7 +54,8 @@ namespace VstsSyncMigrator.Engine
 
                     foreach (var val in sourceTestConf.Values)
                     {
-                        if (!targetTc.Values.ContainsKey(val.Key)) {
+                        if (!targetTc.Values.ContainsKey(val.Key))
+                        {
                             targetTc.Values.Add(val);
                         }
                     }
@@ -78,7 +75,7 @@ namespace VstsSyncMigrator.Engine
 
         public override void Configure(IProcessorConfig config)
         {
-           
+
         }
     }
 }

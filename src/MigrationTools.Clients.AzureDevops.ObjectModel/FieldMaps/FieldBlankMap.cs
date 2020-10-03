@@ -1,13 +1,8 @@
 ﻿//New COmment
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using System.Diagnostics;
-using MigrationTools.Configuration.FieldMap;
 using Microsoft.Extensions.Logging;
+using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using MigrationTools.Configuration.FieldMap;
 
 namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
 {
@@ -16,7 +11,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
 
         public FieldBlankMap(ILogger<FieldBlankMap> logger) : base(logger)
         {
-           
+
         }
         private FieldBlankMapConfig Config { get { return (FieldBlankMapConfig)_Config; } }
 
@@ -26,7 +21,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
         internal override void InternalExecute(WorkItem source, WorkItem target)
         {
             if (target.Fields.Contains(Config.targetField))
-            { 
+            {
                 target.Fields[Config.targetField].Value = "";
                 Trace.WriteLine(string.Format("  [UPDATE] field mapped {0}:{1} to {2} blanked", source.Id, target.Id, this.Config.targetField));
             }

@@ -1,22 +1,15 @@
-﻿using Microsoft.TeamFoundation;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using Microsoft.Extensions.Logging;
+using Microsoft.TeamFoundation;
 using Microsoft.TeamFoundation.Git.Client;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using MigrationTools.Clients.AzureDevops.ObjectModel;
 using MigrationTools.Clients.AzureDevops.ObjectModel.Clients;
-using MigrationTools;
-using MigrationTools.Clients;
 using MigrationTools.DataContracts;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using VstsSyncMigrator.Engine;
 using MigrationTools.Enrichers;
-using Microsoft.Extensions.Logging;
 
 namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
 {
@@ -34,7 +27,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
         IList<GitRepository> allTargetRepos;
         List<string> gitWits;
 
-        public GitRepositoryEnricher(IMigrationEngine engine, ILogger<GitRepositoryEnricher> logger) :base(engine, logger)
+        public GitRepositoryEnricher(IMigrationEngine engine, ILogger<GitRepositoryEnricher> logger) : base(engine, logger)
         {
             _Engine = engine ?? throw new ArgumentNullException(nameof(engine));
             _Logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -85,9 +78,9 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                     ExternalLink el = (ExternalLink)l;
 
                     GitRepositoryInfo sourceRepoInfo = GitRepositoryInfo.Create(el, sourceRepos, Engine, sourceWorkItem?.ProjectName);
-                    
+
                     // if sourceRepo is null ignore this link and keep processing further links
-                    if (sourceRepoInfo == null) 
+                    if (sourceRepoInfo == null)
                     {
                         continue;
                     }

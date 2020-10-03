@@ -1,20 +1,12 @@
-﻿using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Linq;
-using MigrationTools.Configuration.Processing;
-using MigrationTools.Configuration;
-using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using MigrationTools;
 using MigrationTools.Clients.AzureDevops.ObjectModel;
-using MigrationTools;
+using MigrationTools.Configuration;
+using MigrationTools.Configuration.Processing;
 using MigrationTools.DataContracts;
-using Microsoft.Extensions.Logging;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -24,12 +16,12 @@ namespace VstsSyncMigrator.Engine
 
         public WorkItemUpdate(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<WorkItemUpdate> logger) : base(services, me, telemetry, logger)
         {
-            
+
         }
 
         public override void Configure(IProcessorConfig config)
         {
-            _config = (WorkItemUpdateConfig) config;
+            _config = (WorkItemUpdateConfig)config;
         }
 
         public override string Name
@@ -43,7 +35,7 @@ namespace VstsSyncMigrator.Engine
         protected override void InternalExecute()
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
-			//////////////////////////////////////////////////
+            //////////////////////////////////////////////////
             var Query = string.Format(@"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY [System.ChangedDate] desc", _config.WIQLQueryBit);
             List<WorkItemData> workitems = Engine.Target.WorkItems.GetWorkItems(Query);
             Trace.WriteLine(string.Format("Update {0} work items?", workitems.Count));
@@ -54,7 +46,7 @@ namespace VstsSyncMigrator.Engine
             foreach (WorkItemData workitem in workitems)
             {
                 Stopwatch witstopwatch = Stopwatch.StartNew();
-				workitem.ToWorkItem().Open();
+                workitem.ToWorkItem().Open();
                 Trace.WriteLine(string.Format("Processing work item {0} - Type:{1} - ChangedDate:{2} - CreatedDate:{3}", workitem.Id, workitem.Type, workitem.ToWorkItem().ChangedDate.ToShortDateString(), workitem.ToWorkItem().CreatedDate.ToShortDateString()));
                 Engine.FieldMaps.ApplyFieldMappings(workitem);
 
@@ -71,17 +63,19 @@ namespace VstsSyncMigrator.Engine
                             System.Threading.Thread.Sleep(5000);
                             workitem.SaveToAzureDevOps();
                         }
-                       
-                    } else
+
+                    }
+                    else
                     {
                         Trace.WriteLine("No save done: (What IF: enabled)");
                     }
-                    
-                } else
+
+                }
+                else
                 {
                     Trace.WriteLine("No save done: (IsDirty: false)");
                 }
-                
+
 
 
 

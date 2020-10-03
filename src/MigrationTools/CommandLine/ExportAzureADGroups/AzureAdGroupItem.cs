@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MigrationTools.CommandLine
+﻿namespace MigrationTools.CommandLine
 {
-   public class AzureAdGroupItem
+    public class AzureAdGroupItem
     {
 
         public string TeamProject { get; set; }

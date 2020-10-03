@@ -1,5 +1,4 @@
-﻿using MigrationTools.Configuration;
-using System.IO;
+﻿using System.IO;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
@@ -63,7 +62,7 @@ namespace MigrationTools.Configuration.Tests
         public void TestDeseraliseFromJson()
         {
             HelperCreateDefaultConfigFile();
-             EngineConfiguration ec;
+            EngineConfiguration ec;
             StreamReader sr = new StreamReader("configuration.json");
             string configurationjson = sr.ReadToEnd();
             sr.Close();

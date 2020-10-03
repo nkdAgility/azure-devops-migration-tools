@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using MigrationTools.Clients;
 using MigrationTools.DataContracts;
-using Serilog;
 
 namespace MigrationTools.Clients
 {

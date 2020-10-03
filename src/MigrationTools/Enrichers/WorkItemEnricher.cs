@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using MigrationTools.DataContracts;
 
 namespace MigrationTools.Enrichers
@@ -10,7 +7,7 @@ namespace MigrationTools.Enrichers
     {
 
         protected IMigrationEngine Engine { get; }
-       protected ILogger<IWorkItemEnricher> Log { get; }
+        protected ILogger<IWorkItemEnricher> Log { get; }
 
         public WorkItemEnricher(IMigrationEngine engine, ILogger<WorkItemEnricher> logger)
         {

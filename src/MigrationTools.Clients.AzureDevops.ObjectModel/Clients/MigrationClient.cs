@@ -1,18 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.TeamFoundation;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.VisualStudio.Services.Common;
-using MigrationTools;
-using MigrationTools.Clients;
 using MigrationTools.Configuration;
-using MigrationTools.DataContracts;
 using Serilog;
 
 namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
@@ -50,7 +44,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
             }
         }
         // if you add Migration Engine in here you will have to fix the infinate loop
-        public MigrationClient(ITestPlanMigrationClient testPlanClient,IWorkItemMigrationClient workItemClient, IServiceProvider services, ITelemetryLogger telemetry)
+        public MigrationClient(ITestPlanMigrationClient testPlanClient, IWorkItemMigrationClient workItemClient, IServiceProvider services, ITelemetryLogger telemetry)
         {
             _testPlanClient = testPlanClient;
             _workItemClient = workItemClient;
@@ -126,7 +120,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
                 }
             }
         }
- 
+
         public T GetService<T>()
         {
             EnsureCollection();

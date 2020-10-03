@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using MigrationTools.Clients;
+﻿using MigrationTools.Clients;
 using MigrationTools.Configuration;
 using MigrationTools.Engine.Containers;
 
@@ -11,9 +8,9 @@ namespace MigrationTools
     {
         EngineConfiguration Config { get; }
         ProcessingStatus Run();
-        IMigrationClient Source { get;  }
+        IMigrationClient Source { get; }
 
-        IMigrationClient Target { get;  }
+        IMigrationClient Target { get; }
 
         ProcessorContainer Processors { get; }
         TypeDefinitionMapContainer TypeDefinitionMaps { get; }

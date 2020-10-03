@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using MigrationTools.Clients;
 using MigrationTools.DataContracts;
 using Serilog;
 
@@ -22,9 +21,9 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
             Log.Debug("WorkItemQuery: ===========GetWorkItems=============");
             var wiClient = (WorkItemMigrationClient)MigrationClient.WorkItems;
             Telemetry.TrackEvent("WorkItemQuery.Execute", Parameters, null);
-            Log.Debug("WorkItemQuery: TeamProjectCollection: {QueryTarget}",  wiClient.Store.TeamProjectCollection.Uri.ToString());
-            Log.Debug("WorkItemQuery: Query: {QueryText}",  Query);
-            Log.Debug("WorkItemQuery: Paramiters: {@QueryParams}",  Parameters);
+            Log.Debug("WorkItemQuery: TeamProjectCollection: {QueryTarget}", wiClient.Store.TeamProjectCollection.Uri.ToString());
+            Log.Debug("WorkItemQuery: Query: {QueryText}", Query);
+            Log.Debug("WorkItemQuery: Paramiters: {@QueryParams}", Parameters);
 
             WorkItemCollection wc;
             var startTime = DateTime.UtcNow;
@@ -70,6 +69,6 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
             return wc.ToWorkItemDataList();
         }
 
-       
+
     }
 }

@@ -1,10 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools.Configuration;
-using MigrationTools.Engine.Containers;
-using System;
-using System.Text;
 
 namespace MigrationTools.Engine.Containers.Tests
 {

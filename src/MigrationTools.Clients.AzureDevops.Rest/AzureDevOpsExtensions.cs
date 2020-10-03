@@ -1,12 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using System;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
-using MigrationTools.Configuration;
 using MigrationTools.DataContracts;
-using MigrationTools.Clients;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace MigrationTools.Clients.AzureDevops.Rest
 {

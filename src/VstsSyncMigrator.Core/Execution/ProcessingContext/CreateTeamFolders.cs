@@ -1,20 +1,14 @@
-﻿using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Linq;
+using System.Text.RegularExpressions;
+using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.Client;
-using MigrationTools.Configuration;
-using Microsoft.Extensions.Hosting;
-using MigrationTools;
-using MigrationTools.Clients;
+using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools;
 using MigrationTools.Clients.AzureDevops.ObjectModel.Clients;
-using Microsoft.Extensions.Logging;
+using MigrationTools.Configuration;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -24,7 +18,7 @@ namespace VstsSyncMigrator.Engine
 
         public CreateTeamFolders(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<CreateTeamFolders> logger) : base(services, me, telemetry, logger)
         {
-         
+
         }
 
         public override string Name
@@ -37,13 +31,13 @@ namespace VstsSyncMigrator.Engine
 
         public override void Configure(IProcessorConfig config)
         {
-           
+
         }
 
         protected override void InternalExecute()
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
-			//////////////////////////////////////////////////
+            //////////////////////////////////////////////////
             TfsTeamService teamService = Engine.Target.GetService<TfsTeamService>();
             QueryHierarchy qh = ((WorkItemMigrationClient)Engine.Target.WorkItems).Store.Projects[Engine.Target.Config.Project].QueryHierarchy;
             List<TeamFoundationTeam> teamList = teamService.QueryTeams(Engine.Target.Config.Project).ToList();
@@ -57,7 +51,7 @@ namespace VstsSyncMigrator.Engine
             {
                 Stopwatch witstopwatch = Stopwatch.StartNew();
 
-				Trace.Write(string.Format("Processing team {0}", team.Name));
+                Trace.Write(string.Format("Processing team {0}", team.Name));
                 Regex r = new Regex(@"^Project - ([a-zA-Z ]*)");
                 string path;
                 if (r.IsMatch(team.Name))
@@ -102,13 +96,13 @@ namespace VstsSyncMigrator.Engine
             if (currentItem is QueryFolder)
             {
                 QueryFolder currentFolder = (QueryFolder)currentItem;
-                
+
                 if (!currentFolder.Contains(toCreate[focus]))
                 {
                     currentFolder.Add(new QueryFolder(toCreate[focus]));
                     Trace.WriteLine(string.Format("  Created: {0}", toCreate[focus]));
                 }
-                if (toCreate.Length != focus+1)
+                if (toCreate.Length != focus + 1)
                 {
                     CreateFolderHyerarchy(toCreate, currentFolder[toCreate[focus]], focus + 1);
                 }

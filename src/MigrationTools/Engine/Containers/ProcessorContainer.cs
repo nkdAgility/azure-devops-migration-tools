@@ -1,13 +1,10 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using MigrationTools.Configuration;
-using MigrationTools.DataContracts;
-using Serilog;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
+using Microsoft.Extensions.DependencyInjection;
+using MigrationTools.Configuration;
+using Serilog;
 
 namespace MigrationTools.Engine.Containers
 {
@@ -15,10 +12,14 @@ namespace MigrationTools.Engine.Containers
     {
 
         private List<IProcessor> _Processors = new List<IProcessor>();
-        public override ReadOnlyCollection<IProcessor> Items { get {
+        public override ReadOnlyCollection<IProcessor> Items
+        {
+            get
+            {
                 EnsureConfigured();
                 return _Processors.AsReadOnly();
-            } }
+            }
+        }
         public int Count { get { EnsureConfigured(); return _Processors.Count; } }
 
         public ProcessorContainer(IServiceProvider services, EngineConfiguration config) : base(services, config)
@@ -51,7 +52,7 @@ namespace MigrationTools.Engine.Containers
 
                         IProcessor pc = (IProcessor)Services.GetRequiredService(type);
                         pc.Configure(processorConfig);
-                         _Processors.Add(pc);
+                        _Processors.Add(pc);
                     }
                     else
                     {

@@ -2,15 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
-using MigrationTools.Engine;
 using MigrationTools.Configuration;
-using MigrationTools;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using Serilog;
-using Microsoft.ApplicationInsights.DataContracts;
 using MigrationTools.Engine.Containers;
-using MigrationTools;
+using Serilog;
 
 namespace MigrationTools.Engine.Processors
 {
@@ -75,7 +69,7 @@ namespace MigrationTools.Engine.Processors
             }
             finally
             {
-                Telemetry.TrackRequest( this.Name, start, executeTimer.Elapsed, Status.ToString(), (Status == ProcessingStatus.Complete));
+                Telemetry.TrackRequest(this.Name, start, executeTimer.Elapsed, Status.ToString(), (Status == ProcessingStatus.Complete));
             }
 
         }

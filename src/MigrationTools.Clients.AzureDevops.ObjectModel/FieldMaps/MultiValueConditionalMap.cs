@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.TeamFoundation.WorkItemTracking.Client;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
-using Microsoft.ApplicationInsights;
-using MigrationTools.Configuration.FieldMap;
-using MigrationTools.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using MigrationTools.Configuration;
+using MigrationTools.Configuration.FieldMap;
 
 namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
 {
@@ -36,9 +31,10 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
                 if (fieldsValueMatch(Config.sourceFieldsAndValues, source))
                 {
                     fieldsUpdate(Config.targetFieldsAndValues, target);
-                }                
+                }
                 Trace.WriteLine(string.Format("  [UPDATE] field mapped {0}:{1} to {2}:{3}", source.Id, Config.sourceFieldsAndValues.Keys.ToString(), target.Id, Config.targetFieldsAndValues.Keys.ToString()));
-            } else
+            }
+            else
             {
                 Trace.WriteLine(string.Format("  [SKIPPED] Not all source and target fields exist", source.Id, Config.sourceFieldsAndValues.Keys.ToString(), target.Id, Config.targetFieldsAndValues.Keys.ToString()));
             }
@@ -57,7 +53,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
             bool matches = true;
             foreach (string field in fieldAndValues.Keys)
             {
-                if((string)workitem.Fields[field].Value != fieldAndValues[field])
+                if ((string)workitem.Fields[field].Value != fieldAndValues[field])
                 {
                     matches = false;
                 }

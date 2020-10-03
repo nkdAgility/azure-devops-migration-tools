@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MigrationTools.CommandLine;
-using MigrationTools;
 
 namespace MigrationTools
 {
@@ -33,7 +30,7 @@ namespace MigrationTools
         public Task StartAsync(CancellationToken cancellationToken)
         {
             _logger.LogDebug($"Starting with arguments: {string.Join(" ", Environment.GetCommandLineArgs())}");
-            if(_exceuteOptions == null)
+            if (_exceuteOptions == null)
             {
                 return Task.CompletedTask;
             }
@@ -66,7 +63,7 @@ namespace MigrationTools
         {
             _logger.LogDebug($"Exiting with return code: {_exitCode}");
 
-            if(_exitCode.HasValue)
+            if (_exitCode.HasValue)
             {
                 Environment.ExitCode = _exitCode.Value;
             }

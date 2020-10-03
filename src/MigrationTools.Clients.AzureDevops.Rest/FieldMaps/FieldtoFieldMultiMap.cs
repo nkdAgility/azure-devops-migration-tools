@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 using MigrationTools.Configuration;
 using MigrationTools.Configuration.FieldMap;
