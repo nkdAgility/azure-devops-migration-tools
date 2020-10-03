@@ -8,7 +8,7 @@ namespace VstsSyncMigrator.Engine.ComponentContext
     public class TestManagementContext
     {
         private readonly string testPlanQueryBit;
-        private readonly IMigrationClient source;
+        private readonly IMigrationClient _source;
         private ITestManagementService tms;
 
         internal ITestManagementTeamProject Project { get; }
@@ -18,8 +18,8 @@ namespace VstsSyncMigrator.Engine.ComponentContext
         public TestManagementContext(IMigrationClient source, string testPlanQueryBit)
         {
             this.testPlanQueryBit = testPlanQueryBit;
-            this.source = source;
-            tms = source.GetService<ITestManagementService>();
+            _source = source;
+            tms = _source.GetService<ITestManagementService>();
             Project = tms.GetTeamProject(source.Config.Project);
         }
 
