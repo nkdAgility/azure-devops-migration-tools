@@ -49,6 +49,9 @@ namespace VstsSyncMigrator.ConsoleApp
 
                     // Enrichers
                     services.AddSingleton<WorkItemLinkEnricher>();
+                    services.AddSingleton<EmbededImagesRepairEnricher>();
+                    services.AddSingleton<GitRepositoryEnricher>();
+                    services.AddSingleton<NodeStructureEnricher>();
 
                     // Core
                     services.AddTransient<IMigrationClient, MigrationClient>();
