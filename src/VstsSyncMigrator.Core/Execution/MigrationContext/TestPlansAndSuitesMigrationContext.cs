@@ -16,7 +16,6 @@ using MigrationTools.Configuration;
 using MigrationTools.Configuration.Processing;
 using MigrationTools.DataContracts;
 using MigrationTools.Engine.Processors;
-using Serilog;
 using VstsSyncMigrator.Engine.ComponentContext;
 
 namespace VstsSyncMigrator.Engine
@@ -202,7 +201,7 @@ namespace VstsSyncMigrator.Engine
                 catch (Exception ex)
                 {
                     // SOmetimes this will error out for no reason.
-                    Log.Error(ex, "Applying Configurations");
+                    Log.LogError(ex, "Applying Configurations");
                 }
             }
         }
@@ -985,7 +984,7 @@ namespace VstsSyncMigrator.Engine
             }
             catch (TestManagementServerException ex)
             {
-                Log.Error(ex, " FAILED {TestSuiteType} : {Id} - {Title}",
+                Log.LogError(ex, " FAILED {TestSuiteType} : {Id} - {Title}",
                       new Dictionary<string, string> {
                           { "Name", Name},
                           { "Target Project", Engine.Target.Config.Project},
