@@ -1,20 +1,11 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using MigrationTools.Configuration;
-using MigrationTools.DataContracts;
-using MigrationTools.Enrichers;
-using MigrationTools.Clients;
-using MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using Microsoft.VisualStudio.Services.Common;
-using MigrationTools.Engine.Containers;
-using Serilog;
+using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using MigrationTools.DataContracts;
 
 namespace MigrationTools.Clients.AzureDevops.ObjectModel
 {
-   public static class TfsObjectModelExtensions
+    public static class TfsObjectModelExtensions
     {
         //public static IServiceCollection TfsObjectModelWorkerServices(this IServiceCollection collection, EngineConfiguration config)
         //{
@@ -88,7 +79,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel
                 dict.Add(col[ix].Name, col[ix].Value);
             }
             return dict;
-        }        
+        }
 
         public static ProjectData ToProjectData(this Project project)
         {
@@ -108,6 +99,6 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel
             return (Project)projectdata.internalObject;
         }
 
-     
+
     }
 }

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using MigrationTools.Configuration;
+﻿using MigrationTools.Configuration;
 
 namespace MigrationTools.Engine.Containers.Tests
 {

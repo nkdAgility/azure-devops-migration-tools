@@ -1,19 +1,12 @@
-﻿using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 using System.Diagnostics;
-using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using MigrationTools.Configuration.Processing;
-using Microsoft.Extensions.Hosting;
-using MigrationTools.Configuration;
-using MigrationTools;
-using MigrationTools.Engine.Processors;
+using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools;
 using MigrationTools.Clients.AzureDevops.ObjectModel.Clients;
+using MigrationTools.Configuration;
+using MigrationTools.Configuration.Processing;
+using MigrationTools.Engine.Processors;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -69,7 +62,7 @@ namespace VstsSyncMigrator.Engine
         protected override void InternalExecute()
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
-			//////////////////////////////////////////////////
+            //////////////////////////////////////////////////
 
             var sourceQueryHierarchy = ((WorkItemMigrationClient)Engine.Source.WorkItems).Store.Projects[Engine.Source.Config.Project].QueryHierarchy;
             var targetQueryHierarchy = ((WorkItemMigrationClient)Engine.Target.WorkItems).Store.Projects[Engine.Target.Config.Project].QueryHierarchy;

@@ -1,12 +1,9 @@
 ﻿using MigrationTools.Configuration;
 using MigrationTools.DataContracts;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace MigrationTools.Engine.Containers
 {
-   public interface IFieldMap
+    public interface IFieldMap
     {
         string Name { get; }
         string MappingDisplayName { get; }

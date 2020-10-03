@@ -35,7 +35,7 @@ namespace MigrationTools
         public Task StartAsync(CancellationToken cancellationToken)
         {
             _logger.LogDebug($"Starting with arguments: {string.Join(" ", Environment.GetCommandLineArgs())}");
-            if(_initOptions == null)
+            if (_initOptions == null)
             {
                 return Task.CompletedTask;
             }
@@ -82,7 +82,7 @@ namespace MigrationTools
                             sw.Close();
                             _logger.LogInformation("New configuration.json file has been created");
                         }
-                        _exitCode =  0;
+                        _exitCode = 0;
                     }
                     catch (Exception ex)
                     {

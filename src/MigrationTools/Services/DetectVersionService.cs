@@ -1,21 +1,15 @@
-﻿using Microsoft.ApplicationInsights;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading;
 using Microsoft.ApplicationInsights.DataContracts;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using NuGet;
 using NuGet.Common;
 using NuGet.Configuration;
 using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
 using NuGet.Versioning;
 using Serilog;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Net.NetworkInformation;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace MigrationTools.Services
 {
@@ -58,7 +52,7 @@ namespace MigrationTools.Services
             return latestPackageVersion;
         }
 
-        private  IEnumerable<NuGetVersion> GetVersions(string packageId, string sourceUrl = "https://chocolatey.org/api/v2/")
+        private IEnumerable<NuGetVersion> GetVersions(string packageId, string sourceUrl = "https://chocolatey.org/api/v2/")
         {
             NuGet.Common.ILogger logger = NullLogger.Instance;
             CancellationToken cancellationToken = CancellationToken.None;
@@ -66,7 +60,7 @@ namespace MigrationTools.Services
             PackageSource ps = new PackageSource(sourceUrl);
             var sourceRepository = Repository.Factory.GetCoreV2(ps);
             FindPackageByIdResource resource = sourceRepository.GetResourceAsync<FindPackageByIdResource>().GetAwaiter().GetResult();
-            IEnumerable<NuGetVersion> versions =  resource.GetAllVersionsAsync(packageId, cache, logger, cancellationToken).GetAwaiter().GetResult();
+            IEnumerable<NuGetVersion> versions = resource.GetAllVersionsAsync(packageId, cache, logger, cancellationToken).GetAwaiter().GetResult();
             return versions;
         }
     }

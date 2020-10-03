@@ -1,14 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Microsoft.ApplicationInsights.DataContracts;
-using Microsoft.Extensions.DependencyInjection;
-using MigrationTools.Clients;
 using MigrationTools.Configuration;
 using MigrationTools.DataContracts;
 using Serilog;
@@ -48,7 +41,7 @@ namespace MigrationTools.Clients
             var timer = System.Diagnostics.Stopwatch.StartNew();
             try
             {
-                InnerConfigure(migrationClient,bypassRules);
+                InnerConfigure(migrationClient, bypassRules);
                 timer.Stop();
                 Telemetry.TrackDependency(new DependencyTelemetry("TeamService", "GetWorkItemStore", startTime, timer.Elapsed, true));
             }

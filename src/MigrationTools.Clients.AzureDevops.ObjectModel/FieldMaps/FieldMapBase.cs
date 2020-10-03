@@ -1,18 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using Microsoft.ApplicationInsights;
-using System.Diagnostics;
-using MigrationTools;
-using Serilog;
 using MigrationTools.Configuration;
-using MigrationTools.Engine;
 using MigrationTools.DataContracts;
 using MigrationTools.Engine.Containers;
-using Microsoft.Extensions.Logging;
 
 namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
 {
@@ -38,12 +30,12 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Field mapp fault", 
+                Logger.LogError(ex, "Field mapp fault",
                        new Dictionary<string, string> {
                             { "Source", source.ToWorkItem().Id.ToString() },
                             { "Target",  target.ToWorkItem().Id.ToString()}
                        });
-            }            
+            }
         }
         public string Name
         {

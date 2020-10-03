@@ -1,24 +1,17 @@
-﻿using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using MigrationTools.Configuration.Processing;
+using Microsoft.Extensions.Logging;
+using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
-using Serilog;
-using Microsoft.Extensions.Logging;
 
 namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
 {
-   public class EmbededImagesRepairEnricher : EmbededImagesRepairEnricherBase
+    public class EmbededImagesRepairEnricher : EmbededImagesRepairEnricherBase
     {
 
 

@@ -1,13 +1,4 @@
-﻿using Serilog;
-using Serilog.Events;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MigrationTools;
+﻿using System;
 using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
 

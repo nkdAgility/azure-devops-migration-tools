@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using MigrationTools.DataContracts;
+﻿using MigrationTools.DataContracts;
 
 namespace MigrationTools.Enrichers
 {

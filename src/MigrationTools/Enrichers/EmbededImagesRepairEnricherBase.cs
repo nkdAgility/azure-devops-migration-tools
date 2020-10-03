@@ -1,12 +1,11 @@
-﻿using Microsoft.Extensions.Logging;
-using MigrationTools.DataContracts;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using Microsoft.Extensions.Logging;
+using MigrationTools.DataContracts;
 
 namespace MigrationTools.Enrichers
 {
@@ -17,7 +16,7 @@ namespace MigrationTools.Enrichers
         /**
       *  from https://gist.github.com/pietergheysens/792ed505f09557e77ddfc1b83531e4fb
       */
-        public EmbededImagesRepairEnricherBase(IMigrationEngine engine, ILogger<EmbededImagesRepairEnricherBase> logger) :base(engine, logger)
+        public EmbededImagesRepairEnricherBase(IMigrationEngine engine, ILogger<EmbededImagesRepairEnricherBase> logger) : base(engine, logger)
         {
 
             _httpClientHandler = new HttpClientHandler { AllowAutoRedirect = false, UseDefaultCredentials = true, AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate };
@@ -119,7 +118,7 @@ namespace MigrationTools.Enrichers
             return oppositeUrl;
         }
 
-      
+
 
         protected enum ImageFormat
         {

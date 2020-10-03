@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools.Clients.AzureDevops.ObjectModel.Clients;
-using MigrationTools.Clients;
 using MigrationTools.DataContracts;
-using MigrationTools.Exceptions;
-using VstsSyncMigrator.Engine;
 using MigrationTools.Enrichers;
-using Microsoft.Extensions.Logging;
+using MigrationTools.Exceptions;
 
 namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
 {
@@ -18,7 +16,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
         private bool _save = true;
         private bool _filterWorkItemsThatAlreadyExistInTarget = true;
 
-        public WorkItemLinkEnricher(IMigrationEngine engine, ILogger<WorkItemLinkEnricher> logger) :base(engine, logger)
+        public WorkItemLinkEnricher(IMigrationEngine engine, ILogger<WorkItemLinkEnricher> logger) : base(engine, logger)
         {
 
         }

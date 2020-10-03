@@ -1,12 +1,9 @@
 ﻿using CommandLine;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace MigrationTools.CommandLine
 {
     [Verb("execute", HelpText = "Record changes to the repository.")]
-   public class ExecuteOptions
+    public class ExecuteOptions
     {
         [Option('c', "config", Required = true, HelpText = "Configuration file to be processed.")]
         public string ConfigFile { get; set; }

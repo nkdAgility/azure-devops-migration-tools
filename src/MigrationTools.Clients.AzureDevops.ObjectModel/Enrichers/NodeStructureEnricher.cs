@@ -4,13 +4,8 @@ using System.Linq;
 using System.Xml;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.Server;
-using MigrationTools;
-using MigrationTools.Configuration;
-using MigrationTools.Configuration.Processing;
 using MigrationTools.DataContracts;
-using MigrationTools.Engine.Processors;
 using MigrationTools.Enrichers;
-using Serilog;
 
 namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
 {
@@ -25,7 +20,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
 
         public override void Configure(bool save = true, bool filterWorkItemsThatAlreadyExistInTarget = true)
         {
-            
+
         }
 
         public override int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
@@ -47,9 +42,9 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             _prefixProjectToNodes = prefixProjectToNodes;
             _nodeBasePaths = nodeBasePaths;
             //////////////////////////////////////////////////
-            ProcessCommonStructure( Engine.Source.Config.LanguageMaps.AreaPath, Engine.Target.Config.LanguageMaps.AreaPath);
+            ProcessCommonStructure(Engine.Source.Config.LanguageMaps.AreaPath, Engine.Target.Config.LanguageMaps.AreaPath);
             //////////////////////////////////////////////////
-            ProcessCommonStructure( Engine.Source.Config.LanguageMaps.IterationPath, Engine.Target.Config.LanguageMaps.IterationPath);
+            ProcessCommonStructure(Engine.Source.Config.LanguageMaps.IterationPath, Engine.Target.Config.LanguageMaps.IterationPath);
             //////////////////////////////////////////////////
         }
 
@@ -76,7 +71,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             }
             if (_prefixProjectToNodes)
             {
-                structureParent = CreateNode( Engine.Source.Config.Project, structureParent);
+                structureParent = CreateNode(Engine.Source.Config.Project, structureParent);
             }
             if (sourceTree.ChildNodes[0].HasChildNodes)
             {
@@ -113,7 +108,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                 }
                 else
                 {
-                    targetNode = CreateNode( newNodeName, parentPath);
+                    targetNode = CreateNode(newNodeName, parentPath);
                 }
                 if (item.HasChildNodes)
                 {

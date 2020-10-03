@@ -1,9 +1,5 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace MigrationTools.Configuration
 {
@@ -15,7 +11,7 @@ namespace MigrationTools.Configuration
         bool Enabled { get; set; }
         [JsonIgnoreAttribute]
         string Processor { get; }
-        
+
         /// <summary>
         /// Indicates, if this processor can be added to the list of current processors or not.
         /// Some processors are not compatible with each other.

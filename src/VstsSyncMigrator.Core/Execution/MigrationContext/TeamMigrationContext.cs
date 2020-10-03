@@ -1,22 +1,15 @@
-﻿using Microsoft.TeamFoundation.Client;
-using Microsoft.TeamFoundation.ProcessConfiguration.Client;
-using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using MigrationTools.Configuration.Processing;
-using Microsoft.Extensions.Hosting;
-using MigrationTools.Configuration;
+using Microsoft.TeamFoundation.Client;
+using Microsoft.TeamFoundation.ProcessConfiguration.Client;
 using MigrationTools;
-using MigrationTools.Engine.Processors;
-using MigrationTools;
-using MigrationTools.DataContracts;
 using MigrationTools.Clients.AzureDevops.ObjectModel;
+using MigrationTools.Configuration;
+using MigrationTools.Configuration.Processing;
+using MigrationTools.DataContracts;
+using MigrationTools.Engine.Processors;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -97,7 +90,7 @@ namespace VstsSyncMigrator.Engine
                             Trace.WriteLine(string.Format("-> Settings found for team '{0}'..", sourceTeam.Name));
                             if (_config.PrefixProjectToNodes)
                             {
-                                targetConfig.TeamSettings.BacklogIterationPath = 
+                                targetConfig.TeamSettings.BacklogIterationPath =
                                     string.Format("{0}\\{1}", Engine.Target.Config.Project, sourceConfig.TeamSettings.BacklogIterationPath);
                                 targetConfig.TeamSettings.IterationPaths = sourceConfig.TeamSettings.IterationPaths
                                     .Select(path => string.Format("{0}\\{1}", Engine.Target.Config.Project, path))

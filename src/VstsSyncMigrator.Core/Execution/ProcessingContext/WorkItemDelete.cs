@@ -1,15 +1,13 @@
-﻿using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using MigrationTools.Configuration;
+using Microsoft.Extensions.Logging;
 using MigrationTools;
 using MigrationTools.Clients.AzureDevops.ObjectModel.Clients;
+using MigrationTools.Configuration;
 using MigrationTools.Configuration.Processing;
-using Serilog;
 using MigrationTools.DataContracts;
-using Microsoft.Extensions.Logging;
 
 namespace VstsSyncMigrator.Engine
 {

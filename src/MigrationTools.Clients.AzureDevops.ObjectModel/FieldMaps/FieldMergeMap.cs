@@ -1,14 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using System.Diagnostics;
-using Microsoft.ApplicationInsights;
-using MigrationTools.Configuration.FieldMap;
-using MigrationTools.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using MigrationTools.Configuration;
+using MigrationTools.Configuration.FieldMap;
 
 namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
 {
@@ -43,10 +38,12 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
                 if (valT.Contains(val2) && val2.Trim().Length > 0)
                 {
                     Trace.WriteLine(string.Format("  [SKIP] field already merged {0}:{1}+{2} to {3}:{4}", source.Id, Config.sourceField1, Config.sourceField2, target.Id, Config.targetField));
-                } else if (valT.Equals(newValT))
-                    {
+                }
+                else if (valT.Equals(newValT))
+                {
                     Trace.WriteLine(string.Format("  [SKIP] field already merged {0}:{1}+{2} to {3}:{4}", source.Id, Config.sourceField1, Config.sourceField2, target.Id, Config.targetField));
-                } else
+                }
+                else
                 {
                     target.Fields[Config.targetField].Value = newValT;
                     Trace.WriteLine(string.Format("  [UPDATE] field merged {0}:{1}+{2} to {3}:{4}", source.Id, Config.sourceField1, Config.sourceField2, target.Id, Config.targetField));

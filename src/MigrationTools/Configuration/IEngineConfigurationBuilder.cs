@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace MigrationTools.Configuration
+﻿namespace MigrationTools.Configuration
 {
     public interface IEngineConfigurationBuilder
     {

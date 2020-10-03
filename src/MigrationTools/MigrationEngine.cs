@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using Microsoft.Extensions.DependencyInjection;
-using MigrationTools;
-using MigrationTools.CommandLine;
 using MigrationTools.Clients;
+using MigrationTools.CommandLine;
 using MigrationTools.Configuration;
-using MigrationTools.Engine;
 using MigrationTools.Engine.Containers;
 using Serilog;
 using Serilog.Core;
@@ -68,9 +66,13 @@ namespace MigrationTools
 
         private IMigrationClient _Source;
 
-        public IMigrationClient Source { get {
+        public IMigrationClient Source
+        {
+            get
+            {
                 return GetSource();
-            } }
+            }
+        }
 
 
         private IMigrationClient GetSource()
@@ -127,6 +129,11 @@ namespace MigrationTools
 
             LoggingLevelSwitch logLevel = _services.GetRequiredService<LoggingLevelSwitch>();
             logLevel.MinimumLevel = Config.LogLevel;
+            Log.Information("Logging has been configured and is set to: {LogLevel}. ", Config.LogLevel.ToString());
+            Log.Information("                              Max Logfile: {FileLogLevel}. ", "Verbose");
+            Log.Information("                              Max Console: {ConsoleLogLevel}. ", "Debug");
+            Log.Information("                 Max Application Insights: {AILogLevel}. ", "Error");
+            Log.Information("The Max log levels above show where to go look for extra info. e.g. Even if you set the log level to Verbose you will only see that info in the Log File, however everything up to Debug will be in the Console.");
 
 
             ProcessingStatus ps = ProcessingStatus.Running;
@@ -142,7 +149,7 @@ namespace MigrationTools
             {
                 Log.Information("Processor: {ProcessorName}", process.Name);
                 Stopwatch processorTimer = Stopwatch.StartNew();
-				process.Execute();
+                process.Execute();
                 processorTimer.Stop();
                 Telemetry.TrackEvent("ProcessorComplete", new Dictionary<string, string> { { "Processor", process.Name }, { "Status", process.Status.ToString() } }, new Dictionary<string, double> { { "ProcessingTime", processorTimer.ElapsedMilliseconds } });
 

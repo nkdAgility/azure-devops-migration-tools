@@ -1,10 +1,9 @@
-﻿using Microsoft.ApplicationInsights;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.ApplicationInsights.Extensibility.PerfCounterCollector;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace MigrationTools
 {
@@ -34,7 +33,7 @@ namespace MigrationTools
             telemetryClient.Context.Session.Id = Guid.NewGuid().ToString();
             telemetryClient.Context.Device.OperatingSystem = Environment.OSVersion.ToString();
 
-           telemetryClient.Context.Component.Version = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString();
+            telemetryClient.Context.Component.Version = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString();
 
             AddModules(telemetryConfiguration);
         }

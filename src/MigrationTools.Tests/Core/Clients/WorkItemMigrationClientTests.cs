@@ -1,10 +1,6 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.Linq;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools.DataContracts;
-using MigrationTools.Clients;
-using System;
-using System.Text;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 
 namespace MigrationTools.Clients.Tests
 {
