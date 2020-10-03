@@ -19,10 +19,6 @@ namespace MigrationTools.Engine.Containers
 
         public static implicit operator TItemType(EngineContainer<TItemType> ecType)
         {
-            if (!ecType._configured)
-            {
-                throw new Exception($"You must call EnsureConfigured(); on {ecType.GetType().Name}");
-            }
             return ecType.Items;
         }
 
