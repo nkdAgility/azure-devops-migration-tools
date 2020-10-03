@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools.Configuration;
@@ -13,14 +12,13 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
         {
         }
 
+        public override string MappingDisplayName => string.Empty;
         private MultiValueConditionalMapConfig Config { get { return (MultiValueConditionalMapConfig)_Config; } }
 
         public override void Configure(IFieldMapConfig config)
         {
             base.Configure(config);
         }
-
-        public override string MappingDisplayName => string.Empty;
 
         internal override void InternalExecute(WorkItem source, WorkItem target)
         {
@@ -30,12 +28,25 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
                 {
                     fieldsUpdate(Config.targetFieldsAndValues, target);
                 }
-                Trace.WriteLine(string.Format("  [UPDATE] field mapped {0}:{1} to {2}:{3}", source.Id, Config.sourceFieldsAndValues.Keys.ToString(), target.Id, Config.targetFieldsAndValues.Keys.ToString()));
+                Log.LogDebug("FieldValuetoTagMap: [UPDATE] field mapped {0}:{1} to {2}:{3}", source.Id, Config.sourceFieldsAndValues.Keys.ToString(), target.Id, Config.targetFieldsAndValues.Keys.ToString());
             }
             else
             {
-                Trace.WriteLine(string.Format("  [SKIPPED] Not all source and target fields exist", source.Id, Config.sourceFieldsAndValues.Keys.ToString(), target.Id, Config.targetFieldsAndValues.Keys.ToString()));
+                Log.LogDebug("FieldValuetoTagMap: [SKIPPED] Not all source and target fields exist", source.Id, Config.sourceFieldsAndValues.Keys.ToString(), target.Id, Config.targetFieldsAndValues.Keys.ToString());
             }
+        }
+
+        private bool fieldsExist(Dictionary<string, string> fieldsAndValues, WorkItem workitem)
+        {
+            bool exists = true;
+            foreach (string field in fieldsAndValues.Keys)
+            {
+                if (!workitem.Fields.Contains(field))
+                {
+                    exists = false;
+                }
+            }
+            return exists;
         }
 
         private void fieldsUpdate(Dictionary<string, string> fieldAndValues, WorkItem workitem)
@@ -57,19 +68,6 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
                 }
             }
             return matches;
-        }
-
-        private bool fieldsExist(Dictionary<string, string> fieldsAndValues, WorkItem workitem)
-        {
-            bool exists = true;
-            foreach (string field in fieldsAndValues.Keys)
-            {
-                if (!workitem.Fields.Contains(field))
-                {
-                    exists = false;
-                }
-            }
-            return exists;
         }
     }
 }

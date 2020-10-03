@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
@@ -44,7 +43,6 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
 
             if (ShouldCopyLinks(sourceWorkItemLinkStart, targetWorkItemLinkStart))
             {
-                Trace.Indent();
                 foreach (Link item in sourceWorkItemLinkStart.ToWorkItem().Links)
                 {
                     try

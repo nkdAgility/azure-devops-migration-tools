@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
@@ -14,14 +13,13 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
         {
         }
 
+        public override string MappingDisplayName => Config.sourceField;
         private FieldtoTagMapConfig Config { get { return (FieldtoTagMapConfig)_Config; } }
 
         public override void Configure(IFieldMapConfig config)
         {
             base.Configure(config);
         }
-
-        public override string MappingDisplayName => Config.sourceField;
 
         internal override void InternalExecute(WorkItem source, WorkItem target)
         {
@@ -43,7 +41,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
                             newTags.Add(string.Format(Config.formatExpression, value));
                         }
                         target.Tags = string.Join(";", newTags.ToArray());
-                        Trace.WriteLine(string.Format("  [UPDATE] field tagged {0}:{1} to {2}:Tag with foramt of {3}", source.Id, Config.sourceField, target.Id, Config.formatExpression));
+                        Log.LogDebug("FieldToTagFieldMap: [UPDATE] field tagged {0}:{1} to {2}:Tag with foramt of {3}", source.Id, Config.sourceField, target.Id, Config.formatExpression);
                     }
                 }
             }

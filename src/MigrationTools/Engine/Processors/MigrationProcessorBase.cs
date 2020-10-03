@@ -2,38 +2,40 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.Logging;
 using MigrationTools.Configuration;
 using MigrationTools.Engine.Containers;
-using Serilog;
 
 namespace MigrationTools.Engine.Processors
 {
     public abstract class MigrationProcessorBase : IProcessor
     {
-        internal IMigrationEngine _me;
-        internal IServiceProvider _services;
-
-        public IMigrationEngine Engine { get { return _me; } }
-        public IServiceProvider Services { get { return _services; } }
-
-        protected MigrationProcessorBase(IMigrationEngine me, IServiceProvider services, ITelemetryLogger telemetry)
+        protected MigrationProcessorBase(IMigrationEngine engine, IServiceProvider services, ITelemetryLogger telemetry, ILogger<MigrationProcessorBase> logger)
         {
-            _me = me;
-            _services = services;
+            Engine = engine;
+            Services = services;
             Telemetry = telemetry;
+            Log = logger;
         }
-
-        public abstract void Configure(IProcessorConfig config);
 
         public abstract string Name { get; }
 
         public ProcessingStatus Status { get; private set; } = ProcessingStatus.None;
-        public ITelemetryLogger Telemetry { get; }
+
+        protected IMigrationEngine Engine { get; }
+
+        protected ILogger<MigrationProcessorBase> Log { get; }
+
+        protected IServiceProvider Services { get; }
+
+        protected ITelemetryLogger Telemetry { get; }
+
+        public abstract void Configure(IProcessorConfig config);
 
         public void Execute()
         {
             Telemetry.TrackEvent(this.Name);
-            Log.Information("Migration Context Start: {MigrationContextname} ", Name);
+            Log.LogInformation("Migration Context Start: {MigrationContextname} ", Name);
             DateTime start = DateTime.Now;
             var executeTimer = Stopwatch.StartNew();
             //////////////////////////////////////////////////
@@ -44,7 +46,7 @@ namespace MigrationTools.Engine.Processors
                 Status = ProcessingStatus.Complete;
                 executeTimer.Stop();
 
-                Log.Information(" Migration Context Complete {MigrationContextname} ", Name);
+                Log.LogInformation(" Migration Context Complete {MigrationContextname} ", Name);
             }
             catch (Exception ex)
             {
@@ -65,12 +67,22 @@ namespace MigrationTools.Engine.Processors
                     {
                         {"MigrationContextTime", executeTimer.ElapsedMilliseconds}
                     });
-                Log.Fatal(ex, "Error while running {MigrationContextname}", Name);
+                Log.LogCritical(ex, "Error while running {MigrationContextname}", Name);
             }
             finally
             {
                 Telemetry.TrackRequest(this.Name, start, executeTimer.Elapsed, Status.ToString(), (Status == ProcessingStatus.Complete));
             }
+        }
+
+        protected static void AddMetric(string name, IDictionary<string, double> store, double value)
+        {
+            if (!store.ContainsKey(name)) store.Add(name, value);
+        }
+
+        protected static void AddParameter(string name, IDictionary<string, string> store, string value)
+        {
+            if (!store.ContainsKey(name)) store.Add(name, value);
         }
 
         protected abstract void InternalExecute();
@@ -90,16 +102,6 @@ namespace MigrationTools.Engine.Processors
             var r = new Regex(Engine.Source.Config.Project, RegexOptions.IgnoreCase);
             //// Output = [targetTeamProject]\[sourceTeamProject]\[AreaPath]
             return r.Replace(input, Engine.Target.Config.Project, 1);
-        }
-
-        protected static void AddParameter(string name, IDictionary<string, string> store, string value)
-        {
-            if (!store.ContainsKey(name)) store.Add(name, value);
-        }
-
-        protected static void AddMetric(string name, IDictionary<string, double> store, double value)
-        {
-            if (!store.ContainsKey(name)) store.Add(name, value);
         }
     }
 }

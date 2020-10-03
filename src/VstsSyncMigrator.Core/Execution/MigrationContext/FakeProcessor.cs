@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Microsoft.Extensions.Logging;
 using MigrationTools;
 using MigrationTools.Configuration;
 using MigrationTools.DataContracts;
@@ -10,6 +11,10 @@ namespace VstsSyncMigrator.Engine
 {
     public class FakeProcessor : MigrationProcessorBase
     {
+        public FakeProcessor(IMigrationEngine engine, IServiceProvider services, ITelemetryLogger telemetry, ILogger<FakeProcessor> logger) : base(engine, services, telemetry, logger)
+        {
+        }
+
         public override string Name
         {
             get
@@ -18,8 +23,9 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        public FakeProcessor(IMigrationEngine me, IServiceProvider services, ITelemetryLogger telemetry) : base(me, services, telemetry)
+        public override void Configure(IProcessorConfig config)
         {
+            // FakeProcessorConfig config
         }
 
         protected override void InternalExecute()
@@ -29,7 +35,7 @@ namespace VstsSyncMigrator.Engine
 
             var query = @"SELECT [System.Id] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject ";// AND [System.Id] = 188708 ";
             List<WorkItemData> sourceWIS = Engine.Source.WorkItems.GetWorkItems(query);
-            Trace.WriteLine(string.Format("Migrate {0} work items?", sourceWIS.Count));
+            Log.LogDebug("Migrate {0} work items?", sourceWIS.Count);
             //////////////////////////////////////////////////
 
             int current = sourceWIS.Count;
@@ -39,11 +45,6 @@ namespace VstsSyncMigrator.Engine
             }
             stopwatch.Stop();
             Console.WriteLine(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds", stopwatch.Elapsed);
-        }
-
-        public override void Configure(IProcessorConfig config)
-        {
-            // FakeProcessorConfig config
         }
     }
 }

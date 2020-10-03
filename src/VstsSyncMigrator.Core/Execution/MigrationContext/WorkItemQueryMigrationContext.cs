@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools;
 using MigrationTools.Clients.AzureDevops.ObjectModel.Clients;
@@ -13,14 +14,14 @@ namespace VstsSyncMigrator.Engine
     public class WorkItemQueryMigrationContext : MigrationProcessorBase
     {
         /// <summary>
+        /// The processor configuration
+        /// </summary>
+        private WorkItemQueryMigrationConfig config;
+
+        /// <summary>
         /// Counter for folders processed
         /// </summary>
         private int totalFoldersAttempted = 0;
-
-        /// <summary>
-        /// Counter for queries skipped
-        /// </summary>
-        private int totalQueriesSkipped = 0;
 
         /// <summary>
         /// Counter for queries attempted
@@ -33,14 +34,18 @@ namespace VstsSyncMigrator.Engine
         private int totalQueriesMigrated = 0;
 
         /// <summary>
+        /// Counter for queries skipped
+        /// </summary>
+        private int totalQueriesSkipped = 0;
+
+        /// <summary>
         /// Counter for the queries that failed migration
         /// </summary>
         private int totalQueryFailed = 0;
 
-        /// <summary>
-        /// The processor configuration
-        /// </summary>
-        private WorkItemQueryMigrationConfig config;
+        public WorkItemQueryMigrationContext(IMigrationEngine engine, IServiceProvider services, ITelemetryLogger telemetry, ILogger<WorkItemQueryMigrationContext> logger) : base(engine, services, telemetry, logger)
+        {
+        }
 
         public override string Name
         {
@@ -48,10 +53,6 @@ namespace VstsSyncMigrator.Engine
             {
                 return "WorkItemQueryMigrationProcessorContext";
             }
-        }
-
-        public WorkItemQueryMigrationContext(IMigrationEngine me, IServiceProvider services, ITelemetryLogger telemetry) : base(me, services, telemetry)
-        {
         }
 
         public override void Configure(IProcessorConfig config)

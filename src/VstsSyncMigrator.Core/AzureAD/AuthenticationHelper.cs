@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
+using Serilog;
 
 namespace VstsSyncMigrator
 {
@@ -31,7 +31,7 @@ namespace VstsSyncMigrator
                 AuthenticationResult userAuthnResult = await authenticationContext.AcquireTokenAsync(GlobalConstants.ResourceUrl,
                     UserModeConstants.ClientId, redirectUri, new PlatformParameters(PromptBehavior.RefreshSession));
                 TokenForUser = userAuthnResult.AccessToken;
-                Trace.WriteLine("\n Welcome " + userAuthnResult.UserInfo.GivenName + " " +
+                Log.Information("AuthenticationHelper: \n Welcome " + userAuthnResult.UserInfo.GivenName + " " +
                                   userAuthnResult.UserInfo.FamilyName);
             }
             return TokenForUser;
