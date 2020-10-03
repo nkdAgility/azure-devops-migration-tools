@@ -11,7 +11,7 @@ namespace MigrationTools.Engine.Containers
    public class TypeDefinitionMapContainer : EngineContainer<ReadOnlyDictionary<string, IWitdMapper>>
     {
 
-        Dictionary<string, IWitdMapper> _TypeDefinitions = new Dictionary<string, IWitdMapper>();
+        private Dictionary<string, IWitdMapper> _TypeDefinitions = new Dictionary<string, IWitdMapper>();
 
         public override ReadOnlyDictionary<string, IWitdMapper> Items { get { return new ReadOnlyDictionary<string, IWitdMapper>(_TypeDefinitions); } }
 

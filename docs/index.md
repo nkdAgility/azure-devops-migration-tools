@@ -18,6 +18,7 @@ _NOTICE: Both paid and community support is available through our [recommended c
 
 ## Change Log
 
+- v11.5 - Added more usefull logging levels. Replace `"TelemetryEnableTrace": false` with `"LogLevel": "Verbose"` in the config. Verbose will only be logged to the logfile.
 - v11.2.1 - Removed NodeMogrationContext and converted it to an enricher for Work Items. Still needs work, so that it migrates individual nodes, but currently migrates all.
 - v10.1 - Changed config design to have only the Name and not FullName of the class. Remove `MigrationTools.Core.Configuration.FieldMap.` and `MigrationTools.Core.Configuration.Processing.` from the config leaving only the Name of the class in ObjectType field.
 - v10.0 - Start of the greate refactor over to .NET Core and the REST API as the Object Model has been retired.

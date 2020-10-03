@@ -47,10 +47,10 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
             throw new NotImplementedException();
         }
 
-        public override List<WorkItemData> GetWorkItems(string query)
+        public override List<WorkItemData> GetWorkItems(string WIQLQuery)
         {
             IWorkItemQueryBuilder wiqb = Services.GetRequiredService<IWorkItemQueryBuilder>();
-            wiqb.Query = query;
+            wiqb.Query = WIQLQuery;
             return GetWorkItems(wiqb);
         }
         public override List<WorkItemData> GetWorkItems(IWorkItemQueryBuilder queryBuilder)

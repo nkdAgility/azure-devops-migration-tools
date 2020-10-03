@@ -75,7 +75,7 @@ namespace MigrationTools.Clients
 
         public abstract void InnerConfigure(IMigrationClient migrationClient, bool bypassRules = true);
         public abstract List<WorkItemData> GetWorkItems();
-        public abstract List<WorkItemData> GetWorkItems(string query);
+        public abstract List<WorkItemData> GetWorkItems(string WIQLQuery);
         public abstract List<WorkItemData> GetWorkItems(IWorkItemQueryBuilder queryBuilder);
         public abstract WorkItemData PersistWorkItem(WorkItemData workItem);
         public abstract WorkItemData GetRevision(WorkItemData workItem, int revision);
@@ -84,7 +84,7 @@ namespace MigrationTools.Clients
         public abstract WorkItemData FindReflectedWorkItemByReflectedWorkItemId(string refId);
         public abstract WorkItemData FindReflectedWorkItemByReflectedWorkItemId(int refId, bool cache);
         public abstract WorkItemData FindReflectedWorkItemByReflectedWorkItemId(WorkItemData refWi);
-        public abstract string CreateReflectedWorkItemId(WorkItemData wi);
+        public abstract string CreateReflectedWorkItemId(WorkItemData workItem);
         public abstract int GetReflectedWorkItemId(WorkItemData workItem);
         public abstract WorkItemData FindReflectedWorkItem(WorkItemData workItem, bool cache);
         public abstract ProjectData GetProject();

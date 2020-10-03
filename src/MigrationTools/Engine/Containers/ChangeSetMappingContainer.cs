@@ -12,7 +12,7 @@ namespace MigrationTools.Engine.Containers
 {
     public class ChangeSetMappingContainer : EngineContainer<ReadOnlyDictionary<int, string>>
     {
-        public readonly Dictionary<int, string> _ChangeSetMappings = new Dictionary<int, string>();
+        private Dictionary<int, string> _ChangeSetMappings = new Dictionary<int, string>();
         public override ReadOnlyDictionary<int,string> Items { get { return new ReadOnlyDictionary<int, string>(_ChangeSetMappings); } }
         public int Count { get { return _ChangeSetMappings.Count; } }
 

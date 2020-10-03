@@ -69,6 +69,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
         }
 
         private TfsTeamProjectCollection _collection;
+
         [Obsolete]
         public object InternalCollection
         {
@@ -76,7 +77,9 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
             {
                 return _collection;
             }
-        }        
+        }
+
+        protected IServiceProvider Services => _Services;
 
         private void EnsureCollection()
         {

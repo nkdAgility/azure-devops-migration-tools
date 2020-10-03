@@ -11,7 +11,7 @@ namespace MigrationTools.Engine.Containers
    public class GitRepoMapContainer : EngineContainer<ReadOnlyDictionary<string, string>>
     {
 
-        public Dictionary<string, string> _GitRepoMaps { get; set; }
+        private Dictionary<string, string> _GitRepoMaps { get; set; }
 
         public override ReadOnlyDictionary<string, string> Items { get { return new ReadOnlyDictionary<string, string>(_GitRepoMaps); } }
 

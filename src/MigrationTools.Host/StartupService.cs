@@ -18,7 +18,7 @@ namespace MigrationTools.Host
         private readonly IDetectVersionService _detectVersionService;
         private readonly ILogger<StartupService> _logger;
         private readonly ITelemetryLogger _telemetryLogger;
-        protected static Stopwatch _mainTimer = new Stopwatch();
+        private static Stopwatch _mainTimer = new Stopwatch();
 
         public StartupService(IDetectOnlineService detectOnlineService, IDetectVersionService detectVersionService, ILogger<StartupService> logger, ITelemetryLogger telemetryLogger)
         {
@@ -78,7 +78,6 @@ namespace MigrationTools.Host
             _logger.LogInformation("Running with args: {@Args}", args);
             _logger.LogInformation("OSVersion: {OSVersion}", Environment.OSVersion.ToString());
             _logger.LogInformation("Version: {Version}", version);
-            _logger.LogInformation("userID: {UserId}", System.Security.Principal.WindowsIdentity.GetCurrent().Name);
         }
 
         protected void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)

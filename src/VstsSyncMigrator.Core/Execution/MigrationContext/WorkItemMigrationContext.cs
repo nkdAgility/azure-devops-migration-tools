@@ -789,11 +789,9 @@ namespace VstsSyncMigrator.Engine
     {
         ICommonStructureService _commonStructure;
         List<string> _foundNodes = new List<string>();
-        WorkItemStore _store;
 
         public NodeDetecomatic(WorkItemStore store)
         {
-            _store = store;
             if (_commonStructure == null)
             {
                 _commonStructure = (ICommonStructureService4)store.TeamProjectCollection.GetService(typeof(ICommonStructureService4));

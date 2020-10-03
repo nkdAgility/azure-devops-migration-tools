@@ -54,16 +54,6 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel
 
         public static WorkItemData AsWorkItemData(this WorkItem context)
         {
-            if (context.AreaPath == "migrationTarget1")
-            {
-                //stop here
-                Log.Information(context.AreaPath);
-            }
-            if (context is null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
-
             var internalWorkItem = new WorkItemData();
             internalWorkItem.internalObject = context;
             internalWorkItem.RefreshWorkItem();
