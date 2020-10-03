@@ -22,9 +22,9 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
             Log.Verbose("WorkItemQuery: ===========GetWorkItems=============");
             var wiClient = (WorkItemMigrationClient)MigrationClient.WorkItems;
             Telemetry.TrackEvent("WorkItemQuery.Execute", Parameters, null);
-            Log.Verbose("WorkItemQuery: TeamProjectCollection: {QueryTarget}",  wiClient.Store.TeamProjectCollection.Uri.ToString());
-            Log.Verbose("WorkItemQuery: Query: {QueryText}",  Query);
-            Log.Verbose("WorkItemQuery: Paramiters: {@QueryParams}",  Parameters);
+            Log.Debug("WorkItemQuery: TeamProjectCollection: {QueryTarget}",  wiClient.Store.TeamProjectCollection.Uri.ToString());
+            Log.Debug("WorkItemQuery: Query: {QueryText}",  Query);
+            Log.Debug("WorkItemQuery: Paramiters: {@QueryParams}",  Parameters);
 
             WorkItemCollection wc;
             var startTime = DateTime.UtcNow;

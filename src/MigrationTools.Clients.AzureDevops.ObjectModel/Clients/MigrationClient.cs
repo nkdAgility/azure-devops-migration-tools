@@ -82,7 +82,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
         {
             if (_collection == null)
             {
-                _Telemetry.TrackEvent("TeamProjectContext.Connect",
+                _Telemetry.TrackEvent("TeamProjectContext.EnsureCollection",
                     new Dictionary<string, string> {
                           { "Name", Config.Project},
                           { "Target Project", Config.Project},
@@ -91,21 +91,21 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
                     }, null);
                 Stopwatch connectionTimer = Stopwatch.StartNew();
                 DateTime start = DateTime.Now;
-                Log.Information("Connecting to {@Config}", Config);
+                Log.Information("MigrationClient: Connecting to {Project} on {Collection}", Config.Project, Config.Collection);
+                Log.Verbose("MigrationClient: Connecting to {@Config}", Config);
 
                 if (_credentials == null)
                     _collection = new TfsTeamProjectCollection(Config.Collection);
                 else
                     _collection = new TfsTeamProjectCollection(Config.Collection, new VssCredentials(new Microsoft.VisualStudio.Services.Common.WindowsCredential(_credentials)));
-
                 try
                 {
-                    Log.Debug("Connected to {CollectionUrl} ", _collection.Uri.ToString());
-                    Log.Debug("validating security for {@AuthorizedIdentity} ", _collection.AuthorizedIdentity);
+                    Log.Debug("MigrationClient: Connected to {CollectionUrl} ", _collection.Uri.ToString());
+                    Log.Debug("MigrationClient: validating security for {@AuthorizedIdentity} ", _collection.AuthorizedIdentity);
                     _collection.EnsureAuthenticated();
                     connectionTimer.Stop();
                     _Telemetry.TrackDependency(new DependencyTelemetry("TeamService", "EnsureAuthenticated", start, connectionTimer.Elapsed, true));
-                    Log.Information(" Access granted ");
+                    Log.Information("MigrationClient: Access granted ");
                 }
                 catch (TeamFoundationServiceUnavailableException ex)
                 {
@@ -118,12 +118,12 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
                        new Dictionary<string, double> {
                             { "ConnectionTimer", connectionTimer.ElapsedMilliseconds }
                        });
-                    Log.Error(ex, "Unable to connect to {@Config}", Config);
+                    Log.Error(ex, "MigrationClient: Unable to connect to {@Config}", Config);
                     throw;
                 }
             }
         }
-
+ 
         public T GetService<T>()
         {
             EnsureCollection();

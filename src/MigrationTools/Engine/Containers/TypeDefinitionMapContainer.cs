@@ -34,7 +34,7 @@ namespace MigrationTools.Engine.Containers
         {
             if (!_TypeDefinitions.ContainsKey(workItemTypeName))
             {
-                Log.Verbose("TypeDefinitionMapContainer: Adding Work Item Type {WorkItemType}", workItemTypeName);
+                Log.Debug("TypeDefinitionMapContainer: Adding Work Item Type {WorkItemType}", workItemTypeName);
                 _TypeDefinitions.Add(workItemTypeName, workItemTypeDefinitionMap);
             }
         }
