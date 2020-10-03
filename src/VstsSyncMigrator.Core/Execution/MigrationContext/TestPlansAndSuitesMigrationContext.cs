@@ -120,7 +120,7 @@ namespace VstsSyncMigrator.Engine
             sourceIdentityManagementService = Engine.Source.GetService<IIdentityManagementService>();
             targetIdentityManagementService = Engine.Target.GetService<IIdentityManagementService>();
 
-            bool filterByCompleted = false;
+            bool filterByCompleted = config.FilterCompleted;
 
             var stopwatch = Stopwatch.StartNew();
             var starttime = DateTime.Now;
