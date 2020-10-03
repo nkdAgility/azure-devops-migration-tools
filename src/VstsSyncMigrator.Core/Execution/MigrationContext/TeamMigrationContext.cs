@@ -45,14 +45,14 @@ namespace VstsSyncMigrator.Engine
             //////////////////////////////////////////////////
             TfsTeamService sourceTS = Engine.Source.GetService<TfsTeamService>();
             List<TeamFoundationTeam> sourceTL = sourceTS.QueryTeams(Engine.Source.Config.Project).ToList();
-            Trace.WriteLine(string.Format("Found {0} teams in Source?", sourceTL.Count));
+            Log.LogDebug("Found {0} teams in Source?", sourceTL.Count);
             var sourceTSCS = Engine.Source.GetService<TeamSettingsConfigurationService>();
             //////////////////////////////////////////////////
             ProjectData targetProject = Engine.Target.WorkItems.GetProject();
-            Trace.WriteLine(string.Format("Found target project as {0}", targetProject.Name));
+            Log.LogDebug("Found target project as {0}", targetProject.Name);
             TfsTeamService targetTS = Engine.Target.GetService<TfsTeamService>();
             List<TeamFoundationTeam> targetTL = targetTS.QueryTeams(Engine.Target.Config.Project).ToList();
-            Trace.WriteLine(string.Format("Found {0} teams in Target?", targetTL.Count));
+            Log.LogDebug("Found {0} teams in Target?", targetTL.Count);
             var targetTSCS = Engine.Target.GetService<TeamSettingsConfigurationService>();
             //////////////////////////////////////////////////
             int current = sourceTL.Count;
@@ -67,14 +67,14 @@ namespace VstsSyncMigrator.Engine
                 var foundTargetTeam = (from x in targetTL where x.Name == sourceTeam.Name select x).SingleOrDefault();
                 if (foundTargetTeam == null)
                 {
-                    Trace.WriteLine(string.Format("Processing team '{0}':", sourceTeam.Name));
+                    Log.LogDebug("Processing team '{0}':", sourceTeam.Name);
                     TeamFoundationTeam newTeam = targetTS.CreateTeam(targetProject.ToProject().Uri.ToString(), sourceTeam.Name, sourceTeam.Description, null);
-                    Trace.WriteLine(string.Format("-> Team '{0}' created", sourceTeam.Name));
+                    Log.LogDebug("-> Team '{0}' created", sourceTeam.Name);
 
                     if (_config.EnableTeamSettingsMigration)
                     {
                         /// Duplicate settings
-                        Trace.WriteLine(string.Format("-> Processing team '{0}' settings:", sourceTeam.Name));
+                        Log.LogDebug("-> Processing team '{0}' settings:", sourceTeam.Name);
                         var sourceConfigurations = sourceTSCS.GetTeamConfigurations(new List<Guid> { sourceTeam.Identity.TeamFoundationId });
                         var targetConfigurations = targetTSCS.GetTeamConfigurations(new List<Guid> { newTeam.Identity.TeamFoundationId });
 
@@ -83,7 +83,7 @@ namespace VstsSyncMigrator.Engine
                             var targetConfig = targetConfigurations.FirstOrDefault(t => t.TeamName == sourceConfig.TeamName);
                             if (targetConfig == null)
                             {
-                                Trace.WriteLine(string.Format("-> Settings for team '{0}'.. not found", sourceTeam.Name));
+                                Log.LogDebug("-> Settings for team '{0}'.. not found", sourceTeam.Name);
                                 continue;
                             }
 
@@ -111,13 +111,13 @@ namespace VstsSyncMigrator.Engine
                             }
 
                             targetTSCS.SetTeamSettings(targetConfig.TeamId, targetConfig.TeamSettings);
-                            Trace.WriteLine(string.Format("-> Team '{0}' settings... applied", targetConfig.TeamName));
+                            Log.LogDebug("-> Team '{0}' settings... applied", targetConfig.TeamName);
                         }
                     }
                 }
                 else
                 {
-                    Trace.WriteLine(string.Format("Team '{0}' found.. skipping", sourceTeam.Name));
+                    Log.LogDebug("Team '{0}' found.. skipping", sourceTeam.Name);
                 }
 
                 witstopwatch.Stop();
@@ -126,7 +126,6 @@ namespace VstsSyncMigrator.Engine
                 count++;
                 TimeSpan average = new TimeSpan(0, 0, 0, 0, (int)(elapsedms / count));
                 TimeSpan remaining = new TimeSpan(0, 0, 0, 0, (int)(average.TotalMilliseconds * current));
-                Trace.WriteLine("");
                 //Trace.WriteLine(string.Format("Average time of {0} per work item and {1} estimated to completion", string.Format(@"{0:s\:fff} seconds", average), string.Format(@"{0:%h} hours {0:%m} minutes {0:s\:fff} seconds", remaining)));
             }
             // Set Team Settings
@@ -160,7 +159,7 @@ namespace VstsSyncMigrator.Engine
             //}
             //////////////////////////////////////////////////
             stopwatch.Stop();
-            Console.WriteLine(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds", stopwatch.Elapsed);
+            Log.LogDebug("DONE in {Elapsed} ", stopwatch.Elapsed.ToString("c"));
         }
 
         private TeamSettings CreateTargetTeamSettings(TeamConfiguration sourceTCfU)

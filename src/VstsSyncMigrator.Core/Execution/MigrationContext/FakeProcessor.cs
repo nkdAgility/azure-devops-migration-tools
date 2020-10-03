@@ -35,7 +35,7 @@ namespace VstsSyncMigrator.Engine
 
             var query = @"SELECT [System.Id] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject ";// AND [System.Id] = 188708 ";
             List<WorkItemData> sourceWIS = Engine.Source.WorkItems.GetWorkItems(query);
-            Trace.WriteLine(string.Format("Migrate {0} work items?", sourceWIS.Count));
+            Log.LogDebug("Migrate {0} work items?", sourceWIS.Count);
             //////////////////////////////////////////////////
 
             int current = sourceWIS.Count;

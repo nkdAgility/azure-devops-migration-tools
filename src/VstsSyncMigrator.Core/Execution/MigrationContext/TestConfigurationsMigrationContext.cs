@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.TestManagement.Client;
@@ -36,20 +35,20 @@ namespace VstsSyncMigrator.Engine
             TestManagementContext targetTmc = new TestManagementContext(Engine.Target);
 
             ITestConfigurationCollection tc = SourceTmc.Project.TestConfigurations.Query("Select * From TestConfiguration");
-            Trace.WriteLine($"Plan to copy {tc.Count} Configurations", Name);
+            Log.LogDebug("Plan to copy {TestCaseCount} Configurations", tc.Count);
 
             foreach (var sourceTestConf in tc)
             {
-                Trace.WriteLine($"{sourceTestConf.Name} - Copy Configuration", Name);
+                Log.LogDebug("{sourceTestConfName} - Copy Configuration", sourceTestConf.Name);
                 ITestConfiguration targetTc = GetCon(targetTmc.Project.TestConfigurations, sourceTestConf.Name);
                 if (targetTc != null)
                 {
-                    Trace.WriteLine($"{sourceTestConf.Name} - Found", Name);
+                    Log.LogDebug("{sourceTestConfName} - Found", sourceTestConf.Name);
                     // Move on
                 }
                 else
                 {
-                    Trace.WriteLine($"{sourceTestConf.Name} - Create new", Name);
+                    Log.LogDebug("{sourceTestConfName} - Create new", sourceTestConf.Name);
                     targetTc = targetTmc.Project.TestConfigurations.Create();
                     targetTc.AreaPath = sourceTestConf.AreaPath.Replace(Engine.Source.Config.Project, Engine.Target.Config.Project);
                     targetTc.Description = sourceTestConf.Description;
@@ -66,7 +65,7 @@ namespace VstsSyncMigrator.Engine
 
                     targetTc.State = sourceTestConf.State;
                     targetTc.Save();
-                    Trace.WriteLine($"{sourceTestConf.Name} - Saved as {targetTc.Name}", Name);
+                    Log.LogDebug("{sourceTestConfName} - Saved as {targetTcName}", sourceTestConf.Name, targetTc.Name);
                 }
             }
         }
