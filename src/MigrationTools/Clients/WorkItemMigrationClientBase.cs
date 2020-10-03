@@ -43,12 +43,12 @@ namespace MigrationTools.Clients
             {
                 InnerConfigure(migrationClient, bypassRules);
                 timer.Stop();
-                Telemetry.TrackDependency(new DependencyTelemetry("TeamService", "GetWorkItemStore", startTime, timer.Elapsed, true));
+                Telemetry.TrackDependency(new DependencyTelemetry("TeamService", migrationClient.Config.Collection.ToString(), "GetWorkItemStore", null, startTime, timer.Elapsed, "200", true));
             }
             catch (Exception ex)
             {
                 timer.Stop();
-                Telemetry.TrackDependency(new DependencyTelemetry("TeamService", "GetWorkItemStore", startTime, timer.Elapsed, false));
+                Telemetry.TrackDependency(new DependencyTelemetry("TeamService", migrationClient.Config.Collection.ToString(), "GetWorkItemStore", null, startTime, timer.Elapsed, "500", false));
                 Telemetry.TrackException(ex,
                        new Dictionary<string, string> {
                             { "CollectionUrl", MigrationClient.Config.Collection.ToString() }

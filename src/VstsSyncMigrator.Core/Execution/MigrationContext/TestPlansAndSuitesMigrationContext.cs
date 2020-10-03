@@ -35,7 +35,6 @@ namespace VstsSyncMigrator.Engine
 
         int _currentPlan = 0;
         int _totalPlans = 0;
-        long _elapsedms = 0;
         int __currentSuite = 0;
         int __totalSuites = 0;
         int _currentTestCases = 0;
@@ -243,7 +242,7 @@ namespace VstsSyncMigrator.Engine
                 {
                     link.Uri.ToString();
                 }
-                catch (UriFormatException e)
+                catch (UriFormatException)
                 {
                     linksToRemove.Add(link);
                 }
@@ -472,7 +471,6 @@ namespace VstsSyncMigrator.Engine
                         CompareOptions.IgnoreCase) >= 0)
                 {
                     string regExSearchForSystemId = @"(\[System.Id\]\s*=\s*[\d]*)";
-                    string regExSearchForSystemId2 = @"(\[System.Id\]\s*IN\s*)";
 
                     MatchCollection matches = Regex.Matches(dynamic.Query.QueryText, regExSearchForSystemId, RegexOptions.IgnoreCase);
 

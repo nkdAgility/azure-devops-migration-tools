@@ -41,8 +41,6 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
         protected override void FixEmbededImages(WorkItemData wi, string oldTfsurl, string newTfsurl, string sourcePersonalAccessToken = "")
         {
             Log.LogInformation("EmbededImagesRepairEnricher: Fixing HTML field attachemtnts for work item {Id} from {OldTfsurl} to {NewTfsUrl}", wi.Id, oldTfsurl, GetUrlWithOppositeSchema(oldTfsurl));
-            bool wiUpdated = false;
-            bool hasCandidates = false;
 
             var oldTfsurlOppositeSchema = GetUrlWithOppositeSchema(oldTfsurl);
             string regExSearchForImageUrl = "(?<=<img.*src=\")[^\"]*";
@@ -99,7 +97,6 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                                 field.Value = field.Value.ToString().Replace(match.Value, newImageLink);
                                 wi.ToWorkItem().Attachments.RemoveAt(attachmentIndex);
                                 wi.SaveToAzureDevOps();
-                                wiUpdated = true;
                                 File.Delete(fullImageFilePath);
                             }
                         }

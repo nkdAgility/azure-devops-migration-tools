@@ -39,9 +39,6 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
 
         private static GitRepositoryInfo CreateFromTFVC(ExternalLink gitExternalLink, IList<GitRepository> possibleRepos, ReadOnlyDictionary<int, string> changesetMapping, string sourceProjectName, string workItemSourceProjectName)
         {
-            string commitID;
-            string repoID;
-            GitRepository gitRepo;
 
             //vstfs:///VersionControl/Changeset/{id}
             var changeSetIdPart = gitExternalLink.LinkedArtifactUri.Substring(gitExternalLink.LinkedArtifactUri.LastIndexOf('/') + 1);
