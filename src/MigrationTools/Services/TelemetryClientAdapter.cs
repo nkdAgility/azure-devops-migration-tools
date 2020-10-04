@@ -12,17 +12,9 @@ namespace MigrationTools
 
         private TelemetryConfiguration telemetryConfiguration;
 
-        public TelemetryConfiguration Configuration
-        {
-            get
-            {
-                return telemetryConfiguration;
-            }
-        }
-
         public TelemetryClientAdapter()
         {
-            telemetryConfiguration = TelemetryConfiguration.CreateDefault();
+            telemetryConfiguration = TelemetryConfiguration.CreateFromConfiguration("ApplicationInsights.config");
             telemetryConfiguration.InstrumentationKey = "2d666f84-b3fb-4dcf-9aad-65de038d2772";
             telemetryConfiguration.ConnectionString = "InstrumentationKey=2d666f84-b3fb-4dcf-9aad-65de038d2772;IngestionEndpoint=https://northeurope-0.in.applicationinsights.azure.com/";
             telemetryClient = new TelemetryClient(telemetryConfiguration);
@@ -31,12 +23,25 @@ namespace MigrationTools
             telemetryClient.Context.Component.Version = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString();
         }
 
+        public TelemetryConfiguration Configuration
+        {
+            get
+            {
+                return telemetryConfiguration;
+            }
+        }
+
         public string SessionId
         {
             get
             {
                 return telemetryClient.Context.Session.Id;
             }
+        }
+
+        public void CloseAndFlush()
+        {
+            telemetryClient.Flush();
         }
 
         public void TrackDependency(DependencyTelemetry dependencyTelemetry)
@@ -59,19 +64,14 @@ namespace MigrationTools
             telemetryClient.TrackEvent(name, properties, measurements);
         }
 
-        public void TrackRequest(string name, DateTimeOffset startTime, TimeSpan duration, string responseCode, bool success)
-        {
-            telemetryClient.TrackRequest(name, startTime, duration, responseCode, success);
-        }
-
         public void TrackException(Exception ex, IDictionary<string, string> properties, IDictionary<string, double> measurements)
         {
             telemetryClient.TrackException(ex, properties, measurements);
         }
 
-        public void CloseAndFlush()
+        public void TrackRequest(string name, DateTimeOffset startTime, TimeSpan duration, string responseCode, bool success)
         {
-            telemetryClient.Flush();
+            telemetryClient.TrackRequest(name, startTime, duration, responseCode, success);
         }
     }
 }
