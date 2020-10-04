@@ -21,7 +21,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.ApplicationInsights.PerfCounterCollector" Version="2.15.0" />
     <PackageReference Include="Microsoft.ApplicationInsights.TraceListener" Version="2.15.0" />
+    <PackageReference Include="Microsoft.ApplicationInsights.WorkerService" Version="2.15.0" />
   </ItemGroup>
 
   <ItemGroup>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.ApplicationInsights.Extensibility;
+using Microsoft.ApplicationInsights.Extensibility.PerfCounterCollector.QuickPulse;
 
 namespace MigrationTools
 {
@@ -14,13 +15,33 @@ namespace MigrationTools
 
         public TelemetryClientAdapter()
         {
-            telemetryConfiguration = TelemetryConfiguration.CreateFromConfiguration("ApplicationInsights.config");
-            telemetryConfiguration.InstrumentationKey = "2d666f84-b3fb-4dcf-9aad-65de038d2772";
-            telemetryConfiguration.ConnectionString = "InstrumentationKey=2d666f84-b3fb-4dcf-9aad-65de038d2772;IngestionEndpoint=https://northeurope-0.in.applicationinsights.azure.com/";
+            GetConfiguration();
             telemetryClient = new TelemetryClient(telemetryConfiguration);
             telemetryClient.Context.Session.Id = Guid.NewGuid().ToString();
             telemetryClient.Context.Device.OperatingSystem = Environment.OSVersion.ToString();
             telemetryClient.Context.Component.Version = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString();
+        }
+
+        private void GetConfiguration()
+        {
+            telemetryConfiguration = TelemetryConfiguration.CreateFromConfiguration("ApplicationInsights.config");
+            telemetryConfiguration.InstrumentationKey = "2d666f84-b3fb-4dcf-9aad-65de038d2772";
+            telemetryConfiguration.ConnectionString = "InstrumentationKey=2d666f84-b3fb-4dcf-9aad-65de038d2772;IngestionEndpoint=https://northeurope-0.in.applicationinsights.azure.com/";
+
+            ///
+            QuickPulseTelemetryProcessor processor = null;
+            telemetryConfiguration.TelemetryProcessorChainBuilder
+                .Use((next) =>
+                {
+                    processor = new QuickPulseTelemetryProcessor(next);
+                    return processor;
+                })
+                .Build();
+
+            var QuickPulse = new QuickPulseTelemetryModule();
+            QuickPulse.Initialize(telemetryConfiguration);
+            QuickPulse.RegisterTelemetryProcessor(processor);
+            ///
         }
 
         public TelemetryConfiguration Configuration
