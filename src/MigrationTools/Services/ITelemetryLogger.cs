@@ -7,8 +7,8 @@ namespace MigrationTools
 {
     public interface ITelemetryLogger
     {
-        bool EnableTrace { get; set; }
         TelemetryConfiguration Configuration { get; }
+        string SessionId { get; }
 
         void TrackDependency(DependencyTelemetry dependencyTelemetry);
 

@@ -3,18 +3,14 @@ using System.Collections.Generic;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.ApplicationInsights.Extensibility;
-using Microsoft.ApplicationInsights.Extensibility.PerfCounterCollector;
 
 namespace MigrationTools
 {
     public class TelemetryClientAdapter : ITelemetryLogger
     {
-        private const string applicationInsightsKey = "4b9bb17b-c7ee-43e5-b220-ec6db2c33373";
         private TelemetryClient telemetryClient;
-        private TelemetryConfiguration telemetryConfiguration;
-        private bool enableTrace = false;
 
-        public bool EnableTrace { get { return enableTrace; } set { enableTrace = value; } }
+        private TelemetryConfiguration telemetryConfiguration;
 
         public TelemetryConfiguration Configuration
         {
@@ -27,23 +23,20 @@ namespace MigrationTools
         public TelemetryClientAdapter()
         {
             telemetryConfiguration = TelemetryConfiguration.CreateDefault();
-            telemetryConfiguration.InstrumentationKey = applicationInsightsKey;
-
+            telemetryConfiguration.InstrumentationKey = "2d666f84-b3fb-4dcf-9aad-65de038d2772";
+            telemetryConfiguration.ConnectionString = "InstrumentationKey=2d666f84-b3fb-4dcf-9aad-65de038d2772;IngestionEndpoint=https://northeurope-0.in.applicationinsights.azure.com/";
             telemetryClient = new TelemetryClient(telemetryConfiguration);
             telemetryClient.Context.Session.Id = Guid.NewGuid().ToString();
             telemetryClient.Context.Device.OperatingSystem = Environment.OSVersion.ToString();
-
             telemetryClient.Context.Component.Version = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString();
-
-            AddModules(telemetryConfiguration);
         }
 
-        private void AddModules(TelemetryConfiguration telemetryConfiguration)
+        public string SessionId
         {
-            var perfCollectorModule = new PerformanceCollectorModule();
-            perfCollectorModule.Counters.Add(new PerformanceCounterCollectionRequest(
-              string.Format(@"\.NET CLR Memory({0})\# GC Handles", System.AppDomain.CurrentDomain.FriendlyName), "GC Handles"));
-            perfCollectorModule.Initialize(telemetryConfiguration);
+            get
+            {
+                return telemetryClient.Context.Session.Id;
+            }
         }
 
         public void TrackDependency(DependencyTelemetry dependencyTelemetry)

@@ -17,7 +17,6 @@ namespace MigrationTools
         private ExecuteOptions executeOptions;
 
         private readonly IServiceProvider _services;
-        private readonly Guid _Guid = Guid.NewGuid();
 
         public ProcessorContainer Processors { get; }
         public TypeDefinitionMapContainer TypeDefinitionMaps { get; }
@@ -39,7 +38,7 @@ namespace MigrationTools
             FieldMapContainer fieldMaps,
             ITelemetryLogger telemetry)
         {
-            Log.Information("Creating Migration Engine {Guid}", _Guid);
+            Log.Information("Creating Migration Engine {Guid}", telemetry.SessionId);
             _services = services;
             FieldMaps = fieldMaps;
             this.executeOptions = executeOptions;
