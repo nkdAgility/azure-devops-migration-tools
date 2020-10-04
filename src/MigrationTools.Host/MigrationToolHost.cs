@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using CommandLine;
+using Microsoft.ApplicationInsights;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MigrationTools.CommandLine;
@@ -39,7 +40,7 @@ namespace MigrationTools.Host
                      .Enrich.WithMachineName()
                      .Enrich.WithProcessId()
                      .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Debug, theme: AnsiConsoleTheme.Code)
-                     .WriteTo.ApplicationInsights(services.GetService<ITelemetryLogger>().Configuration, new CustomConverter(), LogEventLevel.Error)
+                     .WriteTo.ApplicationInsights(services.GetService<TelemetryClient>(), new CustomConverter(), LogEventLevel.Error)
                      .WriteTo.File(logPath, LogEventLevel.Verbose);
              })
              .ConfigureLogging((context, logBuilder) =>
@@ -66,7 +67,18 @@ namespace MigrationTools.Host
                  services.AddOptions();
                  // Sieralog
                  services.AddSingleton<LoggingLevelSwitch>(levelSwitch);
+
+                 // Application Insights
+
+                 Microsoft.ApplicationInsights.WorkerService.ApplicationInsightsServiceOptions aiOptions
+                    = new Microsoft.ApplicationInsights.WorkerService.ApplicationInsightsServiceOptions
+                    {
+                        // Disables adaptive sampling.
+                        InstrumentationKey = "2d666f84-b3fb-4dcf-9aad-65de038d2772"
+                    };
+                 services.AddApplicationInsightsTelemetryWorkerService(aiOptions);
                  // Services
+
                  services.AddTransient<IDetectOnlineService, DetectOnlineService>();
                  services.AddTransient<IDetectVersionService, DetectVersionService>();
                  services.AddSingleton<ITelemetryLogger, TelemetryClientAdapter>();
