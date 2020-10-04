@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.ApplicationInsights.DataContracts;
-using Microsoft.ApplicationInsights.Extensibility;
 
 namespace MigrationTools
 {
     public interface ITelemetryLogger
     {
-        bool EnableTrace { get; set; }
-        TelemetryConfiguration Configuration { get; }
+        string SessionId { get; }
 
         void TrackDependency(DependencyTelemetry dependencyTelemetry);
 

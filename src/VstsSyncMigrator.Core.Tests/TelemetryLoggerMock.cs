@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.ApplicationInsights.DataContracts;
-using Microsoft.ApplicationInsights.Extensibility;
 
 namespace MigrationTools.Services
 {
     public class TelemetryLoggerMock : ITelemetryLogger
     {
-        public bool EnableTrace { get; set; }
-
-        public TelemetryConfiguration Configuration { get; }
+        public string SessionId => throw new NotImplementedException();
 
         public void CloseAndFlush()
         {
