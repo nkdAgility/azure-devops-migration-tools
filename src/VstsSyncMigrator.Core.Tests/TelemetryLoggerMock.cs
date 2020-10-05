@@ -6,7 +6,7 @@ namespace MigrationTools.Services
 {
     public class TelemetryLoggerMock : ITelemetryLogger
     {
-        public string SessionId => throw new NotImplementedException();
+        public string SessionId => Guid.NewGuid().ToString();
 
         public void CloseAndFlush()
         {
