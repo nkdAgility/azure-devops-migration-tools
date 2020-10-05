@@ -184,7 +184,7 @@ namespace VstsSyncMigrator.Engine
                 {
                     foreach (var sourceField in config.SourceToTargetFieldMappings.Keys)
                     {
-                        fixedQueryText = query.QueryText.Replace($"{sourceField}", $"{config.SourceToTargetFieldMappings[sourceField]}");
+                        fixedQueryText = query.QueryText.Replace(sourceField, config.SourceToTargetFieldMappings[sourceField]);
                     }
                 }
 
