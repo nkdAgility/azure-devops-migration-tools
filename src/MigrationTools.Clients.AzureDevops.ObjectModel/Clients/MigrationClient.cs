@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Net;
 using Microsoft.ApplicationInsights.DataContracts;
-using Microsoft.TeamFoundation;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.VisualStudio.Services.Common;
 using MigrationTools.Configuration;
@@ -87,39 +85,48 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
                           { "Target Collection",Config.Collection.ToString() },
                            { "ReflectedWorkItemID Field Name",Config.ReflectedWorkItemIDFieldName }
                     }, null);
-                Stopwatch connectionTimer = Stopwatch.StartNew();
-                DateTime start = DateTime.Now;
-                Log.Information("MigrationClient: Connecting to {Project} on {Collection}", Config.Project, Config.Collection);
-                Log.Verbose("MigrationClient: Connecting to {@Config}", Config);
+                _collection = GetDependantTfsCollection(_credentials);
+            }
+        }
 
-                if (_credentials == null)
-                    _collection = new TfsTeamProjectCollection(Config.Collection);
-                else
-                    _collection = new TfsTeamProjectCollection(Config.Collection, new VssCredentials(new Microsoft.VisualStudio.Services.Common.WindowsCredential(_credentials)));
-                try
+        private TfsTeamProjectCollection GetDependantTfsCollection(NetworkCredential credentials)
+        {
+            var startTime = DateTime.UtcNow;
+            var timer = System.Diagnostics.Stopwatch.StartNew();
+            Log.Debug("MigrationClient: Connected to {CollectionUrl} ", _collection.Uri.ToString());
+            Log.Debug("MigrationClient: validating security for {@AuthorizedIdentity} ", _collection.AuthorizedIdentity);
+            TfsTeamProjectCollection y;
+            try
+            {
+                if (credentials == null)
                 {
-                    Log.Debug("MigrationClient: Connected to {CollectionUrl} ", _collection.Uri.ToString());
-                    Log.Debug("MigrationClient: validating security for {@AuthorizedIdentity} ", _collection.AuthorizedIdentity);
-                    _collection.EnsureAuthenticated();
-                    connectionTimer.Stop();
-                    _Telemetry.TrackDependency(new DependencyTelemetry("TeamService", "EnsureAuthenticated", start, connectionTimer.Elapsed, true));
-                    Log.Information("MigrationClient: Access granted ");
+                    y = new TfsTeamProjectCollection(Config.Collection);
                 }
-                catch (TeamFoundationServiceUnavailableException ex)
+                else
                 {
-                    _Telemetry.TrackDependency(new DependencyTelemetry("TeamService", "EnsureAuthenticated", start, connectionTimer.Elapsed, false));
-                    _Telemetry.TrackException(ex,
+                    y = new TfsTeamProjectCollection(Config.Collection, new VssCredentials(new Microsoft.VisualStudio.Services.Common.WindowsCredential(credentials)));
+                }
+                _collection.EnsureAuthenticated();
+                timer.Stop();
+                Log.Information("MigrationClient: Access granted ");
+                _Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", Config.Collection.ToString(), "GetWorkItem", null, startTime, timer.Elapsed, "200", true));
+            }
+            catch (Exception ex)
+            {
+                timer.Stop();
+                _Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", Config.Collection.ToString(), "GetWorkItem", null, startTime, timer.Elapsed, "500", false));
+                _Telemetry.TrackException(ex,
                        new Dictionary<string, string> {
                             { "CollectionUrl", Config.Collection.ToString() },
                             { "TeamProjectName",  Config.Project}
                        },
                        new Dictionary<string, double> {
-                            { "ConnectionTimer", connectionTimer.ElapsedMilliseconds }
+                            { "Time",timer.ElapsedMilliseconds }
                        });
-                    Log.Error(ex, "MigrationClient: Unable to connect to {@Config}", Config);
-                    throw;
-                }
+                Log.Error(ex, "Unable to configure store");
+                throw;
             }
+            return y;
         }
 
         public T GetService<T>()

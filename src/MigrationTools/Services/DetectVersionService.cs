@@ -39,15 +39,16 @@ namespace MigrationTools.Services
                 {
                     sucess = true;
                 }
+                _Telemetry.TrackDependency(new DependencyTelemetry("PackageRepository", "chocolatey.org", "vsts-sync-migrator", latestPackageVersion == null ? "nullVersion" : latestPackageVersion.ToString(), startTime, mainTimer.Elapsed, "200", sucess));
             }
             catch (Exception ex)
             {
                 Log.Error(ex, "DetectVersionService");
                 sucess = false;
+                _Telemetry.TrackDependency(new DependencyTelemetry("PackageRepository", "chocolatey.org", "vsts-sync-migrator", latestPackageVersion == null ? "nullVersion" : latestPackageVersion.ToString(), startTime, mainTimer.Elapsed, "500", sucess));
             }
             /////////////////
             mainTimer.Stop();
-            _Telemetry.TrackDependency(new DependencyTelemetry("PackageRepository", "chocolatey.org", "vsts-sync-migrator", latestPackageVersion == null ? "nullVersion" : latestPackageVersion.ToString(), startTime, mainTimer.Elapsed, null, sucess));
             return latestPackageVersion;
         }
 

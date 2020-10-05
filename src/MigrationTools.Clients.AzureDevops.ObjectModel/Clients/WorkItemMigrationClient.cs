@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools.Configuration;
@@ -31,9 +32,37 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
         public override void InnerConfigure(IMigrationClient migrationClient, bool bypassRules = true)
         {
             _config = MigrationClient.Config;
+            _wistore = GetWorkItemStore();
             _bypassRules = bypassRules ? WorkItemStoreFlags.BypassRules : WorkItemStoreFlags.None;
-            _wistore = new WorkItemStore(MigrationClient.Config.Collection.ToString(), _bypassRules);
             _project = migrationClient.WorkItems.GetProject();
+        }
+
+        private WorkItemStore GetWorkItemStore()
+        {
+            var startTime = DateTime.UtcNow;
+            var timer = System.Diagnostics.Stopwatch.StartNew();
+            WorkItemStore store;
+            try
+            {
+                store = new WorkItemStore(MigrationClient.Config.Collection.ToString(), _bypassRules);
+                timer.Stop();
+                Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", MigrationClient.Config.Collection.ToString(), "GetWorkItemStore", null, startTime, timer.Elapsed, "200", true));
+            }
+            catch (Exception ex)
+            {
+                timer.Stop();
+                Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", MigrationClient.Config.Collection.ToString(), "GetWorkItemStore", null, startTime, timer.Elapsed, "500", false));
+                Telemetry.TrackException(ex,
+                       new Dictionary<string, string> {
+                            { "CollectionUrl", MigrationClient.Config.Collection.ToString() }
+                       },
+                       new Dictionary<string, double> {
+                            { "Time",timer.ElapsedMilliseconds }
+                       });
+                Log.Error(ex, "Unable to configure store");
+                throw;
+            }
+            return store;
         }
 
         public override List<WorkItemData> GetWorkItems()
@@ -61,7 +90,29 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
 
         public override ProjectData GetProject()
         {
-            Project y = (from Project x in Store.Projects where x.Name.ToUpper() == MigrationClient.Config.Project.ToUpper() select x).SingleOrDefault();
+            var startTime = DateTime.UtcNow;
+            var timer = System.Diagnostics.Stopwatch.StartNew();
+            Project y;
+            try
+            {
+                y = (from Project x in Store.Projects where x.Name.ToUpper() == MigrationClient.Config.Project.ToUpper() select x).SingleOrDefault();
+                timer.Stop();
+                Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", MigrationClient.Config.Collection.ToString(), "GetProject", null, startTime, timer.Elapsed, "200", true));
+            }
+            catch (Exception ex)
+            {
+                timer.Stop();
+                Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", MigrationClient.Config.Collection.ToString(), "GetProject", null, startTime, timer.Elapsed, "500", false));
+                Telemetry.TrackException(ex,
+                       new Dictionary<string, string> {
+                            { "CollectionUrl", MigrationClient.Config.Collection.ToString() }
+                       },
+                       new Dictionary<string, double> {
+                            { "Time",timer.ElapsedMilliseconds }
+                       });
+                Log.Error(ex, "Unable to configure store");
+                throw;
+            }
             return y.ToProjectData();
         }
 
@@ -127,7 +178,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
             if (Config.ReflectedWorkItemIDFieldName != null && !workItemToFind.Fields.Contains(Config.ReflectedWorkItemIDFieldName))
             {
                 if (found == null) { found = FindReflectedWorkItemByMigrationRef(ReflectedWorkItemId)?.ToWorkItem(); } // Too slow!
-                //if (found == null) { found = FindReflectedWorkItemByTitle(workItemToFind.Title); }
+                                                                                                                       //if (found == null) { found = FindReflectedWorkItemByTitle(workItemToFind.Title); }
             }
             if (found != null && cache)
             {
@@ -222,7 +273,16 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
 
         public override WorkItemData GetRevision(WorkItemData workItem, int revision)
         {
-            return Store.GetWorkItem(int.Parse(workItem.Id), revision).AsWorkItemData();
+            WorkItemData result;
+            try
+            {
+                result = Store.GetWorkItem(int.Parse(workItem.Id), revision).AsWorkItemData();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            return result;
         }
 
         public override WorkItemData GetWorkItem(string id)
@@ -232,7 +292,30 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
 
         public override WorkItemData GetWorkItem(int id)
         {
-            return Store.GetWorkItem(id)?.AsWorkItemData();
+            var startTime = DateTime.UtcNow;
+            var timer = System.Diagnostics.Stopwatch.StartNew();
+            WorkItem y;
+            try
+            {
+                y = Store.GetWorkItem(id);
+                timer.Stop();
+                Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", MigrationClient.Config.Collection.ToString(), "GetWorkItem", null, startTime, timer.Elapsed, "200", true));
+            }
+            catch (Exception ex)
+            {
+                timer.Stop();
+                Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", MigrationClient.Config.Collection.ToString(), "GetWorkItem", null, startTime, timer.Elapsed, "500", false));
+                Telemetry.TrackException(ex,
+                       new Dictionary<string, string> {
+                            { "CollectionUrl", MigrationClient.Config.Collection.ToString() }
+                       },
+                       new Dictionary<string, double> {
+                            { "Time",timer.ElapsedMilliseconds }
+                       });
+                Log.Error(ex, "Unable to configure store");
+                throw;
+            }
+            return y?.AsWorkItemData();
         }
     }
 }
