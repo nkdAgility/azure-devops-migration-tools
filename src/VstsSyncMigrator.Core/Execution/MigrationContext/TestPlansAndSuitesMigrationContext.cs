@@ -182,7 +182,7 @@ namespace VstsSyncMigrator.Engine
 
             if ((sourceConfigCount != targetConfigCount) || deviations)
             {
-                Trace.WriteLine(string.Format("   CONFIG MISMATCH FOUND --- FIX ATTEMPTING"), "TestPlansAndSuites");
+                Log.LogInformation("   CONFIG MISMATCH FOUND --- FIX ATTEMPTING");
                 IList<IdAndName> targetConfigs = new List<IdAndName>();
                 foreach (var config in sourceEntry.Configurations)
                 {
@@ -371,7 +371,7 @@ namespace VstsSyncMigrator.Engine
         {
             if (targetSuite == null)
             {
-                Trace.TraceError($"Target Suite is NULL");
+                Log.LogError("Target Suite is NULL");
             }
 
             List<ITestPointAssignment> assignmentsToAdd = new List<ITestPointAssignment>();
@@ -386,7 +386,7 @@ namespace VstsSyncMigrator.Engine
 
                 if (targetTc == null)
                 {
-                    Trace.TraceError($"Target Reflected Work Item Not found for source WorkItem ID: {sourceTce.TestCase.WorkItem.Id}");
+                    Log.LogError("Target Reflected Work Item Not found for source WorkItem ID: {sourceTceTestCaseWorkItemId}", sourceTce.TestCase.WorkItem.Id);
                 }
                 else
                 {
@@ -441,7 +441,7 @@ namespace VstsSyncMigrator.Engine
                         }
                         else
                         {
-                            Trace.WriteLine($"Cannot find configuration with name [{sourceConfigName}] in target. Cannot assign tester to it.", "TestPlansAndSuites");
+                            Log.LogInformation("Cannot find configuration with name [{sourceConfigName}] in target. Cannot assign tester to it.", sourceConfigName);
                         }
                     }
                 }
@@ -514,14 +514,14 @@ namespace VstsSyncMigrator.Engine
             {
                 targetPlan.ManualTestSettingsId = 0;
                 targetPlan.AutomatedTestSettingsId = 0;
-                Trace.WriteLine("Ignoring migration of Testsettings. Azure DevOps Migration Tools don't support migration of this artifact type.");
+                Log.LogWarning("Ignoring migration of Testsettings. Azure DevOps Migration Tools don't support migration of this artifact type.");
             }
 
             // Remove reference to build uri because VSTS Sync doesn't support migrating these artifacts
             if (targetPlan.BuildUri != null)
             {
                 targetPlan.BuildUri = null;
-                Trace.WriteLine(string.Format("Ignoring migration of assigned Build artifact {0}. Azure DevOps Migration Tools don't support migration of this artifact type.", sourcePlan.BuildUri));
+                Log.LogWarning("Ignoring migration of assigned Build artifact {0}. Azure DevOps Migration Tools don't support migration of this artifact type.", sourcePlan.BuildUri);
             }
             return targetPlan;
         }
@@ -553,9 +553,9 @@ namespace VstsSyncMigrator.Engine
                 var missingIterationPath = regEx.Match(exception.Message).Groups[0].Value;
                 missingIterationPath = missingIterationPath.Substring(missingIterationPath.IndexOf(@"\") + 1, missingIterationPath.Length - missingIterationPath.IndexOf(@"\") - 2);
 
-                Trace.WriteLine("Found a orphaned iteration path in test suite query.");
-                Trace.WriteLine(string.Format("Invalid iteration path {0}:", missingIterationPath));
-                Trace.WriteLine("Replacing the orphaned iteration path from query with root iteration path. Please fix the query after the migration.");
+                Log.LogInformation("Found a orphaned iteration path in test suite query.");
+                Log.LogInformation("Invalid iteration path {0}:", missingIterationPath);
+                Log.LogInformation("Replacing the orphaned iteration path from query with root iteration path. Please fix the query after the migration.");
 
                 targetSuiteChild.Query = targetSuiteChild.Project.CreateTestQuery(
                     targetSuiteChild.Query.QueryText.Replace(
@@ -577,8 +577,8 @@ namespace VstsSyncMigrator.Engine
             // The target team project name is only available via target test store because the dyn. testsuite isnt saved at this point in time
             if (!source.Plan.Project.TeamProjectName.Equals(targetTestStore.Project.TeamProjectName))
             {
-                Trace.WriteLine(string.Format(@"Team Project names dont match. We need to fix the query in dynamic test suite {0} - {1}.", source.Id, source.Title));
-                Trace.WriteLine(string.Format(@"Replacing old project name {1} in query {0} with new team project name {2}", targetSuiteChild.Query.QueryText, source.Plan.Project.TeamProjectName, targetTestStore.Project.TeamProjectName));
+                Log.LogInformation("Team Project names dont match. We need to fix the query in dynamic test suite {0} - {1}.", source.Id, source.Title);
+                Log.LogInformation("Replacing old project name {1} in query {0} with new team project name {2}", targetSuiteChild.Query.QueryText, source.Plan.Project.TeamProjectName, targetTestStore.Project.TeamProjectName);
                 // First need to check is prefix project nodes has been applied for the migration
                 if (_config.PrefixProjectToNodes)
                 {
@@ -595,7 +595,7 @@ namespace VstsSyncMigrator.Engine
                             string.Format(@"'{0}", source.Plan.Project.TeamProjectName),
                             string.Format(@"'{0}", targetTestStore.Project.TeamProjectName)));
                 }
-                Trace.WriteLine(string.Format("New query is now {0}", targetSuiteChild.Query.QueryText));
+                Log.LogInformation("New query is now {0}", targetSuiteChild.Query.QueryText);
             }
         }
 
@@ -695,7 +695,7 @@ namespace VstsSyncMigrator.Engine
                 }
                 catch (MultipleIdentitiesFoundException)
                 {
-                    Trace.WriteLine($"Multiple identities found with email [{sourceIdentityMail}] in target system. Trying Account Name.", "TestPlansAndSuites");
+                    Log.LogInformation("Multiple identities found with email [{sourceIdentityMail}] in target system. Trying Account Name.", sourceIdentityMail);
                 }
 
                 if (targetIdentity == null)
@@ -709,7 +709,7 @@ namespace VstsSyncMigrator.Engine
 
                 if (targetIdentity == null)
                 {
-                    Trace.WriteLine($"Cannot find tester with e-mail [{sourceIdentityMail}] in target system. Cannot assign.", "TestPlansAndSuites");
+                    Log.LogInformation("Cannot find tester with e-mail [{sourceIdentityMail}] in target system. Cannot assign.", sourceIdentityMail);
                     return null;
                 }
 
@@ -717,8 +717,7 @@ namespace VstsSyncMigrator.Engine
             }
             else
             {
-                Trace.WriteLine($"No e-mail address known in source system for [{sourceIdentity.DisplayName}]. Cannot translate to target.",
-                    "TestPlansAndSuites");
+                Log.LogInformation("No e-mail address known in source system for [{sourceIdentity.DisplayName}]. Cannot translate to target.", sourceIdentity.DisplayName);
                 return null;
             }
         }
