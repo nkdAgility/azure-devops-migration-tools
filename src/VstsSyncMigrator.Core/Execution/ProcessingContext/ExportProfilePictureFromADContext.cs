@@ -52,13 +52,13 @@ namespace VstsSyncMigrator.Engine
 
             TeamFoundationIdentity SIDS = ims2.ReadIdentity(IdentitySearchFactor.AccountName, "Team Foundation Valid Users", MembershipQuery.Expanded, ReadIdentityOptions.None);
 
-            Trace.WriteLine(string.Format("Found {0}", SIDS.Members.Count()));
+            Log.LogInformation("Found {0}", SIDS.Members.Count());
             var itypes = (from IdentityDescriptor id in SIDS.Members select id.IdentityType).Distinct();
 
             foreach (string item in itypes)
             {
                 var infolks = (from IdentityDescriptor id in SIDS.Members where id.IdentityType == item select id);
-                Trace.WriteLine(string.Format("Found {0} of {1}", infolks.Count(), item));
+                Log.LogInformation("Found {0} of {1}", infolks.Count(), item);
             }
             var folks = (from IdentityDescriptor id in SIDS.Members where id.IdentityType == "System.Security.Principal.WindowsIdentity" select id);
 
@@ -90,7 +90,7 @@ namespace VstsSyncMigrator.Engine
                             if (!File.Exists(newImage))
                             {
                                 DirectoryEntry deUser = new DirectoryEntry(sresult.Path, config.Username, config.Password);
-                                Trace.WriteLine(string.Format("{0} [PROCESS] {1}: {2}", current, deUser.Name, newImage));
+                                Log.LogInformation("{0} [PROCESS] {1}: {2}", current, deUser.Name, newImage);
                                 string empPic = string.Format(config.PictureEmpIDFormat, deUser.Properties["employeeNumber"].Value);
                                 try
                                 {
@@ -98,12 +98,12 @@ namespace VstsSyncMigrator.Engine
                                 }
                                 catch (Exception ex)
                                 {
-                                    Trace.WriteLine(string.Format("      [ERROR] {0}", ex.ToString()));
+                                    Log.LogError(ex, "      [ERROR] {0}", ex.ToString());
                                 }
                             }
                             else
                             {
-                                Trace.WriteLine(string.Format("{0} [SKIP] Exists {1}", current, newImage));
+                                Log.LogWarning("{0} [SKIP] Exists {1}", current, newImage);
                             }
                         }
                         webClient.Dispose();
@@ -111,7 +111,7 @@ namespace VstsSyncMigrator.Engine
                 }
                 catch (Exception ex)
                 {
-                    Trace.WriteLine(string.Format("      [ERROR] {0}", ex.ToString()));
+                    Log.LogError(ex, "      [ERROR] {0}", ex.ToString());
                 }
 
                 current--;
@@ -119,7 +119,7 @@ namespace VstsSyncMigrator.Engine
 
             //////////////////////////////////////////////////
             stopwatch.Stop();
-            Trace.WriteLine(string.Format(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds", stopwatch.Elapsed));
+            Log.LogInformation("DONE in {Elapsed}", stopwatch.Elapsed.ToString("c"));
         }
     }
 }
