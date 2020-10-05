@@ -417,8 +417,6 @@ namespace VstsSyncMigrator.Engine
             description.Append(oldWorkItem.Description);
             newWorkItem.Description = description.ToString();
             fieldMappingTimer.Stop();
-            // Trace.WriteLine(
-            //    $"FieldMapOnNewWorkItem: {newWorkItemstartTime} - {fieldMappingTimer.Elapsed.ToString("c")}", Name);
         }
 
         private void ProcessHTMLFieldAttachements(WorkItemData targetWorkItem)
