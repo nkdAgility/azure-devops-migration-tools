@@ -49,8 +49,8 @@ namespace VstsSyncMigrator.Engine
                     _config.OrderBit
                     );
             List<WorkItemData> workitems = Engine.Target.WorkItems.GetWorkItems(query);
-            Trace.WriteLine(string.Format("Update {0} work items?", workitems.Count));
-            //////////////////////////////////////////////////
+            Log.LogInformation("Update {0} work items?", workitems.Count);
+            /////////////////////////////////////////////////
             int current = workitems.Count;
             int count = 0;
             long elapsedms = 0;
@@ -64,7 +64,7 @@ namespace VstsSyncMigrator.Engine
 
                 if (workitem.ToWorkItem().IsDirty)
                 {
-                    Trace.WriteLine($"Saving {workitem.Id}");
+                    Log.LogInformation("Saving {workitemId}", workitem.Id);
 
                     workitem.SaveToAzureDevOps();
                 }
@@ -75,14 +75,14 @@ namespace VstsSyncMigrator.Engine
                 count++;
                 TimeSpan average = new TimeSpan(0, 0, 0, 0, (int)(elapsedms / count));
                 TimeSpan remaining = new TimeSpan(0, 0, 0, 0, (int)(average.TotalMilliseconds * current));
-                Trace.WriteLine(string.Format("Average time of {0} per work item and {1} estimated to completion",
+                Log.LogInformation("Average time of {0} per work item and {1} estimated to completion",
                     string.Format(@"{0:s\:fff} seconds", average),
-                    string.Format(@"{0:%h} hours {0:%m} minutes {0:s\:fff} seconds", remaining)));
+                    string.Format(@"{0:%h} hours {0:%m} minutes {0:s\:fff} seconds", remaining));
             }
-            Trace.WriteLine(string.Format("Did not find old repo for {0} links?", noteFound));
+            Log.LogInformation("Did not find old repo for {0} links?", noteFound);
             //////////////////////////////////////////////////
             stopwatch.Stop();
-            Console.WriteLine(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds", stopwatch.Elapsed);
+            Log.LogInformation("DONE in {Elapsed} seconds", stopwatch.Elapsed.ToString("c"));
         }
     }
 }

@@ -57,6 +57,7 @@ namespace _VstsSyncMigrator.Engine.Tests
             services.AddSingleton<IEngineConfigurationBuilder, EngineConfigurationBuilder>();
             services.AddSingleton<EngineConfiguration>(ecb.BuildDefault());
             services.AddSingleton<ITelemetryLogger, TelemetryLoggerMock>();
+            services.AddApplicationInsightsTelemetryWorkerService();
             services.AddLogging();
 
             //Clients

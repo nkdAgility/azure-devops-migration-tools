@@ -39,10 +39,10 @@
 //        internal override void InternalExecute()
 //        {
 //            List<ITestRun> sourceRuns = sourceTestStore.GetTestRuns();
-//            Trace.WriteLine(string.Format("Plan to copy {0} Runs?", sourceRuns.Count), "TestRuns");
+//            Log.WriteLine(string.Format("Plan to copy {0} Runs?", sourceRuns.Count), "TestRuns");
 //            foreach (ITestRun sourceRun in sourceRuns)
 //            {
-//                Trace.WriteLine(string.Format("Process Run {0} - ", sourceRun.Id), "TestRuns");
+//                Log.WriteLine(string.Format("Process Run {0} - ", sourceRun.Id), "TestRuns");
 //                //ITestRun newRun = targetTestStore.Project.TestRuns.Create();
 //                throw new NotImplementedException();
 

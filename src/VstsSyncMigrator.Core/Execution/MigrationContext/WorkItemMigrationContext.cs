@@ -417,8 +417,6 @@ namespace VstsSyncMigrator.Engine
             description.Append(oldWorkItem.Description);
             newWorkItem.Description = description.ToString();
             fieldMappingTimer.Stop();
-            // Trace.WriteLine(
-            //    $"FieldMapOnNewWorkItem: {newWorkItemstartTime} - {fieldMappingTimer.Elapsed.ToString("c")}", Name);
         }
 
         private void ProcessHTMLFieldAttachements(WorkItemData targetWorkItem)
@@ -549,7 +547,6 @@ namespace VstsSyncMigrator.Engine
                     {"average", average},
                     {"remaining", remaining}
                 });
-            Trace.Flush();
             Telemetry.TrackEvent("WorkItemMigrated", processWorkItemParamiters, processWorkItemMetrics);
             Telemetry.TrackRequest("ProcessWorkItem", starttime, witstopwatch.Elapsed, "200", true);
 

@@ -78,7 +78,7 @@ namespace VstsSyncMigrator.Engine
                 toProcess = sourcePlans.ToList();
             }
 
-            Trace.WriteLine(string.Format("Plan to copy {0} Plans?", toProcess.Count()), "TestPlansAndSuites");
+            Log.LogInformation("TestPlandsAndSuitesMigrationContext: Plan to copy {0} Plans?", toProcess.Count());
             _currentPlan = 0;
             _totalPlans = toProcess.Count();
 
@@ -93,7 +93,7 @@ namespace VstsSyncMigrator.Engine
             _currentPlan = 0;
             _totalPlans = 0;
             stopwatch.Stop();
-            Console.WriteLine(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds", stopwatch.Elapsed);
+            Log.LogInformation("TestPlandsAndSuitesMigrationContext:  DONE in {Elapsed}", stopwatch.Elapsed.ToString("c"));
         }
 
         private void AddChildTestCases(ITestSuiteBase source, ITestSuiteBase target, ITestPlan targetPlan)
@@ -116,21 +116,21 @@ namespace VstsSyncMigrator.Engine
             _totalTestCases = source.TestCases.Count;
             _currentTestCases = 0;
             AddMetric("TestCaseCount", metrics, _totalTestCases);
-            TraceWriteLine(source, string.Format("            Suite has {0} test cases", _totalTestCases), 15);
+            InnerLog(source, string.Format("            Suite has {0} test cases", _totalTestCases), 15);
             List<ITestCase> tcs = new List<ITestCase>();
             foreach (ITestSuiteEntry sourceTestCaseEntry in source.TestCases)
             {
                 _currentTestCases++;
-                TraceWriteLine(source, $"Work item: {sourceTestCaseEntry.Id}", 15);
+                InnerLog(source, $"Work item: {sourceTestCaseEntry.Id}", 15);
 
                 if (CanSkipElementBecauseOfTags(sourceTestCaseEntry.Id))
                     return;
 
-                TraceWriteLine(source, string.Format("    Processing {0} : {1} - {2} ", sourceTestCaseEntry.EntryType.ToString(), sourceTestCaseEntry.Id, sourceTestCaseEntry.Title), 15);
+                InnerLog(source, string.Format("    Processing {0} : {1} - {2} ", sourceTestCaseEntry.EntryType.ToString(), sourceTestCaseEntry.Id, sourceTestCaseEntry.Title), 15);
                 WorkItemData wi = Engine.Target.WorkItems.FindReflectedWorkItem(sourceTestCaseEntry.TestCase.WorkItem.AsWorkItemData(), false);
                 if (wi == null)
                 {
-                    TraceWriteLine(source, string.Format("    Can't find work item for Test Case. Has it been migrated? {0} : {1} - {2} ", sourceTestCaseEntry.EntryType.ToString(), sourceTestCaseEntry.Id, sourceTestCaseEntry.Title), 15);
+                    InnerLog(source, string.Format("    Can't find work item for Test Case. Has it been migrated? {0} : {1} - {2} ", sourceTestCaseEntry.EntryType.ToString(), sourceTestCaseEntry.Id, sourceTestCaseEntry.Title), 15);
                     continue;
                 }
                 var exists = (from tc in target.TestCases
@@ -139,19 +139,19 @@ namespace VstsSyncMigrator.Engine
 
                 if (exists != null)
                 {
-                    TraceWriteLine(source, string.Format("    Test case already in suite {0} : {1} - {2} ", sourceTestCaseEntry.EntryType.ToString(), sourceTestCaseEntry.Id, sourceTestCaseEntry.Title), 15);
+                    InnerLog(source, string.Format("    Test case already in suite {0} : {1} - {2} ", sourceTestCaseEntry.EntryType.ToString(), sourceTestCaseEntry.Id, sourceTestCaseEntry.Title), 15);
                 }
                 else
                 {
                     ITestCase targetTestCase = _targetTestStore.Project.TestCases.Find(int.Parse(wi.Id));
                     if (targetTestCase == null)
                     {
-                        TraceWriteLine(source, string.Format("    ERROR: Test case not found {0} : {1} - {2} ", sourceTestCaseEntry.EntryType, sourceTestCaseEntry.Id, sourceTestCaseEntry.Title), 15);
+                        InnerLog(source, string.Format("    ERROR: Test case not found {0} : {1} - {2} ", sourceTestCaseEntry.EntryType, sourceTestCaseEntry.Id, sourceTestCaseEntry.Title), 15);
                     }
                     else
                     {
                         tcs.Add(targetTestCase);
-                        TraceWriteLine(source, string.Format("    Adding {0} : {1} - {2} ", sourceTestCaseEntry.EntryType.ToString(), sourceTestCaseEntry.Id, sourceTestCaseEntry.Title), 15);
+                        InnerLog(source, string.Format("    Adding {0} : {1} - {2} ", sourceTestCaseEntry.EntryType.ToString(), sourceTestCaseEntry.Id, sourceTestCaseEntry.Title), 15);
                     }
                 }
             }
@@ -159,7 +159,7 @@ namespace VstsSyncMigrator.Engine
             target.TestCases.AddCases(tcs);
 
             targetPlan.Save();
-            TraceWriteLine(source, string.Format("    SAVED {0} : {1} - {2} ", target.TestSuiteType.ToString(), target.Id, target.Title), 15);
+            InnerLog(source, string.Format("    SAVED {0} : {1} - {2} ", target.TestSuiteType.ToString(), target.Id, target.Title), 15);
 
             metrics.Add("ElapsedMS", stopwatch.ElapsedMilliseconds);
             Telemetry.TrackEvent("MigrateTestCases", parameters, metrics);
@@ -182,7 +182,7 @@ namespace VstsSyncMigrator.Engine
 
             if ((sourceConfigCount != targetConfigCount) || deviations)
             {
-                Trace.WriteLine(string.Format("   CONFIG MISMATCH FOUND --- FIX ATTEMPTING"), "TestPlansAndSuites");
+                Log.LogInformation("   CONFIG MISMATCH FOUND --- FIX ATTEMPTING");
                 IList<IdAndName> targetConfigs = new List<IdAndName>();
                 foreach (var config in sourceEntry.Configurations)
                 {
@@ -209,7 +209,7 @@ namespace VstsSyncMigrator.Engine
         private void ApplyConfigurationsAndAssignTesters(ITestSuiteBase sourceSuite, ITestSuiteBase targetSuite)
         {
             _totalTestCases = sourceSuite.TestCases.Count();
-            TraceWriteLine(sourceSuite, $"Applying configurations for test cases in source suite {sourceSuite.Title}", 5);
+            InnerLog(sourceSuite, $"Applying configurations for test cases in source suite {sourceSuite.Title}", 5);
             foreach (ITestSuiteEntry sourceTce in sourceSuite.TestCases)
             {
                 var stopwatch = Stopwatch.StartNew();
@@ -224,17 +224,17 @@ namespace VstsSyncMigrator.Engine
                                  select tc).SingleOrDefault();
                     if (targetTce != null)
                     {
-                        TraceWriteLine(sourceSuite, $"ApplyConfigurations Test Case ${sourceTce.Title} ", 5);
+                        InnerLog(sourceSuite, $"ApplyConfigurations Test Case ${sourceTce.Title} ", 5);
                         ApplyConfigurations(sourceTce, targetTce);
                     }
                     else
                     {
-                        TraceWriteLine(sourceSuite, $"Test Case ${sourceTce.Title} from source is not included in target. Cannot apply configuration for it.", 5);
+                        InnerLog(sourceSuite, $"Test Case ${sourceTce.Title} from source is not included in target. Cannot apply configuration for it.", 5);
                     }
                 }
                 else
                 {
-                    TraceWriteLine(sourceSuite, $"Work Item for Test Case {sourceTce.Title} cannot be found in target. Has it been migrated?", 5);
+                    InnerLog(sourceSuite, $"Work Item for Test Case {sourceTce.Title} cannot be found in target. Has it been migrated?", 5);
                 }
                 Telemetry.TrackRequest("ApplyConfigurationsAndAssignTesters", starttime, stopwatch.Elapsed, "200", true);
             }
@@ -265,12 +265,12 @@ namespace VstsSyncMigrator.Engine
                         }
                         else
                         {
-                            TraceWriteLine(sourceSuite, $"Test Suite {sourceSuiteChild.Title} from source cannot be found in target. Has it been migrated?", 5);
+                            InnerLog(sourceSuite, $"Test Suite {sourceSuiteChild.Title} from source cannot be found in target. Has it been migrated?", 5);
                         }
                     }
                     else
                     {
-                        TraceWriteLine(sourceSuite, $"Test Suite {sourceSuiteChild.Title} from source cannot be found in target. Has it been migrated?", 5);
+                        InnerLog(sourceSuite, $"Test Suite {sourceSuiteChild.Title} from source cannot be found in target. Has it been migrated?", 5);
                     }
                 }
             }
@@ -285,7 +285,7 @@ namespace VstsSyncMigrator.Engine
         {
             if (source.DefaultConfigurations != null)
             {
-                TraceWriteLine(source, $"   Setting default configurations for suite {target.Title}", 15);
+                InnerLog(source, $"   Setting default configurations for suite {target.Title}", 15);
                 IList<IdAndName> targetConfigs = new List<IdAndName>();
                 foreach (var config in source.DefaultConfigurations)
                 {
@@ -371,7 +371,7 @@ namespace VstsSyncMigrator.Engine
         {
             if (targetSuite == null)
             {
-                Trace.TraceError($"Target Suite is NULL");
+                Log.LogError("Target Suite is NULL");
             }
 
             List<ITestPointAssignment> assignmentsToAdd = new List<ITestPointAssignment>();
@@ -386,11 +386,11 @@ namespace VstsSyncMigrator.Engine
 
                 if (targetTc == null)
                 {
-                    Trace.TraceError($"Target Reflected Work Item Not found for source WorkItem ID: {sourceTce.TestCase.WorkItem.Id}");
+                    Log.LogError("Target Reflected Work Item Not found for source WorkItem ID: {sourceTceTestCaseWorkItemId}", sourceTce.TestCase.WorkItem.Id);
                 }
                 else
                 {
-                    TraceWriteLine(sourceSuite, $"Test Point Assignement for wi{targetTc.Id}", 15);
+                    InnerLog(sourceSuite, $"Test Point Assignement for wi{targetTc.Id}", 15);
                     //figure out test point assignments for each source tce
                     foreach (ITestPointAssignment tpa in sourceTce.PointAssignments)
                     {
@@ -441,7 +441,7 @@ namespace VstsSyncMigrator.Engine
                         }
                         else
                         {
-                            Trace.WriteLine($"Cannot find configuration with name [{sourceConfigName}] in target. Cannot assign tester to it.", "TestPlansAndSuites");
+                            Log.LogInformation("Cannot find configuration with name [{sourceConfigName}] in target. Cannot assign tester to it.", sourceConfigName);
                         }
                     }
                 }
@@ -480,7 +480,7 @@ namespace VstsSyncMigrator.Engine
             }
             catch (TestManagementValidationException ex)
             {
-                TraceWriteLine(source, string.Format("            Unable to Create Requirement based Test Suite: {0}", ex.Message), 10);
+                InnerLog(source, string.Format("            Unable to Create Requirement based Test Suite: {0}", ex.Message), 10);
                 return null;
             }
             targetSuiteChild.Title = source.Title;
@@ -514,14 +514,14 @@ namespace VstsSyncMigrator.Engine
             {
                 targetPlan.ManualTestSettingsId = 0;
                 targetPlan.AutomatedTestSettingsId = 0;
-                Trace.WriteLine("Ignoring migration of Testsettings. Azure DevOps Migration Tools don't support migration of this artifact type.");
+                Log.LogWarning("Ignoring migration of Testsettings. Azure DevOps Migration Tools don't support migration of this artifact type.");
             }
 
             // Remove reference to build uri because VSTS Sync doesn't support migrating these artifacts
             if (targetPlan.BuildUri != null)
             {
                 targetPlan.BuildUri = null;
-                Trace.WriteLine(string.Format("Ignoring migration of assigned Build artifact {0}. Azure DevOps Migration Tools don't support migration of this artifact type.", sourcePlan.BuildUri));
+                Log.LogWarning("Ignoring migration of assigned Build artifact {0}. Azure DevOps Migration Tools don't support migration of this artifact type.", sourcePlan.BuildUri);
             }
             return targetPlan;
         }
@@ -553,9 +553,9 @@ namespace VstsSyncMigrator.Engine
                 var missingIterationPath = regEx.Match(exception.Message).Groups[0].Value;
                 missingIterationPath = missingIterationPath.Substring(missingIterationPath.IndexOf(@"\") + 1, missingIterationPath.Length - missingIterationPath.IndexOf(@"\") - 2);
 
-                Trace.WriteLine("Found a orphaned iteration path in test suite query.");
-                Trace.WriteLine(string.Format("Invalid iteration path {0}:", missingIterationPath));
-                Trace.WriteLine("Replacing the orphaned iteration path from query with root iteration path. Please fix the query after the migration.");
+                Log.LogInformation("Found a orphaned iteration path in test suite query.");
+                Log.LogInformation("Invalid iteration path {0}:", missingIterationPath);
+                Log.LogInformation("Replacing the orphaned iteration path from query with root iteration path. Please fix the query after the migration.");
 
                 targetSuiteChild.Query = targetSuiteChild.Project.CreateTestQuery(
                     targetSuiteChild.Query.QueryText.Replace(
@@ -577,8 +577,8 @@ namespace VstsSyncMigrator.Engine
             // The target team project name is only available via target test store because the dyn. testsuite isnt saved at this point in time
             if (!source.Plan.Project.TeamProjectName.Equals(targetTestStore.Project.TeamProjectName))
             {
-                Trace.WriteLine(string.Format(@"Team Project names dont match. We need to fix the query in dynamic test suite {0} - {1}.", source.Id, source.Title));
-                Trace.WriteLine(string.Format(@"Replacing old project name {1} in query {0} with new team project name {2}", targetSuiteChild.Query.QueryText, source.Plan.Project.TeamProjectName, targetTestStore.Project.TeamProjectName));
+                Log.LogInformation("Team Project names dont match. We need to fix the query in dynamic test suite {0} - {1}.", source.Id, source.Title);
+                Log.LogInformation("Replacing old project name {1} in query {0} with new team project name {2}", targetSuiteChild.Query.QueryText, source.Plan.Project.TeamProjectName, targetTestStore.Project.TeamProjectName);
                 // First need to check is prefix project nodes has been applied for the migration
                 if (_config.PrefixProjectToNodes)
                 {
@@ -595,7 +595,7 @@ namespace VstsSyncMigrator.Engine
                             string.Format(@"'{0}", source.Plan.Project.TeamProjectName),
                             string.Format(@"'{0}", targetTestStore.Project.TeamProjectName)));
                 }
-                Trace.WriteLine(string.Format("New query is now {0}", targetSuiteChild.Query.QueryText));
+                Log.LogInformation("New query is now {0}", targetSuiteChild.Query.QueryText);
             }
         }
 
@@ -624,11 +624,11 @@ namespace VstsSyncMigrator.Engine
 
                         if (targetWi == null)
                         {
-                            TraceWriteLine(targetSuitChild, "Target WI does not exist. We are skipping this item. Please fix it manually.", 10);
+                            InnerLog(targetSuitChild, "Target WI does not exist. We are skipping this item. Please fix it manually.", 10);
                         }
                         else
                         {
-                            TraceWriteLine(targetSuitChild, "Fixing [System.Id] in query in test suite '" + dynamic.Title + "' from " + qid + " to " + targetWi.Id, 10);
+                            InnerLog(targetSuitChild, "Fixing [System.Id] in query in test suite '" + dynamic.Title + "' from " + qid + " to " + targetWi.Id, 10);
                             if (targetPlan != null)
                             {
                                 dynamic.Refresh();
@@ -695,7 +695,7 @@ namespace VstsSyncMigrator.Engine
                 }
                 catch (MultipleIdentitiesFoundException)
                 {
-                    Trace.WriteLine($"Multiple identities found with email [{sourceIdentityMail}] in target system. Trying Account Name.", "TestPlansAndSuites");
+                    Log.LogInformation("Multiple identities found with email [{sourceIdentityMail}] in target system. Trying Account Name.", sourceIdentityMail);
                 }
 
                 if (targetIdentity == null)
@@ -709,7 +709,7 @@ namespace VstsSyncMigrator.Engine
 
                 if (targetIdentity == null)
                 {
-                    Trace.WriteLine($"Cannot find tester with e-mail [{sourceIdentityMail}] in target system. Cannot assign.", "TestPlansAndSuites");
+                    Log.LogInformation("Cannot find tester with e-mail [{sourceIdentityMail}] in target system. Cannot assign.", sourceIdentityMail);
                     return null;
                 }
 
@@ -717,8 +717,7 @@ namespace VstsSyncMigrator.Engine
             }
             else
             {
-                Trace.WriteLine($"No e-mail address known in source system for [{sourceIdentity.DisplayName}]. Cannot translate to target.",
-                    "TestPlansAndSuites");
+                Log.LogInformation("No e-mail address known in source system for [{sourceIdentity.DisplayName}]. Cannot translate to target.", sourceIdentity.DisplayName);
                 return null;
             }
         }
@@ -749,7 +748,7 @@ namespace VstsSyncMigrator.Engine
             var newPlanName = _config.PrefixProjectToNodes
                 ? $"{Engine.Source.WorkItems.GetProject().Name}-{sourcePlan.Name}"
                 : $"{sourcePlan.Name}";
-            TraceWriteLine(sourcePlan, $"Process Plan {newPlanName}", 0, true);
+            InnerLog(sourcePlan, $"Process Plan {newPlanName}", 0, true);
             var targetPlan = FindTestPlan(_targetTestStore, newPlanName);
             if (targetPlan != null && TargetPlanContansTag(targetPlan.Id))
             {
@@ -757,7 +756,7 @@ namespace VstsSyncMigrator.Engine
             }
             if (targetPlan == null)
             {
-                TraceWriteLine(sourcePlan, $" Creating Plan {newPlanName}", 5);
+                InnerLog(sourcePlan, $" Creating Plan {newPlanName}", 5);
                 targetPlan = CreateNewTestPlanFromSource(sourcePlan, newPlanName);
 
                 RemoveInvalidLinks(targetPlan);
@@ -778,18 +777,18 @@ namespace VstsSyncMigrator.Engine
             }
             else
             {
-                TraceWriteLine(sourcePlan, $"Found Plan {newPlanName}", 5); ;
+                InnerLog(sourcePlan, $"Found Plan {newPlanName}", 5); ;
             }
             if (HasChildSuites(sourcePlan.RootSuite))
             {
                 __currentSuite = 0;
                 __totalSuites = sourcePlan.RootSuite.Entries.Count;
-                TraceWriteLine(sourcePlan, $"Source Plan has {__totalSuites} Suites", 5);
+                InnerLog(sourcePlan, $"Source Plan has {__totalSuites} Suites", 5);
                 metrics.Add("SubSuites", __totalSuites);
                 foreach (var sourceSuiteChild in sourcePlan.RootSuite.SubSuites)
                 {
                     __currentSuite++;
-                    TraceWriteLine(sourceSuiteChild, $"", 5, true);
+                    InnerLog(sourceSuiteChild, $"", 5, true);
                     ProcessTestSuite(sourceSuiteChild, targetPlan.RootSuite, targetPlan);
                 }
                 __currentSuite = 0;
@@ -798,7 +797,7 @@ namespace VstsSyncMigrator.Engine
 
             targetPlan.Save();
             // Load the plan again, because somehow it doesn't let me set configurations on the already loaded plan
-            TraceWriteLine(sourcePlan, $"ApplyConfigurationsAndAssignTesters {targetPlan.Name}", 5); ;
+            InnerLog(sourcePlan, $"ApplyConfigurationsAndAssignTesters {targetPlan.Name}", 5); ;
             ITestPlan targetPlan2 = FindTestPlan(_targetTestStore, targetPlan.Name);
             ApplyConfigurationsAndAssignTesters(sourcePlan.RootSuite, targetPlan2.RootSuite);
             //////////////////////////////
@@ -822,7 +821,7 @@ namespace VstsSyncMigrator.Engine
             AddParameter("TestSuiteType", parameters, sourceSuite.TestSuiteType.ToString());
             ////////////////////////////////////
 
-            TraceWriteLine(sourceSuite, $"    Processing {sourceSuite.TestSuiteType} : {sourceSuite.Id} - {sourceSuite.Title} ", 5);
+            InnerLog(sourceSuite, $"    Processing {sourceSuite.TestSuiteType} : {sourceSuite.Id} - {sourceSuite.Title} ", 5);
             var targetSuiteChild = FindSuiteEntry((IStaticTestSuite)targetParent, sourceSuite.Title);
 
             // Target suite is not found in target system. We should create it.
@@ -850,13 +849,13 @@ namespace VstsSyncMigrator.Engine
                             sourceReq = Engine.Source.WorkItems.GetWorkItem(sourceRid.ToString());
                             if (sourceReq == null)
                             {
-                                TraceWriteLine(sourceSuite, "            Source work item not found", 5);
+                                InnerLog(sourceSuite, "            Source work item not found", 5);
                                 break;
                             }
                         }
                         catch (Exception)
                         {
-                            TraceWriteLine(sourceSuite, "            Source work item cannot be loaded", 5);
+                            InnerLog(sourceSuite, "            Source work item cannot be loaded", 5);
                             break;
                         }
                         try
@@ -865,13 +864,13 @@ namespace VstsSyncMigrator.Engine
 
                             if (targetReq == null)
                             {
-                                TraceWriteLine(sourceSuite, "            Target work item not found", 5);
+                                InnerLog(sourceSuite, "            Target work item not found", 5);
                                 break;
                             }
                         }
                         catch (Exception)
                         {
-                            TraceWriteLine(sourceSuite, "            Source work item not migrated to target, cannot be found", 5);
+                            InnerLog(sourceSuite, "            Source work item not migrated to target, cannot be found", 5);
                             break;
                         }
                         targetSuiteChild = CreateNewRequirementTestSuite(sourceSuite, targetReq);
@@ -897,7 +896,7 @@ namespace VstsSyncMigrator.Engine
             else
             {
                 // The target suite already exists, take it from here
-                TraceWriteLine(sourceSuite, "            Suite Exists", 5);
+                InnerLog(sourceSuite, "            Suite Exists", 5);
                 ApplyDefaultConfigurations(sourceSuite, targetSuiteChild);
                 if (targetSuiteChild.IsDirty)
                 {
@@ -913,7 +912,7 @@ namespace VstsSyncMigrator.Engine
 
                 if (HasChildSuites(sourceSuite))
                 {
-                    TraceWriteLine(sourceSuite, $"            Suite has {((IStaticTestSuite)sourceSuite).Entries.Count} children", 5);
+                    InnerLog(sourceSuite, $"            Suite has {((IStaticTestSuite)sourceSuite).Entries.Count} children", 5);
                     foreach (var sourceSuitChild in ((IStaticTestSuite)sourceSuite).SubSuites)
                     {
                         ProcessTestSuite(sourceSuitChild, targetSuiteChild, targetPlan);
@@ -956,27 +955,27 @@ namespace VstsSyncMigrator.Engine
             {
                 if (!_config.RemoveInvalidTestSuiteLinks)
                 {
-                    TraceWriteLine(targetPlan, "We have detected test suite links that probably can't be migrated. You might receive an error 'The URL specified has a potentially unsafe URL protocol' when migrating to VSTS.", 5);
-                    TraceWriteLine(targetPlan, "Please see https://github.com/nkdAgility/azure-devops-migration-tools/issues/178 for more details.", 5);
+                    InnerLog(targetPlan, "We have detected test suite links that probably can't be migrated. You might receive an error 'The URL specified has a potentially unsafe URL protocol' when migrating to VSTS.", 5);
+                    InnerLog(targetPlan, "Please see https://github.com/nkdAgility/azure-devops-migration-tools/issues/178 for more details.", 5);
                 }
                 else
                 {
-                    TraceWriteLine(targetPlan, $"Link count before removal of invalid: [{targetPlan.Links.Count}]", 5);
+                    InnerLog(targetPlan, $"Link count before removal of invalid: [{targetPlan.Links.Count}]", 5);
                     foreach (var link in linksToRemove)
                     {
-                        TraceWriteLine(targetPlan,
+                        InnerLog(targetPlan,
                             $"Link with Description [{link.Description}] could not be migrated, as the URI is invalid. (We can't display the URI because of limitations in the TFS/VSTS/DevOps API.) Removing link.", 0);
                         targetPlan.Links.Remove(link);
                     }
 
-                    TraceWriteLine(targetPlan, $"Link count after removal of invalid: [{targetPlan.Links.Count}]", 0);
+                    InnerLog(targetPlan, $"Link count after removal of invalid: [{targetPlan.Links.Count}]", 0);
                 }
             }
         }
 
         private void SaveNewTestSuiteToPlan(ITestPlan testPlan, IStaticTestSuite parent, ITestSuiteBase newTestSuite)
         {
-            TraceWriteLine(newTestSuite,
+            InnerLog(newTestSuite,
                 $"       Saving {newTestSuite.TestSuiteType} : {newTestSuite.Id} - {newTestSuite.Title} ", 10);
             try
             {
@@ -1018,41 +1017,35 @@ namespace VstsSyncMigrator.Engine
             return targetPlanWorkItem.ToWorkItem().Tags.Contains("migrated");
         }
 
-        private void TraceWriteLine(ITestPlan sourcePlan, string message = "", int indent = 0, bool header = false)
+        private void InnerLog(ITestPlan sourcePlan, string message = "", int indent = 0, bool header = false)
         {
             if (header)
             {
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Trace.WriteLine("===============================================================================================".PadLeft(indent));
-                Trace.WriteLine("===============================================================================================".PadLeft(indent));
-                Trace.WriteLine("===============================================================================================".PadLeft(indent));
-                Trace.WriteLine($"==      Suite Name: {sourcePlan.Name.PadRight(45)}=============================".PadLeft(indent));
-                Trace.WriteLine($"==            Date: {sourcePlan.StartDate.ToShortDateString().PadRight(45)}=============================".PadLeft(indent));
-                Trace.WriteLine($"==          Suites: {sourcePlan.RootSuite.Entries.Count.ToString().PadRight(45)}=============================".PadLeft(indent));
-                Trace.WriteLine("===============================================================================================".PadLeft(indent));
-                Trace.WriteLine("===============================================================================================".PadLeft(indent));
-                Trace.WriteLine("===============================================================================================".PadLeft(indent));
+                Log.LogInformation("===============================================================================================".PadLeft(indent));
+                Log.LogInformation("===============================================================================================".PadLeft(indent));
+                Log.LogInformation("===============================================================================================".PadLeft(indent));
+                Log.LogInformation("==      Suite Name: {SourcePlanName}=============================".PadLeft(indent), sourcePlan.Name.PadRight(45));
+                Log.LogInformation("==            Date: {SourcePlanStartDate}=============================".PadLeft(indent), sourcePlan.StartDate.ToShortDateString().PadRight(45));
+                Log.LogInformation("==          Suites: {SourcePlanRootSuiteEntriesCount}=============================".PadLeft(indent), sourcePlan.RootSuite.Entries.Count.ToString().PadRight(45));
+                Log.LogInformation("===============================================================================================".PadLeft(indent));
+                Log.LogInformation("===============================================================================================".PadLeft(indent));
+                Log.LogInformation("===============================================================================================".PadLeft(indent));
             }
-            Console.ForegroundColor = ConsoleColor.Green;
-            Trace.WriteLine($"== {GetLogTags()} - planid[{sourcePlan.Id.ToString().PadRight(6)}] | {message}".PadLeft(indent));
-            if (header) Trace.WriteLine("===============================================================================================".PadLeft(indent));
-            Console.ForegroundColor = ConsoleColor.White;
+            Log.LogInformation("== {LogTags} - planid[{SourcePlanId}] | {message}".PadLeft(indent), GetLogTags(), sourcePlan.Id.ToString().PadRight(6), message);
+            if (header) Log.LogInformation("===============================================================================================".PadLeft(indent));
         }
 
-        private void TraceWriteLine(ITestSuiteBase sourceTestSuite, string message = "", int indent = 0, bool header = false)
+        private void InnerLog(ITestSuiteBase sourceTestSuite, string message = "", int indent = 0, bool header = false)
         {
             indent = indent + 5;
             if (header)
             {
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Trace.WriteLine("===============================================================================================".PadLeft(indent));
-                Trace.WriteLine($"==      Suite Title: {sourceTestSuite.Title.PadRight(45)}=============================".PadLeft(indent));
-                Trace.WriteLine("===============================================================================================".PadLeft(indent));
+                Log.LogInformation("===============================================================================================".PadLeft(indent));
+                Log.LogInformation("==      Suite Title: {SourceTestSuiteTitle}=============================".PadLeft(indent), sourceTestSuite.Title.PadRight(45));
+                Log.LogInformation("===============================================================================================".PadLeft(indent));
             }
-            Console.ForegroundColor = ConsoleColor.Green;
-            Trace.WriteLine($"== {GetLogTags()} - suiteid[{sourceTestSuite.Id.ToString().PadRight(6)}] | {message}".PadLeft(indent));
-            if (header) Trace.WriteLine("===============================================================================================".PadLeft(indent));
-            Console.ForegroundColor = ConsoleColor.White;
+            Log.LogInformation("== {GetLogTags()} - suiteid[{SourceTestSuiteId}] | {message}".PadLeft(indent), sourceTestSuite.Id.ToString().PadRight(6), message);
+            if (header) Log.LogInformation("===============================================================================================".PadLeft(indent));
         }
 
         private void ValidateAndFixTestSuiteQuery(ITestSuiteBase source, IDynamicTestSuite targetSuiteChild,

@@ -27,6 +27,7 @@ namespace MigrationTools.Tests
 
             host = new HostBuilder().ConfigureServices((context, services) =>
             {
+                services.AddApplicationInsightsTelemetryWorkerService();
                 services.AddSingleton<IDetectOnlineService, DetectOnlineService>();
                 services.AddSingleton<IDetectVersionService, DetectVersionService>();
                 services.AddSingleton<IEngineConfigurationBuilder, EngineConfigurationBuilderStub>();

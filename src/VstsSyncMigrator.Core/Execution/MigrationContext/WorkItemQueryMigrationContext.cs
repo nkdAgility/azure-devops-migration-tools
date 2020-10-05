@@ -68,7 +68,7 @@ namespace VstsSyncMigrator.Engine
             var sourceQueryHierarchy = ((WorkItemMigrationClient)Engine.Source.WorkItems).Store.Projects[Engine.Source.Config.Project].QueryHierarchy;
             var targetQueryHierarchy = ((WorkItemMigrationClient)Engine.Target.WorkItems).Store.Projects[Engine.Target.Config.Project].QueryHierarchy;
 
-            Trace.WriteLine(string.Format("Found {0} root level child WIQ folders", sourceQueryHierarchy.Count));
+            Log.LogInformation("Found {0} root level child WIQ folders", sourceQueryHierarchy.Count);
             //////////////////////////////////////////////////
 
             foreach (QueryFolder query in sourceQueryHierarchy)
@@ -77,9 +77,9 @@ namespace VstsSyncMigrator.Engine
             }
 
             stopwatch.Stop();
-            Console.WriteLine($"Folders scanned {this.totalFoldersAttempted}");
-            Console.WriteLine($"Queries Found:{this.totalQueriesAttempted}  Skipped:{this.totalQueriesSkipped}  Migrated:{this.totalQueriesMigrated}   Failed:{this.totalQueryFailed}");
-            Console.WriteLine(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds", stopwatch.Elapsed);
+            Log.LogInformation("Folders scanned {totalFoldersAttempted}", totalFoldersAttempted);
+            Log.LogInformation("Queries Found:{totalQueriesAttempted}  Skipped:{totalQueriesSkipped}  Migrated:{totalQueriesMigrated}   Failed:{totalQueryFailed}", totalQueriesAttempted, totalQueriesSkipped, totalQueriesMigrated, totalQueryFailed);
+            Log.LogInformation("DONE in {Elapsed} seconds", stopwatch.Elapsed.ToString("c"));
         }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace VstsSyncMigrator.Engine
             // We only migrate non-private folders and their contents
             if (sourceFolder.IsPersonal)
             {
-                Trace.WriteLine($"Found a personal folder {sourceFolder.Name}. Migration only available for shared Team Query folders");
+                Log.LogInformation("Found a personal folder {sourceFolderName}. Migration only available for shared Team Query folders", sourceFolder.Name);
             }
             else
             {
@@ -116,7 +116,7 @@ namespace VstsSyncMigrator.Engine
                         if (extraFolder == null)
                         {
                             // we are at the root level on the first pass and need to create the extra folder for the team name
-                            Trace.WriteLine($"Adding a folder '{Engine.Source.Config.Project}'");
+                            Log.LogInformation("Adding a folder '{Project}'", Engine.Source.Config.Project);
                             extraFolder = new QueryFolder(Engine.Source.Config.Project);
                             targetSharedFolderRoot.Add(extraFolder);
                             targetHierarchy.Save(); // moved the save here a more immediate and relavent error message
@@ -131,11 +131,11 @@ namespace VstsSyncMigrator.Engine
                 QueryFolder targetFolder = (QueryFolder)parentFolder.FirstOrDefault(q => q.Path == requiredPath);
                 if (targetFolder != null)
                 {
-                    Trace.WriteLine($"Skipping folder '{sourceFolder.Name}' as already exists");
+                    Log.LogInformation("Skipping folder '{sourceFolderName}' as already exists", sourceFolder.Name);
                 }
                 else
                 {
-                    Trace.WriteLine($"Migrating a folder '{sourceFolder.Name}'");
+                    Log.LogInformation("Migrating a folder '{sourceFolderName}'", sourceFolder.Name);
                     targetFolder = new QueryFolder(sourceFolder.Name);
                     parentFolder.Add(targetFolder);
                     targetHierarchy.Save(); // moved the save here a more immediate and relavent error message
@@ -167,7 +167,7 @@ namespace VstsSyncMigrator.Engine
             if (parentFolder.FirstOrDefault(q => q.Name == query.Name) != null)
             {
                 this.totalQueriesSkipped++;
-                Trace.WriteLine($"Skipping query '{query.Name}' as already exists");
+                Log.LogWarning("Skipping query '{queryName}' as already exists", query.Name);
             }
             else
             {
@@ -191,7 +191,7 @@ namespace VstsSyncMigrator.Engine
                 // you cannot just add an item from one store to another, we need to create a new object
                 var queryCopy = new QueryDefinition(query.Name, fixedQueryText);
                 this.totalQueriesAttempted++;
-                Trace.WriteLine($"Migrating query '{query.Name}'");
+                Log.LogInformation("Migrating query '{queryName}'", query.Name);
                 parentFolder.Add(queryCopy);
                 try
                 {
@@ -201,10 +201,9 @@ namespace VstsSyncMigrator.Engine
                 catch (Exception ex)
                 {
                     this.totalQueryFailed++;
-                    Trace.WriteLine($"Error saving query '{query.Name}', probably due to invalid area or iteration paths");
-                    Trace.WriteLine($"Source Query: '{query}'");
-                    Trace.WriteLine($"Target Query: '{fixedQueryText}'");
-                    Trace.WriteLine(ex.Message);
+                    Log.LogDebug("Source Query: '{query}'");
+                    Log.LogDebug("Target Query: '{fixedQueryText}'");
+                    Log.LogError(ex, "Error saving query '{queryName}', probably due to invalid area or iteration paths", query.Name);
                     targetHierarchy.Refresh(); // get the tree without the last edit
                 }
             }

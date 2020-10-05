@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.TestManagement.Client;
@@ -47,38 +46,38 @@ namespace VstsSyncMigrator.Engine
             TestManagementContext SourceTmc = new TestManagementContext(Engine.Source);
             TestManagementContext targetTmc = new TestManagementContext(Engine.Target);
             List<ITestVariable> sourceVars = SourceTmc.Project.TestVariables.Query().ToList();
-            Trace.WriteLine(string.Format("Plan to copy {0} Veriables?", sourceVars.Count));
+            Log.LogInformation("Plan to copy {0} Veriables?", sourceVars.Count);
 
             foreach (var sourceVar in sourceVars)
             {
-                Trace.WriteLine(string.Format("Copy: {0}", sourceVar.Name));
+                Log.LogInformation("Copy: {0}", sourceVar.Name);
                 ITestVariable targetVar = GetVar(targetTmc.Project.TestVariables, sourceVar.Name);
                 if (targetVar == null)
                 {
-                    Trace.WriteLine(string.Format("    Need to create: {0}", sourceVar.Name));
+                    Log.LogInformation("    Need to create: {0}", sourceVar.Name);
                     targetVar = targetTmc.Project.TestVariables.Create();
                     targetVar.Name = sourceVar.Name;
                     targetVar.Save();
                 }
                 else
                 {
-                    Trace.WriteLine(string.Format("    Exists: {0}", sourceVar.Name));
+                    Log.LogInformation("    Exists: {0}", sourceVar.Name);
                 }
                 // match values
                 foreach (var sourceVal in sourceVar.AllowedValues)
                 {
-                    Trace.WriteLine(string.Format("    Seeking: {0}", sourceVal.Value));
+                    Log.LogInformation("    Seeking: {0}", sourceVal.Value);
                     ITestVariableValue targetVal = GetVal(targetVar, sourceVal.Value);
                     if (targetVal == null)
                     {
-                        Trace.WriteLine(string.Format("    Need to create: {0}", sourceVal.Value));
+                        Log.LogInformation("    Need to create: {0}", sourceVal.Value);
                         targetVal = targetTmc.Project.TestVariables.CreateVariableValue(sourceVal.Value);
                         targetVar.AllowedValues.Add(targetVal);
                         targetVar.Save();
                     }
                     else
                     {
-                        Trace.WriteLine(string.Format("    Exists: {0}", targetVal.Value));
+                        Log.LogInformation("    Exists: {0}", targetVal.Value);
                     }
                 }
             }

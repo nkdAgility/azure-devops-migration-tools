@@ -18,9 +18,6 @@ namespace VstsSyncMigrator.Engine
     public class WorkItemPostProcessingContext : MigrationProcessorBase
     {
         private WorkItemPostProcessingConfig _config;
-        //private IList<string> _workItemTypes;
-        //private IList<int> _workItemIDs;
-        // private string _queryBit;
 
         public WorkItemPostProcessingContext(IMigrationEngine engine, IServiceProvider services, ITelemetryLogger telemetry, ILogger<WorkItemPostProcessingContext> logger) : base(engine, services, telemetry, logger)
         {
@@ -39,21 +36,6 @@ namespace VstsSyncMigrator.Engine
             _config = (WorkItemPostProcessingConfig)config;
         }
 
-        //public WorkItemPostProcessingContext(MigrationEngine me, WorkItemPostProcessingConfig config, IList<string> wiTypes) : this(me, config)
-        //{
-        //    _workItemTypes = wiTypes;
-        //}
-
-        //public WorkItemPostProcessingContext(MigrationEngine me, WorkItemPostProcessingConfig config, IList<int> wiIDs) : this(me, config)
-        //{
-        //    _workItemIDs = wiIDs;
-        //}
-
-        //public WorkItemPostProcessingContext(MigrationEngine me, WorkItemPostProcessingConfig config, string queryBit) : this (me, config)
-        //{
-        //    _queryBit = queryBit;
-        //}
-
         protected override void InternalExecute()
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
@@ -64,10 +46,10 @@ namespace VstsSyncMigrator.Engine
             wiqb.Query = string.Format(@"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY [System.Id] ", constraints);
 
             List<WorkItemData> sourceWIS = Engine.Target.WorkItems.GetWorkItems(wiqb);
-            Trace.WriteLine(string.Format("Migrate {0} work items?", sourceWIS.Count));
+            Log.LogInformation("Migrate {0} work items?", sourceWIS.Count);
             //////////////////////////////////////////////////
             ProjectData destProject = Engine.Target.WorkItems.GetProject();
-            Trace.WriteLine(string.Format("Found target project as {0}", destProject.Name));
+            Log.LogInformation("Found target project as {0}", destProject.Name);
 
             int current = sourceWIS.Count;
             int count = 0;
@@ -77,14 +59,14 @@ namespace VstsSyncMigrator.Engine
                 Stopwatch witstopwatch = Stopwatch.StartNew();
                 WorkItemData targetFound;
                 targetFound = Engine.Target.WorkItems.FindReflectedWorkItem(sourceWI, false);
-                Trace.WriteLine(string.Format("{0} - Updating: {1}-{2}", current, sourceWI.Id, sourceWI.Type));
+                Log.LogInformation("{0} - Updating: {1}-{2}", current, sourceWI.Id, sourceWI.Type);
                 if (targetFound == null)
                 {
-                    Trace.WriteLine(string.Format("{0} - WARNING: does not exist {1}-{2}", current, sourceWI.Id, sourceWI.Type));
+                    Log.LogWarning("{0} - WARNING: does not exist {1}-{2}", current, sourceWI.Id, sourceWI.Type);
                 }
                 else
                 {
-                    Console.WriteLine("...Exists");
+                    Log.LogInformation("...Exists");
                     targetFound.ToWorkItem().Open();
                     Engine.FieldMaps.ApplyFieldMappings(sourceWI, targetFound);
                     if (targetFound.ToWorkItem().IsDirty)
@@ -92,16 +74,16 @@ namespace VstsSyncMigrator.Engine
                         try
                         {
                             targetFound.SaveToAzureDevOps();
-                            Trace.WriteLine(string.Format("          Updated"));
+                            Log.LogInformation("          Updated");
                         }
                         catch (ValidationException ve)
                         {
-                            Trace.WriteLine(string.Format("          [FAILED] {0}", ve.ToString()));
+                            Log.LogError(ve, "          [FAILED] {0}", ve.ToString());
                         }
                     }
                     else
                     {
-                        Trace.WriteLine(string.Format("          No changes"));
+                        Log.LogInformation("          No changes");
                     }
                     sourceWI.ToWorkItem().Close();
                 }
@@ -111,11 +93,11 @@ namespace VstsSyncMigrator.Engine
                 count++;
                 TimeSpan average = new TimeSpan(0, 0, 0, 0, (int)(elapsedms / count));
                 TimeSpan remaining = new TimeSpan(0, 0, 0, 0, (int)(average.TotalMilliseconds * current));
-                Trace.WriteLine(string.Format("Average time of {0} per work item and {1} estimated to completion", string.Format(@"{0:s\:fff} seconds", average), string.Format(@"{0:%h} hours {0:%m} minutes {0:s\:fff} seconds", remaining)));
+                Log.LogInformation("Average time of {0} per work item and {1} estimated to completion", string.Format(@"{0:s\:fff} seconds", average), string.Format(@"{0:%h} hours {0:%m} minutes {0:s\:fff} seconds", remaining));
             }
             //////////////////////////////////////////////////
             stopwatch.Stop();
-            Console.WriteLine(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds", stopwatch.Elapsed);
+            Log.LogInformation("DONE in {Elapsed}", stopwatch.Elapsed.ToString("c"));
         }
 
         private string BuildQueryBitConstraints()

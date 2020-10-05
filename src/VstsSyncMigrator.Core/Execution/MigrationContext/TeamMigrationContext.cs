@@ -83,11 +83,11 @@ namespace VstsSyncMigrator.Engine
                             var targetConfig = targetConfigurations.FirstOrDefault(t => t.TeamName == sourceConfig.TeamName);
                             if (targetConfig == null)
                             {
-                                Log.LogDebug("-> Settings for team '{0}'.. not found", sourceTeam.Name);
+                                Log.LogDebug("-> Settings for team '{sourceTeamName}'.. not found", sourceTeam.Name);
                                 continue;
                             }
 
-                            Trace.WriteLine(string.Format("-> Settings found for team '{0}'..", sourceTeam.Name));
+                            Log.LogInformation("-> Settings found for team '{sourceTeamName}'..", sourceTeam.Name);
                             if (_config.PrefixProjectToNodes)
                             {
                                 targetConfig.TeamSettings.BacklogIterationPath =
@@ -126,7 +126,7 @@ namespace VstsSyncMigrator.Engine
                 count++;
                 TimeSpan average = new TimeSpan(0, 0, 0, 0, (int)(elapsedms / count));
                 TimeSpan remaining = new TimeSpan(0, 0, 0, 0, (int)(average.TotalMilliseconds * current));
-                //Trace.WriteLine(string.Format("Average time of {0} per work item and {1} estimated to completion", string.Format(@"{0:s\:fff} seconds", average), string.Format(@"{0:%h} hours {0:%m} minutes {0:s\:fff} seconds", remaining)));
+                //Log.LogInformation("Average time of {0} per work item and {1} estimated to completion", string.Format(@"{0:s\:fff} seconds", average), string.Format(@"{0:%h} hours {0:%m} minutes {0:s\:fff} seconds", remaining)));
             }
             // Set Team Settings
             //foreach (TeamFoundationTeam sourceTeam in sourceTL)
@@ -136,7 +136,7 @@ namespace VstsSyncMigrator.Engine
             //    var foundTargetTeam = (from x in targetTL where x.Name == sourceTeam.Name select x).SingleOrDefault();
             //    if (foundTargetTeam == null)
             //    {
-            //        Trace.WriteLine(string.Format("Processing team {0}", sourceTeam.Name));
+            //        TLog.LogInformation("Processing team {0}", sourceTeam.Name));
             //        var sourceTCfU = sourceTSCS.GetTeamConfigurations((new[] { sourceTeam.Identity.TeamFoundationId })).SingleOrDefault();
             //        TeamSettings newTeamSettings = CreateTargetTeamSettings(sourceTCfU);
             //        TeamFoundationTeam newTeam = targetTS.CreateTeam(targetProject.Uri.ToString(), sourceTeam.Name, sourceTeam.Description, null);
@@ -144,7 +144,7 @@ namespace VstsSyncMigrator.Engine
             //    }
             //    else
             //    {
-            //        Trace.WriteLine(string.Format("Team found.. skipping"));
+            //        Log.LogInformation("Team found.. skipping"));
             //    }
 
             //    witstopwatch.Stop();
@@ -153,8 +153,7 @@ namespace VstsSyncMigrator.Engine
             //    count++;
             //    TimeSpan average = new TimeSpan(0, 0, 0, 0, (int)(elapsedms / count));
             //    TimeSpan remaining = new TimeSpan(0, 0, 0, 0, (int)(average.TotalMilliseconds * current));
-            //    Trace.WriteLine("");
-            //    //Trace.WriteLine(string.Format("Average time of {0} per work item and {1} estimated to completion", string.Format(@"{0:s\:fff} seconds", average), string.Format(@"{0:%h} hours {0:%m} minutes {0:s\:fff} seconds", remaining)));
+            //    //Log.LogInformation("Average time of {0} per work item and {1} estimated to completion", string.Format(@"{0:s\:fff} seconds", average), string.Format(@"{0:%h} hours {0:%m} minutes {0:s\:fff} seconds", remaining)));
 
             //}
             //////////////////////////////////////////////////

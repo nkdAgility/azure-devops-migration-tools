@@ -64,7 +64,7 @@ namespace VstsSyncMigrator.Engine
                 foreach (int begone in tobegone)
                 {
                     ((WorkItemMigrationClient)Engine.Target.WorkItems).Store.DestroyWorkItems(new List<int>() { begone });
-                    Trace.WriteLine(string.Format("Deleted {0}", begone));
+                    Log.LogInformation("Deleted {0}", begone);
                 }
             }
             else

@@ -16,9 +16,13 @@ namespace VstsSyncMigrator.Engine
 {
     public class ImportProfilePictureContext : StaticProcessorBase
     {
-        //private readonly TfsTeamService teamService;
-        //private readonly ProjectInfo projectInfo;
         private readonly IIdentityManagementService2 ims2;
+
+        public ImportProfilePictureContext(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<ImportProfilePictureContext> logger) : base(services, me, telemetry, logger)
+        {
+            //http://www.codeproject.com/Articles/18102/Howto-Almost-Everything-In-Active-Directory-via-C
+            ims2 = (IIdentityManagementService2)me.Target.GetService<IIdentityManagementService2>();
+        }
 
         public override string Name
         {
@@ -28,44 +32,61 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        public ImportProfilePictureContext(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<ImportProfilePictureContext> logger) : base(services, me, telemetry, logger)
+        public static string FriendlyDomainToLdapDomain(string friendlyDomainName)
         {
-            //http://www.codeproject.com/Articles/18102/Howto-Almost-Everything-In-Active-Directory-via-C
-            ims2 = (IIdentityManagementService2)me.Target.GetService<IIdentityManagementService2>();
+            string ldapPath = null;
+            try
+            {
+                DirectoryContext objContext = new DirectoryContext(
+                    DirectoryContextType.Domain, friendlyDomainName);
+                Domain objDomain = Domain.GetDomain(objContext);
+                ldapPath = objDomain.Name;
+            }
+            catch (DirectoryServicesCOMException e)
+            {
+                ldapPath = e.Message.ToString();
+            }
+            return ldapPath;
         }
 
-        protected override void InternalExecute()
+        public bool ClearProfileImage(string identity, out string message)
         {
-            Stopwatch stopwatch = Stopwatch.StartNew();
-            //////////////////////////////////////////////////
-            string exportPath;
-            string assPath = @"C:\Users\martinh\Downloads\mugshots\mugshots"; //System.Reflection.Assembly.GetExecutingAssembly().Location;
-                                                                              // exportPath = Path.Combine(Path.GetDirectoryName(assPath), "export-pic");
-            exportPath = assPath;
-            if (!Directory.Exists(exportPath))
+            bool ret = true;
+            message = string.Empty;
+
+            TeamFoundationIdentity i = ims2.ReadIdentity(IdentitySearchFactor.AccountName, identity, MembershipQuery.Direct, ReadIdentityOptions.None);
+
+            if (i == null)
             {
-                Directory.CreateDirectory(exportPath);
-            }
-            var files = Directory.GetFiles(exportPath);
-            var regex = new Regex(Regex.Escape("-"));
-            foreach (string file in files)
-            {
-                string ident = regex.Replace(Path.GetFileNameWithoutExtension(file), @"\", 1);
-                string mess;
-                if (SetProfileImage(ident, file, out mess))
-                {
-                    Trace.WriteLine(string.Format(" [UPDATE] New Profile for : {0} ", ident));
-                    File.Delete(file);
-                }
-                else
-                {
-                    Trace.WriteLine(string.Format(" [FAIL] Unable to set: {0} ", ident));
-                }
+                message = "User/Group [" + identity + "] not found";
+                ret = false;
             }
 
-            //////////////////////////////////////////////////
-            stopwatch.Stop();
-            Trace.WriteLine(string.Format(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds", stopwatch.Elapsed));
+            if (ret)
+            {
+                i.SetProperty("Microsoft.TeamFoundation.Identity.Image.Data", null);
+                i.SetProperty("Microsoft.TeamFoundation.Identity.Image.Type", null);
+                i.SetProperty("Microsoft.TeamFoundation.Identity.Image.Id", null);
+                i.SetProperty("Microsoft.TeamFoundation.Identity.CandidateImage.Data", null);
+                i.SetProperty("Microsoft.TeamFoundation.Identity.CandidateImage.UploadDate", null);
+
+                try
+                {
+                    ims2.UpdateExtendedProperties(i);
+                }
+                catch (PropertyServiceException)
+                {
+                    // swallow; this exception happens each and every time, but the changes are applied :S.
+                }
+
+                message = "Profile image cleared";
+            }
+
+            return ret;
+        }
+
+        public override void Configure(IProcessorConfig config)
+        {
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Need to kill all errors")]
@@ -126,40 +147,38 @@ namespace VstsSyncMigrator.Engine
             return ret;
         }
 
-        public bool ClearProfileImage(string identity, out string message)
+        protected override void InternalExecute()
         {
-            bool ret = true;
-            message = string.Empty;
-
-            TeamFoundationIdentity i = ims2.ReadIdentity(IdentitySearchFactor.AccountName, identity, MembershipQuery.Direct, ReadIdentityOptions.None);
-
-            if (i == null)
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            //////////////////////////////////////////////////
+            string exportPath;
+            string assPath = @"C:\Users\martinh\Downloads\mugshots\mugshots"; //System.Reflection.Assembly.GetExecutingAssembly().Location;
+                                                                              // exportPath = Path.Combine(Path.GetDirectoryName(assPath), "export-pic");
+            exportPath = assPath;
+            if (!Directory.Exists(exportPath))
             {
-                message = "User/Group [" + identity + "] not found";
-                ret = false;
+                Directory.CreateDirectory(exportPath);
+            }
+            var files = Directory.GetFiles(exportPath);
+            var regex = new Regex(Regex.Escape("-"));
+            foreach (string file in files)
+            {
+                string ident = regex.Replace(Path.GetFileNameWithoutExtension(file), @"\", 1);
+                string mess;
+                if (SetProfileImage(ident, file, out mess))
+                {
+                    Log.LogInformation(" [UPDATE] New Profile for : {0} ", ident);
+                    File.Delete(file);
+                }
+                else
+                {
+                    Log.LogInformation(" [FAIL] Unable to set: {0} ", ident);
+                }
             }
 
-            if (ret)
-            {
-                i.SetProperty("Microsoft.TeamFoundation.Identity.Image.Data", null);
-                i.SetProperty("Microsoft.TeamFoundation.Identity.Image.Type", null);
-                i.SetProperty("Microsoft.TeamFoundation.Identity.Image.Id", null);
-                i.SetProperty("Microsoft.TeamFoundation.Identity.CandidateImage.Data", null);
-                i.SetProperty("Microsoft.TeamFoundation.Identity.CandidateImage.UploadDate", null);
-
-                try
-                {
-                    ims2.UpdateExtendedProperties(i);
-                }
-                catch (PropertyServiceException)
-                {
-                    // swallow; this exception happens each and every time, but the changes are applied :S.
-                }
-
-                message = "Profile image cleared";
-            }
-
-            return ret;
+            //////////////////////////////////////////////////
+            stopwatch.Stop();
+            Log.LogInformation("DONE in {Elapsed} ", stopwatch.Elapsed.ToString("c"));
         }
 
         private static byte[] ConvertAndResizeImage(byte[] bytes)
@@ -204,27 +223,6 @@ namespace VstsSyncMigrator.Engine
                     }
                 }
             }
-        }
-
-        public static string FriendlyDomainToLdapDomain(string friendlyDomainName)
-        {
-            string ldapPath = null;
-            try
-            {
-                DirectoryContext objContext = new DirectoryContext(
-                    DirectoryContextType.Domain, friendlyDomainName);
-                Domain objDomain = Domain.GetDomain(objContext);
-                ldapPath = objDomain.Name;
-            }
-            catch (DirectoryServicesCOMException e)
-            {
-                ldapPath = e.Message.ToString();
-            }
-            return ldapPath;
-        }
-
-        public override void Configure(IProcessorConfig config)
-        {
         }
     }
 }
