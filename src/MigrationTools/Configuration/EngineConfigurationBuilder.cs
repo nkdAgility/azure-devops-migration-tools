@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using Microsoft.Extensions.Logging;
 using MigrationTools.Configuration.FieldMap;
 using MigrationTools.Configuration.Processing;
@@ -34,10 +35,10 @@ namespace MigrationTools.Configuration
             //var settings = new EngineConfiguration();
             //configuration.Bind(settings);
             //#if !DEBUG
-            string appVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(2);
+            string appVersion = Assembly.GetEntryAssembly().GetName().Version.ToString(2);
             if (ec.Version != appVersion)
             {
-                _logger.LogError("The config version {@Version} does not match the current app version {@appVersion}. There may be compatability issues and we recommend that you generate a new default config and then tranfer the settings accross.", ec.Version, appVersion);
+                _logger.LogError("The config version {Version} does not match the current app version {appVersion}. There may be compatability issues and we recommend that you generate a new default config and then tranfer the settings accross.", ec.Version, appVersion);
                 throw new Exception("Version in Config does not match X.X in Application. Please check and revert.");
             }
             //#endif
@@ -79,7 +80,7 @@ namespace MigrationTools.Configuration
             EngineConfiguration ec = new EngineConfiguration
             {
                 LogLevel = LogEventLevel.Information,
-                Version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(2),
+                Version = Assembly.GetEntryAssembly().GetName().Version.ToString(2),
                 Source = new TeamProjectConfig()
                 {
                     Project = "migrationSource1",

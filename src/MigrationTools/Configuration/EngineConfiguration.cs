@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using Microsoft.Extensions.Logging;
 using MigrationTools.CommandLine;
 using Serilog.Events;
@@ -35,7 +36,7 @@ namespace MigrationTools.Configuration
             }
             if (!File.Exists(opts.ConfigFile))
             {
-                logger.LogInformation("The config file {ConfigFile} does not exist, nor does the default 'configuration.json'. Use '{ExecutableName}.exe init' to create a configuration file first", opts.ConfigFile, System.Reflection.Assembly.GetExecutingAssembly().GetName().Name);
+                logger.LogInformation("The config file {ConfigFile} does not exist, nor does the default 'configuration.json'. Use '{ExecutableName}.exe init' to create a configuration file first", opts.ConfigFile, Assembly.GetEntryAssembly().GetName().Name);
                 throw new ArgumentException("missing configfile");
             }
             logger.LogInformation("Config Found, creating engine host");

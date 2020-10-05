@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Reflection;
 using System.Threading.Tasks;
 using CommandLine;
 using Microsoft.ApplicationInsights;
@@ -106,7 +107,7 @@ namespace MigrationTools.Host
         private static string CreateLogsPath()
         {
             string exportPath;
-            string assPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string assPath = Assembly.GetEntryAssembly().Location;
             exportPath = Path.Combine(Path.GetDirectoryName(assPath), "logs", DateTime.Now.ToString("yyyyMMddHHmmss"));
             if (!Directory.Exists(exportPath))
             {

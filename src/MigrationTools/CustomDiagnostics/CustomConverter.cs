@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Microsoft.ApplicationInsights.Channel;
 using Microsoft.ApplicationInsights.DataContracts;
 using Serilog.Events;
@@ -18,7 +19,7 @@ namespace MigrationTools.CustomDiagnostics
             {
                 // Add Common Stuff
                 telemetry.Context.Device.OperatingSystem = Environment.OSVersion.ToString();
-                telemetry.Context.Component.Version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+                telemetry.Context.Component.Version = Assembly.GetEntryAssembly().GetName().Version.ToString();
                 if (logEvent.Properties.ContainsKey("SessionID"))
                 {
                     telemetry.Context.Session.Id = logEvent.Properties["SessionID"].ToString();
