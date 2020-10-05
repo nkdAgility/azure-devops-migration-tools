@@ -292,7 +292,30 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
 
         public override WorkItemData GetWorkItem(int id)
         {
-            return Store.GetWorkItem(id)?.AsWorkItemData();
+            var startTime = DateTime.UtcNow;
+            var timer = System.Diagnostics.Stopwatch.StartNew();
+            WorkItem y;
+            try
+            {
+                y = Store.GetWorkItem(id);
+                timer.Stop();
+                Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", MigrationClient.Config.Collection.ToString(), "GetWorkItem", null, startTime, timer.Elapsed, "200", true));
+            }
+            catch (Exception ex)
+            {
+                timer.Stop();
+                Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", MigrationClient.Config.Collection.ToString(), "GetWorkItem", null, startTime, timer.Elapsed, "500", false));
+                Telemetry.TrackException(ex,
+                       new Dictionary<string, string> {
+                            { "CollectionUrl", MigrationClient.Config.Collection.ToString() }
+                       },
+                       new Dictionary<string, double> {
+                            { "Time",timer.ElapsedMilliseconds }
+                       });
+                Log.Error(ex, "Unable to configure store");
+                throw;
+            }
+            return y?.AsWorkItemData();
         }
     }
 }

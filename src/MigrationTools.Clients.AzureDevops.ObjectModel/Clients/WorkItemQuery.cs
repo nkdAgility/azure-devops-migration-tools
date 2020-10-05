@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools.DataContracts;
@@ -22,8 +21,6 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
             Log.Debug("WorkItemQuery: TeamProjectCollection: {QueryTarget}", wiClient.Store.TeamProjectCollection.Uri.ToString());
             Log.Debug("WorkItemQuery: Query: {QueryText}", Query);
             Log.Debug("WorkItemQuery: Paramiters: {@QueryParams}", Parameters);
-            var startTime = DateTime.UtcNow;
-            Stopwatch queryTimer = new Stopwatch();
             foreach (var item in Parameters)
             {
                 Log.Debug("WorkItemQuery: {0}: {1}", item.Key, item.Value);

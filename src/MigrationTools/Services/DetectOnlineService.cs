@@ -35,17 +35,20 @@ namespace MigrationTools.Services
                 {
                     isOnline = true;
                 }
+                mainTimer.Stop();
+                _Telemetry.TrackDependency(new DependencyTelemetry("Ping", "GoogleDNS", "IsOnline", null, startTime, mainTimer.Elapsed, responce, true));
             }
             catch (Exception ex)
             {
+                mainTimer.Stop();
                 // Likley no network is even available
                 Log.Error(ex, "Error checking if we are online.");
                 responce = "error";
                 isOnline = false;
+                _Telemetry.TrackDependency(new DependencyTelemetry("Ping", "GoogleDNS", "IsOnline", null, startTime, mainTimer.Elapsed, responce, false));
             }
             /////////////////
             mainTimer.Stop();
-            _Telemetry.TrackDependency(new DependencyTelemetry("Ping", "GoogleDNS", "IsOnline", null, startTime, mainTimer.Elapsed, responce, true));
             return isOnline;
         }
     }
