@@ -549,7 +549,6 @@ namespace VstsSyncMigrator.Engine
                     {"average", average},
                     {"remaining", remaining}
                 });
-            Trace.Flush();
             Telemetry.TrackEvent("WorkItemMigrated", processWorkItemParamiters, processWorkItemMetrics);
             Telemetry.TrackRequest("ProcessWorkItem", starttime, witstopwatch.Elapsed, "200", true);
 
