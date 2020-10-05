@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Microsoft.ApplicationInsights.DataContracts;
 using MigrationTools.Configuration;
 using MigrationTools.DataContracts;
-using Serilog;
 
 namespace MigrationTools.Clients
 {
@@ -35,29 +33,7 @@ namespace MigrationTools.Clients
                 throw new ArgumentNullException(nameof(migrationClient));
             }
             _migrationClient = migrationClient;
-
-            var startTime = DateTime.UtcNow;
-            var timer = System.Diagnostics.Stopwatch.StartNew();
-            try
-            {
-                InnerConfigure(migrationClient, bypassRules);
-                timer.Stop();
-                Telemetry.TrackDependency(new DependencyTelemetry("TeamService", migrationClient.Config.Collection.ToString(), "GetWorkItemStore", null, startTime, timer.Elapsed, "200", true));
-            }
-            catch (Exception ex)
-            {
-                timer.Stop();
-                Telemetry.TrackDependency(new DependencyTelemetry("TeamService", migrationClient.Config.Collection.ToString(), "GetWorkItemStore", null, startTime, timer.Elapsed, "500", false));
-                Telemetry.TrackException(ex,
-                       new Dictionary<string, string> {
-                            { "CollectionUrl", MigrationClient.Config.Collection.ToString() }
-                       },
-                       new Dictionary<string, double> {
-                            { "Time",timer.ElapsedMilliseconds }
-                       });
-                Log.Error(ex, "Unable to configure store");
-                throw;
-            }
+            InnerConfigure(migrationClient, bypassRules);
         }
 
         protected void AddToCache(int sourceIdKey, WorkItemData workItem)

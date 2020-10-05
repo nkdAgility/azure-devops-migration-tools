@@ -22,48 +22,41 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
             Log.Debug("WorkItemQuery: TeamProjectCollection: {QueryTarget}", wiClient.Store.TeamProjectCollection.Uri.ToString());
             Log.Debug("WorkItemQuery: Query: {QueryText}", Query);
             Log.Debug("WorkItemQuery: Paramiters: {@QueryParams}", Parameters);
-
-            WorkItemCollection wc;
             var startTime = DateTime.UtcNow;
             Stopwatch queryTimer = new Stopwatch();
             foreach (var item in Parameters)
             {
                 Log.Debug("WorkItemQuery: {0}: {1}", item.Key, item.Value);
             }
+            return GetWorkItemsFromQuery(wiClient).ToWorkItemDataList();
+        }
 
-            queryTimer.Start();
+        private WorkItemCollection GetWorkItemsFromQuery(WorkItemMigrationClient wiClient)
+        {
+            var startTime = DateTime.UtcNow;
+            var timer = System.Diagnostics.Stopwatch.StartNew();
+            WorkItemCollection results;
             try
             {
-                Log.Information("WorkItemQuery: Running query...");
-                wc = wiClient.Store.Query(Query); //, parameters);
-                queryTimer.Stop();
-                Telemetry.TrackDependency(new DependencyTelemetry("TeamService", "Query", startTime, queryTimer.Elapsed, true));
-                // Add additional bits to reuse the paramiters dictionary for telemitery
-                Parameters.Add("CollectionUrl", wiClient.Store.TeamProjectCollection.Uri.ToString());
-                Parameters.Add("Query", Query);
-                Telemetry.TrackEvent("QueryComplete",
-                      Parameters,
-                      new Dictionary<string, double> {
-                            { "QueryTime", queryTimer.ElapsedMilliseconds },
-                          { "QueryCount", wc.Count }
-                      });
-                Log.Information("WorkItemQuery: Query found {WorkItemCount} work items in {QueryTimer}ms ", wc.Count, queryTimer.ElapsedMilliseconds);
+                results = wiClient.Store.Query(Query);
+                timer.Stop();
+                Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", MigrationClient.Config.Collection.ToString(), "GetWorkItemsFromQuery", null, startTime, timer.Elapsed, "200", true));
             }
             catch (Exception ex)
             {
-                queryTimer.Stop();
-                Telemetry.TrackDependency(new DependencyTelemetry("TeamService", "Query", startTime, queryTimer.Elapsed, false));
+                timer.Stop();
+                Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", MigrationClient.Config.Collection.ToString(), "GetWorkItemsFromQuery", null, startTime, timer.Elapsed, "500", false));
                 Telemetry.TrackException(ex,
                        new Dictionary<string, string> {
                             { "CollectionUrl", wiClient.Store.TeamProjectCollection.Uri.ToString() }
                        },
                        new Dictionary<string, double> {
-                            { "QueryTime",queryTimer.ElapsedMilliseconds }
+                            { "QueryTime",timer.ElapsedMilliseconds }
                        });
                 Log.Error(ex, " Error running query");
                 throw;
             }
-            return wc.ToWorkItemDataList();
+            return results;
         }
     }
 }
