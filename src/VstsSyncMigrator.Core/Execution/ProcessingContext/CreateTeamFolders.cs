@@ -47,20 +47,20 @@ namespace VstsSyncMigrator.Engine
             {
                 Stopwatch witstopwatch = Stopwatch.StartNew();
 
-                Trace.Write(string.Format("Processing team {0}", team.Name));
+                Log.LogTrace("Processing team {0}", team.Name);
                 Regex r = new Regex(@"^Project - ([a-zA-Z ]*)");
                 string path;
                 if (r.IsMatch(team.Name))
                 {
-                    Trace.Write(string.Format(" is a Project"));
+                    Log.LogInformation("{0} is a Project", team.Name);
                     path = string.Format(@"Projects\{0}", r.Match(team.Name).Groups[1].Value.Replace(" ", "-"));
                 }
                 else
                 {
-                    Trace.Write(string.Format(" is a Team"));
+                    Log.LogInformation("{0} is a Team", team.Name);
                     path = string.Format(@"Teams\{0}", team.Name.Replace(" ", "-"));
                 }
-                Trace.Write(string.Format(" and new path is {0}", path));
+                Log.LogInformation(" and new path is {0}", path);
                 //me.AddFieldMap("*", new RegexFieldMap("KM.Simulation.Team", "System.AreaPath", @"^Project - ([a-zA-Z ]*)", @"Nemo\Projects\$1"));
 
                 string[] bits = path.Split(char.Parse(@"\"));
@@ -76,12 +76,11 @@ namespace VstsSyncMigrator.Engine
                 count++;
                 TimeSpan average = new TimeSpan(0, 0, 0, 0, (int)(elapsedms / count));
                 TimeSpan remaining = new TimeSpan(0, 0, 0, 0, (int)(average.TotalMilliseconds * current));
-                Trace.WriteLine("");
-                //Trace.WriteLine(string.Format("Average time of {0} per work item and {1} estimated to completion", string.Format(@"{0:s\:fff} seconds", average), string.Format(@"{0:%h} hours {0:%m} minutes {0:s\:fff} seconds", remaining)));
+                Log.LogInformation("Average time of {average} per work item and {remaining} estimated to completion", average.ToString("c"), remaining.ToString("c"));
             }
             //////////////////////////////////////////////////
             stopwatch.Stop();
-            Console.WriteLine(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds", stopwatch.Elapsed);
+            Log.LogInformation("DONE in {Elapsed} ", stopwatch.Elapsed.ToString("c"));
         }
 
         private void CreateFolderHyerarchy(string[] toCreate, QueryItem currentItem, int focus = 0)
@@ -93,7 +92,7 @@ namespace VstsSyncMigrator.Engine
                 if (!currentFolder.Contains(toCreate[focus]))
                 {
                     currentFolder.Add(new QueryFolder(toCreate[focus]));
-                    Trace.WriteLine(string.Format("  Created: {0}", toCreate[focus]));
+                    Log.LogInformation("  Created: {0}", toCreate[focus]);
                 }
                 if (toCreate.Length != focus + 1)
                 {
