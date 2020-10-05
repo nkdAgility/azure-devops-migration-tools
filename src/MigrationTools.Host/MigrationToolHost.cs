@@ -4,6 +4,7 @@ using System.IO;
 using System.Threading.Tasks;
 using CommandLine;
 using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.WorkerService;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MigrationTools.CommandLine;
@@ -67,24 +68,18 @@ namespace MigrationTools.Host
                  services.AddOptions();
                  // Sieralog
                  services.AddSingleton<LoggingLevelSwitch>(levelSwitch);
-
                  // Application Insights
+                 services.AddApplicationInsightsTelemetryWorkerService(new ApplicationInsightsServiceOptions { InstrumentationKey = "2d666f84-b3fb-4dcf-9aad-65de038d2772" });
 
-                 Microsoft.ApplicationInsights.WorkerService.ApplicationInsightsServiceOptions aiOptions
-                    = new Microsoft.ApplicationInsights.WorkerService.ApplicationInsightsServiceOptions
-                    {
-                        // Disables adaptive sampling.
-                        InstrumentationKey = "2d666f84-b3fb-4dcf-9aad-65de038d2772"
-                    };
-                 services.AddApplicationInsightsTelemetryWorkerService(aiOptions);
                  // Services
-
                  services.AddTransient<IDetectOnlineService, DetectOnlineService>();
                  services.AddTransient<IDetectVersionService, DetectVersionService>();
                  services.AddSingleton<ITelemetryLogger, TelemetryClientAdapter>();
+
                  // Config
                  services.AddSingleton<IEngineConfigurationBuilder, EngineConfigurationBuilder>();
                  services.AddSingleton<EngineConfiguration, EngineConfigurationWrapper>();
+
                  //Engine
                  services.AddSingleton<FieldMapContainer>();
                  services.AddSingleton<ProcessorContainer>();
@@ -92,9 +87,9 @@ namespace MigrationTools.Host
                  services.AddSingleton<GitRepoMapContainer>();
                  services.AddSingleton<ChangeSetMappingContainer>();
                  services.AddSingleton<IMigrationEngine, MigrationEngine>();
+
                  // Host Services
                  services.AddTransient<IStartupService, StartupService>();
-
                  services.AddHostedService<InitHostedService>();
                  services.AddHostedService<ExecuteHostedService>();
              })

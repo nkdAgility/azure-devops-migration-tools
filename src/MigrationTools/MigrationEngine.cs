@@ -14,18 +14,10 @@ namespace MigrationTools
 {
     public class MigrationEngine : IMigrationEngine
     {
-        private ExecuteOptions executeOptions;
-
         private readonly IServiceProvider _services;
-
-        public ProcessorContainer Processors { get; }
-        public TypeDefinitionMapContainer TypeDefinitionMaps { get; }
-        public GitRepoMapContainer GitRepoMaps { get; }
-        public ChangeSetMappingContainer ChangeSetMapps { get; }
-        public FieldMapContainer FieldMaps { get; }
-        public EngineConfiguration Config { get; }
-
-        public ITelemetryLogger Telemetry { get; }
+        private IMigrationClient _Source;
+        private IMigrationClient _Target;
+        private ExecuteOptions executeOptions;
 
         public MigrationEngine(
             IServiceProvider services,
@@ -38,7 +30,7 @@ namespace MigrationTools
             FieldMapContainer fieldMaps,
             ITelemetryLogger telemetry)
         {
-            Log.Information("Creating Migration Engine {Guid}", telemetry.SessionId);
+            Log.Information("Creating Migration Engine {SessionId}", telemetry.SessionId);
             _services = services;
             FieldMaps = fieldMaps;
             this.executeOptions = executeOptions;
@@ -49,6 +41,31 @@ namespace MigrationTools
             Telemetry = telemetry;
             Config = config;
         }
+
+        public ChangeSetMappingContainer ChangeSetMapps { get; }
+        public EngineConfiguration Config { get; }
+        public FieldMapContainer FieldMaps { get; }
+        public GitRepoMapContainer GitRepoMaps { get; }
+        public ProcessorContainer Processors { get; }
+
+        public IMigrationClient Source
+        {
+            get
+            {
+                return GetSource();
+            }
+        }
+
+        public IMigrationClient Target
+        {
+            get
+            {
+                return GetTarget();
+            }
+        }
+
+        public ITelemetryLogger Telemetry { get; }
+        public TypeDefinitionMapContainer TypeDefinitionMaps { get; }
 
         public (NetworkCredential source, NetworkCredential target) CheckForNetworkCredentials()
         {
@@ -61,54 +78,6 @@ namespace MigrationTools
                 targetCredentials = new NetworkCredential(executeOptions.TargetUserName, executeOptions.TargetPassword, executeOptions.TargetDomain);
 
             return (sourceCredentials, targetCredentials);
-        }
-
-        private IMigrationClient _Source;
-
-        public IMigrationClient Source
-        {
-            get
-            {
-                return GetSource();
-            }
-        }
-
-        private IMigrationClient GetSource()
-        {
-            if (_Source is null)
-            {
-                var credentials = CheckForNetworkCredentials();
-                if (Config.Source != null)
-                {
-                    _Source = _services.GetRequiredService<IMigrationClient>();
-                    _Source.Configure(Config.Source, credentials.source);
-                }
-            }
-            return _Source;
-        }
-
-        private IMigrationClient _Target;
-
-        public IMigrationClient Target
-        {
-            get
-            {
-                return GetTarget();
-            }
-        }
-
-        private IMigrationClient GetTarget()
-        {
-            if (_Target is null)
-            {
-                var credentials = CheckForNetworkCredentials();
-                if (Config.Target != null)
-                {
-                    _Target = _services.GetRequiredService<IMigrationClient>();
-                    _Target.Configure(Config.Target, credentials.target);
-                }
-            }
-            return _Target;
         }
 
         public ProcessingStatus Run()
@@ -164,6 +133,34 @@ namespace MigrationTools
                     { "EngineTime", engineTimer.ElapsedMilliseconds }
                 });
             return ps;
+        }
+
+        private IMigrationClient GetSource()
+        {
+            if (_Source is null)
+            {
+                var credentials = CheckForNetworkCredentials();
+                if (Config.Source != null)
+                {
+                    _Source = _services.GetRequiredService<IMigrationClient>();
+                    _Source.Configure(Config.Source, credentials.source);
+                }
+            }
+            return _Source;
+        }
+
+        private IMigrationClient GetTarget()
+        {
+            if (_Target is null)
+            {
+                var credentials = CheckForNetworkCredentials();
+                if (Config.Target != null)
+                {
+                    _Target = _services.GetRequiredService<IMigrationClient>();
+                    _Target.Configure(Config.Target, credentials.target);
+                }
+            }
+            return _Target;
         }
     }
 }
