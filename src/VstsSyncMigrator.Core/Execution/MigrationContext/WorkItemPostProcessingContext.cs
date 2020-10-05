@@ -49,7 +49,7 @@ namespace VstsSyncMigrator.Engine
             Log.LogInformation("Migrate {0} work items?", sourceWIS.Count);
             //////////////////////////////////////////////////
             ProjectData destProject = Engine.Target.WorkItems.GetProject();
-            Trace.WriteLine(string.Format("Found target project as {0}", destProject.Name));
+            Log.LogInformation("Found target project as {0}", destProject.Name);
 
             int current = sourceWIS.Count;
             int count = 0;
