@@ -40,12 +40,12 @@ namespace VstsSyncMigrator.Commands
                 foreach (CatalogNode sourceTeamProject in sourceTeamProjects)
                 {
                     logger.LogInformation("---------------{0}\\{1}", current, sourceTeamProjects.Count());
-                    logger.LogInformation("{0}, {1}", sourceTeamProject.Resource.DisplayName, sourceTeamProject.Resource.Identifier));
+                    logger.LogInformation("{0}, {1}", sourceTeamProject.Resource.DisplayName, sourceTeamProject.Resource.Identifier);
                     string projectUri = sourceTeamProject.Resource.Properties["ProjectUri"];
                     TeamFoundationIdentity[] appGroups = sourceIMS2.ListApplicationGroups(projectUri, ReadIdentityOptions.None);
                     foreach (TeamFoundationIdentity appGroup in appGroups.Where(x => !x.DisplayName.EndsWith("\\Project Valid Users")))
                     {
-                        logger.LogInformation("    {0}", appGroup.DisplayName));
+                        logger.LogInformation("    {0}", appGroup.DisplayName);
                         TeamFoundationIdentity sourceAppGroup = sourceIMS2.ReadIdentity(appGroup.Descriptor, MembershipQuery.Expanded, ReadIdentityOptions.None);
                         foreach (IdentityDescriptor child in sourceAppGroup.Members.Where(x => x.IdentityType == "Microsoft.TeamFoundation.Identity"))
                         {
@@ -53,7 +53,7 @@ namespace VstsSyncMigrator.Commands
 
                             if ((string)sourceChildIdentity.GetProperty("SpecialType") == "AzureActiveDirectoryApplicationGroup")
                             {
-                                logger.LogInformation("     Suspected AD Group {0}", sourceChildIdentity.DisplayName));
+                                logger.LogInformation("     Suspected AD Group {0}", sourceChildIdentity.DisplayName);
                                 csv.WriteRecord<AzureAdGroupItem>(new AzureAdGroupItem
                                 {
                                     TeamProject = sourceTeamProject.Resource.DisplayName,

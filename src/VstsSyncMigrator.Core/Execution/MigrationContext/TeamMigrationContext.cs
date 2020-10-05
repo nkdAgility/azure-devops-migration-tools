@@ -83,11 +83,11 @@ namespace VstsSyncMigrator.Engine
                             var targetConfig = targetConfigurations.FirstOrDefault(t => t.TeamName == sourceConfig.TeamName);
                             if (targetConfig == null)
                             {
-                                Log.LogDebug("-> Settings for team '{0}'.. not found", sourceTeam.Name);
+                                Log.LogDebug("-> Settings for team '{sourceTeamName}'.. not found", sourceTeam.Name);
                                 continue;
                             }
 
-                            Log.LogInformation("-> Settings found for team '{0}'..", sourceTeam.Name));
+                            Log.LogInformation("-> Settings found for team '{sourceTeamName}'..", sourceTeam.Name);
                             if (_config.PrefixProjectToNodes)
                             {
                                 targetConfig.TeamSettings.BacklogIterationPath =

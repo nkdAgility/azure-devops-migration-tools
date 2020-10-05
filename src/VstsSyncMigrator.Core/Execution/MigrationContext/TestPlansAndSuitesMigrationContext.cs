@@ -93,7 +93,7 @@ namespace VstsSyncMigrator.Engine
             _currentPlan = 0;
             _totalPlans = 0;
             stopwatch.Stop();
-            Log.LogInformation(@"TestPlandsAndSuitesMigrationContext:  DONE in {Elapsed}", stopwatch.Elapsed.ToString("c"));
+            Log.LogInformation("TestPlandsAndSuitesMigrationContext:  DONE in {Elapsed}", stopwatch.Elapsed.ToString("c"));
         }
 
         private void AddChildTestCases(ITestSuiteBase source, ITestSuiteBase target, ITestPlan targetPlan)
