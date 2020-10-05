@@ -19,7 +19,7 @@ namespace MigrationTools.Engine.Containers
         {
             if (Config.GitRepoMapping != null)
             {
-                _GitRepoMaps = Config.GitRepoMapping;
+                _GitRepoMaps = Config.GitRepoMapping ?? new Dictionary<string, string>();
             }
         }
     }
