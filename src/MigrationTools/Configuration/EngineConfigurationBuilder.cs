@@ -35,7 +35,7 @@ namespace MigrationTools.Configuration
             //var settings = new EngineConfiguration();
             //configuration.Bind(settings);
             //#if !DEBUG
-            string appVersion = Assembly.GetEntryAssembly().GetName().Version.ToString(2);
+            string appVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString(2);
             if (ec.Version != appVersion)
             {
                 _logger.LogError("The config version {Version} does not match the current app version {appVersion}. There may be compatability issues and we recommend that you generate a new default config and then tranfer the settings accross.", ec.Version, appVersion);
@@ -80,7 +80,7 @@ namespace MigrationTools.Configuration
             EngineConfiguration ec = new EngineConfiguration
             {
                 LogLevel = LogEventLevel.Information,
-                Version = Assembly.GetEntryAssembly().GetName().Version.ToString(2),
+                Version = Assembly.GetExecutingAssembly().GetName().Version.ToString(2),
                 Source = new TeamProjectConfig()
                 {
                     Project = "migrationSource1",
