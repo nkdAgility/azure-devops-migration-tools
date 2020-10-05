@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using CommandLine;
@@ -27,11 +26,6 @@ namespace MigrationTools.Host
             var hostBuilder = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args)
              .UseSerilog((hostingContext, services, loggerConfiguration) =>
              {
-                 /////////////////////////////////////////////////////////
-                 Trace.Listeners.Add(new TextWriterTraceListener(Console.Out)); // TODO: Remove once Trace replaced with log
-                 var oldlogPath = Path.Combine(CreateLogsPath(), "old-migration.log"); // TODO: Remove once Trace replaced with log
-                 Trace.Listeners.Add(new TextWriterTraceListener(oldlogPath, "myListener")); // TODO: Remove once Trace replaced with log
-                                                                                             ///////////////////////////////////////////////////////////////////////////
                  string logsPath = CreateLogsPath();
                  var logPath = Path.Combine(logsPath, "migration.log");
                  loggerConfiguration
