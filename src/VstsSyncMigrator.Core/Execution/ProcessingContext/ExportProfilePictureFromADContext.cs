@@ -5,6 +5,7 @@ using System.DirectoryServices.ActiveDirectory;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.Framework.Client;
 using Microsoft.TeamFoundation.Framework.Common;
@@ -43,7 +44,7 @@ namespace VstsSyncMigrator.Engine
             Stopwatch stopwatch = Stopwatch.StartNew();
             //////////////////////////////////////////////////
             string exportPath;
-            string assPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string assPath = Assembly.GetEntryAssembly().Location;
             exportPath = Path.Combine(Path.GetDirectoryName(assPath), "export-pic");
             if (!Directory.Exists(exportPath))
             {

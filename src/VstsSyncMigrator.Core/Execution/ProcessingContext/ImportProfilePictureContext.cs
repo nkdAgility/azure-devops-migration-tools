@@ -152,7 +152,7 @@ namespace VstsSyncMigrator.Engine
             Stopwatch stopwatch = Stopwatch.StartNew();
             //////////////////////////////////////////////////
             string exportPath;
-            string assPath = @"C:\Users\martinh\Downloads\mugshots\mugshots"; //System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string assPath = @"C:\Users\martinh\Downloads\mugshots\mugshots"; //System.Reflection.Assembly.GetEntryAssembly().Location;
                                                                               // exportPath = Path.Combine(Path.GetDirectoryName(assPath), "export-pic");
             exportPath = assPath;
             if (!Directory.Exists(exportPath))
