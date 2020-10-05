@@ -93,8 +93,6 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
         {
             var startTime = DateTime.UtcNow;
             var timer = System.Diagnostics.Stopwatch.StartNew();
-            Log.Debug("MigrationClient: Connected to {CollectionUrl} ", _collection.Uri.ToString());
-            Log.Debug("MigrationClient: validating security for {@AuthorizedIdentity} ", _collection.AuthorizedIdentity);
             TfsTeamProjectCollection y;
             try
             {
@@ -106,7 +104,9 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
                 {
                     y = new TfsTeamProjectCollection(Config.Collection, new VssCredentials(new Microsoft.VisualStudio.Services.Common.WindowsCredential(credentials)));
                 }
-                _collection.EnsureAuthenticated();
+                Log.Debug("MigrationClient: Connectng to {CollectionUrl} ", Config.Collection.ToString());
+                Log.Debug("MigrationClient: validating security for {@AuthorizedIdentity} ", y.AuthorizedIdentity);
+                y.EnsureAuthenticated();
                 timer.Stop();
                 Log.Information("MigrationClient: Access granted ");
                 _Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", Config.Collection.ToString(), "GetWorkItem", null, startTime, timer.Elapsed, "200", true));
