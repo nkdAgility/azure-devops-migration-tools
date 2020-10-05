@@ -45,19 +45,19 @@ namespace VstsSyncMigrator.Engine
 
                 foreach (TeamFoundationTeam team in allTeams)
                 {
-                    Trace.WriteLine(string.Format("Team name: {0}", team.Name), p.Name);
-                    Trace.WriteLine(string.Format("Team ID: {0}", team.Identity.TeamFoundationId.ToString()), p.Name);
-                    Trace.WriteLine(string.Format("Description: {0}", team.Description), p.Name);
+                    Log.LogInformation("Team name: {0}", team.Name);
+                    Log.LogInformation("Team ID: {0}", team.Identity.TeamFoundationId.ToString());
+                    Log.LogInformation("Description: {0}", team.Description, p.Name);
                     var members = team.GetMembers(connection, MembershipQuery.Direct);
-                    Trace.WriteLine(string.Format("Team Accounts: {0}", String.Join(";", (from member in team.GetMembers(connection, MembershipQuery.Direct) select member.UniqueName))), p.Name);
-                    Trace.WriteLine(string.Format("Team names: {0}", String.Join(";", (from member in team.GetMembers(connection, MembershipQuery.Direct) select member.DisplayName))), p.Name);
+                    Log.LogInformation("Team Accounts: {0}", String.Join(";", (from member in team.GetMembers(connection, MembershipQuery.Direct) select member.UniqueName)));
+                    Log.LogInformation("Team names: {0}", String.Join(";", (from member in team.GetMembers(connection, MembershipQuery.Direct) select member.DisplayName)));
                 }
             }
 
             //////////////////////////////////////////////////
             stopwatch.Stop();
 
-            Console.WriteLine(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds", stopwatch.Elapsed);
+            Log.LogInformation("DONE in {Elapsed} ", stopwatch.Elapsed.ToString("c"));
         }
     }
 }
