@@ -38,7 +38,7 @@ namespace VstsSyncMigrator.Engine
             QueryHierarchy qh = ((WorkItemMigrationClient)Engine.Target.WorkItems).Store.Projects[Engine.Target.Config.Project].QueryHierarchy;
             List<TeamFoundationTeam> teamList = teamService.QueryTeams(Engine.Target.Config.Project).ToList();
 
-            Trace.WriteLine(string.Format("Found {0} teams?", teamList.Count));
+            Log.LogInformation("Found {0} teams?", teamList.Count);
             //////////////////////////////////////////////////
             int current = teamList.Count;
             int count = 0;
