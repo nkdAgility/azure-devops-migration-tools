@@ -46,7 +46,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
 
         public string GetNewNodeName(string sourceNodeName, NodeStructureType nodeStructureType)
         {
-            Log.LogDebug("   GetNewNodeName({sourceNodeName}, {nodeStructureType})", sourceNodeName, nodeStructureType);
+            Log.LogDebug("NodeStructureEnricher.GetNewNodeName({sourceNodeName}, {nodeStructureType})", sourceNodeName, nodeStructureType.ToString());
             string targetStructureName = NodeStructureTypeToLanguageSpecificName(Engine.Target, nodeStructureType);
             string targetProjectName = Engine.Target.Config.Project;
             string sourceStructureName = NodeStructureTypeToLanguageSpecificName(Engine.Source, nodeStructureType);
@@ -95,7 +95,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
 
         public void MigrateAllNodeStructures(bool prefixProjectToNodes, string[] nodeBasePaths)
         {
-            Log.LogInformation("Running MigrateAllNodeStructures from NodeStructureEnricher");
+            Log.LogDebug("NodeStructureEnricher.MigrateAllNodeStructures({prefixProjectToNodes}, {nodeBasePaths})", prefixProjectToNodes, nodeBasePaths);
             _prefixProjectToNodes = prefixProjectToNodes;
             _nodeBasePaths = nodeBasePaths;
             //////////////////////////////////////////////////
