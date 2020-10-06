@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Xml;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.Server;
@@ -8,8 +10,15 @@ using MigrationTools.Enrichers;
 
 namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
 {
+    public enum NodeStructureType
+    {
+        Area,
+        Iteration
+    }
+
     public class NodeStructureEnricher : WorkItemEnricher
     {
+        private Dictionary<string, bool> _foundNodes = new Dictionary<string, bool>();
         private string[] _nodeBasePaths;
         private bool _prefixProjectToNodes = false;
         private ICommonStructureService _sourceCommonStructureService;
@@ -35,8 +44,55 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             return 0;
         }
 
+        public string GetNewNodeName(string sourceNodeName, NodeStructureType nodeStructureType)
+        {
+            Log.LogDebug("NodeStructureEnricher.GetNewNodeName({sourceNodeName}, {nodeStructureType})", sourceNodeName, nodeStructureType.ToString());
+            string targetStructureName = NodeStructureTypeToLanguageSpecificName(Engine.Target, nodeStructureType);
+            string targetProjectName = Engine.Target.Config.Project;
+            string sourceStructureName = NodeStructureTypeToLanguageSpecificName(Engine.Source, nodeStructureType);
+            string sourceProjectName = Engine.Source.Config.Project;
+
+            // Replace project name with new name (if necessary) and inject nodePath (Area or Iteration) into path for node validation
+            string newNodeName;
+            if (_prefixProjectToNodes)
+            {
+                newNodeName = $@"{targetProjectName}\{targetStructureName}\{sourceNodeName}";
+            }
+            else
+            {
+                var regex = new Regex(Regex.Escape(sourceProjectName));
+                if (sourceNodeName.StartsWith($@"{sourceProjectName}\{sourceStructureName}\"))
+                {
+                    newNodeName = regex.Replace(sourceNodeName, targetProjectName, 1);
+                }
+                else
+                {
+                    newNodeName = regex.Replace(sourceNodeName, $@"{targetProjectName}\{targetStructureName}", 1);
+                }
+            }
+
+            // Validate the node exists
+            if (!TargetNodeExists(newNodeName))
+            {
+                Log.LogWarning("The Node '{newNodeName}' does not exist, leaving as '{newProjectName}'. This may be because it has been renamed or moved and no longer exists, or that you have not migrateed the Node Structure yet.", newNodeName, targetProjectName);
+                newNodeName = targetProjectName;
+            }
+
+            // Remove nodePath (Area or Iteration) from path for correct population in work item
+            if (newNodeName.StartsWith(targetProjectName + '\\' + targetStructureName + '\\'))
+            {
+                newNodeName = newNodeName.Remove(newNodeName.IndexOf($@"{targetStructureName}\"), $@"{targetStructureName}\".Length);
+            }
+            else if (newNodeName.StartsWith(targetProjectName + '\\' + targetStructureName))
+            {
+                newNodeName = newNodeName.Remove(newNodeName.IndexOf($@"{targetStructureName}"), $@"{targetStructureName}".Length);
+            }
+            return newNodeName;
+        }
+
         public void MigrateAllNodeStructures(bool prefixProjectToNodes, string[] nodeBasePaths)
         {
+            Log.LogDebug("NodeStructureEnricher.MigrateAllNodeStructures({prefixProjectToNodes}, {nodeBasePaths})", prefixProjectToNodes, nodeBasePaths);
             _prefixProjectToNodes = prefixProjectToNodes;
             _nodeBasePaths = nodeBasePaths;
             //////////////////////////////////////////////////
@@ -46,71 +102,77 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             //////////////////////////////////////////////////
         }
 
-        private NodeInfo CreateNode(string name, NodeInfo parent)
+        public string NodeStructureTypeToLanguageSpecificName(IMigrationClient client, NodeStructureType value)
         {
-            string nodePath = string.Format(@"{0}\{1}", parent.Path, name);
-            NodeInfo node = null;
+            // insert switch statement here
+            switch (value)
+            {
+                case NodeStructureType.Area:
+                    return client.Config.LanguageMaps.AreaPath;
 
-            Log.LogDebug("--CreateNode: {0}", nodePath);
-            try
-            {
-                node = _targetCommonStructureService.GetNodeFromPath(nodePath);
-                Log.LogDebug("...found");
+                case NodeStructureType.Iteration:
+                    return client.Config.LanguageMaps.IterationPath;
+
+                default:
+                    throw new InvalidOperationException("Not a valid NodeStructureType ");
             }
-            catch (CommonStructureSubsystemException ex)
+        }
+
+        public bool TargetNodeExists(string nodePath)
+        {
+            if (!_foundNodes.ContainsKey(nodePath))
             {
+                NodeInfo node = null;
                 try
                 {
-                    string newPathUri = _targetCommonStructureService.CreateNode(name, parent.Uri);
-                    Log.LogDebug("...created");
-                    node = _targetCommonStructureService.GetNode(newPathUri);
+                    node = _targetCommonStructureService.GetNodeFromPath(nodePath);
+                    _foundNodes.Add(nodePath, true);
                 }
                 catch
                 {
-                    Log.LogError(ex, "Creating Node");
-                    Log.LogDebug("...missing");
-                    throw;
+                    _foundNodes.Add(nodePath, false);
                 }
             }
-            return node;
+            return _foundNodes[nodePath];
         }
 
         private NodeInfo CreateNode(string name, NodeInfo parent, DateTime? startDate, DateTime? finishDate)
         {
             string nodePath = string.Format(@"{0}\{1}", parent.Path, name);
             NodeInfo node = null;
-            Log.LogDebug("--CreateNode: {0}, start date: {1}, finish date: {2}", nodePath, startDate, finishDate);
+            Log.LogInformation(" Processing Node: {0}, start date: {1}, finish date: {2}", nodePath, startDate, finishDate);
             try
             {
                 node = _targetCommonStructureService.GetNodeFromPath(nodePath);
-                Log.LogDebug("...found");
+                Log.LogDebug("  Node {node} already exists", nodePath);
+                Log.LogTrace("{node}", node);
             }
             catch (CommonStructureSubsystemException ex)
             {
                 try
                 {
                     string newPathUri = _targetCommonStructureService.CreateNode(name, parent.Uri);
-                    Log.LogDebug("...created");
+                    Log.LogDebug("  Node {newPathUri} has been created", newPathUri);
                     node = _targetCommonStructureService.GetNode(newPathUri);
                 }
                 catch
                 {
-                    Log.LogWarning(ex, "Missing ");
+                    Log.LogError(ex, "Creating Node");
                     throw;
                 }
             }
-
-            try
+            if (startDate != null && finishDate != null)
             {
-                ((ICommonStructureService4)_targetCommonStructureService).SetIterationDates(node.Uri, startDate, finishDate);
-                Log.LogDebug("...dates assigned");
+                try
+                {
+                    ((ICommonStructureService4)_targetCommonStructureService).SetIterationDates(node.Uri, startDate, finishDate);
+                    Log.LogDebug("  Node {node} has been assigned {startDate} / {finishDate}", nodePath, startDate, finishDate);
+                }
+                catch (CommonStructureSubsystemException ex)
+                {
+                    Log.LogWarning(ex, " Unable to set {node}dates of {startDate} / {finishDate}", nodePath, startDate, finishDate);
+                }
             }
-            catch (CommonStructureSubsystemException ex)
-            {
-                Log.LogWarning(ex, "Dates not set ");
-            }
-
-            Log.LogDebug(String.Empty);
             return node;
         }
 
@@ -143,7 +205,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                 }
                 else
                 {
-                    targetNode = CreateNode(newNodeName, parentPath);
+                    targetNode = CreateNode(newNodeName, parentPath, null, null);
                 }
                 if (item.HasChildNodes)
                 {
@@ -154,6 +216,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
 
         private void ProcessCommonStructure(string treeTypeSource, string treeTypeTarget)
         {
+            Log.LogDebug("NodeStructureEnricher.ProcessCommonStructure({treeTypeSource}, {treeTypeTarget})", treeTypeSource, treeTypeTarget);
             NodeInfo sourceNode = (from n in _sourceRootNodes where n.Path.Contains(treeTypeSource) select n).Single();
             if (sourceNode == null) // May run into language problems!!! This is to try and detect that
             {
@@ -175,7 +238,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             }
             if (_prefixProjectToNodes)
             {
-                structureParent = CreateNode(Engine.Source.Config.Project, structureParent);
+                structureParent = CreateNode(Engine.Source.Config.Project, structureParent, null, null);
             }
             if (sourceTree.ChildNodes[0].HasChildNodes)
             {
@@ -215,7 +278,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
 
                 if (!_nodeBasePaths.Any(p => path.StartsWith(p, StringComparison.InvariantCultureIgnoreCase)))
                 {
-                    Log.LogDebug("--IgnoreNode: {0}", nodePath);
+                    Log.LogWarning("The node {nodePath} is being excluded due to your basePath setting. ", nodePath);
                     return false;
                 }
             }
