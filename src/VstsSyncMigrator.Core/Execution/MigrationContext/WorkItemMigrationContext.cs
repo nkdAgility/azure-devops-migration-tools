@@ -93,6 +93,7 @@ namespace VstsSyncMigrator.Engine
             ConfigValidation();
             PopulateIgnoreList();
 
+            Log.LogInformation("Migrating all Nodes before the work item run.");
             nodeStructureEnricher.MigrateAllNodeStructures(_config.PrefixProjectToNodes, _config.NodeBasePaths);
 
             var stopwatch = Stopwatch.StartNew();
