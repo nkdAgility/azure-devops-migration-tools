@@ -81,16 +81,13 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             // Remove nodePath (Area or Iteration) from path for correct population in work item
             if (newNodeName.StartsWith(targetProjectName + '\\' + targetStructureName + '\\'))
             {
-                return newNodeName.Remove(newNodeName.IndexOf($@"{targetStructureName}\"), $@"{targetStructureName}\".Length);
+                newNodeName = newNodeName.Remove(newNodeName.IndexOf($@"{targetStructureName}\"), $@"{targetStructureName}\".Length);
             }
             else if (newNodeName.StartsWith(targetProjectName + '\\' + targetStructureName))
             {
-                return newNodeName.Remove(newNodeName.IndexOf($@"{targetStructureName}"), $@"{targetStructureName}".Length);
+                newNodeName = newNodeName.Remove(newNodeName.IndexOf($@"{targetStructureName}"), $@"{targetStructureName}".Length);
             }
-            else
-            {
-                return newNodeName;
-            }
+            return newNodeName;
         }
 
         public void MigrateAllNodeStructures(bool prefixProjectToNodes, string[] nodeBasePaths)
