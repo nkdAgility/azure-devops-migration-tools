@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Xml;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.Server;
@@ -8,8 +10,15 @@ using MigrationTools.Enrichers;
 
 namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
 {
+    public enum NodeStructureType
+    {
+        Area,
+        Iteration
+    }
+
     public class NodeStructureEnricher : WorkItemEnricher
     {
+        private Dictionary<string, bool> _foundNodes = new Dictionary<string, bool>();
         private string[] _nodeBasePaths;
         private bool _prefixProjectToNodes = false;
         private ICommonStructureService _sourceCommonStructureService;
@@ -35,6 +44,54 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             return 0;
         }
 
+        public string GetNewNodeName(string sourceNodeName, NodeStructureType nodeStructureType)
+        {
+            string targetStructureName = NodeStructureTypeToLanguageSpecificName(Engine.Target, nodeStructureType);
+            string targetProjectName = Engine.Target.Config.Project;
+            string sourceStructureName = NodeStructureTypeToLanguageSpecificName(Engine.Source, nodeStructureType);
+            string sourceProjectName = Engine.Source.Config.Project;
+
+            // Replace project name with new name (if necessary) and inject nodePath (Area or Iteration) into path for node validation
+            string newNodeName = "";
+            if (_prefixProjectToNodes)
+            {
+                newNodeName = $@"{targetProjectName}\{targetStructureName}\{sourceNodeName}";
+            }
+            else
+            {
+                var regex = new Regex(Regex.Escape(sourceProjectName));
+                if (sourceNodeName.StartsWith($@"{sourceProjectName}\{sourceStructureName}\"))
+                {
+                    newNodeName = regex.Replace(sourceNodeName, targetProjectName, 1);
+                }
+                else
+                {
+                    newNodeName = regex.Replace(sourceNodeName, $@"{targetProjectName}\{targetStructureName}", 1);
+                }
+            }
+
+            // Validate the node exists
+            if (!TargetNodeExists(newNodeName))
+            {
+                Log.LogWarning("The Node '{newNodeName}' does not exist, leaving as '{newProjectName}'. This may be because it has been renamed or moved and no longer exists, or that you have not migrateed the Node Structure yet.", newNodeName, targetProjectName);
+                newNodeName = targetProjectName;
+            }
+
+            // Remove nodePath (Area or Iteration) from path for correct population in work item
+            if (newNodeName.StartsWith(targetProjectName + '\\' + targetStructureName + '\\'))
+            {
+                return newNodeName.Remove(newNodeName.IndexOf($@"{targetStructureName}\"), $@"{targetStructureName}\".Length);
+            }
+            else if (newNodeName.StartsWith(targetProjectName + '\\' + targetStructureName))
+            {
+                return newNodeName.Remove(newNodeName.IndexOf($@"{targetStructureName}"), $@"{targetStructureName}".Length);
+            }
+            else
+            {
+                return newNodeName;
+            }
+        }
+
         public void MigrateAllNodeStructures(bool prefixProjectToNodes, string[] nodeBasePaths)
         {
             _prefixProjectToNodes = prefixProjectToNodes;
@@ -44,6 +101,40 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             //////////////////////////////////////////////////
             ProcessCommonStructure(Engine.Source.Config.LanguageMaps.IterationPath, Engine.Target.Config.LanguageMaps.IterationPath);
             //////////////////////////////////////////////////
+        }
+
+        public string NodeStructureTypeToLanguageSpecificName(IMigrationClient client, NodeStructureType value)
+        {
+            // insert switch statement here
+            switch (value)
+            {
+                case NodeStructureType.Area:
+                    return client.Config.LanguageMaps.AreaPath;
+
+                case NodeStructureType.Iteration:
+                    return client.Config.LanguageMaps.IterationPath;
+
+                default:
+                    throw new InvalidOperationException("Not a valid NodeStructureType ");
+            }
+        }
+
+        public bool TargetNodeExists(string nodePath)
+        {
+            if (!_foundNodes.ContainsKey(nodePath))
+            {
+                NodeInfo node = null;
+                try
+                {
+                    node = _targetCommonStructureService.GetNodeFromPath(nodePath);
+                    _foundNodes.Add(nodePath, true);
+                }
+                catch
+                {
+                    _foundNodes.Add(nodePath, false);
+                }
+            }
+            return _foundNodes[nodePath];
         }
 
         private NodeInfo CreateNode(string name, NodeInfo parent)

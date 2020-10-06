@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.Framework.Client;
@@ -330,23 +328,6 @@ namespace VstsSyncMigrator.Engine
             }
 
             Engine.FieldMaps.ApplyFieldMappings(sourceWI, targetWI);
-
-            //validate if save operation will work and report issues if found
-            ArrayList validationIssues = targetWI.ToWorkItem().Validate();
-
-            if (validationIssues.Count > 0)
-            {
-                StringBuilder sb = new StringBuilder();
-                sb.AppendLine("error(s) during validation in work item fields before saving:");
-
-                foreach (Microsoft.TeamFoundation.WorkItemTracking.Client.Field issue in validationIssues)
-                {
-                    sb.AppendLine(issue.ReferenceName + " - value = " + issue.Value);
-                }
-
-                throw new Exception(sb.ToString());
-            }
-
             targetWI.SaveToAzureDevOps();
         }
 

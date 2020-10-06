@@ -6,11 +6,9 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
-using System.Text.RegularExpressions;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.TeamFoundation.Server;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Proxy;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
@@ -32,38 +30,6 @@ using ILogger = Serilog.ILogger;
 
 namespace VstsSyncMigrator.Engine
 {
-    public class NodeDetecomatic
-    {
-        private ICommonStructureService _commonStructure;
-        private List<string> _foundNodes = new List<string>();
-
-        public NodeDetecomatic(WorkItemStore store)
-        {
-            if (_commonStructure == null)
-            {
-                _commonStructure = (ICommonStructureService4)store.TeamProjectCollection.GetService(typeof(ICommonStructureService4));
-            }
-        }
-
-        public bool NodeExists(string nodePath)
-        {
-            if (!_foundNodes.Contains(nodePath))
-            {
-                NodeInfo node = null;
-                try
-                {
-                    node = _commonStructure.GetNodeFromPath(nodePath);
-                }
-                catch
-                {
-                    return false;
-                }
-                _foundNodes.Add(nodePath);
-            }
-            return true;
-        }
-    }
-
     public class WorkItemMigrationContext : MigrationProcessorBase
     {
         private static int _count = 0;
@@ -73,7 +39,6 @@ namespace VstsSyncMigrator.Engine
         private static string workItemLogTeamplate = "[{sourceWorkItemTypeName,20}][Complete:{currentWorkItem,6}/{totalWorkItems}][sid:{sourceWorkItemId,6}|Rev:{sourceRevisionInt,3}][tid:{targetWorkItemId,6} | ";
         private WorkItemMigrationConfig _config;
         private List<String> _ignore;
-        private NodeDetecomatic _nodeOMatic;
         private WorkItemTrackingHttpClient _witClient;
         private IAttachmentMigrationEnricher attachmentEnricher;
         private ILogger contextLog;
@@ -293,54 +258,6 @@ namespace VstsSyncMigrator.Engine
             return sourceWorkItems;
         }
 
-        private string GetNewNodeName(string oldNodeName, string oldProjectName, string newProjectName, WorkItemStore newStore, string nodePath)
-        {
-            if (_nodeOMatic == null)
-            {
-                _nodeOMatic = new NodeDetecomatic(newStore);
-            }
-
-            // Replace project name with new name (if necessary) and inject nodePath (Area or Iteration) into path for node validation
-            string newNodeName = "";
-            if (_config.PrefixProjectToNodes)
-            {
-                newNodeName = $@"{newProjectName}\{nodePath}\{oldNodeName}";
-            }
-            else
-            {
-                var regex = new Regex(Regex.Escape(oldProjectName));
-                if (oldNodeName.StartsWith($@"{oldProjectName}\{nodePath}\"))
-                {
-                    newNodeName = regex.Replace(oldNodeName, newProjectName, 1);
-                }
-                else
-                {
-                    newNodeName = regex.Replace(oldNodeName, $@"{newProjectName}\{nodePath}", 1);
-                }
-            }
-
-            // Validate the node exists
-            if (!_nodeOMatic.NodeExists(newNodeName))
-            {
-                contextLog.Warning("The Node '{newNodeName}' does not exist, leaving as '{newProjectName}'. This may be because it has been renamed or moved and no longer exists, or that you have not migrateed the Node Structure yet.", newNodeName, newProjectName);
-                newNodeName = newProjectName;
-            }
-
-            // Remove nodePath (Area or Iteration) from path for correct population in work item
-            if (newNodeName.StartsWith(newProjectName + '\\' + nodePath + '\\'))
-            {
-                return newNodeName.Remove(newNodeName.IndexOf($@"{nodePath}\"), $@"{nodePath}\".Length);
-            }
-            else if (newNodeName.StartsWith(newProjectName + '\\' + nodePath))
-            {
-                return newNodeName.Remove(newNodeName.IndexOf($@"{nodePath}"), $@"{nodePath}".Length);
-            }
-            else
-            {
-                return newNodeName;
-            }
-        }
-
         private void PopulateIgnoreList()
         {
             _ignore = new List<string>
@@ -396,8 +313,8 @@ namespace VstsSyncMigrator.Engine
                 }
             }
 
-            newWorkItem.AreaPath = GetNewNodeName(oldWorkItem.AreaPath, oldWorkItem.Project.Name, newWorkItem.Project.Name, newWorkItem.Store, "Area");
-            newWorkItem.IterationPath = GetNewNodeName(oldWorkItem.IterationPath, oldWorkItem.Project.Name, newWorkItem.Project.Name, newWorkItem.Store, "Iteration");
+            newWorkItem.AreaPath = nodeStructureEnricher.GetNewNodeName(oldWorkItem.AreaPath, NodeStructureType.Area);
+            newWorkItem.IterationPath = nodeStructureEnricher.GetNewNodeName(oldWorkItem.IterationPath, NodeStructureType.Iteration);
             switch (destType)
             {
                 case "Test Case":
