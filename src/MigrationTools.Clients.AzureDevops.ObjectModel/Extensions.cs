@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools.DataContracts;
+using Serilog;
 
 namespace MigrationTools.Clients.AzureDevops.ObjectModel
 {
@@ -25,9 +26,31 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel
         public static void SaveToAzureDevOps(this WorkItemData context)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
-            var wi = (WorkItem)context.internalObject;
-            wi.Fields["System.ChangedBy"].Value = "Migration";
-            wi.Save();
+            var workItem = (WorkItem)context.internalObject;
+            var fails = workItem.Validate();
+            if (fails.Count > 0)
+            {
+                Log.Warning("Work Item is not ready to save as it has some invalid fields. This may not result in an error. Enable LogLevel as 'Debug' in the ocnfig to see more.");
+            }
+            Log.Debug("--------------------------------------------------------------------------------------------------------------------");
+            Log.Debug("--------------------------------------------------------------------------------------------------------------------");
+            foreach (Field f in fails)
+            {
+                Log.Debug("   Invalid Field: [Id:{CurrentRevisionWorkItemId}/{CurrentRevisionWorkItemRev}][Type:{CurrentRevisionWorkItemTypeName}][IsDirty:{IsDirty}][ReferenceName:{FieldReferenceName}][Value: {FieldValue}]",
+                   new Dictionary<string, object>() {
+                               {"CurrentRevisionWorkItemId", workItem.Id },
+                               {"CurrentRevisionWorkItemRev", workItem.Rev },
+                               {"CurrentRevisionWorkItemTypeName",  workItem.Type},
+                               {"IsDirty", f.IsDirty },
+                               {"FieldReferenceName", f.ReferenceName },
+                               {"FieldValue", f.Value }
+                   });
+                Log.Verbose("{   Field Object: {field}", f);
+            }
+            Log.Debug("--------------------------------------------------------------------------------------------------------------------");
+            Log.Debug("--------------------------------------------------------------------------------------------------------------------");
+            workItem.Fields["System.ChangedBy"].Value = "Migration";
+            workItem.Save();
             context.RefreshWorkItem();
         }
 

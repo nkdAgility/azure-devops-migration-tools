@@ -569,26 +569,6 @@ namespace VstsSyncMigrator.Engine
                         currentRevisionWorkItem.ToWorkItem().Revisions[revision.Index].Fields["System.History"].Value;
                     //Debug.WriteLine("Discussion:" + currentRevisionWorkItem.Revisions[revision.Index].Fields["System.History"].Value);
 
-                    var fails = targetWorkItem.ToWorkItem().Validate();
-
-                    foreach (Field f in fails)
-                    {
-                        TraceWriteLine(LogEventLevel.Information,
-                            "{Current} - Invalid: {CurrentRevisionWorkItemId}-{CurrentRevisionWorkItemTypeName}-{FieldReferenceName}-{SourceWorkItemTitle} Value: {FieldValue}",
-                           new Dictionary<string, object>() {
-                               {"Current", current },
-                               {"CurrentRevisionWorkItemId", currentRevisionWorkItem.Id },
-                               {"CurrentRevisionWorkItemTypeName",  currentRevisionWorkItem.Type},
-                               {"FieldReferenceName", f.ReferenceName },
-                               {"SourceWorkItemTitle", sourceWorkItem.Title },
-                               {"FieldValue", f.Value }
-                           });
-                    }
-                    //if (fails.Count > 0) // TODO Do we want to stop or continue?
-                    //{
-                    //    contextLog.Error("Unable to save revission due to the error in validation");
-                    //    break;
-                    //}
                     targetWorkItem.SaveToAzureDevOps();
                     TraceWriteLine(LogEventLevel.Information,
                         " Saved TargetWorkItem {TargetWorkItemId}. Replayed revision {RevisionNumber} of {RevisionsToMigrateCount}",
