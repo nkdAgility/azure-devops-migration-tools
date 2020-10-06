@@ -46,13 +46,14 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
 
         public string GetNewNodeName(string sourceNodeName, NodeStructureType nodeStructureType)
         {
+            Log.LogDebug("   GetNewNodeName({sourceNodeName}, {nodeStructureType})", sourceNodeName, nodeStructureType);
             string targetStructureName = NodeStructureTypeToLanguageSpecificName(Engine.Target, nodeStructureType);
             string targetProjectName = Engine.Target.Config.Project;
             string sourceStructureName = NodeStructureTypeToLanguageSpecificName(Engine.Source, nodeStructureType);
             string sourceProjectName = Engine.Source.Config.Project;
 
             // Replace project name with new name (if necessary) and inject nodePath (Area or Iteration) into path for node validation
-            string newNodeName = "";
+            string newNodeName;
             if (_prefixProjectToNodes)
             {
                 newNodeName = $@"{targetProjectName}\{targetStructureName}\{sourceNodeName}";
@@ -94,6 +95,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
 
         public void MigrateAllNodeStructures(bool prefixProjectToNodes, string[] nodeBasePaths)
         {
+            Log.LogInformation("Running MigrateAllNodeStructures from NodeStructureEnricher");
             _prefixProjectToNodes = prefixProjectToNodes;
             _nodeBasePaths = nodeBasePaths;
             //////////////////////////////////////////////////
@@ -245,6 +247,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
 
         private void ProcessCommonStructure(string treeTypeSource, string treeTypeTarget)
         {
+            Log.LogInformation("   ProcessCommonStructure({treeTypeSource}, {treeTypeTarget})", treeTypeSource, treeTypeTarget);
             NodeInfo sourceNode = (from n in _sourceRootNodes where n.Path.Contains(treeTypeSource) select n).Single();
             if (sourceNode == null) // May run into language problems!!! This is to try and detect that
             {
