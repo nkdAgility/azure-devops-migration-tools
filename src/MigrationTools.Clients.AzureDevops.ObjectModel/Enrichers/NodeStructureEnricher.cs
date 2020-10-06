@@ -139,71 +139,43 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             return _foundNodes[nodePath];
         }
 
-        private NodeInfo CreateNode(string name, NodeInfo parent)
+        private NodeInfo CreateNode(string name, NodeInfo parent, DateTime? startDate, DateTime? finishDate)
         {
             string nodePath = string.Format(@"{0}\{1}", parent.Path, name);
             NodeInfo node = null;
-
-            Log.LogDebug("--CreateNode: {0}", nodePath);
+            Log.LogInformation(" Processing Node: {0}, start date: {1}, finish date: {2}", nodePath, startDate, finishDate);
             try
             {
                 node = _targetCommonStructureService.GetNodeFromPath(nodePath);
-                Log.LogDebug("...found");
+                Log.LogDebug("  Node {node} already exists", nodePath);
+                Log.LogTrace("{node}", node);
             }
             catch (CommonStructureSubsystemException ex)
             {
                 try
                 {
                     string newPathUri = _targetCommonStructureService.CreateNode(name, parent.Uri);
-                    Log.LogDebug("...created");
+                    Log.LogDebug("  Node {newPathUri} has been created", newPathUri);
                     node = _targetCommonStructureService.GetNode(newPathUri);
                 }
                 catch
                 {
                     Log.LogError(ex, "Creating Node");
-                    Log.LogDebug("...missing");
                     throw;
                 }
             }
-            return node;
-        }
-
-        private NodeInfo CreateNode(string name, NodeInfo parent, DateTime? startDate, DateTime? finishDate)
-        {
-            string nodePath = string.Format(@"{0}\{1}", parent.Path, name);
-            NodeInfo node = null;
-            Log.LogDebug("--CreateNode: {0}, start date: {1}, finish date: {2}", nodePath, startDate, finishDate);
-            try
-            {
-                node = _targetCommonStructureService.GetNodeFromPath(nodePath);
-                Log.LogDebug("...found");
-            }
-            catch (CommonStructureSubsystemException ex)
+            if (startDate != null && finishDate != null)
             {
                 try
                 {
-                    string newPathUri = _targetCommonStructureService.CreateNode(name, parent.Uri);
-                    Log.LogDebug("...created");
-                    node = _targetCommonStructureService.GetNode(newPathUri);
+                    ((ICommonStructureService4)_targetCommonStructureService).SetIterationDates(node.Uri, startDate, finishDate);
+                    Log.LogDebug("  Node {node} has been assigned {startDate} / {finishDate}", nodePath, startDate, finishDate);
                 }
-                catch
+                catch (CommonStructureSubsystemException ex)
                 {
-                    Log.LogWarning(ex, "Missing ");
-                    throw;
+                    Log.LogWarning(ex, " Unable to set {node}dates of {startDate} / {finishDate}", nodePath, startDate, finishDate);
                 }
             }
-
-            try
-            {
-                ((ICommonStructureService4)_targetCommonStructureService).SetIterationDates(node.Uri, startDate, finishDate);
-                Log.LogDebug("...dates assigned");
-            }
-            catch (CommonStructureSubsystemException ex)
-            {
-                Log.LogWarning(ex, "Dates not set ");
-            }
-
-            Log.LogDebug(String.Empty);
             return node;
         }
 
@@ -236,7 +208,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                 }
                 else
                 {
-                    targetNode = CreateNode(newNodeName, parentPath);
+                    targetNode = CreateNode(newNodeName, parentPath, null, null);
                 }
                 if (item.HasChildNodes)
                 {
@@ -247,7 +219,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
 
         private void ProcessCommonStructure(string treeTypeSource, string treeTypeTarget)
         {
-            Log.LogInformation("   ProcessCommonStructure({treeTypeSource}, {treeTypeTarget})", treeTypeSource, treeTypeTarget);
+            Log.LogDebug("NodeStructureEnricher.ProcessCommonStructure({treeTypeSource}, {treeTypeTarget})", treeTypeSource, treeTypeTarget);
             NodeInfo sourceNode = (from n in _sourceRootNodes where n.Path.Contains(treeTypeSource) select n).Single();
             if (sourceNode == null) // May run into language problems!!! This is to try and detect that
             {
@@ -269,7 +241,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             }
             if (_prefixProjectToNodes)
             {
-                structureParent = CreateNode(Engine.Source.Config.Project, structureParent);
+                structureParent = CreateNode(Engine.Source.Config.Project, structureParent, null, null);
             }
             if (sourceTree.ChildNodes[0].HasChildNodes)
             {
@@ -309,7 +281,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
 
                 if (!_nodeBasePaths.Any(p => path.StartsWith(p, StringComparison.InvariantCultureIgnoreCase)))
                 {
-                    Log.LogDebug("--IgnoreNode: {0}", nodePath);
+                    Log.LogWarning("The node {nodePath} is being excluded due to your basePath setting. ", nodePath);
                     return false;
                 }
             }

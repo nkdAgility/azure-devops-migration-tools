@@ -64,7 +64,6 @@ namespace MigrationTools.Configuration.Processing
             LinkMigrationSaveEachAsAdded = false;
             WIQLQueryBit = @"AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
             WIQLOrderBit = "[System.ChangedDate] desc";
-            NodeBasePaths = new[] { "Product\\Area\\Path1", "Product\\Area\\Path2" };
         }
     }
 }
