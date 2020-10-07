@@ -1,4 +1,6 @@
 ﻿using System;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace MigrationTools.Configuration
 {
@@ -11,6 +13,7 @@ namespace MigrationTools.Configuration
         public string PersonalAccessToken { get; set; }
         public LanguageMaps LanguageMaps { get; set; }
 
+        [JsonConverter(typeof(StringEnumConverter))]
         public MigrationClientClientDirection Direction { get; set; }
 
         Type IMigrationClientConfig.MigrationClient => throw new NotImplementedException();

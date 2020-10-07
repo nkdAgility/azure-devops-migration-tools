@@ -88,11 +88,13 @@ namespace MigrationTools.Configuration
                 FieldMaps = new List<IFieldMapConfig>(),
                 WorkItemTypeDefinition = new Dictionary<string, string> {
                     { "sourceWorkItemTypeName", "targetWorkItemTypeName" }
-            },
-                Processors = new List<IProcessorConfig>()
+                },
+                Processors = new List<IProcessorConfig>(),
+                Clients = new List<IMigrationClientConfig>()
             };
             ec.Clients.Add(new TeamProjectConfig()
             {
+                Direction = MigrationClientClientDirection.Source,
                 Project = "migrationSource1",
                 AllowCrossProjectLinking = false,
                 Collection = new Uri("https://dev.azure.com/nkdagility-preview/"),
@@ -102,6 +104,7 @@ namespace MigrationTools.Configuration
             });
             ec.Clients.Add(new TeamProjectConfig()
             {
+                Direction = MigrationClientClientDirection.Target,
                 Project = "migrationTarget1",
                 AllowCrossProjectLinking = false,
                 Collection = new Uri("https://dev.azure.com/nkdagility-preview/"),

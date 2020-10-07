@@ -6,7 +6,7 @@
     },
     "init": {
       "commandName": "Project",
-      "commandLineArgs": "Init"
+      "commandLineArgs": "init"
     }
   }
 }

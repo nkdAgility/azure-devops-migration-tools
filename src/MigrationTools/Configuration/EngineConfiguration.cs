@@ -4,6 +4,8 @@ using System.IO;
 using System.Reflection;
 using Microsoft.Extensions.Logging;
 using MigrationTools.CommandLine;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using Serilog.Events;
 
 namespace MigrationTools.Configuration
@@ -14,7 +16,10 @@ namespace MigrationTools.Configuration
         public virtual List<IMigrationClientConfig> Clients { get; set; }
         public virtual List<IFieldMapConfig> FieldMaps { get; set; }
         public virtual Dictionary<string, string> GitRepoMapping { get; set; }
+
+        [JsonConverter(typeof(StringEnumConverter))]
         public virtual LogEventLevel LogLevel { get; set; }
+
         public virtual List<IProcessorConfig> Processors { get; set; }
         public virtual string Version { get; set; }
         public virtual bool workaroundForQuerySOAPBugEnabled { get; set; }
