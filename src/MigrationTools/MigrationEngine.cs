@@ -141,7 +141,7 @@ namespace MigrationTools
             if (_Source is null)
             {
                 var credentials = CheckForNetworkCredentials();
-                var source = Config.Clients.SingleOrDefault(x => x.Direction == MigrationClientClientDirection.Source);
+                var source = Config.Clients.Single(x => x.Direction == MigrationClientClientDirection.Source);
                 if (source != null)
                 {
                     _Source = _services.GetRequiredService<IMigrationClient>();
@@ -156,7 +156,7 @@ namespace MigrationTools
             if (_Target is null)
             {
                 var credentials = CheckForNetworkCredentials();
-                var target = Config.Clients.SingleOrDefault(x => x.Direction == MigrationClientClientDirection.Target);
+                var target = Config.Clients.Single(x => x.Direction == MigrationClientClientDirection.Target);
                 if (target != null)
                 {
                     _Target = _services.GetRequiredService<IMigrationClient>();
