@@ -513,7 +513,12 @@ namespace VstsSyncMigrator.Engine
                 //If work item hasn't been created yet, create a shell
                 if (targetWorkItem == null)
                 {
-                    targetWorkItem = CreateWorkItem_Shell(Engine.Target.WorkItems.Project, sourceWorkItem, skipToFinalRevisedWorkItemType ? finalDestType : Engine.Source.WorkItems.GetRevision(sourceWorkItem, revisionsToMigrate.First().Number).Type);
+                    string targetType = Engine.Source.WorkItems.GetRevision(sourceWorkItem, revisionsToMigrate.First().Number).Type;
+                    if (Engine.TypeDefinitionMaps.Items.ContainsKey(targetType))
+                    {
+                        targetType = Engine.TypeDefinitionMaps.Items[targetType].Map();
+                    }
+                    targetWorkItem = CreateWorkItem_Shell(Engine.Target.WorkItems.Project, sourceWorkItem, skipToFinalRevisedWorkItemType ? finalDestType : targetType);
                 }
 
                 if (_config.CollapseRevisions)
