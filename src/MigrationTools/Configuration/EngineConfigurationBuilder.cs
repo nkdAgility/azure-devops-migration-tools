@@ -53,7 +53,7 @@ namespace MigrationTools.Configuration
             AddTestPlansMigrationDefault(ec);
             ec.Processors.Add(new ImportProfilePictureConfig());
             ec.Processors.Add(new ExportProfilePictureFromADConfig());
-            ec.Processors.Add(new FixGitCommitLinksConfig() { TargetRepository = ec.Target.Project });
+            ec.Processors.Add(new FixGitCommitLinksConfig() { TargetRepository = "targetProjectName" });
             ec.Processors.Add(new WorkItemUpdateConfig());
             ec.Processors.Add(new WorkItemPostProcessingConfig() { WorkItemIDs = new List<int> { 1, 2, 3 } });
             ec.Processors.Add(new WorkItemDeleteConfig());
@@ -85,30 +85,30 @@ namespace MigrationTools.Configuration
             {
                 LogLevel = LogEventLevel.Information,
                 Version = Assembly.GetExecutingAssembly().GetName().Version.ToString(2),
-                Source = new TeamProjectConfig()
-                {
-                    Project = "migrationSource1",
-                    AllowCrossProjectLinking = false,
-                    Collection = new Uri("https://dev.azure.com/nkdagility-preview/"),
-                    ReflectedWorkItemIDFieldName = "Custom.ReflectedWorkItemId",
-                    PersonalAccessToken = "",
-                    LanguageMaps = new LanguageMaps() { AreaPath = "Area", IterationPath = "Iteration" }
-                },
-                Target = new TeamProjectConfig()
-                {
-                    Project = "migrationTarget1",
-                    AllowCrossProjectLinking = false,
-                    Collection = new Uri("https://dev.azure.com/nkdagility-preview/"),
-                    ReflectedWorkItemIDFieldName = "Custom.ReflectedWorkItemId",
-                    PersonalAccessToken = "",
-                    LanguageMaps = new LanguageMaps() { AreaPath = "Area", IterationPath = "Iteration" }
-                },
                 FieldMaps = new List<IFieldMapConfig>(),
                 WorkItemTypeDefinition = new Dictionary<string, string> {
                     { "sourceWorkItemTypeName", "targetWorkItemTypeName" }
             },
                 Processors = new List<IProcessorConfig>()
             };
+            ec.Clients.Add(new TeamProjectConfig()
+            {
+                Project = "migrationSource1",
+                AllowCrossProjectLinking = false,
+                Collection = new Uri("https://dev.azure.com/nkdagility-preview/"),
+                ReflectedWorkItemIDFieldName = "Custom.ReflectedWorkItemId",
+                PersonalAccessToken = "",
+                LanguageMaps = new LanguageMaps() { AreaPath = "Area", IterationPath = "Iteration" }
+            });
+            ec.Clients.Add(new TeamProjectConfig()
+            {
+                Project = "migrationTarget1",
+                AllowCrossProjectLinking = false,
+                Collection = new Uri("https://dev.azure.com/nkdagility-preview/"),
+                ReflectedWorkItemIDFieldName = "Custom.ReflectedWorkItemId",
+                PersonalAccessToken = "",
+                LanguageMaps = new LanguageMaps() { AreaPath = "Area", IterationPath = "Iteration" }
+            });
             return ec;
         }
 

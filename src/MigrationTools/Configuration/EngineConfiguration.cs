@@ -8,20 +8,22 @@ using Serilog.Events;
 
 namespace MigrationTools.Configuration
 {
+    public class EngineConfiguration
+    {
+        public virtual string ChangeSetMappingFile { get; set; }
+        public virtual List<IMigrationClientConfig> Clients { get; set; }
+        public virtual List<IFieldMapConfig> FieldMaps { get; set; }
+        public virtual Dictionary<string, string> GitRepoMapping { get; set; }
+        public virtual LogEventLevel LogLevel { get; set; }
+        public virtual List<IProcessorConfig> Processors { get; set; }
+        public virtual string Version { get; set; }
+        public virtual bool workaroundForQuerySOAPBugEnabled { get; set; }
+        public virtual Dictionary<string, string> WorkItemTypeDefinition { get; set; }
+    }
+
     public class EngineConfigurationWrapper : EngineConfiguration
     {
         private readonly EngineConfiguration _engineConfiguration;
-
-        public override string Version { get { return _engineConfiguration.Version; } set { _engineConfiguration.Version = value; } }
-        public override LogEventLevel LogLevel { get { return _engineConfiguration.LogLevel; } set { _engineConfiguration.LogLevel = value; } }
-        public override bool workaroundForQuerySOAPBugEnabled { get { return _engineConfiguration.workaroundForQuerySOAPBugEnabled; } set { _engineConfiguration.workaroundForQuerySOAPBugEnabled = value; } }
-        public override string ChangeSetMappingFile { get { return _engineConfiguration.ChangeSetMappingFile; } set { _engineConfiguration.ChangeSetMappingFile = value; } }
-        public override TeamProjectConfig Source { get { return _engineConfiguration.Source; } set { _engineConfiguration.Source = value; } }
-        public override TeamProjectConfig Target { get { return _engineConfiguration.Target; } set { _engineConfiguration.Target = value; } }
-        public override List<IFieldMapConfig> FieldMaps { get { return _engineConfiguration.FieldMaps; } set { _engineConfiguration.FieldMaps = value; } }
-        public override Dictionary<string, string> WorkItemTypeDefinition { get { return _engineConfiguration.WorkItemTypeDefinition; } set { _engineConfiguration.WorkItemTypeDefinition = value; } }
-        public override Dictionary<string, string> GitRepoMapping { get { return _engineConfiguration.GitRepoMapping; } set { _engineConfiguration.GitRepoMapping = value; } }
-        public override List<IProcessorConfig> Processors { get { return _engineConfiguration.Processors; } set { _engineConfiguration.Processors = value; } }
 
         public EngineConfigurationWrapper(IEngineConfigurationBuilder engineConfigurationBuilder, ExecuteOptions opts, ILogger<EngineConfigurationWrapper> logger)
         {
@@ -42,19 +44,15 @@ namespace MigrationTools.Configuration
             logger.LogInformation("Config Found, creating engine host");
             _engineConfiguration = engineConfigurationBuilder.BuildFromFile(opts.ConfigFile);
         }
-    }
 
-    public class EngineConfiguration
-    {
-        public virtual string Version { get; set; }
-        public virtual bool workaroundForQuerySOAPBugEnabled { get; set; }
-        public virtual string ChangeSetMappingFile { get; set; }
-        public virtual TeamProjectConfig Source { get; set; }
-        public virtual TeamProjectConfig Target { get; set; }
-        public virtual List<IFieldMapConfig> FieldMaps { get; set; }
-        public virtual Dictionary<string, string> WorkItemTypeDefinition { get; set; }
-        public virtual Dictionary<string, string> GitRepoMapping { get; set; }
-        public virtual List<IProcessorConfig> Processors { get; set; }
-        public virtual LogEventLevel LogLevel { get; set; }
+        public override string ChangeSetMappingFile { get { return _engineConfiguration.ChangeSetMappingFile; } set { _engineConfiguration.ChangeSetMappingFile = value; } }
+        public override List<IMigrationClientConfig> Clients { get { return _engineConfiguration.Clients; } set { _engineConfiguration.Clients = value; } }
+        public override List<IFieldMapConfig> FieldMaps { get { return _engineConfiguration.FieldMaps; } set { _engineConfiguration.FieldMaps = value; } }
+        public override Dictionary<string, string> GitRepoMapping { get { return _engineConfiguration.GitRepoMapping; } set { _engineConfiguration.GitRepoMapping = value; } }
+        public override LogEventLevel LogLevel { get { return _engineConfiguration.LogLevel; } set { _engineConfiguration.LogLevel = value; } }
+        public override List<IProcessorConfig> Processors { get { return _engineConfiguration.Processors; } set { _engineConfiguration.Processors = value; } }
+        public override string Version { get { return _engineConfiguration.Version; } set { _engineConfiguration.Version = value; } }
+        public override bool workaroundForQuerySOAPBugEnabled { get { return _engineConfiguration.workaroundForQuerySOAPBugEnabled; } set { _engineConfiguration.workaroundForQuerySOAPBugEnabled = value; } }
+        public override Dictionary<string, string> WorkItemTypeDefinition { get { return _engineConfiguration.WorkItemTypeDefinition; } set { _engineConfiguration.WorkItemTypeDefinition = value; } }
     }
 }
