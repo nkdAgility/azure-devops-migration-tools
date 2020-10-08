@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.Logging;
 using MigrationTools.Configuration.FieldMap;
@@ -92,26 +93,8 @@ namespace MigrationTools.Configuration
                 },
                 Processors = new List<IProcessorConfig>(),
             };
-            ec.Source = new TeamProjectConfig()
-            {
-                Direction = MigrationClientClientDirection.Source,
-                Project = "migrationSource1",
-                AllowCrossProjectLinking = false,
-                Collection = new Uri("https://dev.azure.com/nkdagility-preview/"),
-                ReflectedWorkItemIDFieldName = "Custom.ReflectedWorkItemId",
-                PersonalAccessToken = "",
-                LanguageMaps = new LanguageMaps() { AreaPath = "Area", IterationPath = "Iteration" }
-            };
-            ec.Target = new TeamProjectConfig()
-            {
-                Direction = MigrationClientClientDirection.Target,
-                Project = "migrationTarget1",
-                AllowCrossProjectLinking = false,
-                Collection = new Uri("https://dev.azure.com/nkdagility-preview/"),
-                ReflectedWorkItemIDFieldName = "Custom.ReflectedWorkItemId",
-                PersonalAccessToken = "",
-                LanguageMaps = new LanguageMaps() { AreaPath = "Area", IterationPath = "Iteration" }
-            };
+            ec.Source = GetMigrationConfigDefault();
+            ec.Target = GetMigrationConfigDefault();
             return ec;
         }
 
@@ -210,6 +193,20 @@ namespace MigrationTools.Configuration
                 timeTravel = 1,
                 toSkip = 3
             });
+        }
+
+        private IMigrationClientConfig GetMigrationConfigDefault()
+        {
+            Type type = AppDomain.CurrentDomain.GetAssemblies().SelectMany(x => x.GetTypes())
+                .Where(x => typeof(IMigrationClientConfig).IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
+                .FirstOrDefault();
+            if (type.BaseType == null)
+            {
+                throw new InvalidOperationException("No IMigrationClientConfig instance found in scope. Please make sure that you have implemented one!");
+            }
+            IMigrationClientConfig result = (IMigrationClientConfig)Activator.CreateInstance(type);
+            result.PopulateWithDefault();
+            return result;
         }
     }
 }

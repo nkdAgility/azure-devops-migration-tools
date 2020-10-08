@@ -6,11 +6,11 @@ namespace MigrationTools.Clients
 {
     public interface IMigrationClient
     {
-        TeamProjectConfig Config { get; }
+        IMigrationClientConfig Config { get; }
         IWorkItemMigrationClient WorkItems { get; }
         ITestPlanMigrationClient TestPlans { get; }
 
-        void Configure(TeamProjectConfig config, NetworkCredential credentials = null);
+        void Configure(IMigrationClientConfig config, NetworkCredential credentials = null);
 
         T GetService<T>();
 

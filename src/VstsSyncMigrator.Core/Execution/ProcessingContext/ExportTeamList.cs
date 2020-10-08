@@ -6,6 +6,7 @@ using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.Framework.Common;
 using Microsoft.TeamFoundation.Server;
 using MigrationTools;
+using MigrationTools.Clients.AzureDevops.ObjectModel;
 using MigrationTools.Configuration;
 
 namespace VstsSyncMigrator.Engine
@@ -34,7 +35,7 @@ namespace VstsSyncMigrator.Engine
             //////////////////////////////////////////////////
             // Retrieve the project URI. Needed to enumerate teams.
             var css4 = Engine.Target.GetService<ICommonStructureService4>();
-            ProjectInfo projectInfo = css4.GetProjectFromName(Engine.Target.Config.Project);
+            ProjectInfo projectInfo = css4.GetProjectFromName(Engine.Target.Config.AsTeamProjectConfig().Project);
             // Retrieve a list of all teams on the project.
             TfsTeamService teamService = Engine.Target.GetService<TfsTeamService>();
             TfsConnection connection = (TfsConnection)Engine.Target.InternalCollection;

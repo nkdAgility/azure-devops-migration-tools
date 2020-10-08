@@ -33,11 +33,11 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             _Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             sourceRepoService = engine.Source.GetService<GitRepositoryService>();
-            sourceRepos = sourceRepoService.QueryRepositories(engine.Source.Config.Project);
+            sourceRepos = sourceRepoService.QueryRepositories(engine.Source.Config.AsTeamProjectConfig().Project);
             allSourceRepos = sourceRepoService.QueryRepositories("");
             //////////////////////////////////////////////////
             targetRepoService = engine.Target.GetService<GitRepositoryService>();
-            targetRepos = targetRepoService.QueryRepositories(engine.Target.Config.Project);
+            targetRepos = targetRepoService.QueryRepositories(engine.Target.Config.AsTeamProjectConfig().Project);
             allTargetRepos = targetRepoService.QueryRepositories("");
             gitWits = new List<string>
                 {
@@ -102,8 +102,8 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                     if (sourceRepoInfo.GitRepo != null)
                     {
                         string targetRepoName = GetTargetRepoName(Engine.GitRepoMaps.Items, sourceRepoInfo);
-                        string sourceProjectName = sourceRepoInfo?.GitRepo?.ProjectReference?.Name ?? Engine.Target.Config.Project;
-                        string targetProjectName = Engine.Target.Config.Project;
+                        string sourceProjectName = sourceRepoInfo?.GitRepo?.ProjectReference?.Name ?? Engine.Target.Config.AsTeamProjectConfig().Project;
+                        string targetProjectName = Engine.Target.Config.AsTeamProjectConfig().Project;
 
                         GitRepositoryInfo targetRepoInfo = GitRepositoryInfo.Create(targetRepoName, sourceRepoInfo, targetRepos);
                         // if repo was not found in the target project, try to find it in the whole target project collection

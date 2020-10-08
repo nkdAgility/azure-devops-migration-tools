@@ -56,8 +56,7 @@ namespace VstsSyncMigrator.Engine
                 Telemetry.TrackEvent("ProcessingContextComplete",
                     new Dictionary<string, string> {
                         { "Name", Name},
-                        { "Target Project", Engine.Target.Config.Project},
-                        { "Target Collection", Engine.Target.Config.Collection.ToString()},
+                        { "Target", Engine.Target.Config.ToString()},
                         { "Status", Status.ToString() }
                     },
                     new Dictionary<string, double> {
@@ -72,8 +71,7 @@ namespace VstsSyncMigrator.Engine
                 Telemetry.TrackException(ex,
                       new Dictionary<string, string> {
                           { "Name", Name},
-                          { "Target Project", Engine.Target.Config.Project},
-                          { "Target Collection", Engine.Target.Config.Collection.ToString() },
+                          { "Target", Engine.Target.Config.ToString()},
                           { "Status", Status.ToString() }
                       },
                       new Dictionary<string, double> {

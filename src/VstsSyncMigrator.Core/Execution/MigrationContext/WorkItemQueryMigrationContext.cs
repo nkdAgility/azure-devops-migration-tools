@@ -4,6 +4,7 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools;
+using MigrationTools.Clients.AzureDevops.ObjectModel;
 using MigrationTools.Clients.AzureDevops.ObjectModel.Clients;
 using MigrationTools.Configuration;
 using MigrationTools.Configuration.Processing;
@@ -65,8 +66,8 @@ namespace VstsSyncMigrator.Engine
             Stopwatch stopwatch = Stopwatch.StartNew();
             //////////////////////////////////////////////////
 
-            var sourceQueryHierarchy = ((WorkItemMigrationClient)Engine.Source.WorkItems).Store.Projects[Engine.Source.Config.Project].QueryHierarchy;
-            var targetQueryHierarchy = ((WorkItemMigrationClient)Engine.Target.WorkItems).Store.Projects[Engine.Target.Config.Project].QueryHierarchy;
+            var sourceQueryHierarchy = ((WorkItemMigrationClient)Engine.Source.WorkItems).Store.Projects[Engine.Source.Config.AsTeamProjectConfig().Project].QueryHierarchy;
+            var targetQueryHierarchy = ((WorkItemMigrationClient)Engine.Target.WorkItems).Store.Projects[Engine.Target.Config.AsTeamProjectConfig().Project].QueryHierarchy;
 
             Log.LogInformation("Found {0} root level child WIQ folders", sourceQueryHierarchy.Count);
             //////////////////////////////////////////////////
@@ -100,13 +101,13 @@ namespace VstsSyncMigrator.Engine
                 this.totalFoldersAttempted++;
 
                 // we need to replace the team project name in folder names as it included in query paths
-                var requiredPath = sourceFolder.Path.Replace($"{Engine.Source.Config.Project}/", $"{Engine.Target.Config.Project}/");
+                var requiredPath = sourceFolder.Path.Replace($"{Engine.Source.Config.AsTeamProjectConfig().Project}/", $"{Engine.Target.Config.AsTeamProjectConfig().Project}/");
 
                 // Is the project name to be used in the migration as an extra folder level?
                 if (config.PrefixProjectToNodes == true)
                 {
                     // we need to inject the team name as a folder in the structure
-                    requiredPath = requiredPath.Replace(config.SharedFolderName, $"{config.SharedFolderName}/{Engine.Source.Config.Project}");
+                    requiredPath = requiredPath.Replace(config.SharedFolderName, $"{config.SharedFolderName}/{Engine.Source.Config.AsTeamProjectConfig().Project}");
 
                     // If on the root level we need to check that the extra folder has already been added
                     if (sourceFolder.Path.Count(f => f == '/') == 1)
@@ -116,8 +117,8 @@ namespace VstsSyncMigrator.Engine
                         if (extraFolder == null)
                         {
                             // we are at the root level on the first pass and need to create the extra folder for the team name
-                            Log.LogInformation("Adding a folder '{Project}'", Engine.Source.Config.Project);
-                            extraFolder = new QueryFolder(Engine.Source.Config.Project);
+                            Log.LogInformation("Adding a folder '{Project}'", Engine.Source.Config.AsTeamProjectConfig().Project);
+                            extraFolder = new QueryFolder(Engine.Source.Config.AsTeamProjectConfig().Project);
                             targetSharedFolderRoot.Add(extraFolder);
                             targetHierarchy.Save(); // moved the save here a more immediate and relavent error message
                         }
@@ -172,12 +173,12 @@ namespace VstsSyncMigrator.Engine
             else
             {
                 // Sort out any path issues in the quertText
-                var fixedQueryText = query.QueryText.Replace($"'{Engine.Source.Config.Project}", $"'{Engine.Target.Config.Project}"); // the ' should only items at the start of areapath etc.
+                var fixedQueryText = query.QueryText.Replace($"'{Engine.Source.Config.AsTeamProjectConfig().Project}", $"'{Engine.Target.Config.AsTeamProjectConfig().Project}"); // the ' should only items at the start of areapath etc.
 
                 if (config.PrefixProjectToNodes)
                 {
                     // we need to inject the team name as a folder in the structure too
-                    fixedQueryText = fixedQueryText.Replace($"{Engine.Target.Config.Project}\\", $"{Engine.Target.Config.Project}\\{Engine.Source.Config.Project}\\");
+                    fixedQueryText = fixedQueryText.Replace($"{Engine.Target.Config.AsTeamProjectConfig().Project}\\", $"{Engine.Target.Config.AsTeamProjectConfig().Project}\\{Engine.Source.Config.AsTeamProjectConfig().Project}\\");
                 }
 
                 if (config.SourceToTargetFieldMappings != null)

@@ -143,7 +143,7 @@ namespace MigrationTools
                 if (_Source == null)
                 {
                     _Source = _services.GetRequiredService<IMigrationClient>();
-                    _Source.Configure((TeamProjectConfig)Config.Source, credentials.source);
+                    _Source.Configure(Config.Source, credentials.source);
                 }
             }
             return _Source;
@@ -157,7 +157,7 @@ namespace MigrationTools
                 if (_Target == null)
                 {
                     _Target = _services.GetRequiredService<IMigrationClient>();
-                    _Target.Configure((TeamProjectConfig)Config.Target, credentials.target);
+                    _Target.Configure(Config.Target, credentials.target);
                 }
             }
             return _Target;

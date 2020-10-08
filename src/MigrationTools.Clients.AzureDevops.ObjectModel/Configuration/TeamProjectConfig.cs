@@ -1,6 +1,4 @@
 ﻿using System;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace MigrationTools.Configuration
 {
@@ -13,10 +11,23 @@ namespace MigrationTools.Configuration
         public string PersonalAccessToken { get; set; }
         public LanguageMaps LanguageMaps { get; set; }
 
-        [JsonConverter(typeof(StringEnumConverter))]
-        public MigrationClientClientDirection Direction { get; set; }
+        public Type MigrationClient { get { return MigrationClient; } }
 
-        Type IMigrationClientConfig.MigrationClient => throw new NotImplementedException();
+        public IMigrationClientConfig PopulateWithDefault()
+        {
+            Project = "myProjectName";
+            AllowCrossProjectLinking = false;
+            Collection = new Uri("https://dev.azure.com/nkdagility-preview/");
+            ReflectedWorkItemIDFieldName = "Custom.ReflectedWorkItemId";
+            PersonalAccessToken = "";
+            LanguageMaps = new LanguageMaps() { AreaPath = "Area", IterationPath = "Iteration" };
+            return this;
+        }
+
+        public override string ToString()
+        {
+            return string.Format("{0}/{1}", Collection, Project);
+        }
     }
 
     public class LanguageMaps

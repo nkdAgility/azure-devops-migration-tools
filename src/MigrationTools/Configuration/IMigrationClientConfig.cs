@@ -1,12 +1,9 @@
-﻿using System.Text.Json.Serialization;
-
-namespace MigrationTools.Configuration
+﻿namespace MigrationTools.Configuration
 {
     public interface IMigrationClientConfig
     {
-        [JsonIgnoreAttribute]
-        System.Type MigrationClient { get; }
+        IMigrationClientConfig PopulateWithDefault();
 
-        MigrationClientClientDirection Direction { get; }
+        string ToString();
     }
 }

@@ -30,7 +30,7 @@ namespace _VstsSyncMigrator.Engine.Tests
             EngineConfiguration ec = ecb.BuildDefault();
             Assert.IsNotNull(ec);
             Assert.IsNotNull(ec.Source);
-            Assert.AreEqual(ec.Source.AsTeamProjectConfig().Project, "migrationSource1");
+            Assert.AreEqual(ec.Source.ToString(), "FakeMigration");
         }
     }
 }

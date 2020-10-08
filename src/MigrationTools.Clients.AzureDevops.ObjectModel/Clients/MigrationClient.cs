@@ -19,7 +19,15 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
         private readonly IServiceProvider _Services;
         private readonly ITelemetryLogger _Telemetry;
 
-        public TeamProjectConfig Config
+        public TeamProjectConfig TfsConfig
+        {
+            get
+            {
+                return _config;
+            }
+        }
+
+        public IMigrationClientConfig Config
         {
             get
             {
@@ -52,10 +60,19 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
             _Telemetry = telemetry;
         }
 
-        public void Configure(TeamProjectConfig config, NetworkCredential credentials = null)
+        public void Configure(IMigrationClientConfig config, NetworkCredential credentials = null)
         {
-            _config = config;
-            _credentials = credentials;
+            if (config is null)
+            {
+                throw new ArgumentNullException(nameof(config));
+            }
+            if (!(config is TeamProjectConfig))
+            {
+                throw new ArgumentOutOfRangeException(string.Format("{0} needs to be of type {1}", nameof(config), nameof(TeamProjectConfig)));
+            }
+
+            _config = (TeamProjectConfig)config;
+            _credentials = credentials ?? throw new ArgumentNullException(nameof(credentials));
             EnsureCollection();
             _workItemClient.Configure(this);
             _testPlanClient.Configure(this);
@@ -72,18 +89,16 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
             }
         }
 
-        protected IServiceProvider Services => _Services;
-
         private void EnsureCollection()
         {
             if (_collection == null)
             {
                 _Telemetry.TrackEvent("TeamProjectContext.EnsureCollection",
                     new Dictionary<string, string> {
-                          { "Name", Config.Project},
-                          { "Target Project", Config.Project},
-                          { "Target Collection",Config.Collection.ToString() },
-                           { "ReflectedWorkItemID Field Name",Config.ReflectedWorkItemIDFieldName }
+                          { "Name", TfsConfig.Project},
+                          { "Target Project", TfsConfig.Project},
+                          { "Target Collection",TfsConfig.Collection.ToString() },
+                           { "ReflectedWorkItemID Field Name",TfsConfig.ReflectedWorkItemIDFieldName }
                     }, null);
                 _collection = GetDependantTfsCollection(_credentials);
             }
@@ -98,27 +113,27 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
             {
                 if (credentials == null)
                 {
-                    y = new TfsTeamProjectCollection(Config.Collection);
+                    y = new TfsTeamProjectCollection(TfsConfig.Collection);
                 }
                 else
                 {
-                    y = new TfsTeamProjectCollection(Config.Collection, new VssCredentials(new Microsoft.VisualStudio.Services.Common.WindowsCredential(credentials)));
+                    y = new TfsTeamProjectCollection(TfsConfig.Collection, new VssCredentials(new Microsoft.VisualStudio.Services.Common.WindowsCredential(credentials)));
                 }
-                Log.Debug("MigrationClient: Connectng to {CollectionUrl} ", Config.Collection.ToString());
+                Log.Debug("MigrationClient: Connectng to {CollectionUrl} ", TfsConfig.Collection.ToString());
                 Log.Debug("MigrationClient: validating security for {@AuthorizedIdentity} ", y.AuthorizedIdentity);
                 y.EnsureAuthenticated();
                 timer.Stop();
                 Log.Information("MigrationClient: Access granted ");
-                _Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", Config.Collection.ToString(), "GetWorkItem", null, startTime, timer.Elapsed, "200", true));
+                _Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", TfsConfig.Collection.ToString(), "GetWorkItem", null, startTime, timer.Elapsed, "200", true));
             }
             catch (Exception ex)
             {
                 timer.Stop();
-                _Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", Config.Collection.ToString(), "GetWorkItem", null, startTime, timer.Elapsed, "500", false));
+                _Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", TfsConfig.Collection.ToString(), "GetWorkItem", null, startTime, timer.Elapsed, "500", false));
                 _Telemetry.TrackException(ex,
                        new Dictionary<string, string> {
-                            { "CollectionUrl", Config.Collection.ToString() },
-                            { "TeamProjectName",  Config.Project}
+                            { "CollectionUrl", TfsConfig.Collection.ToString() },
+                            { "TeamProjectName",  TfsConfig.Project}
                        },
                        new Dictionary<string, double> {
                             { "Time",timer.ElapsedMilliseconds }

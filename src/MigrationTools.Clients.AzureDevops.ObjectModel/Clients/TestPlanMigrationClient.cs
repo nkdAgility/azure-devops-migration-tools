@@ -6,7 +6,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
 {
     public class TestPlanMigrationClient : ITestPlanMigrationClient
     {
-        public TeamProjectConfig Config => throw new NotImplementedException();
+        public IMigrationClientConfig Config => throw new NotImplementedException();
 
         public void Configure(IMigrationClient migrationClient, bool bypassRules = true)
         {

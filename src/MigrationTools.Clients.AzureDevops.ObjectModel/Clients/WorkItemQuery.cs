@@ -37,12 +37,12 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
             {
                 results = wiClient.Store.Query(Query);
                 timer.Stop();
-                Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", MigrationClient.Config.Collection.ToString(), "GetWorkItemsFromQuery", null, startTime, timer.Elapsed, "200", true));
+                Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", MigrationClient.Config.AsTeamProjectConfig().Collection.ToString(), "GetWorkItemsFromQuery", null, startTime, timer.Elapsed, "200", true));
             }
             catch (Exception ex)
             {
                 timer.Stop();
-                Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", MigrationClient.Config.Collection.ToString(), "GetWorkItemsFromQuery", null, startTime, timer.Elapsed, "500", false));
+                Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", MigrationClient.Config.AsTeamProjectConfig().Collection.ToString(), "GetWorkItemsFromQuery", null, startTime, timer.Elapsed, "500", false));
                 Telemetry.TrackException(ex,
                        new Dictionary<string, string> {
                             { "CollectionUrl", wiClient.Store.TeamProjectCollection.Uri.ToString() }

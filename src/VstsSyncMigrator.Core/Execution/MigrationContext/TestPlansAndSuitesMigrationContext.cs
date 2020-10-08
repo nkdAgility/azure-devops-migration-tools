@@ -317,14 +317,14 @@ namespace VstsSyncMigrator.Engine
 
             if (_config.PrefixProjectToNodes)
             {
-                targetWI.ToWorkItem().AreaPath = string.Format(@"{0}\{1}", Engine.Target.Config.Project, sourceWI.ToWorkItem().AreaPath);
-                targetWI.ToWorkItem().IterationPath = string.Format(@"{0}\{1}", Engine.Target.Config.Project, sourceWI.ToWorkItem().IterationPath);
+                targetWI.ToWorkItem().AreaPath = string.Format(@"{0}\{1}", Engine.Target.Config.AsTeamProjectConfig().Project, sourceWI.ToWorkItem().AreaPath);
+                targetWI.ToWorkItem().IterationPath = string.Format(@"{0}\{1}", Engine.Target.Config.AsTeamProjectConfig().Project, sourceWI.ToWorkItem().IterationPath);
             }
             else
             {
-                var regex = new Regex(Regex.Escape(Engine.Source.Config.Project));
-                targetWI.ToWorkItem().AreaPath = regex.Replace(sourceWI.ToWorkItem().AreaPath, Engine.Target.Config.Project, 1);
-                targetWI.ToWorkItem().IterationPath = regex.Replace(sourceWI.ToWorkItem().IterationPath, Engine.Target.Config.Project, 1);
+                var regex = new Regex(Regex.Escape(Engine.Source.Config.AsTeamProjectConfig().Project));
+                targetWI.ToWorkItem().AreaPath = regex.Replace(sourceWI.ToWorkItem().AreaPath, Engine.Target.Config.AsTeamProjectConfig().Project, 1);
+                targetWI.ToWorkItem().IterationPath = regex.Replace(sourceWI.ToWorkItem().IterationPath, Engine.Target.Config.AsTeamProjectConfig().Project, 1);
             }
 
             Engine.FieldMaps.ApplyFieldMappings(sourceWI, targetWI);
@@ -344,7 +344,7 @@ namespace VstsSyncMigrator.Engine
         {
             var sourceWI = Engine.Source.WorkItems.GetWorkItem(sourceWIId.ToString());
             var targetWI = Engine.Target.WorkItems.GetWorkItem(targetWIId.ToString());
-            targetWI.ToWorkItem().Fields[Engine.Target.Config.ReflectedWorkItemIDFieldName].Value = Engine.Source.WorkItems.CreateReflectedWorkItemId(sourceWI);
+            targetWI.ToWorkItem().Fields[Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName].Value = Engine.Source.WorkItems.CreateReflectedWorkItemId(sourceWI);
             targetWI.SaveToAzureDevOps();
         }
 
@@ -487,8 +487,8 @@ namespace VstsSyncMigrator.Engine
 
             // Set area and iteration to root of the target project.
             // We will set the correct values later, when we actually have a work item available
-            targetPlan.Iteration = Engine.Target.Config.Project;
-            targetPlan.AreaPath = Engine.Target.Config.Project;
+            targetPlan.Iteration = Engine.Target.Config.AsTeamProjectConfig().Project;
+            targetPlan.AreaPath = Engine.Target.Config.AsTeamProjectConfig().Project;
 
             // Remove testsettings reference because VSTS Sync doesn't support migrating these artifacts
             if (targetPlan.ManualTestSettingsId != 0)
@@ -967,10 +967,10 @@ namespace VstsSyncMigrator.Engine
                 Log.LogError(ex, " FAILED {TestSuiteType} : {Id} - {Title}",
                       new Dictionary<string, string> {
                           { "Name", Name},
-                          { "Target Project", Engine.Target.Config.Project},
-                          { "Target Collection", Engine.Target.Config.Collection.ToString() },
-                          { "Source Project", Engine.Source.Config.Project},
-                          { "Source Collection", Engine.Source.Config.Collection.ToString() },
+                          { "Target Project", Engine.Target.Config.AsTeamProjectConfig().Project},
+                          { "Target Collection", Engine.Target.Config.AsTeamProjectConfig().Collection.ToString() },
+                          { "Source Project", Engine.Source.Config.AsTeamProjectConfig().Project},
+                          { "Source Collection", Engine.Source.Config.AsTeamProjectConfig().Collection.ToString() },
                           { "Status", Status.ToString() },
                           { "Task", "SaveNewTestSuitToPlan" },
                           { "Id", newTestSuite.Id.ToString()},

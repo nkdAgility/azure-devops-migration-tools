@@ -88,7 +88,7 @@ namespace VstsSyncMigrator.Engine
             gitRepositoryEnricher = Services.GetRequiredService<GitRepositoryEnricher>();
             nodeStructureEnricher = Services.GetRequiredService<NodeStructureEnricher>();
             VssClientCredentials adoCreds = new VssClientCredentials();
-            _witClient = new WorkItemTrackingHttpClient(Engine.Target.Config.Collection, adoCreds);
+            _witClient = new WorkItemTrackingHttpClient(Engine.Target.Config.AsTeamProjectConfig().Collection, adoCreds);
             //Validation: make sure that the ReflectedWorkItemId field name specified in the config exists in the target process, preferably on each work item type.
             ConfigValidation();
             PopulateIgnoreList();
@@ -201,14 +201,14 @@ namespace VstsSyncMigrator.Engine
         private void ConfigValidation()
         {
             //Make sure that the ReflectedWorkItemId field name specified in the config exists in the target process, preferably on each work item type
-            var fields = _witClient.GetFieldsAsync(Engine.Target.Config.Project).Result;
-            bool rwiidFieldExists = fields.Any(x => x.ReferenceName == Engine.Target.Config.ReflectedWorkItemIDFieldName || x.Name == Engine.Target.Config.ReflectedWorkItemIDFieldName);
+            var fields = _witClient.GetFieldsAsync(Engine.Target.Config.AsTeamProjectConfig().Project).Result;
+            bool rwiidFieldExists = fields.Any(x => x.ReferenceName == Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName || x.Name == Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName);
             contextLog.Information("Found {FieldsFoundCount} work item fields.", fields.Count.ToString("n0"));
             if (rwiidFieldExists)
-                contextLog.Information("Found '{ReflectedWorkItemIDFieldName}' in this project, proceeding.", Engine.Target.Config.ReflectedWorkItemIDFieldName);
+                contextLog.Information("Found '{ReflectedWorkItemIDFieldName}' in this project, proceeding.", Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName);
             else
             {
-                contextLog.Information("Config file specifies '{ReflectedWorkItemIDFieldName}', which wasn't found.", Engine.Target.Config.ReflectedWorkItemIDFieldName);
+                contextLog.Information("Config file specifies '{ReflectedWorkItemIDFieldName}', which wasn't found.", Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName);
                 contextLog.Information("Instead, found:");
                 foreach (var field in fields.OrderBy(x => x.Name))
                     contextLog.Information("{FieldType} - {FieldName} - {FieldRefName}", field.Type.ToString().PadLeft(15), field.Name.PadRight(20), field.ReferenceName ?? "");
@@ -230,7 +230,7 @@ namespace VstsSyncMigrator.Engine
                 throw new Exception(string.Format("WARNING: Unable to find '{0}' in the target project. Most likley this is due to a typo in the .json configuration under WorkItemTypeDefinition! ", destType));
             }
             newWorkItemTimer.Stop();
-            Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", Engine.Target.Config.Collection.ToString(), "NewWorkItem", null, newWorkItemstartTime, newWorkItemTimer.Elapsed, "200", true));
+            Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", Engine.Target.Config.AsTeamProjectConfig().Collection.ToString(), "NewWorkItem", null, newWorkItemstartTime, newWorkItemTimer.Elapsed, "200", true));
             if (_config.UpdateCreatedBy) { newwit.Fields["System.CreatedBy"].Value = currentRevisionWorkItem.ToWorkItem().Revisions[0].Fields["System.CreatedBy"].Value; }
             if (_config.UpdateCreatedDate) { newwit.Fields["System.CreatedDate"].Value = currentRevisionWorkItem.ToWorkItem().Revisions[0].Fields["System.CreatedDate"].Value; }
 
@@ -243,7 +243,7 @@ namespace VstsSyncMigrator.Engine
             var targetQuery =
                 string.Format(
                     @"SELECT [System.Id], [{0}] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {1} ORDER BY {2}",
-                     Engine.Target.Config.ReflectedWorkItemIDFieldName,
+                     Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName,
                     _config.WIQLQueryBit,
                     _config.WIQLOrderBit
                     );
@@ -351,9 +351,9 @@ namespace VstsSyncMigrator.Engine
             var starttime = DateTime.Now;
             processWorkItemMetrics = new Dictionary<string, double>();
             processWorkItemParamiters = new Dictionary<string, string>();
-            AddParameter("SourceURL", processWorkItemParamiters, Engine.Source.WorkItems.Config.Collection.ToString());
+            AddParameter("SourceURL", processWorkItemParamiters, Engine.Source.WorkItems.Config.AsTeamProjectConfig().Collection.ToString());
             AddParameter("SourceWorkItem", processWorkItemParamiters, sourceWorkItem.Id.ToString());
-            AddParameter("TargetURL", processWorkItemParamiters, Engine.Target.WorkItems.Config.Collection.ToString());
+            AddParameter("TargetURL", processWorkItemParamiters, Engine.Target.WorkItems.Config.AsTeamProjectConfig().Collection.ToString());
             AddParameter("TargetProject", processWorkItemParamiters, Engine.Target.WorkItems.Project.Name);
             AddParameter("RetryLimit", processWorkItemParamiters, retryLimit.ToString());
             AddParameter("RetryNumber", processWorkItemParamiters, retrys.ToString());
@@ -589,9 +589,9 @@ namespace VstsSyncMigrator.Engine
                     ProcessWorkItemAttachments(sourceWorkItem, targetWorkItem, false);
                     ProcessWorkItemLinks(Engine.Source.WorkItems, Engine.Target.WorkItems, sourceWorkItem, targetWorkItem);
                     string reflectedUri = Engine.Source.WorkItems.CreateReflectedWorkItemId(sourceWorkItem);
-                    if (targetWorkItem.ToWorkItem().Fields.Contains(Engine.Target.Config.ReflectedWorkItemIDFieldName))
+                    if (targetWorkItem.ToWorkItem().Fields.Contains(Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName))
                     {
-                        targetWorkItem.ToWorkItem().Fields[Engine.Target.Config.ReflectedWorkItemIDFieldName].Value = reflectedUri;
+                        targetWorkItem.ToWorkItem().Fields[Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName].Value = reflectedUri;
                     }
                     var history = new StringBuilder();
                     history.Append(
