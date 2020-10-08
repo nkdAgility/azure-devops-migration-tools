@@ -11,8 +11,6 @@ namespace MigrationTools.Configuration
         public string PersonalAccessToken { get; set; }
         public LanguageMaps LanguageMaps { get; set; }
 
-        public Type MigrationClient { get { return MigrationClient; } }
-
         public IMigrationClientConfig PopulateWithDefault()
         {
             Project = "myProjectName";
