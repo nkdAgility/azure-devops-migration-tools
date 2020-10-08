@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using MigrationTools.Configuration;
 using MigrationTools.DataContracts;
 using Serilog;
 
@@ -75,6 +76,11 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel
             };
             internalWorkItem.RefreshWorkItem();
             return internalWorkItem;
+        }
+
+        public static TeamProjectConfig AsTeamProjectConfig(this IMigrationClientConfig context)
+        {
+            return (TeamProjectConfig)context;
         }
 
         public static WorkItem ToWorkItem(this WorkItemData workItemData)

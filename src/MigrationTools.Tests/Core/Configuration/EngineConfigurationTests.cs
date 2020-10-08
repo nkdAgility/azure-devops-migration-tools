@@ -16,7 +16,8 @@ namespace MigrationTools.Tests
         {
             string json = JsonConvert.SerializeObject(ecb.BuildDefault(),
                     new FieldMapConfigJsonConverter(),
-                    new ProcessorConfigJsonConverter());
+                    new ProcessorConfigJsonConverter(),
+                    new MigrationClientConfigJsonConverter());
             StreamWriter sw = new StreamWriter("configuration.json");
             sw.WriteLine(json);
             sw.Close();
@@ -32,7 +33,8 @@ namespace MigrationTools.Tests
             sr.Close();
             ec = JsonConvert.DeserializeObject<EngineConfiguration>(configurationjson,
                 new FieldMapConfigJsonConverter(),
-                new ProcessorConfigJsonConverter());
+                new ProcessorConfigJsonConverter(),
+                    new MigrationClientConfigJsonConverter());
             Assert.AreEqual(10, ec.FieldMaps.Count);
             Assert.AreEqual(12, ec.Processors.Count);
         }
