@@ -13,7 +13,8 @@ namespace MigrationTools.Configuration
     public class EngineConfiguration
     {
         public virtual string ChangeSetMappingFile { get; set; }
-        public virtual List<IMigrationClientConfig> Clients { get; set; }
+        public virtual IMigrationClientConfig Source { get; set; }
+        public virtual IMigrationClientConfig Target { get; set; }
         public virtual List<IFieldMapConfig> FieldMaps { get; set; }
         public virtual Dictionary<string, string> GitRepoMapping { get; set; }
 
@@ -51,7 +52,8 @@ namespace MigrationTools.Configuration
         }
 
         public override string ChangeSetMappingFile { get { return _engineConfiguration.ChangeSetMappingFile; } set { _engineConfiguration.ChangeSetMappingFile = value; } }
-        public override List<IMigrationClientConfig> Clients { get { return _engineConfiguration.Clients; } set { _engineConfiguration.Clients = value; } }
+        public override IMigrationClientConfig Source { get { return _engineConfiguration.Source; } set { _engineConfiguration.Source = value; } }
+        public override IMigrationClientConfig Target { get { return _engineConfiguration.Target; } set { _engineConfiguration.Target = value; } }
         public override List<IFieldMapConfig> FieldMaps { get { return _engineConfiguration.FieldMaps; } set { _engineConfiguration.FieldMaps = value; } }
         public override Dictionary<string, string> GitRepoMapping { get { return _engineConfiguration.GitRepoMapping; } set { _engineConfiguration.GitRepoMapping = value; } }
         public override LogEventLevel LogLevel { get { return _engineConfiguration.LogLevel; } set { _engineConfiguration.LogLevel = value; } }

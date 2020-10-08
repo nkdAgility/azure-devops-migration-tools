@@ -26,7 +26,8 @@ namespace MigrationTools.Configuration
                 configurationjson = sr.ReadToEnd();
             var ec = JsonConvert.DeserializeObject<EngineConfiguration>(configurationjson,
                     new FieldMapConfigJsonConverter(),
-                    new ProcessorConfigJsonConverter());
+                    new ProcessorConfigJsonConverter(),
+                    new MigrationClientConfigJsonConverter());
 
             //var builder = new ConfigurationBuilder();
             //builder.SetBasePath(Directory.GetCurrentDirectory());
@@ -90,9 +91,8 @@ namespace MigrationTools.Configuration
                     { "sourceWorkItemTypeName", "targetWorkItemTypeName" }
                 },
                 Processors = new List<IProcessorConfig>(),
-                Clients = new List<IMigrationClientConfig>()
             };
-            ec.Clients.Add(new TeamProjectConfig()
+            ec.Source = new TeamProjectConfig()
             {
                 Direction = MigrationClientClientDirection.Source,
                 Project = "migrationSource1",
@@ -101,8 +101,8 @@ namespace MigrationTools.Configuration
                 ReflectedWorkItemIDFieldName = "Custom.ReflectedWorkItemId",
                 PersonalAccessToken = "",
                 LanguageMaps = new LanguageMaps() { AreaPath = "Area", IterationPath = "Iteration" }
-            });
-            ec.Clients.Add(new TeamProjectConfig()
+            };
+            ec.Target = new TeamProjectConfig()
             {
                 Direction = MigrationClientClientDirection.Target,
                 Project = "migrationTarget1",
@@ -111,7 +111,7 @@ namespace MigrationTools.Configuration
                 ReflectedWorkItemIDFieldName = "Custom.ReflectedWorkItemId",
                 PersonalAccessToken = "",
                 LanguageMaps = new LanguageMaps() { AreaPath = "Area", IterationPath = "Iteration" }
-            });
+            };
             return ec;
         }
 

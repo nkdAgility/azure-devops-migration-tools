@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Net;
 using Microsoft.Extensions.DependencyInjection;
 using MigrationTools.Clients;
@@ -141,11 +140,10 @@ namespace MigrationTools
             if (_Source is null)
             {
                 var credentials = CheckForNetworkCredentials();
-                var source = Config.Clients.Single(x => x.Direction == MigrationClientClientDirection.Source);
-                if (source != null)
+                if (_Source != null)
                 {
                     _Source = _services.GetRequiredService<IMigrationClient>();
-                    _Source.Configure((TeamProjectConfig)source, credentials.source);
+                    _Source.Configure((TeamProjectConfig)Config.Source, credentials.source);
                 }
             }
             return _Source;
@@ -156,11 +154,10 @@ namespace MigrationTools
             if (_Target is null)
             {
                 var credentials = CheckForNetworkCredentials();
-                var target = Config.Clients.Single(x => x.Direction == MigrationClientClientDirection.Target);
-                if (target != null)
+                if (_Target != null)
                 {
                     _Target = _services.GetRequiredService<IMigrationClient>();
-                    _Target.Configure((TeamProjectConfig)target, credentials.target);
+                    _Target.Configure((TeamProjectConfig)Config.Target, credentials.target);
                 }
             }
             return _Target;
