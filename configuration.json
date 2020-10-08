@@ -3,6 +3,7 @@
   "LogLevel": "Verbose",
   "workaroundForQuerySOAPBugEnabled": false,
   "Source": {
+    "ObjectType": "TeamProjectConfig",
     "Collection": "https://dev.azure.com/nkdagility-preview/",
     "Project": "migrationSource1",
     "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
@@ -14,6 +15,7 @@
     }
   },
   "Target": {
+    "ObjectType": "TeamProjectConfig",
     "Collection": "https://dev.azure.com/nkdagility-preview/",
     "Project": "migrationTarget1",
     "ReflectedWorkItemIDFieldName": "nkdScrum.ReflectedWorkItemId",
