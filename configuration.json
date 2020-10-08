@@ -116,9 +116,9 @@
   "Processors": [
     {
       "ObjectType": "WorkItemDeleteConfig",
-      "Enabled": false,
-      "QueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
-      "OrderBit": "[System.ChangedDate] desc"
+      "Enabled": true,
+      "WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
+      "WIQLOrderBit": "[System.ChangedDate] desc"
     },
     {
       "ObjectType": "WorkItemMigrationConfig",
@@ -128,8 +128,8 @@
       "UpdateCreatedBy": true,
       "BuildFieldTable": false,
       "AppendMigrationToolSignatureFooter": false,
-      "QueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
-      "OrderBit": "[System.ChangedDate] desc",
+      "WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
+      "WIQLOrderBit": "[System.ChangedDate] desc",
       "Enabled": true,
       "LinkMigration": true,
       "AttachmentMigration": true,

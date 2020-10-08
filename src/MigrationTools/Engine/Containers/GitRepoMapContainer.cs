@@ -7,19 +7,20 @@ namespace MigrationTools.Engine.Containers
 {
     public class GitRepoMapContainer : EngineContainer<ReadOnlyDictionary<string, string>>
     {
-        private Dictionary<string, string> _GitRepoMaps { get; set; }
+        private Dictionary<string, string> GitRepoMaps { get; set; }
 
-        public override ReadOnlyDictionary<string, string> Items { get { return new ReadOnlyDictionary<string, string>(_GitRepoMaps); } }
+        public override ReadOnlyDictionary<string, string> Items { get { return new ReadOnlyDictionary<string, string>(GitRepoMaps); } }
 
         public GitRepoMapContainer(IServiceProvider services, EngineConfiguration config) : base(services, config)
         {
+            GitRepoMaps = new Dictionary<string, string>();
         }
 
         protected override void Configure()
         {
             if (Config.GitRepoMapping != null)
             {
-                _GitRepoMaps = Config.GitRepoMapping ?? new Dictionary<string, string>();
+                GitRepoMaps = Config.GitRepoMapping ?? new Dictionary<string, string>();
             }
         }
     }

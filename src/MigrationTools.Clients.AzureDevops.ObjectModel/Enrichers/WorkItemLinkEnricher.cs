@@ -119,7 +119,6 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
 
             if (wiTargetL.ToWorkItem().IsDirty && _save)
             {
-                wiTargetL.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
                 wiTargetL.SaveToAzureDevOps();
             }
         }
