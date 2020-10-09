@@ -63,6 +63,7 @@ namespace MigrationTools.Configuration.Processing
             PrefixProjectToNodes = false;
             UpdateCreatedDate = true;
             LinkMigrationSaveEachAsAdded = false;
+            GenerateMigrationComment = true;
             WIQLQueryBit = @"AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
             WIQLOrderBit = "[System.ChangedDate] desc";
         }
