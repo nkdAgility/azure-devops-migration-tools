@@ -80,7 +80,8 @@ namespace MigrationTools
 
                             string json = JsonConvert.SerializeObject(config, Formatting.Indented,
                                 new FieldMapConfigJsonConverter(),
-                                new ProcessorConfigJsonConverter());
+                                new ProcessorConfigJsonConverter(),
+                                new MigrationClientConfigJsonConverter());
                             StreamWriter sw = new StreamWriter(configFile);
                             sw.WriteLine(json);
                             sw.Close();

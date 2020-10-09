@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
 using MigrationTools.Configuration;
 using MigrationTools.Engine.Containers;
@@ -57,10 +56,8 @@ namespace MigrationTools.Engine.Processors
                     new Dictionary<string, string>
                     {
                         {"Name", Name},
-                        {"Target Project", Engine.Target.Config.Project},
-                        {"Target Collection", Engine.Target.Config.Collection.ToString()},
-                        {"Source Project", Engine.Source.Config.Project},
-                        {"Source Collection", Engine.Source.Config.Collection.ToString()},
+                        {"Target", Engine.Target.Config.ToString()},
+                        {"Source", Engine.Source.Config.ToString()},
                         {"Status", Status.ToString()}
                     },
                     new Dictionary<string, double>
@@ -86,22 +83,5 @@ namespace MigrationTools.Engine.Processors
         }
 
         protected abstract void InternalExecute();
-
-        protected string NodeStructreSourceToTarget(string input)
-        {
-            //input = [sourceTeamProject]\[AreaPath]
-            return string.Format("{0}\\{1}", Engine.Target.Config.Project, input);
-            //Regex r = new Regex(source.Name, RegexOptions.IgnoreCase);
-            //// Output = [targetTeamProject]\[sourceTeamProject]\[AreaPath]
-            //return r.Replace(input, target.Name, 1);
-        }
-
-        protected string ReplaceFirstInstanceOf(string input)
-        {
-            //input = [sourceTeamProject]\[AreaPath]
-            var r = new Regex(Engine.Source.Config.Project, RegexOptions.IgnoreCase);
-            //// Output = [targetTeamProject]\[sourceTeamProject]\[AreaPath]
-            return r.Replace(input, Engine.Target.Config.Project, 1);
-        }
     }
 }

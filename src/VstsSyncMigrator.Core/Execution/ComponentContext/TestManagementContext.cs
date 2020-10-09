@@ -2,6 +2,7 @@
 using System.Linq;
 using Microsoft.TeamFoundation.TestManagement.Client;
 using MigrationTools.Clients;
+using MigrationTools.Clients.AzureDevops.ObjectModel;
 
 namespace VstsSyncMigrator.Engine.ComponentContext
 {
@@ -22,7 +23,7 @@ namespace VstsSyncMigrator.Engine.ComponentContext
             this.testPlanQueryBit = testPlanQueryBit;
             _source = source;
             tms = _source.GetService<ITestManagementService>();
-            Project = tms.GetTeamProject(source.Config.Project);
+            Project = tms.GetTeamProject(source.Config.AsTeamProjectConfig().Project);
         }
 
         internal ITestPlanCollection GetTestPlans()

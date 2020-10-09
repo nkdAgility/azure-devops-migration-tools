@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MigrationTools.Clients.AzureDevops.ObjectModel;
 using MigrationTools.Configuration;
 
 namespace _VstsSyncMigrator.Engine.Tests
@@ -19,7 +20,7 @@ namespace _VstsSyncMigrator.Engine.Tests
             };
             Assert.IsNotNull(ec);
             Assert.IsNotNull(ec.Source);
-            Assert.AreEqual(ec.Source.Project, "DemoProjs");
+            Assert.AreEqual(ec.Source.AsTeamProjectConfig().Project, "DemoProjs");
         }
 
         [TestMethod]
@@ -29,7 +30,7 @@ namespace _VstsSyncMigrator.Engine.Tests
             EngineConfiguration ec = ecb.BuildDefault();
             Assert.IsNotNull(ec);
             Assert.IsNotNull(ec.Source);
-            Assert.AreEqual(ec.Source.Project, "migrationSource1");
+            Assert.AreEqual(ec.Source.ToString(), "FakeMigration");
         }
     }
 }

@@ -24,7 +24,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
 
         public override int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
         {
-            FixEmbededImages(targetWorkItem, Engine.Source.Config.Collection.ToString(), Engine.Target.Config.Collection.ToString(), Engine.Source.Config.PersonalAccessToken);
+            FixEmbededImages(targetWorkItem, Engine.Source.Config.AsTeamProjectConfig().Collection.ToString(), Engine.Target.Config.AsTeamProjectConfig().Collection.ToString(), Engine.Source.Config.AsTeamProjectConfig().PersonalAccessToken);
             return 0;
         }
 

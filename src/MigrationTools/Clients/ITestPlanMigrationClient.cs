@@ -5,7 +5,7 @@ namespace MigrationTools.Clients
 {
     public interface ITestPlanMigrationClient
     {
-        TeamProjectConfig Config { get; }
+        IMigrationClientConfig Config { get; }
 
         void Configure(IMigrationClient migrationClient, bool bypassRules = true);
 

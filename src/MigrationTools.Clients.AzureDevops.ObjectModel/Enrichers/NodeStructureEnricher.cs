@@ -30,7 +30,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
         {
             _sourceCommonStructureService = (ICommonStructureService)Engine.Source.GetService<ICommonStructureService>();
             _targetCommonStructureService = (ICommonStructureService)Engine.Target.GetService<ICommonStructureService4>();
-            _sourceProjectInfo = _sourceCommonStructureService.GetProjectFromName(Engine.Source.Config.Project);
+            _sourceProjectInfo = _sourceCommonStructureService.GetProjectFromName(Engine.Source.Config.AsTeamProjectConfig().Project);
             _sourceRootNodes = _sourceCommonStructureService.ListStructures(_sourceProjectInfo.Uri);
         }
 
@@ -48,9 +48,9 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
         {
             Log.LogDebug("NodeStructureEnricher.GetNewNodeName({sourceNodeName}, {nodeStructureType})", sourceNodeName, nodeStructureType.ToString());
             string targetStructureName = NodeStructureTypeToLanguageSpecificName(Engine.Target, nodeStructureType);
-            string targetProjectName = Engine.Target.Config.Project;
+            string targetProjectName = Engine.Target.Config.AsTeamProjectConfig().Project;
             string sourceStructureName = NodeStructureTypeToLanguageSpecificName(Engine.Source, nodeStructureType);
-            string sourceProjectName = Engine.Source.Config.Project;
+            string sourceProjectName = Engine.Source.Config.AsTeamProjectConfig().Project;
 
             // Replace project name with new name (if necessary) and inject nodePath (Area or Iteration) into path for node validation
             string newNodeName;
@@ -96,9 +96,9 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             _prefixProjectToNodes = prefixProjectToNodes;
             _nodeBasePaths = nodeBasePaths;
             //////////////////////////////////////////////////
-            ProcessCommonStructure(Engine.Source.Config.LanguageMaps.AreaPath, Engine.Target.Config.LanguageMaps.AreaPath);
+            ProcessCommonStructure(Engine.Source.Config.AsTeamProjectConfig().LanguageMaps.AreaPath, Engine.Target.Config.AsTeamProjectConfig().LanguageMaps.AreaPath);
             //////////////////////////////////////////////////
-            ProcessCommonStructure(Engine.Source.Config.LanguageMaps.IterationPath, Engine.Target.Config.LanguageMaps.IterationPath);
+            ProcessCommonStructure(Engine.Source.Config.AsTeamProjectConfig().LanguageMaps.IterationPath, Engine.Target.Config.AsTeamProjectConfig().LanguageMaps.IterationPath);
             //////////////////////////////////////////////////
         }
 
@@ -108,10 +108,10 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             switch (value)
             {
                 case NodeStructureType.Area:
-                    return client.Config.LanguageMaps.AreaPath;
+                    return client.Config.AsTeamProjectConfig().LanguageMaps.AreaPath;
 
                 case NodeStructureType.Iteration:
-                    return client.Config.LanguageMaps.IterationPath;
+                    return client.Config.AsTeamProjectConfig().LanguageMaps.IterationPath;
 
                 default:
                     throw new InvalidOperationException("Not a valid NodeStructureType ");
@@ -228,7 +228,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             NodeInfo structureParent;
             try // May run into language problems!!! This is to try and detect that
             {
-                structureParent = _targetCommonStructureService.GetNodeFromPath(string.Format("\\{0}\\{1}", Engine.Target.Config.Project, treeTypeTarget));
+                structureParent = _targetCommonStructureService.GetNodeFromPath(string.Format("\\{0}\\{1}", Engine.Target.Config.AsTeamProjectConfig().Project, treeTypeTarget));
             }
             catch (Exception ex)
             {
@@ -238,7 +238,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             }
             if (_prefixProjectToNodes)
             {
-                structureParent = CreateNode(Engine.Source.Config.Project, structureParent, null, null);
+                structureParent = CreateNode(Engine.Source.Config.AsTeamProjectConfig().Project, structureParent, null, null);
             }
             if (sourceTree.ChildNodes[0].HasChildNodes)
             {

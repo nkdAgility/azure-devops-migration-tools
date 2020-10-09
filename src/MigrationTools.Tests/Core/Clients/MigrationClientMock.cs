@@ -14,7 +14,7 @@ namespace MigrationTools.Tests.Core.Clients
             this.workItemMigrationClient = workItemMigrationClient;
         }
 
-        public TeamProjectConfig Config => throw new NotImplementedException();
+        public IMigrationClientConfig Config => throw new NotImplementedException();
 
         public object InternalCollection => throw new NotImplementedException();
 
@@ -22,7 +22,7 @@ namespace MigrationTools.Tests.Core.Clients
 
         public ITestPlanMigrationClient TestPlans => throw new NotImplementedException();
 
-        public void Configure(TeamProjectConfig config, NetworkCredential credentials = null)
+        public void Configure(IMigrationClientConfig config, NetworkCredential credentials = null)
         {
         }
 

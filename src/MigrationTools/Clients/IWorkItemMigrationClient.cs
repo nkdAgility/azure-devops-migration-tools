@@ -6,7 +6,7 @@ namespace MigrationTools.Clients
 {
     public interface IWorkItemMigrationClient
     {
-        TeamProjectConfig Config { get; }
+        IMigrationClientConfig Config { get; }
         ProjectData Project { get; }
 
         void Configure(IMigrationClient migrationClient, bool bypassRules = true);

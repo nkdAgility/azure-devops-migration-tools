@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.Logging;
 using MigrationTools.Configuration.FieldMap;
@@ -26,7 +27,8 @@ namespace MigrationTools.Configuration
                 configurationjson = sr.ReadToEnd();
             var ec = JsonConvert.DeserializeObject<EngineConfiguration>(configurationjson,
                     new FieldMapConfigJsonConverter(),
-                    new ProcessorConfigJsonConverter());
+                    new ProcessorConfigJsonConverter(),
+                    new MigrationClientConfigJsonConverter());
 
             //var builder = new ConfigurationBuilder();
             //builder.SetBasePath(Directory.GetCurrentDirectory());
@@ -53,7 +55,7 @@ namespace MigrationTools.Configuration
             AddTestPlansMigrationDefault(ec);
             ec.Processors.Add(new ImportProfilePictureConfig());
             ec.Processors.Add(new ExportProfilePictureFromADConfig());
-            ec.Processors.Add(new FixGitCommitLinksConfig() { TargetRepository = ec.Target.Project });
+            ec.Processors.Add(new FixGitCommitLinksConfig() { TargetRepository = "targetProjectName" });
             ec.Processors.Add(new WorkItemUpdateConfig());
             ec.Processors.Add(new WorkItemPostProcessingConfig() { WorkItemIDs = new List<int> { 1, 2, 3 } });
             ec.Processors.Add(new WorkItemDeleteConfig());
@@ -85,30 +87,14 @@ namespace MigrationTools.Configuration
             {
                 LogLevel = LogEventLevel.Information,
                 Version = Assembly.GetExecutingAssembly().GetName().Version.ToString(2),
-                Source = new TeamProjectConfig()
-                {
-                    Project = "migrationSource1",
-                    AllowCrossProjectLinking = false,
-                    Collection = new Uri("https://dev.azure.com/nkdagility-preview/"),
-                    ReflectedWorkItemIDFieldName = "Custom.ReflectedWorkItemId",
-                    PersonalAccessToken = "",
-                    LanguageMaps = new LanguageMaps() { AreaPath = "Area", IterationPath = "Iteration" }
-                },
-                Target = new TeamProjectConfig()
-                {
-                    Project = "migrationTarget1",
-                    AllowCrossProjectLinking = false,
-                    Collection = new Uri("https://dev.azure.com/nkdagility-preview/"),
-                    ReflectedWorkItemIDFieldName = "Custom.ReflectedWorkItemId",
-                    PersonalAccessToken = "",
-                    LanguageMaps = new LanguageMaps() { AreaPath = "Area", IterationPath = "Iteration" }
-                },
                 FieldMaps = new List<IFieldMapConfig>(),
                 WorkItemTypeDefinition = new Dictionary<string, string> {
                     { "sourceWorkItemTypeName", "targetWorkItemTypeName" }
-            },
-                Processors = new List<IProcessorConfig>()
+                },
+                Processors = new List<IProcessorConfig>(),
             };
+            ec.Source = GetMigrationConfigDefault();
+            ec.Target = GetMigrationConfigDefault();
             return ec;
         }
 
@@ -207,6 +193,20 @@ namespace MigrationTools.Configuration
                 timeTravel = 1,
                 toSkip = 3
             });
+        }
+
+        private IMigrationClientConfig GetMigrationConfigDefault()
+        {
+            Type type = AppDomain.CurrentDomain.GetAssemblies().SelectMany(x => x.GetTypes())
+                .Where(x => typeof(IMigrationClientConfig).IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
+                .FirstOrDefault();
+            if (type.BaseType == null)
+            {
+                throw new InvalidOperationException("No IMigrationClientConfig instance found in scope. Please make sure that you have implemented one!");
+            }
+            IMigrationClientConfig result = (IMigrationClientConfig)Activator.CreateInstance(type);
+            result.PopulateWithDefault();
+            return result;
         }
     }
 }

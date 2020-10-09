@@ -9,7 +9,7 @@ namespace MigrationTools.Clients.Tests
     {
         private List<WorkItemData> list = new List<WorkItemData>();
 
-        public TeamProjectConfig Config => throw new System.NotImplementedException();
+        public IMigrationClientConfig Config => throw new System.NotImplementedException();
 
         public ProjectData Project => throw new System.NotImplementedException();
 

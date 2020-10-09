@@ -44,14 +44,14 @@ namespace VstsSyncMigrator.Engine
             Stopwatch stopwatch = Stopwatch.StartNew();
             //////////////////////////////////////////////////
             TfsTeamService sourceTS = Engine.Source.GetService<TfsTeamService>();
-            List<TeamFoundationTeam> sourceTL = sourceTS.QueryTeams(Engine.Source.Config.Project).ToList();
+            List<TeamFoundationTeam> sourceTL = sourceTS.QueryTeams(Engine.Source.Config.AsTeamProjectConfig().Project).ToList();
             Log.LogDebug("Found {0} teams in Source?", sourceTL.Count);
             var sourceTSCS = Engine.Source.GetService<TeamSettingsConfigurationService>();
             //////////////////////////////////////////////////
             ProjectData targetProject = Engine.Target.WorkItems.GetProject();
             Log.LogDebug("Found target project as {0}", targetProject.Name);
             TfsTeamService targetTS = Engine.Target.GetService<TfsTeamService>();
-            List<TeamFoundationTeam> targetTL = targetTS.QueryTeams(Engine.Target.Config.Project).ToList();
+            List<TeamFoundationTeam> targetTL = targetTS.QueryTeams(Engine.Target.Config.AsTeamProjectConfig().Project).ToList();
             Log.LogDebug("Found {0} teams in Target?", targetTL.Count);
             var targetTSCS = Engine.Target.GetService<TeamSettingsConfigurationService>();
             //////////////////////////////////////////////////
@@ -91,15 +91,15 @@ namespace VstsSyncMigrator.Engine
                             if (_config.PrefixProjectToNodes)
                             {
                                 targetConfig.TeamSettings.BacklogIterationPath =
-                                    string.Format("{0}\\{1}", Engine.Target.Config.Project, sourceConfig.TeamSettings.BacklogIterationPath);
+                                    string.Format("{0}\\{1}", Engine.Target.Config.AsTeamProjectConfig().Project, sourceConfig.TeamSettings.BacklogIterationPath);
                                 targetConfig.TeamSettings.IterationPaths = sourceConfig.TeamSettings.IterationPaths
-                                    .Select(path => string.Format("{0}\\{1}", Engine.Target.Config.Project, path))
+                                    .Select(path => string.Format("{0}\\{1}", Engine.Target.Config.AsTeamProjectConfig().Project, path))
                                     .ToArray();
                                 targetConfig.TeamSettings.TeamFieldValues = sourceConfig.TeamSettings.TeamFieldValues
                                     .Select(field => new TeamFieldValue
                                     {
                                         IncludeChildren = field.IncludeChildren,
-                                        Value = string.Format("{0}\\{1}", Engine.Target.Config.Project, field.Value)
+                                        Value = string.Format("{0}\\{1}", Engine.Target.Config.AsTeamProjectConfig().Project, field.Value)
                                     })
                                     .ToArray();
                             }
@@ -165,11 +165,11 @@ namespace VstsSyncMigrator.Engine
         {
             ///////////////////////////////////////////////////
             TeamSettings newTeamSettings = sourceTCfU.TeamSettings;
-            newTeamSettings.BacklogIterationPath = newTeamSettings.BacklogIterationPath.Replace(Engine.Source.Config.Project, Engine.Target.Config.Project);
+            newTeamSettings.BacklogIterationPath = newTeamSettings.BacklogIterationPath.Replace(Engine.Source.Config.AsTeamProjectConfig().Project, Engine.Target.Config.AsTeamProjectConfig().Project);
             List<string> newIterationPaths = new List<string>();
             foreach (var ip in newTeamSettings.IterationPaths)
             {
-                newIterationPaths.Add(ip.Replace(Engine.Source.Config.Project, Engine.Target.Config.Project));
+                newIterationPaths.Add(ip.Replace(Engine.Source.Config.AsTeamProjectConfig().Project, Engine.Target.Config.AsTeamProjectConfig().Project));
             }
             newTeamSettings.IterationPaths = newIterationPaths.ToArray();
 

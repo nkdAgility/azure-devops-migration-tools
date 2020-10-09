@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools;
+using MigrationTools.Clients.AzureDevops.ObjectModel;
 using MigrationTools.Clients.AzureDevops.ObjectModel.Clients;
 using MigrationTools.Configuration;
 
@@ -35,8 +36,8 @@ namespace VstsSyncMigrator.Engine
             Stopwatch stopwatch = Stopwatch.StartNew();
             //////////////////////////////////////////////////
             TfsTeamService teamService = Engine.Target.GetService<TfsTeamService>();
-            QueryHierarchy qh = ((WorkItemMigrationClient)Engine.Target.WorkItems).Store.Projects[Engine.Target.Config.Project].QueryHierarchy;
-            List<TeamFoundationTeam> teamList = teamService.QueryTeams(Engine.Target.Config.Project).ToList();
+            QueryHierarchy qh = ((WorkItemMigrationClient)Engine.Target.WorkItems).Store.Projects[Engine.Target.Config.AsTeamProjectConfig().Project].QueryHierarchy;
+            List<TeamFoundationTeam> teamList = teamService.QueryTeams(Engine.Target.Config.AsTeamProjectConfig().Project).ToList();
 
             Log.LogInformation("Found {0} teams?", teamList.Count);
             //////////////////////////////////////////////////

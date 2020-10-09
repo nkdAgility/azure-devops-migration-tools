@@ -17,7 +17,7 @@ namespace MigrationTools.Clients
 
         protected ReadOnlyDictionary<int, WorkItemData> Cache { get { return new ReadOnlyDictionary<int, WorkItemData>(_Cache); } }
 
-        public abstract TeamProjectConfig Config { get; }
+        public abstract IMigrationClientConfig Config { get; }
         public abstract ProjectData Project { get; }
 
         public WorkItemMigrationClientBase(IServiceProvider services, ITelemetryLogger telemetry)

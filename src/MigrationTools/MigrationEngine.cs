@@ -140,7 +140,7 @@ namespace MigrationTools
             if (_Source is null)
             {
                 var credentials = CheckForNetworkCredentials();
-                if (Config.Source != null)
+                if (_Source == null)
                 {
                     _Source = _services.GetRequiredService<IMigrationClient>();
                     _Source.Configure(Config.Source, credentials.source);
@@ -154,7 +154,7 @@ namespace MigrationTools
             if (_Target is null)
             {
                 var credentials = CheckForNetworkCredentials();
-                if (Config.Target != null)
+                if (_Target == null)
                 {
                     _Target = _services.GetRequiredService<IMigrationClient>();
                     _Target.Configure(Config.Target, credentials.target);

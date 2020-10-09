@@ -3,6 +3,7 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.TestManagement.Client;
 using MigrationTools;
+using MigrationTools.Clients.AzureDevops.ObjectModel;
 using MigrationTools.Configuration;
 using MigrationTools.Engine.Processors;
 using VstsSyncMigrator.Engine.ComponentContext;
@@ -50,7 +51,7 @@ namespace VstsSyncMigrator.Engine
                 {
                     Log.LogDebug("{sourceTestConfName} - Create new", sourceTestConf.Name);
                     targetTc = targetTmc.Project.TestConfigurations.Create();
-                    targetTc.AreaPath = sourceTestConf.AreaPath.Replace(Engine.Source.Config.Project, Engine.Target.Config.Project);
+                    targetTc.AreaPath = sourceTestConf.AreaPath.Replace(Engine.Source.Config.AsTeamProjectConfig().Project, Engine.Target.Config.AsTeamProjectConfig().Project);
                     targetTc.Description = sourceTestConf.Description;
                     targetTc.IsDefault = sourceTestConf.IsDefault;
                     targetTc.Name = sourceTestConf.Name;
