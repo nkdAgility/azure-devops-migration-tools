@@ -71,8 +71,9 @@ namespace MigrationTools
         {
             NetworkCredential sourceCredentials = null;
             if (!string.IsNullOrWhiteSpace(executeOptions?.SourceUserName) && !string.IsNullOrWhiteSpace(executeOptions.SourcePassword))
+            {
                 sourceCredentials = new NetworkCredential(executeOptions.SourceUserName, executeOptions.SourcePassword, executeOptions.SourceDomain);
-
+            }
             return sourceCredentials;
         }
 
