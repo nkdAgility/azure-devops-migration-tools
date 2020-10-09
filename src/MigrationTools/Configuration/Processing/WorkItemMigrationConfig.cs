@@ -35,6 +35,7 @@ namespace MigrationTools.Configuration.Processing
         public int AttachmentMaxSize { get; set; }
         public bool CollapseRevisions { get; set; }
         public bool LinkMigrationSaveEachAsAdded { get; set; }
+        public bool GenerateMigrationComment { get; set; }
         public string[] NodeBasePaths { get; set; }
         public IList<int> WorkItemIDs { get; set; }
 
