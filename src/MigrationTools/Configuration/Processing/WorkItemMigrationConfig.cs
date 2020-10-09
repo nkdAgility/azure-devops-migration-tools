@@ -35,6 +35,7 @@ namespace MigrationTools.Configuration.Processing
         public int AttachmentMaxSize { get; set; }
         public bool CollapseRevisions { get; set; }
         public bool LinkMigrationSaveEachAsAdded { get; set; }
+        public bool GenerateMigrationComment { get; set; }
         public string[] NodeBasePaths { get; set; }
         public IList<int> WorkItemIDs { get; set; }
 
@@ -62,6 +63,7 @@ namespace MigrationTools.Configuration.Processing
             PrefixProjectToNodes = false;
             UpdateCreatedDate = true;
             LinkMigrationSaveEachAsAdded = false;
+            GenerateMigrationComment = true;
             WIQLQueryBit = @"AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
             WIQLOrderBit = "[System.ChangedDate] desc";
         }

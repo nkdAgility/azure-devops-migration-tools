@@ -593,10 +593,13 @@ namespace VstsSyncMigrator.Engine
                     {
                         targetWorkItem.ToWorkItem().Fields[Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName].Value = reflectedUri;
                     }
-                    var history = new StringBuilder();
-                    history.Append(
-                        $"This work item was migrated from a different project or organization. You can find the old version at <a href=\"{reflectedUri}\">{reflectedUri}</a>.");
-                    targetWorkItem.ToWorkItem().History = history.ToString();
+                    if (_config.GenerateMigrationComment)
+                    {
+                        var history = new StringBuilder();
+                        history.Append(
+                            $"This work item was migrated from a different project or organization. You can find the old version at <a href=\"{reflectedUri}\">{reflectedUri}</a>.");
+                        targetWorkItem.ToWorkItem().History = history.ToString();
+                    }
                     targetWorkItem.SaveToAzureDevOps();
 
                     attachmentEnricher.CleanUpAfterSave();
