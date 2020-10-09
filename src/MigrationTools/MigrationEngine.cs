@@ -67,17 +67,22 @@ namespace MigrationTools
         public ITelemetryLogger Telemetry { get; }
         public TypeDefinitionMapContainer TypeDefinitionMaps { get; }
 
-        public (NetworkCredential source, NetworkCredential target) CheckForNetworkCredentials()
+        public NetworkCredential CheckForNetworkCredentials_Source()
         {
             NetworkCredential sourceCredentials = null;
-            NetworkCredential targetCredentials = null;
             if (!string.IsNullOrWhiteSpace(executeOptions?.SourceUserName) && !string.IsNullOrWhiteSpace(executeOptions.SourcePassword))
+            {
                 sourceCredentials = new NetworkCredential(executeOptions.SourceUserName, executeOptions.SourcePassword, executeOptions.SourceDomain);
+            }
+            return sourceCredentials;
+        }
 
+        public NetworkCredential CheckForNetworkCredentials_Target()
+        {
+            NetworkCredential targetCredentials = null;
             if (!string.IsNullOrWhiteSpace(executeOptions?.TargetUserName) && !string.IsNullOrWhiteSpace(executeOptions.TargetPassword))
                 targetCredentials = new NetworkCredential(executeOptions.TargetUserName, executeOptions.TargetPassword, executeOptions.TargetDomain);
-
-            return (sourceCredentials, targetCredentials);
+            return targetCredentials;
         }
 
         public ProcessingStatus Run()
@@ -139,11 +144,11 @@ namespace MigrationTools
         {
             if (_Source is null)
             {
-                var credentials = CheckForNetworkCredentials();
+                var credentials = CheckForNetworkCredentials_Source();
                 if (_Source == null)
                 {
                     _Source = _services.GetRequiredService<IMigrationClient>();
-                    _Source.Configure(Config.Source, credentials.source);
+                    _Source.Configure(Config.Source, credentials);
                 }
             }
             return _Source;
@@ -153,11 +158,11 @@ namespace MigrationTools
         {
             if (_Target is null)
             {
-                var credentials = CheckForNetworkCredentials();
+                var credentials = CheckForNetworkCredentials_Target();
                 if (_Target == null)
                 {
                     _Target = _services.GetRequiredService<IMigrationClient>();
-                    _Target.Configure(Config.Target, credentials.target);
+                    _Target.Configure(Config.Target, credentials);
                 }
             }
             return _Target;
