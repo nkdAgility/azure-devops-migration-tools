@@ -132,7 +132,7 @@
       "AppendMigrationToolSignatureFooter": false,
       "WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
       "WIQLOrderBit": "[System.ChangedDate] desc",
-      "Enabled": true,
+      "Enabled": "poo",
       "LinkMigration": true,
       "AttachmentMigration": true,
       "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
