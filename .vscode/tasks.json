@@ -32,7 +32,7 @@
             "command": "dotnet",
             "args": [
                 "build",
-                "MigrationTools.sln",
+                "${workspaceFolder}/MigrationTools.sln",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
