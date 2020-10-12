@@ -10,7 +10,6 @@ using MigrationTools.CommandLine;
 using MigrationTools.Configuration;
 using MigrationTools.Engine.Containers;
 using MigrationTools.Services;
-using Serilog;
 using Serilog.Core;
 
 namespace _VstsSyncMigrator.Engine.Tests
@@ -18,18 +17,14 @@ namespace _VstsSyncMigrator.Engine.Tests
     [TestClass]
     public class MigrationEngineTests
     {
-        private IEngineConfigurationBuilder ecb;
         private IServiceProvider _services;
 
         [TestInitialize]
         public void Setup()
         {
-            var levelSwitch = new LoggingLevelSwitch();
-            Log.Logger = new LoggerConfiguration().MinimumLevel.ControlledBy(levelSwitch).WriteTo.Console().CreateLogger();
-
-            ecb = new EngineConfigurationBuilder(new NullLogger<EngineConfigurationBuilder>());
+            var ecb = new EngineConfigurationBuilder(new NullLogger<EngineConfigurationBuilder>());
             var services = new ServiceCollection();
-            services.AddSingleton<LoggingLevelSwitch>(levelSwitch);
+            services.AddSingleton<LoggingLevelSwitch>();
 
             // Field Mapps
             services.AddTransient<FieldBlankMap>();

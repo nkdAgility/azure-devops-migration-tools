@@ -72,7 +72,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
             }
 
             _config = (TeamProjectConfig)config;
-            _credentials = credentials ?? throw new ArgumentNullException(nameof(credentials));
+            _credentials = credentials;
             EnsureCollection();
             _workItemClient.Configure(this);
             _testPlanClient.Configure(this);

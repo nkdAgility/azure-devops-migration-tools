@@ -4,5 +4,6 @@
     <Authors>Martin Hinshelwood</Authors>
     <Company>naked Agility with Martin Hinshelwood</Company>
     <LangVersion>9.0</LangVersion>
+    <Product>MigrationTools.CommandLine</Product>
   </PropertyGroup>
 </Project>
