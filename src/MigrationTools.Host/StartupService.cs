@@ -62,12 +62,12 @@ namespace MigrationTools.Host
         {
             appLifetime.ApplicationStarted.Register(() =>
             {
-                Console.WriteLine("Press Ctrl+C to shut down.");
+                _logger.LogInformation("Press Ctrl+C to shut down.");
             });
 
             appLifetime.ApplicationStopped.Register(() =>
             {
-                Console.WriteLine("Terminating application...");
+                _logger.LogInformation("Terminating: Application forcebly closed.");
                 RunExitLogic();
                 System.Diagnostics.Process.GetCurrentProcess().Kill();
             });
