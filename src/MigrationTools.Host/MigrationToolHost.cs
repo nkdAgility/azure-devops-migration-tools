@@ -25,7 +25,6 @@ namespace MigrationTools.Host
         {
             var levelSwitch = new LoggingLevelSwitch();
             var hostBuilder = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args)
-             .UseConsoleLifetime()
              .UseSerilog((hostingContext, services, loggerConfiguration) =>
              {
                  string logsPath = CreateLogsPath();
