@@ -25,9 +25,7 @@ namespace MigrationTools.Configuration
             EngineConfiguration ec = null;
             try
             {
-                string configurationjson;
-                using (var sr = new StreamReader(configFile))
-                    configurationjson = sr.ReadToEnd();
+                string configurationjson = File.ReadAllText(configFile);
                 ec = JsonConvert.DeserializeObject<EngineConfiguration>(configurationjson,
                         new FieldMapConfigJsonConverter(),
                         new ProcessorConfigJsonConverter(),
