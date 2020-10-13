@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MigrationTools.Services;
 
@@ -16,14 +17,16 @@ namespace MigrationTools.Host
 
     internal class StartupService : IStartupService
     {
+        private readonly IHostApplicationLifetime _LifeTime;
         private readonly IDetectOnlineService _detectOnlineService;
         private readonly IDetectVersionService _detectVersionService;
         private readonly ILogger<StartupService> _logger;
         private readonly ITelemetryLogger _telemetryLogger;
         private static Stopwatch _mainTimer = new Stopwatch();
 
-        public StartupService(IDetectOnlineService detectOnlineService, IDetectVersionService detectVersionService, ILogger<StartupService> logger, ITelemetryLogger telemetryLogger)
+        public StartupService(IHostApplicationLifetime lifeTime, IDetectOnlineService detectOnlineService, IDetectVersionService detectVersionService, ILogger<StartupService> logger, ITelemetryLogger telemetryLogger)
         {
+            _LifeTime = lifeTime;
             _detectOnlineService = detectOnlineService;
             _detectVersionService = detectVersionService;
             _logger = logger;
@@ -33,6 +36,7 @@ namespace MigrationTools.Host
         public void RunStartupLogic(string[] args)
         {
             ApplicationStartup(args);
+            Configure(_LifeTime);
             if (_detectOnlineService.IsOnline())
             {
                 Version latestVersion = _detectVersionService.GetLatestVersion();
@@ -52,6 +56,22 @@ namespace MigrationTools.Host
 #endif
                 }
             }
+        }
+
+        public void Configure(IHostApplicationLifetime appLifetime)
+        {
+            appLifetime.ApplicationStarted.Register(() =>
+            {
+                _logger.LogInformation("Press Ctrl+C to shut down.");
+            });
+
+            appLifetime.ApplicationStopped.Register(() =>
+            {
+                _logger.LogInformation("Terminating: Application forcebly closed.");
+                RunExitLogic();
+                Environment.Exit(-1);
+                //System.Diagnostics.Process.GetCurrentProcess().Kill();
+            });
         }
 
         public void RunExitLogic()
