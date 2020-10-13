@@ -69,7 +69,8 @@ namespace MigrationTools.Host
             {
                 _logger.LogInformation("Terminating: Application forcebly closed.");
                 RunExitLogic();
-                System.Diagnostics.Process.GetCurrentProcess().Kill();
+                Environment.Exit(-1);
+                //System.Diagnostics.Process.GetCurrentProcess().Kill();
             });
         }
 

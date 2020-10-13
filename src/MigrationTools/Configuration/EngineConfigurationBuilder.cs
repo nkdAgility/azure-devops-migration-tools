@@ -39,7 +39,7 @@ namespace MigrationTools.Configuration
                 _logger.LogCritical("Your configuration file is malformed and cant be loaded!");
                 _logger.LogError(ex.Message);
                 _logger.LogError("How to Solve: Malformed Json is usually a result of editing errors. Validate that your {configFile} is valid Json!", configFile);
-                System.Diagnostics.Process.GetCurrentProcess().Kill();
+                Environment.Exit(-1);
                 return null;
             }
             catch (JsonReaderException ex)
@@ -48,7 +48,7 @@ namespace MigrationTools.Configuration
                 _logger.LogCritical("Your configuration file was loaded but was unable to be mapped to ");
                 _logger.LogError(ex.Message);
                 _logger.LogError("How to Solve: Malformed configurations are usually a result of changes between versions. The best way to understand the change is to run 'migration.exe init' to create a new wel formed config and determin where the problem is!");
-                System.Diagnostics.Process.GetCurrentProcess().Kill();
+                Environment.Exit(-1);
                 return null;
             }
 
