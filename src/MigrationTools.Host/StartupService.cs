@@ -85,7 +85,6 @@ namespace MigrationTools.Host
             _logger.LogInformation("The application ran in {Application_Elapsed} and finished at {Application_EndTime}", _mainTimer.Elapsed.ToString("c"), DateTime.Now.ToUniversalTime().ToLocalTime());
             //Log.CloseAndFlush();
             System.Threading.Thread.Sleep(5000);
-            System.Diagnostics.Process.GetCurrentProcess().Kill();
         }
 
         private void ApplicationStartup(string[] args)
