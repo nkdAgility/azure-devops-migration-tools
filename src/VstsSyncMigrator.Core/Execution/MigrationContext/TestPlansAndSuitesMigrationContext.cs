@@ -1025,7 +1025,7 @@ namespace VstsSyncMigrator.Engine
                 Log.LogInformation("==      Suite Title: {SourceTestSuiteTitle}=============================".PadLeft(indent), sourceTestSuite.Title.PadRight(45));
                 Log.LogInformation("===============================================================================================".PadLeft(indent));
             }
-            Log.LogInformation("== {GetLogTags()} - suiteid[{SourceTestSuiteId}] | {message}".PadLeft(indent), sourceTestSuite.Id.ToString().PadRight(6), message);
+            Log.LogInformation("== {Tags} - suiteid[{SourceTestSuiteId}] | {message}".PadLeft(indent), GetLogTags(), sourceTestSuite.Id.ToString().PadRight(6), message);
             if (header) Log.LogInformation("===============================================================================================".PadLeft(indent));
         }
 
