@@ -28,18 +28,18 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
                 {
                     fieldsUpdate(Config.targetFieldsAndValues, target);
                 }
-                Log.LogDebug("FieldValuetoTagMap: [UPDATE] field mapped {0}:{1} to {2}:{3}", source.Id, Config.sourceFieldsAndValues.Keys.ToString(), target.Id, Config.targetFieldsAndValues.Keys.ToString());
+                Log.LogDebug("FieldValuetoTagMap: [UPDATE] field mapped {0}:{1} to {2}:{3}", source.Id, Config.sourceFieldsAndValues?.Keys.ToString(), target.Id, Config.targetFieldsAndValues?.Keys.ToString());
             }
             else
             {
-                Log.LogDebug("FieldValuetoTagMap: [SKIPPED] Not all source and target fields exist", source.Id, Config.sourceFieldsAndValues.Keys.ToString(), target.Id, Config.targetFieldsAndValues.Keys.ToString());
+                Log.LogDebug("FieldValuetoTagMap: [SKIPPED] Not all source and target fields exist", source.Id, Config.sourceFieldsAndValues?.Keys.ToString(), target.Id, Config.targetFieldsAndValues?.Keys.ToString());
             }
         }
 
         private bool fieldsExist(Dictionary<string, string> fieldsAndValues, WorkItem workitem)
         {
             bool exists = true;
-            foreach (string field in fieldsAndValues.Keys)
+            foreach (string field in fieldsAndValues?.Keys)
             {
                 if (!workitem.Fields.Contains(field))
                 {
@@ -51,7 +51,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
 
         private void fieldsUpdate(Dictionary<string, string> fieldAndValues, WorkItem workitem)
         {
-            foreach (string field in fieldAndValues.Keys)
+            foreach (string field in fieldAndValues?.Keys)
             {
                 workitem.Fields[field].Value = fieldAndValues[field];
             }
@@ -60,7 +60,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
         private bool fieldsValueMatch(Dictionary<string, string> fieldAndValues, WorkItem workitem)
         {
             bool matches = true;
-            foreach (string field in fieldAndValues.Keys)
+            foreach (string field in fieldAndValues?.Keys)
             {
                 if ((string)workitem.Fields[field].Value != fieldAndValues[field])
                 {
