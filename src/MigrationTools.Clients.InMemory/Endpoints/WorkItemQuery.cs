@@ -8,6 +8,8 @@ namespace MigrationTools.Clients.InMemory.Endpoints
     {
         private int _query;
 
+        public string Query => _query.ToString();
+
         public void Configure(IMigrationClient migrationClient, string query, Dictionary<string, string> parameters)
         {
             if (string.IsNullOrEmpty(query))

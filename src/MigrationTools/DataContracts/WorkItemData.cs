@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace MigrationTools.DataContracts
 {
@@ -12,7 +13,10 @@ namespace MigrationTools.DataContracts
         public DateTime RevisedDate { get; set; }
         public int Revision { get; set; }
         public string ProjectName { get; set; }
+
+        [JsonIgnoreAttribute]
         public object internalObject { get; set; }
+
         public Dictionary<string, object> Fields { get; set; }
         public List<RevisionItem> Revisions { get; set; }
     }
