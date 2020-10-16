@@ -2,5 +2,6 @@
 {
     public interface IEndpoint
     {
+        int Count { get; }
     }
 }

@@ -12,20 +12,12 @@ namespace MigrationTools.Clients.InMemory.Endpoints
         {
         }
 
-        private void Configure(IWorkItemQuery query)
+        public int Count { get { return _innerList.Count; } }
+
+        public void Configure(IWorkItemQuery query)
         {
             _innerList.Clear();
-            for (int i = 0; i < 10; i++)
-            {
-                _innerList.Add(new WorkItemData()
-                {
-                    Id = i.ToString(),
-                    Title = string.Format("Title {i}", i),
-                    Rev = 1,
-                    Revision = 1,
-                    Revisions =
-                });
-            }
+            _innerList.AddRange(query.GetWorkItems());
         }
     }
 }
