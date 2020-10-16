@@ -11,7 +11,7 @@ namespace MigrationTools.Clients.FileSystem.Endpoints
     public class WorkItemEndpoint : IWorkItemSourceEndPoint, IWorkItemTargetEndPoint
     {
         private List<WorkItemData> _innerList = new List<WorkItemData>();
-        private string _WorkItemStore;
+        private IWorkItemQuery _WorkItemStoreQuery;
 
         public WorkItemEndpoint()
         {
@@ -23,9 +23,8 @@ namespace MigrationTools.Clients.FileSystem.Endpoints
 
         public void Configure(IWorkItemQuery query)
         {
-            _innerList.Clear();
-            _innerList.AddRange(query.GetWorkItems());
-            _WorkItemStore = query.Query;
+            _WorkItemStoreQuery = query;
+            RefreshStore();
         }
 
         public void Filter(IEnumerable<WorkItemData> workItems)
@@ -39,8 +38,15 @@ namespace MigrationTools.Clients.FileSystem.Endpoints
         public void PersistWorkItem(WorkItemData source)
         {
             var content = JsonConvert.SerializeObject(source, Formatting.Indented);
-            var fileName = Path.Combine(_WorkItemStore, string.Format("{0}.json", source.Id));
-            System.IO.File.WriteAllText(fileName, content);
+            var fileName = Path.Combine(_WorkItemStoreQuery.Query, string.Format("{0}.json", source.Id));
+            File.WriteAllText(fileName, content);
+            RefreshStore();
+        }
+
+        private void RefreshStore()
+        {
+            _innerList.Clear();
+            _innerList.AddRange(_WorkItemStoreQuery.GetWorkItems());
         }
     }
 }

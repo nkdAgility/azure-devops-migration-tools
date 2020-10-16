@@ -6,15 +6,17 @@ namespace MigrationTools.Clients.FileSystem.Endpoints.Tests
     [TestClass()]
     public class WorkItemEndpointTests
     {
-        [TestInitialize]
-        public void Setup()
+        public void SetupStore(string path, int count)
         {
-            //System.IO.Directory.Delete(@".\Store\");
+            if (System.IO.Directory.Exists(path))
+            {
+                System.IO.Directory.Delete(path, true);
+            }
             WorkItemEndpoint e = new WorkItemEndpoint();
             WorkItemQuery query = new WorkItemQuery();
-            query.Configure(null, @".\Store\", null);
+            query.Configure(null, path, null);
             e.Configure(query);
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < count; i++)
             {
                 e.PersistWorkItem(new WorkItemData() { Id = i.ToString(), Title = string.Format("Title {0}", i) });
             }
@@ -30,9 +32,10 @@ namespace MigrationTools.Clients.FileSystem.Endpoints.Tests
         [TestMethod]
         public void ConfiguredTest()
         {
+            SetupStore(@".\Store\Source\", 10);
             WorkItemEndpoint e = new WorkItemEndpoint();
             WorkItemQuery query = new WorkItemQuery();
-            query.Configure(null, @".\Store\", null);
+            query.Configure(null, @".\Store\Source\", null);
             e.Configure(query);
             Assert.AreEqual(10, e.Count);
         }
@@ -40,11 +43,14 @@ namespace MigrationTools.Clients.FileSystem.Endpoints.Tests
         [TestMethod]
         public void FilterAllTest()
         {
+            SetupStore(@".\Store\Source\", 10);
+            SetupStore(@".\Store\target\", 10);
             WorkItemEndpoint e1 = new WorkItemEndpoint();
             WorkItemQuery query = new WorkItemQuery();
-            query.Configure(null, @".\Store\", null);
+            query.Configure(null, @".\Store\Source\", null);
             e1.Configure(query);
             WorkItemEndpoint e2 = new WorkItemEndpoint();
+            query.Configure(null, @".\Store\Target\", null);
             e2.Configure(query);
             e1.Filter(e2.WorkItems);
             Assert.AreEqual(0, e1.Count);
@@ -53,51 +59,57 @@ namespace MigrationTools.Clients.FileSystem.Endpoints.Tests
         [TestMethod]
         public void FilterHalfTest()
         {
+            SetupStore(@".\Store\Source\", 20);
+            SetupStore(@".\Store\target\", 10);
             WorkItemEndpoint e1 = new WorkItemEndpoint();
             WorkItemQuery query = new WorkItemQuery();
-            query.Configure(null, @".\Store\", null);
+            query.Configure(null, @".\Store\Source\", null);
             e1.Configure(query);
             WorkItemEndpoint e2 = new WorkItemEndpoint();
-            query.Configure(null, @".\Store\", null);
+            query.Configure(null, @".\Store\target\", null);
             e2.Configure(query);
             e1.Filter(e2.WorkItems);
-            Assert.AreEqual(0, e1.Count);
+            Assert.AreEqual(10, e1.Count);
         }
 
         [TestMethod]
         public void PersistWorkItemWithFilterTest()
         {
+            SetupStore(@".\Store\Source\", 20);
+            SetupStore(@".\Store\target\", 10);
             WorkItemEndpoint e1 = new WorkItemEndpoint();
             WorkItemQuery query = new WorkItemQuery();
-            query.Configure(null, "20", null);
+            query.Configure(null, @".\Store\Source\", null);
             e1.Configure(query);
             WorkItemEndpoint e2 = new WorkItemEndpoint();
-            query.Configure(null, "10", null);
+            query.Configure(null, @".\Store\target\", null);
             e2.Configure(query);
             e1.Filter(e2.WorkItems);
-            Assert.AreEqual(0, e1.Count);
+            Assert.AreEqual(10, e1.Count);
             foreach (WorkItemData item in e1.WorkItems)
             {
                 e2.PersistWorkItem(item);
             }
-            Assert.AreEqual(0, e2.Count);
+            Assert.AreEqual(20, e2.Count);
         }
 
         [TestMethod]
         public void PersistWorkItemExistsTest()
         {
+            SetupStore(@".\Store\Source\", 20);
+            SetupStore(@".\Store\target\", 10);
             WorkItemEndpoint e1 = new WorkItemEndpoint();
             WorkItemQuery query = new WorkItemQuery();
-            query.Configure(null, "20", null);
+            query.Configure(null, @".\Store\Source\", null);
             e1.Configure(query);
             WorkItemEndpoint e2 = new WorkItemEndpoint();
-            query.Configure(null, "10", null);
+            query.Configure(null, @".\Store\target\", null);
             e2.Configure(query);
             foreach (WorkItemData item in e1.WorkItems)
             {
                 e2.PersistWorkItem(item);
             }
-            Assert.AreEqual(0, e2.Count);
+            Assert.AreEqual(20, e2.Count);
         }
     }
 }
