@@ -4,19 +4,20 @@ using MigrationTools.DataContracts;
 
 namespace MigrationTools.EndPoints
 {
-    public interface IWorkItemSourceEndPoint : IEndpoint
+    public interface IWorkItemSourceEndPoint : IWorkItemEndPoint
+    {
+        void Filter(IEnumerable<WorkItemData> targetWorkItems);
+    }
+
+    public interface IWorkItemTargetEndPoint : IWorkItemEndPoint
+    {
+        void PersistWorkItem(WorkItemData sourceWorkItem);
+    }
+
+    public interface IWorkItemEndPoint : IEndpoint
     {
         IEnumerable<WorkItemData> WorkItems { get; }
 
         void Configure(IWorkItemQuery query);
-    }
-
-    public interface IWorkItemTargetEndPoint : IEndpoint
-    {
-        void Configure(IWorkItemQuery query);
-
-        void Filter(IEnumerable<WorkItemData> workItems);
-
-        void PersistWorkItem(WorkItemData source);
     }
 }
