@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace MigrationTools.DataContracts
 {
@@ -12,6 +13,7 @@ namespace MigrationTools.DataContracts
         public int Revision { get; set; }
         public string ProjectName { get; set; }
         public object internalObject { get; set; }
-        public object Fields { get; set; }
+        public Dictionary<string, object> Fields { get; set; }
+        public List<RevisionItem> Revisions { get; set; }
     }
 }

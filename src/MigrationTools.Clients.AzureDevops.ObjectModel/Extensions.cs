@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools.Configuration;
 using MigrationTools.DataContracts;
@@ -66,6 +67,13 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel
             context.Revision = workItem.Revision;
             context.ProjectName = workItem?.Project?.Name;
             context.Fields = workItem.Fields.AsDictionary();
+            context.Revisions = (from Revision x in workItem.Revisions
+                                 select new RevisionItem()
+                                 {
+                                     Index = x.Index,
+                                     Number = Convert.ToInt32(x.Fields["System.Rev"].Value),
+                                     ChangedDate = Convert.ToDateTime(x.Fields["System.ChangedDate"].Value)
+                                 }).ToList();
         }
 
         public static WorkItemData AsWorkItemData(this WorkItem context)
