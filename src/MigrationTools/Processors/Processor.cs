@@ -1,36 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using MigrationTools.Configuration;
-using MigrationTools.Engine.Containers;
-using MigrationTools.Processors;
+using MigrationTools.Endpoints;
+using MigrationTools.Enrichers;
 
-namespace MigrationTools.Engine.Processors
+namespace MigrationTools.Processors
 {
-    public abstract class MigrationProcessorBase : IProcessor
+    public abstract class Processor : IProcessor2
     {
-        protected MigrationProcessorBase(IMigrationEngine engine, IServiceProvider services, ITelemetryLogger telemetry, ILogger<MigrationProcessorBase> logger)
+        public Processor(IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger)
         {
-            Engine = engine;
             Services = services;
             Telemetry = telemetry;
             Log = logger;
         }
 
-        public abstract string Name { get; }
+        public Collection<IEndpoint> Endpoints => throw new NotImplementedException();
+
+        public Collection<IProcessorEnricher> Enrichers => throw new NotImplementedException();
+
+        public string Name { get { return this.GetType().Name; } }
 
         public ProcessingStatus Status { get; private set; } = ProcessingStatus.None;
+        public IServiceProvider Services { get; }
+        public ITelemetryLogger Telemetry { get; }
+        public ILogger<Processor> Log { get; }
 
-        protected IMigrationEngine Engine { get; }
+        public abstract void Configure(IProcessorOptions config);
 
-        protected ILogger<MigrationProcessorBase> Log { get; }
-
-        protected IServiceProvider Services { get; }
-
-        protected ITelemetryLogger Telemetry { get; }
-
-        public abstract void Configure(IProcessorConfig config);
+        public void Configure(IProcessorConfig config)
+        {
+            Configure((IProcessorOptions)config);
+        }
 
         public void Execute()
         {
@@ -46,7 +50,7 @@ namespace MigrationTools.Engine.Processors
                 Status = ProcessingStatus.Complete;
                 executeTimer.Stop();
 
-                Log.LogInformation(" Migration Context Complete {MigrationContextname} ", Name);
+                Log.LogInformation(" Migration Processor Complete {MigrationContextname} ", Name);
             }
             catch (Exception ex)
             {
@@ -57,8 +61,8 @@ namespace MigrationTools.Engine.Processors
                     new Dictionary<string, string>
                     {
                         {"Name", Name},
-                        {"Target", Engine.Target.Config.ToString()},
-                        {"Source", Engine.Source.Config.ToString()},
+                        //{"Target", Engine.Target.Config.ToString()},
+                        //{"Source", Engine.Source.Config.ToString()},
                         {"Status", Status.ToString()}
                     },
                     new Dictionary<string, double>
@@ -69,18 +73,9 @@ namespace MigrationTools.Engine.Processors
             }
             finally
             {
+                Log.LogInformation("{ProcessorName} completed in {ProcessorDuration} ", Name, executeTimer.Elapsed.ToString("c"));
                 Telemetry.TrackRequest(this.Name, start, executeTimer.Elapsed, Status.ToString(), (Status == ProcessingStatus.Complete));
             }
-        }
-
-        protected static void AddMetric(string name, IDictionary<string, double> store, double value)
-        {
-            if (!store.ContainsKey(name)) store.Add(name, value);
-        }
-
-        protected static void AddParameter(string name, IDictionary<string, string> store, string value)
-        {
-            if (!store.ContainsKey(name)) store.Add(name, value);
         }
 
         protected abstract void InternalExecute();

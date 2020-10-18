@@ -18,7 +18,6 @@
 
   <ItemGroup>
     <Folder Include="MappingTools\" />
-    <Folder Include="Processors\" />
   </ItemGroup>
 
 </Project>
