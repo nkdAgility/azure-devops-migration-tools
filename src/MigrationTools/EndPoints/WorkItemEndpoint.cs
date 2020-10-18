@@ -12,8 +12,9 @@ namespace MigrationTools.Endpoints
         protected IWorkItemQuery _WorkItemStoreQuery;
         protected List<IWorkItemEnricher> _innerEnrichers = new List<IWorkItemEnricher>();
 
-        public WorkItemEndpoint()
+        public WorkItemEndpoint(IEndpointOptions endpointOptions)
         {
+            EndpointOptions = endpointOptions;
         }
 
         public int Count { get { return _innerList.Count; } }
@@ -23,6 +24,8 @@ namespace MigrationTools.Endpoints
         public IEnumerable<IWorkItemSourceEnricher> SourceEnrichers => (from e in _innerEnrichers where e is IWorkItemSourceEnricher select (IWorkItemSourceEnricher)e);
 
         public IEnumerable<IWorkItemTargetEnricher> TargetEnrichers => (from e in _innerEnrichers where e is IWorkItemTargetEnricher select (IWorkItemTargetEnricher)e);
+
+        public IEndpointOptions EndpointOptions { get; }
 
         public virtual void Configure(IWorkItemQuery query, List<IWorkItemEnricher> enrichers)
         {

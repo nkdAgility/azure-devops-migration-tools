@@ -12,7 +12,7 @@ namespace MigrationTools.Endpoints.Tests
             {
                 System.IO.Directory.Delete(path, true);
             }
-            FileSystemWorkItemEndpoint e = new FileSystemWorkItemEndpoint();
+            FileSystemWorkItemEndpoint e = new FileSystemWorkItemEndpoint(new FileSystemWorkItemEndpointOptions() { Direction = EndpointDirection.Source });
             FileSystemWorkItemQuery query = new FileSystemWorkItemQuery();
             query.Configure(null, path, null);
             e.Configure(query, null);
@@ -25,7 +25,7 @@ namespace MigrationTools.Endpoints.Tests
         [TestMethod]
         public void EmptyTest()
         {
-            FileSystemWorkItemEndpoint e = new FileSystemWorkItemEndpoint();
+            FileSystemWorkItemEndpoint e = new FileSystemWorkItemEndpoint(new FileSystemWorkItemEndpointOptions() { Direction = EndpointDirection.Source });
             Assert.AreEqual(0, e.Count);
         }
 
@@ -33,7 +33,7 @@ namespace MigrationTools.Endpoints.Tests
         public void ConfiguredTest()
         {
             SetupStore(@".\Store\Source\", 10);
-            FileSystemWorkItemEndpoint e = new FileSystemWorkItemEndpoint();
+            FileSystemWorkItemEndpoint e = new FileSystemWorkItemEndpoint(new FileSystemWorkItemEndpointOptions() { Direction = EndpointDirection.Source });
             FileSystemWorkItemQuery query = new FileSystemWorkItemQuery();
             query.Configure(null, @".\Store\Source\", null);
             e.Configure(query, null);
@@ -45,11 +45,11 @@ namespace MigrationTools.Endpoints.Tests
         {
             SetupStore(@".\Store\Source\", 10);
             SetupStore(@".\Store\target\", 10);
-            FileSystemWorkItemEndpoint e1 = new FileSystemWorkItemEndpoint();
+            FileSystemWorkItemEndpoint e1 = new FileSystemWorkItemEndpoint(new FileSystemWorkItemEndpointOptions() { Direction = EndpointDirection.Source });
             FileSystemWorkItemQuery query = new FileSystemWorkItemQuery();
             query.Configure(null, @".\Store\Source\", null);
             e1.Configure(query, null);
-            FileSystemWorkItemEndpoint e2 = new FileSystemWorkItemEndpoint();
+            FileSystemWorkItemEndpoint e2 = new FileSystemWorkItemEndpoint(new FileSystemWorkItemEndpointOptions() { Direction = EndpointDirection.Target });
             query.Configure(null, @".\Store\Target\", null);
             e2.Configure(query, null);
             e1.Filter(e2.WorkItems);
@@ -61,11 +61,11 @@ namespace MigrationTools.Endpoints.Tests
         {
             SetupStore(@".\Store\Source\", 20);
             SetupStore(@".\Store\target\", 10);
-            FileSystemWorkItemEndpoint e1 = new FileSystemWorkItemEndpoint();
+            FileSystemWorkItemEndpoint e1 = new FileSystemWorkItemEndpoint(new FileSystemWorkItemEndpointOptions() { Direction = EndpointDirection.Source });
             FileSystemWorkItemQuery query = new FileSystemWorkItemQuery();
             query.Configure(null, @".\Store\Source\", null);
             e1.Configure(query, null);
-            FileSystemWorkItemEndpoint e2 = new FileSystemWorkItemEndpoint();
+            FileSystemWorkItemEndpoint e2 = new FileSystemWorkItemEndpoint(new FileSystemWorkItemEndpointOptions() { Direction = EndpointDirection.Target });
             query.Configure(null, @".\Store\target\", null);
             e2.Configure(query, null);
             e1.Filter(e2.WorkItems);
@@ -77,11 +77,11 @@ namespace MigrationTools.Endpoints.Tests
         {
             SetupStore(@".\Store\Source\", 20);
             SetupStore(@".\Store\target\", 10);
-            FileSystemWorkItemEndpoint e1 = new FileSystemWorkItemEndpoint();
+            FileSystemWorkItemEndpoint e1 = new FileSystemWorkItemEndpoint(new FileSystemWorkItemEndpointOptions() { Direction = EndpointDirection.Source });
             FileSystemWorkItemQuery query = new FileSystemWorkItemQuery();
             query.Configure(null, @".\Store\Source\", null);
             e1.Configure(query, null);
-            FileSystemWorkItemEndpoint e2 = new FileSystemWorkItemEndpoint();
+            FileSystemWorkItemEndpoint e2 = new FileSystemWorkItemEndpoint(new FileSystemWorkItemEndpointOptions() { Direction = EndpointDirection.Target });
             query.Configure(null, @".\Store\target\", null);
             e2.Configure(query, null);
             e1.Filter(e2.WorkItems);
@@ -98,11 +98,11 @@ namespace MigrationTools.Endpoints.Tests
         {
             SetupStore(@".\Store\Source\", 20);
             SetupStore(@".\Store\target\", 10);
-            FileSystemWorkItemEndpoint e1 = new FileSystemWorkItemEndpoint();
+            FileSystemWorkItemEndpoint e1 = new FileSystemWorkItemEndpoint(new FileSystemWorkItemEndpointOptions() { Direction = EndpointDirection.Source });
             FileSystemWorkItemQuery query = new FileSystemWorkItemQuery();
             query.Configure(null, @".\Store\Source\", null);
             e1.Configure(query, null);
-            FileSystemWorkItemEndpoint e2 = new FileSystemWorkItemEndpoint();
+            FileSystemWorkItemEndpoint e2 = new FileSystemWorkItemEndpoint(new FileSystemWorkItemEndpointOptions() { Direction = EndpointDirection.Target });
             query.Configure(null, @".\Store\target\", null);
             e2.Configure(query, null);
             foreach (WorkItemData item in e1.WorkItems)

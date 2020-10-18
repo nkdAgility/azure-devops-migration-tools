@@ -128,7 +128,7 @@
       "PrefixProjectToNodes": false,
       "CollapseRevisions": false,
       "WorkItemCreateRetryLimit": 5,
-      "PipelineAdapter": [
+      "Enrichers": [
         {
           "ObjectType": "PauseAfterEachWorkItem",
           "Enabled": true
@@ -155,7 +155,7 @@
           "Direction": "Source",
           "WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
           "WIQLOrderBit": "[System.ChangedDate] desc",
-          "Enrichers": [
+          "EndpointEnrichers": [
             {
               "ObjectType": "FileSystemWorkItemAttachmentEnricherConfig",
               "Enabled": true,

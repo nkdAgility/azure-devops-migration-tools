@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace MigrationTools.Configuration
+namespace MigrationTools.Endpoints
 {
     public enum EndpointDirection
     {
@@ -9,7 +9,7 @@ namespace MigrationTools.Configuration
         Target
     }
 
-    public interface IEndpointConfig
+    public interface IEndpointOptions
     {
         [JsonConverter(typeof(StringEnumConverter))]
         public EndpointDirection Direction { get; set; }

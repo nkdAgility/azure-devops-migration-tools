@@ -6,7 +6,7 @@ namespace MigrationTools.Endpoints
 {
     public class FileSystemWorkItemEndpoint : WorkItemEndpoint
     {
-        public FileSystemWorkItemEndpoint()
+        public FileSystemWorkItemEndpoint(FileSystemWorkItemEndpointOptions workItemEndpointOptions) : base(workItemEndpointOptions)
         {
         }
 

@@ -3,7 +3,7 @@ using MigrationTools.DataContracts;
 
 namespace MigrationTools.Enrichers
 {
-    public interface IWorkItemEnricher : IEnricher
+    public interface IWorkItemEnricher : IEndpointEnricher
     {
         void Configure(bool save = true, bool filter = true);
 
