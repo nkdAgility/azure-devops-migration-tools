@@ -4,6 +4,7 @@ using MigrationTools.Clients;
 using MigrationTools.Clients.AzureDevops.ObjectModel.Clients;
 using MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers;
 using MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps;
+using MigrationTools.Endpoints;
 using MigrationTools.Host;
 using VstsSyncMigrator.Engine;
 

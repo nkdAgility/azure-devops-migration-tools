@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using MigrationTools.Clients;
 using MigrationTools.DataContracts;
+using MigrationTools.Endpoints;
 using Newtonsoft.Json;
 
-namespace MigrationTools.Clients.FileSystem.Endpoints
+namespace MigrationTools.Endpoints
 {
-    public class WorkItemQuery : IWorkItemQuery
+    public class FileSystemWorkItemQuery : IWorkItemQuery
     {
         private string _query;
 

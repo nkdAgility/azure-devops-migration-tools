@@ -3,7 +3,7 @@ using MigrationTools.Clients;
 using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
 
-namespace MigrationTools.EndPoints
+namespace MigrationTools.Endpoints
 {
     public interface IWorkItemSourceEndPoint : IWorkItemEndPoint
     {

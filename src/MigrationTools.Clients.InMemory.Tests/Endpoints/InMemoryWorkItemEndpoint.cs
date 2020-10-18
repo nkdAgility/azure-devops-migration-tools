@@ -1,23 +1,23 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools.DataContracts;
 
-namespace MigrationTools.Clients.InMemory.Endpoints.Tests
+namespace MigrationTools.Endpoints.Tests
 {
     [TestClass()]
-    public class WorkItemEndpointTests
+    public class InMemoryWorkItemEndpointTests
     {
         [TestMethod()]
         public void EmptyTest()
         {
-            WorkItemEndpoint e = new WorkItemEndpoint();
+            InMemoryWorkItemEndpoint e = new InMemoryWorkItemEndpoint();
             Assert.AreEqual(0, e.Count);
         }
 
         [TestMethod]
         public void ConfiguredTest()
         {
-            WorkItemEndpoint e = new WorkItemEndpoint();
-            WorkItemQuery query = new WorkItemQuery();
+            InMemoryWorkItemEndpoint e = new InMemoryWorkItemEndpoint();
+            InMemoryWorkItemQuery query = new InMemoryWorkItemQuery();
             query.Configure(null, "10", null);
             e.Configure(query, null);
             Assert.AreEqual(10, e.Count);
@@ -26,11 +26,11 @@ namespace MigrationTools.Clients.InMemory.Endpoints.Tests
         [TestMethod]
         public void FilterAllTest()
         {
-            WorkItemEndpoint e1 = new WorkItemEndpoint();
-            WorkItemQuery query = new WorkItemQuery();
+            InMemoryWorkItemEndpoint e1 = new InMemoryWorkItemEndpoint();
+            InMemoryWorkItemQuery query = new InMemoryWorkItemQuery();
             query.Configure(null, "10", null);
             e1.Configure(query, null);
-            WorkItemEndpoint e2 = new WorkItemEndpoint();
+            InMemoryWorkItemEndpoint e2 = new InMemoryWorkItemEndpoint();
             e2.Configure(query, null);
             e1.Filter(e2.GetWorkItems());
             Assert.AreEqual(0, e1.Count);
@@ -39,11 +39,11 @@ namespace MigrationTools.Clients.InMemory.Endpoints.Tests
         [TestMethod]
         public void FilterHalfTest()
         {
-            WorkItemEndpoint e1 = new WorkItemEndpoint();
-            WorkItemQuery query = new WorkItemQuery();
+            InMemoryWorkItemEndpoint e1 = new InMemoryWorkItemEndpoint();
+            InMemoryWorkItemQuery query = new InMemoryWorkItemQuery();
             query.Configure(null, "20", null);
             e1.Configure(query, null);
-            WorkItemEndpoint e2 = new WorkItemEndpoint();
+            InMemoryWorkItemEndpoint e2 = new InMemoryWorkItemEndpoint();
             query.Configure(null, "10", null);
             e2.Configure(query, null);
             e1.Filter(e2.GetWorkItems());
@@ -53,11 +53,11 @@ namespace MigrationTools.Clients.InMemory.Endpoints.Tests
         [TestMethod]
         public void PersistWorkItemWithFilterTest()
         {
-            WorkItemEndpoint e1 = new WorkItemEndpoint();
-            WorkItemQuery query = new WorkItemQuery();
+            InMemoryWorkItemEndpoint e1 = new InMemoryWorkItemEndpoint();
+            InMemoryWorkItemQuery query = new InMemoryWorkItemQuery();
             query.Configure(null, "20", null);
             e1.Configure(query, null);
-            WorkItemEndpoint e2 = new WorkItemEndpoint();
+            InMemoryWorkItemEndpoint e2 = new InMemoryWorkItemEndpoint();
             query.Configure(null, "10", null);
             e2.Configure(query, null);
             e1.Filter(e2.GetWorkItems());
@@ -72,11 +72,11 @@ namespace MigrationTools.Clients.InMemory.Endpoints.Tests
         [TestMethod]
         public void PersistWorkItemExistsTest()
         {
-            WorkItemEndpoint e1 = new WorkItemEndpoint();
-            WorkItemQuery query = new WorkItemQuery();
+            InMemoryWorkItemEndpoint e1 = new InMemoryWorkItemEndpoint();
+            InMemoryWorkItemQuery query = new InMemoryWorkItemQuery();
             query.Configure(null, "20", null);
             e1.Configure(query, null);
-            WorkItemEndpoint e2 = new WorkItemEndpoint();
+            InMemoryWorkItemEndpoint e2 = new InMemoryWorkItemEndpoint();
             query.Configure(null, "10", null);
             e2.Configure(query, null);
             foreach (WorkItemData item in e1.GetWorkItems())

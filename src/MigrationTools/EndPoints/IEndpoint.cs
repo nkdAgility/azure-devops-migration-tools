@@ -1,4 +1,4 @@
-﻿namespace MigrationTools.EndPoints
+﻿namespace MigrationTools.Endpoints
 {
     public interface IEndpoint
     {

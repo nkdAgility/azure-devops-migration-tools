@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Product>MigrationTools.Sinks.FileSystem</Product>
+    <RootNamespace>MigrationTools</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

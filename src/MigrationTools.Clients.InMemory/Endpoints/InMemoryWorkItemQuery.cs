@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using MigrationTools.Clients;
 using MigrationTools.DataContracts;
 
-namespace MigrationTools.Clients.InMemory.Endpoints
+namespace MigrationTools.Endpoints
 {
-    public class WorkItemQuery : IWorkItemQuery
+    public class InMemoryWorkItemQuery : IWorkItemQuery
     {
         private int _query;
 

@@ -4,6 +4,8 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
 
     <IsPackable>false</IsPackable>
+
+    <RootNamespace>MigrationTools.Tests</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,5 +18,4 @@
   <ItemGroup>
     <ProjectReference Include="..\MigrationTools.Clients.FileSystem\MigrationTools.Clients.FileSystem.csproj" />
   </ItemGroup>
-
 </Project>

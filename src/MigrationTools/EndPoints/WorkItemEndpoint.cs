@@ -1,19 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using MigrationTools.DataContracts;
-using MigrationTools.EndPoints;
 using MigrationTools.Enrichers;
-using Newtonsoft.Json;
 
-namespace MigrationTools.Clients.FileSystem.Endpoints
+namespace MigrationTools.Endpoints
 {
-    public class WorkItemEndpoint : IWorkItemSourceEndPoint, IWorkItemTargetEndPoint
+    public abstract class WorkItemEndpoint : IWorkItemSourceEndPoint, IWorkItemTargetEndPoint
     {
-        private List<WorkItemData> _innerList = new List<WorkItemData>();
-        private IWorkItemQuery _WorkItemStoreQuery;
-        private List<IWorkItemEnricher> _innerEnrichers = new List<IWorkItemEnricher>();
+        protected List<WorkItemData> _innerList = new List<WorkItemData>();
+        protected IWorkItemQuery _WorkItemStoreQuery;
+        protected List<IWorkItemEnricher> _innerEnrichers = new List<IWorkItemEnricher>();
 
         public WorkItemEndpoint()
         {
@@ -27,14 +24,18 @@ namespace MigrationTools.Clients.FileSystem.Endpoints
 
         public IEnumerable<IWorkItemTargetEnricher> TargetEnrichers => (from e in _innerEnrichers where e is IWorkItemTargetEnricher select (IWorkItemTargetEnricher)e);
 
-        public void Configure(IWorkItemQuery query, List<IWorkItemEnricher> enrichers)
+        public virtual void Configure(IWorkItemQuery query, List<IWorkItemEnricher> enrichers)
         {
-            _WorkItemStoreQuery = query;
-            _innerEnrichers = enrichers;
+            _WorkItemStoreQuery = query ?? throw new ArgumentNullException(nameof(query));
+            if (enrichers != null)
+            {
+                _innerEnrichers = enrichers;
+            }
+
             RefreshStore();
         }
 
-        public void Filter(IEnumerable<WorkItemData> workItems)
+        public virtual void Filter(IEnumerable<WorkItemData> workItems)
         {
             var ids = (from x in workItems.ToList() select x.Id);
             _innerList = (from x in _innerList
@@ -42,20 +43,14 @@ namespace MigrationTools.Clients.FileSystem.Endpoints
                           select x).ToList();
         }
 
-        public IEnumerable<WorkItemData> GetWorkItems()
+        public virtual IEnumerable<WorkItemData> GetWorkItems()
         {
             return _innerList;
         }
 
-        public void PersistWorkItem(WorkItemData source)
-        {
-            var content = JsonConvert.SerializeObject(source, Formatting.Indented);
-            var fileName = Path.Combine(_WorkItemStoreQuery.Query, string.Format("{0}.json", source.Id));
-            File.WriteAllText(fileName, content);
-            RefreshStore();
-        }
+        public abstract void PersistWorkItem(WorkItemData source);
 
-        private void RefreshStore()
+        protected virtual void RefreshStore()
         {
             _innerList.Clear();
             _innerList.AddRange(_WorkItemStoreQuery.GetWorkItems());

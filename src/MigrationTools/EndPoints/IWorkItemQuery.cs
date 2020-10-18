@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
+using MigrationTools.Clients;
 using MigrationTools.DataContracts;
 
-namespace MigrationTools.Clients
+namespace MigrationTools.Endpoints
 {
     public interface IWorkItemQuery
     {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using MigrationTools.DataContracts;
+using MigrationTools.Endpoints;
 
 namespace MigrationTools.Clients
 {
