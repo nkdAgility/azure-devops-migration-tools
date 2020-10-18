@@ -7,13 +7,12 @@ using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools.DataContracts;
-using MigrationTools.Enrichers;
 
-namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
+namespace MigrationTools.Enrichers
 {
-    public class EmbededImagesRepairEnricher : EmbededImagesRepairEnricherBase
+    public class AzureDevOpsObjectModelEmbededImagesRepairEnricher : EmbededImagesRepairEnricherBase
     {
-        public EmbededImagesRepairEnricher(IMigrationEngine engine, ILogger<EmbededImagesRepairEnricher> logger) : base(engine, logger)
+        public AzureDevOpsObjectModelEmbededImagesRepairEnricher(IMigrationEngine engine, ILogger<AzureDevOpsObjectModelEmbededImagesRepairEnricher> logger) : base(engine, logger)
         {
         }
 

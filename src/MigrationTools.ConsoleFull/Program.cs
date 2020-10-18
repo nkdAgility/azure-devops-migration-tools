@@ -1,10 +1,9 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using MigrationTools.Clients;
-using MigrationTools.Clients.AzureDevops.ObjectModel.Clients;
-using MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers;
-using MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps;
 using MigrationTools.Endpoints;
+using MigrationTools.Enrichers;
+using MigrationTools.FieldMaps.AzureDevops.ObjectModel;
 using MigrationTools.Host;
 using VstsSyncMigrator.Engine;
 
@@ -49,17 +48,17 @@ namespace VstsSyncMigrator.ConsoleApp
                     services.AddSingleton<WorkItemUpdateAreasAsTagsContext>();
 
                     // Enrichers
-                    services.AddSingleton<WorkItemLinkEnricher>();
-                    services.AddSingleton<EmbededImagesRepairEnricher>();
-                    services.AddSingleton<GitRepositoryEnricher>();
-                    services.AddSingleton<NodeStructureEnricher>();
+                    services.AddSingleton<AzureDevOpsObjectModelWorkItemLinkEnricher>();
+                    services.AddSingleton<AzureDevOpsObjectModelEmbededImagesRepairEnricher>();
+                    services.AddSingleton<AzureDevOpsObjectModelGitRepositoryEnricher>();
+                    services.AddSingleton<AzureDevOpsObjectModelNodeStructureEnricher>();
 
                     // Core
-                    services.AddTransient<IMigrationClient, MigrationClient>();
-                    services.AddTransient<IWorkItemMigrationClient, WorkItemMigrationClient>();
-                    services.AddTransient<ITestPlanMigrationClient, TestPlanMigrationClient>();
+                    services.AddTransient<IMigrationClient, AzureDevOpsObjectModelMigrationClient>();
+                    services.AddTransient<IWorkItemMigrationClient, AzureDevOpsObjectModelWorkItemMigrationClient>();
+                    services.AddTransient<ITestPlanMigrationClient, AzureDevOpsObjectModelTestPlanMigrationClient>();
                     services.AddTransient<IWorkItemQueryBuilder, WorkItemQueryBuilder>();
-                    services.AddTransient<IWorkItemQuery, WorkItemQuery>();
+                    services.AddTransient<IWorkItemQuery, AzureDevOpsObjectModelWorkItemQuery>();
                 });
 
             await hostBuilder.RunMigrationTools(args);

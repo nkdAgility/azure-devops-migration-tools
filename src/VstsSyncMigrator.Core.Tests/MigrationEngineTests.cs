@@ -56,8 +56,8 @@ namespace _VstsSyncMigrator.Engine.Tests
             services.AddLogging();
 
             //Clients
-            services.AddTransient<IMigrationClient, MigrationClient>();
-            services.AddTransient<IWorkItemMigrationClient, WorkItemMigrationClient>();
+            services.AddTransient<IMigrationClient, AzureDevOpsObjectModelMigrationClient>();
+            services.AddTransient<IWorkItemMigrationClient, AzureDevOpsObjectModelWorkItemMigrationClient>();
             services.AddTransient<IWorkItemQueryBuilder, WorkItemQueryBuilder>();
 
             services.AddSingleton<IMigrationEngine, MigrationEngine>();

@@ -5,10 +5,10 @@ using System.Text.RegularExpressions;
 using System.Xml;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.Server;
+using MigrationTools.Clients;
 using MigrationTools.DataContracts;
-using MigrationTools.Enrichers;
 
-namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
+namespace MigrationTools.Enrichers
 {
     public enum NodeStructureType
     {
@@ -16,7 +16,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
         Iteration
     }
 
-    public class NodeStructureEnricher : WorkItemEnricher
+    public class AzureDevOpsObjectModelNodeStructureEnricher : WorkItemEnricher
     {
         private Dictionary<string, bool> _foundNodes = new Dictionary<string, bool>();
         private string[] _nodeBasePaths;
@@ -26,7 +26,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
         private NodeInfo[] _sourceRootNodes;
         private ICommonStructureService _targetCommonStructureService;
 
-        public NodeStructureEnricher(IMigrationEngine engine, ILogger<NodeStructureEnricher> logger) : base(engine, logger)
+        public AzureDevOpsObjectModelNodeStructureEnricher(IMigrationEngine engine, ILogger<AzureDevOpsObjectModelNodeStructureEnricher> logger) : base(engine, logger)
         {
             _sourceCommonStructureService = (ICommonStructureService)Engine.Source.GetService<ICommonStructureService>();
             _targetCommonStructureService = (ICommonStructureService)Engine.Target.GetService<ICommonStructureService4>();

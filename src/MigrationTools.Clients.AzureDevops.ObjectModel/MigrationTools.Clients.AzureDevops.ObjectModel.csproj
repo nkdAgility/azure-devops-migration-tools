@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
     <Product>MigrationTools.Clients.AzureDevops.ObjectModel</Product>
+    <RootNamespace>MigrationTools</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

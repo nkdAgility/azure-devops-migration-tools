@@ -6,7 +6,7 @@ using MigrationTools.Configuration;
 using MigrationTools.DataContracts;
 using Serilog;
 
-namespace MigrationTools.Clients.AzureDevops.ObjectModel
+namespace MigrationTools
 {
     public static class TfsObjectModelExtensions
     {
@@ -86,9 +86,9 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel
             return internalWorkItem;
         }
 
-        public static TeamProjectConfig AsTeamProjectConfig(this IMigrationClientConfig context)
+        public static AzureDevOpsObjectModelTeamProjectConfig AsTeamProjectConfig(this IMigrationClientConfig context)
         {
-            return (TeamProjectConfig)context;
+            return (AzureDevOpsObjectModelTeamProjectConfig)context;
         }
 
         public static WorkItem ToWorkItem(this WorkItemData workItemData)

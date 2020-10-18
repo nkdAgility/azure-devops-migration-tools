@@ -2,19 +2,17 @@
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using MigrationTools.Clients.AzureDevops.ObjectModel.Clients;
 using MigrationTools.DataContracts;
-using MigrationTools.Enrichers;
 using MigrationTools.Exceptions;
 
-namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
+namespace MigrationTools.Enrichers
 {
-    public class WorkItemLinkEnricher : WorkItemEnricher
+    public class AzureDevOpsObjectModelWorkItemLinkEnricher : WorkItemEnricher
     {
         private bool _save = true;
         private bool _filterWorkItemsThatAlreadyExistInTarget = true;
 
-        public WorkItemLinkEnricher(IMigrationEngine engine, ILogger<WorkItemLinkEnricher> logger) : base(engine, logger)
+        public AzureDevOpsObjectModelWorkItemLinkEnricher(IMigrationEngine engine, ILogger<AzureDevOpsObjectModelWorkItemLinkEnricher> logger) : base(engine, logger)
         {
         }
 
@@ -206,7 +204,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                     if (wiSourceR.Id != wiTargetR.Id)
                     {
                         Log.LogInformation("  [CREATE-START] Adding Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id);
-                        var client = (WorkItemMigrationClient) Engine.Target.WorkItems;
+                        var client = (AzureDevOpsObjectModelWorkItemMigrationClient)Engine.Target.WorkItems;
                         if (!client.Store.WorkItemLinkTypes.LinkTypeEnds.Contains(rl.LinkTypeEnd.ImmutableName))
                         {
                             Log.LogError($"  [SKIP] Unable to migrate Link because type {rl.LinkTypeEnd.ImmutableName} does not exist in the target project.");
@@ -226,7 +224,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                             {
                                 wiTargetR.ToWorkItem().Links.Remove(potentialParentConflictLink);
                             }
-                            linkTypeEnd = ((WorkItemMigrationClient)Engine.Target.WorkItems).Store.WorkItemLinkTypes.LinkTypeEnds["System.LinkTypes.Hierarchy-Reverse"];
+                            linkTypeEnd = ((AzureDevOpsObjectModelWorkItemMigrationClient)Engine.Target.WorkItems).Store.WorkItemLinkTypes.LinkTypeEnds["System.LinkTypes.Hierarchy-Reverse"];
                             RelatedLink newLl = new RelatedLink(linkTypeEnd, int.Parse(wiTargetL.Id));
                             wiTargetR.ToWorkItem().Links.Add(newLl);
                             wiTargetR.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";

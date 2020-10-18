@@ -66,8 +66,8 @@ namespace VstsSyncMigrator.Engine
             Stopwatch stopwatch = Stopwatch.StartNew();
             //////////////////////////////////////////////////
 
-            var sourceQueryHierarchy = ((WorkItemMigrationClient)Engine.Source.WorkItems).Store.Projects[Engine.Source.Config.AsTeamProjectConfig().Project].QueryHierarchy;
-            var targetQueryHierarchy = ((WorkItemMigrationClient)Engine.Target.WorkItems).Store.Projects[Engine.Target.Config.AsTeamProjectConfig().Project].QueryHierarchy;
+            var sourceQueryHierarchy = ((AzureDevOpsObjectModelWorkItemMigrationClient)Engine.Source.WorkItems).Store.Projects[Engine.Source.Config.AsTeamProjectConfig().Project].QueryHierarchy;
+            var targetQueryHierarchy = ((AzureDevOpsObjectModelWorkItemMigrationClient)Engine.Target.WorkItems).Store.Projects[Engine.Target.Config.AsTeamProjectConfig().Project].QueryHierarchy;
 
             Log.LogInformation("Found {0} root level child WIQ folders", sourceQueryHierarchy.Count);
             //////////////////////////////////////////////////

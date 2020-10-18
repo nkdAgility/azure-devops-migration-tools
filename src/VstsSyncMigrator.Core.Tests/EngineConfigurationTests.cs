@@ -15,8 +15,8 @@ namespace _VstsSyncMigrator.Engine.Tests
             EngineConfiguration ec = new EngineConfiguration
             {
                 LogLevel = Serilog.Events.LogEventLevel.Verbose,
-                Source = new TeamProjectConfig() { Project = "DemoProjs", Collection = new Uri("https://sdd2016.visualstudio.com/"), ReflectedWorkItemIDFieldName = "TfsMigrationTool.ReflectedWorkItemId", PersonalAccessToken = "" },
-                Target = new TeamProjectConfig() { Project = "DemoProjt", Collection = new Uri("https://sdd2016.visualstudio.com/"), ReflectedWorkItemIDFieldName = "TfsMigrationTool.ReflectedWorkItemId", PersonalAccessToken = "" }
+                Source = new AzureDevOpsObjectModelTeamProjectConfig() { Project = "DemoProjs", Collection = new Uri("https://sdd2016.visualstudio.com/"), ReflectedWorkItemIDFieldName = "TfsMigrationTool.ReflectedWorkItemId", PersonalAccessToken = "" },
+                Target = new AzureDevOpsObjectModelTeamProjectConfig() { Project = "DemoProjt", Collection = new Uri("https://sdd2016.visualstudio.com/"), ReflectedWorkItemIDFieldName = "TfsMigrationTool.ReflectedWorkItemId", PersonalAccessToken = "" }
             };
             Assert.IsNotNull(ec);
             Assert.IsNotNull(ec.Source);

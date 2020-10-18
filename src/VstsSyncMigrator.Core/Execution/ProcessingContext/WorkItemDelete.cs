@@ -63,7 +63,7 @@ namespace VstsSyncMigrator.Engine
 
                 foreach (int begone in tobegone)
                 {
-                    ((WorkItemMigrationClient)Engine.Target.WorkItems).Store.DestroyWorkItems(new List<int>() { begone });
+                    ((AzureDevOpsObjectModelWorkItemMigrationClient)Engine.Target.WorkItems).Store.DestroyWorkItems(new List<int>() { begone });
                     Log.LogInformation("Deleted {0}", begone);
                 }
             }

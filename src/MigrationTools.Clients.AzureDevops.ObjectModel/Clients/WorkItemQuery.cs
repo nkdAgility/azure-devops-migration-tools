@@ -5,18 +5,18 @@ using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools.DataContracts;
 using Serilog;
 
-namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
+namespace MigrationTools.Clients
 {
-    public class WorkItemQuery : WorkItemQueryBase
+    public class AzureDevOpsObjectModelWorkItemQuery : WorkItemQueryBase
     {
-        public WorkItemQuery(IServiceProvider services, ITelemetryLogger telemetry) : base(services, telemetry)
+        public AzureDevOpsObjectModelWorkItemQuery(IServiceProvider services, ITelemetryLogger telemetry) : base(services, telemetry)
         {
         }
 
         public override List<WorkItemData> GetWorkItems()
         {
             Log.Debug("WorkItemQuery: ===========GetWorkItems=============");
-            var wiClient = (WorkItemMigrationClient)MigrationClient.WorkItems;
+            var wiClient = (AzureDevOpsObjectModelWorkItemMigrationClient)MigrationClient.WorkItems;
             Telemetry.TrackEvent("WorkItemQuery.Execute", Parameters, null);
             Log.Debug("WorkItemQuery: TeamProjectCollection: {QueryTarget}", wiClient.Store.TeamProjectCollection.Uri.ToString());
             Log.Debug("WorkItemQuery: Query: {QueryText}", Query);
@@ -28,7 +28,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
             return GetWorkItemsFromQuery(wiClient).ToWorkItemDataList();
         }
 
-        private WorkItemCollection GetWorkItemsFromQuery(WorkItemMigrationClient wiClient)
+        private WorkItemCollection GetWorkItemsFromQuery(AzureDevOpsObjectModelWorkItemMigrationClient wiClient)
         {
             var startTime = DateTime.UtcNow;
             var timer = System.Diagnostics.Stopwatch.StartNew();
