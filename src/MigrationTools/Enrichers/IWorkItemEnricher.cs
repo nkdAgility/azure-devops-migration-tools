@@ -10,14 +10,4 @@ namespace MigrationTools.Enrichers
         [Obsolete("We are migrating to a new model. This is the old one.")]
         int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem);
     }
-
-    public interface IWorkItemSourceEnricher : IWorkItemEnricher
-    {
-        int EnrichToWorkItem(WorkItemData workItem);
-    }
-
-    public interface IWorkItemTargetEnricher : IWorkItemEnricher
-    {
-        int PersistFromWorkItem(WorkItemData workItem);
-    }
 }

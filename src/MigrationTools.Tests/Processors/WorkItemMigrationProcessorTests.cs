@@ -33,7 +33,11 @@ namespace MigrationTools.Processors.Tests
         {
             var y = new WorkItemMigrationProcessorOptions
             {
-                Enabled = true
+                Enabled = true,
+                CollapseRevisions = false,
+                ReplayRevisions = true,
+                WorkItemCreateRetryLimit = 5,
+                PrefixProjectToNodes = false
             };
             var x = Services.GetRequiredService<WorkItemMigrationProcessor>();
             x.Configure(y);
