@@ -19,7 +19,7 @@ namespace MigrationTools.Clients.InMemory.Endpoints.Tests
             WorkItemEndpoint e = new WorkItemEndpoint();
             WorkItemQuery query = new WorkItemQuery();
             query.Configure(null, "10", null);
-            e.Configure(query);
+            e.Configure(query, null);
             Assert.AreEqual(10, e.Count);
         }
 
@@ -29,10 +29,10 @@ namespace MigrationTools.Clients.InMemory.Endpoints.Tests
             WorkItemEndpoint e1 = new WorkItemEndpoint();
             WorkItemQuery query = new WorkItemQuery();
             query.Configure(null, "10", null);
-            e1.Configure(query);
+            e1.Configure(query, null);
             WorkItemEndpoint e2 = new WorkItemEndpoint();
-            e2.Configure(query);
-            e1.Filter(e2.WorkItems);
+            e2.Configure(query, null);
+            e1.Filter(e2.GetWorkItems());
             Assert.AreEqual(0, e1.Count);
         }
 
@@ -42,11 +42,11 @@ namespace MigrationTools.Clients.InMemory.Endpoints.Tests
             WorkItemEndpoint e1 = new WorkItemEndpoint();
             WorkItemQuery query = new WorkItemQuery();
             query.Configure(null, "20", null);
-            e1.Configure(query);
+            e1.Configure(query, null);
             WorkItemEndpoint e2 = new WorkItemEndpoint();
             query.Configure(null, "10", null);
-            e2.Configure(query);
-            e1.Filter(e2.WorkItems);
+            e2.Configure(query, null);
+            e1.Filter(e2.GetWorkItems());
             Assert.AreEqual(10, e1.Count);
         }
 
@@ -56,13 +56,13 @@ namespace MigrationTools.Clients.InMemory.Endpoints.Tests
             WorkItemEndpoint e1 = new WorkItemEndpoint();
             WorkItemQuery query = new WorkItemQuery();
             query.Configure(null, "20", null);
-            e1.Configure(query);
+            e1.Configure(query, null);
             WorkItemEndpoint e2 = new WorkItemEndpoint();
             query.Configure(null, "10", null);
-            e2.Configure(query);
-            e1.Filter(e2.WorkItems);
+            e2.Configure(query, null);
+            e1.Filter(e2.GetWorkItems());
             Assert.AreEqual(10, e1.Count);
-            foreach (WorkItemData item in e1.WorkItems)
+            foreach (WorkItemData item in e1.GetWorkItems())
             {
                 e2.PersistWorkItem(item);
             }
@@ -75,11 +75,11 @@ namespace MigrationTools.Clients.InMemory.Endpoints.Tests
             WorkItemEndpoint e1 = new WorkItemEndpoint();
             WorkItemQuery query = new WorkItemQuery();
             query.Configure(null, "20", null);
-            e1.Configure(query);
+            e1.Configure(query, null);
             WorkItemEndpoint e2 = new WorkItemEndpoint();
             query.Configure(null, "10", null);
-            e2.Configure(query);
-            foreach (WorkItemData item in e1.WorkItems)
+            e2.Configure(query, null);
+            foreach (WorkItemData item in e1.GetWorkItems())
             {
                 e2.PersistWorkItem(item);
             }

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using MigrationTools.DataContracts;
 using MigrationTools.EndPoints;
+using MigrationTools.Enrichers;
 using Newtonsoft.Json;
 
 namespace MigrationTools.Clients.FileSystem.Endpoints
@@ -12,6 +13,7 @@ namespace MigrationTools.Clients.FileSystem.Endpoints
     {
         private List<WorkItemData> _innerList = new List<WorkItemData>();
         private IWorkItemQuery _WorkItemStoreQuery;
+        private List<IWorkItemEnricher> _innerEnrichers = new List<IWorkItemEnricher>();
 
         public WorkItemEndpoint()
         {
@@ -21,9 +23,14 @@ namespace MigrationTools.Clients.FileSystem.Endpoints
 
         public IEnumerable<WorkItemData> WorkItems { get { return _innerList; } }
 
-        public void Configure(IWorkItemQuery query)
+        public IEnumerable<IWorkItemSourceEnricher> SourceEnrichers => (from e in _innerEnrichers where e is IWorkItemSourceEnricher select (IWorkItemSourceEnricher)e);
+
+        public IEnumerable<IWorkItemTargetEnricher> TargetEnrichers => (from e in _innerEnrichers where e is IWorkItemTargetEnricher select (IWorkItemTargetEnricher)e);
+
+        public void Configure(IWorkItemQuery query, List<IWorkItemEnricher> enrichers)
         {
             _WorkItemStoreQuery = query;
+            _innerEnrichers = enrichers;
             RefreshStore();
         }
 
@@ -33,6 +40,11 @@ namespace MigrationTools.Clients.FileSystem.Endpoints
             _innerList = (from x in _innerList
                           where !ids.Contains(x.Id)
                           select x).ToList();
+        }
+
+        public IEnumerable<WorkItemData> GetWorkItems()
+        {
+            return _innerList;
         }
 
         public void PersistWorkItem(WorkItemData source)

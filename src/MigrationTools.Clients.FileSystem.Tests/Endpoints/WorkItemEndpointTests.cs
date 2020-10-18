@@ -15,7 +15,7 @@ namespace MigrationTools.Clients.FileSystem.Endpoints.Tests
             WorkItemEndpoint e = new WorkItemEndpoint();
             WorkItemQuery query = new WorkItemQuery();
             query.Configure(null, path, null);
-            e.Configure(query);
+            e.Configure(query, null);
             for (int i = 0; i < count; i++)
             {
                 e.PersistWorkItem(new WorkItemData() { Id = i.ToString(), Title = string.Format("Title {0}", i) });
@@ -36,7 +36,7 @@ namespace MigrationTools.Clients.FileSystem.Endpoints.Tests
             WorkItemEndpoint e = new WorkItemEndpoint();
             WorkItemQuery query = new WorkItemQuery();
             query.Configure(null, @".\Store\Source\", null);
-            e.Configure(query);
+            e.Configure(query, null);
             Assert.AreEqual(10, e.Count);
         }
 
@@ -48,10 +48,10 @@ namespace MigrationTools.Clients.FileSystem.Endpoints.Tests
             WorkItemEndpoint e1 = new WorkItemEndpoint();
             WorkItemQuery query = new WorkItemQuery();
             query.Configure(null, @".\Store\Source\", null);
-            e1.Configure(query);
+            e1.Configure(query, null);
             WorkItemEndpoint e2 = new WorkItemEndpoint();
             query.Configure(null, @".\Store\Target\", null);
-            e2.Configure(query);
+            e2.Configure(query, null);
             e1.Filter(e2.WorkItems);
             Assert.AreEqual(0, e1.Count);
         }
@@ -64,10 +64,10 @@ namespace MigrationTools.Clients.FileSystem.Endpoints.Tests
             WorkItemEndpoint e1 = new WorkItemEndpoint();
             WorkItemQuery query = new WorkItemQuery();
             query.Configure(null, @".\Store\Source\", null);
-            e1.Configure(query);
+            e1.Configure(query, null);
             WorkItemEndpoint e2 = new WorkItemEndpoint();
             query.Configure(null, @".\Store\target\", null);
-            e2.Configure(query);
+            e2.Configure(query, null);
             e1.Filter(e2.WorkItems);
             Assert.AreEqual(10, e1.Count);
         }
@@ -80,10 +80,10 @@ namespace MigrationTools.Clients.FileSystem.Endpoints.Tests
             WorkItemEndpoint e1 = new WorkItemEndpoint();
             WorkItemQuery query = new WorkItemQuery();
             query.Configure(null, @".\Store\Source\", null);
-            e1.Configure(query);
+            e1.Configure(query, null);
             WorkItemEndpoint e2 = new WorkItemEndpoint();
             query.Configure(null, @".\Store\target\", null);
-            e2.Configure(query);
+            e2.Configure(query, null);
             e1.Filter(e2.WorkItems);
             Assert.AreEqual(10, e1.Count);
             foreach (WorkItemData item in e1.WorkItems)
@@ -101,10 +101,10 @@ namespace MigrationTools.Clients.FileSystem.Endpoints.Tests
             WorkItemEndpoint e1 = new WorkItemEndpoint();
             WorkItemQuery query = new WorkItemQuery();
             query.Configure(null, @".\Store\Source\", null);
-            e1.Configure(query);
+            e1.Configure(query, null);
             WorkItemEndpoint e2 = new WorkItemEndpoint();
             query.Configure(null, @".\Store\target\", null);
-            e2.Configure(query);
+            e2.Configure(query, null);
             foreach (WorkItemData item in e1.WorkItems)
             {
                 e2.PersistWorkItem(item);

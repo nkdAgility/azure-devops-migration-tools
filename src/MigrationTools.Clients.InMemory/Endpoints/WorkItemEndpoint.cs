@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using MigrationTools.DataContracts;
 using MigrationTools.EndPoints;
+using MigrationTools.Enrichers;
 
 namespace MigrationTools.Clients.InMemory.Endpoints
 {
     public class WorkItemEndpoint : IWorkItemSourceEndPoint, IWorkItemTargetEndPoint
     {
         private List<WorkItemData> _innerList = new List<WorkItemData>();
+        private List<IWorkItemEnricher> _innerEnrichers = new List<IWorkItemEnricher>();
 
         public WorkItemEndpoint()
         {
@@ -16,9 +18,11 @@ namespace MigrationTools.Clients.InMemory.Endpoints
 
         public int Count { get { return _innerList.Count; } }
 
-        public IEnumerable<WorkItemData> WorkItems { get { return _innerList; } }
+        public IEnumerable<IWorkItemSourceEnricher> SourceEnrichers => (from e in _innerEnrichers where e is IWorkItemSourceEnricher select (IWorkItemSourceEnricher)e);
 
-        public void Configure(IWorkItemQuery query)
+        public IEnumerable<IWorkItemTargetEnricher> TargetEnrichers => (from e in _innerEnrichers where e is IWorkItemTargetEnricher select (IWorkItemTargetEnricher)e);
+
+        public void Configure(IWorkItemQuery query, List<IWorkItemEnricher> enrichers)
         {
             _innerList.Clear();
             _innerList.AddRange(query.GetWorkItems());
@@ -37,12 +41,13 @@ namespace MigrationTools.Clients.InMemory.Endpoints
             var found = (from x in _innerList where x.Id == source.Id select x).SingleOrDefault();
             if (found is null)
             {
-                CreateNewFrom(source);
+                found = CreateNewFrom(source);
             }
-            else
+            foreach (IWorkItemTargetEnricher enricher in TargetEnrichers)
             {
-                UpdateWorkItemFrom(found, source);
+                enricher.PersistFromWorkItem(source);
             }
+            UpdateWorkItemFrom(found, source);
         }
 
         private void UpdateWorkItemFrom(WorkItemData source, WorkItemData target)
@@ -51,9 +56,15 @@ namespace MigrationTools.Clients.InMemory.Endpoints
             _innerList.Add(target);
         }
 
-        public void CreateNewFrom(WorkItemData source)
+        public WorkItemData CreateNewFrom(WorkItemData source)
         {
             _innerList.Add(source);
+            return source;
+        }
+
+        public IEnumerable<WorkItemData> GetWorkItems()
+        {
+            return _innerList;
         }
     }
 }
