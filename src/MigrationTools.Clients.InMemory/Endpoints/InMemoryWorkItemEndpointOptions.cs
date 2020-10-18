@@ -1,7 +1,6 @@
 ﻿namespace MigrationTools.Endpoints
 {
-    public class InMemoryWorkItemEndpointOptions : IEndpointOptions
+    public class InMemoryWorkItemEndpointOptions : EndpointOptions
     {
-        public EndpointDirection Direction { get; set; }
     }
 }

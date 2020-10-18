@@ -1,7 +1,6 @@
 ﻿namespace MigrationTools.Endpoints
 {
-    public class FileSystemWorkItemEndpointOptions : IEndpointOptions
+    public class FileSystemWorkItemEndpointOptions : EndpointOptions
     {
-        public EndpointDirection Direction { get; set; }
     }
 }

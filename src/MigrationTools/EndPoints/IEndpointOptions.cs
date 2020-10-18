@@ -14,4 +14,10 @@ namespace MigrationTools.Endpoints
         [JsonConverter(typeof(StringEnumConverter))]
         public EndpointDirection Direction { get; set; }
     }
+
+    public class EndpointOptions : IEndpointOptions
+    {
+        [JsonConverter(typeof(StringEnumConverter))]
+        public EndpointDirection Direction { get; set; }
+    }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Options;
 using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
 
@@ -12,9 +13,9 @@ namespace MigrationTools.Endpoints
         protected IWorkItemQuery _WorkItemStoreQuery;
         protected List<IWorkItemEnricher> _innerEnrichers = new List<IWorkItemEnricher>();
 
-        public WorkItemEndpoint(IEndpointOptions endpointOptions)
+        public WorkItemEndpoint(IOptions<EndpointOptions> endpointOptions)
         {
-            EndpointOptions = endpointOptions;
+            EndpointOptions = endpointOptions.Value;
         }
 
         public int Count { get { return _innerList.Count; } }
