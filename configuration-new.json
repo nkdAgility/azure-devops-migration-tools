@@ -127,11 +127,28 @@
       "ReplayRevisions": true,
       "PrefixProjectToNodes": false,
       "CollapseRevisions": false,
-      "PauseAfterEachWorkItem": false,
       "WorkItemCreateRetryLimit": 5,
-      "SkipToFinalRevisedWorkItemType": false,
-      "AppendMigrationToolSignatureFooter": false,
-      "FilterWorkItemsThatAlreadyExistInTarget": true,
+      "PipelineAdapter": [
+        {
+          "ObjectType": "PauseAfterEachWorkItem",
+          "Enabled": true
+        },
+        {
+          "ObjectType": "FilterWorkItemsThatAlreadyExistInTarget",
+          "Enabled": true,
+          "WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
+          "WIQLOrderBit": "[System.ChangedDate] desc"
+        },
+        {
+          "ObjectType": "AppendMigrationToolSignatureFooter",
+          "Enabled": false
+        },
+        {
+          "ObjectType": "SkipToFinalRevisedWorkItemType",
+          "Enabled": false
+        }
+
+      ],
       "Endpoints": [
         {
           "ObjectType": "FileSystemWorkItemEndpointConfig",
