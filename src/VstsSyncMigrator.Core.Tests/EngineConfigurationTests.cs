@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MigrationTools.Clients.AzureDevops.ObjectModel;
+using MigrationTools;
 using MigrationTools.Configuration;
 
 namespace _VstsSyncMigrator.Engine.Tests
