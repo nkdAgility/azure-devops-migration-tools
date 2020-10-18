@@ -48,17 +48,17 @@ namespace VstsSyncMigrator.ConsoleApp
                     services.AddSingleton<WorkItemUpdateAreasAsTagsContext>();
 
                     // Enrichers
-                    services.AddSingleton<AzureDevOpsObjectModelWorkItemLinkEnricher>();
-                    services.AddSingleton<AzureDevOpsObjectModelEmbededImagesRepairEnricher>();
-                    services.AddSingleton<AzureDevOpsObjectModelGitRepositoryEnricher>();
-                    services.AddSingleton<AzureDevOpsObjectModelNodeStructureEnricher>();
+                    services.AddSingleton<TfsWorkItemLinkEnricher>();
+                    services.AddSingleton<TfsEmbededImagesEnricher>();
+                    services.AddSingleton<TfsGitRepositoryEnricher>();
+                    services.AddSingleton<TfsNodeStructureEnricher>();
 
                     // Core
-                    services.AddTransient<IMigrationClient, AzureDevOpsObjectModelMigrationClient>();
-                    services.AddTransient<IWorkItemMigrationClient, AzureDevOpsObjectModelWorkItemMigrationClient>();
-                    services.AddTransient<ITestPlanMigrationClient, AzureDevOpsObjectModelTestPlanMigrationClient>();
+                    services.AddTransient<IMigrationClient, TfsMigrationClient>();
+                    services.AddTransient<IWorkItemMigrationClient, TfsWorkItemMigrationClient>();
+                    services.AddTransient<ITestPlanMigrationClient, TfsTestPlanMigrationClient>();
                     services.AddTransient<IWorkItemQueryBuilder, WorkItemQueryBuilder>();
-                    services.AddTransient<IWorkItemQuery, AzureDevOpsObjectModelWorkItemQuery>();
+                    services.AddTransient<IWorkItemQuery, TfsWorkItemQuery>();
                 });
 
             await hostBuilder.RunMigrationTools(args);

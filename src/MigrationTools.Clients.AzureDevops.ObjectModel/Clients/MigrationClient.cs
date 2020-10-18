@@ -9,9 +9,9 @@ using Serilog;
 
 namespace MigrationTools.Clients
 {
-    public class AzureDevOpsObjectModelMigrationClient : IMigrationClient
+    public class TfsMigrationClient : IMigrationClient
     {
-        private AzureDevOpsObjectModelTeamProjectConfig _config;
+        private TfsTeamProjectConfig _config;
         private NetworkCredential _credentials;
         private IWorkItemMigrationClient _workItemClient;
         private ITestPlanMigrationClient _testPlanClient;
@@ -19,7 +19,7 @@ namespace MigrationTools.Clients
         private readonly IServiceProvider _Services;
         private readonly ITelemetryLogger _Telemetry;
 
-        public AzureDevOpsObjectModelTeamProjectConfig TfsConfig
+        public TfsTeamProjectConfig TfsConfig
         {
             get
             {
@@ -52,7 +52,7 @@ namespace MigrationTools.Clients
         }
 
         // if you add Migration Engine in here you will have to fix the infinate loop
-        public AzureDevOpsObjectModelMigrationClient(ITestPlanMigrationClient testPlanClient, IWorkItemMigrationClient workItemClient, IServiceProvider services, ITelemetryLogger telemetry)
+        public TfsMigrationClient(ITestPlanMigrationClient testPlanClient, IWorkItemMigrationClient workItemClient, IServiceProvider services, ITelemetryLogger telemetry)
         {
             _testPlanClient = testPlanClient;
             _workItemClient = workItemClient;
@@ -66,12 +66,12 @@ namespace MigrationTools.Clients
             {
                 throw new ArgumentNullException(nameof(config));
             }
-            if (!(config is AzureDevOpsObjectModelTeamProjectConfig))
+            if (!(config is TfsTeamProjectConfig))
             {
-                throw new ArgumentOutOfRangeException(string.Format("{0} needs to be of type {1}", nameof(config), nameof(AzureDevOpsObjectModelTeamProjectConfig)));
+                throw new ArgumentOutOfRangeException(string.Format("{0} needs to be of type {1}", nameof(config), nameof(TfsTeamProjectConfig)));
             }
 
-            _config = (AzureDevOpsObjectModelTeamProjectConfig)config;
+            _config = (TfsTeamProjectConfig)config;
             _credentials = credentials;
             EnsureCollection();
             _workItemClient.Configure(this);

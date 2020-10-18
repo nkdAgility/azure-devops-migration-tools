@@ -10,13 +10,13 @@ using MigrationTools.DataContracts;
 
 namespace MigrationTools.Enrichers
 {
-    public enum NodeStructureType
+    public enum TfsNodeStructureType
     {
         Area,
         Iteration
     }
 
-    public class AzureDevOpsObjectModelNodeStructureEnricher : WorkItemEnricher
+    public class TfsNodeStructureEnricher : WorkItemEnricher
     {
         private Dictionary<string, bool> _foundNodes = new Dictionary<string, bool>();
         private string[] _nodeBasePaths;
@@ -26,7 +26,7 @@ namespace MigrationTools.Enrichers
         private NodeInfo[] _sourceRootNodes;
         private ICommonStructureService _targetCommonStructureService;
 
-        public AzureDevOpsObjectModelNodeStructureEnricher(IMigrationEngine engine, ILogger<AzureDevOpsObjectModelNodeStructureEnricher> logger) : base(engine, logger)
+        public TfsNodeStructureEnricher(IMigrationEngine engine, ILogger<TfsNodeStructureEnricher> logger) : base(engine, logger)
         {
             _sourceCommonStructureService = (ICommonStructureService)Engine.Source.GetService<ICommonStructureService>();
             _targetCommonStructureService = (ICommonStructureService)Engine.Target.GetService<ICommonStructureService4>();
@@ -44,7 +44,7 @@ namespace MigrationTools.Enrichers
             return 0;
         }
 
-        public string GetNewNodeName(string sourceNodeName, NodeStructureType nodeStructureType)
+        public string GetNewNodeName(string sourceNodeName, TfsNodeStructureType nodeStructureType)
         {
             Log.LogDebug("NodeStructureEnricher.GetNewNodeName({sourceNodeName}, {nodeStructureType})", sourceNodeName, nodeStructureType.ToString());
             string targetStructureName = NodeStructureTypeToLanguageSpecificName(Engine.Target, nodeStructureType);
@@ -102,15 +102,15 @@ namespace MigrationTools.Enrichers
             //////////////////////////////////////////////////
         }
 
-        public string NodeStructureTypeToLanguageSpecificName(IMigrationClient client, NodeStructureType value)
+        public string NodeStructureTypeToLanguageSpecificName(IMigrationClient client, TfsNodeStructureType value)
         {
             // insert switch statement here
             switch (value)
             {
-                case NodeStructureType.Area:
+                case TfsNodeStructureType.Area:
                     return client.Config.AsTeamProjectConfig().LanguageMaps.AreaPath;
 
-                case NodeStructureType.Iteration:
+                case TfsNodeStructureType.Iteration:
                     return client.Config.AsTeamProjectConfig().LanguageMaps.IterationPath;
 
                 default:

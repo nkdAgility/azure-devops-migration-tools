@@ -2,7 +2,7 @@
 
 namespace MigrationTools.Configuration
 {
-    public class AzureDevOpsObjectModelTeamProjectConfig : IMigrationClientConfig
+    public class TfsTeamProjectConfig : IMigrationClientConfig
     {
         public Uri Collection { get; set; }
         public string Project { get; set; }

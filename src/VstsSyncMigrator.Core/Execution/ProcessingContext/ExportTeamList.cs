@@ -6,7 +6,7 @@ using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.Framework.Common;
 using Microsoft.TeamFoundation.Server;
 using MigrationTools;
-using MigrationTools.Clients.AzureDevops.ObjectModel;
+
 using MigrationTools.Configuration;
 
 namespace VstsSyncMigrator.Engine

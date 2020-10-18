@@ -8,14 +8,14 @@ using Serilog;
 
 namespace MigrationTools.Enrichers
 {
-    public class AzureDevOpsObjectModelAttachmentEnricher : IAttachmentMigrationEnricher
+    public class TfsAttachmentEnricher : IAttachmentMigrationEnricher
     {
         private WorkItemServer _server;
         private string _exportBasePath;
         private string _exportWiPath;
         private int _maxAttachmentSize;
 
-        public AzureDevOpsObjectModelAttachmentEnricher(WorkItemServer workItemServer, string exportBasePath, int maxAttachmentSize = 480000000)
+        public TfsAttachmentEnricher(WorkItemServer workItemServer, string exportBasePath, int maxAttachmentSize = 480000000)
         {
             _server = workItemServer;
             _exportBasePath = exportBasePath;

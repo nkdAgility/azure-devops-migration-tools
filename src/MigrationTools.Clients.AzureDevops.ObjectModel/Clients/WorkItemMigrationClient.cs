@@ -12,7 +12,7 @@ using Serilog;
 
 namespace MigrationTools.Clients
 {
-    public class AzureDevOpsObjectModelWorkItemMigrationClient : WorkItemMigrationClientBase
+    public class TfsWorkItemMigrationClient : WorkItemMigrationClientBase
     {
         private WorkItemStoreFlags _bypassRules;
         private IMigrationClientConfig _config;
@@ -20,7 +20,7 @@ namespace MigrationTools.Clients
         private ProjectData _project;
         private WorkItemStore _wistore;
 
-        public AzureDevOpsObjectModelWorkItemMigrationClient(IServiceProvider services, ITelemetryLogger telemetry) : base(services, telemetry)
+        public TfsWorkItemMigrationClient(IServiceProvider services, ITelemetryLogger telemetry) : base(services, telemetry)
         {
         }
 

@@ -14,7 +14,7 @@ namespace VstsSyncMigrator.Engine
     public class FixGitCommitLinks : StaticProcessorBase
     {
         private FixGitCommitLinksConfig _config;
-        private AzureDevOpsObjectModelGitRepositoryEnricher _GitRepositoryEnricher;
+        private TfsGitRepositoryEnricher _GitRepositoryEnricher;
 
         public FixGitCommitLinks(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<FixGitCommitLinks> logger) : base(services, me, telemetry, logger)
         {
@@ -34,7 +34,7 @@ namespace VstsSyncMigrator.Engine
         public override void Configure(IProcessorConfig config)
         {
             _config = (FixGitCommitLinksConfig)config;
-            _GitRepositoryEnricher = Services.GetRequiredService<AzureDevOpsObjectModelGitRepositoryEnricher>();
+            _GitRepositoryEnricher = Services.GetRequiredService<TfsGitRepositoryEnricher>();
         }
 
         protected override void InternalExecute()

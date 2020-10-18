@@ -4,7 +4,7 @@ using MigrationTools.Configuration;
 
 namespace MigrationTools.Clients
 {
-    public class AzureDevOpsObjectModelTestPlanMigrationClient : ITestPlanMigrationClient
+    public class TfsTestPlanMigrationClient : ITestPlanMigrationClient
     {
         public IMigrationClientConfig Config => throw new NotImplementedException();
 

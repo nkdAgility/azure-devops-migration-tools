@@ -4,8 +4,7 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools;
-using MigrationTools.Clients.AzureDevops.ObjectModel;
-using MigrationTools.Clients.AzureDevops.ObjectModel.Clients;
+using MigrationTools.Clients;
 using MigrationTools.Configuration;
 using MigrationTools.Configuration.Processing;
 using MigrationTools.Engine.Processors;
@@ -66,8 +65,8 @@ namespace VstsSyncMigrator.Engine
             Stopwatch stopwatch = Stopwatch.StartNew();
             //////////////////////////////////////////////////
 
-            var sourceQueryHierarchy = ((AzureDevOpsObjectModelWorkItemMigrationClient)Engine.Source.WorkItems).Store.Projects[Engine.Source.Config.AsTeamProjectConfig().Project].QueryHierarchy;
-            var targetQueryHierarchy = ((AzureDevOpsObjectModelWorkItemMigrationClient)Engine.Target.WorkItems).Store.Projects[Engine.Target.Config.AsTeamProjectConfig().Project].QueryHierarchy;
+            var sourceQueryHierarchy = ((TfsWorkItemMigrationClient)Engine.Source.WorkItems).Store.Projects[Engine.Source.Config.AsTeamProjectConfig().Project].QueryHierarchy;
+            var targetQueryHierarchy = ((TfsWorkItemMigrationClient)Engine.Target.WorkItems).Store.Projects[Engine.Target.Config.AsTeamProjectConfig().Project].QueryHierarchy;
 
             Log.LogInformation("Found {0} root level child WIQ folders", sourceQueryHierarchy.Count);
             //////////////////////////////////////////////////

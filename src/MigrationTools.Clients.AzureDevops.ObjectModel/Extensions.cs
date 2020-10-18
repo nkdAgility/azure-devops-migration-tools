@@ -8,7 +8,7 @@ using Serilog;
 
 namespace MigrationTools
 {
-    public static class TfsObjectModelExtensions
+    public static class TfsExtensions
     {
         //public static IServiceCollection TfsObjectModelWorkerServices(this IServiceCollection collection, EngineConfiguration config)
         //{
@@ -86,9 +86,9 @@ namespace MigrationTools
             return internalWorkItem;
         }
 
-        public static AzureDevOpsObjectModelTeamProjectConfig AsTeamProjectConfig(this IMigrationClientConfig context)
+        public static TfsTeamProjectConfig AsTeamProjectConfig(this IMigrationClientConfig context)
         {
-            return (AzureDevOpsObjectModelTeamProjectConfig)context;
+            return (TfsTeamProjectConfig)context;
         }
 
         public static WorkItem ToWorkItem(this WorkItemData workItemData)

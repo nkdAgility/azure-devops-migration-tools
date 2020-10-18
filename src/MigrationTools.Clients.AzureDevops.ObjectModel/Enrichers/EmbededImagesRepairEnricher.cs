@@ -10,9 +10,9 @@ using MigrationTools.DataContracts;
 
 namespace MigrationTools.Enrichers
 {
-    public class AzureDevOpsObjectModelEmbededImagesRepairEnricher : EmbededImagesRepairEnricherBase
+    public class TfsEmbededImagesEnricher : EmbededImagesRepairEnricherBase
     {
-        public AzureDevOpsObjectModelEmbededImagesRepairEnricher(IMigrationEngine engine, ILogger<AzureDevOpsObjectModelEmbededImagesRepairEnricher> logger) : base(engine, logger)
+        public TfsEmbededImagesEnricher(IMigrationEngine engine, ILogger<TfsEmbededImagesEnricher> logger) : base(engine, logger)
         {
         }
 
