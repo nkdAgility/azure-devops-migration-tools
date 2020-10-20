@@ -9,7 +9,7 @@ using Microsoft.TeamFoundation.Framework.Client;
 using Microsoft.TeamFoundation.Framework.Common;
 using Microsoft.TeamFoundation.TestManagement.Client;
 using MigrationTools;
-using MigrationTools.Clients.AzureDevops.ObjectModel;
+
 using MigrationTools.Configuration;
 using MigrationTools.Configuration.Processing;
 using MigrationTools.DataContracts;

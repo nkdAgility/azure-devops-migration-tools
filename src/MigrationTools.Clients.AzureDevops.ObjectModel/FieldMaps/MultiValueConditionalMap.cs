@@ -4,7 +4,7 @@ using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools.Configuration;
 using MigrationTools.Configuration.FieldMap;
 
-namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
+namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
 {
     public class MultiValueConditionalMap : FieldMapBase
     {

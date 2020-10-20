@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.DependencyInjection;
+using MigrationTools.Endpoints;
 
 namespace MigrationTools.Clients
 {

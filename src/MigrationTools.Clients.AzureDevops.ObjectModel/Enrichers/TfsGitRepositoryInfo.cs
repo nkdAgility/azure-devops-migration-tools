@@ -7,22 +7,22 @@ using Microsoft.TeamFoundation.SourceControl.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using Serilog;
 
-namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
+namespace MigrationTools.Enrichers
 {
-    public class GitRepositoryInfo
+    public class TfsGitRepositoryInfo
     {
         public string CommitID { get; }
         public string RepoID { get; }
         public GitRepository GitRepo { get; }
 
-        public GitRepositoryInfo(string CommitID, string RepoID, GitRepository GitRepo)
+        public TfsGitRepositoryInfo(string CommitID, string RepoID, GitRepository GitRepo)
         {
             this.CommitID = CommitID;
             this.RepoID = RepoID;
             this.GitRepo = GitRepo;
         }
 
-        public static GitRepositoryInfo Create(ExternalLink gitExternalLink, IList<GitRepository> possibleRepos, IMigrationEngine migrationEngine, string workItemSourceProjectName)
+        public static TfsGitRepositoryInfo Create(ExternalLink gitExternalLink, IList<GitRepository> possibleRepos, IMigrationEngine migrationEngine, string workItemSourceProjectName)
         {
             var repoType = DetermineFromLink(gitExternalLink.LinkedArtifactUri);
             switch (repoType)
@@ -37,7 +37,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             return null;
         }
 
-        private static GitRepositoryInfo CreateFromTFVC(ExternalLink gitExternalLink, IList<GitRepository> possibleRepos, ReadOnlyDictionary<int, string> changesetMapping, string sourceProjectName, string workItemSourceProjectName)
+        private static TfsGitRepositoryInfo CreateFromTFVC(ExternalLink gitExternalLink, IList<GitRepository> possibleRepos, ReadOnlyDictionary<int, string> changesetMapping, string sourceProjectName, string workItemSourceProjectName)
         {
             //vstfs:///VersionControl/Changeset/{id}
             var changeSetIdPart = gitExternalLink.LinkedArtifactUri.Substring(gitExternalLink.LinkedArtifactUri.LastIndexOf('/') + 1);
@@ -54,7 +54,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             }
 
             //assume the GitRepository source name is the work items project name, which changeset links needs to be fixed
-            return new GitRepositoryInfo(commitIDKvPair.Value, null, new GitRepository() { Name = workItemSourceProjectName });
+            return new TfsGitRepositoryInfo(commitIDKvPair.Value, null, new GitRepository() { Name = workItemSourceProjectName });
         }
 
         private enum RepistoryType
@@ -86,7 +86,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             return RepistoryType.Unknown;
         }
 
-        public static GitRepositoryInfo CreateFromGit(ExternalLink gitExternalLink, IList<GitRepository> possibleRepos)
+        public static TfsGitRepositoryInfo CreateFromGit(ExternalLink gitExternalLink, IList<GitRepository> possibleRepos)
         {
             string commitID;
             string repoID;
@@ -110,16 +110,16 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             gitRepo =
                 (from g in possibleRepos where g.Id.ToString() == repoID select g)
                 .SingleOrDefault();
-            return new GitRepositoryInfo(commitID, repoID, gitRepo);
+            return new TfsGitRepositoryInfo(commitID, repoID, gitRepo);
         }
 
-        internal static GitRepositoryInfo Create(string targetRepoName, GitRepositoryInfo sourceRepoInfo, IList<GitRepository> targetRepos)
+        internal static TfsGitRepositoryInfo Create(string targetRepoName, TfsGitRepositoryInfo sourceRepoInfo, IList<GitRepository> targetRepos)
         {
             var gitRepo = (from g in targetRepos
                            where
                                g.Name == targetRepoName
                            select g).SingleOrDefault();
-            return new GitRepositoryInfo(sourceRepoInfo.CommitID, gitRepo?.Id.ToString(), gitRepo);
+            return new TfsGitRepositoryInfo(sourceRepoInfo.CommitID, gitRepo?.Id.ToString(), gitRepo);
         }
     }
 }

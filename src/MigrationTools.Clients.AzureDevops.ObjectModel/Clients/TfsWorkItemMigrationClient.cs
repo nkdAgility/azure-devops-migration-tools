@@ -10,9 +10,9 @@ using MigrationTools.Configuration;
 using MigrationTools.DataContracts;
 using Serilog;
 
-namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
+namespace MigrationTools.Clients
 {
-    public class WorkItemMigrationClient : WorkItemMigrationClientBase
+    public class TfsWorkItemMigrationClient : WorkItemMigrationClientBase
     {
         private WorkItemStoreFlags _bypassRules;
         private IMigrationClientConfig _config;
@@ -20,7 +20,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
         private ProjectData _project;
         private WorkItemStore _wistore;
 
-        public WorkItemMigrationClient(IServiceProvider services, ITelemetryLogger telemetry) : base(services, telemetry)
+        public TfsWorkItemMigrationClient(IServiceProvider services, ITelemetryLogger telemetry) : base(services, telemetry)
         {
         }
 

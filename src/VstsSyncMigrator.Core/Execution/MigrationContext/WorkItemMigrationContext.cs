@@ -16,8 +16,6 @@ using Microsoft.VisualStudio.Services.Client;
 using Microsoft.VisualStudio.Services.WebApi.Patch.Json;
 using MigrationTools;
 using MigrationTools.Clients;
-using MigrationTools.Clients.AzureDevops.ObjectModel;
-using MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers;
 using MigrationTools.Configuration;
 using MigrationTools.Configuration.Processing;
 using MigrationTools.DataContracts;
@@ -43,11 +41,11 @@ namespace VstsSyncMigrator.Engine
         private IAttachmentMigrationEnricher attachmentEnricher;
         private ILogger contextLog;
         private IWorkItemEnricher embededImagesEnricher;
-        private GitRepositoryEnricher gitRepositoryEnricher;
-        private NodeStructureEnricher nodeStructureEnricher;
+        private TfsGitRepositoryEnricher gitRepositoryEnricher;
+        private TfsNodeStructureEnricher nodeStructureEnricher;
         private IDictionary<string, double> processWorkItemMetrics = null;
         private IDictionary<string, string> processWorkItemParamiters = null;
-        private WorkItemLinkEnricher workItemLinkEnricher;
+        private TfsWorkItemLinkEnricher workItemLinkEnricher;
         private ILogger workItemLog;
 
         public WorkItemMigrationContext(IMigrationEngine engine, IServiceProvider services, ITelemetryLogger telemetry, ILogger<WorkItemMigrationContext> logger) : base(engine, services, telemetry, logger)
@@ -82,11 +80,11 @@ namespace VstsSyncMigrator.Engine
                 throw new Exception("You must call Configure() first");
             }
             var workItemServer = Engine.Source.GetService<WorkItemServer>();
-            workItemLinkEnricher = Services.GetRequiredService<WorkItemLinkEnricher>();
-            attachmentEnricher = new AttachmentMigrationEnricher(workItemServer, _config.AttachmentWorkingPath, _config.AttachmentMaxSize);
-            embededImagesEnricher = Services.GetRequiredService<EmbededImagesRepairEnricher>();
-            gitRepositoryEnricher = Services.GetRequiredService<GitRepositoryEnricher>();
-            nodeStructureEnricher = Services.GetRequiredService<NodeStructureEnricher>();
+            workItemLinkEnricher = Services.GetRequiredService<TfsWorkItemLinkEnricher>();
+            attachmentEnricher = new TfsAttachmentEnricher(workItemServer, _config.AttachmentWorkingPath, _config.AttachmentMaxSize);
+            embededImagesEnricher = Services.GetRequiredService<TfsEmbededImagesEnricher>();
+            gitRepositoryEnricher = Services.GetRequiredService<TfsGitRepositoryEnricher>();
+            nodeStructureEnricher = Services.GetRequiredService<TfsNodeStructureEnricher>();
             VssClientCredentials adoCreds = new VssClientCredentials();
             _witClient = new WorkItemTrackingHttpClient(Engine.Target.Config.AsTeamProjectConfig().Collection, adoCreds);
             //Validation: make sure that the ReflectedWorkItemId field name specified in the config exists in the target process, preferably on each work item type.
@@ -314,8 +312,8 @@ namespace VstsSyncMigrator.Engine
                 }
             }
 
-            newWorkItem.AreaPath = nodeStructureEnricher.GetNewNodeName(oldWorkItem.AreaPath, NodeStructureType.Area);
-            newWorkItem.IterationPath = nodeStructureEnricher.GetNewNodeName(oldWorkItem.IterationPath, NodeStructureType.Iteration);
+            newWorkItem.AreaPath = nodeStructureEnricher.GetNewNodeName(oldWorkItem.AreaPath, TfsNodeStructureType.Area);
+            newWorkItem.IterationPath = nodeStructureEnricher.GetNewNodeName(oldWorkItem.IterationPath, TfsNodeStructureType.Iteration);
             switch (destType)
             {
                 case "Test Case":

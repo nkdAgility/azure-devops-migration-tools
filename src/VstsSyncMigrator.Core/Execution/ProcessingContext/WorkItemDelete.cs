@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using MigrationTools;
-using MigrationTools.Clients.AzureDevops.ObjectModel.Clients;
+using MigrationTools.Clients;
 using MigrationTools.Configuration;
 using MigrationTools.Configuration.Processing;
 using MigrationTools.DataContracts;
@@ -63,7 +63,7 @@ namespace VstsSyncMigrator.Engine
 
                 foreach (int begone in tobegone)
                 {
-                    ((WorkItemMigrationClient)Engine.Target.WorkItems).Store.DestroyWorkItems(new List<int>() { begone });
+                    ((TfsWorkItemMigrationClient)Engine.Target.WorkItems).Store.DestroyWorkItems(new List<int>() { begone });
                     Log.LogInformation("Deleted {0}", begone);
                 }
             }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using MigrationTools.DataContracts;
+using MigrationTools.Endpoints;
 
 namespace MigrationTools.Clients
 {
@@ -16,7 +17,7 @@ namespace MigrationTools.Clients
             Telemetry = telemetry;
         }
 
-        protected string Query { get { return _Query; } }
+        public string Query { get { return _Query; } }
         protected Dictionary<string, string> Parameters { get { return _Parameters; } }
         protected IMigrationClient MigrationClient { get { return _MigrationClient; } }
         protected IServiceProvider Services { get; }

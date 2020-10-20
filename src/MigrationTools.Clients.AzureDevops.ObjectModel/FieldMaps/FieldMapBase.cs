@@ -6,7 +6,7 @@ using MigrationTools.Configuration;
 using MigrationTools.DataContracts;
 using MigrationTools.Engine.Containers;
 
-namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
+namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
 {
     public abstract class FieldMapBase : IFieldMap
     {

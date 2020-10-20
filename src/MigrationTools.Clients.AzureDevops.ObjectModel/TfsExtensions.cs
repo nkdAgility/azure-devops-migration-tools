@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools.Configuration;
 using MigrationTools.DataContracts;
 using Serilog;
 
-namespace MigrationTools.Clients.AzureDevops.ObjectModel
+namespace MigrationTools
 {
-    public static class TfsObjectModelExtensions
+    public static class TfsExtensions
     {
         //public static IServiceCollection TfsObjectModelWorkerServices(this IServiceCollection collection, EngineConfiguration config)
         //{
@@ -66,6 +67,13 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel
             context.Revision = workItem.Revision;
             context.ProjectName = workItem?.Project?.Name;
             context.Fields = workItem.Fields.AsDictionary();
+            context.Revisions = (from Revision x in workItem.Revisions
+                                 select new RevisionItem()
+                                 {
+                                     Index = x.Index,
+                                     Number = Convert.ToInt32(x.Fields["System.Rev"].Value),
+                                     ChangedDate = Convert.ToDateTime(x.Fields["System.ChangedDate"].Value)
+                                 }).ToList();
         }
 
         public static WorkItemData AsWorkItemData(this WorkItem context)
@@ -78,9 +86,9 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel
             return internalWorkItem;
         }
 
-        public static TeamProjectConfig AsTeamProjectConfig(this IMigrationClientConfig context)
+        public static TfsTeamProjectConfig AsTeamProjectConfig(this IMigrationClientConfig context)
         {
-            return (TeamProjectConfig)context;
+            return (TfsTeamProjectConfig)context;
         }
 
         public static WorkItem ToWorkItem(this WorkItemData workItemData)

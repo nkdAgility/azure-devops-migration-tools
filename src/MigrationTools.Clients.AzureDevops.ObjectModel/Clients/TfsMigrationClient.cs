@@ -7,11 +7,11 @@ using Microsoft.VisualStudio.Services.Common;
 using MigrationTools.Configuration;
 using Serilog;
 
-namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
+namespace MigrationTools.Clients
 {
-    public class MigrationClient : IMigrationClient
+    public class TfsMigrationClient : IMigrationClient
     {
-        private TeamProjectConfig _config;
+        private TfsTeamProjectConfig _config;
         private NetworkCredential _credentials;
         private IWorkItemMigrationClient _workItemClient;
         private ITestPlanMigrationClient _testPlanClient;
@@ -19,7 +19,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
         private readonly IServiceProvider _Services;
         private readonly ITelemetryLogger _Telemetry;
 
-        public TeamProjectConfig TfsConfig
+        public TfsTeamProjectConfig TfsConfig
         {
             get
             {
@@ -52,7 +52,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
         }
 
         // if you add Migration Engine in here you will have to fix the infinate loop
-        public MigrationClient(ITestPlanMigrationClient testPlanClient, IWorkItemMigrationClient workItemClient, IServiceProvider services, ITelemetryLogger telemetry)
+        public TfsMigrationClient(ITestPlanMigrationClient testPlanClient, IWorkItemMigrationClient workItemClient, IServiceProvider services, ITelemetryLogger telemetry)
         {
             _testPlanClient = testPlanClient;
             _workItemClient = workItemClient;
@@ -66,12 +66,12 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
             {
                 throw new ArgumentNullException(nameof(config));
             }
-            if (!(config is TeamProjectConfig))
+            if (!(config is TfsTeamProjectConfig))
             {
-                throw new ArgumentOutOfRangeException(string.Format("{0} needs to be of type {1}", nameof(config), nameof(TeamProjectConfig)));
+                throw new ArgumentOutOfRangeException(string.Format("{0} needs to be of type {1}", nameof(config), nameof(TfsTeamProjectConfig)));
             }
 
-            _config = (TeamProjectConfig)config;
+            _config = (TfsTeamProjectConfig)config;
             _credentials = credentials;
             EnsureCollection();
             _workItemClient.Configure(this);

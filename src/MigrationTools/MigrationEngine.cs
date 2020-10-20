@@ -7,6 +7,7 @@ using MigrationTools.Clients;
 using MigrationTools.CommandLine;
 using MigrationTools.Configuration;
 using MigrationTools.Engine.Containers;
+using MigrationTools.Processors;
 using Serilog;
 using Serilog.Core;
 
