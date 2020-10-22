@@ -1,5 +1,7 @@
 # Node structures migration
 
+> Obsolete - merged into WorkItemMigration
+
 This processor creates the required structure (Area(s) and iteration(s)) of the project. That should be the first migration task.
 
 

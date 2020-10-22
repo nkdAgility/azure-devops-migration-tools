@@ -1,5 +1,7 @@
 # Work item revision replay migration
 
+> Obsolete - merged into WorkItemMigration
+
 That is the working horse. This processor migrate all the work items. 
 The process is different from `WorkItemMigrationConfig`. This process will create a work item step by step. So you get a clean history in the target project. 
 

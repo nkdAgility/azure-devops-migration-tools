@@ -35,8 +35,12 @@ It will migrate work items using a tip or replay migrator as well as Attachments
 | `WIQLQueryBit`                           | string  | A work item query based on WIQL to select only important work items. To migrate all leave this empty. |                                          |
 | `WIQLOrderBit` | string | A work item query to affect the order in which the work items are migrated. Don't leave this empty. | [System.ChangedDate] desc
 | `SkipToFinalRevisedWorkItemType` | Boolean | If enabled, when a revision is found that changes the work item type it will use the most recent revision work item type when migrating the initial work item. This should only be enabled for migrations from Azure DevOps Service to Azure DevOps Server. | true
-| `CollapseRevisions` | Boolean | If enabled, all revisions except the most recent are collapsed into a JSON format and attached as an attachment. Requires ReplayRevisions to be enabled. | false
-
+| `CollapseRevisions` | Boolean | If enabled, all revisions except the most recent are collapsed into a JSON format and attached as an attachment. Requires ReplayRevisions to be enabled. | false 
+| `PauseAfterEachWorkItem` | Boolean |  Pause after each work item is migrated | false
+| `CollapseRevisions ` | Boolean | If enabled, all work item revisions ar treated as a single revision | false 
+| `GenerateMigrationComment` | Boolean | If enabled, adds a comment recording the migration | true 
+| `NodeBasePaths` |Array`<string`> | The root paths of the Ares / Iterations you want migrate. | ["/"]                                    |
+| `WorkItemIDs ` | Array`<int`> | A list of work items to import | 
 
 ## WIQL Query Bits
 
@@ -47,7 +51,7 @@ The Work Item queries are all built using Work Item [Query Language (WIQL)](http
 
 You can use the [WIQL Editor](https://marketplace.visualstudio.com/items?itemName=ottostreifel.wiql-editor) to craft a query in Azure DevOps.
 
-Typical way that queris are built:
+Typical way that queries are built:
 
 ```
  var targetQuery = 

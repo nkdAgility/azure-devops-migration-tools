@@ -20,34 +20,119 @@ The global configuration created by the `init` command look like this:
 
 ```json
 {
-  "Version": "8.4",
-  "LogLevel": "Information",
-  "workaroundForQuerySOAPBugEnabled": false,
+  "ChangeSetMappingFile": null,
   "Source": {
-    "Collection": "https://dev.azure.com/psd45",
-    "Project": "DemoProjs",
-    "ReflectedWorkItemIDFieldName": "TfsMigrationTool.ReflectedWorkItemId",
+    "ObjectType": "TfsTeamProjectConfig",
+    "Collection": "https://dev.azure.com/nkdagility-preview/",
+    "Project": "myProjectName",
+    "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
     "AllowCrossProjectLinking": false,
+    "PersonalAccessToken": "",
     "LanguageMaps": {
-        "AreaPath": "Area",
-        "IterationPath": "Iteration"
-	}
+      "AreaPath": "Area",
+      "IterationPath": "Iteration"
+    }
   },
   "Target": {
-    "Collection": "https://dev.azure.com/psd46",
-    "Project": "DemoProjt",
-    "ReflectedWorkItemIDFieldName": "ProcessName.ReflectedWorkItemId",
+    "ObjectType": "TfsTeamProjectConfig",
+    "Collection": "https://dev.azure.com/nkdagility-preview/",
+    "Project": "myProjectName",
+    "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
     "AllowCrossProjectLinking": false,
+    "PersonalAccessToken": "",
     "LanguageMaps": {
-        "AreaPath": "Area",
-        "IterationPath": "Iteration"
-	}
+      "AreaPath": "Area",
+      "IterationPath": "Iteration"
+    }
   },
-  "FieldMaps": [],
-  "WorkItemTypeDefinition": {
-    "sourceWorkItemTypeName": "targetWorkItemTypeName"
-  },
+  "FieldMaps": [
+    {
+      "ObjectType": "MultiValueConditionalMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceFieldsAndValues": {
+        "Field1": "Value1",
+        "Field2": "Value2"
+      },
+      "targetFieldsAndValues": {
+        "Field1": "Value1",
+        "Field2": "Value2"
+      }
+    },
+    {
+      "ObjectType": "FieldBlankMapConfig",
+      "WorkItemTypeName": "*",
+      "targetField": "TfsMigrationTool.ReflectedWorkItemId"
+    },
+    {
+      "ObjectType": "FieldValueMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceField": "System.State",
+      "targetField": "System.State",
+      "defaultValue": "New",
+      "valueMapping": {
+        "Approved": "New",
+        "New": "New",
+        "Committed": "Active",
+        "In Progress": "Active",
+        "To Do": "New",
+        "Done": "Closed",
+        "Removed": "Removed"
+      }
+    },
+    {
+      "ObjectType": "FieldtoFieldMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceField": "Microsoft.VSTS.Common.BacklogPriority",
+      "targetField": "Microsoft.VSTS.Common.StackRank",
+      "defaultValue": null
+    },
+    {
+      "ObjectType": "FieldtoFieldMultiMapConfig",
+      "WorkItemTypeName": "*",
+      "SourceToTargetMappings": {
+        "SourceField1": "TargetField1",
+        "SourceField2": "TargetField2"
+      }
+    },
+    {
+      "ObjectType": "FieldtoTagMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceField": "System.State",
+      "formatExpression": "ScrumState:{0}"
+    },
+    {
+      "ObjectType": "FieldMergeMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceField1": "System.Description",
+      "sourceField2": "Microsoft.VSTS.Common.AcceptanceCriteria",
+      "targetField": "System.Description",
+      "formatExpression": "{0} <br/><br/><h3>Acceptance Criteria</h3>{1}",
+      "doneMatch": "##DONE##"
+    },
+    {
+      "ObjectType": "RegexFieldMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceField": "COMPANY.PRODUCT.Release",
+      "targetField": "COMPANY.DEVISION.MinorReleaseVersion",
+      "pattern": "PRODUCT \\d{4}.(\\d{1})",
+      "replacement": "$1"
+    },
+    {
+      "ObjectType": "FieldValuetoTagMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceField": "Microsoft.VSTS.CMMI.Blocked",
+      "pattern": "Yes",
+      "formatExpression": "{0}"
+    },
+    {
+      "ObjectType": "TreeToTagMapConfig",
+      "WorkItemTypeName": "*",
+      "toSkip": 3,
+      "timeTravel": 1
+    }
+  ],
   "GitRepoMapping": null,
+  "LogLevel": "Information",
   "Processors": [
     {
       "ObjectType": "WorkItemMigrationConfig",
@@ -57,33 +142,43 @@ The global configuration created by the `init` command look like this:
       "UpdateCreatedBy": true,
       "BuildFieldTable": false,
       "AppendMigrationToolSignatureFooter": false,
-      "QueryBit": "AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
-      "OrderBit": "[System.ChangedDate] desc",
+      "WIQLQueryBit": "AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
+      "WIQLOrderBit": "[System.ChangedDate] desc",
       "Enabled": false,
       "LinkMigration": true,
       "AttachmentMigration": true,
       "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
       "FixHtmlAttachmentLinks": false,
+      "SkipToFinalRevisedWorkItemType": true,
       "WorkItemCreateRetryLimit": 5,
       "FilterWorkItemsThatAlreadyExistInTarget": true,
       "PauseAfterEachWorkItem": false,
-      "BasePaths": [
+      "AttachmentMaxSize": 480000000,
+      "CollapseRevisions": false,
+      "LinkMigrationSaveEachAsAdded": false,
+      "GenerateMigrationComment": true,
+      "NodeBasePaths": [
         "Product\\Area\\Path1",
         "Product\\Area\\Path2"
+      ],
+      "WorkItemIDs": null
     }
-  ]
+  ],
+  "Version": "11.6",
+  "workaroundForQuerySOAPBugEnabled": false,
+  "WorkItemTypeDefinition": {
+    "sourceWorkItemTypeName": "targetWorkItemTypeName"
+  }
 }
-
-
 
 ```
 
 And the description of the available options are:
 
 ### TelemetryEnableTrace
-Allows you to submit trace to Application Insights to allow the devellpment team to diagnose any issues that may be found. If you are submitting a support ticket then please include the Session GUID found in your log file for that run. This will help us find the problem.
+Allows you to submit trace to Application Insights to allow the development team to diagnose any issues that may be found. If you are submitting a support ticket then please include the Session GUID found in your log file for that run. This will help us find the problem.
 
-**note:** All exceptions that you encounter will surface inside of Visual Studio as the developers are working on the source. This will make sure that they tackle issues as they arise.
+**Note:** All exceptions that you encounter will surface inside of Visual Studio as the developers are working on the source. This will make sure that they tackle issues as they arise.
 
 ### Source & Target
 Both the `Source` and `Target` entries hold the collection URL and the Team Project name that you are connecting to. The `Source` is where the tool will read the data to migrate. The `Target` is where the tool will write the data.
