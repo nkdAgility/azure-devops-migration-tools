@@ -6,12 +6,12 @@ on:
     - '**'
   pull_request:
     branches: [ master ]
+env:
+  Configuration: Release
 
 jobs:
   build:
-
     runs-on: windows-latest
-
     steps:
     - uses: actions/checkout@v2
 
@@ -24,7 +24,7 @@ jobs:
       run: dotnet restore
 
     - name: Build
-      run: dotnet build --configuration Release --no-restore
+      run: dotnet build --configuration ${{ env.Configuration }} --no-restore
 
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test --configuration ${{ env.Configuration }} --no-build --verbosity normal
