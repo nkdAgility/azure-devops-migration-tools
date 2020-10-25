@@ -38,15 +38,9 @@ namespace MigrationTools.Clients
 
         public abstract WorkItemData FindReflectedWorkItem(WorkItemData reflectedWorkItem, bool cache);
 
-        public abstract WorkItemData FindReflectedWorkItemByMigrationRef(ReflectedWorkItemId reflectedWorkItemId);
-
         public abstract WorkItemData FindReflectedWorkItemByReflectedWorkItemId(string reflectedWorkItemId);
 
-        public abstract WorkItemData FindReflectedWorkItemByReflectedWorkItemId(ReflectedWorkItemId reflectedWorkItemId, bool cache);
-
         public abstract WorkItemData FindReflectedWorkItemByReflectedWorkItemId(WorkItemData reflectedWorkItem);
-
-        public abstract WorkItemData FindReflectedWorkItemByTitle(string title);
 
         public abstract ProjectData GetProject();
 

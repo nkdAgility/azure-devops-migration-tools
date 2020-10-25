@@ -78,46 +78,9 @@ namespace MigrationTools.Clients
             return found?.AsWorkItemData();
         }
 
-        public override WorkItemData FindReflectedWorkItemByMigrationRef(ReflectedWorkItemId refId)
-        {
-            IWorkItemQueryBuilder wiqb = Services.GetRequiredService<IWorkItemQueryBuilder>();
-            StringBuilder queryBuilder = FindReflectedWorkItemQueryBase(wiqb);
-            queryBuilder.Append(" [System.Description] Contains @KeyToFind");
-            wiqb.AddParameter("KeyToFind", string.Format("##REF##{0}##", refId));
-            wiqb.Query = queryBuilder.ToString();
-            return FindWorkItemByQuery(wiqb);
-        }
-
         public override WorkItemData FindReflectedWorkItemByReflectedWorkItemId(WorkItemData workItemToReflect)
         {
             return FindReflectedWorkItemByReflectedWorkItemId(CreateReflectedWorkItemId(workItemToReflect));
-        }
-
-        public override WorkItemData FindReflectedWorkItemByReflectedWorkItemId(ReflectedWorkItemId refId, bool cache = true)
-        {
-            var IdKey = ~int.Parse(refId.WorkItemId);
-
-            if (Cache.TryGetValue(IdKey, out var workItem)) return workItem;
-
-            IEnumerable<WorkItemData> QueryWorkItems()
-            {
-                IWorkItemQueryBuilder wiqb = Services.GetRequiredService<IWorkItemQueryBuilder>();
-                wiqb.Query = string.Format(@"SELECT [System.Id] FROM WorkItems  WHERE [System.TeamProject]=@TeamProject AND [{0}] Contains '@idToFind'", MigrationClient.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName);
-                wiqb.AddParameter("idToFind", refId.ToString());
-                wiqb.AddParameter("TeamProject", MigrationClient.Config.AsTeamProjectConfig().Project);
-
-                foreach (WorkItemData wi in wiqb.BuildWIQLQuery(MigrationClient).GetWorkItems())
-                {
-                    yield return wi;
-                }
-            }
-
-            var foundWorkItem = QueryWorkItems().FirstOrDefault(wi => wi.ToWorkItem().Fields[MigrationClient.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName].Value.ToString().EndsWith("/" + refId));
-            if (cache && foundWorkItem != null)
-            {
-                AddToCache(IdKey, foundWorkItem);
-            }
-            return foundWorkItem;
         }
 
         public override WorkItemData FindReflectedWorkItemByReflectedWorkItemId(string refId)
@@ -127,15 +90,6 @@ namespace MigrationTools.Clients
             queryBuilder.AppendFormat("[{0}] = @idToFind", MigrationClient.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName);
             wiqb.AddParameter("idToFind", refId.ToString());
             wiqb.Query = queryBuilder.ToString();
-            return FindWorkItemByQuery(wiqb);
-        }
-
-        public override WorkItemData FindReflectedWorkItemByTitle(string title)
-        {
-            IWorkItemQueryBuilder wiqb = Services.GetRequiredService<IWorkItemQueryBuilder>();
-            wiqb.Query = @"SELECT [System.Id] FROM WorkItems  WHERE [System.TeamProject]=@TeamProject AND [System.Title] = @TitleToFind";
-            wiqb.AddParameter("TitleToFind", title);
-            wiqb.AddParameter("TeamProject", MigrationClient.Config.AsTeamProjectConfig().Project);
             return FindWorkItemByQuery(wiqb);
         }
 
@@ -263,6 +217,52 @@ namespace MigrationTools.Clients
         public override WorkItemData PersistWorkItem(WorkItemData workItem)
         {
             throw new NotImplementedException();
+        }
+
+        protected WorkItemData FindReflectedWorkItemByMigrationRef(ReflectedWorkItemId refId)
+        {
+            IWorkItemQueryBuilder wiqb = Services.GetRequiredService<IWorkItemQueryBuilder>();
+            StringBuilder queryBuilder = FindReflectedWorkItemQueryBase(wiqb);
+            queryBuilder.Append(" [System.Description] Contains @KeyToFind");
+            wiqb.AddParameter("KeyToFind", string.Format("##REF##{0}##", refId));
+            wiqb.Query = queryBuilder.ToString();
+            return FindWorkItemByQuery(wiqb);
+        }
+
+        protected WorkItemData FindReflectedWorkItemByReflectedWorkItemId(ReflectedWorkItemId refId, bool cache = true)
+        {
+            var IdKey = ~int.Parse(refId.WorkItemId);
+
+            if (Cache.TryGetValue(IdKey, out var workItem)) return workItem;
+
+            IEnumerable<WorkItemData> QueryWorkItems()
+            {
+                IWorkItemQueryBuilder wiqb = Services.GetRequiredService<IWorkItemQueryBuilder>();
+                wiqb.Query = string.Format(@"SELECT [System.Id] FROM WorkItems  WHERE [System.TeamProject]=@TeamProject AND [{0}] Contains '@idToFind'", MigrationClient.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName);
+                wiqb.AddParameter("idToFind", refId.ToString());
+                wiqb.AddParameter("TeamProject", MigrationClient.Config.AsTeamProjectConfig().Project);
+
+                foreach (WorkItemData wi in wiqb.BuildWIQLQuery(MigrationClient).GetWorkItems())
+                {
+                    yield return wi;
+                }
+            }
+
+            var foundWorkItem = QueryWorkItems().FirstOrDefault(wi => wi.ToWorkItem().Fields[MigrationClient.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName].Value.ToString().EndsWith("/" + refId));
+            if (cache && foundWorkItem != null)
+            {
+                AddToCache(IdKey, foundWorkItem);
+            }
+            return foundWorkItem;
+        }
+
+        protected WorkItemData FindReflectedWorkItemByTitle(string title)
+        {
+            IWorkItemQueryBuilder wiqb = Services.GetRequiredService<IWorkItemQueryBuilder>();
+            wiqb.Query = @"SELECT [System.Id] FROM WorkItems  WHERE [System.TeamProject]=@TeamProject AND [System.Title] = @TitleToFind";
+            wiqb.AddParameter("TitleToFind", title);
+            wiqb.AddParameter("TeamProject", MigrationClient.Config.AsTeamProjectConfig().Project);
+            return FindWorkItemByQuery(wiqb);
         }
 
         private StringBuilder FindReflectedWorkItemQueryBase(IWorkItemQueryBuilder query)
