@@ -38,11 +38,7 @@ namespace MigrationTools.Clients
 
             var workItemToFind = workItemToReflect.ToWorkItem();
 
-            WorkItem found = null;
-            if (Cache.ContainsKey(workItemToFind.Id))
-            {
-                return Cache[workItemToFind.Id]; ;
-            }
+            WorkItem found = GetFromCache(ReflectedWorkItemId)?.ToWorkItem();
 
             // If we have a Reflected WorkItem ID field on the source store, assume it is pointing to the desired work item on the target store
             if (Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName != null && workItemToFind.Fields.Contains(Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName) && !string.IsNullOrEmpty(workItemToFind.Fields[Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName]?.Value?.ToString()))
@@ -73,7 +69,7 @@ namespace MigrationTools.Clients
             }
             if (found != null && cache)
             {
-                AddToCache(workItemToFind.Id, found.AsWorkItemData());/// TODO MEMORY LEAK
+                AddToCache(found.AsWorkItemData());/// TODO MEMORY LEAK
             }
             return found?.AsWorkItemData();
         }

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using System.Linq;
 using MigrationTools.Configuration;
 using MigrationTools.DataContracts;
 
@@ -8,7 +8,7 @@ namespace MigrationTools.Clients
 {
     public abstract class WorkItemMigrationClientBase : IWorkItemMigrationClient
     {
-        private Dictionary<int, WorkItemData> _Cache = new Dictionary<int, WorkItemData>();
+        private Dictionary<ReflectedWorkItemId, WorkItemData> _Cache = new Dictionary<ReflectedWorkItemId, WorkItemData>();
         private IMigrationClient _migrationClient;
 
         public WorkItemMigrationClientBase(IServiceProvider services, ITelemetryLogger telemetry)
@@ -19,7 +19,6 @@ namespace MigrationTools.Clients
 
         public abstract IMigrationClientConfig Config { get; }
         public abstract ProjectData Project { get; }
-        protected ReadOnlyDictionary<int, WorkItemData> Cache { get { return new ReadOnlyDictionary<int, WorkItemData>(_Cache); } }
         protected IMigrationClient MigrationClient { get { return _migrationClient; } }
         protected IServiceProvider Services { get; }
         protected ITelemetryLogger Telemetry { get; }
@@ -62,9 +61,23 @@ namespace MigrationTools.Clients
 
         public abstract WorkItemData PersistWorkItem(WorkItemData workItem);
 
-        protected void AddToCache(int sourceIdKey, WorkItemData workItem)
+        protected void AddToCache(WorkItemData workItem)
         {
-            _Cache.Add(sourceIdKey, workItem);
+            _Cache.Add(GetReflectedWorkItemId(workItem), workItem);
+        }
+
+        protected WorkItemData GetFromCache(ReflectedWorkItemId reflectedWorkItemId)
+        {
+            if (_Cache.ContainsKey(reflectedWorkItemId))
+            {
+                return _Cache[reflectedWorkItemId];
+            }
+            var found = (from ReflectedWorkItemId x in _Cache.Keys where x.ToString() == reflectedWorkItemId.ToString() select x).SingleOrDefault();
+            if (found != null)
+            {
+                return _Cache[found];
+            }
+            return null;
         }
     }
 }
