@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
@@ -28,17 +27,16 @@ namespace MigrationTools.Clients
         public override ProjectData Project { get { return _project; } }
         public WorkItemStore Store { get { return _wistore; } }
 
-        public override string CreateReflectedWorkItemId(WorkItemData workItem)
+        public override ReflectedWorkItemId CreateReflectedWorkItemId(WorkItemData workItem)
         {
-            var wi = workItem.ToWorkItem();
-            return string.Format("{0}/{1}/_workitems/edit/{2}", wi.Store.TeamProjectCollection.Uri.ToString().TrimEnd('/'), wi.Project.Name, wi.Id);
+            throw new NotImplementedException();
         }
 
-        public override WorkItemData FindReflectedWorkItem(WorkItemData workItem, bool cache)
+        public override WorkItemData FindReflectedWorkItem(WorkItemData workItemToReflect, bool cache)
         {
-            string ReflectedWorkItemId = CreateReflectedWorkItemId(workItem);
+            TfsReflectedWorkItemId ReflectedWorkItemId = new TfsReflectedWorkItemId(workItemToReflect);
 
-            var workItemToFind = workItem.ToWorkItem();
+            var workItemToFind = workItemToReflect.ToWorkItem();
 
             WorkItem found = null;
             if (Cache.ContainsKey(workItemToFind.Id))
@@ -50,8 +48,8 @@ namespace MigrationTools.Clients
             if (Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName != null && workItemToFind.Fields.Contains(Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName) && !string.IsNullOrEmpty(workItemToFind.Fields[Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName]?.Value?.ToString()))
             {
                 string rwiid = workItemToFind.Fields[Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName].Value.ToString();
-                int idToFind = GetReflectedWorkItemId(workItem);
-                if (idToFind == 0)
+                ReflectedWorkItemId idToFind = GetReflectedWorkItemId(workItemToReflect);
+                if (int.Parse(idToFind.WorkItemId) == 0)
                 {
                     found = null;
                 }
@@ -59,7 +57,7 @@ namespace MigrationTools.Clients
                 {
                     try
                     {
-                        found = Store.GetWorkItem(idToFind);
+                        found = Store.GetWorkItem(int.Parse(idToFind.WorkItemId));
                     }
                     catch (DeniedOrNotExistException)
                     {
@@ -80,7 +78,7 @@ namespace MigrationTools.Clients
             return found?.AsWorkItemData();
         }
 
-        public override WorkItemData FindReflectedWorkItemByMigrationRef(string refId)
+        public override WorkItemData FindReflectedWorkItemByMigrationRef(ReflectedWorkItemId refId)
         {
             IWorkItemQueryBuilder wiqb = Services.GetRequiredService<IWorkItemQueryBuilder>();
             StringBuilder queryBuilder = FindReflectedWorkItemQueryBase(wiqb);
@@ -90,14 +88,15 @@ namespace MigrationTools.Clients
             return FindWorkItemByQuery(wiqb);
         }
 
-        public override WorkItemData FindReflectedWorkItemByReflectedWorkItemId(WorkItemData refWi)
+        public override WorkItemData FindReflectedWorkItemByReflectedWorkItemId(WorkItemData workItemToReflect)
         {
-            return FindReflectedWorkItemByReflectedWorkItemId(CreateReflectedWorkItemId(refWi));
+            return FindReflectedWorkItemByReflectedWorkItemId(CreateReflectedWorkItemId(workItemToReflect));
         }
 
-        public override WorkItemData FindReflectedWorkItemByReflectedWorkItemId(int refId, bool cache)
+        public override WorkItemData FindReflectedWorkItemByReflectedWorkItemId(ReflectedWorkItemId refId, bool cache = true)
         {
-            var IdKey = ~refId;
+            var IdKey = ~int.Parse(refId.WorkItemId);
+
             if (Cache.TryGetValue(IdKey, out var workItem)) return workItem;
 
             IEnumerable<WorkItemData> QueryWorkItems()
@@ -168,23 +167,23 @@ namespace MigrationTools.Clients
             return y.ToProjectData();
         }
 
-        public override int GetReflectedWorkItemId(WorkItemData workItem)
+        public override ReflectedWorkItemId GetReflectedWorkItemId(WorkItemData workItem)
         {
             Log.Debug("GetReflectedWorkItemId: START");
             var local = workItem.ToWorkItem();
             if (!local.Fields.Contains(Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName))
             {
                 Log.Debug("GetReflectedWorkItemId: END - no reflected work item id on work item");
-                return 0;
+                return null;
             }
             string rwiid = local.Fields[Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName].Value.ToString();
-            if (Regex.IsMatch(rwiid, @"(http(s)?://)?([\w-]+\.)+[\w-]+(/[\w- ;,./?%&=]*)?"))
+            if (!string.IsNullOrEmpty(rwiid))
             {
                 Log.Debug("GetReflectedWorkItemId: END - Has ReflectedWorkItemIdField and has value");
-                return int.Parse(rwiid.Substring(rwiid.LastIndexOf(@"/") + 1));
+                return new TfsReflectedWorkItemId(rwiid);
             }
             Log.Debug("GetReflectedWorkItemId: END - Has ReflectedWorkItemIdField but has no value");
-            return 0;
+            return null;
         }
 
         public override WorkItemData GetRevision(WorkItemData workItem, int revision)

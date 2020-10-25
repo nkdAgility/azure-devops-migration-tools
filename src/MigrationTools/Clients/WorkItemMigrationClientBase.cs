@@ -11,20 +11,18 @@ namespace MigrationTools.Clients
         private Dictionary<int, WorkItemData> _Cache = new Dictionary<int, WorkItemData>();
         private IMigrationClient _migrationClient;
 
-        protected IMigrationClient MigrationClient { get { return _migrationClient; } }
-        protected IServiceProvider Services { get; }
-        protected ITelemetryLogger Telemetry { get; }
-
-        protected ReadOnlyDictionary<int, WorkItemData> Cache { get { return new ReadOnlyDictionary<int, WorkItemData>(_Cache); } }
-
-        public abstract IMigrationClientConfig Config { get; }
-        public abstract ProjectData Project { get; }
-
         public WorkItemMigrationClientBase(IServiceProvider services, ITelemetryLogger telemetry)
         {
             Services = services;
             Telemetry = telemetry;
         }
+
+        public abstract IMigrationClientConfig Config { get; }
+        public abstract ProjectData Project { get; }
+        protected ReadOnlyDictionary<int, WorkItemData> Cache { get { return new ReadOnlyDictionary<int, WorkItemData>(_Cache); } }
+        protected IMigrationClient MigrationClient { get { return _migrationClient; } }
+        protected IServiceProvider Services { get; }
+        protected ITelemetryLogger Telemetry { get; }
 
         public void Configure(IMigrationClient migrationClient, bool bypassRules = true)
         {
@@ -36,12 +34,29 @@ namespace MigrationTools.Clients
             InnerConfigure(migrationClient, bypassRules);
         }
 
-        protected void AddToCache(int sourceIdKey, WorkItemData workItem)
-        {
-            _Cache.Add(sourceIdKey, workItem);
-        }
+        public abstract ReflectedWorkItemId CreateReflectedWorkItemId(WorkItemData workItem);
 
-        public abstract void InnerConfigure(IMigrationClient migrationClient, bool bypassRules = true);
+        public abstract WorkItemData FindReflectedWorkItem(WorkItemData reflectedWorkItem, bool cache);
+
+        public abstract WorkItemData FindReflectedWorkItemByMigrationRef(ReflectedWorkItemId reflectedWorkItemId);
+
+        public abstract WorkItemData FindReflectedWorkItemByReflectedWorkItemId(string reflectedWorkItemId);
+
+        public abstract WorkItemData FindReflectedWorkItemByReflectedWorkItemId(ReflectedWorkItemId reflectedWorkItemId, bool cache);
+
+        public abstract WorkItemData FindReflectedWorkItemByReflectedWorkItemId(WorkItemData reflectedWorkItem);
+
+        public abstract WorkItemData FindReflectedWorkItemByTitle(string title);
+
+        public abstract ProjectData GetProject();
+
+        public abstract ReflectedWorkItemId GetReflectedWorkItemId(WorkItemData workItem);
+
+        public abstract WorkItemData GetRevision(WorkItemData workItem, int revision);
+
+        public abstract WorkItemData GetWorkItem(string id);
+
+        public abstract WorkItemData GetWorkItem(int id);
 
         public abstract List<WorkItemData> GetWorkItems();
 
@@ -49,30 +64,13 @@ namespace MigrationTools.Clients
 
         public abstract List<WorkItemData> GetWorkItems(IWorkItemQueryBuilder queryBuilder);
 
+        public abstract void InnerConfigure(IMigrationClient migrationClient, bool bypassRules = true);
+
         public abstract WorkItemData PersistWorkItem(WorkItemData workItem);
 
-        public abstract WorkItemData GetRevision(WorkItemData workItem, int revision);
-
-        public abstract WorkItemData FindReflectedWorkItemByTitle(string title);
-
-        public abstract WorkItemData FindReflectedWorkItemByMigrationRef(string refId);
-
-        public abstract WorkItemData FindReflectedWorkItemByReflectedWorkItemId(string refId);
-
-        public abstract WorkItemData FindReflectedWorkItemByReflectedWorkItemId(int refId, bool cache);
-
-        public abstract WorkItemData FindReflectedWorkItemByReflectedWorkItemId(WorkItemData refWi);
-
-        public abstract string CreateReflectedWorkItemId(WorkItemData workItem);
-
-        public abstract int GetReflectedWorkItemId(WorkItemData workItem);
-
-        public abstract WorkItemData FindReflectedWorkItem(WorkItemData workItem, bool cache);
-
-        public abstract ProjectData GetProject();
-
-        public abstract WorkItemData GetWorkItem(string id);
-
-        public abstract WorkItemData GetWorkItem(int id);
+        protected void AddToCache(int sourceIdKey, WorkItemData workItem)
+        {
+            _Cache.Add(sourceIdKey, workItem);
+        }
     }
 }

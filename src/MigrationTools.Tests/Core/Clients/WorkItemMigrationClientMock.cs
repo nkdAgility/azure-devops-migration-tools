@@ -134,5 +134,25 @@ namespace MigrationTools.Clients.Tests
         {
             throw new System.NotImplementedException();
         }
+
+        public WorkItemData FindReflectedWorkItemByMigrationRef(ReflectedWorkItemId refId)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public WorkItemData FindReflectedWorkItemByReflectedWorkItemId(ReflectedWorkItemId refId, bool cache)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        ReflectedWorkItemId IWorkItemMigrationClient.CreateReflectedWorkItemId(WorkItemData workItem)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        ReflectedWorkItemId IWorkItemMigrationClient.GetReflectedWorkItemId(WorkItemData workItem)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

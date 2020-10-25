@@ -586,7 +586,7 @@ namespace VstsSyncMigrator.Engine
                 {
                     ProcessWorkItemAttachments(sourceWorkItem, targetWorkItem, false);
                     ProcessWorkItemLinks(Engine.Source.WorkItems, Engine.Target.WorkItems, sourceWorkItem, targetWorkItem);
-                    string reflectedUri = Engine.Source.WorkItems.CreateReflectedWorkItemId(sourceWorkItem);
+                    TfsReflectedWorkItemId reflectedUri = (TfsReflectedWorkItemId)Engine.Source.WorkItems.CreateReflectedWorkItemId(sourceWorkItem);
                     if (targetWorkItem.ToWorkItem().Fields.Contains(Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName))
                     {
                         targetWorkItem.ToWorkItem().Fields[Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName].Value = reflectedUri;
