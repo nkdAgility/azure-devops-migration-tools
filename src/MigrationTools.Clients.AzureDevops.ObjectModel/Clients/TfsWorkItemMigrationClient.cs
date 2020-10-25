@@ -32,6 +32,30 @@ namespace MigrationTools.Clients
             throw new NotImplementedException();
         }
 
+        public List<WorkItemData> FilterExistingWorkItems(List<WorkItemData> sourceWorkItems, TfsWiqlDefinition wiqlDefinition)
+        {
+            Log.Debug("FilterExistingWorkItems: START | ");
+
+            var targetQuery =
+                string.Format(
+                    @"SELECT [System.Id], [{0}] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {1} ORDER BY {2}",
+                     _config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName,
+                    wiqlDefinition.QueryBit,
+                    wiqlDefinition.OrderBit
+                    );
+
+            Log.Debug("FilterByTarget: Query Execute...");
+            var targetFoundItems = GetWorkItems(targetQuery);
+            Log.Debug("FilterByTarget: ... query complete.");
+            Log.Debug("FilterByTarget: Found {TargetWorkItemCount} based on the WIQLQueryBit in the target system.", targetFoundItems.Count());
+            var targetFoundIds = (from WorkItemData twi in targetFoundItems select GetReflectedWorkItemId(twi)).ToList();
+            //////////////////////////////////////////////////////////
+            sourceWorkItems = sourceWorkItems.Where(p => !targetFoundIds.Any(p2 => p2.ToString() == p.Id)).ToList();
+            Log.Debug("FilterByTarget: After removing all found work items there are {SourceWorkItemCount} remaining to be migrated.", sourceWorkItems.Count());
+            Log.Debug("FilterByTarget: END");
+            return sourceWorkItems;
+        }
+
         public override WorkItemData FindReflectedWorkItem(WorkItemData workItemToReflect, bool cache)
         {
             TfsReflectedWorkItemId ReflectedWorkItemId = new TfsReflectedWorkItemId(workItemToReflect);
@@ -229,7 +253,7 @@ namespace MigrationTools.Clients
         {
             var IdKey = ~int.Parse(refId.WorkItemId);
 
-            if (Cache.TryGetValue(IdKey, out var workItem)) return workItem;
+            var workItem = GetFromCache(refId);
 
             IEnumerable<WorkItemData> QueryWorkItems()
             {
@@ -247,7 +271,7 @@ namespace MigrationTools.Clients
             var foundWorkItem = QueryWorkItems().FirstOrDefault(wi => wi.ToWorkItem().Fields[MigrationClient.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName].Value.ToString().EndsWith("/" + refId));
             if (cache && foundWorkItem != null)
             {
-                AddToCache(IdKey, foundWorkItem);
+                AddToCache(foundWorkItem);
             }
             return foundWorkItem;
         }
@@ -311,30 +335,6 @@ namespace MigrationTools.Clients
                 throw;
             }
             return store;
-        }
-
-        public List<WorkItemData> FilterExistingWorkItems(List<WorkItemData> sourceWorkItems, TfsWiqlDefinition wiqlDefinition)
-        {
-            Log.Debug("FilterExistingWorkItems: START | ");
-
-            var targetQuery =
-                string.Format(
-                    @"SELECT [System.Id], [{0}] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {1} ORDER BY {2}",
-                     _config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName,
-                    wiqlDefinition.QueryBit,
-                    wiqlDefinition.OrderBit
-                    );
-
-            Log.Debug("FilterByTarget: Query Execute...");
-            var targetFoundItems = GetWorkItems(targetQuery);
-            Log.Debug("FilterByTarget: ... query complete.");
-            Log.Debug("FilterByTarget: Found {TargetWorkItemCount} based on the WIQLQueryBit in the target system.", targetFoundItems.Count());
-            var targetFoundIds = (from WorkItemData twi in targetFoundItems select GetReflectedWorkItemId(twi)).ToList();
-            //////////////////////////////////////////////////////////
-            sourceWorkItems = sourceWorkItems.Where(p => !targetFoundIds.Any(p2 => p2.ToString() == p.Id)).ToList();
-            Log.Debug("FilterByTarget: After removing all found work items there are {SourceWorkItemCount} remaining to be migrated.", sourceWorkItems.Count());
-            Log.Debug("FilterByTarget: END");
-            return sourceWorkItems;
         }
     }
 }
