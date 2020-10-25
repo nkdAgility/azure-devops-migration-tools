@@ -1,5 +1,7 @@
 # Attachment export Migration
 
+>  Obsolete -merged into WorkItemMigration
+
 With this processor you can export work item attachments from the source project.
 
 > Note: Make sure you have enough disk-space for all attachments on the migration machine.
