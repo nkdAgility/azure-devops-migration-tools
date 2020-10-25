@@ -312,5 +312,29 @@ namespace MigrationTools.Clients
             }
             return store;
         }
+
+        public List<WorkItemData> FilterExistingWorkItems(List<WorkItemData> sourceWorkItems, TfsWiqlDefinition wiqlDefinition)
+        {
+            Log.Debug("FilterExistingWorkItems: START | ");
+
+            var targetQuery =
+                string.Format(
+                    @"SELECT [System.Id], [{0}] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {1} ORDER BY {2}",
+                     _config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName,
+                    wiqlDefinition.QueryBit,
+                    wiqlDefinition.OrderBit
+                    );
+
+            Log.Debug("FilterByTarget: Query Execute...");
+            var targetFoundItems = GetWorkItems(targetQuery);
+            Log.Debug("FilterByTarget: ... query complete.");
+            Log.Debug("FilterByTarget: Found {TargetWorkItemCount} based on the WIQLQueryBit in the target system.", targetFoundItems.Count());
+            var targetFoundIds = (from WorkItemData twi in targetFoundItems select GetReflectedWorkItemId(twi)).ToList();
+            //////////////////////////////////////////////////////////
+            sourceWorkItems = sourceWorkItems.Where(p => !targetFoundIds.Any(p2 => p2.ToString() == p.Id)).ToList();
+            Log.Debug("FilterByTarget: After removing all found work items there are {SourceWorkItemCount} remaining to be migrated.", sourceWorkItems.Count());
+            Log.Debug("FilterByTarget: END");
+            return sourceWorkItems;
+        }
     }
 }

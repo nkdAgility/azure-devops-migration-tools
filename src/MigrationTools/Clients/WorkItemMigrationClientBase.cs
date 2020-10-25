@@ -66,6 +66,14 @@ namespace MigrationTools.Clients
             _Cache.Add(GetReflectedWorkItemId(workItem), workItem);
         }
 
+        protected void AddToCache(List<WorkItemData> workItems)
+        {
+            foreach (WorkItemData workItem in workItems)
+            {
+                _Cache.Add(GetReflectedWorkItemId(workItem), workItem);
+            }
+        }
+
         protected WorkItemData GetFromCache(ReflectedWorkItemId reflectedWorkItemId)
         {
             if (_Cache.ContainsKey(reflectedWorkItemId))
