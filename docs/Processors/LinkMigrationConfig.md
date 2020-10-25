@@ -1,5 +1,7 @@
 # Link migration
 
+> Obsolete - merged into WorkItemMigration
+
 This processor migrate links between work items. This must run after `WorkItemMigrationConfig`.
 
 | Parameter name | Type    | Description                              | Default Value                            |

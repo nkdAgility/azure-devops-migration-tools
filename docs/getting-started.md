@@ -11,16 +11,16 @@ In order to run the migration you will need to install the tools first.
 1. Install Chocolatey from [https://chocolatey.org/install](https://chocolatey.org/install)
 1. Run "**choco install vsts-sync-migrator**" to install the tools [source](https://chocolatey.org/packages/vsts-sync-migrator)
 
-The tools are now installed and calling "vstssyncmigrator" from any command line will run the tools or it will not and you will need to switch to `c:\tools\vstssyncmigration\` and run `migrate.exe`.
+The tools are now installed. To run them you will need to switch to `c:\tools\MigrationTools\` and run `migrate.exe`.
 
 ## Server configuration and setup
 
-Follow the [setup instructions](./server-configuration.md) to make sure that you can run the tool against your enviroments.
+Follow the [setup instructions](./server-configuration.md) to make sure that you can run the tool against your environments.
 
 
 ## Create a default configuration file
 
-1. Open a command prompt or PowerShell window at `c:\tools\vstssyncmigration\`
+1. Open a command prompt or PowerShell window at `c:\tools\MigrationTools\`
 2. Run "./migration.exe init" to create a default configuration
 3. Open "configuration.json" from the current directory
 
@@ -28,12 +28,11 @@ You can now customise the configuration depending on what you need to do. Howeve
 
 ```
 {
-  "Version": "0.0",
-  "LogLevel": "Information",
-  "workaroundForQuerySOAPBugEnabled": false,
+  "ChangeSetMappingFile": null,
   "Source": {
+    "ObjectType": "TfsTeamProjectConfig",
     "Collection": "https://dev.azure.com/nkdagility-preview/",
-    "Project": "migrationSource1",
+    "Project": "myProjectName",
     "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
     "AllowCrossProjectLinking": false,
     "PersonalAccessToken": "",
@@ -43,8 +42,9 @@ You can now customise the configuration depending on what you need to do. Howeve
     }
   },
   "Target": {
+    "ObjectType": "TfsTeamProjectConfig",
     "Collection": "https://dev.azure.com/nkdagility-preview/",
-    "Project": "migrationTarget1",
+    "Project": "myProjectName",
     "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
     "AllowCrossProjectLinking": false,
     "PersonalAccessToken": "",
@@ -91,7 +91,8 @@ You can now customise the configuration depending on what you need to do. Howeve
       "ObjectType": "FieldtoFieldMapConfig",
       "WorkItemTypeName": "*",
       "sourceField": "Microsoft.VSTS.Common.BacklogPriority",
-      "targetField": "Microsoft.VSTS.Common.StackRank"
+      "targetField": "Microsoft.VSTS.Common.StackRank",
+      "defaultValue": null
     },
     {
       "ObjectType": "FieldtoFieldMultiMapConfig",
@@ -138,20 +139,9 @@ You can now customise the configuration depending on what you need to do. Howeve
       "timeTravel": 1
     }
   ],
-  "WorkItemTypeDefinition": {
-    "sourceWorkItemTypeName": "targetWorkItemTypeName"
-  },
   "GitRepoMapping": null,
+  "LogLevel": "Information",
   "Processors": [
-    {
-      "ObjectType": "NodeStructuresMigrationConfig",
-      "PrefixProjectToNodes": false,
-      "Enabled": false,
-      "BasePaths": [
-        "Product\\Area\\Path1",
-        "Product\\Area\\Path2"
-      ]
-    },
     {
       "ObjectType": "WorkItemMigrationConfig",
       "ReplayRevisions": true,
@@ -160,24 +150,34 @@ You can now customise the configuration depending on what you need to do. Howeve
       "UpdateCreatedBy": true,
       "BuildFieldTable": false,
       "AppendMigrationToolSignatureFooter": false,
-      "QueryBit": "AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
-      "OrderBit": "[System.ChangedDate] desc",
+      "WIQLQueryBit": "AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
+      "WIQLOrderBit": "[System.ChangedDate] desc",
       "Enabled": false,
       "LinkMigration": true,
       "AttachmentMigration": true,
       "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
       "FixHtmlAttachmentLinks": false,
-      "SkipToFinalRevisedWorkItemType": false,
+      "SkipToFinalRevisedWorkItemType": true,
       "WorkItemCreateRetryLimit": 5,
       "FilterWorkItemsThatAlreadyExistInTarget": true,
       "PauseAfterEachWorkItem": false,
       "AttachmentMaxSize": 480000000,
       "CollapseRevisions": false,
-      "LinkMigrationSaveEachAsAdded": false
+      "LinkMigrationSaveEachAsAdded": false,
+      "GenerateMigrationComment": true,
+      "NodeBasePaths": [
+        "Product\\Area\\Path1",
+        "Product\\Area\\Path2"
+      ],
+      "WorkItemIDs": null
     }
-  ]
+  ],
+  "Version": "0.0",
+  "workaroundForQuerySOAPBugEnabled": false,
+  "WorkItemTypeDefinition": {
+    "sourceWorkItemTypeName": "targetWorkItemTypeName"
+  }
 }
-
 ```
 
 Here we are performing the following operations:
