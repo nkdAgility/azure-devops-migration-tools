@@ -28,14 +28,27 @@ namespace MigrationTools.Clients
             return GetWorkItemsFromQuery(wiClient).ToWorkItemDataList();
         }
 
-        private WorkItemCollection GetWorkItemsFromQuery(TfsWorkItemMigrationClient wiClient)
+        private IList<WorkItem> GetWorkItemsFromQuery(TfsWorkItemMigrationClient wiClient)
         {
             var startTime = DateTime.UtcNow;
             var timer = System.Diagnostics.Stopwatch.StartNew();
-            WorkItemCollection results;
+            List<WorkItem> results = new List<WorkItem>();
+            WorkItemCollection workItemCollection;
             try
             {
-                results = wiClient.Store.Query(Query);
+                workItemCollection = wiClient.Store.Query(Query);
+                foreach (WorkItem item in workItemCollection)
+                {
+                    try
+                    {
+                        if (!string.IsNullOrEmpty(item.Title)) // Force to read WI
+                            results.Add(item);
+                    }
+                    catch (DeniedOrNotExistException ex)
+                    {
+                        Log.Information(ex, "Deleted Item found.");
+                    }
+                }
                 timer.Stop();
                 Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", MigrationClient.Config.AsTeamProjectConfig().Collection.ToString(), "GetWorkItemsFromQuery", null, startTime, timer.Elapsed, "200", true));
             }
