@@ -3,7 +3,7 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.TestManagement.Client;
 using MigrationTools;
-using MigrationTools.Clients.AzureDevops.ObjectModel;
+
 using MigrationTools.Configuration;
 using MigrationTools.Engine.Processors;
 using VstsSyncMigrator.Engine.ComponentContext;

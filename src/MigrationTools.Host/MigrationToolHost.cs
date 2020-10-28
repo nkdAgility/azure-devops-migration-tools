@@ -9,8 +9,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MigrationTools.CommandLine;
 using MigrationTools.Configuration;
-using MigrationTools.CustomDiagnostics;
 using MigrationTools.Engine.Containers;
+using MigrationTools.Host.CustomDiagnostics;
 using MigrationTools.Services;
 using Serilog;
 using Serilog.Core;
@@ -23,7 +23,7 @@ namespace MigrationTools.Host
     {
         public static IHostBuilder CreateDefaultBuilder(string[] args)
         {
-            var levelSwitch = new LoggingLevelSwitch();
+            var levelSwitch = new LoggingLevelSwitch(LogEventLevel.Verbose);
             var hostBuilder = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args)
              .UseSerilog((hostingContext, services, loggerConfiguration) =>
              {

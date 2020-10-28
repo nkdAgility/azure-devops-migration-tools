@@ -1,5 +1,7 @@
 # Work item update
 
+> Obsolete - merged into WorkItemMigration
+
 This processor only updates work items in the target project. So you must first run a full migration so you can update this migration with this processor.
 
 | Parameter name | Type    | Description                              | Default Value                            |

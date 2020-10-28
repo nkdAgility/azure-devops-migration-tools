@@ -22,13 +22,33 @@ namespace MigrationTools.Configuration
 
         public EngineConfiguration BuildFromFile(string configFile = "configuration.json")
         {
-            string configurationjson;
-            using (var sr = new StreamReader(configFile))
-                configurationjson = sr.ReadToEnd();
-            var ec = JsonConvert.DeserializeObject<EngineConfiguration>(configurationjson,
-                    new FieldMapConfigJsonConverter(),
-                    new ProcessorConfigJsonConverter(),
-                    new MigrationClientConfigJsonConverter());
+            EngineConfiguration ec = null;
+            try
+            {
+                string configurationjson = File.ReadAllText(configFile);
+                ec = JsonConvert.DeserializeObject<EngineConfiguration>(configurationjson,
+                        new FieldMapConfigJsonConverter(),
+                        new ProcessorConfigJsonConverter(),
+                        new MigrationClientConfigJsonConverter());
+            }
+            catch (JsonSerializationException ex)
+            {
+                _logger.LogTrace(ex, "Configuration Error");
+                _logger.LogCritical("Your configuration file is malformed and cant be loaded!");
+                _logger.LogError(ex.Message);
+                _logger.LogError("How to Solve: Malformed Json is usually a result of editing errors. Validate that your {configFile} is valid Json!", configFile);
+                Environment.Exit(-1);
+                return null;
+            }
+            catch (JsonReaderException ex)
+            {
+                _logger.LogTrace(ex, "Configuration Error");
+                _logger.LogCritical("Your configuration file was loaded but was unable to be mapped to ");
+                _logger.LogError(ex.Message);
+                _logger.LogError("How to Solve: Malformed configurations are usually a result of changes between versions. The best way to understand the change is to run 'migration.exe init' to create a new wel formed config and determin where the problem is!");
+                Environment.Exit(-1);
+                return null;
+            }
 
             //var builder = new ConfigurationBuilder();
             //builder.SetBasePath(Directory.GetCurrentDirectory());
@@ -38,7 +58,7 @@ namespace MigrationTools.Configuration
             //configuration.Bind(settings);
             //#if !DEBUG
             string appVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString(2);
-            if (ec.Version != appVersion)
+            if (ec?.Version != appVersion)
             {
                 _logger.LogError("The config version {Version} does not match the current app version {appVersion}. There may be compatability issues and we recommend that you generate a new default config and then tranfer the settings accross.", ec.Version, appVersion);
                 throw new Exception("Version in Config does not match X.X in Application. Please check and revert.");

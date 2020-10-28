@@ -4,7 +4,7 @@ using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools.Configuration;
 using MigrationTools.Configuration.FieldMap;
 
-namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
+namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
 {
     public class MultiValueConditionalMap : FieldMapBase
     {
@@ -28,17 +28,29 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.FieldMaps
                 {
                     fieldsUpdate(Config.targetFieldsAndValues, target);
                 }
-                Log.LogDebug("FieldValuetoTagMap: [UPDATE] field mapped {0}:{1} to {2}:{3}", source.Id, Config.sourceFieldsAndValues.Keys.ToString(), target.Id, Config.targetFieldsAndValues.Keys.ToString());
+                Log.LogDebug("FieldValuetoTagMap: [UPDATE] field mapped {0}:{1} to {2}:{3}", source.Id, Config.sourceFieldsAndValues?.Keys.ToString(), target.Id, Config.targetFieldsAndValues?.Keys.ToString());
             }
             else
             {
-                Log.LogDebug("FieldValuetoTagMap: [SKIPPED] Not all source and target fields exist", source.Id, Config.sourceFieldsAndValues.Keys.ToString(), target.Id, Config.targetFieldsAndValues.Keys.ToString());
+                Log.LogDebug("FieldValuetoTagMap: [SKIPPED] Not all source and target fields exist", source.Id, Config.sourceFieldsAndValues?.Keys.ToString(), target.Id, Config.targetFieldsAndValues?.Keys.ToString());
             }
         }
 
         private bool fieldsExist(Dictionary<string, string> fieldsAndValues, WorkItem workitem)
         {
+            if (fieldsAndValues is null)
+            {
+                Log.LogWarning("MultiValueConditionalMap: Your field and Values are Null. Please set it in the config to run this field map.");
+                return false;
+            }
+
+            if (workitem is null)
+            {
+                throw new System.ArgumentNullException(nameof(workitem));
+            }
+
             bool exists = true;
+
             foreach (string field in fieldsAndValues.Keys)
             {
                 if (!workitem.Fields.Contains(field))

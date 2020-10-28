@@ -1,7 +1,8 @@
 # HTML field embedded image migration
 
-This processor migrate all images in all text fields. This must run after `WorkItemMigrationConfig`.
+> Obsolete - merged into WorkItemMigration
 
+This processor migrate all images in all text fields. This must run after `WorkItemMigrationConfig`.
 
 
 | Parameter name                 | Type          | Description                              | Default Value                            |

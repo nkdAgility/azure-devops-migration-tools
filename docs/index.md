@@ -18,10 +18,10 @@ _NOTICE: Both paid and community support is available through our [recommended c
 
 ## Change Log
 
-- v11.5 - Added more usefull logging levels. Replace `"TelemetryEnableTrace": false` with `"LogLevel": "Verbose"` in the config. Verbose will only be logged to the logfile.
-- v11.2.1 - Removed NodeMogrationContext and converted it to an enricher for Work Items. Still needs work, so that it migrates individual nodes, but currently migrates all.
+- v11.5 - Added more useful logging levels. Replace `"TelemetryEnableTrace": false` with `"LogLevel": "Verbose"` in the config. Verbose will only be logged to the logfile.
+- v11.2.1 - Removed NodeMigrationContext and converted it to an enricher for Work Items. Still needs work, so that it migrates individual nodes, but currently migrates all.
 - v10.1 - Changed config design to have only the Name and not FullName of the class. Remove `MigrationTools.Core.Configuration.FieldMap.` and `MigrationTools.Core.Configuration.Processing.` from the config leaving only the Name of the class in ObjectType field.
-- v10.0 - Start of the greate refactor over to .NET Core and the REST API as the Object Model has been retired.
+- v10.0 - Start of the great refactor over to .NET Core and the REST API as the Object Model has been retired.
 - v9.0 - Added support for migration between other language versions of Azure DevOps. Developed for German -> English
 - v8.9 - Added 'Collapse Revisions' feature to collapse and attache revisions instead of replaying them
 - v8.8 - 'SkipToFinalRevisedWorkItemType' feature added to handle scenario when changing Work Item Type
@@ -86,25 +86,27 @@ Most of these processors need to be run in order. If you try to migrate work ite
 
 |Processor | Status |Target |Usage |
 |---------|---------|---------|---------|
-| [WorkItemMigration](./Processors/WorkItemMigrationConfig.md) | ready | Work Items | Migrates either tip or history of work items with Links & Attachments based on a query with field mappings |
-| [TeamMigration](./Processors/TeamMigrationConfig.md) | beta | Teams | Migrates Teams and Team Settings |
-| [WorkItemDelete](./Processors/WorkItemDeleteConfig.md) | ready | Work Items | Bulk delete of work items **WARNING DANGEROUS** |
-| [WorkItemUpdate](./Processors/WorkItemUpdateConfig.md) | ready | Work Items | Bulk update of Work Items based on a query and field mappings |
+|[WorkItemMigration](./Processors/WorkItemMigrationConfig.md) | ready | Work Items | Migrates either tip or history of work items with Links & Attachments based on a query with field mappings |
+|[TeamMigration](./Processors/TeamMigrationConfig.md) | beta | Teams | Migrates Teams and Team Settings |
+|[WorkItemDelete](./Processors/WorkItemDeleteConfig.md) | ready | Work Items | Bulk delete of work items **WARNING DANGEROUS** |
+|[WorkItemUpdate](./Processors/WorkItemUpdateConfig.md) | ready | Work Items | Bulk update of Work Items based on a query and field mappings |
 |[WorkItemQueryMigration](./Processors/WorkItemQueryMigrationConfig.md) | ready | Queries | Migrates shared queries |
-|[TestVeriablesMigration](./Processors/TestVeriablesMigrationConfig.md) | Beta | Suits & Plans | Migrates Test Variables |
-|[TestConfigurationsMigration](./Processors/TestConfigurationsMigrationConfig.md) | Beta  | Suits & Plans | Migrates Test configurations |
-|[TestPlansAndSuitesMigration](./Processors/TestPlansAndSuitesMigrationConfig.md) | Beta  | Suits & Plans | Rebuilds Suits and plans for Test Cases migrated using the WorkItemMigration |
+|[TeamMigration](./Processors/TeamMigrationConfig.md) | Beta | Teams | Migrates Teams |
+|[TestVariablesMigration](./Processors/TestVariablesMigrationConfig.md) | Beta | Suites & Plans | Migrates Test Variables |
+|[TestConfigurationsMigration](./Processors/TestConfigurationsMigrationConfig.md) | Beta  | Suites & Plans | Migrates Test configurations |
+|[TestPlansAndSuitesMigration](./Processors/TestPlansAndSuitesMigrationConfig.md) | Beta  | Suites & Plans | Rebuilds Suits and plans for Test Cases migrated using the WorkItemMigration |
+|[ImportProfilePicture](./Processors/ImportProfilePictureConfig) & ExportProfilePictureFromAD | Beta | Profiles | Downloads corporate images and updates TFS/Azure DevOps profiles |
+|[WorkItemUpdateAreasAsTags](](./Processors/WorkItemUpdateAreasAsTagsConfig) | Beta | Work Items | Adds tags to work items  to reflect area paths on source system |
 |TestRunsMigration | Alfa | Suits & Plans | Migrates the history of Test Runs |
-|ImportProfilePicture & ExportProfilePictureFromAD | Beta | Profiles | Downloads corporate images and updates TFS/Azure DevOps profiles |
-|CreateTeamFolders | ? | ? | ? | 
-|ExportTeamList | ? | ? | ? | 
-|[NodeStructuresMigration](./Processors/NodeStructuresMigrationConfig.md) | merged | Area & Iteration | obsolite - merged into WorkItemMigration |
-|AttachementExportMigration | merged | Work Items | obsolite - merged into WorkItemMigration |
-|AttachementImportMigration | merged | Work Items | obsolite - merged into WorkItemMigration |
-|LinkMigration | merged | Work Items | obsolite - merged into WorkItemMigration |
-|HtmlFieldEmbeddedImageMigration | merged | HTML Fields | obsolite - merged into WorkItemMigration |
-|WorkItemRevisionReplayMigration | merged |  Work Items | obsolite - merged into WorkItemMigration |
-|GitCommitFix | merged | Git links | obsolite - merged into WorkItemMigration |
+|NodeStructuresMigration | merged | Area & Iteration | obsolete - merged into WorkItemMigration |
+|AttachementExportMigration | merged | Work Items | obsolete - merged into WorkItemMigration |
+|AttachementImportMigration | merged | Work Items | obsolete - merged into WorkItemMigration |
+|LinkMigration | merged | Work Items | obsolete - merged into WorkItemMigration |
+|HtmlFieldEmbeddedImageMigration | merged | HTML Fields | obsolete - merged into WorkItemMigration |
+|WorkItemRevisionReplayMigration | merged |  Work Items | obsolete - merged into WorkItemMigration |
+|GitCommitFix | merged | Git links | obsolete - merged into WorkItemMigration |
+|WorkItemUpdateConfig | merged | Work Items | obsolete - merged into WorkItemMigration |
+
 
 ### Field Maps
 
