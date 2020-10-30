@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using CommandLine;
 using Newtonsoft.Json.Linq;
 
 namespace MigrationTools.Configuration
@@ -15,6 +16,12 @@ namespace MigrationTools.Configuration
                   .Where(a => !a.IsDynamic)
                   .SelectMany(a => a.GetTypes())
                   .FirstOrDefault(t => t.Name.Equals(typename) || t.FullName.Equals(typename));
+
+                if(type == null)
+                {
+                    throw new Exception($"Unknown ObjectType: \"{typename}\" found in {jObject.ToString()}");
+                }
+
                 return (IMigrationClientConfig)Activator.CreateInstance(type);
             }
             else
