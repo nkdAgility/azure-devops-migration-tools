@@ -83,6 +83,12 @@ namespace MigrationTools.Enrichers
                         targetWorkItemLinkStart.ToWorkItem().Reset();
                         Log.LogError(ex, "[CREATE-FAIL] Adding Link for wiSourceL={sourceWorkItemLinkStartId}", sourceWorkItemLinkStart.Id);
                     }
+                    catch (UnexpectedErrorException ex)
+                    {
+                        sourceWorkItemLinkStart.ToWorkItem().Reset();
+                        targetWorkItemLinkStart.ToWorkItem().Reset();
+                        Log.LogError(ex, "[UnexpectedErrorException] Adding Link for wiSourceL={sourceWorkItemLinkStartId}", sourceWorkItemLinkStart.Id);
+                    }
                 }
             }
             if (sourceWorkItemLinkStart.Type == "Test Case")
