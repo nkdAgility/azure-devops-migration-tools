@@ -314,18 +314,45 @@ namespace MigrationTools.Enrichers
 
         private void CreateHyperlink(Hyperlink sourceLink, WorkItemData target)
         {
-            var exist = (from Link l in target.ToWorkItem().Links where l is Hyperlink && ((Hyperlink)l).Location == ((Hyperlink)sourceLink).Location select (Hyperlink)l).SingleOrDefault();
-            if (exist == null)
+            var sourceLinkAbsoluteUri = GetAbsoluteUri(sourceLink);
+            if (string.IsNullOrEmpty(sourceLinkAbsoluteUri))
             {
-                Hyperlink hl = new Hyperlink(sourceLink.Location)
-                {
-                    Comment = sourceLink.Comment
-                };
-                target.ToWorkItem().Links.Add(hl);
-                if (_save)
-                {
-                    target.SaveToAzureDevOps();
-                }
+                Log.LogWarning($"  [SKIP] Unable to create a hyperlink to [{sourceLink.Location}]");
+                return;
+            }
+
+            var exist = (from hyperlink in target.ToWorkItem().Links.Cast<Link>().Where(l => l is Hyperlink).Cast<Hyperlink>()
+                let absoluteUri = GetAbsoluteUri(hyperlink)
+                where sourceLinkAbsoluteUri == absoluteUri
+                select hyperlink).SingleOrDefault();
+
+            if (exist != null)
+            {
+                return;
+            }
+
+            var hl = new Hyperlink(sourceLinkAbsoluteUri) // Use AbsoluteUri here as a possible \\UNC\Path\Link will be converted to file://UNC/Path/Link this way
+            {
+                Comment = sourceLink.Comment
+            };
+
+            target.ToWorkItem().Links.Add(hl);
+            if (_save)
+            {
+                target.SaveToAzureDevOps();
+            }
+        }
+
+        private string GetAbsoluteUri(Hyperlink hyperlink)
+        {
+            try
+            {
+                return new Uri(hyperlink.Location.Trim('"')).AbsoluteUri;
+            }
+            catch (UriFormatException e)
+            {
+                Log.LogError($"Unable to get AbsoluteUri of [{hyperlink.Location}]: {e.Message}");
+                return null;
             }
         }
 
