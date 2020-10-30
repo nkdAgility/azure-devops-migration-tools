@@ -10,7 +10,7 @@ namespace MigrationTools.Configuration.Processing
         /// <inheritdoc />
         public string Processor
         {
-            get { return "TestVeriablesMigrationContext"; }
+            get { return "TestVariablesMigrationContext"; }
         }
 
         /// <inheritdoc />
