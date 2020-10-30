@@ -52,12 +52,13 @@ namespace VstsSyncMigrator.Engine
             {
                 Log.LogInformation("Copy: {0}", sourceVar.Name);
                 ITestVariable targetVar = GetVar(targetTmc.Project.TestVariables, sourceVar.Name);
+                bool isDirty = false;
                 if (targetVar == null)
                 {
                     Log.LogInformation("    Need to create: {0}", sourceVar.Name);
                     targetVar = targetTmc.Project.TestVariables.Create();
                     targetVar.Name = sourceVar.Name;
-                    targetVar.Save();
+                    isDirty = true;
                 }
                 else
                 {
@@ -73,12 +74,16 @@ namespace VstsSyncMigrator.Engine
                         Log.LogInformation("    Need to create: {0}", sourceVal.Value);
                         targetVal = targetTmc.Project.TestVariables.CreateVariableValue(sourceVal.Value);
                         targetVar.AllowedValues.Add(targetVal);
-                        targetVar.Save();
+                        isDirty = true;
                     }
                     else
                     {
                         Log.LogInformation("    Exists: {0}", targetVal.Value);
                     }
+                }
+                if (isDirty)
+                {
+                    targetVar.Save();
                 }
             }
         }
