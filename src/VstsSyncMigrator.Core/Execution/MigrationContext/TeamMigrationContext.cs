@@ -64,10 +64,10 @@ namespace VstsSyncMigrator.Engine
             {
                 Stopwatch witstopwatch = Stopwatch.StartNew();
                 var foundTargetTeam = (from x in targetTL where x.Name == sourceTeam.Name select x).SingleOrDefault();
-                if (foundTargetTeam == null)
+                if (foundTargetTeam == null || _config.FixTeamSettingsForExistingTeams)
                 {
                     Log.LogDebug("Processing team '{0}':", sourceTeam.Name);
-                    TeamFoundationTeam newTeam = targetTS.CreateTeam(targetProject.ToProject().Uri.ToString(), sourceTeam.Name, sourceTeam.Description, null);
+                    TeamFoundationTeam newTeam = foundTargetTeam ?? targetTS.CreateTeam(targetProject.ToProject().Uri.ToString(), sourceTeam.Name, sourceTeam.Description, null);
                     Log.LogDebug("-> Team '{0}' created", sourceTeam.Name);
 
                     if (_config.EnableTeamSettingsMigration)
