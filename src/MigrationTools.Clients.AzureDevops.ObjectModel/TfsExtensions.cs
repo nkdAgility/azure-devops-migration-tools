@@ -100,6 +100,15 @@ namespace MigrationTools
             return (WorkItem)workItemData.internalObject;
         }
 
+        public static List<WorkItemData> ToWorkItemDataList(this IList<WorkItem> collection)
+        {
+            List<WorkItemData> list = new List<WorkItemData>();
+            foreach (WorkItem wi in collection)
+            {
+                list.Add(wi.AsWorkItemData());
+            }
+            return list;
+        }
         public static List<WorkItemData> ToWorkItemDataList(this WorkItemCollection collection)
         {
             List<WorkItemData> list = new List<WorkItemData>();
