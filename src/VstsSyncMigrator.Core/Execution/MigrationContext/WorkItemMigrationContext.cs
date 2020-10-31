@@ -108,7 +108,7 @@ namespace VstsSyncMigrator.Engine
             if (_config.FilterWorkItemsThatAlreadyExistInTarget)
             {
                 contextLog.Information("[FilterWorkItemsThatAlreadyExistInTarget] is enabled. Searching for work items that have already been migrated to the target...", sourceWorkItems.Count());
-                sourceWorkItems = FilterByTarget(sourceWorkItems);
+                sourceWorkItems = ((TfsWorkItemMigrationClient)Engine.Target.WorkItems).FilterExistingWorkItems(sourceWorkItems, new TfsWiqlDefinition() { OrderBit = _config.WIQLOrderBit, QueryBit = _config.WIQLQueryBit });
                 contextLog.Information("!! After removing all found work items there are {SourceWorkItemCount} remaining to be migrated.", sourceWorkItems.Count());
             }
             //////////////////////////////////////////////////
@@ -231,10 +231,10 @@ namespace VstsSyncMigrator.Engine
             Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", Engine.Target.Config.AsTeamProjectConfig().Collection.ToString(), "NewWorkItem", null, newWorkItemstartTime, newWorkItemTimer.Elapsed, "200", true));
             if (_config.UpdateCreatedBy) { newwit.Fields["System.CreatedBy"].Value = currentRevisionWorkItem.ToWorkItem().Revisions[0].Fields["System.CreatedBy"].Value; }
             if (_config.UpdateCreatedDate) { newwit.Fields["System.CreatedDate"].Value = currentRevisionWorkItem.ToWorkItem().Revisions[0].Fields["System.CreatedDate"].Value; }
-
             return newwit.AsWorkItemData();
         }
 
+        [Obsolete("Replaced be TfsWorkItemMigrationClient.FilterExistingWorkItems ", true)]
         private List<WorkItemData> FilterByTarget(List<WorkItemData> sourceWorkItems)
         {
             contextLog.Debug("FilterByTarget: START");
@@ -355,7 +355,9 @@ namespace VstsSyncMigrator.Engine
             AddParameter("TargetProject", processWorkItemParamiters, Engine.Target.WorkItems.Project.Name);
             AddParameter("RetryLimit", processWorkItemParamiters, retryLimit.ToString());
             AddParameter("RetryNumber", processWorkItemParamiters, retrys.ToString());
-
+            Log.LogDebug("######################################################################################");
+            Log.LogDebug("ProcessWorkItem: {sourceWorkItemId}", sourceWorkItem.Id);
+            Log.LogDebug("######################################################################################");
             try
             {
                 if (sourceWorkItem.Type != "Test Plan" || sourceWorkItem.Type != "Test Suite")
@@ -572,6 +574,12 @@ namespace VstsSyncMigrator.Engine
                         currentRevisionWorkItem.ToWorkItem().Revisions[revision.Index].Fields["System.History"].Value;
                     //Debug.WriteLine("Discussion:" + currentRevisionWorkItem.Revisions[revision.Index].Fields["System.History"].Value);
 
+                    TfsReflectedWorkItemId reflectedUri = (TfsReflectedWorkItemId)Engine.Source.WorkItems.CreateReflectedWorkItemId(sourceWorkItem);
+                    if (targetWorkItem.ToWorkItem().Fields.Contains(Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName))
+                    {
+                        targetWorkItem.ToWorkItem().Fields[Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName].Value = reflectedUri.ToString();
+                    }
+
                     targetWorkItem.SaveToAzureDevOps();
                     TraceWriteLine(LogEventLevel.Information,
                         " Saved TargetWorkItem {TargetWorkItemId}. Replayed revision {RevisionNumber} of {RevisionsToMigrateCount}",
@@ -586,13 +594,10 @@ namespace VstsSyncMigrator.Engine
                 {
                     ProcessWorkItemAttachments(sourceWorkItem, targetWorkItem, false);
                     ProcessWorkItemLinks(Engine.Source.WorkItems, Engine.Target.WorkItems, sourceWorkItem, targetWorkItem);
-                    string reflectedUri = Engine.Source.WorkItems.CreateReflectedWorkItemId(sourceWorkItem);
-                    if (targetWorkItem.ToWorkItem().Fields.Contains(Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName))
-                    {
-                        targetWorkItem.ToWorkItem().Fields[Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName].Value = reflectedUri;
-                    }
+
                     if (_config.GenerateMigrationComment)
                     {
+                        var reflectedUri = targetWorkItem.ToWorkItem().Fields[Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName].Value;
                         var history = new StringBuilder();
                         history.Append(
                             $"This work item was migrated from a different project or organization. You can find the old version at <a href=\"{reflectedUri}\">{reflectedUri}</a>.");

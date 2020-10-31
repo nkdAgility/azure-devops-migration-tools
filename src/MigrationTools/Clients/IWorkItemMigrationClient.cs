@@ -29,18 +29,12 @@ namespace MigrationTools.Clients
 
         WorkItemData FindReflectedWorkItem(WorkItemData workItem, bool cache);
 
-        WorkItemData FindReflectedWorkItemByTitle(string title);
-
-        WorkItemData FindReflectedWorkItemByMigrationRef(string refId);
-
         WorkItemData FindReflectedWorkItemByReflectedWorkItemId(string refId);
-
-        WorkItemData FindReflectedWorkItemByReflectedWorkItemId(int refId, bool cache);
 
         WorkItemData FindReflectedWorkItemByReflectedWorkItemId(WorkItemData refWi);
 
-        string CreateReflectedWorkItemId(WorkItemData workItem);
+        ReflectedWorkItemId CreateReflectedWorkItemId(WorkItemData workItem);
 
-        int GetReflectedWorkItemId(WorkItemData workItem);
+        ReflectedWorkItemId GetReflectedWorkItemId(WorkItemData workItem);
     }
 }
