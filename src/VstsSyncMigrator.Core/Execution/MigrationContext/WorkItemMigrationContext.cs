@@ -38,8 +38,9 @@ namespace VstsSyncMigrator.Engine
         private WorkItemMigrationConfig _config;
         private List<String> _ignore;
         private WorkItemTrackingHttpClient _witClient;
-        private IAttachmentMigrationEnricher attachmentEnricher;
+
         private ILogger contextLog;
+        private IAttachmentMigrationEnricher attachmentEnricher;
         private IWorkItemEnricher embededImagesEnricher;
         private TfsGitRepositoryEnricher gitRepositoryEnricher;
         private TfsNodeStructureEnricher nodeStructureEnricher;
@@ -80,8 +81,8 @@ namespace VstsSyncMigrator.Engine
                 throw new Exception("You must call Configure() first");
             }
             var workItemServer = Engine.Source.GetService<WorkItemServer>();
-            workItemLinkEnricher = Services.GetRequiredService<TfsWorkItemLinkEnricher>();
             attachmentEnricher = new TfsAttachmentEnricher(workItemServer, _config.AttachmentWorkingPath, _config.AttachmentMaxSize);
+            workItemLinkEnricher = Services.GetRequiredService<TfsWorkItemLinkEnricher>();
             embededImagesEnricher = Services.GetRequiredService<TfsEmbededImagesEnricher>();
             gitRepositoryEnricher = Services.GetRequiredService<TfsGitRepositoryEnricher>();
             nodeStructureEnricher = Services.GetRequiredService<TfsNodeStructureEnricher>();

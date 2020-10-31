@@ -1,7 +1,6 @@
 {
   "Version": "0.0",
   "LogLevel": "Verbose",
-  "workaroundForQuerySOAPBugEnabled": false,
   "MappingTools": [
     {
       "ObjectType": "WorkItemTypeMappingTool",
@@ -109,11 +108,11 @@
   ],
   "Processors": [
     {
-      "ObjectType": "WorkItemDeleteConfig",
+      "ObjectType": "WorkItemDeleteOptions",
       "Enabled": true,
       "Endpoints": [
         {
-          "ObjectType": "TfsWorkItemEndpointConfig",
+          "ObjectType": "TfsWorkItemEndpointOptions",
           "Direction": "Target",
           "WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
           "WIQLOrderBit": "[System.ChangedDate] desc",
@@ -122,7 +121,7 @@
       ]
     },
     {
-      "ObjectType": "WorkItemMigrationConfig",
+      "ObjectType": "WorkItemMigrationProcessorOptions",
       "Enabled": true,
       "ReplayRevisions": true,
       "PrefixProjectToNodes": false,
@@ -130,28 +129,28 @@
       "WorkItemCreateRetryLimit": 5,
       "Enrichers": [
         {
-          "ObjectType": "PauseAfterEachWorkItem",
+          "ObjectType": "PauseAfterEachWorkItemOptions",
           "Enabled": true
         },
         {
-          "ObjectType": "FilterWorkItemsThatAlreadyExistInTarget",
+          "ObjectType": "FilterWorkItemsThatAlreadyExistInTargetOptions",
           "Enabled": true,
           "WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
           "WIQLOrderBit": "[System.ChangedDate] desc"
         },
         {
-          "ObjectType": "AppendMigrationToolSignatureFooter",
+          "ObjectType": "AppendMigrationToolSignatureFooterOptions",
           "Enabled": false
         },
         {
-          "ObjectType": "SkipToFinalRevisedWorkItemType",
+          "ObjectType": "SkipToFinalRevisedWorkItemTypeOptions",
           "Enabled": false
         }
 
       ],
       "Endpoints": [
         {
-          "ObjectType": "FileSystemWorkItemEndpointConfig",
+          "ObjectType": "FileSystemWorkItemEndpointOptions",
           "Direction": "Source",
           "WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
           "WIQLOrderBit": "[System.ChangedDate] desc",
@@ -163,47 +162,47 @@
               "AttachmentMaxSize": 480000000
             },
             {
-              "ObjectType": "FileSystemWorkItemLinkEnricherConfig",
+              "ObjectType": "FileSystemWorkItemLinkEnricherOptions",
               "Enabled": true,
               "LinkMigrationSaveEachAsAdded": true
             }
           ]
         },
         {
-          "ObjectType": "TfsWorkItemEndpointConfig",
+          "ObjectType": "TfsWorkItemEndpointOptions",
           "Direction": "Target",
           "WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
           "WIQLOrderBit": "[System.ChangedDate] desc",
           "Enrichers": [
             {
-              "ObjectType": "TfsWorkItemAttachmentEnricherConfig",
+              "ObjectType": "TfsWorkItemAttachmentEnricherOptions",
               "Enabled": true,
               "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
               "AttachmentMaxSize": 480000000
             },
             {
-              "ObjectType": "TfsWorkItemEmbedEnricherConfig",
+              "ObjectType": "TfsWorkItemEmbedEnricherOptions",
               "Enabled": true,
               "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\"
             },
             {
-              "ObjectType": "TfsWorkItemEmbedEnricherConfig",
+              "ObjectType": "TfsWorkItemEmbedEnricherOptions",
               "Enabled": true,
               "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\"
             },
             {
-              "ObjectType": "TfsWorkItemLinkEnricherConfig",
+              "ObjectType": "TfsWorkItemLinkEnricherOptions",
               "Enabled": true,
               "LinkMigrationSaveEachAsAdded": true
             },
             {
-              "ObjectType": "TfsWorkItemCreatedEnricherConfig",
+              "ObjectType": "TfsWorkItemCreatedEnricherOptions",
               "Enabled": true,
               "UpdateCreatedDate": true,
               "UpdateCreatedBy": true
             },
             {
-              "ObjectType": "TfsWorkItemFieldTableEnricherConfig",
+              "ObjectType": "TfsWorkItemFieldTableEnricherOptions",
               "Enabled": true
             }
           ]

@@ -5,13 +5,7 @@ using Newtonsoft.Json.Converters;
 
 namespace MigrationTools.Endpoints
 {
-    public enum EndpointDirection
-    {
-        Source,
-        Target
-    }
-
-    public interface IEndpointOptions
+    public class EndpointOptions : IEndpointOptions
     {
         [JsonConverter(typeof(StringEnumConverter))]
         public EndpointDirection Direction { get; set; }
