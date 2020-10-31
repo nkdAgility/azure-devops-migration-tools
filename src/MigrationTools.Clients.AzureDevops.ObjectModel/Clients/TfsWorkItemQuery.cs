@@ -46,7 +46,7 @@ namespace MigrationTools.Clients
                     }
                     catch (DeniedOrNotExistException ex)
                     {
-                        Log.Information(ex, "Deleted Item found.");
+                        Log.Error(ex, "Deleted Item detected.");
                     }
                 }
                 timer.Stop();
