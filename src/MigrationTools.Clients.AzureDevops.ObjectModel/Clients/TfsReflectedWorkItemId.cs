@@ -38,12 +38,9 @@ namespace MigrationTools.Clients
             }
         }
 
-        public new string ToString
+        public override string ToString()
         {
-            get
-            {
-                return string.Format("{0}/{1}/_workitems/edit/{2}", _Connection.ToString().TrimEnd('/'), _ProjectName, _WorkItemId);
-            }
+            return string.Format("{0}/{1}/_workitems/edit/{2}", _Connection.ToString().TrimEnd('/'), _ProjectName, _WorkItemId);
         }
     }
 }

@@ -3,7 +3,7 @@ using MigrationTools.DataContracts;
 
 namespace MigrationTools.Clients
 {
-    public class ReflectedWorkItemId
+    public abstract class ReflectedWorkItemId
     {
         private string _WorkItemId;
 
@@ -24,6 +24,11 @@ namespace MigrationTools.Clients
                 throw new ArgumentNullException(nameof(ReflectedWorkItemId));
             }
             _WorkItemId = ReflectedWorkItemId;
+        }
+
+        public override string ToString()
+        {
+            return WorkItemId;
         }
 
         public string WorkItemId

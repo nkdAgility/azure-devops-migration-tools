@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using MigrationTools.Configuration;
 using MigrationTools.DataContracts;
 
@@ -8,7 +7,7 @@ namespace MigrationTools.Clients
 {
     public abstract class WorkItemMigrationClientBase : IWorkItemMigrationClient
     {
-        private Dictionary<ReflectedWorkItemId, WorkItemData> _Cache = new Dictionary<ReflectedWorkItemId, WorkItemData>();
+        private Dictionary<string, WorkItemData> _Cache = new Dictionary<string, WorkItemData>();
         private IMigrationClient _migrationClient;
 
         public WorkItemMigrationClientBase(IServiceProvider services, ITelemetryLogger telemetry)
@@ -63,27 +62,26 @@ namespace MigrationTools.Clients
 
         protected void AddToCache(WorkItemData workItem)
         {
-            _Cache.Add(GetReflectedWorkItemId(workItem), workItem);
+            string key = GetReflectedWorkItemId(workItem).ToString();
+            if (!_Cache.ContainsKey(key))
+            {
+                _Cache.Add(key, workItem);
+            }
         }
 
         protected void AddToCache(List<WorkItemData> workItems)
         {
             foreach (WorkItemData workItem in workItems)
             {
-                _Cache.Add(GetReflectedWorkItemId(workItem), workItem);
+                AddToCache(workItem);
             }
         }
 
         protected WorkItemData GetFromCache(ReflectedWorkItemId reflectedWorkItemId)
         {
-            if (_Cache.ContainsKey(reflectedWorkItemId))
+            if (_Cache.ContainsKey(reflectedWorkItemId.ToString()))
             {
-                return _Cache[reflectedWorkItemId];
-            }
-            var found = (from ReflectedWorkItemId x in _Cache.Keys where x.ToString() == reflectedWorkItemId.ToString() select x).SingleOrDefault();
-            if (found != null)
-            {
-                return _Cache[found];
+                return _Cache[reflectedWorkItemId.ToString()];
             }
             return null;
         }
