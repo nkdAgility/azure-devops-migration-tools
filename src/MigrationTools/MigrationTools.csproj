@@ -16,8 +16,4 @@
     <PackageReference Include="System.Security.Principal.Windows" Version="4.7.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="MappingTools\" />
-  </ItemGroup>
-
 </Project>

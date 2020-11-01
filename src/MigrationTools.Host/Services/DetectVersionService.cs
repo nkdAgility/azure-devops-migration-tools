@@ -11,7 +11,7 @@ using NuGet.Protocol.Core.Types;
 using NuGet.Versioning;
 using Serilog;
 
-namespace MigrationTools.Services
+namespace MigrationTools.Host.Services
 {
     public class DetectVersionService : IDetectVersionService
     {
