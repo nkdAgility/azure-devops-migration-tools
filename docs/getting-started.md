@@ -2,7 +2,7 @@
 
 If you want to perform a bulk edit or a migration then you need to start here. This tool has been tested on updating from 100 to 250,000 work items by its users.
 
-Watch the [Video Overview](https://youtu.be/RCJsST0xBCE) to get you started in 30 minutes. This tool is complicated and its not always easy to discover what you need to do.
+Watch the [Video Overview](https://youtu.be/RCJsST0xBCE) to get you started in 30 minutes. This tool is complicated and it's not always easy to discover what you need to do.
 
 ## Install
 
@@ -184,7 +184,7 @@ Here we are performing the following operations:
 
 1. Set the Source and Target Team Projects
 1. Set the field name of the Migration tracking field. I use "TfsMigrationTool.ReflectedWorkItemId" for TFS and "ReflectedWorkItemId" for VSTS
-1. Set the mapping of Work Items that you want in "WorkItemTypeDefinition". This allows you to merge and change types..
+1. Set the mapping of Work Items that you want in "WorkItemTypeDefinition". This allows you to merge and change types.
 1. NodeStructuresMigration - We need to create the same Area and Iteration paths in the Target Team Project as you have in the Source. Make sure you clean up your Area and Iteration paths first.
 1. Work Item Migration - Move the work items. Use the QueryBit to scope to only the items that you want.
 1. Link Migration - Once all of the work items are across you can then migrate the links. Links will only be re-created if both ends of the link are in the new system. The "ReflectedWorkItemId" field value is used to find the new work items easily.
