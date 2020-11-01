@@ -2,7 +2,7 @@
 
 namespace MigrationTools.Enrichers
 {
-    public interface IWorkItemTargetEnricher : IWorkItemEnricher
+    public interface IWorkItemProcessorTargetEnricher : IWorkItemProcessorEnricher
     {
         int PersistFromWorkItem(WorkItemData2 workItem);
     }

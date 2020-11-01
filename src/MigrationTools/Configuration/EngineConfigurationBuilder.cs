@@ -8,6 +8,7 @@ using MigrationTools.Configuration.FieldMap;
 using MigrationTools.Configuration.Processing;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
+using MigrationTools.Processors;
 using Newtonsoft.Json;
 using Serilog.Events;
 
@@ -85,6 +86,34 @@ namespace MigrationTools.Configuration
             ec.Processors.Add(new WorkItemDeleteConfig());
             ec.Processors.Add(new WorkItemQueryMigrationConfig() { SourceToTargetFieldMappings = new Dictionary<string, string>() { { "SourceFieldRef", "TargetFieldRef" } } });
             ec.Processors.Add(new TeamMigrationConfig());
+            return ec;
+        }
+
+        public EngineConfiguration BuildDefault2()
+        {
+            EngineConfiguration ec = new EngineConfiguration
+            {
+                LogLevel = LogEventLevel.Information,
+                Version = Assembly.GetExecutingAssembly().GetName().Version.ToString(2),
+                FieldMaps = new List<IFieldMapConfig>(),
+                WorkItemTypeDefinition = new Dictionary<string, string> {
+                    { "sourceWorkItemTypeName", "targetWorkItemTypeName" }
+                },
+                Processors = new List<IProcessorConfig>(),
+            };
+            ec.Processors.Add(
+                new WorkItemMigrationProcessorOptions
+                {
+                    Enabled = true,
+                    CollapseRevisions = false,
+                    PrefixProjectToNodes = false,
+                    ReplayRevisions = true,
+                    WorkItemCreateRetryLimit = 5,
+                    //Endpoints = new List<IEndpointOptions>()
+                    //{
+                    //    new InMemoryWorkItemEndpointOptions()
+                    //}
+                }); ;
             return ec;
         }
 

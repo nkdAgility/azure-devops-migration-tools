@@ -116,14 +116,16 @@
       "WorkItemCreateRetryLimit": 5,
       "Enrichers": [
         {
-          "ObjectType": "PauseAfterEachWorkItemOptions",
+          "ObjectType": "PauseAfterEachItemOptions",
           "Enabled": true
         },
         {
           "ObjectType": "FilterWorkItemsThatAlreadyExistInTargetOptions",
           "Enabled": true,
-          "WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
-          "WIQLOrderBit": "[System.ChangedDate] desc"
+          "Query": {
+            "WhereBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
+            "OrderBit": "[System.ChangedDate] desc"
+          }
         },
         {
           "ObjectType": "AppendMigrationToolSignatureFooterOptions",
@@ -138,9 +140,11 @@
         {
           "ObjectType": "FileSystemWorkItemEndpointOptions",
           "Direction": "Source",
-          "WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
-          "WIQLOrderBit": "[System.ChangedDate] desc",
-          "EndpointEnrichers": [
+          "Query": {
+            "WhereBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
+            "OrderBit": "[System.ChangedDate] desc"
+          },
+          "Enrichers": [
             {
               "ObjectType": "FileSystemWorkItemAttachmentEnricherConfig",
               "Enabled": true,
@@ -155,21 +159,18 @@
           ]
         },
         {
-          "ObjectType": "TfsWorkItemEndpoint",
+          "ObjectType": "TfsWorkItemEndPointOptions",
           "Direction": "Target",
-          "WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
-          "WIQLOrderBit": "[System.ChangedDate] desc",
+          "Query": {
+            "WhereBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
+            "OrderBit": "[System.ChangedDate] desc"
+          },
           "Enrichers": [
             {
               "ObjectType": "TfsWorkItemAttachmentEnricherOptions",
               "Enabled": true,
               "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
               "AttachmentMaxSize": 480000000
-            },
-            {
-              "ObjectType": "TfsWorkItemEmbedEnricherOptions",
-              "Enabled": true,
-              "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\"
             },
             {
               "ObjectType": "TfsWorkItemEmbedEnricherOptions",

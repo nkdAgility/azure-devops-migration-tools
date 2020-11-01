@@ -6,6 +6,8 @@
 
         EngineConfiguration BuildDefault();
 
+        EngineConfiguration BuildDefault2();
+
         EngineConfiguration BuildWorkItemMigration();
 
         EngineConfiguration CreateEmptyConfig();

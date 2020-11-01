@@ -12,7 +12,7 @@ using MigrationTools.DataContracts;
 
 namespace MigrationTools.Enrichers
 {
-    public class TfsGitRepositoryEnricher : WorkItemEnricher
+    public class TfsGitRepositoryEnricher : WorkItemProcessorEnricher
     {
         private IMigrationEngine _Engine;
         private readonly ILogger<TfsGitRepositoryEnricher> _Logger;

@@ -16,6 +16,10 @@ namespace VstsSyncMigrator.ConsoleApp
             var hostBuilder = MigrationToolHost.CreateDefaultBuilder(args)
                 .ConfigureServices((context, services) =>
                 {
+                    // New v2 Architecture fpr testing
+                    services.AddTransient<MigrationTools.Endpoints.FileSystemWorkItemEndpoint>();
+                    services.AddTransient<MigrationTools.Endpoints.TfsWorkItemEndPoint>();
+
                     // Field Mapps
                     services.AddTransient<FieldBlankMap>();
                     services.AddTransient<FieldLiteralMap>();

@@ -13,8 +13,8 @@ namespace MigrationTools.Processors
         /// </summary>
         public bool Enabled { get; set; }
 
-        public List<IEndpointOptions> Endpoints { get; }
-        public List<ProcessorEnricherOptions> Enrichers { get; }
+        public List<IEndpointOptions> Endpoints { get; set; }
+        public List<ProcessorEnricherOptions> Enrichers { get; set; }
 
         [JsonIgnoreAttribute]
         public abstract string Processor { get; }

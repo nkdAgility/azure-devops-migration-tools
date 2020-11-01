@@ -16,6 +16,11 @@ namespace MigrationTools.Configuration.Tests
             return ecb.BuildDefault();
         }
 
+        public EngineConfiguration BuildDefault2()
+        {
+            throw new System.NotImplementedException();
+        }
+
         public EngineConfiguration BuildFromFile(string configFile = "configuration.json")
         {
             return ecb.BuildDefault();

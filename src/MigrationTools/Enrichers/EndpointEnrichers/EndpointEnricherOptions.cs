@@ -1,6 +1,6 @@
 ﻿namespace MigrationTools.Enrichers
 {
-    public class WorkItemEnricherOptions : IEnricherOptions
+    public class EndpointEnricherOptions : IEndpointEnricherOptions
     {
         public bool Enabled { get; set; }
     }

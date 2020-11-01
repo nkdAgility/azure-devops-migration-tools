@@ -8,7 +8,7 @@ using MigrationTools.Exceptions;
 
 namespace MigrationTools.Enrichers
 {
-    public class TfsWorkItemLinkEnricher : WorkItemEnricher
+    public class TfsWorkItemLinkEnricher : WorkItemProcessorEnricher
     {
         private bool _save = true;
         private bool _filterWorkItemsThatAlreadyExistInTarget = true;
@@ -328,9 +328,9 @@ namespace MigrationTools.Enrichers
             }
 
             var exist = (from hyperlink in target.ToWorkItem().Links.Cast<Link>().Where(l => l is Hyperlink).Cast<Hyperlink>()
-                let absoluteUri = GetAbsoluteUri(hyperlink)
-                where sourceLinkAbsoluteUri == absoluteUri
-                select hyperlink).SingleOrDefault();
+                         let absoluteUri = GetAbsoluteUri(hyperlink)
+                         where sourceLinkAbsoluteUri == absoluteUri
+                         select hyperlink).SingleOrDefault();
 
             if (exist != null)
             {

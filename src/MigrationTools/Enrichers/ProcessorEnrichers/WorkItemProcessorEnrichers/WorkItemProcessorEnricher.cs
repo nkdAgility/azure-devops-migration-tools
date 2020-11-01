@@ -3,12 +3,12 @@ using MigrationTools.DataContracts;
 
 namespace MigrationTools.Enrichers
 {
-    public abstract class WorkItemEnricher : IWorkItemEnricher
+    public abstract class WorkItemProcessorEnricher : IWorkItemProcessorEnricher
     {
         protected IMigrationEngine Engine { get; }
-        protected ILogger<IWorkItemEnricher> Log { get; }
+        protected ILogger<IWorkItemProcessorEnricher> Log { get; }
 
-        public WorkItemEnricher(IMigrationEngine engine, ILogger<WorkItemEnricher> logger)
+        public WorkItemProcessorEnricher(IMigrationEngine engine, ILogger<WorkItemProcessorEnricher> logger)
         {
             Engine = engine;
             Log = logger;

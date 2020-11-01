@@ -9,7 +9,7 @@ using MigrationTools.DataContracts;
 
 namespace MigrationTools.Enrichers
 {
-    public abstract class EmbededImagesRepairEnricherBase : WorkItemEnricher
+    public abstract class EmbededImagesRepairEnricherBase : WorkItemProcessorEnricher
     {
         protected readonly HttpClientHandler _httpClientHandler;
         protected bool _ignore404Errors = true;

@@ -6,7 +6,7 @@ namespace MigrationTools.Endpoints
 {
     public interface IWorkItemSourceEndPoint : IWorkItemEndPoint
     {
-        IEnumerable<IWorkItemSourceEnricher> SourceEnrichers { get; }
+        IEnumerable<IWorkItemProcessorSourceEnricher> SourceEnrichers { get; }
 
         void Filter(IEnumerable<WorkItemData2> targetWorkItems);
 
@@ -15,13 +15,13 @@ namespace MigrationTools.Endpoints
 
     public interface IWorkItemTargetEndPoint : IWorkItemEndPoint
     {
-        IEnumerable<IWorkItemTargetEnricher> TargetEnrichers { get; }
+        IEnumerable<IWorkItemProcessorTargetEnricher> TargetEnrichers { get; }
 
         void PersistWorkItem(WorkItemData2 sourceWorkItem);
     }
 
     public interface IWorkItemEndPoint : IEndpoint
     {
-        void Configure(IWorkItemQuery query, List<IWorkItemEnricher> enrichers);
+        void Configure(IWorkItemQuery query, List<IWorkItemProcessorEnricher> enrichers);
     }
 }

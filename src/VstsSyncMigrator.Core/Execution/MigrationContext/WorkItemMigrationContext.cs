@@ -41,7 +41,7 @@ namespace VstsSyncMigrator.Engine
 
         private ILogger contextLog;
         private IAttachmentMigrationEnricher attachmentEnricher;
-        private IWorkItemEnricher embededImagesEnricher;
+        private IWorkItemProcessorEnricher embededImagesEnricher;
         private TfsGitRepositoryEnricher gitRepositoryEnricher;
         private TfsNodeStructureEnricher nodeStructureEnricher;
         private IDictionary<string, double> processWorkItemMetrics = null;

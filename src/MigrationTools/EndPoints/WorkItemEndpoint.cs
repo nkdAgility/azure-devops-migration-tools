@@ -11,7 +11,7 @@ namespace MigrationTools.Endpoints
     {
         protected List<WorkItemData2> _innerList = new List<WorkItemData2>();
         protected IWorkItemQuery _WorkItemStoreQuery;
-        protected List<IWorkItemEnricher> _innerEnrichers = new List<IWorkItemEnricher>();
+        protected List<IWorkItemProcessorEnricher> _innerEnrichers = new List<IWorkItemProcessorEnricher>();
 
         public WorkItemEndpoint(IOptions<EndpointOptions> endpointOptions)
         {
@@ -22,13 +22,13 @@ namespace MigrationTools.Endpoints
 
         public IEnumerable<WorkItemData2> WorkItems { get { return _innerList; } }
 
-        public IEnumerable<IWorkItemSourceEnricher> SourceEnrichers => (from e in _innerEnrichers where e is IWorkItemSourceEnricher select (IWorkItemSourceEnricher)e);
+        public IEnumerable<IWorkItemProcessorSourceEnricher> SourceEnrichers => (from e in _innerEnrichers where e is IWorkItemProcessorSourceEnricher select (IWorkItemProcessorSourceEnricher)e);
 
-        public IEnumerable<IWorkItemTargetEnricher> TargetEnrichers => (from e in _innerEnrichers where e is IWorkItemTargetEnricher select (IWorkItemTargetEnricher)e);
+        public IEnumerable<IWorkItemProcessorTargetEnricher> TargetEnrichers => (from e in _innerEnrichers where e is IWorkItemProcessorTargetEnricher select (IWorkItemProcessorTargetEnricher)e);
 
         public IEndpointOptions EndpointOptions { get; }
 
-        public virtual void Configure(IWorkItemQuery query, List<IWorkItemEnricher> enrichers)
+        public virtual void Configure(IWorkItemQuery query, List<IWorkItemProcessorEnricher> enrichers)
         {
             _WorkItemStoreQuery = query ?? throw new ArgumentNullException(nameof(query));
             if (enrichers != null)

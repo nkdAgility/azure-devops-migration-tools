@@ -18,7 +18,7 @@ namespace MigrationTools.Endpoints
             {
                 found = CreateNewFrom(source);
             }
-            foreach (IWorkItemTargetEnricher enricher in TargetEnrichers)
+            foreach (IWorkItemProcessorTargetEnricher enricher in TargetEnrichers)
             {
                 enricher.PersistFromWorkItem(source);
             }

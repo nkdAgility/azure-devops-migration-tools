@@ -16,7 +16,7 @@ namespace MigrationTools.Enrichers
         Iteration
     }
 
-    public class TfsNodeStructureEnricher : WorkItemEnricher
+    public class TfsNodeStructureEnricher : WorkItemProcessorEnricher
     {
         private Dictionary<string, bool> _foundNodes = new Dictionary<string, bool>();
         private string[] _nodeBasePaths;
