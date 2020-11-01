@@ -1,6 +1,6 @@
 ﻿namespace MigrationTools.Enrichers
 {
-    public class AppendMigrationToolSignatureFooterOptions : ProcessorEnricherOptions
+    public class WorkItemFieldTableEnricherOptions : EndpointEnricherOptions
     {
         public override void SetDefaults()
         {

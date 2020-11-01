@@ -18,7 +18,7 @@ namespace MigrationTools.Configuration.Tests
 
         public EngineConfiguration BuildDefault2()
         {
-            throw new System.NotImplementedException();
+            return ecb.BuildDefault2();
         }
 
         public EngineConfiguration BuildFromFile(string configFile = "configuration.json")
@@ -29,6 +29,11 @@ namespace MigrationTools.Configuration.Tests
         public EngineConfiguration BuildWorkItemMigration()
         {
             return ecb.BuildWorkItemMigration();
+        }
+
+        public EngineConfiguration BuildWorkItemMigration2()
+        {
+            return ecb.BuildWorkItemMigration2();
         }
 
         public EngineConfiguration CreateEmptyConfig()

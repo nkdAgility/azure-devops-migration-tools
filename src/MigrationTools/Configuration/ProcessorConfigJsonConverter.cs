@@ -17,9 +17,10 @@ namespace MigrationTools.Configuration
                   .Where(a => !a.IsDynamic)
                   .SelectMany(a => a.GetTypes())
                   .FirstOrDefault(t => t.Name.Equals(typename) || t.FullName.Equals(typename));
-                if (type is null)
+                if (type is null || type.IsAbstract || type.IsInterface)
                 {
                     Log.Warning("Unable to load Processor: {typename}", typename);
+                    throw new InvalidOperationException();
                 }
                 return (IProcessorConfig)Activator.CreateInstance(type);
             }

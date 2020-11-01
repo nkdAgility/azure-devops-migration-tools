@@ -2,5 +2,9 @@
 {
     public class SkipToFinalRevisedWorkItemTypeOptions : ProcessorEnricherOptions
     {
+        public override void SetDefaults()
+        {
+            Enabled = true;
+        }
     }
 }

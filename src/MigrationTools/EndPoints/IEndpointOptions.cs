@@ -17,6 +17,8 @@ namespace MigrationTools.Endpoints
         [JsonConverter(typeof(StringEnumConverter))]
         public EndpointDirection Direction { get; set; }
 
-        public List<IEndpointEnricher> EndpointEnrichers { get; set; }
+        public List<IEndpointEnricher> Enrichers { get; set; }
+
+        void SetDefaults();
     }
 }

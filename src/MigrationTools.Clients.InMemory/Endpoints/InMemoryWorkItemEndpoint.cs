@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using Microsoft.Extensions.Options;
 using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
 
@@ -7,7 +6,7 @@ namespace MigrationTools.Endpoints
 {
     public class InMemoryWorkItemEndpoint : WorkItemEndpoint
     {
-        public InMemoryWorkItemEndpoint(IOptions<InMemoryWorkItemEndpointOptions> inMemoryWorkItemEndpointOptions) : base(inMemoryWorkItemEndpointOptions)
+        public InMemoryWorkItemEndpoint(InMemoryWorkItemEndpointOptions inMemoryWorkItemEndpointOptions) : base(inMemoryWorkItemEndpointOptions)
         {
         }
 

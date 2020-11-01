@@ -89,34 +89,6 @@ namespace MigrationTools.Configuration
             return ec;
         }
 
-        public EngineConfiguration BuildDefault2()
-        {
-            EngineConfiguration ec = new EngineConfiguration
-            {
-                LogLevel = LogEventLevel.Information,
-                Version = Assembly.GetExecutingAssembly().GetName().Version.ToString(2),
-                FieldMaps = new List<IFieldMapConfig>(),
-                WorkItemTypeDefinition = new Dictionary<string, string> {
-                    { "sourceWorkItemTypeName", "targetWorkItemTypeName" }
-                },
-                Processors = new List<IProcessorConfig>(),
-            };
-            ec.Processors.Add(
-                new WorkItemMigrationProcessorOptions
-                {
-                    Enabled = true,
-                    CollapseRevisions = false,
-                    PrefixProjectToNodes = false,
-                    ReplayRevisions = true,
-                    WorkItemCreateRetryLimit = 5,
-                    //Endpoints = new List<IEndpointOptions>()
-                    //{
-                    //    new InMemoryWorkItemEndpointOptions()
-                    //}
-                }); ;
-            return ec;
-        }
-
         public EngineConfiguration BuildWorkItemMigration()
         {
             EngineConfiguration ec = CreateEmptyConfig();
@@ -260,6 +232,69 @@ namespace MigrationTools.Configuration
             IMigrationClientConfig result = (IMigrationClientConfig)Activator.CreateInstance(type);
             result.PopulateWithDefault();
             return result;
+        }
+
+        public EngineConfiguration BuildDefault2()
+        {
+            EngineConfiguration ec = new EngineConfiguration
+            {
+                LogLevel = LogEventLevel.Information,
+                Version = Assembly.GetExecutingAssembly().GetName().Version.ToString(2),
+                FieldMaps = new List<IFieldMapConfig>(),
+                WorkItemTypeDefinition = new Dictionary<string, string> {
+                    { "sourceWorkItemTypeName", "targetWorkItemTypeName" }
+                },
+                Processors = new List<IProcessorConfig>(),
+            };
+            ec.Processors.Add(
+                new WorkItemMigrationProcessorOptions
+                {
+                    Enabled = true,
+                    CollapseRevisions = false,
+                    PrefixProjectToNodes = false,
+                    ReplayRevisions = true,
+                    WorkItemCreateRetryLimit = 5,
+                    Enrichers = GetAllEnricherOptions<ProcessorEnricherOptions>(),
+                    Endpoints = GetAllEndpointOptions<IEndpointOptions>()
+                });
+            return ec;
+        }
+
+        public EngineConfiguration BuildWorkItemMigration2()
+        {
+            throw new NotImplementedException();
+        }
+
+        private List<TInterfaceToFind> GetAllEnricherOptions<TInterfaceToFind>() where TInterfaceToFind : IEnricherOptions
+        {
+            List<Type> types = AppDomain.CurrentDomain.GetAssemblies()
+              .Where(a => !a.IsDynamic)
+              .SelectMany(a => a.GetTypes())
+              .Where(t => t.IsAssignableFrom(typeof(TInterfaceToFind))).ToList();
+            List<TInterfaceToFind> output = new List<TInterfaceToFind>();
+            foreach (Type type in types)
+            {
+                TInterfaceToFind option = (TInterfaceToFind)Activator.CreateInstance(type);
+                option.SetDefaults();
+                output.Add(option);
+            }
+            return output;
+        }
+
+        private List<TInterfaceToFind> GetAllEndpointOptions<TInterfaceToFind>() where TInterfaceToFind : IEndpointOptions
+        {
+            List<Type> types = AppDomain.CurrentDomain.GetAssemblies()
+              .Where(a => !a.IsDynamic)
+              .SelectMany(a => a.GetTypes())
+              .Where(t => t.IsAssignableFrom(typeof(TInterfaceToFind))).ToList();
+            List<TInterfaceToFind> output = new List<TInterfaceToFind>();
+            foreach (Type type in types)
+            {
+                TInterfaceToFind option = (TInterfaceToFind)Activator.CreateInstance(type);
+                option.SetDefaults();
+                output.Add(option);
+            }
+            return output;
         }
     }
 }

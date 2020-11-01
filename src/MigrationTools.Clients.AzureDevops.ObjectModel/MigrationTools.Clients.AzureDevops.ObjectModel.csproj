@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <Folder Include="Configuration\" />
+    <Folder Include="Enrichers\EndpointEnrichers\WorkItemEndpointEnrichers\" />
   </ItemGroup>
 
 </Project>

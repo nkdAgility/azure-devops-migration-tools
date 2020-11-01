@@ -5,14 +5,16 @@ using Newtonsoft.Json.Converters;
 
 namespace MigrationTools.Endpoints
 {
-    public class EndpointOptions : IEndpointOptions
+    public abstract class EndpointOptions : IEndpointOptions
     {
         [JsonConverter(typeof(StringEnumConverter))]
         public EndpointDirection Direction { get; set; }
 
         [JsonIgnoreAttribute]
-        public virtual string Endpoint { get { return "Should override!"; } }
+        public abstract string Endpoint { get; }
 
-        public List<IEndpointEnricher> EndpointEnrichers { get; set; }
+        public List<IEndpointEnricher> Enrichers { get; set; }
+
+        public abstract void SetDefaults();
     }
 }

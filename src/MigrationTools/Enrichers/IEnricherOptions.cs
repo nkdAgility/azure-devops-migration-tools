@@ -6,5 +6,7 @@
         /// Active the enricher if it true.
         /// </summary>
         bool Enabled { get; set; }
+
+        void SetDefaults();
     }
 }

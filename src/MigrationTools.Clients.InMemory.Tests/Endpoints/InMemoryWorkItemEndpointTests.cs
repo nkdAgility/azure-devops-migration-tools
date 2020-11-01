@@ -16,7 +16,7 @@ namespace MigrationTools.Endpoints.Tests
         [TestMethod()]
         public void EmptyTest()
         {
-            var targetOptions = Microsoft.Extensions.Options.Options.Create<InMemoryWorkItemEndpointOptions>(new InMemoryWorkItemEndpointOptions() { Direction = EndpointDirection.Source });
+            var targetOptions = new InMemoryWorkItemEndpointOptions() { Direction = EndpointDirection.Source };
             InMemoryWorkItemEndpoint e = new InMemoryWorkItemEndpoint(targetOptions);
             Assert.AreEqual(0, e.Count);
         }
@@ -77,7 +77,7 @@ namespace MigrationTools.Endpoints.Tests
 
         private static InMemoryWorkItemEndpoint CreateInMemoryWorkItemEndpoint(EndpointDirection direction)
         {
-            var options = Microsoft.Extensions.Options.Options.Create<InMemoryWorkItemEndpointOptions>(new InMemoryWorkItemEndpointOptions() { Direction = direction });
+            var options = new InMemoryWorkItemEndpointOptions() { Direction = direction };
             InMemoryWorkItemEndpoint e = new InMemoryWorkItemEndpoint(options);
             return e;
         }

@@ -1,7 +1,9 @@
 ﻿namespace MigrationTools.Enrichers
 {
-    public class ProcessorEnricherOptions : IProcessorEnricherOptions
+    public abstract class ProcessorEnricherOptions : IProcessorEnricherOptions
     {
         public bool Enabled { get; set; }
+
+        public abstract void SetDefaults();
     }
 }

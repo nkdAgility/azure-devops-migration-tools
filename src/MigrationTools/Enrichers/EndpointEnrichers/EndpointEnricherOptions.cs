@@ -1,7 +1,9 @@
 ﻿namespace MigrationTools.Enrichers
 {
-    public class EndpointEnricherOptions : IEndpointEnricherOptions
+    public abstract class EndpointEnricherOptions : IEndpointEnricherOptions
     {
         public bool Enabled { get; set; }
+
+        public abstract void SetDefaults();
     }
 }

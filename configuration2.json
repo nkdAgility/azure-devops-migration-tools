@@ -146,16 +146,16 @@
           },
           "Enrichers": [
             {
-              "ObjectType": "FileSystemWorkItemAttachmentEnricherConfig",
+              "ObjectType": "WorkItemAttachmentEnricherOptions",
               "Enabled": true,
               "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
               "AttachmentMaxSize": 480000000
-            },
-            {
-              "ObjectType": "FileSystemWorkItemLinkEnricherOptions",
-              "Enabled": true,
-              "LinkMigrationSaveEachAsAdded": true
-            }
+              }
+              //{
+              //  "ObjectType": "WorkItemLinkEnricherOptions",
+              //  "Enabled": true,
+              //  "LinkMigrationSaveEachAsAdded": true
+              //}
           ]
         },
         {
@@ -164,37 +164,38 @@
           "Query": {
             "WhereBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
             "OrderBit": "[System.ChangedDate] desc"
-          },
-          "Enrichers": [
-            {
-              "ObjectType": "TfsWorkItemAttachmentEnricherOptions",
-              "Enabled": true,
-              "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
-              "AttachmentMaxSize": 480000000
-            },
-            {
-              "ObjectType": "TfsWorkItemEmbedEnricherOptions",
-              "Enabled": true,
-              "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\"
-            },
-            {
-              "ObjectType": "TfsWorkItemLinkEnricherOptions",
-              "Enabled": true,
-              "LinkMigrationSaveEachAsAdded": true
-            },
-            {
-              "ObjectType": "TfsWorkItemCreatedEnricherOptions",
-              "Enabled": true,
-              "UpdateCreatedDate": true,
-              "UpdateCreatedBy": true
-            },
-            {
-              "ObjectType": "TfsWorkItemFieldTableEnricherOptions",
-              "Enabled": true
-            }
-          ]
+          }
+          //"Enrichers": [
+          //  {
+          //    "ObjectType": "WorkItemAttachmentEnricherOptions",
+          //    "Enabled": true,
+          //    "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
+          //    "AttachmentMaxSize": 480000000
+          //  },
+          //  {
+          //    "ObjectType": "WorkItemEmbedEnricherOptions",
+          //    "Enabled": true,
+          //    "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\"
+          //  },
+          //  {
+          //    "ObjectType": "WorkItemLinkEnricherOptions",
+          //    "Enabled": true,
+          //    "LinkMigrationSaveEachAsAdded": true
+          //  },
+          //  {
+          //    "ObjectType": "WorkItemCreatedEnricherOptions",
+          //    "Enabled": true,
+          //    "UpdateCreatedDate": true,
+          //    "UpdateCreatedBy": true
+          //  },
+          //  {
+          //    "ObjectType": "WorkItemFieldTableEnricherOptions",
+          //    "Enabled": true
+          //  }
+          //]
         }
       ]
     }
   ]
+}]
 }

@@ -75,6 +75,14 @@ namespace MigrationTools
                                     config = _configurationBuilder.BuildWorkItemMigration();
                                     break;
 
+                                case OptionsMode.Fullv2:
+                                    config = _configurationBuilder.BuildDefault2();
+                                    break;
+
+                                case OptionsMode.WorkItemTrackingv2:
+                                    config = _configurationBuilder.BuildWorkItemMigration2();
+                                    break;
+
                                 default:
                                     config = _configurationBuilder.BuildDefault();
                                     break;

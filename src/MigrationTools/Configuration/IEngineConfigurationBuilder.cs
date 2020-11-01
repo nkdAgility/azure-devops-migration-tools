@@ -10,6 +10,8 @@
 
         EngineConfiguration BuildWorkItemMigration();
 
+        EngineConfiguration BuildWorkItemMigration2();
+
         EngineConfiguration CreateEmptyConfig();
     }
 }

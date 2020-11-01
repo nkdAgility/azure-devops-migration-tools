@@ -1,11 +1,10 @@
-﻿using Microsoft.Extensions.Options;
-using MigrationTools.DataContracts;
+﻿using MigrationTools.DataContracts;
 
 namespace MigrationTools.Endpoints
 {
     public class TfsWorkItemEndPoint : WorkItemEndpoint
     {
-        public TfsWorkItemEndPoint(IOptions<TfsWorkItemEndPointOptions> endpointOptions) : base(endpointOptions)
+        public TfsWorkItemEndPoint(TfsWorkItemEndPointOptions endpointOptions) : base(endpointOptions)
         {
         }
 

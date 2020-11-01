@@ -97,7 +97,7 @@ namespace MigrationTools.Endpoints.Tests
 
         private static FileSystemWorkItemEndpoint CreateInMemoryWorkItemEndpoint(EndpointDirection direction)
         {
-            var options = Microsoft.Extensions.Options.Options.Create<FileSystemWorkItemEndpointOptions>(new FileSystemWorkItemEndpointOptions() { Direction = direction });
+            var options = new FileSystemWorkItemEndpointOptions() { Direction = direction };
             FileSystemWorkItemEndpoint e = new FileSystemWorkItemEndpoint(options);
             return e;
         }
