@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Options;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools.DataContracts;
 
 namespace MigrationTools.Endpoints.Tests
@@ -98,7 +97,7 @@ namespace MigrationTools.Endpoints.Tests
 
         private static FileSystemWorkItemEndpoint CreateInMemoryWorkItemEndpoint(EndpointDirection direction)
         {
-            var options = Options.Create<FileSystemWorkItemEndpointOptions>(new FileSystemWorkItemEndpointOptions() { Direction = direction });
+            var options = Microsoft.Extensions.Options.Options.Create<FileSystemWorkItemEndpointOptions>(new FileSystemWorkItemEndpointOptions() { Direction = direction });
             FileSystemWorkItemEndpoint e = new FileSystemWorkItemEndpoint(options);
             return e;
         }

@@ -2,9 +2,9 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace MigrationTools.Configuration
+namespace MigrationTools.Options
 {
-    public abstract class JsonCreationConverter<T> : JsonConverter
+    public abstract class JsonOptionConvertor<T> : JsonConverter
     {
         /// <summary>
         /// Create an instance of objectType, based properties in the JSON object

@@ -2,5 +2,6 @@
 {
     public class FileSystemWorkItemEndpointOptions : EndpointOptions
     {
+        public override string Endpoint => nameof(FileSystemWorkItemEndpoint);
     }
 }

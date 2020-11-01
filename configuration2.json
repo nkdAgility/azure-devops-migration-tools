@@ -108,20 +108,7 @@
   ],
   "Processors": [
     {
-      "ObjectType": "WorkItemDeleteOptions",
-      "Enabled": true,
-      "Endpoints": [
-        {
-          "ObjectType": "TfsWorkItemEndpointOptions",
-          "Direction": "Target",
-          "WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
-          "WIQLOrderBit": "[System.ChangedDate] desc",
-          "Enrichers": []
-        }
-      ]
-    },
-    {
-      "ObjectType": "WorkItemMigrationProcessor",
+      "ObjectType": "WorkItemMigrationProcessorOptions",
       "Enabled": true,
       "ReplayRevisions": true,
       "PrefixProjectToNodes": false,
@@ -146,7 +133,6 @@
           "ObjectType": "SkipToFinalRevisedWorkItemTypeOptions",
           "Enabled": false
         }
-
       ],
       "Endpoints": [
         {

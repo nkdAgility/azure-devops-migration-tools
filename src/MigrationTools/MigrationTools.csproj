@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <Folder Include="MappingTools\" />
+    <Folder Include="Options\" />
   </ItemGroup>
 
 </Project>

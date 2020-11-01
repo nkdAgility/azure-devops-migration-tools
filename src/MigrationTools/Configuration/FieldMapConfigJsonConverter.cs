@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Linq;
+using MigrationTools.Options;
 using Newtonsoft.Json.Linq;
 
 namespace MigrationTools.Configuration
 {
-    public class FieldMapConfigJsonConverter : JsonCreationConverter<IFieldMapConfig>
+    public class FieldMapConfigJsonConverter : JsonOptionConvertor<IFieldMapConfig>
     {
         protected override IFieldMapConfig Create(Type objectType, JObject jObject)
         {

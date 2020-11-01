@@ -6,6 +6,8 @@ using System.Reflection;
 using Microsoft.Extensions.Logging;
 using MigrationTools.Configuration.FieldMap;
 using MigrationTools.Configuration.Processing;
+using MigrationTools.Endpoints;
+using MigrationTools.Enrichers;
 using Newtonsoft.Json;
 using Serilog.Events;
 
@@ -29,6 +31,8 @@ namespace MigrationTools.Configuration
                 ec = JsonConvert.DeserializeObject<EngineConfiguration>(configurationjson,
                         new FieldMapConfigJsonConverter(),
                         new ProcessorConfigJsonConverter(),
+                        new JsonConverterForEndpointOptions(),
+                        new JsonConverterForEnricherOptions(),
                         new MigrationClientConfigJsonConverter());
             }
             catch (JsonSerializationException ex)

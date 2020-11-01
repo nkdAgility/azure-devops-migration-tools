@@ -9,8 +9,8 @@
       "commandLineArgs": "init"
     },
     "execute2": {
-      "commandName": "Executable",
-      "commandLineArgs": "execute -c configuration-new.json"
+      "commandName": "Project",
+      "commandLineArgs": "execute -c configuration2.json"
     }
   }
 }

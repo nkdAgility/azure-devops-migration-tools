@@ -7,6 +7,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MigrationTools.CommandLine;
 using MigrationTools.Configuration;
+using MigrationTools.Endpoints;
+using MigrationTools.Enrichers;
 using Newtonsoft.Json;
 
 namespace MigrationTools
@@ -81,6 +83,8 @@ namespace MigrationTools
                             string json = JsonConvert.SerializeObject(config, Formatting.Indented,
                                 new FieldMapConfigJsonConverter(),
                                 new ProcessorConfigJsonConverter(),
+                                new JsonConverterForEndpointOptions(),
+                                new JsonConverterForEnricherOptions(),
                                 new MigrationClientConfigJsonConverter());
                             StreamWriter sw = new StreamWriter(configFile);
                             sw.WriteLine(json);

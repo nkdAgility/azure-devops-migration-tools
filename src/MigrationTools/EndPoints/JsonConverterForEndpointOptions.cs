@@ -2,12 +2,13 @@
 using System.Linq;
 using MigrationTools.Options;
 using Newtonsoft.Json.Linq;
+using Serilog;
 
-namespace MigrationTools.Configuration
+namespace MigrationTools.Endpoints
 {
-    public class MigrationClientConfigJsonConverter : JsonOptionConvertor<IMigrationClientConfig>
+    public class JsonConverterForEndpointOptions : JsonOptionConvertor<IEndpointOptions>
     {
-        protected override IMigrationClientConfig Create(Type objectType, JObject jObject)
+        protected override IEndpointOptions Create(Type objectType, JObject jObject)
         {
             if (FieldExists("ObjectType", jObject))
             {
@@ -16,13 +17,11 @@ namespace MigrationTools.Configuration
                   .Where(a => !a.IsDynamic)
                   .SelectMany(a => a.GetTypes())
                   .FirstOrDefault(t => t.Name.Equals(typename) || t.FullName.Equals(typename));
-
-                if (type == null)
+                if (type is null)
                 {
-                    throw new Exception($"Unknown ObjectType: \"{typename}\" found in {jObject.ToString()}");
+                    Log.Warning("Unable to load Processor: {typename}", typename);
                 }
-
-                return (IMigrationClientConfig)Activator.CreateInstance(type);
+                return (IEndpointOptions)Activator.CreateInstance(type);
             }
             else
             {

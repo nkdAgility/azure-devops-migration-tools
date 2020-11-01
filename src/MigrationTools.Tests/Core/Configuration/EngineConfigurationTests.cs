@@ -2,6 +2,8 @@
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools.Configuration;
+using MigrationTools.Endpoints;
+using MigrationTools.Enrichers;
 using Newtonsoft.Json;
 
 namespace MigrationTools.Tests
@@ -16,8 +18,10 @@ namespace MigrationTools.Tests
         {
             string json = JsonConvert.SerializeObject(ecb.BuildDefault(),
                     new FieldMapConfigJsonConverter(),
-                    new ProcessorConfigJsonConverter(),
-                    new MigrationClientConfigJsonConverter());
+                        new ProcessorConfigJsonConverter(),
+                        new JsonConverterForEndpointOptions(),
+                        new JsonConverterForEnricherOptions(),
+                        new MigrationClientConfigJsonConverter());
             StreamWriter sw = new StreamWriter("configuration.json");
             sw.WriteLine(json);
             sw.Close();
@@ -33,8 +37,10 @@ namespace MigrationTools.Tests
             sr.Close();
             ec = JsonConvert.DeserializeObject<EngineConfiguration>(configurationjson,
                 new FieldMapConfigJsonConverter(),
-                new ProcessorConfigJsonConverter(),
-                    new MigrationClientConfigJsonConverter());
+                        new ProcessorConfigJsonConverter(),
+                        new JsonConverterForEndpointOptions(),
+                        new JsonConverterForEnricherOptions(),
+                        new MigrationClientConfigJsonConverter());
             Assert.AreEqual(10, ec.FieldMaps.Count);
             Assert.AreEqual(12, ec.Processors.Count);
         }

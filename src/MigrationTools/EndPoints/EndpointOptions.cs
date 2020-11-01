@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
 using MigrationTools.Enrichers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -10,6 +10,9 @@ namespace MigrationTools.Endpoints
         [JsonConverter(typeof(StringEnumConverter))]
         public EndpointDirection Direction { get; set; }
 
-        public Collection<IEndpointEnricher> EndpointEnrichers { get; set; }
+        [JsonIgnoreAttribute]
+        public virtual string Endpoint { get { return "Should override!"; } }
+
+        public List<IEndpointEnricher> EndpointEnrichers { get; set; }
     }
 }

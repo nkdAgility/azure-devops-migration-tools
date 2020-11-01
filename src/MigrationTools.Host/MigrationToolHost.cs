@@ -11,6 +11,7 @@ using MigrationTools.CommandLine;
 using MigrationTools.Configuration;
 using MigrationTools.Engine.Containers;
 using MigrationTools.Host.CustomDiagnostics;
+using MigrationTools.Processors;
 using MigrationTools.Services;
 using Serilog;
 using Serilog.Core;
@@ -74,6 +75,9 @@ namespace MigrationTools.Host
                  // Config
                  services.AddSingleton<IEngineConfigurationBuilder, EngineConfigurationBuilder>();
                  services.AddSingleton<EngineConfiguration, EngineConfigurationWrapper>();
+
+                 // New Native Processors
+                 services.AddSingleton<WorkItemMigrationProcessor>();
 
                  //Engine
                  services.AddSingleton<FieldMapContainer>();

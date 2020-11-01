@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Linq;
+using MigrationTools.Options;
 using Newtonsoft.Json.Linq;
+using Serilog;
 
 namespace MigrationTools.Configuration
 {
-    public class ProcessorConfigJsonConverter : JsonCreationConverter<IProcessorConfig>
+    public class ProcessorConfigJsonConverter : JsonOptionConvertor<IProcessorConfig>
     {
         protected override IProcessorConfig Create(Type objectType, JObject jObject)
         {
@@ -15,6 +17,10 @@ namespace MigrationTools.Configuration
                   .Where(a => !a.IsDynamic)
                   .SelectMany(a => a.GetTypes())
                   .FirstOrDefault(t => t.Name.Equals(typename) || t.FullName.Equals(typename));
+                if (type is null)
+                {
+                    Log.Warning("Unable to load Processor: {typename}", typename);
+                }
                 return (IProcessorConfig)Activator.CreateInstance(type);
             }
             else

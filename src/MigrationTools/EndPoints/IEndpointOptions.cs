@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
 using MigrationTools.Enrichers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -17,6 +17,6 @@ namespace MigrationTools.Endpoints
         [JsonConverter(typeof(StringEnumConverter))]
         public EndpointDirection Direction { get; set; }
 
-        public Collection<IEndpointEnricher> EndpointEnrichers { get; set; }
+        public List<IEndpointEnricher> EndpointEnrichers { get; set; }
     }
 }
