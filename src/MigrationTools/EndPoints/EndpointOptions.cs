@@ -13,7 +13,7 @@ namespace MigrationTools.Endpoints
         [JsonIgnoreAttribute]
         public abstract string Endpoint { get; }
 
-        public List<IEndpointEnricher> Enrichers { get; set; }
+        public List<IEndpointEnricherOptions> Enrichers { get; set; }
 
         public abstract void SetDefaults();
     }

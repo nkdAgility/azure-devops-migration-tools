@@ -1,6 +1,6 @@
 ﻿namespace MigrationTools.Enrichers
 {
-    internal interface IEndpointEnricherOptions : IEnricherOptions
+    public interface IEndpointEnricherOptions : IEnricherOptions
     {
     }
 }
