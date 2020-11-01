@@ -27,7 +27,7 @@ The more information you can provide, the more likely someone will be successful
 Please include the following with each issue. 
 
 * Version of VSTS Sync Migrator
-* Version of the source adn target VSTS/TFS instances 
+* Version of the source and target VSTS/TFS instances 
 
 * Reproducible steps (1... 2... 3...) and what you expected versus what you actually got.
 * The Session ID from your migration run that had a problem (this lets us look up telemitery).
@@ -42,7 +42,7 @@ Don't feel bad if we can't reproduce the issue and ask for more information!
 
 ## Contributing Fixes
 
-VSTS Sync Migrator acceots both bug fixes and feature enhancements as Pull Requests. When contibuting please try to minimise the number of files that you touch, and do not arbitrearly change large about of the files without justification. This will help keep the fix or feature as simple and easy as posible to review and incorporate. If you are a long term conributor you may request access to the VSTS repository that houses the core code and provide direct contributions there.
+VSTS Sync Migrator accepts both bug fixes and feature enhancements as Pull Requests. When contibuting please try to minimise the number of files that you touch, and do not arbitrarily change large amounts of the files without justification. This will help keep the fix or feature as simple and easy as posible to review and incorporate. If you are a long term contributor you may request access to the VSTS repository that houses the core code and provide direct contributions there.
 
 # Instructions for Contributing Code
 

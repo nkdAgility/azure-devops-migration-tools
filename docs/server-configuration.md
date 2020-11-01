@@ -1,6 +1,6 @@
 # Server Configuration and Requirements
 
-There are some requirements that you will need to meet in order to use the tool against your TFS or VSTS server. The VSTS Bulk Data Editor uses a flag to Bypass the Work Item rules engine and write data into TFS\VSTS that may not comply with the rules. For example you can write data directly into the `Closed` state without starting at `New`. This is very useful for migrations but requires some pre-requisits.
+There are some requirements that you will need to meet in order to use the tool against your TFS or VSTS server. The VSTS Bulk Data Editor uses a flag to Bypass the Work Item rules engine and write data into TFS\VSTS that may not comply with the rules. For example you can write data directly into the `Closed` state without starting at `New`. This is very useful for migrations but requires some pre-requisites.
 
 ## Bypass Rules
 
