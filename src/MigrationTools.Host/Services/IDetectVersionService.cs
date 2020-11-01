@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MigrationTools.Services
+namespace MigrationTools.Host.Services
 {
     public interface IDetectVersionService
     {

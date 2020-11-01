@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Reflection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using MigrationTools.Services;
+using MigrationTools.Host.Services;
 
 namespace MigrationTools.Host
 {

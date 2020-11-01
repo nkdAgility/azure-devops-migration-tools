@@ -38,8 +38,8 @@ namespace _VstsSyncMigrator.Engine.Tests
             services.AddTransient<RegexFieldMap>();
             services.AddTransient<TreeToTagFieldMap>();
             //Services
-            services.AddSingleton<IDetectOnlineService, DetectOnlineService>();
-            services.AddSingleton<IDetectVersionService, DetectVersionService>();
+            //services.AddSingleton<IDetectOnlineService, DetectOnlineService>();
+            //services.AddSingleton<IDetectVersionService, DetectVersionService>();
             //Containers
             services.AddSingleton<FieldMapContainer>();
             services.AddSingleton<ProcessorContainer>();
@@ -67,12 +67,6 @@ namespace _VstsSyncMigrator.Engine.Tests
         }
 
         [TestMethod]
-        public void TestEngineCreation()
-        {
-            IMigrationEngine me = _services.GetRequiredService<IMigrationEngine>();
-        }
-
-        [TestMethod]
         public void TestEngineExecuteEmptyProcessors()
         {
             EngineConfiguration ec = _services.GetRequiredService<EngineConfiguration>();
@@ -81,23 +75,5 @@ namespace _VstsSyncMigrator.Engine.Tests
             me.Run();
         }
 
-        [TestMethod]
-        public void TestEngineExecuteEmptyFieldMaps()
-        {
-            EngineConfiguration ec = _services.GetRequiredService<EngineConfiguration>();
-            ec.Processors.Clear();
-            ec.FieldMaps.Clear();
-            IMigrationEngine me = _services.GetRequiredService<IMigrationEngine>();
-            me.Run();
-        }
-
-        [TestMethod]
-        public void TestEngineExecuteProcessors()
-        {
-            EngineConfiguration ec = _services.GetRequiredService<EngineConfiguration>();
-            ec.FieldMaps.Clear();
-            IMigrationEngine me = _services.GetRequiredService<IMigrationEngine>();
-            me.Run();
-        }
     }
 }

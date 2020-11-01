@@ -1,4 +1,4 @@
-﻿namespace MigrationTools.Services
+﻿namespace MigrationTools.Host.Services
 {
     public interface IDetectOnlineService
     {
