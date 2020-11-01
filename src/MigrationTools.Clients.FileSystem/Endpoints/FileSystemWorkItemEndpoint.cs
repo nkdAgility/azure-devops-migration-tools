@@ -11,7 +11,7 @@ namespace MigrationTools.Endpoints
         {
         }
 
-        public override void PersistWorkItem(WorkItemData source)
+        public override void PersistWorkItem(WorkItemData2 source)
         {
             var content = JsonConvert.SerializeObject(source, Formatting.Indented);
             var fileName = Path.Combine(_WorkItemStoreQuery.Query, string.Format("{0}.json", source.Id));

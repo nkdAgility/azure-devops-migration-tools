@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using MigrationTools.Clients;
 using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
 
@@ -9,16 +8,16 @@ namespace MigrationTools.Endpoints
     {
         IEnumerable<IWorkItemSourceEnricher> SourceEnrichers { get; }
 
-        void Filter(IEnumerable<WorkItemData> targetWorkItems);
+        void Filter(IEnumerable<WorkItemData2> targetWorkItems);
 
-        IEnumerable<WorkItemData> GetWorkItems();
+        IEnumerable<WorkItemData2> GetWorkItems();
     }
 
     public interface IWorkItemTargetEndPoint : IWorkItemEndPoint
     {
         IEnumerable<IWorkItemTargetEnricher> TargetEnrichers { get; }
 
-        void PersistWorkItem(WorkItemData sourceWorkItem);
+        void PersistWorkItem(WorkItemData2 sourceWorkItem);
     }
 
     public interface IWorkItemEndPoint : IEndpoint

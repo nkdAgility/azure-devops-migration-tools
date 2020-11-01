@@ -28,6 +28,11 @@ namespace MigrationTools.Clients
             return GetWorkItemsFromQuery(wiClient).ToWorkItemDataList();
         }
 
+        public override List<WorkItemData2> GetWorkItems2()
+        {
+            throw new NotImplementedException();
+        }
+
         private IList<WorkItem> GetWorkItemsFromQuery(TfsWorkItemMigrationClient wiClient)
         {
             var startTime = DateTime.UtcNow;

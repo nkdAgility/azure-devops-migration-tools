@@ -25,27 +25,29 @@ namespace MigrationTools.Endpoints
 
         public List<WorkItemData> GetWorkItems()
         {
-            var list = new List<WorkItemData>();
+            throw new InvalidOperationException();
+        }
+
+        public List<WorkItemData2> GetWorkItems2()
+        {
+            var list = new List<WorkItemData2>();
             for (int i = 0; i < _query; i++)
             {
-                list.Add(new WorkItemData()
+                list.Add(new WorkItemData2()
                 {
                     Id = i.ToString(),
-                    Title = string.Format("Title {0}", i),
-                    Rev = 1,
-                    Revision = 1,
                     Revisions = GetRevisions()
                 });
             }
 
-            List<RevisionItem> GetRevisions()
+            List<RevisionItem2> GetRevisions()
             {
                 Random rand = new Random();
                 int revCount = rand.Next(0, 5);
-                List<RevisionItem> list = new List<RevisionItem>();
+                List<RevisionItem2> list = new List<RevisionItem2>();
                 for (int i = 0; i < revCount; i++)
                 {
-                    list.Add(new RevisionItem { Index = i, Number = i, ChangedDate = DateTime.Now.AddHours(-i) });
+                    list.Add(new RevisionItem2 { Index = i, Number = i, ChangedDate = DateTime.Now.AddHours(-i) });
                 }
                 return list;
             }

@@ -11,7 +11,7 @@ namespace MigrationTools.Endpoints
         {
         }
 
-        public override void PersistWorkItem(WorkItemData source)
+        public override void PersistWorkItem(WorkItemData2 source)
         {
             var found = (from x in _innerList where x.Id == source.Id select x).SingleOrDefault();
             if (found is null)
@@ -25,13 +25,13 @@ namespace MigrationTools.Endpoints
             UpdateWorkItemFrom(found, source);
         }
 
-        private void UpdateWorkItemFrom(WorkItemData source, WorkItemData target)
+        private void UpdateWorkItemFrom(WorkItemData2 source, WorkItemData2 target)
         {
             _innerList.Remove(source);
             _innerList.Add(target);
         }
 
-        public WorkItemData CreateNewFrom(WorkItemData source)
+        public WorkItemData2 CreateNewFrom(WorkItemData2 source)
         {
             _innerList.Add(source);
             return source;

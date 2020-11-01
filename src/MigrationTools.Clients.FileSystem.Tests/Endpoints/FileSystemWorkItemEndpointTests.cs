@@ -51,7 +51,7 @@ namespace MigrationTools.Endpoints.Tests
             SetupStore(@".\Store\target\", 10);
             FileSystemWorkItemEndpoint e1 = CreateAndConfigureInMemoryWorkItemEndpoint(EndpointDirection.Source, @".\Store\Source\");
             FileSystemWorkItemEndpoint e2 = CreateAndConfigureInMemoryWorkItemEndpoint(EndpointDirection.Source, @".\Store\target\");
-            foreach (WorkItemData item in e1.WorkItems)
+            foreach (WorkItemData2 item in e1.WorkItems)
             {
                 e2.PersistWorkItem(item);
             }
@@ -67,7 +67,7 @@ namespace MigrationTools.Endpoints.Tests
             FileSystemWorkItemEndpoint e2 = CreateAndConfigureInMemoryWorkItemEndpoint(EndpointDirection.Source, @".\Store\target\");
             e1.Filter(e2.WorkItems);
             Assert.AreEqual(10, e1.Count);
-            foreach (WorkItemData item in e1.WorkItems)
+            foreach (WorkItemData2 item in e1.WorkItems)
             {
                 e2.PersistWorkItem(item);
             }
@@ -83,7 +83,7 @@ namespace MigrationTools.Endpoints.Tests
             FileSystemWorkItemEndpoint e = CreateAndConfigureInMemoryWorkItemEndpoint(EndpointDirection.Source, path);
             for (int i = 0; i < count; i++)
             {
-                e.PersistWorkItem(new WorkItemData() { Id = i.ToString(), Title = string.Format("Title {0}", i) });
+                e.PersistWorkItem(new WorkItemData2() { Id = i.ToString() });
             }
         }
 

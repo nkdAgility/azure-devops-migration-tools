@@ -9,7 +9,7 @@ namespace MigrationTools.Endpoints
 {
     public abstract class WorkItemEndpoint : IWorkItemSourceEndPoint, IWorkItemTargetEndPoint
     {
-        protected List<WorkItemData> _innerList = new List<WorkItemData>();
+        protected List<WorkItemData2> _innerList = new List<WorkItemData2>();
         protected IWorkItemQuery _WorkItemStoreQuery;
         protected List<IWorkItemEnricher> _innerEnrichers = new List<IWorkItemEnricher>();
 
@@ -20,7 +20,7 @@ namespace MigrationTools.Endpoints
 
         public int Count { get { return _innerList.Count; } }
 
-        public IEnumerable<WorkItemData> WorkItems { get { return _innerList; } }
+        public IEnumerable<WorkItemData2> WorkItems { get { return _innerList; } }
 
         public IEnumerable<IWorkItemSourceEnricher> SourceEnrichers => (from e in _innerEnrichers where e is IWorkItemSourceEnricher select (IWorkItemSourceEnricher)e);
 
@@ -39,7 +39,7 @@ namespace MigrationTools.Endpoints
             RefreshStore();
         }
 
-        public virtual void Filter(IEnumerable<WorkItemData> workItems)
+        public virtual void Filter(IEnumerable<WorkItemData2> workItems)
         {
             var ids = (from x in workItems.ToList() select x.Id);
             _innerList = (from x in _innerList
@@ -47,17 +47,17 @@ namespace MigrationTools.Endpoints
                           select x).ToList();
         }
 
-        public virtual IEnumerable<WorkItemData> GetWorkItems()
+        public virtual IEnumerable<WorkItemData2> GetWorkItems()
         {
             return _innerList;
         }
 
-        public abstract void PersistWorkItem(WorkItemData source);
+        public abstract void PersistWorkItem(WorkItemData2 source);
 
         protected virtual void RefreshStore()
         {
             _innerList.Clear();
-            _innerList.AddRange(_WorkItemStoreQuery.GetWorkItems());
+            _innerList.AddRange(_WorkItemStoreQuery.GetWorkItems2());
         }
     }
 }

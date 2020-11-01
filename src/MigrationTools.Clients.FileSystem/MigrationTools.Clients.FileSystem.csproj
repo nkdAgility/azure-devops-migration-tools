@@ -10,4 +10,8 @@
     <ProjectReference Include="..\MigrationTools\MigrationTools.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Enrichers\" />
+  </ItemGroup>
+
 </Project>

@@ -121,7 +121,7 @@
       ]
     },
     {
-      "ObjectType": "WorkItemMigrationProcessorOptions",
+      "ObjectType": "WorkItemMigrationProcessor",
       "Enabled": true,
       "ReplayRevisions": true,
       "PrefixProjectToNodes": false,
@@ -169,7 +169,7 @@
           ]
         },
         {
-          "ObjectType": "TfsWorkItemEndpointOptions",
+          "ObjectType": "TfsWorkItemEndpoint",
           "Direction": "Target",
           "WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
           "WIQLOrderBit": "[System.ChangedDate] desc",

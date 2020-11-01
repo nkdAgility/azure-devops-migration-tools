@@ -46,7 +46,7 @@ namespace MigrationTools.Endpoints.Tests
         {
             InMemoryWorkItemEndpoint e1 = CreateAndConfigureInMemoryWorkItemEndpoint(EndpointDirection.Source, "20");
             InMemoryWorkItemEndpoint e2 = CreateAndConfigureInMemoryWorkItemEndpoint(EndpointDirection.Target, "10");
-            foreach (WorkItemData item in e1.GetWorkItems())
+            foreach (WorkItemData2 item in e1.GetWorkItems())
             {
                 e2.PersistWorkItem(item);
             }
@@ -60,7 +60,7 @@ namespace MigrationTools.Endpoints.Tests
             InMemoryWorkItemEndpoint e2 = CreateAndConfigureInMemoryWorkItemEndpoint(EndpointDirection.Target, "10");
             e1.Filter(e2.GetWorkItems());
             Assert.AreEqual(10, e1.Count);
-            foreach (WorkItemData item in e1.GetWorkItems())
+            foreach (WorkItemData2 item in e1.GetWorkItems())
             {
                 e2.PersistWorkItem(item);
             }

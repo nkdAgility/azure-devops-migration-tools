@@ -7,8 +7,9 @@ namespace MigrationTools.Endpoints
 {
     public enum EndpointDirection
     {
-        Source,
-        Target
+        NotSet = 0,
+        Source = 1,
+        Target = 2
     }
 
     public interface IEndpointOptions
