@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using MigrationTools.Configuration;
 
-namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
+namespace MigrationTools.Clients
 {
-    public class TestPlanMigrationClient : ITestPlanMigrationClient
+    public class TfsTestPlanMigrationClient : ITestPlanMigrationClient
     {
         public IMigrationClientConfig Config => throw new NotImplementedException();
 

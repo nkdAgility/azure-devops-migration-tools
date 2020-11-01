@@ -7,16 +7,15 @@ using Microsoft.TeamFoundation;
 using Microsoft.TeamFoundation.Git.Client;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using MigrationTools.Clients.AzureDevops.ObjectModel.Clients;
+using MigrationTools.Clients;
 using MigrationTools.DataContracts;
-using MigrationTools.Enrichers;
 
-namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
+namespace MigrationTools.Enrichers
 {
-    public class GitRepositoryEnricher : WorkItemEnricher
+    public class TfsGitRepositoryEnricher : WorkItemEnricher
     {
         private IMigrationEngine _Engine;
-        private readonly ILogger<GitRepositoryEnricher> _Logger;
+        private readonly ILogger<TfsGitRepositoryEnricher> _Logger;
         private bool _save = true;
         private bool _filter = true;
         private GitRepositoryService sourceRepoService;
@@ -27,7 +26,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
         private IList<GitRepository> allTargetRepos;
         private List<string> gitWits;
 
-        public GitRepositoryEnricher(IMigrationEngine engine, ILogger<GitRepositoryEnricher> logger) : base(engine, logger)
+        public TfsGitRepositoryEnricher(IMigrationEngine engine, ILogger<TfsGitRepositoryEnricher> logger) : base(engine, logger)
         {
             _Engine = engine ?? throw new ArgumentNullException(nameof(engine));
             _Logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -76,7 +75,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                 {
                     ExternalLink el = (ExternalLink)l;
 
-                    GitRepositoryInfo sourceRepoInfo = GitRepositoryInfo.Create(el, sourceRepos, Engine, sourceWorkItem?.ProjectName);
+                    TfsGitRepositoryInfo sourceRepoInfo = TfsGitRepositoryInfo.Create(el, sourceRepos, Engine, sourceWorkItem?.ProjectName);
 
                     // if sourceRepo is null ignore this link and keep processing further links
                     if (sourceRepoInfo == null)
@@ -87,7 +86,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                     // if repo was not found in source project, try to find it by repoId in the whole project collection
                     if (sourceRepoInfo.GitRepo == null)
                     {
-                        var anyProjectSourceRepoInfo = GitRepositoryInfo.Create(el, allSourceRepos, Engine, sourceWorkItem?.ProjectName);
+                        var anyProjectSourceRepoInfo = TfsGitRepositoryInfo.Create(el, allSourceRepos, Engine, sourceWorkItem?.ProjectName);
                         // if repo is found in a different project and the repo Name is listed in repo mappings, use it
                         if (anyProjectSourceRepoInfo.GitRepo != null && Engine.GitRepoMaps.Items.ContainsKey(anyProjectSourceRepoInfo.GitRepo.Name))
                         {
@@ -105,13 +104,13 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                         string sourceProjectName = sourceRepoInfo?.GitRepo?.ProjectReference?.Name ?? Engine.Target.Config.AsTeamProjectConfig().Project;
                         string targetProjectName = Engine.Target.Config.AsTeamProjectConfig().Project;
 
-                        GitRepositoryInfo targetRepoInfo = GitRepositoryInfo.Create(targetRepoName, sourceRepoInfo, targetRepos);
+                        TfsGitRepositoryInfo targetRepoInfo = TfsGitRepositoryInfo.Create(targetRepoName, sourceRepoInfo, targetRepos);
                         // if repo was not found in the target project, try to find it in the whole target project collection
                         if (targetRepoInfo.GitRepo == null)
                         {
                             if (Engine.GitRepoMaps.Items.Values.Contains(targetRepoName))
                             {
-                                var anyTargetRepoInCollectionInfo = GitRepositoryInfo.Create(targetRepoName, sourceRepoInfo, allTargetRepos);
+                                var anyTargetRepoInCollectionInfo = TfsGitRepositoryInfo.Create(targetRepoName, sourceRepoInfo, allTargetRepos);
                                 if (anyTargetRepoInCollectionInfo.GitRepo != null)
                                 {
                                     targetRepoInfo = anyTargetRepoInCollectionInfo;
@@ -129,13 +128,13 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                             switch (l.ArtifactLinkType.Name)
                             {
                                 case "Branch":
-                                    newLink = new ExternalLink(((WorkItemMigrationClient)Engine.Target.WorkItems).Store.RegisteredLinkTypes[ArtifactLinkIds.Branch],
+                                    newLink = new ExternalLink(((TfsWorkItemMigrationClient)Engine.Target.WorkItems).Store.RegisteredLinkTypes[ArtifactLinkIds.Branch],
                                         $"vstfs:///git/ref/{targetRepoInfo.GitRepo.ProjectReference.Id}%2f{targetRepoInfo.GitRepo.Id}%2f{sourceRepoInfo.CommitID}");
                                     break;
 
                                 case "Fixed in Changeset":  // TFVC
                                 case "Fixed in Commit":
-                                    newLink = new ExternalLink(((WorkItemMigrationClient)Engine.Target.WorkItems).Store.RegisteredLinkTypes[ArtifactLinkIds.Commit],
+                                    newLink = new ExternalLink(((TfsWorkItemMigrationClient)Engine.Target.WorkItems).Store.RegisteredLinkTypes[ArtifactLinkIds.Commit],
                                         $"vstfs:///git/commit/{targetRepoInfo.GitRepo.ProjectReference.Id}%2f{targetRepoInfo.GitRepo.Id}%2f{sourceRepoInfo.CommitID}");
                                     break;
 
@@ -212,7 +211,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
             return count;
         }
 
-        private string GetTargetRepoName(ReadOnlyDictionary<string, string> gitRepoMappings, GitRepositoryInfo repoInfo)
+        private string GetTargetRepoName(ReadOnlyDictionary<string, string> gitRepoMappings, TfsGitRepositoryInfo repoInfo)
         {
             if (gitRepoMappings.ContainsKey(repoInfo.GitRepo.Name))
             {

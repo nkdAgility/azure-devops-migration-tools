@@ -5,18 +5,18 @@ using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools.DataContracts;
 using Serilog;
 
-namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
+namespace MigrationTools.Clients
 {
-    public class WorkItemQuery : WorkItemQueryBase
+    public class TfsWorkItemQuery : WorkItemQueryBase
     {
-        public WorkItemQuery(IServiceProvider services, ITelemetryLogger telemetry) : base(services, telemetry)
+        public TfsWorkItemQuery(IServiceProvider services, ITelemetryLogger telemetry) : base(services, telemetry)
         {
         }
 
         public override List<WorkItemData> GetWorkItems()
         {
             Log.Debug("WorkItemQuery: ===========GetWorkItems=============");
-            var wiClient = (WorkItemMigrationClient)MigrationClient.WorkItems;
+            var wiClient = (TfsWorkItemMigrationClient)MigrationClient.WorkItems;
             Telemetry.TrackEvent("WorkItemQuery.Execute", Parameters, null);
             Log.Debug("WorkItemQuery: TeamProjectCollection: {QueryTarget}", wiClient.Store.TeamProjectCollection.Uri.ToString());
             Log.Debug("WorkItemQuery: Query: {QueryText}", Query);
@@ -28,14 +28,27 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Clients
             return GetWorkItemsFromQuery(wiClient).ToWorkItemDataList();
         }
 
-        private WorkItemCollection GetWorkItemsFromQuery(WorkItemMigrationClient wiClient)
+        private IList<WorkItem> GetWorkItemsFromQuery(TfsWorkItemMigrationClient wiClient)
         {
             var startTime = DateTime.UtcNow;
             var timer = System.Diagnostics.Stopwatch.StartNew();
-            WorkItemCollection results;
+            List<WorkItem> results = new List<WorkItem>();
+            WorkItemCollection workItemCollection;
             try
             {
-                results = wiClient.Store.Query(Query);
+                workItemCollection = wiClient.Store.Query(Query);
+                foreach (WorkItem item in workItemCollection)
+                {
+                    try
+                    {
+                        if (!string.IsNullOrEmpty(item.Title)) // Force to read WI
+                            results.Add(item);
+                    }
+                    catch (DeniedOrNotExistException ex)
+                    {
+                        Log.Error(ex, "Deleted Item detected.");
+                    }
+                }
                 timer.Stop();
                 Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", MigrationClient.Config.AsTeamProjectConfig().Collection.ToString(), "GetWorkItemsFromQuery", null, startTime, timer.Elapsed, "200", true));
             }

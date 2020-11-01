@@ -2,19 +2,18 @@
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using MigrationTools.Clients.AzureDevops.ObjectModel.Clients;
+using MigrationTools.Clients;
 using MigrationTools.DataContracts;
-using MigrationTools.Enrichers;
 using MigrationTools.Exceptions;
 
-namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
+namespace MigrationTools.Enrichers
 {
-    public class WorkItemLinkEnricher : WorkItemEnricher
+    public class TfsWorkItemLinkEnricher : WorkItemEnricher
     {
         private bool _save = true;
         private bool _filterWorkItemsThatAlreadyExistInTarget = true;
 
-        public WorkItemLinkEnricher(IMigrationEngine engine, ILogger<WorkItemLinkEnricher> logger) : base(engine, logger)
+        public TfsWorkItemLinkEnricher(IMigrationEngine engine, ILogger<TfsWorkItemLinkEnricher> logger) : base(engine, logger)
         {
         }
 
@@ -83,6 +82,12 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                         sourceWorkItemLinkStart.ToWorkItem().Reset();
                         targetWorkItemLinkStart.ToWorkItem().Reset();
                         Log.LogError(ex, "[CREATE-FAIL] Adding Link for wiSourceL={sourceWorkItemLinkStartId}", sourceWorkItemLinkStart.Id);
+                    }
+                    catch (UnexpectedErrorException ex)
+                    {
+                        sourceWorkItemLinkStart.ToWorkItem().Reset();
+                        targetWorkItemLinkStart.ToWorkItem().Reset();
+                        Log.LogError(ex, "[UnexpectedErrorException] Adding Link for wiSourceL={sourceWorkItemLinkStartId}", sourceWorkItemLinkStart.Id);
                     }
                 }
             }
@@ -206,7 +211,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                     if (wiSourceR.Id != wiTargetR.Id)
                     {
                         Log.LogInformation("  [CREATE-START] Adding Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id);
-                        var client = (WorkItemMigrationClient) Engine.Target.WorkItems;
+                        var client = (TfsWorkItemMigrationClient)Engine.Target.WorkItems;
                         if (!client.Store.WorkItemLinkTypes.LinkTypeEnds.Contains(rl.LinkTypeEnd.ImmutableName))
                         {
                             Log.LogError($"  [SKIP] Unable to migrate Link because type {rl.LinkTypeEnd.ImmutableName} does not exist in the target project.");
@@ -226,7 +231,7 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
                             {
                                 wiTargetR.ToWorkItem().Links.Remove(potentialParentConflictLink);
                             }
-                            linkTypeEnd = ((WorkItemMigrationClient)Engine.Target.WorkItems).Store.WorkItemLinkTypes.LinkTypeEnds["System.LinkTypes.Hierarchy-Reverse"];
+                            linkTypeEnd = ((TfsWorkItemMigrationClient)Engine.Target.WorkItems).Store.WorkItemLinkTypes.LinkTypeEnds["System.LinkTypes.Hierarchy-Reverse"];
                             RelatedLink newLl = new RelatedLink(linkTypeEnd, int.Parse(wiTargetL.Id));
                             wiTargetR.ToWorkItem().Links.Add(newLl);
                             wiTargetR.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
@@ -315,18 +320,45 @@ namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
 
         private void CreateHyperlink(Hyperlink sourceLink, WorkItemData target)
         {
-            var exist = (from Link l in target.ToWorkItem().Links where l is Hyperlink && ((Hyperlink)l).Location == ((Hyperlink)sourceLink).Location select (Hyperlink)l).SingleOrDefault();
-            if (exist == null)
+            var sourceLinkAbsoluteUri = GetAbsoluteUri(sourceLink);
+            if (string.IsNullOrEmpty(sourceLinkAbsoluteUri))
             {
-                Hyperlink hl = new Hyperlink(sourceLink.Location)
-                {
-                    Comment = sourceLink.Comment
-                };
-                target.ToWorkItem().Links.Add(hl);
-                if (_save)
-                {
-                    target.SaveToAzureDevOps();
-                }
+                Log.LogWarning($"  [SKIP] Unable to create a hyperlink to [{sourceLink.Location}]");
+                return;
+            }
+
+            var exist = (from hyperlink in target.ToWorkItem().Links.Cast<Link>().Where(l => l is Hyperlink).Cast<Hyperlink>()
+                let absoluteUri = GetAbsoluteUri(hyperlink)
+                where sourceLinkAbsoluteUri == absoluteUri
+                select hyperlink).SingleOrDefault();
+
+            if (exist != null)
+            {
+                return;
+            }
+
+            var hl = new Hyperlink(sourceLinkAbsoluteUri) // Use AbsoluteUri here as a possible \\UNC\Path\Link will be converted to file://UNC/Path/Link this way
+            {
+                Comment = sourceLink.Comment
+            };
+
+            target.ToWorkItem().Links.Add(hl);
+            if (_save)
+            {
+                target.SaveToAzureDevOps();
+            }
+        }
+
+        private string GetAbsoluteUri(Hyperlink hyperlink)
+        {
+            try
+            {
+                return new Uri(hyperlink.Location.Trim('"')).AbsoluteUri;
+            }
+            catch (UriFormatException e)
+            {
+                Log.LogError($"Unable to get AbsoluteUri of [{hyperlink.Location}]: {e.Message}");
+                return null;
             }
         }
 

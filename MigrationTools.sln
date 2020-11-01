@@ -39,6 +39,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
+		configuration-new.json = configuration-new.json
 		configuration.json = configuration.json
 		Directory.Build.props = Directory.Build.props
 		GitVersion.yml = GitVersion.yml
@@ -100,6 +101,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SampleConfigs", "SampleConf
 		src\MigrationTools.Samples\demo-migration.json = src\MigrationTools.Samples\demo-migration.json
 	EndProjectSection
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Clients.InMemory", "src\MigrationTools.Clients.InMemory\MigrationTools.Clients.InMemory.csproj", "{54DF41E6-9F94-42DD-877E-437DC6E9F3E2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Clients.InMemory.Tests", "src\MigrationTools.Clients.InMemory.Tests\MigrationTools.Clients.InMemory.Tests.csproj", "{504D6953-E83D-498D-A1C7-E511F14B9563}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Clients.FileSystem.Tests", "src\MigrationTools.Clients.FileSystem.Tests\MigrationTools.Clients.FileSystem.Tests.csproj", "{3191B594-1C3A-4245-8AFE-076EA142B778}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -146,6 +153,18 @@ Global
 		{B400FC37-A4B7-4526-85DD-36784E3B56EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B400FC37-A4B7-4526-85DD-36784E3B56EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B400FC37-A4B7-4526-85DD-36784E3B56EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{54DF41E6-9F94-42DD-877E-437DC6E9F3E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{54DF41E6-9F94-42DD-877E-437DC6E9F3E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{54DF41E6-9F94-42DD-877E-437DC6E9F3E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{54DF41E6-9F94-42DD-877E-437DC6E9F3E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{504D6953-E83D-498D-A1C7-E511F14B9563}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{504D6953-E83D-498D-A1C7-E511F14B9563}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{504D6953-E83D-498D-A1C7-E511F14B9563}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{504D6953-E83D-498D-A1C7-E511F14B9563}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3191B594-1C3A-4245-8AFE-076EA142B778}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3191B594-1C3A-4245-8AFE-076EA142B778}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3191B594-1C3A-4245-8AFE-076EA142B778}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3191B594-1C3A-4245-8AFE-076EA142B778}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -168,6 +187,9 @@ Global
 		{D58EEDFA-D74C-4E84-9C26-6D69521382FD} = {13FE9FE2-9C6E-4866-BBAD-106F5BF765F1}
 		{B400FC37-A4B7-4526-85DD-36784E3B56EC} = {5C05DA7B-B70F-4A87-920B-DCD14EA7670D}
 		{A6831354-6128-4F1A-A1F3-C6E598B0925F} = {32E2956A-9056-4D9D-8018-14DFD0E6CA41}
+		{54DF41E6-9F94-42DD-877E-437DC6E9F3E2} = {13FE9FE2-9C6E-4866-BBAD-106F5BF765F1}
+		{504D6953-E83D-498D-A1C7-E511F14B9563} = {13FE9FE2-9C6E-4866-BBAD-106F5BF765F1}
+		{3191B594-1C3A-4245-8AFE-076EA142B778} = {13FE9FE2-9C6E-4866-BBAD-106F5BF765F1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {62EE0B27-C55A-46EE-8D17-1691DE9BBD50}

@@ -9,7 +9,7 @@ using Microsoft.TeamFoundation.Framework.Client;
 using Microsoft.TeamFoundation.Framework.Common;
 using Microsoft.TeamFoundation.TestManagement.Client;
 using MigrationTools;
-using MigrationTools.Clients.AzureDevops.ObjectModel;
+
 using MigrationTools.Configuration;
 using MigrationTools.Configuration.Processing;
 using MigrationTools.DataContracts;
@@ -601,7 +601,7 @@ namespace VstsSyncMigrator.Engine
                     foreach (Match match in matches)
                     {
                         var qid = match.Value.Split('=')[1].Trim();
-                        var targetWi = Engine.Target.WorkItems.FindReflectedWorkItemByReflectedWorkItemId(Convert.ToInt32(qid), false);
+                        var targetWi = Engine.Target.WorkItems.FindReflectedWorkItemByReflectedWorkItemId(qid);
 
                         if (targetWi == null)
                         {

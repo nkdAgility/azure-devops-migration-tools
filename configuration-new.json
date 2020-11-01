@@ -1,0 +1,214 @@
+{
+  "Version": "0.0",
+  "LogLevel": "Verbose",
+  "workaroundForQuerySOAPBugEnabled": false,
+  "MappingTools": [
+    {
+      "ObjectType": "WorkItemTypeMappingTool",
+      "Enabled": true,
+      "WorkItemTypeDefinition": {
+        "sourceWorkItemTypeName": "targetWorkItemTypeName"
+      }
+    },
+    {
+      "ObjectType": "WorkItemFieldMappingTool",
+      "Enabled": true,
+      "WorkItemFieldMaps": [
+        {
+          "ObjectType": "MultiValueConditionalMapConfig",
+          "WorkItemTypeName": "*",
+          "sourceFieldsAndValues": {
+            "Field1": "Value1",
+            "Field2": "Value2"
+          },
+          "targetFieldsAndValues": {
+            "Field1": "Value1",
+            "Field2": "Value2"
+          }
+        },
+        {
+          "ObjectType": "FieldBlankMapConfig",
+          "WorkItemTypeName": "*",
+          "targetField": "TfsMigrationTool.ReflectedWorkItemId"
+        },
+        {
+          "ObjectType": "FieldValueMapConfig",
+          "WorkItemTypeName": "*",
+          "sourceField": "System.State",
+          "targetField": "System.State",
+          "defaultValue": "New",
+          "valueMapping": {
+            "Approved": "New",
+            "New": "New",
+            "Committed": "Active",
+            "In Progress": "Active",
+            "To Do": "New",
+            "Done": "Closed",
+            "Removed": "Removed"
+          }
+        },
+        {
+          "ObjectType": "FieldtoFieldMapConfig",
+          "WorkItemTypeName": "*",
+          "sourceField": "Microsoft.VSTS.Common.BacklogPriority",
+          "targetField": "Microsoft.VSTS.Common.StackRank"
+        },
+        {
+          "ObjectType": "FieldtoFieldMultiMapConfig",
+          "WorkItemTypeName": "*",
+          "SourceToTargetMappings": {
+            "SourceField1": "TargetField1",
+            "SourceField2": "TargetField2"
+          }
+        },
+        {
+          "ObjectType": "FieldtoTagMapConfig",
+          "WorkItemTypeName": "*",
+          "sourceField": "System.State",
+          "formatExpression": "ScrumState:{0}"
+        },
+        {
+          "ObjectType": "FieldMergeMapConfig",
+          "WorkItemTypeName": "*",
+          "sourceField1": "System.Description",
+          "sourceField2": "Microsoft.VSTS.Common.AcceptanceCriteria",
+          "targetField": "System.Description",
+          "formatExpression": "{0} <br/><br/><h3>Acceptance Criteria</h3>{1}",
+          "doneMatch": "##DONE##"
+        },
+        {
+          "ObjectType": "RegexFieldMapConfig",
+          "WorkItemTypeName": "*",
+          "sourceField": "COMPANY.PRODUCT.Release",
+          "targetField": "COMPANY.DEVISION.MinorReleaseVersion",
+          "pattern": "PRODUCT \\d{4}.(\\d{1})",
+          "replacement": "$1"
+        },
+        {
+          "ObjectType": "FieldValuetoTagMapConfig",
+          "WorkItemTypeName": "*",
+          "sourceField": "Microsoft.VSTS.CMMI.Blocked",
+          "pattern": "Yes",
+          "formatExpression": "{0}"
+        },
+        {
+          "ObjectType": "TreeToTagMapConfig",
+          "WorkItemTypeName": "*",
+          "toSkip": 3,
+          "timeTravel": 1
+        }
+      ]
+    },
+    {
+      "ObjectType": "WorkItemGitRepoMappingTool",
+      "Enabled": true,
+      "WorkItemGitRepos": {
+        "sourceRepoName": "targetRepoName"
+      }
+    }
+  ],
+  "Processors": [
+    {
+      "ObjectType": "WorkItemDeleteConfig",
+      "Enabled": true,
+      "Endpoints": [
+        {
+          "ObjectType": "TfsWorkItemEndpointConfig",
+          "Direction": "Target",
+          "WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
+          "WIQLOrderBit": "[System.ChangedDate] desc",
+          "Enrichers": []
+        }
+      ]
+    },
+    {
+      "ObjectType": "WorkItemMigrationConfig",
+      "Enabled": true,
+      "ReplayRevisions": true,
+      "PrefixProjectToNodes": false,
+      "CollapseRevisions": false,
+      "WorkItemCreateRetryLimit": 5,
+      "Enrichers": [
+        {
+          "ObjectType": "PauseAfterEachWorkItem",
+          "Enabled": true
+        },
+        {
+          "ObjectType": "FilterWorkItemsThatAlreadyExistInTarget",
+          "Enabled": true,
+          "WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
+          "WIQLOrderBit": "[System.ChangedDate] desc"
+        },
+        {
+          "ObjectType": "AppendMigrationToolSignatureFooter",
+          "Enabled": false
+        },
+        {
+          "ObjectType": "SkipToFinalRevisedWorkItemType",
+          "Enabled": false
+        }
+
+      ],
+      "Endpoints": [
+        {
+          "ObjectType": "FileSystemWorkItemEndpointConfig",
+          "Direction": "Source",
+          "WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
+          "WIQLOrderBit": "[System.ChangedDate] desc",
+          "EndpointEnrichers": [
+            {
+              "ObjectType": "FileSystemWorkItemAttachmentEnricherConfig",
+              "Enabled": true,
+              "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
+              "AttachmentMaxSize": 480000000
+            },
+            {
+              "ObjectType": "FileSystemWorkItemLinkEnricherConfig",
+              "Enabled": true,
+              "LinkMigrationSaveEachAsAdded": true
+            }
+          ]
+        },
+        {
+          "ObjectType": "TfsWorkItemEndpointConfig",
+          "Direction": "Target",
+          "WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
+          "WIQLOrderBit": "[System.ChangedDate] desc",
+          "Enrichers": [
+            {
+              "ObjectType": "TfsWorkItemAttachmentEnricherConfig",
+              "Enabled": true,
+              "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
+              "AttachmentMaxSize": 480000000
+            },
+            {
+              "ObjectType": "TfsWorkItemEmbedEnricherConfig",
+              "Enabled": true,
+              "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\"
+            },
+            {
+              "ObjectType": "TfsWorkItemEmbedEnricherConfig",
+              "Enabled": true,
+              "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\"
+            },
+            {
+              "ObjectType": "TfsWorkItemLinkEnricherConfig",
+              "Enabled": true,
+              "LinkMigrationSaveEachAsAdded": true
+            },
+            {
+              "ObjectType": "TfsWorkItemCreatedEnricherConfig",
+              "Enabled": true,
+              "UpdateCreatedDate": true,
+              "UpdateCreatedBy": true
+            },
+            {
+              "ObjectType": "TfsWorkItemFieldTableEnricherConfig",
+              "Enabled": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

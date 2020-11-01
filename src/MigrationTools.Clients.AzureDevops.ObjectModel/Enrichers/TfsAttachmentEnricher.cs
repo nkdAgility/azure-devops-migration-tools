@@ -4,19 +4,18 @@ using System.Linq;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Proxy;
 using MigrationTools.DataContracts;
-using MigrationTools.Enrichers;
 using Serilog;
 
-namespace MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers
+namespace MigrationTools.Enrichers
 {
-    public class AttachmentMigrationEnricher : IAttachmentMigrationEnricher
+    public class TfsAttachmentEnricher : IAttachmentMigrationEnricher
     {
         private WorkItemServer _server;
         private string _exportBasePath;
         private string _exportWiPath;
         private int _maxAttachmentSize;
 
-        public AttachmentMigrationEnricher(WorkItemServer workItemServer, string exportBasePath, int maxAttachmentSize = 480000000)
+        public TfsAttachmentEnricher(WorkItemServer workItemServer, string exportBasePath, int maxAttachmentSize = 480000000)
         {
             _server = workItemServer;
             _exportBasePath = exportBasePath;

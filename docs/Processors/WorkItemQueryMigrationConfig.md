@@ -4,7 +4,7 @@ This processor can migrate queries for work items. Only shared queries are inclu
 
 That processor should run after these processors:
 
-* `NodeStructuresMigrationConfig`
+* `NodeStructuresMigrationConfig` (Obsolete)
 * `TeamMigrationConfig`
  
 
@@ -15,5 +15,5 @@ That processor should run after these processors:
 | `ObjectType`           | string  | The name of the processor                | WorkItemQueryMigrationConfig |
 | `SharedFolderName`     | string  | The folder where the shared queries are in. | Shared Queries                           |
 | `PrefixProjectToNodes` | Boolean | Prefix your iterations and areas with the project name. If you have enabled this in `NodeStructuresMigrationConfig` you must do it here too. | false                                    |
-
+| `SourceToTargetFieldMappings` | Dictionary`<string, string`>| Any field mappings | none |
 

@@ -6,7 +6,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.ProcessConfiguration.Client;
 using MigrationTools;
-using MigrationTools.Clients.AzureDevops.ObjectModel;
 using MigrationTools.Configuration;
 using MigrationTools.Configuration.Processing;
 using MigrationTools.DataContracts;
@@ -65,10 +64,10 @@ namespace VstsSyncMigrator.Engine
             {
                 Stopwatch witstopwatch = Stopwatch.StartNew();
                 var foundTargetTeam = (from x in targetTL where x.Name == sourceTeam.Name select x).SingleOrDefault();
-                if (foundTargetTeam == null)
+                if (foundTargetTeam == null || _config.FixTeamSettingsForExistingTeams)
                 {
                     Log.LogDebug("Processing team '{0}':", sourceTeam.Name);
-                    TeamFoundationTeam newTeam = targetTS.CreateTeam(targetProject.ToProject().Uri.ToString(), sourceTeam.Name, sourceTeam.Description, null);
+                    TeamFoundationTeam newTeam = foundTargetTeam ?? targetTS.CreateTeam(targetProject.ToProject().Uri.ToString(), sourceTeam.Name, sourceTeam.Description, null);
                     Log.LogDebug("-> Team '{0}' created", sourceTeam.Name);
 
                     if (_config.EnableTeamSettingsMigration)
@@ -80,38 +79,46 @@ namespace VstsSyncMigrator.Engine
 
                         foreach (var sourceConfig in sourceConfigurations)
                         {
-                            var targetConfig = targetConfigurations.FirstOrDefault(t => t.TeamName == sourceConfig.TeamName);
-                            if (targetConfig == null)
+                            if (sourceConfig.TeamSettings.BacklogIterationPath != null &&
+                                sourceConfig.TeamSettings.TeamFieldValues.Length > 0)
                             {
-                                Log.LogDebug("-> Settings for team '{sourceTeamName}'.. not found", sourceTeam.Name);
-                                continue;
-                            }
+                                var targetConfig = targetConfigurations.FirstOrDefault(t => t.TeamName == sourceConfig.TeamName);
+                                if (targetConfig == null)
+                                {
+                                    Log.LogDebug("-> Settings for team '{sourceTeamName}'.. not found", sourceTeam.Name);
+                                    continue;
+                                }
 
-                            Log.LogInformation("-> Settings found for team '{sourceTeamName}'..", sourceTeam.Name);
-                            if (_config.PrefixProjectToNodes)
-                            {
-                                targetConfig.TeamSettings.BacklogIterationPath =
-                                    string.Format("{0}\\{1}", Engine.Target.Config.AsTeamProjectConfig().Project, sourceConfig.TeamSettings.BacklogIterationPath);
-                                targetConfig.TeamSettings.IterationPaths = sourceConfig.TeamSettings.IterationPaths
-                                    .Select(path => string.Format("{0}\\{1}", Engine.Target.Config.AsTeamProjectConfig().Project, path))
-                                    .ToArray();
-                                targetConfig.TeamSettings.TeamFieldValues = sourceConfig.TeamSettings.TeamFieldValues
-                                    .Select(field => new TeamFieldValue
-                                    {
-                                        IncludeChildren = field.IncludeChildren,
-                                        Value = string.Format("{0}\\{1}", Engine.Target.Config.AsTeamProjectConfig().Project, field.Value)
-                                    })
-                                    .ToArray();
+                                Log.LogInformation("-> Settings found for team '{sourceTeamName}'..", sourceTeam.Name);
+                                if (_config.PrefixProjectToNodes)
+                                {
+                                    targetConfig.TeamSettings.BacklogIterationPath =
+                                        string.Format("{0}\\{1}", Engine.Target.Config.AsTeamProjectConfig().Project, sourceConfig.TeamSettings.BacklogIterationPath);
+                                    targetConfig.TeamSettings.IterationPaths = sourceConfig.TeamSettings.IterationPaths
+                                        .Select(path => string.Format("{0}\\{1}", Engine.Target.Config.AsTeamProjectConfig().Project, path))
+                                        .ToArray();
+                                    targetConfig.TeamSettings.TeamFieldValues = sourceConfig.TeamSettings.TeamFieldValues
+                                        .Select(field => new TeamFieldValue
+                                        {
+                                            IncludeChildren = field.IncludeChildren,
+                                            Value = string.Format("{0}\\{1}", Engine.Target.Config.AsTeamProjectConfig().Project, field.Value)
+                                        })
+                                        .ToArray();
+                                }
+                                else
+                                {
+                                    targetConfig.TeamSettings.BacklogIterationPath = sourceConfig.TeamSettings.BacklogIterationPath;
+                                    targetConfig.TeamSettings.IterationPaths = sourceConfig.TeamSettings.IterationPaths;
+                                    targetConfig.TeamSettings.TeamFieldValues = sourceConfig.TeamSettings.TeamFieldValues;
+                                }
+
+                                targetTSCS.SetTeamSettings(targetConfig.TeamId, targetConfig.TeamSettings);
+                                Log.LogDebug("-> Team '{0}' settings... applied", targetConfig.TeamName);
                             }
                             else
                             {
-                                targetConfig.TeamSettings.BacklogIterationPath = sourceConfig.TeamSettings.BacklogIterationPath;
-                                targetConfig.TeamSettings.IterationPaths = sourceConfig.TeamSettings.IterationPaths;
-                                targetConfig.TeamSettings.TeamFieldValues = sourceConfig.TeamSettings.TeamFieldValues;
+                                Log.LogWarning("-> Settings for team '{sourceTeamName}'.. not configured", sourceTeam.Name);
                             }
-
-                            targetTSCS.SetTeamSettings(targetConfig.TeamId, targetConfig.TeamSettings);
-                            Log.LogDebug("-> Team '{0}' settings... applied", targetConfig.TeamName);
                         }
                     }
                 }

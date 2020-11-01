@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using MigrationTools;
 using MigrationTools.Configuration;
 using MigrationTools.Engine.Containers;
+using MigrationTools.Processors;
 
 namespace VstsSyncMigrator.Engine
 {

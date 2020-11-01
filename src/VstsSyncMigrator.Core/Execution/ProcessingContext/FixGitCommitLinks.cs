@@ -4,18 +4,17 @@ using System.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MigrationTools;
-using MigrationTools.Clients.AzureDevops.ObjectModel;
-using MigrationTools.Clients.AzureDevops.ObjectModel.Enrichers;
 using MigrationTools.Configuration;
 using MigrationTools.Configuration.Processing;
 using MigrationTools.DataContracts;
+using MigrationTools.Enrichers;
 
 namespace VstsSyncMigrator.Engine
 {
     public class FixGitCommitLinks : StaticProcessorBase
     {
         private FixGitCommitLinksConfig _config;
-        private GitRepositoryEnricher _GitRepositoryEnricher;
+        private TfsGitRepositoryEnricher _GitRepositoryEnricher;
 
         public FixGitCommitLinks(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<FixGitCommitLinks> logger) : base(services, me, telemetry, logger)
         {
@@ -35,7 +34,7 @@ namespace VstsSyncMigrator.Engine
         public override void Configure(IProcessorConfig config)
         {
             _config = (FixGitCommitLinksConfig)config;
-            _GitRepositoryEnricher = Services.GetRequiredService<GitRepositoryEnricher>();
+            _GitRepositoryEnricher = Services.GetRequiredService<TfsGitRepositoryEnricher>();
         }
 
         protected override void InternalExecute()
