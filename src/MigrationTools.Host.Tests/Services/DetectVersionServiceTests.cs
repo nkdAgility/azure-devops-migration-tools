@@ -1,11 +1,12 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MigrationTools.Services;
 
-namespace MigrationTools.Services.Tests
+namespace MigrationTools.Host.Services.Tests
 {
-    [TestClass()]
+    [TestClass]
     public class DetectVersionServiceTests
     {
-        [TestMethod()]
+        [TestMethod]
         public void DetectVersionServiceTest()
         {
             var dos = new DetectVersionService(new TelemetryLoggerMock());

@@ -32,7 +32,8 @@ namespace MigrationTools.Clients
             return new TfsReflectedWorkItemId(workItem);
         }
 
-        public List<WorkItemData> FilterExistingWorkItems(List<WorkItemData> sourceWorkItems, TfsWiqlDefinition wiqlDefinition)
+        public List<WorkItemData> FilterExistingWorkItems(List<WorkItemData> sourceWorkItems,
+            TfsWiqlDefinition wiqlDefinition, TfsWorkItemMigrationClient sourceWorkItemMigrationClient)
         {
             Log.Debug("FilterExistingWorkItems: START | ");
 
@@ -47,11 +48,11 @@ namespace MigrationTools.Clients
             Log.Debug("FilterByTarget: Query Execute...");
             var targetFoundItems = GetWorkItems(targetQuery);
             Log.Debug("FilterByTarget: ... query complete.");
-            Log.Debug("FilterByTarget: Found {TargetWorkItemCount} based on the WIQLQueryBit in the target system.", targetFoundItems.Count());
+            Log.Debug("FilterByTarget: Found {TargetWorkItemCount} based on the WIQLQueryBit in the target system.", targetFoundItems.Count);
             var targetFoundIds = (from WorkItemData twi in targetFoundItems select GetReflectedWorkItemId(twi)).ToList();
             //////////////////////////////////////////////////////////
-            sourceWorkItems = sourceWorkItems.Where(p => !targetFoundIds.Any(p2 => p2.ToString() == GetReflectedWorkItemId(p).ToString())).ToList();
-            Log.Debug("FilterByTarget: After removing all found work items there are {SourceWorkItemCount} remaining to be migrated.", sourceWorkItems.Count());
+            sourceWorkItems = sourceWorkItems.Where(p => targetFoundIds.All(p2 => p2.ToString() != sourceWorkItemMigrationClient.CreateReflectedWorkItemId(p).ToString())).ToList();
+            Log.Debug("FilterByTarget: After removing all found work items there are {SourceWorkItemCount} remaining to be migrated.", sourceWorkItems.Count);
             Log.Debug("FilterByTarget: END");
             return sourceWorkItems;
         }

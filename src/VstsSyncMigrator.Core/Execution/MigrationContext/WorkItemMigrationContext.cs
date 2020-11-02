@@ -109,7 +109,7 @@ namespace VstsSyncMigrator.Engine
             if (_config.FilterWorkItemsThatAlreadyExistInTarget)
             {
                 contextLog.Information("[FilterWorkItemsThatAlreadyExistInTarget] is enabled. Searching for work items that have already been migrated to the target...", sourceWorkItems.Count());
-                sourceWorkItems = ((TfsWorkItemMigrationClient)Engine.Target.WorkItems).FilterExistingWorkItems(sourceWorkItems, new TfsWiqlDefinition() { OrderBit = _config.WIQLOrderBit, QueryBit = _config.WIQLQueryBit });
+                sourceWorkItems = ((TfsWorkItemMigrationClient)Engine.Target.WorkItems).FilterExistingWorkItems(sourceWorkItems, new TfsWiqlDefinition() { OrderBit = _config.WIQLOrderBit, QueryBit = _config.WIQLQueryBit }, (TfsWorkItemMigrationClient)Engine.Source.WorkItems);
                 contextLog.Information("!! After removing all found work items there are {SourceWorkItemCount} remaining to be migrated.", sourceWorkItems.Count());
             }
             //////////////////////////////////////////////////

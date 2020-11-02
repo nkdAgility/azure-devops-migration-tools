@@ -11,6 +11,7 @@ using MigrationTools.CommandLine;
 using MigrationTools.Configuration;
 using MigrationTools.Engine.Containers;
 using MigrationTools.Host.CustomDiagnostics;
+using MigrationTools.Host.Services;
 using MigrationTools.Processors;
 using MigrationTools.Services;
 using Serilog;

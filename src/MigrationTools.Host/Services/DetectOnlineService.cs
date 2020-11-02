@@ -4,7 +4,7 @@ using System.Net.NetworkInformation;
 using Microsoft.ApplicationInsights.DataContracts;
 using Serilog;
 
-namespace MigrationTools.Services
+namespace MigrationTools.Host.Services
 {
     public class DetectOnlineService : IDetectOnlineService
     {
