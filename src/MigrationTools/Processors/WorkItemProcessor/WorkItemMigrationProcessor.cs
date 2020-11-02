@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
@@ -22,18 +23,32 @@ namespace MigrationTools.Processors
         {
             _config = (WorkItemMigrationProcessorOptions)config;
 
-            foreach (IEndpointOptions item in config.Endpoints)
+            if (config.Endpoints is null)
             {
-                var ep = (IWorkItemEndPoint)Services.GetService(item.ToConfigure);
-                ep.Configure(item);
-                Endpoints.Add(ep);
+                Log.LogWarning("No Endpoints have been Configured");
+            }
+            else
+            {
+                foreach (IEndpointOptions item in config?.Endpoints)
+                {
+                    var ep = (IWorkItemEndPoint)Services.GetRequiredService(item.ToConfigure);
+                    ep.Configure(item);
+                    Endpoints.Add(ep);
+                }
             }
 
-            foreach (IProcessorEnricherOptions item in config.Enrichers)
+            if (config.Enrichers is null)
             {
-                var ep = (WorkItemProcessorEnricher)Services.GetService(item.ToConfigure);
-                ep.Configure(item);
-                Enrichers.Add(ep);
+                Log.LogWarning("No Enrichers have been Configured");
+            }
+            else
+            {
+                foreach (IProcessorEnricherOptions item in config?.Enrichers)
+                {
+                    var ep = (WorkItemProcessorEnricher)Services.GetRequiredService(item.ToConfigure);
+                    ep.Configure(item);
+                    Enrichers.Add(ep);
+                }
             }
         }
 

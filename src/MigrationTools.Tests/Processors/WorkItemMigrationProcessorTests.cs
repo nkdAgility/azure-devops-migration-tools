@@ -22,7 +22,7 @@ namespace MigrationTools.Processors.Tests
             {
                 Enabled = true
             };
-            var x = new WorkItemMigrationProcessor(null, null, null);
+            var x = Services.GetRequiredService<WorkItemMigrationProcessor>();
             x.Configure(y);
 
             Assert.IsNotNull(x);
