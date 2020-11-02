@@ -1,10 +1,11 @@
-﻿namespace MigrationTools.Options
+﻿using System.Collections.Generic;
+
+namespace MigrationTools.Options
 {
     public class QueryOptions
     {
-        public string WhereBit { get; set; }
+        public string Query { get; set; }
 
-        /// <inheritdoc />
-        public string OrderBit { get; set; }
+        public Dictionary<string, object> Paramiters { get; set; }
     }
 }
