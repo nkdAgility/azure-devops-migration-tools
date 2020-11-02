@@ -10,6 +10,8 @@ using Microsoft.Extensions.Hosting;
 using MigrationTools.CommandLine;
 using MigrationTools.Configuration;
 using MigrationTools.Engine.Containers;
+using MigrationTools.Enrichers;
+
 using MigrationTools.Host.CustomDiagnostics;
 using MigrationTools.Host.Services;
 using MigrationTools.Processors;
@@ -76,8 +78,10 @@ namespace MigrationTools.Host
                  services.AddSingleton<IEngineConfigurationBuilder, EngineConfigurationBuilder>();
                  services.AddSingleton<EngineConfiguration, EngineConfigurationWrapper>();
 
-                 // New Native Processors
-                 services.AddSingleton<WorkItemMigrationProcessor>();
+                 // New v2Bits
+                 services.AddMigrationToolEndpointEnrichers();
+                 services.AddMigrationToolProcessorEnrichers();
+                 services.AddMigrationToolProcessors();
 
                  //Engine
                  services.AddSingleton<FieldMapContainer>();
