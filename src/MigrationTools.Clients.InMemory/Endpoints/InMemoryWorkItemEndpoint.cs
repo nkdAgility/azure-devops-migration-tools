@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using Microsoft.Extensions.Logging;
 using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
 
@@ -6,7 +8,7 @@ namespace MigrationTools.Endpoints
 {
     public class InMemoryWorkItemEndpoint : WorkItemEndpoint
     {
-        public InMemoryWorkItemEndpoint(InMemoryWorkItemEndpointOptions inMemoryWorkItemEndpointOptions) : base(inMemoryWorkItemEndpointOptions)
+        public InMemoryWorkItemEndpoint(IServiceProvider services, ITelemetryLogger telemetry, ILogger<WorkItemEndpoint> logger) : base(services, telemetry, logger)
         {
         }
 

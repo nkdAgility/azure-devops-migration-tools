@@ -1,8 +1,10 @@
-﻿namespace MigrationTools.Endpoints
+﻿using System;
+
+namespace MigrationTools.Endpoints
 {
     public class InMemoryWorkItemEndpointOptions : EndpointOptions
     {
-        public override string Endpoint => nameof(InMemoryWorkItemEndpoint);
+        public override Type ToConfigure => typeof(InMemoryWorkItemEndpoint);
 
         public override void SetDefaults()
         {

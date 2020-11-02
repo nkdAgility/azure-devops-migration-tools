@@ -222,5 +222,11 @@ namespace MigrationTools.Enrichers
                 return repoInfo.GitRepo.Name;
             }
         }
+
+        [Obsolete("v2 Archtecture: use Configure(bool save = true, bool filter = true) instead", true)]
+        public override void Configure(IProcessorEnricherOptions options)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

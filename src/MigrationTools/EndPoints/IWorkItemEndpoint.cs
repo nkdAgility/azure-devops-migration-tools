@@ -22,6 +22,5 @@ namespace MigrationTools.Endpoints
 
     public interface IWorkItemEndPoint : IEndpoint
     {
-        void Configure(IWorkItemQuery query, List<IWorkItemProcessorEnricher> enrichers);
     }
 }

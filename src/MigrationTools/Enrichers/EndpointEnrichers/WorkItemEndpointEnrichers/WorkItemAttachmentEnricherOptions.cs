@@ -1,9 +1,13 @@
-﻿namespace MigrationTools.Enrichers
+﻿using System;
+
+namespace MigrationTools.Enrichers
 {
     public class WorkItemAttachmentEnricherOptions : EndpointEnricherOptions
     {
         public string WorkingPath { get; set; }
         public int MaxSize { get; set; }
+
+        public override Type ToConfigure => typeof(WorkItemAttachmentEnricher);
 
         public override void SetDefaults()
         {

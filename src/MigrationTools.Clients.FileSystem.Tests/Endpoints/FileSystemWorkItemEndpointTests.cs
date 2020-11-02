@@ -1,11 +1,21 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools.DataContracts;
+using MigrationTools.Tests;
 
 namespace MigrationTools.Endpoints.Tests
 {
     [TestClass()]
     public class FileSystemWorkItemEndpointTests
     {
+        public ServiceProvider Services { get; private set; }
+
+        [TestInitialize]
+        public void Setup()
+        {
+            Services = ServiceProviderHelper.GetWorkItemMigrationProcessor();
+        }
+
         [TestMethod]
         public void ConfiguredTest()
         {
@@ -86,7 +96,7 @@ namespace MigrationTools.Endpoints.Tests
             }
         }
 
-        private static FileSystemWorkItemEndpoint CreateAndConfigureInMemoryWorkItemEndpoint(EndpointDirection direction, string queryString)
+        private FileSystemWorkItemEndpoint CreateAndConfigureInMemoryWorkItemEndpoint(EndpointDirection direction, string queryString)
         {
             FileSystemWorkItemEndpoint e = CreateInMemoryWorkItemEndpoint(EndpointDirection.Source);
             FileSystemWorkItemQuery query = new FileSystemWorkItemQuery();
@@ -95,10 +105,11 @@ namespace MigrationTools.Endpoints.Tests
             return e;
         }
 
-        private static FileSystemWorkItemEndpoint CreateInMemoryWorkItemEndpoint(EndpointDirection direction)
+        private FileSystemWorkItemEndpoint CreateInMemoryWorkItemEndpoint(EndpointDirection direction)
         {
             var options = new FileSystemWorkItemEndpointOptions() { Direction = direction };
-            FileSystemWorkItemEndpoint e = new FileSystemWorkItemEndpoint(options);
+            FileSystemWorkItemEndpoint e = Services.GetRequiredService<FileSystemWorkItemEndpoint>();
+            e.Configure(options);
             return e;
         }
     }

@@ -379,5 +379,11 @@ namespace MigrationTools.Enrichers
         {
             return item is Hyperlink;
         }
+
+        [Obsolete("v2 Archtecture: use Configure(bool save = true, bool filter = true) instead", true)]
+        public override void Configure(IProcessorEnricherOptions options)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

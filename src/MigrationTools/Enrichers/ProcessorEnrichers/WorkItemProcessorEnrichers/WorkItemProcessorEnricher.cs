@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System;
+using Microsoft.Extensions.Logging;
 using MigrationTools.DataContracts;
 
 namespace MigrationTools.Enrichers
@@ -14,8 +15,12 @@ namespace MigrationTools.Enrichers
             Log = logger;
         }
 
+        [Obsolete("v1 Architecture: Here to support migration, use Configure(IProcessorEnricherOptions options) instead", false)]
         public abstract void Configure(bool save = true, bool filter = true);
 
+        public abstract void Configure(IProcessorEnricherOptions options);
+
+        [Obsolete("v1 Architecture: Here to support migration, use PhaseEnrichers: BeforeLoadData, AfterLoadData, etc", false)]
         public abstract int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem);
     }
 }

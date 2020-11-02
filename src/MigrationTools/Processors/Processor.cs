@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Linq;
 using Microsoft.Extensions.Logging;
 using MigrationTools.Configuration;
 using MigrationTools.Endpoints;
@@ -18,16 +18,16 @@ namespace MigrationTools.Processors
             Log = logger;
         }
 
-        public Collection<IEndpoint> Endpoints => throw new NotImplementedException();
+        public abstract List<IEndpoint> Endpoints { get; }
 
-        public Collection<IProcessorEnricher> Enrichers => throw new NotImplementedException();
+        public abstract List<IProcessorEnricher> Enrichers { get; }
 
         public string Name { get { return this.GetType().Name; } }
 
         public ProcessingStatus Status { get; private set; } = ProcessingStatus.None;
-        public IServiceProvider Services { get; }
-        public ITelemetryLogger Telemetry { get; }
-        public ILogger<Processor> Log { get; }
+        protected IServiceProvider Services { get; }
+        protected ITelemetryLogger Telemetry { get; }
+        protected ILogger<Processor> Log { get; }
 
         public abstract void Configure(IProcessorOptions config);
 
@@ -79,5 +79,20 @@ namespace MigrationTools.Processors
         }
 
         protected abstract void InternalExecute();
+
+        protected Type GetTypeFromName(string name)
+        {
+            Type type = AppDomain.CurrentDomain.GetAssemblies()
+                 .Where(a => !a.IsDynamic)
+                 .SelectMany(a => a.GetTypes())
+                 .FirstOrDefault(t => t.Name.Equals(name) || t.FullName.Equals(name));
+            if (type is null)
+            {
+                var e = new InvalidOperationException("The Type cant be found");
+                Log.LogError(e, "Unable to find the type {ObjectToLoadName} needed by the processor {ProfessorName}", name, nameof(this.GetType));
+                throw e;
+            }
+            return type;
+        }
     }
 }

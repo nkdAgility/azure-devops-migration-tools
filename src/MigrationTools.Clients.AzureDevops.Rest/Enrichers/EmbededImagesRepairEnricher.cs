@@ -16,6 +16,11 @@ namespace MigrationTools.Clients.AzureDevops.Rest.Enrichers
             throw new NotImplementedException();
         }
 
+        public override void Configure(IProcessorEnricherOptions options)
+        {
+            throw new NotImplementedException();
+        }
+
         public override int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
         {
             throw new NotImplementedException();

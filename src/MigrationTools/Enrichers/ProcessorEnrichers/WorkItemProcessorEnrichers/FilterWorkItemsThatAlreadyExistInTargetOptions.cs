@@ -1,10 +1,13 @@
-﻿using MigrationTools.Options;
+﻿using System;
+using MigrationTools.Options;
 
 namespace MigrationTools.Enrichers
 {
     internal class FilterWorkItemsThatAlreadyExistInTargetOptions : ProcessorEnricherOptions
     {
         public QueryOptions Query { get; set; }
+
+        public override Type ToConfigure => typeof(FilterWorkItemsThatAlreadyExistInTarget);
 
         public override void SetDefaults()
         {

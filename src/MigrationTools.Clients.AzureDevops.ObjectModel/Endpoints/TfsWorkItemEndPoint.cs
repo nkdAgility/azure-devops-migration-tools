@@ -1,10 +1,12 @@
-﻿using MigrationTools.DataContracts;
+﻿using System;
+using Microsoft.Extensions.Logging;
+using MigrationTools.DataContracts;
 
 namespace MigrationTools.Endpoints
 {
     public class TfsWorkItemEndPoint : WorkItemEndpoint
     {
-        public TfsWorkItemEndPoint(TfsWorkItemEndPointOptions endpointOptions) : base(endpointOptions)
+        public TfsWorkItemEndPoint(IServiceProvider services, ITelemetryLogger telemetry, ILogger<WorkItemEndpoint> logger) : base(services, telemetry, logger)
         {
         }
 

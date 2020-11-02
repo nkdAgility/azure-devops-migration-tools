@@ -38,6 +38,12 @@ namespace MigrationTools.Enrichers
         {
         }
 
+        [Obsolete("v2 Archtecture: use Configure(bool save = true, bool filter = true) instead", true)]
+        public override void Configure(IProcessorEnricherOptions options)
+        {
+            throw new NotImplementedException();
+        }
+
         public override int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
         {
             throw new NotImplementedException();

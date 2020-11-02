@@ -1,11 +1,21 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools.DataContracts;
+using MigrationTools.Tests;
 
 namespace MigrationTools.Endpoints.Tests
 {
     [TestClass()]
     public class InMemoryWorkItemEndpointTests
     {
+        public ServiceProvider Services { get; private set; }
+
+        [TestInitialize]
+        public void Setup()
+        {
+            Services = ServiceProviderHelper.GetWorkItemMigrationProcessor();
+        }
+
         [TestMethod]
         public void ConfiguredTest()
         {
@@ -17,7 +27,8 @@ namespace MigrationTools.Endpoints.Tests
         public void EmptyTest()
         {
             var targetOptions = new InMemoryWorkItemEndpointOptions() { Direction = EndpointDirection.Source };
-            InMemoryWorkItemEndpoint e = new InMemoryWorkItemEndpoint(targetOptions);
+            InMemoryWorkItemEndpoint e = Services.GetRequiredService<InMemoryWorkItemEndpoint>();
+            e.Configure(targetOptions);
             Assert.AreEqual(0, e.Count);
         }
 
@@ -66,7 +77,7 @@ namespace MigrationTools.Endpoints.Tests
             Assert.AreEqual(20, e2.Count);
         }
 
-        private static InMemoryWorkItemEndpoint CreateAndConfigureInMemoryWorkItemEndpoint(EndpointDirection direction, string queryString)
+        private InMemoryWorkItemEndpoint CreateAndConfigureInMemoryWorkItemEndpoint(EndpointDirection direction, string queryString)
         {
             InMemoryWorkItemEndpoint e = CreateInMemoryWorkItemEndpoint(EndpointDirection.Source);
             InMemoryWorkItemQuery query = new InMemoryWorkItemQuery();
@@ -75,10 +86,11 @@ namespace MigrationTools.Endpoints.Tests
             return e;
         }
 
-        private static InMemoryWorkItemEndpoint CreateInMemoryWorkItemEndpoint(EndpointDirection direction)
+        private InMemoryWorkItemEndpoint CreateInMemoryWorkItemEndpoint(EndpointDirection direction)
         {
             var options = new InMemoryWorkItemEndpointOptions() { Direction = direction };
-            InMemoryWorkItemEndpoint e = new InMemoryWorkItemEndpoint(options);
+            InMemoryWorkItemEndpoint e = Services.GetRequiredService<InMemoryWorkItemEndpoint>();
+            e.Configure(options);
             return e;
         }
     }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
 
@@ -8,13 +9,16 @@ namespace MigrationTools.Endpoints
 {
     public abstract class WorkItemEndpoint : IWorkItemSourceEndPoint, IWorkItemTargetEndPoint
     {
+        private IEndpointOptions _EndpointOptions;
         protected List<WorkItemData2> _innerList = new List<WorkItemData2>();
         protected IWorkItemQuery _WorkItemStoreQuery;
         protected List<IWorkItemProcessorEnricher> _innerEnrichers = new List<IWorkItemProcessorEnricher>();
 
-        public WorkItemEndpoint(EndpointOptions endpointOptions)
+        public WorkItemEndpoint(IServiceProvider services, ITelemetryLogger telemetry, ILogger<WorkItemEndpoint> logger)
         {
-            EndpointOptions = endpointOptions;
+            Services = services;
+            Telemetry = telemetry;
+            Log = logger;
         }
 
         public int Count { get { return _innerList.Count; } }
@@ -25,7 +29,11 @@ namespace MigrationTools.Endpoints
 
         public IEnumerable<IWorkItemProcessorTargetEnricher> TargetEnrichers => (from e in _innerEnrichers where e is IWorkItemProcessorTargetEnricher select (IWorkItemProcessorTargetEnricher)e);
 
-        public IEndpointOptions EndpointOptions { get; }
+        public IEndpointOptions EndpointOptions => _EndpointOptions;
+
+        protected IServiceProvider Services { get; }
+        protected ITelemetryLogger Telemetry { get; }
+        protected ILogger<WorkItemEndpoint> Log { get; }
 
         public virtual void Configure(IWorkItemQuery query, List<IWorkItemProcessorEnricher> enrichers)
         {
@@ -36,6 +44,11 @@ namespace MigrationTools.Endpoints
             }
 
             RefreshStore();
+        }
+
+        public void Configure(IEndpointOptions options)
+        {
+            _EndpointOptions = options;
         }
 
         public virtual void Filter(IEnumerable<WorkItemData2> workItems)

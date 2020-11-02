@@ -21,6 +21,12 @@ namespace MigrationTools.Enrichers
             throw new NotImplementedException();
         }
 
+        [Obsolete("v2 Archtecture: use Configure(bool save = true, bool filter = true) instead", true)]
+        public override void Configure(IProcessorEnricherOptions options)
+        {
+            throw new NotImplementedException();
+        }
+
         public override int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
         {
             FixEmbededImages(targetWorkItem, Engine.Source.Config.AsTeamProjectConfig().Collection.ToString(), Engine.Target.Config.AsTeamProjectConfig().Collection.ToString(), Engine.Source.Config.AsTeamProjectConfig().PersonalAccessToken);

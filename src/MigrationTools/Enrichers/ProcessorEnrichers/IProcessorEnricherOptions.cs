@@ -1,6 +1,6 @@
 ﻿namespace MigrationTools.Enrichers
 {
-    internal interface IProcessorEnricherOptions : IEnricherOptions
+    public interface IProcessorEnricherOptions : IEnricherOptions
     {
     }
 }
