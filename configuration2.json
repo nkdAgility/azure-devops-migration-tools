@@ -140,6 +140,7 @@
         {
           "ObjectType": "FileSystemWorkItemEndpointOptions",
           "Direction": "Source",
+          "FileStore": ".\\Store\\Source\\",
           "Query": {
             "WhereBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
             "OrderBit": "[System.ChangedDate] desc"

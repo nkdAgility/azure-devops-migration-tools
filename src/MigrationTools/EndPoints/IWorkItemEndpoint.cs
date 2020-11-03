@@ -11,6 +11,8 @@ namespace MigrationTools.Endpoints
         void Filter(IEnumerable<WorkItemData2> targetWorkItems);
 
         IEnumerable<WorkItemData2> GetWorkItems();
+
+        IEnumerable<WorkItemData2> GetWorkItems(IWorkItemQuery query);
     }
 
     public interface IWorkItemTargetEndPoint : IWorkItemEndPoint

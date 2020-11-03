@@ -82,7 +82,7 @@ namespace MigrationTools.Endpoints.Tests
             InMemoryWorkItemEndpoint e = CreateInMemoryWorkItemEndpoint(EndpointDirection.Source);
             InMemoryWorkItemQuery query = new InMemoryWorkItemQuery();
             query.Configure(null, queryString, null);
-            e.Configure(query, null);
+            //e.Configure(query, null);
             return e;
         }
 

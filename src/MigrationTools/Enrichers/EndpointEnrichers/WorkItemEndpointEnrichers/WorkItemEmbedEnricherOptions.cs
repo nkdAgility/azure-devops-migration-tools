@@ -2,7 +2,7 @@
 
 namespace MigrationTools.Enrichers
 {
-    internal class WorkItemEmbedEnricherOptions : EndpointEnricherOptions
+    public class WorkItemEmbedEnricherOptions : EndpointEnricherOptions
     {
         public string WorkingPath { get; set; }
 

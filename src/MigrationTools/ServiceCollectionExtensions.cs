@@ -15,6 +15,7 @@ namespace MigrationTools
             //Containers
             context.AddTransient<EndPointContainer>();
             context.AddTransient<ProcessorEnricherContainer>();
+            context.AddTransient<EndpointEnricherContainer>();
             // Processors
             context.AddTransient<WorkItemMigrationProcessor>();
             // Endpoint Enrichers

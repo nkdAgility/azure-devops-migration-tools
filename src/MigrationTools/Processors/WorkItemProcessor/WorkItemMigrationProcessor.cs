@@ -1,5 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Extensions.Logging;
+using MigrationTools.DataContracts;
+using MigrationTools.Endpoints;
+using MigrationTools.EndPoints;
+using MigrationTools.Enrichers;
 
 namespace MigrationTools.Processors
 {
@@ -7,12 +13,13 @@ namespace MigrationTools.Processors
     {
         private WorkItemMigrationProcessorOptions _config;
 
-        public WorkItemMigrationProcessor(IServiceProvider services, ITelemetryLogger telemetry, ILogger<WorkItemMigrationProcessor> log) : base(services, telemetry, log)
+        public WorkItemMigrationProcessor(ProcessorEnricherContainer processorEnricherContainer, EndPointContainer endpointContainer, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(processorEnricherContainer, endpointContainer, services, telemetry, logger)
         {
         }
 
         public override void Configure(IProcessorOptions config)
         {
+            Log.LogInformation("Processor::Configure");
             _config = (WorkItemMigrationProcessorOptions)config;
             Endpoints.ConfigureEndpoints(config.Endpoints);
             Enrichers.ConfigureEnrichers(config.Enrichers);
@@ -20,47 +27,42 @@ namespace MigrationTools.Processors
 
         protected override void InternalExecute()
         {
-            Log.LogInformation("Processor Starting");
+            Log.LogInformation("Processor::InternalExecute::Start");
             EnsureConfigured();
-            BeginProcessorExecution();
-            AfterProcessorLoadSource();
-            // var source = Endpoints.Where(e => e.Direction == ).SingleOrDefault()
-            // FOR EACH DATA ITEM
-
-            EndProcessorExecution();
-            Log.LogInformation("Finishing ");
+            Enrichers.ProcessorExecutionBegin(this);
+            var source = (WorkItemEndpoint)Endpoints.Source;
+            List<WorkItemData2> workItems = source.GetWorkItems().ToList();
+            Enrichers.ProcessorExecutionAfterSource(this, workItems);
+            foreach (WorkItemData2 item in workItems)
+            {
+                Enrichers.ProcessorExecutionBeforeProcessWorkItem(this, item);
+                ProcessWorkItem(item, _config.WorkItemCreateRetryLimit);
+                Enrichers.ProcessorExecutionAfterProcessWorkItem(this, item);
+            }
+            Enrichers.ProcessorExecutionEnd(this);
+            Log.LogInformation("Processor::InternalExecute::End");
         }
 
-        private void AfterProcessorLoadSource()
+        private void ProcessWorkItem(WorkItemData2 workItem, int workItemCreateRetryLimit)
         {
-            Log.LogInformation("Processor AfterProcessorLoadSource");
+            Log.LogInformation("Processor::ProcessWorkItem::TheWork");
+            /// Stuff to really do
         }
 
         private void EnsureConfigured()
         {
-            Log.LogInformation("Processor EnsureConfigured");
+            Log.LogInformation("Processor::EnsureConfigured");
             if (_config == null)
             {
                 throw new Exception("You must call Configure() first");
             }
-        }
-
-        private void BeginProcessorExecution()
-        {
-            Log.LogInformation("Processor BeginProcessorExecution");
-
-            foreach (var item in Enrichers)
+            if (!(Endpoints.Source is WorkItemEndpoint))
             {
-                item.BeginProcessorExecution();
+                throw new Exception("The Source endpoint configured must be of type WorkItemEndpoint");
             }
-        }
-
-        private void EndProcessorExecution()
-        {
-            Log.LogInformation("Processor EndProcessorExecution");
-            foreach (var item in Enrichers)
+            if (!(Endpoints.Target is WorkItemEndpoint))
             {
-                item.EndProcessorExecution();
+                throw new Exception("The Target endpoint configured must be of type WorkItemEndpoint");
             }
         }
     }

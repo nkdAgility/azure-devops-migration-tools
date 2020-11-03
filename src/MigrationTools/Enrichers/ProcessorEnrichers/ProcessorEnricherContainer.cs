@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using MigrationTools.DataContracts;
+using MigrationTools.Processors;
 
 namespace MigrationTools.Enrichers
 {
@@ -34,6 +36,41 @@ namespace MigrationTools.Enrichers
                     Log.LogInformation("Loading Processor Enricher: {ProcessorEnricherName} {ProcessorEnricherEnabled}", pe.GetType().Name, item.Enabled);
                 }
             }
+        }
+
+        internal void ProcessorExecutionAfterProcessWorkItem(IProcessor2 processor, WorkItemData2 workitem)
+        {
+            Log.LogInformation("ProcessorEnricherContainer::ProcessorExecutionBeforeProcessWorkItem");
+            foreach (var enricher in this)
+                enricher.ProcessorExecutionAfterProcessWorkItem(processor, workitem);
+        }
+
+        internal void ProcessorExecutionBeforeProcessWorkItem(IProcessor2 processor, WorkItemData2 workitem)
+        {
+            Log.LogInformation("ProcessorEnricherContainer::ProcessorExecutionBeforeProcessWorkItem");
+            foreach (var enricher in this)
+                enricher.ProcessorExecutionBeforeProcessWorkItem(processor, workitem);
+        }
+
+        internal void ProcessorExecutionAfterSource(IProcessor2 processor, List<WorkItemData2> workItems)
+        {
+            Log.LogInformation("ProcessorEnricherContainer::ProcessorExecutionAfterSource");
+            foreach (var enricher in this)
+                enricher.ProcessorExecutionAfterSource(processor, workItems);
+        }
+
+        public void ProcessorExecutionBegin(IProcessor2 processor)
+        {
+            Log.LogInformation("ProcessorEnricherContainer::ProcessorExecutionBegin");
+            foreach (var enricher in this)
+                enricher.ProcessorExecutionBegin(processor);
+        }
+
+        public void ProcessorExecutionEnd(IProcessor2 processor)
+        {
+            Log.LogInformation("ProcessorEnricherContainer::ProcessorExecutionEnd");
+            foreach (var enricher in this)
+                enricher.ProcessorExecutionEnd(processor);
         }
     }
 }

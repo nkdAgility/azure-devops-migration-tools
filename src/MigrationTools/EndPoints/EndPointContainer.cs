@@ -16,6 +16,9 @@ namespace MigrationTools.EndPoints
             Log = logger;
         }
 
+        public IEndpoint Source { get { return GetDirection(EndpointDirection.Source); } }
+        public IEndpoint Target { get { return GetDirection(EndpointDirection.Source); } }
+
         protected IServiceProvider Services { get; }
         protected ITelemetryLogger Telemetry { get; }
         protected ILogger<EndPointContainer> Log { get; }
@@ -43,6 +46,11 @@ namespace MigrationTools.EndPoints
                     ConfigureEndpoint(item);
                 }
             }
+        }
+
+        public IEndpoint GetDirection(EndpointDirection direction)
+        {
+            return this.Where(e => e.Direction == direction).SingleOrDefault();
         }
 
         protected void ValidateDirection(List<IEndpointOptions> endpoints, EndpointDirection direction, bool required)
