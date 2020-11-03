@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools.Configuration;
 using MigrationTools.DataContracts;
+using Newtonsoft.Json;
 using Serilog;
 
 namespace MigrationTools
@@ -37,16 +39,7 @@ namespace MigrationTools
                 Log.Debug("--------------------------------------------------------------------------------------------------------------------");
                 foreach (Field f in fails)
                 {
-                    Log.Debug("   Invalid Field: [Id:{CurrentRevisionWorkItemId}/{CurrentRevisionWorkItemRev}][Type:{CurrentRevisionWorkItemTypeName}][IsDirty:{IsDirty}][ReferenceName:{FieldReferenceName}][Value: {FieldValue}]",
-                       new Dictionary<string, object>() {
-                               {"CurrentRevisionWorkItemId", workItem.Id },
-                               {"CurrentRevisionWorkItemRev", workItem.Rev },
-                               {"CurrentRevisionWorkItemTypeName",  workItem.Type},
-                               {"IsDirty", f.IsDirty },
-                               {"FieldReferenceName", f.ReferenceName },
-                               {"FieldValue", f.Value }
-                       });
-                    Log.Verbose("{   Field Object: {field}", f);
+                    Log.Debug("Invalid Field Object:\r\n{Field}", f.ToJson());
                 }
                 Log.Debug("--------------------------------------------------------------------------------------------------------------------");
                 Log.Debug("--------------------------------------------------------------------------------------------------------------------");
@@ -54,6 +47,36 @@ namespace MigrationTools
             workItem.Fields["System.ChangedBy"].Value = "Migration";
             workItem.Save();
             context.RefreshWorkItem();
+        }
+
+        public static string ToJson(this Field f)
+        {
+            dynamic expando = new ExpandoObject();
+            expando.WorkItemId = f.WorkItem.Id;
+            expando.CurrentRevisionWorkItemRev = f.WorkItem.Rev;
+            expando.CurrentRevisionWorkItemTypeName = f.WorkItem.Type.Name;
+            expando.Name = f.Name;
+            expando.ReferenceName = f.ReferenceName;
+            expando.Value = f.Value;
+            expando.OriginalValue = f.OriginalValue;
+            expando.ValueWithServerDefault = f.ValueWithServerDefault;
+
+            expando.Status = f.Status;
+            expando.IsRequired = f.IsRequired;
+            expando.IsEditable = f.IsEditable;
+            expando.IsDirty = f.IsDirty;
+            expando.IsComputed = f.IsComputed;
+            expando.IsChangedByUser = f.IsChangedByUser;
+            expando.IsChangedInRevision = f.IsChangedInRevision;
+            expando.HasPatternMatch = f.HasPatternMatch;
+
+            expando.IsLimitedToAllowedValues = f.IsLimitedToAllowedValues;
+            expando.HasAllowedValuesList = f.HasAllowedValuesList;
+            expando.AllowedValues = f.AllowedValues;
+            expando.IdentityFieldAllowedValues = f.IdentityFieldAllowedValues;
+            expando.ProhibitedValues = f.ProhibitedValues;
+
+            return JsonConvert.SerializeObject(expando, Formatting.Indented);
         }
 
         public static void RefreshWorkItem(this WorkItemData context)
