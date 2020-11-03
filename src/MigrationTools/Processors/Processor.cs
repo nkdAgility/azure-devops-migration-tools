@@ -18,9 +18,15 @@ namespace MigrationTools.Processors
             Log = logger;
         }
 
+<<<<<<< Updated upstream
         public abstract List<IEndpoint> Endpoints { get; }
 
         public abstract List<IProcessorEnricher> Enrichers { get; }
+=======
+        public List<IEndpoint> Endpoints => throw new NotImplementedException();
+
+        public List<IProcessorEnricher> Enrichers => throw new NotImplementedException();
+>>>>>>> Stashed changes
 
         public string Name { get { return this.GetType().Name; } }
 
@@ -93,6 +99,22 @@ namespace MigrationTools.Processors
                 throw e;
             }
             return type;
+        }
+
+        protected void ValidateDirection(IProcessorOptions config, EndpointDirection direction, bool required)
+        {
+            if (config.Endpoints.Where(e => e.Direction == direction).SingleOrDefault() == null)
+            {
+                if (required)
+                {
+                    Log.LogCritical("ConfigureEndpoints: No {Direction} configured - It is requiored for this processor", direction.ToString());
+                    throw new InvalidOperationException();
+                }
+                else
+                {
+                    Log.LogWarning("ConfigureEndpoints: No {Direction} configured: This may lead to problems, but it was not indecated as required for this processor", direction.ToString());
+                }
+            }
         }
     }
 }

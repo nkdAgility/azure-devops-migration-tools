@@ -23,20 +23,12 @@ namespace MigrationTools.Processors
         {
             _config = (WorkItemMigrationProcessorOptions)config;
 
-            if (config.Endpoints is null)
-            {
-                Log.LogWarning("No Endpoints have been Configured");
-            }
-            else
-            {
-                foreach (IEndpointOptions item in config?.Endpoints)
-                {
-                    var ep = (IWorkItemEndPoint)Services.GetRequiredService(item.ToConfigure);
-                    ep.Configure(item);
-                    Endpoints.Add(ep);
-                }
-            }
+            ConfigureEndpoints(config);
+            ConfigureEnrichers(config);
+        }
 
+        protected void ConfigureEnrichers(IProcessorOptions config)
+        {
             if (config.Enrichers is null)
             {
                 Log.LogWarning("No Enrichers have been Configured");
@@ -48,6 +40,25 @@ namespace MigrationTools.Processors
                     var ep = (WorkItemProcessorEnricher)Services.GetRequiredService(item.ToConfigure);
                     ep.Configure(item);
                     Enrichers.Add(ep);
+                }
+            }
+        }
+
+        protected void ConfigureEndpoints(IProcessorOptions config, bool sourceRequired = true, bool targetRequired = false)
+        {
+            if (config.Endpoints is null)
+            {
+                Log.LogWarning("No Endpoints have been Configured");
+            }
+            else
+            {
+                ValidateDirection(config, EndpointDirection.Target, targetRequired);
+                ValidateDirection(config, EndpointDirection.Source, targetRequired);
+                foreach (IEndpointOptions item in config?.Endpoints)
+                {
+                    var ep = (IWorkItemEndPoint)Services.GetRequiredService(item.ToConfigure);
+                    ep.Configure(item);
+                    Endpoints.Add(ep);
                 }
             }
         }
