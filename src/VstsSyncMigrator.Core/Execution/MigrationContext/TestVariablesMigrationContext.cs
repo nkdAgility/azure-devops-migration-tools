@@ -10,15 +10,15 @@ using VstsSyncMigrator.Engine.ComponentContext;
 
 namespace VstsSyncMigrator.Engine
 {
-    public class TestVeriablesMigrationContext : MigrationProcessorBase
+    public class TestVariablesMigrationContext : MigrationProcessorBase
     {
-        public TestVeriablesMigrationContext(IMigrationEngine engine, IServiceProvider services, ITelemetryLogger telemetry, ILogger<TestVeriablesMigrationContext> logger) : base(engine, services, telemetry, logger)
+        public TestVariablesMigrationContext(IMigrationEngine engine, IServiceProvider services, ITelemetryLogger telemetry, ILogger<TestVariablesMigrationContext> logger) : base(engine, services, telemetry, logger)
         {
         }
 
         public override string Name
         {
-            get { return "TestVeriablesMigrationContext"; }
+            get { return "TestVariablesMigrationContext"; }
         }
 
         public override void Configure(IProcessorConfig config)

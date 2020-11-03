@@ -33,6 +33,10 @@ namespace MigrationTools.Engine.Containers
             {
                 var enabledProcessors = Config.Processors.Where(x => x.Enabled).ToList();
                 Log.Information("ProcessorContainer: Of {ProcessorCount} configured Processors only {EnabledProcessorCount} are enabled", Config.Processors.Count, enabledProcessors.Count);
+                var allTypes = AppDomain.CurrentDomain.GetAssemblies()
+                    .Where(a => !a.IsDynamic)
+                    .SelectMany(a => a.GetTypes()).ToList();
+
                 foreach (IProcessorConfig processorConfig in enabledProcessors)
                 {
                     if (processorConfig.IsProcessorCompatible(enabledProcessors))
@@ -40,9 +44,7 @@ namespace MigrationTools.Engine.Containers
                         Log.Information("ProcessorContainer: Adding Processor {ProcessorName}", processorConfig.Processor);
                         string typePattern = $"VstsSyncMigrator.Engine.{processorConfig.Processor}";
 
-                        Type type = AppDomain.CurrentDomain.GetAssemblies()
-                              .Where(a => !a.IsDynamic)
-                              .SelectMany(a => a.GetTypes())
+                        Type type = allTypes
                               .FirstOrDefault(t => t.Name.Equals(processorConfig.Processor) || t.FullName.Equals(typePattern));
 
                         if (type == null)

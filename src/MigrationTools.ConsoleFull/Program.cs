@@ -35,7 +35,7 @@ namespace VstsSyncMigrator.ConsoleApp
                     services.AddSingleton<TeamMigrationContext>();
                     services.AddSingleton<TestConfigurationsMigrationContext>();
                     services.AddSingleton<TestPlandsAndSuitesMigrationContext>();
-                    services.AddSingleton<TestVeriablesMigrationContext>();
+                    services.AddSingleton<TestVariablesMigrationContext>();
                     services.AddSingleton<WorkItemPostProcessingContext>();
                     services.AddSingleton<WorkItemQueryMigrationContext>();
                     services.AddSingleton<CreateTeamFolders>();
