@@ -111,15 +111,19 @@ namespace MigrationTools.Clients
             TfsTeamProjectCollection y;
             try
             {
-                if (credentials == null)
-                {
-                    y = new TfsTeamProjectCollection(TfsConfig.Collection);
-                }
-                else
+                if (credentials != null)
                 {
                     y = new TfsTeamProjectCollection(TfsConfig.Collection, new VssCredentials(new Microsoft.VisualStudio.Services.Common.WindowsCredential(credentials)));
                 }
-                Log.Debug("MigrationClient: Connectng to {CollectionUrl} ", TfsConfig.Collection.ToString());
+                else if (!string.IsNullOrEmpty(TfsConfig.PersonalAccessToken))
+                {
+                    y = new TfsTeamProjectCollection(TfsConfig.Collection, new VssBasicCredential(string.Empty, TfsConfig.PersonalAccessToken));
+                }
+                else
+                {
+                    y = new TfsTeamProjectCollection(TfsConfig.Collection);
+                }
+                Log.Debug("MigrationClient: Connecting to {CollectionUrl} ", TfsConfig.Collection.ToString());
                 Log.Debug("MigrationClient: validating security for {@AuthorizedIdentity} ", y.AuthorizedIdentity);
                 y.EnsureAuthenticated();
                 timer.Stop();
