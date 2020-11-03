@@ -6,6 +6,13 @@ namespace MigrationTools.Enrichers
 {
     public class FilterWorkItemsThatAlreadyExistInTarget : WorkItemProcessorEnricher
     {
+        private FilterWorkItemsThatAlreadyExistInTargetOptions _Options;
+
+        public FilterWorkItemsThatAlreadyExistInTargetOptions Options
+        {
+            get { return _Options; }
+        }
+
         public FilterWorkItemsThatAlreadyExistInTarget(IMigrationEngine engine, ILogger<WorkItemProcessorEnricher> logger) : base(engine, logger)
         {
         }
@@ -18,7 +25,7 @@ namespace MigrationTools.Enrichers
 
         public override void Configure(IProcessorEnricherOptions options)
         {
-            throw new System.NotImplementedException();
+            _Options = (FilterWorkItemsThatAlreadyExistInTargetOptions)options;
         }
 
         [Obsolete("Old v1 arch: this is a v2 class", true)]

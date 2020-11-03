@@ -6,6 +6,13 @@ namespace MigrationTools.Enrichers
 {
     public class AppendMigrationToolSignatureFooter : WorkItemProcessorEnricher
     {
+        private AppendMigrationToolSignatureFooterOptions _Options;
+
+        public AppendMigrationToolSignatureFooterOptions Options
+        {
+            get { return _Options; }
+        }
+
         public AppendMigrationToolSignatureFooter(IMigrationEngine engine, ILogger<WorkItemProcessorEnricher> logger) : base(engine, logger)
         {
         }
@@ -18,7 +25,7 @@ namespace MigrationTools.Enrichers
 
         public override void Configure(IProcessorEnricherOptions options)
         {
-            throw new System.NotImplementedException();
+            _Options = (AppendMigrationToolSignatureFooterOptions)options;
         }
 
         [Obsolete("Old v1 arch: this is a v2 class", true)]

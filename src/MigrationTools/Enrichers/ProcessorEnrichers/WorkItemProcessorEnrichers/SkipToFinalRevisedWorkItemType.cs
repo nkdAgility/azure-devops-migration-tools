@@ -6,6 +6,13 @@ namespace MigrationTools.Enrichers
 {
     public class SkipToFinalRevisedWorkItemType : WorkItemProcessorEnricher
     {
+        private SkipToFinalRevisedWorkItemTypeOptions _Options;
+
+        public SkipToFinalRevisedWorkItemTypeOptions Options
+        {
+            get { return _Options; }
+        }
+
         public SkipToFinalRevisedWorkItemType(IMigrationEngine engine, ILogger<WorkItemProcessorEnricher> logger) : base(engine, logger)
         {
         }
@@ -18,7 +25,7 @@ namespace MigrationTools.Enrichers
 
         public override void Configure(IProcessorEnricherOptions options)
         {
-            throw new System.NotImplementedException();
+            _Options = (SkipToFinalRevisedWorkItemTypeOptions)options;
         }
 
         [Obsolete("Old v1 arch: this is a v2 class", true)]

@@ -6,6 +6,13 @@ namespace MigrationTools.Enrichers
 {
     public class PauseAfterEachItem : WorkItemProcessorEnricher
     {
+        private PauseAfterEachItemOptions _Options;
+
+        public PauseAfterEachItemOptions Options
+        {
+            get { return _Options; }
+        }
+
         public PauseAfterEachItem(IMigrationEngine engine, ILogger<WorkItemProcessorEnricher> logger) : base(engine, logger)
         {
         }
@@ -18,7 +25,7 @@ namespace MigrationTools.Enrichers
 
         public override void Configure(IProcessorEnricherOptions options)
         {
-            throw new System.NotImplementedException();
+            _Options = (PauseAfterEachItemOptions)options;
         }
 
         [Obsolete("Old v1 arch: this is a v2 class", true)]
