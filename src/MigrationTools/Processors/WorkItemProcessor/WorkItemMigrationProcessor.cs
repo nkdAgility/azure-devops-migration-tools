@@ -1,77 +1,67 @@
 ﻿using System;
-using System.Collections.Generic;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using MigrationTools.Endpoints;
-using MigrationTools.Enrichers;
 
 namespace MigrationTools.Processors
 {
     public class WorkItemMigrationProcessor : Processor
     {
         private WorkItemMigrationProcessorOptions _config;
-        public override List<IEndpoint> Endpoints { get; }
-        public override List<IProcessorEnricher> Enrichers { get; }
 
         public WorkItemMigrationProcessor(IServiceProvider services, ITelemetryLogger telemetry, ILogger<WorkItemMigrationProcessor> log) : base(services, telemetry, log)
         {
-            Endpoints = new List<IEndpoint>();
-            Enrichers = new List<IProcessorEnricher>();
         }
 
         public override void Configure(IProcessorOptions config)
         {
             _config = (WorkItemMigrationProcessorOptions)config;
-
-            ConfigureEndpoints(config);
-            ConfigureEnrichers(config);
-        }
-
-        protected void ConfigureEnrichers(IProcessorOptions config)
-        {
-            if (config.Enrichers is null)
-            {
-                Log.LogWarning("No Enrichers have been Configured");
-            }
-            else
-            {
-                foreach (IProcessorEnricherOptions item in config?.Enrichers)
-                {
-                    var ep = (WorkItemProcessorEnricher)Services.GetRequiredService(item.ToConfigure);
-                    ep.Configure(item);
-                    Enrichers.Add(ep);
-                }
-            }
-        }
-
-        protected void ConfigureEndpoints(IProcessorOptions config, bool sourceRequired = true, bool targetRequired = false)
-        {
-            if (config.Endpoints is null)
-            {
-                Log.LogWarning("No Endpoints have been Configured");
-            }
-            else
-            {
-                ValidateDirection(config, EndpointDirection.Target, targetRequired);
-                ValidateDirection(config, EndpointDirection.Source, targetRequired);
-                foreach (IEndpointOptions item in config?.Endpoints)
-                {
-                    var ep = (IWorkItemEndPoint)Services.GetRequiredService(item.ToConfigure);
-                    ep.Configure(item);
-                    Endpoints.Add(ep);
-                }
-            }
+            Endpoints.ConfigureEndpoints(config.Endpoints);
+            Enrichers.ConfigureEnrichers(config.Enrichers);
         }
 
         protected override void InternalExecute()
         {
-            Log.LogInformation("Starting ");
+            Log.LogInformation("Processor Starting");
+            EnsureConfigured();
+            BeginProcessorExecution();
+            AfterProcessorLoadSource();
+            // var source = Endpoints.Where(e => e.Direction == ).SingleOrDefault()
+            // FOR EACH DATA ITEM
+
+            EndProcessorExecution();
+            Log.LogInformation("Finishing ");
+        }
+
+        private void AfterProcessorLoadSource()
+        {
+            Log.LogInformation("Processor AfterProcessorLoadSource");
+        }
+
+        private void EnsureConfigured()
+        {
+            Log.LogInformation("Processor EnsureConfigured");
             if (_config == null)
             {
                 throw new Exception("You must call Configure() first");
             }
+        }
 
-            Log.LogInformation("Finishing ");
+        private void BeginProcessorExecution()
+        {
+            Log.LogInformation("Processor BeginProcessorExecution");
+
+            foreach (var item in Enrichers)
+            {
+                item.BeginProcessorExecution();
+            }
+        }
+
+        private void EndProcessorExecution()
+        {
+            Log.LogInformation("Processor EndProcessorExecution");
+            foreach (var item in Enrichers)
+            {
+                item.EndProcessorExecution();
+            }
         }
     }
 }

@@ -4,29 +4,30 @@ using System.Diagnostics;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using MigrationTools.Configuration;
-using MigrationTools.Endpoints;
+using MigrationTools.EndPoints;
 using MigrationTools.Enrichers;
 
 namespace MigrationTools.Processors
 {
     public abstract class Processor : IProcessor2
     {
-        public Processor(IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger)
+        public Processor(
+            ProcessorEnricherContainer processorEnricherContainer,
+            EndPointContainer endpointContainer,
+            IServiceProvider services,
+            ITelemetryLogger telemetry,
+            ILogger<Processor> logger)
         {
             Services = services;
             Telemetry = telemetry;
             Log = logger;
+            Endpoints = endpointContainer;
+            Enrichers = processorEnricherContainer;
         }
 
-<<<<<<< Updated upstream
-        public abstract List<IEndpoint> Endpoints { get; }
+        public EndPointContainer Endpoints { get; }
 
-        public abstract List<IProcessorEnricher> Enrichers { get; }
-=======
-        public List<IEndpoint> Endpoints => throw new NotImplementedException();
-
-        public List<IProcessorEnricher> Enrichers => throw new NotImplementedException();
->>>>>>> Stashed changes
+        public ProcessorEnricherContainer Enrichers { get; }
 
         public string Name { get { return this.GetType().Name; } }
 
@@ -99,22 +100,6 @@ namespace MigrationTools.Processors
                 throw e;
             }
             return type;
-        }
-
-        protected void ValidateDirection(IProcessorOptions config, EndpointDirection direction, bool required)
-        {
-            if (config.Endpoints.Where(e => e.Direction == direction).SingleOrDefault() == null)
-            {
-                if (required)
-                {
-                    Log.LogCritical("ConfigureEndpoints: No {Direction} configured - It is requiored for this processor", direction.ToString());
-                    throw new InvalidOperationException();
-                }
-                else
-                {
-                    Log.LogWarning("ConfigureEndpoints: No {Direction} configured: This may lead to problems, but it was not indecated as required for this processor", direction.ToString());
-                }
-            }
         }
     }
 }

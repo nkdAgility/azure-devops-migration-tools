@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 using MigrationTools.Configuration;
+using MigrationTools.EndPoints;
 using MigrationTools.Engine.Containers;
 using MigrationTools.Enrichers;
 using MigrationTools.Processors;
@@ -11,6 +12,9 @@ namespace MigrationTools
     {
         public static void AddMigrationToolServices(this IServiceCollection context)
         {
+            //Containers
+            context.AddTransient<EndPointContainer>();
+            context.AddTransient<ProcessorEnricherContainer>();
             // Processors
             context.AddTransient<WorkItemMigrationProcessor>();
             // Endpoint Enrichers
