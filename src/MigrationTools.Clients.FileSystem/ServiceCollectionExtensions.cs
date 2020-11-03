@@ -1,12 +1,11 @@
-﻿using System;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using MigrationTools.Endpoints;
 
 namespace MigrationTools
 {
-    public static class ServiceCollectionExtensions
+    public static partial class ServiceCollectionExtensions
     {
-        public static void AddMigrationToolServicesForFileSystem(this IServiceCollection context)
+        public static void AddMigrationToolServicesForClientFileSystem(this IServiceCollection context)
         {
             context.AddTransient<FileSystemWorkItemEndpoint>();
         }

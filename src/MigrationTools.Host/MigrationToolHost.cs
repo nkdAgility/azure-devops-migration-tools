@@ -70,7 +70,7 @@ namespace MigrationTools.Host
                  services.AddTransient<IDetectVersionService, DetectVersionService>();
 
                  /// Add Old v1Bits
-                 services.AddMigrationToolLegacyServices();
+                 services.AddMigrationToolServicesLegacy();
                  // New v2Bits
                  services.AddMigrationToolServices();
 

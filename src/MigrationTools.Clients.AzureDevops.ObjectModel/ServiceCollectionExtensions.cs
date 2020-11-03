@@ -1,18 +1,21 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using MigrationTools.Clients;
 using MigrationTools.Endpoints;
+using MigrationTools.Enrichers;
+using MigrationTools.FieldMaps.AzureDevops.ObjectModel;
 
 namespace MigrationTools
 {
-    public static class ServiceCollectionExtensions
+    public static partial class ServiceCollectionExtensions
     {
-        public static void AddMigrationToolServicesForAzureDevOpsObjectModel(this IServiceCollection context)
+        public static void AddMigrationToolServicesForClientAzureDevOpsObjectModel(this IServiceCollection context)
         {
             context.AddTransient<TfsWorkItemEndPoint>();
         }
 
         [Obsolete("This is the v1 Archtiecture, we are movign to V2", false)]
-        public static void AddMigrationToolLegacyServicesForAzureDevOpsObjectModel(this IServiceCollection context)
+        public static void AddMigrationToolServicesForClientLegacyAzureDevOpsObjectModel(this IServiceCollection context)
         {
             // Field Mapps
             context.AddTransient<FieldBlankMap>();
@@ -28,16 +31,16 @@ namespace MigrationTools
             context.AddTransient<RegexFieldMap>();
             context.AddTransient<TreeToTagFieldMap>();
             // Enrichers
-            services.AddSingleton<TfsWorkItemLinkEnricher>();
-            services.AddSingleton<TfsEmbededImagesEnricher>();
-            services.AddSingleton<TfsGitRepositoryEnricher>();
-            services.AddSingleton<TfsNodeStructureEnricher>();
+            context.AddSingleton<TfsWorkItemLinkEnricher>();
+            context.AddSingleton<TfsEmbededImagesEnricher>();
+            context.AddSingleton<TfsGitRepositoryEnricher>();
+            context.AddSingleton<TfsNodeStructureEnricher>();
             // Core
-            services.AddTransient<IMigrationClient, TfsMigrationClient>();
-            services.AddTransient<IWorkItemMigrationClient, TfsWorkItemMigrationClient>();
-            services.AddTransient<ITestPlanMigrationClient, TfsTestPlanMigrationClient>();
-            services.AddTransient<IWorkItemQueryBuilder, WorkItemQueryBuilder>();
-            services.AddTransient<IWorkItemQuery, TfsWorkItemQuery>();
+            context.AddTransient<IMigrationClient, TfsMigrationClient>();
+            context.AddTransient<IWorkItemMigrationClient, TfsWorkItemMigrationClient>();
+            context.AddTransient<ITestPlanMigrationClient, TfsTestPlanMigrationClient>();
+            context.AddTransient<IWorkItemQueryBuilder, WorkItemQueryBuilder>();
+            context.AddTransient<IWorkItemQuery, TfsWorkItemQuery>();
         }
     }
 }

@@ -7,41 +7,29 @@ using MigrationTools.Processors;
 
 namespace MigrationTools
 {
-    public static class ServiceCollectionExtensions
+    public static partial class ServiceCollectionExtensions
     {
         public static void AddMigrationToolServices(this IServiceCollection context)
         {
-            AddMigrationToolEndpointEnrichers(context);
-            AddMigrationToolProcessorEnrichers(context);
-            AddMigrationToolProcessors(context);
-        }
-
-        public static void AddMigrationToolProcessors(this IServiceCollection context)
-        {
+            // Processors
             context.AddTransient<WorkItemMigrationProcessor>();
-        }
-
-        public static void AddMigrationToolEndpointEnrichers(this IServiceCollection context)
-        {
+            // Endpoint Enrichers
             context.AddTransient<AppendMigrationToolSignatureFooter>();
             context.AddTransient<FilterWorkItemsThatAlreadyExistInTarget>();
             context.AddTransient<SkipToFinalRevisedWorkItemType>();
-            //Following are Abstract
+            // WorkItem Endpoint Enrichers
             context.AddTransient<WorkItemAttachmentEnricher>();
             context.AddTransient<WorkItemCreatedEnricher>();
             context.AddTransient<WorkItemEmbedEnricher>();
             context.AddTransient<WorkItemFieldTableEnricher>();
             context.AddTransient<WorkItemLinkEnricher>();
-        }
-
-        public static void AddMigrationToolProcessorEnrichers(this IServiceCollection context)
-        {
+            // processor Enrichers
             context.AddTransient<WorkItemAttachmentEnricher>();
             context.AddTransient<PauseAfterEachItem>();
         }
 
         [Obsolete("This is the v1 Archtiecture, we are movign to V2", false)]
-        public static void AddMigrationToolLegacyServices(this IServiceCollection context)
+        public static void AddMigrationToolServicesLegacy(this IServiceCollection context)
         {
             // Services
             context.AddSingleton<ITelemetryLogger, TelemetryClientAdapter>();
