@@ -161,6 +161,7 @@
         {
           "ObjectType": "TfsWorkItemEndPointOptions",
           "Direction": "Target",
+          "AccessToken": "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
           "Query": {
             "WhereBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
             "OrderBit": "[System.ChangedDate] desc"

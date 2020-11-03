@@ -109,6 +109,7 @@ namespace MigrationTools
             }
             return list;
         }
+
         public static List<WorkItemData> ToWorkItemDataList(this WorkItemCollection collection)
         {
             List<WorkItemData> list = new List<WorkItemData>();

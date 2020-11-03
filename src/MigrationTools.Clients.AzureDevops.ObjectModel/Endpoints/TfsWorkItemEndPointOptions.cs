@@ -9,6 +9,8 @@ namespace MigrationTools.Endpoints
 
         private QueryOptions Query { get; set; }
 
+        private string AccessToken { get; set; }
+
         public override void SetDefaults()
         {
             Direction = EndpointDirection.NotSet;

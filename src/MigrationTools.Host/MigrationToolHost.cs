@@ -8,13 +8,9 @@ using Microsoft.ApplicationInsights.WorkerService;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MigrationTools.CommandLine;
-using MigrationTools.Configuration;
-using MigrationTools.Engine.Containers;
-using MigrationTools.Enrichers;
 
 using MigrationTools.Host.CustomDiagnostics;
 using MigrationTools.Host.Services;
-using MigrationTools.Processors;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
@@ -72,24 +68,11 @@ namespace MigrationTools.Host
                  // Services
                  services.AddTransient<IDetectOnlineService, DetectOnlineService>();
                  services.AddTransient<IDetectVersionService, DetectVersionService>();
-                 services.AddSingleton<ITelemetryLogger, TelemetryClientAdapter>();
 
-                 // Config
-                 services.AddSingleton<IEngineConfigurationBuilder, EngineConfigurationBuilder>();
-                 services.AddSingleton<EngineConfiguration, EngineConfigurationWrapper>();
-
+                 /// Add Old v1Bits
+                 services.AddMigrationToolLegacyServices();
                  // New v2Bits
-                 services.AddMigrationToolEndpointEnrichers();
-                 services.AddMigrationToolProcessorEnrichers();
-                 services.AddMigrationToolProcessors();
-
-                 //Engine
-                 services.AddSingleton<FieldMapContainer>();
-                 services.AddSingleton<ProcessorContainer>();
-                 services.AddSingleton<TypeDefinitionMapContainer>();
-                 services.AddSingleton<GitRepoMapContainer>();
-                 services.AddSingleton<ChangeSetMappingContainer>();
-                 services.AddSingleton<IMigrationEngine, MigrationEngine>();
+                 services.AddMigrationToolServices();
 
                  // Host Services
                  services.AddTransient<IStartupService, StartupService>();
