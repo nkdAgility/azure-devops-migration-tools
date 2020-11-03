@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using MigrationTools;
 using MigrationTools.Clients;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
@@ -17,22 +18,11 @@ namespace VstsSyncMigrator.ConsoleApp
                 .ConfigureServices((context, services) =>
                 {
                     // New v2 Architecture fpr testing
-                    services.AddTransient<MigrationTools.Endpoints.FileSystemWorkItemEndpoint>();
-                    services.AddTransient<MigrationTools.Endpoints.TfsWorkItemEndPoint>();
+                    services.AddMigrationToolServicesForFileSystem();
+                    services.AddMigrationToolServicesForAzureDevOpsObjectModel();
 
-                    // Field Mapps
-                    services.AddTransient<FieldBlankMap>();
-                    services.AddTransient<FieldLiteralMap>();
-                    services.AddTransient<FieldMergeMap>();
-                    services.AddTransient<FieldToFieldMap>();
-                    services.AddTransient<FieldtoFieldMultiMap>();
-                    services.AddTransient<FieldToTagFieldMap>();
-                    services.AddTransient<FieldValuetoTagMap>();
-                    services.AddTransient<FieldToFieldMap>();
-                    services.AddTransient<FieldValueMap>();
-                    services.AddTransient<MultiValueConditionalMap>();
-                    services.AddTransient<RegexFieldMap>();
-                    services.AddTransient<TreeToTagFieldMap>();
+                    // v1 Architecture
+                    services.AddMigrationToolLegacyServicesForAzureDevOpsObjectModel();
 
                     //Processors
                     services.AddSingleton<WorkItemMigrationContext>();
@@ -50,19 +40,6 @@ namespace VstsSyncMigrator.ConsoleApp
                     services.AddSingleton<WorkItemDelete>();
                     services.AddSingleton<WorkItemUpdate>();
                     services.AddSingleton<WorkItemUpdateAreasAsTagsContext>();
-
-                    // Enrichers
-                    services.AddSingleton<TfsWorkItemLinkEnricher>();
-                    services.AddSingleton<TfsEmbededImagesEnricher>();
-                    services.AddSingleton<TfsGitRepositoryEnricher>();
-                    services.AddSingleton<TfsNodeStructureEnricher>();
-
-                    // Core
-                    services.AddTransient<IMigrationClient, TfsMigrationClient>();
-                    services.AddTransient<IWorkItemMigrationClient, TfsWorkItemMigrationClient>();
-                    services.AddTransient<ITestPlanMigrationClient, TfsTestPlanMigrationClient>();
-                    services.AddTransient<IWorkItemQueryBuilder, WorkItemQueryBuilder>();
-                    services.AddTransient<IWorkItemQuery, TfsWorkItemQuery>();
                 });
 
             await hostBuilder.RunMigrationTools(args);
