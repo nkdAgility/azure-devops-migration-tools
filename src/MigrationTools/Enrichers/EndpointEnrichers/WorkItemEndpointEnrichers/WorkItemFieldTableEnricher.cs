@@ -1,6 +1,6 @@
 ﻿namespace MigrationTools.Enrichers
 {
-    public abstract class WorkItemFieldTableEnricher : WorkItemEndpointEnricher
+    public class WorkItemFieldTableEnricher : WorkItemEndpointEnricher
     {
     }
 }

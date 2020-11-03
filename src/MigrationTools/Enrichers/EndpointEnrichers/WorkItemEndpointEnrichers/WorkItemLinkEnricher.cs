@@ -1,6 +1,6 @@
 ﻿namespace MigrationTools.Enrichers
 {
-    public abstract class WorkItemLinkEnricher : WorkItemEndpointEnricher
+    public class WorkItemLinkEnricher : WorkItemEndpointEnricher
     {
     }
 }

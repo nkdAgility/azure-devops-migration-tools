@@ -9,6 +9,7 @@ namespace MigrationTools.Enrichers
             context.AddTransient<AppendMigrationToolSignatureFooter>();
             context.AddTransient<FilterWorkItemsThatAlreadyExistInTarget>();
             context.AddTransient<SkipToFinalRevisedWorkItemType>();
+            //Following are Abstract
             context.AddTransient<WorkItemAttachmentEnricher>();
             context.AddTransient<WorkItemCreatedEnricher>();
             context.AddTransient<WorkItemEmbedEnricher>();
