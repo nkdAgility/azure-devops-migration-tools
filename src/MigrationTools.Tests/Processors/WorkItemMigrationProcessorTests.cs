@@ -26,7 +26,6 @@ namespace MigrationTools.Processors.Tests
             };
             var x = Services.GetRequiredService<WorkItemMigrationProcessor>();
             x.Configure(y);
-
             Assert.IsNotNull(x);
         }
 
