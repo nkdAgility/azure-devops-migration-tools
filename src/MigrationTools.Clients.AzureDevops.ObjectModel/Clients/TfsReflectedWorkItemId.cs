@@ -37,6 +37,11 @@ namespace MigrationTools.Clients
                 _ProjectName = match.Groups["project"].Value;
                 _Connection = new Uri(match.Groups["org"].Value);
             }
+            else
+            {
+                Log.Error("TfsReflectedWorkItemId: Unable to match ReflectedWorkItemId({ReflectedWorkItemId}) as id! ", ReflectedWorkItemId);
+                throw new Exception("Unable to Parse ReflectedWorkItemId. Check Log...");
+            }
         }
 
         public override string ToString()
