@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 using MigrationTools.DataContracts;
+using Serilog;
 
 namespace MigrationTools.Clients
 {
