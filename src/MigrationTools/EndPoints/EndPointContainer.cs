@@ -7,9 +7,9 @@ using MigrationTools.Endpoints;
 
 namespace MigrationTools.EndPoints
 {
-    public class EndPointContainer : List<IEndpoint>
+    public class EndpointContainer : List<IEndpoint>
     {
-        public EndPointContainer(IServiceProvider services, ITelemetryLogger telemetry, ILogger<EndPointContainer> logger)
+        public EndpointContainer(IServiceProvider services, ITelemetryLogger telemetry, ILogger<EndpointContainer> logger)
         {
             Services = services;
             Telemetry = telemetry;
@@ -21,17 +21,17 @@ namespace MigrationTools.EndPoints
 
         protected IServiceProvider Services { get; }
         protected ITelemetryLogger Telemetry { get; }
-        protected ILogger<EndPointContainer> Log { get; }
+        protected ILogger<EndpointContainer> Log { get; }
 
         public void ConfigureEndpoint(IEndpointOptions endpointOptions)
         {
             var ep = (IWorkItemEndPoint)Services.GetRequiredService(endpointOptions.ToConfigure);
             ep.Configure(endpointOptions);
             Add(ep);
-            Log.LogInformation("ConfigureEndpoint: {EndPointName} {Direction} : Enrichers{EnrichersCount}: {EnrichersList} ", ep.GetType().Name, endpointOptions.Direction, endpointOptions.Enrichers.Count, endpointOptions.Enrichers.Select(x => x.GetType().Name));
+            Log.LogInformation("ConfigureEndpoint: {EndPointName} {Direction} : Enrichers{EnrichersCount}: {EnrichersList} ", ep.GetType().Name, endpointOptions.Direction, endpointOptions.Enrichers?.Count, endpointOptions.Enrichers?.Select(x => x.GetType().Name));
         }
 
-        public void ConfigureEndpoints(List<IEndpointOptions> endpoints, bool sourceRequired = true, bool targetRequired = false)
+        public void ConfigureEndpoints(List<IEndpointOptions> endpoints, bool sourceRequired = true, bool targetRequired = true)
         {
             if (endpoints is null)
             {

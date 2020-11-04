@@ -11,16 +11,18 @@ namespace MigrationTools.Endpoints
     {
         private List<WorkItemData2> _innerList;
         private InMemoryWorkItemEndpointOptions _Options;
+        private List<IEndpointEnricher> _EndpointEnrichers;
 
         public InMemoryWorkItemEndpoint(EndpointEnricherContainer endpointEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<WorkItemEndpoint> logger) : base(endpointEnrichers, services, telemetry, logger)
         {
             _innerList = new List<WorkItemData2>();
+            _EndpointEnrichers = new List<IEndpointEnricher>();
         }
 
         public override int Count => _innerList.Count;
         public override EndpointDirection Direction => _Options.Direction;
-        public override IEnumerable<IWorkItemProcessorSourceEnricher> SourceEnrichers => throw new NotImplementedException();
-        public override IEnumerable<IWorkItemProcessorTargetEnricher> TargetEnrichers => throw new NotImplementedException();
+        public override IEnumerable<IWorkItemProcessorSourceEnricher> SourceEnrichers => _EndpointEnrichers.Where(e => e.GetType().IsAssignableFrom(typeof(IWorkItemProcessorSourceEnricher))).Select(e => (IWorkItemProcessorSourceEnricher)e);
+        public override IEnumerable<IWorkItemProcessorTargetEnricher> TargetEnrichers => _EndpointEnrichers.Where(e => e.GetType().IsAssignableFrom(typeof(IWorkItemProcessorTargetEnricher))).Select(e => (IWorkItemProcessorTargetEnricher)e);
 
         public override void Configure(IEndpointOptions options)
         {

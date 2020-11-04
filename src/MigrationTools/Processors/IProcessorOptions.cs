@@ -9,5 +9,7 @@ namespace MigrationTools.Processors
     {
         List<IEndpointOptions> Endpoints { get; set; }
         List<ProcessorEnricherOptions> Enrichers { get; set; }
+
+        IProcessorOptions GetDefault();
     }
 }

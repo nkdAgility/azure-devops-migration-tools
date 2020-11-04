@@ -13,7 +13,7 @@ namespace MigrationTools.Processors
     {
         public Processor(
             ProcessorEnricherContainer processorEnricherContainer,
-            EndPointContainer endpointContainer,
+            EndpointContainer endpointContainer,
             IServiceProvider services,
             ITelemetryLogger telemetry,
             ILogger<Processor> logger)
@@ -25,7 +25,7 @@ namespace MigrationTools.Processors
             Enrichers = processorEnricherContainer;
         }
 
-        public EndPointContainer Endpoints { get; }
+        public EndpointContainer Endpoints { get; }
 
         public ProcessorEnricherContainer Enrichers { get; }
 

@@ -13,7 +13,7 @@ namespace MigrationTools.Processors
     {
         private WorkItemMigrationProcessorOptions _config;
 
-        public WorkItemMigrationProcessor(ProcessorEnricherContainer processorEnricherContainer, EndPointContainer endpointContainer, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(processorEnricherContainer, endpointContainer, services, telemetry, logger)
+        public WorkItemMigrationProcessor(ProcessorEnricherContainer processorEnricherContainer, EndpointContainer endpointContainer, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(processorEnricherContainer, endpointContainer, services, telemetry, logger)
         {
         }
 

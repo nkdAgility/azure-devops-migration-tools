@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools.DataContracts;
 using MigrationTools.Tests;
@@ -19,7 +21,7 @@ namespace MigrationTools.Endpoints.Tests
         [TestMethod]
         public void ConfiguredTest()
         {
-            InMemoryWorkItemEndpoint e = CreateAndConfigureInMemoryWorkItemEndpoint(EndpointDirection.Source, "10");
+            InMemoryWorkItemEndpoint e = CreateAndConfigureInMemoryWorkItemEndpoint(EndpointDirection.Source, 10);
             Assert.AreEqual(10, e.Count);
         }
 
@@ -35,8 +37,8 @@ namespace MigrationTools.Endpoints.Tests
         [TestMethod]
         public void FilterAllTest()
         {
-            InMemoryWorkItemEndpoint e1 = CreateAndConfigureInMemoryWorkItemEndpoint(EndpointDirection.Source, "10");
-            InMemoryWorkItemEndpoint e2 = CreateAndConfigureInMemoryWorkItemEndpoint(EndpointDirection.Target, "10");
+            InMemoryWorkItemEndpoint e1 = CreateAndConfigureInMemoryWorkItemEndpoint(EndpointDirection.Source, 10);
+            InMemoryWorkItemEndpoint e2 = CreateAndConfigureInMemoryWorkItemEndpoint(EndpointDirection.Target, 10);
             e1.Filter(e2.GetWorkItems());
             Assert.AreEqual(0, e1.Count);
         }
@@ -44,9 +46,8 @@ namespace MigrationTools.Endpoints.Tests
         [TestMethod]
         public void FilterHalfTest()
         {
-            InMemoryWorkItemEndpoint e1 = CreateAndConfigureInMemoryWorkItemEndpoint(EndpointDirection.Source, "20");
-            InMemoryWorkItemEndpoint e2 = CreateAndConfigureInMemoryWorkItemEndpoint(EndpointDirection.Target, "10");
-
+            InMemoryWorkItemEndpoint e1 = CreateAndConfigureInMemoryWorkItemEndpoint(EndpointDirection.Source, 20);
+            InMemoryWorkItemEndpoint e2 = CreateAndConfigureInMemoryWorkItemEndpoint(EndpointDirection.Target, 10);
             e1.Filter(e2.GetWorkItems());
             Assert.AreEqual(10, e1.Count);
         }
@@ -54,8 +55,8 @@ namespace MigrationTools.Endpoints.Tests
         [TestMethod]
         public void PersistWorkItemExistsTest()
         {
-            InMemoryWorkItemEndpoint e1 = CreateAndConfigureInMemoryWorkItemEndpoint(EndpointDirection.Source, "20");
-            InMemoryWorkItemEndpoint e2 = CreateAndConfigureInMemoryWorkItemEndpoint(EndpointDirection.Target, "10");
+            InMemoryWorkItemEndpoint e1 = CreateAndConfigureInMemoryWorkItemEndpoint(EndpointDirection.Source, 20);
+            InMemoryWorkItemEndpoint e2 = CreateAndConfigureInMemoryWorkItemEndpoint(EndpointDirection.Target, 10);
             foreach (WorkItemData2 item in e1.GetWorkItems())
             {
                 e2.PersistWorkItem(item);
@@ -66,8 +67,8 @@ namespace MigrationTools.Endpoints.Tests
         [TestMethod]
         public void PersistWorkItemWithFilterTest()
         {
-            InMemoryWorkItemEndpoint e1 = CreateAndConfigureInMemoryWorkItemEndpoint(EndpointDirection.Source, "20");
-            InMemoryWorkItemEndpoint e2 = CreateAndConfigureInMemoryWorkItemEndpoint(EndpointDirection.Target, "10");
+            InMemoryWorkItemEndpoint e1 = CreateAndConfigureInMemoryWorkItemEndpoint(EndpointDirection.Source, 20);
+            InMemoryWorkItemEndpoint e2 = CreateAndConfigureInMemoryWorkItemEndpoint(EndpointDirection.Target, 10);
             e1.Filter(e2.GetWorkItems());
             Assert.AreEqual(10, e1.Count);
             foreach (WorkItemData2 item in e1.GetWorkItems())
@@ -77,12 +78,10 @@ namespace MigrationTools.Endpoints.Tests
             Assert.AreEqual(20, e2.Count);
         }
 
-        private InMemoryWorkItemEndpoint CreateAndConfigureInMemoryWorkItemEndpoint(EndpointDirection direction, string queryString)
+        private InMemoryWorkItemEndpoint CreateAndConfigureInMemoryWorkItemEndpoint(EndpointDirection direction, int workItemCount)
         {
-            InMemoryWorkItemEndpoint e = CreateInMemoryWorkItemEndpoint(EndpointDirection.Source);
-            InMemoryWorkItemQuery query = new InMemoryWorkItemQuery();
-            query.Configure(null, queryString, null);
-            //e.Configure(query, null);
+            InMemoryWorkItemEndpoint e = CreateInMemoryWorkItemEndpoint(direction);
+            AddWorkItems(e, workItemCount);
             return e;
         }
 
@@ -92,6 +91,31 @@ namespace MigrationTools.Endpoints.Tests
             InMemoryWorkItemEndpoint e = Services.GetRequiredService<InMemoryWorkItemEndpoint>();
             e.Configure(options);
             return e;
+        }
+
+        private void AddWorkItems(InMemoryWorkItemEndpoint e, int workItemCount)
+        {
+            var list = new List<WorkItemData2>();
+            for (int i = 0; i < workItemCount; i++)
+            {
+                e.PersistWorkItem(new WorkItemData2()
+                {
+                    Id = i.ToString(),
+                    Revisions = GetRevisions()
+                });
+            }
+
+            List<RevisionItem2> GetRevisions()
+            {
+                Random rand = new Random();
+                int revCount = rand.Next(0, 5);
+                List<RevisionItem2> list = new List<RevisionItem2>();
+                for (int i = 0; i < revCount; i++)
+                {
+                    list.Add(new RevisionItem2 { Index = i, Number = i, ChangedDate = DateTime.Now.AddHours(-i) });
+                }
+                return list;
+            }
         }
     }
 }

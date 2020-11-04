@@ -6,7 +6,7 @@ namespace MigrationTools.Processors
 {
     public interface IProcessor2 : IProcessor
     {
-        EndPointContainer Endpoints { get; }
+        EndpointContainer Endpoints { get; }
         ProcessorEnricherContainer Enrichers { get; }
     }
 }

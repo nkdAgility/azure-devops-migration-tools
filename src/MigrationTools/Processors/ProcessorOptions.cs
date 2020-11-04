@@ -19,6 +19,8 @@ namespace MigrationTools.Processors
         [JsonIgnoreAttribute]
         public abstract string Processor { get; }
 
+        public abstract IProcessorOptions GetDefault();
+
         public bool IsProcessorCompatible(IReadOnlyList<IProcessorConfig> otherProcessors)
         {
             return true;
