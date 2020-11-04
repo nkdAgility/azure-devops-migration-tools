@@ -9,6 +9,7 @@ namespace MigrationTools.Clients
         private Uri _Connection;
         private string _ProjectName;
         private string _WorkItemId;
+        private static readonly Regex ReflectedIdRegex = new Regex(@"^(?<org>[\S ]+)\/(?<project>[\S ]+)\/_workitems\/edit\/(?<id>\d+)", RegexOptions.Compiled);
 
         public TfsReflectedWorkItemId(WorkItemData workItem) : base(workItem.Id)
         {
@@ -28,8 +29,8 @@ namespace MigrationTools.Clients
             {
                 throw new ArgumentNullException(nameof(ReflectedWorkItemId));
             }
-            var re = new Regex(@"^(?<org>\S+)\/(?<project>\S+)\/_workitems\/edit\/(?<id>\d+)");
-            var match = re.Match(ReflectedWorkItemId);
+
+            var match = ReflectedIdRegex.Match(ReflectedWorkItemId);
             if (match.Success)
             {
                 _WorkItemId = match.Groups["id"].Value;
