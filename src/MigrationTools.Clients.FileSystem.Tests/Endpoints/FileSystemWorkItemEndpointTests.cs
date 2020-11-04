@@ -20,7 +20,7 @@ namespace MigrationTools.Endpoints.Tests
         public void ConfiguredTest()
         {
             SetupStore(EndpointDirection.Source, 10);
-            FileSystemWorkItemEndpoint e = CreateInMemoryWorkItemEndpoint(EndpointDirection.Source);
+            FileSystemWorkItemEndpoint e = CreateEndpoint(EndpointDirection.Source);
             Assert.AreEqual(10, e.Count);
         }
 
@@ -28,7 +28,7 @@ namespace MigrationTools.Endpoints.Tests
         public void EmptyTest()
         {
             SetupStore(EndpointDirection.Source, 0);
-            FileSystemWorkItemEndpoint e = CreateInMemoryWorkItemEndpoint(EndpointDirection.Source);
+            FileSystemWorkItemEndpoint e = CreateEndpoint(EndpointDirection.Source);
             Assert.AreEqual(0, e.Count);
         }
 
@@ -36,9 +36,9 @@ namespace MigrationTools.Endpoints.Tests
         public void FilterAllTest()
         {
             SetupStore(EndpointDirection.Source, 10);
-            FileSystemWorkItemEndpoint e1 = CreateInMemoryWorkItemEndpoint(EndpointDirection.Source);
+            FileSystemWorkItemEndpoint e1 = CreateEndpoint(EndpointDirection.Source);
             SetupStore(EndpointDirection.Target, 10);
-            FileSystemWorkItemEndpoint e2 = CreateInMemoryWorkItemEndpoint(EndpointDirection.Target);
+            FileSystemWorkItemEndpoint e2 = CreateEndpoint(EndpointDirection.Target);
             e1.Filter(e2.GetWorkItems());
             Assert.AreEqual(0, e1.Count);
         }
@@ -47,9 +47,9 @@ namespace MigrationTools.Endpoints.Tests
         public void FilterHalfTest()
         {
             SetupStore(EndpointDirection.Source, 20);
-            FileSystemWorkItemEndpoint e1 = CreateInMemoryWorkItemEndpoint(EndpointDirection.Source);
+            FileSystemWorkItemEndpoint e1 = CreateEndpoint(EndpointDirection.Source);
             SetupStore(EndpointDirection.Target, 10);
-            FileSystemWorkItemEndpoint e2 = CreateInMemoryWorkItemEndpoint(EndpointDirection.Target);
+            FileSystemWorkItemEndpoint e2 = CreateEndpoint(EndpointDirection.Target);
             e1.Filter(e2.GetWorkItems());
             Assert.AreEqual(10, e1.Count);
         }
@@ -58,9 +58,9 @@ namespace MigrationTools.Endpoints.Tests
         public void PersistWorkItemExistsTest()
         {
             SetupStore(EndpointDirection.Source, 20);
-            FileSystemWorkItemEndpoint e1 = CreateInMemoryWorkItemEndpoint(EndpointDirection.Source);
+            FileSystemWorkItemEndpoint e1 = CreateEndpoint(EndpointDirection.Source);
             SetupStore(EndpointDirection.Target, 10);
-            FileSystemWorkItemEndpoint e2 = CreateInMemoryWorkItemEndpoint(EndpointDirection.Target);
+            FileSystemWorkItemEndpoint e2 = CreateEndpoint(EndpointDirection.Target);
             foreach (WorkItemData2 item in e1.GetWorkItems())
             {
                 e2.PersistWorkItem(item);
@@ -72,9 +72,9 @@ namespace MigrationTools.Endpoints.Tests
         public void PersistWorkItemWithFilterTest()
         {
             SetupStore(EndpointDirection.Source, 20);
-            FileSystemWorkItemEndpoint e1 = CreateInMemoryWorkItemEndpoint(EndpointDirection.Source);
+            FileSystemWorkItemEndpoint e1 = CreateEndpoint(EndpointDirection.Source);
             SetupStore(EndpointDirection.Target, 10);
-            FileSystemWorkItemEndpoint e2 = CreateInMemoryWorkItemEndpoint(EndpointDirection.Target);
+            FileSystemWorkItemEndpoint e2 = CreateEndpoint(EndpointDirection.Target);
             e1.Filter(e2.GetWorkItems());
             Assert.AreEqual(10, e1.Count);
             foreach (WorkItemData2 item in e1.GetWorkItems())
@@ -91,14 +91,14 @@ namespace MigrationTools.Endpoints.Tests
             {
                 System.IO.Directory.Delete(path, true);
             }
-            FileSystemWorkItemEndpoint e = CreateInMemoryWorkItemEndpoint(EndpointDirection.Source);
+            FileSystemWorkItemEndpoint e = CreateEndpoint(direction);
             for (int i = 0; i < count; i++)
             {
                 e.PersistWorkItem(new WorkItemData2() { Id = i.ToString() });
             }
         }
 
-        private FileSystemWorkItemEndpoint CreateInMemoryWorkItemEndpoint(EndpointDirection direction)
+        private FileSystemWorkItemEndpoint CreateEndpoint(EndpointDirection direction)
         {
             var options = new FileSystemWorkItemEndpointOptions() { Direction = direction, FileStore = string.Format(@".\Store\{0}\", direction.ToString()) };
             FileSystemWorkItemEndpoint e = Services.GetRequiredService<FileSystemWorkItemEndpoint>();
