@@ -26,27 +26,27 @@ namespace MigrationTools.Enrichers
         [Obsolete("v1 Architecture: Here to support migration, use PhaseEnrichers: BeforeLoadData, AfterLoadData, etc", false)]
         public abstract int Enrich(_Enginev1.DataContracts.WorkItemData sourceWorkItem, _Enginev1.DataContracts.WorkItemData targetWorkItem);
 
-        public void ProcessorExecutionBegin(IProcessor2 processor)
+        public void ProcessorExecutionBegin(IProcessor processor)
         {
             Log.LogDebug("{WorkItemProcessorEnricher}::ProcessorExecutionBegin::NoAction", this.GetType().Name);
         }
 
-        public virtual void ProcessorExecutionEnd(IProcessor2 processor)
+        public virtual void ProcessorExecutionEnd(IProcessor processor)
         {
             Log.LogDebug("{WorkItemProcessorEnricher}::ProcessorExecutionEnd::NoAction", this.GetType().Name);
         }
 
-        public virtual void ProcessorExecutionAfterSource(IProcessor2 processor, List<DataContracts.WorkItemData> workItems)
+        public virtual void ProcessorExecutionAfterSource(IProcessor processor, List<DataContracts.WorkItemData> workItems)
         {
             Log.LogDebug("{WorkItemProcessorEnricher}::ProcessorExecutionAfterSource::NoAction", this.GetType().Name);
         }
 
-        public virtual void ProcessorExecutionAfterProcessWorkItem(IProcessor2 processor, DataContracts.WorkItemData workitem)
+        public virtual void ProcessorExecutionAfterProcessWorkItem(IProcessor processor, DataContracts.WorkItemData workitem)
         {
             Log.LogDebug("{WorkItemProcessorEnricher}::ProcessorExecutionAfterProcessWorkItem::NoAction", this.GetType().Name);
         }
 
-        public virtual void ProcessorExecutionBeforeProcessWorkItem(IProcessor2 processor, DataContracts.WorkItemData workitem)
+        public virtual void ProcessorExecutionBeforeProcessWorkItem(IProcessor processor, DataContracts.WorkItemData workitem)
         {
             Log.LogDebug("{WorkItemProcessorEnricher}::ProcessorExecutionBeforeProcessWorkItem::NoAction", this.GetType().Name);
         }

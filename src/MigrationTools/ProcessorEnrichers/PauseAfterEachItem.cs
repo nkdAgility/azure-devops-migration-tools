@@ -36,7 +36,7 @@ namespace MigrationTools.Enrichers
             throw new System.NotImplementedException();
         }
 
-        public override void ProcessorExecutionAfterProcessWorkItem(IProcessor2 processor, DataContracts.WorkItemData workitem)
+        public override void ProcessorExecutionAfterProcessWorkItem(IProcessor processor, DataContracts.WorkItemData workitem)
         {
             if (Options.Enabled)
             {

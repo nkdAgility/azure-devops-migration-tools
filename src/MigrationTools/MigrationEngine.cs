@@ -115,7 +115,7 @@ namespace MigrationTools
             FieldMaps.EnsureConfigured();
 
             Log.Information("Beginning run of {ProcessorCount} processors", Processors.Count.ToString());
-            foreach (IProcessor process in Processors.Items)
+            foreach (_Enginev1.Containers.IProcessor process in Processors.Items)
             {
                 Log.Information("Processor: {ProcessorName}", process.Name);
                 Stopwatch processorTimer = Stopwatch.StartNew();

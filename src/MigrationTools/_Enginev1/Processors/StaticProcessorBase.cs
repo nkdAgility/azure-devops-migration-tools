@@ -9,7 +9,7 @@ using MigrationTools.Processors;
 
 namespace VstsSyncMigrator._Enginev1.Processors
 {
-    public abstract class StaticProcessorBase : IProcessor
+    public abstract class StaticProcessorBase : MigrationTools._Enginev1.Containers.IProcessor
     {
         internal IMigrationEngine _me;
         private ProcessingStatus status = ProcessingStatus.None;
@@ -18,7 +18,7 @@ namespace VstsSyncMigrator._Enginev1.Processors
         public IMigrationEngine Engine { get { return _me; } }
         public IServiceProvider Services { get { return _services; } }
 
-        public StaticProcessorBase(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<IProcessor> logger)
+        public StaticProcessorBase(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<MigrationTools._Enginev1.Containers.IProcessor> logger)
         {
             _services = services;
             _me = me;
@@ -39,7 +39,7 @@ namespace VstsSyncMigrator._Enginev1.Processors
         }
 
         public ITelemetryLogger Telemetry { get; }
-        public ILogger<IProcessor> Log { get; }
+        public ILogger<MigrationTools._Enginev1.Containers.IProcessor> Log { get; }
 
         public void Execute()
         {

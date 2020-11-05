@@ -38,35 +38,35 @@ namespace MigrationTools.Enrichers
             }
         }
 
-        internal void ProcessorExecutionAfterProcessWorkItem(IProcessor2 processor, WorkItemData workitem)
+        internal void ProcessorExecutionAfterProcessWorkItem(IProcessor processor, WorkItemData workitem)
         {
             Log.LogInformation("ProcessorEnricherContainer::ProcessorExecutionBeforeProcessWorkItem");
             foreach (var enricher in this)
                 enricher.ProcessorExecutionAfterProcessWorkItem(processor, workitem);
         }
 
-        internal void ProcessorExecutionBeforeProcessWorkItem(IProcessor2 processor, WorkItemData workitem)
+        internal void ProcessorExecutionBeforeProcessWorkItem(IProcessor processor, WorkItemData workitem)
         {
             Log.LogInformation("ProcessorEnricherContainer::ProcessorExecutionBeforeProcessWorkItem");
             foreach (var enricher in this)
                 enricher.ProcessorExecutionBeforeProcessWorkItem(processor, workitem);
         }
 
-        internal void ProcessorExecutionAfterSource(IProcessor2 processor, List<WorkItemData> workItems)
+        internal void ProcessorExecutionAfterSource(IProcessor processor, List<WorkItemData> workItems)
         {
             Log.LogInformation("ProcessorEnricherContainer::ProcessorExecutionAfterSource");
             foreach (var enricher in this)
                 enricher.ProcessorExecutionAfterSource(processor, workItems);
         }
 
-        public void ProcessorExecutionBegin(IProcessor2 processor)
+        public void ProcessorExecutionBegin(IProcessor processor)
         {
             Log.LogInformation("ProcessorEnricherContainer::ProcessorExecutionBegin");
             foreach (var enricher in this)
                 enricher.ProcessorExecutionBegin(processor);
         }
 
-        public void ProcessorExecutionEnd(IProcessor2 processor)
+        public void ProcessorExecutionEnd(IProcessor processor)
         {
             Log.LogInformation("ProcessorEnricherContainer::ProcessorExecutionEnd");
             foreach (var enricher in this)

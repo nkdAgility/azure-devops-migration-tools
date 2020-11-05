@@ -4,7 +4,7 @@ using MigrationTools.Processors;
 
 namespace MigrationTools.Engine.Containers.Tests
 {
-    public class SimpleProcessorMock : IProcessor
+    public class SimpleProcessorMock : _Enginev1.Containers.IProcessor
     {
         public string Name => "TestSimpleContext";
 

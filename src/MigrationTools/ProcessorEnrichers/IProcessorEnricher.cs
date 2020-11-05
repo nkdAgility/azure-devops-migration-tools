@@ -6,15 +6,15 @@ namespace MigrationTools.Enrichers
 {
     public interface IProcessorEnricher : IEnricher
     {
-        void ProcessorExecutionBegin(IProcessor2 processor);
+        void ProcessorExecutionBegin(IProcessor processor);
 
-        void ProcessorExecutionEnd(IProcessor2 processor);
+        void ProcessorExecutionEnd(IProcessor processor);
 
-        void ProcessorExecutionAfterSource(IProcessor2 processor, List<WorkItemData> workItems);
+        void ProcessorExecutionAfterSource(IProcessor processor, List<WorkItemData> workItems);
 
-        void ProcessorExecutionAfterProcessWorkItem(IProcessor2 processor, WorkItemData workitem);
+        void ProcessorExecutionAfterProcessWorkItem(IProcessor processor, WorkItemData workitem);
 
-        void ProcessorExecutionBeforeProcessWorkItem(IProcessor2 processor, WorkItemData workitem);
+        void ProcessorExecutionBeforeProcessWorkItem(IProcessor processor, WorkItemData workitem);
 
         void Configure(IProcessorEnricherOptions options);
     }

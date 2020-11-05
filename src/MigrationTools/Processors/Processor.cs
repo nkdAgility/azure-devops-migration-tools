@@ -9,7 +9,7 @@ using MigrationTools.Enrichers;
 
 namespace MigrationTools.Processors
 {
-    public abstract class Processor : IProcessor2
+    public abstract class Processor : IProcessor
     {
         public Processor(
             ProcessorEnricherContainer processorEnricherContainer,

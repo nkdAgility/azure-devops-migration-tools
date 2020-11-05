@@ -8,7 +8,7 @@ using MigrationTools.Processors;
 
 namespace MigrationTools._Enginev1.Processors
 {
-    public abstract class MigrationProcessorBase : IProcessor
+    public abstract class MigrationProcessorBase : Containers.IProcessor
     {
         protected MigrationProcessorBase(IMigrationEngine engine, IServiceProvider services, ITelemetryLogger telemetry, ILogger<MigrationProcessorBase> logger)
         {
