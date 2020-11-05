@@ -5,7 +5,6 @@ using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.VisualStudio.Services.Common;
 using MigrationTools._EngineV1.Configuration;
-using MigrationTools.Clients;
 using MigrationTools.Configuration;
 using Serilog;
 

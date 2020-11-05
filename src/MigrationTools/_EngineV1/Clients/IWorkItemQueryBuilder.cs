@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using MigrationTools.Endpoints;
 
-namespace MigrationTools.Clients
+namespace MigrationTools._EngineV1.Clients
 {
     public interface IWorkItemQueryBuilder
     {

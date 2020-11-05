@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Net;
-using MigrationTools.Clients;
+using MigrationTools._EngineV1.Clients;
 using MigrationTools.Configuration;
 
 namespace MigrationTools.Tests.Core.Clients

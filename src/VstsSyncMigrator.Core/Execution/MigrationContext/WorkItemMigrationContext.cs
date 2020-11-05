@@ -18,7 +18,6 @@ using MigrationTools;
 using MigrationTools._EngineV1.Clients;
 using MigrationTools._EngineV1.DataContracts;
 using MigrationTools._EngineV1.Processors;
-using MigrationTools.Clients;
 using MigrationTools.Configuration;
 using MigrationTools.Configuration.Processing;
 using MigrationTools.DataContracts;

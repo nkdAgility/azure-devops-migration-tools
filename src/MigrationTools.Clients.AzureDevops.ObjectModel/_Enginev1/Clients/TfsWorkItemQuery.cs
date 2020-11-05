@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using MigrationTools.Clients;
 using Serilog;
 
 namespace MigrationTools._EngineV1.Clients

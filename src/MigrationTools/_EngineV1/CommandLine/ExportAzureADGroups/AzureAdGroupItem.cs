@@ -1,4 +1,4 @@
-﻿namespace MigrationTools.CommandLine
+﻿namespace MigrationTools._EngineV1.CommandLine
 {
     public class AzureAdGroupItem
     {

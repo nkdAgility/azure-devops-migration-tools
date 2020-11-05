@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using MigrationTools.Endpoints;
 
-namespace MigrationTools.Clients
+namespace MigrationTools._EngineV1.Clients
 {
     public abstract class WorkItemQueryBase : IWorkItemQuery
     {
@@ -29,7 +29,7 @@ namespace MigrationTools.Clients
             _Parameters = parameters ?? throw new ArgumentNullException(nameof(parameters));
         }
 
-        public abstract List<_EngineV1.DataContracts.WorkItemData> GetWorkItems();
+        public abstract List<DataContracts.WorkItemData> GetWorkItems();
 
         public abstract List<DataContracts.WorkItemData> GetWorkItems2();
     }

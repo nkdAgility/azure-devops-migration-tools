@@ -4,7 +4,7 @@ using MigrationTools._EngineV1.DataContracts;
 using MigrationTools.Configuration;
 using MigrationTools.DataContracts;
 
-namespace MigrationTools.Clients
+namespace MigrationTools._EngineV1.Clients
 {
     public abstract class WorkItemMigrationClientBase : IWorkItemMigrationClient
     {
