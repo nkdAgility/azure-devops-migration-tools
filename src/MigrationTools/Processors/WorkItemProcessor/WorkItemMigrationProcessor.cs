@@ -22,24 +22,24 @@ namespace MigrationTools.Processors
             Log.LogInformation("Processor::Configure");
             _config = (WorkItemMigrationProcessorOptions)config;
             Endpoints.ConfigureEndpoints(config.Endpoints);
-            Enrichers.ConfigureEnrichers(config.Enrichers);
+            ProcessorEnrichers.ConfigureEnrichers(config.Enrichers);
         }
 
         protected override void InternalExecute()
         {
             Log.LogInformation("Processor::InternalExecute::Start");
             EnsureConfigured();
-            Enrichers.ProcessorExecutionBegin(this);
+            ProcessorEnrichers.ProcessorExecutionBegin(this);
             var source = (WorkItemEndpoint)Endpoints.Source;
             List<WorkItemData2> workItems = source.GetWorkItems().ToList();
-            Enrichers.ProcessorExecutionAfterSource(this, workItems);
+            ProcessorEnrichers.ProcessorExecutionAfterSource(this, workItems);
             foreach (WorkItemData2 item in workItems)
             {
-                Enrichers.ProcessorExecutionBeforeProcessWorkItem(this, item);
+                ProcessorEnrichers.ProcessorExecutionBeforeProcessWorkItem(this, item);
                 ProcessWorkItem(item, _config.WorkItemCreateRetryLimit);
-                Enrichers.ProcessorExecutionAfterProcessWorkItem(this, item);
+                ProcessorEnrichers.ProcessorExecutionAfterProcessWorkItem(this, item);
             }
-            Enrichers.ProcessorExecutionEnd(this);
+            ProcessorEnrichers.ProcessorExecutionEnd(this);
             Log.LogInformation("Processor::InternalExecute::End");
         }
 

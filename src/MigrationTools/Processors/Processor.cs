@@ -22,12 +22,12 @@ namespace MigrationTools.Processors
             Telemetry = telemetry;
             Log = logger;
             Endpoints = endpointContainer;
-            Enrichers = processorEnricherContainer;
+            ProcessorEnrichers = processorEnricherContainer;
         }
 
         public EndpointContainer Endpoints { get; }
 
-        public ProcessorEnricherContainer Enrichers { get; }
+        public ProcessorEnricherContainer ProcessorEnrichers { get; }
 
         public string Name { get { return this.GetType().Name; } }
 
