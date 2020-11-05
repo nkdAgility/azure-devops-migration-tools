@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using MigrationTools;
+using MigrationTools._Enginev1.Containers;
 using MigrationTools.Configuration;
-using MigrationTools.Engine.Containers;
 using MigrationTools.Processors;
 
-namespace VstsSyncMigrator.Engine
+namespace VstsSyncMigrator._Enginev1.Processors
 {
     public abstract class StaticProcessorBase : IProcessor
     {
@@ -43,7 +43,7 @@ namespace VstsSyncMigrator.Engine
 
         public void Execute()
         {
-            Telemetry.TrackEvent(this.Name);
+            Telemetry.TrackEvent(Name);
             Log.LogDebug("StaticProcessorBase: Start {0} ", Name);
             Stopwatch executeTimer = Stopwatch.StartNew();
             DateTime start = DateTime.Now;
@@ -82,7 +82,7 @@ namespace VstsSyncMigrator.Engine
             }
             finally
             {
-                Telemetry.TrackRequest(this.Name, start, executeTimer.Elapsed, Status.ToString(), (Status == ProcessingStatus.Complete));
+                Telemetry.TrackRequest(Name, start, executeTimer.Elapsed, Status.ToString(), Status == ProcessingStatus.Complete);
             }
         }
 

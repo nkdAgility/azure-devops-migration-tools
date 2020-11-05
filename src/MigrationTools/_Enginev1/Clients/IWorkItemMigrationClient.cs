@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using MigrationTools._Enginev1.DataContracts;
 using MigrationTools.Configuration;
 using MigrationTools.DataContracts;
 

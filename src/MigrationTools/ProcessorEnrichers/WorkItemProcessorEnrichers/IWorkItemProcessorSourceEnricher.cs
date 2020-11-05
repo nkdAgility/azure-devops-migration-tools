@@ -4,6 +4,6 @@ namespace MigrationTools.Enrichers
 {
     public interface IWorkItemProcessorSourceEnricher : IWorkItemProcessorEnricher
     {
-        int EnrichToWorkItem(WorkItemData2 workItem);
+        int EnrichToWorkItem(WorkItemData workItem);
     }
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using MigrationTools.Configuration;
 
-namespace MigrationTools.Engine.Containers
+namespace MigrationTools._Enginev1.Containers
 {
     public class ChangeSetMappingContainer : EngineContainer<ReadOnlyDictionary<int, string>>
     {

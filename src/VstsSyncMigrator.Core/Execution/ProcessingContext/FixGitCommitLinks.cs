@@ -4,10 +4,11 @@ using System.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MigrationTools;
+using MigrationTools._Enginev1.DataContracts;
 using MigrationTools.Configuration;
 using MigrationTools.Configuration.Processing;
-using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
+using VstsSyncMigrator._Enginev1.Processors;
 
 namespace VstsSyncMigrator.Engine
 {

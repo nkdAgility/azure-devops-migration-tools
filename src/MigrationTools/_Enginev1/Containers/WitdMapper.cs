@@ -1,4 +1,4 @@
-﻿namespace MigrationTools.Engine.Containers
+﻿namespace MigrationTools._Enginev1.Containers
 {
     public class WitMapper : IWitdMapper
     {
@@ -6,7 +6,7 @@
 
         public WitMapper(string mapTo)
         {
-            this._MapTo = mapTo;
+            _MapTo = mapTo;
         }
 
         public string Map()

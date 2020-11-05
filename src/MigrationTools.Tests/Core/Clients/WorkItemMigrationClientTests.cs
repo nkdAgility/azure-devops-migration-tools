@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MigrationTools.DataContracts;
+using MigrationTools._Enginev1.DataContracts;
 
 namespace MigrationTools.Clients.Tests
 {

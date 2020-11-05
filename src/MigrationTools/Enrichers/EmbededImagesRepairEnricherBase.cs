@@ -5,7 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using Microsoft.Extensions.Logging;
-using MigrationTools.DataContracts;
+using MigrationTools._Enginev1.DataContracts;
 
 namespace MigrationTools.Enrichers
 {

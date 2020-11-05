@@ -12,6 +12,7 @@ using Microsoft.TeamFoundation.Framework.Common;
 using MigrationTools;
 using MigrationTools.Configuration;
 using MigrationTools.Configuration.Processing;
+using VstsSyncMigrator._Enginev1.Processors;
 
 namespace VstsSyncMigrator.Engine
 {

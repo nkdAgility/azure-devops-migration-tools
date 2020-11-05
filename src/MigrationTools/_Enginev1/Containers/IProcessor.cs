@@ -1,7 +1,7 @@
 ﻿using MigrationTools.Configuration;
 using MigrationTools.Processors;
 
-namespace MigrationTools.Engine.Containers
+namespace MigrationTools._Enginev1.Containers
 {
     public interface IProcessor
     {

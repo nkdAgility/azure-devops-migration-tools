@@ -10,11 +10,11 @@ namespace MigrationTools.Enrichers
 
         void ProcessorExecutionEnd(IProcessor2 processor);
 
-        void ProcessorExecutionAfterSource(IProcessor2 processor, List<WorkItemData2> workItems);
+        void ProcessorExecutionAfterSource(IProcessor2 processor, List<WorkItemData> workItems);
 
-        void ProcessorExecutionAfterProcessWorkItem(IProcessor2 processor, WorkItemData2 workitem);
+        void ProcessorExecutionAfterProcessWorkItem(IProcessor2 processor, WorkItemData workitem);
 
-        void ProcessorExecutionBeforeProcessWorkItem(IProcessor2 processor, WorkItemData2 workitem);
+        void ProcessorExecutionBeforeProcessWorkItem(IProcessor2 processor, WorkItemData workitem);
 
         void Configure(IProcessorEnricherOptions options);
     }

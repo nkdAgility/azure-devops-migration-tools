@@ -11,11 +11,11 @@ namespace MigrationTools.Endpoints
     public class FileSystemWorkItemEndpoint : WorkItemEndpoint
     {
         private FileSystemWorkItemEndpointOptions _options;
-        private List<WorkItemData2> _innerList;
+        private List<WorkItemData> _innerList;
 
         public FileSystemWorkItemEndpoint(EndpointEnricherContainer endpointEnrichers, System.IServiceProvider services, ITelemetryLogger telemetry, ILogger<WorkItemEndpoint> logger) : base(endpointEnrichers, services, telemetry, logger)
         {
-            _innerList = new List<WorkItemData2>();
+            _innerList = new List<WorkItemData>();
         }
 
         public override int Count => GetWorkItems().Count();
@@ -40,12 +40,12 @@ namespace MigrationTools.Endpoints
             foreach (var item in workitemFiles)
             {
                 var contents = System.IO.File.ReadAllText(item);
-                var workItem = JsonConvert.DeserializeObject<WorkItemData2>(contents);
+                var workItem = JsonConvert.DeserializeObject<WorkItemData>(contents);
                 _innerList.Add(workItem);
             }
         }
 
-        public override void Filter(IEnumerable<WorkItemData2> workItems)
+        public override void Filter(IEnumerable<WorkItemData> workItems)
         {
             var ids = (from x in workItems.ToList() select x.Id);
             _innerList = (from x in _innerList
@@ -53,17 +53,17 @@ namespace MigrationTools.Endpoints
                           select x).ToList();
         }
 
-        public override IEnumerable<WorkItemData2> GetWorkItems()
+        public override IEnumerable<WorkItemData> GetWorkItems()
         {
             return _innerList;
         }
 
-        public override IEnumerable<WorkItemData2> GetWorkItems(IWorkItemQuery query)
+        public override IEnumerable<WorkItemData> GetWorkItems(IWorkItemQuery query)
         {
             return GetWorkItems();
         }
 
-        public override void PersistWorkItem(WorkItemData2 source)
+        public override void PersistWorkItem(WorkItemData source)
         {
             var content = JsonConvert.SerializeObject(source, Formatting.Indented);
             var fileName = Path.Combine(_options.FileStore, string.Format("{0}.json", source.Id));

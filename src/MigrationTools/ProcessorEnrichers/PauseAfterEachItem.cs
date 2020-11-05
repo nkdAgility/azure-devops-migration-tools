@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
+using MigrationTools._Enginev1.DataContracts;
 using MigrationTools.DataContracts;
 using MigrationTools.Processors;
 
@@ -30,12 +31,12 @@ namespace MigrationTools.Enrichers
         }
 
         [Obsolete("Old v1 arch: this is a v2 class", true)]
-        public override int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
+        public override int Enrich(_Enginev1.DataContracts.WorkItemData sourceWorkItem, _Enginev1.DataContracts.WorkItemData targetWorkItem)
         {
             throw new System.NotImplementedException();
         }
 
-        public override void ProcessorExecutionAfterProcessWorkItem(IProcessor2 processor, WorkItemData2 workitem)
+        public override void ProcessorExecutionAfterProcessWorkItem(IProcessor2 processor, DataContracts.WorkItemData workitem)
         {
             if (Options.Enabled)
             {

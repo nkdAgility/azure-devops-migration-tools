@@ -57,7 +57,7 @@ namespace MigrationTools.Endpoints.Tests
         {
             InMemoryWorkItemEndpoint e1 = CreateAndConfigureInMemoryWorkItemEndpoint(EndpointDirection.Source, 20);
             InMemoryWorkItemEndpoint e2 = CreateAndConfigureInMemoryWorkItemEndpoint(EndpointDirection.Target, 10);
-            foreach (WorkItemData2 item in e1.GetWorkItems())
+            foreach (WorkItemData item in e1.GetWorkItems())
             {
                 e2.PersistWorkItem(item);
             }
@@ -71,7 +71,7 @@ namespace MigrationTools.Endpoints.Tests
             InMemoryWorkItemEndpoint e2 = CreateAndConfigureInMemoryWorkItemEndpoint(EndpointDirection.Target, 10);
             e1.Filter(e2.GetWorkItems());
             Assert.AreEqual(10, e1.Count);
-            foreach (WorkItemData2 item in e1.GetWorkItems())
+            foreach (WorkItemData item in e1.GetWorkItems())
             {
                 e2.PersistWorkItem(item);
             }
@@ -95,24 +95,24 @@ namespace MigrationTools.Endpoints.Tests
 
         private void AddWorkItems(InMemoryWorkItemEndpoint e, int workItemCount)
         {
-            var list = new List<WorkItemData2>();
+            var list = new List<WorkItemData>();
             for (int i = 0; i < workItemCount; i++)
             {
-                e.PersistWorkItem(new WorkItemData2()
+                e.PersistWorkItem(new WorkItemData()
                 {
                     Id = i.ToString(),
                     Revisions = GetRevisions()
                 });
             }
 
-            List<RevisionItem2> GetRevisions()
+            List<RevisionItem> GetRevisions()
             {
                 Random rand = new Random();
                 int revCount = rand.Next(0, 5);
-                List<RevisionItem2> list = new List<RevisionItem2>();
+                List<RevisionItem> list = new List<RevisionItem>();
                 for (int i = 0; i < revCount; i++)
                 {
-                    list.Add(new RevisionItem2 { Index = i, Number = i, ChangedDate = DateTime.Now.AddHours(-i) });
+                    list.Add(new RevisionItem { Index = i, Number = i, ChangedDate = DateTime.Now.AddHours(-i) });
                 }
                 return list;
             }

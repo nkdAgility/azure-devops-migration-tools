@@ -5,8 +5,8 @@ using System.Text.RegularExpressions;
 using System.Xml;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.Server;
+using MigrationTools._Enginev1.DataContracts;
 using MigrationTools.Clients;
-using MigrationTools.DataContracts;
 
 namespace MigrationTools.Enrichers
 {

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using MigrationTools;
+using MigrationTools._Enginev1.DataContracts;
+using MigrationTools._Enginev1.Processors;
 using MigrationTools.Configuration;
-using MigrationTools.DataContracts;
-using MigrationTools.Engine.Processors;
 
 namespace VstsSyncMigrator.Engine
 {

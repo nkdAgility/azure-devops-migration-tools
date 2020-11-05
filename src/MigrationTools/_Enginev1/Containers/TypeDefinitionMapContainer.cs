@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using MigrationTools.Configuration;
 using Serilog;
 
-namespace MigrationTools.Engine.Containers
+namespace MigrationTools._Enginev1.Containers
 {
     public class TypeDefinitionMapContainer : EngineContainer<ReadOnlyDictionary<string, IWitdMapper>>
     {

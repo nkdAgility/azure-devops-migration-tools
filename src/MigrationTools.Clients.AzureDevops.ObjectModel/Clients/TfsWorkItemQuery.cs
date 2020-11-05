@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using MigrationTools._Enginev1.DataContracts;
 using MigrationTools.DataContracts;
 using Serilog;
 
@@ -13,7 +14,7 @@ namespace MigrationTools.Clients
         {
         }
 
-        public override List<WorkItemData> GetWorkItems()
+        public override List<_Enginev1.DataContracts.WorkItemData> GetWorkItems()
         {
             Log.Debug("WorkItemQuery: ===========GetWorkItems=============");
             var wiClient = (TfsWorkItemMigrationClient)MigrationClient.WorkItems;
@@ -28,7 +29,7 @@ namespace MigrationTools.Clients
             return GetWorkItemsFromQuery(wiClient).ToWorkItemDataList();
         }
 
-        public override List<WorkItemData2> GetWorkItems2()
+        public override List<DataContracts.WorkItemData> GetWorkItems2()
         {
             throw new NotImplementedException();
         }

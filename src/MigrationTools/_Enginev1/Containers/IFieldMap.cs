@@ -1,7 +1,7 @@
-﻿using MigrationTools.Configuration;
-using MigrationTools.DataContracts;
+﻿using MigrationTools._Enginev1.DataContracts;
+using MigrationTools.Configuration;
 
-namespace MigrationTools.Engine.Containers
+namespace MigrationTools._Enginev1.Containers
 {
     public interface IFieldMap
     {

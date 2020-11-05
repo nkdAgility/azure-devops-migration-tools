@@ -61,7 +61,7 @@ namespace MigrationTools.Endpoints.Tests
             FileSystemWorkItemEndpoint e1 = CreateEndpoint(EndpointDirection.Source);
             SetupStore(EndpointDirection.Target, 10);
             FileSystemWorkItemEndpoint e2 = CreateEndpoint(EndpointDirection.Target);
-            foreach (WorkItemData2 item in e1.GetWorkItems())
+            foreach (WorkItemData item in e1.GetWorkItems())
             {
                 e2.PersistWorkItem(item);
             }
@@ -77,7 +77,7 @@ namespace MigrationTools.Endpoints.Tests
             FileSystemWorkItemEndpoint e2 = CreateEndpoint(EndpointDirection.Target);
             e1.Filter(e2.GetWorkItems());
             Assert.AreEqual(10, e1.Count);
-            foreach (WorkItemData2 item in e1.GetWorkItems())
+            foreach (WorkItemData item in e1.GetWorkItems())
             {
                 e2.PersistWorkItem(item);
             }
@@ -94,7 +94,7 @@ namespace MigrationTools.Endpoints.Tests
             FileSystemWorkItemEndpoint e = CreateEndpoint(direction);
             for (int i = 0; i < count; i++)
             {
-                e.PersistWorkItem(new WorkItemData2() { Id = i.ToString() });
+                e.PersistWorkItem(new WorkItemData() { Id = i.ToString() });
             }
         }
 

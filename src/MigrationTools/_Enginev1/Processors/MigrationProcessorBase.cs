@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
+using MigrationTools._Enginev1.Containers;
 using MigrationTools.Configuration;
-using MigrationTools.Engine.Containers;
 using MigrationTools.Processors;
 
-namespace MigrationTools.Engine.Processors
+namespace MigrationTools._Enginev1.Processors
 {
     public abstract class MigrationProcessorBase : IProcessor
     {
@@ -34,7 +34,7 @@ namespace MigrationTools.Engine.Processors
 
         public void Execute()
         {
-            Telemetry.TrackEvent(this.Name);
+            Telemetry.TrackEvent(Name);
             Log.LogInformation("Migration Context Start: {MigrationContextname} ", Name);
             DateTime start = DateTime.Now;
             var executeTimer = Stopwatch.StartNew();
@@ -69,7 +69,7 @@ namespace MigrationTools.Engine.Processors
             }
             finally
             {
-                Telemetry.TrackRequest(this.Name, start, executeTimer.Elapsed, Status.ToString(), (Status == ProcessingStatus.Complete));
+                Telemetry.TrackRequest(Name, start, executeTimer.Elapsed, Status.ToString(), Status == ProcessingStatus.Complete);
             }
         }
 

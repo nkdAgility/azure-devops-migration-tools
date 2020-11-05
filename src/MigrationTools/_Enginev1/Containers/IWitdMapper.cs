@@ -1,4 +1,4 @@
-﻿namespace MigrationTools.Engine.Containers
+﻿namespace MigrationTools._Enginev1.Containers
 {
     public interface IWitdMapper
     {

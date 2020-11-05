@@ -27,12 +27,12 @@ namespace MigrationTools.Endpoints
 
         public abstract void Configure(IEndpointOptions options);
 
-        public abstract void Filter(IEnumerable<WorkItemData2> workItems);
+        public abstract void Filter(IEnumerable<WorkItemData> workItems);
 
-        public abstract IEnumerable<WorkItemData2> GetWorkItems();
+        public abstract IEnumerable<WorkItemData> GetWorkItems();
 
-        public abstract IEnumerable<WorkItemData2> GetWorkItems(IWorkItemQuery query);
+        public abstract IEnumerable<WorkItemData> GetWorkItems(IWorkItemQuery query);
 
-        public abstract void PersistWorkItem(WorkItemData2 sourceWorkItem);
+        public abstract void PersistWorkItem(WorkItemData sourceWorkItem);
     }
 }

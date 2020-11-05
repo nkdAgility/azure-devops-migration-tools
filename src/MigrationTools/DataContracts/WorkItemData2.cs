@@ -6,7 +6,7 @@ using Newtonsoft.Json.Converters;
 
 namespace MigrationTools.DataContracts
 {
-    public class WorkItemData2
+    public class WorkItemData
     {
         [JsonConverter(typeof(StringEnumConverter))]
         public EndpointDirection Direction { get; set; }
@@ -24,7 +24,7 @@ namespace MigrationTools.DataContracts
         }
 
         [JsonIgnoreAttribute]
-        public RevisionItem2 LatestRevision
+        public RevisionItem LatestRevision
         {
             get
             {
@@ -41,6 +41,6 @@ namespace MigrationTools.DataContracts
             }
         }
 
-        public List<RevisionItem2> Revisions { get; set; }
+        public List<RevisionItem> Revisions { get; set; }
     }
 }

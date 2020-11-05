@@ -31,9 +31,9 @@ namespace MigrationTools.Processors
             EnsureConfigured();
             ProcessorEnrichers.ProcessorExecutionBegin(this);
             var source = (WorkItemEndpoint)Endpoints.Source;
-            List<WorkItemData2> workItems = source.GetWorkItems().ToList();
+            List<WorkItemData> workItems = source.GetWorkItems().ToList();
             ProcessorEnrichers.ProcessorExecutionAfterSource(this, workItems);
-            foreach (WorkItemData2 item in workItems)
+            foreach (WorkItemData item in workItems)
             {
                 ProcessorEnrichers.ProcessorExecutionBeforeProcessWorkItem(this, item);
                 ProcessWorkItem(item, _config.WorkItemCreateRetryLimit);
@@ -43,7 +43,7 @@ namespace MigrationTools.Processors
             Log.LogInformation("Processor::InternalExecute::End");
         }
 
-        private void ProcessWorkItem(WorkItemData2 workItem, int workItemCreateRetryLimit)
+        private void ProcessWorkItem(WorkItemData workItem, int workItemCreateRetryLimit)
         {
             Log.LogInformation("Processor::ProcessWorkItem::TheWork");
             /// Stuff to really do

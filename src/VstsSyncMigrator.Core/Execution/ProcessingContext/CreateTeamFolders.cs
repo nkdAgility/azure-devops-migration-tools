@@ -9,6 +9,7 @@ using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools;
 using MigrationTools.Clients;
 using MigrationTools.Configuration;
+using VstsSyncMigrator._Enginev1.Processors;
 
 namespace VstsSyncMigrator.Engine
 {

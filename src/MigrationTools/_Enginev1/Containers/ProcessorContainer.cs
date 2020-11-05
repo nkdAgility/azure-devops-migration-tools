@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using MigrationTools.Configuration;
 using Serilog;
 
-namespace MigrationTools.Engine.Containers
+namespace MigrationTools._Enginev1.Containers
 {
     public class ProcessorContainer : EngineContainer<ReadOnlyCollection<IProcessor>>
     {

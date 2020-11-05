@@ -4,6 +4,6 @@ namespace MigrationTools.Enrichers
 {
     public interface IWorkItemProcessorTargetEnricher : IWorkItemProcessorEnricher
     {
-        int PersistFromWorkItem(WorkItemData2 workItem);
+        int PersistFromWorkItem(WorkItemData workItem);
     }
 }

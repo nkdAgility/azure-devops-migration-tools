@@ -1,7 +1,7 @@
 ﻿using System;
 using MigrationTools.Configuration;
 
-namespace MigrationTools.Engine.Containers
+namespace MigrationTools._Enginev1.Containers
 {
     public abstract class EngineContainer<TItemType>
     {

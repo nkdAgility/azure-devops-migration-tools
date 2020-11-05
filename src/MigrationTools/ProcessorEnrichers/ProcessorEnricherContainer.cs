@@ -38,21 +38,21 @@ namespace MigrationTools.Enrichers
             }
         }
 
-        internal void ProcessorExecutionAfterProcessWorkItem(IProcessor2 processor, WorkItemData2 workitem)
+        internal void ProcessorExecutionAfterProcessWorkItem(IProcessor2 processor, WorkItemData workitem)
         {
             Log.LogInformation("ProcessorEnricherContainer::ProcessorExecutionBeforeProcessWorkItem");
             foreach (var enricher in this)
                 enricher.ProcessorExecutionAfterProcessWorkItem(processor, workitem);
         }
 
-        internal void ProcessorExecutionBeforeProcessWorkItem(IProcessor2 processor, WorkItemData2 workitem)
+        internal void ProcessorExecutionBeforeProcessWorkItem(IProcessor2 processor, WorkItemData workitem)
         {
             Log.LogInformation("ProcessorEnricherContainer::ProcessorExecutionBeforeProcessWorkItem");
             foreach (var enricher in this)
                 enricher.ProcessorExecutionBeforeProcessWorkItem(processor, workitem);
         }
 
-        internal void ProcessorExecutionAfterSource(IProcessor2 processor, List<WorkItemData2> workItems)
+        internal void ProcessorExecutionAfterSource(IProcessor2 processor, List<WorkItemData> workItems)
         {
             Log.LogInformation("ProcessorEnricherContainer::ProcessorExecutionAfterSource");
             foreach (var enricher in this)

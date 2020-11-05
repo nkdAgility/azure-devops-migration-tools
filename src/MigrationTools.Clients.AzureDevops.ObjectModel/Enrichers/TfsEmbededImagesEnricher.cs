@@ -6,7 +6,7 @@ using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using MigrationTools.DataContracts;
+using MigrationTools._Enginev1.DataContracts;
 
 namespace MigrationTools.Enrichers
 {

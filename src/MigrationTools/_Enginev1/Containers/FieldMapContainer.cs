@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using MigrationTools._Enginev1.DataContracts;
 using MigrationTools.Configuration;
-using MigrationTools.DataContracts;
 using Serilog;
 
-namespace MigrationTools.Engine.Containers
+namespace MigrationTools._Enginev1.Containers
 {
     public class FieldMapContainer : EngineContainer<Dictionary<string, List<IFieldMap>>>
     {
@@ -44,7 +44,7 @@ namespace MigrationTools.Engine.Containers
                     }
                     IFieldMap fm = (IFieldMap)Services.GetRequiredService(type);
                     fm.Configure(fieldmapConfig);
-                    this.AddFieldMap(fieldmapConfig.WorkItemTypeName, fm);
+                    AddFieldMap(fieldmapConfig.WorkItemTypeName, fm);
                 }
             }
         }

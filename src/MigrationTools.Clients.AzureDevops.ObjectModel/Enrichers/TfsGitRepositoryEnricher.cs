@@ -7,8 +7,8 @@ using Microsoft.TeamFoundation;
 using Microsoft.TeamFoundation.Git.Client;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using MigrationTools._Enginev1.DataContracts;
 using MigrationTools.Clients;
-using MigrationTools.DataContracts;
 
 namespace MigrationTools.Enrichers
 {

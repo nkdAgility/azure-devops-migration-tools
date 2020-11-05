@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace MigrationTools.DataContracts
+namespace MigrationTools._Enginev1.DataContracts
 {
     public class WorkItemData
     {
@@ -14,7 +14,7 @@ namespace MigrationTools.DataContracts
         public int Revision { get; set; }
         public string ProjectName { get; set; }
 
-        [JsonIgnoreAttribute]
+        [JsonIgnore]
         public object internalObject { get; set; }
 
         public Dictionary<string, object> Fields { get; set; }

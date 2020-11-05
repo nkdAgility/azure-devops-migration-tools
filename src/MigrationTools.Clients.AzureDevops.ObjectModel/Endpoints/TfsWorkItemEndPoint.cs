@@ -25,24 +25,24 @@ namespace MigrationTools.Endpoints
             _Options = (TfsWorkItemEndPointOptions)options;
         }
 
-        public override void Filter(IEnumerable<WorkItemData2> workItems)
+        public override void Filter(IEnumerable<WorkItemData> workItems)
         {
             Log.LogDebug("TfsWorkItemEndPoint::Configure::Filter");
         }
 
-        public override IEnumerable<WorkItemData2> GetWorkItems()
+        public override IEnumerable<WorkItemData> GetWorkItems()
         {
             Log.LogDebug("TfsWorkItemEndPoint::Configure::GetWorkItems");
-            return new List<WorkItemData2>();
+            return new List<WorkItemData>();
         }
 
-        public override IEnumerable<WorkItemData2> GetWorkItems(IWorkItemQuery query)
+        public override IEnumerable<WorkItemData> GetWorkItems(IWorkItemQuery query)
         {
             Log.LogDebug("TfsWorkItemEndPoint::Configure::GetWorkItems(query)");
-            return new List<WorkItemData2>();
+            return new List<WorkItemData>();
         }
 
-        public override void PersistWorkItem(WorkItemData2 source)
+        public override void PersistWorkItem(WorkItemData source)
         {
             Log.LogDebug("TfsWorkItemEndPoint::Configure::PersistWorkItem");
         }

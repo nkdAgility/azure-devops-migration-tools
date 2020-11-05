@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using MigrationTools._Enginev1.DataContracts;
 using MigrationTools.Configuration;
 using MigrationTools.DataContracts;
 using Serilog;

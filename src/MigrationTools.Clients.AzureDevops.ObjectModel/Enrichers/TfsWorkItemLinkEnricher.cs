@@ -2,8 +2,8 @@
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using MigrationTools._Enginev1.DataContracts;
 using MigrationTools.Clients;
-using MigrationTools.DataContracts;
 using MigrationTools.Exceptions;
 
 namespace MigrationTools.Enrichers

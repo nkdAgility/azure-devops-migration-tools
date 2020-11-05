@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MigrationTools.DataContracts
+namespace MigrationTools._Enginev1.DataContracts
 {
     public class RevisionItem
     {
