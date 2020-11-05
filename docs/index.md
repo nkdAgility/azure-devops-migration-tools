@@ -18,6 +18,8 @@ _NOTICE: Both paid and community support is available through our [recommended c
 
 ## Change Log
 
+**We are working on a [v2 Architectire](./v2/index.md) for this tool, while still suppoting the existng architecture. if you want to help support us in the is effort then please get in touch.**
+
 - v11.5 - Added more useful logging levels. Replace `"TelemetryEnableTrace": false` with `"LogLevel": "Verbose"` in the config. Verbose will only be logged to the logfile.
 - v11.2.1 - Removed NodeMigrationContext and converted it to an enricher for Work Items. Still needs work, so that it migrates individual nodes, but currently migrates all.
 - v10.1 - Changed config design to have only the Name and not FullName of the class. Remove `MigrationTools.Core.Configuration.FieldMap.` and `MigrationTools.Core.Configuration.Processing.` from the config leaving only the Name of the class in ObjectType field.

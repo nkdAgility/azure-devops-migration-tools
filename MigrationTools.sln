@@ -109,7 +109,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Clients.File
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Host.Tests", "src\MigrationTools.Host.Tests\MigrationTools.Host.Tests.csproj", "{6F51CE1D-FEBD-4F7F-A462-27A4745924F4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MigrationTools.Integration.Tests", "MigrationTools.Integration.Tests\MigrationTools.Integration.Tests.csproj", "{E7989368-A86A-4A6B-86DE-30ECE0BC342B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Integration.Tests", "MigrationTools.Integration.Tests\MigrationTools.Integration.Tests.csproj", "{E7989368-A86A-4A6B-86DE-30ECE0BC342B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "v2", "v2", "{A76BEFD1-2848-4A44-99D7-A4EAEB223597}"
+	ProjectSection(SolutionItems) = preProject
+		docs\v2\index.md = docs\v2\index.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -204,6 +209,7 @@ Global
 		{3191B594-1C3A-4245-8AFE-076EA142B778} = {13FE9FE2-9C6E-4866-BBAD-106F5BF765F1}
 		{6F51CE1D-FEBD-4F7F-A462-27A4745924F4} = {5C05DA7B-B70F-4A87-920B-DCD14EA7670D}
 		{E7989368-A86A-4A6B-86DE-30ECE0BC342B} = {5C05DA7B-B70F-4A87-920B-DCD14EA7670D}
+		{A76BEFD1-2848-4A44-99D7-A4EAEB223597} = {2BC0808B-6F4D-4635-82FE-1118181DD64F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {62EE0B27-C55A-46EE-8D17-1691DE9BBD50}
