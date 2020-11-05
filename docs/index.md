@@ -159,6 +159,13 @@ This project is primarily managed and maintained on Visual Studio Team Services 
 If you want to sync your GitHub repository then check out [Open-source with VSTS or TFS and Github for better DevOps
 ](https://nkdagility.com/open-source-vsts-tfs-github-better-devops/).
 
+Events for the Team:
+
+- Weekly Architectural Review - Thursday 2100 GMT
+
+If you want to be added to the community Team then please [fill out this form and request access](http://nkdagility.com/contact)
+
+
 ## Support
 
 You can get free support from the community here and on social media on a best effort basis if folks are available. If you are looking for paid support there are a number of consultants that contribute to this project and that are experts in this type of work:
