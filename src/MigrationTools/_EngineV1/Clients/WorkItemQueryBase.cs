@@ -29,8 +29,8 @@ namespace MigrationTools._EngineV1.Clients
             _Parameters = parameters ?? throw new ArgumentNullException(nameof(parameters));
         }
 
-        public abstract List<DataContracts.WorkItemData> GetWorkItems();
+        public abstract List<MigrationTools._EngineV1.DataContracts.WorkItemData> GetWorkItems();
 
-        public abstract List<DataContracts.WorkItemData> GetWorkItems2();
+        public abstract List<MigrationTools.DataContracts.WorkItemData> GetWorkItems2();
     }
 }

@@ -27,7 +27,7 @@ namespace MigrationTools._EngineV1.Clients
             return GetWorkItemsFromQuery(wiClient).ToWorkItemDataList();
         }
 
-        public override List<DataContracts.WorkItemData> GetWorkItems2()
+        public override List<MigrationTools.DataContracts.WorkItemData> GetWorkItems2()
         {
             throw new NotImplementedException();
         }

@@ -20,7 +20,6 @@ using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Configuration.Processing;
 using MigrationTools._EngineV1.DataContracts;
 using MigrationTools._EngineV1.Processors;
-using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
 using Newtonsoft.Json;
 using Serilog.Context;
@@ -251,7 +250,7 @@ namespace VstsSyncMigrator.Engine
             var targetFoundItems = Engine.Target.WorkItems.GetWorkItems(targetQuery);
             contextLog.Debug("FilterByTarget: ... query complete.");
             contextLog.Debug("FilterByTarget: Found {TargetWorkItemCount} based on the WIQLQueryBit in the target system.", targetFoundItems.Count());
-            var targetFoundIds = (from WorkItemData twi in targetFoundItems select Engine.Target.WorkItems.GetReflectedWorkItemId(twi)).ToList();
+            var targetFoundIds = (from MigrationTools._EngineV1.DataContracts.WorkItemData twi in targetFoundItems select Engine.Target.WorkItems.GetReflectedWorkItemId(twi)).ToList();
             //////////////////////////////////////////////////////////
             sourceWorkItems = sourceWorkItems.Where(p => !targetFoundIds.Any(p2 => p2.ToString() == p.Id)).ToList();
             contextLog.Debug("FilterByTarget: After removing all found work items there are {SourceWorkItemCount} remaining to be migrated.", sourceWorkItems.Count());
