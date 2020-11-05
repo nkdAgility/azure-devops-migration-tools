@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using MigrationTools._EngineV1.Clients;
+using MigrationTools._EngineV1.DataContracts;
 using MigrationTools.Configuration;
-using MigrationTools.DataContracts;
 
 namespace MigrationTools.Clients.Tests
 {

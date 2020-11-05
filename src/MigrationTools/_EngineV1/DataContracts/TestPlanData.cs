@@ -1,4 +1,4 @@
-﻿namespace MigrationTools
+﻿namespace MigrationTools._EngineV1.DataContracts
 {
     public class TestPlanData
     {

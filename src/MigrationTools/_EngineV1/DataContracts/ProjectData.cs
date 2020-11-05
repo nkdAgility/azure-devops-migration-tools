@@ -1,4 +1,4 @@
-﻿namespace MigrationTools.DataContracts
+﻿namespace MigrationTools._EngineV1.DataContracts
 {
     public class ProjectData
     {

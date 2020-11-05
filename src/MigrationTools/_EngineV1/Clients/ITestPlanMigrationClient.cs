@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using MigrationTools._EngineV1.DataContracts;
 using MigrationTools.Configuration;
 
 namespace MigrationTools._EngineV1.Clients

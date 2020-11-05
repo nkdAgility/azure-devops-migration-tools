@@ -6,10 +6,10 @@ using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.ProcessConfiguration.Client;
 using MigrationTools;
+using MigrationTools._EngineV1.DataContracts;
 using MigrationTools._EngineV1.Processors;
 using MigrationTools.Configuration;
 using MigrationTools.Configuration.Processing;
-using MigrationTools.DataContracts;
 
 namespace VstsSyncMigrator.Engine
 {
