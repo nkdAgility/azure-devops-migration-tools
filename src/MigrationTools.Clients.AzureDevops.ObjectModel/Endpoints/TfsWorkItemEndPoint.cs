@@ -33,13 +33,13 @@ namespace MigrationTools.Endpoints
         public override IEnumerable<WorkItemData2> GetWorkItems()
         {
             Log.LogDebug("TfsWorkItemEndPoint::Configure::GetWorkItems");
-            return null;
+            return new List<WorkItemData2>();
         }
 
         public override IEnumerable<WorkItemData2> GetWorkItems(IWorkItemQuery query)
         {
             Log.LogDebug("TfsWorkItemEndPoint::Configure::GetWorkItems(query)");
-            return null;
+            return new List<WorkItemData2>();
         }
 
         public override void PersistWorkItem(WorkItemData2 source)

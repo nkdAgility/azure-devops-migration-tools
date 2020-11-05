@@ -17,7 +17,7 @@ namespace MigrationTools.EndPoints
         }
 
         public IEndpoint Source { get { return GetDirection(EndpointDirection.Source); } }
-        public IEndpoint Target { get { return GetDirection(EndpointDirection.Source); } }
+        public IEndpoint Target { get { return GetDirection(EndpointDirection.Target); } }
 
         protected IServiceProvider Services { get; }
         protected ITelemetryLogger Telemetry { get; }

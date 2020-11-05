@@ -7,9 +7,11 @@ namespace MigrationTools.Endpoints
     {
         public override Type ToConfigure => typeof(TfsWorkItemEndPoint);
 
-        private QueryOptions Query { get; set; }
+        public QueryOptions Query { get; set; }
 
-        private string AccessToken { get; set; }
+        public string AccessToken { get; set; }
+        public string Organisation { get; set; }
+        public string Project { get; set; }
 
         public override void SetDefaults()
         {

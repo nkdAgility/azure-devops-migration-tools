@@ -1,38 +1,29 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging.Abstractions;
-using MigrationTools.Endpoints;
-using MigrationTools.EndPoints;
-using MigrationTools.Engine.Containers;
-using MigrationTools.Enrichers;
-using MigrationTools.Processors;
+using Serilog;
+using Serilog.Events;
 
 namespace MigrationTools.Tests
 {
     internal static class ServiceProviderHelper
     {
-        internal static ServiceProvider GetWorkItemMigrationProcessor()
+        internal static ServiceProvider GetServicesV2()
         {
-            var logger = new NullLogger<WorkItemMigrationProcessor>();
+            var loggers = new LoggerConfiguration().MinimumLevel.Verbose().Enrich.FromLogContext();
+            loggers.WriteTo.Logger(logger => logger
+              .WriteTo.Debug(restrictedToMinimumLevel: LogEventLevel.Verbose));
+            Log.Logger = loggers.CreateLogger();
+            Log.Logger.Information("Logger is initialized");
+
             var services = new ServiceCollection();
             services.AddApplicationInsightsTelemetryWorkerService();
-
-            // Containers
-            services.AddSingleton<ProcessorContainer>();
-            services.AddSingleton<TypeDefinitionMapContainer>();
-            services.AddSingleton<GitRepoMapContainer>();
-            services.AddSingleton<FieldMapContainer>();
-            services.AddSingleton<ChangeSetMappingContainer>();
-
             services.AddSingleton<ITelemetryLogger, TelemetryClientAdapter>();
-
-            // Processors
-            services.AddSingleton<WorkItemMigrationProcessor>();
-            services.AddTransient<ProcessorEnricherContainer>();
-            services.AddTransient<EndpointContainer>();
-
-            //Endpoints
-            services.AddTransient<InMemoryWorkItemEndpoint>();
-            services.AddTransient<EndpointEnricherContainer>();
+            services.AddLogging(loggingBuilder => loggingBuilder.AddSerilog(dispose: true));
+            /////////////////////////////////
+            services.AddMigrationToolServices();
+            services.AddMigrationToolServicesForClientInMemory();
+            services.AddMigrationToolServicesForClientFileSystem();
+            services.AddMigrationToolServicesForClientAzureDevOpsObjectModel();
+            services.AddMigrationToolServicesForClientAzureDevopsRest();
 
             return services.BuildServiceProvider();
         }
