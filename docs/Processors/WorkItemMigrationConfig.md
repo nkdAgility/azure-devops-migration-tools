@@ -32,20 +32,21 @@ It will migrate work items using a tip or replay migrator as well as Attachments
 | `FixHtmlAttachmentLinks` | Boolean | **beta** If enabled this will fix any image attachments URL's in the HTML fields. You must specify a PersonalAccessToken in the Source project for Azure DevOps; TFS should use integrated authentication.  |
 | `WorkItemCreateRetryLimit` | Integer | *beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count. This allows for periodic network glitches not to end the process. | 5 |
 | `FilterWorkItemsThatAlreadyExistInTarget` | Boolean | This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run. While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart. | true |
-| `WIQLQueryBit`                           | string  | A work item query based on WIQL to select only important work items. To migrate all leave this empty. |                                          |
-| `WIQLOrderBit` | string | A work item query to affect the order in which the work items are migrated. Don't leave this empty. | [System.ChangedDate] desc
+| `WIQLQueryBit` | string  | A work item query based on WIQL to select only important work items. To migrate all leave this empty.  See [WIQL Query Bits](#WIQLQueryBits)
+| `WIQLOrderBit` | string | A work item query to affect the order in which the work items are migrated. Don't leave this empty. | [System.ChangedDate] desc 
 | `SkipToFinalRevisedWorkItemType` | Boolean | If enabled, when a revision is found that changes the work item type it will use the most recent revision work item type when migrating the initial work item. This should only be enabled for migrations from Azure DevOps Service to Azure DevOps Server. | true
 | `CollapseRevisions` | Boolean | If enabled, all revisions except the most recent are collapsed into a JSON format and attached as an attachment. Requires ReplayRevisions to be enabled. | false 
 | `PauseAfterEachWorkItem` | Boolean |  Pause after each work item is migrated | false
 | `CollapseRevisions ` | Boolean | If enabled, all work item revisions ar treated as a single revision | false 
 | `GenerateMigrationComment` | Boolean | If enabled, adds a comment recording the migration | true 
-| `NodeBasePaths` |Array`<string`> | The root paths of the Ares / Iterations you want migrate. | ["/"]                                    |
+| `NodeBasePaths` |Array`<string`> | The root paths of the Ares / Iterations you want migrate. See [NodeBasePath Configuration](#NodeBasePath) | ["/"] 
 | `WorkItemIDs ` | Array`<int`> | A list of work items to import | 
 
-## WIQL Query Bits
+## <a name="WIQLQueryBits"></a>WIQL Query Bits
 
 The Work Item queries are all built using Work Item [Query Language (WIQL)](https://docs.microsoft.com/en-us/azure/devops/boards/queries/wiql-syntax). 
 
+> Note: A useful Azure DevOps Extension to explore WIQL is the [WIQL Editor](https://marketplace.visualstudio.com/items?itemName=ottostreifel.wiql-editor)
 
 ### Examples
 
@@ -81,3 +82,51 @@ Scope to Area Path (Team data):
 "WIQLQueryBit": "AND [System.ChangedDate] > 'project\Team 1\' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
 "WIQLOrderBit": "[System.ChangedDate] desc",
 ```
+
+## <a name="NodeBasePath"></a>NodeBasePath Configuration ## 
+The `NodeBasePaths` entry allows the filtering of the nodes to be replicated on the target projects. To try to explain the correct usage let us assume that we have a source team project `SourceProj` with the following node structures
+
+- AreaPath
+   - SourceProj
+   - SourceProj\Team 1
+   - SourceProj\Team 2
+   - SourceProj\Team 3
+- IterationPath
+   - SourceProj
+   - SourceProj\Sprint 1
+   - SourceProj\Sprint 2
+   - SourceProj\Sprint 3
+
+Depending upon what node structures you wish to migrate you would need the following settings. Example are
+
+| Migration Option | NodeBasePath | Comment |
+|-|-|-|
+| Migrate all areas and iterations and all WI | [] | The same AreaPath and Iteration Paths are created on the target as on the source. Hence, all migrated WI remain in their existing area and iteration paths|
+| To only migrate area path `Team 2` and it's associated WI, but all iteration paths | [ "Team 2, "Sprint"] | Only the area path ending `Team 2` will be migrated. <br>The `WIQLQueryBit` should be edited to limit the WI migrated to this area path e.g. add `AND [System.AreaPath] UNDER 'SampleProject\\Team 2'` . <br> The migrated WI will have an area path of `TargetProj\Team 2` but retain their iteration paths matching the sprint name on the source |
+| Only migrate iterations structure | [ "Sprint"] | Only the area path ending `Team 2` will be migrated<br>All the iteration paths will be migrated. <br> The migrated WI will have the default area path of `TargetProj` as their source area path was not migrated i.e. `TargetProj`<br> The migrated WI will have an iteration path match the sprint name on the source |
+| Move all WI to the existing area and iteration paths on the targetProj | ["DUMMY VALUE"] | As the `NodeBasePath` does not match any source area or iteration path no nodes are migrated. <br>Migrated WI will be assigned to any matching area or iteration paths. If no matching ones can be found they will default to the respective root values | 
+
+## More Complex Team Migrations
+The above options allow you to bring over a sub-set of the WIs (using the `WIQLQueryBit`) and move their area or iteration path to a default location. However you may wish to do something more complex e.g. re-map the team structure. This can be done with addition of a `FieldMaps` block to configuration in addition to the `NodeBasePaths`.
+
+Using the above sample structure, if you wanted to map the source project `Team 1`  to target project `Team A` etc. you could add the field map as follows
+
+```
+ "FieldMaps": [
+   {
+      "ObjectType": "FieldValueMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceField": "System.AreaPath",
+      "targetField": "System.AreaPath",
+      "defaultValue": "TargetProg",
+      "valueMapping": {
+        "SampleProj\\Team 1": "TargetProg\\Team A",
+        "SampleProj\\Team 2": "TargetProg\\Team B"
+        "SampleProj\\Team 3": "TargetProg\\Team C"
+      }
+    },
+  ],
+
+```
+
+> Note: This mappings could also be achieved with other forms of Field mapper e.g. `RegexFieldMapConfig`, but the value mapper as an example is easy to understand
