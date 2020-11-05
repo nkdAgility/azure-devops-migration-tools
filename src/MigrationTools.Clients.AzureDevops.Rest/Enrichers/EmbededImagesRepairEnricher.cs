@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
 using MigrationTools._EngineV1.DataContracts;
+using MigrationTools._EngineV1.Enrichers;
 using MigrationTools.Enrichers;
 
 namespace MigrationTools.Clients.AzureDevops.Rest.Enrichers

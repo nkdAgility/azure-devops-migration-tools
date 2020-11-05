@@ -19,6 +19,7 @@ using MigrationTools._EngineV1.Clients;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Configuration.Processing;
 using MigrationTools._EngineV1.DataContracts;
+using MigrationTools._EngineV1.Enrichers;
 using MigrationTools._EngineV1.Processors;
 using MigrationTools.Enrichers;
 using Newtonsoft.Json;

@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools._EngineV1.DataContracts;
+using MigrationTools._EngineV1.Enrichers;
 
 namespace MigrationTools.Enrichers
 {

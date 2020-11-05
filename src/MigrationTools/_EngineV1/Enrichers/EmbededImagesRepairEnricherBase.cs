@@ -6,8 +6,9 @@ using System.Net.Http;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using MigrationTools._EngineV1.DataContracts;
+using MigrationTools.Enrichers;
 
-namespace MigrationTools.Enrichers
+namespace MigrationTools._EngineV1.Enrichers
 {
     public abstract class EmbededImagesRepairEnricherBase : WorkItemProcessorEnricher
     {
