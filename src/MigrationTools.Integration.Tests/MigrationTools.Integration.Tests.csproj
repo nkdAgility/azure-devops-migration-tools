@@ -23,11 +23,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\MigrationTools.Clients.AzureDevops.ObjectModel\MigrationTools.Clients.AzureDevops.ObjectModel.csproj" />
-    <ProjectReference Include="..\src\MigrationTools.Clients.AzureDevops.Rest\MigrationTools.Clients.AzureDevops.Rest.csproj" />
-    <ProjectReference Include="..\src\MigrationTools.Clients.FileSystem\MigrationTools.Clients.FileSystem.csproj" />
-    <ProjectReference Include="..\src\MigrationTools.Clients.InMemory\MigrationTools.Clients.InMemory.csproj" />
-    <ProjectReference Include="..\src\MigrationTools\MigrationTools.csproj" />
+    <ProjectReference Include="..\MigrationTools.Clients.AzureDevops.ObjectModel\MigrationTools.Clients.AzureDevops.ObjectModel.csproj" />
+    <ProjectReference Include="..\MigrationTools.Clients.AzureDevops.Rest\MigrationTools.Clients.AzureDevops.Rest.csproj" />
+    <ProjectReference Include="..\MigrationTools.Clients.FileSystem\MigrationTools.Clients.FileSystem.csproj" />
+    <ProjectReference Include="..\MigrationTools.Clients.InMemory\MigrationTools.Clients.InMemory.csproj" />
+    <ProjectReference Include="..\MigrationTools\MigrationTools.csproj" />
   </ItemGroup>
 
 </Project>
