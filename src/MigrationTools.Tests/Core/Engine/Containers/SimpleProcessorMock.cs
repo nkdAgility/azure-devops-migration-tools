@@ -1,4 +1,4 @@
-﻿using MigrationTools.Configuration;
+﻿using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Processors;
 
 namespace MigrationTools.Engine.Containers.Tests

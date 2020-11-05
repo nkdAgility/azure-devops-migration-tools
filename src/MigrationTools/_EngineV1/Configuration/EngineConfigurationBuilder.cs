@@ -12,7 +12,7 @@ using MigrationTools.Processors;
 using Newtonsoft.Json;
 using Serilog.Events;
 
-namespace MigrationTools.Configuration
+namespace MigrationTools._EngineV1.Configuration
 {
     public class EngineConfigurationBuilder : IEngineConfigurationBuilder
     {

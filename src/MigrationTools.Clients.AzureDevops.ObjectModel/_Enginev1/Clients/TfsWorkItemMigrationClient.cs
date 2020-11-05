@@ -6,8 +6,8 @@ using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools;
+using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.DataContracts;
-using MigrationTools.Configuration;
 using Serilog;
 
 namespace MigrationTools._EngineV1.Clients

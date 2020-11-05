@@ -5,9 +5,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools;
 using MigrationTools._EngineV1.Clients;
+using MigrationTools._EngineV1.Configuration;
+using MigrationTools._EngineV1.Configuration.Processing;
 using MigrationTools._EngineV1.Processors;
-using MigrationTools.Configuration;
-using MigrationTools.Configuration.Processing;
 
 namespace VstsSyncMigrator.Engine
 {

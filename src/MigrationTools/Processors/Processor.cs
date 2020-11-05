@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.Extensions.Logging;
-using MigrationTools.Configuration;
+using MigrationTools._EngineV1.Configuration;
 using MigrationTools.EndPoints;
 using MigrationTools.Enrichers;
 

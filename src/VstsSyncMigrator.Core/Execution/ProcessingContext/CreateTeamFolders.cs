@@ -8,7 +8,7 @@ using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools;
 using MigrationTools._EngineV1.Clients;
-using MigrationTools.Configuration;
+using MigrationTools._EngineV1.Configuration;
 using VstsSyncMigrator._EngineV1.Processors;
 
 namespace VstsSyncMigrator.Engine

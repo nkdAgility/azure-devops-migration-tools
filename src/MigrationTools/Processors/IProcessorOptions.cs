@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using MigrationTools.Configuration;
+using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
 

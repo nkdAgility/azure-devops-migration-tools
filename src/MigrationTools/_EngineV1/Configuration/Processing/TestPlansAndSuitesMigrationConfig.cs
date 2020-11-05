@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace MigrationTools.Configuration.Processing
+namespace MigrationTools._EngineV1.Configuration.Processing
 {
     public class TestPlansAndSuitesMigrationConfig : IProcessorConfig
     {

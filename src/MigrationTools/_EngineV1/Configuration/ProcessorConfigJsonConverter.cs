@@ -4,7 +4,7 @@ using MigrationTools.Options;
 using Newtonsoft.Json.Linq;
 using Serilog;
 
-namespace MigrationTools.Configuration
+namespace MigrationTools._EngineV1.Configuration
 {
     public class ProcessorConfigJsonConverter : JsonOptionConvertor<IProcessorConfig>
     {

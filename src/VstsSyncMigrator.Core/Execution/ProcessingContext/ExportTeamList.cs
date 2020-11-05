@@ -6,8 +6,7 @@ using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.Framework.Common;
 using Microsoft.TeamFoundation.Server;
 using MigrationTools;
-
-using MigrationTools.Configuration;
+using MigrationTools._EngineV1.Configuration;
 using VstsSyncMigrator._EngineV1.Processors;
 
 namespace VstsSyncMigrator.Engine

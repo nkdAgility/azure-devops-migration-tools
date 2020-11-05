@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Containers;
 using MigrationTools._EngineV1.DataContracts;
-using MigrationTools.Configuration;
 
 namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
 {

@@ -1,12 +1,12 @@
 ﻿using Newtonsoft.Json;
 
-namespace MigrationTools.Configuration
+namespace MigrationTools._EngineV1.Configuration
 {
     public interface IFieldMapConfig
     {
         string WorkItemTypeName { get; set; }
 
-        [JsonIgnoreAttribute]
+        [JsonIgnore]
         string FieldMap { get; }
     }
 }

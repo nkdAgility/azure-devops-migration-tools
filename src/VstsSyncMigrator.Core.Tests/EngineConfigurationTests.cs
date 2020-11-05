@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools;
-using MigrationTools.Configuration;
+using MigrationTools._EngineV1.Configuration;
 
 namespace _VstsSyncMigrator.Engine.Tests
 {

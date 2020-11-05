@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using Microsoft.Extensions.Logging;
+using MigrationTools._EngineV1.Configuration;
 using MigrationTools.CommandLine;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Serilog.Events;
 
-namespace MigrationTools.Configuration
+namespace MigrationTools._EngineV1.Configuration
 {
     public class EngineConfiguration
     {
@@ -26,7 +27,10 @@ namespace MigrationTools.Configuration
         public virtual bool workaroundForQuerySOAPBugEnabled { get; set; }
         public virtual Dictionary<string, string> WorkItemTypeDefinition { get; set; }
     }
+}
 
+namespace MigrationTools.Configuration
+{
     public class EngineConfigurationWrapper : EngineConfiguration
     {
         private readonly EngineConfiguration _engineConfiguration;

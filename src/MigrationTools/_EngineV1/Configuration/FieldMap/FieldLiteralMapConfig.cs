@@ -1,4 +1,4 @@
-﻿namespace MigrationTools.Configuration.FieldMap
+﻿namespace MigrationTools._EngineV1.Configuration.FieldMap
 {
     public class FieldLiteralMapConfig : IFieldMapConfig
     {

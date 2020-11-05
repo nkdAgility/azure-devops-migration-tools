@@ -1,4 +1,4 @@
-﻿namespace MigrationTools.Configuration
+﻿namespace MigrationTools._EngineV1.Configuration
 {
     public interface IEngineConfigurationBuilder
     {

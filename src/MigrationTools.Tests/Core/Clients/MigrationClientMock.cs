@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net;
 using MigrationTools._EngineV1.Clients;
-using MigrationTools.Configuration;
+using MigrationTools._EngineV1.Configuration;
 
 namespace MigrationTools.Tests.Core.Clients
 {

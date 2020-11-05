@@ -1,4 +1,4 @@
-﻿using MigrationTools.Configuration;
+﻿using MigrationTools._EngineV1.Configuration;
 
 namespace _VstsSyncMigrator.Engine.Tests
 {

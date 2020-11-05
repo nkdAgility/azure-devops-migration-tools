@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace MigrationTools.Configuration
+namespace MigrationTools._EngineV1.Configuration
 {
     internal interface IWorkItemProcessorConfig : IProcessorConfig
     {

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace MigrationTools.Configuration.FieldMap
+namespace MigrationTools._EngineV1.Configuration.FieldMap
 {
     public class MultiValueConditionalMapConfig : IFieldMapConfig
     {

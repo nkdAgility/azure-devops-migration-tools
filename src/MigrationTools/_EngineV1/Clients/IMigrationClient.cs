@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Net;
-using MigrationTools.Configuration;
+using MigrationTools._EngineV1.Configuration;
 
 namespace MigrationTools._EngineV1.Clients
 {

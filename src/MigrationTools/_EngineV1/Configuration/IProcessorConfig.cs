@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace MigrationTools.Configuration
+namespace MigrationTools._EngineV1.Configuration
 {
     public interface IProcessorConfig
     {
@@ -10,7 +10,7 @@ namespace MigrationTools.Configuration
         /// </summary>
         bool Enabled { get; set; }
 
-        [JsonIgnoreAttribute]
+        [JsonIgnore]
         string Processor { get; }
 
         /// <summary>

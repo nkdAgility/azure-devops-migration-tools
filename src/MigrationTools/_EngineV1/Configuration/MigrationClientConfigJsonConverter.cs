@@ -3,7 +3,7 @@ using System.Linq;
 using MigrationTools.Options;
 using Newtonsoft.Json.Linq;
 
-namespace MigrationTools.Configuration
+namespace MigrationTools._EngineV1.Configuration
 {
     public class MigrationClientConfigJsonConverter : JsonOptionConvertor<IMigrationClientConfig>
     {

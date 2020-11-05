@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
-using MigrationTools.Configuration;
+using MigrationTools._EngineV1.Configuration;
 using Serilog;
 
 namespace MigrationTools._EngineV1.Containers

@@ -1,5 +1,5 @@
 ﻿using System;
-using MigrationTools.Configuration;
+using MigrationTools._EngineV1.Configuration;
 
 namespace MigrationTools._EngineV1.Containers
 {

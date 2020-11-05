@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using MigrationTools;
-using MigrationTools.Configuration;
+using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Processors;
 
 namespace VstsSyncMigrator._EngineV1.Processors

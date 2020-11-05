@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MigrationTools.Configuration;
+using MigrationTools._EngineV1.Configuration;
 
 namespace MigrationTools.Host.Tests
 {

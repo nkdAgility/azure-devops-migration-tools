@@ -10,8 +10,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.Framework.Client;
 using Microsoft.TeamFoundation.Framework.Common;
 using MigrationTools;
-using MigrationTools.Configuration;
-using MigrationTools.Configuration.Processing;
+using MigrationTools._EngineV1.Configuration;
+using MigrationTools._EngineV1.Configuration.Processing;
 using VstsSyncMigrator._EngineV1.Processors;
 
 namespace VstsSyncMigrator.Engine
