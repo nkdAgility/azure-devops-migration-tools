@@ -3,10 +3,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools;
-using MigrationTools.Clients;
+using MigrationTools._EngineV1.Clients;
+using MigrationTools._EngineV1.Configuration;
+using MigrationTools._EngineV1.Containers;
 using MigrationTools.CommandLine;
-using MigrationTools.Configuration;
-using MigrationTools.Engine.Containers;
 using MigrationTools.FieldMaps.AzureDevops.ObjectModel;
 using MigrationTools.Services;
 using Serilog.Core;
@@ -74,6 +74,5 @@ namespace _VstsSyncMigrator.Engine.Tests
             IMigrationEngine me = _services.GetRequiredService<IMigrationEngine>();
             me.Run();
         }
-
     }
 }

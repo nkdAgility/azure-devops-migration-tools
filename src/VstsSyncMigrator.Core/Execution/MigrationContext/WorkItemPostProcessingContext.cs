@@ -6,11 +6,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools;
-using MigrationTools.Clients;
-using MigrationTools.Configuration;
-using MigrationTools.Configuration.Processing;
-using MigrationTools.DataContracts;
-using MigrationTools.Engine.Processors;
+using MigrationTools._EngineV1.Clients;
+using MigrationTools._EngineV1.Configuration;
+using MigrationTools._EngineV1.Configuration.Processing;
+using MigrationTools._EngineV1.DataContracts;
+using MigrationTools._EngineV1.Processors;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -44,7 +44,7 @@ namespace VstsSyncMigrator.Engine
             string constraints = BuildQueryBitConstraints();
             wiqb.Query = string.Format(@"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY [System.Id] ", constraints);
 
-            List<WorkItemData> sourceWIS = Engine.Target.WorkItems.GetWorkItems(wiqb);
+            List<MigrationTools._EngineV1.DataContracts.WorkItemData> sourceWIS = Engine.Target.WorkItems.GetWorkItems((IWorkItemQueryBuilder)wiqb);
             Log.LogInformation("Migrate {0} work items?", sourceWIS.Count);
             //////////////////////////////////////////////////
             ProjectData destProject = Engine.Target.WorkItems.GetProject();
@@ -53,11 +53,11 @@ namespace VstsSyncMigrator.Engine
             int current = sourceWIS.Count;
             int count = 0;
             long elapsedms = 0;
-            foreach (WorkItemData sourceWI in sourceWIS)
+            foreach (MigrationTools._EngineV1.DataContracts.WorkItemData sourceWI in sourceWIS)
             {
                 Stopwatch witstopwatch = Stopwatch.StartNew();
-                WorkItemData targetFound;
-                targetFound = Engine.Target.WorkItems.FindReflectedWorkItem(sourceWI, false);
+                MigrationTools._EngineV1.DataContracts.WorkItemData targetFound;
+                targetFound = Engine.Target.WorkItems.FindReflectedWorkItem((MigrationTools._EngineV1.DataContracts.WorkItemData)sourceWI, (bool)false);
                 Log.LogInformation("{0} - Updating: {1}-{2}", current, sourceWI.Id, sourceWI.Type);
                 if (targetFound == null)
                 {
@@ -66,13 +66,13 @@ namespace VstsSyncMigrator.Engine
                 else
                 {
                     Log.LogInformation("...Exists");
-                    targetFound.ToWorkItem().Open();
+                    TfsExtensions.ToWorkItem(targetFound).Open();
                     Engine.FieldMaps.ApplyFieldMappings(sourceWI, targetFound);
-                    if (targetFound.ToWorkItem().IsDirty)
+                    if (TfsExtensions.ToWorkItem(targetFound).IsDirty)
                     {
                         try
                         {
-                            targetFound.SaveToAzureDevOps();
+                            TfsExtensions.SaveToAzureDevOps(targetFound);
                             Log.LogInformation("          Updated");
                         }
                         catch (ValidationException ve)
@@ -84,7 +84,7 @@ namespace VstsSyncMigrator.Engine
                     {
                         Log.LogInformation("          No changes");
                     }
-                    sourceWI.ToWorkItem().Close();
+                    TfsExtensions.ToWorkItem(sourceWI).Close();
                 }
                 witstopwatch.Stop();
                 elapsedms = elapsedms + witstopwatch.ElapsedMilliseconds;

@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
-using MigrationTools.DataContracts;
+using MigrationTools._EngineV1.DataContracts;
+using MigrationTools._EngineV1.Enrichers;
 using MigrationTools.Enrichers;
 
 namespace MigrationTools.Clients.AzureDevops.Rest.Enrichers
@@ -12,6 +13,11 @@ namespace MigrationTools.Clients.AzureDevops.Rest.Enrichers
         }
 
         public override void Configure(bool save = true, bool filter = true)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Configure(IProcessorEnricherOptions options)
         {
             throw new NotImplementedException();
         }

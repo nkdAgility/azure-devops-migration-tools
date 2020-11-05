@@ -4,10 +4,10 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools;
-using MigrationTools.Clients;
-using MigrationTools.Configuration;
-using MigrationTools.Configuration.Processing;
-using MigrationTools.Engine.Processors;
+using MigrationTools._EngineV1.Clients;
+using MigrationTools._EngineV1.Configuration;
+using MigrationTools._EngineV1.Configuration.Processing;
+using MigrationTools._EngineV1.Processors;
 
 namespace VstsSyncMigrator.Engine
 {

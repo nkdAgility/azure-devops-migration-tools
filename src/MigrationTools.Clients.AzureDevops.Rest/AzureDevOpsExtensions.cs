@@ -1,6 +1,6 @@
 ﻿using System;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
-using MigrationTools.DataContracts;
+using MigrationTools._EngineV1.DataContracts;
 
 namespace MigrationTools.Clients.AzureDevops.Rest
 {

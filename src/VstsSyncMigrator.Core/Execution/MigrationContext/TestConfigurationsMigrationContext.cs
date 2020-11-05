@@ -3,9 +3,8 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.TestManagement.Client;
 using MigrationTools;
-
-using MigrationTools.Configuration;
-using MigrationTools.Engine.Processors;
+using MigrationTools._EngineV1.Configuration;
+using MigrationTools._EngineV1.Processors;
 using VstsSyncMigrator.Engine.ComponentContext;
 
 namespace VstsSyncMigrator.Engine

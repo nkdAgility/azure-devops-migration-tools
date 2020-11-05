@@ -5,8 +5,10 @@ using System.Threading.Tasks;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using MigrationTools._EngineV1.Configuration;
 using MigrationTools.CommandLine;
-using MigrationTools.Configuration;
+using MigrationTools.Endpoints;
+using MigrationTools.Enrichers;
 using Newtonsoft.Json;
 
 namespace MigrationTools
@@ -73,6 +75,14 @@ namespace MigrationTools
                                     config = _configurationBuilder.BuildWorkItemMigration();
                                     break;
 
+                                case OptionsMode.Fullv2:
+                                    config = _configurationBuilder.BuildDefault2();
+                                    break;
+
+                                case OptionsMode.WorkItemTrackingv2:
+                                    config = _configurationBuilder.BuildWorkItemMigration2();
+                                    break;
+
                                 default:
                                     config = _configurationBuilder.BuildDefault();
                                     break;
@@ -81,6 +91,8 @@ namespace MigrationTools
                             string json = JsonConvert.SerializeObject(config, Formatting.Indented,
                                 new FieldMapConfigJsonConverter(),
                                 new ProcessorConfigJsonConverter(),
+                                new JsonConverterForEndpointOptions(),
+                                new JsonConverterForEnricherOptions(),
                                 new MigrationClientConfigJsonConverter());
                             StreamWriter sw = new StreamWriter(configFile);
                             sw.WriteLine(json);

@@ -1,9 +1,9 @@
-﻿using MigrationTools.Configuration;
+﻿using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Processors;
 
 namespace MigrationTools.Engine.Containers.Tests
 {
-    public class SimpleProcessorMock : IProcessor
+    public class SimpleProcessorMock : _EngineV1.Containers.IProcessor
     {
         public string Name => "TestSimpleContext";
 

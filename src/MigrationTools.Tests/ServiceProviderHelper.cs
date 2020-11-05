@@ -1,6 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
-using MigrationTools.Engine.Containers;
+using MigrationTools._EngineV1.Containers;
+using MigrationTools.Endpoints;
+using MigrationTools.EndPoints;
+using MigrationTools.Enrichers;
 using MigrationTools.Processors;
 
 namespace MigrationTools.Tests
@@ -24,6 +27,12 @@ namespace MigrationTools.Tests
 
             // Processors
             services.AddSingleton<WorkItemMigrationProcessor>();
+            services.AddTransient<ProcessorEnricherContainer>();
+            services.AddTransient<EndpointContainer>();
+
+            //Endpoints
+            services.AddTransient<InMemoryWorkItemEndpoint>();
+            services.AddTransient<EndpointEnricherContainer>();
 
             return services.BuildServiceProvider();
         }

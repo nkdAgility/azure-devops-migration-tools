@@ -1,6 +1,7 @@
 ﻿using System;
-using MigrationTools.Configuration;
-using MigrationTools.DataContracts;
+using MigrationTools._EngineV1.Configuration;
+using MigrationTools._EngineV1.Containers;
+using MigrationTools._EngineV1.DataContracts;
 
 namespace MigrationTools.Engine.Containers.Tests
 {

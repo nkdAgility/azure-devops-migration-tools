@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using MigrationTools.Clients;
-using MigrationTools.DataContracts;
-using MigrationTools.Endpoints;
+using MigrationTools._EngineV1.Clients;
 using Newtonsoft.Json;
 
 namespace MigrationTools.Endpoints
@@ -26,15 +24,20 @@ namespace MigrationTools.Endpoints
             }
         }
 
-        public List<WorkItemData> GetWorkItems()
+        public List<_EngineV1.DataContracts.WorkItemData> GetWorkItems()
         {
-            List<WorkItemData> workItems = new List<WorkItemData>();
+            throw new InvalidOperationException();
+        }
+
+        public List<DataContracts.WorkItemData> GetWorkItems2()
+        {
+            List<DataContracts.WorkItemData> workItems = new List<DataContracts.WorkItemData>();
 
             var workitemFiles = System.IO.Directory.GetFiles(_query);
             foreach (var item in workitemFiles)
             {
                 var contents = System.IO.File.ReadAllText(item);
-                var workItem = JsonConvert.DeserializeObject<WorkItemData>(contents);
+                var workItem = JsonConvert.DeserializeObject<DataContracts.WorkItemData>(contents);
                 workItems.Add(workItem);
             }
 

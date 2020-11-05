@@ -6,7 +6,8 @@ using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using MigrationTools.DataContracts;
+using MigrationTools._EngineV1.DataContracts;
+using MigrationTools._EngineV1.Enrichers;
 
 namespace MigrationTools.Enrichers
 {
@@ -17,6 +18,12 @@ namespace MigrationTools.Enrichers
         }
 
         public override void Configure(bool save = true, bool filter = true)
+        {
+            throw new NotImplementedException();
+        }
+
+        [Obsolete("v2 Archtecture: use Configure(bool save = true, bool filter = true) instead", true)]
+        public override void Configure(IProcessorEnricherOptions options)
         {
             throw new NotImplementedException();
         }

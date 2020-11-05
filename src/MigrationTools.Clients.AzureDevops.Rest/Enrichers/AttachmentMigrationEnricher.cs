@@ -1,6 +1,6 @@
 ﻿using System;
-using MigrationTools.DataContracts;
-using MigrationTools.Enrichers;
+using MigrationTools._EngineV1.DataContracts;
+using MigrationTools._EngineV1.Enrichers;
 
 namespace MigrationTools.Clients.AzureDevops.Rest.Enrichers
 {

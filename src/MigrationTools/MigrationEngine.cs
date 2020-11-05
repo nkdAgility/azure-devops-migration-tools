@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using Microsoft.Extensions.DependencyInjection;
-using MigrationTools.Clients;
+using MigrationTools._EngineV1.Clients;
+using MigrationTools._EngineV1.Configuration;
+using MigrationTools._EngineV1.Containers;
 using MigrationTools.CommandLine;
-using MigrationTools.Configuration;
-using MigrationTools.Engine.Containers;
 using MigrationTools.Processors;
 using Serilog;
 using Serilog.Core;
@@ -115,7 +115,7 @@ namespace MigrationTools
             FieldMaps.EnsureConfigured();
 
             Log.Information("Beginning run of {ProcessorCount} processors", Processors.Count.ToString());
-            foreach (IProcessor process in Processors.Items)
+            foreach (_EngineV1.Containers.IProcessor process in Processors.Items)
             {
                 Log.Information("Processor: {ProcessorName}", process.Name);
                 Stopwatch processorTimer = Stopwatch.StartNew();

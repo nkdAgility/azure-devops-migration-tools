@@ -1,13 +1,11 @@
-﻿using System.Collections.ObjectModel;
-using MigrationTools.Endpoints;
-using MigrationTools.Engine.Containers;
+﻿using MigrationTools.EndPoints;
 using MigrationTools.Enrichers;
 
 namespace MigrationTools.Processors
 {
-    public interface IProcessor2 : IProcessor
+    public interface IProcessor : MigrationTools._EngineV1.Containers.IProcessor
     {
-        Collection<IEndpoint> Endpoints { get; }
-        Collection<IProcessorEnricher> Enrichers { get; }
+        EndpointContainer Endpoints { get; }
+        ProcessorEnricherContainer ProcessorEnrichers { get; }
     }
 }

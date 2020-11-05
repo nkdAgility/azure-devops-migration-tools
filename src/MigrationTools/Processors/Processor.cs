@@ -1,33 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Linq;
 using Microsoft.Extensions.Logging;
-using MigrationTools.Configuration;
-using MigrationTools.Endpoints;
+using MigrationTools._EngineV1.Configuration;
+using MigrationTools.EndPoints;
 using MigrationTools.Enrichers;
 
 namespace MigrationTools.Processors
 {
-    public abstract class Processor : IProcessor2
+    public abstract class Processor : IProcessor
     {
-        public Processor(IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger)
+        public Processor(
+            ProcessorEnricherContainer processorEnricherContainer,
+            EndpointContainer endpointContainer,
+            IServiceProvider services,
+            ITelemetryLogger telemetry,
+            ILogger<Processor> logger)
         {
             Services = services;
             Telemetry = telemetry;
             Log = logger;
+            Endpoints = endpointContainer;
+            ProcessorEnrichers = processorEnricherContainer;
         }
 
-        public Collection<IEndpoint> Endpoints => throw new NotImplementedException();
+        public EndpointContainer Endpoints { get; }
 
-        public Collection<IProcessorEnricher> Enrichers => throw new NotImplementedException();
+        public ProcessorEnricherContainer ProcessorEnrichers { get; }
 
         public string Name { get { return this.GetType().Name; } }
 
         public ProcessingStatus Status { get; private set; } = ProcessingStatus.None;
-        public IServiceProvider Services { get; }
-        public ITelemetryLogger Telemetry { get; }
-        public ILogger<Processor> Log { get; }
+        protected IServiceProvider Services { get; }
+        protected ITelemetryLogger Telemetry { get; }
+        protected ILogger<Processor> Log { get; }
 
         public abstract void Configure(IProcessorOptions config);
 
@@ -79,5 +86,20 @@ namespace MigrationTools.Processors
         }
 
         protected abstract void InternalExecute();
+
+        protected Type GetTypeFromName(string name)
+        {
+            Type type = AppDomain.CurrentDomain.GetAssemblies()
+                 .Where(a => !a.IsDynamic)
+                 .SelectMany(a => a.GetTypes())
+                 .FirstOrDefault(t => t.Name.Equals(name) || t.FullName.Equals(name));
+            if (type is null)
+            {
+                var e = new InvalidOperationException("The Type cant be found");
+                Log.LogError(e, "Unable to find the type {ObjectToLoadName} needed by the processor {ProfessorName}", name, nameof(this.GetType));
+                throw e;
+            }
+            return type;
+        }
     }
 }

@@ -7,12 +7,12 @@ using Microsoft.TeamFoundation;
 using Microsoft.TeamFoundation.Git.Client;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using MigrationTools.Clients;
-using MigrationTools.DataContracts;
+using MigrationTools._EngineV1.Clients;
+using MigrationTools._EngineV1.DataContracts;
 
 namespace MigrationTools.Enrichers
 {
-    public class TfsGitRepositoryEnricher : WorkItemEnricher
+    public class TfsGitRepositoryEnricher : WorkItemProcessorEnricher
     {
         private IMigrationEngine _Engine;
         private readonly ILogger<TfsGitRepositoryEnricher> _Logger;
@@ -221,6 +221,12 @@ namespace MigrationTools.Enrichers
             {
                 return repoInfo.GitRepo.Name;
             }
+        }
+
+        [Obsolete("v2 Archtecture: use Configure(bool save = true, bool filter = true) instead", true)]
+        public override void Configure(IProcessorEnricherOptions options)
+        {
+            throw new NotImplementedException();
         }
     }
 }

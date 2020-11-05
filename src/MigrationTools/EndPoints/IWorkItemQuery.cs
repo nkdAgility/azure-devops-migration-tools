@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using MigrationTools.Clients;
-using MigrationTools.DataContracts;
+﻿using System;
+using System.Collections.Generic;
+using MigrationTools._EngineV1.Clients;
 
 namespace MigrationTools.Endpoints
 {
@@ -10,6 +10,9 @@ namespace MigrationTools.Endpoints
 
         void Configure(IMigrationClient migrationClient, string query, Dictionary<string, string> parameters);
 
-        List<WorkItemData> GetWorkItems();
+        [Obsolete("For old style code use this, for new style use GetWorkItems2. Return type differs only")]
+        List<_EngineV1.DataContracts.WorkItemData> GetWorkItems();
+
+        List<DataContracts.WorkItemData> GetWorkItems2();
     }
 }

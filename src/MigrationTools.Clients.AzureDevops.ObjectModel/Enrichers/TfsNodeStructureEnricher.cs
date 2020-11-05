@@ -5,8 +5,8 @@ using System.Text.RegularExpressions;
 using System.Xml;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.Server;
-using MigrationTools.Clients;
-using MigrationTools.DataContracts;
+using MigrationTools._EngineV1.Clients;
+using MigrationTools._EngineV1.DataContracts;
 
 namespace MigrationTools.Enrichers
 {
@@ -16,7 +16,7 @@ namespace MigrationTools.Enrichers
         Iteration
     }
 
-    public class TfsNodeStructureEnricher : WorkItemEnricher
+    public class TfsNodeStructureEnricher : WorkItemProcessorEnricher
     {
         private Dictionary<string, bool> _foundNodes = new Dictionary<string, bool>();
         private string[] _nodeBasePaths;
@@ -36,6 +36,12 @@ namespace MigrationTools.Enrichers
 
         public override void Configure(bool save = true, bool filterWorkItemsThatAlreadyExistInTarget = true)
         {
+        }
+
+        [Obsolete("v2 Archtecture: use Configure(bool save = true, bool filter = true) instead", true)]
+        public override void Configure(IProcessorEnricherOptions options)
+        {
+            throw new NotImplementedException();
         }
 
         public override int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)

@@ -2,7 +2,7 @@
 using System.Linq;
 using Microsoft.TeamFoundation.TestManagement.Client;
 using MigrationTools;
-using MigrationTools.Clients;
+using MigrationTools._EngineV1.Clients;
 
 namespace VstsSyncMigrator.Engine.ComponentContext
 {
