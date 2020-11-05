@@ -5,12 +5,13 @@ using System.Text;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using MigrationTools._Enginev1.DataContracts;
+using MigrationTools;
+using MigrationTools._EngineV1.DataContracts;
+using MigrationTools.Clients;
 using MigrationTools.Configuration;
-using MigrationTools.DataContracts;
 using Serilog;
 
-namespace MigrationTools.Clients
+namespace MigrationTools._EngineV1.Clients
 {
     public class TfsWorkItemMigrationClient : WorkItemMigrationClientBase
     {

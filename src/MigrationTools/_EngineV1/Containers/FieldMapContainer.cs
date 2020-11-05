@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
-using MigrationTools._Enginev1.DataContracts;
+using MigrationTools._EngineV1.DataContracts;
 using MigrationTools.Configuration;
 using Serilog;
 
-namespace MigrationTools._Enginev1.Containers
+namespace MigrationTools._EngineV1.Containers
 {
     public class FieldMapContainer : EngineContainer<Dictionary<string, List<IFieldMap>>>
     {

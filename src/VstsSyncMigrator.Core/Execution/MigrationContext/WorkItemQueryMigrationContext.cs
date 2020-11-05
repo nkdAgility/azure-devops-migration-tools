@@ -4,8 +4,8 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools;
-using MigrationTools._Enginev1.Processors;
-using MigrationTools.Clients;
+using MigrationTools._EngineV1.Clients;
+using MigrationTools._EngineV1.Processors;
 using MigrationTools.Configuration;
 using MigrationTools.Configuration.Processing;
 

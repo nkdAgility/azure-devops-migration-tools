@@ -1,4 +1,4 @@
-﻿namespace MigrationTools.Clients
+﻿namespace MigrationTools._EngineV1.Clients
 {
     public class TfsWiqlDefinition
     {

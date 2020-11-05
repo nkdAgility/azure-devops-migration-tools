@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
-using MigrationTools._Enginev1.Containers;
-using MigrationTools._Enginev1.DataContracts;
+using MigrationTools._EngineV1.Containers;
+using MigrationTools._EngineV1.DataContracts;
 using MigrationTools.Configuration;
 using Serilog;
 

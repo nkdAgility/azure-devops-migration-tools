@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Text.RegularExpressions;
-using MigrationTools._Enginev1.DataContracts;
+using MigrationTools;
+using MigrationTools._EngineV1.DataContracts;
+using MigrationTools.Clients;
 using Serilog;
 
-namespace MigrationTools.Clients
+namespace MigrationTools._EngineV1.Clients
 {
     public class TfsReflectedWorkItemId : ReflectedWorkItemId
     {

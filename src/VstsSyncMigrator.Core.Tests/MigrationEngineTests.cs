@@ -3,7 +3,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools;
-using MigrationTools._Enginev1.Containers;
+using MigrationTools._EngineV1.Clients;
+using MigrationTools._EngineV1.Containers;
 using MigrationTools.Clients;
 using MigrationTools.CommandLine;
 using MigrationTools.Configuration;
@@ -74,6 +75,5 @@ namespace _VstsSyncMigrator.Engine.Tests
             IMigrationEngine me = _services.GetRequiredService<IMigrationEngine>();
             me.Run();
         }
-
     }
 }

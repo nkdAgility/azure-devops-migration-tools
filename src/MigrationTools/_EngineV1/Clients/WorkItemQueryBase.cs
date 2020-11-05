@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using MigrationTools._Enginev1.DataContracts;
-using MigrationTools.DataContracts;
 using MigrationTools.Endpoints;
 
 namespace MigrationTools.Clients
@@ -31,7 +29,7 @@ namespace MigrationTools.Clients
             _Parameters = parameters ?? throw new ArgumentNullException(nameof(parameters));
         }
 
-        public abstract List<_Enginev1.DataContracts.WorkItemData> GetWorkItems();
+        public abstract List<_EngineV1.DataContracts.WorkItemData> GetWorkItems();
 
         public abstract List<DataContracts.WorkItemData> GetWorkItems2();
     }

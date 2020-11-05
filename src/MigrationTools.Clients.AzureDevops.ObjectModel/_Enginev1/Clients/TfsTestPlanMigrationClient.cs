@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using MigrationTools.Clients;
 using MigrationTools.Configuration;
 
-namespace MigrationTools.Clients
+namespace MigrationTools._EngineV1.Clients
 {
     public class TfsTestPlanMigrationClient : ITestPlanMigrationClient
     {

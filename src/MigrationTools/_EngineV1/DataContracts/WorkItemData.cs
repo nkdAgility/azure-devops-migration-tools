@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace MigrationTools._Enginev1.DataContracts
+namespace MigrationTools._EngineV1.DataContracts
 {
     public class WorkItemData
     {

@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using MigrationTools;
-using MigrationTools._Enginev1.Containers;
 using MigrationTools.Configuration;
 using MigrationTools.Processors;
 
-namespace VstsSyncMigrator._Enginev1.Processors
+namespace VstsSyncMigrator._EngineV1.Processors
 {
-    public abstract class StaticProcessorBase : MigrationTools._Enginev1.Containers.IProcessor
+    public abstract class StaticProcessorBase : MigrationTools._EngineV1.Containers.IProcessor
     {
         internal IMigrationEngine _me;
         private ProcessingStatus status = ProcessingStatus.None;
@@ -18,7 +17,7 @@ namespace VstsSyncMigrator._Enginev1.Processors
         public IMigrationEngine Engine { get { return _me; } }
         public IServiceProvider Services { get { return _services; } }
 
-        public StaticProcessorBase(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<MigrationTools._Enginev1.Containers.IProcessor> logger)
+        public StaticProcessorBase(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<MigrationTools._EngineV1.Containers.IProcessor> logger)
         {
             _services = services;
             _me = me;
@@ -39,7 +38,7 @@ namespace VstsSyncMigrator._Enginev1.Processors
         }
 
         public ITelemetryLogger Telemetry { get; }
-        public ILogger<MigrationTools._Enginev1.Containers.IProcessor> Log { get; }
+        public ILogger<MigrationTools._EngineV1.Containers.IProcessor> Log { get; }
 
         public void Execute()
         {

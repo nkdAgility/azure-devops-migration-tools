@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using MigrationTools._Enginev1.DataContracts;
 using MigrationTools.Clients;
-using MigrationTools.DataContracts;
 using Newtonsoft.Json;
 
 namespace MigrationTools.Endpoints
@@ -26,7 +24,7 @@ namespace MigrationTools.Endpoints
             }
         }
 
-        public List<_Enginev1.DataContracts.WorkItemData> GetWorkItems()
+        public List<_EngineV1.DataContracts.WorkItemData> GetWorkItems()
         {
             throw new InvalidOperationException();
         }

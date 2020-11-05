@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Proxy;
-using MigrationTools._Enginev1.DataContracts;
+using MigrationTools._EngineV1.DataContracts;
 using Serilog;
 
 namespace MigrationTools.Enrichers

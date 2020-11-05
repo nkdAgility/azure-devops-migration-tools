@@ -1,6 +1,7 @@
 ﻿using System;
+using MigrationTools.Configuration;
 
-namespace MigrationTools.Configuration
+namespace MigrationTools._EngineV1.Configuration
 {
     public class TfsTeamProjectConfig : IMigrationClientConfig
     {
@@ -27,7 +28,10 @@ namespace MigrationTools.Configuration
             return string.Format("{0}/{1}", Collection, Project);
         }
     }
+}
 
+namespace MigrationTools.Configuration
+{
     public class LanguageMaps
     {
         public string AreaPath { get; set; }

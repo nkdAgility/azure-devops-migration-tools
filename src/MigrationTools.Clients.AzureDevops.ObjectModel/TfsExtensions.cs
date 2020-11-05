@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using MigrationTools._Enginev1.DataContracts;
+using MigrationTools._EngineV1.Configuration;
+using MigrationTools._EngineV1.DataContracts;
 using MigrationTools.Configuration;
 using MigrationTools.DataContracts;
 using Newtonsoft.Json;
@@ -92,7 +93,7 @@ namespace MigrationTools
             context.ProjectName = workItem?.Project?.Name;
             context.Fields = workItem.Fields.AsDictionary();
             context.Revisions = (from Revision x in workItem.Revisions
-                                 select new _Enginev1.DataContracts.RevisionItem()
+                                 select new _EngineV1.DataContracts.RevisionItem()
                                  {
                                      Index = x.Index,
                                      Number = Convert.ToInt32(x.Fields["System.Rev"].Value),

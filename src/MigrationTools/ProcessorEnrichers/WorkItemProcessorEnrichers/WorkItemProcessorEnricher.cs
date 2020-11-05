@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
-using MigrationTools._Enginev1.DataContracts;
-using MigrationTools.DataContracts;
 using MigrationTools.Processors;
 
 namespace MigrationTools.Enrichers
@@ -24,7 +22,7 @@ namespace MigrationTools.Enrichers
         public abstract void Configure(IProcessorEnricherOptions options);
 
         [Obsolete("v1 Architecture: Here to support migration, use PhaseEnrichers: BeforeLoadData, AfterLoadData, etc", false)]
-        public abstract int Enrich(_Enginev1.DataContracts.WorkItemData sourceWorkItem, _Enginev1.DataContracts.WorkItemData targetWorkItem);
+        public abstract int Enrich(_EngineV1.DataContracts.WorkItemData sourceWorkItem, _EngineV1.DataContracts.WorkItemData targetWorkItem);
 
         public void ProcessorExecutionBegin(IProcessor processor)
         {

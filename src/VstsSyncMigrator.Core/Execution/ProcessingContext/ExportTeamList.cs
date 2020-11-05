@@ -8,7 +8,7 @@ using Microsoft.TeamFoundation.Server;
 using MigrationTools;
 
 using MigrationTools.Configuration;
-using VstsSyncMigrator._Enginev1.Processors;
+using VstsSyncMigrator._EngineV1.Processors;
 
 namespace VstsSyncMigrator.Engine
 {

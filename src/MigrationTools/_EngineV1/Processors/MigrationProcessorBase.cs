@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
-using MigrationTools._Enginev1.Containers;
 using MigrationTools.Configuration;
 using MigrationTools.Processors;
 
-namespace MigrationTools._Enginev1.Processors
+namespace MigrationTools._EngineV1.Processors
 {
     public abstract class MigrationProcessorBase : Containers.IProcessor
     {

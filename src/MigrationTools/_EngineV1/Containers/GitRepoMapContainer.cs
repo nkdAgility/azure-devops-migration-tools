@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using MigrationTools.Configuration;
 
-namespace MigrationTools._Enginev1.Containers
+namespace MigrationTools._EngineV1.Containers
 {
     public class GitRepoMapContainer : EngineContainer<ReadOnlyDictionary<string, string>>
     {

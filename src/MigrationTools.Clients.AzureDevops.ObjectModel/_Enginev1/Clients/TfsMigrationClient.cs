@@ -4,10 +4,12 @@ using System.Net;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.VisualStudio.Services.Common;
+using MigrationTools._EngineV1.Configuration;
+using MigrationTools.Clients;
 using MigrationTools.Configuration;
 using Serilog;
 
-namespace MigrationTools.Clients
+namespace MigrationTools._EngineV1.Clients
 {
     public class TfsMigrationClient : IMigrationClient
     {
