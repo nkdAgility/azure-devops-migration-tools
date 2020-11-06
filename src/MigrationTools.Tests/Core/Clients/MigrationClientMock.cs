@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using Microsoft.VisualStudio.Services.Common;
 using MigrationTools._EngineV1.Clients;
 using MigrationTools._EngineV1.Configuration;
 
@@ -21,6 +22,8 @@ namespace MigrationTools.Tests.Core.Clients
         public IWorkItemMigrationClient WorkItems => workItemMigrationClient;
 
         public ITestPlanMigrationClient TestPlans => throw new NotImplementedException();
+
+        public VssCredentials Credentials => throw new NotImplementedException();
 
         public void Configure(IMigrationClientConfig config, NetworkCredential credentials = null)
         {
