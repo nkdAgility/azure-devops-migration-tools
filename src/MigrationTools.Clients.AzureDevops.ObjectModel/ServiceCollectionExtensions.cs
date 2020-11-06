@@ -4,6 +4,7 @@ using MigrationTools._EngineV1.Clients;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
 using MigrationTools.FieldMaps.AzureDevops.ObjectModel;
+using MigrationTools.ProcessorEnrichers;
 
 namespace MigrationTools
 {
@@ -31,6 +32,7 @@ namespace MigrationTools
             context.AddTransient<RegexFieldMap>();
             context.AddTransient<TreeToTagFieldMap>();
             // Enrichers
+            context.AddSingleton<TfsValidateRequiredField>();
             context.AddSingleton<TfsWorkItemLinkEnricher>();
             context.AddSingleton<TfsEmbededImagesEnricher>();
             context.AddSingleton<TfsGitRepositoryEnricher>();

@@ -22,6 +22,7 @@ using MigrationTools._EngineV1.DataContracts;
 using MigrationTools._EngineV1.Enrichers;
 using MigrationTools._EngineV1.Processors;
 using MigrationTools.Enrichers;
+using MigrationTools.ProcessorEnrichers;
 using Newtonsoft.Json;
 using Serilog.Context;
 using Serilog.Events;
@@ -45,6 +46,7 @@ namespace VstsSyncMigrator.Engine
         private IWorkItemProcessorEnricher embededImagesEnricher;
         private TfsGitRepositoryEnricher gitRepositoryEnricher;
         private TfsNodeStructureEnricher nodeStructureEnricher;
+        private TfsValidateRequiredField validateConfig;
         private IDictionary<string, double> processWorkItemMetrics = null;
         private IDictionary<string, string> processWorkItemParamiters = null;
         private TfsWorkItemLinkEnricher workItemLinkEnricher;
@@ -60,6 +62,7 @@ namespace VstsSyncMigrator.Engine
         public override void Configure(IProcessorConfig config)
         {
             _config = (WorkItemMigrationConfig)config;
+            validateConfig = Services.GetRequiredService<TfsValidateRequiredField>();
         }
 
         internal void TraceWriteLine(LogEventLevel level, string message, Dictionary<string, object> properties = null)
@@ -76,7 +79,7 @@ namespace VstsSyncMigrator.Engine
 
         protected override void InternalExecute()
         {
-            Log.LogInformation("Starting ");
+            Log.LogInformation("WorkItemMigrationContext::InternalExecute ");
             if (_config == null)
             {
                 throw new Exception("You must call Configure() first");
@@ -90,7 +93,6 @@ namespace VstsSyncMigrator.Engine
             VssClientCredentials adoCreds = new VssClientCredentials();
             _witClient = new WorkItemTrackingHttpClient(Engine.Target.Config.AsTeamProjectConfig().Collection, adoCreds);
             //Validation: make sure that the ReflectedWorkItemId field name specified in the config exists in the target process, preferably on each work item type.
-            ConfigValidation();
             PopulateIgnoreList();
 
             Log.LogInformation("Migrating all Nodes before the work item run.");
@@ -112,6 +114,15 @@ namespace VstsSyncMigrator.Engine
                 contextLog.Information("[FilterWorkItemsThatAlreadyExistInTarget] is enabled. Searching for work items that have already been migrated to the target...", sourceWorkItems.Count());
                 sourceWorkItems = ((TfsWorkItemMigrationClient)Engine.Target.WorkItems).FilterExistingWorkItems(sourceWorkItems, new TfsWiqlDefinition() { OrderBit = _config.WIQLOrderBit, QueryBit = _config.WIQLQueryBit }, (TfsWorkItemMigrationClient)Engine.Source.WorkItems);
                 contextLog.Information("!! After removing all found work items there are {SourceWorkItemCount} remaining to be migrated.", sourceWorkItems.Count());
+            }
+            //////////////////////////////////////////////////
+
+            var result = validateConfig.ValidatingRequiredField(Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName, sourceWorkItems);
+            if (!result)
+            {
+                var ex = new InvalidFieldValueException("Not all work items in scope contain a valid ReflectedWorkItemId Field!");
+                Log.LogError(ex, "Not all work items in scope contain a valid ReflectedWorkItemId Field!");
+                throw ex;
             }
             //////////////////////////////////////////////////
             _current = 1;
@@ -193,27 +204,6 @@ namespace VstsSyncMigrator.Engine
             double result;
             return double.TryParse(val, numberStyle,
                 CultureInfo.CurrentCulture, out result);
-        }
-
-        /// <summary>
-        /// Validate the current configuration of the both the migrator and the target project
-        /// </summary>
-        private void ConfigValidation()
-        {
-            //Make sure that the ReflectedWorkItemId field name specified in the config exists in the target process, preferably on each work item type
-            var fields = _witClient.GetFieldsAsync(Engine.Target.Config.AsTeamProjectConfig().Project).Result;
-            bool rwiidFieldExists = fields.Any(x => x.ReferenceName == Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName || x.Name == Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName);
-            contextLog.Information("Found {FieldsFoundCount} work item fields.", fields.Count.ToString("n0"));
-            if (rwiidFieldExists)
-                contextLog.Information("Found '{ReflectedWorkItemIDFieldName}' in this project, proceeding.", Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName);
-            else
-            {
-                contextLog.Information("Config file specifies '{ReflectedWorkItemIDFieldName}', which wasn't found.", Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName);
-                contextLog.Information("Instead, found:");
-                foreach (var field in fields.OrderBy(x => x.Name))
-                    contextLog.Information("{FieldType} - {FieldName} - {FieldRefName}", field.Type.ToString().PadLeft(15), field.Name.PadRight(20), field.ReferenceName ?? "");
-                throw new Exception("Running a replay migration requires a ReflectedWorkItemId field to be defined in the target project's process.");
-            }
         }
 
         private MigrationTools._EngineV1.DataContracts.WorkItemData CreateWorkItem_Shell(ProjectData destProject, MigrationTools._EngineV1.DataContracts.WorkItemData currentRevisionWorkItem, string destType)
