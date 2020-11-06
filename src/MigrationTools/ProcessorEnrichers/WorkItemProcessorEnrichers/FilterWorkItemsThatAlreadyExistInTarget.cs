@@ -17,12 +17,6 @@ namespace MigrationTools.Enrichers
         {
         }
 
-        [Obsolete("Old v1 arch: this is a v2 class", true)]
-        public override void Configure(bool save = true, bool filter = true)
-        {
-            throw new System.NotImplementedException();
-        }
-
         public override void Configure(IProcessorEnricherOptions options)
         {
             _Options = (FilterWorkItemsThatAlreadyExistInTargetOptions)options;
