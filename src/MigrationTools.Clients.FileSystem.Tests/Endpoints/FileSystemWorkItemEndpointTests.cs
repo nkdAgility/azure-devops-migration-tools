@@ -13,7 +13,7 @@ namespace MigrationTools.Endpoints.Tests
         [TestInitialize]
         public void Setup()
         {
-            Services = ServiceProviderHelper.GetWorkItemMigrationProcessor();
+            Services = ServiceProviderHelper.GetServices();
         }
 
         [TestMethod]
