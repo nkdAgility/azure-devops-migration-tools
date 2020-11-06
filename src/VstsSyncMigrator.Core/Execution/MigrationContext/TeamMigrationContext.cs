@@ -108,8 +108,11 @@ namespace VstsSyncMigrator.Engine
                                 else
                                 {
                                     targetConfig.TeamSettings.BacklogIterationPath = sourceConfig.TeamSettings.BacklogIterationPath;
+                                    Log.LogDebug("targetConfig.TeamSettings.BacklogIterationPath={BacklogIterationPath}", targetConfig.TeamSettings.BacklogIterationPath);
                                     targetConfig.TeamSettings.IterationPaths = sourceConfig.TeamSettings.IterationPaths;
+                                    Log.LogDebug("targetConfig.TeamSettings.IterationPaths={@IterationPaths}", sourceConfig.TeamSettings.IterationPaths);
                                     targetConfig.TeamSettings.TeamFieldValues = sourceConfig.TeamSettings.TeamFieldValues;
+                                    Log.LogDebug("targetConfig.TeamSettings.TeamFieldValues={@TeamFieldValues}", sourceConfig.TeamSettings.TeamFieldValues);
                                 }
 
                                 targetTSCS.SetTeamSettings(targetConfig.TeamId, targetConfig.TeamSettings);
