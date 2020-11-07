@@ -1,6 +1,6 @@
 ## Work Item Tracking Processor
 
-[Overview](.././) > [Processors](./) > Work Item Tracking Processor
+[Overview](.././index.md) > [Processors](./index.md) > Work Item Tracking Processor
 
 This processor is intended, with the aid of [ProcessorEnrichers](./v2/ProcessorEnrichers/), to allow the migration of Work Items between two [Endpoints](./v2/Endpoints/). 
 
