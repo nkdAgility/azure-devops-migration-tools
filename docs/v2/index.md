@@ -31,7 +31,9 @@ _NOTICE: Both paid and community support is available through our [recommended c
 
 -Overview
 - [Getting Started](./getting-started.md)
-- The Details
+
+## Deep Dive
+
   - [Archtectural Overview](./Architecture.md)
   - [Processors](./Processors/index.md)
   - [ProcessorEnrichers](./ProcessorEnrichers/index.md)
