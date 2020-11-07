@@ -13,7 +13,10 @@ namespace MigrationTools
         {
             telemetryClient.Context.Session.Id = Guid.NewGuid().ToString();
             telemetryClient.Context.Device.OperatingSystem = Environment.OSVersion.ToString();
-            telemetryClient.Context.Component.Version = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString();
+            if (!(System.Reflection.Assembly.GetEntryAssembly() is null))
+            {
+                telemetryClient.Context.Component.Version = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString();
+            }
             _telemetryClient = telemetryClient;
         }
 

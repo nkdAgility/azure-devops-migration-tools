@@ -62,7 +62,7 @@ namespace MigrationTools.Tests
         [TestMethod]
         public void TestDeseraliseFromJson2()
         {
-            TestSeraliseToJson();
+            TestSeraliseToJson2();
             EngineConfiguration ec;
             StreamReader sr = new StreamReader("configuration2.json");
             string configurationjson = sr.ReadToEnd();
