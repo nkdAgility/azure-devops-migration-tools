@@ -1,6 +1,6 @@
 ## How does the system fit together?
 
-The system works by setting one or more `Processors` in the json configuration file. This `Processor` can have many `ProcessorEnrichers` that enable aditional features, and must have at least a *Source* `Endpoint` and a *Target* `Endpoint`. Each `Endpoint` may have additional `EndpointEnrichers` that add additional *Client* specific functionality.
+The system works by setting one or more [Processors](./processors/) in the json configuration file. This processor can have many [ProcessorEnrichers](./processorenrichers/) that enable aditional features, and must have at least two [Endpoints](./endpoints/); a *Source* `Endpoint` and a *Target* `Endpoint`. Each `Endpoint` may have additional [EndpointEnrichers](./endpointenrichers/) that add additional *Client* specific functionality.
 
 - Processors
   - ProcessorA
@@ -18,15 +18,15 @@ The system works by setting one or more `Processors` in the json configuration f
 
 ### What types of things do we have
 
-- *Processors* - Processors allow you to move diferent types of data between `Endpoints` and does not care what `Endpoint` you have on each end.
-- *ProcessorEnrichers* - Enrichers at the processor level allow you to add additional functionality to a processor without endangering the core functionality. Each Enricher should have a single responsabiity and can add funtionality to the following stages of the processor pipeline.
+- *[Processors](./processors/)* - Processors allow you to move diferent types of data between `Endpoints` and does not care what `Endpoint` you have on each end.
+- *[ProcessorEnrichers](./processorenrichers/)* - Enrichers at the processor level allow you to add additional functionality to a processor without endangering the core functionality. Each Enricher should have a single responsabiity and can add funtionality to the following stages of the processor pipeline.
   - ProcessorExecutionBegin
   - ProcessorExecutionAfterSource
   - ProcessorExecutionBeforeProcessWorkItem
   - ProcessorExecutionAfterProcessWorkItem
   - ProcessorExecutionEnd
-- *Endpoints* connect to the target system and load and save the data. Endpoint can load or save data from any system, but we are focusing on Azure DevOps & Github.
-- *EndpointEnrichers* - Because systems likely have different data shapes we also have *EndpointEnrichers* that can be added to `Endpoints` that allow loading and saving of specific data.
+- *[Endpoints](./endpoints/)* connect to the target system and load and save the data. Endpoint can load or save data from any system, but we are focusing on Azure DevOps & Github.
+- *[EndpointEnrichers](./endpointenrichers/)* - Because systems likely have different data shapes we also have *EndpointEnrichers* that can be added to `Endpoints` that allow loading and saving of specific data.
 
 We currently have a `WorkItemTrackingProcessor` with Endpoints for *InMemory* (for testing), *FileSystem*, and *Tfs*. You can mix-and-match Endpoints so that you would be able to migrate your `WorkItem` data from *Tfs* to *FileSystem* as needed.
 
@@ -44,6 +44,5 @@ While we still have a long way to go this is a strong move towards v2. It will a
 #### Legacy Folders
 
 - `VstsSyncMigrator.Core` - Everything in here must go :)
-- `MigrationTools\Engine\` - These will me refactored away and into v2.
-- `MigrationTools\Clients\` - Clients model is being abandoned in favour of `Endpoints`
-- `MigrationTools.Clients.AzureDevops.ObjectModel\Clients\` - Clients model is being abandoned in favour of `Endpoints`
+- `MigrationTools\_EngineV1\*` - These will me refactored away and into v2.
+- `MigrationTools.Clients.AzureDevops.ObjectModel\_EngineV1\*` - Clients model is being abandoned in favour of `Endpoints`
