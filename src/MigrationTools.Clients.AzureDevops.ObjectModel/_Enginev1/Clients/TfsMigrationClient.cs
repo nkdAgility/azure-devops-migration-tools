@@ -12,6 +12,8 @@ namespace MigrationTools._EngineV1.Clients
     public class TfsMigrationClient : IMigrationClient
     {
         private TfsTeamProjectConfig _config;
+        private TfsTeamProjectCollection _collection;
+        private VssCredentials _vssCredentials;
         private NetworkCredential _credentials;
         private IWorkItemMigrationClient _workItemClient;
         private ITestPlanMigrationClient _testPlanClient;
@@ -51,6 +53,8 @@ namespace MigrationTools._EngineV1.Clients
             }
         }
 
+        public VssCredentials Credentials => _vssCredentials ??= new VssCredentials();
+
         // if you add Migration Engine in here you will have to fix the infinate loop
         public TfsMigrationClient(ITestPlanMigrationClient testPlanClient, IWorkItemMigrationClient workItemClient, IServiceProvider services, ITelemetryLogger telemetry)
         {
@@ -77,10 +81,7 @@ namespace MigrationTools._EngineV1.Clients
             _workItemClient.Configure(this);
             _testPlanClient.Configure(this);
         }
-
-        private TfsTeamProjectCollection _collection;
-
-        [Obsolete]
+        
         public object InternalCollection
         {
             get
@@ -113,21 +114,25 @@ namespace MigrationTools._EngineV1.Clients
             {
                 if (credentials != null)
                 {
-                    y = new TfsTeamProjectCollection(TfsConfig.Collection, new VssCredentials(new Microsoft.VisualStudio.Services.Common.WindowsCredential(credentials)));
+                    _vssCredentials =  new VssCredentials(new Microsoft.VisualStudio.Services.Common.WindowsCredential(credentials));
+                    
                 }
                 else if (!string.IsNullOrEmpty(TfsConfig.PersonalAccessToken))
                 {
-                    y = new TfsTeamProjectCollection(TfsConfig.Collection, new VssBasicCredential(string.Empty, TfsConfig.PersonalAccessToken));
+                    _vssCredentials = new VssBasicCredential(string.Empty, TfsConfig.PersonalAccessToken);
                 }
                 else
                 {
-                    y = new TfsTeamProjectCollection(TfsConfig.Collection);
+                    _vssCredentials = new VssCredentials();
                 }
-                Log.Debug("MigrationClient: Connecting to {CollectionUrl} ", TfsConfig.Collection.ToString());
+
+                y = new TfsTeamProjectCollection(TfsConfig.Collection, _vssCredentials);
+
+                Log.Debug("MigrationClient: Connecting to {CollectionUrl} ", TfsConfig.Collection);
                 Log.Debug("MigrationClient: validating security for {@AuthorizedIdentity} ", y.AuthorizedIdentity);
                 y.EnsureAuthenticated();
                 timer.Stop();
-                Log.Information("MigrationClient: Access granted ");
+                Log.Information("MigrationClient: Access granted to {CollectionUrl} for {Name} ({Account})", TfsConfig.Collection, y.AuthorizedIdentity.DisplayName, y.AuthorizedIdentity.UniqueName);
                 _Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", TfsConfig.Collection.ToString(), "GetWorkItem", null, startTime, timer.Elapsed, "200", true));
             }
             catch (Exception ex)

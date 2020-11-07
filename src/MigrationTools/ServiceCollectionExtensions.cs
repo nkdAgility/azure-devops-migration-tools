@@ -8,6 +8,7 @@ using MigrationTools.EndPoints;
 using MigrationTools.Enrichers;
 using MigrationTools.Processors;
 using Serilog;
+using Serilog.Core;
 using Serilog.Events;
 
 namespace MigrationTools
@@ -30,6 +31,7 @@ namespace MigrationTools
             Log.Logger = loggers.CreateLogger();
             Log.Logger.Information("Logger is initialized");
             context.AddLogging(loggingBuilder => loggingBuilder.AddSerilog(dispose: true));
+            context.AddSingleton<LoggingLevelSwitch>();
         }
 
         public static void AddMigrationToolServices(this IServiceCollection context)
@@ -65,6 +67,12 @@ namespace MigrationTools
             context.AddSingleton<IEngineConfigurationBuilder, EngineConfigurationBuilder>();
             context.AddSingleton<EngineConfiguration, EngineConfigurationWrapper>();
 
+            // Containers
+            context.AddSingleton<TypeDefinitionMapContainer>();
+            context.AddSingleton<ProcessorContainer>();
+            context.AddSingleton<GitRepoMapContainer>();
+            context.AddSingleton<FieldMapContainer>();
+            context.AddSingleton<ChangeSetMappingContainer>();
             //Engine
             context.AddSingleton<FieldMapContainer>();
             context.AddSingleton<ProcessorContainer>();

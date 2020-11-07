@@ -90,7 +90,7 @@ namespace MigrationTools._EngineV1.Containers
         {
             foreach (IFieldMap map in list)
             {
-                Log.Debug("{Context} Running Field Map: {MapName} {MappingDisplayName}", map.Name, map.MappingDisplayName);
+                Log.Debug("Running Field Map: {MapName} {MappingDisplayName}", map.Name, map.MappingDisplayName);
                 map.Execute(source, target);
             }
         }

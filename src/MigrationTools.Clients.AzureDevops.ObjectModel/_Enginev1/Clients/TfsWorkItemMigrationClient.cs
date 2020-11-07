@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools;
 using MigrationTools._EngineV1.Configuration;
@@ -313,7 +314,7 @@ namespace MigrationTools._EngineV1.Clients
             WorkItemStore store;
             try
             {
-                store = new WorkItemStore(MigrationClient.Config.AsTeamProjectConfig().Collection.ToString(), bypassRules);
+                store = new WorkItemStore((TfsTeamProjectCollection)MigrationClient.InternalCollection, bypassRules);
                 timer.Stop();
                 Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", MigrationClient.Config.AsTeamProjectConfig().Collection.ToString(), "GetWorkItemStore", null, startTime, timer.Elapsed, "200", true));
             }

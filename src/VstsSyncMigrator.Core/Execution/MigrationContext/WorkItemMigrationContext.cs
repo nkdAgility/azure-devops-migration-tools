@@ -90,8 +90,7 @@ namespace VstsSyncMigrator.Engine
             embededImagesEnricher = Services.GetRequiredService<TfsEmbededImagesEnricher>();
             gitRepositoryEnricher = Services.GetRequiredService<TfsGitRepositoryEnricher>();
             nodeStructureEnricher = Services.GetRequiredService<TfsNodeStructureEnricher>();
-            VssClientCredentials adoCreds = new VssClientCredentials();
-            _witClient = new WorkItemTrackingHttpClient(Engine.Target.Config.AsTeamProjectConfig().Collection, adoCreds);
+            _witClient = new WorkItemTrackingHttpClient(Engine.Target.Config.AsTeamProjectConfig().Collection, Engine.Target.Credentials);
             //Validation: make sure that the ReflectedWorkItemId field name specified in the config exists in the target process, preferably on each work item type.
             PopulateIgnoreList();
 

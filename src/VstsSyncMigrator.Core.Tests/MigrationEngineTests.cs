@@ -1,15 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools;
-using MigrationTools._EngineV1.Clients;
 using MigrationTools._EngineV1.Configuration;
-using MigrationTools._EngineV1.Containers;
 using MigrationTools.CommandLine;
-using MigrationTools.FieldMaps.AzureDevops.ObjectModel;
-using MigrationTools.Services;
-using Serilog.Core;
+using Serilog;
 
 namespace _VstsSyncMigrator.Engine.Tests
 {
@@ -23,41 +22,18 @@ namespace _VstsSyncMigrator.Engine.Tests
         {
             var ecb = new EngineConfigurationBuilder(new NullLogger<EngineConfigurationBuilder>());
             var services = new ServiceCollection();
-            services.AddSingleton<LoggingLevelSwitch>();
-
-            // Field Mapps
-            services.AddTransient<FieldBlankMap>();
-            services.AddTransient<FieldLiteralMap>();
-            services.AddTransient<FieldMergeMap>();
-            services.AddTransient<FieldValueMap>();
-            services.AddTransient<FieldToFieldMap>();
-            services.AddTransient<FieldtoFieldMultiMap>();
-            services.AddTransient<FieldToTagFieldMap>();
-            services.AddTransient<FieldValuetoTagMap>();
-            services.AddTransient<MultiValueConditionalMap>();
-            services.AddTransient<RegexFieldMap>();
-            services.AddTransient<TreeToTagFieldMap>();
-            //Services
-            //services.AddSingleton<IDetectOnlineService, DetectOnlineService>();
-            //services.AddSingleton<IDetectVersionService, DetectVersionService>();
-            //Containers
-            services.AddSingleton<FieldMapContainer>();
-            services.AddSingleton<ProcessorContainer>();
-            services.AddSingleton<TypeDefinitionMapContainer>();
-            services.AddSingleton<GitRepoMapContainer>();
-            services.AddSingleton<ChangeSetMappingContainer>();
+            // Core
+            services.AddMigrationToolServicesForUnitTests();
+            services.AddMigrationToolServicesForClientLegacyCore();
+            services.AddMigrationToolServices();
+            services.AddMigrationToolServicesLegacy();
+            // Clients
+            services.AddMigrationToolServicesForClientAzureDevOpsObjectModel();
+            services.AddMigrationToolServicesForClientLegacyAzureDevOpsObjectModel();
 
             //
             services.AddSingleton<IEngineConfigurationBuilder, EngineConfigurationBuilder>();
             services.AddSingleton<EngineConfiguration>(ecb.BuildDefault());
-            services.AddSingleton<ITelemetryLogger, TelemetryLoggerMock>();
-            services.AddApplicationInsightsTelemetryWorkerService();
-            services.AddLogging();
-
-            //Clients
-            services.AddTransient<IMigrationClient, TfsMigrationClient>();
-            services.AddTransient<IWorkItemMigrationClient, TfsWorkItemMigrationClient>();
-            services.AddTransient<IWorkItemQueryBuilder, WorkItemQueryBuilder>();
 
             services.AddSingleton<IMigrationEngine, MigrationEngine>();
 
@@ -73,6 +49,28 @@ namespace _VstsSyncMigrator.Engine.Tests
             ec.Processors.Clear();
             IMigrationEngine me = _services.GetRequiredService<IMigrationEngine>();
             me.Run();
+        }
+
+        [TestMethod]
+        public void TestTypeLoadForAborations()
+        {
+            List<Type> allTypes;
+            try
+            {
+                allTypes = AppDomain.CurrentDomain.GetAssemblies()
+               .Where(a => !a.IsDynamic)
+               .SelectMany(a => a.GetTypes()).ToList();
+            }
+            catch (ReflectionTypeLoadException ex)
+            {
+                allTypes = new List<Type>();
+                Log.Error(ex, "Unable to continue! ");
+                foreach (Exception item in ex.LoaderExceptions)
+                {
+                    Log.Error(item, "LoaderException: {Message}", item.Message);
+                }
+                throw ex;
+            }
         }
     }
 }

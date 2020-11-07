@@ -34,7 +34,7 @@ namespace MigrationTools
             var fails = workItem.Validate();
             if (fails.Count > 0)
             {
-                Log.Warning("Work Item is not ready to save as it has some invalid fields. This may not result in an error. Enable LogLevel as 'Debug' in the ocnfig to see more.");
+                Log.Warning("Work Item is not ready to save as it has some invalid fields. This may not result in an error. Enable LogLevel as 'Debug' in the config to see more.");
                 Log.Debug("--------------------------------------------------------------------------------------------------------------------");
                 Log.Debug("--------------------------------------------------------------------------------------------------------------------");
                 foreach (Field f in fails)

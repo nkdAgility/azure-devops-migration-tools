@@ -1,5 +1,5 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
+using Microsoft.VisualStudio.Services.Common;
 using MigrationTools._EngineV1.Configuration;
 
 namespace MigrationTools._EngineV1.Clients
@@ -10,11 +10,12 @@ namespace MigrationTools._EngineV1.Clients
         IWorkItemMigrationClient WorkItems { get; }
         ITestPlanMigrationClient TestPlans { get; }
 
+        VssCredentials Credentials { get; }
+
         void Configure(IMigrationClientConfig config, NetworkCredential credentials = null);
 
         T GetService<T>();
 
-        [Obsolete]
         object InternalCollection { get; }
     }
 }
