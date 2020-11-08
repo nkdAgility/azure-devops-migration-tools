@@ -1,4 +1,6 @@
 ## Endpoints
+**_This documentation is for a preview version of the Azure DevOps Migration Tools._**
+
 [Overview](.././index.md) > [Reference](../index.md) > *Endpoints*
 
 Azyre DevOps Migration Tools provides _endpoints_ for reading and writing `WorkItems`, `PlansAndSuits`, `Teams`, or `Queries`. 
