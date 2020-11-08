@@ -1,8 +1,8 @@
 ## Work Item Tracking Processor
 
-[Overview](.././index.md) > [Processors](./index.md) > Work Item Tracking Processor
+[Overview](.././index.md) > [Reference](../index.md) > [Processors](./index.md) > Work Item Tracking Processor
 
-This processor is intended, with the aid of [ProcessorEnrichers](./v2/ProcessorEnrichers/), to allow the migration of Work Items between two [Endpoints](./v2/Endpoints/). 
+This processor is intended, with the aid of [ProcessorEnrichers](../ProcessorEnrichers/index.md), to allow the migration of Work Items between two [Endpoints](../Endpoints/index.md). 
 
 ### Properties
 
@@ -33,7 +33,7 @@ PrefixProjectToNodes | Boolean | false | Preixes the Source location to the cata
 
 #### Minimum Options to run
 
-```
+```JSON
     {
       "ObjectType": "WorkItemMigrationProcessorOptions",
       "Enabled": true,
@@ -47,7 +47,7 @@ PrefixProjectToNodes | Boolean | false | Preixes the Source location to the cata
 #### Full Example with Enpoints & Enrichers
 
 
-```
+```JSON
     {
       "ObjectType": "WorkItemMigrationProcessorOptions",
       "Enabled": true,

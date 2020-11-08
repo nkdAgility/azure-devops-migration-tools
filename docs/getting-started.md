@@ -26,7 +26,7 @@ Follow the [setup instructions](./server-configuration.md) to make sure that you
 
 You can now customise the configuration depending on what you need to do. However a basic config that you can use to migrate from one team project to another with the same process template is:
 
-```
+```JSON
 {
   "ChangeSetMappingFile": null,
   "Source": {
