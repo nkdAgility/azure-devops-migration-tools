@@ -38,6 +38,7 @@ _This is a preview version of both the documentation and the Azure DevOps Migrat
 - [Overview](./index.md)
 - [Getting Started](./getting-started.md)
 - [How To Migrate Things](/HowTo/index.md)
+- [Reference](/Reference/index.md)
 
 ## Migration Home
 
