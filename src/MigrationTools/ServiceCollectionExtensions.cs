@@ -41,7 +41,7 @@ namespace MigrationTools
             context.AddTransient<ProcessorEnricherContainer>();
             context.AddTransient<EndpointEnricherContainer>();
             // Processors
-            context.AddTransient<WorkItemMigrationProcessor>();
+            context.AddTransient<WorkItemTrackingProcessor>();
             // Endpoint Enrichers
             context.AddTransient<AppendMigrationToolSignatureFooter>();
             context.AddTransient<FilterWorkItemsThatAlreadyExistInTarget>();

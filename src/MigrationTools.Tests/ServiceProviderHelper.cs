@@ -24,7 +24,7 @@ namespace MigrationTools.Tests
             services.AddSingleton<ITelemetryLogger, TelemetryClientAdapter>();
 
             // Processors
-            services.AddSingleton<WorkItemMigrationProcessor>();
+            services.AddSingleton<WorkItemTrackingProcessor>();
             services.AddTransient<ProcessorEnricherContainer>();
             services.AddTransient<EndpointContainer>();
 
