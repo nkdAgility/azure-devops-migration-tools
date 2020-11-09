@@ -75,16 +75,30 @@ namespace MigrationTools.Endpoints
                 Direction = _Options.Direction,
                 Type = wi.Type.ToString()
             };
-            RunSourceEnrichers(wi, wid);
-
+            PopulateRevisions(wi, wid);
             return wid;
         }
 
-        private void RunSourceEnrichers(WorkItem wi, WorkItemData wid)
+        private void PopulateRevisions(WorkItem wi, WorkItemData wid)
+        {
+            foreach (Revision revision in wi.Revisions)
+            {
+                RevisionItem revi = new RevisionItem
+                {
+                    Number = revision.Index,
+                    Index = revision.Index
+                };
+                RunSourceEnrichers(revision, revi);
+                wid.Revisions.Add(revi);
+            }
+        }
+
+        private void RunSourceEnrichers(Revision wi, RevisionItem wid)
         {
             Log.LogDebug("TfsWorkItemEndPoint::RunSourceEnrichers::{SourceEnrichersCount}", SourceEnrichers.Count());
             foreach (IWorkItemEndpointSourceEnricher enricher in SourceEnrichers)
             {
+                enricher.EnrichWorkItemData(this, wi, wid); // HELP:: is this Right
             }
         }
 

@@ -1,4 +1,5 @@
-﻿using MigrationTools.Enrichers;
+﻿using MigrationTools.DataContracts;
+using MigrationTools.Enrichers;
 
 namespace MigrationTools.EndpointEnrichers
 {
@@ -13,6 +14,7 @@ namespace MigrationTools.EndpointEnrichers
 
     public interface IWorkItemEndpointSourceEnricher : IWorkItemEndpoinEnricher
     {
+        void EnrichWorkItemData(Endpoints.IEndpoint endpoint, object dataSource, RevisionItem dataTarget);
     }
 
     public interface IWorkItemEndpointTargetEnricher : IWorkItemEndpoinEnricher

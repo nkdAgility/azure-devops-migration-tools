@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 
 namespace MigrationTools.EndpointEnrichers
 {
-    public class WorkItemLinkEnricher : WorkItemEndpointEnricher
+    public abstract class WorkItemLinkEnricher : WorkItemEndpointEnricher
     {
         private WorkItemLinkEnricherOptions _Options;
 
