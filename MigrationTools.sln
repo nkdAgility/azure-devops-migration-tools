@@ -111,6 +111,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Host.Tests",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "v2", "v2", "{A76BEFD1-2848-4A44-99D7-A4EAEB223597}"
 	ProjectSection(SolutionItems) = preProject
+		docs\v2\Architecture.md = docs\v2\Architecture.md
+		docs\v2\getting-started.md = docs\v2\getting-started.md
 		docs\v2\index.md = docs\v2\index.md
 	EndProjectSection
 EndProject

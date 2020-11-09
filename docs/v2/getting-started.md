@@ -1,4 +1,10 @@
-# Getting Started with the VSTS Sync Migrator
+# Getting Started with the Azure DevOps Migration Tools
+
+
+>**_This documentation is for a preview version of the Azure DevOps Migration Tools._ If you are not using the preview version then please head over to the main [documentation](https://nkdagility.github.io/azure-devops-migration-tools).**
+
+
+[Overview](./index.md) > *Getting Started*
 
 If you want to perform a bulk edit or a migration then you need to start here. This tool has been tested on updating from 100 to 250,000 work items by its users.
 
@@ -26,7 +32,7 @@ Follow the [setup instructions](./server-configuration.md) to make sure that you
 
 You can now customise the configuration depending on what you need to do. However a basic config that you can use to migrate from one team project to another with the same process template is:
 
-```JSON
+```
 {
   "ChangeSetMappingFile": null,
   "Source": {

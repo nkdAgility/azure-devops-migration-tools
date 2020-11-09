@@ -15,7 +15,7 @@ The Azure DevOps Migration Tools allow you to bulk edit and migrate data between
 
 - Migrate `Work Items`, `TestPlans & Suits`, `Teams`, & `Shared Queries` from one `Team Project` to another
 - Migrate `Work Items`, `TestPlans & Suits`, `Teams`, & `Shared Queries` from one `Organisation` to another
-- Bulk edit of `Work Items` accross an entire `Project`.
+- Bulk edit of `Work Items` accross an entire `Project`. 
 
 ### What versions of Azure DevOps & TFS do you support?
 
@@ -37,14 +37,15 @@ The Azure DevOps Migration Tools allow you to bulk edit and migrate data between
 
 ## Quick Links
 
- * _{new}_ [Video Overview](https://youtu.be/RCJsST0xBCE)
+ * [Video Overview](https://youtu.be/RCJsST0xBCE)
  * [Getting Started](./getting-started.md)
  * [Documentation](http://nkdagility.github.io/azure-devops-migration-tools/)
- * _{NEW}_ [Changeset Migration](./changeset-migration.md)
+ * [Changeset Migration](./changeset-migration.md)
  * [Contributing](#contributing)
  * [Why](#why-does-this-exist)
  * [FAQ](./faq.md)
  * [Support](#support)
+ * _Preview_ [Preview v2](./v2/index.md) - 
 
 ### External Walkthroughs and Reviews
 
@@ -164,11 +165,6 @@ If you want to be added to the community Team then please [fill out this form an
 ## Support
 
 You can get free support from the community here and on social media on a best effort basis if folks are available. If you are looking for paid support there are a number of consultants that contribute to this project and that are experts in this type of work:
-
-* **Martin Hinshelwood, naked Agility Ltd** - [@MrHinsh](https://github.com/MrHinsh) is the founder of the Azure DevOps Migration Tools is available worldwide to help organisations plan and enact their migration efforts. You can contact him through [naked Agility Ltd.](https://nkdagility.com).
-* **Wes MacDonald, LIKE 10 INC.** - [@wesmacdonald](https://github.com/wesmacdonald) is a DevOps Consultant located in Toronto, Canada.  You can reach out to him via [LIKE 10 INC.](http://www.like10.com).
-* **Ove Bastiansen** - [@ovebastiansen](https://github.com/ovebastiansen) is a DevOps Consultant located in Norway. You can reach out to him via his [GitHub Profile](https://github.com/ovebastiansen). 
-* **Gordon Beeming** - [@Gordon-Beeming](https://github.com/Gordon-Beeming) is a DevOps Consultant located in South Africa. You can reach out to him via [profile page](https://beeming.dev/). 
 
 ## FAQ
 

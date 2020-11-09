@@ -24,7 +24,7 @@ namespace MigrationTools.Processors.Tests
             {
                 Enabled = true
             };
-            var x = Services.GetRequiredService<WorkItemMigrationProcessor>();
+            var x = Services.GetRequiredService<WorkItemTrackingProcessor>();
             x.Configure(y);
             Assert.IsNotNull(x);
         }
@@ -44,7 +44,7 @@ namespace MigrationTools.Processors.Tests
                     new InMemoryWorkItemEndpointOptions { Direction = EndpointDirection.Target }
                 }
             };
-            var x = Services.GetRequiredService<WorkItemMigrationProcessor>();
+            var x = Services.GetRequiredService<WorkItemTrackingProcessor>();
             x.Configure(y);
             x.Execute();
             Assert.AreEqual(ProcessingStatus.Complete, x.Status);
