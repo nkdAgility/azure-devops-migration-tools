@@ -14,12 +14,11 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="newtonsoft.json" Version="12.0.3" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\MigrationTools.Clients.AzureDevops.ObjectModel\MigrationTools.Clients.AzureDevops.ObjectModel.csproj" />
     <ProjectReference Include="..\VstsSyncMigrator.Core\VstsSyncMigrator.Core.csproj" />
   </ItemGroup>
-
 </Project>

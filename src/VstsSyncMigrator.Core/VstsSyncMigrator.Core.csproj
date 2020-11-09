@@ -15,9 +15,10 @@
     <PackageReference Include="Microsoft.TeamFoundationServer.ExtendedClient" Version="16.153.0">
       <IncludeAssets>all</IncludeAssets>
       <ExcludeAssets>none</ExcludeAssets>
-      <PrivateAssets>contentFiles;analyzers</PrivateAssets><!--Need to be able to flow up the build folder so that we can get some native dlls into the output folder-->
+      <PrivateAssets>contentFiles;analyzers</PrivateAssets>
+      <!--Need to be able to flow up the build folder so that we can get some native dlls into the output folder-->
     </PackageReference>
-
+    <PackageReference Include="newtonsoft.json" Version="12.0.3" />
   </ItemGroup>
 
   <ItemGroup>
@@ -29,5 +30,4 @@
     <Reference Include="System.DirectoryServices" />
     <Reference Include="System.DirectoryServices.AccountManagement" />
   </ItemGroup>
-
 </Project>
