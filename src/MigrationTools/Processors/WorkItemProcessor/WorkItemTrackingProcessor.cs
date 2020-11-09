@@ -9,11 +9,11 @@ using MigrationTools.Enrichers;
 
 namespace MigrationTools.Processors
 {
-    public class WorkItemMigrationProcessor : Processor
+    public class WorkItemTrackingProcessor : Processor
     {
         private WorkItemMigrationProcessorOptions _config;
 
-        public WorkItemMigrationProcessor(ProcessorEnricherContainer processorEnricherContainer, EndpointContainer endpointContainer, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(processorEnricherContainer, endpointContainer, services, telemetry, logger)
+        public WorkItemTrackingProcessor(ProcessorEnricherContainer processorEnricherContainer, EndpointContainer endpointContainer, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(processorEnricherContainer, endpointContainer, services, telemetry, logger)
         {
         }
 

@@ -7,7 +7,7 @@
         public bool CollapseRevisions { get; set; }
         public int WorkItemCreateRetryLimit { get; set; }
 
-        public override string Processor => nameof(WorkItemMigrationProcessor);
+        public override string Processor => nameof(WorkItemTrackingProcessor);
 
         public override IProcessorOptions GetDefault()
         {
