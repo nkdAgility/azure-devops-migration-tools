@@ -4,6 +4,8 @@
     <TargetFramework>net472</TargetFramework>
 
     <IsPackable>false</IsPackable>
+
+    <RootNamespace>MigrationTools.Tests</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
