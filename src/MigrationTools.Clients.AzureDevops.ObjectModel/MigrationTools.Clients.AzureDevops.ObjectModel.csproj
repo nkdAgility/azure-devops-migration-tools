@@ -7,15 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Configuration\**" />
-    <Compile Remove="Enrichers\EndpointEnrichers\**" />
-    <EmbeddedResource Remove="Configuration\**" />
-    <EmbeddedResource Remove="Enrichers\EndpointEnrichers\**" />
-    <None Remove="Configuration\**" />
-    <None Remove="Enrichers\EndpointEnrichers\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Ben.Demystifier" Version="0.1.6" />
     <PackageReference Include="Microsoft.TeamFoundationServer.ExtendedClient" Version="16.153.0" />
   </ItemGroup>
@@ -24,7 +15,4 @@
     <ProjectReference Include="..\MigrationTools\MigrationTools.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="_EngineV1\" />
-  </ItemGroup>
 </Project>

@@ -5,12 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="MappingTools\**" />
-    <EmbeddedResource Remove="MappingTools\**" />
-    <None Remove="MappingTools\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.8.0" />
     <PackageReference Include="Microsoft.ApplicationInsights" Version="2.15.0" />
     <PackageReference Include="Microsoft.ApplicationInsights.WorkerService" Version="2.15.0" />
@@ -18,16 +12,11 @@
     <PackageReference Include="Microsoft.Extensions.Options" Version="3.1.9" />
     <PackageReference Include="Microsoft.IdentityModel.Clients.ActiveDirectory" Version="5.2.8" />
     <PackageReference Include="Microsoft.VisualStudio.Services.Client" Version="16.153.0" />
-    <PackageReference Include="NuGet.Protocol" Version="5.7.0" />
-    <PackageReference Include="NuGet.Versioning" Version="5.7.0" />
+
     <PackageReference Include="Serilog" Version="2.10.0" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="3.0.1" />
     <PackageReference Include="Serilog.Sinks.Debug" Version="1.0.1" />
     <PackageReference Include="System.Security.Principal.Windows" Version="4.7.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="_EngineV1\Enrichers\" />
   </ItemGroup>
 
 </Project>
