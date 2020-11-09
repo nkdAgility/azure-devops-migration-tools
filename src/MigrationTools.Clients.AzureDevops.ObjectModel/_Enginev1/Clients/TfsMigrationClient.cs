@@ -81,7 +81,7 @@ namespace MigrationTools._EngineV1.Clients
             _workItemClient.Configure(this);
             _testPlanClient.Configure(this);
         }
-        
+
         public object InternalCollection
         {
             get
@@ -114,8 +114,7 @@ namespace MigrationTools._EngineV1.Clients
             {
                 if (credentials != null)
                 {
-                    _vssCredentials =  new VssCredentials(new Microsoft.VisualStudio.Services.Common.WindowsCredential(credentials));
-                    
+                    _vssCredentials = new VssCredentials(new Microsoft.VisualStudio.Services.Common.WindowsCredential(credentials));
                 }
                 else if (!string.IsNullOrEmpty(TfsConfig.PersonalAccessToken))
                 {
