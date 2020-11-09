@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
+using MigrationTools.Options;
 
 namespace MigrationTools.Endpoints
 {
@@ -12,7 +13,7 @@ namespace MigrationTools.Endpoints
 
         IEnumerable<WorkItemData> GetWorkItems();
 
-        IEnumerable<WorkItemData> GetWorkItems(IWorkItemQuery query);
+        IEnumerable<WorkItemData> GetWorkItems(QueryOptions query);
     }
 
     public interface IWorkItemTargetEndPoint : IWorkItemEndPoint

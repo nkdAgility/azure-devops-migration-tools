@@ -7,6 +7,7 @@ using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using Microsoft.VisualStudio.Services.Common;
 using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
+using MigrationTools.Options;
 
 namespace MigrationTools.Endpoints
 {
@@ -43,7 +44,7 @@ namespace MigrationTools.Endpoints
             return new List<WorkItemData>();
         }
 
-        public override IEnumerable<WorkItemData> GetWorkItems(IWorkItemQuery query)
+        public override IEnumerable<WorkItemData> GetWorkItems(QueryOptions query)
         {
             Log.LogDebug("TfsWorkItemEndPoint::GetWorkItems(query)");
             RefreshData();

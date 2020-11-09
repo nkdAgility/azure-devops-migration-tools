@@ -4,6 +4,7 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
+using MigrationTools.Options;
 using Newtonsoft.Json;
 
 namespace MigrationTools.Endpoints
@@ -58,7 +59,7 @@ namespace MigrationTools.Endpoints
             return _innerList;
         }
 
-        public override IEnumerable<WorkItemData> GetWorkItems(IWorkItemQuery query)
+        public override IEnumerable<WorkItemData> GetWorkItems(QueryOptions query)
         {
             return GetWorkItems();
         }

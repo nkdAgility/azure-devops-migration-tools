@@ -1,5 +1,9 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MigrationTools.DataContracts;
+using MigrationTools.Options;
 using MigrationTools.Tests;
 
 namespace MigrationTools.Endpoints.Tests
@@ -24,11 +28,13 @@ namespace MigrationTools.Endpoints.Tests
             Assert.IsNotNull(endpoint);
         }
 
-        //[TestMethod()]
-        //public void ConfigureTest()
-        //{
-        //    Assert.Fail();
-        //}
+        [TestMethod()]
+        public void ConfigureTest()
+        {
+            var endpoint = Services.GetRequiredService<TfsWorkItemEndPoint>();
+            endpoint.Configure(GetTfsWorkItemEndPointOptions(EndpointDirection.Source, "migrationSource1"));
+            Assert.IsNotNull(endpoint);
+        }
 
         //[TestMethod()]
         //public void FilterTest()
@@ -36,17 +42,24 @@ namespace MigrationTools.Endpoints.Tests
         //    Assert.Fail();
         //}
 
-        //[TestMethod()]
-        //public void GetWorkItemsTest()
-        //{
-        //    Assert.Fail();
-        //}
+        [TestMethod()]
+        public void GetWorkItemsTest()
+        {
+            var endpoint = Services.GetRequiredService<TfsWorkItemEndPoint>();
+            endpoint.Configure(GetTfsWorkItemEndPointOptions(EndpointDirection.Source, "migrationSource1"));
+            IEnumerable<WorkItemData> result = endpoint.GetWorkItems();
+            Assert.AreEqual(0, result.Count());
+        }
 
-        //[TestMethod()]
-        //public void GetWorkItemsTest1()
-        //{
-        //    Assert.Fail();
-        //}
+        [TestMethod()]
+        public void GetWorkItemsQueryTest()
+        {
+            var endpoint = Services.GetRequiredService<TfsWorkItemEndPoint>();
+            endpoint.Configure(GetTfsWorkItemEndPointOptions(EndpointDirection.Source, "migrationSource1"));
+            QueryOptions qo = new QueryOptions() { Query = "" };
+            IEnumerable<WorkItemData> result = endpoint.GetWorkItems(qo);
+            Assert.AreEqual(0, result.Count());
+        }
 
         //[TestMethod()]
         //public void PersistWorkItemTest()

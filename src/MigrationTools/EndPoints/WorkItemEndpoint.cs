@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
+using MigrationTools.Options;
 
 namespace MigrationTools.Endpoints
 {
@@ -31,7 +32,7 @@ namespace MigrationTools.Endpoints
 
         public abstract IEnumerable<WorkItemData> GetWorkItems();
 
-        public abstract IEnumerable<WorkItemData> GetWorkItems(IWorkItemQuery query);
+        public abstract IEnumerable<WorkItemData> GetWorkItems(QueryOptions query);
 
         public abstract void PersistWorkItem(WorkItemData sourceWorkItem);
     }
