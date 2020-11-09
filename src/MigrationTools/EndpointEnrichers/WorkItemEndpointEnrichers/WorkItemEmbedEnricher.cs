@@ -1,9 +1,9 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
 
-namespace MigrationTools.Enrichers
+namespace MigrationTools.EndpointEnrichers
 {
-    public class WorkItemEmbedEnricher : WorkItemEndpointEnricher
+    public abstract class WorkItemEmbedEnricher : WorkItemEndpointEnricher
     {
         private WorkItemEmbedEnricherOptions _Options;
 

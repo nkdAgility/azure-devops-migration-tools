@@ -6,7 +6,6 @@ using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using MigrationTools;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.DataContracts;
 using Serilog;
@@ -272,15 +271,6 @@ namespace MigrationTools._EngineV1.Clients
                 }
             }
             return foundWorkItem;
-        }
-
-        protected WorkItemData FindReflectedWorkItemByTitle(string title)
-        {
-            IWorkItemQueryBuilder wiqb = Services.GetRequiredService<IWorkItemQueryBuilder>();
-            wiqb.Query = @"SELECT [System.Id] FROM WorkItems  WHERE [System.TeamProject]=@TeamProject AND [System.Title] = @TitleToFind";
-            wiqb.AddParameter("TitleToFind", title);
-            wiqb.AddParameter("TeamProject", MigrationClient.Config.AsTeamProjectConfig().Project);
-            return FindWorkItemByQuery(wiqb);
         }
 
         private StringBuilder FindReflectedWorkItemQueryBase(IWorkItemQueryBuilder query)

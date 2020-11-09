@@ -7,11 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MigrationTools\MigrationTools.csproj" />
+    <Compile Remove="Enrichers\**" />
+    <EmbeddedResource Remove="Enrichers\**" />
+    <None Remove="Enrichers\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Enrichers\EndpointEnrichers\WorkItemEndpointEnrichers\" />
+    <ProjectReference Include="..\MigrationTools\MigrationTools.csproj" />
   </ItemGroup>
 
 </Project>

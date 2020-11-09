@@ -3,7 +3,8 @@ using System.IO;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using MigrationTools.DataContracts;
-using MigrationTools.Enrichers;
+using MigrationTools.EndpointEnrichers;
+using MigrationTools.Options;
 using Newtonsoft.Json;
 
 namespace MigrationTools.Endpoints
@@ -19,12 +20,10 @@ namespace MigrationTools.Endpoints
         }
 
         public override int Count => GetWorkItems().Count();
-        public override EndpointDirection Direction => _options.Direction;
-        public override IEnumerable<IWorkItemProcessorSourceEnricher> SourceEnrichers => throw new System.NotImplementedException();
-        public override IEnumerable<IWorkItemProcessorTargetEnricher> TargetEnrichers => throw new System.NotImplementedException();
 
         public override void Configure(IEndpointOptions options)
         {
+            base.Configure(options);
             _options = (FileSystemWorkItemEndpointOptions)options;
             if (!System.IO.Directory.Exists(_options.FileStore))
             {
@@ -58,7 +57,7 @@ namespace MigrationTools.Endpoints
             return _innerList;
         }
 
-        public override IEnumerable<WorkItemData> GetWorkItems(IWorkItemQuery query)
+        public override IEnumerable<WorkItemData> GetWorkItems(QueryOptions query)
         {
             return GetWorkItems();
         }

@@ -1,9 +1,11 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
+using MigrationTools.DataContracts;
+using MigrationTools.Endpoints;
 
-namespace MigrationTools.Enrichers
+namespace MigrationTools.EndpointEnrichers
 {
-    public abstract class WorkItemEndpointEnricher : IWorkItemEndpointEnricher
+    public abstract class WorkItemEndpointEnricher : IWorkItemEndpointSourceEnricher, IWorkItemEndpointTargetEnricher
     {
         public WorkItemEndpointEnricher(IServiceProvider services, ITelemetryLogger telemetry, ILogger<WorkItemEndpointEnricher> logger)
         {
@@ -17,5 +19,7 @@ namespace MigrationTools.Enrichers
         public ILogger<WorkItemEndpointEnricher> Log { get; }
 
         public abstract void Configure(IEndpointEnricherOptions options);
+
+        public abstract void EnrichWorkItemData(IEndpoint endpoint, object dataSource, RevisionItem dataTarget);
     }
 }

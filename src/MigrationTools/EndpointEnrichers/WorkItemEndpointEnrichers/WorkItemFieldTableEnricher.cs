@@ -1,9 +1,9 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
 
-namespace MigrationTools.Enrichers
+namespace MigrationTools.EndpointEnrichers
 {
-    public class WorkItemFieldTableEnricher : WorkItemEndpointEnricher
+    public abstract class WorkItemFieldTableEnricher : WorkItemEndpointEnricher
     {
         private WorkItemFieldTableEnricherOptions _Options;
 

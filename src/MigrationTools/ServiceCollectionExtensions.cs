@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Containers;
 using MigrationTools.Configuration;
+using MigrationTools.EndpointEnrichers;
 using MigrationTools.EndPoints;
 using MigrationTools.Enrichers;
 using MigrationTools.Processors;
@@ -47,13 +48,12 @@ namespace MigrationTools
             context.AddTransient<FilterWorkItemsThatAlreadyExistInTarget>();
             context.AddTransient<SkipToFinalRevisedWorkItemType>();
             // WorkItem Endpoint Enrichers
-            context.AddTransient<WorkItemAttachmentEnricher>();
-            context.AddTransient<WorkItemCreatedEnricher>();
-            context.AddTransient<WorkItemEmbedEnricher>();
-            context.AddTransient<WorkItemFieldTableEnricher>();
-            context.AddTransient<WorkItemLinkEnricher>();
+            //context.AddTransient<WorkItemAttachmentEnricher>();
+            //context.AddTransient<WorkItemCreatedEnricher>();
+            //context.AddTransient<WorkItemEmbedEnricher>();
+            //context.AddTransient<WorkItemFieldTableEnricher>();
+            //context.AddTransient<WorkItemLinkEnricher>();
             // processor Enrichers
-            context.AddTransient<WorkItemAttachmentEnricher>();
             context.AddTransient<PauseAfterEachItem>();
         }
 

@@ -1,4 +1,4 @@
-﻿using MigrationTools.Enrichers;
+﻿using MigrationTools.EndpointEnrichers;
 
 namespace MigrationTools.Endpoints
 {

@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using MigrationTools.DataContracts;
+using MigrationTools.EndpointEnrichers;
 using MigrationTools.Enrichers;
+using MigrationTools.Options;
 
 namespace MigrationTools.Endpoints
 {
@@ -11,21 +13,17 @@ namespace MigrationTools.Endpoints
     {
         private List<WorkItemData> _innerList;
         private InMemoryWorkItemEndpointOptions _Options;
-        private List<IEndpointEnricher> _EndpointEnrichers;
 
         public InMemoryWorkItemEndpoint(EndpointEnricherContainer endpointEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<WorkItemEndpoint> logger) : base(endpointEnrichers, services, telemetry, logger)
         {
             _innerList = new List<WorkItemData>();
-            _EndpointEnrichers = new List<IEndpointEnricher>();
         }
 
         public override int Count => _innerList.Count;
-        public override EndpointDirection Direction => _Options.Direction;
-        public override IEnumerable<IWorkItemProcessorSourceEnricher> SourceEnrichers => _EndpointEnrichers.Where(e => e.GetType().IsAssignableFrom(typeof(IWorkItemProcessorSourceEnricher))).Select(e => (IWorkItemProcessorSourceEnricher)e);
-        public override IEnumerable<IWorkItemProcessorTargetEnricher> TargetEnrichers => _EndpointEnrichers.Where(e => e.GetType().IsAssignableFrom(typeof(IWorkItemProcessorTargetEnricher))).Select(e => (IWorkItemProcessorTargetEnricher)e);
 
         public override void Configure(IEndpointOptions options)
         {
+            base.Configure(options);
             _Options = (InMemoryWorkItemEndpointOptions)options;
         }
 
@@ -48,7 +46,7 @@ namespace MigrationTools.Endpoints
             return _innerList;
         }
 
-        public override IEnumerable<WorkItemData> GetWorkItems(IWorkItemQuery query)
+        public override IEnumerable<WorkItemData> GetWorkItems(QueryOptions query)
         {
             return GetWorkItems();
         }
