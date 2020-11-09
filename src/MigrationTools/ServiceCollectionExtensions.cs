@@ -48,13 +48,12 @@ namespace MigrationTools
             context.AddTransient<FilterWorkItemsThatAlreadyExistInTarget>();
             context.AddTransient<SkipToFinalRevisedWorkItemType>();
             // WorkItem Endpoint Enrichers
-            context.AddTransient<WorkItemAttachmentEnricher>();
-            context.AddTransient<WorkItemCreatedEnricher>();
-            context.AddTransient<WorkItemEmbedEnricher>();
-            context.AddTransient<WorkItemFieldTableEnricher>();
-            context.AddTransient<WorkItemLinkEnricher>();
+            //context.AddTransient<WorkItemAttachmentEnricher>();
+            //context.AddTransient<WorkItemCreatedEnricher>();
+            //context.AddTransient<WorkItemEmbedEnricher>();
+            //context.AddTransient<WorkItemFieldTableEnricher>();
+            //context.AddTransient<WorkItemLinkEnricher>();
             // processor Enrichers
-            context.AddTransient<WorkItemAttachmentEnricher>();
             context.AddTransient<PauseAfterEachItem>();
         }
 

@@ -23,6 +23,7 @@ namespace MigrationTools.Endpoints
 
         public override void Configure(IEndpointOptions options)
         {
+            base.Configure(options);
             _Options = (InMemoryWorkItemEndpointOptions)options;
         }
 

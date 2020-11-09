@@ -147,15 +147,10 @@
           },
           "Enrichers": [
             {
-              "ObjectType": "WorkItemAttachmentEnricherOptions",
+              "ObjectType": "FileSystemWorkItemAttachmentEnricherOptions",
               "Enabled": true,
               "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
               "AttachmentMaxSize": 480000000
-            },
-            {
-              "ObjectType": "WorkItemLinkEnricherOptions",
-              "Enabled": true,
-              "LinkMigrationSaveEachAsAdded": true
             }
           ]
         },
@@ -168,29 +163,29 @@
           },
           "Enrichers": [
             {
-              "ObjectType": "WorkItemAttachmentEnricherOptions",
+              "ObjectType": "TfsWorkItemAttachmentEnricherOptions",
               "Enabled": true,
               "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
               "AttachmentMaxSize": 480000000
             },
             {
-              "ObjectType": "WorkItemEmbedEnricherOptions",
+              "ObjectType": "TfsWorkItemEmbedEnricherOptions",
               "Enabled": true,
               "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\"
             },
             {
-              "ObjectType": "WorkItemLinkEnricherOptions",
+              "ObjectType": "TfsWorkItemLinkEnricherOptions",
               "Enabled": true,
               "LinkMigrationSaveEachAsAdded": true
             },
             {
-              "ObjectType": "WorkItemCreatedEnricherOptions",
+              "ObjectType": "TfsWorkItemCreatedEnricherOptions",
               "Enabled": true,
               "UpdateCreatedDate": true,
               "UpdateCreatedBy": true
             },
             {
-              "ObjectType": "WorkItemFieldTableEnricherOptions",
+              "ObjectType": "TfsWorkItemFieldTableEnricherOptions",
               "Enabled": true
             }
           ]

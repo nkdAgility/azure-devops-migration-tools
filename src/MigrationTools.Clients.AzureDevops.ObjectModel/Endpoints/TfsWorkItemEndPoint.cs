@@ -81,6 +81,7 @@ namespace MigrationTools.Endpoints
 
         private void PopulateRevisions(WorkItem wi, WorkItemData wid)
         {
+            wid.Revisions = new List<RevisionItem>();
             foreach (Revision revision in wi.Revisions)
             {
                 RevisionItem revi = new RevisionItem

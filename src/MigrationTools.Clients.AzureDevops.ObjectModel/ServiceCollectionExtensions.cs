@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 using MigrationTools._EngineV1.Clients;
+using MigrationTools.EndpointEnrichers;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
 using MigrationTools.FieldMaps.AzureDevops.ObjectModel;
@@ -37,6 +38,8 @@ namespace MigrationTools
             context.AddSingleton<TfsEmbededImagesEnricher>();
             context.AddSingleton<TfsGitRepositoryEnricher>();
             context.AddSingleton<TfsNodeStructureEnricher>();
+            // EndPoint Enrichers
+            context.AddTransient<TfsWorkItemAttachmentEnricher>();
             // Core
             context.AddTransient<IMigrationClient, TfsMigrationClient>();
             context.AddTransient<IWorkItemMigrationClient, TfsWorkItemMigrationClient>();

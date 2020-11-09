@@ -48,7 +48,7 @@ namespace MigrationTools.Endpoints.Tests
             var endpoint = Services.GetRequiredService<TfsWorkItemEndPoint>();
             endpoint.Configure(GetTfsWorkItemEndPointOptions(EndpointDirection.Source, "migrationSource1"));
             IEnumerable<WorkItemData> result = endpoint.GetWorkItems();
-            Assert.AreEqual(0, result.Count());
+            Assert.AreEqual(5, result.Count());
         }
 
         [TestMethod()]
@@ -56,9 +56,13 @@ namespace MigrationTools.Endpoints.Tests
         {
             var endpoint = Services.GetRequiredService<TfsWorkItemEndPoint>();
             endpoint.Configure(GetTfsWorkItemEndPointOptions(EndpointDirection.Source, "migrationSource1"));
-            QueryOptions qo = new QueryOptions() { Query = "" };
+            QueryOptions qo = new QueryOptions()
+            {
+                Query = "SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject",
+                Paramiters = new Dictionary<string, string>() { { "TeamProject", "migrationSource1" } }
+            };
             IEnumerable<WorkItemData> result = endpoint.GetWorkItems(qo);
-            Assert.AreEqual(0, result.Count());
+            Assert.AreEqual(5, result.Count());
         }
 
         //[TestMethod()]
@@ -82,6 +86,7 @@ namespace MigrationTools.Endpoints.Tests
                             "WHERE [System.TeamProject] = @TeamProject " +
                                 "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan') " +
                             "ORDER BY [System.ChangedDate] desc",
+                    Paramiters = new Dictionary<string, string>() { { "TeamProject", "migrationSource1" } }
                 }
             };
         }

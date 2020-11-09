@@ -6,6 +6,6 @@ namespace MigrationTools.Options
     {
         public string Query { get; set; }
 
-        public Dictionary<string, object> Paramiters { get; set; }
+        public Dictionary<string, string> Paramiters { get; set; }
     }
 }
