@@ -1,98 +1,111 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using Microsoft.VisualStudio.Services.Common;
 using MigrationTools.DataContracts;
-using MigrationTools.Enrichers;
+using MigrationTools.EndpointEnrichers;
 using MigrationTools.Options;
+using WorkItem = Microsoft.TeamFoundation.WorkItemTracking.Client.WorkItem;
 
 namespace MigrationTools.Endpoints
 {
     public class TfsWorkItemEndPoint : WorkItemEndpoint
     {
+        private TfsTeamProjectCollection _Collection;
         private TfsWorkItemEndPointOptions _Options;
-        private TfsTeamProjectCollection _tfsTeamProjectCollection;
+        private WorkItemStore _Store;
 
         public TfsWorkItemEndPoint(EndpointEnricherContainer endpointEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<WorkItemEndpoint> logger) : base(endpointEnrichers, services, telemetry, logger)
         {
         }
 
         public override int Count => 0;
-        public override EndpointDirection Direction => _Options.Direction;
-        public override IEnumerable<IWorkItemProcessorSourceEnricher> SourceEnrichers => throw new NotImplementedException();
-        public override IEnumerable<IWorkItemProcessorTargetEnricher> TargetEnrichers => throw new NotImplementedException();
 
         public override void Configure(IEndpointOptions options)
         {
+            base.Configure(options);
             Log.LogDebug("TfsWorkItemEndPoint::Configure");
             _Options = (TfsWorkItemEndPointOptions)options;
+            ValidateConfiguration(_Options);
         }
 
         public override void Filter(IEnumerable<WorkItemData> workItems)
         {
             Log.LogDebug("TfsWorkItemEndPoint::Filter");
-            RefreshData();
+            EnsureConnection();
         }
 
         public override IEnumerable<WorkItemData> GetWorkItems()
         {
             Log.LogDebug("TfsWorkItemEndPoint::GetWorkItems");
-            RefreshData();
-            return new List<WorkItemData>();
+            if (string.IsNullOrEmpty(_Options.Query?.Query))
+            {
+                throw new ArgumentNullException(nameof(_Options.Query));
+            }
+            return GetWorkItems(_Options.Query);
         }
 
         public override IEnumerable<WorkItemData> GetWorkItems(QueryOptions query)
         {
             Log.LogDebug("TfsWorkItemEndPoint::GetWorkItems(query)");
-            RefreshData();
-            return new List<WorkItemData>();
+            EnsureConnection();
+            var wis = _Store.Query(query.Query, query.Paramiters);
+            return ToWorkItemDataList(wis);
+        }
+
+        private List<WorkItemData> ToWorkItemDataList(WorkItemCollection collection)
+        {
+            List<WorkItemData> list = new List<WorkItemData>();
+            foreach (WorkItem wi in collection)
+            {
+                list.Add(ConvertToWorkItemData(wi));
+            }
+            return list;
+        }
+
+        private WorkItemData ConvertToWorkItemData(WorkItem wi)
+        {
+            WorkItemData wid = new WorkItemData
+            {
+                Id = wi.Id.ToString(),
+                Direction = _Options.Direction,
+                Type = wi.Type.ToString()
+            };
+            RunSourceEnrichers(wi, wid);
+
+            return wid;
+        }
+
+        private void RunSourceEnrichers(WorkItem wi, WorkItemData wid)
+        {
+            Log.LogDebug("TfsWorkItemEndPoint::RunSourceEnrichers::{SourceEnrichersCount}", SourceEnrichers.Count());
+            foreach (IWorkItemEndpointSourceEnricher enricher in SourceEnrichers)
+            {
+            }
         }
 
         public override void PersistWorkItem(WorkItemData source)
         {
             Log.LogDebug("TfsWorkItemEndPoint::PersistWorkItem");
-            RefreshData();
+            EnsureConnection();
         }
 
-        private void RefreshData()
+        private void EnsureConnection()
         {
             Log.LogDebug("TfsWorkItemEndPoint::RefreshData");
-            if (string.IsNullOrEmpty(_Options.Organisation))
-            {
-                throw new ArgumentNullException(nameof(_Options.Organisation));
-            }
-
+            ValidateConfiguration(_Options);
             TfsTeamProjectCollection tfs = GetTfsCollection();
             WorkItemStore store = GetWorkItemStore(tfs, WorkItemStoreFlags.BypassRules);
-        }
-
-        private WorkItemStore GetWorkItemStore(TfsTeamProjectCollection tfs, WorkItemStoreFlags bypassRules)
-        {
-            var startTime = DateTime.UtcNow;
-            var timer = System.Diagnostics.Stopwatch.StartNew();
-            WorkItemStore store;
-            try
-            {
-                store = new WorkItemStore(tfs, bypassRules);
-                timer.Stop();
-                Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", _Options.Organisation, "GetWorkItemStore", null, startTime, timer.Elapsed, "200", true));
-            }
-            catch (Exception ex)
-            {
-                timer.Stop();
-                Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", _Options.Organisation, "GetWorkItemStore", null, startTime, timer.Elapsed, "500", false));
-                Log.LogError(ex, "Unable to connect to {Organisation} Store", _Options.Organisation);
-                throw;
-            }
-            return store;
+            Log.LogDebug("TfsWorkItemEndPoint::EnsureConnection: Validated connection to {TeamProjectCollection} ", store.TeamProjectCollection.DisplayName);
         }
 
         private TfsTeamProjectCollection GetTfsCollection()
         {
-            if (_tfsTeamProjectCollection is null)
+            if (_Collection is null)
             {
                 var startTime = DateTime.UtcNow;
                 var timer = System.Diagnostics.Stopwatch.StartNew();
@@ -101,7 +114,7 @@ namespace MigrationTools.Endpoints
                 {
                     if (!string.IsNullOrEmpty(_Options.AccessToken))
                     {
-                        Log.LogDebug("TfsWorkItemEndPoint::EnsureDataSource: Using PAT Authentication ", _Options.Organisation);
+                        Log.LogDebug("TfsWorkItemEndPoint::GetTfsCollection: Using PAT Authentication ", _Options.Organisation);
                         vssCredentials = new VssBasicCredential(string.Empty, _Options.AccessToken);
                     }
                     else
@@ -110,13 +123,13 @@ namespace MigrationTools.Endpoints
                         vssCredentials = new VssCredentials();
                     }
                     Log.LogDebug(Microsoft.TeamFoundation.Framework.Common.LocationServiceConstants.ApplicationLocationServiceIdentifier.ToString());
-                    Log.LogDebug("TfsWorkItemEndPoint::EnsureDataSource: Connecting to {CollectionUrl} ", _Options.Organisation);
-                    _tfsTeamProjectCollection = new TfsTeamProjectCollection(new Uri(_Options.Organisation), vssCredentials);
-                    Log.LogDebug("TfsWorkItemEndPoint::EnsureDataSource: Connected ");
-                    Log.LogDebug("TfsWorkItemEndPoint::EnsureDataSource: validating security for {@AuthorizedIdentity} ", _tfsTeamProjectCollection.AuthorizedIdentity);
-                    _tfsTeamProjectCollection.EnsureAuthenticated();
+                    Log.LogDebug("TfsWorkItemEndPoint::GetTfsCollection: Connecting to {CollectionUrl} ", _Options.Organisation);
+                    _Collection = new TfsTeamProjectCollection(new Uri(_Options.Organisation), vssCredentials);
+                    Log.LogDebug("TfsWorkItemEndPoint::GetTfsCollection: Connected ");
+                    Log.LogDebug("TfsWorkItemEndPoint::GetTfsCollection: validating security for {@AuthorizedIdentity} ", _Collection.AuthorizedIdentity);
+                    _Collection.EnsureAuthenticated();
                     timer.Stop();
-                    Log.LogInformation("TfsWorkItemEndPoint::EnsureDataSource: Access granted to {CollectionUrl} for {Name} ({Account})", _Options.Organisation, _tfsTeamProjectCollection.AuthorizedIdentity.DisplayName, _tfsTeamProjectCollection.AuthorizedIdentity.UniqueName);
+                    Log.LogInformation("TfsWorkItemEndPoint::GetTfsCollection: Access granted to {CollectionUrl} for {Name} ({Account})", _Options.Organisation, _Collection.AuthorizedIdentity.DisplayName, _Collection.AuthorizedIdentity.UniqueName);
                     Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", _Options.Organisation, "GetTfsCollection", null, startTime, timer.Elapsed, "200", true));
                 }
                 catch (Exception ex)
@@ -127,7 +140,51 @@ namespace MigrationTools.Endpoints
                     throw;
                 }
             }
-            return _tfsTeamProjectCollection;
+            return _Collection;
+        }
+
+        private WorkItemStore GetWorkItemStore(TfsTeamProjectCollection tfs, WorkItemStoreFlags bypassRules)
+        {
+            if (_Store is null)
+            {
+                var startTime = DateTime.UtcNow;
+                var timer = System.Diagnostics.Stopwatch.StartNew();
+                try
+                {
+                    _Store = new WorkItemStore(tfs, bypassRules);
+                    timer.Stop();
+                    Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", _Options.Organisation, "GetWorkItemStore", null, startTime, timer.Elapsed, "200", true));
+                }
+                catch (Exception ex)
+                {
+                    timer.Stop();
+                    Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", _Options.Organisation, "GetWorkItemStore", null, startTime, timer.Elapsed, "500", false));
+                    Log.LogError(ex, "Unable to connect to {Organisation} Store", _Options.Organisation);
+                    throw;
+                }
+            }
+
+            return _Store;
+        }
+
+        private void ValidateConfiguration(TfsWorkItemEndPointOptions options)
+        {
+            if (string.IsNullOrEmpty(_Options.Organisation))
+            {
+                throw new ArgumentNullException(nameof(_Options.Organisation));
+            }
+            if (string.IsNullOrEmpty(_Options.Project))
+            {
+                throw new ArgumentNullException(nameof(_Options.Project));
+            }
+            if (string.IsNullOrEmpty(_Options.AccessToken))
+            {
+                throw new ArgumentNullException(nameof(_Options.AccessToken));
+            }
+            if (string.IsNullOrEmpty(_Options.Query?.Query))
+            {
+                throw new ArgumentNullException(nameof(_Options.Query));
+            }
         }
     }
 }

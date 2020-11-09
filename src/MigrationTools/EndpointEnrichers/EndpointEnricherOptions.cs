@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MigrationTools.Enrichers
+namespace MigrationTools.EndpointEnrichers
 {
     public abstract class EndpointEnricherOptions : IEndpointEnricherOptions
     {

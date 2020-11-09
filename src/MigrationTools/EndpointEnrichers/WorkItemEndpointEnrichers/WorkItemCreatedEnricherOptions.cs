@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MigrationTools.Enrichers
+namespace MigrationTools.EndpointEnrichers
 {
     public class WorkItemCreatedEnricherOptions : EndpointEnricherOptions
     {

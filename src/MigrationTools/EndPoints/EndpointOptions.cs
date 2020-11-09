@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using MigrationTools.Enrichers;
+using MigrationTools.EndpointEnrichers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 

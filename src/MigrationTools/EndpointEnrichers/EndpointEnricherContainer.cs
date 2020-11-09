@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace MigrationTools.Enrichers
+namespace MigrationTools.EndpointEnrichers
 {
     public class EndpointEnricherContainer : List<IEndpointEnricher>
     {
@@ -18,7 +18,7 @@ namespace MigrationTools.Enrichers
         protected IServiceProvider Services { get; }
         protected ITelemetryLogger Telemetry { get; }
 
-        public void ConfigureEnrichers(List<EndpointEnricherOptions> enrichers)
+        public void ConfigureEnrichers(List<IEndpointEnricherOptions> enrichers)
         {
             if (enrichers is null)
             {
