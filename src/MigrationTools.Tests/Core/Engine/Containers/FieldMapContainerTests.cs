@@ -25,7 +25,7 @@ namespace MigrationTools.Engine.Containers.Tests
             return sp;
         }
 
-        [TestMethod()]
+        [TestMethod(), TestCategory("L0")]
         public void FieldMapContainerTest()
         {
             var config = CreateEngineConfiguration();

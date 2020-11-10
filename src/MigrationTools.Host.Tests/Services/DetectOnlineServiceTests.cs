@@ -6,7 +6,7 @@ namespace MigrationTools.Host.Services.Tests
     [TestClass]
     public class DetectOnlineServiceTests
     {
-        [TestMethod]
+        [TestMethod, TestCategory("L1")]
         public void DetectOnlineServiceTest()
         {
             var dos = new DetectOnlineService(new TelemetryLoggerMock());

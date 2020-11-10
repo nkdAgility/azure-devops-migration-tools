@@ -17,7 +17,7 @@ namespace MigrationTools.Processors.Tests
             Services = ServiceProviderHelper.GetWorkItemMigrationProcessor();
         }
 
-        [TestMethod()]
+        [TestMethod(), TestCategory("L0")]
         public void ConfigureTest()
         {
             var y = new WorkItemMigrationProcessorOptions
@@ -29,7 +29,7 @@ namespace MigrationTools.Processors.Tests
             Assert.IsNotNull(x);
         }
 
-        [TestMethod()]
+        [TestMethod(), TestCategory("L1")]
         public void RunTest()
         {
             var y = new WorkItemMigrationProcessorOptions

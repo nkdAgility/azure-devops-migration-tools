@@ -19,7 +19,7 @@ namespace MigrationTools.Endpoints.Tests
             Services = ServiceProviderHelper.GetServices();
         }
 
-        [TestMethod(), TestCategory("Integration")]
+        [TestMethod(), TestCategory("L3")]
         public void TfsWorkItemEndPointTest()
         {
             var endpoint = Services.GetRequiredService<TfsWorkItemEndPoint>();
@@ -28,7 +28,7 @@ namespace MigrationTools.Endpoints.Tests
             Assert.IsNotNull(endpoint);
         }
 
-        [TestMethod(), TestCategory("Integration")]
+        [TestMethod(), TestCategory("L3")]
         public void ConfigureTest()
         {
             var endpoint = Services.GetRequiredService<TfsWorkItemEndPoint>();
@@ -42,7 +42,7 @@ namespace MigrationTools.Endpoints.Tests
         //    Assert.Fail();
         //}
 
-        [TestMethod(), TestCategory("Integration")]
+        [TestMethod(), TestCategory("L3")]
         public void GetWorkItemsTest()
         {
             var endpoint = Services.GetRequiredService<TfsWorkItemEndPoint>();
@@ -51,7 +51,7 @@ namespace MigrationTools.Endpoints.Tests
             Assert.AreEqual(5, result.Count());
         }
 
-        [TestMethod(), TestCategory("Integration")]
+        [TestMethod(), TestCategory("L3")]
         public void GetWorkItemsQueryTest()
         {
             var endpoint = Services.GetRequiredService<TfsWorkItemEndPoint>();
