@@ -24,7 +24,7 @@ namespace MigrationTools.Integration.Tests
             Log.Logger.Information("Logger is initialized");
         }
 
-        [TestMethod()]
+        [TestMethod(), TestCategory("L3")]
         public void TestTfsToTfsNoEnrichers()
         {
             // Senario 1 Migration from Tfs to Tfs with no Enrichers.

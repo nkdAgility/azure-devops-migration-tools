@@ -11,14 +11,14 @@ namespace MigrationTools.Configuration.Tests
     [TestClass()]
     public class EngineConfigurationBuilderTests
     {
-        [TestMethod()]
+        [TestMethod(), TestCategory("L0")]
         public void BuildDefaultTest()
         {
             var ecb = CreateEngine();
             ecb.BuildDefault();
         }
 
-        [TestMethod()]
+        [TestMethod(), TestCategory("L0")]
         public void BuildFromFileTest()
         {
             HelperCreateDefaultConfigFile();
@@ -26,14 +26,14 @@ namespace MigrationTools.Configuration.Tests
             ecb.BuildFromFile();
         }
 
-        [TestMethod()]
+        [TestMethod(), TestCategory("L0")]
         public void BuildWorkItemMigrationTest()
         {
             var ecb = CreateEngine();
             ecb.BuildWorkItemMigration();
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("L0")]
         public void TestDeseraliseFromJson()
         {
             HelperCreateDefaultConfigFile();
@@ -51,7 +51,7 @@ namespace MigrationTools.Configuration.Tests
             Assert.AreEqual(12, ec.Processors.Count);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("L0")]
         public void TestSeraliseToJson()
         {
             HelperCreateDefaultConfigFile();

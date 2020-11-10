@@ -16,7 +16,7 @@ namespace MigrationTools.Endpoints.Tests
             Services = ServiceProviderHelper.GetServices();
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("L3")]
         public void ConfiguredTest()
         {
             SetupStore(EndpointDirection.Source, 10);
@@ -24,7 +24,7 @@ namespace MigrationTools.Endpoints.Tests
             Assert.AreEqual(10, e.Count);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("L3")]
         public void EmptyTest()
         {
             SetupStore(EndpointDirection.Source, 0);
@@ -32,7 +32,7 @@ namespace MigrationTools.Endpoints.Tests
             Assert.AreEqual(0, e.Count);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("L3")]
         public void FilterAllTest()
         {
             SetupStore(EndpointDirection.Source, 10);
@@ -43,7 +43,7 @@ namespace MigrationTools.Endpoints.Tests
             Assert.AreEqual(0, e1.Count);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("L3")]
         public void FilterHalfTest()
         {
             SetupStore(EndpointDirection.Source, 20);
@@ -54,7 +54,7 @@ namespace MigrationTools.Endpoints.Tests
             Assert.AreEqual(10, e1.Count);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("L3")]
         public void PersistWorkItemExistsTest()
         {
             SetupStore(EndpointDirection.Source, 20);
@@ -68,7 +68,7 @@ namespace MigrationTools.Endpoints.Tests
             Assert.AreEqual(20, e2.Count);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("L3")]
         public void PersistWorkItemWithFilterTest()
         {
             SetupStore(EndpointDirection.Source, 20);

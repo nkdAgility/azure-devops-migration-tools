@@ -13,7 +13,7 @@ namespace MigrationTools.Tests
     {
         private IEngineConfigurationBuilder ecb = new EngineConfigurationBuilder(new NullLogger<EngineConfigurationBuilder>());
 
-        [TestMethod]
+        [TestMethod, TestCategory("L2")]
         public void TestSeraliseToJson()
         {
             string json = JsonConvert.SerializeObject(ecb.BuildDefault(),
@@ -27,7 +27,7 @@ namespace MigrationTools.Tests
             sw.Close();
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("L2")]
         public void TestDeseraliseFromJson()
         {
             TestSeraliseToJson();
@@ -45,7 +45,7 @@ namespace MigrationTools.Tests
             Assert.AreEqual(12, ec.Processors.Count);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("L2")]
         public void TestSeraliseToJson2()
         {
             string json = JsonConvert.SerializeObject(ecb.BuildDefault(),
@@ -59,7 +59,7 @@ namespace MigrationTools.Tests
             sw.Close();
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("L2")]
         public void TestDeseraliseFromJson2()
         {
             TestSeraliseToJson2();
