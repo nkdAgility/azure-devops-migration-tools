@@ -6,7 +6,7 @@ namespace MigrationTools.Host.Services.Tests
     [TestClass]
     public class DetectVersionServiceTests
     {
-        [TestMethod, TestCategory("L1")]
+        [TestMethod, TestCategory("L3")]
         public void DetectVersionServiceTest()
         {
             var dos = new DetectVersionService(new TelemetryLoggerMock());
