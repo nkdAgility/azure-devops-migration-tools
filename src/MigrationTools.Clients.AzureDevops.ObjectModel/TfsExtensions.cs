@@ -29,6 +29,7 @@ namespace MigrationTools
 
         public static void SaveToAzureDevOps(this WorkItemData context)
         {
+            Log.Debug("TfsExtensions::SaveToAzureDevOps");
             if (context == null) throw new ArgumentNullException(nameof(context));
             var workItem = (WorkItem)context.internalObject;
             var fails = workItem.Validate();
@@ -45,12 +46,14 @@ namespace MigrationTools
                 Log.Debug("--------------------------------------------------------------------------------------------------------------------");
             }
             workItem.Fields["System.ChangedBy"].Value = "Migration";
+            Log.Verbose("TfsExtensions::SaveToAzureDevOps::Save()");
             workItem.Save();
             context.RefreshWorkItem();
         }
 
         public static string ToJson(this Field f)
         {
+            Log.Debug("TfsExtensions::ToJson");
             dynamic expando = new ExpandoObject();
             expando.WorkItemId = f.WorkItem.Id;
             expando.CurrentRevisionWorkItemRev = f.WorkItem.Rev;
@@ -81,6 +84,7 @@ namespace MigrationTools
 
         public static void RefreshWorkItem(this WorkItemData context)
         {
+            Log.Debug("TfsExtensions::RefreshWorkItem");
             var workItem = (WorkItem)context.internalObject;
             context.Id = workItem.Id.ToString();
             context.Type = workItem.Type.Name;
@@ -101,6 +105,7 @@ namespace MigrationTools
 
         public static WorkItemData AsWorkItemData(this WorkItem context)
         {
+            Log.Debug("TfsExtensions::AsWorkItemData");
             var internalWorkItem = new WorkItemData
             {
                 internalObject = context

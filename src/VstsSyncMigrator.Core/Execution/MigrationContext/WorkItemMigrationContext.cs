@@ -12,7 +12,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Proxy;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
-using Microsoft.VisualStudio.Services.Client;
 using Microsoft.VisualStudio.Services.WebApi.Patch.Json;
 using MigrationTools;
 using MigrationTools._EngineV1.Clients;
@@ -603,13 +602,15 @@ namespace VstsSyncMigrator.Engine
             catch (Exception ex)
             {
                 TraceWriteLine(LogEventLevel.Information, "...FAILED to Save");
-
+                Log.LogInformation("===============================================================");
                 if (targetWorkItem != null)
                 {
                     foreach (Field f in targetWorkItem.ToWorkItem().Fields)
                         TraceWriteLine(LogEventLevel.Information, "{FieldReferenceName} ({FieldName}) | {FieldValue}", new Dictionary<string, object>() { { "FieldReferenceName", f.ReferenceName }, { "FieldName", f.Name }, { "FieldValue", f.Value } });
                 }
+                Log.LogInformation("===============================================================");
                 Log.LogError(ex.ToString(), ex);
+                Log.LogInformation("===============================================================");
             }
 
             return targetWorkItem;
