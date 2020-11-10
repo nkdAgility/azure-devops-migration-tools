@@ -114,21 +114,23 @@ namespace MigrationTools._EngineV1.Clients
             {
                 if (credentials != null)
                 {
+                    Log.Information("TfsMigrationClient: Connecting with NetworkCredential passes on CommandLine ");
                     _vssCredentials = new VssCredentials(new Microsoft.VisualStudio.Services.Common.WindowsCredential(credentials));
                 }
                 else if (!string.IsNullOrEmpty(TfsConfig.PersonalAccessToken))
                 {
+                    Log.Information("TfsMigrationClient: Connecting with PAT token ");
                     _vssCredentials = new VssBasicCredential(string.Empty, TfsConfig.PersonalAccessToken);
                 }
                 else
                 {
+                    Log.Information("TfsMigrationClient: Connecting with PAT token ");
                     _vssCredentials = new VssCredentials();
                 }
 
                 y = new TfsTeamProjectCollection(TfsConfig.Collection, _vssCredentials);
-
-                Log.Debug("MigrationClient: Connecting to {CollectionUrl} ", TfsConfig.Collection);
-                Log.Debug("MigrationClient: validating security for {@AuthorizedIdentity} ", y.AuthorizedIdentity);
+                Log.Information("MigrationClient: Connecting to {CollectionUrl} ", TfsConfig.Collection);
+                Log.Information("MigrationClient: validating security for {@AuthorizedIdentity} ", y.AuthorizedIdentity);
                 y.EnsureAuthenticated();
                 timer.Stop();
                 Log.Information("MigrationClient: Access granted to {CollectionUrl} for {Name} ({Account})", TfsConfig.Collection, y.AuthorizedIdentity.DisplayName, y.AuthorizedIdentity.UniqueName);
