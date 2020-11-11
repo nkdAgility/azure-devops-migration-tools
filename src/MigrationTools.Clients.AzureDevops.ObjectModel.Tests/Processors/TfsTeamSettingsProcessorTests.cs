@@ -1,12 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Endpoints;
-using MigrationTools.Enrichers;
 using MigrationTools.Tests;
-using Newtonsoft.Json;
 
 namespace MigrationTools.Processors.Tests
 {
@@ -62,13 +58,8 @@ namespace MigrationTools.Processors.Tests
         public void TfsTeamSettingsProcessorOptionsJSON()
         {
             var migrationConfig = GetTfsTeamSettingsProcessorOptions();
-            string json = JsonConvert.SerializeObject(migrationConfig, Formatting.Indented,
-                       new ProcessorConfigJsonConverter(),
-                       new JsonConverterForEndpointOptions(),
-                       new JsonConverterForEnricherOptions());
-            StreamWriter sw = new StreamWriter("../../../../../docs/v2/Reference/JSON/TfsTeamSettingsProcessorOptions.json");
-            sw.WriteLine(json);
-            sw.Close();
+            TestHelpers.SaveDocsObjectAsJSON(migrationConfig);
+            Assert.IsTrue(true);
         }
 
         [TestMethod(), TestCategory("L3")]

@@ -65,6 +65,14 @@ namespace MigrationTools.Endpoints.Tests
             Assert.AreEqual(5, result.Count());
         }
 
+        [TestMethod(), TestCategory("L2")]
+        public void TfsWorkItemEndpointOptionsJSON()
+        {
+            var migrationConfig = GetTfsWorkItemEndPointOptions(EndpointDirection.Source, "MyProjectName");
+            TestHelpers.SaveDocsObjectAsJSON(migrationConfig);
+            Assert.IsTrue(true);
+        }
+
         //[TestMethod()]
         //public void PersistWorkItemTest()
         //{

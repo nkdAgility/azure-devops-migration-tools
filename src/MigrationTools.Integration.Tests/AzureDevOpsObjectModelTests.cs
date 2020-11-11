@@ -35,6 +35,14 @@ namespace MigrationTools.Integration.Tests
             Assert.AreEqual(ProcessingStatus.Complete, workItemMigrationProcessor.Status);
         }
 
+        [TestMethod(), TestCategory("L2")]
+        public void WorkItemMigrationProcessorOptionsJSON()
+        {
+            var migrationConfig = GetConfigurationTfsToTfsNoEnrichers();
+            TestHelpers.SaveDocsObjectAsJSON(migrationConfig);
+            Assert.IsTrue(true);
+        }
+
         private static WorkItemMigrationProcessorOptions GetConfigurationTfsToTfsNoEnrichers()
         {
             // Tfs To Tfs
