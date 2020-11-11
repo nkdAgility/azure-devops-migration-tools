@@ -1,0 +1,9 @@
+{
+  "ObjectType": "TfsTeamSettingsProcessorOptions",
+  "MigrateTeamSettings": true,
+  "UpdateTeamSettings": true,
+  "PrefixProjectToNodes": false,
+  "Enabled": false,
+  "Endpoints": null,
+  "Enrichers": null
+}

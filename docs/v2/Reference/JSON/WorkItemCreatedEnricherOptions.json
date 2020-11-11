@@ -1,6 +1,0 @@
-{
-  "ObjectType": "WorkItemCreatedEnricherOptions",
-  "UpdateCreatedDate": true,
-  "UpdateCreatedBy": true,
-  "Enabled": true
-}

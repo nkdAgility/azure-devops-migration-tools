@@ -1,4 +1,6 @@
-﻿namespace MigrationTools.Processors
+﻿using System;
+
+namespace MigrationTools.Processors
 {
     public class WorkItemMigrationProcessorOptions : ProcessorOptions
     {
@@ -7,9 +9,16 @@
         public bool CollapseRevisions { get; set; }
         public int WorkItemCreateRetryLimit { get; set; }
 
-        public override string Processor => nameof(WorkItemTrackingProcessor);
+        public override string Processor => nameof(ToConfigure);
+
+        public override Type ToConfigure => typeof(WorkItemTrackingProcessor);
 
         public override IProcessorOptions GetDefault()
+        {
+            return this;
+        }
+
+        public override void SetDefaults()
         {
             Enabled = true;
             CollapseRevisions = false;
@@ -20,7 +29,6 @@
             //    new InMemoryWorkItemEndpointOptions { Direction = EndpointDirection.Source },
             //    new InMemoryWorkItemEndpointOptions { Direction = EndpointDirection.Target }
             //    };
-            return this;
         }
     }
 }

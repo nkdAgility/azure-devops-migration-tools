@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
-using Newtonsoft.Json;
 
 namespace MigrationTools.Processors
 {
@@ -16,8 +16,10 @@ namespace MigrationTools.Processors
         public List<IEndpointOptions> Endpoints { get; set; }
         public List<ProcessorEnricherOptions> Enrichers { get; set; }
 
-        [JsonIgnoreAttribute]
+        [Obsolete("Avoid using! V1 Architecture")]
         public abstract string Processor { get; }
+
+        public abstract Type ToConfigure { get; }
 
         public abstract IProcessorOptions GetDefault();
 
@@ -25,5 +27,7 @@ namespace MigrationTools.Processors
         {
             return true;
         }
+
+        public abstract void SetDefaults();
     }
 }

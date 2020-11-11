@@ -7,14 +7,13 @@ namespace MigrationTools.Tests
 {
     public static class TestHelpers
     {
-        public static int SaveDocsObjectAsJSON(object obj)
+        public static string SaveObjectAsJson(object obj)
         {
             string json = JsonConvert.SerializeObject(obj, Formatting.Indented,
                       new ProcessorConfigJsonConverter(),
                       new JsonConverterForEndpointOptions(),
                       new JsonConverterForEnricherOptions());
-            System.IO.File.WriteAllText(string.Format("../../../../../docs/v2/Reference/JSON/{0}.json", obj.GetType().Name), json);
-            return 0;
+            return json;
         }
     }
 }
