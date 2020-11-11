@@ -10,7 +10,7 @@ using WorkItem = Microsoft.TeamFoundation.WorkItemTracking.Client.WorkItem;
 
 namespace MigrationTools.Endpoints
 {
-    public class TfsWorkItemEndpoint : TfsEndpoint, IWorkItemSourceEndPoint, IWorkItemTargetEndPoint, ITfsWorkItemEndpointOptions
+    public class TfsWorkItemEndpoint : TfsEndpoint, IWorkItemSourceEndpoint, IWorkItemTargetEndpoint, ITfsWorkItemEndpointOptions
     {
         private TfsWorkItemEndpointOptions _Options;
 

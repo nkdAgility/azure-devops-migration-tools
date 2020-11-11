@@ -16,12 +16,11 @@ namespace MigrationTools.Processors
         {
         }
 
-        public override void Configure(IProcessorOptions config)
+        public override void Configure(IProcessorOptions options)
         {
-            Log.LogInformation("Processor::Configure");
-            _config = (WorkItemMigrationProcessorOptions)config;
-            Endpoints.ConfigureEndpoints(config.Endpoints);
-            ProcessorEnrichers.ConfigureEnrichers(config.Enrichers);
+            base.Configure(options);
+            Log.LogInformation("WorkItemTrackingProcessor::Configure");
+            _config = (WorkItemMigrationProcessorOptions)options;
         }
 
         protected override void InternalExecute()
@@ -29,7 +28,7 @@ namespace MigrationTools.Processors
             Log.LogInformation("Processor::InternalExecute::Start");
             EnsureConfigured();
             ProcessorEnrichers.ProcessorExecutionBegin(this);
-            var source = (IWorkItemSourceEndPoint)Endpoints.Source;
+            var source = (IWorkItemSourceEndpoint)Endpoints.Source;
             List<WorkItemData> workItems = source.GetWorkItems().ToList();
             ProcessorEnrichers.ProcessorExecutionAfterSource(this, workItems);
             foreach (WorkItemData item in workItems)

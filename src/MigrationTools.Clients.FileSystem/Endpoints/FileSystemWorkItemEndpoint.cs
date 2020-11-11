@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 
 namespace MigrationTools.Endpoints
 {
-    public class FileSystemWorkItemEndpoint : Endpoint, IWorkItemSourceEndPoint, IWorkItemTargetEndPoint
+    public class FileSystemWorkItemEndpoint : Endpoint, IWorkItemSourceEndpoint, IWorkItemTargetEndpoint
     {
         private FileSystemWorkItemEndpointOptions _options;
         private List<WorkItemData> _innerList;

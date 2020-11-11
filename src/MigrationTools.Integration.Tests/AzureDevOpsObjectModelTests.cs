@@ -60,7 +60,7 @@ namespace MigrationTools.Integration.Tests
             {
                 Direction = direction,
                 Organisation = "https://dev.azure.com/nkdagility-preview/",
-                Project = "migrationSource1",
+                Project = project,
                 AccessToken = "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
                 Query = new Options.QueryOptions()
                 {

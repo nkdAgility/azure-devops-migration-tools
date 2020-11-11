@@ -4,7 +4,7 @@ using MigrationTools.Options;
 
 namespace MigrationTools.Endpoints
 {
-    public interface IWorkItemSourceEndPoint : ISourceEndPoint, IWorkItemEndPoint
+    public interface IWorkItemSourceEndpoint : ISourceEndPoint, IWorkItemEndpoint
     {
         void Filter(IEnumerable<WorkItemData> targetWorkItems);
 
@@ -13,12 +13,12 @@ namespace MigrationTools.Endpoints
         IEnumerable<WorkItemData> GetWorkItems(QueryOptions query);
     }
 
-    public interface IWorkItemTargetEndPoint : ITargetEndPoint, IWorkItemEndPoint
+    public interface IWorkItemTargetEndpoint : ITargetEndPoint, IWorkItemEndpoint
     {
         void PersistWorkItem(WorkItemData sourceWorkItem);
     }
 
-    public interface IWorkItemEndPoint : IEndpoint
+    public interface IWorkItemEndpoint : IEndpoint
     {
     }
 }

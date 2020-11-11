@@ -21,9 +21,11 @@ namespace MigrationTools.Processors
         {
         }
 
-        public override void Configure(IProcessorOptions config)
+        public override void Configure(IProcessorOptions options)
         {
-            _Options = (TfsTeamSettingsProcessorOptions)config;
+            base.Configure(options);
+            Log.LogInformation("TfsTeamSettingsProcessor::Configure");
+            _Options = (TfsTeamSettingsProcessorOptions)options;
         }
 
         public TfsTeamSettingsEndpoint Source => (TfsTeamSettingsEndpoint)Endpoints.Source;

@@ -14,6 +14,8 @@ namespace MigrationTools
     {
         public static void AddMigrationToolServicesForClientAzureDevOpsObjectModel(this IServiceCollection context)
         {
+            // Generic Endpoint
+            context.AddTransient<TfsEndpoint>();
             //TfsWorkItem
             context.AddTransient<TfsWorkItemEndpoint>();
             //TfsTeamSettings

@@ -11,6 +11,8 @@ namespace MigrationTools.Processors
 {
     public abstract class Processor : IProcessor
     {
+        private bool _ProcessorConfigured;
+
         public Processor(
             ProcessorEnricherContainer processorEnricherContainer,
             EndpointContainer endpointContainer,
@@ -38,7 +40,13 @@ namespace MigrationTools.Processors
 
         public bool SupportsProcessorEnrichers => false;
 
-        public abstract void Configure(IProcessorOptions options);
+        public virtual void Configure(IProcessorOptions options)
+        {
+            Log.LogInformation("Processor::Configure");
+            Endpoints.ConfigureEndpoints(options.Endpoints);
+            ProcessorEnrichers.ConfigureEnrichers(options.Enrichers);
+            _ProcessorConfigured = true;
+        }
 
         public void Configure(IProcessorConfig config)
         {
@@ -54,6 +62,11 @@ namespace MigrationTools.Processors
             //////////////////////////////////////////////////
             try
             {
+                if (!_ProcessorConfigured)
+                {
+                    Log.LogError("Processor::Execute: Processer base has not been configured.");
+                    throw new InvalidOperationException("Processer base has not been configured.");
+                }
                 Status = ProcessingStatus.Running;
                 InternalExecute();
                 Status = ProcessingStatus.Complete;

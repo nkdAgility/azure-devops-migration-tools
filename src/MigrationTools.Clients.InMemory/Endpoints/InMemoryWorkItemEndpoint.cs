@@ -9,7 +9,7 @@ using MigrationTools.Options;
 
 namespace MigrationTools.Endpoints
 {
-    public class InMemoryWorkItemEndpoint : Endpoint, IWorkItemSourceEndPoint, IWorkItemTargetEndPoint
+    public class InMemoryWorkItemEndpoint : Endpoint, IWorkItemSourceEndpoint, IWorkItemTargetEndpoint
     {
         private List<WorkItemData> _innerList;
         private InMemoryWorkItemEndpointOptions _Options;

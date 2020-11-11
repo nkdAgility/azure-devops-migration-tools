@@ -13,7 +13,7 @@ namespace MigrationTools.Endpoints
         private TfsTeamProjectCollection _Collection;
         private Project _Project;
         private WorkItemStore _Store;
-        private TfsEndpointOptions _Options;
+        private ITfsEndpointOptions _Options;
 
         public string AccessToken { get { return _Options.AccessToken; } }
         public string Organisation { get { return _Options.Organisation; } }
@@ -55,7 +55,7 @@ namespace MigrationTools.Endpoints
         {
             base.Configure(options);
             Log.LogDebug("TfsEndpoint::Configure");
-            _Options = (TfsEndpointOptions)options;
+            _Options = (ITfsEndpointOptions)options;
             if (string.IsNullOrEmpty(_Options.Organisation))
             {
                 throw new ArgumentNullException(nameof(_Options.Organisation));
