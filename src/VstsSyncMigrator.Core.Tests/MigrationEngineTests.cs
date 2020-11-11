@@ -42,7 +42,7 @@ namespace _VstsSyncMigrator.Engine.Tests
             _services = services.BuildServiceProvider();
         }
 
-        [TestMethod, TestCategory("L0")]
+        [TestMethod, TestCategory("L2")]
         public void TestEngineExecuteEmptyProcessors()
         {
             EngineConfiguration ec = _services.GetRequiredService<EngineConfiguration>();
@@ -51,7 +51,7 @@ namespace _VstsSyncMigrator.Engine.Tests
             me.Run();
         }
 
-        [TestMethod, TestCategory("L1")]
+        [TestMethod, TestCategory("L2")]
         public void TestTypeLoadForAborations()
         {
             List<Type> allTypes;
