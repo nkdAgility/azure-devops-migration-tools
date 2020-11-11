@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using MigrationTools._EngineV1.Configuration;
-using MigrationTools.EndPoints;
+using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
 
 namespace MigrationTools.Processors
@@ -36,7 +36,7 @@ namespace MigrationTools.Processors
         protected ITelemetryLogger Telemetry { get; }
         protected ILogger<Processor> Log { get; }
 
-        public abstract void Configure(IProcessorOptions config);
+        public abstract void Configure(IProcessorOptions options);
 
         public void Configure(IProcessorConfig config)
         {

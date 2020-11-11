@@ -1,4 +1,4 @@
-﻿using MigrationTools.EndPoints;
+﻿using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
 
 namespace MigrationTools.Processors

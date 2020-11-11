@@ -8,16 +8,20 @@ namespace MigrationTools.EndpointEnrichers
         void Configure(IEndpointEnricherOptions options);
     }
 
-    public interface IWorkItemEndpoinEnricher : IEndpointEnricher
+    public interface IEndpointSourceEnricher : IEndpointEnricher
     {
     }
 
-    public interface IWorkItemEndpointSourceEnricher : IWorkItemEndpoinEnricher
+    public interface IWorkItemEndpointSourceEnricher : IEndpointSourceEnricher
     {
         void EnrichWorkItemData(Endpoints.IEndpoint endpoint, object dataSource, RevisionItem dataTarget);
     }
 
-    public interface IWorkItemEndpointTargetEnricher : IWorkItemEndpoinEnricher
+    public interface IEndpointTargetEnricher : IEndpointEnricher
+    {
+    }
+
+    public interface IWorkItemEndpointTargetEnricher : IEndpointTargetEnricher
     {
     }
 }

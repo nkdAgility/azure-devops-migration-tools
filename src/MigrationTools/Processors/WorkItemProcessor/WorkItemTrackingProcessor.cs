@@ -4,7 +4,6 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using MigrationTools.DataContracts;
 using MigrationTools.Endpoints;
-using MigrationTools.EndPoints;
 using MigrationTools.Enrichers;
 
 namespace MigrationTools.Processors
@@ -30,7 +29,7 @@ namespace MigrationTools.Processors
             Log.LogInformation("Processor::InternalExecute::Start");
             EnsureConfigured();
             ProcessorEnrichers.ProcessorExecutionBegin(this);
-            var source = (WorkItemEndpoint)Endpoints.Source;
+            var source = (IWorkItemSourceEndPoint)Endpoints.Source;
             List<WorkItemData> workItems = source.GetWorkItems().ToList();
             ProcessorEnrichers.ProcessorExecutionAfterSource(this, workItems);
             foreach (WorkItemData item in workItems)
@@ -56,11 +55,11 @@ namespace MigrationTools.Processors
             {
                 throw new Exception("You must call Configure() first");
             }
-            if (!(Endpoints.Source is WorkItemEndpoint))
+            if (!(Endpoints.Source is Endpoint))
             {
                 throw new Exception("The Source endpoint configured must be of type WorkItemEndpoint");
             }
-            if (!(Endpoints.Target is WorkItemEndpoint))
+            if (!(Endpoints.Target is Endpoint))
             {
                 throw new Exception("The Target endpoint configured must be of type WorkItemEndpoint");
             }

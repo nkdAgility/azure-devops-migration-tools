@@ -3,15 +3,11 @@ using MigrationTools.Options;
 
 namespace MigrationTools.Endpoints
 {
-    public class TfsWorkItemEndPointOptions : EndpointOptions
+    public class TfsWorkItemEndpointOptions : TfsEndpointOptions
     {
-        public override Type ToConfigure => typeof(TfsWorkItemEndPoint);
+        public override Type ToConfigure => typeof(TfsWorkItemEndpoint);
 
         public QueryOptions Query { get; set; }
-
-        public string AccessToken { get; set; }
-        public string Organisation { get; set; }
-        public string Project { get; set; }
 
         public override void SetDefaults()
         {

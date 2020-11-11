@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using MigrationTools.Endpoints;
 
-namespace MigrationTools.EndPoints
+namespace MigrationTools.Endpoints
 {
     public class EndpointContainer : List<IEndpoint>
     {

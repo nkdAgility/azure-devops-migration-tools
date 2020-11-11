@@ -9,12 +9,12 @@ using MigrationTools.Options;
 
 namespace MigrationTools.Endpoints
 {
-    public class InMemoryWorkItemEndpoint : WorkItemEndpoint
+    public class InMemoryWorkItemEndpoint : Endpoint
     {
         private List<WorkItemData> _innerList;
         private InMemoryWorkItemEndpointOptions _Options;
 
-        public InMemoryWorkItemEndpoint(EndpointEnricherContainer endpointEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<WorkItemEndpoint> logger) : base(endpointEnrichers, services, telemetry, logger)
+        public InMemoryWorkItemEndpoint(EndpointEnricherContainer endpointEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Endpoint> logger) : base(endpointEnrichers, services, telemetry, logger)
         {
             _innerList = new List<WorkItemData>();
         }

@@ -9,12 +9,12 @@ using Newtonsoft.Json;
 
 namespace MigrationTools.Endpoints
 {
-    public class FileSystemWorkItemEndpoint : WorkItemEndpoint
+    public class FileSystemWorkItemEndpoint : Endpoint
     {
         private FileSystemWorkItemEndpointOptions _options;
         private List<WorkItemData> _innerList;
 
-        public FileSystemWorkItemEndpoint(EndpointEnricherContainer endpointEnrichers, System.IServiceProvider services, ITelemetryLogger telemetry, ILogger<WorkItemEndpoint> logger) : base(endpointEnrichers, services, telemetry, logger)
+        public FileSystemWorkItemEndpoint(EndpointEnricherContainer endpointEnrichers, System.IServiceProvider services, ITelemetryLogger telemetry, ILogger<Endpoint> logger) : base(endpointEnrichers, services, telemetry, logger)
         {
             _innerList = new List<WorkItemData>();
         }
