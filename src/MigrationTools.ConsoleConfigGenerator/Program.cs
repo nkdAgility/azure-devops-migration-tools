@@ -56,6 +56,7 @@ namespace VstsSyncMigrator.ConsoleApp
                 string templatemd = GetTemplate(folder, referencePath, masterTemplate, item);
 
                 templatemd = templatemd.Replace("<ClassName>", item.Name);
+                templatemd = templatemd.Replace("<TypeName>", folder);
                 templatemd = ProcessBreadcrumbs(folder, item, templatemd);
                 templatemd = templatemd.Replace("<Description>", "No description, create a template");
                 templatemd = templatemd.Replace("<Options>", "Options not yet implmeneted");
@@ -80,7 +81,7 @@ namespace VstsSyncMigrator.ConsoleApp
 
         private static string ProcessBreadcrumbs(string folder, Type item, string templatemd)
         {
-            string breadcrumbs = $"[Overview](.. /./ index.md) > [Reference](.. / index.md) > [{folder}](./index.md) > **{item.Name}**";
+            string breadcrumbs = $"[Overview](.././index.md) > [Reference](../index.md) > [{folder}](./index.md) > **{item.Name}**";
             templatemd = templatemd.Replace("<Breadcrumbs>", breadcrumbs);
             return templatemd;
         }
