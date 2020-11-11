@@ -16,13 +16,13 @@ namespace MigrationTools.Host.Tests
             host = MigrationToolHost.CreateDefaultBuilder(new string[0]).Build();
         }
 
-        [TestMethod, TestCategory("L0")]
+        [TestMethod, TestCategory("L2")]
         public void MigrationHostTest()
         {
             IMigrationEngine mh = host.Services.GetRequiredService<IMigrationEngine>();
         }
 
-        [TestMethod, TestCategory("L0")]
+        [TestMethod, TestCategory("L1")]
         [Ignore("need to ignore for now, untill we get some generic field maps")]
         public void TestEngineExecuteEmptyProcessors()
         {

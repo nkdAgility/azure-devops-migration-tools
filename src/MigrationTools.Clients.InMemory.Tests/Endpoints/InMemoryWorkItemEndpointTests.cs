@@ -18,14 +18,14 @@ namespace MigrationTools.Endpoints.Tests
             Services = ServiceProviderHelper.GetServices();
         }
 
-        [TestMethod, TestCategory("L0")]
+        [TestMethod, TestCategory("L1")]
         public void ConfiguredTest()
         {
             InMemoryWorkItemEndpoint e = CreateAndConfigureInMemoryWorkItemEndpoint(EndpointDirection.Source, 10);
             Assert.AreEqual(10, e.Count);
         }
 
-        [TestMethod(), TestCategory("L0")]
+        [TestMethod(), TestCategory("L1")]
         public void EmptyTest()
         {
             var targetOptions = new InMemoryWorkItemEndpointOptions() { Direction = EndpointDirection.Source };
@@ -34,7 +34,7 @@ namespace MigrationTools.Endpoints.Tests
             Assert.AreEqual(0, e.Count);
         }
 
-        [TestMethod, TestCategory("L0")]
+        [TestMethod, TestCategory("L1")]
         public void FilterAllTest()
         {
             InMemoryWorkItemEndpoint e1 = CreateAndConfigureInMemoryWorkItemEndpoint(EndpointDirection.Source, 10);
@@ -43,7 +43,7 @@ namespace MigrationTools.Endpoints.Tests
             Assert.AreEqual(0, e1.Count);
         }
 
-        [TestMethod, TestCategory("L0")]
+        [TestMethod, TestCategory("L1")]
         public void FilterHalfTest()
         {
             InMemoryWorkItemEndpoint e1 = CreateAndConfigureInMemoryWorkItemEndpoint(EndpointDirection.Source, 20);
@@ -52,7 +52,7 @@ namespace MigrationTools.Endpoints.Tests
             Assert.AreEqual(10, e1.Count);
         }
 
-        [TestMethod, TestCategory("L0")]
+        [TestMethod, TestCategory("L1")]
         public void PersistWorkItemExistsTest()
         {
             InMemoryWorkItemEndpoint e1 = CreateAndConfigureInMemoryWorkItemEndpoint(EndpointDirection.Source, 20);
@@ -64,7 +64,7 @@ namespace MigrationTools.Endpoints.Tests
             Assert.AreEqual(20, e2.Count);
         }
 
-        [TestMethod, TestCategory("L0")]
+        [TestMethod, TestCategory("L1")]
         public void PersistWorkItemWithFilterTest()
         {
             InMemoryWorkItemEndpoint e1 = CreateAndConfigureInMemoryWorkItemEndpoint(EndpointDirection.Source, 20);
