@@ -5,7 +5,6 @@ namespace MigrationTools.Endpoints
 {
     public interface IEndpoint
     {
-        int Count { get; }
         EndpointDirection Direction { get; }
 
         void Configure(IEndpointOptions options);
@@ -15,6 +14,7 @@ namespace MigrationTools.Endpoints
 
     public interface ISourceEndPoint : IEndpoint
     {
+        int Count { get; }
         IEnumerable<IEndpointSourceEnricher> SourceEnrichers { get; }
     }
 

@@ -36,6 +36,8 @@ namespace MigrationTools.Processors
         protected ITelemetryLogger Telemetry { get; }
         protected ILogger<Processor> Log { get; }
 
+        public bool SupportsProcessorEnrichers => false;
+
         public abstract void Configure(IProcessorOptions options);
 
         public void Configure(IProcessorConfig config)

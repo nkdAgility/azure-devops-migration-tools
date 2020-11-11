@@ -2,23 +2,50 @@
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.Client;
+using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using Microsoft.VisualStudio.Services.Common;
 using MigrationTools.EndpointEnrichers;
 
 namespace MigrationTools.Endpoints
 {
-    public abstract class TfsEndpoint : Endpoint
+    public class TfsEndpoint : Endpoint, ITfsEndpointOptions
     {
         private TfsTeamProjectCollection _Collection;
+        private Project _Project;
+        private WorkItemStore _Store;
         private TfsEndpointOptions _Options;
 
-        protected TfsTeamProjectCollection Collection
+        public string AccessToken { get { return _Options.AccessToken; } }
+        public string Organisation { get { return _Options.Organisation; } }
+        public string Project { get { return _Options.Project; } }
+
+        protected TfsTeamProjectCollection TfsCollection
         {
             get
             {
                 return GetTfsCollection();
             }
         }
+
+        protected WorkItemStore TfsStore
+        {
+            get
+            {
+                return GetWorkItemStore(TfsCollection, WorkItemStoreFlags.BypassRules);
+            }
+        }
+
+        protected Project TfsProject
+        {
+            get { return GetTfsProject(); }
+        }
+
+        public Uri TfsProjectUri
+        {
+            get { return TfsProject.Uri; }
+        }
+
+        public override int Count => 0;
 
         protected TfsEndpoint(EndpointEnricherContainer endpointEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Endpoint> logger) : base(endpointEnrichers, services, telemetry, logger)
         {
@@ -81,6 +108,49 @@ namespace MigrationTools.Endpoints
                 }
             }
             return _Collection;
+        }
+
+        private WorkItemStore GetWorkItemStore(TfsTeamProjectCollection tfs, WorkItemStoreFlags bypassRules)
+        {
+            if (_Store is null)
+            {
+                var startTime = DateTime.UtcNow;
+                var timer = System.Diagnostics.Stopwatch.StartNew();
+                try
+                {
+                    _Store = new WorkItemStore(tfs, bypassRules);
+                    timer.Stop();
+                    Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", _Options.Organisation, "GetWorkItemStore", null, startTime, timer.Elapsed, "200", true));
+                }
+                catch (Exception ex)
+                {
+                    timer.Stop();
+                    Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", _Options.Organisation, "GetWorkItemStore", null, startTime, timer.Elapsed, "500", false));
+                    Log.LogError(ex, "Unable to connect to {Organisation} Store", _Options.Organisation);
+                    throw;
+                }
+            }
+
+            return _Store;
+        }
+
+        private Project GetTfsProject()
+        {
+            var startTime = DateTime.UtcNow;
+            var timer = System.Diagnostics.Stopwatch.StartNew();
+            if (_Project is null)
+            {
+                if (TfsStore.Projects.Contains(_Options.Project))
+                {
+                    _Project = TfsStore.Projects[_Options.Project];
+                }
+                else
+                {
+                    Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", _Options.Organisation, "GetTfsProject", null, startTime, timer.Elapsed, "500", false));
+                    Log.LogError(new InvalidFieldValueException(), "Unable to find to {Project}", _Options.Project);
+                }
+            }
+            return _Project;
         }
     }
 }

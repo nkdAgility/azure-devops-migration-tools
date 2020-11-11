@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.Logging;
-using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools.DataContracts;
 using MigrationTools.EndpointEnrichers;
@@ -12,24 +10,15 @@ using WorkItem = Microsoft.TeamFoundation.WorkItemTracking.Client.WorkItem;
 
 namespace MigrationTools.Endpoints
 {
-    public class TfsWorkItemEndpoint : TfsEndpoint, IWorkItemSourceEndPoint, IWorkItemTargetEndPoint
+    public class TfsWorkItemEndpoint : TfsEndpoint, IWorkItemSourceEndPoint, IWorkItemTargetEndPoint, ITfsWorkItemEndpointOptions
     {
         private TfsWorkItemEndpointOptions _Options;
-        private WorkItemStore _InnerStore;
 
-        protected WorkItemStore Store
-        {
-            get
-            {
-                return GetWorkItemStore(Collection, WorkItemStoreFlags.BypassRules);
-            }
-        }
+        public QueryOptions Query => _Options.Query;
 
         public TfsWorkItemEndpoint(EndpointEnricherContainer endpointEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Endpoint> logger) : base(endpointEnrichers, services, telemetry, logger)
         {
         }
-
-        public override int Count => 0;
 
         public override void Configure(IEndpointOptions options)
         {
@@ -60,7 +49,7 @@ namespace MigrationTools.Endpoints
         public IEnumerable<WorkItemData> GetWorkItems(QueryOptions query)
         {
             Log.LogDebug("TfsWorkItemEndPoint::GetWorkItems(query)");
-            var wis = Store.Query(query.Query, query.Paramiters);
+            var wis = TfsStore.Query(query.Query, query.Paramiters);
             return ToWorkItemDataList(wis);
         }
 
@@ -113,30 +102,6 @@ namespace MigrationTools.Endpoints
         public void PersistWorkItem(WorkItemData source)
         {
             Log.LogDebug("TfsWorkItemEndPoint::PersistWorkItem");
-        }
-
-        private WorkItemStore GetWorkItemStore(TfsTeamProjectCollection tfs, WorkItemStoreFlags bypassRules)
-        {
-            if (_InnerStore is null)
-            {
-                var startTime = DateTime.UtcNow;
-                var timer = System.Diagnostics.Stopwatch.StartNew();
-                try
-                {
-                    _InnerStore = new WorkItemStore(tfs, bypassRules);
-                    timer.Stop();
-                    Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", _Options.Organisation, "GetWorkItemStore", null, startTime, timer.Elapsed, "200", true));
-                }
-                catch (Exception ex)
-                {
-                    timer.Stop();
-                    Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", _Options.Organisation, "GetWorkItemStore", null, startTime, timer.Elapsed, "500", false));
-                    Log.LogError(ex, "Unable to connect to {Organisation} Store", _Options.Organisation);
-                    throw;
-                }
-            }
-
-            return _InnerStore;
         }
     }
 }

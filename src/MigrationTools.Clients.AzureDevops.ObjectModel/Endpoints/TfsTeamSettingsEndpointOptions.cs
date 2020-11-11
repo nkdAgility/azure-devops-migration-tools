@@ -2,7 +2,7 @@
 
 namespace MigrationTools.Endpoints
 {
-    public class TfsTeamSettingsEndpointOptions : TfsEndpointOptions
+    public class TfsTeamSettingsEndpointOptions : TfsEndpointOptions, ITfsTeamSettingsEndpointOptions
     {
         public override Type ToConfigure => typeof(TfsTeamSettingsEndpoint);
 
@@ -10,5 +10,9 @@ namespace MigrationTools.Endpoints
         {
             Direction = EndpointDirection.NotSet;
         }
+    }
+
+    public interface ITfsTeamSettingsEndpointOptions
+    {
     }
 }

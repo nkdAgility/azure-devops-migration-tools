@@ -3,7 +3,7 @@ using MigrationTools.Options;
 
 namespace MigrationTools.Endpoints
 {
-    public class TfsWorkItemEndpointOptions : TfsEndpointOptions
+    public class TfsWorkItemEndpointOptions : TfsEndpointOptions, ITfsWorkItemEndpointOptions
     {
         public override Type ToConfigure => typeof(TfsWorkItemEndpoint);
 
@@ -13,5 +13,10 @@ namespace MigrationTools.Endpoints
         {
             Direction = EndpointDirection.NotSet;
         }
+    }
+
+    public interface ITfsWorkItemEndpointOptions
+    {
+        public QueryOptions Query { get; }
     }
 }

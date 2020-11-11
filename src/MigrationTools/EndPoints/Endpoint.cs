@@ -26,11 +26,11 @@ namespace MigrationTools.Endpoints
         public IEnumerable<IEndpointSourceEnricher> SourceEnrichers => _EndpointEnrichers.Where(e => e.GetType().IsAssignableFrom(typeof(IEndpointSourceEnricher))).Select(e => (IEndpointSourceEnricher)e);
         public IEnumerable<IEndpointTargetEnricher> TargetEnrichers => _EndpointEnrichers.Where(e => e.GetType().IsAssignableFrom(typeof(IEndpointTargetEnricher))).Select(e => (IEndpointTargetEnricher)e);
 
-        public abstract int Count { get; }
-
         protected IServiceProvider Services { get; }
         protected ITelemetryLogger Telemetry { get; }
         protected ILogger<Endpoint> Log { get; }
+
+        public abstract int Count { get; }
 
         public virtual void Configure(IEndpointOptions options)
         {
