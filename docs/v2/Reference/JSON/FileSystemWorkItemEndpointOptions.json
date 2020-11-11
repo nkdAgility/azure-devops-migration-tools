@@ -1,0 +1,6 @@
+{
+  "ObjectType": "FileSystemWorkItemEndpointOptions",
+  "FileStore": null,
+  "Direction": "NotSet",
+  "Enrichers": null
+}

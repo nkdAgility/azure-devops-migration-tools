@@ -1,0 +1,6 @@
+{
+  "ObjectType": "WorkItemAttachmentEnricherOptions",
+  "WorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
+  "MaxSize": 480000000,
+  "Enabled": true
+}

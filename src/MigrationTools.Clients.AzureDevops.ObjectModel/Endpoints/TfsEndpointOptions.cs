@@ -12,6 +12,7 @@ namespace MigrationTools.Endpoints
 
         public override void SetDefaults()
         {
+            base.SetDefaults();
             AccessToken = "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq";
             Organisation = "https://dev.azure.com/nkdagility-preview/";
             Project = "NeedToSetThis";

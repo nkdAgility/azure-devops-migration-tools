@@ -54,14 +54,6 @@ namespace MigrationTools.Processors.Tests
             Assert.IsNotNull(x);
         }
 
-        [TestMethod(), TestCategory("JSON")]
-        public void TfsTeamSettingsProcessorOptionsJSON()
-        {
-            var migrationConfig = GetTfsTeamSettingsProcessorOptions();
-            TestHelpers.SaveDocsObjectAsJSON(migrationConfig);
-            Assert.IsTrue(true);
-        }
-
         [TestMethod(), TestCategory("L3")]
         public void TestTfsTeamSettingsProcessorNoEnrichers()
         {

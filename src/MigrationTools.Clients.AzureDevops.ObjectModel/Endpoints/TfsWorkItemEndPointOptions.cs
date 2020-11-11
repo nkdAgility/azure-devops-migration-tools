@@ -11,6 +11,7 @@ namespace MigrationTools.Endpoints
 
         public override void SetDefaults()
         {
+            base.SetDefaults();
             Direction = EndpointDirection.NotSet;
         }
     }

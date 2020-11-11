@@ -1,0 +1,5 @@
+{
+  "ObjectType": "WorkItemLinkEnricherOptions",
+  "SaveEachAsAdded": false,
+  "Enabled": true
+}

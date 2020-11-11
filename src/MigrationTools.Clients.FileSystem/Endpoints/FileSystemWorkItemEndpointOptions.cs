@@ -9,7 +9,8 @@ namespace MigrationTools.Endpoints
 
         public override void SetDefaults()
         {
-            Direction = EndpointDirection.NotSet;
+            Direction = EndpointDirection.Source;
+            FileStore = @"c:\temp\Store";
         }
     }
 }
