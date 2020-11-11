@@ -15,9 +15,10 @@ namespace MigrationTools.Endpoints
         private WorkItemStore _Store;
         private ITfsEndpointOptions _Options;
 
-        public string AccessToken { get { return _Options.AccessToken; } }
-        public string Organisation { get { return _Options.Organisation; } }
-        public string Project { get { return _Options.Project; } }
+        public string AccessToken => _Options.AccessToken;
+        public string Organisation => _Options.Organisation;
+        public string Project => _Options.Project;
+        public string ReflectedWorkItemIdField => _Options.ReflectedWorkItemIdField;
 
         protected TfsTeamProjectCollection TfsCollection
         {

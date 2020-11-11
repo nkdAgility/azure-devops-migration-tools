@@ -20,7 +20,7 @@ namespace MigrationTools.Processors.Tests
         [TestMethod(), TestCategory("L0")]
         public void ConfigureTest()
         {
-            var y = new WorkItemMigrationProcessorOptions
+            var y = new WorkItemTrackingProcessorOptions
             {
                 Enabled = true
             };
@@ -32,7 +32,7 @@ namespace MigrationTools.Processors.Tests
         [TestMethod(), TestCategory("L1")]
         public void RunTest()
         {
-            var y = new WorkItemMigrationProcessorOptions
+            var y = new WorkItemTrackingProcessorOptions
             {
                 Enabled = true,
                 CollapseRevisions = false,

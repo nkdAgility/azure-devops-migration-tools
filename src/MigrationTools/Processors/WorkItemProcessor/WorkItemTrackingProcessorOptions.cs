@@ -2,7 +2,7 @@
 
 namespace MigrationTools.Processors
 {
-    public class WorkItemMigrationProcessorOptions : ProcessorOptions
+    public class WorkItemTrackingProcessorOptions : ProcessorOptions
     {
         public bool ReplayRevisions { get; set; }
         public bool PrefixProjectToNodes { get; set; }

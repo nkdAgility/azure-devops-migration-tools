@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using MigrationTools.Options;
 
 namespace MigrationTools.Endpoints
@@ -12,7 +13,15 @@ namespace MigrationTools.Endpoints
         public override void SetDefaults()
         {
             base.SetDefaults();
-            Direction = EndpointDirection.NotSet;
+            Query = new Options.QueryOptions()
+            {
+                Query = "SELECT [System.Id], [System.Tags] " +
+                             "FROM WorkItems " +
+                             "WHERE [System.TeamProject] = @TeamProject " +
+                                 "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan') " +
+                             "ORDER BY [System.ChangedDate] desc",
+                Paramiters = new Dictionary<string, string>() { { "TeamProject", "migrationSource1" } }
+            };
         }
     }
 

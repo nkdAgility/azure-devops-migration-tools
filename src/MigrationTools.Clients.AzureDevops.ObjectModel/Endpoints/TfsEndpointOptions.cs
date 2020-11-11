@@ -7,6 +7,7 @@ namespace MigrationTools.Endpoints
         public string AccessToken { get; set; }
         public string Organisation { get; set; }
         public string Project { get; set; }
+        public string ReflectedWorkItemIdField { get; set; }
 
         public override Type ToConfigure => typeof(TfsEndpoint);
 
@@ -16,6 +17,7 @@ namespace MigrationTools.Endpoints
             AccessToken = "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq";
             Organisation = "https://dev.azure.com/nkdagility-preview/";
             Project = "NeedToSetThis";
+            ReflectedWorkItemIdField = "Custom.ReflectedWorkItemId";
         }
     }
 
@@ -24,5 +26,6 @@ namespace MigrationTools.Endpoints
         public string AccessToken { get; }
         public string Organisation { get; }
         public string Project { get; }
+        public string ReflectedWorkItemIdField { get; }
     }
 }

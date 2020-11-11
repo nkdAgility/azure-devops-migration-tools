@@ -35,10 +35,10 @@ namespace MigrationTools.Integration.Tests
             Assert.AreEqual(ProcessingStatus.Complete, workItemMigrationProcessor.Status);
         }
 
-        private static WorkItemMigrationProcessorOptions GetConfigurationTfsToTfsNoEnrichers()
+        private static WorkItemTrackingProcessorOptions GetConfigurationTfsToTfsNoEnrichers()
         {
             // Tfs To Tfs
-            var migrationConfig = new WorkItemMigrationProcessorOptions()
+            var migrationConfig = new WorkItemTrackingProcessorOptions()
             {
                 Enabled = true,
                 CollapseRevisions = false,

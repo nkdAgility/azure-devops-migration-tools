@@ -23,7 +23,40 @@ The `Direction` option is required to allow the system to set direction. At a mi
 
 ```JSON
     {
-      "ObjectType": "EndpointOptions",
-      "Direction": "Source"
+      {
+  "ObjectType": "TfsWorkItemEndpointOptions",
+  "Query": {
+    "Query": "SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan') ORDER BY [System.ChangedDate] desc",
+    "Paramiters": {
+      "TeamProject": "migrationSource1"
+    }
+  },
+  "AccessToken": "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
+  "Organisation": "https://dev.azure.com/nkdagility-preview/",
+  "Project": "NeedToSetThis",
+  "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
+  "Direction": "Source",
+  "Enrichers": null
+}
+    }
+```
+
+```JSON
+    {
+      {
+  "ObjectType": "TfsWorkItemEndpointOptions",
+  "Query": {
+    "Query": "SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan') ORDER BY [System.ChangedDate] desc",
+    "Paramiters": {
+      "TeamProject": "migrationSource1"
+    }
+  },
+  "AccessToken": "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
+  "Organisation": "https://dev.azure.com/nkdagility-preview/",
+  "Project": "NeedToSetThis",
+  "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
+  "Direction": "Source",
+  "Enrichers": null
+}
     }
 ```

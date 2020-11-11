@@ -23,7 +23,6 @@ The `Direction` option is required to allow the system to set direction. At a mi
 
 ```JSON
     {
-      "ObjectType": "EndpointOptions",
-      "Direction": "Source"
+      <ExampleJson>
     }
 ```

@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using MigrationTools.EndpointEnrichers;
+using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
 using MigrationTools.Options;
 using MigrationTools.Processors;
@@ -27,9 +29,19 @@ namespace VstsSyncMigrator.ConsoleApp
             List<Type> types = domain.GetAssemblies()
                   .Where(a => !a.IsDynamic && a.FullName.StartsWith("MigrationTools"))
                   .SelectMany(a => a.GetTypes()).ToList();
+            Console.WriteLine("--------------------------");
+            Console.WriteLine("---------EndpointEnrichers");
             Process(types, typeof(IEndpointEnricher), "EndpointEnrichers");
+            Console.WriteLine("--------------------------");
+            Console.WriteLine("---------Endpoints");
+            Process(types, typeof(IEndpoint), "Endpoints");
+            Console.WriteLine("--------------------------");
+            Console.WriteLine("---------ProcessorEnrichers");
             Process(types, typeof(IProcessorEnricher), "ProcessorEnrichers");
+            Console.WriteLine("--------------------------");
+            Console.WriteLine("---------Processors");
             Process(types, typeof(IProcessor), "Processors");
+            Console.WriteLine("--------------------------");
         }
 
         private static void Process(List<Type> types, Type type, string folder)
@@ -39,27 +51,55 @@ namespace VstsSyncMigrator.ConsoleApp
             var founds = types.Where(t => type.IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface).ToList();
             foreach (var item in founds)
             {
+                Console.WriteLine("Processing:" + item.Name);
                 var jsonSample = DeployJsonSample(types, type, folder, referencePath, item);
-
-                string typeTemplatename = string.Format("{0}-template.md", item.Name);
-                string templateFile = Path.Combine(referencePath, folder, typeTemplatename);
-                string templatemd;
-                if (System.IO.File.Exists(templateFile))
-                {
-                    templatemd = System.IO.File.ReadAllText(templateFile);
-                }
-                else
-                {
-                    templatemd = System.IO.File.ReadAllText(masterTemplate);
-                }
+                string templatemd = GetTemplate(folder, referencePath, masterTemplate, item);
 
                 templatemd = templatemd.Replace("<ClassName>", item.Name);
+                templatemd = ProcessBreadcrumbs(folder, item, templatemd);
                 templatemd = templatemd.Replace("<Description>", "No description, create a template");
                 templatemd = templatemd.Replace("<Options>", "Options not yet implmeneted");
-                templatemd = templatemd.Replace("<ExampleJson>", jsonSample);
-                //
+                templatemd = ProcessSamples(jsonSample, templatemd, referencePath);
                 File.WriteAllText(string.Format("../../../../../docs/v2/Reference/{0}/{1}.md", folder, item.Name), templatemd);
             }
+        }
+
+        private static string ProcessSamples(string jsonSample, string templatemd, string referencePath)
+        {
+            templatemd = templatemd.Replace("<ExampleJson>", jsonSample);
+            var match = new Regex(@"<Import:([\s\S]*)>");
+            MatchCollection matches = match.Matches(templatemd);
+            foreach (Match item in matches)
+            {
+                string importPath = Path.Combine(referencePath, item.Value);
+                string importFile = System.IO.File.ReadAllText(importPath);
+                templatemd.Replace(string.Format($"<Import:{item.Value}>"), importFile);
+            }
+            return templatemd;
+        }
+
+        private static string ProcessBreadcrumbs(string folder, Type item, string templatemd)
+        {
+            string breadcrumbs = $"[Overview](.. /./ index.md) > [Reference](.. / index.md) > [{folder}](./index.md) > **{item.Name}**";
+            templatemd = templatemd.Replace("<Breadcrumbs>", breadcrumbs);
+            return templatemd;
+        }
+
+        private static string GetTemplate(string folder, string referencePath, string masterTemplate, Type item)
+        {
+            string typeTemplatename = string.Format("{0}-template.md", item.Name);
+            string templateFile = Path.Combine(referencePath, folder, typeTemplatename);
+            string templatemd;
+            if (System.IO.File.Exists(templateFile))
+            {
+                templatemd = System.IO.File.ReadAllText(templateFile);
+            }
+            else
+            {
+                templatemd = System.IO.File.ReadAllText(masterTemplate);
+            }
+
+            return templatemd;
         }
 
         private static string DeployJsonSample(List<Type> types, Type type, string folder, string referencePath, Type item)
