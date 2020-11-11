@@ -2,7 +2,7 @@
 
 namespace MigrationTools.Endpoints
 {
-    public class TfsTeamSettingsEndpointOptions : TfsEndPointOptions
+    public class TfsTeamSettingsEndpointOptions : TfsEndpointOptions
     {
         public override Type ToConfigure => typeof(TfsTeamSettingsEndpoint);
 

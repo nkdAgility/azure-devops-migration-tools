@@ -54,9 +54,9 @@ namespace MigrationTools.Integration.Tests
             return migrationConfig;
         }
 
-        private static TfsWorkItemEndPointOptions GetTfsWorkItemEndPointOptions(EndpointDirection direction, string project)
+        private static TfsWorkItemEndpointOptions GetTfsWorkItemEndPointOptions(EndpointDirection direction, string project)
         {
-            return new TfsWorkItemEndPointOptions()
+            return new TfsWorkItemEndpointOptions()
             {
                 Direction = direction,
                 Organisation = "https://dev.azure.com/nkdagility-preview/",

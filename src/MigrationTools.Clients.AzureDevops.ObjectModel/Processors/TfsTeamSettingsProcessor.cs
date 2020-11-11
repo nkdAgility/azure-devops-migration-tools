@@ -20,7 +20,10 @@ namespace MigrationTools.Processors
 
         protected override void InternalExecute()
         {
-            throw new System.NotImplementedException();
+            if (_Options == null)
+            {
+                throw new Exception("You must call Configure() first");
+            }
         }
     }
 }

@@ -9,7 +9,7 @@ using MigrationTools.Options;
 
 namespace MigrationTools.Endpoints
 {
-    public class InMemoryWorkItemEndpoint : Endpoint
+    public class InMemoryWorkItemEndpoint : Endpoint, IWorkItemSourceEndPoint, IWorkItemTargetEndPoint
     {
         private List<WorkItemData> _innerList;
         private InMemoryWorkItemEndpointOptions _Options;
@@ -33,7 +33,7 @@ namespace MigrationTools.Endpoints
             return source;
         }
 
-        public override void Filter(IEnumerable<WorkItemData> workItems)
+        public void Filter(IEnumerable<WorkItemData> workItems)
         {
             var ids = (from x in workItems select x.Id);
             _innerList = (from x in _innerList
@@ -41,17 +41,17 @@ namespace MigrationTools.Endpoints
                           select x).ToList();
         }
 
-        public override IEnumerable<WorkItemData> GetWorkItems()
+        public IEnumerable<WorkItemData> GetWorkItems()
         {
             return _innerList;
         }
 
-        public override IEnumerable<WorkItemData> GetWorkItems(QueryOptions query)
+        public IEnumerable<WorkItemData> GetWorkItems(QueryOptions query)
         {
             return GetWorkItems();
         }
 
-        public override void PersistWorkItem(WorkItemData source)
+        public void PersistWorkItem(WorkItemData source)
         {
             var found = (from x in _innerList where x.Id == source.Id select x).SingleOrDefault();
             if (found is null)

@@ -35,11 +35,11 @@ namespace MigrationTools.Endpoints
         {
             base.Configure(options);
             Log.LogDebug("TfsWorkItemEndPoint::Configure");
+            _Options = (TfsWorkItemEndpointOptions)options;
             if (string.IsNullOrEmpty(_Options.Query?.Query))
             {
                 throw new ArgumentNullException(nameof(_Options.Query));
             }
-            _Options = (TfsWorkItemEndpointOptions)options;
         }
 
         public void Filter(IEnumerable<WorkItemData> workItems)

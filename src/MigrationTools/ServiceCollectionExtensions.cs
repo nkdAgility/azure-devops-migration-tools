@@ -5,7 +5,7 @@ using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Containers;
 using MigrationTools.Configuration;
 using MigrationTools.EndpointEnrichers;
-using MigrationTools.EndPoints;
+using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
 using MigrationTools.Processors;
 using Serilog;

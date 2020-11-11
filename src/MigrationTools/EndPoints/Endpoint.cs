@@ -34,7 +34,7 @@ namespace MigrationTools.Endpoints
 
         public virtual void Configure(IEndpointOptions options)
         {
-            Log.LogDebug("WorkItemEndpoint::Configure");
+            Log.LogDebug("Endpoint::Configure");
             _InnerOptions = options;
             EndpointEnrichers.ConfigureEnrichers(_InnerOptions.Enrichers);
         }

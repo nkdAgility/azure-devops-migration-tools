@@ -24,8 +24,11 @@ namespace MigrationTools.Endpoints
         {
         }
 
-        public void Configure(TfsEndpointOptions options)
+        public override void Configure(IEndpointOptions options)
         {
+            base.Configure(options);
+            Log.LogDebug("TfsEndpoint::Configure");
+            _Options = (TfsEndpointOptions)options;
             if (string.IsNullOrEmpty(_Options.Organisation))
             {
                 throw new ArgumentNullException(nameof(_Options.Organisation));
@@ -38,7 +41,6 @@ namespace MigrationTools.Endpoints
             {
                 throw new ArgumentNullException(nameof(_Options.AccessToken));
             }
-            _Options = options;
         }
 
         private TfsTeamProjectCollection GetTfsCollection()
