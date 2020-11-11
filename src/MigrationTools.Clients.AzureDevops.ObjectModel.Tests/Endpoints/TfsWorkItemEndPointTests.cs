@@ -65,7 +65,7 @@ namespace MigrationTools.Endpoints.Tests
             Assert.AreEqual(5, result.Count());
         }
 
-        [TestMethod(), TestCategory("L2")]
+        [TestMethod(), TestCategory("JSON")]
         public void TfsWorkItemEndpointOptionsJSON()
         {
             var migrationConfig = GetTfsWorkItemEndPointOptions(EndpointDirection.Source, "MyProjectName");

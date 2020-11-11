@@ -54,7 +54,7 @@ namespace MigrationTools.Processors.Tests
             Assert.IsNotNull(x);
         }
 
-        [TestMethod(), TestCategory("L2")]
+        [TestMethod(), TestCategory("JSON")]
         public void TfsTeamSettingsProcessorOptionsJSON()
         {
             var migrationConfig = GetTfsTeamSettingsProcessorOptions();
