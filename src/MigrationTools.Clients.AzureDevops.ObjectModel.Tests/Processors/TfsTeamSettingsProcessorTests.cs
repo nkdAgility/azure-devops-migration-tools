@@ -1,8 +1,12 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Endpoints;
+using MigrationTools.Enrichers;
 using MigrationTools.Tests;
+using Newtonsoft.Json;
 
 namespace MigrationTools.Processors.Tests
 {
@@ -54,18 +58,31 @@ namespace MigrationTools.Processors.Tests
             Assert.IsNotNull(x);
         }
 
+        [TestMethod(), TestCategory("L2")]
+        public void TfsTeamSettingsProcessorOptionsJSON()
+        {
+            var migrationConfig = GetTfsTeamSettingsProcessorOptions();
+            string json = JsonConvert.SerializeObject(migrationConfig, Formatting.Indented,
+                       new ProcessorConfigJsonConverter(),
+                       new JsonConverterForEndpointOptions(),
+                       new JsonConverterForEnricherOptions());
+            StreamWriter sw = new StreamWriter("../../../../../docs/v2/Reference/JSON/TfsTeamSettingsProcessorOptions.json");
+            sw.WriteLine(json);
+            sw.Close();
+        }
+
         [TestMethod(), TestCategory("L3")]
         public void TestTfsTeamSettingsProcessorNoEnrichers()
         {
             // Senario 1 Migration from Tfs to Tfs with no Enrichers.
-            var migrationConfig = GetConfigurationTfsToTfsNoEnrichers();
+            var migrationConfig = GetTfsTeamSettingsProcessorOptions();
             var processor = Services.GetRequiredService<TfsTeamSettingsProcessor>();
             processor.Configure(migrationConfig);
             processor.Execute();
             Assert.AreEqual(ProcessingStatus.Complete, processor.Status);
         }
 
-        private static TfsTeamSettingsProcessorOptions GetConfigurationTfsToTfsNoEnrichers()
+        private static TfsTeamSettingsProcessorOptions GetTfsTeamSettingsProcessorOptions()
         {
             // Tfs To Tfs
             var migrationConfig = new TfsTeamSettingsProcessorOptions()
