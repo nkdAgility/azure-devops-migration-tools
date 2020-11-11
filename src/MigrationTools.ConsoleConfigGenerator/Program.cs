@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using MigrationTools.EndpointEnrichers;
@@ -59,10 +61,32 @@ namespace VstsSyncMigrator.ConsoleApp
                 templatemd = templatemd.Replace("<TypeName>", folder);
                 templatemd = ProcessBreadcrumbs(folder, item, templatemd);
                 templatemd = templatemd.Replace("<Description>", "No description, create a template");
-                templatemd = templatemd.Replace("<Options>", "Options not yet implmeneted");
+                templatemd = ProcessOptions(types, item, templatemd);
                 templatemd = ProcessSamples(jsonSample, templatemd, referencePath);
                 File.WriteAllText(string.Format("../../../../../docs/v2/Reference/{0}/{1}.md", folder, item.Name), templatemd);
             }
+        }
+
+        private static string ProcessOptions(List<Type> types, Type item, string templatemd)
+        {
+            var typeOption = types.Where(t => t.Name == string.Format("{0}Options", item.Name) && !t.IsAbstract && !t.IsInterface).SingleOrDefault();
+            StringBuilder options = new StringBuilder();
+            if (!(typeOption is null))
+            {
+                options.AppendLine("Property | Type");
+                options.AppendLine("-------- | ----");
+                var propertys = typeOption.GetProperties();
+                foreach (PropertyInfo property in propertys)
+                {
+                    options.AppendLine(string.Format("{0} | {1}", property.Name, property.PropertyType.Name));
+                }
+                templatemd = templatemd.Replace("<Options>", options.ToString());
+            }
+            else
+            {
+                templatemd = templatemd.Replace("<Options>", "Options not yet implmeneted");
+            }
+            return templatemd;
         }
 
         private static string ProcessSamples(string jsonSample, string templatemd, string referencePath)

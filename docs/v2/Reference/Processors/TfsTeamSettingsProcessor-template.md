@@ -4,35 +4,10 @@
 
 [Overview](.././index.md) > [Reference](../index.md) > [Processors](./index.md) > **Tfs TeamSettings Processor**
 
-No description, create a template
+The Team Settings Processor will allow the migration and manipulation of the Teams within Azure DevOps. 
 
-Options not yet implmeneted
+<Options>
 
 ```JSON
-{
-  "ObjectType": "TfsTeamSettingsProcessorOptions",
-  "MigrateTeamSettings": true,
-  "UpdateTeamSettings": true,
-  "PrefixProjectToNodes": false,
-  "Enabled": false,
-  "Endpoints": [
-    {
-      "AccessToken": "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
-      "Organisation": "https://dev.azure.com/nkdagility-preview/",
-      "Project": "sourceProject",
-      "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
-      "Direction": "Source",
-      "Enrichers": null
-    },
-    {
-      "AccessToken": "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
-      "Organisation": "https://dev.azure.com/nkdagility-preview/",
-      "Project": "targetProject",
-      "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
-      "Direction": "Target",
-      "Enrichers": null
-    }
-  ],
-  "Enrichers": null
-}
+<ExampleJson>
 ```

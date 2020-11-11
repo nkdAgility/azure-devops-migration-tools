@@ -1,12 +1,21 @@
-## Endpoint: TfsEndpoint
+## Endpoints: TfsEndpoint
 
 >**_This documentation is for a preview version of the Azure DevOps Migration Tools._ If you are not using the preview version then please head over to the main [documentation](https://nkdagility.github.io/azure-devops-migration-tools).**
 
-[Overview](.. /./ index.md) > [Reference](.. / index.md) > [Endpoints](./index.md) > **TfsEndpoint**
+[Overview](.././index.md) > [Reference](../index.md) > [Endpoints](./index.md) > **TfsEndpoint**
 
 No description, create a template
 
-Options not yet implmeneted
+Property | Type
+-------- | ----
+AccessToken | String
+Organisation | String
+Project | String
+ReflectedWorkItemIdField | String
+ToConfigure | Type
+Direction | EndpointDirection
+Enrichers | List`1
+
 
 ```JSON
 {
