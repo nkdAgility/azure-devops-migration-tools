@@ -14,8 +14,8 @@ namespace MigrationTools.Processors
         private bool _ProcessorConfigured;
 
         public Processor(
-            ProcessorEnricherContainer processorEnricherContainer,
-            EndpointContainer endpointContainer,
+            ProcessorEnricherContainer processorEnrichers,
+            EndpointContainer endpoints,
             IServiceProvider services,
             ITelemetryLogger telemetry,
             ILogger<Processor> logger)
@@ -23,8 +23,8 @@ namespace MigrationTools.Processors
             Services = services;
             Telemetry = telemetry;
             Log = logger;
-            Endpoints = endpointContainer;
-            ProcessorEnrichers = processorEnricherContainer;
+            Endpoints = endpoints;
+            ProcessorEnrichers = processorEnrichers;
         }
 
         public EndpointContainer Endpoints { get; }

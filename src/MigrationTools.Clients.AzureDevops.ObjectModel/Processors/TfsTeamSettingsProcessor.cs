@@ -17,9 +17,17 @@ namespace MigrationTools.Processors
     {
         private TfsTeamSettingsProcessorOptions _Options;
 
-        public TfsTeamSettingsProcessor(ProcessorEnricherContainer processorEnricherContainer, EndpointContainer endpointContainer, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(processorEnricherContainer, endpointContainer, services, telemetry, logger)
+        public TfsTeamSettingsProcessor(ProcessorEnricherContainer processorEnrichers,
+                                        EndpointContainer endpoints,
+                                        IServiceProvider services,
+                                        ITelemetryLogger telemetry,
+                                        ILogger<Processor> logger) : base(processorEnrichers, endpoints, services, telemetry, logger)
         {
         }
+
+        public TfsTeamSettingsEndpoint Source => (TfsTeamSettingsEndpoint)Endpoints.Source;
+
+        public TfsTeamSettingsEndpoint Target => (TfsTeamSettingsEndpoint)Endpoints.Target;
 
         public override void Configure(IProcessorOptions options)
         {
@@ -27,9 +35,6 @@ namespace MigrationTools.Processors
             Log.LogInformation("TfsTeamSettingsProcessor::Configure");
             _Options = (TfsTeamSettingsProcessorOptions)options;
         }
-
-        public TfsTeamSettingsEndpoint Source => (TfsTeamSettingsEndpoint)Endpoints.Source;
-        public TfsTeamSettingsEndpoint Target => (TfsTeamSettingsEndpoint)Endpoints.Target;
 
         protected override void InternalExecute()
         {
