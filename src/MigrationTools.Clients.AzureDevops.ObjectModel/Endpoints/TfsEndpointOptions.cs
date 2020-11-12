@@ -1,9 +1,21 @@
 ﻿using System;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace MigrationTools.Endpoints
 {
+    public enum AuthenticationMode
+    {
+        AccessToken = 0,
+        Windows = 1,
+        Prompt = 2
+    }
+
     public class TfsEndpointOptions : EndpointOptions, ITfsEndpointOptions
     {
+        [JsonConverter(typeof(StringEnumConverter))]
+        public AuthenticationMode AuthenticationMode { get; set; }
+
         public string AccessToken { get; set; }
         public string Organisation { get; set; }
         public string Project { get; set; }
@@ -27,5 +39,6 @@ namespace MigrationTools.Endpoints
         public string Organisation { get; }
         public string Project { get; }
         public string ReflectedWorkItemIdField { get; }
+        public AuthenticationMode AuthenticationMode { get; }
     }
 }
