@@ -45,7 +45,15 @@ The Azure DevOps Migration Tools allow you to bulk edit and migrate data between
  * [Why](#why-does-this-exist)
  * [FAQ](./faq.md)
  * [Support](#support)
- * _Preview_ [Preview v2](./v2/index.md) - 
+
+#### Quick Links [ PREVIEW ]
+
+_This is a preview version of both the documentation and the Azure DevOps Migration Tools._
+
+- [Overview](./index.md)
+- [Getting Started](./getting-started.md)
+- [How To Migrate Things](./HowTo/index.md)
+- [Reference](./Reference/index.md)
 
 ### External Walkthroughs and Reviews
 
@@ -60,19 +68,11 @@ There are two ways to get these tools:
 * (recommended)[Install from Chocolatey](https://chocolatey.org/packages/vsts-sync-migrator/)
 * Download the [latest release from GitHub](https://github.com/nkdAgility/azure-devops-migration-tools/releases) and unzip
 
-## Overview
+## Getting Support
 
-These tools are build by naked Agility Limited's DevOps & Agility consultants to do real world migrations on a daily basis. We always work in [Azure DevOps Services](http://dev.azure.com) on https://dev.azure.com/nkdagility/migration-tools/ with code in GitHub and publish as a chocolatey package that pulls from GitGub Releases.
+1. [Question on Stackoverflow](https://stackoverflow.com/questions/tagged/azure-devops-migration-tools) - The first place to look for unsage, configuration, and general help is on Stackoverflow. 
+1. [Issues on Gitbub](https://github.com/nkdAgility/azure-devops-migration-tools/issues)
 
-|-|-|
-|-------------:|:-------------|
-| Team Work Items | [Azure Boards](https://dev.azure.com/nkdagility/migration-tools/) |
-| Public Issues | [GitHub Issues](https://github.com/nkdAgility/azure-devops-migration-tools/) |
-| Builds & Releases | [Azure Pipelines](https://dev.azure.com/nkdagility/migration-tools/) |
-| Releases Output | [Github Releases](https://github.com/nkdAgility/azure-devops-migration-tools/releases) |
-| Documentation | [Github Pages](http://nkdagility.github.io/azure-devops-migration-tools/) |
-
-**Watch the [Video Overview](https://youtu.be/RCJsST0xBCE) to get you started in 30 minutes. This tool is complicated and its not always easy to discover what you need to do.**
 
 ### Processors (v1 Architecture)
 
@@ -103,7 +103,8 @@ Most of these processors need to be run in order. If you try to migrate work ite
 |GitCommitFix | merged | Git links | obsolete - merged into WorkItemMigration |
 |WorkItemUpdateConfig | merged | Work Items | obsolete - merged into WorkItemMigration |
 
-### Processors (v2 Architecture)
+
+### Processors (v2 Architecture) [ PREVIEW ]
 
 **_These are experimental processors that should replace those above. We are intersted in feedback of the new foramt of the config, as well as the functionality._**
 
@@ -111,10 +112,16 @@ The new processor configuration is designed to allow the Migration Tools to supp
 
 |Processor | Status |Target |Usage |
 |---------|---------|---------|---------|
-|[WorkItemMigration](./v2/Reference/Processors/WorkItemTrackingProcessor.md) | alfa | Work Items | Migrates either tip or history of work items with Links & Attachments based on a query with field mappings |
-|[TeamMigration](./v2/Reference/Processors/TfsTeamSettingsProcessor.md) | preview | Teams | Migrates Teams and Team Settings |
+|[WorkItemMigration](./Reference/Processors/WorkItemTrackingProcessor.md) | alfa | Work Items | Migrates either tip or history of work items with Links & Attachments based on a query with field mappings |
+|[TeamMigration](./Reference/Processors/TfsTeamSettingsProcessor.md) | preview | Teams | Migrates Teams and Team Settings |
 
+#### Reference: A Deep Dive
 
+  - [Overview](./Reference/index.md)
+  - [Processors](./Reference/Processors/index.md)
+  - [ProcessorEnrichers](./Reference/ProcessorEnrichers/index.md)
+  - [Endpoints](./Reference/Endpoints/index.md)
+  - [EndpointEnrichers](./Reference/EndpointEnrichers/index.md)
 
 ### Field Maps
 
@@ -177,6 +184,19 @@ If you want to be added to the community Team then please [fill out this form an
 ## Support
 
 You can get free support from the community here and on social media on a best effort basis if folks are available. If you are looking for paid support there are a number of consultants that contribute to this project and that are experts in this type of work:
+
+These tools are build by naked Agility Limited's DevOps & Agility consultants to do real world migrations on a daily basis. We always work in [Azure DevOps Services](http://dev.azure.com) on https://dev.azure.com/nkdagility/migration-tools/ with code in GitHub and publish as a chocolatey package that pulls from GitGub Releases.
+
+|-|-|
+|-------------:|:-------------|
+| Team Work Items | [Azure Boards](https://dev.azure.com/nkdagility/migration-tools/) |
+| Public Issues | [GitHub Issues](https://github.com/nkdAgility/azure-devops-migration-tools/) |
+| Builds & Releases | [Azure Pipelines](https://dev.azure.com/nkdagility/migration-tools/) |
+| Releases Output | [Github Releases](https://github.com/nkdAgility/azure-devops-migration-tools/releases) |
+| Documentation | [Github Pages](http://nkdagility.github.io/azure-devops-migration-tools/) |
+
+**Watch the [Video Overview](https://youtu.be/RCJsST0xBCE) to get you started in 30 minutes. This tool is complicated and its not always easy to discover what you need to do.**
+
 
 ## FAQ
 
