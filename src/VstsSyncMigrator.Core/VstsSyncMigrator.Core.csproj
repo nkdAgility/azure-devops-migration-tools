@@ -5,6 +5,10 @@
     <Product>VstsSyncMigrator.Core</Product>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>..\..\docs\Reference\Generated\VstsSyncMigrator.Core.xml</DocumentationFile>
+  </PropertyGroup>
+
   <ItemGroup>
     <Compile Remove="Execution\MigrationContext\ExcelMigrationContext.cs" />
   </ItemGroup>

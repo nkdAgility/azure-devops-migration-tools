@@ -5,6 +5,10 @@
     <Product>MigrationTools.Clients.AzureDevops.Rest</Product>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>..\..\docs\Reference\Generated\MigrationTools.Clients.AzureDevops.Rest.xml</DocumentationFile>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.TeamFoundationServer.Client" Version="16.153.0" />
   </ItemGroup>
