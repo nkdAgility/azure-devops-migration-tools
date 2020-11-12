@@ -73,7 +73,6 @@ namespace MigrationTools.Processors.Tests
                 Enabled = true,
                 MigrateTeamSettings = true,
                 UpdateTeamSettings = true,
-
                 PrefixProjectToNodes = false,
                 Endpoints = new List<IEndpointOptions>()
                     {
@@ -92,7 +91,7 @@ namespace MigrationTools.Processors.Tests
                 Organisation = "https://dev.azure.com/nkdagility-preview/",
                 Project = project,
                 AuthenticationMode = AuthenticationMode.AccessToken,
-                AccessToken = "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
+                AccessToken = TestingConstants.AccessToken,
             };
         }
     }
