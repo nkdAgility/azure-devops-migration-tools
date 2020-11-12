@@ -44,7 +44,7 @@ namespace MigrationTools.Processors
         {
             Log.LogInformation("Processor::Configure");
             Endpoints.ConfigureEndpoints(options.Endpoints);
-            ProcessorEnrichers.ConfigureEnrichers(options.Enrichers);
+            ProcessorEnrichers.ConfigureEnrichers(options.ProcessorEnrichers);
             _ProcessorConfigured = true;
         }
 

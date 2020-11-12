@@ -254,7 +254,7 @@ namespace MigrationTools._EngineV1.Configuration
                     PrefixProjectToNodes = false,
                     ReplayRevisions = true,
                     WorkItemCreateRetryLimit = 5,
-                    Enrichers = GetAllEnricherOptions<ProcessorEnricherOptions>(),
+                    ProcessorEnrichers = GetAllEnricherOptions<IProcessorEnricherOptions>(),
                     Endpoints = GetAllEndpointOptions<IEndpointOptions>()
                 });
             return ec;

@@ -8,6 +8,9 @@ using MigrationTools.Enrichers;
 
 namespace MigrationTools.Processors
 {
+    /// <summary>
+    /// This processor is intended, with the aid of [ProcessorEnrichers](../ProcessorEnrichers/index.md), to allow the migration of Work Items between two [Endpoints](../Endpoints/index.md).
+    /// </summary>
     public class WorkItemTrackingProcessor : Processor
     {
         private WorkItemTrackingProcessorOptions _config;

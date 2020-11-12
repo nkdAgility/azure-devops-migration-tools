@@ -6,5 +6,12 @@
   "WorkItemCreateRetryLimit": 5,
   "Enabled": true,
   "Endpoints": null,
-  "Enrichers": null
+  "ProcessorEnrichers": [
+    {
+      "Enabled": true
+    },
+    {
+      "Enabled": true
+    }
+  ]
 }

@@ -10,9 +10,12 @@ namespace MigrationTools.Tests
         public static string SaveObjectAsJson(object obj)
         {
             string json = JsonConvert.SerializeObject(obj, Formatting.Indented,
+                new ProcessorConfigJsonConverter(),
                       new ProcessorConfigJsonConverter(),
                       new JsonConverterForEndpointOptions(),
-                      new JsonConverterForEnricherOptions());
+                      new JsonConverterForEnricherOptions(),
+                      new JsonConverterForIOptions(),
+                      new IProcessorEnricherOptionsJsonConverter());
             return json;
         }
     }

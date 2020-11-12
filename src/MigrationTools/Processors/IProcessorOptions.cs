@@ -9,7 +9,7 @@ namespace MigrationTools.Processors
     public interface IProcessorOptions : IProcessorConfig, IOptions
     {
         List<IEndpointOptions> Endpoints { get; set; }
-        List<ProcessorEnricherOptions> Enrichers { get; set; }
+        List<IProcessorEnricherOptions> ProcessorEnrichers { get; set; }
 
         IProcessorOptions GetDefault();
     }

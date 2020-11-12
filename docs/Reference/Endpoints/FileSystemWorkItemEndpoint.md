@@ -4,16 +4,16 @@
 
 [Overview](.././index.md) > [Reference](../index.md) > [Endpoints](./index.md) > **FileSystemWorkItemEndpoint**
 
-No description, create a template
+missng XML code comments
 
 ### Options
 
 | Parameter name         | Type    | Description                              | Default Value                            |
 |------------------------|---------|------------------------------------------|------------------------------------------|
-| FileStore | String | {Description} | {Default Value} |
-| ToConfigure | Type | {Description} | {Default Value} |
-| Direction | EndpointDirection | {Description} | {Default Value} |
-| Enrichers | List | {Description} | {Default Value} |
+| FileStore | String | missng XML code comments | missng XML code comments |
+| ToConfigure | Type | missng XML code comments | missng XML code comments |
+| Direction | EndpointDirection | missng XML code comments | missng XML code comments |
+| Enrichers | List | missng XML code comments | missng XML code comments |
 
 
 ### Example JSON

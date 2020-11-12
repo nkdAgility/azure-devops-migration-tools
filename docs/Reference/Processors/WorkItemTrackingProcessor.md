@@ -3,19 +3,24 @@
 
 >**_This documentation is for a preview version of the Azure DevOps Migration Tools._ If you are not using the preview version then please head over to the main [documentation](https://nkdagility.github.io/azure-devops-migration-tools).**
 
-[Overview](.././index.md) > [Reference](../index.md) > [Processors](./index.md) > Work Item Tracking Processor
+[Overview](.././index.md) > [Reference](../index.md) > [Processors](./index.md) > **WorkItemTrackingProcessor**
 
-This processor is intended, with the aid of [ProcessorEnrichers](../ProcessorEnrichers/index.md), to allow the migration of Work Items between two [Endpoints](../Endpoints/index.md). 
+This processor is intended, with the aid of [ProcessorEnrichers](../ProcessorEnrichers/index.md), to allow the migration of Work Items between two [Endpoints](../Endpoints/index.md).
 
 ### Properties
 
-Name | Type | Default | Description
------|------|---------|-------------
-Enabled | Boolean | true | Turns this processor on or off.
-collapseRevisions | Boolean | false
-ReplayRevisions | Boolean | true
-WorkItemCreateRetryLimit | Int | 5 | Number of retries when we get a 503 web error
-PrefixProjectToNodes | Boolean | false | Preixes the Source location to the catagorisation system of the target
+| Parameter name         | Type    | Description                              | Default Value                            |
+|------------------------|---------|------------------------------------------|------------------------------------------|
+| ReplayRevisions | Boolean | missng XML code comments | missng XML code comments |
+| PrefixProjectToNodes | Boolean | missng XML code comments | missng XML code comments |
+| CollapseRevisions | Boolean | missng XML code comments | missng XML code comments |
+| WorkItemCreateRetryLimit | Int32 | missng XML code comments | missng XML code comments |
+| Processor | String | missng XML code comments | missng XML code comments |
+| ToConfigure | Type | missng XML code comments | missng XML code comments |
+| Enabled | Boolean | Active the processor if it true. | missng XML code comments |
+| Endpoints | List | missng XML code comments | missng XML code comments |
+| ProcessorEnrichers | List | missng XML code comments | missng XML code comments |
+
 
 ### Supported Endpoints
 
@@ -37,14 +42,23 @@ PrefixProjectToNodes | Boolean | false | Preixes the Source location to the cata
 #### Minimum Options to run
 
 ```JSON
+{
+  "ObjectType": "WorkItemTrackingProcessorOptions",
+  "ReplayRevisions": true,
+  "PrefixProjectToNodes": false,
+  "CollapseRevisions": false,
+  "WorkItemCreateRetryLimit": 5,
+  "Enabled": true,
+  "Endpoints": null,
+  "ProcessorEnrichers": [
     {
-      "ObjectType": "WorkItemMigrationProcessorOptions",
-      "Enabled": true,
-      "ReplayRevisions": true,
-      "PrefixProjectToNodes": false,
-      "CollapseRevisions": false,
-      "WorkItemCreateRetryLimit": 5,
+      "Enabled": true
+    },
+    {
+      "Enabled": true
     }
+  ]
+}
 ```
 
 #### Full Example with Enpoints & Enrichers

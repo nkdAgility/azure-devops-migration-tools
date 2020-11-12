@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using MigrationTools.EndpointEnrichers;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
@@ -19,6 +20,7 @@ namespace VstsSyncMigrator.ConsoleApp
     public class Program
     {
         public static AppDomain domain = AppDomain.CreateDomain("MigrationTools");
+        private static string referencePath = "../../../../../docs/Reference/";
 
         public static async Task Main(string[] args)
         {
@@ -48,7 +50,6 @@ namespace VstsSyncMigrator.ConsoleApp
 
         private static void Process(List<Type> types, Type type, string folder)
         {
-            string referencePath = "../../../../../docs/Reference/";
             string masterTemplate = System.IO.Path.Combine(referencePath, "template.md");
             var founds = types.Where(t => type.IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface).ToList();
             foreach (var item in founds)
@@ -60,11 +61,78 @@ namespace VstsSyncMigrator.ConsoleApp
                 templatemd = templatemd.Replace("<ClassName>", item.Name);
                 templatemd = templatemd.Replace("<TypeName>", folder);
                 templatemd = ProcessBreadcrumbs(folder, item, templatemd);
-                templatemd = templatemd.Replace("<Description>", "No description, create a template");
+                templatemd = templatemd.Replace("<Description>", GetTypeSummary(item));
                 templatemd = ProcessOptions(types, item, templatemd);
                 templatemd = ProcessSamples(jsonSample, templatemd, referencePath);
                 File.WriteAllText(string.Format("../../../../../docs/Reference/{0}/{1}.md", folder, item.Name), templatemd);
             }
+        }
+
+        private static string GetTypeSummary(Type item)
+        {
+            // Query the data and write out a subset of contacts
+            var query = (from c in GetXDocument(item).Root.Descendants("member")
+                         where c.Attribute("name").Value == $"T:{item.FullName}"
+                         select c.Element("summary").Value).SingleOrDefault();
+            if (query != null)
+            {
+                Console.WriteLine($"- Description Loaded: {item.FullName}");
+            }
+            else
+            {
+                query = "missng XML code comments";
+                // Console.WriteLine($"- Description FAILED: {item.FullName}");
+            }
+            return query.Replace(Environment.NewLine, "").Trim();
+        }
+
+        private static string GetPropertySummary(PropertyInfo property)
+        {
+            // Query the data and write out a subset of contacts
+            var query = (from c in GetXDocument(property.DeclaringType).Root.Descendants("member")
+                         where c.Attribute("name").Value == $"P:{property.DeclaringType.FullName}.{property.Name}"
+                         select c.Element("summary").Value).SingleOrDefault();
+            if (query != null)
+            {
+                Console.WriteLine($"- - Proptery Loaded: {property.Name}");
+            }
+            else
+            {
+                // Console.WriteLine($"- Description FAILED: {item.FullName}");
+                query = "missng XML code comments";
+            }
+            return query.Replace(Environment.NewLine, "").Trim();
+        }
+
+        private static string GetPropertyDefault(PropertyInfo property)
+        {
+            // Query the data and write out a subset of contacts
+            var properyXml = (from c in GetXDocument(property.DeclaringType).Root.Descendants("member")
+                              where c.Attribute("name").Value == $"P:{property.DeclaringType.FullName}.{property.Name}"
+                              select c).SingleOrDefault();
+            string defaultvalue = null;
+            if (properyXml != null)
+            {
+                defaultvalue = properyXml.Element("default")?.Value;
+            }
+
+            if (!string.IsNullOrEmpty(defaultvalue))
+            {
+                Console.WriteLine($"- - Default Loaded: {property.Name}");
+            }
+            else
+            {
+                // Console.WriteLine($"- Description FAILED: {item.FullName}");
+                defaultvalue = "missng XML code comments";
+            }
+
+            return defaultvalue.Replace(Environment.NewLine, "").Trim();
+        }
+
+        private static XDocument GetXDocument(Type item)
+        {
+            string xmlDataPath = Path.Combine(referencePath, "Generated", string.Format($"{item.Assembly.GetName().Name}.xml"));
+            return XDocument.Load(xmlDataPath);
         }
 
         private static string ProcessOptions(List<Type> types, Type item, string templatemd)
@@ -78,7 +146,7 @@ namespace VstsSyncMigrator.ConsoleApp
                 var propertys = typeOption.GetProperties();
                 foreach (PropertyInfo property in propertys)
                 {
-                    options.AppendLine(string.Format("| {0} | {1} | {2} | {3} |", property.Name, property.PropertyType.Name.Replace("`1", ""), "{Description}", "{Default Value}"));
+                    options.AppendLine(string.Format("| {0} | {1} | {2} | {3} |", property.Name, property.PropertyType.Name.Replace("`1", ""), GetPropertySummary(property), GetPropertyDefault(property)));
                 }
                 templatemd = templatemd.Replace("<Options>", options.ToString());
             }

@@ -4,20 +4,20 @@
 
 [Overview](.././index.md) > [Reference](../index.md) > [Endpoints](./index.md) > **TfsTeamSettingsEndpoint**
 
-No description, create a template
+missng XML code comments
 
 ### Options
 
 | Parameter name         | Type    | Description                              | Default Value                            |
 |------------------------|---------|------------------------------------------|------------------------------------------|
-| ToConfigure | Type | {Description} | {Default Value} |
-| AuthenticationMode | AuthenticationMode | {Description} | {Default Value} |
-| AccessToken | String | {Description} | {Default Value} |
-| Organisation | String | {Description} | {Default Value} |
-| Project | String | {Description} | {Default Value} |
-| ReflectedWorkItemIdField | String | {Description} | {Default Value} |
-| Direction | EndpointDirection | {Description} | {Default Value} |
-| Enrichers | List | {Description} | {Default Value} |
+| ToConfigure | Type | missng XML code comments | missng XML code comments |
+| AuthenticationMode | AuthenticationMode | missng XML code comments | missng XML code comments |
+| AccessToken | String | missng XML code comments | missng XML code comments |
+| Organisation | String | missng XML code comments | missng XML code comments |
+| Project | String | missng XML code comments | missng XML code comments |
+| ReflectedWorkItemIdField | String | missng XML code comments | missng XML code comments |
+| Direction | EndpointDirection | missng XML code comments | missng XML code comments |
+| Enrichers | List | missng XML code comments | missng XML code comments |
 
 
 ### Example JSON

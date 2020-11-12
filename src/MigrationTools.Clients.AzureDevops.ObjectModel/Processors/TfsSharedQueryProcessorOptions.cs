@@ -4,6 +4,9 @@ using MigrationTools.Endpoints;
 
 namespace MigrationTools.Processors
 {
+    /// <summary>
+    /// The `TfsSharedQueryProcessor` enabled you to migrate queries from one locatio nto another.
+    /// </summary>
     public class TfsSharedQueryProcessorOptions : ProcessorOptions
     {
         /// <summary>
@@ -14,11 +17,13 @@ namespace MigrationTools.Processors
         /// <summary>
         ///     Do we add the source project name into the folder path
         /// </summary>
+        /// <default>false</default>
         public bool PrefixProjectToNodes { get; set; }
 
         /// <summary>
         ///     The name of the shared folder, made a parameter incase it every needs to be edited
         /// </summary>
+        /// <default>Shared Queries</default>
         public string SharedFolderName
         {
             get { return sharedFolderName; }

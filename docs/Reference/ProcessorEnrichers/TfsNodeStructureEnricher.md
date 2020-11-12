@@ -4,7 +4,7 @@
 
 [Overview](.././index.md) > [Reference](../index.md) > [ProcessorEnrichers](./index.md) > **TfsNodeStructureEnricher**
 
-No description, create a template
+missng XML code comments
 
 ### Options
 

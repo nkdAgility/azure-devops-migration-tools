@@ -14,7 +14,7 @@ namespace MigrationTools.Processors
         public bool Enabled { get; set; }
 
         public List<IEndpointOptions> Endpoints { get; set; }
-        public List<ProcessorEnricherOptions> Enrichers { get; set; }
+        public List<IProcessorEnricherOptions> ProcessorEnrichers { get; set; }
 
         [Obsolete("Avoid using! V1 Architecture")]
         public abstract string Processor { get; }

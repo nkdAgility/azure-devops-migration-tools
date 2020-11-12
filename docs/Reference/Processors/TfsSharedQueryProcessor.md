@@ -4,20 +4,20 @@
 
 [Overview](.././index.md) > [Reference](../index.md) > [Processors](./index.md) > **TfsSharedQueryProcessor**
 
-No description, create a template
+The TfsSharedQueryProcessor enabled you to migrate queries from one locatio nto another.
 
 ### Options
 
 | Parameter name         | Type    | Description                              | Default Value                            |
 |------------------------|---------|------------------------------------------|------------------------------------------|
-| PrefixProjectToNodes | Boolean | {Description} | {Default Value} |
-| SharedFolderName | String | {Description} | {Default Value} |
-| SourceToTargetFieldMappings | Dictionary`2 | {Description} | {Default Value} |
-| Processor | String | {Description} | {Default Value} |
-| ToConfigure | Type | {Description} | {Default Value} |
-| Enabled | Boolean | {Description} | {Default Value} |
-| Endpoints | List | {Description} | {Default Value} |
-| Enrichers | List | {Description} | {Default Value} |
+| PrefixProjectToNodes | Boolean | Do we add the source project name into the folder path | false |
+| SharedFolderName | String | The name of the shared folder, made a parameter incase it every needs to be edited | Shared Queries |
+| SourceToTargetFieldMappings | Dictionary`2 | Mapping of the source to the target | missng XML code comments |
+| Processor | String | missng XML code comments | missng XML code comments |
+| ToConfigure | Type | missng XML code comments | missng XML code comments |
+| Enabled | Boolean | Active the processor if it true. | missng XML code comments |
+| Endpoints | List | missng XML code comments | missng XML code comments |
+| ProcessorEnrichers | List | missng XML code comments | missng XML code comments |
 
 
 ### Example JSON
@@ -49,6 +49,6 @@ No description, create a template
       "Enrichers": null
     }
   ],
-  "Enrichers": null
+  "ProcessorEnrichers": null
 }
 ```

@@ -4,21 +4,21 @@
 
 [Overview](.././index.md) > [Reference](../index.md) > [Processors](./index.md) > **TfsTeamSettingsProcessor**
 
-No description, create a template
+Native TFS Processor, does not work with any other Endpoints.
 
 ### Options
 
 | Parameter name         | Type    | Description                              | Default Value                            |
 |------------------------|---------|------------------------------------------|------------------------------------------|
-| MigrateTeamSettings | Boolean | {Description} | {Default Value} |
-| UpdateTeamSettings | Boolean | {Description} | {Default Value} |
-| PrefixProjectToNodes | Boolean | {Description} | {Default Value} |
-| Teams | List | {Description} | {Default Value} |
-| Processor | String | {Description} | {Default Value} |
-| ToConfigure | Type | {Description} | {Default Value} |
-| Enabled | Boolean | {Description} | {Default Value} |
-| Endpoints | List | {Description} | {Default Value} |
-| Enrichers | List | {Description} | {Default Value} |
+| MigrateTeamSettings | Boolean | missng XML code comments | missng XML code comments |
+| UpdateTeamSettings | Boolean | missng XML code comments | missng XML code comments |
+| PrefixProjectToNodes | Boolean | missng XML code comments | missng XML code comments |
+| Teams | List | missng XML code comments | missng XML code comments |
+| Processor | String | missng XML code comments | missng XML code comments |
+| ToConfigure | Type | missng XML code comments | missng XML code comments |
+| Enabled | Boolean | Active the processor if it true. | missng XML code comments |
+| Endpoints | List | missng XML code comments | missng XML code comments |
+| ProcessorEnrichers | List | missng XML code comments | missng XML code comments |
 
 
 ### Example JSON
@@ -51,6 +51,6 @@ No description, create a template
       "Enrichers": null
     }
   ],
-  "Enrichers": null
+  "ProcessorEnrichers": null
 }
 ```

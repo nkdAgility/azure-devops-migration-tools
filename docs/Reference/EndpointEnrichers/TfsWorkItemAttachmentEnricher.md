@@ -4,16 +4,16 @@
 
 [Overview](.././index.md) > [Reference](../index.md) > [EndpointEnrichers](./index.md) > **TfsWorkItemAttachmentEnricher**
 
-No description, create a template
+missng XML code comments
 
 ### Options
 
 | Parameter name         | Type    | Description                              | Default Value                            |
 |------------------------|---------|------------------------------------------|------------------------------------------|
-| ToConfigure | Type | {Description} | {Default Value} |
-| WorkingPath | String | {Description} | {Default Value} |
-| MaxSize | Int32 | {Description} | {Default Value} |
-| Enabled | Boolean | {Description} | {Default Value} |
+| ToConfigure | Type | missng XML code comments | missng XML code comments |
+| WorkingPath | String | missng XML code comments | missng XML code comments |
+| MaxSize | Int32 | missng XML code comments | missng XML code comments |
+| Enabled | Boolean | missng XML code comments | missng XML code comments |
 
 
 ### Example JSON

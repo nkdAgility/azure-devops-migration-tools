@@ -24,6 +24,11 @@
             Active the processor if it true.
             </summary>
         </member>
+        <member name="T:MigrationTools.Processors.WorkItemTrackingProcessor">
+            <summary>
+            This processor is intended, with the aid of [ProcessorEnrichers](../ProcessorEnrichers/index.md), to allow the migration of Work Items between two [Endpoints](../Endpoints/index.md).
+            </summary>
+        </member>
         <member name="P:MigrationTools._EngineV1.Configuration.IProcessorConfig.Enabled">
             <summary>
             Active the processor if it true.

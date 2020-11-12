@@ -25,5 +25,5 @@
       "Enrichers": null
     }
   ],
-  "Enrichers": null
+  "ProcessorEnrichers": null
 }

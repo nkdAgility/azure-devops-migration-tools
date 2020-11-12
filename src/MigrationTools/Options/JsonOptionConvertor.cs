@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -51,7 +52,7 @@ namespace MigrationTools.Options
             {
                 JObject o = (JObject)jt;
                 o.AddFirst(new JProperty("ObjectType", value.GetType().Name));
-                o.WriteTo(writer);
+                o.WriteTo(writer, serializer.Converters.ToArray());
             }
         }
     }
