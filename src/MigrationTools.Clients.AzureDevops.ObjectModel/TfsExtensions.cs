@@ -45,7 +45,6 @@ namespace MigrationTools
                 Log.Debug("--------------------------------------------------------------------------------------------------------------------");
                 Log.Debug("--------------------------------------------------------------------------------------------------------------------");
             }
-            workItem.Fields["System.ChangedBy"].Value = "Migration";
             Log.Verbose("TfsExtensions::SaveToAzureDevOps::Save()");
             workItem.Save();
             context.RefreshWorkItem();

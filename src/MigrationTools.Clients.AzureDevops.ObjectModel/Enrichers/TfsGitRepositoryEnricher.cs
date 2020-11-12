@@ -205,7 +205,6 @@ namespace MigrationTools.Enrichers
             if (targetWorkItem.ToWorkItem().IsDirty && _save)
             {
                 Log.LogDebug("GitRepositoryEnricher: Saving {TargetWorkItemId}", targetWorkItem.Id);
-                targetWorkItem.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
                 targetWorkItem.SaveToAzureDevOps();
             }
             return count;
