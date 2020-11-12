@@ -20,7 +20,7 @@ namespace MigrationTools.Tests
                     new FieldMapConfigJsonConverter(),
                         new ProcessorConfigJsonConverter(),
                         new JsonConverterForEndpointOptions(),
-                        new JsonConverterForEnricherOptions(),
+                        new IOptionsJsonConvertor(),
                         new MigrationClientConfigJsonConverter());
             StreamWriter sw = new StreamWriter("configuration.json");
             sw.WriteLine(json);
@@ -39,7 +39,7 @@ namespace MigrationTools.Tests
                 new FieldMapConfigJsonConverter(),
                         new ProcessorConfigJsonConverter(),
                         new JsonConverterForEndpointOptions(),
-                        new JsonConverterForEnricherOptions(),
+                        new IOptionsJsonConvertor(),
                         new MigrationClientConfigJsonConverter());
             Assert.AreEqual(10, ec.FieldMaps.Count);
             Assert.AreEqual(12, ec.Processors.Count);
@@ -52,7 +52,7 @@ namespace MigrationTools.Tests
                     new FieldMapConfigJsonConverter(),
                         new ProcessorConfigJsonConverter(),
                         new JsonConverterForEndpointOptions(),
-                        new JsonConverterForEnricherOptions(),
+                        new IOptionsJsonConvertor(),
                         new MigrationClientConfigJsonConverter());
             StreamWriter sw = new StreamWriter("configuration2.json");
             sw.WriteLine(json);
@@ -71,7 +71,7 @@ namespace MigrationTools.Tests
                 new FieldMapConfigJsonConverter(),
                         new ProcessorConfigJsonConverter(),
                         new JsonConverterForEndpointOptions(),
-                        new JsonConverterForEnricherOptions(),
+                        new IOptionsJsonConvertor(),
                         new MigrationClientConfigJsonConverter());
             Assert.AreEqual(10, ec.FieldMaps.Count);
             Assert.AreEqual(12, ec.Processors.Count);

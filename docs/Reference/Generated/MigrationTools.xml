@@ -9,7 +9,7 @@
             Active the enricher if it true.
             </summary>
         </member>
-        <member name="M:MigrationTools.Options.JsonOptionConvertor`1.Create(System.Type,Newtonsoft.Json.Linq.JObject)">
+        <member name="M:MigrationTools.Options.JsonConvertor`1.Create(System.Type,Newtonsoft.Json.Linq.JObject)">
             <summary>
             Create an instance of objectType, based properties in the JSON object
             </summary>

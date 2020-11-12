@@ -92,7 +92,7 @@ namespace MigrationTools
                                 new FieldMapConfigJsonConverter(),
                                 new ProcessorConfigJsonConverter(),
                                 new JsonConverterForEndpointOptions(),
-                                new JsonConverterForEnricherOptions(),
+                                new IOptionsJsonConvertor(),
                                 new MigrationClientConfigJsonConverter());
                             StreamWriter sw = new StreamWriter(configFile);
                             sw.WriteLine(json);

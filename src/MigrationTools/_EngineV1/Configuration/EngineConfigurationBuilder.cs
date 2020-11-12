@@ -33,7 +33,7 @@ namespace MigrationTools._EngineV1.Configuration
                         new FieldMapConfigJsonConverter(),
                         new ProcessorConfigJsonConverter(),
                         new JsonConverterForEndpointOptions(),
-                        new JsonConverterForEnricherOptions(),
+                        new IOptionsJsonConvertor(),
                         new MigrationClientConfigJsonConverter());
             }
             catch (JsonSerializationException ex)

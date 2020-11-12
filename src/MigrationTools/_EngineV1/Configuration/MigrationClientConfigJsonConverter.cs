@@ -5,7 +5,7 @@ using Newtonsoft.Json.Linq;
 
 namespace MigrationTools._EngineV1.Configuration
 {
-    public class MigrationClientConfigJsonConverter : JsonOptionConvertor<IMigrationClientConfig>
+    public class MigrationClientConfigJsonConverter : JsonConvertor<IMigrationClientConfig>
     {
         protected override IMigrationClientConfig Create(Type objectType, JObject jObject)
         {

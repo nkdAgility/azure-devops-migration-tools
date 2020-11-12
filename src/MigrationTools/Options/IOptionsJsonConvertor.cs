@@ -6,9 +6,9 @@ using Serilog;
 
 namespace MigrationTools.Enrichers
 {
-    public class JsonConverterForEnricherOptions : JsonOptionConvertor<IEnricherOptions>
+    public class IOptionsJsonConvertor : JsonConvertor<IOptions>
     {
-        protected override IEnricherOptions Create(Type objectType, JObject jObject)
+        protected override IOptions Create(Type objectType, JObject jObject)
         {
             if (FieldExists("ObjectType", jObject))
             {

@@ -13,9 +13,7 @@ namespace MigrationTools.Tests
                 new ProcessorConfigJsonConverter(),
                       new ProcessorConfigJsonConverter(),
                       new JsonConverterForEndpointOptions(),
-                      new JsonConverterForEnricherOptions(),
-                      new JsonConverterForIOptions(),
-                      new IProcessorEnricherOptionsJsonConverter());
+                      new IOptionsJsonConvertor());
             return json;
         }
     }

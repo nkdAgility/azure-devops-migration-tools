@@ -6,7 +6,7 @@ using Serilog;
 
 namespace MigrationTools.Endpoints
 {
-    public class JsonConverterForEndpointOptions : JsonOptionConvertor<IEndpointOptions>
+    public class JsonConverterForEndpointOptions : JsonConvertor<IEndpointOptions>
     {
         protected override IEndpointOptions Create(Type objectType, JObject jObject)
         {
