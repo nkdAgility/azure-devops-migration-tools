@@ -22,7 +22,7 @@ namespace MigrationTools.Enrichers
         protected IServiceProvider Services { get; }
         protected ITelemetryLogger Telemetry { get; }
 
-        public void ConfigureEnrichers(List<ProcessorEnricherOptions> enrichers)
+        public void ConfigureEnrichers(List<IProcessorEnricherOptions> enrichers)
         {
             Log.LogDebug("ProcessorEnricherContainer::ConfigureEnrichers");
             if (_Configured)

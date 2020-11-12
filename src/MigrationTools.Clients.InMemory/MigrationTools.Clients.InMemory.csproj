@@ -5,6 +5,10 @@
     <RootNamespace>MigrationTools</RootNamespace>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>..\..\docs\Reference\Generated\MigrationTools.Clients.InMemory.xml</DocumentationFile>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\MigrationTools\MigrationTools.csproj" />
   </ItemGroup>

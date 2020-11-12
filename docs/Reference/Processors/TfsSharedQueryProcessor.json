@@ -1,9 +1,8 @@
 {
-  "ObjectType": "TfsTeamSettingsProcessorOptions",
-  "MigrateTeamSettings": true,
-  "UpdateTeamSettings": true,
+  "ObjectType": "TfsSharedQueryProcessorOptions",
   "PrefixProjectToNodes": false,
-  "Teams": null,
+  "SharedFolderName": "Shared Queries",
+  "SourceToTargetFieldMappings": null,
   "Enabled": false,
   "Endpoints": [
     {

@@ -1,5 +1,6 @@
 {
   "ObjectType": "TfsTeamSettingsEndpointOptions",
+  "AuthenticationMode": "AccessToken",
   "AccessToken": "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
   "Organisation": "https://dev.azure.com/nkdagility-preview/",
   "Project": "NeedToSetThis",

@@ -1,0 +1,104 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>VstsSyncMigrator.Core</name>
+    </assembly>
+    <members>
+        <member name="M:VstsSyncMigrator.AuthenticationHelper.AcquireTokenAsyncForUser">
+            <summary>
+            Async task to acquire token for User.
+            </summary>
+            <returns>Token for user.</returns>
+        </member>
+        <member name="M:VstsSyncMigrator.AuthenticationHelper.GetTokenForUser">
+            <summary>
+            Get Token for User.
+            </summary>
+            <returns>Token for user.</returns>
+        </member>
+        <member name="M:VstsSyncMigrator.Engine.TestPlandsAndSuitesMigrationContext.ApplyConfigurations(Microsoft.TeamFoundation.TestManagement.Client.ITestSuiteEntry,Microsoft.TeamFoundation.TestManagement.Client.ITestSuiteEntry)">
+            <summary>
+            Apply configurations to a single test case entry on the target, by copying from the source
+            </summary>
+            <param name="sourceEntry"></param>
+            <param name="targetEntry"></param>
+        </member>
+        <member name="M:VstsSyncMigrator.Engine.TestPlandsAndSuitesMigrationContext.ApplyDefaultConfigurations(Microsoft.TeamFoundation.TestManagement.Client.ITestSuiteBase,Microsoft.TeamFoundation.TestManagement.Client.ITestSuiteBase)">
+            <summary>
+            Sets default configurations on migrated test suites.
+            </summary>
+            <param name="source">The test suite to take as a source.</param>
+            <param name="target">The test suite to apply the default configurations to.</param>
+        </member>
+        <member name="M:VstsSyncMigrator.Engine.TestPlandsAndSuitesMigrationContext.FixWorkItemIdInQuery(Microsoft.TeamFoundation.TestManagement.Client.ITestSuiteBase)">
+            <summary>
+            Fix work item ID's in query based suites
+            </summary>
+        </member>
+        <member name="M:VstsSyncMigrator.Engine.TestPlandsAndSuitesMigrationContext.GetTargetIdentity(Microsoft.TeamFoundation.Framework.Client.IdentityDescriptor)">
+            <summary>
+            Retrieve the target identity for a given source descriptor
+            </summary>
+            <param name="sourceIdentityDescriptor">Source identity Descriptor</param>
+            <returns>Target Identity</returns>
+        </member>
+        <member name="M:VstsSyncMigrator.Engine.TestPlandsAndSuitesMigrationContext.RemoveInvalidLinks(Microsoft.TeamFoundation.TestManagement.Client.ITestPlan)">
+            <summary>
+            Remove invalid links
+            </summary>
+            <remarks>
+            VSTS cannot store some links which have an invalid URI Scheme. You will get errors like "The URL specified has a potentially unsafe URL protocol"
+            For myself, the issue were urls that pointed to TFVC:    "vstfs:///VersionControl/Changeset/19415"
+            Unfortunately the API does not seem to allow access to the "raw" data, so there's nowhere to retrieve this as far as I can find.
+            Should take care of https://github.com/nkdAgility/azure-devops-migration-tools/issues/178
+            </remarks>
+            <param name="targetPlan">The plan to remove invalid links drom</param>
+        </member>
+        <member name="F:VstsSyncMigrator.Engine.WorkItemQueryMigrationContext.config">
+            <summary>
+            The processor configuration
+            </summary>
+        </member>
+        <member name="F:VstsSyncMigrator.Engine.WorkItemQueryMigrationContext.totalFoldersAttempted">
+            <summary>
+            Counter for folders processed
+            </summary>
+        </member>
+        <member name="F:VstsSyncMigrator.Engine.WorkItemQueryMigrationContext.totalQueriesAttempted">
+            <summary>
+            Counter for queries attempted
+            </summary>
+        </member>
+        <member name="F:VstsSyncMigrator.Engine.WorkItemQueryMigrationContext.totalQueriesMigrated">
+            <summary>
+            Counter for queries successfully migrated
+            </summary>
+        </member>
+        <member name="F:VstsSyncMigrator.Engine.WorkItemQueryMigrationContext.totalQueriesSkipped">
+            <summary>
+            Counter for queries skipped
+            </summary>
+        </member>
+        <member name="F:VstsSyncMigrator.Engine.WorkItemQueryMigrationContext.totalQueryFailed">
+            <summary>
+            Counter for the queries that failed migration
+            </summary>
+        </member>
+        <member name="M:VstsSyncMigrator.Engine.WorkItemQueryMigrationContext.MigrateFolder(Microsoft.TeamFoundation.WorkItemTracking.Client.QueryHierarchy,Microsoft.TeamFoundation.WorkItemTracking.Client.QueryFolder,Microsoft.TeamFoundation.WorkItemTracking.Client.QueryFolder)">
+            <summary>
+            Define Query Folders under the current parent
+            </summary>
+            <param name="targetHierarchy">The object that represents the whole of the target query tree</param>
+            <param name="sourceFolder">The source folder in tree on source instance</param>
+            <param name="parentFolder">The target folder in tree on target instance</param>
+        </member>
+        <member name="M:VstsSyncMigrator.Engine.WorkItemQueryMigrationContext.MigrateQuery(Microsoft.TeamFoundation.WorkItemTracking.Client.QueryHierarchy,Microsoft.TeamFoundation.WorkItemTracking.Client.QueryDefinition,Microsoft.TeamFoundation.WorkItemTracking.Client.QueryFolder)">
+            <summary>
+            Add Query Definition under a specific Query Folder.
+            </summary>
+            <param name="targetHierarchy">The object that represents the whole of the target query tree</param>
+            <param name="query">Query Definition - Contains the Query Details</param>
+            <param name="QueryFolder">Parent Folder</param>
+        </member>
+    </members>
+</doc>

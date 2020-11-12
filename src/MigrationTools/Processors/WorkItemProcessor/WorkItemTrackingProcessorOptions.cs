@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using MigrationTools.Enrichers;
 
 namespace MigrationTools.Processors
 {
@@ -29,6 +31,10 @@ namespace MigrationTools.Processors
             //    new InMemoryWorkItemEndpointOptions { Direction = EndpointDirection.Source },
             //    new InMemoryWorkItemEndpointOptions { Direction = EndpointDirection.Target }
             //    };
+            ProcessorEnrichers = new List<IProcessorEnricherOptions>() {
+                { new PauseAfterEachItemOptions { Enabled = true } },
+                { new AppendMigrationToolSignatureFooterOptions { Enabled = true } }
+            };
         }
     }
 }

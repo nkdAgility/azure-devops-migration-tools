@@ -1,19 +1,18 @@
-## Processors: TfsTeamSettingsProcessor
+## Processors: TfsSharedQueryProcessor
 
 >**_This documentation is for a preview version of the Azure DevOps Migration Tools._ If you are not using the preview version then please head over to the main [documentation](https://nkdagility.github.io/azure-devops-migration-tools).**
 
-[Overview](.././index.md) > [Reference](../index.md) > [Processors](./index.md) > **TfsTeamSettingsProcessor**
+[Overview](.././index.md) > [Reference](../index.md) > [Processors](./index.md) > **TfsSharedQueryProcessor**
 
-Native TFS Processor, does not work with any other Endpoints.
+The TfsSharedQueryProcessor enabled you to migrate queries from one locatio nto another.
 
 ### Options
 
 | Parameter name         | Type    | Description                              | Default Value                            |
 |------------------------|---------|------------------------------------------|------------------------------------------|
-| MigrateTeamSettings | Boolean | missng XML code comments | missng XML code comments |
-| UpdateTeamSettings | Boolean | missng XML code comments | missng XML code comments |
-| PrefixProjectToNodes | Boolean | missng XML code comments | missng XML code comments |
-| Teams | List | missng XML code comments | missng XML code comments |
+| PrefixProjectToNodes | Boolean | Do we add the source project name into the folder path | false |
+| SharedFolderName | String | The name of the shared folder, made a parameter incase it every needs to be edited | Shared Queries |
+| SourceToTargetFieldMappings | Dictionary`2 | Mapping of the source to the target | missng XML code comments |
 | Processor | String | missng XML code comments | missng XML code comments |
 | ToConfigure | Type | missng XML code comments | missng XML code comments |
 | Enabled | Boolean | Active the processor if it true. | missng XML code comments |
@@ -25,11 +24,10 @@ Native TFS Processor, does not work with any other Endpoints.
 
 ```JSON
 {
-  "ObjectType": "TfsTeamSettingsProcessorOptions",
-  "MigrateTeamSettings": true,
-  "UpdateTeamSettings": true,
+  "ObjectType": "TfsSharedQueryProcessorOptions",
   "PrefixProjectToNodes": false,
-  "Teams": null,
+  "SharedFolderName": "Shared Queries",
+  "SourceToTargetFieldMappings": null,
   "Enabled": false,
   "Endpoints": [
     {

@@ -21,7 +21,7 @@ namespace MigrationTools.Endpoints
         public string ReflectedWorkItemIdField => _Options.ReflectedWorkItemIdField;
         public AuthenticationMode AuthenticationMode => _Options.AuthenticationMode;
 
-        protected TfsTeamProjectCollection TfsCollection
+        internal TfsTeamProjectCollection TfsCollection
         {
             get
             {
@@ -29,7 +29,7 @@ namespace MigrationTools.Endpoints
             }
         }
 
-        protected WorkItemStore TfsStore
+        internal WorkItemStore TfsStore
         {
             get
             {
@@ -37,7 +37,7 @@ namespace MigrationTools.Endpoints
             }
         }
 
-        protected Project TfsProject
+        internal Project TfsProject
         {
             get { return GetTfsProject(); }
         }

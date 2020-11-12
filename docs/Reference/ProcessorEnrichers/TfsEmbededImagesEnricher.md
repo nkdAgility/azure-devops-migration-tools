@@ -4,9 +4,13 @@
 
 [Overview](.././index.md) > [Reference](../index.md) > [ProcessorEnrichers](./index.md) > **TfsEmbededImagesEnricher**
 
-No description, create a template
+missng XML code comments
+
+### Options
 
 Options not yet implmeneted
+
+### Example JSON
 
 ```JSON
 !No Support for V1

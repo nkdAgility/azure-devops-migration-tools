@@ -4,13 +4,17 @@
 
 [Overview](.././index.md) > [Reference](../index.md) > [ProcessorEnrichers](./index.md) > **SkipToFinalRevisedWorkItemType**
 
-No description, create a template
+missng XML code comments
 
-Property | Type
--------- | ----
-ToConfigure | Type
-Enabled | Boolean
+### Options
 
+| Parameter name         | Type    | Description                              | Default Value                            |
+|------------------------|---------|------------------------------------------|------------------------------------------|
+| ToConfigure | Type | missng XML code comments | missng XML code comments |
+| Enabled | Boolean | missng XML code comments | missng XML code comments |
+
+
+### Example JSON
 
 ```JSON
 {

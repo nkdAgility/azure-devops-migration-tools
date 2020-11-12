@@ -3,19 +3,13 @@
 
 >**_This documentation is for a preview version of the Azure DevOps Migration Tools._ If you are not using the preview version then please head over to the main [documentation](https://nkdagility.github.io/azure-devops-migration-tools).**
 
-[Overview](.././index.md) > [Reference](../index.md) > [Processors](./index.md) > Work Item Tracking Processor
+<Breadcrumbs>
 
-This processor is intended, with the aid of [ProcessorEnrichers](../ProcessorEnrichers/index.md), to allow the migration of Work Items between two [Endpoints](../Endpoints/index.md). 
+<Description>
 
 ### Properties
 
-Name | Type | Default | Description
------|------|---------|-------------
-Enabled | Boolean | true | Turns this processor on or off.
-collapseRevisions | Boolean | false
-ReplayRevisions | Boolean | true
-WorkItemCreateRetryLimit | Int | 5 | Number of retries when we get a 503 web error
-PrefixProjectToNodes | Boolean | false | Preixes the Source location to the catagorisation system of the target
+<Options>
 
 ### Supported Endpoints
 
@@ -37,14 +31,7 @@ PrefixProjectToNodes | Boolean | false | Preixes the Source location to the cata
 #### Minimum Options to run
 
 ```JSON
-    {
-      "ObjectType": "WorkItemMigrationProcessorOptions",
-      "Enabled": true,
-      "ReplayRevisions": true,
-      "PrefixProjectToNodes": false,
-      "CollapseRevisions": false,
-      "WorkItemCreateRetryLimit": 5,
-    }
+<ExampleJson>
 ```
 
 #### Full Example with Enpoints & Enrichers

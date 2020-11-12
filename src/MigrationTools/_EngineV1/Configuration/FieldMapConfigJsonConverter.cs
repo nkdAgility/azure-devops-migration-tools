@@ -5,7 +5,7 @@ using Newtonsoft.Json.Linq;
 
 namespace MigrationTools._EngineV1.Configuration
 {
-    public class FieldMapConfigJsonConverter : JsonOptionConvertor<IFieldMapConfig>
+    public class FieldMapConfigJsonConverter : JsonConvertor<IFieldMapConfig>
     {
         protected override IFieldMapConfig Create(Type objectType, JObject jObject)
         {

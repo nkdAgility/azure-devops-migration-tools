@@ -4,14 +4,18 @@
 
 [Overview](.././index.md) > [Reference](../index.md) > [ProcessorEnrichers](./index.md) > **FilterWorkItemsThatAlreadyExistInTarget**
 
-No description, create a template
+missng XML code comments
 
-Property | Type
--------- | ----
-Query | QueryOptions
-ToConfigure | Type
-Enabled | Boolean
+### Options
 
+| Parameter name         | Type    | Description                              | Default Value                            |
+|------------------------|---------|------------------------------------------|------------------------------------------|
+| Query | QueryOptions | missng XML code comments | missng XML code comments |
+| ToConfigure | Type | missng XML code comments | missng XML code comments |
+| Enabled | Boolean | missng XML code comments | missng XML code comments |
+
+
+### Example JSON
 
 ```JSON
 {

@@ -6,7 +6,7 @@
     },
     "init": {
       "commandName": "Project",
-      "commandLineArgs": "init"
+      "commandLineArgs": "init --options Fullv2"
     },
     "execute2": {
       "commandName": "Project",

@@ -6,7 +6,7 @@ using Serilog;
 
 namespace MigrationTools._EngineV1.Configuration
 {
-    public class ProcessorConfigJsonConverter : JsonOptionConvertor<IProcessorConfig>
+    public class ProcessorConfigJsonConverter : JsonConvertor<IProcessorConfig>
     {
         protected override IProcessorConfig Create(Type objectType, JObject jObject)
         {

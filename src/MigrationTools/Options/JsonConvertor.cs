@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace MigrationTools.Options
 {
-    public abstract class JsonOptionConvertor<T> : JsonConverter
+    public abstract class JsonConvertor<T> : JsonConverter
     {
         /// <summary>
         /// Create an instance of objectType, based properties in the JSON object
@@ -51,7 +52,7 @@ namespace MigrationTools.Options
             {
                 JObject o = (JObject)jt;
                 o.AddFirst(new JProperty("ObjectType", value.GetType().Name));
-                o.WriteTo(writer);
+                o.WriteTo(writer, serializer.Converters.ToArray());
             }
         }
     }
