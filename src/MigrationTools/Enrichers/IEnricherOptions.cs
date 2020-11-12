@@ -1,18 +1,12 @@
-﻿using System;
-using Newtonsoft.Json;
+﻿using MigrationTools.Options;
 
 namespace MigrationTools.Enrichers
 {
-    public interface IEnricherOptions
+    public interface IEnricherOptions : IOptions
     {
         /// <summary>
         /// Active the enricher if it true.
         /// </summary>
         bool Enabled { get; set; }
-
-        [JsonIgnoreAttribute]
-        public Type ToConfigure { get; }
-
-        void SetDefaults();
     }
 }

@@ -1,0 +1,10 @@
+{
+  "ObjectType": "WorkItemTrackingProcessorOptions",
+  "ReplayRevisions": true,
+  "PrefixProjectToNodes": false,
+  "CollapseRevisions": false,
+  "WorkItemCreateRetryLimit": 5,
+  "Enabled": true,
+  "Endpoints": null,
+  "Enrichers": null
+}

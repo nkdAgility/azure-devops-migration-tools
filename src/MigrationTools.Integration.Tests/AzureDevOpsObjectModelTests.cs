@@ -35,10 +35,10 @@ namespace MigrationTools.Integration.Tests
             Assert.AreEqual(ProcessingStatus.Complete, workItemMigrationProcessor.Status);
         }
 
-        private static WorkItemMigrationProcessorOptions GetConfigurationTfsToTfsNoEnrichers()
+        private static WorkItemTrackingProcessorOptions GetConfigurationTfsToTfsNoEnrichers()
         {
             // Tfs To Tfs
-            var migrationConfig = new WorkItemMigrationProcessorOptions()
+            var migrationConfig = new WorkItemTrackingProcessorOptions()
             {
                 Enabled = true,
                 CollapseRevisions = false,
@@ -54,9 +54,9 @@ namespace MigrationTools.Integration.Tests
             return migrationConfig;
         }
 
-        private static TfsWorkItemEndPointOptions GetTfsWorkItemEndPointOptions(EndpointDirection direction, string project)
+        private static TfsWorkItemEndpointOptions GetTfsWorkItemEndPointOptions(EndpointDirection direction, string project)
         {
-            return new TfsWorkItemEndPointOptions()
+            return new TfsWorkItemEndpointOptions()
             {
                 Direction = direction,
                 Organisation = "https://dev.azure.com/nkdagility-preview/",

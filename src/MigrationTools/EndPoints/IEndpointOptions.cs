@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using MigrationTools.EndpointEnrichers;
+using MigrationTools.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -13,16 +13,11 @@ namespace MigrationTools.Endpoints
         Target = 2
     }
 
-    public interface IEndpointOptions
+    public interface IEndpointOptions : IOptions
     {
         [JsonConverter(typeof(StringEnumConverter))]
         public EndpointDirection Direction { get; set; }
 
-        [JsonIgnoreAttribute]
-        public Type ToConfigure { get; }
-
         public List<IEndpointEnricherOptions> Enrichers { get; set; }
-
-        void SetDefaults();
     }
 }

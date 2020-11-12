@@ -9,12 +9,12 @@ using Newtonsoft.Json;
 
 namespace MigrationTools.Endpoints
 {
-    public class FileSystemWorkItemEndpoint : WorkItemEndpoint
+    public class FileSystemWorkItemEndpoint : Endpoint, IWorkItemSourceEndpoint, IWorkItemTargetEndpoint
     {
         private FileSystemWorkItemEndpointOptions _options;
         private List<WorkItemData> _innerList;
 
-        public FileSystemWorkItemEndpoint(EndpointEnricherContainer endpointEnrichers, System.IServiceProvider services, ITelemetryLogger telemetry, ILogger<WorkItemEndpoint> logger) : base(endpointEnrichers, services, telemetry, logger)
+        public FileSystemWorkItemEndpoint(EndpointEnricherContainer endpointEnrichers, System.IServiceProvider services, ITelemetryLogger telemetry, ILogger<Endpoint> logger) : base(endpointEnrichers, services, telemetry, logger)
         {
             _innerList = new List<WorkItemData>();
         }
@@ -44,7 +44,7 @@ namespace MigrationTools.Endpoints
             }
         }
 
-        public override void Filter(IEnumerable<WorkItemData> workItems)
+        public void Filter(IEnumerable<WorkItemData> workItems)
         {
             var ids = (from x in workItems.ToList() select x.Id);
             _innerList = (from x in _innerList
@@ -52,17 +52,17 @@ namespace MigrationTools.Endpoints
                           select x).ToList();
         }
 
-        public override IEnumerable<WorkItemData> GetWorkItems()
+        public IEnumerable<WorkItemData> GetWorkItems()
         {
             return _innerList;
         }
 
-        public override IEnumerable<WorkItemData> GetWorkItems(QueryOptions query)
+        public IEnumerable<WorkItemData> GetWorkItems(QueryOptions query)
         {
             return GetWorkItems();
         }
 
-        public override void PersistWorkItem(WorkItemData source)
+        public void PersistWorkItem(WorkItemData source)
         {
             var content = JsonConvert.SerializeObject(source, Formatting.Indented);
             var fileName = Path.Combine(_options.FileStore, string.Format("{0}.json", source.Id));

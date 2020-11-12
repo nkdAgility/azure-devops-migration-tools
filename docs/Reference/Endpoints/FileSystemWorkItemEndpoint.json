@@ -1,0 +1,6 @@
+{
+  "ObjectType": "FileSystemWorkItemEndpointOptions",
+  "FileStore": "c:\\temp\\Store",
+  "Direction": "Source",
+  "Enrichers": null
+}

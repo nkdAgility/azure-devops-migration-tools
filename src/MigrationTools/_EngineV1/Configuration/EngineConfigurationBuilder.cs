@@ -247,7 +247,7 @@ namespace MigrationTools._EngineV1.Configuration
                 Processors = new List<IProcessorConfig>(),
             };
             ec.Processors.Add(
-                new WorkItemMigrationProcessorOptions
+                new WorkItemTrackingProcessorOptions
                 {
                     Enabled = true,
                     CollapseRevisions = false,

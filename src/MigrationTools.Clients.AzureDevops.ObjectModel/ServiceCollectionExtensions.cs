@@ -6,6 +6,7 @@ using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
 using MigrationTools.FieldMaps.AzureDevops.ObjectModel;
 using MigrationTools.ProcessorEnrichers;
+using MigrationTools.Processors;
 
 namespace MigrationTools
 {
@@ -13,7 +14,13 @@ namespace MigrationTools
     {
         public static void AddMigrationToolServicesForClientAzureDevOpsObjectModel(this IServiceCollection context)
         {
-            context.AddTransient<TfsWorkItemEndPoint>();
+            // Generic Endpoint
+            context.AddTransient<TfsEndpoint>();
+            //TfsWorkItem
+            context.AddTransient<TfsWorkItemEndpoint>();
+            //TfsTeamSettings
+            context.AddTransient<TfsTeamSettingsEndpoint>();
+            context.AddTransient<TfsTeamSettingsProcessor>();
         }
 
         [Obsolete("This is the v1 Archtiecture, we are movign to V2", false)]

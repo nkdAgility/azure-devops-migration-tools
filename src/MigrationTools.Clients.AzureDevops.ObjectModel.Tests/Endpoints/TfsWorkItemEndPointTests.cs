@@ -22,7 +22,7 @@ namespace MigrationTools.Endpoints.Tests
         [TestMethod(), TestCategory("L3")]
         public void TfsWorkItemEndPointTest()
         {
-            var endpoint = Services.GetRequiredService<TfsWorkItemEndPoint>();
+            var endpoint = Services.GetRequiredService<TfsWorkItemEndpoint>();
             endpoint.Configure(GetTfsWorkItemEndPointOptions(EndpointDirection.Source, "migrationSource1"));
             endpoint.GetWorkItems();
             Assert.IsNotNull(endpoint);
@@ -31,7 +31,7 @@ namespace MigrationTools.Endpoints.Tests
         [TestMethod(), TestCategory("L3")]
         public void ConfigureTest()
         {
-            var endpoint = Services.GetRequiredService<TfsWorkItemEndPoint>();
+            var endpoint = Services.GetRequiredService<TfsWorkItemEndpoint>();
             endpoint.Configure(GetTfsWorkItemEndPointOptions(EndpointDirection.Source, "migrationSource1"));
             Assert.IsNotNull(endpoint);
         }
@@ -45,7 +45,7 @@ namespace MigrationTools.Endpoints.Tests
         [TestMethod(), TestCategory("L3")]
         public void GetWorkItemsTest()
         {
-            var endpoint = Services.GetRequiredService<TfsWorkItemEndPoint>();
+            var endpoint = Services.GetRequiredService<TfsWorkItemEndpoint>();
             endpoint.Configure(GetTfsWorkItemEndPointOptions(EndpointDirection.Source, "migrationSource1"));
             IEnumerable<WorkItemData> result = endpoint.GetWorkItems();
             Assert.AreEqual(5, result.Count());
@@ -54,7 +54,7 @@ namespace MigrationTools.Endpoints.Tests
         [TestMethod(), TestCategory("L3")]
         public void GetWorkItemsQueryTest()
         {
-            var endpoint = Services.GetRequiredService<TfsWorkItemEndPoint>();
+            TfsWorkItemEndpoint endpoint = Services.GetRequiredService<TfsWorkItemEndpoint>();
             endpoint.Configure(GetTfsWorkItemEndPointOptions(EndpointDirection.Source, "migrationSource1"));
             QueryOptions qo = new QueryOptions()
             {
@@ -71,9 +71,9 @@ namespace MigrationTools.Endpoints.Tests
         //    Assert.Fail();
         //}
 
-        private static TfsWorkItemEndPointOptions GetTfsWorkItemEndPointOptions(EndpointDirection direction, string project)
+        private static TfsWorkItemEndpointOptions GetTfsWorkItemEndPointOptions(EndpointDirection direction, string project)
         {
-            return new TfsWorkItemEndPointOptions()
+            return new TfsWorkItemEndpointOptions()
             {
                 Direction = direction,
                 Organisation = "https://dev.azure.com/nkdagility-preview/",

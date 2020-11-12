@@ -16,6 +16,9 @@ namespace MigrationTools.Endpoints
 
         public List<IEndpointEnricherOptions> Enrichers { get; set; }
 
-        public abstract void SetDefaults();
+        public virtual void SetDefaults()
+        {
+            Direction = EndpointDirection.Source;
+        }
     }
 }

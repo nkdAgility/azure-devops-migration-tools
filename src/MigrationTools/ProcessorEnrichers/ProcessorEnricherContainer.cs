@@ -9,6 +9,8 @@ namespace MigrationTools.Enrichers
 {
     public class ProcessorEnricherContainer : List<IProcessorEnricher>
     {
+        private bool _Configured;
+
         public ProcessorEnricherContainer(IServiceProvider services, ITelemetryLogger telemetry, ILogger<ProcessorEnricherContainer> logger)
         {
             Services = services;
@@ -22,6 +24,12 @@ namespace MigrationTools.Enrichers
 
         public void ConfigureEnrichers(List<ProcessorEnricherOptions> enrichers)
         {
+            Log.LogDebug("ProcessorEnricherContainer::ConfigureEnrichers");
+            if (_Configured)
+            {
+                Log.LogError("ProcessorEnricherContainer::ConfigureEnrichers: You cant configure enrichers twice");
+                throw new Exception("You cant configure enrichers twice");
+            }
             if (enrichers is null)
             {
                 Log.LogWarning("No Enrichers have been Configured");
@@ -36,6 +44,7 @@ namespace MigrationTools.Enrichers
                     Log.LogInformation("Loading Processor Enricher: {ProcessorEnricherName} {ProcessorEnricherEnabled}", pe.GetType().Name, item.Enabled);
                 }
             }
+            _Configured = true;
         }
 
         internal void ProcessorExecutionAfterProcessWorkItem(IProcessor processor, WorkItemData workitem)

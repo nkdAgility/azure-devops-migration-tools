@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using MigrationTools.Endpoints;
 
-namespace MigrationTools.EndPoints
+namespace MigrationTools.Endpoints
 {
     public class EndpointContainer : List<IEndpoint>
     {
+        private bool _Configured;
+
         public EndpointContainer(IServiceProvider services, ITelemetryLogger telemetry, ILogger<EndpointContainer> logger)
         {
             Services = services;
@@ -25,7 +26,7 @@ namespace MigrationTools.EndPoints
 
         public void ConfigureEndpoint(IEndpointOptions endpointOptions)
         {
-            var ep = (IWorkItemEndPoint)Services.GetRequiredService(endpointOptions.ToConfigure);
+            var ep = (IEndpoint)Services.GetRequiredService(endpointOptions.ToConfigure);
             ep.Configure(endpointOptions);
             Add(ep);
             Log.LogInformation("ConfigureEndpoint: {EndPointName} {Direction} : Enrichers{EnrichersCount}: {EnrichersList} ", ep.GetType().Name, endpointOptions.Direction, endpointOptions.Enrichers?.Count, endpointOptions.Enrichers?.Select(x => x.GetType().Name));
@@ -33,6 +34,12 @@ namespace MigrationTools.EndPoints
 
         public void ConfigureEndpoints(List<IEndpointOptions> endpoints, bool sourceRequired = true, bool targetRequired = true)
         {
+            Log.LogDebug("EndpointContainer::ConfigureEndpoints");
+            if (_Configured)
+            {
+                Log.LogError("EndpointContainer::ConfigureEndpoints: You cant configure Endpoints twice");
+                throw new Exception("You cant configure Endpoints twice");
+            }
             if (endpoints is null)
             {
                 Log.LogWarning("ConfigureEndpoints: No Endpoints have been Configured");
@@ -46,6 +53,7 @@ namespace MigrationTools.EndPoints
                     ConfigureEndpoint(item);
                 }
             }
+            _Configured = true;
         }
 
         public IEndpoint GetDirection(EndpointDirection direction)

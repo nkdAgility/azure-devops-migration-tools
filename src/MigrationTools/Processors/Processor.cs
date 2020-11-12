@@ -4,16 +4,18 @@ using System.Diagnostics;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using MigrationTools._EngineV1.Configuration;
-using MigrationTools.EndPoints;
+using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
 
 namespace MigrationTools.Processors
 {
     public abstract class Processor : IProcessor
     {
+        private bool _ProcessorConfigured;
+
         public Processor(
-            ProcessorEnricherContainer processorEnricherContainer,
-            EndpointContainer endpointContainer,
+            ProcessorEnricherContainer processorEnrichers,
+            EndpointContainer endpoints,
             IServiceProvider services,
             ITelemetryLogger telemetry,
             ILogger<Processor> logger)
@@ -21,8 +23,8 @@ namespace MigrationTools.Processors
             Services = services;
             Telemetry = telemetry;
             Log = logger;
-            Endpoints = endpointContainer;
-            ProcessorEnrichers = processorEnricherContainer;
+            Endpoints = endpoints;
+            ProcessorEnrichers = processorEnrichers;
         }
 
         public EndpointContainer Endpoints { get; }
@@ -36,7 +38,15 @@ namespace MigrationTools.Processors
         protected ITelemetryLogger Telemetry { get; }
         protected ILogger<Processor> Log { get; }
 
-        public abstract void Configure(IProcessorOptions config);
+        public bool SupportsProcessorEnrichers => false;
+
+        public virtual void Configure(IProcessorOptions options)
+        {
+            Log.LogInformation("Processor::Configure");
+            Endpoints.ConfigureEndpoints(options.Endpoints);
+            ProcessorEnrichers.ConfigureEnrichers(options.Enrichers);
+            _ProcessorConfigured = true;
+        }
 
         public void Configure(IProcessorConfig config)
         {
@@ -52,6 +62,11 @@ namespace MigrationTools.Processors
             //////////////////////////////////////////////////
             try
             {
+                if (!_ProcessorConfigured)
+                {
+                    Log.LogError("Processor::Execute: Processer base has not been configured.");
+                    throw new InvalidOperationException("Processer base has not been configured.");
+                }
                 Status = ProcessingStatus.Running;
                 InternalExecute();
                 Status = ProcessingStatus.Complete;
