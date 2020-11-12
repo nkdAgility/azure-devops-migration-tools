@@ -119,9 +119,9 @@ The new processor configuration is designed to allow the Migration Tools to supp
 
 |Processor | Status |Target |Usage |
 |---------|---------|---------|---------|
-|[WorkItemMigration](./Reference/Processors/WorkItemTrackingProcessor.md) | alfa | Work Items | Migrates either tip or history of work items with Links & Attachments based on a query with field mappings |
-|[TeamMigration](./Reference/Processors/TfsTeamSettingsProcessor.md) | preview | Teams | Migrates Teams and Team Settings |
-
+|[WorkItemTrackingProcessor](./Reference/Processors/WorkItemTrackingProcessor.md) | alfa | Work Items | Migrates either tip or history of work items with Links & Attachments based on a query with field mappings |
+|[TfsTeamSettingsProcessor](./Reference/Processors/TfsTeamSettingsProcessor.md) | preview | Teams | Migrates Teams and Team Settings |
+|[TfsSharedQueryProcessor](./Reference/Processors/TfsTeamSettingsProcessor.md) | preview | Shared Queries | Moved Shared Queries best effort |
 
 ### Field Maps
 

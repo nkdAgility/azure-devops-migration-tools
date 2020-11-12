@@ -6,13 +6,17 @@
 
 No description, create a template
 
-Property | Type
--------- | ----
-FileStore | String
-ToConfigure | Type
-Direction | EndpointDirection
-Enrichers | List`1
+### Options
 
+| Parameter name         | Type    | Description                              | Default Value                            |
+|------------------------|---------|------------------------------------------|------------------------------------------|
+| FileStore | String | {Description} | {Default Value} |
+| ToConfigure | Type | {Description} | {Default Value} |
+| Direction | EndpointDirection | {Description} | {Default Value} |
+| Enrichers | List | {Description} | {Default Value} |
+
+
+### Example JSON
 
 ```JSON
 {

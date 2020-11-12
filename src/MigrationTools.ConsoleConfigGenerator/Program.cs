@@ -48,7 +48,7 @@ namespace VstsSyncMigrator.ConsoleApp
 
         private static void Process(List<Type> types, Type type, string folder)
         {
-            string referencePath = "../../../../../docs/v2/Reference/";
+            string referencePath = "../../../../../docs/Reference/";
             string masterTemplate = System.IO.Path.Combine(referencePath, "template.md");
             var founds = types.Where(t => type.IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface).ToList();
             foreach (var item in founds)
@@ -63,7 +63,7 @@ namespace VstsSyncMigrator.ConsoleApp
                 templatemd = templatemd.Replace("<Description>", "No description, create a template");
                 templatemd = ProcessOptions(types, item, templatemd);
                 templatemd = ProcessSamples(jsonSample, templatemd, referencePath);
-                File.WriteAllText(string.Format("../../../../../docs/v2/Reference/{0}/{1}.md", folder, item.Name), templatemd);
+                File.WriteAllText(string.Format("../../../../../docs/Reference/{0}/{1}.md", folder, item.Name), templatemd);
             }
         }
 
@@ -73,12 +73,12 @@ namespace VstsSyncMigrator.ConsoleApp
             StringBuilder options = new StringBuilder();
             if (!(typeOption is null))
             {
-                options.AppendLine("Property | Type");
-                options.AppendLine("-------- | ----");
+                options.AppendLine("| Parameter name         | Type    | Description                              | Default Value                            |");
+                options.AppendLine("|------------------------|---------|------------------------------------------|------------------------------------------|");
                 var propertys = typeOption.GetProperties();
                 foreach (PropertyInfo property in propertys)
                 {
-                    options.AppendLine(string.Format("{0} | {1}", property.Name, property.PropertyType.Name));
+                    options.AppendLine(string.Format("| {0} | {1} | {2} | {3} |", property.Name, property.PropertyType.Name.Replace("`1", ""), "{Description}", "{Default Value}"));
                 }
                 templatemd = templatemd.Replace("<Options>", options.ToString());
             }

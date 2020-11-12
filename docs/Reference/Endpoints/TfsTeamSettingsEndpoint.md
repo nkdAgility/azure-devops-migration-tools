@@ -6,20 +6,26 @@
 
 No description, create a template
 
-Property | Type
--------- | ----
-ToConfigure | Type
-AccessToken | String
-Organisation | String
-Project | String
-ReflectedWorkItemIdField | String
-Direction | EndpointDirection
-Enrichers | List`1
+### Options
 
+| Parameter name         | Type    | Description                              | Default Value                            |
+|------------------------|---------|------------------------------------------|------------------------------------------|
+| ToConfigure | Type | {Description} | {Default Value} |
+| AuthenticationMode | AuthenticationMode | {Description} | {Default Value} |
+| AccessToken | String | {Description} | {Default Value} |
+| Organisation | String | {Description} | {Default Value} |
+| Project | String | {Description} | {Default Value} |
+| ReflectedWorkItemIdField | String | {Description} | {Default Value} |
+| Direction | EndpointDirection | {Description} | {Default Value} |
+| Enrichers | List | {Description} | {Default Value} |
+
+
+### Example JSON
 
 ```JSON
 {
   "ObjectType": "TfsTeamSettingsEndpointOptions",
+  "AuthenticationMode": "AccessToken",
   "AccessToken": "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
   "Organisation": "https://dev.azure.com/nkdagility-preview/",
   "Project": "NeedToSetThis",

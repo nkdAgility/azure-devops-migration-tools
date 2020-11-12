@@ -1,8 +1,8 @@
-## Processors: TfsTeamSettingsProcessor
+## Processors: TfsSharedQueryProcessor
 
 >**_This documentation is for a preview version of the Azure DevOps Migration Tools._ If you are not using the preview version then please head over to the main [documentation](https://nkdagility.github.io/azure-devops-migration-tools).**
 
-[Overview](.././index.md) > [Reference](../index.md) > [Processors](./index.md) > **TfsTeamSettingsProcessor**
+[Overview](.././index.md) > [Reference](../index.md) > [Processors](./index.md) > **TfsSharedQueryProcessor**
 
 No description, create a template
 
@@ -10,10 +10,9 @@ No description, create a template
 
 | Parameter name         | Type    | Description                              | Default Value                            |
 |------------------------|---------|------------------------------------------|------------------------------------------|
-| MigrateTeamSettings | Boolean | {Description} | {Default Value} |
-| UpdateTeamSettings | Boolean | {Description} | {Default Value} |
 | PrefixProjectToNodes | Boolean | {Description} | {Default Value} |
-| Teams | List | {Description} | {Default Value} |
+| SharedFolderName | String | {Description} | {Default Value} |
+| SourceToTargetFieldMappings | Dictionary`2 | {Description} | {Default Value} |
 | Processor | String | {Description} | {Default Value} |
 | ToConfigure | Type | {Description} | {Default Value} |
 | Enabled | Boolean | {Description} | {Default Value} |
@@ -25,11 +24,10 @@ No description, create a template
 
 ```JSON
 {
-  "ObjectType": "TfsTeamSettingsProcessorOptions",
-  "MigrateTeamSettings": true,
-  "UpdateTeamSettings": true,
+  "ObjectType": "TfsSharedQueryProcessorOptions",
   "PrefixProjectToNodes": false,
-  "Teams": null,
+  "SharedFolderName": "Shared Queries",
+  "SourceToTargetFieldMappings": null,
   "Enabled": false,
   "Endpoints": [
     {

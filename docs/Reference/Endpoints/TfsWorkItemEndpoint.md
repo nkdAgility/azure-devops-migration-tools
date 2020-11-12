@@ -31,6 +31,7 @@ The `Direction` option is required to allow the system to set direction. At a mi
       "TeamProject": "migrationSource1"
     }
   },
+  "AuthenticationMode": "AccessToken",
   "AccessToken": "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
   "Organisation": "https://dev.azure.com/nkdagility-preview/",
   "Project": "NeedToSetThis",

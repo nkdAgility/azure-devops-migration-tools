@@ -6,12 +6,16 @@
 
 No description, create a template
 
-Property | Type
--------- | ----
-Query | QueryOptions
-ToConfigure | Type
-Enabled | Boolean
+### Options
 
+| Parameter name         | Type    | Description                              | Default Value                            |
+|------------------------|---------|------------------------------------------|------------------------------------------|
+| Query | QueryOptions | {Description} | {Default Value} |
+| ToConfigure | Type | {Description} | {Default Value} |
+| Enabled | Boolean | {Description} | {Default Value} |
+
+
+### Example JSON
 
 ```JSON
 {

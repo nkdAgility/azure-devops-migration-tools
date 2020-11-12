@@ -6,13 +6,17 @@
 
 No description, create a template
 
-Property | Type
--------- | ----
-ToConfigure | Type
-WorkingPath | String
-MaxSize | Int32
-Enabled | Boolean
+### Options
 
+| Parameter name         | Type    | Description                              | Default Value                            |
+|------------------------|---------|------------------------------------------|------------------------------------------|
+| ToConfigure | Type | {Description} | {Default Value} |
+| WorkingPath | String | {Description} | {Default Value} |
+| MaxSize | Int32 | {Description} | {Default Value} |
+| Enabled | Boolean | {Description} | {Default Value} |
+
+
+### Example JSON
 
 ```JSON
 {

@@ -10,6 +10,7 @@ Processor | Data Type | Description
 ----------|-----------|------------
 [WorkItemTrackingProcessor](./WorkItemTrackingProcessor.md) | Work Items | Migrated any number of work items, their revisions, links, & attcahments
 [TfsTeamSettingsProcessor](./TfsTeamSettingsProcessor.md) | Teams | Migrate Teams and Team Settings to a new environment
+[TfsSharedQueryProcessor](./TfsSharedQueryProcessor.md) | Shared Queries | Migrates all of the Shared Queries from one Project to Another.
 
 
 ### Processor Options

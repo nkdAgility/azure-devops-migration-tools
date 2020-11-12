@@ -6,7 +6,11 @@
 
 <Description>
 
+### Options
+
 <Options>
+
+### Example JSON
 
 ```JSON
 <ExampleJson>

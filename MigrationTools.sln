@@ -109,13 +109,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Clients.File
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Host.Tests", "src\MigrationTools.Host.Tests\MigrationTools.Host.Tests.csproj", "{6F51CE1D-FEBD-4F7F-A462-27A4745924F4}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "v2", "v2", "{A76BEFD1-2848-4A44-99D7-A4EAEB223597}"
-	ProjectSection(SolutionItems) = preProject
-		docs\v2\Architecture.md = docs\v2\Architecture.md
-		docs\v2\getting-started.md = docs\v2\getting-started.md
-		docs\v2\index.md = docs\v2\index.md
-	EndProjectSection
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Integration.Tests", "src\MigrationTools.Integration.Tests\MigrationTools.Integration.Tests.csproj", "{AADA5B89-83F9-45E4-B713-EA1FEB9EBC89}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Clients.AzureDevops.ObjectModel.Tests", "src\MigrationTools.Clients.AzureDevops.ObjectModel.Tests\MigrationTools.Clients.AzureDevops.ObjectModel.Tests.csproj", "{72FA4853-D840-480E-A6FD-670EF66E9D5B}"
@@ -222,7 +215,6 @@ Global
 		{504D6953-E83D-498D-A1C7-E511F14B9563} = {13FE9FE2-9C6E-4866-BBAD-106F5BF765F1}
 		{3191B594-1C3A-4245-8AFE-076EA142B778} = {13FE9FE2-9C6E-4866-BBAD-106F5BF765F1}
 		{6F51CE1D-FEBD-4F7F-A462-27A4745924F4} = {5C05DA7B-B70F-4A87-920B-DCD14EA7670D}
-		{A76BEFD1-2848-4A44-99D7-A4EAEB223597} = {2BC0808B-6F4D-4635-82FE-1118181DD64F}
 		{AADA5B89-83F9-45E4-B713-EA1FEB9EBC89} = {5C05DA7B-B70F-4A87-920B-DCD14EA7670D}
 		{72FA4853-D840-480E-A6FD-670EF66E9D5B} = {13FE9FE2-9C6E-4866-BBAD-106F5BF765F1}
 		{B64B19C7-BD17-4B2A-83E6-B33B3D73B078} = {D0EE5917-21B2-49FA-9506-69857EE82DCD}
