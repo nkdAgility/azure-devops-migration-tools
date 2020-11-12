@@ -8,6 +8,7 @@ using MigrationTools._EngineV1.Configuration.FieldMap;
 using MigrationTools._EngineV1.Configuration.Processing;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
+using MigrationTools.Options;
 using MigrationTools.Processors;
 using Newtonsoft.Json;
 using Serilog.Events;
@@ -254,8 +255,8 @@ namespace MigrationTools._EngineV1.Configuration
                     PrefixProjectToNodes = false,
                     ReplayRevisions = true,
                     WorkItemCreateRetryLimit = 5,
-                    ProcessorEnrichers = GetAllEnricherOptions<IProcessorEnricherOptions>(),
-                    Endpoints = GetAllEndpointOptions<IEndpointOptions>()
+                    ProcessorEnrichers = GetAllTypes<IProcessorEnricherOptions>(),
+                    Endpoints = GetAllTypes<IEndpointOptions>()
                 });
             return ec;
         }
@@ -265,28 +266,15 @@ namespace MigrationTools._EngineV1.Configuration
             throw new NotImplementedException();
         }
 
-        private List<TInterfaceToFind> GetAllEnricherOptions<TInterfaceToFind>() where TInterfaceToFind : IEnricherOptions
+        private List<TInterfaceToFind> GetAllTypes<TInterfaceToFind>() where TInterfaceToFind : IOptions
         {
+            AppDomain.CurrentDomain.Load("MigrationTools");
+            AppDomain.CurrentDomain.Load("MigrationTools.Clients.AzureDevops.ObjectModel");
+            AppDomain.CurrentDomain.Load("MigrationTools.Clients.FileSystem");
             List<Type> types = AppDomain.CurrentDomain.GetAssemblies()
-              .Where(a => !a.IsDynamic)
+              .Where(a => a.FullName.StartsWith("MigrationTools"))
               .SelectMany(a => a.GetTypes())
-              .Where(t => t.IsAssignableFrom(typeof(TInterfaceToFind))).ToList();
-            List<TInterfaceToFind> output = new List<TInterfaceToFind>();
-            foreach (Type type in types)
-            {
-                TInterfaceToFind option = (TInterfaceToFind)Activator.CreateInstance(type);
-                option.SetDefaults();
-                output.Add(option);
-            }
-            return output;
-        }
-
-        private List<TInterfaceToFind> GetAllEndpointOptions<TInterfaceToFind>() where TInterfaceToFind : IEndpointOptions
-        {
-            List<Type> types = AppDomain.CurrentDomain.GetAssemblies()
-              .Where(a => !a.IsDynamic)
-              .SelectMany(a => a.GetTypes())
-              .Where(t => t.IsAssignableFrom(typeof(TInterfaceToFind))).ToList();
+              .Where(t => typeof(TInterfaceToFind).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract && t.Name != "Object").ToList();
             List<TInterfaceToFind> output = new List<TInterfaceToFind>();
             foreach (Type type in types)
             {
