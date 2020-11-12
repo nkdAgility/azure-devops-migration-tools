@@ -103,12 +103,16 @@ namespace MigrationTools.Processors
                                 }
                                 else
                                 {
-                                    targetConfig.TeamSettings.BacklogIterationPath = sourceConfig.TeamSettings.BacklogIterationPath;
+                                    targetConfig.TeamSettings.BacklogIterationPath = sourceConfig.TeamSettings.BacklogIterationPath.Replace(Source.Project, Target.Project);
                                     Log.LogDebug("targetConfig.TeamSettings.BacklogIterationPath={BacklogIterationPath}", targetConfig.TeamSettings.BacklogIterationPath);
-                                    targetConfig.TeamSettings.IterationPaths = sourceConfig.TeamSettings.IterationPaths;
-                                    Log.LogDebug("targetConfig.TeamSettings.IterationPaths={@IterationPaths}", sourceConfig.TeamSettings.IterationPaths);
+                                    targetConfig.TeamSettings.IterationPaths = sourceConfig.TeamSettings.IterationPaths.Select(ip => ip.Replace(Source.Project, Target.Project)).ToArray();
+                                    Log.LogDebug("targetConfig.TeamSettings.IterationPaths={@IterationPaths}", targetConfig.TeamSettings.IterationPaths);
                                     targetConfig.TeamSettings.TeamFieldValues = sourceConfig.TeamSettings.TeamFieldValues;
-                                    Log.LogDebug("targetConfig.TeamSettings.TeamFieldValues={@TeamFieldValues}", sourceConfig.TeamSettings.TeamFieldValues);
+                                    foreach (var item in targetConfig.TeamSettings.TeamFieldValues)
+                                    {
+                                        item.Value = item.Value.Replace(Source.Project, Target.Project);
+                                    }
+                                    Log.LogDebug("targetConfig.TeamSettings.TeamFieldValues={@TeamFieldValues}", targetConfig.TeamSettings.TeamFieldValues);
                                 }
 
                                 Target.TfsTeamSettingsService.SetTeamSettings(targetConfig.TeamId, targetConfig.TeamSettings);
