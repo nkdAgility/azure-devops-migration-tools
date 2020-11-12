@@ -254,7 +254,6 @@ namespace MigrationTools.Enrichers
                             wiTargetL.ToWorkItem().Links.Add(newRl);
                             if (_save)
                             {
-                                wiTargetL.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
                                 wiTargetL.SaveToAzureDevOps();
                             }
                         }
