@@ -5,6 +5,7 @@ using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.VisualStudio.Services.Common;
 using MigrationTools._EngineV1.Configuration;
+using MigrationTools.Endpoints;
 using Serilog;
 
 namespace MigrationTools._EngineV1.Clients
@@ -112,23 +113,35 @@ namespace MigrationTools._EngineV1.Clients
             TfsTeamProjectCollection y;
             try
             {
-                if (credentials != null)
+                Log.Information("TfsMigrationClient::GetDependantTfsCollection:AuthenticationMode({0})", _config.AuthenticationMode.ToString());
+                switch (_config.AuthenticationMode)
                 {
-                    Log.Information("TfsMigrationClient: Connecting with NetworkCredential passes on CommandLine ");
-                    _vssCredentials = new VssCredentials(new Microsoft.VisualStudio.Services.Common.WindowsCredential(credentials));
-                }
-                else if (!string.IsNullOrEmpty(TfsConfig.PersonalAccessToken))
-                {
-                    Log.Information("TfsMigrationClient: Connecting with PAT token ");
-                    _vssCredentials = new VssBasicCredential(string.Empty, TfsConfig.PersonalAccessToken);
-                }
-                else
-                {
-                    Log.Information("TfsMigrationClient: Connecting with PAT token ");
-                    _vssCredentials = new VssCredentials();
-                }
+                    case AuthenticationMode.AccessToken:
+                        Log.Information("TfsMigrationClient::GetDependantTfsCollection: Connecting with AccessToken ");
+                        _vssCredentials = new VssBasicCredential(string.Empty, TfsConfig.PersonalAccessToken);
+                        y = new TfsTeamProjectCollection(TfsConfig.Collection, _vssCredentials);
+                        break;
 
-                y = new TfsTeamProjectCollection(TfsConfig.Collection, _vssCredentials);
+                    case AuthenticationMode.Windows:
+                        Log.Information("TfsMigrationClient::GetDependantTfsCollection: Connecting with NetworkCredential passes on CommandLine ");
+                        if (credentials is null)
+                        {
+                            throw new InvalidOperationException("If AuthenticationMode = Windows then you must pass credentails on the command line.");
+                        }
+                        _vssCredentials = new VssCredentials(new Microsoft.VisualStudio.Services.Common.WindowsCredential(credentials));
+                        y = new TfsTeamProjectCollection(TfsConfig.Collection, _vssCredentials);
+                        break;
+
+                    case AuthenticationMode.Prompt:
+                        Log.Information("TfsMigrationClient::GetDependantTfsCollection: Prompting for credentials ");
+                        y = new TfsTeamProjectCollection(TfsConfig.Collection);
+                        break;
+
+                    default:
+                        Log.Information("TfsMigrationClient::GetDependantTfsCollection: Setting _vssCredentials to Null ");
+                        y = new TfsTeamProjectCollection(TfsConfig.Collection);
+                        break;
+                }
                 Log.Information("MigrationClient: Connecting to {CollectionUrl} ", TfsConfig.Collection);
                 Log.Information("MigrationClient: validating security for {@AuthorizedIdentity} ", y.AuthorizedIdentity);
                 y.EnsureAuthenticated();

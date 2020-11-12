@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools;
 using MigrationTools._EngineV1.Clients;
 using MigrationTools._EngineV1.Configuration;
@@ -64,8 +65,15 @@ namespace VstsSyncMigrator.Engine
 
                 foreach (int begone in tobegone)
                 {
-                    ((TfsWorkItemMigrationClient)Engine.Target.WorkItems).Store.DestroyWorkItems(new List<int>() { begone });
-                    Log.LogInformation("Deleted {0}", begone);
+                    ICollection<WorkItemOperationError> err = ((TfsWorkItemMigrationClient)Engine.Target.WorkItems).Store.DestroyWorkItems(new List<int>() { begone });
+                    if (err.Count > 0)
+                    {
+                        Log.LogInformation("Delete Failed: {0}", err.First().Exception.ToString());
+                    }
+                    else
+                    {
+                        Log.LogInformation("Deleted {0}", begone);
+                    }
                 }
             }
             else

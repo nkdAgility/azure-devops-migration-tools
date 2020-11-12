@@ -1,5 +1,8 @@
 ﻿using System;
 using MigrationTools.Configuration;
+using MigrationTools.Endpoints;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace MigrationTools._EngineV1.Configuration
 {
@@ -9,6 +12,10 @@ namespace MigrationTools._EngineV1.Configuration
         public string Project { get; set; }
         public string ReflectedWorkItemIDFieldName { get; set; }
         public bool AllowCrossProjectLinking { get; set; }
+
+        [JsonConverter(typeof(StringEnumConverter))]
+        public AuthenticationMode AuthenticationMode { get; set; }
+
         public string PersonalAccessToken { get; set; }
         public LanguageMaps LanguageMaps { get; set; }
 
@@ -19,6 +26,7 @@ namespace MigrationTools._EngineV1.Configuration
             Collection = new Uri("https://dev.azure.com/nkdagility-preview/");
             ReflectedWorkItemIDFieldName = "Custom.ReflectedWorkItemId";
             PersonalAccessToken = "";
+            AuthenticationMode = AuthenticationMode.Prompt;
             LanguageMaps = new LanguageMaps() { AreaPath = "Area", IterationPath = "Iteration" };
             return this;
         }

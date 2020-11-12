@@ -127,19 +127,25 @@ namespace MigrationTools.Endpoints
                 VssCredentials vssCredentials;
                 try
                 {
-                    if (!string.IsNullOrEmpty(_Options.AccessToken))
+                    Log.LogDebug("TfsWorkItemEndPoint::GetTfsCollection:AuthenticationMode({0})", _Options.AuthenticationMode.ToString());
+                    switch (_Options.AuthenticationMode)
                     {
-                        Log.LogDebug("TfsWorkItemEndPoint::GetTfsCollection: Using PAT Authentication ", _Options.Organisation);
-                        vssCredentials = new VssBasicCredential(string.Empty, _Options.AccessToken);
+                        case AuthenticationMode.AccessToken:
+                            Log.LogDebug("TfsWorkItemEndPoint::GetTfsCollection: Connecting Using PAT Authentication ", _Options.Organisation);
+                            vssCredentials = new VssBasicCredential(string.Empty, _Options.AccessToken);
+                            _Collection = new TfsTeamProjectCollection(new Uri(_Options.Organisation), vssCredentials);
+                            break;
+
+                        case AuthenticationMode.Prompt:
+                            Log.LogDebug("TfsWorkItemEndPoint::EnsureDataSource: Connecting Using Interactive Authentication ", _Options.Organisation);
+                            _Collection = new TfsTeamProjectCollection(new Uri(_Options.Organisation));
+                            break;
+
+                        default:
+                            Log.LogDebug("TfsWorkItemEndPoint::EnsureDataSource: Connecting Using Interactive Authentication ", _Options.Organisation);
+                            _Collection = new TfsTeamProjectCollection(new Uri(_Options.Organisation));
+                            break;
                     }
-                    else
-                    {
-                        Log.LogDebug("TfsWorkItemEndPoint::EnsureDataSource: Using Interactive Authentication ", _Options.Organisation);
-                        vssCredentials = new VssCredentials();
-                    }
-                    Log.LogDebug(Microsoft.TeamFoundation.Framework.Common.LocationServiceConstants.ApplicationLocationServiceIdentifier.ToString());
-                    Log.LogDebug("TfsWorkItemEndPoint::GetTfsCollection: Connecting to {CollectionUrl} ", _Options.Organisation);
-                    _Collection = new TfsTeamProjectCollection(new Uri(_Options.Organisation), vssCredentials);
                     Log.LogDebug("TfsWorkItemEndPoint::GetTfsCollection: Connected ");
                     Log.LogDebug("TfsWorkItemEndPoint::GetTfsCollection: validating security for {@AuthorizedIdentity} ", _Collection.AuthorizedIdentity);
                     _Collection.EnsureAuthenticated();
