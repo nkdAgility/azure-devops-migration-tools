@@ -91,6 +91,7 @@ namespace MigrationTools.Processors.Tests
                 Direction = direction,
                 Organisation = "https://dev.azure.com/nkdagility-preview/",
                 Project = project,
+                AuthenticationMode = AuthenticationMode.AccessToken,
                 AccessToken = "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
             };
         }
