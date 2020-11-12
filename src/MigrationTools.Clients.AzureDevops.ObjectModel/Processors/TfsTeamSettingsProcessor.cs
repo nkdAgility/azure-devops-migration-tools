@@ -54,6 +54,12 @@ namespace MigrationTools.Processors
             int count = 0;
             long elapsedms = 0;
 
+            /////////
+            ///
+            if (_Options.Teams != null)
+            {
+                sourceTeams = sourceTeams.Where(t => _Options.Teams.Contains(t.Name)).ToList();
+            }
             /// Create teams
             ///
             foreach (TeamFoundationTeam sourceTeam in sourceTeams)

@@ -9,6 +9,8 @@ We provide a number of Processors that can be used to migrate diferent sorts of 
 Processor | Data Type | Description
 ----------|-----------|------------
 [WorkItemTrackingProcessor](./WorkItemTrackingProcessor.md) | Work Items | Migrated any number of work items, their revisions, links, & attcahments
+[TfsTeamSettingsProcessor](./TfsTeamSettingsProcessor.md) | Teams | Migrate Teams and Team Settings to a new environment
+
 
 ### Processor Options
 

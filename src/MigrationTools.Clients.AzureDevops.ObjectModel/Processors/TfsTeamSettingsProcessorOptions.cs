@@ -9,6 +9,8 @@ namespace MigrationTools.Processors
         public bool MigrateTeamSettings { get; set; }
         public bool UpdateTeamSettings { get; set; }
         public bool PrefixProjectToNodes { get; set; }
+        public List<string> Teams { get; set; }
+
         public override string Processor => nameof(ToConfigure);
 
         public override Type ToConfigure => typeof(WorkItemTrackingProcessor);

@@ -37,38 +37,45 @@ The Azure DevOps Migration Tools allow you to bulk edit and migrate data between
 
 ## Quick Links
 
- * [Video Overview](https://youtu.be/RCJsST0xBCE)
- * [Getting Started](./getting-started.md)
- * [Documentation](http://nkdagility.github.io/azure-devops-migration-tools/)
- * [Changeset Migration](./changeset-migration.md)
- * [Contributing](#contributing)
- * [Why](#why-does-this-exist)
- * [FAQ](./faq.md)
- * [Support](#support)
+ - [Video Overview](https://youtu.be/RCJsST0xBCE)
+ - [Getting Started](./getting-started.md)
+ - [FAQ](./faq.md)
+ - _!preview v2_ [How To Migrate Things](./HowTo/index.md)
+ - _!preview v2_ [Reference](./Reference/index.md)
 
-#### Quick Links [ PREVIEW ]
+
+
+#### Extras
 
 _This is a preview version of both the documentation and the Azure DevOps Migration Tools._
 
-- [Overview](./index.md)
-- [Getting Started](./getting-started.md)
-- [How To Migrate Things](./HowTo/index.md)
-- [Reference](./Reference/index.md)
+ - [Why](#why-does-this-exist)
+ - [FAQ](./faq.md)
+ - [Changeset Migration](./changeset-migration.md)
+ - [Contributing](#contributing)
 
-### External Walkthroughs and Reviews
+#### Reference: A Deep Dive
+
+  - _!preview v2_ [Reference](./Reference/index.md)
+  - _!preview v2_  [Processors](./Reference/Processors/index.md)
+  - _!preview v2_ [ProcessorEnrichers](./Reference/ProcessorEnrichers/index.md)
+  - _!preview v2_ [Endpoints](./Reference/Endpoints/index.md)
+  - _!preview v2_ [EndpointEnrichers](./Reference/EndpointEnrichers/index.md)
+
+#### External Walkthroughs and Reviews
 
  * [TFS 2017 Migration To VSTS with VSTS Sync Migrator from Mohamed Radwan](http://mohamedradwan.com/2017/09/15/tfs-2017-migration-to-vsts-with-vsts-sync-migrator/)
  * [Options migrating TFS to VSTS from Richard Fennell](https://blogs.blackmarble.co.uk/blogs/rfennell/post/2017/05/10/Options-migrating-TFS-to-VSTS)
  * [Migrating Test artifacts and all other work item types using the Azure DevOps from Gordon Beeming](https://youtu.be/jU6E0k0eXXw)
 
-## Getting the Tools
+#### Getting the Tools
 
 There are two ways to get these tools:
 
 * (recommended)[Install from Chocolatey](https://chocolatey.org/packages/vsts-sync-migrator/)
 * Download the [latest release from GitHub](https://github.com/nkdAgility/azure-devops-migration-tools/releases) and unzip
 
-## Getting Support
+#### Getting Support
 
 1. [Question on Stackoverflow](https://stackoverflow.com/questions/tagged/azure-devops-migration-tools) - The first place to look for unsage, configuration, and general help is on Stackoverflow. 
 1. [Issues on Gitbub](https://github.com/nkdAgility/azure-devops-migration-tools/issues)
@@ -115,13 +122,6 @@ The new processor configuration is designed to allow the Migration Tools to supp
 |[WorkItemMigration](./Reference/Processors/WorkItemTrackingProcessor.md) | alfa | Work Items | Migrates either tip or history of work items with Links & Attachments based on a query with field mappings |
 |[TeamMigration](./Reference/Processors/TfsTeamSettingsProcessor.md) | preview | Teams | Migrates Teams and Team Settings |
 
-#### Reference: A Deep Dive
-
-  - [Overview](./Reference/index.md)
-  - [Processors](./Reference/Processors/index.md)
-  - [ProcessorEnrichers](./Reference/ProcessorEnrichers/index.md)
-  - [Endpoints](./Reference/Endpoints/index.md)
-  - [EndpointEnrichers](./Reference/EndpointEnrichers/index.md)
 
 ### Field Maps
 

@@ -4,10 +4,20 @@
 
 [Overview](.././index.md) > [Reference](../index.md) > [Processors](./index.md) > **Tfs TeamSettings Processor**
 
-The Team Settings Processor will allow the migration and manipulation of the Teams within Azure DevOps. 
 
 <Options>
 
 ```JSON
 <ExampleJson>
+```
+
+### Filter by Teams 
+
+You can filter the list of teams using the "Teams" value. This will limit the migrated teams to only this list.
+
+```JSON
+"Teams": {
+    "Team 1",
+    "Team 2"
+}
 ```
