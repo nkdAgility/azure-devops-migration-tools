@@ -87,12 +87,12 @@ Most of these processors need to be run in order. If you try to migrate work ite
 |[WorkItemDelete](./Processors/WorkItemDeleteConfig.md) | ready | Work Items | Bulk delete of work items **WARNING DANGEROUS** |
 |[WorkItemUpdate](./Processors/WorkItemUpdateConfig.md) | ready | Work Items | Bulk update of Work Items based on a query and field mappings |
 |[WorkItemQueryMigration](./Processors/WorkItemQueryMigrationConfig.md) | ready | Queries | Migrates shared queries |
-|[TeamMigration](./Processors/TeamMigrationConfig.md) | Beta | Teams | Migrates Teams |
+|[TeamMigration](./v2/Reference/Processors/TfsTeamSettingsProcessor.md) | Beta | Teams | Migrates Teams |
 |[TestVariablesMigration](./Processors/TestVariablesMigrationConfig.md) | Beta | Suites & Plans | Migrates Test Variables |
 |[TestConfigurationsMigration](./Processors/TestConfigurationsMigrationConfig.md) | Beta  | Suites & Plans | Migrates Test configurations |
 |[TestPlansAndSuitesMigration](./Processors/TestPlansAndSuitesMigrationConfig.md) | Beta  | Suites & Plans | Rebuilds Suits and plans for Test Cases migrated using the WorkItemMigration |
 |[ImportProfilePicture](./Processors/ImportProfilePictureConfig) & ExportProfilePictureFromAD | Beta | Profiles | Downloads corporate images and updates TFS/Azure DevOps profiles |
-|[WorkItemUpdateAreasAsTags](](./Processors/WorkItemUpdateAreasAsTagsConfig) | Beta | Work Items | Adds tags to work items  to reflect area paths on source system |
+|[WorkItemUpdateAreasAsTags](./Processors/WorkItemUpdateAreasAsTagsConfig) | Beta | Work Items | Adds tags to work items  to reflect area paths on source system |
 |TestRunsMigration | Alfa | Suits & Plans | Migrates the history of Test Runs |
 |NodeStructuresMigration | merged | Area & Iteration | obsolete - merged into WorkItemMigration |
 |AttachementExportMigration | merged | Work Items | obsolete - merged into WorkItemMigration |
@@ -102,6 +102,18 @@ Most of these processors need to be run in order. If you try to migrate work ite
 |WorkItemRevisionReplayMigration | merged |  Work Items | obsolete - merged into WorkItemMigration |
 |GitCommitFix | merged | Git links | obsolete - merged into WorkItemMigration |
 |WorkItemUpdateConfig | merged | Work Items | obsolete - merged into WorkItemMigration |
+
+### Processors (v2 Architecture)
+
+**_These are experimental processors that should replace those above. We are intersted in feedback of the new foramt of the config, as well as the functionality._**
+
+The new processor configuration is designed to allow the Migration Tools to support diferent Source and targets than just TFS/Azure DevOps, and we moved the Endpoints to the processor to allow both Object Model & REST in different processors.
+
+|Processor | Status |Target |Usage |
+|---------|---------|---------|---------|
+|[WorkItemMigration](./v2/Reference/Processors/WorkItemTrackingProcessor.md) | alfa | Work Items | Migrates either tip or history of work items with Links & Attachments based on a query with field mappings |
+|[TeamMigration](./v2/Reference/Processors/TfsTeamSettingsProcessor.md) | preview | Teams | Migrates Teams and Team Settings |
+
 
 
 ### Field Maps
