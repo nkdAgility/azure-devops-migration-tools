@@ -21,17 +21,25 @@ namespace MigrationTools.ProcessorEnrichers
 
         public bool ValidatingRequiredField(string fieldToFind, List<_EngineV1.DataContracts.WorkItemData> sourceWorkItems)
         {
-            var workItemTypes = sourceWorkItems.Select(wid => wid.ToWorkItem().Type).Distinct();
+            var sourceWorkItemTypes = sourceWorkItems.Select(wid => wid.ToWorkItem().Type).Distinct();
+            var targetTypes = Engine.Target.WorkItems.Project.ToProject().WorkItemTypes;
             var result = true;
-            foreach (WorkItemType item in workItemTypes)
+            foreach (WorkItemType sourceWorkItemType in sourceWorkItemTypes)
             {
-                if (item.FieldDefinitions.Contains(fieldToFind))
+                var workItemTypeName = sourceWorkItemType.Name;
+                if (Engine.TypeDefinitionMaps.Items.ContainsKey(workItemTypeName))
                 {
-                    Log.LogDebug("ValidatingRequiredField: {WorkItemTypeName} contains {fieldToFind}", item.Name, fieldToFind);
+                    workItemTypeName = Engine.TypeDefinitionMaps.Items[workItemTypeName].Map();
+                }
+                var targetType = targetTypes[workItemTypeName];
+
+                if (targetType.FieldDefinitions.Contains(fieldToFind))
+                {
+                    Log.LogDebug("ValidatingRequiredField: {WorkItemTypeName} contains {fieldToFind}", targetType.Name, fieldToFind);
                 }
                 else
                 {
-                    Log.LogWarning("ValidatingRequiredField: {WorkItemTypeName} does not contain {fieldToFind}", item.Name, fieldToFind);
+                    Log.LogWarning("ValidatingRequiredField: {WorkItemTypeName} does not contain {fieldToFind}", targetType.Name, fieldToFind);
                     result = false;
                 }
             }
