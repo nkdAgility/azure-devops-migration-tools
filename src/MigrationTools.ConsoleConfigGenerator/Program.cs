@@ -10,9 +10,9 @@ using System.Xml.Linq;
 using MigrationTools.EndpointEnrichers;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
+using MigrationTools.Helpers;
 using MigrationTools.Options;
 using MigrationTools.Processors;
-using MigrationTools.Tests;
 
 namespace VstsSyncMigrator.ConsoleApp
 {
@@ -203,7 +203,7 @@ namespace VstsSyncMigrator.ConsoleApp
             {
                 var instance = (IOptions)Activator.CreateInstance(typeOption);
                 instance.SetDefaults();
-                json = TestHelpers.SaveObjectAsJson(instance);
+                json = NewtonsoftHelpers.SerializeObject(instance);
                 string jsonFilename = string.Format("{0}.json", item.Name);
                 string jsonFilePath = Path.Combine(referencePath, folder, jsonFilename);
                 File.WriteAllText(jsonFilePath, json);

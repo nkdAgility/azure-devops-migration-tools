@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
-using MigrationTools.Options;
-using Newtonsoft.Json;
 
 namespace MigrationTools.Processors
 {
@@ -15,7 +13,6 @@ namespace MigrationTools.Processors
         /// </summary>
         public bool Enabled { get; set; }
 
-        [JsonConverter(typeof(OptionsJsonConvertor))]
         public List<IEndpointOptions> Endpoints { get; set; }
 
         public List<IProcessorEnricherOptions> ProcessorEnrichers { get; set; }

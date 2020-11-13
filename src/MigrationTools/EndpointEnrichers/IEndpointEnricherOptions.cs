@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace MigrationTools.EndpointEnrichers
 {
-    [JsonConverter(typeof(OptionsJsonConvertor))]
+    [JsonConverter(typeof(OptionsJsonConvertor<IEndpointEnricherOptions>))]
     public interface IEndpointEnricherOptions : IEnricherOptions
     {
     }

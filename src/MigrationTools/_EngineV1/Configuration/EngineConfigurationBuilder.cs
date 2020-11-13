@@ -8,6 +8,7 @@ using MigrationTools._EngineV1.Configuration.FieldMap;
 using MigrationTools._EngineV1.Configuration.Processing;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
+using MigrationTools.Helpers;
 using MigrationTools.Options;
 using MigrationTools.Processors;
 using Newtonsoft.Json;
@@ -30,12 +31,7 @@ namespace MigrationTools._EngineV1.Configuration
             try
             {
                 string configurationjson = File.ReadAllText(configFile);
-                ec = JsonConvert.DeserializeObject<EngineConfiguration>(configurationjson,
-                        new FieldMapConfigJsonConverter(),
-                        new ProcessorConfigJsonConverter(),
-                        new JsonConverterForEndpointOptions(),
-                        new IOptionsJsonConvertor(),
-                        new MigrationClientConfigJsonConverter());
+                ec = NewtonsoftHelpers.DeserializeObject<EngineConfiguration>(configurationjson);
             }
             catch (JsonSerializationException ex)
             {

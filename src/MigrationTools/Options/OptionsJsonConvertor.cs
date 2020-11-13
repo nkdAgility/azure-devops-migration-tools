@@ -6,15 +6,15 @@ using Serilog;
 
 namespace MigrationTools.Options
 {
-    public class OptionsJsonConvertor : JsonConverter
+    public class OptionsJsonConvertor<TOptions> : JsonConverter where TOptions : IOptions
     {
         public override bool CanConvert(Type objectType)
         {
             Log.Verbose("MigrationToolsJsonConvertor::CanConvert({ObjectName})", objectType.Name);
-            return typeof(IOptions).IsAssignableFrom(objectType);
+            return typeof(TOptions).IsAssignableFrom(objectType);
         }
 
-        protected IOptions Create(Type objectType, JObject jObject)
+        protected TOptions Create(Type objectType, JObject jObject)
         {
             if (FieldExists("ObjectType", jObject))
             {
@@ -29,7 +29,7 @@ namespace MigrationTools.Options
                     throw new InvalidOperationException();
                 }
 
-                return (IOptions)Activator.CreateInstance(type);
+                return (TOptions)Activator.CreateInstance(type);
             }
             else
             {
@@ -51,7 +51,7 @@ namespace MigrationTools.Options
             JObject jObject = JObject.Load(reader);
 
             // Create target object based on JObject
-            IOptions target = Create(objectType, jObject);
+            TOptions target = Create(objectType, jObject);
 
             // Populate the object properties
             serializer.Populate(jObject.CreateReader(), target);
@@ -67,11 +67,7 @@ namespace MigrationTools.Options
 
             JToken jt = JToken.FromObject(value);
 
-            if (jt.Type == JTokenType.Array)
-            {
-                Log.Verbose("LIST MANAGEMNT");
-            }
-            else if (jt.Type != JTokenType.Object)
+            if (jt.Type != JTokenType.Object)
             {
                 jt.WriteTo(writer);
             }
