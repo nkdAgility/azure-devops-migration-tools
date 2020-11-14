@@ -20,8 +20,8 @@ missng XML code comments
 ```JSON
 {
   "$type": "MigrationTools.Endpoints.FileSystemWorkItemEndpointOptions, MigrationTools.Clients.FileSystem",
-  "FileStore": "c:\\temp\\Store",
   "Direction": "Source",
+  "FileStore": "c:\\temp\\Store",
   "EndpointEnrichers": null
 }
 ```

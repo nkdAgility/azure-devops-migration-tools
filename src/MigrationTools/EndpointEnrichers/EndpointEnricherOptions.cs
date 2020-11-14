@@ -3,9 +3,9 @@ using Newtonsoft.Json;
 
 namespace MigrationTools.EndpointEnrichers
 {
-    [JsonObjectAttribute(Description = "moo")]
     public abstract class EndpointEnricherOptions : IEndpointEnricherOptions
     {
+        [JsonProperty(Order = -2)]
         public bool Enabled { get; set; }
 
         public abstract Type ToConfigure { get; }

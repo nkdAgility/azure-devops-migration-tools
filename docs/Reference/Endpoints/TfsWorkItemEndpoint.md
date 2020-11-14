@@ -25,6 +25,9 @@ The `Direction` option is required to allow the system to set direction. At a mi
     {
       {
   "$type": "MigrationTools.Endpoints.TfsWorkItemEndpointOptions, MigrationTools.Clients.AzureDevops.ObjectModel",
+  "Direction": "Source",
+  "Organisation": "https://dev.azure.com/nkdagility-preview/",
+  "Project": "NeedToSetThis",
   "Query": {
     "$type": "MigrationTools.Options.QueryOptions, MigrationTools",
     "Query": "SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan') ORDER BY [System.ChangedDate] desc",
@@ -35,10 +38,7 @@ The `Direction` option is required to allow the system to set direction. At a mi
   },
   "AuthenticationMode": "AccessToken",
   "AccessToken": "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
-  "Organisation": "https://dev.azure.com/nkdagility-preview/",
-  "Project": "NeedToSetThis",
   "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
-  "Direction": "Source",
   "EndpointEnrichers": null
 }
     }

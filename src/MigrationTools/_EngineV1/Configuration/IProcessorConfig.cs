@@ -8,6 +8,7 @@ namespace MigrationTools._EngineV1.Configuration
         /// <summary>
         /// Active the processor if it true.
         /// </summary>
+        [JsonProperty(Order = -200)]
         bool Enabled { get; set; }
 
         [JsonIgnore]

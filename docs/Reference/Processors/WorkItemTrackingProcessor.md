@@ -42,11 +42,11 @@ This processor is intended, with the aid of [ProcessorEnrichers](../ProcessorEnr
 ```JSON
 {
   "$type": "MigrationTools.Processors.WorkItemTrackingProcessorOptions, MigrationTools",
+  "Enabled": true,
   "ReplayRevisions": true,
   "PrefixProjectToNodes": false,
   "CollapseRevisions": false,
   "WorkItemCreateRetryLimit": 5,
-  "Enabled": true,
   "Endpoints": null,
   "ProcessorEnrichers": [
     {

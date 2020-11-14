@@ -23,29 +23,29 @@ The TfsSharedQueryProcessor enabled you to migrate queries from one locatio nto 
 ```JSON
 {
   "$type": "MigrationTools.Processors.TfsSharedQueryProcessorOptions, MigrationTools.Clients.AzureDevops.ObjectModel",
+  "Enabled": false,
   "PrefixProjectToNodes": false,
   "SharedFolderName": "Shared Queries",
   "SourceToTargetFieldMappings": null,
-  "Enabled": false,
   "Endpoints": [
     {
       "$type": "MigrationTools.Endpoints.TfsEndpointOptions, MigrationTools.Clients.AzureDevops.ObjectModel",
-      "AuthenticationMode": "AccessToken",
-      "AccessToken": "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
+      "Direction": "Source",
       "Organisation": "https://dev.azure.com/nkdagility-preview/",
       "Project": "sourceProject",
+      "AuthenticationMode": "AccessToken",
+      "AccessToken": "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
       "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
-      "Direction": "Source",
       "EndpointEnrichers": null
     },
     {
       "$type": "MigrationTools.Endpoints.TfsEndpointOptions, MigrationTools.Clients.AzureDevops.ObjectModel",
-      "AuthenticationMode": "AccessToken",
-      "AccessToken": "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
+      "Direction": "Target",
       "Organisation": "https://dev.azure.com/nkdagility-preview/",
       "Project": "targetProject",
+      "AuthenticationMode": "AccessToken",
+      "AccessToken": "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
       "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
-      "Direction": "Target",
       "EndpointEnrichers": null
     }
   ],

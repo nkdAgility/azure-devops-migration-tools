@@ -24,12 +24,12 @@ missng XML code comments
 ```JSON
 {
   "$type": "MigrationTools.Endpoints.TfsEndpointOptions, MigrationTools.Clients.AzureDevops.ObjectModel",
-  "AuthenticationMode": "AccessToken",
-  "AccessToken": "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
+  "Direction": "Source",
   "Organisation": "https://dev.azure.com/nkdagility-preview/",
   "Project": "NeedToSetThis",
+  "AuthenticationMode": "AccessToken",
+  "AccessToken": "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
   "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
-  "Direction": "Source",
   "EndpointEnrichers": null
 }
 ```

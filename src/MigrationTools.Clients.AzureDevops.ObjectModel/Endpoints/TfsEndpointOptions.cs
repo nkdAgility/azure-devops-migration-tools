@@ -17,8 +17,14 @@ namespace MigrationTools.Endpoints
         public AuthenticationMode AuthenticationMode { get; set; }
 
         public string AccessToken { get; set; }
+
+        [JsonProperty(Order = -3)]
         public string Organisation { get; set; }
+
+        [JsonProperty(Order = -2)]
         public string Project { get; set; }
+
+        [JsonProperty(Order = -1)]
         public string ReflectedWorkItemIdField { get; set; }
 
         public override Type ToConfigure => typeof(TfsEndpoint);

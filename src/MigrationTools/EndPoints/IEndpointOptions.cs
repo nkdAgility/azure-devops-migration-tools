@@ -16,7 +16,7 @@ namespace MigrationTools.Endpoints
     //[JsonConverter(typeof(OptionsJsonConvertor<IEndpointOptions>))]
     public interface IEndpointOptions : IOptions
     {
-        [JsonConverter(typeof(StringEnumConverter))]
+        [JsonConverter(typeof(StringEnumConverter)), JsonProperty(Order = -200)]
         public EndpointDirection Direction { get; set; }
 
         public List<IEndpointEnricherOptions> EndpointEnrichers { get; set; }
