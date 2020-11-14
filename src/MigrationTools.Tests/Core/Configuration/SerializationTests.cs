@@ -13,8 +13,9 @@ namespace MigrationTools.Configuration.Tests
     {
         private Zoo CreateZoo()
         {
-            var animal = new Animal { Name = "Martin", AnimalType = "Monkey" };
-            var cage = new Cage { Adress = "Scottland", Animals = new List<Animal> { animal } };
+            var animal = new LandAnimal { Name = "Martin", AnimalType = "Monkey", Tropical = true };
+            var waterAnimal = new WaterAnimal { Name = "Ove", AnimalType = "Fish", FreshWater = false };
+            var cage = new Cage { Adress = "Scottland", Animals = new List<Animal> { animal, waterAnimal } };
             var zoo = new Zoo { Name = "Migration", Cages = new List<Cage> { cage } };
             return zoo;
         }
@@ -25,11 +26,17 @@ namespace MigrationTools.Configuration.Tests
             var zoo = CreateZoo();
             string output = JsonConvert.SerializeObject(zoo);
             Console.WriteLine(output);
-
+            var assignableType = typeof(ISuperOptions);
+            var superOptions = AppDomain.CurrentDomain.GetAssemblies().ToList()
+                   .SelectMany(x => x.GetTypes())
+                   .Where(t => assignableType.IsAssignableFrom(t) && t.IsClass).ToList();
+            var knownTypes = new List<Type> { typeof(Zoo) };
+            knownTypes.AddRange(superOptions);
             KnownTypesBinder knownTypesBinder = new KnownTypesBinder
             {
-                KnownTypes = new List<Type> { typeof(Zoo), typeof(Cage), typeof(Animal) }
+                KnownTypes = knownTypes
             };
+            
 
             string json = JsonConvert.SerializeObject(zoo, Formatting.Indented, new JsonSerializerSettings
             {
@@ -55,16 +62,33 @@ namespace MigrationTools.Configuration.Tests
         public List<Cage> Cages { get; set; }
     }
 
-    public class Cage
+    public interface ISuperOptions
+    {
+        string Name { get; }
+    }
+
+    public class Cage: ISuperOptions
     {
         public string Adress { get; set; }
         public List<Animal> Animals { get; set; }
+
+        public string Name { get; set; }
     }
 
-    public class Animal
+    public class Animal : ISuperOptions
     {
         public string Name { get; set; }
         public string AnimalType { get; set; }
+    }
+
+    public class WaterAnimal : Animal
+    {
+        public bool FreshWater { get; set; }
+    }
+
+    public class LandAnimal : Animal
+    {
+        public bool Tropical { get; set; }
     }
 
     public class KnownTypesBinder : ISerializationBinder
