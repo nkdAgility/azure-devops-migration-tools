@@ -13,6 +13,7 @@ using MigrationTools.Enrichers;
 using MigrationTools.Helpers;
 using MigrationTools.Options;
 using MigrationTools.Processors;
+using Newtonsoft.Json;
 
 namespace VstsSyncMigrator.ConsoleApp
 {
@@ -203,7 +204,7 @@ namespace VstsSyncMigrator.ConsoleApp
             {
                 var instance = (IOptions)Activator.CreateInstance(typeOption);
                 instance.SetDefaults();
-                json = NewtonsoftHelpers.SerializeObject(instance);
+                json = NewtonsoftHelpers.SerializeObject(instance, TypeNameHandling.Objects);
                 string jsonFilename = string.Format("{0}.json", item.Name);
                 string jsonFilePath = Path.Combine(referencePath, folder, jsonFilename);
                 File.WriteAllText(jsonFilePath, json);
