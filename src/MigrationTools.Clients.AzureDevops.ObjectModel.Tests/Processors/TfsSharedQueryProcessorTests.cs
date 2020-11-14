@@ -61,7 +61,7 @@ namespace MigrationTools.Processors.Tests
             var migrationConfig = GetTfsSharedQueryProcessorOptions();
             var processor = Services.GetRequiredService<TfsSharedQueryProcessor>();
             processor.Configure(migrationConfig);
-            //processor.Execute();
+            processor.Execute();
             Assert.AreEqual(ProcessingStatus.Complete, processor.Status);
         }
 

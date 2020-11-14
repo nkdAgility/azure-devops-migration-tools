@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using MigrationTools._EngineV1.Configuration;
-using MigrationTools.Options;
+﻿using MigrationTools.Options;
 using Newtonsoft.Json;
 
 namespace MigrationTools.Helpers
@@ -26,11 +24,7 @@ namespace MigrationTools.Helpers
                 TypeNameHandling = TypeNameHandling.Objects,
                 TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
                 SerializationBinder = new OptionsSerializationBinder(),
-                Formatting = Formatting.Indented,
-                Converters = new List<JsonConverter>() {
-                    { new  FieldMapConfigJsonConverter() },
-                     {  new MigrationClientConfigJsonConverter() }
-                }
+                Formatting = Formatting.Indented
             };
         }
     }

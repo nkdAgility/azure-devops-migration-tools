@@ -9,16 +9,6 @@
             Active the enricher if it true.
             </summary>
         </member>
-        <member name="M:MigrationTools.Options.JsonConvertor`1.Create(System.Type,Newtonsoft.Json.Linq.JObject)">
-            <summary>
-            Create an instance of objectType, based properties in the JSON object
-            </summary>
-            <param name="objectType">type of object expected</param>
-            <param name="jObject">
-            contents of JSON object that will be deserialized
-            </param>
-            <returns></returns>
-        </member>
         <member name="P:MigrationTools.Processors.IProcessorOptions.Source">
             <summary>
             This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.

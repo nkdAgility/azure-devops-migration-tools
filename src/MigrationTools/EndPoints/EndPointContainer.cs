@@ -44,7 +44,7 @@ namespace MigrationTools.Endpoints
 
             var targetEp = (IEndpoint)Services.GetRequiredService(_TargetOptions.ToConfigure);
             targetEp.Configure(_TargetOptions);
-            _Source = targetEp;
+            _Target = targetEp;
             _Configured = true;
         }
     }
