@@ -22,6 +22,7 @@ namespace MigrationTools.Helpers
             return new JsonSerializerSettings()
             {
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                TypeNameHandling = TypeNameHandling.Objects,
                 Formatting = Formatting.Indented,
                 Converters = new List<JsonConverter>() {
                     { new  FieldMapConfigJsonConverter() },

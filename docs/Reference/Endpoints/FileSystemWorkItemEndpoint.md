@@ -13,16 +13,16 @@ missng XML code comments
 | FileStore | String | missng XML code comments | missng XML code comments |
 | ToConfigure | Type | missng XML code comments | missng XML code comments |
 | Direction | EndpointDirection | missng XML code comments | missng XML code comments |
-| Enrichers | List | missng XML code comments | missng XML code comments |
+| EndpointEnrichers | List | missng XML code comments | missng XML code comments |
 
 
 ### Example JSON
 
 ```JSON
 {
-  "ObjectType": "FileSystemWorkItemEndpointOptions",
+  "$type": "MigrationTools.Endpoints.FileSystemWorkItemEndpointOptions, MigrationTools.Clients.FileSystem",
   "FileStore": "c:\\temp\\Store",
   "Direction": "Source",
-  "Enrichers": null
+  "EndpointEnrichers": null
 }
 ```

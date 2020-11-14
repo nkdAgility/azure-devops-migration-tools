@@ -1,4 +1,4 @@
 {
-  "ObjectType": "PauseAfterEachItemOptions",
+  "$type": "MigrationTools.Enrichers.PauseAfterEachItemOptions, MigrationTools",
   "Enabled": true
 }

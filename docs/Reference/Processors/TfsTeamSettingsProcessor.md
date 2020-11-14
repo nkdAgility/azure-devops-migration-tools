@@ -39,7 +39,7 @@ Native TFS Processor, does not work with any other Endpoints.
       "Project": "sourceProject",
       "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
       "Direction": "Source",
-      "Enrichers": null
+      "EndpointEnrichers": null
     },
     {
       "AuthenticationMode": "AccessToken",
@@ -48,7 +48,7 @@ Native TFS Processor, does not work with any other Endpoints.
       "Project": "targetProject",
       "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
       "Direction": "Target",
-      "Enrichers": null
+      "EndpointEnrichers": null
     }
   ],
   "ProcessorEnrichers": null

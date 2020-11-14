@@ -13,7 +13,7 @@ namespace MigrationTools.Endpoints
         Target = 2
     }
 
-    [JsonConverter(typeof(OptionsJsonConvertor<IEndpointOptions>))]
+    //[JsonConverter(typeof(OptionsJsonConvertor<IEndpointOptions>))]
     public interface IEndpointOptions : IOptions
     {
         [JsonConverter(typeof(StringEnumConverter))]

@@ -37,7 +37,7 @@ The TfsSharedQueryProcessor enabled you to migrate queries from one locatio nto 
       "Project": "sourceProject",
       "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
       "Direction": "Source",
-      "Enrichers": null
+      "EndpointEnrichers": null
     },
     {
       "AuthenticationMode": "AccessToken",
@@ -46,7 +46,7 @@ The TfsSharedQueryProcessor enabled you to migrate queries from one locatio nto 
       "Project": "targetProject",
       "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
       "Direction": "Target",
-      "Enrichers": null
+      "EndpointEnrichers": null
     }
   ],
   "ProcessorEnrichers": null

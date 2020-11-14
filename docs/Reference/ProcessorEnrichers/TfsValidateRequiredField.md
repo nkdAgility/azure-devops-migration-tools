@@ -18,7 +18,7 @@ missng XML code comments
 
 ```JSON
 {
-  "ObjectType": "TfsValidateRequiredFieldOptions",
+  "$type": "MigrationTools.ProcessorEnrichers.TfsValidateRequiredFieldOptions, MigrationTools.Clients.AzureDevops.ObjectModel",
   "Enabled": true
 }
 ```

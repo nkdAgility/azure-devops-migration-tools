@@ -20,7 +20,7 @@ missng XML code comments
 
 ```JSON
 {
-  "ObjectType": "TfsWorkItemAttachmentEnricherOptions",
+  "$type": "MigrationTools.EndpointEnrichers.TfsWorkItemAttachmentEnricherOptions, MigrationTools.Clients.AzureDevops.ObjectModel",
   "WorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
   "MaxSize": 480000000,
   "Enabled": true

@@ -18,7 +18,7 @@ missng XML code comments
 
 ```JSON
 {
-  "ObjectType": "AppendMigrationToolSignatureFooterOptions",
+  "$type": "MigrationTools.Enrichers.AppendMigrationToolSignatureFooterOptions, MigrationTools",
   "Enabled": true
 }
 ```

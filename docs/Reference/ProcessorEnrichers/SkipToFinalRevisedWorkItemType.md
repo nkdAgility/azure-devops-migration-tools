@@ -18,7 +18,7 @@ missng XML code comments
 
 ```JSON
 {
-  "ObjectType": "SkipToFinalRevisedWorkItemTypeOptions",
+  "$type": "MigrationTools.Enrichers.SkipToFinalRevisedWorkItemTypeOptions, MigrationTools",
   "Enabled": true
 }
 ```
