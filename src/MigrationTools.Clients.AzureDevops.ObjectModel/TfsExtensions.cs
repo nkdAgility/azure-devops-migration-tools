@@ -30,8 +30,10 @@ namespace MigrationTools
         public static void SaveToAzureDevOps(this WorkItemData context)
         {
             Log.Debug("TfsExtensions::SaveToAzureDevOps");
+
             if (context == null) throw new ArgumentNullException(nameof(context));
             var workItem = (WorkItem)context.internalObject;
+            Log.Debug("TfsExtensions::SaveToAzureDevOps: ChangedBy: {ChangedBy}, AuthorisedBy: {AuthorizedIdentity}", workItem.ChangedBy, workItem.Store.TeamProjectCollection.AuthorizedIdentity.DisplayName);
             var fails = workItem.Validate();
             if (fails.Count > 0)
             {
