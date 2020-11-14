@@ -21,14 +21,14 @@ namespace MigrationTools.Endpoints.Tests
         [TestMethod, TestCategory("L1")]
         public void ConfiguredTest()
         {
-            InMemoryWorkItemEndpoint e = CreateAndConfigureInMemoryWorkItemEndpoint(EndpointDirection.Source, 10);
+            InMemoryWorkItemEndpoint e = CreateAndConfigureInMemoryWorkItemEndpoint(10);
             Assert.AreEqual(10, e.Count);
         }
 
         [TestMethod(), TestCategory("L1")]
         public void EmptyTest()
         {
-            var targetOptions = new InMemoryWorkItemEndpointOptions() { Direction = EndpointDirection.Source };
+            var targetOptions = new InMemoryWorkItemEndpointOptions();
             InMemoryWorkItemEndpoint e = Services.GetRequiredService<InMemoryWorkItemEndpoint>();
             e.Configure(targetOptions);
             Assert.AreEqual(0, e.Count);
@@ -37,8 +37,8 @@ namespace MigrationTools.Endpoints.Tests
         [TestMethod, TestCategory("L1")]
         public void FilterAllTest()
         {
-            InMemoryWorkItemEndpoint e1 = CreateAndConfigureInMemoryWorkItemEndpoint(EndpointDirection.Source, 10);
-            InMemoryWorkItemEndpoint e2 = CreateAndConfigureInMemoryWorkItemEndpoint(EndpointDirection.Target, 10);
+            InMemoryWorkItemEndpoint e1 = CreateAndConfigureInMemoryWorkItemEndpoint(10);
+            InMemoryWorkItemEndpoint e2 = CreateAndConfigureInMemoryWorkItemEndpoint(10);
             e1.Filter(e2.GetWorkItems());
             Assert.AreEqual(0, e1.Count);
         }
@@ -46,8 +46,8 @@ namespace MigrationTools.Endpoints.Tests
         [TestMethod, TestCategory("L1")]
         public void FilterHalfTest()
         {
-            InMemoryWorkItemEndpoint e1 = CreateAndConfigureInMemoryWorkItemEndpoint(EndpointDirection.Source, 20);
-            InMemoryWorkItemEndpoint e2 = CreateAndConfigureInMemoryWorkItemEndpoint(EndpointDirection.Target, 10);
+            InMemoryWorkItemEndpoint e1 = CreateAndConfigureInMemoryWorkItemEndpoint(20);
+            InMemoryWorkItemEndpoint e2 = CreateAndConfigureInMemoryWorkItemEndpoint(10);
             e1.Filter(e2.GetWorkItems());
             Assert.AreEqual(10, e1.Count);
         }
@@ -55,8 +55,8 @@ namespace MigrationTools.Endpoints.Tests
         [TestMethod, TestCategory("L1")]
         public void PersistWorkItemExistsTest()
         {
-            InMemoryWorkItemEndpoint e1 = CreateAndConfigureInMemoryWorkItemEndpoint(EndpointDirection.Source, 20);
-            InMemoryWorkItemEndpoint e2 = CreateAndConfigureInMemoryWorkItemEndpoint(EndpointDirection.Target, 10);
+            InMemoryWorkItemEndpoint e1 = CreateAndConfigureInMemoryWorkItemEndpoint(20);
+            InMemoryWorkItemEndpoint e2 = CreateAndConfigureInMemoryWorkItemEndpoint(10);
             foreach (WorkItemData item in e1.GetWorkItems())
             {
                 e2.PersistWorkItem(item);
@@ -67,8 +67,8 @@ namespace MigrationTools.Endpoints.Tests
         [TestMethod, TestCategory("L1")]
         public void PersistWorkItemWithFilterTest()
         {
-            InMemoryWorkItemEndpoint e1 = CreateAndConfigureInMemoryWorkItemEndpoint(EndpointDirection.Source, 20);
-            InMemoryWorkItemEndpoint e2 = CreateAndConfigureInMemoryWorkItemEndpoint(EndpointDirection.Target, 10);
+            InMemoryWorkItemEndpoint e1 = CreateAndConfigureInMemoryWorkItemEndpoint(20);
+            InMemoryWorkItemEndpoint e2 = CreateAndConfigureInMemoryWorkItemEndpoint(10);
             e1.Filter(e2.GetWorkItems());
             Assert.AreEqual(10, e1.Count);
             foreach (WorkItemData item in e1.GetWorkItems())
@@ -78,16 +78,16 @@ namespace MigrationTools.Endpoints.Tests
             Assert.AreEqual(20, e2.Count);
         }
 
-        private InMemoryWorkItemEndpoint CreateAndConfigureInMemoryWorkItemEndpoint(EndpointDirection direction, int workItemCount)
+        private InMemoryWorkItemEndpoint CreateAndConfigureInMemoryWorkItemEndpoint(int workItemCount)
         {
-            InMemoryWorkItemEndpoint e = CreateInMemoryWorkItemEndpoint(direction);
+            InMemoryWorkItemEndpoint e = CreateInMemoryWorkItemEndpoint();
             AddWorkItems(e, workItemCount);
             return e;
         }
 
-        private InMemoryWorkItemEndpoint CreateInMemoryWorkItemEndpoint(EndpointDirection direction)
+        private InMemoryWorkItemEndpoint CreateInMemoryWorkItemEndpoint()
         {
-            var options = new InMemoryWorkItemEndpointOptions() { Direction = direction };
+            var options = new InMemoryWorkItemEndpointOptions();
             InMemoryWorkItemEndpoint e = Services.GetRequiredService<InMemoryWorkItemEndpoint>();
             e.Configure(options);
             return e;

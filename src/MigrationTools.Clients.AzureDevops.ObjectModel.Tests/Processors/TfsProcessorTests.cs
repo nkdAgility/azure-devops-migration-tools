@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools.Endpoints;
 using MigrationTools.Tests;
@@ -24,11 +23,8 @@ namespace MigrationTools.Processors.Tests
                 MigrateTeamSettings = true,
                 UpdateTeamSettings = true,
                 PrefixProjectToNodes = false,
-                Endpoints = new List<IEndpointOptions>()
-                    {
-                         {GetTfsEndPointOptions(EndpointDirection.Source, "migrationSource1")},
-                         {GetTfsEndPointOptions(EndpointDirection.Target, "migrationTarget1")}
-                    }
+                Source = GetTfsEndPointOptions("migrationSource1"),
+                Target = GetTfsEndPointOptions("migrationTarget1")
             };
             return migrationConfig;
         }
@@ -40,20 +36,16 @@ namespace MigrationTools.Processors.Tests
             {
                 Enabled = true,
                 PrefixProjectToNodes = false,
-                Endpoints = new List<IEndpointOptions>()
-                    {
-                         {GetTfsEndPointOptions(EndpointDirection.Source, "migrationSource1")},
-                         {GetTfsEndPointOptions(EndpointDirection.Target, "migrationTarget1")}
-                    }
+                Target = GetTfsEndPointOptions("migrationTarget1"),
+                Source = GetTfsEndPointOptions("migrationSource1"),
             };
             return migrationConfig;
         }
 
-        protected static TfsEndpointOptions GetTfsEndPointOptions(EndpointDirection direction, string project)
+        protected static TfsEndpointOptions GetTfsEndPointOptions(string project)
         {
             return new TfsTeamSettingsEndpointOptions()
             {
-                Direction = direction,
                 Organisation = "https://dev.azure.com/nkdagility-preview/",
                 Project = project,
                 AuthenticationMode = AuthenticationMode.AccessToken,

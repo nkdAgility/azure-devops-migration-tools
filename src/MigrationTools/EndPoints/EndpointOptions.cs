@@ -2,15 +2,11 @@
 using System.Collections.Generic;
 using MigrationTools.EndpointEnrichers;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace MigrationTools.Endpoints
 {
     public abstract class EndpointOptions : IEndpointOptions
     {
-        [JsonConverter(typeof(StringEnumConverter))]
-        public EndpointDirection Direction { get; set; }
-
         [JsonIgnoreAttribute]
         public abstract Type ToConfigure { get; }
 
@@ -18,7 +14,6 @@ namespace MigrationTools.Endpoints
 
         public virtual void SetDefaults()
         {
-            Direction = EndpointDirection.Source;
         }
     }
 }

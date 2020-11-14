@@ -10,7 +10,6 @@ namespace MigrationTools.Endpoints
     {
         private IEndpointOptions _InnerOptions;
         private List<IEndpointEnricher> _EndpointEnrichers;
-        public EndpointDirection Direction => _InnerOptions.Direction;
 
         public Endpoint(EndpointEnricherContainer endpointEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Endpoint> logger)
         {

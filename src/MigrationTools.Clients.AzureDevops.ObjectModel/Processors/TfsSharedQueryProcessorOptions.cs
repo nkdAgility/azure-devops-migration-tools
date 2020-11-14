@@ -46,17 +46,14 @@ namespace MigrationTools.Processors
 
         public override void SetDefaults()
         {
-            Endpoints = new List<IEndpointOptions>();
             var e1 = new TfsEndpointOptions();
             e1.SetDefaults();
-            e1.Direction = EndpointDirection.Source;
             e1.Project = "sourceProject";
-            Endpoints.Add(e1);
+            Source = e1;
             var e2 = new TfsEndpointOptions();
             e2.SetDefaults();
-            e2.Direction = EndpointDirection.Target;
             e2.Project = "targetProject";
-            Endpoints.Add(e2);
+            Target = e2;
         }
     }
 }

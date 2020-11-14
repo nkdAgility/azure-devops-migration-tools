@@ -252,14 +252,29 @@ namespace MigrationTools._EngineV1.Configuration
                     ReplayRevisions = true,
                     WorkItemCreateRetryLimit = 5,
                     ProcessorEnrichers = GetAllTypes<IProcessorEnricherOptions>(),
-                    Endpoints = GetAllTypes<IEndpointOptions>()
-                });
+                    Source = GetSpecioficType<IEndpointOptions>("InMemoryWorkItemEndpointOptions"),
+                    Target = GetSpecioficType<IEndpointOptions>("InMemoryWorkItemEndpointOptions")
+                }); ; ;
             return ec;
         }
 
         public EngineConfiguration BuildWorkItemMigration2()
         {
             throw new NotImplementedException();
+        }
+
+        private TInterfaceToFind GetSpecioficType<TInterfaceToFind>(string typeName) where TInterfaceToFind : IOptions
+        {
+            AppDomain.CurrentDomain.Load("MigrationTools");
+            AppDomain.CurrentDomain.Load("MigrationTools.Clients.AzureDevops.ObjectModel");
+            AppDomain.CurrentDomain.Load("MigrationTools.Clients.FileSystem");
+            Type type = AppDomain.CurrentDomain.GetAssemblies()
+               .Where(a => a.FullName.StartsWith("MigrationTools"))
+               .SelectMany(a => a.GetTypes())
+               .Where(t => typeof(TInterfaceToFind).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract && t.Name == typeName).SingleOrDefault();
+            TInterfaceToFind option = (TInterfaceToFind)Activator.CreateInstance(type);
+            option.SetDefaults();
+            return option;
         }
 
         private List<TInterfaceToFind> GetAllTypes<TInterfaceToFind>() where TInterfaceToFind : IOptions

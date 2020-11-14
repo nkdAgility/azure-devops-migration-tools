@@ -8,7 +8,6 @@ namespace MigrationTools.Endpoints
 
         public override void SetDefaults()
         {
-            Direction = EndpointDirection.NotSet;
         }
     }
 }
