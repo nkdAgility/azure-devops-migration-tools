@@ -1,16 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MigrationTools.Tests;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using Serilog;
 
 namespace MigrationTools.Configuration.Tests
 {
     [TestClass]
     public class SerializationTests
     {
+        private ServiceProvider Services;
+
+        [TestInitialize]
+        public void Setup()
+        {
+            Services = ServiceProviderHelper.GetWorkItemMigrationProcessor();
+        }
+
         private Zoo CreateZoo()
         {
             var animal = new LandAnimal { Name = "Martin", AnimalType = "Monkey", Tropical = true };
@@ -36,7 +46,6 @@ namespace MigrationTools.Configuration.Tests
             {
                 KnownTypes = knownTypes
             };
-            
 
             string json = JsonConvert.SerializeObject(zoo, Formatting.Indented, new JsonSerializerSettings
             {
@@ -44,7 +53,7 @@ namespace MigrationTools.Configuration.Tests
                 SerializationBinder = knownTypesBinder
             });
 
-            Console.WriteLine(json);
+            Log.Information(json);
 
             var deserializedZoo = JsonConvert.DeserializeObject(json, new JsonSerializerSettings
             {
@@ -52,7 +61,7 @@ namespace MigrationTools.Configuration.Tests
                 SerializationBinder = knownTypesBinder
             });
 
-            Console.WriteLine(deserializedZoo);
+            Log.Information(deserializedZoo.ToString());
         }
     }
 
@@ -67,7 +76,7 @@ namespace MigrationTools.Configuration.Tests
         string Name { get; }
     }
 
-    public class Cage: ISuperOptions
+    public class Cage : ISuperOptions
     {
         public string Adress { get; set; }
         public List<Animal> Animals { get; set; }
@@ -106,5 +115,4 @@ namespace MigrationTools.Configuration.Tests
             typeName = serializedType.Name;
         }
     }
-
 }

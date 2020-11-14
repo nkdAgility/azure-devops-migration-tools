@@ -15,7 +15,6 @@ missng XML code comments
 | Organisation | String | missng XML code comments | missng XML code comments |
 | Project | String | missng XML code comments | missng XML code comments |
 | ReflectedWorkItemIdField | String | missng XML code comments | missng XML code comments |
-| Direction | EndpointDirection | missng XML code comments | missng XML code comments |
 | EndpointEnrichers | List | missng XML code comments | missng XML code comments |
 
 
@@ -23,8 +22,7 @@ missng XML code comments
 
 ```JSON
 {
-  "$type": "MigrationTools.Endpoints.TfsEndpointOptions, MigrationTools.Clients.AzureDevops.ObjectModel",
-  "Direction": "Source",
+  "$type": "TfsEndpointOptions",
   "Organisation": "https://dev.azure.com/nkdagility-preview/",
   "Project": "NeedToSetThis",
   "AuthenticationMode": "AccessToken",

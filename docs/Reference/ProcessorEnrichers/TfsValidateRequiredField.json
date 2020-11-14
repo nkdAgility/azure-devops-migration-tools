@@ -1,4 +1,4 @@
 {
-  "$type": "MigrationTools.ProcessorEnrichers.TfsValidateRequiredFieldOptions, MigrationTools.Clients.AzureDevops.ObjectModel",
+  "$type": "TfsValidateRequiredFieldOptions",
   "Enabled": true
 }

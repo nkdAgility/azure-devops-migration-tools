@@ -17,7 +17,7 @@ missng XML code comments
 
 ```JSON
 {
-  "$type": "MigrationTools.Enrichers.PauseAfterEachItemOptions, MigrationTools",
+  "$type": "PauseAfterEachItemOptions",
   "Enabled": true
 }
 ```

@@ -1,6 +1,5 @@
 {
-  "$type": "MigrationTools.Endpoints.FileSystemWorkItemEndpointOptions, MigrationTools.Clients.FileSystem",
-  "Direction": "Source",
+  "$type": "FileSystemWorkItemEndpointOptions",
   "FileStore": "c:\\temp\\Store",
   "EndpointEnrichers": null
 }

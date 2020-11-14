@@ -1,6 +1,5 @@
 {
-  "$type": "MigrationTools.Endpoints.TfsTeamSettingsEndpointOptions, MigrationTools.Clients.AzureDevops.ObjectModel",
-  "Direction": "Source",
+  "$type": "TfsTeamSettingsEndpointOptions",
   "Organisation": "https://dev.azure.com/nkdagility-preview/",
   "Project": "NeedToSetThis",
   "AuthenticationMode": "AccessToken",
