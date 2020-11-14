@@ -26,8 +26,6 @@ namespace MigrationTools.Helpers
                 Formatting = Formatting.Indented,
                 Converters = new List<JsonConverter>() {
                     { new  FieldMapConfigJsonConverter() },
-                     {  new ProcessorConfigJsonConverter() }
-                    ,
                      {  new MigrationClientConfigJsonConverter() }
                 }
             };

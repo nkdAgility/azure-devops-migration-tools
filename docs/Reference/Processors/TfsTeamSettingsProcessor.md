@@ -25,7 +25,7 @@ Native TFS Processor, does not work with any other Endpoints.
 
 ```JSON
 {
-  "ObjectType": "TfsTeamSettingsProcessorOptions",
+  "$type": "MigrationTools.Processors.TfsTeamSettingsProcessorOptions, MigrationTools.Clients.AzureDevops.ObjectModel",
   "MigrateTeamSettings": true,
   "UpdateTeamSettings": true,
   "PrefixProjectToNodes": false,
@@ -33,6 +33,7 @@ Native TFS Processor, does not work with any other Endpoints.
   "Enabled": false,
   "Endpoints": [
     {
+      "$type": "MigrationTools.Endpoints.TfsEndpointOptions, MigrationTools.Clients.AzureDevops.ObjectModel",
       "AuthenticationMode": "AccessToken",
       "AccessToken": "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
       "Organisation": "https://dev.azure.com/nkdagility-preview/",
@@ -42,6 +43,7 @@ Native TFS Processor, does not work with any other Endpoints.
       "EndpointEnrichers": null
     },
     {
+      "$type": "MigrationTools.Endpoints.TfsEndpointOptions, MigrationTools.Clients.AzureDevops.ObjectModel",
       "AuthenticationMode": "AccessToken",
       "AccessToken": "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
       "Organisation": "https://dev.azure.com/nkdagility-preview/",

@@ -43,7 +43,7 @@ This processor is intended, with the aid of [ProcessorEnrichers](../ProcessorEnr
 
 ```JSON
 {
-  "ObjectType": "WorkItemTrackingProcessorOptions",
+  "$type": "MigrationTools.Processors.WorkItemTrackingProcessorOptions, MigrationTools",
   "ReplayRevisions": true,
   "PrefixProjectToNodes": false,
   "CollapseRevisions": false,
@@ -52,9 +52,11 @@ This processor is intended, with the aid of [ProcessorEnrichers](../ProcessorEnr
   "Endpoints": null,
   "ProcessorEnrichers": [
     {
+      "$type": "MigrationTools.Enrichers.PauseAfterEachItemOptions, MigrationTools",
       "Enabled": true
     },
     {
+      "$type": "MigrationTools.Enrichers.AppendMigrationToolSignatureFooterOptions, MigrationTools",
       "Enabled": true
     }
   ]

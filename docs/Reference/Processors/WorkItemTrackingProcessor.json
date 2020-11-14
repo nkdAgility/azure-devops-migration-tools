@@ -1,5 +1,5 @@
 {
-  "ObjectType": "WorkItemTrackingProcessorOptions",
+  "$type": "MigrationTools.Processors.WorkItemTrackingProcessorOptions, MigrationTools",
   "ReplayRevisions": true,
   "PrefixProjectToNodes": false,
   "CollapseRevisions": false,
@@ -8,9 +8,11 @@
   "Endpoints": null,
   "ProcessorEnrichers": [
     {
+      "$type": "MigrationTools.Enrichers.PauseAfterEachItemOptions, MigrationTools",
       "Enabled": true
     },
     {
+      "$type": "MigrationTools.Enrichers.AppendMigrationToolSignatureFooterOptions, MigrationTools",
       "Enabled": true
     }
   ]
