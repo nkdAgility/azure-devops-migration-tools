@@ -1,4 +1,4 @@
 {
-  "$type": "MigrationTools.Enrichers.AppendMigrationToolSignatureFooterOptions, MigrationTools",
+  "$type": "AppendMigrationToolSignatureFooterOptions",
   "Enabled": true
 }

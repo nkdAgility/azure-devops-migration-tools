@@ -1,19 +1,20 @@
 {
-  "$type": "MigrationTools.Processors.WorkItemTrackingProcessorOptions, MigrationTools",
+  "$type": "WorkItemTrackingProcessorOptions",
   "Enabled": true,
   "ReplayRevisions": true,
   "PrefixProjectToNodes": false,
   "CollapseRevisions": false,
   "WorkItemCreateRetryLimit": 5,
-  "Endpoints": null,
   "ProcessorEnrichers": [
     {
-      "$type": "MigrationTools.Enrichers.PauseAfterEachItemOptions, MigrationTools",
+      "$type": "PauseAfterEachItemOptions",
       "Enabled": true
     },
     {
-      "$type": "MigrationTools.Enrichers.AppendMigrationToolSignatureFooterOptions, MigrationTools",
+      "$type": "AppendMigrationToolSignatureFooterOptions",
       "Enabled": true
     }
-  ]
+  ],
+  "Source": null,
+  "Target": null
 }

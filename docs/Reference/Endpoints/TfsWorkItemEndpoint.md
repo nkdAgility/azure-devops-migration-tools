@@ -24,15 +24,14 @@ The `Direction` option is required to allow the system to set direction. At a mi
 ```JSON
     {
       {
-  "$type": "MigrationTools.Endpoints.TfsWorkItemEndpointOptions, MigrationTools.Clients.AzureDevops.ObjectModel",
-  "Direction": "Source",
+  "$type": "TfsWorkItemEndpointOptions",
   "Organisation": "https://dev.azure.com/nkdagility-preview/",
   "Project": "NeedToSetThis",
   "Query": {
-    "$type": "MigrationTools.Options.QueryOptions, MigrationTools",
+    "$type": "QueryOptions",
     "Query": "SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan') ORDER BY [System.ChangedDate] desc",
     "Paramiters": {
-      "$type": "System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.String, mscorlib]], mscorlib",
+      "$type": "Dictionary`2",
       "TeamProject": "migrationSource1"
     }
   },

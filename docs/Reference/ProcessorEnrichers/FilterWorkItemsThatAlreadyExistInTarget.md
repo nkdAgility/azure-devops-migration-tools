@@ -18,10 +18,10 @@ missng XML code comments
 
 ```JSON
 {
-  "$type": "MigrationTools.Enrichers.FilterWorkItemsThatAlreadyExistInTargetOptions, MigrationTools",
+  "$type": "FilterWorkItemsThatAlreadyExistInTargetOptions",
   "Enabled": true,
   "Query": {
-    "$type": "MigrationTools.Options.QueryOptions, MigrationTools",
+    "$type": "QueryOptions",
     "Query": "SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan') ORDER BY [System.ChangedDate] desc",
     "Paramiters": null
   }

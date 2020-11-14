@@ -11,7 +11,6 @@ missng XML code comments
 | Parameter name         | Type    | Description                              | Default Value                            |
 |------------------------|---------|------------------------------------------|------------------------------------------|
 | FileStore | String | missng XML code comments | missng XML code comments |
-| Direction | EndpointDirection | missng XML code comments | missng XML code comments |
 | EndpointEnrichers | List | missng XML code comments | missng XML code comments |
 
 
@@ -19,8 +18,7 @@ missng XML code comments
 
 ```JSON
 {
-  "$type": "MigrationTools.Endpoints.FileSystemWorkItemEndpointOptions, MigrationTools.Clients.FileSystem",
-  "Direction": "Source",
+  "$type": "FileSystemWorkItemEndpointOptions",
   "FileStore": "c:\\temp\\Store",
   "EndpointEnrichers": null
 }

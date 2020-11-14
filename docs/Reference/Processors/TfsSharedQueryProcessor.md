@@ -13,42 +13,39 @@ The TfsSharedQueryProcessor enabled you to migrate queries from one locatio nto 
 | PrefixProjectToNodes | Boolean | Do we add the source project name into the folder path | false |
 | SharedFolderName | String | The name of the shared folder, made a parameter incase it every needs to be edited | Shared Queries |
 | SourceToTargetFieldMappings | Dictionary`2 | Mapping of the source to the target | missng XML code comments |
-| Enabled | Boolean | Active the processor if it true. | missng XML code comments |
-| Endpoints | List | missng XML code comments | missng XML code comments |
+| Enabled | Boolean | If set to `true` then the processor will run. Set to `false` and the processor will not run. | missng XML code comments |
 | ProcessorEnrichers | List | missng XML code comments | missng XML code comments |
+| Source | IEndpointOptions | missng XML code comments | missng XML code comments |
+| Target | IEndpointOptions | missng XML code comments | missng XML code comments |
 
 
 ### Example JSON
 
 ```JSON
 {
-  "$type": "MigrationTools.Processors.TfsSharedQueryProcessorOptions, MigrationTools.Clients.AzureDevops.ObjectModel",
+  "$type": "TfsSharedQueryProcessorOptions",
   "Enabled": false,
   "PrefixProjectToNodes": false,
   "SharedFolderName": "Shared Queries",
   "SourceToTargetFieldMappings": null,
-  "Endpoints": [
-    {
-      "$type": "MigrationTools.Endpoints.TfsEndpointOptions, MigrationTools.Clients.AzureDevops.ObjectModel",
-      "Direction": "Source",
-      "Organisation": "https://dev.azure.com/nkdagility-preview/",
-      "Project": "sourceProject",
-      "AuthenticationMode": "AccessToken",
-      "AccessToken": "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
-      "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
-      "EndpointEnrichers": null
-    },
-    {
-      "$type": "MigrationTools.Endpoints.TfsEndpointOptions, MigrationTools.Clients.AzureDevops.ObjectModel",
-      "Direction": "Target",
-      "Organisation": "https://dev.azure.com/nkdagility-preview/",
-      "Project": "targetProject",
-      "AuthenticationMode": "AccessToken",
-      "AccessToken": "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
-      "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
-      "EndpointEnrichers": null
-    }
-  ],
-  "ProcessorEnrichers": null
+  "ProcessorEnrichers": null,
+  "Source": {
+    "$type": "TfsEndpointOptions",
+    "Organisation": "https://dev.azure.com/nkdagility-preview/",
+    "Project": "sourceProject",
+    "AuthenticationMode": "AccessToken",
+    "AccessToken": "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
+    "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
+    "EndpointEnrichers": null
+  },
+  "Target": {
+    "$type": "TfsEndpointOptions",
+    "Organisation": "https://dev.azure.com/nkdagility-preview/",
+    "Project": "targetProject",
+    "AuthenticationMode": "AccessToken",
+    "AccessToken": "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
+    "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
+    "EndpointEnrichers": null
+  }
 }
 ```
