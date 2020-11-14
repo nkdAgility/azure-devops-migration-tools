@@ -21,7 +21,7 @@ namespace MigrationTools.Helpers
             return new JsonSerializerSettings()
             {
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                TypeNameHandling = TypeNameHandling.Objects,
+                TypeNameHandling = TypeNameHandling.Auto,
                 TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
                 SerializationBinder = new OptionsSerializationBinder(),
                 Formatting = Formatting.Indented
