@@ -1,8 +1,9 @@
-﻿using Newtonsoft.Json;
+﻿using MigrationTools.Options;
+using Newtonsoft.Json;
 
 namespace MigrationTools.Enrichers
 {
-    [JsonConverter(typeof(ProcessorEnricherOptionsJsonConvertor))]
+    [JsonConverter(typeof(OptionsJsonConvertor<IProcessorEnricherOptions>))]
     public interface IProcessorEnricherOptions : IEnricherOptions
     {
     }

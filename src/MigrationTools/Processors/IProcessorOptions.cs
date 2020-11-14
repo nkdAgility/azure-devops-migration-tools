@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 
 namespace MigrationTools.Processors
 {
-    [JsonConverter(typeof(ProcessorOptionsJsonConvertor))]
+    [JsonConverter(typeof(OptionsJsonConvertor<IProcessorOptions>))]
     public interface IProcessorOptions : IProcessorConfig, IOptions
     {
         List<IEndpointOptions> Endpoints { get; set; }
