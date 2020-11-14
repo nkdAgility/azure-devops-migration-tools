@@ -34,6 +34,7 @@ namespace MigrationTools.Endpoints
                 Log.LogError("EndpointContainer::ConfigureEndpoints: You cant configure Endpoints twice");
                 throw new Exception("You cant configure Endpoints twice");
             }
+
             _SourceOptions = source ?? throw new ArgumentNullException(nameof(source));
             _TargetOptions = target ?? throw new ArgumentNullException(nameof(target));
 

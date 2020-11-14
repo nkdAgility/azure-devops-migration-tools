@@ -2,7 +2,7 @@
 
 namespace MigrationTools.Endpoints
 {
-    public class InMemoryWorkItemEndpointOptions : EndpointOptions
+    public class InMemoryWorkItemEndpointOptions : EndpointOptions, IWorkItemEndpoint
     {
         public override Type ToConfigure => typeof(InMemoryWorkItemEndpoint);
 

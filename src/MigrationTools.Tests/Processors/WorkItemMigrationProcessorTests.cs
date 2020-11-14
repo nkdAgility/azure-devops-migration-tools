@@ -21,7 +21,13 @@ namespace MigrationTools.Processors.Tests
         {
             var y = new WorkItemTrackingProcessorOptions
             {
-                Enabled = true
+                Enabled = true,
+                CollapseRevisions = false,
+                ReplayRevisions = true,
+                WorkItemCreateRetryLimit = 5,
+                PrefixProjectToNodes = false,
+                Source = new InMemoryWorkItemEndpointOptions(),
+                Target = new InMemoryWorkItemEndpointOptions()
             };
             var x = Services.GetRequiredService<WorkItemTrackingProcessor>();
             x.Configure(y);

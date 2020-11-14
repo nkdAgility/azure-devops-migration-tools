@@ -25,7 +25,7 @@ namespace MigrationTools.Processors
         {
         }
 
-        public TfsTeamSettingsEndpoint Source => (TfsTeamSettingsEndpoint)Endpoints.Source;
+        public TfsTeamSettingsEndpoint Source => (TfsTeamSetting    sEndpoint)Endpoints.Source;
 
         public TfsTeamSettingsEndpoint Target => (TfsTeamSettingsEndpoint)Endpoints.Target;
 
@@ -47,7 +47,7 @@ namespace MigrationTools.Processors
             List<TeamFoundationTeam> sourceTeams = Source.TfsTeamService.QueryTeams(Source.Project).ToList();
             Log.LogInformation("TfsTeamSettingsProcessor::InternalExecute: Found {0} teams in Source?", sourceTeams.Count);
             //////////////////////////////////////////////////
-            List<TeamFoundationTeam> targetTeams = Target.TfsTeamService.QueryTeams(Target.Project).ToList();
+            List<TeamFoundationTeam> targetTeams = Target.TfsTeamService.QueryTeams(EndpointsTarget.Project).ToList();
             Log.LogDebug("Found {0} teams in Target?", sourceTeams.Count);
             //////////////////////////////////////////////////
             int current = sourceTeams.Count;
