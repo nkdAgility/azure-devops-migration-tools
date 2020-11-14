@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Text.RegularExpressions;
-using MigrationTools;
 using MigrationTools._EngineV1.DataContracts;
 using Serilog;
 
@@ -38,6 +37,7 @@ namespace MigrationTools._EngineV1.Clients
                 _WorkItemId = match.Groups["id"].Value;
                 _ProjectName = match.Groups["project"].Value;
                 _Connection = new Uri(match.Groups["org"].Value);
+                Log.Verbose("TfsReflectedWorkItemId: Match Sucess from {ReflectedWorkItemId}: {@ReflectedWorkItemIdObject}", ReflectedWorkItemId, this);
             }
             else
             {
@@ -48,6 +48,18 @@ namespace MigrationTools._EngineV1.Clients
 
         public override string ToString()
         {
+            if (_Connection is null)
+            {
+                throw new ArgumentNullException(nameof(_Connection));
+            }
+            if (_ProjectName is null)
+            {
+                throw new ArgumentNullException(nameof(_ProjectName));
+            }
+            if (_WorkItemId is null)
+            {
+                throw new ArgumentNullException(nameof(_WorkItemId));
+            }
             return string.Format("{0}/{1}/_workitems/edit/{2}", _Connection.ToString().TrimEnd('/'), _ProjectName, _WorkItemId);
         }
     }
