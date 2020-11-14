@@ -14,7 +14,7 @@ namespace MigrationTools.Endpoints
         [JsonIgnoreAttribute]
         public abstract Type ToConfigure { get; }
 
-        public List<IEndpointEnricherOptions> Enrichers { get; set; }
+        public List<IEndpointEnricherOptions> EndpointEnrichers { get; set; }
 
         public virtual void SetDefaults()
         {

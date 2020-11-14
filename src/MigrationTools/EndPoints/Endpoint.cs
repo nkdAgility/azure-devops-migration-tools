@@ -36,7 +36,7 @@ namespace MigrationTools.Endpoints
         {
             Log.LogDebug("Endpoint::Configure");
             _InnerOptions = options;
-            EndpointEnrichers.ConfigureEnrichers(_InnerOptions.Enrichers);
+            EndpointEnrichers.ConfigureEnrichers(_InnerOptions.EndpointEnrichers);
         }
 
         //public abstract void Filter(IEnumerable<WorkItemData> workItems);

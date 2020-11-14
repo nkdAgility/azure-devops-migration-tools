@@ -53,14 +53,9 @@ namespace MigrationTools.Options
             return target;
         }
 
-        public override void WriteJson(JsonWriter writer,
-                                       object value,
-                                       JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            Log.Verbose("MigrationToolsJsonConvertor::WriteJson({ObjectName})", value.GetType().Name);
-
             JToken jt = JToken.FromObject(value);
-
             if (jt.Type != JTokenType.Object)
             {
                 jt.WriteTo(writer);
@@ -71,44 +66,44 @@ namespace MigrationTools.Options
                 o.AddFirst(new JProperty("ObjectType", value.GetType().Name));
                 o.WriteTo(writer);
             }
-
-            //JObject jo = new JObject();
-            //Type type = value.GetType();
-            //jo.Add("ObjectType", type.Name);
-            //foreach (PropertyInfo prop in type.GetProperties().Where(p => p.CanRead && p.CanWrite))
-            //{
-            //    if (prop.Name == "ToConfigure")
-            //    {
-            //        Log.Verbose("Moo");
-            //    }
-            //    if (prop.GetCustomAttributes(typeof(JsonIgnoreAttribute), true).Count() > 0)
-            //    {
-            //        Log.Verbose("MigrationToolsJsonConvertor::WriteJson: Ignore Property {Name} : {@CustomAttributes}", prop.Name, prop.GetCustomAttributes(true));
-            //        continue;
-            //    }
-            //    if (prop.CanRead)
-            //    {
-            //        object propVal = prop.GetValue(value, null);
-            //        if (propVal != null)
-            //        {
-            //            jo.Add(prop.Name, JToken.FromObject(propVal, serializer));
-            //        }
-            //    }
-            //}
-
-            //JToken jt = JToken.FromObject(value);
-            //if (jt.Type != JTokenType.Object)
-            //{
-            //    jt.WriteTo(writer);
-            //}
-            //else
-            //{
-            //    JObject o = (JObject)jt;
-            //    o.AddFirst(new JProperty("ObjectType", value.GetType().Name));
-            //    o.WriteTo(writer);
-            //}
-            //jo.WriteTo(writer);
         }
+
+        //JObject jo = new JObject();
+        //Type type = value.GetType();
+        //jo.Add("ObjectType", type.Name);
+        //foreach (PropertyInfo prop in type.GetProperties().Where(p => p.CanRead && p.CanWrite))
+        //{
+        //    if (prop.Name == "ToConfigure")
+        //    {
+        //        Log.Verbose("Moo");
+        //    }
+        //    if (prop.GetCustomAttributes(typeof(JsonIgnoreAttribute), true).Count() > 0)
+        //    {
+        //        Log.Verbose("MigrationToolsJsonConvertor::WriteJson: Ignore Property {Name} : {@CustomAttributes}", prop.Name, prop.GetCustomAttributes(true));
+        //        continue;
+        //    }
+        //    if (prop.CanRead)
+        //    {
+        //        object propVal = prop.GetValue(value, null);
+        //        if (propVal != null)
+        //        {
+        //            jo.Add(prop.Name, JToken.FromObject(propVal, serializer));
+        //        }
+        //    }
+        //}
+
+        //JToken jt = JToken.FromObject(value);
+        //if (jt.Type != JTokenType.Object)
+        //{
+        //    jt.WriteTo(writer);
+        //}
+        //else
+        //{
+        //    JObject o = (JObject)jt;
+        //    o.AddFirst(new JProperty("ObjectType", value.GetType().Name));
+        //    o.WriteTo(writer);
+        //}
+        //jo.WriteTo(writer);
 
         public override bool CanConvert(Type objectType)
         {

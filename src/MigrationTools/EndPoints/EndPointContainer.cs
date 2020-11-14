@@ -29,7 +29,7 @@ namespace MigrationTools.Endpoints
             var ep = (IEndpoint)Services.GetRequiredService(endpointOptions.ToConfigure);
             ep.Configure(endpointOptions);
             Add(ep);
-            Log.LogInformation("ConfigureEndpoint: {EndPointName} {Direction} : Enrichers{EnrichersCount}: {EnrichersList} ", ep.GetType().Name, endpointOptions.Direction, endpointOptions.Enrichers?.Count, endpointOptions.Enrichers?.Select(x => x.GetType().Name));
+            Log.LogInformation("ConfigureEndpoint: {EndPointName} {Direction} : Enrichers{EnrichersCount}: {EnrichersList} ", ep.GetType().Name, endpointOptions.Direction, endpointOptions.EndpointEnrichers?.Count, endpointOptions.EndpointEnrichers?.Select(x => x.GetType().Name));
         }
 
         public void ConfigureEndpoints(List<IEndpointOptions> endpoints, bool sourceRequired = true, bool targetRequired = true)
