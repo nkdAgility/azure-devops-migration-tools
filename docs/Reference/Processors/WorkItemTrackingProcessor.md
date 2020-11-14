@@ -15,8 +15,6 @@ This processor is intended, with the aid of [ProcessorEnrichers](../ProcessorEnr
 | PrefixProjectToNodes | Boolean | missng XML code comments | missng XML code comments |
 | CollapseRevisions | Boolean | missng XML code comments | missng XML code comments |
 | WorkItemCreateRetryLimit | Int32 | missng XML code comments | missng XML code comments |
-| Processor | String | missng XML code comments | missng XML code comments |
-| ToConfigure | Type | missng XML code comments | missng XML code comments |
 | Enabled | Boolean | Active the processor if it true. | missng XML code comments |
 | Endpoints | List | missng XML code comments | missng XML code comments |
 | ProcessorEnrichers | List | missng XML code comments | missng XML code comments |

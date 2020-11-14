@@ -13,8 +13,6 @@ The TfsSharedQueryProcessor enabled you to migrate queries from one locatio nto 
 | PrefixProjectToNodes | Boolean | Do we add the source project name into the folder path | false |
 | SharedFolderName | String | The name of the shared folder, made a parameter incase it every needs to be edited | Shared Queries |
 | SourceToTargetFieldMappings | Dictionary`2 | Mapping of the source to the target | missng XML code comments |
-| Processor | String | missng XML code comments | missng XML code comments |
-| ToConfigure | Type | missng XML code comments | missng XML code comments |
 | Enabled | Boolean | Active the processor if it true. | missng XML code comments |
 | Endpoints | List | missng XML code comments | missng XML code comments |
 | ProcessorEnrichers | List | missng XML code comments | missng XML code comments |

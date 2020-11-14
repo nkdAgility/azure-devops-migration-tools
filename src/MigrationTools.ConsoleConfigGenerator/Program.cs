@@ -143,7 +143,7 @@ namespace VstsSyncMigrator.ConsoleApp
             {
                 options.AppendLine("| Parameter name         | Type    | Description                              | Default Value                            |");
                 options.AppendLine("|------------------------|---------|------------------------------------------|------------------------------------------|");
-                var propertys = typeOption.GetProperties();
+                var propertys = typeOption.GetProperties().Where(p => p.CanWrite);
                 foreach (PropertyInfo property in propertys)
                 {
                     options.AppendLine(string.Format("| {0} | {1} | {2} | {3} |", property.Name, property.PropertyType.Name.Replace("`1", ""), GetPropertySummary(property), GetPropertyDefault(property)));

@@ -11,7 +11,6 @@ missng XML code comments
 | Parameter name         | Type    | Description                              | Default Value                            |
 |------------------------|---------|------------------------------------------|------------------------------------------|
 | FileStore | String | missng XML code comments | missng XML code comments |
-| ToConfigure | Type | missng XML code comments | missng XML code comments |
 | Direction | EndpointDirection | missng XML code comments | missng XML code comments |
 | EndpointEnrichers | List | missng XML code comments | missng XML code comments |
 

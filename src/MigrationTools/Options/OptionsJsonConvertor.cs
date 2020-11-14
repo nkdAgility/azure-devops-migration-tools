@@ -6,8 +6,37 @@ using Serilog;
 
 namespace MigrationTools.Options
 {
-    public class OptionsJsonConvertor<TOptions> : JsonConverter
+    public class OptionsJsonConvertor<TOptions> : Newtonsoft.Json.JsonConverter<TOptions>
     {
+        public override TOptions ReadJson(JsonReader reader, Type objectType, TOptions existingValue, bool hasExistingValue, JsonSerializer serializer)
+        {
+            // Load JObject from stream
+            JObject jObject = JObject.Load(reader);
+
+            // Create target object based on JObject
+            TOptions target = Create(objectType, jObject);
+
+            // Populate the object properties
+            serializer.Populate(jObject.CreateReader(), target);
+
+            return target;
+        }
+
+        public override void WriteJson(JsonWriter writer, TOptions value, JsonSerializer serializer)
+        {
+            JToken jt = JToken.FromObject(value);
+            if (jt.Type != JTokenType.Object)
+            {
+                jt.WriteTo(writer);
+            }
+            else
+            {
+                JObject o = (JObject)jt;
+                o.AddFirst(new JProperty("ObjectType", value.GetType().Name));
+                o.WriteTo(writer);
+            }
+        }
+
         protected TOptions Create(Type objectType, JObject jObject)
         {
             if (FieldExists("ObjectType", jObject))
@@ -35,79 +64,42 @@ namespace MigrationTools.Options
         {
             return jObject[fieldName] != null;
         }
-
-        public override object ReadJson(JsonReader reader,
-                                        Type objectType,
-                                         object existingValue,
-                                         JsonSerializer serializer)
-        {
-            // Load JObject from stream
-            JObject jObject = JObject.Load(reader);
-
-            // Create target object based on JObject
-            TOptions target = Create(objectType, jObject);
-
-            // Populate the object properties
-            serializer.Populate(jObject.CreateReader(), target);
-
-            return target;
-        }
-
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-        {
-            JToken jt = JToken.FromObject(value);
-            if (jt.Type != JTokenType.Object)
-            {
-                jt.WriteTo(writer);
-            }
-            else
-            {
-                JObject o = (JObject)jt;
-                o.AddFirst(new JProperty("ObjectType", value.GetType().Name));
-                o.WriteTo(writer);
-            }
-        }
-
-        //JObject jo = new JObject();
-        //Type type = value.GetType();
-        //jo.Add("ObjectType", type.Name);
-        //foreach (PropertyInfo prop in type.GetProperties().Where(p => p.CanRead && p.CanWrite))
-        //{
-        //    if (prop.Name == "ToConfigure")
-        //    {
-        //        Log.Verbose("Moo");
-        //    }
-        //    if (prop.GetCustomAttributes(typeof(JsonIgnoreAttribute), true).Count() > 0)
-        //    {
-        //        Log.Verbose("MigrationToolsJsonConvertor::WriteJson: Ignore Property {Name} : {@CustomAttributes}", prop.Name, prop.GetCustomAttributes(true));
-        //        continue;
-        //    }
-        //    if (prop.CanRead)
-        //    {
-        //        object propVal = prop.GetValue(value, null);
-        //        if (propVal != null)
-        //        {
-        //            jo.Add(prop.Name, JToken.FromObject(propVal, serializer));
-        //        }
-        //    }
-        //}
-
-        //JToken jt = JToken.FromObject(value);
-        //if (jt.Type != JTokenType.Object)
-        //{
-        //    jt.WriteTo(writer);
-        //}
-        //else
-        //{
-        //    JObject o = (JObject)jt;
-        //    o.AddFirst(new JProperty("ObjectType", value.GetType().Name));
-        //    o.WriteTo(writer);
-        //}
-        //jo.WriteTo(writer);
-
-        public override bool CanConvert(Type objectType)
-        {
-            return typeof(TOptions).IsAssignableFrom(objectType);
-        }
     }
 }
+
+//JObject jo = new JObject();
+//Type type = value.GetType();
+//jo.Add("ObjectType", type.Name);
+//foreach (PropertyInfo prop in type.GetProperties().Where(p => p.CanRead && p.CanWrite))
+//{
+//    if (prop.Name == "ToConfigure")
+//    {
+//        Log.Verbose("Moo");
+//    }
+//    if (prop.GetCustomAttributes(typeof(JsonIgnoreAttribute), true).Count() > 0)
+//    {
+//        Log.Verbose("MigrationToolsJsonConvertor::WriteJson: Ignore Property {Name} : {@CustomAttributes}", prop.Name, prop.GetCustomAttributes(true));
+//        continue;
+//    }
+//    if (prop.CanRead)
+//    {
+//        object propVal = prop.GetValue(value, null);
+//        if (propVal != null)
+//        {
+//            jo.Add(prop.Name, JToken.FromObject(propVal, serializer));
+//        }
+//    }
+//}
+
+//JToken jt = JToken.FromObject(value);
+//if (jt.Type != JTokenType.Object)
+//{
+//    jt.WriteTo(writer);
+//}
+//else
+//{
+//    JObject o = (JObject)jt;
+//    o.AddFirst(new JProperty("ObjectType", value.GetType().Name));
+//    o.WriteTo(writer);
+//}
+//jo.WriteTo(writer);

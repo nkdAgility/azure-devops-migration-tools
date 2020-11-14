@@ -10,7 +10,6 @@ missng XML code comments
 
 | Parameter name         | Type    | Description                              | Default Value                            |
 |------------------------|---------|------------------------------------------|------------------------------------------|
-| ToConfigure | Type | missng XML code comments | missng XML code comments |
 | AuthenticationMode | AuthenticationMode | missng XML code comments | missng XML code comments |
 | AccessToken | String | missng XML code comments | missng XML code comments |
 | Organisation | String | missng XML code comments | missng XML code comments |

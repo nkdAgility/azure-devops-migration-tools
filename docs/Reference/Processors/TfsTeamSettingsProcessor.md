@@ -14,8 +14,6 @@ Native TFS Processor, does not work with any other Endpoints.
 | UpdateTeamSettings | Boolean | missng XML code comments | missng XML code comments |
 | PrefixProjectToNodes | Boolean | missng XML code comments | missng XML code comments |
 | Teams | List | missng XML code comments | missng XML code comments |
-| Processor | String | missng XML code comments | missng XML code comments |
-| ToConfigure | Type | missng XML code comments | missng XML code comments |
 | Enabled | Boolean | Active the processor if it true. | missng XML code comments |
 | Endpoints | List | missng XML code comments | missng XML code comments |
 | ProcessorEnrichers | List | missng XML code comments | missng XML code comments |

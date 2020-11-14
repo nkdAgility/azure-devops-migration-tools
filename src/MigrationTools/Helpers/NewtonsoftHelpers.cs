@@ -23,6 +23,8 @@ namespace MigrationTools.Helpers
             {
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
                 TypeNameHandling = TypeNameHandling.Objects,
+                TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
+                TypeNameAssemblyFormat = System.Runtime.Serialization.Formatters.FormatterAssemblyStyle.Simple,
                 Formatting = Formatting.Indented,
                 Converters = new List<JsonConverter>() {
                     { new  FieldMapConfigJsonConverter() },
