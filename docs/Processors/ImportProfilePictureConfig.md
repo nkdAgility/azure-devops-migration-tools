@@ -5,4 +5,4 @@ This processor can import profile pictures. This processor must run after `Expor
 | Parameter name | Type    | Description                              | Default Value                            |
 |----------------|---------|------------------------------------------|------------------------------------------|
 | `Enabled`      | Boolean | Active the processor if it true.         | false                                    |
-| `ObjectType`   | string  | The name of the processor                | ImportProfilePictureConfig |
+| `$type`   | string  | The name of the processor                | ImportProfilePictureConfig |
