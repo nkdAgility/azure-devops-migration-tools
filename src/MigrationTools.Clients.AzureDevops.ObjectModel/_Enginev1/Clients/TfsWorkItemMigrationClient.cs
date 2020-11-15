@@ -165,16 +165,7 @@ namespace MigrationTools._EngineV1.Clients
 
         public override WorkItemData GetRevision(WorkItemData workItem, int revision)
         {
-            WorkItemData result;
-            try
-            {
-                result = Store.GetWorkItem(int.Parse(workItem.Id), revision).AsWorkItemData();
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-            return result;
+            throw new NotImplementedException("GetRevision in combination with WorkItemData is buggy");
         }
 
         public override WorkItemData GetWorkItem(string id)
