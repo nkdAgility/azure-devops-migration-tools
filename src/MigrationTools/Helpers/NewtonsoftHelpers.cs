@@ -24,7 +24,8 @@ namespace MigrationTools.Helpers
                 TypeNameHandling = typeHandling,
                 TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
                 SerializationBinder = new OptionsSerializationBinder(),
-                Formatting = Formatting.Indented
+                Formatting = Formatting.Indented,
+                ContractResolver = new OptionsSerializeContractResolver()
             };
         }
     }
