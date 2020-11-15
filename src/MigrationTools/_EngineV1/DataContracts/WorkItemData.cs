@@ -22,7 +22,7 @@ namespace MigrationTools._EngineV1.DataContracts
                     return _id;
                 }
 
-                _id = GetField("ID").ToString();
+                _id = GetField("ID")?.ToString();
                 return _id;
             }
             set
