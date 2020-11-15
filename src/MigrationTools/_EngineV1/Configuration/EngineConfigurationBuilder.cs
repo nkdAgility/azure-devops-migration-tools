@@ -31,6 +31,7 @@ namespace MigrationTools._EngineV1.Configuration
             try
             {
                 string configurationjson = File.ReadAllText(configFile);
+                configurationjson = Upgrade118(configFile, configurationjson);
                 ec = NewtonsoftHelpers.DeserializeObject<EngineConfiguration>(configurationjson);
             }
             catch (JsonSerializationException ex)
@@ -67,6 +68,18 @@ namespace MigrationTools._EngineV1.Configuration
             }
             //#endif
             return ec;
+        }
+
+        private string Upgrade118(string configFile, string configurationjson)
+        {
+            if (configurationjson.Contains("ObjectType"))
+            {
+                configurationjson = configurationjson.Replace("ObjectType", "$type");
+                File.WriteAllText(configFile, configurationjson);
+                _logger.LogWarning("You config file is out of date! In 11.8 we changed `ObjectType` to `$type`! We have updated it for you just now!");
+            }
+
+            return configurationjson;
         }
 
         public EngineConfiguration BuildDefault()
