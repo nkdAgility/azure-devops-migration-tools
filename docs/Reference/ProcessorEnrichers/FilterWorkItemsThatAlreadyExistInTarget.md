@@ -10,8 +10,8 @@ missng XML code comments
 
 | Parameter name         | Type    | Description                              | Default Value                            |
 |------------------------|---------|------------------------------------------|------------------------------------------|
-| Query | QueryOptions | missng XML code comments | missng XML code comments |
 | Enabled | Boolean | missng XML code comments | missng XML code comments |
+| Query | QueryOptions | missng XML code comments | missng XML code comments |
 | RefName | String | missng XML code comments | missng XML code comments |
 
 

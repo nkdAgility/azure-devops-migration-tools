@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -15,6 +14,7 @@ using MigrationTools.Options;
 using MigrationTools.Processors;
 using MigrationTools.Tests;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace VstsSyncMigrator.ConsoleApp
 {
@@ -56,17 +56,26 @@ namespace VstsSyncMigrator.ConsoleApp
             var founds = types.Where(t => type.IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface).ToList();
             foreach (var item in founds)
             {
-                Console.WriteLine("Processing:" + item.Name);
-                var jsonSample = DeployJsonSample(types, type, folder, referencePath, item);
-                string templatemd = GetTemplate(folder, referencePath, masterTemplate, item);
+                var typeOption = types.Where(t => t.Name == string.Format("{0}Options", item.Name) && !t.IsAbstract && !t.IsInterface).SingleOrDefault();
+                if (typeOption != null)
+                {
+                    var options = (IOptions)Activator.CreateInstance(typeOption);
+                    options.SetDefaults();
+                    JObject joptions = (JObject)JToken.FromObject(options);
+                    //---------------------------------------
+                    Console.WriteLine("Processing:" + item.Name);
+                    var jsonSample = DeployJsonSample(options, folder, referencePath, item);
 
-                templatemd = templatemd.Replace("<ClassName>", item.Name);
-                templatemd = templatemd.Replace("<TypeName>", folder);
-                templatemd = ProcessBreadcrumbs(folder, item, templatemd);
-                templatemd = templatemd.Replace("<Description>", GetTypeSummary(item));
-                templatemd = ProcessOptions(types, item, templatemd);
-                templatemd = ProcessSamples(jsonSample, templatemd, referencePath);
-                File.WriteAllText(string.Format("../../../../../docs/Reference/{0}/{1}.md", folder, item.Name), templatemd);
+                    string templatemd = GetTemplate(folder, referencePath, masterTemplate, item);
+
+                    templatemd = templatemd.Replace("<ClassName>", item.Name);
+                    templatemd = templatemd.Replace("<TypeName>", folder);
+                    templatemd = ProcessBreadcrumbs(folder, item, templatemd);
+                    templatemd = templatemd.Replace("<Description>", GetTypeSummary(item));
+                    templatemd = ProcessOptions(options, joptions, templatemd);
+                    templatemd = ProcessSamples(jsonSample, templatemd, referencePath);
+                    File.WriteAllText(string.Format("../../../../../docs/Reference/{0}/{1}.md", folder, item.Name), templatemd);
+                }
             }
         }
 
@@ -88,11 +97,12 @@ namespace VstsSyncMigrator.ConsoleApp
             return query.Replace(Environment.NewLine, "").Trim();
         }
 
-        private static string GetPropertySummary(PropertyInfo property)
+        private static string GetPropertySummary(IOptions options, JObject joptions, JProperty property)
         {
+            var optionsType = options.GetType();
             // Query the data and write out a subset of contacts
-            var query = (from c in GetXDocument(property.DeclaringType).Root.Descendants("member")
-                         where c.Attribute("name").Value == $"P:{property.DeclaringType.FullName}.{property.Name}"
+            var query = (from c in GetXDocument(optionsType).Root.Descendants("member")
+                         where c.Attribute("name").Value == $"P:{optionsType.FullName}.{property.Name}"
                          select c.Element("summary").Value).SingleOrDefault();
             if (query != null)
             {
@@ -106,11 +116,12 @@ namespace VstsSyncMigrator.ConsoleApp
             return query.Replace(Environment.NewLine, "").Trim();
         }
 
-        private static string GetPropertyDefault(PropertyInfo property)
+        private static string GetPropertyDefault(IOptions options, JObject joptions, JProperty property)
         {
+            var optionsType = options.GetType();
             // Query the data and write out a subset of contacts
-            var properyXml = (from c in GetXDocument(property.DeclaringType).Root.Descendants("member")
-                              where c.Attribute("name").Value == $"P:{property.DeclaringType.FullName}.{property.Name}"
+            var properyXml = (from c in GetXDocument(optionsType).Root.Descendants("member")
+                              where c.Attribute("name").Value == $"P:{optionsType.FullName}.{property.Name}"
                               select c).SingleOrDefault();
             string defaultvalue = null;
             if (properyXml != null)
@@ -137,26 +148,30 @@ namespace VstsSyncMigrator.ConsoleApp
             return XDocument.Load(xmlDataPath);
         }
 
-        private static string ProcessOptions(List<Type> types, Type item, string templatemd)
+        private static string ProcessOptions(IOptions options, JObject joptions, string templatemd)
         {
-            var typeOption = types.Where(t => t.Name == string.Format("{0}Options", item.Name) && !t.IsAbstract && !t.IsInterface).SingleOrDefault();
-            StringBuilder options = new StringBuilder();
-            if (!(typeOption is null))
+            StringBuilder properties = new StringBuilder();
+            if (!(joptions is null))
             {
-                options.AppendLine("| Parameter name         | Type    | Description                              | Default Value                            |");
-                options.AppendLine("|------------------------|---------|------------------------------------------|------------------------------------------|");
-                var propertys = typeOption.GetProperties().Where(p => p.CanWrite);
-                foreach (PropertyInfo property in propertys)
+                properties.AppendLine("| Parameter name         | Type    | Description                              | Default Value                            |");
+                properties.AppendLine("|------------------------|---------|------------------------------------------|------------------------------------------|");
+                var jpropertys = joptions.Properties();
+                foreach (JProperty jproperty in jpropertys)
                 {
-                    options.AppendLine(string.Format("| {0} | {1} | {2} | {3} |", property.Name, property.PropertyType.Name.Replace("`1", ""), GetPropertySummary(property), GetPropertyDefault(property)));
+                    properties.AppendLine(string.Format("| {0} | {1} | {2} | {3} |", jproperty.Name, GetPropertyType(options, jproperty), GetPropertySummary(options, joptions, jproperty), GetPropertyDefault(options, joptions, jproperty)));
                 }
-                templatemd = templatemd.Replace("<Options>", options.ToString());
+                templatemd = templatemd.Replace("<Options>", properties.ToString());
             }
             else
             {
                 templatemd = templatemd.Replace("<Options>", "Options not yet implmeneted");
             }
             return templatemd;
+        }
+
+        private static object GetPropertyType(IOptions options, JProperty jproperty)
+        {
+            return options.GetType().GetProperty(jproperty.Name).PropertyType.Name.Replace("`1", "");
         }
 
         private static string ProcessSamples(string jsonSample, string templatemd, string referencePath)
@@ -197,23 +212,13 @@ namespace VstsSyncMigrator.ConsoleApp
             return templatemd;
         }
 
-        private static string DeployJsonSample(List<Type> types, Type type, string folder, string referencePath, Type item)
+        private static string DeployJsonSample(IOptions options, string folder, string referencePath, Type item)
         {
-            var typeOption = types.Where(t => t.Name == string.Format("{0}Options", item.Name) && !t.IsAbstract && !t.IsInterface).SingleOrDefault();
             string json;
-            if (!(typeOption is null))
-            {
-                var instance = (IOptions)Activator.CreateInstance(typeOption);
-                instance.SetDefaults();
-                json = NewtonsoftHelpers.SerializeObject(instance, TypeNameHandling.Objects);
-                string jsonFilename = string.Format("{0}.json", item.Name);
-                string jsonFilePath = Path.Combine(referencePath, folder, jsonFilename);
-                File.WriteAllText(jsonFilePath, json.Replace(TestingConstants.AccessToken, "6i4jyylsadahtdjniaydxnjsi4zsz3qsword2y5ngzzsdfewaostq"));
-            }
-            else
-            {
-                json = "!No Support for V1";
-            }
+            json = NewtonsoftHelpers.SerializeObject(options, TypeNameHandling.Objects);
+            string jsonFilename = string.Format("{0}.json", item.Name);
+            string jsonFilePath = Path.Combine(referencePath, folder, jsonFilename);
+            File.WriteAllText(jsonFilePath, json.Replace(TestingConstants.AccessToken, "6i4jyylsadahtdjniaydxnjsi4zsz3qsword2y5ngzzsdfewaostq"));
             return json;
         }
     }
