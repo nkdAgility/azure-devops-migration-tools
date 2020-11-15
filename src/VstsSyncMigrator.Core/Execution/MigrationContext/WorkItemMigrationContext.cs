@@ -102,6 +102,9 @@ namespace VstsSyncMigrator.Engine
                 string.Format(
                     @"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY {1}",
                     _config.WIQLQueryBit, _config.WIQLOrderBit);
+
+            // Inform the user that he maybe has to be patient now
+            contextLog.Information("Querying items to be migrated: {SourceQuery} ...", sourceQuery);
             var sourceWorkItems = Engine.Source.WorkItems.GetWorkItems(sourceQuery);
             contextLog.Information("Replay all revisions of {sourceWorkItemsCount} work items?", sourceWorkItems.Count);
             //////////////////////////////////////////////////
