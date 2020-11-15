@@ -22,37 +22,72 @@ namespace MigrationTools._EngineV1.DataContracts
                     return _id;
                 }
 
-                _id = this.Fields["ID"].ToString();
+                _id = GetField<string>("ID");
                 return _id;
             }
             set
             {
                 var val = int.Parse(value);
                 _id = value;
-                this.Fields["ID"] = val;
+                SetField<int>("ID", val);
             }
         }
 
         public string Type
         {
-            get => this.Fields["Work Item Type"] as string;
-            set => this.Fields["Work Item Type"] = value;
+            get => GetField<string>("Work Item Type");
+            set => SetField("Work Item Type", value);
         }
 
         public string Title
         {
-            get => this.Fields["Title"] as string;
-            set => this.Fields["Title"] = value;
+            get => GetField<string>("Title");
+            set => SetField("Title", value);
         }
 
-        public int Rev => (int)this.Fields["Rev"];
-        public DateTime RevisedDate => (DateTime)this.Fields["Revised Date"];
+        public int Rev => GetField<int>("Rev");
+        public DateTime RevisedDate => GetField<DateTime>("Revised Date");
         public string ProjectName { get; set; }
 
         [JsonIgnore]
         public object internalObject { get; set; }
 
         public Dictionary<string, object> Fields { get; set; }
+
+        public WorkItemData()
+        {
+            Fields = new Dictionary<string, object>();
+        }
+
         public IReadOnlyDictionary<int, RevisionItem> Revisions { get; set; }
+
+        private T GetField<T>(string field)
+        {
+            if (Fields is null)
+            {
+                this.Fields = new Dictionary<string, object>();
+            }
+            if (!this.Fields.ContainsKey(field))
+            {
+                return default;
+            }
+            return (T)this.Fields[field];
+        }
+
+        private void SetField<T>(string field, T value)
+        {
+            if (Fields is null)
+            {
+                this.Fields = new Dictionary<string, object>();
+            }
+            if (this.Fields.ContainsKey(field))
+            {
+                this.Fields[field] = value;
+            }
+            else
+            {
+                this.Fields.Add(field, value);
+            }
+        }
     }
 }
