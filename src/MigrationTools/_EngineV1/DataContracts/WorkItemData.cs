@@ -22,31 +22,31 @@ namespace MigrationTools._EngineV1.DataContracts
                     return _id;
                 }
 
-                _id = GetField("ID")?.ToString();
+                _id = GetField("System.Id")?.ToString(); // ToString() will create a new string while the field value already is a string => as cast is more efficient here
                 return _id;
             }
             set
             {
                 var val = int.Parse(value);
                 _id = value;
-                SetField<int>("ID", val);
+                SetField<int>("System.Id", val);
             }
         }
 
         public string Type
         {
-            get => GetField("Work Item Type").ToString();
-            set => SetField("Work Item Type", value);
+            get => GetField("System.WorkItemType").ToString(); // ToString() will create a new string while the field value already is a string => as cast is more efficient here
+            set => SetField("System.WorkItemType", value);
         }
 
         public string Title
         {
-            get => GetField("Title").ToString();
-            set => SetField("Title", value);
+            get => GetField("System.Title").ToString(); // ToString() will create a new string while the field value already is a string => as cast is more efficient here
+            set => SetField("System.Title", value);
         }
 
-        public int Rev => int.Parse(GetField("Rev").ToString());
-        public DateTime RevisedDate => DateTime.Parse(GetField("Revised Date").ToString());
+        public int Rev => int.Parse(GetField("System.Rev").ToString()); // Rev is always an int => cast is more efficient than ToString() and parsing it
+        public DateTime ChangedDate => DateTime.Parse(GetField("System.ChangedDate").ToString()); // ChangedDate always is DateTime => cast is more efficient than ToString() and parsing its
         public string ProjectName { get; set; }
 
         [JsonIgnore]

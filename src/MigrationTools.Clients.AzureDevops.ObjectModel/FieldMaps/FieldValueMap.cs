@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools._EngineV1.Configuration.FieldMap;
+using MigrationTools._EngineV1.DataContracts;
 
 namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
 {
@@ -17,24 +18,32 @@ namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
 
         internal override void InternalExecute(WorkItem source, WorkItem target)
         {
-            if (source.Fields.Contains(Config.sourceField))
+            throw new NotImplementedException("Use the WorkItemData overload instead");
+        }
+
+        internal override bool RefactoredToUseWorkItemData { get; } = true;
+
+        internal override void InternalExecute(WorkItemData source, WorkItemData target)
+        {
+            if (source.Fields.ContainsKey(Config.sourceField))
             {
-                var sourceVal = source.Fields[Config.sourceField].Value;
-                var t = target.Fields[Config.targetField].FieldDefinition.SystemType;
+                var sourceVal = source.Fields[Config.sourceField];
+                var targetWi = target.ToWorkItem();
+                var t = targetWi.Fields[Config.targetField].FieldDefinition.SystemType;
 
                 if (sourceVal is null && Config.valueMapping.ContainsKey("null"))
                 {
-                    target.Fields[Config.targetField].Value = Convert.ChangeType(Config.valueMapping["null"], t);
+                    targetWi.Fields[Config.targetField].Value = Convert.ChangeType(Config.valueMapping["null"], t);
                     Log.LogDebug("FieldValueMap: [UPDATE] field value mapped {SourceId}:{SourceField} to {TargetId}:{TargetField}", source.Id, Config.sourceField, target.Id, Config.targetField);
                 }
                 else if (sourceVal != null && Config.valueMapping.ContainsKey(sourceVal.ToString()))
                 {
-                    target.Fields[Config.targetField].Value = Convert.ChangeType(Config.valueMapping[sourceVal.ToString()], t);
+                    targetWi.Fields[Config.targetField].Value = Convert.ChangeType(Config.valueMapping[sourceVal.ToString()], t);
                     Log.LogDebug("FieldValueMap: [UPDATE] field value mapped {SourceId}:{SourceField} to {TargetId}:{TargetField}", source.Id, Config.sourceField, target.Id, Config.targetField);
                 }
                 else if (sourceVal != null && !string.IsNullOrWhiteSpace(Config.defaultValue))
                 {
-                    target.Fields[Config.targetField].Value = Convert.ChangeType(Config.defaultValue, t);
+                    targetWi.Fields[Config.targetField].Value = Convert.ChangeType(Config.defaultValue, t);
                     Log.LogDebug("FieldValueMap: [UPDATE] field value mapped {SourceId}:{SourceField} to {TargetId}:{TargetField}", source.Id, Config.sourceField, target.Id, Config.targetField);
                 }
             }

@@ -522,7 +522,7 @@ namespace VstsSyncMigrator.Engine
                         {
                             revWi.Id,
                             revWi.Rev,
-                            revWi.RevisedDate,
+                            revWi.ChangedDate, // According to https://docs.microsoft.com/en-us/azure/devops/reference/xml/reportable-fields-reference?view=azure-devops-2020 Revised Date was misused here
                             revWi.Fields
                         };
                     });
@@ -562,13 +562,14 @@ namespace VstsSyncMigrator.Engine
                     WorkItemTypeChange(targetWorkItem, skipToFinalRevisedWorkItemType, finalDestType, revision, currentRevisionWorkItem, destType);
 
                     PopulateWorkItem(currentRevisionWorkItem, targetWorkItem, destType);
+
+                    // Todo: Ensure all field maps use WorkItemData.Fields to apply a correct mapping
                     Engine.FieldMaps.ApplyFieldMappings(currentRevisionWorkItem, targetWorkItem);
 
-                    targetWorkItem.ToWorkItem().Fields["System.ChangedBy"].Value =
-                        currentRevisionWorkItem.ToWorkItem().Revisions[revision.Index].Fields["System.ChangedBy"].Value;
+                    // Todo: Think about an "UpdateChangedBy" flag as this is expensive! (2s/WI instead of 1,5s when writing "Migration")
+                    targetWorkItem.ToWorkItem().Fields["System.ChangedBy"].Value = currentRevisionWorkItem.Fields["System.ChangedBy"];
 
-                    targetWorkItem.ToWorkItem().Fields["System.History"].Value =
-                        currentRevisionWorkItem.ToWorkItem().Revisions[revision.Index].Fields["System.History"].Value;
+                    targetWorkItem.ToWorkItem().Fields["System.History"].Value = currentRevisionWorkItem.Fields["System.History"];
                     //Debug.WriteLine("Discussion:" + currentRevisionWorkItem.Revisions[revision.Index].Fields["System.History"].Value);
 
                     TfsReflectedWorkItemId reflectedUri = (TfsReflectedWorkItemId)Engine.Source.WorkItems.CreateReflectedWorkItemId(sourceWorkItem);
