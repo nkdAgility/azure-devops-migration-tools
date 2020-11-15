@@ -34,10 +34,10 @@ namespace MigrationTools._EngineV1.Clients
             var match = ReflectedIdRegex.Match(ReflectedWorkItemId);
             if (match.Success)
             {
-                _WorkItemId = match.Groups["id"].Value;
-                _ProjectName = match.Groups["project"].Value;
-                _Connection = new Uri(match.Groups["org"].Value);
                 Log.Verbose("TfsReflectedWorkItemId: Match Sucess from {ReflectedWorkItemId}: {@ReflectedWorkItemIdObject}", ReflectedWorkItemId, this);
+                _WorkItemId = match.Groups[0].Value;
+                _ProjectName = match.Groups[1].Value;
+                _Connection = new Uri(match.Groups[2].Value);
             }
             else
             {

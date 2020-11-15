@@ -13,6 +13,7 @@ using MigrationTools.Enrichers;
 using MigrationTools.Helpers;
 using MigrationTools.Options;
 using MigrationTools.Processors;
+using MigrationTools.Tests;
 using Newtonsoft.Json;
 
 namespace VstsSyncMigrator.ConsoleApp
@@ -167,7 +168,7 @@ namespace VstsSyncMigrator.ConsoleApp
             {
                 string importPath = Path.Combine(referencePath, item.Value);
                 string importFile = System.IO.File.ReadAllText(importPath);
-                templatemd.Replace(string.Format($"<Import:{item.Value}>"), importFile);
+                templatemd = templatemd.Replace(string.Format($"<Import:{item.Value}>"), importFile);
             }
             return templatemd;
         }
@@ -207,7 +208,7 @@ namespace VstsSyncMigrator.ConsoleApp
                 json = NewtonsoftHelpers.SerializeObject(instance, TypeNameHandling.Objects);
                 string jsonFilename = string.Format("{0}.json", item.Name);
                 string jsonFilePath = Path.Combine(referencePath, folder, jsonFilename);
-                File.WriteAllText(jsonFilePath, json);
+                File.WriteAllText(jsonFilePath, json.Replace(TestingConstants.AccessToken, "6i4jyylsadahtdjniaydxnjsi4zsz3qsword2y5ngzzsdfewaostq"));
             }
             else
             {
