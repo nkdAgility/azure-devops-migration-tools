@@ -166,7 +166,7 @@ namespace MigrationTools
             var dict = new Dictionary<string, object>();
             for (var ix = 0; ix < col.Count; ix++)
             {
-                dict.Add(col[ix].Name, col[ix].Value);
+                dict.Add(col[ix].ReferenceName, col[ix].Value);
             }
             return dict;
         }
