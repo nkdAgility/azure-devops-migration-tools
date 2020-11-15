@@ -11,6 +11,7 @@ missng XML code comments
 | Parameter name         | Type    | Description                              | Default Value                            |
 |------------------------|---------|------------------------------------------|------------------------------------------|
 | Enabled | Boolean | missng XML code comments | missng XML code comments |
+| RefName | String | missng XML code comments | missng XML code comments |
 
 
 ### Example JSON
@@ -18,6 +19,7 @@ missng XML code comments
 ```JSON
 {
   "$type": "SkipToFinalRevisedWorkItemTypeOptions",
-  "Enabled": true
+  "Enabled": true,
+  "RefName": null
 }
 ```

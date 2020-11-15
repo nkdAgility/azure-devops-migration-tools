@@ -1,5 +1,6 @@
 {
   "$type": "FileSystemWorkItemEndpointOptions",
   "FileStore": "c:\\temp\\Store",
-  "EndpointEnrichers": null
+  "EndpointEnrichers": null,
+  "RefName": null
 }

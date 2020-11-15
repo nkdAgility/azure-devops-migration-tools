@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using MigrationTools.EndPoints;
 
 namespace MigrationTools.Endpoints
 {
@@ -38,13 +39,29 @@ namespace MigrationTools.Endpoints
             _SourceOptions = source ?? throw new ArgumentNullException(nameof(source));
             _TargetOptions = target ?? throw new ArgumentNullException(nameof(target));
 
-            var sourceEp = (IEndpoint)Services.GetRequiredService(_SourceOptions.ToConfigure);
-            sourceEp.Configure(_SourceOptions);
-            _Source = sourceEp;
+            if (source is RefEndpointOptions)
+            {
+                // Must load from catalog
+                throw new NotImplementedException("RefEndpointOptions has not yet been implemnted");
+            }
+            else
+            {
+                var sourceEp = (IEndpoint)Services.GetRequiredService(_SourceOptions.ToConfigure);
+                sourceEp.Configure(_SourceOptions);
+                _Source = sourceEp;
+            }
 
-            var targetEp = (IEndpoint)Services.GetRequiredService(_TargetOptions.ToConfigure);
-            targetEp.Configure(_TargetOptions);
-            _Target = targetEp;
+            if (target is RefEndpointOptions)
+            {
+                // Must load from catalog
+                throw new NotImplementedException("RefEndpointOptions has not yet been implemnted");
+            }
+            else
+            {
+                var targetEp = (IEndpoint)Services.GetRequiredService(_TargetOptions.ToConfigure);
+                targetEp.Configure(_TargetOptions);
+                _Target = targetEp;
+            }
             _Configured = true;
         }
     }

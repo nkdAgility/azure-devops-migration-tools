@@ -1,4 +1,5 @@
 {
   "$type": "TfsValidateRequiredFieldOptions",
-  "Enabled": true
+  "Enabled": true,
+  "RefName": null
 }

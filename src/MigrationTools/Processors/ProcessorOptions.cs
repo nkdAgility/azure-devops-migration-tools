@@ -20,6 +20,7 @@ namespace MigrationTools.Processors
         public IEndpointOptions Source { get; set; }
         public IEndpointOptions Target { get; set; }
         public abstract Type ToConfigure { get; }
+        public string RefName { get; set; }
 
         public abstract IProcessorOptions GetDefault();
 

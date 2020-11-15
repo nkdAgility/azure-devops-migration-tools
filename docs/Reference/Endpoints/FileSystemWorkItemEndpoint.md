@@ -12,6 +12,7 @@ missng XML code comments
 |------------------------|---------|------------------------------------------|------------------------------------------|
 | FileStore | String | missng XML code comments | missng XML code comments |
 | EndpointEnrichers | List | missng XML code comments | missng XML code comments |
+| RefName | String | missng XML code comments | missng XML code comments |
 
 
 ### Example JSON
@@ -20,6 +21,7 @@ missng XML code comments
 {
   "$type": "FileSystemWorkItemEndpointOptions",
   "FileStore": "c:\\temp\\Store",
-  "EndpointEnrichers": null
+  "EndpointEnrichers": null,
+  "RefName": null
 }
 ```
