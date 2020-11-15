@@ -102,6 +102,9 @@ namespace VstsSyncMigrator.Engine
                 string.Format(
                     @"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY {1}",
                     _config.WIQLQueryBit, _config.WIQLOrderBit);
+
+            // Inform the user that he maybe has to be patient now
+            contextLog.Information("Querying items to be migrated: {SourceQuery} ...", sourceQuery);
             var sourceWorkItems = Engine.Source.WorkItems.GetWorkItems(sourceQuery);
             contextLog.Information("Replay all revisions of {sourceWorkItemsCount} work items?", sourceWorkItems.Count);
             //////////////////////////////////////////////////
@@ -490,9 +493,7 @@ namespace VstsSyncMigrator.Engine
             {
                 var skipToFinalRevisedWorkItemType = _config.SkipToFinalRevisedWorkItemType;
 
-                var last = Engine.Source.WorkItems.GetRevision(sourceWorkItem, revisionsToMigrate.Last().Number);
-
-                string finalDestType = last.Type;
+                string finalDestType = revisionsToMigrate.Last().Type;
 
                 if (skipToFinalRevisedWorkItemType && Engine.TypeDefinitionMaps.Items.ContainsKey(finalDestType))
                 {
@@ -503,7 +504,7 @@ namespace VstsSyncMigrator.Engine
                 //If work item hasn't been created yet, create a shell
                 if (targetWorkItem == null)
                 {
-                    string targetType = Engine.Source.WorkItems.GetRevision(sourceWorkItem, revisionsToMigrate.First().Number).Type;
+                    string targetType = revisionsToMigrate.First().Type;
                     if (Engine.TypeDefinitionMaps.Items.ContainsKey(targetType))
                     {
                         targetType = Engine.TypeDefinitionMaps.Items[targetType].Map();
@@ -513,17 +514,23 @@ namespace VstsSyncMigrator.Engine
 
                 if (_config.CollapseRevisions)
                 {
-                    var data = revisionsToMigrate.Select(rev => Engine.Source.WorkItems.GetRevision(sourceWorkItem, rev.Number)).Select(rev => new
+                    var data = revisionsToMigrate.Select(rev =>
                     {
-                        rev.Id,
-                        rev.Rev,
-                        rev.RevisedDate,
-                        Fields = rev.ToWorkItem().Fields.AsDictionary()
+                        var revWi = sourceWorkItem.GetRevision(rev.Number);
+
+                        return new
+                        {
+                            revWi.Id,
+                            revWi.Rev,
+                            revWi.RevisedDate,
+                            revWi.Fields
+                        };
                     });
 
                     var fileData = JsonConvert.SerializeObject(data, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
                     var filePath = Path.Combine(Path.GetTempPath(), $"{sourceWorkItem.Id}_PreMigrationHistory.json");
 
+                    // todo: Delete this file after (!) WorkItem has been saved
                     File.WriteAllText(filePath, fileData);
                     targetWorkItem.ToWorkItem().Attachments.Add(new Attachment(filePath, "History has been consolidated into the attached file."));
 
@@ -537,7 +544,7 @@ namespace VstsSyncMigrator.Engine
 
                 foreach (var revision in revisionsToMigrate)
                 {
-                    var currentRevisionWorkItem = Engine.Source.WorkItems.GetRevision(sourceWorkItem, revision.Number);
+                    var currentRevisionWorkItem = sourceWorkItem.GetRevision(revision.Number);
 
                     TraceWriteLine(LogEventLevel.Information, " Processing Revision [{RevisionNumber}]",
                         new Dictionary<string, object>() {
@@ -621,21 +628,12 @@ namespace VstsSyncMigrator.Engine
 
         private List<MigrationTools._EngineV1.DataContracts.RevisionItem> RevisionsToMigrate(MigrationTools._EngineV1.DataContracts.WorkItemData sourceWorkItem, MigrationTools._EngineV1.DataContracts.WorkItemData targetWorkItem)
         {
-            // just to make sure, we replay the events in the same order as they appeared
-            // maybe, the Revisions collection is not sorted according to the actual Revision number
-            List<MigrationTools._EngineV1.DataContracts.RevisionItem> sortedRevisions = null;
-            sortedRevisions = sourceWorkItem.ToWorkItem().Revisions.Cast<Revision>()
-                    .Select(x => new RevisionItem
-                    {
-                        Index = x.Index,
-                        Number = Convert.ToInt32(x.Fields["System.Rev"].Value),
-                        ChangedDate = Convert.ToDateTime(x.Fields["System.ChangedDate"].Value)
-                    })
-                    .ToList();
+            // Revisions have been sorted already on object creation. Values of the Dictionary are sorted by RevisionItem.Number
+            var sortedRevisions = sourceWorkItem.Revisions.Values.ToList();
 
             if (targetWorkItem != null)
             {
-                // Target exists so remove any Changed Date matches bwtween them
+                // Target exists so remove any Changed Date matches between them
                 var targetChangedDates = (from Revision x in targetWorkItem.ToWorkItem().Revisions select Convert.ToDateTime(x.Fields["System.ChangedDate"].Value)).ToList();
                 if (_config.ReplayRevisions)
                 {
@@ -646,10 +644,9 @@ namespace VstsSyncMigrator.Engine
                 sortedRevisions = sortedRevisions.Where(x => x.ChangedDate > targetLatestDate).ToList();
             }
 
-            sortedRevisions = sortedRevisions.OrderBy(x => x.Number).ToList();
             if (!_config.ReplayRevisions && sortedRevisions.Count > 0)
             {
-                // Remove all but the latest revision if we are not replaying reviss=ions
+                // Remove all but the latest revision if we are not replaying revisions
                 sortedRevisions.RemoveRange(0, sortedRevisions.Count - 1);
             }
 

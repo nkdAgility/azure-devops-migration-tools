@@ -123,7 +123,7 @@ namespace MigrationTools._EngineV1.Clients
             Project y;
             try
             {
-                y = (from Project x in Store.Projects where x.Name.ToUpper() == MigrationClient.Config.AsTeamProjectConfig().Project.ToUpper() select x).SingleOrDefault();
+                y = (from Project x in Store.Projects where string.Equals(x.Name, MigrationClient.Config.AsTeamProjectConfig().Project, StringComparison.OrdinalIgnoreCase) select x).Single(); // Use Single instead of SingleOrDefault to force an exception here
                 timer.Stop();
                 Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", MigrationClient.Config.AsTeamProjectConfig().Collection.ToString(), "GetProject", null, startTime, timer.Elapsed, "200", true));
             }
@@ -138,10 +138,10 @@ namespace MigrationTools._EngineV1.Clients
                        new Dictionary<string, double> {
                             { "Time",timer.ElapsedMilliseconds }
                        });
-                Log.Error(ex, "Unable to configure store");
+                Log.Error(ex, "Unable to get project with name {ConfiguredProjectName}", MigrationClient.Config.AsTeamProjectConfig().Project);
                 throw;
             }
-            return y.ToProjectData();
+            return y.ToProjectData(); // With SingleOrDefault earlier this would result in a NullReferenceException which is hard to debug
         }
 
         public override ReflectedWorkItemId GetReflectedWorkItemId(WorkItemData workItem)
@@ -165,16 +165,7 @@ namespace MigrationTools._EngineV1.Clients
 
         public override WorkItemData GetRevision(WorkItemData workItem, int revision)
         {
-            WorkItemData result;
-            try
-            {
-                result = Store.GetWorkItem(int.Parse(workItem.Id), revision).AsWorkItemData();
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-            return result;
+            throw new NotImplementedException("GetRevision in combination with WorkItemData is buggy");
         }
 
         public override WorkItemData GetWorkItem(string id)
