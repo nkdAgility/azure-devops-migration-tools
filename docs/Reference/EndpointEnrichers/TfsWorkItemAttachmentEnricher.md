@@ -23,7 +23,6 @@ missng XML code comments
   "$type": "TfsWorkItemAttachmentEnricherOptions",
   "Enabled": true,
   "WorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
-  "MaxSize": 480000000,
-  "RefName": null
+  "MaxSize": 480000000
 }
 ```

@@ -52,18 +52,15 @@ This processor is intended, with the aid of [ProcessorEnrichers](../ProcessorEnr
   "ProcessorEnrichers": [
     {
       "$type": "PauseAfterEachItemOptions",
-      "Enabled": true,
-      "RefName": null
+      "Enabled": true
     },
     {
       "$type": "AppendMigrationToolSignatureFooterOptions",
-      "Enabled": true,
-      "RefName": null
+      "Enabled": true
     }
   ],
   "Source": null,
-  "Target": null,
-  "RefName": null
+  "Target": null
 }
 ```
 

@@ -19,7 +19,6 @@ missng XML code comments
 ```JSON
 {
   "$type": "AppendMigrationToolSignatureFooterOptions",
-  "Enabled": true,
-  "RefName": null
+  "Enabled": true
 }
 ```

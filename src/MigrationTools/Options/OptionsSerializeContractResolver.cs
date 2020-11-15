@@ -11,7 +11,7 @@ namespace MigrationTools.Options
             JsonProperty property = base.CreateProperty(member, memberSerialization);
             if (property.PropertyName == "RefName")
             {
-                property.ShouldSerialize = instance => string.IsNullOrEmpty((instance?.GetType().GetProperty(property.PropertyName).GetValue(instance)?.ToString()));
+                property.ShouldSerialize = instance => !string.IsNullOrEmpty((instance?.GetType().GetProperty(property.PropertyName).GetValue(instance)?.ToString()));
             }
             return property;
         }

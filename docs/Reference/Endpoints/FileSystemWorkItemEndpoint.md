@@ -21,7 +21,6 @@ missng XML code comments
 {
   "$type": "FileSystemWorkItemEndpointOptions",
   "FileStore": "c:\\temp\\Store",
-  "EndpointEnrichers": null,
-  "RefName": null
+  "EndpointEnrichers": null
 }
 ```

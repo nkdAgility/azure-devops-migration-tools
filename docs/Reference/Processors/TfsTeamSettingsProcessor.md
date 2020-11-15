@@ -39,8 +39,7 @@ Native TFS Processor, does not work with any other Endpoints.
     "AuthenticationMode": "AccessToken",
     "AccessToken": "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
     "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
-    "EndpointEnrichers": null,
-    "RefName": null
+    "EndpointEnrichers": null
   },
   "Target": {
     "$type": "TfsEndpointOptions",
@@ -49,9 +48,7 @@ Native TFS Processor, does not work with any other Endpoints.
     "AuthenticationMode": "AccessToken",
     "AccessToken": "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
     "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
-    "EndpointEnrichers": null,
-    "RefName": null
-  },
-  "RefName": null
+    "EndpointEnrichers": null
+  }
 }
 ```
