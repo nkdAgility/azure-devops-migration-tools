@@ -1,5 +1,4 @@
 {
   "$type": "PauseAfterEachItemOptions",
-  "Enabled": true,
-  "RefName": null
+  "Enabled": true
 }

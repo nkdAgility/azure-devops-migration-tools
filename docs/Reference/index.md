@@ -33,49 +33,49 @@ The model should also work for other data `Teams`, `SharedQueries`, `PlansAndSui
   "LogLevel": "Verbose",
   "MappingTools": [
     {
-      "ObjectType": "MappingToolA",
+      "$type": "MappingToolA",
       "Enabled": true
     },
     {
-      "ObjectType": "MappingToolA",
+      "$type": "MappingToolA",
       "Enabled": true
     }
   ],
   "Processors": [
     {
-      "ObjectType": "ProcessorA",
+      "$type": "ProcessorA",
       "Enabled": true,
       "Enrichers": [
         {
-          "ObjectType": "EnricherA",
+          "$type": "EnricherA",
           "Enabled": true
         },
         {
-          "ObjectType": "EnricherB",
+          "$type": "EnricherB",
           "Enabled": true
         }
       ],
       "Endpoints": [
         {
-          "ObjectType": "EndPointA",
+          "$type": "EndPointA",
           "Direction": "Source",
           "Enrichers": [
             {
-              "ObjectType": "EnricherA",
+              "$type": "EnricherA",
               "Enabled": true,
             },
             {
-              "ObjectType": "EnricherB",
+              "$type": "EnricherB",
               "Enabled": true,
             }
           ]
         },
         {
-          "ObjectType": "EndPointB",
+          "$type": "EndPointB",
           "Direction": "Target",
           "Enrichers": [
             {
-              "ObjectType": "EnricherA",
+              "$type": "EnricherA",
               "Enabled": true,
               "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
               "AttachmentMaxSize": 480000000

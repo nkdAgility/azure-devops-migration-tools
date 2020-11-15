@@ -10,18 +10,18 @@ namespace MigrationTools.Processors
     public class TfsSharedQueryProcessorOptions : ProcessorOptions
     {
         /// <summary>
-        ///     The name of the shared folder, setting the default name
+        /// The name of the shared folder, setting the default name
         /// </summary>
         private string sharedFolderName = "Shared Queries";
 
         /// <summary>
-        ///     Do we add the source project name into the folder path
+        /// Do we add the source project name into the folder path
         /// </summary>
         /// <default>false</default>
         public bool PrefixProjectToNodes { get; set; }
 
         /// <summary>
-        ///     The name of the shared folder, made a parameter incase it every needs to be edited
+        /// The name of the shared folder, made a parameter incase it every needs to be edited
         /// </summary>
         /// <default>Shared Queries</default>
         public string SharedFolderName

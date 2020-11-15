@@ -10,10 +10,10 @@ missng XML code comments
 
 | Parameter name         | Type    | Description                              | Default Value                            |
 |------------------------|---------|------------------------------------------|------------------------------------------|
-| AuthenticationMode | AuthenticationMode | missng XML code comments | missng XML code comments |
-| AccessToken | String | missng XML code comments | missng XML code comments |
 | Organisation | String | missng XML code comments | missng XML code comments |
 | Project | String | missng XML code comments | missng XML code comments |
+| AuthenticationMode | AuthenticationMode | missng XML code comments | missng XML code comments |
+| AccessToken | String | missng XML code comments | missng XML code comments |
 | ReflectedWorkItemIdField | String | missng XML code comments | missng XML code comments |
 | EndpointEnrichers | List | missng XML code comments | missng XML code comments |
 | RefName | String | missng XML code comments | missng XML code comments |
@@ -29,7 +29,6 @@ missng XML code comments
   "AuthenticationMode": "AccessToken",
   "AccessToken": "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
   "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
-  "EndpointEnrichers": null,
-  "RefName": null
+  "EndpointEnrichers": null
 }
 ```

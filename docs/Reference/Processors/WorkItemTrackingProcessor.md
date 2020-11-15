@@ -11,15 +11,15 @@ This processor is intended, with the aid of [ProcessorEnrichers](../ProcessorEnr
 
 | Parameter name         | Type    | Description                              | Default Value                            |
 |------------------------|---------|------------------------------------------|------------------------------------------|
+| Enabled | Boolean | If set to `true` then the processor will run. Set to `false` and the processor will not run. | missng XML code comments |
 | ReplayRevisions | Boolean | missng XML code comments | missng XML code comments |
 | PrefixProjectToNodes | Boolean | missng XML code comments | missng XML code comments |
 | CollapseRevisions | Boolean | missng XML code comments | missng XML code comments |
 | WorkItemCreateRetryLimit | Int32 | missng XML code comments | missng XML code comments |
-| Enabled | Boolean | If set to `true` then the processor will run. Set to `false` and the processor will not run. | missng XML code comments |
-| ProcessorEnrichers | List | missng XML code comments | missng XML code comments |
-| Source | IEndpointOptions | missng XML code comments | missng XML code comments |
-| Target | IEndpointOptions | missng XML code comments | missng XML code comments |
-| RefName | String | missng XML code comments | missng XML code comments |
+| ProcessorEnrichers | List | List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors. | missng XML code comments |
+| Source | IEndpointOptions | This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor. | missng XML code comments |
+| Target | IEndpointOptions | This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a write only processor. | missng XML code comments |
+| RefName | String | `Refname` will be used in the future to allow for using named Options without the need to copy all of the options. | missng XML code comments |
 
 
 ### Supported Endpoints
@@ -52,18 +52,15 @@ This processor is intended, with the aid of [ProcessorEnrichers](../ProcessorEnr
   "ProcessorEnrichers": [
     {
       "$type": "PauseAfterEachItemOptions",
-      "Enabled": true,
-      "RefName": null
+      "Enabled": true
     },
     {
       "$type": "AppendMigrationToolSignatureFooterOptions",
-      "Enabled": true,
-      "RefName": null
+      "Enabled": true
     }
   ],
   "Source": null,
-  "Target": null,
-  "RefName": null
+  "Target": null
 }
 ```
 

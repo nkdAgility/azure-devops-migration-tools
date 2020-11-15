@@ -16,10 +16,26 @@ namespace MigrationTools.Processors
         [Obsolete("Avoid using! V1 Architecture")]
         public abstract string Processor { get; }
 
+        /// <summary>
+        /// List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.
+        /// </summary>
         public List<IProcessorEnricherOptions> ProcessorEnrichers { get; set; }
+
+        /// <summary>
+        /// This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.
+        /// </summary>
         public IEndpointOptions Source { get; set; }
+
+        /// <summary>
+        /// This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a write only processor.
+        /// </summary>
         public IEndpointOptions Target { get; set; }
+
         public abstract Type ToConfigure { get; }
+
+        /// <summary>
+        /// `Refname` will be used in the future to allow for using named Options without the need to copy all of the options.
+        /// </summary>
         public string RefName { get; set; }
 
         public abstract IProcessorOptions GetDefault();

@@ -38,8 +38,7 @@ The `Direction` option is required to allow the system to set direction. At a mi
   "AuthenticationMode": "AccessToken",
   "AccessToken": "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
   "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
-  "EndpointEnrichers": null,
-  "RefName": null
+  "EndpointEnrichers": null
 }
     }
 ```

@@ -19,7 +19,6 @@ missng XML code comments
 ```JSON
 {
   "$type": "TfsValidateRequiredFieldOptions",
-  "Enabled": true,
-  "RefName": null
+  "Enabled": true
 }
 ```
