@@ -14,10 +14,10 @@ The TfsSharedQueryProcessor enabled you to migrate queries from one locatio nto 
 | SharedFolderName | String | The name of the shared folder, made a parameter incase it every needs to be edited | Shared Queries |
 | SourceToTargetFieldMappings | Dictionary`2 | Mapping of the source to the target | missng XML code comments |
 | Enabled | Boolean | If set to `true` then the processor will run. Set to `false` and the processor will not run. | missng XML code comments |
-| ProcessorEnrichers | List | missng XML code comments | missng XML code comments |
-| Source | IEndpointOptions | missng XML code comments | missng XML code comments |
-| Target | IEndpointOptions | missng XML code comments | missng XML code comments |
-| RefName | String | missng XML code comments | missng XML code comments |
+| ProcessorEnrichers | List | List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors. | missng XML code comments |
+| Source | IEndpointOptions | This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor. | missng XML code comments |
+| Target | IEndpointOptions | This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a write only processor. | missng XML code comments |
+| RefName | String | `Refname` will be used in the future to allow for using named Options without the need to copy all of the options. | missng XML code comments |
 
 
 ### Example JSON

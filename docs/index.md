@@ -90,11 +90,9 @@ Most of these processors need to be run in order. If you try to migrate work ite
 |Processor | Status |Target |Usage |
 |---------|---------|---------|---------|
 |[WorkItemMigration](./Processors/WorkItemMigrationConfig.md) | ready | Work Items | Migrates either tip or history of work items with Links & Attachments based on a query with field mappings |
-|[TeamMigration](./Processors/TeamMigrationConfig.md) | beta | Teams | Migrates Teams and Team Settings |
-|[WorkItemDelete](./Processors/WorkItemDeleteConfig.md) | ready | Work Items | Bulk delete of work items **WARNING DANGEROUS** |
+|[TfsTeamSettingsProcessor](./Reference/Processors/TfsTeamSettingsProcessor.md) | preview | Teams | Migrates Teams and Team Settings ||[WorkItemDelete](./Processors/WorkItemDeleteConfig.md) | ready | Work Items | Bulk delete of work items **WARNING DANGEROUS** |
 |[WorkItemUpdate](./Processors/WorkItemUpdateConfig.md) | ready | Work Items | Bulk update of Work Items based on a query and field mappings |
-|[WorkItemQueryMigration](./Processors/WorkItemQueryMigrationConfig.md) | ready | Queries | Migrates shared queries |
-|[TeamMigration](./v2/Reference/Processors/TfsTeamSettingsProcessor.md) | Beta | Teams | Migrates Teams |
+|[TfsSharedQueryProcessor](./Reference/Processors/TfsTeamSettingsProcessor.md) | preview | Shared Queries | Moved Shared Queries best effort |
 |[TestVariablesMigration](./Processors/TestVariablesMigrationConfig.md) | Beta | Suites & Plans | Migrates Test Variables |
 |[TestConfigurationsMigration](./Processors/TestConfigurationsMigrationConfig.md) | Beta  | Suites & Plans | Migrates Test configurations |
 |[TestPlansAndSuitesMigration](./Processors/TestPlansAndSuitesMigrationConfig.md) | Beta  | Suites & Plans | Rebuilds Suits and plans for Test Cases migrated using the WorkItemMigration |

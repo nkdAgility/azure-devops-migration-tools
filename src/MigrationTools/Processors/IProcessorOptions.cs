@@ -22,7 +22,6 @@ namespace MigrationTools.Processors
         /// <summary>
         /// List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.
         /// </summary>
-
         List<IProcessorEnricherOptions> ProcessorEnrichers { get; set; }
 
         IProcessorOptions GetDefault();
