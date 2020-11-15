@@ -35,9 +35,9 @@ namespace MigrationTools._EngineV1.Clients
             if (match.Success)
             {
                 Log.Verbose("TfsReflectedWorkItemId: Match Sucess from {ReflectedWorkItemId}: {@ReflectedWorkItemIdObject}", ReflectedWorkItemId, this);
-                _WorkItemId = match.Groups[0].Value;
-                _ProjectName = match.Groups[1].Value;
-                _Connection = new Uri(match.Groups[2].Value);
+                _Connection = new Uri(match.Groups[1].Value);
+                _ProjectName = match.Groups[2].Value;
+                _WorkItemId = match.Groups[3].Value;
             }
             else
             {

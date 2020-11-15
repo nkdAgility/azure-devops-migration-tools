@@ -59,46 +59,5 @@
             The processor configuration
             </summary>
         </member>
-        <member name="F:VstsSyncMigrator.Engine.WorkItemQueryMigrationContext.totalFoldersAttempted">
-            <summary>
-            Counter for folders processed
-            </summary>
-        </member>
-        <member name="F:VstsSyncMigrator.Engine.WorkItemQueryMigrationContext.totalQueriesAttempted">
-            <summary>
-            Counter for queries attempted
-            </summary>
-        </member>
-        <member name="F:VstsSyncMigrator.Engine.WorkItemQueryMigrationContext.totalQueriesMigrated">
-            <summary>
-            Counter for queries successfully migrated
-            </summary>
-        </member>
-        <member name="F:VstsSyncMigrator.Engine.WorkItemQueryMigrationContext.totalQueriesSkipped">
-            <summary>
-            Counter for queries skipped
-            </summary>
-        </member>
-        <member name="F:VstsSyncMigrator.Engine.WorkItemQueryMigrationContext.totalQueryFailed">
-            <summary>
-            Counter for the queries that failed migration
-            </summary>
-        </member>
-        <member name="M:VstsSyncMigrator.Engine.WorkItemQueryMigrationContext.MigrateFolder(Microsoft.TeamFoundation.WorkItemTracking.Client.QueryHierarchy,Microsoft.TeamFoundation.WorkItemTracking.Client.QueryFolder,Microsoft.TeamFoundation.WorkItemTracking.Client.QueryFolder)">
-            <summary>
-            Define Query Folders under the current parent
-            </summary>
-            <param name="targetHierarchy">The object that represents the whole of the target query tree</param>
-            <param name="sourceFolder">The source folder in tree on source instance</param>
-            <param name="parentFolder">The target folder in tree on target instance</param>
-        </member>
-        <member name="M:VstsSyncMigrator.Engine.WorkItemQueryMigrationContext.MigrateQuery(Microsoft.TeamFoundation.WorkItemTracking.Client.QueryHierarchy,Microsoft.TeamFoundation.WorkItemTracking.Client.QueryDefinition,Microsoft.TeamFoundation.WorkItemTracking.Client.QueryFolder)">
-            <summary>
-            Add Query Definition under a specific Query Folder.
-            </summary>
-            <param name="targetHierarchy">The object that represents the whole of the target query tree</param>
-            <param name="query">Query Definition - Contains the Query Details</param>
-            <param name="QueryFolder">Parent Folder</param>
-        </member>
     </members>
 </doc>
