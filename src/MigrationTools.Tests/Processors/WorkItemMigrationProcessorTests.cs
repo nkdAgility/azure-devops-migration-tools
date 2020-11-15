@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools.Endpoints;
 using MigrationTools.Tests;
@@ -22,7 +21,13 @@ namespace MigrationTools.Processors.Tests
         {
             var y = new WorkItemTrackingProcessorOptions
             {
-                Enabled = true
+                Enabled = true,
+                CollapseRevisions = false,
+                ReplayRevisions = true,
+                WorkItemCreateRetryLimit = 5,
+                PrefixProjectToNodes = false,
+                Source = new InMemoryWorkItemEndpointOptions(),
+                Target = new InMemoryWorkItemEndpointOptions()
             };
             var x = Services.GetRequiredService<WorkItemTrackingProcessor>();
             x.Configure(y);
@@ -39,10 +44,8 @@ namespace MigrationTools.Processors.Tests
                 ReplayRevisions = true,
                 WorkItemCreateRetryLimit = 5,
                 PrefixProjectToNodes = false,
-                Endpoints = new List<IEndpointOptions> {
-                    new InMemoryWorkItemEndpointOptions { Direction = EndpointDirection.Source},
-                    new InMemoryWorkItemEndpointOptions { Direction = EndpointDirection.Target }
-                }
+                Source = new InMemoryWorkItemEndpointOptions(),
+                Target = new InMemoryWorkItemEndpointOptions()
             };
             var x = Services.GetRequiredService<WorkItemTrackingProcessor>();
             x.Configure(y);

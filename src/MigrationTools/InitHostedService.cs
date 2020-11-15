@@ -7,9 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools.CommandLine;
-using MigrationTools.Endpoints;
-using MigrationTools.Enrichers;
-using Newtonsoft.Json;
+using MigrationTools.Helpers;
 
 namespace MigrationTools
 {
@@ -88,12 +86,7 @@ namespace MigrationTools
                                     break;
                             }
 
-                            string json = JsonConvert.SerializeObject(config, Formatting.Indented,
-                                new FieldMapConfigJsonConverter(),
-                                new ProcessorConfigJsonConverter(),
-                                new JsonConverterForEndpointOptions(),
-                                new IOptionsJsonConvertor(),
-                                new MigrationClientConfigJsonConverter());
+                            string json = NewtonsoftHelpers.SerializeObject(config);
                             StreamWriter sw = new StreamWriter(configFile);
                             sw.WriteLine(json);
                             sw.Close();

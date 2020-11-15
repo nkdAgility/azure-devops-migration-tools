@@ -5,4 +5,4 @@ This processor can migrate test variables that are defined in the test plans / s
 | Parameter name | Type    | Description                      | Default Value                            |
 |----------------|---------|----------------------------------|------------------------------------------|
 | `Enabled`      | Boolean | Active the processor if it true. | false                                    |
-| `ObjectType`   | string  | The name of the processor        | TestVariablesMigrationConfig |
+| `$type`   | string  | The name of the processor        | TestVariablesMigrationConfig |

@@ -68,7 +68,6 @@ namespace MigrationTools.Endpoints
             WorkItemData wid = new WorkItemData
             {
                 Id = wi.Id.ToString(),
-                Direction = _Options.Direction,
                 Type = wi.Type.ToString()
             };
             PopulateRevisions(wi, wid);

@@ -1,10 +1,9 @@
 {
-  "ObjectType": "TfsEndpointOptions",
-  "AuthenticationMode": "AccessToken",
-  "AccessToken": "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
+  "$type": "TfsEndpointOptions",
   "Organisation": "https://dev.azure.com/nkdagility-preview/",
   "Project": "NeedToSetThis",
+  "AuthenticationMode": "AccessToken",
+  "AccessToken": "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
   "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
-  "Direction": "Source",
-  "Enrichers": null
+  "EndpointEnrichers": null
 }

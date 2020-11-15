@@ -5,5 +5,5 @@ This processor can migrate `test configuration`. This should be run before `Link
 | Parameter name | Type    | Description                      | Default Value                            |
 |----------------|---------|----------------------------------|------------------------------------------|
 | `Enabled`      | Boolean | Active the processor if it true. | false                                    |
-| `ObjectType`   | string  | The name of the processor        | TestConfigurationsMigrationConfig |
+| `$type`   | string  | The name of the processor        | TestConfigurationsMigrationConfig |
 

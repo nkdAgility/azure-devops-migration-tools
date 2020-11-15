@@ -23,7 +23,7 @@ namespace MigrationTools.Endpoints.Tests
         public void TfsWorkItemEndPointTest()
         {
             var endpoint = Services.GetRequiredService<TfsWorkItemEndpoint>();
-            endpoint.Configure(GetTfsWorkItemEndPointOptions(EndpointDirection.Source, "migrationSource1"));
+            endpoint.Configure(GetTfsWorkItemEndPointOptions("migrationSource1"));
             endpoint.GetWorkItems();
             Assert.IsNotNull(endpoint);
         }
@@ -32,7 +32,7 @@ namespace MigrationTools.Endpoints.Tests
         public void ConfigureTest()
         {
             var endpoint = Services.GetRequiredService<TfsWorkItemEndpoint>();
-            endpoint.Configure(GetTfsWorkItemEndPointOptions(EndpointDirection.Source, "migrationSource1"));
+            endpoint.Configure(GetTfsWorkItemEndPointOptions("migrationSource1"));
             Assert.IsNotNull(endpoint);
         }
 
@@ -46,7 +46,7 @@ namespace MigrationTools.Endpoints.Tests
         public void GetWorkItemsTest()
         {
             var endpoint = Services.GetRequiredService<TfsWorkItemEndpoint>();
-            endpoint.Configure(GetTfsWorkItemEndPointOptions(EndpointDirection.Source, "migrationSource1"));
+            endpoint.Configure(GetTfsWorkItemEndPointOptions("migrationSource1"));
             IEnumerable<WorkItemData> result = endpoint.GetWorkItems();
             Assert.AreEqual(5, result.Count());
         }
@@ -55,7 +55,7 @@ namespace MigrationTools.Endpoints.Tests
         public void GetWorkItemsQueryTest()
         {
             TfsWorkItemEndpoint endpoint = Services.GetRequiredService<TfsWorkItemEndpoint>();
-            endpoint.Configure(GetTfsWorkItemEndPointOptions(EndpointDirection.Source, "migrationSource1"));
+            endpoint.Configure(GetTfsWorkItemEndPointOptions("migrationSource1"));
             QueryOptions qo = new QueryOptions()
             {
                 Query = "SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject",
@@ -71,11 +71,10 @@ namespace MigrationTools.Endpoints.Tests
         //    Assert.Fail();
         //}
 
-        private static TfsWorkItemEndpointOptions GetTfsWorkItemEndPointOptions(EndpointDirection direction, string project)
+        private static TfsWorkItemEndpointOptions GetTfsWorkItemEndPointOptions(string project)
         {
             return new TfsWorkItemEndpointOptions()
             {
-                Direction = direction,
                 Organisation = "https://dev.azure.com/nkdagility-preview/",
                 Project = "migrationSource1",
                 AuthenticationMode = AuthenticationMode.AccessToken,

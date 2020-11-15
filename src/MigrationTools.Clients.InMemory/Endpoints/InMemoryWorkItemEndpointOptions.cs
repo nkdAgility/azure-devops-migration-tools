@@ -6,9 +6,13 @@ namespace MigrationTools.Endpoints
     {
         public override Type ToConfigure => typeof(InMemoryWorkItemEndpoint);
 
+        public void Configure(IEndpointOptions options)
+        {
+            throw new NotImplementedException();
+        }
+
         public override void SetDefaults()
         {
-            Direction = EndpointDirection.NotSet;
         }
     }
 }

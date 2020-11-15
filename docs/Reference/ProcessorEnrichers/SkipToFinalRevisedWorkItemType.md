@@ -10,7 +10,6 @@ missng XML code comments
 
 | Parameter name         | Type    | Description                              | Default Value                            |
 |------------------------|---------|------------------------------------------|------------------------------------------|
-| ToConfigure | Type | missng XML code comments | missng XML code comments |
 | Enabled | Boolean | missng XML code comments | missng XML code comments |
 
 
@@ -18,7 +17,7 @@ missng XML code comments
 
 ```JSON
 {
-  "ObjectType": "SkipToFinalRevisedWorkItemTypeOptions",
+  "$type": "SkipToFinalRevisedWorkItemTypeOptions",
   "Enabled": true
 }
 ```

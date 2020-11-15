@@ -17,7 +17,7 @@ It will migrate work items using a tip or replay migrator as well as Attachments
 | Parameter name                       | Type    | Description                              | Default Value                            |
 |--------------------------------------|---------|------------------------------------------|------------------------------------------|
 | `Enabled`                            | Boolean | Active the processor if it true.         | false                                    |
-| `ObjectType`                         | string  | The name of the processor                | VstsSyncMigrator. Engine. Configuration. Processing. WorkItemMigrationConfig |
+| `$type`                         | string  | The name of the processor                | VstsSyncMigrator. Engine. Configuration. Processing. WorkItemMigrationConfig |
 | `PrefixProjectToNodes`               | Boolean | Prefix your iterations and areas with the project name. If you have enabled this in `NodeStructuresMigrationConfig` you must do it here too. | false                                    |
 | `UpdateCreatedDate`                  | Boolean | If this is enabled the creation process on the target project will create the items with the original creation date. (Important: The item history is always pointed to the date of the migration, it's change only the data column `CreateDate`, not the internal create date) | false                                    |
 | `UpdateCreatedBy`                    | Boolean | If this is enabled the creation process on the target project will create the items with the original creation date. (Important: The item history is always pointed to the date of the migration, it's change only the data column `CreateDate`, not the internal create date) | false                                    |
@@ -114,7 +114,7 @@ Using the above sample structure, if you wanted to map the source project `Team 
 ```
  "FieldMaps": [
    {
-      "ObjectType": "FieldValueMapConfig",
+      "$type": "FieldValueMapConfig",
       "WorkItemTypeName": "*",
       "sourceField": "System.AreaPath",
       "targetField": "System.AreaPath",

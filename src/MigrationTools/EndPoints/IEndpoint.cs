@@ -5,8 +5,6 @@ namespace MigrationTools.Endpoints
 {
     public interface IEndpoint
     {
-        EndpointDirection Direction { get; }
-
         void Configure(IEndpointOptions options);
 
         EndpointEnricherContainer EndpointEnrichers { get; }

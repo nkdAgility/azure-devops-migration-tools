@@ -1,4 +1,5 @@
 ﻿using MigrationTools.Options;
+using Newtonsoft.Json;
 
 namespace MigrationTools.Enrichers
 {
@@ -7,6 +8,7 @@ namespace MigrationTools.Enrichers
         /// <summary>
         /// Active the enricher if it true.
         /// </summary>
+        [JsonProperty(Order = -2)]
         bool Enabled { get; set; }
     }
 }

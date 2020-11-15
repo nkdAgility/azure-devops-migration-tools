@@ -10,7 +10,6 @@ missng XML code comments
 
 | Parameter name         | Type    | Description                              | Default Value                            |
 |------------------------|---------|------------------------------------------|------------------------------------------|
-| ToConfigure | Type | missng XML code comments | missng XML code comments |
 | WorkingPath | String | missng XML code comments | missng XML code comments |
 | MaxSize | Int32 | missng XML code comments | missng XML code comments |
 | Enabled | Boolean | missng XML code comments | missng XML code comments |
@@ -20,9 +19,9 @@ missng XML code comments
 
 ```JSON
 {
-  "ObjectType": "TfsWorkItemAttachmentEnricherOptions",
+  "$type": "TfsWorkItemAttachmentEnricherOptions",
+  "Enabled": true,
   "WorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
-  "MaxSize": 480000000,
-  "Enabled": true
+  "MaxSize": 480000000
 }
 ```
