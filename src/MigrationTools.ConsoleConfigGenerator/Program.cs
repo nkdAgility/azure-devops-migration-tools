@@ -97,16 +97,16 @@ namespace VstsSyncMigrator.ConsoleApp
             return query.Replace(Environment.NewLine, "").Trim();
         }
 
-        private static string GetPropertySummary(IOptions options, JObject joptions, JProperty property)
+        private static string GetPropertyData(IOptions options, JObject joptions, JProperty jproperty, string element)
         {
-            var optionsType = options.GetType();
+            var optionsType = options.GetType().GetProperty(jproperty.Name).DeclaringType;
             // Query the data and write out a subset of contacts
             var query = (from c in GetXDocument(optionsType).Root.Descendants("member")
-                         where c.Attribute("name").Value == $"P:{optionsType.FullName}.{property.Name}"
-                         select c.Element("summary").Value).SingleOrDefault();
+                         where c.Attribute("name").Value == $"P:{optionsType.FullName}.{jproperty.Name}"
+                         select c.Element(element)?.Value).SingleOrDefault();
             if (query != null)
             {
-                Console.WriteLine($"- - Proptery Loaded: {property.Name}");
+                Console.WriteLine($"- - {element} Loaded: {jproperty.Name}");
             }
             else
             {
@@ -116,12 +116,12 @@ namespace VstsSyncMigrator.ConsoleApp
             return query.Replace(Environment.NewLine, "").Trim();
         }
 
-        private static string GetPropertyDefault(IOptions options, JObject joptions, JProperty property)
+        private static string GetPropertyDefault(IOptions options, JObject joptions, JProperty jproperty)
         {
-            var optionsType = options.GetType();
+            var optionsType = options.GetType().GetProperty(jproperty.Name).DeclaringType;
             // Query the data and write out a subset of contacts
             var properyXml = (from c in GetXDocument(optionsType).Root.Descendants("member")
-                              where c.Attribute("name").Value == $"P:{optionsType.FullName}.{property.Name}"
+                              where c.Attribute("name").Value == $"P:{optionsType.FullName}.{jproperty.Name}"
                               select c).SingleOrDefault();
             string defaultvalue = null;
             if (properyXml != null)
@@ -131,7 +131,7 @@ namespace VstsSyncMigrator.ConsoleApp
 
             if (!string.IsNullOrEmpty(defaultvalue))
             {
-                Console.WriteLine($"- - Default Loaded: {property.Name}");
+                Console.WriteLine($"- - Default Loaded: {jproperty.Name}");
             }
             else
             {
@@ -158,7 +158,7 @@ namespace VstsSyncMigrator.ConsoleApp
                 var jpropertys = joptions.Properties();
                 foreach (JProperty jproperty in jpropertys)
                 {
-                    properties.AppendLine(string.Format("| {0} | {1} | {2} | {3} |", jproperty.Name, GetPropertyType(options, jproperty), GetPropertySummary(options, joptions, jproperty), GetPropertyDefault(options, joptions, jproperty)));
+                    properties.AppendLine(string.Format("| {0} | {1} | {2} | {3} |", jproperty.Name, GetPropertyType(options, jproperty), GetPropertyData(options, joptions, jproperty, "summary"), GetPropertyData(options, joptions, jproperty, "default")));
                 }
                 templatemd = templatemd.Replace("<Options>", properties.ToString());
             }
