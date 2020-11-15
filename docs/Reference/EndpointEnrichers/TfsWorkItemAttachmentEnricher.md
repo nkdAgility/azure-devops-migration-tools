@@ -13,6 +13,7 @@ missng XML code comments
 | WorkingPath | String | missng XML code comments | missng XML code comments |
 | MaxSize | Int32 | missng XML code comments | missng XML code comments |
 | Enabled | Boolean | missng XML code comments | missng XML code comments |
+| RefName | String | missng XML code comments | missng XML code comments |
 
 
 ### Example JSON
@@ -22,6 +23,7 @@ missng XML code comments
   "$type": "TfsWorkItemAttachmentEnricherOptions",
   "Enabled": true,
   "WorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
-  "MaxSize": 480000000
+  "MaxSize": 480000000,
+  "RefName": null
 }
 ```

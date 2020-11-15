@@ -1,4 +1,5 @@
 {
   "$type": "AppendMigrationToolSignatureFooterOptions",
-  "Enabled": true
+  "Enabled": true,
+  "RefName": null
 }

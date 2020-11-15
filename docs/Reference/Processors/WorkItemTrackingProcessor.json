@@ -8,13 +8,16 @@
   "ProcessorEnrichers": [
     {
       "$type": "PauseAfterEachItemOptions",
-      "Enabled": true
+      "Enabled": true,
+      "RefName": null
     },
     {
       "$type": "AppendMigrationToolSignatureFooterOptions",
-      "Enabled": true
+      "Enabled": true,
+      "RefName": null
     }
   ],
   "Source": null,
-  "Target": null
+  "Target": null,
+  "RefName": null
 }

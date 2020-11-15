@@ -1,4 +1,5 @@
 {
   "$type": "SkipToFinalRevisedWorkItemTypeOptions",
-  "Enabled": true
+  "Enabled": true,
+  "RefName": null
 }

@@ -19,6 +19,7 @@ This processor is intended, with the aid of [ProcessorEnrichers](../ProcessorEnr
 | ProcessorEnrichers | List | missng XML code comments | missng XML code comments |
 | Source | IEndpointOptions | missng XML code comments | missng XML code comments |
 | Target | IEndpointOptions | missng XML code comments | missng XML code comments |
+| RefName | String | missng XML code comments | missng XML code comments |
 
 
 ### Supported Endpoints
@@ -51,15 +52,18 @@ This processor is intended, with the aid of [ProcessorEnrichers](../ProcessorEnr
   "ProcessorEnrichers": [
     {
       "$type": "PauseAfterEachItemOptions",
-      "Enabled": true
+      "Enabled": true,
+      "RefName": null
     },
     {
       "$type": "AppendMigrationToolSignatureFooterOptions",
-      "Enabled": true
+      "Enabled": true,
+      "RefName": null
     }
   ],
   "Source": null,
-  "Target": null
+  "Target": null,
+  "RefName": null
 }
 ```
 

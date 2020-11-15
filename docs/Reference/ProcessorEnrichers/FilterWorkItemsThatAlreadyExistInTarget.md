@@ -12,6 +12,7 @@ missng XML code comments
 |------------------------|---------|------------------------------------------|------------------------------------------|
 | Query | QueryOptions | missng XML code comments | missng XML code comments |
 | Enabled | Boolean | missng XML code comments | missng XML code comments |
+| RefName | String | missng XML code comments | missng XML code comments |
 
 
 ### Example JSON
@@ -24,6 +25,7 @@ missng XML code comments
     "$type": "QueryOptions",
     "Query": "SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan') ORDER BY [System.ChangedDate] desc",
     "Paramiters": null
-  }
+  },
+  "RefName": null
 }
 ```

@@ -13,7 +13,8 @@
     "AuthenticationMode": "AccessToken",
     "AccessToken": "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
     "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
-    "EndpointEnrichers": null
+    "EndpointEnrichers": null,
+    "RefName": null
   },
   "Target": {
     "$type": "TfsEndpointOptions",
@@ -22,6 +23,8 @@
     "AuthenticationMode": "AccessToken",
     "AccessToken": "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
     "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
-    "EndpointEnrichers": null
-  }
+    "EndpointEnrichers": null,
+    "RefName": null
+  },
+  "RefName": null
 }

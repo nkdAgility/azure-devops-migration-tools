@@ -18,6 +18,7 @@ Native TFS Processor, does not work with any other Endpoints.
 | ProcessorEnrichers | List | missng XML code comments | missng XML code comments |
 | Source | IEndpointOptions | missng XML code comments | missng XML code comments |
 | Target | IEndpointOptions | missng XML code comments | missng XML code comments |
+| RefName | String | missng XML code comments | missng XML code comments |
 
 
 ### Example JSON
@@ -38,7 +39,8 @@ Native TFS Processor, does not work with any other Endpoints.
     "AuthenticationMode": "AccessToken",
     "AccessToken": "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
     "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
-    "EndpointEnrichers": null
+    "EndpointEnrichers": null,
+    "RefName": null
   },
   "Target": {
     "$type": "TfsEndpointOptions",
@@ -47,7 +49,9 @@ Native TFS Processor, does not work with any other Endpoints.
     "AuthenticationMode": "AccessToken",
     "AccessToken": "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
     "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
-    "EndpointEnrichers": null
-  }
+    "EndpointEnrichers": null,
+    "RefName": null
+  },
+  "RefName": null
 }
 ```
