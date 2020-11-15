@@ -14,43 +14,40 @@ Native TFS Processor, does not work with any other Endpoints.
 | UpdateTeamSettings | Boolean | missng XML code comments | missng XML code comments |
 | PrefixProjectToNodes | Boolean | missng XML code comments | missng XML code comments |
 | Teams | List | missng XML code comments | missng XML code comments |
-| Processor | String | missng XML code comments | missng XML code comments |
-| ToConfigure | Type | missng XML code comments | missng XML code comments |
-| Enabled | Boolean | Active the processor if it true. | missng XML code comments |
-| Endpoints | List | missng XML code comments | missng XML code comments |
+| Enabled | Boolean | If set to `true` then the processor will run. Set to `false` and the processor will not run. | missng XML code comments |
 | ProcessorEnrichers | List | missng XML code comments | missng XML code comments |
+| Source | IEndpointOptions | missng XML code comments | missng XML code comments |
+| Target | IEndpointOptions | missng XML code comments | missng XML code comments |
 
 
 ### Example JSON
 
 ```JSON
 {
-  "ObjectType": "TfsTeamSettingsProcessorOptions",
+  "$type": "TfsTeamSettingsProcessorOptions",
+  "Enabled": false,
   "MigrateTeamSettings": true,
   "UpdateTeamSettings": true,
   "PrefixProjectToNodes": false,
   "Teams": null,
-  "Enabled": false,
-  "Endpoints": [
-    {
-      "AuthenticationMode": "AccessToken",
-      "AccessToken": "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
-      "Organisation": "https://dev.azure.com/nkdagility-preview/",
-      "Project": "sourceProject",
-      "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
-      "Direction": "Source",
-      "Enrichers": null
-    },
-    {
-      "AuthenticationMode": "AccessToken",
-      "AccessToken": "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
-      "Organisation": "https://dev.azure.com/nkdagility-preview/",
-      "Project": "targetProject",
-      "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
-      "Direction": "Target",
-      "Enrichers": null
-    }
-  ],
-  "ProcessorEnrichers": null
+  "ProcessorEnrichers": null,
+  "Source": {
+    "$type": "TfsEndpointOptions",
+    "Organisation": "https://dev.azure.com/nkdagility-preview/",
+    "Project": "sourceProject",
+    "AuthenticationMode": "AccessToken",
+    "AccessToken": "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
+    "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
+    "EndpointEnrichers": null
+  },
+  "Target": {
+    "$type": "TfsEndpointOptions",
+    "Organisation": "https://dev.azure.com/nkdagility-preview/",
+    "Project": "targetProject",
+    "AuthenticationMode": "AccessToken",
+    "AccessToken": "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
+    "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
+    "EndpointEnrichers": null
+  }
 }
 ```

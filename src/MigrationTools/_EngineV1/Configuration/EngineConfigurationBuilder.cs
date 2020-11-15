@@ -8,6 +8,7 @@ using MigrationTools._EngineV1.Configuration.FieldMap;
 using MigrationTools._EngineV1.Configuration.Processing;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
+using MigrationTools.Helpers;
 using MigrationTools.Options;
 using MigrationTools.Processors;
 using Newtonsoft.Json;
@@ -30,12 +31,8 @@ namespace MigrationTools._EngineV1.Configuration
             try
             {
                 string configurationjson = File.ReadAllText(configFile);
-                ec = JsonConvert.DeserializeObject<EngineConfiguration>(configurationjson,
-                        new FieldMapConfigJsonConverter(),
-                        new ProcessorConfigJsonConverter(),
-                        new JsonConverterForEndpointOptions(),
-                        new IOptionsJsonConvertor(),
-                        new MigrationClientConfigJsonConverter());
+                configurationjson = Upgrade118(configFile, configurationjson);
+                ec = NewtonsoftHelpers.DeserializeObject<EngineConfiguration>(configurationjson);
             }
             catch (JsonSerializationException ex)
             {
@@ -71,6 +68,18 @@ namespace MigrationTools._EngineV1.Configuration
             }
             //#endif
             return ec;
+        }
+
+        private string Upgrade118(string configFile, string configurationjson)
+        {
+            if (configurationjson.Contains("ObjectType"))
+            {
+                configurationjson = configurationjson.Replace("ObjectType", "$type");
+                File.WriteAllText(configFile, configurationjson);
+                _logger.LogWarning("You config file is out of date! In 11.8 we changed `ObjectType` to `$type`! We have updated it for you just now!");
+            }
+
+            return configurationjson;
         }
 
         public EngineConfiguration BuildDefault()
@@ -256,14 +265,29 @@ namespace MigrationTools._EngineV1.Configuration
                     ReplayRevisions = true,
                     WorkItemCreateRetryLimit = 5,
                     ProcessorEnrichers = GetAllTypes<IProcessorEnricherOptions>(),
-                    Endpoints = GetAllTypes<IEndpointOptions>()
-                });
+                    Source = GetSpecioficType<IEndpointOptions>("InMemoryWorkItemEndpointOptions"),
+                    Target = GetSpecioficType<IEndpointOptions>("InMemoryWorkItemEndpointOptions")
+                }); ; ;
             return ec;
         }
 
         public EngineConfiguration BuildWorkItemMigration2()
         {
             throw new NotImplementedException();
+        }
+
+        private TInterfaceToFind GetSpecioficType<TInterfaceToFind>(string typeName) where TInterfaceToFind : IOptions
+        {
+            AppDomain.CurrentDomain.Load("MigrationTools");
+            AppDomain.CurrentDomain.Load("MigrationTools.Clients.AzureDevops.ObjectModel");
+            AppDomain.CurrentDomain.Load("MigrationTools.Clients.FileSystem");
+            Type type = AppDomain.CurrentDomain.GetAssemblies()
+               .Where(a => a.FullName.StartsWith("MigrationTools"))
+               .SelectMany(a => a.GetTypes())
+               .Where(t => typeof(TInterfaceToFind).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract && t.Name == typeName).SingleOrDefault();
+            TInterfaceToFind option = (TInterfaceToFind)Activator.CreateInstance(type);
+            option.SetDefaults();
+            return option;
         }
 
         private List<TInterfaceToFind> GetAllTypes<TInterfaceToFind>() where TInterfaceToFind : IOptions

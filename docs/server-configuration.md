@@ -69,7 +69,7 @@ Once you have created the `ReflectedWorkItemId` field and confirmed you have the
     ...... other stuff
 
  	"Processors": [{
-			"ObjectType": "WorkItemMigrationConfig",
+			"$type": "WorkItemMigrationConfig",
 			"Enabled": false,
 			"PrefixProjectToNodes": true,
 			"UpdateCreatedDate": true,

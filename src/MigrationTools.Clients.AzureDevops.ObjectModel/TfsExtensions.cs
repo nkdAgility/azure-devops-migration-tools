@@ -83,36 +83,48 @@ namespace MigrationTools
             return JsonConvert.SerializeObject(expando, Formatting.Indented);
         }
 
-        public static void RefreshWorkItem(this WorkItemData context)
+        public static void RefreshWorkItem(this WorkItemData context, FieldCollection fieldsOfRevision = null)
         {
-            Log.Debug("TfsExtensions::RefreshWorkItem");
             var workItem = (WorkItem)context.internalObject;
-            context.Id = workItem.Id.ToString();
-            context.Type = workItem.Type.Name;
-            context.Title = workItem.Title;
-            context.Rev = workItem.Rev;
-            context.RevisedDate = workItem.RevisedDate;
-            context.Revision = workItem.Revision;
-            context.ProjectName = workItem?.Project?.Name;
-            context.Fields = workItem.Fields.AsDictionary();
-            context.Revisions = (from Revision x in workItem.Revisions
-                                 select new _EngineV1.DataContracts.RevisionItem()
-                                 {
-                                     Index = x.Index,
-                                     Number = Convert.ToInt32(x.Fields["System.Rev"].Value),
-                                     ChangedDate = Convert.ToDateTime(x.Fields["System.ChangedDate"].Value)
-                                 }).ToList();
+            context.ProjectName = workItem.Project?.Name;
+
+            // If fieldsOfRevision is provided we use this collection as we want to create a revised WorkItemData object
+            context.Fields = fieldsOfRevision != null ? fieldsOfRevision.AsDictionary() : workItem.Fields.AsDictionary();
+
+            // We only need to fill the revisions object if we create a WorkItemData object for the whole WorkItem and
+            // we sort it here by Number using a SortedDictionary
+            context.Revisions = fieldsOfRevision == null ? new SortedDictionary<int, RevisionItem>((from Revision x in workItem.Revisions
+                                                                                                    select new RevisionItem()
+                                                                                                    {
+                                                                                                        Index = x.Index,
+                                                                                                        Number = (int)x.Fields["System.Rev"].Value,
+                                                                                                        ChangedDate = (DateTime)x.Fields["System.ChangedDate"].Value,
+                                                                                                        Type = x.Fields["System.WorkItemType"].Value as string,
+                                                                                                        Fields = x.Fields
+                                                                                                    }).ToDictionary(r => r.Number, r => r)) : null;
         }
 
-        public static WorkItemData AsWorkItemData(this WorkItem context)
+        public static WorkItemData AsWorkItemData(this WorkItem context, FieldCollection fieldsOfRevision = null)
         {
-            Log.Debug("TfsExtensions::AsWorkItemData");
             var internalWorkItem = new WorkItemData
             {
                 internalObject = context
             };
-            internalWorkItem.RefreshWorkItem();
+
+            internalWorkItem.RefreshWorkItem(fieldsOfRevision);
             return internalWorkItem;
+        }
+
+        public static WorkItemData GetRevision(this WorkItemData context, int rev)
+        {
+            var wid = new WorkItemData
+            {
+                internalObject = context.internalObject
+            };
+
+            wid.RefreshWorkItem((FieldCollection)context.Revisions[rev].Fields);
+
+            return wid;
         }
 
         public static TfsTeamProjectConfig AsTeamProjectConfig(this IMigrationClientConfig context)

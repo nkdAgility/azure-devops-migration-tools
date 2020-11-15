@@ -45,22 +45,18 @@ namespace MigrationTools.Integration.Tests
                 ReplayRevisions = true,
                 WorkItemCreateRetryLimit = 5,
                 PrefixProjectToNodes = false,
-                Endpoints = new List<IEndpointOptions>()
-                    {
-                         {GetTfsWorkItemEndPointOptions(EndpointDirection.Source, "migrationSource1")},
-                         {GetTfsWorkItemEndPointOptions(EndpointDirection.Target, "migrationTarget1")}
-                    }
+                Source = GetTfsWorkItemEndPointOptions("migrationSource1"),
+                Target = GetTfsWorkItemEndPointOptions("migrationTarget1")
             };
             return migrationConfig;
         }
 
-        private static TfsWorkItemEndpointOptions GetTfsWorkItemEndPointOptions(EndpointDirection direction, string project)
+        private static TfsWorkItemEndpointOptions GetTfsWorkItemEndPointOptions(string project)
         {
             return new TfsWorkItemEndpointOptions()
             {
-                Direction = direction,
                 Organisation = "https://dev.azure.com/nkdagility-preview/",
-                Project = "migrationSource1",
+                Project = project,
                 AuthenticationMode = AuthenticationMode.AccessToken,
                 AccessToken = TestingConstants.AccessToken,
                 Query = new Options.QueryOptions()

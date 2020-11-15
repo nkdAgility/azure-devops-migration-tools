@@ -10,9 +10,10 @@ using System.Xml.Linq;
 using MigrationTools.EndpointEnrichers;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
+using MigrationTools.Helpers;
 using MigrationTools.Options;
 using MigrationTools.Processors;
-using MigrationTools.Tests;
+using Newtonsoft.Json;
 
 namespace VstsSyncMigrator.ConsoleApp
 {
@@ -143,7 +144,7 @@ namespace VstsSyncMigrator.ConsoleApp
             {
                 options.AppendLine("| Parameter name         | Type    | Description                              | Default Value                            |");
                 options.AppendLine("|------------------------|---------|------------------------------------------|------------------------------------------|");
-                var propertys = typeOption.GetProperties();
+                var propertys = typeOption.GetProperties().Where(p => p.CanWrite);
                 foreach (PropertyInfo property in propertys)
                 {
                     options.AppendLine(string.Format("| {0} | {1} | {2} | {3} |", property.Name, property.PropertyType.Name.Replace("`1", ""), GetPropertySummary(property), GetPropertyDefault(property)));
@@ -203,7 +204,7 @@ namespace VstsSyncMigrator.ConsoleApp
             {
                 var instance = (IOptions)Activator.CreateInstance(typeOption);
                 instance.SetDefaults();
-                json = TestHelpers.SaveObjectAsJson(instance);
+                json = NewtonsoftHelpers.SerializeObject(instance, TypeNameHandling.Objects);
                 string jsonFilename = string.Format("{0}.json", item.Name);
                 string jsonFilePath = Path.Combine(referencePath, folder, jsonFilename);
                 File.WriteAllText(jsonFilePath, json);

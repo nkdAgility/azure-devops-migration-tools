@@ -12,7 +12,7 @@ That processor should run after these processors:
 | Parameter name         | Type    | Description                              | Default Value                            |
 |------------------------|---------|------------------------------------------|------------------------------------------|
 | `Enabled`              | Boolean | Active the processor if it true.         | false                                    |
-| `ObjectType`           | string  | The name of the processor                | WorkItemQueryMigrationConfig |
+| `$type`           | string  | The name of the processor                | WorkItemQueryMigrationConfig |
 | `SharedFolderName`     | string  | The folder where the shared queries are in. | Shared Queries                           |
 | `PrefixProjectToNodes` | Boolean | Prefix your iterations and areas with the project name. If you have enabled this in `NodeStructuresMigrationConfig` you must do it here too. | false                                    |
 | `SourceToTargetFieldMappings` | Dictionary`<string, string`>| Any field mappings | none |

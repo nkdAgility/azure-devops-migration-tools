@@ -30,7 +30,7 @@ You can now customise the configuration depending on what you need to do. Howeve
 {
   "ChangeSetMappingFile": null,
   "Source": {
-    "ObjectType": "TfsTeamProjectConfig",
+    "$type": "TfsTeamProjectConfig",
     "Collection": "https://dev.azure.com/nkdagility-preview/",
     "Project": "myProjectName",
     "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
@@ -42,7 +42,7 @@ You can now customise the configuration depending on what you need to do. Howeve
     }
   },
   "Target": {
-    "ObjectType": "TfsTeamProjectConfig",
+    "$type": "TfsTeamProjectConfig",
     "Collection": "https://dev.azure.com/nkdagility-preview/",
     "Project": "myProjectName",
     "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
@@ -55,7 +55,7 @@ You can now customise the configuration depending on what you need to do. Howeve
   },
   "FieldMaps": [
     {
-      "ObjectType": "MultiValueConditionalMapConfig",
+      "$type": "MultiValueConditionalMapConfig",
       "WorkItemTypeName": "*",
       "sourceFieldsAndValues": {
         "Field1": "Value1",
@@ -67,12 +67,12 @@ You can now customise the configuration depending on what you need to do. Howeve
       }
     },
     {
-      "ObjectType": "FieldBlankMapConfig",
+      "$type": "FieldBlankMapConfig",
       "WorkItemTypeName": "*",
       "targetField": "TfsMigrationTool.ReflectedWorkItemId"
     },
     {
-      "ObjectType": "FieldValueMapConfig",
+      "$type": "FieldValueMapConfig",
       "WorkItemTypeName": "*",
       "sourceField": "System.State",
       "targetField": "System.State",
@@ -88,14 +88,14 @@ You can now customise the configuration depending on what you need to do. Howeve
       }
     },
     {
-      "ObjectType": "FieldtoFieldMapConfig",
+      "$type": "FieldtoFieldMapConfig",
       "WorkItemTypeName": "*",
       "sourceField": "Microsoft.VSTS.Common.BacklogPriority",
       "targetField": "Microsoft.VSTS.Common.StackRank",
       "defaultValue": null
     },
     {
-      "ObjectType": "FieldtoFieldMultiMapConfig",
+      "$type": "FieldtoFieldMultiMapConfig",
       "WorkItemTypeName": "*",
       "SourceToTargetMappings": {
         "SourceField1": "TargetField1",
@@ -103,13 +103,13 @@ You can now customise the configuration depending on what you need to do. Howeve
       }
     },
     {
-      "ObjectType": "FieldtoTagMapConfig",
+      "$type": "FieldtoTagMapConfig",
       "WorkItemTypeName": "*",
       "sourceField": "System.State",
       "formatExpression": "ScrumState:{0}"
     },
     {
-      "ObjectType": "FieldMergeMapConfig",
+      "$type": "FieldMergeMapConfig",
       "WorkItemTypeName": "*",
       "sourceField1": "System.Description",
       "sourceField2": "Microsoft.VSTS.Common.AcceptanceCriteria",
@@ -118,7 +118,7 @@ You can now customise the configuration depending on what you need to do. Howeve
       "doneMatch": "##DONE##"
     },
     {
-      "ObjectType": "RegexFieldMapConfig",
+      "$type": "RegexFieldMapConfig",
       "WorkItemTypeName": "*",
       "sourceField": "COMPANY.PRODUCT.Release",
       "targetField": "COMPANY.DEVISION.MinorReleaseVersion",
@@ -126,14 +126,14 @@ You can now customise the configuration depending on what you need to do. Howeve
       "replacement": "$1"
     },
     {
-      "ObjectType": "FieldValuetoTagMapConfig",
+      "$type": "FieldValuetoTagMapConfig",
       "WorkItemTypeName": "*",
       "sourceField": "Microsoft.VSTS.CMMI.Blocked",
       "pattern": "Yes",
       "formatExpression": "{0}"
     },
     {
-      "ObjectType": "TreeToTagMapConfig",
+      "$type": "TreeToTagMapConfig",
       "WorkItemTypeName": "*",
       "toSkip": 3,
       "timeTravel": 1
@@ -143,7 +143,7 @@ You can now customise the configuration depending on what you need to do. Howeve
   "LogLevel": "Information",
   "Processors": [
     {
-      "ObjectType": "WorkItemMigrationConfig",
+      "$type": "WorkItemMigrationConfig",
       "ReplayRevisions": true,
       "PrefixProjectToNodes": false,
       "UpdateCreatedDate": true,

@@ -43,7 +43,7 @@ namespace MigrationTools.Processors
         public virtual void Configure(IProcessorOptions options)
         {
             Log.LogInformation("Processor::Configure");
-            Endpoints.ConfigureEndpoints(options.Endpoints);
+            Endpoints.ConfigureEndpoints(options.Source, options.Target);
             ProcessorEnrichers.ConfigureEnrichers(options.ProcessorEnrichers);
             _ProcessorConfigured = true;
         }

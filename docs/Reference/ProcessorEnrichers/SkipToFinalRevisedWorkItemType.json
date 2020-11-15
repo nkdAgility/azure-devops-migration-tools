@@ -1,4 +1,4 @@
 {
-  "ObjectType": "SkipToFinalRevisedWorkItemTypeOptions",
+  "$type": "SkipToFinalRevisedWorkItemTypeOptions",
   "Enabled": true
 }

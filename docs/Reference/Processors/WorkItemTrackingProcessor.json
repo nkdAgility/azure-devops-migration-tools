@@ -1,17 +1,20 @@
 {
-  "ObjectType": "WorkItemTrackingProcessorOptions",
+  "$type": "WorkItemTrackingProcessorOptions",
+  "Enabled": true,
   "ReplayRevisions": true,
   "PrefixProjectToNodes": false,
   "CollapseRevisions": false,
   "WorkItemCreateRetryLimit": 5,
-  "Enabled": true,
-  "Endpoints": null,
   "ProcessorEnrichers": [
     {
+      "$type": "PauseAfterEachItemOptions",
       "Enabled": true
     },
     {
+      "$type": "AppendMigrationToolSignatureFooterOptions",
       "Enabled": true
     }
-  ]
+  ],
+  "Source": null,
+  "Target": null
 }

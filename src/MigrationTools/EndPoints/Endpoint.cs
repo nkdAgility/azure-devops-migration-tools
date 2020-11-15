@@ -10,7 +10,6 @@ namespace MigrationTools.Endpoints
     {
         private IEndpointOptions _InnerOptions;
         private List<IEndpointEnricher> _EndpointEnrichers;
-        public EndpointDirection Direction => _InnerOptions.Direction;
 
         public Endpoint(EndpointEnricherContainer endpointEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Endpoint> logger)
         {
@@ -36,7 +35,7 @@ namespace MigrationTools.Endpoints
         {
             Log.LogDebug("Endpoint::Configure");
             _InnerOptions = options;
-            EndpointEnrichers.ConfigureEnrichers(_InnerOptions.Enrichers);
+            EndpointEnrichers.ConfigureEnrichers(_InnerOptions.EndpointEnrichers);
         }
 
         //public abstract void Filter(IEnumerable<WorkItemData> workItems);

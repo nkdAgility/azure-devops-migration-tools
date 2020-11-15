@@ -15,11 +15,10 @@ This processor is intended, with the aid of [ProcessorEnrichers](../ProcessorEnr
 | PrefixProjectToNodes | Boolean | missng XML code comments | missng XML code comments |
 | CollapseRevisions | Boolean | missng XML code comments | missng XML code comments |
 | WorkItemCreateRetryLimit | Int32 | missng XML code comments | missng XML code comments |
-| Processor | String | missng XML code comments | missng XML code comments |
-| ToConfigure | Type | missng XML code comments | missng XML code comments |
-| Enabled | Boolean | Active the processor if it true. | missng XML code comments |
-| Endpoints | List | missng XML code comments | missng XML code comments |
+| Enabled | Boolean | If set to `true` then the processor will run. Set to `false` and the processor will not run. | missng XML code comments |
 | ProcessorEnrichers | List | missng XML code comments | missng XML code comments |
+| Source | IEndpointOptions | missng XML code comments | missng XML code comments |
+| Target | IEndpointOptions | missng XML code comments | missng XML code comments |
 
 
 ### Supported Endpoints
@@ -43,21 +42,24 @@ This processor is intended, with the aid of [ProcessorEnrichers](../ProcessorEnr
 
 ```JSON
 {
-  "ObjectType": "WorkItemTrackingProcessorOptions",
+  "$type": "WorkItemTrackingProcessorOptions",
+  "Enabled": true,
   "ReplayRevisions": true,
   "PrefixProjectToNodes": false,
   "CollapseRevisions": false,
   "WorkItemCreateRetryLimit": 5,
-  "Enabled": true,
-  "Endpoints": null,
   "ProcessorEnrichers": [
     {
+      "$type": "PauseAfterEachItemOptions",
       "Enabled": true
     },
     {
+      "$type": "AppendMigrationToolSignatureFooterOptions",
       "Enabled": true
     }
-  ]
+  ],
+  "Source": null,
+  "Target": null
 }
 ```
 

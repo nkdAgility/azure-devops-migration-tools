@@ -9,19 +9,24 @@
             Active the enricher if it true.
             </summary>
         </member>
-        <member name="M:MigrationTools.Options.JsonConvertor`1.Create(System.Type,Newtonsoft.Json.Linq.JObject)">
+        <member name="P:MigrationTools.Processors.IProcessorOptions.Source">
             <summary>
-            Create an instance of objectType, based properties in the JSON object
+            This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.
             </summary>
-            <param name="objectType">type of object expected</param>
-            <param name="jObject">
-            contents of JSON object that will be deserialized
-            </param>
-            <returns></returns>
+        </member>
+        <member name="P:MigrationTools.Processors.IProcessorOptions.Target">
+            <summary>
+            This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a write only processor.
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Processors.IProcessorOptions.ProcessorEnrichers">
+            <summary>
+            List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.
+            </summary>
         </member>
         <member name="P:MigrationTools.Processors.ProcessorOptions.Enabled">
             <summary>
-            Active the processor if it true.
+            If set to `true` then the processor will run. Set to `false` and the processor will not run.
             </summary>
         </member>
         <member name="T:MigrationTools.Processors.WorkItemTrackingProcessor">
