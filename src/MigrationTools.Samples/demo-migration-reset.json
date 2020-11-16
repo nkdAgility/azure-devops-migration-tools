@@ -1,0 +1,28 @@
+{
+    "TelemetryEnableTrace": true,
+    "Target": {
+        "Collection": "https://tfs.test.company.com/tfs/Coll2/",
+        "Name": "ProjectName"
+    },
+    "ReflectedWorkItemIDFieldName": "TfsMigrationTool.ReflectedWorkItemId",
+    "WorkItemTypeDefinition": {
+        "Bug": "Bug",
+        "User Story": "User Story",
+        "Requirement": "Requirement",
+        "Task": "Task",
+        "Test Case": "Test Case",
+        "Shared Steps": "Shared Steps",
+        "Shared Parameter": "Shared Parameter"
+    },
+    "FieldMaps": [{
+        "ObjectType": "VstsSyncMigrator.Engine.Configuration.FieldMap.FieldBlankMapConfig",
+        "WorkItemTypeName": "*",
+        "targetField": "TfsMigrationTool.ReflectedWorkItemId"
+    }],
+    "Processors": [{
+        "ObjectType": "WorkItemUpdateConfig",
+        "WhatIf": false,
+        "Enabled": true,
+        "QueryBit": "AND [TfsMigrationTool.ReflectedWorkItemId] <> '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')"
+    }]
+}

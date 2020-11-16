@@ -1,40 +1,76 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using VstsSyncMigrator.Engine;
-using VstsSyncMigrator.Engine.Configuration;
+using MigrationTools;
+using MigrationTools._EngineV1.Configuration;
+using MigrationTools.CommandLine;
+using Serilog;
 
 namespace _VstsSyncMigrator.Engine.Tests
 {
     [TestClass]
     public class MigrationEngineTests
     {
-        [TestMethod]
-        public void TestEngineCreation()
+        private IServiceProvider _services;
+
+        [TestInitialize]
+        public void Setup()
         {
-            EngineConfiguration ec = EngineConfiguration.GetDefault();
-            MigrationEngine me = new MigrationEngine(ec);
+            var ecb = new EngineConfigurationBuilder(new NullLogger<EngineConfigurationBuilder>());
+            var services = new ServiceCollection();
+            // Core
+            services.AddMigrationToolServicesForUnitTests();
+            services.AddMigrationToolServicesForClientLegacyCore();
+            services.AddMigrationToolServices();
+            services.AddMigrationToolServicesLegacy();
+            // Clients
+            services.AddMigrationToolServicesForClientAzureDevOpsObjectModel();
+            services.AddMigrationToolServicesForClientLegacyAzureDevOpsObjectModel();
+
+            //
+            services.AddSingleton<IEngineConfigurationBuilder, EngineConfigurationBuilder>();
+            services.AddSingleton<EngineConfiguration>(ecb.BuildDefault());
+
+            services.AddSingleton<IMigrationEngine, MigrationEngine>();
+
+            services.AddSingleton<ExecuteOptions>((p) => null);
+
+            _services = services.BuildServiceProvider();
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("L2")]
         public void TestEngineExecuteEmptyProcessors()
         {
-            EngineConfiguration ec = EngineConfiguration.GetDefault();
+            EngineConfiguration ec = _services.GetRequiredService<EngineConfiguration>();
             ec.Processors.Clear();
-            MigrationEngine me = new MigrationEngine(ec);
+            IMigrationEngine me = _services.GetRequiredService<IMigrationEngine>();
             me.Run();
-
         }
 
-        [TestMethod]
-        public void TestEngineExecuteEmptyFieldMaps()
+        [TestMethod, TestCategory("L2")]
+        public void TestTypeLoadForAborations()
         {
-            EngineConfiguration ec = EngineConfiguration.GetDefault();
-            ec.Processors.Clear();
-            ec.FieldMaps.Clear();
-            MigrationEngine me = new MigrationEngine(ec);
-            me.Run();
+            List<Type> allTypes;
+            try
+            {
+                allTypes = AppDomain.CurrentDomain.GetAssemblies()
+               .Where(a => !a.IsDynamic)
+               .SelectMany(a => a.GetTypes()).ToList();
+            }
+            catch (ReflectionTypeLoadException ex)
+            {
+                allTypes = new List<Type>();
+                Log.Error(ex, "Unable to continue! ");
+                foreach (Exception item in ex.LoaderExceptions)
+                {
+                    Log.Error(item, "LoaderException: {Message}", item.Message);
+                }
+                throw ex;
+            }
         }
-
-
     }
 }

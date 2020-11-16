@@ -1,0 +1,102 @@
+{
+  "manifestVersion": 1,
+  "id": "vsts-sync-migration",
+  "name": "Migration Tools for Azure DevOps",
+  "version": "#{GitVersion.SemVer}#",
+  "public": false,
+  "publisher": "nkdAgility",
+  "galleryFlags": [
+    "#{Extension.galleryFlags}#"
+  ],
+  "targets": [
+    {
+      "id": "Microsoft.VisualStudio.Services.Integration"
+    }
+  ],
+  "description": "Azure DevOps Migration Tools allow you to migrate Teams, Work Items, and Plans & Suits from one Project to another in Azure DevOps/TFS both within the same Organisation, and between Organisations.",
+  "categories": [
+    "Integrate"
+  ],
+  "tags": [
+    "migration",
+    "AzureDevOps",
+    "Azure DevOps",
+    "TFS",
+    "upgrade",
+    "migrate",
+    "merge",
+    "Test Plans",
+    "Backlogs",
+    "Work Items"
+  ],
+  "links": {
+    "home": {
+      "uri": "https://nkdagility.github.io/azure-devops-migration-tools/"
+    },
+    "getstarted": {
+      "uri": "http://nkdagility.github.io/azure-devops-migration-tools/getting-started"
+    },
+    "learn": {
+      "uri": "https://nkdagility.github.io/azure-devops-migration-tools/"
+    },
+    "support": {
+      "uri": "https://stackoverflow.com/questions/tagged/azure-devops-migration-tools"
+    },
+    "repository": {
+      "uri": "https://github.com/nkdAgility/azure-devops-migration-tools"
+    },
+    "issues": {
+      "uri": "https://github.com/nkdAgility/azure-devops-migration-tools/issues"
+    }
+  },
+  "CustomerQnASupport": {
+    "enableqna": "true",
+    "url": "https://stackoverflow.com/questions/tagged/azure-devops-migration-tools"
+  },
+  "badges": [
+    {
+      "href": "https://dev.azure.com/nkdagility/migration-tools/_build/index?path=%5C&definitionId=94",
+      "uri": "https://dev.azure.com/nkdagility/migration-tools/_apis/build/status/vsts-sync-migration",
+      "description": "Azure Pipline CI for this project"
+    },
+    {
+      "href": "https://dev.azure.com/nkdagility/migration-tools/_releases2?definitionId=6",
+      "uri": "https://vsrm.dev.azure.com/nkdagility/_apis/public/Release/badge/1b52ce63-eccc-41c8-88f9-ae6ebeefdc63/6/11",
+      "description": "Azure Pipeline CD for the project"
+    },
+    {
+      "href": "https://sonarcloud.io/dashboard?id=vsts-sync-migrator%3Amaster",
+      "uri": "https://sonarcloud.io/api/project_badges/measure?project=vsts-sync-migrator%3Amaster&metric=sqale_rating",
+      "description": "SonarCloud Maintainability Rating"
+    },
+    {
+      "href": "https://sonarcloud.io/dashboard?id=vsts-sync-migrator%3Amaster",
+      "uri": "https://sonarcloud.io/api/project_badges/measure?project=vsts-sync-migrator%3Amaster&metric=security_rating",
+      "description": "Security Rating"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "uri": "https://github.com/nkdAgility/azure-devops-migration-tools.git"
+  },
+  "icons": {
+    "default": "images/extension-icon.png"
+  },
+  "branding": {
+    "color": "#1E1E1E",
+    "theme": "dark"
+  },
+  "screenshots": [
+    {
+      "path": "images/screenshot-01.png"
+    }
+  ],
+  "content": {
+    "details": {
+      "path": "README.md"
+    },
+    "license": {
+      "path": "LICENSE.txt"
+    }
+  }
+}

@@ -1,27 +1,25 @@
-﻿using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text.RegularExpressions;
-using System.Linq;
-using Microsoft.TeamFoundation.Git.Client;
-using Microsoft.TeamFoundation;
-
-using VstsSyncMigrator.Engine.Configuration.Processing;
-using Microsoft.TeamFoundation.SourceControl.WebApi;
-using VstsSyncMigrator.Core.Execution.OMatics;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using MigrationTools;
+using MigrationTools._EngineV1.Configuration;
+using MigrationTools._EngineV1.Configuration.Processing;
+using MigrationTools._EngineV1.DataContracts;
+using MigrationTools.Enrichers;
+using VstsSyncMigrator._EngineV1.Processors;
 
 namespace VstsSyncMigrator.Engine
 {
-    public class FixGitCommitLinks : ProcessingContextBase
+    public class FixGitCommitLinks : StaticProcessorBase
     {
         private FixGitCommitLinksConfig _config;
-        private RepoOMatic _RepoOMatic;
+        private TfsGitRepositoryEnricher _GitRepositoryEnricher;
 
-        public FixGitCommitLinks(MigrationEngine me, FixGitCommitLinksConfig config, WorkItemStoreContext storeContext) : base(me, config)
+        public FixGitCommitLinks(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<FixGitCommitLinks> logger) : base(services, me, telemetry, logger)
         {
-            _config = config;
-            _RepoOMatic = new RepoOMatic(me);
+            Logger = logger;
         }
 
         public override string Name
@@ -32,57 +30,59 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        internal override void InternalExecute()
+        public ILogger<FixGitCommitLinks> Logger { get; }
+
+        public override void Configure(IProcessorConfig config)
+        {
+            _config = (FixGitCommitLinksConfig)config;
+            _GitRepositoryEnricher = Services.GetRequiredService<TfsGitRepositoryEnricher>();
+        }
+
+        protected override void InternalExecute()
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
-			//////////////////////////////////////////////////
-            WorkItemStoreContext targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
-            var targetQuery = new TfsQueryContext(targetStore);
-            targetQuery.AddParameter("TeamProject", me.Target.Config.Project);
-            targetQuery.Query =
+            //////////////////////////////////////////////////
+            var query =
                 string.Format(
                     @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY {1}",
                     _config.QueryBit,
                     _config.OrderBit
                     );
-            WorkItemCollection workitems = targetQuery.Execute();
-            Trace.WriteLine(string.Format("Update {0} work items?", workitems.Count));
-            //////////////////////////////////////////////////
+            List<WorkItemData> workitems = Engine.Target.WorkItems.GetWorkItems(query);
+            Log.LogInformation("Update {0} work items?", workitems.Count);
+            /////////////////////////////////////////////////
             int current = workitems.Count;
             int count = 0;
             long elapsedms = 0;
             int noteFound = 0;
-            foreach (WorkItem workitem in workitems)
+            foreach (WorkItemData workitem in workitems)
             {
-               
                 Stopwatch witstopwatch = Stopwatch.StartNew();
-				workitem.Open();
+                workitem.ToWorkItem().Open();
 
-                _RepoOMatic.FixExternalLinks(workitem, targetStore, null);
+                _GitRepositoryEnricher.Enrich(null, workitem);
 
-                if (workitem.IsDirty)
+                if (workitem.ToWorkItem().IsDirty)
                 {
-                    Trace.WriteLine($"Saving {workitem.Id}");
+                    Log.LogInformation("Saving {workitemId}", workitem.Id);
 
-                    workitem.Save();
+                    workitem.SaveToAzureDevOps();
                 }
 
                 witstopwatch.Stop();
                 elapsedms = elapsedms + witstopwatch.ElapsedMilliseconds;
                 current--;
                 count++;
-                TimeSpan average = new TimeSpan(0, 0, 0, 0, (int) (elapsedms / count));
-                TimeSpan remaining = new TimeSpan(0, 0, 0, 0, (int) (average.TotalMilliseconds * current));
-                Trace.WriteLine(string.Format("Average time of {0} per work item and {1} estimated to completion",
+                TimeSpan average = new TimeSpan(0, 0, 0, 0, (int)(elapsedms / count));
+                TimeSpan remaining = new TimeSpan(0, 0, 0, 0, (int)(average.TotalMilliseconds * current));
+                Log.LogInformation("Average time of {0} per work item and {1} estimated to completion",
                     string.Format(@"{0:s\:fff} seconds", average),
-                    string.Format(@"{0:%h} hours {0:%m} minutes {0:s\:fff} seconds", remaining)));
-
+                    string.Format(@"{0:%h} hours {0:%m} minutes {0:s\:fff} seconds", remaining));
             }
-            Trace.WriteLine(string.Format("Did not find old repo for {0} links?", noteFound));
+            Log.LogInformation("Did not find old repo for {0} links?", noteFound);
             //////////////////////////////////////////////////
             stopwatch.Stop();
-            Console.WriteLine(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds", stopwatch.Elapsed);
+            Log.LogInformation("DONE in {Elapsed} seconds", stopwatch.Elapsed.ToString("c"));
         }
-
     }
 }

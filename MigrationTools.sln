@@ -1,0 +1,290 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29006.145
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.ConsoleFull", "src\MigrationTools.ConsoleFull\MigrationTools.ConsoleFull.csproj", "{033EB332-4A50-4C73-9B7D-A35D9F3C0513}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VstsSyncMigrator.Core", "src\VstsSyncMigrator.Core\VstsSyncMigrator.Core.csproj", "{68BAF6BA-2BC0-48D0-B892-1D9F93D7003A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Chocolatey", "Chocolatey", "{89434800-3004-4621-8677-C14C1D1AA4AF}"
+	ProjectSection(SolutionItems) = preProject
+		src\MigrationTools.Chocolatey\chocolateyInstall.ps1 = src\MigrationTools.Chocolatey\chocolateyInstall.ps1
+		src\MigrationTools.Chocolatey\chocolateyUninstall.ps1 = src\MigrationTools.Chocolatey\chocolateyUninstall.ps1
+		src\MigrationTools.Chocolatey\vstssyncmigration.nuspec = src\MigrationTools.Chocolatey\vstssyncmigration.nuspec
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VstsSyncMigrator.Core.Tests", "src\VstsSyncMigrator.Core.Tests\VstsSyncMigrator.Core.Tests.csproj", "{AB3922F0-E801-474A-A498-892C3EA99799}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extension", "Extension", "{243265E4-0E5A-4E95-BE7C-B92B7666FF79}"
+	ProjectSection(SolutionItems) = preProject
+		src\MigrationTools.Extension\LICENSE.txt = src\MigrationTools.Extension\LICENSE.txt
+		src\MigrationTools.Extension\README.md = src\MigrationTools.Extension\README.md
+		src\MigrationTools.Extension\vss-extension.json = src\MigrationTools.Extension\vss-extension.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{2BC0808B-6F4D-4635-82FE-1118181DD64F}"
+	ProjectSection(SolutionItems) = preProject
+		docs\_config.yml = docs\_config.yml
+		docs\changeset-migration.md = docs\changeset-migration.md
+		docs\configuration.md = docs\configuration.md
+		docs\faq.md = docs\faq.md
+		docs\getting-started.md = docs\getting-started.md
+		docs\index.md = docs\index.md
+		docs\server-configuration.md = docs\server-configuration.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A05A7847-4C75-4E92-B156-F529483688CC}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		configuration.json = configuration.json
+		configuration2.json = configuration2.json
+		Directory.Build.props = Directory.Build.props
+		GitVersion.yml = GitVersion.yml
+		mkdocs.yml = mkdocs.yml
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Processors", "Processors", "{E9399C6D-A5E0-43ED-8412-6C4A6BC86EC8}"
+	ProjectSection(SolutionItems) = preProject
+		docs\Processors\ImportProfilePictureConfig.md = docs\Processors\ImportProfilePictureConfig.md
+		docs\Processors\TestConfigurationsMigrationConfig.md = docs\Processors\TestConfigurationsMigrationConfig.md
+		docs\Processors\TestPlansAndSuitesMigrationConfig.md = docs\Processors\TestPlansAndSuitesMigrationConfig.md
+		docs\Processors\TestVeriablesMigrationConfig.md = docs\Processors\TestVeriablesMigrationConfig.md
+		docs\Processors\WorkItemDeleteConfig.md = docs\Processors\WorkItemDeleteConfig.md
+		docs\Processors\WorkItemMigrationConfig.md = docs\Processors\WorkItemMigrationConfig.md
+		docs\Processors\WorkItemPostProcessingConfig.md = docs\Processors\WorkItemPostProcessingConfig.md
+		docs\Processors\WorkItemUpdateAreasAsTagsConfig.md = docs\Processors\WorkItemUpdateAreasAsTagsConfig.md
+		docs\Processors\WorkItemUpdateConfig.md = docs\Processors\WorkItemUpdateConfig.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "images", "images", "{F29B9C2E-7EE3-49A5-8341-1277FA8BE0DB}"
+	ProjectSection(SolutionItems) = preProject
+		src\MigrationTools.Extension\images\azure-devops-migration-tools-naked-agility-martin-hinshelwood.png = src\MigrationTools.Extension\images\azure-devops-migration-tools-naked-agility-martin-hinshelwood.png
+		src\MigrationTools.Extension\images\extension-icon.png = src\MigrationTools.Extension\images\extension-icon.png
+		src\MigrationTools.Extension\images\screenshot-01.png = src\MigrationTools.Extension\images\screenshot-01.png
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Distribution", "Distribution", "{32E2956A-9056-4D9D-8018-14DFD0E6CA41}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.ConsoleCore", "src\MigrationTools.ConsoleCore\MigrationTools.ConsoleCore.csproj", "{A314A07F-1D5E-44B8-9973-3AB2C41F17D5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{5C05DA7B-B70F-4A87-920B-DCD14EA7670D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Clients.AzureDevops.Rest", "src\MigrationTools.Clients.AzureDevops.Rest\MigrationTools.Clients.AzureDevops.Rest.csproj", "{7CE6D8B2-920C-43F6-95E8-F2682B029DB8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools", "src\MigrationTools\MigrationTools.csproj", "{EBDB3038-9081-41B5-B82A-D0BC8F96859F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Clients.FileSystem", "src\MigrationTools.Clients.FileSystem\MigrationTools.Clients.FileSystem.csproj", "{6F97F030-162D-49BF-A45C-1CF12E7ABA88}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Tests", "src\MigrationTools.Tests\MigrationTools.Tests.csproj", "{A679B3FF-1355-455F-853F-433A9CB1BE60}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Clients.AzureDevops.ObjectModel", "src\MigrationTools.Clients.AzureDevops.ObjectModel\MigrationTools.Clients.AzureDevops.ObjectModel.csproj", "{D58EEDFA-D74C-4E84-9C26-6D69521382FD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Host", "src\MigrationTools.Host\MigrationTools.Host.csproj", "{B400FC37-A4B7-4526-85DD-36784E3B56EC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_RefactorToZero", "_RefactorToZero", "{E5294FF3-167A-49A5-A453-19332DA32B01}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EntryPoints", "EntryPoints", "{D0EE5917-21B2-49FA-9506-69857EE82DCD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Clients", "Clients", "{13FE9FE2-9C6E-4866-BBAD-106F5BF765F1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SampleConfigs", "SampleConfigs", "{A6831354-6128-4F1A-A1F3-C6E598B0925F}"
+	ProjectSection(SolutionItems) = preProject
+		src\MigrationTools.Samples\configuration.json = src\MigrationTools.Samples\configuration.json
+		src\MigrationTools.Samples\demo-mapping-scrum2Agile.json = src\MigrationTools.Samples\demo-mapping-scrum2Agile.json
+		src\MigrationTools.Samples\demo-migration-reset.json = src\MigrationTools.Samples\demo-migration-reset.json
+		src\MigrationTools.Samples\demo-migration.json = src\MigrationTools.Samples\demo-migration.json
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Clients.InMemory", "src\MigrationTools.Clients.InMemory\MigrationTools.Clients.InMemory.csproj", "{54DF41E6-9F94-42DD-877E-437DC6E9F3E2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Clients.InMemory.Tests", "src\MigrationTools.Clients.InMemory.Tests\MigrationTools.Clients.InMemory.Tests.csproj", "{504D6953-E83D-498D-A1C7-E511F14B9563}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Clients.FileSystem.Tests", "src\MigrationTools.Clients.FileSystem.Tests\MigrationTools.Clients.FileSystem.Tests.csproj", "{3191B594-1C3A-4245-8AFE-076EA142B778}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Host.Tests", "src\MigrationTools.Host.Tests\MigrationTools.Host.Tests.csproj", "{6F51CE1D-FEBD-4F7F-A462-27A4745924F4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Integration.Tests", "src\MigrationTools.Integration.Tests\MigrationTools.Integration.Tests.csproj", "{AADA5B89-83F9-45E4-B713-EA1FEB9EBC89}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Clients.AzureDevops.ObjectModel.Tests", "src\MigrationTools.Clients.AzureDevops.ObjectModel.Tests\MigrationTools.Clients.AzureDevops.ObjectModel.Tests.csproj", "{72FA4853-D840-480E-A6FD-670EF66E9D5B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.ConsoleConfigGenerator", "src\MigrationTools.ConsoleConfigGenerator\MigrationTools.ConsoleConfigGenerator.csproj", "{B64B19C7-BD17-4B2A-83E6-B33B3D73B078}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Reference", "Reference", "{00238E4D-EBF6-4604-AA6C-792FC32C89A1}"
+	ProjectSection(SolutionItems) = preProject
+		docs\Reference\index.md = docs\Reference\index.md
+		docs\Reference\template.md = docs\Reference\template.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EndpointEnrichers", "EndpointEnrichers", "{E2FDAB96-3FA2-4A83-AFEA-49FE4A4DAFC4}"
+	ProjectSection(SolutionItems) = preProject
+		docs\Reference\EndpointEnrichers\index.md = docs\Reference\EndpointEnrichers\index.md
+		docs\Reference\EndpointEnrichers\TfsWorkItemAttachmentEnricher.json = docs\Reference\EndpointEnrichers\TfsWorkItemAttachmentEnricher.json
+		docs\Reference\EndpointEnrichers\TfsWorkItemAttachmentEnricher.md = docs\Reference\EndpointEnrichers\TfsWorkItemAttachmentEnricher.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Endpoints", "Endpoints", "{A433BB95-FC3C-4133-A289-7EDFC9E7E62F}"
+	ProjectSection(SolutionItems) = preProject
+		docs\Reference\Endpoints\FileSystemWorkItemEndpoint.json = docs\Reference\Endpoints\FileSystemWorkItemEndpoint.json
+		docs\Reference\Endpoints\FileSystemWorkItemEndpoint.md = docs\Reference\Endpoints\FileSystemWorkItemEndpoint.md
+		docs\Reference\Endpoints\index-template.md = docs\Reference\Endpoints\index-template.md
+		docs\Reference\Endpoints\index.md = docs\Reference\Endpoints\index.md
+		docs\Reference\Endpoints\TfsEndpoint.json = docs\Reference\Endpoints\TfsEndpoint.json
+		docs\Reference\Endpoints\TfsEndpoint.md = docs\Reference\Endpoints\TfsEndpoint.md
+		docs\Reference\Endpoints\TfsTeamSettingsEndpoint.json = docs\Reference\Endpoints\TfsTeamSettingsEndpoint.json
+		docs\Reference\Endpoints\TfsTeamSettingsEndpoint.md = docs\Reference\Endpoints\TfsTeamSettingsEndpoint.md
+		docs\Reference\Endpoints\TfsWorkItemEndpoint-template.md = docs\Reference\Endpoints\TfsWorkItemEndpoint-template.md
+		docs\Reference\Endpoints\TfsWorkItemEndpoint.json = docs\Reference\Endpoints\TfsWorkItemEndpoint.json
+		docs\Reference\Endpoints\TfsWorkItemEndpoint.md = docs\Reference\Endpoints\TfsWorkItemEndpoint.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Processors", "Processors", "{6B1F49FC-250D-4671-87BA-B95EB90C5A94}"
+	ProjectSection(SolutionItems) = preProject
+		docs\Reference\Processors\index.md = docs\Reference\Processors\index.md
+		docs\Reference\Processors\TfsSharedQueryProcessor.json = docs\Reference\Processors\TfsSharedQueryProcessor.json
+		docs\Reference\Processors\TfsSharedQueryProcessor.md = docs\Reference\Processors\TfsSharedQueryProcessor.md
+		docs\Reference\Processors\TfsTeamSettingsProcessor.json = docs\Reference\Processors\TfsTeamSettingsProcessor.json
+		docs\Reference\Processors\TfsTeamSettingsProcessor.md = docs\Reference\Processors\TfsTeamSettingsProcessor.md
+		docs\Reference\Processors\WorkItemTrackingProcessor-template.md = docs\Reference\Processors\WorkItemTrackingProcessor-template.md
+		docs\Reference\Processors\WorkItemTrackingProcessor.json = docs\Reference\Processors\WorkItemTrackingProcessor.json
+		docs\Reference\Processors\WorkItemTrackingProcessor.md = docs\Reference\Processors\WorkItemTrackingProcessor.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ProcessorEnrichers", "ProcessorEnrichers", "{73142CEF-17E1-47EA-8BEF-1A6A1EBDF1D7}"
+	ProjectSection(SolutionItems) = preProject
+		docs\Reference\ProcessorEnrichers\AppendMigrationToolSignatureFooter.json = docs\Reference\ProcessorEnrichers\AppendMigrationToolSignatureFooter.json
+		docs\Reference\ProcessorEnrichers\AppendMigrationToolSignatureFooter.md = docs\Reference\ProcessorEnrichers\AppendMigrationToolSignatureFooter.md
+		docs\Reference\ProcessorEnrichers\FilterWorkItemsThatAlreadyExistInTarget.json = docs\Reference\ProcessorEnrichers\FilterWorkItemsThatAlreadyExistInTarget.json
+		docs\Reference\ProcessorEnrichers\FilterWorkItemsThatAlreadyExistInTarget.md = docs\Reference\ProcessorEnrichers\FilterWorkItemsThatAlreadyExistInTarget.md
+		docs\Reference\ProcessorEnrichers\index.md = docs\Reference\ProcessorEnrichers\index.md
+		docs\Reference\ProcessorEnrichers\PauseAfterEachItem.json = docs\Reference\ProcessorEnrichers\PauseAfterEachItem.json
+		docs\Reference\ProcessorEnrichers\PauseAfterEachItem.md = docs\Reference\ProcessorEnrichers\PauseAfterEachItem.md
+		docs\Reference\ProcessorEnrichers\SkipToFinalRevisedWorkItemType.json = docs\Reference\ProcessorEnrichers\SkipToFinalRevisedWorkItemType.json
+		docs\Reference\ProcessorEnrichers\SkipToFinalRevisedWorkItemType.md = docs\Reference\ProcessorEnrichers\SkipToFinalRevisedWorkItemType.md
+		docs\Reference\ProcessorEnrichers\TfsEmbededImagesEnricher.md = docs\Reference\ProcessorEnrichers\TfsEmbededImagesEnricher.md
+		docs\Reference\ProcessorEnrichers\TfsGitRepositoryEnricher.md = docs\Reference\ProcessorEnrichers\TfsGitRepositoryEnricher.md
+		docs\Reference\ProcessorEnrichers\TfsNodeStructureEnricher.md = docs\Reference\ProcessorEnrichers\TfsNodeStructureEnricher.md
+		docs\Reference\ProcessorEnrichers\TfsValidateRequiredField.json = docs\Reference\ProcessorEnrichers\TfsValidateRequiredField.json
+		docs\Reference\ProcessorEnrichers\TfsValidateRequiredField.md = docs\Reference\ProcessorEnrichers\TfsValidateRequiredField.md
+		docs\Reference\ProcessorEnrichers\TfsWorkItemLinkEnricher.md = docs\Reference\ProcessorEnrichers\TfsWorkItemLinkEnricher.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{033EB332-4A50-4C73-9B7D-A35D9F3C0513}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{033EB332-4A50-4C73-9B7D-A35D9F3C0513}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{033EB332-4A50-4C73-9B7D-A35D9F3C0513}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{033EB332-4A50-4C73-9B7D-A35D9F3C0513}.Release|Any CPU.Build.0 = Release|Any CPU
+		{68BAF6BA-2BC0-48D0-B892-1D9F93D7003A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{68BAF6BA-2BC0-48D0-B892-1D9F93D7003A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{68BAF6BA-2BC0-48D0-B892-1D9F93D7003A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{68BAF6BA-2BC0-48D0-B892-1D9F93D7003A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB3922F0-E801-474A-A498-892C3EA99799}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB3922F0-E801-474A-A498-892C3EA99799}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB3922F0-E801-474A-A498-892C3EA99799}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB3922F0-E801-474A-A498-892C3EA99799}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A314A07F-1D5E-44B8-9973-3AB2C41F17D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A314A07F-1D5E-44B8-9973-3AB2C41F17D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A314A07F-1D5E-44B8-9973-3AB2C41F17D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A314A07F-1D5E-44B8-9973-3AB2C41F17D5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7CE6D8B2-920C-43F6-95E8-F2682B029DB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7CE6D8B2-920C-43F6-95E8-F2682B029DB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7CE6D8B2-920C-43F6-95E8-F2682B029DB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7CE6D8B2-920C-43F6-95E8-F2682B029DB8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EBDB3038-9081-41B5-B82A-D0BC8F96859F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EBDB3038-9081-41B5-B82A-D0BC8F96859F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EBDB3038-9081-41B5-B82A-D0BC8F96859F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EBDB3038-9081-41B5-B82A-D0BC8F96859F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F97F030-162D-49BF-A45C-1CF12E7ABA88}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F97F030-162D-49BF-A45C-1CF12E7ABA88}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F97F030-162D-49BF-A45C-1CF12E7ABA88}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F97F030-162D-49BF-A45C-1CF12E7ABA88}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A679B3FF-1355-455F-853F-433A9CB1BE60}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A679B3FF-1355-455F-853F-433A9CB1BE60}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A679B3FF-1355-455F-853F-433A9CB1BE60}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A679B3FF-1355-455F-853F-433A9CB1BE60}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D58EEDFA-D74C-4E84-9C26-6D69521382FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D58EEDFA-D74C-4E84-9C26-6D69521382FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D58EEDFA-D74C-4E84-9C26-6D69521382FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D58EEDFA-D74C-4E84-9C26-6D69521382FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B400FC37-A4B7-4526-85DD-36784E3B56EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B400FC37-A4B7-4526-85DD-36784E3B56EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B400FC37-A4B7-4526-85DD-36784E3B56EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B400FC37-A4B7-4526-85DD-36784E3B56EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{54DF41E6-9F94-42DD-877E-437DC6E9F3E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{54DF41E6-9F94-42DD-877E-437DC6E9F3E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{54DF41E6-9F94-42DD-877E-437DC6E9F3E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{54DF41E6-9F94-42DD-877E-437DC6E9F3E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{504D6953-E83D-498D-A1C7-E511F14B9563}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{504D6953-E83D-498D-A1C7-E511F14B9563}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{504D6953-E83D-498D-A1C7-E511F14B9563}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{504D6953-E83D-498D-A1C7-E511F14B9563}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3191B594-1C3A-4245-8AFE-076EA142B778}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3191B594-1C3A-4245-8AFE-076EA142B778}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3191B594-1C3A-4245-8AFE-076EA142B778}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3191B594-1C3A-4245-8AFE-076EA142B778}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F51CE1D-FEBD-4F7F-A462-27A4745924F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F51CE1D-FEBD-4F7F-A462-27A4745924F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F51CE1D-FEBD-4F7F-A462-27A4745924F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F51CE1D-FEBD-4F7F-A462-27A4745924F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AADA5B89-83F9-45E4-B713-EA1FEB9EBC89}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AADA5B89-83F9-45E4-B713-EA1FEB9EBC89}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AADA5B89-83F9-45E4-B713-EA1FEB9EBC89}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AADA5B89-83F9-45E4-B713-EA1FEB9EBC89}.Release|Any CPU.Build.0 = Release|Any CPU
+		{72FA4853-D840-480E-A6FD-670EF66E9D5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72FA4853-D840-480E-A6FD-670EF66E9D5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72FA4853-D840-480E-A6FD-670EF66E9D5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72FA4853-D840-480E-A6FD-670EF66E9D5B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B64B19C7-BD17-4B2A-83E6-B33B3D73B078}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B64B19C7-BD17-4B2A-83E6-B33B3D73B078}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B64B19C7-BD17-4B2A-83E6-B33B3D73B078}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B64B19C7-BD17-4B2A-83E6-B33B3D73B078}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{033EB332-4A50-4C73-9B7D-A35D9F3C0513} = {D0EE5917-21B2-49FA-9506-69857EE82DCD}
+		{68BAF6BA-2BC0-48D0-B892-1D9F93D7003A} = {E5294FF3-167A-49A5-A453-19332DA32B01}
+		{89434800-3004-4621-8677-C14C1D1AA4AF} = {32E2956A-9056-4D9D-8018-14DFD0E6CA41}
+		{AB3922F0-E801-474A-A498-892C3EA99799} = {E5294FF3-167A-49A5-A453-19332DA32B01}
+		{243265E4-0E5A-4E95-BE7C-B92B7666FF79} = {32E2956A-9056-4D9D-8018-14DFD0E6CA41}
+		{2BC0808B-6F4D-4635-82FE-1118181DD64F} = {A05A7847-4C75-4E92-B156-F529483688CC}
+		{E9399C6D-A5E0-43ED-8412-6C4A6BC86EC8} = {2BC0808B-6F4D-4635-82FE-1118181DD64F}
+		{F29B9C2E-7EE3-49A5-8341-1277FA8BE0DB} = {243265E4-0E5A-4E95-BE7C-B92B7666FF79}
+		{32E2956A-9056-4D9D-8018-14DFD0E6CA41} = {A05A7847-4C75-4E92-B156-F529483688CC}
+		{A314A07F-1D5E-44B8-9973-3AB2C41F17D5} = {D0EE5917-21B2-49FA-9506-69857EE82DCD}
+		{7CE6D8B2-920C-43F6-95E8-F2682B029DB8} = {13FE9FE2-9C6E-4866-BBAD-106F5BF765F1}
+		{EBDB3038-9081-41B5-B82A-D0BC8F96859F} = {5C05DA7B-B70F-4A87-920B-DCD14EA7670D}
+		{6F97F030-162D-49BF-A45C-1CF12E7ABA88} = {13FE9FE2-9C6E-4866-BBAD-106F5BF765F1}
+		{A679B3FF-1355-455F-853F-433A9CB1BE60} = {5C05DA7B-B70F-4A87-920B-DCD14EA7670D}
+		{D58EEDFA-D74C-4E84-9C26-6D69521382FD} = {13FE9FE2-9C6E-4866-BBAD-106F5BF765F1}
+		{B400FC37-A4B7-4526-85DD-36784E3B56EC} = {5C05DA7B-B70F-4A87-920B-DCD14EA7670D}
+		{A6831354-6128-4F1A-A1F3-C6E598B0925F} = {32E2956A-9056-4D9D-8018-14DFD0E6CA41}
+		{54DF41E6-9F94-42DD-877E-437DC6E9F3E2} = {13FE9FE2-9C6E-4866-BBAD-106F5BF765F1}
+		{504D6953-E83D-498D-A1C7-E511F14B9563} = {13FE9FE2-9C6E-4866-BBAD-106F5BF765F1}
+		{3191B594-1C3A-4245-8AFE-076EA142B778} = {13FE9FE2-9C6E-4866-BBAD-106F5BF765F1}
+		{6F51CE1D-FEBD-4F7F-A462-27A4745924F4} = {5C05DA7B-B70F-4A87-920B-DCD14EA7670D}
+		{AADA5B89-83F9-45E4-B713-EA1FEB9EBC89} = {5C05DA7B-B70F-4A87-920B-DCD14EA7670D}
+		{72FA4853-D840-480E-A6FD-670EF66E9D5B} = {13FE9FE2-9C6E-4866-BBAD-106F5BF765F1}
+		{B64B19C7-BD17-4B2A-83E6-B33B3D73B078} = {D0EE5917-21B2-49FA-9506-69857EE82DCD}
+		{00238E4D-EBF6-4604-AA6C-792FC32C89A1} = {2BC0808B-6F4D-4635-82FE-1118181DD64F}
+		{E2FDAB96-3FA2-4A83-AFEA-49FE4A4DAFC4} = {00238E4D-EBF6-4604-AA6C-792FC32C89A1}
+		{A433BB95-FC3C-4133-A289-7EDFC9E7E62F} = {00238E4D-EBF6-4604-AA6C-792FC32C89A1}
+		{6B1F49FC-250D-4671-87BA-B95EB90C5A94} = {00238E4D-EBF6-4604-AA6C-792FC32C89A1}
+		{73142CEF-17E1-47EA-8BEF-1A6A1EBDF1D7} = {00238E4D-EBF6-4604-AA6C-792FC32C89A1}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {62EE0B27-C55A-46EE-8D17-1691DE9BBD50}
+	EndGlobalSection
+	GlobalSection(CodealikeProperties) = postSolution
+		SolutionGuid = 51c92075-0694-476b-8366-efd65c9a9b77
+	EndGlobalSection
+EndGlobal

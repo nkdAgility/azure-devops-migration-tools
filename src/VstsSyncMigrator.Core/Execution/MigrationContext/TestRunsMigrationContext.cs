@@ -14,7 +14,6 @@
 //    //http://stackoverflow.com/questions/6505812/how-to-create-a-test-run-and-result-using-the-team-foundation-server-api
 //    public class TestRunsMigrationContext : MigrationContextBase
 //    {
-
 //        WorkItemStoreContext sourceWitStore;
 //        TestManagementContext sourceTestStore;
 
@@ -39,20 +38,17 @@
 
 //        internal override void InternalExecute()
 //        {
-
 //            List<ITestRun> sourceRuns = sourceTestStore.GetTestRuns();
-//            Trace.WriteLine(string.Format("Plan to copy {0} Runs?", sourceRuns.Count), "TestRuns");
+//            Log.WriteLine(string.Format("Plan to copy {0} Runs?", sourceRuns.Count), "TestRuns");
 //            foreach (ITestRun sourceRun in sourceRuns)
 //            {
-//                Trace.WriteLine(string.Format("Process Run {0} - ", sourceRun.Id), "TestRuns");
+//                Log.WriteLine(string.Format("Process Run {0} - ", sourceRun.Id), "TestRuns");
 //                //ITestRun newRun = targetTestStore.Project.TestRuns.Create();
 //                throw new NotImplementedException();
 
 //            }
 
 //        }
-
-
 
 //    }
 //}

@@ -1,26 +1,20 @@
-﻿using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 using System.Diagnostics;
-using System.Globalization;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Linq;
-using Microsoft.TeamFoundation.Server;
+using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.Framework.Common;
-using VstsSyncMigrator.Engine.Configuration.Processing;
+using Microsoft.TeamFoundation.Server;
+using MigrationTools;
+using MigrationTools._EngineV1.Configuration;
+using VstsSyncMigrator._EngineV1.Processors;
 
 namespace VstsSyncMigrator.Engine
 {
-    public class ExportTeamList : ProcessingContextBase
+    public class ExportTeamList : StaticProcessorBase
     {
-
-
-        public ExportTeamList(MigrationEngine me, ITfsProcessingConfig config) : base(me, config)
+        public ExportTeamList(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<ExportTeamList> logger) : base(services, me, telemetry, logger)
         {
-
         }
 
         public override string Name
@@ -31,15 +25,20 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        internal override void InternalExecute()
+        public override void Configure(IProcessorConfig config)
+        {
+        }
+
+        protected override void InternalExecute()
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
-			//////////////////////////////////////////////////
-			// Retrieve the project URI. Needed to enumerate teams.     
-			var css4 = me.Target.Collection.GetService<ICommonStructureService4>();
-            ProjectInfo projectInfo = css4.GetProjectFromName(me.Target.Config.Project);
-            // Retrieve a list of all teams on the project.     
-            TfsTeamService teamService = me.Target.Collection.GetService<TfsTeamService>();
+            //////////////////////////////////////////////////
+            // Retrieve the project URI. Needed to enumerate teams.
+            var css4 = Engine.Target.GetService<ICommonStructureService4>();
+            ProjectInfo projectInfo = css4.GetProjectFromName(Engine.Target.Config.AsTeamProjectConfig().Project);
+            // Retrieve a list of all teams on the project.
+            TfsTeamService teamService = Engine.Target.GetService<TfsTeamService>();
+            TfsConnection connection = (TfsConnection)Engine.Target.InternalCollection;
 
             foreach (ProjectInfo p in css4.ListAllProjects())
             {
@@ -47,25 +46,19 @@ namespace VstsSyncMigrator.Engine
 
                 foreach (TeamFoundationTeam team in allTeams)
                 {
-                    Trace.WriteLine(string.Format("Team name: {0}", team.Name), p.Name);
-                    Trace.WriteLine(string.Format("Team ID: {0}", team.Identity.TeamFoundationId.ToString()), p.Name);
-                    Trace.WriteLine(string.Format("Description: {0}", team.Description), p.Name);
-                    var members =  team.GetMembers(me.Target.Collection, MembershipQuery.Direct);
-                    Trace.WriteLine(string.Format("Team Accounts: {0}", String.Join(";", (from member in team.GetMembers(me.Target.Collection, MembershipQuery.Direct) select member.UniqueName))), p.Name);
-                    Trace.WriteLine(string.Format("Team names: {0}", String.Join(";", (from member in team.GetMembers(me.Target.Collection, MembershipQuery.Direct) select member.DisplayName))), p.Name);
+                    Log.LogInformation("Team name: {0}", team.Name);
+                    Log.LogInformation("Team ID: {0}", team.Identity.TeamFoundationId.ToString());
+                    Log.LogInformation("Description: {0}", team.Description, p.Name);
+                    var members = team.GetMembers(connection, MembershipQuery.Direct);
+                    Log.LogInformation("Team Accounts: {0}", String.Join(";", (from member in team.GetMembers(connection, MembershipQuery.Direct) select member.UniqueName)));
+                    Log.LogInformation("Team names: {0}", String.Join(";", (from member in team.GetMembers(connection, MembershipQuery.Direct) select member.DisplayName)));
                 }
             }
-
-           
-
-
-
 
             //////////////////////////////////////////////////
             stopwatch.Stop();
 
-            Console.WriteLine(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds", stopwatch.Elapsed);
+            Log.LogInformation("DONE in {Elapsed} ", stopwatch.Elapsed.ToString("c"));
         }
-
     }
 }

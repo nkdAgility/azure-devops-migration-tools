@@ -1,31 +1,36 @@
 ﻿using System;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using VstsSyncMigrator.Engine.Configuration;
+using MigrationTools;
+using MigrationTools._EngineV1.Configuration;
 
 namespace _VstsSyncMigrator.Engine.Tests
 {
     [TestClass]
     public class EngineConfigurationTests
     {
-        [TestMethod]
+        [TestMethod, TestCategory("L1")]
         public void EngineConfigurationCreate()
         {
-            EngineConfiguration ec = new EngineConfiguration();
-            ec.TelemetryEnableTrace = true;
-            ec.Source = new TeamProjectConfig() { Project = "DemoProjs", Collection = new Uri("https://sdd2016.visualstudio.com/"), ReflectedWorkItemIDFieldName = "TfsMigrationTool.ReflectedWorkItemId", PersonalAccessToken="" };
-            ec.Target = new TeamProjectConfig() { Project = "DemoProjt", Collection = new Uri("https://sdd2016.visualstudio.com/"), ReflectedWorkItemIDFieldName = "TfsMigrationTool.ReflectedWorkItemId", PersonalAccessToken = "" };
+            EngineConfiguration ec = new EngineConfiguration
+            {
+                LogLevel = Serilog.Events.LogEventLevel.Verbose,
+                Source = new TfsTeamProjectConfig() { Project = "DemoProjs", Collection = new Uri("https://sdd2016.visualstudio.com/"), ReflectedWorkItemIDFieldName = "TfsMigrationTool.ReflectedWorkItemId", PersonalAccessToken = "" },
+                Target = new TfsTeamProjectConfig() { Project = "DemoProjt", Collection = new Uri("https://sdd2016.visualstudio.com/"), ReflectedWorkItemIDFieldName = "TfsMigrationTool.ReflectedWorkItemId", PersonalAccessToken = "" }
+            };
             Assert.IsNotNull(ec);
             Assert.IsNotNull(ec.Source);
-            Assert.AreEqual(ec.Source.Project, "DemoProjs");
+            Assert.AreEqual(ec.Source.AsTeamProjectConfig().Project, "DemoProjs");
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("L1")]
         public void EngineConfigurationCreateDefault()
         {
-            EngineConfiguration ec = EngineConfiguration.GetDefault();
+            IEngineConfigurationBuilder ecb = new EngineConfigurationBuilder(new NullLogger<EngineConfigurationBuilder>());
+            EngineConfiguration ec = ecb.BuildDefault();
             Assert.IsNotNull(ec);
             Assert.IsNotNull(ec.Source);
-            Assert.AreEqual(ec.Source.Project, "migrationSource1");
+            Assert.AreEqual(ec.Source.ToString(), "FakeMigration");
         }
     }
 }

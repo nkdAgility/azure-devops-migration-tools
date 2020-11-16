@@ -1,0 +1,26 @@
+{
+  "$type": "TfsSharedQueryProcessorOptions",
+  "Enabled": false,
+  "PrefixProjectToNodes": false,
+  "SharedFolderName": "Shared Queries",
+  "SourceToTargetFieldMappings": null,
+  "ProcessorEnrichers": null,
+  "Source": {
+    "$type": "TfsEndpointOptions",
+    "Organisation": "https://dev.azure.com/nkdagility-preview/",
+    "Project": "sourceProject",
+    "AuthenticationMode": "AccessToken",
+    "AccessToken": "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
+    "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
+    "EndpointEnrichers": null
+  },
+  "Target": {
+    "$type": "TfsEndpointOptions",
+    "Organisation": "https://dev.azure.com/nkdagility-preview/",
+    "Project": "targetProject",
+    "AuthenticationMode": "AccessToken",
+    "AccessToken": "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
+    "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
+    "EndpointEnrichers": null
+  }
+}

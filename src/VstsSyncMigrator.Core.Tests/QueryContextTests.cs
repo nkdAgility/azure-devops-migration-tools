@@ -1,7 +1,4 @@
-﻿using System;
-using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using VstsSyncMigrator.Engine;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace VstsSyncMigrator.Core.Tests
 {
@@ -17,7 +14,7 @@ namespace VstsSyncMigrator.Core.Tests
         //    tfsqc.AddParameter("TeamProject", teamProject.Name);
         //    tfsqc.Query = string.Format(@"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY [System.ChangedDate] desc", "");
         //    WorkItemCollection sourceWIS = tfsqc.Execute();
-          
+
         //}
     }
 }

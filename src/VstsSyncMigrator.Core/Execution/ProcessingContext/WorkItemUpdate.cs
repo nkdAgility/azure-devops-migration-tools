@@ -1,25 +1,26 @@
-﻿using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Linq;
-using VstsSyncMigrator.Engine.Configuration.Processing;
+using Microsoft.Extensions.Logging;
+using MigrationTools;
+using MigrationTools._EngineV1.Configuration;
+using MigrationTools._EngineV1.Configuration.Processing;
+using MigrationTools._EngineV1.DataContracts;
+using VstsSyncMigrator._EngineV1.Processors;
 
 namespace VstsSyncMigrator.Engine
 {
-    public class WorkItemUpdate : ProcessingContextBase
+    public class WorkItemUpdate : StaticProcessorBase
     {
-        WorkItemUpdateConfig _config;
-        MigrationEngine _me;
+        private WorkItemUpdateConfig _config;
 
-        public WorkItemUpdate(MigrationEngine me, WorkItemUpdateConfig config) : base(me, config)
+        public WorkItemUpdate(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<WorkItemUpdate> logger) : base(services, me, telemetry, logger)
         {
-            _me = me;
-            _config = config;
+        }
+
+        public override void Configure(IProcessorConfig config)
+        {
+            _config = (WorkItemUpdateConfig)config;
         }
 
         public override string Name
@@ -30,54 +31,47 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        internal override void InternalExecute()
+        protected override void InternalExecute()
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
-			//////////////////////////////////////////////////
-			WorkItemStoreContext targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
-
-            TfsQueryContext tfsqc = new TfsQueryContext(targetStore);
-            tfsqc.AddParameter("TeamProject", me.Target.Config.Project);
-            tfsqc.Query = string.Format(@"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY [System.ChangedDate] desc", _config.QueryBit);
-            WorkItemCollection  workitems = tfsqc.Execute();
-            Trace.WriteLine(string.Format("Update {0} work items?", workitems.Count));
+            //////////////////////////////////////////////////
+            var Query = string.Format(@"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY [System.ChangedDate] desc", _config.WIQLQueryBit);
+            List<WorkItemData> workitems = Engine.Target.WorkItems.GetWorkItems(Query);
+            Log.LogInformation("Update {0} work items?", workitems.Count);
             //////////////////////////////////////////////////
             int current = workitems.Count;
             int count = 0;
             long elapsedms = 0;
-            foreach (WorkItem workitem in workitems)
+            foreach (WorkItemData workitem in workitems)
             {
                 Stopwatch witstopwatch = Stopwatch.StartNew();
-				workitem.Open();
-                Trace.WriteLine(string.Format("Processing work item {0} - Type:{1} - ChangedDate:{2} - CreatedDate:{3}", workitem.Id, workitem.Type.Name, workitem.ChangedDate.ToShortDateString(), workitem.CreatedDate.ToShortDateString()));
-                _me.ApplyFieldMappings(workitem);
+                workitem.ToWorkItem().Open();
+                Log.LogInformation("Processing work item {0} - Type:{1} - ChangedDate:{2} - CreatedDate:{3}", workitem.Id, workitem.Type, workitem.ToWorkItem().ChangedDate.ToShortDateString(), workitem.ToWorkItem().CreatedDate.ToShortDateString());
+                Engine.FieldMaps.ApplyFieldMappings(workitem);
 
-                if (workitem.IsDirty)
+                if (workitem.ToWorkItem().IsDirty)
                 {
                     if (!_config.WhatIf)
                     {
                         try
                         {
-                            workitem.Save();
+                            workitem.SaveToAzureDevOps();
                         }
                         catch (Exception)
                         {
                             System.Threading.Thread.Sleep(5000);
-                            workitem.Save();
+                            workitem.SaveToAzureDevOps();
                         }
-                       
-                    } else
-                    {
-                        Trace.WriteLine("No save done: (What IF: enabled)");
                     }
-                    
-                } else
-                {
-                    Trace.WriteLine("No save done: (IsDirty: false)");
+                    else
+                    {
+                        Log.LogWarning("No save done: (What IF: enabled)");
+                    }
                 }
-                
-
-
+                else
+                {
+                    Log.LogWarning("No save done: (IsDirty: false)");
+                }
 
                 witstopwatch.Stop();
                 elapsedms = elapsedms + witstopwatch.ElapsedMilliseconds;
@@ -85,12 +79,11 @@ namespace VstsSyncMigrator.Engine
                 count++;
                 TimeSpan average = new TimeSpan(0, 0, 0, 0, (int)(elapsedms / count));
                 TimeSpan remaining = new TimeSpan(0, 0, 0, 0, (int)(average.TotalMilliseconds * current));
-                Trace.WriteLine(string.Format("Average time of {0} per work item and {1} estimated to completion", string.Format(@"{0:s\:fff} seconds", average), string.Format(@"{0:%h} hours {0:%m} minutes {0:s\:fff} seconds", remaining)));
+                Log.LogWarning("Average time of {0} per work item and {1} estimated to completion", string.Format(@"{0:s\:fff} seconds", average), string.Format(@"{0:%h} hours {0:%m} minutes {0:s\:fff} seconds", remaining));
             }
             //////////////////////////////////////////////////
             stopwatch.Stop();
-            Console.WriteLine(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds", stopwatch.Elapsed);
+            Log.LogWarning("DONE in {Elapsed} seconds", stopwatch.Elapsed.ToString("c"));
         }
-
     }
 }

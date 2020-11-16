@@ -1,18 +1,20 @@
-﻿using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using VstsSyncMigrator.Engine.Configuration.Processing;
+using Microsoft.Extensions.Logging;
+using MigrationTools;
+using MigrationTools._EngineV1.Configuration;
+using MigrationTools._EngineV1.DataContracts;
+using MigrationTools._EngineV1.Processors;
 
 namespace VstsSyncMigrator.Engine
 {
-    public class FakeProcessor : MigrationContextBase
+    public class FakeProcessor : MigrationProcessorBase
     {
+        public FakeProcessor(IMigrationEngine engine, IServiceProvider services, ITelemetryLogger telemetry, ILogger<FakeProcessor> logger) : base(engine, services, telemetry, logger)
+        {
+        }
+
         public override string Name
         {
             get
@@ -21,32 +23,28 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        public FakeProcessor(MigrationEngine me, FakeProcessorConfig config) : base(me, config)
+        public override void Configure(IProcessorConfig config)
         {
-
+            // FakeProcessorConfig config
         }
 
-
-        internal override void InternalExecute()
+        protected override void InternalExecute()
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
-			//////////////////////////////////////////////////
-			WorkItemStoreContext sourceStore = new WorkItemStoreContext(me.Source, WorkItemStoreFlags.None);
-            TfsQueryContext tfsqc = new TfsQueryContext(sourceStore);
-            tfsqc.AddParameter("TeamProject", me.Source.Config.Project);
-            tfsqc.Query = @"SELECT [System.Id] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject ";// AND [System.Id] = 188708 ";
-            WorkItemCollection sourceWIS = tfsqc.Execute();
-            Trace.WriteLine(string.Format("Migrate {0} work items?", sourceWIS.Count));
             //////////////////////////////////////////////////
-            
+
+            var query = @"SELECT [System.Id] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject ";// AND [System.Id] = 188708 ";
+            List<WorkItemData> sourceWIS = Engine.Source.WorkItems.GetWorkItems(query);
+            Log.LogDebug("Migrate {0} work items?", sourceWIS.Count);
+            //////////////////////////////////////////////////
+
             int current = sourceWIS.Count;
-            foreach (WorkItem sourceWI in sourceWIS)
+            foreach (WorkItemData sourceWI in sourceWIS)
             {
                 System.Threading.Thread.Sleep(10);
             }
             stopwatch.Stop();
             Console.WriteLine(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds", stopwatch.Elapsed);
         }
-
     }
 }

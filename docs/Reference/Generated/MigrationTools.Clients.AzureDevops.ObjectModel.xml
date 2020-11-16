@@ -1,0 +1,95 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>MigrationTools.Clients.AzureDevops.ObjectModel</name>
+    </assembly>
+    <members>
+        <member name="M:MigrationTools.Enrichers.TfsEmbededImagesEnricher.FixEmbededImages(MigrationTools._EngineV1.DataContracts.WorkItemData,System.String,System.String,System.String)">
+            from https://gist.github.com/pietergheysens/792ed505f09557e77ddfc1b83531e4fb
+        </member>
+        <member name="M:MigrationTools.Enrichers.TfsNodeStructureEnricher.ShouldCreateNode(Microsoft.TeamFoundation.Server.NodeInfo,System.String)">
+            <summary>
+            Checks node-to-be-created with allowed BasePath's
+            </summary>
+            <param name="parentPath">Parent Node</param>
+            <param name="newNodeName">Node to be created</param>
+            <returns>true/false</returns>
+        </member>
+        <member name="T:MigrationTools.Processors.TfsSharedQueryProcessor">
+            <summary>
+            The TfsSharedQueryProcessor enabled you to migrate queries from one locatio nto another.
+            </summary>
+        </member>
+        <member name="M:MigrationTools.Processors.TfsSharedQueryProcessor.MigrateFolder(Microsoft.TeamFoundation.WorkItemTracking.Client.QueryHierarchy,Microsoft.TeamFoundation.WorkItemTracking.Client.QueryFolder,Microsoft.TeamFoundation.WorkItemTracking.Client.QueryFolder)">
+            <summary>
+            Define Query Folders under the current parent
+            </summary>
+            <param name="targetHierarchy">The object that represents the whole of the target query tree</param>
+            <param name="sourceFolder">The source folder in tree on source instance</param>
+            <param name="parentFolder">The target folder in tree on target instance</param>
+        </member>
+        <member name="M:MigrationTools.Processors.TfsSharedQueryProcessor.MigrateQuery(Microsoft.TeamFoundation.WorkItemTracking.Client.QueryHierarchy,Microsoft.TeamFoundation.WorkItemTracking.Client.QueryDefinition,Microsoft.TeamFoundation.WorkItemTracking.Client.QueryFolder)">
+            <summary>
+            Add Query Definition under a specific Query Folder.
+            </summary>
+            <param name="targetHierarchy">The object that represents the whole of the target query tree</param>
+            <param name="query">Query Definition - Contains the Query Details</param>
+            <param name="QueryFolder">Parent Folder</param>
+        </member>
+        <member name="T:MigrationTools.Processors.TfsSharedQueryProcessorOptions">
+            <summary>
+            The `TfsSharedQueryProcessor` enabled you to migrate queries from one locatio nto another.
+            </summary>
+        </member>
+        <member name="F:MigrationTools.Processors.TfsSharedQueryProcessorOptions.sharedFolderName">
+            <summary>
+            The name of the shared folder, setting the default name
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Processors.TfsSharedQueryProcessorOptions.PrefixProjectToNodes">
+            <summary>
+            Do we add the source project name into the folder path
+            </summary>
+            <default>false</default>
+        </member>
+        <member name="P:MigrationTools.Processors.TfsSharedQueryProcessorOptions.SharedFolderName">
+            <summary>
+            The name of the shared folder, made a parameter incase it every needs to be edited
+            </summary>
+            <default>Shared Queries</default>
+        </member>
+        <member name="P:MigrationTools.Processors.TfsSharedQueryProcessorOptions.SourceToTargetFieldMappings">
+            <summary>
+            Mapping of the source to the target
+            </summary>
+        </member>
+        <member name="T:MigrationTools.Processors.TfsTeamSettingsProcessor">
+            <summary>
+            Native TFS Processor, does not work with any other Endpoints.
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Processors.TfsTeamSettingsProcessorOptions.MigrateTeamSettings">
+            <summary>
+            Migrate original team settings after their creation on target team project
+            </summary>
+            <default>false</default>
+        </member>
+        <member name="P:MigrationTools.Processors.TfsTeamSettingsProcessorOptions.UpdateTeamSettings">
+            <summary>
+            Reset the target team settings to match the source if the team exists
+            </summary>
+            <default>false</default>
+        </member>
+        <member name="P:MigrationTools.Processors.TfsTeamSettingsProcessorOptions.PrefixProjectToNodes">
+            <summary>
+            Prefix your iterations and areas with the project name. If you have enabled this in `NodeStructuresMigrationConfig` you must do it here too.
+            </summary>
+            <default>false</default>
+        </member>
+        <member name="P:MigrationTools.Processors.TfsTeamSettingsProcessorOptions.Teams">
+            <summary>
+            List of Teams to process. If this is `null` then all teams will be processed.
+            </summary>
+        </member>
+    </members>
+</doc>

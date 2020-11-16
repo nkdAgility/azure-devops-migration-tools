@@ -1,24 +1,24 @@
-﻿using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Linq;
-using VstsSyncMigrator.Engine.Configuration.Processing;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using MigrationTools;
+using MigrationTools._EngineV1.Clients;
+using MigrationTools._EngineV1.Configuration;
+using MigrationTools._EngineV1.Configuration.Processing;
+using MigrationTools._EngineV1.DataContracts;
+using VstsSyncMigrator._EngineV1.Processors;
 
 namespace VstsSyncMigrator.Engine
 {
-    public class WorkItemUpdateAreasAsTagsContext : ProcessingContextBase
+    public class WorkItemUpdateAreasAsTagsContext : StaticProcessorBase
     {
+        private WorkItemUpdateAreasAsTagsConfig config;
 
-        WorkItemUpdateAreasAsTagsConfig config;
-
-        public WorkItemUpdateAreasAsTagsContext(MigrationEngine me, WorkItemUpdateAreasAsTagsConfig config) : base(me, config)
+        public WorkItemUpdateAreasAsTagsContext(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<WorkItemUpdateAreasAsTagsContext> logger) : base(services, me, telemetry, logger)
         {
-            this.config = config;
         }
 
         public override string Name
@@ -29,52 +29,53 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        internal override void InternalExecute()
+        public override void Configure(IProcessorConfig config)
+        {
+            this.config = (WorkItemUpdateAreasAsTagsConfig)config;
+        }
+
+        protected override void InternalExecute()
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
-			//////////////////////////////////////////////////
-			WorkItemStoreContext targetStore = new WorkItemStoreContext(me.Target, WorkItemStoreFlags.BypassRules);
+            //////////////////////////////////////////////////
 
-            TfsQueryContext tfsqc = new TfsQueryContext(targetStore);
-            tfsqc.AddParameter("TeamProject", me.Target.Config.Project);
-            tfsqc.AddParameter("AreaPath", config.AreaIterationPath);
-            tfsqc.Query = @"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject and [System.AreaPath] under @AreaPath";
-            WorkItemCollection  workitems = tfsqc.Execute();
-            Trace.WriteLine(string.Format("Update {0} work items?", workitems.Count));
+            IWorkItemQueryBuilder wiqb = Services.GetRequiredService<IWorkItemQueryBuilder>();
+            wiqb.AddParameter("AreaPath", config.AreaIterationPath);
+            wiqb.Query = @"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject and [System.AreaPath] under @AreaPath";
+            List<WorkItemData> workitems = Engine.Target.WorkItems.GetWorkItems(wiqb);
+            Log.LogInformation("Update {0} work items?", workitems.Count);
             //////////////////////////////////////////////////
             int current = workitems.Count;
             int count = 0;
             long elapsedms = 0;
-            foreach (WorkItem workitem in workitems)
+            foreach (WorkItemData workitem in workitems)
             {
                 Stopwatch witstopwatch = Stopwatch.StartNew();
 
-				Trace.WriteLine(string.Format("{0} - Updating: {1}-{2}", current, workitem.Id, workitem.Type.Name));
-                string areaPath = workitem.AreaPath;
+                Log.LogInformation("{0} - Updating: {1}-{2}", current, workitem.Id, workitem.Type);
+                string areaPath = workitem.ToWorkItem().AreaPath;
                 List<string> bits = new List<string>(areaPath.Split(char.Parse(@"\"))).Skip(4).ToList();
-                List<string> tags = workitem.Tags.Split(char.Parse(@";")).ToList();
+                List<string> tags = workitem.ToWorkItem().Tags.Split(char.Parse(@";")).ToList();
                 List<string> newTags = tags.Union(bits).ToList();
                 string newTagList = string.Join(";", newTags.ToArray());
-                if (newTagList != workitem.Tags)
-                { 
-                workitem.Open();
-                workitem.Tags = newTagList;
-                workitem.Save();
+                if (newTagList != workitem.ToWorkItem().Tags)
+                {
+                    workitem.ToWorkItem().Open();
+                    workitem.ToWorkItem().Tags = newTagList;
+                    workitem.SaveToAzureDevOps();
+                }
 
-            }
-
-            witstopwatch.Stop();
+                witstopwatch.Stop();
                 elapsedms = elapsedms + witstopwatch.ElapsedMilliseconds;
                 current--;
                 count++;
                 TimeSpan average = new TimeSpan(0, 0, 0, 0, (int)(elapsedms / count));
                 TimeSpan remaining = new TimeSpan(0, 0, 0, 0, (int)(average.TotalMilliseconds * current));
-                Trace.WriteLine(string.Format("Average time of {0} per work item and {1} estimated to completion", string.Format(@"{0:s\:fff} seconds", average), string.Format(@"{0:%h} hours {0:%m} minutes {0:s\:fff} seconds", remaining)));
+                Log.LogInformation("Average time of {0} per work item and {1} estimated to completion", string.Format(@"{0:s\:fff} seconds", average), string.Format(@"{0:%h} hours {0:%m} minutes {0:s\:fff} seconds", remaining));
             }
             //////////////////////////////////////////////////
             stopwatch.Stop();
-            Console.WriteLine(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds", stopwatch.Elapsed);
+            Log.LogInformation("DONE in {Elapsed} seconds", stopwatch.Elapsed.ToString("c"));
         }
-
     }
 }

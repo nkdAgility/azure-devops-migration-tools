@@ -1,0 +1,60 @@
+{
+    "TelemetryEnableTrace": true,
+    "Source": {
+        "Collection": "https://tfs.test.company.com/tfs/coll2/",
+        "Name": "ProjectName"
+    },
+    "Target": {
+        "Collection": "https://tfs.test.company.com/tfs/coll1/",
+        "Name": "ProjectName_New"
+    },
+    "ReflectedWorkItemIDFieldName": "TfsMigrationTool.ReflectedWorkItemId",
+    "WorkItemTypeDefinition": {
+        "Bug": "Bug",
+        "User Story": "User Story",
+        "Requirement": "Requirement",
+        "Task": "Task",
+        "Test Case": "Test Case",
+        "Shared Steps": "Shared Steps",
+        "Shared Parameter": "Shared Parameter"
+    },
+    "Processors": [{
+            "ObjectType": "TeamMigrationConfig",
+            "Enabled": true
+        },
+        {
+            "ObjectType": "NodeStructuresMigrationConfig",
+            "Enabled": false
+        },
+        {
+            "ObjectType": "WorkItemMigrationConfig",
+            "Enabled": false,
+            "QueryBit": "AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')"
+        },
+        {
+            "ObjectType": "LinkMigrationConfig",
+            "Enabled": false
+        },
+        {
+            "ObjectType": "AttachementExportMigrationConfig",
+            "Enabled": false,
+            "QueryBit": "AND [System.AttachedFileCount] > 0"
+        },
+        {
+            "ObjectType": "AttachementImportMigrationConfig",
+            "Enabled": false
+        },
+        {
+            "ObjectType": "TestVeriablesMigrationConfig",
+            "Enabled": false
+        },
+        {
+            "ObjectType": "TestConfigurationsMigrationConfig",
+            "Enabled": false
+        },
+        {
+            "ObjectType": "TestPlansAndSuitsMigrationConfig",
+            "Enabled": false
+        }
+    ]
+}

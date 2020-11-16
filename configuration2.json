@@ -1,0 +1,196 @@
+{
+  "Version": "0.0",
+  "LogLevel": "Verbose",
+  "MappingTools": [
+    {
+      "$type": "WorkItemTypeMappingTool",
+      "Enabled": true,
+      "WorkItemTypeDefinition": {
+        "sourceWorkItemTypeName": "targetWorkItemTypeName"
+      }
+    },
+    {
+      "$type": "WorkItemFieldMappingTool",
+      "Enabled": true,
+      "WorkItemFieldMaps": [
+        {
+          "$type": "MultiValueConditionalMapConfig",
+          "WorkItemTypeName": "*",
+          "sourceFieldsAndValues": {
+            "Field1": "Value1",
+            "Field2": "Value2"
+          },
+          "targetFieldsAndValues": {
+            "Field1": "Value1",
+            "Field2": "Value2"
+          }
+        },
+        {
+          "$type": "FieldBlankMapConfig",
+          "WorkItemTypeName": "*",
+          "targetField": "TfsMigrationTool.ReflectedWorkItemId"
+        },
+        {
+          "$type": "FieldValueMapConfig",
+          "WorkItemTypeName": "*",
+          "sourceField": "System.State",
+          "targetField": "System.State",
+          "defaultValue": "New",
+          "valueMapping": {
+            "Approved": "New",
+            "New": "New",
+            "Committed": "Active",
+            "In Progress": "Active",
+            "To Do": "New",
+            "Done": "Closed",
+            "Removed": "Removed"
+          }
+        },
+        {
+          "$type": "FieldtoFieldMapConfig",
+          "WorkItemTypeName": "*",
+          "sourceField": "Microsoft.VSTS.Common.BacklogPriority",
+          "targetField": "Microsoft.VSTS.Common.StackRank"
+        },
+        {
+          "$type": "FieldtoFieldMultiMapConfig",
+          "WorkItemTypeName": "*",
+          "SourceToTargetMappings": {
+            "SourceField1": "TargetField1",
+            "SourceField2": "TargetField2"
+          }
+        },
+        {
+          "$type": "FieldtoTagMapConfig",
+          "WorkItemTypeName": "*",
+          "sourceField": "System.State",
+          "formatExpression": "ScrumState:{0}"
+        },
+        {
+          "$type": "FieldMergeMapConfig",
+          "WorkItemTypeName": "*",
+          "sourceField1": "System.Description",
+          "sourceField2": "Microsoft.VSTS.Common.AcceptanceCriteria",
+          "targetField": "System.Description",
+          "formatExpression": "{0} <br/><br/><h3>Acceptance Criteria</h3>{1}",
+          "doneMatch": "##DONE##"
+        },
+        {
+          "$type": "RegexFieldMapConfig",
+          "WorkItemTypeName": "*",
+          "sourceField": "COMPANY.PRODUCT.Release",
+          "targetField": "COMPANY.DEVISION.MinorReleaseVersion",
+          "pattern": "PRODUCT \\d{4}.(\\d{1})",
+          "replacement": "$1"
+        },
+        {
+          "$type": "FieldValuetoTagMapConfig",
+          "WorkItemTypeName": "*",
+          "sourceField": "Microsoft.VSTS.CMMI.Blocked",
+          "pattern": "Yes",
+          "formatExpression": "{0}"
+        },
+        {
+          "$type": "TreeToTagMapConfig",
+          "WorkItemTypeName": "*",
+          "toSkip": 3,
+          "timeTravel": 1
+        }
+      ]
+    },
+    {
+      "$type": "WorkItemGitRepoMappingTool",
+      "Enabled": true,
+      "WorkItemGitRepos": {
+        "sourceRepoName": "targetRepoName"
+      }
+    }
+  ],
+  "Processors": [
+    {
+      "$type": "WorkItemMigrationProcessorOptions",
+      "Enabled": true,
+      "ReplayRevisions": true,
+      "PrefixProjectToNodes": false,
+      "CollapseRevisions": false,
+      "WorkItemCreateRetryLimit": 5,
+      "Enrichers": [
+        {
+          "$type": "PauseAfterEachItemOptions",
+          "Enabled": true
+        },
+        {
+          "$type": "FilterWorkItemsThatAlreadyExistInTargetOptions",
+          "Enabled": true,
+          "Query": {
+            "WhereBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
+            "OrderBit": "[System.ChangedDate] desc"
+          }
+        },
+        {
+          "$type": "AppendMigrationToolSignatureFooterOptions",
+          "Enabled": false
+        },
+        {
+          "$type": "SkipToFinalRevisedWorkItemTypeOptions",
+          "Enabled": false
+        }
+      ],
+      "Endpoints": [
+        {
+          "$type": "FileSystemWorkItemEndpointOptions",
+          "Direction": "Source",
+          "FileStore": ".\\Store\\Source\\",
+          "Query": {
+            "WhereBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
+            "OrderBit": "[System.ChangedDate] desc"
+          },
+          "Enrichers": [
+            {
+              "$type": "FileSystemWorkItemAttachmentEnricherOptions",
+              "Enabled": true,
+              "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
+              "AttachmentMaxSize": 480000000
+            }
+          ]
+        },
+        {
+          "$type": "TfsWorkItemEndPointOptions",
+          "Direction": "Target",
+          "AccessToken": "qosss7crwz3vie4fupzpaafjndoy6g6ulgkzhoxtmjgicv2lqjyq",
+          "Query": {
+            "Query": "SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan') ORDER BY [System.ChangedDate] desc"
+          },
+          "Enrichers": [
+            {
+              "$type": "TfsWorkItemAttachmentEnricherOptions",
+              "Enabled": true,
+              "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
+              "AttachmentMaxSize": 480000000
+            },
+            {
+              "$type": "TfsWorkItemEmbedEnricherOptions",
+              "Enabled": true,
+              "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\"
+            },
+            {
+              "$type": "TfsWorkItemLinkEnricherOptions",
+              "Enabled": true,
+              "LinkMigrationSaveEachAsAdded": true
+            },
+            {
+              "$type": "TfsWorkItemCreatedEnricherOptions",
+              "Enabled": true,
+              "UpdateCreatedDate": true,
+              "UpdateCreatedBy": true
+            },
+            {
+              "$type": "TfsWorkItemFieldTableEnricherOptions",
+              "Enabled": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "$type": "TfsTeamSettingsProcessorOptions",
+  "Enabled": false,
+  "MigrateTeamSettings": true,
+  "UpdateTeamSettings": true,
+  "PrefixProjectToNodes": false,
+  "Teams": null,
+  "ProcessorEnrichers": null,
+  "Source": {
+    "$type": "TfsEndpointOptions",
+    "Organisation": "https://dev.azure.com/nkdagility-preview/",
+    "Project": "sourceProject",
+    "AuthenticationMode": "AccessToken",
+    "AccessToken": "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
+    "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
+    "EndpointEnrichers": null
+  },
+  "Target": {
+    "$type": "TfsEndpointOptions",
+    "Organisation": "https://dev.azure.com/nkdagility-preview/",
+    "Project": "targetProject",
+    "AuthenticationMode": "AccessToken",
+    "AccessToken": "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
+    "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
+    "EndpointEnrichers": null
+  }
+}
