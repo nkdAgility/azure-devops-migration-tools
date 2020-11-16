@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using MigrationTools._EngineV1.Configuration;
-using MigrationTools.Configuration;
 
 namespace MigrationTools._EngineV1.Containers
 {
