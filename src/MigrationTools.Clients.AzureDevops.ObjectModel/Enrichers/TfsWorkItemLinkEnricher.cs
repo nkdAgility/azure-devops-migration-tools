@@ -37,7 +37,8 @@ namespace MigrationTools.Enrichers
             }
             if (targetWorkItemLinkStart.Id == "0")
             {
-                throw new IndexOutOfRangeException("Target work item must be saved before you can add a link");
+                Log.LogWarning("TfsWorkItemLinkEnricher::Enrich: Target work item must be saved before you can add a link: exiting Link Migration");
+                return 0;
             }
 
             if (ShouldCopyLinks(sourceWorkItemLinkStart, targetWorkItemLinkStart))
