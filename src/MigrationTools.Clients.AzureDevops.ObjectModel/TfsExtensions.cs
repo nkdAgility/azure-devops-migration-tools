@@ -117,11 +117,13 @@ namespace MigrationTools
 
         public static WorkItemData GetRevision(this WorkItemData context, int rev)
         {
+            var originalWi = (WorkItem)context.internalObject;
             var wid = new WorkItemData
             {
-                internalObject = context.internalObject
+                // internalObject = context.internalObject
+                // TODO: Had to revert to calling revision load again untill WorkItemMigrationContext.PopulateWorkItem can be updated to pull from WorkItemData
+                internalObject = originalWi.Store.GetWorkItem(originalWi.Id, rev)
             };
-
             wid.RefreshWorkItem((FieldCollection)context.Revisions[rev].Fields);
 
             return wid;
