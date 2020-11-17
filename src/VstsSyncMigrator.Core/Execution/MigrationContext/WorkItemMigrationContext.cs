@@ -656,6 +656,13 @@ namespace VstsSyncMigrator.Engine
                     {"RevisionsCount", sortedRevisions.Count},
                     {"sourceWorkItemId", sourceWorkItem.Id}
                 });
+            Log.LogTrace("RevisionsToMigrate:----------------------------------------------------");
+            foreach (RevisionItem item in sortedRevisions)
+            {
+                Log.LogTrace("RevisionsToMigrate: Index:{Index} - Number:{Number} - ChangedDate:{ChangedDate}", item.Index, item.Number, item.ChangedDate);
+            }
+            Log.LogTrace("RevisionsToMigrate:----------------------------------------------------");
+
             return sortedRevisions;
         }
 
