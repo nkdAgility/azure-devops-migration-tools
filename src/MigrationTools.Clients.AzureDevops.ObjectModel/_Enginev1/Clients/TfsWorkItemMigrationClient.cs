@@ -8,6 +8,7 @@ using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.DataContracts;
+using MigrationTools.DataContracts;
 using Serilog;
 
 namespace MigrationTools._EngineV1.Clients

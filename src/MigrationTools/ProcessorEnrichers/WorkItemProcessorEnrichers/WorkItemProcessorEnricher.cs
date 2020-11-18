@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
+using MigrationTools.DataContracts;
 using MigrationTools.Processors;
 
 namespace MigrationTools.Enrichers
@@ -25,7 +26,7 @@ namespace MigrationTools.Enrichers
         public abstract void Configure(IProcessorEnricherOptions options);
 
         [Obsolete("v1 Architecture: Here to support migration, use PhaseEnrichers: BeforeLoadData, AfterLoadData, etc", false)]
-        public virtual int Enrich(_EngineV1.DataContracts.WorkItemData sourceWorkItem, _EngineV1.DataContracts.WorkItemData targetWorkItem)
+        public virtual int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
         {
             throw new InvalidOperationException("This is invalid for this Enricher type");
         }
@@ -40,17 +41,17 @@ namespace MigrationTools.Enrichers
             Log.LogDebug("{WorkItemProcessorEnricher}::ProcessorExecutionEnd::NoAction", this.GetType().Name);
         }
 
-        public virtual void ProcessorExecutionAfterSource(IProcessor processor, List<DataContracts.WorkItemData> workItems)
+        public virtual void ProcessorExecutionAfterSource(IProcessor processor, List<WorkItemData> workItems)
         {
             Log.LogDebug("{WorkItemProcessorEnricher}::ProcessorExecutionAfterSource::NoAction", this.GetType().Name);
         }
 
-        public virtual void ProcessorExecutionAfterProcessWorkItem(IProcessor processor, DataContracts.WorkItemData workitem)
+        public virtual void ProcessorExecutionAfterProcessWorkItem(IProcessor processor, WorkItemData workitem)
         {
             Log.LogDebug("{WorkItemProcessorEnricher}::ProcessorExecutionAfterProcessWorkItem::NoAction", this.GetType().Name);
         }
 
-        public virtual void ProcessorExecutionBeforeProcessWorkItem(IProcessor processor, DataContracts.WorkItemData workitem)
+        public virtual void ProcessorExecutionBeforeProcessWorkItem(IProcessor processor, WorkItemData workitem)
         {
             Log.LogDebug("{WorkItemProcessorEnricher}::ProcessorExecutionBeforeProcessWorkItem::NoAction", this.GetType().Name);
         }

@@ -1,6 +1,6 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
-using MigrationTools._EngineV1.DataContracts;
+using MigrationTools.DataContracts;
 
 namespace MigrationTools.Enrichers
 {

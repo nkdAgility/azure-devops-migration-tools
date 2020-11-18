@@ -6,7 +6,7 @@ using System.Xml;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.Server;
 using MigrationTools._EngineV1.Clients;
-using MigrationTools._EngineV1.DataContracts;
+using MigrationTools.DataContracts;
 
 namespace MigrationTools.Enrichers
 {

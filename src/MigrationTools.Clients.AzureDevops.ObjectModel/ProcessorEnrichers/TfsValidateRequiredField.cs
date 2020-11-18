@@ -2,6 +2,7 @@
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
 
 namespace MigrationTools.ProcessorEnrichers
@@ -19,7 +20,7 @@ namespace MigrationTools.ProcessorEnrichers
             _Options = (TfsValidateRequiredFieldOptions)options;
         }
 
-        public bool ValidatingRequiredField(string fieldToFind, List<_EngineV1.DataContracts.WorkItemData> sourceWorkItems)
+        public bool ValidatingRequiredField(string fieldToFind, List<WorkItemData> sourceWorkItems)
         {
             var sourceWorkItemTypes = sourceWorkItems.Select(wid => wid.ToWorkItem().Type).Distinct();
             var targetTypes = Engine.Target.WorkItems.Project.ToProject().WorkItemTypes;

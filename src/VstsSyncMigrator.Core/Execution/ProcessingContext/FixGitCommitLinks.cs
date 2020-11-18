@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using MigrationTools;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Configuration.Processing;
-using MigrationTools._EngineV1.DataContracts;
+using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
 using VstsSyncMigrator._EngineV1.Processors;
 
