@@ -360,7 +360,7 @@ namespace VstsSyncMigrator.Engine
                     ///////////////////////////////////////////////
                     TraceWriteLine(LogEventLevel.Information, "Work Item has {sourceWorkItemRev} revisions and revision migration is set to {ReplayRevisions}",
                         new Dictionary<string, object>(){
-                            { "sourceWorkItemRev", sourceWorkItem.Rev },
+                            { "sourceWorkItemRev", sourceWorkItem.Fields["Rev"] },
                             { "ReplayRevisions", _config.ReplayRevisions }}
                         );
                     List<RevisionItem> revisionsToMigrate = RevisionsToMigrate(sourceWorkItem, targetWorkItem);
@@ -522,8 +522,8 @@ namespace VstsSyncMigrator.Engine
                         return new
                         {
                             revWi.Id,
-                            revWi.Rev,
-                            revWi.RevisedDate,
+                            Rev = revWi.Fields["System.Rev"],
+                            RevisedDate = revWi.Fields["System.RevisedDate"],
                             revWi.Fields
                         };
                     });

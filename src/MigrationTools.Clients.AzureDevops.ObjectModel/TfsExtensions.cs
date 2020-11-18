@@ -87,6 +87,10 @@ namespace MigrationTools
         public static void RefreshWorkItem(this WorkItemData context, Dictionary<string, object> fieldsOfRevision = null)
         {
             var workItem = (WorkItem)context.internalObject;
+            workItem.SyncToLatest();
+            //
+            context.Id = workItem.Id.ToString();
+            context.Title = workItem.Title;
             context.ProjectName = workItem.Project?.Name;
 
             // If fieldsOfRevision is provided we use this collection as we want to create a revised WorkItemData object
