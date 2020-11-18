@@ -72,14 +72,13 @@ namespace MigrationTools
         public static void RefreshWorkItem(this WorkItemData context, Dictionary<string, object> fieldsOfRevision = null)
         {
             var workItem = (WorkItem)context.internalObject;
-            workItem.SyncToLatest();
             //
             context.Id = workItem.Id.ToString();
-            context.Title = workItem.Title;
+            context.Title = fieldsOfRevision != null ? fieldsOfRevision["System.Title"].ToString() : workItem.Title;
             context.ProjectName = workItem.Project?.Name;
-            context.Type = workItem.Type.ToString();
-            context.Rev = workItem.Rev;
-            context.ChangedDate = workItem.ChangedDate;
+            context.Type = fieldsOfRevision != null ? fieldsOfRevision["System.WorkItemType"].ToString() : workItem.Type.Name;
+            context.Rev = fieldsOfRevision != null ? (int)fieldsOfRevision["System.Rev"] : workItem.Rev;
+            context.ChangedDate = fieldsOfRevision != null ? (DateTime)fieldsOfRevision["System.ChangedDate"] : workItem.ChangedDate;
 
             // If fieldsOfRevision is provided we use this collection as we want to create a revised WorkItemData object
             context.Fields = fieldsOfRevision != null ? fieldsOfRevision : workItem.Fields.AsDictionary();
