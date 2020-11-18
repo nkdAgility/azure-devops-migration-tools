@@ -29,9 +29,9 @@ namespace MigrationTools.Processors
         /// </summary>
         public List<string> Teams { get; set; }
 
-        public override string Processor => nameof(ToConfigure);
+        public override Type ToConfigure => typeof(TfsTeamSettingsProcessor);
 
-        public override Type ToConfigure => typeof(WorkItemTrackingProcessor);
+        public override string Processor => nameof(TfsTeamSettingsProcessor);
 
         public override IProcessorOptions GetDefault()
         {
@@ -43,11 +43,11 @@ namespace MigrationTools.Processors
             MigrateTeamSettings = true;
             UpdateTeamSettings = true;
             PrefixProjectToNodes = false;
-            var e1 = new TfsEndpointOptions();
+            var e1 = new TfsTeamSettingsEndpointOptions();
             e1.SetDefaults();
             e1.Project = "sourceProject";
             Source = e1;
-            var e2 = new TfsEndpointOptions();
+            var e2 = new TfsTeamSettingsEndpointOptions();
             e2.SetDefaults();
             e2.Project = "targetProject";
             Target = e2;
