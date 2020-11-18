@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace MigrationTools.DataContracts
@@ -21,6 +22,9 @@ namespace MigrationTools.DataContracts
 
         [JsonIgnore]
         public object internalObject { get; set; }
+
+        public int Rev { get; set; }
+        public DateTime ChangedDate { get; set; }
 
         public string ProjectName { get; set; }
         public SortedDictionary<int, RevisionItem> Revisions { get; set; }

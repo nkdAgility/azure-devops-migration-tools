@@ -28,6 +28,75 @@ namespace MigrationTools
         //    workItem.Save();
         //}
 
+        public static Dictionary<string, object> AsDictionary(this FieldCollection col)
+        {
+            var dict = new Dictionary<string, object>();
+            for (var ix = 0; ix < col.Count; ix++)
+            {
+                dict.Add(col[ix].ReferenceName, col[ix].Value);
+            }
+            return dict;
+        }
+
+        public static TfsTeamProjectConfig AsTeamProjectConfig(this IMigrationClientConfig context)
+        {
+            return (TfsTeamProjectConfig)context;
+        }
+
+        public static WorkItemData AsWorkItemData(this WorkItem context, Dictionary<string, object> fieldsOfRevision = null)
+        {
+            var internalWorkItem = new WorkItemData
+            {
+                internalObject = context
+            };
+
+            internalWorkItem.RefreshWorkItem(fieldsOfRevision);
+            return internalWorkItem;
+        }
+
+        public static WorkItemData GetRevision(this WorkItemData context, int rev)
+        {
+            var originalWi = (WorkItem)context.internalObject;
+            var wid = new WorkItemData
+            {
+                // internalObject = context.internalObject
+                // TODO: Had to revert to calling revision load again untill WorkItemMigrationContext.PopulateWorkItem can be updated to pull from WorkItemData
+                internalObject = originalWi.Store.GetWorkItem(originalWi.Id, rev)
+            };
+
+            wid.RefreshWorkItem(context.Revisions[rev].Fields);
+
+            return wid;
+        }
+
+        public static void RefreshWorkItem(this WorkItemData context, Dictionary<string, object> fieldsOfRevision = null)
+        {
+            var workItem = (WorkItem)context.internalObject;
+            workItem.SyncToLatest();
+            //
+            context.Id = workItem.Id.ToString();
+            context.Title = workItem.Title;
+            context.ProjectName = workItem.Project?.Name;
+            context.Type = workItem.Type.ToString();
+            context.Rev = workItem.Rev;
+            context.ChangedDate = workItem.ChangedDate;
+
+            // If fieldsOfRevision is provided we use this collection as we want to create a revised WorkItemData object
+            context.Fields = fieldsOfRevision != null ? fieldsOfRevision : workItem.Fields.AsDictionary();
+
+            // We only need to fill the revisions object if we create a WorkItemData object for the whole WorkItem and
+            // we sort it here by Number using a SortedDictionary
+            context.Revisions = fieldsOfRevision == null ? new SortedDictionary<int, RevisionItem>((from Revision x in workItem.Revisions
+                                                                                                    select new RevisionItem()
+                                                                                                    {
+                                                                                                        Index = x.Index,
+                                                                                                        Number = (int)x.Fields["System.Rev"].Value,
+                                                                                                        ChangedDate = (DateTime)x.Fields["System.ChangedDate"].Value,
+                                                                                                        Type = x.Fields["System.WorkItemType"].Value as string,
+                                                                                                        Fields = x.Fields.AsDictionary()
+                                                                                                    }).ToDictionary(r => r.Number, r => r)) : null;
+        }
+
         public static void SaveToAzureDevOps(this WorkItemData context)
         {
             Log.Debug("TfsExtensions::SaveToAzureDevOps");
@@ -84,61 +153,24 @@ namespace MigrationTools
             return JsonConvert.SerializeObject(expando, Formatting.Indented);
         }
 
-        public static void RefreshWorkItem(this WorkItemData context, Dictionary<string, object> fieldsOfRevision = null)
+        public static Project ToProject(this ProjectData projectdata)
         {
-            var workItem = (WorkItem)context.internalObject;
-            workItem.SyncToLatest();
-            //
-            context.Id = workItem.Id.ToString();
-            context.Title = workItem.Title;
-            context.ProjectName = workItem.Project?.Name;
-            context.Type = workItem.Type.ToString();
-
-            // If fieldsOfRevision is provided we use this collection as we want to create a revised WorkItemData object
-            context.Fields = fieldsOfRevision != null ? fieldsOfRevision : workItem.Fields.AsDictionary();
-
-            // We only need to fill the revisions object if we create a WorkItemData object for the whole WorkItem and
-            // we sort it here by Number using a SortedDictionary
-            context.Revisions = fieldsOfRevision == null ? new SortedDictionary<int, RevisionItem>((from Revision x in workItem.Revisions
-                                                                                                    select new RevisionItem()
-                                                                                                    {
-                                                                                                        Index = x.Index,
-                                                                                                        Number = (int)x.Fields["System.Rev"].Value,
-                                                                                                        ChangedDate = (DateTime)x.Fields["System.ChangedDate"].Value,
-                                                                                                        Type = x.Fields["System.WorkItemType"].Value as string,
-                                                                                                        Fields = x.Fields.AsDictionary()
-                                                                                                    }).ToDictionary(r => r.Number, r => r)) : null;
-        }
-
-        public static WorkItemData AsWorkItemData(this WorkItem context, Dictionary<string, object> fieldsOfRevision = null)
-        {
-            var internalWorkItem = new WorkItemData
+            if (!(projectdata.internalObject is Project))
             {
-                internalObject = context
-            };
-
-            internalWorkItem.RefreshWorkItem(fieldsOfRevision);
-            return internalWorkItem;
+                throw new InvalidCastException($"The Work Item stored in the inner field must be of type {(nameof(Project))}");
+            }
+            return (Project)projectdata.internalObject;
         }
 
-        public static WorkItemData GetRevision(this WorkItemData context, int rev)
+        public static ProjectData ToProjectData(this Project project)
         {
-            var originalWi = (WorkItem)context.internalObject;
-            var wid = new WorkItemData
+            var internalObject = new ProjectData
             {
-                // internalObject = context.internalObject
-                // TODO: Had to revert to calling revision load again untill WorkItemMigrationContext.PopulateWorkItem can be updated to pull from WorkItemData
-                internalObject = originalWi.Store.GetWorkItem(originalWi.Id, rev)
+                Id = project.Id.ToString(),
+                Name = project.Name,
+                internalObject = project
             };
-
-            wid.RefreshWorkItem(context.Revisions[rev].Fields);
-
-            return wid;
-        }
-
-        public static TfsTeamProjectConfig AsTeamProjectConfig(this IMigrationClientConfig context)
-        {
-            return (TfsTeamProjectConfig)context;
+            return internalObject;
         }
 
         public static WorkItem ToWorkItem(this WorkItemData workItemData)
@@ -168,36 +200,6 @@ namespace MigrationTools
                 list.Add(wi.AsWorkItemData());
             }
             return list;
-        }
-
-        public static Dictionary<string, object> AsDictionary(this FieldCollection col)
-        {
-            var dict = new Dictionary<string, object>();
-            for (var ix = 0; ix < col.Count; ix++)
-            {
-                dict.Add(col[ix].ReferenceName, col[ix].Value);
-            }
-            return dict;
-        }
-
-        public static ProjectData ToProjectData(this Project project)
-        {
-            var internalObject = new ProjectData
-            {
-                Id = project.Id.ToString(),
-                Name = project.Name,
-                internalObject = project
-            };
-            return internalObject;
-        }
-
-        public static Project ToProject(this ProjectData projectdata)
-        {
-            if (!(projectdata.internalObject is Project))
-            {
-                throw new InvalidCastException($"The Work Item stored in the inner field must be of type {(nameof(Project))}");
-            }
-            return (Project)projectdata.internalObject;
         }
     }
 }
