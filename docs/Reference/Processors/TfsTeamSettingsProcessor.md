@@ -33,7 +33,7 @@ Native TFS Processor, does not work with any other Endpoints.
   "Teams": null,
   "ProcessorEnrichers": null,
   "Source": {
-    "$type": "TfsEndpointOptions",
+    "$type": "TfsTeamSettingsEndpointOptions",
     "Organisation": "https://dev.azure.com/nkdagility-preview/",
     "Project": "sourceProject",
     "AuthenticationMode": "AccessToken",
@@ -42,7 +42,7 @@ Native TFS Processor, does not work with any other Endpoints.
     "EndpointEnrichers": null
   },
   "Target": {
-    "$type": "TfsEndpointOptions",
+    "$type": "TfsTeamSettingsEndpointOptions",
     "Organisation": "https://dev.azure.com/nkdagility-preview/",
     "Project": "targetProject",
     "AuthenticationMode": "AccessToken",

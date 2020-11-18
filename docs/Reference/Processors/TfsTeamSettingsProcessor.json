@@ -7,7 +7,7 @@
   "Teams": null,
   "ProcessorEnrichers": null,
   "Source": {
-    "$type": "TfsEndpointOptions",
+    "$type": "TfsTeamSettingsEndpointOptions",
     "Organisation": "https://dev.azure.com/nkdagility-preview/",
     "Project": "sourceProject",
     "AuthenticationMode": "AccessToken",
@@ -16,7 +16,7 @@
     "EndpointEnrichers": null
   },
   "Target": {
-    "$type": "TfsEndpointOptions",
+    "$type": "TfsTeamSettingsEndpointOptions",
     "Organisation": "https://dev.azure.com/nkdagility-preview/",
     "Project": "targetProject",
     "AuthenticationMode": "AccessToken",
