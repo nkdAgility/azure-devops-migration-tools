@@ -5,6 +5,7 @@ using System.Linq;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.DataContracts;
+using MigrationTools.DataContracts;
 using Newtonsoft.Json;
 using Serilog;
 
@@ -83,13 +84,13 @@ namespace MigrationTools
             return JsonConvert.SerializeObject(expando, Formatting.Indented);
         }
 
-        public static void RefreshWorkItem(this WorkItemData context, FieldCollection fieldsOfRevision = null)
+        public static void RefreshWorkItem(this WorkItemData context, Dictionary<string, object> fieldsOfRevision = null)
         {
             var workItem = (WorkItem)context.internalObject;
             context.ProjectName = workItem.Project?.Name;
 
             // If fieldsOfRevision is provided we use this collection as we want to create a revised WorkItemData object
-            context.Fields = fieldsOfRevision != null ? fieldsOfRevision.AsDictionary() : workItem.Fields.AsDictionary();
+            context.Fields = fieldsOfRevision != null ? fieldsOfRevision : workItem.Fields.AsDictionary();
 
             // We only need to fill the revisions object if we create a WorkItemData object for the whole WorkItem and
             // we sort it here by Number using a SortedDictionary
@@ -100,11 +101,11 @@ namespace MigrationTools
                                                                                                         Number = (int)x.Fields["System.Rev"].Value,
                                                                                                         ChangedDate = (DateTime)x.Fields["System.ChangedDate"].Value,
                                                                                                         Type = x.Fields["System.WorkItemType"].Value as string,
-                                                                                                        Fields = x.Fields
+                                                                                                        Fields = x.Fields.AsDictionary()
                                                                                                     }).ToDictionary(r => r.Number, r => r)) : null;
         }
 
-        public static WorkItemData AsWorkItemData(this WorkItem context, FieldCollection fieldsOfRevision = null)
+        public static WorkItemData AsWorkItemData(this WorkItem context, Dictionary<string, object> fieldsOfRevision = null)
         {
             var internalWorkItem = new WorkItemData
             {
@@ -122,7 +123,7 @@ namespace MigrationTools
                 internalObject = context.internalObject
             };
 
-            wid.RefreshWorkItem((FieldCollection)context.Revisions[rev].Fields);
+            wid.RefreshWorkItem(context.Revisions[rev].Fields);
 
             return wid;
         }

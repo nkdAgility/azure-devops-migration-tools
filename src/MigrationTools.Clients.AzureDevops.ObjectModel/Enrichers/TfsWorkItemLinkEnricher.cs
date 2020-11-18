@@ -3,7 +3,7 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools._EngineV1.Clients;
-using MigrationTools._EngineV1.DataContracts;
+using MigrationTools.DataContracts;
 using MigrationTools.Exceptions;
 
 namespace MigrationTools.Enrichers

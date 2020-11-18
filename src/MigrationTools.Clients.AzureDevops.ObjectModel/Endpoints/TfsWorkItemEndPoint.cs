@@ -76,7 +76,7 @@ namespace MigrationTools.Endpoints
 
         private void PopulateRevisions(WorkItem wi, WorkItemData wid)
         {
-            wid.Revisions = new List<RevisionItem>();
+            wid.Revisions = new SortedDictionary<int, RevisionItem>();
             foreach (Revision revision in wi.Revisions)
             {
                 RevisionItem revi = new RevisionItem
@@ -85,7 +85,7 @@ namespace MigrationTools.Endpoints
                     Index = revision.Index
                 };
                 RunSourceEnrichers(revision, revi);
-                wid.Revisions.Add(revi);
+                wid.Revisions.Add(revision.Index, revi);
             }
         }
 

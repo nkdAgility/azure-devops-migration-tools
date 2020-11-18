@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
+using MigrationTools.DataContracts;
 using MigrationTools.Processors;
 
 namespace MigrationTools.Enrichers
@@ -29,7 +30,7 @@ namespace MigrationTools.Enrichers
         }
 
         [Obsolete("Old v1 arch: this is a v2 class", true)]
-        public override int Enrich(_EngineV1.DataContracts.WorkItemData sourceWorkItem, _EngineV1.DataContracts.WorkItemData targetWorkItem)
+        public override int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
         {
             throw new System.NotImplementedException();
         }
