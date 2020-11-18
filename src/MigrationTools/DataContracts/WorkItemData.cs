@@ -27,33 +27,33 @@ namespace MigrationTools.DataContracts
         public string Title { get; set; }
         public string Type { get; set; }
 
-        private object GetField(string field)
-        {
-            if (Fields is null)
-            {
-                this.Fields = new Dictionary<string, object>();
-            }
-            if (!this.Fields.ContainsKey(field))
-            {
-                return default;
-            }
-            return this.Fields[field];
-        }
+        //private object GetField(string field)
+        //{
+        //    if (Fields is null)
+        //    {
+        //        this.Fields = new Dictionary<string, object>();
+        //    }
+        //    if (!this.Fields.ContainsKey(field))
+        //    {
+        //        return default;
+        //    }
+        //    return this.Fields[field];
+        //}
 
-        private void SetField<T>(string field, T value)
-        {
-            if (Fields is null)
-            {
-                this.Fields = new Dictionary<string, object>();
-            }
-            if (this.Fields.ContainsKey(field))
-            {
-                this.Fields[field] = value;
-            }
-            else
-            {
-                this.Fields.Add(field, value);
-            }
-        }
+        //private void SetField<T>(string field, T value)
+        //{
+        //    if (Fields is null)
+        //    {
+        //        this.Fields = new Dictionary<string, object>();
+        //    }
+        //    if (this.Fields.ContainsKey(field))
+        //    {
+        //        this.Fields[field] = value;
+        //    }
+        //    else
+        //    {
+        //        this.Fields.Add(field, value);
+        //    }
+        //}
     }
 }
