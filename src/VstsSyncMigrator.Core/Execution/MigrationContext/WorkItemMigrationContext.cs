@@ -300,8 +300,9 @@ namespace VstsSyncMigrator.Engine
 
             foreach (Field f in oldWorkItem.Fields)
             {
-                if (newWorkItem.Fields.Contains(f.ReferenceName) && !_ignore.Contains(f.ReferenceName) && (!newWorkItem.Fields[f.ReferenceName].IsChangedInRevision || newWorkItem.Fields[f.ReferenceName].IsEditable))
+                if (newWorkItem.Fields.Contains(f.ReferenceName) && !_ignore.Contains(f.ReferenceName) && (!newWorkItem.Fields[f.ReferenceName].IsChangedInRevision || newWorkItem.Fields[f.ReferenceName].IsEditable) && oldWorkItem.Fields[f.ReferenceName].Value != newWorkItem.Fields[f.ReferenceName].Value)
                 {
+                    Log.LogDebug("PopulateWorkItem:FieldUpdate: {ReferenceName} | Old:{OldReferenceValue} New:{NewReferenceValue}", f.ReferenceName, oldWorkItem.Fields[f.ReferenceName].Value, newWorkItem.Fields[f.ReferenceName].Value);
                     newWorkItem.Fields[f.ReferenceName].Value = oldWorkItem.Fields[f.ReferenceName].Value;
                 }
             }
@@ -523,7 +524,7 @@ namespace VstsSyncMigrator.Engine
                         {
                             revWi.Id,
                             Rev = revWi.Fields["System.Rev"],
-                            RevisedDate = revWi.Fields["System.RevisedDate"],
+                            RevisedDate = revWi.Fields["System.ChangedDate"],
                             revWi.Fields
                         };
                     });
@@ -563,13 +564,14 @@ namespace VstsSyncMigrator.Engine
                     WorkItemTypeChange(targetWorkItem, skipToFinalRevisedWorkItemType, finalDestType, revision, currentRevisionWorkItem, destType);
 
                     PopulateWorkItem(currentRevisionWorkItem, targetWorkItem, destType);
+
+                    // Todo: Ensure all field maps use WorkItemData.Fields to apply a correct mapping
                     Engine.FieldMaps.ApplyFieldMappings(currentRevisionWorkItem, targetWorkItem);
 
-                    targetWorkItem.ToWorkItem().Fields["System.ChangedBy"].Value =
-                        currentRevisionWorkItem.ToWorkItem().Revisions[revision.Index].Fields["System.ChangedBy"].Value;
+                    // Todo: Think about an "UpdateChangedBy" flag as this is expensive! (2s/WI instead of 1,5s when writing "Migration")
+                    targetWorkItem.ToWorkItem().Fields["System.ChangedBy"].Value = currentRevisionWorkItem.Fields["System.ChangedBy"];
 
-                    targetWorkItem.ToWorkItem().Fields["System.History"].Value =
-                        currentRevisionWorkItem.ToWorkItem().Revisions[revision.Index].Fields["System.History"].Value;
+                    targetWorkItem.ToWorkItem().Fields["System.History"].Value = currentRevisionWorkItem.Fields["System.History"];
                     //Debug.WriteLine("Discussion:" + currentRevisionWorkItem.Revisions[revision.Index].Fields["System.History"].Value);
 
                     TfsReflectedWorkItemId reflectedUri = (TfsReflectedWorkItemId)Engine.Source.WorkItems.CreateReflectedWorkItemId(sourceWorkItem);
@@ -594,7 +596,8 @@ namespace VstsSyncMigrator.Engine
                 if (targetWorkItem != null)
                 {
                     ProcessWorkItemAttachments(sourceWorkItem, targetWorkItem, false);
-                    ProcessWorkItemLinks(Engine.Source.WorkItems, Engine.Target.WorkItems, sourceWorkItem, targetWorkItem);
+                    if (!string.IsNullOrEmpty(targetWorkItem.Id))
+                    { ProcessWorkItemLinks(Engine.Source.WorkItems, Engine.Target.WorkItems, sourceWorkItem, targetWorkItem); }
 
                     if (_config.GenerateMigrationComment)
                     {
@@ -656,6 +659,13 @@ namespace VstsSyncMigrator.Engine
                     {"RevisionsCount", sortedRevisions.Count},
                     {"sourceWorkItemId", sourceWorkItem.Id}
                 });
+            Log.LogDebug("RevisionsToMigrate:----------------------------------------------------");
+            foreach (RevisionItem item in sortedRevisions)
+            {
+                Log.LogDebug("RevisionsToMigrate: Index:{Index} - Number:{Number} - ChangedDate:{ChangedDate}", item.Index, item.Number, item.ChangedDate);
+            }
+            Log.LogDebug("RevisionsToMigrate:----------------------------------------------------");
+
             return sortedRevisions;
         }
 

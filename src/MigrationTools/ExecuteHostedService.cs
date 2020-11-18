@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MigrationTools.CommandLine;
@@ -10,20 +11,21 @@ namespace MigrationTools
     public class ExecuteHostedService : IHostedService
     {
         private readonly ExecuteOptions _exceuteOptions;
-        private readonly IMigrationEngine _migrationEngine;
+        
+        private readonly IServiceProvider _services;
         private readonly ILogger _logger;
         private readonly IHostApplicationLifetime _appLifetime;
 
         private int? _exitCode;
 
         public ExecuteHostedService(
+            IServiceProvider services,
             ExecuteOptions exceuteOptions,
-            IMigrationEngine migrationEngine,
             ILogger<ExecuteHostedService> logger,
             IHostApplicationLifetime appLifetime)
         {
             _exceuteOptions = exceuteOptions;
-            _migrationEngine = migrationEngine;
+            _services = services;
             _logger = logger;
             _appLifetime = appLifetime;
         }
@@ -41,7 +43,8 @@ namespace MigrationTools
                 {
                     try
                     {
-                        _migrationEngine.Run();
+                        var migrationEngine = _services.GetRequiredService<IMigrationEngine>();
+                        migrationEngine.Run();
                         _exitCode = 0;
                     }
                     catch (Exception ex)
@@ -70,17 +73,5 @@ namespace MigrationTools
             }
             return Task.CompletedTask;
         }
-
-        //protected override Task ExecuteAsync(CancellationToken stoppingToken)
-        //{
-        //    if (_exceuteOptions == null)
-        //    {
-        //        return Task.CompletedTask;
-        //    }
-        //    return Task.Run(() =>
-        //    {
-        //        _migrationEngine.Run();
-        //    });
-        //}
     }
 }

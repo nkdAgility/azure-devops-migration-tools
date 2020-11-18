@@ -123,9 +123,12 @@ namespace MigrationTools
 
         public static WorkItemData GetRevision(this WorkItemData context, int rev)
         {
+            var originalWi = (WorkItem)context.internalObject;
             var wid = new WorkItemData
             {
-                internalObject = context.internalObject
+                // internalObject = context.internalObject
+                // TODO: Had to revert to calling revision load again untill WorkItemMigrationContext.PopulateWorkItem can be updated to pull from WorkItemData
+                internalObject = originalWi.Store.GetWorkItem(originalWi.Id, rev)
             };
 
             wid.RefreshWorkItem(context.Revisions[rev].Fields);
@@ -172,7 +175,7 @@ namespace MigrationTools
             var dict = new Dictionary<string, object>();
             for (var ix = 0; ix < col.Count; ix++)
             {
-                dict.Add(col[ix].Name, col[ix].Value);
+                dict.Add(col[ix].ReferenceName, col[ix].Value);
             }
             return dict;
         }

@@ -26,11 +26,18 @@ namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
         {
             try
             {
-                InternalExecute(source.ToWorkItem(), target.ToWorkItem());
+                if (RefactoredToUseWorkItemData)
+                {
+                    InternalExecute(source, target);
+                }
+                else
+                {
+                    InternalExecute(source.ToWorkItem(), target.ToWorkItem());
+                }
             }
             catch (Exception ex)
             {
-                Log.LogError(ex, "Field mapp fault",
+                Log.LogError(ex, "Field map fault",
                        new Dictionary<string, string> {
                             { "Source", source.ToWorkItem().Id.ToString() },
                             { "Target",  target.ToWorkItem().Id.ToString()}
@@ -50,5 +57,12 @@ namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
         public ILogger<FieldMapBase> Log { get; }
 
         internal abstract void InternalExecute(WorkItem source, WorkItem target);
+
+        internal virtual bool RefactoredToUseWorkItemData => false;
+
+        internal virtual void InternalExecute(WorkItemData source, WorkItemData target)
+        {
+
+        }
     }
 }
