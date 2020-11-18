@@ -87,6 +87,7 @@ namespace MigrationTools
         {
             var workItem = (WorkItem)context.internalObject;
             context.ProjectName = workItem.Project?.Name;
+            context.Id = workItem.Id.ToString();
 
             // If fieldsOfRevision is provided we use this collection as we want to create a revised WorkItemData object
             context.Fields = fieldsOfRevision != null ? fieldsOfRevision.AsDictionary() : workItem.Fields.AsDictionary();
