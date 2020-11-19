@@ -25,6 +25,6 @@ namespace MigrationTools.CommandLine
 
         [Option("targetPassword", Required = false, HelpText = "Password used to connect to target TFS instance.")]
         public string TargetPassword { get; set; }
-        
+
     }
 }
