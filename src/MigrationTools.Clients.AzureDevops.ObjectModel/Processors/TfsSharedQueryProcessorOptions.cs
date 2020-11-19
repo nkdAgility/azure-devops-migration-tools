@@ -35,7 +35,7 @@ namespace MigrationTools.Processors
         /// </summary>
         public Dictionary<string, string> SourceToTargetFieldMappings { get; set; }
 
-        public override string Processor => ToConfigure.ToString();
+        public override string Processor => nameof(TfsSharedQueryProcessor);
 
         public override Type ToConfigure => typeof(TfsSharedQueryProcessor);
 
