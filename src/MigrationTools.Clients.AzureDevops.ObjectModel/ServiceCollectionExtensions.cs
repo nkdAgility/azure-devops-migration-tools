@@ -23,6 +23,8 @@ namespace MigrationTools
             context.AddTransient<TfsTeamSettingsProcessor>();
             //TfsSharedQueries
             context.AddTransient<TfsSharedQueryProcessor>();
+            //TfsPipelines
+            context.AddTransient<TfsPipelineProcessor>();
         }
 
         [Obsolete("This is the v1 Archtiecture, we are movign to V2", false)]
