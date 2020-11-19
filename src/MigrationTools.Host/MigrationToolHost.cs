@@ -54,6 +54,10 @@ namespace MigrationTools.Host
                          services.AddSingleton(opts);
                          services.AddSingleton<InitOptions>((p) => null);
                      })
+                     .WithParsed<CommonOptions>(opts =>
+                     {
+                         services.AddSingleton(opts);
+                     })
                      .WithNotParsed(error =>
                      {
                          services.AddSingleton<InitOptions>((p) => null);

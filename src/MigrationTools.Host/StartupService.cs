@@ -37,7 +37,7 @@ namespace MigrationTools.Host
         {
             ApplicationStartup(args);
             Configure(_LifeTime);
-            if (_detectOnlineService.IsOnline())
+            if (_detectOnlineService.IsOnline() && !_detectVersionService.SkipUpdateCheck())
             {
                 Version latestVersion = _detectVersionService.GetLatestVersion();
 

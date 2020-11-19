@@ -3,7 +3,7 @@
 namespace MigrationTools.CommandLine
 {
     [Verb("execute", HelpText = "Record changes to the repository.")]
-    public class ExecuteOptions
+    public class ExecuteOptions : CommonOptions, Interfaces.IExecuteOptions
     {
         [Option('c', "config", Required = true, HelpText = "Configuration file to be processed.")]
         public string ConfigFile { get; set; }
@@ -25,5 +25,6 @@ namespace MigrationTools.CommandLine
 
         [Option("targetPassword", Required = false, HelpText = "Password used to connect to target TFS instance.")]
         public string TargetPassword { get; set; }
+        
     }
 }

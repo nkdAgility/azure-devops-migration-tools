@@ -9,6 +9,8 @@ using NuGet.Configuration;
 using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
 using NuGet.Versioning;
+using MigrationTools.CommandLine;
+using MigrationTools.CommandLine.Interfaces;
 using Serilog;
 
 namespace MigrationTools.Host.Services
@@ -17,11 +19,13 @@ namespace MigrationTools.Host.Services
     {
         private readonly ITelemetryLogger _Telemetry;
 
-        public DetectVersionService(ITelemetryLogger telemetry)
+        private readonly CommonOptions _commonOptions;
+
+        public DetectVersionService(ITelemetryLogger telemetry, CommonOptions commonOptions)
         {
             _Telemetry = telemetry;
+            _commonOptions = commonOptions;
         }
-
         public Version GetLatestVersion()
         {
             DateTime startTime = DateTime.Now;
@@ -50,6 +54,11 @@ namespace MigrationTools.Host.Services
             /////////////////
             mainTimer.Stop();
             return latestPackageVersion;
+        }
+
+        public bool SkipUpdateCheck()
+        {
+            return _commonOptions.SkipUpdateCheck;
         }
 
         private IEnumerable<NuGetVersion> GetVersions(string packageId, string sourceUrl = "https://chocolatey.org/api/v2/")
