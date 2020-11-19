@@ -46,7 +46,7 @@ namespace MigrationTools
             context.AddSingleton<TfsWorkItemLinkEnricher>();
             context.AddSingleton<TfsEmbededImagesEnricher>();
             context.AddSingleton<TfsGitRepositoryEnricher>();
-            context.AddSingleton<TfsNodeStructureEnricher>();
+            context.AddSingleton<TfsNodeStructure>();
             // EndPoint Enrichers
             context.AddTransient<TfsWorkItemAttachmentEnricher>();
             // Core

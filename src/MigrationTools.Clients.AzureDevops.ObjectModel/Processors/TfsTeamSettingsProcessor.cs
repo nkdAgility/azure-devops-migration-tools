@@ -38,10 +38,34 @@ namespace MigrationTools.Processors
 
         protected override void InternalExecute()
         {
+            Log.LogInformation("Processor::InternalExecute::Start");
+            EnsureConfigured();
+            ProcessorEnrichers.ProcessorExecutionBegin(this);
+            MigrateTeamSettings();
+            ProcessorEnrichers.ProcessorExecutionEnd(this);
+            Log.LogInformation("Processor::InternalExecute::End");
+        }
+
+
+
+        private void EnsureConfigured()
+        {
+            Log.LogInformation("Processor::EnsureConfigured");
             if (_Options == null)
             {
                 throw new Exception("You must call Configure() first");
             }
+            if (!(Endpoints.Source is Endpoint))
+            {
+                throw new Exception("The Source endpoint configured must be of type WorkItemEndpoint");
+            }
+            if (!(Endpoints.Target is Endpoint))
+            {
+                throw new Exception("The Target endpoint configured must be of type WorkItemEndpoint");
+            }
+        }
+        private void MigrateTeamSettings()
+        {
             Stopwatch stopwatch = Stopwatch.StartNew();
             //////////////////////////////////////////////////
             List<TeamFoundationTeam> sourceTeams = Source.TfsTeamService.QueryTeams(Source.Project).ToList();
