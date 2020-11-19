@@ -28,6 +28,7 @@ namespace MigrationTools.Processors
         public TfsEndpoint Target => (TfsEndpoint)Endpoints.Target;
 
         List<Pipeline> sourcePipelines = new List<Pipeline>();
+        List<Pipeline> targetPipelines = new List<Pipeline>();
 
 
         public override void Configure(IProcessorOptions options)
@@ -67,11 +68,11 @@ namespace MigrationTools.Processors
         private void MigratePipelines()
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
-            GetPipelines();
+            GetPipelines(Source.Organisation, Source.Project, Source.AccessToken);
 
             if (_Options.MigrateBuildPipelines)
             {
-
+                CreatePipelines();
             }
 
             if (_Options.MigrateReleasePipelines)
@@ -82,10 +83,10 @@ namespace MigrationTools.Processors
             Log.LogDebug("DONE in {Elapsed} ", stopwatch.Elapsed.ToString("c"));
         }
 
-        private void GetPipelines()
+        private void GetPipelines(string organisation, string project, string accessToken)
         {
-            string baseUrl = Source.Organisation + "/" + Source.Project + "/_apis/pipelines";
-            string credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes(":" + Source.AccessToken));
+            string baseUrl = organisation + "/" + project + "/_apis/build/definitions";
+            string credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes(":" + accessToken));
 
             WebClient client = new WebClient();
             client.Headers[HttpRequestHeader.Authorization] = "Basic " + credentials;
@@ -102,9 +103,61 @@ namespace MigrationTools.Processors
 
                     Pipeline newPipeline = JsonConvert.DeserializeObject<Pipeline>(responseMessage);
 
-                    Log.LogInformation("Getting Pipeline '{pipeline}'..", newPipeline.Name);
-                    sourcePipelines.Add(newPipeline);
+                    if (organisation == Source.Organisation)
+                    {
+                        sourcePipelines.Add(newPipeline);
+                    }
+                    else
+                    {
+                        targetPipelines.Add(newPipeline);
+                    }
                 }
+            }
+        }
+
+        private void CreatePipelines()
+        {
+            List<Pipeline> pipelinesToBeMigrated = new List<Pipeline>();
+            GetPipelines(Target.Organisation, Target.Project, Target.AccessToken);
+
+            //Filter out Pipelines that already exsit
+            foreach (Pipeline sourcePipeline in sourcePipelines)
+            {
+                int exsits = 0;
+                foreach (Pipeline targetPipeline in targetPipelines)
+                {
+                    if (targetPipeline.Name == sourcePipeline.Name)
+                    {
+                        exsits++;
+                    }
+                }
+                if (exsits == 0)
+                {
+                    pipelinesToBeMigrated.Add(sourcePipeline);
+                }
+            }
+            Log.LogInformation("From {sourcePipelines} source Pipelines {pipelinesToBeMigrated} Pipelines are going to be migrated..", sourcePipelines.Count, pipelinesToBeMigrated.Count);
+            string baseUrl = Target.Organisation + "/" + Target.Project + "/_apis/build/definitions";
+            string credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes(":" + Target.AccessToken));
+
+            WebClient client = new WebClient();
+            client.Headers[HttpRequestHeader.Authorization] = "Basic " + credentials;
+
+            foreach (Pipeline pipelineToBeMigrated in pipelinesToBeMigrated)
+            {
+                pipelineToBeMigrated.Links = null;
+                pipelineToBeMigrated.AuthoredBy = null;
+                pipelineToBeMigrated.Queue = null;
+                pipelineToBeMigrated.Url = null;
+                pipelineToBeMigrated.Uri = null;
+                pipelineToBeMigrated.Revision = 0;
+                pipelineToBeMigrated.Id = 0;
+                pipelineToBeMigrated.Project = null;
+
+                Log.LogInformation("Processing Pipeline '{pipelineToBeMigrated}'..", pipelineToBeMigrated.Name);
+                string body = JsonConvert.SerializeObject(pipelineToBeMigrated);
+                client.UploadString(baseUrl, body);
+
             }
         }
     }
