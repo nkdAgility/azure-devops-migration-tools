@@ -45,7 +45,7 @@ namespace VstsSyncMigrator.Engine
         private IAttachmentMigrationEnricher attachmentEnricher;
         private IWorkItemProcessorEnricher embededImagesEnricher;
         private TfsGitRepositoryEnricher gitRepositoryEnricher;
-        private TfsNodeStructureEnricher nodeStructureEnricher;
+        private TfsNodeStructure nodeStructureEnricher;
         private TfsValidateRequiredField validateConfig;
         private IDictionary<string, double> processWorkItemMetrics = null;
         private IDictionary<string, string> processWorkItemParamiters = null;
@@ -89,13 +89,10 @@ namespace VstsSyncMigrator.Engine
             workItemLinkEnricher = Services.GetRequiredService<TfsWorkItemLinkEnricher>();
             embededImagesEnricher = Services.GetRequiredService<TfsEmbededImagesEnricher>();
             gitRepositoryEnricher = Services.GetRequiredService<TfsGitRepositoryEnricher>();
-            nodeStructureEnricher = Services.GetRequiredService<TfsNodeStructureEnricher>();
+            nodeStructureEnricher = Services.GetRequiredService<TfsNodeStructure>();
             _witClient = new WorkItemTrackingHttpClient(Engine.Target.Config.AsTeamProjectConfig().Collection, Engine.Target.Credentials);
             //Validation: make sure that the ReflectedWorkItemId field name specified in the config exists in the target process, preferably on each work item type.
             PopulateIgnoreList();
-
-            Log.LogInformation("Migrating all Nodes before the work item run.");
-            nodeStructureEnricher.MigrateAllNodeStructures(_config.PrefixProjectToNodes, _config.NodeBasePaths);
 
             var stopwatch = Stopwatch.StartNew();
             //////////////////////////////////////////////////
