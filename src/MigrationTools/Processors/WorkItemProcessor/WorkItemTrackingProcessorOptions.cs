@@ -11,7 +11,6 @@ namespace MigrationTools.Processors
         public bool CollapseRevisions { get; set; }
         public int WorkItemCreateRetryLimit { get; set; }
         public override Type ToConfigure => typeof(WorkItemTrackingProcessor);
-        public override string Processor => ToConfigure.Name;
 
         public override IProcessorOptions GetDefault()
         {

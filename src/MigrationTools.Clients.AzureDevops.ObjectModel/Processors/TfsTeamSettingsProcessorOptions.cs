@@ -31,8 +31,6 @@ namespace MigrationTools.Processors
 
         public override Type ToConfigure => typeof(TfsTeamSettingsProcessor);
 
-        public override string Processor => ToConfigure.Name;
-
         public override IProcessorOptions GetDefault()
         {
             return this;
