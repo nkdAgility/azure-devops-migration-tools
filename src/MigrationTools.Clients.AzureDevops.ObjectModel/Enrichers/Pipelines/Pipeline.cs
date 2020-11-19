@@ -16,7 +16,7 @@ namespace MigrationTools.Enrichers.Pipelines
         public Option[] Options { get; set; }
 
         [JsonProperty("triggers")]
-        public Trigger[] Triggers { get; set; }
+        public ExpandoObject[] Triggers { get; set; }
 
         [JsonProperty("variables")]
         public Variables Variables { get; set; }

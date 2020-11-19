@@ -140,15 +140,13 @@ namespace MigrationTools.Processors
             string baseUrl = Target.Organisation + "/" + Target.Project + "/_apis/build/definitions?api-version=5.1-preview";
             string credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes(":" + Target.AccessToken));
 
-            WebClient client = new WebClient();
-            client.Headers[HttpRequestHeader.Authorization] = "Basic " + credentials;
-            client.Headers[HttpRequestHeader.ContentType] = "application/json";
-            client.Headers.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
-
-
-
             foreach (Pipeline pipelineToBeMigrated in pipelinesToBeMigrated)
             {
+                WebClient client = new WebClient();
+                client.Headers[HttpRequestHeader.Authorization] = "Basic " + credentials;
+                client.Headers[HttpRequestHeader.ContentType] = "application/json";
+                client.Headers.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
+
                 pipelineToBeMigrated.Links = null;
                 pipelineToBeMigrated.AuthoredBy = null;
                 pipelineToBeMigrated.Queue = null;
@@ -157,11 +155,18 @@ namespace MigrationTools.Processors
                 pipelineToBeMigrated.Revision = 0;
                 pipelineToBeMigrated.Id = 0;
                 pipelineToBeMigrated.Project = null;
+                pipelineToBeMigrated.Repository.Id = null;
 
                 Log.LogInformation("Processing Pipeline '{pipelineToBeMigrated}'..", pipelineToBeMigrated.Name);
-
                 string body = JsonConvert.SerializeObject(pipelineToBeMigrated);
-                client.UploadString(baseUrl, "POST", body);
+                try
+                {
+                    client.UploadString(baseUrl, "POST", body);
+                }
+                catch
+                {
+                    Log.LogError("Error migrating Pipeling '{pipelineToBeMigrated}'. Please migrate it manually.", pipelineToBeMigrated.Name);
+                }
 
             }
         }
