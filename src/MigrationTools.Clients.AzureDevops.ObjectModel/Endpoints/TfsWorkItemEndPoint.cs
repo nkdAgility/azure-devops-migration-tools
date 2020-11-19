@@ -58,35 +58,9 @@ namespace MigrationTools.Endpoints
             List<WorkItemData> list = new List<WorkItemData>();
             foreach (WorkItem wi in collection)
             {
-                list.Add(ConvertToWorkItemData(wi));
+                list.Add(wi.AsWorkItemData());
             }
             return list;
-        }
-
-        private WorkItemData ConvertToWorkItemData(WorkItem wi)
-        {
-            WorkItemData wid = new WorkItemData
-            {
-                Id = wi.Id.ToString(),
-                Type = wi.Type.ToString()
-            };
-            PopulateRevisions(wi, wid);
-            return wid;
-        }
-
-        private void PopulateRevisions(WorkItem wi, WorkItemData wid)
-        {
-            wid.Revisions = new SortedDictionary<int, RevisionItem>();
-            foreach (Revision revision in wi.Revisions)
-            {
-                RevisionItem revi = new RevisionItem
-                {
-                    Number = revision.Index,
-                    Index = revision.Index
-                };
-                RunSourceEnrichers(revision, revi);
-                wid.Revisions.Add(revision.Index, revi);
-            }
         }
 
         private void RunSourceEnrichers(Revision wi, RevisionItem wid)

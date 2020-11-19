@@ -106,9 +106,11 @@ namespace MigrationTools.Processors
             var stopwatch = Stopwatch.StartNew();
             var starttime = DateTime.Now;
             var metrics = new Dictionary<string, double>();
-            var parameters = new Dictionary<string, string>();
-            AddParameter("SuiteId", parameters, source.Id.ToString());
-            AddParameter("PlanId", parameters, targetPlan.Id.ToString());
+            var parameters = new Dictionary<string, string>
+            {
+                { "SuiteId", source.Id.ToString() },
+                { "PlanId", targetPlan.Id.ToString() }
+            };
             ////////////////////////////////////
             target.Refresh();
             targetPlan.Refresh();
@@ -119,7 +121,7 @@ namespace MigrationTools.Processors
 
             _totalTestCases = source.TestCases.Count;
             _currentTestCases = 0;
-            AddMetric("TestCaseCount", metrics, _totalTestCases);
+            metrics.Add("TestCaseCount", _totalTestCases);
             InnerLog(source, string.Format("            Suite has {0} test cases", _totalTestCases), 15);
             List<ITestCase> tcs = new List<ITestCase>();
             foreach (ITestSuiteEntry sourceTestCaseEntry in source.TestCases)
@@ -131,7 +133,7 @@ namespace MigrationTools.Processors
                     return;
 
                 InnerLog(source, string.Format("    Processing {0} : {1} - {2} ", sourceTestCaseEntry.EntryType.ToString(), sourceTestCaseEntry.Id, sourceTestCaseEntry.Title), 15);
-                WorkItemData wi = Engine.Target.WorkItems.FindReflectedWorkItem(sourceTestCaseEntry.TestCase.WorkItem.AsWorkItemData(), false);
+                WorkItemData wi = Target.WorkItems.FindReflectedWorkItem(sourceTestCaseEntry.TestCase.WorkItem.AsWorkItemData(), false);
                 if (wi == null)
                 {
                     InnerLog(source, string.Format("    Can't find work item for Test Case. Has it been migrated? {0} : {1} - {2} ", sourceTestCaseEntry.EntryType.ToString(), sourceTestCaseEntry.Id, sourceTestCaseEntry.Title), 15);

@@ -27,7 +27,7 @@ namespace MigrationTools.Processors
         public bool PrefixProjectToNodes { get; set; }
 
         /// <summary>
-        /// This option will skip invalid links. That is usually happened if in a test plan is a link to a tfvc changeset in the test case.<br>If that option is false you get an error if you have unsaved links like this in your test plan. If it true you only get a warning. https://github.com/nkdAgility/azure-devops-migration-tools/issues/178
+        /// This option will skip invalid links. That is usually happened if in a test plan is a link to a tfvc changeset in the test case. If that option is false you get an error if you have unsaved links like this in your test plan. If it true you only get a warning. https://github.com/nkdAgility/azure-devops-migration-tools/issues/178
         /// </summary>
         /// <default>false</default>
         public bool RemoveInvalidTestSuiteLinks { get; set; }
@@ -48,8 +48,6 @@ namespace MigrationTools.Processors
         public string TestConfigurationQuery { get; set; }
 
         public override Type ToConfigure => typeof(TfsSharedQueryProcessor);
-
-        public override string Processor => ToConfigure.Name;
 
         public override IProcessorOptions GetDefault()
         {
