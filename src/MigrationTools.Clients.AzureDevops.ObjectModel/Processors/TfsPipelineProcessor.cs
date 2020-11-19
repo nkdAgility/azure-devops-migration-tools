@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,6 +26,9 @@ namespace MigrationTools.Processors
         public TfsEndpoint Source => (TfsEndpoint)Endpoints.Source;
 
         public TfsEndpoint Target => (TfsEndpoint)Endpoints.Target;
+
+        List<Pipeline> sourcePipelines = new List<Pipeline>();
+
 
         public override void Configure(IProcessorOptions options)
         {
@@ -61,31 +66,44 @@ namespace MigrationTools.Processors
 
         private void MigratePipelines()
         {
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            GetPipelines();
+
             if (_Options.MigrateBuildPipelines)
             {
-                GetData();
 
-                async void GetData()
+            }
+
+            if (_Options.MigrateReleasePipelines)
+            {
+
+            }
+            stopwatch.Stop();
+            Log.LogDebug("DONE in {Elapsed} ", stopwatch.Elapsed.ToString("c"));
+        }
+
+        private void GetPipelines()
+        {
+            string baseUrl = Source.Organisation + "/" + Source.Project + "/_apis/pipelines";
+            string credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes(":" + Source.AccessToken));
+
+            WebClient client = new WebClient();
+            client.Headers[HttpRequestHeader.Authorization] = "Basic " + credentials;
+            string httpResponse = client.DownloadString(baseUrl);
+
+            if (httpResponse != null)
+            {
+                Pipelines pipelines = JsonConvert.DeserializeObject<Pipelines>(httpResponse);
+
+                foreach (Pipeline pipeline in pipelines.Value)
                 {
-                    string baseUrl = Source.Organisation + "/" + Source.Project + "/_apis/pipelines";
+                    //Nessecary because getting all Pipelines doesn't include all of their properties 
+                    string responseMessage = client.DownloadString(baseUrl + "/" + pipeline.Id);
 
-                    HttpClient client = new HttpClient();
-                    var byteArray = Encoding.ASCII.GetBytes(":" + Source.AccessToken);
-                    client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
+                    Pipeline newPipeline = JsonConvert.DeserializeObject<Pipeline>(responseMessage);
 
-                    HttpResponseMessage res = await client.GetAsync(baseUrl);
-                    HttpContent content = res.Content;
-                    string data = await content.ReadAsStringAsync();
-                    if (data != null)
-                    {
-                        Pipelines pipelines = JsonConvert.DeserializeObject<Pipelines>(data);
-                    }
-
-                }
-
-                if (_Options.MigrateReleasePipelines)
-                {
-
+                    Log.LogInformation("Getting Pipeline '{pipeline}'..", newPipeline.Name);
+                    sourcePipelines.Add(newPipeline);
                 }
             }
         }
