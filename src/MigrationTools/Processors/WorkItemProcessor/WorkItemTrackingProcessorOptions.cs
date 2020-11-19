@@ -10,10 +10,8 @@ namespace MigrationTools.Processors
         public bool PrefixProjectToNodes { get; set; }
         public bool CollapseRevisions { get; set; }
         public int WorkItemCreateRetryLimit { get; set; }
-
-        public override string Processor => nameof(ToConfigure);
-
         public override Type ToConfigure => typeof(WorkItemTrackingProcessor);
+        public override string Processor => ToConfigure.Name;
 
         public override IProcessorOptions GetDefault()
         {
