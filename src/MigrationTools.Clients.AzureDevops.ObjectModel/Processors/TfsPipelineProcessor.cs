@@ -137,11 +137,15 @@ namespace MigrationTools.Processors
                 }
             }
             Log.LogInformation("From {sourcePipelines} source Pipelines {pipelinesToBeMigrated} Pipelines are going to be migrated..", sourcePipelines.Count, pipelinesToBeMigrated.Count);
-            string baseUrl = Target.Organisation + "/" + Target.Project + "/_apis/build/definitions";
+            string baseUrl = Target.Organisation + "/" + Target.Project + "/_apis/build/definitions?api-version=5.1-preview";
             string credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes(":" + Target.AccessToken));
 
             WebClient client = new WebClient();
             client.Headers[HttpRequestHeader.Authorization] = "Basic " + credentials;
+            client.Headers[HttpRequestHeader.ContentType] = "application/json";
+            client.Headers.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
+
+
 
             foreach (Pipeline pipelineToBeMigrated in pipelinesToBeMigrated)
             {
@@ -155,8 +159,9 @@ namespace MigrationTools.Processors
                 pipelineToBeMigrated.Project = null;
 
                 Log.LogInformation("Processing Pipeline '{pipelineToBeMigrated}'..", pipelineToBeMigrated.Name);
+
                 string body = JsonConvert.SerializeObject(pipelineToBeMigrated);
-                client.UploadString(baseUrl, body);
+                client.UploadString(baseUrl, "POST", body);
 
             }
         }

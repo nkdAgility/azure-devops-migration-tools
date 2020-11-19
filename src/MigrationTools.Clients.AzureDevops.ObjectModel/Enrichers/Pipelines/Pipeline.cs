@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -238,12 +239,7 @@ namespace MigrationTools.Enrichers.Pipelines
         public Task Task { get; set; }
 
         [JsonProperty("inputs")]
-        public Inputs Inputs { get; set; }
-    }
-
-    public class Inputs
-    {
-//TODO: We need don't know what the Inputs are since they differ in every Step
+        public ExpandoObject Inputs { get; set; }
     }
 
     public partial class ProcessParameters
