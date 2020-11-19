@@ -31,7 +31,7 @@ namespace MigrationTools.Enrichers
             throw new InvalidOperationException("This is invalid for this Enricher type");
         }
 
-        public void ProcessorExecutionBegin(IProcessor processor)
+        public virtual void ProcessorExecutionBegin(IProcessor processor)
         {
             Log.LogDebug("{WorkItemProcessorEnricher}::ProcessorExecutionBegin::NoAction", this.GetType().Name);
         }
