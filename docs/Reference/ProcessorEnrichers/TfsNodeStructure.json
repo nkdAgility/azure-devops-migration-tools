@@ -1,0 +1,6 @@
+{
+  "$type": "TfsNodeStructureOptions",
+  "Enabled": true,
+  "PrefixProjectToNodes": false,
+  "NodeBasePaths": null
+}

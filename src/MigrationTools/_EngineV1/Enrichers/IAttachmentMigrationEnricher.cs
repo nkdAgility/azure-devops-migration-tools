@@ -1,4 +1,4 @@
-﻿using MigrationTools._EngineV1.DataContracts;
+﻿using MigrationTools.DataContracts;
 
 namespace MigrationTools._EngineV1.Enrichers
 {

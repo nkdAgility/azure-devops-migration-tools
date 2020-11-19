@@ -6,7 +6,8 @@ using System.Xml;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.Server;
 using MigrationTools._EngineV1.Clients;
-using MigrationTools._EngineV1.DataContracts;
+using MigrationTools.DataContracts;
+using MigrationTools.Processors;
 
 namespace MigrationTools.Enrichers
 {
@@ -16,8 +17,15 @@ namespace MigrationTools.Enrichers
         Iteration
     }
 
-    public class TfsNodeStructureEnricher : WorkItemProcessorEnricher
+    public class TfsNodeStructure : WorkItemProcessorEnricher
     {
+        private TfsNodeStructureOptions _Options;
+
+        public TfsNodeStructureOptions Options
+        {
+            get { return _Options; }
+        }
+
         private Dictionary<string, bool> _foundNodes = new Dictionary<string, bool>();
         private string[] _nodeBasePaths;
         private bool _prefixProjectToNodes = false;
@@ -26,7 +34,7 @@ namespace MigrationTools.Enrichers
         private NodeInfo[] _sourceRootNodes;
         private ICommonStructureService _targetCommonStructureService;
 
-        public TfsNodeStructureEnricher(IMigrationEngine engine, ILogger<TfsNodeStructureEnricher> logger) : base(engine, logger)
+        public TfsNodeStructure(IMigrationEngine engine, ILogger<WorkItemProcessorEnricher> logger) : base(engine, logger)
         {
             _sourceCommonStructureService = (ICommonStructureService)Engine.Source.GetService<ICommonStructureService>();
             _targetCommonStructureService = (ICommonStructureService)Engine.Target.GetService<ICommonStructureService4>();
@@ -34,22 +42,32 @@ namespace MigrationTools.Enrichers
             _sourceRootNodes = _sourceCommonStructureService.ListStructures(_sourceProjectInfo.Uri);
         }
 
-        public override void Configure(bool save = true, bool filterWorkItemsThatAlreadyExistInTarget = true)
+        [Obsolete("Old v1 arch: this is a v2 class", true)]
+        public override void Configure(bool save = true, bool filter = true)
         {
+            throw new System.NotImplementedException();
         }
 
-        [Obsolete("v2 Archtecture: use Configure(bool save = true, bool filter = true) instead", true)]
         public override void Configure(IProcessorEnricherOptions options)
         {
-            throw new NotImplementedException();
+            _Options = (TfsNodeStructureOptions)options;
         }
 
+        [Obsolete("Old v1 arch: this is a v2 class", true)]
         public override int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
         {
-            throw new NotImplementedException();
-            return 0;
+            throw new System.NotImplementedException();
         }
 
+        public override void ProcessorExecutionBegin(IProcessor processor)
+        {
+            if (Options.Enabled)
+            {
+                Log.LogInformation("Migrating all Nodes before the Processor run.");
+
+                MigrateAllNodeStructures();
+            }
+        }
         public string GetNewNodeName(string sourceNodeName, TfsNodeStructureType nodeStructureType)
         {
             Log.LogDebug("NodeStructureEnricher.GetNewNodeName({sourceNodeName}, {nodeStructureType})", sourceNodeName, nodeStructureType.ToString());
@@ -96,11 +114,12 @@ namespace MigrationTools.Enrichers
             return newNodeName;
         }
 
-        public void MigrateAllNodeStructures(bool prefixProjectToNodes, string[] nodeBasePaths)
+        public void MigrateAllNodeStructures()
         {
-            Log.LogDebug("NodeStructureEnricher.MigrateAllNodeStructures({prefixProjectToNodes}, {nodeBasePaths})", prefixProjectToNodes, nodeBasePaths);
-            _prefixProjectToNodes = prefixProjectToNodes;
-            _nodeBasePaths = nodeBasePaths;
+            _prefixProjectToNodes = Options.PrefixProjectToNodes;
+            _nodeBasePaths = Options.NodeBasePaths;
+
+            Log.LogDebug("NodeStructureEnricher.MigrateAllNodeStructures({prefixProjectToNodes}, {nodeBasePaths})", _prefixProjectToNodes, _nodeBasePaths);
             //////////////////////////////////////////////////
             ProcessCommonStructure(Engine.Source.Config.AsTeamProjectConfig().LanguageMaps.AreaPath, Engine.Target.Config.AsTeamProjectConfig().LanguageMaps.AreaPath);
             //////////////////////////////////////////////////

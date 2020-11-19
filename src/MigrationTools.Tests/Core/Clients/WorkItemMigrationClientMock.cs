@@ -3,12 +3,13 @@ using System.Linq;
 using MigrationTools._EngineV1.Clients;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.DataContracts;
+using MigrationTools.DataContracts;
 
 namespace MigrationTools.Clients.Tests
 {
     internal class WorkItemMigrationClientMock : IWorkItemMigrationClient
     {
-        private List<_EngineV1.DataContracts.WorkItemData> list = new List<_EngineV1.DataContracts.WorkItemData>();
+        private List<WorkItemData> list = new List<WorkItemData>();
 
         public IMigrationClientConfig Config => throw new System.NotImplementedException();
 
@@ -18,7 +19,7 @@ namespace MigrationTools.Clients.Tests
         {
         }
 
-        public List<_EngineV1.DataContracts.WorkItemData> GetWorkItems()
+        public List<WorkItemData> GetWorkItems()
         {
             if (list.Count == 0)
             {
@@ -27,7 +28,7 @@ namespace MigrationTools.Clients.Tests
             return list;
         }
 
-        public _EngineV1.DataContracts.WorkItemData PersistWorkItem(_EngineV1.DataContracts.WorkItemData workItem)
+        public WorkItemData PersistWorkItem(WorkItemData workItem)
         {
             PopulateList();
             var found = list.Find(x => x.Id == workItem.Id);
@@ -41,7 +42,7 @@ namespace MigrationTools.Clients.Tests
             {
                 // Create new
                 var newid = list.Max(s => int.Parse(s.Id)) + 1;
-                list.Add(new _EngineV1.DataContracts.WorkItemData { Id = newid.ToString(), Title = workItem.Title });
+                list.Add(new WorkItemData { Id = newid.ToString(), Title = workItem.Title });
                 return workItem;
             }
         }
@@ -49,59 +50,59 @@ namespace MigrationTools.Clients.Tests
         private void PopulateList()
         {
             list.Clear();
-            list.Add(new _EngineV1.DataContracts.WorkItemData { Id = "1", Title = "Item 1" });
-            list.Add(new _EngineV1.DataContracts.WorkItemData { Id = "2", Title = "Item 2" });
-            list.Add(new _EngineV1.DataContracts.WorkItemData { Id = "3", Title = "Item 3" });
-            list.Add(new _EngineV1.DataContracts.WorkItemData { Id = "4", Title = "Item 4" });
-            list.Add(new _EngineV1.DataContracts.WorkItemData { Id = "5", Title = "Item 5" });
+            list.Add(new WorkItemData { Id = "1", Title = "Item 1" });
+            list.Add(new WorkItemData { Id = "2", Title = "Item 2" });
+            list.Add(new WorkItemData { Id = "3", Title = "Item 3" });
+            list.Add(new WorkItemData { Id = "4", Title = "Item 4" });
+            list.Add(new WorkItemData { Id = "5", Title = "Item 5" });
         }
 
-        public IEnumerable<_EngineV1.DataContracts.WorkItemData> GetWorkItems(string query)
+        public IEnumerable<WorkItemData> GetWorkItems(string query)
         {
             throw new System.NotImplementedException();
         }
 
-        public string CreateReflectedWorkItemId(_EngineV1.DataContracts.WorkItemData wi)
+        public string CreateReflectedWorkItemId(WorkItemData wi)
         {
             throw new System.NotImplementedException();
         }
 
-        public _EngineV1.DataContracts.WorkItemData FindReflectedWorkItem(_EngineV1.DataContracts.WorkItemData workItem, bool cache)
+        public WorkItemData FindReflectedWorkItem(WorkItemData workItem, bool cache)
         {
             throw new System.NotImplementedException();
         }
 
-        public _EngineV1.DataContracts.WorkItemData FindReflectedWorkItemByMigrationRef(string refId)
+        public WorkItemData FindReflectedWorkItemByMigrationRef(string refId)
         {
             throw new System.NotImplementedException();
         }
 
-        public _EngineV1.DataContracts.WorkItemData FindReflectedWorkItemByReflectedWorkItemId(string refId)
+        public WorkItemData FindReflectedWorkItemByReflectedWorkItemId(string refId)
         {
             throw new System.NotImplementedException();
         }
 
-        public _EngineV1.DataContracts.WorkItemData FindReflectedWorkItemByReflectedWorkItemId(int refId, bool cache)
+        public WorkItemData FindReflectedWorkItemByReflectedWorkItemId(int refId, bool cache)
         {
             throw new System.NotImplementedException();
         }
 
-        public _EngineV1.DataContracts.WorkItemData FindReflectedWorkItemByReflectedWorkItemId(_EngineV1.DataContracts.WorkItemData refWi)
+        public WorkItemData FindReflectedWorkItemByReflectedWorkItemId(WorkItemData refWi)
         {
             throw new System.NotImplementedException();
         }
 
-        public _EngineV1.DataContracts.WorkItemData FindReflectedWorkItemByTitle(string title)
+        public WorkItemData FindReflectedWorkItemByTitle(string title)
         {
             throw new System.NotImplementedException();
         }
 
-        public int GetReflectedWorkItemId(_EngineV1.DataContracts.WorkItemData workItem)
+        public int GetReflectedWorkItemId(WorkItemData workItem)
         {
             throw new System.NotImplementedException();
         }
 
-        public _EngineV1.DataContracts.WorkItemData GetRevision(_EngineV1.DataContracts.WorkItemData workItem, int revision)
+        public WorkItemData GetRevision(WorkItemData workItem, int revision)
         {
             throw new System.NotImplementedException();
         }
@@ -111,47 +112,47 @@ namespace MigrationTools.Clients.Tests
             throw new System.NotImplementedException();
         }
 
-        public _EngineV1.DataContracts.WorkItemData GetWorkItem(string id)
+        public WorkItemData GetWorkItem(string id)
         {
             throw new System.NotImplementedException();
         }
 
-        List<_EngineV1.DataContracts.WorkItemData> IWorkItemMigrationClient.GetWorkItems(string query)
+        List<WorkItemData> IWorkItemMigrationClient.GetWorkItems(string query)
         {
             throw new System.NotImplementedException();
         }
 
-        public List<_EngineV1.DataContracts.WorkItemData> FilterWorkItemsThatAlreadyExist(List<_EngineV1.DataContracts.WorkItemData> sourceWorkItems, IWorkItemMigrationClient target)
+        public List<WorkItemData> FilterWorkItemsThatAlreadyExist(List<WorkItemData> sourceWorkItems, IWorkItemMigrationClient target)
         {
             throw new System.NotImplementedException();
         }
 
-        public _EngineV1.DataContracts.WorkItemData GetWorkItem(int id)
+        public WorkItemData GetWorkItem(int id)
         {
             throw new System.NotImplementedException();
         }
 
-        public List<_EngineV1.DataContracts.WorkItemData> GetWorkItems(IWorkItemQueryBuilder queryBuilder)
+        public List<WorkItemData> GetWorkItems(IWorkItemQueryBuilder queryBuilder)
         {
             throw new System.NotImplementedException();
         }
 
-        public _EngineV1.DataContracts.WorkItemData FindReflectedWorkItemByMigrationRef(ReflectedWorkItemId refId)
+        public WorkItemData FindReflectedWorkItemByMigrationRef(ReflectedWorkItemId refId)
         {
             throw new System.NotImplementedException();
         }
 
-        public _EngineV1.DataContracts.WorkItemData FindReflectedWorkItemByReflectedWorkItemId(ReflectedWorkItemId refId, bool cache)
+        public WorkItemData FindReflectedWorkItemByReflectedWorkItemId(ReflectedWorkItemId refId, bool cache)
         {
             throw new System.NotImplementedException();
         }
 
-        ReflectedWorkItemId IWorkItemMigrationClient.CreateReflectedWorkItemId(_EngineV1.DataContracts.WorkItemData workItem)
+        ReflectedWorkItemId IWorkItemMigrationClient.CreateReflectedWorkItemId(WorkItemData workItem)
         {
             throw new System.NotImplementedException();
         }
 
-        ReflectedWorkItemId IWorkItemMigrationClient.GetReflectedWorkItemId(_EngineV1.DataContracts.WorkItemData workItem)
+        ReflectedWorkItemId IWorkItemMigrationClient.GetReflectedWorkItemId(WorkItemData workItem)
         {
             throw new System.NotImplementedException();
         }

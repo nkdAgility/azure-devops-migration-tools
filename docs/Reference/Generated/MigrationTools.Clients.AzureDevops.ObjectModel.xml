@@ -4,10 +4,10 @@
         <name>MigrationTools.Clients.AzureDevops.ObjectModel</name>
     </assembly>
     <members>
-        <member name="M:MigrationTools.Enrichers.TfsEmbededImagesEnricher.FixEmbededImages(MigrationTools._EngineV1.DataContracts.WorkItemData,System.String,System.String,System.String)">
+        <member name="M:MigrationTools.Enrichers.TfsEmbededImagesEnricher.FixEmbededImages(MigrationTools.DataContracts.WorkItemData,System.String,System.String,System.String)">
             from https://gist.github.com/pietergheysens/792ed505f09557e77ddfc1b83531e4fb
         </member>
-        <member name="M:MigrationTools.Enrichers.TfsNodeStructureEnricher.ShouldCreateNode(Microsoft.TeamFoundation.Server.NodeInfo,System.String)">
+        <member name="M:MigrationTools.Enrichers.TfsNodeStructure.ShouldCreateNode(Microsoft.TeamFoundation.Server.NodeInfo,System.String)">
             <summary>
             Checks node-to-be-created with allowed BasePath's
             </summary>
