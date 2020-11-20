@@ -10,7 +10,7 @@ using Newtonsoft.Json.Converters;
 
 namespace MigrationTools.Enrichers.Pipelines
 {
-    public partial class Pipeline
+    public partial class BuildDefinition
     {
         [JsonProperty("options")]
         public Option[] Options { get; set; }

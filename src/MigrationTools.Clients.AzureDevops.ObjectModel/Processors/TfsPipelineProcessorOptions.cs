@@ -22,6 +22,12 @@ namespace MigrationTools.Processors
         public bool MigrateReleasePipelines { get; set; }
 
         /// <summary>
+        /// Migrate Task Groups
+        /// </summary>
+        /// <default>true</default>
+        public bool MigrateTaskGroups { get; set; }
+
+        /// <summary>
         /// List of Build Pipelines to process. If this is `null` then all Build Pipelines will be processed.
         /// </summary>
         public List<string> BuildPipelines { get; set; }
@@ -41,6 +47,7 @@ namespace MigrationTools.Processors
         {
             MigrateBuildPipelines = true;
             MigrateReleasePipelines = true;
+            MigrateTaskGroups = true;
             BuildPipelines = null;
             ReleasePipelines = null;
             var e1 = new TfsEndpointOptions();
