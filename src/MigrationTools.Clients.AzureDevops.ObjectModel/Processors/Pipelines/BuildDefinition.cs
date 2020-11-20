@@ -1,12 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Dynamic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace MigrationTools.Enrichers.Pipelines
 {
@@ -175,7 +169,6 @@ namespace MigrationTools.Enrichers.Pipelines
         public string WorkItemType { get; set; }
 
         [JsonProperty("assignToRequestor", NullValueHandling = NullValueHandling.Ignore)]
-
         public bool? AssignToRequestor { get; set; }
     }
 
@@ -245,7 +238,6 @@ namespace MigrationTools.Enrichers.Pipelines
     public partial class ProcessParameters
     {
     }
-
 
     public partial class Task
     {
@@ -355,7 +347,6 @@ namespace MigrationTools.Enrichers.Pipelines
         public string DefaultBranch { get; set; }
 
         [JsonProperty("clean")]
-
         public bool Clean { get; set; }
 
         [JsonProperty("checkoutSubmodules")]
@@ -365,34 +356,27 @@ namespace MigrationTools.Enrichers.Pipelines
     public partial class Properties
     {
         [JsonProperty("cleanOptions")]
-
         public string CleanOptions { get; set; }
 
         [JsonProperty("labelSources")]
-
         public string LabelSources { get; set; }
 
         [JsonProperty("labelSourcesFormat")]
         public string LabelSourcesFormat { get; set; }
 
         [JsonProperty("reportBuildStatus")]
-
         public bool ReportBuildStatus { get; set; }
 
         [JsonProperty("gitLfsSupport")]
-
         public bool GitLfsSupport { get; set; }
 
         [JsonProperty("skipSyncSource")]
-
         public bool SkipSyncSource { get; set; }
 
         [JsonProperty("checkoutNestedSubmodules")]
-
         public bool CheckoutNestedSubmodules { get; set; }
 
         [JsonProperty("fetchDepth")]
-
         public long FetchDepth { get; set; }
     }
 
@@ -456,4 +440,3 @@ namespace MigrationTools.Enrichers.Pipelines
         public bool AllowOverride { get; set; }
     }
 }
-

@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Microsoft.TeamFoundation.DistributedTask.Pipelines;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
 using MigrationTools.Enrichers.Pipelines;
@@ -15,7 +11,7 @@ using Newtonsoft.Json;
 
 namespace MigrationTools.Processors
 {
-    class TfsPipelineProcessor : Processor
+    internal class TfsPipelineProcessor : Processor
     {
         private TfsPipelineProcessorOptions _Options;
 
@@ -27,13 +23,12 @@ namespace MigrationTools.Processors
 
         public TfsEndpoint Target => (TfsEndpoint)Endpoints.Target;
 
-        List<BuildDefinition> sourceBuildDefinition = new List<BuildDefinition>();
-        List<BuildDefinition> targetBuildDefinition = new List<BuildDefinition>();
-        List<ReleaseDefinition> sourceReleaseDefinitions = new List<ReleaseDefinition>();
-        List<ReleaseDefinition> targetReleaseDefinitions = new List<ReleaseDefinition>();
-        List<TaskGroup> sourceTaskGroups = new List<TaskGroup>();
-        List<TaskGroup> targetTaskGroups = new List<TaskGroup>();
-
+        private List<BuildDefinition> sourceBuildDefinition = new List<BuildDefinition>();
+        private List<BuildDefinition> targetBuildDefinition = new List<BuildDefinition>();
+        private List<ReleaseDefinition> sourceReleaseDefinitions = new List<ReleaseDefinition>();
+        private List<ReleaseDefinition> targetReleaseDefinitions = new List<ReleaseDefinition>();
+        private List<TaskGroup> sourceTaskGroups = new List<TaskGroup>();
+        private List<TaskGroup> targetTaskGroups = new List<TaskGroup>();
 
         public override void Configure(IProcessorOptions options)
         {
@@ -119,7 +114,6 @@ namespace MigrationTools.Processors
 
         private void GetBuildDefinitions(string organisation, string project, string accessToken)
         {
-
             string baseUrl = organisation + "/" + project + "/_apis/build/definitions";
             string credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes(":" + accessToken));
 
@@ -133,7 +127,7 @@ namespace MigrationTools.Processors
 
                 foreach (BuildDefinition pipeline in pipelines.Value)
                 {
-                    //Nessecary because getting all Pipelines doesn't include all of their properties 
+                    //Nessecary because getting all Pipelines doesn't include all of their properties
                     string responseMessage = client.DownloadString(baseUrl + "/" + pipeline.Id);
 
                     BuildDefinition newPipeline = JsonConvert.DeserializeObject<BuildDefinition>(responseMessage);
@@ -165,7 +159,7 @@ namespace MigrationTools.Processors
 
                 foreach (ReleaseDefinition pipeline in pipelines.Value)
                 {
-                    //Nessecary because getting all Pipelines doesn't include all of their properties 
+                    //Nessecary because getting all Pipelines doesn't include all of their properties
                     string responseMessage = client.DownloadString(baseUrl + "/" + pipeline.Id);
 
                     ReleaseDefinition newPipeline = JsonConvert.DeserializeObject<ReleaseDefinition>(responseMessage);
@@ -178,6 +172,53 @@ namespace MigrationTools.Processors
                     {
                         targetReleaseDefinitions.Add(newPipeline);
                     }
+                }
+            }
+        }
+
+        private void CreateTaskGroups()
+        {
+            List<TaskGroup> taskGroupsToBeMigrated = new List<TaskGroup>();
+            Log.LogInformation("Fetching TaskGroups...");
+            GetTaskGroups(Source.Organisation, Source.Project, Source.AccessToken);
+            GetTaskGroups(Target.Organisation, Target.Project, Target.AccessToken);
+
+            //Filter out Pipelines that already exsit
+            foreach (TaskGroup sourceTaskGroup in sourceTaskGroups)
+            {
+                int exsits = 0;
+                foreach (TaskGroup targetTaskGroup in targetTaskGroups)
+                {
+                    if (targetTaskGroup.Name == sourceTaskGroup.Name)
+                    {
+                        exsits++;
+                    }
+                }
+                if (exsits == 0)
+                {
+                    taskGroupsToBeMigrated.Add(sourceTaskGroup);
+                }
+            }
+            Log.LogInformation("From {sourceTaskGroupss} source Task Groups {taskGroupsToBeMigrated} Task Groups are going to be migrated..", taskGroupsToBeMigrated.Count, taskGroupsToBeMigrated.Count);
+            string baseUrl = Target.Organisation + "/" + Target.Project + "/_apis/distributedtask/taskgroups?api-version=5.1-preview";
+            string credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes(":" + Target.AccessToken));
+
+            foreach (TaskGroup taskGroupToBeMigrated in taskGroupsToBeMigrated)
+            {
+                WebClient client = new WebClient();
+                client.Headers[HttpRequestHeader.Authorization] = "Basic " + credentials;
+                client.Headers[HttpRequestHeader.ContentType] = "application/json";
+                client.Headers.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
+
+                Log.LogInformation("Processing TaskGroup '{TaskGroup}'..", taskGroupToBeMigrated.Name);
+                string body = JsonConvert.SerializeObject(taskGroupToBeMigrated);
+                try
+                {
+                    client.UploadString(baseUrl, "POST", body);
+                }
+                catch
+                {
+                    Log.LogError("Error migrating TaskGroup '{TaskGroup}'. Please migrate it manually.", taskGroupToBeMigrated.Name);
                 }
             }
         }
@@ -236,7 +277,6 @@ namespace MigrationTools.Processors
                 {
                     Log.LogError("Error migrating Pipeling '{pipelineToBeMigrated}'. Please migrate it manually.", pipelineToBeMigrated.Name);
                 }
-
             }
         }
 
@@ -280,6 +320,7 @@ namespace MigrationTools.Processors
                 pipelineToBeMigrated.Url = null;
                 pipelineToBeMigrated.Links = null;
                 pipelineToBeMigrated.Id = 0;
+                pipelineToBeMigrated.VariableGroups = null;
 
                 Log.LogInformation("Processing Pipeline '{pipelineToBeMigrated}'..", pipelineToBeMigrated.Name);
                 string body = JsonConvert.SerializeObject(pipelineToBeMigrated);
@@ -291,54 +332,6 @@ namespace MigrationTools.Processors
                 {
                     Log.LogError("Error migrating Pipeling '{pipelineToBeMigrated}'. Please migrate it manually.", pipelineToBeMigrated.Name);
                 }
-
-            }
-        }
-        private void CreateTaskGroups()
-        {
-            List<TaskGroup> taskGroupsToBeMigrated = new List<TaskGroup>();
-            Log.LogInformation("Fetching TaskGroups...");
-            GetTaskGroups(Source.Organisation, Source.Project, Source.AccessToken);
-            GetTaskGroups(Target.Organisation, Target.Project, Target.AccessToken);
-
-            //Filter out Pipelines that already exsit
-            foreach (TaskGroup sourceTaskGroup in sourceTaskGroups)
-            {
-                int exsits = 0;
-                foreach (TaskGroup targetTaskGroup in targetTaskGroups)
-                {
-                    if (targetTaskGroup.Name == sourceTaskGroup.Name)
-                    {
-                        exsits++;
-                    }
-                }
-                if (exsits == 0)
-                {
-                    taskGroupsToBeMigrated.Add(sourceTaskGroup);
-                }
-            }
-            Log.LogInformation("From {sourceTaskGroupss} source Task Groups {taskGroupsToBeMigrated} Task Groups are going to be migrated..", taskGroupsToBeMigrated.Count, taskGroupsToBeMigrated.Count);
-            string baseUrl = Target.Organisation + "/" + Target.Project + "/_apis/distributedtask/taskgroups?api-version=5.1-preview";
-            string credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes(":" + Target.AccessToken));
-
-            foreach (TaskGroup taskGroupToBeMigrated in taskGroupsToBeMigrated)
-            {
-                WebClient client = new WebClient();
-                client.Headers[HttpRequestHeader.Authorization] = "Basic " + credentials;
-                client.Headers[HttpRequestHeader.ContentType] = "application/json";
-                client.Headers.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
-
-                Log.LogInformation("Processing TaskGroup '{TaskGroup}'..", taskGroupToBeMigrated.Name);
-                string body = JsonConvert.SerializeObject(taskGroupToBeMigrated);
-                try
-                {
-                    client.UploadString(baseUrl, "POST", body);
-                }
-                catch
-                {
-                    Log.LogError("Error migrating TaskGroup '{TaskGroup}'. Please migrate it manually.", taskGroupToBeMigrated.Name);
-                }
-
             }
         }
     }

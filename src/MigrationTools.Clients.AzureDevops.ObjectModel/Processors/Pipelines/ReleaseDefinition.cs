@@ -1,12 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Dynamic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace MigrationTools.Enrichers.Pipelines
 {
@@ -49,7 +43,7 @@ namespace MigrationTools.Enrichers.Pipelines
         public PipelineProcess PipelineProcess { get; set; }
 
         [JsonProperty("properties")]
-        public Properties Properties { get; set; }
+        public ExpandoObject Properties { get; set; }
 
         [JsonProperty("id")]
         public long Id { get; set; }
@@ -295,9 +289,6 @@ namespace MigrationTools.Enrichers.Pipelines
         [JsonProperty("artifactsDownloadInput")]
         public ArtifactsDownloadInput ArtifactsDownloadInput { get; set; }
 
-        [JsonProperty("queueId")]
-        public long QueueId { get; set; }
-
         [JsonProperty("demands")]
         public string[] Demands { get; set; }
 
@@ -367,6 +358,7 @@ namespace MigrationTools.Enrichers.Pipelines
         [JsonProperty("inputs")]
         public ExpandoObject Inputs { get; set; }
     }
+
     public partial class DeployStep
     {
         [JsonProperty("id")]
@@ -448,7 +440,7 @@ namespace MigrationTools.Enrichers.Pipelines
         public long Rank { get; set; }
 
         [JsonProperty("isAutomated")]
-        public bool IsAutomated { get; set; }
+        public bool IsAutomated { get; } = true;
 
         [JsonProperty("isNotificationOn")]
         public bool IsNotificationOn { get; set; }
@@ -602,4 +594,3 @@ namespace MigrationTools.Enrichers.Pipelines
         public static readonly FluffyParseStringConverter Singleton = new FluffyParseStringConverter();
     }
 }
-

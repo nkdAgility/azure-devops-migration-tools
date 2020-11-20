@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MigrationTools.Endpoints;
 
 namespace MigrationTools.Processors
 {
-    class TfsPipelineProcessorOptions : ProcessorOptions
+    internal class TfsPipelineProcessorOptions : ProcessorOptions
     {
         /// <summary>
         /// Migrate Build Pipelines
@@ -36,6 +33,7 @@ namespace MigrationTools.Processors
         /// List of Release Pipelines to process. If this is `null` then all Release Pipelines will be processed.
         /// </summary>
         public List<string> ReleasePipelines { get; set; }
+
         public override Type ToConfigure => typeof(TfsPipelineProcessor);
 
         public override IProcessorOptions GetDefault()
