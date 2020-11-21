@@ -4,7 +4,7 @@ using System.Globalization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace MigrationTools.Enrichers.Pipelines
+namespace MigrationTools.Processors.Pipelines
 {
     public partial class TaskGroup
     {

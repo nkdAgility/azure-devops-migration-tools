@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Net;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
-using MigrationTools.Enrichers.Pipelines;
+using MigrationTools.Processors.Pipelines;
 using Newtonsoft.Json;
 
 namespace MigrationTools.Processors
 {
-    internal class TfsPipelineProcessor : Processor
+    internal partial class TfsPipelineProcessor : Processor
     {
         private TfsPipelineProcessorOptions _Options;
 
@@ -22,13 +23,6 @@ namespace MigrationTools.Processors
         public TfsEndpoint Source => (TfsEndpoint)Endpoints.Source;
 
         public TfsEndpoint Target => (TfsEndpoint)Endpoints.Target;
-
-        private List<BuildDefinition> sourceBuildDefinition = new List<BuildDefinition>();
-        private List<BuildDefinition> targetBuildDefinition = new List<BuildDefinition>();
-        private List<ReleaseDefinition> sourceReleaseDefinitions = new List<ReleaseDefinition>();
-        private List<ReleaseDefinition> targetReleaseDefinitions = new List<ReleaseDefinition>();
-        private List<TaskGroup> sourceTaskGroups = new List<TaskGroup>();
-        private List<TaskGroup> targetTaskGroups = new List<TaskGroup>();
 
         public override void Configure(IProcessorOptions options)
         {
@@ -70,25 +64,36 @@ namespace MigrationTools.Processors
 
             if (_Options.MigrateTaskGroups)
             {
-                CreateTaskGroups();
+                createTaskGroups();
             }
             if (_Options.MigrateBuildPipelines)
             {
-                CreateBuildDefinitions();
+                createPipelineDefinitions(PipelineType.build);
             }
 
             if (_Options.MigrateReleasePipelines)
             {
-                CreateReleaseDefinitions();
+                createPipelineDefinitions(PipelineType.release);
             }
             stopwatch.Stop();
             Log.LogDebug("DONE in {Elapsed} ", stopwatch.Elapsed.ToString("c"));
         }
 
-        private void GetTaskGroups(string organisation, string project, string accessToken)
+        private WebClient getWebClient(string credentials)
+        {
+            WebClient client = new WebClient();
+            client.Headers[HttpRequestHeader.Authorization] = "Basic " + credentials;
+            client.Headers[HttpRequestHeader.ContentType] = "application/json";
+            client.Headers.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
+
+            return client;
+        }
+
+        private IList<TaskGroup> getTaskGroups(string organisation, string project, string accessToken)
         {
             string baseUrl = organisation + "/" + project + "/_apis/distributedtask/taskgroups";
             string credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes(":" + accessToken));
+            var taskGroups = new List<TaskGroup>();
 
             WebClient client = new WebClient();
             client.Headers[HttpRequestHeader.Authorization] = "Basic " + credentials;
@@ -96,26 +101,21 @@ namespace MigrationTools.Processors
 
             if (httpResponse != null)
             {
-                TaskGroups taskGroups = JsonConvert.DeserializeObject<TaskGroups>(httpResponse);
+                TaskGroups receivedTaskGroups = JsonConvert.DeserializeObject<TaskGroups>(httpResponse);
 
-                foreach (TaskGroup taskGroup in taskGroups.Value)
+                foreach (TaskGroup taskGroup in receivedTaskGroups.Value)
                 {
-                    if (organisation == Source.Organisation)
-                    {
-                        sourceTaskGroups.Add(taskGroup);
-                    }
-                    else
-                    {
-                        targetTaskGroups.Add(taskGroup);
-                    }
+                    taskGroups.Add(taskGroup);
                 }
             }
+            return taskGroups;
         }
 
-        private void GetBuildDefinitions(string organisation, string project, string accessToken)
+        private IList<ReleaseBuildDefinitionAbstract> getPipelineDefinitions(string organisation, string project, string accessToken, PipelineType pipelineType)
         {
-            string baseUrl = organisation + "/" + project + "/_apis/build/definitions";
+            string baseUrl = organisation + "/" + project + "/_apis/" + pipelineType.ToString() + "/definitions";
             string credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes(":" + accessToken));
+            var pipelineDefinitions = new List<ReleaseBuildDefinitionAbstract>();
 
             WebClient client = new WebClient();
             client.Headers[HttpRequestHeader.Authorization] = "Basic " + credentials;
@@ -123,92 +123,48 @@ namespace MigrationTools.Processors
 
             if (httpResponse != null)
             {
-                BuildDefinitions pipelines = JsonConvert.DeserializeObject<BuildDefinitions>(httpResponse);
-
-                foreach (BuildDefinition pipeline in pipelines.Value)
+                if (pipelineType == PipelineType.build)
                 {
-                    //Nessecary because getting all Pipelines doesn't include all of their properties
-                    string responseMessage = client.DownloadString(baseUrl + "/" + pipeline.Id);
+                    BuildDefinitions pipelines = JsonConvert.DeserializeObject<BuildDefinitions>(httpResponse);
 
-                    BuildDefinition newPipeline = JsonConvert.DeserializeObject<BuildDefinition>(responseMessage);
-
-                    if (organisation == Source.Organisation)
+                    foreach (BuildDefinition pipeline in pipelines.Value)
                     {
-                        sourceBuildDefinition.Add(newPipeline);
+                        //Nessecary because getting all Pipelines doesn't include all of their properties
+                        string responseMessage = client.DownloadString(baseUrl + "/" + pipeline.Id);
+                        pipelineDefinitions.Add(JsonConvert.DeserializeObject<BuildDefinition>(responseMessage));
                     }
-                    else
+                }
+                else
+                {
+                    ReleaseDefinitions pipelines = JsonConvert.DeserializeObject<ReleaseDefinitions>(httpResponse);
+
+                    foreach (ReleaseDefinition pipeline in pipelines.Value)
                     {
-                        targetBuildDefinition.Add(newPipeline);
+                        //Nessecary because getting all Pipelines doesn't include all of their properties
+                        string responseMessage = client.DownloadString(baseUrl + "/" + pipeline.Id);
+                        pipelineDefinitions.Add(JsonConvert.DeserializeObject<ReleaseDefinition>(responseMessage));
                     }
                 }
             }
+            return pipelineDefinitions;
         }
 
-        private void GetReleaseDefinitions(string organisation, string project, string accessToken)
+        private void createTaskGroups()
         {
-            string baseUrl = organisation + "/" + project + "/_apis/release/definitions";
-            string credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes(":" + accessToken));
-
-            WebClient client = new WebClient();
-            client.Headers[HttpRequestHeader.Authorization] = "Basic " + credentials;
-            string httpResponse = client.DownloadString(baseUrl);
-
-            if (httpResponse != null)
-            {
-                ReleaseDefinitions pipelines = JsonConvert.DeserializeObject<ReleaseDefinitions>(httpResponse);
-
-                foreach (ReleaseDefinition pipeline in pipelines.Value)
-                {
-                    //Nessecary because getting all Pipelines doesn't include all of their properties
-                    string responseMessage = client.DownloadString(baseUrl + "/" + pipeline.Id);
-
-                    ReleaseDefinition newPipeline = JsonConvert.DeserializeObject<ReleaseDefinition>(responseMessage);
-
-                    if (organisation == Source.Organisation)
-                    {
-                        sourceReleaseDefinitions.Add(newPipeline);
-                    }
-                    else
-                    {
-                        targetReleaseDefinitions.Add(newPipeline);
-                    }
-                }
-            }
-        }
-
-        private void CreateTaskGroups()
-        {
-            List<TaskGroup> taskGroupsToBeMigrated = new List<TaskGroup>();
             Log.LogInformation("Fetching TaskGroups...");
-            GetTaskGroups(Source.Organisation, Source.Project, Source.AccessToken);
-            GetTaskGroups(Target.Organisation, Target.Project, Target.AccessToken);
+            var sourceTaskGroups = getTaskGroups(Source.Organisation, Source.Project, Source.AccessToken);
+            var targetTaskGroups = getTaskGroups(Target.Organisation, Target.Project, Target.AccessToken);
 
             //Filter out Pipelines that already exsit
-            foreach (TaskGroup sourceTaskGroup in sourceTaskGroups)
-            {
-                int exsits = 0;
-                foreach (TaskGroup targetTaskGroup in targetTaskGroups)
-                {
-                    if (targetTaskGroup.Name == sourceTaskGroup.Name)
-                    {
-                        exsits++;
-                    }
-                }
-                if (exsits == 0)
-                {
-                    taskGroupsToBeMigrated.Add(sourceTaskGroup);
-                }
-            }
-            Log.LogInformation("From {sourceTaskGroupss} source Task Groups {taskGroupsToBeMigrated} Task Groups are going to be migrated..", taskGroupsToBeMigrated.Count, taskGroupsToBeMigrated.Count);
+            var taskGroupsToBeMigrated = sourceTaskGroups.Where(s => !targetTaskGroups.Any(t => t.Name == s.Name));
+
+            Log.LogInformation("From {sourceTaskGroupss} source Task Groups {taskGroupsToBeMigrated} Task Groups are going to be migrated..", sourceTaskGroups.Count, taskGroupsToBeMigrated.Count());
             string baseUrl = Target.Organisation + "/" + Target.Project + "/_apis/distributedtask/taskgroups?api-version=5.1-preview";
             string credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes(":" + Target.AccessToken));
 
             foreach (TaskGroup taskGroupToBeMigrated in taskGroupsToBeMigrated)
             {
-                WebClient client = new WebClient();
-                client.Headers[HttpRequestHeader.Authorization] = "Basic " + credentials;
-                client.Headers[HttpRequestHeader.ContentType] = "application/json";
-                client.Headers.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
+                WebClient client = getWebClient(credentials);
 
                 Log.LogInformation("Processing TaskGroup '{TaskGroup}'..", taskGroupToBeMigrated.Name);
                 string body = JsonConvert.SerializeObject(taskGroupToBeMigrated);
@@ -223,114 +179,75 @@ namespace MigrationTools.Processors
             }
         }
 
-        private void CreateBuildDefinitions()
+        private void createPipelineDefinitions(PipelineType pipelineType)
         {
-            List<BuildDefinition> pipelinesToBeMigrated = new List<BuildDefinition>();
-            Log.LogInformation("Fetching Build Pipelines...");
-            GetBuildDefinitions(Source.Organisation, Source.Project, Source.AccessToken);
-            GetBuildDefinitions(Target.Organisation, Target.Project, Target.AccessToken);
+            Log.LogInformation("Fetching Pipelines...");
+            var sourceDefinitions = getPipelineDefinitions(Source.Organisation, Source.Project, Source.AccessToken, pipelineType);
+            var targetDefinitions = getPipelineDefinitions(Target.Organisation, Target.Project, Target.AccessToken, pipelineType);
 
-            //Filter out Pipelines that already exsit
-            foreach (BuildDefinition sourcePipeline in sourceBuildDefinition)
-            {
-                int exsits = 0;
-                foreach (BuildDefinition targetPipeline in targetBuildDefinition)
-                {
-                    if (targetPipeline.Name == sourcePipeline.Name)
-                    {
-                        exsits++;
-                    }
-                }
-                if (exsits == 0)
-                {
-                    pipelinesToBeMigrated.Add(sourcePipeline);
-                }
-            }
-            Log.LogInformation("From {sourcePipelines} source Pipelines {pipelinesToBeMigrated} Pipelines are going to be migrated..", sourceBuildDefinition.Count, pipelinesToBeMigrated.Count);
+            //Filter out Pipelines that already exist
+            var pipelinesToBeMigrated = sourceDefinitions.Where(s => !targetDefinitions.Any(t => t.Name == s.Name));
+
+            Log.LogInformation($"From {sourceDefinitions.Count} source {pipelineType} Pipelines {pipelinesToBeMigrated.Count()} Pipelines are going to be migrated..");
             string baseUrl = Target.Organisation + "/" + Target.Project + "/_apis/build/definitions?api-version=5.1-preview";
             string credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes(":" + Target.AccessToken));
 
-            foreach (BuildDefinition pipelineToBeMigrated in pipelinesToBeMigrated)
+            if (pipelineType == PipelineType.build)
             {
-                WebClient client = new WebClient();
-                client.Headers[HttpRequestHeader.Authorization] = "Basic " + credentials;
-                client.Headers[HttpRequestHeader.ContentType] = "application/json";
-                client.Headers.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
-
-                pipelineToBeMigrated.Links = null;
-                pipelineToBeMigrated.AuthoredBy = null;
-                pipelineToBeMigrated.Queue = null;
-                pipelineToBeMigrated.Url = null;
-                pipelineToBeMigrated.Uri = null;
-                pipelineToBeMigrated.Revision = 0;
-                pipelineToBeMigrated.Id = 0;
-                pipelineToBeMigrated.Project = null;
-                pipelineToBeMigrated.Repository.Id = null;
-
-                Log.LogInformation("Processing Pipeline '{pipelineToBeMigrated}'..", pipelineToBeMigrated.Name);
-                string body = JsonConvert.SerializeObject(pipelineToBeMigrated);
-                try
+                foreach (BuildDefinition pipelineToBeMigrated in pipelinesToBeMigrated)
                 {
-                    client.UploadString(baseUrl, "POST", body);
-                }
-                catch
-                {
-                    Log.LogError("Error migrating Pipeling '{pipelineToBeMigrated}'. Please migrate it manually.", pipelineToBeMigrated.Name);
-                }
-            }
-        }
+                    var client = getWebClient(credentials);
 
-        private void CreateReleaseDefinitions()
-        {
-            List<ReleaseDefinition> pipelinesToBeMigrated = new List<ReleaseDefinition>();
-            Log.LogInformation("Fetching Release Pipelines...");
-            GetReleaseDefinitions(Source.Organisation, Source.Project, Source.AccessToken);
-            GetReleaseDefinitions(Target.Organisation, Target.Project, Target.AccessToken);
+                    pipelineToBeMigrated.Links = null;
+                    pipelineToBeMigrated.AuthoredBy = null;
+                    pipelineToBeMigrated.Queue = null;
+                    pipelineToBeMigrated.Url = null;
+                    pipelineToBeMigrated.Uri = null;
+                    pipelineToBeMigrated.Revision = 0;
+                    pipelineToBeMigrated.Id = 0;
+                    pipelineToBeMigrated.Project = null;
+                    pipelineToBeMigrated.Repository.Id = null;
 
-            //Filter out Pipelines that already exsit
-            foreach (ReleaseDefinition sourcePipeline in sourceReleaseDefinitions)
-            {
-                int exsits = 0;
-                foreach (ReleaseDefinition targetPipeline in targetReleaseDefinitions)
-                {
-                    if (targetPipeline.Name == sourcePipeline.Name)
+                    Log.LogInformation("Processing Pipeline '{pipelineToBeMigrated}'..", pipelineToBeMigrated.Name);
+                    string body = JsonConvert.SerializeObject(pipelineToBeMigrated);
+                    try
                     {
-                        exsits++;
+                        client.UploadString(baseUrl, "POST", body);
+                    }
+                    catch
+                    {
+                        Log.LogError("Error migrating Pipeling '{pipelineToBeMigrated}'. Please migrate it manually.", pipelineToBeMigrated.Name);
                     }
                 }
-                if (exsits == 0)
-                {
-                    pipelinesToBeMigrated.Add(sourcePipeline);
-                }
             }
-            Log.LogInformation("From {sourcePipelines} source Pipelines {pipelinesToBeMigrated} Pipelines are going to be migrated..", sourceReleaseDefinitions.Count, pipelinesToBeMigrated.Count);
-            string baseUrl = Target.Organisation + "/" + Target.Project + "/_apis/release/definitions?api-version=5.1-preview";
-            string credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes(":" + Target.AccessToken));
 
-            foreach (ReleaseDefinition pipelineToBeMigrated in pipelinesToBeMigrated)
+            if (pipelineType == PipelineType.release)
             {
-                WebClient client = new WebClient();
-                client.Headers[HttpRequestHeader.Authorization] = "Basic " + credentials;
-                client.Headers[HttpRequestHeader.ContentType] = "application/json";
-                client.Headers.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
-
-                pipelineToBeMigrated.Links = null;
-                pipelineToBeMigrated.Revision = 0;
-                pipelineToBeMigrated.Artifacts = null;
-                pipelineToBeMigrated.Url = null;
-                pipelineToBeMigrated.Links = null;
-                pipelineToBeMigrated.Id = 0;
-                pipelineToBeMigrated.VariableGroups = null;
-
-                Log.LogInformation("Processing Pipeline '{pipelineToBeMigrated}'..", pipelineToBeMigrated.Name);
-                string body = JsonConvert.SerializeObject(pipelineToBeMigrated);
-                try
+                foreach (ReleaseDefinition pipelineToBeMigrated in pipelinesToBeMigrated)
                 {
-                    client.UploadString(baseUrl, "POST", body);
-                }
-                catch
-                {
-                    Log.LogError("Error migrating Pipeling '{pipelineToBeMigrated}'. Please migrate it manually.", pipelineToBeMigrated.Name);
+                    WebClient client = new WebClient();
+                    client.Headers[HttpRequestHeader.Authorization] = "Basic " + credentials;
+                    client.Headers[HttpRequestHeader.ContentType] = "application/json";
+                    client.Headers.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
+
+                    pipelineToBeMigrated.Links = null;
+                    pipelineToBeMigrated.Revision = 0;
+                    pipelineToBeMigrated.Artifacts = null;
+                    pipelineToBeMigrated.Url = null;
+                    pipelineToBeMigrated.Links = null;
+                    pipelineToBeMigrated.Id = 0;
+                    pipelineToBeMigrated.VariableGroups = null;
+
+                    Log.LogInformation("Processing Pipeline '{pipelineToBeMigrated}'..", pipelineToBeMigrated.Name);
+                    string body = JsonConvert.SerializeObject(pipelineToBeMigrated);
+                    try
+                    {
+                        client.UploadString(baseUrl, "POST", body);
+                    }
+                    catch
+                    {
+                        Log.LogError("Error migrating Pipeling '{pipelineToBeMigrated}'. Please migrate it manually.", pipelineToBeMigrated.Name);
+                    }
                 }
             }
         }

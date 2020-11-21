@@ -2,9 +2,9 @@
 using System.Dynamic;
 using Newtonsoft.Json;
 
-namespace MigrationTools.Enrichers.Pipelines
+namespace MigrationTools.Processors.Pipelines
 {
-    public partial class ReleaseDefinition
+    public partial class ReleaseDefinition : ReleaseBuildDefinitionAbstract
     {
         [JsonProperty("source")]
         public string Source { get; set; }
@@ -47,9 +47,6 @@ namespace MigrationTools.Enrichers.Pipelines
 
         [JsonProperty("id")]
         public long Id { get; set; }
-
-        [JsonProperty("name")]
-        public string Name { get; set; }
 
         [JsonProperty("path")]
         public string Path { get; set; }

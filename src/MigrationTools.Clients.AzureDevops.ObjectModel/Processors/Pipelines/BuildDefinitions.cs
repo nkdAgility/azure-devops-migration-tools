@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace MigrationTools.Enrichers.Pipelines
+namespace MigrationTools.Processors.Pipelines
 {
     public partial class BuildDefinitions
     {

@@ -2,9 +2,9 @@
 using System.Dynamic;
 using Newtonsoft.Json;
 
-namespace MigrationTools.Enrichers.Pipelines
+namespace MigrationTools.Processors.Pipelines
 {
-    public partial class BuildDefinition
+    public partial class BuildDefinition : ReleaseBuildDefinitionAbstract
     {
         [JsonProperty("options")]
         public Option[] Options { get; set; }
@@ -59,9 +59,6 @@ namespace MigrationTools.Enrichers.Pipelines
 
         [JsonProperty("id")]
         public long Id { get; set; }
-
-        [JsonProperty("name")]
-        public string Name { get; set; }
 
         [JsonProperty("url")]
         public Uri Url { get; set; }
