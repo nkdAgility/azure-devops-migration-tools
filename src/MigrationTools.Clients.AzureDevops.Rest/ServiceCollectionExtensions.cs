@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using MigrationTools.Processors;
 
 namespace MigrationTools
 {
@@ -6,7 +7,8 @@ namespace MigrationTools
     {
         public static void AddMigrationToolServicesForClientAzureDevopsRest(this IServiceCollection context)
         {
-            //
+            //TfsPipelines
+            context.AddTransient<TfsPipelineProcessor>();
         }
     }
 }

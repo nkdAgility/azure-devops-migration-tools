@@ -5,9 +5,10 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using Microsoft.Extensions.Logging;
+using MigrationTools.DataContracts.Pipelines;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
-using MigrationTools.Processors.Pipelines;
+using MigrationTools.Processors;
 using Newtonsoft.Json;
 
 namespace MigrationTools.Processors

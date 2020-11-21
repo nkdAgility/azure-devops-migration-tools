@@ -4,5 +4,33 @@
         <name>MigrationTools.Clients.AzureDevops.Rest</name>
     </assembly>
     <members>
+        <member name="P:MigrationTools.Processors.TfsPipelineProcessorOptions.MigrateBuildPipelines">
+            <summary>
+            Migrate Build Pipelines
+            </summary>
+            <default>true</default>
+        </member>
+        <member name="P:MigrationTools.Processors.TfsPipelineProcessorOptions.MigrateReleasePipelines">
+            <summary>
+            Migrate Release Pipelines
+            </summary>
+            <default>true</default>
+        </member>
+        <member name="P:MigrationTools.Processors.TfsPipelineProcessorOptions.MigrateTaskGroups">
+            <summary>
+            Migrate Task Groups
+            </summary>
+            <default>true</default>
+        </member>
+        <member name="P:MigrationTools.Processors.TfsPipelineProcessorOptions.BuildPipelines">
+            <summary>
+            List of Build Pipelines to process. If this is `null` then all Build Pipelines will be processed.
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Processors.TfsPipelineProcessorOptions.ReleasePipelines">
+            <summary>
+            List of Release Pipelines to process. If this is `null` then all Release Pipelines will be processed.
+            </summary>
+        </member>
     </members>
 </doc>

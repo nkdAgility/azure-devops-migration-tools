@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
-namespace MigrationTools.Processors.Pipelines
+namespace MigrationTools.Clients.AzureDevops.Rest.Processors.Pipelines
 {
     public abstract class ReleaseBuildDefinitionAbstract
     {
