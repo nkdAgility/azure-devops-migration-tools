@@ -75,10 +75,6 @@ namespace MigrationTools
                 var builder = sp.GetRequiredService<IEngineConfigurationBuilder>();
                 var logger = sp.GetServices<ILoggerFactory>().First().CreateLogger<EngineConfiguration>();
 
-                if (executeOptions.ConfigFile == string.Empty)
-                {
-                    executeOptions.ConfigFile = "configuration.json";
-                }
                 if (!File.Exists(executeOptions.ConfigFile))
                 {
                     logger.LogInformation("The config file {ConfigFile} does not exist, nor does the default 'configuration.json'. Use '{ExecutableName}.exe init' to create a configuration file first", executeOptions.ConfigFile, Assembly.GetEntryAssembly().GetName().Name);

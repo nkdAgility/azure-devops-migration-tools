@@ -11,6 +11,7 @@ using MigrationTools.CommandLine;
 
 using MigrationTools.Host.CustomDiagnostics;
 using MigrationTools.Host.Services;
+using MigrationTools.Options;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
@@ -43,6 +44,8 @@ namespace MigrationTools.Host
              })
              .ConfigureServices((context, services) =>
              {
+                 services.AddOptions();
+
                  Parser.Default.ParseArguments<InitOptions, ExecuteOptions>(args)
                      .WithParsed<InitOptions>(opts =>
                      {
@@ -52,6 +55,21 @@ namespace MigrationTools.Host
                      .WithParsed<ExecuteOptions>(opts =>
                      {
                          services.AddSingleton(opts);
+                         services.Configure<NetworkCredentialsOptions>(cred =>
+                                         {
+                                             cred.Source = new Credentials
+                                                         {
+                                                             Domain = opts.SourceDomain,
+                                                             UserName = opts.SourceUserName,
+                                                             Password = opts.SourcePassword
+                                                         };
+                                             cred.Target = new Credentials
+                                             {
+                                                 Domain = opts.TargetDomain,
+                                                 UserName = opts.TargetUserName,
+                                                 Password = opts.TargetPassword
+                                             };
+                                         });
                          services.AddSingleton<InitOptions>((p) => null);
                      })
                      .WithNotParsed(error =>
@@ -59,7 +77,7 @@ namespace MigrationTools.Host
                          services.AddSingleton<InitOptions>((p) => null);
                          services.AddSingleton<ExecuteOptions>((p) => null);
                      });
-                 services.AddOptions();
+
                  // Sieralog
                  services.AddSingleton<LoggingLevelSwitch>(levelSwitch);
                  // Application Insights

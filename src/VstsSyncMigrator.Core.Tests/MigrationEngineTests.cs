@@ -37,8 +37,6 @@ namespace _VstsSyncMigrator.Engine.Tests
 
             services.AddSingleton<IMigrationEngine, MigrationEngine>();
 
-            services.AddSingleton<ExecuteOptions>((p) => null);
-
             _services = services.BuildServiceProvider();
         }
 
