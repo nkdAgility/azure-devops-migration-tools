@@ -6,7 +6,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MigrationTools.CommandLine;
 
-namespace MigrationTools
+namespace MigrationTools.Host
 {
     public class ExecuteHostedService : IHostedService
     {

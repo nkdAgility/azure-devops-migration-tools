@@ -9,7 +9,7 @@ using MigrationTools._EngineV1.Configuration;
 using MigrationTools.CommandLine;
 using MigrationTools.Helpers;
 
-namespace MigrationTools
+namespace MigrationTools.Host
 {
     public class InitHostedService : IHostedService
     {
