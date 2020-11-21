@@ -1,7 +1,7 @@
 ﻿using System;
 using CommandLine;
 
-namespace MigrationTools.Host.CommandLine
+namespace VstsSyncMigrator.Core.CommandLine
 {
     public class OptionsBase
     {

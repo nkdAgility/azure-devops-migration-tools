@@ -9,8 +9,7 @@ using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.Framework.Client;
 using Microsoft.TeamFoundation.Framework.Common;
 using MigrationTools;
-using MigrationTools._EngineV1.CommandLine;
-using MigrationTools.Host.CommandLine;
+using VstsSyncMigrator.Core.CommandLine;
 
 namespace VstsSyncMigrator.Commands
 {

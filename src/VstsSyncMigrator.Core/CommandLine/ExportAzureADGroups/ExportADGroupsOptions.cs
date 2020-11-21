@@ -1,7 +1,6 @@
 ﻿using CommandLine;
-using MigrationTools.Host.CommandLine;
 
-namespace MigrationTools._EngineV1.CommandLine
+namespace VstsSyncMigrator.Core.CommandLine
 {
     [Verb("exportADGroups", HelpText = "Iterates through a collection and lists all AD groups assigned but that have not been synced to AzureAD.")]
     public class ExportADGroupsOptions : OptionsBase

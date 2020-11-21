@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace MigrationTools.Host.CommandLine
+namespace VstsSyncMigrator.Commands
 {
     public class CommandBase
     {

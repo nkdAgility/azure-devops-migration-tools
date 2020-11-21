@@ -1,4 +1,4 @@
-﻿namespace MigrationTools._EngineV1.CommandLine
+﻿namespace VstsSyncMigrator.Core.CommandLine
 {
     public class AzureAdGroupItem
     {
