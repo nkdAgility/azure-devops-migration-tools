@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using CommandLine;
@@ -7,8 +8,9 @@ using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.WorkerService;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using MigrationTools.CommandLine;
-
+using Microsoft.Extensions.Logging;
+using MigrationTools._EngineV1.Configuration;
+using MigrationTools.Host.CommandLine;
 using MigrationTools.Host.CustomDiagnostics;
 using MigrationTools.Host.Services;
 using MigrationTools.Options;
@@ -64,11 +66,11 @@ namespace MigrationTools.Host
                                                              Password = opts.SourcePassword
                                                          };
                                              cred.Target = new Credentials
-                                             {
-                                                 Domain = opts.TargetDomain,
-                                                 UserName = opts.TargetUserName,
-                                                 Password = opts.TargetPassword
-                                             };
+                                                         {
+                                                             Domain = opts.TargetDomain,
+                                                             UserName = opts.TargetUserName,
+                                                             Password = opts.TargetPassword
+                                                         };
                                          });
                          services.AddSingleton<InitOptions>((p) => null);
                      })
@@ -86,6 +88,23 @@ namespace MigrationTools.Host
                  // Services
                  services.AddTransient<IDetectOnlineService, DetectOnlineService>();
                  services.AddTransient<IDetectVersionService, DetectVersionService>();
+
+                 // Config
+                 services.AddSingleton<IEngineConfigurationBuilder, EngineConfigurationBuilder>();
+                 services.AddSingleton<EngineConfiguration>(sp =>
+                 {
+                     var executeOptions = sp.GetRequiredService<ExecuteOptions>();
+                     var builder = sp.GetRequiredService<IEngineConfigurationBuilder>();
+                     var logger = sp.GetServices<ILoggerFactory>().First().CreateLogger<EngineConfiguration>();
+
+                     if (!File.Exists(executeOptions.ConfigFile))
+                     {
+                         logger.LogInformation("The config file {ConfigFile} does not exist, nor does the default 'configuration.json'. Use '{ExecutableName}.exe init' to create a configuration file first", executeOptions.ConfigFile, Assembly.GetEntryAssembly().GetName().Name);
+                         throw new ArgumentException("missing configfile");
+                     }
+                     logger.LogInformation("Config Found, creating engine host");
+                     return builder.BuildFromFile(executeOptions.ConfigFile);
+                 });
 
                  /// Add Old v1Bits
                  services.AddMigrationToolServicesLegacy();

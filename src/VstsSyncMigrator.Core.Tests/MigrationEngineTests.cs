@@ -7,7 +7,6 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools;
 using MigrationTools._EngineV1.Configuration;
-using MigrationTools.CommandLine;
 using Serilog;
 
 namespace _VstsSyncMigrator.Engine.Tests

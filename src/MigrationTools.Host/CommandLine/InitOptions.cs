@@ -1,6 +1,6 @@
 ﻿using CommandLine;
 
-namespace MigrationTools.CommandLine
+namespace MigrationTools.Host.CommandLine
 {
     [Verb("init", HelpText = "Creates initial config file")]
     public class InitOptions

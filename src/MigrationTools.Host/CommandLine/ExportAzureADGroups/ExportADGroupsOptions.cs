@@ -1,5 +1,5 @@
 ﻿using CommandLine;
-using MigrationTools.CommandLine;
+using MigrationTools.Host.CommandLine;
 
 namespace MigrationTools._EngineV1.CommandLine
 {

@@ -1,7 +1,7 @@
 ﻿using System;
 using CommandLine;
 
-namespace MigrationTools.CommandLine
+namespace MigrationTools.Host.CommandLine
 {
     public class OptionsBase
     {

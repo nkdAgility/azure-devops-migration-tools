@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace MigrationTools.CommandLine
+namespace MigrationTools.Host.CommandLine
 {
     public class CommandBase
     {

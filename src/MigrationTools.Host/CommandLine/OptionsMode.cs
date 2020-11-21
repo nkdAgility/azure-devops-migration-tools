@@ -1,4 +1,4 @@
-﻿namespace MigrationTools.CommandLine
+﻿namespace MigrationTools.Host.CommandLine
 {
     public enum OptionsMode
     {
