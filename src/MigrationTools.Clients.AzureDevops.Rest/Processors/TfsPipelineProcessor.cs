@@ -8,7 +8,6 @@ using Microsoft.Extensions.Logging;
 using MigrationTools.DataContracts.Pipelines;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
-using MigrationTools.Processors;
 using Newtonsoft.Json;
 
 namespace MigrationTools.Processors
@@ -21,9 +20,9 @@ namespace MigrationTools.Processors
         {
         }
 
-        public TfsEndpoint Source => (TfsEndpoint)Endpoints.Source;
+        public AzureDevOpsEndpoint Source => (AzureDevOpsEndpoint)Endpoints.Source;
 
-        public TfsEndpoint Target => (TfsEndpoint)Endpoints.Target;
+        public AzureDevOpsEndpoint Target => (AzureDevOpsEndpoint)Endpoints.Target;
 
         public override void Configure(IProcessorOptions options)
         {
