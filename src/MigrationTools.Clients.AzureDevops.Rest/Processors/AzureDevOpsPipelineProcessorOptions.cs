@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using MigrationTools.Endpoints;
-using MigrationTools.Processors;
 
 namespace MigrationTools.Processors
 {
-    internal class TfsPipelineProcessorOptions : ProcessorOptions
+    internal class AzureDevOpsPipelineProcessorOptions : ProcessorOptions
     {
         /// <summary>
         /// Migrate Build Pipelines
@@ -35,7 +34,7 @@ namespace MigrationTools.Processors
         /// </summary>
         public List<string> ReleasePipelines { get; set; }
 
-        public override Type ToConfigure => typeof(TfsPipelineProcessor);
+        public override Type ToConfigure => typeof(AzureDevOpsPipelineProcessor);
 
         public override IProcessorOptions GetDefault()
         {

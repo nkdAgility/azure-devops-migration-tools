@@ -12,11 +12,11 @@ using Newtonsoft.Json;
 
 namespace MigrationTools.Processors
 {
-    internal partial class TfsPipelineProcessor : Processor
+    internal partial class AzureDevOpsPipelineProcessor : Processor
     {
-        private TfsPipelineProcessorOptions _Options;
+        private AzureDevOpsPipelineProcessorOptions _Options;
 
-        public TfsPipelineProcessor(ProcessorEnricherContainer processorEnrichers, EndpointContainer endpoints, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(processorEnrichers, endpoints, services, telemetry, logger)
+        public AzureDevOpsPipelineProcessor(ProcessorEnricherContainer processorEnrichers, EndpointContainer endpoints, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(processorEnrichers, endpoints, services, telemetry, logger)
         {
         }
 
@@ -28,7 +28,7 @@ namespace MigrationTools.Processors
         {
             base.Configure(options);
             Log.LogInformation("TfsTeamSettingsProcessor::Configure");
-            _Options = (TfsPipelineProcessorOptions)options;
+            _Options = (AzureDevOpsPipelineProcessorOptions)options;
         }
 
         protected override void InternalExecute()
