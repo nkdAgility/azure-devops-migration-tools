@@ -10,7 +10,9 @@ namespace MigrationTools.DataContracts.Pipelines
         public BuildDefinition[] Value { get; set; }
     }
 
-    public partial class BuildDefinition : PipelineDefinition
+    [ApiPath("build/definitions")]
+    [ApiName("Build Piplines")]
+    public partial class BuildDefinition : RestApiDefinition
     {
         public Option[] Options { get; set; }
 
@@ -46,8 +48,6 @@ namespace MigrationTools.DataContracts.Pipelines
 
         public Queue Queue { get; set; }
 
-        public long Id { get; set; }
-
         public Uri Url { get; set; }
 
         public string Uri { get; set; }
@@ -63,6 +63,22 @@ namespace MigrationTools.DataContracts.Pipelines
         public DateTimeOffset CreatedDate { get; set; }
 
         public Project Project { get; set; }
+
+        ///<inheritdoc/>
+        public override RestApiDefinition GetMigrationObject()
+        {
+            Links = null;
+            AuthoredBy = null;
+            Queue = null;
+            Url = null;
+            Uri = null;
+            Revision = 0;
+            Id = null;
+            Project = null;
+            Repository.Id = null;
+            Variables = null;
+            return this;
+        }
     }
 
     public partial class AuthoredBy

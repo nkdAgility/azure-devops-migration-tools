@@ -67,16 +67,16 @@ namespace MigrationTools.Processors
 
             if (_Options.MigrateTaskGroups)
             {
-                createTaskGroups();
+                createApiDefinitions<TaskGroup>();
             }
             if (_Options.MigrateBuildPipelines)
             {
-                createPipelineDefinitions(PipelineType.build);
+                createApiDefinitions<BuildDefinition>();
             }
 
             if (_Options.MigrateReleasePipelines)
             {
-                createPipelineDefinitions(PipelineType.release);
+                createApiDefinitions<ReleaseDefinition>();
             }
             stopwatch.Stop();
             Log.LogDebug("DONE in {Elapsed} ", stopwatch.Elapsed.ToString("c"));
@@ -92,30 +92,15 @@ namespace MigrationTools.Processors
             return client;
         }
 
-        private IList<TaskGroup> getTaskGroups(string organisation, string project, string accessToken)
+        private IList<DefinitionType> getApiDefinitions<DefinitionType>(string organisation, string project, string accessToken) where DefinitionType : RestApiDefinition, new()
         {
-            string baseUrl = $"{organisation}/{project}/_apis/distributedtask/taskgroups";
-            var taskGroups = new List<TaskGroup>();
-
-            HttpClient client = getHttpClient(accessToken);
-            string httpResponse = client.GetStringAsync(baseUrl).Result;
-
-            if (httpResponse != null)
+            var apiPathAttribute = typeof(DefinitionType).GetCustomAttributes(typeof(ApiPathAttribute), false).OfType<ApiPathAttribute>().FirstOrDefault();
+            if (apiPathAttribute == null)
             {
-                TaskGroups receivedTaskGroups = JsonConvert.DeserializeObject<TaskGroups>(httpResponse);
-
-                foreach (TaskGroup taskGroup in receivedTaskGroups.Value)
-                {
-                    taskGroups.Add(taskGroup);
-                }
+                throw new ArgumentNullException($"On the class defintion of '{typeof(DefinitionType).Name}' is the attribute 'ApiName' misssing. Please add the 'ApiName' Attribute to your class");
             }
-            return taskGroups;
-        }
-
-        private IList<PipelineDefinition> getPipelineDefinitions(string organisation, string project, string accessToken, PipelineType pipelineType)
-        {
-            string baseUrl = $"{organisation}/{project}/_apis/{pipelineType}/definitions";
-            var pipelineDefinitions = new List<PipelineDefinition>();
+            string baseUrl = $"{organisation}/{project}/_apis/{apiPathAttribute.Path}";
+            var initialDefinitions = new List<DefinitionType>();
 
             HttpClient client = getHttpClient(accessToken);
 
@@ -123,126 +108,50 @@ namespace MigrationTools.Processors
 
             if (httpResponse != null)
             {
-                if (pipelineType == PipelineType.build)
-                {
-                    BuildDefinitions pipelines = JsonConvert.DeserializeObject<BuildDefinitions>(httpResponse);
+                var definitions = JsonConvert.DeserializeObject<RestResultDefinition<DefinitionType>>(httpResponse);
 
-                    foreach (BuildDefinition pipeline in pipelines.Value)
-                    {
-                        //Nessecary because getting all Pipelines doesn't include all of their properties
-                        string responseMessage = client.GetStringAsync(baseUrl + "/" + pipeline.Id).Result;
-                        pipelineDefinitions.Add(JsonConvert.DeserializeObject<BuildDefinition>(responseMessage));
-                    }
-                }
-                else
+                foreach (RestApiDefinition definition in definitions.Value)
                 {
-                    ReleaseDefinitions pipelines = JsonConvert.DeserializeObject<ReleaseDefinitions>(httpResponse);
-
-                    foreach (ReleaseDefinition pipeline in pipelines.Value)
-                    {
-                        //Nessecary because getting all Pipelines doesn't include all of their properties
-                        string responseMessage = client.GetStringAsync(baseUrl + "/" + pipeline.Id).Result;
-                        pipelineDefinitions.Add(JsonConvert.DeserializeObject<ReleaseDefinition>(responseMessage));
-                    }
+                    //Nessecary because getting all Pipelines doesn't include all of their properties
+                    string responseMessage = client.GetStringAsync(baseUrl + "/" + definition.Id).Result;
+                    initialDefinitions.Add(JsonConvert.DeserializeObject<DefinitionType>(responseMessage));
                 }
             }
-            return pipelineDefinitions;
+            return initialDefinitions;
         }
 
-        private void createTaskGroups()
+        private void createApiDefinitions<DefinitionType>() where DefinitionType : RestApiDefinition, new()
         {
-            Log.LogInformation("Fetching TaskGroups...");
-            var sourceTaskGroups = getTaskGroups(Source.Organisation, Source.Project, Source.AccessToken);
-            var targetTaskGroups = getTaskGroups(Target.Organisation, Target.Project, Target.AccessToken);
-
-            //Filter out Pipelines that already exsit
-            var taskGroupsToBeMigrated = sourceTaskGroups.Where(s => !targetTaskGroups.Any(t => t.Name == s.Name));
-
-            Log.LogInformation("From {sourceTaskGroupss} source Task Groups {taskGroupsToBeMigrated} Task Groups are going to be migrated..", sourceTaskGroups.Count, taskGroupsToBeMigrated.Count());
-            string baseUrl = $"{Target.Organisation}/{Target.Project}/_apis/distributedtask/taskgroups?api-version=5.1-preview";
-
-            foreach (TaskGroup taskGroupToBeMigrated in taskGroupsToBeMigrated)
+            Log.LogInformation("Fetching Definitions...");
+            var sourceDefinitions = getApiDefinitions<DefinitionType>(Source.Organisation, Source.Project, Source.AccessToken);
+            var targetDefinitions = getApiDefinitions<DefinitionType>(Target.Organisation, Target.Project, Target.AccessToken);
+            var apiPathAttribute = typeof(DefinitionType).GetCustomAttributes(typeof(ApiPathAttribute), false).OfType<ApiPathAttribute>().FirstOrDefault();
+            var apiNameAttribute = typeof(DefinitionType).GetCustomAttributes(typeof(ApiNameAttribute), false).OfType<ApiNameAttribute>().FirstOrDefault();
+            if (apiPathAttribute == null)
             {
-                HttpClient client = getHttpClient(Target.AccessToken);
+                throw new ArgumentNullException($"On the class defintion of '{typeof(DefinitionType).Name}' is the attribute 'ApiName' misssing. Please add the 'ApiName' Attribute to your class");
+            }
 
-                Log.LogInformation("Processing TaskGroup '{TaskGroup}'..", taskGroupToBeMigrated.Name);
-                string body = JsonConvert.SerializeObject(taskGroupToBeMigrated);
+            //Filter out Pipelines that already exist
+            var definitionsToBeMigrated = sourceDefinitions.Where(s => !targetDefinitions.Any(t => t.Name == s.Name));
+
+            Log.LogInformation($"From {sourceDefinitions.Count} source {apiNameAttribute.Name} {definitionsToBeMigrated.Count()} {apiNameAttribute.Name} are going to be migrated..");
+            string baseUrl = $"{Target.Organisation}/{Target.Project}/_apis/{apiPathAttribute.Path}?api-version=5.1-preview";
+
+            foreach (RestApiDefinition definitionToBeMigrated in definitionsToBeMigrated)
+            {
+                var client = getHttpClient(Target.AccessToken);
+
+                var objectToMigrate = definitionToBeMigrated.GetMigrationObject();
+                Log.LogInformation($"Processing {apiNameAttribute.Name} {objectToMigrate.Name}..");
+                string body = JsonConvert.SerializeObject(objectToMigrate);
 
                 var content = new StringContent(body, Encoding.UTF8, "application/json");
                 var result = client.PostAsync(baseUrl, content).Result;
 
                 if (result.StatusCode != HttpStatusCode.OK)
                 {
-                    Log.LogError("Error migrating Pipeling '{pipelineToBeMigrated}'. Please migrate it manually.", taskGroupToBeMigrated.Name);
-                }
-            }
-        }
-
-        private void createPipelineDefinitions(PipelineType pipelineType)
-        {
-            Log.LogInformation("Fetching Pipelines...");
-            var sourceDefinitions = getPipelineDefinitions(Source.Organisation, Source.Project, Source.AccessToken, pipelineType);
-            var targetDefinitions = getPipelineDefinitions(Target.Organisation, Target.Project, Target.AccessToken, pipelineType);
-
-            //Filter out Pipelines that already exist
-            var pipelinesToBeMigrated = sourceDefinitions.Where(s => !targetDefinitions.Any(t => t.Name == s.Name));
-
-            Log.LogInformation($"From {sourceDefinitions.Count} source {pipelineType} Pipelines {pipelinesToBeMigrated.Count()} Pipelines are going to be migrated..");
-            string baseUrl = $"{Target.Organisation}/{Target.Project}/_apis/{pipelineType}/definitions?api-version=5.1-preview";
-
-            if (pipelineType == PipelineType.build)
-            {
-                foreach (BuildDefinition pipelineToBeMigrated in pipelinesToBeMigrated)
-                {
-                    var client = getHttpClient(Target.AccessToken);
-
-                    pipelineToBeMigrated.Links = null;
-                    pipelineToBeMigrated.AuthoredBy = null;
-                    pipelineToBeMigrated.Queue = null;
-                    pipelineToBeMigrated.Url = null;
-                    pipelineToBeMigrated.Uri = null;
-                    pipelineToBeMigrated.Revision = 0;
-                    pipelineToBeMigrated.Id = 0;
-                    pipelineToBeMigrated.Project = null;
-                    pipelineToBeMigrated.Repository.Id = null;
-
-                    Log.LogInformation("Processing Pipeline '{pipelineToBeMigrated}'..", pipelineToBeMigrated.Name);
-                    string body = JsonConvert.SerializeObject(pipelineToBeMigrated);
-
-                    var content = new StringContent(body, Encoding.UTF8, "application/json");
-                    var result = client.PostAsync(baseUrl, content).Result;
-
-                    if (result.StatusCode != HttpStatusCode.OK)
-                    {
-                        Log.LogError("Error migrating Pipeling '{pipelineToBeMigrated}'. Please migrate it manually.", pipelineToBeMigrated.Name);
-                    }
-                }
-            }
-
-            if (pipelineType == PipelineType.release)
-            {
-                foreach (ReleaseDefinition pipelineToBeMigrated in pipelinesToBeMigrated)
-                {
-                    HttpClient client = getHttpClient(Target.AccessToken);
-
-                    pipelineToBeMigrated.Links = null;
-                    pipelineToBeMigrated.Revision = 0;
-                    pipelineToBeMigrated.Artifacts = null;
-                    pipelineToBeMigrated.Url = null;
-                    pipelineToBeMigrated.Links = null;
-                    pipelineToBeMigrated.Id = 0;
-                    pipelineToBeMigrated.VariableGroups = null;
-
-                    Log.LogInformation("Processing Pipeline '{pipelineToBeMigrated}'..", pipelineToBeMigrated.Name);
-                    string body = JsonConvert.SerializeObject(pipelineToBeMigrated);
-
-                    var content = new StringContent(body, Encoding.UTF8, "application/json");
-                    var result = client.PostAsync(baseUrl, content).Result;
-
-                    if (result.StatusCode != HttpStatusCode.OK)
-                    {
-                        Log.LogError("Error migrating Pipeling '{pipelineToBeMigrated}'. Please migrate it manually.", pipelineToBeMigrated.Name);
-                    }
+                    Log.LogError($"Error migrating {apiNameAttribute.Name} {objectToMigrate.Name}. Please migrate it manually.");
                 }
             }
         }

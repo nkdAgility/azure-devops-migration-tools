@@ -11,7 +11,9 @@ namespace MigrationTools.DataContracts.Pipelines
         public ReleaseDefinition[] Value { get; set; }
     }
 
-    public partial class ReleaseDefinition : PipelineDefinition
+    [ApiPath("release/definitions")]
+    [ApiName("Release Piplines")]
+    public partial class ReleaseDefinition : RestApiDefinition
     {
         public string Source { get; set; }
 
@@ -39,8 +41,6 @@ namespace MigrationTools.DataContracts.Pipelines
 
         public ExpandoObject Properties { get; set; }
 
-        public long Id { get; set; }
-
         public string Path { get; set; }
 
         public object ProjectReference { get; set; }
@@ -48,6 +48,19 @@ namespace MigrationTools.DataContracts.Pipelines
         public Uri Url { get; set; }
 
         public TaskGroupLinks Links { get; set; }
+
+        ///<inheritdoc/>
+        public override RestApiDefinition GetMigrationObject()
+        {
+            Links = null;
+            Revision = 0;
+            Artifacts = null;
+            Url = null;
+            Links = null;
+            Id = null;
+            VariableGroups = null;
+            return this;
+        }
     }
 
     public partial class Artifact
