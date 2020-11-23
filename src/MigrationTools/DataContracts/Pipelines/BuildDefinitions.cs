@@ -14,7 +14,7 @@ namespace MigrationTools.DataContracts.Pipelines
     [ApiName("Build Piplines")]
     public partial class BuildDefinition : RestApiDefinition
     {
-        public Option[] Options { get; set; }
+        public ExpandoObject[] Options { get; set; }
 
         public ExpandoObject[] Triggers { get; set; }
 
