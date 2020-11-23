@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using MigrationTools.DataContracts.Pipelines;
@@ -79,12 +81,12 @@ namespace MigrationTools.Processors
             Log.LogDebug("DONE in {Elapsed} ", stopwatch.Elapsed.ToString("c"));
         }
 
-        private WebClient getWebClient(string credentials)
+        private HttpClient getHttpClient(string accessToken)
         {
-            WebClient client = new WebClient();
-            client.Headers[HttpRequestHeader.Authorization] = "Basic " + credentials;
-            client.Headers[HttpRequestHeader.ContentType] = "application/json";
-            client.Headers.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
+            HttpClient client = new HttpClient();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes(string.Format("{0}:{1}", "", accessToken))));
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            client.DefaultRequestHeaders.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
 
             return client;
         }
@@ -92,12 +94,10 @@ namespace MigrationTools.Processors
         private IList<TaskGroup> getTaskGroups(string organisation, string project, string accessToken)
         {
             string baseUrl = organisation + "/" + project + "/_apis/distributedtask/taskgroups";
-            string credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes(":" + accessToken));
             var taskGroups = new List<TaskGroup>();
 
-            WebClient client = new WebClient();
-            client.Headers[HttpRequestHeader.Authorization] = "Basic " + credentials;
-            string httpResponse = client.DownloadString(baseUrl);
+            HttpClient client = getHttpClient(accessToken);
+            string httpResponse = client.GetStringAsync(baseUrl).Result;
 
             if (httpResponse != null)
             {
@@ -114,12 +114,11 @@ namespace MigrationTools.Processors
         private IList<ReleaseBuildDefinitionAbstract> getPipelineDefinitions(string organisation, string project, string accessToken, PipelineType pipelineType)
         {
             string baseUrl = organisation + "/" + project + "/_apis/" + pipelineType.ToString() + "/definitions";
-            string credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes(":" + accessToken));
             var pipelineDefinitions = new List<ReleaseBuildDefinitionAbstract>();
 
-            WebClient client = new WebClient();
-            client.Headers[HttpRequestHeader.Authorization] = "Basic " + credentials;
-            string httpResponse = client.DownloadString(baseUrl);
+            HttpClient client = getHttpClient(accessToken);
+
+            string httpResponse = client.GetStringAsync(baseUrl).Result;
 
             if (httpResponse != null)
             {
@@ -130,7 +129,7 @@ namespace MigrationTools.Processors
                     foreach (BuildDefinition pipeline in pipelines.Value)
                     {
                         //Nessecary because getting all Pipelines doesn't include all of their properties
-                        string responseMessage = client.DownloadString(baseUrl + "/" + pipeline.Id);
+                        string responseMessage = client.GetStringAsync(baseUrl + "/" + pipeline.Id).Result;
                         pipelineDefinitions.Add(JsonConvert.DeserializeObject<BuildDefinition>(responseMessage));
                     }
                 }
@@ -141,7 +140,7 @@ namespace MigrationTools.Processors
                     foreach (ReleaseDefinition pipeline in pipelines.Value)
                     {
                         //Nessecary because getting all Pipelines doesn't include all of their properties
-                        string responseMessage = client.DownloadString(baseUrl + "/" + pipeline.Id);
+                        string responseMessage = client.GetStringAsync(baseUrl + "/" + pipeline.Id).Result;
                         pipelineDefinitions.Add(JsonConvert.DeserializeObject<ReleaseDefinition>(responseMessage));
                     }
                 }
@@ -160,21 +159,20 @@ namespace MigrationTools.Processors
 
             Log.LogInformation("From {sourceTaskGroupss} source Task Groups {taskGroupsToBeMigrated} Task Groups are going to be migrated..", sourceTaskGroups.Count, taskGroupsToBeMigrated.Count());
             string baseUrl = Target.Organisation + "/" + Target.Project + "/_apis/distributedtask/taskgroups?api-version=5.1-preview";
-            string credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes(":" + Target.AccessToken));
 
             foreach (TaskGroup taskGroupToBeMigrated in taskGroupsToBeMigrated)
             {
-                WebClient client = getWebClient(credentials);
+                HttpClient client = getHttpClient(Target.AccessToken);
 
                 Log.LogInformation("Processing TaskGroup '{TaskGroup}'..", taskGroupToBeMigrated.Name);
                 string body = JsonConvert.SerializeObject(taskGroupToBeMigrated);
-                try
+
+                var content = new StringContent(body, Encoding.UTF8, "application/json");
+                var result = client.PostAsync(baseUrl, content).Result;
+
+                if (result.StatusCode != HttpStatusCode.OK)
                 {
-                    client.UploadString(baseUrl, "POST", body);
-                }
-                catch
-                {
-                    Log.LogError("Error migrating TaskGroup '{TaskGroup}'. Please migrate it manually.", taskGroupToBeMigrated.Name);
+                    Log.LogError("Error migrating Pipeling '{pipelineToBeMigrated}'. Please migrate it manually.", taskGroupToBeMigrated.Name);
                 }
             }
         }
@@ -190,13 +188,12 @@ namespace MigrationTools.Processors
 
             Log.LogInformation($"From {sourceDefinitions.Count} source {pipelineType} Pipelines {pipelinesToBeMigrated.Count()} Pipelines are going to be migrated..");
             string baseUrl = Target.Organisation + "/" + Target.Project + "/_apis/build/definitions?api-version=5.1-preview";
-            string credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes(":" + Target.AccessToken));
 
             if (pipelineType == PipelineType.build)
             {
                 foreach (BuildDefinition pipelineToBeMigrated in pipelinesToBeMigrated)
                 {
-                    var client = getWebClient(credentials);
+                    var client = getHttpClient(Target.AccessToken);
 
                     pipelineToBeMigrated.Links = null;
                     pipelineToBeMigrated.AuthoredBy = null;
@@ -210,11 +207,11 @@ namespace MigrationTools.Processors
 
                     Log.LogInformation("Processing Pipeline '{pipelineToBeMigrated}'..", pipelineToBeMigrated.Name);
                     string body = JsonConvert.SerializeObject(pipelineToBeMigrated);
-                    try
-                    {
-                        client.UploadString(baseUrl, "POST", body);
-                    }
-                    catch
+
+                    var content = new StringContent(body, Encoding.UTF8, "application/json");
+                    var result = client.PostAsync(baseUrl, content).Result;
+
+                    if (result.StatusCode != HttpStatusCode.OK)
                     {
                         Log.LogError("Error migrating Pipeling '{pipelineToBeMigrated}'. Please migrate it manually.", pipelineToBeMigrated.Name);
                     }
@@ -225,10 +222,7 @@ namespace MigrationTools.Processors
             {
                 foreach (ReleaseDefinition pipelineToBeMigrated in pipelinesToBeMigrated)
                 {
-                    WebClient client = new WebClient();
-                    client.Headers[HttpRequestHeader.Authorization] = "Basic " + credentials;
-                    client.Headers[HttpRequestHeader.ContentType] = "application/json";
-                    client.Headers.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
+                    HttpClient client = getHttpClient(Target.AccessToken);
 
                     pipelineToBeMigrated.Links = null;
                     pipelineToBeMigrated.Revision = 0;
@@ -240,11 +234,11 @@ namespace MigrationTools.Processors
 
                     Log.LogInformation("Processing Pipeline '{pipelineToBeMigrated}'..", pipelineToBeMigrated.Name);
                     string body = JsonConvert.SerializeObject(pipelineToBeMigrated);
-                    try
-                    {
-                        client.UploadString(baseUrl, "POST", body);
-                    }
-                    catch
+
+                    var content = new StringContent(body, Encoding.UTF8, "application/json");
+                    var result = client.PostAsync(baseUrl, content).Result;
+
+                    if (result.StatusCode != HttpStatusCode.OK)
                     {
                         Log.LogError("Error migrating Pipeling '{pipelineToBeMigrated}'. Please migrate it manually.", pipelineToBeMigrated.Name);
                     }

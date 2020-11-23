@@ -4,30 +4,30 @@
         <name>MigrationTools.Clients.AzureDevops.Rest</name>
     </assembly>
     <members>
-        <member name="P:MigrationTools.Processors.TfsPipelineProcessorOptions.MigrateBuildPipelines">
+        <member name="P:MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions.MigrateBuildPipelines">
             <summary>
             Migrate Build Pipelines
             </summary>
             <default>true</default>
         </member>
-        <member name="P:MigrationTools.Processors.TfsPipelineProcessorOptions.MigrateReleasePipelines">
+        <member name="P:MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions.MigrateReleasePipelines">
             <summary>
             Migrate Release Pipelines
             </summary>
             <default>true</default>
         </member>
-        <member name="P:MigrationTools.Processors.TfsPipelineProcessorOptions.MigrateTaskGroups">
+        <member name="P:MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions.MigrateTaskGroups">
             <summary>
             Migrate Task Groups
             </summary>
             <default>true</default>
         </member>
-        <member name="P:MigrationTools.Processors.TfsPipelineProcessorOptions.BuildPipelines">
+        <member name="P:MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions.BuildPipelines">
             <summary>
             List of Build Pipelines to process. If this is `null` then all Build Pipelines will be processed.
             </summary>
         </member>
-        <member name="P:MigrationTools.Processors.TfsPipelineProcessorOptions.ReleasePipelines">
+        <member name="P:MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions.ReleasePipelines">
             <summary>
             List of Release Pipelines to process. If this is `null` then all Release Pipelines will be processed.
             </summary>
