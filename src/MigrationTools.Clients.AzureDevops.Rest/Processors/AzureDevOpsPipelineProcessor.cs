@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using Microsoft.Extensions.Logging;
+using MigrationTools.DataContracts;
 using MigrationTools.DataContracts.Pipelines;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
@@ -29,7 +30,7 @@ namespace MigrationTools.Processors
         public override void Configure(IProcessorOptions options)
         {
             base.Configure(options);
-            Log.LogInformation("TfsTeamSettingsProcessor::Configure");
+            Log.LogInformation("AzureDevOpsPipelineProcessor::Configure");
             _Options = (AzureDevOpsPipelineProcessorOptions)options;
         }
 
@@ -93,7 +94,7 @@ namespace MigrationTools.Processors
 
         private IList<TaskGroup> getTaskGroups(string organisation, string project, string accessToken)
         {
-            string baseUrl = organisation + "/" + project + "/_apis/distributedtask/taskgroups";
+            string baseUrl = $"{organisation}/{project}/_apis/distributedtask/taskgroups";
             var taskGroups = new List<TaskGroup>();
 
             HttpClient client = getHttpClient(accessToken);
@@ -111,10 +112,10 @@ namespace MigrationTools.Processors
             return taskGroups;
         }
 
-        private IList<ReleaseBuildDefinitionAbstract> getPipelineDefinitions(string organisation, string project, string accessToken, PipelineType pipelineType)
+        private IList<PipelineDefinition> getPipelineDefinitions(string organisation, string project, string accessToken, PipelineType pipelineType)
         {
-            string baseUrl = organisation + "/" + project + "/_apis/" + pipelineType.ToString() + "/definitions";
-            var pipelineDefinitions = new List<ReleaseBuildDefinitionAbstract>();
+            string baseUrl = $"{organisation}/{project}/_apis/{pipelineType}/definitions";
+            var pipelineDefinitions = new List<PipelineDefinition>();
 
             HttpClient client = getHttpClient(accessToken);
 
@@ -158,7 +159,7 @@ namespace MigrationTools.Processors
             var taskGroupsToBeMigrated = sourceTaskGroups.Where(s => !targetTaskGroups.Any(t => t.Name == s.Name));
 
             Log.LogInformation("From {sourceTaskGroupss} source Task Groups {taskGroupsToBeMigrated} Task Groups are going to be migrated..", sourceTaskGroups.Count, taskGroupsToBeMigrated.Count());
-            string baseUrl = Target.Organisation + "/" + Target.Project + "/_apis/distributedtask/taskgroups?api-version=5.1-preview";
+            string baseUrl = $"{Target.Organisation}/{Target.Project}/_apis/distributedtask/taskgroups?api-version=5.1-preview";
 
             foreach (TaskGroup taskGroupToBeMigrated in taskGroupsToBeMigrated)
             {
@@ -187,7 +188,7 @@ namespace MigrationTools.Processors
             var pipelinesToBeMigrated = sourceDefinitions.Where(s => !targetDefinitions.Any(t => t.Name == s.Name));
 
             Log.LogInformation($"From {sourceDefinitions.Count} source {pipelineType} Pipelines {pipelinesToBeMigrated.Count()} Pipelines are going to be migrated..");
-            string baseUrl = Target.Organisation + "/" + Target.Project + "/_apis/build/definitions?api-version=5.1-preview";
+            string baseUrl = $"{Target.Organisation}/{Target.Project}/_apis/{pipelineType}/definitions?api-version=5.1-preview";
 
             if (pipelineType == PipelineType.build)
             {

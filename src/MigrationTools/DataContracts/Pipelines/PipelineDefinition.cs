@@ -7,9 +7,8 @@ using Newtonsoft.Json;
 
 namespace MigrationTools.DataContracts.Pipelines
 {
-    public abstract class ReleaseBuildDefinitionAbstract
+    public abstract class PipelineDefinition
     {
-        [JsonProperty("name")]
         public string Name { get; set; }
     }
 }
