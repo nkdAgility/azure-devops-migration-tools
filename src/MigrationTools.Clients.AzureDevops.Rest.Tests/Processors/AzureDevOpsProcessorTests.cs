@@ -20,6 +20,9 @@ namespace MigrationTools.Processors.Tests
             var migrationConfig = new AzureDevOpsPipelineProcessorOptions()
             {
                 Enabled = true,
+                MigrateTaskGroups = true,
+                MigrateBuildPipelines = true,
+                MigrateReleasePipelines = true,
                 Target = GetAzureDevOpsEndpointOptions("migrationTarget1"),
                 Source = GetAzureDevOpsEndpointOptions("migrationSource1"),
             };
