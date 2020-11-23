@@ -10,14 +10,14 @@ namespace MigrationTools.Configuration.Tests
     public class EngineConfigurationBuilderTests
     {
         [TestMethod(), TestCategory("L0")]
-        public void BuildDefaultTest()
+        public void EngineConfigurationBuilderBuildDefaultTest()
         {
             var ecb = CreateEngine();
             ecb.BuildDefault();
         }
 
         [TestMethod(), TestCategory("L0")]
-        public void BuildFromFileTest()
+        public void EngineConfigurationBuilderBuildFromFileTest()
         {
             HelperCreateDefaultConfigFile();
             var ecb = CreateEngine();
@@ -25,14 +25,14 @@ namespace MigrationTools.Configuration.Tests
         }
 
         [TestMethod(), TestCategory("L0")]
-        public void BuildWorkItemMigrationTest()
+        public void EngineConfigurationBuilderBuildWorkItemMigrationTest()
         {
             var ecb = CreateEngine();
             ecb.BuildWorkItemMigration();
         }
 
         [TestMethod, TestCategory("L0")]
-        public void TestDeseraliseFromJson()
+        public void EngineConfigurationBuilderDeseraliseFromJsonTest()
         {
             HelperCreateDefaultConfigFile();
             EngineConfiguration ec;
@@ -45,7 +45,7 @@ namespace MigrationTools.Configuration.Tests
         }
 
         [TestMethod, TestCategory("L0")]
-        public void TestSeraliseToJson()
+        public void EngineConfigurationBuilderSeraliseToJsonTest()
         {
             HelperCreateDefaultConfigFile();
         }

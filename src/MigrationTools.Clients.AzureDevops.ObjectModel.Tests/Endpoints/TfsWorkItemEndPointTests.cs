@@ -19,7 +19,7 @@ namespace MigrationTools.Endpoints.Tests
             Services = ServiceProviderHelper.GetServices();
         }
 
-        [TestMethod(), TestCategory("L3")]
+        [TestMethod(), TestCategory("L3"), TestCategory("AzureDevOps.ObjectModel")]
         public void TfsWorkItemEndPointTest()
         {
             var endpoint = Services.GetRequiredService<TfsWorkItemEndpoint>();
@@ -28,8 +28,8 @@ namespace MigrationTools.Endpoints.Tests
             Assert.IsNotNull(endpoint);
         }
 
-        [TestMethod(), TestCategory("L3")]
-        public void ConfigureTest()
+        [TestMethod(), TestCategory("L3"), TestCategory("AzureDevOps.ObjectModel")]
+        public void TfsWorkItemEndPointConfigureTest()
         {
             var endpoint = Services.GetRequiredService<TfsWorkItemEndpoint>();
             endpoint.Configure(GetTfsWorkItemEndPointOptions("migrationSource1"));
@@ -42,8 +42,8 @@ namespace MigrationTools.Endpoints.Tests
         //    Assert.Fail();
         //}
 
-        [TestMethod(), TestCategory("L3")]
-        public void GetWorkItemsTest()
+        [TestMethod(), TestCategory("L3"), TestCategory("AzureDevOps.ObjectModel")]
+        public void TfsWorkItemEndPointGetWorkItemsTest()
         {
             var endpoint = Services.GetRequiredService<TfsWorkItemEndpoint>();
             endpoint.Configure(GetTfsWorkItemEndPointOptions("migrationSource1"));
@@ -51,8 +51,8 @@ namespace MigrationTools.Endpoints.Tests
             Assert.AreEqual(5, result.Count());
         }
 
-        [TestMethod(), TestCategory("L3")]
-        public void GetWorkItemsQueryTest()
+        [TestMethod(), TestCategory("L3"), TestCategory("AzureDevOps.ObjectModel")]
+        public void TfsWorkItemEndPointGetWorkItemsQueryTest()
         {
             TfsWorkItemEndpoint endpoint = Services.GetRequiredService<TfsWorkItemEndpoint>();
             endpoint.Configure(GetTfsWorkItemEndPointOptions("migrationSource1"));
