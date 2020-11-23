@@ -4,7 +4,7 @@ using MigrationTools.Endpoints;
 
 namespace MigrationTools.Processors
 {
-    internal class AzureDevOpsPipelineProcessorOptions : ProcessorOptions
+    public class AzureDevOpsPipelineProcessorOptions : ProcessorOptions
     {
         /// <summary>
         /// Migrate Build Pipelines

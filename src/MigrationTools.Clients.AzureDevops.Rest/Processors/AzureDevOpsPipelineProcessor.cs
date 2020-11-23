@@ -15,7 +15,7 @@ using Newtonsoft.Json;
 
 namespace MigrationTools.Processors
 {
-    internal partial class AzureDevOpsPipelineProcessor : Processor
+    public partial class AzureDevOpsPipelineProcessor : Processor
     {
         private AzureDevOpsPipelineProcessorOptions _Options;
 
