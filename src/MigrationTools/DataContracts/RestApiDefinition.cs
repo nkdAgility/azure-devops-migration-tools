@@ -8,10 +8,10 @@ namespace MigrationTools.DataContracts
         public string Id { get; set; }
 
         /// <summary>
-        /// removes the values of generated propperties
+        /// reset values that cannot be set on new objects
         /// </summary>
-        /// <returns>The cleanuped this</returns>
-        public abstract RestApiDefinition GetMigrationObject();
+        /// <returns>The clean RestApiDefinition</returns>
+        public abstract RestApiDefinition ResetObject();
     }
 
     public class RestResultDefinition<ValueType> where ValueType : RestApiDefinition, new()

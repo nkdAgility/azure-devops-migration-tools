@@ -67,22 +67,22 @@ namespace MigrationTools.Processors
 
             if (_Options.MigrateTaskGroups)
             {
-                createApiDefinitions<TaskGroup>();
+                CreateApiDefinitions<TaskGroup>();
             }
             if (_Options.MigrateBuildPipelines)
             {
-                createApiDefinitions<BuildDefinition>();
+                CreateApiDefinitions<BuildDefinition>();
             }
 
             if (_Options.MigrateReleasePipelines)
             {
-                createApiDefinitions<ReleaseDefinition>();
+                CreateApiDefinitions<ReleaseDefinition>();
             }
             stopwatch.Stop();
             Log.LogDebug("DONE in {Elapsed} ", stopwatch.Elapsed.ToString("c"));
         }
 
-        private HttpClient getHttpClient(string accessToken)
+        private HttpClient GetHttpClient(string accessToken)
         {
             HttpClient client = new HttpClient();
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes(string.Format("{0}:{1}", "", accessToken))));
@@ -92,7 +92,7 @@ namespace MigrationTools.Processors
             return client;
         }
 
-        private IList<DefinitionType> getApiDefinitions<DefinitionType>(string organisation, string project, string accessToken) where DefinitionType : RestApiDefinition, new()
+        private IList<DefinitionType> GetApiDefinitions<DefinitionType>(string organisation, string project, string accessToken) where DefinitionType : RestApiDefinition, new()
         {
             var apiPathAttribute = typeof(DefinitionType).GetCustomAttributes(typeof(ApiPathAttribute), false).OfType<ApiPathAttribute>().FirstOrDefault();
             if (apiPathAttribute == null)
@@ -102,7 +102,7 @@ namespace MigrationTools.Processors
             string baseUrl = $"{organisation}/{project}/_apis/{apiPathAttribute.Path}";
             var initialDefinitions = new List<DefinitionType>();
 
-            HttpClient client = getHttpClient(accessToken);
+            HttpClient client = GetHttpClient(accessToken);
 
             string httpResponse = client.GetStringAsync(baseUrl).Result;
 
@@ -120,11 +120,11 @@ namespace MigrationTools.Processors
             return initialDefinitions;
         }
 
-        private void createApiDefinitions<DefinitionType>() where DefinitionType : RestApiDefinition, new()
+        private void CreateApiDefinitions<DefinitionType>() where DefinitionType : RestApiDefinition, new()
         {
             Log.LogInformation("Fetching Definitions...");
-            var sourceDefinitions = getApiDefinitions<DefinitionType>(Source.Organisation, Source.Project, Source.AccessToken);
-            var targetDefinitions = getApiDefinitions<DefinitionType>(Target.Organisation, Target.Project, Target.AccessToken);
+            var sourceDefinitions = GetApiDefinitions<DefinitionType>(Source.Organisation, Source.Project, Source.AccessToken);
+            var targetDefinitions = GetApiDefinitions<DefinitionType>(Target.Organisation, Target.Project, Target.AccessToken);
             var apiPathAttribute = typeof(DefinitionType).GetCustomAttributes(typeof(ApiPathAttribute), false).OfType<ApiPathAttribute>().FirstOrDefault();
             var apiNameAttribute = typeof(DefinitionType).GetCustomAttributes(typeof(ApiNameAttribute), false).OfType<ApiNameAttribute>().FirstOrDefault();
             if (apiPathAttribute == null)
@@ -140,9 +140,9 @@ namespace MigrationTools.Processors
 
             foreach (RestApiDefinition definitionToBeMigrated in definitionsToBeMigrated)
             {
-                var client = getHttpClient(Target.AccessToken);
+                var client = GetHttpClient(Target.AccessToken);
 
-                var objectToMigrate = definitionToBeMigrated.GetMigrationObject();
+                var objectToMigrate = definitionToBeMigrated.ResetObject();
                 Log.LogInformation($"Processing {apiNameAttribute.Name} {objectToMigrate.Name}..");
                 string body = JsonConvert.SerializeObject(objectToMigrate);
 

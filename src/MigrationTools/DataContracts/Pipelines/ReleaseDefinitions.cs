@@ -50,7 +50,7 @@ namespace MigrationTools.DataContracts.Pipelines
         public TaskGroupLinks Links { get; set; }
 
         ///<inheritdoc/>
-        public override RestApiDefinition GetMigrationObject()
+        public override RestApiDefinition ResetObject()
         {
             Links = null;
             Revision = 0;

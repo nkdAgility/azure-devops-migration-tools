@@ -65,7 +65,7 @@ namespace MigrationTools.DataContracts.Pipelines
         public Project Project { get; set; }
 
         ///<inheritdoc/>
-        public override RestApiDefinition GetMigrationObject()
+        public override RestApiDefinition ResetObject()
         {
             Links = null;
             AuthoredBy = null;

@@ -83,7 +83,7 @@ namespace MigrationTools.DataContracts.Pipelines
 
         public string HelpMarkDown { get; set; }
 
-        public override RestApiDefinition GetMigrationObject()
+        public override RestApiDefinition ResetObject()
         {
             return this;
         }
