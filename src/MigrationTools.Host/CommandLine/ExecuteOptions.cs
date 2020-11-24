@@ -1,6 +1,6 @@
 ﻿using CommandLine;
 
-namespace MigrationTools.CommandLine
+namespace MigrationTools.Host.CommandLine
 {
     [Verb("execute", HelpText = "Record changes to the repository.")]
     public class ExecuteOptions
