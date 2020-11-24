@@ -14,6 +14,7 @@ namespace VstsSyncMigrator.ConsoleApp
                     // New v2 Architecture fpr testing
                     services.AddMigrationToolServicesForClientFileSystem();
                     services.AddMigrationToolServicesForClientAzureDevOpsObjectModel();
+                    services.AddMigrationToolServicesForClientAzureDevopsRest();
 
                     // v1 Architecture (Legacy)
                     services.AddMigrationToolServicesForClientLegacyAzureDevOpsObjectModel();
