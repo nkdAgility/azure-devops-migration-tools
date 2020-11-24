@@ -6,10 +6,10 @@ using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MigrationTools._EngineV1.Configuration;
-using MigrationTools.CommandLine;
 using MigrationTools.Helpers;
+using MigrationTools.Host.CommandLine;
 
-namespace MigrationTools
+namespace MigrationTools.Host
 {
     public class InitHostedService : IHostedService
     {

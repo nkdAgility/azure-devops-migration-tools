@@ -7,7 +7,6 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools;
 using MigrationTools._EngineV1.Configuration;
-using MigrationTools.CommandLine;
 using Serilog;
 
 namespace _VstsSyncMigrator.Engine.Tests
@@ -36,8 +35,6 @@ namespace _VstsSyncMigrator.Engine.Tests
             services.AddSingleton<EngineConfiguration>(ecb.BuildDefault());
 
             services.AddSingleton<IMigrationEngine, MigrationEngine>();
-
-            services.AddSingleton<ExecuteOptions>((p) => null);
 
             _services = services.BuildServiceProvider();
         }

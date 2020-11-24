@@ -40,6 +40,8 @@ namespace MigrationTools.Processors
 
         public bool SupportsProcessorEnrichers => false;
 
+        public virtual ProcessorType Type => ProcessorType.AddHock;
+
         public virtual void Configure(IProcessorOptions options)
         {
             Log.LogInformation("Processor::Configure");
