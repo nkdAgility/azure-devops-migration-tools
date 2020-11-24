@@ -6,7 +6,7 @@
     <members>
         <member name="T:MigrationTools.Processors.AzureDevOpsPipelineProcessor">
             <summary>
-            Azure DevOps Processor that migrates Taskgroups, Buils- and Release Pipelines.
+            Azure DevOps Processor that migrates Taskgroups, Build- and Release Pipelines.
             </summary>
         </member>
         <member name="M:MigrationTools.Processors.AzureDevOpsPipelineProcessor.MigratePipelines">

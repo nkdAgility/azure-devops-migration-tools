@@ -4,7 +4,7 @@
 
 [Overview](.././index.md) > [Reference](../index.md) > [Processors](./index.md) > **AzureDevOpsPipelineProcessor**
 
-Azure DevOps Processor that migrates Taskgroups, Buils- and Release Pipelines.
+Azure DevOps Processor that migrates Taskgroups, Build- and Release Pipelines.
 
 ### Options
 

@@ -16,7 +16,7 @@ using Newtonsoft.Json;
 namespace MigrationTools.Processors
 {
     /// <summary>
-    /// Azure DevOps Processor that migrates Taskgroups, Buils- and Release Pipelines.
+    /// Azure DevOps Processor that migrates Taskgroups, Build- and Release Pipelines.
     /// </summary>
     public partial class AzureDevOpsPipelineProcessor : Processor
     {
