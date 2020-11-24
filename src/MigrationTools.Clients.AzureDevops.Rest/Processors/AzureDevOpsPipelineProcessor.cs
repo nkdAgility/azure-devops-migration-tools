@@ -82,6 +82,71 @@ namespace MigrationTools.Processors
             Log.LogDebug("DONE in {Elapsed} ", stopwatch.Elapsed.ToString("c"));
         }
 
+        //Ugly Method to get the RESP API URLs right
+        public string getModUrl(string organisation, string project, ApiPathAttribute apiPathAttribute, ApiNameAttribute apiNameAttribute)
+        {
+            string schema = string.Empty;
+            string modUrl = string.Empty;
+
+            if (apiNameAttribute.Name == "Release Piplines")
+            {
+                if (organisation.Contains("dev.azure.com"))
+                {
+                    if (organisation.Contains("https://"))
+                    {
+                        organisation = organisation.Replace("https://", "");
+                        schema = "https://";
+                    }
+                    else if (organisation.Contains("http://"))
+                    {
+                        organisation = organisation.Replace("http://", "");
+                        schema = "http://";
+                    }
+                    else
+                    {
+                        throw new Exception("The configured Organization has a wrong format");
+                    }
+                    organisation = schema + "vsrm." + organisation;
+                    modUrl = organisation + project + "/_apis/" + apiPathAttribute.Path;
+                }
+                else if (organisation.Contains("visualstudio.com"))
+                {
+                    string domain = string.Empty;
+                    if (organisation.Contains("https://"))
+                    {
+                        organisation = organisation.Replace("https://", "");
+                        int num = organisation.IndexOf(".visualstudio.com");
+                        domain = organisation.Substring(0, num);
+                        organisation = organisation.Replace(domain, "");
+                        schema = "https://";
+                    }
+                    else if (organisation.Contains("http://"))
+                    {
+                        organisation = organisation.Replace("http://", "");
+                        int num = organisation.IndexOf(".visualstudio.com");
+                        domain = organisation.Substring(0, num);
+                        organisation = organisation.Replace(domain, "");
+                        schema = "http://";
+                    }
+                    else
+                    {
+                        throw new Exception("The configured Organization has a wrong format");
+                    }
+                    organisation = schema + domain + ".vsrm" + organisation;
+                    modUrl = organisation + project + "/_apis/" + apiPathAttribute.Path;
+                }
+                else
+                {
+                    modUrl = organisation + project + "/_apis/" + apiPathAttribute.Path;
+                }
+            }
+            else
+            {
+                modUrl = organisation + project + "/_apis/" + apiPathAttribute.Path;
+            }
+            return modUrl;
+        }
+
         private HttpClient GetHttpClient(string accessToken)
         {
             HttpClient client = new HttpClient();
@@ -94,12 +159,13 @@ namespace MigrationTools.Processors
 
         private IList<DefinitionType> GetApiDefinitions<DefinitionType>(string organisation, string project, string accessToken) where DefinitionType : RestApiDefinition, new()
         {
+            var apiNameAttribute = typeof(DefinitionType).GetCustomAttributes(typeof(ApiNameAttribute), false).OfType<ApiNameAttribute>().FirstOrDefault();
             var apiPathAttribute = typeof(DefinitionType).GetCustomAttributes(typeof(ApiPathAttribute), false).OfType<ApiPathAttribute>().FirstOrDefault();
             if (apiPathAttribute == null)
             {
                 throw new ArgumentNullException($"On the class defintion of '{typeof(DefinitionType).Name}' is the attribute 'ApiName' misssing. Please add the 'ApiName' Attribute to your class");
             }
-            string baseUrl = $"{organisation}/{project}/_apis/{apiPathAttribute.Path}";
+            string baseUrl = getModUrl(organisation, project, apiPathAttribute, apiNameAttribute);
             var initialDefinitions = new List<DefinitionType>();
 
             HttpClient client = GetHttpClient(accessToken);
@@ -136,7 +202,7 @@ namespace MigrationTools.Processors
             var definitionsToBeMigrated = sourceDefinitions.Where(s => !targetDefinitions.Any(t => t.Name == s.Name));
 
             Log.LogInformation($"From {sourceDefinitions.Count} source {apiNameAttribute.Name} {definitionsToBeMigrated.Count()} {apiNameAttribute.Name} are going to be migrated..");
-            string baseUrl = $"{Target.Organisation}/{Target.Project}/_apis/{apiPathAttribute.Path}?api-version=5.1-preview";
+            string baseUrl = getModUrl(Target.Organisation, Target.Project, apiPathAttribute, apiNameAttribute) + "?api -version=5.1-preview";
 
             foreach (RestApiDefinition definitionToBeMigrated in definitionsToBeMigrated)
             {
