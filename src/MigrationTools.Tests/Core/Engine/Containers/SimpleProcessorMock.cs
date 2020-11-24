@@ -9,6 +9,8 @@ namespace MigrationTools.Engine.Containers.Tests
 
         public ProcessingStatus Status => ProcessingStatus.None;
 
+        public ProcessorType Type => ProcessorType.Legacy;
+
         public void Configure(IProcessorConfig config)
         {
         }
