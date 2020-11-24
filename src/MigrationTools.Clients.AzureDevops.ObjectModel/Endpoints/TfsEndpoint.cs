@@ -66,10 +66,6 @@ namespace MigrationTools.Endpoints
             {
                 throw new ArgumentNullException(nameof(_Options.Project));
             }
-            if (string.IsNullOrEmpty(_Options.AccessToken))
-            {
-                throw new ArgumentNullException(nameof(_Options.AccessToken));
-            }
         }
 
         private TfsTeamProjectCollection GetTfsCollection()
