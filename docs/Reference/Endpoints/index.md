@@ -5,12 +5,12 @@
 
 [Overview](.././index.md) > [Reference](../index.md) > *Endpoints*
 
-Azyre DevOps Migration Tools provides _endpoints_ for reading and writing `WorkItems`, `PlansAndSuits`, `Teams`, or `Queries`. 
+Azure DevOps Migration Tools provides _endpoints_ for reading and writing `WorkItems`, `PlansAndSuits`, `Teams`, or `Queries`. 
 
 Client  | WriteTo/ReadFrom | Endpoint | Data Target | Description
 ----------|-----------|------------
 AzureDevops.ObjectModel | Tfs Object Model | `TfsWorkItemEndPoint` | WorkItems | TBA
-AzureDevops.Rest | Azure DevOps REST | ?
+AzureDevops.Rest | Azure DevOps REST | `AzureDevOpsEndpoint` | Pipelines | TBA
 FileSystem | Local Files | `FileSystemWorkItemEndpoint` | WorkItems | TBA
 
 ### Endpoints Options
