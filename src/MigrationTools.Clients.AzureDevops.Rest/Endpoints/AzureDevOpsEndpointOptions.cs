@@ -4,7 +4,7 @@ using Newtonsoft.Json.Converters;
 
 namespace MigrationTools.Endpoints
 {
-    public class TfsEndpointOptions : EndpointOptions, ITfsEndpointOptions
+    public class AzureDevOpsEndpointOptions : EndpointOptions, IAzureDevOpsEndpointOptions
     {
         [JsonConverter(typeof(StringEnumConverter))]
         public AuthenticationMode AuthenticationMode { get; set; }
@@ -20,19 +20,19 @@ namespace MigrationTools.Endpoints
         [JsonProperty(Order = -1)]
         public string ReflectedWorkItemIdField { get; set; }
 
-        public override Type ToConfigure => typeof(TfsEndpoint);
+        public override Type ToConfigure => typeof(AzureDevOpsEndpoint);
 
         public override void SetDefaults()
         {
             base.SetDefaults();
-            AccessToken = "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq";
+            AccessToken = MigrationTools.Tests.TestingConstants.AccessToken;
             Organisation = "https://dev.azure.com/nkdagility-preview/";
             Project = "NeedToSetThis";
             ReflectedWorkItemIdField = "Custom.ReflectedWorkItemId";
         }
     }
 
-    public interface ITfsEndpointOptions
+    public interface IAzureDevOpsEndpointOptions
     {
         public string AccessToken { get; }
         public string Organisation { get; }

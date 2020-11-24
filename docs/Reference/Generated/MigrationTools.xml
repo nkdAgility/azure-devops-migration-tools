@@ -4,6 +4,18 @@
         <name>MigrationTools</name>
     </assembly>
     <members>
+        <member name="M:MigrationTools.DataContracts.Pipelines.BuildDefinition.GetMigrationObject">
+            <inheritdoc/>
+        </member>
+        <member name="M:MigrationTools.DataContracts.Pipelines.ReleaseDefinition.GetMigrationObject">
+            <inheritdoc/>
+        </member>
+        <member name="M:MigrationTools.DataContracts.RestApiDefinition.GetMigrationObject">
+            <summary>
+            removes the values of generated propperties
+            </summary>
+            <returns>The cleanuped this</returns>
+        </member>
         <member name="P:MigrationTools.Enrichers.IEnricherOptions.Enabled">
             <summary>
             Active the enricher if it true.
