@@ -15,6 +15,8 @@ namespace MigrationTools.Processors
     {
         private WorkItemTrackingProcessorOptions _config;
 
+        public override ProcessorType Type => ProcessorType.Integrated;
+
         public WorkItemTrackingProcessor(ProcessorEnricherContainer processorEnricherContainer, EndpointContainer endpointContainer, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(processorEnricherContainer, endpointContainer, services, telemetry, logger)
         {
         }
