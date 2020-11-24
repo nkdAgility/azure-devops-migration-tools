@@ -29,6 +29,8 @@ namespace MigrationTools._EngineV1.Processors
 
         protected ITelemetryLogger Telemetry { get; }
 
+        public ProcessorType Type => ProcessorType.Legacy;
+
         public abstract void Configure(IProcessorConfig config);
 
         public void Execute()

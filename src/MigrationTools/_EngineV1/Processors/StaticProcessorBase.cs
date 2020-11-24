@@ -40,6 +40,8 @@ namespace VstsSyncMigrator._EngineV1.Processors
         public ITelemetryLogger Telemetry { get; }
         public ILogger<MigrationTools._EngineV1.Containers.IProcessor> Log { get; }
 
+        public ProcessorType Type => ProcessorType.Legacy;
+
         public void Execute()
         {
             Telemetry.TrackEvent(Name);
