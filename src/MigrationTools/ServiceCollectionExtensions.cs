@@ -1,13 +1,7 @@
 ﻿using System;
-using System.IO;
-using System.Linq;
-using System.Reflection;
 using Microsoft.ApplicationInsights.WorkerService;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Containers;
-using MigrationTools.CommandLine;
 using MigrationTools.EndpointEnrichers;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
@@ -67,26 +61,7 @@ namespace MigrationTools
             // Services
             context.AddSingleton<ITelemetryLogger, TelemetryClientAdapter>();
 
-            // Config
-            context.AddSingleton<IEngineConfigurationBuilder, EngineConfigurationBuilder>();
-            context.AddSingleton<EngineConfiguration>(sp =>
-            {
-                var executeOptions = sp.GetRequiredService<ExecuteOptions>();
-                var builder = sp.GetRequiredService<IEngineConfigurationBuilder>();
-                var logger = sp.GetServices<ILoggerFactory>().First().CreateLogger<EngineConfiguration>();
-
-                if (executeOptions.ConfigFile == string.Empty)
-                {
-                    executeOptions.ConfigFile = "configuration.json";
-                }
-                if (!File.Exists(executeOptions.ConfigFile))
-                {
-                    logger.LogInformation("The config file {ConfigFile} does not exist, nor does the default 'configuration.json'. Use '{ExecutableName}.exe init' to create a configuration file first", executeOptions.ConfigFile, Assembly.GetEntryAssembly().GetName().Name);
-                    throw new ArgumentException("missing configfile");
-                }
-                logger.LogInformation("Config Found, creating engine host");
-                return builder.BuildFromFile(executeOptions.ConfigFile);
-            });
+            
 
             // Containers
             context.AddSingleton<TypeDefinitionMapContainer>();

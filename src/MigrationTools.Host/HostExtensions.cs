@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using MigrationTools.CommandLine;
+using MigrationTools.Host.CommandLine;
 
 namespace MigrationTools.Host
 {
