@@ -66,7 +66,7 @@ namespace MigrationTools.Endpoints
             {
                 throw new ArgumentNullException(nameof(_Options.Project));
             }
-            if (string.IsNullOrEmpty(_Options.AccessToken))
+            if (string.IsNullOrEmpty(_Options.AccessToken) && _Options.AuthenticationMode == AuthenticationMode.AccessToken)
             {
                 throw new ArgumentNullException(nameof(_Options.AccessToken));
             }
