@@ -4,6 +4,49 @@
         <name>MigrationTools.Clients.AzureDevops.Rest</name>
     </assembly>
     <members>
+        <member name="T:MigrationTools.Processors.AzureDevOpsPipelineProcessor">
+            <summary>
+            Azure DevOps Processor that migrates Taskgroups, Build- and Release Pipelines.
+            </summary>
+        </member>
+        <member name="M:MigrationTools.Processors.AzureDevOpsPipelineProcessor.MigratePipelines">
+            <summary>
+            Executes Method for migrating Taskgroups or Pipelines, depinding on whhat is set in the config.
+            </summary>
+        </member>
+        <member name="M:MigrationTools.Processors.AzureDevOpsPipelineProcessor.getModUrl(System.String,System.String,MigrationTools.DataContracts.ApiPathAttribute,MigrationTools.DataContracts.ApiNameAttribute)">
+            <summary>
+            Ugly Method to get the RESP API URLs right
+            </summary>
+            <param name="organisation"></param>
+            <param name="project"></param>
+            <param name="apiPathAttribute">REST API Path</param>
+            <param name="apiNameAttribute">Name of Object</param>
+            <returns>API URL</returns>
+        </member>
+        <member name="M:MigrationTools.Processors.AzureDevOpsPipelineProcessor.GetHttpClient(System.String)">
+            <summary>
+            Create a new instance of HttpClient including Heades
+            </summary>
+            <param name="accessToken"></param>
+            <returns>HttpClient</returns>
+        </member>
+        <member name="M:MigrationTools.Processors.AzureDevOpsPipelineProcessor.GetApiDefinitions``1(System.String,System.String,System.String)">
+            <summary>
+            Generic Method to get API Definitions (Taskgroups, Build- or Release Pipelines)
+            </summary>
+            <typeparam name="DefinitionType">Type of Definition. Can be: Taskgroup, Build- or Release Pipeline</typeparam>
+            <param name="organisation"></param>
+            <param name="project"></param>
+            <param name="accessToken"></param>
+            <returns>List of API Definitions </returns>
+        </member>
+        <member name="M:MigrationTools.Processors.AzureDevOpsPipelineProcessor.CreateApiDefinitions``1">
+            <summary>
+            Method to create an Api Definition
+            </summary>
+            <typeparam name="DefinitionType">Type of Definition. Can be: Taskgroup, Build- or Release Pipeline</typeparam>
+        </member>
         <member name="P:MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions.MigrateBuildPipelines">
             <summary>
             Migrate Build Pipelines

@@ -15,6 +15,9 @@ using Newtonsoft.Json;
 
 namespace MigrationTools.Processors
 {
+    /// <summary>
+    /// Azure DevOps Processor that migrates Taskgroups, Build- and Release Pipelines.
+    /// </summary>
     public partial class AzureDevOpsPipelineProcessor : Processor
     {
         private AzureDevOpsPipelineProcessorOptions _Options;
@@ -60,7 +63,9 @@ namespace MigrationTools.Processors
                 throw new Exception("The Target endpoint configured must be of type WorkItemEndpoint");
             }
         }
-
+        /// <summary>
+        /// Executes Method for migrating Taskgroups or Pipelines, depinding on whhat is set in the config.
+        /// </summary>
         private void MigratePipelines()
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
@@ -82,7 +87,14 @@ namespace MigrationTools.Processors
             Log.LogDebug("DONE in {Elapsed} ", stopwatch.Elapsed.ToString("c"));
         }
 
-        //Ugly Method to get the RESP API URLs right
+        /// <summary>
+        /// Ugly Method to get the RESP API URLs right
+        /// </summary>
+        /// <param name="organisation"></param>
+        /// <param name="project"></param>
+        /// <param name="apiPathAttribute">REST API Path</param>
+        /// <param name="apiNameAttribute">Name of Object</param>
+        /// <returns>API URL</returns>
         public string getModUrl(string organisation, string project, ApiPathAttribute apiPathAttribute, ApiNameAttribute apiNameAttribute)
         {
             string schema = string.Empty;
@@ -147,6 +159,11 @@ namespace MigrationTools.Processors
             return modUrl;
         }
 
+        /// <summary>
+        /// Create a new instance of HttpClient including Heades
+        /// </summary>
+        /// <param name="accessToken"></param>
+        /// <returns>HttpClient</returns>
         private HttpClient GetHttpClient(string accessToken)
         {
             HttpClient client = new HttpClient();
@@ -157,6 +174,14 @@ namespace MigrationTools.Processors
             return client;
         }
 
+        /// <summary>
+        /// Generic Method to get API Definitions (Taskgroups, Build- or Release Pipelines)
+        /// </summary>
+        /// <typeparam name="DefinitionType">Type of Definition. Can be: Taskgroup, Build- or Release Pipeline</typeparam>
+        /// <param name="organisation"></param>
+        /// <param name="project"></param>
+        /// <param name="accessToken"></param>
+        /// <returns>List of API Definitions </returns>
         private IList<DefinitionType> GetApiDefinitions<DefinitionType>(string organisation, string project, string accessToken) where DefinitionType : RestApiDefinition, new()
         {
             var apiNameAttribute = typeof(DefinitionType).GetCustomAttributes(typeof(ApiNameAttribute), false).OfType<ApiNameAttribute>().FirstOrDefault();
@@ -186,6 +211,10 @@ namespace MigrationTools.Processors
             return initialDefinitions;
         }
 
+        /// <summary>
+        /// Method to create an Api Definition
+        /// </summary>
+        /// <typeparam name="DefinitionType">Type of Definition. Can be: Taskgroup, Build- or Release Pipeline</typeparam>
         private void CreateApiDefinitions<DefinitionType>() where DefinitionType : RestApiDefinition, new()
         {
             Log.LogInformation("Fetching Definitions...");

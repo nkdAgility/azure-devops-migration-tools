@@ -1,0 +1,9 @@
+{
+  "$type": "AzureDevOpsEndpointOptions",
+  "Organisation": "https://dev.azure.com/nkdagility-preview/",
+  "Project": "NeedToSetThis",
+  "AuthenticationMode": "AccessToken",
+  "AccessToken": "6i4jyylsadahtdjniaydxnjsi4zsz3qsword2y5ngzzsdfewaostq",
+  "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
+  "EndpointEnrichers": null
+}
