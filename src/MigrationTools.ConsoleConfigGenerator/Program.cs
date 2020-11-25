@@ -30,6 +30,7 @@ namespace VstsSyncMigrator.ConsoleApp
 
             domain.Load("MigrationTools");
             domain.Load("MigrationTools.Clients.AzureDevops.ObjectModel");
+            domain.Load("MigrationTools.Clients.AzureDevops.Rest");
             domain.Load("MigrationTools.Clients.FileSystem");
             //AppDomain.CurrentDomain.Load("MigrationTools.Clients.AzureDevops.Rest");
             List<Type> types = domain.GetAssemblies()

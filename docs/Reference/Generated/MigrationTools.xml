@@ -4,17 +4,17 @@
         <name>MigrationTools</name>
     </assembly>
     <members>
-        <member name="M:MigrationTools.DataContracts.Pipelines.BuildDefinition.GetMigrationObject">
+        <member name="M:MigrationTools.DataContracts.Pipelines.BuildDefinition.ResetObject">
             <inheritdoc/>
         </member>
-        <member name="M:MigrationTools.DataContracts.Pipelines.ReleaseDefinition.GetMigrationObject">
+        <member name="M:MigrationTools.DataContracts.Pipelines.ReleaseDefinition.ResetObject">
             <inheritdoc/>
         </member>
-        <member name="M:MigrationTools.DataContracts.RestApiDefinition.GetMigrationObject">
+        <member name="M:MigrationTools.DataContracts.RestApiDefinition.ResetObject">
             <summary>
-            removes the values of generated propperties
+            reset values that cannot be set on new objects
             </summary>
-            <returns>The cleanuped this</returns>
+            <returns>The clean RestApiDefinition</returns>
         </member>
         <member name="P:MigrationTools.Enrichers.IEnricherOptions.Enabled">
             <summary>
