@@ -4,13 +4,6 @@ using Newtonsoft.Json.Converters;
 
 namespace MigrationTools.Endpoints
 {
-    public enum AuthenticationMode
-    {
-        AccessToken = 0,
-        Windows = 1,
-        Prompt = 2
-    }
-
     public class TfsEndpointOptions : EndpointOptions, ITfsEndpointOptions
     {
         [JsonConverter(typeof(StringEnumConverter))]

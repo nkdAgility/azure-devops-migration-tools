@@ -4,6 +4,18 @@
         <name>MigrationTools</name>
     </assembly>
     <members>
+        <member name="M:MigrationTools.DataContracts.Pipelines.BuildDefinition.ResetObject">
+            <inheritdoc/>
+        </member>
+        <member name="M:MigrationTools.DataContracts.Pipelines.ReleaseDefinition.ResetObject">
+            <inheritdoc/>
+        </member>
+        <member name="M:MigrationTools.DataContracts.RestApiDefinition.ResetObject">
+            <summary>
+            reset values that cannot be set on new objects
+            </summary>
+            <returns>The clean RestApiDefinition</returns>
+        </member>
         <member name="P:MigrationTools.Enrichers.IEnricherOptions.Enabled">
             <summary>
             Active the enricher if it true.

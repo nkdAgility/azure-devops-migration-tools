@@ -32,7 +32,7 @@ The Azure DevOps Migration Tools allow you to bulk edit and migrate data between
 - Migration of Test Suites & Test Plans
 - Migrate from one Language version of TFS / Azure Devops to another (*new v9.0*)
 
-**NOTE: If you are able to migrate your entire Collection to Azure DevOps Services you should use [Azure DevOps Migration Service](https://www.visualstudio.com/team-services/migrate-tfs-vsts/) from Microsoft. If you have a requirement to change Process Template then you will need to do that before you move t
+**NOTE: If you are able to migrate your entire Collection to Azure DevOps Services you should use [Azure DevOps Migration Service](https://azure.microsoft.com/services/devops/migrate/) from Microsoft. If you have a requirement to change Process Template then you will need to do that before you move t
 
 
 ## Quick Links

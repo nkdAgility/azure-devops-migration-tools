@@ -9,7 +9,7 @@ namespace MigrationTools.Clients.Tests
     public class WorkItemMigrationClientTests
     {
         [TestMethod(), TestCategory("L0")]
-        public void TestGetWorkItems()
+        public void WorkItemMigrationClientGetWorkItemsTest()
         {
             IWorkItemMigrationClient sink = new WorkItemMigrationClientMock();
             var list = sink.GetWorkItems();
@@ -18,7 +18,7 @@ namespace MigrationTools.Clients.Tests
         }
 
         [TestMethod(), TestCategory("L0")]
-        public void TestPersistNewWorkItem()
+        public void WorkItemMigrationClientPersistNewWorkItemTest()
         {
             IWorkItemMigrationClient sink = new WorkItemMigrationClientMock();
             sink.PersistWorkItem(new WorkItemData { Title = "Item 6" });
@@ -28,7 +28,7 @@ namespace MigrationTools.Clients.Tests
         }
 
         [TestMethod(), TestCategory("L0")]
-        public void TestpersistExistingItem()
+        public void WorkItemMigrationClientPersistExistingItemTest()
         {
             IWorkItemMigrationClient sink = new WorkItemMigrationClientMock();
             var workItem = sink.GetWorkItems().First();

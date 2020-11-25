@@ -7,6 +7,7 @@ namespace MigrationTools._EngineV1.Containers
     {
         string Name { get; }
         ProcessingStatus Status { get; }
+        ProcessorType Type { get; }
 
         void Execute();
 
