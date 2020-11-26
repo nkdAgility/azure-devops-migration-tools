@@ -5,6 +5,7 @@
     <Company>naked Agility with Martin Hinshelwood</Company>
     <LangVersion>9.0</LangVersion>
     <Product>MigrationTools.CommandLine</Product>
+    <NoWarn>1701;1702;1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

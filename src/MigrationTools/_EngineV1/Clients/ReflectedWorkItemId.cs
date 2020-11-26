@@ -5,7 +5,6 @@ namespace MigrationTools._EngineV1.Clients
 {
     public abstract class ReflectedWorkItemId
     {
-        private string _WorkItemId;
 
         public ReflectedWorkItemId(WorkItemData workItem)
         {
@@ -14,7 +13,7 @@ namespace MigrationTools._EngineV1.Clients
                 throw new ArgumentNullException(nameof(workItem));
             }
 
-            _WorkItemId = workItem.Id;
+            WorkItemId = workItem.Id;
         }
 
         public ReflectedWorkItemId(string ReflectedWorkItemId)
@@ -23,7 +22,7 @@ namespace MigrationTools._EngineV1.Clients
             {
                 throw new ArgumentNullException(nameof(ReflectedWorkItemId));
             }
-            _WorkItemId = ReflectedWorkItemId;
+            WorkItemId = ReflectedWorkItemId;
         }
 
         public override string ToString()
@@ -33,10 +32,7 @@ namespace MigrationTools._EngineV1.Clients
 
         public string WorkItemId
         {
-            get
-            {
-                return _WorkItemId;
-            }
+            get; private set;
         }
     }
 }
