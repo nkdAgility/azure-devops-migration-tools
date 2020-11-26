@@ -90,11 +90,11 @@ namespace MigrationTools._EngineV1.Clients
             //    }
             //}
             if (found == null) { found = FindReflectedWorkItemByReflectedWorkItemId(ReflectedWorkItemId)?.ToWorkItem(); }
-            if (Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName != null && !workItemToFind.Fields.Contains(Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName))
-            {
-                if (found == null) { found = FindReflectedWorkItemByMigrationRef(ReflectedWorkItemId)?.ToWorkItem(); } // Too slow!
-                                                                                                                       //if (found == null) { found = FindReflectedWorkItemByTitle(workItemToFind.Title); }
-            }
+            //if (Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName != null && !workItemToFind.Fields.Contains(Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName))
+            //{
+            //    if (found == null) { found = FindReflectedWorkItemByMigrationRef(ReflectedWorkItemId)?.ToWorkItem(); } // Too slow!
+            //    //if (found == null) { found = FindReflectedWorkItemByTitle(workItemToFind.Title); }
+            //}
             if (found != null && cache)
             {
                 AddToCache(found.AsWorkItemData());/// TODO MEMORY LEAK
@@ -234,15 +234,15 @@ namespace MigrationTools._EngineV1.Clients
             throw new NotImplementedException();
         }
 
-        protected WorkItemData FindReflectedWorkItemByMigrationRef(ReflectedWorkItemId refId)
-        {
-            IWorkItemQueryBuilder wiqb = Services.GetRequiredService<IWorkItemQueryBuilder>();
-            StringBuilder queryBuilder = FindReflectedWorkItemQueryBase(wiqb);
-            queryBuilder.Append(" [System.Description] Contains @KeyToFind");
-            wiqb.AddParameter("KeyToFind", string.Format("##REF##{0}##", refId));
-            wiqb.Query = queryBuilder.ToString();
-            return FindWorkItemByQuery(wiqb);
-        }
+        //protected WorkItemData FindReflectedWorkItemByMigrationRef(ReflectedWorkItemId refId)
+        //{
+        //    IWorkItemQueryBuilder wiqb = Services.GetRequiredService<IWorkItemQueryBuilder>();
+        //    StringBuilder queryBuilder = FindReflectedWorkItemQueryBase(wiqb);
+        //    queryBuilder.Append(" [System.Description] Contains @KeyToFind");
+        //    wiqb.AddParameter("KeyToFind", string.Format("##REF##{0}##", refId));
+        //    wiqb.Query = queryBuilder.ToString();
+        //    return FindWorkItemByQuery(wiqb);
+        //}
 
         protected WorkItemData FindReflectedWorkItemByReflectedWorkItemId(ReflectedWorkItemId refId, bool cache = true)
         {
