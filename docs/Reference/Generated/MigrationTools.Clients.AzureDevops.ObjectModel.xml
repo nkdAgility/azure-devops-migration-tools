@@ -17,7 +17,7 @@
         </member>
         <member name="T:MigrationTools.Processors.TfsAreaAndIterationProcessor">
             <summary>
-            Native TFS Processor, does not work with any other Endpoints.
+            The `TfsAreaAndIterationProcessor` migrates all of the Area nd Iteraion paths.
             </summary>
         </member>
         <member name="P:MigrationTools.Processors.TfsAreaAndIterationProcessorOptions.PrefixProjectToNodes">

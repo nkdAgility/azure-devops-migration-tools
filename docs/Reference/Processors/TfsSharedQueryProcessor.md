@@ -37,6 +37,11 @@ The TfsSharedQueryProcessor enabled you to migrate queries from one locatio nto 
     "AuthenticationMode": "AccessToken",
     "AccessToken": "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
     "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
+    "LanguageMaps": {
+      "$type": "TfsLanguageMapOptions",
+      "AreaPath": "Area",
+      "IterationPath": "Iteration"
+    },
     "EndpointEnrichers": null
   },
   "Target": {
@@ -46,6 +51,11 @@ The TfsSharedQueryProcessor enabled you to migrate queries from one locatio nto 
     "AuthenticationMode": "AccessToken",
     "AccessToken": "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
     "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
+    "LanguageMaps": {
+      "$type": "TfsLanguageMapOptions",
+      "AreaPath": "Area",
+      "IterationPath": "Iteration"
+    },
     "EndpointEnrichers": null
   }
 }
