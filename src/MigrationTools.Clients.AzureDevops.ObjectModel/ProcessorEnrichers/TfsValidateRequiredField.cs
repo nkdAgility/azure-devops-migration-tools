@@ -19,6 +19,16 @@ namespace MigrationTools.ProcessorEnrichers
             Engine = services.GetRequiredService<IMigrationEngine>();
         }
 
+        protected override void EntryForProcessorType(IProcessor processor)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void RefreshForProcessorType(IProcessor processor)
+        {
+            throw new NotImplementedException();
+        }
+
         public IMigrationEngine Engine { get; private set; }
 
         public override void Configure(IProcessorEnricherOptions options)
@@ -51,26 +61,6 @@ namespace MigrationTools.ProcessorEnrichers
                 }
             }
             return result;
-        }
-
-        protected override void EntryForProcessorType_Legacy(IProcessor processor)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override void EntryForProcessorType_New(IProcessor processor)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override void ExitForProcessorType_Legacy(IProcessor processor)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override void ExitForProcessorType_New(IProcessor processor)
-        {
-            throw new NotImplementedException();
         }
 
         //private void ConfigValidation()

@@ -17,51 +17,9 @@ namespace MigrationTools.Enrichers
             Log = logger;
         }
 
-        protected void EntryForProcessorType(IProcessor processor)
-        {
-            if (processor is null)
-            {
-                EntryForProcessorType_Legacy(processor);
-                return;
-            }
-            switch (processor.Type)
-            {
-                case ProcessorType.Legacy:
-                    EntryForProcessorType_Legacy(processor);
-                    break;
+        protected abstract void RefreshForProcessorType(IProcessor processor);
 
-                default:
-                    EntryForProcessorType_New(processor);
-                    break;
-            }
-        }
-
-        protected void ExitForProcessorType(IProcessor processor)
-        {
-            if (processor is null)
-            {
-                ExitForProcessorType_Legacy(processor);
-                return;
-            }
-            switch (processor.Type)
-            {
-                case ProcessorType.Legacy:
-                    ExitForProcessorType_Legacy(processor);
-                    break;
-
-                default:
-                    ExitForProcessorType_New(processor);
-                    break;
-            }
-        }
-
-        protected abstract void ExitForProcessorType_Legacy(IProcessor processor);
-
-        protected abstract void ExitForProcessorType_New(IProcessor processor);
-
-        protected abstract void EntryForProcessorType_Legacy(IProcessor processor);
-
-        protected abstract void EntryForProcessorType_New(IProcessor processor);
+        protected abstract void EntryForProcessorType(IProcessor processor);
 
         [Obsolete("v1 Architecture: Here to support migration, use Configure(IProcessorEnricherOptions options) instead", false)]
         public virtual void Configure(bool save = true, bool filter = true)

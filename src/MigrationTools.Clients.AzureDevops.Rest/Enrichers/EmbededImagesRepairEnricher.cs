@@ -32,27 +32,17 @@ namespace MigrationTools.Clients.AzureDevops.Rest.Enrichers
             throw new NotImplementedException();
         }
 
-        protected override void EntryForProcessorType_Legacy(IProcessor processor)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override void EntryForProcessorType_New(IProcessor processor)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override void ExitForProcessorType_Legacy(IProcessor processor)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override void ExitForProcessorType_New(IProcessor processor)
+        protected override void EntryForProcessorType(IProcessor processor)
         {
             throw new NotImplementedException();
         }
 
         protected override void FixEmbededImages(WorkItemData wi, string oldTfsurl, string newTfsurl, string sourcePersonalAccessToken = "")
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void RefreshForProcessorType(IProcessor processor)
         {
             throw new NotImplementedException();
         }

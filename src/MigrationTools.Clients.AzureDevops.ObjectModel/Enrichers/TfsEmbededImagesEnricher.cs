@@ -111,22 +111,12 @@ namespace MigrationTools.Enrichers
             }
         }
 
-        protected override void ExitForProcessorType_Legacy(IProcessor processor)
+        protected override void RefreshForProcessorType(IProcessor processor)
         {
             throw new NotImplementedException();
         }
 
-        protected override void ExitForProcessorType_New(IProcessor processor)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override void EntryForProcessorType_Legacy(IProcessor processor)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override void EntryForProcessorType_New(IProcessor processor)
+        protected override void EntryForProcessorType(IProcessor processor)
         {
             throw new NotImplementedException();
         }
