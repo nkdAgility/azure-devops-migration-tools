@@ -1,9 +1,10 @@
 ﻿using System;
 using MigrationTools.Endpoints;
+using MigrationTools.Enrichers;
 
 namespace MigrationTools.Processors
 {
-    public class TfsAreaAndIterationProcessorOptions : ProcessorOptions
+    public class TfsAreaAndIterationProcessorOptions : ProcessorOptions, ITfsNodeStructureOptions
     {
         /// <summary>
         /// Prefix your iterations and areas with the project name. If you have enabled this in `NodeStructuresMigrationConfig` you must do it here too.

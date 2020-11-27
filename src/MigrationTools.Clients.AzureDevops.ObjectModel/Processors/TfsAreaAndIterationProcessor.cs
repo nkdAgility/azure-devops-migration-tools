@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
@@ -6,11 +7,12 @@ using MigrationTools.Enrichers;
 namespace MigrationTools.Processors
 {
     /// <summary>
-    /// Native TFS Processor, does not work with any other Endpoints.
+    /// The `TfsAreaAndIterationProcessor` migrates all of the Area nd Iteraion paths.
     /// </summary>
     public class TfsAreaAndIterationProcessor : Processor
     {
         private TfsAreaAndIterationProcessorOptions _Options;
+        private TfsNodeStructure nodeStructureEnricher;
 
         public TfsAreaAndIterationProcessor(ProcessorEnricherContainer processorEnrichers,
                                         EndpointContainer endpoints,
@@ -36,7 +38,9 @@ namespace MigrationTools.Processors
             Log.LogInformation("Processor::InternalExecute::Start");
             EnsureConfigured();
             ProcessorEnrichers.ProcessorExecutionBegin(this);
-            //MigrateTeamSettings();
+            nodeStructureEnricher = Services.GetRequiredService<TfsNodeStructure>();
+            nodeStructureEnricher.Configure(new TfsNodeStructureOptions() { Enabled = true, NodeBasePaths = _Options.NodeBasePaths, PrefixProjectToNodes = _Options.PrefixProjectToNodes });
+            nodeStructureEnricher.ProcessorExecutionBegin(null);
             ProcessorEnrichers.ProcessorExecutionEnd(this);
             Log.LogInformation("Processor::InternalExecute::End");
         }
