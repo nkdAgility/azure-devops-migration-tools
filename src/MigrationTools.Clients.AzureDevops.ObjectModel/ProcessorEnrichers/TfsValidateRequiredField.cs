@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
+using MigrationTools.Processors;
 
 namespace MigrationTools.ProcessorEnrichers
 {
@@ -11,9 +14,12 @@ namespace MigrationTools.ProcessorEnrichers
     {
         private TfsValidateRequiredFieldOptions _Options;
 
-        public TfsValidateRequiredField(IMigrationEngine engine, ILogger<WorkItemProcessorEnricher> logger) : base(engine, logger)
+        public TfsValidateRequiredField(IServiceProvider services, ILogger<TfsValidateRequiredField> logger) : base(services, logger)
         {
+            Engine = services.GetRequiredService<IMigrationEngine>();
         }
+
+        public IMigrationEngine Engine { get; private set; }
 
         public override void Configure(IProcessorEnricherOptions options)
         {
@@ -45,6 +51,26 @@ namespace MigrationTools.ProcessorEnrichers
                 }
             }
             return result;
+        }
+
+        protected override void EntryForProcessorType_Legacy(IProcessor processor)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void EntryForProcessorType_New(IProcessor processor)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void ExitForProcessorType_Legacy(IProcessor processor)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void ExitForProcessorType_New(IProcessor processor)
+        {
+            throw new NotImplementedException();
         }
 
         //private void ConfigValidation()

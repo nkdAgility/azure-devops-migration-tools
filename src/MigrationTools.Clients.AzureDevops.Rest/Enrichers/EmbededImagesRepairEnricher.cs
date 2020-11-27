@@ -1,16 +1,21 @@
 ﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MigrationTools._EngineV1.Enrichers;
 using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
+using MigrationTools.Processors;
 
 namespace MigrationTools.Clients.AzureDevops.Rest.Enrichers
 {
     public class EmbededImagesRepairEnricher : EmbededImagesRepairEnricherBase
     {
-        public EmbededImagesRepairEnricher(IMigrationEngine engine, ILogger<EmbededImagesRepairEnricher> logger) : base(engine, logger)
+        public EmbededImagesRepairEnricher(IServiceProvider services, ILogger<EmbededImagesRepairEnricher> logger) : base(services, logger)
         {
+            Engine = services.GetRequiredService<IMigrationEngine>();
         }
+
+        public IMigrationEngine Engine { get; private set; }
 
         public override void Configure(bool save = true, bool filter = true)
         {
@@ -23,6 +28,26 @@ namespace MigrationTools.Clients.AzureDevops.Rest.Enrichers
         }
 
         public override int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void EntryForProcessorType_Legacy(IProcessor processor)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void EntryForProcessorType_New(IProcessor processor)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void ExitForProcessorType_Legacy(IProcessor processor)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void ExitForProcessorType_New(IProcessor processor)
         {
             throw new NotImplementedException();
         }

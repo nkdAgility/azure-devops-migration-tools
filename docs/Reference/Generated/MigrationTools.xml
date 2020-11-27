@@ -216,7 +216,7 @@
         <member name="M:MigrationTools._EngineV1.Configuration.Processing.WorkItemUpdateConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
             <inheritdoc />
         </member>
-        <member name="M:MigrationTools._EngineV1.Enrichers.EmbededImagesRepairEnricherBase.#ctor(MigrationTools.IMigrationEngine,Microsoft.Extensions.Logging.ILogger{MigrationTools._EngineV1.Enrichers.EmbededImagesRepairEnricherBase})">
+        <member name="M:MigrationTools._EngineV1.Enrichers.EmbededImagesRepairEnricherBase.#ctor(System.IServiceProvider,Microsoft.Extensions.Logging.ILogger{MigrationTools._EngineV1.Enrichers.EmbededImagesRepairEnricherBase})">
             from https://gist.github.com/pietergheysens/792ed505f09557e77ddfc1b83531e4fb
         </member>
         <member name="M:MigrationTools._EngineV1.Enrichers.EmbededImagesRepairEnricherBase.GetImageFormat(System.Byte[])">

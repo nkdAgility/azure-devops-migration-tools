@@ -6,7 +6,6 @@ using System.Xml;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.Server;
-using MigrationTools.Configuration;
 using MigrationTools.DataContracts;
 using MigrationTools.Endpoints;
 using MigrationTools.Processors;
@@ -32,10 +31,10 @@ namespace MigrationTools.Enrichers
         private ProjectInfo _sourceProjectInfo;
 
         private NodeInfo[] _sourceRootNodes;
-        private LanguageMaps _sourceLanguageMaps;
+        private TfsLanguageMapOptions _sourceLanguageMaps;
         private string _sourceProjectName;
         private ICommonStructureService4 _targetCommonStructureService;
-        private LanguageMaps _targetLanguageMaps;
+        private TfsLanguageMapOptions _targetLanguageMaps;
         private string _targetProjectName;
 
         public TfsNodeStructure(IServiceProvider services, ILogger<WorkItemProcessorEnricher> logger) : base(services, logger)
@@ -122,7 +121,7 @@ namespace MigrationTools.Enrichers
             //////////////////////////////////////////////////
         }
 
-        private string NodeStructureTypeToLanguageSpecificName(LanguageMaps languageMaps, TfsNodeStructureType value)
+        private string NodeStructureTypeToLanguageSpecificName(TfsLanguageMapOptions languageMaps, TfsNodeStructureType value)
         {
             // insert switch statement here
             switch (value)

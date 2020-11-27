@@ -90,6 +90,9 @@ namespace VstsSyncMigrator.Engine
             embededImagesEnricher = Services.GetRequiredService<TfsEmbededImagesEnricher>();
             gitRepositoryEnricher = Services.GetRequiredService<TfsGitRepositoryEnricher>();
             nodeStructureEnricher = Services.GetRequiredService<TfsNodeStructure>();
+            nodeStructureEnricher.Configure(new TfsNodeStructureOptions() { Enabled = true, NodeBasePaths = _config.NodeBasePaths, PrefixProjectToNodes = _config.PrefixProjectToNodes });
+            nodeStructureEnricher.ProcessorExecutionBegin(null);
+
             _witClient = new WorkItemTrackingHttpClient(Engine.Target.Config.AsTeamProjectConfig().Collection, Engine.Target.Credentials);
             //Validation: make sure that the ReflectedWorkItemId field name specified in the config exists in the target process, preferably on each work item type.
             PopulateIgnoreList();
@@ -304,8 +307,8 @@ namespace VstsSyncMigrator.Engine
                 }
             }
 
-            newWorkItem.AreaPath = nodeStructureEnricher.EngineV1_GetNewNodeName(oldWorkItem.AreaPath, Engine.Source.Config.AsTeamProjectConfig().Project, TfsNodeStructureType.Area, Engine.Target.Config.AsTeamProjectConfig().Project);
-            newWorkItem.IterationPath = nodeStructureEnricher.EngineV1_GetNewNodeName(oldWorkItem.IterationPath, Engine.Source.Config.AsTeamProjectConfig().Project, TfsNodeStructureType.Iteration, Engine.Target.Config.AsTeamProjectConfig().Project);
+            newWorkItem.AreaPath = nodeStructureEnricher.GetNewNodeName(oldWorkItem.AreaPath, TfsNodeStructureType.Area);
+            newWorkItem.IterationPath = nodeStructureEnricher.GetNewNodeName(oldWorkItem.IterationPath, TfsNodeStructureType.Iteration);
             switch (destType)
             {
                 case "Test Case":

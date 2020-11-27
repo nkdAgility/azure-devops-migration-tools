@@ -19,6 +19,11 @@ namespace MigrationTools.Enrichers
 
         protected void EntryForProcessorType(IProcessor processor)
         {
+            if (processor is null)
+            {
+                EntryForProcessorType_Legacy(processor);
+                return;
+            }
             switch (processor.Type)
             {
                 case ProcessorType.Legacy:
@@ -33,6 +38,11 @@ namespace MigrationTools.Enrichers
 
         protected void ExitForProcessorType(IProcessor processor)
         {
+            if (processor is null)
+            {
+                ExitForProcessorType_Legacy(processor);
+                return;
+            }
             switch (processor.Type)
             {
                 case ProcessorType.Legacy:

@@ -26,7 +26,7 @@ namespace MigrationTools._EngineV1.Configuration
             ReflectedWorkItemIDFieldName = "Custom.ReflectedWorkItemId";
             PersonalAccessToken = "";
             AuthenticationMode = AuthenticationMode.Prompt;
-            LanguageMaps = new LanguageMaps() { AreaPath = "Area", IterationPath = "Iteration" };
+            LanguageMaps = new TfsLanguageMapOptions() { AreaPath = "Area", IterationPath = "Iteration" };
             return this;
         }
 

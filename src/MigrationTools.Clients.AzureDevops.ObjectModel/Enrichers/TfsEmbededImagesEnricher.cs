@@ -4,17 +4,23 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools._EngineV1.Enrichers;
 using MigrationTools.DataContracts;
+using MigrationTools.Processors;
 
 namespace MigrationTools.Enrichers
 {
     public class TfsEmbededImagesEnricher : EmbededImagesRepairEnricherBase
     {
-        public TfsEmbededImagesEnricher(IMigrationEngine engine, ILogger<TfsEmbededImagesEnricher> logger) : base(engine, logger)
+        public IMigrationEngine Engine { get; private set; }
+
+        public TfsEmbededImagesEnricher(IServiceProvider services, ILogger<TfsEmbededImagesEnricher> logger) : base(services, logger)
         {
+            Engine = services.GetRequiredService<IMigrationEngine>();
+            //
         }
 
         public override void Configure(bool save = true, bool filter = true)
@@ -103,6 +109,26 @@ namespace MigrationTools.Enrichers
                     }
                 }
             }
+        }
+
+        protected override void ExitForProcessorType_Legacy(IProcessor processor)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void ExitForProcessorType_New(IProcessor processor)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void EntryForProcessorType_Legacy(IProcessor processor)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void EntryForProcessorType_New(IProcessor processor)
+        {
+            throw new NotImplementedException();
         }
     }
 }
