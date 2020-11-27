@@ -304,8 +304,8 @@ namespace VstsSyncMigrator.Engine
                 }
             }
 
-            newWorkItem.AreaPath = nodeStructureEnricher.GetNewNodeName(oldWorkItem.AreaPath, TfsNodeStructureType.Area);
-            newWorkItem.IterationPath = nodeStructureEnricher.GetNewNodeName(oldWorkItem.IterationPath, TfsNodeStructureType.Iteration);
+            newWorkItem.AreaPath = nodeStructureEnricher.EngineV1_GetNewNodeName(oldWorkItem.AreaPath, Engine.Source.Config.AsTeamProjectConfig().Project, TfsNodeStructureType.Area, Engine.Target.Config.AsTeamProjectConfig().Project);
+            newWorkItem.IterationPath = nodeStructureEnricher.EngineV1_GetNewNodeName(oldWorkItem.IterationPath, Engine.Source.Config.AsTeamProjectConfig().Project, TfsNodeStructureType.Iteration, Engine.Target.Config.AsTeamProjectConfig().Project);
             switch (destType)
             {
                 case "Test Case":

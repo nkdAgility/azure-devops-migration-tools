@@ -20,6 +20,8 @@ namespace MigrationTools.Endpoints
         [JsonProperty(Order = -1)]
         public string ReflectedWorkItemIdField { get; set; }
 
+        public TfsLanguageMapOptions LanguageMaps { get; set; }
+
         public override Type ToConfigure => typeof(TfsEndpoint);
 
         public override void SetDefaults()
@@ -29,6 +31,8 @@ namespace MigrationTools.Endpoints
             Organisation = "https://dev.azure.com/nkdagility-preview/";
             Project = "NeedToSetThis";
             ReflectedWorkItemIdField = "Custom.ReflectedWorkItemId";
+            LanguageMaps = new TfsLanguageMapOptions();
+            LanguageMaps.SetDefaults();
         }
     }
 
@@ -39,5 +43,6 @@ namespace MigrationTools.Endpoints
         public string Project { get; }
         public string ReflectedWorkItemIdField { get; }
         public AuthenticationMode AuthenticationMode { get; }
+        public TfsLanguageMapOptions LanguageMaps { get; }
     }
 }

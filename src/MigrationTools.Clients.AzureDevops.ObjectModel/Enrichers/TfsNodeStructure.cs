@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.Server;
-using MigrationTools._EngineV1.Clients;
+using MigrationTools.Configuration;
 using MigrationTools.DataContracts;
+using MigrationTools.Endpoints;
 using MigrationTools.Processors;
 
 namespace MigrationTools.Enrichers
@@ -19,27 +21,81 @@ namespace MigrationTools.Enrichers
 
     public class TfsNodeStructure : WorkItemProcessorEnricher
     {
+        private Dictionary<string, bool> _foundNodes = new Dictionary<string, bool>();
+        private string[] _nodeBasePaths;
         private TfsNodeStructureOptions _Options;
+
+        private bool _prefixProjectToNodes = false;
+
+        private ICommonStructureService4 _sourceCommonStructureService;
+
+        private ProjectInfo _sourceProjectInfo;
+
+        private NodeInfo[] _sourceRootNodes;
+        private LanguageMaps _sourceLanguageMaps;
+        private string _sourceProjectName;
+        private ICommonStructureService4 _targetCommonStructureService;
+        private LanguageMaps _targetLanguageMaps;
+        private string _targetProjectName;
+
+        public TfsNodeStructure(IServiceProvider services, ILogger<WorkItemProcessorEnricher> logger) : base(services, logger)
+        {
+        }
+
+        protected override void EntryForProcessorType_Legacy(IProcessor processor)
+        {
+            IMigrationEngine engine = Services.GetRequiredService<IMigrationEngine>();
+            if (_sourceCommonStructureService is null)
+            {
+                _sourceCommonStructureService = (ICommonStructureService4)engine.Source.GetService<ICommonStructureService>();
+                _sourceProjectInfo = _sourceCommonStructureService.GetProjectFromName(engine.Source.Config.AsTeamProjectConfig().Project);
+                _sourceRootNodes = _sourceCommonStructureService.ListStructures(_sourceProjectInfo.Uri);
+                _sourceLanguageMaps = engine.Source.Config.AsTeamProjectConfig().LanguageMaps;
+                _sourceProjectName = engine.Source.Config.AsTeamProjectConfig().Project;
+            }
+            if (_targetCommonStructureService is null)
+            {
+                _targetCommonStructureService = (ICommonStructureService4)engine.Target.GetService<ICommonStructureService4>();
+                _targetLanguageMaps = engine.Target.Config.AsTeamProjectConfig().LanguageMaps;
+                _targetProjectName = engine.Target.Config.AsTeamProjectConfig().Project;
+            }
+        }
+
+        protected override void EntryForProcessorType_New(IProcessor processor)
+        {
+            if (_sourceCommonStructureService is null)
+            {
+                TfsEndpoint source = (TfsEndpoint)processor.Endpoints.Source;
+                _sourceCommonStructureService = (ICommonStructureService4)source.TfsCollection.GetService<ICommonStructureService>();
+                _sourceProjectInfo = _sourceCommonStructureService.GetProjectFromName(source.Project);
+                _sourceRootNodes = _sourceCommonStructureService.ListStructures(_sourceProjectInfo.Uri);
+                _sourceLanguageMaps = source.LanguageMaps;
+                _sourceProjectName = source.Project;
+            }
+            if (_targetCommonStructureService is null)
+            {
+                TfsEndpoint target = (TfsEndpoint)processor.Endpoints.Target;
+                _targetCommonStructureService = (ICommonStructureService4)target.TfsCollection.GetService<ICommonStructureService4>();
+                _targetLanguageMaps = target.LanguageMaps;
+                _targetProjectName = target.Project;
+            }
+        }
+
+        protected override void ExitForProcessorType_Legacy(IProcessor processor)
+        {
+            IMigrationEngine engine = Services.GetRequiredService<IMigrationEngine>();
+            // refresh
+        }
+
+        protected override void ExitForProcessorType_New(IProcessor processor)
+        {
+            TfsEndpoint target = (TfsEndpoint)processor.Endpoints.Target;
+            target.TfsStore.RefreshCache(true);
+        }
 
         public TfsNodeStructureOptions Options
         {
             get { return _Options; }
-        }
-
-        private Dictionary<string, bool> _foundNodes = new Dictionary<string, bool>();
-        private string[] _nodeBasePaths;
-        private bool _prefixProjectToNodes = false;
-        private ICommonStructureService _sourceCommonStructureService;
-        private ProjectInfo _sourceProjectInfo;
-        private NodeInfo[] _sourceRootNodes;
-        private ICommonStructureService _targetCommonStructureService;
-
-        public TfsNodeStructure(IMigrationEngine engine, ILogger<WorkItemProcessorEnricher> logger) : base(engine, logger)
-        {
-            _sourceCommonStructureService = (ICommonStructureService)Engine.Source.GetService<ICommonStructureService>();
-            _targetCommonStructureService = (ICommonStructureService)Engine.Target.GetService<ICommonStructureService4>();
-            _sourceProjectInfo = _sourceCommonStructureService.GetProjectFromName(Engine.Source.Config.AsTeamProjectConfig().Project);
-            _sourceRootNodes = _sourceCommonStructureService.ListStructures(_sourceProjectInfo.Uri);
         }
 
         [Obsolete("Old v1 arch: this is a v2 class", true)]
@@ -53,10 +109,82 @@ namespace MigrationTools.Enrichers
             _Options = (TfsNodeStructureOptions)options;
         }
 
+        private void MigrateAllNodeStructures()
+        {
+            _prefixProjectToNodes = Options.PrefixProjectToNodes;
+            _nodeBasePaths = Options.NodeBasePaths;
+
+            Log.LogDebug("NodeStructureEnricher.MigrateAllNodeStructures({prefixProjectToNodes}, {nodeBasePaths})", _prefixProjectToNodes, _nodeBasePaths);
+            //////////////////////////////////////////////////
+            ProcessCommonStructure(_sourceLanguageMaps.AreaPath, _sourceProjectName, _targetLanguageMaps.AreaPath, _targetProjectName);
+            //////////////////////////////////////////////////
+            ProcessCommonStructure(_sourceLanguageMaps.IterationPath, _sourceProjectName, _targetLanguageMaps.IterationPath, _targetProjectName);
+            //////////////////////////////////////////////////
+        }
+
+        private string NodeStructureTypeToLanguageSpecificName(LanguageMaps languageMaps, TfsNodeStructureType value)
+        {
+            // insert switch statement here
+            switch (value)
+            {
+                case TfsNodeStructureType.Area:
+                    return languageMaps.AreaPath;
+
+                case TfsNodeStructureType.Iteration:
+                    return languageMaps.IterationPath;
+
+                default:
+                    throw new InvalidOperationException("Not a valid NodeStructureType ");
+            }
+        }
+
         [Obsolete("Old v1 arch: this is a v2 class", true)]
         public override int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
         {
             throw new System.NotImplementedException();
+        }
+
+        public string GetNewNodeName(string sourceNodeName, TfsNodeStructureType nodeStructureType)
+        {
+            Log.LogDebug("NodeStructureEnricher.GetNewNodeName({sourceNodeName}, {nodeStructureType})", sourceNodeName, nodeStructureType.ToString());
+            string targetStructureName = NodeStructureTypeToLanguageSpecificName(_sourceLanguageMaps, nodeStructureType);
+            string sourceStructureName = NodeStructureTypeToLanguageSpecificName(_targetLanguageMaps, nodeStructureType);
+            // Replace project name with new name (if necessary) and inject nodePath (Area or Iteration) into path for node validation
+            string newNodeName;
+            if (_prefixProjectToNodes)
+            {
+                newNodeName = $@"{_targetProjectName}\{targetStructureName}\{sourceNodeName}";
+            }
+            else
+            {
+                var regex = new Regex(Regex.Escape(_sourceProjectName));
+                if (sourceNodeName.StartsWith($@"{_sourceProjectName}\{sourceStructureName}\"))
+                {
+                    newNodeName = regex.Replace(sourceNodeName, _targetProjectName, 1);
+                }
+                else
+                {
+                    newNodeName = regex.Replace(sourceNodeName, $@"{_targetProjectName}\{targetStructureName}", 1);
+                }
+            }
+
+            // Validate the node exists
+            if (!TargetNodeExists(newNodeName))
+            {
+                Log.LogWarning("The Node '{newNodeName}' does not exist, leaving as '{newProjectName}'. This may be because it has been renamed or moved and no longer exists, or that you have not migrateed the Node Structure yet.", newNodeName, _targetProjectName);
+                newNodeName = _targetProjectName;
+            }
+
+            // Remove nodePath (Area or Iteration) from path for correct population in work item
+            if (newNodeName.StartsWith(_targetProjectName + '\\' + targetStructureName + '\\'))
+            {
+                newNodeName = newNodeName.Remove(newNodeName.IndexOf($@"{targetStructureName}\"), $@"{targetStructureName}\".Length);
+            }
+            else if (newNodeName.StartsWith(_targetProjectName + '\\' + targetStructureName))
+            {
+                newNodeName = newNodeName.Remove(newNodeName.IndexOf($@"{targetStructureName}"), $@"{targetStructureName}".Length);
+            }
+            return newNodeName;
         }
 
         public override void ProcessorExecutionBegin(IProcessor processor)
@@ -64,86 +192,13 @@ namespace MigrationTools.Enrichers
             if (Options.Enabled)
             {
                 Log.LogInformation("Migrating all Nodes before the Processor run.");
-
+                EntryForProcessorType(processor);
                 MigrateAllNodeStructures();
-            }
-        }
-        public string GetNewNodeName(string sourceNodeName, TfsNodeStructureType nodeStructureType)
-        {
-            Log.LogDebug("NodeStructureEnricher.GetNewNodeName({sourceNodeName}, {nodeStructureType})", sourceNodeName, nodeStructureType.ToString());
-            string targetStructureName = NodeStructureTypeToLanguageSpecificName(Engine.Target, nodeStructureType);
-            string targetProjectName = Engine.Target.Config.AsTeamProjectConfig().Project;
-            string sourceStructureName = NodeStructureTypeToLanguageSpecificName(Engine.Source, nodeStructureType);
-            string sourceProjectName = Engine.Source.Config.AsTeamProjectConfig().Project;
-
-            // Replace project name with new name (if necessary) and inject nodePath (Area or Iteration) into path for node validation
-            string newNodeName;
-            if (_prefixProjectToNodes)
-            {
-                newNodeName = $@"{targetProjectName}\{targetStructureName}\{sourceNodeName}";
-            }
-            else
-            {
-                var regex = new Regex(Regex.Escape(sourceProjectName));
-                if (sourceNodeName.StartsWith($@"{sourceProjectName}\{sourceStructureName}\"))
-                {
-                    newNodeName = regex.Replace(sourceNodeName, targetProjectName, 1);
-                }
-                else
-                {
-                    newNodeName = regex.Replace(sourceNodeName, $@"{targetProjectName}\{targetStructureName}", 1);
-                }
-            }
-
-            // Validate the node exists
-            if (!TargetNodeExists(newNodeName))
-            {
-                Log.LogWarning("The Node '{newNodeName}' does not exist, leaving as '{newProjectName}'. This may be because it has been renamed or moved and no longer exists, or that you have not migrateed the Node Structure yet.", newNodeName, targetProjectName);
-                newNodeName = targetProjectName;
-            }
-
-            // Remove nodePath (Area or Iteration) from path for correct population in work item
-            if (newNodeName.StartsWith(targetProjectName + '\\' + targetStructureName + '\\'))
-            {
-                newNodeName = newNodeName.Remove(newNodeName.IndexOf($@"{targetStructureName}\"), $@"{targetStructureName}\".Length);
-            }
-            else if (newNodeName.StartsWith(targetProjectName + '\\' + targetStructureName))
-            {
-                newNodeName = newNodeName.Remove(newNodeName.IndexOf($@"{targetStructureName}"), $@"{targetStructureName}".Length);
-            }
-            return newNodeName;
-        }
-
-        public void MigrateAllNodeStructures()
-        {
-            _prefixProjectToNodes = Options.PrefixProjectToNodes;
-            _nodeBasePaths = Options.NodeBasePaths;
-
-            Log.LogDebug("NodeStructureEnricher.MigrateAllNodeStructures({prefixProjectToNodes}, {nodeBasePaths})", _prefixProjectToNodes, _nodeBasePaths);
-            //////////////////////////////////////////////////
-            ProcessCommonStructure(Engine.Source.Config.AsTeamProjectConfig().LanguageMaps.AreaPath, Engine.Target.Config.AsTeamProjectConfig().LanguageMaps.AreaPath);
-            //////////////////////////////////////////////////
-            ProcessCommonStructure(Engine.Source.Config.AsTeamProjectConfig().LanguageMaps.IterationPath, Engine.Target.Config.AsTeamProjectConfig().LanguageMaps.IterationPath);
-            //////////////////////////////////////////////////
-        }
-
-        public string NodeStructureTypeToLanguageSpecificName(IMigrationClient client, TfsNodeStructureType value)
-        {
-            // insert switch statement here
-            switch (value)
-            {
-                case TfsNodeStructureType.Area:
-                    return client.Config.AsTeamProjectConfig().LanguageMaps.AreaPath;
-
-                case TfsNodeStructureType.Iteration:
-                    return client.Config.AsTeamProjectConfig().LanguageMaps.IterationPath;
-
-                default:
-                    throw new InvalidOperationException("Not a valid NodeStructureType ");
+                ExitForProcessorType(processor);
             }
         }
 
-        public bool TargetNodeExists(string nodePath)
+        private bool TargetNodeExists(string nodePath)
         {
             if (!_foundNodes.ContainsKey(nodePath))
             {
@@ -239,7 +294,7 @@ namespace MigrationTools.Enrichers
             }
         }
 
-        private void ProcessCommonStructure(string treeTypeSource, string treeTypeTarget)
+        private void ProcessCommonStructure(string treeTypeSource, string sourceTarget, string treeTypeTarget, string projectTarget)
         {
             Log.LogDebug("NodeStructureEnricher.ProcessCommonStructure({treeTypeSource}, {treeTypeTarget})", treeTypeSource, treeTypeTarget);
             NodeInfo sourceNode = (from n in _sourceRootNodes where n.Path.Contains(treeTypeSource) select n).Single();
@@ -253,7 +308,7 @@ namespace MigrationTools.Enrichers
             NodeInfo structureParent;
             try // May run into language problems!!! This is to try and detect that
             {
-                structureParent = _targetCommonStructureService.GetNodeFromPath(string.Format("\\{0}\\{1}", Engine.Target.Config.AsTeamProjectConfig().Project, treeTypeTarget));
+                structureParent = _targetCommonStructureService.GetNodeFromPath(string.Format("\\{0}\\{1}", projectTarget, treeTypeTarget));
             }
             catch (Exception ex)
             {
@@ -263,7 +318,7 @@ namespace MigrationTools.Enrichers
             }
             if (_prefixProjectToNodes)
             {
-                structureParent = CreateNode(Engine.Source.Config.AsTeamProjectConfig().Project, structureParent, null, null);
+                structureParent = CreateNode(sourceTarget, structureParent, null, null);
             }
             if (sourceTree.ChildNodes[0].HasChildNodes)
             {
