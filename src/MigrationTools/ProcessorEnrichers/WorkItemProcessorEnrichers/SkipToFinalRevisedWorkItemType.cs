@@ -15,7 +15,7 @@ namespace MigrationTools.Enrichers
             get { return _Options; }
         }
 
-        public object Engine { get; private set; }
+        public IMigrationEngine Engine { get; private set; }
 
         public SkipToFinalRevisedWorkItemType(IServiceProvider services, ILogger<SkipToFinalRevisedWorkItemType> logger) : base(services, logger)
         {

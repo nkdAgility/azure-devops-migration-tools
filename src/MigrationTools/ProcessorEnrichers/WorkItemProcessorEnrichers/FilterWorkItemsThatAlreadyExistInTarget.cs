@@ -15,7 +15,7 @@ namespace MigrationTools.Enrichers
             get { return _Options; }
         }
 
-        public object Engine { get; private set; }
+        public IMigrationEngine Engine { get; private set; }
 
         public FilterWorkItemsThatAlreadyExistInTarget(IServiceProvider services, ILogger<FilterWorkItemsThatAlreadyExistInTarget> logger) : base(services, logger)
         {
