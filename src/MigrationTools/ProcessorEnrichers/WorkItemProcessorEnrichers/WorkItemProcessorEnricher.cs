@@ -8,14 +8,18 @@ namespace MigrationTools.Enrichers
 {
     public abstract class WorkItemProcessorEnricher : IWorkItemProcessorEnricher
     {
-        protected IMigrationEngine Engine { get; }
+        protected IServiceProvider Services { get; }
         protected ILogger<IWorkItemProcessorEnricher> Log { get; }
 
-        public WorkItemProcessorEnricher(IMigrationEngine engine, ILogger<WorkItemProcessorEnricher> logger)
+        public WorkItemProcessorEnricher(IServiceProvider services, ILogger<WorkItemProcessorEnricher> logger)
         {
-            Engine = engine;
+            Services = services;
             Log = logger;
         }
+
+        protected abstract void RefreshForProcessorType(IProcessor processor);
+
+        protected abstract void EntryForProcessorType(IProcessor processor);
 
         [Obsolete("v1 Architecture: Here to support migration, use Configure(IProcessorEnricherOptions options) instead", false)]
         public virtual void Configure(bool save = true, bool filter = true)

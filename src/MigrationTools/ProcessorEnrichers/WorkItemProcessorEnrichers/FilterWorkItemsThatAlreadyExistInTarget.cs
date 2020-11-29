@@ -1,6 +1,8 @@
 ﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MigrationTools.DataContracts;
+using MigrationTools.Processors;
 
 namespace MigrationTools.Enrichers
 {
@@ -13,8 +15,11 @@ namespace MigrationTools.Enrichers
             get { return _Options; }
         }
 
-        public FilterWorkItemsThatAlreadyExistInTarget(IMigrationEngine engine, ILogger<WorkItemProcessorEnricher> logger) : base(engine, logger)
+        public IMigrationEngine Engine { get; private set; }
+
+        public FilterWorkItemsThatAlreadyExistInTarget(IServiceProvider services, ILogger<FilterWorkItemsThatAlreadyExistInTarget> logger) : base(services, logger)
         {
+            Engine = Services.GetRequiredService<IMigrationEngine>();
         }
 
         public override void Configure(IProcessorEnricherOptions options)
@@ -26,6 +31,16 @@ namespace MigrationTools.Enrichers
         public override int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
         {
             throw new System.NotImplementedException();
+        }
+
+        protected override void RefreshForProcessorType(IProcessor processor)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void EntryForProcessorType(IProcessor processor)
+        {
+            throw new NotImplementedException();
         }
     }
 }

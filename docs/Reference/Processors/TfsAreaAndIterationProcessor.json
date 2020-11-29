@@ -1,9 +1,8 @@
 {
-  "$type": "TfsSharedQueryProcessorOptions",
+  "$type": "TfsAreaAndIterationProcessorOptions",
   "Enabled": false,
   "PrefixProjectToNodes": false,
-  "SharedFolderName": "Shared Queries",
-  "SourceToTargetFieldMappings": null,
+  "NodeBasePaths": null,
   "ProcessorEnrichers": null,
   "Source": {
     "$type": "TfsEndpointOptions",

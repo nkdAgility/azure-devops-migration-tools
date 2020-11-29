@@ -15,6 +15,7 @@ missng XML code comments
 | AuthenticationMode | AuthenticationMode | missng XML code comments | missng XML code comments |
 | AccessToken | String | missng XML code comments | missng XML code comments |
 | ReflectedWorkItemIdField | String | missng XML code comments | missng XML code comments |
+| LanguageMaps | TfsLanguageMapOptions | missng XML code comments | missng XML code comments |
 | EndpointEnrichers | List | missng XML code comments | missng XML code comments |
 | RefName | String | missng XML code comments | missng XML code comments |
 
@@ -29,6 +30,11 @@ missng XML code comments
   "AuthenticationMode": "AccessToken",
   "AccessToken": "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
   "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
+  "LanguageMaps": {
+    "$type": "TfsLanguageMapOptions",
+    "AreaPath": "Area",
+    "IterationPath": "Iteration"
+  },
   "EndpointEnrichers": null
 }
 ```

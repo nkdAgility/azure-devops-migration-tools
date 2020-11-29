@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation;
 using Microsoft.TeamFoundation.Git.Client;
@@ -9,6 +10,7 @@ using Microsoft.TeamFoundation.SourceControl.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools._EngineV1.Clients;
 using MigrationTools.DataContracts;
+using MigrationTools.Processors;
 
 namespace MigrationTools.Enrichers
 {
@@ -26,17 +28,19 @@ namespace MigrationTools.Enrichers
         private IList<GitRepository> allTargetRepos;
         private List<string> gitWits;
 
-        public TfsGitRepositoryEnricher(IMigrationEngine engine, ILogger<TfsGitRepositoryEnricher> logger) : base(engine, logger)
+        public IMigrationEngine Engine { get => _Engine; set => _Engine = value; }
+
+        public TfsGitRepositoryEnricher(IServiceProvider services, ILogger<TfsGitRepositoryEnricher> logger) : base(services, logger)
         {
-            _Engine = engine ?? throw new ArgumentNullException(nameof(engine));
+            Engine = Services.GetRequiredService<IMigrationEngine>();
             _Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            sourceRepoService = engine.Source.GetService<GitRepositoryService>();
-            sourceRepos = sourceRepoService.QueryRepositories(engine.Source.Config.AsTeamProjectConfig().Project);
+            sourceRepoService = Engine.Source.GetService<GitRepositoryService>();
+            sourceRepos = sourceRepoService.QueryRepositories(Engine.Source.Config.AsTeamProjectConfig().Project);
             allSourceRepos = sourceRepoService.QueryRepositories("");
             //////////////////////////////////////////////////
-            targetRepoService = engine.Target.GetService<GitRepositoryService>();
-            targetRepos = targetRepoService.QueryRepositories(engine.Target.Config.AsTeamProjectConfig().Project);
+            targetRepoService = Engine.Target.GetService<GitRepositoryService>();
+            targetRepos = targetRepoService.QueryRepositories(Engine.Target.Config.AsTeamProjectConfig().Project);
             allTargetRepos = targetRepoService.QueryRepositories("");
             gitWits = new List<string>
                 {
@@ -224,6 +228,16 @@ namespace MigrationTools.Enrichers
 
         [Obsolete("v2 Archtecture: use Configure(bool save = true, bool filter = true) instead", true)]
         public override void Configure(IProcessorEnricherOptions options)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void RefreshForProcessorType(IProcessor processor)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void EntryForProcessorType(IProcessor processor)
         {
             throw new NotImplementedException();
         }

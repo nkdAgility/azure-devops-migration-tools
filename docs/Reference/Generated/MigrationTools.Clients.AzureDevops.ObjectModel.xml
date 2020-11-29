@@ -15,6 +15,17 @@
             <param name="newNodeName">Node to be created</param>
             <returns>true/false</returns>
         </member>
+        <member name="T:MigrationTools.Processors.TfsAreaAndIterationProcessor">
+            <summary>
+            The `TfsAreaAndIterationProcessor` migrates all of the Area nd Iteraion paths.
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Processors.TfsAreaAndIterationProcessorOptions.PrefixProjectToNodes">
+            <summary>
+            Prefix your iterations and areas with the project name. If you have enabled this in `NodeStructuresMigrationConfig` you must do it here too.
+            </summary>
+            <default>false</default>
+        </member>
         <member name="T:MigrationTools.Processors.TfsSharedQueryProcessor">
             <summary>
             The TfsSharedQueryProcessor enabled you to migrate queries from one locatio nto another.
