@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MigrationTools.Enrichers
 {
-    public class TfsNodeStructureOptions : ProcessorEnricherOptions
+    public class TfsNodeStructureOptions : ProcessorEnricherOptions, ITfsNodeStructureOptions
     {
         public override Type ToConfigure => typeof(TfsNodeStructure);
 
@@ -17,5 +13,11 @@ namespace MigrationTools.Enrichers
         {
             Enabled = true;
         }
+    }
+
+    public interface ITfsNodeStructureOptions
+    {
+        public bool PrefixProjectToNodes { get; set; }
+        public string[] NodeBasePaths { get; set; }
     }
 }

@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools._EngineV1.Clients;
 using MigrationTools.DataContracts;
 using MigrationTools.Exceptions;
+using MigrationTools.Processors;
 
 namespace MigrationTools.Enrichers
 {
@@ -12,9 +14,11 @@ namespace MigrationTools.Enrichers
     {
         private bool _save = true;
         private bool _filterWorkItemsThatAlreadyExistInTarget = true;
+        private IMigrationEngine Engine;
 
-        public TfsWorkItemLinkEnricher(IMigrationEngine engine, ILogger<TfsWorkItemLinkEnricher> logger) : base(engine, logger)
+        public TfsWorkItemLinkEnricher(IServiceProvider services, ILogger<TfsWorkItemLinkEnricher> logger) : base(services, logger)
         {
+            Engine = services.GetRequiredService<IMigrationEngine>();
         }
 
         public override void Configure(
@@ -382,6 +386,16 @@ namespace MigrationTools.Enrichers
 
         [Obsolete("v2 Archtecture: use Configure(bool save = true, bool filter = true) instead", true)]
         public override void Configure(IProcessorEnricherOptions options)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void RefreshForProcessorType(IProcessor processor)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void EntryForProcessorType(IProcessor processor)
         {
             throw new NotImplementedException();
         }
