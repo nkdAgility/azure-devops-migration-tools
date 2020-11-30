@@ -76,6 +76,11 @@ namespace MigrationTools.DataContracts.Pipelines
 
         public string HelpMarkDown { get; set; }
 
+        public override bool HasTaskGroups()
+        {
+            throw new NotImplementedException("we currently not support taskgroup nesting.");
+        }
+
         public override RestApiDefinition ResetObject()
         {
             return this;

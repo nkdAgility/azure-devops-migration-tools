@@ -41,12 +41,6 @@
             <param name="accessToken"></param>
             <returns>List of API Definitions </returns>
         </member>
-        <member name="M:MigrationTools.Processors.AzureDevOpsPipelineProcessor.CreateApiDefinitions``1">
-            <summary>
-            Method to create an Api Definition
-            </summary>
-            <typeparam name="DefinitionType">Type of Definition. Can be: Taskgroup, Build- or Release Pipeline</typeparam>
-        </member>
         <member name="P:MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions.MigrateBuildPipelines">
             <summary>
             Migrate Build Pipelines

@@ -12,6 +12,13 @@ namespace MigrationTools.DataContracts
         /// </summary>
         /// <returns>The clean RestApiDefinition</returns>
         public abstract RestApiDefinition ResetObject();
+        public abstract bool HasTaskGroups();
+    }
+
+    public class TaskGroupStore
+    {
+        public string Name { get; set; }
+        public string Id { get; set; }
     }
 
     public class RestResultDefinition<ValueType> where ValueType : RestApiDefinition, new()

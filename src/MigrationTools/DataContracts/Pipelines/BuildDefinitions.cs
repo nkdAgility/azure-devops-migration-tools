@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Dynamic;
+using System.Linq;
 
 namespace MigrationTools.DataContracts.Pipelines
 {
@@ -71,6 +73,11 @@ namespace MigrationTools.DataContracts.Pipelines
             Repository.Id = null;
             Variables = null;
             return this;
+        }
+
+        public override bool HasTaskGroups()
+        {
+            return Process.Phases.Any(p => p.Steps.Any(s => s.Task.DefinitionType.ToString() == "metaTask"));  
         }
     }
 

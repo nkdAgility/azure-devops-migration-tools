@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Dynamic;
+using System.Linq;
 using Newtonsoft.Json;
 
 namespace MigrationTools.DataContracts.Pipelines
@@ -53,6 +54,10 @@ namespace MigrationTools.DataContracts.Pipelines
             Id = null;
             VariableGroups = null;
             return this;
+        }
+        public override bool HasTaskGroups()
+        {
+            return Environments.Any(e => e.DeployPhases.Any(p => p.WorkflowTasks.Any(t => t.DefinitionType.ToString() == "metaTask")));
         }
     }
 

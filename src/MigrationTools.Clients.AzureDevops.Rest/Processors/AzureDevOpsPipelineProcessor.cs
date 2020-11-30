@@ -63,25 +63,26 @@ namespace MigrationTools.Processors
                 throw new Exception("The Target endpoint configured must be of type WorkItemEndpoint");
             }
         }
+
         /// <summary>
         /// Executes Method for migrating Taskgroups or Pipelines, depinding on whhat is set in the config.
         /// </summary>
         private void MigratePipelines()
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
-
+            IEnumerable<Mapping> taskGroupMappings = null;
             if (_Options.MigrateTaskGroups)
             {
-                CreateApiDefinitions<TaskGroup>();
+                taskGroupMappings = CreateTaskGroupDefinitions();
             }
             if (_Options.MigrateBuildPipelines)
             {
-                CreateApiDefinitions<BuildDefinition>();
+                CreateBuildPipelines(taskGroupMappings);
             }
 
             if (_Options.MigrateReleasePipelines)
             {
-                CreateApiDefinitions<ReleaseDefinition>();
+                CreateReleasePipelines(taskGroupMappings);
             }
             stopwatch.Stop();
             Log.LogDebug("DONE in {Elapsed} ", stopwatch.Elapsed.ToString("c"));
@@ -182,7 +183,7 @@ namespace MigrationTools.Processors
         /// <param name="project"></param>
         /// <param name="accessToken"></param>
         /// <returns>List of API Definitions </returns>
-        private IList<DefinitionType> GetApiDefinitions<DefinitionType>(string organisation, string project, string accessToken) where DefinitionType : RestApiDefinition, new()
+        private IEnumerable<DefinitionType> GetApiDefinitions<DefinitionType>(string organisation, string project, string accessToken) where DefinitionType : RestApiDefinition, new()
         {
             var apiNameAttribute = typeof(DefinitionType).GetCustomAttributes(typeof(ApiNameAttribute), false).OfType<ApiNameAttribute>().FirstOrDefault();
             var apiPathAttribute = typeof(DefinitionType).GetCustomAttributes(typeof(ApiPathAttribute), false).OfType<ApiPathAttribute>().FirstOrDefault();
@@ -215,20 +216,145 @@ namespace MigrationTools.Processors
                 {
                     initialDefinitions = definitions.Value.ToList();
                 }
-
             }
             return initialDefinitions;
         }
 
-        /// <summary>
-        /// Method to create an Api Definition
-        /// </summary>
-        /// <typeparam name="DefinitionType">Type of Definition. Can be: Taskgroup, Build- or Release Pipeline</typeparam>
-        private void CreateApiDefinitions<DefinitionType>() where DefinitionType : RestApiDefinition, new()
+        // targetTaskGroup -> TaskGroupMapping == @{sid: string, tid: string}[]
+        private IEnumerable<Mapping> CreateBuildPipelines(IEnumerable<Mapping> TaskGroupMapping = null)
         {
-            Log.LogInformation("Fetching Definitions...");
-            var sourceDefinitions = GetApiDefinitions<DefinitionType>(Source.Organisation, Source.Project, Source.AccessToken);
-            var targetDefinitions = GetApiDefinitions<DefinitionType>(Target.Organisation, Target.Project, Target.AccessToken);
+            var sourceDefinitions = GetApiDefinitions<BuildDefinition>(Source.Organisation, Source.Project, Source.AccessToken);
+            var targetDefinitions = GetApiDefinitions<BuildDefinition>(Target.Organisation, Target.Project, Target.AccessToken);
+            var definitionsToBeMigrated = objectToMigrate(sourceDefinitions, targetDefinitions);
+
+            // Replace taskgroup sIds with tIds
+            foreach (var definitionToBeMigrated in definitionsToBeMigrated)
+            {
+                if (definitionToBeMigrated.HasTaskGroups() && TaskGroupMapping != null)
+                {
+                    foreach (var phase in definitionToBeMigrated.Process.Phases)
+                    {
+                        foreach (var step in phase.Steps)
+                        {
+                            if (step.Task.DefinitionType.ToLower() != "metaTask".ToLower())
+                            {
+                                continue;
+                            }
+                            var mapping = TaskGroupMapping
+                                .Where(d => d.SId == step.Task.Id.ToString()).FirstOrDefault();
+                            if (mapping == null)
+                            {
+                                Log.LogWarning($"Can't find taskgroup {step.Task.Id.ToString()} in the target collection.");
+                            }
+                            else
+                            {
+                                step.Task.Id = mapping.TId;
+                            }
+                        }
+                    }
+                }
+                else if (definitionToBeMigrated.HasTaskGroups() && TaskGroupMapping == null)
+                {
+                    Log.LogWarning("You can't migrate pipelines that uses taskgroups if you didn't migrate taskgroups");
+                    definitionsToBeMigrated = definitionsToBeMigrated.Where(d => d.HasTaskGroups() == false);
+                }
+            }
+            var mappings = CreateApiDefinitions<BuildDefinition>(definitionsToBeMigrated.ToList()).ToList();
+            mappings = AddAllreadySyncedMappings(sourceDefinitions, targetDefinitions, mappings).ToList();
+            return mappings;
+        }
+        private IEnumerable<Mapping> CreateReleasePipelines(IEnumerable<Mapping> TaskGroupMapping = null)
+        {
+            var sourceDefinitions = GetApiDefinitions<ReleaseDefinition>(Source.Organisation, Source.Project, Source.AccessToken);
+            var targetDefinitions = GetApiDefinitions<ReleaseDefinition>(Target.Organisation, Target.Project, Target.AccessToken);
+            var definitionsToBeMigrated = objectToMigrate(sourceDefinitions, targetDefinitions);
+
+            // Replace taskgroup sIds with tIds
+            foreach (var definitionToBeMigrated in definitionsToBeMigrated)
+            {
+                if (definitionToBeMigrated.HasTaskGroups() && TaskGroupMapping != null)
+                {
+                    var Environments = definitionToBeMigrated.Environments;
+                    foreach (var environment in Environments)
+                    {
+                        foreach (var deployPhase in environment.DeployPhases)
+                        {
+                            foreach (var WorkflowTask in deployPhase.WorkflowTasks)
+                            {
+                                if (WorkflowTask.DefinitionType.ToLower() != "metaTask".ToLower())
+                                {
+                                    continue;
+                                }
+                                var mapping = TaskGroupMapping
+                                    .Where(d => d.SId == WorkflowTask.TaskId.ToString()).FirstOrDefault();
+                                if (mapping == null)
+                                {
+                                    Log.LogWarning($"Can't find taskgroup {WorkflowTask.TaskId.ToString()} in the target collection.");
+                                }
+                                else
+                                {
+                                    WorkflowTask.TaskId = Guid.Parse(mapping.TId);
+                                }
+                            }
+                        }
+                    }
+                }
+                else if (definitionToBeMigrated.HasTaskGroups() && TaskGroupMapping == null)
+                {
+                    Log.LogWarning("You can't migrate pipelines that uses taskgroups if you didn't migrate taskgroups");
+                    definitionsToBeMigrated = definitionsToBeMigrated.Where(d => d.HasTaskGroups() == false);
+                }
+            }
+            var mappings = CreateApiDefinitions<ReleaseDefinition>(definitionsToBeMigrated).ToList();
+            mappings = AddAllreadySyncedMappings(sourceDefinitions, targetDefinitions, mappings).ToList();
+            return mappings;
+        }
+
+        private IEnumerable<Mapping> CreateTaskGroupDefinitions()
+        {
+            var sourceDefinitions = GetApiDefinitions<TaskGroup>(Source.Organisation, Source.Project, Source.AccessToken);
+            var targetDefinitions = GetApiDefinitions<TaskGroup>(Target.Organisation, Target.Project, Target.AccessToken);
+            var mappings = CreateApiDefinitions(objectToMigrate(sourceDefinitions, targetDefinitions)).ToList();
+            mappings = AddAllreadySyncedMappings(sourceDefinitions, targetDefinitions, mappings).ToList();
+            return mappings;
+        }
+
+        private IEnumerable<Mapping> AddAllreadySyncedMappings<DefintionType>(IEnumerable<DefintionType> sourceDefinitions, IEnumerable<DefintionType> targetDefinitions, IEnumerable<Mapping> newMappings) where DefintionType : RestApiDefinition, new()
+        {
+            // Map the taskgroups that are already migrated. (it's not safe, because the target project can have a taskgroup with the same name but with different content)
+            // To make this save we must add a local storage option for the mappings (sid, tid)
+            var allMappings = newMappings.ToList();
+            var allreadyMigratedDefintions = targetDefinitions.Where(t => newMappings.Any(m => m.TId == t.Id) == false).ToList();
+            foreach (var item in allreadyMigratedDefintions)
+            {
+                var source = sourceDefinitions.FirstOrDefault(d => d.Name == item.Name);
+                if (source == null)
+                {
+                    Log.LogInformation($"The {typeof(DefintionType).Name} {item.Name}({item.Id}) doesn't exsist in the source collection.");
+                }
+                else
+                {
+                    allMappings.Add(new()
+                    {
+                        SId = source.Id,
+                        TId = item.Id,
+                        Name = item.Name
+                    });
+                }
+            }
+            return allMappings;
+        }
+
+        private IEnumerable<DefinitionType> objectToMigrate<DefinitionType>(IEnumerable<DefinitionType> sourceDefinitions, IEnumerable<DefinitionType> targetDefinitions) where DefinitionType : RestApiDefinition, new()
+        {
+            var objectsToMigrate = sourceDefinitions.Where(s => !targetDefinitions.Any(t => t.Name == s.Name));
+            Log.LogInformation($"From {sourceDefinitions.Count()} source {typeof(DefinitionType).Name}(s) {objectsToMigrate.Count()} {typeof(DefinitionType).Name}(s) are going to be migrated..");
+
+            return objectsToMigrate;
+        }
+
+        private IEnumerable<Mapping> CreateApiDefinitions<DefinitionType>(IEnumerable<DefinitionType> definitionsToBeMigrated) where DefinitionType : RestApiDefinition, new()
+        {
             var apiPathAttribute = typeof(DefinitionType).GetCustomAttributes(typeof(ApiPathAttribute), false).OfType<ApiPathAttribute>().FirstOrDefault();
             var apiNameAttribute = typeof(DefinitionType).GetCustomAttributes(typeof(ApiNameAttribute), false).OfType<ApiNameAttribute>().FirstOrDefault();
             if (apiPathAttribute == null)
@@ -236,28 +362,42 @@ namespace MigrationTools.Processors
                 throw new ArgumentNullException($"On the class defintion of '{typeof(DefinitionType).Name}' is the attribute 'ApiName' misssing. Please add the 'ApiName' Attribute to your class");
             }
 
-            //Filter out Pipelines that already exist
-            var definitionsToBeMigrated = sourceDefinitions.Where(s => !targetDefinitions.Any(t => t.Name == s.Name));
-
-            Log.LogInformation($"From {sourceDefinitions.Count} source {apiNameAttribute.Name} {definitionsToBeMigrated.Count()} {apiNameAttribute.Name} are going to be migrated..");
             string baseUrl = getModUrl(Target.Organisation, Target.Project, apiPathAttribute, apiNameAttribute) + "?api-version=5.1-preview";
 
             foreach (RestApiDefinition definitionToBeMigrated in definitionsToBeMigrated)
             {
                 var client = GetHttpClient(Target.AccessToken);
-
-                var objectToMigrate = definitionToBeMigrated.ResetObject();
-                Log.LogInformation($"Processing {apiNameAttribute.Name} {objectToMigrate.Name}..");
-                string body = JsonConvert.SerializeObject(objectToMigrate);
+                var sourceId = definitionToBeMigrated.Id;
+                definitionToBeMigrated.ResetObject();
+                Log.LogInformation($"Processing {apiNameAttribute.Name} {definitionToBeMigrated.Name}..");
+                string body = JsonConvert.SerializeObject(definitionToBeMigrated);
 
                 var content = new StringContent(body, Encoding.UTF8, "application/json");
-                var result = client.PostAsync(baseUrl, content).Result;
+                var result = client.PostAsync(baseUrl, content).GetAwaiter().GetResult();
 
                 if (result.StatusCode != HttpStatusCode.OK)
                 {
-                    Log.LogError($"Error migrating {apiNameAttribute.Name} {objectToMigrate.Name}. Please migrate it manually.");
+                    Log.LogError($"Error migrating {apiNameAttribute.Name} {definitionToBeMigrated.Name}. Please migrate it manually.");
+                    continue;
+                }
+                else
+                {
+                    var targetObject = JsonConvert.DeserializeObject<DefinitionType>(result.Content.ReadAsStringAsync().GetAwaiter().GetResult());
+                    yield return new Mapping()
+                    {
+                        Name = definitionToBeMigrated.Name,
+                        SId = sourceId,
+                        TId = targetObject.Id
+                    };
                 }
             }
         }
+    }
+
+    internal class Mapping
+    {
+        public string SId { get; set; }
+        public string TId { get; set; }
+        public string Name { get; set; }
     }
 }
