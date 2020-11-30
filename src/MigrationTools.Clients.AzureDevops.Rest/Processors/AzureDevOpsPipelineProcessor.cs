@@ -201,12 +201,21 @@ namespace MigrationTools.Processors
             {
                 var definitions = JsonConvert.DeserializeObject<RestResultDefinition<DefinitionType>>(httpResponse);
 
-                foreach (RestApiDefinition definition in definitions.Value)
+                if (!typeof(DefinitionType).ToString().Contains("TaskGroup"))
                 {
-                    //Nessecary because getting all Pipelines doesn't include all of their properties
-                    string responseMessage = client.GetStringAsync(baseUrl + "/" + definition.Id).Result;
-                    initialDefinitions.Add(JsonConvert.DeserializeObject<DefinitionType>(responseMessage));
+                    foreach (RestApiDefinition definition in definitions.Value)
+                    {
+                        //Nessecary because getting all Pipelines doesn't include all of their properties
+                        string responseMessage = client.GetStringAsync(baseUrl + "/" + definition.Id).Result;
+                        var test = JsonConvert.DeserializeObject<RestResultDefinition<DefinitionType>>(responseMessage);
+                        initialDefinitions.Add(JsonConvert.DeserializeObject<DefinitionType>(responseMessage));
+                    }
                 }
+                else
+                {
+                    initialDefinitions = definitions.Value.ToList();
+                }
+
             }
             return initialDefinitions;
         }
@@ -231,7 +240,7 @@ namespace MigrationTools.Processors
             var definitionsToBeMigrated = sourceDefinitions.Where(s => !targetDefinitions.Any(t => t.Name == s.Name));
 
             Log.LogInformation($"From {sourceDefinitions.Count} source {apiNameAttribute.Name} {definitionsToBeMigrated.Count()} {apiNameAttribute.Name} are going to be migrated..");
-            string baseUrl = getModUrl(Target.Organisation, Target.Project, apiPathAttribute, apiNameAttribute) + "?api -version=5.1-preview";
+            string baseUrl = getModUrl(Target.Organisation, Target.Project, apiPathAttribute, apiNameAttribute) + "?api-version=5.1-preview";
 
             foreach (RestApiDefinition definitionToBeMigrated in definitionsToBeMigrated)
             {

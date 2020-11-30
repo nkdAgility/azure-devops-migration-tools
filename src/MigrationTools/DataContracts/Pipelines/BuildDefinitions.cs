@@ -3,13 +3,6 @@ using System.Dynamic;
 
 namespace MigrationTools.DataContracts.Pipelines
 {
-    public partial class BuildDefinitions
-    {
-        public long Count { get; set; }
-
-        public BuildDefinition[] Value { get; set; }
-    }
-
     [ApiPath("build/definitions")]
     [ApiName("Build Piplines")]
     public partial class BuildDefinition : RestApiDefinition

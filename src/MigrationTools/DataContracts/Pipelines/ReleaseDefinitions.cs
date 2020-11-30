@@ -4,13 +4,6 @@ using Newtonsoft.Json;
 
 namespace MigrationTools.DataContracts.Pipelines
 {
-    public partial class ReleaseDefinitions
-    {
-        public long Count { get; set; }
-
-        public ReleaseDefinition[] Value { get; set; }
-    }
-
     [ApiPath("release/definitions")]
     [ApiName("Release Piplines")]
     public partial class ReleaseDefinition : RestApiDefinition

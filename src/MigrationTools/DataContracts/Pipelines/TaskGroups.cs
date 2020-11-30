@@ -6,13 +6,6 @@ using Newtonsoft.Json.Converters;
 
 namespace MigrationTools.DataContracts.Pipelines
 {
-    public partial class TaskGroups
-    {
-        public long Count { get; set; }
-
-        public TaskGroup[] Value { get; set; }
-    }
-
     [ApiPath("distributedtask/taskgroups")]
     [ApiName("Task Groups")]
     public partial class TaskGroup : RestApiDefinition
