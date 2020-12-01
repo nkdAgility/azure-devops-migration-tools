@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
+using Microsoft.VisualStudio.Services.Common;
 using Newtonsoft.Json;
 
 namespace MigrationTools.DataContracts.Pipelines
@@ -44,7 +46,7 @@ namespace MigrationTools.DataContracts.Pipelines
         public TaskGroupLinks Links { get; set; }
 
         ///<inheritdoc/>
-        public override RestApiDefinition ResetObject()
+        public override void ResetObject()
         {
             Links = null;
             Revision = 0;
@@ -53,11 +55,28 @@ namespace MigrationTools.DataContracts.Pipelines
             Links = null;
             Id = null;
             VariableGroups = null;
-            return this;
+
+            //Remove secure files
+            Environments.ForEach(e => e.DeployPhases.ForEach(d => d.WorkflowTasks.ForEach(w =>
+            {
+                var secureFiles = w.Inputs.Where(i => i.Key == "secureFile");
+                for (int i = 0; i < secureFiles.Count(); i++)
+                {
+                    var secureFile = secureFiles.ElementAt(i);
+                    ((ICollection<KeyValuePair<string, object>>)w.Inputs).Remove(secureFile);
+                }
+            }
+            )));
         }
+
         public override bool HasTaskGroups()
         {
-            return Environments.Any(e => e.DeployPhases.Any(p => p.WorkflowTasks.Any(t => t.DefinitionType.ToString() == "metaTask")));
+            return Environments.Any(e => e.DeployPhases.Any(d => d.WorkflowTasks.Any(w => w.DefinitionType == "metaTask")));
+        }
+
+        public override bool HasVariableGroups()
+        {
+            return Environments.Any(e => e.VariableGroups != null);
         }
     }
 
@@ -139,7 +158,7 @@ namespace MigrationTools.DataContracts.Pipelines
 
         public EnvironmentVariables Variables { get; set; }
 
-        public object[] VariableGroups { get; set; }
+        public int[] VariableGroups { get; set; }
 
         public DeployApprovals PreDeployApprovals { get; set; }
 

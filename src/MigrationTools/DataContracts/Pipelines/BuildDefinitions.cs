@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
+using Microsoft.VisualStudio.Services.Common;
+using Newtonsoft.Json;
+
 
 namespace MigrationTools.DataContracts.Pipelines
 {
@@ -12,8 +15,8 @@ namespace MigrationTools.DataContracts.Pipelines
         public ExpandoObject[] Options { get; set; }
 
         public ExpandoObject[] Triggers { get; set; }
-
         public Variables Variables { get; set; }
+        public VariableGroupList[] VariableGroups { get; set; }
 
         public RetentionRule[] RetentionRules { get; set; }
 
@@ -60,7 +63,7 @@ namespace MigrationTools.DataContracts.Pipelines
         public Project Project { get; set; }
 
         ///<inheritdoc/>
-        public override RestApiDefinition ResetObject()
+        public override void ResetObject()
         {
             Links = null;
             AuthoredBy = null;
@@ -71,14 +74,37 @@ namespace MigrationTools.DataContracts.Pipelines
             Id = null;
             Project = null;
             Repository.Id = null;
-            Variables = null;
-            return this;
+
+            //Remove secure files
+            Process.Phases.ForEach(p => p.Steps.ForEach(s =>
+            {
+                var secureFiles = s.Inputs.Where(i => i.Key == "secureFile");
+                for (int i = 0; i < secureFiles.Count(); i++)
+                {
+                    var secureFile = secureFiles.ElementAt(i);
+                    ((ICollection<KeyValuePair<string, object>>)s.Inputs).Remove(secureFile);
+                }
+            }
+            ));
         }
 
         public override bool HasTaskGroups()
         {
             return Process.Phases.Any(p => p.Steps.Any(s => s.Task.DefinitionType.ToString() == "metaTask"));  
         }
+
+        public override bool HasVariableGroups()
+        {
+            return VariableGroups != null;
+        }
+    }
+
+    public class VariableGroupList
+    {
+        public ExpandoObject Variables { get; set; }
+        public string Type { get; set; }
+        public string Name { get; set; }
+        public string Id { get; set; }
     }
 
     public partial class AuthoredBy

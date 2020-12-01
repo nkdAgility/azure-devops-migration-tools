@@ -11,8 +11,9 @@ namespace MigrationTools.DataContracts
         /// reset values that cannot be set on new objects
         /// </summary>
         /// <returns>The clean RestApiDefinition</returns>
-        public abstract RestApiDefinition ResetObject();
+        public abstract void ResetObject();
         public abstract bool HasTaskGroups();
+        public abstract bool HasVariableGroups();
     }
 
     public class TaskGroupStore

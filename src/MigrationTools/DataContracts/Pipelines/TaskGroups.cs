@@ -81,9 +81,13 @@ namespace MigrationTools.DataContracts.Pipelines
             throw new NotImplementedException("we currently not support taskgroup nesting.");
         }
 
-        public override RestApiDefinition ResetObject()
+        public override bool HasVariableGroups()
         {
-            return this;
+            throw new NotImplementedException("we currently not support variablegroup nesting.");
+        }
+
+        public override void ResetObject()
+        {
         }
     }
 
