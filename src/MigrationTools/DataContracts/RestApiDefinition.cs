@@ -16,12 +16,6 @@ namespace MigrationTools.DataContracts
         public abstract bool HasVariableGroups();
     }
 
-    public class TaskGroupStore
-    {
-        public string Name { get; set; }
-        public string Id { get; set; }
-    }
-
     public class RestResultDefinition<ValueType> where ValueType : RestApiDefinition, new()
     {
         public long Count { get; set; }
