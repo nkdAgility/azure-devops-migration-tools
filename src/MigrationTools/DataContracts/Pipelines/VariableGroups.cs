@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Dynamic;
+using Microsoft.Extensions.Logging;
 
 namespace MigrationTools.DataContracts.Pipelines
 {
@@ -8,6 +9,8 @@ namespace MigrationTools.DataContracts.Pipelines
     [ApiName("Variable Groups")]
     public class VariableGroups : RestApiDefinition
     {
+        protected ILogger Log { get; }
+
         public ExpandoObject Variables { get; set; }
         public string Type { get; set; }
         public Createdby CreatedBy { get; set; }
@@ -18,12 +21,14 @@ namespace MigrationTools.DataContracts.Pipelines
 
         public override bool HasTaskGroups()
         {
-            throw new NotImplementedException("we currently not support taskgroup nesting.");
+            Log.LogError("we currently not support taskgroup nesting.");
+            return false;
         }
 
         public override bool HasVariableGroups()
         {
-            throw new NotImplementedException("we currently not support variablegroup nesting.");
+            Log.LogError("we currently not support variablegroup nesting.");
+            return false;
         }
 
         public override void ResetObject()
