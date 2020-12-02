@@ -2,6 +2,6 @@
 {
     public static class TestingConstants
     {
-        public static readonly string AccessToken = "qosss7crwz3vie4fupzpaafjndoy6g6ulgkzhoxtmjgicv2lqjyq";
+        public static readonly string AccessToken = "iksmyfwmracmyqb22p2rlytagg6mpzxu7ntowjvpihvk4fwcjzcq";
     }
 }
