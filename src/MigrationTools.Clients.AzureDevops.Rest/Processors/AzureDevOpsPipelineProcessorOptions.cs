@@ -31,12 +31,12 @@ namespace MigrationTools.Processors
         public bool MigrateVariableGroups { get; set; }
 
         /// <summary>
-        /// List of Build Pipelines to process. If this is `null` then all Build Pipelines will be processed.
+        /// List of Build Pipelines to process. If this is `null` then all Build Pipelines will be processed. **Not implemented yet**
         /// </summary>
         public List<string> BuildPipelines { get; set; }
 
         /// <summary>
-        /// List of Release Pipelines to process. If this is `null` then all Release Pipelines will be processed.
+        /// List of Release Pipelines to process. If this is `null` then all Release Pipelines will be processed. **Not implemented yet**
         /// </summary>
         public List<string> ReleasePipelines { get; set; }
 

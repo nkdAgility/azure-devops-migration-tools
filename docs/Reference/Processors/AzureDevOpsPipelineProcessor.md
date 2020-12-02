@@ -15,8 +15,8 @@ Azure DevOps Processor that migrates Taskgroups, Build- and Release Pipelines.
 | MigrateReleasePipelines | Boolean | Migrate Release Pipelines | true |
 | MigrateTaskGroups | Boolean | Migrate Task Groups | true |
 | MigrateVariableGroups | Boolean | Migrate Valiable Groups | true |
-| BuildPipelines | List | List of Build Pipelines to process. If this is `null` then all Build Pipelines will be processed. | missng XML code comments |
-| ReleasePipelines | List | List of Release Pipelines to process. If this is `null` then all Release Pipelines will be processed. | missng XML code comments |
+| BuildPipelines | List | List of Build Pipelines to process. If this is `null` then all Build Pipelines will be processed. **Not implemented yet** | missng XML code comments |
+| ReleasePipelines | List | List of Release Pipelines to process. If this is `null` then all Release Pipelines will be processed. **Not implemented yet** | missng XML code comments |
 | ProcessorEnrichers | List | List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors. | missng XML code comments |
 | Source | IEndpointOptions | This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor. | missng XML code comments |
 | Target | IEndpointOptions | This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a write only processor. | missng XML code comments |

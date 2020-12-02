@@ -65,7 +65,7 @@ namespace MigrationTools.Processors
         }
 
         /// <summary>
-        /// Executes Method for migrating Taskgroups or Pipelines, depinding on whhat is set in the config.
+        /// Executes Method for migrating Taskgroups, Variablegroups or Pipelines, depinding on whhat is set in the config.
         /// </summary>
         private void MigratePipelines()
         {
@@ -94,7 +94,7 @@ namespace MigrationTools.Processors
         }
 
         /// <summary>
-        /// Ugly Method to get the RESP API URLs right
+        /// Method to get the RESP API URLs right
         /// </summary>
         /// <param name="organisation"></param>
         /// <param name="project"></param>
@@ -181,7 +181,7 @@ namespace MigrationTools.Processors
         }
 
         /// <summary>
-        /// Generic Method to get API Definitions (Taskgroups, Build- or Release Pipelines)
+        /// Generic Method to get API Definitions (Taskgroups, Variablegroups, Build- or Release Pipelines)
         /// </summary>
         /// <typeparam name="DefinitionType">Type of Definition. Can be: Taskgroup, Build- or Release Pipeline</typeparam>
         /// <param name="organisation"></param>
@@ -207,11 +207,12 @@ namespace MigrationTools.Processors
             {
                 var definitions = JsonConvert.DeserializeObject<RestResultDefinition<DefinitionType>>(httpResponse);
 
+                // Taskgroups only have a LIST option, so the following step is not needed
                 if (!typeof(DefinitionType).ToString().Contains("TaskGroup"))
                 {
                     foreach (RestApiDefinition definition in definitions.Value)
                     {
-                        //Nessecary because getting all Pipelines doesn't include all of their properties
+                        // Nessecary because getting all Pipelines doesn't include all of their properties
                         string responseMessage = client.GetStringAsync(baseUrl + "/" + definition.Id).Result;
                         var test = JsonConvert.DeserializeObject<RestResultDefinition<DefinitionType>>(responseMessage);
                         initialDefinitions.Add(JsonConvert.DeserializeObject<DefinitionType>(responseMessage));
@@ -231,7 +232,7 @@ namespace MigrationTools.Processors
 
             var sourceDefinitions = GetApiDefinitions<BuildDefinition>(Source.Organisation, Source.Project, Source.AccessToken);
             var targetDefinitions = GetApiDefinitions<BuildDefinition>(Target.Organisation, Target.Project, Target.AccessToken);
-            var definitionsToBeMigrated = objectToMigrate(sourceDefinitions, targetDefinitions);
+            var definitionsToBeMigrated = filteredDefinitions(sourceDefinitions, targetDefinitions);
 
             // Replace taskgroup and variablegroup sIds with tIds
             foreach (var definitionToBeMigrated in definitionsToBeMigrated)
@@ -302,7 +303,7 @@ namespace MigrationTools.Processors
 
             var sourceDefinitions = GetApiDefinitions<ReleaseDefinition>(Source.Organisation, Source.Project, Source.AccessToken);
             var targetDefinitions = GetApiDefinitions<ReleaseDefinition>(Target.Organisation, Target.Project, Target.AccessToken);
-            var definitionsToBeMigrated = objectToMigrate(sourceDefinitions, targetDefinitions);
+            var definitionsToBeMigrated = filteredDefinitions(sourceDefinitions, targetDefinitions);
 
             // Replace taskgroup and variablegroup sIds with tIds
             foreach (var definitionToBeMigrated in definitionsToBeMigrated)
@@ -383,7 +384,7 @@ namespace MigrationTools.Processors
 
             var sourceDefinitions = GetApiDefinitions<TaskGroup>(Source.Organisation, Source.Project, Source.AccessToken);
             var targetDefinitions = GetApiDefinitions<TaskGroup>(Target.Organisation, Target.Project, Target.AccessToken);
-            var mappings = CreateApiDefinitions(objectToMigrate(sourceDefinitions, targetDefinitions)).ToList();
+            var mappings = CreateApiDefinitions(filteredDefinitions(sourceDefinitions, targetDefinitions)).ToList();
             mappings = AddAllreadySyncedMappings(sourceDefinitions, targetDefinitions, mappings).ToList();
             return mappings;
         }
@@ -394,14 +395,22 @@ namespace MigrationTools.Processors
 
             var sourceDefinitions = GetApiDefinitions<VariableGroups>(Source.Organisation, Source.Project, Source.AccessToken);
             var targetDefinitions = GetApiDefinitions<VariableGroups>(Target.Organisation, Target.Project, Target.AccessToken);
-            var mappings = CreateApiDefinitions(objectToMigrate(sourceDefinitions, targetDefinitions)).ToList();
+            var mappings = CreateApiDefinitions(filteredDefinitions(sourceDefinitions, targetDefinitions)).ToList();
             mappings = AddAllreadySyncedMappings(sourceDefinitions, targetDefinitions, mappings).ToList();
             return mappings;
         }
 
+        /// <summary>
+        /// Map the taskgroups that are already migrated
+        /// </summary>
+        /// <typeparam name="DefintionType"></typeparam>
+        /// <param name="sourceDefinitions"></param>
+        /// <param name="targetDefinitions"></param>
+        /// <param name="newMappings"></param>
+        /// <returns>Mapping list</returns>
         private IEnumerable<Mapping> AddAllreadySyncedMappings<DefintionType>(IEnumerable<DefintionType> sourceDefinitions, IEnumerable<DefintionType> targetDefinitions, IEnumerable<Mapping> newMappings) where DefintionType : RestApiDefinition, new()
         {
-            // Map the taskgroups that are already migrated. (it's not safe, because the target project can have a taskgroup with the same name but with different content)
+            // This is not safe, because the target project can have a taskgroup with the same name but with different content
             // To make this save we must add a local storage option for the mappings (sid, tid)
             var allMappings = newMappings.ToList();
             var allreadyMigratedDefintions = targetDefinitions.Where(t => newMappings.Any(m => m.TId == t.Id) == false).ToList();
@@ -425,7 +434,14 @@ namespace MigrationTools.Processors
             return allMappings;
         }
 
-        private IEnumerable<DefinitionType> objectToMigrate<DefinitionType>(IEnumerable<DefinitionType> sourceDefinitions, IEnumerable<DefinitionType> targetDefinitions) where DefinitionType : RestApiDefinition, new()
+        /// <summary>
+        /// Filter existing Definitions
+        /// </summary>
+        /// <typeparam name="DefinitionType"></typeparam>
+        /// <param name="sourceDefinitions"></param>
+        /// <param name="targetDefinitions"></param>
+        /// <returns>List of filtered Definitions</returns>
+        private IEnumerable<DefinitionType> filteredDefinitions<DefinitionType>(IEnumerable<DefinitionType> sourceDefinitions, IEnumerable<DefinitionType> targetDefinitions) where DefinitionType : RestApiDefinition, new()
         {
             var objectsToMigrate = sourceDefinitions.Where(s => !targetDefinitions.Any(t => t.Name == s.Name));
             Log.LogInformation($"From {sourceDefinitions.Count()} source {typeof(DefinitionType).Name}(s) {objectsToMigrate.Count()} {typeof(DefinitionType).Name}(s) are going to be migrated..");
@@ -433,6 +449,12 @@ namespace MigrationTools.Processors
             return objectsToMigrate;
         }
 
+        /// <summary>
+        /// Make HTTP Request to create a Definition
+        /// </summary>
+        /// <typeparam name="DefinitionType"></typeparam>
+        /// <param name="definitionsToBeMigrated"></param>
+        /// <returns>List of Mappings</returns>
         private IEnumerable<Mapping> CreateApiDefinitions<DefinitionType>(IEnumerable<DefinitionType> definitionsToBeMigrated) where DefinitionType : RestApiDefinition, new()
         {
             var apiPathAttribute = typeof(DefinitionType).GetCustomAttributes(typeof(ApiPathAttribute), false).OfType<ApiPathAttribute>().FirstOrDefault();
