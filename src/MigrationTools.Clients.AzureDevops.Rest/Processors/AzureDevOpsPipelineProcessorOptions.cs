@@ -25,12 +25,18 @@ namespace MigrationTools.Processors
         public bool MigrateTaskGroups { get; set; }
 
         /// <summary>
-        /// List of Build Pipelines to process. If this is `null` then all Build Pipelines will be processed.
+        /// Migrate Valiable Groups
+        /// </summary>
+        /// <default>true</default>
+        public bool MigrateVariableGroups { get; set; }
+
+        /// <summary>
+        /// List of Build Pipelines to process. If this is `null` then all Build Pipelines will be processed. **Not implemented yet**
         /// </summary>
         public List<string> BuildPipelines { get; set; }
 
         /// <summary>
-        /// List of Release Pipelines to process. If this is `null` then all Release Pipelines will be processed.
+        /// List of Release Pipelines to process. If this is `null` then all Release Pipelines will be processed. **Not implemented yet**
         /// </summary>
         public List<string> ReleasePipelines { get; set; }
 
@@ -46,6 +52,7 @@ namespace MigrationTools.Processors
             MigrateBuildPipelines = true;
             MigrateReleasePipelines = true;
             MigrateTaskGroups = true;
+            MigrateVariableGroups = true;
             BuildPipelines = null;
             ReleasePipelines = null;
             var e1 = new AzureDevOpsEndpointOptions();

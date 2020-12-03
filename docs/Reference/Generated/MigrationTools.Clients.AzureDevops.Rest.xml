@@ -11,12 +11,12 @@
         </member>
         <member name="M:MigrationTools.Processors.AzureDevOpsPipelineProcessor.MigratePipelines">
             <summary>
-            Executes Method for migrating Taskgroups or Pipelines, depinding on whhat is set in the config.
+            Executes Method for migrating Taskgroups, Variablegroups or Pipelines, depinding on whhat is set in the config.
             </summary>
         </member>
         <member name="M:MigrationTools.Processors.AzureDevOpsPipelineProcessor.getModUrl(System.String,System.String,MigrationTools.DataContracts.ApiPathAttribute,MigrationTools.DataContracts.ApiNameAttribute)">
             <summary>
-            Ugly Method to get the RESP API URLs right
+            Method to get the RESP API URLs right
             </summary>
             <param name="organisation"></param>
             <param name="project"></param>
@@ -33,7 +33,7 @@
         </member>
         <member name="M:MigrationTools.Processors.AzureDevOpsPipelineProcessor.GetApiDefinitions``1(System.String,System.String,System.String)">
             <summary>
-            Generic Method to get API Definitions (Taskgroups, Build- or Release Pipelines)
+            Generic Method to get API Definitions (Taskgroups, Variablegroups, Build- or Release Pipelines)
             </summary>
             <typeparam name="DefinitionType">Type of Definition. Can be: Taskgroup, Build- or Release Pipeline</typeparam>
             <param name="organisation"></param>
@@ -41,11 +41,32 @@
             <param name="accessToken"></param>
             <returns>List of API Definitions </returns>
         </member>
-        <member name="M:MigrationTools.Processors.AzureDevOpsPipelineProcessor.CreateApiDefinitions``1">
+        <member name="M:MigrationTools.Processors.AzureDevOpsPipelineProcessor.AddAllreadySyncedMappings``1(System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEnumerable{MigrationTools.DataContracts.Mapping})">
             <summary>
-            Method to create an Api Definition
+            Map the taskgroups that are already migrated
             </summary>
-            <typeparam name="DefinitionType">Type of Definition. Can be: Taskgroup, Build- or Release Pipeline</typeparam>
+            <typeparam name="DefintionType"></typeparam>
+            <param name="sourceDefinitions"></param>
+            <param name="targetDefinitions"></param>
+            <param name="newMappings"></param>
+            <returns>Mapping list</returns>
+        </member>
+        <member name="M:MigrationTools.Processors.AzureDevOpsPipelineProcessor.filteredDefinitions``1(System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Filter existing Definitions
+            </summary>
+            <typeparam name="DefinitionType"></typeparam>
+            <param name="sourceDefinitions"></param>
+            <param name="targetDefinitions"></param>
+            <returns>List of filtered Definitions</returns>
+        </member>
+        <member name="M:MigrationTools.Processors.AzureDevOpsPipelineProcessor.CreateApiDefinitions``1(System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Make HTTP Request to create a Definition
+            </summary>
+            <typeparam name="DefinitionType"></typeparam>
+            <param name="definitionsToBeMigrated"></param>
+            <returns>List of Mappings</returns>
         </member>
         <member name="P:MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions.MigrateBuildPipelines">
             <summary>
@@ -65,14 +86,20 @@
             </summary>
             <default>true</default>
         </member>
+        <member name="P:MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions.MigrateVariableGroups">
+            <summary>
+            Migrate Valiable Groups
+            </summary>
+            <default>true</default>
+        </member>
         <member name="P:MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions.BuildPipelines">
             <summary>
-            List of Build Pipelines to process. If this is `null` then all Build Pipelines will be processed.
+            List of Build Pipelines to process. If this is `null` then all Build Pipelines will be processed. **Not implemented yet**
             </summary>
         </member>
         <member name="P:MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions.ReleasePipelines">
             <summary>
-            List of Release Pipelines to process. If this is `null` then all Release Pipelines will be processed.
+            List of Release Pipelines to process. If this is `null` then all Release Pipelines will be processed. **Not implemented yet**
             </summary>
         </member>
     </members>

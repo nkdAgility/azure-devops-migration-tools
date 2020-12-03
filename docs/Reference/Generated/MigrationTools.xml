@@ -16,6 +16,18 @@
             </summary>
             <returns>The clean RestApiDefinition</returns>
         </member>
+        <member name="M:MigrationTools.DataContracts.RestApiDefinition.HasTaskGroups">
+            <summary>
+            Checks whether the Definition references Taskgroups
+            </summary>
+            <returns>bool</returns>
+        </member>
+        <member name="M:MigrationTools.DataContracts.RestApiDefinition.HasVariableGroups">
+            <summary>
+            Checks whether the Definition references Variablegroups
+            </summary>
+            <returns>bool</returns>
+        </member>
         <member name="P:MigrationTools.Enrichers.IEnricherOptions.Enabled">
             <summary>
             Active the enricher if it true.
