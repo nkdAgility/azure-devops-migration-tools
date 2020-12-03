@@ -15,7 +15,7 @@ namespace MigrationTools.DataContracts.Pipelines
         public ExpandoObject[] Options { get; set; }
 
         public ExpandoObject[] Triggers { get; set; }
-        public Variables Variables { get; set; }
+        public ExpandoObject Variables { get; set; }
         public VariableGroupList[] VariableGroups { get; set; }
 
         public RetentionRule[] RetentionRules { get; set; }
