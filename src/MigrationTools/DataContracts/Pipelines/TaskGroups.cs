@@ -1,22 +1,18 @@
 ﻿using System;
 using System.Dynamic;
 using System.Globalization;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
 namespace MigrationTools.DataContracts.Pipelines
 {
-    public partial class TaskGroups
-    {
-        public long Count { get; set; }
-
-        public TaskGroup[] Value { get; set; }
-    }
-
     [ApiPath("distributedtask/taskgroups")]
     [ApiName("Task Groups")]
     public partial class TaskGroup : RestApiDefinition
     {
+        protected ILogger Log { get; }
+
         public TaskElement[] Tasks { get; set; }
 
         public string[] RunsOn { get; set; }
@@ -83,9 +79,20 @@ namespace MigrationTools.DataContracts.Pipelines
 
         public string HelpMarkDown { get; set; }
 
-        public override RestApiDefinition ResetObject()
+        public override bool HasTaskGroups()
         {
-            return this;
+            Log.LogError("we currently not support taskgroup nesting.");
+            return false;
+        }
+
+        public override bool HasVariableGroups()
+        {
+            Log.LogError("we currently not support variablegroup nesting.");
+            return false;
+        }
+
+        public override void ResetObject()
+        {
         }
     }
 
