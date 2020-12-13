@@ -5,6 +5,7 @@
         public Credentials Source { get; set; }
         public Credentials Target { get; set; }
     }
+
     public class Credentials
     {
         public string Domain { get; set; }

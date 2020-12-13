@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Helpers;
 using MigrationTools.Host.CommandLine;
@@ -22,13 +23,13 @@ namespace MigrationTools.Host
 
         public InitHostedService(
             IEngineConfigurationBuilder configurationBuilder,
-            InitOptions initOptions,
+            IOptions<InitOptions> initOptions,
             ILogger<InitHostedService> logger,
             ITelemetryLogger telemetryLogger,
             IHostApplicationLifetime appLifetime)
         {
             _configurationBuilder = configurationBuilder;
-            _initOptions = initOptions;
+            _initOptions = initOptions.Value;
             _logger = logger;
             _telemetryLogger = telemetryLogger;
             _appLifetime = appLifetime;
@@ -36,11 +37,6 @@ namespace MigrationTools.Host
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _logger.LogDebug($"Starting with arguments: {string.Join(" ", Environment.GetCommandLineArgs())}");
-            if (_initOptions == null)
-            {
-                return Task.CompletedTask;
-            }
             _appLifetime.ApplicationStarted.Register(() =>
             {
                 Task.Run(() =>

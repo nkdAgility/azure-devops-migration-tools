@@ -4,14 +4,11 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using MigrationTools.Host.CommandLine;
 
 namespace MigrationTools.Host
 {
     public class ExecuteHostedService : IHostedService
     {
-        private readonly ExecuteOptions _exceuteOptions;
-        
         private readonly IServiceProvider _services;
         private readonly ILogger _logger;
         private readonly IHostApplicationLifetime _appLifetime;
@@ -20,11 +17,9 @@ namespace MigrationTools.Host
 
         public ExecuteHostedService(
             IServiceProvider services,
-            ExecuteOptions exceuteOptions,
             ILogger<ExecuteHostedService> logger,
             IHostApplicationLifetime appLifetime)
         {
-            _exceuteOptions = exceuteOptions;
             _services = services;
             _logger = logger;
             _appLifetime = appLifetime;
@@ -32,11 +27,6 @@ namespace MigrationTools.Host
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _logger.LogDebug($"Starting with arguments: {string.Join(" ", Environment.GetCommandLineArgs())}");
-            if (_exceuteOptions == null)
-            {
-                return Task.CompletedTask;
-            }
             _appLifetime.ApplicationStarted.Register(() =>
             {
                 Task.Run(() =>
