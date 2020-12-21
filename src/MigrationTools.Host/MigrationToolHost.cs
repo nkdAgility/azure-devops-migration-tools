@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using CommandLine;
@@ -25,6 +24,13 @@ namespace MigrationTools.Host
     {
         public static IHostBuilder CreateDefaultBuilder(string[] args)
         {
+            (var initOptions, var executeOptions) = ParseOptions(args);
+
+            if(initOptions is null && executeOptions is null)
+            {
+                return null;
+            }
+
             var levelSwitch = new LoggingLevelSwitch(LogEventLevel.Verbose);
             var hostBuilder = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args)
              .UseSerilog((hostingContext, services, loggerConfiguration) =>
@@ -48,40 +54,6 @@ namespace MigrationTools.Host
              {
                  services.AddOptions();
 
-                 Parser.Default.ParseArguments<InitOptions, ExecuteOptions>(args)
-                     .WithParsed<InitOptions>(opts =>
-                     {
-                         services.AddSingleton(opts);
-                         services.AddSingleton<ExecuteOptions>((p) => null);
-                     })
-                     .WithParsed<ExecuteOptions>(opts =>
-                     {
-                         services.AddSingleton(opts);
-                         services.Configure<NetworkCredentialsOptions>(cred =>
-                                         {
-                                             cred.Source = new Credentials
-                                                         {
-                                                             Domain = opts.SourceDomain,
-                                                             UserName = opts.SourceUserName,
-                                                             Password = opts.SourcePassword
-                                                         };
-                                             cred.Target = new Credentials
-                                                         {
-                                                             Domain = opts.TargetDomain,
-                                                             UserName = opts.TargetUserName,
-                                                             Password = opts.TargetPassword
-                                                         };
-                                         });
-                         services.AddSingleton<InitOptions>((p) => null);
-                     })
-                     .WithNotParsed(error =>
-                     {
-                         services.AddSingleton<InitOptions>((p) => null);
-                         services.AddSingleton<ExecuteOptions>((p) => null);
-                     });
-
-                 // Sieralog
-                 services.AddSingleton<LoggingLevelSwitch>(levelSwitch);
                  // Application Insights
                  services.AddApplicationInsightsTelemetryWorkerService(new ApplicationInsightsServiceOptions { InstrumentationKey = "2d666f84-b3fb-4dcf-9aad-65de038d2772" });
 
@@ -93,9 +65,8 @@ namespace MigrationTools.Host
                  services.AddSingleton<IEngineConfigurationBuilder, EngineConfigurationBuilder>();
                  services.AddSingleton<EngineConfiguration>(sp =>
                  {
-                     var executeOptions = sp.GetRequiredService<ExecuteOptions>();
                      var builder = sp.GetRequiredService<IEngineConfigurationBuilder>();
-                     var logger = sp.GetServices<ILoggerFactory>().First().CreateLogger<EngineConfiguration>();
+                     var logger = sp.GetService<ILoggerFactory>().CreateLogger<EngineConfiguration>();
 
                      if (!File.Exists(executeOptions.ConfigFile))
                      {
@@ -103,7 +74,9 @@ namespace MigrationTools.Host
                          throw new ArgumentException("missing configfile");
                      }
                      logger.LogInformation("Config Found, creating engine host");
-                     return builder.BuildFromFile(executeOptions.ConfigFile);
+                     var config = builder.BuildFromFile(executeOptions.ConfigFile);
+                     levelSwitch.MinimumLevel = config.LogLevel;
+                     return config;
                  });
 
                  /// Add Old v1Bits
@@ -113,8 +86,30 @@ namespace MigrationTools.Host
 
                  // Host Services
                  services.AddTransient<IStartupService, StartupService>();
-                 services.AddHostedService<InitHostedService>();
-                 services.AddHostedService<ExecuteHostedService>();
+                 if (initOptions is not null)
+                 {
+                     services.Configure<InitOptions>((opts) => opts = initOptions);
+                     services.AddHostedService<InitHostedService>();
+                 }
+                 if (executeOptions is not null)
+                 {
+                     services.Configure<NetworkCredentialsOptions>(cred =>
+                     {
+                         cred.Source = new Credentials
+                         {
+                             Domain = executeOptions.SourceDomain,
+                             UserName = executeOptions.SourceUserName,
+                             Password = executeOptions.SourcePassword
+                         };
+                         cred.Target = new Credentials
+                         {
+                             Domain = executeOptions.TargetDomain,
+                             UserName = executeOptions.TargetUserName,
+                             Password = executeOptions.TargetPassword
+                         };
+                     });
+                     services.AddHostedService<ExecuteHostedService>();
+                 }
              })
              .UseConsoleLifetime();
             return hostBuilder;
@@ -143,6 +138,22 @@ namespace MigrationTools.Host
             }
 
             return exportPath;
+        }
+
+        private static (InitOptions init, ExecuteOptions execute) ParseOptions(string[] args)
+        {
+            InitOptions initOptions = null;
+            ExecuteOptions executeOptions = null;
+            Parser.Default.ParseArguments<InitOptions, ExecuteOptions>(args)
+                            .WithParsed<InitOptions>(opts =>
+                            {
+                                initOptions = opts;
+                            })
+                            .WithParsed<ExecuteOptions>(opts =>
+                            {
+                                executeOptions = opts;
+                            });
+            return (initOptions, executeOptions);
         }
     }
 }

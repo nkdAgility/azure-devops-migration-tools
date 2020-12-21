@@ -9,7 +9,13 @@ namespace MigrationTools.ConsoleCore
     {
         public static async Task Main(string[] args)
         {
-            var hostBuilder = MigrationToolHost.CreateDefaultBuilder(args)
+            var hostBuilder = MigrationToolHost.CreateDefaultBuilder(args);
+            if (hostBuilder is null)
+            {
+                return;
+            }
+
+            hostBuilder
                 .ConfigureServices((context, services) =>
                 {
                     // Field Mapps
