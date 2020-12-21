@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using CommandLine;
@@ -55,8 +54,6 @@ namespace MigrationTools.Host
              {
                  services.AddOptions();
 
-                 // Sieralog
-                 services.AddSingleton<LoggingLevelSwitch>(levelSwitch);
                  // Application Insights
                  services.AddApplicationInsightsTelemetryWorkerService(new ApplicationInsightsServiceOptions { InstrumentationKey = "2d666f84-b3fb-4dcf-9aad-65de038d2772" });
 
@@ -77,7 +74,9 @@ namespace MigrationTools.Host
                          throw new ArgumentException("missing configfile");
                      }
                      logger.LogInformation("Config Found, creating engine host");
-                     return builder.BuildFromFile(executeOptions.ConfigFile);
+                     var config = builder.BuildFromFile(executeOptions.ConfigFile);
+                     levelSwitch.MinimumLevel = config.LogLevel;
+                     return config;
                  });
 
                  /// Add Old v1Bits

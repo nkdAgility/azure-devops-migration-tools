@@ -3,19 +3,19 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MigrationTools._EngineV1.Clients;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Containers;
 using MigrationTools.Options;
 using MigrationTools.Processors;
-using Serilog;
-using Serilog.Core;
 
 namespace MigrationTools
 {
     public class MigrationEngine : IMigrationEngine
     {
+        private readonly ILogger<MigrationEngine> _logger;
         private readonly IServiceProvider _services;
         private IMigrationClient _Source;
         private IMigrationClient _Target;
@@ -30,9 +30,11 @@ namespace MigrationTools
             GitRepoMapContainer gitRepoMaps,
             ChangeSetMappingContainer changeSetMapps,
             FieldMapContainer fieldMaps,
-            ITelemetryLogger telemetry)
+            ITelemetryLogger telemetry,
+            ILogger<MigrationEngine> logger)
         {
-            Log.Information("Creating Migration Engine {SessionId}", telemetry.SessionId);
+            _logger = logger;
+            _logger.LogInformation("Creating Migration Engine {SessionId}", telemetry.SessionId);
             _services = services;
             FieldMaps = fieldMaps;
             _networkCredentials = networkCredentials.Value;
@@ -91,13 +93,11 @@ namespace MigrationTools
                 });
             Stopwatch engineTimer = Stopwatch.StartNew();
 
-            LoggingLevelSwitch logLevel = _services.GetRequiredService<LoggingLevelSwitch>();
-            logLevel.MinimumLevel = Config.LogLevel;
-            Log.Information("Logging has been configured and is set to: {LogLevel}. ", Config.LogLevel.ToString());
-            Log.Information("                              Max Logfile: {FileLogLevel}. ", "Verbose");
-            Log.Information("                              Max Console: {ConsoleLogLevel}. ", "Debug");
-            Log.Information("                 Max Application Insights: {AILogLevel}. ", "Error");
-            Log.Information("The Max log levels above show where to go look for extra info. e.g. Even if you set the log level to Verbose you will only see that info in the Log File, however everything up to Debug will be in the Console.");
+            _logger.LogInformation("Logging has been configured and is set to: {LogLevel}. ", Config.LogLevel.ToString());
+            _logger.LogInformation("                              Max Logfile: {FileLogLevel}. ", "Verbose");
+            _logger.LogInformation("                              Max Console: {ConsoleLogLevel}. ", "Debug");
+            _logger.LogInformation("                 Max Application Insights: {AILogLevel}. ", "Error");
+            _logger.LogInformation("The Max log levels above show where to go look for extra info. e.g. Even if you set the log level to Verbose you will only see that info in the Log File, however everything up to Debug will be in the Console.");
 
             ProcessingStatus ps = ProcessingStatus.Running;
 
@@ -107,10 +107,10 @@ namespace MigrationTools
             ChangeSetMapps.EnsureConfigured();
             FieldMaps.EnsureConfigured();
 
-            Log.Information("Beginning run of {ProcessorCount} processors", Processors.Count.ToString());
+            _logger.LogInformation("Beginning run of {ProcessorCount} processors", Processors.Count.ToString());
             foreach (_EngineV1.Containers.IProcessor process in Processors.Items)
             {
-                Log.Information("Processor: {ProcessorName}", process.Name);
+                _logger.LogInformation("Processor: {ProcessorName}", process.Name);
                 Stopwatch processorTimer = Stopwatch.StartNew();
                 process.Execute();
                 processorTimer.Stop();
@@ -119,7 +119,7 @@ namespace MigrationTools
                 if (process.Status == ProcessingStatus.Failed)
                 {
                     ps = ProcessingStatus.Failed;
-                    Log.Error("{Context} The Processor {ProcessorName} entered the failed state...stopping run", process.Name, "MigrationEngine");
+                    _logger.LogError("{Context} The Processor {ProcessorName} entered the failed state...stopping run", process.Name, "MigrationEngine");
                     break;
                 }
             }
