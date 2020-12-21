@@ -9,14 +9,6 @@ namespace MigrationTools.Processors.Tests
     [TestClass()]
     public class TfsSharedQueryProcessorTests : TfsProcessorTests
     {
-        public ServiceProvider Services { get; private set; }
-
-        [TestInitialize]
-        public void Setup()
-        {
-            Services = ServiceProviderHelper.GetServices();
-        }
-
         [TestMethod(), TestCategory("L0"), TestCategory("AzureDevOps.ObjectModel")]
         public void TfsSharedQueryProcessorTest()
         {

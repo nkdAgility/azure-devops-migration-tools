@@ -23,6 +23,7 @@ namespace MigrationTools.Enrichers
             //
         }
 
+        [Obsolete]
         public override void Configure(bool save = true, bool filter = true)
         {
             throw new NotImplementedException();
@@ -34,6 +35,7 @@ namespace MigrationTools.Enrichers
             throw new NotImplementedException();
         }
 
+        [Obsolete]
         public override int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
         {
             FixEmbededImages(targetWorkItem, Engine.Source.Config.AsTeamProjectConfig().Collection.ToString(), Engine.Target.Config.AsTeamProjectConfig().Collection.ToString(), Engine.Source.Config.AsTeamProjectConfig().PersonalAccessToken);

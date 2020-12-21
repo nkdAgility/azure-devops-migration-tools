@@ -140,7 +140,7 @@ namespace MigrationTools.Processors
         /// </summary>
         /// <param name="targetHierarchy">The object that represents the whole of the target query tree</param>
         /// <param name="query">Query Definition - Contains the Query Details</param>
-        /// <param name="QueryFolder">Parent Folder</param>
+        /// <param name="parentFolder">Parent Folder</param>
         private void MigrateQuery(QueryHierarchy targetHierarchy, QueryDefinition query, QueryFolder parentFolder)
         {
             if (parentFolder.FirstOrDefault(q => q.Name == query.Name) != null)

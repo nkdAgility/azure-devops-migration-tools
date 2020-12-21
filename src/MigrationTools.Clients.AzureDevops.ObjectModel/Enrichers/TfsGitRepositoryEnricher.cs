@@ -51,12 +51,14 @@ namespace MigrationTools.Enrichers
                 };
         }
 
+        [Obsolete]
         public override void Configure(bool save = true, bool filter = true)
         {
             _filter = filter;
             _save = save;
         }
 
+        [Obsolete]
         public override int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
         {
             if (sourceWorkItem is null)

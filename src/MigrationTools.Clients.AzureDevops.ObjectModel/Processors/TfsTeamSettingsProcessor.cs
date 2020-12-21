@@ -79,13 +79,11 @@ namespace MigrationTools.Processors
             long elapsedms = 0;
 
             /////////
-            ///
             if (_Options.Teams != null)
             {
                 sourceTeams = sourceTeams.Where(t => _Options.Teams.Contains(t.Name)).ToList();
             }
-            /// Create teams
-            ///
+            // Create teams
             foreach (TeamFoundationTeam sourceTeam in sourceTeams)
             {
                 Stopwatch witstopwatch = Stopwatch.StartNew();
@@ -98,7 +96,7 @@ namespace MigrationTools.Processors
 
                     if (_Options.MigrateTeamSettings)
                     {
-                        /// Duplicate settings
+                        // Duplicate settings
                         Log.LogDebug("-> Processing team '{0}' settings:", sourceTeam.Name);
                         var sourceConfigurations = Source.TfsTeamSettingsService.GetTeamConfigurations(new List<Guid> { sourceTeam.Identity.TeamFoundationId });
                         var targetConfigurations = Target.TfsTeamSettingsService.GetTeamConfigurations(new List<Guid> { newTeam.Identity.TeamFoundationId });
