@@ -94,7 +94,7 @@ namespace MigrationTools
                 });
             Stopwatch engineTimer = Stopwatch.StartNew();
 
-            _logger.LogInformation("Logging has been configured and is set to: {LogLevel}. ", Config.LogLevel.ToString());
+            _logger.LogInformation("Logging has been configured and is set to: {LogLevel}. ", Config.LogLevel);
             _logger.LogInformation("                              Max Logfile: {FileLogLevel}. ", "Verbose");
             _logger.LogInformation("                              Max Console: {ConsoleLogLevel}. ", "Debug");
             _logger.LogInformation("                 Max Application Insights: {AILogLevel}. ", "Error");
