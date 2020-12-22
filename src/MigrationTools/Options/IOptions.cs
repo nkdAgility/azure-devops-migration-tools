@@ -10,7 +10,7 @@ namespace MigrationTools.Options
         /// </summary>
         public string RefName { get; set; }
 
-        [JsonIgnoreAttribute]
+        [JsonIgnore]
         Type ToConfigure { get; }
 
         void SetDefaults();

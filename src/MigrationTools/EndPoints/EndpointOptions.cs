@@ -7,7 +7,7 @@ namespace MigrationTools.Endpoints
 {
     public abstract class EndpointOptions : IEndpointOptions
     {
-        [JsonIgnoreAttribute]
+        [JsonIgnore]
         public abstract Type ToConfigure { get; }
 
         public List<IEndpointEnricherOptions> EndpointEnrichers { get; set; }

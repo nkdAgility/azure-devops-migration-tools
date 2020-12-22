@@ -164,7 +164,7 @@ namespace MigrationTools.Enrichers
             if (processor is null)
             {
                 IMigrationEngine engine = Services.GetRequiredService<IMigrationEngine>();
-                ((TfsWorkItemMigrationClient)engine.Target.WorkItems).Store.RefreshCache(true);
+                ((TfsWorkItemMigrationClient)engine.Target.WorkItems).Store?.RefreshCache(true);
             }
             else
             {
