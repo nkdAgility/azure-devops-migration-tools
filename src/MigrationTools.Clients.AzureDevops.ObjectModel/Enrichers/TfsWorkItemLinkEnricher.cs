@@ -21,6 +21,7 @@ namespace MigrationTools.Enrichers
             Engine = services.GetRequiredService<IMigrationEngine>();
         }
 
+        [Obsolete]
         public override void Configure(
             bool save = true,
             bool filterWorkItemsThatAlreadyExistInTarget = true)
@@ -29,6 +30,7 @@ namespace MigrationTools.Enrichers
             _filterWorkItemsThatAlreadyExistInTarget = filterWorkItemsThatAlreadyExistInTarget;
         }
 
+        [Obsolete]
         public override int Enrich(WorkItemData sourceWorkItemLinkStart, WorkItemData targetWorkItemLinkStart)
         {
             if (sourceWorkItemLinkStart is null)

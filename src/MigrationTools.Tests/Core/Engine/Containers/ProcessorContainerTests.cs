@@ -38,7 +38,7 @@ namespace MigrationTools.Engine.Containers.Tests
 
             Assert.AreEqual(1, config.Processors.Count);
 
-            var processorContainer = new ProcessorContainer(CreateServiceProvider(), config);
+            var processorContainer = new ProcessorContainer(CreateServiceProvider(), config, new NullLogger<ProcessorContainer>());
 
             Assert.AreEqual(1, processorContainer.Count);
         }

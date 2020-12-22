@@ -1,20 +1,11 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MigrationTools.Tests;
 
 namespace MigrationTools.Processors.Tests
 {
     [TestClass()]
     public class AzureDevOpsPipelineProcessorTests : AzureDevOpsProcessorTests
     {
-        public ServiceProvider Services { get; private set; }
-
-        [TestInitialize]
-        public void Setup()
-        {
-            Services = ServiceProviderHelper.GetServices();
-        }
-
         [TestMethod(), TestCategory("L0"), TestCategory("AzureDevOps.REST")]
         public void AzureDevOpsPipelineProcessorTest()
         {

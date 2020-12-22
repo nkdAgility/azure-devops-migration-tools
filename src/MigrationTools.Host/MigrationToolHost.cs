@@ -75,11 +75,11 @@ namespace MigrationTools.Host
                      }
                      logger.LogInformation("Config Found, creating engine host");
                      var config = builder.BuildFromFile(executeOptions.ConfigFile);
-                     levelSwitch.MinimumLevel = config.LogLevel;
+                     levelSwitch.MinimumLevel = (LogEventLevel)Enum.Parse(typeof(LogEventLevel), config.LogLevel);
                      return config;
                  });
 
-                 /// Add Old v1Bits
+                 // Add Old v1Bits
                  services.AddMigrationToolServicesLegacy();
                  // New v2Bits
                  services.AddMigrationToolServices();

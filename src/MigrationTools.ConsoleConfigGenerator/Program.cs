@@ -24,7 +24,7 @@ namespace VstsSyncMigrator.ConsoleApp
         public static AppDomain domain = AppDomain.CreateDomain("MigrationTools");
         private static string referencePath = "../../../../../docs/Reference/";
 
-        public static async Task Main(string[] args)
+        public static void Main(string[] args)
         {
             string dir = AppDomain.CurrentDomain.BaseDirectory;
 

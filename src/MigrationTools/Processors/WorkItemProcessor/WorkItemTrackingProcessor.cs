@@ -49,7 +49,7 @@ namespace MigrationTools.Processors
         private void ProcessWorkItem(WorkItemData workItem, int workItemCreateRetryLimit)
         {
             Log.LogInformation("Processor::ProcessWorkItem::TheWork");
-            /// Stuff to really do
+            // Stuff to really do
         }
 
         private void EnsureConfigured()

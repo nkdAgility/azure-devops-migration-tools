@@ -40,7 +40,7 @@ namespace MigrationTools.Engine.Containers.Tests
 
             Assert.AreEqual(1, config.FieldMaps.Count);
 
-            var fieldMapContainer = new FieldMapContainer(CreateServiceProvider(), config);
+            var fieldMapContainer = new FieldMapContainer(CreateServiceProvider(), config, new NullLogger<FieldMapContainer>());
             fieldMapContainer.EnsureConfigured();
             Assert.AreEqual(1, fieldMapContainer.Count);
         }

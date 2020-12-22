@@ -4,6 +4,7 @@ using MigrationTools.EndpointEnrichers;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
 using MigrationTools.Processors;
+using MigrationTools.TestExtensions;
 
 namespace MigrationTools.Tests
 {

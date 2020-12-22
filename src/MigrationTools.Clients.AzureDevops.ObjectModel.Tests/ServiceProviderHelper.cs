@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using MigrationTools.TestExtensions;
 
 namespace MigrationTools.Tests
 {
