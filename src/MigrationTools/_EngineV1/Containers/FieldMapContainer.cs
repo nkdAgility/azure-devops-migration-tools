@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools.DataContracts;
 
@@ -13,7 +14,7 @@ namespace MigrationTools._EngineV1.Containers
         private Dictionary<string, List<IFieldMap>> fieldMapps = new Dictionary<string, List<IFieldMap>>();
         private readonly ILogger<FieldMapContainer> _logger;
 
-        public FieldMapContainer(IServiceProvider services, EngineConfiguration config, ILogger<FieldMapContainer> logger) : base(services, config)
+        public FieldMapContainer(IServiceProvider services, IOptions<EngineConfiguration> config, ILogger<FieldMapContainer> logger) : base(services, config)
         {
             _logger = logger;
         }

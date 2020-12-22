@@ -32,7 +32,8 @@ namespace _VstsSyncMigrator.Engine.Tests
             services.AddMigrationToolServicesForClientLegacyAzureDevOpsObjectModel();
 
             //
-            services.AddSingleton<IEngineConfigurationBuilder, EngineConfigurationBuilder>();
+            //services.AddSingleton<IEngineConfigurationBuilder, EngineConfigurationBuilder>();
+            services.AddOptions();
             services.AddSingleton<EngineConfiguration>(ecb.BuildDefault());
 
             services.AddSingleton<IMigrationEngine, MigrationEngine>();

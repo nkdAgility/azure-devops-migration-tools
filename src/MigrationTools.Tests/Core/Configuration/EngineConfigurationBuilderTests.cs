@@ -60,7 +60,6 @@ namespace MigrationTools.Configuration.Tests
         private void HelperCreateDefaultConfigFile()
         {
             var ecb = CreateEngine();
-            EngineConfiguration ec = ecb.BuildDefault();
             string json = NewtonsoftHelpers.SerializeObject(ecb.BuildDefault());
             StreamWriter sw = new StreamWriter("configuration.json");
             sw.WriteLine(json);

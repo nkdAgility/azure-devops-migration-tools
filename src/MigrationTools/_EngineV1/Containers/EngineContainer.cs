@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Extensions.Options;
 using MigrationTools._EngineV1.Configuration;
 
 namespace MigrationTools._EngineV1.Containers
@@ -27,10 +28,10 @@ namespace MigrationTools._EngineV1.Containers
             get { return _Config; }
         }
 
-        public EngineContainer(IServiceProvider services, EngineConfiguration config)
+        protected EngineContainer(IServiceProvider services, IOptions<EngineConfiguration> config)
         {
             _services = services;
-            _Config = config;
+            _Config = config.Value;
         }
 
         protected abstract void Configure();
