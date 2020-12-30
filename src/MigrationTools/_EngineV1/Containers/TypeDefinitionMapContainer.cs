@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MigrationTools._EngineV1.Configuration;
 
 namespace MigrationTools._EngineV1.Containers
@@ -13,7 +14,7 @@ namespace MigrationTools._EngineV1.Containers
 
         public override ReadOnlyDictionary<string, IWitdMapper> Items { get { return new ReadOnlyDictionary<string, IWitdMapper>(_TypeDefinitions); } }
 
-        public TypeDefinitionMapContainer(IServiceProvider services, EngineConfiguration config, ILogger<TypeDefinitionMapContainer> logger) : base(services, config)
+        public TypeDefinitionMapContainer(IServiceProvider services, IOptions<EngineConfiguration> config, ILogger<TypeDefinitionMapContainer> logger) : base(services, config)
         {
             _logger = logger;
         }

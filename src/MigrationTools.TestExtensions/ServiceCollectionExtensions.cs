@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.ApplicationInsights.WorkerService;
+﻿using Microsoft.ApplicationInsights.WorkerService;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Serilog.Events;
@@ -24,7 +23,6 @@ namespace MigrationTools.TestExtensions
             Log.Logger = loggers.CreateLogger();
             Log.Logger.Information("Logger is initialized");
             context.AddLogging(loggingBuilder => loggingBuilder.AddSerilog(dispose: true));
-            //context.AddSingleton<LoggingLevelSwitch>();
         }
     }
 }

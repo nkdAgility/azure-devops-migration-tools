@@ -12,7 +12,6 @@ using MigrationTools.Helpers;
 using MigrationTools.Options;
 using MigrationTools.Processors;
 using Newtonsoft.Json;
-using Serilog.Events;
 
 namespace MigrationTools._EngineV1.Configuration
 {
@@ -120,7 +119,6 @@ namespace MigrationTools._EngineV1.Configuration
         {
             EngineConfiguration ec = new EngineConfiguration
             {
-                LogLevel = LogEventLevel.Information.ToString(),
                 Version = Assembly.GetExecutingAssembly().GetName().Version.ToString(2),
                 FieldMaps = new List<IFieldMapConfig>(),
                 WorkItemTypeDefinition = new Dictionary<string, string> {
@@ -248,7 +246,6 @@ namespace MigrationTools._EngineV1.Configuration
         {
             EngineConfiguration ec = new EngineConfiguration
             {
-                LogLevel = LogEventLevel.Information.ToString(),
                 Version = Assembly.GetExecutingAssembly().GetName().Version.ToString(2),
                 FieldMaps = new List<IFieldMapConfig>(),
                 WorkItemTypeDefinition = new Dictionary<string, string> {

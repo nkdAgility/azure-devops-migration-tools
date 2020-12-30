@@ -21,10 +21,11 @@ namespace MigrationTools
         private IMigrationClient _Target;
         private NetworkCredentialsOptions _networkCredentials;
 
+
         public MigrationEngine(
             IServiceProvider services,
             IOptions<NetworkCredentialsOptions> networkCredentials,
-            EngineConfiguration config,
+            IOptions<EngineConfiguration> config,
             TypeDefinitionMapContainer typeDefinitionMaps,
             ProcessorContainer processors,
             GitRepoMapContainer gitRepoMaps,
@@ -43,7 +44,7 @@ namespace MigrationTools
             GitRepoMaps = gitRepoMaps;
             ChangeSetMapps = changeSetMapps;
             Telemetry = telemetry;
-            Config = config;
+            Config = config.Value;
         }
 
         public ChangeSetMappingContainer ChangeSetMapps { get; }
@@ -93,7 +94,7 @@ namespace MigrationTools
                 });
             Stopwatch engineTimer = Stopwatch.StartNew();
 
-            _logger.LogInformation("Logging has been configured and is set to: {LogLevel}. ", Config.LogLevel.ToString());
+            _logger.LogInformation("Logging has been configured and is set to: {LogLevel}. ", Config.LogLevel);
             _logger.LogInformation("                              Max Logfile: {FileLogLevel}. ", "Verbose");
             _logger.LogInformation("                              Max Console: {ConsoleLogLevel}. ", "Debug");
             _logger.LogInformation("                 Max Application Insights: {AILogLevel}. ", "Error");
