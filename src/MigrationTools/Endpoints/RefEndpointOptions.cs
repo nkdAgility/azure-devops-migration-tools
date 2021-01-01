@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using MigrationTools.EndpointEnrichers;
-using MigrationTools.Endpoints;
 
-namespace MigrationTools.EndPoints
+namespace MigrationTools.Endpoints
 {
     public class RefEndpointOptions : IEndpointOptions
     {
