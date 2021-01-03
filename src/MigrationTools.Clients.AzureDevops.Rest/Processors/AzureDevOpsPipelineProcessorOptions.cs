@@ -55,14 +55,8 @@ namespace MigrationTools.Processors
             MigrateVariableGroups = true;
             BuildPipelines = null;
             ReleasePipelines = null;
-            var e1 = new AzureDevOpsEndpointOptions();
-            e1.SetDefaults();
-            e1.Project = "sourceProject";
-            Source = e1;
-            var e2 = new AzureDevOpsEndpointOptions();
-            e2.SetDefaults();
-            e2.Project = "targetProject";
-            Target = e2;
+            SourceName = "sourceName";
+            TargetName = "targetName";
         }
     }
 }

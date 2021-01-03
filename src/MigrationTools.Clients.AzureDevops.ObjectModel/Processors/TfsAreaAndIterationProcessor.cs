@@ -14,17 +14,15 @@ namespace MigrationTools.Processors
         private TfsAreaAndIterationProcessorOptions _Options;
         private TfsNodeStructure nodeStructureEnricher;
 
-        public TfsAreaAndIterationProcessor(ProcessorEnricherContainer processorEnrichers,
-                                        EndpointContainer endpoints,
-                                        IServiceProvider services,
-                                        ITelemetryLogger telemetry,
-                                        ILogger<Processor> logger) : base(processorEnrichers, endpoints, services, telemetry, logger)
+        public TfsAreaAndIterationProcessor(
+                            ProcessorEnricherContainer processorEnrichers,
+                            IEndpointFactory endpointFactory,
+                            IServiceProvider services,
+                            ITelemetryLogger telemetry,
+                            ILogger<Processor> logger)
+            : base(processorEnrichers, endpointFactory, services, telemetry, logger)
         {
         }
-
-        public TfsEndpoint Source => (TfsEndpoint)Endpoints.Source;
-
-        public TfsEndpoint Target => (TfsEndpoint)Endpoints.Target;
 
         public override void Configure(IProcessorOptions options)
         {
@@ -52,11 +50,11 @@ namespace MigrationTools.Processors
             {
                 throw new Exception("You must call Configure() first");
             }
-            if (!(Endpoints.Source is TfsEndpoint))
+            if (Source is not TfsEndpoint)
             {
                 throw new Exception("The Source endpoint configured must be of type TfsEndpoint");
             }
-            if (!(Endpoints.Target is TfsEndpoint))
+            if (Target is not TfsEndpoint)
             {
                 throw new Exception("The Target endpoint configured must be of type TfsEndpoint");
             }

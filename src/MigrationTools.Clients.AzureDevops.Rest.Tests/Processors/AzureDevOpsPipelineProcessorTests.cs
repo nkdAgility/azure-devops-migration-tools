@@ -19,8 +19,8 @@ namespace MigrationTools.Processors.Tests
             var y = new AzureDevOpsPipelineProcessorOptions
             {
                 Enabled = true,
-                Source = GetAzureDevOpsEndpointOptions("migrationSource1"),
-                Target = GetAzureDevOpsEndpointOptions("migrationTarget1")
+                SourceName = "Source",
+                TargetName = "Target"
             };
             var x = Services.GetRequiredService<AzureDevOpsPipelineProcessor>();
             x.Configure(y);
@@ -33,8 +33,8 @@ namespace MigrationTools.Processors.Tests
             var y = new AzureDevOpsPipelineProcessorOptions
             {
                 Enabled = true,
-                Source = GetAzureDevOpsEndpointOptions("migrationSource1"),
-                Target = GetAzureDevOpsEndpointOptions("migrationTarget1")
+                SourceName = "Source",
+                TargetName = "Target"
             };
             var x = Services.GetRequiredService<AzureDevOpsPipelineProcessor>();
             x.Configure(y);

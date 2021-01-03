@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MigrationTools._EngineV1.Clients;
 using MigrationTools.EndpointEnrichers;
@@ -12,8 +14,47 @@ namespace MigrationTools
 {
     public static partial class ServiceCollectionExtensions
     {
-        public static void AddMigrationToolServicesForClientAzureDevOpsObjectModel(this IServiceCollection context)
+        public static void AddMigrationToolServicesForClientAzureDevOpsObjectModel(this IServiceCollection context, IConfiguration configuration)
         {
+            var endPoints = configuration.GetSection("Endpoints");
+            var children = endPoints.GetChildren();
+            foreach (var child in children)
+            {
+                var sections = child.GetChildren();
+                if (sections.First(s => s.Key == "Type").Value == "TfsEndpointOptions")
+                {
+                    var name = sections.First(s => s.Key == "Name").Value;
+                    context.AddEndpoint(name, (provider) =>
+                    {
+                        var options = child.Get<TfsEndpointOptions>();
+                        var endpoint = provider.GetRequiredService<TfsEndpoint>();
+                        endpoint.Configure(options);
+                        return endpoint;
+                    });
+                }
+                else if (sections.First(s => s.Key == "Type").Value == "TfsWorkItemEndpointOptions")
+                {
+                    var name = sections.First(s => s.Key == "Name").Value;
+                    context.AddEndpoint(name, (provider) =>
+                    {
+                        var options = child.Get<TfsWorkItemEndpointOptions>();
+                        var endpoint = provider.GetRequiredService<TfsWorkItemEndpoint>();
+                        endpoint.Configure(options);
+                        return endpoint;
+                    });
+                }
+                else if (sections.First(s => s.Key == "Type").Value == "TfsTeamSettingsEndpointOptions")
+                {
+                    var name = sections.First(s => s.Key == "Name").Value;
+                    context.AddEndpoint(name, (provider) =>
+                    {
+                        var options = child.Get<TfsTeamSettingsEndpointOptions>();
+                        var endpoint = provider.GetRequiredService<TfsTeamSettingsEndpoint>();
+                        endpoint.Configure(options);
+                        return endpoint;
+                    });
+                }
+            }
             // Generic Endpoint
             context.AddTransient<TfsEndpoint>();
             //TfsWorkItem

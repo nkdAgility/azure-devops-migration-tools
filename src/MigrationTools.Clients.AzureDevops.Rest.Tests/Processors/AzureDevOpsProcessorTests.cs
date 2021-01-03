@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MigrationTools.Endpoints;
 using MigrationTools.Tests;
 
 namespace MigrationTools.Processors.Tests
@@ -23,21 +22,10 @@ namespace MigrationTools.Processors.Tests
                 MigrateTaskGroups = true,
                 MigrateBuildPipelines = true,
                 MigrateReleasePipelines = true,
-                Target = GetAzureDevOpsEndpointOptions("migrationTarget1"),
-                Source = GetAzureDevOpsEndpointOptions("migrationSource1"),
+                SourceName = "Source",
+                TargetName = "Target"
             };
             return migrationConfig;
-        }
-
-        protected static AzureDevOpsEndpointOptions GetAzureDevOpsEndpointOptions(string project)
-        {
-            return new AzureDevOpsEndpointOptions()
-            {
-                Organisation = "https://dev.azure.com/nkdagility-preview/",
-                Project = project,
-                AuthenticationMode = AuthenticationMode.AccessToken,
-                AccessToken = TestingConstants.AccessToken,
-            };
         }
     }
 }

@@ -262,9 +262,9 @@ namespace MigrationTools._EngineV1.Configuration
                     ReplayRevisions = true,
                     WorkItemCreateRetryLimit = 5,
                     ProcessorEnrichers = GetAllTypes<IProcessorEnricherOptions>(),
-                    Source = GetSpecioficType<IEndpointOptions>("InMemoryWorkItemEndpointOptions"),
-                    Target = GetSpecioficType<IEndpointOptions>("InMemoryWorkItemEndpointOptions")
-                }); ; ;
+                    SourceName = "Source",
+                    TargetName = "Target",
+                });
             return ec;
         }
 
@@ -273,7 +273,8 @@ namespace MigrationTools._EngineV1.Configuration
             throw new NotImplementedException();
         }
 
-        private TInterfaceToFind GetSpecioficType<TInterfaceToFind>(string typeName) where TInterfaceToFind : IOptions
+        private T GetSpecificType<T>(string typeName)
+            where T : IEndpointOptions
         {
             AppDomain.CurrentDomain.Load("MigrationTools");
             AppDomain.CurrentDomain.Load("MigrationTools.Clients.AzureDevops.ObjectModel");
@@ -281,8 +282,8 @@ namespace MigrationTools._EngineV1.Configuration
             Type type = AppDomain.CurrentDomain.GetAssemblies()
                .Where(a => a.FullName.StartsWith("MigrationTools"))
                .SelectMany(a => a.GetTypes())
-               .Where(t => typeof(TInterfaceToFind).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract && t.Name == typeName).SingleOrDefault();
-            TInterfaceToFind option = (TInterfaceToFind)Activator.CreateInstance(type);
+               .Where(t => typeof(IEndpointOptions).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract && t.Name == typeName).SingleOrDefault();
+            var option = (T)Activator.CreateInstance(type);
             option.SetDefaults();
             return option;
         }

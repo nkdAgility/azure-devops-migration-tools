@@ -38,16 +38,6 @@
             If you set a `RefName` then this configration will be added to a Catalog of configurations that can be refernced using tha `RefName` so tha tyou dont have to keep adding the ame items with the same configuration.
             </summary>
         </member>
-        <member name="P:MigrationTools.Processors.IProcessorOptions.Source">
-            <summary>
-            This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.
-            </summary>
-        </member>
-        <member name="P:MigrationTools.Processors.IProcessorOptions.Target">
-            <summary>
-            This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a write only processor.
-            </summary>
-        </member>
         <member name="P:MigrationTools.Processors.IProcessorOptions.ProcessorEnrichers">
             <summary>
             List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.
@@ -63,12 +53,7 @@
             List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.
             </summary>
         </member>
-        <member name="P:MigrationTools.Processors.ProcessorOptions.Source">
-            <summary>
-            This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.
-            </summary>
-        </member>
-        <member name="P:MigrationTools.Processors.ProcessorOptions.Target">
+        <member name="P:MigrationTools.Processors.ProcessorOptions.ToConfigure">
             <summary>
             This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a write only processor.
             </summary>

@@ -8,7 +8,7 @@ using MigrationTools.EndpointEnrichers;
 
 namespace MigrationTools.Endpoints
 {
-    public class TfsEndpoint : Endpoint, ITfsEndpointOptions
+    public class TfsEndpoint : Endpoint
     {
         private TfsTeamProjectCollection _Collection;
         private Project _Project;

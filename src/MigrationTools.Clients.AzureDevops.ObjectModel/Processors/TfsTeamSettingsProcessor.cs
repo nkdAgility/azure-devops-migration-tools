@@ -18,16 +18,17 @@ namespace MigrationTools.Processors
         private TfsTeamSettingsProcessorOptions _Options;
 
         public TfsTeamSettingsProcessor(ProcessorEnricherContainer processorEnrichers,
-                                        EndpointContainer endpoints,
+                                        IEndpointFactory endpointFactory,
                                         IServiceProvider services,
                                         ITelemetryLogger telemetry,
-                                        ILogger<Processor> logger) : base(processorEnrichers, endpoints, services, telemetry, logger)
+                                        ILogger<Processor> logger)
+            : base(processorEnrichers, endpointFactory, services, telemetry, logger)
         {
         }
 
-        public TfsTeamSettingsEndpoint Source => (TfsTeamSettingsEndpoint)Endpoints.Source;
+        public new TfsTeamSettingsEndpoint Source => (TfsTeamSettingsEndpoint)base.Source;
 
-        public TfsTeamSettingsEndpoint Target => (TfsTeamSettingsEndpoint)Endpoints.Target;
+        public new TfsTeamSettingsEndpoint Target => (TfsTeamSettingsEndpoint)base.Target;
 
         public override void Configure(IProcessorOptions options)
         {
@@ -55,11 +56,11 @@ namespace MigrationTools.Processors
             {
                 throw new Exception("You must call Configure() first");
             }
-            if (!(Endpoints.Source is Endpoint))
+            if (Source is not Endpoint)
             {
                 throw new Exception("The Source endpoint configured must be of type WorkItemEndpoint");
             }
-            if (!(Endpoints.Target is Endpoint))
+            if (Target is not Endpoint)
             {
                 throw new Exception("The Target endpoint configured must be of type WorkItemEndpoint");
             }

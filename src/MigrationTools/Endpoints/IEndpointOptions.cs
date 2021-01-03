@@ -4,8 +4,9 @@ using MigrationTools.Options;
 
 namespace MigrationTools.Endpoints
 {
-    public interface IEndpointOptions : IOptions
+    public interface IEndpointOptions //: IOptions
     {
+        void SetDefaults();
         public List<IEndpointEnricherOptions> EndpointEnrichers { get; set; }
     }
 }

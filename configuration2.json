@@ -106,6 +106,43 @@
       }
     }
   ],
+  "Endpoints": [
+    {
+      "Type": "TfsEndpointOptions",
+      "Name": "Source",
+      "AccessToken": "qosss7crwz3vie4fupzpaafjndoy6g6ulgkzhoxtmjgicv2lqjyq",
+      "Query": {
+        "Query": "SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan') ORDER BY [System.ChangedDate] desc"
+      },
+      "Organisation": "https://dev.azure.com/nkdagility-preview/",
+      "Project": "migrationSource1",
+      "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
+      "AuthenticationMode": "Prompt",
+      "AllowCrossProjectLinking": false,
+      "PersonalAccessToken": "qosss7crwz3vie4fupzpaafjndoy6g6ulgkzhoxtmjgicv2lqjyq",
+      "LanguageMaps": {
+        "AreaPath": "Area",
+        "IterationPath": "Iteration"
+      }
+    },
+    {
+      "Type": "TfsEndpointOptions",
+      "Name": "Target",
+      "AccessToken": "qosss7crwz3vie4fupzpaafjndoy6g6ulgkzhoxtmjgicv2lqjyq",
+      "Query": {
+        "Query": "SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan') ORDER BY [System.ChangedDate] desc"
+      },
+      "Organisation": "https://dev.azure.com/nkdagility-preview/",
+      "Project": "migrationTarget1",
+      "ReflectedWorkItemIdField": "nkdScrum.ReflectedWorkItemId",
+      "AuthenticationMode": "Prompt",
+      "AllowCrossProjectLinking": false,
+      "LanguageMaps": {
+        "AreaPath": "Area",
+        "IterationPath": "Iteration"
+      }
+    }
+  ],
   "Source": {
     "$type": "TfsTeamProjectConfig",
     "Collection": "https://dev.azure.com/nkdagility-preview/",
@@ -222,6 +259,8 @@
       "$type": "TfsAreaAndIterationProcessorOptions",
       "Enabled": true,
       "PrefixProjectToNodes": false,
+      "SourceName": "Source",
+      "TargetName": "Target",
       "Source": {
         "$type": "TfsEndpointOptions",
         "Direction": "Source",
