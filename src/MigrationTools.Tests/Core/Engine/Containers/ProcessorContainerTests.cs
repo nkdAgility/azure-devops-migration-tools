@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Containers;
@@ -10,11 +11,12 @@ namespace MigrationTools.Engine.Containers.Tests
     [TestClass()]
     public class ProcessorContainerTests
     {
-        private EngineConfiguration CreateEngineConfiguration()
+        private IOptions<EngineConfiguration> CreateEngineConfiguration()
         {
             var ecb = new EngineConfigurationBuilder(new NullLogger<EngineConfigurationBuilder>());
             var ec = ecb.CreateEmptyConfig();
-            return ec;
+            var opts = Microsoft.Extensions.Options.Options.Create(ec);
+            return opts;
         }
 
         private IServiceProvider CreateServiceProvider()
@@ -31,12 +33,12 @@ namespace MigrationTools.Engine.Containers.Tests
             var config = CreateEngineConfiguration();
             var testSimple = new SimpleProcessorConfigMock();
 
-            Assert.AreEqual(0, config.Processors.Count);
+            Assert.AreEqual(0, config.Value.Processors.Count);
 
             testSimple.Enabled = true;
-            config.Processors.Add(testSimple);
+            config.Value.Processors.Add(testSimple);
 
-            Assert.AreEqual(1, config.Processors.Count);
+            Assert.AreEqual(1, config.Value.Processors.Count);
 
             var processorContainer = new ProcessorContainer(CreateServiceProvider(), config, new NullLogger<ProcessorContainer>());
 

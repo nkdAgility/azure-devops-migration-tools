@@ -13,7 +13,6 @@ namespace _VstsSyncMigrator.Engine.Tests
         {
             EngineConfiguration ec = new EngineConfiguration
             {
-                LogLevel = Serilog.Events.LogEventLevel.Verbose.ToString(),
                 Source = new TfsTeamProjectConfig() { Project = "DemoProjs", Collection = new Uri("https://sdd2016.visualstudio.com/"), ReflectedWorkItemIDFieldName = "TfsMigrationTool.ReflectedWorkItemId", PersonalAccessToken = "" },
                 Target = new TfsTeamProjectConfig() { Project = "DemoProjt", Collection = new Uri("https://sdd2016.visualstudio.com/"), ReflectedWorkItemIDFieldName = "TfsMigrationTool.ReflectedWorkItemId", PersonalAccessToken = "" }
             };

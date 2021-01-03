@@ -24,11 +24,10 @@ namespace MigrationTools.Tests
         public void TestDeseraliseFromJson()
         {
             TestSeraliseToJson();
-            EngineConfiguration ec;
             StreamReader sr = new StreamReader("configuration.json");
             string configurationjson = sr.ReadToEnd();
             sr.Close();
-            ec = NewtonsoftHelpers.DeserializeObject<EngineConfiguration>(configurationjson);
+            EngineConfiguration ec = NewtonsoftHelpers.DeserializeObject<EngineConfiguration>(configurationjson);
             Assert.AreEqual(10, ec.FieldMaps.Count);
             Assert.AreEqual(12, ec.Processors.Count);
         }
@@ -46,11 +45,10 @@ namespace MigrationTools.Tests
         public void TestDeseraliseFromJson2()
         {
             TestSeraliseToJson2();
-            EngineConfiguration ec;
             StreamReader sr = new StreamReader("configuration2.json");
             string configurationjson = sr.ReadToEnd();
             sr.Close();
-            ec = NewtonsoftHelpers.DeserializeObject<EngineConfiguration>(configurationjson);
+            EngineConfiguration ec = NewtonsoftHelpers.DeserializeObject<EngineConfiguration>(configurationjson);
             Assert.AreEqual(10, ec.FieldMaps.Count);
             Assert.AreEqual(12, ec.Processors.Count);
         }

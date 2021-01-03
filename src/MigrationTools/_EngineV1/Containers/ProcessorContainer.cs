@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using MigrationTools._EngineV1.Configuration;
 
@@ -24,7 +25,7 @@ namespace MigrationTools._EngineV1.Containers
 
         public int Count { get { EnsureConfigured(); return _Processors.Count; } }
 
-        public ProcessorContainer(IServiceProvider services, EngineConfiguration config, ILogger<ProcessorContainer> logger) : base(services, config)
+        public ProcessorContainer(IServiceProvider services, IOptions<EngineConfiguration> config, ILogger<ProcessorContainer> logger) : base(services, config)
         {
             _logger = logger;
         }

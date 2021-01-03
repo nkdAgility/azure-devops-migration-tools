@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Containers;
@@ -10,11 +11,12 @@ namespace MigrationTools.Engine.Containers.Tests
     [TestClass()]
     public class FieldMapContainerTests
     {
-        private EngineConfiguration CreateEngineConfiguration()
+        private IOptions<EngineConfiguration> CreateEngineConfiguration()
         {
             var ecb = new EngineConfigurationBuilder(new NullLogger<EngineConfigurationBuilder>());
             var ec = ecb.CreateEmptyConfig();
-            return ec;
+            var opts = Microsoft.Extensions.Options.Options.Create(ec);
+            return opts;
         }
 
         private IServiceProvider CreateServiceProvider()
@@ -30,15 +32,15 @@ namespace MigrationTools.Engine.Containers.Tests
         {
             var config = CreateEngineConfiguration();
 
-            Assert.AreEqual(0, config.FieldMaps.Count);
+            Assert.AreEqual(0, config.Value.FieldMaps.Count);
 
             var testSimple = new SimpleFieldMapConfigMock
             {
                 WorkItemTypeName = "*"
             };
-            config.FieldMaps.Add(testSimple);
+            config.Value.FieldMaps.Add(testSimple);
 
-            Assert.AreEqual(1, config.FieldMaps.Count);
+            Assert.AreEqual(1, config.Value.FieldMaps.Count);
 
             var fieldMapContainer = new FieldMapContainer(CreateServiceProvider(), config, new NullLogger<FieldMapContainer>());
             fieldMapContainer.EnsureConfigured();

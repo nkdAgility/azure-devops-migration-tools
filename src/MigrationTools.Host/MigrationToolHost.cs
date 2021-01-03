@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using CommandLine;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.WorkerService;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -26,17 +27,18 @@ namespace MigrationTools.Host
         {
             (var initOptions, var executeOptions) = ParseOptions(args);
 
-            if(initOptions is null && executeOptions is null)
+            if (initOptions is null && executeOptions is null)
             {
                 return null;
             }
 
-            var levelSwitch = new LoggingLevelSwitch(LogEventLevel.Verbose);
             var hostBuilder = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args)
              .UseSerilog((hostingContext, services, loggerConfiguration) =>
              {
                  string logsPath = CreateLogsPath();
                  var logPath = Path.Combine(logsPath, "migration.log");
+                 var logLevel = hostingContext.Configuration.GetValue<LogEventLevel>("LogLevel");
+                 var levelSwitch = new LoggingLevelSwitch(logLevel);
                  loggerConfiguration
                      .MinimumLevel.ControlledBy(levelSwitch)
                      .ReadFrom.Configuration(hostingContext.Configuration)
@@ -50,9 +52,42 @@ namespace MigrationTools.Host
              .ConfigureLogging((context, logBuilder) =>
              {
              })
+             .ConfigureAppConfiguration(builder =>
+             {
+                 if (executeOptions is not null)
+                 {
+                     builder.AddJsonFile(executeOptions.ConfigFile);
+                 }
+             })
              .ConfigureServices((context, services) =>
              {
                  services.AddOptions();
+                 services.Configure<EngineConfiguration>((config) =>
+                 {
+                     var sp = services.BuildServiceProvider();
+                     var builder = sp.GetRequiredService<IEngineConfigurationBuilder>();
+                     var logger = sp.GetService<ILoggerFactory>().CreateLogger<EngineConfiguration>();
+                     if(executeOptions is null)
+                     {
+                         return;
+                     }
+                     if (!File.Exists(executeOptions.ConfigFile))
+                     {
+                         logger.LogInformation("The config file {ConfigFile} does not exist, nor does the default 'configuration.json'. Use '{ExecutableName}.exe init' to create a configuration file first", executeOptions.ConfigFile, Assembly.GetEntryAssembly().GetName().Name);
+                         throw new ArgumentException("missing configfile");
+                     }
+                     logger.LogInformation("Config Found, creating engine host");
+                     var parsed = builder.BuildFromFile(executeOptions.ConfigFile);
+                     config.ChangeSetMappingFile = parsed.ChangeSetMappingFile;
+                     config.FieldMaps = parsed.FieldMaps;
+                     config.GitRepoMapping = parsed.GitRepoMapping;
+                     config.Processors = parsed.Processors;
+                     config.Source = parsed.Source;
+                     config.Target = parsed.Target;
+                     config.Version = parsed.Version;
+                     config.workaroundForQuerySOAPBugEnabled = parsed.workaroundForQuerySOAPBugEnabled;
+                     config.WorkItemTypeDefinition = parsed.WorkItemTypeDefinition;
+                 });
 
                  // Application Insights
                  services.AddApplicationInsightsTelemetryWorkerService(new ApplicationInsightsServiceOptions { InstrumentationKey = "2d666f84-b3fb-4dcf-9aad-65de038d2772" });
@@ -63,21 +98,6 @@ namespace MigrationTools.Host
 
                  // Config
                  services.AddSingleton<IEngineConfigurationBuilder, EngineConfigurationBuilder>();
-                 services.AddSingleton<EngineConfiguration>(sp =>
-                 {
-                     var builder = sp.GetRequiredService<IEngineConfigurationBuilder>();
-                     var logger = sp.GetService<ILoggerFactory>().CreateLogger<EngineConfiguration>();
-
-                     if (!File.Exists(executeOptions.ConfigFile))
-                     {
-                         logger.LogInformation("The config file {ConfigFile} does not exist, nor does the default 'configuration.json'. Use '{ExecutableName}.exe init' to create a configuration file first", executeOptions.ConfigFile, Assembly.GetEntryAssembly().GetName().Name);
-                         throw new ArgumentException("missing configfile");
-                     }
-                     logger.LogInformation("Config Found, creating engine host");
-                     var config = builder.BuildFromFile(executeOptions.ConfigFile);
-                     levelSwitch.MinimumLevel = (LogEventLevel)Enum.Parse(typeof(LogEventLevel), config.LogLevel);
-                     return config;
-                 });
 
                  // Add Old v1Bits
                  services.AddMigrationToolServicesLegacy();
