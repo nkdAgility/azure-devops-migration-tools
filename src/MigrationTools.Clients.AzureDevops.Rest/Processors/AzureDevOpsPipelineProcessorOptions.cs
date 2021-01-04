@@ -31,6 +31,12 @@ namespace MigrationTools.Processors
         public bool MigrateVariableGroups { get; set; }
 
         /// <summary>
+        /// Migrate Service Connections
+        /// </summary>
+        /// <default>true</default>
+        public bool MigrateServiceConnections { get; set; }
+
+        /// <summary>
         /// List of Build Pipelines to process. If this is `null` then all Build Pipelines will be processed. **Not implemented yet**
         /// </summary>
         public List<string> BuildPipelines { get; set; }
@@ -53,6 +59,7 @@ namespace MigrationTools.Processors
             MigrateReleasePipelines = true;
             MigrateTaskGroups = true;
             MigrateVariableGroups = true;
+            MigrateServiceConnections = true;
             BuildPipelines = null;
             ReleasePipelines = null;
             var e1 = new AzureDevOpsEndpointOptions();
