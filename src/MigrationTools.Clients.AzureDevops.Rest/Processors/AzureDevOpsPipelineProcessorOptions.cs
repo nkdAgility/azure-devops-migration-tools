@@ -31,7 +31,7 @@ namespace MigrationTools.Processors
         public bool MigrateVariableGroups { get; set; }
 
         /// <summary>
-        /// Migrate Service Connections
+        /// Migrate Service Connections **secrets need to be entered manually**
         /// </summary>
         /// <default>true</default>
         public bool MigrateServiceConnections { get; set; }
