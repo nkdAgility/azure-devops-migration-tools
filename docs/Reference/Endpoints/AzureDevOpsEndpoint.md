@@ -27,7 +27,7 @@ missng XML code comments
   "Organisation": "https://dev.azure.com/nkdagility-preview/",
   "Project": "NeedToSetThis",
   "AuthenticationMode": "AccessToken",
-  "AccessToken": "qosss7crwz3vie4fupzpaafjndoy6g6ulgkzhoxtmjgicv2lqjyq",
+  "AccessToken": "iksmyfwmracmyqb22p2rlytagg6mpzxu7ntowjvpihvk4fwcjzcq",
   "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
   "EndpointEnrichers": null
 }
