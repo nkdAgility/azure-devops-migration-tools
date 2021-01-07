@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace MigrationTools.Endpoints
+﻿namespace MigrationTools.Endpoints
 {
     public class FileSystemWorkItemEndpointOptions : EndpointOptions
     {
