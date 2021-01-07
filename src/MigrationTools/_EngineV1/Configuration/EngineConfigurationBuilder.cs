@@ -273,20 +273,20 @@ namespace MigrationTools._EngineV1.Configuration
             throw new NotImplementedException();
         }
 
-        private T GetSpecificType<T>(string typeName)
-            where T : IEndpointOptions
-        {
-            AppDomain.CurrentDomain.Load("MigrationTools");
-            AppDomain.CurrentDomain.Load("MigrationTools.Clients.AzureDevops.ObjectModel");
-            AppDomain.CurrentDomain.Load("MigrationTools.Clients.FileSystem");
-            Type type = AppDomain.CurrentDomain.GetAssemblies()
-               .Where(a => a.FullName.StartsWith("MigrationTools"))
-               .SelectMany(a => a.GetTypes())
-               .Where(t => typeof(IEndpointOptions).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract && t.Name == typeName).SingleOrDefault();
-            var option = (T)Activator.CreateInstance(type);
-            option.SetDefaults();
-            return option;
-        }
+        //private T GetSpecificType<T>(string typeName)
+        //    where T : IEndpointOptions
+        //{
+        //    AppDomain.CurrentDomain.Load("MigrationTools");
+        //    AppDomain.CurrentDomain.Load("MigrationTools.Clients.AzureDevops.ObjectModel");
+        //    AppDomain.CurrentDomain.Load("MigrationTools.Clients.FileSystem");
+        //    Type type = AppDomain.CurrentDomain.GetAssemblies()
+        //       .Where(a => a.FullName.StartsWith("MigrationTools"))
+        //       .SelectMany(a => a.GetTypes())
+        //       .Where(t => typeof(IEndpointOptions).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract && t.Name == typeName).SingleOrDefault();
+        //    var option = (T)Activator.CreateInstance(type);
+        //    option.SetDefaults();
+        //    return option;
+        //}
 
         private List<TInterfaceToFind> GetAllTypes<TInterfaceToFind>() where TInterfaceToFind : IOptions
         {

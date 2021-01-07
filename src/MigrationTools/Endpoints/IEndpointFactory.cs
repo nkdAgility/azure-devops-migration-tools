@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace MigrationTools.Endpoints
+﻿namespace MigrationTools.Endpoints
 {
     public interface IEndpointFactory
     {

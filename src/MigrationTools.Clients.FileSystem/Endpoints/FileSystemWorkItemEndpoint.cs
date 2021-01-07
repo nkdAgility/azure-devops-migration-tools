@@ -14,7 +14,8 @@ namespace MigrationTools.Endpoints
         private FileSystemWorkItemEndpointOptions _options;
         private List<WorkItemData> _innerList;
 
-        public FileSystemWorkItemEndpoint(EndpointEnricherContainer endpointEnrichers, System.IServiceProvider services, ITelemetryLogger telemetry, ILogger<Endpoint> logger) : base(endpointEnrichers, services, telemetry, logger)
+        public FileSystemWorkItemEndpoint(EndpointEnricherContainer endpointEnrichers, ITelemetryLogger telemetry, ILogger<FileSystemWorkItemEndpoint> logger)
+            : base(endpointEnrichers, telemetry, logger)
         {
             _innerList = new List<WorkItemData>();
         }
@@ -25,9 +26,9 @@ namespace MigrationTools.Endpoints
         {
             base.Configure(options);
             _options = (FileSystemWorkItemEndpointOptions)options;
-            if (!System.IO.Directory.Exists(_options.FileStore))
+            if (!Directory.Exists(_options.FileStore))
             {
-                System.IO.Directory.CreateDirectory(_options.FileStore);
+                Directory.CreateDirectory(_options.FileStore);
             }
             LoadStore();
         }
@@ -35,10 +36,10 @@ namespace MigrationTools.Endpoints
         private void LoadStore()
         {
             _innerList.Clear();
-            var workitemFiles = System.IO.Directory.GetFiles(_options.FileStore);
+            var workitemFiles = Directory.GetFiles(_options.FileStore);
             foreach (var item in workitemFiles)
             {
-                var contents = System.IO.File.ReadAllText(item);
+                var contents = File.ReadAllText(item);
                 var workItem = JsonConvert.DeserializeObject<WorkItemData>(contents);
                 _innerList.Add(workItem);
             }

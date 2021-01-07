@@ -4,9 +4,9 @@ using MigrationTools.EndpointEnrichers;
 
 namespace MigrationTools.Endpoints
 {
-    public class AzureDevOpsEndpoint : Endpoint, IAzureDevOpsEndpointOptions
+    public class AzureDevOpsEndpoint : Endpoint
     {
-        private IAzureDevOpsEndpointOptions _Options;
+        private AzureDevOpsEndpointOptions _Options;
 
         public string AccessToken => _Options.AccessToken;
         public string Organisation => _Options.Organisation;
@@ -16,7 +16,8 @@ namespace MigrationTools.Endpoints
 
         public override int Count => 0;
 
-        public AzureDevOpsEndpoint(EndpointEnricherContainer endpointEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Endpoint> logger) : base(endpointEnrichers, services, telemetry, logger)
+        public AzureDevOpsEndpoint(EndpointEnricherContainer endpointEnrichers, ITelemetryLogger telemetry, ILogger<AzureDevOpsEndpoint> logger)
+            : base(endpointEnrichers, telemetry, logger)
         {
         }
 
@@ -24,7 +25,7 @@ namespace MigrationTools.Endpoints
         {
             base.Configure(options);
             Log.LogDebug("AzureDevOpsEndpoint::Configure");
-            _Options = (IAzureDevOpsEndpointOptions)options;
+            _Options = (AzureDevOpsEndpointOptions)options;
             if (string.IsNullOrEmpty(_Options.Organisation))
             {
                 throw new ArgumentNullException(nameof(_Options.Organisation));

@@ -13,13 +13,9 @@ namespace MigrationTools.Endpoints
         private TfsTeamProjectCollection _Collection;
         private Project _Project;
         private WorkItemStore _Store;
-        private ITfsEndpointOptions _Options;
+        private TfsEndpointOptions _Options;
 
-        public string AccessToken => _Options.AccessToken;
-        public string Organisation => _Options.Organisation;
         public string Project => _Options.Project;
-        public string ReflectedWorkItemIdField => _Options.ReflectedWorkItemIdField;
-        public AuthenticationMode AuthenticationMode => _Options.AuthenticationMode;
 
         internal TfsTeamProjectCollection TfsCollection
         {
@@ -51,7 +47,8 @@ namespace MigrationTools.Endpoints
 
         public TfsLanguageMapOptions LanguageMaps => _Options.LanguageMaps;
 
-        public TfsEndpoint(EndpointEnricherContainer endpointEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Endpoint> logger) : base(endpointEnrichers, services, telemetry, logger)
+        public TfsEndpoint(EndpointEnricherContainer endpointEnrichers, ITelemetryLogger telemetry, ILogger<TfsEndpoint> logger)
+            : base(endpointEnrichers, telemetry, logger)
         {
         }
 
@@ -59,7 +56,7 @@ namespace MigrationTools.Endpoints
         {
             base.Configure(options);
             Log.LogDebug("TfsEndpoint::Configure");
-            _Options = (ITfsEndpointOptions)options;
+            _Options = (TfsEndpointOptions)options;
             if (string.IsNullOrEmpty(_Options.Organisation))
             {
                 throw new ArgumentNullException(nameof(_Options.Organisation));

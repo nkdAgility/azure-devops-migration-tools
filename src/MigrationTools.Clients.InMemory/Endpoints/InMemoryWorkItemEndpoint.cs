@@ -14,7 +14,8 @@ namespace MigrationTools.Endpoints
         private List<WorkItemData> _innerList;
         private InMemoryWorkItemEndpointOptions _Options;
 
-        public InMemoryWorkItemEndpoint(EndpointEnricherContainer endpointEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Endpoint> logger) : base(endpointEnrichers, services, telemetry, logger)
+        public InMemoryWorkItemEndpoint(EndpointEnricherContainer endpointEnrichers, ITelemetryLogger telemetry, ILogger<InMemoryWorkItemEndpoint> logger)
+            : base(endpointEnrichers, telemetry, logger)
         {
             _innerList = new List<WorkItemData>();
         }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using MigrationTools.EndpointEnrichers;
@@ -11,10 +10,9 @@ namespace MigrationTools.Endpoints
         private IEndpointOptions _InnerOptions;
         private List<IEndpointEnricher> _EndpointEnrichers;
 
-        public Endpoint(EndpointEnricherContainer endpointEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Endpoint> logger)
+        public Endpoint(EndpointEnricherContainer endpointEnrichers, ITelemetryLogger telemetry, ILogger<Endpoint> logger)
         {
             EndpointEnrichers = endpointEnrichers;
-            Services = services;
             Telemetry = telemetry;
             Log = logger;
             _EndpointEnrichers = new List<IEndpointEnricher>();
@@ -25,7 +23,6 @@ namespace MigrationTools.Endpoints
         public IEnumerable<IEndpointSourceEnricher> SourceEnrichers => _EndpointEnrichers.Where(e => e.GetType().IsAssignableFrom(typeof(IEndpointSourceEnricher))).Select(e => (IEndpointSourceEnricher)e);
         public IEnumerable<IEndpointTargetEnricher> TargetEnrichers => _EndpointEnrichers.Where(e => e.GetType().IsAssignableFrom(typeof(IEndpointTargetEnricher))).Select(e => (IEndpointTargetEnricher)e);
 
-        protected IServiceProvider Services { get; }
         protected ITelemetryLogger Telemetry { get; }
         protected ILogger<Endpoint> Log { get; }
 

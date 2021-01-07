@@ -16,51 +16,10 @@ namespace MigrationTools
     {
         public static void AddMigrationToolServicesForClientAzureDevOpsObjectModel(this IServiceCollection context, IConfiguration configuration)
         {
-            var endPoints = configuration.GetSection("Endpoints");
-            var children = endPoints.GetChildren();
-            foreach (var child in children)
-            {
-                var sections = child.GetChildren();
-                if (sections.First(s => s.Key == "Type").Value == "TfsEndpointOptions")
-                {
-                    var name = sections.First(s => s.Key == "Name").Value;
-                    context.AddEndpoint(name, (provider) =>
-                    {
-                        var options = child.Get<TfsEndpointOptions>();
-                        var endpoint = provider.GetRequiredService<TfsEndpoint>();
-                        endpoint.Configure(options);
-                        return endpoint;
-                    });
-                }
-                else if (sections.First(s => s.Key == "Type").Value == "TfsWorkItemEndpointOptions")
-                {
-                    var name = sections.First(s => s.Key == "Name").Value;
-                    context.AddEndpoint(name, (provider) =>
-                    {
-                        var options = child.Get<TfsWorkItemEndpointOptions>();
-                        var endpoint = provider.GetRequiredService<TfsWorkItemEndpoint>();
-                        endpoint.Configure(options);
-                        return endpoint;
-                    });
-                }
-                else if (sections.First(s => s.Key == "Type").Value == "TfsTeamSettingsEndpointOptions")
-                {
-                    var name = sections.First(s => s.Key == "Name").Value;
-                    context.AddEndpoint(name, (provider) =>
-                    {
-                        var options = child.Get<TfsTeamSettingsEndpointOptions>();
-                        var endpoint = provider.GetRequiredService<TfsTeamSettingsEndpoint>();
-                        endpoint.Configure(options);
-                        return endpoint;
-                    });
-                }
-            }
-            // Generic Endpoint
-            context.AddTransient<TfsEndpoint>();
-            //TfsWorkItem
-            context.AddTransient<TfsWorkItemEndpoint>();
-            //TfsTeamSettings
-            context.AddTransient<TfsTeamSettingsEndpoint>();
+            context.AddEndPoints<TfsEndpointOptions, TfsEndpoint>(configuration, "TfsEndpoints");
+            context.AddEndPoints<TfsWorkItemEndpointOptions, TfsWorkItemEndpoint>(configuration, "TfsWorkItemEndpoints");
+            context.AddEndPoints<TfsTeamSettingsEndpointOptions, TfsTeamSettingsEndpoint>(configuration, "TfsTeamSettingsEndpoints");
+
             context.AddTransient<TfsTeamSettingsProcessor>();
             //TfsSharedQueries
             context.AddTransient<TfsSharedQueryProcessor>();

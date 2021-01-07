@@ -10,13 +10,12 @@ using WorkItem = Microsoft.TeamFoundation.WorkItemTracking.Client.WorkItem;
 
 namespace MigrationTools.Endpoints
 {
-    public class TfsWorkItemEndpoint : TfsEndpoint, IWorkItemSourceEndpoint, IWorkItemTargetEndpoint, ITfsWorkItemEndpointOptions
+    public class TfsWorkItemEndpoint : TfsEndpoint, IWorkItemSourceEndpoint, IWorkItemTargetEndpoint
     {
         private TfsWorkItemEndpointOptions _Options;
 
-        public QueryOptions Query => _Options.Query;
-
-        public TfsWorkItemEndpoint(EndpointEnricherContainer endpointEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Endpoint> logger) : base(endpointEnrichers, services, telemetry, logger)
+        public TfsWorkItemEndpoint(EndpointEnricherContainer endpointEnrichers, ITelemetryLogger telemetry, ILogger<TfsWorkItemEndpoint> logger)
+            : base(endpointEnrichers, telemetry, logger)
         {
         }
 

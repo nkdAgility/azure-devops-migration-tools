@@ -1,20 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using MigrationTools.EndpointEnrichers;
-using Newtonsoft.Json;
 
 namespace MigrationTools.Endpoints
 {
     public abstract class EndpointOptions : IEndpointOptions
     {
-        [JsonIgnore]
-        public abstract Type ToConfigure { get; }
-
+        public string Name { get; set; }
         public List<IEndpointEnricherOptions> EndpointEnrichers { get; set; }
-        public string RefName { get; set; }
 
-        public virtual void SetDefaults()
-        {
-        }
+        //public virtual void SetDefaults()
+        //{
+        //}
     }
 }
