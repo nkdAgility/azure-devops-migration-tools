@@ -22,8 +22,8 @@ namespace MigrationTools.Processors.Tests
                 MigrateTeamSettings = true,
                 UpdateTeamSettings = true,
                 PrefixProjectToNodes = false,
-                SourceName = "Source",
-                TargetName = "Target"
+                SourceName = "TfsTeamSettingsSource",
+                TargetName = "TfsTeamSettingsTarget"
             };
             var x = Services.GetRequiredService<TfsTeamSettingsProcessor>();
             x.Configure(y);
@@ -39,8 +39,8 @@ namespace MigrationTools.Processors.Tests
                 MigrateTeamSettings = true,
                 UpdateTeamSettings = true,
                 PrefixProjectToNodes = false,
-                SourceName = "Source",
-                TargetName = "Target"
+                SourceName = "TfsTeamSettingsSource",
+                TargetName = "TfsTeamSettingsTarget"
             };
             var x = Services.GetRequiredService<TfsTeamSettingsProcessor>();
             x.Configure(y);

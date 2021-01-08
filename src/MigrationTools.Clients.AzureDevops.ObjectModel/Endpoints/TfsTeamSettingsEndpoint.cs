@@ -5,7 +5,7 @@ using MigrationTools.EndpointEnrichers;
 
 namespace MigrationTools.Endpoints
 {
-    public class TfsTeamSettingsEndpoint : TfsEndpoint, ISourceEndPoint, ITargetEndPoint
+    public class TfsTeamSettingsEndpoint : GenericTfsEndpoint<TfsTeamSettingsEndpointOptions>, ISourceEndPoint, ITargetEndPoint
     {
         public TfsTeamSettingsEndpoint(EndpointEnricherContainer endpointEnrichers, ITelemetryLogger telemetry, ILogger<TfsTeamSettingsEndpoint> logger)
             : base(endpointEnrichers, telemetry, logger)

@@ -4,15 +4,11 @@ using MigrationTools.EndpointEnrichers;
 
 namespace MigrationTools.Endpoints
 {
-    public class AzureDevOpsEndpoint : Endpoint
+    public class AzureDevOpsEndpoint : Endpoint<AzureDevOpsEndpointOptions>
     {
-        private AzureDevOpsEndpointOptions _Options;
-
-        public string AccessToken => _Options.AccessToken;
-        public string Organisation => _Options.Organisation;
-        public string Project => _Options.Project;
-        public string ReflectedWorkItemIdField => _Options.ReflectedWorkItemIdField;
-        public AuthenticationMode AuthenticationMode => _Options.AuthenticationMode;
+        public string AccessToken => Options.AccessToken;
+        public string Organisation => Options.Organisation;
+        public string Project => Options.Project;
 
         public override int Count => 0;
 
@@ -21,22 +17,21 @@ namespace MigrationTools.Endpoints
         {
         }
 
-        public override void Configure(IEndpointOptions options)
+        public override void Configure(AzureDevOpsEndpointOptions options)
         {
             base.Configure(options);
             Log.LogDebug("AzureDevOpsEndpoint::Configure");
-            _Options = (AzureDevOpsEndpointOptions)options;
-            if (string.IsNullOrEmpty(_Options.Organisation))
+            if (string.IsNullOrEmpty(Options.Organisation))
             {
-                throw new ArgumentNullException(nameof(_Options.Organisation));
+                throw new ArgumentNullException(nameof(Options.Organisation));
             }
-            if (string.IsNullOrEmpty(_Options.Project))
+            if (string.IsNullOrEmpty(Options.Project))
             {
-                throw new ArgumentNullException(nameof(_Options.Project));
+                throw new ArgumentNullException(nameof(Options.Project));
             }
-            if (string.IsNullOrEmpty(_Options.AccessToken))
+            if (string.IsNullOrEmpty(Options.AccessToken))
             {
-                throw new ArgumentNullException(nameof(_Options.AccessToken));
+                throw new ArgumentNullException(nameof(Options.AccessToken));
             }
         }
     }

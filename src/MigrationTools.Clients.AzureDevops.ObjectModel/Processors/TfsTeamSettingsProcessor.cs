@@ -56,13 +56,13 @@ namespace MigrationTools.Processors
             {
                 throw new Exception("You must call Configure() first");
             }
-            if (Source is not Endpoint)
+            if (Source is not TfsTeamSettingsEndpoint)
             {
-                throw new Exception("The Source endpoint configured must be of type WorkItemEndpoint");
+                throw new Exception("The Source endpoint configured must be of type TfsTeamSettingsEndpoint");
             }
-            if (Target is not Endpoint)
+            if (Target is not TfsTeamSettingsEndpoint)
             {
-                throw new Exception("The Target endpoint configured must be of type WorkItemEndpoint");
+                throw new Exception("The Target endpoint configured must be of type TfsTeamSettingsEndpoint");
             }
         }
         private void MigrateTeamSettings()

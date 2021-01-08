@@ -9,10 +9,9 @@ using MigrationTools.Options;
 
 namespace MigrationTools.Endpoints
 {
-    public class InMemoryWorkItemEndpoint : Endpoint, IWorkItemSourceEndpoint, IWorkItemTargetEndpoint
+    public class InMemoryWorkItemEndpoint : Endpoint<InMemoryWorkItemEndpointOptions>, IWorkItemSourceEndpoint, IWorkItemTargetEndpoint
     {
         private List<WorkItemData> _innerList;
-        private InMemoryWorkItemEndpointOptions _Options;
 
         public InMemoryWorkItemEndpoint(EndpointEnricherContainer endpointEnrichers, ITelemetryLogger telemetry, ILogger<InMemoryWorkItemEndpoint> logger)
             : base(endpointEnrichers, telemetry, logger)
@@ -22,10 +21,9 @@ namespace MigrationTools.Endpoints
 
         public override int Count => _innerList.Count;
 
-        public override void Configure(IEndpointOptions options)
+        public override void Configure(InMemoryWorkItemEndpointOptions options)
         {
             base.Configure(options);
-            _Options = (InMemoryWorkItemEndpointOptions)options;
         }
 
         public WorkItemData CreateNewFrom(WorkItemData source)

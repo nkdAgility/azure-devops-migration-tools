@@ -15,18 +15,43 @@ namespace MigrationTools.Tests
 
             services.AddMigrationToolServices();
             services.AddMigrationToolServicesForClientAzureDevOpsObjectModel(configuration);
-            AddEndpoint(services, "Source", "migrationSource1");
-            AddEndpoint(services, "Target", "migrationTarget1");
+            AddTfsEndpoint(services, "Source", "migrationSource1");
+            AddTfsEndpoint(services, "Target", "migrationTarget1");
+
+            AddTfsTeamEndpoint(services, "TfsTeamSettingsSource", "migrationSource1");
+            AddTfsTeamEndpoint(services, "TfsTeamSettingsTarget", "migrationTarget1");
 
             return services.BuildServiceProvider();
         }
 
-        private static void AddEndpoint(IServiceCollection services, string name, string project)
+        private static void AddTfsTeamEndpoint(IServiceCollection services, string name, string project)
+        {
+            services.AddEndpoint(name, (provider) =>
+            {
+                var options = GetTfsTeamEndPointOptions(project);
+                var endpoint = provider.GetRequiredService<TfsTeamSettingsEndpoint>();
+                endpoint.Configure(options);
+                return endpoint;
+            });
+        }
+
+        private static TfsTeamSettingsEndpointOptions GetTfsTeamEndPointOptions(string project)
+        {
+            return new TfsTeamSettingsEndpointOptions()
+            {
+                Organisation = "https://dev.azure.com/nkdagility-preview/",
+                Project = project,
+                AuthenticationMode = AuthenticationMode.AccessToken,
+                AccessToken = TestingConstants.AccessToken,
+            };
+        }
+
+        private static void AddTfsEndpoint(IServiceCollection services, string name, string project)
         {
             services.AddEndpoint(name, (provider) =>
             {
                 var options = GetTfsEndPointOptions(project);
-                var endpoint = provider.GetRequiredService<TfsTeamSettingsEndpoint>();
+                var endpoint = provider.GetRequiredService<TfsEndpoint>();
                 endpoint.Configure(options);
                 return endpoint;
             });
@@ -34,7 +59,7 @@ namespace MigrationTools.Tests
 
         private static TfsEndpointOptions GetTfsEndPointOptions(string project)
         {
-            return new TfsTeamSettingsEndpointOptions()
+            return new TfsEndpointOptions()
             {
                 Organisation = "https://dev.azure.com/nkdagility-preview/",
                 Project = project,

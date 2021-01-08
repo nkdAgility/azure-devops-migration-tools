@@ -9,9 +9,8 @@ using Newtonsoft.Json;
 
 namespace MigrationTools.Endpoints
 {
-    public class FileSystemWorkItemEndpoint : Endpoint, IWorkItemSourceEndpoint, IWorkItemTargetEndpoint
+    public class FileSystemWorkItemEndpoint : Endpoint<FileSystemWorkItemEndpointOptions>, IWorkItemSourceEndpoint, IWorkItemTargetEndpoint
     {
-        private FileSystemWorkItemEndpointOptions _options;
         private List<WorkItemData> _innerList;
 
         public FileSystemWorkItemEndpoint(EndpointEnricherContainer endpointEnrichers, ITelemetryLogger telemetry, ILogger<FileSystemWorkItemEndpoint> logger)
@@ -22,13 +21,13 @@ namespace MigrationTools.Endpoints
 
         public override int Count => GetWorkItems().Count();
 
-        public override void Configure(IEndpointOptions options)
+        public override void Configure(FileSystemWorkItemEndpointOptions options)
         {
             base.Configure(options);
-            _options = (FileSystemWorkItemEndpointOptions)options;
-            if (!Directory.Exists(_options.FileStore))
+
+            if (!Directory.Exists(Options.FileStore))
             {
-                Directory.CreateDirectory(_options.FileStore);
+                Directory.CreateDirectory(Options.FileStore);
             }
             LoadStore();
         }
@@ -36,7 +35,7 @@ namespace MigrationTools.Endpoints
         private void LoadStore()
         {
             _innerList.Clear();
-            var workitemFiles = Directory.GetFiles(_options.FileStore);
+            var workitemFiles = Directory.GetFiles(Options.FileStore);
             foreach (var item in workitemFiles)
             {
                 var contents = File.ReadAllText(item);
@@ -66,7 +65,7 @@ namespace MigrationTools.Endpoints
         public void PersistWorkItem(WorkItemData source)
         {
             var content = JsonConvert.SerializeObject(source, Formatting.Indented);
-            var fileName = Path.Combine(_options.FileStore, string.Format("{0}.json", source.Id));
+            var fileName = Path.Combine(Options.FileStore, string.Format("{0}.json", source.Id));
             File.WriteAllText(fileName, content);
             LoadStore();
         }

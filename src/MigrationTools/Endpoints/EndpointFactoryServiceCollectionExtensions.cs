@@ -25,7 +25,7 @@ namespace MigrationTools.Endpoints
 
         public static IServiceCollection AddEndPoints<TOptions, TEndpoint>(this IServiceCollection services, IConfiguration configuration, string settingsName)
             where TOptions : EndpointOptions
-            where TEndpoint : Endpoint
+            where TEndpoint : Endpoint<TOptions>
         {
             services.AddTransient<TEndpoint>();
 

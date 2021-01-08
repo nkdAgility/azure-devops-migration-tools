@@ -22,8 +22,8 @@ namespace MigrationTools.Processors.Tests
                 MigrateTeamSettings = true,
                 UpdateTeamSettings = true,
                 PrefixProjectToNodes = false,
-                SourceName = "Source",
-                TargetName = "Target"
+                SourceName = "TfsTeamSettingsSource",
+                TargetName = "TfsTeamSettingsTarget"
             };
             return migrationConfig;
         }

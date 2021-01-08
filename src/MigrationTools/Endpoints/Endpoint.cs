@@ -5,12 +5,12 @@ using MigrationTools.EndpointEnrichers;
 
 namespace MigrationTools.Endpoints
 {
-    public abstract class Endpoint : ISourceEndPoint, ITargetEndPoint
+    public abstract class Endpoint<TOptions> : ISourceEndPoint, ITargetEndPoint
+        where TOptions : IEndpointOptions
     {
-        private IEndpointOptions _InnerOptions;
         private List<IEndpointEnricher> _EndpointEnrichers;
 
-        public Endpoint(EndpointEnricherContainer endpointEnrichers, ITelemetryLogger telemetry, ILogger<Endpoint> logger)
+        public Endpoint(EndpointEnricherContainer endpointEnrichers, ITelemetryLogger telemetry, ILogger<Endpoint<TOptions>> logger)
         {
             EndpointEnrichers = endpointEnrichers;
             Telemetry = telemetry;
@@ -24,15 +24,17 @@ namespace MigrationTools.Endpoints
         public IEnumerable<IEndpointTargetEnricher> TargetEnrichers => _EndpointEnrichers.Where(e => e.GetType().IsAssignableFrom(typeof(IEndpointTargetEnricher))).Select(e => (IEndpointTargetEnricher)e);
 
         protected ITelemetryLogger Telemetry { get; }
-        protected ILogger<Endpoint> Log { get; }
+        protected ILogger<Endpoint<TOptions>> Log { get; }
+
+        protected TOptions Options { get; private set; }
 
         public abstract int Count { get; }
 
-        public virtual void Configure(IEndpointOptions options)
+        public virtual void Configure(TOptions options)
         {
             Log.LogDebug("Endpoint::Configure");
-            _InnerOptions = options;
-            EndpointEnrichers.ConfigureEnrichers(_InnerOptions.EndpointEnrichers);
+            Options = options;
+            EndpointEnrichers.ConfigureEnrichers(Options.EndpointEnrichers);
         }
 
         //public abstract void Filter(IEnumerable<WorkItemData> workItems);
