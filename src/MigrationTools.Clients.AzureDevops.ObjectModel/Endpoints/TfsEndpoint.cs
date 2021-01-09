@@ -53,8 +53,6 @@ namespace MigrationTools.Endpoints
 
         public override int Count => 0;
 
-        public TfsLanguageMapOptions LanguageMaps => Options.LanguageMaps;
-
         public GenericTfsEndpoint(EndpointEnricherContainer endpointEnrichers, ITelemetryLogger telemetry, ILogger<GenericTfsEndpoint<TTfsOptions>> logger)
             : base(endpointEnrichers, telemetry, logger)
         {

@@ -7,7 +7,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MigrationTools._EngineV1.Configuration;
-using MigrationTools.Helpers;
 using MigrationTools.Host.CommandLine;
 
 namespace MigrationTools.Host
@@ -15,6 +14,7 @@ namespace MigrationTools.Host
     public class InitHostedService : IHostedService
     {
         private readonly IEngineConfigurationBuilder _configurationBuilder;
+        private readonly ISettingsWriter _settingWriter;
         private readonly InitOptions _initOptions;
         private readonly ILogger _logger;
         private readonly ITelemetryLogger _telemetryLogger;
@@ -23,12 +23,14 @@ namespace MigrationTools.Host
 
         public InitHostedService(
             IEngineConfigurationBuilder configurationBuilder,
+            ISettingsWriter settingsWriter,
             IOptions<InitOptions> initOptions,
             ILogger<InitHostedService> logger,
             ITelemetryLogger telemetryLogger,
             IHostApplicationLifetime appLifetime)
         {
             _configurationBuilder = configurationBuilder;
+            _settingWriter = settingsWriter;
             _initOptions = initOptions.Value;
             _logger = logger;
             _telemetryLogger = telemetryLogger;
@@ -81,12 +83,8 @@ namespace MigrationTools.Host
                                     config = _configurationBuilder.BuildDefault();
                                     break;
                             }
-
-                            string json = NewtonsoftHelpers.SerializeObject(config);
-                            StreamWriter sw = new StreamWriter(configFile);
-                            sw.WriteLine(json);
-                            sw.Close();
-                            _logger.LogInformation("New configuration.json file has been created");
+                            _settingWriter.WriteSettings(config, configFile);
+                            _logger.LogInformation($"New {configFile} file has been created");
                         }
                         _exitCode = 0;
                     }

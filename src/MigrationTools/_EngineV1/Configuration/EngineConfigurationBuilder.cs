@@ -12,10 +12,11 @@ using MigrationTools.Helpers;
 using MigrationTools.Options;
 using MigrationTools.Processors;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace MigrationTools._EngineV1.Configuration
 {
-    public class EngineConfigurationBuilder : IEngineConfigurationBuilder
+    public class EngineConfigurationBuilder : IEngineConfigurationBuilder, IEngineConfigurationReader, ISettingsWriter
     {
         private readonly ILogger<EngineConfigurationBuilder> _logger;
 
@@ -26,7 +27,7 @@ namespace MigrationTools._EngineV1.Configuration
 
         public EngineConfiguration BuildFromFile(string configFile = "configuration.json")
         {
-            EngineConfiguration ec = null;
+            EngineConfiguration ec;
             try
             {
                 string configurationjson = File.ReadAllText(configFile);
@@ -273,20 +274,19 @@ namespace MigrationTools._EngineV1.Configuration
             throw new NotImplementedException();
         }
 
-        //private T GetSpecificType<T>(string typeName)
-        //    where T : IEndpointOptions
-        //{
-        //    AppDomain.CurrentDomain.Load("MigrationTools");
-        //    AppDomain.CurrentDomain.Load("MigrationTools.Clients.AzureDevops.ObjectModel");
-        //    AppDomain.CurrentDomain.Load("MigrationTools.Clients.FileSystem");
-        //    Type type = AppDomain.CurrentDomain.GetAssemblies()
-        //       .Where(a => a.FullName.StartsWith("MigrationTools"))
-        //       .SelectMany(a => a.GetTypes())
-        //       .Where(t => typeof(IEndpointOptions).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract && t.Name == typeName).SingleOrDefault();
-        //    var option = (T)Activator.CreateInstance(type);
-        //    option.SetDefaults();
-        //    return option;
-        //}
+        private object GetSpecificType(string typeName)
+        {
+            AppDomain.CurrentDomain.Load("MigrationTools");
+            AppDomain.CurrentDomain.Load("MigrationTools.Clients.AzureDevops.ObjectModel");
+            AppDomain.CurrentDomain.Load("MigrationTools.Clients.FileSystem");
+            Type type = AppDomain.CurrentDomain.GetAssemblies()
+               .Where(a => a.FullName.StartsWith("MigrationTools"))
+               .SelectMany(a => a.GetTypes())
+               .Where(t => !t.IsInterface && !t.IsAbstract && t.Name == typeName).SingleOrDefault();
+            var option = Activator.CreateInstance(type);
+            type.GetMethod("SetDefaults", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(option, null);
+            return option;
+        }
 
         private List<TInterfaceToFind> GetAllTypes<TInterfaceToFind>() where TInterfaceToFind : IOptions
         {
@@ -305,6 +305,31 @@ namespace MigrationTools._EngineV1.Configuration
                 output.Add(option);
             }
             return output;
+        }
+
+        public void WriteSettings(EngineConfiguration engineConfiguration, string settingsFileName)
+        {
+            string json = NewtonsoftHelpers.SerializeObject(engineConfiguration);
+            var engine = JObject.Parse(json);
+
+            var endpoints = new JArray();
+            var source = GetSpecificType("TfsEndpointOptions") as EndpointOptions;
+            source.Name = "Source";
+            var sourceobj = (JObject)JToken.FromObject(source);
+            endpoints.Add(sourceobj);
+            var target = GetSpecificType("TfsEndpointOptions") as EndpointOptions;
+            target.Name = "Target";
+            var targetobj = (JObject)JToken.FromObject(target);
+            endpoints.Add(targetobj);
+
+            var endpoint = new JObject();
+            endpoint.Add("TfsEndpoints", endpoints);
+            engine.Add("Endpoints", endpoint);
+            //engine.Endpoints.TfsEndpoints = endpoints;
+            json = engine.ToString();
+            //json = NewtonsoftHelpers.SerializeObject(engine);
+
+            File.WriteAllText(settingsFileName, json);
         }
     }
 }

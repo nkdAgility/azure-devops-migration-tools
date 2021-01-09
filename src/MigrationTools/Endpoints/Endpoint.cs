@@ -26,7 +26,7 @@ namespace MigrationTools.Endpoints
         protected ITelemetryLogger Telemetry { get; }
         protected ILogger<Endpoint<TOptions>> Log { get; }
 
-        protected TOptions Options { get; private set; }
+        public TOptions Options { get; private set; }
 
         public abstract int Count { get; }
 

@@ -35,11 +35,8 @@ namespace MigrationTools.Configuration.Tests
         public void EngineConfigurationBuilderDeseraliseFromJsonTest()
         {
             HelperCreateDefaultConfigFile();
-            EngineConfiguration ec;
-            StreamReader sr = new StreamReader("configuration.json");
-            string configurationjson = sr.ReadToEnd();
-            sr.Close();
-            ec = NewtonsoftHelpers.DeserializeObject<EngineConfiguration>(configurationjson);
+            var ecb = CreateEngine();
+            EngineConfiguration ec = ecb.BuildFromFile("configuration.json");
             Assert.AreEqual(10, ec.FieldMaps.Count);
             Assert.AreEqual(12, ec.Processors.Count);
         }
@@ -60,10 +57,8 @@ namespace MigrationTools.Configuration.Tests
         private void HelperCreateDefaultConfigFile()
         {
             var ecb = CreateEngine();
-            string json = NewtonsoftHelpers.SerializeObject(ecb.BuildDefault());
-            StreamWriter sw = new StreamWriter("configuration.json");
-            sw.WriteLine(json);
-            sw.Close();
+            var config = ecb.BuildDefault();
+            ecb.WriteSettings(config, "configuration.json");
         }
     }
 }
