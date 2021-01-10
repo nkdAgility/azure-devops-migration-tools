@@ -4,8 +4,8 @@ namespace MigrationTools.DataContracts
 {
     public abstract class RestApiDefinition
     {
-        public string Name { get; set; }
-        public string Id { get; set; }
+        public virtual string Name { get; set; }
+        public virtual string Id { get; set; }
 
         /// <summary>
         /// reset values that cannot be set on new objects
