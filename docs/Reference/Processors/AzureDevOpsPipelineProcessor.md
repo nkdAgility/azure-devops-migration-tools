@@ -15,6 +15,7 @@ Azure DevOps Processor that migrates Taskgroups, Build- and Release Pipelines.
 | MigrateReleasePipelines | Boolean | Migrate Release Pipelines | true |
 | MigrateTaskGroups | Boolean | Migrate Task Groups | true |
 | MigrateVariableGroups | Boolean | Migrate Valiable Groups | true |
+| MigrateServiceConnections | Boolean | Migrate Service Connections | true |
 | BuildPipelines | List | List of Build Pipelines to process. If this is `null` then all Build Pipelines will be processed. **Not implemented yet** | missng XML code comments |
 | ReleasePipelines | List | List of Release Pipelines to process. If this is `null` then all Release Pipelines will be processed. **Not implemented yet** | missng XML code comments |
 | ProcessorEnrichers | List | List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors. | missng XML code comments |
@@ -33,6 +34,7 @@ Azure DevOps Processor that migrates Taskgroups, Build- and Release Pipelines.
   "MigrateReleasePipelines": true,
   "MigrateTaskGroups": true,
   "MigrateVariableGroups": true,
+  "MigrateServiceConnections": true,
   "BuildPipelines": null,
   "ReleasePipelines": null,
   "ProcessorEnrichers": null,
@@ -41,7 +43,7 @@ Azure DevOps Processor that migrates Taskgroups, Build- and Release Pipelines.
     "Organisation": "https://dev.azure.com/nkdagility-preview/",
     "Project": "sourceProject",
     "AuthenticationMode": "AccessToken",
-    "AccessToken": "qosss7crwz3vie4fupzpaafjndoy6g6ulgkzhoxtmjgicv2lqjyq",
+    "AccessToken": "iksmyfwmracmyqb22p2rlytagg6mpzxu7ntowjvpihvk4fwcjzcq",
     "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
     "EndpointEnrichers": null
   },
@@ -50,7 +52,7 @@ Azure DevOps Processor that migrates Taskgroups, Build- and Release Pipelines.
     "Organisation": "https://dev.azure.com/nkdagility-preview/",
     "Project": "targetProject",
     "AuthenticationMode": "AccessToken",
-    "AccessToken": "qosss7crwz3vie4fupzpaafjndoy6g6ulgkzhoxtmjgicv2lqjyq",
+    "AccessToken": "iksmyfwmracmyqb22p2rlytagg6mpzxu7ntowjvpihvk4fwcjzcq",
     "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
     "EndpointEnrichers": null
   }

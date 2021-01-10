@@ -70,8 +70,13 @@ namespace MigrationTools.Processors
         private void MigratePipelines()
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
+            IEnumerable<Mapping> serviceConnectionMappings = null;
             IEnumerable<Mapping> taskGroupMappings = null;
             IEnumerable<Mapping> variableGroupMappings = null;
+            if (_Options.MigrateServiceConnections)
+            {
+                serviceConnectionMappings = CreateServiceConnections();
+            }
             if (_Options.MigrateTaskGroups)
             {
                 taskGroupMappings = CreateTaskGroupDefinitions();
@@ -91,6 +96,21 @@ namespace MigrationTools.Processors
             }
             stopwatch.Stop();
             Log.LogDebug("DONE in {Elapsed} ", stopwatch.Elapsed.ToString("c"));
+        }
+
+        /// <summary>
+        /// Create a new instance of HttpClient including Heades
+        /// </summary>
+        /// <param name="accessToken"></param>
+        /// <returns>HttpClient</returns>
+        private HttpClient GetHttpClient(string accessToken)
+        {
+            HttpClient client = new HttpClient();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes(string.Format("{0}:{1}", "", accessToken))));
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            client.DefaultRequestHeaders.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
+
+            return client;
         }
 
         /// <summary>
@@ -166,21 +186,6 @@ namespace MigrationTools.Processors
         }
 
         /// <summary>
-        /// Create a new instance of HttpClient including Heades
-        /// </summary>
-        /// <param name="accessToken"></param>
-        /// <returns>HttpClient</returns>
-        private HttpClient GetHttpClient(string accessToken)
-        {
-            HttpClient client = new HttpClient();
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes(string.Format("{0}:{1}", "", accessToken))));
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            client.DefaultRequestHeaders.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
-
-            return client;
-        }
-
-        /// <summary>
         /// Generic Method to get API Definitions (Taskgroups, Variablegroups, Build- or Release Pipelines)
         /// </summary>
         /// <typeparam name="DefinitionType">Type of Definition. Can be: Taskgroup, Build- or Release Pipeline</typeparam>
@@ -224,6 +229,103 @@ namespace MigrationTools.Processors
                 }
             }
             return initialDefinitions;
+        }
+
+        /// <summary>
+        /// Map the taskgroups that are already migrated
+        /// </summary>
+        /// <typeparam name="DefintionType"></typeparam>
+        /// <param name="sourceDefinitions"></param>
+        /// <param name="targetDefinitions"></param>
+        /// <param name="newMappings"></param>
+        /// <returns>Mapping list</returns>
+        private IEnumerable<Mapping> AddAllreadySyncedMappings<DefintionType>(IEnumerable<DefintionType> sourceDefinitions, IEnumerable<DefintionType> targetDefinitions, IEnumerable<Mapping> newMappings) where DefintionType : RestApiDefinition, new()
+        {
+            // This is not safe, because the target project can have a taskgroup with the same name but with different content
+            // To make this save we must add a local storage option for the mappings (sid, tid)
+            var allMappings = newMappings.ToList();
+            var allreadyMigratedDefintions = targetDefinitions.Where(t => newMappings.Any(m => m.TId == t.Id) == false).ToList();
+            foreach (var item in allreadyMigratedDefintions)
+            {
+                var source = sourceDefinitions.FirstOrDefault(d => d.Name == item.Name);
+                if (source == null)
+                {
+                    Log.LogInformation($"The {typeof(DefintionType).Name} {item.Name}({item.Id}) doesn't exsist in the source collection.");
+                }
+                else
+                {
+                    allMappings.Add(new()
+                    {
+                        SId = source.Id,
+                        TId = item.Id,
+                        Name = item.Name
+                    });
+                }
+            }
+            return allMappings;
+        }
+
+        /// <summary>
+        /// Filter existing Definitions
+        /// </summary>
+        /// <typeparam name="DefinitionType"></typeparam>
+        /// <param name="sourceDefinitions"></param>
+        /// <param name="targetDefinitions"></param>
+        /// <returns>List of filtered Definitions</returns>
+        private IEnumerable<DefinitionType> filteredDefinitions<DefinitionType>(IEnumerable<DefinitionType> sourceDefinitions, IEnumerable<DefinitionType> targetDefinitions) where DefinitionType : RestApiDefinition, new()
+        {
+            var objectsToMigrate = sourceDefinitions.Where(s => !targetDefinitions.Any(t => t.Name == s.Name));
+            Log.LogInformation($"{objectsToMigrate.Count()} of {sourceDefinitions.Count()} source {typeof(DefinitionType).Name}(s) are going to be migrated..");
+
+            return objectsToMigrate;
+        }
+
+        /// <summary>
+        /// Make HTTP Request to create a Definition
+        /// </summary>
+        /// <typeparam name="DefinitionType"></typeparam>
+        /// <param name="definitionsToBeMigrated"></param>
+        /// <returns>List of Mappings</returns>
+        private IEnumerable<Mapping> CreateApiDefinitions<DefinitionType>(IEnumerable<DefinitionType> definitionsToBeMigrated) where DefinitionType : RestApiDefinition, new()
+        {
+            List<DefinitionType> migratedDefinitions = new List<DefinitionType>();
+            var apiPathAttribute = typeof(DefinitionType).GetCustomAttributes(typeof(ApiPathAttribute), false).OfType<ApiPathAttribute>().FirstOrDefault();
+            var apiNameAttribute = typeof(DefinitionType).GetCustomAttributes(typeof(ApiNameAttribute), false).OfType<ApiNameAttribute>().FirstOrDefault();
+            if (apiPathAttribute == null)
+            {
+                throw new ArgumentNullException($"On the class defintion of '{typeof(DefinitionType).Name}' is the attribute 'ApiName' misssing. Please add the 'ApiName' Attribute to your class");
+            }
+
+            string baseUrl = getModUrl(Target.Organisation, Target.Project, apiPathAttribute, apiNameAttribute) + "?api-version=5.1-preview";
+
+            foreach (RestApiDefinition definitionToBeMigrated in definitionsToBeMigrated)
+            {
+                var client = GetHttpClient(Target.AccessToken);
+                var sourceId = definitionToBeMigrated.Id;
+                definitionToBeMigrated.ResetObject();
+                string body = JsonConvert.SerializeObject(definitionToBeMigrated);
+
+                var content = new StringContent(body, Encoding.UTF8, "application/json");
+                var result = client.PostAsync(baseUrl, content).GetAwaiter().GetResult();
+
+                if (result.StatusCode != HttpStatusCode.OK)
+                {
+                    Log.LogError($"Error migrating {apiNameAttribute.Name} {definitionToBeMigrated.Name}. Please migrate it manually.");
+                    continue;
+                }
+                else
+                {
+                    var targetObject = JsonConvert.DeserializeObject<DefinitionType>(result.Content.ReadAsStringAsync().GetAwaiter().GetResult());
+                    migratedDefinitions.Add(targetObject);
+                    yield return new Mapping()
+                    {
+                        Name = definitionToBeMigrated.Name,
+                        SId = sourceId,
+                        TId = targetObject.Id
+                    };
+                }
+            }
+            Log.LogInformation($"{migratedDefinitions.Count()} of {definitionsToBeMigrated.Count()} {typeof(DefinitionType).Name}(s) got migrated..");
         }
 
         private IEnumerable<Mapping> CreateBuildPipelines(IEnumerable<Mapping> TaskGroupMapping = null, IEnumerable<Mapping> VariableGroupMapping = null)
@@ -378,6 +480,17 @@ namespace MigrationTools.Processors
             return mappings;
         }
 
+        private IEnumerable<Mapping> CreateServiceConnections()
+        {
+            Log.LogInformation($"Processing Service Connections..");
+
+            var sourceDefinitions = GetApiDefinitions<ServiceConnection>(Source.Organisation, Source.Project, Source.AccessToken);
+            var targetDefinitions = GetApiDefinitions<ServiceConnection>(Target.Organisation, Target.Project, Target.AccessToken);
+            var mappings = CreateApiDefinitions(filteredDefinitions(sourceDefinitions, targetDefinitions)).ToList();
+            mappings = AddAllreadySyncedMappings(sourceDefinitions, targetDefinitions, mappings).ToList();
+            return mappings;
+        }
+
         private IEnumerable<Mapping> CreateTaskGroupDefinitions()
         {
             Log.LogInformation($"Processing Taskgroups..");
@@ -398,100 +511,6 @@ namespace MigrationTools.Processors
             var mappings = CreateApiDefinitions(filteredDefinitions(sourceDefinitions, targetDefinitions)).ToList();
             mappings = AddAllreadySyncedMappings(sourceDefinitions, targetDefinitions, mappings).ToList();
             return mappings;
-        }
-
-        /// <summary>
-        /// Map the taskgroups that are already migrated
-        /// </summary>
-        /// <typeparam name="DefintionType"></typeparam>
-        /// <param name="sourceDefinitions"></param>
-        /// <param name="targetDefinitions"></param>
-        /// <param name="newMappings"></param>
-        /// <returns>Mapping list</returns>
-        private IEnumerable<Mapping> AddAllreadySyncedMappings<DefintionType>(IEnumerable<DefintionType> sourceDefinitions, IEnumerable<DefintionType> targetDefinitions, IEnumerable<Mapping> newMappings) where DefintionType : RestApiDefinition, new()
-        {
-            // This is not safe, because the target project can have a taskgroup with the same name but with different content
-            // To make this save we must add a local storage option for the mappings (sid, tid)
-            var allMappings = newMappings.ToList();
-            var allreadyMigratedDefintions = targetDefinitions.Where(t => newMappings.Any(m => m.TId == t.Id) == false).ToList();
-            foreach (var item in allreadyMigratedDefintions)
-            {
-                var source = sourceDefinitions.FirstOrDefault(d => d.Name == item.Name);
-                if (source == null)
-                {
-                    Log.LogInformation($"The {typeof(DefintionType).Name} {item.Name}({item.Id}) doesn't exsist in the source collection.");
-                }
-                else
-                {
-                    allMappings.Add(new()
-                    {
-                        SId = source.Id,
-                        TId = item.Id,
-                        Name = item.Name
-                    });
-                }
-            }
-            return allMappings;
-        }
-
-        /// <summary>
-        /// Filter existing Definitions
-        /// </summary>
-        /// <typeparam name="DefinitionType"></typeparam>
-        /// <param name="sourceDefinitions"></param>
-        /// <param name="targetDefinitions"></param>
-        /// <returns>List of filtered Definitions</returns>
-        private IEnumerable<DefinitionType> filteredDefinitions<DefinitionType>(IEnumerable<DefinitionType> sourceDefinitions, IEnumerable<DefinitionType> targetDefinitions) where DefinitionType : RestApiDefinition, new()
-        {
-            var objectsToMigrate = sourceDefinitions.Where(s => !targetDefinitions.Any(t => t.Name == s.Name));
-            Log.LogInformation($"From {sourceDefinitions.Count()} source {typeof(DefinitionType).Name}(s) {objectsToMigrate.Count()} {typeof(DefinitionType).Name}(s) are going to be migrated..");
-
-            return objectsToMigrate;
-        }
-
-        /// <summary>
-        /// Make HTTP Request to create a Definition
-        /// </summary>
-        /// <typeparam name="DefinitionType"></typeparam>
-        /// <param name="definitionsToBeMigrated"></param>
-        /// <returns>List of Mappings</returns>
-        private IEnumerable<Mapping> CreateApiDefinitions<DefinitionType>(IEnumerable<DefinitionType> definitionsToBeMigrated) where DefinitionType : RestApiDefinition, new()
-        {
-            var apiPathAttribute = typeof(DefinitionType).GetCustomAttributes(typeof(ApiPathAttribute), false).OfType<ApiPathAttribute>().FirstOrDefault();
-            var apiNameAttribute = typeof(DefinitionType).GetCustomAttributes(typeof(ApiNameAttribute), false).OfType<ApiNameAttribute>().FirstOrDefault();
-            if (apiPathAttribute == null)
-            {
-                throw new ArgumentNullException($"On the class defintion of '{typeof(DefinitionType).Name}' is the attribute 'ApiName' misssing. Please add the 'ApiName' Attribute to your class");
-            }
-
-            string baseUrl = getModUrl(Target.Organisation, Target.Project, apiPathAttribute, apiNameAttribute) + "?api-version=5.1-preview";
-
-            foreach (RestApiDefinition definitionToBeMigrated in definitionsToBeMigrated)
-            {
-                var client = GetHttpClient(Target.AccessToken);
-                var sourceId = definitionToBeMigrated.Id;
-                definitionToBeMigrated.ResetObject();
-                string body = JsonConvert.SerializeObject(definitionToBeMigrated);
-
-                var content = new StringContent(body, Encoding.UTF8, "application/json");
-                var result = client.PostAsync(baseUrl, content).GetAwaiter().GetResult();
-
-                if (result.StatusCode != HttpStatusCode.OK)
-                {
-                    Log.LogError($"Error migrating {apiNameAttribute.Name} {definitionToBeMigrated.Name}. Please migrate it manually.");
-                    continue;
-                }
-                else
-                {
-                    var targetObject = JsonConvert.DeserializeObject<DefinitionType>(result.Content.ReadAsStringAsync().GetAwaiter().GetResult());
-                    yield return new Mapping()
-                    {
-                        Name = definitionToBeMigrated.Name,
-                        SId = sourceId,
-                        TId = targetObject.Id
-                    };
-                }
-            }
         }
     }
 }

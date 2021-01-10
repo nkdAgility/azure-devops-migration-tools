@@ -5,6 +5,7 @@
   "MigrateReleasePipelines": true,
   "MigrateTaskGroups": true,
   "MigrateVariableGroups": true,
+  "MigrateServiceConnections": true,
   "BuildPipelines": null,
   "ReleasePipelines": null,
   "ProcessorEnrichers": null,
