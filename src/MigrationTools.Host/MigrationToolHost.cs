@@ -108,7 +108,11 @@ namespace MigrationTools.Host
                  services.AddTransient<IStartupService, StartupService>();
                  if (initOptions is not null)
                  {
-                     services.Configure<InitOptions>((opts) => opts = initOptions);
+                     services.Configure<InitOptions>((opts) =>
+                     {
+                         opts.ConfigFile = initOptions.ConfigFile;
+                         opts.Options = initOptions.Options;
+                     });
                      services.AddHostedService<InitHostedService>();
                  }
                  if (executeOptions is not null)

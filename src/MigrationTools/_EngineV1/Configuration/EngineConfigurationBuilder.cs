@@ -262,9 +262,9 @@ namespace MigrationTools._EngineV1.Configuration
                     ReplayRevisions = true,
                     WorkItemCreateRetryLimit = 5,
                     ProcessorEnrichers = GetAllTypes<IProcessorEnricherOptions>(),
-                    Source = GetSpecioficType<IEndpointOptions>("InMemoryWorkItemEndpointOptions"),
-                    Target = GetSpecioficType<IEndpointOptions>("InMemoryWorkItemEndpointOptions")
-                }); ; ;
+                    Source = GetSpecioficType<IEndpointOptions>("TfsEndpointOptions"),
+                    Target = GetSpecioficType<IEndpointOptions>("TfsEndpointOptions")
+                });
             return ec;
         }
 
