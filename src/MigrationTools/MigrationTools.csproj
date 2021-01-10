@@ -16,6 +16,7 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
     <PackageReference Include="Microsoft.IdentityModel.Clients.ActiveDirectory" Version="5.2.8" />
     <PackageReference Include="Microsoft.VisualStudio.Services.Client" Version="16.153.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Services.ServiceEndpoints.WebApi" Version="16.153.0" />
     <PackageReference Include="Serilog" Version="2.10.0" />
     <PackageReference Include="System.Security.Principal.Windows" Version="5.0.0" />
   </ItemGroup>
