@@ -27,8 +27,11 @@ namespace MigrationTools.Endpoints
             Organisation = "https://dev.azure.com/nkdagility-preview/";
             Project = "NeedToSetThis";
             ReflectedWorkItemIdField = "Custom.ReflectedWorkItemId";
-            LanguageMaps = new TfsLanguageMapOptions();
-            LanguageMaps.SetDefaults();
+            LanguageMaps = new TfsLanguageMapOptions()
+            {
+                AreaPath = "Area",
+                IterationPath = "Iteration"
+            };
         }
     }
 }
