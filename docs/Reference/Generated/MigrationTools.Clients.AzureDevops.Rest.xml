@@ -94,7 +94,7 @@
         </member>
         <member name="P:MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions.MigrateServiceConnections">
             <summary>
-            Migrate Service Connections
+            Migrate Service Connections **secrets need to be entered manually**
             </summary>
             <default>true</default>
         </member>

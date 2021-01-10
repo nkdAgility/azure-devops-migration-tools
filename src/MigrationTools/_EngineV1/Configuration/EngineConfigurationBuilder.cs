@@ -277,22 +277,22 @@ namespace MigrationTools._EngineV1.Configuration
         private object GetSpecificType(string typeName)
         {
             AppDomain.CurrentDomain.Load("MigrationTools");
-            AppDomain.CurrentDomain.Load("MigrationTools.Clients.AzureDevops.ObjectModel");
-            AppDomain.CurrentDomain.Load("MigrationTools.Clients.FileSystem");
+            AppDomain.CurrentDomain.Load("MigrationTools.Clients.InMemory");
+            //AppDomain.CurrentDomain.Load("MigrationTools.Clients.FileSystem");
             Type type = AppDomain.CurrentDomain.GetAssemblies()
                .Where(a => a.FullName.StartsWith("MigrationTools"))
                .SelectMany(a => a.GetTypes())
                .Where(t => !t.IsInterface && !t.IsAbstract && t.Name == typeName).SingleOrDefault();
             var option = Activator.CreateInstance(type);
-            type.GetMethod("SetDefaults", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(option, null);
+            //type.GetMethod("SetDefaults", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(option, null);
             return option;
         }
 
         private List<TInterfaceToFind> GetAllTypes<TInterfaceToFind>() where TInterfaceToFind : IOptions
         {
             AppDomain.CurrentDomain.Load("MigrationTools");
-            AppDomain.CurrentDomain.Load("MigrationTools.Clients.AzureDevops.ObjectModel");
-            AppDomain.CurrentDomain.Load("MigrationTools.Clients.FileSystem");
+            AppDomain.CurrentDomain.Load("MigrationTools.Clients.InMemory");
+            //AppDomain.CurrentDomain.Load("MigrationTools.Clients.FileSystem");
             List<Type> types = AppDomain.CurrentDomain.GetAssemblies()
               .Where(a => a.FullName.StartsWith("MigrationTools"))
               .SelectMany(a => a.GetTypes())
@@ -313,17 +313,17 @@ namespace MigrationTools._EngineV1.Configuration
             var engine = JObject.Parse(json);
 
             var endpoints = new JArray();
-            var source = GetSpecificType("TfsEndpointOptions") as EndpointOptions;
+            var source = GetSpecificType("InMemoryWorkItemEndpointOptions") as EndpointOptions;
             source.Name = "Source";
             var sourceobj = (JObject)JToken.FromObject(source);
             endpoints.Add(sourceobj);
-            var target = GetSpecificType("TfsEndpointOptions") as EndpointOptions;
+            var target = GetSpecificType("InMemoryWorkItemEndpointOptions") as EndpointOptions;
             target.Name = "Target";
             var targetobj = (JObject)JToken.FromObject(target);
             endpoints.Add(targetobj);
 
             var endpoint = new JObject();
-            endpoint.Add("TfsEndpoints", endpoints);
+            endpoint.Add("InMemoryWorkItemEndpoints", endpoints);
             engine.Add("Endpoints", endpoint);
             //engine.Endpoints.TfsEndpoints = endpoints;
             json = engine.ToString();
