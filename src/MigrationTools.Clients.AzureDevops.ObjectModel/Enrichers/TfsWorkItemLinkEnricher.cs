@@ -150,7 +150,25 @@ namespace MigrationTools.Enrichers
                 target.ToWorkItem().Links.Add(el);
                 if (_save)
                 {
-                    target.SaveToAzureDevOps();
+                    try
+                    {
+                        target.SaveToAzureDevOps();
+                    }
+                    catch (Exception ex)
+                    {
+                        // Ignore this link because the TFS server didn't recognize its type (There's no point in crashing the rest of the migration due to a link)
+                        if(ex.Message.Contains("Unrecognized Resource link"))
+                        {
+                            Log.LogError(ex, "[{ExceptionType}] Failed to save link {SourceLinkType} on {TargetId}", ex.GetType().Name, sourceLink.GetType().Name, target.Id);
+                            // Remove the link from the target so it doesn't cause problems downstream
+                            target.ToWorkItem().Links.Remove(el);
+                        }
+                        else
+                        {
+                            //pass along the exception since we don't know what went wrong
+                            throw;
+                        }
+                    }
                 }
             }
             else
