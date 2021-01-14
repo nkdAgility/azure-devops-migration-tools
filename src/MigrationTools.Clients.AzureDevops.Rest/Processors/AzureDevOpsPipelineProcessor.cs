@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MigrationTools.DataContracts;
 using MigrationTools.DataContracts.Pipelines;
@@ -37,7 +38,7 @@ namespace MigrationTools.Processors
             Log.LogInformation("Processor::InternalExecute::Start");
             EnsureConfigured();
             ProcessorEnrichers.ProcessorExecutionBegin(this);
-            MigratePipelines();
+            MigratePipelinesAsync().GetAwaiter().GetResult();
             ProcessorEnrichers.ProcessorExecutionEnd(this);
             Log.LogInformation("Processor::InternalExecute::End");
         }
@@ -60,9 +61,9 @@ namespace MigrationTools.Processors
         }
 
         /// <summary>
-        /// Executes Method for migrating Taskgroups, Variablegroups or Pipelines, depinding on whhat is set in the config.
+        /// Executes Method for migrating Taskgroups, Variablegroups or Pipelines, depinding on what is set in the config.
         /// </summary>
-        private void MigratePipelines()
+        private async System.Threading.Tasks.Task MigratePipelinesAsync()
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
             IEnumerable<Mapping> serviceConnectionMappings = null;
@@ -70,24 +71,24 @@ namespace MigrationTools.Processors
             IEnumerable<Mapping> variableGroupMappings = null;
             if (_Options.MigrateServiceConnections)
             {
-                serviceConnectionMappings = CreateServiceConnections();
+                serviceConnectionMappings = await CreateServiceConnectionsAsync();
             }
             if (_Options.MigrateTaskGroups)
             {
-                taskGroupMappings = CreateTaskGroupDefinitions();
+                taskGroupMappings = await CreateTaskGroupDefinitionsAsync();
             }
             if (_Options.MigrateVariableGroups)
             {
-                variableGroupMappings = CreateVariableGroupDefinitions();
+                variableGroupMappings = await CreateVariableGroupDefinitionsAsync();
             }
             if (_Options.MigrateBuildPipelines)
             {
-                CreateBuildPipelines(taskGroupMappings, variableGroupMappings);
+                await CreateBuildPipelinesAsync(taskGroupMappings, variableGroupMappings);
             }
 
             if (_Options.MigrateReleasePipelines)
             {
-                CreateReleasePipelines(taskGroupMappings, variableGroupMappings);
+                await CreateReleasePipelinesAsync(taskGroupMappings, variableGroupMappings);
             }
             stopwatch.Stop();
             Log.LogDebug("DONE in {Elapsed} ", stopwatch.Elapsed.ToString("c"));
@@ -145,12 +146,12 @@ namespace MigrationTools.Processors
             return objectsToMigrate;
         }
 
-        private IEnumerable<Mapping> CreateBuildPipelines(IEnumerable<Mapping> TaskGroupMapping = null, IEnumerable<Mapping> VariableGroupMapping = null)
+        private async Task<IEnumerable<Mapping>> CreateBuildPipelinesAsync(IEnumerable<Mapping> TaskGroupMapping = null, IEnumerable<Mapping> VariableGroupMapping = null)
         {
             Log.LogInformation("Processing Build Pipelines..");
 
-            var sourceDefinitions = Source.GetApiDefinitions<BuildDefinition>();
-            var targetDefinitions = Target.GetApiDefinitions<BuildDefinition>();
+            var sourceDefinitions = await Source.GetApiDefinitionsAsync<BuildDefinition>();
+            var targetDefinitions = await Target.GetApiDefinitionsAsync<BuildDefinition>();
             var definitionsToBeMigrated = filteredDefinitions(sourceDefinitions, targetDefinitions);
 
             definitionsToBeMigrated = FilterAwayIfAnyMapsAreMissing(definitionsToBeMigrated, TaskGroupMapping, VariableGroupMapping);
@@ -203,16 +204,16 @@ namespace MigrationTools.Processors
                 }
 
             }
-            var mappings = Target.CreateApiDefinitions<BuildDefinition>(definitionsToBeMigrated.ToList());
+            var mappings = await Target.CreateApiDefinitionsAsync<BuildDefinition>(definitionsToBeMigrated.ToList());
             mappings.AddRange(FindExistingMappings(sourceDefinitions, targetDefinitions, mappings));
             return mappings;
         }
 
-        private IEnumerable<Mapping> CreatePoolMappings<DefinitionType>()
+        private async Task<IEnumerable<Mapping>> CreatePoolMappingsAsync<DefinitionType>()
             where DefinitionType : RestApiDefinition, new()
         {
-            var sourcePools = Source.GetApiDefinitions<DefinitionType>();
-            var targetPools = Target.GetApiDefinitions<DefinitionType>();
+            var sourcePools = await Source.GetApiDefinitionsAsync<DefinitionType>();
+            var targetPools = await Target.GetApiDefinitionsAsync<DefinitionType>();
             var mappings = new List<Mapping>();
             foreach (var sourcePool in sourcePools)
             {
@@ -243,15 +244,15 @@ namespace MigrationTools.Processors
             }
         }
 
-        private IEnumerable<Mapping> CreateReleasePipelines(IEnumerable<Mapping> TaskGroupMapping = null, IEnumerable<Mapping> VariableGroupMapping = null)
+        private async Task<IEnumerable<Mapping>> CreateReleasePipelinesAsync(IEnumerable<Mapping> TaskGroupMapping = null, IEnumerable<Mapping> VariableGroupMapping = null)
         {
             Log.LogInformation($"Processing Release Pipelines..");
 
-            var sourceDefinitions = Source.GetApiDefinitions<ReleaseDefinition>();
-            var targetDefinitions = Target.GetApiDefinitions<ReleaseDefinition>();
+            var sourceDefinitions = await Source.GetApiDefinitionsAsync<ReleaseDefinition>();
+            var targetDefinitions = await Target.GetApiDefinitionsAsync<ReleaseDefinition>();
 
-            var agentPoolMappings = CreatePoolMappings<TaskAgentPool>();
-            var deploymentGroupMappings = CreatePoolMappings<DeploymentGroup>();
+            var agentPoolMappings = await CreatePoolMappingsAsync<TaskAgentPool>();
+            var deploymentGroupMappings = await CreatePoolMappingsAsync<DeploymentGroup>();
 
             var definitionsToBeMigrated = filteredDefinitions(sourceDefinitions, targetDefinitions);
             if (_Options.ReleasePipelines is not null)
@@ -279,7 +280,7 @@ namespace MigrationTools.Processors
                 }
             }
 
-            var mappings = Target.CreateApiDefinitions<ReleaseDefinition>(definitionsToBeMigrated);
+            var mappings = await Target.CreateApiDefinitionsAsync<ReleaseDefinition>(definitionsToBeMigrated);
             mappings.AddRange(FindExistingMappings(sourceDefinitions, targetDefinitions, mappings));
             return mappings;
         }
@@ -380,34 +381,34 @@ namespace MigrationTools.Processors
             }
         }
 
-        private IEnumerable<Mapping> CreateServiceConnections()
+        private async Task<IEnumerable<Mapping>> CreateServiceConnectionsAsync()
         {
             Log.LogInformation($"Processing Service Connections..");
 
-            var sourceDefinitions = Source.GetApiDefinitions<ServiceConnection>();
-            var targetDefinitions = Target.GetApiDefinitions<ServiceConnection>();
-            var mappings = Target.CreateApiDefinitions(filteredDefinitions(sourceDefinitions, targetDefinitions));
+            var sourceDefinitions = await Source.GetApiDefinitionsAsync<ServiceConnection>();
+            var targetDefinitions = await Target.GetApiDefinitionsAsync<ServiceConnection>();
+            var mappings = await Target.CreateApiDefinitionsAsync(filteredDefinitions(sourceDefinitions, targetDefinitions));
             mappings.AddRange(FindExistingMappings(sourceDefinitions, targetDefinitions, mappings));
             return mappings;
         }
 
-        private IEnumerable<Mapping> CreateTaskGroupDefinitions()
+        private async Task<IEnumerable<Mapping>> CreateTaskGroupDefinitionsAsync()
         {
             Log.LogInformation($"Processing Taskgroups..");
 
-            var sourceDefinitions = Source.GetApiDefinitions<TaskGroup>();
-            var targetDefinitions = Target.GetApiDefinitions<TaskGroup>();
-            var mappings = Target.CreateApiDefinitions(filteredDefinitions(sourceDefinitions, targetDefinitions));
+            var sourceDefinitions = await Source.GetApiDefinitionsAsync<TaskGroup>();
+            var targetDefinitions = await Target.GetApiDefinitionsAsync<TaskGroup>();
+            var mappings = await Target.CreateApiDefinitionsAsync(filteredDefinitions(sourceDefinitions, targetDefinitions));
             mappings.AddRange(FindExistingMappings(sourceDefinitions, targetDefinitions, mappings));
             return mappings;
         }
 
-        private IEnumerable<Mapping> CreateVariableGroupDefinitions()
+        private async Task<IEnumerable<Mapping>> CreateVariableGroupDefinitionsAsync()
         {
             Log.LogInformation($"Processing Variablegroups..");
 
-            var sourceDefinitions = Source.GetApiDefinitions<VariableGroups>();
-            var targetDefinitions = Target.GetApiDefinitions<VariableGroups>();
+            var sourceDefinitions = await Source.GetApiDefinitionsAsync<VariableGroups>();
+            var targetDefinitions = await Target.GetApiDefinitionsAsync<VariableGroups>();
             var filteredDefinition = filteredDefinitions(sourceDefinitions, targetDefinitions);
             foreach (var variableGroup in filteredDefinition)
             {
@@ -422,7 +423,7 @@ namespace MigrationTools.Processors
                                                         }
                                 };
             }
-            var mappings = Target.CreateApiDefinitions(filteredDefinition);
+            var mappings = await Target.CreateApiDefinitionsAsync(filteredDefinition);
             mappings.AddRange(FindExistingMappings(sourceDefinitions, targetDefinitions, mappings));
             return mappings;
         }

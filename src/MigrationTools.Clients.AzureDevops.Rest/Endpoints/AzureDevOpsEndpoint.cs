@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MigrationTools.DataContracts;
 using MigrationTools.EndpointEnrichers;
@@ -112,18 +113,18 @@ namespace MigrationTools.Endpoints
         /// </summary>
         /// <typeparam name="DefinitionType">Type of Definition. Can be: Taskgroup, Build- or Release Pipeline</typeparam>
         /// <returns>List of API Definitions </returns>
-        public IEnumerable<DefinitionType> GetApiDefinitions<DefinitionType>()
+        public async Task<IEnumerable<DefinitionType>> GetApiDefinitionsAsync<DefinitionType>()
             where DefinitionType : RestApiDefinition, new()
         {
             var initialDefinitions = new List<DefinitionType>();
 
             HttpClient client = GetHttpClient<DefinitionType>();
             
-            var httpResponse = client.GetAsync("").Result;
+            var httpResponse = await client.GetAsync("");
 
             if (httpResponse != null)
             {
-                var definitions = httpResponse.Content.ReadAsAsync<RestResultDefinition<DefinitionType>>().Result;
+                var definitions = await httpResponse.Content.ReadAsAsync<RestResultDefinition<DefinitionType>>();
 
                 // Taskgroups only have a LIST option, so the following step is not needed
                 if (!typeof(DefinitionType).ToString().Contains("TaskGroup"))
@@ -131,8 +132,8 @@ namespace MigrationTools.Endpoints
                     foreach (RestApiDefinition definition in definitions.Value)
                     {
                         // Nessecary because getting all Pipelines doesn't include all of their properties
-                        var response = client.GetAsync(definition.Id).Result;
-                        var fullDefinition = response.Content.ReadAsAsync<DefinitionType>().Result;
+                        var response = await client.GetAsync(definition.Id);
+                        var fullDefinition = await response.Content.ReadAsAsync<DefinitionType>();
                         initialDefinitions.Add(fullDefinition);
                     }
                 }
@@ -150,7 +151,7 @@ namespace MigrationTools.Endpoints
         /// <typeparam name="DefinitionType"></typeparam>
         /// <param name="definitionsToBeMigrated"></param>
         /// <returns>List of Mappings</returns>
-        public List<Mapping> CreateApiDefinitions<DefinitionType>(IEnumerable<DefinitionType> definitionsToBeMigrated)
+        public async Task<List<Mapping>> CreateApiDefinitionsAsync<DefinitionType>(IEnumerable<DefinitionType> definitionsToBeMigrated)
             where DefinitionType : RestApiDefinition, new()
         {
             var migratedDefinitions = new List<Mapping>();
@@ -172,17 +173,17 @@ namespace MigrationTools.Endpoints
                 string body = JsonConvert.SerializeObject(definitionToBeMigrated, jsonSettings);
 
                 var content = new StringContent(body, Encoding.UTF8, "application/json");
-                var result = client.PostAsync("", content).GetAwaiter().GetResult();
+                var result = await client.PostAsync("", content);
 
+                var responseContent = await result.Content.ReadAsStringAsync();
                 if (result.StatusCode != HttpStatusCode.OK)
                 {
-                    var responseContent = result.Content.ReadAsStringAsync().GetAwaiter().GetResult();
                     Log.LogError("Error migrating {DefinitionType} {DefinitionName}. Please migrate it manually. {ErrorText}", typeof(DefinitionType).Name, definitionToBeMigrated.Name, responseContent);
                     continue;
                 }
                 else
                 {
-                    var targetObject = JsonConvert.DeserializeObject<DefinitionType>(result.Content.ReadAsStringAsync().GetAwaiter().GetResult());
+                    var targetObject = JsonConvert.DeserializeObject<DefinitionType>(responseContent);
                     migratedDefinitions.Add(new Mapping()
                     {
                         Name = definitionToBeMigrated.Name,

@@ -16,14 +16,14 @@
             </summary>
             <returns>UriBuilder</returns>
         </member>
-        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.GetApiDefinitions``1">
+        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.GetApiDefinitionsAsync``1">
             <summary>
             Generic Method to get API Definitions (Taskgroups, Variablegroups, Build- or Release Pipelines)
             </summary>
             <typeparam name="DefinitionType">Type of Definition. Can be: Taskgroup, Build- or Release Pipeline</typeparam>
             <returns>List of API Definitions </returns>
         </member>
-        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.CreateApiDefinitions``1(System.Collections.Generic.IEnumerable{``0})">
+        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.CreateApiDefinitionsAsync``1(System.Collections.Generic.IEnumerable{``0})">
             <summary>
             Make HTTP Request to create a Definition
             </summary>
@@ -36,9 +36,9 @@
             Azure DevOps Processor that migrates Taskgroups, Build- and Release Pipelines.
             </summary>
         </member>
-        <member name="M:MigrationTools.Processors.AzureDevOpsPipelineProcessor.MigratePipelines">
+        <member name="M:MigrationTools.Processors.AzureDevOpsPipelineProcessor.MigratePipelinesAsync">
             <summary>
-            Executes Method for migrating Taskgroups, Variablegroups or Pipelines, depinding on whhat is set in the config.
+            Executes Method for migrating Taskgroups, Variablegroups or Pipelines, depinding on what is set in the config.
             </summary>
         </member>
         <member name="M:MigrationTools.Processors.AzureDevOpsPipelineProcessor.FindExistingMappings``1(System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.List{MigrationTools.DataContracts.Mapping})">
