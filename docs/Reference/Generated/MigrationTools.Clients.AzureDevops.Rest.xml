@@ -4,6 +4,33 @@
         <name>MigrationTools.Clients.AzureDevops.Rest</name>
     </assembly>
     <members>
+        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.GetHttpClient``1">
+            <summary>
+            Create a new instance of HttpClient including Heades
+            </summary>
+            <returns>HttpClient</returns>
+        </member>
+        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.GetUriBuilderBasedOnEndpointAndType``1">
+            <summary>
+            Method to get the RESP API URLs right
+            </summary>
+            <returns>UriBuilder</returns>
+        </member>
+        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.GetApiDefinitions``1">
+            <summary>
+            Generic Method to get API Definitions (Taskgroups, Variablegroups, Build- or Release Pipelines)
+            </summary>
+            <typeparam name="DefinitionType">Type of Definition. Can be: Taskgroup, Build- or Release Pipeline</typeparam>
+            <returns>List of API Definitions </returns>
+        </member>
+        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.CreateApiDefinitions``1(System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Make HTTP Request to create a Definition
+            </summary>
+            <typeparam name="DefinitionType"></typeparam>
+            <param name="definitionsToBeMigrated"></param>
+            <returns>List of Mappings</returns>
+        </member>
         <member name="T:MigrationTools.Processors.AzureDevOpsPipelineProcessor">
             <summary>
             Azure DevOps Processor that migrates Taskgroups, Build- and Release Pipelines.
@@ -14,34 +41,7 @@
             Executes Method for migrating Taskgroups, Variablegroups or Pipelines, depinding on whhat is set in the config.
             </summary>
         </member>
-        <member name="M:MigrationTools.Processors.AzureDevOpsPipelineProcessor.GetHttpClient(System.String)">
-            <summary>
-            Create a new instance of HttpClient including Heades
-            </summary>
-            <param name="accessToken"></param>
-            <returns>HttpClient</returns>
-        </member>
-        <member name="M:MigrationTools.Processors.AzureDevOpsPipelineProcessor.getModUrl(System.String,System.String,MigrationTools.DataContracts.ApiPathAttribute,MigrationTools.DataContracts.ApiNameAttribute)">
-            <summary>
-            Method to get the RESP API URLs right
-            </summary>
-            <param name="organisation"></param>
-            <param name="project"></param>
-            <param name="apiPathAttribute">REST API Path</param>
-            <param name="apiNameAttribute">Name of Object</param>
-            <returns>API URL</returns>
-        </member>
-        <member name="M:MigrationTools.Processors.AzureDevOpsPipelineProcessor.GetApiDefinitions``1(System.String,System.String,System.String)">
-            <summary>
-            Generic Method to get API Definitions (Taskgroups, Variablegroups, Build- or Release Pipelines)
-            </summary>
-            <typeparam name="DefinitionType">Type of Definition. Can be: Taskgroup, Build- or Release Pipeline</typeparam>
-            <param name="organisation"></param>
-            <param name="project"></param>
-            <param name="accessToken"></param>
-            <returns>List of API Definitions </returns>
-        </member>
-        <member name="M:MigrationTools.Processors.AzureDevOpsPipelineProcessor.AddAllreadySyncedMappings``1(System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEnumerable{MigrationTools.DataContracts.Mapping})">
+        <member name="M:MigrationTools.Processors.AzureDevOpsPipelineProcessor.FindExistingMappings``1(System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.List{MigrationTools.DataContracts.Mapping})">
             <summary>
             Map the taskgroups that are already migrated
             </summary>
@@ -59,14 +59,6 @@
             <param name="sourceDefinitions"></param>
             <param name="targetDefinitions"></param>
             <returns>List of filtered Definitions</returns>
-        </member>
-        <member name="M:MigrationTools.Processors.AzureDevOpsPipelineProcessor.CreateApiDefinitions``1(System.Collections.Generic.IEnumerable{``0})">
-            <summary>
-            Make HTTP Request to create a Definition
-            </summary>
-            <typeparam name="DefinitionType"></typeparam>
-            <param name="definitionsToBeMigrated"></param>
-            <returns>List of Mappings</returns>
         </member>
         <member name="P:MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions.MigrateBuildPipelines">
             <summary>
@@ -94,7 +86,7 @@
         </member>
         <member name="P:MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions.MigrateServiceConnections">
             <summary>
-            Migrate Service Connections
+            Migrate Service Connections **secrets need to be entered manually**
             </summary>
             <default>true</default>
         </member>
