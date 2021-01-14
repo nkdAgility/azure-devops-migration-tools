@@ -156,7 +156,7 @@ namespace MigrationTools.Endpoints
         {
             var migratedDefinitions = new List<Mapping>();
 
-            foreach (RestApiDefinition definitionToBeMigrated in definitionsToBeMigrated)
+            foreach (var definitionToBeMigrated in definitionsToBeMigrated)
             {
                 var client = GetHttpClient<DefinitionType>();
                 definitionToBeMigrated.ResetObject();
@@ -187,8 +187,8 @@ namespace MigrationTools.Endpoints
                     migratedDefinitions.Add(new Mapping()
                     {
                         Name = definitionToBeMigrated.Name,
-                        SId = definitionToBeMigrated.Id,
-                        TId = targetObject.Id
+                        SourceId = definitionToBeMigrated.Id,
+                        TargetId = targetObject.Id
                     });
 
                 }

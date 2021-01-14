@@ -51,7 +51,7 @@
             <param name="newMappings"></param>
             <returns>Mapping list</returns>
         </member>
-        <member name="M:MigrationTools.Processors.AzureDevOpsPipelineProcessor.filteredDefinitions``1(System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEnumerable{``0})">
+        <member name="M:MigrationTools.Processors.AzureDevOpsPipelineProcessor.FilterOutExistingDefinitions``1(System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEnumerable{``0})">
             <summary>
             Filter existing Definitions
             </summary>
