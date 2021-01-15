@@ -16,10 +16,6 @@ namespace MigrationTools.Endpoints
 {
     public class AzureDevOpsEndpoint : Endpoint<AzureDevOpsEndpointOptions>
     {
-        public string AccessToken => Options.AccessToken;
-        public string Organisation => Options.Organisation;
-        public string Project => Options.Project;
-
         public override int Count => 0;
 
         public AzureDevOpsEndpoint(EndpointEnricherContainer endpointEnrichers, ITelemetryLogger telemetry, ILogger<AzureDevOpsEndpoint> logger)
@@ -56,7 +52,7 @@ namespace MigrationTools.Endpoints
 
             HttpClient client = new HttpClient();
             client.BaseAddress = baseUrl.Uri;
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes(string.Format("{0}:{1}", "", _Options.AccessToken))));
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes(string.Format("{0}:{1}", "", Options.AccessToken))));
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             client.DefaultRequestHeaders.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
 
@@ -76,8 +72,8 @@ namespace MigrationTools.Endpoints
             {
                 throw new ArgumentNullException($"On the class defintion of '{typeof(DefinitionType).Name}' is the attribute 'ApiName' misssing. Please add the 'ApiName' Attribute to your class");
             }
-            var builder = new UriBuilder(_Options.Organisation);
-            builder.Path += _Options.Project + "/_apis/" + apiPathAttribute.Path + "/";
+            var builder = new UriBuilder(Options.Organisation);
+            builder.Path += Options.Project + "/_apis/" + apiPathAttribute.Path + "/";
 
             if (apiNameAttribute.Name == "Release Piplines")
             {
@@ -115,7 +111,6 @@ namespace MigrationTools.Endpoints
             var initialDefinitions = new List<DefinitionType>();
 
             HttpClient client = GetHttpClient<DefinitionType>();
-            
             var httpResponse = await client.GetAsync("");
 
             if (httpResponse != null)

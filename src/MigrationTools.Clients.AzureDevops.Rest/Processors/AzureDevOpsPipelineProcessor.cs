@@ -422,7 +422,7 @@ namespace MigrationTools.Processors
                     Name = variableGroup.Name,
                     ProjectReference = new ProjectReference
                     {
-                        Name = Target.Project
+                        Name = Target.Options.Project
                     }
                 };
             }
