@@ -2,8 +2,8 @@
 {
     public class Mapping
     {
-        public string SId { get; set; }
-        public string TId { get; set; }
+        public string SourceId { get; set; }
+        public string TargetId { get; set; }
         public string Name { get; set; }
     }
 }

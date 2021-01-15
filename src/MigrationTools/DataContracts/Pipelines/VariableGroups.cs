@@ -19,6 +19,8 @@ namespace MigrationTools.DataContracts.Pipelines
         public string ModifiedOn { get; set; }
         public bool IsShared { get; set; }
 
+        public VariableGroupProjectReference[] VariableGroupProjectReferences { get; set; }
+
         public override bool HasTaskGroups()
         {
             Log.LogError("we currently not support taskgroup nesting.");
@@ -33,12 +35,25 @@ namespace MigrationTools.DataContracts.Pipelines
 
         public override void ResetObject()
         {
-            Id = null;
+            Id = "0";
             CreatedBy = null;
             CreatedOn = null;
             ModifiedBy = null;
             ModifiedOn = null;
         }
+    }
+
+    public class VariableGroupProjectReference
+    {
+        public string Description { get; set; }
+        public string Name { get; set; }
+        public ProjectReference ProjectReference { get; set; }
+    }
+
+    public class ProjectReference
+    {
+        public string Id { get; set; }
+        public string Name { get; set; }
     }
 
     public class Createdby
