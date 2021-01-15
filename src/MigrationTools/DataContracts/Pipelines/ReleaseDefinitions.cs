@@ -21,7 +21,7 @@ namespace MigrationTools.DataContracts.Pipelines
 
         public ExpandoObject Variables { get; set; }
 
-        public object[] VariableGroups { get; set; }
+        public int[] VariableGroups { get; set; }
 
         public Environment[] Environments { get; set; }
 
@@ -48,25 +48,23 @@ namespace MigrationTools.DataContracts.Pipelines
         ///<inheritdoc/>
         public override void ResetObject()
         {
+            Source = "restApi";
+            Revision = 1;
+
             Links = null;
-            Revision = 0;
+
             Artifacts = null;
             Url = null;
             Links = null;
-            Id = null;
-            VariableGroups = null;
+            Id = "0";
+            Triggers = null;
 
-            //Remove secure files
-            Environments.ForEach(e => e.DeployPhases.ForEach(d => d.WorkflowTasks.ForEach(w =>
+            PipelineProcess = null;
+
+            foreach (var env in Environments)
             {
-                var secureFiles = w.Inputs.Where(i => i.Key == "secureFile");
-                for (int i = 0; i < secureFiles.Count(); i++)
-                {
-                    var secureFile = secureFiles.ElementAt(i);
-                    ((ICollection<KeyValuePair<string, object>>)w.Inputs).Remove(secureFile);
-                }
+                env.ResetObject();
             }
-            )));
         }
 
         public override bool HasTaskGroups()
@@ -156,7 +154,7 @@ namespace MigrationTools.DataContracts.Pipelines
 
         public CreatedBy Owner { get; set; }
 
-        public EnvironmentVariables Variables { get; set; }
+        public ExpandoObject Variables { get; set; }
 
         public int[] VariableGroups { get; set; }
 
@@ -193,6 +191,22 @@ namespace MigrationTools.DataContracts.Pipelines
         public object[] EnvironmentTriggers { get; set; }
 
         public Uri BadgeUrl { get; set; }
+
+        public void ResetObject()
+        {
+            Id = 0;
+            DeployStep = null;
+            Owner = null;
+            BadgeUrl = null;
+            CurrentRelease = null;
+            
+            foreach (var deployPhase in DeployPhases)
+            {
+                deployPhase.ResetObject();
+            }
+            PreDeployApprovals.ResetObject();
+            PostDeployApprovals.ResetObject();
+        }
     }
 
     public partial class ConditionElement
@@ -230,14 +244,22 @@ namespace MigrationTools.DataContracts.Pipelines
         public object RefName { get; set; }
 
         public WorkflowTask[] WorkflowTasks { get; set; }
+
+        public void ResetObject()
+        {
+            foreach (var workflowTask in WorkflowTasks)
+            {
+                workflowTask.ResetObject();
+            }
+        }
     }
 
     public partial class DeploymentInput
     {
         public ParallelExecution ParallelExecution { get; set; }
 
-        public object AgentSpecification { get; set; }
-
+        public string[] Tags { get; set; }
+        public int QueueId { get; set; }
         public bool SkipArtifactsDownload { get; set; }
 
         public ArtifactsDownloadInput ArtifactsDownloadInput { get; set; }
@@ -290,6 +312,16 @@ namespace MigrationTools.DataContracts.Pipelines
         public string Condition { get; set; }
 
         public ExpandoObject Inputs { get; set; }
+
+        public void ResetObject()
+        {
+            var secureFiles = Inputs.Where(i => i.Key == "secureFile");
+            for (int i = 0; i < secureFiles.Count(); i++)
+            {
+                var secureFile = secureFiles.ElementAt(i);
+                ((ICollection<KeyValuePair<string, object>>)Inputs).Remove(secureFile);
+            }
+        }
     }
 
     public partial class DeployStep
@@ -330,6 +362,14 @@ namespace MigrationTools.DataContracts.Pipelines
         public Approval[] Approvals { get; set; }
 
         public ApprovalOptions ApprovalOptions { get; set; }
+
+        public void ResetObject()
+        {
+            foreach (var approval in Approvals)
+            {
+                approval.ResetObject();
+            }
+        }
     }
 
     public partial class ApprovalOptions
@@ -356,6 +396,11 @@ namespace MigrationTools.DataContracts.Pipelines
         public bool IsNotificationOn { get; set; }
 
         public long Id { get; set; }
+
+        public void ResetObject()
+        {
+            Id = 0;
+        }
     }
 
     public partial class DeploymentGates
