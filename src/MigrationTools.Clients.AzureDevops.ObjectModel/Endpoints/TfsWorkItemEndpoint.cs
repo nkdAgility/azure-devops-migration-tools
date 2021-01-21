@@ -10,24 +10,20 @@ using WorkItem = Microsoft.TeamFoundation.WorkItemTracking.Client.WorkItem;
 
 namespace MigrationTools.Endpoints
 {
-    public class TfsWorkItemEndpoint : TfsEndpoint, IWorkItemSourceEndpoint, IWorkItemTargetEndpoint, ITfsWorkItemEndpointOptions
+    public class TfsWorkItemEndpoint : GenericTfsEndpoint<TfsWorkItemEndpointOptions>, IWorkItemSourceEndpoint, IWorkItemTargetEndpoint
     {
-        private TfsWorkItemEndpointOptions _Options;
-
-        public QueryOptions Query => _Options.Query;
-
-        public TfsWorkItemEndpoint(EndpointEnricherContainer endpointEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Endpoint> logger) : base(endpointEnrichers, services, telemetry, logger)
+        public TfsWorkItemEndpoint(EndpointEnricherContainer endpointEnrichers, ITelemetryLogger telemetry, ILogger<TfsWorkItemEndpoint> logger)
+            : base(endpointEnrichers, telemetry, logger)
         {
         }
 
-        public override void Configure(IEndpointOptions options)
+        public override void Configure(TfsWorkItemEndpointOptions options)
         {
             base.Configure(options);
             Log.LogDebug("TfsWorkItemEndPoint::Configure");
-            _Options = (TfsWorkItemEndpointOptions)options;
-            if (string.IsNullOrEmpty(_Options.Query?.Query))
+            if (string.IsNullOrEmpty(Options.Query?.Query))
             {
-                throw new ArgumentNullException(nameof(_Options.Query));
+                throw new ArgumentNullException(nameof(Options.Query));
             }
         }
 
@@ -39,11 +35,11 @@ namespace MigrationTools.Endpoints
         public IEnumerable<WorkItemData> GetWorkItems()
         {
             Log.LogDebug("TfsWorkItemEndPoint::GetWorkItems");
-            if (string.IsNullOrEmpty(_Options.Query?.Query))
+            if (string.IsNullOrEmpty(Options.Query?.Query))
             {
-                throw new ArgumentNullException(nameof(_Options.Query));
+                throw new ArgumentNullException(nameof(Options.Query));
             }
-            return GetWorkItems(_Options.Query);
+            return GetWorkItems(Options.Query);
         }
 
         public IEnumerable<WorkItemData> GetWorkItems(QueryOptions query)

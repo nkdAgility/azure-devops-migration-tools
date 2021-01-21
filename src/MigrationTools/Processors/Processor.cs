@@ -12,10 +12,11 @@ namespace MigrationTools.Processors
     public abstract class Processor : IProcessor
     {
         private bool _ProcessorConfigured;
+        private IEndpointFactory _endpointFactory;
 
         public Processor(
             ProcessorEnricherContainer processorEnrichers,
-            EndpointContainer endpoints,
+            IEndpointFactory endpointFactory,
             IServiceProvider services,
             ITelemetryLogger telemetry,
             ILogger<Processor> logger)
@@ -23,11 +24,12 @@ namespace MigrationTools.Processors
             Services = services;
             Telemetry = telemetry;
             Log = logger;
-            Endpoints = endpoints;
             ProcessorEnrichers = processorEnrichers;
+            _endpointFactory = endpointFactory;
         }
 
-        public EndpointContainer Endpoints { get; }
+        public IEndpoint Source { get; private set; }
+        public IEndpoint Target { get; private set; }
 
         public ProcessorEnricherContainer ProcessorEnrichers { get; }
 
@@ -45,7 +47,9 @@ namespace MigrationTools.Processors
         public virtual void Configure(IProcessorOptions options)
         {
             Log.LogInformation("Processor::Configure");
-            Endpoints.ConfigureEndpoints(options.Source, options.Target);
+            Source = _endpointFactory.CreateEndpoint(options.SourceName);
+            Target = _endpointFactory.CreateEndpoint(options.TargetName);
+            //Endpoints.ConfigureEndpoints(source, target);
             ProcessorEnrichers.ConfigureEnrichers(options.ProcessorEnrichers);
             _ProcessorConfigured = true;
         }

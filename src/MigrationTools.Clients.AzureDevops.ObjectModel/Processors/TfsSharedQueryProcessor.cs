@@ -20,15 +20,16 @@ namespace MigrationTools.Processors
         private int totalQueriesMigrated;
         private int totalQueryFailed;
 
-        public TfsEndpoint Source => (TfsEndpoint)Endpoints.Source;
+        public new TfsEndpoint Source => (TfsEndpoint)base.Source;
 
-        public TfsEndpoint Target => (TfsEndpoint)Endpoints.Target;
+        public new TfsEndpoint Target => (TfsEndpoint)base.Target;
 
         public TfsSharedQueryProcessor(ProcessorEnricherContainer processorEnrichers,
-                                       EndpointContainer endpoints,
+                                       IEndpointFactory endpointFactory,
                                        IServiceProvider services,
                                        ITelemetryLogger telemetry,
-                                       ILogger<Processor> logger) : base(processorEnrichers, endpoints, services, telemetry, logger)
+                                       ILogger<Processor> logger)
+            : base(processorEnrichers, endpointFactory, services, telemetry, logger)
         {
         }
 

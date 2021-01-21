@@ -18,13 +18,19 @@ namespace MigrationTools.Processors
     {
         private AzureDevOpsPipelineProcessorOptions _Options;
 
-        public AzureDevOpsPipelineProcessor(ProcessorEnricherContainer processorEnrichers, EndpointContainer endpoints, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(processorEnrichers, endpoints, services, telemetry, logger)
+        public AzureDevOpsPipelineProcessor(
+                    ProcessorEnricherContainer processorEnrichers,
+                    IEndpointFactory endpointFactory,
+                    IServiceProvider services,
+                    ITelemetryLogger telemetry,
+                    ILogger<Processor> logger)
+            : base(processorEnrichers, endpointFactory, services, telemetry, logger)
         {
         }
 
-        public AzureDevOpsEndpoint Source => (AzureDevOpsEndpoint)Endpoints.Source;
+        public new AzureDevOpsEndpoint Source => (AzureDevOpsEndpoint)base.Source;
 
-        public AzureDevOpsEndpoint Target => (AzureDevOpsEndpoint)Endpoints.Target;
+        public new AzureDevOpsEndpoint Target => (AzureDevOpsEndpoint)base.Target;
 
         public override void Configure(IProcessorOptions options)
         {
@@ -50,13 +56,13 @@ namespace MigrationTools.Processors
             {
                 throw new Exception("You must call Configure() first");
             }
-            if (!(Endpoints.Source is Endpoint))
+            if (Source is not AzureDevOpsEndpoint)
             {
-                throw new Exception("The Source endpoint configured must be of type WorkItemEndpoint");
+                throw new Exception("The Source endpoint configured must be of type AzureDevOpsEndpoint");
             }
-            if (!(Endpoints.Target is Endpoint))
+            if (Target is not AzureDevOpsEndpoint)
             {
-                throw new Exception("The Target endpoint configured must be of type WorkItemEndpoint");
+                throw new Exception("The Target endpoint configured must be of type AzureDevOpsEndpoint");
             }
         }
 
@@ -416,7 +422,7 @@ namespace MigrationTools.Processors
                     Name = variableGroup.Name,
                     ProjectReference = new ProjectReference
                     {
-                        Name = Target.Project
+                        Name = Target.Options.Project
                     }
                 };
             }

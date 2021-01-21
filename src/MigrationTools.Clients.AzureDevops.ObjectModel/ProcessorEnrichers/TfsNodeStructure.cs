@@ -142,18 +142,18 @@ namespace MigrationTools.Enrichers
             {
                 if (_sourceCommonStructureService is null)
                 {
-                    TfsEndpoint source = (TfsEndpoint)processor.Endpoints.Source;
+                    TfsEndpoint source = (TfsEndpoint)processor.Source;
                     _sourceCommonStructureService = (ICommonStructureService4)source.TfsCollection.GetService<ICommonStructureService>();
                     _sourceProjectInfo = _sourceCommonStructureService.GetProjectFromName(source.Project);
                     _sourceRootNodes = _sourceCommonStructureService.ListStructures(_sourceProjectInfo.Uri);
-                    _sourceLanguageMaps = source.LanguageMaps;
+                    _sourceLanguageMaps = source.Options.LanguageMaps;
                     _sourceProjectName = source.Project;
                 }
                 if (_targetCommonStructureService is null)
                 {
-                    TfsEndpoint target = (TfsEndpoint)processor.Endpoints.Target;
+                    TfsEndpoint target = (TfsEndpoint)processor.Target;
                     _targetCommonStructureService = (ICommonStructureService4)target.TfsCollection.GetService<ICommonStructureService4>();
-                    _targetLanguageMaps = target.LanguageMaps;
+                    _targetLanguageMaps = target.Options.LanguageMaps;
                     _targetProjectName = target.Project;
                 }
             }
@@ -168,7 +168,7 @@ namespace MigrationTools.Enrichers
             }
             else
             {
-                TfsEndpoint target = (TfsEndpoint)processor.Endpoints.Target;
+                TfsEndpoint target = (TfsEndpoint)processor.Target;
                 target.TfsStore.RefreshCache(true);
             }
         }

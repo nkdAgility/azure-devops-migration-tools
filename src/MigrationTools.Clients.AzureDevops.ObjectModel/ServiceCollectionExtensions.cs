@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MigrationTools._EngineV1.Clients;
 using MigrationTools.EndpointEnrichers;
@@ -12,14 +14,12 @@ namespace MigrationTools
 {
     public static partial class ServiceCollectionExtensions
     {
-        public static void AddMigrationToolServicesForClientAzureDevOpsObjectModel(this IServiceCollection context)
+        public static void AddMigrationToolServicesForClientAzureDevOpsObjectModel(this IServiceCollection context, IConfiguration configuration)
         {
-            // Generic Endpoint
-            context.AddTransient<TfsEndpoint>();
-            //TfsWorkItem
-            context.AddTransient<TfsWorkItemEndpoint>();
-            //TfsTeamSettings
-            context.AddTransient<TfsTeamSettingsEndpoint>();
+            context.AddEndPoints<TfsEndpointOptions, TfsEndpoint>(configuration, "TfsEndpoints");
+            context.AddEndPoints<TfsWorkItemEndpointOptions, TfsWorkItemEndpoint>(configuration, "TfsWorkItemEndpoints");
+            context.AddEndPoints<TfsTeamSettingsEndpointOptions, TfsTeamSettingsEndpoint>(configuration, "TfsTeamSettingsEndpoints");
+
             context.AddTransient<TfsTeamSettingsProcessor>();
             //TfsSharedQueries
             context.AddTransient<TfsSharedQueryProcessor>();

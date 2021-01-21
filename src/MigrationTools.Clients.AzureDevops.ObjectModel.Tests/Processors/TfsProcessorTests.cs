@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MigrationTools.Endpoints;
 using MigrationTools.Tests;
 
 namespace MigrationTools.Processors.Tests
@@ -23,8 +22,8 @@ namespace MigrationTools.Processors.Tests
                 MigrateTeamSettings = true,
                 UpdateTeamSettings = true,
                 PrefixProjectToNodes = false,
-                Source = GetTfsEndPointOptions("migrationSource1"),
-                Target = GetTfsEndPointOptions("migrationTarget1")
+                SourceName = "TfsTeamSettingsSource",
+                TargetName = "TfsTeamSettingsTarget"
             };
             return migrationConfig;
         }
@@ -36,21 +35,10 @@ namespace MigrationTools.Processors.Tests
             {
                 Enabled = true,
                 PrefixProjectToNodes = false,
-                Target = GetTfsEndPointOptions("migrationTarget1"),
-                Source = GetTfsEndPointOptions("migrationSource1"),
+                SourceName = "Source",
+                TargetName = "Target"
             };
             return migrationConfig;
-        }
-
-        protected static TfsEndpointOptions GetTfsEndPointOptions(string project)
-        {
-            return new TfsTeamSettingsEndpointOptions()
-            {
-                Organisation = "https://dev.azure.com/nkdagility-preview/",
-                Project = project,
-                AuthenticationMode = AuthenticationMode.AccessToken,
-                AccessToken = TestingConstants.AccessToken,
-            };
         }
     }
 }

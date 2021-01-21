@@ -24,14 +24,8 @@ namespace MigrationTools.Processors
         public override void SetDefaults()
         {
             PrefixProjectToNodes = false;
-            var e1 = new TfsEndpointOptions();
-            e1.SetDefaults();
-            e1.Project = "sourceProject";
-            Source = e1;
-            var e2 = new TfsEndpointOptions();
-            e2.SetDefaults();
-            e2.Project = "targetProject";
-            Target = e2;
+            SourceName = "sourceName";
+            TargetName = "targetName";
         }
     }
 }

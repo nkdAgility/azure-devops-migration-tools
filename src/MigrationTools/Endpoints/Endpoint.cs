@@ -1,20 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using MigrationTools.EndpointEnrichers;
 
 namespace MigrationTools.Endpoints
 {
-    public abstract class Endpoint : ISourceEndPoint, ITargetEndPoint
+    public abstract class Endpoint<TOptions> : ISourceEndPoint, ITargetEndPoint
+        where TOptions : IEndpointOptions
     {
-        private IEndpointOptions _InnerOptions;
         private List<IEndpointEnricher> _EndpointEnrichers;
 
-        public Endpoint(EndpointEnricherContainer endpointEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Endpoint> logger)
+        public Endpoint(EndpointEnricherContainer endpointEnrichers, ITelemetryLogger telemetry, ILogger<Endpoint<TOptions>> logger)
         {
             EndpointEnrichers = endpointEnrichers;
-            Services = services;
             Telemetry = telemetry;
             Log = logger;
             _EndpointEnrichers = new List<IEndpointEnricher>();
@@ -25,17 +23,18 @@ namespace MigrationTools.Endpoints
         public IEnumerable<IEndpointSourceEnricher> SourceEnrichers => _EndpointEnrichers.Where(e => e.GetType().IsAssignableFrom(typeof(IEndpointSourceEnricher))).Select(e => (IEndpointSourceEnricher)e);
         public IEnumerable<IEndpointTargetEnricher> TargetEnrichers => _EndpointEnrichers.Where(e => e.GetType().IsAssignableFrom(typeof(IEndpointTargetEnricher))).Select(e => (IEndpointTargetEnricher)e);
 
-        protected IServiceProvider Services { get; }
         protected ITelemetryLogger Telemetry { get; }
-        protected ILogger<Endpoint> Log { get; }
+        protected ILogger<Endpoint<TOptions>> Log { get; }
+
+        public TOptions Options { get; private set; }
 
         public abstract int Count { get; }
 
-        public virtual void Configure(IEndpointOptions options)
+        public virtual void Configure(TOptions options)
         {
             Log.LogDebug("Endpoint::Configure");
-            _InnerOptions = options;
-            EndpointEnrichers.ConfigureEnrichers(_InnerOptions.EndpointEnrichers);
+            Options = options;
+            EndpointEnrichers.ConfigureEnrichers(Options.EndpointEnrichers);
         }
 
         //public abstract void Filter(IEnumerable<WorkItemData> workItems);

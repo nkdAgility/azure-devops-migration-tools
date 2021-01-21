@@ -26,8 +26,8 @@ namespace MigrationTools.Processors.Tests
                 ReplayRevisions = true,
                 WorkItemCreateRetryLimit = 5,
                 PrefixProjectToNodes = false,
-                Source = new InMemoryWorkItemEndpointOptions(),
-                Target = new InMemoryWorkItemEndpointOptions()
+                SourceName = "Source",
+                TargetName = "Target"
             };
             var x = Services.GetRequiredService<WorkItemTrackingProcessor>();
             x.Configure(y);
@@ -44,8 +44,8 @@ namespace MigrationTools.Processors.Tests
                 ReplayRevisions = true,
                 WorkItemCreateRetryLimit = 5,
                 PrefixProjectToNodes = false,
-                Source = new InMemoryWorkItemEndpointOptions(),
-                Target = new InMemoryWorkItemEndpointOptions()
+                SourceName = "Source",
+                TargetName = "Target"
             };
             var x = Services.GetRequiredService<WorkItemTrackingProcessor>();
             x.Configure(y);

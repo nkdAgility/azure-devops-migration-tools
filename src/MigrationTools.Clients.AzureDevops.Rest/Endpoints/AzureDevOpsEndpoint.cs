@@ -14,38 +14,30 @@ using Newtonsoft.Json.Serialization;
 
 namespace MigrationTools.Endpoints
 {
-    public class AzureDevOpsEndpoint : Endpoint, IAzureDevOpsEndpointOptions
+    public class AzureDevOpsEndpoint : Endpoint<AzureDevOpsEndpointOptions>
     {
-        private IAzureDevOpsEndpointOptions _Options;
-
-        public string AccessToken => _Options.AccessToken;
-        public string Organisation => _Options.Organisation;
-        public string Project => _Options.Project;
-        public string ReflectedWorkItemIdField => _Options.ReflectedWorkItemIdField;
-        public AuthenticationMode AuthenticationMode => _Options.AuthenticationMode;
-
         public override int Count => 0;
 
-        public AzureDevOpsEndpoint(EndpointEnricherContainer endpointEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Endpoint> logger) : base(endpointEnrichers, services, telemetry, logger)
+        public AzureDevOpsEndpoint(EndpointEnricherContainer endpointEnrichers, ITelemetryLogger telemetry, ILogger<AzureDevOpsEndpoint> logger)
+            : base(endpointEnrichers, telemetry, logger)
         {
         }
 
-        public override void Configure(IEndpointOptions options)
+        public override void Configure(AzureDevOpsEndpointOptions options)
         {
             base.Configure(options);
             Log.LogDebug("AzureDevOpsEndpoint::Configure");
-            _Options = (IAzureDevOpsEndpointOptions)options;
-            if (string.IsNullOrEmpty(_Options.Organisation))
+            if (string.IsNullOrEmpty(Options.Organisation))
             {
-                throw new ArgumentNullException(nameof(_Options.Organisation));
+                throw new ArgumentNullException(nameof(Options.Organisation));
             }
-            if (string.IsNullOrEmpty(_Options.Project))
+            if (string.IsNullOrEmpty(Options.Project))
             {
-                throw new ArgumentNullException(nameof(_Options.Project));
+                throw new ArgumentNullException(nameof(Options.Project));
             }
-            if (string.IsNullOrEmpty(_Options.AccessToken))
+            if (string.IsNullOrEmpty(Options.AccessToken))
             {
-                throw new ArgumentNullException(nameof(_Options.AccessToken));
+                throw new ArgumentNullException(nameof(Options.AccessToken));
             }
         }
 
@@ -60,7 +52,7 @@ namespace MigrationTools.Endpoints
 
             HttpClient client = new HttpClient();
             client.BaseAddress = baseUrl.Uri;
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes(string.Format("{0}:{1}", "", _Options.AccessToken))));
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes(string.Format("{0}:{1}", "", Options.AccessToken))));
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             client.DefaultRequestHeaders.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
 
@@ -80,8 +72,8 @@ namespace MigrationTools.Endpoints
             {
                 throw new ArgumentNullException($"On the class defintion of '{typeof(DefinitionType).Name}' is the attribute 'ApiName' misssing. Please add the 'ApiName' Attribute to your class");
             }
-            var builder = new UriBuilder(_Options.Organisation);
-            builder.Path += _Options.Project + "/_apis/" + apiPathAttribute.Path + "/";
+            var builder = new UriBuilder(Options.Organisation);
+            builder.Path += Options.Project + "/_apis/" + apiPathAttribute.Path + "/";
 
             if (apiNameAttribute.Name == "Release Piplines")
             {
@@ -119,7 +111,6 @@ namespace MigrationTools.Endpoints
             var initialDefinitions = new List<DefinitionType>();
 
             HttpClient client = GetHttpClient<DefinitionType>();
-            
             var httpResponse = await client.GetAsync("");
 
             if (httpResponse != null)

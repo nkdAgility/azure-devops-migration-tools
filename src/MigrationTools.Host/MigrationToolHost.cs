@@ -64,20 +64,21 @@ namespace MigrationTools.Host
                  services.AddOptions();
                  services.Configure<EngineConfiguration>((config) =>
                  {
-                     var sp = services.BuildServiceProvider();
-                     var builder = sp.GetRequiredService<IEngineConfigurationBuilder>();
-                     var logger = sp.GetService<ILoggerFactory>().CreateLogger<EngineConfiguration>();
                      if(executeOptions is null)
                      {
                          return;
                      }
+
+                     var sp = services.BuildServiceProvider();
+                     var logger = sp.GetService<ILoggerFactory>().CreateLogger<EngineConfiguration>();
                      if (!File.Exists(executeOptions.ConfigFile))
                      {
                          logger.LogInformation("The config file {ConfigFile} does not exist, nor does the default 'configuration.json'. Use '{ExecutableName}.exe init' to create a configuration file first", executeOptions.ConfigFile, Assembly.GetEntryAssembly().GetName().Name);
                          throw new ArgumentException("missing configfile");
                      }
                      logger.LogInformation("Config Found, creating engine host");
-                     var parsed = builder.BuildFromFile(executeOptions.ConfigFile);
+                     var reader = sp.GetRequiredService<IEngineConfigurationReader>();
+                     var parsed = reader.BuildFromFile(executeOptions.ConfigFile);
                      config.ChangeSetMappingFile = parsed.ChangeSetMappingFile;
                      config.FieldMaps = parsed.FieldMaps;
                      config.GitRepoMapping = parsed.GitRepoMapping;
@@ -98,6 +99,8 @@ namespace MigrationTools.Host
 
                  // Config
                  services.AddSingleton<IEngineConfigurationBuilder, EngineConfigurationBuilder>();
+                 services.AddTransient((provider) => provider.GetRequiredService<IEngineConfigurationBuilder>() as IEngineConfigurationReader);
+                 services.AddTransient((provider) => provider.GetRequiredService<IEngineConfigurationBuilder>() as ISettingsWriter);
 
                  // Add Old v1Bits
                  services.AddMigrationToolServicesLegacy();

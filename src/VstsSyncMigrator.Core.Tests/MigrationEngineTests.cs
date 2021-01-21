@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -20,6 +21,7 @@ namespace _VstsSyncMigrator.Engine.Tests
         [TestInitialize]
         public void Setup()
         {
+            var configuration = new ConfigurationBuilder().Build();
             var ecb = new EngineConfigurationBuilder(new NullLogger<EngineConfigurationBuilder>());
             var services = new ServiceCollection();
             // Core
@@ -28,7 +30,7 @@ namespace _VstsSyncMigrator.Engine.Tests
             services.AddMigrationToolServices();
             services.AddMigrationToolServicesLegacy();
             // Clients
-            services.AddMigrationToolServicesForClientAzureDevOpsObjectModel();
+            services.AddMigrationToolServicesForClientAzureDevOpsObjectModel(configuration);
             services.AddMigrationToolServicesForClientLegacyAzureDevOpsObjectModel();
 
             //

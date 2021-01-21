@@ -23,8 +23,8 @@ namespace MigrationTools.Processors.Tests
             {
                 Enabled = true,
                 PrefixProjectToNodes = false,
-                Source = GetTfsWorkItemEndPointOptions("source"),
-                Target = GetTfsWorkItemEndPointOptions("target")
+                SourceName = "Source",
+                TargetName = "Target"
             };
             var x = Services.GetRequiredService<TfsSharedQueryProcessor>();
             x.Configure(y);
@@ -38,8 +38,8 @@ namespace MigrationTools.Processors.Tests
             {
                 Enabled = true,
                 PrefixProjectToNodes = false,
-                Source = GetTfsWorkItemEndPointOptions("source"),
-                Target = GetTfsWorkItemEndPointOptions("target")
+                SourceName = "Source",
+                TargetName = "Target"
             };
             var x = Services.GetRequiredService<TfsSharedQueryProcessor>();
             x.Configure(y);

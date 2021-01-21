@@ -17,7 +17,13 @@ namespace MigrationTools.Processors
 
         public override ProcessorType Type => ProcessorType.Integrated;
 
-        public WorkItemTrackingProcessor(ProcessorEnricherContainer processorEnricherContainer, EndpointContainer endpointContainer, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(processorEnricherContainer, endpointContainer, services, telemetry, logger)
+        public WorkItemTrackingProcessor(
+                    ProcessorEnricherContainer processorEnricherContainer,
+                    IEndpointFactory endpointFactory,
+                    IServiceProvider services,
+                    ITelemetryLogger telemetry,
+                    ILogger<Processor> logger)
+            : base(processorEnricherContainer, endpointFactory, services, telemetry, logger)
         {
         }
 
@@ -33,7 +39,7 @@ namespace MigrationTools.Processors
             Log.LogInformation("Processor::InternalExecute::Start");
             EnsureConfigured();
             ProcessorEnrichers.ProcessorExecutionBegin(this);
-            var source = (IWorkItemSourceEndpoint)Endpoints.Source;
+            var source = (IWorkItemSourceEndpoint)Source;
             List<WorkItemData> workItems = source.GetWorkItems().ToList();
             ProcessorEnrichers.ProcessorExecutionAfterSource(this, workItems);
             foreach (WorkItemData item in workItems)
@@ -59,13 +65,13 @@ namespace MigrationTools.Processors
             {
                 throw new Exception("You must call Configure() first");
             }
-            if (!(Endpoints.Source is Endpoint))
+            if (Source is not IWorkItemEndpoint)
             {
-                throw new Exception("The Source endpoint configured must be of type WorkItemEndpoint");
+                throw new Exception("The Source endpoint configured must be of type IWorkItemEndpoint");
             }
-            if (!(Endpoints.Target is Endpoint))
+            if (Target is not IWorkItemEndpoint)
             {
-                throw new Exception("The Target endpoint configured must be of type WorkItemEndpoint");
+                throw new Exception("The Target endpoint configured must be of type IWorkItemEndpoint");
             }
         }
     }

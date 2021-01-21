@@ -41,14 +41,8 @@ namespace MigrationTools.Processors
             MigrateTeamSettings = true;
             UpdateTeamSettings = true;
             PrefixProjectToNodes = false;
-            var e1 = new TfsTeamSettingsEndpointOptions();
-            e1.SetDefaults();
-            e1.Project = "sourceProject";
-            Source = e1;
-            var e2 = new TfsTeamSettingsEndpointOptions();
-            e2.SetDefaults();
-            e2.Project = "targetProject";
-            Target = e2;
+            SourceName = "sourceName";
+            TargetName = "targetName";
         }
     }
 }
