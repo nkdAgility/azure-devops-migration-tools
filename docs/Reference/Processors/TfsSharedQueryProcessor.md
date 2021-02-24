@@ -73,7 +73,7 @@ The TfsSharedQueryProcessor enabled you to migrate queries from one locatio nto 
         "SourceToTargetFieldMappings": null,
         "ProcessorEnrichers": null,
         "SourceName": "Source",
-        "TargetName": "Target",
+        "TargetName": "Target"
       }
     ]
   }
