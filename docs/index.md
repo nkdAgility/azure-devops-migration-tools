@@ -95,7 +95,7 @@ Most of these processors need to be run in order. If you try to migrate work ite
 |[TfsAreaAndIterationProcessor](./Reference/Processors/TfsAreaAndIterationProcessor.md) | preview | Area & Iterations | Migrates Nodes before run |
 |[WorkItemDelete](./Processors/WorkItemDeleteConfig.md) | ready | Work Items | Bulk delete of work items **WARNING DANGEROUS** |
 |[WorkItemUpdate](./Processors/WorkItemUpdateConfig.md) | ready | Work Items | Bulk update of Work Items based on a query and field mappings |
-|[TfsSharedQueryProcessor](./Reference/Processors/TfsTeamSettingsProcessor.md) | preview | Shared Queries | Moved Shared Queries best effort |
+|[TfsSharedQueryProcessor](./Reference/Processors/TfsSharedQueryProcessor.md) | preview | Shared Queries | Moved Shared Queries best effort |
 |[TestVariablesMigration](./Processors/TestVariablesMigrationConfig.md) | Beta | Suites & Plans | Migrates Test Variables |
 |[TestConfigurationsMigration](./Processors/TestConfigurationsMigrationConfig.md) | Beta  | Suites & Plans | Migrates Test configurations |
 |[TestPlansAndSuitesMigration](./Processors/TestPlansAndSuitesMigrationConfig.md) | Beta  | Suites & Plans | Rebuilds Suits and plans for Test Cases migrated using the WorkItemMigration |
@@ -114,7 +114,7 @@ Most of these processors need to be run in order. If you try to migrate work ite
 
 ### Processors (v2 Architecture) [ PREVIEW ]
 
-**_These are experimental processors that should replace those above. We are intersted in feedback of the new foramt of the config, as well as the functionality._**
+**_These are experimental processors that should replace those above. We are intersted in feedback of the new format of the config, as well as the functionality._**
 
 The new processor configuration is designed to allow the Migration Tools to support diferent Source and targets than just TFS/Azure DevOps, and we moved the Endpoints to the processor to allow both Object Model & REST in different processors.
 
