@@ -164,7 +164,7 @@ namespace MigrationTools.Processors
                 {
                     foreach (var sourceField in _Options.SourceToTargetFieldMappings.Keys)
                     {
-                        fixedQueryText = query.QueryText.Replace(sourceField, _Options.SourceToTargetFieldMappings[sourceField]);
+                        fixedQueryText = fixedQueryText.Replace(sourceField, _Options.SourceToTargetFieldMappings[sourceField]);
                     }
                 }
 
