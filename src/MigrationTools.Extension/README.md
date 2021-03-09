@@ -40,6 +40,7 @@ before you move to Azure DevOps.
 
 ## Quick Links
 
+ - [Start Here]()
  - [Video Overview](https://youtu.be/ZxDktQae10M)
  - [Getting Started](http://nkdagility.github.io/azure-devops-migration-tools/getting-started)
  - [Documentation](http://nkdagility.github.io/azure-devops-migration-tools/)
