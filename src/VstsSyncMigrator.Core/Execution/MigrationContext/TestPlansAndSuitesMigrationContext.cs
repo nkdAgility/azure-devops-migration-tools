@@ -963,7 +963,7 @@ namespace VstsSyncMigrator.Engine
             }
             catch (TestManagementServerException ex)
             {
-                Log.LogError(ex, " FAILED {TestSuiteType} : {Id} - {Title}",
+                Log.LogError(ex, " FAILED {TestSuiteType} : {Id} - {Title}", newTestSuite.TestSuiteType.ToString(), newTestSuite.Id.ToString(), newTestSuite.Title,
                       new Dictionary<string, string> {
                           { "Name", Name},
                           { "Target Project", Engine.Target.Config.AsTeamProjectConfig().Project},
