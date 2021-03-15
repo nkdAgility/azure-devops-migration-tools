@@ -1002,6 +1002,7 @@ namespace VstsSyncMigrator.Engine
 
         private void TagCompletedTargetPlan(int workItemId)
         {
+            // Remvoed to fix bug #852
             //var targetPlanWorkItem = Engine.Target.WorkItems.GetWorkItem(workItemId.ToString());
             //targetPlanWorkItem.ToWorkItem().Tags = targetPlanWorkItem.ToWorkItem().Tags + ";migrated";
             //targetPlanWorkItem.SaveToAzureDevOps();
