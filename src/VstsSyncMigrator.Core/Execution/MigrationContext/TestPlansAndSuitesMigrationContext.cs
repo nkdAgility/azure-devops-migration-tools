@@ -446,6 +446,10 @@ namespace VstsSyncMigrator.Engine
         {
             IDynamicTestSuite targetSuiteChild = _targetTestStore.Project.TestSuites.CreateDynamic();
             targetSuiteChild.TestSuiteEntry.Title = source.TestSuiteEntry.Title;
+            if (targetSuiteChild is ITestSuiteBase2)
+            {
+                ((ITestSuiteBase2)targetSuiteChild).Status = ((ITestSuiteBase2)source).Status;
+            }
             ApplyTestSuiteQuery(source, targetSuiteChild, _targetTestStore);
 
             return targetSuiteChild;
@@ -471,6 +475,10 @@ namespace VstsSyncMigrator.Engine
         {
             ITestSuiteBase targetSuiteChild = _targetTestStore.Project.TestSuites.CreateStatic();
             targetSuiteChild.TestSuiteEntry.Title = source.TestSuiteEntry.Title;
+            if (targetSuiteChild is ITestSuiteBase2)
+            {
+                ((ITestSuiteBase2)targetSuiteChild).Status = ((ITestSuiteBase2)source).Status;
+            }
             return targetSuiteChild;
         }
 
