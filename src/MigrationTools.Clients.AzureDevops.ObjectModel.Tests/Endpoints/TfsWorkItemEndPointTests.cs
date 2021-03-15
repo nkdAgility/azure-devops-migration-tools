@@ -48,7 +48,7 @@ namespace MigrationTools.Endpoints.Tests
             var endpoint = Services.GetRequiredService<TfsWorkItemEndpoint>();
             endpoint.Configure(GetTfsWorkItemEndPointOptions("migrationSource1"));
             IEnumerable<WorkItemData> result = endpoint.GetWorkItems();
-            Assert.AreEqual(5, result.Count());
+            Assert.AreEqual(7, result.Count());
         }
 
         [TestMethod(), TestCategory("L3"), TestCategory("AzureDevOps.ObjectModel")]
@@ -58,11 +58,11 @@ namespace MigrationTools.Endpoints.Tests
             endpoint.Configure(GetTfsWorkItemEndPointOptions("migrationSource1"));
             QueryOptions qo = new QueryOptions()
             {
-                Query = "SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject",
+                Query = "SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
                 Paramiters = new Dictionary<string, string>() { { "TeamProject", "migrationSource1" } }
             };
             IEnumerable<WorkItemData> result = endpoint.GetWorkItems(qo);
-            Assert.AreEqual(5, result.Count());
+            Assert.AreEqual(7, result.Count());
         }
 
         //[TestMethod()]
