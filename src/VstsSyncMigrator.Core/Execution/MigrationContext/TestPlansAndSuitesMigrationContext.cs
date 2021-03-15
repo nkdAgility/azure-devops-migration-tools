@@ -1002,9 +1002,9 @@ namespace VstsSyncMigrator.Engine
 
         private void TagCompletedTargetPlan(int workItemId)
         {
-            var targetPlanWorkItem = Engine.Target.WorkItems.GetWorkItem(workItemId.ToString());
-            targetPlanWorkItem.ToWorkItem().Tags = targetPlanWorkItem.ToWorkItem().Tags + ";migrated";
-            targetPlanWorkItem.SaveToAzureDevOps();
+            //var targetPlanWorkItem = Engine.Target.WorkItems.GetWorkItem(workItemId.ToString());
+            //targetPlanWorkItem.ToWorkItem().Tags = targetPlanWorkItem.ToWorkItem().Tags + ";migrated";
+            //targetPlanWorkItem.SaveToAzureDevOps();
         }
 
         private bool TargetPlanContansTag(int workItemId)
