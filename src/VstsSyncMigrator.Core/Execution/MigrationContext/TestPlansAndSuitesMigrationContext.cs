@@ -483,6 +483,10 @@ namespace VstsSyncMigrator.Engine
             targetPlan.StartDate = sourcePlan.StartDate;
             targetPlan.EndDate = sourcePlan.EndDate;
             targetPlan.Description = sourcePlan.Description;
+            if (targetPlan is ITestPlan2)
+            {
+                ((ITestPlan2)targetPlan).Status = ((ITestPlan2)sourcePlan).Status;
+            }
 
             // Set area and iteration to root of the target project.
             // We will set the correct values later, when we actually have a work item available
