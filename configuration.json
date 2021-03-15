@@ -7,9 +7,9 @@
     "Collection": "https://dev.azure.com/nkdagility-preview/",
     "Project": "migrationSource1",
     "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
-    "AuthenticationMode": "Prompt",
+    "AuthenticationMode": "AccessToken",
     "AllowCrossProjectLinking": false,
-    "PersonalAccessToken": "qosss7crwz3vie4fupzpaafjndoy6g6ulgkzhoxtmjgicv2lqjyq",
+    "PersonalAccessToken": "zk5u4xu46ql4uxpik7d54e3tcjirtr6khzru2l4cz5gzoo2tda4q",
     "LanguageMaps": {
       "AreaPath": "Area",
       "IterationPath": "Iteration"
@@ -20,9 +20,9 @@
     "Collection": "https://dev.azure.com/nkdagility-preview/",
     "Project": "migrationTarget1",
     "ReflectedWorkItemIDFieldName": "nkdScrum.ReflectedWorkItemId",
-    "AuthenticationMode": "Prompt",
+    "AuthenticationMode": "AccessToken",
     "AllowCrossProjectLinking": false,
-    "PersonalAccessToken": "qosss7crwz3vie4fupzpaafjndoy6g6ulgkzhoxtmjgicv2lqjyq",
+    "PersonalAccessToken": "zk5u4xu46ql4uxpik7d54e3tcjirtr6khzru2l4cz5gzoo2tda4q",
     "LanguageMaps": {
       "AreaPath": "Area",
       "IterationPath": "Iteration"
@@ -118,12 +118,12 @@
   },
   "GitRepoMapping": null,
   "Processors": [
-    {
-      "$type": "WorkItemDeleteConfig",
-      "Enabled": true,
-      "WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
-      "WIQLOrderBit": "[System.ChangedDate] desc"
-    },
+    //{
+    //  "$type": "WorkItemDeleteConfig",
+    //  "Enabled": true,
+    //  "WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
+    //  "WIQLOrderBit": "[System.ChangedDate] desc"
+    //},
     //{
     //  "$type": "WorkItemMigrationConfig",
     //  "ReplayRevisions": true,
@@ -147,28 +147,34 @@
     //  "CollapseRevisions": false,
     //  "LinkMigrationSaveEachAsAdded": true
     //},
+    //{
+    //  "$type": "WorkItemMigrationConfig",
+    //  "ReplayRevisions": true,
+    //  "PrefixProjectToNodes": false,
+    //  "UpdateCreatedDate": true,
+    //  "UpdateCreatedBy": true,
+    //  "BuildFieldTable": false,
+    //  "AppendMigrationToolSignatureFooter": false,
+    //  "WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
+    //  "WIQLOrderBit": "[System.ChangedDate] desc",
+    //  "Enabled": true,
+    //  "LinkMigration": true,
+    //  "AttachmentMigration": true,
+    //  "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
+    //  "FixHtmlAttachmentLinks": false,
+    //  "SkipToFinalRevisedWorkItemType": true,
+    //  "WorkItemCreateRetryLimit": 5,
+    //  "FilterWorkItemsThatAlreadyExistInTarget": false,
+    //  "PauseAfterEachWorkItem": false,
+    //  "AttachmentMaxSize": 480000000,
+    //  "CollapseRevisions": false,
+    //  "LinkMigrationSaveEachAsAdded": true
+    //},
     {
-      "$type": "WorkItemMigrationConfig",
-      "ReplayRevisions": true,
+      "$type": "TestPlansAndSuitesMigrationConfig",
       "PrefixProjectToNodes": false,
-      "UpdateCreatedDate": true,
-      "UpdateCreatedBy": true,
-      "BuildFieldTable": false,
-      "AppendMigrationToolSignatureFooter": false,
-      "WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
-      "WIQLOrderBit": "[System.ChangedDate] desc",
-      "Enabled": true,
-      "LinkMigration": true,
-      "AttachmentMigration": true,
-      "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
-      "FixHtmlAttachmentLinks": false,
-      "SkipToFinalRevisedWorkItemType": true,
-      "WorkItemCreateRetryLimit": 5,
-      "FilterWorkItemsThatAlreadyExistInTarget": false,
-      "PauseAfterEachWorkItem": false,
-      "AttachmentMaxSize": 480000000,
-      "CollapseRevisions": false,
-      "LinkMigrationSaveEachAsAdded": true
+      "Enabled": true
     }
+
   ]
 }

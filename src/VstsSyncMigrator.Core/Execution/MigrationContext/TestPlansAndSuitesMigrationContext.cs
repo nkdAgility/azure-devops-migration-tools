@@ -730,10 +730,10 @@ namespace VstsSyncMigrator.Engine
                 : $"{sourcePlan.Name}";
             InnerLog(sourcePlan, $"Process Plan {newPlanName}", 0, true);
             var targetPlan = FindTestPlan(_targetTestStore, newPlanName);
-            if (targetPlan != null && TargetPlanContansTag(targetPlan.Id))
-            {
-                return;
-            }
+            //if (targetPlan != null && TargetPlanContansTag(targetPlan.Id))
+            //{
+            //    return;
+            //}
             if (targetPlan == null)
             {
                 InnerLog(sourcePlan, $" Creating Plan {newPlanName}", 5);
@@ -759,6 +759,8 @@ namespace VstsSyncMigrator.Engine
             {
                 InnerLog(sourcePlan, $"Found Plan {newPlanName}", 5); ;
             }
+            targetPlan.Save();
+            targetPlan.Refresh();
             if (HasChildSuites(sourcePlan.RootSuite))
             {
                 __currentSuite = 0;
@@ -769,6 +771,7 @@ namespace VstsSyncMigrator.Engine
                 {
                     __currentSuite++;
                     InnerLog(sourceSuiteChild, $"", 5, true);
+
                     ProcessTestSuite(sourceSuiteChild, targetPlan.RootSuite, targetPlan);
                 }
                 __currentSuite = 0;
@@ -864,6 +867,7 @@ namespace VstsSyncMigrator.Engine
                 {
                     // Apply default configurations, Add to target and Save
                     ApplyDefaultConfigurations(sourceSuite, targetSuiteChild);
+
                     if (targetSuiteChild.Plan == null)
                     {
                         SaveNewTestSuiteToPlan(targetPlan, (IStaticTestSuite)targetParent, targetSuiteChild);
