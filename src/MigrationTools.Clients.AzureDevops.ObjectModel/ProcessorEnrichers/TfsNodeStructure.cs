@@ -10,6 +10,7 @@ using MigrationTools._EngineV1.Clients;
 using MigrationTools.DataContracts;
 using MigrationTools.Endpoints;
 using MigrationTools.Processors;
+using Newtonsoft.Json;
 
 namespace MigrationTools.Enrichers
 {
@@ -283,7 +284,19 @@ namespace MigrationTools.Enrichers
         private void ProcessCommonStructure(string treeTypeSource, string sourceTarget, string treeTypeTarget, string projectTarget)
         {
             Log.LogDebug("NodeStructureEnricher.ProcessCommonStructure({treeTypeSource}, {treeTypeTarget})", treeTypeSource, treeTypeTarget);
-            NodeInfo sourceNode = (from n in _sourceRootNodes where n.Path.Contains(treeTypeSource) select n).Single();
+            var nodes = _sourceRootNodes.Where((n) =>
+            {
+                // (i.e. "\CoolProject\Area" )
+                var startPath = "\\" + this._sourceProjectName + "\\" + treeTypeSource;
+                return n.Path.StartsWith(startPath);
+            });
+            if (nodes.Count() > 1)
+            {
+                Exception ex = new Exception(string.Format("Unable to load Common Structure for Source because more than one node path matches \"{0}\". {1}", treeTypeSource, JsonConvert.SerializeObject(nodes.Select(x => x.Path))));
+                Log.LogError(ex, "Unable to load Common Structure for Source.");
+                throw ex;
+            }
+            NodeInfo sourceNode = nodes.First();
             if (sourceNode == null) // May run into language problems!!! This is to try and detect that
             {
                 Exception ex = new Exception(string.Format("Unable to load Common Structure for Source. This is usually due to diferent language versions. Validate that '{0}' is the correct name in your version. ", treeTypeSource));
