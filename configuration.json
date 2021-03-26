@@ -7,9 +7,9 @@
     "Collection": "https://dev.azure.com/nkdagility-preview/",
     "Project": "migrationSource1",
     "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
-    "AuthenticationMode": "AccessToken",
+    "AuthenticationMode": "Prompt",
     "AllowCrossProjectLinking": false,
-    "PersonalAccessToken": "zk5u4xu46ql4uxpik7d54e3tcjirtr6khzru2l4cz5gzoo2tda4q",
+    "PersonalAccessToken": "qosss7crwz3vie4fupzpaafjndoy6g6ulgkzhoxtmjgicv2lqjyq",
     "LanguageMaps": {
       "AreaPath": "Area",
       "IterationPath": "Iteration"
@@ -20,9 +20,9 @@
     "Collection": "https://dev.azure.com/nkdagility-preview/",
     "Project": "migrationTarget1",
     "ReflectedWorkItemIDFieldName": "nkdScrum.ReflectedWorkItemId",
-    "AuthenticationMode": "AccessToken",
+    "AuthenticationMode": "Prompt",
     "AllowCrossProjectLinking": false,
-    "PersonalAccessToken": "zk5u4xu46ql4uxpik7d54e3tcjirtr6khzru2l4cz5gzoo2tda4q",
+    "PersonalAccessToken": "qosss7crwz3vie4fupzpaafjndoy6g6ulgkzhoxtmjgicv2lqjyq",
     "LanguageMaps": {
       "AreaPath": "Area",
       "IterationPath": "Iteration"
@@ -55,11 +55,21 @@
       "valueMapping": {
         "Approved": "New",
         "New": "New",
+        "Done": "Closed",
+        "Removed": "Removed"
+      }
+    },
+    {
+      "$type": "FieldValueMapConfig",
+      "WorkItemTypeName": "Task",
+      "sourceField": "System.State",
+      "targetField": "System.State",
+      "defaultValue": "New",
+      "valueMapping": {
         "Committed": "Active",
         "In Progress": "Active",
         "To Do": "New",
-        "Done": "Closed",
-        "Removed": "Removed"
+        "Done": "Closed"
       }
     },
     {
@@ -118,12 +128,12 @@
   },
   "GitRepoMapping": null,
   "Processors": [
-    //{
-    //  "$type": "WorkItemDeleteConfig",
-    //  "Enabled": true,
-    //  "WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
-    //  "WIQLOrderBit": "[System.ChangedDate] desc"
-    //},
+    {
+      "$type": "WorkItemDeleteConfig",
+      "Enabled": true,
+      "WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
+      "WIQLOrderBit": "[System.ChangedDate] desc"
+    },
     //{
     //  "$type": "WorkItemMigrationConfig",
     //  "ReplayRevisions": true,
@@ -147,34 +157,28 @@
     //  "CollapseRevisions": false,
     //  "LinkMigrationSaveEachAsAdded": true
     //},
-    //{
-    //  "$type": "WorkItemMigrationConfig",
-    //  "ReplayRevisions": true,
-    //  "PrefixProjectToNodes": false,
-    //  "UpdateCreatedDate": true,
-    //  "UpdateCreatedBy": true,
-    //  "BuildFieldTable": false,
-    //  "AppendMigrationToolSignatureFooter": false,
-    //  "WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
-    //  "WIQLOrderBit": "[System.ChangedDate] desc",
-    //  "Enabled": true,
-    //  "LinkMigration": true,
-    //  "AttachmentMigration": true,
-    //  "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
-    //  "FixHtmlAttachmentLinks": false,
-    //  "SkipToFinalRevisedWorkItemType": true,
-    //  "WorkItemCreateRetryLimit": 5,
-    //  "FilterWorkItemsThatAlreadyExistInTarget": false,
-    //  "PauseAfterEachWorkItem": false,
-    //  "AttachmentMaxSize": 480000000,
-    //  "CollapseRevisions": false,
-    //  "LinkMigrationSaveEachAsAdded": true
-    //},
     {
-      "$type": "TestPlansAndSuitesMigrationConfig",
+      "$type": "WorkItemMigrationConfig",
+      "ReplayRevisions": true,
       "PrefixProjectToNodes": false,
-      "Enabled": true
+      "UpdateCreatedDate": true,
+      "UpdateCreatedBy": true,
+      "BuildFieldTable": false,
+      "AppendMigrationToolSignatureFooter": false,
+      "WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
+      "WIQLOrderBit": "[System.ChangedDate] desc",
+      "Enabled": true,
+      "LinkMigration": true,
+      "AttachmentMigration": true,
+      "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
+      "FixHtmlAttachmentLinks": false,
+      "SkipToFinalRevisedWorkItemType": true,
+      "WorkItemCreateRetryLimit": 5,
+      "FilterWorkItemsThatAlreadyExistInTarget": false,
+      "PauseAfterEachWorkItem": false,
+      "AttachmentMaxSize": 480000000,
+      "CollapseRevisions": false,
+      "LinkMigrationSaveEachAsAdded": true
     }
-
   ]
 }
