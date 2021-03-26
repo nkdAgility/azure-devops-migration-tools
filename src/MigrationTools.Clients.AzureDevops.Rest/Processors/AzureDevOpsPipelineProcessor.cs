@@ -67,7 +67,8 @@ namespace MigrationTools.Processors
         }
 
         /// <summary>
-        /// Executes Method for migrating Taskgroups, Variablegroups or Pipelines, depinding on what is set in the config.
+        /// Executes Method for migrating Taskgroups, Variablegroups or Pipelines, depinding on what
+        /// is set in the config.
         /// </summary>
         private async System.Threading.Tasks.Task MigratePipelinesAsync()
         {
@@ -111,8 +112,9 @@ namespace MigrationTools.Processors
         private IEnumerable<Mapping> FindExistingMappings<DefintionType>(IEnumerable<DefintionType> sourceDefinitions, IEnumerable<DefintionType> targetDefinitions, List<Mapping> newMappings)
             where DefintionType : RestApiDefinition, new()
         {
-            // This is not safe, because the target project can have a taskgroup with the same name but with different content
-            // To make this save we must add a local storage option for the mappings (sid, tid)
+            // This is not safe, because the target project can have a taskgroup with the same name
+            // but with different content To make this save we must add a local storage option for
+            // the mappings (sid, tid)
             var alreadyMigratedMappings = new List<Mapping>();
             var alreadyMigratedDefintions = targetDefinitions.Where(t => newMappings.Any(m => m.TargetId == t.Id) == false).ToList();
             foreach (var item in alreadyMigratedDefintions)
@@ -187,7 +189,7 @@ namespace MigrationTools.Processors
                     }
                 }
 
-                if (VariableGroupMapping is not null)
+                if (VariableGroupMapping is not null && definitionToBeMigrated.VariableGroups is not null)
                 {
                     foreach (var variableGroup in definitionToBeMigrated.VariableGroups)
                     {
@@ -206,7 +208,6 @@ namespace MigrationTools.Processors
                         }
                     }
                 }
-
             }
             var mappings = await Target.CreateApiDefinitionsAsync<BuildDefinition>(definitionsToBeMigrated.ToList());
             mappings.AddRange(FindExistingMappings(sourceDefinitions, targetDefinitions, mappings));
@@ -348,14 +349,14 @@ namespace MigrationTools.Processors
                 {
                     foreach (var WorkflowTask in deployPhase.WorkflowTasks)
                     {
-                        if (WorkflowTask.DefinitionType.ToLower() != "metaTask".ToLower())
+                        if (WorkflowTask.DefinitionType != null && WorkflowTask.DefinitionType.ToLower() != "metaTask".ToLower())
                         {
                             continue;
                         }
                         var mapping = TaskGroupMapping.FirstOrDefault(d => d.SourceId == WorkflowTask.TaskId.ToString());
                         if (mapping == null)
                         {
-                            Log.LogWarning("Can't find taskgroup {TaskGroupId} in the target collection.", WorkflowTask.TaskId);
+                            Log.LogWarning("Can't find taskgroup {TaskGroupName} in the target collection.", WorkflowTask.Name);
                         }
                         else
                         {

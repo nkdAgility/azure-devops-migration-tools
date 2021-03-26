@@ -95,7 +95,7 @@ namespace MigrationTools.Endpoints
             }
             else
             {
-                builder.Query = "api-version=5.1-preview.1";
+                builder.Query = "api-version=5.1-preview";
             }
             return builder;
         }
@@ -103,8 +103,10 @@ namespace MigrationTools.Endpoints
         /// <summary>
         /// Generic Method to get API Definitions (Taskgroups, Variablegroups, Build- or Release Pipelines)
         /// </summary>
-        /// <typeparam name="DefinitionType">Type of Definition. Can be: Taskgroup, Build- or Release Pipeline</typeparam>
-        /// <returns>List of API Definitions </returns>
+        /// <typeparam name="DefinitionType">
+        /// Type of Definition. Can be: Taskgroup, Build- or Release Pipeline
+        /// </typeparam>
+        /// <returns>List of API Definitions</returns>
         public async Task<IEnumerable<DefinitionType>> GetApiDefinitionsAsync<DefinitionType>()
             where DefinitionType : RestApiDefinition, new()
         {
@@ -169,7 +171,7 @@ namespace MigrationTools.Endpoints
                 var responseContent = await result.Content.ReadAsStringAsync();
                 if (result.StatusCode != HttpStatusCode.OK)
                 {
-                    Log.LogError("Error migrating {DefinitionType} {DefinitionName}. Please migrate it manually. {ErrorText}", typeof(DefinitionType).Name, definitionToBeMigrated.Name, responseContent);
+                    Log.LogError("Error migrating {DefinitionType}: {DefinitionName}. Please migrate it manually. {ErrorText}", typeof(DefinitionType).Name, definitionToBeMigrated.Name, responseContent);
                     continue;
                 }
                 else
@@ -181,7 +183,6 @@ namespace MigrationTools.Endpoints
                         SourceId = definitionToBeMigrated.Id,
                         TargetId = targetObject.Id
                     });
-
                 }
             }
             Log.LogInformation("{MigratedCount} of {TriedToMigrate} {DefinitionType}(s) got migrated..", migratedDefinitions.Count, definitionsToBeMigrated.Count(), typeof(DefinitionType).Name);
