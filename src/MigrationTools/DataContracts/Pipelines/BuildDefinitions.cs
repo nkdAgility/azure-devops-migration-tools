@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using Microsoft.VisualStudio.Services.Common;
-using Newtonsoft.Json;
-
 
 namespace MigrationTools.DataContracts.Pipelines
 {
@@ -73,7 +71,6 @@ namespace MigrationTools.DataContracts.Pipelines
             Revision = 0;
             Id = null;
             Project = null;
-            Repository.Id = null;
 
             //Remove secure files
             Process.Phases.ForEach(p => p.Steps.ForEach(s =>
@@ -90,7 +87,7 @@ namespace MigrationTools.DataContracts.Pipelines
 
         public override bool HasTaskGroups()
         {
-            return Process.Phases.Any(p => p.Steps.Any(s => s.Task.DefinitionType.ToString() == "metaTask"));  
+            return Process.Phases.Any(p => p.Steps.Any(s => s.Task.DefinitionType.ToString() == "metaTask"));
         }
 
         public override bool HasVariableGroups()
@@ -305,6 +302,7 @@ namespace MigrationTools.DataContracts.Pipelines
 
     public partial class Properties
     {
+        public string ConnectedServiceId { get; set; }
         public string CleanOptions { get; set; }
 
         public string LabelSources { get; set; }

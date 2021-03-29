@@ -160,12 +160,19 @@ namespace MigrationTools.Processors
 
             var sourceDefinitions = await Source.GetApiDefinitionsAsync<BuildDefinition>();
             var targetDefinitions = await Target.GetApiDefinitionsAsync<BuildDefinition>();
+            var sourceServiceConnections = await Source.GetApiDefinitionsAsync<ServiceConnection>();
+            var targetServiceConnections = await Target.GetApiDefinitionsAsync<ServiceConnection>();
             var definitionsToBeMigrated = FilterOutExistingDefinitions(sourceDefinitions, targetDefinitions);
 
             definitionsToBeMigrated = FilterAwayIfAnyMapsAreMissing(definitionsToBeMigrated, TaskGroupMapping, VariableGroupMapping);
             // Replace taskgroup and variablegroup sIds with tIds
             foreach (var definitionToBeMigrated in definitionsToBeMigrated)
             {
+                var sourceConnectedServiceId = definitionToBeMigrated.Repository.Properties.ConnectedServiceId;
+                var targetConnectedServiceId = targetServiceConnections.FirstOrDefault(s => sourceServiceConnections
+                    .FirstOrDefault(c => c.Id == sourceConnectedServiceId)?.Name == s.Name)?.Id;
+                definitionToBeMigrated.Repository.Properties.ConnectedServiceId = targetConnectedServiceId;
+
                 if (TaskGroupMapping is not null)
                 {
                     foreach (var phase in definitionToBeMigrated.Process.Phases)
