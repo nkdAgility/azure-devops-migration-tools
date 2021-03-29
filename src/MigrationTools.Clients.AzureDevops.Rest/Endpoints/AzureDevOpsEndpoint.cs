@@ -142,10 +142,11 @@ namespace MigrationTools.Endpoints
         }
 
         /// <summary>
-        /// Make HTTP Request to create a Definition
+        /// Make HTTP Request to add Revision / Version of Task Group
         /// </summary>
-        /// <typeparam name="TaskGroup"></typeparam>
-        /// <param name="definitionsToBeMigrated"></param>
+        /// <param name="targetDefinitions"></param>
+        /// <param name="rootDefinitions"></param>
+        /// <param name="updatedDefinitions"></param>
         /// <returns>List of Mappings</returns>
         public async Task<List<Mapping>> UpdateTaskGroupsAsync(IEnumerable<TaskGroup> targetDefinitions, IEnumerable<TaskGroup> rootDefinitions, IEnumerable<TaskGroup> updatedDefinitions)
         {
