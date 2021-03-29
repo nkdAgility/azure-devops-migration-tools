@@ -475,6 +475,7 @@ namespace VstsSyncMigrator.Engine
         {
             ITestSuiteBase targetSuiteChild = _targetTestStore.Project.TestSuites.CreateStatic();
             targetSuiteChild.TestSuiteEntry.Title = source.TestSuiteEntry.Title;
+            targetSuiteChild.State = TestSuiteState.InPlanning;
             if (targetSuiteChild is ITestSuiteBase2)
             {
                 ((ITestSuiteBase2)targetSuiteChild).Status = ((ITestSuiteBase2)source).Status;
