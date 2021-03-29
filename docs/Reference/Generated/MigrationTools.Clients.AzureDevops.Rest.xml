@@ -20,8 +20,19 @@
             <summary>
             Generic Method to get API Definitions (Taskgroups, Variablegroups, Build- or Release Pipelines)
             </summary>
-            <typeparam name="DefinitionType">Type of Definition. Can be: Taskgroup, Build- or Release Pipeline</typeparam>
-            <returns>List of API Definitions </returns>
+            <typeparam name="DefinitionType">
+            Type of Definition. Can be: Taskgroup, Build- or Release Pipeline
+            </typeparam>
+            <returns>List of API Definitions</returns>
+        </member>
+        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.UpdateTaskGroupsAsync(System.Collections.Generic.IEnumerable{MigrationTools.DataContracts.Pipelines.TaskGroup},System.Collections.Generic.IEnumerable{MigrationTools.DataContracts.Pipelines.TaskGroup},System.Collections.Generic.IEnumerable{MigrationTools.DataContracts.Pipelines.TaskGroup})">
+            <summary>
+            Make HTTP Request to add Revision / Version of Task Group
+            </summary>
+            <param name="targetDefinitions"></param>
+            <param name="rootDefinitions"></param>
+            <param name="updatedDefinitions"></param>
+            <returns>List of Mappings</returns>
         </member>
         <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.CreateApiDefinitionsAsync``1(System.Collections.Generic.IEnumerable{``0})">
             <summary>
@@ -38,7 +49,8 @@
         </member>
         <member name="M:MigrationTools.Processors.AzureDevOpsPipelineProcessor.MigratePipelinesAsync">
             <summary>
-            Executes Method for migrating Taskgroups, Variablegroups or Pipelines, depinding on what is set in the config.
+            Executes Method for migrating Taskgroups, Variablegroups or Pipelines, depinding on what
+            is set in the config.
             </summary>
         </member>
         <member name="M:MigrationTools.Processors.AzureDevOpsPipelineProcessor.FindExistingMappings``1(System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.List{MigrationTools.DataContracts.Mapping})">
@@ -59,6 +71,22 @@
             <param name="sourceDefinitions"></param>
             <param name="targetDefinitions"></param>
             <returns>List of filtered Definitions</returns>
+        </member>
+        <member name="M:MigrationTools.Processors.AzureDevOpsPipelineProcessor.FilterOutExistingTaskGroups(System.Collections.Generic.IEnumerable{MigrationTools.DataContracts.Pipelines.TaskGroup},System.Collections.Generic.IEnumerable{MigrationTools.DataContracts.Pipelines.TaskGroup})">
+            <summary>
+            Filter existing TaskGroups
+            </summary>
+            <typeparam name="DefinitionType"></typeparam>
+            <param name="sourceDefinitions"></param>
+            <param name="targetDefinitions"></param>
+            <returns>List of filtered Definitions</returns>
+        </member>
+        <member name="M:MigrationTools.Processors.AzureDevOpsPipelineProcessor.SortDefinitionsByVersion(System.Collections.Generic.IEnumerable{MigrationTools.DataContracts.Pipelines.TaskGroup})">
+            <summary>
+            Group and Sort Definitions by Version numer
+            </summary>
+            <param name="sourceDefinitions"></param>
+            <returns>List of sorted Definitions</returns>
         </member>
         <member name="P:MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions.MigrateBuildPipelines">
             <summary>
