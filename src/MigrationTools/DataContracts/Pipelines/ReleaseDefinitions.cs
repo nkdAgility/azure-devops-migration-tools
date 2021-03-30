@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
-using Microsoft.VisualStudio.Services.Common;
 using Newtonsoft.Json;
 
 namespace MigrationTools.DataContracts.Pipelines
@@ -48,17 +47,15 @@ namespace MigrationTools.DataContracts.Pipelines
         ///<inheritdoc/>
         public override void ResetObject()
         {
+            SetSourceId(Id);
             Source = "restApi";
             Revision = 1;
-
             Links = null;
-
             Artifacts = null;
             Url = null;
             Links = null;
             Id = "0";
             Triggers = null;
-
             PipelineProcess = null;
 
             foreach (var env in Environments)
@@ -199,7 +196,7 @@ namespace MigrationTools.DataContracts.Pipelines
             Owner = null;
             BadgeUrl = null;
             CurrentRelease = null;
-            
+
             foreach (var deployPhase in DeployPhases)
             {
                 deployPhase.ResetObject();

@@ -80,13 +80,13 @@ namespace MigrationTools.Processors
             {
                 serviceConnectionMappings = await CreateServiceConnectionsAsync();
             }
-            if (_Options.MigrateTaskGroups)
-            {
-                taskGroupMappings = await CreateTaskGroupDefinitionsAsync();
-            }
             if (_Options.MigrateVariableGroups)
             {
                 variableGroupMappings = await CreateVariableGroupDefinitionsAsync();
+            }
+            if (_Options.MigrateTaskGroups)
+            {
+                taskGroupMappings = await CreateTaskGroupDefinitionsAsync();
             }
             if (_Options.MigrateBuildPipelines)
             {

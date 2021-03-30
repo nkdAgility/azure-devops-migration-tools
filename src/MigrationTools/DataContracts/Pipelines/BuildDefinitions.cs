@@ -63,6 +63,7 @@ namespace MigrationTools.DataContracts.Pipelines
         ///<inheritdoc/>
         public override void ResetObject()
         {
+            SetSourceId(Id);
             Links = null;
             AuthoredBy = null;
             Queue = null;

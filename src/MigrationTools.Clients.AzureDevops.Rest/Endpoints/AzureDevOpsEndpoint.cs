@@ -290,7 +290,7 @@ namespace MigrationTools.Endpoints
                     migratedDefinitions.Add(new Mapping()
                     {
                         Name = definitionToBeMigrated.Name,
-                        SourceId = definitionToBeMigrated.Id,
+                        SourceId = definitionToBeMigrated.GetSourceId(),
                         TargetId = targetObject.Id
                     });
                 }
