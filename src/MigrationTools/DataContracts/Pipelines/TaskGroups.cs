@@ -99,6 +99,7 @@ namespace MigrationTools.DataContracts.Pipelines
 
         public override void ResetObject()
         {
+            SetSourceId(Id);
             Revision = 0;
         }
     }
