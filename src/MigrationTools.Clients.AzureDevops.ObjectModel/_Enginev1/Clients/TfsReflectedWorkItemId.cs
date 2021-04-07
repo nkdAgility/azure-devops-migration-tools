@@ -24,6 +24,18 @@ namespace MigrationTools._EngineV1.Clients
             _Connection = workItem.ToWorkItem().Store.TeamProjectCollection.Uri;
         }
 
+        public TfsReflectedWorkItemId(int workItemId, string tfsProject, Uri tfsTeamProjectCollection) : base(workItemId)
+        {
+            if (workItemId == 0)
+            {
+                throw new ArgumentNullException(nameof(workItemId));
+            }
+
+            _WorkItemId = workItemId.ToString();
+            _ProjectName = tfsProject;
+            _Connection = tfsTeamProjectCollection;
+        }
+
         public TfsReflectedWorkItemId(string ReflectedWorkItemId) : base(ReflectedWorkItemId)
         {
             if (ReflectedWorkItemId is null)

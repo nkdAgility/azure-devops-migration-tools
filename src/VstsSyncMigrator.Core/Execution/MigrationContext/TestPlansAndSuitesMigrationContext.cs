@@ -9,6 +9,7 @@ using Microsoft.TeamFoundation.Framework.Client;
 using Microsoft.TeamFoundation.Framework.Common;
 using Microsoft.TeamFoundation.TestManagement.Client;
 using MigrationTools;
+using MigrationTools._EngineV1.Clients;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Configuration.Processing;
 using MigrationTools._EngineV1.Processors;
@@ -613,7 +614,8 @@ namespace VstsSyncMigrator.Engine
                     foreach (Match match in matches)
                     {
                         var qid = match.Value.Split('=')[1].Trim();
-                        var targetWi = Engine.Target.WorkItems.FindReflectedWorkItemByReflectedWorkItemId(qid);
+                        var reflectedString = new TfsReflectedWorkItemId(int.Parse(qid), Engine.Source.Config.AsTeamProjectConfig().Project, Engine.Source.Config.AsTeamProjectConfig().Collection);
+                        var targetWi = Engine.Target.WorkItems.FindReflectedWorkItemByReflectedWorkItemId(reflectedString);
 
                         if (targetWi == null)
                         {

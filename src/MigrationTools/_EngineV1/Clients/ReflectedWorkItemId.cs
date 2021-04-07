@@ -5,7 +5,6 @@ namespace MigrationTools._EngineV1.Clients
 {
     public abstract class ReflectedWorkItemId
     {
-
         public ReflectedWorkItemId(WorkItemData workItem)
         {
             if (workItem is null)
@@ -23,6 +22,15 @@ namespace MigrationTools._EngineV1.Clients
                 throw new ArgumentNullException(nameof(ReflectedWorkItemId));
             }
             WorkItemId = ReflectedWorkItemId;
+        }
+
+        public ReflectedWorkItemId(int ReflectedWorkItemId)
+        {
+            if (ReflectedWorkItemId == 0)
+            {
+                throw new ArgumentNullException(nameof(ReflectedWorkItemId));
+            }
+            WorkItemId = ReflectedWorkItemId.ToString();
         }
 
         public override string ToString()
