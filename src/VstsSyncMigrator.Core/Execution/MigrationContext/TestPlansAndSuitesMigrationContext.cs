@@ -614,8 +614,8 @@ namespace VstsSyncMigrator.Engine
                     foreach (Match match in matches)
                     {
                         var qid = match.Value.Split('=')[1].Trim();
-                        var reflectedString = new TfsReflectedWorkItemId(int.Parse(qid), Engine.Source.Config.AsTeamProjectConfig().Project, Engine.Source.Config.AsTeamProjectConfig().Collection);
-                        var targetWi = Engine.Target.WorkItems.FindReflectedWorkItemByReflectedWorkItemId(reflectedString);
+                        TfsReflectedWorkItemId reflectedString = new TfsReflectedWorkItemId(int.Parse(qid), Engine.Source.Config.AsTeamProjectConfig().Project, Engine.Source.Config.AsTeamProjectConfig().Collection);
+                        var targetWi = Engine.Target.WorkItems.FindReflectedWorkItemByReflectedWorkItemId(reflectedString.ToString());
 
                         if (targetWi == null)
                         {
