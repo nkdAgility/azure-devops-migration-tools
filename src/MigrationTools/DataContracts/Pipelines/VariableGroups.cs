@@ -1,10 +1,8 @@
-﻿using System;
-using System.Dynamic;
+﻿using System.Dynamic;
 using Microsoft.Extensions.Logging;
 
 namespace MigrationTools.DataContracts.Pipelines
 {
-
     [ApiPath("distributedtask/variablegroups")]
     [ApiName("Variable Groups")]
     public class VariableGroups : RestApiDefinition
@@ -35,6 +33,7 @@ namespace MigrationTools.DataContracts.Pipelines
 
         public override void ResetObject()
         {
+            SetSourceId(Id);
             Id = "0";
             CreatedBy = null;
             CreatedOn = null;

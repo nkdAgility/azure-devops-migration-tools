@@ -80,13 +80,13 @@ namespace MigrationTools.Processors
             {
                 serviceConnectionMappings = await CreateServiceConnectionsAsync();
             }
-            if (_Options.MigrateTaskGroups)
-            {
-                taskGroupMappings = await CreateTaskGroupDefinitionsAsync();
-            }
             if (_Options.MigrateVariableGroups)
             {
                 variableGroupMappings = await CreateVariableGroupDefinitionsAsync();
+            }
+            if (_Options.MigrateTaskGroups)
+            {
+                taskGroupMappings = await CreateTaskGroupDefinitionsAsync();
             }
             if (_Options.MigrateBuildPipelines)
             {
@@ -154,18 +154,57 @@ namespace MigrationTools.Processors
             return objectsToMigrate;
         }
 
+        /// <summary>
+        /// Filter existing TaskGroups
+        /// </summary>
+        /// <typeparam name="DefinitionType"></typeparam>
+        /// <param name="sourceDefinitions"></param>
+        /// <param name="targetDefinitions"></param>
+        /// <returns>List of filtered Definitions</returns>
+        private IEnumerable<TaskGroup> FilterOutExistingTaskGroups(IEnumerable<TaskGroup> sourceDefinitions, IEnumerable<TaskGroup> targetDefinitions)
+        {
+            var objectsToMigrate = sourceDefinitions.Where(s => !targetDefinitions.Any(t => t.Name == s.Name));
+            var rootSourceDefinitions = SortDefinitionsByVersion(objectsToMigrate).First();
+            Log.LogInformation("{ObjectsToBeMigrated} of {TotalObjects} source {DefinitionType}(s) are going to be migrated..", objectsToMigrate.GroupBy(o => o.Name).Where(o => o.Count() >= 1).Count(), rootSourceDefinitions.Count(), typeof(TaskGroup).Name);
+            return objectsToMigrate;
+        }
+
+        /// <summary>
+        /// Group and Sort Definitions by Version numer
+        /// </summary>
+        /// <param name="sourceDefinitions"></param>
+        /// <returns>List of sorted Definitions</returns>
+        private IEnumerable<IEnumerable<TaskGroup>> SortDefinitionsByVersion(IEnumerable<TaskGroup> sourceDefinitions)
+        {
+            var groupList = new List<IEnumerable<TaskGroup>>();
+            sourceDefinitions.OrderBy(d => d.Version.Major);
+            var rootGroups = sourceDefinitions.Where(d => d.Version.Major == 1);
+            var updatedGroups = sourceDefinitions.Where(d => d.Version.Major > 1);
+            groupList.Add(rootGroups);
+            groupList.Add(updatedGroups);
+
+            return groupList;
+        }
+
         private async Task<IEnumerable<Mapping>> CreateBuildPipelinesAsync(IEnumerable<Mapping> TaskGroupMapping = null, IEnumerable<Mapping> VariableGroupMapping = null)
         {
             Log.LogInformation("Processing Build Pipelines..");
 
             var sourceDefinitions = await Source.GetApiDefinitionsAsync<BuildDefinition>();
             var targetDefinitions = await Target.GetApiDefinitionsAsync<BuildDefinition>();
+            var sourceServiceConnections = await Source.GetApiDefinitionsAsync<ServiceConnection>();
+            var targetServiceConnections = await Target.GetApiDefinitionsAsync<ServiceConnection>();
             var definitionsToBeMigrated = FilterOutExistingDefinitions(sourceDefinitions, targetDefinitions);
 
             definitionsToBeMigrated = FilterAwayIfAnyMapsAreMissing(definitionsToBeMigrated, TaskGroupMapping, VariableGroupMapping);
             // Replace taskgroup and variablegroup sIds with tIds
             foreach (var definitionToBeMigrated in definitionsToBeMigrated)
             {
+                var sourceConnectedServiceId = definitionToBeMigrated.Repository.Properties.ConnectedServiceId;
+                var targetConnectedServiceId = targetServiceConnections.FirstOrDefault(s => sourceServiceConnections
+                    .FirstOrDefault(c => c.Id == sourceConnectedServiceId)?.Name == s.Name)?.Id;
+                definitionToBeMigrated.Repository.Properties.ConnectedServiceId = targetConnectedServiceId;
+
                 if (TaskGroupMapping is not null)
                 {
                     foreach (var phase in definitionToBeMigrated.Process.Phases)
@@ -402,8 +441,18 @@ namespace MigrationTools.Processors
 
             var sourceDefinitions = await Source.GetApiDefinitionsAsync<TaskGroup>();
             var targetDefinitions = await Target.GetApiDefinitionsAsync<TaskGroup>();
-            var mappings = await Target.CreateApiDefinitionsAsync(FilterOutExistingDefinitions(sourceDefinitions, targetDefinitions));
-            mappings.AddRange(FindExistingMappings(sourceDefinitions, targetDefinitions, mappings));
+            var filteredTaskGroups = FilterOutExistingTaskGroups(sourceDefinitions, targetDefinitions);
+            var rootSourceDefinitions = SortDefinitionsByVersion(filteredTaskGroups).First();
+            var updatedSourceDefinitions = SortDefinitionsByVersion(filteredTaskGroups).Last();
+
+            var mappings = await Target.CreateApiDefinitionsAsync(rootSourceDefinitions);
+
+            targetDefinitions = await Target.GetApiDefinitionsAsync<TaskGroup>();
+            var rootTargetDefinitions = SortDefinitionsByVersion(targetDefinitions).First();
+            await Target.UpdateTaskGroupsAsync(targetDefinitions, rootTargetDefinitions, updatedSourceDefinitions);
+
+            targetDefinitions = await Target.GetApiDefinitionsAsync<TaskGroup>();
+            mappings.AddRange(FindExistingMappings(sourceDefinitions, targetDefinitions.Where(d => d.Name != null), mappings));
             return mappings;
         }
 

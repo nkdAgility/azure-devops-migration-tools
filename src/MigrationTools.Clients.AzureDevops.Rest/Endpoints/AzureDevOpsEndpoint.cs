@@ -7,7 +7,9 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.VisualStudio.Services.WebApi;
 using MigrationTools.DataContracts;
+using MigrationTools.DataContracts.Pipelines;
 using MigrationTools.EndpointEnrichers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -49,11 +51,12 @@ namespace MigrationTools.Endpoints
             where DefinitionType : RestApiDefinition
         {
             UriBuilder baseUrl = GetUriBuilderBasedOnEndpointAndType<DefinitionType>();
-
+            var versionParameter = baseUrl.Query.Replace("?", "");
             HttpClient client = new HttpClient();
-            client.BaseAddress = baseUrl.Uri;
+
+            client.BaseAddress = new Uri(baseUrl.Uri.AbsoluteUri.ToString().Replace(baseUrl.Query, ""));
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes(string.Format("{0}:{1}", "", Options.AccessToken))));
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            client.DefaultRequestHeaders.Add("Accept", $"application/json; {versionParameter}");
             client.DefaultRequestHeaders.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
 
             return client;
@@ -73,7 +76,7 @@ namespace MigrationTools.Endpoints
                 throw new ArgumentNullException($"On the class defintion of '{typeof(DefinitionType).Name}' is the attribute 'ApiName' misssing. Please add the 'ApiName' Attribute to your class");
             }
             var builder = new UriBuilder(Options.Organisation);
-            builder.Path += Options.Project + "/_apis/" + apiPathAttribute.Path + "/";
+            builder.Path += "/" + Options.Project + "/_apis/" + apiPathAttribute.Path + "/";
 
             if (apiNameAttribute.Name == "Release Piplines")
             {
@@ -112,7 +115,7 @@ namespace MigrationTools.Endpoints
         {
             var initialDefinitions = new List<DefinitionType>();
 
-            HttpClient client = GetHttpClient<DefinitionType>();
+            var client = GetHttpClient<DefinitionType>();
             var httpResponse = await client.GetAsync("");
 
             if (httpResponse != null)
@@ -125,7 +128,7 @@ namespace MigrationTools.Endpoints
                     foreach (RestApiDefinition definition in definitions.Value)
                     {
                         // Nessecary because getting all Pipelines doesn't include all of their properties
-                        var response = await client.GetAsync(definition.Id);
+                        var response = await client.GetAsync(client.BaseAddress + "/" + definition.Id);
                         var fullDefinition = await response.Content.ReadAsAsync<DefinitionType>();
                         initialDefinitions.Add(fullDefinition);
                     }
@@ -136,6 +139,113 @@ namespace MigrationTools.Endpoints
                 }
             }
             return initialDefinitions;
+        }
+
+        /// <summary>
+        /// Make HTTP Request to add Revision / Version of Task Group
+        /// </summary>
+        /// <param name="targetDefinitions"></param>
+        /// <param name="rootDefinitions"></param>
+        /// <param name="updatedDefinitions"></param>
+        /// <returns>List of Mappings</returns>
+        public async Task<List<Mapping>> UpdateTaskGroupsAsync(IEnumerable<TaskGroup> targetDefinitions, IEnumerable<TaskGroup> rootDefinitions, IEnumerable<TaskGroup> updatedDefinitions)
+        {
+            var migratedDefinitions = new List<Mapping>();
+            foreach (var definitionToBeMigrated in updatedDefinitions)
+            {
+                var relatedRootDefinition = rootDefinitions.FirstOrDefault(d => definitionToBeMigrated.Name == d.Name);
+                var taskGroupId = rootDefinitions.FirstOrDefault(d => definitionToBeMigrated.Name == d.Name).Id;
+                definitionToBeMigrated.ParentDefinitionId = taskGroupId;
+                definitionToBeMigrated.Version.IsTest = true;
+
+                var client = GetHttpClient<TaskGroup>();
+                definitionToBeMigrated.ResetObject();
+
+                DefaultContractResolver contractResolver = new DefaultContractResolver
+                {
+                    NamingStrategy = new CamelCaseNamingStrategy()
+                };
+                var jsonSettings = new JsonSerializerSettings
+                {
+                    NullValueHandling = NullValueHandling.Ignore,
+                    ContractResolver = contractResolver,
+                };
+                string body = JsonConvert.SerializeObject(definitionToBeMigrated, jsonSettings);
+
+                var content = new StringContent(body, Encoding.UTF8, "application/json");
+                var result = await client.PostAsync(client.BaseAddress, content);
+
+                var responseContent = await result.Content.ReadAsStringAsync();
+                if (result.StatusCode != HttpStatusCode.OK)
+                {
+                    Log.LogError("Error migrating {DefinitionType}: {DefinitionName}. Please migrate it manually. {ErrorText}", typeof(TaskGroup).Name, definitionToBeMigrated.Name, responseContent);
+                    continue;
+                }
+                else
+                {
+                    var tempTaskGroup = new TaskGroup()
+                    {
+                        Comment = "Draft published as preview ",
+                        ParentDefinitionRevision = relatedRootDefinition.Revision,
+                        Preview = true,
+                        TaskGroupId = JsonConvert.DeserializeObject<TaskGroup>(responseContent).Id,
+                        TaskGroupRevision = 1
+                    };
+
+                    body = JsonConvert.SerializeObject(tempTaskGroup, jsonSettings);
+
+                    content = new StringContent(body, Encoding.UTF8, "application/json");
+                    result = await client.PutAsync(client.BaseAddress.ToString() + $"?parentTaskGroupId={taskGroupId}", content);
+
+                    responseContent = await result.Content.ReadAsStringAsync();
+                    if (result.StatusCode != HttpStatusCode.OK)
+                    {
+                        Log.LogError("Error migrating {DefinitionType}: {DefinitionName}. Please migrate it manually. {ErrorText}", typeof(TaskGroup).Name, definitionToBeMigrated.Name, responseContent);
+                        continue;
+                    }
+                    else
+                    {
+                        relatedRootDefinition.Revision += 1;
+                        tempTaskGroup = new TaskGroup()
+                        {
+                            Comment = "Published TaskGroup",
+                            Revision = relatedRootDefinition.Revision,
+                            Preview = false,
+                            Version = new DataContracts.Pipelines.Version
+                            {
+                                Major = definitionToBeMigrated.Version.Major,
+                                Minor = definitionToBeMigrated.Version.Minor,
+                                Patch = definitionToBeMigrated.Version.Patch,
+                                IsTest = false
+                            }
+                        };
+
+                        body = JsonConvert.SerializeObject(tempTaskGroup, jsonSettings);
+
+                        content = new StringContent(body, Encoding.UTF8, "application/json");
+                        result = await client.PatchAsync(client.BaseAddress + $"/{taskGroupId}?disablePriorVersions=false", content);
+
+                        responseContent = await result.Content.ReadAsStringAsync();
+                        if (result.StatusCode != HttpStatusCode.OK)
+                        {
+                            Log.LogError("Error migrating {DefinitionType}: {DefinitionName}. Please migrate it manually. {ErrorText}", typeof(TaskGroup).Name, definitionToBeMigrated.Name, responseContent);
+                            continue;
+                        }
+                        else
+                        {
+                            var targetObject = JsonConvert.DeserializeObject<TaskGroup>(responseContent);
+                            migratedDefinitions.Add(new Mapping()
+                            {
+                                Name = definitionToBeMigrated.Name,
+                                SourceId = definitionToBeMigrated.Id,
+                                TargetId = targetObject.Id
+                            });
+                        }
+                    }
+                }
+                Log.LogInformation("{RevisionCount} of {TriedToMigrate} Revisions from {DefinitionName} got migrated..", migratedDefinitions.Count, updatedDefinitions.Count(), definitionToBeMigrated.Name);
+            }
+            return migratedDefinitions;
         }
 
         /// <summary>
@@ -166,7 +276,7 @@ namespace MigrationTools.Endpoints
                 string body = JsonConvert.SerializeObject(definitionToBeMigrated, jsonSettings);
 
                 var content = new StringContent(body, Encoding.UTF8, "application/json");
-                var result = await client.PostAsync("", content);
+                var result = await client.PostAsync(client.BaseAddress, content);
 
                 var responseContent = await result.Content.ReadAsStringAsync();
                 if (result.StatusCode != HttpStatusCode.OK)
@@ -180,7 +290,7 @@ namespace MigrationTools.Endpoints
                     migratedDefinitions.Add(new Mapping()
                     {
                         Name = definitionToBeMigrated.Name,
-                        SourceId = definitionToBeMigrated.Id,
+                        SourceId = definitionToBeMigrated.GetSourceId(),
                         TargetId = targetObject.Id
                     });
                 }

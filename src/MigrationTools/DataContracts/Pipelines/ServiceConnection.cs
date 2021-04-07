@@ -1,17 +1,10 @@
 ﻿using System;
-using System.Dynamic;
-using System.Globalization;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Microsoft.VisualStudio.Services.Servicing.Client;
-using Microsoft.VisualStudio.Services.ServiceEndpoints.WebApi;
-using Microsoft.VisualStudio.Services.Common.Internal;
-using System.Runtime.Serialization;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
+using Microsoft.VisualStudio.Services.Common.Internal;
+using Microsoft.VisualStudio.Services.ServiceEndpoints.WebApi;
 using Microsoft.VisualStudio.Services.WebApi;
 using Newtonsoft.Json.Linq;
-using System.Collections;
 
 namespace MigrationTools.DataContracts.Pipelines
 {
@@ -22,9 +15,7 @@ namespace MigrationTools.DataContracts.Pipelines
         [DataMember(EmitDefaultValue = false, Name = "Data")]
         private Dictionary<string, string> m_data;
 
-        //
-        // Summary:
-        //     Gets or sets the type of the endpoint.
+        // Summary: Gets or sets the type of the endpoint.
         [DataMember(EmitDefaultValue = false)]
         public string Type
         {
@@ -32,9 +23,7 @@ namespace MigrationTools.DataContracts.Pipelines
             set;
         }
 
-        //
-        // Summary:
-        //     Gets or sets the url of the endpoint.
+        // Summary: Gets or sets the url of the endpoint.
         [DataMember(EmitDefaultValue = false)]
         public Uri Url
         {
@@ -42,9 +31,7 @@ namespace MigrationTools.DataContracts.Pipelines
             set;
         }
 
-        //
-        // Summary:
-        //     Gets or sets the identity reference for the user who created the Service endpoint.
+        // Summary: Gets or sets the identity reference for the user who created the Service endpoint.
         [DataMember(EmitDefaultValue = false)]
         public IdentityRef CreatedBy
         {
@@ -52,9 +39,7 @@ namespace MigrationTools.DataContracts.Pipelines
             set;
         }
 
-        //
-        // Summary:
-        //     Gets or sets the description of endpoint.
+        // Summary: Gets or sets the description of endpoint.
         [DataMember(EmitDefaultValue = false)]
         public string Description
         {
@@ -62,9 +47,7 @@ namespace MigrationTools.DataContracts.Pipelines
             set;
         }
 
-        //
-        // Summary:
-        //     Gets or sets the authorization data for talking to the endpoint.
+        // Summary: Gets or sets the authorization data for talking to the endpoint.
         [DataMember(EmitDefaultValue = false)]
         public EndpointAuthorization Authorization
         {
@@ -72,9 +55,7 @@ namespace MigrationTools.DataContracts.Pipelines
             set;
         }
 
-        //
-        // Summary:
-        //     This is a deprecated field.
+        // Summary: This is a deprecated field.
         [DataMember(EmitDefaultValue = false)]
         public Guid GroupScopeId
         {
@@ -82,10 +63,7 @@ namespace MigrationTools.DataContracts.Pipelines
             internal set;
         }
 
-        //
-        // Summary:
-        //     Gets or sets the identity reference for the administrators group of the service
-        //     endpoint.
+        // Summary: Gets or sets the identity reference for the administrators group of the service endpoint.
         [DataMember(EmitDefaultValue = false)]
         public IdentityRef AdministratorsGroup
         {
@@ -93,9 +71,7 @@ namespace MigrationTools.DataContracts.Pipelines
             internal set;
         }
 
-        //
-        // Summary:
-        //     Gets or sets the identity reference for the readers group of the service endpoint.
+        // Summary: Gets or sets the identity reference for the readers group of the service endpoint.
         [DataMember(EmitDefaultValue = false)]
         public IdentityRef ReadersGroup
         {
@@ -103,9 +79,7 @@ namespace MigrationTools.DataContracts.Pipelines
             internal set;
         }
 
-        //
-        // Summary:
-        //     Gets the custom data associated with this endpoint.
+        // Summary: Gets the custom data associated with this endpoint.
         public IDictionary<string, string> Data
         {
             get
@@ -121,9 +95,7 @@ namespace MigrationTools.DataContracts.Pipelines
             }
         }
 
-        //
-        // Summary:
-        //     Indicates whether service endpoint is shared with other projects or not.
+        // Summary: Indicates whether service endpoint is shared with other projects or not.
         [DataMember(EmitDefaultValue = true)]
         public bool IsShared
         {
@@ -131,9 +103,7 @@ namespace MigrationTools.DataContracts.Pipelines
             set;
         }
 
-        //
-        // Summary:
-        //     EndPoint state indicator
+        // Summary: EndPoint state indicator
         [DataMember(EmitDefaultValue = true)]
         public bool IsReady
         {
@@ -141,9 +111,7 @@ namespace MigrationTools.DataContracts.Pipelines
             set;
         }
 
-        //
-        // Summary:
-        //     Error message during creation/deletion of endpoint
+        // Summary: Error message during creation/deletion of endpoint
         [DataMember(EmitDefaultValue = false)]
         public JObject OperationStatus
         {
@@ -151,9 +119,7 @@ namespace MigrationTools.DataContracts.Pipelines
             set;
         }
 
-        //
-        // Summary:
-        //     Owner of the endpoint Supported values are "library", "agentcloud"
+        // Summary: Owner of the endpoint Supported values are "library", "agentcloud"
         [DataMember(EmitDefaultValue = false)]
         public string Owner
         {
@@ -201,8 +167,11 @@ namespace MigrationTools.DataContracts.Pipelines
 
             return true;
         }
+
         public override void ResetObject()
         {
+            SetSourceId(Id);
+
             //Replace null Keys since it can't be null
             var parameters = Authorization.Parameters;
             bool hasNullKey = false;
@@ -235,5 +204,4 @@ namespace MigrationTools.DataContracts.Pipelines
             return false;
         }
     }
-
 }

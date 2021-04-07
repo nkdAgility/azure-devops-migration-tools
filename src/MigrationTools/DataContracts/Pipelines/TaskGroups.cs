@@ -11,6 +11,12 @@ namespace MigrationTools.DataContracts.Pipelines
     [ApiName("Task Groups")]
     public partial class TaskGroup : RestApiDefinition
     {
+        public string ParentDefinitionId { get; set; }
+        public string TaskGroupId { get; set; }
+        public long ParentDefinitionRevision { get; set; }
+        public long TaskGroupRevision { get; set; }
+        public bool Preview { get; set; }
+
         protected ILogger Log { get; }
 
         public TaskElement[] Tasks { get; set; }
@@ -93,6 +99,8 @@ namespace MigrationTools.DataContracts.Pipelines
 
         public override void ResetObject()
         {
+            SetSourceId(Id);
+            Revision = 0;
         }
     }
 
@@ -175,7 +183,7 @@ namespace MigrationTools.DataContracts.Pipelines
 
         public long Patch { get; set; }
 
-        public bool IsTest { get; set; }
+        public bool IsTest { get; set; } = false;
     }
 
     internal static class Converter
