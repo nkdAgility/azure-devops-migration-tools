@@ -1,0 +1,35 @@
+{
+  "$type": "TfsAreaAndIterationProcessorOptions",
+  "Enabled": false,
+  "PrefixProjectToNodes": false,
+  "NodeBasePaths": null,
+  "ProcessorEnrichers": null,
+  "Source": {
+    "$type": "TfsEndpointOptions",
+    "Organisation": "https://dev.azure.com/nkdagility-preview/",
+    "Project": "sourceProject",
+    "AuthenticationMode": "AccessToken",
+    "AccessToken": "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
+    "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
+    "LanguageMaps": {
+      "$type": "TfsLanguageMapOptions",
+      "AreaPath": "Area",
+      "IterationPath": "Iteration"
+    },
+    "EndpointEnrichers": null
+  },
+  "Target": {
+    "$type": "TfsEndpointOptions",
+    "Organisation": "https://dev.azure.com/nkdagility-preview/",
+    "Project": "targetProject",
+    "AuthenticationMode": "AccessToken",
+    "AccessToken": "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
+    "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
+    "LanguageMaps": {
+      "$type": "TfsLanguageMapOptions",
+      "AreaPath": "Area",
+      "IterationPath": "Iteration"
+    },
+    "EndpointEnrichers": null
+  }
+}

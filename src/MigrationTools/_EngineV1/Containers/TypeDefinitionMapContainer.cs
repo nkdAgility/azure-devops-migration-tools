@@ -1,19 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MigrationTools._EngineV1.Configuration;
-using Serilog;
 
 namespace MigrationTools._EngineV1.Containers
 {
     public class TypeDefinitionMapContainer : EngineContainer<ReadOnlyDictionary<string, IWitdMapper>>
     {
         private Dictionary<string, IWitdMapper> _TypeDefinitions = new Dictionary<string, IWitdMapper>();
+        private readonly ILogger<TypeDefinitionMapContainer> _logger;
 
         public override ReadOnlyDictionary<string, IWitdMapper> Items { get { return new ReadOnlyDictionary<string, IWitdMapper>(_TypeDefinitions); } }
 
-        public TypeDefinitionMapContainer(IServiceProvider services, EngineConfiguration config) : base(services, config)
+        public TypeDefinitionMapContainer(IServiceProvider services, IOptions<EngineConfiguration> config, ILogger<TypeDefinitionMapContainer> logger) : base(services, config)
         {
+            _logger = logger;
         }
 
         protected override void Configure()
@@ -31,7 +34,7 @@ namespace MigrationTools._EngineV1.Containers
         {
             if (!_TypeDefinitions.ContainsKey(workItemTypeName))
             {
-                Log.Debug("TypeDefinitionMapContainer: Adding Work Item Type {WorkItemType}", workItemTypeName);
+                _logger.LogDebug("TypeDefinitionMapContainer: Adding Work Item Type {WorkItemType}", workItemTypeName);
                 _TypeDefinitions.Add(workItemTypeName, workItemTypeDefinitionMap);
             }
         }

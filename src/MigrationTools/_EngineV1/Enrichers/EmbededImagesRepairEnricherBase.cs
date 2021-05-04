@@ -5,7 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using Microsoft.Extensions.Logging;
-using MigrationTools._EngineV1.DataContracts;
+using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
 
 namespace MigrationTools._EngineV1.Enrichers
@@ -18,13 +18,15 @@ namespace MigrationTools._EngineV1.Enrichers
       *  from https://gist.github.com/pietergheysens/792ed505f09557e77ddfc1b83531e4fb
       */
 
-        public EmbededImagesRepairEnricherBase(IMigrationEngine engine, ILogger<EmbededImagesRepairEnricherBase> logger) : base(engine, logger)
+        public EmbededImagesRepairEnricherBase(IServiceProvider services, ILogger<EmbededImagesRepairEnricherBase> logger) : base(services, logger)
         {
             _httpClientHandler = new HttpClientHandler { AllowAutoRedirect = false, UseDefaultCredentials = true, AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate };
         }
 
+        [Obsolete]
         public override abstract void Configure(bool save = true, bool filter = true);
 
+        [Obsolete]
         public override abstract int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem);
 
         protected abstract void FixEmbededImages(WorkItemData wi, string oldTfsurl, string newTfsurl, string sourcePersonalAccessToken = "");

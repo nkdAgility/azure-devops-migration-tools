@@ -2,18 +2,21 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MigrationTools._EngineV1.Configuration;
-using MigrationTools._EngineV1.DataContracts;
-using Serilog;
+using MigrationTools.DataContracts;
 
 namespace MigrationTools._EngineV1.Containers
 {
     public class FieldMapContainer : EngineContainer<Dictionary<string, List<IFieldMap>>>
     {
         private Dictionary<string, List<IFieldMap>> fieldMapps = new Dictionary<string, List<IFieldMap>>();
+        private readonly ILogger<FieldMapContainer> _logger;
 
-        public FieldMapContainer(IServiceProvider services, EngineConfiguration config) : base(services, config)
+        public FieldMapContainer(IServiceProvider services, IOptions<EngineConfiguration> config, ILogger<FieldMapContainer> logger) : base(services, config)
         {
+            _logger = logger;
         }
 
         public int Count { get { return fieldMapps.Count; } }
@@ -29,7 +32,7 @@ namespace MigrationTools._EngineV1.Containers
             {
                 foreach (IFieldMapConfig fieldmapConfig in Config.FieldMaps)
                 {
-                    Log.Information("FieldMapContainer: Adding FieldMap {FieldMapName} for {WorkItemTypeName}", fieldmapConfig.FieldMap, fieldmapConfig.WorkItemTypeName);
+                    _logger.LogInformation("FieldMapContainer: Adding FieldMap {FieldMapName} for {WorkItemTypeName}", fieldmapConfig.FieldMap, fieldmapConfig.WorkItemTypeName);
                     string typePattern = $"MigrationTools.Sinks.*.FieldMaps.{fieldmapConfig.FieldMap}";
 
                     Type type = AppDomain.CurrentDomain.GetAssemblies()
@@ -39,7 +42,7 @@ namespace MigrationTools._EngineV1.Containers
 
                     if (type == null)
                     {
-                        Log.Error("Type " + typePattern + " not found.", typePattern);
+                        _logger.LogError("Type " + typePattern + " not found.", typePattern);
                         throw new Exception("Type " + typePattern + " not found.");
                     }
                     IFieldMap fm = (IFieldMap)Services.GetRequiredService(type);
@@ -90,7 +93,7 @@ namespace MigrationTools._EngineV1.Containers
         {
             foreach (IFieldMap map in list)
             {
-                Log.Debug("Running Field Map: {MapName} {MappingDisplayName}", map.Name, map.MappingDisplayName);
+                _logger.LogDebug("Running Field Map: {MapName} {MappingDisplayName}", map.Name, map.MappingDisplayName);
                 map.Execute(source, target);
             }
         }

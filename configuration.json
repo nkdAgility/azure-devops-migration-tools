@@ -7,7 +7,7 @@
     "Collection": "https://dev.azure.com/nkdagility-preview/",
     "Project": "migrationSource1",
     "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
-    "AuthenticationMode": "AccessToken",
+    "AuthenticationMode": "Prompt",
     "AllowCrossProjectLinking": false,
     "PersonalAccessToken": "qosss7crwz3vie4fupzpaafjndoy6g6ulgkzhoxtmjgicv2lqjyq",
     "LanguageMaps": {
@@ -20,7 +20,7 @@
     "Collection": "https://dev.azure.com/nkdagility-preview/",
     "Project": "migrationTarget1",
     "ReflectedWorkItemIDFieldName": "nkdScrum.ReflectedWorkItemId",
-    "AuthenticationMode": "AccessToken",
+    "AuthenticationMode": "Prompt",
     "AllowCrossProjectLinking": false,
     "PersonalAccessToken": "qosss7crwz3vie4fupzpaafjndoy6g6ulgkzhoxtmjgicv2lqjyq",
     "LanguageMaps": {
@@ -55,11 +55,21 @@
       "valueMapping": {
         "Approved": "New",
         "New": "New",
+        "Done": "Closed",
+        "Removed": "Removed"
+      }
+    },
+    {
+      "$type": "FieldValueMapConfig",
+      "WorkItemTypeName": "Task",
+      "sourceField": "System.State",
+      "targetField": "System.State",
+      "defaultValue": "New",
+      "valueMapping": {
         "Committed": "Active",
         "In Progress": "Active",
         "To Do": "New",
-        "Done": "Closed",
-        "Removed": "Removed"
+        "Done": "Closed"
       }
     },
     {
@@ -162,7 +172,7 @@
       "AttachmentMigration": true,
       "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
       "FixHtmlAttachmentLinks": false,
-      "SkipToFinalRevisedWorkItemType": false,
+      "SkipToFinalRevisedWorkItemType": true,
       "WorkItemCreateRetryLimit": 5,
       "FilterWorkItemsThatAlreadyExistInTarget": false,
       "PauseAfterEachWorkItem": false,

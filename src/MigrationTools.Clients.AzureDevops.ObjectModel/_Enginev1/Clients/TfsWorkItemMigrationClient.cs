@@ -8,6 +8,7 @@ using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.DataContracts;
+using MigrationTools.DataContracts;
 using Serilog;
 
 namespace MigrationTools._EngineV1.Clients
@@ -50,7 +51,10 @@ namespace MigrationTools._EngineV1.Clients
             var targetFoundItems = GetWorkItems(targetQuery);
             Log.Debug("FilterByTarget: ... query complete.");
             Log.Debug("FilterByTarget: Found {TargetWorkItemCount} based on the WIQLQueryBit in the target system.", targetFoundItems.Count);
-            var targetFoundIds = (from WorkItemData twi in targetFoundItems select GetReflectedWorkItemId(twi)).ToList();
+            var targetFoundIds = (from WorkItemData twi in targetFoundItems select GetReflectedWorkItemId(twi))
+                //exclude null IDs
+                .Where(x=> x != null)
+                .ToList();
             //////////////////////////////////////////////////////////
             sourceWorkItems = sourceWorkItems.Where(p => targetFoundIds.All(p2 => p2.ToString() != sourceWorkItemMigrationClient.CreateReflectedWorkItemId(p).ToString())).ToList();
             Log.Debug("FilterByTarget: After removing all found work items there are {SourceWorkItemCount} remaining to be migrated.", sourceWorkItems.Count);
@@ -62,41 +66,12 @@ namespace MigrationTools._EngineV1.Clients
 
         {
             TfsReflectedWorkItemId ReflectedWorkItemId = new TfsReflectedWorkItemId(workItemToReflect);
-
             var workItemToFind = workItemToReflect.ToWorkItem();
-
             WorkItem found = GetFromCache(ReflectedWorkItemId)?.ToWorkItem();
-            // SHOULD NEVER HAVE A rEFLECTEDiD ON SOURCE! IF WE DO ITS IRRELEVENT AS ITS FROM A PREVIOUS MIGRATION
-            // If we have a Reflected WorkItem ID field on the source store, assume it is pointing to the desired work item on the target store
-            //if (Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName != null && workItemToFind.Fields.Contains(Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName) && !string.IsNullOrEmpty(workItemToFind.Fields[Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName]?.Value?.ToString()))
-            //{
-            //    string rwiid = workItemToFind.Fields[Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName].Value.ToString();
-            //    ReflectedWorkItemId idToFind = GetReflectedWorkItemId(workItemToReflect);
-            //    if (int.Parse(idToFind.WorkItemId) == 0)
-            //    {
-            //        found = null;
-            //    }
-            //    else
-            //    {
-            //        try
-            //        {
-            //            found = Store.GetWorkItem(int.Parse(idToFind.WorkItemId));
-            //        }
-            //        catch (DeniedOrNotExistException)
-            //        {
-            //            found = null;
-            //        }
-            //    }
-            //}
             if (found == null) { found = FindReflectedWorkItemByReflectedWorkItemId(ReflectedWorkItemId)?.ToWorkItem(); }
-            if (Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName != null && !workItemToFind.Fields.Contains(Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName))
-            {
-                if (found == null) { found = FindReflectedWorkItemByMigrationRef(ReflectedWorkItemId)?.ToWorkItem(); } // Too slow!
-                                                                                                                       //if (found == null) { found = FindReflectedWorkItemByTitle(workItemToFind.Title); }
-            }
             if (found != null && cache)
             {
-                AddToCache(found.AsWorkItemData());/// TODO MEMORY LEAK
+                AddToCache(found.AsWorkItemData());// TODO MEMORY LEAK
             }
             return found?.AsWorkItemData();
         }
@@ -231,16 +206,6 @@ namespace MigrationTools._EngineV1.Clients
         public override WorkItemData PersistWorkItem(WorkItemData workItem)
         {
             throw new NotImplementedException();
-        }
-
-        protected WorkItemData FindReflectedWorkItemByMigrationRef(ReflectedWorkItemId refId)
-        {
-            IWorkItemQueryBuilder wiqb = Services.GetRequiredService<IWorkItemQueryBuilder>();
-            StringBuilder queryBuilder = FindReflectedWorkItemQueryBase(wiqb);
-            queryBuilder.Append(" [System.Description] Contains @KeyToFind");
-            wiqb.AddParameter("KeyToFind", string.Format("##REF##{0}##", refId));
-            wiqb.Query = queryBuilder.ToString();
-            return FindWorkItemByQuery(wiqb);
         }
 
         protected WorkItemData FindReflectedWorkItemByReflectedWorkItemId(ReflectedWorkItemId refId, bool cache = true)

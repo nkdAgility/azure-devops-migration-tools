@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools._EngineV1.Clients;
-using MigrationTools._EngineV1.DataContracts;
+using MigrationTools.DataContracts;
 using MigrationTools.Exceptions;
+using MigrationTools.Processors;
 
 namespace MigrationTools.Enrichers
 {
@@ -12,11 +14,14 @@ namespace MigrationTools.Enrichers
     {
         private bool _save = true;
         private bool _filterWorkItemsThatAlreadyExistInTarget = true;
+        private IMigrationEngine Engine;
 
-        public TfsWorkItemLinkEnricher(IMigrationEngine engine, ILogger<TfsWorkItemLinkEnricher> logger) : base(engine, logger)
+        public TfsWorkItemLinkEnricher(IServiceProvider services, ILogger<TfsWorkItemLinkEnricher> logger) : base(services, logger)
         {
+            Engine = services.GetRequiredService<IMigrationEngine>();
         }
 
+        [Obsolete]
         public override void Configure(
             bool save = true,
             bool filterWorkItemsThatAlreadyExistInTarget = true)
@@ -25,6 +30,7 @@ namespace MigrationTools.Enrichers
             _filterWorkItemsThatAlreadyExistInTarget = filterWorkItemsThatAlreadyExistInTarget;
         }
 
+        [Obsolete]
         public override int Enrich(WorkItemData sourceWorkItemLinkStart, WorkItemData targetWorkItemLinkStart)
         {
             if (sourceWorkItemLinkStart is null)
@@ -37,7 +43,8 @@ namespace MigrationTools.Enrichers
             }
             if (targetWorkItemLinkStart.Id == "0")
             {
-                throw new IndexOutOfRangeException("Target work item must be saved before you can add a link");
+                Log.LogWarning("TfsWorkItemLinkEnricher::Enrich: Target work item must be saved before you can add a link: exiting Link Migration");
+                return 0;
             }
 
             if (ShouldCopyLinks(sourceWorkItemLinkStart, targetWorkItemLinkStart))
@@ -143,7 +150,25 @@ namespace MigrationTools.Enrichers
                 target.ToWorkItem().Links.Add(el);
                 if (_save)
                 {
-                    target.SaveToAzureDevOps();
+                    try
+                    {
+                        target.SaveToAzureDevOps();
+                    }
+                    catch (Exception ex)
+                    {
+                        // Ignore this link because the TFS server didn't recognize its type (There's no point in crashing the rest of the migration due to a link)
+                        if(ex.Message.Contains("Unrecognized Resource link"))
+                        {
+                            Log.LogError(ex, "[{ExceptionType}] Failed to save link {SourceLinkType} on {TargetId}", ex.GetType().Name, sourceLink.GetType().Name, target.Id);
+                            // Remove the link from the target so it doesn't cause problems downstream
+                            target.ToWorkItem().Links.Remove(el);
+                        }
+                        else
+                        {
+                            //pass along the exception since we don't know what went wrong
+                            throw;
+                        }
+                    }
                 }
             }
             else
@@ -381,6 +406,16 @@ namespace MigrationTools.Enrichers
 
         [Obsolete("v2 Archtecture: use Configure(bool save = true, bool filter = true) instead", true)]
         public override void Configure(IProcessorEnricherOptions options)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void RefreshForProcessorType(IProcessor processor)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void EntryForProcessorType(IProcessor processor)
         {
             throw new NotImplementedException();
         }

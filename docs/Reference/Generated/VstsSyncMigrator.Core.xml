@@ -4,18 +4,6 @@
         <name>VstsSyncMigrator.Core</name>
     </assembly>
     <members>
-        <member name="M:VstsSyncMigrator.AuthenticationHelper.AcquireTokenAsyncForUser">
-            <summary>
-            Async task to acquire token for User.
-            </summary>
-            <returns>Token for user.</returns>
-        </member>
-        <member name="M:VstsSyncMigrator.AuthenticationHelper.GetTokenForUser">
-            <summary>
-            Get Token for User.
-            </summary>
-            <returns>Token for user.</returns>
-        </member>
         <member name="M:VstsSyncMigrator.Engine.TestPlandsAndSuitesMigrationContext.ApplyConfigurations(Microsoft.TeamFoundation.TestManagement.Client.ITestSuiteEntry,Microsoft.TeamFoundation.TestManagement.Client.ITestSuiteEntry)">
             <summary>
             Apply configurations to a single test case entry on the target, by copying from the source

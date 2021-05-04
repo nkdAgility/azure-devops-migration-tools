@@ -24,7 +24,7 @@ namespace MigrationTools.Integration.Tests
             Log.Logger.Information("Logger is initialized");
         }
 
-        [TestMethod(), TestCategory("L3")]
+        [TestMethod(), TestCategory("L3"), TestCategory("Integration")]
         public void TestTfsToTfsNoEnrichers()
         {
             // Senario 1 Migration from Tfs to Tfs with no Enrichers.
@@ -45,30 +45,10 @@ namespace MigrationTools.Integration.Tests
                 ReplayRevisions = true,
                 WorkItemCreateRetryLimit = 5,
                 PrefixProjectToNodes = false,
-                Source = GetTfsWorkItemEndPointOptions("migrationSource1"),
-                Target = GetTfsWorkItemEndPointOptions("migrationTarget1")
+                SourceName = "Source",
+                TargetName = "Target"
             };
             return migrationConfig;
-        }
-
-        private static TfsWorkItemEndpointOptions GetTfsWorkItemEndPointOptions(string project)
-        {
-            return new TfsWorkItemEndpointOptions()
-            {
-                Organisation = "https://dev.azure.com/nkdagility-preview/",
-                Project = project,
-                AuthenticationMode = AuthenticationMode.AccessToken,
-                AccessToken = TestingConstants.AccessToken,
-                Query = new Options.QueryOptions()
-                {
-                    Query = "SELECT [System.Id], [System.Tags] " +
-                            "FROM WorkItems " +
-                            "WHERE [System.TeamProject] = @TeamProject " +
-                                "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan') " +
-                            "ORDER BY [System.ChangedDate] desc",
-                    Paramiters = new Dictionary<string, string>() { { "TeamProject", "migrationSource1" } }
-                }
-            };
         }
     }
 }

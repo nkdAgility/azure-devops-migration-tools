@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Text.RegularExpressions;
-using MigrationTools._EngineV1.DataContracts;
+using MigrationTools.DataContracts;
 using Serilog;
 
 namespace MigrationTools._EngineV1.Clients
@@ -12,7 +12,7 @@ namespace MigrationTools._EngineV1.Clients
         private string _WorkItemId;
         private static readonly Regex ReflectedIdRegex = new Regex(@"^(?<org>[\S ]+)\/(?<project>[\S ]+)\/_workitems\/edit\/(?<id>\d+)", RegexOptions.Compiled);
 
-        public TfsReflectedWorkItemId(WorkItemData workItem) : base(workItem.Id)
+        public TfsReflectedWorkItemId(WorkItemData workItem) : base(workItem)
         {
             if (workItem is null)
             {
@@ -22,6 +22,18 @@ namespace MigrationTools._EngineV1.Clients
             _WorkItemId = workItem.Id;
             _ProjectName = workItem.ProjectName;
             _Connection = workItem.ToWorkItem().Store.TeamProjectCollection.Uri;
+        }
+
+        public TfsReflectedWorkItemId(int workItemId, string tfsProject, Uri tfsTeamProjectCollection) : base(workItemId)
+        {
+            if (workItemId == 0)
+            {
+                throw new ArgumentNullException(nameof(workItemId));
+            }
+
+            _WorkItemId = workItemId.ToString();
+            _ProjectName = tfsProject;
+            _Connection = tfsTeamProjectCollection;
         }
 
         public TfsReflectedWorkItemId(string ReflectedWorkItemId) : base(ReflectedWorkItemId)

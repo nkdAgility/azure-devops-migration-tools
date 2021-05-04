@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MigrationTools.Tests;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Serilog;
@@ -13,14 +11,6 @@ namespace MigrationTools.Configuration.Tests
     [TestClass]
     public class SerializationTests
     {
-        private ServiceProvider Services;
-
-        [TestInitialize]
-        public void Setup()
-        {
-            Services = ServiceProviderHelper.GetWorkItemMigrationProcessor();
-        }
-
         private Zoo CreateZoo()
         {
             var animal = new LandAnimal { Name = "Martin", AnimalType = "Monkey", Tropical = true };

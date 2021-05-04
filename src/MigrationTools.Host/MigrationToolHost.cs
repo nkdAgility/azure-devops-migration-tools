@@ -5,12 +5,15 @@ using System.Threading.Tasks;
 using CommandLine;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.WorkerService;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using MigrationTools.CommandLine;
-
+using Microsoft.Extensions.Logging;
+using MigrationTools._EngineV1.Configuration;
+using MigrationTools.Host.CommandLine;
 using MigrationTools.Host.CustomDiagnostics;
 using MigrationTools.Host.Services;
+using MigrationTools.Options;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
@@ -22,12 +25,20 @@ namespace MigrationTools.Host
     {
         public static IHostBuilder CreateDefaultBuilder(string[] args)
         {
-            var levelSwitch = new LoggingLevelSwitch(LogEventLevel.Verbose);
+            (var initOptions, var executeOptions) = ParseOptions(args);
+
+            if (initOptions is null && executeOptions is null)
+            {
+                return null;
+            }
+
             var hostBuilder = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args)
              .UseSerilog((hostingContext, services, loggerConfiguration) =>
              {
                  string logsPath = CreateLogsPath();
                  var logPath = Path.Combine(logsPath, "migration.log");
+                 var logLevel = hostingContext.Configuration.GetValue<LogEventLevel>("LogLevel");
+                 var levelSwitch = new LoggingLevelSwitch(logLevel);
                  loggerConfiguration
                      .MinimumLevel.ControlledBy(levelSwitch)
                      .ReadFrom.Configuration(hostingContext.Configuration)
@@ -41,27 +52,44 @@ namespace MigrationTools.Host
              .ConfigureLogging((context, logBuilder) =>
              {
              })
+             .ConfigureAppConfiguration(builder =>
+             {
+                 if (executeOptions is not null)
+                 {
+                     builder.AddJsonFile(executeOptions.ConfigFile);
+                 }
+             })
              .ConfigureServices((context, services) =>
              {
-                 Parser.Default.ParseArguments<InitOptions, ExecuteOptions>(args)
-                     .WithParsed<InitOptions>(opts =>
-                     {
-                         services.AddSingleton(opts);
-                         services.AddSingleton<ExecuteOptions>((p) => null);
-                     })
-                     .WithParsed<ExecuteOptions>(opts =>
-                     {
-                         services.AddSingleton(opts);
-                         services.AddSingleton<InitOptions>((p) => null);
-                     })
-                     .WithNotParsed(error =>
-                     {
-                         services.AddSingleton<InitOptions>((p) => null);
-                         services.AddSingleton<ExecuteOptions>((p) => null);
-                     });
                  services.AddOptions();
-                 // Sieralog
-                 services.AddSingleton<LoggingLevelSwitch>(levelSwitch);
+                 services.Configure<EngineConfiguration>((config) =>
+                 {
+                     if(executeOptions is null)
+                     {
+                         return;
+                     }
+
+                     var sp = services.BuildServiceProvider();
+                     var logger = sp.GetService<ILoggerFactory>().CreateLogger<EngineConfiguration>();
+                     if (!File.Exists(executeOptions.ConfigFile))
+                     {
+                         logger.LogInformation("The config file {ConfigFile} does not exist, nor does the default 'configuration.json'. Use '{ExecutableName}.exe init' to create a configuration file first", executeOptions.ConfigFile, Assembly.GetEntryAssembly().GetName().Name);
+                         throw new ArgumentException("missing configfile");
+                     }
+                     logger.LogInformation("Config Found, creating engine host");
+                     var reader = sp.GetRequiredService<IEngineConfigurationReader>();
+                     var parsed = reader.BuildFromFile(executeOptions.ConfigFile);
+                     config.ChangeSetMappingFile = parsed.ChangeSetMappingFile;
+                     config.FieldMaps = parsed.FieldMaps;
+                     config.GitRepoMapping = parsed.GitRepoMapping;
+                     config.Processors = parsed.Processors;
+                     config.Source = parsed.Source;
+                     config.Target = parsed.Target;
+                     config.Version = parsed.Version;
+                     config.workaroundForQuerySOAPBugEnabled = parsed.workaroundForQuerySOAPBugEnabled;
+                     config.WorkItemTypeDefinition = parsed.WorkItemTypeDefinition;
+                 });
+
                  // Application Insights
                  services.AddApplicationInsightsTelemetryWorkerService(new ApplicationInsightsServiceOptions { InstrumentationKey = "2d666f84-b3fb-4dcf-9aad-65de038d2772" });
 
@@ -69,15 +97,46 @@ namespace MigrationTools.Host
                  services.AddTransient<IDetectOnlineService, DetectOnlineService>();
                  services.AddTransient<IDetectVersionService, DetectVersionService>();
 
-                 /// Add Old v1Bits
+                 // Config
+                 services.AddSingleton<IEngineConfigurationBuilder, EngineConfigurationBuilder>();
+                 services.AddTransient((provider) => provider.GetRequiredService<IEngineConfigurationBuilder>() as IEngineConfigurationReader);
+                 services.AddTransient((provider) => provider.GetRequiredService<IEngineConfigurationBuilder>() as ISettingsWriter);
+
+                 // Add Old v1Bits
                  services.AddMigrationToolServicesLegacy();
                  // New v2Bits
                  services.AddMigrationToolServices();
 
                  // Host Services
                  services.AddTransient<IStartupService, StartupService>();
-                 services.AddHostedService<InitHostedService>();
-                 services.AddHostedService<ExecuteHostedService>();
+                 if (initOptions is not null)
+                 {
+                     services.Configure<InitOptions>((opts) =>
+                     {
+                         opts.ConfigFile = initOptions.ConfigFile;
+                         opts.Options = initOptions.Options;
+                     });
+                     services.AddHostedService<InitHostedService>();
+                 }
+                 if (executeOptions is not null)
+                 {
+                     services.Configure<NetworkCredentialsOptions>(cred =>
+                     {
+                         cred.Source = new Credentials
+                         {
+                             Domain = executeOptions.SourceDomain,
+                             UserName = executeOptions.SourceUserName,
+                             Password = executeOptions.SourcePassword
+                         };
+                         cred.Target = new Credentials
+                         {
+                             Domain = executeOptions.TargetDomain,
+                             UserName = executeOptions.TargetUserName,
+                             Password = executeOptions.TargetPassword
+                         };
+                     });
+                     services.AddHostedService<ExecuteHostedService>();
+                 }
              })
              .UseConsoleLifetime();
             return hostBuilder;
@@ -106,6 +165,22 @@ namespace MigrationTools.Host
             }
 
             return exportPath;
+        }
+
+        private static (InitOptions init, ExecuteOptions execute) ParseOptions(string[] args)
+        {
+            InitOptions initOptions = null;
+            ExecuteOptions executeOptions = null;
+            Parser.Default.ParseArguments<InitOptions, ExecuteOptions>(args)
+                            .WithParsed<InitOptions>(opts =>
+                            {
+                                initOptions = opts;
+                            })
+                            .WithParsed<ExecuteOptions>(opts =>
+                            {
+                                executeOptions = opts;
+                            });
+            return (initOptions, executeOptions);
         }
     }
 }

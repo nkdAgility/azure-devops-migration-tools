@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools;
 using MigrationTools._EngineV1.Configuration;
-using MigrationTools.CommandLine;
+using MigrationTools.TestExtensions;
 using Serilog;
 
 namespace _VstsSyncMigrator.Engine.Tests
@@ -20,6 +21,7 @@ namespace _VstsSyncMigrator.Engine.Tests
         [TestInitialize]
         public void Setup()
         {
+            var configuration = new ConfigurationBuilder().Build();
             var ecb = new EngineConfigurationBuilder(new NullLogger<EngineConfigurationBuilder>());
             var services = new ServiceCollection();
             // Core
@@ -28,16 +30,15 @@ namespace _VstsSyncMigrator.Engine.Tests
             services.AddMigrationToolServices();
             services.AddMigrationToolServicesLegacy();
             // Clients
-            services.AddMigrationToolServicesForClientAzureDevOpsObjectModel();
+            services.AddMigrationToolServicesForClientAzureDevOpsObjectModel(configuration);
             services.AddMigrationToolServicesForClientLegacyAzureDevOpsObjectModel();
 
             //
-            services.AddSingleton<IEngineConfigurationBuilder, EngineConfigurationBuilder>();
+            //services.AddSingleton<IEngineConfigurationBuilder, EngineConfigurationBuilder>();
+            services.AddOptions();
             services.AddSingleton<EngineConfiguration>(ecb.BuildDefault());
 
             services.AddSingleton<IMigrationEngine, MigrationEngine>();
-
-            services.AddSingleton<ExecuteOptions>((p) => null);
 
             _services = services.BuildServiceProvider();
         }

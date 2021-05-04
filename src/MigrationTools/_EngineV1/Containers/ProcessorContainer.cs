@@ -3,14 +3,16 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 using MigrationTools._EngineV1.Configuration;
-using Serilog;
 
 namespace MigrationTools._EngineV1.Containers
 {
     public class ProcessorContainer : EngineContainer<ReadOnlyCollection<IProcessor>>
     {
         private List<IProcessor> _Processors = new List<IProcessor>();
+        private readonly ILogger<ProcessorContainer> _logger;
 
         public override ReadOnlyCollection<IProcessor> Items
         {
@@ -23,8 +25,9 @@ namespace MigrationTools._EngineV1.Containers
 
         public int Count { get { EnsureConfigured(); return _Processors.Count; } }
 
-        public ProcessorContainer(IServiceProvider services, EngineConfiguration config) : base(services, config)
+        public ProcessorContainer(IServiceProvider services, IOptions<EngineConfiguration> config, ILogger<ProcessorContainer> logger) : base(services, config)
         {
+            _logger = logger;
         }
 
         protected override void Configure()
@@ -32,7 +35,7 @@ namespace MigrationTools._EngineV1.Containers
             if (Config.Processors != null)
             {
                 var enabledProcessors = Config.Processors.Where(x => x.Enabled).ToList();
-                Log.Information("ProcessorContainer: Of {ProcessorCount} configured Processors only {EnabledProcessorCount} are enabled", Config.Processors.Count, enabledProcessors.Count);
+                _logger.LogInformation("ProcessorContainer: Of {ProcessorCount} configured Processors only {EnabledProcessorCount} are enabled", Config.Processors.Count, enabledProcessors.Count);
                 var allTypes = AppDomain.CurrentDomain.GetAssemblies()
                     .Where(a => !a.IsDynamic)
                     .SelectMany(a => a.GetTypes()).ToList();
@@ -41,7 +44,7 @@ namespace MigrationTools._EngineV1.Containers
                 {
                     if (processorConfig.IsProcessorCompatible(enabledProcessors))
                     {
-                        Log.Information("ProcessorContainer: Adding Processor {ProcessorName}", processorConfig.Processor);
+                        _logger.LogInformation("ProcessorContainer: Adding Processor {ProcessorName}", processorConfig.Processor);
                         string typePattern = $"VstsSyncMigrator.Engine.{processorConfig.Processor}";
 
                         Type type = allTypes
@@ -49,7 +52,7 @@ namespace MigrationTools._EngineV1.Containers
 
                         if (type == null)
                         {
-                            Log.Error("Type " + typePattern + " not found.", typePattern);
+                            _logger.LogError("Type " + typePattern + " not found.", typePattern);
                             throw new Exception("Type " + typePattern + " not found.");
                         }
 
@@ -60,7 +63,7 @@ namespace MigrationTools._EngineV1.Containers
                     else
                     {
                         var message = "ProcessorContainer: Cannot add Processor {ProcessorName}. Processor is not compatible with other enabled processors in configuration.";
-                        Log.Error(message, processorConfig.Processor);
+                        _logger.LogError(message, processorConfig.Processor);
                         throw new InvalidOperationException(string.Format(message, processorConfig.Processor, "ProcessorContainer"));
                     }
                 }

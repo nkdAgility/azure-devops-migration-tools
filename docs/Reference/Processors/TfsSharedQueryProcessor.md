@@ -24,29 +24,57 @@ The TfsSharedQueryProcessor enabled you to migrate queries from one locatio nto 
 
 ```JSON
 {
-  "$type": "TfsSharedQueryProcessorOptions",
-  "Enabled": false,
-  "PrefixProjectToNodes": false,
-  "SharedFolderName": "Shared Queries",
-  "SourceToTargetFieldMappings": null,
-  "ProcessorEnrichers": null,
-  "Source": {
-    "$type": "TfsEndpointOptions",
-    "Organisation": "https://dev.azure.com/nkdagility-preview/",
-    "Project": "sourceProject",
-    "AuthenticationMode": "AccessToken",
-    "AccessToken": "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
-    "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
-    "EndpointEnrichers": null
-  },
-  "Target": {
-    "$type": "TfsEndpointOptions",
-    "Organisation": "https://dev.azure.com/nkdagility-preview/",
-    "Project": "targetProject",
-    "AuthenticationMode": "AccessToken",
-    "AccessToken": "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
-    "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
-    "EndpointEnrichers": null
+    "Version": "11.9",
+    "LogLevel": "Verbose",
+    
+    "Endpoints": {
+      "TfsEndpoints": [
+        {
+          "Name": "Source",
+          "AccessToken": "",
+          "Query": {
+            "Query": "SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan') ORDER BY [System.ChangedDate] desc"
+          },
+          "Organisation": "https://dev.azure.com/like10-demos/",
+          "Project": "SourceProject",
+          "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
+          "AuthenticationMode": "Prompt",
+          "AllowCrossProjectLinking": false,
+          "PersonalAccessToken": "",
+          "LanguageMaps": {
+            "AreaPath": "Area",
+            "IterationPath": "Iteration"
+          }
+        },
+        {
+          "Name": "Target",
+          "AccessToken": "",
+          "Query": {
+            "Query": "SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan') ORDER BY [System.ChangedDate] desc"
+          },
+          "Organisation": "https://dev.azure.com/like10-demos/",
+          "Project": "TargetProject",
+          "ReflectedWorkItemIdField": "nkdScrum.ReflectedWorkItemId",
+          "AuthenticationMode": "Prompt",
+          "AllowCrossProjectLinking": false,
+          "LanguageMaps": {
+            "AreaPath": "Area",
+            "IterationPath": "Iteration"
+          }
+        }
+      ]
+    },
+    "Processors": [     
+      {
+        "$type": "TfsSharedQueryProcessorOptions",
+        "Enabled": true,
+        "PrefixProjectToNodes": false,
+        "SharedFolderName": "Shared Queries",
+        "SourceToTargetFieldMappings": null,
+        "ProcessorEnrichers": null,
+        "SourceName": "Source",
+        "TargetName": "Target"
+      }
+    ]
   }
-}
 ```

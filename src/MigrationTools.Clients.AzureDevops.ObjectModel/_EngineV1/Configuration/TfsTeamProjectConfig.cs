@@ -1,5 +1,4 @@
 ﻿using System;
-using MigrationTools.Configuration;
 using MigrationTools.Endpoints;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -17,7 +16,7 @@ namespace MigrationTools._EngineV1.Configuration
         public AuthenticationMode AuthenticationMode { get; set; }
 
         public string PersonalAccessToken { get; set; }
-        public LanguageMaps LanguageMaps { get; set; }
+        public TfsLanguageMapOptions LanguageMaps { get; set; }
 
         public IMigrationClientConfig PopulateWithDefault()
         {
@@ -27,7 +26,7 @@ namespace MigrationTools._EngineV1.Configuration
             ReflectedWorkItemIDFieldName = "Custom.ReflectedWorkItemId";
             PersonalAccessToken = "";
             AuthenticationMode = AuthenticationMode.Prompt;
-            LanguageMaps = new LanguageMaps() { AreaPath = "Area", IterationPath = "Iteration" };
+            LanguageMaps = new TfsLanguageMapOptions() { AreaPath = "Area", IterationPath = "Iteration" };
             return this;
         }
 
@@ -35,14 +34,5 @@ namespace MigrationTools._EngineV1.Configuration
         {
             return string.Format("{0}/{1}", Collection, Project);
         }
-    }
-}
-
-namespace MigrationTools.Configuration
-{
-    public class LanguageMaps
-    {
-        public string AreaPath { get; set; }
-        public string IterationPath { get; set; }
     }
 }

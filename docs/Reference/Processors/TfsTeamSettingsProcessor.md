@@ -25,30 +25,58 @@ Native TFS Processor, does not work with any other Endpoints.
 
 ```JSON
 {
-  "$type": "TfsTeamSettingsProcessorOptions",
-  "Enabled": false,
-  "MigrateTeamSettings": true,
-  "UpdateTeamSettings": true,
-  "PrefixProjectToNodes": false,
-  "Teams": null,
-  "ProcessorEnrichers": null,
-  "Source": {
-    "$type": "TfsEndpointOptions",
-    "Organisation": "https://dev.azure.com/nkdagility-preview/",
-    "Project": "sourceProject",
-    "AuthenticationMode": "AccessToken",
-    "AccessToken": "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
-    "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
-    "EndpointEnrichers": null
-  },
-  "Target": {
-    "$type": "TfsEndpointOptions",
-    "Organisation": "https://dev.azure.com/nkdagility-preview/",
-    "Project": "targetProject",
-    "AuthenticationMode": "AccessToken",
-    "AccessToken": "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
-    "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
-    "EndpointEnrichers": null
+    "Version": "11.9",
+    "LogLevel": "Verbose",
+    
+    "Endpoints": {
+      "TfsTeamSettingsEndpoints": [
+        {
+          "Name": "TeamSettingsSource",
+          "AccessToken": "",
+          "Query": {
+            "Query": "SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan') ORDER BY [System.ChangedDate] desc"
+          },
+          "Organisation": "https://dev.azure.com/like10-demos/",
+          "Project": "SourceProject",
+          "ReflectedWorkItemIdField": "ReflectedWorkItemId",
+          "AuthenticationMode": "Prompt",
+          "AllowCrossProjectLinking": false,
+          "LanguageMaps": {
+            "AreaPath": "Area",
+            "IterationPath": "Iteration"
+          }
+        },
+        {
+          "Name": "TeamSettingsTarget",
+          "AccessToken": "",
+          "Query": {
+            "Query": "SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan') ORDER BY [System.ChangedDate] desc"
+          },
+          "Organisation": "https://dev.azure.com/like10-demos/",
+          "Project": "TargetProject",
+          "ReflectedWorkItemIdField": "ReflectedWorkItemId",
+          "AuthenticationMode": "Prompt",
+          "AllowCrossProjectLinking": false,
+          "LanguageMaps": {
+            "AreaPath": "Area",
+            "IterationPath": "Iteration"
+          }
+        }
+      ]      
+    },
+    "Processors": [     
+      {
+        "$type": "TfsTeamSettingsProcessorOptions",
+        "Enabled": true,
+        "MigrateTeamSettings": true,
+        "UpdateTeamSettings": true,
+        "PrefixProjectToNodes": false,
+        "Teams": null,
+        "ProcessorEnrichers": null,
+        "SourceName": "TeamSettingsSource",
+        "TargetName": "TeamSettingsTarget"        
+        }
+    ]
   }
-}
+
 ```

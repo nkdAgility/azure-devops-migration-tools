@@ -4,19 +4,26 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using MigrationTools._EngineV1.DataContracts;
 using MigrationTools._EngineV1.Enrichers;
+using MigrationTools.DataContracts;
+using MigrationTools.Processors;
 
 namespace MigrationTools.Enrichers
 {
     public class TfsEmbededImagesEnricher : EmbededImagesRepairEnricherBase
     {
-        public TfsEmbededImagesEnricher(IMigrationEngine engine, ILogger<TfsEmbededImagesEnricher> logger) : base(engine, logger)
+        public IMigrationEngine Engine { get; private set; }
+
+        public TfsEmbededImagesEnricher(IServiceProvider services, ILogger<TfsEmbededImagesEnricher> logger) : base(services, logger)
         {
+            Engine = services.GetRequiredService<IMigrationEngine>();
+            //
         }
 
+        [Obsolete]
         public override void Configure(bool save = true, bool filter = true)
         {
             throw new NotImplementedException();
@@ -28,6 +35,7 @@ namespace MigrationTools.Enrichers
             throw new NotImplementedException();
         }
 
+        [Obsolete]
         public override int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
         {
             FixEmbededImages(targetWorkItem, Engine.Source.Config.AsTeamProjectConfig().Collection.ToString(), Engine.Target.Config.AsTeamProjectConfig().Collection.ToString(), Engine.Source.Config.AsTeamProjectConfig().PersonalAccessToken);
@@ -103,6 +111,16 @@ namespace MigrationTools.Enrichers
                     }
                 }
             }
+        }
+
+        protected override void RefreshForProcessorType(IProcessor processor)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void EntryForProcessorType(IProcessor processor)
+        {
+            throw new NotImplementedException();
         }
     }
 }

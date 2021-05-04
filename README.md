@@ -13,8 +13,8 @@ The Azure DevOps Migration Tools allow you to bulk edit and migrate data between
 
 ## What can you do with this tool?
 
-- Migrate `Work Items`, `TestPlans & Suits`, `Teams`, & `Shared Queries` from one `Team Project` to another
-- Migrate `Work Items`, `TestPlans & Suits`, `Teams`, & `Shared Queries` from one `Organisation` to another
+- Migrate `Work Items`, `TestPlans & Suits`, `Teams`, `Shared Queries`, & `Pipelines` from one `Team Project` to another
+- Migrate `Work Items`, `TestPlans & Suits`, `Teams`, `Shared Queries`, & `Pipelines` from one `Organisation` to another
 - Bulk edit of `Work Items` accross an entire `Project`.
 
 ### What versions of Azure DevOps & TFS do you support?
@@ -30,13 +30,14 @@ The Azure DevOps Migration Tools allow you to bulk edit and migrate data between
 - Assistance in changing Process Templates
 - Bulk edit of Work Items
 - Migration of Test Suites & Test Plans
+- _new_ Migration of Builds & Pipelines
 - Migrate from one Language version of TFS / Azure Devops to another (*new v9.0*)
 
-**NOTE: If you are able to migrate your entire Collection to Azure DevOps Services you should use [Azure DevOps Migration Service](https://www.visualstudio.com/team-services/migrate-tfs-vsts/) from Microsoft. If you have a requirement to change Process Template then you will need to do that before you move to Azure DevOps Services.**
+**NOTE: If you are able to migrate your entire Collection to Azure DevOps Services you should use [Azure DevOps Migration Service](https://azure.microsoft.com/services/devops/migrate/) from Microsoft. If you have a requirement to change Process Template then you will need to do that before you move to Azure DevOps Services.**
 
 ## Quick Links
 
- - [Video Overview](https://youtu.be/ZxDktQae10M)
+ - [Video Overview](https://www.youtube.com/watch?v=RCJsST0xBCE)
  - [Getting Started](http://nkdagility.github.io/azure-devops-migration-tools/getting-started)
  - [Documentation](http://nkdagility.github.io/azure-devops-migration-tools/)
  - [Questions on Usage](https://stackoverflow.com/questions/tagged/azure-devops-migration-tools)
@@ -44,6 +45,7 @@ The Azure DevOps Migration Tools allow you to bulk edit and migrate data between
 
 ## Change Log
 
+- v11.9 - Dark launch of `Pipelines` & `Builds` migration by @tomfrenzel
 - v11.8 - As part of moving to the new architecture we moved to default newtonsoft type handling with `$type` properties instead of `ObjectType` ___To Migrate rename "ObjectType" to "$type" in your configuration!___
 - v11.5 - Added more useful logging levels. Replace `"TelemetryEnableTrace": false` with `"LogLevel": "Verbose"` in the config. Verbose will only be logged to the logfile.
 - v11.2.1 - Removed NodeMigrationContext and converted it to an enricher for Work Items. Still needs work, so that it migrates individual nodes, but currently migrates all.

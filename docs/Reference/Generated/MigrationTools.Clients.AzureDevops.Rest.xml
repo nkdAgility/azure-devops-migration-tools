@@ -4,5 +4,129 @@
         <name>MigrationTools.Clients.AzureDevops.Rest</name>
     </assembly>
     <members>
+        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.GetHttpClient``1">
+            <summary>
+            Create a new instance of HttpClient including Heades
+            </summary>
+            <returns>HttpClient</returns>
+        </member>
+        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.GetUriBuilderBasedOnEndpointAndType``1">
+            <summary>
+            Method to get the RESP API URLs right
+            </summary>
+            <returns>UriBuilder</returns>
+        </member>
+        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.GetApiDefinitionsAsync``1">
+            <summary>
+            Generic Method to get API Definitions (Taskgroups, Variablegroups, Build- or Release Pipelines)
+            </summary>
+            <typeparam name="DefinitionType">
+            Type of Definition. Can be: Taskgroup, Build- or Release Pipeline
+            </typeparam>
+            <returns>List of API Definitions</returns>
+        </member>
+        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.UpdateTaskGroupsAsync(System.Collections.Generic.IEnumerable{MigrationTools.DataContracts.Pipelines.TaskGroup},System.Collections.Generic.IEnumerable{MigrationTools.DataContracts.Pipelines.TaskGroup},System.Collections.Generic.IEnumerable{MigrationTools.DataContracts.Pipelines.TaskGroup})">
+            <summary>
+            Make HTTP Request to add Revision / Version of Task Group
+            </summary>
+            <param name="targetDefinitions"></param>
+            <param name="rootDefinitions"></param>
+            <param name="updatedDefinitions"></param>
+            <returns>List of Mappings</returns>
+        </member>
+        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.CreateApiDefinitionsAsync``1(System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Make HTTP Request to create a Definition
+            </summary>
+            <typeparam name="DefinitionType"></typeparam>
+            <param name="definitionsToBeMigrated"></param>
+            <returns>List of Mappings</returns>
+        </member>
+        <member name="T:MigrationTools.Processors.AzureDevOpsPipelineProcessor">
+            <summary>
+            Azure DevOps Processor that migrates Taskgroups, Build- and Release Pipelines.
+            </summary>
+        </member>
+        <member name="M:MigrationTools.Processors.AzureDevOpsPipelineProcessor.MigratePipelinesAsync">
+            <summary>
+            Executes Method for migrating Taskgroups, Variablegroups or Pipelines, depinding on what
+            is set in the config.
+            </summary>
+        </member>
+        <member name="M:MigrationTools.Processors.AzureDevOpsPipelineProcessor.FindExistingMappings``1(System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.List{MigrationTools.DataContracts.Mapping})">
+            <summary>
+            Map the taskgroups that are already migrated
+            </summary>
+            <typeparam name="DefintionType"></typeparam>
+            <param name="sourceDefinitions"></param>
+            <param name="targetDefinitions"></param>
+            <param name="newMappings"></param>
+            <returns>Mapping list</returns>
+        </member>
+        <member name="M:MigrationTools.Processors.AzureDevOpsPipelineProcessor.FilterOutExistingDefinitions``1(System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Filter existing Definitions
+            </summary>
+            <typeparam name="DefinitionType"></typeparam>
+            <param name="sourceDefinitions"></param>
+            <param name="targetDefinitions"></param>
+            <returns>List of filtered Definitions</returns>
+        </member>
+        <member name="M:MigrationTools.Processors.AzureDevOpsPipelineProcessor.FilterOutExistingTaskGroups(System.Collections.Generic.IEnumerable{MigrationTools.DataContracts.Pipelines.TaskGroup},System.Collections.Generic.IEnumerable{MigrationTools.DataContracts.Pipelines.TaskGroup})">
+            <summary>
+            Filter existing TaskGroups
+            </summary>
+            <typeparam name="DefinitionType"></typeparam>
+            <param name="sourceDefinitions"></param>
+            <param name="targetDefinitions"></param>
+            <returns>List of filtered Definitions</returns>
+        </member>
+        <member name="M:MigrationTools.Processors.AzureDevOpsPipelineProcessor.SortDefinitionsByVersion(System.Collections.Generic.IEnumerable{MigrationTools.DataContracts.Pipelines.TaskGroup})">
+            <summary>
+            Group and Sort Definitions by Version numer
+            </summary>
+            <param name="sourceDefinitions"></param>
+            <returns>List of sorted Definitions</returns>
+        </member>
+        <member name="P:MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions.MigrateBuildPipelines">
+            <summary>
+            Migrate Build Pipelines
+            </summary>
+            <default>true</default>
+        </member>
+        <member name="P:MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions.MigrateReleasePipelines">
+            <summary>
+            Migrate Release Pipelines
+            </summary>
+            <default>true</default>
+        </member>
+        <member name="P:MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions.MigrateTaskGroups">
+            <summary>
+            Migrate Task Groups
+            </summary>
+            <default>true</default>
+        </member>
+        <member name="P:MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions.MigrateVariableGroups">
+            <summary>
+            Migrate Valiable Groups
+            </summary>
+            <default>true</default>
+        </member>
+        <member name="P:MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions.MigrateServiceConnections">
+            <summary>
+            Migrate Service Connections **secrets need to be entered manually**
+            </summary>
+            <default>true</default>
+        </member>
+        <member name="P:MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions.BuildPipelines">
+            <summary>
+            List of Build Pipelines to process. If this is `null` then all Build Pipelines will be processed. **Not implemented yet**
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions.ReleasePipelines">
+            <summary>
+            List of Release Pipelines to process. If this is `null` then all Release Pipelines will be processed. **Not implemented yet**
+            </summary>
+        </member>
     </members>
 </doc>

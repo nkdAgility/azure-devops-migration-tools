@@ -11,6 +11,7 @@ using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Configuration.Processing;
 using MigrationTools._EngineV1.DataContracts;
 using MigrationTools._EngineV1.Processors;
+using MigrationTools.DataContracts;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -44,7 +45,7 @@ namespace VstsSyncMigrator.Engine
             string constraints = BuildQueryBitConstraints();
             wiqb.Query = string.Format(@"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY [System.Id] ", constraints);
 
-            List<MigrationTools._EngineV1.DataContracts.WorkItemData> sourceWIS = Engine.Target.WorkItems.GetWorkItems((IWorkItemQueryBuilder)wiqb);
+            List<WorkItemData> sourceWIS = Engine.Target.WorkItems.GetWorkItems((IWorkItemQueryBuilder)wiqb);
             Log.LogInformation("Migrate {0} work items?", sourceWIS.Count);
             //////////////////////////////////////////////////
             ProjectData destProject = Engine.Target.WorkItems.GetProject();
@@ -53,11 +54,11 @@ namespace VstsSyncMigrator.Engine
             int current = sourceWIS.Count;
             int count = 0;
             long elapsedms = 0;
-            foreach (MigrationTools._EngineV1.DataContracts.WorkItemData sourceWI in sourceWIS)
+            foreach (WorkItemData sourceWI in sourceWIS)
             {
                 Stopwatch witstopwatch = Stopwatch.StartNew();
-                MigrationTools._EngineV1.DataContracts.WorkItemData targetFound;
-                targetFound = Engine.Target.WorkItems.FindReflectedWorkItem((MigrationTools._EngineV1.DataContracts.WorkItemData)sourceWI, (bool)false);
+                WorkItemData targetFound;
+                targetFound = Engine.Target.WorkItems.FindReflectedWorkItem((WorkItemData)sourceWI, (bool)false);
                 Log.LogInformation("{0} - Updating: {1}-{2}", current, sourceWI.Id, sourceWI.Type);
                 if (targetFound == null)
                 {

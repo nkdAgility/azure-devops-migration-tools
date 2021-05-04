@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Microsoft.Extensions.Options;
 using MigrationTools._EngineV1.Configuration;
 
 namespace MigrationTools._EngineV1.Containers
@@ -11,7 +12,7 @@ namespace MigrationTools._EngineV1.Containers
 
         public override ReadOnlyDictionary<string, string> Items { get { return new ReadOnlyDictionary<string, string>(GitRepoMaps); } }
 
-        public GitRepoMapContainer(IServiceProvider services, EngineConfiguration config) : base(services, config)
+        public GitRepoMapContainer(IServiceProvider services, IOptions<EngineConfiguration> config) : base(services, config)
         {
             GitRepoMaps = new Dictionary<string, string>();
         }

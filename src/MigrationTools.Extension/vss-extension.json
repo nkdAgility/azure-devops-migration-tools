@@ -40,7 +40,7 @@
       "uri": "https://nkdagility.github.io/azure-devops-migration-tools/"
     },
     "support": {
-      "uri": "https://stackoverflow.com/questions/tagged/azure-devops-migration-tools"
+      "uri": "https://github.com/nkdAgility/azure-devops-migration-tools/discussions"
     },
     "repository": {
       "uri": "https://github.com/nkdAgility/azure-devops-migration-tools"
@@ -51,7 +51,7 @@
   },
   "CustomerQnASupport": {
     "enableqna": "true",
-    "url": "https://stackoverflow.com/questions/tagged/azure-devops-migration-tools"
+    "url": "https://github.com/nkdAgility/azure-devops-migration-tools/discussions"
   },
   "badges": [
     {

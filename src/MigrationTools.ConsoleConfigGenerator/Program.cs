@@ -24,12 +24,13 @@ namespace VstsSyncMigrator.ConsoleApp
         public static AppDomain domain = AppDomain.CreateDomain("MigrationTools");
         private static string referencePath = "../../../../../docs/Reference/";
 
-        public static async Task Main(string[] args)
+        public static void Main(string[] args)
         {
             string dir = AppDomain.CurrentDomain.BaseDirectory;
 
             domain.Load("MigrationTools");
             domain.Load("MigrationTools.Clients.AzureDevops.ObjectModel");
+            domain.Load("MigrationTools.Clients.AzureDevops.Rest");
             domain.Load("MigrationTools.Clients.FileSystem");
             //AppDomain.CurrentDomain.Load("MigrationTools.Clients.AzureDevops.Rest");
             List<Type> types = domain.GetAssemblies()
@@ -54,28 +55,39 @@ namespace VstsSyncMigrator.ConsoleApp
         {
             string masterTemplate = System.IO.Path.Combine(referencePath, "template.md");
             var founds = types.Where(t => type.IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface).ToList();
+            ProcessIndexFile(types, folder, masterTemplate);
+            // Each File
             foreach (var item in founds)
             {
-                var typeOption = types.Where(t => t.Name == string.Format("{0}Options", item.Name) && !t.IsAbstract && !t.IsInterface).SingleOrDefault();
-                if (typeOption != null)
-                {
-                    var options = (IOptions)Activator.CreateInstance(typeOption);
-                    options.SetDefaults();
-                    JObject joptions = (JObject)JToken.FromObject(options);
-                    //---------------------------------------
-                    Console.WriteLine("Processing:" + item.Name);
-                    var jsonSample = DeployJsonSample(options, folder, referencePath, item);
+                ProcessItemFile(types, folder, masterTemplate, item);
+            }
+        }
 
-                    string templatemd = GetTemplate(folder, referencePath, masterTemplate, item);
+        private static void ProcessIndexFile(List<Type> types, string folder, string masterTemplate)
+        {
+        }
 
-                    templatemd = templatemd.Replace("<ClassName>", item.Name);
-                    templatemd = templatemd.Replace("<TypeName>", folder);
-                    templatemd = ProcessBreadcrumbs(folder, item, templatemd);
-                    templatemd = templatemd.Replace("<Description>", GetTypeSummary(item));
-                    templatemd = ProcessOptions(options, joptions, templatemd);
-                    templatemd = ProcessSamples(jsonSample, templatemd, referencePath);
-                    File.WriteAllText(string.Format("../../../../../docs/Reference/{0}/{1}.md", folder, item.Name), templatemd);
-                }
+        private static void ProcessItemFile(List<Type> types, string folder, string masterTemplate, Type item)
+        {
+            var typeOption = types.Where(t => t.Name == string.Format("{0}Options", item.Name) && !t.IsAbstract && !t.IsInterface).SingleOrDefault();
+            if (typeOption != null)
+            {
+                var options = (IOptions)Activator.CreateInstance(typeOption);
+                options.SetDefaults();
+                JObject joptions = (JObject)JToken.FromObject(options);
+                //---------------------------------------
+                Console.WriteLine("Processing:" + item.Name);
+                var jsonSample = DeployJsonSample(options, folder, referencePath, item);
+
+                string templatemd = GetTemplate(folder, referencePath, masterTemplate, item);
+
+                templatemd = templatemd.Replace("<ClassName>", item.Name);
+                templatemd = templatemd.Replace("<TypeName>", folder);
+                templatemd = ProcessBreadcrumbs(folder, item, templatemd);
+                templatemd = templatemd.Replace("<Description>", GetTypeSummary(item));
+                templatemd = ProcessOptions(options, joptions, templatemd);
+                templatemd = ProcessSamples(jsonSample, templatemd, referencePath);
+                File.WriteAllText(string.Format("../../../../../docs/Reference/{0}/{1}.md", folder, item.Name), templatemd);
             }
         }
 

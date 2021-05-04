@@ -20,15 +20,16 @@ namespace MigrationTools.Processors
         private int totalQueriesMigrated;
         private int totalQueryFailed;
 
-        public TfsEndpoint Source => (TfsEndpoint)Endpoints.Source;
+        public new TfsEndpoint Source => (TfsEndpoint)base.Source;
 
-        public TfsEndpoint Target => (TfsEndpoint)Endpoints.Target;
+        public new TfsEndpoint Target => (TfsEndpoint)base.Target;
 
         public TfsSharedQueryProcessor(ProcessorEnricherContainer processorEnrichers,
-                                       EndpointContainer endpoints,
+                                       IEndpointFactory endpointFactory,
                                        IServiceProvider services,
                                        ITelemetryLogger telemetry,
-                                       ILogger<Processor> logger) : base(processorEnrichers, endpoints, services, telemetry, logger)
+                                       ILogger<Processor> logger)
+            : base(processorEnrichers, endpointFactory, services, telemetry, logger)
         {
         }
 
@@ -140,7 +141,7 @@ namespace MigrationTools.Processors
         /// </summary>
         /// <param name="targetHierarchy">The object that represents the whole of the target query tree</param>
         /// <param name="query">Query Definition - Contains the Query Details</param>
-        /// <param name="QueryFolder">Parent Folder</param>
+        /// <param name="parentFolder">Parent Folder</param>
         private void MigrateQuery(QueryHierarchy targetHierarchy, QueryDefinition query, QueryFolder parentFolder)
         {
             if (parentFolder.FirstOrDefault(q => q.Name == query.Name) != null)
@@ -163,7 +164,7 @@ namespace MigrationTools.Processors
                 {
                     foreach (var sourceField in _Options.SourceToTargetFieldMappings.Keys)
                     {
-                        fixedQueryText = query.QueryText.Replace(sourceField, _Options.SourceToTargetFieldMappings[sourceField]);
+                        fixedQueryText = fixedQueryText.Replace(sourceField, _Options.SourceToTargetFieldMappings[sourceField]);
                     }
                 }
 

@@ -9,53 +9,45 @@ namespace MigrationTools.Processors.Tests
     [TestClass()]
     public class TfsSharedQueryProcessorTests : TfsProcessorTests
     {
-        public ServiceProvider Services { get; private set; }
-
-        [TestInitialize]
-        public void Setup()
-        {
-            Services = ServiceProviderHelper.GetServices();
-        }
-
-        [TestMethod(), TestCategory("L0")]
+        [TestMethod(), TestCategory("L0"), TestCategory("AzureDevOps.ObjectModel")]
         public void TfsSharedQueryProcessorTest()
         {
             var x = Services.GetRequiredService<TfsSharedQueryProcessor>();
             Assert.IsNotNull(x);
         }
 
-        [TestMethod(), TestCategory("L0")]
-        public void ConfigureTest()
+        [TestMethod(), TestCategory("L0"), TestCategory("AzureDevOps.ObjectModel")]
+        public void TfsSharedQueryProcessorConfigureTest()
         {
             var y = new TfsSharedQueryProcessorOptions
             {
                 Enabled = true,
                 PrefixProjectToNodes = false,
-                Source = GetTfsWorkItemEndPointOptions("source"),
-                Target = GetTfsWorkItemEndPointOptions("target")
+                SourceName = "Source",
+                TargetName = "Target"
             };
             var x = Services.GetRequiredService<TfsSharedQueryProcessor>();
             x.Configure(y);
             Assert.IsNotNull(x);
         }
 
-        [TestMethod(), TestCategory("L0")]
-        public void RunTest()
+        [TestMethod(), TestCategory("L0"), TestCategory("AzureDevOps.ObjectModel")]
+        public void TfsSharedQueryProcessorRunTest()
         {
             var y = new TfsSharedQueryProcessorOptions
             {
                 Enabled = true,
                 PrefixProjectToNodes = false,
-                Source = GetTfsWorkItemEndPointOptions("source"),
-                Target = GetTfsWorkItemEndPointOptions("target")
+                SourceName = "Source",
+                TargetName = "Target"
             };
             var x = Services.GetRequiredService<TfsSharedQueryProcessor>();
             x.Configure(y);
             Assert.IsNotNull(x);
         }
 
-        [TestMethod(), TestCategory("L3")]
-        public void TestTfsSharedQueryProcessorNoEnrichers()
+        [TestMethod(), TestCategory("L3"), TestCategory("AzureDevOps.ObjectModel")]
+        public void TfsSharedQueryProcessorNoEnrichersTest()
         {
             // Senario 1 Migration from Tfs to Tfs with no Enrichers.
             var migrationConfig = GetTfsSharedQueryProcessorOptions();

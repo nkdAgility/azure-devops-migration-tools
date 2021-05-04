@@ -18,16 +18,17 @@ namespace MigrationTools.Processors
         private TfsTeamSettingsProcessorOptions _Options;
 
         public TfsTeamSettingsProcessor(ProcessorEnricherContainer processorEnrichers,
-                                        EndpointContainer endpoints,
+                                        IEndpointFactory endpointFactory,
                                         IServiceProvider services,
                                         ITelemetryLogger telemetry,
-                                        ILogger<Processor> logger) : base(processorEnrichers, endpoints, services, telemetry, logger)
+                                        ILogger<Processor> logger)
+            : base(processorEnrichers, endpointFactory, services, telemetry, logger)
         {
         }
 
-        public TfsTeamSettingsEndpoint Source => (TfsTeamSettingsEndpoint)Endpoints.Source;
+        public new TfsTeamSettingsEndpoint Source => (TfsTeamSettingsEndpoint)base.Source;
 
-        public TfsTeamSettingsEndpoint Target => (TfsTeamSettingsEndpoint)Endpoints.Target;
+        public new TfsTeamSettingsEndpoint Target => (TfsTeamSettingsEndpoint)base.Target;
 
         public override void Configure(IProcessorOptions options)
         {
@@ -38,10 +39,34 @@ namespace MigrationTools.Processors
 
         protected override void InternalExecute()
         {
+            Log.LogInformation("Processor::InternalExecute::Start");
+            EnsureConfigured();
+            ProcessorEnrichers.ProcessorExecutionBegin(this);
+            MigrateTeamSettings();
+            ProcessorEnrichers.ProcessorExecutionEnd(this);
+            Log.LogInformation("Processor::InternalExecute::End");
+        }
+
+
+
+        private void EnsureConfigured()
+        {
+            Log.LogInformation("Processor::EnsureConfigured");
             if (_Options == null)
             {
                 throw new Exception("You must call Configure() first");
             }
+            if (Source is not TfsTeamSettingsEndpoint)
+            {
+                throw new Exception("The Source endpoint configured must be of type TfsTeamSettingsEndpoint");
+            }
+            if (Target is not TfsTeamSettingsEndpoint)
+            {
+                throw new Exception("The Target endpoint configured must be of type TfsTeamSettingsEndpoint");
+            }
+        }
+        private void MigrateTeamSettings()
+        {
             Stopwatch stopwatch = Stopwatch.StartNew();
             //////////////////////////////////////////////////
             List<TeamFoundationTeam> sourceTeams = Source.TfsTeamService.QueryTeams(Source.Project).ToList();
@@ -55,13 +80,11 @@ namespace MigrationTools.Processors
             long elapsedms = 0;
 
             /////////
-            ///
             if (_Options.Teams != null)
             {
                 sourceTeams = sourceTeams.Where(t => _Options.Teams.Contains(t.Name)).ToList();
             }
-            /// Create teams
-            ///
+            // Create teams
             foreach (TeamFoundationTeam sourceTeam in sourceTeams)
             {
                 Stopwatch witstopwatch = Stopwatch.StartNew();
@@ -74,7 +97,7 @@ namespace MigrationTools.Processors
 
                     if (_Options.MigrateTeamSettings)
                     {
-                        /// Duplicate settings
+                        // Duplicate settings
                         Log.LogDebug("-> Processing team '{0}' settings:", sourceTeam.Name);
                         var sourceConfigurations = Source.TfsTeamSettingsService.GetTeamConfigurations(new List<Guid> { sourceTeam.Identity.TeamFoundationId });
                         var targetConfigurations = Target.TfsTeamSettingsService.GetTeamConfigurations(new List<Guid> { newTeam.Identity.TeamFoundationId });

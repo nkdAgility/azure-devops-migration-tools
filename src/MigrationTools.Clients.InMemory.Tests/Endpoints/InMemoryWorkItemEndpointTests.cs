@@ -105,14 +105,14 @@ namespace MigrationTools.Endpoints.Tests
                 });
             }
 
-            List<RevisionItem> GetRevisions()
+            SortedDictionary<int, RevisionItem> GetRevisions()
             {
                 Random rand = new Random();
                 int revCount = rand.Next(0, 5);
-                List<RevisionItem> list = new List<RevisionItem>();
+                SortedDictionary<int, RevisionItem> list = new SortedDictionary<int, RevisionItem>();
                 for (int i = 0; i < revCount; i++)
                 {
-                    list.Add(new RevisionItem { Index = i, Number = i, ChangedDate = DateTime.Now.AddHours(-i) });
+                    list.Add(i, new RevisionItem { Index = i, Number = i, ChangedDate = DateTime.Now.AddHours(-i) });
                 }
                 return list;
             }

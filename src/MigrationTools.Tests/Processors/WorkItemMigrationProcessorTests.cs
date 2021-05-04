@@ -16,8 +16,8 @@ namespace MigrationTools.Processors.Tests
             Services = ServiceProviderHelper.GetWorkItemMigrationProcessor();
         }
 
-        [TestMethod(), TestCategory("L0")]
-        public void ConfigureTest()
+        [TestMethod(), TestCategory("L0"), TestCategory("Generic.Processor")]
+        public void WorkItemMigrationProcessorConfigureTest()
         {
             var y = new WorkItemTrackingProcessorOptions
             {
@@ -26,16 +26,16 @@ namespace MigrationTools.Processors.Tests
                 ReplayRevisions = true,
                 WorkItemCreateRetryLimit = 5,
                 PrefixProjectToNodes = false,
-                Source = new InMemoryWorkItemEndpointOptions(),
-                Target = new InMemoryWorkItemEndpointOptions()
+                SourceName = "Source",
+                TargetName = "Target"
             };
             var x = Services.GetRequiredService<WorkItemTrackingProcessor>();
             x.Configure(y);
             Assert.IsNotNull(x);
         }
 
-        [TestMethod(), TestCategory("L1")]
-        public void RunTest()
+        [TestMethod(), TestCategory("L1"), TestCategory("Generic.Processor")]
+        public void WorkItemMigrationProcessorRunTest()
         {
             var y = new WorkItemTrackingProcessorOptions
             {
@@ -44,8 +44,8 @@ namespace MigrationTools.Processors.Tests
                 ReplayRevisions = true,
                 WorkItemCreateRetryLimit = 5,
                 PrefixProjectToNodes = false,
-                Source = new InMemoryWorkItemEndpointOptions(),
-                Target = new InMemoryWorkItemEndpointOptions()
+                SourceName = "Source",
+                TargetName = "Target"
             };
             var x = Services.GetRequiredService<WorkItemTrackingProcessor>();
             x.Configure(y);

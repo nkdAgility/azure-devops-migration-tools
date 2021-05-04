@@ -9,10 +9,11 @@ using Microsoft.TeamFoundation.Framework.Client;
 using Microsoft.TeamFoundation.Framework.Common;
 using Microsoft.TeamFoundation.TestManagement.Client;
 using MigrationTools;
+using MigrationTools._EngineV1.Clients;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Configuration.Processing;
-using MigrationTools._EngineV1.DataContracts;
 using MigrationTools._EngineV1.Processors;
+using MigrationTools.DataContracts;
 using VstsSyncMigrator.Engine.ComponentContext;
 
 namespace VstsSyncMigrator.Engine
@@ -446,6 +447,10 @@ namespace VstsSyncMigrator.Engine
         {
             IDynamicTestSuite targetSuiteChild = _targetTestStore.Project.TestSuites.CreateDynamic();
             targetSuiteChild.TestSuiteEntry.Title = source.TestSuiteEntry.Title;
+            if (targetSuiteChild is ITestSuiteBase2)
+            {
+                ((ITestSuiteBase2)targetSuiteChild).Status = ((ITestSuiteBase2)source).Status;
+            }
             ApplyTestSuiteQuery(source, targetSuiteChild, _targetTestStore);
 
             return targetSuiteChild;
@@ -471,6 +476,11 @@ namespace VstsSyncMigrator.Engine
         {
             ITestSuiteBase targetSuiteChild = _targetTestStore.Project.TestSuites.CreateStatic();
             targetSuiteChild.TestSuiteEntry.Title = source.TestSuiteEntry.Title;
+            targetSuiteChild.State = TestSuiteState.InPlanning;
+            if (targetSuiteChild is ITestSuiteBase2)
+            {
+                ((ITestSuiteBase2)targetSuiteChild).Status = ((ITestSuiteBase2)source).Status;
+            }
             return targetSuiteChild;
         }
 
@@ -483,6 +493,10 @@ namespace VstsSyncMigrator.Engine
             targetPlan.StartDate = sourcePlan.StartDate;
             targetPlan.EndDate = sourcePlan.EndDate;
             targetPlan.Description = sourcePlan.Description;
+            if (targetPlan is ITestPlan2)
+            {
+                ((ITestPlan2)targetPlan).Status = ((ITestPlan2)sourcePlan).Status;
+            }
 
             // Set area and iteration to root of the target project.
             // We will set the correct values later, when we actually have a work item available
@@ -600,7 +614,8 @@ namespace VstsSyncMigrator.Engine
                     foreach (Match match in matches)
                     {
                         var qid = match.Value.Split('=')[1].Trim();
-                        var targetWi = Engine.Target.WorkItems.FindReflectedWorkItemByReflectedWorkItemId(qid);
+                        TfsReflectedWorkItemId reflectedString = new TfsReflectedWorkItemId(int.Parse(qid), Engine.Source.Config.AsTeamProjectConfig().Project, Engine.Source.Config.AsTeamProjectConfig().Collection);
+                        var targetWi = Engine.Target.WorkItems.FindReflectedWorkItemByReflectedWorkItemId(reflectedString.ToString());
 
                         if (targetWi == null)
                         {
@@ -730,10 +745,10 @@ namespace VstsSyncMigrator.Engine
                 : $"{sourcePlan.Name}";
             InnerLog(sourcePlan, $"Process Plan {newPlanName}", 0, true);
             var targetPlan = FindTestPlan(_targetTestStore, newPlanName);
-            if (targetPlan != null && TargetPlanContansTag(targetPlan.Id))
-            {
-                return;
-            }
+            //if (targetPlan != null && TargetPlanContansTag(targetPlan.Id))
+            //{
+            //    return;
+            //}
             if (targetPlan == null)
             {
                 InnerLog(sourcePlan, $" Creating Plan {newPlanName}", 5);
@@ -759,6 +774,8 @@ namespace VstsSyncMigrator.Engine
             {
                 InnerLog(sourcePlan, $"Found Plan {newPlanName}", 5); ;
             }
+            targetPlan.Save();
+            targetPlan.Refresh();
             if (HasChildSuites(sourcePlan.RootSuite))
             {
                 __currentSuite = 0;
@@ -769,6 +786,7 @@ namespace VstsSyncMigrator.Engine
                 {
                     __currentSuite++;
                     InnerLog(sourceSuiteChild, $"", 5, true);
+
                     ProcessTestSuite(sourceSuiteChild, targetPlan.RootSuite, targetPlan);
                 }
                 __currentSuite = 0;
@@ -864,6 +882,7 @@ namespace VstsSyncMigrator.Engine
                 {
                     // Apply default configurations, Add to target and Save
                     ApplyDefaultConfigurations(sourceSuite, targetSuiteChild);
+
                     if (targetSuiteChild.Plan == null)
                     {
                         SaveNewTestSuiteToPlan(targetPlan, (IStaticTestSuite)targetParent, targetSuiteChild);
@@ -963,7 +982,7 @@ namespace VstsSyncMigrator.Engine
             }
             catch (TestManagementServerException ex)
             {
-                Log.LogError(ex, " FAILED {TestSuiteType} : {Id} - {Title}",
+                Log.LogError(ex, " FAILED {TestSuiteType} : {Id} - {Title}", newTestSuite.TestSuiteType.ToString(), newTestSuite.Id.ToString(), newTestSuite.Title,
                       new Dictionary<string, string> {
                           { "Name", Name},
                           { "Target Project", Engine.Target.Config.AsTeamProjectConfig().Project},
@@ -986,9 +1005,10 @@ namespace VstsSyncMigrator.Engine
 
         private void TagCompletedTargetPlan(int workItemId)
         {
-            var targetPlanWorkItem = Engine.Target.WorkItems.GetWorkItem(workItemId.ToString());
-            targetPlanWorkItem.ToWorkItem().Tags = targetPlanWorkItem.ToWorkItem().Tags + ";migrated";
-            targetPlanWorkItem.SaveToAzureDevOps();
+            // Remvoed to fix bug #852
+            //var targetPlanWorkItem = Engine.Target.WorkItems.GetWorkItem(workItemId.ToString());
+            //targetPlanWorkItem.ToWorkItem().Tags = targetPlanWorkItem.ToWorkItem().Tags + ";migrated";
+            //targetPlanWorkItem.SaveToAzureDevOps();
         }
 
         private bool TargetPlanContansTag(int workItemId)

@@ -10,14 +10,14 @@ namespace MigrationTools.Configuration.Tests
     public class EngineConfigurationBuilderTests
     {
         [TestMethod(), TestCategory("L0")]
-        public void BuildDefaultTest()
+        public void EngineConfigurationBuilderBuildDefaultTest()
         {
             var ecb = CreateEngine();
             ecb.BuildDefault();
         }
 
         [TestMethod(), TestCategory("L0")]
-        public void BuildFromFileTest()
+        public void EngineConfigurationBuilderBuildFromFileTest()
         {
             HelperCreateDefaultConfigFile();
             var ecb = CreateEngine();
@@ -25,27 +25,24 @@ namespace MigrationTools.Configuration.Tests
         }
 
         [TestMethod(), TestCategory("L0")]
-        public void BuildWorkItemMigrationTest()
+        public void EngineConfigurationBuilderBuildWorkItemMigrationTest()
         {
             var ecb = CreateEngine();
             ecb.BuildWorkItemMigration();
         }
 
         [TestMethod, TestCategory("L0")]
-        public void TestDeseraliseFromJson()
+        public void EngineConfigurationBuilderDeseraliseFromJsonTest()
         {
             HelperCreateDefaultConfigFile();
-            EngineConfiguration ec;
-            StreamReader sr = new StreamReader("configuration.json");
-            string configurationjson = sr.ReadToEnd();
-            sr.Close();
-            ec = NewtonsoftHelpers.DeserializeObject<EngineConfiguration>(configurationjson);
+            var ecb = CreateEngine();
+            EngineConfiguration ec = ecb.BuildFromFile("configuration.json");
             Assert.AreEqual(10, ec.FieldMaps.Count);
             Assert.AreEqual(12, ec.Processors.Count);
         }
 
         [TestMethod, TestCategory("L0")]
-        public void TestSeraliseToJson()
+        public void EngineConfigurationBuilderSeraliseToJsonTest()
         {
             HelperCreateDefaultConfigFile();
         }
@@ -60,11 +57,8 @@ namespace MigrationTools.Configuration.Tests
         private void HelperCreateDefaultConfigFile()
         {
             var ecb = CreateEngine();
-            EngineConfiguration ec = ecb.BuildDefault();
-            string json = NewtonsoftHelpers.SerializeObject(ecb.BuildDefault());
-            StreamWriter sw = new StreamWriter("configuration.json");
-            sw.WriteLine(json);
-            sw.Close();
+            var config = ecb.BuildDefault();
+            ecb.WriteSettings(config, "configuration.json");
         }
     }
 }

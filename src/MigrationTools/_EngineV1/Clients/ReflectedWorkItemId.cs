@@ -1,12 +1,10 @@
 ﻿using System;
-using MigrationTools._EngineV1.DataContracts;
+using MigrationTools.DataContracts;
 
 namespace MigrationTools._EngineV1.Clients
 {
     public abstract class ReflectedWorkItemId
     {
-        private string _WorkItemId;
-
         public ReflectedWorkItemId(WorkItemData workItem)
         {
             if (workItem is null)
@@ -14,7 +12,7 @@ namespace MigrationTools._EngineV1.Clients
                 throw new ArgumentNullException(nameof(workItem));
             }
 
-            _WorkItemId = workItem.Id;
+            WorkItemId = workItem.Id;
         }
 
         public ReflectedWorkItemId(string ReflectedWorkItemId)
@@ -23,7 +21,16 @@ namespace MigrationTools._EngineV1.Clients
             {
                 throw new ArgumentNullException(nameof(ReflectedWorkItemId));
             }
-            _WorkItemId = ReflectedWorkItemId;
+            WorkItemId = ReflectedWorkItemId;
+        }
+
+        public ReflectedWorkItemId(int ReflectedWorkItemId)
+        {
+            if (ReflectedWorkItemId == 0)
+            {
+                throw new ArgumentNullException(nameof(ReflectedWorkItemId));
+            }
+            WorkItemId = ReflectedWorkItemId.ToString();
         }
 
         public override string ToString()
@@ -33,10 +40,7 @@ namespace MigrationTools._EngineV1.Clients
 
         public string WorkItemId
         {
-            get
-            {
-                return _WorkItemId;
-            }
+            get; private set;
         }
     }
 }

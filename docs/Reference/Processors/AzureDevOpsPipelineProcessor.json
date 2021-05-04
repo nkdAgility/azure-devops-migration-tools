@@ -1,0 +1,30 @@
+{
+  "$type": "AzureDevOpsPipelineProcessorOptions",
+  "Enabled": false,
+  "MigrateBuildPipelines": true,
+  "MigrateReleasePipelines": true,
+  "MigrateTaskGroups": true,
+  "MigrateVariableGroups": true,
+  "MigrateServiceConnections": true,
+  "BuildPipelines": null,
+  "ReleasePipelines": null,
+  "ProcessorEnrichers": null,
+  "Source": {
+    "$type": "AzureDevOpsEndpointOptions",
+    "Organisation": "https://dev.azure.com/nkdagility-preview/",
+    "Project": "sourceProject",
+    "AuthenticationMode": "AccessToken",
+    "AccessToken": "6i4jyylsadahtdjniaydxnjsi4zsz3qsword2y5ngzzsdfewaostq",
+    "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
+    "EndpointEnrichers": null
+  },
+  "Target": {
+    "$type": "AzureDevOpsEndpointOptions",
+    "Organisation": "https://dev.azure.com/nkdagility-preview/",
+    "Project": "targetProject",
+    "AuthenticationMode": "AccessToken",
+    "AccessToken": "6i4jyylsadahtdjniaydxnjsi4zsz3qsword2y5ngzzsdfewaostq",
+    "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
+    "EndpointEnrichers": null
+  }
+}

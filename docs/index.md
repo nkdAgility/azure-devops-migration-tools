@@ -13,9 +13,9 @@ The Azure DevOps Migration Tools allow you to bulk edit and migrate data between
 
 ## What can you do with this tool?
 
-- Migrate `Work Items`, `TestPlans & Suits`, `Teams`, & `Shared Queries` from one `Team Project` to another
-- Migrate `Work Items`, `TestPlans & Suits`, `Teams`, & `Shared Queries` from one `Organisation` to another
-- Bulk edit of `Work Items` accross an entire `Project`. 
+- Migrate `Work Items`, `TestPlans & Suits`, `Teams`, `Shared Queries`, & `Pipelines` from one `Team Project` to another
+- Migrate `Work Items`, `TestPlans & Suits`, `Teams`, `Shared Queries`, & `Pipelines` from one `Organisation` to another
+- Bulk edit of `Work Items` accross an entire `Project`.
 
 ### What versions of Azure DevOps & TFS do you support?
 
@@ -30,9 +30,10 @@ The Azure DevOps Migration Tools allow you to bulk edit and migrate data between
 - Assistance in changing Process Templates
 - Bulk edit of Work Items
 - Migration of Test Suites & Test Plans
+- _new_ Migration of Builds & Pipelines
 - Migrate from one Language version of TFS / Azure Devops to another (*new v9.0*)
 
-**NOTE: If you are able to migrate your entire Collection to Azure DevOps Services you should use [Azure DevOps Migration Service](https://www.visualstudio.com/team-services/migrate-tfs-vsts/) from Microsoft. If you have a requirement to change Process Template then you will need to do that before you move t
+**NOTE: If you are able to migrate your entire Collection to Azure DevOps Services you should use [Azure DevOps Migration Service](https://azure.microsoft.com/services/devops/migrate/) from Microsoft. If you have a requirement to change Process Template then you will need to do that before you move t
 
 
 ## Quick Links
@@ -90,9 +91,11 @@ Most of these processors need to be run in order. If you try to migrate work ite
 |Processor | Status |Target |Usage |
 |---------|---------|---------|---------|
 |[WorkItemMigration](./Processors/WorkItemMigrationConfig.md) | ready | Work Items | Migrates either tip or history of work items with Links & Attachments based on a query with field mappings |
-|[TfsTeamSettingsProcessor](./Reference/Processors/TfsTeamSettingsProcessor.md) | preview | Teams | Migrates Teams and Team Settings ||[WorkItemDelete](./Processors/WorkItemDeleteConfig.md) | ready | Work Items | Bulk delete of work items **WARNING DANGEROUS** |
+|[TfsTeamSettingsProcessor](./Reference/Processors/TfsTeamSettingsProcessor.md) | preview | Teams | Migrates Teams and Team Settings |
+|[TfsAreaAndIterationProcessor](./Reference/Processors/TfsAreaAndIterationProcessor.md) | preview | Area & Iterations | Migrates Nodes before run |
+|[WorkItemDelete](./Processors/WorkItemDeleteConfig.md) | ready | Work Items | Bulk delete of work items **WARNING DANGEROUS** |
 |[WorkItemUpdate](./Processors/WorkItemUpdateConfig.md) | ready | Work Items | Bulk update of Work Items based on a query and field mappings |
-|[TfsSharedQueryProcessor](./Reference/Processors/TfsTeamSettingsProcessor.md) | preview | Shared Queries | Moved Shared Queries best effort |
+|[TfsSharedQueryProcessor](./Reference/Processors/TfsSharedQueryProcessor.md) | preview | Shared Queries | Moved Shared Queries best effort |
 |[TestVariablesMigration](./Processors/TestVariablesMigrationConfig.md) | Beta | Suites & Plans | Migrates Test Variables |
 |[TestConfigurationsMigration](./Processors/TestConfigurationsMigrationConfig.md) | Beta  | Suites & Plans | Migrates Test configurations |
 |[TestPlansAndSuitesMigration](./Processors/TestPlansAndSuitesMigrationConfig.md) | Beta  | Suites & Plans | Rebuilds Suits and plans for Test Cases migrated using the WorkItemMigration |
@@ -111,7 +114,7 @@ Most of these processors need to be run in order. If you try to migrate work ite
 
 ### Processors (v2 Architecture) [ PREVIEW ]
 
-**_These are experimental processors that should replace those above. We are intersted in feedback of the new foramt of the config, as well as the functionality._**
+**_These are experimental processors that should replace those above. We are intersted in feedback of the new format of the config, as well as the functionality._**
 
 The new processor configuration is designed to allow the Migration Tools to support diferent Source and targets than just TFS/Azure DevOps, and we moved the Endpoints to the processor to allow both Object Model & REST in different processors.
 

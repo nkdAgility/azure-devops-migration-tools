@@ -12,11 +12,11 @@ using MigrationTools.Helpers;
 using MigrationTools.Options;
 using MigrationTools.Processors;
 using Newtonsoft.Json;
-using Serilog.Events;
+using Newtonsoft.Json.Linq;
 
 namespace MigrationTools._EngineV1.Configuration
 {
-    public class EngineConfigurationBuilder : IEngineConfigurationBuilder
+    public class EngineConfigurationBuilder : IEngineConfigurationBuilder, IEngineConfigurationReader, ISettingsWriter
     {
         private readonly ILogger<EngineConfigurationBuilder> _logger;
 
@@ -27,7 +27,7 @@ namespace MigrationTools._EngineV1.Configuration
 
         public EngineConfiguration BuildFromFile(string configFile = "configuration.json")
         {
-            EngineConfiguration ec = null;
+            EngineConfiguration ec;
             try
             {
                 string configurationjson = File.ReadAllText(configFile);
@@ -120,7 +120,6 @@ namespace MigrationTools._EngineV1.Configuration
         {
             EngineConfiguration ec = new EngineConfiguration
             {
-                LogLevel = LogEventLevel.Information,
                 Version = Assembly.GetExecutingAssembly().GetName().Version.ToString(2),
                 FieldMaps = new List<IFieldMapConfig>(),
                 WorkItemTypeDefinition = new Dictionary<string, string> {
@@ -248,7 +247,6 @@ namespace MigrationTools._EngineV1.Configuration
         {
             EngineConfiguration ec = new EngineConfiguration
             {
-                LogLevel = LogEventLevel.Information,
                 Version = Assembly.GetExecutingAssembly().GetName().Version.ToString(2),
                 FieldMaps = new List<IFieldMapConfig>(),
                 WorkItemTypeDefinition = new Dictionary<string, string> {
@@ -265,9 +263,9 @@ namespace MigrationTools._EngineV1.Configuration
                     ReplayRevisions = true,
                     WorkItemCreateRetryLimit = 5,
                     ProcessorEnrichers = GetAllTypes<IProcessorEnricherOptions>(),
-                    Source = GetSpecioficType<IEndpointOptions>("InMemoryWorkItemEndpointOptions"),
-                    Target = GetSpecioficType<IEndpointOptions>("InMemoryWorkItemEndpointOptions")
-                }); ; ;
+                    SourceName = "Source",
+                    TargetName = "Target",
+                });
             return ec;
         }
 
@@ -276,25 +274,25 @@ namespace MigrationTools._EngineV1.Configuration
             throw new NotImplementedException();
         }
 
-        private TInterfaceToFind GetSpecioficType<TInterfaceToFind>(string typeName) where TInterfaceToFind : IOptions
+        private object GetSpecificType(string typeName)
         {
             AppDomain.CurrentDomain.Load("MigrationTools");
-            AppDomain.CurrentDomain.Load("MigrationTools.Clients.AzureDevops.ObjectModel");
-            AppDomain.CurrentDomain.Load("MigrationTools.Clients.FileSystem");
+            AppDomain.CurrentDomain.Load("MigrationTools.Clients.InMemory");
+            //AppDomain.CurrentDomain.Load("MigrationTools.Clients.FileSystem");
             Type type = AppDomain.CurrentDomain.GetAssemblies()
                .Where(a => a.FullName.StartsWith("MigrationTools"))
                .SelectMany(a => a.GetTypes())
-               .Where(t => typeof(TInterfaceToFind).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract && t.Name == typeName).SingleOrDefault();
-            TInterfaceToFind option = (TInterfaceToFind)Activator.CreateInstance(type);
-            option.SetDefaults();
+               .Where(t => !t.IsInterface && !t.IsAbstract && t.Name == typeName).SingleOrDefault();
+            var option = Activator.CreateInstance(type);
+            //type.GetMethod("SetDefaults", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(option, null);
             return option;
         }
 
         private List<TInterfaceToFind> GetAllTypes<TInterfaceToFind>() where TInterfaceToFind : IOptions
         {
             AppDomain.CurrentDomain.Load("MigrationTools");
-            AppDomain.CurrentDomain.Load("MigrationTools.Clients.AzureDevops.ObjectModel");
-            AppDomain.CurrentDomain.Load("MigrationTools.Clients.FileSystem");
+            AppDomain.CurrentDomain.Load("MigrationTools.Clients.InMemory");
+            //AppDomain.CurrentDomain.Load("MigrationTools.Clients.FileSystem");
             List<Type> types = AppDomain.CurrentDomain.GetAssemblies()
               .Where(a => a.FullName.StartsWith("MigrationTools"))
               .SelectMany(a => a.GetTypes())
@@ -307,6 +305,31 @@ namespace MigrationTools._EngineV1.Configuration
                 output.Add(option);
             }
             return output;
+        }
+
+        public void WriteSettings(EngineConfiguration engineConfiguration, string settingsFileName)
+        {
+            string json = NewtonsoftHelpers.SerializeObject(engineConfiguration);
+            var engine = JObject.Parse(json);
+
+            var endpoints = new JArray();
+            var source = GetSpecificType("InMemoryWorkItemEndpointOptions") as EndpointOptions;
+            source.Name = "Source";
+            var sourceobj = (JObject)JToken.FromObject(source);
+            endpoints.Add(sourceobj);
+            var target = GetSpecificType("InMemoryWorkItemEndpointOptions") as EndpointOptions;
+            target.Name = "Target";
+            var targetobj = (JObject)JToken.FromObject(target);
+            endpoints.Add(targetobj);
+
+            var endpoint = new JObject();
+            endpoint.Add("InMemoryWorkItemEndpoints", endpoints);
+            engine.Add("Endpoints", endpoint);
+            //engine.Endpoints.TfsEndpoints = endpoints;
+            json = engine.ToString();
+            //json = NewtonsoftHelpers.SerializeObject(engine);
+
+            File.WriteAllText(settingsFileName, json);
         }
     }
 }
