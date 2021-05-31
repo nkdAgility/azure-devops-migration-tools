@@ -93,15 +93,18 @@ namespace MigrationTools
 
             // We only need to fill the revisions object if we create a WorkItemData object for the whole WorkItem and
             // we sort it here by Number using a SortedDictionary
-            context.Revisions = fieldsOfRevision == null ? new SortedDictionary<int, RevisionItem>((from Revision x in workItem.Revisions
-                                                                                                    select new RevisionItem()
-                                                                                                    {
-                                                                                                        Index = x.Index,
-                                                                                                        Number = (int)x.Fields["System.Rev"].Value,
-                                                                                                        ChangedDate = (DateTime)x.Fields["System.ChangedDate"].Value,
-                                                                                                        Type = x.Fields["System.WorkItemType"].Value as string,
-                                                                                                        Fields = x.Fields
-                                                                                                    }).ToDictionary(r => r.Number, r => r)) : null;
+     
+            context.Revisions = fieldsOfRevision == null ? new Dictionary<int, RevisionItem>(workItem.Revisions
+                .Cast<Revision>()
+                .OrderByDescending(x => (DateTime) x.Fields["System.ChangedDate"].Value)
+                .Select(x => new RevisionItem()
+                {
+                    Index = x.Index,
+                    Number = (int) x.Fields["System.Rev"].Value,
+                    ChangedDate = (DateTime) x.Fields["System.ChangedDate"].Value,
+                    Type = x.Fields["System.WorkItemType"].Value as string,
+                    Fields = x.Fields
+                }).Distinct(new RevComparer()).ToDictionary(r => r.Number, r => r)) : null;
         }
 
         public static WorkItemData AsWorkItemData(this WorkItem context, FieldCollection fieldsOfRevision = null)
@@ -117,9 +120,11 @@ namespace MigrationTools
 
         public static WorkItemData GetRevision(this WorkItemData context, int rev)
         {
+            var originalWi = (WorkItem) context.internalObject;
             var wid = new WorkItemData
             {
-                internalObject = context.internalObject
+                //internalObject = context.internalObject
+                internalObject = originalWi.Store.GetWorkItem(originalWi.Id,rev)
             };
 
             wid.RefreshWorkItem((FieldCollection)context.Revisions[rev].Fields);
@@ -189,6 +194,20 @@ namespace MigrationTools
                 throw new InvalidCastException($"The Work Item stored in the inner field must be of type {(nameof(Project))}");
             }
             return (Project)projectdata.internalObject;
+        }
+    }
+
+    public class RevComparer : IEqualityComparer<RevisionItem>
+    {
+        public bool Equals(RevisionItem x, RevisionItem y)
+        {
+            return x.Number == y.Number;
+        }
+
+        public int GetHashCode(RevisionItem rev)
+        {
+            //Get hash code for the Name field if it is not null.
+            return rev.Number.GetHashCode();
         }
     }
 }

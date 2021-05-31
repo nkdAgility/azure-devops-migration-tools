@@ -22,31 +22,31 @@ namespace MigrationTools._EngineV1.DataContracts
                     return _id;
                 }
 
-                _id = GetField<string>("ID");
+                _id = GetField("ID")?.ToString();
                 return _id;
             }
             set
             {
                 var val = int.Parse(value);
                 _id = value;
-                SetField<int>("ID", val);
+                SetField("ID", val);
             }
         }
 
         public string Type
         {
-            get => GetField<string>("Work Item Type");
+            get => GetField("Work Item Type")?.ToString();
             set => SetField("Work Item Type", value);
         }
 
         public string Title
         {
-            get => GetField<string>("Title");
+            get => GetField("Title")?.ToString();
             set => SetField("Title", value);
         }
 
-        public int Rev => GetField<int>("Rev");
-        public DateTime RevisedDate => GetField<DateTime>("Revised Date");
+        public int Rev => (int)GetField("Rev");
+        public DateTime RevisedDate => (DateTime)GetField("Revised Date");
         public string ProjectName { get; set; }
 
         [JsonIgnore]
@@ -61,7 +61,7 @@ namespace MigrationTools._EngineV1.DataContracts
 
         public IReadOnlyDictionary<int, RevisionItem> Revisions { get; set; }
 
-        private T GetField<T>(string field)
+        private object GetField(string field)
         {
             if (Fields is null)
             {
@@ -71,10 +71,10 @@ namespace MigrationTools._EngineV1.DataContracts
             {
                 return default;
             }
-            return (T)this.Fields[field];
+            return this.Fields[field];
         }
 
-        private void SetField<T>(string field, T value)
+        private void SetField(string field, object value)
         {
             if (Fields is null)
             {
