@@ -94,7 +94,7 @@ namespace MigrationTools
             // We only need to fill the revisions object if we create a WorkItemData object for the whole WorkItem and
             // we sort it here by Number using a SortedDictionary
      
-            context.Revisions = fieldsOfRevision == null ? new Dictionary<int, RevisionItem>(workItem.Revisions
+            context.Revisions = fieldsOfRevision == null ? new SortedDictionary<int, RevisionItem>(workItem.Revisions
                 .Cast<Revision>()
                 .OrderByDescending(x => (DateTime) x.Fields["System.ChangedDate"].Value)
                 .Select(x => new RevisionItem()
