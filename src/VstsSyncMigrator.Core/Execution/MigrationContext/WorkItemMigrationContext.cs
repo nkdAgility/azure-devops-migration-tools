@@ -9,6 +9,7 @@ using System.Text;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.TeamFoundation;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Proxy;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
@@ -376,7 +377,7 @@ namespace VstsSyncMigrator.Engine
                             ProcessWorkItemAttachments(sourceWorkItem, targetWorkItem, false);
                             ProcessWorkItemLinks(Engine.Source.WorkItems, Engine.Target.WorkItems, sourceWorkItem, targetWorkItem);
                             TraceWriteLine(LogEventLevel.Information, "Skipping as work item exists and no revisions to sync detected");
-                            processWorkItemMetrics.Add("Revisions", 0);
+                            AddMetric("Revisions",processWorkItemMetrics,0);
                         }
                         else
                         {
@@ -418,6 +419,29 @@ namespace VstsSyncMigrator.Engine
                         });
                 }
             }
+            catch (TeamFoundationServiceUnavailableException ex)
+            {
+                Log.LogError(ex, "Some kind of internet pipe blockage");
+                if (retrys < retryLimit)
+                {
+                    TraceWriteLine(LogEventLevel.Warning, "WebException: Will retry in {retrys}s ",
+                        new Dictionary<string, object>() {
+                            {"retrys", retrys }
+                        });
+                    System.Threading.Thread.Sleep(new TimeSpan(0, 0, retrys));
+                    retrys++;
+                    TraceWriteLine(LogEventLevel.Warning, "RETRY {Retrys}/{RetryLimit} ",
+                        new Dictionary<string, object>() {
+                            {"Retrys", retrys },
+                            {"RetryLimit", retryLimit }
+                        });
+                    ProcessWorkItem(sourceWorkItem, retryLimit, retrys);
+                }
+                else
+                {
+                    TraceWriteLine(LogEventLevel.Error, "ERROR: Failed to create work item. Retry Limit reached ");
+                }
+            }
             catch (WebException ex)
             {
                 Log.LogError(ex, "Some kind of internet pipe blockage");
@@ -449,7 +473,7 @@ namespace VstsSyncMigrator.Engine
             }
             witstopwatch.Stop();
             _elapsedms += witstopwatch.ElapsedMilliseconds;
-            processWorkItemMetrics.Add("ElapsedTimeMS", _elapsedms);
+            AddMetric("ElapsedTimeMS",processWorkItemMetrics, _elapsedms);
 
             var average = new TimeSpan(0, 0, 0, 0, (int)(_elapsedms / _current));
             var remaining = new TimeSpan(0, 0, 0, 0, (int)(average.TotalMilliseconds * _count));
