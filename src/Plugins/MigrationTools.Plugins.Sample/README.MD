@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.Extensions.Logging;
-using MigrationTools._EngineV1.Configuration;
-using MigrationTools.Endpoints;
-using MigrationTools.Enrichers;
-using MigrationTools.Helpers;
-using MigrationTools.Processors;
+﻿# Processor Plugins System
+There are times where you might want to write custom processors that you can slip into an "out of the box" installation of the tool.
 
-namespace MigrationTools.Plugins.Sample
-{
+This allows developers to write, use and maintain processors outside of the existing NkdAgility repository.
+
+## Reference Sample Plugin
+
+```cs
     public class SamplePluginProcessorOptions : ProcessorOptions, IProcessorConfig
     {
         public string Greeting { get; set; } = "Howdy";
@@ -42,4 +39,6 @@ namespace MigrationTools.Plugins.Sample
         }
 
     }
-}
+```
+
+One key thing to note is that from inside your sample project you will need to reference the MigrationTools.csproj from NkdAgility. You can use git submodules to pull in the repos, or just grab the an existing MigrationTools.dll.
