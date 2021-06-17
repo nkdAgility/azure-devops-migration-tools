@@ -19,10 +19,12 @@ namespace MigrationTools._EngineV1.Configuration
     public class EngineConfigurationBuilder : IEngineConfigurationBuilder, IEngineConfigurationReader, ISettingsWriter
     {
         private readonly ILogger<EngineConfigurationBuilder> _logger;
+        private PluginsLoader _pluginsLoader;
 
-        public EngineConfigurationBuilder(ILogger<EngineConfigurationBuilder> logger)
+        public EngineConfigurationBuilder(ILogger<EngineConfigurationBuilder> logger, PluginsLoader pluginsLoader)
         {
             _logger = logger;
+            _pluginsLoader = pluginsLoader;
         }
 
         public EngineConfiguration BuildFromFile(string configFile = "configuration.json")
@@ -30,6 +32,7 @@ namespace MigrationTools._EngineV1.Configuration
             EngineConfiguration ec;
             try
             {
+                if (!_pluginsLoader.Loaded) _pluginsLoader.Load(configFile);
                 string configurationjson = File.ReadAllText(configFile);
                 configurationjson = Upgrade118(configFile, configurationjson);
                 ec = NewtonsoftHelpers.DeserializeObject<EngineConfiguration>(configurationjson);

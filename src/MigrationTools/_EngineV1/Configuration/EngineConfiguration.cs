@@ -21,5 +21,6 @@ namespace MigrationTools._EngineV1.Configuration
         public string Version { get; set; }
         public bool workaroundForQuerySOAPBugEnabled { get; set; }
         public Dictionary<string, string> WorkItemTypeDefinition { get; set; }
+        public List<string> Plugins { get; set; }
     }
 }

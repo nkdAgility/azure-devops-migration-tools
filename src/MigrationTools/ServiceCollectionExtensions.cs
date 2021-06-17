@@ -4,6 +4,7 @@ using MigrationTools._EngineV1.Containers;
 using MigrationTools.EndpointEnrichers;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
+using MigrationTools.Helpers;
 using MigrationTools.Processors;
 
 namespace MigrationTools
@@ -12,6 +13,7 @@ namespace MigrationTools
     {
         public static void AddMigrationToolServices(this IServiceCollection context)
         {
+            context.AddSingleton<PluginsLoader>();
             context.AddEndpoint();
             //Containers
             context.AddTransient<ProcessorEnricherContainer>();

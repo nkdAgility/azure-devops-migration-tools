@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using MigrationTools._EngineV1.Configuration;
+using MigrationTools.Helpers;
 
 namespace MigrationTools._EngineV1.Containers
 {
@@ -35,7 +36,9 @@ namespace MigrationTools._EngineV1.Containers
             if (Config.Processors != null)
             {
                 var enabledProcessors = Config.Processors.Where(x => x.Enabled).ToList();
+
                 _logger.LogInformation("ProcessorContainer: Of {ProcessorCount} configured Processors only {EnabledProcessorCount} are enabled", Config.Processors.Count, enabledProcessors.Count);
+
                 var allTypes = AppDomain.CurrentDomain.GetAssemblies()
                     .Where(a => !a.IsDynamic)
                     .SelectMany(a => a.GetTypes()).ToList();
@@ -56,7 +59,28 @@ namespace MigrationTools._EngineV1.Containers
                             throw new Exception("Type " + typePattern + " not found.");
                         }
 
-                        IProcessor pc = (IProcessor)Services.GetRequiredService(type);
+                        IProcessor pc = null;
+                        if (type.GetInterfaces().Any( x => x == typeof(IPluginProcessor)))
+                        {
+                            var constructor = type.GetConstructors().Where(x => x.GetCustomAttributes(typeof(PluginConstructorAttribute), true).Any()).FirstOrDefault();
+                            var constructorParms = new List<object>();
+                            if (constructor != null)
+                            {
+                                foreach (var parm in constructor?.GetParameters())
+                                {
+                                    constructorParms.Add(Services.GetRequiredService(parm.ParameterType));
+                                }
+                                pc = constructor.Invoke(parameters: constructorParms.ToArray()) as IPluginProcessor;
+                            }
+                            else
+                            {
+                                throw new InvalidOperationException($"No valid plugin constructor located for type {type.FullName}.");
+                            }
+                        } else
+                        {
+                            pc = (IProcessor)Services.GetRequiredService(type);
+                        }
+
                         pc.Configure(processorConfig);
                         _Processors.Add(pc);
                     }
