@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
+using Microsoft.TeamFoundation;
+using Microsoft.TeamFoundation.Build.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.DataContracts;
@@ -83,28 +85,41 @@ namespace MigrationTools
             return JsonConvert.SerializeObject(expando, Formatting.Indented);
         }
 
-        public static void RefreshWorkItem(this WorkItemData context, FieldCollection fieldsOfRevision = null)
+        public static void RefreshWorkItem(this WorkItemData context, FieldCollection fieldsOfRevision = null, int retries = 5)
         {
-            var workItem = (WorkItem)context.internalObject;
-            context.ProjectName = workItem.Project?.Name;
+            try
+            {
+                var workItem = (WorkItem)context.internalObject;
+                context.ProjectName = workItem.Project?.Name;
 
-            // If fieldsOfRevision is provided we use this collection as we want to create a revised WorkItemData object
-            context.Fields = fieldsOfRevision != null ? fieldsOfRevision.AsDictionary() : workItem.Fields.AsDictionary();
+                // If fieldsOfRevision is provided we use this collection as we want to create a revised WorkItemData object
+                context.Fields = fieldsOfRevision != null ? fieldsOfRevision.AsDictionary() : workItem.Fields.AsDictionary();
 
-            // We only need to fill the revisions object if we create a WorkItemData object for the whole WorkItem and
-            // we sort it here by Number using a SortedDictionary
-     
-            context.Revisions = fieldsOfRevision == null ? new SortedDictionary<int, RevisionItem>(workItem.Revisions
-                .Cast<Revision>()
-                .OrderByDescending(x => (DateTime) x.Fields["System.ChangedDate"].Value)
-                .Select(x => new RevisionItem()
+                // We only need to fill the revisions object if we create a WorkItemData object for the whole WorkItem and
+                // we sort it here by Number using a SortedDictionary
+         
+                context.Revisions = fieldsOfRevision == null ? new SortedDictionary<int, RevisionItem>(workItem.Revisions
+                    .Cast<Revision>()
+                    .OrderByDescending(x => (DateTime) x.Fields["System.ChangedDate"].Value)
+                    .Select(x => new RevisionItem()
+                    {
+                        Index = x.Index,
+                        Number = (int) x.Fields["System.Rev"].Value,
+                        ChangedDate = (DateTime) x.Fields["System.ChangedDate"].Value,
+                        Type = x.Fields["System.WorkItemType"].Value as string,
+                        Fields = x.Fields
+                    }).Distinct(new RevComparer()).ToDictionary(r => r.Number, r => r)) : null;
+            }
+            //too many workitems can cause AZDO unavailable exception
+            catch (TeamFoundationServiceUnavailableException ex)
+            {
+                if(retries > 0)
+                    context.RefreshWorkItem(fieldsOfRevision,retries-1);
+                else
                 {
-                    Index = x.Index,
-                    Number = (int) x.Fields["System.Rev"].Value,
-                    ChangedDate = (DateTime) x.Fields["System.ChangedDate"].Value,
-                    Type = x.Fields["System.WorkItemType"].Value as string,
-                    Fields = x.Fields
-                }).Distinct(new RevComparer()).ToDictionary(r => r.Number, r => r)) : null;
+                    throw;
+                }
+            }
         }
 
         public static WorkItemData AsWorkItemData(this WorkItem context, FieldCollection fieldsOfRevision = null)

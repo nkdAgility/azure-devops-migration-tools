@@ -14,7 +14,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Ben.Demystifier" Version="0.1.6" />
     <PackageReference Include="CsvHelper" Version="15.0.9" />
     <PackageReference Include="Microsoft.TeamFoundationServer.ExtendedClient" Version="16.153.0">
       <IncludeAssets>all</IncludeAssets>
