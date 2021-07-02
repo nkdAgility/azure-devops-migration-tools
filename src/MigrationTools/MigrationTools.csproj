@@ -9,6 +9,8 @@
     <RepositoryUrl>https://github.com/nkdAgility/azure-devops-migration-tools.git</RepositoryUrl>
     <RepositoryType>Git</RepositoryType>
     <PackageTags>Migration Tools, Azure DevOps, API</PackageTags>
+    <PackageLicenseExpression>https://github.com/nkdAgility/azure-devops-migration-tools/blob/master/LICENSE</PackageLicenseExpression>
+    <Copyright>naked Agility with Martin Hinshelwood 2016-2021</Copyright>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
