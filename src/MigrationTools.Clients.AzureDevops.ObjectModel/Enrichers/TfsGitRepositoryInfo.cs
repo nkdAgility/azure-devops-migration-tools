@@ -108,7 +108,7 @@ namespace MigrationTools.Enrichers
                 commitID = bits[2];
             }
             gitRepo =
-                (from g in possibleRepos where g.Id.ToString() == repoID select g)
+                (from g in possibleRepos where string.Equals(g.Id.ToString(), repoID, StringComparison.OrdinalIgnoreCase) select g)
                 .SingleOrDefault();
             return new TfsGitRepositoryInfo(commitID, repoID, gitRepo);
         }
