@@ -35,6 +35,8 @@ namespace MigrationTools.DataContracts
         /// </summary>
         /// <returns>bool</returns>
         public abstract bool HasVariableGroups();
+
+        public virtual dynamic ToJson() { return this; }
     }
 
     public class RestResultDefinition<ValueType> where ValueType : RestApiDefinition, new()
