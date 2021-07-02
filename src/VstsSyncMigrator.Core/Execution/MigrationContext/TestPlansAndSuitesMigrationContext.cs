@@ -84,8 +84,10 @@ namespace VstsSyncMigrator.Engine
             {
                 _currentPlan++;
                 if (CanSkipElementBecauseOfTags(sourcePlan.Id))
+                {
+                    Log.LogInformation("TestPlandsAndSuitesMigrationContext: Skipping Test Plan {Id}:'{Name}' as is not tagged with '{Tag}'.", sourcePlan.Id, sourcePlan.Name, _config.OnlyElementsWithTag);
                     continue;
-
+                }
                 ProcessTestPlan(sourcePlan);
             }
             _currentPlan = 0;
