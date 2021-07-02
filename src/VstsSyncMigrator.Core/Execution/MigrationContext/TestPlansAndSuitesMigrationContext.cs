@@ -84,8 +84,10 @@ namespace VstsSyncMigrator.Engine
             {
                 _currentPlan++;
                 if (CanSkipElementBecauseOfTags(sourcePlan.Id))
+                {
+                    Log.LogInformation("TestPlandsAndSuitesMigrationContext: Skipping Test Plan {Id}:'{Name}' as is not tagged with '{Tag}'.", sourcePlan.Id, sourcePlan.Name, _config.OnlyElementsWithTag);
                     continue;
-
+                }
                 ProcessTestPlan(sourcePlan);
             }
             _currentPlan = 0;
@@ -109,7 +111,11 @@ namespace VstsSyncMigrator.Engine
             targetPlan.RefreshRootSuite();
 
             if (CanSkipElementBecauseOfTags(source.Id))
+            {
+                Log.LogInformation("TestPlandsAndSuitesMigrationContext::AddChildTestCases: Skipping Test Case {Id}:'{Name}' as is not tagged with '{Tag}'.", source.Id, source.Title, _config.OnlyElementsWithTag);
                 return;
+            }
+            
 
             _totalTestCases = source.TestCases.Count;
             _currentTestCases = 0;
@@ -122,7 +128,10 @@ namespace VstsSyncMigrator.Engine
                 InnerLog(source, $"Work item: {sourceTestCaseEntry.Id}", 15);
 
                 if (CanSkipElementBecauseOfTags(sourceTestCaseEntry.Id))
-                    return;
+                {
+                    Log.LogInformation("TestPlandsAndSuitesMigrationContext::AddChildTestCases: Skipping Test Suite {Id}:'{Name}' as is not tagged with '{Tag}'.", sourceTestCaseEntry.Id, sourceTestCaseEntry.Title, _config.OnlyElementsWithTag);
+                    continue;
+                }
 
                 InnerLog(source, string.Format("    Processing {0} : {1} - {2} ", sourceTestCaseEntry.EntryType.ToString(), sourceTestCaseEntry.Id, sourceTestCaseEntry.Title), 15);
                 WorkItemData wi = Engine.Target.WorkItems.FindReflectedWorkItem(sourceTestCaseEntry.TestCase.WorkItem.AsWorkItemData(), false);
