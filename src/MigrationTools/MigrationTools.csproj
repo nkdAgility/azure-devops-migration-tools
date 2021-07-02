@@ -4,6 +4,11 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <Product>Azure DevOps Migration Tools API</Product>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Description>Reference API for creating plugins for the Azure DevOps Migration Tools</Description>
+    <PackageProjectUrl>https://github.com/nkdAgility/azure-devops-migration-tools/</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/nkdAgility/azure-devops-migration-tools.git</RepositoryUrl>
+    <RepositoryType>Git</RepositoryType>
+    <PackageTags>Migration Tools, Azure DevOps, API</PackageTags>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
