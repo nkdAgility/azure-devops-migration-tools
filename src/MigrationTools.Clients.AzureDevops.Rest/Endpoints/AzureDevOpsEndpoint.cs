@@ -5,11 +5,13 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.Services.WebApi;
 using MigrationTools.DataContracts;
 using MigrationTools.DataContracts.Pipelines;
+using MigrationTools.DataContracts.Process;
 using MigrationTools.EndpointEnrichers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -46,11 +48,12 @@ namespace MigrationTools.Endpoints
         /// <summary>
         /// Create a new instance of HttpClient including Heades
         /// </summary>
+        /// <param name="routeParams">strings that are injected into the route parameters of the definitions url</param>
         /// <returns>HttpClient</returns>
-        private HttpClient GetHttpClient<DefinitionType>()
+        private HttpClient GetHttpClient<DefinitionType>(params object[] routeParams)
             where DefinitionType : RestApiDefinition
         {
-            UriBuilder baseUrl = GetUriBuilderBasedOnEndpointAndType<DefinitionType>();
+            UriBuilder baseUrl = GetUriBuilderBasedOnEndpointAndType<DefinitionType>(routeParams);
             var versionParameter = baseUrl.Query.Replace("?", "");
             HttpClient client = new HttpClient();
 
@@ -63,10 +66,31 @@ namespace MigrationTools.Endpoints
         }
 
         /// <summary>
+        /// Create a new instance of HttpClient including Heades
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="versionParameter">allows caller to override the default api version (ie. api-version=5.1)</param>
+        /// <param name="routeParams">strings that are injected into the route parameters of the definitions url</param>
+        /// <returns>HttpClient</returns>
+        private HttpClient GetHttpClient(string url, string versionParameter, params object[] routeParams)
+        {
+            UriBuilder baseUrl = new UriBuilder(string.Format(url, routeParams));
+            HttpClient client = new HttpClient();
+
+            client.BaseAddress = new Uri(baseUrl.Uri.AbsoluteUri.ToString());
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes(string.Format("{0}:{1}", "", Options.AccessToken))));
+            client.DefaultRequestHeaders.Add("Accept", $"application/json; {versionParameter}");
+            client.DefaultRequestHeaders.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
+
+            return client;
+        }
+
+        /// <summary>
         /// Method to get the RESP API URLs right
         /// </summary>
+        /// <param name="routeParameters">strings that are injected into the route parameters of the definitions url</param>
         /// <returns>UriBuilder</returns>
-        private UriBuilder GetUriBuilderBasedOnEndpointAndType<DefinitionType>()
+        private UriBuilder GetUriBuilderBasedOnEndpointAndType<DefinitionType>(params object[] routeParams)
             where DefinitionType : RestApiDefinition
         {
             var apiNameAttribute = typeof(DefinitionType).GetCustomAttributes(typeof(ApiNameAttribute), false).OfType<ApiNameAttribute>().FirstOrDefault();
@@ -76,7 +100,17 @@ namespace MigrationTools.Endpoints
                 throw new ArgumentNullException($"On the class defintion of '{typeof(DefinitionType).Name}' is the attribute 'ApiName' misssing. Please add the 'ApiName' Attribute to your class");
             }
             var builder = new UriBuilder(Options.Organisation);
-            builder.Path += "/" + Options.Project + "/_apis/" + apiPathAttribute.Path + "/";
+
+            var pathSplit = apiPathAttribute.Path.Split('?');
+            string queryParts = "";
+            if (pathSplit.Length > 1)
+            {
+                // reassemble query string
+                queryParts = string.Join("?", pathSplit.Skip(1)).TrimStart('?');
+            }
+
+            string unformatted = (apiPathAttribute.IncludeProject ? "/" + Options.Project : "") + "/_apis/" + pathSplit[0] + (apiPathAttribute.IncludeTrailingSlash ? "/" : "");
+            builder.Path += Regex.IsMatch(unformatted, @"{\d}") ? string.Format(unformatted, routeParams) : unformatted;
 
             if (apiNameAttribute.Name == "Release Piplines")
             {
@@ -104,41 +138,102 @@ namespace MigrationTools.Endpoints
         }
 
         /// <summary>
-        /// Generic Method to get API Definitions (Taskgroups, Variablegroups, Build- or Release Pipelines)
+        /// Generic Method to get API Definitions (Taskgroups, Variablegroups, Build- or Release Pipelines, ProcessDefinition)
         /// </summary>
         /// <typeparam name="DefinitionType">
-        /// Type of Definition. Can be: Taskgroup, Build- or Release Pipeline
+        /// Type of Definition. Can be: Taskgroup, Build- or Release Pipeline, ProcessDefinition
         /// </typeparam>
+        /// <param name="routeParameters">strings that are injected into the route parameters of the definitions url</param>
+        /// <param name="queryString">additional query string parameters passed to the underlying api call</param>
+        /// <param name="singleDefinitionQueryString">additional query string parameter passed when pulling the single instance details (ie. $expands, etc)</param>
+        /// <param name="queryForDetails">a boolean flag to allow caller to skip the calls for each individual definition details</param>
         /// <returns>List of API Definitions</returns>
-        public async Task<IEnumerable<DefinitionType>> GetApiDefinitionsAsync<DefinitionType>()
+        public async Task<IEnumerable<DefinitionType>> GetApiDefinitionsAsync<DefinitionType>(object[] routeParameters = null, string queryString = "", string singleDefinitionQueryString = "", bool queryForDetails = true)
             where DefinitionType : RestApiDefinition, new()
         {
             var initialDefinitions = new List<DefinitionType>();
+            routeParameters = routeParameters ?? new object[] { };
 
-            var client = GetHttpClient<DefinitionType>();
-            var httpResponse = await client.GetAsync("");
+            var client = GetHttpClient<DefinitionType>(routeParameters);
+            var httpResponse = await client.GetAsync("?" + queryString);
 
-            if (httpResponse != null)
+            var apiPathAttribute = typeof(DefinitionType).GetCustomAttributes(typeof(ApiPathAttribute), false).OfType<ApiPathAttribute>().FirstOrDefault();
+            if (apiPathAttribute == null)
+            {
+                throw new ArgumentNullException($"On the class defintion of '{typeof(DefinitionType).Name}' is the attribute 'ApiName' misssing. Please add the 'ApiName' Attribute to your class");
+            }
+
+            if (httpResponse != null && httpResponse.StatusCode == HttpStatusCode.OK)
             {
                 var definitions = await httpResponse.Content.ReadAsAsync<RestResultDefinition<DefinitionType>>();
 
                 // Taskgroups only have a LIST option, so the following step is not needed
-                if (!typeof(DefinitionType).ToString().Contains("TaskGroup"))
+                if (!typeof(DefinitionType).ToString().Contains("TaskGroup") && queryForDetails)
                 {
+                    var client2 = GetHttpClient<DefinitionType>(routeParameters);
                     foreach (RestApiDefinition definition in definitions.Value)
                     {
                         // Nessecary because getting all Pipelines doesn't include all of their properties
-                        var response = await client.GetAsync(client.BaseAddress + "/" + definition.Id);
-                        var fullDefinition = await response.Content.ReadAsAsync<DefinitionType>();
-                        initialDefinitions.Add(fullDefinition);
+                        var response = await client2.GetAsync(client2.BaseAddress + "/" + definition.Id + "?" + singleDefinitionQueryString);
+                        if (response.StatusCode == HttpStatusCode.OK)
+                        {
+                            var fullDefinition = await response.Content.ReadAsAsync<DefinitionType>();
+                            initialDefinitions.Add(fullDefinition);
+                        }
+                        else
+                        {
+                            Log.LogError($"Failed on call to get single [{typeof(DefinitionType).Name}] with Id [{definition.Id}].\r\nUrl: GET {response.RequestMessage.RequestUri.ToString()}");
+                            throw new Exception(await response.Content.ReadAsStringAsync());
+                        }
                     }
                 }
                 else
                 {
-                    initialDefinitions = definitions.Value.ToList();
+                    initialDefinitions = definitions.Value?.ToList();
                 }
             }
+            else
+            {
+                throw new Exception($"Failed on call to get list of [{typeof(DefinitionType).Name}].\r\nUrl: GET {httpResponse.RequestMessage.RequestUri.ToString()}\r\n{await httpResponse.Content.ReadAsStringAsync()}");
+
+            }
             return initialDefinitions;
+        }
+
+        /// <summary>
+        /// Get a single instance of a defined type
+        /// </summary>
+        /// <typeparam name="DefinitionType"></typeparam>
+        /// <param name="routeParameters">strings that are injected into the route parameters of the definitions url</param>
+        /// <param name="queryString">additional query string parameters passed to the underlying api call</param>
+        /// <param name="singleDefinitionQueryString">additional query string parameter passed when pulling the single instance details (ie. $expands, etc)</param>
+        /// <param name="queryForDetails">a boolean flag to allow caller to skip the calls for each individual definition details</param>
+        /// <returns></returns>
+        public async Task<DefinitionType> GetApiDefinitionAsync<DefinitionType>(object[] routeParameters = null, string queryString = "", string singleDefinitionQueryString = "", bool queryForDetails = true)
+            where DefinitionType : RestApiDefinition, new()
+        {
+            var initialDefinition = new DefinitionType();
+            routeParameters = routeParameters ?? new object[] { };
+
+            var client = GetHttpClient<DefinitionType>(routeParameters);
+            var httpResponse = await client.GetAsync("?" + queryString);
+
+            var apiPathAttribute = typeof(DefinitionType).GetCustomAttributes(typeof(ApiPathAttribute), false).OfType<ApiPathAttribute>().FirstOrDefault();
+            if (apiPathAttribute == null)
+            {
+                throw new ArgumentNullException($"On the class defintion of '{typeof(DefinitionType).Name}' is the attribute 'ApiName' misssing. Please add the 'ApiName' Attribute to your class");
+            }
+
+            if (httpResponse != null && httpResponse.StatusCode == HttpStatusCode.OK)
+            {
+                initialDefinition = await httpResponse.Content.ReadAsAsync<DefinitionType>();
+            }
+            else
+            {
+                throw new Exception($"Failed on call to get individual [{typeof(DefinitionType).Name}].\r\nUrl: GET {httpResponse.RequestMessage.RequestUri.ToString()}\r\n{await httpResponse.Content.ReadAsStringAsync()}");
+
+            }
+            return initialDefinition;
         }
 
         /// <summary>
@@ -253,15 +348,16 @@ namespace MigrationTools.Endpoints
         /// </summary>
         /// <typeparam name="DefinitionType"></typeparam>
         /// <param name="definitionsToBeMigrated"></param>
+        /// <param name="parentIds">strings that are injected into the route parameters of the definitions url</param>
         /// <returns>List of Mappings</returns>
-        public async Task<List<Mapping>> CreateApiDefinitionsAsync<DefinitionType>(IEnumerable<DefinitionType> definitionsToBeMigrated)
+        public async Task<List<Mapping>> CreateApiDefinitionsAsync<DefinitionType>(IEnumerable<DefinitionType> definitionsToBeMigrated, params string[] parentIds)
             where DefinitionType : RestApiDefinition, new()
         {
             var migratedDefinitions = new List<Mapping>();
 
             foreach (var definitionToBeMigrated in definitionsToBeMigrated)
             {
-                var client = GetHttpClient<DefinitionType>();
+                var client = GetHttpClient<DefinitionType>(parentIds);
                 definitionToBeMigrated.ResetObject();
 
                 DefaultContractResolver contractResolver = new DefaultContractResolver
@@ -273,20 +369,21 @@ namespace MigrationTools.Endpoints
                     NullValueHandling = NullValueHandling.Ignore,
                     ContractResolver = contractResolver,
                 };
-                string body = JsonConvert.SerializeObject(definitionToBeMigrated, jsonSettings);
+                string body = JsonConvert.SerializeObject(definitionToBeMigrated.ToJson(), jsonSettings);
 
                 var content = new StringContent(body, Encoding.UTF8, "application/json");
                 var result = await client.PostAsync(client.BaseAddress, content);
 
                 var responseContent = await result.Content.ReadAsStringAsync();
-                if (result.StatusCode != HttpStatusCode.OK)
+                if (result.StatusCode != HttpStatusCode.OK && result.StatusCode != HttpStatusCode.Created)
                 {
-                    Log.LogError("Error migrating {DefinitionType}: {DefinitionName}. Please migrate it manually. {ErrorText}", typeof(DefinitionType).Name, definitionToBeMigrated.Name, responseContent);
+                    Log.LogError("Error migrating {DefinitionType}: {DefinitionName}. Please migrate it manually. \r\nUrl: POST {Url}\r\n{ErrorText}", typeof(DefinitionType).Name, definitionToBeMigrated.Name, result.RequestMessage.RequestUri.ToString(), responseContent);
                     continue;
                 }
                 else
                 {
                     var targetObject = JsonConvert.DeserializeObject<DefinitionType>(responseContent);
+                    definitionToBeMigrated.Id = targetObject.Id;
                     migratedDefinitions.Add(new Mapping()
                     {
                         Name = definitionToBeMigrated.Name,
@@ -297,6 +394,262 @@ namespace MigrationTools.Endpoints
             }
             Log.LogInformation("{MigratedCount} of {TriedToMigrate} {DefinitionType}(s) got migrated..", migratedDefinitions.Count, definitionsToBeMigrated.Count(), typeof(DefinitionType).Name);
             return migratedDefinitions;
+        }
+
+        /// <summary>
+        /// Make HTTP Request to update a Definition
+        /// </summary>
+        /// <typeparam name="DefinitionType"></typeparam>
+        /// <param name="definitionsToBeMigrated"></param>
+        /// <param name="parentIds">strings that are injected into the route parameters of the definitions url</param>
+        /// <returns>List of Mappings</returns>
+        public async Task<List<Mapping>> UpdateApiDefinitionsAsync<DefinitionType>(IEnumerable<DefinitionType> definitionsToBeMigrated, params string[] parentIds)
+            where DefinitionType : RestApiDefinition, new()
+        {
+            var migratedDefinitions = new List<Mapping>();
+            var apiPathAttribute = typeof(DefinitionType).GetCustomAttributes(typeof(ApiPathAttribute), false).OfType<ApiPathAttribute>().FirstOrDefault();
+
+            foreach (var definitionToBeMigrated in definitionsToBeMigrated)
+            {
+                var client = GetHttpClient<DefinitionType>(parentIds);
+
+                DefaultContractResolver contractResolver = new DefaultContractResolver
+                {
+                    NamingStrategy = new CamelCaseNamingStrategy()
+                };
+                var jsonSettings = new JsonSerializerSettings
+                {
+                    NullValueHandling = NullValueHandling.Ignore,
+                    ContractResolver = contractResolver,
+                };
+                string body = JsonConvert.SerializeObject(definitionToBeMigrated.ToJson(), jsonSettings);
+
+                var content = new StringContent(body, Encoding.UTF8, "application/json");
+                string suffix = "";
+                if (apiPathAttribute == null || apiPathAttribute.IncludeIdOnUpdate)
+                {
+                    suffix = "/" + definitionToBeMigrated.Id;
+                }
+                HttpResponseMessage result = null;
+                switch (apiPathAttribute.UpdateVerb)
+                {
+                    case HttpVerbs.Patch:
+                        result = await client.PatchAsync(client.BaseAddress.ToString() + suffix, content);
+                        break;
+                    default:
+                        result = await client.PutAsync(client.BaseAddress.ToString() + suffix, content);
+                        break;
+                }
+
+                var responseContent = await result.Content.ReadAsStringAsync();
+                if (result.StatusCode != HttpStatusCode.OK && result.StatusCode != HttpStatusCode.NotModified)
+                {
+                    Log.LogError("Error migrating {DefinitionType}: {DefinitionName}. Please migrate it manually. \r\nUrl: {Verb} {Url}\r\n{ErrorText}", typeof(DefinitionType).Name, definitionToBeMigrated.Name, Enum.GetName(typeof(HttpMethod), result.RequestMessage.Method), result.RequestMessage.RequestUri.ToString(), responseContent);
+                    continue;
+                }
+                else if (result.StatusCode == HttpStatusCode.NotModified)
+                {
+                    Log.LogInformation("{DefinitionType}: {DefinitionName}) was already up to date.", typeof(DefinitionType).Name, definitionToBeMigrated.Name);
+                }
+                else
+                {
+                    var targetObject = JsonConvert.DeserializeObject<DefinitionType>(responseContent);
+                    definitionToBeMigrated.Id = targetObject.Id;
+                    migratedDefinitions.Add(new Mapping()
+                    {
+                        Name = definitionToBeMigrated.Name,
+                        TargetId = targetObject.Id
+                    });
+                }
+            }
+            Log.LogInformation("{MigratedCount} of {TriedToMigrate} {DefinitionType}(s) got migrated..", migratedDefinitions.Count, definitionsToBeMigrated.Count(), typeof(DefinitionType).Name);
+            return migratedDefinitions;
+        }
+
+        /// <summary>
+        /// Performs an update or create operation on the target definition
+        /// </summary>
+        /// <typeparam name="DefinitionType"></typeparam>
+        /// <param name="sourceDef"></param>
+        /// <param name="targetDef"></param>
+        /// <param name="parentIds"></param>
+        /// <returns></returns>
+        public async Task<DefinitionType> SyncDefinition<DefinitionType>(DefinitionType sourceDef, DefinitionType targetDef, params string[] parentIds)
+            where DefinitionType : RestApiDefinition, ISynchronizeable<DefinitionType>, new()
+        {
+            if (targetDef == null || string.IsNullOrEmpty(targetDef.Id))
+            {
+                // Could not find targetProc, let's build it
+                targetDef = sourceDef.CloneAsNew();
+
+                var result = await CreateApiDefinitionsAsync<DefinitionType>(new DefinitionType[] { targetDef }, parentIds);
+                if (result.Count == 0)
+                {
+                    // TODO: Give them option to bail out?
+                }
+                else
+                {
+                    Log.LogInformation($"Created target {typeof(DefinitionType).Name} entry for [{targetDef.Name}] in [{Options.Name}]");
+                }
+            }
+            else
+            {
+                // Go ahead and update the target process details
+                targetDef.UpdateWithExisting(sourceDef);
+
+                var result = await UpdateApiDefinitionsAsync<DefinitionType>(new DefinitionType[] { targetDef }, parentIds);
+                if (result.Count == 0)
+                {
+                    // TODO: Give them option to bail out?
+                }
+                else
+                {
+                    Log.LogInformation($"Updated target {typeof(DefinitionType).Name} entry for [{targetDef.Name}] in [{Options.Name}]");
+                }
+            }
+
+            return targetDef;
+        }
+
+        /// <summary>
+        /// Move work item group to another page and section
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="processId"></param>
+        /// <param name="witRefName"></param>
+        /// <param name="pageId"></param>
+        /// <param name="sectionId"></param>
+        /// <param name="oldPageId"></param>
+        /// <param name="oldSectionId"></param>
+        /// <returns></returns>
+        public async Task<bool> MoveWorkItemGroupToNewPage(WorkItemGroup group, string processId, string witRefName, string pageId, string sectionId, string oldPageId, string oldSectionId)
+        {
+            return await MoveWorkItemGroup(group, processId, witRefName, pageId, sectionId, oldSectionId, oldPageId);
+        }
+        /// <summary>
+        /// Move a work item group from one Layout->Section to another Layout->Section
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="processId"></param>
+        /// <param name="witRefName"></param>
+        /// <param name="pageId"></param>
+        /// <param name="sectionId"></param>
+        /// <param name="oldSectionId"></param>
+        /// <returns></returns>
+        public async Task<bool> MoveWorkItemGroupWithinPage(WorkItemGroup group, string processId, string witRefName, string pageId, string sectionId, string oldSectionId)
+        {
+            return await MoveWorkItemGroup(group, processId, witRefName, pageId, sectionId, oldSectionId);
+        }
+
+
+        private async Task<bool> MoveWorkItemGroup(WorkItemGroup group, string processId, string witRefName, string pageId, string sectionId, string oldSectionId, string oldPageId = null)
+        {
+            var client = GetHttpClient(
+                $"{new UriBuilder(Options.Organisation)}/_apis/work/processes" +
+                $"/{processId}/workItemTypes/{witRefName}/layout/pages/{pageId}/sections/{sectionId}/groups/{group.Id}?" +
+                $"removeFromSectionId={oldSectionId}" +
+                (!string.IsNullOrEmpty(oldPageId) ? $"&removeFromPageId={oldPageId}" : ""),
+                "api-version=6.1-preview.1");
+
+            DefaultContractResolver contractResolver = new DefaultContractResolver
+            {
+                NamingStrategy = new CamelCaseNamingStrategy()
+            };
+            var jsonSettings = new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore,
+                ContractResolver = contractResolver,
+            };
+            string body = JsonConvert.SerializeObject(group.ToJson(), jsonSettings);
+
+            var content = new StringContent(body, Encoding.UTF8, "application/json");
+            var result = await client.PutAsync(client.BaseAddress, content);
+
+            var responseContent = await result.Content.ReadAsStringAsync();
+            if (result.StatusCode != HttpStatusCode.OK && result.StatusCode != HttpStatusCode.Created)
+            {
+                Log.LogError("Error moving {DefinitionType}: {processId}::{witRefName}::{pageId}::{sectionId}::{groupLabel}. Please migrate it manually. \r\nUrl: PUT {Url}\r\n{ErrorText}", typeof(WorkItemGroup).Name, processId, witRefName, pageId, sectionId, group.Label, result.RequestMessage.RequestUri.ToString(), responseContent);
+                return false;
+            }
+            else
+            {
+                var targetObject = JsonConvert.DeserializeObject<WorkItemGroup>(responseContent);
+                group.Id = targetObject.Id;
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// Move a work item control from out Layout->Group to another Layout->Group
+        /// </summary>
+        /// <param name="control"></param>
+        /// <param name="processId"></param>
+        /// <param name="witRefName"></param>
+        /// <param name="groupId"></param>
+        /// <param name="fieldName"></param>
+        /// <param name="oldGroupId"></param>
+        /// <returns></returns>
+        public async Task<bool> MoveWorkItemControlToOtherGroup(WorkItemControl control, string processId, string witRefName, string groupId, string fieldName, string oldGroupId)
+        {
+            return await MoveWorkItemControl(control, processId, witRefName, groupId, fieldName, oldGroupId);
+        }
+        /// <summary>
+        /// Adds a work item control to an existing Layout->Group
+        /// </summary>
+        /// <param name="control"></param>
+        /// <param name="processId"></param>
+        /// <param name="witRefName"></param>
+        /// <param name="groupId"></param>
+        /// <param name="fieldName"></param>
+        /// <returns></returns>
+        public async Task<bool> AddWorkItemControlToGroup(WorkItemControl control, string processId, string witRefName, string groupId, string fieldName)
+        {
+            return await MoveWorkItemControl(control, processId, witRefName, groupId, fieldName);
+        }
+
+
+        private async Task<bool> MoveWorkItemControl(WorkItemControl control, string processId, string witRefName, string groupId, string fieldName, string oldGroupId = null)
+        {
+            var client = GetHttpClient(
+                $"{new UriBuilder(Options.Organisation)}/_apis/work/processes" +
+                $"/{processId}/workItemTypes/{witRefName}/layout/groups/{groupId}/Controls/{fieldName}?" +
+                (!string.IsNullOrEmpty(oldGroupId) ? $"&removeFromGroupId={oldGroupId}" : ""),
+                "api-version=6.1-preview.1");
+
+            DefaultContractResolver contractResolver = new DefaultContractResolver
+            {
+                NamingStrategy = new CamelCaseNamingStrategy()
+            };
+            var jsonSettings = new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore,
+                ContractResolver = contractResolver,
+            };
+            string body = JsonConvert.SerializeObject(control.ToJson(), jsonSettings);
+
+            var content = new StringContent(body, Encoding.UTF8, "application/json");
+            var result = await client.PutAsync(client.BaseAddress, content);
+
+            var responseContent = await result.Content.ReadAsStringAsync();
+            if (result.StatusCode != HttpStatusCode.OK && result.StatusCode != HttpStatusCode.Created)
+            {
+                Log.LogError("Error moving {DefinitionType}: {processId}::{witRefName}::{groupLabel}::{controlLabel}. Please migrate it manually. \r\nUrl: PUT {Url}\r\n{ErrorText}", typeof(WorkItemGroup).Name, processId, witRefName, groupId, control.Label, result.RequestMessage.RequestUri.ToString(), responseContent);
+                return false;
+            }
+            else
+            {
+                var targetObject = JsonConvert.DeserializeObject<WorkItemControl>(responseContent);
+                control.Id = targetObject.Id;
+                return true;
+            }
+        }
+    }
+
+    public static class HttpClientExt
+    {
+        public static void AddToPath(this HttpClient client, string pathToAdd)
+        {
+            client.BaseAddress = new Uri($"https://{client.BaseAddress.Host}:{client.BaseAddress.Port}{client.BaseAddress.LocalPath}{pathToAdd}{client.BaseAddress.Query}");
         }
     }
 }
