@@ -4,26 +4,52 @@
         <name>MigrationTools.Clients.AzureDevops.Rest</name>
     </assembly>
     <members>
-        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.GetHttpClient``1">
+        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.GetHttpClient``1(System.Object[])">
             <summary>
             Create a new instance of HttpClient including Heades
             </summary>
+            <param name="routeParams">strings that are injected into the route parameters of the definitions url</param>
             <returns>HttpClient</returns>
         </member>
-        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.GetUriBuilderBasedOnEndpointAndType``1">
+        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.GetHttpClient(System.String,System.String,System.Object[])">
+            <summary>
+            Create a new instance of HttpClient including Heades
+            </summary>
+            <param name="url"></param>
+            <param name="versionParameter">allows caller to override the default api version (ie. api-version=5.1)</param>
+            <param name="routeParams">strings that are injected into the route parameters of the definitions url</param>
+            <returns>HttpClient</returns>
+        </member>
+        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.GetUriBuilderBasedOnEndpointAndType``1(System.Object[])">
             <summary>
             Method to get the RESP API URLs right
             </summary>
+            <param name="routeParameters">strings that are injected into the route parameters of the definitions url</param>
             <returns>UriBuilder</returns>
         </member>
-        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.GetApiDefinitionsAsync``1">
+        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.GetApiDefinitionsAsync``1(System.Object[],System.String,System.String,System.Boolean)">
             <summary>
-            Generic Method to get API Definitions (Taskgroups, Variablegroups, Build- or Release Pipelines)
+            Generic Method to get API Definitions (Taskgroups, Variablegroups, Build- or Release Pipelines, ProcessDefinition)
             </summary>
             <typeparam name="DefinitionType">
-            Type of Definition. Can be: Taskgroup, Build- or Release Pipeline
+            Type of Definition. Can be: Taskgroup, Build- or Release Pipeline, ProcessDefinition
             </typeparam>
+            <param name="routeParameters">strings that are injected into the route parameters of the definitions url</param>
+            <param name="queryString">additional query string parameters passed to the underlying api call</param>
+            <param name="singleDefinitionQueryString">additional query string parameter passed when pulling the single instance details (ie. $expands, etc)</param>
+            <param name="queryForDetails">a boolean flag to allow caller to skip the calls for each individual definition details</param>
             <returns>List of API Definitions</returns>
+        </member>
+        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.GetApiDefinitionAsync``1(System.Object[],System.String,System.String,System.Boolean)">
+            <summary>
+            Get a single instance of a defined type
+            </summary>
+            <typeparam name="DefinitionType"></typeparam>
+            <param name="routeParameters">strings that are injected into the route parameters of the definitions url</param>
+            <param name="queryString">additional query string parameters passed to the underlying api call</param>
+            <param name="singleDefinitionQueryString">additional query string parameter passed when pulling the single instance details (ie. $expands, etc)</param>
+            <param name="queryForDetails">a boolean flag to allow caller to skip the calls for each individual definition details</param>
+            <returns></returns>
         </member>
         <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.UpdateTaskGroupsAsync(System.Collections.Generic.IEnumerable{MigrationTools.DataContracts.Pipelines.TaskGroup},System.Collections.Generic.IEnumerable{MigrationTools.DataContracts.Pipelines.TaskGroup},System.Collections.Generic.IEnumerable{MigrationTools.DataContracts.Pipelines.TaskGroup})">
             <summary>
@@ -34,13 +60,81 @@
             <param name="updatedDefinitions"></param>
             <returns>List of Mappings</returns>
         </member>
-        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.CreateApiDefinitionsAsync``1(System.Collections.Generic.IEnumerable{``0})">
+        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.CreateApiDefinitionsAsync``1(System.Collections.Generic.IEnumerable{``0},System.String[])">
             <summary>
             Make HTTP Request to create a Definition
             </summary>
             <typeparam name="DefinitionType"></typeparam>
             <param name="definitionsToBeMigrated"></param>
+            <param name="parentIds">strings that are injected into the route parameters of the definitions url</param>
             <returns>List of Mappings</returns>
+        </member>
+        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.UpdateApiDefinitionsAsync``1(System.Collections.Generic.IEnumerable{``0},System.String[])">
+            <summary>
+            Make HTTP Request to update a Definition
+            </summary>
+            <typeparam name="DefinitionType"></typeparam>
+            <param name="definitionsToBeMigrated"></param>
+            <param name="parentIds">strings that are injected into the route parameters of the definitions url</param>
+            <returns>List of Mappings</returns>
+        </member>
+        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.SyncDefinition``1(``0,``0,System.String[])">
+            <summary>
+            Performs an update or create operation on the target definition
+            </summary>
+            <typeparam name="DefinitionType"></typeparam>
+            <param name="sourceDef"></param>
+            <param name="targetDef"></param>
+            <param name="parentIds"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.MoveWorkItemGroupToNewPage(MigrationTools.DataContracts.Process.WorkItemGroup,System.String,System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            Move work item group to another page and section
+            </summary>
+            <param name="group"></param>
+            <param name="processId"></param>
+            <param name="witRefName"></param>
+            <param name="pageId"></param>
+            <param name="sectionId"></param>
+            <param name="oldPageId"></param>
+            <param name="oldSectionId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.MoveWorkItemGroupWithinPage(MigrationTools.DataContracts.Process.WorkItemGroup,System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            Move a work item group from one Layout->Section to another Layout->Section
+            </summary>
+            <param name="group"></param>
+            <param name="processId"></param>
+            <param name="witRefName"></param>
+            <param name="pageId"></param>
+            <param name="sectionId"></param>
+            <param name="oldSectionId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.MoveWorkItemControlToOtherGroup(MigrationTools.DataContracts.Process.WorkItemControl,System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            Move a work item control from out Layout->Group to another Layout->Group
+            </summary>
+            <param name="control"></param>
+            <param name="processId"></param>
+            <param name="witRefName"></param>
+            <param name="groupId"></param>
+            <param name="fieldName"></param>
+            <param name="oldGroupId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.AddWorkItemControlToGroup(MigrationTools.DataContracts.Process.WorkItemControl,System.String,System.String,System.String,System.String)">
+            <summary>
+            Adds a work item control to an existing Layout->Group
+            </summary>
+            <param name="control"></param>
+            <param name="processId"></param>
+            <param name="witRefName"></param>
+            <param name="groupId"></param>
+            <param name="fieldName"></param>
+            <returns></returns>
         </member>
         <member name="T:MigrationTools.Processors.AzureDevOpsPipelineProcessor">
             <summary>
@@ -126,6 +220,26 @@
         <member name="P:MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions.ReleasePipelines">
             <summary>
             List of Release Pipelines to process. If this is `null` then all Release Pipelines will be processed. **Not implemented yet**
+            </summary>
+        </member>
+        <member name="T:MigrationTools.Processors.ProcessorModel">
+            <summary>
+            Data model used by Process Definition Processor to keep track of it' state
+            </summary>
+        </member>
+        <member name="T:MigrationTools.Processors.ProcessDefinitionModel">
+            <summary>
+            Model that carries meta and state of an individual process definition
+            </summary>
+        </member>
+        <member name="T:MigrationTools.Processors.WorkItemTypeModel">
+            <summary>
+            Model that carries meta and state of an individual work item type
+            </summary>
+        </member>
+        <member name="T:MigrationTools.Processors.ProcessDefinitionProcessor">
+            <summary>
+            Process definition processor used to keep processes between two orgs in sync
             </summary>
         </member>
     </members>

@@ -14,6 +14,8 @@ namespace MigrationTools
 
             //TfsPipelines
             context.AddTransient<AzureDevOpsPipelineProcessor>();
+            context.AddTransient<ProcessDefinitionProcessor>();
+
         }
     }
 }
