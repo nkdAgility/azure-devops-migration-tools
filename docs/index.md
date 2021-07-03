@@ -58,7 +58,7 @@ _This is a preview version of both the documentation and the Azure DevOps Migrat
 #### Reference: A Deep Dive
 
   - _!preview v2_ [Reference](./Reference/index.md)
-  - _!preview v2_  [Processors](./Reference/Processors/index.md)
+  - _!preview v2_ [Processors](./Reference/Processors/index.md)
   - _!preview v2_ [ProcessorEnrichers](./Reference/ProcessorEnrichers/index.md)
   - _!preview v2_ [Endpoints](./Reference/Endpoints/index.md)
   - _!preview v2_ [EndpointEnrichers](./Reference/EndpointEnrichers/index.md)
