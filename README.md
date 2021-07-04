@@ -45,6 +45,7 @@ The Azure DevOps Migration Tools allow you to bulk edit and migrate data between
 
 ## Change Log
 
+- v11.10 - Added ability to limit the number of revisions migrated with `MaxRevisions` on `WorkItemMigration` processor. 0 = All, and any other number should migrate the first revision + the latest up to MAX.
 - v11.9 - Dark launch of `Process` migration by @akanieski 
 - v11.9 - Dark launch of `Pipelines` & `Builds` migration by @tomfrenzel
 - v11.8 - As part of moving to the new architecture we moved to default newtonsoft type handling with `$type` properties instead of `ObjectType` ___To Migrate rename "ObjectType" to "$type" in your configuration!___
