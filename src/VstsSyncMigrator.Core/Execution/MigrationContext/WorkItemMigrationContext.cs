@@ -368,7 +368,7 @@ namespace VstsSyncMigrator.Engine
                             { "sourceWorkItemRev", sourceWorkItem.Rev },
                             { "ReplayRevisions", _config.ReplayRevisions }}
                         );
-                    List<RevisionItem> revisionsToMigrate = revisionManager.RevisionsToMigrate(sourceWorkItem, targetWorkItem);
+                    List<RevisionItem> revisionsToMigrate = revisionManager.GetRevisionsToMigrate(sourceWorkItem, targetWorkItem);
                     if (targetWorkItem == null)
                     {
                         targetWorkItem = ReplayRevisions(revisionsToMigrate, sourceWorkItem, null, _current);
@@ -518,35 +518,7 @@ namespace VstsSyncMigrator.Engine
                     targetWorkItem = CreateWorkItem_Shell(Engine.Target.WorkItems.Project, sourceWorkItem, skipToFinalRevisedWorkItemType ? finalDestType : targetType);
                 }
 
-                if (_config.CollapseRevisions)
-                {
-                    var data = revisionsToMigrate.Select(rev =>
-                    {
-                        var revWi = sourceWorkItem.GetRevision(rev.Number);
-
-                        return new
-                        {
-                            revWi.Id,
-                            Rev = revWi.Rev,
-                            RevisedDate = revWi.ChangedDate,
-                            revWi.Fields
-                        };
-                    });
-
-                    var fileData = JsonConvert.SerializeObject(data, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-                    var filePath = Path.Combine(Path.GetTempPath(), $"{sourceWorkItem.Id}_PreMigrationHistory.json");
-
-                    // todo: Delete this file after (!) WorkItem has been saved
-                    File.WriteAllText(filePath, fileData);
-                    targetWorkItem.ToWorkItem().Attachments.Add(new Attachment(filePath, "History has been consolidated into the attached file."));
-
-                    revisionsToMigrate = revisionsToMigrate.GetRange(revisionsToMigrate.Count - 1, 1);
-
-                    TraceWriteLine(LogEventLevel.Information, " Attached a consolidated set of {RevisionCount} revisions.",
-                        new Dictionary<string, object>() {
-                            {"RevisionCount", data.Count() }
-                        });
-                }
+                revisionsToMigrate = revisionManager.CollapseRevisions(revisionsToMigrate, sourceWorkItem, targetWorkItem);
 
                 foreach (var revision in revisionsToMigrate)
                 {
@@ -633,6 +605,8 @@ namespace VstsSyncMigrator.Engine
 
             return targetWorkItem;
         }
+
+       
 
         private void WorkItemTypeChange(WorkItemData targetWorkItem, bool skipToFinalRevisedWorkItemType, string finalDestType, RevisionItem revision, WorkItemData currentRevisionWorkItem, string destType)
         {

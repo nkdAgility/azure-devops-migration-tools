@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml;
@@ -88,7 +89,7 @@ namespace MigrationTools.Enrichers
             }
         }
 
-        public List<RevisionItem> RevisionsToMigrate(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
+        public List<RevisionItem> GetRevisionsToMigrate(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
         {
             // Revisions have been sorted already on object creation. Values of the Dictionary are sorted by RevisionItem.Number
             var sortedRevisions = sourceWorkItem.Revisions.Values.ToList();
@@ -134,6 +135,41 @@ namespace MigrationTools.Enrichers
             Log.LogDebug("RevisionsToMigrate:----------------------------------------------------");
 
             return sortedRevisions;
+        }
+
+        public List<RevisionItem> CollapseRevisions(List<RevisionItem> revisionsToMigrate, WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
+        {
+            if (_Options.CollapseRevisions)
+            {
+                var data = revisionsToMigrate.Select(rev =>
+                {
+                    var revWi = sourceWorkItem.GetRevision(rev.Number);
+
+                    return new
+                    {
+                        revWi.Id,
+                        Rev = revWi.Rev,
+                        RevisedDate = revWi.ChangedDate,
+                        revWi.Fields
+                    };
+                });
+
+                var fileData = JsonConvert.SerializeObject(data, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                var filePath = Path.Combine(Path.GetTempPath(), $"{sourceWorkItem.Id}_PreMigrationHistory.json");
+
+                // todo: Delete this file after (!) WorkItem has been saved
+                File.WriteAllText(filePath, fileData);
+                targetWorkItem.ToWorkItem().Attachments.Add(new Attachment(filePath, "History has been consolidated into the attached file."));
+
+                revisionsToMigrate = revisionsToMigrate.GetRange(revisionsToMigrate.Count - 1, 1);
+
+                Log.LogInformation(" Attached a consolidated set of {RevisionCount} revisions.",
+                    new Dictionary<string, object>() {
+                            {"RevisionCount", data.Count() }
+                    });
+            }
+
+            return revisionsToMigrate;
         }
 
     }
