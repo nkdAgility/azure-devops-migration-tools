@@ -38,6 +38,7 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         public bool GenerateMigrationComment { get; set; }
         public string[] NodeBasePaths { get; set; }
         public IList<int> WorkItemIDs { get; set; }
+        public int MaxRevisions { get; set; }
 
         /// <inheritdoc />
         public bool IsProcessorCompatible(IReadOnlyList<IProcessorConfig> otherProcessors)
