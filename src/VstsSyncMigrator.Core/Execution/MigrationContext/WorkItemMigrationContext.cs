@@ -46,6 +46,7 @@ namespace VstsSyncMigrator.Engine
         private IWorkItemProcessorEnricher embededImagesEnricher;
         private TfsGitRepositoryEnricher gitRepositoryEnricher;
         private TfsNodeStructure nodeStructureEnricher;
+        private TfsRevisionManager revisionManager;
         private TfsValidateRequiredField validateConfig;
         private IDictionary<string, double> processWorkItemMetrics = null;
         private IDictionary<string, string> processWorkItemParamiters = null;
@@ -92,6 +93,9 @@ namespace VstsSyncMigrator.Engine
             nodeStructureEnricher = Services.GetRequiredService<TfsNodeStructure>();
             nodeStructureEnricher.Configure(new TfsNodeStructureOptions() { Enabled = true, NodeBasePaths = _config.NodeBasePaths, PrefixProjectToNodes = _config.PrefixProjectToNodes });
             nodeStructureEnricher.ProcessorExecutionBegin(null);
+            revisionManager = Services.GetRequiredService<TfsRevisionManager>();
+            revisionManager.Configure(new TfsRevisionManagerOptions() { Enabled = true, MaxRevisions = _config.MaxRevisions, CollapseRevisions = _config.CollapseRevisions, ReplayRevisions = _config.ReplayRevisions });
+
 
             _witClient = new WorkItemTrackingHttpClient(Engine.Target.Config.AsTeamProjectConfig().Collection, Engine.Target.Credentials);
             //Validation: make sure that the ReflectedWorkItemId field name specified in the config exists in the target process, preferably on each work item type.
@@ -364,7 +368,7 @@ namespace VstsSyncMigrator.Engine
                             { "sourceWorkItemRev", sourceWorkItem.Rev },
                             { "ReplayRevisions", _config.ReplayRevisions }}
                         );
-                    List<RevisionItem> revisionsToMigrate = RevisionsToMigrate(sourceWorkItem, targetWorkItem);
+                    List<RevisionItem> revisionsToMigrate = revisionManager.GetRevisionsToMigrate(sourceWorkItem, targetWorkItem);
                     if (targetWorkItem == null)
                     {
                         targetWorkItem = ReplayRevisions(revisionsToMigrate, sourceWorkItem, null, _current);
@@ -514,35 +518,7 @@ namespace VstsSyncMigrator.Engine
                     targetWorkItem = CreateWorkItem_Shell(Engine.Target.WorkItems.Project, sourceWorkItem, skipToFinalRevisedWorkItemType ? finalDestType : targetType);
                 }
 
-                if (_config.CollapseRevisions)
-                {
-                    var data = revisionsToMigrate.Select(rev =>
-                    {
-                        var revWi = sourceWorkItem.GetRevision(rev.Number);
-
-                        return new
-                        {
-                            revWi.Id,
-                            Rev = revWi.Rev,
-                            RevisedDate = revWi.ChangedDate,
-                            revWi.Fields
-                        };
-                    });
-
-                    var fileData = JsonConvert.SerializeObject(data, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-                    var filePath = Path.Combine(Path.GetTempPath(), $"{sourceWorkItem.Id}_PreMigrationHistory.json");
-
-                    // todo: Delete this file after (!) WorkItem has been saved
-                    File.WriteAllText(filePath, fileData);
-                    targetWorkItem.ToWorkItem().Attachments.Add(new Attachment(filePath, "History has been consolidated into the attached file."));
-
-                    revisionsToMigrate = revisionsToMigrate.GetRange(revisionsToMigrate.Count - 1, 1);
-
-                    TraceWriteLine(LogEventLevel.Information, " Attached a consolidated set of {RevisionCount} revisions.",
-                        new Dictionary<string, object>() {
-                            {"RevisionCount", data.Count() }
-                        });
-                }
+                revisionsToMigrate = revisionManager.CollapseRevisions(revisionsToMigrate, sourceWorkItem, targetWorkItem);
 
                 foreach (var revision in revisionsToMigrate)
                 {
@@ -630,44 +606,7 @@ namespace VstsSyncMigrator.Engine
             return targetWorkItem;
         }
 
-        private List<RevisionItem> RevisionsToMigrate(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
-        {
-            // Revisions have been sorted already on object creation. Values of the Dictionary are sorted by RevisionItem.Number
-            var sortedRevisions = sourceWorkItem.Revisions.Values.ToList();
-
-            if (targetWorkItem != null)
-            {
-                // Target exists so remove any Changed Date matches between them
-                var targetChangedDates = (from Revision x in targetWorkItem.ToWorkItem().Revisions select Convert.ToDateTime(x.Fields["System.ChangedDate"].Value)).ToList();
-                if (_config.ReplayRevisions)
-                {
-                    sortedRevisions = sortedRevisions.Where(x => !targetChangedDates.Contains(x.ChangedDate)).ToList();
-                }
-                // Find Max target date and remove all source revisions that are newer
-                var targetLatestDate = targetChangedDates.Max();
-                sortedRevisions = sortedRevisions.Where(x => x.ChangedDate > targetLatestDate).ToList();
-            }
-
-            if (!_config.ReplayRevisions && sortedRevisions.Count > 0)
-            {
-                // Remove all but the latest revision if we are not replaying revisions
-                sortedRevisions.RemoveRange(0, sortedRevisions.Count - 1);
-            }
-
-            TraceWriteLine(LogEventLevel.Information, "Found {RevisionsCount} revisions to migrate on  Work item:{sourceWorkItemId}",
-                new Dictionary<string, object>() {
-                    {"RevisionsCount", sortedRevisions.Count},
-                    {"sourceWorkItemId", sourceWorkItem.Id}
-                });
-            Log.LogDebug("RevisionsToMigrate:----------------------------------------------------");
-            foreach (RevisionItem item in sortedRevisions)
-            {
-                Log.LogDebug("RevisionsToMigrate: Index:{Index} - Number:{Number} - ChangedDate:{ChangedDate}", item.Index, item.Number, item.ChangedDate);
-            }
-            Log.LogDebug("RevisionsToMigrate:----------------------------------------------------");
-
-            return sortedRevisions;
-        }
+       
 
         private void WorkItemTypeChange(WorkItemData targetWorkItem, bool skipToFinalRevisedWorkItemType, string finalDestType, RevisionItem revision, WorkItemData currentRevisionWorkItem, string destType)
         {
