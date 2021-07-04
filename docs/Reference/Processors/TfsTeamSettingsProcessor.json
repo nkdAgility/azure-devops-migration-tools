@@ -1,54 +1,11 @@
 {
-    "Version": "11.9",
-    "LogLevel": "Verbose",
-    
-    "Endpoints": {
-      "TfsTeamSettingsEndpoints": [
-        {
-          "Name": "TeamSettingsSource",
-          "AccessToken": "",
-          "Query": {
-            "Query": "SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan') ORDER BY [System.ChangedDate] desc"
-          },
-          "Organisation": "https://dev.azure.com/like10-demos/",
-          "Project": "SourceProject",
-          "ReflectedWorkItemIdField": "ReflectedWorkItemId",
-          "AuthenticationMode": "Prompt",
-          "AllowCrossProjectLinking": false,
-          "LanguageMaps": {
-            "AreaPath": "Area",
-            "IterationPath": "Iteration"
-          }
-        },
-        {
-          "Name": "TeamSettingsTarget",
-          "AccessToken": "",
-          "Query": {
-            "Query": "SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan') ORDER BY [System.ChangedDate] desc"
-          },
-          "Organisation": "https://dev.azure.com/like10-demos/",
-          "Project": "TargetProject",
-          "ReflectedWorkItemIdField": "ReflectedWorkItemId",
-          "AuthenticationMode": "Prompt",
-          "AllowCrossProjectLinking": false,
-          "LanguageMaps": {
-            "AreaPath": "Area",
-            "IterationPath": "Iteration"
-          }
-        }
-      ]      
-    },
-    "Processors": [     
-      {
-        "$type": "TfsTeamSettingsProcessorOptions",
-        "Enabled": true,
-        "MigrateTeamSettings": true,
-        "UpdateTeamSettings": true,
-        "PrefixProjectToNodes": false,
-        "Teams": null,
-        "ProcessorEnrichers": null,
-        "SourceName": "TeamSettingsSource",
-        "TargetName": "TeamSettingsTarget"        
-        }
-    ]
-  }
+  "$type": "TfsTeamSettingsProcessorOptions",
+  "Enabled": false,
+  "MigrateTeamSettings": true,
+  "UpdateTeamSettings": true,
+  "PrefixProjectToNodes": false,
+  "Teams": null,
+  "ProcessorEnrichers": null,
+  "SourceName": "sourceName",
+  "TargetName": "targetName"
+}

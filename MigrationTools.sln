@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29006.145
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31410.414
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.ConsoleFull", "src\MigrationTools.ConsoleFull\MigrationTools.ConsoleFull.csproj", "{033EB332-4A50-4C73-9B7D-A35D9F3C0513}"
 EndProject
@@ -20,6 +20,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extension", "Extension", "{
 	ProjectSection(SolutionItems) = preProject
 		src\MigrationTools.Extension\LICENSE.txt = src\MigrationTools.Extension\LICENSE.txt
 		src\MigrationTools.Extension\README.md = src\MigrationTools.Extension\README.md
+		README.md = README.md
 		src\MigrationTools.Extension\vss-extension.json = src\MigrationTools.Extension\vss-extension.json
 	EndProjectSection
 EndProject
@@ -174,7 +175,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ProcessorEnrichers", "Proce
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Clients.AzureDevops.Rest.Tests", "src\MigrationTools.Clients.AzureDevops.Rest.Tests\MigrationTools.Clients.AzureDevops.Rest.Tests.csproj", "{70EA792C-E84C-4A5D-8280-FCC47F4AE150}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MigrationTools.TestExtensions", "src\MigrationTools.TestExtensions\MigrationTools.TestExtensions.csproj", "{4C16C19A-AF2D-4061-B2DE-87E39B1DF422}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.TestExtensions", "src\MigrationTools.TestExtensions\MigrationTools.TestExtensions.csproj", "{4C16C19A-AF2D-4061-B2DE-87E39B1DF422}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
