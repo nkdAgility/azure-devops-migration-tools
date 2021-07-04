@@ -94,7 +94,7 @@ namespace VstsSyncMigrator.Engine
             nodeStructureEnricher.Configure(new TfsNodeStructureOptions() { Enabled = true, NodeBasePaths = _config.NodeBasePaths, PrefixProjectToNodes = _config.PrefixProjectToNodes });
             nodeStructureEnricher.ProcessorExecutionBegin(null);
             revisionManager = Services.GetRequiredService<TfsRevisionManager>();
-            revisionManager.Configure(new TfsRevisionManagerOptions() { Enabled = true, MaxRevisions = 50, CollapseRevisions = _config.CollapseRevisions, ReplayRevisions = _config.ReplayRevisions });
+            revisionManager.Configure(new TfsRevisionManagerOptions() { Enabled = true, MaxRevisions = _config.MaxRevisions, CollapseRevisions = _config.CollapseRevisions, ReplayRevisions = _config.ReplayRevisions });
 
 
             _witClient = new WorkItemTrackingHttpClient(Engine.Target.Config.AsTeamProjectConfig().Collection, Engine.Target.Credentials);

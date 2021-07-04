@@ -68,6 +68,7 @@ namespace MigrationTools._EngineV1.Configuration.Processing
             GenerateMigrationComment = true;
             WIQLQueryBit = @"AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
             WIQLOrderBit = "[System.ChangedDate] desc";
+            MaxRevisions = 0;
         }
     }
 }
