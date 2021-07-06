@@ -8,7 +8,6 @@ namespace MigrationTools.Enrichers
 
         public bool ReplayRevisions { get; set; }
         public int MaxRevisions { get; set; }
-        public bool CollapseRevisions { get; set; }
 
         public override void SetDefaults()
         {
@@ -19,7 +18,6 @@ namespace MigrationTools.Enrichers
     public interface ITfsRevisionManagerOptions
     {
         public int MaxRevisions { get; set; }
-        public bool CollapseRevisions { get; set; }
         public bool ReplayRevisions { get; set; }
     }
 

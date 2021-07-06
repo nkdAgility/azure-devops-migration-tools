@@ -24,6 +24,8 @@ It will migrate work items using a tip or replay migrator as well as Attachments
 | `BuildFieldTable`                    | Boolean | Add in the original field to value table in a history comment. So if you lost information with the field mapping you are on the save side without data lost. This table is searchable using a `CONTAINS` WIQL query | false                                    |
 | `AppendMigrationToolSignatureFooter` | Boolean | Add a signature to the in the comment history of each work item. If you like this project please set this to true 😊 | false                                    |
 | `ReplayRevisions` | Boolean | You can choose to migrate the tip only (a single write) or all of the revisions (many writes). If you are setting this to `false` to migrate only the tip then you should set `BuildFieldTable` to `true` | true |
+| `AttachMigrationHistory` | Boolean | Attaches a file with all of the revisions from the source in json format. | false |
+| `MaxRevisions` | Int | Sets the maximum number of revisions that will be migrated. "First + Last N = Max". If this was set to 5 and there were 10 revisions you would get the first 1 (creation) and the latest 4 migrated. | 0 |
 | `LinkMigration` | Boolean | If enabled this will migrate the Links for the work item at the same time as the whole work item. | true |
 | _{NEW}_ `LinkMigrationSaveEachAsAdded` | Boolean | If you have changed parents before re-running a sync you may get a `TF26194: unable to change the value of the 'Parent' field` error. This will resolve it, but will slow migration. | false                                    |
 | `AttachmentMigration` | Boolean | If enabled this will migrate all of the attachments at the same time as the work item | true |
@@ -37,7 +39,6 @@ It will migrate work items using a tip or replay migrator as well as Attachments
 | `SkipToFinalRevisedWorkItemType` | Boolean | If enabled, when a revision is found that changes the work item type it will use the most recent revision work item type when migrating the initial work item. This should only be enabled for migrations from Azure DevOps Service to Azure DevOps Server. | true
 | `CollapseRevisions` | Boolean | If enabled, all revisions except the most recent are collapsed into a JSON format and attached as an attachment. Requires ReplayRevisions to be enabled. | false 
 | `PauseAfterEachWorkItem` | Boolean |  Pause after each work item is migrated | false
-| `CollapseRevisions ` | Boolean | If enabled, all work item revisions ar treated as a single revision | false 
 | `GenerateMigrationComment` | Boolean | If enabled, adds a comment recording the migration | true 
 | `NodeBasePaths` |Array`<string`> | The root paths of the Ares / Iterations you want migrate. See [NodeBasePath Configuration](#NodeBasePath) | ["/"] 
 | `WorkItemIDs ` | Array`<int`> | A list of work items to import | 

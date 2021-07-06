@@ -33,7 +33,7 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         public bool FilterWorkItemsThatAlreadyExistInTarget { get; set; }
         public bool PauseAfterEachWorkItem { get; set; }
         public int AttachmentMaxSize { get; set; }
-        public bool CollapseRevisions { get; set; }
+        public bool AttachRevisionHistory { get; set; }
         public bool LinkMigrationSaveEachAsAdded { get; set; }
         public bool GenerateMigrationComment { get; set; }
         public string[] NodeBasePaths { get; set; }
@@ -69,6 +69,7 @@ namespace MigrationTools._EngineV1.Configuration.Processing
             WIQLQueryBit = @"AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
             WIQLOrderBit = "[System.ChangedDate] desc";
             MaxRevisions = 0;
+            AttachRevisionHistory = false;
         }
     }
 }

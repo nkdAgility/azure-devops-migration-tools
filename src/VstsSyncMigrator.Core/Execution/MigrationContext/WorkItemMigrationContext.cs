@@ -94,7 +94,7 @@ namespace VstsSyncMigrator.Engine
             nodeStructureEnricher.Configure(new TfsNodeStructureOptions() { Enabled = true, NodeBasePaths = _config.NodeBasePaths, PrefixProjectToNodes = _config.PrefixProjectToNodes });
             nodeStructureEnricher.ProcessorExecutionBegin(null);
             revisionManager = Services.GetRequiredService<TfsRevisionManager>();
-            revisionManager.Configure(new TfsRevisionManagerOptions() { Enabled = true, MaxRevisions = _config.MaxRevisions, CollapseRevisions = _config.CollapseRevisions, ReplayRevisions = _config.ReplayRevisions });
+            revisionManager.Configure(new TfsRevisionManagerOptions() { Enabled = true, MaxRevisions = _config.MaxRevisions, ReplayRevisions = _config.ReplayRevisions });
 
 
             _witClient = new WorkItemTrackingHttpClient(Engine.Target.Config.AsTeamProjectConfig().Collection, Engine.Target.Credentials);
@@ -517,8 +517,11 @@ namespace VstsSyncMigrator.Engine
                     }
                     targetWorkItem = CreateWorkItem_Shell(Engine.Target.WorkItems.Project, sourceWorkItem, skipToFinalRevisedWorkItemType ? finalDestType : targetType);
                 }
-
-                revisionsToMigrate = revisionManager.CollapseRevisions(revisionsToMigrate, sourceWorkItem, targetWorkItem);
+                
+                if (_config.AttachRevisionHistory)
+                {
+                    revisionManager.AttachSourceRevisionHistroyJsonToTarget(sourceWorkItem, targetWorkItem);
+                } 
 
                 foreach (var revision in revisionsToMigrate)
                 {
