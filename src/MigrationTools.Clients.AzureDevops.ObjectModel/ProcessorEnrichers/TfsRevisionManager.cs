@@ -122,11 +122,7 @@ namespace MigrationTools.Enrichers
             //    sortedRevisions.RemoveRange(1, revisionsToRemove );
             //}
 
-            Log.LogInformation("Found {RevisionsCount} revisions to migrate on  Work item:{sourceWorkItemId}",
-                new Dictionary<string, object>() {
-                    {"RevisionsCount", sortedRevisions.Count},
-                    {"sourceWorkItemId", sourceWorkItem.Id}
-                });
+            Log.LogInformation("Found {RevisionsCount} revisions to migrate on  Work item:{sourceWorkItemId}",sortedRevisions.Count,sourceWorkItem.Id);
             Log.LogDebug("RevisionsToMigrate:----------------------------------------------------");
             foreach (RevisionItem item in sortedRevisions)
             {
