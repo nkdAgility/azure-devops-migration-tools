@@ -93,79 +93,94 @@ namespace MigrationTools.Enrichers
         {
             // Revisions have been sorted already on object creation. Values of the Dictionary are sorted by RevisionItem.Number
             var sortedRevisions = sourceWorkItem.Revisions.Values.ToList();
+            LogDebugCurrentSortedRevisions(sourceWorkItem, sortedRevisions);
+            Log.LogDebug("TfsRevisionManager::GetRevisionsToMigrate: Raw Source {sourceWorkItem} Has {sortedRevisions} revisions", sourceWorkItem.Id, sortedRevisions.Count);
 
-            if (targetWorkItem != null)
-            {
-                // Target exists so remove any Changed Date matches between them
-                var targetChangedDates = (from Revision x in targetWorkItem.ToWorkItem().Revisions select Convert.ToDateTime(x.Fields["System.ChangedDate"].Value)).ToList();
-                if (_Options.ReplayRevisions)
-                {
-                    sortedRevisions = sortedRevisions.Where(x => !targetChangedDates.Contains(x.ChangedDate)).ToList();
-                }
-                // Find Max target date and remove all source revisions that are newer
-                var targetLatestDate = targetChangedDates.Max();
-                sortedRevisions = sortedRevisions.Where(x => x.ChangedDate > targetLatestDate).ToList();
-            }
+            sortedRevisions = RemoveRevisionsAlreadyOnTarget(targetWorkItem, sortedRevisions);
 
-            if (!_Options.ReplayRevisions && sortedRevisions.Count > 0)
-            {
-                // Remove all but the latest revision if we are not replaying revisions
-                sortedRevisions.RemoveRange(0, sortedRevisions.Count - 1);
-            }
+            RemoveRevisionsAllExceptLatest(sortedRevisions);
 
-            //if (_Options.ReplayRevisions && _Options.MaxRevisions > 0 && sortedRevisions.Count > 0)
-            //{
-            //    // Keep the first revission, and the latest up to [MaxRevisions]
-            //    // _config.MaxRevisions = 10?
-            //    var revisionsToRemove = _Options.MaxRevisions > sortedRevisions.Count ? sortedRevisions.Count-1 : (sortedRevisions.Count - _Options.MaxRevisions); // all except latest
+            RemoveRevisionsMoreThanMaxRevisions(sortedRevisions);
 
-            //    sortedRevisions.RemoveRange(1, revisionsToRemove );
-            //}
+            LogDebugCurrentSortedRevisions(sourceWorkItem, sortedRevisions);
 
-            Log.LogInformation("Found {RevisionsCount} revisions to migrate on  Work item:{sourceWorkItemId}",sortedRevisions.Count,sourceWorkItem.Id);
+            return sortedRevisions;
+        }
+
+        private void LogDebugCurrentSortedRevisions(WorkItemData sourceWorkItem, List<RevisionItem> sortedRevisions)
+        {
+            Log.LogInformation("Found {RevisionsCount} revisions to migrate on  Work item:{sourceWorkItemId}", sortedRevisions.Count, sourceWorkItem.Id);
             Log.LogDebug("RevisionsToMigrate:----------------------------------------------------");
             foreach (RevisionItem item in sortedRevisions)
             {
                 Log.LogDebug("RevisionsToMigrate: Index:{Index} - Number:{Number} - ChangedDate:{ChangedDate}", item.Index, item.Number, item.ChangedDate);
             }
             Log.LogDebug("RevisionsToMigrate:----------------------------------------------------");
+        }
+
+        private void RemoveRevisionsMoreThanMaxRevisions(List<RevisionItem> sortedRevisions)
+        {
+            if (_Options.ReplayRevisions && _Options.MaxRevisions > 0 && sortedRevisions.Count > 0)
+            {
+                // Keep the first revission, and the latest up to [MaxRevisions]
+                // _config.MaxRevisions = 10?
+                var revisionsToRemove = _Options.MaxRevisions > sortedRevisions.Count ? sortedRevisions.Count - 1 : (sortedRevisions.Count - _Options.MaxRevisions); // all except latest
+                sortedRevisions.RemoveRange(1, revisionsToRemove);
+                Log.LogDebug("TfsRevisionManager::GetRevisionsToMigrate: MaxRevisions={MaxRevisions}! There are {sortedRevisionsCount} left", _Options.MaxRevisions, sortedRevisions.Count);
+            }
+        }
+
+        private void RemoveRevisionsAllExceptLatest(List<RevisionItem> sortedRevisions)
+        {
+            if (!_Options.ReplayRevisions && sortedRevisions.Count > 0)
+            {
+                // Remove all but the latest revision if we are not replaying revisions
+                sortedRevisions.RemoveRange(0, sortedRevisions.Count - 1);
+                Log.LogDebug("TfsRevisionManager::GetRevisionsToMigrate: ReplayRevisions=false! There are {sortedRevisionsCount} left", sortedRevisions.Count);
+            }
+        }
+
+        private List<RevisionItem> RemoveRevisionsAlreadyOnTarget(WorkItemData targetWorkItem, List<RevisionItem> sortedRevisions)
+        {
+            if (targetWorkItem != null)
+            {
+                Log.LogDebug("TfsRevisionManager::GetRevisionsToMigrate: Raw Target {targetWorkItemId} Has {targetWorkItemRevCount} revisions", targetWorkItem.Id, targetWorkItem.Revisions.Count);
+                // Target exists so remove any Changed Date matches between them
+                var targetChangedDates = (from RevisionItem x in targetWorkItem.Revisions.Values select x.ChangedDate).ToList();
+                if (_Options.ReplayRevisions)
+                {
+                    sortedRevisions = sortedRevisions.Where(x => !targetChangedDates.Contains(x.ChangedDate)).ToList();
+                    Log.LogDebug("TfsRevisionManager::GetRevisionsToMigrate: After removing Date Matches there are {sortedRevisionsCount} left", sortedRevisions.Count);
+                }
+                // Find Max target date and remove all source revisions that are newer
+                var targetLatestDate = targetChangedDates.Max();
+                sortedRevisions = sortedRevisions.Where(x => x.ChangedDate > targetLatestDate).ToList();
+                Log.LogDebug("TfsRevisionManager::GetRevisionsToMigrate: After removing revisions before target latest date {targetLatestDate} there are {sortedRevisionsCount} left", targetLatestDate, sortedRevisions.Count);
+            }
 
             return sortedRevisions;
         }
 
-        public List<RevisionItem> CollapseRevisions(List<RevisionItem> revisionsToMigrate, WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
+        public void AttachSourceRevisionHistroyJsonToTarget(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
         {
-            if (_Options.CollapseRevisions)
+
+            var fileData = JsonConvert.SerializeObject(sourceWorkItem.Revisions, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+            var filePath = Path.Combine(Path.GetTempPath(), $"{sourceWorkItem.ProjectName}-{sourceWorkItem.Id}-PreMigrationHistory.json");
+
+            // todo: Delete this file after (!) WorkItem has been saved
+            File.WriteAllText(filePath, fileData);
+
+            if (targetWorkItem.internalObject != null)
             {
-                var data = revisionsToMigrate.Select(rev =>
-                {
-                    var revWi = sourceWorkItem.GetRevision(rev.Number);
-
-                    return new
-                    {
-                        revWi.Id,
-                        Rev = revWi.Rev,
-                        RevisedDate = revWi.ChangedDate,
-                        revWi.Fields
-                    };
-                });
-
-                var fileData = JsonConvert.SerializeObject(data, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-                var filePath = Path.Combine(Path.GetTempPath(), $"{sourceWorkItem.Id}_PreMigrationHistory.json");
-
-                // todo: Delete this file after (!) WorkItem has been saved
-                File.WriteAllText(filePath, fileData);
                 targetWorkItem.ToWorkItem().Attachments.Add(new Attachment(filePath, "History has been consolidated into the attached file."));
-
-                revisionsToMigrate = revisionsToMigrate.GetRange(revisionsToMigrate.Count - 1, 1);
+            }
+                
 
                 Log.LogInformation(" Attached a consolidated set of {RevisionCount} revisions.",
                     new Dictionary<string, object>() {
-                            {"RevisionCount", data.Count() }
+                            {"RevisionCount", sourceWorkItem.Revisions.Count() }
                     });
-            }
 
-            return revisionsToMigrate;
         }
 
     }
