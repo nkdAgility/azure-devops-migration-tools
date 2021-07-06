@@ -165,7 +165,7 @@ namespace MigrationTools.Enrichers
         {
 
             var fileData = JsonConvert.SerializeObject(sourceWorkItem.Revisions, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-            var filePath = Path.Combine(Path.GetTempPath(), $"{sourceWorkItem.ProjectName}-{sourceWorkItem.Id}-PreMigrationHistory.json");
+            var filePath = Path.Combine(Path.GetTempPath(), $"{sourceWorkItem.ProjectName}-ID{sourceWorkItem.Id}-R{sourceWorkItem.Rev}-PreMigrationHistory.json");
 
             // todo: Delete this file after (!) WorkItem has been saved
             File.WriteAllText(filePath, fileData);
