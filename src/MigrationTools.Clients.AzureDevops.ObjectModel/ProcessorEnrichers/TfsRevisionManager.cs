@@ -113,14 +113,14 @@ namespace MigrationTools.Enrichers
                 sortedRevisions.RemoveRange(0, sortedRevisions.Count - 1);
             }
 
-            if (_Options.ReplayRevisions && _Options.MaxRevisions > 0 && sortedRevisions.Count > 0)
-            {
-                // Keep the first revission, and the latest up to [MaxRevisions]
-                // _config.MaxRevisions = 10?
-                var revisionsToRemove = _Options.MaxRevisions > sortedRevisions.Count ? sortedRevisions.Count-1 : (sortedRevisions.Count - _Options.MaxRevisions); // all except latest
+            //if (_Options.ReplayRevisions && _Options.MaxRevisions > 0 && sortedRevisions.Count > 0)
+            //{
+            //    // Keep the first revission, and the latest up to [MaxRevisions]
+            //    // _config.MaxRevisions = 10?
+            //    var revisionsToRemove = _Options.MaxRevisions > sortedRevisions.Count ? sortedRevisions.Count-1 : (sortedRevisions.Count - _Options.MaxRevisions); // all except latest
 
-                sortedRevisions.RemoveRange(1, revisionsToRemove );
-            }
+            //    sortedRevisions.RemoveRange(1, revisionsToRemove );
+            //}
 
             Log.LogInformation("Found {RevisionsCount} revisions to migrate on  Work item:{sourceWorkItemId}",
                 new Dictionary<string, object>() {
