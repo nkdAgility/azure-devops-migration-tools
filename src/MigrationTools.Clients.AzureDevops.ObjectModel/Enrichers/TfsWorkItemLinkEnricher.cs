@@ -314,7 +314,7 @@ namespace MigrationTools.Enrichers
             }
             else
             {
-                Log.LogInformation("  [SKIP] Cant find wiTargetR where wiSourceL={0}, wiSourceR={1}", wiSourceL.Id, wiSourceR.Id);
+                Log.LogWarning("[SKIP] [LINK_CAPTURE_RELATED] [{RegisteredLinkType}] target not found. wiSourceL={wiSourceL}, wiSourceR={wiSourceR}, wiTargetL={wiTargetL}", rl.ArtifactLinkType.Name, wiSourceL.Id, wiSourceR.Id, wiTargetL == null? "null": wiTargetL.Id);
             }
         }
 
