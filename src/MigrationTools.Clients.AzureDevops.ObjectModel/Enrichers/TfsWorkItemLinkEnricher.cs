@@ -314,7 +314,7 @@ namespace MigrationTools.Enrichers
             }
             else
             {
-                Log.LogInformation("  [SKIP] Cant find wiTargetR where wiSourceL={0}, wiSourceR={1}, wiTargetL={2}", wiSourceL.Id, wiSourceR.Id, wiTargetL.Id);
+                Log.LogInformation("  [SKIP] Cant find wiTargetR where wiSourceL={0}, wiSourceR={1}", wiSourceL.Id, wiSourceR.Id);
             }
         }
 
