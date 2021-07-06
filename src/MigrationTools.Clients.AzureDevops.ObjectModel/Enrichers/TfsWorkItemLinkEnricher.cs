@@ -194,24 +194,31 @@ namespace MigrationTools.Enrichers
             RelatedLink rl = (RelatedLink)item;
             WorkItemData wiSourceR = null;
             WorkItemData wiTargetR = null;
-            try
+
+            Log.LogDebug("RelatedLink is of ArtifactLinkType '{ArtifactLinkType}' on WorkItemId s:{ids} t:{idt}", rl.ArtifactLinkType.Name, wiSourceL.Id, wiTargetL.Id);
+
+            if (!(rl.ArtifactLinkType is RegisteredLinkType)) // On a registered link type these will for sure fail as target is not in the system.
             {
-                wiSourceR = Engine.Source.WorkItems.GetWorkItem(rl.RelatedWorkItemId.ToString());
+                try
+                {
+                    wiSourceR = Engine.Source.WorkItems.GetWorkItem(rl.RelatedWorkItemId.ToString());
+                }
+                catch (Exception ex)
+                {
+                    Log.LogError(ex, "  [FIND-FAIL] Adding Link of type {0} where wiSourceL={1}, wiTargetL={2} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiTargetL.Id);
+                    return;
+                }
+                try
+                {
+                    wiTargetR = GetRightHandSideTargetWi(wiSourceL, wiSourceR, wiTargetL);
+                }
+                catch (Exception ex)
+                {
+                    Log.LogError(ex, "  [FIND-FAIL] Adding Link of type {0} where wiSourceL={1}, wiTargetL={2} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiTargetL.Id);
+                    return;
+                }
             }
-            catch (Exception ex)
-            {
-                Log.LogError(ex, "  [FIND-FAIL] Adding Link of type {0} where wiSourceL={1}, wiTargetL={2} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiTargetL.Id);
-                return;
-            }
-            try
-            {
-                wiTargetR = GetRightHandSideTargetWi(wiSourceL, wiSourceR, wiTargetL);
-            }
-            catch (Exception ex)
-            {
-                Log.LogError(ex, "  [FIND-FAIL] Adding Link of type {0} where wiSourceL={1}, wiTargetL={2} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiTargetL.Id);
-                return;
-            }
+            
             if (wiTargetR != null)
             {
                 bool IsExisting = false;
