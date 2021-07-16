@@ -197,7 +197,7 @@ namespace MigrationTools.Enrichers
 
             Log.LogDebug("RelatedLink is of ArtifactLinkType '{ArtifactLinkType}' on WorkItemId s:{ids} t:{idt}", rl.ArtifactLinkType.Name, wiSourceL.Id, wiTargetL.Id);
 
-            if (!(rl.ArtifactLinkType is RegisteredLinkType)) // On a registered link type these will for sure fail as target is not in the system.
+            if (rl.ArtifactLinkType.Name.Contains("Related")) // On a registered link type these will for sure fail as target is not in the system.
             {
                 try
                 {
