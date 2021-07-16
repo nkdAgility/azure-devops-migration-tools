@@ -2,7 +2,7 @@
 {
     public class LinkItem
     {
-        public object LinkType { get; set; }
+        public LinkItemType LinkType { get; set; }
         public string LinkUri { get; set; }
         public string Comment { get; set; }
         public string ArtifactLinkType { get; set; }
