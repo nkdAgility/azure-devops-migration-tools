@@ -137,6 +137,8 @@ The global configuration created by the `init` command look like this:
     {
       "$type": "WorkItemMigrationConfig",
       "ReplayRevisions": true,
+      "AttachRevisionHistory": false,
+      "MaxRevisions": 0,
       "PrefixProjectToNodes": false,
       "UpdateCreatedDate": true,
       "UpdateCreatedBy": true,
@@ -154,7 +156,6 @@ The global configuration created by the `init` command look like this:
       "FilterWorkItemsThatAlreadyExistInTarget": true,
       "PauseAfterEachWorkItem": false,
       "AttachmentMaxSize": 480000000,
-      "CollapseRevisions": false,
       "LinkMigrationSaveEachAsAdded": false,
       "GenerateMigrationComment": true,
       "NodeBasePaths": [

@@ -41,7 +41,7 @@ namespace VstsSyncMigrator.ConsoleApp
             Process(types, typeof(IEndpointEnricher), "EndpointEnrichers");
             Console.WriteLine("--------------------------");
             Console.WriteLine("---------Endpoints");
-            Process(types, typeof(IEndpoint), "Endpoints");
+// Process(types, typeof(IEndpoint), "Endpoints");
             Console.WriteLine("--------------------------");
             Console.WriteLine("---------ProcessorEnrichers");
             Process(types, typeof(IProcessorEnricher), "ProcessorEnrichers");

@@ -4,6 +4,15 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <Product>Azure DevOps Migration Tools API</Product>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Description>Reference API for creating plugins for the Azure DevOps Migration Tools</Description>
+    <PackageProjectUrl>https://github.com/nkdAgility/azure-devops-migration-tools/</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/nkdAgility/azure-devops-migration-tools.git</RepositoryUrl>
+    <RepositoryType>Git</RepositoryType>
+    <PackageTags>Migration Tools, Azure DevOps, API</PackageTags>
+    <PackageLicenseExpression></PackageLicenseExpression>
+    <Copyright>naked Agility with Martin Hinshelwood 2016-2021</Copyright>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -21,6 +30,13 @@
     <PackageReference Include="Microsoft.VisualStudio.Services.ServiceEndpoints.WebApi" Version="16.170.0" />
     <PackageReference Include="Serilog" Version="2.10.0" />
     <PackageReference Include="System.Security.Principal.Windows" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

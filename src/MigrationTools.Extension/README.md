@@ -13,8 +13,8 @@ The Azure DevOps Migration Tools allow you to bulk edit and migrate data between
 
 ## What can you do with this tool?
 
-- Migrate `Work Items`, `TestPlans & Suits`, `Teams`, `Shared Queries`, & `Pipelines` from one `Team Project` to another
-- Migrate `Work Items`, `TestPlans & Suits`, `Teams`, `Shared Queries`, & `Pipelines` from one `Organisation` to another
+- Migrate `Work Items`, `TestPlans & Suits`, `Teams`, `Shared Queries`, `Pipelines`, & `Processes` from one `Team Project` to another
+- Migrate `Work Items`, `TestPlans & Suits`, `Teams`, `Shared Queries`, `Pipelines`, & `Processes` from one `Organisation` to another
 - Bulk edit of `Work Items` accross an entire `Project`.
 
 ### What versions of Azure DevOps & TFS do you support?
@@ -32,16 +32,13 @@ The Azure DevOps Migration Tools allow you to bulk edit and migrate data between
 - Migration of Test Suites & Test Plans
 - _new_ Migration of Builds & Pipelines
 - Migrate from one Language version of TFS / Azure Devops to another (*new v9.0*)
+- _new_  Migration of Processes
 
-**NOTE: If you are able to migrate your entire Collection to Azure DevOps Services 
-you should use [Azure DevOps Migration Service](https://azure.microsoft.com/services/devops/migrate/) from Microsoft.
- If you have a requirement to change Process Template then you will need to do that 
-before you move to Azure DevOps.
+**NOTE: If you are able to migrate your entire Collection to Azure DevOps Services you should use [Azure DevOps Migration Service](https://azure.microsoft.com/services/devops/migrate/) from Microsoft. If you have a requirement to change Process Template then you will need to do that before you move to Azure DevOps Services.**
 
 ## Quick Links
 
- - [Start Here]()
- - [Video Overview](https://youtu.be/ZxDktQae10M)
+ - [Video Overview](https://www.youtube.com/watch?v=RCJsST0xBCE)
  - [Getting Started](http://nkdagility.github.io/azure-devops-migration-tools/getting-started)
  - [Documentation](http://nkdagility.github.io/azure-devops-migration-tools/)
  - [Questions on Usage](https://stackoverflow.com/questions/tagged/azure-devops-migration-tools)
@@ -49,6 +46,9 @@ before you move to Azure DevOps.
 
 ## Change Log
 
+- v11.11 - Refactored revision manager to have more tests and support limiting the number of revisions. CollapseRevisions has been replaced by setting MaxRevisions to 1 and setting AttachRevisionHistory to true; MaxRevisions sets the maximum number of revisions that will be migrated. "First + Last*N = Max". If this was set to 5 and there were 10 revisions you would get the first 1 (creation) and the latest 4 migrated. This is done after all of the existing revisions are created but before anything newer that target is removed.
+- v11.10 - Added ability to limit the number of revisions migrated with `MaxRevisions` on `WorkItemMigration` processor. 0 = All, and any other number should migrate the first revision + the latest up to MAX.
+- v11.9 - Dark launch of `Process` migration by @akanieski 
 - v11.9 - Dark launch of `Pipelines` & `Builds` migration by @tomfrenzel
 - v11.8 - As part of moving to the new architecture we moved to default newtonsoft type handling with `$type` properties instead of `ObjectType` ___To Migrate rename "ObjectType" to "$type" in your configuration!___
 - v11.5 - Added more useful logging levels. Replace `"TelemetryEnableTrace": false` with `"LogLevel": "Verbose"` in the config. Verbose will only be logged to the logfile.

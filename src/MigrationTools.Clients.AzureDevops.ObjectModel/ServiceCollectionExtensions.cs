@@ -20,11 +20,20 @@ namespace MigrationTools
             context.AddEndPoints<TfsWorkItemEndpointOptions, TfsWorkItemEndpoint>(configuration, "TfsWorkItemEndpoints");
             context.AddEndPoints<TfsTeamSettingsEndpointOptions, TfsTeamSettingsEndpoint>(configuration, "TfsTeamSettingsEndpoints");
 
+            //Processors
             context.AddTransient<TfsTeamSettingsProcessor>();
-            //TfsSharedQueries
             context.AddTransient<TfsSharedQueryProcessor>();
-            //TfsAreaAndIterationProcessor
             context.AddTransient<TfsAreaAndIterationProcessor>();
+
+            // Enrichers
+            context.AddSingleton<TfsValidateRequiredField>();
+            context.AddSingleton<TfsWorkItemLinkEnricher>();
+            context.AddSingleton<TfsEmbededImagesEnricher>();
+            context.AddSingleton<TfsGitRepositoryEnricher>();
+            context.AddSingleton<TfsNodeStructure>();
+            context.AddSingleton<TfsRevisionManager>();
+            // EndPoint Enrichers
+            context.AddTransient<TfsWorkItemAttachmentEnricher>();
         }
 
         [Obsolete("This is the v1 Archtiecture, we are movign to V2", false)]
@@ -43,14 +52,7 @@ namespace MigrationTools
             context.AddTransient<MultiValueConditionalMap>();
             context.AddTransient<RegexFieldMap>();
             context.AddTransient<TreeToTagFieldMap>();
-            // Enrichers
-            context.AddSingleton<TfsValidateRequiredField>();
-            context.AddSingleton<TfsWorkItemLinkEnricher>();
-            context.AddSingleton<TfsEmbededImagesEnricher>();
-            context.AddSingleton<TfsGitRepositoryEnricher>();
-            context.AddSingleton<TfsNodeStructure>();
-            // EndPoint Enrichers
-            context.AddTransient<TfsWorkItemAttachmentEnricher>();
+            
             // Core
             context.AddTransient<IMigrationClient, TfsMigrationClient>();
             context.AddTransient<IWorkItemMigrationClient, TfsWorkItemMigrationClient>();

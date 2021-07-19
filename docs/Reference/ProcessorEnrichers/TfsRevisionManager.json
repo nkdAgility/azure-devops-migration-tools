@@ -1,0 +1,6 @@
+{
+  "$type": "TfsRevisionManagerOptions",
+  "Enabled": true,
+  "ReplayRevisions": false,
+  "MaxRevisions": 0
+}
