@@ -8,7 +8,9 @@
             <summary>
             Create a new instance of HttpClient including Heades
             </summary>
-            <param name="routeParams">strings that are injected into the route parameters of the definitions url</param>
+            <param name="routeParams">
+            strings that are injected into the route parameters of the definitions url
+            </param>
             <returns>HttpClient</returns>
         </member>
         <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.GetHttpClient(System.String,System.String,System.Object[])">
@@ -16,28 +18,44 @@
             Create a new instance of HttpClient including Heades
             </summary>
             <param name="url"></param>
-            <param name="versionParameter">allows caller to override the default api version (ie. api-version=5.1)</param>
-            <param name="routeParams">strings that are injected into the route parameters of the definitions url</param>
+            <param name="versionParameter">
+            allows caller to override the default api version (ie. api-version=5.1)
+            </param>
+            <param name="routeParams">
+            strings that are injected into the route parameters of the definitions url
+            </param>
             <returns>HttpClient</returns>
         </member>
         <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.GetUriBuilderBasedOnEndpointAndType``1(System.Object[])">
             <summary>
             Method to get the RESP API URLs right
             </summary>
-            <param name="routeParameters">strings that are injected into the route parameters of the definitions url</param>
+            <param name="routeParameters">
+            strings that are injected into the route parameters of the definitions url
+            </param>
             <returns>UriBuilder</returns>
         </member>
         <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.GetApiDefinitionsAsync``1(System.Object[],System.String,System.String,System.Boolean)">
             <summary>
-            Generic Method to get API Definitions (Taskgroups, Variablegroups, Build- or Release Pipelines, ProcessDefinition)
+            Generic Method to get API Definitions (Taskgroups, Variablegroups, Build- or Release
+            Pipelines, ProcessDefinition)
             </summary>
             <typeparam name="DefinitionType">
             Type of Definition. Can be: Taskgroup, Build- or Release Pipeline, ProcessDefinition
             </typeparam>
-            <param name="routeParameters">strings that are injected into the route parameters of the definitions url</param>
-            <param name="queryString">additional query string parameters passed to the underlying api call</param>
-            <param name="singleDefinitionQueryString">additional query string parameter passed when pulling the single instance details (ie. $expands, etc)</param>
-            <param name="queryForDetails">a boolean flag to allow caller to skip the calls for each individual definition details</param>
+            <param name="routeParameters">
+            strings that are injected into the route parameters of the definitions url
+            </param>
+            <param name="queryString">
+            additional query string parameters passed to the underlying api call
+            </param>
+            <param name="singleDefinitionQueryString">
+            additional query string parameter passed when pulling the single instance details (ie.
+            $expands, etc)
+            </param>
+            <param name="queryForDetails">
+            a boolean flag to allow caller to skip the calls for each individual definition details
+            </param>
             <returns>List of API Definitions</returns>
         </member>
         <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.GetApiDefinitionAsync``1(System.Object[],System.String,System.String,System.Boolean)">
@@ -45,10 +63,19 @@
             Get a single instance of a defined type
             </summary>
             <typeparam name="DefinitionType"></typeparam>
-            <param name="routeParameters">strings that are injected into the route parameters of the definitions url</param>
-            <param name="queryString">additional query string parameters passed to the underlying api call</param>
-            <param name="singleDefinitionQueryString">additional query string parameter passed when pulling the single instance details (ie. $expands, etc)</param>
-            <param name="queryForDetails">a boolean flag to allow caller to skip the calls for each individual definition details</param>
+            <param name="routeParameters">
+            strings that are injected into the route parameters of the definitions url
+            </param>
+            <param name="queryString">
+            additional query string parameters passed to the underlying api call
+            </param>
+            <param name="singleDefinitionQueryString">
+            additional query string parameter passed when pulling the single instance details (ie.
+            $expands, etc)
+            </param>
+            <param name="queryForDetails">
+            a boolean flag to allow caller to skip the calls for each individual definition details
+            </param>
             <returns></returns>
         </member>
         <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.UpdateTaskGroupsAsync(System.Collections.Generic.IEnumerable{MigrationTools.DataContracts.Pipelines.TaskGroup},System.Collections.Generic.IEnumerable{MigrationTools.DataContracts.Pipelines.TaskGroup},System.Collections.Generic.IEnumerable{MigrationTools.DataContracts.Pipelines.TaskGroup})">
@@ -66,7 +93,9 @@
             </summary>
             <typeparam name="DefinitionType"></typeparam>
             <param name="definitionsToBeMigrated"></param>
-            <param name="parentIds">strings that are injected into the route parameters of the definitions url</param>
+            <param name="parentIds">
+            strings that are injected into the route parameters of the definitions url
+            </param>
             <returns>List of Mappings</returns>
         </member>
         <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.UpdateApiDefinitionsAsync``1(System.Collections.Generic.IEnumerable{``0},System.String[])">
@@ -75,7 +104,9 @@
             </summary>
             <typeparam name="DefinitionType"></typeparam>
             <param name="definitionsToBeMigrated"></param>
-            <param name="parentIds">strings that are injected into the route parameters of the definitions url</param>
+            <param name="parentIds">
+            strings that are injected into the route parameters of the definitions url
+            </param>
             <returns>List of Mappings</returns>
         </member>
         <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.SyncDefinition``1(``0,``0,System.String[])">
@@ -103,7 +134,7 @@
         </member>
         <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.MoveWorkItemGroupWithinPage(MigrationTools.DataContracts.Process.WorkItemGroup,System.String,System.String,System.String,System.String,System.String)">
             <summary>
-            Move a work item group from one Layout->Section to another Layout->Section
+            Move a work item group from one Layout-&gt;Section to another Layout-&gt;Section
             </summary>
             <param name="group"></param>
             <param name="processId"></param>
@@ -115,7 +146,7 @@
         </member>
         <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.MoveWorkItemControlToOtherGroup(MigrationTools.DataContracts.Process.WorkItemControl,System.String,System.String,System.String,System.String,System.String)">
             <summary>
-            Move a work item control from out Layout->Group to another Layout->Group
+            Move a work item control from out Layout-&gt;Group to another Layout-&gt;Group
             </summary>
             <param name="control"></param>
             <param name="processId"></param>
@@ -127,7 +158,7 @@
         </member>
         <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.AddWorkItemControlToGroup(MigrationTools.DataContracts.Process.WorkItemControl,System.String,System.String,System.String,System.String)">
             <summary>
-            Adds a work item control to an existing Layout->Group
+            Adds a work item control to an existing Layout-&gt;Group
             </summary>
             <param name="control"></param>
             <param name="processId"></param>

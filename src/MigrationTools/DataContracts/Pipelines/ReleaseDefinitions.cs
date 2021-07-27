@@ -51,7 +51,6 @@ namespace MigrationTools.DataContracts.Pipelines
             Source = "restApi";
             Revision = 1;
             Links = null;
-            Artifacts = null;
             Url = null;
             Links = null;
             Id = "0";
@@ -105,6 +104,10 @@ namespace MigrationTools.DataContracts.Pipelines
         public ArtifactSourceDefinitionUrl Definition { get; set; }
 
         public ArtifactSourceDefinitionUrl Project { get; set; }
+        public ArtifactSourceDefinitionUrl Branches { get; set; }
+        public ArtifactSourceDefinitionUrl Feed { get; set; }
+        public ArtifactSourceDefinitionUrl PackageType { get; set; }
+        public ArtifactSourceDefinitionUrl View { get; set; }
     }
 
     public partial class ArtifactSourceDefinitionUrl

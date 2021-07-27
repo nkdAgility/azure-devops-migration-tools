@@ -45,10 +45,50 @@ namespace MigrationTools.Endpoints
             }
         }
 
+        public async Task<ArtifactSourceDefinitionUrl> GetProjectAsync()
+        {
+            var baseUrl = new UriBuilder(string.Format(Options.Organisation));
+            var client = new HttpClient
+            {
+                BaseAddress = new Uri(baseUrl.Uri.AbsoluteUri.ToString())
+            };
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes(string.Format("{0}:{1}", "", Options.AccessToken))));
+
+            var projects = await client.GetAsync(client.BaseAddress.AbsoluteUri + "_apis/projects").Result.Content.ReadAsAsync<RestResultDefinition<Projects>>();
+            return new ArtifactSourceDefinitionUrl() { Name = Options.Project, Id = projects.Value.Single(p => p.Name == Options.Project).Id };
+        }
+
+        public async Task<List<ArtifactPackage>> GetArtifactPackages()
+        {
+            var artifactPackages = new List<ArtifactPackage>();
+            var baseUrl = new UriBuilder(string.Format(Options.Organisation));
+            var client = new HttpClient
+            {
+                BaseAddress = new Uri(baseUrl.Uri.AbsoluteUri.ToString())
+            };
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes(string.Format("{0}:{1}", "", Options.AccessToken))));
+
+            var feeds = await client.GetAsync(client.BaseAddress.AbsoluteUri + "_apis/packaging/Feeds").Result.Content.ReadAsAsync<RestResultDefinition<AzureFeed>>(); ;
+            foreach (var feed in feeds.Value)
+            {
+                var packages = await client.GetAsync(client.BaseAddress.AbsoluteUri + $"_apis/packaging/Feeds/{feed.Id}/packages").Result.Content.ReadAsAsync<RestResultDefinition<ArtifactPackage>>();
+                packages.Value = packages.Value.Select(v =>
+                {
+                    v.Feed = feed;
+                    return v;
+                });
+                artifactPackages.AddRange(packages.Value);
+            }
+
+            return artifactPackages;
+        }
+
         /// <summary>
         /// Create a new instance of HttpClient including Heades
         /// </summary>
-        /// <param name="routeParams">strings that are injected into the route parameters of the definitions url</param>
+        /// <param name="routeParams">
+        /// strings that are injected into the route parameters of the definitions url
+        /// </param>
         /// <returns>HttpClient</returns>
         private HttpClient GetHttpClient<DefinitionType>(params object[] routeParams)
             where DefinitionType : RestApiDefinition
@@ -69,8 +109,12 @@ namespace MigrationTools.Endpoints
         /// Create a new instance of HttpClient including Heades
         /// </summary>
         /// <param name="url"></param>
-        /// <param name="versionParameter">allows caller to override the default api version (ie. api-version=5.1)</param>
-        /// <param name="routeParams">strings that are injected into the route parameters of the definitions url</param>
+        /// <param name="versionParameter">
+        /// allows caller to override the default api version (ie. api-version=5.1)
+        /// </param>
+        /// <param name="routeParams">
+        /// strings that are injected into the route parameters of the definitions url
+        /// </param>
         /// <returns>HttpClient</returns>
         private HttpClient GetHttpClient(string url, string versionParameter, params object[] routeParams)
         {
@@ -88,7 +132,9 @@ namespace MigrationTools.Endpoints
         /// <summary>
         /// Method to get the RESP API URLs right
         /// </summary>
-        /// <param name="routeParameters">strings that are injected into the route parameters of the definitions url</param>
+        /// <param name="routeParameters">
+        /// strings that are injected into the route parameters of the definitions url
+        /// </param>
         /// <returns>UriBuilder</returns>
         private UriBuilder GetUriBuilderBasedOnEndpointAndType<DefinitionType>(params object[] routeParams)
             where DefinitionType : RestApiDefinition
@@ -138,15 +184,25 @@ namespace MigrationTools.Endpoints
         }
 
         /// <summary>
-        /// Generic Method to get API Definitions (Taskgroups, Variablegroups, Build- or Release Pipelines, ProcessDefinition)
+        /// Generic Method to get API Definitions (Taskgroups, Variablegroups, Build- or Release
+        /// Pipelines, ProcessDefinition)
         /// </summary>
         /// <typeparam name="DefinitionType">
         /// Type of Definition. Can be: Taskgroup, Build- or Release Pipeline, ProcessDefinition
         /// </typeparam>
-        /// <param name="routeParameters">strings that are injected into the route parameters of the definitions url</param>
-        /// <param name="queryString">additional query string parameters passed to the underlying api call</param>
-        /// <param name="singleDefinitionQueryString">additional query string parameter passed when pulling the single instance details (ie. $expands, etc)</param>
-        /// <param name="queryForDetails">a boolean flag to allow caller to skip the calls for each individual definition details</param>
+        /// <param name="routeParameters">
+        /// strings that are injected into the route parameters of the definitions url
+        /// </param>
+        /// <param name="queryString">
+        /// additional query string parameters passed to the underlying api call
+        /// </param>
+        /// <param name="singleDefinitionQueryString">
+        /// additional query string parameter passed when pulling the single instance details (ie.
+        /// $expands, etc)
+        /// </param>
+        /// <param name="queryForDetails">
+        /// a boolean flag to allow caller to skip the calls for each individual definition details
+        /// </param>
         /// <returns>List of API Definitions</returns>
         public async Task<IEnumerable<DefinitionType>> GetApiDefinitionsAsync<DefinitionType>(object[] routeParameters = null, string queryString = "", string singleDefinitionQueryString = "", bool queryForDetails = true)
             where DefinitionType : RestApiDefinition, new()
@@ -195,7 +251,6 @@ namespace MigrationTools.Endpoints
             else
             {
                 throw new Exception($"Failed on call to get list of [{typeof(DefinitionType).Name}].\r\nUrl: GET {httpResponse.RequestMessage.RequestUri.ToString()}\r\n{await httpResponse.Content.ReadAsStringAsync()}");
-
             }
             return initialDefinitions;
         }
@@ -204,10 +259,19 @@ namespace MigrationTools.Endpoints
         /// Get a single instance of a defined type
         /// </summary>
         /// <typeparam name="DefinitionType"></typeparam>
-        /// <param name="routeParameters">strings that are injected into the route parameters of the definitions url</param>
-        /// <param name="queryString">additional query string parameters passed to the underlying api call</param>
-        /// <param name="singleDefinitionQueryString">additional query string parameter passed when pulling the single instance details (ie. $expands, etc)</param>
-        /// <param name="queryForDetails">a boolean flag to allow caller to skip the calls for each individual definition details</param>
+        /// <param name="routeParameters">
+        /// strings that are injected into the route parameters of the definitions url
+        /// </param>
+        /// <param name="queryString">
+        /// additional query string parameters passed to the underlying api call
+        /// </param>
+        /// <param name="singleDefinitionQueryString">
+        /// additional query string parameter passed when pulling the single instance details (ie.
+        /// $expands, etc)
+        /// </param>
+        /// <param name="queryForDetails">
+        /// a boolean flag to allow caller to skip the calls for each individual definition details
+        /// </param>
         /// <returns></returns>
         public async Task<DefinitionType> GetApiDefinitionAsync<DefinitionType>(object[] routeParameters = null, string queryString = "", string singleDefinitionQueryString = "", bool queryForDetails = true)
             where DefinitionType : RestApiDefinition, new()
@@ -231,7 +295,6 @@ namespace MigrationTools.Endpoints
             else
             {
                 throw new Exception($"Failed on call to get individual [{typeof(DefinitionType).Name}].\r\nUrl: GET {httpResponse.RequestMessage.RequestUri.ToString()}\r\n{await httpResponse.Content.ReadAsStringAsync()}");
-
             }
             return initialDefinition;
         }
@@ -348,7 +411,9 @@ namespace MigrationTools.Endpoints
         /// </summary>
         /// <typeparam name="DefinitionType"></typeparam>
         /// <param name="definitionsToBeMigrated"></param>
-        /// <param name="parentIds">strings that are injected into the route parameters of the definitions url</param>
+        /// <param name="parentIds">
+        /// strings that are injected into the route parameters of the definitions url
+        /// </param>
         /// <returns>List of Mappings</returns>
         public async Task<List<Mapping>> CreateApiDefinitionsAsync<DefinitionType>(IEnumerable<DefinitionType> definitionsToBeMigrated, params string[] parentIds)
             where DefinitionType : RestApiDefinition, new()
@@ -401,7 +466,9 @@ namespace MigrationTools.Endpoints
         /// </summary>
         /// <typeparam name="DefinitionType"></typeparam>
         /// <param name="definitionsToBeMigrated"></param>
-        /// <param name="parentIds">strings that are injected into the route parameters of the definitions url</param>
+        /// <param name="parentIds">
+        /// strings that are injected into the route parameters of the definitions url
+        /// </param>
         /// <returns>List of Mappings</returns>
         public async Task<List<Mapping>> UpdateApiDefinitionsAsync<DefinitionType>(IEnumerable<DefinitionType> definitionsToBeMigrated, params string[] parentIds)
             where DefinitionType : RestApiDefinition, new()
@@ -436,6 +503,7 @@ namespace MigrationTools.Endpoints
                     case HttpVerbs.Patch:
                         result = await client.PatchAsync(client.BaseAddress.ToString() + suffix, content);
                         break;
+
                     default:
                         result = await client.PutAsync(client.BaseAddress.ToString() + suffix, content);
                         break;
@@ -526,8 +594,9 @@ namespace MigrationTools.Endpoints
         {
             return await MoveWorkItemGroup(group, processId, witRefName, pageId, sectionId, oldSectionId, oldPageId);
         }
+
         /// <summary>
-        /// Move a work item group from one Layout->Section to another Layout->Section
+        /// Move a work item group from one Layout-&gt;Section to another Layout-&gt;Section
         /// </summary>
         /// <param name="group"></param>
         /// <param name="processId"></param>
@@ -540,7 +609,6 @@ namespace MigrationTools.Endpoints
         {
             return await MoveWorkItemGroup(group, processId, witRefName, pageId, sectionId, oldSectionId);
         }
-
 
         private async Task<bool> MoveWorkItemGroup(WorkItemGroup group, string processId, string witRefName, string pageId, string sectionId, string oldSectionId, string oldPageId = null)
         {
@@ -580,7 +648,7 @@ namespace MigrationTools.Endpoints
         }
 
         /// <summary>
-        /// Move a work item control from out Layout->Group to another Layout->Group
+        /// Move a work item control from out Layout-&gt;Group to another Layout-&gt;Group
         /// </summary>
         /// <param name="control"></param>
         /// <param name="processId"></param>
@@ -593,8 +661,9 @@ namespace MigrationTools.Endpoints
         {
             return await MoveWorkItemControl(control, processId, witRefName, groupId, fieldName, oldGroupId);
         }
+
         /// <summary>
-        /// Adds a work item control to an existing Layout->Group
+        /// Adds a work item control to an existing Layout-&gt;Group
         /// </summary>
         /// <param name="control"></param>
         /// <param name="processId"></param>
@@ -606,7 +675,6 @@ namespace MigrationTools.Endpoints
         {
             return await MoveWorkItemControl(control, processId, witRefName, groupId, fieldName);
         }
-
 
         private async Task<bool> MoveWorkItemControl(WorkItemControl control, string processId, string witRefName, string groupId, string fieldName, string oldGroupId = null)
         {

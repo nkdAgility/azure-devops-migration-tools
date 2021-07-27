@@ -76,6 +76,7 @@ namespace MigrationTools.Processors
             IEnumerable<Mapping> serviceConnectionMappings = null;
             IEnumerable<Mapping> taskGroupMappings = null;
             IEnumerable<Mapping> variableGroupMappings = null;
+            IEnumerable<Mapping> buildPipelineMappings = null;
             if (_Options.MigrateServiceConnections)
             {
                 serviceConnectionMappings = await CreateServiceConnectionsAsync();
@@ -90,12 +91,12 @@ namespace MigrationTools.Processors
             }
             if (_Options.MigrateBuildPipelines)
             {
-                await CreateBuildPipelinesAsync(taskGroupMappings, variableGroupMappings);
+                buildPipelineMappings = await CreateBuildPipelinesAsync(taskGroupMappings, variableGroupMappings);
             }
 
             if (_Options.MigrateReleasePipelines)
             {
-                await CreateReleasePipelinesAsync(taskGroupMappings, variableGroupMappings);
+                await CreateReleasePipelinesAsync(taskGroupMappings, variableGroupMappings, buildPipelineMappings);
             }
             stopwatch.Stop();
             Log.LogDebug("DONE in {Elapsed} ", stopwatch.Elapsed.ToString("c"));
@@ -295,13 +296,12 @@ namespace MigrationTools.Processors
             }
         }
 
-        private async Task<IEnumerable<Mapping>> CreateReleasePipelinesAsync(IEnumerable<Mapping> TaskGroupMapping = null, IEnumerable<Mapping> VariableGroupMapping = null)
+        private async Task<IEnumerable<Mapping>> CreateReleasePipelinesAsync(IEnumerable<Mapping> TaskGroupMapping = null, IEnumerable<Mapping> VariableGroupMapping = null, IEnumerable<Mapping> buildPipelineMapping = null)
         {
             Log.LogInformation($"Processing Release Pipelines..");
 
             var sourceDefinitions = await Source.GetApiDefinitionsAsync<ReleaseDefinition>();
             var targetDefinitions = await Target.GetApiDefinitionsAsync<ReleaseDefinition>();
-
             var agentPoolMappings = await CreatePoolMappingsAsync<TaskAgentPool>();
             var deploymentGroupMappings = await CreatePoolMappingsAsync<DeploymentGroup>();
 
@@ -312,10 +312,34 @@ namespace MigrationTools.Processors
             }
 
             definitionsToBeMigrated = FilterAwayIfAnyMapsAreMissing(definitionsToBeMigrated, TaskGroupMapping, VariableGroupMapping);
+            var targetProject = await Target.GetProjectAsync();
 
-            // Replace queue, taskgroup and variablegroup sourceIds with targetIds
+            // Replace queue, artifacts, taskgroup and variablegroup sourceIds with targetIds
             foreach (var definitionToBeMigrated in definitionsToBeMigrated)
             {
+                foreach (var artifact in definitionToBeMigrated.Artifacts)
+                {
+                    if (artifact.Type == "PackageManagement")
+                    {
+                        var targetPackages = await Target.GetArtifactPackages();
+                        artifact.DefinitionReference.Feed.Id = targetPackages.Select(p => p.Feed).FirstOrDefault(f => f.Name == artifact.DefinitionReference.Feed.Name).Id;
+                        artifact.DefinitionReference.Definition.Id = targetPackages
+                            .Where(p => p.Feed.Id == artifact.DefinitionReference.Feed.Id)
+                            .SingleOrDefault(f => f.Name == artifact.DefinitionReference.Definition.Name).Id;
+                    }
+                    else if (artifact.Type == "Build")
+                    {
+                        artifact.DefinitionReference.Project = targetProject;
+                        artifact.DefinitionReference.Definition.Id = buildPipelineMapping.SingleOrDefault(m => m.Name == artifact.DefinitionReference.Definition.Name).TargetId;
+                    }
+                    else if (artifact.Type == "Git")
+                    {
+                        var targetRepositories = await Target.GetApiDefinitionsAsync<GitRepository>();
+                        artifact.DefinitionReference.Project = targetProject;
+                        artifact.DefinitionReference.Definition.Id = targetRepositories.SingleOrDefault(r => r.Name == artifact.DefinitionReference.Definition.Name).Id;
+                    }
+                }
+
                 UpdateQueueIdOnPhases(definitionToBeMigrated, agentPoolMappings, deploymentGroupMappings);
 
                 UpdateTaskGroupId(definitionToBeMigrated, TaskGroupMapping);
