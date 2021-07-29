@@ -118,7 +118,30 @@ namespace VstsSyncMigrator.Engine
             if (_config.FilterWorkItemsThatAlreadyExistInTarget)
             {
                 contextLog.Information("[FilterWorkItemsThatAlreadyExistInTarget] is enabled. Searching for work items that have already been migrated to the target...", sourceWorkItems.Count());
-                sourceWorkItems = ((TfsWorkItemMigrationClient)Engine.Target.WorkItems).FilterExistingWorkItems(sourceWorkItems, new TfsWiqlDefinition() { OrderBit = _config.WIQLOrderBit, QueryBit = _config.WIQLQueryBit }, (TfsWorkItemMigrationClient)Engine.Source.WorkItems);
+
+                //Switch out source Area Path with destination
+                string targetWIQLQueryBit = _config.WIQLQueryBit;
+                if (_config.NodeBasePaths.Any() && targetWIQLQueryBit.Contains("[System.AreaPath]"))
+                {
+                    string sourceProject = Engine.Source.WorkItems.Project.Name;
+                    string targetProject = Engine.Target.WorkItems.Project.Name;
+                    if (sourceProject != targetProject)
+                    {
+                        foreach (var nodeBasePath in _config.NodeBasePaths)
+                        {
+                            if (_config.WIQLQueryBit.Contains(nodeBasePath))
+                            {
+                                contextLog.Information("[NodeBasePaths] has been set and QueryBit contaings [System.AreaPath].  Since {nodeBasePath} was found in the query, updating the projectName from {source} to {target}", nodeBasePath, sourceProject, targetProject);
+                                StringBuilder myStringBuilder = new StringBuilder(_config.WIQLQueryBit);
+                                int locationOfAreaPath = _config.WIQLQueryBit.IndexOf("[System.AreaPath]");
+                                int querySegmentSize = (_config.WIQLQueryBit.IndexOf(nodeBasePath) + nodeBasePath.Length) - locationOfAreaPath;
+                                myStringBuilder.Replace(sourceProject, targetProject, locationOfAreaPath, querySegmentSize);
+                                targetWIQLQueryBit = myStringBuilder.ToString();
+                            }
+                        }
+                    }
+                }
+                sourceWorkItems = ((TfsWorkItemMigrationClient)Engine.Target.WorkItems).FilterExistingWorkItems(sourceWorkItems, new TfsWiqlDefinition() { OrderBit = _config.WIQLOrderBit, QueryBit = targetWIQLQueryBit }, (TfsWorkItemMigrationClient)Engine.Source.WorkItems);
                 contextLog.Information("!! After removing all found work items there are {SourceWorkItemCount} remaining to be migrated.", sourceWorkItems.Count());
             }
             //////////////////////////////////////////////////
