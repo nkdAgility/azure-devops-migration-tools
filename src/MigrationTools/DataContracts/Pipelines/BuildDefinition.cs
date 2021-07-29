@@ -240,12 +240,8 @@ namespace MigrationTools.DataContracts.Pipelines
         public int Type { get; set; }
     }
 
-    public partial class Project
+    public partial class Project : RestApiDefinition
     {
-        public string Id { get; set; }
-
-        public string Name { get; set; }
-
         public Uri Url { get; set; }
 
         public string State { get; set; }
@@ -255,6 +251,20 @@ namespace MigrationTools.DataContracts.Pipelines
         public string Visibility { get; set; }
 
         public DateTimeOffset LastUpdateTime { get; set; }
+
+        public override bool HasTaskGroups()
+        {
+            return false;
+        }
+
+        public override bool HasVariableGroups()
+        {
+            return false;
+        }
+
+        public override void ResetObject()
+        {
+        }
     }
 
     public partial class Queue

@@ -5,7 +5,7 @@ namespace MigrationTools.DataContracts.Pipelines
 {
     [ApiPath("distributedtask/variablegroups")]
     [ApiName("Variable Groups")]
-    public class VariableGroups : RestApiDefinition
+    public class VariableGroup : RestApiDefinition
     {
         protected ILogger Log { get; }
 

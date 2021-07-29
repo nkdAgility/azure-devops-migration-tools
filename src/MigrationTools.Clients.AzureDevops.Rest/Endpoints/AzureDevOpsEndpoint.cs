@@ -54,7 +54,7 @@ namespace MigrationTools.Endpoints
             };
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes(string.Format("{0}:{1}", "", Options.AccessToken))));
 
-            var projects = await client.GetAsync(client.BaseAddress.AbsoluteUri + "_apis/projects").Result.Content.ReadAsAsync<RestResultDefinition<Projects>>();
+            var projects = await client.GetAsync(client.BaseAddress.AbsoluteUri + "_apis/projects").Result.Content.ReadAsAsync<RestResultDefinition<Project>>();
             return new ArtifactSourceDefinitionUrl() { Name = Options.Project, Id = projects.Value.Single(p => p.Name == Options.Project).Id };
         }
 
