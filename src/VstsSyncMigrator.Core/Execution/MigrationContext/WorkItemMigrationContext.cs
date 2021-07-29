@@ -131,7 +131,7 @@ namespace VstsSyncMigrator.Engine
                         {
                             if (_config.WIQLQueryBit.Contains(nodeBasePath))
                             {
-                                contextLog.Information("[NodeBasePaths] has been set and QueryBit contaings [System.AreaPath].  Since {nodeBasePath} was found in the query, updating the projectName from {source} to {target}", nodeBasePath, sourceProject, targetProject);
+                                contextLog.Information("[NodeBasePaths] has been set and QueryBit contains [System.AreaPath].  Since {nodeBasePath} was found in the query, updating the projectName from {source} to {target}", nodeBasePath, sourceProject, targetProject);
                                 StringBuilder myStringBuilder = new StringBuilder(_config.WIQLQueryBit);
                                 int locationOfAreaPath = _config.WIQLQueryBit.IndexOf("[System.AreaPath]");
                                 int querySegmentSize = (_config.WIQLQueryBit.IndexOf(nodeBasePath) + nodeBasePath.Length) - locationOfAreaPath;
