@@ -319,25 +319,7 @@ namespace MigrationTools.Processors
             {
                 foreach (var artifact in definitionToBeMigrated.Artifacts)
                 {
-                    if (artifact.Type == "PackageManagement")
-                    {
-                        var targetPackages = await Target.GetArtifactPackages();
-                        artifact.DefinitionReference.Feed.Id = targetPackages.Select(p => p.Feed).FirstOrDefault(f => f.Name == artifact.DefinitionReference.Feed.Name).Id;
-                        artifact.DefinitionReference.Definition.Id = targetPackages
-                            .Where(p => p.Feed.Id == artifact.DefinitionReference.Feed.Id)
-                            .SingleOrDefault(f => f.Name == artifact.DefinitionReference.Definition.Name).Id;
-                    }
-                    else if (artifact.Type == "Build")
-                    {
-                        artifact.DefinitionReference.Project = targetProject;
-                        artifact.DefinitionReference.Definition.Id = buildPipelineMapping.SingleOrDefault(m => m.Name == artifact.DefinitionReference.Definition.Name).TargetId;
-                    }
-                    else if (artifact.Type == "Git")
-                    {
-                        var targetRepositories = await Target.GetApiDefinitionsAsync<GitRepository>();
-                        artifact.DefinitionReference.Project = targetProject;
-                        artifact.DefinitionReference.Definition.Id = targetRepositories.SingleOrDefault(r => r.Name == artifact.DefinitionReference.Definition.Name).Id;
-                    }
+                    await MapLinkedArtifacts(buildPipelineMapping, targetProject, artifact);
                 }
 
                 UpdateQueueIdOnPhases(definitionToBeMigrated, agentPoolMappings, deploymentGroupMappings);
@@ -358,6 +340,29 @@ namespace MigrationTools.Processors
             var mappings = await Target.CreateApiDefinitionsAsync<ReleaseDefinition>(definitionsToBeMigrated);
             mappings.AddRange(FindExistingMappings(sourceDefinitions, targetDefinitions, mappings));
             return mappings;
+        }
+
+        private async System.Threading.Tasks.Task MapLinkedArtifacts(IEnumerable<Mapping> buildPipelineMapping, ArtifactSourceDefinitionUrl targetProject, Artifact artifact)
+        {
+            if (artifact.Type == "PackageManagement")
+            {
+                var targetPackages = await Target.GetPackagesFromFeedsAsync();
+                artifact.DefinitionReference.Feed.Id = targetPackages.Select(p => p.Feed).FirstOrDefault(f => f.Name == artifact.DefinitionReference.Feed.Name).Id;
+                artifact.DefinitionReference.Definition.Id = targetPackages
+                    .Where(p => p.Feed.Id == artifact.DefinitionReference.Feed.Id)
+                    .SingleOrDefault(f => f.Name == artifact.DefinitionReference.Definition.Name).Id;
+            }
+            else if (artifact.Type == "Build")
+            {
+                artifact.DefinitionReference.Project = targetProject;
+                artifact.DefinitionReference.Definition.Id = buildPipelineMapping.SingleOrDefault(m => m.Name == artifact.DefinitionReference.Definition.Name).TargetId;
+            }
+            else if (artifact.Type == "Git")
+            {
+                var targetRepositories = await Target.GetApiDefinitionsAsync<GitRepository>();
+                artifact.DefinitionReference.Project = targetProject;
+                artifact.DefinitionReference.Definition.Id = targetRepositories.SingleOrDefault(r => r.Name == artifact.DefinitionReference.Definition.Name).Id;
+            }
         }
 
         private IEnumerable<DefinitionType> FilterAwayIfAnyMapsAreMissing<DefinitionType>(
@@ -491,8 +496,8 @@ namespace MigrationTools.Processors
         {
             Log.LogInformation($"Processing Variablegroups..");
 
-            var sourceDefinitions = await Source.GetApiDefinitionsAsync<VariableGroups>();
-            var targetDefinitions = await Target.GetApiDefinitionsAsync<VariableGroups>();
+            var sourceDefinitions = await Source.GetApiDefinitionsAsync<VariableGroup>();
+            var targetDefinitions = await Target.GetApiDefinitionsAsync<VariableGroup>();
             var filteredDefinition = FilterOutExistingDefinitions(sourceDefinitions, targetDefinitions);
             foreach (var variableGroup in filteredDefinition)
             {

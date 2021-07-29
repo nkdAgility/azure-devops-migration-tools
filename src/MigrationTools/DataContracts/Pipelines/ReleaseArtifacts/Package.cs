@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace MigrationTools.DataContracts.Pipelines
 {
-    public class ArtifactPackage : RestApiDefinition
+    public class Package : RestApiDefinition
     {
         public AzureFeed Feed { get; set; }
         public bool IsCached { get; set; }

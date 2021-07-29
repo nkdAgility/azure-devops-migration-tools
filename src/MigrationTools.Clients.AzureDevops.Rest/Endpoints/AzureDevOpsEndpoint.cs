@@ -54,13 +54,17 @@ namespace MigrationTools.Endpoints
             };
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes(string.Format("{0}:{1}", "", Options.AccessToken))));
 
-            var projects = await client.GetAsync(client.BaseAddress.AbsoluteUri + "_apis/projects").Result.Content.ReadAsAsync<RestResultDefinition<Projects>>();
+            var projects = await client.GetAsync(client.BaseAddress.AbsoluteUri + "_apis/projects").Result.Content.ReadAsAsync<RestResultDefinition<Project>>();
             return new ArtifactSourceDefinitionUrl() { Name = Options.Project, Id = projects.Value.Single(p => p.Name == Options.Project).Id };
         }
 
-        public async Task<List<ArtifactPackage>> GetArtifactPackages()
+        /// <summary>
+        /// Resolves all Feeds and their Packages.
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<Package>> GetPackagesFromFeedsAsync()
         {
-            var artifactPackages = new List<ArtifactPackage>();
+            var artifactPackages = new List<Package>();
             var baseUrl = new UriBuilder(string.Format(Options.Organisation));
             var client = new HttpClient
             {
@@ -71,7 +75,7 @@ namespace MigrationTools.Endpoints
             var feeds = await client.GetAsync(client.BaseAddress.AbsoluteUri + "_apis/packaging/Feeds").Result.Content.ReadAsAsync<RestResultDefinition<AzureFeed>>(); ;
             foreach (var feed in feeds.Value)
             {
-                var packages = await client.GetAsync(client.BaseAddress.AbsoluteUri + $"_apis/packaging/Feeds/{feed.Id}/packages").Result.Content.ReadAsAsync<RestResultDefinition<ArtifactPackage>>();
+                var packages = await client.GetAsync(client.BaseAddress.AbsoluteUri + $"_apis/packaging/Feeds/{feed.Id}/packages").Result.Content.ReadAsAsync<RestResultDefinition<Package>>();
                 packages.Value = packages.Value.Select(v =>
                 {
                     v.Feed = feed;
