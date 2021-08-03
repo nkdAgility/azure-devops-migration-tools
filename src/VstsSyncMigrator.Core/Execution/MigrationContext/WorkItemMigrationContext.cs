@@ -118,7 +118,9 @@ namespace VstsSyncMigrator.Engine
             if (_config.FilterWorkItemsThatAlreadyExistInTarget)
             {
                 contextLog.Information("[FilterWorkItemsThatAlreadyExistInTarget] is enabled. Searching for work items that have already been migrated to the target...", sourceWorkItems.Count());
-                sourceWorkItems = ((TfsWorkItemMigrationClient)Engine.Target.WorkItems).FilterExistingWorkItems(sourceWorkItems, new TfsWiqlDefinition() { OrderBit = _config.WIQLOrderBit, QueryBit = _config.WIQLQueryBit }, (TfsWorkItemMigrationClient)Engine.Source.WorkItems);
+                                               
+                string targetWIQLQueryBit = FixAreaPathInTargetQuery(_config.WIQLQueryBit, Engine.Source.WorkItems.Project.Name, Engine.Target.WorkItems.Project.Name, _config.NodeBasePaths, contextLog);
+                sourceWorkItems = ((TfsWorkItemMigrationClient)Engine.Target.WorkItems).FilterExistingWorkItems(sourceWorkItems, new TfsWiqlDefinition() { OrderBit = _config.WIQLOrderBit, QueryBit = targetWIQLQueryBit }, (TfsWorkItemMigrationClient)Engine.Source.WorkItems);
                 contextLog.Information("!! After removing all found work items there are {SourceWorkItemCount} remaining to be migrated.", sourceWorkItems.Count());
             }
             //////////////////////////////////////////////////
@@ -162,6 +164,32 @@ namespace VstsSyncMigrator.Engine
             stopwatch.Stop();
 
             contextLog.Information("DONE in {Elapsed}", stopwatch.Elapsed.ToString("c"));
+        }
+
+        internal static string FixAreaPathInTargetQuery(string sourceWIQLQueryBit, string sourceProject, string targetProject, string[] nodeBasePaths, ILogger? contextLog)
+        {
+            string targetWIQLQueryBit = sourceWIQLQueryBit;
+            if (nodeBasePaths != null && nodeBasePaths.Any() && targetWIQLQueryBit.Contains("[System.AreaPath]"))
+            {               
+                if (sourceProject != targetProject)
+                {
+                    //Switch out source Area Path with destination
+                    foreach (var nodeBasePath in nodeBasePaths)
+                    {
+                        if (sourceWIQLQueryBit.Contains(nodeBasePath))
+                        {
+                            contextLog?.Information("[NodeBasePaths] has been set and QueryBit contains [System.AreaPath].  Since {nodeBasePath} was found in the query, updating the projectName from {source} to {target}", nodeBasePath, sourceProject, targetProject);
+                            StringBuilder myStringBuilder = new StringBuilder(sourceWIQLQueryBit);
+                            int locationOfAreaPath = sourceWIQLQueryBit.IndexOf("[System.AreaPath]");
+                            int querySegmentSize = (sourceWIQLQueryBit.IndexOf(nodeBasePath) + nodeBasePath.Length) - locationOfAreaPath;
+                            myStringBuilder.Replace(sourceProject, targetProject, locationOfAreaPath, querySegmentSize);
+                            targetWIQLQueryBit = myStringBuilder.ToString();
+                        }
+                    }
+                }
+            }
+
+            return targetWIQLQueryBit;
         }
 
         private static void AppendMigratedByFooter(StringBuilder history)
