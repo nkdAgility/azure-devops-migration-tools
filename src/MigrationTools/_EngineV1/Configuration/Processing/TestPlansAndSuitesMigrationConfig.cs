@@ -7,6 +7,7 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         public bool PrefixProjectToNodes { get; set; }
         public bool Enabled { get; set; }
         public string OnlyElementsWithTag { get; set; }
+        public string OnlyElementsUnderAreaPath { get; set; }
         public string TestPlanQueryBit { get; set; }
 
         public string Processor
