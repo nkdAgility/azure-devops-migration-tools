@@ -132,7 +132,7 @@ However sometimes you want to move data to another field, or use a regex to pars
 
 * **FieldtoFieldMap** - Just want to map one field to another? This is the one for you.
 * **FieldtoFieldMultiMap** - Allows you to create a list of one to one field maps.
-* **FieldMergeMap** - Ever wanted to merge two fields? This mapping will let you do just that.
+* **FieldMergeMap** - Ever wanted to merge two or three fields? This mapping will let you do just that.
 * **FieldBlankMap** - Allows you to set an already populated field to empty
 * **FieldtoTagMap** - Want to take a field and convert its value to a tag? Done...
 * **FieldValueMap** - Need to map not just the field but also values? This is the default value mapper.
