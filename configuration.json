@@ -101,6 +101,16 @@
       "formatExpression": "{0} <br/><br/><h3>Acceptance Criteria</h3>{1}",
       "doneMatch": "##DONE##"
     },
+    //{
+    //  "$type": "FieldMergeMapConfig",
+    //  "WorkItemTypeName": "*",
+    //  "sourceField1": "System.Description",
+    //  "sourceField2": "Microsoft.VSTS.Common.AcceptanceCriteria",
+    //  "sourceField3": "Microsoft.VSTS.TCM.ReproSteps",
+    //  "targetField": "System.Description",
+    //  "formatExpression": "{0} <br/><br/><h3>Acceptance Criteria</h3>{1} <br/><br/><h3>Repro Steps</h3>{2}",
+    //  "doneMatch": "##DONE##"
+    //},
     {
       "$type": "RegexFieldMapConfig",
       "WorkItemTypeName": "*",
