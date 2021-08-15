@@ -748,7 +748,7 @@ namespace VstsSyncMigrator.Engine
             }
             else
             {
-                Log.LogInformation("No e-mail address known in source system for [{sourceIdentity.DisplayName}]. Cannot translate to target.", sourceIdentity.DisplayName);
+                Log.LogInformation("No e-mail address known in source system for [{sourceIdentityDisplayName}]. Cannot translate to target.", sourceIdentity.DisplayName);
                 return null;
             }
         }
