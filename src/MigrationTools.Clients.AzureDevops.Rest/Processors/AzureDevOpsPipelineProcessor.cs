@@ -207,10 +207,8 @@ namespace MigrationTools.Processors
                     .FirstOrDefault(c => c.Id == sourceConnectedServiceId)?.Name == s.Name)?.Id;
                 definitionToBeMigrated.Repository.Properties.ConnectedServiceId = targetConnectedServiceId;
 
-                var sourceRepoId = definitionToBeMigrated.Repository.Id;
-                var targetRepoId = targetRepositories.FirstOrDefault(r => sourceRepositories
-                    .FirstOrDefault(s => s.Id == sourceRepoId)?.Name == r.Name)?.Id;
-                definitionToBeMigrated.Repository.Id = targetRepoId;
+                
+                MapRepositoriesInBuidDefinition(sourceRepositories, targetRepositories, definitionToBeMigrated);
 
                 if (TaskGroupMapping is not null)
                 {
@@ -258,6 +256,23 @@ namespace MigrationTools.Processors
             var mappings = await Target.CreateApiDefinitionsAsync<BuildDefinition>(definitionsToBeMigrated.ToList());
             mappings.AddRange(FindExistingMappings(sourceDefinitions, targetDefinitions, mappings));
             return mappings;
+        }
+
+        private void MapRepositoriesInBuidDefinition(IEnumerable<GitRepository> sourceRepositories, IEnumerable<GitRepository> targetRepositories, BuildDefinition definitionToBeMigrated)
+        {
+            var sourceRepoId = definitionToBeMigrated.Repository.Id;
+            string sourceRepositoryName = sourceRepositories.FirstOrDefault(s => s.Id == sourceRepoId)?.Name;
+            string targetRepoId;
+
+            if (_Options.RepositoryNameMaps.ContainsKey(sourceRepositoryName))  //Map repository name if configured
+            {
+                targetRepoId = targetRepositories.FirstOrDefault(r => _Options.RepositoryNameMaps[sourceRepositoryName] == r.Name)?.Id;
+            }
+            else
+            {
+                targetRepoId = targetRepositories.FirstOrDefault(r => sourceRepositoryName == r.Name)?.Id;
+            }
+            definitionToBeMigrated.Repository.Id = targetRepoId;
         }
 
         private async Task<IEnumerable<Mapping>> CreatePoolMappingsAsync<DefinitionType>()
