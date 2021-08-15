@@ -576,9 +576,9 @@ namespace VstsSyncMigrator.Engine
                     Engine.FieldMaps.ApplyFieldMappings(currentRevisionWorkItem, targetWorkItem);
 
                     // Todo: Think about an "UpdateChangedBy" flag as this is expensive! (2s/WI instead of 1,5s when writing "Migration")
-                    targetWorkItem.ToWorkItem().Fields["System.ChangedBy"].Value = currentRevisionWorkItem.Fields["System.ChangedBy"];
+                    targetWorkItem.ToWorkItem().Fields["System.ChangedBy"].Value = currentRevisionWorkItem.Fields["System.ChangedBy"].Value;
 
-                    targetWorkItem.ToWorkItem().Fields["System.History"].Value = currentRevisionWorkItem.Fields["System.History"];
+                    targetWorkItem.ToWorkItem().Fields["System.History"].Value = currentRevisionWorkItem.Fields["System.History"].Value;
                     //Debug.WriteLine("Discussion:" + currentRevisionWorkItem.Revisions[revision.Index].Fields["System.History"].Value);
 
                     TfsReflectedWorkItemId reflectedUri = (TfsReflectedWorkItemId)Engine.Source.WorkItems.CreateReflectedWorkItemId(sourceWorkItem);
