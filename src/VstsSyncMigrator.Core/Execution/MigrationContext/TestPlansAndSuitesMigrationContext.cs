@@ -83,11 +83,18 @@ namespace VstsSyncMigrator.Engine
             foreach (ITestPlan sourcePlan in toProcess)
             {
                 _currentPlan++;
+                if (CanSkipElementBecauseOfAreaPath(sourcePlan.Id))
+                {
+                    Log.LogInformation("TestPlandsAndSuitesMigrationContext: Skipping Test Plan {Id}:'{Name}' as is not in Area with '{AreaPath}'.", sourcePlan.Id, sourcePlan.Name, _config.OnlyElementsUnderAreaPath);
+                    continue;
+                }
+
                 if (CanSkipElementBecauseOfTags(sourcePlan.Id))
                 {
                     Log.LogInformation("TestPlandsAndSuitesMigrationContext: Skipping Test Plan {Id}:'{Name}' as is not tagged with '{Tag}'.", sourcePlan.Id, sourcePlan.Name, _config.OnlyElementsWithTag);
                     continue;
                 }
+                
                 ProcessTestPlan(sourcePlan);
             }
             _currentPlan = 0;
@@ -439,6 +446,26 @@ namespace VstsSyncMigrator.Engine
 
             // assign the list to the suite
             targetSuite?.AssignTestPoints(assignmentsToAdd);
+        }
+
+        private bool CanSkipElementBecauseOfAreaPath(int workItemId)
+        {
+            if (_config.OnlyElementsUnderAreaPath == null)
+            {
+                return false;
+            }
+
+            var sourcePlanWorkItem = Engine.Source.WorkItems.GetWorkItem(workItemId.ToString());
+            var areaPathWhichMustBePresent = _config.OnlyElementsUnderAreaPath;
+            var sourceAreaPath = sourcePlanWorkItem.ToWorkItem().AreaPath;
+            
+            if (sourcePlanWorkItem.ToWorkItem().AreaPath.Contains(areaPathWhichMustBePresent))
+            {
+                Log.LogInformation("Source AreaPath: {sourceAreaPath} contain [{areaPathWhichMustBePresent}]? ", sourceAreaPath, areaPathWhichMustBePresent);
+                return false;
+            }
+
+            return true;
         }
 
         private bool CanSkipElementBecauseOfTags(int workItemId)
