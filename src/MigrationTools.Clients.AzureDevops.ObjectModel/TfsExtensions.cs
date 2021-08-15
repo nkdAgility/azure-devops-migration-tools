@@ -6,6 +6,7 @@ using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.DataContracts;
 using MigrationTools.DataContracts;
+using MigrationTools.Endpoints;
 using Newtonsoft.Json;
 using Serilog;
 
@@ -72,92 +73,8 @@ namespace MigrationTools
         public static void RefreshWorkItem(this WorkItemData context, Dictionary<string, FieldItem> fieldsOfRevision = null)
         {
             var workItem = (WorkItem)context.internalObject;
-            //
-            context.Id = workItem.Id.ToString();
-            context.Title = fieldsOfRevision != null ? fieldsOfRevision["System.Title"].ToString() : workItem.Title;
-            context.ProjectName = workItem.Project?.Name;
-            context.Type = fieldsOfRevision != null ? fieldsOfRevision["System.WorkItemType"].ToString() : workItem.Type.Name;
-            context.Rev = fieldsOfRevision != null ? (int)fieldsOfRevision["System.Rev"].Value : workItem.Rev;
-            context.ChangedDate = fieldsOfRevision != null ? (DateTime)fieldsOfRevision["System.ChangedDate"].Value : workItem.ChangedDate;
-
-            context.Fields = GetFieldItems(workItem.Fields);
-            context.Links = GetLinkItems(workItem.Links);
-            context.Revisions = fieldsOfRevision == null ? GetRevisionItems(workItem.Revisions) : null;
-
-            // We only need to fill the revisions object if we create a WorkItemData object for the whole WorkItem and
-            // we sort it here by Number using a SortedDictionary
-        }
-
-        private static SortedDictionary<int, RevisionItem> GetRevisionItems(RevisionCollection tfsRevisions)
-        {
-            return new SortedDictionary<int, RevisionItem>((from Revision x in tfsRevisions
-                                                            select new RevisionItem()
-                                                            {
-                                                                Index = x.Index,
-                                                                Number = (int)x.Fields["System.Rev"].Value,
-                                                                ChangedDate = (DateTime)x.Fields["System.ChangedDate"].Value,
-                                                                Type = x.Fields["System.WorkItemType"].Value as string,
-                                                                Fields = GetFieldItems(x.Fields)
-                                                            }).ToDictionary(r => r.Number, r => r));
-        }
-
-        private static  Dictionary<string, FieldItem> GetFieldItems(FieldCollection tfsFields)
-        {
-            return (from Field x in tfsFields select new FieldItem() {
-                        Name = x.Name,
-                        ReferenceName = x.ReferenceName,
-                        Value = x.Value,
-                        internalObject = x
-                    }).ToDictionary(r => r.ReferenceName, r => r);
-        }
-
-        private static List<LinkItem> GetLinkItems(LinkCollection tfsLinks)
-        {
-            var ls = new List<LinkItem>();
-
-            foreach (Link l in tfsLinks)
-            {
-                if (l is Hyperlink)
-                {
-                    var lh = (Hyperlink)l;
-                    ls.Add(new LinkItem() {
-                        LinkType = LinkItemType.Hyperlink,
-                        ArtifactLinkType = l.ArtifactLinkType.Name,
-                        Comment = lh.Comment, 
-                        LinkUri = lh.Location,
-                        internalObject = l
-                    });
-                }
-                else if (l is ExternalLink)
-                {
-                    var le = (ExternalLink)l;
-                    ls.Add(new LinkItem() {
-                        LinkType = LinkItemType.ExternalLink,
-                        ArtifactLinkType = l.ArtifactLinkType.Name,
-                        Comment = le.Comment,
-                        LinkUri = le.LinkedArtifactUri,
-                        internalObject = l
-                    });
-                }
-                else if (l is RelatedLink)
-                {
-                    var lr = (RelatedLink)l;
-                    ls.Add(new LinkItem()
-                    {
-                        LinkType = LinkItemType.RelatedLink,
-                        ArtifactLinkType = l.ArtifactLinkType.Name,
-                        Comment = lr.Comment,
-                        RelatedWorkItem = lr.RelatedWorkItemId,
-                        LinkTypeEndImmutableName = lr.LinkTypeEnd==null? "": lr.LinkTypeEnd.ImmutableName,
-                        LinkTypeEndName = lr.LinkTypeEnd == null ? "" : lr.LinkTypeEnd.Name,
-                        internalObject = l
-                    });
-                } else
-                {
-                    Log.Debug("TfsExtensions::GetLinkData: RelatedLink is of ArtifactLinkType '{ArtifactLinkType}' and Type '{GetTypeName}' on WorkItemId: {WorkItemId}", l.ArtifactLinkType.Name, l.GetType().Name , tfsLinks.WorkItem.Id);
-                }
-            }
-            return ls;
+            TfsWorkItemConvertor tfswic = new TfsWorkItemConvertor();
+            tfswic.MapWorkItemtoWorkItemData(context, workItem, fieldsOfRevision);
         }
 
         public static void SaveToAzureDevOps(this WorkItemData context)
