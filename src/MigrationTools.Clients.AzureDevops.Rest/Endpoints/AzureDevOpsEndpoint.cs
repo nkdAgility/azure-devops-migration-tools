@@ -182,7 +182,7 @@ namespace MigrationTools.Endpoints
                         }
                         else
                         {
-                            Log.LogError($"Failed on call to get single [{typeof(DefinitionType).Name}] with Id [{definition.Id}].\r\nUrl: GET {response.RequestMessage.RequestUri.ToString()}");
+                            Log.LogError($"Failed on call to get single [{typeof(DefinitionType).Name}] with Id [{definition.Id}].\r\nUrl: GET {response.RequestMessage.RequestUri.ToString()}\r\nResponse Code:{httpResponse.StatusCode}");
                             throw new Exception(await response.Content.ReadAsStringAsync());
                         }
                     }
@@ -194,7 +194,7 @@ namespace MigrationTools.Endpoints
             }
             else
             {
-                throw new Exception($"Failed on call to get list of [{typeof(DefinitionType).Name}].\r\nUrl: GET {httpResponse.RequestMessage.RequestUri.ToString()}\r\n{await httpResponse.Content.ReadAsStringAsync()}");
+                throw new Exception($"Failed on call to get list of [{typeof(DefinitionType).Name}].\r\nUrl: GET {httpResponse.RequestMessage.RequestUri.ToString()}\r\nResponse Code:{httpResponse.StatusCode}\r\n{await httpResponse.Content.ReadAsStringAsync()}");
 
             }
             return initialDefinitions;
