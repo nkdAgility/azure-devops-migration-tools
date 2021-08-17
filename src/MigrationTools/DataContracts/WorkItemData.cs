@@ -14,10 +14,10 @@ namespace MigrationTools.DataContracts
 
         public WorkItemData()
         {
-            Fields = new Dictionary<string, object>();
+            Fields = new Dictionary<string, FieldItem>();
         }
 
-        public Dictionary<string, object> Fields { get; set; }
+        public Dictionary<string, FieldItem> Fields { get; set; }
         public string Id { get; set; }
 
         [JsonIgnore]

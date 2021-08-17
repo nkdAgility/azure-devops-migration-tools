@@ -1,4 +1,6 @@
-﻿namespace MigrationTools.DataContracts
+﻿using System.Text.Json.Serialization;
+
+namespace MigrationTools.DataContracts
 {
     public class LinkItem
     {
@@ -9,6 +11,9 @@
         public int RelatedWorkItem { get; set; }
         public string LinkTypeEndImmutableName { get; set; }
         public string LinkTypeEndName { get; set; }
+
+        [JsonIgnore]
+        public object internalObject { get; set; }
     }
 
     public enum LinkItemType
