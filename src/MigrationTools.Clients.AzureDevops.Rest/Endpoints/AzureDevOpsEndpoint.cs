@@ -182,7 +182,7 @@ namespace MigrationTools.Endpoints
                         }
                         else
                         {
-                            Log.LogError($"Failed on call to get single [{typeof(DefinitionType).Name}] with Id [{definition.Id}].\r\nUrl: GET {response.RequestMessage.RequestUri.ToString()}\r\nResponse Code:{httpResponse.StatusCode}");
+                            Log.LogError("Failed on call to get single [{definitionName}] with Id [{definitionId}].\r\nUrl: GET {requestUri}\r\nResponse Code:{statusCode}", typeof(DefinitionType).Name, definition.Id, response.RequestMessage.RequestUri.ToString(), httpResponse.StatusCode);
                             throw new Exception(await response.Content.ReadAsStringAsync());
                         }
                     }
