@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Contexts;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools.DataContracts;
@@ -52,37 +53,15 @@ namespace MigrationTools.Endpoints
         private List<WorkItemData> ToWorkItemDataList(WorkItemCollection collection)
         {
             List<WorkItemData> list = new List<WorkItemData>();
+            TfsWorkItemConvertor tfswic = new TfsWorkItemConvertor();
+            
             foreach (WorkItem wi in collection)
             {
-                list.Add(ConvertToWorkItemData(wi));
+                WorkItemData wid = new WorkItemData { internalObject = wi };
+                tfswic.MapWorkItemtoWorkItemData(wid, wi, null);
+                list.Add(wid);
             }
             return list;
-        }
-
-        private WorkItemData ConvertToWorkItemData(WorkItem wi)
-        {
-            WorkItemData wid = new WorkItemData
-            {
-                Id = wi.Id.ToString(),
-                Type = wi.Type.ToString()
-            };
-            PopulateRevisions(wi, wid);
-            return wid;
-        }
-
-        private void PopulateRevisions(WorkItem wi, WorkItemData wid)
-        {
-            wid.Revisions = new SortedDictionary<int, RevisionItem>();
-            foreach (Revision revision in wi.Revisions)
-            {
-                RevisionItem revi = new RevisionItem
-                {
-                    Number = revision.Index,
-                    Index = revision.Index
-                };
-                RunSourceEnrichers(revision, revi);
-                wid.Revisions.Add(revision.Index, revi);
-            }
         }
 
         private void RunSourceEnrichers(Revision wi, RevisionItem wid)
