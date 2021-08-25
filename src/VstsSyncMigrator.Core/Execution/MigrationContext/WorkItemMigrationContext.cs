@@ -589,8 +589,8 @@ namespace VstsSyncMigrator.Engine
                     PopulateWorkItem(currentRevisionWorkItem, targetWorkItem, destType);
                     Engine.FieldMaps.ApplyFieldMappings(currentRevisionWorkItem, targetWorkItem);
 
-                    targetWorkItem.ToWorkItem().Fields["System.ChangedBy"].Value =
-                        currentRevisionWorkItem.ToWorkItem().Revisions[revision.Index].Fields["System.ChangedBy"].Value;
+                    //this here to keep authors in historical revisions, otherwise owner of PAT will be everywhere.
+                    targetWorkItem.ToWorkItem().Fields["System.ChangedBy"].Value = currentRevisionWorkItem.ToWorkItem().Revisions[revision.Index].Fields["System.ChangedBy"].Value;
 
                     targetWorkItem.ToWorkItem().Fields["System.History"].Value =
                         currentRevisionWorkItem.ToWorkItem().Revisions[revision.Index].Fields["System.History"].Value;

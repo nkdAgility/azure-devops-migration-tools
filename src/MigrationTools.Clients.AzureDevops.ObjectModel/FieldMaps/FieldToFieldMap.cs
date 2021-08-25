@@ -24,7 +24,7 @@ namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
             if (source.Fields.Contains(Config.sourceField) && target.Fields.Contains(Config.targetField))
             {
                 var value = source.Fields[Config.sourceField].Value;
-                if ((value as string is null || value as string == "") && Config.defaultValue != null)
+                if (!(value is bool) && (value as string is null || value as string == "") && Config.defaultValue != null)
                 {
                     value = Config.defaultValue;
                 }
