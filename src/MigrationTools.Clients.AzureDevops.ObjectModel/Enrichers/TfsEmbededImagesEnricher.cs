@@ -97,7 +97,15 @@ namespace MigrationTools.Enrichers
                                 field.Value = field.Value.ToString().Replace(match.Value, newImageLink);
                                 wi.ToWorkItem().Attachments.RemoveAt(attachmentIndex);
                                 wi.SaveToAzureDevOps();
-                                File.Delete(fullImageFilePath);
+                                try
+                                {
+                                    File.Delete(fullImageFilePath);
+                                }
+                                catch (Exception)
+                                {
+                                    
+                                }
+                                
                             }
                         }
                     }
