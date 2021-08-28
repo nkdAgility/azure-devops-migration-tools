@@ -569,50 +569,64 @@ namespace VstsSyncMigrator.Engine
 
                 foreach (var revision in revisionsToMigrate)
                 {
-                    var currentRevisionWorkItem = sourceWorkItem.GetRevision(revision.Number);
+                    try {
+                        TraceWriteLine(LogEventLevel.Information, " Processing Revision [{RevisionNumber}]",
+                            new Dictionary<string, object>() {
+                                {"RevisionNumber", revision.Number }
+                            });
+                        var currentRevisionWorkItem = sourceWorkItem.GetRevision(revision.Number);
 
-                    TraceWriteLine(LogEventLevel.Information, " Processing Revision [{RevisionNumber}]",
-                        new Dictionary<string, object>() {
-                            {"RevisionNumber", revision.Number }
-                        });
+                        // Decide on WIT
+                        string destType = currentRevisionWorkItem.Type;
+                        if (Engine.TypeDefinitionMaps.Items.ContainsKey(destType))
+                        {
+                            destType =
+                               Engine.TypeDefinitionMaps.Items[destType].Map();
+                        }
 
-                    // Decide on WIT
-                    string destType = currentRevisionWorkItem.Type;
-                    if (Engine.TypeDefinitionMaps.Items.ContainsKey(destType))
-                    {
-                        destType =
-                           Engine.TypeDefinitionMaps.Items[destType].Map();
+                        WorkItemTypeChange(targetWorkItem, skipToFinalRevisedWorkItemType, finalDestType, revision, currentRevisionWorkItem, destType);
+
+                        PopulateWorkItem(currentRevisionWorkItem, targetWorkItem, destType);
+                        Engine.FieldMaps.ApplyFieldMappings(currentRevisionWorkItem, targetWorkItem);
+
+                        //this here to keep authors in historical revisions, otherwise owner of PAT will be everywhere.
+                        targetWorkItem.ToWorkItem().Fields["System.ChangedBy"].Value = currentRevisionWorkItem.ToWorkItem().Revisions[revision.Index].Fields["System.ChangedBy"].Value;
+
+                        targetWorkItem.ToWorkItem().Fields["System.History"].Value =
+                            currentRevisionWorkItem.ToWorkItem().Revisions[revision.Index].Fields["System.History"].Value;
+                        //Debug.WriteLine("Discussion:" + currentRevisionWorkItem.Revisions[revision.Index].Fields["System.History"].Value);
+
+                        TfsReflectedWorkItemId reflectedUri = (TfsReflectedWorkItemId)Engine.Source.WorkItems.CreateReflectedWorkItemId(sourceWorkItem);
+                        if (!targetWorkItem.ToWorkItem().Fields.Contains(Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName))
+                        {
+                            var ex = new InvalidOperationException("ReflectedWorkItemIDField Field Missing");
+                            Log.LogError(ex, " The WorkItemType {WorkItemType} does not have a Field called {ReflectedWorkItemID}", targetWorkItem.Type, Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName);
+                            throw ex;
+                        }
+                        targetWorkItem.ToWorkItem().Fields[Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName].Value = reflectedUri.ToString();
+
+                        targetWorkItem.SaveToAzureDevOps();
+                        TraceWriteLine(LogEventLevel.Information,
+                            " Saved TargetWorkItem {TargetWorkItemId}. Replayed revision {RevisionNumber} of {RevisionsToMigrateCount}",
+                           new Dictionary<string, object>() {
+                                   {"TargetWorkItemId", targetWorkItem.Id },
+                                   {"RevisionNumber", revision.Number },
+                                   {"RevisionsToMigrateCount",  revisionsToMigrate.Count}
+                               });
                     }
-
-                    WorkItemTypeChange(targetWorkItem, skipToFinalRevisedWorkItemType, finalDestType, revision, currentRevisionWorkItem, destType);
-
-                    PopulateWorkItem(currentRevisionWorkItem, targetWorkItem, destType);
-                    Engine.FieldMaps.ApplyFieldMappings(currentRevisionWorkItem, targetWorkItem);
-
-                    //this here to keep authors in historical revisions, otherwise owner of PAT will be everywhere.
-                    targetWorkItem.ToWorkItem().Fields["System.ChangedBy"].Value = currentRevisionWorkItem.ToWorkItem().Revisions[revision.Index].Fields["System.ChangedBy"].Value;
-
-                    targetWorkItem.ToWorkItem().Fields["System.History"].Value =
-                        currentRevisionWorkItem.ToWorkItem().Revisions[revision.Index].Fields["System.History"].Value;
-                    //Debug.WriteLine("Discussion:" + currentRevisionWorkItem.Revisions[revision.Index].Fields["System.History"].Value);
-
-                    TfsReflectedWorkItemId reflectedUri = (TfsReflectedWorkItemId)Engine.Source.WorkItems.CreateReflectedWorkItemId(sourceWorkItem);
-                    if (!targetWorkItem.ToWorkItem().Fields.Contains(Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName))
+                    catch (Exception ex)
                     {
-                        var ex = new InvalidOperationException("ReflectedWorkItemIDField Field Missing");
-                        Log.LogError(ex, " The WorkItemType {WorkItemType} does not have a Field called {ReflectedWorkItemID}", targetWorkItem.Type, Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName);
-                        throw ex;
+                        TraceWriteLine(LogEventLevel.Information, "...FAILED to Save Revision ... SKIPPING");
+                        Log.LogInformation("===============================================================");
+                        if (targetWorkItem != null)
+                        {
+                            foreach (Field f in targetWorkItem.ToWorkItem().Fields)
+                                TraceWriteLine(LogEventLevel.Information, "{FieldReferenceName} ({FieldName}) | {FieldValue}", new Dictionary<string, object>() { { "FieldReferenceName", f.ReferenceName }, { "FieldName", f.Name }, { "FieldValue", f.Value } });
+                        }
+                        Log.LogInformation("===============================================================");
+                        Log.LogError(ex.ToString(), ex);
+                        Log.LogInformation("===============================================================");
                     }
-                    targetWorkItem.ToWorkItem().Fields[Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName].Value = reflectedUri.ToString();
-
-                    targetWorkItem.SaveToAzureDevOps();
-                    TraceWriteLine(LogEventLevel.Information,
-                        " Saved TargetWorkItem {TargetWorkItemId}. Replayed revision {RevisionNumber} of {RevisionsToMigrateCount}",
-                       new Dictionary<string, object>() {
-                               {"TargetWorkItemId", targetWorkItem.Id },
-                               {"RevisionNumber", revision.Number },
-                               {"RevisionsToMigrateCount",  revisionsToMigrate.Count}
-                           });
                 }
 
                 if (targetWorkItem != null)
