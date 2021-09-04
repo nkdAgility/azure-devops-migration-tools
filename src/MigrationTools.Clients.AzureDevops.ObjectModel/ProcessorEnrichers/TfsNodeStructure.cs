@@ -20,6 +20,14 @@ namespace MigrationTools.Enrichers
         Iteration
     }
 
+    public struct TfsNodeStructureSettings
+    {
+        public string SourceProjectName;
+        public string TargetProjectName;
+
+        public Dictionary<string, bool> FoundNodes;
+    }
+
     public class TfsNodeStructure : WorkItemProcessorEnricher
     {
         private Dictionary<string, bool> _foundNodes = new Dictionary<string, bool>();
@@ -57,6 +65,14 @@ namespace MigrationTools.Enrichers
         public override void Configure(IProcessorEnricherOptions options)
         {
             _Options = (TfsNodeStructureOptions)options;
+
+        }
+
+        public void ApplySettings(TfsNodeStructureSettings settings)
+        {
+            _sourceProjectName = settings.SourceProjectName;
+            _targetProjectName = settings.TargetProjectName;
+            _foundNodes = settings.FoundNodes;
         }
 
         [Obsolete("Old v1 arch: this is a v2 class", true)]
@@ -65,27 +81,27 @@ namespace MigrationTools.Enrichers
             throw new System.NotImplementedException();
         }
 
-        public string GetNewNodeName(string sourceNodeName, TfsNodeStructureType nodeStructureType)
+        public string GetNewNodeName(string sourceNodeName, TfsNodeStructureType nodeStructureType, string targetStructureName = null, string sourceStructureName = null)
         {
             Log.LogDebug("NodeStructureEnricher.GetNewNodeName({sourceNodeName}, {nodeStructureType})", sourceNodeName, nodeStructureType.ToString());
-            string targetStructureName = NodeStructureTypeToLanguageSpecificName(_sourceLanguageMaps, nodeStructureType);
-            string sourceStructureName = NodeStructureTypeToLanguageSpecificName(_targetLanguageMaps, nodeStructureType);
+            var tStructureName = targetStructureName ?? NodeStructureTypeToLanguageSpecificName(_targetLanguageMaps, nodeStructureType);
+            var sStructureName = sourceStructureName ?? NodeStructureTypeToLanguageSpecificName(_sourceLanguageMaps, nodeStructureType);
             // Replace project name with new name (if necessary) and inject nodePath (Area or Iteration) into path for node validation
             string newNodeName;
             if (_prefixProjectToNodes)
             {
-                newNodeName = $@"{_targetProjectName}\{targetStructureName}\{sourceNodeName}";
+                newNodeName = $@"{_targetProjectName}\{tStructureName}\{sourceNodeName}";
             }
             else
             {
                 var regex = new Regex(Regex.Escape(_sourceProjectName));
-                if (sourceNodeName.StartsWith($@"{_sourceProjectName}\{sourceStructureName}\"))
+                if (sourceNodeName.StartsWith($@"{_sourceProjectName}\{sStructureName}\"))
                 {
                     newNodeName = regex.Replace(sourceNodeName, _targetProjectName, 1);
                 }
                 else
                 {
-                    newNodeName = regex.Replace(sourceNodeName, $@"{_targetProjectName}\{targetStructureName}", 1);
+                    newNodeName = regex.Replace(sourceNodeName, $@"{_targetProjectName}\{tStructureName}", 1);
                 }
             }
 
@@ -97,13 +113,13 @@ namespace MigrationTools.Enrichers
             }
 
             // Remove nodePath (Area or Iteration) from path for correct population in work item
-            if (newNodeName.StartsWith(_targetProjectName + '\\' + targetStructureName + '\\'))
+            if (newNodeName.StartsWith(_targetProjectName + '\\' + tStructureName + '\\'))
             {
-                newNodeName = newNodeName.Remove(newNodeName.IndexOf($@"{targetStructureName}\"), $@"{targetStructureName}\".Length);
+                newNodeName = newNodeName.Remove(newNodeName.IndexOf($@"{nodeStructureType}\"), $@"{nodeStructureType}\".Length);
             }
-            else if (newNodeName.StartsWith(_targetProjectName + '\\' + targetStructureName))
+            else if (newNodeName.StartsWith(_targetProjectName + '\\' + tStructureName))
             {
-                newNodeName = newNodeName.Remove(newNodeName.IndexOf($@"{targetStructureName}"), $@"{targetStructureName}".Length);
+                newNodeName = newNodeName.Remove(newNodeName.IndexOf($@"{nodeStructureType}"), $@"{nodeStructureType}".Length);
             }
             return newNodeName;
         }
