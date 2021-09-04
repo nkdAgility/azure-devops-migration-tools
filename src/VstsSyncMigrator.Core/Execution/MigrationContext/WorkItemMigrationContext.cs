@@ -91,7 +91,7 @@ namespace VstsSyncMigrator.Engine
             embededImagesEnricher = Services.GetRequiredService<TfsEmbededImagesEnricher>();
             gitRepositoryEnricher = Services.GetRequiredService<TfsGitRepositoryEnricher>();
             nodeStructureEnricher = Services.GetRequiredService<TfsNodeStructure>();
-            nodeStructureEnricher.Configure(new TfsNodeStructureOptions() { Enabled = true, NodeBasePaths = _config.NodeBasePaths, PrefixProjectToNodes = _config.PrefixProjectToNodes });
+            nodeStructureEnricher.Configure(new TfsNodeStructureOptions() { Enabled = _config.NodeStructureEnricherEnabled, NodeBasePaths = _config.NodeBasePaths, PrefixProjectToNodes = _config.PrefixProjectToNodes });
             nodeStructureEnricher.ProcessorExecutionBegin(null);
             revisionManager = Services.GetRequiredService<TfsRevisionManager>();
             revisionManager.Configure(new TfsRevisionManagerOptions() { Enabled = true, MaxRevisions = _config.MaxRevisions, ReplayRevisions = _config.ReplayRevisions });
@@ -118,7 +118,7 @@ namespace VstsSyncMigrator.Engine
             if (_config.FilterWorkItemsThatAlreadyExistInTarget)
             {
                 contextLog.Information("[FilterWorkItemsThatAlreadyExistInTarget] is enabled. Searching for work items that have already been migrated to the target...", sourceWorkItems.Count());
-                                               
+
                 string targetWIQLQueryBit = FixAreaPathInTargetQuery(_config.WIQLQueryBit, Engine.Source.WorkItems.Project.Name, Engine.Target.WorkItems.Project.Name, _config.NodeBasePaths, contextLog);
                 sourceWorkItems = ((TfsWorkItemMigrationClient)Engine.Target.WorkItems).FilterExistingWorkItems(sourceWorkItems, new TfsWiqlDefinition() { OrderBit = _config.WIQLOrderBit, QueryBit = targetWIQLQueryBit }, (TfsWorkItemMigrationClient)Engine.Source.WorkItems);
                 contextLog.Information("!! After removing all found work items there are {SourceWorkItemCount} remaining to be migrated.", sourceWorkItems.Count());
@@ -170,7 +170,7 @@ namespace VstsSyncMigrator.Engine
         {
             string targetWIQLQueryBit = sourceWIQLQueryBit;
             if (nodeBasePaths != null && nodeBasePaths.Any() && targetWIQLQueryBit.Contains("[System.AreaPath]"))
-            {               
+            {
                 if (sourceProject != targetProject)
                 {
                     //Switch out source Area Path with destination
@@ -545,11 +545,11 @@ namespace VstsSyncMigrator.Engine
                     }
                     targetWorkItem = CreateWorkItem_Shell(Engine.Target.WorkItems.Project, sourceWorkItem, skipToFinalRevisedWorkItemType ? finalDestType : targetType);
                 }
-                
+
                 if (_config.AttachRevisionHistory)
                 {
                     revisionManager.AttachSourceRevisionHistroyJsonToTarget(sourceWorkItem, targetWorkItem);
-                } 
+                }
 
                 foreach (var revision in revisionsToMigrate)
                 {
@@ -637,7 +637,7 @@ namespace VstsSyncMigrator.Engine
             return targetWorkItem;
         }
 
-       
+
 
         private void WorkItemTypeChange(WorkItemData targetWorkItem, bool skipToFinalRevisedWorkItemType, string finalDestType, RevisionItem revision, WorkItemData currentRevisionWorkItem, string destType)
         {
