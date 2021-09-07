@@ -91,7 +91,7 @@ namespace VstsSyncMigrator.Engine
             embededImagesEnricher = Services.GetRequiredService<TfsEmbededImagesEnricher>();
             gitRepositoryEnricher = Services.GetRequiredService<TfsGitRepositoryEnricher>();
             nodeStructureEnricher = Services.GetRequiredService<TfsNodeStructure>();
-            nodeStructureEnricher.Configure(new TfsNodeStructureOptions() { Enabled = _config.NodeStructureEnricherEnabled ?? true, NodeBasePaths = _config.NodeBasePaths, PrefixProjectToNodes = _config.PrefixProjectToNodes });
+            nodeStructureEnricher.Configure(new TfsNodeStructureOptions() { Enabled = _config.NodeStructureEnricherEnabled.HasValue ? _config.NodeStructureEnricherEnabled.Value : true, NodeBasePaths = _config.NodeBasePaths, PrefixProjectToNodes = _config.PrefixProjectToNodes });
             nodeStructureEnricher.ProcessorExecutionBegin(null);
             revisionManager = Services.GetRequiredService<TfsRevisionManager>();
             revisionManager.Configure(new TfsRevisionManagerOptions() { Enabled = true, MaxRevisions = _config.MaxRevisions, ReplayRevisions = _config.ReplayRevisions });
