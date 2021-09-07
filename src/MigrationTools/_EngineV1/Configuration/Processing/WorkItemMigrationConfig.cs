@@ -36,7 +36,7 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         public bool AttachRevisionHistory { get; set; }
         public bool LinkMigrationSaveEachAsAdded { get; set; }
         public bool GenerateMigrationComment { get; set; }
-        public bool NodeStructureEnricherEnabled { get; set; }
+        public bool? NodeStructureEnricherEnabled { get; set; }
         public string[] NodeBasePaths { get; set; }
         public IList<int> WorkItemIDs { get; set; }
         public int MaxRevisions { get; set; }
