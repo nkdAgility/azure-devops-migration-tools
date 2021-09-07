@@ -37,9 +37,9 @@ namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
                     targetWi.Fields[Config.targetField].Value = Convert.ChangeType(Config.valueMapping["null"], t);
                     Log.LogDebug("FieldValueMap: [UPDATE] field value mapped {SourceId}:{SourceField} to {TargetId}:{TargetField}", source.Id, Config.sourceField, target.Id, Config.targetField);
                 }
-                else if (sourceVal != null && Config.valueMapping.ContainsKey(sourceVal.ToString()))
+                else if (sourceVal != null && Config.valueMapping.ContainsKey(sourceVal.Value.ToString()))
                 {
-                    targetWi.Fields[Config.targetField].Value = Convert.ChangeType(Config.valueMapping[sourceVal.ToString()], t);
+                    targetWi.Fields[Config.targetField].Value = Convert.ChangeType(Config.valueMapping[sourceVal.Value.ToString()], t);
                     Log.LogDebug("FieldValueMap: [UPDATE] field value mapped {SourceId}:{SourceField} to {TargetId}:{TargetField}", source.Id, Config.sourceField, target.Id, Config.targetField);
                 }
                 else if (sourceVal != null && !string.IsNullOrWhiteSpace(Config.defaultValue))
