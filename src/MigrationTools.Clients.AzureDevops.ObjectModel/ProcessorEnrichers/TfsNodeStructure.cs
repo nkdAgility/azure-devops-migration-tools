@@ -121,6 +121,8 @@ namespace MigrationTools.Enrichers
             {
                 newNodeName = newNodeName.Remove(newNodeName.IndexOf($@"{nodeStructureType}"), $@"{nodeStructureType}".Length);
             }
+            newNodeName = newNodeName.Replace(@"\\", @"\");
+
             return newNodeName;
         }
 
