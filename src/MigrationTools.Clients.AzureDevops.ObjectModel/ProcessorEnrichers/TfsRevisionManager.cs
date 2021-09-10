@@ -123,9 +123,10 @@ namespace MigrationTools.Enrichers
             if (_Options.ReplayRevisions && _Options.MaxRevisions > 0 && sortedRevisions.Count > 0)
             {
                 // Keep the first revission, and the latest up to [MaxRevisions]
-                // _config.MaxRevisions = 10?
-                var revisionsToRemove = _Options.MaxRevisions > sortedRevisions.Count ? sortedRevisions.Count - 1 : (sortedRevisions.Count - _Options.MaxRevisions); // all except latest
-                sortedRevisions.RemoveRange(1, revisionsToRemove);
+                var revisionsToRemove = _Options.MaxRevisions >= sortedRevisions.Count - 1 ?
+                    0 :
+                    sortedRevisions.Count - _Options.MaxRevisions - 1;
+                sortedRevisions.RemoveRange(0, revisionsToRemove);
                 Log.LogDebug("TfsRevisionManager::GetRevisionsToMigrate: MaxRevisions={MaxRevisions}! There are {sortedRevisionsCount} left", _Options.MaxRevisions, sortedRevisions.Count);
             }
         }
@@ -174,7 +175,7 @@ namespace MigrationTools.Enrichers
             {
                 targetWorkItem.ToWorkItem().Attachments.Add(new Attachment(filePath, "History has been consolidated into the attached file."));
             }
-                
+
 
                 Log.LogInformation(" Attached a consolidated set of {RevisionCount} revisions.",
                     new Dictionary<string, object>() {
