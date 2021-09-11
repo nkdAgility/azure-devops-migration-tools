@@ -333,7 +333,7 @@ namespace VstsSyncMigrator.Engine
                     List<RevisionItem> revisionsToMigrate = revisionManager.GetRevisionsToMigrate(sourceWorkItem, targetWorkItem);
                     if (targetWorkItem == null)
                     {
-                        targetWorkItem = await ReplayRevisionsAsync(revisionsToMigrate, sourceWorkItem, null);
+                        targetWorkItem = ReplayRevisions(revisionsToMigrate, sourceWorkItem, null);
                             AddMetric("Revisions", processWorkItemMetrics, revisionsToMigrate.Count);
                     }
                     else
@@ -352,7 +352,7 @@ namespace VstsSyncMigrator.Engine
                                     { "revisionsToMigrateCount", revisionsToMigrate.Count }
                                 });
 
-                            targetWorkItem = await ReplayRevisionsAsync(revisionsToMigrate, sourceWorkItem, targetWorkItem);
+                            targetWorkItem = ReplayRevisions(revisionsToMigrate, sourceWorkItem, targetWorkItem);
 
                             AddMetric("Revisions", processWorkItemMetrics, revisionsToMigrate.Count);
                             AddMetric("SyncRev", processWorkItemMetrics, revisionsToMigrate.Count);
@@ -455,7 +455,7 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        private async Task<WorkItemData> ReplayRevisionsAsync(List<RevisionItem> revisionsToMigrate, WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
+        private WorkItemData ReplayRevisions(List<RevisionItem> revisionsToMigrate, WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
         {
             try
             {

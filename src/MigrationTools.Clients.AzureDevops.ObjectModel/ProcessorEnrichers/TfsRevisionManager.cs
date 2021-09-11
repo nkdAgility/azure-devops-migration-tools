@@ -100,12 +100,12 @@ namespace MigrationTools.Enrichers
 
         private void RemoveRevisionsMoreThanMaxRevisions(List<RevisionItem> sortedRevisions)
         {
-            if (Options.ReplayRevisions && Options.MaxRevisions > 0 && sortedRevisions.Count > 0)
+            if (Options.ReplayRevisions &&
+                Options.MaxRevisions > 0 &&
+                sortedRevisions.Count > 0 &&
+                Options.MaxRevisions < sortedRevisions.Count)
             {
-                // Keep the first revision, and the latest up to [MaxRevisions]
-                var revisionsToRemove = Options.MaxRevisions >= sortedRevisions.Count - 1 ?
-                    0 :
-                    sortedRevisions.Count - Options.MaxRevisions - 1;
+                var revisionsToRemove = sortedRevisions.Count - Options.MaxRevisions;
                 sortedRevisions.RemoveRange(0, revisionsToRemove);
                 Log.LogDebug("TfsRevisionManager::GetRevisionsToMigrate: MaxRevisions={MaxRevisions}! There are {sortedRevisionsCount} left", Options.MaxRevisions, sortedRevisions.Count);
             }

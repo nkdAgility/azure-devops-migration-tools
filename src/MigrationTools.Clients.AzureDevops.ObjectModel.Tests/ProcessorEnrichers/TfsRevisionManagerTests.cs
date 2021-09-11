@@ -11,14 +11,14 @@ namespace MigrationTools.ProcessorEnrichers.Tests
     [TestClass()]
     public class TfsRevisionManagerTests
     {
-        protected ServiceProvider Services = ServiceProviderHelper.GetServices();
+        private ServiceProvider Services = ServiceProviderHelper.GetServices();
 
         [TestInitialize]
         public void Setup()
         {
         }
 
-        protected static TfsRevisionManagerOptions GetTfsRevisionManagerOptions()
+        private static TfsRevisionManagerOptions GetTfsRevisionManagerOptions()
         {
             var migrationConfig = new TfsRevisionManagerOptions()
             {
@@ -30,7 +30,7 @@ namespace MigrationTools.ProcessorEnrichers.Tests
             return migrationConfig;
         }
 
-        private static WorkItemData GetWorkItemWithRevisions(System.DateTime currentDateTime, int startHours = 1, int endHours = 1)
+        private static WorkItemData GetWorkItemWithRevisions(DateTime currentDateTime, int startHours = 1, int endHours = 1)
         {
             var fakeWorkItem = new WorkItemData();
             fakeWorkItem.Id = Guid.NewGuid().ToString();
@@ -100,7 +100,7 @@ namespace MigrationTools.ProcessorEnrichers.Tests
             var processorEnricher = Services.GetRequiredService<TfsRevisionManager>();
             processorEnricher.Configure(peOptions);
 
-            var currentDateTime = System.DateTime.Now;
+            var currentDateTime = DateTime.Now;
             WorkItemData source = GetWorkItemWithRevisions(currentDateTime, 1, 11);
             WorkItemData target = GetWorkItemWithRevisions(currentDateTime, 11, 1);
 
@@ -117,7 +117,7 @@ namespace MigrationTools.ProcessorEnrichers.Tests
             var processorEnricher = Services.GetRequiredService<TfsRevisionManager>();
             processorEnricher.Configure(peOptions);
 
-            var currentDateTime = System.DateTime.Now;
+            var currentDateTime = DateTime.Now;
             WorkItemData source = GetWorkItemWithRevisions(currentDateTime, 1, 4);
             WorkItemData target = GetWorkItemWithRevisions(currentDateTime, 4, 1);
 
@@ -135,7 +135,7 @@ namespace MigrationTools.ProcessorEnrichers.Tests
             var processorEnricher = Services.GetRequiredService<TfsRevisionManager>();
             processorEnricher.Configure(peOptions);
 
-            var currentDateTime = System.DateTime.Now;
+            var currentDateTime = DateTime.Now;
             WorkItemData source = GetWorkItemWithRevisions(currentDateTime, 1, 2);
             WorkItemData target = GetWorkItemWithRevisions(currentDateTime, 2, 1);
 
@@ -152,7 +152,7 @@ namespace MigrationTools.ProcessorEnrichers.Tests
             var processorEnricher = Services.GetRequiredService<TfsRevisionManager>();
             processorEnricher.Configure(peOptions);
 
-            var currentDateTime = System.DateTime.Now;
+            var currentDateTime = DateTime.Now;
             WorkItemData source = GetWorkItemWithRevisions(currentDateTime, 1, 7);
             WorkItemData target = GetWorkItemWithRevisions(currentDateTime, 7, 1);
 
@@ -169,7 +169,7 @@ namespace MigrationTools.ProcessorEnrichers.Tests
             var processorEnricher = Services.GetRequiredService<TfsRevisionManager>();
             processorEnricher.Configure(peOptions);
 
-            var currentDateTime = System.DateTime.Now;
+            var currentDateTime = DateTime.Now;
             WorkItemData source = GetWorkItemWithRevisions(currentDateTime, 1, 10);
 
             var revs = processorEnricher.GetRevisionsToMigrate(source, null);
