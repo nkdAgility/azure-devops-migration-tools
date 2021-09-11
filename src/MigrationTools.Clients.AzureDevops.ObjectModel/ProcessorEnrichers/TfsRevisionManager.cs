@@ -2,11 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
-using System.Xml;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.TeamFoundation.Server;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools._EngineV1.Clients;
 using MigrationTools.DataContracts;
@@ -19,33 +16,27 @@ namespace MigrationTools.Enrichers
 
     public class TfsRevisionManager : WorkItemProcessorEnricher
     {
-
-        private TfsRevisionManagerOptions _Options;
-
         public TfsRevisionManager(IServiceProvider services, ILogger<WorkItemProcessorEnricher> logger) : base(services, logger)
         {
         }
 
-        public TfsRevisionManagerOptions Options
-        {
-            get { return _Options; }
-        }
+        public TfsRevisionManagerOptions Options { get; private set; }
 
         [Obsolete("Old v1 arch: this is a v2 class", true)]
         public override void Configure(bool save = true, bool filter = true)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public override void Configure(IProcessorEnricherOptions options)
         {
-            _Options = (TfsRevisionManagerOptions)options;
+            Options = (TfsRevisionManagerOptions)options;
         }
 
         [Obsolete("Old v1 arch: this is a v2 class", true)]
         public override int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
 
@@ -120,20 +111,20 @@ namespace MigrationTools.Enrichers
 
         private void RemoveRevisionsMoreThanMaxRevisions(List<RevisionItem> sortedRevisions)
         {
-            if (_Options.ReplayRevisions && _Options.MaxRevisions > 0 && sortedRevisions.Count > 0)
+            if (Options.ReplayRevisions && Options.MaxRevisions > 0 && sortedRevisions.Count > 0)
             {
                 // Keep the first revission, and the latest up to [MaxRevisions]
-                var revisionsToRemove = _Options.MaxRevisions >= sortedRevisions.Count - 1 ?
+                var revisionsToRemove = Options.MaxRevisions >= sortedRevisions.Count - 1 ?
                     0 :
-                    sortedRevisions.Count - _Options.MaxRevisions - 1;
+                    sortedRevisions.Count - Options.MaxRevisions - 1;
                 sortedRevisions.RemoveRange(0, revisionsToRemove);
-                Log.LogDebug("TfsRevisionManager::GetRevisionsToMigrate: MaxRevisions={MaxRevisions}! There are {sortedRevisionsCount} left", _Options.MaxRevisions, sortedRevisions.Count);
+                Log.LogDebug("TfsRevisionManager::GetRevisionsToMigrate: MaxRevisions={MaxRevisions}! There are {sortedRevisionsCount} left", Options.MaxRevisions, sortedRevisions.Count);
             }
         }
 
         private void RemoveRevisionsAllExceptLatest(List<RevisionItem> sortedRevisions)
         {
-            if (!_Options.ReplayRevisions && sortedRevisions.Count > 0)
+            if (!Options.ReplayRevisions && sortedRevisions.Count > 0)
             {
                 // Remove all but the latest revision if we are not replaying revisions
                 sortedRevisions.RemoveRange(0, sortedRevisions.Count - 1);
@@ -148,7 +139,7 @@ namespace MigrationTools.Enrichers
                 Log.LogDebug("TfsRevisionManager::GetRevisionsToMigrate: Raw Target {targetWorkItemId} Has {targetWorkItemRevCount} revisions", targetWorkItem.Id, targetWorkItem.Revisions.Count);
                 // Target exists so remove any Changed Date matches between them
                 var targetChangedDates = (from RevisionItem x in targetWorkItem.Revisions.Values select x.ChangedDate).ToList();
-                if (_Options.ReplayRevisions)
+                if (Options.ReplayRevisions)
                 {
                     sortedRevisions = sortedRevisions.Where(x => !targetChangedDates.Contains(x.ChangedDate)).ToList();
                     Log.LogDebug("TfsRevisionManager::GetRevisionsToMigrate: After removing Date Matches there are {sortedRevisionsCount} left", sortedRevisions.Count);
@@ -162,7 +153,7 @@ namespace MigrationTools.Enrichers
             return sortedRevisions;
         }
 
-        public void AttachSourceRevisionHistroyJsonToTarget(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
+        public void AttachSourceRevisionHistoryJsonToTarget(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
         {
 
             var fileData = JsonConvert.SerializeObject(sourceWorkItem.Revisions, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
@@ -176,13 +167,10 @@ namespace MigrationTools.Enrichers
                 targetWorkItem.ToWorkItem().Attachments.Add(new Attachment(filePath, "History has been consolidated into the attached file."));
             }
 
-
-                Log.LogInformation(" Attached a consolidated set of {RevisionCount} revisions.",
-                    new Dictionary<string, object>() {
-                            {"RevisionCount", sourceWorkItem.Revisions.Count() }
-                    });
-
+            Log.LogInformation(" Attached a consolidated set of {RevisionCount} revisions.",
+                new Dictionary<string, object>() {
+                    {"RevisionCount", sourceWorkItem.Revisions.Count() }
+                });
         }
-
     }
 }

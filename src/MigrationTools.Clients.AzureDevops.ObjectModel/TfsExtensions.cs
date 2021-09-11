@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Dynamic;
-using System.Linq;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.DataContracts;
@@ -14,31 +13,6 @@ namespace MigrationTools
 {
     public static class TfsExtensions
     {
-        //public static IServiceCollection TfsObjectModelWorkerServices(this IServiceCollection collection, EngineConfiguration config)
-        //{
-        //    if (collection == null) throw new ArgumentNullException(nameof(collection));
-        //    if (config == null) throw new ArgumentNullException(nameof(config));
-
-        //   // return collection.AddTransient<IWorkItemSink, AzureDevOpsWorkItemSink>();
-        //}
-
-        //public static void SaveWorkItem(this IProcessor context, WorkItem workItem)
-        //{
-        //    if (workItem == null) throw new ArgumentNullException(nameof(workItem));
-        //    workItem.Fields["System.ChangedBy"].Value = "Migration";
-        //    workItem.Save();
-        //}
-
-        public static Dictionary<string, object> AsDictionary(this FieldCollection col)
-        {
-            var dict = new Dictionary<string, object>();
-            for (var ix = 0; ix < col.Count; ix++)
-            {
-                dict.Add(col[ix].ReferenceName, col[ix].Value);
-            }
-            return dict;
-        }
-
         public static TfsTeamProjectConfig AsTeamProjectConfig(this IMigrationClientConfig context)
         {
             return (TfsTeamProjectConfig)context;
@@ -163,16 +137,6 @@ namespace MigrationTools
         }
 
         public static List<WorkItemData> ToWorkItemDataList(this IList<WorkItem> collection)
-        {
-            List<WorkItemData> list = new List<WorkItemData>();
-            foreach (WorkItem wi in collection)
-            {
-                list.Add(wi.AsWorkItemData());
-            }
-            return list;
-        }
-
-        public static List<WorkItemData> ToWorkItemDataList(this WorkItemCollection collection)
         {
             List<WorkItemData> list = new List<WorkItemData>();
             foreach (WorkItem wi in collection)

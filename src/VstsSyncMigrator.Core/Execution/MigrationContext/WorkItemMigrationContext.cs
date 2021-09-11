@@ -486,7 +486,7 @@ namespace VstsSyncMigrator.Engine
 
                 if (_config.AttachRevisionHistory)
                 {
-                    revisionManager.AttachSourceRevisionHistroyJsonToTarget(sourceWorkItem, targetWorkItem);
+                    revisionManager.AttachSourceRevisionHistoryJsonToTarget(sourceWorkItem, targetWorkItem);
                 }
 
                 foreach (var revision in revisionsToMigrate)
