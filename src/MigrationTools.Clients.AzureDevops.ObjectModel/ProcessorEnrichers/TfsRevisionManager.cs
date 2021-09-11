@@ -20,7 +20,7 @@ namespace MigrationTools.Enrichers
         {
         }
 
-        public TfsRevisionManagerOptions Options { get; private set; }
+        private TfsRevisionManagerOptions Options { get; set; }
 
         [Obsolete("Old v1 arch: this is a v2 class", true)]
         public override void Configure(bool save = true, bool filter = true)
@@ -44,7 +44,7 @@ namespace MigrationTools.Enrichers
         {
             if (Options.Enabled)
             {
-                Log.LogInformation("Filter Revisions .");
+                Log.LogInformation("Filter Revisions.");
                 EntryForProcessorType(processor);
 
                 RefreshForProcessorType(processor);
@@ -53,17 +53,6 @@ namespace MigrationTools.Enrichers
 
         protected override void EntryForProcessorType(IProcessor processor)
         {
-            if (processor is null)
-            {
-                Log.LogInformation("EntryForProcessorType:v1 (No-Endpoints)");
-                IMigrationEngine engine = Services.GetRequiredService<IMigrationEngine>();
-            }
-            else
-            {
-                Log.LogInformation("EntryForProcessorType:v2 (Endpoints)");
-                TfsEndpoint source = (TfsEndpoint)processor.Source;
-                TfsEndpoint target = (TfsEndpoint)processor.Target;
-            }
         }
 
         protected override void RefreshForProcessorType(IProcessor processor)
@@ -113,7 +102,7 @@ namespace MigrationTools.Enrichers
         {
             if (Options.ReplayRevisions && Options.MaxRevisions > 0 && sortedRevisions.Count > 0)
             {
-                // Keep the first revission, and the latest up to [MaxRevisions]
+                // Keep the first revision, and the latest up to [MaxRevisions]
                 var revisionsToRemove = Options.MaxRevisions >= sortedRevisions.Count - 1 ?
                     0 :
                     sortedRevisions.Count - Options.MaxRevisions - 1;
@@ -167,7 +156,7 @@ namespace MigrationTools.Enrichers
                 targetWorkItem.ToWorkItem().Attachments.Add(new Attachment(filePath, "History has been consolidated into the attached file."));
             }
 
-            Log.LogInformation(" Attached a consolidated set of {RevisionCount} revisions.",
+            Log.LogInformation("Attached a consolidated set of {RevisionCount} revisions.",
                 new Dictionary<string, object>() {
                     {"RevisionCount", sourceWorkItem.Revisions.Count() }
                 });

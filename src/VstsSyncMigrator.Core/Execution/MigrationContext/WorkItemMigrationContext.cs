@@ -256,7 +256,6 @@ namespace VstsSyncMigrator.Engine
         {
             var oldWorkItem = oldWi.ToWorkItem();
             var newWorkItem = newwit.ToWorkItem();
-            var newWorkItemstartTime = DateTime.UtcNow;
             var fieldMappingTimer = Stopwatch.StartNew();
 
             if (newWorkItem.IsPartialOpen || !newWorkItem.IsOpen)
@@ -308,18 +307,18 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        private async Task ProcessWorkItemAsync(WorkItemData sourceWorkItem, int retryLimit = 5, int retrys = 0)
+        private async Task ProcessWorkItemAsync(WorkItemData sourceWorkItem, int retryLimit = 5, int retries = 0)
         {
-            var witstopwatch = Stopwatch.StartNew();
-            var starttime = DateTime.Now;
+            var witStopWatch = Stopwatch.StartNew();
+            var startTime = DateTime.Now;
             processWorkItemMetrics = new Dictionary<string, double>();
             processWorkItemParamiters = new Dictionary<string, string>();
             AddParameter("SourceURL", processWorkItemParamiters, Engine.Source.WorkItems.Config.AsTeamProjectConfig().Collection.ToString());
-            AddParameter("SourceWorkItem", processWorkItemParamiters, sourceWorkItem.Id.ToString());
+            AddParameter("SourceWorkItem", processWorkItemParamiters, sourceWorkItem.Id);
             AddParameter("TargetURL", processWorkItemParamiters, Engine.Target.WorkItems.Config.AsTeamProjectConfig().Collection.ToString());
             AddParameter("TargetProject", processWorkItemParamiters, Engine.Target.WorkItems.Project.Name);
             AddParameter("RetryLimit", processWorkItemParamiters, retryLimit.ToString());
-            AddParameter("RetryNumber", processWorkItemParamiters, retrys.ToString());
+            AddParameter("RetryNumber", processWorkItemParamiters, retries.ToString());
             Log.LogDebug("######################################################################################");
             Log.LogDebug("ProcessWorkItem: {sourceWorkItemId}", sourceWorkItem.Id);
             Log.LogDebug("######################################################################################");
@@ -351,7 +350,7 @@ namespace VstsSyncMigrator.Engine
                         }
                         else
                         {
-                            TraceWriteLine(LogEventLevel.Information, "Syncing as there are {revisionsToMigrateCount} revisons detected",
+                            TraceWriteLine(LogEventLevel.Information, "Syncing as there are {revisionsToMigrateCount} revisions detected",
                                 new Dictionary<string, object>(){
                                     { "revisionsToMigrateCount", revisionsToMigrate.Count }
                                 });
@@ -392,20 +391,20 @@ namespace VstsSyncMigrator.Engine
             catch (WebException ex)
             {
                 Log.LogError(ex, "Some kind of internet pipe blockage");
-                if (retrys < retryLimit)
+                if (retries < retryLimit)
                 {
                     TraceWriteLine(LogEventLevel.Warning, "WebException: Will retry in {retrys}s ",
                         new Dictionary<string, object>() {
-                            {"retrys", retrys }
+                            {"retrys", retries }
                         });
-                    System.Threading.Thread.Sleep(new TimeSpan(0, 0, retrys));
-                    retrys++;
+                    System.Threading.Thread.Sleep(new TimeSpan(0, 0, retries));
+                    retries++;
                     TraceWriteLine(LogEventLevel.Warning, "RETRY {Retrys}/{RetryLimit} ",
                         new Dictionary<string, object>() {
-                            {"Retrys", retrys },
+                            {"Retrys", retries },
                             {"RetryLimit", retryLimit }
                         });
-                    await ProcessWorkItemAsync(sourceWorkItem, retryLimit, retrys);
+                    await ProcessWorkItemAsync(sourceWorkItem, retryLimit, retries);
                 }
                 else
                 {
@@ -415,11 +414,11 @@ namespace VstsSyncMigrator.Engine
             catch (Exception ex)
             {
                 Log.LogError(ex, ex.ToString());
-                Telemetry.TrackRequest("ProcessWorkItem", starttime, witstopwatch.Elapsed, "502", false);
+                Telemetry.TrackRequest("ProcessWorkItem", startTime, witStopWatch.Elapsed, "502", false);
                 throw ex;
             }
-            witstopwatch.Stop();
-            _elapsedms += witstopwatch.ElapsedMilliseconds;
+            witStopWatch.Stop();
+            _elapsedms += witStopWatch.ElapsedMilliseconds;
             processWorkItemMetrics.Add("ElapsedTimeMS", _elapsedms);
 
             var average = new TimeSpan(0, 0, 0, 0, (int)(_elapsedms / _current));
@@ -431,7 +430,7 @@ namespace VstsSyncMigrator.Engine
                     {"remaining", remaining}
                 });
             Telemetry.TrackEvent("WorkItemMigrated", processWorkItemParamiters, processWorkItemMetrics);
-            Telemetry.TrackRequest("ProcessWorkItem", starttime, witstopwatch.Elapsed, "200", true);
+            Telemetry.TrackRequest("ProcessWorkItem", startTime, witStopWatch.Elapsed, "200", true);
 
             _current++;
             _count--;
@@ -464,19 +463,15 @@ namespace VstsSyncMigrator.Engine
             try
             {
                 var skipToFinalRevisedWorkItemType = _config.SkipToFinalRevisedWorkItemType;
-
-                string finalDestType = revisionsToMigrate.Last().Type;
+                var finalDestType = revisionsToMigrate.Last().Type;
 
                 if (skipToFinalRevisedWorkItemType && Engine.TypeDefinitionMaps.Items.ContainsKey(finalDestType))
-                {
-                    finalDestType =
-                       Engine.TypeDefinitionMaps.Items[finalDestType].Map();
-                }
+                    finalDestType = Engine.TypeDefinitionMaps.Items[finalDestType].Map();
 
                 //If work item hasn't been created yet, create a shell
                 if (targetWorkItem == null)
                 {
-                    string targetType = revisionsToMigrate.First().Type;
+                    var targetType = revisionsToMigrate.First().Type;
                     if (Engine.TypeDefinitionMaps.Items.ContainsKey(targetType))
                     {
                         targetType = Engine.TypeDefinitionMaps.Items[targetType].Map();
@@ -499,7 +494,7 @@ namespace VstsSyncMigrator.Engine
                         });
 
                     // Decide on WIT
-                    string destType = currentRevisionWorkItem.Type;
+                    var destType = currentRevisionWorkItem.Type;
                     if (Engine.TypeDefinitionMaps.Items.ContainsKey(destType))
                     {
                         destType =
@@ -515,15 +510,16 @@ namespace VstsSyncMigrator.Engine
 
                     // Todo: Think about an "UpdateChangedBy" flag as this is expensive! (2s/WI instead of 1,5s when writing "Migration")
                     targetWorkItem.ToWorkItem().Fields["System.ChangedBy"].Value = revision.Fields["System.ChangedBy"].Value;
-
                     targetWorkItem.ToWorkItem().Fields["System.History"].Value = revision.Fields["System.History"].Value;
-                    //Debug.WriteLine("Discussion:" + currentRevisionWorkItem.Revisions[revision.Index].Fields["System.History"].Value);
 
-                    TfsReflectedWorkItemId reflectedUri = (TfsReflectedWorkItemId)Engine.Source.WorkItems.CreateReflectedWorkItemId(sourceWorkItem);
+                    var reflectedUri = (TfsReflectedWorkItemId)Engine.Source.WorkItems.CreateReflectedWorkItemId(sourceWorkItem);
                     if (!targetWorkItem.ToWorkItem().Fields.Contains(Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName))
                     {
                         var ex = new InvalidOperationException("ReflectedWorkItemIDField Field Missing");
-                        Log.LogError(ex, " The WorkItemType {WorkItemType} does not have a Field called {ReflectedWorkItemID}", targetWorkItem.Type, Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName);
+                        Log.LogError(ex,
+                            " The WorkItemType {WorkItemType} does not have a Field called {ReflectedWorkItemID}",
+                            targetWorkItem.Type,
+                            Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName);
                         throw ex;
                     }
                     targetWorkItem.ToWorkItem().Fields[Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName].Value = reflectedUri.ToString();
@@ -565,7 +561,12 @@ namespace VstsSyncMigrator.Engine
                 if (targetWorkItem != null)
                 {
                     foreach (Field f in targetWorkItem.ToWorkItem().Fields)
-                        TraceWriteLine(LogEventLevel.Information, "{FieldReferenceName} ({FieldName}) | {FieldValue}", new Dictionary<string, object>() { { "FieldReferenceName", f.ReferenceName }, { "FieldName", f.Name }, { "FieldValue", f.Value } });
+                        TraceWriteLine(LogEventLevel.Information, "{FieldReferenceName} ({FieldName}) | {FieldValue}",
+                            new Dictionary<string, object>()
+                            {
+                                { "FieldReferenceName", f.ReferenceName }, { "FieldName", f.Name },
+                                { "FieldValue", f.Value }
+                            });
                 }
                 Log.LogInformation("===============================================================");
                 Log.LogError(ex.ToString(), ex);
@@ -581,7 +582,6 @@ namespace VstsSyncMigrator.Engine
         {
             //If the work item already exists and its type has changed, update its type. Done this way because there doesn't appear to be a way to do this through the store.
             if (!skipToFinalRevisedWorkItemType && targetWorkItem.Type != finalDestType)
-
             {
                 Debug.WriteLine($"Work Item type change! '{targetWorkItem.Title}': From {targetWorkItem.Type} to {destType}");
                 var typePatch = new JsonPatchOperation()

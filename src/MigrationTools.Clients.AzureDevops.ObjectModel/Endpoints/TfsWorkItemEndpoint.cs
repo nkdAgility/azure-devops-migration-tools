@@ -54,7 +54,7 @@ namespace MigrationTools.Endpoints
         {
             List<WorkItemData> list = new List<WorkItemData>();
             TfsWorkItemConvertor tfswic = new TfsWorkItemConvertor();
-            
+
             foreach (WorkItem wi in collection)
             {
                 WorkItemData wid = new WorkItemData { internalObject = wi };
@@ -62,15 +62,6 @@ namespace MigrationTools.Endpoints
                 list.Add(wid);
             }
             return list;
-        }
-
-        private void RunSourceEnrichers(Revision wi, RevisionItem wid)
-        {
-            Log.LogDebug("TfsWorkItemEndPoint::RunSourceEnrichers::{SourceEnrichersCount}", SourceEnrichers.Count());
-            foreach (IWorkItemEndpointSourceEnricher enricher in SourceEnrichers)
-            {
-                enricher.EnrichWorkItemData(this, wi, wid); // HELP:: is this Right
-            }
         }
 
         public void PersistWorkItem(WorkItemData source)
