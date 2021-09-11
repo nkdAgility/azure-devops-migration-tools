@@ -337,7 +337,7 @@ namespace VstsSyncMigrator.Engine
                     if (targetWorkItem == null)
                     {
                         targetWorkItem = await ReplayRevisionsAsync(revisionsToMigrate, sourceWorkItem, null);
-                        AddMetric("Revisions", processWorkItemMetrics, revisionsToMigrate.Count);
+                            AddMetric("Revisions", processWorkItemMetrics, revisionsToMigrate.Count);
                     }
                     else
                     {
@@ -501,8 +501,6 @@ namespace VstsSyncMigrator.Engine
                            Engine.TypeDefinitionMaps.Items[destType].Map();
                     }
 
-                    await WorkItemTypeChange(targetWorkItem, skipToFinalRevisedWorkItemType, finalDestType, revision, currentRevisionWorkItem, destType);
-
                     PopulateWorkItem(currentRevisionWorkItem, targetWorkItem, destType);
 
                     // Todo: Ensure all field maps use WorkItemData.Fields to apply a correct mapping
@@ -574,36 +572,6 @@ namespace VstsSyncMigrator.Engine
             }
 
             return targetWorkItem;
-        }
-
-
-
-        private async Task WorkItemTypeChange(WorkItemData targetWorkItem, bool skipToFinalRevisedWorkItemType, string finalDestType, RevisionItem revision, WorkItemData currentRevisionWorkItem, string destType)
-        {
-            //If the work item already exists and its type has changed, update its type. Done this way because there doesn't appear to be a way to do this through the store.
-            if (!skipToFinalRevisedWorkItemType && targetWorkItem.Type != finalDestType)
-            {
-                Debug.WriteLine($"Work Item type change! '{targetWorkItem.Title}': From {targetWorkItem.Type} to {destType}");
-                var typePatch = new JsonPatchOperation()
-                {
-                    Operation = Microsoft.VisualStudio.Services.WebApi.Patch.Operation.Add,
-                    Path = "/fields/System.WorkItemType",
-                    Value = destType
-                };
-                var datePatch = new JsonPatchOperation()
-                {
-                    Operation = Microsoft.VisualStudio.Services.WebApi.Patch.Operation.Add,
-                    Path = "/fields/System.ChangedDate",
-                    Value = currentRevisionWorkItem.ToWorkItem().Revisions[revision.Index].Fields["System.ChangedDate"].Value
-                };
-
-                var patchDoc = new JsonPatchDocument
-                {
-                    typePatch,
-                    datePatch
-                };
-                await _witClient.UpdateWorkItemAsync(patchDoc, int.Parse(targetWorkItem.Id), bypassRules: true);
-            }
         }
     }
 }
