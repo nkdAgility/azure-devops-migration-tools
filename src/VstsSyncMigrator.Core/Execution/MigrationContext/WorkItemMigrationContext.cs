@@ -504,6 +504,7 @@ namespace VstsSyncMigrator.Engine
                     Engine.FieldMaps.ApplyFieldMappings(currentRevisionWorkItem, targetWorkItem);
 
                     // Todo: Think about an "UpdateChangedBy" flag as this is expensive! (2s/WI instead of 1,5s when writing "Migration")
+                    var changedBy = targetWorkItem.ToWorkItem().Fields["System.ChangedBy"].Value.ToString();
                     targetWorkItem.ToWorkItem().Fields["System.ChangedBy"].Value = revision.Fields["System.ChangedBy"].Value;
                     targetWorkItem.ToWorkItem().Fields["System.History"].Value = revision.Fields["System.History"].Value;
 
@@ -527,6 +528,9 @@ namespace VstsSyncMigrator.Engine
                                {"RevisionNumber", revision.Number },
                                {"RevisionsToMigrateCount",  revisionsToMigrate.Count}
                            });
+
+                    // Change this back to the original value as this object is mutated, and this value is needed elsewhere.
+                    targetWorkItem.ToWorkItem().Fields["System.ChangedBy"].Value = changedBy;
                 }
 
                 if (targetWorkItem != null)
