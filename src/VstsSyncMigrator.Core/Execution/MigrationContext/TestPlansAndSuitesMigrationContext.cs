@@ -905,6 +905,7 @@ namespace VstsSyncMigrator.Engine
                         catch (Exception)
                         {
                             InnerLog(sourceSuite, "            Source work item not migrated to target, cannot be found", 5);
+                            Log.LogError("Unable to locate SourceWI:{SourceWI} in the Target. ReflectedWorkItemId:{ReflectedWorkItemId}", sourceReq.Id, Engine.Target.WorkItems.CreateReflectedWorkItemId(sourceReq), ex);
                             break;
                         }
                         targetSuiteChild = CreateNewRequirementTestSuite(sourceSuite, targetReq);
