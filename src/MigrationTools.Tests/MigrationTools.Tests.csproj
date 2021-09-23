@@ -7,13 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.ApplicationInsights.WorkerService" Version="2.17.0" />
+    <PackageReference Include="Microsoft.ApplicationInsights.WorkerService" Version="2.18.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="5.0.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.1" />
-    <PackageReference Include="MSTest.TestAdapter" Version="2.2.1" />
-    <PackageReference Include="MSTest.TestFramework" Version="2.2.1" />
-    <PackageReference Include="coverlet.collector" Version="3.0.3">
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
+    <PackageReference Include="MSTest.TestAdapter" Version="2.2.7" />
+    <PackageReference Include="MSTest.TestFramework" Version="2.2.7" />
+    <PackageReference Include="coverlet.collector" Version="3.1.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -23,6 +23,10 @@
     <ProjectReference Include="..\MigrationTools.Clients.InMemory\MigrationTools.Clients.InMemory.csproj" />
     <ProjectReference Include="..\MigrationTools.TestExtensions\MigrationTools.TestExtensions.csproj" />
     <ProjectReference Include="..\MigrationTools\MigrationTools.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
 
 </Project>

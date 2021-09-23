@@ -16,10 +16,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.1" />
-    <PackageReference Include="MSTest.TestAdapter" Version="2.2.1" />
-    <PackageReference Include="MSTest.TestFramework" Version="2.2.1" />
-    <PackageReference Include="coverlet.collector" Version="3.0.3">
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
+    <PackageReference Include="MSTest.TestAdapter" Version="2.2.7" />
+    <PackageReference Include="MSTest.TestFramework" Version="2.2.7" />
+    <PackageReference Include="coverlet.collector" Version="3.1.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -28,6 +28,10 @@
   <ItemGroup>
     <ProjectReference Include="..\MigrationTools.Host\MigrationTools.Host.csproj" />
     <ProjectReference Include="..\MigrationTools.Tests\MigrationTools.Tests.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
 
 </Project>
