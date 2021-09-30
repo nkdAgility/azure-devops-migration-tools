@@ -36,12 +36,6 @@ namespace MigrationTools.Endpoints.Tests
             Assert.IsNotNull(endpoint);
         }
 
-        //[TestMethod()]
-        //public void FilterTest()
-        //{
-        //    Assert.Fail();
-        //}
-
         [TestMethod(), TestCategory("L3"), TestCategory("AzureDevOps.ObjectModel")]
         public void TfsWorkItemEndPointGetWorkItemsTest()
         {
@@ -64,12 +58,6 @@ namespace MigrationTools.Endpoints.Tests
             IEnumerable<WorkItemData> result = endpoint.GetWorkItems(qo);
             Assert.AreEqual(9, result.Count());
         }
-
-        //[TestMethod()]
-        //public void PersistWorkItemTest()
-        //{
-        //    Assert.Fail();
-        //}
 
         private static TfsWorkItemEndpointOptions GetTfsWorkItemEndPointOptions(string project)
         {

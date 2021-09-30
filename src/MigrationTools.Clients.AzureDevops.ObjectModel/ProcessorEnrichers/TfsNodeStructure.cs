@@ -221,7 +221,7 @@ namespace MigrationTools.Enrichers
             {
                 try
                 {
-                    ((ICommonStructureService4)_targetCommonStructureService).SetIterationDates(node.Uri, startDate, finishDate);
+                    _targetCommonStructureService.SetIterationDates(node.Uri, startDate, finishDate);
                     Log.LogDebug("  Node {node} has been assigned {startDate} / {finishDate}", nodePath, startDate, finishDate);
                 }
                 catch (CommonStructureSubsystemException ex)

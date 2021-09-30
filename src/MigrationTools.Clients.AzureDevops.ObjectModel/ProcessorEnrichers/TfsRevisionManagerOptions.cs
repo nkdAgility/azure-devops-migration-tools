@@ -2,7 +2,7 @@
 
 namespace MigrationTools.Enrichers
 {
-    public class TfsRevisionManagerOptions : ProcessorEnricherOptions, ITfsRevisionManagerOptions
+    public class TfsRevisionManagerOptions : ProcessorEnricherOptions
     {
         public override Type ToConfigure => typeof(TfsRevisionManager);
 
@@ -14,12 +14,4 @@ namespace MigrationTools.Enrichers
             Enabled = true;
         }
     }
-
-    public interface ITfsRevisionManagerOptions
-    {
-        public int MaxRevisions { get; set; }
-        public bool ReplayRevisions { get; set; }
-    }
-
-
 }

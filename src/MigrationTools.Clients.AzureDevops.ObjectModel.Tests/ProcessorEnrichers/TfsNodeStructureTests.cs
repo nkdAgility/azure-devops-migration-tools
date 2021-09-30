@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools.Enrichers;
-using MigrationTools.Processors;
 using MigrationTools.Tests;
 
 
@@ -19,22 +17,6 @@ namespace MigrationTools.ProcessorEnrichers.Tests
         {
             _services = ServiceProviderHelper.GetServices();
         }
-
-        private static TfsNodeStructureOptions GetTfsNodeStructureOptions() => new()
-        {
-            Enabled = true,
-            NodeBasePaths = Array.Empty<string>(),
-            PrefixProjectToNodes = false,
-            RefName = null
-        };
-
-        private static TfsAreaAndIterationProcessorOptions GetTfsAreaAndIterationProcessorOptions() => new()
-        {
-            PrefixProjectToNodes = false,
-            SourceName = "sourceName",
-            TargetName = "targetName",
-        };
-
 
         [TestMethod(), TestCategory("L0"), TestCategory("AzureDevOps.ObjectModel")]
         public void GetTfsNodeStructure_WithDifferentAreaPath()

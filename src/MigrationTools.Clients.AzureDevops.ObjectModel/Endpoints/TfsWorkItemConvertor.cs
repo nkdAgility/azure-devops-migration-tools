@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools.DataContracts;
 using Serilog;
@@ -15,9 +13,9 @@ namespace MigrationTools.Endpoints
         public void MapWorkItemtoWorkItemData(WorkItemData context_wid, WorkItem context_wi, Dictionary<string, FieldItem> fieldsOfRevision = null)
         {
             context_wid.Id = context_wi.Id.ToString();
-            context_wid.Title = fieldsOfRevision != null ? fieldsOfRevision["System.Title"].ToString() : context_wi.Title;
+            context_wid.Title = fieldsOfRevision != null ? fieldsOfRevision["System.Title"].Value.ToString() : context_wi.Title;
             context_wid.ProjectName = context_wi.Project?.Name;
-            context_wid.Type = fieldsOfRevision != null ? fieldsOfRevision["System.WorkItemType"].ToString() : context_wi.Type.Name;
+            context_wid.Type = fieldsOfRevision != null ? fieldsOfRevision["System.WorkItemType"].Value.ToString() : context_wi.Type.Name;
             context_wid.Rev = fieldsOfRevision != null ? (int)fieldsOfRevision["System.Rev"].Value : context_wi.Rev;
             context_wid.ChangedDate = fieldsOfRevision != null ? (DateTime)fieldsOfRevision["System.ChangedDate"].Value : context_wi.ChangedDate;
 
