@@ -302,11 +302,14 @@ namespace MigrationTools.Enrichers
         private void ProcessCommonStructure(string treeTypeSource, string sourceTarget, string treeTypeTarget, string projectTarget)
         {
             Log.LogDebug("NodeStructureEnricher.ProcessCommonStructure({treeTypeSource}, {treeTypeTarget})", treeTypeSource, treeTypeTarget);
+
+            var startPath = ("\\" + this._sourceProjectName + "\\" + treeTypeSource).ToLower();
+            Log.LogDebug("Source Node Path StartsWith [{startPath}]", startPath);
+
             var nodes = _sourceRootNodes.Where((n) =>
             {
                 // (i.e. "\CoolProject\Area" )
-                var startPath = "\\" + this._sourceProjectName + "\\" + treeTypeSource;
-                return n.Path.StartsWith(startPath);
+                return n.Path.ToLower().StartsWith(startPath);
             });
             if (nodes.Count() > 1)
             {
