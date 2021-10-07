@@ -44,9 +44,15 @@ namespace MigrationTools.Endpoints
             }
             _logger.LogInformation("Creating endpoint with name {EndpointName}", name);
             EndpointFactoryOptions options = _optionsMonitor.Get(name);
-            if(options.EndpointFuncs.Count != 1)
+
+            if (options.EndpointFuncs.Count == 0)
             {
-                throw new InvalidOperationException("There is no endpoint named that or duplicates of the same name");
+                _logger.LogDebug($"Endpoint count: {_optionsMonitor.CurrentValue.EndpointFuncs.Count}");
+                throw new InvalidOperationException($"There is no endpoint named [{name}]");
+            }
+            else if (options.EndpointFuncs.Count > 1)
+            {
+                throw new InvalidOperationException($"There duplicate endpoints with name [{name}]");
             }
             return options.EndpointFuncs[0](_services);
         }
