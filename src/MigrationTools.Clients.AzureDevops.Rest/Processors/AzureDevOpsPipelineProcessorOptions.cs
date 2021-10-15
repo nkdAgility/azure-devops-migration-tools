@@ -37,12 +37,12 @@ namespace MigrationTools.Processors
         public bool MigrateServiceConnections { get; set; }
 
         /// <summary>
-        /// List of Build Pipelines to process. If this is `null` then all Build Pipelines will be processed. **Not implemented yet**
+        /// List of Build Pipelines to process. If this is `null` then all Build Pipelines will be processed.
         /// </summary>
         public List<string> BuildPipelines { get; set; }
 
         /// <summary>
-        /// List of Release Pipelines to process. If this is `null` then all Release Pipelines will be processed. **Not implemented yet**
+        /// List of Release Pipelines to process. If this is `null` then all Release Pipelines will be processed.
         /// </summary>
         public List<string> ReleasePipelines { get; set; }
 

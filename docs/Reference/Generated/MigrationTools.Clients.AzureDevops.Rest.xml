@@ -182,6 +182,15 @@
             <param name="sourceDefinitions"></param>
             <returns>List of sorted Definitions</returns>
         </member>
+        <member name="M:MigrationTools.Processors.AzureDevOpsPipelineProcessor.GetSelectedDefinitionsFromEndpointAsync``1(MigrationTools.Endpoints.AzureDevOpsEndpoint,System.Collections.Generic.List{System.String})">
+            <summary>
+            Retrieve the selected pipeline definitions from the Azure DevOps Endpoint for the <typeparamref name="DefinitionType"/> type.
+            </summary>
+            <typeparam name="DefinitionType">The type of Pipeline definition to query. The type must inherit from <see cref="T:MigrationTools.DataContracts.RestApiDefinition"/>.</typeparam>
+            <param name="endpoint">The <see cref="T:MigrationTools.Endpoints.AzureDevOpsEndpoint"/> to query against.</param>
+            <param name="definitionNames">The list of definitions to query for. If the value is <c>null</c> or an empty list, all definitions will be queried.</param>
+            <returns></returns>
+        </member>
         <member name="P:MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions.MigrateBuildPipelines">
             <summary>
             Migrate Build Pipelines
@@ -214,12 +223,12 @@
         </member>
         <member name="P:MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions.BuildPipelines">
             <summary>
-            List of Build Pipelines to process. If this is `null` then all Build Pipelines will be processed. **Not implemented yet**
+            List of Build Pipelines to process. If this is `null` then all Build Pipelines will be processed.
             </summary>
         </member>
         <member name="P:MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions.ReleasePipelines">
             <summary>
-            List of Release Pipelines to process. If this is `null` then all Release Pipelines will be processed. **Not implemented yet**
+            List of Release Pipelines to process. If this is `null` then all Release Pipelines will be processed.
             </summary>
         </member>
         <member name="T:MigrationTools.Processors.ProcessorModel">

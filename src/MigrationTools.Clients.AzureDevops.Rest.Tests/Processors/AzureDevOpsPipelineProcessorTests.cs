@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace MigrationTools.Processors.Tests
@@ -49,6 +50,25 @@ namespace MigrationTools.Processors.Tests
             var processor = Services.GetRequiredService<AzureDevOpsPipelineProcessor>();
             processor.Configure(migrationConfig);
             processor.Execute();
+            Assert.AreEqual(ProcessingStatus.Complete, processor.Status);
+        }
+
+        [TestMethod, TestCategory("L3"), TestCategory("AzureDevOps.REST")]
+        public void AzureDevOpsPipelineProcessorSelectedBuildDefinitionsTest()
+        {
+            var config = new AzureDevOpsPipelineProcessorOptions
+            {
+                BuildPipelines = new List<string> { "Test1", "Test2"},
+                MigrateBuildPipelines = true,
+                Enabled = true,
+                SourceName = "Source",
+                TargetName = "Target",
+            };
+            var processor = Services.GetRequiredService<AzureDevOpsPipelineProcessor>();
+            processor.Configure(config);
+
+            processor.Execute();
+
             Assert.AreEqual(ProcessingStatus.Complete, processor.Status);
         }
     }
