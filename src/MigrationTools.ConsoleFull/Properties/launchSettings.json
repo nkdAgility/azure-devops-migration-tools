@@ -2,7 +2,7 @@
   "profiles": {
     "execute": {
       "commandName": "Project",
-      "commandLineArgs": " execute -c C:\\tools\\c_full_geooffice.json"
+      "commandLineArgs": "execute -c configuration.json"
     },
     "init": {
       "commandName": "Project",
