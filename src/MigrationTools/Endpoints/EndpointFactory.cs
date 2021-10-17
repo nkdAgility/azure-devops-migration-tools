@@ -47,7 +47,7 @@ namespace MigrationTools.Endpoints
 
             if (options.EndpointFuncs.Count == 0)
             {
-                _logger.LogDebug($"Endpoint count: {_optionsMonitor.CurrentValue.EndpointFuncs.Count}");
+                _logger.LogDebug("Endpoint count: {0}", _optionsMonitor.CurrentValue.EndpointFuncs.Count);
                 throw new InvalidOperationException($"There is no endpoint named [{name}]");
             }
             else if (options.EndpointFuncs.Count > 1)

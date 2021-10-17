@@ -47,7 +47,7 @@ namespace MigrationTools.Processors
         public virtual void Configure(IProcessorOptions options)
         {
             Log.LogInformation("Processor::Configure");
-            Log.LogInformation($"Processor::Configure Processor Type {Name}");
+            Log.LogInformation("Processor::Configure Processor Type {Name}", Name);
             try
             {
                 Source = _endpointFactory.CreateEndpoint(options.SourceName);
@@ -59,7 +59,7 @@ namespace MigrationTools.Processors
             }
             catch (InvalidOperationException)
             {
-                Log.LogError($"Couldn't find a Source EndPoint with SourceName [{options.SourceName}]");
+                Log.LogError("Couldn't find a Source EndPoint with SourceName [{0}]", options.SourceName);
                 throw;
             }
 
@@ -74,7 +74,7 @@ namespace MigrationTools.Processors
             }
             catch (InvalidOperationException)
             {
-                Log.LogError($"Couldn't find a Target EndPoint with TargetName [{options.TargetName}]");
+                Log.LogError("Couldn't find a Target EndPoint with TargetName [{0}]", options.TargetName);
                 throw;
             }
             //Endpoints.ConfigureEndpoints(source, target);
