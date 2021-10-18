@@ -200,11 +200,15 @@ namespace MigrationTools.Processors
                 definitionNames switch
                 {
                     null or { Count: 0 } => new List<Task<IEnumerable<DefinitionType>>> { endpoint.GetApiDefinitionsAsync<DefinitionType>() },
-                    not null => definitionNames.ConvertAll(d => endpoint.GetApiDefinitionsAsync<DefinitionType>(queryString: $"name={d}"))
+                    not null when typeof(DefinitionType) == typeof(BuildDefinition) => definitionNames.ConvertAll(d => endpoint.GetApiDefinitionsAsync<DefinitionType>(queryString: $"name={d}")),
+                    not null when typeof(DefinitionType) == typeof(ReleaseDefinition) => definitionNames.ConvertAll(d => endpoint.GetApiDefinitionsAsync<DefinitionType>(queryString: $"searchText={d}&isExactNameMatch=true")),
+                    _ => new List<Task<IEnumerable<DefinitionType>>>()
                 };
 
-            Log.LogInformation($"Querying definitions in the project: {endpoint.Options.Project}");
-            Log.LogInformation($"Configured definitions: { (definitionNames == null || definitionNames.Count == 0 ? "All" : String.Join(";", definitionNames))}");
+            Log.LogInformation("Querying definitions in the project: {ProjectName}", endpoint.Options.Project);
+            Log.LogInformation("Configured {Definition} definitions: {DefinitionList}",
+                typeof(DefinitionType).Name,
+                definitionNames == null || definitionNames.Count == 0 ? "All" : String.Join(";", definitionNames));
 
             var listTasks = GetDefinitionListTasks(endpoint, definitionNames);
             var executedTasks = await System.Threading.Tasks.Task.WhenAll(listTasks).ConfigureAwait(false);
