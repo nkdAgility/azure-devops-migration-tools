@@ -12,6 +12,7 @@ namespace MigrationTools.Processors.Tests
         [TestInitialize]
         public void Setup()
         {
+            Serilog.Sinks.InMemory.InMemorySink.Instance?.Dispose();            
         }
 
         protected static AzureDevOpsPipelineProcessorOptions GetAzureDevOpsPipelineProcessorOptions()
