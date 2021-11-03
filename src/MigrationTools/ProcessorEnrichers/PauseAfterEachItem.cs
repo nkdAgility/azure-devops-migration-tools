@@ -1,5 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
+using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
+using MigrationTools._EngineV1.DataContracts;
 using MigrationTools.Processors;
 
 namespace MigrationTools.Enrichers
@@ -29,7 +31,8 @@ namespace MigrationTools.Enrichers
         }
 
         [Obsolete("Old v1 arch: this is a v2 class", true)]
-        public override int Enrich(_EngineV1.DataContracts.WorkItemData sourceWorkItem, _EngineV1.DataContracts.WorkItemData targetWorkItem)
+        public override int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem,
+            WorkItemTrackingHttpClient witClient, string project)
         {
             throw new System.NotImplementedException();
         }

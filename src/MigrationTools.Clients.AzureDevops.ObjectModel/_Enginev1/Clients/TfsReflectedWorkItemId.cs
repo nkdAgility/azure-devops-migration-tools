@@ -10,10 +10,9 @@ namespace MigrationTools._EngineV1.Clients
     {
         private Uri _Connection;
         private string _ProjectName;
-        private string _WorkItemId;
         private static readonly Regex ReflectedIdRegex = new Regex(@"^(?<org>[\S ]+)\/(?<project>[\S ]+)\/_workitems\/edit\/(?<id>\d+)", RegexOptions.Compiled);
 
-        public TfsReflectedWorkItemId(WorkItemData workItem) : base(workItem.Id)
+        public TfsReflectedWorkItemId(WorkItemData workItem)
         {
             if (workItem is null)
             {
@@ -25,7 +24,7 @@ namespace MigrationTools._EngineV1.Clients
             _Connection = workItem.ToWorkItem().Store.TeamProjectCollection.Uri;
         }
 
-        public TfsReflectedWorkItemId(string ReflectedWorkItemId) : base(ReflectedWorkItemId)
+        public TfsReflectedWorkItemId(string ReflectedWorkItemId)
         {
             if (ReflectedWorkItemId is null)
             {

@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using Microsoft.Extensions.Logging;
+using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using MigrationTools._EngineV1.DataContracts;
 using MigrationTools.Enrichers;
 
@@ -25,9 +26,13 @@ namespace MigrationTools._EngineV1.Enrichers
 
         public override abstract void Configure(bool save = true, bool filter = true);
 
-        public override abstract int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem);
+        public override abstract int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem,
+            WorkItemTrackingHttpClient witClient, string project);
 
-        protected abstract void FixEmbededImages(WorkItemData wi, string oldTfsurl, string newTfsurl, string sourcePersonalAccessToken = "");
+        protected abstract void FixEmbededImages(WorkItemData wi, string oldTfsurl, string newTfsurl,
+            WorkItemTrackingHttpClient witClient,
+            string project,
+            string sourcePersonalAccessToken = "");
 
         protected static HttpResponseMessage DownloadFile(HttpClient httpClient, string url, string destinationPath)
         {

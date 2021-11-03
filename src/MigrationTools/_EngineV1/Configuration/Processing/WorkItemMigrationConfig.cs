@@ -25,6 +25,7 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         public string AttachmentWorkingPath { get; set; }
 
         public bool FixHtmlAttachmentLinks { get; set; }
+        public bool FixTargetOnly { get; set; }
 
         public bool SkipToFinalRevisedWorkItemType { get; set; }
 
@@ -57,6 +58,7 @@ namespace MigrationTools._EngineV1.Configuration.Processing
             LinkMigration = true;
             AttachmentMigration = true;
             FixHtmlAttachmentLinks = false;
+            FixTargetOnly = false;
             AttachmentWorkingPath = "c:\\temp\\WorkItemAttachmentWorkingFolder\\";
             AttachmentMaxSize = 480000000;
             UpdateCreatedBy = true;

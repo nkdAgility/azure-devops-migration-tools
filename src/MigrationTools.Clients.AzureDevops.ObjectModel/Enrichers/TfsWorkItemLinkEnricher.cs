@@ -2,6 +2,7 @@
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using MigrationTools._EngineV1.Clients;
 using MigrationTools._EngineV1.DataContracts;
 using MigrationTools.Exceptions;
@@ -25,7 +26,8 @@ namespace MigrationTools.Enrichers
             _filterWorkItemsThatAlreadyExistInTarget = filterWorkItemsThatAlreadyExistInTarget;
         }
 
-        public override int Enrich(WorkItemData sourceWorkItemLinkStart, WorkItemData targetWorkItemLinkStart)
+        public override int Enrich(WorkItemData sourceWorkItemLinkStart, WorkItemData targetWorkItemLinkStart,
+            WorkItemTrackingHttpClient witClient, string project)
         {
             if (sourceWorkItemLinkStart is null)
             {

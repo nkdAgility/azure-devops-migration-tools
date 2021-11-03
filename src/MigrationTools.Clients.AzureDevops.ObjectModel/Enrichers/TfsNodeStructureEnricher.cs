@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using System.Xml;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.Server;
+using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using MigrationTools._EngineV1.Clients;
 using MigrationTools._EngineV1.DataContracts;
 
@@ -44,7 +45,8 @@ namespace MigrationTools.Enrichers
             throw new NotImplementedException();
         }
 
-        public override int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
+        public override int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem,
+            WorkItemTrackingHttpClient witClient, string project)
         {
             throw new NotImplementedException();
             return 0;

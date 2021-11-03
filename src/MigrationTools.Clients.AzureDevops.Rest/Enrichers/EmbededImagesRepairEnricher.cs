@@ -22,12 +22,14 @@ namespace MigrationTools.Clients.AzureDevops.Rest.Enrichers
             throw new NotImplementedException();
         }
 
-        public override int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
+        public override int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem,
+            WorkItemTrackingHttpClient witClient)
         {
             throw new NotImplementedException();
         }
 
-        protected override void FixEmbededImages(WorkItemData wi, string oldTfsurl, string newTfsurl, string sourcePersonalAccessToken = "")
+        protected override void FixEmbededImages(WorkItemData wi, string oldTfsurl, string newTfsurl,
+            string sourcePersonalAccessToken = "", WorkItemTrackingHttpClient witClient)
         {
             throw new NotImplementedException();
         }

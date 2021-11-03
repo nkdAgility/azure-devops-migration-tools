@@ -6,6 +6,11 @@
     <Product>Azure DevOps Migration Tools [Object Model]</Product>
     <AssemblyName>migration</AssemblyName>
     <PlatformTarget>AnyCPU</PlatformTarget>
+	<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath>c:\tools\MigrationTools44vertigis\</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>

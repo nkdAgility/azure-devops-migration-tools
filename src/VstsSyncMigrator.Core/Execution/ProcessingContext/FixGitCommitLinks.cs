@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using MigrationTools;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Configuration.Processing;
@@ -60,7 +61,7 @@ namespace VstsSyncMigrator.Engine
                 Stopwatch witstopwatch = Stopwatch.StartNew();
                 workitem.ToWorkItem().Open();
 
-                _GitRepositoryEnricher.Enrich(null, workitem);
+                _GitRepositoryEnricher.Enrich((WorkItemData)null, workitem, null, Engine.Target.WorkItems.Project.Name);
 
                 if (workitem.ToWorkItem().IsDirty)
                 {

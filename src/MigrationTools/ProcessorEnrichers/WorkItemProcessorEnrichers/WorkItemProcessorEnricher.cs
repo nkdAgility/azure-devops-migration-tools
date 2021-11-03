@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
+using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
+using MigrationTools._EngineV1.DataContracts;
 using MigrationTools.Processors;
 
 namespace MigrationTools.Enrichers
@@ -25,7 +27,8 @@ namespace MigrationTools.Enrichers
         public abstract void Configure(IProcessorEnricherOptions options);
 
         [Obsolete("v1 Architecture: Here to support migration, use PhaseEnrichers: BeforeLoadData, AfterLoadData, etc", false)]
-        public virtual int Enrich(_EngineV1.DataContracts.WorkItemData sourceWorkItem, _EngineV1.DataContracts.WorkItemData targetWorkItem)
+        public virtual int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem,
+            WorkItemTrackingHttpClient witClient, string project)
         {
             throw new InvalidOperationException("This is invalid for this Enricher type");
         }

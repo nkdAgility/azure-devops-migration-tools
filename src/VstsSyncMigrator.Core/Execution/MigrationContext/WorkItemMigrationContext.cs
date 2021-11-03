@@ -94,6 +94,12 @@ namespace VstsSyncMigrator.Engine
             //Validation: make sure that the ReflectedWorkItemId field name specified in the config exists in the target process, preferably on each work item type.
             PopulateIgnoreList();
 
+            if (_config.FixTargetOnly)
+            {
+                FixTargetOnly();
+                return;
+            }
+
             Log.LogInformation("Migrating all Nodes before the work item run.");
             nodeStructureEnricher.MigrateAllNodeStructures(_config.PrefixProjectToNodes, _config.NodeBasePaths);
 
@@ -113,7 +119,7 @@ namespace VstsSyncMigrator.Engine
             //////////////////////////////////////////////////////////FilterCompletedByQuery
             if (_config.FilterWorkItemsThatAlreadyExistInTarget)
             {
-                contextLog.Information("[FilterWorkItemsThatAlreadyExistInTarget] is enabled. Searching for work items that have already been migrated to the target...", sourceWorkItems.Count());
+                contextLog.Information("[FilterWorkItemsThatAlreadyExistInTarget] is enabled. Searching for work items that have already been migrated to the target...");
                 sourceWorkItems = ((TfsWorkItemMigrationClient)Engine.Target.WorkItems).FilterExistingWorkItems(sourceWorkItems, new TfsWiqlDefinition() { OrderBit = _config.WIQLOrderBit, QueryBit = _config.WIQLQueryBit }, (TfsWorkItemMigrationClient)Engine.Source.WorkItems);
                 contextLog.Information("!! After removing all found work items there are {SourceWorkItemCount} remaining to be migrated.", sourceWorkItems.Count());
             }
@@ -158,6 +164,125 @@ namespace VstsSyncMigrator.Engine
             stopwatch.Stop();
 
             contextLog.Information("DONE in {Elapsed}", stopwatch.Elapsed.ToString("c"));
+        }
+
+        private void FixTargetOnly()
+        {
+    
+            var stopwatch = Stopwatch.StartNew();
+            //////////////////////////////////////////////////
+            string targetQuery =
+                string.Format(
+                    @"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY {1}",
+                    _config.WIQLQueryBit, _config.WIQLOrderBit);
+
+            // Inform the user that he maybe has to be patient now
+            contextLog.Information("Querying items to be fixed: {SourceQuery} ...", targetQuery);
+            var targetWorkItems = Engine.Target.WorkItems.GetWorkItems(targetQuery);
+            //////////////////////////////////////////////////
+
+            //////////////////////////////////////////////////
+            _current = 1;
+            _count = targetWorkItems.Count;
+            _elapsedms = 0;
+            _totalWorkItem = targetWorkItems.Count;
+            foreach (WorkItemData targetWorkItemData in targetWorkItems)
+            {
+                var targetWorkItem = TfsExtensions.ToWorkItem(targetWorkItemData);
+                workItemLog = contextLog.ForContext("SourceWorkItemId", 0);
+                using (LogContext.PushProperty("sourceWorkItemTypeName", targetWorkItem.Type.Name))
+                using (LogContext.PushProperty("currentWorkItem", _current))
+                using (LogContext.PushProperty("totalWorkItems", _totalWorkItem))
+                using (LogContext.PushProperty("sourceWorkItemId", 0))
+                using (LogContext.PushProperty("sourceRevisionInt", 0))
+                using (LogContext.PushProperty("targetWorkItemId", targetWorkItem.Id))
+                {
+                    FixWorkItem(targetWorkItemData, _config.WorkItemCreateRetryLimit);
+                }
+            }
+            //////////////////////////////////////////////////
+            stopwatch.Stop();
+
+            contextLog.Information("DONE in {Elapsed}", stopwatch.Elapsed.ToString("c"));
+        }
+
+        private void FixWorkItem(WorkItemData targetWorkItem, int retryLimit, int retrys = 0)
+        {
+            var witstopwatch = Stopwatch.StartNew();
+            var starttime = DateTime.Now;
+            Log.LogDebug("######################################################################################");
+            Log.LogDebug("ProcessWorkItem: {sourceWorkItemId}", targetWorkItem.Id);
+            Log.LogDebug("######################################################################################");
+            try
+            {
+                
+                    ///////////////////////////////////////////////
+                    ProcessHTMLFieldAttachements(targetWorkItem);
+                    ///////////////////////////////////////////////
+                    ///////////////////////////////////////////////////////
+                    if (targetWorkItem != null && targetWorkItem.ToWorkItem().IsDirty)
+                    {
+                        targetWorkItem.SaveToAzureDevOps();
+                    }
+                    if (targetWorkItem != null)
+                    {
+                        targetWorkItem.ToWorkItem().Close();
+                    }
+                    
+          
+            }
+            catch (TeamFoundationServiceUnavailableException ex)
+            {
+                Log.LogError(ex, "Some kind of internet pipe blockage");
+                if (retrys < retryLimit)
+                {
+                    TraceWriteLine(LogEventLevel.Warning, "WebException: Will retry in {retrys}s ",
+                        new Dictionary<string, object>() {
+                            {"retrys", retrys }
+                        });
+                    System.Threading.Thread.Sleep(new TimeSpan(0, 0, retrys));
+                    retrys++;
+                    TraceWriteLine(LogEventLevel.Warning, "RETRY {Retrys}/{RetryLimit} ",
+                        new Dictionary<string, object>() {
+                            {"Retrys", retrys },
+                            {"RetryLimit", retryLimit }
+                        });
+                    FixWorkItem(targetWorkItem, retryLimit, retrys);
+                }
+                else
+                {
+                    TraceWriteLine(LogEventLevel.Error, "ERROR: Failed to create work item. Retry Limit reached ");
+                }
+            }
+            catch (WebException ex)
+            {
+                Log.LogError(ex, "Some kind of internet pipe blockage");
+                if (retrys < retryLimit)
+                {
+                    TraceWriteLine(LogEventLevel.Warning, "WebException: Will retry in {retrys}s ",
+                        new Dictionary<string, object>() {
+                            {"retrys", retrys }
+                        });
+                    System.Threading.Thread.Sleep(new TimeSpan(0, 0, retrys));
+                    retrys++;
+                    TraceWriteLine(LogEventLevel.Warning, "RETRY {Retrys}/{RetryLimit} ",
+                        new Dictionary<string, object>() {
+                            {"Retrys", retrys },
+                            {"RetryLimit", retryLimit }
+                        });
+                    FixWorkItem(targetWorkItem, retryLimit, retrys);
+                }
+                else
+                {
+                    TraceWriteLine(LogEventLevel.Error, "ERROR: Failed to create work item. Retry Limit reached ");
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.LogError(ex, ex.ToString());
+                Telemetry.TrackRequest("ProcessWorkItem", starttime, witstopwatch.Elapsed, "502", false);
+                throw ex;
+            }
         }
 
         private static void AppendMigratedByFooter(StringBuilder history)
@@ -334,7 +459,7 @@ namespace VstsSyncMigrator.Engine
         {
             if (targetWorkItem != null && _config.FixHtmlAttachmentLinks)
             {
-                embededImagesEnricher.Enrich(null, targetWorkItem);
+                embededImagesEnricher.Enrich(null, targetWorkItem, _witClient, Engine.Target.WorkItems.Project.Name);
             }
         }
 
@@ -505,9 +630,9 @@ namespace VstsSyncMigrator.Engine
             if (targetWorkItem != null && _config.LinkMigration && sourceWorkItem.ToWorkItem().Links.Count > 0)
             {
                 TraceWriteLine(LogEventLevel.Information, "Links {SourceWorkItemLinkCount} | LinkMigrator:{LinkMigration}", new Dictionary<string, object>() { { "SourceWorkItemLinkCount", sourceWorkItem.ToWorkItem().Links.Count }, { "LinkMigration", _config.LinkMigration } });
-                workItemLinkEnricher.Enrich(sourceWorkItem, targetWorkItem);
+                workItemLinkEnricher.Enrich(sourceWorkItem, targetWorkItem, _witClient, Engine.Target.WorkItems.Project.Name);
                 AddMetric("RelatedLinkCount", processWorkItemMetrics, targetWorkItem.ToWorkItem().Links.Count);
-                int fixedLinkCount = gitRepositoryEnricher.Enrich(sourceWorkItem, targetWorkItem);
+                int fixedLinkCount = gitRepositoryEnricher.Enrich(sourceWorkItem, targetWorkItem, _witClient, Engine.Target.WorkItems.Project.Name);
                 AddMetric("FixedGitLinkCount", processWorkItemMetrics, fixedLinkCount);
             }
         }
@@ -594,7 +719,7 @@ namespace VstsSyncMigrator.Engine
 
                         targetWorkItem.ToWorkItem().Fields["System.History"].Value =
                             currentRevisionWorkItem.ToWorkItem().Revisions[revision.Index].Fields["System.History"].Value;
-                        //Debug.WriteLine("Discussion:" + currentRevisionWorkItem.Revisions[revision.Index].Fields["System.History"].Value);
+                        Debug.WriteLine("Discussion:" + currentRevisionWorkItem.ToWorkItem().Revisions[revision.Index].Fields["System.History"].Value);
 
                         TfsReflectedWorkItemId reflectedUri = (TfsReflectedWorkItemId)Engine.Source.WorkItems.CreateReflectedWorkItemId(sourceWorkItem);
                         if (!targetWorkItem.ToWorkItem().Fields.Contains(Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName))

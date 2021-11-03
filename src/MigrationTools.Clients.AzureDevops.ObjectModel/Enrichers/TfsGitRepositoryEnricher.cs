@@ -7,6 +7,7 @@ using Microsoft.TeamFoundation;
 using Microsoft.TeamFoundation.Git.Client;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using MigrationTools._EngineV1.Clients;
 using MigrationTools._EngineV1.DataContracts;
 
@@ -53,7 +54,8 @@ namespace MigrationTools.Enrichers
             _save = save;
         }
 
-        public override int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
+        public override int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem,
+            WorkItemTrackingHttpClient witClient, string project)
         {
             if (sourceWorkItem is null)
             {
