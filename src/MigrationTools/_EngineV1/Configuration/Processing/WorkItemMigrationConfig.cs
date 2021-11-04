@@ -8,8 +8,7 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         public bool PrefixProjectToNodes { get; set; }
         public bool UpdateCreatedDate { get; set; }
         public bool UpdateCreatedBy { get; set; }
-        public bool BuildFieldTable { get; set; }
-        public bool AppendMigrationToolSignatureFooter { get; set; }
+
         public string WIQLQueryBit { get; set; }
 
         /// <inheritdoc />
@@ -36,6 +35,7 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         public bool AttachRevisionHistory { get; set; }
         public bool LinkMigrationSaveEachAsAdded { get; set; }
         public bool GenerateMigrationComment { get; set; }
+        public bool? NodeStructureEnricherEnabled { get; set; }
         public string[] NodeBasePaths { get; set; }
         public IList<int> WorkItemIDs { get; set; }
         public int MaxRevisions { get; set; }
