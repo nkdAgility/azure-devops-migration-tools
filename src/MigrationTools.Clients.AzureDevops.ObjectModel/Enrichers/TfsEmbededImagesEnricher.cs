@@ -54,11 +54,7 @@ namespace MigrationTools.Enrichers
             var oldTfsurlOppositeSchema = GetUrlWithOppositeSchema(oldTfsurl);
             string regExSearchForImageUrl = "(?<=<img.*src=\")[^\"]*";
 
-            var linkList = new List<Link>();
-            foreach (Link link in wi.ToWorkItem().Links)
-            {
-                linkList.Add(link);
-            }
+            var linkList = ExtractLinksToReflectedIds(wi);
 
             foreach (Field field in wi.ToWorkItem().Fields)
             {
@@ -126,80 +122,10 @@ namespace MigrationTools.Enrichers
                         }
                     }
 
-                    //find links in field, match #12345
-                    //<!--<a href="https://dev.azure.com/GEBmanDEV/b88f3c69-ad72-476f-aec4-25cdd6db838d/_workitems/edit/11933" data-vss-mention="version:1.0">#188</a>-->
-                    string regExSearchForIssueUrl = "(?<=#)[0-9]*";
-                    matches = Regex.Matches((string)field.Value, regExSearchForIssueUrl);
-                    
-                    foreach (Match match in matches)
-                    {
-
-                        foreach (Link item in linkList)
-                        {
-                            try
-                            {
-                                Log.LogInformation("Migrating link for {sourceWorkItemLinkStartId} of type {ItemGetTypeName}", wi.Id, item.GetType().Name);
-                                if (item is RelatedLink rlink)
-                                {
-                                    var workItem = Engine.Target.WorkItems.GetWorkItem(rlink.RelatedWorkItemId);
-                                    var reflectedWorkItemId = Engine.Target.WorkItems.GetReflectedWorkItemId(workItem) as TfsReflectedWorkItemId;
-                                    if (string.Equals(reflectedWorkItemId?.WorkItemId, match.Value))
-                                    {
-                                        field.Value = Regex.Replace(field.Value.ToString(), $"(?<=href=\"){oldTfsurl}.*?" + $"/{match.Value}/?(?=\")", new TfsReflectedWorkItemId(workItem).ToString(),RegexOptions.IgnoreCase);
-
-                                        field.Value = Regex.Replace(field.Value.ToString(), "(?<=#)"+match.Value, workItem.Id);
-                                        wi.SaveToAzureDevOps();
-                                    }
-                                }
-                                else
-                                {
-                                    Log.LogError($"Not implemented Link conversion for {match.Value} [{item.BaseType.ToString()}]");
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                Log.LogError(ex, $"[UnexpectedErrorException] Replacing Link for {match.Value}");
-                            }
-                        }
-                    }
-
-                    var oldProject = Engine.Config.Source.AsTeamProjectConfig().Project;
-                    string regExSearchForIssueLinkUncert = $"(?<={oldTfsurl}/?{oldProject}/_workitems/edit/)";
-                    string regExSearchForIssueLink = regExSearchForIssueLinkUncert + $"[0-9]*";
-                    matches = Regex.Matches((string)field.Value, regExSearchForIssueLink);
-
-                    foreach (Match match in matches)
-                    {
-
-                        foreach (Link item in linkList)
-                        {
-                            try
-                            {
-                                Log.LogInformation("Migrating link for {sourceWorkItemLinkStartId} of type {ItemGetTypeName}", wi.Id, item.GetType().Name);
-                                if (item is RelatedLink rlink)
-                                {
-                                    var workItem = Engine.Target.WorkItems.GetWorkItem(rlink.RelatedWorkItemId);
-                                    var reflectedWorkItemId = Engine.Target.WorkItems.GetReflectedWorkItemId(workItem) as TfsReflectedWorkItemId;
-                                    if (string.Equals(reflectedWorkItemId?.WorkItemId, match.Value))
-                                    {
-                                        field.Value = Regex.Replace(field.Value.ToString(), reflectedWorkItemId.ToString(), new TfsReflectedWorkItemId(workItem).ToString());
-
-                                        field.Value = Regex.Replace(field.Value.ToString(), "(?<=<a.*?)" + match.Value + "(?=.*?</a>)", rlink.RelatedWorkItemId.ToString());
-                                        wi.SaveToAzureDevOps();
-                                    }
-                                }
-                                else
-                                {
-                                    Log.LogError($"Not implemented Link conversion for {match.Value} [{item.BaseType.ToString()}]");
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                Log.LogError(ex, $"[UnexpectedErrorException] Replacing Link for {match.Value}");
-                            }
-                        }
-                    }
-
+                    var before = field.Value.ToString();
+                    field.Value = ReplaceLinksInText(wi, oldTfsurl, linkList, before);
+                    if (!string.Equals(field.Value, before))
+                        wi.SaveToAzureDevOps();
                 }
             }
 
@@ -270,79 +196,9 @@ namespace MigrationTools.Enrichers
                     }
                 }
 
-                //find links in field, match #12345
-                //<!--<a href="https://dev.azure.com/GEBmanDEV/b88f3c69-ad72-476f-aec4-25cdd6db838d/_workitems/edit/11933" data-vss-mention="version:1.0">#188</a>-->
-                string regExSearchForIssueUrl = "(?<=#)[0-9]*";
-                matches = Regex.Matches(comment.Text, regExSearchForIssueUrl);
+                commentUpdate.Text = ReplaceLinksInText(wi, oldTfsurl, linkList, commentUpdate.Text);
 
-                foreach (Match match in matches)
-                {
-
-                    foreach (Link item in linkList)
-                    {
-                        try
-                        {
-                            Log.LogInformation("Migrating link for {sourceWorkItemLinkStartId} of type {ItemGetTypeName}", wi.Id, item.GetType().Name);
-                            if (item is RelatedLink rlink)
-                            {
-                                var workItem = Engine.Target.WorkItems.GetWorkItem(rlink.RelatedWorkItemId);
-                                var reflectedWorkItemId = Engine.Target.WorkItems.GetReflectedWorkItemId(workItem) as TfsReflectedWorkItemId;
-                                if (string.Equals(reflectedWorkItemId?.WorkItemId, match.Value))
-                                {
-                                    commentUpdate.Text = Regex.Replace(commentUpdate.Text, $"(?<=href=\"){oldTfsurl}.*?" + $"/{match.Value}/?(?=\")", new TfsReflectedWorkItemId(workItem).ToString(), RegexOptions.IgnoreCase);
-
-                                    commentUpdate.Text = Regex.Replace(commentUpdate.Text, "(?<=#)" + match.Value, workItem.Id);
-                                }
-                            }
-                            else
-                            {
-                                Log.LogError($"Not implemented Link conversion for {match.Value} [{item.BaseType.ToString()}]");
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            Log.LogError(ex, $"[UnexpectedErrorException] Replacing Link for {match.Value}");
-                        }
-                    }
-                }
-
-                var oldProject = Engine.Config.Source.AsTeamProjectConfig().Project;
-                string regExSearchForIssueLinkUncert = $"(?<={oldTfsurl}/?{oldProject}/_workitems/edit/)";
-                string regExSearchForIssueLink = regExSearchForIssueLinkUncert + $"[0-9]*";
-                matches = Regex.Matches(comment.Text, regExSearchForIssueLink);
-
-                foreach (Match match in matches)
-                {
-
-                    foreach (Link item in linkList)
-                    {
-                        try
-                        {
-                            Log.LogInformation("Migrating link for {sourceWorkItemLinkStartId} of type {ItemGetTypeName}", wi.Id, item.GetType().Name);
-                            if (item is RelatedLink rlink)
-                            {
-                                var workItem = Engine.Target.WorkItems.GetWorkItem(rlink.RelatedWorkItemId);
-                                var reflectedWorkItemId = Engine.Target.WorkItems.GetReflectedWorkItemId(workItem) as TfsReflectedWorkItemId;
-                                if (string.Equals(reflectedWorkItemId?.WorkItemId, match.Value))
-                                {
-                                    commentUpdate.Text = Regex.Replace(commentUpdate.Text, reflectedWorkItemId.ToString(), new TfsReflectedWorkItemId(workItem).ToString());
-
-                                    commentUpdate.Text = Regex.Replace(commentUpdate.Text, "(?<=<a.*?)" + match.Value + "(?=.*?</a>)", rlink.RelatedWorkItemId.ToString());
-                                }
-                            }
-                            else
-                            {
-                                Log.LogError($"Not implemented Link conversion for {match.Value} [{item.BaseType.ToString()}]");
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            Log.LogError(ex, $"[UnexpectedErrorException] Replacing Link for {match.Value}");
-                        }
-                    }
-                }
-
-                if(!string.Equals(commentUpdate.Text,comment.Text))
+                if (!string.Equals(commentUpdate.Text, comment.Text))
                     witClient.UpdateCommentAsync(commentUpdate, project, int.Parse(wi.Id), comment.Id).Wait();
             }
             if (attIndices.Any())
@@ -367,6 +223,94 @@ namespace MigrationTools.Enrichers
                 }
 
             }
+        }
+
+        private Dictionary<string, WorkItemData> ExtractLinksToReflectedIds(WorkItemData wi)
+        {
+            var linkList = new Dictionary<string, WorkItemData>();
+            foreach (Link link in wi.ToWorkItem().Links)
+            {
+                if (link is RelatedLink rlink)
+                {
+                    var workItem = Engine.Target.WorkItems.GetWorkItem(rlink.RelatedWorkItemId);
+
+                    var reflectedWorkItemId =
+                        Engine.Target.WorkItems.GetReflectedWorkItemId(workItem) as TfsReflectedWorkItemId;
+                    if (reflectedWorkItemId?.WorkItemId != null)
+                        linkList.Add(reflectedWorkItemId.WorkItemId, workItem);
+                }
+                else
+                {
+                    Log.LogError($"Not implemented Link conversion for [{link.BaseType}]");
+                }
+            }
+
+            return linkList;
+        }
+
+        private string ReplaceLinksInText(WorkItemData wi, string oldTfsurl, Dictionary<string, WorkItemData> linkList, string text)
+        {
+            MatchCollection matches;
+            //<a href="https://dev.azure.com/GEBmanDEV/b88f3c69-ad72-476f-aec4-25cdd6db838d/_workitems/edit/11933" data-vss-mention="version:1.0">#11933</a>
+
+            string regExSearchForIssueUrl = "(?<=#)[0-9]*";
+            matches = Regex.Matches(text, regExSearchForIssueUrl);
+
+            oldTfsurl = "";
+
+            foreach (Match match in matches)
+            {
+
+                try
+                {
+                    Log.LogInformation("Migrating link for {sourceWorkItemLinkStartId} with link to {oldId}", wi.Id, match.Value);
+
+                    if (linkList.ContainsKey(match.Value))
+                    {
+                        text = Regex.Replace(text, $"(?<=href=\"){oldTfsurl}.*?/_workitems/edit/{match.Value}/?(?=\")",
+                            new TfsReflectedWorkItemId(linkList[match.Value]).ToString(), RegexOptions.IgnoreCase);
+
+                        text = Regex.Replace(text, "(?<=#)" + match.Value, linkList[match.Value].Id);
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    Log.LogError(ex, $"[UnexpectedErrorException] Replacing Link for {match.Value}");
+                }
+
+            }
+
+            //<a href="https://dev.azure.com/GEBmanDEV/b88f3c69-ad72-476f-aec4-25cdd6db838d/_workitems/edit/11933" data-vss-mention="version:1.0">Bug 11933</a>
+            //<a href="x-mvwit:workitem/10828">Bug 10828</a>
+
+            var oldProject = Engine.Config.Source.AsTeamProjectConfig().Project;
+            string regExSearchForIssueLinkUncert = $"(?<=href=\"{oldTfsurl}.*?/_workitems/edit/|x-mvwit:workitem/)";
+            string regExSearchForIssueLink = regExSearchForIssueLinkUncert + $"[0-9]*";
+            matches = Regex.Matches(text, regExSearchForIssueLink);
+
+
+            foreach (Match match in matches)
+            {
+                try
+                {
+                    Log.LogInformation("Migrating link for {sourceWorkItemLinkStartId} with link to {reflectedId}", wi.Id, match.Value);
+
+                    if (linkList.ContainsKey(match.Value))
+                    {
+                        text = Regex.Replace(text, $"(?<=href=\")({oldTfsurl}.*?/_workitems/edit|x-mvwit:workitem)/{match.Value}/?(?=\")",
+                            new TfsReflectedWorkItemId(linkList[match.Value]).ToString());
+
+                        text = Regex.Replace(text, "(?<=<a.*?)" + match.Value + "(?=.*?</a>)", linkList[match.Value].Id);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.LogError(ex, $"[UnexpectedErrorException] Replacing Link for {match.Value}");
+                }
+            }
+
+            return text;
         }
     }
 }
