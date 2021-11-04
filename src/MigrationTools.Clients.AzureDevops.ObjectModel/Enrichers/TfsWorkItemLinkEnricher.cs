@@ -355,7 +355,7 @@ namespace MigrationTools.Enrichers
             var sourceLinkAbsoluteUri = GetAbsoluteUri(sourceLink);
             if (string.IsNullOrEmpty(sourceLinkAbsoluteUri))
             {
-                Log.LogWarning($"  [SKIP] Unable to create a hyperlink to [{sourceLink.Location}]");
+                Log.LogWarning("  [SKIP] Unable to create a hyperlink to [{0}]", sourceLink.Location);
                 return;
             }
 
@@ -389,7 +389,7 @@ namespace MigrationTools.Enrichers
             }
             catch (UriFormatException e)
             {
-                Log.LogError($"Unable to get AbsoluteUri of [{hyperlink.Location}]: {e.Message}");
+                Log.LogError("Unable to get AbsoluteUri of [{0}]: {1}", hyperlink.Location, e.Message);
                 return null;
             }
         }
