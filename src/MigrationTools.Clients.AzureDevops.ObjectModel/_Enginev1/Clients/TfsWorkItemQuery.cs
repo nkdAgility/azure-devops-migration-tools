@@ -41,7 +41,9 @@ namespace MigrationTools._EngineV1.Clients
             WorkItemCollection workItemCollection;
             try
             {
+                Log.Debug("Query sent");
                 workItemCollection = wiClient.Store.Query(Query);
+                Log.Debug("{0} Work items received, verifying", workItemCollection.Count);
                 foreach (WorkItem item in workItemCollection)
                 {
                     try
