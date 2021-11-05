@@ -222,6 +222,11 @@
             List of Release Pipelines to process. If this is `null` then all Release Pipelines will be processed. **Not implemented yet**
             </summary>
         </member>
+        <member name="P:MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions.RepositoryNameMaps">
+            <summary>
+            Map of Source Repository to Target Repository Names 
+            </summary>
+        </member>
         <member name="T:MigrationTools.Processors.ProcessorModel">
             <summary>
             Data model used by Process Definition Processor to keep track of it' state
