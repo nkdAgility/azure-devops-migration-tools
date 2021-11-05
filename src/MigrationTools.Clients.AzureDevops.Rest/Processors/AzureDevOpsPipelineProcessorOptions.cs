@@ -46,6 +46,11 @@ namespace MigrationTools.Processors
         /// </summary>
         public List<string> ReleasePipelines { get; set; }
 
+        /// <summary>
+        /// Map of Source Repository to Target Repository Names 
+        /// </summary>
+        public Dictionary<string, string> RepositoryNameMaps { get; set; } //Can we reuse GitRepoMapping?
+
         public override Type ToConfigure => typeof(AzureDevOpsPipelineProcessor);
 
         public override IProcessorOptions GetDefault()
