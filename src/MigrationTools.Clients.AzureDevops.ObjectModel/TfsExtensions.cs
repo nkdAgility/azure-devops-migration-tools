@@ -138,11 +138,21 @@ namespace MigrationTools
 
         public static List<WorkItemData> ToWorkItemDataList(this IList<WorkItem> collection)
         {
+            Log.Debug("Loading {0} Work Items", collection.Count);
             List<WorkItemData> list = new List<WorkItemData>();
+            var counter = 0;
+            var lastProgressUpdate = DateTime.Now.AddDays(-1);
             foreach (WorkItem wi in collection)
             {
+                counter++;
+                if ((System.DateTime.Now - lastProgressUpdate).TotalSeconds > 10)
+                {
+                    Log.Debug("{0}/{1} {2}", counter, collection.Count, (1.0  * counter/collection.Count).ToString("#0.##%", System.Globalization.CultureInfo.InvariantCulture));
+                    lastProgressUpdate = DateTime.Now;
+                }
                 list.Add(wi.AsWorkItemData());
             }
+            Log.Debug("{0} Work Items loaded", collection.Count);
             return list;
         }
     }

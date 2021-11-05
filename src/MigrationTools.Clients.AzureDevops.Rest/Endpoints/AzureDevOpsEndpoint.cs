@@ -489,7 +489,7 @@ namespace MigrationTools.Endpoints
                 }
                 else
                 {
-                    Log.LogInformation($"Created target {typeof(DefinitionType).Name} entry for [{targetDef.Name}] in [{Options.Name}]");
+                    Log.LogInformation("Created target {0} entry for [{1}] in [{2}]", typeof(DefinitionType).Name, targetDef.Name, Options.Name);
                 }
             }
             else
@@ -504,7 +504,7 @@ namespace MigrationTools.Endpoints
                 }
                 else
                 {
-                    Log.LogInformation($"Updated target {typeof(DefinitionType).Name} entry for [{targetDef.Name}] in [{Options.Name}]");
+                    Log.LogInformation("Updated target {0} entry for [{1}] in [{2}]", typeof(DefinitionType).Name, targetDef.Name, Options.Name);
                 }
             }
 

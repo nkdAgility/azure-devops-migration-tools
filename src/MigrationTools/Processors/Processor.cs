@@ -47,8 +47,36 @@ namespace MigrationTools.Processors
         public virtual void Configure(IProcessorOptions options)
         {
             Log.LogInformation("Processor::Configure");
-            Source = _endpointFactory.CreateEndpoint(options.SourceName);
-            Target = _endpointFactory.CreateEndpoint(options.TargetName);
+            Log.LogInformation("Processor::Configure Processor Type {Name}", Name);
+            try
+            {
+                Source = _endpointFactory.CreateEndpoint(options.SourceName);
+            }
+            catch (ArgumentNullException)
+            {
+                Log.LogError("In the Processor configuration, specify the SourceName, for example \"SourceName\" : \"mySourceName\" and make sure there's an EndPoint with that name");
+                throw;
+            }
+            catch (InvalidOperationException)
+            {
+                Log.LogError("Couldn't find a Source EndPoint with SourceName [{0}]", options.SourceName);
+                throw;
+            }
+
+            try
+            {
+                Target = _endpointFactory.CreateEndpoint(options.TargetName);
+            }
+            catch (ArgumentNullException)
+            {
+                Log.LogError("In the Processor configuration, specify the TargetName, for example \"TargetName\" : \"myTargetName\" and make sure there's an EndPoint with that name");
+                throw;
+            }
+            catch (InvalidOperationException)
+            {
+                Log.LogError("Couldn't find a Target EndPoint with TargetName [{0}]", options.TargetName);
+                throw;
+            }
             //Endpoints.ConfigureEndpoints(source, target);
             ProcessorEnrichers.ConfigureEnrichers(options.ProcessorEnrichers);
             _ProcessorConfigured = true;
