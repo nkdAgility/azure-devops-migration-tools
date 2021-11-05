@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools.Tests;
+using Serilog.Events;
 
 namespace MigrationTools.Processors.Tests
 {
@@ -11,6 +12,7 @@ namespace MigrationTools.Processors.Tests
         [TestInitialize]
         public void Setup()
         {
+            Serilog.Sinks.InMemory.InMemorySink.Instance?.Dispose();            
         }
 
         protected static AzureDevOpsPipelineProcessorOptions GetAzureDevOpsPipelineProcessorOptions()
@@ -27,5 +29,12 @@ namespace MigrationTools.Processors.Tests
             };
             return migrationConfig;
         }
+
+        public static object GetValueFromProperty(LogEventPropertyValue value) =>
+            value switch
+        {
+            ScalarValue v => v.Value,
+            _ => value.ToString(),
+        };
     }
 }

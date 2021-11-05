@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Serilog.Events;
+using Serilog.Sinks.InMemory;
 
 namespace MigrationTools.TestExtensions
 {
@@ -19,7 +20,9 @@ namespace MigrationTools.TestExtensions
             // Logging for Unit Tests
             var loggers = new LoggerConfiguration().MinimumLevel.Verbose().Enrich.FromLogContext();
             loggers.WriteTo.Logger(logger => logger
-              .WriteTo.Debug(restrictedToMinimumLevel: LogEventLevel.Verbose));
+              .WriteTo.Debug(restrictedToMinimumLevel: LogEventLevel.Verbose))
+              .WriteTo.InMemory();
+
             Log.Logger = loggers.CreateLogger();
             Log.Logger.Information("Logger is initialized");
             context.AddLogging(loggingBuilder => loggingBuilder.AddSerilog(dispose: true));
