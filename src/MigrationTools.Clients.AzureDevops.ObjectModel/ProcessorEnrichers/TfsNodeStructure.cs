@@ -115,11 +115,11 @@ namespace MigrationTools.Enrichers
             // Remove nodePath (Area or Iteration) from path for correct population in work item
             if (newNodeName.StartsWith(_targetProjectName + '\\' + tStructureName + '\\'))
             {
-                newNodeName = newNodeName.Remove(newNodeName.IndexOf($@"{nodeStructureType}\"), $@"{nodeStructureType}\".Length);
+                newNodeName = newNodeName.Remove(newNodeName.IndexOf($@"{tStructureName}\"), $@"{tStructureName}\".Length);
             }
             else if (newNodeName.StartsWith(_targetProjectName + '\\' + tStructureName))
             {
-                newNodeName = newNodeName.Remove(newNodeName.IndexOf($@"{nodeStructureType}"), $@"{nodeStructureType}".Length);
+                newNodeName = newNodeName.Remove(newNodeName.IndexOf($@"{tStructureName}"), $@"{tStructureName}".Length);
             }
             newNodeName = newNodeName.Replace(@"\\", @"\");
 
