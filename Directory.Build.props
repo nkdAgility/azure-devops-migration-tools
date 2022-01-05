@@ -3,9 +3,11 @@
     <Version>0.0.0.1</Version>
     <Authors>Martin Hinshelwood</Authors>
     <Company>naked Agility with Martin Hinshelwood</Company>
-    <LangVersion>9.0</LangVersion>
+    <LangVersion>10.0</LangVersion>
     <Product>MigrationTools.CommandLine</Product>
     <NoWarn>1701;1702;1591</NoWarn>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
