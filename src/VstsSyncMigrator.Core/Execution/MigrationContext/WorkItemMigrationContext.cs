@@ -321,7 +321,7 @@ namespace VstsSyncMigrator.Engine
             Log.LogDebug("######################################################################################");
             try
             {
-                if (sourceWorkItem.Type != "Test Plan" || sourceWorkItem.Type != "Test Suite")
+                if (sourceWorkItem.Type != "Test Plan" && sourceWorkItem.Type != "Test Suite")
                 {
                     var targetWorkItem = Engine.Target.WorkItems.FindReflectedWorkItem(sourceWorkItem, false);
                     ///////////////////////////////////////////////
