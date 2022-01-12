@@ -362,9 +362,9 @@ namespace MigrationTools.Enrichers
             var exist = (from hyperlink in target.ToWorkItem().Links.Cast<Link>().Where(l => l is Hyperlink).Cast<Hyperlink>()
                          let absoluteUri = GetAbsoluteUri(hyperlink)
                          where sourceLinkAbsoluteUri == absoluteUri
-                         select hyperlink).SingleOrDefault();
+                         select hyperlink).Any();
 
-            if (exist != null)
+            if (exist)
             {
                 return;
             }
