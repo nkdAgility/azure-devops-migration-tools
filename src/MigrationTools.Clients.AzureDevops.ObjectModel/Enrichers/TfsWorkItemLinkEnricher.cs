@@ -359,12 +359,12 @@ namespace MigrationTools.Enrichers
                 return;
             }
 
-            var exist = (from hyperlink in target.ToWorkItem().Links.Cast<Link>().Where(l => l is Hyperlink).Cast<Hyperlink>()
+            var exist = (from hyperlink in target.ToWorkItem().Links.OfType<Hyperlink>()
                          let absoluteUri = GetAbsoluteUri(hyperlink)
-                         where sourceLinkAbsoluteUri == absoluteUri
-                         select hyperlink).SingleOrDefault();
+                         where string.Equals(sourceLinkAbsoluteUri, absoluteUri, StringComparison.OrdinalIgnoreCase)
+                         select hyperlink).Any();
 
-            if (exist != null)
+            if (exist)
             {
                 return;
             }
