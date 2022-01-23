@@ -16,7 +16,8 @@ namespace MigrationTools.Enrichers
 
     public class TfsRevisionManager : WorkItemProcessorEnricher
     {
-        public TfsRevisionManager(IServiceProvider services, ILogger<WorkItemProcessorEnricher> logger) : base(services, logger)
+        public TfsRevisionManager(IServiceProvider services, ILogger<TfsRevisionManager> logger)
+            : base(services, logger)
         {
         }
 
@@ -144,7 +145,6 @@ namespace MigrationTools.Enrichers
 
         public void AttachSourceRevisionHistoryJsonToTarget(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
         {
-
             var fileData = JsonConvert.SerializeObject(sourceWorkItem.Revisions, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
             var filePath = Path.Combine(Path.GetTempPath(), $"{sourceWorkItem.ProjectName}-ID{sourceWorkItem.Id}-R{sourceWorkItem.Rev}-PreMigrationHistory.json");
 

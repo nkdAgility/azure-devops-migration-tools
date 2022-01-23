@@ -17,11 +17,11 @@ namespace MigrationTools._EngineV1.Clients
     {
         private WorkItemStoreFlags _bypassRules;
         private IMigrationClientConfig _config;
-        private IMigrationClient _migrationClient;
         private ProjectData _project;
         private WorkItemStore _wistore;
 
-        public TfsWorkItemMigrationClient(IServiceProvider services, ITelemetryLogger telemetry) : base(services, telemetry)
+        public TfsWorkItemMigrationClient(IServiceProvider services, ITelemetryLogger telemetry)
+            : base(services, telemetry)
         {
         }
 
@@ -63,12 +63,13 @@ namespace MigrationTools._EngineV1.Clients
         }
 
         public override WorkItemData FindReflectedWorkItem(WorkItemData workItemToReflect, bool cache)
-
         {
             TfsReflectedWorkItemId ReflectedWorkItemId = new TfsReflectedWorkItemId(workItemToReflect);
-            var workItemToFind = workItemToReflect.ToWorkItem();
             WorkItem found = GetFromCache(ReflectedWorkItemId)?.ToWorkItem();
-            if (found == null) { found = FindReflectedWorkItemByReflectedWorkItemId(ReflectedWorkItemId)?.ToWorkItem(); }
+            if (found == null)
+            {
+                found = FindReflectedWorkItemByReflectedWorkItemId(ReflectedWorkItemId)?.ToWorkItem();
+            }
             if (found != null && cache)
             {
                 AddToCache(found.AsWorkItemData());// TODO MEMORY LEAK
@@ -196,10 +197,9 @@ namespace MigrationTools._EngineV1.Clients
 
         public override void InnerConfigure(IMigrationClient migrationClient, bool bypassRules = true)
         {
-            _migrationClient = migrationClient;
             _config = MigrationClient.Config;
             _bypassRules = bypassRules ? WorkItemStoreFlags.BypassRules : WorkItemStoreFlags.None;
-            _wistore = GetWorkItemStore(_bypassRules);
+            _wistore = GetWorkItemStore();
             _project = migrationClient.WorkItems.GetProject();
         }
 
@@ -253,14 +253,14 @@ namespace MigrationTools._EngineV1.Clients
             return newFound[0];
         }
 
-        private WorkItemStore GetWorkItemStore(WorkItemStoreFlags bypassRules)
+        private WorkItemStore GetWorkItemStore()
         {
             var startTime = DateTime.UtcNow;
             var timer = System.Diagnostics.Stopwatch.StartNew();
             WorkItemStore store;
             try
             {
-                store = new WorkItemStore((TfsTeamProjectCollection)MigrationClient.InternalCollection, bypassRules);
+                store = new WorkItemStore((TfsTeamProjectCollection)MigrationClient.InternalCollection, _bypassRules);
                 timer.Stop();
                 Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", MigrationClient.Config.AsTeamProjectConfig().Collection.ToString(), "GetWorkItemStore", null, startTime, timer.Elapsed, "200", true));
             }

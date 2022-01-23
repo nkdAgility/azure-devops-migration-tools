@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools.DataContracts;
@@ -9,7 +10,8 @@ namespace MigrationTools._EngineV1.Clients
 {
     public class TfsWorkItemQuery : WorkItemQueryBase
     {
-        public TfsWorkItemQuery(IServiceProvider services, ITelemetryLogger telemetry) : base(services, telemetry)
+        public TfsWorkItemQuery(IServiceProvider services, ITelemetryLogger telemetry)
+            : base(services, telemetry)
         {
         }
 
@@ -20,7 +22,7 @@ namespace MigrationTools._EngineV1.Clients
             Telemetry.TrackEvent("WorkItemQuery.Execute", Parameters, null);
             Log.Debug("WorkItemQuery: TeamProjectCollection: {QueryTarget}", wiClient.Store.TeamProjectCollection.Uri.ToString());
             Log.Debug("WorkItemQuery: Query: {QueryText}", Query);
-            Log.Debug("WorkItemQuery: Paramiters: {@QueryParams}", Parameters);
+            Log.Debug("WorkItemQuery: Parameters: {@QueryParams}", Parameters);
             foreach (var item in Parameters)
             {
                 Log.Debug("WorkItemQuery: {0}: {1}", item.Key, item.Value);
@@ -28,7 +30,7 @@ namespace MigrationTools._EngineV1.Clients
             return GetWorkItemsFromQuery(wiClient).ToWorkItemDataList();
         }
 
-        public override List<MigrationTools.DataContracts.WorkItemData> GetWorkItems2()
+        public override List<WorkItemData> GetWorkItems2()
         {
             throw new NotImplementedException();
         }
@@ -36,13 +38,12 @@ namespace MigrationTools._EngineV1.Clients
         private IList<WorkItem> GetWorkItemsFromQuery(TfsWorkItemMigrationClient wiClient)
         {
             var startTime = DateTime.UtcNow;
-            var timer = System.Diagnostics.Stopwatch.StartNew();
-            List<WorkItem> results = new List<WorkItem>();
-            WorkItemCollection workItemCollection;
+            var timer = Stopwatch.StartNew();
+            var results = new List<WorkItem>();
             try
             {
                 Log.Debug("Query sent");
-                workItemCollection = wiClient.Store.Query(Query);
+                var workItemCollection = wiClient.Store.Query(Query);
                 Log.Debug("{0} Work items received, verifying", workItemCollection.Count);
                 foreach (WorkItem item in workItemCollection)
                 {

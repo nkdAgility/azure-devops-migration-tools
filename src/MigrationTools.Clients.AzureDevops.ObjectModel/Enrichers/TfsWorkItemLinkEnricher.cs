@@ -16,7 +16,8 @@ namespace MigrationTools.Enrichers
         private bool _filterWorkItemsThatAlreadyExistInTarget = true;
         private IMigrationEngine Engine;
 
-        public TfsWorkItemLinkEnricher(IServiceProvider services, ILogger<TfsWorkItemLinkEnricher> logger) : base(services, logger)
+        public TfsWorkItemLinkEnricher(IServiceProvider services, ILogger<TfsWorkItemLinkEnricher> logger)
+            : base(services, logger)
         {
             Engine = services.GetRequiredService<IMigrationEngine>();
         }
@@ -192,7 +193,7 @@ namespace MigrationTools.Enrichers
 
         private void CreateRelatedLink(WorkItemData wiSourceL, RelatedLink item, WorkItemData wiTargetL)
         {
-            RelatedLink rl = (RelatedLink)item;
+            RelatedLink rl = item;
             WorkItemData wiSourceR = null;
             WorkItemData wiTargetR = null;
 
@@ -211,7 +212,7 @@ namespace MigrationTools.Enrichers
                 }
                 try
                 {
-                    wiTargetR = GetRightHandSideTargetWi(wiSourceL, wiSourceR, wiTargetL);
+                    wiTargetR = GetRightHandSideTargetWi(wiSourceR, wiTargetL);
                 }
                 catch (Exception ex)
                 {
@@ -319,7 +320,7 @@ namespace MigrationTools.Enrichers
             }
         }
 
-        private WorkItemData GetRightHandSideTargetWi(WorkItemData wiSourceL, WorkItemData wiSourceR, WorkItemData wiTargetL)
+        private WorkItemData GetRightHandSideTargetWi(WorkItemData wiSourceR, WorkItemData wiTargetL)
         {
             WorkItemData wiTargetR;
             if (!(wiTargetL == null)
