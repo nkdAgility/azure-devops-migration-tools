@@ -47,7 +47,8 @@ namespace MigrationTools.Enrichers
         private TfsLanguageMapOptions _targetLanguageMaps;
         private string _targetProjectName;
 
-        public TfsNodeStructure(IServiceProvider services, ILogger<WorkItemProcessorEnricher> logger) : base(services, logger)
+        public TfsNodeStructure(IServiceProvider services, ILogger<TfsNodeStructure> logger)
+            : base(services, logger)
         {
         }
 
@@ -59,7 +60,7 @@ namespace MigrationTools.Enrichers
         [Obsolete("Old v1 arch: this is a v2 class", true)]
         public override void Configure(bool save = true, bool filter = true)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public override void Configure(IProcessorEnricherOptions options)
@@ -78,7 +79,7 @@ namespace MigrationTools.Enrichers
         [Obsolete("Old v1 arch: this is a v2 class", true)]
         public override int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public string GetNewNodeName(string sourceNodeName, TfsNodeStructureType nodeStructureType, string targetStructureName = null, string sourceStructureName = null)
@@ -195,7 +196,7 @@ namespace MigrationTools.Enrichers
         private NodeInfo CreateNode(string name, NodeInfo parent, DateTime? startDate, DateTime? finishDate)
         {
             string nodePath = string.Format(@"{0}\{1}", parent.Path, name);
-            NodeInfo node = null;
+            NodeInfo node;
             Log.LogInformation(" Processing Node: {0}, start date: {1}, finish date: {2}", nodePath, startDate, finishDate);
             try
             {
@@ -390,10 +391,9 @@ namespace MigrationTools.Enrichers
         {
             if (!_foundNodes.ContainsKey(nodePath))
             {
-                NodeInfo node = null;
                 try
                 {
-                    node = _targetCommonStructureService.GetNodeFromPath(nodePath);
+                    var node = _targetCommonStructureService.GetNodeFromPath(nodePath);
                     _foundNodes.Add(nodePath, true);
                 }
                 catch
