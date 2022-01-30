@@ -72,7 +72,7 @@ namespace MigrationTools.Processors.Tests
                             "WHERE [System.TeamProject] = @TeamProject " +
                                 "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan') " +
                             "ORDER BY [System.ChangedDate] desc",
-                    Paramiters = new Dictionary<string, string>() { { "TeamProject", project } }
+                    Parameters = new Dictionary<string, string>() { { "TeamProject", project } }
                 }
             };
         }

@@ -10,17 +10,13 @@ namespace VstsSyncMigrator._EngineV1.Processors
 {
     public abstract class StaticProcessorBase : MigrationTools._EngineV1.Containers.IProcessor
     {
-        internal IMigrationEngine _me;
-        private ProcessingStatus status = ProcessingStatus.None;
-        private readonly IServiceProvider _services;
+        protected IMigrationEngine Engine { get; }
+        protected IServiceProvider Services { get; }
 
-        public IMigrationEngine Engine { get { return _me; } }
-        public IServiceProvider Services { get { return _services; } }
-
-        public StaticProcessorBase(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<MigrationTools._EngineV1.Containers.IProcessor> logger)
+        public StaticProcessorBase(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<StaticProcessorBase> logger)
         {
-            _services = services;
-            _me = me;
+            Services = services;
+            Engine = me;
             Telemetry = telemetry;
             Log = logger;
         }
@@ -29,16 +25,10 @@ namespace VstsSyncMigrator._EngineV1.Processors
 
         public abstract string Name { get; }
 
-        public ProcessingStatus Status
-        {
-            get
-            {
-                return status;
-            }
-        }
+        public ProcessingStatus Status { get; private set; } = ProcessingStatus.None;
 
         public ITelemetryLogger Telemetry { get; }
-        public ILogger<MigrationTools._EngineV1.Containers.IProcessor> Log { get; }
+        public ILogger<StaticProcessorBase> Log { get; }
 
         public ProcessorType Type => ProcessorType.Legacy;
 
@@ -51,9 +41,9 @@ namespace VstsSyncMigrator._EngineV1.Processors
             //////////////////////////////////////////////////
             try
             {
-                status = ProcessingStatus.Running;
+                Status = ProcessingStatus.Running;
                 InternalExecute();
-                status = ProcessingStatus.Complete;
+                Status = ProcessingStatus.Complete;
                 executeTimer.Stop();
                 Telemetry.TrackEvent("ProcessingContextComplete",
                     new Dictionary<string, string> {
@@ -68,7 +58,7 @@ namespace VstsSyncMigrator._EngineV1.Processors
             }
             catch (Exception ex)
             {
-                status = ProcessingStatus.Failed;
+                Status = ProcessingStatus.Failed;
                 executeTimer.Stop();
                 Telemetry.TrackException(ex,
                       new Dictionary<string, string> {

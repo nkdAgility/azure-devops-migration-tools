@@ -17,7 +17,8 @@ namespace VstsSyncMigrator.Engine
     {
         private WorkItemUpdateAreasAsTagsConfig config;
 
-        public WorkItemUpdateAreasAsTagsContext(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<WorkItemUpdateAreasAsTagsContext> logger) : base(services, me, telemetry, logger)
+        public WorkItemUpdateAreasAsTagsContext(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<WorkItemUpdateAreasAsTagsContext> logger)
+            : base(services, me, telemetry, logger)
         {
         }
 

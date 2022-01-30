@@ -1,5 +1,4 @@
 ﻿using System;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
@@ -11,10 +10,11 @@ namespace MigrationTools.Processors
     /// </summary>
     public class TfsAreaAndIterationProcessor : Processor
     {
-        private TfsAreaAndIterationProcessorOptions _Options;
-        private TfsNodeStructure nodeStructureEnricher;
+        private TfsAreaAndIterationProcessorOptions _options;
+        private TfsNodeStructure _nodeStructureEnricher;
 
         public TfsAreaAndIterationProcessor(
+                            TfsNodeStructure tfsNodeStructure,
                             ProcessorEnricherContainer processorEnrichers,
                             IEndpointFactory endpointFactory,
                             IServiceProvider services,
@@ -22,13 +22,14 @@ namespace MigrationTools.Processors
                             ILogger<Processor> logger)
             : base(processorEnrichers, endpointFactory, services, telemetry, logger)
         {
+            _nodeStructureEnricher = tfsNodeStructure;
         }
 
         public override void Configure(IProcessorOptions options)
         {
             base.Configure(options);
             Log.LogInformation("TfsAreaAndIterationProcessor::Configure");
-            _Options = (TfsAreaAndIterationProcessorOptions)options;
+            _options = (TfsAreaAndIterationProcessorOptions)options;
         }
 
         protected override void InternalExecute()
@@ -36,9 +37,14 @@ namespace MigrationTools.Processors
             Log.LogInformation("Processor::InternalExecute::Start");
             EnsureConfigured();
             ProcessorEnrichers.ProcessorExecutionBegin(this);
-            nodeStructureEnricher = Services.GetRequiredService<TfsNodeStructure>();
-            nodeStructureEnricher.Configure(new TfsNodeStructureOptions() { Enabled = true, NodeBasePaths = _Options.NodeBasePaths, PrefixProjectToNodes = _Options.PrefixProjectToNodes });
-            nodeStructureEnricher.ProcessorExecutionBegin(null);
+            var nodeStructurOptions = new TfsNodeStructureOptions()
+                                        {
+                                            Enabled = true,
+                                            NodeBasePaths = _options.NodeBasePaths,
+                                            PrefixProjectToNodes = _options.PrefixProjectToNodes
+                                        };
+            _nodeStructureEnricher.Configure(nodeStructurOptions);
+            _nodeStructureEnricher.ProcessorExecutionBegin(null);
             ProcessorEnrichers.ProcessorExecutionEnd(this);
             Log.LogInformation("Processor::InternalExecute::End");
         }
@@ -46,17 +52,17 @@ namespace MigrationTools.Processors
         private void EnsureConfigured()
         {
             Log.LogInformation("Processor::EnsureConfigured");
-            if (_Options == null)
+            if (_options == null)
             {
                 throw new Exception("You must call Configure() first");
             }
-            if (Source is not TfsEndpoint)
+            if (Source is not TfsWorkItemEndpoint)
             {
-                throw new Exception("The Source endpoint configured must be of type TfsEndpoint");
+                throw new Exception("The Source endpoint configured must be of type TfsWorkItemEndpoint");
             }
-            if (Target is not TfsEndpoint)
+            if (Target is not TfsWorkItemEndpoint)
             {
-                throw new Exception("The Target endpoint configured must be of type TfsEndpoint");
+                throw new Exception("The Target endpoint configured must be of type TfsWorkItemEndpoint");
             }
         }
     }

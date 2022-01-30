@@ -57,6 +57,7 @@ namespace MigrationTools
             context.AddTransient<IMigrationClient, TfsMigrationClient>();
             context.AddTransient<IWorkItemMigrationClient, TfsWorkItemMigrationClient>();
             context.AddTransient<ITestPlanMigrationClient, TfsTestPlanMigrationClient>();
+            context.AddTransient<IWorkItemQueryBuilderFactory, WorkItemQueryBuilderFactory>();
             context.AddTransient<IWorkItemQueryBuilder, WorkItemQueryBuilder>();
             context.AddTransient<IWorkItemQuery, TfsWorkItemQuery>();
         }

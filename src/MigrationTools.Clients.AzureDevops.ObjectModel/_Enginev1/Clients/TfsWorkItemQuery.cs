@@ -10,8 +10,8 @@ namespace MigrationTools._EngineV1.Clients
 {
     public class TfsWorkItemQuery : WorkItemQueryBase
     {
-        public TfsWorkItemQuery(IServiceProvider services, ITelemetryLogger telemetry)
-            : base(services, telemetry)
+        public TfsWorkItemQuery(ITelemetryLogger telemetry)
+            : base(telemetry)
         {
         }
 
@@ -28,11 +28,6 @@ namespace MigrationTools._EngineV1.Clients
                 Log.Debug("WorkItemQuery: {0}: {1}", item.Key, item.Value);
             }
             return GetWorkItemsFromQuery(wiClient).ToWorkItemDataList();
-        }
-
-        public override List<WorkItemData> GetWorkItems2()
-        {
-            throw new NotImplementedException();
         }
 
         private IList<WorkItem> GetWorkItemsFromQuery(TfsWorkItemMigrationClient wiClient)

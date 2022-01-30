@@ -44,7 +44,7 @@ namespace MigrationTools.Endpoints
         public IEnumerable<WorkItemData> GetWorkItems(QueryOptions query)
         {
             Log.LogDebug("TfsWorkItemEndPoint::GetWorkItems(query)");
-            var wis = TfsStore.Query(query.Query, query.Paramiters);
+            var wis = TfsStore.Query(query.Query, query.Parameters);
             return ToWorkItemDataList(wis);
         }
 
