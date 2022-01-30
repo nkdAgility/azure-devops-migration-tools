@@ -65,11 +65,11 @@ namespace MigrationTools.Processors
             {
                 throw new Exception("You must call Configure() first");
             }
-            if (Source is not IWorkItemEndpoint)
+            if (Source is not IEndpoint)
             {
                 throw new Exception("The Source endpoint configured must be of type IWorkItemEndpoint");
             }
-            if (Target is not IWorkItemEndpoint)
+            if (Target is not IEndpoint)
             {
                 throw new Exception("The Target endpoint configured must be of type IWorkItemEndpoint");
             }

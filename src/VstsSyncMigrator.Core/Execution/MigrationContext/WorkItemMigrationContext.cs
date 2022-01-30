@@ -11,7 +11,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Proxy;
-using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using MigrationTools;
 using MigrationTools._EngineV1.Clients;
 using MigrationTools._EngineV1.Configuration;
@@ -34,10 +33,9 @@ namespace VstsSyncMigrator.Engine
         private static int _current = 0;
         private static long _elapsedms = 0;
         private static int _totalWorkItem = 0;
-        private static string workItemLogTeamplate = "[{sourceWorkItemTypeName,20}][Complete:{currentWorkItem,6}/{totalWorkItems}][sid:{sourceWorkItemId,6}|Rev:{sourceRevisionInt,3}][tid:{targetWorkItemId,6} | ";
+        private static string workItemLogTemplate = "[{sourceWorkItemTypeName,20}][Complete:{currentWorkItem,6}/{totalWorkItems}][sid:{sourceWorkItemId,6}|Rev:{sourceRevisionInt,3}][tid:{targetWorkItemId,6} | ";
         private WorkItemMigrationConfig _config;
         private List<string> _ignore;
-        private WorkItemTrackingHttpClient _witClient;
 
         private ILogger contextLog;
         private IAttachmentMigrationEnricher attachmentEnricher;
@@ -51,7 +49,8 @@ namespace VstsSyncMigrator.Engine
         private TfsWorkItemLinkEnricher workItemLinkEnricher;
         private ILogger workItemLog;
 
-        public WorkItemMigrationContext(IMigrationEngine engine, IServiceProvider services, ITelemetryLogger telemetry, ILogger<WorkItemMigrationContext> logger) : base(engine, services, telemetry, logger)
+        public WorkItemMigrationContext(IMigrationEngine engine, IServiceProvider services, ITelemetryLogger telemetry, ILogger<WorkItemMigrationContext> logger)
+            : base(engine, services, telemetry, logger)
         {
             contextLog = Serilog.Log.ForContext<WorkItemMigrationContext>();
         }
@@ -73,7 +72,7 @@ namespace VstsSyncMigrator.Engine
                     workItemLog = workItemLog.ForContext(item.Key, item.Value);
                 }
             }
-            workItemLog.Write(level, workItemLogTeamplate + message);
+            workItemLog.Write(level, workItemLogTemplate + message);
         }
 
         protected override void InternalExecute()
@@ -96,7 +95,6 @@ namespace VstsSyncMigrator.Engine
             revisionManager.Configure(new TfsRevisionManagerOptions() { Enabled = true, MaxRevisions = _config.MaxRevisions, ReplayRevisions = _config.ReplayRevisions });
 
 
-            _witClient = new WorkItemTrackingHttpClient(Engine.Target.Config.AsTeamProjectConfig().Collection, Engine.Target.Credentials);
             //Validation: make sure that the ReflectedWorkItemId field name specified in the config exists in the target process, preferably on each work item type.
             PopulateIgnoreList();
 
@@ -334,7 +332,7 @@ namespace VstsSyncMigrator.Engine
                     if (targetWorkItem == null)
                     {
                         targetWorkItem = ReplayRevisions(revisionsToMigrate, sourceWorkItem, null);
-                            AddMetric("Revisions", processWorkItemMetrics, revisionsToMigrate.Count);
+                        AddMetric("Revisions", processWorkItemMetrics, revisionsToMigrate.Count);
                     }
                     else
                     {

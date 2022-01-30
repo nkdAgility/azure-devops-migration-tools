@@ -11,16 +11,14 @@ namespace MigrationTools._EngineV1.Clients
         private Dictionary<string, WorkItemData> _Cache = new Dictionary<string, WorkItemData>();
         private IMigrationClient _migrationClient;
 
-        public WorkItemMigrationClientBase(IServiceProvider services, ITelemetryLogger telemetry)
+        public WorkItemMigrationClientBase(ITelemetryLogger telemetry)
         {
-            Services = services;
             Telemetry = telemetry;
         }
 
         public abstract IMigrationClientConfig Config { get; }
         public abstract ProjectData Project { get; }
         protected IMigrationClient MigrationClient { get { return _migrationClient; } }
-        protected IServiceProvider Services { get; }
         protected ITelemetryLogger Telemetry { get; }
 
         public void Configure(IMigrationClient migrationClient, bool bypassRules = true)
@@ -57,7 +55,7 @@ namespace MigrationTools._EngineV1.Clients
 
         public abstract List<WorkItemData> GetWorkItems(IWorkItemQueryBuilder queryBuilder);
 
-        public abstract void InnerConfigure(IMigrationClient migrationClient, bool bypassRules = true);
+        protected abstract void InnerConfigure(IMigrationClient migrationClient, bool bypassRules = true);
 
         public abstract WorkItemData PersistWorkItem(WorkItemData workItem);
 

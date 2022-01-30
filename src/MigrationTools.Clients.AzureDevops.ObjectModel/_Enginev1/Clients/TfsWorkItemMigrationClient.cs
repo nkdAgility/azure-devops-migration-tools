@@ -15,14 +15,16 @@ namespace MigrationTools._EngineV1.Clients
 {
     public class TfsWorkItemMigrationClient : WorkItemMigrationClientBase
     {
+        private readonly IWorkItemQueryBuilderFactory _workItemQueryBuilderFactory;
         private WorkItemStoreFlags _bypassRules;
         private IMigrationClientConfig _config;
         private ProjectData _project;
         private WorkItemStore _wistore;
 
-        public TfsWorkItemMigrationClient(IServiceProvider services, ITelemetryLogger telemetry)
-            : base(services, telemetry)
+        public TfsWorkItemMigrationClient(IWorkItemQueryBuilderFactory workItemQueryBuilderFactory, ITelemetryLogger telemetry)
+            : base(telemetry)
         {
+            _workItemQueryBuilderFactory = workItemQueryBuilderFactory;
         }
 
         public override IMigrationClientConfig Config => _config;
@@ -34,8 +36,10 @@ namespace MigrationTools._EngineV1.Clients
             return new TfsReflectedWorkItemId(workItem);
         }
 
-        public List<WorkItemData> FilterExistingWorkItems(List<WorkItemData> sourceWorkItems,
-            TfsWiqlDefinition wiqlDefinition, TfsWorkItemMigrationClient sourceWorkItemMigrationClient)
+        public List<WorkItemData> FilterExistingWorkItems(
+            List<WorkItemData> sourceWorkItems,
+            TfsWiqlDefinition wiqlDefinition,
+            TfsWorkItemMigrationClient sourceWorkItemMigrationClient)
         {
             Log.Debug("FilterExistingWorkItems: START | ");
 
@@ -44,8 +48,7 @@ namespace MigrationTools._EngineV1.Clients
                     @"SELECT [System.Id], [{0}] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {1} ORDER BY {2}",
                      _config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName,
                     wiqlDefinition.QueryBit,
-                    wiqlDefinition.OrderBit
-                    );
+                    wiqlDefinition.OrderBit);
 
             Log.Debug("FilterByTarget: Query Execute...");
             var targetFoundItems = GetWorkItems(targetQuery);
@@ -84,12 +87,12 @@ namespace MigrationTools._EngineV1.Clients
 
         public override WorkItemData FindReflectedWorkItemByReflectedWorkItemId(string refId)
         {
-            IWorkItemQueryBuilder wiqb = Services.GetRequiredService<IWorkItemQueryBuilder>();
-            StringBuilder queryBuilder = FindReflectedWorkItemQueryBase(wiqb);
+            var workItemQueryBuilder = _workItemQueryBuilderFactory.Create();
+            StringBuilder queryBuilder = FindReflectedWorkItemQueryBase(workItemQueryBuilder);
             queryBuilder.AppendFormat("[{0}] = @idToFind", MigrationClient.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName);
-            wiqb.AddParameter("idToFind", refId.ToString());
-            wiqb.Query = queryBuilder.ToString();
-            return FindWorkItemByQuery(wiqb);
+            workItemQueryBuilder.AddParameter("idToFind", refId.ToString());
+            workItemQueryBuilder.Query = queryBuilder.ToString();
+            return FindWorkItemByQuery(workItemQueryBuilder);
         }
 
         public override ProjectData GetProject()
@@ -184,7 +187,7 @@ namespace MigrationTools._EngineV1.Clients
 
         public override List<WorkItemData> GetWorkItems(string WIQLQuery)
         {
-            IWorkItemQueryBuilder wiqb = Services.GetRequiredService<IWorkItemQueryBuilder>();
+            var wiqb = _workItemQueryBuilderFactory.Create();
             wiqb.Query = WIQLQuery;
             return GetWorkItems(wiqb);
         }
@@ -195,7 +198,7 @@ namespace MigrationTools._EngineV1.Clients
             return queryBuilder.BuildWIQLQuery(MigrationClient).GetWorkItems();
         }
 
-        public override void InnerConfigure(IMigrationClient migrationClient, bool bypassRules = true)
+        protected override void InnerConfigure(IMigrationClient migrationClient, bool bypassRules = true)
         {
             _config = MigrationClient.Config;
             _bypassRules = bypassRules ? WorkItemStoreFlags.BypassRules : WorkItemStoreFlags.None;
@@ -213,7 +216,7 @@ namespace MigrationTools._EngineV1.Clients
             var foundWorkItem = GetFromCache(refId);
             if (foundWorkItem is null)
             {
-                IWorkItemQueryBuilder wiqb = Services.GetRequiredService<IWorkItemQueryBuilder>();
+                var wiqb = _workItemQueryBuilderFactory.Create();
                 wiqb.Query = string.Format(@"SELECT [System.Id] FROM WorkItems  WHERE [System.TeamProject]=@TeamProject AND [{0}] = '@idToFind'", MigrationClient.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName);
                 wiqb.AddParameter("idToFind", refId.ToString());
                 wiqb.AddParameter("TeamProject", MigrationClient.Config.AsTeamProjectConfig().Project);
