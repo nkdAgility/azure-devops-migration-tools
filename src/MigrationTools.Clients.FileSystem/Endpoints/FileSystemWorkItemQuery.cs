@@ -27,18 +27,13 @@ namespace MigrationTools.Endpoints
 
         public List<WorkItemData> GetWorkItems()
         {
-            throw new InvalidOperationException();
-        }
-
-        public List<DataContracts.WorkItemData> GetWorkItems2()
-        {
-            List<DataContracts.WorkItemData> workItems = new List<DataContracts.WorkItemData>();
+            var workItems = new List<WorkItemData>();
 
             var workitemFiles = System.IO.Directory.GetFiles(_query);
             foreach (var item in workitemFiles)
             {
                 var contents = System.IO.File.ReadAllText(item);
-                var workItem = JsonConvert.DeserializeObject<DataContracts.WorkItemData>(contents);
+                var workItem = JsonConvert.DeserializeObject<WorkItemData>(contents);
                 workItems.Add(workItem);
             }
 

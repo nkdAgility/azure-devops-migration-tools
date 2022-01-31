@@ -19,7 +19,8 @@ namespace VstsSyncMigrator.Engine
     {
         private WorkItemPostProcessingConfig _config;
 
-        public WorkItemPostProcessingContext(IMigrationEngine engine, IServiceProvider services, ITelemetryLogger telemetry, ILogger<WorkItemPostProcessingContext> logger) : base(engine, services, telemetry, logger)
+        public WorkItemPostProcessingContext(IMigrationEngine engine, IServiceProvider services, ITelemetryLogger telemetry, ILogger<WorkItemPostProcessingContext> logger)
+            : base(engine, services, telemetry, logger)
         {
         }
 
@@ -40,12 +41,13 @@ namespace VstsSyncMigrator.Engine
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
             //////////////////////////////////////////////////
-            IWorkItemQueryBuilder wiqb = Services.GetRequiredService<IWorkItemQueryBuilder>();
+            var wiqbFactory = Services.GetRequiredService<IWorkItemQueryBuilderFactory>();
+            var wiqb = wiqbFactory.Create();
             //Builds the constraint part of the query
             string constraints = BuildQueryBitConstraints();
             wiqb.Query = string.Format(@"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY [System.Id] ", constraints);
 
-            List<WorkItemData> sourceWIS = Engine.Target.WorkItems.GetWorkItems((IWorkItemQueryBuilder)wiqb);
+            List<WorkItemData> sourceWIS = Engine.Target.WorkItems.GetWorkItems(wiqb);
             Log.LogInformation("Migrate {0} work items?", sourceWIS.Count);
             //////////////////////////////////////////////////
             ProjectData destProject = Engine.Target.WorkItems.GetProject();
@@ -58,7 +60,7 @@ namespace VstsSyncMigrator.Engine
             {
                 Stopwatch witstopwatch = Stopwatch.StartNew();
                 WorkItemData targetFound;
-                targetFound = Engine.Target.WorkItems.FindReflectedWorkItem((WorkItemData)sourceWI, (bool)false);
+                targetFound = Engine.Target.WorkItems.FindReflectedWorkItem(sourceWI, false);
                 Log.LogInformation("{0} - Updating: {1}-{2}", current, sourceWI.Id, sourceWI.Type);
                 if (targetFound == null)
                 {
@@ -128,7 +130,7 @@ namespace VstsSyncMigrator.Engine
                 }
             }
 
-            if (!String.IsNullOrEmpty(_config.WIQLQueryBit))
+            if (!string.IsNullOrEmpty(_config.WIQLQueryBit))
             {
                 constraints += _config.WIQLQueryBit;
             }

@@ -33,7 +33,7 @@ namespace MigrationTools.Processors
 
         public ProcessorEnricherContainer ProcessorEnrichers { get; }
 
-        public string Name { get { return this.GetType().Name; } }
+        public string Name { get { return GetType().Name; } }
 
         public ProcessingStatus Status { get; private set; } = ProcessingStatus.None;
         protected IServiceProvider Services { get; }
@@ -130,7 +130,7 @@ namespace MigrationTools.Processors
             finally
             {
                 Log.LogInformation("{ProcessorName} completed in {ProcessorDuration} ", Name, executeTimer.Elapsed.ToString("c"));
-                Telemetry.TrackRequest(this.Name, start, executeTimer.Elapsed, Status.ToString(), (Status == ProcessingStatus.Complete));
+                Telemetry.TrackRequest(Name, start, executeTimer.Elapsed, Status.ToString(), (Status == ProcessingStatus.Complete));
             }
         }
 

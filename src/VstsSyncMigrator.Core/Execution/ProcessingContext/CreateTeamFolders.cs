@@ -15,7 +15,8 @@ namespace VstsSyncMigrator.Engine
 {
     public class CreateTeamFolders : StaticProcessorBase
     {
-        public CreateTeamFolders(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<CreateTeamFolders> logger) : base(services, me, telemetry, logger)
+        public CreateTeamFolders(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<CreateTeamFolders> logger)
+            : base(services, me, telemetry, logger)
         {
         }
 
@@ -66,7 +67,7 @@ namespace VstsSyncMigrator.Engine
 
                 string[] bits = path.Split(char.Parse(@"\"));
 
-                CreateFolderHyerarchy(bits, qh["Shared Queries"]);
+                CreateFolderHierarchy(bits, qh["Shared Queries"]);
 
                 //_me.ApplyFieldMappings(workitem);
                 qh.Save();
@@ -84,7 +85,7 @@ namespace VstsSyncMigrator.Engine
             Log.LogInformation("DONE in {Elapsed} ", stopwatch.Elapsed.ToString("c"));
         }
 
-        private void CreateFolderHyerarchy(string[] toCreate, QueryItem currentItem, int focus = 0)
+        private void CreateFolderHierarchy(string[] toCreate, QueryItem currentItem, int focus = 0)
         {
             if (currentItem is QueryFolder)
             {
@@ -97,7 +98,7 @@ namespace VstsSyncMigrator.Engine
                 }
                 if (toCreate.Length != focus + 1)
                 {
-                    CreateFolderHyerarchy(toCreate, currentFolder[toCreate[focus]], focus + 1);
+                    CreateFolderHierarchy(toCreate, currentFolder[toCreate[focus]], focus + 1);
                 }
             }
         }

@@ -11,16 +11,14 @@ namespace MigrationTools._EngineV1.Clients
         private Dictionary<string, string> _Parameters;
         private IMigrationClient _MigrationClient;
 
-        public WorkItemQueryBase(IServiceProvider services, ITelemetryLogger telemetry)
+        public WorkItemQueryBase(ITelemetryLogger telemetry)
         {
-            Services = services;
             Telemetry = telemetry;
         }
 
         public string Query { get { return _Query; } }
         protected Dictionary<string, string> Parameters { get { return _Parameters; } }
         protected IMigrationClient MigrationClient { get { return _MigrationClient; } }
-        protected IServiceProvider Services { get; }
         protected ITelemetryLogger Telemetry { get; }
 
         public void Configure(IMigrationClient migrationClient, string query, Dictionary<string, string> parameters)
@@ -31,7 +29,5 @@ namespace MigrationTools._EngineV1.Clients
         }
 
         public abstract List<WorkItemData> GetWorkItems();
-
-        public abstract List<MigrationTools.DataContracts.WorkItemData> GetWorkItems2();
     }
 }
