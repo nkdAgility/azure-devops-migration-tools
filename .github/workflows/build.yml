@@ -54,3 +54,7 @@ jobs:
 
     - name: dotnet test (L?) - tests with No Catagory
       run: dotnet test  --configuration ${{ env.Configuration }} --collect "Code coverage" --no-build --filter "(TestCategory!=L0&TestCategory!=L1&TestCategory!=L2&TestCategory!=L3)"
+
+    - name: Copy files
+      run: |
+        mkdir artifacts/MigrationTools
