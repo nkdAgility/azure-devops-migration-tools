@@ -28,6 +28,7 @@ jobs:
       uses: gittools/actions/gitversion/execute@v0.9.7
       with:
         useConfigFile: true
+        configFilePath: GitVersion2.yml
 
     - name: Setup dotnet
       uses: actions/setup-dotnet@v1
@@ -42,8 +43,14 @@ jobs:
     - name: Install dependencies
       run: dotnet restore
 
-    - name: Build
+    - name: dotnet build
       run: dotnet build --configuration ${{ env.Configuration }} --no-restore
 
-    - name: Test
-      run: dotnet test --configuration ${{ env.Configuration }} --no-build --verbosity normal
+    - name: dotnet test (L0 & L1)
+      run: dotnet test  --configuration ${{ env.Configuration }} --collect "Code coverage" --no-build --filter (TestCategory=L0|TestCategory=L1)
+
+    - name: dotnet test (L2 & L3)
+      run: dotnet test  --configuration ${{ env.Configuration }} --collect "Code coverage" --no-build --filter (TestCategory=L2|TestCategory=L3)
+
+    - name: dotnet test (L?) - tests with No Catagory
+      run: dotnet test  --configuration ${{ env.Configuration }} --collect "Code coverage" --no-build --filter (TestCategory!=L0&TestCategory!=L1&TestCategory!=L2&TestCategory!=L3)
