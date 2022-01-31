@@ -40,17 +40,17 @@ jobs:
       with:
         dotnet-version: '5.0.x'
 
-    - name: Install dependencies
+    - name: dotnet restore
       run: dotnet restore
 
     - name: dotnet build
       run: dotnet build --configuration ${{ env.Configuration }} --no-restore
 
     - name: dotnet test (L0 & L1)
-      run: dotnet test  --configuration ${{ env.Configuration }} --collect "Code coverage" --no-build --filter (TestCategory=L0|TestCategory=L1)
+      run: dotnet test  --configuration ${{ env.Configuration }} --collect "Code coverage" --no-build --filter "(TestCategory=L0|TestCategory=L1)"
 
     - name: dotnet test (L2 & L3)
-      run: dotnet test  --configuration ${{ env.Configuration }} --collect "Code coverage" --no-build --filter (TestCategory=L2|TestCategory=L3)
+      run: dotnet test  --configuration ${{ env.Configuration }} --collect "Code coverage" --no-build --filter "(TestCategory=L2|TestCategory=L3)"
 
     - name: dotnet test (L?) - tests with No Catagory
-      run: dotnet test  --configuration ${{ env.Configuration }} --collect "Code coverage" --no-build --filter (TestCategory!=L0&TestCategory!=L1&TestCategory!=L2&TestCategory!=L3)
+      run: dotnet test  --configuration ${{ env.Configuration }} --collect "Code coverage" --no-build --filter "(TestCategory!=L0&TestCategory!=L1&TestCategory!=L2&TestCategory!=L3)"
