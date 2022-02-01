@@ -1,0 +1,60 @@
+name: Build
+
+on:
+  push:
+    branches:
+    - '**'
+  pull_request:
+    branches:
+    - master
+env:
+  Configuration: Release
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Install GitVersion
+      uses: gittools/actions/gitversion/setup@v0.9.7
+      with:
+        versionSpec: '5.x'
+
+    - name: Determine Version
+      uses: gittools/actions/gitversion/execute@v0.9.7
+      with:
+        useConfigFile: true
+        configFilePath: GitVersion2.yml
+
+    - name: Setup dotnet
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '3.1.x'
+
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '5.0.x'
+
+    - name: dotnet restore
+      run: dotnet restore
+
+    - name: dotnet build
+      run: dotnet build --configuration ${{ env.Configuration }} --no-restore
+
+    - name: dotnet test (L0 & L1)
+      run: dotnet test  --configuration ${{ env.Configuration }} --collect "Code coverage" --no-build --filter "(TestCategory=L0|TestCategory=L1)"
+
+    - name: dotnet test (L2 & L3)
+      run: dotnet test  --configuration ${{ env.Configuration }} --collect "Code coverage" --no-build --filter "(TestCategory=L2|TestCategory=L3)"
+
+    - name: dotnet test (L?) - tests with No Catagory
+      run: dotnet test  --configuration ${{ env.Configuration }} --collect "Code coverage" --no-build --filter "(TestCategory!=L0&TestCategory!=L1&TestCategory!=L2&TestCategory!=L3)"
+
+    - name: Copy files
+      run: |
+        mkdir artifacts/MigrationTools
