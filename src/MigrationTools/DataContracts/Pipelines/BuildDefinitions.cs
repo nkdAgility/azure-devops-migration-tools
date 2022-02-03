@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using Microsoft.VisualStudio.Services.Common;
+using Newtonsoft.Json;
 
 namespace MigrationTools.DataContracts.Pipelines
 {
@@ -88,7 +89,7 @@ namespace MigrationTools.DataContracts.Pipelines
 
         public override bool HasTaskGroups()
         {
-            return Process.Phases.Any(p => p.Steps.Any(s => s.Task.DefinitionType.ToString() == "metaTask"));
+            return Process.Phases.Any(p => p.Steps.Any(s => s.Task.DefinitionType == "metaTask"));
         }
 
         public override bool HasVariableGroups()
@@ -171,8 +172,22 @@ namespace MigrationTools.DataContracts.Pipelines
     public partial class Process
     {
         public Phase[] Phases { get; set; } = new Phase[] { };
+        
+        public string YamlFilename { get; set; }
 
         public int Type { get; set; }
+
+        /// <summary>
+        /// If the value is set, then serialize it, if it isn't don't
+        /// </summary>
+        /// <returns>bool on if the YamlFilename should be serialized.</returns>
+        public bool ShouldSerializeYamlFilename() => this.Type == 2;
+
+        /// <summary>
+        /// If the type is 1 then this is a classis pipeline, so the phases should be serialized.
+        /// </summary>
+        /// <returns>bool on if the Phases should be serialized.</returns>
+        public bool ShouldSerializePhases() => this.Type == 1;
     }
 
     public partial class Phase
