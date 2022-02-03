@@ -170,14 +170,14 @@ namespace MigrationTools.DataContracts.Pipelines
 
     public partial class Process
     {
-        public Phase[] Phases { get; set; }
+        public Phase[] Phases { get; set; } = new Phase[] { };
 
         public int Type { get; set; }
     }
 
     public partial class Phase
     {
-        public Step[] Steps { get; set; }
+        public Step[] Steps { get; set; } = new Step[] { };
 
         public string Name { get; set; }
 
