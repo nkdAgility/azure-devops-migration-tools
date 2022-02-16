@@ -6,9 +6,9 @@ Azure DevOps Migration Tools enable migrating work item changesets with cross pr
 
 For a successful migration of work items changesets from TFVC to Git you need a mapping file with ChangeSetId - CommitId values. If you 
 have migrated your TFVC repository with [git-tfs](https://github.com/git-tfs/git-tfs) you can generate this file by using the following
-[command](https://github.com/git-tfs/git-tfs/blob/master/doc/commands/exportmap.md). Than start the migration with the mapping file:
+[command](https://github.com/git-tfs/git-tfs/blob/master/doc/commands/exportmap.md). Then you need to add following line to the config json file:
 
---changeSetMappingFile mappingFile
+"ChangeSetMappingFile": "C:\\git-tfs\\ChangeSetId-to-CommitId\\{mappingFile}",
 
 ### Migrate Changesets from TFVC to Git with external project links
 
@@ -25,6 +25,6 @@ changesets from Project B needs to move to the Git Repository of Project C. To a
 
 "GitRepoMapping": {"A" :"C","B" :"C"}
 
-3. Run the migration with following command
+3. Run the migration with configuration file that contain
 
-migration --config configFile --changeSetMappingFile mappingFile
+"ChangeSetMappingFile": "C:\\git-tfs\\ChangeSetId-to-CommitId\\{mappingFile}",
