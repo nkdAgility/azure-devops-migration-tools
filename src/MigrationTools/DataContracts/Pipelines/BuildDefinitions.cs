@@ -296,7 +296,7 @@ namespace MigrationTools.DataContracts.Pipelines
 
         public string DefaultBranch { get; set; }
 
-        public bool Clean { get; set; }
+        public bool Clean { get; set; } = true;
 
         public bool CheckoutSubmodules { get; set; }
     }
