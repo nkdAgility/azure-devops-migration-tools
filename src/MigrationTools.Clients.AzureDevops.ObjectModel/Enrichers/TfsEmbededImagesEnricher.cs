@@ -48,69 +48,102 @@ namespace MigrationTools.Enrichers
 
         protected override void FixEmbededImages(WorkItemData wi, string oldTfsurl, string newTfsurl, string sourcePersonalAccessToken = "")
         {
-            Log.LogInformation("EmbededImagesRepairEnricher: Fixing HTML field attachments for work item {Id} from {OldTfsurl} to {NewTfsUrl}", wi.Id, oldTfsurl, GetUrlWithOppositeSchema(oldTfsurl));
+            var logTypeName = nameof(TfsEmbededImagesEnricher);
+            Log.LogInformation($"{logTypeName}: Fixing HTML field attachments for work item {wi.Id} from {oldTfsurl} to {newTfsurl}");
 
             var oldTfsurlOppositeSchema = GetUrlWithOppositeSchema(oldTfsurl);
             string regExSearchForImageUrl = "(?<=<img.*src=\")[^\"]*";
 
             foreach (Field field in wi.ToWorkItem().Fields)
             {
-                if (field.FieldDefinition.FieldType == FieldType.Html)
+                if (field.FieldDefinition.FieldType != FieldType.Html && field.FieldDefinition.FieldType != FieldType.History)
+                {
+                    continue;
+                }
+
+                try
                 {
                     MatchCollection matches = Regex.Matches((string)field.Value, regExSearchForImageUrl);
 
                     string regExSearchFileName = "(?<=FileName=)[^=]*";
                     foreach (Match match in matches)
                     {
-                        if (match.Value.ToLower().Contains(oldTfsurl.ToLower()) || match.Value.ToLower().Contains(oldTfsurlOppositeSchema.ToLower()))
+                        if (!match.Value.ToLower().Contains(oldTfsurl.ToLower()) && !match.Value.ToLower().Contains(oldTfsurlOppositeSchema.ToLower()))
+                            continue;
+
+                        //save image locally and upload as attachment
+                        Match newFileNameMatch = Regex.Match(match.Value, regExSearchFileName, RegexOptions.IgnoreCase);
+                        if (!newFileNameMatch.Success)
+                            continue;
+
+                        Log.LogDebug($"{logTypeName}: field '{field.Name}' has match: {WebUtility.HtmlDecode(match.Value)}");
+                        string fullImageFilePath = Path.GetTempPath() + newFileNameMatch.Value;
+
+                        try
                         {
-                            //save image locally and upload as attachment
-                            Match newFileNameMatch = Regex.Match(match.Value, regExSearchFileName, RegexOptions.IgnoreCase);
-                            if (newFileNameMatch.Success)
+                            using (var httpClient = new HttpClient(_httpClientHandler, false))
                             {
-                                Log.LogDebug("EmbededImagesRepairEnricher: field '{fieldName}' has match: {matchValue}", field.Name, System.Net.WebUtility.HtmlDecode(match.Value));
-                                string fullImageFilePath = Path.GetTempPath() + newFileNameMatch.Value;
-
-                                using (var httpClient = new HttpClient(_httpClientHandler, false))
+                                if (!string.IsNullOrEmpty(sourcePersonalAccessToken))
                                 {
-                                    if (!string.IsNullOrEmpty(sourcePersonalAccessToken))
+                                    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(System.Text.ASCIIEncoding.ASCII.GetBytes(string.Format("{0}:{1}", "", sourcePersonalAccessToken))));
+                                }
+                                var result = DownloadFile(httpClient, match.Value, fullImageFilePath);
+                                if (!result.IsSuccessStatusCode)
+                                {
+                                    if (_ignore404Errors && result.StatusCode == HttpStatusCode.NotFound)
                                     {
-                                        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(System.Text.ASCIIEncoding.ASCII.GetBytes(string.Format("{0}:{1}", "", sourcePersonalAccessToken))));
+                                        Log.LogDebug($"{logTypeName}: Image {match.Value} could not be found in WorkItem {wi.Id}, Field {field.Name}");
+                                        continue;
                                     }
-                                    var result = DownloadFile(httpClient, match.Value, fullImageFilePath);
-                                    if (!result.IsSuccessStatusCode)
+                                    else
                                     {
-                                        if (_ignore404Errors && result.StatusCode == HttpStatusCode.NotFound)
-                                        {
-                                            Log.LogDebug("EmbededImagesRepairEnricher: Image {MatchValue} could not be found in WorkItem {WorkItemId}, Field {FieldName}", match.Value, wi.Id, field.Name);
-                                            continue;
-                                        }
-                                        else
-                                        {
-                                            result.EnsureSuccessStatusCode();
-                                        }
+                                        result.EnsureSuccessStatusCode();
                                     }
                                 }
-
-                                if (GetImageFormat(File.ReadAllBytes(fullImageFilePath)) == ImageFormat.unknown)
-                                {
-                                    throw new Exception($"Downloaded image [{fullImageFilePath}] from Work Item [{wi.ToWorkItem().Id}] Field: [{field.Name}] could not be identified as an image. Authentication issue?");
-                                }
-
-                                int attachmentIndex = wi.ToWorkItem().Attachments.Add(new Attachment(fullImageFilePath));
-                                wi.SaveToAzureDevOps();
-
-                                var newImageLink = wi.ToWorkItem().Attachments[attachmentIndex].Uri.ToString();
-
-                                field.Value = field.Value.ToString().Replace(match.Value, newImageLink);
-                                wi.ToWorkItem().Attachments.RemoveAt(attachmentIndex);
-                                wi.SaveToAzureDevOps();
-                                File.Delete(fullImageFilePath);
                             }
+
+                            if (GetImageFormat(File.ReadAllBytes(fullImageFilePath)) == ImageFormat.unknown)
+                            {
+                                throw new Exception($"{logTypeName}: Downloaded image [{fullImageFilePath}] from Work Item [{wi.ToWorkItem().Id}] Field: [{field.Name}] could not be identified as an image. Authentication issue?");
+                            }
+
+                            var attachmentInfo = new Microsoft.TeamFoundation.WorkItemTracking.Internals.AttachmentInfo(fullImageFilePath);
+                            wi.ToWorkItem().UploadAttachment(attachmentInfo);
+
+                            if (attachmentInfo.IsUploaded)
+                            {
+                                var newImageLink = BuildAttachmentUrl(attachmentInfo);
+                                field.Value = field.Value.ToString().Replace(match.Value, newImageLink);
+                            }
+                            else
+                            {
+                                throw new Exception($"{logTypeName}: Unable to upload the image [{fullImageFilePath}] to Work Item [{wi.ToWorkItem().Id}] Field: [{field.Name}].");
+                            }
+                        }
+                        finally
+                        {
+                            if (File.Exists(fullImageFilePath))
+                                File.Delete(fullImageFilePath);
                         }
                     }
                 }
+                catch (Exception ex)
+                {
+                    Log.LogError(ex, $"{logTypeName}: Unable to fix HTML field attachments for work item {wi.Id} from {oldTfsurl} to {newTfsurl}");
+                }
             }
+        }
+
+        private string BuildAttachmentUrl(Microsoft.TeamFoundation.WorkItemTracking.Internals.AttachmentInfo attachmentInfo)
+        {
+            //https://{instance}/{collection}/{project}/_apis/wit/attachments/{id}?fileName={fileName}
+
+            var project = Engine.Target.WorkItems.Project.ToProject();
+            var config = Engine.Target.Config.AsTeamProjectConfig();
+
+            var uri = new UriBuilder(config.Collection);
+            uri.Path += $"{project.Guid}/_apis/wit/attachments/{attachmentInfo.Path}?fileName={attachmentInfo.FileInfo.Name}";
+            return uri.ToString();
         }
 
         protected override void RefreshForProcessorType(IProcessor processor)

@@ -340,6 +340,7 @@ namespace VstsSyncMigrator.Engine
                         {
                             ProcessWorkItemAttachments(sourceWorkItem, targetWorkItem, false);
                             ProcessWorkItemLinks(Engine.Source.WorkItems, Engine.Target.WorkItems, sourceWorkItem, targetWorkItem);
+                            ProcessHTMLFieldAttachements(targetWorkItem);
                             TraceWriteLine(LogEventLevel.Information, "Skipping as work item exists and no revisions to sync detected");
                             processWorkItemMetrics.Add("Revisions", 0);
                         }
@@ -357,10 +358,7 @@ namespace VstsSyncMigrator.Engine
                         }
                     }
                     AddParameter("TargetWorkItem", processWorkItemParamiters, targetWorkItem.ToWorkItem().Revisions.Count.ToString());
-                    ///////////////////////////////////////////////
-                    ProcessHTMLFieldAttachements(targetWorkItem);
-                    ///////////////////////////////////////////////
-                    ///////////////////////////////////////////////////////
+
                     if (targetWorkItem != null && targetWorkItem.ToWorkItem().IsDirty)
                     {
                         targetWorkItem.SaveToAzureDevOps();
@@ -517,6 +515,8 @@ namespace VstsSyncMigrator.Engine
                         throw ex;
                     }
                     targetWorkItem.ToWorkItem().Fields[Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName].Value = reflectedUri.ToString();
+
+                    ProcessHTMLFieldAttachements(targetWorkItem);
 
                     targetWorkItem.SaveToAzureDevOps();
                     TraceWriteLine(LogEventLevel.Information,
