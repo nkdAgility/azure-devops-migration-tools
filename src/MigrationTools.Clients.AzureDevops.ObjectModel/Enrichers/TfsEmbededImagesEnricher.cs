@@ -52,7 +52,8 @@ namespace MigrationTools.Enrichers
             Log.LogInformation($"{logTypeName}: Fixing HTML field attachments for work item {wi.Id} from {oldTfsurl} to {newTfsurl}");
 
             var oldTfsurlOppositeSchema = GetUrlWithOppositeSchema(oldTfsurl);
-            string regExSearchForImageUrl = "(?<=<img.*src=\")[^\"]*";
+            const string regExSearchForImageUrl = "(?<=<img.*src=\")[^\"]*";
+            const string regExSearchFileName = "(?<=FileName=)[^=]*";
 
             foreach (Field field in wi.ToWorkItem().Fields)
             {
@@ -65,7 +66,6 @@ namespace MigrationTools.Enrichers
                 {
                     MatchCollection matches = Regex.Matches((string)field.Value, regExSearchForImageUrl);
 
-                    string regExSearchFileName = "(?<=FileName=)[^=]*";
                     foreach (Match match in matches)
                     {
                         if (!match.Value.ToLower().Contains(oldTfsurl.ToLower()) && !match.Value.ToLower().Contains(oldTfsurlOppositeSchema.ToLower()))
