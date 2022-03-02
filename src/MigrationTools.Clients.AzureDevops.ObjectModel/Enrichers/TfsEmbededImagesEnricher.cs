@@ -15,6 +15,9 @@ namespace MigrationTools.Enrichers
 {
     public class TfsEmbededImagesEnricher : EmbededImagesRepairEnricherBase
     {
+        private const string RegexPatternForImageUrl = "(?<=<img.*src=\")[^\"]*";
+        private const string RegexPatternForImageFileName = "(?<=FileName=)[^=]*";
+
         public IMigrationEngine Engine { get; private set; }
 
         public TfsEmbededImagesEnricher(IServiceProvider services, ILogger<TfsEmbededImagesEnricher> logger) : base(services, logger)
@@ -52,27 +55,22 @@ namespace MigrationTools.Enrichers
             Log.LogInformation($"{logTypeName}: Fixing HTML field attachments for work item {wi.Id} from {oldTfsurl} to {newTfsurl}");
 
             var oldTfsurlOppositeSchema = GetUrlWithOppositeSchema(oldTfsurl);
-            const string regExSearchForImageUrl = "(?<=<img.*src=\")[^\"]*";
-            const string regExSearchFileName = "(?<=FileName=)[^=]*";
-
+            
             foreach (Field field in wi.ToWorkItem().Fields)
             {
                 if (field.FieldDefinition.FieldType != FieldType.Html && field.FieldDefinition.FieldType != FieldType.History)
-                {
                     continue;
-                }
 
                 try
                 {
-                    MatchCollection matches = Regex.Matches((string)field.Value, regExSearchForImageUrl);
-
+                    MatchCollection matches = Regex.Matches((string)field.Value, RegexPatternForImageUrl);
                     foreach (Match match in matches)
                     {
                         if (!match.Value.ToLower().Contains(oldTfsurl.ToLower()) && !match.Value.ToLower().Contains(oldTfsurlOppositeSchema.ToLower()))
                             continue;
 
                         //save image locally and upload as attachment
-                        Match newFileNameMatch = Regex.Match(match.Value, regExSearchFileName, RegexOptions.IgnoreCase);
+                        Match newFileNameMatch = Regex.Match(match.Value, RegexPatternForImageFileName, RegexOptions.IgnoreCase);
                         if (!newFileNameMatch.Success)
                             continue;
 
