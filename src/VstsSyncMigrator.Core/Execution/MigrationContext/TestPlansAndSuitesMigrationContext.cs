@@ -790,8 +790,12 @@ namespace VstsSyncMigrator.Engine
                 InnerLog(sourcePlan, $" Creating Plan {newPlanName}", 5);
                 targetPlan = CreateNewTestPlanFromSource(sourcePlan, newPlanName);
 
+                
                 RemoveInvalidLinks(targetPlan);
-
+                if (_config.RemoveAllLinks)
+                {
+                    targetPlan.Links.Clear();
+                }
                 targetPlan.Save();
 
                 ApplyFieldMappings(sourcePlan.Id, targetPlan.Id);

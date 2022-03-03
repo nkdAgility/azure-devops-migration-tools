@@ -9,6 +9,8 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         public string OnlyElementsWithTag { get; set; }
         public string OnlyElementsUnderAreaPath { get; set; }
         public string TestPlanQueryBit { get; set; }
+        public bool RemoveAllLinks { get; set; } 
+
 
         public string Processor
         {
