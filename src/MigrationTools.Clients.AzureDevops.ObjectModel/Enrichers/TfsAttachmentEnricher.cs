@@ -47,12 +47,12 @@ namespace MigrationTools.Enrichers
                 try
                 {
                     string filepath = null;
-                    string localName = wia.FileGuid.ToString(); // TODO#2 Use GUID for local file name
+                    System.IO.Directory.CreateDirectory(Path.Combine(_exportWiPath, wia.Id.ToString()));
                     filepath = ExportAttachment(source.ToWorkItem(), wia, _exportWiPath);
                     Log.Debug("AttachmentMigrationEnricher: Exported {Filename} to disk", System.IO.Path.GetFileName(filepath));
                     if (filepath != null)
                     {
-                        ImportAttachemnt(target.ToWorkItem(), filepath, localName, save);
+                        ImportAttachemnt(target.ToWorkItem(), filepath, save);
                         Log.Debug("AttachmentMigrationEnricher: Imported {Filename} from disk", System.IO.Path.GetFileName(filepath));
                     }
                 }
@@ -89,8 +89,9 @@ namespace MigrationTools.Enrichers
         {
             string fname = GetSafeFilename(wia.Name);
             Log.Debug(fname);
-
-            string fpath = Path.Combine(exportpath, fname);
+            
+            string fpath = Path.Combine(exportpath, wia.Id.ToString(), fname);
+            
             if (!File.Exists(fpath))
             {
                 Log.Debug(string.Format("...downloading {0} to {1}", fname, exportpath));
@@ -112,7 +113,7 @@ namespace MigrationTools.Enrichers
             return fpath;
         }
 
-        private void ImportAttachemnt(WorkItem targetWorkItem, string filepath, string localName, bool save = true)
+        private void ImportAttachemnt(WorkItem targetWorkItem, string filepath, bool save = true)
         {
             var filename = System.IO.Path.GetFileName(filepath);
             FileInfo fi = new FileInfo(filepath);
