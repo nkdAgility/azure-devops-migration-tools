@@ -15,24 +15,33 @@ namespace MigrationTools.Enrichers
 {
     public class TfsWorkItemEmbededLinkEnricher : WorkItemProcessorEnricher
     {
+        private const string LogTypeName = nameof(TfsWorkItemEmbededLinkEnricher);
         private const string RegexPatternLinkAnchorTag = "<a[^>].*?(?:href=\"(?<href>[^\"]*)\".*?|(?<version>data-vss-mention=\"[^\"]*\").*?)*>(?<value>.*?)<\\/a?>";
         private const string RegexPatternWorkItemUrl = "http[s]*://.*?/_workitems/edit/(?<id>\\d+)";
-        private readonly Lazy<List<TeamFoundationIdentity>> _targetTeamFoundationIdentities;
+        private readonly Lazy<List<TeamFoundationIdentity>> _targetTeamFoundationIdentitiesLazyCache;
+        private readonly IMigrationEngine Engine;
 
-        private IMigrationEngine Engine;
-        
         public TfsWorkItemEmbededLinkEnricher(IServiceProvider services, ILogger<TfsWorkItemEmbededLinkEnricher> logger)
             : base(services, logger)
         {
             Engine = services.GetRequiredService<IMigrationEngine>();
-            _targetTeamFoundationIdentities = new Lazy<List<TeamFoundationIdentity>>(() =>
-            {
-                TfsTeamService teamService = Engine.Target.GetService<TfsTeamService>();
-                TfsConnection connection = (TfsConnection)Engine.Target.InternalCollection;
 
-                var identityService = Engine.Target.GetService<IIdentityManagementService>();
-                var tfi = identityService.ReadIdentity(IdentitySearchFactor.General, "Project Collection Valid Users", MembershipQuery.Expanded, ReadIdentityOptions.None);
-                return identityService.ReadIdentities(tfi.Members, MembershipQuery.None, ReadIdentityOptions.None).ToList();
+            _targetTeamFoundationIdentitiesLazyCache = new Lazy<List<TeamFoundationIdentity>>(() =>
+            {
+                try
+                {
+                    TfsTeamService teamService = Engine.Target.GetService<TfsTeamService>();
+                    TfsConnection connection = (TfsConnection)Engine.Target.InternalCollection;
+
+                    var identityService = Engine.Target.GetService<IIdentityManagementService>();
+                    var tfi = identityService.ReadIdentity(IdentitySearchFactor.General, "Project Collection Valid Users", MembershipQuery.Expanded, ReadIdentityOptions.None);
+                    return identityService.ReadIdentities(tfi.Members, MembershipQuery.None, ReadIdentityOptions.None).ToList();
+                }
+                catch (Exception ex)
+                {
+                    Log.LogError(ex, "{LogTypeName}: Unable load list of identities from target collection.", LogTypeName);
+                    return new List<TeamFoundationIdentity>();
+                }
             });
         }
 
@@ -48,8 +57,7 @@ namespace MigrationTools.Enrichers
             string oldTfsurl = Engine.Source.Config.AsTeamProjectConfig().Collection.ToString();
             string newTfsurl = Engine.Target.Config.AsTeamProjectConfig().Collection.ToString();
 
-            var logTypeName = nameof(TfsWorkItemEmbededLinkEnricher);
-            Log.LogInformation($"{logTypeName}: Fixing embedded mention links on target work item {targetWorkItem.Id} from {oldTfsurl} to {newTfsurl}");
+            Log.LogInformation("{LogTypeName}: Fixing embedded mention links on target work item {targetWorkItemId} from {oldTfsurl} to {newTfsurl}", LogTypeName, targetWorkItem.Id, oldTfsurl, newTfsurl);
 
             foreach (Field field in targetWorkItem.ToWorkItem().Fields)
             {
@@ -78,7 +86,7 @@ namespace MigrationTools.Enrichers
                         if (workItemLinkMatch.Success)
                         {
                             var workItemId = workItemLinkMatch.Groups["id"].Value;
-                            Log.LogDebug($"{logTypeName}: Source work item {workItemId} mention link traced on field {field.Name} on target work item {targetWorkItem.Id}.");
+                            Log.LogDebug("{LogTypeName}: Source work item {workItemId} mention link traced on field {fieldName} on target work item {targetWorkItemId}.", LogTypeName, workItemId, field.Name, targetWorkItem.Id);
                             var sourceLinkWi = Engine.Source.WorkItems.GetWorkItem(workItemId);
                             if (sourceLinkWi != null)
                             {
@@ -87,39 +95,39 @@ namespace MigrationTools.Enrichers
                                 {
                                     var replaceValue = anchorTagMatch.Value.Replace(workItemId, linkWI.Id);
                                     field.Value = field.Value.ToString().Replace(anchorTagMatch.Value, replaceValue);
-                                    Log.LogInformation($"{logTypeName}: Source work item {workItemId} mention link was successfully replaced with target work item {linkWI.Id} mention link on field {field.Name} on target work item {targetWorkItem.Id}.");
+                                    Log.LogInformation("{LogTypeName}: Source work item {workItemId} mention link was successfully replaced with target work item {linkWIId} mention link on field {fieldName} on target work item {targetWorkItemId}.", LogTypeName, workItemId, linkWI.Id, field.Name, targetWorkItem.Id);
                                 }
                                 else
                                 {
-                                    Log.LogError($"{logTypeName}: Matching target work item mention link for source work item {workItemId} mention link on field {field.Name} on target work item {targetWorkItem.Id} was not found on the target collection.");
+                                    Log.LogError("{LogTypeName}: Matching target work item mention link for source work item {workItemId} mention link on field {fieldName} on target work item {targetWorkItemId} was not found on the target collection.", LogTypeName, workItemId, field.Name, targetWorkItem.Id);
                                 }
                             }
                             else
                             {
-                                Log.LogInformation($"{logTypeName}: [SKIP] Source work item {workItemId} mention link on field {field.Name} on target work item {targetWorkItem.Id} was not found on the source collection.");
+                                Log.LogInformation("{LogTypeName}: [SKIP] Source work item {workItemId} mention link on field {fieldName} on target work item {targetWorkItemId} was not found on the source collection.", LogTypeName, workItemId, field.Name, targetWorkItem.Id);
                             }
                         }
                         else if ((href.StartsWith("mailto:") || href.StartsWith("#")) && value.StartsWith("@"))
                         {
                             var displayName = value.Substring(1);
-                            Log.LogDebug($"{logTypeName}: User identity {displayName} mention traced on field {field.Name} on target work item {targetWorkItem.Id}.");
-                            var identity = _targetTeamFoundationIdentities.Value.FirstOrDefault(i => i.DisplayName == displayName);
+                            Log.LogDebug("{LogTypeName}: User identity {displayName} mention traced on field {fieldName} on target work item {targetWorkItemId}.", LogTypeName, displayName, field.Name, targetWorkItem.Id);
+                            var identity = _targetTeamFoundationIdentitiesLazyCache.Value.FirstOrDefault(i => i.DisplayName == displayName);
                             if (identity != null)
                             {
                                 var replaceValue = anchorTagMatch.Value.Replace(href, "#").Replace(version, $"data-vss-mention=\"version:2.0,{identity.TeamFoundationId}\"");
                                 field.Value = field.Value.ToString().Replace(anchorTagMatch.Value, replaceValue);
-                                Log.LogInformation($"{logTypeName}: User identity {displayName} mention was successfully matched on field {field.Name} on target work item {targetWorkItem.Id}.");
+                                Log.LogInformation("{LogTypeName}: User identity {displayName} mention was successfully matched on field {fieldName} on target work item {targetWorkItemId}.", LogTypeName, displayName, field.Name, targetWorkItem.Id);
                             }
                             else
                             {
-                                Log.LogInformation($"{logTypeName}: [SKIP] Matching user identity {displayName} mention was not found on field {field.Name} on target work item {targetWorkItem.Id}.");
+                                Log.LogInformation("{LogTypeName}: [SKIP] Matching user identity {displayName} mention was not found on field {fieldName} on target work item {targetWorkItemId}.", LogTypeName, displayName, field.Name, targetWorkItem.Id);
                             }
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    Log.LogError(ex, $"{logTypeName}: Unable to fix embedded mention links on field {field.Name} on target work item {targetWorkItem.Id} from {oldTfsurl} to {newTfsurl}");
+                    Log.LogError(ex, "{LogTypeName}: Unable to fix embedded mention links on field {fieldName} on target work item {targetWorkItemId} from {oldTfsurl} to {newTfsurl}", LogTypeName, field.Name, targetWorkItem.Id, oldTfsurl, newTfsurl);
                 }
             }
 
