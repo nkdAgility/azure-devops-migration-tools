@@ -42,8 +42,17 @@ namespace MigrationTools.Enrichers
                 System.IO.Directory.Delete(_exportWiPath, true);
             }
             System.IO.Directory.CreateDirectory(_exportWiPath);
+
+
+            int count = 0;
             foreach (Attachment wia in source.ToWorkItem().Attachments) // TODO#1 Limit to 100 attachements
             {
+                count++;
+                if (count > 100)
+                {
+                    break; 
+                }
+
                 try
                 {
                     string filepath = null;
