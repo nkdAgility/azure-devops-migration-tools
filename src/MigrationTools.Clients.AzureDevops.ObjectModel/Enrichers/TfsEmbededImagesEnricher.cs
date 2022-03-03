@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Enrichers;
 using MigrationTools.DataContracts;
 using MigrationTools.Processors;
@@ -18,12 +19,16 @@ namespace MigrationTools.Enrichers
         private const string RegexPatternForImageUrl = "(?<=<img.*src=\")[^\"]*";
         private const string RegexPatternForImageFileName = "(?<=FileName=)[^=]*";
 
+        private readonly Project _targetProject;
+        private readonly TfsTeamProjectConfig _targetConfig;
+
         public IMigrationEngine Engine { get; private set; }
 
         public TfsEmbededImagesEnricher(IServiceProvider services, ILogger<TfsEmbededImagesEnricher> logger) : base(services, logger)
         {
             Engine = services.GetRequiredService<IMigrationEngine>();
-            //
+            _targetProject = Engine.Target.WorkItems.Project.ToProject();
+            _targetConfig = Engine.Target.Config.AsTeamProjectConfig();
         }
 
         [Obsolete]
@@ -51,8 +56,7 @@ namespace MigrationTools.Enrichers
 
         protected override void FixEmbededImages(WorkItemData wi, string oldTfsurl, string newTfsurl, string sourcePersonalAccessToken = "")
         {
-            var logTypeName = nameof(TfsEmbededImagesEnricher);
-            Log.LogInformation($"{logTypeName}: Fixing HTML field attachments for work item {wi.Id} from {oldTfsurl} to {newTfsurl}");
+            Log.LogInformation("EmbededImagesRepairEnricher: Fixing HTML field attachments for work item {Id} from {OldTfsurl} to {NewTfsUrl}", wi.Id, oldTfsurl, newTfsurl);
 
             var oldTfsurlOppositeSchema = GetUrlWithOppositeSchema(oldTfsurl);
             
@@ -74,7 +78,7 @@ namespace MigrationTools.Enrichers
                         if (!newFileNameMatch.Success)
                             continue;
 
-                        Log.LogDebug($"{logTypeName}: field '{field.Name}' has match: {WebUtility.HtmlDecode(match.Value)}");
+                        Log.LogDebug("EmbededImagesRepairEnricher: field '{fieldName}' has match: {matchValue}", field.Name, System.Net.WebUtility.HtmlDecode(match.Value));
                         string fullImageFilePath = Path.GetTempPath() + newFileNameMatch.Value;
 
                         try
@@ -90,7 +94,7 @@ namespace MigrationTools.Enrichers
                                 {
                                     if (_ignore404Errors && result.StatusCode == HttpStatusCode.NotFound)
                                     {
-                                        Log.LogDebug($"{logTypeName}: Image {match.Value} could not be found in WorkItem {wi.Id}, Field {field.Name}");
+                                        Log.LogDebug("EmbededImagesRepairEnricher: Image {MatchValue} could not be found in WorkItem {WorkItemId}, Field {FieldName}", match.Value, wi.Id, field.Name);
                                         continue;
                                     }
                                     else
@@ -102,12 +106,12 @@ namespace MigrationTools.Enrichers
 
                             if (GetImageFormat(File.ReadAllBytes(fullImageFilePath)) == ImageFormat.unknown)
                             {
-                                throw new Exception($"{logTypeName}: Downloaded image [{fullImageFilePath}] from Work Item [{wi.ToWorkItem().Id}] Field: [{field.Name}] could not be identified as an image. Authentication issue?");
+                                throw new Exception($"Downloaded image [{fullImageFilePath}] from Work Item [{wi.ToWorkItem().Id}] Field: [{field.Name}] could not be identified as an image. Authentication issue?");
                             }
 
                             var attachmentInfo = new Microsoft.TeamFoundation.WorkItemTracking.Internals.AttachmentInfo(fullImageFilePath);
                             wi.ToWorkItem().UploadAttachment(attachmentInfo);
-
+                            
                             if (attachmentInfo.IsUploaded)
                             {
                                 var newImageLink = BuildAttachmentUrl(attachmentInfo);
@@ -115,7 +119,7 @@ namespace MigrationTools.Enrichers
                             }
                             else
                             {
-                                throw new Exception($"{logTypeName}: Unable to upload the image [{fullImageFilePath}] to Work Item [{wi.ToWorkItem().Id}] Field: [{field.Name}].");
+                                throw new Exception($"Unable to upload the image [{fullImageFilePath}] to Work Item [{wi.ToWorkItem().Id}] Field: [{field.Name}].");
                             }
                         }
                         finally
@@ -127,7 +131,7 @@ namespace MigrationTools.Enrichers
                 }
                 catch (Exception ex)
                 {
-                    Log.LogError(ex, $"{logTypeName}: Unable to fix HTML field attachments for work item {wi.Id} from {oldTfsurl} to {newTfsurl}");
+                    Log.LogError(ex, "EmbededImagesRepairEnricher: Unable to fix HTML field attachments for work item {wiId} from {oldTfsurl} to {newTfsurl}", wi.Id, oldTfsurl, newTfsurl);
                 }
             }
         }
@@ -136,11 +140,11 @@ namespace MigrationTools.Enrichers
         {
             //https://{instance}/{collection}/{project}/_apis/wit/attachments/{id}?fileName={fileName}
 
-            var project = Engine.Target.WorkItems.Project.ToProject();
-            var config = Engine.Target.Config.AsTeamProjectConfig();
+            if (_targetProject == null || _targetConfig == null)
+                throw new Exception("Unable to build attachment URL because either TargetProject or TargetConfiguration is not initialized!");
 
-            var uri = new UriBuilder(config.Collection);
-            uri.Path += $"{project.Guid}/_apis/wit/attachments/{attachmentInfo.Path}?fileName={attachmentInfo.FileInfo.Name}";
+            var uri = new UriBuilder(_targetConfig.Collection);
+            uri.Path += $"{_targetProject.Guid}/_apis/wit/attachments/{attachmentInfo.Path}?fileName={attachmentInfo.FileInfo.Name}";
             return uri.ToString();
         }
 
