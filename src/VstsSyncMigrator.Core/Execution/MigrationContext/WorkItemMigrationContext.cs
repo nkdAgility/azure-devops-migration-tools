@@ -40,6 +40,7 @@ namespace VstsSyncMigrator.Engine
         private ILogger contextLog;
         private IAttachmentMigrationEnricher attachmentEnricher;
         private IWorkItemProcessorEnricher embededImagesEnricher;
+        private IWorkItemProcessorEnricher workItemEmbededLinkEnricher;
         private TfsGitRepositoryEnricher gitRepositoryEnricher;
         private TfsNodeStructure nodeStructureEnricher;
         private TfsRevisionManager revisionManager;
@@ -86,6 +87,7 @@ namespace VstsSyncMigrator.Engine
             attachmentEnricher = new TfsAttachmentEnricher(workItemServer, _config.AttachmentWorkingPath, _config.AttachmentMaxSize);
             workItemLinkEnricher = Services.GetRequiredService<TfsWorkItemLinkEnricher>();
             embededImagesEnricher = Services.GetRequiredService<TfsEmbededImagesEnricher>();
+            workItemEmbededLinkEnricher = Services.GetRequiredService<TfsWorkItemEmbededLinkEnricher>();
             gitRepositoryEnricher = Services.GetRequiredService<TfsGitRepositoryEnricher>();
             nodeStructureEnricher = Services.GetRequiredService<TfsNodeStructure>();
             nodeStructureEnricher.Configure(new TfsNodeStructureOptions() { Enabled = _config.NodeStructureEnricherEnabled ?? true, NodeBasePaths = _config.NodeBasePaths, PrefixProjectToNodes = _config.PrefixProjectToNodes });
@@ -302,6 +304,14 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
+        private void ProcessWorkItemEmbeddedLinks(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
+        {
+            if (sourceWorkItem != null && targetWorkItem != null && _config.FixHtmlAttachmentLinks)
+            {
+                workItemEmbededLinkEnricher.Enrich(sourceWorkItem, targetWorkItem);
+            }
+        }
+
         private async Task ProcessWorkItemAsync(WorkItemData sourceWorkItem, int retryLimit = 5, int retries = 0)
         {
             var witStopWatch = Stopwatch.StartNew();
@@ -341,6 +351,7 @@ namespace VstsSyncMigrator.Engine
                             ProcessWorkItemAttachments(sourceWorkItem, targetWorkItem, false);
                             ProcessWorkItemLinks(Engine.Source.WorkItems, Engine.Target.WorkItems, sourceWorkItem, targetWorkItem);
                             ProcessHTMLFieldAttachements(targetWorkItem);
+                            ProcessWorkItemEmbeddedLinks(sourceWorkItem, targetWorkItem);
                             TraceWriteLine(LogEventLevel.Information, "Skipping as work item exists and no revisions to sync detected");
                             processWorkItemMetrics.Add("Revisions", 0);
                         }
@@ -517,6 +528,7 @@ namespace VstsSyncMigrator.Engine
                     targetWorkItem.ToWorkItem().Fields[Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName].Value = reflectedUri.ToString();
 
                     ProcessHTMLFieldAttachements(targetWorkItem);
+                    ProcessWorkItemEmbeddedLinks(sourceWorkItem, targetWorkItem);
 
                     targetWorkItem.SaveToAzureDevOps();
                     TraceWriteLine(LogEventLevel.Information,
