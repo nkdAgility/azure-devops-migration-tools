@@ -42,16 +42,17 @@ namespace MigrationTools.Enrichers
                 System.IO.Directory.Delete(_exportWiPath, true);
             }
             System.IO.Directory.CreateDirectory(_exportWiPath);
-            foreach (Attachment wia in source.ToWorkItem().Attachments)
+            foreach (Attachment wia in source.ToWorkItem().Attachments) // TODO#1 Limit to 100 attachements
             {
                 try
                 {
                     string filepath = null;
+                    string localName = wia.FileGuid.ToString(); // TODO#2 Use GUID for local file name
                     filepath = ExportAttachment(source.ToWorkItem(), wia, _exportWiPath);
                     Log.Debug("AttachmentMigrationEnricher: Exported {Filename} to disk", System.IO.Path.GetFileName(filepath));
                     if (filepath != null)
                     {
-                        ImportAttachemnt(target.ToWorkItem(), filepath, save);
+                        ImportAttachemnt(target.ToWorkItem(), filepath, localName, save);
                         Log.Debug("AttachmentMigrationEnricher: Imported {Filename} from disk", System.IO.Path.GetFileName(filepath));
                     }
                 }
@@ -111,7 +112,7 @@ namespace MigrationTools.Enrichers
             return fpath;
         }
 
-        private void ImportAttachemnt(WorkItem targetWorkItem, string filepath, bool save = true)
+        private void ImportAttachemnt(WorkItem targetWorkItem, string filepath, string localName, bool save = true)
         {
             var filename = System.IO.Path.GetFileName(filepath);
             FileInfo fi = new FileInfo(filepath);

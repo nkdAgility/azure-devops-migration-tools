@@ -852,6 +852,10 @@ namespace VstsSyncMigrator.Engine
                 return;
             //////////////////////////////////////////
             var stopwatch = Stopwatch.StartNew();
+            if (_config.MigrationDelay >0 )
+            {
+                System.Threading.Thread.Sleep( _config.MigrationDelay );
+            }
             var starttime = DateTime.Now;
             var metrics = new Dictionary<string, double>();
             var parameters = new Dictionary<string, string>();
