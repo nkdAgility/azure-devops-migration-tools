@@ -42,11 +42,21 @@ namespace MigrationTools.Enrichers
                 System.IO.Directory.Delete(_exportWiPath, true);
             }
             System.IO.Directory.CreateDirectory(_exportWiPath);
-            foreach (Attachment wia in source.ToWorkItem().Attachments)
+
+
+            int count = 0;
+            foreach (Attachment wia in source.ToWorkItem().Attachments) // TODO#1 Limit to 100 attachements
             {
+                count++;
+                if (count > 100)
+                {
+                    break; 
+                }
+
                 try
                 {
                     string filepath = null;
+                    System.IO.Directory.CreateDirectory(Path.Combine(_exportWiPath, wia.Id.ToString()));
                     filepath = ExportAttachment(source.ToWorkItem(), wia, _exportWiPath);
                     Log.Debug("AttachmentMigrationEnricher: Exported {Filename} to disk", System.IO.Path.GetFileName(filepath));
                     if (filepath != null)
@@ -88,8 +98,9 @@ namespace MigrationTools.Enrichers
         {
             string fname = GetSafeFilename(wia.Name);
             Log.Debug(fname);
-
-            string fpath = Path.Combine(exportpath, fname);
+            
+            string fpath = Path.Combine(exportpath, wia.Id.ToString(), fname);
+            
             if (!File.Exists(fpath))
             {
                 Log.Debug(string.Format("...downloading {0} to {1}", fname, exportpath));

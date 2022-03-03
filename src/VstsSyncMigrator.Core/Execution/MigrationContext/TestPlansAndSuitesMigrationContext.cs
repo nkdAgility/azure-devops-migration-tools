@@ -790,8 +790,12 @@ namespace VstsSyncMigrator.Engine
                 InnerLog(sourcePlan, $" Creating Plan {newPlanName}", 5);
                 targetPlan = CreateNewTestPlanFromSource(sourcePlan, newPlanName);
 
+                
                 RemoveInvalidLinks(targetPlan);
-
+                if (_config.RemoveAllLinks)
+                {
+                    targetPlan.Links.Clear();
+                }
                 targetPlan.Save();
 
                 ApplyFieldMappings(sourcePlan.Id, targetPlan.Id);
@@ -848,6 +852,10 @@ namespace VstsSyncMigrator.Engine
                 return;
             //////////////////////////////////////////
             var stopwatch = Stopwatch.StartNew();
+            if (_config.MigrationDelay >0 )
+            {
+                System.Threading.Thread.Sleep( _config.MigrationDelay );
+            }
             var starttime = DateTime.Now;
             var metrics = new Dictionary<string, double>();
             var parameters = new Dictionary<string, string>();

@@ -28,6 +28,7 @@ namespace MigrationTools
             // Enrichers
             context.AddSingleton<TfsValidateRequiredField>();
             context.AddSingleton<TfsWorkItemLinkEnricher>();
+            context.AddSingleton<TfsWorkItemEmbededLinkEnricher>();
             context.AddSingleton<TfsEmbededImagesEnricher>();
             context.AddSingleton<TfsGitRepositoryEnricher>();
             context.AddSingleton<TfsNodeStructure>();
