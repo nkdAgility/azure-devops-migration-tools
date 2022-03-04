@@ -2,7 +2,7 @@
 
 ## What is this tool for?
 
-Have a look at the [why page](why.md) for a description as to why this tool exists.
+The Azure DevOps Migration Tools allow you to bulk edit and migrate data between Team Projects on both Microsoft Team Foundation Server (TFS) and Azure DevOps Services.
 
 ## What processors are available?
 
@@ -61,7 +61,7 @@ This field needs to be added to both the source and target team projects. On bot
 How the `ReflectedWorkItemId` field is added depends on whether the system, there are three options
 
 - TFS
-- Azure DevOps Services using the new process customisation process
-- Azure DevOps Services when the instance has been imported using the  [VSTS Migration Tool](https://blogs.msdn.microsoft.com/visualstudioalm/2016/11/16/import-your-tfs-database-into-visual-studio-team-services/)
+- Azure DevOps Services using the new [process customisation](https://docs.microsoft.com/en-us/azure/devops/organizations/settings/work/add-custom-field?view=azure-devops) process
+- Azure DevOps Services when the instance has been imported using the [VSTS Migration Tool](https://blogs.msdn.microsoft.com/visualstudioalm/2016/11/16/import-your-tfs-database-into-visual-studio-team-services/)
 
 For details on how to add the field in each case, and trouble shooting check the [server configuration page](server-configuration.md)

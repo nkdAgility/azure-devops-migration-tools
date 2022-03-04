@@ -14,6 +14,11 @@ This is not required for VSTS targets.
 
 In order to store the state for the migration you need to use a custom field, the `ReflectedWorkItemId` field. The way you add this depends on the platform you are using.
 
+### Azure DevOps
+
+1. Create a custom field called 'ReflectedWorkItemId' of type 'Text (single line)' by following this [guide](https://docs.microsoft.com/en-us/azure/devops/organizations/settings/work/add-custom-field?view=azure-devops)
+1.  Add this custom field to all workflow types to be migrated eg bug, story, task, test case etc
+
 ### Team Foundation Server (TFS)
 
 Use the `witadmin exportwitd` command to export each work item and add:
