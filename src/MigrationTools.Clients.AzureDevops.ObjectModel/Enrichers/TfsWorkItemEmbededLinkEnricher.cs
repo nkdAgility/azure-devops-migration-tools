@@ -99,7 +99,9 @@ namespace MigrationTools.Enrichers
                                 }
                                 else
                                 {
-                                    Log.LogError("{LogTypeName}: Matching target work item mention link for source work item {workItemId} mention link on field {fieldName} on target work item {targetWorkItemId} was not found on the target collection.", LogTypeName, workItemId, field.Name, targetWorkItem.Id);
+                                    var replaceValue = value;
+                                    field.Value = field.Value.ToString().Replace(anchorTagMatch.Value, replaceValue);
+                                    Log.LogError("{LogTypeName}: [SKIP] Matching target work item mention link for source work item {workItemId} mention link on field {fieldName} on target work item {targetWorkItemId} was not found on the target collection. So link is replaced with just simple text.", LogTypeName, workItemId, field.Name, targetWorkItem.Id);
                                 }
                             }
                             else
@@ -120,7 +122,7 @@ namespace MigrationTools.Enrichers
                             }
                             else
                             {
-                                Log.LogInformation("{LogTypeName}: [SKIP] Matching user identity {displayName} mention was not found on field {fieldName} on target work item {targetWorkItemId}.", LogTypeName, displayName, field.Name, targetWorkItem.Id);
+                                Log.LogInformation("{LogTypeName}: [SKIP] Matching user identity {displayName} mention was not found on field {fieldName} on target work item {targetWorkItemId}. So left it as it is.", LogTypeName, displayName, field.Name, targetWorkItem.Id);
                             }
                         }
                     }
