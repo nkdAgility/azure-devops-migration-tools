@@ -8,7 +8,7 @@ The Azure DevOps Migration Tools allow you to bulk edit and migrate data between
 
 ![alt text](https://raw.githubusercontent.com/nkdAgility/azure-devops-migration-tools/master/src/MigrationTools.Extension/images/azure-devops-migration-tools-naked-agility-martin-hinshelwood.png)
 
-**WARNING: This tool is not designed for a novice. This tool was developed to support the scenarios below, and the edge cases that have been encountered by the 30+ contributors from around the Azure DevOps community. You should be comfortable with the TFS/Azure DevOps object model, as well as debugging code in Visual Studio.**
+**INFO: This tool was developed to support the scenarios below, and the edge cases that have been encountered by the 30+ contributors from around the Azure DevOps community. You should be comfortable with the TFS/Azure DevOps object model, as well as debugging code in Visual Studio.**
 **Community support is available through [GitHub](https://github.com/nkdAgility/azure-devops-migration-tools) and [StackOverflow](https://stackoverflow.com/questions/tagged/azure-devops-migration-tools); Paid support is available through our [recommended consultants](http://nkdagility.github.io/azure-devops-migration-tools/#support) as well as our contributors and many DevOps consultants around the world.**
 
 ## What can you do with this tool?
@@ -43,8 +43,6 @@ The Azure DevOps Migration Tools allow you to bulk edit and migrate data between
  - [FAQ](./faq.md)
  - _!preview v2_ [How To Migrate Things](./HowTo/index.md)
  - _!preview v2_ [Reference](./Reference/index.md)
-
-
 
 #### Extras
 
@@ -88,28 +86,28 @@ There are other processors that can be used to migrate, or process, different so
 
 Most of these processors need to be run in order. If you try to migrate work items before you have migrated Area and Iterations then ***bang*** you need to go back.
 
-|Processor | Status |Target |Usage |
-|---------|---------|---------|---------|
-|[WorkItemMigration](./Processors/WorkItemMigrationConfig.md) | ready | Work Items | Migrates either tip or history of work items with Links & Attachments based on a query with field mappings |
-|[TfsTeamSettingsProcessor](./Reference/Processors/TfsTeamSettingsProcessor.md) | preview | Teams | Migrates Teams and Team Settings |
-|[TfsAreaAndIterationProcessor](./Reference/Processors/TfsAreaAndIterationProcessor.md) | preview | Area & Iterations | Migrates Nodes before run |
-|[WorkItemDelete](./Processors/WorkItemDeleteConfig.md) | ready | Work Items | Bulk delete of work items **WARNING DANGEROUS** |
-|[WorkItemUpdate](./Processors/WorkItemUpdateConfig.md) | ready | Work Items | Bulk update of Work Items based on a query and field mappings |
-|[TfsSharedQueryProcessor](./Reference/Processors/TfsSharedQueryProcessor.md) | preview | Shared Queries | Moved Shared Queries best effort |
-|[TestVariablesMigration](./Processors/TestVariablesMigrationConfig.md) | Beta | Suites & Plans | Migrates Test Variables |
-|[TestConfigurationsMigration](./Processors/TestConfigurationsMigrationConfig.md) | Beta  | Suites & Plans | Migrates Test configurations |
-|[TestPlansAndSuitesMigration](./Processors/TestPlansAndSuitesMigrationConfig.md) | Beta  | Suites & Plans | Rebuilds Suits and plans for Test Cases migrated using the WorkItemMigration |
-|[ImportProfilePicture](./Processors/ImportProfilePictureConfig) & ExportProfilePictureFromAD | Beta | Profiles | Downloads corporate images and updates TFS/Azure DevOps profiles |
-|[WorkItemUpdateAreasAsTags](./Processors/WorkItemUpdateAreasAsTagsConfig) | Beta | Work Items | Adds tags to work items  to reflect area paths on source system |
-|TestRunsMigration | Alfa | Suits & Plans | Migrates the history of Test Runs |
-|NodeStructuresMigration | merged | Area & Iteration | obsolete - merged into WorkItemMigration |
-|AttachementExportMigration | merged | Work Items | obsolete - merged into WorkItemMigration |
-|AttachementImportMigration | merged | Work Items | obsolete - merged into WorkItemMigration |
-|LinkMigration | merged | Work Items | obsolete - merged into WorkItemMigration |
-|HtmlFieldEmbeddedImageMigration | merged | HTML Fields | obsolete - merged into WorkItemMigration |
-|WorkItemRevisionReplayMigration | merged |  Work Items | obsolete - merged into WorkItemMigration |
-|GitCommitFix | merged | Git links | obsolete - merged into WorkItemMigration |
-|WorkItemUpdateConfig | merged | Work Items | obsolete - merged into WorkItemMigration |
+| Processor                                                                                    | Status   | Target            | Usage                                                                                                      |
+| -------------------------------------------------------------------------------------------- | -------- | ----------------- | ---------------------------------------------------------------------------------------------------------- |
+| [WorkItemMigrationConfig](./Processors/WorkItemMigrationConfig.md)                           | ready    | Work Items        | Migrates either tip or history of work items with Links & Attachments based on a query with field mappings |
+| [TfsTeamSettingsProcessor](./Reference/Processors/TfsTeamSettingsProcessor.md)               | preview  | Teams             | Migrates Teams and Team Settings                                                                           |
+| [TfsAreaAndIterationProcessor](./Reference/Processors/TfsAreaAndIterationProcessor.md)       | preview  | Area & Iterations | Migrates Nodes before run                                                                                  |
+| [WorkItemDelete](./Processors/WorkItemDeleteConfig.md)                                       | ready    | Work Items        | Bulk delete of work items **WARNING DANGEROUS**                                                            |
+| [WorkItemUpdate](./Processors/WorkItemUpdateConfig.md)                                       | ready    | Work Items        | Bulk update of Work Items based on a query and field mappings                                              |
+| [TfsSharedQueryProcessor](./Reference/Processors/TfsSharedQueryProcessor.md)                 | preview  | Shared Queries    | Moved Shared Queries best effort                                                                           |
+| [TestVariablesMigration](./Processors/TestVariablesMigrationConfig.md)                       | Beta     | Suites & Plans    | Migrates Test Variables                                                                                    |
+| [TestConfigurationsMigration](./Processors/TestConfigurationsMigrationConfig.md)             | Beta     | Suites & Plans    | Migrates Test configurations                                                                               |
+| [TestPlansAndSuitesMigration](./Processors/TestPlansAndSuitesMigrationConfig.md)             | Beta     | Suites & Plans    | Rebuilds Suits and plans for Test Cases migrated using the WorkItemMigration                               |
+| [ImportProfilePicture](./Processors/ImportProfilePictureConfig) & ExportProfilePictureFromAD | Beta     | Profiles          | Downloads corporate images and updates TFS/Azure DevOps profiles                                           |
+| [WorkItemUpdateAreasAsTags](./Processors/WorkItemUpdateAreasAsTagsConfig)                    | Beta     | Work Items        | Adds tags to work items  to reflect area paths on source system                                            |
+| ~~TestRunsMigration~~                                                                        | Alfa     | Suits & Plans     | Migrates the history of Test Runs                                                                          |
+| ~~NodeStructuresMigration~~                                                                  | obsolete | Area & Iteration  | obsolete - merged into WorkItemMigrationConfig                                                             |
+| ~~AttachementExportMigration~~                                                               | obsolete | Work Items        | obsolete - merged into WorkItemMigrationConfig                                                             |
+| ~~AttachementImportMigration~~                                                               | obsolete | Work Items        | obsolete - merged into WorkItemMigrationConfig                                                             |
+| ~~LinkMigration~~                                                                            | obsolete | Work Items        | obsolete - merged into WorkItemMigrationConfig                                                             |
+| ~~HtmlFieldEmbeddedImageMigration~~                                                          | obsolete | HTML Fields       | obsolete - merged into WorkItemMigrationConfig                                                             |
+| ~~WorkItemRevisionReplayMigration~~                                                          | obsolete | Work Items        | obsolete - merged into WorkItemMigrationConfig                                                             |
+| ~~GitCommitFix~~                                                                             | obsolete | Git links         | obsolete - merged into WorkItemMigrationConfig                                                             |
+| ~~WorkItemUpdateConfig~~                                                                     | obsolete | Work Items        | obsolete - merged into WorkItemMigrationConfig                                                             |
 
 
 ### Processors (v2 Architecture) [ PREVIEW ]
@@ -118,11 +116,11 @@ Most of these processors need to be run in order. If you try to migrate work ite
 
 The new processor configuration is designed to allow the Migration Tools to support diferent Source and targets than just TFS/Azure DevOps, and we moved the Endpoints to the processor to allow both Object Model & REST in different processors.
 
-|Processor | Status |Target |Usage |
-|---------|---------|---------|---------|
-|[WorkItemTrackingProcessor](./Reference/Processors/WorkItemTrackingProcessor.md) | alfa | Work Items | Migrates either tip or history of work items with Links & Attachments based on a query with field mappings |
-|[TfsTeamSettingsProcessor](./Reference/Processors/TfsTeamSettingsProcessor.md) | preview | Teams | Migrates Teams and Team Settings |
-|[TfsSharedQueryProcessor](./Reference/Processors/TfsTeamSettingsProcessor.md) | preview | Shared Queries | Moved Shared Queries best effort |
+| Processor                                                                        | Status  | Target         | Usage                                                                                                      |
+| :------------------------------------------------------------------------------- | :------ | :------------- | :--------------------------------------------------------------------------------------------------------- |
+| [WorkItemTrackingProcessor](./Reference/Processors/WorkItemTrackingProcessor.md) | alfa    | Work Items     | Migrates either tip or history of work items with Links & Attachments based on a query with field mappings |
+| [TfsTeamSettingsProcessor](./Reference/Processors/TfsTeamSettingsProcessor.md)   | preview | Teams          | Migrates Teams and Team Settings                                                                           |
+| [TfsSharedQueryProcessor](./Reference/Processors/TfsTeamSettingsProcessor.md)    | preview | Shared Queries | Moved Shared Queries best effort                                                                           |
 
 ### Field Maps
 
@@ -148,7 +146,7 @@ There are no good tools for migrating TFVC code. All of them suffer from "time-d
 
 When moving Git repos between Projects and Accounts you are able to maintain full history. However you will need to have all of the links to 
 
-* **FixGitCommitLinks** - (obsolite) [this is now fixed on the fly if git is migrated first) Allows you to fix the migrated Git commit hooks (and thus external links) to point to the new repository in the target project. If the source and target repository names are the same, this will work out of the box. If the target repository has a different name, you can specify that name via the "TargetRepository" property.
+* **FixGitCommitLinks** - (obsolete) [this is now fixed on the fly if git is migrated first) Allows you to fix the migrated Git commit hooks (and thus external links) to point to the new repository in the target project. If the source and target repository names are the same, this will work out of the box. If the target repository has a different name, you can specify that name via the "TargetRepository" property.
 
 ##### Build & Releases
 
@@ -188,13 +186,13 @@ You can get free support from the community here and on social media on a best e
 
 These tools are build by naked Agility Limited's DevOps & Agility consultants to do real world migrations on a daily basis. We always work in [Azure DevOps Services](http://dev.azure.com) on https://dev.azure.com/nkdagility/migration-tools/ with code in GitHub and publish as a chocolatey package that pulls from GitGub Releases.
 
-|-|-|
-|-------------:|:-------------|
-| Team Work Items | [Azure Boards](https://dev.azure.com/nkdagility/migration-tools/) |
-| Public Issues | [GitHub Issues](https://github.com/nkdAgility/azure-devops-migration-tools/) |
-| Builds & Releases | [Azure Pipelines](https://dev.azure.com/nkdagility/migration-tools/) |
-| Releases Output | [Github Releases](https://github.com/nkdAgility/azure-devops-migration-tools/releases) |
-| Documentation | [Github Pages](http://nkdagility.github.io/azure-devops-migration-tools/) |
+|                 - | -                                                                                      |
+| ----------------: | :------------------------------------------------------------------------------------- |
+|   Team Work Items | [Azure Boards](https://dev.azure.com/nkdagility/migration-tools/)                      |
+|     Public Issues | [GitHub Issues](https://github.com/nkdAgility/azure-devops-migration-tools/)           |
+| Builds & Releases | [Azure Pipelines](https://dev.azure.com/nkdagility/migration-tools/)                   |
+|   Releases Output | [Github Releases](https://github.com/nkdAgility/azure-devops-migration-tools/releases) |
+|     Documentation | [Github Pages](http://nkdagility.github.io/azure-devops-migration-tools/)              |
 
 **Watch the [Video Overview](https://youtu.be/RCJsST0xBCE) to get you started in 30 minutes. This tool is complicated and its not always easy to discover what you need to do.**
 

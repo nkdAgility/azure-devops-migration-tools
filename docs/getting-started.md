@@ -13,10 +13,13 @@ In order to run the migration you will need to install the tools first.
 
 The tools are now installed. To run them you will need to switch to `c:\tools\MigrationTools\` and run `migrate.exe`.
 
+## Update
+
+1. Run "**choco upgrade  vsts-sync-migrator**" to upgrade the tools [source](https://chocolatey.org/packages/vsts-sync-migrator)
+
 ## Server configuration and setup
 
 Follow the [setup instructions](./server-configuration.md) to make sure that you can run the tool against your environments.
-
 
 ## Create a default configuration file
 
@@ -35,6 +38,7 @@ You can now customise the configuration depending on what you need to do. Howeve
     "Project": "myProjectName",
     "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
     "AllowCrossProjectLinking": false,
+    "AuthenticationMode": "Prompt",
     "PersonalAccessToken": "",
     "LanguageMaps": {
       "AreaPath": "Area",
@@ -47,6 +51,7 @@ You can now customise the configuration depending on what you need to do. Howeve
     "Project": "myProjectName",
     "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
     "AllowCrossProjectLinking": false,
+    "AuthenticationMode": "Prompt",
     "PersonalAccessToken": "",
     "LanguageMaps": {
       "AreaPath": "Area",
@@ -113,6 +118,7 @@ You can now customise the configuration depending on what you need to do. Howeve
       "WorkItemTypeName": "*",
       "sourceField1": "System.Description",
       "sourceField2": "Microsoft.VSTS.Common.AcceptanceCriteria",
+      "sourceField3": null,
       "targetField": "System.Description",
       "formatExpression": "{0} <br/><br/><h3>Acceptance Criteria</h3>{1}",
       "doneMatch": "##DONE##"
@@ -144,15 +150,13 @@ You can now customise the configuration depending on what you need to do. Howeve
   "Processors": [
     {
       "$type": "WorkItemMigrationConfig",
+      "Enabled": false,
       "ReplayRevisions": true,
       "PrefixProjectToNodes": false,
       "UpdateCreatedDate": true,
       "UpdateCreatedBy": true,
-      "BuildFieldTable": false,
-      "AppendMigrationToolSignatureFooter": false,
       "WIQLQueryBit": "AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
       "WIQLOrderBit": "[System.ChangedDate] desc",
-      "Enabled": false,
       "LinkMigration": true,
       "AttachmentMigration": true,
       "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
@@ -162,38 +166,51 @@ You can now customise the configuration depending on what you need to do. Howeve
       "FilterWorkItemsThatAlreadyExistInTarget": true,
       "PauseAfterEachWorkItem": false,
       "AttachmentMaxSize": 480000000,
-      "CollapseRevisions": false,
+      "AttachRevisionHistory": false,
       "LinkMigrationSaveEachAsAdded": false,
       "GenerateMigrationComment": true,
+      "NodeStructureEnricherEnabled": null,
       "NodeBasePaths": [
         "Product\\Area\\Path1",
         "Product\\Area\\Path2"
       ],
-      "WorkItemIDs": null
+      "WorkItemIDs": null,
+      "MaxRevisions": 0
     }
   ],
-  "Version": "0.0",
+  "Version": "11.11",
   "workaroundForQuerySOAPBugEnabled": false,
   "WorkItemTypeDefinition": {
     "sourceWorkItemTypeName": "targetWorkItemTypeName"
+  },
+  "Endpoints": {
+    "InMemoryWorkItemEndpoints": [
+      {
+        "Name": "Source",
+        "EndpointEnrichers": null
+      },
+      {
+        "Name": "Target",
+        "EndpointEnrichers": null
+      }
+    ]
   }
 }
 ```
 
-Here we are performing the following operations:
+> Make sure you have added the custom field 'ReflectedWorkItemId' to the target team project
 
-1. Set the Source and Target Team Projects
-1. Set the field name of the Migration tracking field. I use "TfsMigrationTool.ReflectedWorkItemId" for TFS and "ReflectedWorkItemId" for VSTS
-1. Set the mapping of Work Items that you want in "WorkItemTypeDefinition". This allows you to merge and change types.
-1. NodeStructuresMigration - We need to create the same Area and Iteration paths in the Target Team Project as you have in the Source. Make sure you clean up your Area and Iteration paths first.
-1. Work Item Migration - Move the work items. Use the QueryBit to scope to only the items that you want.
-1. Link Migration - Once all of the work items are across you can then migrate the links. Links will only be re-created if both ends of the link are in the new system. The "ReflectedWorkItemId" field value is used to find the new work items easily.
-1. Attachment Export & Import - Now we can export and then re-import the attachments. This just done separately to prevent errors
+The default [WorkItemMigrationConfig](./Processors/WorkItemMigrationConfig.md) processor will perform the following operations:
+
+* Migrate interations and sprints
+* Attachments
+* Links including for source code. Optionally clone the repositories before starting the migration to have links maintained on the initial pass.
+
+Minimum configuration information required
+
+1. Set the Source and Target Team Projects. 
+2. Set the AuthenticationMode. Prompt or AccessToken
+3. Set the field name of the Migration tracking field. I use "TfsMigrationTool.ReflectedWorkItemId" for TFS or "ReflectedWorkItemId" for VSTS or Azure DevOps
+4. Enable the 'WorkItemMigrationConfig' processor and optionally modify the WIQLQueryBit to migrate only the work items you want. The default WIQL will migrate all open workitems and revisions excluding test suites and plans.
 
 **Remember** if you want a processor to run it's `Enabled` property must be set to true. 
-
-If you have Test Suits & Plans you can also migrate them using other processors, you would need to add them to your configuration file.
-
-
-
-
