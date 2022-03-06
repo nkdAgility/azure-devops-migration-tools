@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,6 +30,8 @@ namespace VstsSyncMigrator.Engine
 {
     public class WorkItemMigrationContext : MigrationProcessorBase
     {
+        private const string RegexPatterForAreaAndIterationPathsFix = "\\[?(?<key>System.AreaPath|System.IterationPath)+\\]?[^']*'(?<value>[^']*(?:''.[^']*)*)'";
+
         private static int _count = 0;
         private static int _current = 0;
         private static long _elapsedms = 0;
@@ -118,7 +121,7 @@ namespace VstsSyncMigrator.Engine
             {
                 contextLog.Information("[FilterWorkItemsThatAlreadyExistInTarget] is enabled. Searching for work items that have already been migrated to the target...", sourceWorkItems.Count());
 
-                string targetWIQLQueryBit = FixAreaPathInTargetQuery(_config.WIQLQueryBit, Engine.Source.WorkItems.Project.Name, Engine.Target.WorkItems.Project.Name, _config.NodeBasePaths, contextLog);
+                string targetWIQLQueryBit = FixAreaPathAndIterationPathForTargetQuery(_config.WIQLQueryBit, Engine.Source.WorkItems.Project.Name, Engine.Target.WorkItems.Project.Name, contextLog);
                 sourceWorkItems = ((TfsWorkItemMigrationClient)Engine.Target.WorkItems).FilterExistingWorkItems(sourceWorkItems, new TfsWiqlDefinition() { OrderBit = _config.WIQLOrderBit, QueryBit = targetWIQLQueryBit }, (TfsWorkItemMigrationClient)Engine.Source.WorkItems);
                 contextLog.Information("!! After removing all found work items there are {SourceWorkItemCount} remaining to be migrated.", sourceWorkItems.Count());
             }
@@ -165,30 +168,44 @@ namespace VstsSyncMigrator.Engine
             contextLog.Information("DONE in {Elapsed}", stopwatch.Elapsed.ToString("c"));
         }
 
-        internal static string FixAreaPathInTargetQuery(string sourceWIQLQueryBit, string sourceProject, string targetProject, string[] nodeBasePaths, ILogger? contextLog)
+        internal static string FixAreaPathAndIterationPathForTargetQuery(string sourceWIQLQueryBit, string sourceProject, string targetProject, ILogger? contextLog)
         {
             string targetWIQLQueryBit = sourceWIQLQueryBit;
-            if (nodeBasePaths != null && nodeBasePaths.Any() && targetWIQLQueryBit.Contains("[System.AreaPath]"))
+
+            if (string.IsNullOrWhiteSpace(targetWIQLQueryBit)
+                || string.IsNullOrWhiteSpace(sourceProject)
+                || string.IsNullOrWhiteSpace(targetProject)
+                || sourceProject == targetProject)
             {
-                if (sourceProject != targetProject)
+                return targetWIQLQueryBit;
+            }
+
+            var matches = Regex.Matches(targetWIQLQueryBit, RegexPatterForAreaAndIterationPathsFix);
+            foreach (Match match in matches)
+            {
+                if (!match.Success)
+                    continue;
+
+                var value = match.Groups["value"].Value;
+                if (string.IsNullOrWhiteSpace(value) || !value.StartsWith(sourceProject))
+                    continue;
+
+                var slashIndex = value.IndexOf('\\');
+                if (slashIndex > 0)
                 {
-                    //Switch out source Area Path with destination
-                    foreach (var nodeBasePath in nodeBasePaths)
+                    var subValue = value.Substring(0, slashIndex);
+                    if (subValue == sourceProject)
                     {
-                        if (sourceWIQLQueryBit.Contains(nodeBasePath))
-                        {
-                            contextLog?.Information("[NodeBasePaths] has been set and QueryBit contains [System.AreaPath].  Since {nodeBasePath} was found in the query, updating the projectName from {source} to {target}", nodeBasePath, sourceProject, targetProject);
-                            StringBuilder myStringBuilder = new StringBuilder(sourceWIQLQueryBit);
-                            int locationOfAreaPath = sourceWIQLQueryBit.IndexOf("[System.AreaPath]");
-                            int querySegmentSize = (sourceWIQLQueryBit.IndexOf(nodeBasePath) + nodeBasePath.Length) - locationOfAreaPath;
-                            myStringBuilder.Replace(sourceProject, targetProject, locationOfAreaPath, querySegmentSize);
-                            targetWIQLQueryBit = myStringBuilder.ToString();
-                        }
+                        var targetValue = targetProject + value.Substring(slashIndex);
+                        var targetMatchValue = match.Value.Replace(value, targetValue);
+                        targetWIQLQueryBit = targetWIQLQueryBit.Replace(match.Value, targetMatchValue);
                     }
                 }
             }
 
-            return targetWIQLQueryBit;
+            contextLog?.Information("[FilterWorkItemsThatAlreadyExistInTarget] is enabled. Source project {sourceProject} is replaced with target project {targetProject} on the WIQLQueryBit which resulted into this target WIQLQueryBit \"{targetWIQLQueryBit}\" .", sourceProject, targetProject, targetWIQLQueryBit);
+
+            return targetWIQLQueryBit;    
         }
 
         private static bool IsNumeric(string val, NumberStyles numberStyle)
