@@ -57,6 +57,17 @@ namespace MigrationTools.Enrichers
             string oldTfsurl = Engine.Source.Config.AsTeamProjectConfig().Collection.ToString();
             string newTfsurl = Engine.Target.Config.AsTeamProjectConfig().Collection.ToString();
 
+            var regexForHashDigit = new Regex("#\\d+");
+
+            var sourceUri = Engine.Source.Config.AsTeamProjectConfig().Collection;
+            var sourceProject = (Project)Engine.Source.WorkItems.GetProject().internalObject;
+            var sourceGuid = sourceProject.Guid;
+            var sourceUrlRegEx = $"href=\"http[s]*://{sourceUri.IdnHost}{sourceUri.LocalPath}{sourceGuid}/_workitems/edit/(\\d*)";
+
+            var targetUri = Engine.Target.Config.AsTeamProjectConfig().Collection;
+            var targetGuid = ((Project)Engine.Target.WorkItems.GetProject().internalObject).Guid;
+            var targetUrlPrefix = $"href=\"https://{targetUri.IdnHost}{targetUri.LocalPath}{targetGuid}/_workitems/edit/";
+
             Log.LogInformation("{LogTypeName}: Fixing embedded mention links on target work item {targetWorkItemId} from {oldTfsurl} to {newTfsurl}", LogTypeName, targetWorkItem.Id, oldTfsurl, newTfsurl);
 
             foreach (Field field in targetWorkItem.ToWorkItem().Fields)
@@ -70,63 +81,78 @@ namespace MigrationTools.Enrichers
 
                 try
                 {
-                    var anchorTagMatches = Regex.Matches((string)field.Value, RegexPatternLinkAnchorTag);
-                    foreach (Match anchorTagMatch in anchorTagMatches)
+                    MatchCollection anchorTagMatches = Regex.Matches((string)field.Value, sourceUrlRegEx);
+
+                    //var anchorTagMatches = Regex.Matches((string)field.Value, RegexPatternLinkAnchorTag);
+                    foreach (Match match in anchorTagMatches)
                     {
-                        if (!anchorTagMatch.Success) continue;
+                        var sourceWiId = $"{sourceUri}{sourceProject.Name}/_workitems/edit/{match.Groups[1].Value}";
+                        var targetWI = Engine.Target.WorkItems.FindReflectedWorkItemByReflectedWorkItemId(sourceWiId);
 
-                        var href = anchorTagMatch.Groups["href"].Value;
-                        var version = anchorTagMatch.Groups["version"].Value;
-                        var value = anchorTagMatch.Groups["value"].Value;
-
-                        if (string.IsNullOrWhiteSpace(href) || string.IsNullOrWhiteSpace(version) || string.IsNullOrWhiteSpace(value))
-                            continue;
-
-                        var workItemLinkMatch = Regex.Match(href, RegexPatternWorkItemUrl);
-                        if (workItemLinkMatch.Success)
+                        if (targetWI != null)
                         {
-                            var workItemId = workItemLinkMatch.Groups["id"].Value;
-                            Log.LogDebug("{LogTypeName}: Source work item {workItemId} mention link traced on field {fieldName} on target work item {targetWorkItemId}.", LogTypeName, workItemId, field.Name, targetWorkItem.Id);
-                            var sourceLinkWi = Engine.Source.WorkItems.GetWorkItem(workItemId);
-                            if (sourceLinkWi != null)
-                            {
-                                var linkWI = Engine.Target.WorkItems.FindReflectedWorkItemByReflectedWorkItemId(sourceLinkWi);
-                                if (linkWI != null)
-                                {
-                                    var replaceValue = anchorTagMatch.Value.Replace(workItemId, linkWI.Id);
-                                    field.Value = field.Value.ToString().Replace(anchorTagMatch.Value, replaceValue);
-                                    Log.LogInformation("{LogTypeName}: Source work item {workItemId} mention link was successfully replaced with target work item {linkWIId} mention link on field {fieldName} on target work item {targetWorkItemId}.", LogTypeName, workItemId, linkWI.Id, field.Name, targetWorkItem.Id);
-                                }
-                                else
-                                {
-                                    // Anand: don't change anything when link not found
-                                    //var replaceValue = value;
-                                    //field.Value = field.Value.ToString().Replace(anchorTagMatch.Value, replaceValue);
-                                    //Log.LogError("{LogTypeName}: [SKIP] Matching target work item mention link for source work item {workItemId} mention link on field {fieldName} on target work item {targetWorkItemId} was not found on the target collection. So link is replaced with just simple text.", LogTypeName, workItemId, field.Name, targetWorkItem.Id);
-                                }
-                            }
-                            else
-                            {
-                                Log.LogInformation("{LogTypeName}: [SKIP] Source work item {workItemId} mention link on field {fieldName} on target work item {targetWorkItemId} was not found on the source collection.", LogTypeName, workItemId, field.Name, targetWorkItem.Id);
-                            }
+                            // replace URL
+                            var newLinkUrl = targetUrlPrefix + targetWI.Id;
+                            field.Value = field.Value.ToString().Replace(match.Value, newLinkUrl);
+
+                            // Replace text inside the anchor tag eg. #97 -> #556
+                            field.Value = regexForHashDigit.Replace(field.Value.ToString(), "#" + targetWI.Id, 1, match.Index + 15);
                         }
-                        else if ((href.StartsWith("mailto:") || href.StartsWith("#")) && value.StartsWith("@"))
-                        {
-                            // Anand: don't do anything for mentions cos it sends emails.
-                            //var displayName = value.Substring(1);
-                            //Log.LogDebug("{LogTypeName}: User identity {displayName} mention traced on field {fieldName} on target work item {targetWorkItemId}.", LogTypeName, displayName, field.Name, targetWorkItem.Id);
-                            //var identity = _targetTeamFoundationIdentitiesLazyCache.Value.FirstOrDefault(i => i.DisplayName == displayName);
-                            //if (identity != null)
-                            //{
-                            //    var replaceValue = anchorTagMatch.Value.Replace(href, "#").Replace(version, $"data-vss-mention=\"version:2.0,{identity.TeamFoundationId}\"");
-                            //    field.Value = field.Value.ToString().Replace(anchorTagMatch.Value, replaceValue);
-                            //    Log.LogInformation("{LogTypeName}: User identity {displayName} mention was successfully matched on field {fieldName} on target work item {targetWorkItemId}.", LogTypeName, displayName, field.Name, targetWorkItem.Id);
-                            //}
-                            //else
-                            //{
-                            //    Log.LogInformation("{LogTypeName}: [SKIP] Matching user identity {displayName} mention was not found on field {fieldName} on target work item {targetWorkItemId}. So left it as it is.", LogTypeName, displayName, field.Name, targetWorkItem.Id);
-                            //}
-                        }
+
+
+
+                        //var href = anchorTagMatch.Groups["href"].Value;
+                        //var version = anchorTagMatch.Groups["version"].Value;
+                        //var value = anchorTagMatch.Groups["value"].Value;
+
+                        //if (string.IsNullOrWhiteSpace(href) || string.IsNullOrWhiteSpace(version) || string.IsNullOrWhiteSpace(value))
+                        //    continue;
+
+                        //var workItemLinkMatch = Regex.Match(href, RegexPatternWorkItemUrl);
+                        //if (workItemLinkMatch.Success)
+                        //{
+                        //    var workItemId = workItemLinkMatch.Groups["id"].Value;
+                        //    Log.LogDebug("{LogTypeName}: Source work item {workItemId} mention link traced on field {fieldName} on target work item {targetWorkItemId}.", LogTypeName, workItemId, field.Name, targetWorkItem.Id);
+                        //    var sourceLinkWi = Engine.Source.WorkItems.GetWorkItem(workItemId);
+                        //    if (sourceLinkWi != null)
+                        //    {
+                        //        var linkWI = Engine.Target.WorkItems.FindReflectedWorkItemByReflectedWorkItemId(sourceLinkWi);
+                        //        if (linkWI != null)
+                        //        {
+                        //            var replaceValue = anchorTagMatch.Value.Replace(workItemId, linkWI.Id);
+                        //            field.Value = field.Value.ToString().Replace(anchorTagMatch.Value, replaceValue);
+                        //            Log.LogInformation("{LogTypeName}: Source work item {workItemId} mention link was successfully replaced with target work item {linkWIId} mention link on field {fieldName} on target work item {targetWorkItemId}.", LogTypeName, workItemId, linkWI.Id, field.Name, targetWorkItem.Id);
+                        //        }
+                        //        else
+                        //        {
+                        //            // Anand: don't change anything when link not found
+                        //            //var replaceValue = value;
+                        //            //field.Value = field.Value.ToString().Replace(anchorTagMatch.Value, replaceValue);
+                        //            //Log.LogError("{LogTypeName}: [SKIP] Matching target work item mention link for source work item {workItemId} mention link on field {fieldName} on target work item {targetWorkItemId} was not found on the target collection. So link is replaced with just simple text.", LogTypeName, workItemId, field.Name, targetWorkItem.Id);
+                        //        }
+                        //    }
+                        //    else
+                        //    {
+                        //        Log.LogInformation("{LogTypeName}: [SKIP] Source work item {workItemId} mention link on field {fieldName} on target work item {targetWorkItemId} was not found on the source collection.", LogTypeName, workItemId, field.Name, targetWorkItem.Id);
+                        //    }
+                        //}
+                        //else if ((href.StartsWith("mailto:") || href.StartsWith("#")) && value.StartsWith("@"))
+                        //{
+                        //    // Anand: don't do anything for mentions cos it sends emails.
+                        //    //var displayName = value.Substring(1);
+                        //    //Log.LogDebug("{LogTypeName}: User identity {displayName} mention traced on field {fieldName} on target work item {targetWorkItemId}.", LogTypeName, displayName, field.Name, targetWorkItem.Id);
+                        //    //var identity = _targetTeamFoundationIdentitiesLazyCache.Value.FirstOrDefault(i => i.DisplayName == displayName);
+                        //    //if (identity != null)
+                        //    //{
+                        //    //    var replaceValue = anchorTagMatch.Value.Replace(href, "#").Replace(version, $"data-vss-mention=\"version:2.0,{identity.TeamFoundationId}\"");
+                        //    //    field.Value = field.Value.ToString().Replace(anchorTagMatch.Value, replaceValue);
+                        //    //    Log.LogInformation("{LogTypeName}: User identity {displayName} mention was successfully matched on field {fieldName} on target work item {targetWorkItemId}.", LogTypeName, displayName, field.Name, targetWorkItem.Id);
+                        //    //}
+                        //    //else
+                        //    //{
+                        //    //    Log.LogInformation("{LogTypeName}: [SKIP] Matching user identity {displayName} mention was not found on field {fieldName} on target work item {targetWorkItemId}. So left it as it is.", LogTypeName, displayName, field.Name, targetWorkItem.Id);
+                        //    //}
+                        //}
                     }
                 }
                 catch (Exception ex)

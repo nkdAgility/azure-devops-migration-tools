@@ -169,6 +169,12 @@ namespace VstsSyncMigrator.Engine
                 _targetWorkItems[k].Item2.ToWorkItem().Open();
                 _targetWorkItems[k].Item1.ToWorkItem().Open();
                 ProcessWorkItemEmbeddedLinks(_targetWorkItems[k].Item1, _targetWorkItems[k].Item2);
+
+                if (_targetWorkItems[k].Item2.ToWorkItem().IsDirty)
+                {
+                    _targetWorkItems[k].Item2.SaveToAzureDevOps();
+                }
+
                 _targetWorkItems[k].Item2.ToWorkItem().Close();
                 _targetWorkItems[k].Item1.ToWorkItem().Close();
                 //MigrateInlineLinks.MigrateFor(_targetWorkItems.Values.ToArray());
