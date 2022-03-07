@@ -86,29 +86,20 @@ There are other processors that can be used to migrate, or process, different so
 
 Most of these processors need to be run in order. If you try to migrate work items before you have migrated Area and Iterations then ***bang*** you need to go back.
 
-| Processor                                                                                    | Status   | Target            | Usage                                                                                                      |
-| -------------------------------------------------------------------------------------------- | -------- | ----------------- | ---------------------------------------------------------------------------------------------------------- |
-| [WorkItemMigrationConfig](./Processors/WorkItemMigrationConfig.md)                           | ready    | Work Items        | Migrates either tip or history of work items with Links & Attachments based on a query with field mappings |
-| [TfsTeamSettingsProcessor](./Reference/Processors/TfsTeamSettingsProcessor.md)               | preview  | Teams             | Migrates Teams and Team Settings                                                                           |
-| [TfsAreaAndIterationProcessor](./Reference/Processors/TfsAreaAndIterationProcessor.md)       | preview  | Area & Iterations | Migrates Nodes before run                                                                                  |
-| [WorkItemDelete](./Processors/WorkItemDeleteConfig.md)                                       | ready    | Work Items        | Bulk delete of work items **WARNING DANGEROUS**                                                            |
-| [WorkItemUpdate](./Processors/WorkItemUpdateConfig.md)                                       | ready    | Work Items        | Bulk update of Work Items based on a query and field mappings                                              |
-| [TfsSharedQueryProcessor](./Reference/Processors/TfsSharedQueryProcessor.md)                 | preview  | Shared Queries    | Moved Shared Queries best effort                                                                           |
-| [TestVariablesMigration](./Processors/TestVariablesMigrationConfig.md)                       | Beta     | Suites & Plans    | Migrates Test Variables                                                                                    |
-| [TestConfigurationsMigration](./Processors/TestConfigurationsMigrationConfig.md)             | Beta     | Suites & Plans    | Migrates Test configurations                                                                               |
-| [TestPlansAndSuitesMigration](./Processors/TestPlansAndSuitesMigrationConfig.md)             | Beta     | Suites & Plans    | Rebuilds Suits and plans for Test Cases migrated using the WorkItemMigration                               |
-| [ImportProfilePicture](./Processors/ImportProfilePictureConfig) & ExportProfilePictureFromAD | Beta     | Profiles          | Downloads corporate images and updates TFS/Azure DevOps profiles                                           |
-| [WorkItemUpdateAreasAsTags](./Processors/WorkItemUpdateAreasAsTagsConfig)                    | Beta     | Work Items        | Adds tags to work items  to reflect area paths on source system                                            |
-| ~~TestRunsMigration~~                                                                        | Alfa     | Suits & Plans     | Migrates the history of Test Runs                                                                          |
-| ~~NodeStructuresMigration~~                                                                  | obsolete | Area & Iteration  | obsolete - merged into WorkItemMigrationConfig                                                             |
-| ~~AttachementExportMigration~~                                                               | obsolete | Work Items        | obsolete - merged into WorkItemMigrationConfig                                                             |
-| ~~AttachementImportMigration~~                                                               | obsolete | Work Items        | obsolete - merged into WorkItemMigrationConfig                                                             |
-| ~~LinkMigration~~                                                                            | obsolete | Work Items        | obsolete - merged into WorkItemMigrationConfig                                                             |
-| ~~HtmlFieldEmbeddedImageMigration~~                                                          | obsolete | HTML Fields       | obsolete - merged into WorkItemMigrationConfig                                                             |
-| ~~WorkItemRevisionReplayMigration~~                                                          | obsolete | Work Items        | obsolete - merged into WorkItemMigrationConfig                                                             |
-| ~~GitCommitFix~~                                                                             | obsolete | Git links         | obsolete - merged into WorkItemMigrationConfig                                                             |
-| ~~WorkItemUpdateConfig~~                                                                     | obsolete | Work Items        | obsolete - merged into WorkItemMigrationConfig                                                             |
-
+| Processor                                                                                    | Status  | Target            | Usage                                                                                                      |
+| :------------------------------------------------------------------------------------------- | :------ | :---------------- | ---------------------------------------------------------------------------------------------------------- |
+| [WorkItemMigrationConfig](./Processors/WorkItemMigrationConfig.md)                           | ready   | Work Items        | Migrates either tip or history of work items with Links & Attachments based on a query with field mappings |
+| [TfsTeamSettingsProcessor](./Reference/Processors/TfsTeamSettingsProcessor.md)               | preview | Teams             | Migrates Teams and Team Settings                                                                           |
+| [TfsAreaAndIterationProcessor](./Reference/Processors/TfsAreaAndIterationProcessor.md)       | preview | Area & Iterations | Migrates Nodes before run                                                                                  |
+| [WorkItemDelete](./Processors/WorkItemDeleteConfig.md)                                       | ready   | Work Items        | Bulk delete of work items **WARNING DANGEROUS**                                                            |
+| [WorkItemUpdate](./Processors/WorkItemUpdateConfig.md)                                       | ready   | Work Items        | Bulk update of Work Items based on a query and field mappings                                              |
+| [TfsSharedQueryProcessor](./Reference/Processors/TfsSharedQueryProcessor.md)                 | preview | Shared Queries    | Moved Shared Queries best effort                                                                           |
+| [TestVariablesMigration](./Processors/TestVariablesMigrationConfig.md)                       | Beta    | Suites & Plans    | Migrates Test Variables                                                                                    |
+| [TestConfigurationsMigration](./Processors/TestConfigurationsMigrationConfig.md)             | Beta    | Suites & Plans    | Migrates Test configurations                                                                               |
+| [TestPlansAndSuitesMigration](./Processors/TestPlansAndSuitesMigrationConfig.md)             | Beta    | Suites & Plans    | Rebuilds Suits and plans for Test Cases migrated using the WorkItemMigration                               |
+| [ImportProfilePicture](./Processors/ImportProfilePictureConfig) & ExportProfilePictureFromAD | Beta    | Profiles          | Downloads corporate images and updates TFS/Azure DevOps profiles                                           |
+| [WorkItemUpdateAreasAsTags](./Processors/WorkItemUpdateAreasAsTagsConfig)                    | Beta    | Work Items        | Adds tags to work items  to reflect area paths on source system                                            |
+| TestRunsMigration                                                                            | Alpha   | Suits & Plans     | Migrates the history of Test Runs                                                                          |
 
 ### Processors (v2 Architecture) [ PREVIEW ]
 
@@ -118,7 +109,7 @@ The new processor configuration is designed to allow the Migration Tools to supp
 
 | Processor                                                                        | Status  | Target         | Usage                                                                                                      |
 | :------------------------------------------------------------------------------- | :------ | :------------- | :--------------------------------------------------------------------------------------------------------- |
-| [WorkItemTrackingProcessor](./Reference/Processors/WorkItemTrackingProcessor.md) | alfa    | Work Items     | Migrates either tip or history of work items with Links & Attachments based on a query with field mappings |
+| [WorkItemTrackingProcessor](./Reference/Processors/WorkItemTrackingProcessor.md) | Alpha   | Work Items     | Migrates either tip or history of work items with Links & Attachments based on a query with field mappings |
 | [TfsTeamSettingsProcessor](./Reference/Processors/TfsTeamSettingsProcessor.md)   | preview | Teams          | Migrates Teams and Team Settings                                                                           |
 | [TfsSharedQueryProcessor](./Reference/Processors/TfsTeamSettingsProcessor.md)    | preview | Shared Queries | Moved Shared Queries best effort                                                                           |
 

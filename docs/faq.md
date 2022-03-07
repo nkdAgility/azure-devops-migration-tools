@@ -36,7 +36,7 @@ You do have to be careful with this process, it does assume that you are not cle
 
 That said it is often a good idea to build up your configuration processor by processor. Proving each one works as required before adding the next one.
 
-## No work items get migrate
+## Work items are not migrated
 
 Maybe you see a `TF237124: Work Item is not ready to save` error when you atempt to do a migration.
 
@@ -44,7 +44,7 @@ A number of processors have a setting `"PrefixProjectToNodes": false`. If set to
 
 This setting **must** be consistent across all processors in a configuration file. If it not it can often cause migrations to fail as expected paths are not present.
 
-## My test migration are skipping items
+## My test migration is skipping items
 
 This tools is designed to do sync and/or migrations. This means it detects if an item has already been migrated. If it finds a migrated item it will be skipped. 
 
@@ -52,7 +52,7 @@ If you want to fully test a migration it is often easiest to delete the target T
 
 Also remember that the `ReflectedWorkItemId` value will have been set on the source system. This can mean the work item select queries may not give the expect results, unless this field is cleared between test runs.
 
-## I don't understand what the 'ReflectedWorkItemId' is for.
+## I don't understand what the 'ReflectedWorkItemId' is for?
 
 To provide sync as well as migration it is important that the tools knows which items have already been migrated. This is the purpose of the `ReflectedWorkItemId` field. 
 
@@ -61,7 +61,7 @@ This field needs to be added to both the source and target team projects. On bot
 How the `ReflectedWorkItemId` field is added depends on whether the system, there are three options
 
 - TFS
-- Azure DevOps Services using the new [process customisation](https://docs.microsoft.com/en-us/azure/devops/organizations/settings/work/add-custom-field?view=azure-devops) process
+- Azure DevOps Services using the new [process customisation](https://docs.microsoft.com/en-us/azure/devops/organizations/settings/work/add-custom-field?view=azure-devops)
 - Azure DevOps Services when the instance has been imported using the [VSTS Migration Tool](https://blogs.msdn.microsoft.com/visualstudioalm/2016/11/16/import-your-tfs-database-into-visual-studio-team-services/)
 
 For details on how to add the field in each case, and trouble shooting check the [server configuration page](server-configuration.md)

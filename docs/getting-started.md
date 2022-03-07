@@ -13,13 +13,13 @@ In order to run the migration you will need to install the tools first.
 
 The tools are now installed. To run them you will need to switch to `c:\tools\MigrationTools\` and run `migrate.exe`.
 
-## Update
+## Upgrade
 
 1. Run "**choco upgrade  vsts-sync-migrator**" to upgrade the tools [source](https://chocolatey.org/packages/vsts-sync-migrator)
 
 ## Server configuration and setup
 
-Follow the [setup instructions](./server-configuration.md) to make sure that you can run the tool against your environments.
+Follow the [setup instructions](./server-configuration.md) to make sure that you can run the tool against your environments and importantly add the required custom field 'ReflectedWorkItemId'
 
 ## Create a default configuration file
 
@@ -198,19 +198,21 @@ You can now customise the configuration depending on what you need to do. Howeve
 }
 ```
 
-> Make sure you have added the custom field 'ReflectedWorkItemId' to the target team project
-
 The default [WorkItemMigrationConfig](./Processors/WorkItemMigrationConfig.md) processor will perform the following operations:
 
 * Migrate interations and sprints
 * Attachments
 * Links including for source code. Optionally clone the repositories before starting the migration to have links maintained on the initial pass.
 
-Minimum configuration information required
+## Set minimum info and execute configuration.json 
+
+> Remember to add custom field ['ReflectedWorkItemId'](./server-configuration.md) to the target team project before starting migration!
 
 1. Set the Source and Target Team Projects. 
-2. Set the AuthenticationMode. Prompt or AccessToken
-3. Set the field name of the Migration tracking field. I use "TfsMigrationTool.ReflectedWorkItemId" for TFS or "ReflectedWorkItemId" for VSTS or Azure DevOps
-4. Enable the 'WorkItemMigrationConfig' processor and optionally modify the WIQLQueryBit to migrate only the work items you want. The default WIQL will migrate all open workitems and revisions excluding test suites and plans.
+1. Set the AuthenticationMode. Prompt or AccessToken
+1. Set the field name of the Migration tracking field. I use "TfsMigrationTool.ReflectedWorkItemId" for TFS or "ReflectedWorkItemId" for VSTS or Azure DevOps
+1. Enable the 'WorkItemMigrationConfig' processor and optionally modify the WIQLQueryBit to migrate only the work items you want. The default WIQL will migrate all open workitems and revisions excluding test suites and plans.
+1. Set the ['NodeBasePaths'](./Processors/WorkItemMigrationConfig.md) of leave empty to migrate all nodes
+1. From the 'C:\tools\MigrationTools' path run "**.\migration.exe execute --config .\configuration.json**"
 
 **Remember** if you want a processor to run it's `Enabled` property must be set to true. 
