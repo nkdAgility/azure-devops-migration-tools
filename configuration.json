@@ -2,14 +2,15 @@
   "Version": "0.0",
   "LogLevel": "Verbose",
   "workaroundForQuerySOAPBugEnabled": false,
+  "GenerateMigrationComment": false,
   "Source": {
     "$type": "TfsTeamProjectConfig",
-    "Collection": "https://dev.azure.com/nkdagility-preview/",
-    "Project": "migrationSource1",
+    "Collection": "https://dev.azure.com/devonrepo/",
+    "Project": "AjithDummy1",
     "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
-    "AuthenticationMode": "Prompt",
     "AllowCrossProjectLinking": false,
-    "PersonalAccessToken": "qosss7crwz3vie4fupzpaafjndoy6g6ulgkzhoxtmjgicv2lqjyq",
+    "AuthenticationMode": "AccessToken",
+    "PersonalAccessToken": "d6zobjrncqgl6gbalbmhbkr4kqemmltgpv4mqugu7tlbrkb272xa",
     "LanguageMaps": {
       "AreaPath": "Area",
       "IterationPath": "Iteration"
@@ -17,25 +18,18 @@
   },
   "Target": {
     "$type": "TfsTeamProjectConfig",
-    "Collection": "https://dev.azure.com/nkdagility-preview/",
-    "Project": "migrationTarget1",
-    "ReflectedWorkItemIDFieldName": "nkdScrum.ReflectedWorkItemId",
-    "AuthenticationMode": "Prompt",
+    "Collection": "https://dev.azure.com/anandgothe/",
+    "Project": "ProTT",
+    "ReflectedWorkItemIDFieldName": "TempMigrationField",
     "AllowCrossProjectLinking": false,
-    "PersonalAccessToken": "qosss7crwz3vie4fupzpaafjndoy6g6ulgkzhoxtmjgicv2lqjyq",
+    "AuthenticationMode": "AccessToken",
+    "PersonalAccessToken": "yjbf2jk5ajvxnnixbni4z6a6uydw37wwyeqrlrx5hchu7bqf65aq",
+    "DummyWorkItemForImageUploads": "37",
     "LanguageMaps": {
       "AreaPath": "Area",
       "IterationPath": "Iteration"
     }
   },
-  "FieldMaps": [
-    {
-      "$type": "TreeToTagMapConfig",
-      "WorkItemTypeName": "*",
-      "toSkip": 3,
-      "timeTravel": 1
-    }
-  ],
   "WorkItemTypeDefinition": {
     "sourceWorkItemTypeName": "targetWorkItemTypeName"
   },
@@ -79,12 +73,13 @@
       "BuildFieldTable": false,
       "AppendMigrationToolSignatureFooter": false,
       "WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
+      //"WIQLQueryBit": "AND [System.ID] IN (95)",
       "WIQLOrderBit": "[System.ChangedDate] desc",
       "Enabled": true,
       "LinkMigration": true,
       "AttachmentMigration": true,
       "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
-      "FixHtmlAttachmentLinks": false,
+      "FixHtmlAttachmentLinks": true,
       "SkipToFinalRevisedWorkItemType": true,
       "WorkItemCreateRetryLimit": 5,
       "FilterWorkItemsThatAlreadyExistInTarget": false,

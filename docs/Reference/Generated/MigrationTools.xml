@@ -7,6 +7,18 @@
         <member name="M:MigrationTools.DataContracts.Pipelines.BuildDefinition.ResetObject">
             <inheritdoc/>
         </member>
+        <member name="M:MigrationTools.DataContracts.Pipelines.Process.ShouldSerializeYamlFilename">
+            <summary>
+            If the value is set, then serialize it, if it isn't don't
+            </summary>
+            <returns>bool on if the YamlFilename should be serialized.</returns>
+        </member>
+        <member name="M:MigrationTools.DataContracts.Pipelines.Process.ShouldSerializePhases">
+            <summary>
+            If the type is 1 then this is a classis pipeline, so the phases should be serialized.
+            </summary>
+            <returns>bool on if the Phases should be serialized.</returns>
+        </member>
         <member name="M:MigrationTools.DataContracts.Pipelines.ReleaseDefinition.ResetObject">
             <inheritdoc/>
         </member>
