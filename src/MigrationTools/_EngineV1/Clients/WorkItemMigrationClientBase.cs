@@ -35,6 +35,7 @@ namespace MigrationTools._EngineV1.Clients
 
         public abstract WorkItemData FindReflectedWorkItem(WorkItemData reflectedWorkItem, bool cache);
 
+        public abstract WorkItemData FindReflectedWorkItemByReflectedWorkItemIdWithCaching(string reflectedWorkItemId);
         public abstract WorkItemData FindReflectedWorkItemByReflectedWorkItemId(string reflectedWorkItemId);
 
         public abstract WorkItemData FindReflectedWorkItemByReflectedWorkItemId(WorkItemData reflectedWorkItem);

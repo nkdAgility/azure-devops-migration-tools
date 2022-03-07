@@ -8,6 +8,7 @@ using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.Framework.Client;
 using Microsoft.TeamFoundation.Framework.Common;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using MigrationTools._EngineV1.Clients;
 using MigrationTools.DataContracts;
 using MigrationTools.Processors;
 
@@ -82,12 +83,12 @@ namespace MigrationTools.Enrichers
                 try
                 {
                     MatchCollection anchorTagMatches = Regex.Matches((string)field.Value, sourceUrlRegEx);
-
+                    TfsWorkItemMigrationClient targetClient = Engine.Target.WorkItems as TfsWorkItemMigrationClient;
                     //var anchorTagMatches = Regex.Matches((string)field.Value, RegexPatternLinkAnchorTag);
                     foreach (Match match in anchorTagMatches)
                     {
                         var sourceWiId = $"{sourceUri}{sourceProject.Name}/_workitems/edit/{match.Groups[1].Value}";
-                        var targetWI = Engine.Target.WorkItems.FindReflectedWorkItemByReflectedWorkItemId(sourceWiId);
+                        var targetWI = targetClient.FindReflectedWorkItemByReflectedWorkItemIdWithCaching(sourceWiId);
 
                         if (targetWI != null)
                         {
