@@ -99,9 +99,10 @@ namespace MigrationTools.Enrichers
                                 }
                                 else
                                 {
-                                    var replaceValue = value;
-                                    field.Value = field.Value.ToString().Replace(anchorTagMatch.Value, replaceValue);
-                                    Log.LogError("{LogTypeName}: [SKIP] Matching target work item mention link for source work item {workItemId} mention link on field {fieldName} on target work item {targetWorkItemId} was not found on the target collection. So link is replaced with just simple text.", LogTypeName, workItemId, field.Name, targetWorkItem.Id);
+                                    // Anand: don't change anything when link not found
+                                    //var replaceValue = value;
+                                    //field.Value = field.Value.ToString().Replace(anchorTagMatch.Value, replaceValue);
+                                    //Log.LogError("{LogTypeName}: [SKIP] Matching target work item mention link for source work item {workItemId} mention link on field {fieldName} on target work item {targetWorkItemId} was not found on the target collection. So link is replaced with just simple text.", LogTypeName, workItemId, field.Name, targetWorkItem.Id);
                                 }
                             }
                             else
@@ -111,19 +112,20 @@ namespace MigrationTools.Enrichers
                         }
                         else if ((href.StartsWith("mailto:") || href.StartsWith("#")) && value.StartsWith("@"))
                         {
-                            var displayName = value.Substring(1);
-                            Log.LogDebug("{LogTypeName}: User identity {displayName} mention traced on field {fieldName} on target work item {targetWorkItemId}.", LogTypeName, displayName, field.Name, targetWorkItem.Id);
-                            var identity = _targetTeamFoundationIdentitiesLazyCache.Value.FirstOrDefault(i => i.DisplayName == displayName);
-                            if (identity != null)
-                            {
-                                var replaceValue = anchorTagMatch.Value.Replace(href, "#").Replace(version, $"data-vss-mention=\"version:2.0,{identity.TeamFoundationId}\"");
-                                field.Value = field.Value.ToString().Replace(anchorTagMatch.Value, replaceValue);
-                                Log.LogInformation("{LogTypeName}: User identity {displayName} mention was successfully matched on field {fieldName} on target work item {targetWorkItemId}.", LogTypeName, displayName, field.Name, targetWorkItem.Id);
-                            }
-                            else
-                            {
-                                Log.LogInformation("{LogTypeName}: [SKIP] Matching user identity {displayName} mention was not found on field {fieldName} on target work item {targetWorkItemId}. So left it as it is.", LogTypeName, displayName, field.Name, targetWorkItem.Id);
-                            }
+                            // Anand: don't do anything for mentions cos it sends emails.
+                            //var displayName = value.Substring(1);
+                            //Log.LogDebug("{LogTypeName}: User identity {displayName} mention traced on field {fieldName} on target work item {targetWorkItemId}.", LogTypeName, displayName, field.Name, targetWorkItem.Id);
+                            //var identity = _targetTeamFoundationIdentitiesLazyCache.Value.FirstOrDefault(i => i.DisplayName == displayName);
+                            //if (identity != null)
+                            //{
+                            //    var replaceValue = anchorTagMatch.Value.Replace(href, "#").Replace(version, $"data-vss-mention=\"version:2.0,{identity.TeamFoundationId}\"");
+                            //    field.Value = field.Value.ToString().Replace(anchorTagMatch.Value, replaceValue);
+                            //    Log.LogInformation("{LogTypeName}: User identity {displayName} mention was successfully matched on field {fieldName} on target work item {targetWorkItemId}.", LogTypeName, displayName, field.Name, targetWorkItem.Id);
+                            //}
+                            //else
+                            //{
+                            //    Log.LogInformation("{LogTypeName}: [SKIP] Matching user identity {displayName} mention was not found on field {fieldName} on target work item {targetWorkItemId}. So left it as it is.", LogTypeName, displayName, field.Name, targetWorkItem.Id);
+                            //}
                         }
                     }
                 }

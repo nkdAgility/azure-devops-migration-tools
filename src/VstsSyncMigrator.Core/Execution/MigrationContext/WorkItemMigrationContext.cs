@@ -39,6 +39,7 @@ namespace VstsSyncMigrator.Engine
         private static string workItemLogTemplate = "[{sourceWorkItemTypeName,20}][Complete:{currentWorkItem,6}/{totalWorkItems}][sid:{sourceWorkItemId,6}|Rev:{sourceRevisionInt,3}][tid:{targetWorkItemId,6} | ";
         private WorkItemMigrationConfig _config;
         private List<string> _ignore;
+        private Dictionary<string, Tuple<WorkItemData, WorkItemData>> _targetWorkItems = new Dictionary<string, Tuple<WorkItemData, WorkItemData>>();  
 
         private ILogger contextLog;
         private IAttachmentMigrationEnricher attachmentEnricher;
@@ -162,6 +163,17 @@ namespace VstsSyncMigrator.Engine
                     }
                 }
             }
+
+            foreach (var k in _targetWorkItems.Keys)
+            {
+                _targetWorkItems[k].Item2.ToWorkItem().Open();
+                _targetWorkItems[k].Item1.ToWorkItem().Open();
+                ProcessWorkItemEmbeddedLinks(_targetWorkItems[k].Item1, _targetWorkItems[k].Item2);
+                _targetWorkItems[k].Item2.ToWorkItem().Close();
+                _targetWorkItems[k].Item1.ToWorkItem().Close();
+                //MigrateInlineLinks.MigrateFor(_targetWorkItems.Values.ToArray());
+            }
+
             //////////////////////////////////////////////////
             stopwatch.Stop();
 
@@ -394,6 +406,11 @@ namespace VstsSyncMigrator.Engine
                     if (targetWorkItem != null)
                     {
                         targetWorkItem.ToWorkItem().Close();
+
+                        if (!_targetWorkItems.ContainsKey(targetWorkItem.Id))
+                        {
+                            _targetWorkItems.Add(targetWorkItem.Id, new Tuple<WorkItemData, WorkItemData>(sourceWorkItem,targetWorkItem));
+                        }
                     }
                     if (sourceWorkItem != null)
                     {
