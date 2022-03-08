@@ -18,6 +18,8 @@ namespace MigrationTools.Enrichers
     {
         private const string RegexPatternForImageUrl = "(?<=<img.*src=\")[^\"]*";
         private const string RegexPatternForImageFileName = "(?<=FileName=)[^=]*";
+        private readonly string _dummyWorkItemId;
+        private WorkItemData _dummyWorkItem;
 
         private readonly Project _targetProject;
         private readonly TfsTeamProjectConfig _targetConfig;
@@ -29,6 +31,7 @@ namespace MigrationTools.Enrichers
             Engine = services.GetRequiredService<IMigrationEngine>();
             _targetProject = Engine.Target.WorkItems.Project.ToProject();
             _targetConfig = Engine.Target.Config.AsTeamProjectConfig();
+            _dummyWorkItemId = Engine.Target.Config.AsTeamProjectConfig().DummyWorkItemForImageUploads;
         }
 
         [Obsolete]
@@ -46,6 +49,13 @@ namespace MigrationTools.Enrichers
         [Obsolete]
         public override int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
         {
+            _dummyWorkItem = Engine.Target.WorkItems.GetWorkItem(_dummyWorkItemId);
+
+            if (_dummyWorkItem == null)
+            {
+                throw new InvalidDataException("Work Item specified in DummyWorkItemForImageUploads ID does not exist on target");
+            }
+
             FixEmbededImages(targetWorkItem, Engine.Source.Config.AsTeamProjectConfig().Collection.ToString(), Engine.Target.Config.AsTeamProjectConfig().Collection.ToString(), Engine.Source.Config.AsTeamProjectConfig().PersonalAccessToken);
             return 0;
         }
@@ -109,18 +119,28 @@ namespace MigrationTools.Enrichers
                                 throw new Exception($"Downloaded image [{fullImageFilePath}] from Work Item [{wi.ToWorkItem().Id}] Field: [{field.Name}] could not be identified as an image. Authentication issue?");
                             }
 
-                            var attachmentInfo = new Microsoft.TeamFoundation.WorkItemTracking.Internals.AttachmentInfo(fullImageFilePath);
-                            wi.ToWorkItem().UploadAttachment(attachmentInfo);
-                            
-                            if (attachmentInfo.IsUploaded)
-                            {
-                                var newImageLink = BuildAttachmentUrl(attachmentInfo);
-                                field.Value = field.Value.ToString().Replace(match.Value, newImageLink);
-                            }
-                            else
-                            {
-                                throw new Exception($"Unable to upload the image [{fullImageFilePath}] to Work Item [{wi.ToWorkItem().Id}] Field: [{field.Name}].");
-                            }
+                            int attachmentIndex = _dummyWorkItem.ToWorkItem().Attachments.Add(new Attachment(fullImageFilePath));
+                            _dummyWorkItem.SaveToAzureDevOps();
+                            var newImageLink = _dummyWorkItem.ToWorkItem().Attachments[attachmentIndex].Uri.ToString();
+                            field.Value = field.Value.ToString().Replace(match.Value, newImageLink);
+                            _dummyWorkItem.ToWorkItem().Attachments.RemoveAt(attachmentIndex);
+                            _dummyWorkItem.SaveToAzureDevOps();
+
+
+                            //var attachmentInfo = new Microsoft.TeamFoundation.WorkItemTracking.Internals.AttachmentInfo(fullImageFilePath);
+                            //wi.ToWorkItem().UploadAttachment(attachmentInfo);
+
+                            //if (attachmentInfo.IsUploaded)
+                            //{
+                            //    var newImageLink = BuildAttachmentUrl(attachmentInfo);
+                            //    field.Value = field.Value.ToString().Replace(match.Value, newImageLink);
+
+                            //    _dummyWorkItem.ToWorkItem().Attachments.Add()
+                            //}
+                            //else
+                            //{
+                            //    throw new Exception($"Unable to upload the image [{fullImageFilePath}] to Work Item [{wi.ToWorkItem().Id}] Field: [{field.Name}].");
+                            //}
                         }
                         finally
                         {

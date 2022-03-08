@@ -85,6 +85,20 @@ namespace MigrationTools._EngineV1.Clients
             return FindReflectedWorkItemByReflectedWorkItemId(CreateReflectedWorkItemId(workItemToReflect));
         }
 
+        private static Dictionary<string, WorkItemData> _cache = new Dictionary<string, WorkItemData>();
+        public override WorkItemData FindReflectedWorkItemByReflectedWorkItemIdWithCaching(string refId)
+        {
+            if (_cache.ContainsKey(refId))
+                return _cache[refId];
+
+            var res = FindReflectedWorkItemByReflectedWorkItemId(refId);
+            if (res != null)
+            {
+                _cache[refId] = res;
+            }
+            return res;
+        }
+
         public override WorkItemData FindReflectedWorkItemByReflectedWorkItemId(string refId)
         {
             var workItemQueryBuilder = _workItemQueryBuilderFactory.Create();
