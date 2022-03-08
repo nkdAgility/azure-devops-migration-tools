@@ -10,7 +10,7 @@
     "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
     "AllowCrossProjectLinking": false,
     "AuthenticationMode": "AccessToken",
-    "PersonalAccessToken": "d6zobjrncqgl6gbalbmhbkr4kqemmltgpv4mqugu7tlbrkb272xa",
+    "PersonalAccessToken": "d6zobjrncqgl7gbalbmhbkr4kqemmltgpv4mqugu7tlbrkb272xa",
     "LanguageMaps": {
       "AreaPath": "Area",
       "IterationPath": "Iteration"
@@ -23,7 +23,7 @@
     "ReflectedWorkItemIDFieldName": "TempMigrationField",
     "AllowCrossProjectLinking": false,
     "AuthenticationMode": "AccessToken",
-    "PersonalAccessToken": "fg6simagntqa6pu7fwsqa6emh423kuf6pui6iinhfbmpuk2zkckq",
+    "PersonalAccessToken": "fg6simagntqa6pu17fwsqa6emh423kuf6pui6iinhfbmpuk2zkckq",
     "DummyWorkItemForImageUploads": "37",
     "LanguageMaps": {
       "AreaPath": "Area",
