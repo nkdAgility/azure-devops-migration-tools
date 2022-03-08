@@ -39,12 +39,12 @@ namespace VstsSyncMigrator.Engine
         private static string workItemLogTemplate = "[{sourceWorkItemTypeName,20}][Complete:{currentWorkItem,6}/{totalWorkItems}][sid:{sourceWorkItemId,6}|Rev:{sourceRevisionInt,3}][tid:{targetWorkItemId,6} | ";
         private WorkItemMigrationConfig _config;
         private List<string> _ignore;
-        private Dictionary<string, Tuple<WorkItemData, WorkItemData>> _targetWorkItems = new Dictionary<string, Tuple<WorkItemData, WorkItemData>>();  
+        private Dictionary<string, Tuple<WorkItemData, WorkItemData>> _processedWorkItems = new Dictionary<string, Tuple<WorkItemData, WorkItemData>>();  
 
         private ILogger contextLog;
         private IAttachmentMigrationEnricher attachmentEnricher;
         private IWorkItemProcessorEnricher embededImagesEnricher;
-        private IWorkItemProcessorEnricher workItemEmbededLinkEnricher;
+        private TfsWorkItemEmbededLinkEnricher workItemEmbededLinkEnricher;
         private TfsGitRepositoryEnricher gitRepositoryEnricher;
         private TfsNodeStructure nodeStructureEnricher;
         private TfsRevisionManager revisionManager;
@@ -164,26 +164,58 @@ namespace VstsSyncMigrator.Engine
                 }
             }
 
-            foreach (var k in _targetWorkItems.Keys)
+            // fix embedded links in html fields
+            foreach (var k in _processedWorkItems.Keys)
             {
-                _targetWorkItems[k].Item2.ToWorkItem().Open();
-                _targetWorkItems[k].Item1.ToWorkItem().Open();
-                ProcessWorkItemEmbeddedLinks(_targetWorkItems[k].Item1, _targetWorkItems[k].Item2);
+                _processedWorkItems[k].Item2.ToWorkItem().Open();
+                _processedWorkItems[k].Item1.ToWorkItem().Open();
+                ProcessWorkItemEmbeddedLinks(_processedWorkItems[k].Item1, _processedWorkItems[k].Item2);
 
-                if (_targetWorkItems[k].Item2.ToWorkItem().IsDirty)
+                if (_processedWorkItems[k].Item2.ToWorkItem().IsDirty)
                 {
-                    _targetWorkItems[k].Item2.SaveToAzureDevOps();
+                    _processedWorkItems[k].Item2.SaveToAzureDevOps();
                 }
 
-                _targetWorkItems[k].Item2.ToWorkItem().Close();
-                _targetWorkItems[k].Item1.ToWorkItem().Close();
+                _processedWorkItems[k].Item2.ToWorkItem().Close();
+                _processedWorkItems[k].Item1.ToWorkItem().Close();
                 //MigrateInlineLinks.MigrateFor(_targetWorkItems.Values.ToArray());
             }
 
+
+            var creds = new Microsoft.VisualStudio.Services.Common.VssBasicCredential(string.Empty, Engine.Target.Config.AsTeamProjectConfig().PersonalAccessToken);
+            var connection = new Microsoft.VisualStudio.Services.WebApi.VssConnection(Engine.Target.Config.AsTeamProjectConfig().Collection, creds);
+            var targetGuid = ((Project)Engine.Target.WorkItems.GetProject().internalObject).Guid;
+            using (var witClient = connection.GetClient<Microsoft.TeamFoundation.WorkItemTracking.WebApi.WorkItemTrackingHttpClient>())
+            {
+                // fix embedded links in History
+                foreach (var k in _processedWorkItems.Keys)
+                {
+                    var wid = int.Parse(_processedWorkItems[k].Item2.Id);
+                    var res = witClient.GetCommentsAsync(targetGuid, wid).Result;
+
+                    foreach(var c in res.Comments)
+                    {
+                        var text = c.Text;
+                        var newText = workItemEmbededLinkEnricher.FixLinks(text);
+
+                        if (newText != text)
+                        {
+                            contextLog.Information($"Fixing comment for wi {wid}");
+                            var commentUpdate = new Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models.CommentUpdate { Text = newText };
+                            var ddd = witClient.UpdateCommentAsync(commentUpdate, targetGuid, wid, c.Id).Result;
+                        }
+                    }
+                }
+            }
             //////////////////////////////////////////////////
             stopwatch.Stop();
 
             contextLog.Information("DONE in {Elapsed}", stopwatch.Elapsed.ToString("c"));
+        }
+
+        private void FixEmbeddedLinksInHistory(string id)
+        {
+            
         }
 
         internal static string FixAreaPathAndIterationPathForTargetQuery(string sourceWIQLQueryBit, string sourceProject, string targetProject, ILogger? contextLog)
@@ -413,9 +445,9 @@ namespace VstsSyncMigrator.Engine
                     {
                         targetWorkItem.ToWorkItem().Close();
 
-                        if (!_targetWorkItems.ContainsKey(targetWorkItem.Id))
+                        if (!_processedWorkItems.ContainsKey(targetWorkItem.Id))
                         {
-                            _targetWorkItems.Add(targetWorkItem.Id, new Tuple<WorkItemData, WorkItemData>(sourceWorkItem,targetWorkItem));
+                            _processedWorkItems.Add(targetWorkItem.Id, new Tuple<WorkItemData, WorkItemData>(sourceWorkItem,targetWorkItem));
                         }
                     }
                     if (sourceWorkItem != null)

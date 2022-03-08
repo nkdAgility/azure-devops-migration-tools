@@ -72,7 +72,7 @@
       "UpdateCreatedBy": true,
       "BuildFieldTable": false,
       "AppendMigrationToolSignatureFooter": false,
-      "WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
+      "WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan', 'Idea')",
       //"WIQLQueryBit": "AND [System.ID] IN (95)",
       "WIQLOrderBit": "[System.ChangedDate] desc",
       "Enabled": true,
