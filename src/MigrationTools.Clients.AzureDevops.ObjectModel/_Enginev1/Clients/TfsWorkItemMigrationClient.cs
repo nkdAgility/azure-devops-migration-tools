@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.ApplicationInsights.DataContracts;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools._EngineV1.Configuration;
@@ -185,17 +184,30 @@ namespace MigrationTools._EngineV1.Clients
             throw new NotImplementedException();
         }
 
+        public override List<int> GetWorkItemIds(string WIQLQuery)
+        {
+            var query = GetWorkItemQuery(WIQLQuery);
+            return query.GetWorkItemIds();
+        }
+
         public override List<WorkItemData> GetWorkItems(string WIQLQuery)
         {
-            var wiqb = _workItemQueryBuilderFactory.Create();
-            wiqb.Query = WIQLQuery;
-            return GetWorkItems(wiqb);
+            var query = GetWorkItemQuery(WIQLQuery);
+            return query.GetWorkItems();
         }
 
         public override List<WorkItemData> GetWorkItems(IWorkItemQueryBuilder queryBuilder)
-        {
+{
             queryBuilder.AddParameter("TeamProject", MigrationClient.Config.AsTeamProjectConfig().Project);
             return queryBuilder.BuildWIQLQuery(MigrationClient).GetWorkItems();
+        }
+
+        private Endpoints.IWorkItemQuery GetWorkItemQuery(string WIQLQuery)
+        {
+            var wiqb = _workItemQueryBuilderFactory.Create();
+            wiqb.Query = WIQLQuery;
+            wiqb.AddParameter("TeamProject", MigrationClient.Config.AsTeamProjectConfig().Project);
+            return wiqb.BuildWIQLQuery(MigrationClient);
         }
 
         protected override void InnerConfigure(IMigrationClient migrationClient, bool bypassRules = true)
