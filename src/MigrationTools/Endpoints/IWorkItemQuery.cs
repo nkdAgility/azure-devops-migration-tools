@@ -11,5 +11,7 @@ namespace MigrationTools.Endpoints
         void Configure(IMigrationClient migrationClient, string query, Dictionary<string, string> parameters);
 
         List<WorkItemData> GetWorkItems();
+
+        List<int> GetWorkItemIds();
     }
 }

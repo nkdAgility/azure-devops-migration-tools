@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using Microsoft.Extensions.Logging;
-using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools;
 using MigrationTools._EngineV1.Clients;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Configuration.Processing;
-using MigrationTools.DataContracts;
 using VstsSyncMigrator._EngineV1.Processors;
 
 namespace VstsSyncMigrator.Engine
@@ -17,7 +16,8 @@ namespace VstsSyncMigrator.Engine
     {
         private WorkItemDeleteConfig _config;
 
-        public WorkItemDelete(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<WorkItemUpdate> logger) : base(services, me, telemetry, logger)
+        public WorkItemDelete(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<WorkItemUpdate> logger)
+            : base(services, me, telemetry, logger)
         {
         }
 
@@ -42,7 +42,7 @@ namespace VstsSyncMigrator.Engine
                 string.Format(
                     @"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY {1}",
                     _config.WIQLQueryBit, _config.WIQLOrderBit);
-            var workItems = Engine.Target.WorkItems.GetWorkItems(sourceQuery);
+            var workItems = Engine.Target.WorkItems.GetWorkItemIds(sourceQuery);
 
             if (workItems.Count > 0)
             {
@@ -57,23 +57,31 @@ namespace VstsSyncMigrator.Engine
                 }
 
                 //////////////////////////////////////////////////
-                int current = workItems.Count;
-
-                //int count = 0;
-                //long elapsedms = 0;
-                var tobegone = (from WorkItemData wi in workItems select int.Parse(wi.Id)).ToList();
-
-                foreach (int begone in tobegone)
+                var counter = 0;
+                var totalCount = workItems.Count;
+                var lastProgressUpdate = DateTime.Now;
+                var store = ((TfsWorkItemMigrationClient)Engine.Target.WorkItems).Store;
+                var chunks = workItems.Chunk(10);
+                foreach (var begone in chunks)
                 {
-                    ICollection<WorkItemOperationError> err = ((TfsWorkItemMigrationClient)Engine.Target.WorkItems).Store.DestroyWorkItems(new List<int>() { begone });
+                    if ((DateTime.Now - lastProgressUpdate).TotalSeconds > 30)
+                    {
+                        Log.LogInformation("Delete Progress {0}/{1} {2}", counter, totalCount, (1.0 * counter / totalCount).ToString("#0.##%", CultureInfo.InvariantCulture));
+                        lastProgressUpdate = DateTime.Now;
+                    }
+                    var deleted = begone.ToList();
+                    var err = store.DestroyWorkItems(begone);
                     if (err.Count > 0)
                     {
-                        Log.LogInformation("Delete Failed: {0}", err.First().Exception.ToString());
+                        foreach (var e in err)
+                        {
+                            deleted.Remove(e.Id);
+                            Log.LogWarning("Delete Failed: {0}", e.Exception.ToString());
+                        }
                     }
-                    else
-                    {
-                        Log.LogInformation("Deleted {0}", begone);
-                    }
+                    var deletedIds = string.Join(", ", deleted);
+                    Log.LogDebug("Deleted {0}", deletedIds);
+                    counter += begone.Count();
                 }
             }
             else
@@ -84,6 +92,20 @@ namespace VstsSyncMigrator.Engine
             //////////////////////////////////////////////////
             stopwatch.Stop();
             Console.WriteLine(@"DONE in {0:%h} hours {0:%m} minutes {0:s\:fff} seconds", stopwatch.Elapsed);
+        }
+
+
+    }
+
+    public static class ListExtensions
+    {
+        public static IEnumerable<IEnumerable<T>> Chunk<T>(this IEnumerable<T> source, int chunksize)
+        {
+            while (source.Any())
+            {
+                yield return source.Take(chunksize);
+                source = source.Skip(chunksize);
+            }
         }
     }
 }

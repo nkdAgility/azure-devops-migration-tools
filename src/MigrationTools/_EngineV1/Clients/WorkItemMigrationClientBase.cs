@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.DataContracts;
@@ -49,6 +49,8 @@ namespace MigrationTools._EngineV1.Clients
         public abstract WorkItemData GetWorkItem(int id);
 
         public abstract List<WorkItemData> GetWorkItems();
+
+        public abstract List<int> GetWorkItemIds(string WIQLQuery);
 
         public abstract List<WorkItemData> GetWorkItems(string WIQLQuery);
 

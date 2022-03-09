@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using MigrationTools._EngineV1.Clients;
 using MigrationTools.DataContracts;
 using Newtonsoft.Json;
@@ -23,6 +24,11 @@ namespace MigrationTools.Endpoints
             {
                 System.IO.Directory.CreateDirectory(_query);
             }
+        }
+
+        public List<int> GetWorkItemIds()
+        {
+            return GetWorkItems().Select(wi => int.Parse(wi.Id)).ToList();
         }
 
         public List<WorkItemData> GetWorkItems()
