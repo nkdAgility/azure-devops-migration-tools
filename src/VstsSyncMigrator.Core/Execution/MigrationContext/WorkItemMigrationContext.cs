@@ -99,73 +99,81 @@ namespace VstsSyncMigrator.Engine
             revisionManager = Services.GetRequiredService<TfsRevisionManager>();
             revisionManager.Configure(new TfsRevisionManagerOptions() { Enabled = true, MaxRevisions = _config.MaxRevisions, ReplayRevisions = _config.ReplayRevisions });
 
-
-            //Validation: make sure that the ReflectedWorkItemId field name specified in the config exists in the target process, preferably on each work item type.
-            PopulateIgnoreList();
-
             var stopwatch = Stopwatch.StartNew();
-            //////////////////////////////////////////////////
-            string sourceQuery =
-                string.Format(
-                    @"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY {1}",
-                    _config.WIQLQueryBit, _config.WIQLOrderBit);
 
-            // Inform the user that he maybe has to be patient now
-            contextLog.Information("Querying items to be migrated: {SourceQuery} ...", sourceQuery);
-            var sourceWorkItems = Engine.Source.WorkItems.GetWorkItems(sourceQuery);
-            contextLog.Information("Replay all revisions of {sourceWorkItemsCount} work items?", sourceWorkItems.Count);
-            //////////////////////////////////////////////////
-            contextLog.Information("Found target project as {@destProject}", Engine.Target.WorkItems.Project.Name);
-            //////////////////////////////////////////////////////////FilterCompletedByQuery
-            if (_config.FilterWorkItemsThatAlreadyExistInTarget)
+            try
             {
-                contextLog.Information("[FilterWorkItemsThatAlreadyExistInTarget] is enabled. Searching for work items that have already been migrated to the target...", sourceWorkItems.Count());
+                //Validation: make sure that the ReflectedWorkItemId field name specified in the config exists in the target process, preferably on each work item type.
+                PopulateIgnoreList();
 
-                string targetWIQLQueryBit = FixAreaPathAndIterationPathForTargetQuery(_config.WIQLQueryBit, Engine.Source.WorkItems.Project.Name, Engine.Target.WorkItems.Project.Name, contextLog);
-                sourceWorkItems = ((TfsWorkItemMigrationClient)Engine.Target.WorkItems).FilterExistingWorkItems(sourceWorkItems, new TfsWiqlDefinition() { OrderBit = _config.WIQLOrderBit, QueryBit = targetWIQLQueryBit }, (TfsWorkItemMigrationClient)Engine.Source.WorkItems);
-                contextLog.Information("!! After removing all found work items there are {SourceWorkItemCount} remaining to be migrated.", sourceWorkItems.Count());
-            }
-            //////////////////////////////////////////////////
+                string sourceQuery =
+                    string.Format(
+                        @"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY {1}",
+                        _config.WIQLQueryBit, _config.WIQLOrderBit);
 
-            var result = validateConfig.ValidatingRequiredField(Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName, sourceWorkItems);
-            if (!result)
-            {
-                var ex = new InvalidFieldValueException("Not all work items in scope contain a valid ReflectedWorkItemId Field!");
-                Log.LogError(ex, "Not all work items in scope contain a valid ReflectedWorkItemId Field!");
-                throw ex;
-            }
-            //////////////////////////////////////////////////
-            _current = 1;
-            _count = sourceWorkItems.Count;
-            _elapsedms = 0;
-            _totalWorkItem = sourceWorkItems.Count;
-            foreach (WorkItemData sourceWorkItemData in sourceWorkItems)
-            {
-                var sourceWorkItem = TfsExtensions.ToWorkItem(sourceWorkItemData);
-                workItemLog = contextLog.ForContext("SourceWorkItemId", sourceWorkItem.Id);
-                using (LogContext.PushProperty("sourceWorkItemTypeName", sourceWorkItem.Type.Name))
-                using (LogContext.PushProperty("currentWorkItem", _current))
-                using (LogContext.PushProperty("totalWorkItems", _totalWorkItem))
-                using (LogContext.PushProperty("sourceWorkItemId", sourceWorkItem.Id))
-                using (LogContext.PushProperty("sourceRevisionInt", sourceWorkItem.Revision))
-                using (LogContext.PushProperty("targetWorkItemId", null))
+                // Inform the user that he maybe has to be patient now
+                contextLog.Information("Querying items to be migrated: {SourceQuery} ...", sourceQuery);
+                var sourceWorkItems = Engine.Source.WorkItems.GetWorkItems(sourceQuery);
+                contextLog.Information("Replay all revisions of {sourceWorkItemsCount} work items?", sourceWorkItems.Count);
+                //////////////////////////////////////////////////
+                contextLog.Information("Found target project as {@destProject}", Engine.Target.WorkItems.Project.Name);
+                //////////////////////////////////////////////////////////FilterCompletedByQuery
+                if (_config.FilterWorkItemsThatAlreadyExistInTarget)
                 {
-                    ProcessWorkItemAsync(sourceWorkItemData, _config.WorkItemCreateRetryLimit).Wait();
-                    if (_config.PauseAfterEachWorkItem)
+                    contextLog.Information("[FilterWorkItemsThatAlreadyExistInTarget] is enabled. Searching for work items that have already been migrated to the target...", sourceWorkItems.Count());
+
+                    string targetWIQLQueryBit = FixAreaPathAndIterationPathForTargetQuery(_config.WIQLQueryBit, Engine.Source.WorkItems.Project.Name, Engine.Target.WorkItems.Project.Name, contextLog);
+                    sourceWorkItems = ((TfsWorkItemMigrationClient)Engine.Target.WorkItems).FilterExistingWorkItems(sourceWorkItems, new TfsWiqlDefinition() { OrderBit = _config.WIQLOrderBit, QueryBit = targetWIQLQueryBit }, (TfsWorkItemMigrationClient)Engine.Source.WorkItems);
+                    contextLog.Information("!! After removing all found work items there are {SourceWorkItemCount} remaining to be migrated.", sourceWorkItems.Count());
+                }
+                //////////////////////////////////////////////////
+
+                var result = validateConfig.ValidatingRequiredField(Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName, sourceWorkItems);
+                if (!result)
+                {
+                    var ex = new InvalidFieldValueException("Not all work items in scope contain a valid ReflectedWorkItemId Field!");
+                    Log.LogError(ex, "Not all work items in scope contain a valid ReflectedWorkItemId Field!");
+                    throw ex;
+                }
+                //////////////////////////////////////////////////
+                _current = 1;
+                _count = sourceWorkItems.Count;
+                _elapsedms = 0;
+                _totalWorkItem = sourceWorkItems.Count;
+                foreach (WorkItemData sourceWorkItemData in sourceWorkItems)
+                {
+                    var sourceWorkItem = TfsExtensions.ToWorkItem(sourceWorkItemData);
+                    workItemLog = contextLog.ForContext("SourceWorkItemId", sourceWorkItem.Id);
+                    using (LogContext.PushProperty("sourceWorkItemTypeName", sourceWorkItem.Type.Name))
+                    using (LogContext.PushProperty("currentWorkItem", _current))
+                    using (LogContext.PushProperty("totalWorkItems", _totalWorkItem))
+                    using (LogContext.PushProperty("sourceWorkItemId", sourceWorkItem.Id))
+                    using (LogContext.PushProperty("sourceRevisionInt", sourceWorkItem.Revision))
+                    using (LogContext.PushProperty("targetWorkItemId", null))
                     {
-                        Console.WriteLine("Do you want to continue? (y/n)");
-                        if (Console.ReadKey().Key != ConsoleKey.Y)
+                        ProcessWorkItemAsync(sourceWorkItemData, _config.WorkItemCreateRetryLimit).Wait();
+                        if (_config.PauseAfterEachWorkItem)
                         {
-                            workItemLog.Warning("USER ABORTED");
-                            break;
+                            Console.WriteLine("Do you want to continue? (y/n)");
+                            if (Console.ReadKey().Key != ConsoleKey.Y)
+                            {
+                                workItemLog.Warning("USER ABORTED");
+                                break;
+                            }
                         }
                     }
                 }
             }
-            //////////////////////////////////////////////////
-            stopwatch.Stop();
+            finally
+            {
+                if (_config.FixHtmlAttachmentLinks)
+                {
+                    embededImagesEnricher?.ProcessorExecutionEnd(null);
+                }
 
-            contextLog.Information("DONE in {Elapsed}", stopwatch.Elapsed.ToString("c"));
+                stopwatch.Stop();
+                contextLog.Information("DONE in {Elapsed}", stopwatch.Elapsed.ToString("c"));
+            }
         }
 
         internal static string FixAreaPathAndIterationPathForTargetQuery(string sourceWIQLQueryBit, string sourceProject, string targetProject, ILogger? contextLog)
@@ -205,7 +213,7 @@ namespace VstsSyncMigrator.Engine
 
             contextLog?.Information("[FilterWorkItemsThatAlreadyExistInTarget] is enabled. Source project {sourceProject} is replaced with target project {targetProject} on the WIQLQueryBit which resulted into this target WIQLQueryBit \"{targetWIQLQueryBit}\" .", sourceProject, targetProject, targetWIQLQueryBit);
 
-            return targetWIQLQueryBit;    
+            return targetWIQLQueryBit;
         }
 
         private static bool IsNumeric(string val, NumberStyles numberStyle)
