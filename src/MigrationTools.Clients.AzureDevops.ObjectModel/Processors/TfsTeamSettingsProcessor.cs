@@ -4,7 +4,11 @@ using System.Diagnostics;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.Client;
-using Microsoft.TeamFoundation.ProcessConfiguration.Client;
+using Microsoft.TeamFoundation.Core.WebApi.Types;
+using Microsoft.TeamFoundation.Framework.Client;
+using Microsoft.TeamFoundation.Framework.Common;
+using Microsoft.TeamFoundation.Work.WebApi;
+using Microsoft.VisualStudio.Services.WebApi;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
 
@@ -15,6 +19,9 @@ namespace MigrationTools.Processors
     /// </summary>
     public class TfsTeamSettingsProcessor : Processor
     {
+        private const string LogTypeName = nameof(TfsTeamSettingsProcessor);
+        private readonly Lazy<List<TeamFoundationIdentity>> _targetTeamFoundationIdentitiesLazyCache;
+
         private TfsTeamSettingsProcessorOptions _Options;
 
         public TfsTeamSettingsProcessor(ProcessorEnricherContainer processorEnrichers,
@@ -24,6 +31,22 @@ namespace MigrationTools.Processors
                                         ILogger<Processor> logger)
             : base(processorEnrichers, endpointFactory, services, telemetry, logger)
         {
+            _targetTeamFoundationIdentitiesLazyCache = new Lazy<List<TeamFoundationIdentity>>(() =>
+            {
+                try
+                {
+                    TfsTeamService teamService = Target.TfsTeamService;
+
+                    var identityService = Target.TfsCollection.GetService<IIdentityManagementService>();
+                    var tfi = identityService.ReadIdentity(IdentitySearchFactor.General, "Project Collection Valid Users", MembershipQuery.Expanded, ReadIdentityOptions.None);
+                    return identityService.ReadIdentities(tfi.Members, MembershipQuery.None, ReadIdentityOptions.None).ToList();
+                }
+                catch (Exception ex)
+                {
+                    Log.LogError(ex, "{LogTypeName}: Unable load list of identities from target collection.", LogTypeName);
+                    return new List<TeamFoundationIdentity>();
+                }
+            });
         }
 
         public new TfsTeamSettingsEndpoint Source => (TfsTeamSettingsEndpoint)base.Source;
@@ -84,6 +107,10 @@ namespace MigrationTools.Processors
             {
                 sourceTeams = sourceTeams.Where(t => _Options.Teams.Contains(t.Name)).ToList();
             }
+
+            var sourceHttpClient = Source.WorkHttpClient;
+            var targetHttpClient = Target.WorkHttpClient;
+
             // Create teams
             foreach (TeamFoundationTeam sourceTeam in sourceTeams)
             {
@@ -107,6 +134,8 @@ namespace MigrationTools.Processors
                             if (sourceConfig.TeamSettings.BacklogIterationPath != null &&
                                 sourceConfig.TeamSettings.TeamFieldValues.Length > 0)
                             {
+                                var iterationMap = new Dictionary<string, string>();
+
                                 var targetConfig = targetConfigurations.FirstOrDefault(t => t.TeamName == sourceConfig.TeamName);
                                 if (targetConfig == null)
                                 {
@@ -120,10 +149,15 @@ namespace MigrationTools.Processors
                                     targetConfig.TeamSettings.BacklogIterationPath =
                                         string.Format("{0}\\{1}", Target.Project, sourceConfig.TeamSettings.BacklogIterationPath);
                                     targetConfig.TeamSettings.IterationPaths = sourceConfig.TeamSettings.IterationPaths
-                                        .Select(path => string.Format("{0}\\{1}", Target.Project, path))
+                                        .Select(path =>
+                                        {
+                                            var result = string.Format("{0}\\{1}", Target.Project, path);
+                                            iterationMap[path] = result;
+                                            return result;
+                                        })
                                         .ToArray();
                                     targetConfig.TeamSettings.TeamFieldValues = sourceConfig.TeamSettings.TeamFieldValues
-                                        .Select(field => new TeamFieldValue
+                                        .Select(field => new Microsoft.TeamFoundation.ProcessConfiguration.Client.TeamFieldValue
                                         {
                                             IncludeChildren = field.IncludeChildren,
                                             Value = string.Format("{0}\\{1}", Target.Project, field.Value)
@@ -134,7 +168,12 @@ namespace MigrationTools.Processors
                                 {
                                     targetConfig.TeamSettings.BacklogIterationPath = sourceConfig.TeamSettings.BacklogIterationPath.Replace(Source.Project, Target.Project);
                                     Log.LogDebug("targetConfig.TeamSettings.BacklogIterationPath={BacklogIterationPath}", targetConfig.TeamSettings.BacklogIterationPath);
-                                    targetConfig.TeamSettings.IterationPaths = sourceConfig.TeamSettings.IterationPaths.Select(ip => ip.Replace(Source.Project, Target.Project)).ToArray();
+                                    targetConfig.TeamSettings.IterationPaths = sourceConfig.TeamSettings.IterationPaths.Select(ip =>
+                                    {
+                                        var result = ip.Replace(Source.Project, Target.Project);
+                                        iterationMap[ip] = result;
+                                        return result;
+                                    }).ToArray();
                                     Log.LogDebug("targetConfig.TeamSettings.IterationPaths={@IterationPaths}", targetConfig.TeamSettings.IterationPaths);
                                     targetConfig.TeamSettings.TeamFieldValues = sourceConfig.TeamSettings.TeamFieldValues;
                                     foreach (var item in targetConfig.TeamSettings.TeamFieldValues)
@@ -145,7 +184,10 @@ namespace MigrationTools.Processors
                                 }
 
                                 Target.TfsTeamSettingsService.SetTeamSettings(targetConfig.TeamId, targetConfig.TeamSettings);
+
                                 Log.LogDebug("-> Team '{0}' settings... applied", targetConfig.TeamName);
+
+                                MigrateCapacities(sourceHttpClient, targetHttpClient, sourceTeam, newTeam, iterationMap);
                             }
                             else
                             {
@@ -198,6 +240,78 @@ namespace MigrationTools.Processors
             //////////////////////////////////////////////////
             stopwatch.Stop();
             Log.LogDebug("DONE in {Elapsed} ", stopwatch.Elapsed.ToString("c"));
+        }
+
+        private void MigrateCapacities(WorkHttpClient sourceHttpClient, WorkHttpClient targetHttpClient, TeamFoundationTeam sourceTeam, TeamFoundationTeam targetTeam, Dictionary<string, string> iterationMap)
+        {
+            if (!_Options.MigrateTeamCapacities) return;
+
+            Log.LogInformation("Migrating team capacities..");
+            try
+            {
+                var sourceTeamContext = new TeamContext(Source.TfsProject.Guid, sourceTeam.Identity.TeamFoundationId);
+                var sourceIterations = sourceHttpClient.GetTeamIterationsAsync(sourceTeamContext).ConfigureAwait(false).GetAwaiter().GetResult();
+
+                var targetTeamContext = new TeamContext(Target.TfsProject.Guid, targetTeam.Identity.TeamFoundationId);
+                var targetIterations = targetHttpClient.GetTeamIterationsAsync(targetTeamContext).ConfigureAwait(false).GetAwaiter().GetResult();
+
+                foreach (var sourceIteration in sourceIterations)
+                {
+                    try
+                    {
+                        var targetIterationPath = iterationMap[sourceIteration.Path];
+                        var targetIteration = targetIterations.FirstOrDefault(i => i.Path == targetIterationPath);
+                        if (targetIteration == null) continue;
+
+                        var targetCapacities = new List<TeamMemberCapacityIdentityRef>();
+                        var sourceCapacities = sourceHttpClient.GetCapacitiesWithIdentityRefAsync(sourceTeamContext, sourceIteration.Id).ConfigureAwait(false).GetAwaiter().GetResult();
+                        foreach (var sourceCapacity in sourceCapacities)
+                        {
+                            var sourceDisplayName = sourceCapacity.TeamMember.DisplayName;
+                            var index = sourceDisplayName.IndexOf("<");
+                            if (index > 0)
+                            {
+                                sourceDisplayName = sourceDisplayName.Substring(0, index).Trim();
+                            }
+
+                            var targetTeamFoundatationIdentity = _targetTeamFoundationIdentitiesLazyCache.Value.FirstOrDefault(i => i.DisplayName == sourceDisplayName);
+                            if (targetTeamFoundatationIdentity != null)
+                            {
+                                targetCapacities.Add(new TeamMemberCapacityIdentityRef
+                                {
+                                    Activities = sourceCapacity.Activities,
+                                    DaysOff = sourceCapacity.DaysOff,
+                                    TeamMember = new IdentityRef
+                                    {
+                                        Id = targetTeamFoundatationIdentity.TeamFoundationId.ToString()
+                                    }
+                                });
+                            }
+                            else
+                            {
+                                Log.LogWarning("[SKIP] Team Member {member} was not found on target when replacing capacities on iteration {iteration}.", sourceCapacity.TeamMember.DisplayName, targetIteration.Path);
+                            }
+                        }
+
+                        if (targetCapacities.Count > 0)
+                        {
+                            targetHttpClient.ReplaceCapacitiesWithIdentityRefAsync(targetCapacities, targetTeamContext, targetIteration.Id).ConfigureAwait(false).GetAwaiter().GetResult();
+                            Log.LogDebug("Team {team} capacities for iteration {iteration} migrated.", targetTeam.Name, targetIteration.Path);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.LogError(ex, "[SKIP] Problem migrating team capacities for iteration {iteration}.", sourceIteration.Path);
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.LogError(ex, "[SKIP] Problem migrating team capacities.");
+            }
+
+            Log.LogInformation("Team capacities migration done..");
         }
     }
 }

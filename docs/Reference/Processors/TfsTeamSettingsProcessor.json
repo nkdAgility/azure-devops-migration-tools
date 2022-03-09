@@ -3,6 +3,7 @@
   "Enabled": false,
   "MigrateTeamSettings": true,
   "UpdateTeamSettings": true,
+  "MigrateTeamCapacities": false,
   "PrefixProjectToNodes": false,
   "Teams": null,
   "ProcessorEnrichers": null,
