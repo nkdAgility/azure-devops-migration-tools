@@ -56,47 +56,47 @@ namespace MigrationTools.Endpoints
 
             foreach (Link l in tfsLinks)
             {
-                if (l is Hyperlink)
+                switch (l)
                 {
-                    var lh = (Hyperlink)l;
-                    ls.Add(new LinkItem()
-                    {
-                        LinkType = LinkItemType.Hyperlink,
-                        ArtifactLinkType = l.ArtifactLinkType.Name,
-                        Comment = lh.Comment,
-                        LinkUri = lh.Location,
-                        internalObject = l
-                    });
-                }
-                else if (l is ExternalLink)
-                {
-                    var le = (ExternalLink)l;
-                    ls.Add(new LinkItem()
-                    {
-                        LinkType = LinkItemType.ExternalLink,
-                        ArtifactLinkType = l.ArtifactLinkType.Name,
-                        Comment = le.Comment,
-                        LinkUri = le.LinkedArtifactUri,
-                        internalObject = l
-                    });
-                }
-                else if (l is RelatedLink)
-                {
-                    var lr = (RelatedLink)l;
-                    ls.Add(new LinkItem()
-                    {
-                        LinkType = LinkItemType.RelatedLink,
-                        ArtifactLinkType = l.ArtifactLinkType.Name,
-                        Comment = lr.Comment,
-                        RelatedWorkItem = lr.RelatedWorkItemId,
-                        LinkTypeEndImmutableName = lr.LinkTypeEnd == null ? "" : lr.LinkTypeEnd.ImmutableName,
-                        LinkTypeEndName = lr.LinkTypeEnd == null ? "" : lr.LinkTypeEnd.Name,
-                        internalObject = l
-                    });
-                }
-                else
-                {
-                    Log.Debug("TfsExtensions::GetLinkData: RelatedLink is of ArtifactLinkType '{ArtifactLinkType}' and Type '{GetTypeName}' on WorkItemId: {WorkItemId}", l.ArtifactLinkType.Name, l.GetType().Name, tfsLinks.WorkItem.Id);
+                    case Hyperlink lh:
+                        ls.Add(new LinkItem()
+                        {
+                            LinkType = LinkItemType.Hyperlink,
+                            ArtifactLinkType = l.ArtifactLinkType.Name,
+                            Comment = lh.Comment,
+                            LinkUri = lh.Location,
+                            internalObject = l
+                        });
+                        break;
+                    case ExternalLink le:
+                        {
+                            ls.Add(new LinkItem()
+                            {
+                                LinkType = LinkItemType.ExternalLink,
+                                ArtifactLinkType = l.ArtifactLinkType.Name,
+                                Comment = le.Comment,
+                                LinkUri = le.LinkedArtifactUri,
+                                internalObject = l
+                            });
+                            break;
+                        }
+                    case RelatedLink lr:
+                        {
+                            ls.Add(new LinkItem()
+                            {
+                                LinkType = LinkItemType.RelatedLink,
+                                ArtifactLinkType = l.ArtifactLinkType.Name,
+                                Comment = lr.Comment,
+                                RelatedWorkItem = lr.RelatedWorkItemId,
+                                LinkTypeEndImmutableName = lr.LinkTypeEnd == null ? "" : lr.LinkTypeEnd.ImmutableName,
+                                LinkTypeEndName = lr.LinkTypeEnd == null ? "" : lr.LinkTypeEnd.Name,
+                                internalObject = l
+                            });
+                            break;
+                        }
+                    default:
+                        Log.Debug("TfsExtensions::GetLinkData: RelatedLink is of ArtifactLinkType '{ArtifactLinkType}' and Type '{GetTypeName}' on WorkItemId: {WorkItemId}", l.ArtifactLinkType.Name, l.GetType().Name, tfsLinks.WorkItem.Id);
+                        break;
                 }
             }
             return ls;

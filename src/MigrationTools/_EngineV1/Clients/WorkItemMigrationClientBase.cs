@@ -9,7 +9,6 @@ namespace MigrationTools._EngineV1.Clients
     public abstract class WorkItemMigrationClientBase : IWorkItemMigrationClient
     {
         private Dictionary<string, WorkItemData> _Cache = new Dictionary<string, WorkItemData>();
-        private IMigrationClient _migrationClient;
 
         public WorkItemMigrationClientBase(ITelemetryLogger telemetry)
         {
@@ -18,7 +17,7 @@ namespace MigrationTools._EngineV1.Clients
 
         public abstract IMigrationClientConfig Config { get; }
         public abstract ProjectData Project { get; }
-        protected IMigrationClient MigrationClient { get { return _migrationClient; } }
+        protected IMigrationClient MigrationClient { get; private set; }
         protected ITelemetryLogger Telemetry { get; }
 
         public void Configure(IMigrationClient migrationClient, bool bypassRules = true)
@@ -27,7 +26,7 @@ namespace MigrationTools._EngineV1.Clients
             {
                 throw new ArgumentNullException(nameof(migrationClient));
             }
-            _migrationClient = migrationClient;
+            MigrationClient = migrationClient;
             InnerConfigure(migrationClient, bypassRules);
         }
 
