@@ -177,7 +177,7 @@ You can get free support from the community here and on social media on a best e
 
 * **Martin Hinshelwood, naked Agility Ltd** - @MrHinsh is the founder of the Azure DevOps Migration Tools is available worldwide to help organisations plan and enact their migration efforts. You can contact him through [naked Agility Ltd.](https://nkdagility.com).
 * **Wes MacDonald, LIKE 10 INC.** - @wesmacdonald is a DevOps Consultant located in Toronto, Canada.  You can reach out to him via [LIKE 10 INC.](http://www.like10.com). 
-* **Ove Bastiansen** - @ovebastiansen isa DevOpd consultant living in Oslo, Norway. You can reach him via his GitHub profile https://github.com/ovebastiansen.
+* **Ove Bastiansen** - @ovebastiansen is a DevOps consultant living in Oslo, Norway, but working worldwide in todays remote friendly world. You can reach him via his GitHub profile https://github.com/ovebastiansen.
 * _others coming soon_
 
 These tools are build by naked Agility Limited's DevOps & Agility consultants to do real world migrations on a daily basis. We always work in [Azure DevOps Services](http://dev.azure.com) on https://dev.azure.com/nkdagility/migration-tools/ with code in GitHub and publish as a chocolatey package that pulls from GitGub Releases.
