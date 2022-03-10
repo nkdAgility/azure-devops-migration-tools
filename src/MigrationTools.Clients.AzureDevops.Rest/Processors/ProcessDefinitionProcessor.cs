@@ -544,7 +544,13 @@ namespace MigrationTools.Processors
                                 {
                                     model.WorkItemTypes[wit.Id].Fields =
                                         (await endpoint.GetApiDefinitionsAsync<WorkItemTypeField>(new object[] { proc.Id, wit.Id }, singleDefinitionQueryString: "$expand=All")).ToList();
-                                    model.WorkItemTypes[wit.Id].Fields.ForEach(field => model.WorkItemFields.Add(field.Id, field));
+                                    model.WorkItemTypes[wit.Id].Fields.ForEach(field =>
+                                    {
+                                        if (!model.WorkItemFields.ContainsKey(field.Id))
+                                        {
+                                            model.WorkItemFields.Add(field.Id, field);
+                                        }
+                                    });
                                 }),
                                 Task.Run(async () =>
                                 {
