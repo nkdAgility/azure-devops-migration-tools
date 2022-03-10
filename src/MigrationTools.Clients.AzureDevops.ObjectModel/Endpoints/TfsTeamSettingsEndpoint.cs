@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.ProcessConfiguration.Client;
+using Microsoft.TeamFoundation.Work.WebApi;
 using MigrationTools.EndpointEnrichers;
 
 namespace MigrationTools.Endpoints
@@ -15,5 +16,7 @@ namespace MigrationTools.Endpoints
         public TfsTeamService TfsTeamService { get { return TfsCollection.GetService<TfsTeamService>(); } }
 
         public TeamSettingsConfigurationService TfsTeamSettingsService { get { return TfsCollection.GetService<TeamSettingsConfigurationService>(); } }
+
+        public WorkHttpClient WorkHttpClient { get { return TfsCollection.GetClient<WorkHttpClient>(); } }
     }
 }

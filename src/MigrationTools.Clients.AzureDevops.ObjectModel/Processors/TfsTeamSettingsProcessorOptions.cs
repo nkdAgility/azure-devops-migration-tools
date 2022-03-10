@@ -24,6 +24,12 @@ namespace MigrationTools.Processors
         public bool PrefixProjectToNodes { get; set; }
 
         /// <summary>
+        /// Migrate original team member capacities after their creation on the target team project. Note: It will only migrate team member capacity if the team member with same display name exists on the target collection otherwise it will be ignored.
+        /// </summary>
+        /// <default>false</default>
+        public bool MigrateTeamCapacities { get; set; }
+
+        /// <summary>
         /// List of Teams to process. If this is `null` then all teams will be processed.
         /// </summary>
         public List<string> Teams { get; set; }
