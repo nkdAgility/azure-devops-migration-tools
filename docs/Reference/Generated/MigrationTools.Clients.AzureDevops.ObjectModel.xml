@@ -97,6 +97,12 @@
             </summary>
             <default>false</default>
         </member>
+        <member name="P:MigrationTools.Processors.TfsTeamSettingsProcessorOptions.MigrateTeamCapacities">
+            <summary>
+            Migrate original team member capacities after their creation on the target team project. Note: It will only migrate team member capacity if the team member with same display name exists on the target collection otherwise it will be ignored.
+            </summary>
+            <default>false</default>
+        </member>
         <member name="P:MigrationTools.Processors.TfsTeamSettingsProcessorOptions.Teams">
             <summary>
             List of Teams to process. If this is `null` then all teams will be processed.

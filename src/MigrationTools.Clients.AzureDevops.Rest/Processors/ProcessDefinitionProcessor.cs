@@ -130,7 +130,11 @@ namespace MigrationTools.Processors
                 await Task.WhenAll(
                     BuildModel(SourceModel, Source, true),
                     BuildModel(TargetModel, Target, false));
-
+                /*
+                // Comment out the below for Synchronous model loading - Usually for debugging purposes
+                await BuildModel(TargetModel, Target, false);
+                await BuildModel(SourceModel, Source, true);
+                */
                 Log.LogInformation("Source and target data models established.");
 
                 Log.LogInformation("Synchronizing organization level fields.");
@@ -161,7 +165,7 @@ namespace MigrationTools.Processors
         {
             Log.LogInformation($"Starting sync of process [{sourceProc.Process.Name}] in [{Source.Options.Name}].");
 
-            var targetProc = TargetModel.ProcessDefinitions.ContainsKey(sourceProc.MappedFrom) ? TargetModel.ProcessDefinitions[sourceProc.MappedFrom] : new ProcessDefinitionModel()
+            var targetProc = TargetModel.ProcessDefinitions.FirstOrDefault(tgtProc => tgtProc.Value.MappedFrom.Equals(sourceProc.Process.Name, StringComparison.OrdinalIgnoreCase)).Value ?? new ProcessDefinitionModel()
             {
                 MappedFrom = sourceProc.Process.Name
             };
@@ -187,8 +191,18 @@ namespace MigrationTools.Processors
 
         private async Task SyncWorkItemType(WorkItemTypeModel sourceWit, string processId)
         {
-            var targetWit = TargetModel.WorkItemTypes.ContainsKey(sourceWit.WorkItemType.Id) ? TargetModel.WorkItemTypes[sourceWit.WorkItemType.Id] : new();
+            var targetWit = TargetModel.WorkItemTypes.ContainsKey(sourceWit.WorkItemType.Name) ? TargetModel.WorkItemTypes[sourceWit.WorkItemType.Name] : new();
             targetWit.WorkItemType = await Target.SyncDefinition(sourceWit.WorkItemType, targetWit.WorkItemType, processId);
+
+            // When you create a new WIT you need to go get the default states & fields that come after it gets created
+            if (targetWit.States == null || targetWit.States.Count == 0)
+            {
+                targetWit.States = (await Target.GetApiDefinitionsAsync<WorkItemState>(new object[] { processId, targetWit.WorkItemType.Id })).ToDictionary(x => x.Id, x => x);
+            }
+            if (targetWit.Fields == null || targetWit.Fields.Count == 0)
+            {
+                await LoadWorkItemFields(TargetModel, targetWit.WorkItemType, Target, processId);
+            }
 
             foreach (var state in sourceWit.States.Where(x => x.Value.CustomizationType == "custom"))
             {
@@ -199,7 +213,7 @@ namespace MigrationTools.Processors
                 else
                 {
                     await SyncDefinitionType<WorkItemState>(
-                        sourceWit.States, state.Value,
+                        targetWit.States, state.Value,
                         targetWit.States.Values.FirstOrDefault(x => x.Name == state.Value.Name),
                         processId, targetWit.WorkItemType.ReferenceName);
                 }
@@ -261,15 +275,15 @@ namespace MigrationTools.Processors
                 {
                     foreach (var sourceGroup in sourceSection.Groups)
                     {
-                        var sourceGroupKey = $"{sourceWit.WorkItemType.ReferenceName}::{sourcePage.Label}::{sourceSection.Id}::{sourceGroup.Label}";
+                        var sourceGroupKey = $"{sourceWit.WorkItemType.Name}::{sourcePage.Label}::{sourceSection.Id}::{sourceGroup.Label}";
                         // first let's see if the target has any inherited group for this source group ..
                         // It will have a group.inherits != null/"" if it is inherited.. you can edit "system" groups
                         if (!sourceGroup.Inherited) // It's a custom group
                         {
-                            // look for the group on the flattened set of groups.. remember flat groups are keyed on $"{wit.ReferenceName}::{page.Label}::{section.Id}::{group.Label}"
+                            // look for the group on the flattened set of groups.. remember flat groups are keyed on $"{wit.Name}::{page.Label}::{section.Id}::{group.Label}"
                             var existingGroup = TargetModel.WorkItemGroups.Select(x => new { x.Key, x.Value })
                                 .FirstOrDefault(x =>
-                                    x.Key.StartsWith($"{targetWit.WorkItemType.ReferenceName}::") &&
+                                    x.Key.StartsWith($"{targetWit.WorkItemType.Name}::") &&
                                     x.Value.Label.Equals(sourceGroup.Label, StringComparison.OrdinalIgnoreCase));
 
                             if (existingGroup != null)
@@ -298,7 +312,7 @@ namespace MigrationTools.Processors
                                         var tempTargetGroup = existingGroup.Value.CloneAsNew();
                                         tempTargetGroup.Id = existingGroup.Value.Id;
                                         if (await Target.MoveWorkItemGroupWithinPage(
-                                            tempTargetGroup, processId, sourceWit.WorkItemType.ReferenceName,
+                                            tempTargetGroup, processId, targetWit.WorkItemType.ReferenceName,
                                             targetPage.Id, sourceSplit[2], existingSplit[2]))
                                         {
                                             Log.LogInformation($"Target group [{sourceGroup.Label}] located on same page but different section. Moved from [{sourceSplit[2]}] to [{existingSplit[2]}] ..");
@@ -359,7 +373,7 @@ namespace MigrationTools.Processors
 
                                             if (oldGroup == null) // It must be a new control
                                             {
-                                                if (await Target.AddWorkItemControlToGroup(sourceControl.CloneAsNew(), processId, sourceWit.WorkItemType.ReferenceName, finalTargetGroup.Id, sourceControl.Id))
+                                                if (await Target.AddWorkItemControlToGroup(sourceControl.CloneAsNew(), processId, targetWit.WorkItemType.ReferenceName, finalTargetGroup.Id, sourceControl.Id))
                                                 {
                                                     Log.LogInformation($"Attached control [{sourceControl.Label}] to group [{finalTargetGroup.Label}].");
                                                 }
@@ -371,7 +385,7 @@ namespace MigrationTools.Processors
                                             else
                                             {
                                                 // It must be control movement between groups
-                                                if (await Target.MoveWorkItemControlToOtherGroup(sourceControl.CloneAsNew(), processId, sourceWit.WorkItemType.ReferenceName, finalTargetGroup.Id, sourceControl.Id, oldGroup.Id))
+                                                if (await Target.MoveWorkItemControlToOtherGroup(sourceControl.CloneAsNew(), processId, targetWit.WorkItemType.ReferenceName, finalTargetGroup.Id, sourceControl.Id, oldGroup.Id))
                                                 {
                                                     Log.LogInformation($"Moved control [{sourceControl.Id}] from [{oldGroup.Label}] to existing group [{finalTargetGroup.Label}].");
                                                 }
@@ -394,12 +408,12 @@ namespace MigrationTools.Processors
                             {
                                 // Target doesn't have the group at all
                                 WorkItemGroup newGroup = await SyncDefinitionType<WorkItemGroup>(TargetModel.WorkItemGroups, sourceGroup,
-                                    null, processId, sourceWit.WorkItemType.ReferenceName, targetPage.Id, sourceSection.Id);
+                                    null, processId, targetWit.WorkItemType.ReferenceName, targetPage.Id, sourceSection.Id);
 
                                 // Add all the controls
                                 foreach (var sourceControl in sourceGroup.Controls.Where(c => !c.ControlType.Equals("HtmlFieldControl", StringComparison.OrdinalIgnoreCase)))
                                 {
-                                    if (await Target.AddWorkItemControlToGroup(sourceControl.CloneAsNew(), processId, sourceWit.WorkItemType.ReferenceName, newGroup.Id, sourceControl.Id))
+                                    if (await Target.AddWorkItemControlToGroup(sourceControl.CloneAsNew(), processId, targetWit.WorkItemType.ReferenceName, newGroup.Id, sourceControl.Id))
                                     {
                                         Log.LogInformation($"Attached control [{sourceControl.Label}] to new group [{newGroup.Label}].");
                                     }
@@ -518,17 +532,17 @@ namespace MigrationTools.Processors
                     {
                         foreach (var wit in procWits)
                         {
-                            if (!model.WorkItemTypes.ContainsKey(wit.Id))
+                            if (!model.WorkItemTypes.ContainsKey(wit.Name))
                             {
-                                model.WorkItemTypes.Add(wit.Id, new WorkItemTypeModel()
+                                model.WorkItemTypes.Add(wit.Name, new WorkItemTypeModel()
                                 {
                                     WorkItemType = wit
                                 });
-                                model.ProcessDefinitions[mappedProcName].WorkItemTypes.Add(model.WorkItemTypes[wit.Id]);
+                                model.ProcessDefinitions[mappedProcName].WorkItemTypes.Add(model.WorkItemTypes[wit.Name]);
                             }
                             else
                             {
-                                model.WorkItemTypes[wit.Id] = new WorkItemTypeModel()
+                                model.WorkItemTypes[wit.Name] = new WorkItemTypeModel()
                                 {
                                     WorkItemType = wit
                                 };
@@ -536,32 +550,21 @@ namespace MigrationTools.Processors
 
                             #region --- Loading Wit Type Details ---
                             await Task.WhenAll(
-                                Task.Run(async () => await LoadLayout(model, model.WorkItemTypes[wit.Id], endpoint, proc.Id)),
+                                Task.Run(async () => await LoadLayout(model, model.WorkItemTypes[wit.Name], endpoint, proc.Id)),
+                                Task.Run(async () => await LoadWorkItemFields(model, model.WorkItemTypes[wit.Name].WorkItemType, endpoint, proc.Id)),
                                 Task.Run(async () =>
                                 {
-                                    model.WorkItemTypes[wit.Id].Fields =
-                                        (await endpoint.GetApiDefinitionsAsync<WorkItemTypeField>(new object[] { proc.Id, wit.Id }, singleDefinitionQueryString: "$expand=All")).ToList();
-                                    model.WorkItemTypes[wit.Id].Fields.ForEach(field =>
-                                    {
-                                        if (!model.WorkItemFields.ContainsKey(field.Id))
-                                        {
-                                            model.WorkItemFields.Add(field.Id, field);
-                                        }
-                                    });
-                                }),
-                                Task.Run(async () =>
-                                {
-                                    model.WorkItemTypes[wit.Id].States =
+                                    model.WorkItemTypes[wit.Name].States =
                                         (await endpoint.GetApiDefinitionsAsync<WorkItemState>(new object[] { proc.Id, wit.Id })).ToDictionary(x => x.Id, x => x);
                                 }),
                                 Task.Run(async () =>
                                 {
-                                    model.WorkItemTypes[wit.Id].Rules =
+                                    model.WorkItemTypes[wit.Name].Rules =
                                         (await endpoint.GetApiDefinitionsAsync<WorkItemRule>(new object[] { proc.Id, wit.Id })).ToDictionary(x => x.Id, x => x);
                                 }),
                                 Task.Run(async () =>
                                 {
-                                    model.WorkItemTypes[wit.Id].Behaviors =
+                                    model.WorkItemTypes[wit.Name].Behaviors =
                                         (await endpoint.GetApiDefinitionsAsync<WorkItemTypeBehavior>(new object[] { proc.Id, wit.Id })).ToDictionary(x => x.Id, x => x);
                                 })
                             );
@@ -576,12 +579,26 @@ namespace MigrationTools.Processors
                 }
             }
         }
+        private async Task LoadWorkItemFields(ProcessorModel model, WorkItemType wit, AzureDevOpsEndpoint endpoint, string processId)
+        {
+
+            model.WorkItemTypes[wit.Name].Fields =
+                (await endpoint.GetApiDefinitionsAsync<WorkItemTypeField>(new object[] { processId, wit.Id }, singleDefinitionQueryString: "$expand=All")).ToList();
+            model.WorkItemTypes[wit.Name].Fields.ForEach(field =>
+            {
+                if (!model.WorkItemFields.ContainsKey(field.Id))
+                {
+                    model.WorkItemFields.Add(field.Id, field);
+                }
+            });
+
+        }
         private async Task LoadLayout(ProcessorModel model, WorkItemTypeModel wit, AzureDevOpsEndpoint endpoint, string processId)
         {
             wit.Layout = (await endpoint.GetApiDefinitionAsync<WorkItemLayout>(new object[] { processId, wit.WorkItemType.ReferenceName }, queryForDetails: false));
             foreach (var page in wit.Layout.Pages)
             {
-                var pageKey = $"{wit.WorkItemType.ReferenceName}::{page.Label}";
+                var pageKey = $"{wit.WorkItemType.Name}::{page.Label}";
                 if (model.WorkItemPages.ContainsKey(pageKey))
                 {
                     model.WorkItemPages[pageKey] = page;
@@ -594,7 +611,7 @@ namespace MigrationTools.Processors
                 {
                     foreach (var group in section.Groups)
                     {
-                        var groupKey = $"{wit.WorkItemType.ReferenceName}::{page.Label}::{section.Id}::{group.Label}";
+                        var groupKey = $"{wit.WorkItemType.Name}::{page.Label}::{section.Id}::{group.Label}";
                         if (model.WorkItemGroups.ContainsKey(groupKey))
                         {
                             model.WorkItemGroups[groupKey] = group;
@@ -605,7 +622,7 @@ namespace MigrationTools.Processors
                         }
                         foreach (var control in group.Controls)
                         {
-                            var controlKey = $"{wit.WorkItemType.ReferenceName}::{page.Label}::{section.Id}::{group.Label}::{control.Id}";
+                            var controlKey = $"{wit.WorkItemType.Name}::{page.Label}::{section.Id}::{group.Label}::{control.Id}";
                             if (model.WorkItemControls.ContainsKey(controlKey))
                             {
                                 model.WorkItemControls[controlKey] = control;
