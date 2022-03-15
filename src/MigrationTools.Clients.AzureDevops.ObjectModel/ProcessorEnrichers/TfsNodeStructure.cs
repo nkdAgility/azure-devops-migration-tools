@@ -129,10 +129,11 @@ namespace MigrationTools.Enrichers
 
         public override void ProcessorExecutionBegin(IProcessor processor)
         {
+            EntryForProcessorType(processor);
+
             if (Options.Enabled)
             {
                 Log.LogInformation("Migrating all Nodes before the Processor run.");
-                EntryForProcessorType(processor);
                 MigrateAllNodeStructures();
                 RefreshForProcessorType(processor);
             }
