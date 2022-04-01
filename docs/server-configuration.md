@@ -16,8 +16,8 @@ In order to store the state for the migration you need to use a custom field, th
 
 ### Azure DevOps
 
-1. Create a custom field called 'ReflectedWorkItemId' of type 'Text (single line)' by following this [guide](https://docs.microsoft.com/en-us/azure/devops/organizations/settings/work/add-custom-field?view=azure-devops)
-1.  Add this custom field to all workflow types to be migrated eg bug, story, task, test case etc
+1. Create a custom field called `ReflectedWorkItemId` of type `Text (single line)` by following this [guide](https://docs.microsoft.com/en-us/azure/devops/organizations/settings/work/add-custom-field?view=azure-devops)
+1.  Add this custom field to all work item types to be migrated (e.g. Bug, User Story, Task, Test Case, etc)
 
 ### Team Foundation Server (TFS)
 
@@ -51,39 +51,45 @@ If you migrated a TPC to VSTS using the [VSTS Migration Tool](https://blogs.msdn
 - Once you have the .ZIP file, unpack it and edit the work item type definitions as detailed above for an on-premises installation.
 - Once the fields have been added then zip up the folder structure again and re-import it into your VSTS instance, where it will be applied to the Team Project it was exported from. 
 
-### TIP: Checking the actual name of the 'ReflectedWorkItemID' field ###
+### TIP: Checking the actual 'ReflectedWorkItemIDFieldName' ###
 
-If you are in any doubt over the full name in use for the `ReflectedWorkItemID` field on either the source or target systems, it can vary based on the type of customisation, use the following process to confirm it
+If you are in any doubt over the full name in use for the `ReflectedWorkItemIDFieldName` on either the source or target systems, it can vary based on the type of customisation, use the following process to confirm it
 
 - Open Visual Studio, connect to the customised Team Project
 - Via Team Explorer > Work, create a new work item query. Make sure the `ReflectedWorkItemId` is one of the output columns
 - Save the work item query as a file on your local PC
-- Open the resultant file in a text editor and check the actual name, it should in the form `NameOfYourCustomisedTemplate.ReflectedWorkItemId` or `TfsMigrationTool.ReflectedWorkItemId`
+- Open the resulting file in a text editor and check the actual name, it should be in the form `NameOfYourCustomisedTemplate.ReflectedWorkItemId` or `TfsMigrationTool.ReflectedWorkItemId`
 
 ### Editing the configuration ###
 
-Once you have created the `ReflectedWorkItemId` field and confirmed you have the correct full name for both the SOurce and the Target, you will need to edit `configuration.json` to match your values, you need to set the 
+Once you have created the `ReflectedWorkItemId` field and confirmed you have the correct full name for both, the Source and the Target, you will need to edit `configuration.json` to match your values:
 
 
-```json
+```JSON
 {
-    ...... other stuff
-    
-	"ReflectedWorkItemIDFieldName": "TfsMigrationTool.ReflectedWorkItemId",
+	"ChangeSetMappingFile": null,
+	"Source": {
+		...
+		"ReflectedWorkItemIDFieldName": "TfsMigrationTool.ReflectedWorkItemId",
+		...
+	},
+	"Target": {
+		...
+		"ReflectedWorkItemIDFieldName": "TfsMigrationTool.ReflectedWorkItemId",
+		...
+	},
 
-    ...... other stuff
+    	...... other stuff
 
- 	"Processors": [{
-			"$type": "WorkItemMigrationConfig",
-			"Enabled": false,
-			"PrefixProjectToNodes": true,
-			"UpdateCreatedDate": true,
-			"UpdateCreatedBy": true,
-			"QueryBit": "AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')"
-      },
-      
-      ...... other stuff
-
+ 	"Processors": [
+		{
+			...
+			"WIQLQueryBit": "AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')"
+			...
+		}
+	],
+	
+	...... other stuff
     
 }
 ```
