@@ -53,6 +53,7 @@ namespace MigrationTools
 
         public static void SaveToAzureDevOps(this WorkItemData context)
         {
+            var timer = System.Diagnostics.Stopwatch.StartNew();
             Log.Debug("TfsExtensions::SaveToAzureDevOps");
 
             if (context == null) throw new ArgumentNullException(nameof(context));
@@ -74,6 +75,8 @@ namespace MigrationTools
             Log.Verbose("TfsExtensions::SaveToAzureDevOps::Save()");
             workItem.Save();
             context.RefreshWorkItem();
+            timer.Stop();
+            Log.Debug("TfsExtensions::SaveToAzureDevOps took " + timer.ElapsedMilliseconds + "ms");
         }
 
         public static string ToJson(this Field f)

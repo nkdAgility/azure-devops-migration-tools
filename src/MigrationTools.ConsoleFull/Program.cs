@@ -27,6 +27,12 @@ namespace VstsSyncMigrator.ConsoleApp
                     services.AddMigrationToolServicesForClientLegacyCore();
                 });
 
+            //for (int i = 0; i < 120; i++)
+            //{
+            //    System.Console.WriteLine("Waiting " + i);
+            //    System.Threading.Thread.Sleep(60 * 1000);
+            //}
+
             await hostBuilder.RunMigrationTools(args);
         }
     }

@@ -1,0 +1,150 @@
+{
+	"Version": "0.0",
+	"LogLevel": "Debug",
+	"workaroundForQuerySOAPBugEnabled": false,
+	"GenerateMigrationComment": false,
+	"Source": {
+		"$type": "TfsTeamProjectConfig",
+		"Collection": "https://dev.azure.com/devopsmkb/",
+		"Project": "AccountancyGemak",
+		"ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
+		"AllowCrossProjectLinking": false,
+		"AuthenticationMode": "AccessToken",
+		"PersonalAccessToken": "5sxs2543yegisgchvp2arv4qbe3rzlotksb32apscve3s42e5ia",
+		"LanguageMaps": {
+			"AreaPath": "Area",
+			"IterationPath": "Iteration"
+		}
+	},
+	"Target": {
+		"$type": "TfsTeamProjectConfig",
+		"Collection": "https://dev.azure.com/ExactGroup/",
+		"Project": "EOL-Fiscaal-Jaarrekening",
+		"ReflectedWorkItemIDFieldName": "TempMigrationField",
+		"AllowCrossProjectLinking": false,
+		"AuthenticationMode": "AccessToken",
+		"PersonalAccessToken": "2qgltspo3bsh4aspmqc4nv42rabj7upxnfdb2v7cbvyze5jpnzq",
+		"DummyWorkItemForImageUploads": "172534",
+		"DelayBetweenTwoWorkItems": 2000,
+		"LanguageMaps": {
+			"AreaPath": "Area",
+			"IterationPath": "Iteration"
+		}
+	},
+	"WorkItemTypeDefinition": {
+		"sourceWorkItemTypeName": "targetWorkItemTypeName"
+	},
+	"GitRepoMapping": null,
+	"FieldMaps": [{
+			"$type": "FieldValueMapConfig",
+			"WorkItemTypeName": "Product Backlog Item",
+			"sourceField": "System.State",
+			"targetField": "System.State",
+			"defaultValue": "New",
+			"valueMapping": {
+				"Approved": "Sprint ready",
+				"New": "New",
+				"Committed": "In Sprint",
+				"On Hold": "New",
+				"Removed": "Removed"
+			}
+		},
+		{
+			"$type": "FieldValueMapConfig",
+			"WorkItemTypeName": "Bug",
+			"sourceField": "System.State",
+			"targetField": "System.State",
+			"defaultValue": "New",
+			"valueMapping": {
+				"Approved": "Approved",
+				"New": "New",
+				"Committed": "In Sprint",
+				"Done": "Finished",
+				"Removed": "Removed"  
+        
+			}
+		},
+		{
+			"$type": "FieldValueMapConfig",
+			"WorkItemTypeName": "Feature",
+			"sourceField": "System.State",
+			"targetField": "System.State",
+			"defaultValue": "New",
+			"valueMapping": {
+				"New": "New",
+				"In Progress": "In Progress",
+				"Done": "Released",
+				"Removed": "Removed"
+			}
+		},
+		{
+			"$type": "FieldValueMapConfig",
+			"WorkItemTypeName": "Task",
+			"sourceField": "System.State",
+			"targetField": "System.State",
+			"defaultValue": "To Do",
+			"valueMapping": {
+				"New": "To Do",
+				"Test": "In Progress",
+				"Review": "In Progress",
+				"In Progress": "In Progress",
+				"Done": "Done",
+				"Removed": "Removed"
+			}
+		}
+	],
+	"Processors": [
+		//"$type": "WorkItemDeleteConfig",
+		//"Enabled": true,
+		//"WIQLQueryBit": "AND [System.ID] in ('174152') AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
+		//"WIQLOrderBit": "[System.ChangedDate] desc"
+		//},
+		//{
+		//  "$type": "WorkItemMigrationConfig",
+		//  "ReplayRevisions": true,
+		//  "PrefixProjectToNodes": false,
+		//  "UpdateCreatedDate": true,
+		//  "UpdateCreatedBy": true,
+		//  "BuildFieldTable": false,
+		//  "AppendMigrationToolSignatureFooter": false,
+		//  "WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
+		//  "WIQLOrderBit": "[System.ChangedDate] desc",
+		//  "Enabled": true,
+		//  "LinkMigration": true,
+		//  "AttachmentMigration": true,
+		//  "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
+		//  "FixHtmlAttachmentLinks": false,
+		//  "SkipToFinalRevisedWorkItemType": false,
+		//  "WorkItemCreateRetryLimit": 5,
+		//  "FilterWorkItemsThatAlreadyExistInTarget": true,
+		//  "PauseAfterEachWorkItem": false,
+		//  "AttachmentMaxSize": 480000000,
+		//  "CollapseRevisions": false,
+		//  "LinkMigrationSaveEachAsAdded": true
+		{
+			"$type": "WorkItemMigrationConfig",
+			"ReplayRevisions": true,
+			"PrefixProjectToNodes": false,
+			"UpdateCreatedDate": true,
+			"UpdateCreatedBy": true,
+			"BuildFieldTable": false,
+			"AppendMigrationToolSignatureFooter": false,
+			//"WIQLQueryBit": "AND [System.WorkItemType] IN ('Test Suite', 'Test Plan', 'Idea')",
+			"WIQLQueryBit": "AND [System.ID] >= '256000' AND [System.ID] <= '270000' ",
+			"WIQLOrderBit": "[System.ChangedDate] desc",
+			"Enabled": true,
+			"LinkMigration": true,
+			"AttachmentMigration": true,
+			"AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
+			"FixHtmlAttachmentLinks": true,
+			"SkipToFinalRevisedWorkItemType": true,
+			"WorkItemCreateRetryLimit": 5,
+			"FilterWorkItemsThatAlreadyExistInTarget": false,
+			"PauseAfterEachWorkItem": false,
+			"AttachmentMaxSize": 480000000,
+			"CollapseRevisions": false,
+			"LinkMigrationSaveEachAsAdded": true,
+			"GenerateMigrationComment": false
+		}
+	]
+}

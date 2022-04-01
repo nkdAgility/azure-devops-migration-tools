@@ -195,6 +195,7 @@ namespace MigrationTools.Enrichers
 
         private NodeInfo CreateNode(string name, NodeInfo parent, DateTime? startDate, DateTime? finishDate)
         {
+            System.Threading.Thread.Sleep(1000);
             string nodePath = string.Format(@"{0}\{1}", parent.Path, name);
             NodeInfo node;
             Log.LogInformation(" Processing Node: {0}, start date: {1}, finish date: {2}", nodePath, startDate, finishDate);

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.DependencyInjection;
@@ -62,9 +63,12 @@ namespace VstsSyncMigrator.Engine
 
         public override string Name => "WorkItemMigration";
 
+        public int _delayBetweenWI = 0;
+
         public override void Configure(IProcessorConfig config)
         {
             _config = (WorkItemMigrationConfig)config;
+            _delayBetweenWI = Engine.Target.Config.AsTeamProjectConfig().DelayBetweenTwoWorkItems;
             validateConfig = Services.GetRequiredService<TfsValidateRequiredField>();
         }
 
@@ -162,6 +166,10 @@ namespace VstsSyncMigrator.Engine
                         }
                     }
                 }
+
+                Log.LogInformation("Sleeping for " + _delayBetweenWI);
+                Thread.Sleep(_delayBetweenWI);
+                Log.LogInformation("Sleeping over!");
             }
 
             // fix embedded links in html fields
@@ -212,11 +220,7 @@ namespace VstsSyncMigrator.Engine
 
             contextLog.Information("DONE in {Elapsed}", stopwatch.Elapsed.ToString("c"));
         }
-
-        private void FixEmbeddedLinksInHistory(string id)
-        {
-            
-        }
+         
 
         internal static string FixAreaPathAndIterationPathForTargetQuery(string sourceWIQLQueryBit, string sourceProject, string targetProject, ILogger? contextLog)
         {
@@ -562,6 +566,8 @@ namespace VstsSyncMigrator.Engine
 
                 foreach (var revision in revisionsToMigrate)
                 {
+                    Log.LogInformation("Sleeping for " + _delayBetweenWI/2);
+                    Thread.Sleep(_delayBetweenWI/2);
                     var currentRevisionWorkItem = sourceWorkItem.GetRevision(revision.Number);
 
                     TraceWriteLine(LogEventLevel.Information, " Processing Revision [{RevisionNumber}]",
