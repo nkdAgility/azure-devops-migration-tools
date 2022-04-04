@@ -377,6 +377,7 @@ namespace MigrationTools.Endpoints
                 var responseContent = await result.Content.ReadAsStringAsync();
                 if (result.StatusCode != HttpStatusCode.OK && result.StatusCode != HttpStatusCode.Created)
                 {
+
                     Log.LogError("Error migrating {DefinitionType}: {DefinitionName}. Please migrate it manually. \r\nUrl: POST {Url}\r\n{ErrorText}", typeof(DefinitionType).Name, definitionToBeMigrated.Name, result.RequestMessage.RequestUri.ToString(), responseContent);
                     continue;
                 }
