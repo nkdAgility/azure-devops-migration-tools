@@ -26,6 +26,8 @@ namespace MigrationTools.Enrichers
         private readonly Project _targetProject;
         private readonly TfsTeamProjectConfig _targetConfig;
 
+        private readonly IDictionary<string, string> _cachedUploadedUrisBySourceValue;
+
         private WorkItem _targetDummyWorkItem;
 
         public IMigrationEngine Engine { get; private set; }
@@ -35,6 +37,8 @@ namespace MigrationTools.Enrichers
             Engine = services.GetRequiredService<IMigrationEngine>();
             _targetProject = Engine.Target.WorkItems.Project.ToProject();
             _targetConfig = Engine.Target.Config.AsTeamProjectConfig();
+
+            _cachedUploadedUrisBySourceValue = new System.Collections.Concurrent.ConcurrentDictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
         }
 
         [Obsolete]
@@ -88,49 +92,26 @@ namespace MigrationTools.Enrichers
                         if (!match.Value.ToLower().Contains(oldTfsurl.ToLower()) && !match.Value.ToLower().Contains(oldTfsurlOppositeSchema.ToLower()))
                             continue;
 
-                        //save image locally and upload as attachment
-                        Match newFileNameMatch = Regex.Match(match.Value, RegexPatternForImageFileName, RegexOptions.IgnoreCase);
-                        if (!newFileNameMatch.Success)
-                            continue;
-
-                        Log.LogDebug("EmbededImagesRepairEnricher: field '{fieldName}' has match: {matchValue}", field.Name, System.Net.WebUtility.HtmlDecode(match.Value));
-                        string fullImageFilePath = Path.GetTempPath() + newFileNameMatch.Value;
-
-                        try
+                        string newImageLink = "";
+                        if (_cachedUploadedUrisBySourceValue.ContainsKey(match.Value))
                         {
-                            using (var httpClient = new HttpClient(_httpClientHandler, false))
-                            {
-                                if (!string.IsNullOrEmpty(sourcePersonalAccessToken))
-                                {
-                                    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(System.Text.ASCIIEncoding.ASCII.GetBytes(string.Format("{0}:{1}", "", sourcePersonalAccessToken))));
-                                }
-                                var result = DownloadFile(httpClient, match.Value, fullImageFilePath);
-                                if (!result.IsSuccessStatusCode)
-                                {
-                                    if (_ignore404Errors && result.StatusCode == HttpStatusCode.NotFound)
-                                    {
-                                        Log.LogDebug("EmbededImagesRepairEnricher: Image {MatchValue} could not be found in WorkItem {WorkItemId}, Field {FieldName}", match.Value, wi.Id, field.Name);
-                                        continue;
-                                    }
-                                    else
-                                    {
-                                        result.EnsureSuccessStatusCode();
-                                    }
-                                }
-                            }
-
-                            if (GetImageFormat(File.ReadAllBytes(fullImageFilePath)) == ImageFormat.unknown)
-                            {
-                                throw new Exception($"Downloaded image [{fullImageFilePath}] from Work Item [{wi.ToWorkItem().Id}] Field: [{field.Name}] could not be identified as an image. Authentication issue?");
-                            }
-
-                            var ar = UploadImageToTarget(wi.ToWorkItem(), fullImageFilePath);
-                            field.Value = field.Value.ToString().Replace(match.Value, ar.Url);
+                            newImageLink = _cachedUploadedUrisBySourceValue[match.Value];
                         }
-                        finally
+                        else
                         {
-                            if (File.Exists(fullImageFilePath))
-                                File.Delete(fullImageFilePath);
+                            // go upload and get newImageLink
+                            newImageLink = this.UploadedAndRetrieveAttachmentLinkUrl(match.Value, field.Name, wi, sourcePersonalAccessToken);
+
+                            // if unable to store/upload the link, should we cache that result? so the next revision will either just ignore it or try again
+                            //   for now, i think the best option is to set it to null so we don't retry an upload, with the assumption being that the next
+                            //   upload will most likely fail and just cause the revision process to take longer
+                            _cachedUploadedUrisBySourceValue[match.Value] = newImageLink;
+                        }
+
+                        if (!string.IsNullOrWhiteSpace(newImageLink))
+                        {
+                            // the match.Value was either just uploaded or uploaded most likely because of a previous revision. we can replace it
+                            field.Value = field.Value.ToString().Replace(match.Value, newImageLink);
                         }
                     }
                 }
@@ -141,6 +122,57 @@ namespace MigrationTools.Enrichers
             }
         }
 
+        private string UploadedAndRetrieveAttachmentLinkUrl(string matchedSourceUri, string sourceFieldName, WorkItemData targetWorkItem, string sourcePersonalAccessToken)
+        {
+            // save image locally and upload as attachment
+            Match newFileNameMatch = Regex.Match(matchedSourceUri, RegexPatternForImageFileName, RegexOptions.IgnoreCase);
+            if (!newFileNameMatch.Success) return null;
+
+            Log.LogDebug("EmbededImagesRepairEnricher: field '{fieldName}' has match: {matchValue}", sourceFieldName, System.Net.WebUtility.HtmlDecode(matchedSourceUri));
+            string fullImageFilePath = Path.GetTempPath() + newFileNameMatch.Value;
+
+            try
+            {
+                using (var httpClient = new HttpClient(_httpClientHandler, false))
+                {
+                    if (!string.IsNullOrEmpty(sourcePersonalAccessToken))
+                    {
+                        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(System.Text.ASCIIEncoding.ASCII.GetBytes(string.Format("{0}:{1}", "", sourcePersonalAccessToken))));
+                    }
+                    var result = DownloadFile(httpClient, matchedSourceUri, fullImageFilePath);
+                    if (!result.IsSuccessStatusCode)
+                    {
+                        if (_ignore404Errors && result.StatusCode == HttpStatusCode.NotFound)
+                        {
+                            Log.LogDebug("EmbededImagesRepairEnricher: Image {MatchValue} could not be found in WorkItem {WorkItemId}, Field {FieldName}", matchedSourceUri, targetWorkItem.Id, sourceFieldName);
+                            return null;
+                        }
+                        else
+                        {
+                            result.EnsureSuccessStatusCode();
+                        }
+                    }
+                }
+
+                if (GetImageFormat(File.ReadAllBytes(fullImageFilePath)) == ImageFormat.unknown)
+                {
+                    throw new Exception($"Downloaded image [{fullImageFilePath}] from Work Item [{targetWorkItem.Id}] Field: [{sourceFieldName}] could not be identified as an image. Authentication issue?");
+                }
+
+                var attachRef = UploadImageToTarget(targetWorkItem.ToWorkItem(), fullImageFilePath);
+                if (attachRef == null)
+                {
+                    throw new Exception($"Unable to upload the image [{fullImageFilePath}] to Work Item [{targetWorkItem.Id}] Field: [{sourceFieldName}].");
+                }
+
+                return attachRef.Url;
+            }
+            finally
+            {
+                if (File.Exists(fullImageFilePath))
+                    File.Delete(fullImageFilePath);
+            }
+        }
 
         private Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models.AttachmentReference UploadImageToTarget(WorkItem wi, string filePath)
         {
@@ -157,7 +189,6 @@ namespace MigrationTools.Enrichers
             {
                 throw new Exception($"Problem uploading image [{filePath}] for Work Item [{wi.Id}].");
             }
-
 
             // Attaches it with dummy work item and removes it just to be able to make the image visible to all the users.
             // VS402330: Unauthorized Read access to the attachment under the areas 
