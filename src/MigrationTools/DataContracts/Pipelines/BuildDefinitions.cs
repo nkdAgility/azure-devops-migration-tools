@@ -64,6 +64,10 @@ namespace MigrationTools.DataContracts.Pipelines
         ///<inheritdoc/>
         public override void ResetObject()
         {
+            string q_name = string.Empty;
+            if (this.Queue != null)
+                q_name = this.Queue.Name;
+
             SetSourceId(Id);
             Links = null;
             AuthoredBy = null;
@@ -73,6 +77,12 @@ namespace MigrationTools.DataContracts.Pipelines
             Revision = 0;
             Id = null;
             Project = null;
+
+            if (q_name != string.Empty)
+            {
+                Queue = new Queue();
+                Queue.Name = q_name;
+            }
 
             //Remove secure files
             Process.Phases.ForEach(p => p.Steps.ForEach(s =>
@@ -172,10 +182,12 @@ namespace MigrationTools.DataContracts.Pipelines
     public partial class Process
     {
         public Phase[] Phases { get; set; } = new Phase[] { };
-        
+
         public string YamlFilename { get; set; }
 
         public int Type { get; set; }
+
+        public TargetAgent Target { get; set; }
 
         /// <summary>
         /// If the value is set, then serialize it, if it isn't don't
@@ -188,6 +200,16 @@ namespace MigrationTools.DataContracts.Pipelines
         /// </summary>
         /// <returns>bool on if the Phases should be serialized.</returns>
         public bool ShouldSerializePhases() => this.Type == 1;
+    }
+
+    public partial class TargetAgent
+    {
+        public AgentSpecification AgentSpecification { get; set; }
+    }
+
+    public partial class AgentSpecification
+    {
+        public string Identifier { get; set; }
     }
 
     public partial class Phase
