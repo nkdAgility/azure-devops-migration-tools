@@ -40,6 +40,9 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         public IList<int> WorkItemIDs { get; set; }
         public int MaxRevisions { get; set; }
 
+        public Dictionary<string, string> AreaMaps { get; set; }
+        public Dictionary<string, string> IterationMaps { get; set; }
+
         /// <inheritdoc />
         public bool IsProcessorCompatible(IReadOnlyList<IProcessorConfig> otherProcessors)
         {
@@ -70,6 +73,8 @@ namespace MigrationTools._EngineV1.Configuration.Processing
             WIQLOrderBit = "[System.ChangedDate] desc";
             MaxRevisions = 0;
             AttachRevisionHistory = false;
+            AreaMaps = new Dictionary<string, string>();
+            IterationMaps = new Dictionary<string, string>();
         }
     }
 }
