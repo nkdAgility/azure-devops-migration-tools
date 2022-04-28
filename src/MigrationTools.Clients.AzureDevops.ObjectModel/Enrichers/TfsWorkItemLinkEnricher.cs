@@ -133,6 +133,7 @@ namespace MigrationTools.Enrichers
 
             if (wiTargetL.ToWorkItem().IsDirty && _save)
             {
+                wiTargetL.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
                 wiTargetL.SaveToAzureDevOps();
             }
         }
@@ -154,6 +155,7 @@ namespace MigrationTools.Enrichers
                 {
                     try
                     {
+                        target.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
                         target.SaveToAzureDevOps();
                     }
                     catch (Exception ex)
@@ -288,6 +290,7 @@ namespace MigrationTools.Enrichers
                             wiTargetL.ToWorkItem().Links.Add(newRl);
                             if (_save)
                             {
+                                wiTargetL.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
                                 wiTargetL.SaveToAzureDevOps();
                             }
                         }
@@ -378,6 +381,7 @@ namespace MigrationTools.Enrichers
             target.ToWorkItem().Links.Add(hl);
             if (_save)
             {
+                target.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
                 target.SaveToAzureDevOps();
             }
         }
