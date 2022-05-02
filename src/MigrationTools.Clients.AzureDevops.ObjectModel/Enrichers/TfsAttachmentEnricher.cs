@@ -56,6 +56,17 @@ namespace MigrationTools.Enrichers
                 try
                 {
                     string filepath = null;
+
+                    var fileName = GetSafeFilename(wia.Name);
+                    var attachments = target.ToWorkItem().Attachments.Cast<Attachment>();
+                    var attachmentExists = attachments.Any(a => a.Name == fileName);
+                    if (attachmentExists)
+                    {
+                        Log.Debug(" [SKIP DOWNLOAD] WorkItem {0} already contains attachment {1}", target.Id, fileName);
+                        continue;
+                    }
+
+
                     System.IO.Directory.CreateDirectory(Path.Combine(_exportWiPath, wia.Id.ToString()));
                     filepath = ExportAttachment(source.ToWorkItem(), wia, _exportWiPath);
                     Log.Debug("AttachmentMigrationEnricher: Exported {Filename} to disk", System.IO.Path.GetFileName(filepath));

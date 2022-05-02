@@ -147,6 +147,7 @@ namespace MigrationTools.Enrichers
                 }
             }
 
+            System.Threading.Thread.Sleep(300);
             return 0;
         }
 

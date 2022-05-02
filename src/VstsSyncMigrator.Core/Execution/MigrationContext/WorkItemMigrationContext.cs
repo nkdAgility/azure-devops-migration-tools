@@ -182,6 +182,7 @@ namespace VstsSyncMigrator.Engine
                 if (_processedWorkItems[k].Item2.ToWorkItem().IsDirty)
                 {
                     _processedWorkItems[k].Item2.SaveToAzureDevOps();
+                    Thread.Sleep(200);
                 }
 
                 _processedWorkItems[k].Item2.ToWorkItem().Close();

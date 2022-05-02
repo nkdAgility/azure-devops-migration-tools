@@ -48,7 +48,18 @@ namespace MigrationTools
         {
             var workItem = (WorkItem)context.internalObject;
             TfsWorkItemConvertor tfswic = new TfsWorkItemConvertor();
-            tfswic.MapWorkItemtoWorkItemData(context, workItem, fieldsOfRevision);
+
+            try
+            {
+                tfswic.MapWorkItemtoWorkItemData(context, workItem, fieldsOfRevision);
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                Console.WriteLine("Trying again in 8...");
+                System.Threading.Thread.Sleep(8000);
+                tfswic.MapWorkItemtoWorkItemData(context, workItem, fieldsOfRevision);
+            }
         }
 
         public static void SaveToAzureDevOps(this WorkItemData context)
@@ -72,8 +83,27 @@ namespace MigrationTools
                 Log.Debug("--------------------------------------------------------------------------------------------------------------------");
                 Log.Debug("--------------------------------------------------------------------------------------------------------------------");
             }
-            Log.Verbose("TfsExtensions::SaveToAzureDevOps::Save()");
-            workItem.Save();
+
+            try
+            {
+                Log.Verbose("TfsExtensions::SaveToAzureDevOps::Save()");
+                workItem.Save();
+            }
+            catch(Microsoft.TeamFoundation.WorkItemTracking.Client.UnexpectedErrorException ex)
+            {
+                Console.WriteLine(ex);
+                Console.WriteLine(ex.StackTrace);
+                Console.WriteLine("ignoring");
+                System.Threading.Thread.Sleep(10000);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                Console.WriteLine("Trying again in 10...");
+                System.Threading.Thread.Sleep(10000);
+                workItem.Save();
+            }
+
             context.RefreshWorkItem();
             timer.Stop();
             Log.Debug("TfsExtensions::SaveToAzureDevOps took " + timer.ElapsedMilliseconds + "ms");
@@ -148,12 +178,13 @@ namespace MigrationTools
             foreach (WorkItem wi in collection)
             {
                 counter++;
-                if ((System.DateTime.Now - lastProgressUpdate).TotalSeconds > 10)
+                if ((System.DateTime.Now - lastProgressUpdate).TotalSeconds > 5)
                 {
                     Log.Debug("{0}/{1} {2}", counter, collection.Count, (1.0  * counter/collection.Count).ToString("#0.##%", System.Globalization.CultureInfo.InvariantCulture));
                     lastProgressUpdate = DateTime.Now;
                 }
                 list.Add(wi.AsWorkItemData());
+                //System.Threading.Thread.Sleep(100);
             }
             Log.Debug("{0} Work Items loaded", collection.Count);
             return list;

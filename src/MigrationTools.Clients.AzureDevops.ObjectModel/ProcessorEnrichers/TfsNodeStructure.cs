@@ -129,10 +129,11 @@ namespace MigrationTools.Enrichers
 
         public override void ProcessorExecutionBegin(IProcessor processor)
         {
+            EntryForProcessorType(processor);
+
             if (Options.Enabled)
             {
                 Log.LogInformation("Migrating all Nodes before the Processor run.");
-                EntryForProcessorType(processor);
                 MigrateAllNodeStructures();
                 RefreshForProcessorType(processor);
             }
@@ -204,6 +205,7 @@ namespace MigrationTools.Enrichers
                 node = _targetCommonStructureService.GetNodeFromPath(nodePath);
                 Log.LogDebug("  Node {node} already exists", nodePath);
                 Log.LogTrace("{node}", node);
+                System.Threading.Thread.Sleep(300);
             }
             catch (CommonStructureSubsystemException ex)
             {

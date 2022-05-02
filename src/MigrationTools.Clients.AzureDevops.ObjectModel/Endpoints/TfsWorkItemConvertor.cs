@@ -40,14 +40,32 @@ namespace MigrationTools.Endpoints
 
         private Dictionary<string, FieldItem> GetFieldItems(FieldCollection tfsFields)
         {
-            return (from Field x in tfsFields
-                    select new FieldItem()
-                    {
-                        Name = x.Name,
-                        ReferenceName = x.ReferenceName,
-                        Value = x.Value,
-                        internalObject = x
-                    }).ToDictionary(r => r.ReferenceName, r => r);
+            try
+            {
+                return (from Field x in tfsFields
+                        select new FieldItem()
+                        {
+                            Name = x.Name,
+                            ReferenceName = x.ReferenceName,
+                            Value = x.Value,
+                            internalObject = x
+                        }).ToDictionary(r => r.ReferenceName, r => r);
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                Console.WriteLine("Trying again in 7...");
+                System.Threading.Thread.Sleep(7000);
+
+                return (from Field x in tfsFields
+                        select new FieldItem()
+                        {
+                            Name = x.Name,
+                            ReferenceName = x.ReferenceName,
+                            Value = x.Value,
+                            internalObject = x
+                        }).ToDictionary(r => r.ReferenceName, r => r);
+            }
         }
 
         private List<LinkItem> GetLinkItems(LinkCollection tfsLinks)

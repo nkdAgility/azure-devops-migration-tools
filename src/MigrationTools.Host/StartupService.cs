@@ -84,8 +84,9 @@ namespace MigrationTools.Host
                 });
             _telemetryLogger.CloseAndFlush();
             _logger.LogInformation("The application ran in {Application_Elapsed} and finished at {Application_EndTime}", _mainTimer.Elapsed.ToString("c"), DateTime.Now.ToUniversalTime().ToLocalTime());
-            //Log.CloseAndFlush();
             System.Threading.Thread.Sleep(5000);
+            Console.WriteLine("Press any key to exit...");
+            Console.ReadKey();
         }
 
         private void ApplicationStartup(string[] args)

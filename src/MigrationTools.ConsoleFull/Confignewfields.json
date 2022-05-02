@@ -1,16 +1,16 @@
 {
 	"Version": "0.0",
-	"LogLevel": "Debug",
+	"LogLevel": "Verbose",
 	"workaroundForQuerySOAPBugEnabled": false,
 	"GenerateMigrationComment": false,
 	"Source": {
 		"$type": "TfsTeamProjectConfig",
 		"Collection": "https://dev.azure.com/devopsmkb/",
-		"Project": "AccountancyGemak",
+		"Project": "Multivers",
 		"ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
-		"AllowCrossProjectLinking": false,
+		"AllowCrossProjectLinking": false,	
 		"AuthenticationMode": "AccessToken",
-		"PersonalAccessToken": "5sxs2543yegisgchvp2arv4qbe3rzlotksb32apscve3s42e5ia",
+		"PersonalAccessToken": "gxsymtgghhn5ygaxqm36zgergdvdgjeryyfczfnisqrg5noaqrfq",
 		"LanguageMaps": {
 			"AreaPath": "Area",
 			"IterationPath": "Iteration"
@@ -19,13 +19,14 @@
 	"Target": {
 		"$type": "TfsTeamProjectConfig",
 		"Collection": "https://dev.azure.com/ExactGroup/",
-		"Project": "EOL-Fiscaal-Jaarrekening",
+		"Project": "Multivers",
 		"ReflectedWorkItemIDFieldName": "TempMigrationField",
 		"AllowCrossProjectLinking": false,
 		"AuthenticationMode": "AccessToken",
-		"PersonalAccessToken": "2qgltspo3bsh4aspmqc4nv42rabj7upxnfdb2v7cbvyze5jpnzq",
+		// anand - EOL token 4qwxh...
+		"PersonalAccessToken": "4qwxyhkq5vtjmed3etldzwxhkpxodg3v2do3odkdo7qozpdtfk7a",
 		"DummyWorkItemForImageUploads": "172534",
-		"DelayBetweenTwoWorkItems": 2000,
+		"DelayBetweenTwoWorkItems": 1000,
 		"LanguageMaps": {
 			"AreaPath": "Area",
 			"IterationPath": "Iteration"
@@ -34,8 +35,9 @@
 	"WorkItemTypeDefinition": {
 		"sourceWorkItemTypeName": "targetWorkItemTypeName"
 	},
-	"GitRepoMapping": null,
-	"FieldMaps": [{
+	"GitRepoMapping": { "AccountancyGemak": "eol-fiscaal-jaarrekening" },
+	"FieldMaps": [
+		{
 			"$type": "FieldValueMapConfig",
 			"WorkItemTypeName": "Product Backlog Item",
 			"sourceField": "System.State",
@@ -46,7 +48,8 @@
 				"New": "New",
 				"Committed": "In Sprint",
 				"On Hold": "New",
-				"Removed": "Removed"
+				"Removed": "Removed",
+				"Done": "Finished"
 			}
 		},
 		{
@@ -60,8 +63,8 @@
 				"New": "New",
 				"Committed": "In Sprint",
 				"Done": "Finished",
-				"Removed": "Removed"  
-        
+				"Removed": "Removed"
+
 			}
 		},
 		{
@@ -91,6 +94,13 @@
 				"Done": "Done",
 				"Removed": "Removed"
 			}
+		},
+		{
+			"$type": "FieldtoFieldMapConfig",
+			"WorkItemTypeName": "Feature",
+			"sourceField": "Custom.CrucialChange",
+			"targetField": "Custom.SignificantChange",
+			"defaultValue": null
 		}
 	],
 	"Processors": [
@@ -129,9 +139,11 @@
 			"UpdateCreatedBy": true,
 			"BuildFieldTable": false,
 			"AppendMigrationToolSignatureFooter": false,
-			//"WIQLQueryBit": "AND [System.WorkItemType] IN ('Test Suite', 'Test Plan', 'Idea')",
-			"WIQLQueryBit": "AND [System.ID] >= '256000' AND [System.ID] <= '270000' ",
-			"WIQLOrderBit": "[System.ChangedDate] desc",
+			"WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Code Review Response', 'Code Review Request') AND [System.ID] > '106000' AND [System.ID] <= '107000'",
+			//"WIQLQueryBit": "AND [System.ID] > '106000' AND [System.ID] <= '108000'",
+			//"WIQLQueryBit": "AND [System.ChangedDate] >= '2022-4-27'",
+			//"WIQLQueryBit": "AND [System.ChangedDate] > '2022-4-25'",
+			"WIQLOrderBit": "[System.ID]",
 			"Enabled": true,
 			"LinkMigration": true,
 			"AttachmentMigration": true,
@@ -139,12 +151,13 @@
 			"FixHtmlAttachmentLinks": true,
 			"SkipToFinalRevisedWorkItemType": true,
 			"WorkItemCreateRetryLimit": 5,
-			"FilterWorkItemsThatAlreadyExistInTarget": false,
+			"FilterWorkItemsThatAlreadyExistInTarget": true,
 			"PauseAfterEachWorkItem": false,
 			"AttachmentMaxSize": 480000000,
 			"CollapseRevisions": false,
 			"LinkMigrationSaveEachAsAdded": true,
-			"GenerateMigrationComment": false
+			"GenerateMigrationComment": false,
+			"NodeStructureEnricherEnabled": false
 		}
 	]
 }
