@@ -55,6 +55,7 @@ namespace VstsSyncMigrator.Engine
         private IDictionary<string, string> processWorkItemParamiters = null;
         private TfsWorkItemLinkEnricher _workItemLinkEnricher;
         private ILogger workItemLog;
+        private List<string> _itemsInError;
 
         public WorkItemMigrationContext(IMigrationEngine engine,
                                         IServiceProvider services,
@@ -148,34 +149,48 @@ namespace VstsSyncMigrator.Engine
                 // Inform the user that he maybe has to be patient now
                 contextLog.Information("Querying items to be migrated: {SourceQuery} ...", sourceQuery);
                 var sourceWorkItems = Engine.Source.WorkItems.GetWorkItems(sourceQuery);
-                contextLog.Information("Replay all revisions of {sourceWorkItemsCount} work items?", sourceWorkItems.Count);
+                contextLog.Information("Replay all revisions of {sourceWorkItemsCount} work items?",
+                    sourceWorkItems.Count);
                 //////////////////////////////////////////////////
                 contextLog.Information("Found target project as {@destProject}", Engine.Target.WorkItems.Project.Name);
                 //////////////////////////////////////////////////////////FilterCompletedByQuery
                 if (_config.FilterWorkItemsThatAlreadyExistInTarget)
                 {
-                    contextLog.Information("[FilterWorkItemsThatAlreadyExistInTarget] is enabled. Searching for work items that have already been migrated to the target...", sourceWorkItems.Count());
+                    contextLog.Information(
+                        "[FilterWorkItemsThatAlreadyExistInTarget] is enabled. Searching for work items that have already been migrated to the target...",
+                        sourceWorkItems.Count());
 
-                    string targetWIQLQueryBit = FixAreaPathAndIterationPathForTargetQuery(_config.WIQLQueryBit, Engine.Source.WorkItems.Project.Name, Engine.Target.WorkItems.Project.Name, contextLog);
-                    sourceWorkItems = ((TfsWorkItemMigrationClient)Engine.Target.WorkItems).FilterExistingWorkItems(sourceWorkItems, new TfsWiqlDefinition() { OrderBit = _config.WIQLOrderBit, QueryBit = targetWIQLQueryBit }, (TfsWorkItemMigrationClient)Engine.Source.WorkItems);
-                    contextLog.Information("!! After removing all found work items there are {SourceWorkItemCount} remaining to be migrated.", sourceWorkItems.Count());
+                    string targetWIQLQueryBit = FixAreaPathAndIterationPathForTargetQuery(_config.WIQLQueryBit,
+                        Engine.Source.WorkItems.Project.Name, Engine.Target.WorkItems.Project.Name, contextLog);
+                    sourceWorkItems = ((TfsWorkItemMigrationClient)Engine.Target.WorkItems).FilterExistingWorkItems(
+                        sourceWorkItems,
+                        new TfsWiqlDefinition() { OrderBit = _config.WIQLOrderBit, QueryBit = targetWIQLQueryBit },
+                        (TfsWorkItemMigrationClient)Engine.Source.WorkItems);
+                    contextLog.Information(
+                        "!! After removing all found work items there are {SourceWorkItemCount} remaining to be migrated.",
+                        sourceWorkItems.Count());
                 }
                 //////////////////////////////////////////////////
 
-                var result = _validateConfig.ValidatingRequiredField(Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName, sourceWorkItems);
+                var result = _validateConfig.ValidatingRequiredField(
+                    Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName, sourceWorkItems);
                 if (!result)
                 {
-                    var ex = new InvalidFieldValueException("Not all work items in scope contain a valid ReflectedWorkItemId Field!");
+                    var ex = new InvalidFieldValueException(
+                        "Not all work items in scope contain a valid ReflectedWorkItemId Field!");
                     Log.LogError(ex, "Not all work items in scope contain a valid ReflectedWorkItemId Field!");
                     throw ex;
                 }
+
                 //////////////////////////////////////////////////
                 _current = 1;
                 _count = sourceWorkItems.Count;
                 _elapsedms = 0;
                 _totalWorkItem = sourceWorkItems.Count;
+                _itemsInError = new List<string>();
                 foreach (WorkItemData sourceWorkItemData in sourceWorkItems)
                 {
+
                     var sourceWorkItem = TfsExtensions.ToWorkItem(sourceWorkItemData);
                     workItemLog = contextLog.ForContext("SourceWorkItemId", sourceWorkItem.Id);
                     using (LogContext.PushProperty("sourceWorkItemTypeName", sourceWorkItem.Type.Name))
@@ -185,6 +200,8 @@ namespace VstsSyncMigrator.Engine
                     using (LogContext.PushProperty("sourceRevisionInt", sourceWorkItem.Revision))
                     using (LogContext.PushProperty("targetWorkItemId", null))
                     {
+                        try
+                        {
                         ProcessWorkItemAsync(sourceWorkItemData, _config.WorkItemCreateRetryLimit).Wait();
                         if (_config.PauseAfterEachWorkItem)
                         {
@@ -196,6 +213,17 @@ namespace VstsSyncMigrator.Engine
                             }
                         }
                     }
+                        catch (Exception e)
+                        {
+                            _itemsInError.Add(sourceWorkItem.Id.ToString());
+                            workItemLog.Error(e, "Could not save migrated work item {WorkItemId}, an exception occurred.", sourceWorkItem.Id);
+
+                            if (_itemsInError.Count > 100)
+                            {
+                                throw new Exception("Too many migrations failed");
+                }
+            }
+                    }
                 }
             }
             finally
@@ -206,6 +234,11 @@ namespace VstsSyncMigrator.Engine
                 }
 
                 stopwatch.Stop();
+
+                if (_itemsInError.Count > 0)
+                {
+                    contextLog.Warning("The following items could not be migrated: {ItemIds}", string.Join(", ", _itemsInError));
+                }
                 contextLog.Information("DONE in {Elapsed}", stopwatch.Elapsed.ToString("c"));
             }
         }
