@@ -175,19 +175,26 @@ namespace VstsSyncMigrator.Engine
             // fix embedded links in html fields
             foreach (var k in _processedWorkItems.Keys)
             {
-                _processedWorkItems[k].Item2.ToWorkItem().Open();
-                _processedWorkItems[k].Item1.ToWorkItem().Open();
-                ProcessWorkItemEmbeddedLinks(_processedWorkItems[k].Item1, _processedWorkItems[k].Item2);
-
-                if (_processedWorkItems[k].Item2.ToWorkItem().IsDirty)
+                try
                 {
-                    _processedWorkItems[k].Item2.SaveToAzureDevOps();
-                    Thread.Sleep(200);
-                }
+                    _processedWorkItems[k].Item2.ToWorkItem().Open();
+                    _processedWorkItems[k].Item1.ToWorkItem().Open();
+                    ProcessWorkItemEmbeddedLinks(_processedWorkItems[k].Item1, _processedWorkItems[k].Item2);
 
-                _processedWorkItems[k].Item2.ToWorkItem().Close();
-                _processedWorkItems[k].Item1.ToWorkItem().Close();
-                //MigrateInlineLinks.MigrateFor(_targetWorkItems.Values.ToArray());
+                    if (_processedWorkItems[k].Item2.ToWorkItem().IsDirty)
+                    {
+                        _processedWorkItems[k].Item2.SaveToAzureDevOps();
+                        Thread.Sleep(200);
+                    }
+
+                    _processedWorkItems[k].Item2.ToWorkItem().Close();
+                    _processedWorkItems[k].Item1.ToWorkItem().Close();
+                    //MigrateInlineLinks.MigrateFor(_targetWorkItems.Values.ToArray());
+                }
+                catch (Exception ex)
+                {
+                    contextLog.Error("Error for " + k + ". Will continue with next WI.", ex);
+                }
             }
 
 
@@ -200,19 +207,27 @@ namespace VstsSyncMigrator.Engine
                 foreach (var k in _processedWorkItems.Keys)
                 {
                     var wid = int.Parse(_processedWorkItems[k].Item2.Id);
-                    var res = witClient.GetCommentsAsync(targetGuid, wid).Result;
 
-                    foreach(var c in res.Comments)
+                    try
                     {
-                        var text = c.Text;
-                        var newText = workItemEmbededLinkEnricher.FixLinks(text);
+                        var res = witClient.GetCommentsAsync(targetGuid, wid).Result;
 
-                        if (newText != text)
+                        foreach (var c in res.Comments)
                         {
-                            contextLog.Information($"Fixing comment for wi {wid}");
-                            var commentUpdate = new Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models.CommentUpdate { Text = newText };
-                            var ddd = witClient.UpdateCommentAsync(commentUpdate, targetGuid, wid, c.Id).Result;
+                            var text = c.Text;
+                            var newText = workItemEmbededLinkEnricher.FixLinks(text);
+
+                            if (newText != text)
+                            {
+                                contextLog.Information($"Fixing comment for wi {wid}");
+                                var commentUpdate = new Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models.CommentUpdate { Text = newText };
+                                var ddd = witClient.UpdateCommentAsync(commentUpdate, targetGuid, wid, c.Id).Result;
+                            }
                         }
+                    }
+                    catch(Exception ex)
+                    {
+                        contextLog.Error("Error for " + wid + ". Will continue with next WI.", ex);
                     }
                 }
             }

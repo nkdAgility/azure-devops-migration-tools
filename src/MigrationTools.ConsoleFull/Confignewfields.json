@@ -8,7 +8,7 @@
 		"Collection": "https://dev.azure.com/devopsmkb/",
 		"Project": "Multivers",
 		"ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
-		"AllowCrossProjectLinking": false,	
+		"AllowCrossProjectLinking": false,
 		"AuthenticationMode": "AccessToken",
 		"PersonalAccessToken": "gxsymtgghhn5ygaxqm36zgergdvdgjeryyfczfnisqrg5noaqrfq",
 		"LanguageMaps": {
@@ -35,7 +35,8 @@
 	"WorkItemTypeDefinition": {
 		"sourceWorkItemTypeName": "targetWorkItemTypeName"
 	},
-	"GitRepoMapping": { "AccountancyGemak": "eol-fiscaal-jaarrekening" },
+	//"GitRepoMapping": { "AccountancyGemak": "eol-fiscaal-jaarrekening" },
+	"GitRepoMapping": null,
 	"FieldMaps": [
 		{
 			"$type": "FieldValueMapConfig",
@@ -139,7 +140,7 @@
 			"UpdateCreatedBy": true,
 			"BuildFieldTable": false,
 			"AppendMigrationToolSignatureFooter": false,
-			"WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Code Review Response', 'Code Review Request') AND [System.ID] > '106000' AND [System.ID] <= '107000'",
+			"WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Code Review Response', 'Code Review Request') AND [System.ID] > '107000' AND [System.ID] <= '108000'",
 			//"WIQLQueryBit": "AND [System.ID] > '106000' AND [System.ID] <= '108000'",
 			//"WIQLQueryBit": "AND [System.ChangedDate] >= '2022-4-27'",
 			//"WIQLQueryBit": "AND [System.ChangedDate] > '2022-4-25'",
