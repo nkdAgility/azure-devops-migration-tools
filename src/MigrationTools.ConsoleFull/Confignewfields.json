@@ -19,14 +19,14 @@
 	"Target": {
 		"$type": "TfsTeamProjectConfig",
 		"Collection": "https://dev.azure.com/ExactGroup/",
-		"Project": "Multivers",
+		"Project": "Venice",
 		"ReflectedWorkItemIDFieldName": "TempMigrationField",
 		"AllowCrossProjectLinking": false,
 		"AuthenticationMode": "AccessToken",
 		// anand - EOL token 4qwxh...
 		"PersonalAccessToken": "4qwxyhkq5vtjmed3etldzwxhkpxodg3v2do3odkdo7qozpdtfk7a",
 		"DummyWorkItemForImageUploads": "172534",
-		"DelayBetweenTwoWorkItems": 1000,
+		"DelayBetweenTwoWorkItems": 800,
 		"LanguageMaps": {
 			"AreaPath": "Area",
 			"IterationPath": "Iteration"
@@ -134,17 +134,17 @@
 		//  "LinkMigrationSaveEachAsAdded": true
 		{
 			"$type": "WorkItemMigrationConfig",
-			"ReplayRevisions": true,
+			"ReplayRevisions": false,
 			"PrefixProjectToNodes": false,
 			"UpdateCreatedDate": true,
 			"UpdateCreatedBy": true,
 			"BuildFieldTable": false,
 			"AppendMigrationToolSignatureFooter": false,
-			"WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Code Review Response', 'Code Review Request') AND [System.ID] > '107000' AND [System.ID] <= '108000'",
-			//"WIQLQueryBit": "AND [System.ID] > '106000' AND [System.ID] <= '108000'",
+			"WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Code Review Response', 'Code Review Request') AND [System.AreaPath] UNDER 'Multivers\\Venice' AND [System.IterationPath] UNDER 'Multivers\\Sandon' AND [System.ID]>='292750'",
+			//"WIQLQueryBit": "AND [System.ID] in ('141264','139473','210783','210778','212455','210773','214389','210784','215143','212371','214394','214416','224196','139765','216330','217570','217612','217639','230533','221120','213669','213269','221117','221171','221118','221376','221119','221809','217617','215430','218663','221836','214313','221814','223898','223892','224433','223919','223908','115482','226492','115481','128840','139573','139711','128829','128828','128830','115484','128841','139592','128827','128831','139410','139648','139710','128826','223897','225667','226230','226388','226630','226780','226789','226635','228319','229089','228346','230895','230922','230900','233839','233866','139407','233844','237484','238373','237511','238834','240080','240107','240285','240085','241368','241366','241362','240958','242524','236351','241583','242529','238866','241937','244700','244727','244705','246861','232864','247037','248721','248726','248746','250843','250868','250848','252461','252466','252486','253754','253886','254014','254686','254691','254711','259271','261359','261363','265226','262938','265222','265294','265290','270452','270456','270519','270523','272098','272094','273980','273976','277525','277511','284996','284969','286622','286650','288637','288665')",
 			//"WIQLQueryBit": "AND [System.ChangedDate] >= '2022-4-27'",
 			//"WIQLQueryBit": "AND [System.ChangedDate] > '2022-4-25'",
-			"WIQLOrderBit": "[System.ID]",
+			"WIQLOrderBit": "[System.ID] DESC",
 			"Enabled": true,
 			"LinkMigration": true,
 			"AttachmentMigration": true,

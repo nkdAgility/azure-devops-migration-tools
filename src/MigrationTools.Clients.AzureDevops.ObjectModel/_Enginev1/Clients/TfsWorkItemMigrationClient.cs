@@ -231,9 +231,9 @@ namespace MigrationTools._EngineV1.Clients
             if (foundWorkItem is null)
             {
                 var wiqb = _workItemQueryBuilderFactory.Create();
-                wiqb.Query = string.Format(@"SELECT [System.Id] FROM WorkItems  WHERE [System.TeamProject]=@TeamProject AND [{0}] = '@idToFind'", MigrationClient.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName);
+                wiqb.Query = string.Format(@"SELECT [System.Id] FROM WorkItems  WHERE [{0}] = '@idToFind'", MigrationClient.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName);
                 wiqb.AddParameter("idToFind", refId.ToString());
-                wiqb.AddParameter("TeamProject", MigrationClient.Config.AsTeamProjectConfig().Project);
+                //wiqb.AddParameter("TeamProject", MigrationClient.Config.AsTeamProjectConfig().Project);
                 var query = wiqb.BuildWIQLQuery(MigrationClient);
                 var items = query.GetWorkItems();
 

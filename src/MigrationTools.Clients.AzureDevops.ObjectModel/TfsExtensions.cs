@@ -89,18 +89,21 @@ namespace MigrationTools
                 Log.Verbose("TfsExtensions::SaveToAzureDevOps::Save()");
                 workItem.Save();
             }
-            catch(Microsoft.TeamFoundation.WorkItemTracking.Client.UnexpectedErrorException ex)
+            catch (System.FormatException ex)
             {
                 Console.WriteLine(ex);
                 Console.WriteLine(ex.StackTrace);
                 Console.WriteLine("ignoring");
+                Log.Error("ignoring", ex);
                 System.Threading.Thread.Sleep(10000);
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.StackTrace);
                 Console.WriteLine("Trying again in 10...");
                 System.Threading.Thread.Sleep(10000);
+                Log.Error("retrying", ex);
                 workItem.Save();
             }
 
