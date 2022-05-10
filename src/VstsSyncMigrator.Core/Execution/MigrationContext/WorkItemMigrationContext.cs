@@ -435,10 +435,20 @@ namespace VstsSyncMigrator.Engine
                     {
                         if (revisionsToMigrate.Count == 0)
                         {
-                            ProcessWorkItemAttachments(sourceWorkItem, targetWorkItem, false);
-                            ProcessWorkItemLinks(Engine.Source.WorkItems, Engine.Target.WorkItems, sourceWorkItem, targetWorkItem);
-                            ProcessHTMLFieldAttachements(targetWorkItem);
-                            ProcessWorkItemEmbeddedLinks(sourceWorkItem, targetWorkItem);
+                            string si = sourceWorkItem.Fields["System.IterationPath"].Value.ToString();
+                            string ti = targetWorkItem.Fields["System.IterationPath"].Value.ToString();
+                            string temp = si.Replace("Multivers", "Venice");
+                            if (ti!=temp)
+                            {
+                                targetWorkItem.ToWorkItem().Fields["System.IterationPath"].Value = temp;
+                                TraceWriteLine(LogEventLevel.Information, $"FIXED ITERATION {ti} -> {temp}");
+
+                            }
+
+                            //ProcessWorkItemAttachments(sourceWorkItem, targetWorkItem, false);
+                            //ProcessWorkItemLinks(Engine.Source.WorkItems, Engine.Target.WorkItems, sourceWorkItem, targetWorkItem);
+                            //ProcessHTMLFieldAttachements(targetWorkItem);
+                            //ProcessWorkItemEmbeddedLinks(sourceWorkItem, targetWorkItem);
                             TraceWriteLine(LogEventLevel.Information, "Skipping as work item exists and no revisions to sync detected");
                             processWorkItemMetrics.Add("Revisions", 0);
                         }
