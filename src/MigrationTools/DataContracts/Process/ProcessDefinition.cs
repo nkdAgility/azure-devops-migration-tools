@@ -78,7 +78,8 @@ namespace MigrationTools.DataContracts.Process
         {
             this.IsDisabled = existing.IsDisabled;
             this.Name = existing.Name;
-            this.ReferenceName = existing.ReferenceName;
+            // Keep the old ProcModel name prefix but change the name (after the period)
+            this.ReferenceName = (ReferenceName??"").Split('.').FirstOrDefault() + "." + (existing.ReferenceName??"").Split('.').Last();
             this.Description = existing.Description;
             this.Color = existing.Color;
             this.Name = existing.Name;
@@ -367,7 +368,7 @@ namespace MigrationTools.DataContracts.Process
             Color = existing.Color;
             Description = existing.Description;
             Customization = existing.Customization;
-            Inherits = new WorkItemBehaviorRef() { BehaviorRefName = existing.Inherits.BehaviorRefName };
+            Inherits = new WorkItemBehaviorRef() { BehaviorRefName = existing.Inherits?.BehaviorRefName };
             Rank = existing.Rank;
         }
     }
