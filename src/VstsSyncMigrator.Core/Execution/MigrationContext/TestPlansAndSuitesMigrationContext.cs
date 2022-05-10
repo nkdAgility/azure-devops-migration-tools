@@ -397,13 +397,16 @@ namespace VstsSyncMigrator.Engine
 
                         if (tpa.AssignedTo != null)
                         {
-                            targetIdentity = GetTargetIdentity(tpa.AssignedTo.Descriptor);
-                            if (targetIdentity == null)
-                            {
-                                _sourceIdentityManagementService.RefreshIdentity(tpa.AssignedTo.Descriptor);
-                            }
 
                             targetIdentity = GetTargetIdentity(tpa.AssignedTo.Descriptor);
+
+                            if (targetIdentity == null)
+                            {
+                                if (TryToRefreshTesterIdentity(targetSuite, tpa))
+                                {
+                                    targetIdentity = GetTargetIdentity(tpa.AssignedTo.Descriptor);
+                                }
+                            }
                         }
 
                         // translate source configuration id to target configuration id and name
@@ -448,6 +451,20 @@ namespace VstsSyncMigrator.Engine
             targetSuite?.AssignTestPoints(assignmentsToAdd);
         }
 
+        private bool TryToRefreshTesterIdentity(ITestSuiteBase targetSuite, ITestPointAssignment tpa)
+        {
+            try
+            {
+                _sourceIdentityManagementService.RefreshIdentity(tpa.AssignedTo.Descriptor);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                InnerLog(targetSuite, string.Format("            Unable to refresh tester identity: {0}", ex.Message), 10);
+                Log.LogWarning("Cannot refresh identity of [{tester}] in target. Cannot assign tester to it.", tpa.AssignedTo.DisplayName);
+                return false;
+            }
+        }
         private bool CanSkipElementBecauseOfAreaPath(int workItemId)
         {
             if (_config.OnlyElementsUnderAreaPath == null)
@@ -526,8 +543,8 @@ namespace VstsSyncMigrator.Engine
             targetPlan = _targetTestStore.CreateTestPlan();
             targetPlan.CopyPropertiesFrom(sourcePlan);
             targetPlan.Name = newPlanName;
-            targetPlan.StartDate = sourcePlan.StartDate;
-            targetPlan.EndDate = sourcePlan.EndDate;
+            targetPlan.StartDate = sourcePlan.StartDate != DateTime.MinValue ? sourcePlan.StartDate : DateTime.Now;
+            targetPlan.EndDate = sourcePlan.EndDate != DateTime.MinValue ? sourcePlan.EndDate : targetPlan.StartDate.AddDays(1);
             targetPlan.Description = sourcePlan.Description;
             if (targetPlan is ITestPlan2)
             {
@@ -796,6 +813,10 @@ namespace VstsSyncMigrator.Engine
                 {
                     targetPlan.Links.Clear();
                 }
+
+                InnerLog(sourcePlan, $" Starte Date {targetPlan.StartDate}", 5);
+                InnerLog(sourcePlan, $" EndDate Plan {targetPlan.EndDate}", 5);
+
                 targetPlan.Save();
 
                 ApplyFieldMappings(sourcePlan.Id, targetPlan.Id);
