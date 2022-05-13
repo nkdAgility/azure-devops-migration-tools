@@ -311,7 +311,7 @@ These remapping rules are applied both while creating path nodes in the target
 project and when migrating work items.
 
 These remapping rules are applied with a higher priority than the
-`PrevixProjectToNodes` option. This means that if no declared rule matches the
+`PrefixProjectToNodes` option. This means that if no declared rule matches the
 path and the `PrefixProjectToNodes` option is enabled, then the old behavior is
 used.
 
