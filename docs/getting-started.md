@@ -212,7 +212,9 @@ The default [WorkItemMigrationConfig](./Processors/WorkItemMigrationConfig.md) p
 1. Adjust the value of the `Project` attribute for Source and Target
 1. Set the `AuthenticationMode` (`Prompt` or `AccessToken`) for Source and Target
 
-    If you set Authentication mode to `AccessToken`, enter a valid PAT as value for the `PersonalAccessToken` attribute
+    If you set Authentication mode to `AccessToken`, enter a valid PAT as value
+    for the `PersonalAccessToken` attribute, or set the
+    `PersonalAccessTokenVariableName` to the name of an environment variable containing your PAT.
 
 1. Adjust the value of the `ReflectedWorkItemIDFieldName` attribute (field name of the migration tracking field) for Source and Target
 
