@@ -35,6 +35,8 @@ WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links,
 | `PauseAfterEachWorkItem`                  | Boolean         | Pause after each work item is migrated                                                                                                                                                                                                                                         | false                                                                        |
 | `GenerateMigrationComment`                | Boolean         | If enabled, adds a comment recording the migration                                                                                                                                                                                                                             | true                                                                         |
 | `NodeBasePaths`                           | Array`<string`> | The root paths of the Ares / Iterations you want migrate. See [NodeBasePath Configuration](#NodeBasePath)                                                                                                                                                                      | ["/"]                                                                        |
+| `AreaMaps`                                | Dictionary`<string,string>` | Remapping rules for area paths, implemented with regular expressions. The rules apply with a higher priority than the `PrefixProjectToNodes`, that is, if no rule matches the path and the `PrefixProjectToNodes` option is enabled, then the old `PrefixProjectToNodes` behavior is applied. | {} |
+| `IterationMaps`                           | Dictionary`<string,string>` | Remapping rules for iteration paths, implemented with regular expressions. The rules apply with a higher priority than the `PrefixProjectToNodes`, that is, if no rule matches the path and the `PrefixProjectToNodes` option is enabled, then the old `PrefixProjectToNodes` behavior is applied. | {} |
 | `WorkItemIDs `                            | Array`<int`>    | A list of work items to import                                                                                                                                                                                                                                                 |
 
 ## <a name="WIQLQueryBits"></a>WIQL Query Bits
@@ -100,6 +102,104 @@ Depending upon what node structures you wish to migrate you would need the follo
 | To only migrate area path `Team 2` and it's associated WI, but all iteration paths | [ "Team 2, "Sprint"] | Only the area path ending `Team 2` will be migrated. <br>The `WIQLQueryBit` should be edited to limit the WI migrated to this area path e.g. add `AND [System.AreaPath] UNDER 'SampleProject\\Team 2'` . <br> The migrated WI will have an area path of `TargetProj\Team 2` but retain their iteration paths matching the sprint name on the source |
 | Only migrate iterations structure                                                  | [ "Sprint"]          | Only the area path ending `Team 2` will be migrated<br>All the iteration paths will be migrated. <br> The migrated WI will have the default area path of `TargetProj` as their source area path was not migrated i.e. `TargetProj`<br> The migrated WI will have an iteration path match the sprint name on the source                              |
 | Move all WI to the existing area and iteration paths on the targetProj             | ["DUMMY VALUE"]      | As the `NodeBasePath` does not match any source area or iteration path no nodes are migrated. <br>Migrated WI will be assigned to any matching area or iteration paths. If no matching ones can be found they will default to the respective root values                                                                                            |
+
+# Iteration Maps and Area Maps
+
+These two configuration elements apply after the `NodeBasePaths` selector, i.e.
+only on Areas and Iterations that have been selected for migration. They allow
+to change the area path, respectively the iteration path, of migrated work items.
+
+These remapping rules are applied both while creating path nodes in the target
+project and when migrating work items.
+
+These remapping rules are applied with a higher priority than the
+`PrevixProjectToNodes` option. This means that if no declared rule matches the
+path and the `PrefixProjectToNodes` option is enabled, then the old behavior is
+used.
+
+The syntax is a dictionary of regular expressions and the replacement text.
+
+*Warning*: These follow the
+[.net regular expression language](https://docs.microsoft.com/en-us/dotnet/standard/base-types/regular-expression-language-quick-reference).
+The key in the dictionary is a regular expression search pattern, while the
+value is a regular expression replacement pattern. It is therefore possible to
+use back-references in the replacement string.
+
+*Warning*: Special characters in the acceptation of regular expressions _and_
+json both need to be escaped. For a key, this means, for example, that a
+litteral backslash must be escaped for the regular expression language `\\`
+_and_ each of these backslashes must then be escaped for the json encoding:
+`\\\\`. In the replacement string, a litteral `$` must be escaped with an
+additional `$` if it is followed by a number (due to the special meaning in
+regular expression replacement strings), while a backslash must be escaped
+(`\\`) due to the special meaning in json.
+
+*Advice*: To avoid unexpected results, always match terminating backslashes in
+the search pattern and replacement string: if a search pattern ends with a
+backslash, you should also put one in the replacement string, and if the search
+pattern does not include a terminating backslash, then none should be included
+in the replacement string.
+
+#### Examples explained
+
+```json
+"IterationMaps": {
+  "^OriginalProject\\\\Path1(?=\\\\Sprint 2022)": "TargetProject\\AnotherPath\\NewTeam",
+  "^OriginalProject\\\\Path1(?=\\\\Sprint 2020)": "TargetProject\\AnotherPath\\Archives\\Sprints 2020",
+  "^OriginalProject\\\\Path2": "TargetProject\\YetAnotherPath\\Path2",
+},
+"AreaMaps": {
+  "^OriginalProject\\\\(DescopeThis|DescopeThat)": "TargetProject\\Archive\\Descoped\\",
+  "^OriginalProject\\\\(?!DescopeThis|DescopeThat)": "TargetProject\\NewArea\\",
+}
+```
+
+- `"^OriginalProject\\\\Path1(?=\\\\Sprint 2022)": "TargetProject\\AnotherPath\\NewTeam",`
+
+  In an iteration path, `OriginalProject\Path1` found at the beginning of the
+  path, when followed by `\Sprint 2022`, will be replaced by
+  `TargetProject\AnotherPath\NewTeam`.
+
+  `OriginalProject\Path1\Sprint 2022\Sprint 01` will become
+  `TargetProject\AnotherPath\NewTeam\Sprint 2022\Sprint 01` but
+  `OriginalProject\Path1\Sprint 2020\Sprint 03` will _not_ be transformed by
+  this rule.
+
+- `"^OriginalProject\\\\Path1(?=\\\\Sprint 2020)": "TargetProject\\AnotherPath\\Archives\\Sprints 2020",`
+
+  In an iteration path, `OriginalProject\Path1` found at the beginning of the
+  path, when followed by `\Sprint 2020`, will be replaced by
+  `TargetProject\AnotherPath\Archives\\Sprints 2020`.
+
+  `OriginalProject\Path1\Sprint 2020\Sprint 01` will become
+  `TargetProject\AnotherPath\Archives\Sprint 2020\Sprint 01` but
+  `OriginalProject\Path1\Sprint 2021\Sprint 03` will _not_ be transformed by
+  this rule.
+
+- `"^OriginalProject\\\\Path2": "TargetProject\\YetAnotherPath\\Path2",`
+
+  In an iteration path, `OriginalProject\Path2` will be replaced by
+  `TargetProject\YetAnotherPath\Path2`.
+
+- `"^OriginalProject\\\\(DescopeThis|DescopeThat)": "TargetProject\\Archive\\Descoped\\",`
+
+  In an area path, `OriginalProject\` found at the beginning of the path, when
+  followed by either `DescopeThis` or `DescopeThat` will be replaced by `TargetProject\Archive\Descoped\`.
+
+  `OriginalProject\DescopeThis\Area` will be transformed to
+  `TargetProject\Archive\Descoped\DescopeThis\Area`.
+  `OriginalProject\DescopeThat\Product` will be transformed to
+  `TargetProject\Archive\Descoped\DescopeThat\Product`.
+
+- `"^OriginalProject\\\\(?!DescopeThis|DescopeThat)": "TargetProject\\NewArea\\",`
+
+  In an area path, `OriginalProject\` found at the beginning of the path will be
+  replaced by `TargetProject\NewArea\` unless it is followed by `DescopeThis` or
+  `DescopeThat`.
+
+  `OriginalProject\ValidArea\` would be replaced by
+  `TargetProject\NewArea\ValidArea\` but `OriginalProject\DescopeThis` would not
+  be modified by this rule.
 
 ## More Complex Team Migrations
 The above options allow you to bring over a sub-set of the WIs (using the `WIQLQueryBit`) and move their area or iteration path to a default location. However you may wish to do something more complex e.g. re-map the team structure. This can be done with addition of a `FieldMaps` block to configuration in addition to the `NodeBasePaths`.
