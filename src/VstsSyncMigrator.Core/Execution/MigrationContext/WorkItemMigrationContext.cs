@@ -31,7 +31,7 @@ namespace VstsSyncMigrator.Engine
 {
     public class WorkItemMigrationContext : MigrationProcessorBase
     {
-        private const string RegexPatterForAreaAndIterationPathsFix = "\\[?(?<key>System.AreaPath|System.IterationPath)+\\]?[^']*'(?<value>[^']*(?:''.[^']*)*)'";
+        private const string RegexPatternForAreaAndIterationPathsFix = "\\[?(?<key>System.AreaPath|System.IterationPath)+\\]?[^']*'(?<value>[^']*(?:''.[^']*)*)'";
 
         private static int _count = 0;
         private static int _current = 0;
@@ -197,7 +197,7 @@ namespace VstsSyncMigrator.Engine
                 return targetWIQLQueryBit;
             }
 
-            var matches = Regex.Matches(targetWIQLQueryBit, RegexPatterForAreaAndIterationPathsFix);
+            var matches = Regex.Matches(targetWIQLQueryBit, RegexPatternForAreaAndIterationPathsFix);
 
 
             if(string.IsNullOrWhiteSpace(sourceProject)

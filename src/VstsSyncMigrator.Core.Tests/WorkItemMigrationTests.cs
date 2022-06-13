@@ -25,8 +25,8 @@ namespace VstsSyncMigrator.Core.Tests
             nodeStructure.ApplySettings(new TfsNodeStructureSettings
             {
                 FoundNodes = new Dictionary<string, bool>(),
-                SourceProjectName = "Path1",
-                TargetProjectName = "Path1",
+                SourceProjectName = "SourceServer",
+                TargetProjectName = "TargetServer",
             });
             nodeStructure.Configure(new TfsNodeStructureOptions
             {
@@ -72,6 +72,27 @@ namespace VstsSyncMigrator.Core.Tests
         {
             string WIQLQueryBit =         @"AND [System.AreaPath] = 'SourceServer\Area\Path1' AND   [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
             string expectTargetQueryBit = @"AND [System.AreaPath] = 'TargetServer\Area\Path1' AND   [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
+
+            string targetWIQLQueryBit = _underTest.FixAreaPathAndIterationPathForTargetQuery(WIQLQueryBit, "SourceServer", "TargetServer", null);
+
+            Assert.AreEqual(expectTargetQueryBit, targetWIQLQueryBit);
+        }
+
+        [TestMethod]
+        public void TestFixAreaPath_WhenAreaPathInQuery_WithPrefixProjectToNodesEnabled_ChangesQuery()
+        {
+            var nodeStructure = _services.GetRequiredService<TfsNodeStructure>();
+
+            // For this test we use the prefixing of the project node and no remapping rule
+            nodeStructure.Configure(new TfsNodeStructureOptions
+            {
+                AreaMaps = new Dictionary<string, string>(),
+                IterationMaps = new Dictionary<string, string>(),
+                PrefixProjectToNodes = true,
+            });
+
+            string WIQLQueryBit = @"AND [System.AreaPath] = 'SourceServer\Area\Path1' AND   [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
+            string expectTargetQueryBit = @"AND [System.AreaPath] = 'TargetServer\SourceServer\Area\Path1' AND   [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
 
             string targetWIQLQueryBit = _underTest.FixAreaPathAndIterationPathForTargetQuery(WIQLQueryBit, "SourceServer", "TargetServer", null);
 
