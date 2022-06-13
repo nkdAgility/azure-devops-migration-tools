@@ -122,7 +122,7 @@ namespace VstsSyncMigrator.Engine
                 {
                     contextLog.Information("[FilterWorkItemsThatAlreadyExistInTarget] is enabled. Searching for work items that have already been migrated to the target...", sourceWorkItems.Count());
 
-                    string targetWIQLQueryBit = FixAreaPathAndIterationPathForTargetQuery(_config.WIQLQueryBit, Engine.Source.WorkItems.Project.Name, Engine.Target.WorkItems.Project.Name, contextLog);
+                    string targetWIQLQueryBit = FixAreaPathAndIterationPathForTargetQuery(_config.WIQLQueryBit, Engine.Source.WorkItems.Project.Name, Engine.Target.WorkItems.Project.Name, _config.PrefixProjectToNodes, contextLog);
                     sourceWorkItems = ((TfsWorkItemMigrationClient)Engine.Target.WorkItems).FilterExistingWorkItems(sourceWorkItems, new TfsWiqlDefinition() { OrderBit = _config.WIQLOrderBit, QueryBit = targetWIQLQueryBit }, (TfsWorkItemMigrationClient)Engine.Source.WorkItems);
                     contextLog.Information("!! After removing all found work items there are {SourceWorkItemCount} remaining to be migrated.", sourceWorkItems.Count());
                 }
@@ -176,7 +176,7 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        internal static string FixAreaPathAndIterationPathForTargetQuery(string sourceWIQLQueryBit, string sourceProject, string targetProject, ILogger? contextLog)
+        internal static string FixAreaPathAndIterationPathForTargetQuery(string sourceWIQLQueryBit, string sourceProject, string targetProject, bool isPrefixProjectToNode, ILogger? contextLog)
         {
             string targetWIQLQueryBit = sourceWIQLQueryBit;
 
@@ -187,6 +187,8 @@ namespace VstsSyncMigrator.Engine
             {
                 return targetWIQLQueryBit;
             }
+
+            var prefixProject = isPrefixProjectToNode ? "\\" + sourceProject : string.Empty;
 
             var matches = Regex.Matches(targetWIQLQueryBit, RegexPatterForAreaAndIterationPathsFix);
             foreach (Match match in matches)
@@ -204,7 +206,7 @@ namespace VstsSyncMigrator.Engine
                     var subValue = value.Substring(0, slashIndex);
                     if (subValue == sourceProject)
                     {
-                        var targetValue = targetProject + value.Substring(slashIndex);
+                        var targetValue = targetProject + prefixProject + value.Substring(slashIndex);
                         var targetMatchValue = match.Value.Replace(value, targetValue);
                         targetWIQLQueryBit = targetWIQLQueryBit.Replace(match.Value, targetMatchValue);
                     }
