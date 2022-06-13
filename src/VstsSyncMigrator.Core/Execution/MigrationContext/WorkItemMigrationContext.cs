@@ -135,6 +135,7 @@ namespace VstsSyncMigrator.Engine
             _nodeStructureEnricher.ProcessorExecutionBegin(null);
 
             var stopwatch = Stopwatch.StartNew();
+            _itemsInError = new List<string>();
 
             try
             {
@@ -187,7 +188,6 @@ namespace VstsSyncMigrator.Engine
                 _count = sourceWorkItems.Count;
                 _elapsedms = 0;
                 _totalWorkItem = sourceWorkItems.Count;
-                _itemsInError = new List<string>();
                 foreach (WorkItemData sourceWorkItemData in sourceWorkItems)
                 {
 
