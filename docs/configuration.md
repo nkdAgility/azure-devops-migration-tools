@@ -131,6 +131,26 @@ The global configuration created by the `init` command look like this:
       "timeTravel": 1
     }
   ],
+  "CommonEnrichersConfig": [
+    {
+      "$type": "TfsNodeStructureOptions",
+      "Enabled": false,
+      "PrefixProjectToNodes": false,
+      "NodeBasePaths": [
+        "Product\\Area\\Path1",
+        "Product\\Area\\Path2"
+      ],
+      "IterationMaps": {
+        "^OriginalProject\\\\Path1(?=\\\\Sprint 2022)": "TargetProject\\AnotherPath\\NewTeam",
+        "^OriginalProject\\\\Path1(?=\\\\Sprint 2020)": "TargetProject\\AnotherPath\\Archives\\Sprints 2020",
+        "^OriginalProject\\\\Path2": "TargetProject\\YetAnotherPath\\Path2"
+      },
+      "AreaMaps": {
+        "^OriginalProject\\\\(DescopeThis|DescopeThat)": "TargetProject\\Archive\\Descoped\\",
+        "^OriginalProject\\\\(?!DescopeThis|DescopeThat)": "TargetProject\\NewArea\\"
+      },
+    }
+  ],
   "GitRepoMapping": null,
   "LogLevel": "Information",
   "Processors": [
@@ -158,6 +178,7 @@ The global configuration created by the `init` command look like this:
       "AttachmentMaxSize": 480000000,
       "LinkMigrationSaveEachAsAdded": false,
       "GenerateMigrationComment": true,
+      "UseCommonNodeStructureEnricherConfig": false,
       "NodeBasePaths": [
         "Product\\Area\\Path1",
         "Product\\Area\\Path2"
@@ -172,6 +193,30 @@ The global configuration created by the `init` command look like this:
         "^OriginalProject\\\\(?!DescopeThis|DescopeThat)": "TargetProject\\NewArea\\"
       },
       "WorkItemIDs": null
+    },
+    {
+      "$type": "TestConfigurationsMigrationConfig",
+      "Enabled": false
+    },
+    {
+        "$type": "TestPlansAndSuitesMigrationConfig",
+        "Enabled": false,
+        "RemoveInvalidTestSuiteLinks": true,
+        "TestPlanQueryBit": "AreaPath UNDER 'Project1' AND PlanName CONTAINS 'Title' AND TestState NOT IN ('Inactive')",
+        "UseCommonNodeStructureEnricherConfig": false,
+        "NodeBasePaths": [
+          "Product\\Area\\Path1",
+          "Product\\Area\\Path2"
+        ],
+        "IterationMaps": {
+          "^OriginalProject\\\\Path1(?=\\\\Sprint 2022)": "TargetProject\\AnotherPath\\NewTeam",
+          "^OriginalProject\\\\Path1(?=\\\\Sprint 2020)": "TargetProject\\AnotherPath\\Archives\\Sprints 2020",
+          "^OriginalProject\\\\Path2": "TargetProject\\YetAnotherPath\\Path2"
+        },
+        "AreaMaps": {
+          "^OriginalProject\\\\(DescopeThis|DescopeThat)": "TargetProject\\Archive\\Descoped\\",
+          "^OriginalProject\\\\(?!DescopeThis|DescopeThat)": "TargetProject\\NewArea\\"
+        }
     }
   ],
   "Version": "11.6",
@@ -197,7 +242,13 @@ For multi Language support you can add the name used in the source and target fo
 
 ### ReflectedWorkItemIDFieldName
 
-This is the field that will be used to store the state for the migration . See [Server Configuration](server-configuration.md)  
+This is the field that will be used to store the state for the migration . See [Server Configuration](server-configuration.md)
+
+### CommonEnrichersConfig
+
+This configuration allows to set the configuration for some enrichers at the global level, and the configuration can
+then be re-used in processors. Currently supported only by `TfsNodeStructureOption`, to be re-used in
+`WorkItemMigrationConfig` and `TestPlansAndSuitesMigrationConfig`.
 
 ### WorkItemMigrationConfig
 You can specify BasePaths for Areas/Iterations to migrate. The area/iteration has to start with that string to be eligible for migration.

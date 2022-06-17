@@ -34,6 +34,7 @@ WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links,
 | `CollapseRevisions`                       | Boolean         | If enabled, all revisions except the most recent are collapsed into a JSON format and attached as an attachment. Requires ReplayRevisions to be enabled.                                                                                                                       | false                                                                        |
 | `PauseAfterEachWorkItem`                  | Boolean         | Pause after each work item is migrated                                                                                                                                                                                                                                         | false                                                                        |
 | `GenerateMigrationComment`                | Boolean         | If enabled, adds a comment recording the migration                                                                                                                                                                                                                             | true                                                                         |
+| `UseCommonNodeStructureEnricherConfig`    | bool     | Indicates whether the configuration for node structure transformation should be taken from the common enricher configs. Otherwise the configuration elements below are used | false
 | `NodeBasePaths`                           | Array`<string`> | The root paths of the Ares / Iterations you want migrate. See [NodeBasePath Configuration](#NodeBasePath)                                                                                                                                                                      | ["/"]                                                                        |
 | `AreaMaps`                                | Dictionary`<string,string>` | Remapping rules for area paths, implemented with regular expressions. The rules apply with a higher priority than the `PrefixProjectToNodes`, that is, if no rule matches the path and the `PrefixProjectToNodes` option is enabled, then the old `PrefixProjectToNodes` behavior is applied. | {} |
 | `IterationMaps`                           | Dictionary`<string,string>` | Remapping rules for iteration paths, implemented with regular expressions. The rules apply with a higher priority than the `PrefixProjectToNodes`, that is, if no rule matches the path and the `PrefixProjectToNodes` option is enabled, then the old `PrefixProjectToNodes` behavior is applied. | {} |
@@ -41,7 +42,7 @@ WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links,
 
 ## <a name="WIQLQueryBits"></a>WIQL Query Bits
 
-The Work Item queries are all built using Work Item [Query Language (WIQL)](https://docs.microsoft.com/en-us/azure/devops/boards/queries/wiql-syntax). 
+The Work Item queries are all built using Work Item [Query Language (WIQL)](https://docs.microsoft.com/en-us/azure/devops/boards/queries/wiql-syntax).
 
 > Note: A useful Azure DevOps Extension to explore WIQL is the [WIQL Editor](https://marketplace.visualstudio.com/items?itemName=ottostreifel.wiql-editor)
 
@@ -52,7 +53,7 @@ You can use the [WIQL Editor](https://marketplace.visualstudio.com/items?itemNam
 Typical way that queries are built:
 
 ```
- var targetQuery = 
+ var targetQuery =
      string.Format(
          @"SELECT [System.Id], [{ReflectedWorkItemIDFieldName}] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {WIQLQueryBit} ORDER BY {WIQLOrderBit}",
          Engine.Target.Config.ReflectedWorkItemIDFieldName,
@@ -80,7 +81,7 @@ Scope to Area Path (Team data):
 "WIQLOrderBit": "[System.ChangedDate] desc",
 ```
 
-## <a name="NodeBasePath"></a>NodeBasePath Configuration ## 
+## <a name="NodeBasePath"></a>NodeBasePath Configuration ##
 The `NodeBasePaths` entry allows the filtering of the nodes to be replicated on the target projects. To try to explain the correct usage let us assume that we have a source team project `SourceProj` with the following node structures
 
 - AreaPath
