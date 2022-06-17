@@ -35,11 +35,12 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         public bool AttachRevisionHistory { get; set; }
         public bool LinkMigrationSaveEachAsAdded { get; set; }
         public bool GenerateMigrationComment { get; set; }
-        public bool? NodeStructureEnricherEnabled { get; set; }
-        public string[] NodeBasePaths { get; set; }
         public IList<int> WorkItemIDs { get; set; }
         public int MaxRevisions { get; set; }
 
+        public bool? NodeStructureEnricherEnabled { get; set; }
+        public bool UseCommonNodeStructureEnricherConfig { get; set; }
+        public string[] NodeBasePaths { get; set; }
         public Dictionary<string, string> AreaMaps { get; set; }
         public Dictionary<string, string> IterationMaps { get; set; }
 

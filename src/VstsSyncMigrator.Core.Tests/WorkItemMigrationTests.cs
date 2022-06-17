@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools;
+using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Configuration.Processing;
 using MigrationTools.Enrichers;
-using MigrationTools.Processors;
+using MigrationTools.ProcessorEnrichers;
 using MigrationTools.Tests;
 using VstsSyncMigrator.Engine;
 
@@ -40,9 +42,16 @@ namespace VstsSyncMigrator.Core.Tests
                 },
             });
 
-            _underTest = new WorkItemMigrationContext(_services.GetRequiredService<IMigrationEngine>(), _services,
-                _services.GetRequiredService<ITelemetryLogger>(),
-                _services.GetRequiredService<ILogger<WorkItemMigrationContext>>());
+            _underTest = new WorkItemMigrationContext(_services.GetRequiredService<IMigrationEngine>(),
+                                                      _services,
+                                                      _services.GetRequiredService<ITelemetryLogger>(),
+                                                      _services.GetRequiredService<ILogger<WorkItemMigrationContext>>(),
+                                                      nodeStructure,
+                                                      _services.GetRequiredService<TfsRevisionManager>(),
+                                                      _services.GetRequiredService<TfsWorkItemLinkEnricher>(),
+                                                      _services.GetRequiredService<TfsWorkItemEmbededLinkEnricher>(),
+                                                      _services.GetRequiredService<TfsValidateRequiredField>(),
+                                                      _services.GetRequiredService<IOptions<EngineConfiguration>>());
             _underTest.Configure(new WorkItemMigrationConfig
             {
                 AreaMaps = new Dictionary<string, string>

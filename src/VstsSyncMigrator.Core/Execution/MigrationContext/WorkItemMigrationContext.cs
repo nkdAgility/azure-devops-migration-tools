@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Proxy;
 using MigrationTools;
@@ -44,23 +45,36 @@ namespace VstsSyncMigrator.Engine
         private ILogger contextLog;
         private IAttachmentMigrationEnricher attachmentEnricher;
         private IWorkItemProcessorEnricher embededImagesEnricher;
-        private IWorkItemProcessorEnricher workItemEmbededLinkEnricher;
-        private TfsAreaAndIterationProcessor areaAndIterationProcessor;
+        private IWorkItemProcessorEnricher _workItemEmbededLinkEnricher;
         private TfsGitRepositoryEnricher gitRepositoryEnricher;
-        private TfsNodeStructure nodeStructureEnricher;
-        private TfsRevisionManager revisionManager;
-        private TfsValidateRequiredField validateConfig;
+        private TfsNodeStructure _nodeStructureEnricher;
+        private readonly EngineConfiguration _engineConfig;
+        private TfsRevisionManager _revisionManager;
+        private TfsValidateRequiredField _validateConfig;
         private IDictionary<string, double> processWorkItemMetrics = null;
         private IDictionary<string, string> processWorkItemParamiters = null;
-        private TfsWorkItemLinkEnricher workItemLinkEnricher;
+        private TfsWorkItemLinkEnricher _workItemLinkEnricher;
         private ILogger workItemLog;
-        private TfsNodeStructure areaAndIterationEnricher;
 
-        public WorkItemMigrationContext(IMigrationEngine engine, IServiceProvider services, ITelemetryLogger telemetry, ILogger<WorkItemMigrationContext> logger)
+        public WorkItemMigrationContext(IMigrationEngine engine,
+                                        IServiceProvider services,
+                                        ITelemetryLogger telemetry,
+                                        ILogger<WorkItemMigrationContext> logger,
+                                        TfsNodeStructure nodeStructureEnricher,
+                                        TfsRevisionManager revisionManager,
+                                        TfsWorkItemLinkEnricher workItemLinkEnricher,
+                                        TfsWorkItemEmbededLinkEnricher workItemEmbeddedLinkEnricher,
+                                        TfsValidateRequiredField requiredFieldValidator,
+                                        IOptions<EngineConfiguration> engineConfig)
             : base(engine, services, telemetry, logger)
         {
+            _engineConfig = engineConfig.Value;
             contextLog = Serilog.Log.ForContext<WorkItemMigrationContext>();
-            areaAndIterationEnricher = Services.GetRequiredService<TfsNodeStructure>();
+            _nodeStructureEnricher = nodeStructureEnricher;
+            _revisionManager = revisionManager;
+            _workItemLinkEnricher = workItemLinkEnricher;
+            _workItemEmbededLinkEnricher = workItemEmbeddedLinkEnricher;
+            _validateConfig = requiredFieldValidator;
         }
 
         public override string Name => "WorkItemMigration";
@@ -68,7 +82,28 @@ namespace VstsSyncMigrator.Engine
         public override void Configure(IProcessorConfig config)
         {
             _config = (WorkItemMigrationConfig)config;
-            validateConfig = Services.GetRequiredService<TfsValidateRequiredField>();
+
+            if (_config.UseCommonNodeStructureEnricherConfig)
+            {
+                var nseConfig = _engineConfig.CommonEnrichersConfig.OfType<TfsNodeStructureOptions>()
+                                    .FirstOrDefault() ??
+                                throw new InvalidOperationException(
+                                    "Cannot use common node structure because it is not found.");
+                _nodeStructureEnricher.Configure(nseConfig);
+            }
+            else
+            {
+                _nodeStructureEnricher.Configure(new TfsNodeStructureOptions
+                {
+                    Enabled = _config.NodeStructureEnricherEnabled ?? true,
+                    NodeBasePaths = _config.NodeBasePaths,
+                    PrefixProjectToNodes = _config.PrefixProjectToNodes,
+                    AreaMaps = _config.AreaMaps ?? new Dictionary<string, string>(),
+                    IterationMaps = _config.IterationMaps ?? new Dictionary<string, string>(),
+                });
+            }
+
+            _revisionManager.Configure(new TfsRevisionManagerOptions() { Enabled = true, MaxRevisions = _config.MaxRevisions, ReplayRevisions = _config.ReplayRevisions });
         }
 
         internal void TraceWriteLine(LogEventLevel level, string message, Dictionary<string, object> properties = null)
@@ -90,25 +125,13 @@ namespace VstsSyncMigrator.Engine
             {
                 throw new Exception("You must call Configure() first");
             }
+
             var workItemServer = Engine.Source.GetService<WorkItemServer>();
             attachmentEnricher = new TfsAttachmentEnricher(workItemServer, _config.AttachmentWorkingPath, _config.AttachmentMaxSize);
-            workItemLinkEnricher = Services.GetRequiredService<TfsWorkItemLinkEnricher>();
             embededImagesEnricher = Services.GetRequiredService<TfsEmbededImagesEnricher>();
-            workItemEmbededLinkEnricher = Services.GetRequiredService<TfsWorkItemEmbededLinkEnricher>();
-            areaAndIterationProcessor = Services.GetRequiredService<TfsAreaAndIterationProcessor>();
             gitRepositoryEnricher = Services.GetRequiredService<TfsGitRepositoryEnricher>();
-            nodeStructureEnricher = Services.GetRequiredService<TfsNodeStructure>();
-            nodeStructureEnricher.Configure(new TfsNodeStructureOptions()
-            {
-                Enabled = _config.NodeStructureEnricherEnabled ?? true,
-                NodeBasePaths = _config.NodeBasePaths,
-                PrefixProjectToNodes = _config.PrefixProjectToNodes,
-                AreaMaps = _config.AreaMaps ?? new Dictionary<string, string>(),
-                IterationMaps = _config.IterationMaps ?? new Dictionary<string, string>(),
-            });
-            nodeStructureEnricher.ProcessorExecutionBegin(null);
-            revisionManager = Services.GetRequiredService<TfsRevisionManager>();
-            revisionManager.Configure(new TfsRevisionManagerOptions() { Enabled = true, MaxRevisions = _config.MaxRevisions, ReplayRevisions = _config.ReplayRevisions });
+
+            _nodeStructureEnricher.ProcessorExecutionBegin(null);
 
             var stopwatch = Stopwatch.StartNew();
 
@@ -139,7 +162,7 @@ namespace VstsSyncMigrator.Engine
                 }
                 //////////////////////////////////////////////////
 
-                var result = validateConfig.ValidatingRequiredField(Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName, sourceWorkItems);
+                var result = _validateConfig.ValidatingRequiredField(Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName, sourceWorkItems);
                 if (!result)
                 {
                     var ex = new InvalidFieldValueException("Not all work items in scope contain a valid ReflectedWorkItemId Field!");
@@ -227,7 +250,7 @@ namespace VstsSyncMigrator.Engine
                         throw new InvalidOperationException($"Field type {fieldType} is not supported for query remapping.");
                 }
 
-                var remappedPath = areaAndIterationEnricher.GetNewNodeName(value, structureType);
+                var remappedPath = _nodeStructureEnricher.GetNewNodeName(value, structureType);
                 targetWIQLQueryBit = targetWIQLQueryBit.Replace(value, remappedPath);
             }
 
@@ -318,10 +341,10 @@ namespace VstsSyncMigrator.Engine
                 }
             }
 
-            if (nodeStructureEnricher.Options.Enabled)
+            if (_nodeStructureEnricher.Options.Enabled)
             {
-                newWorkItem.AreaPath = nodeStructureEnricher.GetNewNodeName(oldWorkItem.AreaPath, TfsNodeStructureType.Area);
-                newWorkItem.IterationPath = nodeStructureEnricher.GetNewNodeName(oldWorkItem.IterationPath, TfsNodeStructureType.Iteration);
+                newWorkItem.AreaPath = _nodeStructureEnricher.GetNewNodeName(oldWorkItem.AreaPath, TfsNodeStructureType.Area);
+                newWorkItem.IterationPath = _nodeStructureEnricher.GetNewNodeName(oldWorkItem.IterationPath, TfsNodeStructureType.Iteration);
             }
 
             switch (destType)
@@ -357,7 +380,7 @@ namespace VstsSyncMigrator.Engine
         {
             if (sourceWorkItem != null && targetWorkItem != null && _config.FixHtmlAttachmentLinks)
             {
-                workItemEmbededLinkEnricher.Enrich(sourceWorkItem, targetWorkItem);
+                _workItemEmbededLinkEnricher.Enrich(sourceWorkItem, targetWorkItem);
             }
         }
 
@@ -387,7 +410,7 @@ namespace VstsSyncMigrator.Engine
                             { "sourceWorkItemRev", sourceWorkItem.Rev },
                             { "ReplayRevisions", _config.ReplayRevisions }}
                         );
-                    List<RevisionItem> revisionsToMigrate = revisionManager.GetRevisionsToMigrate(sourceWorkItem, targetWorkItem);
+                    List<RevisionItem> revisionsToMigrate = _revisionManager.GetRevisionsToMigrate(sourceWorkItem, targetWorkItem);
                     if (targetWorkItem == null)
                     {
                         targetWorkItem = ReplayRevisions(revisionsToMigrate, sourceWorkItem, null);
@@ -504,7 +527,7 @@ namespace VstsSyncMigrator.Engine
             if (targetWorkItem != null && _config.LinkMigration && sourceWorkItem.ToWorkItem().Links.Count > 0)
             {
                 TraceWriteLine(LogEventLevel.Information, "Links {SourceWorkItemLinkCount} | LinkMigrator:{LinkMigration}", new Dictionary<string, object>() { { "SourceWorkItemLinkCount", sourceWorkItem.ToWorkItem().Links.Count }, { "LinkMigration", _config.LinkMigration } });
-                workItemLinkEnricher.Enrich(sourceWorkItem, targetWorkItem);
+                _workItemLinkEnricher.Enrich(sourceWorkItem, targetWorkItem);
                 AddMetric("RelatedLinkCount", processWorkItemMetrics, targetWorkItem.ToWorkItem().Links.Count);
                 int fixedLinkCount = gitRepositoryEnricher.Enrich(sourceWorkItem, targetWorkItem);
                 AddMetric("FixedGitLinkCount", processWorkItemMetrics, fixedLinkCount);
@@ -534,7 +557,7 @@ namespace VstsSyncMigrator.Engine
 
                 if (_config.AttachRevisionHistory)
                 {
-                    revisionManager.AttachSourceRevisionHistoryJsonToTarget(sourceWorkItem, targetWorkItem);
+                    _revisionManager.AttachSourceRevisionHistoryJsonToTarget(sourceWorkItem, targetWorkItem);
                 }
 
                 foreach (var revision in revisionsToMigrate)

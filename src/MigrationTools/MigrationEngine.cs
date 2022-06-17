@@ -146,7 +146,7 @@ namespace MigrationTools
         private NetworkCredential CheckForNetworkCredentials(Credentials credentials)
         {
             NetworkCredential networkCredentials = null;
-            if (!string.IsNullOrWhiteSpace(credentials.UserName) && !string.IsNullOrWhiteSpace(credentials.Password))
+            if (!string.IsNullOrWhiteSpace(credentials?.UserName) && !string.IsNullOrWhiteSpace(credentials?.Password))
             {
                 networkCredentials = new NetworkCredential(credentials.UserName, credentials.Password, credentials.Domain);
             }

@@ -118,11 +118,13 @@ namespace MigrationTools.Enrichers
 
         private NodeInfo GetOrCreateNode(string nodePath, DateTime? startDate, DateTime? finishDate)
         {
-            Log.LogInformation(" Processing Node: {0}, start date: {1}, finish date: {2}", nodePath, startDate, finishDate);
             if (_pathToKnownNodeMap.TryGetValue(nodePath, out var info))
             {
+                Log.LogInformation(" Node {0} already migrated, nothing to do", nodePath);
                 return info;
             }
+
+            Log.LogInformation(" Processing Node: {0}, start date: {1}, finish date: {2}", nodePath, startDate, finishDate);
 
             // We don't know the node yet, so try to find the closest existing ancestor for the node
             var currentAncestorPath = nodePath;
@@ -380,21 +382,18 @@ namespace MigrationTools.Enrichers
             var startPath = ("\\" + this._sourceProjectName + "\\" + treeTypeSource).ToLower();
             Log.LogDebug("Source Node Path StartsWith [{startPath}]", startPath);
 
-            var nodes = _sourceRootNodes.Where((n) =>
-            {
-                // (i.e. "\CoolProject\Area" )
-                return n.Path.ToLower().StartsWith(startPath);
-            });
+            // (i.e. "\CoolProject\Area" )
+            var nodes = _sourceRootNodes.Where(n => n.Path.ToLower().StartsWith(startPath));
             if (nodes.Count() > 1)
             {
                 Exception ex = new Exception(string.Format("Unable to load Common Structure for Source because more than one node path matches \"{0}\". {1}", treeTypeSource, JsonConvert.SerializeObject(nodes.Select(x => x.Path))));
                 Log.LogError(ex, "Unable to load Common Structure for Source.");
                 throw ex;
             }
-            NodeInfo sourceNode = nodes.First();
+            NodeInfo sourceNode = nodes.FirstOrDefault();
             if (sourceNode == null) // May run into language problems!!! This is to try and detect that
             {
-                Exception ex = new Exception(string.Format("Unable to load Common Structure for Source. This is usually due to diferent language versions. Validate that '{0}' is the correct name in your version. ", treeTypeSource));
+                Exception ex = new Exception(string.Format("Unable to load Common Structure for Source. This is usually due to different language versions. Validate that '{0}' is the correct name in your version. ", treeTypeSource));
                 Log.LogError(ex, "Unable to load Common Structure for Source.");
                 throw ex;
             }
@@ -406,7 +405,7 @@ namespace MigrationTools.Enrichers
             }
             catch (Exception ex)
             {
-                Exception ex2 = new Exception(string.Format("Unable to load Common Structure for Target.This is usually due to diferent language versions. Validate that '{0}' is the correct name in your version. ", localizedTreeTypeName), ex);
+                Exception ex2 = new Exception(string.Format("Unable to load Common Structure for Target.This is usually due to different language versions. Validate that '{0}' is the correct name in your version. ", localizedTreeTypeName), ex);
                 Log.LogError(ex2, "Unable to load Common Structure for Target.");
                 throw ex2;
             }
