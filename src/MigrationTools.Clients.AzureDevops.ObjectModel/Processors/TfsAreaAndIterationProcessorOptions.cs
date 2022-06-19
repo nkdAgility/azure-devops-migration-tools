@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using MigrationTools.Enrichers;
 
 namespace MigrationTools.Processors
@@ -12,6 +13,8 @@ namespace MigrationTools.Processors
         public bool PrefixProjectToNodes { get; set; }
 
         public string[] NodeBasePaths { get; set; }
+        public Dictionary<string, string> AreaMaps { get; set; }
+        public Dictionary<string, string> IterationMaps { get; set; }
 
         public override Type ToConfigure => typeof(TfsAreaAndIterationProcessor);
 
@@ -25,6 +28,8 @@ namespace MigrationTools.Processors
             PrefixProjectToNodes = false;
             SourceName = "sourceName";
             TargetName = "targetName";
+            AreaMaps = new Dictionary<string, string>();
+            IterationMaps = new Dictionary<string, string>();
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using MigrationTools.Enrichers;
 
 namespace MigrationTools._EngineV1.Configuration
 {
@@ -16,7 +17,7 @@ namespace MigrationTools._EngineV1.Configuration
         public Dictionary<string, string> GitRepoMapping { get; set; }
 
         public string LogLevel { get; private set; }
-
+        public List<IProcessorEnricherOptions> CommonEnrichersConfig { get; set; }
         public List<IProcessorConfig> Processors { get; set; }
         public string Version { get; set; }
         public bool workaroundForQuerySOAPBugEnabled { get; set; }

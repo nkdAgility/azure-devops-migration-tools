@@ -7,12 +7,11 @@
         <member name="M:MigrationTools.Enrichers.TfsEmbededImagesEnricher.FixEmbededImages(MigrationTools.DataContracts.WorkItemData,System.String,System.String,System.String)">
             from https://gist.github.com/pietergheysens/792ed505f09557e77ddfc1b83531e4fb
         </member>
-        <member name="M:MigrationTools.Enrichers.TfsNodeStructure.ShouldCreateNode(Microsoft.TeamFoundation.Server.NodeInfo,System.String)">
+        <member name="M:MigrationTools.Enrichers.TfsNodeStructure.ShouldCreateNode(System.String)">
             <summary>
             Checks node-to-be-created with allowed BasePath's
             </summary>
-            <param name="parentPath">Parent Node</param>
-            <param name="newNodeName">Node to be created</param>
+            <param name="sourceNodePath">The path of the source node</param>
             <returns>true/false</returns>
         </member>
         <member name="T:MigrationTools.Processors.TfsAreaAndIterationProcessor">
