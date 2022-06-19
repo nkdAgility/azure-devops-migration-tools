@@ -8,6 +8,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.ApplicationInsights.WorkerService" Version="2.19.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.0.0" />
+    <PackageReference Include="Moq" Version="4.17.2" />
     <PackageReference Include="MSTest.TestAdapter" Version="2.2.8" />
     <PackageReference Include="MSTest.TestFramework" Version="2.2.8" />
     <PackageReference Include="coverlet.collector" Version="3.1.0">
@@ -17,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MigrationTools.Clients.AzureDevops.ObjectModel.Tests\MigrationTools.Clients.AzureDevops.ObjectModel.Tests.csproj" />
     <ProjectReference Include="..\MigrationTools.Clients.AzureDevops.ObjectModel\MigrationTools.Clients.AzureDevops.ObjectModel.csproj" />
     <ProjectReference Include="..\MigrationTools.TestExtensions\MigrationTools.TestExtensions.csproj" />
     <ProjectReference Include="..\VstsSyncMigrator.Core\VstsSyncMigrator.Core.csproj" />
