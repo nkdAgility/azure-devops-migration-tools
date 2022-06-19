@@ -5,9 +5,9 @@ using MigrationTools.TestExtensions;
 
 namespace MigrationTools.Tests
 {
-    internal static class ServiceProviderHelper
+    public static class ServiceProviderHelper
     {
-        internal static ServiceProvider GetServices()
+        public static ServiceProvider GetServices()
         {
             var configuration = new ConfigurationBuilder().Build();
             var services = new ServiceCollection();
@@ -16,6 +16,7 @@ namespace MigrationTools.Tests
             services.AddMigrationToolServices();
             services.AddMigrationToolServicesForClientAzureDevOpsObjectModel(configuration);
             services.AddMigrationToolServicesForClientLegacyAzureDevOpsObjectModel();
+            services.AddMigrationToolServicesLegacy();
             AddTfsEndpoint(services, "Source", "migrationSource1");
             AddTfsEndpoint(services, "Target", "migrationTarget1");
 
