@@ -118,7 +118,12 @@ namespace MigrationTools._EngineV1.Clients
                 {
                     case AuthenticationMode.AccessToken:
                         Log.Information("TfsMigrationClient::GetDependantTfsCollection: Connecting with AccessToken ");
-                        _vssCredentials = new VssBasicCredential(string.Empty, TfsConfig.PersonalAccessToken);
+                        var pat = TfsConfig.PersonalAccessToken;
+                        if (!string.IsNullOrEmpty(TfsConfig.PersonalAccessTokenVariableName))
+                        {
+                            pat = Environment.GetEnvironmentVariable(TfsConfig.PersonalAccessTokenVariableName);
+                        }
+                        _vssCredentials = new VssBasicCredential(string.Empty, pat);
                         y = new TfsTeamProjectCollection(TfsConfig.Collection, _vssCredentials);
                         break;
 
