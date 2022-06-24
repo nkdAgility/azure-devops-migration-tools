@@ -72,7 +72,11 @@ namespace MigrationTools
                 Log.Debug("--------------------------------------------------------------------------------------------------------------------");
             }
             Log.Verbose("TfsExtensions::SaveToAzureDevOps::Save()");
-            workItem.Save();
+            try {
+                workItem.Save();
+            } catch (FormatException exc) when (exc.Message.Equals("The string 'Microsoft.TeamFoundation.WorkItemTracking.Common.ServerDefaultFieldValue' is not a valid AllXsd value.", StringComparison.InvariantCultureIgnoreCase)) {
+                Log.Warning("Ignoring: The string 'Microsoft.TeamFoundation.WorkItemTracking.Common.ServerDefaultFieldValue' is not a valid AllXsd value.");
+            }
             context.RefreshWorkItem();
         }
 
