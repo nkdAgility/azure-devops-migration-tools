@@ -23,7 +23,6 @@ using MigrationTools._EngineV1.Processors;
 using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
 using MigrationTools.ProcessorEnrichers;
-using MigrationTools.Processors;
 using Serilog.Context;
 using Serilog.Events;
 using ILogger = Serilog.ILogger;
@@ -202,27 +201,32 @@ namespace VstsSyncMigrator.Engine
                     {
                         try
                         {
-                        ProcessWorkItemAsync(sourceWorkItemData, _config.WorkItemCreateRetryLimit).Wait();
-                        if (_config.PauseAfterEachWorkItem)
-                        {
-                            Console.WriteLine("Do you want to continue? (y/n)");
-                            if (Console.ReadKey().Key != ConsoleKey.Y)
+                            ProcessWorkItemAsync(sourceWorkItemData, _config.WorkItemCreateRetryLimit).Wait();
+                            if (_config.PauseAfterEachWorkItem)
                             {
-                                workItemLog.Warning("USER ABORTED");
-                                break;
+                                Console.WriteLine("Do you want to continue? (y/n)");
+                                if (Console.ReadKey().Key != ConsoleKey.Y)
+                                {
+                                    workItemLog.Warning("USER ABORTED");
+                                    break;
+                                }
                             }
                         }
-                    }
                         catch (Exception e)
                         {
                             _itemsInError.Add(sourceWorkItem.Id.ToString());
                             workItemLog.Error(e, "Could not save migrated work item {WorkItemId}, an exception occurred.", sourceWorkItem.Id);
 
-                            if (_itemsInError.Count > 100)
+                            if (_config.MaxGracefulFailures == 0)
                             {
-                                throw new Exception("Too many migrations failed");
-                }
-            }
+                                throw;
+                            }
+
+                            if (_itemsInError.Count > _config.MaxGracefulFailures)
+                            {
+                                throw new Exception($"Too many errors: more than {_config.MaxGracefulFailures} errors occurred, aborting migration.");
+                            }
+                        }
                     }
                 }
             }
