@@ -44,6 +44,9 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         public Dictionary<string, string> AreaMaps { get; set; }
         public Dictionary<string, string> IterationMaps { get; set; }
 
+
+        public int MaxGracefulFailures { get; set; }
+
         /// <inheritdoc />
         public bool IsProcessorCompatible(IReadOnlyList<IProcessorConfig> otherProcessors)
         {
@@ -76,6 +79,7 @@ namespace MigrationTools._EngineV1.Configuration.Processing
             AttachRevisionHistory = false;
             AreaMaps = new Dictionary<string, string>();
             IterationMaps = new Dictionary<string, string>();
+            MaxGracefulFailures = 0;
         }
     }
 }
