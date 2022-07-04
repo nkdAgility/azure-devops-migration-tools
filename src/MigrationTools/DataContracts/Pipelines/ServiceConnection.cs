@@ -173,10 +173,11 @@ namespace MigrationTools.DataContracts.Pipelines
             SetSourceId(Id);
 
             //Replace null Keys since it can't be null
-            var parameters = Authorization.Parameters;
+            var authParameters = Authorization.Parameters;
+            var dataParameters = Data;
             bool hasNullKey = false;
             List<KeyValuePair<string, string>> NullKeyPair = new List<KeyValuePair<string, string>>();
-            foreach (var param in parameters)
+            foreach (var param in authParameters)
             {
                 if (param.Value == null)
                 {
@@ -188,10 +189,16 @@ namespace MigrationTools.DataContracts.Pipelines
             {
                 foreach (var pair in NullKeyPair)
                 {
-                    parameters.Remove(pair.Key);
-                    parameters.Add(pair.Key, "toBeReplaced");
+                    authParameters.Remove(pair.Key);
+                    authParameters.Add(pair.Key, "toBeReplaced");
                 }
             }
+            authParameters.Remove("serviceprincipalid");
+            authParameters.Remove("serviceprincipalkey");
+            dataParameters.Remove("azureSpnRoleAssignmentId");
+            dataParameters.Remove("azureSpnPermissions");
+            dataParameters.Remove("spnObjectId");
+            dataParameters.Remove("appObjectId");
         }
 
         public override bool HasTaskGroups()
