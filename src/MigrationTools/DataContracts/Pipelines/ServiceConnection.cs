@@ -193,12 +193,17 @@ namespace MigrationTools.DataContracts.Pipelines
                     authParameters.Add(pair.Key, "toBeReplaced");
                 }
             }
-            authParameters.Remove("serviceprincipalid");
-            authParameters.Remove("serviceprincipalkey");
-            dataParameters.Remove("azureSpnRoleAssignmentId");
-            dataParameters.Remove("azureSpnPermissions");
-            dataParameters.Remove("spnObjectId");
-            dataParameters.Remove("appObjectId");
+            if (dataParameters.TryGetValue("environment", out var environment) && environment == "AzureCloud" &&
+                dataParameters.TryGetValue("creationMode", out var creationMode) && creationMode == "Automatic")
+            {
+                authParameters.Remove("serviceprincipalid");
+                authParameters.Remove("serviceprincipalkey");
+                dataParameters.Remove("azureSpnRoleAssignmentId");
+                dataParameters.Remove("azureSpnPermissions");
+                dataParameters.Remove("spnObjectId");
+                dataParameters.Remove("appObjectId");
+            }
+
         }
 
         public override bool HasTaskGroups()
