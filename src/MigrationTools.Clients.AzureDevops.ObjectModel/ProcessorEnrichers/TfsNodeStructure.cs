@@ -288,32 +288,39 @@ namespace MigrationTools.Enrichers
         {
             foreach (var item in nodeList.OfType<XmlElement>())
             {
-                if (!ShouldCreateNode(item.Attributes["Path"].Value))
+                // We work on the system paths, but user-friendly paths are used in maps
+                var userFriendlyPath = GetUserFriendlyPath(item.Attributes["Path"].Value);
+
+                var shouldCreateNode = ShouldCreateNode(userFriendlyPath);
+                var isParentOfSelectedBasePath = CheckIsParentOfSelectedBasePath(userFriendlyPath);
+                if (!shouldCreateNode && !isParentOfSelectedBasePath)
                 {
+                    // It is not a selected path or a descendant, and it cannot be the parent of a selected path, so we can skip it.
                     continue;
                 }
 
-                DateTime? startDate = null;
-                DateTime? finishDate = null;
-                if (treeType == "Iteration")
+                if (shouldCreateNode)
                 {
-                    if (item.Attributes["StartDate"] != null)
+                    DateTime? startDate = null;
+                    DateTime? finishDate = null;
+                    if (treeType == "Iteration")
                     {
-                        startDate = DateTime.Parse(item.Attributes["StartDate"].Value);
+                        if (item.Attributes["StartDate"] != null)
+                        {
+                            startDate = DateTime.Parse(item.Attributes["StartDate"].Value);
+                        }
+                        if (item.Attributes["FinishDate"] != null)
+                        {
+                            finishDate = DateTime.Parse(item.Attributes["FinishDate"].Value);
+                        }
                     }
-                    if (item.Attributes["FinishDate"] != null)
-                    {
-                        finishDate = DateTime.Parse(item.Attributes["FinishDate"].Value);
-                    }
+
+                    var newUserPath = GetNewNodeName(userFriendlyPath, nodeStructureType);
+                    var newSystemPath = GetSystemPath(newUserPath, nodeStructureType);
+
+                    var targetNode = GetOrCreateNode(newSystemPath, startDate, finishDate);
+                    _pathToKnownNodeMap[targetNode.Path] = targetNode;
                 }
-
-                // We work on the system paths, but user-friendly paths are used in maps
-                var userFriendlyPath = GetUserFriendlyPath(item.Attributes["Path"].Value);
-                var newUserPath = GetNewNodeName(userFriendlyPath, nodeStructureType);
-                var newSystemPath = GetSystemPath(newUserPath, nodeStructureType);
-
-                var targetNode = GetOrCreateNode(newSystemPath, startDate, finishDate);
-                _pathToKnownNodeMap[targetNode.Path] = targetNode;
 
                 if (item.HasChildNodes)
                 {
@@ -423,24 +430,37 @@ namespace MigrationTools.Enrichers
         /// <summary>
         /// Checks node-to-be-created with allowed BasePath's
         /// </summary>
-        /// <param name="sourceNodePath">The path of the source node</param>
+        /// <param name="userFriendlyPath">The user-friendly path of the source node</param>
         /// <returns>true/false</returns>
-        private bool ShouldCreateNode(string sourceNodePath)
+        private bool ShouldCreateNode(string userFriendlyPath)
         {
             if (_nodeBasePaths == null || _nodeBasePaths.Length == 0)
             {
                 return true;
             }
 
-            var userFriendlyPath = GetUserFriendlyPath(sourceNodePath);
-
-            if (_nodeBasePaths.Any(oneBasePath => userFriendlyPath.StartsWith(oneBasePath)))
+            var invertedPath = "!" + userFriendlyPath;
+            var exclusionPatterns = _nodeBasePaths.Where(oneBasePath => oneBasePath.StartsWith("!", StringComparison.InvariantCulture));
+            if (_nodeBasePaths.Any(oneBasePath => userFriendlyPath.StartsWith(oneBasePath)) &&
+                !exclusionPatterns.Any(oneBasePath => invertedPath.StartsWith(oneBasePath)))
             {
                 return true;
             }
 
-            Log.LogWarning("The node {nodePath} is being excluded due to your basePath setting. ", sourceNodePath);
+            Log.LogWarning("The node {nodePath} is being excluded due to your basePath setting. ", userFriendlyPath);
             return false;
+        }
+
+        /// <summary>
+        /// Checks whether a path is a parent of a selected base path (meaning we cannot skip it entirely)
+        /// </summary>
+        /// <param name="userFriendlyPath">The user-friendly path of the source node</param>
+        /// <returns>A boolean indicating whether the path is a parent of any positively selected base path.</returns>
+        /// <exception cref="NotImplementedException"></exception>
+        private bool CheckIsParentOfSelectedBasePath(string userFriendlyPath)
+        {
+            return _nodeBasePaths.Where(onePath => !onePath.StartsWith("!"))
+                                 .Any(onePath => onePath.StartsWith(userFriendlyPath));
         }
     }
 }
