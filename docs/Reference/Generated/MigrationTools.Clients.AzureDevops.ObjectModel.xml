@@ -11,7 +11,7 @@
             <summary>
             Checks node-to-be-created with allowed BasePath's
             </summary>
-            <param name="sourceNodePath">The path of the source node</param>
+            <param name="userFriendlyPath">The user-friendly path of the source node</param>
             <returns>true/false</returns>
         </member>
         <member name="T:MigrationTools.Processors.TfsAreaAndIterationProcessor">
