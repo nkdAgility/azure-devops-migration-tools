@@ -56,8 +56,8 @@ namespace MigrationTools
             catch(Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                Console.WriteLine("Trying again in 8...");
-                System.Threading.Thread.Sleep(8000);
+                Console.WriteLine("Trying again in 30...");
+                System.Threading.Thread.Sleep(30000);
                 tfswic.MapWorkItemtoWorkItemData(context, workItem, fieldsOfRevision);
             }
         }
@@ -95,14 +95,14 @@ namespace MigrationTools
                 Console.WriteLine(ex.StackTrace);
                 Console.WriteLine("ignoring");
                 Log.Error("ignoring", ex);
-                System.Threading.Thread.Sleep(10000);
+                System.Threading.Thread.Sleep(30000);
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
                 Console.WriteLine(ex.StackTrace);
-                Console.WriteLine("Trying again in 10...");
-                System.Threading.Thread.Sleep(10000);
+                Console.WriteLine("Trying again in 30...");
+                System.Threading.Thread.Sleep(30000);
                 Log.Error("retrying", ex);
                 workItem.Save();
             }

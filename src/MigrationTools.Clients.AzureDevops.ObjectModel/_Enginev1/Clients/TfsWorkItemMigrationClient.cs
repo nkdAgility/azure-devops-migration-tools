@@ -238,11 +238,40 @@ namespace MigrationTools._EngineV1.Clients
                 var items = query.GetWorkItems();
 
                 foundWorkItem = items.FirstOrDefault(wi => wi.ToWorkItem().Fields[MigrationClient.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName].Value.ToString() == refId.ToString());
+
+                if (foundWorkItem == null)
+                {
+                    foundWorkItem = Find2(refId, MigrationClient.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName);
+                }
+
                 if (cache && foundWorkItem != null)
                 {
                     AddToCache(foundWorkItem);
                 }
             }
+            return foundWorkItem;
+        }
+
+        /// <summary>
+        /// This is used for Shared Steps and Shared Parameters which don't have the option to add Custom Reflection Fields
+        /// </summary>
+        /// <param name="refId"></param>
+        /// <returns></returns>
+        private WorkItemData Find2(ReflectedWorkItemId refId, string configuredFieldName)
+        {
+            string myfield2 = "Microsoft.VSTS.Build.IntegrationBuild";
+
+            if (configuredFieldName == "Microsoft.VSTS.Build.IntegrationBuild")
+                myfield2 = "TempMigrationField";
+
+            var wiqb = _workItemQueryBuilderFactory.Create();
+            wiqb.Query = string.Format(@$"SELECT [System.Id] FROM WorkItems WHERE [{configuredFieldName}] = '@idToFind' OR [{myfield2}] = '@idToFind'");
+            wiqb.AddParameter("idToFind", refId.ToString());
+            //wiqb.AddParameter("TeamProject", MigrationClient.Config.AsTeamProjectConfig().Project);
+            var query = wiqb.BuildWIQLQuery(MigrationClient);
+            var items = query.GetWorkItems();
+
+            var foundWorkItem = items.FirstOrDefault(wi => wi.ToWorkItem().Fields[MigrationClient.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName].Value.ToString() == refId.ToString());
             return foundWorkItem;
         }
 

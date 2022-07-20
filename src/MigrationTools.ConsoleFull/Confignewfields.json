@@ -6,11 +6,11 @@
 	"Source": {
 		"$type": "TfsTeamProjectConfig",
 		"Collection": "https://dev.azure.com/devopsmkb/",
-		"Project": "Multivers",
+		"Project": "Personeel en Salaris",
 		"ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
 		"AllowCrossProjectLinking": false,
 		"AuthenticationMode": "AccessToken",
-		"PersonalAccessToken": "gxsymtgghhn5ygaxqm36zgergdvdgjeryyfczfnisqrg5noaqrfq",
+		"PersonalAccessToken": "vmbb7xdqqhs7ipxfwovkfixbhj4ocwwwzqiyjdnibloh6ckl55za",
 		"LanguageMaps": {
 			"AreaPath": "Area",
 			"IterationPath": "Iteration"
@@ -19,14 +19,17 @@
 	"Target": {
 		"$type": "TfsTeamProjectConfig",
 		"Collection": "https://dev.azure.com/ExactGroup/",
-		"Project": "Venice",
-		"ReflectedWorkItemIDFieldName": "TempMigrationField",
+		"Project": "SalarisGemak",
+		//"ReflectedWorkItemIDFieldName": "TempMigrationField",
+		"ReflectedWorkItemIDFieldName": "Microsoft.VSTS.Build.IntegrationBuild",
 		"AllowCrossProjectLinking": false,
 		"AuthenticationMode": "AccessToken",
-		// anand - EOL token 4qwxh...
-		"PersonalAccessToken": "4qwxyhkq5vtjmed3etldzwxhkpxodg3v2do3odkdo7qozpdtfk7a",
-		"DummyWorkItemForImageUploads": "172534",
-		"DelayBetweenTwoWorkItems": 800,
+		"PersonalAccessToken": "2lzwqfomhsacdlnjm2kchk2zo2sftp3dhdnbk474ccsjgkwt4yta", // and
+		//"PersonalAccessToken": "ypzk2gfdcvtzlfng6s5emanl7ae2x4pr4xaeaudd3walekhq3tiq", // ais
+		//"PersonalAccessToken": "y4hcelpp3uri4t3bx6flcp4m5yvwfwljolywvctv6h4xjowjy23a", // aji
+		"DummyWorkItemForImageUploads": "249333",
+		"DelayBetweenTwoWorkItems": 350,
+		"WhoToEmail": "a.gothe@devon.nl",
 		"LanguageMaps": {
 			"AreaPath": "Area",
 			"IterationPath": "Iteration"
@@ -105,46 +108,20 @@
 		}
 	],
 	"Processors": [
-		//"$type": "WorkItemDeleteConfig",
-		//"Enabled": true,
-		//"WIQLQueryBit": "AND [System.ID] in ('174152') AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
-		//"WIQLOrderBit": "[System.ChangedDate] desc"
-		//},
-		//{
-		//  "$type": "WorkItemMigrationConfig",
-		//  "ReplayRevisions": true,
-		//  "PrefixProjectToNodes": false,
-		//  "UpdateCreatedDate": true,
-		//  "UpdateCreatedBy": true,
-		//  "BuildFieldTable": false,
-		//  "AppendMigrationToolSignatureFooter": false,
-		//  "WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
-		//  "WIQLOrderBit": "[System.ChangedDate] desc",
-		//  "Enabled": true,
-		//  "LinkMigration": true,
-		//  "AttachmentMigration": true,
-		//  "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
-		//  "FixHtmlAttachmentLinks": false,
-		//  "SkipToFinalRevisedWorkItemType": false,
-		//  "WorkItemCreateRetryLimit": 5,
-		//  "FilterWorkItemsThatAlreadyExistInTarget": true,
-		//  "PauseAfterEachWorkItem": false,
-		//  "AttachmentMaxSize": 480000000,
-		//  "CollapseRevisions": false,
-		//  "LinkMigrationSaveEachAsAdded": true
 		{
 			"$type": "WorkItemMigrationConfig",
-			"ReplayRevisions": false,
+			"ReplayRevisions": true,
 			"PrefixProjectToNodes": false,
 			"UpdateCreatedDate": true,
 			"UpdateCreatedBy": true,
 			"BuildFieldTable": false,
 			"AppendMigrationToolSignatureFooter": false,
-			"WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Code Review Response', 'Code Review Request') AND [System.AreaPath] UNDER 'Multivers\\Venice' AND [System.IterationPath] UNDER 'Multivers\\Sandon'",
-			//"WIQLQueryBit": "AND [System.ID] in ('141264','139473','210783','210778','212455','210773','214389','210784','215143','212371','214394','214416','224196','139765','216330','217570','217612','217639','230533','221120','213669','213269','221117','221171','221118','221376','221119','221809','217617','215430','218663','221836','214313','221814','223898','223892','224433','223919','223908','115482','226492','115481','128840','139573','139711','128829','128828','128830','115484','128841','139592','128827','128831','139410','139648','139710','128826','223897','225667','226230','226388','226630','226780','226789','226635','228319','229089','228346','230895','230922','230900','233839','233866','139407','233844','237484','238373','237511','238834','240080','240107','240285','240085','241368','241366','241362','240958','242524','236351','241583','242529','238866','241937','244700','244727','244705','246861','232864','247037','248721','248726','248746','250843','250868','250848','252461','252466','252486','253754','253886','254014','254686','254691','254711','259271','261359','261363','265226','262938','265222','265294','265290','270452','270456','270519','270523','272098','272094','273980','273976','277525','277511','284996','284969','286622','286650','288637','288665')",
-			//"WIQLQueryBit": "AND [System.ChangedDate] >= '2022-4-27'",
-			//"WIQLQueryBit": "AND [System.ChangedDate] > '2022-4-25'",
-			"WIQLOrderBit": "[System.ID]",
+			//"WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Code Review Response', 'Code Review Request', 'Test Case','Shared Steps','Shared Parameter','Test Suite', 'Test Plan') AND [System.AreaPath] NOT UNDER 'Multivers\\Venice' AND [System.ChangedDate] >= '2022-5-15'",
+			"WIQLQueryBit": "AND [System.WorkItemType] IN ('Shared Steps','Shared Parameter')",
+			//"WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Shared Parameter','Shared Steps','Test Suite', 'Test Plan') AND [System.ID] >= '265000' AND [System.ID] < '275000'",
+			//"WIQLQueryBit": "AND [System.ChangedDate] >= '2022-06-1'",
+			//"WIQLQueryBit": "AND [System.ID] = '239710'",
+			//"WIQLQueryBit": "AND [System.ID] IN ('285343','295453','295464','295465','295466','295520','295530','295531','295545','295594','295615')",
 			"Enabled": true,
 			"LinkMigration": true,
 			"AttachmentMigration": true,
@@ -152,7 +129,7 @@
 			"FixHtmlAttachmentLinks": true,
 			"SkipToFinalRevisedWorkItemType": true,
 			"WorkItemCreateRetryLimit": 5,
-			"FilterWorkItemsThatAlreadyExistInTarget": true,
+			"FilterWorkItemsThatAlreadyExistInTarget": false,
 			"PauseAfterEachWorkItem": false,
 			"AttachmentMaxSize": 480000000,
 			"CollapseRevisions": false,

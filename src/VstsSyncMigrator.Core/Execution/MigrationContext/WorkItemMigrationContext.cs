@@ -167,6 +167,8 @@ namespace VstsSyncMigrator.Engine
                     }
                 }
 
+                if(_current%30==0) sendemail(Engine.Source.WorkItems.Project.Name, Engine.Target.Config.AsTeamProjectConfig().WhoToEmail);
+
                 Log.LogInformation("Sleeping for " + _delayBetweenWI);
                 Thread.Sleep(_delayBetweenWI);
                 Log.LogInformation("Sleeping over!");
@@ -184,7 +186,7 @@ namespace VstsSyncMigrator.Engine
                     if (_processedWorkItems[k].Item2.ToWorkItem().IsDirty)
                     {
                         _processedWorkItems[k].Item2.SaveToAzureDevOps();
-                        Thread.Sleep(200);
+                        Thread.Sleep(150);
                     }
 
                     _processedWorkItems[k].Item2.ToWorkItem().Close();
@@ -236,7 +238,20 @@ namespace VstsSyncMigrator.Engine
 
             contextLog.Information("DONE in {Elapsed}", stopwatch.Elapsed.ToString("c"));
         }
-         
+
+        internal void sendemail(string projName, string who)
+        {
+            try
+            {
+                var req = WebRequest.Create($"https://andyemailer.azurewebsites.net/api/Emailer?code=2gQ24cKqsicIcrjBAP7n8zz8EhEwnJ4ucTQtBdjBRjKZAzFue8QLcw==&to={who}&subject=Done {projName} - {_current} of {_totalWorkItem}&body=Nothing");
+                WebResponse myWebResponse = req.GetResponse();
+                myWebResponse.Close();
+            }
+            catch (Exception ex)
+            {
+                contextLog.Error("Error sending email..", ex);
+            }
+        }
 
         internal static string FixAreaPathAndIterationPathForTargetQuery(string sourceWIQLQueryBit, string sourceProject, string targetProject, ILogger? contextLog)
         {
@@ -435,20 +450,10 @@ namespace VstsSyncMigrator.Engine
                     {
                         if (revisionsToMigrate.Count == 0)
                         {
-                            string si = sourceWorkItem.Fields["System.IterationPath"].Value.ToString();
-                            string ti = targetWorkItem.Fields["System.IterationPath"].Value.ToString();
-                            string temp = si.Replace("Multivers", "Venice");
-                            if (ti!=temp)
-                            {
-                                targetWorkItem.ToWorkItem().Fields["System.IterationPath"].Value = temp;
-                                TraceWriteLine(LogEventLevel.Information, $"FIXED ITERATION {ti} -> {temp}");
-
-                            }
-
-                            //ProcessWorkItemAttachments(sourceWorkItem, targetWorkItem, false);
-                            //ProcessWorkItemLinks(Engine.Source.WorkItems, Engine.Target.WorkItems, sourceWorkItem, targetWorkItem);
-                            //ProcessHTMLFieldAttachements(targetWorkItem);
-                            //ProcessWorkItemEmbeddedLinks(sourceWorkItem, targetWorkItem);
+                            ProcessWorkItemAttachments(sourceWorkItem, targetWorkItem, false);
+                            ProcessWorkItemLinks(Engine.Source.WorkItems, Engine.Target.WorkItems, sourceWorkItem, targetWorkItem);
+                            ProcessHTMLFieldAttachements(targetWorkItem);
+                            ProcessWorkItemEmbeddedLinks(sourceWorkItem, targetWorkItem);
                             TraceWriteLine(LogEventLevel.Information, "Skipping as work item exists and no revisions to sync detected");
                             processWorkItemMetrics.Add("Revisions", 0);
                         }

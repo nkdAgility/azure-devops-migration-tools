@@ -17,6 +17,7 @@ namespace MigrationTools._EngineV1.Configuration
 
         public string PersonalAccessToken { get; set; }
         public string DummyWorkItemForImageUploads { get; set; }
+        public string WhoToEmail { get; set; }
         public int DelayBetweenTwoWorkItems { get; set; }
         public TfsLanguageMapOptions LanguageMaps { get; set; }
 

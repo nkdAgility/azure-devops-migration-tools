@@ -59,7 +59,7 @@ namespace VstsSyncMigrator.Engine
                         }
                         catch (Exception)
                         {
-                            System.Threading.Thread.Sleep(5000);
+                            System.Threading.Thread.Sleep(15000);
                             workitem.SaveToAzureDevOps();
                         }
                     }

@@ -54,8 +54,8 @@ namespace MigrationTools.Endpoints
             catch(Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                Console.WriteLine("Trying again in 7...");
-                System.Threading.Thread.Sleep(7000);
+                Console.WriteLine("Trying again in 30...");
+                System.Threading.Thread.Sleep(30000);
 
                 return (from Field x in tfsFields
                         select new FieldItem()
