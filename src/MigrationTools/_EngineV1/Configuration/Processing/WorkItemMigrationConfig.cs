@@ -73,7 +73,7 @@ namespace MigrationTools._EngineV1.Configuration.Processing
             SkipToFinalRevisedWorkItemType = true;
             LinkMigrationSaveEachAsAdded = false;
             GenerateMigrationComment = true;
-            WIQLQueryBit = @"AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
+            WIQLQueryBit = @"AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')";
             WIQLOrderBit = "[System.ChangedDate] desc";
             MaxRevisions = 0;
             AttachRevisionHistory = false;
