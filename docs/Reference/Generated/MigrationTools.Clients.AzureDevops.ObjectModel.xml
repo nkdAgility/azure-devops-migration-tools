@@ -14,6 +14,14 @@
             <param name="userFriendlyPath">The user-friendly path of the source node</param>
             <returns>true/false</returns>
         </member>
+        <member name="M:MigrationTools.Enrichers.TfsNodeStructure.CheckIsParentOfSelectedBasePath(System.String)">
+            <summary>
+            Checks whether a path is a parent of a selected base path (meaning we cannot skip it entirely)
+            </summary>
+            <param name="userFriendlyPath">The user-friendly path of the source node</param>
+            <returns>A boolean indicating whether the path is a parent of any positively selected base path.</returns>
+            <exception cref="T:System.NotImplementedException"></exception>
+        </member>
         <member name="T:MigrationTools.Processors.TfsAreaAndIterationProcessor">
             <summary>
             The `TfsAreaAndIterationProcessor` migrates all of the Area nd Iteraion paths.

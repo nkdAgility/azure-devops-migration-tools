@@ -20,9 +20,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CommandLineParser" Version="2.8.0" />
+    <PackageReference Include="CommandLineParser" Version="2.9.1" />
     <PackageReference Include="Ben.Demystifier" Version="0.4.1" />
-    <PackageReference Include="CsvHelper" Version="27.2.1" />
+    <PackageReference Include="CsvHelper" Version="28.0.1" />
     <PackageReference Include="Microsoft.TeamFoundationServer.ExtendedClient" Version="16.170.0">
       <IncludeAssets>all</IncludeAssets>
       <ExcludeAssets>none</ExcludeAssets>
