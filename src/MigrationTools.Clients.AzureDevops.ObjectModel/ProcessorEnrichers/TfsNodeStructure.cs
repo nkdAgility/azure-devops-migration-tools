@@ -99,7 +99,7 @@ namespace MigrationTools.Enrichers
                 throw new InvalidOperationException($"This path is not anchored in the source project name: {sourceNodePath}");
             }
 
-            return Regex.Replace(sourceNodePath, lastResortRule.Key, lastResortRule.Value);
+            return Regex.Replace(sourceNodePath, lastResortRule.Key, lastResortRule.Value.Replace("\\", ""));
         }
 
         private KeyValuePair<string, string> GetLastResortRemappingRule()
