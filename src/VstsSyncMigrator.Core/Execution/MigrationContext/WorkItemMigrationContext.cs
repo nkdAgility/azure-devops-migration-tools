@@ -581,16 +581,23 @@ namespace VstsSyncMigrator.Engine
         {
             try
             {
-                var skipToFinalRevisedWorkItemType = _config.SkipToFinalRevisedWorkItemType;
-                var finalDestType = revisionsToMigrate.Last().Type;
-
-                if (skipToFinalRevisedWorkItemType && Engine.TypeDefinitionMaps.Items.ContainsKey(finalDestType))
-                    finalDestType = Engine.TypeDefinitionMaps.Items[finalDestType].Map();
-
                 //If work item hasn't been created yet, create a shell
                 if (targetWorkItem == null)
                 {
+                    var skipToFinalRevisedWorkItemType = _config.SkipToFinalRevisedWorkItemType;
+                    var finalDestType = revisionsToMigrate.Last().Type;
                     var targetType = revisionsToMigrate.First().Type;
+
+                    if(targetType != finalDestType)
+                    {
+                        TraceWriteLine(LogEventLevel.Information, $"WorkItem has changed type at one of the revisions, from {targetType} to {finalDestType}");
+                    }
+
+                    if (skipToFinalRevisedWorkItemType && Engine.TypeDefinitionMaps.Items.ContainsKey(finalDestType))
+                    {
+                        finalDestType = Engine.TypeDefinitionMaps.Items[finalDestType].Map();
+                    }
+                    
                     if (Engine.TypeDefinitionMaps.Items.ContainsKey(targetType))
                     {
                         targetType = Engine.TypeDefinitionMaps.Items[targetType].Map();
@@ -616,8 +623,7 @@ namespace VstsSyncMigrator.Engine
                     var destType = currentRevisionWorkItem.Type;
                     if (Engine.TypeDefinitionMaps.Items.ContainsKey(destType))
                     {
-                        destType =
-                           Engine.TypeDefinitionMaps.Items[destType].Map();
+                        destType = Engine.TypeDefinitionMaps.Items[destType].Map();
                     }
 
                     PopulateWorkItem(currentRevisionWorkItem, targetWorkItem, destType);
