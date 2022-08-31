@@ -35,10 +35,17 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         public bool AttachRevisionHistory { get; set; }
         public bool LinkMigrationSaveEachAsAdded { get; set; }
         public bool GenerateMigrationComment { get; set; }
-        public bool? NodeStructureEnricherEnabled { get; set; }
-        public string[] NodeBasePaths { get; set; }
         public IList<int> WorkItemIDs { get; set; }
         public int MaxRevisions { get; set; }
+
+        public bool? NodeStructureEnricherEnabled { get; set; }
+        public bool UseCommonNodeStructureEnricherConfig { get; set; }
+        public string[] NodeBasePaths { get; set; }
+        public Dictionary<string, string> AreaMaps { get; set; }
+        public Dictionary<string, string> IterationMaps { get; set; }
+
+
+        public int MaxGracefulFailures { get; set; }
 
         /// <inheritdoc />
         public bool IsProcessorCompatible(IReadOnlyList<IProcessorConfig> otherProcessors)
@@ -66,10 +73,13 @@ namespace MigrationTools._EngineV1.Configuration.Processing
             SkipToFinalRevisedWorkItemType = true;
             LinkMigrationSaveEachAsAdded = false;
             GenerateMigrationComment = true;
-            WIQLQueryBit = @"AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
+            WIQLQueryBit = @"AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')";
             WIQLOrderBit = "[System.ChangedDate] desc";
             MaxRevisions = 0;
             AttachRevisionHistory = false;
+            AreaMaps = new Dictionary<string, string>();
+            IterationMaps = new Dictionary<string, string>();
+            MaxGracefulFailures = 0;
         }
     }
 }

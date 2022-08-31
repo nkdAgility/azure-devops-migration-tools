@@ -166,11 +166,11 @@ namespace MigrationTools.Processors
                                 }
                                 else
                                 {
-                                    targetConfig.TeamSettings.BacklogIterationPath = sourceConfig.TeamSettings.BacklogIterationPath.Replace(Source.Project, Target.Project);
+                                    targetConfig.TeamSettings.BacklogIterationPath = SwitchProjectName(sourceConfig.TeamSettings.BacklogIterationPath, Source.Project, Target.Project);
                                     Log.LogDebug("targetConfig.TeamSettings.BacklogIterationPath={BacklogIterationPath}", targetConfig.TeamSettings.BacklogIterationPath);
                                     targetConfig.TeamSettings.IterationPaths = sourceConfig.TeamSettings.IterationPaths.Select(ip =>
                                     {
-                                        var result = ip.Replace(Source.Project, Target.Project);
+                                        var result = SwitchProjectName(ip, Source.Project, Target.Project);
                                         iterationMap[ip] = result;
                                         return result;
                                     }).ToArray();
@@ -178,7 +178,7 @@ namespace MigrationTools.Processors
                                     targetConfig.TeamSettings.TeamFieldValues = sourceConfig.TeamSettings.TeamFieldValues;
                                     foreach (var item in targetConfig.TeamSettings.TeamFieldValues)
                                     {
-                                        item.Value = item.Value.Replace(Source.Project, Target.Project);
+                                        item.Value = SwitchProjectName(item.Value, Source.Project, Target.Project);
                                     }
                                     Log.LogDebug("targetConfig.TeamSettings.TeamFieldValues={@TeamFieldValues}", targetConfig.TeamSettings.TeamFieldValues);
                                 }
@@ -240,6 +240,26 @@ namespace MigrationTools.Processors
             //////////////////////////////////////////////////
             stopwatch.Stop();
             Log.LogDebug("DONE in {Elapsed} ", stopwatch.Elapsed.ToString("c"));
+        }
+
+        internal static string SwitchProjectName(string expressionString, string sourceProjectName, string targetProjectName)
+        {
+            if (expressionString == sourceProjectName)
+            {
+                return targetProjectName;
+            }
+
+            var slashIndex = expressionString.IndexOf('\\');
+            if (slashIndex > 0)
+            {
+                var subValue = expressionString.Substring(0, slashIndex);
+                if (subValue == sourceProjectName)
+                {
+                    return targetProjectName + expressionString.Substring(slashIndex);
+                }
+            }
+
+            return string.Empty;
         }
 
         private void MigrateCapacities(WorkHttpClient sourceHttpClient, WorkHttpClient targetHttpClient, TeamFoundationTeam sourceTeam, TeamFoundationTeam targetTeam, Dictionary<string, string> iterationMap)

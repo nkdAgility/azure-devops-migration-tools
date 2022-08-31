@@ -23,9 +23,6 @@ namespace MigrationTools.ProcessorEnrichers.Tests
         {
             var nodeStructure = _services.GetRequiredService<TfsNodeStructure>();
 
-            const string targetStructureName = "Area\\test";
-            const string sourceStructureName = "Area";
-
             nodeStructure.ApplySettings(new TfsNodeStructureSettings
             {
                 SourceProjectName = "SourceProject",
@@ -36,11 +33,15 @@ namespace MigrationTools.ProcessorEnrichers.Tests
                 }
             });
 
+            var options = new TfsNodeStructureOptions();
+            options.SetDefaults();
+            options.AreaMaps[@"^SourceProject\\PUL"] = "TargetProject\\test\\PUL";
+            nodeStructure.Configure(options);
+
             const string sourceNodeName = @"SourceProject\PUL";
             const TfsNodeStructureType nodeStructureType = TfsNodeStructureType.Area;
 
-
-            var newNodeName = nodeStructure.GetNewNodeName(sourceNodeName, nodeStructureType, targetStructureName, sourceStructureName);
+            var newNodeName = nodeStructure.GetNewNodeName(sourceNodeName, nodeStructureType);
 
             Assert.AreEqual(newNodeName, @"TargetProject\test\PUL");
 

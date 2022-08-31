@@ -95,7 +95,7 @@ namespace MigrationTools.Processors
 
             if (_Options.MigrateReleasePipelines)
             {
-                await CreateReleasePipelinesAsync(taskGroupMappings, variableGroupMappings);
+                await CreateReleasePipelinesAsync(taskGroupMappings, variableGroupMappings, serviceConnectionMappings);
             }
             stopwatch.Stop();
             Log.LogDebug("DONE in {Elapsed} ", stopwatch.Elapsed.ToString("c"));
@@ -342,7 +342,7 @@ namespace MigrationTools.Processors
             }
         }
 
-        private async Task<IEnumerable<Mapping>> CreateReleasePipelinesAsync(IEnumerable<Mapping> TaskGroupMapping = null, IEnumerable<Mapping> VariableGroupMapping = null)
+        private async Task<IEnumerable<Mapping>> CreateReleasePipelinesAsync(IEnumerable<Mapping> TaskGroupMapping = null, IEnumerable<Mapping> VariableGroupMapping = null, IEnumerable<Mapping> ServiceConnectionMappings = null)
         {
             Log.LogInformation($"Processing Release Pipelines..");
 
@@ -371,6 +371,8 @@ namespace MigrationTools.Processors
                         UpdateVariableGroupId(environment.VariableGroups, VariableGroupMapping);
                     }
                 }
+
+                UpdateServiceConnectionId(definitionToBeMigrated, ServiceConnectionMappings);
             }
 
             var mappings = await Target.CreateApiDefinitionsAsync<ReleaseDefinition>(definitionsToBeMigrated);
@@ -468,6 +470,47 @@ namespace MigrationTools.Processors
                     else if (phase.PhaseType == "machineGroupBasedDeployment")
                     {
                         UpdateQueueIdForPhase(phase, deploymentGroupMappings);
+                    }
+                }
+            }
+        }
+
+        private void UpdateServiceConnectionId(ReleaseDefinition definitionToBeMigrated, IEnumerable<Mapping> ServiceConnectionMappings)
+        {
+            if (ServiceConnectionMappings is null)
+            {
+                return;
+            }
+
+            foreach (var environment in definitionToBeMigrated.Environments)
+            {
+                foreach (var deployPhase in environment.DeployPhases)
+                {
+                    foreach (var workflowTask in deployPhase.WorkflowTasks)
+                    {
+                        bool hasFoundInputWhichNeedsReplacement = false;
+                        string inputNameWhichNeedsValueReplacement = "azureSubscription";
+                        string valueOfInputThatNeedsToBeMapped = string.Empty;
+
+                        foreach (var input in workflowTask.Inputs)
+                        {
+                            if (input.Key == inputNameWhichNeedsValueReplacement)
+                            {
+                                valueOfInputThatNeedsToBeMapped = input.Value.ToString();
+                                hasFoundInputWhichNeedsReplacement = true;
+                                break;
+                            }
+                        }
+
+                        if (hasFoundInputWhichNeedsReplacement)
+                        {
+                            Mapping scMapping = ServiceConnectionMappings.FirstOrDefault(sc => sc.SourceId == valueOfInputThatNeedsToBeMapped);
+
+                            IDictionary<string, object> workflowTaskInputs = workflowTask.Inputs;
+                            workflowTaskInputs.Remove(inputNameWhichNeedsValueReplacement);
+                            workflowTaskInputs.Add(inputNameWhichNeedsValueReplacement, scMapping.TargetId);
+                            workflowTask.Inputs = (System.Dynamic.ExpandoObject)workflowTaskInputs;
+                        }
                     }
                 }
             }

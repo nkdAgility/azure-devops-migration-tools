@@ -30,11 +30,9 @@ namespace MigrationTools.Enrichers
 
     public class TfsNodeStructure : WorkItemProcessorEnricher
     {
-        private Dictionary<string, bool> _foundNodes = new Dictionary<string, bool>();
+        private readonly Dictionary<string, NodeInfo> _pathToKnownNodeMap = new Dictionary<string, NodeInfo>();
         private string[] _nodeBasePaths;
         private TfsNodeStructureOptions _Options;
-
-        private bool _prefixProjectToNodes = false;
 
         private ICommonStructureService4 _sourceCommonStructureService;
 
@@ -46,6 +44,7 @@ namespace MigrationTools.Enrichers
         private ICommonStructureService4 _targetCommonStructureService;
         private TfsLanguageMapOptions _targetLanguageMaps;
         private string _targetProjectName;
+        private KeyValuePair<string, string>? _lastResortRemapRule;
 
         public TfsNodeStructure(IServiceProvider services, ILogger<TfsNodeStructure> logger)
             : base(services, logger)
@@ -66,14 +65,12 @@ namespace MigrationTools.Enrichers
         public override void Configure(IProcessorEnricherOptions options)
         {
             _Options = (TfsNodeStructureOptions)options;
-
         }
 
         public void ApplySettings(TfsNodeStructureSettings settings)
         {
             _sourceProjectName = settings.SourceProjectName;
             _targetProjectName = settings.TargetProjectName;
-            _foundNodes = settings.FoundNodes;
         }
 
         [Obsolete("Old v1 arch: this is a v2 class", true)]
@@ -82,49 +79,143 @@ namespace MigrationTools.Enrichers
             throw new NotImplementedException();
         }
 
-        public string GetNewNodeName(string sourceNodeName, TfsNodeStructureType nodeStructureType, string targetStructureName = null, string sourceStructureName = null)
+        public string GetNewNodeName(string sourceNodePath, TfsNodeStructureType nodeStructureType)
         {
-            Log.LogDebug("NodeStructureEnricher.GetNewNodeName({sourceNodeName}, {nodeStructureType})", sourceNodeName, nodeStructureType.ToString());
-            var tStructureName = targetStructureName ?? NodeStructureTypeToLanguageSpecificName(_targetLanguageMaps, nodeStructureType);
-            var sStructureName = sourceStructureName ?? NodeStructureTypeToLanguageSpecificName(_sourceLanguageMaps, nodeStructureType);
-            // Replace project name with new name (if necessary) and inject nodePath (Area or Iteration) into path for node validation
-            string newNodeName;
-            if (_prefixProjectToNodes)
+            Log.LogDebug("NodeStructureEnricher.GetNewNodeName({sourceNodePath}, {nodeStructureType})", sourceNodePath, nodeStructureType.ToString());
+
+            var mappers = GetMaps(nodeStructureType);
+            var lastResortRule = GetLastResortRemappingRule();
+
+            foreach (var mapper in mappers)
             {
-                newNodeName = $@"{_targetProjectName}\{tStructureName}\{sourceNodeName}";
-            }
-            else
-            {
-                var regex = new Regex(Regex.Escape(_sourceProjectName));
-                if (sourceNodeName.StartsWith($@"{_sourceProjectName}\{sStructureName}\"))
+                if (Regex.IsMatch(sourceNodePath, mapper.Key))
                 {
-                    newNodeName = regex.Replace(sourceNodeName, _targetProjectName, 1);
+                    return Regex.Replace(sourceNodePath, mapper.Key, mapper.Value);
+                }
+            }
+
+            if (!Regex.IsMatch(sourceNodePath, lastResortRule.Key))
+            {
+                throw new InvalidOperationException($"This path is not anchored in the source project name: {sourceNodePath}");
+            }
+
+            return Regex.Replace(sourceNodePath, lastResortRule.Key, lastResortRule.Value.Replace("\\", ""));
+        }
+
+        private KeyValuePair<string, string> GetLastResortRemappingRule()
+        {
+            if (_lastResortRemapRule == null)
+            {
+                var escapedSourceProjectName = Regex.Escape(_sourceProjectName);
+                var escapedTargetProjectName = Regex.Escape(_targetProjectName);
+                _lastResortRemapRule = _Options.PrefixProjectToNodes
+                    ? new KeyValuePair<string, string>($"^{escapedSourceProjectName}", $"{escapedTargetProjectName}\\{escapedSourceProjectName}")
+                    : new KeyValuePair<string, string>($"^{escapedSourceProjectName}", $"{escapedTargetProjectName}");
+            }
+
+            return _lastResortRemapRule.Value;
+        }
+
+        private NodeInfo GetOrCreateNode(string nodePath, DateTime? startDate, DateTime? finishDate)
+        {
+            if (_pathToKnownNodeMap.TryGetValue(nodePath, out var info))
+            {
+                Log.LogInformation(" Node {0} already migrated, nothing to do", nodePath);
+                return info;
+            }
+
+            Log.LogInformation(" Processing Node: {0}, start date: {1}, finish date: {2}", nodePath, startDate, finishDate);
+
+            // We don't know the node yet, so try to find the closest existing ancestor for the node
+            var currentAncestorPath = nodePath;
+            var pathSegments = new Stack<string>();
+            NodeInfo parentNode = null;
+            do
+            {
+                var match = Regex.Match(currentAncestorPath, @"(?<parentPath>^.+)?\\(?<nodeName>[^\\]+)\\?$");
+                if (match.Success)
+                {
+                    var nodeName = match.Groups["nodeName"].Value;
+
+                    // Store the list of nodes to creates on the way down
+                    pathSegments.Push(nodeName);
+
+                    // Move up the path
+                    currentAncestorPath = match.Groups["parentPath"].Success
+                        ? match.Groups["parentPath"].Value
+                        : string.Empty;
+                    _pathToKnownNodeMap.TryGetValue(currentAncestorPath, out parentNode);
                 }
                 else
                 {
-                    newNodeName = regex.Replace(sourceNodeName, $@"{_targetProjectName}\{tStructureName}", 1);
+                    throw new InvalidOperationException($"This does not look like a valid area or iteration path: {currentAncestorPath}");
                 }
+            } while (parentNode == null && !string.IsNullOrEmpty(currentAncestorPath));
+
+            if (parentNode == null)
+            {
+                throw new InvalidOperationException(
+                    $"Path {nodePath} is not anchored in the target project, it cannot be created.");
             }
 
-            // Validate the node exists
-            if (!TargetNodeExists(newNodeName))
+            // Now that we have a parent, we can start creating nodes down the tree from that point
+            do
             {
-                Log.LogWarning("The Node '{newNodeName}' does not exist, leaving as '{newProjectName}'. This may be because it has been renamed or moved and no longer exists, or that you have not migrateed the Node Structure yet.", newNodeName, _targetProjectName);
-                newNodeName = _targetProjectName;
-            }
+                var currentNodeName = pathSegments.Pop();
+                var currentNodePath = $@"{parentNode.Path}\{currentNodeName}";
+                try
+                {
+                    parentNode = _targetCommonStructureService.GetNodeFromPath(currentNodePath);
+                    _pathToKnownNodeMap[parentNode.Path] = parentNode;
+                    Log.LogDebug("  Node {node} already exists", currentNodePath);
+                    Log.LogTrace("{node}", parentNode);
+                }
+                catch (CommonStructureSubsystemException ex)
+                {
+                    try
+                    {
+                        var newPathUri = _targetCommonStructureService.CreateNode(currentNodeName, parentNode.Uri);
+                        Log.LogDebug("  Node {newPathUri} has been created", newPathUri);
+                        parentNode = _targetCommonStructureService.GetNode(newPathUri);
+                        _pathToKnownNodeMap[parentNode.Path] = parentNode;
+                    }
+                    catch
+                    {
+                        Log.LogError(ex, "Creating Node");
+                        throw;
+                    }
+                }
 
-            // Remove nodePath (Area or Iteration) from path for correct population in work item
-            if (newNodeName.StartsWith(_targetProjectName + '\\' + tStructureName + '\\'))
-            {
-                newNodeName = newNodeName.Remove(newNodeName.IndexOf($@"{nodeStructureType}\"), $@"{nodeStructureType}\".Length);
-            }
-            else if (newNodeName.StartsWith(_targetProjectName + '\\' + tStructureName))
-            {
-                newNodeName = newNodeName.Remove(newNodeName.IndexOf($@"{nodeStructureType}"), $@"{nodeStructureType}".Length);
-            }
-            newNodeName = newNodeName.Replace(@"\\", @"\");
+                if (startDate != null && finishDate != null)
+                {
+                    try
+                    {
+                        _targetCommonStructureService.SetIterationDates(parentNode.Uri, startDate, finishDate);
+                        Log.LogDebug("  Node {node} has been assigned {startDate} / {finishDate}", currentNodePath,
+                            startDate, finishDate);
+                    }
+                    catch (CommonStructureSubsystemException ex)
+                    {
+                        Log.LogWarning(ex, " Unable to set {node}dates of {startDate} / {finishDate}", currentNodePath,
+                            startDate, finishDate);
+                    }
+                }
+            } while (parentNode.Path != nodePath);
 
-            return newNodeName;
+            return parentNode;
+        }
+
+        private Dictionary<string, string> GetMaps(TfsNodeStructureType nodeStructureType)
+        {
+            switch (nodeStructureType)
+            {
+                case TfsNodeStructureType.Area:
+                    return _Options.AreaMaps;
+                case TfsNodeStructureType.Iteration:
+                    return _Options.IterationMaps;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(nodeStructureType), nodeStructureType, null);
+            }
         }
 
         public override void ProcessorExecutionBegin(IProcessor processor)
@@ -193,135 +284,123 @@ namespace MigrationTools.Enrichers
             }
         }
 
-        private NodeInfo CreateNode(string name, NodeInfo parent, DateTime? startDate, DateTime? finishDate)
+        private void CreateNodes(XmlNodeList nodeList, string treeType, TfsNodeStructureType nodeStructureType)
         {
-            string nodePath = string.Format(@"{0}\{1}", parent.Path, name);
-            NodeInfo node;
-            Log.LogInformation(" Processing Node: {0}, start date: {1}, finish date: {2}", nodePath, startDate, finishDate);
-            try
+            foreach (var item in nodeList.OfType<XmlElement>())
             {
-                node = _targetCommonStructureService.GetNodeFromPath(nodePath);
-                Log.LogDebug("  Node {node} already exists", nodePath);
-                Log.LogTrace("{node}", node);
-            }
-            catch (CommonStructureSubsystemException ex)
-            {
-                try
-                {
-                    string newPathUri = _targetCommonStructureService.CreateNode(name, parent.Uri);
-                    Log.LogDebug("  Node {newPathUri} has been created", newPathUri);
-                    node = _targetCommonStructureService.GetNode(newPathUri);
-                }
-                catch
-                {
-                    Log.LogError(ex, "Creating Node");
-                    throw;
-                }
-            }
-            if (startDate != null && finishDate != null)
-            {
-                try
-                {
-                    _targetCommonStructureService.SetIterationDates(node.Uri, startDate, finishDate);
-                    Log.LogDebug("  Node {node} has been assigned {startDate} / {finishDate}", nodePath, startDate, finishDate);
-                }
-                catch (CommonStructureSubsystemException ex)
-                {
-                    Log.LogWarning(ex, " Unable to set {node}dates of {startDate} / {finishDate}", nodePath, startDate, finishDate);
-                }
-            }
-            return node;
-        }
+                // We work on the system paths, but user-friendly paths are used in maps
+                var userFriendlyPath = GetUserFriendlyPath(item.Attributes["Path"].Value);
 
-        private void CreateNodes(XmlNodeList nodeList, NodeInfo parentPath, string treeType)
-        {
-            foreach (XmlNode item in nodeList)
-            {
-                string newNodeName = item.Attributes["Name"].Value;
-
-                if (!ShouldCreateNode(parentPath, newNodeName))
+                var shouldCreateNode = ShouldCreateNode(userFriendlyPath);
+                var isParentOfSelectedBasePath = CheckIsParentOfSelectedBasePath(userFriendlyPath);
+                if (!shouldCreateNode && !isParentOfSelectedBasePath)
                 {
+                    // It is not a selected path or a descendant, and it cannot be the parent of a selected path, so we can skip it.
                     continue;
                 }
 
-                NodeInfo targetNode;
-                if (treeType == "Iteration")
+                if (shouldCreateNode)
                 {
                     DateTime? startDate = null;
                     DateTime? finishDate = null;
-                    if (item.Attributes["StartDate"] != null)
+                    if (treeType == "Iteration")
                     {
-                        startDate = DateTime.Parse(item.Attributes["StartDate"].Value);
-                    }
-                    if (item.Attributes["FinishDate"] != null)
-                    {
-                        finishDate = DateTime.Parse(item.Attributes["FinishDate"].Value);
+                        if (item.Attributes["StartDate"] != null)
+                        {
+                            startDate = DateTime.Parse(item.Attributes["StartDate"].Value);
+                        }
+                        if (item.Attributes["FinishDate"] != null)
+                        {
+                            finishDate = DateTime.Parse(item.Attributes["FinishDate"].Value);
+                        }
                     }
 
-                    targetNode = CreateNode(newNodeName, parentPath, startDate, finishDate);
+                    var newUserPath = GetNewNodeName(userFriendlyPath, nodeStructureType);
+                    var newSystemPath = GetSystemPath(newUserPath, nodeStructureType);
+
+                    var targetNode = GetOrCreateNode(newSystemPath, startDate, finishDate);
+                    _pathToKnownNodeMap[targetNode.Path] = targetNode;
                 }
-                else
-                {
-                    targetNode = CreateNode(newNodeName, parentPath, null, null);
-                }
+
                 if (item.HasChildNodes)
                 {
-                    CreateNodes(item.ChildNodes[0].ChildNodes, targetNode, treeType);
+                    // Again, ...Parent/Children/ActualChildNode... in the XML, so we skip Children
+                    CreateNodes(item.ChildNodes[0].ChildNodes, treeType, nodeStructureType);
                 }
             }
+        }
+
+        private string GetSystemPath(string newUserPath, TfsNodeStructureType structureType)
+        {
+            var match = Regex.Match(newUserPath, @"^(?<projectName>[^\\]+)\\(?<restOfThePath>.*)$");
+            if (!match.Success)
+            {
+                throw new InvalidOperationException($"This path is not a valid area or iteration path: {newUserPath}");
+            }
+
+            var structureName = GetTargetLocalizedNodeStructureTypeName(structureType);
+
+            return $"\\{match.Groups["projectName"].Value}\\{structureName}\\{match.Groups["restOfThePath"]}";
+        }
+
+        private static string GetUserFriendlyPath(string systemNodePath)
+        {
+            // Shape of the path is \SourceProject\StructureType\Rest\Of\The\Path, user-friendly shape skips StructureType and initial \
+            var match = Regex.Match(systemNodePath, @"^\\(?<sourceProject>[^\\]+)\\[^\\]+\\(?<restOfThePath>.*)$");
+            if (!match.Success)
+            {
+                throw new InvalidOperationException($"This path is not a valid area or iteration path: {systemNodePath}");
+            }
+
+            return $"{match.Groups["sourceProject"].Value}\\{match.Groups["restOfThePath"].Value}";
         }
 
         private void MigrateAllNodeStructures()
         {
-            _prefixProjectToNodes = Options.PrefixProjectToNodes;
             _nodeBasePaths = Options.NodeBasePaths;
 
-            Log.LogDebug("NodeStructureEnricher.MigrateAllNodeStructures({prefixProjectToNodes}, {nodeBasePaths})", _prefixProjectToNodes, _nodeBasePaths);
+            Log.LogDebug("NodeStructureEnricher.MigrateAllNodeStructures({nodeBasePaths}, {areaMaps}, {iterationMaps})", _nodeBasePaths, _Options.AreaMaps, _Options.IterationMaps);
             //////////////////////////////////////////////////
-            ProcessCommonStructure(_sourceLanguageMaps.AreaPath, _sourceProjectName, _targetLanguageMaps.AreaPath, _targetProjectName);
+            ProcessCommonStructure(_sourceLanguageMaps.AreaPath, _targetLanguageMaps.AreaPath, _targetProjectName, TfsNodeStructureType.Area);
             //////////////////////////////////////////////////
-            ProcessCommonStructure(_sourceLanguageMaps.IterationPath, _sourceProjectName, _targetLanguageMaps.IterationPath, _targetProjectName);
+            ProcessCommonStructure(_sourceLanguageMaps.IterationPath, _targetLanguageMaps.IterationPath, _targetProjectName, TfsNodeStructureType.Iteration);
             //////////////////////////////////////////////////
         }
 
-        private string NodeStructureTypeToLanguageSpecificName(TfsLanguageMapOptions languageMaps, TfsNodeStructureType value)
+        private string GetTargetLocalizedNodeStructureTypeName(TfsNodeStructureType value)
         {
-            // insert switch statement here
             switch (value)
             {
                 case TfsNodeStructureType.Area:
-                    return languageMaps.AreaPath;
+                    return _targetLanguageMaps.AreaPath;
 
                 case TfsNodeStructureType.Iteration:
-                    return languageMaps.IterationPath;
+                    return _targetLanguageMaps.IterationPath;
 
                 default:
                     throw new InvalidOperationException("Not a valid NodeStructureType ");
             }
         }
 
-        private void ProcessCommonStructure(string treeTypeSource, string sourceTarget, string treeTypeTarget, string projectTarget)
+        private void ProcessCommonStructure(string treeTypeSource, string localizedTreeTypeName, string projectTarget, TfsNodeStructureType nodeStructureType)
         {
-            Log.LogDebug("NodeStructureEnricher.ProcessCommonStructure({treeTypeSource}, {treeTypeTarget})", treeTypeSource, treeTypeTarget);
+            Log.LogDebug("NodeStructureEnricher.ProcessCommonStructure({treeTypeSource}, {treeTypeTarget})", treeTypeSource, localizedTreeTypeName);
 
             var startPath = ("\\" + this._sourceProjectName + "\\" + treeTypeSource).ToLower();
             Log.LogDebug("Source Node Path StartsWith [{startPath}]", startPath);
 
-            var nodes = _sourceRootNodes.Where((n) =>
-            {
-                // (i.e. "\CoolProject\Area" )
-                return n.Path.ToLower().StartsWith(startPath);
-            });
+            // (i.e. "\CoolProject\Area" )
+            var nodes = _sourceRootNodes.Where(n => n.Path.ToLower().StartsWith(startPath));
             if (nodes.Count() > 1)
             {
                 Exception ex = new Exception(string.Format("Unable to load Common Structure for Source because more than one node path matches \"{0}\". {1}", treeTypeSource, JsonConvert.SerializeObject(nodes.Select(x => x.Path))));
                 Log.LogError(ex, "Unable to load Common Structure for Source.");
                 throw ex;
             }
-            NodeInfo sourceNode = nodes.First();
+            NodeInfo sourceNode = nodes.FirstOrDefault();
             if (sourceNode == null) // May run into language problems!!! This is to try and detect that
             {
-                Exception ex = new Exception(string.Format("Unable to load Common Structure for Source. This is usually due to diferent language versions. Validate that '{0}' is the correct name in your version. ", treeTypeSource));
+                Exception ex = new Exception(string.Format("Unable to load Common Structure for Source. This is usually due to different language versions. Validate that '{0}' is the correct name in your version. ", treeTypeSource));
                 Log.LogError(ex, "Unable to load Common Structure for Source.");
                 throw ex;
             }
@@ -329,79 +408,59 @@ namespace MigrationTools.Enrichers
             NodeInfo structureParent;
             try // May run into language problems!!! This is to try and detect that
             {
-                structureParent = _targetCommonStructureService.GetNodeFromPath(string.Format("\\{0}\\{1}", projectTarget, treeTypeTarget));
+                structureParent = _targetCommonStructureService.GetNodeFromPath(string.Format("\\{0}\\{1}", projectTarget, localizedTreeTypeName));
             }
             catch (Exception ex)
             {
-                Exception ex2 = new Exception(string.Format("Unable to load Common Structure for Target.This is usually due to diferent language versions. Validate that '{0}' is the correct name in your version. ", treeTypeTarget), ex);
+                Exception ex2 = new Exception(string.Format("Unable to load Common Structure for Target.This is usually due to different language versions. Validate that '{0}' is the correct name in your version. ", localizedTreeTypeName), ex);
                 Log.LogError(ex2, "Unable to load Common Structure for Target.");
                 throw ex2;
             }
-            if (_prefixProjectToNodes)
-            {
-                structureParent = CreateNode(sourceTarget, structureParent, null, null);
-            }
+
+            _pathToKnownNodeMap[structureParent.Path] = structureParent;
+
             if (sourceTree.ChildNodes[0].HasChildNodes)
             {
-                CreateNodes(sourceTree.ChildNodes[0].ChildNodes[0].ChildNodes, structureParent, treeTypeTarget);
+                // The XPath would look like this: /Nodes/Node[Name=Area]/Children/...
+                // The Path attributes however look like that for the children of the Area node: /SourceProject/Area/SourceArea
+                CreateNodes(sourceTree.ChildNodes[0].ChildNodes[0].ChildNodes, localizedTreeTypeName, nodeStructureType);
             }
         }
 
         /// <summary>
         /// Checks node-to-be-created with allowed BasePath's
         /// </summary>
-        /// <param name="parentPath">Parent Node</param>
-        /// <param name="newNodeName">Node to be created</param>
+        /// <param name="userFriendlyPath">The user-friendly path of the source node</param>
         /// <returns>true/false</returns>
-        private bool ShouldCreateNode(NodeInfo parentPath, string newNodeName)
+        private bool ShouldCreateNode(string userFriendlyPath)
         {
-            string nodePath = string.Format(@"{0}\{1}", parentPath.Path, newNodeName);
-
-            if (_nodeBasePaths != null && _nodeBasePaths.Any())
+            if (_nodeBasePaths == null || _nodeBasePaths.Length == 0)
             {
-                var split = nodePath.Split('\\');
-                var removeProjectAndType = split.Skip(3);
-                var path = string.Join(@"\", removeProjectAndType);
-
-                // We need to check if the path is a parent path of one of the base paths, as we need those
-                foreach (var basePath in _nodeBasePaths)
-                {
-                    var splitBase = basePath.Split('\\');
-
-                    for (int i = 0; i < splitBase.Length; i++)
-                    {
-                        if (string.Equals(path, string.Join(@"\", splitBase.Take(i)), StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            return true;
-                        }
-                    }
-                }
-
-                if (!_nodeBasePaths.Any(p => path.StartsWith(p, StringComparison.InvariantCultureIgnoreCase)))
-                {
-                    Log.LogWarning("The node {nodePath} is being excluded due to your basePath setting. ", nodePath);
-                    return false;
-                }
+                return true;
             }
 
-            return true;
+            var invertedPath = "!" + userFriendlyPath;
+            var exclusionPatterns = _nodeBasePaths.Where(oneBasePath => oneBasePath.StartsWith("!", StringComparison.InvariantCulture));
+            if (_nodeBasePaths.Any(oneBasePath => userFriendlyPath.StartsWith(oneBasePath)) &&
+                !exclusionPatterns.Any(oneBasePath => invertedPath.StartsWith(oneBasePath)))
+            {
+                return true;
+            }
+
+            Log.LogWarning("The node {nodePath} is being excluded due to your basePath setting. ", userFriendlyPath);
+            return false;
         }
 
-        private bool TargetNodeExists(string nodePath)
+        /// <summary>
+        /// Checks whether a path is a parent of a selected base path (meaning we cannot skip it entirely)
+        /// </summary>
+        /// <param name="userFriendlyPath">The user-friendly path of the source node</param>
+        /// <returns>A boolean indicating whether the path is a parent of any positively selected base path.</returns>
+        /// <exception cref="NotImplementedException"></exception>
+        private bool CheckIsParentOfSelectedBasePath(string userFriendlyPath)
         {
-            if (!_foundNodes.ContainsKey(nodePath))
-            {
-                try
-                {
-                    var node = _targetCommonStructureService.GetNodeFromPath(nodePath);
-                    _foundNodes.Add(nodePath, true);
-                }
-                catch
-                {
-                    _foundNodes.Add(nodePath, false);
-                }
-            }
-            return _foundNodes[nodePath];
+            return _nodeBasePaths.Where(onePath => !onePath.StartsWith("!"))
+                                 .Any(onePath => onePath.StartsWith(userFriendlyPath));
         }
     }
 }
