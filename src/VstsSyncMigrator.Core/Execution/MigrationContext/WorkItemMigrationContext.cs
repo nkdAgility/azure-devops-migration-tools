@@ -653,9 +653,9 @@ namespace VstsSyncMigrator.Engine
                     ProcessHTMLFieldAttachements(targetWorkItem);
                     ProcessWorkItemEmbeddedLinks(sourceWorkItem, targetWorkItem);
 
-                    var validRevision = RevisionHasValidIterationPath(targetWorkItem);
+                    var skipRevision = SkipRevisionWithInvalidIterationPath(targetWorkItem);
 
-                    if (validRevision)
+                    if (!skipRevision)
                     {
                         targetWorkItem.SaveToAzureDevOps();
                     }
@@ -713,25 +713,28 @@ namespace VstsSyncMigrator.Engine
             return targetWorkItem;
         }
 
-        private static bool RevisionHasValidIterationPath(WorkItemData targetWorkItem)
+        internal bool SkipRevisionWithInvalidIterationPath(WorkItemData targetWorkItem)
         {
-            var workItem = (WorkItem)targetWorkItem.internalObject;
-            var fails = workItem.Validate();
-
-            if (fails.Count > 0)
+            if (_config.SkipRevisionWithInvalidIterationPath)
             {
-                foreach (Field f in fails)
-                {
-                    // We cannot save a revision when it has no IterationPath
-                    if (f.ReferenceName == "System.IterationPath")
-                    {
-                        return false;
-                    }
-                }
+                var workItem = (WorkItem)targetWorkItem.internalObject;
+                var fails = workItem.Validate();
 
+                if (fails.Count > 0)
+                {
+                    foreach (Field f in fails)
+                    {
+                        // We cannot save a revision when it has no IterationPath
+                        if (f.ReferenceName == "System.IterationPath")
+                        {
+                            return true;
+                        }
+                    }
+
+                }
             }
 
-            return true;
+            return false;
         }
     }
 }
