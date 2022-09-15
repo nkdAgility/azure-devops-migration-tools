@@ -668,7 +668,9 @@ namespace VstsSyncMigrator.Engine
                 {
                     ProcessWorkItemAttachments(sourceWorkItem, targetWorkItem, false);
                     if (!string.IsNullOrEmpty(targetWorkItem.Id))
-                    { ProcessWorkItemLinks(Engine.Source.WorkItems, Engine.Target.WorkItems, sourceWorkItem, targetWorkItem); }
+                    {
+                        ProcessWorkItemLinks(Engine.Source.WorkItems, Engine.Target.WorkItems, sourceWorkItem, targetWorkItem);
+                    }
 
                     if (_config.GenerateMigrationComment)
                     {
