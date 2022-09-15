@@ -715,7 +715,6 @@ namespace VstsSyncMigrator.Engine
 
         private static bool RevisionHasValidIterationPath(WorkItemData targetWorkItem)
         {
-            var isValid = true;
             var workItem = (WorkItem)targetWorkItem.internalObject;
             var fails = workItem.Validate();
 
@@ -726,12 +725,13 @@ namespace VstsSyncMigrator.Engine
                     // We cannot save a revision when it has no IterationPath
                     if (f.ReferenceName == "System.IterationPath")
                     {
-                        isValid = false;
+                        return false;
                     }
                 }
 
             }
-            return isValid;
+
+            return true;
         }
     }
 }
