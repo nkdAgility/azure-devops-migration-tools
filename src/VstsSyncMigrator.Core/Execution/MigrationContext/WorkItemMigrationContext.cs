@@ -715,24 +715,27 @@ namespace VstsSyncMigrator.Engine
             return targetWorkItem;
         }
 
-        internal bool SkipRevisionWithInvalidIterationPath(WorkItemData targetWorkItem)
+        private bool SkipRevisionWithInvalidIterationPath(WorkItemData targetWorkItemData)
         {
-            if (_config.SkipRevisionWithInvalidIterationPath)
+            if (!_config.SkipRevisionWithInvalidIterationPath)
             {
-                var workItem = (WorkItem)targetWorkItem.internalObject;
-                var fails = workItem.Validate();
+                return false;
+            }
 
-                if (fails.Count > 0)
+            var workItem = targetWorkItemData.ToWorkItem();
+            var invalidFields = workItem.Validate();
+
+            if (invalidFields.Count == 0)
+            {
+                return false;
+            }
+
+            foreach (Field invalidField in invalidFields)
+            {
+                // We cannot save a revision when it has no IterationPath
+                if (invalidField.ReferenceName == "System.IterationPath")
                 {
-                    foreach (Field f in fails)
-                    {
-                        // We cannot save a revision when it has no IterationPath
-                        if (f.ReferenceName == "System.IterationPath")
-                        {
-                            return true;
-                        }
-                    }
-
+                    return true;
                 }
             }
 
