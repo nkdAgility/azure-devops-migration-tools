@@ -10,8 +10,7 @@
 		"ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
 		"AllowCrossProjectLinking": false,
 		"AuthenticationMode": "AccessToken",
-		//"PersonalAccessToken": "vmbb7xdqqhs7ipxfwovkfixbhj4ocwwwzqiyjdnibloh6ckl55za",//and
-		"PersonalAccessToken": "op7vtruzcaakp5zjs22zxaukrodztftb2bvdnghbgfrmiwohgpgq", //aji	
+		"PersonalAccessToken": "vmbb7xdqqhs7ipxfwovkfixbhj4ocwwwzqiyjdnibloh6ckl55za",
 		"LanguageMaps": {
 			"AreaPath": "Area",
 			"IterationPath": "Iteration"
@@ -26,10 +25,10 @@
 		"AllowCrossProjectLinking": false,
 		"AuthenticationMode": "AccessToken",
 		"PersonalAccessToken": "2lzwqfomhsacdlnjm2kchk2zo2sftp3dhdnbk474ccsjgkwt4yta", // and
-	///"PersonalAccessToken": "ypzk2gfdcvtzlfng6s5emanl7ae2x4pr4xaeaudd3walekhq3tiq", // ais
-		//"PersonalAccessToken": "q6kvi2u3swj6pnf5iga72zyl73wn3yxzlav2kx6wpjsppcb557iq", // aji
-		"DummyWorkItemForImageUploads": "247765",
-		"DelayBetweenTwoWorkItems": 750,
+		//"PersonalAccessToken": "ypzk2gfdcvtzlfng6s5emanl7ae2x4pr4xaeaudd3walekhq3tiq", // ais
+		//"PersonalAccessToken": "y4hcelpp3uri4t3bx6flcp4m5yvwfwljolywvctv6h4xjowjy23a", // aji
+		"DummyWorkItemForImageUploads": "249334",
+		"DelayBetweenTwoWorkItems": 1150,
 		"WhoToEmail": "a.gothe@devon.nl",
 		"LanguageMaps": {
 			"AreaPath": "Area",
@@ -50,15 +49,11 @@
 			"defaultValue": "New",
 			"valueMapping": {
 				"Approved": "Sprint ready",
-				"Analyze": "Ready for grooming",
 				"New": "New",
 				"Committed": "In Sprint",
-				"In Progress": "In Sprint",
 				"On Hold": "New",
 				"Removed": "Removed",
-				"Done": "Released",
-				"Ready for Test": "Finished",
-				"Tested": "Finished"
+				"Done": "Finished"
 			}
 		},
 		{
@@ -69,14 +64,11 @@
 			"defaultValue": "New",
 			"valueMapping": {
 				"Approved": "Approved",
-				"Analyze": "New ",
 				"New": "New",
 				"Committed": "In Sprint",
-				"In Progress": "In Sprint",
-				"Done": "Released",
-				"Removed": "Removed",
-				"Ready for Test": "Finished",
-				"Tested": "Finished"
+				"Done": "Finished",
+				"Removed": "Removed"
+
 			}
 		},
 		{
@@ -127,9 +119,9 @@
 			//"WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Code Review Response', 'Code Review Request', 'Test Case','Shared Steps','Shared Parameter','Test Suite', 'Test Plan') AND [System.AreaPath] NOT UNDER 'Multivers\\Venice' AND [System.ChangedDate] >= '2022-5-15'",
 			//"WIQLQueryBit": "AND [System.WorkItemType] IN ('Shared Steps','Shared Parameter') AND [System.ID] < '68000'",
 			//"WIQLQueryBit": "AND [System.WorkItemType] IN ('Test Case') AND [System.ID] = '62515'",
-			//"WIQLQueryBit": "AND [System.WorkItemType] IN ('Shared Parameter','Shared Steps','Test Case') AND [System.ChangedDate] >= '2022-7-1'",
-			//"WIQLQueryBit": "AND [System.ChangedDate] >= '2022-07-01'",
-			"WIQLQueryBit": "AND [System.ID] in ('74839')",
+			//"WIQLQueryBit": "AND [System.WorkItemType] IN ('Shared Parameter','Shared Steps','Test Case') AND [System.ChangedDate] >= '2022-07-20'",
+			//"WIQLQueryBit": "AND [System.ChangedDate] >= '2022-06-1'",
+			"WIQLQueryBit": "AND [System.ID] = '276689'",
 			//"WIQLQueryBit": "AND [System.ID] IN ('285343','295453','295464','295465','295466','295520','295530','295531','295545','295594','295615')",
 			"WIQLOrderBit": "[System.ID]",
 			"Enabled": true,

@@ -27,15 +27,22 @@ namespace MigrationTools.Endpoints
 
         private SortedDictionary<int, RevisionItem> GetRevisionItems(RevisionCollection tfsRevisions)
         {
-            return new SortedDictionary<int, RevisionItem>((from Revision x in tfsRevisions
-                                                            select new RevisionItem()
-                                                            {
-                                                                Index = x.Index,
-                                                                Number = (int)x.Fields["System.Rev"].Value,
-                                                                ChangedDate = (DateTime)x.Fields["System.ChangedDate"].Value,
-                                                                Type = x.Fields["System.WorkItemType"].Value as string,
-                                                                Fields = GetFieldItems(x.Fields)
-                                                            }).ToDictionary(r => r.Number, r => r));
+            try
+            {
+                return new SortedDictionary<int, RevisionItem>((from Revision x in tfsRevisions
+                                                                select new RevisionItem()
+                                                                {
+                                                                    Index = x.Index,
+                                                                    Number = (int)x.Fields["System.Rev"].Value,
+                                                                    ChangedDate = (DateTime)x.Fields["System.ChangedDate"].Value,
+                                                                    Type = x.Fields["System.WorkItemType"].Value as string,
+                                                                    Fields = GetFieldItems(x.Fields)
+                                                                }).ToDictionary(r => r.Number, r => r));
+            }
+            catch(Exception ex)
+            {
+                return null;
+            }
         }
 
         private Dictionary<string, FieldItem> GetFieldItems(FieldCollection tfsFields)

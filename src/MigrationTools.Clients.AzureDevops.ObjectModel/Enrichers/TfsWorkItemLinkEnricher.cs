@@ -50,7 +50,7 @@ namespace MigrationTools.Enrichers
 
             if (ShouldCopyLinks(sourceWorkItemLinkStart, targetWorkItemLinkStart))
             {
-                Log.LogDebug("Links = '{@sourceWorkItemLinkStartLinks}", sourceWorkItemLinkStart.Links);
+                //Log.LogDebug("Links = '{@sourceWorkItemLinkStartLinks}", sourceWorkItemLinkStart.Links);
                 foreach (Link item in sourceWorkItemLinkStart.ToWorkItem().Links)
                 {
                     try
