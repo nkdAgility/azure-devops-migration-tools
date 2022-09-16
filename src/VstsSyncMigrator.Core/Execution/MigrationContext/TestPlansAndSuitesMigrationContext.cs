@@ -98,21 +98,21 @@ namespace VstsSyncMigrator.Engine
 
             var stopwatch = Stopwatch.StartNew();
             var starttime = DateTime.Now;
-            ITestPlanCollection sourcePlans = _sourceTestStore.GetTestPlans();
+            var sourcePlans = _sourceTestStore.GetTestPlans();
             List<ITestPlan> toProcess;
             if (filterByCompleted)
             {
-                var targetPlanNames = (from ITestPlan tp in _targetTestStore.GetTestPlans() select tp.Name).ToList();
-                toProcess = (from ITestPlan tp in sourcePlans where !targetPlanNames.Contains(tp.Name) select tp).ToList();
+                var targetPlanNames = _targetTestStore.GetTestPlans().Select(tp => tp.Name).ToList();
+                toProcess = sourcePlans.Where(tp => !targetPlanNames.Contains(tp.Name)).ToList();
             }
             else
             {
-                toProcess = sourcePlans.ToList();
+                toProcess = sourcePlans;
             }
 
             Log.LogInformation("TestPlandsAndSuitesMigrationContext: Plan to copy {0} Plans?", toProcess.Count());
             _currentPlan = 0;
-            _totalPlans = toProcess.Count();
+            _totalPlans = toProcess.Count;
 
             foreach (ITestPlan sourcePlan in toProcess)
             {
@@ -123,7 +123,6 @@ namespace VstsSyncMigrator.Engine
                     Log.LogInformation("TestPlandsAndSuitesMigrationContext: Skipping Test Plan {Id}:'{Name}' as is not tagged with '{Tag}'.", sourcePlan.Id, sourcePlan.Name, _config.OnlyElementsWithTag);
                     continue;
                 }
-                
                 ProcessTestPlan(sourcePlan);
             }
             _currentPlan = 0;
@@ -151,13 +150,13 @@ namespace VstsSyncMigrator.Engine
                 Log.LogInformation("TestPlandsAndSuitesMigrationContext::AddChildTestCases: Skipping Test Case {Id}:'{Name}' as is not tagged with '{Tag}'.", source.Id, source.Title, _config.OnlyElementsWithTag);
                 return;
             }
-            
+
 
             _totalTestCases = source.TestCases.Count;
             _currentTestCases = 0;
             AddMetric("TestCaseCount", metrics, _totalTestCases);
             InnerLog(source, string.Format("            Suite has {0} test cases", _totalTestCases), 15);
-            List<ITestCase> tcs = new List<ITestCase>();
+            int index = 0;
             foreach (ITestSuiteEntry sourceTestCaseEntry in source.TestCases)
             {
                 _currentTestCases++;
@@ -193,13 +192,12 @@ namespace VstsSyncMigrator.Engine
                     }
                     else
                     {
-                        tcs.Add(targetTestCase);
+                        target.TestCases.InsertCases(index, new List<ITestCase> { targetTestCase });
                         InnerLog(source, string.Format("    Adding {0} : {1} - {2} ", sourceTestCaseEntry.EntryType.ToString(), sourceTestCaseEntry.Id, sourceTestCaseEntry.Title), 15);
                     }
                 }
+                index++;
             }
-
-            target.TestCases.AddCases(tcs);
 
             targetPlan.Save();
             InnerLog(source, string.Format("    SAVED {0} : {1} - {2} ", target.TestSuiteType.ToString(), target.Id, target.Title), 15);
@@ -808,7 +806,7 @@ namespace VstsSyncMigrator.Engine
                 InnerLog(sourcePlan, $" Creating Plan {newPlanName}", 5);
                 targetPlan = CreateNewTestPlanFromSource(sourcePlan, newPlanName);
 
-                
+
                 RemoveInvalidLinks(targetPlan);
                 if (_config.RemoveAllLinks)
                 {
@@ -834,7 +832,7 @@ namespace VstsSyncMigrator.Engine
             }
             else
             {
-                InnerLog(sourcePlan, $"Found Plan {newPlanName}", 5); ;
+                InnerLog(sourcePlan, $"Found Plan {newPlanName}", 5);
             }
             targetPlan.Save();
             targetPlan.Refresh();
@@ -874,9 +872,9 @@ namespace VstsSyncMigrator.Engine
                 return;
             //////////////////////////////////////////
             var stopwatch = Stopwatch.StartNew();
-            if (_config.MigrationDelay >0 )
+            if (_config.MigrationDelay > 0)
             {
-                System.Threading.Thread.Sleep( _config.MigrationDelay );
+                System.Threading.Thread.Sleep(_config.MigrationDelay);
             }
             var starttime = DateTime.Now;
             var metrics = new Dictionary<string, double>();
