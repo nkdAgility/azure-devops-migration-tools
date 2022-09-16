@@ -26,13 +26,15 @@ namespace VstsSyncMigrator.Engine.ComponentContext
             Project = tms.GetTeamProject(source.Config.AsTeamProjectConfig().Project);
         }
 
-        internal ITestPlanCollection GetTestPlans()
+        internal List<ITestPlan> GetTestPlans()
         {
             var query = (string.IsNullOrWhiteSpace(testPlanQueryBit))
                 ? "Select * From TestPlan"
                 : $"Select * From TestPlan Where {testPlanQueryBit}";
 
-            return Project.TestPlans.Query(query);
+            var testPlans = Project.TestPlans.Query(query);
+
+            return testPlans.Select(tp => Project.TestPlans.Find(tp.Id)).ToList();
         }
 
         internal List<ITestRun> GetTestRuns()
