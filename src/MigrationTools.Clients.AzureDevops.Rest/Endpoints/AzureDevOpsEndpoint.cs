@@ -50,7 +50,7 @@ namespace MigrationTools.Endpoints
         /// </summary>
         /// <param name="routeParams">strings that are injected into the route parameters of the definitions url</param>
         /// <returns>HttpClient</returns>
-        private HttpClient GetHttpClient<DefinitionType>(params object[] routeParams)
+        public HttpClient GetHttpClient<DefinitionType>(params object[] routeParams)
             where DefinitionType : RestApiDefinition
         {
             UriBuilder baseUrl = GetUriBuilderBasedOnEndpointAndType<DefinitionType>(routeParams);
@@ -72,7 +72,7 @@ namespace MigrationTools.Endpoints
         /// <param name="versionParameter">allows caller to override the default api version (ie. api-version=5.1)</param>
         /// <param name="routeParams">strings that are injected into the route parameters of the definitions url</param>
         /// <returns>HttpClient</returns>
-        private HttpClient GetHttpClient(string url, string versionParameter, params object[] routeParams)
+        public HttpClient GetHttpClient(string url, string versionParameter, params object[] routeParams)
         {
             UriBuilder baseUrl = new UriBuilder(string.Format(url, routeParams));
             HttpClient client = new HttpClient();
@@ -132,7 +132,7 @@ namespace MigrationTools.Endpoints
             }
             else
             {
-                builder.Query = "api-version=5.1-preview";
+                builder.Query = "api-version=6.0";
             }
             return builder;
         }

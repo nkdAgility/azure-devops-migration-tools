@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using MigrationTools.Clients.AzureDevops.Rest.Processors;
 using MigrationTools.Endpoints;
 using MigrationTools.Processors;
 
@@ -15,6 +16,8 @@ namespace MigrationTools
             //TfsPipelines
             context.AddTransient<AzureDevOpsPipelineProcessor>();
             context.AddTransient<ProcessDefinitionProcessor>();
+
+            context.AddTransient<LinkChecking>();
 
         }
     }
