@@ -1,31 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Text;
-using System.Text.Json.Serialization;
+﻿using System.Collections.Generic;
 
 namespace MigrationTools.DataContracts.WorkItems
 {
-    [ApiPath("wit/wiql")]
-    [ApiName("Wiql")]
-    public class Wiql : RestApiDefinition
-    {
-        public override bool HasTaskGroups()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override bool HasVariableGroups()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void ResetObject()
-        {
-            throw new NotImplementedException();
-        }
-    }
-
     public class WiqlRequest
     {
         public string Query { get; set; }
@@ -42,27 +18,11 @@ namespace MigrationTools.DataContracts.WorkItems
         public string Url { get; set; }
     }
 
-    [ApiPath("wit/workitemsbatch")]
-    [ApiName("WorkItem")]
-    public class WorkItemBatchResult : RestApiDefinition
+    public class WorkItemBatchResult
     {
         public int Count { get; set; }
         public WorkItem[] Value { get; set; }
 
-        public override bool HasTaskGroups()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override bool HasVariableGroups()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void ResetObject()
-        {
-            throw new NotImplementedException();
-        }
     }
 
     public class WorkItemBatchRequest
@@ -73,28 +33,11 @@ namespace MigrationTools.DataContracts.WorkItems
         public string Expand { get; set; } = "relations";
     }
 
-    [ApiPath("wit/workitems")]
-    [ApiName("WorkItem")]
-    public class WorkItem : RestApiDefinition
+    public class WorkItem
     {
         public Relation[] Relations { get; set; }
 
         public string Url { get; set; }
-
-        public override bool HasTaskGroups()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override bool HasVariableGroups()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void ResetObject()
-        {
-            throw new NotImplementedException();
-        }
     }
 
     public class Relation

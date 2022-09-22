@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -11,13 +12,11 @@ using MigrationTools.Processors;
 
 namespace MigrationTools.Clients.AzureDevops.Rest.Processors
 {
-    internal class LinkChecking : Processor
+    internal class OutboundLinkCheckingProcessor : Processor
     {
-        private LinkCheckingOptions _Options;
+        private OutboundLinkCheckingProcessorOptions _options;
 
-        private Dictionary<string, int> _orgsAndProjects = new();
-
-        public LinkChecking(
+        public OutboundLinkCheckingProcessor(
                     ProcessorEnricherContainer processorEnrichers,
                     IEndpointFactory endpointFactory,
                     IServiceProvider services,
@@ -35,7 +34,7 @@ namespace MigrationTools.Clients.AzureDevops.Rest.Processors
         {
             base.Configure(options);
             Log.LogInformation("AzureDevOpsPipelineProcessor::Configure");
-            _Options = (LinkCheckingOptions)options;
+            _options = (OutboundLinkCheckingProcessorOptions)options;
         }
 
         protected override void InternalExecute()
@@ -51,7 +50,7 @@ namespace MigrationTools.Clients.AzureDevops.Rest.Processors
         private void EnsureConfigured()
         {
             Log.LogInformation("Processor::EnsureConfigured");
-            if (_Options == null)
+            if (_options == null)
             {
                 throw new Exception("You must call Configure() first");
             }
@@ -67,25 +66,28 @@ namespace MigrationTools.Clients.AzureDevops.Rest.Processors
 
         private async Task FindAllOrgsAndProjects()
         {
-            var wiqlClient = Source.GetHttpClient<Wiql>();
+            var wiqlClient = Source.GetHttpClient("wit/wiql");
             var query = new WiqlRequest
             {
-                Query = "Select [System.Id], [System.Title], [System.State] From WorkItems Where [System.TeamProject] = @project and not [System.WorkItemType] contains 'Test Suite, Test Plan,Shared Steps,Shared Parameter,Feedback Request'"
+                Query = _options.WIQLQueryBit
             };
 
             var wiqlResult = await wiqlClient.PostAsJsonAsync("", query);
 
             if (wiqlResult.IsSuccessStatusCode != true)
             {
-                return;
+                var content = await wiqlResult.Content.ReadAsStringAsync();
+                Log.LogError($"Failed to get workitemids based on wiql query {content}");
+                wiqlResult.EnsureSuccessStatusCode();
             }
 
             var workItems = await wiqlResult.Content.ReadAsAsync<WiqlResponse>();
 
-            var client = Source.GetHttpClient<WorkItemBatchResult>();
+            var client = Source.GetHttpClient("wit/workitemsbatch");
 
             var chunks = workItems.WorkItems.Chunk(200);
-
+            Dictionary<string, int> orgsAndProjects = new();
+            var foundLinks = new List<string>();
             foreach (var chunk in chunks)
             {
                 var batch = new WorkItemBatchRequest()
@@ -93,55 +95,63 @@ namespace MigrationTools.Clients.AzureDevops.Rest.Processors
                     Ids = chunk.Select(w => w.Id).ToList()
                 };
                 var items = await client.PostAsJsonAsync("", batch);
-                if (items.StatusCode == System.Net.HttpStatusCode.OK)
+                if (items.IsSuccessStatusCode != true)
                 {
-                    var result = await items.Content.ReadAsAsync<WorkItemBatchResult>();
-                    foreach (var workitem in result.Value)
+                    var content = await items.Content.ReadAsStringAsync();
+                    Log.LogError($"Failed to get workitems from batch request {content}");
+                    items.EnsureSuccessStatusCode();
+                }
+
+                var result = await items.Content.ReadAsAsync<WorkItemBatchResult>();
+                foreach (var workitem in result.Value)
+                {
+                    if (workitem.Relations == null)
                     {
-                        if (workitem.Relations == null)
+                        continue;
+                    }
+                    var workItemLocation = GetOrgAndProject(workitem.Url);
+                    bool logSource = true;
+                    foreach (var relation in workitem.Relations)
+                    {
+                        var relationValues = GetOrgAndProject(relation.Url);
+                        if (relationValues.project == workItemLocation.project)
                         {
                             continue;
                         }
-                        var workItemLocation = GetOrgAndProject(workitem.Url);
-                        bool logSource = true;
-                        foreach (var relation in workitem.Relations)
+                        if (logSource)
                         {
-                            var relationValues = GetOrgAndProject(relation.Url);
-                            if (relationValues.project == workItemLocation.project)
-                            {
-                                continue;
-                            }
-                            if (logSource)
-                            {
-                                Log.LogInformation("Source Workitem: " + workitem.Url);
-                                logSource = false;
-                            }
-
-                            Log.LogInformation($"    Type: {relation.Attributes.Name}, url: {relation.Url}");
-                            var value = $"{relationValues.org}{relationValues.project}{relation.Attributes.Name}";
-                            if (_orgsAndProjects.ContainsKey(value) == false)
-                            {
-                                _orgsAndProjects.Add(value, 0);
-                            }
-
-                            _orgsAndProjects[value]++;
-
+                            Log.LogInformation("Source Workitem: " + workitem.Url);
+                            logSource = false;
                         }
+                        var link = $"{workitem.Url},{relation.Attributes.Name},{relation.Url}";
+                        foundLinks.Add(link);
+                        Log.LogInformation($"    Type: {relation.Attributes.Name}, url: {relation.Url}");
+                        var value = $"{relationValues.org}{relationValues.project}{relation.Attributes.Name}";
+                        if (orgsAndProjects.ContainsKey(value) == false)
+                        {
+                            orgsAndProjects.Add(value, 0);
+                        }
+
+                        orgsAndProjects[value]++;
+
                     }
                 }
             }
-
+            var fileInfo = new FileInfo(_options.ResultFileName);
+            if (fileInfo.Directory.Exists == false)
+            {
+                fileInfo.Directory.Create();
+            }
+            File.WriteAllLines(_options.ResultFileName, foundLinks);
             Log.LogInformation("");
             Log.LogInformation("---------------------------");
 
-            foreach (var value in _orgsAndProjects)
+            foreach (var value in orgsAndProjects)
             {
                 Log.LogInformation($"{value.Key}: {value.Value}");
             }
-
-
-
         }
+
         private (string org, string project) GetOrgAndProject(string url)
         {
             var uri = new Uri(url);

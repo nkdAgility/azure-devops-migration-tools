@@ -17,7 +17,7 @@ namespace MigrationTools
             context.AddTransient<AzureDevOpsPipelineProcessor>();
             context.AddTransient<ProcessDefinitionProcessor>();
 
-            context.AddTransient<LinkChecking>();
+            context.AddTransient<OutboundLinkCheckingProcessor>();
 
         }
     }

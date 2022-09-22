@@ -4,30 +4,37 @@
         <name>MigrationTools.Clients.AzureDevops.Rest</name>
     </assembly>
     <members>
-        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.GetHttpClient``1(System.Object[])">
+        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.GetHttpClient(System.String)">
             <summary>
-            Create a new instance of HttpClient including Heades
+            Create a new instance of HttpClient including Headers
+            </summary>
+            <param name="route">route that is appended after organization and project to create the full api url</param>
+            <returns>HttpClient</returns>
+        </member>
+        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.GetHttpClient``1(System.String[])">
+            <summary>
+            Create a new instance of HttpClient including Headers
             </summary>
             <param name="routeParams">strings that are injected into the route parameters of the definitions url</param>
             <returns>HttpClient</returns>
         </member>
         <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.GetHttpClient(System.String,System.String,System.Object[])">
             <summary>
-            Create a new instance of HttpClient including Heades
+            Create a new instance of HttpClient including Headers
             </summary>
             <param name="url"></param>
             <param name="versionParameter">allows caller to override the default api version (ie. api-version=5.1)</param>
             <param name="routeParams">strings that are injected into the route parameters of the definitions url</param>
             <returns>HttpClient</returns>
         </member>
-        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.GetUriBuilderBasedOnEndpointAndType``1(System.Object[])">
+        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.GetUriBuilderBasedOnEndpointAndType``1(System.String[])">
             <summary>
             Method to get the RESP API URLs right
             </summary>
             <param name="routeParameters">strings that are injected into the route parameters of the definitions url</param>
             <returns>UriBuilder</returns>
         </member>
-        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.GetApiDefinitionsAsync``1(System.Object[],System.String,System.String,System.Boolean)">
+        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.GetApiDefinitionsAsync``1(System.String[],System.String,System.String,System.Boolean)">
             <summary>
             Generic Method to get API Definitions (Taskgroups, Variablegroups, Build- or Release Pipelines, ProcessDefinition)
             </summary>
@@ -40,7 +47,7 @@
             <param name="queryForDetails">a boolean flag to allow caller to skip the calls for each individual definition details</param>
             <returns>List of API Definitions</returns>
         </member>
-        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.GetApiDefinitionAsync``1(System.Object[],System.String,System.String,System.Boolean)">
+        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.GetApiDefinitionAsync``1(System.String[],System.String,System.String,System.Boolean)">
             <summary>
             Get a single instance of a defined type
             </summary>
@@ -170,7 +177,6 @@
             <summary>
             Filter existing TaskGroups
             </summary>
-            <typeparam name="DefinitionType"></typeparam>
             <param name="sourceDefinitions"></param>
             <param name="targetDefinitions"></param>
             <returns>List of filtered Definitions</returns>
