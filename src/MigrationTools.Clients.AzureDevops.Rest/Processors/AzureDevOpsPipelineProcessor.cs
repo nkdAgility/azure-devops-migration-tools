@@ -157,7 +157,6 @@ namespace MigrationTools.Processors
         /// <summary>
         /// Filter existing TaskGroups
         /// </summary>
-        /// <typeparam name="DefinitionType"></typeparam>
         /// <param name="sourceDefinitions"></param>
         /// <param name="targetDefinitions"></param>
         /// <returns>List of filtered Definitions</returns>

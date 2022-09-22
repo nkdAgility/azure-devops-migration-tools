@@ -197,7 +197,7 @@ namespace MigrationTools.Processors
             // When you create a new WIT you need to go get the default states & fields that come after it gets created
             if (targetWit.States == null || targetWit.States.Count == 0)
             {
-                targetWit.States = (await Target.GetApiDefinitionsAsync<WorkItemState>(new object[] { processId, targetWit.WorkItemType.Id })).ToDictionary(x => x.Id, x => x);
+                targetWit.States = (await Target.GetApiDefinitionsAsync<WorkItemState>(new string[] { processId, targetWit.WorkItemType.Id })).ToDictionary(x => x.Id, x => x);
             }
             if (targetWit.Fields == null || targetWit.Fields.Count == 0)
             {
@@ -516,7 +516,7 @@ namespace MigrationTools.Processors
                         });
                     }
 
-                    model.ProcessDefinitions[mappedProcName].WorkItemBehaviors = (await endpoint.GetApiDefinitionsAsync<WorkItemBehavior>(new object[] { proc.Id })).ToList();
+                    model.ProcessDefinitions[mappedProcName].WorkItemBehaviors = (await endpoint.GetApiDefinitionsAsync<WorkItemBehavior>(new string[] { proc.Id })).ToList();
                     model.ProcessDefinitions[mappedProcName].WorkItemBehaviors.ForEach(b => {
                         if (!model.WorkItemBehaviors.ContainsKey(b.Id)) {
                             model.WorkItemBehaviors.Add(b.Id, b);
@@ -525,7 +525,7 @@ namespace MigrationTools.Processors
 
                     #region Build Work Item Types data ...
 
-                    var procWits = (await endpoint.GetApiDefinitionsAsync<WorkItemType>(new object[] { proc.Id }, singleDefinitionQueryString: "$expand=All"));
+                    var procWits = (await endpoint.GetApiDefinitionsAsync<WorkItemType>(new string[] { proc.Id }, singleDefinitionQueryString: "$expand=All"));
                     procWits = procWits.Where(x => _Options.Processes[processFilter].Any(a => a == "*"
                             || x.Name.Equals(a, StringComparison.OrdinalIgnoreCase)));
                     if (procWits != null && procWits.Count() > 0)
@@ -555,17 +555,17 @@ namespace MigrationTools.Processors
                                 Task.Run(async () =>
                                 {
                                     model.WorkItemTypes[wit.Name].States =
-                                        (await endpoint.GetApiDefinitionsAsync<WorkItemState>(new object[] { proc.Id, wit.Id })).ToDictionary(x => x.Id, x => x);
+                                        (await endpoint.GetApiDefinitionsAsync<WorkItemState>(new string[] { proc.Id, wit.Id })).ToDictionary(x => x.Id, x => x);
                                 }),
                                 Task.Run(async () =>
                                 {
                                     model.WorkItemTypes[wit.Name].Rules =
-                                        (await endpoint.GetApiDefinitionsAsync<WorkItemRule>(new object[] { proc.Id, wit.Id })).ToDictionary(x => x.Id, x => x);
+                                        (await endpoint.GetApiDefinitionsAsync<WorkItemRule>(new string[] { proc.Id, wit.Id })).ToDictionary(x => x.Id, x => x);
                                 }),
                                 Task.Run(async () =>
                                 {
                                     model.WorkItemTypes[wit.Name].Behaviors =
-                                        (await endpoint.GetApiDefinitionsAsync<WorkItemTypeBehavior>(new object[] { proc.Id, wit.Id })).ToDictionary(x => x.Id, x => x);
+                                        (await endpoint.GetApiDefinitionsAsync<WorkItemTypeBehavior>(new string[] { proc.Id, wit.Id })).ToDictionary(x => x.Id, x => x);
                                 })
                             );
                             #endregion
@@ -583,7 +583,7 @@ namespace MigrationTools.Processors
         {
 
             model.WorkItemTypes[wit.Name].Fields =
-                (await endpoint.GetApiDefinitionsAsync<WorkItemTypeField>(new object[] { processId, wit.Id }, singleDefinitionQueryString: "$expand=All")).ToList();
+                (await endpoint.GetApiDefinitionsAsync<WorkItemTypeField>(new string[] { processId, wit.Id }, singleDefinitionQueryString: "$expand=All")).ToList();
             model.WorkItemTypes[wit.Name].Fields.ForEach(field =>
             {
                 if (!model.WorkItemFields.ContainsKey(field.Id))
@@ -595,7 +595,7 @@ namespace MigrationTools.Processors
         }
         private async Task LoadLayout(ProcessorModel model, WorkItemTypeModel wit, AzureDevOpsEndpoint endpoint, string processId)
         {
-            wit.Layout = (await endpoint.GetApiDefinitionAsync<WorkItemLayout>(new object[] { processId, wit.WorkItemType.ReferenceName }, queryForDetails: false));
+            wit.Layout = (await endpoint.GetApiDefinitionAsync<WorkItemLayout>(new string[] { processId, wit.WorkItemType.ReferenceName }, queryForDetails: false));
             foreach (var page in wit.Layout.Pages)
             {
                 var pageKey = $"{wit.WorkItemType.Name}::{page.Label}";
