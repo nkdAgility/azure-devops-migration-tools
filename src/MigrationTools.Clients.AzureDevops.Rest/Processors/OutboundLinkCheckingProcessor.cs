@@ -35,6 +35,14 @@ namespace MigrationTools.Clients.AzureDevops.Rest.Processors
             base.Configure(options);
             Log.LogInformation("AzureDevOpsPipelineProcessor::Configure");
             _options = (OutboundLinkCheckingProcessorOptions)options;
+            if(string.IsNullOrEmpty(_options.WIQLQueryBit))
+            {
+                throw new Exception($"The {nameof(_options.WIQLQueryBit)} needs to be set");
+            }
+            if (string.IsNullOrEmpty(_options.ResultFileName))
+            {
+                throw new Exception($"The {nameof(_options.ResultFileName)} needs to be set");
+            }
         }
 
         protected override void InternalExecute()
