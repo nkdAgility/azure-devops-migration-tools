@@ -260,7 +260,7 @@ namespace VstsSyncMigrator.Engine
             var matches = Regex.Matches(targetWIQLQueryBit, RegexPatternForAreaAndIterationPathsFix);
 
 
-            if(string.IsNullOrWhiteSpace(sourceProject)
+            if (string.IsNullOrWhiteSpace(sourceProject)
                 || string.IsNullOrWhiteSpace(targetProject)
                 || sourceProject == targetProject)
             {
@@ -318,11 +318,13 @@ namespace VstsSyncMigrator.Engine
             }
             newWorkItemTimer.Stop();
             Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", Engine.Target.Config.AsTeamProjectConfig().Collection.ToString(), "NewWorkItem", null, newWorkItemstartTime, newWorkItemTimer.Elapsed, "200", true));
-            if (_config.UpdateCreatedBy) {
+            if (_config.UpdateCreatedBy)
+            {
                 newwit.Fields["System.CreatedBy"].Value = currentRevisionWorkItem.ToWorkItem().Revisions[0].Fields["System.CreatedBy"].Value;
                 workItemLog.Debug("Setting 'System.CreatedBy'={SystemCreatedBy}", currentRevisionWorkItem.ToWorkItem().Revisions[0].Fields["System.CreatedBy"].Value);
             }
-            if (_config.UpdateCreatedDate) {
+            if (_config.UpdateCreatedDate)
+            {
                 newwit.Fields["System.CreatedDate"].Value = currentRevisionWorkItem.ToWorkItem().Revisions[0].Fields["System.CreatedDate"].Value;
                 workItemLog.Debug("Setting 'System.CreatedDate'={SystemCreatedDate}", currentRevisionWorkItem.ToWorkItem().Revisions[0].Fields["System.CreatedDate"].Value);
             }
@@ -588,7 +590,7 @@ namespace VstsSyncMigrator.Engine
                     var finalDestType = revisionsToMigrate.Last().Type;
                     var targetType = revisionsToMigrate.First().Type;
 
-                    if(targetType != finalDestType)
+                    if (targetType != finalDestType)
                     {
                         TraceWriteLine(LogEventLevel.Information, $"WorkItem has changed type at one of the revisions, from {targetType} to {finalDestType}");
                     }
@@ -597,7 +599,7 @@ namespace VstsSyncMigrator.Engine
                     {
                         finalDestType = Engine.TypeDefinitionMaps.Items[finalDestType].Map();
                     }
-                    
+
                     if (Engine.TypeDefinitionMaps.Items.ContainsKey(targetType))
                     {
                         targetType = Engine.TypeDefinitionMaps.Items[targetType].Map();
@@ -651,7 +653,12 @@ namespace VstsSyncMigrator.Engine
                     ProcessHTMLFieldAttachements(targetWorkItem);
                     ProcessWorkItemEmbeddedLinks(sourceWorkItem, targetWorkItem);
 
-                    targetWorkItem.SaveToAzureDevOps();
+                    var skipRevision = SkipRevisionWithInvalidIterationPath(targetWorkItem);
+
+                    if (!skipRevision)
+                    {
+                        targetWorkItem.SaveToAzureDevOps();
+                    }
                     TraceWriteLine(LogEventLevel.Information,
                         " Saved TargetWorkItem {TargetWorkItemId}. Replayed revision {RevisionNumber} of {RevisionsToMigrateCount}",
                        new Dictionary<string, object>() {
@@ -706,6 +713,33 @@ namespace VstsSyncMigrator.Engine
             }
 
             return targetWorkItem;
+        }
+
+        private bool SkipRevisionWithInvalidIterationPath(WorkItemData targetWorkItemData)
+        {
+            if (!_config.SkipRevisionWithInvalidIterationPath)
+            {
+                return false;
+            }
+
+            var workItem = targetWorkItemData.ToWorkItem();
+            var invalidFields = workItem.Validate();
+
+            if (invalidFields.Count == 0)
+            {
+                return false;
+            }
+
+            foreach (Field invalidField in invalidFields)
+            {
+                // We cannot save a revision when it has no IterationPath
+                if (invalidField.ReferenceName == "System.IterationPath")
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }
