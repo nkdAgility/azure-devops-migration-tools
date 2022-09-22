@@ -8,6 +8,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.VisualStudio.Services.Common;
 using Microsoft.VisualStudio.Services.WebApi;
 using MigrationTools.DataContracts;
 using MigrationTools.DataContracts.Pipelines;
@@ -15,6 +16,7 @@ using MigrationTools.DataContracts.Process;
 using MigrationTools.EndpointEnrichers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 
 namespace MigrationTools.Endpoints
 {
@@ -46,27 +48,32 @@ namespace MigrationTools.Endpoints
         }
 
         /// <summary>
-        /// Create a new instance of HttpClient including Heades
+        /// Create a new instance of HttpClient including Headers
+        /// </summary>
+        /// <param name="route">route that is appended after organization and project to create the full api url</param>
+        /// <returns>HttpClient</returns>
+        public HttpClient GetHttpClient(string route)
+        {
+            UriBuilder baseUrl = new UriBuilder(Options.Organisation);
+            baseUrl.AppendPathSegments(Options.Project, "_apis", route);
+            return CreateHttpClientWithHeaders(baseUrl.Uri.AbsoluteUri.ToString(), "api-version=6.0");
+        }
+
+        /// <summary>
+        /// Create a new instance of HttpClient including Headers
         /// </summary>
         /// <param name="routeParams">strings that are injected into the route parameters of the definitions url</param>
         /// <returns>HttpClient</returns>
-        private HttpClient GetHttpClient<DefinitionType>(params object[] routeParams)
+        private HttpClient GetHttpClient<DefinitionType>(params string[] routeParams)
             where DefinitionType : RestApiDefinition
         {
             UriBuilder baseUrl = GetUriBuilderBasedOnEndpointAndType<DefinitionType>(routeParams);
             var versionParameter = baseUrl.Query.Replace("?", "");
-            HttpClient client = new HttpClient();
-
-            client.BaseAddress = new Uri(baseUrl.Uri.AbsoluteUri.ToString().Replace(baseUrl.Query, ""));
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes(string.Format("{0}:{1}", "", Options.AccessToken))));
-            client.DefaultRequestHeaders.Add("Accept", $"application/json; {versionParameter}");
-            client.DefaultRequestHeaders.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
-
-            return client;
+            return CreateHttpClientWithHeaders(baseUrl.Uri.AbsoluteUri.ToString().Replace(baseUrl.Query, ""), versionParameter);
         }
 
         /// <summary>
-        /// Create a new instance of HttpClient including Heades
+        /// Create a new instance of HttpClient including Headers
         /// </summary>
         /// <param name="url"></param>
         /// <param name="versionParameter">allows caller to override the default api version (ie. api-version=5.1)</param>
@@ -75,9 +82,16 @@ namespace MigrationTools.Endpoints
         private HttpClient GetHttpClient(string url, string versionParameter, params object[] routeParams)
         {
             UriBuilder baseUrl = new UriBuilder(string.Format(url, routeParams));
-            HttpClient client = new HttpClient();
 
-            client.BaseAddress = new Uri(baseUrl.Uri.AbsoluteUri.ToString());
+            return CreateHttpClientWithHeaders(baseUrl.Uri.AbsoluteUri.ToString(), versionParameter);
+        }
+
+        private HttpClient CreateHttpClientWithHeaders(string url, string versionParameter)
+        {
+            HttpClient client = new HttpClient
+            {
+                BaseAddress = new Uri(url)
+            };
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes(string.Format("{0}:{1}", "", Options.AccessToken))));
             client.DefaultRequestHeaders.Add("Accept", $"application/json; {versionParameter}");
             client.DefaultRequestHeaders.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
@@ -90,7 +104,7 @@ namespace MigrationTools.Endpoints
         /// </summary>
         /// <param name="routeParameters">strings that are injected into the route parameters of the definitions url</param>
         /// <returns>UriBuilder</returns>
-        private UriBuilder GetUriBuilderBasedOnEndpointAndType<DefinitionType>(params object[] routeParams)
+        private UriBuilder GetUriBuilderBasedOnEndpointAndType<DefinitionType>(params string[] routeParameters)
             where DefinitionType : RestApiDefinition
         {
             var apiNameAttribute = typeof(DefinitionType).GetCustomAttributes(typeof(ApiNameAttribute), false).OfType<ApiNameAttribute>().FirstOrDefault();
@@ -102,15 +116,15 @@ namespace MigrationTools.Endpoints
             var builder = new UriBuilder(Options.Organisation);
 
             var pathSplit = apiPathAttribute.Path.Split('?');
-            string queryParts = "";
-            if (pathSplit.Length > 1)
-            {
-                // reassemble query string
-                queryParts = string.Join("?", pathSplit.Skip(1)).TrimStart('?');
-            }
+            //string queryParts = "";
+            //if (pathSplit.Length > 1)
+            //{
+            //    // reassemble query string
+            //    queryParts = string.Join("?", pathSplit.Skip(1)).TrimStart('?');
+            //}
 
             string unformatted = (apiPathAttribute.IncludeProject ? "/" + Options.Project : "") + "/_apis/" + pathSplit[0] + (apiPathAttribute.IncludeTrailingSlash ? "/" : "");
-            builder.Path += Regex.IsMatch(unformatted, @"{\d}") ? string.Format(unformatted, routeParams) : unformatted;
+            builder.Path += Regex.IsMatch(unformatted, @"{\d}") ? string.Format(unformatted, routeParameters) : unformatted;
 
             if (apiNameAttribute.Name == "Release Piplines")
             {
@@ -132,7 +146,7 @@ namespace MigrationTools.Endpoints
             }
             else
             {
-                builder.Query = "api-version=5.1-preview";
+                builder.Query = "api-version=6.0";
             }
             return builder;
         }
@@ -148,11 +162,11 @@ namespace MigrationTools.Endpoints
         /// <param name="singleDefinitionQueryString">additional query string parameter passed when pulling the single instance details (ie. $expands, etc)</param>
         /// <param name="queryForDetails">a boolean flag to allow caller to skip the calls for each individual definition details</param>
         /// <returns>List of API Definitions</returns>
-        public async Task<IEnumerable<DefinitionType>> GetApiDefinitionsAsync<DefinitionType>(object[] routeParameters = null, string queryString = "", string singleDefinitionQueryString = "", bool queryForDetails = true)
+        public async Task<IEnumerable<DefinitionType>> GetApiDefinitionsAsync<DefinitionType>(string[] routeParameters = null, string queryString = "", string singleDefinitionQueryString = "", bool queryForDetails = true)
             where DefinitionType : RestApiDefinition, new()
         {
             var initialDefinitions = new List<DefinitionType>();
-            routeParameters = routeParameters ?? new object[] { };
+            routeParameters = routeParameters ?? new string[] { };
 
             var client = GetHttpClient<DefinitionType>(routeParameters);
             var httpResponse = await client.GetAsync("?" + queryString);
@@ -209,31 +223,25 @@ namespace MigrationTools.Endpoints
         /// <param name="singleDefinitionQueryString">additional query string parameter passed when pulling the single instance details (ie. $expands, etc)</param>
         /// <param name="queryForDetails">a boolean flag to allow caller to skip the calls for each individual definition details</param>
         /// <returns></returns>
-        public async Task<DefinitionType> GetApiDefinitionAsync<DefinitionType>(object[] routeParameters = null, string queryString = "", string singleDefinitionQueryString = "", bool queryForDetails = true)
+        public async Task<DefinitionType> GetApiDefinitionAsync<DefinitionType>(string[] routeParameters = null, string queryString = "", string singleDefinitionQueryString = "", bool queryForDetails = true)
             where DefinitionType : RestApiDefinition, new()
         {
-            var initialDefinition = new DefinitionType();
-            routeParameters = routeParameters ?? new object[] { };
-
-            var client = GetHttpClient<DefinitionType>(routeParameters);
-            var httpResponse = await client.GetAsync("?" + queryString);
-
             var apiPathAttribute = typeof(DefinitionType).GetCustomAttributes(typeof(ApiPathAttribute), false).OfType<ApiPathAttribute>().FirstOrDefault();
             if (apiPathAttribute == null)
             {
                 throw new ArgumentNullException($"On the class defintion of '{typeof(DefinitionType).Name}' is the attribute 'ApiName' misssing. Please add the 'ApiName' Attribute to your class");
             }
 
-            if (httpResponse != null && httpResponse.StatusCode == HttpStatusCode.OK)
-            {
-                initialDefinition = await httpResponse.Content.ReadAsAsync<DefinitionType>();
-            }
-            else
+            routeParameters = routeParameters ?? new string[] { };
+
+            var client = GetHttpClient<DefinitionType>(routeParameters);
+            var httpResponse = await client.GetAsync("?" + queryString);
+            if (!httpResponse.IsSuccessStatusCode)
             {
                 throw new Exception($"Failed on call to get individual [{typeof(DefinitionType).Name}].\r\nUrl: GET {httpResponse.RequestMessage.RequestUri.ToString()}\r\n{await httpResponse.Content.ReadAsStringAsync()}");
-
             }
-            return initialDefinition;
+
+            return await httpResponse.Content.ReadAsAsync<DefinitionType>();
         }
 
         /// <summary>
