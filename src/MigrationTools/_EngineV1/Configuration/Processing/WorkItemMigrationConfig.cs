@@ -47,6 +47,11 @@ namespace MigrationTools._EngineV1.Configuration.Processing
 
         public int MaxGracefulFailures { get; set; }
 
+        /// <summary>
+        /// This will skip a revision if the source iteration has not been migrated i.e. it was deleted
+        /// </summary>
+        public bool SkipRevisionWithInvalidIterationPath { get; set; }
+
         /// <inheritdoc />
         public bool IsProcessorCompatible(IReadOnlyList<IProcessorConfig> otherProcessors)
         {
@@ -80,6 +85,7 @@ namespace MigrationTools._EngineV1.Configuration.Processing
             AreaMaps = new Dictionary<string, string>();
             IterationMaps = new Dictionary<string, string>();
             MaxGracefulFailures = 0;
+            SkipRevisionWithInvalidIterationPath = false;
         }
     }
 }
