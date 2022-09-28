@@ -56,6 +56,10 @@ namespace MigrationTools.Endpoints
         {
             UriBuilder baseUrl = new UriBuilder(Options.Organisation);
             baseUrl.AppendPathSegments(Options.Project, "_apis", route);
+            if (route.EndsWith("/"))
+            {
+                baseUrl.Path += "/";
+            }
             return CreateHttpClientWithHeaders(baseUrl.Uri.AbsoluteUri.ToString(), "api-version=6.0");
         }
 

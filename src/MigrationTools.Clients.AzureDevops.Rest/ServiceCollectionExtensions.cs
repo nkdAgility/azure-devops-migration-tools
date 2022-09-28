@@ -18,6 +18,7 @@ namespace MigrationTools
             context.AddTransient<ProcessDefinitionProcessor>();
 
             context.AddTransient<OutboundLinkCheckingProcessor>();
+            context.AddTransient<KeepOutboundLinkTargetProcessor>();
 
         }
     }
