@@ -107,6 +107,7 @@ namespace MigrationTools.Clients.AzureDevops.Rest.Processors
                     }
                     var workItemLocation = GetOrgAndProject(workitem.Url);
                     WorkItem targetItem = null;
+                    var adds = new List<AddLink>();
                     foreach (var relation in workitem.Relations)
                     {
                         var relationValues = GetOrgAndProject(relation.Url);
@@ -119,15 +120,15 @@ namespace MigrationTools.Clients.AzureDevops.Rest.Processors
                             Log.LogInformation("Source Workitem: " + workitem.Url);
                             targetItem = await GetReflectedWorkItem(wiqlTargetClient, targetClient, workitem.Id);
                         }
-                        var link = $"{workitem.Url},{relation.Attributes.Name},{relation.Url}";
-                        Log.LogInformation($"Adding {link}");
-                        var linkToAdd = relation.Rel;
 
+                        var linkToAdd = relation.Rel;
                         if (relation.Rel is "System.LinkTypes.Remote.Dependency-Reverse")
                         {
                             linkToAdd = "System.LinkTypes.Dependency-Reverse";
                         }
-                        var adds = new List<AddLink> {
+                        var link = $"{workitem.Url},{linkToAdd},{relation.Url}";
+                        Log.LogInformation($"Adding {link}");
+                        adds.Add(
                             new AddLink
                             {
                                 Value = new Relation
@@ -139,23 +140,26 @@ namespace MigrationTools.Clients.AzureDevops.Rest.Processors
                                         Comment = "Created from migration tool"
                                     }
                                 }
-                            }};
+                            });
+                    }
+                    if (_options.DryRun || adds.Count == 0)
+                    {
+                        continue;
+                    }
 
-                        var serializedDoc = JsonConvert.SerializeObject(adds);
-                        var requestContent = new StringContent(serializedDoc, Encoding.UTF8, "application/json-patch+json");
-                        var request = new HttpRequestMessage(new HttpMethod("PATCH"), targetItem.Url);
-                        request.Headers.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes(string.Format("{0}:{1}", "", Target.Options.AccessToken))));
-                        request.Headers.Add("Accept", $"application/json; api-version=6.0");
-                        request.Headers.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
-                        request.Content = requestContent;
-                        var response = await targetClient.SendAsync(request);
-                        if (response.IsSuccessStatusCode != true)
-                        {
-                            var content = await response.Content.ReadAsStringAsync();
-                            Log.LogError($"Failed to add link to target workitem {content}");
-                            response.EnsureSuccessStatusCode();
-                        }
-
+                    var serializedDoc = JsonConvert.SerializeObject(adds);
+                    var requestContent = new StringContent(serializedDoc, Encoding.UTF8, "application/json-patch+json");
+                    var request = new HttpRequestMessage(new HttpMethod("PATCH"), targetItem.Url);
+                    request.Headers.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes(string.Format("{0}:{1}", "", Target.Options.AccessToken))));
+                    request.Headers.Add("Accept", $"application/json; api-version=6.0");
+                    request.Headers.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
+                    request.Content = requestContent;
+                    var response = await targetClient.SendAsync(request);
+                    if (response.IsSuccessStatusCode != true)
+                    {
+                        var content = await response.Content.ReadAsStringAsync();
+                        Log.LogError($"Failed to add link to target workitem {content}");
+                        response.EnsureSuccessStatusCode();
                     }
                 }
             }
