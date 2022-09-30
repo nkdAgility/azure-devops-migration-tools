@@ -12,6 +12,8 @@ namespace MigrationTools.Clients.AzureDevops.Rest.Processors
         public string TargetLinksToKeepOrganization { get; set; }
         public string TargetLinksToKeepProject { get; set; }
 
+        public bool DryRun { get; set; }
+
         public override IProcessorOptions GetDefault()
         {
             SetDefaults();
@@ -21,6 +23,9 @@ namespace MigrationTools.Clients.AzureDevops.Rest.Processors
         public override void SetDefaults()
         {
             WIQLQueryBit = "Select [System.Id] From WorkItems Where [System.TeamProject] = @project and not [System.WorkItemType] contains 'Test Suite, Test Plan,Shared Steps,Shared Parameter,Feedback Request'";
+            TargetLinksToKeepOrganization = "https://dev.azure.com/nkdagility";
+            TargetLinksToKeepProject = Guid.NewGuid().ToString();
+            DryRun = true;
         }
     }
 }
