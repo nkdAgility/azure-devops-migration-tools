@@ -84,6 +84,7 @@ namespace MigrationTools.Clients.AzureDevops.Rest.Processors
             var targetClient = Target.GetHttpClient("wit/workitems/");
 
             var wiqlTargetClient = Target.GetHttpClient("wit/wiql");
+            var uniqueRelationTargets = new HashSet<string>();
             foreach (var chunk in chunks)
             {
                 var batch = new WorkItemBatchRequest()
@@ -126,6 +127,8 @@ namespace MigrationTools.Clients.AzureDevops.Rest.Processors
                         {
                             linkToAdd = "System.LinkTypes.Dependency-Reverse";
                         }
+                        var linkToWorkitem = $"{relationValues.org}/{relationValues.project}_workitems/edit/{relationValues.targetId}";
+                        uniqueRelationTargets.Add(linkToWorkitem);
                         var link = $"{workitem.Url},{linkToAdd},{relation.Url}";
                         Log.LogInformation($"Adding {link}");
                         adds.Add(
@@ -142,7 +145,12 @@ namespace MigrationTools.Clients.AzureDevops.Rest.Processors
                                 }
                             });
                     }
-                    if (_options.DryRun || adds.Count == 0)
+                    if (adds.Count == 0)
+                    {
+                        continue;
+                    }
+
+                    if (_options.DryRun)
                     {
                         continue;
                     }
@@ -162,6 +170,18 @@ namespace MigrationTools.Clients.AzureDevops.Rest.Processors
                         response.EnsureSuccessStatusCode();
                     }
                 }
+            }
+
+            var fileInfo = new FileInfo(_options.CleanupFileName);
+            if (fileInfo.Directory.Exists == false)
+            {
+                fileInfo.Directory.Create();
+            }
+
+            using StreamWriter file = new(fileInfo.FullName);
+            foreach (var target in uniqueRelationTargets)
+            {
+                file.WriteLine($"{_options.PrependCommand} {target}");
             }
         }
 
@@ -201,24 +221,24 @@ namespace MigrationTools.Clients.AzureDevops.Rest.Processors
             return await workitemResult.Content.ReadAsAsync<WorkItem>();
         }
 
-        private (string org, string project) GetOrgAndProject(string url)
+        private (string org, string project, string targetId) GetOrgAndProject(string url)
         {
             var uri = new Uri(url);
             var baseUrl = uri.Host;
-            var org = baseUrl;
+            var org = $"https://{baseUrl}";
             var segments = uri.Segments;
 
             string project;
             if (baseUrl == "dev.azure.com")
             {
-                org = segments[1];
+                org = $"https://dev.azure.com/{segments[1]}";
                 project = segments[2];
             }
             else
             {
                 project = segments[1];
             }
-            return (org, project);
+            return (org, project, segments[segments.Length - 1]);
         }
     }
 }

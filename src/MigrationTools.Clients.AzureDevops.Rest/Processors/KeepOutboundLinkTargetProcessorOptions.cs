@@ -11,6 +11,8 @@ namespace MigrationTools.Clients.AzureDevops.Rest.Processors
 
         public string TargetLinksToKeepOrganization { get; set; }
         public string TargetLinksToKeepProject { get; set; }
+        public string CleanupFileName { get; set; }
+        public string PrependCommand { get; set; }
 
         public bool DryRun { get; set; }
 
@@ -26,6 +28,8 @@ namespace MigrationTools.Clients.AzureDevops.Rest.Processors
             TargetLinksToKeepOrganization = "https://dev.azure.com/nkdagility";
             TargetLinksToKeepProject = Guid.NewGuid().ToString();
             DryRun = true;
+            CleanupFileName = "c:/temp/OutboundLinkTargets.bat";
+            PrependCommand = "start";
         }
     }
 }
