@@ -379,7 +379,18 @@ namespace VstsSyncMigrator.Engine
 
             foreach (Field f in oldWorkItem.Fields)
             {
-                if (newWorkItem.Fields.Contains(f.ReferenceName) && !_ignore.Contains(f.ReferenceName) && (!newWorkItem.Fields[f.ReferenceName].IsChangedInRevision || newWorkItem.Fields[f.ReferenceName].IsEditable) && oldWorkItem.Fields[f.ReferenceName].Value != newWorkItem.Fields[f.ReferenceName].Value)
+                if (newWorkItem.Fields.Contains(f.ReferenceName) == false)
+                {
+                    var missedMigratedValue = oldWorkItem.Fields[f.ReferenceName].Value;
+                    if (missedMigratedValue != null && !string.Empty.Equals(missedMigratedValue))
+                    {
+                        Log.LogDebug("PopulateWorkItem:FieldUpdate: Missing field in target: {MissingField}, with value: {SourceValue}", f.ReferenceName, missedMigratedValue);
+                    }
+                    continue;
+                }
+                if (!_ignore.Contains(f.ReferenceName) &&
+                    (!newWorkItem.Fields[f.ReferenceName].IsChangedInRevision || newWorkItem.Fields[f.ReferenceName].IsEditable)
+                    && oldWorkItem.Fields[f.ReferenceName].Value != newWorkItem.Fields[f.ReferenceName].Value)
                 {
                     Log.LogDebug("PopulateWorkItem:FieldUpdate: {ReferenceName} | Old:{OldReferenceValue} New:{NewReferenceValue}", f.ReferenceName, oldWorkItem.Fields[f.ReferenceName].Value, newWorkItem.Fields[f.ReferenceName].Value);
                     newWorkItem.Fields[f.ReferenceName].Value = oldWorkItem.Fields[f.ReferenceName].Value;
