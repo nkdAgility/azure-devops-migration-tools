@@ -68,7 +68,6 @@ namespace MigrationTools.Processors
         /// <param name="targetHierarchy">The object that represents the whole of the target query tree</param>
         /// <param name="sourceFolder">The source folder in tree on source instance</param>
         /// <param name="parentFolder">The target folder in tree on target instance</param>
-        [Obsolete]
         private void MigrateFolder(QueryHierarchy targetHierarchy, QueryFolder sourceFolder, QueryFolder parentFolder)
         {
             // We only migrate non-private folders and their contents
