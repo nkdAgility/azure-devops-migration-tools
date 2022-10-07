@@ -384,7 +384,7 @@ namespace VstsSyncMigrator.Engine
                     var missedMigratedValue = oldWorkItem.Fields[f.ReferenceName].Value;
                     if (missedMigratedValue != null && !string.Empty.Equals(missedMigratedValue))
                     {
-                        Log.LogDebug("PopulateWorkItem:FieldUpdate: Missing field in target: {MissingField}, with value: {SourceValue}", f.ReferenceName, missedMigratedValue);
+                        Log.LogDebug("PopulateWorkItem:FieldUpdate: Missing field in target workitem, Source WorkItemId: {WorkitemId}, Field: {MissingField}, Value: {SourceValue}", oldWi.Id, f.ReferenceName, missedMigratedValue);
                     }
                     continue;
                 }
