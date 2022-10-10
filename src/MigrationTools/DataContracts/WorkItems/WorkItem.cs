@@ -35,6 +35,7 @@ namespace MigrationTools.DataContracts.WorkItems
 
     public class WorkItem
     {
+        public int Id { get; set; }
         public Relation[] Relations { get; set; }
 
         public string Url { get; set; }
@@ -51,5 +52,14 @@ namespace MigrationTools.DataContracts.WorkItems
     public class Attributes
     {
         public string Name { get;set; }
+        public string Comment { get; set; }
+    }
+
+    public class AddLink
+    {
+        public string Op { get; set; } = "add";
+        public string Path { get; set; } = "/relations/-";
+
+        public Relation Value { get; set; }
     }
 }
