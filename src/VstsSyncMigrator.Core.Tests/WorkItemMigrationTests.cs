@@ -109,6 +109,61 @@ namespace VstsSyncMigrator.Core.Tests
         }
 
         [TestMethod]
+        public void TestFixAreaPath_WhenAreaPathInQuery_WithPrefixProjectToNodesDisabled_SupportsWhitespaces()
+        {
+            var nodeStructure = _services.GetRequiredService<TfsNodeStructure>();
+
+            nodeStructure.ApplySettings(new TfsNodeStructureSettings
+            {
+                FoundNodes = new Dictionary<string, bool>(),
+                SourceProjectName = "Source Project",
+                TargetProjectName = "Target Project",
+            });
+
+            // For this test we use no remapping rule
+            nodeStructure.Configure(new TfsNodeStructureOptions
+            {
+                AreaMaps = new Dictionary<string, string>(),
+                IterationMaps = new Dictionary<string, string>(),
+            });
+
+            string WIQLQueryBit = @"AND [System.AreaPath] = 'Source Project\Area\Path1' AND   [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
+            string expectTargetQueryBit = @"AND [System.AreaPath] = 'Target Project\Area\Path1' AND   [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
+
+            string targetWIQLQueryBit = _underTest.FixAreaPathAndIterationPathForTargetQuery(WIQLQueryBit, "Source Project", "Target Project", null);
+
+            Assert.AreEqual(expectTargetQueryBit, targetWIQLQueryBit);
+        }
+
+        [TestMethod]
+        public void TestFixAreaPath_WhenAreaPathInQuery_WithPrefixProjectToNodesEnabled_SupportsWhitespaces()
+        {
+            var nodeStructure = _services.GetRequiredService<TfsNodeStructure>();
+
+            nodeStructure.ApplySettings(new TfsNodeStructureSettings
+            {
+                FoundNodes = new Dictionary<string, bool>(),
+                SourceProjectName = "Source Project",
+                TargetProjectName = "Target Project",
+            });
+
+            // For this test we use the prefixing of the project node and no remapping rules
+            nodeStructure.Configure(new TfsNodeStructureOptions
+            {
+                AreaMaps = new Dictionary<string, string>(),
+                IterationMaps = new Dictionary<string, string>(),
+                PrefixProjectToNodes = true,
+            });
+
+            var WIQLQueryBit = @"AND [System.AreaPath] = 'Source Project\Area\Path1' AND   [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
+            var expectTargetQueryBit = @"AND [System.AreaPath] = 'Target Project\Source Project\Area\Path1' AND   [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
+
+            var targetWIQLQueryBit = _underTest.FixAreaPathAndIterationPathForTargetQuery(WIQLQueryBit, "Source Project", "Target Project", null);
+
+            Assert.AreEqual(expectTargetQueryBit, targetWIQLQueryBit);
+        }
+
+        [TestMethod]
         public void TestFixAreaPath_WhenMultipleAreaPathInQuery_ChangesQuery()
         {
             string WIQLQueryBit =         @"AND [System.AreaPath] = 'SourceServer\Area\Path1' OR [System.AreaPath] = 'SourceServer\Area\Path2' AND [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
