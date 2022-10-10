@@ -16,6 +16,7 @@ namespace MigrationTools.DataContracts.Pipelines
         public Modifiedby ModifiedBy { get; set; }
         public string ModifiedOn { get; set; }
         public bool IsShared { get; set; }
+        public ProviderData ProviderData { get; set; }
 
         public VariableGroupProjectReference[] VariableGroupProjectReferences { get; set; }
 
@@ -67,5 +68,11 @@ namespace MigrationTools.DataContracts.Pipelines
         public string displayName { get; set; }
         public string id { get; set; }
         public string uniqueName { get; set; }
+    }
+
+    public class ProviderData
+    {
+        public string serviceEndpointId { get; set; }
+        public string vault { get; set; }
     }
 }
