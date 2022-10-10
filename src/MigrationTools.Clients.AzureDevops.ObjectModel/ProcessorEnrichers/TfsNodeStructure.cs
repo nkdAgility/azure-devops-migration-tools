@@ -99,18 +99,24 @@ namespace MigrationTools.Enrichers
                 throw new InvalidOperationException($"This path is not anchored in the source project name: {sourceNodePath}");
             }
 
-            return Regex.Replace(sourceNodePath, lastResortRule.Key, lastResortRule.Value.Replace("\\", ""));
+            return Regex.Replace(sourceNodePath, lastResortRule.Key, lastResortRule.Value);
         }
 
         private KeyValuePair<string, string> GetLastResortRemappingRule()
         {
             if (_lastResortRemapRule == null)
             {
-                var escapedSourceProjectName = Regex.Escape(_sourceProjectName);
-                var escapedTargetProjectName = Regex.Escape(_targetProjectName);
+                // We need to escape different symbols:
+                // - On the _search_ side, everything is taken care of by Regex.Escape()
+                // - On the _replace_ side we need to escape the $ sign only
+                // Note that an escaped white space ("\ ") is _not_ an issue on the search side, the engine will understand that it's meant to be a literal white space.
+                var searchEscapedSourceProjectName = Regex.Escape(_sourceProjectName);
+                var replaceEscapedSourceProjectName = _sourceProjectName.Replace("$", "$$");
+                var replaceEscapedTargetProjectName = _targetProjectName.Replace("$", "$$");
+
                 _lastResortRemapRule = _Options.PrefixProjectToNodes
-                    ? new KeyValuePair<string, string>($"^{escapedSourceProjectName}", $"{escapedTargetProjectName}\\{escapedSourceProjectName}")
-                    : new KeyValuePair<string, string>($"^{escapedSourceProjectName}", $"{escapedTargetProjectName}");
+                    ? new KeyValuePair<string, string>($"^{searchEscapedSourceProjectName}", $"{replaceEscapedTargetProjectName}\\{replaceEscapedSourceProjectName}")
+                    : new KeyValuePair<string, string>($"^{searchEscapedSourceProjectName}", $"{replaceEscapedTargetProjectName}");
             }
 
             return _lastResortRemapRule.Value;
