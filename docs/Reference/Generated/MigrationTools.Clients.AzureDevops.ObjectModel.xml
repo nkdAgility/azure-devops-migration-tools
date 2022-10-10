@@ -56,12 +56,7 @@
         </member>
         <member name="T:MigrationTools.Processors.TfsSharedQueryProcessorOptions">
             <summary>
-            The `TfsSharedQueryProcessor` enabled you to migrate queries from one locatio nto another.
-            </summary>
-        </member>
-        <member name="F:MigrationTools.Processors.TfsSharedQueryProcessorOptions.sharedFolderName">
-            <summary>
-            The name of the shared folder, setting the default name
+            The `TfsSharedQueryProcessor` enabled you to migrate queries from one location to another.
             </summary>
         </member>
         <member name="P:MigrationTools.Processors.TfsSharedQueryProcessorOptions.PrefixProjectToNodes">
