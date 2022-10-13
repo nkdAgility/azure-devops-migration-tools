@@ -18,7 +18,22 @@ namespace MigrationTools.Endpoints
             context_wid.Rev = fieldsOfRevision != null ? (int)fieldsOfRevision["System.Rev"].Value : context_wi.Rev;
             context_wid.ChangedDate = fieldsOfRevision != null ? (DateTime)fieldsOfRevision["System.ChangedDate"].Value : context_wi.ChangedDate;
 
-            context_wid.Fields = GetFieldItems(context_wi.Fields);
+            var fieldItems = GetFieldItems(context_wi.Fields);
+            if (fieldsOfRevision != null)
+            {
+                foreach (var revField in fieldsOfRevision)
+                {
+                    fieldItems[revField.Key] = new FieldItem
+                    {
+                        Name = revField.Value.Name,
+                        ReferenceName = revField.Value.ReferenceName,
+                        Value = revField.Value.Value,
+                        internalObject = revField.Value.internalObject,
+                    };
+                }
+            }
+
+            context_wid.Fields = fieldItems;
             context_wid.Links = GetLinkItems(context_wi.Links);
             context_wid.Revisions = fieldsOfRevision == null ? GetRevisionItems(context_wi.Revisions) : null;
 

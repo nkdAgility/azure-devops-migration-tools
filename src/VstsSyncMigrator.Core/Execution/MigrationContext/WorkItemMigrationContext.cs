@@ -641,13 +641,14 @@ namespace VstsSyncMigrator.Engine
 
                     PopulateWorkItem(currentRevisionWorkItem, targetWorkItem, destType);
 
+                    // Impersonate revision author. Mapping will apply later and may change this.
+                    targetWorkItem.ToWorkItem().Fields["System.ChangedBy"].Value = revision.Fields["System.ChangedBy"].Value.ToString();
+                    targetWorkItem.ToWorkItem().Fields["System.History"].Value = revision.Fields["System.History"].Value;
+
                     // Todo: Ensure all field maps use WorkItemData.Fields to apply a correct mapping
                     Engine.FieldMaps.ApplyFieldMappings(currentRevisionWorkItem, targetWorkItem);
 
                     // Todo: Think about an "UpdateChangedBy" flag as this is expensive! (2s/WI instead of 1,5s when writing "Migration")
-                    var changedBy = targetWorkItem.ToWorkItem().Fields["System.ChangedBy"].Value.ToString();
-                    targetWorkItem.ToWorkItem().Fields["System.ChangedBy"].Value = revision.Fields["System.ChangedBy"].Value;
-                    targetWorkItem.ToWorkItem().Fields["System.History"].Value = revision.Fields["System.History"].Value;
 
                     var reflectedUri = (TfsReflectedWorkItemId)Engine.Source.WorkItems.CreateReflectedWorkItemId(sourceWorkItem);
                     if (!targetWorkItem.ToWorkItem().Fields.Contains(Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName))
@@ -677,10 +678,10 @@ namespace VstsSyncMigrator.Engine
                                {"RevisionNumber", revision.Number },
                                {"RevisionsToMigrateCount",  revisionsToMigrate.Count}
                            });
-
-                    // Change this back to the original value as this object is mutated, and this value is needed elsewhere.
-                    targetWorkItem.ToWorkItem().Fields["System.ChangedBy"].Value = changedBy;
                 }
+
+                // Until here we impersonate the maker of the revisions. From here we act as ourselves to push the attachments and add the comment
+                targetWorkItem.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
 
                 if (targetWorkItem != null)
                 {
@@ -688,6 +689,8 @@ namespace VstsSyncMigrator.Engine
                     if (!string.IsNullOrEmpty(targetWorkItem.Id))
                     {
                         ProcessWorkItemLinks(Engine.Source.WorkItems, Engine.Target.WorkItems, sourceWorkItem, targetWorkItem);
+                        // The TFS client seems to plainly ignore the ChangedBy field when saving a link, so we need to put this back in place
+                        targetWorkItem.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
                     }
 
                     if (_config.GenerateMigrationComment)
