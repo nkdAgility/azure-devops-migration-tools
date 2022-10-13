@@ -128,6 +128,10 @@ namespace MigrationTools.Enrichers
                     newSteps = newSteps.Replace($"ref=\"{sourceSharedStep.Id}\"",
                         $"ref=\"{matchingTargetSharedStep.Id}\"");
                     wiTargetL.ToWorkItem().Fields[microsoftVstsTcmSteps].Value = newSteps;
+
+                    // DevOps doesn't seem to take impersonation very nicely here - as of 13.05.22 the following line would get you an error:
+                    // System.FormatException: The string 'Microsoft.TeamFoundation.WorkItemTracking.Common.ServerDefaultFieldValue' is not a valid AllXsd value.
+                    // target.ToWorkItem().Fields["System.ModifiedBy"].Value = "Migration";
                 }
             }
 
@@ -150,6 +154,10 @@ namespace MigrationTools.Enrichers
                     Comment = sourceLink.Comment
                 };
                 target.ToWorkItem().Links.Add(el);
+
+                // DevOps doesn't seem to take impersonation very nicely here - as of 13.05.22 the following line would get you an error:
+                // System.FormatException: The string 'Microsoft.TeamFoundation.WorkItemTracking.Common.ServerDefaultFieldValue' is not a valid AllXsd value.
+                // target.ToWorkItem().Fields["System.ModifiedBy"].Value = "Migration";
                 if (_save)
                 {
                     try
@@ -268,7 +276,10 @@ namespace MigrationTools.Enrichers
                             linkTypeEnd = ((TfsWorkItemMigrationClient)Engine.Target.WorkItems).Store.WorkItemLinkTypes.LinkTypeEnds["System.LinkTypes.Hierarchy-Reverse"];
                             RelatedLink newLl = new RelatedLink(linkTypeEnd, int.Parse(wiTargetL.Id));
                             wiTargetR.ToWorkItem().Links.Add(newLl);
-                            wiTargetR.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
+
+                            // DevOps doesn't seem to take impersonation very nicely here - as of 13.05.22 the following line would get you an error:
+                            // System.FormatException: The string 'Microsoft.TeamFoundation.WorkItemTracking.Common.ServerDefaultFieldValue' is not a valid AllXsd value.
+                            // wiTargetR.ToWorkItem().Fields["System.ModifiedBy"].Value = "Migration";
                             wiTargetR.SaveToAzureDevOps();
                         }
                         else
@@ -286,6 +297,10 @@ namespace MigrationTools.Enrichers
                                 }
                             }
                             wiTargetL.ToWorkItem().Links.Add(newRl);
+
+                            // DevOps doesn't seem to take impersonation very nicely here - as of 13.05.22 the following line would get you an error:
+                            // System.FormatException: The string 'Microsoft.TeamFoundation.WorkItemTracking.Common.ServerDefaultFieldValue' is not a valid AllXsd value.
+                            // wiTargetL.ToWorkItem().Fields["System.ModifiedBy"].Value = "Migration";
                             if (_save)
                             {
                                 wiTargetL.SaveToAzureDevOps();
@@ -376,6 +391,10 @@ namespace MigrationTools.Enrichers
             };
 
             target.ToWorkItem().Links.Add(hl);
+
+            // DevOps doesn't seem to take impersonation very nicely here - as of 13.05.22 the following line would get you an error:
+            // System.FormatException: The string 'Microsoft.TeamFoundation.WorkItemTracking.Common.ServerDefaultFieldValue' is not a valid AllXsd value.
+            // target.ToWorkItem().Fields["System.ModifiedBy"].Value = "Migration";
             if (_save)
             {
                 target.SaveToAzureDevOps();
