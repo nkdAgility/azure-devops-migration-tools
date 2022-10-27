@@ -53,6 +53,19 @@ The Azure DevOps Migration Tools allow you to bulk edit and migrate data between
  - [Questions on Usage](https://stackoverflow.com/questions/tagged/azure-devops-migration-tools)
  - [Bugs and New Features](https://github.com/nkdAgility/azure-devops-migration-tools)
 
+## Support
+
+1. [Question & Discussion](https://github.com/nkdAgility/azure-devops-migration-tools/discussions) - The first place to look for unsage, configuration, and general help. 
+1. [Issues on Gitbub](https://github.com/nkdAgility/azure-devops-migration-tools/issues) - If you have identified a bug and have logs then please raise an issue.
+
+You can get free support from the community above and on social media on a best effort basis if folks are available. If you are *looking for paid support* [naked Agility with Martin Hinshelwood & Co](https://nkdagility.com) has a number of experts, many of whom contribute to this project, that can help. Book a [free consultation](https://nkdagility.com/book-online) to discuss how we can make things easyer.
+
+We use these tools with out customers, and for fun, to do real world migrations on a daily basis and we can:
+
+ - Consult with your internal folks who need help and guidance in runnign the tooling.
+ - Make changes to the tool to support your needs; all additions are commited to the main repo.
+ - Run the migration for you:- you would need to pay for the hours that we would spend baby-sitting the running migrations
+
 ## Change Log
 
 - v11.11 - Refactored revision manager to have more tests and support limiting the number of revisions. CollapseRevisions has been replaced by setting MaxRevisions to 1 and setting AttachRevisionHistory to true; MaxRevisions sets the maximum number of revisions that will be migrated. "First + Last*N = Max". If this was set to 5 and there were 10 revisions you would get the first 1 (creation) and the latest 4 migrated. This is done after all of the existing revisions are created but before anything newer that target is removed.
