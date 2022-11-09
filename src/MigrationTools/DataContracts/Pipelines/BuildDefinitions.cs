@@ -356,6 +356,21 @@ namespace MigrationTools.DataContracts.Pipelines
         public bool CheckoutNestedSubmodules { get; set; }
 
         public long FetchDepth { get; set; }
+        
+        public void SetDefaults() 
+        {
+            ConnectedServiceId = null;
+            CleanOptions = null;
+            LabelSources = "0";
+            LabelSourcesFormat = "$(build.buildNumber)";
+            ReportBuildStatus = false;
+            GitLfsSupport = false;
+            SkipSyncSource = false;
+            CheckoutNestedSubmodules = false;
+            FetchDepth = 0;
+            EditableOptions = null;
+            SystemEnvironmentRankLogicVersion = null;
+        }
     }
 
     public partial class RetentionRule
