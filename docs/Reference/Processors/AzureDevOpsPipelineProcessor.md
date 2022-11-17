@@ -16,8 +16,9 @@ Azure DevOps Processor that migrates Taskgroups, Build- and Release Pipelines.
 | MigrateTaskGroups | Boolean | Migrate Task Groups | true |
 | MigrateVariableGroups | Boolean | Migrate Valiable Groups | true |
 | MigrateServiceConnections | Boolean | Migrate Service Connections **secrets need to be entered manually** | true |
-| BuildPipelines | List | List of Build Pipelines to process. If this is `null` then all Build Pipelines will be processed. **Not implemented yet** | missng XML code comments |
-| ReleasePipelines | List | List of Release Pipelines to process. If this is `null` then all Release Pipelines will be processed. **Not implemented yet** | missng XML code comments |
+| BuildPipelines | List | List of Build Pipelines to process. If this is `null` then all Build Pipelines will be processed. | missng XML code comments |
+| ReleasePipelines | List | List of Release Pipelines to process. If this is `null` then all Release Pipelines will be processed. | missng XML code comments |
+| RepositoryNameMaps | Dictionary`2 | Map of Source Repository to Target Repository Names | missng XML code comments |
 | ProcessorEnrichers | List | List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors. | missng XML code comments |
 | SourceName | String | missng XML code comments | missng XML code comments |
 | TargetName | String | missng XML code comments | missng XML code comments |
@@ -37,6 +38,7 @@ Azure DevOps Processor that migrates Taskgroups, Build- and Release Pipelines.
   "MigrateServiceConnections": true,
   "BuildPipelines": null,
   "ReleasePipelines": null,
+  "RepositoryNameMaps": null,
   "ProcessorEnrichers": null,
   "SourceName": "sourceName",
   "TargetName": "targetName"
