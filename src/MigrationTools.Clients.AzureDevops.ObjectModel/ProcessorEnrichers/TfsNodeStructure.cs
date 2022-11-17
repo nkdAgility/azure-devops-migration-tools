@@ -11,6 +11,10 @@ using MigrationTools.DataContracts;
 using MigrationTools.Endpoints;
 using MigrationTools.Processors;
 using Newtonsoft.Json;
+using Serilog.Context;
+using Serilog.Events;
+using ILogger = Serilog.ILogger;
+
 
 namespace MigrationTools.Enrichers
 {
@@ -39,6 +43,8 @@ namespace MigrationTools.Enrichers
         private TfsLanguageMapOptions _sourceLanguageMaps;
         private ProjectInfo _sourceProjectInfo;
 
+        private ILogger contextLog;
+
         private string _sourceProjectName;
         private NodeInfo[] _sourceRootNodes;
         private ICommonStructureService4 _targetCommonStructureService;
@@ -49,6 +55,7 @@ namespace MigrationTools.Enrichers
         public TfsNodeStructure(IServiceProvider services, ILogger<TfsNodeStructure> logger)
             : base(services, logger)
         {
+            contextLog = Serilog.Log.ForContext<TfsNodeStructure>();
         }
 
         public TfsNodeStructureOptions Options
@@ -467,6 +474,67 @@ namespace MigrationTools.Enrichers
         {
             return _nodeBasePaths.Where(onePath => !onePath.StartsWith("!"))
                                  .Any(onePath => onePath.StartsWith(userFriendlyPath));
+        }
+
+        public List<string> CheckForMissingPaths(List<WorkItemData> workItems, TfsNodeStructureType nodeType)
+        {
+            EntryForProcessorType(null);
+            _targetCommonStructureService.ClearProjectInfoCache();
+
+            string fieldName = "";
+            switch (nodeType)
+             {
+                case TfsNodeStructureType.Iteration:
+                    fieldName = "System.IterationPath";
+                    break;
+                case TfsNodeStructureType.Area:
+                    fieldName = "System.AreaPath";
+                    break;
+
+            }
+            List<string> areaPaths = (from workItem in workItems where workItem.Fields[fieldName].Value.ToString().Contains("\\") select workItem.Fields[fieldName].Value.ToString()).Distinct().ToList();
+            List<string> missingPaths = new List<string>();
+
+            foreach (var areaPath in areaPaths)
+            {
+                var newpath = GetNewNodeName(areaPath, nodeType);
+                var systempath  = GetSystemPath(newpath, nodeType);
+                try
+                {
+                    NodeInfo c = _targetCommonStructureService.GetNodeFromPath(systempath);
+                }
+                catch
+                {
+                    missingPaths.Add(newpath);
+                }
+            }
+            return missingPaths;
+        }
+
+        public bool ValidateTargetNodesExist(List<WorkItemData> workItems)
+        {
+            bool passedValidation = true;
+            List<string> missingAreaPaths = CheckForMissingPaths(workItems, TfsNodeStructureType.Area);
+            if (missingAreaPaths.Count > 0)
+            {
+                contextLog.Fatal("!! There are {missingAreaPaths} AreaPaths found in the history of the Source that are missing from the Target. These MUST be added or mapped with a fieldMap before we can continue.", missingAreaPaths.Count);
+                foreach (string areaPath in missingAreaPaths)
+                {
+                    contextLog.Warning("MISSING Area: {areaPath}", areaPath);
+                }
+                passedValidation = false;
+            }
+            List<string> missingIterationPaths = CheckForMissingPaths(workItems, TfsNodeStructureType.Iteration);
+            if (missingIterationPaths.Count > 0)
+            {
+                contextLog.Fatal("!! There are {missingIterationPaths} IterationPaths found in the history of the Source that are missing from the Target. These MUST be added or mapped with a fieldMap before we can continue.", missingIterationPaths.Count);
+                foreach (string iterationPath in missingIterationPaths)
+                {
+                    contextLog.Warning("MISSING Iterationea: {iterationPath}", iterationPath);
+                }
+                passedValidation = false;
+            }
+            return passedValidation;
         }
     }
 }

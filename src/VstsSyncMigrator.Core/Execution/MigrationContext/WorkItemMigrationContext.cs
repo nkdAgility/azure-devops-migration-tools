@@ -153,6 +153,12 @@ namespace VstsSyncMigrator.Engine
                 var sourceWorkItems = Engine.Source.WorkItems.GetWorkItems(sourceQuery);
                 contextLog.Information("Replay all revisions of {sourceWorkItemsCount} work items?",
                     sourceWorkItems.Count);
+
+                //////////////////////////////////////////////////
+                if (!_nodeStructureEnricher.ValidateTargetNodesExist(sourceWorkItems))
+                {
+                    throw new Exception("Missing Iterations in Target preventing progress, check log for list.");
+                }
                 //////////////////////////////////////////////////
                 contextLog.Information("Found target project as {@destProject}", Engine.Target.WorkItems.Project.Name);
                 //////////////////////////////////////////////////////////FilterCompletedByQuery
