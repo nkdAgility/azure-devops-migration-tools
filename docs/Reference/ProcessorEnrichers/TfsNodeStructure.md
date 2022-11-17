@@ -13,6 +13,8 @@ missng XML code comments
 | Enabled | Boolean | missng XML code comments | missng XML code comments |
 | PrefixProjectToNodes | Boolean | missng XML code comments | missng XML code comments |
 | NodeBasePaths | String[] | missng XML code comments | missng XML code comments |
+| AreaMaps | Dictionary`2 | missng XML code comments | missng XML code comments |
+| IterationMaps | Dictionary`2 | missng XML code comments | missng XML code comments |
 | RefName | String | missng XML code comments | missng XML code comments |
 
 
@@ -23,6 +25,12 @@ missng XML code comments
   "$type": "TfsNodeStructureOptions",
   "Enabled": true,
   "PrefixProjectToNodes": false,
-  "NodeBasePaths": null
+  "NodeBasePaths": null,
+  "AreaMaps": {
+    "$type": "Dictionary`2"
+  },
+  "IterationMaps": {
+    "$type": "Dictionary`2"
+  }
 }
 ```

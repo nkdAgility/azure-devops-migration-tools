@@ -8,6 +8,7 @@
   "MigrateServiceConnections": true,
   "BuildPipelines": null,
   "ReleasePipelines": null,
+  "RepositoryNameMaps": null,
   "ProcessorEnrichers": null,
   "SourceName": "sourceName",
   "TargetName": "targetName"
