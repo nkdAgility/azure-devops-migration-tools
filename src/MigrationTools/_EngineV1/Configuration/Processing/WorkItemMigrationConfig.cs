@@ -40,6 +40,7 @@ namespace MigrationTools._EngineV1.Configuration.Processing
 
         public bool? NodeStructureEnricherEnabled { get; set; }
         public bool UseCommonNodeStructureEnricherConfig { get; set; }
+        public bool StopMigrationOnMissingAreaIterationNodes { get; set; }
         public string[] NodeBasePaths { get; set; }
         public Dictionary<string, string> AreaMaps { get; set; }
         public Dictionary<string, string> IterationMaps { get; set; }
@@ -76,6 +77,7 @@ namespace MigrationTools._EngineV1.Configuration.Processing
             PrefixProjectToNodes = false;
             UpdateCreatedDate = true;
             SkipToFinalRevisedWorkItemType = true;
+            StopMigrationOnMissingAreaIterationNodes = true;
             LinkMigrationSaveEachAsAdded = false;
             GenerateMigrationComment = true;
             WIQLQueryBit = @"AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')";

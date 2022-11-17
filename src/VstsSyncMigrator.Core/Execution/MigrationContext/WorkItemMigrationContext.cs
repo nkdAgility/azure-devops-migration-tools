@@ -157,7 +157,10 @@ namespace VstsSyncMigrator.Engine
                 //////////////////////////////////////////////////
                 if (!_nodeStructureEnricher.ValidateTargetNodesExist(sourceWorkItems))
                 {
-                    throw new Exception("Missing Iterations in Target preventing progress, check log for list.");
+                    if (_config.StopMigrationOnMissingAreaIterationNodes)
+                    {
+                        throw new Exception("Missing Iterations in Target preventing progress, check log for list. If you resolve with a FieldMap set StopMigrationOnMissingAreaIterationNodes = false in the config to continue.");
+                    }                    
                 }
                 //////////////////////////////////////////////////
                 contextLog.Information("Found target project as {@destProject}", Engine.Target.WorkItems.Project.Name);
