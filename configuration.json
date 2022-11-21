@@ -7,9 +7,9 @@
     "Collection": "https://dev.azure.com/nkdagility-preview/",
     "Project": "migrationSource1",
     "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
-    "AuthenticationMode": "Prompt",
+    "AuthenticationMode": "AccessToken",
     "AllowCrossProjectLinking": false,
-    "PersonalAccessToken": "qosss7crwz3vie4fupzpaafjndoy6g6ulgkzhoxtmjgicv2lqjyq",
+    "PersonalAccessToken": "skakun6of2s6bbkxpav6pj7altpko5uirtl6msjqh2qkuxaovwja",
     "LanguageMaps": {
       "AreaPath": "Area",
       "IterationPath": "Iteration"
@@ -20,9 +20,9 @@
     "Collection": "https://dev.azure.com/nkdagility-preview/",
     "Project": "migration Target 1",
     "ReflectedWorkItemIDFieldName": "nkdScrum.ReflectedWorkItemId",
-    "AuthenticationMode": "Prompt",
+    "AuthenticationMode": "AccessToken",
     "AllowCrossProjectLinking": false,
-    "PersonalAccessToken": "qosss7crwz3vie4fupzpaafjndoy6g6ulgkzhoxtmjgicv2lqjyq",
+    "PersonalAccessToken": "skakun6of2s6bbkxpav6pj7altpko5uirtl6msjqh2qkuxaovwja",
     "LanguageMaps": {
       "AreaPath": "Area",
       "IterationPath": "Iteration"
@@ -54,7 +54,7 @@
       "PrefixProjectToNodes": false,
       "UpdateCreatedDate": true,
       "UpdateCreatedBy": true,
-      "WIQLQueryBit": "AND [System.ID] = 1 AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
+      "WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
       "WIQLOrderBit": "[System.ChangedDate] desc",
       "LinkMigration": true,
       "AttachmentMigration": true,
@@ -62,7 +62,7 @@
       "FixHtmlAttachmentLinks": false,
       "SkipToFinalRevisedWorkItemType": false,
       "WorkItemCreateRetryLimit": 5,
-      "FilterWorkItemsThatAlreadyExistInTarget": true,
+      "FilterWorkItemsThatAlreadyExistInTarget": false,
       "PauseAfterEachWorkItem": false,
       "AttachmentMaxSize": 480000000,
       "AttachRevisionHistory": false,

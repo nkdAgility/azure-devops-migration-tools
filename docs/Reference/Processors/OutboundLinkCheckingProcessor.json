@@ -1,0 +1,9 @@
+{
+  "$type": "OutboundLinkCheckingProcessorOptions",
+  "Enabled": false,
+  "WIQLQueryBit": "Select [System.Id] From WorkItems Where [System.TeamProject] = @project and not [System.WorkItemType] contains 'Test Suite, Test Plan,Shared Steps,Shared Parameter,Feedback Request'",
+  "ResultFileName": "c:/temp/OutboundLinks.csv",
+  "ProcessorEnrichers": null,
+  "SourceName": null,
+  "TargetName": null
+}
