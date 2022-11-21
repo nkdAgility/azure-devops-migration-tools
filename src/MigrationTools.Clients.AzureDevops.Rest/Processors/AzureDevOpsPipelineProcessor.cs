@@ -235,7 +235,6 @@ namespace MigrationTools.Processors
             {
                 if (definitionToBeMigrated.Repository.Properties == null) {
                     definitionToBeMigrated.Repository.Properties = new Properties();
-                    definitionToBeMigrated.Repository.Properties.SetDefaults();
                     Log.LogWarning("No repository properties detected, default values have been assigned.");
                 }
                 
