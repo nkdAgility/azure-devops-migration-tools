@@ -341,6 +341,7 @@ namespace MigrationTools.DataContracts.Pipelines
     public partial class Properties
     {
         public string ConnectedServiceId { get; set; }
+        
         public string CleanOptions { get; set; }
 
         public string LabelSources { get; set; }
@@ -357,7 +358,7 @@ namespace MigrationTools.DataContracts.Pipelines
 
         public long FetchDepth { get; set; }
         
-        public void SetDefaults() 
+        public Properties() 
         {
             ConnectedServiceId = null;
             CleanOptions = null;
