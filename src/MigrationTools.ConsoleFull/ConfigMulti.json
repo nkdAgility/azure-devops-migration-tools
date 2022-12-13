@@ -5,13 +5,13 @@
 	"GenerateMigrationComment": false,
 	"Source": {
 		"$type": "TfsTeamProjectConfig",
-		"Collection": "https://dev.azure.com/devopsmkb/",
-		"Project": "Core Projects",
+		"Collection": "https://dev.azure.com/BORO330216",
+		"Project": "Thunder",
 		"ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
 		"AllowCrossProjectLinking": false,
 		"AuthenticationMode": "AccessToken",
-		"PersonalAccessToken": "pjcv6j5ehsnvyeiz2fngke4qf7er22d6w5w4wvm24apc4iyoukpa", //and
-		//"PersonalAccessToken": "op7vtruzcaakp5zjs22zxaukrodztftb2bvdnghbgfrmiwohgpgq", //aji	
+		//"PersonalAccessToken": "lnygw2e6f7sig7mfb7sudn2qwtvhqqwvf2k3aebvfgqykdpbe7ba", //and
+		"PersonalAccessToken": "op7vtruzcaakp5zjs22zxaukrodztftb2bvdnghbgfrmiwohgpgq", //aji	
 		"LanguageMaps": {
 			"AreaPath": "Area",
 			"IterationPath": "Iteration"
@@ -20,16 +20,16 @@
 	"Target": {
 		"$type": "TfsTeamProjectConfig",
 		"Collection": "https://dev.azure.com/ExactGroup/",
-		"Project": "AccountancyClassics",
+		"Project": "TestMigration-DevOn",
 		"ReflectedWorkItemIDFieldName": "TempMigrationField",
 		//"ReflectedWorkItemIDFieldName": "Microsoft.VSTS.Build.IntegrationBuild",
 		"AllowCrossProjectLinking": false,
 		"AuthenticationMode": "AccessToken",
-		"PersonalAccessToken": "hu5vefgwmrhpmlwo5iziw7xp34wb7tgb3qwsdj4uoove2ytxer5a", // and
-		///"PersonalAccessToken": "ypzk2gfdcvtzlfng6s5emanl7ae2x4pr4xaeaudd3walekhq3tiq", // ais
-		//"PersonalAccessToken": "q6kvi2u3swj6pnf5iga72zyl73wn3yxzlav2kx6wpjsppcb557iq", // aji
-		"DummyWorkItemForImageUploads": "321541",
-		"DelayBetweenTwoWorkItems": 750,
+		"PersonalAccessToken": "2lzwqfomhsacdlnjm2kchk2zo2sftp3dhdnbk474ccsjgkwt4yta", // and
+		//"PersonalAccessToken": "dtu7ucaywcx5qjtq2kwy3kkc24pb7sruyptosrl42poy2wjmwcaa", // ais
+		//"PersonalAccessToken": "utaujgfbzxlj4ak3qm3zk5zngmpjm33ay2flx2ls6i47ceyqmzqa", // aji
+		"DummyWorkItemForImageUploads": "178245", // dummy work item on target
+		"DelayBetweenTwoWorkItems": 1150,
 		"WhoToEmail": "a.gothe@devon.nl",
 		"LanguageMaps": {
 			"AreaPath": "Area",
@@ -50,15 +50,11 @@
 			"defaultValue": "New",
 			"valueMapping": {
 				"Approved": "Sprint ready",
-				"Analyze": "Ready for grooming",
 				"New": "New",
 				"Committed": "In Sprint",
-				"In Progress": "In Sprint",
 				"On Hold": "New",
 				"Removed": "Removed",
-				"Done": "Released",
-				"Ready for Test": "Finished",
-				"Tested": "Finished"
+				"Done": "Released"
 			}
 		},
 		{
@@ -69,14 +65,11 @@
 			"defaultValue": "New",
 			"valueMapping": {
 				"Approved": "Approved",
-				"Analyze": "New ",
 				"New": "New",
 				"Committed": "In Sprint",
-				"In Progress": "In Sprint",
 				"Done": "Released",
-				"Removed": "Removed",
-				"Ready for Test": "Finished",
-				"Tested": "Finished"
+				"Removed": "Removed"
+
 			}
 		},
 		{
@@ -116,6 +109,26 @@
 		}
 	],
 	"Processors": [
+
+		//{
+		//	"$type": "TestVariablesMigrationConfig",
+		//	"Enabled": true
+		//},
+		//{
+		//	"$type": "TestConfigurationsMigrationConfig",
+		//	"Enabled": true
+		//},
+		//{
+		//	"$type": "TestPlansAndSuitesMigrationConfig",
+		//	"Enabled": true,
+		//	"PrefixProjectToNodes": false,
+		//	"OnlyElementsWithTag": null,
+		//	"OnlyElementsUnderAreaPath": null,
+		//	"TestPlanQueryBit": null,
+		//	"RemoveInvalidTestSuiteLinks": false,
+		//	"FilterCompleted": false
+		//},
+
 		{
 			"$type": "WorkItemMigrationConfig",
 			"ReplayRevisions": true,
@@ -124,13 +137,14 @@
 			"UpdateCreatedBy": true,
 			"BuildFieldTable": false,
 			"AppendMigrationToolSignatureFooter": false,
-			//"WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Code Review Response', 'Code Review Request', 'Test Case','Shared Steps','Shared Parameter','Test Suite', 'Test Plan') AND [System.AreaPath] NOT UNDER 'Multivers\\Venice' AND [System.ChangedDate] >= '2022-5-15'",
+			//"WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Code Review Response', 'Code Review Request', 'Test Case','Shared Steps','Shared Parameter','Test Suite', 'Test Plan') AND [System.AreaPath] NOT UNDER 'Multivers\\Venice' AND [System.ChangedDate] >= '2022-9-15'",
+			//"WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Code Review Response', 'Code Review Request') [System.AreaPath] NOT UNDER 'Multivers\\Venice' AND [System.ChangedDate] >= '2022-9-15'",
 			//"WIQLQueryBit": "AND [System.WorkItemType] IN ('Shared Steps','Shared Parameter') AND [System.ID] < '68000'",
 			//"WIQLQueryBit": "AND [System.WorkItemType] IN ('Test Case') AND [System.ID] = '62515'",
-			//"WIQLQueryBit": "AND [System.WorkItemType] IN ('Shared Parameter','Shared Steps','Test Case') AND [System.ChangedDate] >= '2022-7-1'",
-			"WIQLQueryBit": "AND [System.ChangedDate] >= '2022-07-01'",
-			//"WIQLQueryBit": "AND [System.ID] in ('297326','297312','297311')",
-			//"WIQLQueryBit": "AND [System.ID] IN ('285343','295453','295464','295465','295466','295520','295530','295531','295545','295594','295615')",
+			//"WIQLQueryBit": "AND [System.WorkItemType] IN ('Shared Parameter','Shared Steps','Test Case') AND [System.ChangedDate] >= '2022-07-20'",
+			//"WIQLQueryBit": "AND [System.ChangedDate] >= '2022-06-1'",
+			"WIQLQueryBit": " AND [System.ID] in (61597)",
+			//"WIQLQueryBit": "AND [System.ID] in (295665,295807,295810,295812,295814,295822,296210,296336,296436,296462,296464,296465,296468,296477,296481,296482,296489,296494,296501,296526,296673,296823,296829,296829,297086,297934,297935,297936,297937)",
 			"WIQLOrderBit": "[System.ID]",
 			"Enabled": true,
 			"LinkMigration": true,

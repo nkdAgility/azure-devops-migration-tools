@@ -2,7 +2,7 @@
   "profiles": {
     "execute": {
       "commandName": "Project",
-      "commandLineArgs": "execute -c Confignewfields.json"
+      "commandLineArgs": "execute -c ConfigMulti.json"
     },
     "init": {
       "commandName": "Project",
