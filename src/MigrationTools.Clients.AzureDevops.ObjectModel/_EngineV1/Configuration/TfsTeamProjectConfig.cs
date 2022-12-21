@@ -16,6 +16,7 @@ namespace MigrationTools._EngineV1.Configuration
         public AuthenticationMode AuthenticationMode { get; set; }
 
         public string PersonalAccessToken { get; set; }
+        public string PersonalAccessTokenVariableName { get; set; }
         public string DummyWorkItemForImageUploads { get; set; }
         public string WhoToEmail { get; set; }
         public int DelayBetweenTwoWorkItems { get; set; }

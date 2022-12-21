@@ -110,12 +110,5 @@
             List of Teams to process. If this is `null` then all teams will be processed.
             </summary>
         </member>
-        <member name="M:MigrationTools._EngineV1.Clients.TfsWorkItemMigrationClient.Find2(MigrationTools._EngineV1.Clients.ReflectedWorkItemId,System.String)">
-            <summary>
-            This is used for Shared Steps and Shared Parameters which don't have the option to add Custom Reflection Fields
-            </summary>
-            <param name="refId"></param>
-            <returns></returns>
-        </member>
     </members>
 </doc>

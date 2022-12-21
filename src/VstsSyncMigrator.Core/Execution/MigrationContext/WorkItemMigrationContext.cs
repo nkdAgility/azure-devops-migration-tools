@@ -46,7 +46,7 @@ namespace VstsSyncMigrator.Engine
         private ILogger contextLog;
         private IAttachmentMigrationEnricher attachmentEnricher;
         private IWorkItemProcessorEnricher embededImagesEnricher;
-        private IWorkItemProcessorEnricher _workItemEmbededLinkEnricher;
+        private TfsWorkItemEmbededLinkEnricher _workItemEmbededLinkEnricher;
         private TfsGitRepositoryEnricher gitRepositoryEnricher;
         private TfsNodeStructure _nodeStructureEnricher;
         private readonly EngineConfiguration _engineConfig;
@@ -164,7 +164,7 @@ namespace VstsSyncMigrator.Engine
                     if (_config.StopMigrationOnMissingAreaIterationNodes)
                     {
                         throw new Exception("Missing Iterations in Target preventing progress, check log for list. If you resolve with a FieldMap set StopMigrationOnMissingAreaIterationNodes = false in the config to continue.");
-                    }                    
+                    }
                 }
                 //////////////////////////////////////////////////
                 contextLog.Information("Found target project as {@destProject}", Engine.Target.WorkItems.Project.Name);
@@ -244,74 +244,73 @@ namespace VstsSyncMigrator.Engine
                         }
                     }
 
-					if (_current % 30 == 0) sendemail(Engine.Source.WorkItems.Project.Name, Engine.Target.Config.AsTeamProjectConfig().WhoToEmail);
+                    if (_current % 30 == 0) sendemail(Engine.Source.WorkItems.Project.Name, Engine.Target.Config.AsTeamProjectConfig().WhoToEmail);
 
-					Log.LogInformation("Sleeping for " + _delayBetweenWI);
-					Thread.Sleep(_delayBetweenWI);
-					Log.LogInformation("Sleeping over!");
-				}
+                    Log.LogInformation("Sleeping for " + _delayBetweenWI);
+                    Thread.Sleep(_delayBetweenWI);
+                    Log.LogInformation("Sleeping over!");
+                }
 
-				// fix embedded links in html fields
-				foreach (var k in _processedWorkItems.Keys)
-				{
-					try
-					{
-						_processedWorkItems[k].Item2.ToWorkItem().Open();
-						_processedWorkItems[k].Item1.ToWorkItem().Open();
-						ProcessWorkItemEmbeddedLinks(_processedWorkItems[k].Item1, _processedWorkItems[k].Item2);
+                // fix embedded links in html fields
+                foreach (var k in _processedWorkItems.Keys)
+                {
+                    try
+                    {
+                        _processedWorkItems[k].Item2.ToWorkItem().Open();
+                        _processedWorkItems[k].Item1.ToWorkItem().Open();
+                        ProcessWorkItemEmbeddedLinks(_processedWorkItems[k].Item1, _processedWorkItems[k].Item2);
 
-						if (_processedWorkItems[k].Item2.ToWorkItem().IsDirty)
-						{
-							_processedWorkItems[k].Item2.SaveToAzureDevOps();
-							Thread.Sleep(150);
-						}
+                        if (_processedWorkItems[k].Item2.ToWorkItem().IsDirty)
+                        {
+                            _processedWorkItems[k].Item2.SaveToAzureDevOps();
+                            Thread.Sleep(150);
+                        }
 
-						_processedWorkItems[k].Item2.ToWorkItem().Close();
-						_processedWorkItems[k].Item1.ToWorkItem().Close();
-						//MigrateInlineLinks.MigrateFor(_targetWorkItems.Values.ToArray());
-					}
-					catch (Exception ex)
-					{
-						contextLog.Error("Error for " + k + ". Will continue with next WI.", ex);
-					}
-				}
+                        _processedWorkItems[k].Item2.ToWorkItem().Close();
+                        _processedWorkItems[k].Item1.ToWorkItem().Close();
+                        //MigrateInlineLinks.MigrateFor(_targetWorkItems.Values.ToArray());
+                    }
+                    catch (Exception ex)
+                    {
+                        contextLog.Error("Error for " + k + ". Will continue with next WI.", ex);
+                    }
+                }
 
-				var creds = new Microsoft.VisualStudio.Services.Common.VssBasicCredential(string.Empty, Engine.Target.Config.AsTeamProjectConfig().PersonalAccessToken);
-				var connection = new Microsoft.VisualStudio.Services.WebApi.VssConnection(Engine.Target.Config.AsTeamProjectConfig().Collection, creds);
-				var targetGuid = ((Project)Engine.Target.WorkItems.GetProject().internalObject).Guid;
-				using (var witClient = connection.GetClient<Microsoft.TeamFoundation.WorkItemTracking.WebApi.WorkItemTrackingHttpClient>())
-				{
-					// fix embedded links in History
-					foreach (var k in _processedWorkItems.Keys)
-					{
-						var wid = int.Parse(_processedWorkItems[k].Item2.Id);
+                var creds = new Microsoft.VisualStudio.Services.Common.VssBasicCredential(string.Empty, Engine.Target.Config.AsTeamProjectConfig().PersonalAccessToken);
+                var connection = new Microsoft.VisualStudio.Services.WebApi.VssConnection(Engine.Target.Config.AsTeamProjectConfig().Collection, creds);
+                var targetGuid = ((Project)Engine.Target.WorkItems.GetProject().internalObject).Guid;
+                using (var witClient = connection.GetClient<Microsoft.TeamFoundation.WorkItemTracking.WebApi.WorkItemTrackingHttpClient>())
+                {
+                    // fix embedded links in History
+                    foreach (var k in _processedWorkItems.Keys)
+                    {
+                        var wid = int.Parse(_processedWorkItems[k].Item2.Id);
 
-						try
-						{
-							var res = witClient.GetCommentsAsync(targetGuid, wid).Result;
+                        try
+                        {
+                            var res = witClient.GetCommentsAsync(targetGuid, wid).Result;
 
-							foreach (var c in res.Comments)
-							{
-								var text = c.Text;
-								var newText = workItemEmbededLinkEnricher.FixLinks(text);
+                            foreach (var c in res.Comments)
+                            {
+                                var text = c.Text;
+                                var newText = _workItemEmbededLinkEnricher.FixLinks(text);
 
-								if (newText != text)
-								{
-									contextLog.Information($"Fixing comment for wi {wid}");
-									var commentUpdate = new Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models.CommentUpdate { Text = newText };
-									var ddd = witClient.UpdateCommentAsync(commentUpdate, targetGuid, wid, c.Id).Result;
-								}
-							}
-						}
-						catch (Exception ex)
-						{
-							contextLog.Error("Error for " + wid + ". Will continue with next WI.", ex);
-						}
-					}
-
-				}
-
-			finally
+                                if (newText != text)
+                                {
+                                    contextLog.Information($"Fixing comment for wi {wid}");
+                                    var commentUpdate = new Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models.CommentUpdate { Text = newText };
+                                    var ddd = witClient.UpdateCommentAsync(commentUpdate, targetGuid, wid, c.Id).Result;
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            contextLog.Error("Error for " + wid + ". Will continue with next WI.", ex);
+                        }
+                    }
+                }
+            }
+            finally
             {
                 if (_config.FixHtmlAttachmentLinks)
                 {
@@ -342,7 +341,7 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        internal static string FixAreaPathAndIterationPathForTargetQuery(string sourceWIQLQueryBit, string sourceProject, string targetProject, ILogger? contextLog)
+        internal string FixAreaPathAndIterationPathForTargetQuery(string sourceWIQLQueryBit, string sourceProject, string targetProject, ILogger? contextLog)
         {
 
             string targetWIQLQueryBit = sourceWIQLQueryBit;
