@@ -27,6 +27,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Config Before Salaris.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="ConfigMulti.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

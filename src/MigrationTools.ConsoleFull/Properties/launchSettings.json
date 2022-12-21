@@ -2,7 +2,7 @@
   "profiles": {
     "execute": {
       "commandName": "Project",
-      "commandLineArgs": "execute -c ConfigMulti.json"
+      "commandLineArgs": "execute -c \"Config Before Salaris.json\""
     },
     "init": {
       "commandName": "Project",
