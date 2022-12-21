@@ -41,7 +41,9 @@ namespace MigrationTools.Processors
                                         {
                                             Enabled = true,
                                             NodeBasePaths = _options.NodeBasePaths,
-                                            PrefixProjectToNodes = _options.PrefixProjectToNodes
+                                            PrefixProjectToNodes = _options.PrefixProjectToNodes,
+                                            AreaMaps = _options.AreaMaps,
+                                            IterationMaps = _options.IterationMaps,
                                         };
             _nodeStructureEnricher.Configure(nodeStructurOptions);
             _nodeStructureEnricher.ProcessorExecutionBegin(null);

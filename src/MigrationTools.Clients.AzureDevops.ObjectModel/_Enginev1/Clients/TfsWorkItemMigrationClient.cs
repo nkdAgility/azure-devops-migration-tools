@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.ApplicationInsights.DataContracts;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools._EngineV1.Configuration;
@@ -30,11 +29,6 @@ namespace MigrationTools._EngineV1.Clients
         public override IMigrationClientConfig Config => _config;
         public override ProjectData Project { get { return _project; } }
         public WorkItemStore Store { get { return _wistore; } }
-
-        public override ReflectedWorkItemId CreateReflectedWorkItemId(WorkItemData workItem)
-        {
-            return new TfsReflectedWorkItemId(workItem);
-        }
 
         public List<WorkItemData> FilterExistingWorkItems(
             List<WorkItemData> sourceWorkItems,
@@ -85,33 +79,9 @@ namespace MigrationTools._EngineV1.Clients
             return FindReflectedWorkItemByReflectedWorkItemId(CreateReflectedWorkItemId(workItemToReflect));
         }
 
-        private static Dictionary<string, WorkItemData> _cache = new Dictionary<string, WorkItemData>();
-        public override WorkItemData FindReflectedWorkItemByReflectedWorkItemIdWithCaching(string refId)
-        {
-            if (_cache.ContainsKey(refId))
-                return _cache[refId];
-
-            var res = FindReflectedWorkItemByReflectedWorkItemId(refId);
-            if (res != null)
-            {
-                _cache[refId] = res;
-            }
-            return res;
-        }
-
         public override WorkItemData FindReflectedWorkItemByReflectedWorkItemId(string refId)
         {
-            string myfield2 = "Microsoft.VSTS.Build.IntegrationBuild";
-            var configuredFieldName = MigrationClient.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName;
-            if (configuredFieldName == "Microsoft.VSTS.Build.IntegrationBuild")
-                myfield2 = "TempMigrationField";
-
-
-            var workItemQueryBuilder = _workItemQueryBuilderFactory.Create();
-            StringBuilder queryBuilder = FindReflectedWorkItemQueryBase(workItemQueryBuilder);
-            queryBuilder.AppendFormat("[{0}] = @idToFind or [{1}] = @idToFind", configuredFieldName, myfield2);
-            workItemQueryBuilder.AddParameter("idToFind", refId.ToString());
-            workItemQueryBuilder.Query = queryBuilder.ToString();
+            var workItemQueryBuilder = CreateReflectedWorkItemQuery(refId);
             return FindWorkItemByQuery(workItemQueryBuilder);
         }
 
@@ -143,41 +113,26 @@ namespace MigrationTools._EngineV1.Clients
             return y.ToProjectData(); // With SingleOrDefault earlier this would result in a NullReferenceException which is hard to debug
         }
 
+        public override ReflectedWorkItemId CreateReflectedWorkItemId(WorkItemData workItem)
+        {
+            return new TfsReflectedWorkItemId(workItem);
+        }
+
         public override ReflectedWorkItemId GetReflectedWorkItemId(WorkItemData workItem)
         {
-            string myfield2 = "Microsoft.VSTS.Build.IntegrationBuild";
-            var configuredFieldName = MigrationClient.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName;
-            if (configuredFieldName == "Microsoft.VSTS.Build.IntegrationBuild")
-                myfield2 = "TempMigrationField";
-
             Log.Debug("GetReflectedWorkItemId: START");
             var local = workItem.ToWorkItem();
-            if (!local.Fields.Contains(configuredFieldName) && !local.Fields.Contains(myfield2))
+
+            if (!local.Fields.Contains(Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName))
             {
                 Log.Debug("GetReflectedWorkItemId: END - no reflected work item id on work item");
                 return null;
             }
-
-            string rwiid = local.Fields[configuredFieldName].Value.ToString();
-
-            if (string.IsNullOrEmpty(rwiid))
-            {
-                rwiid = local.Fields[myfield2].Value.ToString();
-            }
-
+            string rwiid = local.Fields[Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName].Value.ToString();
             if (!string.IsNullOrEmpty(rwiid))
             {
                 Log.Debug("GetReflectedWorkItemId: END - Has ReflectedWorkItemIdField and has value");
-
-                try
-                {
-                    return new TfsReflectedWorkItemId(rwiid);
-                }
-                catch
-                {
-                    rwiid = local.Fields[myfield2].Value.ToString();
-                    return new TfsReflectedWorkItemId(rwiid);
-                }
+                return new TfsReflectedWorkItemId(rwiid);
             }
             Log.Debug("GetReflectedWorkItemId: END - Has ReflectedWorkItemIdField but has no value");
             return null;
@@ -226,17 +181,30 @@ namespace MigrationTools._EngineV1.Clients
             throw new NotImplementedException();
         }
 
+        public override List<int> GetWorkItemIds(string WIQLQuery)
+        {
+            var query = GetWorkItemQuery(WIQLQuery);
+            return query.GetWorkItemIds();
+        }
+
         public override List<WorkItemData> GetWorkItems(string WIQLQuery)
         {
-            var wiqb = _workItemQueryBuilderFactory.Create();
-            wiqb.Query = WIQLQuery;
-            return GetWorkItems(wiqb);
+            var query = GetWorkItemQuery(WIQLQuery);
+            return query.GetWorkItems();
         }
 
         public override List<WorkItemData> GetWorkItems(IWorkItemQueryBuilder queryBuilder)
-        {
+{
             queryBuilder.AddParameter("TeamProject", MigrationClient.Config.AsTeamProjectConfig().Project);
             return queryBuilder.BuildWIQLQuery(MigrationClient).GetWorkItems();
+        }
+
+        private Endpoints.IWorkItemQuery GetWorkItemQuery(string WIQLQuery)
+        {
+            var wiqb = _workItemQueryBuilderFactory.Create();
+            wiqb.Query = WIQLQuery;
+            wiqb.AddParameter("TeamProject", MigrationClient.Config.AsTeamProjectConfig().Project);
+            return wiqb.BuildWIQLQuery(MigrationClient);
         }
 
         protected override void InnerConfigure(IMigrationClient migrationClient, bool bypassRules = true)
@@ -254,29 +222,15 @@ namespace MigrationTools._EngineV1.Clients
 
         protected WorkItemData FindReflectedWorkItemByReflectedWorkItemId(ReflectedWorkItemId refId, bool cache = true)
         {
-            string myfield2 = "Microsoft.VSTS.Build.IntegrationBuild";
-            var configuredFieldName = MigrationClient.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName;
-            if (configuredFieldName == "Microsoft.VSTS.Build.IntegrationBuild")
-                myfield2 = "TempMigrationField";
-
             var foundWorkItem = GetFromCache(refId);
             if (foundWorkItem is null)
             {
-                var wiqb = _workItemQueryBuilderFactory.Create();
-                wiqb.Query = string.Format(@$"SELECT [System.Id] FROM WorkItems WHERE [{configuredFieldName}] = '@idToFind' OR [{myfield2}] = '@idToFind'");
-                wiqb.AddParameter("idToFind", refId.ToString());
-                //wiqb.AddParameter("TeamProject", MigrationClient.Config.AsTeamProjectConfig().Project);
-                var query = wiqb.BuildWIQLQuery(MigrationClient);
+                var workItemQueryBuilder = CreateReflectedWorkItemQuery(refId.ToString());
+                var query = workItemQueryBuilder.BuildWIQLQuery(MigrationClient);
                 var items = query.GetWorkItems();
-
-                foundWorkItem = items.FirstOrDefault(wi => wi.ToWorkItem().Fields[configuredFieldName].Value.ToString() == refId.ToString() || wi.ToWorkItem().Fields[myfield2].Value.ToString() == refId.ToString());
-
-                if (foundWorkItem == null)
-                {
-                    foundWorkItem = Find2(refId, MigrationClient.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName);
-                }
-
-                if (cache && foundWorkItem != null)
+                var reflectedFielName = MigrationClient.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName;
+                foundWorkItem = items.FirstOrDefault(wi => wi.ToWorkItem().Fields[reflectedFielName].Value.ToString() == refId.ToString());
+                if (cache && foundWorkItem is not null)
                 {
                     AddToCache(foundWorkItem);
                 }
@@ -284,46 +238,27 @@ namespace MigrationTools._EngineV1.Clients
             return foundWorkItem;
         }
 
-        /// <summary>
-        /// This is used for Shared Steps and Shared Parameters which don't have the option to add Custom Reflection Fields
-        /// </summary>
-        /// <param name="refId"></param>
-        /// <returns></returns>
-        private WorkItemData Find2(ReflectedWorkItemId refId, string configuredFieldName)
+        private IWorkItemQueryBuilder CreateReflectedWorkItemQuery(string refId)
         {
-            string myfield2 = "Microsoft.VSTS.Build.IntegrationBuild";
-
-            if (configuredFieldName == "Microsoft.VSTS.Build.IntegrationBuild")
-                myfield2 = "TempMigrationField";
-
-            var wiqb = _workItemQueryBuilderFactory.Create();
-            wiqb.Query = string.Format(@$"SELECT [System.Id] FROM WorkItems WHERE [{configuredFieldName}] = '@idToFind' OR [{myfield2}] = '@idToFind'");
-            wiqb.AddParameter("idToFind", refId.ToString());
-            //wiqb.AddParameter("TeamProject", MigrationClient.Config.AsTeamProjectConfig().Project);
-            var query = wiqb.BuildWIQLQuery(MigrationClient);
-            var items = query.GetWorkItems();
-
-            var foundWorkItem = items.FirstOrDefault(wi => wi.ToWorkItem().Fields[MigrationClient.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName].Value.ToString() == refId.ToString());
-            return foundWorkItem;
-        }
-
-        private StringBuilder FindReflectedWorkItemQueryBase(IWorkItemQueryBuilder query)
-        {
-            StringBuilder s = new StringBuilder();
-            s.Append("SELECT [System.Id] FROM WorkItems");
-            s.Append(" WHERE ");
+            var workItemQueryBuilder = _workItemQueryBuilderFactory.Create();
+            StringBuilder queryBuilder = new StringBuilder();
+            queryBuilder.Append("SELECT [System.Id] FROM WorkItems");
+            queryBuilder.Append(" WHERE ");
             if (!MigrationClient.Config.AsTeamProjectConfig().AllowCrossProjectLinking)
             {
-                s.Append("[System.TeamProject]=@TeamProject AND ");
-                query.AddParameter("TeamProject", MigrationClient.Config.AsTeamProjectConfig().Project);
+                queryBuilder.Append("[System.TeamProject]=@TeamProject AND ");
+                workItemQueryBuilder.AddParameter("TeamProject", MigrationClient.Config.AsTeamProjectConfig().Project);
             }
-            return s;
+
+            queryBuilder.AppendFormat("[{0}] = @idToFind", MigrationClient.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName);
+            workItemQueryBuilder.AddParameter("idToFind", refId);
+            workItemQueryBuilder.Query = queryBuilder.ToString();
+            return workItemQueryBuilder;
         }
 
         private WorkItemData FindWorkItemByQuery(IWorkItemQueryBuilder query)
         {
-            List<WorkItemData> newFound;
-            newFound = query.BuildWIQLQuery(MigrationClient).GetWorkItems();
+            var newFound = query.BuildWIQLQuery(MigrationClient).GetWorkItems();
             if (newFound.Count == 0)
             {
                 return null;

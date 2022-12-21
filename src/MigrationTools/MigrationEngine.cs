@@ -17,10 +17,11 @@ namespace MigrationTools
     {
         private readonly ILogger<MigrationEngine> _logger;
         private readonly IServiceProvider _services;
-        private IMigrationClient _Source;
-        private IMigrationClient _Target;
+        private IMigrationClient _source;
+        private IMigrationClient _target;
         private NetworkCredentialsOptions _networkCredentials;
-
+        private ITelemetryLogger _telemetryLogger;
+        private EngineConfiguration _engineConfiguration;
 
         public MigrationEngine(
             IServiceProvider services,
@@ -43,21 +44,27 @@ namespace MigrationTools
             Processors = processors;
             GitRepoMaps = gitRepoMaps;
             ChangeSetMapps = changeSetMapps;
-            Telemetry = telemetry;
-            Config = config.Value;
+            _telemetryLogger = telemetry;
+            _engineConfiguration = config.Value;
         }
 
         public ChangeSetMappingContainer ChangeSetMapps { get; }
-        public EngineConfiguration Config { get; }
+        
         public FieldMapContainer FieldMaps { get; }
+
         public GitRepoMapContainer GitRepoMaps { get; }
+
         public ProcessorContainer Processors { get; }
 
         public IMigrationClient Source
         {
             get
             {
-                return GetSource();
+                if (_source is null)
+                {
+                    _source = GetMigrationClient(_engineConfiguration.Source, _networkCredentials.Source);
+                }
+                return _source;
             }
         }
 
@@ -65,26 +72,19 @@ namespace MigrationTools
         {
             get
             {
-                return GetTarget();
+                if (_target is null)
+                {
+                    _target = GetMigrationClient(_engineConfiguration.Target, _networkCredentials.Target);
+                }
+                return _target;
             }
         }
-
-        public ITelemetryLogger Telemetry { get; }
+        
         public TypeDefinitionMapContainer TypeDefinitionMaps { get; }
-
-        public NetworkCredential CheckForNetworkCredentials(Credentials credentials)
-        {
-            NetworkCredential networkCredentials = null;
-            if (!string.IsNullOrWhiteSpace(credentials.UserName) && !string.IsNullOrWhiteSpace(credentials.Password))
-            {
-                networkCredentials = new NetworkCredential(credentials.UserName, credentials.Password, credentials.Domain);
-            }
-            return networkCredentials;
-        }
 
         public ProcessingStatus Run()
         {
-            Telemetry.TrackEvent("EngineStart",
+            _telemetryLogger.TrackEvent("EngineStart",
                 new Dictionary<string, string> {
                     { "Engine", "Migration" }
                 },
@@ -94,7 +94,7 @@ namespace MigrationTools
                 });
             Stopwatch engineTimer = Stopwatch.StartNew();
 
-            _logger.LogInformation("Logging has been configured and is set to: {LogLevel}. ", Config.LogLevel);
+            _logger.LogInformation("Logging has been configured and is set to: {LogLevel}. ", _engineConfiguration.LogLevel);
             _logger.LogInformation("                              Max Logfile: {FileLogLevel}. ", "Verbose");
             _logger.LogInformation("                              Max Console: {ConsoleLogLevel}. ", "Debug");
             _logger.LogInformation("                 Max Application Insights: {AILogLevel}. ", "Error");
@@ -115,7 +115,7 @@ namespace MigrationTools
                 Stopwatch processorTimer = Stopwatch.StartNew();
                 process.Execute();
                 processorTimer.Stop();
-                Telemetry.TrackEvent("ProcessorComplete", new Dictionary<string, string> { { "Processor", process.Name }, { "Status", process.Status.ToString() } }, new Dictionary<string, double> { { "ProcessingTime", processorTimer.ElapsedMilliseconds } });
+                _telemetryLogger.TrackEvent("ProcessorComplete", new Dictionary<string, string> { { "Processor", process.Name }, { "Status", process.Status.ToString() } }, new Dictionary<string, double> { { "ProcessingTime", processorTimer.ElapsedMilliseconds } });
 
                 if (process.Status == ProcessingStatus.Failed)
                 {
@@ -125,7 +125,7 @@ namespace MigrationTools
                 }
             }
             engineTimer.Stop();
-            Telemetry.TrackEvent("EngineComplete",
+            _telemetryLogger.TrackEvent("EngineComplete",
                 new Dictionary<string, string> {
                     { "Engine", "Migration" }
                 },
@@ -135,26 +135,22 @@ namespace MigrationTools
             return ps;
         }
 
-        private IMigrationClient GetSource()
+        private IMigrationClient GetMigrationClient(IMigrationClientConfig config, Credentials networkCredentials)
         {
-            if (_Source is null)
-            {
-                var credentials = CheckForNetworkCredentials(_networkCredentials.Source);
-                _Source = _services.GetRequiredService<IMigrationClient>();
-                _Source.Configure(Config.Source, credentials);
-            }
-            return _Source;
+            var credentials = CheckForNetworkCredentials(networkCredentials);
+            var client = _services.GetRequiredService<IMigrationClient>();
+            client.Configure(config, credentials);
+            return client;
         }
 
-        private IMigrationClient GetTarget()
+        private NetworkCredential CheckForNetworkCredentials(Credentials credentials)
         {
-            if (_Target is null)
+            NetworkCredential networkCredentials = null;
+            if (!string.IsNullOrWhiteSpace(credentials?.UserName) && !string.IsNullOrWhiteSpace(credentials?.Password))
             {
-                var credentials = CheckForNetworkCredentials(_networkCredentials.Target);
-                _Target = _services.GetRequiredService<IMigrationClient>();
-                _Target.Configure(Config.Target, credentials);
+                networkCredentials = new NetworkCredential(credentials.UserName, credentials.Password, credentials.Domain);
             }
-            return _Target;
+            return networkCredentials;
         }
     }
 }

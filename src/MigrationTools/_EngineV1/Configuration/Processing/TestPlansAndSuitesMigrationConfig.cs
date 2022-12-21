@@ -7,10 +7,14 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         public bool PrefixProjectToNodes { get; set; }
         public bool Enabled { get; set; }
         public string OnlyElementsWithTag { get; set; }
-        public string OnlyElementsUnderAreaPath { get; set; }
         public string TestPlanQueryBit { get; set; }
         public bool RemoveAllLinks { get; set; }
         public int MigrationDelay { get; set; }
+
+        public bool UseCommonNodeStructureEnricherConfig { get; set; }
+        public string[] NodeBasePaths { get; set; }
+        public Dictionary<string, string> AreaMaps { get; set; }
+        public Dictionary<string, string> IterationMaps { get; set; }
 
         public string Processor
         {

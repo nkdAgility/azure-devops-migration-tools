@@ -2,20 +2,29 @@
 
 The Azure DevOps Migration Tools allow you to bulk edit and migrate data between Team Projects on both Microsoft Team Foundation Server (TFS) and Azure DevOps Services. Take a look at the  [documentation](http://nkdagility.github.io/azure-devops-migration-tools/) to find out how. This project is published as [code on GitHub](https://github.com/nkdAgility/azure-devops-migration-tools/) as well as a [Azure DevOps Migration Tools on Chocolatey](https://chocolatey.org/packages/vsts-sync-migrator/).
 
-<a href="https://stackoverflow.com/questions/tagged/azure-devops-migration-tools" title="Ask Questions on Stack Overflow"><img src="http://cdn.sstatic.net/stackexchange/img/logos/so/so-logo.png" width="250"></a>
 
-**Ask Questions on Stack Overflow: https://stackoverflow.com/questions/tagged/azure-devops-migration-tools**
+**Ask Questions on Github: https://github.com/nkdAgility/azure-devops-migration-tools/discussions**
 
-![alt text](https://raw.githubusercontent.com/nkdAgility/azure-devops-migration-tools/master/src/MigrationTools.Extension/images/azure-devops-migration-tools-naked-agility-martin-hinshelwood.png)
+## Some Data from the last 30 days (as of 01/04/2022)
 
-**WARNING: This tool is not designed for a novice. This tool was developed to support the scenarios below, and the edge cases that have been encountered by the 30+ contributors from around the Azure DevOps community. You should be comfortable with the TFS/Azure DevOps object model, as well as debugging code in Visual Studio.**
-**Community support is available through [GitHub](https://github.com/nkdAgility/azure-devops-migration-tools) and [StackOverflow](https://stackoverflow.com/questions/tagged/azure-devops-migration-tools); Paid support is available through our [recommended consultants](http://nkdagility.github.io/azure-devops-migration-tools/#support) as well as our contributors and many DevOps consultants around the world.**
+| Catagory  | Metric | Notes |
+| ------------- | ------------- | ------------- |
+| Work Item Revisions | **14m** | A single Work Item may have many revisions that we need to migrate |
+| Average Work item Migration Time  | **35s** | Work Item (inlcudes all revisions, links, and attachements for the work item) |
+| Git Commit Links  | **480k** |  |
+| Attachments | **252.37k**  | Total number of attachments migrated |
+| Migration Run Ave  | **14 minutes** | Includes dryruns as well.  |
+| Migration Run Total   |  **19bn Seconds** |  |
+
 
 ## What can you do with this tool?
 
 - Migrate `Work Items`, `TestPlans & Suits`, `Teams`, `Shared Queries`, `Pipelines`, & `Processes` from one `Team Project` to another
 - Migrate `Work Items`, `TestPlans & Suits`, `Teams`, `Shared Queries`, `Pipelines`, & `Processes` from one `Organisation` to another
 - Bulk edit of `Work Items` accross an entire `Project`.
+
+**WARNING: This tool is not designed for a novice. This tool was developed to support the scenarios below, and the edge cases that have been encountered by the 30+ contributors from around the Azure DevOps community. You should be comfortable with the TFS/Azure DevOps object model, as well as debugging code in Visual Studio.**
+**Community support is available through [GitHub](https://github.com/nkdAgility/azure-devops-migration-tools/discussions) ; Paid support is available through our [recommended consultants](http://nkdagility.github.io/azure-devops-migration-tools/#support) as well as our contributors and many DevOps consultants around the world.**
 
 ### What versions of Azure DevOps & TFS do you support?
 
@@ -43,6 +52,22 @@ The Azure DevOps Migration Tools allow you to bulk edit and migrate data between
  - [Documentation](http://nkdagility.github.io/azure-devops-migration-tools/)
  - [Questions on Usage](https://stackoverflow.com/questions/tagged/azure-devops-migration-tools)
  - [Bugs and New Features](https://github.com/nkdAgility/azure-devops-migration-tools)
+
+## Support
+
+1. [Question & Discussion](https://github.com/nkdAgility/azure-devops-migration-tools/discussions) - The first place to look for unsage, configuration, and general help. 
+1. [Issues on Gitbub](https://github.com/nkdAgility/azure-devops-migration-tools/issues) - If you have identified a bug and have logs then please raise an issue.
+
+### Professional Support
+
+You can get free support from the community above and on social media on a best effort basis if folks are available. If you are *looking for paid support* [naked Agility with Martin Hinshelwood & Co](https://nkdagility.com) has a number of experts, many of whom contribute to this project, that can help. Find out how [we can help you](https://nkdagility.com/technical-consulting-and-coaching/azure-devops-migration-tools-consulting/) with your migration and [book a free consultation](https://nkdagility.com/technical-consulting-and-coaching/azure-devops-migration-tools-consulting/) to discuss how we can make things easyer.
+
+We use these tools with our customers, and for fun, to do real world migrations on a daily basis and we can:
+
+ - Consult with your internal folks who need help and guidance in runnign the tooling.
+ - Make changes to the tool to support your needs; all additions are commited to the main repo.
+ - Run the migration for you:- you would need to pay for the hours that we would spend baby-sitting the running migrations
+
 
 ## Change Log
 

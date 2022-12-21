@@ -131,6 +131,26 @@ The global configuration created by the `init` command look like this:
       "timeTravel": 1
     }
   ],
+  "CommonEnrichersConfig": [
+    {
+      "$type": "TfsNodeStructureOptions",
+      "Enabled": false,
+      "PrefixProjectToNodes": false,
+      "NodeBasePaths": [
+        "Product\\Area\\Path1",
+        "Product\\Area\\Path2"
+      ],
+      "IterationMaps": {
+        "^OriginalProject\\\\Path1(?=\\\\Sprint 2022)": "TargetProject\\AnotherPath\\NewTeam",
+        "^OriginalProject\\\\Path1(?=\\\\Sprint 2020)": "TargetProject\\AnotherPath\\Archives\\Sprints 2020",
+        "^OriginalProject\\\\Path2": "TargetProject\\YetAnotherPath\\Path2"
+      },
+      "AreaMaps": {
+        "^OriginalProject\\\\(DescopeThis|DescopeThat)": "TargetProject\\Archive\\Descoped\\",
+        "^OriginalProject\\\\(?!DescopeThis|DescopeThat)": "TargetProject\\NewArea\\"
+      },
+    }
+  ],
   "GitRepoMapping": null,
   "LogLevel": "Information",
   "Processors": [
@@ -158,11 +178,45 @@ The global configuration created by the `init` command look like this:
       "AttachmentMaxSize": 480000000,
       "LinkMigrationSaveEachAsAdded": false,
       "GenerateMigrationComment": true,
+      "UseCommonNodeStructureEnricherConfig": false,
       "NodeBasePaths": [
         "Product\\Area\\Path1",
         "Product\\Area\\Path2"
       ],
+      "IterationMaps": {
+        "^OriginalProject\\\\Path1(?=\\\\Sprint 2022)": "TargetProject\\AnotherPath\\NewTeam",
+        "^OriginalProject\\\\Path1(?=\\\\Sprint 2020)": "TargetProject\\AnotherPath\\Archives\\Sprints 2020",
+        "^OriginalProject\\\\Path2": "TargetProject\\YetAnotherPath\\Path2"
+      },
+      "AreaMaps": {
+        "^OriginalProject\\\\(DescopeThis|DescopeThat)": "TargetProject\\Archive\\Descoped\\",
+        "^OriginalProject\\\\(?!DescopeThis|DescopeThat)": "TargetProject\\NewArea\\"
+      },
       "WorkItemIDs": null
+    },
+    {
+      "$type": "TestConfigurationsMigrationConfig",
+      "Enabled": false
+    },
+    {
+        "$type": "TestPlansAndSuitesMigrationConfig",
+        "Enabled": false,
+        "RemoveInvalidTestSuiteLinks": true,
+        "TestPlanQueryBit": "AreaPath UNDER 'Project1' AND PlanName CONTAINS 'Title' AND TestState NOT IN ('Inactive')",
+        "UseCommonNodeStructureEnricherConfig": false,
+        "NodeBasePaths": [
+          "Product\\Area\\Path1",
+          "Product\\Area\\Path2"
+        ],
+        "IterationMaps": {
+          "^OriginalProject\\\\Path1(?=\\\\Sprint 2022)": "TargetProject\\AnotherPath\\NewTeam",
+          "^OriginalProject\\\\Path1(?=\\\\Sprint 2020)": "TargetProject\\AnotherPath\\Archives\\Sprints 2020",
+          "^OriginalProject\\\\Path2": "TargetProject\\YetAnotherPath\\Path2"
+        },
+        "AreaMaps": {
+          "^OriginalProject\\\\(DescopeThis|DescopeThat)": "TargetProject\\Archive\\Descoped\\",
+          "^OriginalProject\\\\(?!DescopeThis|DescopeThat)": "TargetProject\\NewArea\\"
+        }
     }
   ],
   "Version": "11.6",
@@ -188,7 +242,13 @@ For multi Language support you can add the name used in the source and target fo
 
 ### ReflectedWorkItemIDFieldName
 
-This is the field that will be used to store the state for the migration . See [Server Configuration](server-configuration.md)  
+This is the field that will be used to store the state for the migration . See [Server Configuration](server-configuration.md)
+
+### CommonEnrichersConfig
+
+This configuration allows to set the configuration for some enrichers at the global level, and the configuration can
+then be re-used in processors. Currently supported only by `TfsNodeStructureOption`, to be re-used in
+`WorkItemMigrationConfig` and `TestPlansAndSuitesMigrationConfig`.
 
 ### WorkItemMigrationConfig
 You can specify BasePaths for Areas/Iterations to migrate. The area/iteration has to start with that string to be eligible for migration.
@@ -291,3 +351,101 @@ There are a number of field maps available for when you need to change the data 
     }
   ],
   ```
+
+### Iteration Maps and Area Maps
+
+These two configuration elements apply after the `NodeBasePaths` selector, i.e.
+only on Areas and Iterations that have been selected for migration. They allow
+to change the area path, respectively the iteration path, of migrated work items.
+
+These remapping rules are applied both while creating path nodes in the target
+project and when migrating work items.
+
+These remapping rules are applied with a higher priority than the
+`PrefixProjectToNodes` option. This means that if no declared rule matches the
+path and the `PrefixProjectToNodes` option is enabled, then the old behavior is
+used.
+
+The syntax is a dictionary of regular expressions and the replacement text.
+
+*Warning*: These follow the
+[.net regular expression language](https://docs.microsoft.com/en-us/dotnet/standard/base-types/regular-expression-language-quick-reference).
+The key in the dictionary is a regular expression search pattern, while the
+value is a regular expression replacement pattern. It is therefore possible to
+use back-references in the replacement string.
+
+*Warning*: Special characters in the acceptation of regular expressions _and_
+json both need to be escaped. For a key, this means, for example, that a
+litteral backslash must be escaped for the regular expression language `\\`
+_and_ each of these backslashes must then be escaped for the json encoding:
+`\\\\`. In the replacement string, a litteral `$` must be escaped with an
+additional `$` if it is followed by a number (due to the special meaning in
+regular expression replacement strings), while a backslash must be escaped
+(`\\`) due to the special meaning in json.
+
+*Advice*: To avoid unexpected results, always match terminating backslashes in
+the search pattern and replacement string: if a search pattern ends with a
+backslash, you should also put one in the replacement string, and if the search
+pattern does not include a terminating backslash, then none should be included
+in the replacement string.
+
+#### Examples explained
+
+```json
+"IterationMaps": {
+  "^OriginalProject\\\\Path1(?=\\\\Sprint 2022)": "TargetProject\\AnotherPath\\NewTeam",
+  "^OriginalProject\\\\Path1(?=\\\\Sprint 2020)": "TargetProject\\AnotherPath\\Archives\\Sprints 2020",
+  "^OriginalProject\\\\Path2": "TargetProject\\YetAnotherPath\\Path2",
+},
+"AreaMaps": {
+  "^OriginalProject\\\\(DescopeThis|DescopeThat)": "TargetProject\\Archive\\Descoped\\",
+  "^OriginalProject\\\\(?!DescopeThis|DescopeThat)": "TargetProject\\NewArea\\",
+}
+```
+
+- `"^OriginalProject\\\\Path1(?=\\\\Sprint 2022)": "TargetProject\\AnotherPath\\NewTeam",`
+
+  In an iteration path, `OriginalProject\Path1` found at the beginning of the
+  path, when followed by `\Sprint 2022`, will be replaced by
+  `TargetProject\AnotherPath\NewTeam`.
+
+  `OriginalProject\Path1\Sprint 2022\Sprint 01` will become
+  `TargetProject\AnotherPath\NewTeam\Sprint 2022\Sprint 01` but
+  `OriginalProject\Path1\Sprint 2020\Sprint 03` will _not_ be transformed by
+  this rule.
+
+- `"^OriginalProject\\\\Path1(?=\\\\Sprint 2020)": "TargetProject\\AnotherPath\\Archives\\Sprints 2020",`
+
+  In an iteration path, `OriginalProject\Path1` found at the beginning of the
+  path, when followed by `\Sprint 2020`, will be replaced by
+  `TargetProject\AnotherPath\Archives\\Sprints 2020`.
+
+  `OriginalProject\Path1\Sprint 2020\Sprint 01` will become
+  `TargetProject\AnotherPath\Archives\Sprint 2020\Sprint 01` but
+  `OriginalProject\Path1\Sprint 2021\Sprint 03` will _not_ be transformed by
+  this rule.
+
+- `"^OriginalProject\\\\Path2": "TargetProject\\YetAnotherPath\\Path2",`
+
+  In an iteration path, `OriginalProject\Path2` will be replaced by
+  `TargetProject\YetAnotherPath\Path2`.
+
+- `"^OriginalProject\\\\(DescopeThis|DescopeThat)": "TargetProject\\Archive\\Descoped\\",`
+
+  In an area path, `OriginalProject\` found at the beginning of the path, when
+  followed by either `DescopeThis` or `DescopeThat` will be replaced by `TargetProject\Archive\Descoped\`.
+
+  `OriginalProject\DescopeThis\Area` will be transformed to
+  `TargetProject\Archive\Descoped\DescopeThis\Area`.
+  `OriginalProject\DescopeThat\Product` will be transformed to
+  `TargetProject\Archive\Descoped\DescopeThat\Product`.
+
+- `"^OriginalProject\\\\(?!DescopeThis|DescopeThat)": "TargetProject\\NewArea\\",`
+
+  In an area path, `OriginalProject\` found at the beginning of the path will be
+  replaced by `TargetProject\NewArea\` unless it is followed by `DescopeThis` or
+  `DescopeThat`.
+
+  `OriginalProject\ValidArea\` would be replaced by
+  `TargetProject\NewArea\ValidArea\` but `OriginalProject\DescopeThis` would not
+  be modified by this rule.

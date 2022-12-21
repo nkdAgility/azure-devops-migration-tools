@@ -4,6 +4,7 @@
   "MigrateTeamSettings": true,
   "UpdateTeamSettings": true,
   "PrefixProjectToNodes": false,
+  "MigrateTeamCapacities": false,
   "Teams": null,
   "ProcessorEnrichers": null,
   "SourceName": "sourceName",

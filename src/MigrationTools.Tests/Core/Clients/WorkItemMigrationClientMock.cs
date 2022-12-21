@@ -156,5 +156,10 @@ namespace MigrationTools.Clients.Tests
         {
             throw new System.NotImplementedException();
         }
+
+        public List<int> GetWorkItemIds(string WIQLQuery)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

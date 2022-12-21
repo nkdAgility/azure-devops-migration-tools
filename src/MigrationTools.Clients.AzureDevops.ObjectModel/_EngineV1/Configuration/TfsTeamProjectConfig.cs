@@ -28,6 +28,7 @@ namespace MigrationTools._EngineV1.Configuration
             Collection = new Uri("https://dev.azure.com/nkdagility-preview/");
             ReflectedWorkItemIDFieldName = "Custom.ReflectedWorkItemId";
             PersonalAccessToken = "";
+            PersonalAccessTokenVariableName = "";
             AuthenticationMode = AuthenticationMode.Prompt;
             LanguageMaps = new TfsLanguageMapOptions() { AreaPath = "Area", IterationPath = "Iteration" };
             return this;

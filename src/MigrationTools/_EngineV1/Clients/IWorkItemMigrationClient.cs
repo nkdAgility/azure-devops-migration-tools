@@ -20,6 +20,8 @@ namespace MigrationTools._EngineV1.Clients
 
         WorkItemData GetWorkItem(int id);
 
+        List<int> GetWorkItemIds(string WIQLQuery);
+
         List<WorkItemData> GetWorkItems(string WIQLQuery);
 
         List<WorkItemData> GetWorkItems(IWorkItemQueryBuilder queryBuilder);

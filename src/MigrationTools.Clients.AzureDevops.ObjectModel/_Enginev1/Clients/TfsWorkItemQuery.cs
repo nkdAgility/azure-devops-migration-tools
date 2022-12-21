@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools.DataContracts;
@@ -15,7 +16,17 @@ namespace MigrationTools._EngineV1.Clients
         {
         }
 
+        public override List<int> GetWorkItemIds()
+        {
+            return GetInternalWorkItems().Select(wi => wi.Id).ToList();
+        }
+
         public override List<WorkItemData> GetWorkItems()
+        {
+            return GetInternalWorkItems().ToWorkItemDataList();
+        }
+
+        private IList<WorkItem> GetInternalWorkItems()
         {
             Log.Debug("WorkItemQuery: ===========GetWorkItems=============");
             var wiClient = (TfsWorkItemMigrationClient)MigrationClient.WorkItems;
@@ -27,7 +38,7 @@ namespace MigrationTools._EngineV1.Clients
             {
                 Log.Debug("WorkItemQuery: {0}: {1}", item.Key, item.Value);
             }
-            return GetWorkItemsFromQuery(wiClient).ToWorkItemDataList();
+            return GetWorkItemsFromQuery(wiClient);
         }
 
         private IList<WorkItem> GetWorkItemsFromQuery(TfsWorkItemMigrationClient wiClient)
@@ -39,17 +50,20 @@ namespace MigrationTools._EngineV1.Clients
             {
                 Log.Debug("Query sent");
                 var workItemCollection = wiClient.Store.Query(Query);
-                Log.Debug("{0} Work items received, verifying", workItemCollection.Count);
-                foreach (WorkItem item in workItemCollection)
+                if (workItemCollection.Count > 0)
                 {
-                    try
+                    Log.Information("{0} Work items received, verifying", workItemCollection.Count);
+                    foreach (WorkItem item in workItemCollection)
                     {
-                        if (!string.IsNullOrEmpty(item.Title)) // Force to read WI
-                            results.Add(item);
-                    }
-                    catch (DeniedOrNotExistException ex)
-                    {
-                        Log.Error(ex, "Deleted Item detected.");
+                        try
+                        {
+                            if (!string.IsNullOrEmpty(item.Title)) // Force to read WI
+                                results.Add(item);
+                        }
+                        catch (DeniedOrNotExistException ex)
+                        {
+                            Log.Error(ex, "Deleted Item detected.");
+                        }
                     }
                 }
                 timer.Stop();

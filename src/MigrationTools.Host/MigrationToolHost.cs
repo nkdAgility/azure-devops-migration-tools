@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Host.CommandLine;
 using MigrationTools.Host.CustomDiagnostics;
@@ -82,6 +83,7 @@ namespace MigrationTools.Host
                      config.ChangeSetMappingFile = parsed.ChangeSetMappingFile;
                      config.FieldMaps = parsed.FieldMaps;
                      config.GitRepoMapping = parsed.GitRepoMapping;
+                     config.CommonEnrichersConfig = parsed.CommonEnrichersConfig;
                      config.Processors = parsed.Processors;
                      config.Source = parsed.Source;
                      config.Target = parsed.Target;

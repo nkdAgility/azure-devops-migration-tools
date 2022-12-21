@@ -2,15 +2,14 @@
   "Version": "0.0",
   "LogLevel": "Verbose",
   "workaroundForQuerySOAPBugEnabled": false,
-  "GenerateMigrationComment": false,
   "Source": {
     "$type": "TfsTeamProjectConfig",
-    "Collection": "https://dev.azure.com/devopsmkb/",
-    "Project": "FiscaalGemak",
+    "Collection": "https://dev.azure.com/nkdagility-preview/",
+    "Project": "migrationSource1",
     "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
-    "AllowCrossProjectLinking": false,
     "AuthenticationMode": "AccessToken",
-    "PersonalAccessToken": "5sxs2543yegisgchvp2arv4oqbe3rzlotksb32apscve3s42e5ia",
+    "AllowCrossProjectLinking": false,
+    "PersonalAccessToken": "skakun6of2s6bbkxpav6pj7altpko5uirtl6msjqh2qkuxaovwja",
     "LanguageMaps": {
       "AreaPath": "Area",
       "IterationPath": "Iteration"
@@ -18,94 +17,66 @@
   },
   "Target": {
     "$type": "TfsTeamProjectConfig",
-    "Collection": "https://dev.azure.com/ExactGroup/",
-    "Project": "TestMigration-DevOn",
-    "ReflectedWorkItemIDFieldName": "TempMigrationField",
-    "AllowCrossProjectLinking": false,
+    "Collection": "https://dev.azure.com/nkdagility-preview/",
+    "Project": "migration Target 1",
+    "ReflectedWorkItemIDFieldName": "nkdScrum.ReflectedWorkItemId",
     "AuthenticationMode": "AccessToken",
-    "PersonalAccessToken": "2qgltspo3bsh4aspmqc4nv42jrabj7upxnfdb2v7cbvyze5jpnzq",
-    "DummyWorkItemForImageUploads": "172336",
+    "AllowCrossProjectLinking": false,
+    "PersonalAccessToken": "skakun6of2s6bbkxpav6pj7altpko5uirtl6msjqh2qkuxaovwja",
     "LanguageMaps": {
       "AreaPath": "Area",
       "IterationPath": "Iteration"
     }
   },
+  "FieldMaps": [
+    {
+      "$type": "TreeToTagMapConfig",
+      "WorkItemTypeName": "*",
+      "toSkip": 3,
+      "timeTravel": 1
+    }
+  ],
   "WorkItemTypeDefinition": {
     "sourceWorkItemTypeName": "targetWorkItemTypeName"
   },
   "GitRepoMapping": null,
-  "FieldMaps": [
+  "Processors": [
+    //{
+    //  "$type": "WorkItemDeleteConfig",
+    //  "Enabled": true,
+    //  "WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
+    //  "WIQLOrderBit": "[System.ChangedDate] desc"
+    //},
     {
-      "$type": "FieldValueMapConfig",
-      "WorkItemTypeName": "Product Backlog Item",
-      "sourceField": "System.State",
-      "targetField": "System.State",
-      "defaultValue": "New",
-      "valueMapping": {
-        "Approved": "Sprint ready",
-        "New": "New",
-        "Committed": "In Sprint",
-        "On Hold": "New",
-        "Done": "Finished",
-        "Removed": "Removed"
-      }
+      "$type": "WorkItemMigrationConfig",
+      "Enabled": true,
+      "ReplayRevisions": true,
+      "PrefixProjectToNodes": false,
+      "UpdateCreatedDate": true,
+      "UpdateCreatedBy": true,
+      "WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
+      "WIQLOrderBit": "[System.ChangedDate] desc",
+      "LinkMigration": true,
+      "AttachmentMigration": true,
+      "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
+      "FixHtmlAttachmentLinks": false,
+      "SkipToFinalRevisedWorkItemType": false,
+      "WorkItemCreateRetryLimit": 5,
+      "FilterWorkItemsThatAlreadyExistInTarget": false,
+      "PauseAfterEachWorkItem": false,
+      "AttachmentMaxSize": 480000000,
+      "AttachRevisionHistory": false,
+      "LinkMigrationSaveEachAsAdded": false,
+      "GenerateMigrationComment": true,
+      "WorkItemIDs": null,
+      "MaxRevisions": 0,
+      "NodeStructureEnricherEnabled": true,
+      "UseCommonNodeStructureEnricherConfig": false,
+      "NodeBasePaths": [],
+      "AreaMaps": {},
+      "IterationMaps": {},
+      "MaxGracefulFailures": 0
     }
-  ],
-  "Processors":
-    [
-      {
-        "$type": "WorkItemDeleteConfig",
-        "Enabled": true,
-        "WIQLQueryBit": "AND [System.ID] in ('174152') AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
-        "WIQLOrderBit": "[System.ChangedDate] desc"
-      },
-      //{
-      //  "$type": "WorkItemMigrationConfig",
-      //  "ReplayRevisions": true,
-      //  "PrefixProjectToNodes": false,
-      //  "UpdateCreatedDate": true,
-      //  "UpdateCreatedBy": true,
-      //  "BuildFieldTable": false,
-      //  "AppendMigrationToolSignatureFooter": false,
-      //  "WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
-      //  "WIQLOrderBit": "[System.ChangedDate] desc",
-      //  "Enabled": true,
-      //  "LinkMigration": true,
-      //  "AttachmentMigration": true,
-      //  "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
-      //  "FixHtmlAttachmentLinks": false,
-      //  "SkipToFinalRevisedWorkItemType": false,
-      //  "WorkItemCreateRetryLimit": 5,
-      //  "FilterWorkItemsThatAlreadyExistInTarget": true,
-      //  "PauseAfterEachWorkItem": false,
-      //  "AttachmentMaxSize": 480000000,
-      //  "CollapseRevisions": false,
-      //  "LinkMigrationSaveEachAsAdded": true
-      //},
-      {
-        "$type": "WorkItemMigrationConfig",
-        "ReplayRevisions": true,
-        "PrefixProjectToNodes": false,
-        "UpdateCreatedDate": true,
-        "UpdateCreatedBy": true,
-        "BuildFieldTable": false,
-        "AppendMigrationToolSignatureFooter": false,
-        //"WIQLQueryBit": "AND [System.WorkItemType] IN ('Test Suite', 'Test Plan', 'Idea')",
-        "WIQLQueryBit": "AND [System.ID] IN ('289399')",
-        "WIQLOrderBit": "[System.ChangedDate] desc",
-        "Enabled": true,
-        "LinkMigration": true,
-        "AttachmentMigration": true,
-        "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
-        "FixHtmlAttachmentLinks": true,
-        "SkipToFinalRevisedWorkItemType": true,
-        "WorkItemCreateRetryLimit": 5,
-        "FilterWorkItemsThatAlreadyExistInTarget": false,
-        "PauseAfterEachWorkItem": false,
-        "AttachmentMaxSize": 480000000,
-        "CollapseRevisions": false,
-        "LinkMigrationSaveEachAsAdded": true,
-        "GenerateMigrationComment": false
-      }
-    ]
+
+  ]
 }

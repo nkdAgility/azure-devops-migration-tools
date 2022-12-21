@@ -19,7 +19,7 @@ namespace MigrationTools.Enrichers
 {
     public class TfsEmbededImagesEnricher : EmbededImagesRepairEnricherBase
     {
-        private const string RegexPatternForImageUrl = "(?<=<img.*src=\")[^\"]*";
+        private const string RegexPatternForImageUrl = "(?<=<img.*?src=\")[^\"]*";
         private const string RegexPatternForImageFileName = "(?<=FileName=)[^=]*";
         //private const string TargetDummyWorkItemTitle = "***** DELETE THIS - Migration Tool Generated Dummy Work Item For TfsEmbededImagesEnricher *****";
 

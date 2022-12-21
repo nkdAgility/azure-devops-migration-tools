@@ -4,7 +4,9 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation.Framework.Client;
 using Microsoft.TeamFoundation.Framework.Common;
 using Microsoft.TeamFoundation.TestManagement.Client;
@@ -14,6 +16,7 @@ using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Configuration.Processing;
 using MigrationTools._EngineV1.Processors;
 using MigrationTools.DataContracts;
+using MigrationTools.Enrichers;
 using VstsSyncMigrator.Engine.ComponentContext;
 
 namespace VstsSyncMigrator.Engine
@@ -33,9 +36,19 @@ namespace VstsSyncMigrator.Engine
         private TestManagementContext _targetTestStore;
         private int _totalPlans = 0;
         private int _totalTestCases = 0;
+        private TfsNodeStructure _nodeStructureEnricher;
+        private readonly EngineConfiguration _engineConfig;
 
-        public TestPlandsAndSuitesMigrationContext(IMigrationEngine engine, IServiceProvider services, ITelemetryLogger telemetry, ILogger<TestPlandsAndSuitesMigrationContext> logger) : base(engine, services, telemetry, logger)
+        public TestPlandsAndSuitesMigrationContext(IMigrationEngine engine,
+                                                   IServiceProvider services,
+                                                   ITelemetryLogger telemetry,
+                                                   ILogger<TestPlandsAndSuitesMigrationContext> logger,
+                                                   TfsNodeStructure nodeStructureEnricher,
+                                                   IOptions<EngineConfiguration> engineConfig)
+            : base(engine, services, telemetry, logger)
         {
+            _engineConfig = engineConfig.Value;
+            _nodeStructureEnricher = nodeStructureEnricher;
         }
 
         public override string Name
@@ -49,6 +62,25 @@ namespace VstsSyncMigrator.Engine
         public override void Configure(IProcessorConfig config)
         {
             _config = (TestPlansAndSuitesMigrationConfig)config;
+
+            if (_config.UseCommonNodeStructureEnricherConfig)
+            {
+                var nodeStructureOptions =
+                    _engineConfig.CommonEnrichersConfig.OfType<TfsNodeStructureOptions>().FirstOrDefault()
+                    ?? throw new InvalidOperationException("Cannot use common node structure because it is not found.");
+                _nodeStructureEnricher.Configure(nodeStructureOptions);
+            }
+            else
+            {
+                _nodeStructureEnricher.Configure(new TfsNodeStructureOptions()
+                {
+                    Enabled = true,
+                    NodeBasePaths = _config.NodeBasePaths,
+                    PrefixProjectToNodes = _config.PrefixProjectToNodes,
+                    AreaMaps = _config.AreaMaps ?? new Dictionary<string, string>(),
+                    IterationMaps = _config.IterationMaps ?? new Dictionary<string, string>(),
+                });
+            }
         }
 
         protected override void InternalExecute()
@@ -60,41 +92,37 @@ namespace VstsSyncMigrator.Engine
             _sourceIdentityManagementService = Engine.Source.GetService<IIdentityManagementService>();
             _targetIdentityManagementService = Engine.Target.GetService<IIdentityManagementService>();
 
+            _nodeStructureEnricher.ProcessorExecutionBegin(null);
+
             bool filterByCompleted = _config.FilterCompleted;
 
             var stopwatch = Stopwatch.StartNew();
             var starttime = DateTime.Now;
-            ITestPlanCollection sourcePlans = _sourceTestStore.GetTestPlans();
+            var sourcePlans = _sourceTestStore.GetTestPlans();
             List<ITestPlan> toProcess;
             if (filterByCompleted)
             {
-                var targetPlanNames = (from ITestPlan tp in _targetTestStore.GetTestPlans() select tp.Name).ToList();
-                toProcess = (from ITestPlan tp in sourcePlans where !targetPlanNames.Contains(tp.Name) select tp).ToList();
+                var targetPlanNames = _targetTestStore.GetTestPlans().Select(tp => tp.Name).ToList();
+                toProcess = sourcePlans.Where(tp => !targetPlanNames.Contains(tp.Name)).ToList();
             }
             else
             {
-                toProcess = sourcePlans.ToList();
+                toProcess = sourcePlans;
             }
 
             Log.LogInformation("TestPlandsAndSuitesMigrationContext: Plan to copy {0} Plans?", toProcess.Count());
             _currentPlan = 0;
-            _totalPlans = toProcess.Count();
+            _totalPlans = toProcess.Count;
 
             foreach (ITestPlan sourcePlan in toProcess)
             {
                 _currentPlan++;
-                if (CanSkipElementBecauseOfAreaPath(sourcePlan.Id))
-                {
-                    Log.LogInformation("TestPlandsAndSuitesMigrationContext: Skipping Test Plan {Id}:'{Name}' as is not in Area with '{AreaPath}'.", sourcePlan.Id, sourcePlan.Name, _config.OnlyElementsUnderAreaPath);
-                    continue;
-                }
 
                 if (CanSkipElementBecauseOfTags(sourcePlan.Id))
                 {
                     Log.LogInformation("TestPlandsAndSuitesMigrationContext: Skipping Test Plan {Id}:'{Name}' as is not tagged with '{Tag}'.", sourcePlan.Id, sourcePlan.Name, _config.OnlyElementsWithTag);
                     continue;
                 }
-                
                 ProcessTestPlan(sourcePlan);
             }
             _currentPlan = 0;
@@ -122,13 +150,13 @@ namespace VstsSyncMigrator.Engine
                 Log.LogInformation("TestPlandsAndSuitesMigrationContext::AddChildTestCases: Skipping Test Case {Id}:'{Name}' as is not tagged with '{Tag}'.", source.Id, source.Title, _config.OnlyElementsWithTag);
                 return;
             }
-            
+
 
             _totalTestCases = source.TestCases.Count;
             _currentTestCases = 0;
             AddMetric("TestCaseCount", metrics, _totalTestCases);
             InnerLog(source, string.Format("            Suite has {0} test cases", _totalTestCases), 15);
-            List<ITestCase> tcs = new List<ITestCase>();
+            int index = 0;
             foreach (ITestSuiteEntry sourceTestCaseEntry in source.TestCases)
             {
                 _currentTestCases++;
@@ -164,13 +192,12 @@ namespace VstsSyncMigrator.Engine
                     }
                     else
                     {
-                        tcs.Add(targetTestCase);
+                        target.TestCases.InsertCases(index, new List<ITestCase> { targetTestCase });
                         InnerLog(source, string.Format("    Adding {0} : {1} - {2} ", sourceTestCaseEntry.EntryType.ToString(), sourceTestCaseEntry.Id, sourceTestCaseEntry.Title), 15);
                     }
                 }
+                index++;
             }
-
-            target.TestCases.AddCases(tcs);
 
             targetPlan.Save();
             InnerLog(source, string.Format("    SAVED {0} : {1} - {2} ", target.TestSuiteType.ToString(), target.Id, target.Title), 15);
@@ -331,17 +358,8 @@ namespace VstsSyncMigrator.Engine
             var sourceWI = Engine.Source.WorkItems.GetWorkItem(sourceWIId.ToString());
             var targetWI = Engine.Target.WorkItems.GetWorkItem(targetWIId.ToString());
 
-            if (_config.PrefixProjectToNodes)
-            {
-                targetWI.ToWorkItem().AreaPath = string.Format(@"{0}\{1}", Engine.Target.Config.AsTeamProjectConfig().Project, sourceWI.ToWorkItem().AreaPath);
-                targetWI.ToWorkItem().IterationPath = string.Format(@"{0}\{1}", Engine.Target.Config.AsTeamProjectConfig().Project, sourceWI.ToWorkItem().IterationPath);
-            }
-            else
-            {
-                var regex = new Regex(Regex.Escape(Engine.Source.Config.AsTeamProjectConfig().Project));
-                targetWI.ToWorkItem().AreaPath = regex.Replace(sourceWI.ToWorkItem().AreaPath, Engine.Target.Config.AsTeamProjectConfig().Project, 1);
-                targetWI.ToWorkItem().IterationPath = regex.Replace(sourceWI.ToWorkItem().IterationPath, Engine.Target.Config.AsTeamProjectConfig().Project, 1);
-            }
+            targetWI.ToWorkItem().AreaPath = _nodeStructureEnricher.GetNewNodeName(sourceWI.ToWorkItem().AreaPath, TfsNodeStructureType.Area);
+            targetWI.ToWorkItem().IterationPath = _nodeStructureEnricher.GetNewNodeName(sourceWI.ToWorkItem().IterationPath, TfsNodeStructureType.Iteration);
 
             Engine.FieldMaps.ApplyFieldMappings(sourceWI, targetWI);
             targetWI.SaveToAzureDevOps();
@@ -397,13 +415,16 @@ namespace VstsSyncMigrator.Engine
 
                         if (tpa.AssignedTo != null)
                         {
-                            targetIdentity = GetTargetIdentity(tpa.AssignedTo.Descriptor);
-                            if (targetIdentity == null)
-                            {
-                                _sourceIdentityManagementService.RefreshIdentity(tpa.AssignedTo.Descriptor);
-                            }
 
                             targetIdentity = GetTargetIdentity(tpa.AssignedTo.Descriptor);
+
+                            if (targetIdentity == null)
+                            {
+                                if (TryToRefreshTesterIdentity(targetSuite, tpa))
+                                {
+                                    targetIdentity = GetTargetIdentity(tpa.AssignedTo.Descriptor);
+                                }
+                            }
                         }
 
                         // translate source configuration id to target configuration id and name
@@ -448,24 +469,19 @@ namespace VstsSyncMigrator.Engine
             targetSuite?.AssignTestPoints(assignmentsToAdd);
         }
 
-        private bool CanSkipElementBecauseOfAreaPath(int workItemId)
+        private bool TryToRefreshTesterIdentity(ITestSuiteBase targetSuite, ITestPointAssignment tpa)
         {
-            if (_config.OnlyElementsUnderAreaPath == null)
+            try
             {
+                _sourceIdentityManagementService.RefreshIdentity(tpa.AssignedTo.Descriptor);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                InnerLog(targetSuite, string.Format("            Unable to refresh tester identity: {0}", ex.Message), 10);
+                Log.LogWarning("Cannot refresh identity of [{tester}] in target. Cannot assign tester to it.", tpa.AssignedTo.DisplayName);
                 return false;
             }
-
-            var sourcePlanWorkItem = Engine.Source.WorkItems.GetWorkItem(workItemId.ToString());
-            var areaPathWhichMustBePresent = _config.OnlyElementsUnderAreaPath;
-            var sourceAreaPath = sourcePlanWorkItem.ToWorkItem().AreaPath;
-            
-            if (sourcePlanWorkItem.ToWorkItem().AreaPath.Contains(areaPathWhichMustBePresent))
-            {
-                Log.LogInformation("Source AreaPath: {sourceAreaPath} contain [{areaPathWhichMustBePresent}]? ", sourceAreaPath, areaPathWhichMustBePresent);
-                return false;
-            }
-
-            return true;
         }
 
         private bool CanSkipElementBecauseOfTags(int workItemId)
@@ -526,8 +542,8 @@ namespace VstsSyncMigrator.Engine
             targetPlan = _targetTestStore.CreateTestPlan();
             targetPlan.CopyPropertiesFrom(sourcePlan);
             targetPlan.Name = newPlanName;
-            targetPlan.StartDate = sourcePlan.StartDate;
-            targetPlan.EndDate = sourcePlan.EndDate;
+            targetPlan.StartDate = sourcePlan.StartDate != DateTime.MinValue ? sourcePlan.StartDate : DateTime.Now;
+            targetPlan.EndDate = sourcePlan.EndDate != DateTime.MinValue ? sourcePlan.EndDate : targetPlan.StartDate.AddDays(1);
             targetPlan.Description = sourcePlan.Description;
             if (targetPlan is ITestPlan2)
             {
@@ -790,12 +806,16 @@ namespace VstsSyncMigrator.Engine
                 InnerLog(sourcePlan, $" Creating Plan {newPlanName}", 5);
                 targetPlan = CreateNewTestPlanFromSource(sourcePlan, newPlanName);
 
-                
+
                 RemoveInvalidLinks(targetPlan);
                 if (_config.RemoveAllLinks)
                 {
                     targetPlan.Links.Clear();
                 }
+
+                InnerLog(sourcePlan, $" Starte Date {targetPlan.StartDate}", 5);
+                InnerLog(sourcePlan, $" EndDate Plan {targetPlan.EndDate}", 5);
+
                 targetPlan.Save();
 
                 ApplyFieldMappings(sourcePlan.Id, targetPlan.Id);
@@ -812,7 +832,7 @@ namespace VstsSyncMigrator.Engine
             }
             else
             {
-                InnerLog(sourcePlan, $"Found Plan {newPlanName}", 5); ;
+                InnerLog(sourcePlan, $"Found Plan {newPlanName}", 5);
             }
             targetPlan.Save();
             targetPlan.Refresh();
@@ -852,9 +872,9 @@ namespace VstsSyncMigrator.Engine
                 return;
             //////////////////////////////////////////
             var stopwatch = Stopwatch.StartNew();
-            if (_config.MigrationDelay >0 )
+            if (_config.MigrationDelay > 0)
             {
-                System.Threading.Thread.Sleep( _config.MigrationDelay );
+                System.Threading.Thread.Sleep(_config.MigrationDelay);
             }
             var starttime = DateTime.Now;
             var metrics = new Dictionary<string, double>();

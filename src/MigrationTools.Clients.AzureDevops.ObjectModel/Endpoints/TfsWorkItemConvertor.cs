@@ -7,9 +7,8 @@ using Serilog;
 
 namespace MigrationTools.Endpoints
 {
-   public class TfsWorkItemConvertor
+    public class TfsWorkItemConvertor
     {
-
         public void MapWorkItemtoWorkItemData(WorkItemData context_wid, WorkItem context_wi, Dictionary<string, FieldItem> fieldsOfRevision = null)
         {
             context_wid.Id = context_wi.Id.ToString();
@@ -19,7 +18,22 @@ namespace MigrationTools.Endpoints
             context_wid.Rev = fieldsOfRevision != null ? (int)fieldsOfRevision["System.Rev"].Value : context_wi.Rev;
             context_wid.ChangedDate = fieldsOfRevision != null ? (DateTime)fieldsOfRevision["System.ChangedDate"].Value : context_wi.ChangedDate;
 
-            context_wid.Fields = GetFieldItems(context_wi.Fields);
+            var fieldItems = GetFieldItems(context_wi.Fields);
+            if (fieldsOfRevision != null)
+            {
+                foreach (var revField in fieldsOfRevision)
+                {
+                    fieldItems[revField.Key] = new FieldItem
+                    {
+                        Name = revField.Value.Name,
+                        ReferenceName = revField.Value.ReferenceName,
+                        Value = revField.Value.Value,
+                        internalObject = revField.Value.internalObject,
+                    };
+                }
+            }
+
+            context_wid.Fields = fieldItems;
             context_wid.Links = GetLinkItems(context_wi.Links);
             context_wid.Revisions = fieldsOfRevision == null ? GetRevisionItems(context_wi.Revisions) : null;
 
@@ -27,101 +41,92 @@ namespace MigrationTools.Endpoints
 
         private SortedDictionary<int, RevisionItem> GetRevisionItems(RevisionCollection tfsRevisions)
         {
+            var items = tfsRevisions.OfType<Revision>().Select(x => new RevisionItem()
+            {
+                Index = x.Index,
+                Number = (int)x.Fields["System.Rev"].Value,
+                ChangedDate = (DateTime)x.Fields["System.ChangedDate"].Value,
+                Type = x.Fields["System.WorkItemType"].Value as string,
+                Fields = GetFieldItems(x.Fields)
+            }).ToList();
+
             try
             {
-                return new SortedDictionary<int, RevisionItem>((from Revision x in tfsRevisions
-                                                                select new RevisionItem()
-                                                                {
-                                                                    Index = x.Index,
-                                                                    Number = (int)x.Fields["System.Rev"].Value,
-                                                                    ChangedDate = (DateTime)x.Fields["System.ChangedDate"].Value,
-                                                                    Type = x.Fields["System.WorkItemType"].Value as string,
-                                                                    Fields = GetFieldItems(x.Fields)
-                                                                }).ToDictionary(r => r.Number, r => r));
+                var dictionary = items.ToDictionary(item => item.Number);
+                return new SortedDictionary<int, RevisionItem>(dictionary);
             }
-            catch(Exception ex)
+            catch (ArgumentException e)
             {
-                return null;
+                Log.Error(e, "ArgumentException");
+                var currentNumber = -1;
+                foreach (var item in items)
+                {
+                    if (item.Number == currentNumber)
+                    {
+                        item.Number += 1;
+                    }
+                    currentNumber = item.Number;
+                }
+                var dictionary = items.ToDictionary(item => item.Number);
+                return new SortedDictionary<int, RevisionItem>(dictionary);
             }
         }
 
         private Dictionary<string, FieldItem> GetFieldItems(FieldCollection tfsFields)
         {
-            try
+            return tfsFields.OfType<Field>().Select(x => new FieldItem()
             {
-                return (from Field x in tfsFields
-                        select new FieldItem()
-                        {
-                            Name = x.Name,
-                            ReferenceName = x.ReferenceName,
-                            Value = x.Value,
-                            internalObject = x
-                        }).ToDictionary(r => r.ReferenceName, r => r);
-            }
-            catch(Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                Console.WriteLine("Trying again in 30...");
-                System.Threading.Thread.Sleep(30000);
-
-                return (from Field x in tfsFields
-                        select new FieldItem()
-                        {
-                            Name = x.Name,
-                            ReferenceName = x.ReferenceName,
-                            Value = x.Value,
-                            internalObject = x
-                        }).ToDictionary(r => r.ReferenceName, r => r);
-            }
+                Name = x.Name,
+                ReferenceName = x.ReferenceName,
+                Value = x.Value,
+                internalObject = x
+            })
+            .ToDictionary(r => r.ReferenceName);
         }
 
         private List<LinkItem> GetLinkItems(LinkCollection tfsLinks)
         {
             var ls = new List<LinkItem>();
 
-            foreach (Link l in tfsLinks)
+            foreach (Link link in tfsLinks)
             {
-                if (l is Hyperlink)
+                switch (link)
                 {
-                    var lh = (Hyperlink)l;
-                    ls.Add(new LinkItem()
-                    {
-                        LinkType = LinkItemType.Hyperlink,
-                        ArtifactLinkType = l.ArtifactLinkType.Name,
-                        Comment = lh.Comment,
-                        LinkUri = lh.Location,
-                        internalObject = l
-                    });
-                }
-                else if (l is ExternalLink)
-                {
-                    var le = (ExternalLink)l;
-                    ls.Add(new LinkItem()
-                    {
-                        LinkType = LinkItemType.ExternalLink,
-                        ArtifactLinkType = l.ArtifactLinkType.Name,
-                        Comment = le.Comment,
-                        LinkUri = le.LinkedArtifactUri,
-                        internalObject = l
-                    });
-                }
-                else if (l is RelatedLink)
-                {
-                    var lr = (RelatedLink)l;
-                    ls.Add(new LinkItem()
-                    {
-                        LinkType = LinkItemType.RelatedLink,
-                        ArtifactLinkType = l.ArtifactLinkType.Name,
-                        Comment = lr.Comment,
-                        RelatedWorkItem = lr.RelatedWorkItemId,
-                        LinkTypeEndImmutableName = lr.LinkTypeEnd == null ? "" : lr.LinkTypeEnd.ImmutableName,
-                        LinkTypeEndName = lr.LinkTypeEnd == null ? "" : lr.LinkTypeEnd.Name,
-                        internalObject = l
-                    });
-                }
-                else
-                {
-                    Log.Debug("TfsExtensions::GetLinkData: RelatedLink is of ArtifactLinkType '{ArtifactLinkType}' and Type '{GetTypeName}' on WorkItemId: {WorkItemId}", l.ArtifactLinkType.Name, l.GetType().Name, tfsLinks.WorkItem.Id);
+                    case Hyperlink lh:
+                        ls.Add(new LinkItem()
+                        {
+                            LinkType = LinkItemType.Hyperlink,
+                            ArtifactLinkType = link.ArtifactLinkType.Name,
+                            Comment = lh.Comment,
+                            LinkUri = lh.Location,
+                            internalObject = link
+                        });
+                        break;
+                    case ExternalLink le:
+                        ls.Add(new LinkItem()
+                        {
+                            LinkType = LinkItemType.ExternalLink,
+                            ArtifactLinkType = link.ArtifactLinkType.Name,
+                            Comment = le.Comment,
+                            LinkUri = le.LinkedArtifactUri,
+                            internalObject = link
+                        });
+                        break;
+                    case RelatedLink lr:
+                        ls.Add(new LinkItem()
+                        {
+                            LinkType = LinkItemType.RelatedLink,
+                            ArtifactLinkType = link.ArtifactLinkType.Name,
+                            Comment = lr.Comment,
+                            RelatedWorkItem = lr.RelatedWorkItemId,
+                            LinkTypeEndImmutableName = lr.LinkTypeEnd == null ? "" : lr.LinkTypeEnd.ImmutableName,
+                            LinkTypeEndName = lr.LinkTypeEnd == null ? "" : lr.LinkTypeEnd.Name,
+                            internalObject = link
+                        });
+                        break;
+                    default:
+                        Log.Debug("TfsExtensions::GetLinkData: RelatedLink is of ArtifactLinkType '{ArtifactLinkType}' and Type '{GetTypeName}' on WorkItemId: {WorkItemId}", link.ArtifactLinkType.Name, link.GetType().Name, tfsLinks.WorkItem.Id);
+                        break;
                 }
             }
             return ls;

@@ -5,15 +5,10 @@ using MigrationTools.Endpoints;
 namespace MigrationTools.Processors
 {
     /// <summary>
-    /// The `TfsSharedQueryProcessor` enabled you to migrate queries from one locatio nto another.
+    /// The `TfsSharedQueryProcessor` enabled you to migrate queries from one location to another.
     /// </summary>
     public class TfsSharedQueryProcessorOptions : ProcessorOptions
     {
-        /// <summary>
-        /// The name of the shared folder, setting the default name
-        /// </summary>
-        private string sharedFolderName = "Shared Queries";
-
         /// <summary>
         /// Do we add the source project name into the folder path
         /// </summary>
@@ -24,11 +19,7 @@ namespace MigrationTools.Processors
         /// The name of the shared folder, made a parameter incase it every needs to be edited
         /// </summary>
         /// <default>Shared Queries</default>
-        public string SharedFolderName
-        {
-            get { return sharedFolderName; }
-            set { sharedFolderName = value; }
-        }
+        public string SharedFolderName { get; set; } = "Shared Queries";
 
         /// <summary>
         /// Mapping of the source to the target
