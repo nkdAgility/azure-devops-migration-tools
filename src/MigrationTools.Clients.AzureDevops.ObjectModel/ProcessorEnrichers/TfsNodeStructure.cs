@@ -304,7 +304,10 @@ namespace MigrationTools.Enrichers
             {
                 // We work on the system paths, but user-friendly paths are used in maps
                 var userFriendlyPath = GetUserFriendlyPath(item.Attributes["Path"].Value);
-
+                if (userFriendlyPath.Contains("+"))
+                {
+                    userFriendlyPath = userFriendlyPath.Replace("+", "plus");
+                }
                 var shouldCreateNode = ShouldCreateNode(userFriendlyPath);
                 var isParentOfSelectedBasePath = CheckIsParentOfSelectedBasePath(userFriendlyPath);
                 if (!shouldCreateNode && !isParentOfSelectedBasePath)
