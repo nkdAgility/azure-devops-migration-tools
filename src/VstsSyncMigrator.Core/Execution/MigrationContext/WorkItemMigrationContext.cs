@@ -504,11 +504,11 @@ namespace VstsSyncMigrator.Engine
                     newWorkItem.Fields["Microsoft.VSTS.Common.Priority"].Value =
                         oldWorkItem.Fields["Microsoft.VSTS.Common.Priority"].Value;
                     break;
-                case "Bug":
-                    newWorkItem.Fields["Custom.RejectionReason"].Value = oldWorkItem.Fields.Contains("System.State")
-                       && oldWorkItem.Fields["System.State"].Value != null
-                       && oldWorkItem.Fields["System.State"].Value.ToString() == "Rejected" ? oldWorkItem.Fields["System.Reason"].Value : "";
-                    break;
+                //case "Bug":
+                //    newWorkItem.Fields["Custom.RejectionReason"].Value = oldWorkItem.Fields.Contains("System.State")
+                //       && oldWorkItem.Fields["System.State"].Value != null
+                //       && oldWorkItem.Fields["System.State"].Value.ToString() == "Rejected" ? oldWorkItem.Fields["System.Reason"].Value : "";
+                //    break;
             }
 
             if (newWorkItem.Fields.Contains("Microsoft.VSTS.Common.BacklogPriority")
@@ -519,11 +519,11 @@ namespace VstsSyncMigrator.Engine
 
             var description = new StringBuilder();
             description.Append(oldWorkItem.Description);
-            if (destType == "Feature")
-            {
-                description.Append(oldWorkItem.Fields["Exact.EOL.UserStory"].Value.ToString() + oldWorkItem.Fields["Microsoft.VSTS.Common.DescriptionHtml"].Value.ToString());
-                oldWorkItem.Fields["Microsoft.VSTS.Common.AcceptanceCriteria"].Value = oldWorkItem.Fields["Microsoft.VSTS.Common.AcceptanceCriteria"].Value.ToString() + oldWorkItem.Fields["Exact.EOL.HowToDemo"].Value.ToString();
-            }
+            //if (destType == "Feature")
+            //{
+            //    description.Append(oldWorkItem.Fields["Exact.EOL.UserStory"].Value.ToString() + oldWorkItem.Fields["Microsoft.VSTS.Common.DescriptionHtml"].Value.ToString());
+            //    oldWorkItem.Fields["Microsoft.VSTS.Common.AcceptanceCriteria"].Value = oldWorkItem.Fields["Microsoft.VSTS.Common.AcceptanceCriteria"].Value.ToString() + oldWorkItem.Fields["Exact.EOL.HowToDemo"].Value.ToString();
+            //}
             newWorkItem.Description = description.ToString();
             fieldMappingTimer.Stop();
         }

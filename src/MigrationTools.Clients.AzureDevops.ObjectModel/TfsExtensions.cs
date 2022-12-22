@@ -64,8 +64,24 @@ namespace MigrationTools
 
         public static void SaveToAzureDevOps(this WorkItemData context)
         {
+            //DoPrechecks(context);
+
+            if (context.Fields["System.WorkItemType"].Value.ToString() == "Bug")
+            {
+                if (string.IsNullOrEmpty(context.Fields["Microsoft.VSTS.TCM.ReproSteps"].Value as string))
+                {
+                    context.ToWorkItem().Fields["Microsoft.VSTS.TCM.ReproSteps"].Value = "."; // this is a mandatory field
+                }
+            }
+
+
+            ActualSave(context);
+        }
+
+        private static void ActualSave(WorkItemData context)
+        {
             var timer = System.Diagnostics.Stopwatch.StartNew();
-            Log.Debug("TfsExtensions::SaveToAzureDevOps");
+            Log.Verbose("TfsExtensions::SaveToAzureDevOps");
 
             if (context == null) throw new ArgumentNullException(nameof(context));
             var workItem = (WorkItem)context.internalObject;
@@ -74,13 +90,13 @@ namespace MigrationTools
             if (fails.Count > 0)
             {
                 Log.Warning("Work Item is not ready to save as it has some invalid fields. This may not result in an error. Enable LogLevel as 'Debug' in the config to see more.");
-                Log.Debug("--------------------------------------------------------------------------------------------------------------------");
-                Log.Debug("--------------------------------------------------------------------------------------------------------------------");
+                Log.Verbose("--------------------------------------------------------------------------------------------------------------------");
+                Log.Verbose("--------------------------------------------------------------------------------------------------------------------");
                 foreach (Field f in fails)
                 {
-                    Log.Debug("Invalid Field Object:\r\n{Field}", f.ToJson());
+                    Log.Verbose("Invalid Field Object:\r\n{Field}", f.ToJson());
                 }
-                Log.Debug("--------------------------------------------------------------------------------------------------------------------");
+                Log.Verbose("--------------------------------------------------------------------------------------------------------------------");
                 Log.Debug("--------------------------------------------------------------------------------------------------------------------");
             }
 
