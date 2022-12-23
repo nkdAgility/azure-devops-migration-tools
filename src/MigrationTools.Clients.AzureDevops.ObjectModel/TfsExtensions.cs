@@ -65,13 +65,25 @@ namespace MigrationTools
         public static void SaveToAzureDevOps(this WorkItemData context)
         {
             //DoPrechecks(context);
-
-            if (context.Fields["System.WorkItemType"].Value.ToString() == "Bug")
+            var wi = context.ToWorkItem();
+            if (wi.Fields["System.WorkItemType"].Value.ToString() == "Bug")
             {
-                if (string.IsNullOrEmpty(context.Fields["Microsoft.VSTS.TCM.ReproSteps"].Value as string))
+                if (string.IsNullOrEmpty(wi.Fields["Microsoft.VSTS.TCM.ReproSteps"].Value as string))
                 {
-                    context.ToWorkItem().Fields["Microsoft.VSTS.TCM.ReproSteps"].Value = "."; // this is a mandatory field
+                    wi.Fields["Microsoft.VSTS.TCM.ReproSteps"].Value = "."; // this is a mandatory field
                 }
+                if (wi.Fields["System.State"].Value.ToString() == "Rejected")
+                {
+                    wi.Fields["Custom.RejectionReason"].Value = wi.Fields["System.Reason"].Value;
+                    //    newWorkItem.Fields["Custom.RejectionReason"].Value = oldWorkItem.Fields.Contains("System.State")
+                    //       && oldWorkItem.Fields["System.State"].Value != null
+                    //       && oldWorkItem.Fields["System.State"].Value.ToString() == "Rejected" ? oldWorkItem.Fields["System.Reason"].Value : "";
+                    //    break;
+                }
+                //if (wi.Fields["System.State"].Value.ToString() == "Finished")
+                //{
+                //    wi.Fields["Custom.RejectionReason"].Value = wi.Fields["System.Reason"].Value;
+                //}
             }
 
 
@@ -107,7 +119,7 @@ namespace MigrationTools
             }
             catch (System.FormatException ex)
             {
-                Console.WriteLine(ex);
+                Log.Error(ex,"Error while saving work item");
                 Console.WriteLine(ex.StackTrace);
                 Console.WriteLine("ignoring");
                 Log.Error("ignoring", ex);
@@ -115,7 +127,7 @@ namespace MigrationTools
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Log.Error(ex, "Error while saving work item");
                 Console.WriteLine(ex.StackTrace);
                 Console.WriteLine("Trying again in 30...");
                 System.Threading.Thread.Sleep(30000);

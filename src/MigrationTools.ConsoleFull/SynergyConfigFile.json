@@ -49,18 +49,15 @@
       "targetField": "System.State",
       "defaultValue": "New",
       "valueMapping": {
-        "New": "New",
-        "Realised": "Finished",
+        "Approved": "Approved",
+        "Done" : "Finished",
+        "Development Estimated" : "Approved",
         "Removed": "Removed",
-        "Done": "Done",
-        "Released": "Released",
-        "Committed": "New",
-        "Development Estimated": "New",
-        "Discard": "New",
-        "Approved": "New"
-
-
-      }
+        "Released" : "Released",
+        "Discard": "Removed",
+        "New" : "New",
+        "Realised": "Released",
+        "Rejected" : "Removed"   }
     },
     {
       "$type": "FieldtoFieldMapConfig",
@@ -133,7 +130,7 @@
       //"WIQLQueryBit": "AND [System.WorkItemType] IN ('Test Case') AND [System.ID] = '62515'",
       //"WIQLQueryBit": "AND [System.WorkItemType] IN ('Shared Parameter','Shared Steps','Test Case') AND [System.ChangedDate] >= '2022-7-1'",
       //"WIQLQueryBit": "AND [System.ChangedDate] >= '2022-07-01'",
-      "WIQLQueryBit": "AND [System.ID] IN ('268170')",
+      "WIQLQueryBit": "AND [System.ID] IN ('267596')",
       //"WIQLQueryBit": "AND [System.ID] in ('297326','297312','297311')",
       //"WIQLQueryBit": "AND [System.ID] IN ('285343','295453','295464','295465','295466','295520','295530','295531','295545','295594','295615')",
       "WIQLOrderBit": "[System.ID]",
@@ -151,7 +148,7 @@
       "LinkMigrationSaveEachAsAdded": true,
       "GenerateMigrationComment": false,
       "NodeStructureEnricherEnabled": true,
-      "NodeBasePaths": [ "" ]
+      "NodeBasePaths": []
     }
   ]
 }

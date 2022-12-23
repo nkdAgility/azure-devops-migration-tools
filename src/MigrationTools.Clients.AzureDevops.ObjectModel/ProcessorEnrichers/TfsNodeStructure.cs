@@ -106,7 +106,12 @@ namespace MigrationTools.Enrichers
                 throw new InvalidOperationException($"This path is not anchored in the source project name: {sourceNodePath}");
             }
 
-            return Regex.Replace(sourceNodePath, lastResortRule.Key, lastResortRule.Value);
+            var result =  Regex.Replace(sourceNodePath, lastResortRule.Key, lastResortRule.Value);
+            if (result.Contains("+"))
+            {
+                result = result.Replace("+", "plus");
+            }
+            return result;
         }
 
         private KeyValuePair<string, string> GetLastResortRemappingRule()
@@ -304,10 +309,6 @@ namespace MigrationTools.Enrichers
             {
                 // We work on the system paths, but user-friendly paths are used in maps
                 var userFriendlyPath = GetUserFriendlyPath(item.Attributes["Path"].Value);
-                if (userFriendlyPath.Contains("+"))
-                {
-                    userFriendlyPath = userFriendlyPath.Replace("+", "plus");
-                }
                 var shouldCreateNode = ShouldCreateNode(userFriendlyPath);
                 var isParentOfSelectedBasePath = CheckIsParentOfSelectedBasePath(userFriendlyPath);
                 if (!shouldCreateNode && !isParentOfSelectedBasePath)
