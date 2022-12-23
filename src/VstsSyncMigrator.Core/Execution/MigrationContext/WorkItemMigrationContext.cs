@@ -491,7 +491,7 @@ namespace VstsSyncMigrator.Engine
                 }
             }
 
-            if (_nodeStructureEnricher.Options.Enabled)
+            //if (_nodeStructureEnricher.Options.Enabled)
             {
                 newWorkItem.AreaPath = _nodeStructureEnricher.GetNewNodeName(oldWorkItem.AreaPath, TfsNodeStructureType.Area);
                 newWorkItem.IterationPath = _nodeStructureEnricher.GetNewNodeName(oldWorkItem.IterationPath, TfsNodeStructureType.Iteration);
@@ -504,11 +504,20 @@ namespace VstsSyncMigrator.Engine
                     newWorkItem.Fields["Microsoft.VSTS.Common.Priority"].Value =
                         oldWorkItem.Fields["Microsoft.VSTS.Common.Priority"].Value;
                     break;
-                //case "Bug":
-                //    newWorkItem.Fields["Custom.RejectionReason"].Value = oldWorkItem.Fields.Contains("System.State")
-                //       && oldWorkItem.Fields["System.State"].Value != null
-                //       && oldWorkItem.Fields["System.State"].Value.ToString() == "Rejected" ? oldWorkItem.Fields["System.Reason"].Value : "";
-                //    break;
+                case "Bug":
+                    if (oldWorkItem.Fields["System.State"].Value.ToString() == "Rejected") // custom rule as requested by YS
+                    {
+                        newWorkItem.Fields["Custom.RejectionReason"].Value = oldWorkItem.Fields["System.Reason"].Value;
+                    }
+                    if (oldWorkItem.Fields["System.State"].Value.ToString() == "Processed" || oldWorkItem.Fields["System.State"].Value.ToString() == "Resolved") // custom ruls as requested by YS
+                    {
+                        if (newWorkItem.Fields["Custom.Customerimpact"].Value == null || newWorkItem.Fields["Custom.Customerimpact"].Value.ToString() == string.Empty)
+                            newWorkItem.Fields["Custom.Customerimpact"].Value = "3 - Low";
+
+                        if (newWorkItem.Fields["Custom.Technicalrisk"].Value == null || newWorkItem.Fields["Custom.Technicalrisk"].Value.ToString() == string.Empty)
+                            newWorkItem.Fields["Custom.Technicalrisk"].Value = "3 - Low";
+                    }
+                    break;
             }
 
             if (newWorkItem.Fields.Contains("Microsoft.VSTS.Common.BacklogPriority")

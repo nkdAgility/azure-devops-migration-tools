@@ -10,8 +10,8 @@
     "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
     "AllowCrossProjectLinking": false,
     "AuthenticationMode": "AccessToken",
-    "PersonalAccessToken": "", //and
-    //"PersonalAccessToken": "op7vtruzcaakp5zjs22zxaukrodztftb2bvdnghbgfrmiwohgpgq", //aji	
+    //"PersonalAccessToken": "", //and
+    "PersonalAccessToken": "",
     "LanguageMaps": {
       "AreaPath": "Area",
       "IterationPath": "Iteration"
@@ -25,9 +25,7 @@
     //"ReflectedWorkItemIDFieldName": "Microsoft.VSTS.Build.IntegrationBuild",
     "AllowCrossProjectLinking": false,
     "AuthenticationMode": "AccessToken",
-    "PersonalAccessToken": "", // and
-    ///"PersonalAccessToken": "ypzk2gfdcvtzlfng6s5emanl7ae2x4pr4xaeaudd3walekhq3tiq", // ais
-    //"PersonalAccessToken": "q6kvi2u3swj6pnf5iga72zyl73wn3yxzlav2kx6wpjsppcb557iq", // aji
+    "PersonalAccessToken": "", 
     "DummyWorkItemForImageUploads": "267120",
     "DelayBetweenTwoWorkItems": 750,
     "WhoToEmail": "a.gothe@devon.nl",
@@ -50,14 +48,19 @@
       "defaultValue": "New",
       "valueMapping": {
         "Approved": "Approved",
-        "Done" : "Finished",
-        "Development Estimated" : "Approved",
+        "Active": "Approved",
+        "Proposed": "New",
+        "Done": "Finished",
+        "Development Estimated": "Approved",
         "Removed": "Removed",
-        "Released" : "Released",
+        "Released": "Released",
         "Discard": "Removed",
-        "New" : "New",
-        "Realised": "Released",
-        "Rejected" : "Removed"   }
+        "New": "New",
+        "Realized": "In Sprint",
+        "Rejected": "Removed",
+        "Processed": "Finished",
+        "Resolved": "Finished"
+      }
     },
     {
       "$type": "FieldtoFieldMapConfig",
@@ -130,7 +133,7 @@
       //"WIQLQueryBit": "AND [System.WorkItemType] IN ('Test Case') AND [System.ID] = '62515'",
       //"WIQLQueryBit": "AND [System.WorkItemType] IN ('Shared Parameter','Shared Steps','Test Case') AND [System.ChangedDate] >= '2022-7-1'",
       //"WIQLQueryBit": "AND [System.ChangedDate] >= '2022-07-01'",
-      "WIQLQueryBit": "AND [System.ID] IN ('267596')",
+      "WIQLQueryBit": "AND [System.ID] IN ('23395')",
       //"WIQLQueryBit": "AND [System.ID] in ('297326','297312','297311')",
       //"WIQLQueryBit": "AND [System.ID] IN ('285343','295453','295464','295465','295466','295520','295530','295531','295545','295594','295615')",
       "WIQLOrderBit": "[System.ID]",
@@ -147,7 +150,7 @@
       "CollapseRevisions": false,
       "LinkMigrationSaveEachAsAdded": true,
       "GenerateMigrationComment": false,
-      "NodeStructureEnricherEnabled": true,
+      "NodeStructureEnricherEnabled": false,
       "NodeBasePaths": []
     }
   ]

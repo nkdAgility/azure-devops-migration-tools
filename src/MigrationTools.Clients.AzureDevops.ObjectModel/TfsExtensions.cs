@@ -72,18 +72,7 @@ namespace MigrationTools
                 {
                     wi.Fields["Microsoft.VSTS.TCM.ReproSteps"].Value = "."; // this is a mandatory field
                 }
-                if (wi.Fields["System.State"].Value.ToString() == "Rejected")
-                {
-                    wi.Fields["Custom.RejectionReason"].Value = wi.Fields["System.Reason"].Value;
-                    //    newWorkItem.Fields["Custom.RejectionReason"].Value = oldWorkItem.Fields.Contains("System.State")
-                    //       && oldWorkItem.Fields["System.State"].Value != null
-                    //       && oldWorkItem.Fields["System.State"].Value.ToString() == "Rejected" ? oldWorkItem.Fields["System.Reason"].Value : "";
-                    //    break;
-                }
-                //if (wi.Fields["System.State"].Value.ToString() == "Finished")
-                //{
-                //    wi.Fields["Custom.RejectionReason"].Value = wi.Fields["System.Reason"].Value;
-                //}
+
             }
 
 
@@ -102,13 +91,28 @@ namespace MigrationTools
             if (fails.Count > 0)
             {
                 Log.Warning("Work Item is not ready to save as it has some invalid fields. This may not result in an error. Enable LogLevel as 'Debug' in the config to see more.");
-                Log.Verbose("--------------------------------------------------------------------------------------------------------------------");
+                Log.Warning("--------------------------------------------------------------------------------------------------------------------");
                 Log.Verbose("--------------------------------------------------------------------------------------------------------------------");
                 foreach (Field f in fails)
                 {
-                    Log.Verbose("Invalid Field Object:\r\n{Field}", f.ToJson());
+                    Log.Warning("Invalid Field Object:\r\n{Field}", f.ToJson());
+
+                    if(f.ReferenceName == "System.AreaPath")
+                    {
+                        var newAreaPath = f.Value.ToString().Substring(0,f.Value.ToString().IndexOf("\\"));
+                        workItem.Fields["System.AreaPath"].Value = newAreaPath; 
+                        Log.Warning($"Changing areapath {f.Value} -> {newAreaPath}");
+                    }
+
+
+                    if (f.ReferenceName == "System.IterationPath")
+                    {
+                        var newPath = f.Value.ToString().Substring(0, f.Value.ToString().IndexOf("\\"));
+                        workItem.Fields["System.IterationPath"].Value = newPath;
+                        Log.Warning($"Changing iteration {f.Value} -> {newPath}");
+                    }
                 }
-                Log.Verbose("--------------------------------------------------------------------------------------------------------------------");
+                Log.Warning("--------------------------------------------------------------------------------------------------------------------");
                 Log.Debug("--------------------------------------------------------------------------------------------------------------------");
             }
 
