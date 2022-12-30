@@ -509,7 +509,7 @@ namespace VstsSyncMigrator.Engine
                     {
                         newWorkItem.Fields["Custom.RejectionReason"].Value = oldWorkItem.Fields["System.Reason"].Value;
                     }
-                    if (oldWorkItem.Fields["System.State"].Value.ToString() == "Processed" || oldWorkItem.Fields["System.State"].Value.ToString() == "Resolved") // custom ruls as requested by YS
+                    if (oldWorkItem.Fields["System.State"].Value.ToString() == "Processed" || oldWorkItem.Fields["System.State"].Value.ToString() == "Resolved" || oldWorkItem.Fields["System.State"].Value.ToString() == "Realized" || oldWorkItem.Fields["System.State"].Value.ToString() == "Closed") // custom ruls as requested by YS
                     {
                         if (newWorkItem.Fields["Custom.Customerimpact"].Value == null || newWorkItem.Fields["Custom.Customerimpact"].Value.ToString() == string.Empty)
                             newWorkItem.Fields["Custom.Customerimpact"].Value = "3 - Low";
