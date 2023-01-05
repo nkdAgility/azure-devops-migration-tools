@@ -1,0 +1,156 @@
+{
+  "Version": "0.0",
+  "LogLevel": "Verbose",
+  "workaroundForQuerySOAPBugEnabled": false,
+  "GenerateMigrationComment": false,
+  "Source": {
+    "$type": "TfsTeamProjectConfig",
+    "Collection": "https://tfs.ap.exactsoftware.com:8088/tfs/APCollection",
+    "Project": "SYN_MAIN-Codebase",
+    "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
+    "AllowCrossProjectLinking": false,
+    "AuthenticationMode": "AccessToken",
+    //"PersonalAccessToken": "", //and
+    "PersonalAccessToken": "zikayekda72f5nu7z2egk5w6lexnejvdp2wm7fc2iaq4cae4shiq",
+    "LanguageMaps": {
+      "AreaPath": "Area",
+      "IterationPath": "Iteration"
+    }
+  },
+  "Target": {
+    "$type": "TfsTeamProjectConfig",
+    "Collection": "https://dev.azure.com/ExactGroup/",
+    "Project": "Exact-Synergy",
+    "ReflectedWorkItemIDFieldName": "TempMigrationField",
+    //"ReflectedWorkItemIDFieldName": "Microsoft.VSTS.Build.IntegrationBuild",
+    "AllowCrossProjectLinking": false,
+    "AuthenticationMode": "AccessToken",
+    "PersonalAccessToken": "2zox23qvsw4hlamfff5s2rrlsiwioafyclega5inu5t67lu7qnuq",
+    "DummyWorkItemForImageUploads": "424117",
+    "DelayBetweenTwoWorkItems": 750,
+    "WhoToEmail": "a.gudala@devon.nl",
+    "LanguageMaps": {
+      "AreaPath": "Area",
+      "IterationPath": "Iteration"
+    }
+  },
+  "WorkItemTypeDefinition": {
+    "sourceWorkItemTypeName": "targetWorkItemTypeName"
+  },
+  //"GitRepoMapping": { "AccountancyGemak": "eol-fiscaal-jaarrekening" },
+  "GitRepoMapping": null,
+  "FieldMaps": [
+    {
+      "$type": "FieldtoFieldMapConfig",
+      "WorkItemTypeName": "Epic",
+      "sourceField": "Exact.GlobalPriority",
+      "targetField": "Microsoft.VSTS.Common.BacklogPriority",
+      "defaultValue": null
+    },
+    {
+      "$type": "FieldtoFieldMapConfig",
+      "WorkItemTypeName": "Epic",
+      "sourceField": "Exact.ADC.EOLProjectCode",
+      "targetField": "Custom.ExactOnlineProject",
+      "defaultValue": null
+    },
+    {
+      "$type": "FieldtoFieldMapConfig",
+      "WorkItemTypeName": "Epic",
+      "sourceField": "Microsoft.VSTS.Scheduling.TargetDate",
+      "targetField": "Custom.PlannedCRDate",
+      "defaultValue": null
+    },
+    {
+      "$type": "FieldtoFieldMapConfig",
+      "WorkItemTypeName": "Epic",
+      "sourceField": "Exact.EpicEffort",
+      "targetField": "Custom.EstimatedDevDays",
+      "defaultValue": null
+    },
+    {
+      "$type": "FieldtoFieldMapConfig",
+      "WorkItemTypeName": "Epic",
+      "sourceField": "Exact.InnovationCategory",
+      "targetField": "Custom.SynergyInnovationCategory",
+      "defaultValue": null
+    },
+    {
+      "$type": "FieldtoFieldMapConfig",
+      "WorkItemTypeName": "Epic",
+      "sourceField": "Exact.PSGProject",
+      "targetField": "Custom.SynergyProject",
+      "defaultValue": null
+    },
+    {
+      "$type": "FieldtoFieldMapConfig",
+      "WorkItemTypeName": "Epic",
+      "sourceField": "Exact.InvestmentQuarter",
+      "targetField": "Custom.SynergyInvestmentQuarter",
+      "defaultValue": null
+    },
+    {
+      "$type": "FieldtoFieldMapConfig",
+      "WorkItemTypeName": "Epic",
+      "sourceField": "Exact.InnovationRequestStatus",
+      "targetField": "Custom.SynergyRequestStatus",
+      "defaultValue": null
+    },
+    {
+      "$type": "FieldtoFieldMapConfig",
+      "WorkItemTypeName": "Epic",
+      "sourceField": "Exact.requestid",
+      "targetField": "Custom.SynergyRequestID",
+      "defaultValue": null
+    },
+    {
+      "$type": "FieldtoFieldMapConfig",
+      "WorkItemTypeName": "Epic",
+      "sourceField": "Exact.ADC.Backlog",
+      "targetField": "Custom.Backlog",
+      "defaultValue": null
+    },
+    {
+      "$type": "FieldtoFieldMapConfig",
+      "WorkItemTypeName": "Epic",
+      "sourceField": "Exact.Roadmap",
+      "targetField": "Custom.SynergyLever",
+      "defaultValue": null
+    }
+  ],
+  "Processors": [
+    {
+      "$type": "WorkItemMigrationConfig",
+      "ReplayRevisions": false,
+      "PrefixProjectToNodes": false,
+      "UpdateCreatedDate": true,
+      "UpdateCreatedBy": true,
+      "BuildFieldTable": false,
+      "AppendMigrationToolSignatureFooter": false,
+      //"WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Code Review Response', 'Code Review Request', 'Test Case','Shared Steps','Shared Parameter','Test Suite', 'Test Plan') AND [System.AreaPath] NOT UNDER 'Multivers\\Venice' AND [System.ChangedDate] >= '2022-5-15'",
+      //"WIQLQueryBit": "AND [System.WorkItemType] IN ('Shared Steps','Shared Parameter') AND [System.ID] < '68000'",
+      //"WIQLQueryBit": "AND [System.WorkItemType] IN ('Test Case') AND [System.ID] = '62515'",
+      "WIQLQueryBit": "AND [System.WorkItemType] IN ('Epic') AND [System.ChangedDate] < '2020-1-1'",
+      //"WIQLQueryBit": "AND [System.ChangedDate] >= '2022-01-01'",
+     // "WIQLQueryBit": "AND [System.ID] IN ('228611','227764','231271')",
+      //"WIQLQueryBit": "AND [System.ID] in ('297326','297312','297311')",
+      //"WIQLQueryBit": "AND [System.ID] IN ('285343','295453','295464','295465','295466','295520','295530','295531','295545','295594','295615')",
+      "WIQLOrderBit": "[System.ID]",
+      "Enabled": true,
+      "LinkMigration": true,
+      "AttachmentMigration": true,
+      "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
+      "FixHtmlAttachmentLinks": true,
+      "SkipToFinalRevisedWorkItemType": true,
+      "WorkItemCreateRetryLimit": 5,
+      "FilterWorkItemsThatAlreadyExistInTarget": false,
+      "PauseAfterEachWorkItem": false,
+      "AttachmentMaxSize": 480000000,
+      "CollapseRevisions": false,
+      "LinkMigrationSaveEachAsAdded": true,
+      "GenerateMigrationComment": false,
+      "NodeStructureEnricherEnabled": true,
+      "NodeBasePaths": []
+    }
+  ]
+}
