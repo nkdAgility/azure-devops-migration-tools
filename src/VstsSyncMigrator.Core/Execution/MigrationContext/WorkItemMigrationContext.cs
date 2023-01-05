@@ -23,6 +23,7 @@ using MigrationTools._EngineV1.Enrichers;
 using MigrationTools._EngineV1.Processors;
 using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
+using MigrationTools.FieldMaps.AzureDevops.ObjectModel;
 using MigrationTools.ProcessorEnrichers;
 using Serilog.Context;
 using Serilog.Events;
@@ -595,6 +596,8 @@ namespace VstsSyncMigrator.Engine
                             ProcessWorkItemEmbeddedLinks(sourceWorkItem, targetWorkItem);
                             TraceWriteLine(LogEventLevel.Information, "Skipping as work item exists and no revisions to sync detected");
                             processWorkItemMetrics.Add("Revisions", 0);
+
+                            CompareWI(sourceWorkItem, targetWorkItem);
                         }
                         else
                         {
@@ -684,6 +687,108 @@ namespace VstsSyncMigrator.Engine
 
             _current++;
             _count--;
+        }
+
+        private void CompareWI(WorkItemData sw, WorkItemData tw)
+        {
+            Log.LogInformation($"COMPARING WI ID (s) {sw.Id} ---------> {tw.Id}");
+            bool diff = false;
+
+            string[]ignoredFields = { "System.IterationId", "System.Id", "System.AuthorizedAs","System.AreaId","System.ChangedBy", "System.Watermark", "System.AuthorizedDate",
+                "Microsoft.VSTS.Common.StateChangeDate","System.ChangedDate","Microsoft.VSTS.CMMI.RequirementType","Microsoft.VSTS.Common.ClosedDate","System.BoardColumnDone","System.BoardColumn","System.RelatedLinkCount",
+                "Microsoft.VSTS.Common.BacklogPriority"
+            };
+
+            var sourceProject = Engine.Source.Config.AsTeamProjectConfig().Project;
+            var targetProject = Engine.Target.Config.AsTeamProjectConfig().Project;
+
+            var type = sw.Fields["System.WorkItemType"].Value.ToString();
+
+            foreach (var f in sw.Fields)
+            {
+                if (ignoredFields.Contains(f.Key)) continue;
+
+                if (type == "Epic")
+                {
+                    // fields that can be ignored for this WI Type
+                    if (f.Key == "Microsoft.VSTS.CMMI.RequirementType" || f.Key == "Exact.ProjectId" || f.Key == "Microsoft.VSTS.Common.BacklogPriority")
+                    {
+                        continue;
+                    }
+                }
+
+                var vs = f.Value.Value?.ToString();
+
+                var targetFieldName = GetMapping(f.Key,type);
+
+                if (tw.Fields.ContainsKey(targetFieldName))
+                {
+                    var vt = tw.Fields[targetFieldName].Value?.ToString();
+
+                    if (vs != vt)
+                    {
+                        if (vs != null && vt != null)
+                        {
+
+                            if (new []{ "System.AreaPath", "System.TeamProject","System.IterationPath", "System.NodeName" }.Contains(f.Key))
+                            {
+                                vt = vt.Replace(targetProject, sourceProject);
+                            }
+
+                            if(f.Key == "System.Rev" && !_config.ReplayRevisions)
+                            {
+                                // ignore revision differences if ReplyRevisions is OFF
+                                continue;
+                            }
+
+                            var matching =FuzzySharp.Fuzz.Ratio(vs, vt);
+
+                            if (matching < 97)
+                            {
+                                diff = true;
+                                Log.LogError($"VALUE MISMATCH FOR {f.Key} | {matching}% | {vs ?? string.Empty} --------------------------------------> {vt ?? string.Empty}");
+                            }
+                        }
+                        else
+                        {
+                            diff = true;
+                            Log.LogError($"VALUE MISMATCH FOR {f.Key} | {vs ?? string.Empty} ---------------------------------> {vt ?? string.Empty}");
+                        }
+                    }
+                }
+                else
+                {
+                    diff = true;
+                    Log.LogError("FIELD NOT FOUND ON TARGET " + f.Key + " -> " + targetFieldName);
+                }
+            }
+
+            if (diff)
+            {
+                Log.LogError($"FOUND DIFFERENCES FOR WI ID (s) {sw.Id} ---------> {tw.Id}");
+            }
+            else
+            {
+                Log.LogInformation($"COMPARE OK");
+
+            }
+        }
+
+        private string GetMapping(string key, string wiType)
+        {
+            if (Engine.FieldMaps.Items.ContainsKey(wiType))
+            {
+                var map = Engine.FieldMaps.Items[wiType];
+                var m1 = map.FirstOrDefault(x => x.MappingDisplayName.Contains(key));
+
+                if (m1 != null)
+                {
+                    var m2 = (FieldToFieldMap)m1;
+                    return m2.Config.targetField;
+                }
+
+            }
+            return key;
         }
 
         private void ProcessWorkItemAttachments(WorkItemData sourceWorkItem, WorkItemData targetWorkItem, bool save = true)

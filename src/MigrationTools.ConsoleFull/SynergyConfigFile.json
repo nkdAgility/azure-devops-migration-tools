@@ -1,6 +1,6 @@
 {
   "Version": "0.0",
-  "LogLevel": "Verbose",
+  "LogLevel": "Information",
   "workaroundForQuerySOAPBugEnabled": false,
   "GenerateMigrationComment": false,
   "Source": {
@@ -20,7 +20,7 @@
   "Target": {
     "$type": "TfsTeamProjectConfig",
     "Collection": "https://dev.azure.com/ExactGroup/",
-    "Project": "TestMigration-DevOn",
+    "Project": "Exact-DevOn",
     "ReflectedWorkItemIDFieldName": "TempMigrationField",
     //"ReflectedWorkItemIDFieldName": "Microsoft.VSTS.Build.IntegrationBuild",
     "AllowCrossProjectLinking": false,
@@ -118,12 +118,103 @@
       "sourceField": "Exact.RequestGUID",
       "targetField": "Custom.SynergyRequestGUID",
       "defaultValue": null
+    },
+    {
+      "$type": "FieldtoFieldMapConfig",
+      "WorkItemTypeName": "Epic",
+      "sourceField": "Exact.GlobalPriority",
+      "targetField": "Microsoft.VSTS.Common.BacklogPriority",
+      "defaultValue": null
+    },
+    {
+      "$type": "FieldtoFieldMapConfig",
+      "WorkItemTypeName": "Epic",
+      "sourceField": "Exact.ADC.EOLProjectCode",
+      "targetField": "Custom.ExactOnlineProject",
+      "defaultValue": null
+    },
+    {
+      "$type": "FieldtoFieldMapConfig",
+      "WorkItemTypeName": "Epic",
+      "sourceField": "Microsoft.VSTS.Scheduling.TargetDate",
+      "targetField": "Custom.PlannedCRDate",
+      "defaultValue": null
+    },
+    {
+      "$type": "FieldtoFieldMapConfig",
+      "WorkItemTypeName": "Epic",
+      "sourceField": "Exact.EpicEffort",
+      "targetField": "Custom.EstimatedDevDays",
+      "defaultValue": null
+    },
+    {
+      "$type": "FieldtoFieldMapConfig",
+      "WorkItemTypeName": "Epic",
+      "sourceField": "Exact.InnovationCategory",
+      "targetField": "Custom.SynergyInnovationCategory",
+      "defaultValue": null
+    },
+    {
+      "$type": "FieldtoFieldMapConfig",
+      "WorkItemTypeName": "Epic",
+      "sourceField": "Exact.PSGProject",
+      "targetField": "Custom.SynergyProject",
+      "defaultValue": null
+    },
+    {
+      "$type": "FieldtoFieldMapConfig",
+      "WorkItemTypeName": "Epic",
+      "sourceField": "Exact.InvestmentQuarter",
+      "targetField": "Custom.SynergyInvestmentQuarter",
+      "defaultValue": null
+    },
+    {
+      "$type": "FieldtoFieldMapConfig",
+      "WorkItemTypeName": "Epic",
+      "sourceField": "Exact.InnovationRequestStatus",
+      "targetField": "Custom.SynergyRequestStatus",
+      "defaultValue": null
+    },
+    {
+      "$type": "FieldtoFieldMapConfig",
+      "WorkItemTypeName": "Epic",
+      "sourceField": "Exact.requestid",
+      "targetField": "Custom.SynergyRequestID",
+      "defaultValue": null
+    },
+    {
+      "$type": "FieldtoFieldMapConfig",
+      "WorkItemTypeName": "Epic",
+      "sourceField": "Exact.RequestGuid",
+      "targetField": "Custom.SynergyRequestGUID",
+      "defaultValue": null
+    },
+    {
+      "$type": "FieldtoFieldMapConfig",
+      "WorkItemTypeName": "Epic",
+      "sourceField": "Exact.ADC.Backlog",
+      "targetField": "Custom.Backlog",
+      "defaultValue": null
+    },
+    {
+      "$type": "FieldtoFieldMapConfig",
+      "WorkItemTypeName": "Epic",
+      "sourceField": "Exact.Roadmap",
+      "targetField": "Custom.SynergyLever",
+      "defaultValue": null
+    },
+    {
+      "$type": "FieldtoFieldMapConfig",
+      "WorkItemTypeName": "Epic",
+      "sourceField": "Exact.PlannedGADate",
+      "targetField": "Custom.PlannedGADate",
+      "defaultValue": null
     }
   ],
   "Processors": [
     {
       "$type": "WorkItemMigrationConfig",
-      "ReplayRevisions": true,
+      "ReplayRevisions": false,
       "PrefixProjectToNodes": false,
       "UpdateCreatedDate": true,
       "UpdateCreatedBy": true,
@@ -134,7 +225,7 @@
       //"WIQLQueryBit": "AND [System.WorkItemType] IN ('Test Case') AND [System.ID] = '62515'",
       //"WIQLQueryBit": "AND [System.WorkItemType] IN ('Shared Parameter','Shared Steps','Test Case') AND [System.ChangedDate] >= '2022-7-1'",
       //"WIQLQueryBit": "AND [System.ChangedDate] >= '2022-07-01'",
-      "WIQLQueryBit": "AND [System.ID] IN ('100519')",
+      "WIQLQueryBit": "AND [System.ID] IN ('133166')",
       //"WIQLQueryBit": "AND [System.ID] in ('297326','297312','297311')",
       //"WIQLQueryBit": "AND [System.ID] IN ('285343','295453','295464','295465','295466','295520','295530','295531','295545','295594','295615')",
       "WIQLOrderBit": "[System.ID]",

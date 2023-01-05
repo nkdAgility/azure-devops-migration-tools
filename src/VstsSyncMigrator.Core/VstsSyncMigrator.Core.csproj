@@ -23,6 +23,7 @@
     <PackageReference Include="CommandLineParser" Version="2.9.1" />
     <PackageReference Include="Ben.Demystifier" Version="0.4.1" />
     <PackageReference Include="CsvHelper" Version="29.0.0" />
+    <PackageReference Include="FuzzySharp" Version="2.0.2" />
     <PackageReference Include="Microsoft.TeamFoundationServer.ExtendedClient" Version="16.170.0">
       <IncludeAssets>all</IncludeAssets>
       <ExcludeAssets>none</ExcludeAssets>
