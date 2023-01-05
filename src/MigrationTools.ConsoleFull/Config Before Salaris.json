@@ -10,7 +10,7 @@
 		"ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
 		"AllowCrossProjectLinking": false,
 		"AuthenticationMode": "AccessToken",
-		"PersonalAccessToken": "vmbb7xdqqhs7ipxfwovkfixbhj4ocwwwzqiyjdnibloh6ckl55za",
+		"PersonalAccessToken": "",
 		"LanguageMaps": {
 			"AreaPath": "Area",
 			"IterationPath": "Iteration"
@@ -24,9 +24,9 @@
 		//"ReflectedWorkItemIDFieldName": "Microsoft.VSTS.Build.IntegrationBuild",
 		"AllowCrossProjectLinking": false,
 		"AuthenticationMode": "AccessToken",
-		"PersonalAccessToken": "2lzwqfomhsacdlnjm2kchk2zo2sftp3dhdnbk474ccsjgkwt4yta", // and
-		//"PersonalAccessToken": "ypzk2gfdcvtzlfng6s5emanl7ae2x4pr4xaeaudd3walekhq3tiq", // ais
-		//"PersonalAccessToken": "y4hcelpp3uri4t3bx6flcp4m5yvwfwljolywvctv6h4xjowjy23a", // aji
+		"PersonalAccessToken": "", // and
+		//"PersonalAccessToken": "", // ais
+		//"PersonalAccessToken": "", // aji
 		"DummyWorkItemForImageUploads": "249334",
 		"DelayBetweenTwoWorkItems": 1150,
 		"WhoToEmail": "a.gothe@devon.nl",

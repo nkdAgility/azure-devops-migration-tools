@@ -10,8 +10,8 @@
 		"ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
 		"AllowCrossProjectLinking": false,
 		"AuthenticationMode": "AccessToken",
-		//"PersonalAccessToken": "lnygw2e6f7sig7mfb7sudn2qwtvhqqwvf2k3aebvfgqykdpbe7ba", //and
-		"PersonalAccessToken": "op7vtruzcaakp5zjs22zxaukrodztftb2bvdnghbgfrmiwohgpgq", //aji	
+		//"PersonalAccessToken": "", //and
+		"PersonalAccessToken": "", //aji	
 		"LanguageMaps": {
 			"AreaPath": "Area",
 			"IterationPath": "Iteration"
@@ -25,9 +25,9 @@
 		//"ReflectedWorkItemIDFieldName": "Microsoft.VSTS.Build.IntegrationBuild",
 		"AllowCrossProjectLinking": false,
 		"AuthenticationMode": "AccessToken",
-		"PersonalAccessToken": "2lzwqfomhsacdlnjm2kchk2zo2sftp3dhdnbk474ccsjgkwt4yta", // and
-		//"PersonalAccessToken": "dtu7ucaywcx5qjtq2kwy3kkc24pb7sruyptosrl42poy2wjmwcaa", // ais
-		//"PersonalAccessToken": "utaujgfbzxlj4ak3qm3zk5zngmpjm33ay2flx2ls6i47ceyqmzqa", // aji
+		"PersonalAccessToken": "", // and
+		//"PersonalAccessToken": "", // ais
+		//"PersonalAccessToken": "", // aji
 		"DummyWorkItemForImageUploads": "178245", // dummy work item on target
 		"DelayBetweenTwoWorkItems": 1150,
 		"WhoToEmail": "a.gothe@devon.nl",

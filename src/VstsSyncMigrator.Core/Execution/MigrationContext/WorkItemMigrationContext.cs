@@ -87,6 +87,7 @@ namespace VstsSyncMigrator.Engine
         public override void Configure(IProcessorConfig config)
         {
             _config = (WorkItemMigrationConfig)config;
+            _delayBetweenWI = Engine.Source.Config.AsTeamProjectConfig().DelayBetweenTwoWorkItems;
 
             if (_config.UseCommonNodeStructureEnricherConfig)
             {
