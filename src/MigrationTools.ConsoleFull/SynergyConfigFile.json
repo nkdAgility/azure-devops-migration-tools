@@ -1,6 +1,6 @@
 {
   "Version": "0.0",
-  "LogLevel": "Verbose",
+  "LogLevel": "Information",
   "workaroundForQuerySOAPBugEnabled": false,
   "GenerateMigrationComment": false,
   "Source": {
@@ -28,7 +28,7 @@
     "AuthenticationMode": "AccessToken",
     "PersonalAccessTokenVariableName": "azdoexacttoken",
     "PersonalAccessToken": "",
-    "DummyWorkItemForImageUploads": "267120",
+    "DummyWorkItemForImageUploads": "289356",
     "DelayBetweenTwoWorkItems": 750,
     "WhoToEmail": "a.gothe@devon.nl",
     "LanguageMaps": {
@@ -225,9 +225,9 @@
       //"WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Code Review Response', 'Code Review Request', 'Test Case','Shared Steps','Shared Parameter','Test Suite', 'Test Plan') AND [System.AreaPath] NOT UNDER 'Multivers\\Venice' AND [System.ChangedDate] >= '2022-5-15'",
       //"WIQLQueryBit": "AND [System.WorkItemType] IN ('Shared Steps','Shared Parameter') AND [System.ID] < '68000'",
       //"WIQLQueryBit": "AND [System.WorkItemType] IN ('Test Case') AND [System.ID] = '62515'",
-      //"WIQLQueryBit": "AND [System.WorkItemType] IN ('Shared Parameter','Shared Steps','Test Case') AND [System.ChangedDate] >= '2022-7-1'",
-      //"WIQLQueryBit": "AND [System.ChangedDate] >= '2022-07-01'",
-      "WIQLQueryBit": "AND [System.ID] IN ('133166')",
+      "WIQLQueryBit": "AND [System.WorkItemType] IN ('Epic') AND [System.ChangedDate] < '2020-1-1'",
+      //"WIQLQueryBit": "AND [System.ChangedDate] < '2017-01-01' and ",
+      //"WIQLQueryBit": "AND [System.ID] IN ('133166')",
       //"WIQLQueryBit": "AND [System.ID] in ('297326','297312','297311')",
       //"WIQLQueryBit": "AND [System.ID] IN ('285343','295453','295464','295465','295466','295520','295530','295531','295545','295594','295615')",
       "WIQLOrderBit": "[System.ID]",

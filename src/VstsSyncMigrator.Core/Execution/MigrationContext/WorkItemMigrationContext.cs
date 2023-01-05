@@ -84,10 +84,12 @@ namespace VstsSyncMigrator.Engine
 
         public int _delayBetweenWI = 0;
 
+        List<string> comparisons = new List<string>();
+
         public override void Configure(IProcessorConfig config)
         {
             _config = (WorkItemMigrationConfig)config;
-            _delayBetweenWI = Engine.Source.Config.AsTeamProjectConfig().DelayBetweenTwoWorkItems;
+            _delayBetweenWI = Engine.Target.Config.AsTeamProjectConfig().DelayBetweenTwoWorkItems;
 
             if (_config.UseCommonNodeStructureEnricherConfig)
             {
@@ -274,11 +276,12 @@ namespace VstsSyncMigrator.Engine
                     }
                     catch (Exception ex)
                     {
-                        contextLog.Error("Error for " + k + ". Will continue with next WI.", ex);
+                        contextLog.Error("Error for " + k + ". Will continue with next WI." + ex.ToStringDemystified(), ex);
                     }
                 }
 
-                var creds = new Microsoft.VisualStudio.Services.Common.VssBasicCredential(string.Empty, Engine.Target.Config.AsTeamProjectConfig().PersonalAccessToken);
+                var TfsConfig = Engine.Target.Config.AsTeamProjectConfig();
+                var creds = new Microsoft.VisualStudio.Services.Common.VssBasicCredential(string.Empty, TfsConfig.GetPatToken());
                 var connection = new Microsoft.VisualStudio.Services.WebApi.VssConnection(Engine.Target.Config.AsTeamProjectConfig().Collection, creds);
                 var targetGuid = ((Project)Engine.Target.WorkItems.GetProject().internalObject).Guid;
                 using (var witClient = connection.GetClient<Microsoft.TeamFoundation.WorkItemTracking.WebApi.WorkItemTrackingHttpClient>())
@@ -307,7 +310,7 @@ namespace VstsSyncMigrator.Engine
                         }
                         catch (Exception ex)
                         {
-                            contextLog.Error("Error for " + wid + ". Will continue with next WI.", ex);
+                            contextLog.Error("Error for " + wid + ". Will continue with next WI." + ex.ToStringDemystified(), ex);
                         }
                     }
                 }
@@ -326,6 +329,11 @@ namespace VstsSyncMigrator.Engine
                     contextLog.Warning("The following items could not be migrated: {ItemIds}", string.Join(", ", _itemsInError));
                 }
                 contextLog.Information("DONE in {Elapsed}", stopwatch.Elapsed.ToString("c"));
+            }
+
+            foreach (var c in comparisons)
+            {
+                Log.LogInformation(c);
             }
         }
 
@@ -767,11 +775,12 @@ namespace VstsSyncMigrator.Engine
             if (diff)
             {
                 Log.LogError($"FOUND DIFFERENCES FOR WI ID (s) {sw.Id} ---------> {tw.Id}");
+                comparisons.Add($"COMPARE FAILED FOR {sw.Id} ---------> {tw.Id}");
             }
             else
             {
+                comparisons.Add($"COMPARE OK FOR {sw.Id} ---------> {tw.Id}");
                 Log.LogInformation($"COMPARE OK");
-
             }
         }
 

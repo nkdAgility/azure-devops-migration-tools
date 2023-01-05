@@ -39,5 +39,15 @@ namespace MigrationTools._EngineV1.Configuration
         {
             return string.Format("{0}/{1}", Collection, Project);
         }
+
+        public string GetPatToken()
+        {
+            var pat = this.PersonalAccessToken;
+            if (!string.IsNullOrEmpty(this.PersonalAccessTokenVariableName))
+            {
+                pat = Environment.GetEnvironmentVariable(this.PersonalAccessTokenVariableName);
+            }
+            return pat;
+        }
     }
 }
