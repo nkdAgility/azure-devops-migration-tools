@@ -1,6 +1,6 @@
 {
   "Version": "0.0",
-  "LogLevel": "Information",
+  "LogLevel": "Verbose",
   "workaroundForQuerySOAPBugEnabled": false,
   "GenerateMigrationComment": false,
   "Source": {
@@ -20,7 +20,7 @@
   "Target": {
     "$type": "TfsTeamProjectConfig",
     "Collection": "https://dev.azure.com/ExactGroup/",
-    "Project": "Exact-DevOn",
+    "Project": "TestMigration-DevOn",
     "ReflectedWorkItemIDFieldName": "TempMigrationField",
     //"ReflectedWorkItemIDFieldName": "Microsoft.VSTS.Build.IntegrationBuild",
     "AllowCrossProjectLinking": false,
@@ -209,12 +209,11 @@
       "sourceField": "Exact.PlannedGADate",
       "targetField": "Custom.PlannedGADate",
       "defaultValue": null
-    }
   ],
   "Processors": [
     {
       "$type": "WorkItemMigrationConfig",
-      "ReplayRevisions": false,
+      "ReplayRevisions": true,
       "PrefixProjectToNodes": false,
       "UpdateCreatedDate": true,
       "UpdateCreatedBy": true,
@@ -225,7 +224,7 @@
       //"WIQLQueryBit": "AND [System.WorkItemType] IN ('Test Case') AND [System.ID] = '62515'",
       //"WIQLQueryBit": "AND [System.WorkItemType] IN ('Shared Parameter','Shared Steps','Test Case') AND [System.ChangedDate] >= '2022-7-1'",
       //"WIQLQueryBit": "AND [System.ChangedDate] >= '2022-07-01'",
-      "WIQLQueryBit": "AND [System.ID] IN ('133166')",
+      "WIQLQueryBit": "AND [System.ID] IN ('100519')",
       //"WIQLQueryBit": "AND [System.ID] in ('297326','297312','297311')",
       //"WIQLQueryBit": "AND [System.ID] IN ('285343','295453','295464','295465','295466','295520','295530','295531','295545','295594','295615')",
       "WIQLOrderBit": "[System.ID]",

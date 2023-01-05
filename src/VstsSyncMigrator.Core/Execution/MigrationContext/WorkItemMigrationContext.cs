@@ -42,7 +42,7 @@ namespace VstsSyncMigrator.Engine
         private static string workItemLogTemplate = "[{sourceWorkItemTypeName,20}][Complete:{currentWorkItem,6}/{totalWorkItems}][sid:{sourceWorkItemId,6}|Rev:{sourceRevisionInt,3}][tid:{targetWorkItemId,6} | ";
         private WorkItemMigrationConfig _config;
         private List<string> _ignore;
-        private Dictionary<string, Tuple<WorkItemData, WorkItemData>> _processedWorkItems = new Dictionary<string, Tuple<WorkItemData, WorkItemData>>();  
+        private Dictionary<string, Tuple<WorkItemData, WorkItemData>> _processedWorkItems = new Dictionary<string, Tuple<WorkItemData, WorkItemData>>();
 
         private ILogger contextLog;
         private IAttachmentMigrationEnricher attachmentEnricher;
@@ -624,7 +624,7 @@ namespace VstsSyncMigrator.Engine
 
                         if (!_processedWorkItems.ContainsKey(targetWorkItem.Id))
                         {
-                            _processedWorkItems.Add(targetWorkItem.Id, new Tuple<WorkItemData, WorkItemData>(sourceWorkItem,targetWorkItem));
+                            _processedWorkItems.Add(targetWorkItem.Id, new Tuple<WorkItemData, WorkItemData>(sourceWorkItem, targetWorkItem));
                         }
                     }
                     if (sourceWorkItem != null)
@@ -694,7 +694,7 @@ namespace VstsSyncMigrator.Engine
             Log.LogInformation($"COMPARING WI ID (s) {sw.Id} ---------> {tw.Id}");
             bool diff = false;
 
-            string[]ignoredFields = { "System.IterationId", "System.Id", "System.AuthorizedAs","System.AreaId","System.ChangedBy", "System.Watermark", "System.AuthorizedDate",
+            string[] ignoredFields = { "System.IterationId", "System.Id", "System.AuthorizedAs","System.AreaId","System.ChangedBy", "System.Watermark", "System.AuthorizedDate",
                 "Microsoft.VSTS.Common.StateChangeDate","System.ChangedDate","Microsoft.VSTS.CMMI.RequirementType","Microsoft.VSTS.Common.ClosedDate","System.BoardColumnDone","System.BoardColumn","System.RelatedLinkCount",
                 "Microsoft.VSTS.Common.BacklogPriority"
             };
@@ -719,7 +719,7 @@ namespace VstsSyncMigrator.Engine
 
                 var vs = f.Value.Value?.ToString();
 
-                var targetFieldName = GetMapping(f.Key,type);
+                var targetFieldName = GetMapping(f.Key, type);
 
                 if (tw.Fields.ContainsKey(targetFieldName))
                 {
@@ -730,18 +730,18 @@ namespace VstsSyncMigrator.Engine
                         if (vs != null && vt != null)
                         {
 
-                            if (new []{ "System.AreaPath", "System.TeamProject","System.IterationPath", "System.NodeName" }.Contains(f.Key))
+                            if (new[] { "System.AreaPath", "System.TeamProject", "System.IterationPath", "System.NodeName" }.Contains(f.Key))
                             {
                                 vt = vt.Replace(targetProject, sourceProject);
                             }
 
-                            if(f.Key == "System.Rev" && !_config.ReplayRevisions)
+                            if (f.Key == "System.Rev" && !_config.ReplayRevisions)
                             {
                                 // ignore revision differences if ReplyRevisions is OFF
                                 continue;
                             }
 
-                            var matching =FuzzySharp.Fuzz.Ratio(vs, vt);
+                            var matching = FuzzySharp.Fuzz.Ratio(vs, vt);
 
                             if (matching < 97)
                             {
@@ -848,8 +848,8 @@ namespace VstsSyncMigrator.Engine
 
                 foreach (var revision in revisionsToMigrate)
                 {
-                    Log.LogInformation("Sleeping for " + _delayBetweenWI/2);
-                    Thread.Sleep(_delayBetweenWI/2);
+                    Log.LogInformation("Sleeping for " + _delayBetweenWI / 2);
+                    Thread.Sleep(_delayBetweenWI / 2);
                     var currentRevisionWorkItem = sourceWorkItem.GetRevision(revision.Number);
 
                     TraceWriteLine(LogEventLevel.Information, " Processing Revision [{RevisionNumber}]",
