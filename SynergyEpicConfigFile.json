@@ -11,7 +11,7 @@
     "AllowCrossProjectLinking": false,
     "AuthenticationMode": "AccessToken",
     //"PersonalAccessToken": "", //and
-    "PersonalAccessToken": "zikayekda72f5nu7z2egk5w6lexnejvdp2wm7fc2iaq4cae4shiq",
+    "PersonalAccessToken": "",
     "LanguageMaps": {
       "AreaPath": "Area",
       "IterationPath": "Iteration"
@@ -25,7 +25,7 @@
     //"ReflectedWorkItemIDFieldName": "Microsoft.VSTS.Build.IntegrationBuild",
     "AllowCrossProjectLinking": false,
     "AuthenticationMode": "AccessToken",
-    "PersonalAccessToken": "2zox23qvsw4hlamfff5s2rrlsiwioafyclega5inu5t67lu7qnuq",
+    "PersonalAccessToken": "",
     "DummyWorkItemForImageUploads": "424117",
     "DelayBetweenTwoWorkItems": 750,
     "WhoToEmail": "a.gudala@devon.nl",
