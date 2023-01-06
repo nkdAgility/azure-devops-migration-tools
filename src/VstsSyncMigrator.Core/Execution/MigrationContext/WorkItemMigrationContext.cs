@@ -701,7 +701,7 @@ namespace VstsSyncMigrator.Engine
         private void CompareWI(WorkItemData sw, WorkItemData tw)
         {
             Log.LogInformation($"COMPARING WI ID (s) {sw.Id} ---------> {tw.Id}");
-            bool diff = false;
+            //bool diff = false;
 
             string[] ignoredFields = { "System.IterationId", "System.Id", "System.AuthorizedAs","System.AreaId","System.ChangedBy", "System.Watermark", "System.AuthorizedDate",
                 "Microsoft.VSTS.Common.StateChangeDate","System.ChangedDate","Microsoft.VSTS.CMMI.RequirementType","Microsoft.VSTS.Common.ClosedDate","System.BoardColumnDone","System.BoardColumn","System.RelatedLinkCount",
@@ -744,9 +744,9 @@ namespace VstsSyncMigrator.Engine
                                 vt = vt.Replace(targetProject, sourceProject);
                             }
 
-                            if (f.Key == "System.Rev" && !_config.ReplayRevisions)
+                            if ((f.Key == "System.Rev" || f.Key == "System.History") && !_config.ReplayRevisions)
                             {
-                                // ignore revision differences if ReplyRevisions is OFF
+                                // ignore revision & history differences if ReplyRevisions is OFF
                                 continue;
                             }
 
@@ -754,34 +754,50 @@ namespace VstsSyncMigrator.Engine
 
                             if (matching < 97)
                             {
-                                diff = true;
-                                Log.LogError($"VALUE MISMATCH FOR {f.Key} | {matching}% | {vs ?? string.Empty} --------------------------------------> {vt ?? string.Empty}");
+
+                                if (f.Key == "Exact.EpicEffort" && matching > 50) continue; // ignore decimal point changes in Effort
+                                ReportCompareError($"VALUE MISMATCH FOR {f.Key} | {matching}% | {vs ?? string.Empty} --------------------------------------> {vt ?? string.Empty}", sw.Id, tw.Id);
                             }
                         }
                         else
                         {
-                            diff = true;
-                            Log.LogError($"VALUE MISMATCH FOR {f.Key} | {vs ?? string.Empty} ---------------------------------> {vt ?? string.Empty}");
+                            ReportCompareError($"VALUE MISMATCH FOR {f.Key} | {vs ?? string.Empty} ---------------------------------> {vt ?? string.Empty}", sw.Id, tw.Id);
                         }
                     }
                 }
                 else
                 {
-                    diff = true;
-                    Log.LogError("FIELD NOT FOUND ON TARGET " + f.Key + " -> " + targetFieldName);
+                    ReportCompareError($"FIELD NOT FOUND ON TARGET " + f.Key + " -> " + targetFieldName, sw.Id, tw.Id);
                 }
             }
 
-            if (diff)
+            if (sw.Revisions.Count != tw.Revisions.Count && !_config.ReplayRevisions)
             {
-                Log.LogError($"FOUND DIFFERENCES FOR WI ID (s) {sw.Id} ---------> {tw.Id}");
-                comparisons.Add($"COMPARE FAILED FOR {sw.Id} ---------> {tw.Id}");
+                ReportCompareError($" Revisions.Count don't match {sw.Revisions.Count()}----->{tw.Revisions.Count()}", sw.Id, tw.Id);
             }
-            else
+
+            if (sw.Links.Count != tw.Links.Count)
             {
-                comparisons.Add($"COMPARE OK FOR {sw.Id} ---------> {tw.Id}");
-                Log.LogInformation($"COMPARE OK");
+                ReportCompareError($" Links.Count don't match {sw.Links.Count()}-----> {tw.Links.Count()}", sw.Id,tw.Id);
             }
+
+            //if (diff)
+            //{
+            //    Log.LogError($"FOUND DIFFERENCES FOR WI ID (s) {sw.Id} ---------> {tw.Id}");
+            //    comparisons.Add($"COMPARE FAILED FOR {sw.Id} ---------> {tw.Id}");
+            //}
+            //else
+            //{
+            //    comparisons.Add($"COMPARE OK FOR {sw.Id} ---------> {tw.Id}");
+            //    Log.LogInformation($"COMPARE OK");
+            //}
+        }
+
+        void ReportCompareError(string msg, string sid, string tid)
+        {
+            msg = $"COMPARE {sid} -> {tid} : " + msg;
+            Log.LogError(msg);
+            comparisons.Add(msg);
         }
 
         private string GetMapping(string key, string wiType)

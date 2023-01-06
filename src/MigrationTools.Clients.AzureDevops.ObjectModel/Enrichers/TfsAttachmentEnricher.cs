@@ -59,7 +59,7 @@ namespace MigrationTools.Enrichers
 
                     var fileName = GetSafeFilename(wia.Name);
                     var attachments = target.ToWorkItem().Attachments.Cast<Attachment>();
-                    var attachmentExists = attachments.Any(a => a.Name == fileName);
+                    var attachmentExists = attachments.Any(a => a.Name == fileName && a.Length == wia.Length);
                     if (attachmentExists)
                     {
                         Log.Debug(" [SKIP DOWNLOAD] WorkItem {0} already contains attachment {1}", target.Id, fileName);
@@ -72,7 +72,7 @@ namespace MigrationTools.Enrichers
                     Log.Debug("AttachmentMigrationEnricher: Exported {Filename} to disk", System.IO.Path.GetFileName(filepath));
                     if (filepath != null)
                     {
-                        ImportAttachemnt(target.ToWorkItem(), wia, filepath, save);
+                        ImportAttachemnt(target.ToWorkItem(), wia, filepath, wia.Comment, save);
                         Log.Debug("AttachmentMigrationEnricher: Imported {Filename} from disk", System.IO.Path.GetFileName(filepath));
                     }
                 }
@@ -133,7 +133,7 @@ namespace MigrationTools.Enrichers
             return fpath;
         }
 
-        private void ImportAttachemnt(WorkItem targetWorkItem, Attachment wia, string filepath, bool save = true)
+        private void ImportAttachemnt(WorkItem targetWorkItem, Attachment wia, string filepath, string comment, bool save = true)
         {
             var filename = System.IO.Path.GetFileName(filepath);
             FileInfo fi = new FileInfo(filepath);
@@ -144,6 +144,7 @@ namespace MigrationTools.Enrichers
                 if (attachment == null)
                 {
                     Attachment a = new Attachment(filepath);
+                    a.Comment = comment;
                     targetWorkItem.Attachments.Add(a);
                 }
                 else
