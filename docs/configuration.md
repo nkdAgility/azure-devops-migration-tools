@@ -363,7 +363,7 @@ project and when migrating work items.
 
 These remapping rules are applied with a higher priority than the
 `PrefixProjectToNodes` option. This means that if no declared rule matches the
-path and the `PrefixProjectToNodes` option is enabled, then the old behaviour is
+path and the `PrefixProjectToNodes` option is enabled, then the old behavior is
 used.
 
 The syntax is a dictionary of regular expressions and the replacement text.
