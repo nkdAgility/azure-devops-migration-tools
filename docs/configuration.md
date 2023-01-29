@@ -5,12 +5,12 @@ Azure DevOps Migration Tools are mainly powered by configuration which allows yo
 If you run `migrator.exe init` you will be launched into a configuration tool that will generate a default file. Using the `init` command will create a `configuration.yml` file in the
 working directory. At run time you can specify the configuration file to use.
 
-- `migrator.exe init` - This will create a shortedned getting started config with just what you need to migrate Work Items.
+- `migrator.exe init` - This will create a shortened getting started config with just what you need to migrate Work Items.
 - `migrator.exe init --options Full` - The output of this is a full template with all of the options. You will not need it all.
 
 **Note:** Azure DevOps Migration Tools do not ship with internal default configuration and will not function without one.
 
-To create your config file just type `vstssyncmigrator init` in the directory that you unziped the tools and a minimal `configuration.json` configuration
+To create your config file just type `vstssyncmigrator init` in the directory that you unzipped the tools and a minimal `configuration.json` configuration
 file will be created. Modify this as you need.
 
 Note that the generated file show all the possible options, you configuration file will probably only need a subset of those shown.
@@ -363,7 +363,7 @@ project and when migrating work items.
 
 These remapping rules are applied with a higher priority than the
 `PrefixProjectToNodes` option. This means that if no declared rule matches the
-path and the `PrefixProjectToNodes` option is enabled, then the old behavior is
+path and the `PrefixProjectToNodes` option is enabled, then the old behaviour is
 used.
 
 The syntax is a dictionary of regular expressions and the replacement text.
@@ -376,9 +376,9 @@ use back-references in the replacement string.
 
 *Warning*: Special characters in the acceptation of regular expressions _and_
 json both need to be escaped. For a key, this means, for example, that a
-litteral backslash must be escaped for the regular expression language `\\`
+literal backslash must be escaped for the regular expression language `\\`
 _and_ each of these backslashes must then be escaped for the json encoding:
-`\\\\`. In the replacement string, a litteral `$` must be escaped with an
+`\\\\`. In the replacement string, a literal `$` must be escaped with an
 additional `$` if it is followed by a number (due to the special meaning in
 regular expression replacement strings), while a backslash must be escaped
 (`\\`) due to the special meaning in json.

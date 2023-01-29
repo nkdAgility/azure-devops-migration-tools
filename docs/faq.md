@@ -26,7 +26,7 @@ It is often best to use this file as ane example and to build up your own config
 
 ## The processors are not running in the order I need.
 
-If you find processors are running in an incorrect order for your needs just re-order their declarations in the `configuration.json` configuration file. The processsors are run in the order they are shown.
+If you find processors are running in an incorrect order for your needs just re-order their declarations in the `configuration.json` configuration file. The processors are run in the order they are shown.
 
 ## Every test migration I do is slow
 
@@ -38,7 +38,7 @@ That said it is often a good idea to build up your configuration processor by pr
 
 ## Work items are not migrated
 
-Maybe you see a `TF237124: Work Item is not ready to save` error when you atempt to do a migration.
+Maybe you see a `TF237124: Work Item is not ready to save` error when you attempt to do a migration.
 
 A number of processors have a setting `"PrefixProjectToNodes": false`. If set to true this inserts the name of the source Team Project into the created structure e.g. Area path, Iteration path, or Work Item queries. It is also used by the migration processor. 
 

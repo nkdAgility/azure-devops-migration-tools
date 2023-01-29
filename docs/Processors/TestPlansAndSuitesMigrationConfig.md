@@ -15,5 +15,33 @@ This processor migrate test suites and test plans. This should be run after `Tes
 | `RemoveAllLinks`                       | bool
 | `UseCommonNodeStructureEnricherConfig` | bool     | Indicates whether the configuration for node structure transformation should be taken from the common enricher configs. Otherwise the configuration elements below are used | false
 | `NodeBasePaths`                        | string[] | See documentation for [NodeStructure](Reference/WorkItemMigrationConfig.md)
-| `AreaMaps`                             | Dictionnary[string,string] | See documentation for [NodeStructure](WorkItemMigrationConfig.md)
-| `IterationMaps`                        | Dictionnary[string,string] | See documentation for [NodeStructure](WorkItemMigrationConfig.md)
+| `AreaMaps`                             | Dictionary[string,string] | See documentation for [NodeStructure](WorkItemMigrationConfig.md)
+| `IterationMaps`                        | Dictionary[string,string] | See documentation for [NodeStructure](WorkItemMigrationConfig.md)
+
+```json
+"Processors": [
+    {
+      "$type": "TestVariablesMigrationConfig",
+      "Enabled": false
+    },
+    {
+      "$type": "TestConfigurationsMigrationConfig",
+      "Enabled": true
+    },
+    {
+      "$type": "TestPlansAndSuitesMigrationConfig",
+      "Enabled": true,
+      "PrefixProjectToNodes": false,
+      "OnlyElementsWithTag": null,
+      "TestPlanQueryBit": null,
+      "RemoveAllLinks": false,
+      "MigrationDelay": 0,
+      "UseCommonNodeStructureEnricherConfig": false,
+      "NodeBasePaths": [],
+      "AreaMaps": null,
+      "IterationMaps": null,
+      "RemoveInvalidTestSuiteLinks": false,
+      "FilterCompleted": false
+    }
+]
+```
