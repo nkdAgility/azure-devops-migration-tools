@@ -30,7 +30,7 @@ Please include the following with each issue.
 * Version of the source and target ADO/VSTS/TFS instances 
 
 * Reproducible steps (1... 2... 3...) and what you expected versus what you actually got.
-* The Session ID from your migration run that had a problem (this lets us look up telemitery).
+* The Session ID from your migration run that had a problem (this lets us look up telemetry).
 
 > **Note:** Session ID is in your Log file for that run.
 
@@ -42,11 +42,11 @@ Don't feel bad if we can't reproduce the issue and ask for more information!
 
 ## Contributing Fixes
 
-Azure DevOps Migration Tools accepts both bug fixes and feature enhancements as Pull Requests. When contibuting please try to minimise the number of files that you touch, and do not arbitrarily change large amounts of the files without justification. This will help keep the fix or feature as simple and easy as posible to review and incorporate. If you are a long term contributor you may request access to the git repository that houses the core code and provide direct contributions there.
+Azure DevOps Migration Tools accepts both bug fixes and feature enhancements as Pull Requests. When contributing please try to minimise the number of files that you touch, and do not arbitrarily change large amounts of the files without justification. This will help keep the fix or feature as simple and easy as possible to review and incorporate. If you are a long term contributor you may request access to the git repository that houses the core code and provide direct contributions there.
 
 # Instructions for Contributing Code
 
-All fixed require to update GitVersion.yaml so that we dont have colliding version numbers.
+All fixed require to update GitVersion.yaml so that we don't have colliding version numbers.
 
 ## Contributing bug fixes
 
