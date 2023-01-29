@@ -8,15 +8,15 @@
 
 The system works by setting one or more [Processors](../Reference/Processors/index.md) in the json 
 configuration file. This processor can have many [ProcessorEnrichers](../Reference/ProcessorEnrichers/index.md) that 
-enable aditional features, and must have at least two [Endpoints](../Reference/Endpoints/index.md); 
+enable additional features, and must have at least two [Endpoints](../Reference/Endpoints/index.md); 
 a *Source* `Endpoint` and a *Target* `Endpoint`. Each `Endpoint` 
 may have additional [EndpointEnrichers](../Reference/EndpointEnrichers/index.md) that add 
 additional *Client* specific functionality.
 
 ### What types of things do we have
 
-- **[Processors](../Reference/Processors/index.md)** - Processors allow you to move diferent types of data between `Endpoints` and does not care what `Endpoint` you have on each end.
-- **[Processor Enrichers](../Reference/ProcessorEnrichers/index.md)** - Enrichers at the processor level allow you to add additional functionality to a processor without endangering the core functionality. Each Enricher should have a single responsabiity and can add funtionality to the following stages of the processor pipeline.
+- **[Processors](../Reference/Processors/index.md)** - Processors allow you to move different types of data between `Endpoints` and does not care what `Endpoint` you have on each end.
+- **[Processor Enrichers](../Reference/ProcessorEnrichers/index.md)** - Enrichers at the processor level allow you to add additional functionality to a processor without endangering the core functionality. Each Enricher should have a single responsibility and can add functionality to the following stages of the processor pipeline.
 - **[Endpoints](../Reference/Endpoints/index.md)** connect to the target system and load and save the data. Endpoint can load or save data from any system, but we are focusing on Azure DevOps & Github.
 - **[Endpoint Enrichers](../Reference/EndpointEnrichers/index.md)** - Because systems likely have different data shapes we also have *EndpointEnrichers* that can be added to `Endpoints` that allow loading and saving of specific data.
 - **[Mapping Tools](../Reference/MappingTools/index.md)** - 
