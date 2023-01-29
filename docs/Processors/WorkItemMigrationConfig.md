@@ -39,7 +39,7 @@ WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links,
 | `AreaMaps`                                | Dictionary`<string,string>` | Remapping rules for area paths, implemented with regular expressions. The rules apply with a higher priority than the `PrefixProjectToNodes`, that is, if no rule matches the path and the `PrefixProjectToNodes` option is enabled, then the old `PrefixProjectToNodes` behavior is applied. | {} |
 | `IterationMaps`                           | Dictionary`<string,string>` | Remapping rules for iteration paths, implemented with regular expressions. The rules apply with a higher priority than the `PrefixProjectToNodes`, that is, if no rule matches the path and the `PrefixProjectToNodes` option is enabled, then the old `PrefixProjectToNodes` behavior is applied. | {} |
 | `WorkItemIDs `                            | Array`<int`>    | A list of work items to import | `[]` |
-| `MaxGracefulFailures`                     | Integer         | The maximum number of failures to tolerate befure the migration fails. When set above zero, a work item migration error is logged but the migration will continue until the number of failed items reaches the configured value, after which the migration fails. | 0
+| `MaxGracefulFailures`                     | Integer         | The maximum number of failures to tolerate before the migration fails. When set above zero, a work item migration error is logged but the migration will continue until the number of failed items reaches the configured value, after which the migration fails. | 0
 
 ## <a name="WIQLQueryBits"></a>WIQL Query Bits
 
