@@ -45,3 +45,10 @@ This processor migrate test suites and test plans. This should be run after `Tes
     }
 ]
 ```
+## Known working TestPlanQueryBit filter fields names
+
+`AreaPath`, `PlanName` and `PlanState`
+
+```json
+"TestPlanQueryBit": "PlanName = 'ABC'"
+```
