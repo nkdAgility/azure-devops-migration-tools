@@ -39,7 +39,7 @@ WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links,
 | `AreaMaps`                                | Dictionary`<string,string>` | Remapping rules for area paths, implemented with regular expressions. The rules apply with a higher priority than the `PrefixProjectToNodes`, that is, if no rule matches the path and the `PrefixProjectToNodes` option is enabled, then the old `PrefixProjectToNodes` behavior is applied. | {} |
 | `IterationMaps`                           | Dictionary`<string,string>` | Remapping rules for iteration paths, implemented with regular expressions. The rules apply with a higher priority than the `PrefixProjectToNodes`, that is, if no rule matches the path and the `PrefixProjectToNodes` option is enabled, then the old `PrefixProjectToNodes` behavior is applied. | {} |
 | `WorkItemIDs `                            | Array`<int`>    | A list of work items to import | `[]` |
-| `MaxGracefulFailures`                     | Integer         | The maximum number of failures to tolerate befure the migration fails. When set above zero, a work item migration error is logged but the migration will continue until the number of failed items reaches the configured value, after which the migration fails. | 0
+| `MaxGracefulFailures`                     | Integer         | The maximum number of failures to tolerate before the migration fails. When set above zero, a work item migration error is logged but the migration will continue until the number of failed items reaches the configured value, after which the migration fails. | 0
 
 ## <a name="WIQLQueryBits"></a>WIQL Query Bits
 
@@ -146,9 +146,9 @@ use back-references in the replacement string.
 
 *Warning*: Special characters in the acceptation of regular expressions _and_
 json both need to be escaped. For a key, this means, for example, that a
-litteral backslash must be escaped for the regular expression language `\\`
+literal backslash must be escaped for the regular expression language `\\`
 _and_ each of these backslashes must then be escaped for the json encoding:
-`\\\\`. In the replacement string, a litteral `$` must be escaped with an
+`\\\\`. In the replacement string, a literal `$` must be escaped with an
 additional `$` if it is followed by a number (due to the special meaning in
 regular expression replacement strings), while a backslash must be escaped
 (`\\`) due to the special meaning in json.
