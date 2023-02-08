@@ -208,8 +208,7 @@ namespace MigrationTools._EngineV1.Configuration
             ec.FieldMaps.Add(new FieldMergeMapConfig()
             {
                 WorkItemTypeName = "*",
-                sourceField1 = "System.Description",
-                sourceField2 = "Microsoft.VSTS.Common.AcceptanceCriteria",
+                sourceFields = new List<string> { "System.Description" , "Microsoft.VSTS.Common.AcceptanceCriteria" },
                 targetField = "System.Description",
                 formatExpression = @"{0} <br/><br/><h3>Acceptance Criteria</h3>{1}"
             });
