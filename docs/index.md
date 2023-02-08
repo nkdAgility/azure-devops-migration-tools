@@ -15,7 +15,7 @@ The Azure DevOps Migration Tools allow you to bulk edit and migrate data between
 
 - Migrate `Work Items`, `TestPlans & Suits`, `Teams`, `Shared Queries`, & `Pipelines` from one `Team Project` to another
 - Migrate `Work Items`, `TestPlans & Suits`, `Teams`, `Shared Queries`, & `Pipelines` from one `Organisation` to another
-- Bulk edit of `Work Items` accross an entire `Project`.
+- Bulk edit of `Work Items` across an entire `Project`.
 
 ### What versions of Azure DevOps & TFS do you support?
 
@@ -68,22 +68,22 @@ There are two ways to get these tools:
 
 ## Support
 
-1. [Question & Discussion](https://github.com/nkdAgility/azure-devops-migration-tools/discussions) - The first place to look for unsage, configuration, and general help. 
-1. [Issues on Gitbub](https://github.com/nkdAgility/azure-devops-migration-tools/issues) - If you have identified a bug and have logs then please raise an issue.
+1. [Question & Discussion](https://github.com/nkdAgility/azure-devops-migration-tools/discussions) - The first place to look for usage, configuration, and general help. 
+1. [Issues on Github](https://github.com/nkdAgility/azure-devops-migration-tools/issues) - If you have identified a bug and have logs then please raise an issue.
 
 ### Professional Support
 
-You can get free support from the community above and on social media on a best effort basis if folks are available. If you are *looking for paid support* [naked Agility with Martin Hinshelwood & Co](https://nkdagility.com) has a number of experts, many of whom contribute to this project, that can help. Find out how [we can help you](https://nkdagility.com/technical-consulting-and-coaching/azure-devops-migration-tools-consulting/) with your migration and [book a free consultation](https://nkdagility.com/technical-consulting-and-coaching/azure-devops-migration-tools-consulting/) to discuss how we can make things easyer.
+You can get free support from the community above and on social media on a best effort basis if folks are available. If you are *looking for paid support* [naked Agility with Martin Hinshelwood & Co](https://nkdagility.com) has a number of experts, many of whom contribute to this project, that can help. Find out how [we can help you](https://nkdagility.com/technical-consulting-and-coaching/azure-devops-migration-tools-consulting/) with your migration and [book a free consultation](https://nkdagility.com/technical-consulting-and-coaching/azure-devops-migration-tools-consulting/) to discuss how we can make things easier.
 
 We use these tools with our customers, and for fun, to do real world migrations on a daily basis and we can:
 
- - Consult with your internal folks who need help and guidance in runnign the tooling.
- - Make changes to the tool to support your needs; all additions are commited to the main repo.
+ - Consult with your internal folks who need help and guidance in running the tooling.
+ - Make changes to the tool to support your needs; all additions are committed to the main repo.
  - Run the migration for you:- you would need to pay for the hours that we would spend baby-sitting the running migrations
 
  ## Details
 
-These tools are build by naked Agility Limited's DevOps & Agility consultants to do real world migrations on a daily basis. We always work in [Azure DevOps Services](http://dev.azure.com) on https://dev.azure.com/nkdagility/migration-tools/ with code in GitHub and publish as a chocolatey package that pulls from GitGub Releases.
+These tools are build by naked Agility Limited's DevOps & Agility consultants to do real world migrations on a daily basis. We always work in [Azure DevOps Services](http://dev.azure.com) on https://dev.azure.com/nkdagility/migration-tools/ with code in GitHub and publish as a chocolatey package that pulls from Github Releases.
 
 |                 - | -                                                                                      |
 | ----------------: | :------------------------------------------------------------------------------------- |
@@ -118,15 +118,16 @@ Most of these processors need to be run in order. If you try to migrate work ite
 
 ## Processors (v2 Architecture) [ PREVIEW ]
 
-**_These are experimental processors that should replace those above. We are intersted in feedback of the new format of the config, as well as the functionality._**
+**_These are experimental processors that should replace those above. We are interested in feedback of the new format of the config, as well as the functionality._**
 
-The new processor configuration is designed to allow the Migration Tools to support diferent Source and targets than just TFS/Azure DevOps, and we moved the Endpoints to the processor to allow both Object Model & REST in different processors.
+The new processor configuration is designed to allow the Migration Tools to support different Source and targets than just TFS/Azure DevOps, and we moved the Endpoints to the processor to allow both Object Model & REST in different processors.
 
-| Processor                                                                        | Status  | Target         | Usage                                                                                                      |
-| :------------------------------------------------------------------------------- | :------ | :------------- | :--------------------------------------------------------------------------------------------------------- |
-| [WorkItemTrackingProcessor](./Reference/Processors/WorkItemTrackingProcessor.md) | Alpha   | Work Items     | Migrates either tip or history of work items with Links & Attachments based on a query with field mappings |
-| [TfsTeamSettingsProcessor](./Reference/Processors/TfsTeamSettingsProcessor.md)   | preview | Teams          | Migrates Teams and Team Settings                                                                           |
-| [TfsSharedQueryProcessor](./Reference/Processors/TfsTeamSettingsProcessor.md)    | preview | Shared Queries | Moved Shared Queries best effort                                                                           |
+| Processor                                                                                            | Status  | Target         | Usage                                                                                                      |
+| :--------------------------------------------------------------------------------------------------- | :------ | :------------- | :--------------------------------------------------------------------------------------------------------- |
+| [WorkItemTrackingProcessor](./Reference/Processors/WorkItemTrackingProcessor.md)                     | Alpha   | Work Items     | Migrates either tip or history of work items with Links & Attachments based on a query with field mappings |
+| [TfsTeamSettingsProcessor](./Reference/Processors/TfsTeamSettingsProcessor.md)                       | preview | Teams          | Migrates Teams and Team Settings                                                                           |
+| [TfsSharedQueryProcessor](./Reference/Processors/TfsTeamSettingsProcessor.md)                        | preview | Shared Queries | Moved Shared Queries best effort                                                                           |
+| [AzureDevOpsPipelineProcessorOptions](./Reference/Processors/AzureDevOpsPipelineProcessorOptions.md) | preview | Pipelines      | Migrate build and release pipelines                                                                        |
 
 ### Reference: A Deep Dive
 
@@ -139,7 +140,7 @@ The new processor configuration is designed to allow the Migration Tools to supp
 
 ## Field Maps
 
-By default, when you are moving from source to target the system will map all of the fields that exist in source to the same field in the target. This is the behaviour if the **FieldMaps** section is not present in the configuration file.  
+By default, when you are moving from source to target the system will map all of the fields that exist in source to the same field in the target. This is the behavior if the **FieldMaps** section is not present in the configuration file.  
 
 However sometimes you want to move data to another field, or use a regex to parse out just the bits that you want. To help we have built a number of mapping tools that should give you the versatility you need.
 
