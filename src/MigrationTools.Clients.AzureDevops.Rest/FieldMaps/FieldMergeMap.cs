@@ -12,13 +12,10 @@ namespace MigrationTools.Clients.AzureDevops.Rest.FieldMaps
         public override void Configure(IFieldMapConfig config)
         {
             base.Configure(config);
-            if (Config.targetField == Config.sourceField2)
-            {
-                throw new ArgumentNullException($"The source field `{Config.sourceField2}` can not match target field `{Config.targetField}`. Please use diferent fields.");
-            }
+          // Not implemented
         }
 
-        public override string MappingDisplayName => $"{Config.sourceField1}/{Config.sourceField2} -> {Config.targetField}";
+        public override string MappingDisplayName => $"Notimplemented";
 
         internal override void InternalExecute(WorkItem source, WorkItem target)
         {
