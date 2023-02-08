@@ -204,6 +204,7 @@ Check out the [FAQ pages](faq.md)
 * **Wes MacDonald, LIKE 10 INC.** - [@wesmacdonald](https://github.com/wesmacdonald) is a DevOps Consultant located in Toronto, Canada.  You can reach out to him via [LIKE 10 INC.](http://www.like10.com). 
 * **Ove Bastiansen** - [@ovebastiansen](https://github.com/ovebastiansen) is a DevOps consultant living in Oslo, Norway, but working worldwide in todays remote friendly world. You can reach him via his GitHub profile [https://github.com/ovebastiansen](https://github.com/ovebastiansen).
 * **Gordon Beeming** - [@DevStarOps](https://github.com/DevStarOps) is a DevOps Specialist in Durban, South Africa working at [Derivco](https://derivco.com). You can reach him via his [profile page](https://devstarops.com/) that links to all social media.
+* **Richard Hundhausen** - [@rhundhausen](https://github.com/rhundhausen) is an Azure DevOps consultant living in the United States and working at [Accentient](https://accentient.com)
 
 ## Terms
 
