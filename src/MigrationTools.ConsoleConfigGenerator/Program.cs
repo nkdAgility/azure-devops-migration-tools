@@ -92,10 +92,9 @@ namespace VstsSyncMigrator.ConsoleApp
         private static void ProcessItemFile(List<Type> targetTypes, List<Type> allTypes, string apiVersion, string folder, string masterTemplate, Type item, bool findConfig = true, string configEnd = "Options")
         {
             Type typeOption = item;
-
+            string objectName = item.Name;
             if (findConfig)
             {
-                string objectName = item.Name;
                 objectName = objectName.Replace("Context", "");
                 typeOption = allTypes.Where(t => t.Name == $"{objectName}{configEnd}" && !t.IsAbstract && !t.IsInterface).SingleOrDefault();
             }
