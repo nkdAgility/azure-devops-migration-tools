@@ -2,7 +2,7 @@
 
 >**_This documentation is for a preview version of the Azure DevOps Migration Tools._ If you are not using the preview version then please head over to the main [documentation](https://nkdagility.github.io/azure-devops-migration-tools).**
 
-[Overview](.././index.md) > [Reference](../index.md) > [Processors](./index.md)> **KeepOutboundLinkTargetProcessor**
+[Overview](../././index.md) > [Reference](.././index.md) > [API v2](../index.md) > [Processors](./index.md)> **KeepOutboundLinkTargetProcessor**
 
 missng XML code comments
 
@@ -31,7 +31,7 @@ missng XML code comments
   "Enabled": false,
   "WIQLQueryBit": "Select [System.Id] From WorkItems Where [System.TeamProject] = @project and not [System.WorkItemType] contains 'Test Suite, Test Plan,Shared Steps,Shared Parameter,Feedback Request'",
   "TargetLinksToKeepOrganization": "https://dev.azure.com/nkdagility",
-  "TargetLinksToKeepProject": "c6ca0796-fea6-4a1f-9dd5-09abc03b68ed",
+  "TargetLinksToKeepProject": "b3805c9c-cbcf-432d-b21f-c5b79a750565",
   "CleanupFileName": "c:/temp/OutboundLinkTargets.bat",
   "PrependCommand": "start",
   "DryRun": true,

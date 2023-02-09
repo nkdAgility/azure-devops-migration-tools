@@ -83,7 +83,7 @@ namespace VstsSyncMigrator.ConsoleApp
         {
             string templatemd = GetTemplate(apiVersion, folder, referencePath, masterTemplate, null);
             Console.WriteLine("Processing: index.md");
-            templatemd = ProcessBreadcrumbs(folder, null, templatemd);
+            templatemd = ProcessBreadcrumbs(apiVersion, folder, null, templatemd);
             templatemd = ProcessTypes(types, templatemd, folder);
             string filename = $"../../../../../docs/Reference/{apiVersion}/{folder}/index.md";
             File.WriteAllText(filename, templatemd);
@@ -137,7 +137,7 @@ namespace VstsSyncMigrator.ConsoleApp
                 templatemd = ProcessSamples(jsonSample, templatemd, referencePath);
                 templatemd = templatemd.Replace("<ClassName>", item.Name);
                 templatemd = templatemd.Replace("<TypeName>", folder);
-                templatemd = ProcessBreadcrumbs(folder, item, templatemd);
+                templatemd = ProcessBreadcrumbs(apiVersion, folder, item, templatemd);
                 string filename = $"../../../../../docs/Reference/{apiVersion}/{folder}/{item.Name}.md";
                 File.WriteAllText(filename, templatemd);
             }
@@ -267,9 +267,9 @@ namespace VstsSyncMigrator.ConsoleApp
             return templatemd;
         }
 
-        private static string ProcessBreadcrumbs(string folder, Type item, string templatemd)
+        private static string ProcessBreadcrumbs(string apiVersion, string folder, Type item, string templatemd)
         {
-            string breadcrumbs = $"[Overview](.././index.md) > [Reference](../index.md) > [{folder}](./index.md)";
+            string breadcrumbs = $"[Overview](../././index.md) > [Reference](.././index.md) > [API {apiVersion}](../index.md) > [{folder}](./index.md)";
             if (item != null)
             {
                 breadcrumbs += $"> **{item.Name}**";
