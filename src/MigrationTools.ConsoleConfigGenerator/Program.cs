@@ -86,7 +86,7 @@ namespace VstsSyncMigrator.ConsoleApp
         private static void ProcessItemFile(List<Type> types, string folder, string masterTemplate, Type item, bool findConfig = true, string configEnd = "Options")
         {
             Type typeOption = item;
-            item.
+           
             if (findConfig)
             {
                 typeOption = types.Where(t => t.Name == $"{item.Name}{configEnd}" && !t.IsAbstract && !t.IsInterface).SingleOrDefault();
