@@ -72,6 +72,11 @@ namespace VstsSyncMigrator.ConsoleApp
 
         private static void ProcessIndexFile(List<Type> types, string folder, string masterTemplate)
         {
+            string templatemd = GetTemplate(folder, referencePath, masterTemplate, null);
+            Console.WriteLine("Processing: index.md");
+            templatemd = ProcessBreadcrumbs(folder, null, templatemd);
+            templatemd = ProcessTypes(types, templatemd);
+            File.WriteAllText(string.Format("../../../../../docs/Reference/{0}/index.md", folder), templatemd);
         }
 
         private static void ProcessItemFile(List<Type> types, string folder, string masterTemplate, Type item, bool findConfig = true)
@@ -207,6 +212,21 @@ namespace VstsSyncMigrator.ConsoleApp
             return templatemd;
         }
 
+        private static string ProcessTypes(List<Type> types, string templatemd, string typeCatagoryName)
+        {
+            StringBuilder properties = new StringBuilder();
+            properties.AppendLine($"| {typeCatagoryName} | Data Type    | Description                              | Default Value                            |");
+            properties.AppendLine("|------------------------|---------|------------------------------------------|------------------------------------------|");
+            foreach (var item in types)
+            {
+                JObject joptions = (JObject)JToken.FromObject(item);
+                var jproperty = joptions.Properties();
+                properties.AppendLine(string.Format("| {0} | {1} | {2} | {3} |", item.Name, "", "", ""));
+            }
+            templatemd = templatemd.Replace("<ItemList>", properties.ToString());
+            return templatemd;
+        }
+
         private static object GetPropertyType(object options, JProperty jproperty)
         {
             return options.GetType().GetProperty(jproperty.Name).PropertyType.Name.Replace("`1", "");
@@ -235,7 +255,7 @@ namespace VstsSyncMigrator.ConsoleApp
 
         private static string GetTemplate(string folder, string referencePath, string masterTemplate, Type item)
         {
-            string typeTemplatename = string.Format("{0}-template.md", item.Name);
+            string typeTemplatename = string.Format("{0}-template.md", item != null ? item.Name : "index");
             string templateFile = Path.Combine(referencePath, folder, typeTemplatename);
             string templatemd;
             if (System.IO.File.Exists(templateFile))
