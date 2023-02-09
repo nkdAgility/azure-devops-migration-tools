@@ -1,17 +1,22 @@
-## <TypeName>: <ClassName>
+## FieldMaps
 
->**_This documentation is for a preview version of the Azure DevOps Migration Tools._ If you are not using the preview version then please head over to the main [documentation](https://nkdagility.github.io/azure-devops-migration-tools).**
+[Overview](.././index.md) > [Reference](../index.md) > *FieldMaps*
 
-[Overview](../././index.md) > [Reference](.././index.md) > [API v1](../index.md) > [FieldMaps](./index.md)
+These fieldMaps are provided to allow you to mondify the data as you do the migration.
 
-<Description>
+| FieldMaps | Data Type    | Description                              | Default Value                            |
+|------------------------|---------|------------------------------------------|------------------------------------------|
+| [FieldBlankMapConfig](./FieldBlankMapConfig.md) |  |  |  |
+| [FieldLiteralMapConfig](./FieldLiteralMapConfig.md) |  |  |  |
+| [FieldMergeMapConfig](./FieldMergeMapConfig.md) |  |  |  |
+| [FieldtoFieldMapConfig](./FieldtoFieldMapConfig.md) |  |  |  |
+| [FieldtoFieldMultiMapConfig](./FieldtoFieldMultiMapConfig.md) |  |  |  |
+| [FieldtoTagMapConfig](./FieldtoTagMapConfig.md) |  |  |  |
+| [FieldValueMapConfig](./FieldValueMapConfig.md) |  |  |  |
+| [FieldValuetoTagMapConfig](./FieldValuetoTagMapConfig.md) |  |  |  |
+| [MultiValueConditionalMapConfig](./MultiValueConditionalMapConfig.md) |  |  |  |
+| [RegexFieldMapConfig](./RegexFieldMapConfig.md) |  |  |  |
+| [TreeToTagMapConfig](./TreeToTagMapConfig.md) |  |  |  |
 
-### Options
 
-<Options>
 
-### Example JSON
-
-```JSON
-<ExampleJson>
-```

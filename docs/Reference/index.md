@@ -6,8 +6,8 @@
 
 There are two version of the documentation that corrospnd to tools that focus on the new REST API and the main body of the tools that use the Object Model.
 
-- **[API v1](../Reference/v1/index.md)**
-- **[API v2](../Reference/v2/index.md)**
+- **[API v1](../Reference/v1/index.md)** - Go here for WorkItemMigration as well as Test Plans and Suits.
+- **[API v2](../Reference/v2/index.md)** - Go here for Queries, Pipelines, and Team Settings
 
 
 

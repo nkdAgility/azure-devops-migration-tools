@@ -5,20 +5,20 @@
 
 [Overview](.././index.md) > **Reference**
 
-The system works by setting one or more [Processors](../Reference/v2/Processors/index.md) in the json 
-configuration file. This processor can have many [ProcessorEnrichers](../Reference/v2/ProcessorEnrichers/index.md) that 
-enable additional features, and must have at least two [Endpoints](../Reference/v2/Endpoints/index.md); 
+The system works by setting one or more [Processors](../v2/Processors/index.md) in the json 
+configuration file. This processor can have many [ProcessorEnrichers](../v2/ProcessorEnrichers/index.md) that 
+enable additional features, and must have at least two [Endpoints](../v2/Endpoints/index.md); 
 a *Source* `Endpoint` and a *Target* `Endpoint`. Each `Endpoint` 
-may have additional [EndpointEnrichers](../Reference/v2/EndpointEnrichers/index.md) that add 
+may have additional [EndpointEnrichers](../v2/EndpointEnrichers/index.md) that add 
 additional *Client* specific functionality.
 
 ### What types of things do we have
 
-- **[Processors](../Reference/v2/Processors/index.md)** - Processors allow you to move different types of data between `Endpoints` and does not care what `Endpoint` you have on each end.
-- **[Processor Enrichers](../Reference/v2/ProcessorEnrichers/index.md)** - Enrichers at the processor level allow you to add additional functionality to a processor without endangering the core functionality. Each Enricher should have a single responsibility and can add functionality to the following stages of the processor pipeline.
-- **[Endpoints](../Reference/v2/Endpoints/index.md)** connect to the target system and load and save the data. Endpoint can load or save data from any system, but we are focusing on Azure DevOps & Github.
-- **[Endpoint Enrichers](../Reference/v2/EndpointEnrichers/index.md)** - Because systems likely have different data shapes we also have *EndpointEnrichers* that can be added to `Endpoints` that allow loading and saving of specific data.
-- **[Mapping Tools](../Reference/v2/MappingTools/index.md)** - 
+- **[Processors](../v2/Processors/index.md)** - Processors allow you to move different types of data between `Endpoints` and does not care what `Endpoint` you have on each end.
+- **[Processor Enrichers](../v2/ProcessorEnrichers/index.md)** - Enrichers at the processor level allow you to add additional functionality to a processor without endangering the core functionality. Each Enricher should have a single responsibility and can add functionality to the following stages of the processor pipeline.
+- **[Endpoints](../v2/Endpoints/index.md)** connect to the target system and load and save the data. Endpoint can load or save data from any system, but we are focusing on Azure DevOps & Github.
+- **[Endpoint Enrichers](../v2/EndpointEnrichers/index.md)** - Because systems likely have different data shapes we also have *EndpointEnrichers* that can be added to `Endpoints` that allow loading and saving of specific data.
+- **[Mapping Tools](../v2/MappingTools/index.md)** - 
 
 We currently have a `WorkItemTrackingProcessor` with Endpoints for *InMemory* (for testing), *FileSystem*, and *Tfs*. You can mix-and-match Endpoints so that you would be able to migrate your `WorkItem` data from *Tfs* to *FileSystem* as needed.
 

@@ -200,6 +200,8 @@ The above options allow you to bring over a sub-set of the WIs (using the `WIQLQ
 
 Using the above sample structure, if you wanted to map the source project `Team 1`  to target project `Team A` etc. you could add the field map as follows
 
+A complete list of [FieldMaps](../Reference/v1/FieldMaps/index.md) are available.
+
 ```
  "FieldMaps": [
    {
