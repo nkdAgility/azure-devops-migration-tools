@@ -13,6 +13,18 @@ We provide a number of Processors that can be used to migrate diferent sorts of 
 | [TfsSharedQueryProcessor](./TfsSharedQueryProcessor.md)           | Shared Queries | Migrates all of the Shared Queries from one Project to Another.          |
 | [AzureDevOpsPipelineProcessor](./AzureDevOpsPipelineProcessor.md) | Pipelines      | Migrates Taskgroups, Build and Release Pipelines.                        |
 
+| Processors | Data Type    | Description                              | Default Value                            |
+|------------------------|---------|------------------------------------------|------------------------------------------|
+| [WorkItemTrackingProcessor](/WorkItemTrackingProcessor.md) |  |  |  |
+| [TfsAreaAndIterationProcessor](/TfsAreaAndIterationProcessor.md) |  |  |  |
+| [TfsSharedQueryProcessor](/TfsSharedQueryProcessor.md) |  |  |  |
+| [TfsTeamSettingsProcessor](/TfsTeamSettingsProcessor.md) |  |  |  |
+| [AzureDevOpsPipelineProcessor](/AzureDevOpsPipelineProcessor.md) |  |  |  |
+| [ProcessDefinitionProcessor](/ProcessDefinitionProcessor.md) |  |  |  |
+| [KeepOutboundLinkTargetProcessor](/KeepOutboundLinkTargetProcessor.md) |  |  |  |
+| [OutboundLinkCheckingProcessor](/OutboundLinkCheckingProcessor.md) |  |  |  |
+
+
 ### Processor Options
 
  All processors have a minimum set of options that are required to run. 

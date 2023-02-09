@@ -2,7 +2,7 @@
 
 namespace MigrationTools._EngineV1.Configuration
 {
-    internal interface IWorkItemProcessorConfig : IProcessorConfig
+    public interface IWorkItemProcessorConfig : IProcessorConfig
     {
         public string WIQLQueryBit { get; set; }
 

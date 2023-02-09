@@ -18,7 +18,6 @@ using MigrationTools.Processors;
 using MigrationTools.Tests;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using IProcessor = MigrationTools.Processors.IProcessor;
 
 namespace VstsSyncMigrator.ConsoleApp
 {
@@ -36,37 +35,42 @@ namespace VstsSyncMigrator.ConsoleApp
             domain.Load("MigrationTools.Clients.AzureDevops.ObjectModel");
             domain.Load("MigrationTools.Clients.AzureDevops.Rest");
             domain.Load("MigrationTools.Clients.FileSystem");
+            domain.Load("VstsSyncMigrator.Core");
             //AppDomain.CurrentDomain.Load("MigrationTools.Clients.AzureDevops.Rest");
-            List<Type> types = domain.GetAssemblies()
-                  .Where(a => !a.IsDynamic && a.FullName.StartsWith("MigrationTools"))
+            List<Type> newTypes = domain.GetAssemblies()
+                  .Where(a => !a.IsDynamic && a.FullName.StartsWith("MigrationTools") )
                   .SelectMany(a => a.GetTypes()).ToList();
+            List<Type> oldTypes = domain.GetAssemblies()
+                 .Where(a => !a.IsDynamic && a.FullName.StartsWith("VstsSyncMigrator"))
+                 .SelectMany(a => a.GetTypes()).ToList();
             Console.WriteLine("--------------------------");
             Console.WriteLine("---------EndpointEnrichers");
-            Process(types, typeof(IEndpointEnricher), "EndpointEnrichers");
+            Process(newTypes, typeof(IEndpointEnricher), "EndpointEnrichers");
             Console.WriteLine("--------------------------");
             Console.WriteLine("---------Endpoints");
-// Process(types, typeof(IEndpoint), "Endpoints");
+            // Process(types, typeof(IEndpoint), "Endpoints");
             Console.WriteLine("--------------------------");
             Console.WriteLine("---------ProcessorEnrichers");
-            Process(types, typeof(IProcessorEnricher), "ProcessorEnrichers");
+            Process(newTypes, typeof(IProcessorEnricher), "ProcessorEnrichers");
             Console.WriteLine("--------------------------");
             Console.WriteLine("---------Processors");
-            Process(types, typeof(IProcessor), "Processors");
+            Process(newTypes, typeof(MigrationTools.Processors.IProcessor), "Processors");
+            Process(oldTypes, typeof(MigrationTools._EngineV1.Containers.IProcessor), "Processors_v1", true, "Config");
             Console.WriteLine("--------------------------");
             Console.WriteLine("---------FieldMaps");
-            Process(types, typeof(IFieldMapConfig), "FieldMaps", false);
+            Process(newTypes, typeof(IFieldMapConfig), "FieldMaps", false);
             Console.WriteLine("--------------------------");
         }
 
-        private static void Process(List<Type> types, Type type, string folder, bool findConfig = true)
+        private static void Process(List<Type> types, Type type, string folder, bool findConfig = true, string configEnd = "Options")
         {
             string masterTemplate = System.IO.Path.Combine(referencePath, "template.md");
             var founds = types.Where(t => type.IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface).ToList();
-            ProcessIndexFile(types, folder, masterTemplate);
+            ProcessIndexFile(founds, folder, masterTemplate);
             // Each File
             foreach (var item in founds)
             {
-                ProcessItemFile(types, folder, masterTemplate, item, findConfig);
+                ProcessItemFile(types, folder, masterTemplate, item, findConfig, configEnd);
             }
         }
 
@@ -75,16 +79,17 @@ namespace VstsSyncMigrator.ConsoleApp
             string templatemd = GetTemplate(folder, referencePath, masterTemplate, null);
             Console.WriteLine("Processing: index.md");
             templatemd = ProcessBreadcrumbs(folder, null, templatemd);
-            templatemd = ProcessTypes(types, templatemd);
+            templatemd = ProcessTypes(types, templatemd, folder);
             File.WriteAllText(string.Format("../../../../../docs/Reference/{0}/index.md", folder), templatemd);
         }
 
-        private static void ProcessItemFile(List<Type> types, string folder, string masterTemplate, Type item, bool findConfig = true)
+        private static void ProcessItemFile(List<Type> types, string folder, string masterTemplate, Type item, bool findConfig = true, string configEnd = "Options")
         {
             Type typeOption = item;
+            item.
             if (findConfig)
             {
-                typeOption = types.Where(t => t.Name == string.Format("{0}Options", item.Name) && !t.IsAbstract && !t.IsInterface).SingleOrDefault();
+                typeOption = types.Where(t => t.Name == $"{item.Name}{configEnd}" && !t.IsAbstract && !t.IsInterface).SingleOrDefault();
             }            
             if (typeOption != null)
             {
@@ -219,9 +224,9 @@ namespace VstsSyncMigrator.ConsoleApp
             properties.AppendLine("|------------------------|---------|------------------------------------------|------------------------------------------|");
             foreach (var item in types)
             {
-                JObject joptions = (JObject)JToken.FromObject(item);
-                var jproperty = joptions.Properties();
-                properties.AppendLine(string.Format("| {0} | {1} | {2} | {3} |", item.Name, "", "", ""));
+                //JObject joptions = (JObject)JToken.FromObject(item);
+                //var jproperty = joptions.Properties();
+                properties.AppendLine(string.Format("| [{0}](/{0}.md) | {1} | {2} | {3} |", item.Name, "", "", ""));
             }
             templatemd = templatemd.Replace("<ItemList>", properties.ToString());
             return templatemd;
@@ -248,7 +253,11 @@ namespace VstsSyncMigrator.ConsoleApp
 
         private static string ProcessBreadcrumbs(string folder, Type item, string templatemd)
         {
-            string breadcrumbs = $"[Overview](.././index.md) > [Reference](../index.md) > [{folder}](./index.md) > **{item.Name}**";
+            string breadcrumbs = $"[Overview](.././index.md) > [Reference](../index.md) > [{folder}](./index.md)";
+            if (item != null)
+            {
+                breadcrumbs += $"> **{item.Name}**";
+            }
             templatemd = templatemd.Replace("<Breadcrumbs>", breadcrumbs);
             return templatemd;
         }
