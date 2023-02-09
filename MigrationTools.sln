@@ -25,13 +25,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extension", "Extension", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{2BC0808B-6F4D-4635-82FE-1118181DD64F}"
 	ProjectSection(SolutionItems) = preProject
-		docs\_config.yml = docs\_config.yml
 		docs\changeset-migration.md = docs\changeset-migration.md
 		docs\configuration.md = docs\configuration.md
 		docs\faq.md = docs\faq.md
 		docs\getting-started.md = docs\getting-started.md
 		docs\index.md = docs\index.md
 		docs\server-configuration.md = docs\server-configuration.md
+		docs\_config.yml = docs\_config.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A05A7847-4C75-4E92-B156-F529483688CC}"
