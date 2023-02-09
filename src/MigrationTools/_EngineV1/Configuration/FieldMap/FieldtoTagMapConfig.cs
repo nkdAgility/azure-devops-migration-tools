@@ -1,4 +1,7 @@
-﻿namespace MigrationTools._EngineV1.Configuration.FieldMap
+﻿using System;
+using MigrationTools.Options;
+
+namespace MigrationTools._EngineV1.Configuration.FieldMap
 {
     public class FieldtoTagMapConfig : IFieldMapConfig
     {
@@ -13,5 +16,6 @@
                 return "FieldToTagFieldMap";
             }
         }
+
     }
 }

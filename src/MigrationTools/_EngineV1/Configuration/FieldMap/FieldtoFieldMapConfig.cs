@@ -1,4 +1,5 @@
-﻿namespace MigrationTools._EngineV1.Configuration.FieldMap
+﻿
+namespace MigrationTools._EngineV1.Configuration.FieldMap
 {
     public class FieldtoFieldMapConfig : IFieldMapConfig
     {

@@ -1,0 +1,6 @@
+{
+  "$type": "FieldtoTagMapConfig",
+  "WorkItemTypeName": null,
+  "sourceField": null,
+  "formatExpression": null
+}
