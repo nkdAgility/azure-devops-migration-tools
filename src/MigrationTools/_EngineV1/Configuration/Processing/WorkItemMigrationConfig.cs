@@ -7,13 +7,13 @@ namespace MigrationTools._EngineV1.Configuration.Processing
     {
         /// <summary>
         /// You can choose to migrate the tip only (a single write) or all of the revisions (many writes).
-        /// If you are setting this to false to migrate only the tip then you should set BuildFieldTable to true
+        /// If you are setting this to `false` to migrate only the tip then you should set `BuildFieldTable` to `true`
         /// </summary>
         /// <default>true</default>
         public bool ReplayRevisions { get; set; }
 
         /// <summary>
-        /// Prefix your iterations and areas with the project name. If you have enabled this in NodeStructuresMigrationConfig you must do it here too.
+        /// Prefix your iterations and areas with the project name. If you have enabled this in `NodeStructuresMigrationConfig` you must do it here too.
         /// </summary>
         /// <default>false</default>
         public bool PrefixProjectToNodes { get; set; }
@@ -71,7 +71,7 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         public bool AttachmentMigration { get; set; }
 
         /// <summary>
-        /// AttachmentMigration is set to true then you need to specify a working path for attachments to be saved locally.
+        /// `AttachmentMigration` is set to true then you need to specify a working path for attachments to be saved locally.
         /// </summary>
         /// <default>C:\temp\Migration\</default>
         public string AttachmentWorkingPath { get; set; }
@@ -112,20 +112,20 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         public bool PauseAfterEachWorkItem { get; set; }
 
         /// <summary>
-        /// AttachmentMigration is set to true then you need to specify a max file size for upload in bites.
+        /// `AttachmentMigration` is set to true then you need to specify a max file size for upload in bites.
         /// For Azure DevOps Services the default is 480,000,000 bites (60mb), for TFS its 32,000,000 bites (4mb).
         /// </summary>
         /// <default>480000000</default>
         public int AttachmentMaxSize { get; set; }
 
         /// <summary>
-        /// This will create a json file with the revision history and attach it to the work item. Best used with MaxRevisions or ReplayRevisions.
+        /// This will create a json file with the revision history and attach it to the work item. Best used with `MaxRevisions` or `ReplayRevisions`.
         /// </summary>
         /// <default>?</default>
         public bool AttachRevisionHistory { get; set; }
 
         /// <summary>
-        /// If you have changed parents before re-running a sync you may get a TF26194: unable to change the value of the 'Parent' field error.
+        /// If you have changed parents before re-running a sync you may get a `TF26194: unable to change the value of the 'Parent' field` error.
         /// This will resolve it, but will slow migration.
         /// </summary>
         /// <default>false</default>
@@ -175,15 +175,15 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         public string[] NodeBasePaths { get; set; }
 
         /// <summary>
-        /// Remapping rules for area paths, implemented with regular expressions. The rules apply with a higher priority than the PrefixProjectToNodes,
-        /// that is, if no rule matches the path and the PrefixProjectToNodes option is enabled, then the old PrefixProjectToNodes behavior is applied.
+        /// Remapping rules for area paths, implemented with regular expressions. The rules apply with a higher priority than the `PrefixProjectToNodes`,
+        /// that is, if no rule matches the path and the `PrefixProjectToNodes` option is enabled, then the old `PrefixProjectToNodes` behavior is applied.
         /// </summary>
         /// <default>{}</default>
         public Dictionary<string, string> AreaMaps { get; set; }
 
         /// <summary>
-        /// Remapping rules for iteration paths, implemented with regular expressions. The rules apply with a higher priority than the PrefixProjectToNodes,
-        /// that is, if no rule matches the path and the PrefixProjectToNodes option is enabled, then the old PrefixProjectToNodes behavior is applied.
+        /// Remapping rules for iteration paths, implemented with regular expressions. The rules apply with a higher priority than the `PrefixProjectToNodes`,
+        /// that is, if no rule matches the path and the `PrefixProjectToNodes` option is enabled, then the old `PrefixProjectToNodes` behavior is applied.
         /// </summary>
         /// <default>{}</default>
         public Dictionary<string, string> IterationMaps { get; set; }
