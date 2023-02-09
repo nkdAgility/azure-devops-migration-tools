@@ -4,14 +4,28 @@
 
 [Overview](.././index.md) > [Reference](../index.md) > [FieldMaps](./index.md) > **RegexFieldMapConfig**
 
-<Description>
+missng XML code comments
 
 ### Options
 
-<Options>
+| Parameter name         | Type    | Description                              | Default Value                            |
+|------------------------|---------|------------------------------------------|------------------------------------------|
+| WorkItemTypeName | String | missng XML code comments | missng XML code comments |
+| sourceField | String | missng XML code comments | missng XML code comments |
+| targetField | String | missng XML code comments | missng XML code comments |
+| pattern | String | missng XML code comments | missng XML code comments |
+| replacement | String | missng XML code comments | missng XML code comments |
+
 
 ### Example JSON
 
 ```JSON
-<ExampleJson>
+{
+  "$type": "RegexFieldMapConfig",
+  "WorkItemTypeName": null,
+  "sourceField": null,
+  "targetField": null,
+  "pattern": null,
+  "replacement": null
+}
 ```

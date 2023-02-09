@@ -4,14 +4,28 @@
 
 [Overview](.././index.md) > [Reference](../index.md) > [FieldMaps](./index.md) > **FieldValueMapConfig**
 
-<Description>
+missng XML code comments
 
 ### Options
 
-<Options>
+| Parameter name         | Type    | Description                              | Default Value                            |
+|------------------------|---------|------------------------------------------|------------------------------------------|
+| WorkItemTypeName | String | missng XML code comments | missng XML code comments |
+| sourceField | String | missng XML code comments | missng XML code comments |
+| targetField | String | missng XML code comments | missng XML code comments |
+| defaultValue | String | missng XML code comments | missng XML code comments |
+| valueMapping | Dictionary`2 | missng XML code comments | missng XML code comments |
+
 
 ### Example JSON
 
 ```JSON
-<ExampleJson>
+{
+  "$type": "FieldValueMapConfig",
+  "WorkItemTypeName": null,
+  "sourceField": null,
+  "targetField": null,
+  "defaultValue": null,
+  "valueMapping": null
+}
 ```

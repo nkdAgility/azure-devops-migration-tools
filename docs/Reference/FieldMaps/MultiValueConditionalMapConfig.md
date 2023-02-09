@@ -4,14 +4,24 @@
 
 [Overview](.././index.md) > [Reference](../index.md) > [FieldMaps](./index.md) > **MultiValueConditionalMapConfig**
 
-<Description>
+missng XML code comments
 
 ### Options
 
-<Options>
+| Parameter name         | Type    | Description                              | Default Value                            |
+|------------------------|---------|------------------------------------------|------------------------------------------|
+| WorkItemTypeName | String | missng XML code comments | missng XML code comments |
+| sourceFieldsAndValues | Dictionary`2 | missng XML code comments | missng XML code comments |
+| targetFieldsAndValues | Dictionary`2 | missng XML code comments | missng XML code comments |
+
 
 ### Example JSON
 
 ```JSON
-<ExampleJson>
+{
+  "$type": "MultiValueConditionalMapConfig",
+  "WorkItemTypeName": null,
+  "sourceFieldsAndValues": null,
+  "targetFieldsAndValues": null
+}
 ```

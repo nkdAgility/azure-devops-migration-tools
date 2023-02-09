@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Microsoft.Extensions.Options;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Containers;
 using MigrationTools.EndpointEnrichers;
@@ -52,7 +53,6 @@ namespace VstsSyncMigrator.ConsoleApp
             Console.WriteLine("---------Processors");
             Process(types, typeof(IProcessor), "Processors");
             Console.WriteLine("--------------------------");
- Console.WriteLine("--------------------------");
             Console.WriteLine("---------FieldMaps");
             Process(types, typeof(IFieldMapConfig), "FieldMaps", false);
             Console.WriteLine("--------------------------");
@@ -85,25 +85,32 @@ namespace VstsSyncMigrator.ConsoleApp
             {
                 string templatemd = GetTemplate(folder, referencePath, masterTemplate, item);
                 Console.WriteLine("Processing:" + item.Name);
+                string jsonSample = "";
+                object targetItem = null;
                 if (typeOption.GetInterfaces().Contains(typeof(IOptions)))
                 {
                     Console.WriteLine("Processing as IOptions");
                     var options = (IOptions)Activator.CreateInstance(typeOption);
                     options.SetDefaults();
-                    JObject joptions = (JObject)JToken.FromObject(options);
-                    //---------------------------------------
-                    var jsonSample = DeployJsonSample(options, folder, referencePath, item);
-                    templatemd = templatemd.Replace("<Description>", GetTypeSummary(item));
-                    templatemd = ProcessOptions(options, joptions, templatemd);
-                    templatemd = ProcessSamples(jsonSample, templatemd, referencePath);
+                    targetItem = options;   
                 }
-                if (typeOption.GetInterfaces().Contains(typeof(IFieldMap)))
+                if (typeOption.GetInterfaces().Contains(typeof(IFieldMapConfig)))
                 {
-                    Console.WriteLine("Processing as IFieldMap");
-                    var options = (IFieldMap)Activator.CreateInstance(typeOption);
-
+                    Console.WriteLine("Processing as IFieldMapConfig");
+                    var options = (IFieldMapConfig)Activator.CreateInstance(typeOption);
+                    targetItem = options;
                 }
-                    templatemd = templatemd.Replace("<ClassName>", item.Name);
+                if (targetItem != null)
+                {
+                    Console.WriteLine("targetItem");
+                    JObject joptions = (JObject)JToken.FromObject(targetItem);
+                    templatemd = ProcessOptions(targetItem, joptions, templatemd);
+                    jsonSample = DeployJsonSample(targetItem, folder, referencePath, item);
+                   
+                }
+                templatemd = templatemd.Replace("<Description>", GetTypeSummary(item));
+                templatemd = ProcessSamples(jsonSample, templatemd, referencePath);
+                templatemd = templatemd.Replace("<ClassName>", item.Name);
                 templatemd = templatemd.Replace("<TypeName>", folder);
                 templatemd = ProcessBreadcrumbs(folder, item, templatemd);
                 File.WriteAllText(string.Format("../../../../../docs/Reference/{0}/{1}.md", folder, item.Name), templatemd);
@@ -128,7 +135,7 @@ namespace VstsSyncMigrator.ConsoleApp
             return query.Replace(Environment.NewLine, "").Trim();
         }
 
-        private static string GetPropertyData(IOptions options, JObject joptions, JProperty jproperty, string element)
+        private static string GetPropertyData(object options, JObject joptions, JProperty jproperty, string element)
         {
             var optionsType = options.GetType().GetProperty(jproperty.Name).DeclaringType;
             // Query the data and write out a subset of contacts
@@ -179,7 +186,7 @@ namespace VstsSyncMigrator.ConsoleApp
             return XDocument.Load(xmlDataPath);
         }
 
-        private static string ProcessOptions(IOptions options, JObject joptions, string templatemd)
+        private static string ProcessOptions(object options, JObject joptions, string templatemd)
         {
             StringBuilder properties = new StringBuilder();
             if (!(joptions is null))
@@ -200,7 +207,7 @@ namespace VstsSyncMigrator.ConsoleApp
             return templatemd;
         }
 
-        private static object GetPropertyType(IOptions options, JProperty jproperty)
+        private static object GetPropertyType(object options, JProperty jproperty)
         {
             return options.GetType().GetProperty(jproperty.Name).PropertyType.Name.Replace("`1", "");
         }
@@ -243,7 +250,7 @@ namespace VstsSyncMigrator.ConsoleApp
             return templatemd;
         }
 
-        private static string DeployJsonSample(IOptions options, string folder, string referencePath, Type item)
+        private static string DeployJsonSample(object options, string folder, string referencePath, Type item)
         {
             string json;
             json = NewtonsoftHelpers.SerializeObject(options, TypeNameHandling.Objects);

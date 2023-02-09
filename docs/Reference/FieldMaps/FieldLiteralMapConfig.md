@@ -4,14 +4,24 @@
 
 [Overview](.././index.md) > [Reference](../index.md) > [FieldMaps](./index.md) > **FieldLiteralMapConfig**
 
-<Description>
+missng XML code comments
 
 ### Options
 
-<Options>
+| Parameter name         | Type    | Description                              | Default Value                            |
+|------------------------|---------|------------------------------------------|------------------------------------------|
+| WorkItemTypeName | String | missng XML code comments | missng XML code comments |
+| targetField | String | missng XML code comments | missng XML code comments |
+| value | String | missng XML code comments | missng XML code comments |
+
 
 ### Example JSON
 
 ```JSON
-<ExampleJson>
+{
+  "$type": "FieldLiteralMapConfig",
+  "WorkItemTypeName": null,
+  "targetField": null,
+  "value": null
+}
 ```

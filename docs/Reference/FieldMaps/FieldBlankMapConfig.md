@@ -4,14 +4,22 @@
 
 [Overview](.././index.md) > [Reference](../index.md) > [FieldMaps](./index.md) > **FieldBlankMapConfig**
 
-<Description>
+missng XML code comments
 
 ### Options
 
-<Options>
+| Parameter name         | Type    | Description                              | Default Value                            |
+|------------------------|---------|------------------------------------------|------------------------------------------|
+| WorkItemTypeName | String | missng XML code comments | missng XML code comments |
+| targetField | String | missng XML code comments | missng XML code comments |
+
 
 ### Example JSON
 
 ```JSON
-<ExampleJson>
+{
+  "$type": "FieldBlankMapConfig",
+  "WorkItemTypeName": null,
+  "targetField": null
+}
 ```

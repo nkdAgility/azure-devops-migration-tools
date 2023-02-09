@@ -4,14 +4,24 @@
 
 [Overview](.././index.md) > [Reference](../index.md) > [FieldMaps](./index.md) > **FieldtoTagMapConfig**
 
-<Description>
+missng XML code comments
 
 ### Options
 
-<Options>
+| Parameter name         | Type    | Description                              | Default Value                            |
+|------------------------|---------|------------------------------------------|------------------------------------------|
+| WorkItemTypeName | String | missng XML code comments | missng XML code comments |
+| sourceField | String | missng XML code comments | missng XML code comments |
+| formatExpression | String | missng XML code comments | missng XML code comments |
+
 
 ### Example JSON
 
 ```JSON
-<ExampleJson>
+{
+  "$type": "FieldtoTagMapConfig",
+  "WorkItemTypeName": null,
+  "sourceField": null,
+  "formatExpression": null
+}
 ```

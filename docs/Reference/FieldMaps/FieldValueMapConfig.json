@@ -1,0 +1,8 @@
+{
+  "$type": "FieldValueMapConfig",
+  "WorkItemTypeName": null,
+  "sourceField": null,
+  "targetField": null,
+  "defaultValue": null,
+  "valueMapping": null
+}

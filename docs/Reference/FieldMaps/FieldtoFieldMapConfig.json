@@ -1,0 +1,7 @@
+{
+  "$type": "FieldtoFieldMapConfig",
+  "WorkItemTypeName": null,
+  "sourceField": null,
+  "targetField": null,
+  "defaultValue": null
+}

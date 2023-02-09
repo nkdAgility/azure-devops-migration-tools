@@ -4,14 +4,24 @@
 
 [Overview](.././index.md) > [Reference](../index.md) > [FieldMaps](./index.md) > **TreeToTagMapConfig**
 
-<Description>
+missng XML code comments
 
 ### Options
 
-<Options>
+| Parameter name         | Type    | Description                              | Default Value                            |
+|------------------------|---------|------------------------------------------|------------------------------------------|
+| WorkItemTypeName | String | missng XML code comments | missng XML code comments |
+| toSkip | Int32 | missng XML code comments | missng XML code comments |
+| timeTravel | Int32 | missng XML code comments | missng XML code comments |
+
 
 ### Example JSON
 
 ```JSON
-<ExampleJson>
+{
+  "$type": "TreeToTagMapConfig",
+  "WorkItemTypeName": null,
+  "toSkip": 0,
+  "timeTravel": 0
+}
 ```

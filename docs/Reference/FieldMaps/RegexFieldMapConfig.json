@@ -1,0 +1,8 @@
+{
+  "$type": "RegexFieldMapConfig",
+  "WorkItemTypeName": null,
+  "sourceField": null,
+  "targetField": null,
+  "pattern": null,
+  "replacement": null
+}
