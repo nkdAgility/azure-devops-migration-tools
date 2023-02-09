@@ -37,72 +37,87 @@ namespace VstsSyncMigrator.ConsoleApp
             domain.Load("MigrationTools.Clients.FileSystem");
             domain.Load("VstsSyncMigrator.Core");
             //AppDomain.CurrentDomain.Load("MigrationTools.Clients.AzureDevops.Rest");
+
             List<Type> newTypes = domain.GetAssemblies()
-                  .Where(a => !a.IsDynamic && a.FullName.StartsWith("MigrationTools") )
+                  .Where(a => !a.IsDynamic && a.FullName.StartsWith("MigrationTools"))
                   .SelectMany(a => a.GetTypes()).ToList();
             List<Type> oldTypes = domain.GetAssemblies()
                  .Where(a => !a.IsDynamic && a.FullName.StartsWith("VstsSyncMigrator"))
                  .SelectMany(a => a.GetTypes()).ToList();
+            List<Type> allTypes = newTypes.Concat(oldTypes).ToList();
+
+
             Console.WriteLine("--------------------------");
             Console.WriteLine("---------EndpointEnrichers");
-            Process(newTypes, typeof(IEndpointEnricher), "EndpointEnrichers");
+            Process(newTypes, allTypes, typeof(IEndpointEnricher), "v2", "EndpointEnrichers");
             Console.WriteLine("--------------------------");
             Console.WriteLine("---------Endpoints");
             // Process(types, typeof(IEndpoint), "Endpoints");
             Console.WriteLine("--------------------------");
             Console.WriteLine("---------ProcessorEnrichers");
-            Process(newTypes, typeof(IProcessorEnricher), "ProcessorEnrichers");
+            Process(newTypes, allTypes, typeof(IProcessorEnricher), "v2", "ProcessorEnrichers");
             Console.WriteLine("--------------------------");
             Console.WriteLine("---------Processors");
-            Process(newTypes, typeof(MigrationTools.Processors.IProcessor), "Processors");
-            Process(oldTypes, typeof(MigrationTools._EngineV1.Containers.IProcessor), "Processors_v1", true, "Config");
+            Process(newTypes, allTypes, typeof(MigrationTools.Processors.IProcessor), "v2", "Processors");
+            Process(oldTypes, allTypes, typeof(MigrationTools._EngineV1.Containers.IProcessor), "v1", "Processors", true, "Config");
             Console.WriteLine("--------------------------");
             Console.WriteLine("---------FieldMaps");
-            Process(newTypes, typeof(IFieldMapConfig), "FieldMaps", false);
+            Process(newTypes, allTypes, typeof(IFieldMapConfig), "v1", "FieldMaps", false);
+            Process(newTypes, allTypes, typeof(IFieldMapConfig), "v2", "FieldMaps", false);
             Console.WriteLine("--------------------------");
         }
 
-        private static void Process(List<Type> types, Type type, string folder, bool findConfig = true, string configEnd = "Options")
+        private static void Process(List<Type> targetTypes, List<Type> allTypes, Type type, string apiVersion, string folder, bool findConfig = true, string configEnd = "Options")
         {
             string masterTemplate = System.IO.Path.Combine(referencePath, "template.md");
-            var founds = types.Where(t => type.IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface).ToList();
-            ProcessIndexFile(founds, folder, masterTemplate);
+            var founds = targetTypes.Where(t => type.IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface).ToList();
+            ProcessIndexFile(founds, apiVersion, folder, masterTemplate);
             // Each File
             foreach (var item in founds)
             {
-                ProcessItemFile(types, folder, masterTemplate, item, findConfig, configEnd);
+                ProcessItemFile(targetTypes, allTypes, apiVersion, folder, masterTemplate, item, findConfig, configEnd);
             }
         }
 
-        private static void ProcessIndexFile(List<Type> types, string folder, string masterTemplate)
+        private static void ProcessIndexFile(List<Type> types, string apiVersion, string folder, string masterTemplate)
         {
-            string templatemd = GetTemplate(folder, referencePath, masterTemplate, null);
+            string templatemd = GetTemplate(apiVersion, folder, referencePath, masterTemplate, null);
             Console.WriteLine("Processing: index.md");
             templatemd = ProcessBreadcrumbs(folder, null, templatemd);
             templatemd = ProcessTypes(types, templatemd, folder);
-            File.WriteAllText(string.Format("../../../../../docs/Reference/{0}/index.md", folder), templatemd);
+            string filename = $"../../../../../docs/Reference/{apiVersion}/{folder}/index.md";
+            File.WriteAllText(filename, templatemd);
         }
 
-        private static void ProcessItemFile(List<Type> types, string folder, string masterTemplate, Type item, bool findConfig = true, string configEnd = "Options")
+        private static void ProcessItemFile(List<Type> targetTypes, List<Type> allTypes, string apiVersion, string folder, string masterTemplate, Type item, bool findConfig = true, string configEnd = "Options")
         {
             Type typeOption = item;
-           
+
             if (findConfig)
             {
-                typeOption = types.Where(t => t.Name == $"{item.Name}{configEnd}" && !t.IsAbstract && !t.IsInterface).SingleOrDefault();
-            }            
+                string objectName = item.Name;
+                objectName = objectName.Replace("Context", "");
+                typeOption = allTypes.Where(t => t.Name == $"{objectName}{configEnd}" && !t.IsAbstract && !t.IsInterface).SingleOrDefault();
+            }
+
             if (typeOption != null)
             {
-                string templatemd = GetTemplate(folder, referencePath, masterTemplate, item);
+                string templatemd = GetTemplate(apiVersion, folder, referencePath, masterTemplate, item);
                 Console.WriteLine("Processing:" + item.Name);
                 string jsonSample = "";
                 object targetItem = null;
+                if (typeOption.GetInterfaces().Contains(typeof(IProcessorConfig)))
+                {
+                    Console.WriteLine("Processing as IProcessorConfig");
+                    var options = (IProcessorConfig)Activator.CreateInstance(typeOption);
+                    targetItem = options;
+                }
                 if (typeOption.GetInterfaces().Contains(typeof(IOptions)))
                 {
                     Console.WriteLine("Processing as IOptions");
                     var options = (IOptions)Activator.CreateInstance(typeOption);
                     options.SetDefaults();
-                    targetItem = options;   
+                    targetItem = options;
                 }
                 if (typeOption.GetInterfaces().Contains(typeof(IFieldMapConfig)))
                 {
@@ -115,15 +130,16 @@ namespace VstsSyncMigrator.ConsoleApp
                     Console.WriteLine("targetItem");
                     JObject joptions = (JObject)JToken.FromObject(targetItem);
                     templatemd = ProcessOptions(targetItem, joptions, templatemd);
-                    jsonSample = DeployJsonSample(targetItem, folder, referencePath, item);
-                   
+                    jsonSample = DeployJsonSample(targetItem, apiVersion, folder, referencePath, item);
+
                 }
                 templatemd = templatemd.Replace("<Description>", GetTypeSummary(item));
                 templatemd = ProcessSamples(jsonSample, templatemd, referencePath);
                 templatemd = templatemd.Replace("<ClassName>", item.Name);
                 templatemd = templatemd.Replace("<TypeName>", folder);
                 templatemd = ProcessBreadcrumbs(folder, item, templatemd);
-                File.WriteAllText(string.Format("../../../../../docs/Reference/{0}/{1}.md", folder, item.Name), templatemd);
+                string filename = $"../../../../../docs/Reference/{apiVersion}/{folder}/{item.Name}.md";
+                File.WriteAllText(filename, templatemd);
             }
         }
 
@@ -262,10 +278,10 @@ namespace VstsSyncMigrator.ConsoleApp
             return templatemd;
         }
 
-        private static string GetTemplate(string folder, string referencePath, string masterTemplate, Type item)
+        private static string GetTemplate( string apiVersion,string folder, string referencePath, string masterTemplate, Type item)
         {
             string typeTemplatename = string.Format("{0}-template.md", item != null ? item.Name : "index");
-            string templateFile = Path.Combine(referencePath, folder, typeTemplatename);
+            string templateFile = Path.Combine(referencePath, apiVersion, folder, typeTemplatename);
             string templatemd;
             if (System.IO.File.Exists(templateFile))
             {
@@ -279,12 +295,12 @@ namespace VstsSyncMigrator.ConsoleApp
             return templatemd;
         }
 
-        private static string DeployJsonSample(object options, string folder, string referencePath, Type item)
+        private static string DeployJsonSample(object options, string apiVersion, string folder, string referencePath, Type item)
         {
             string json;
             json = NewtonsoftHelpers.SerializeObject(options, TypeNameHandling.Objects);
             string jsonFilename = string.Format("{0}.json", item.Name);
-            string jsonFilePath = Path.Combine(referencePath, folder, jsonFilename);
+            string jsonFilePath = Path.Combine(referencePath, apiVersion, folder, jsonFilename);
             File.WriteAllText(jsonFilePath, json.Replace(TestingConstants.AccessToken, "6i4jyylsadahtdjniaydxnjsi4zsz3qsword2y5ngzzsdfewaostq"));
             return json;
         }

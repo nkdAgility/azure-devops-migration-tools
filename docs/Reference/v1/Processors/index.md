@@ -4,7 +4,7 @@
 
 We provide a number of Processors that can be used to migrate diferent sorts of data. These processors are the original traditional processors.
 
-| Processors_v1 | Data Type    | Description                              | Default Value                            |
+| Processors | Data Type    | Description                              | Default Value                            |
 |------------------------|---------|------------------------------------------|------------------------------------------|
 | [FakeProcessor](/FakeProcessor.md) |  |  |  |
 | [TeamMigrationContext](/TeamMigrationContext.md) |  |  |  |

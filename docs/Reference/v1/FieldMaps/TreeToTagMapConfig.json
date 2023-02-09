@@ -1,0 +1,6 @@
+{
+  "$type": "TreeToTagMapConfig",
+  "WorkItemTypeName": null,
+  "toSkip": 0,
+  "timeTravel": 0
+}
