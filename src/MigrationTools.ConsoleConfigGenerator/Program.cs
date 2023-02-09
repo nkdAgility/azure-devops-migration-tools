@@ -221,8 +221,8 @@ namespace VstsSyncMigrator.ConsoleApp
                 var jpropertys = joptions.Properties();
                 foreach (JProperty jproperty in jpropertys)
                 {
-                    string PropertyTypeValue = GetPropertyType(options, jproperty).ToString().Replace("\r\n", "").Trim();
-                    properties.AppendLine(string.Format("| {0} | {1} | {2} | {3} |", jproperty.Name, PropertyTypeValue, GetPropertyData(options, joptions, jproperty, "summary"), GetPropertyData(options, joptions, jproperty, "default")));
+                    string PropertyValue = GetPropertyData(options, joptions, jproperty, "summary").Replace("\r", "").Replace("\n", "").Trim();
+                    properties.AppendLine(string.Format("| {0} | {1} | {2} | {3} |", jproperty.Name, GetPropertyType(options, jproperty), PropertyValue, GetPropertyData(options, joptions, jproperty, "default")));
                 }
                 templatemd = templatemd.Replace("<Options>", properties.ToString());
             }

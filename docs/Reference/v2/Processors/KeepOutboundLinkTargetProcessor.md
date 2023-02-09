@@ -31,7 +31,7 @@ missng XML code comments
   "Enabled": false,
   "WIQLQueryBit": "Select [System.Id] From WorkItems Where [System.TeamProject] = @project and not [System.WorkItemType] contains 'Test Suite, Test Plan,Shared Steps,Shared Parameter,Feedback Request'",
   "TargetLinksToKeepOrganization": "https://dev.azure.com/nkdagility",
-  "TargetLinksToKeepProject": "33952d5a-a1b4-4fac-8456-21cfd3fe68e8",
+  "TargetLinksToKeepProject": "6ebf0944-6590-49fb-9765-757f10e4a85c",
   "CleanupFileName": "c:/temp/OutboundLinkTargets.bat",
   "PrependCommand": "start",
   "DryRun": true,
