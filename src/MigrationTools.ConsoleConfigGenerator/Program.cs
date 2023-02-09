@@ -6,6 +6,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using MigrationTools._EngineV1.Configuration;
+using MigrationTools._EngineV1.Containers;
 using MigrationTools.EndpointEnrichers;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
@@ -15,6 +17,7 @@ using MigrationTools.Processors;
 using MigrationTools.Tests;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using IProcessor = MigrationTools.Processors.IProcessor;
 
 namespace VstsSyncMigrator.ConsoleApp
 {
@@ -49,9 +52,13 @@ namespace VstsSyncMigrator.ConsoleApp
             Console.WriteLine("---------Processors");
             Process(types, typeof(IProcessor), "Processors");
             Console.WriteLine("--------------------------");
+ Console.WriteLine("--------------------------");
+            Console.WriteLine("---------FieldMaps");
+            Process(types, typeof(IFieldMapConfig), "FieldMaps", false);
+            Console.WriteLine("--------------------------");
         }
 
-        private static void Process(List<Type> types, Type type, string folder)
+        private static void Process(List<Type> types, Type type, string folder, bool findConfig = true)
         {
             string masterTemplate = System.IO.Path.Combine(referencePath, "template.md");
             var founds = types.Where(t => type.IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface).ToList();
@@ -59,7 +66,7 @@ namespace VstsSyncMigrator.ConsoleApp
             // Each File
             foreach (var item in founds)
             {
-                ProcessItemFile(types, folder, masterTemplate, item);
+                ProcessItemFile(types, folder, masterTemplate, item, findConfig);
             }
         }
 
@@ -67,26 +74,38 @@ namespace VstsSyncMigrator.ConsoleApp
         {
         }
 
-        private static void ProcessItemFile(List<Type> types, string folder, string masterTemplate, Type item)
+        private static void ProcessItemFile(List<Type> types, string folder, string masterTemplate, Type item, bool findConfig = true)
         {
-            var typeOption = types.Where(t => t.Name == string.Format("{0}Options", item.Name) && !t.IsAbstract && !t.IsInterface).SingleOrDefault();
+            Type typeOption = item;
+            if (findConfig)
+            {
+                typeOption = types.Where(t => t.Name == string.Format("{0}Options", item.Name) && !t.IsAbstract && !t.IsInterface).SingleOrDefault();
+            }            
             if (typeOption != null)
             {
-                var options = (IOptions)Activator.CreateInstance(typeOption);
-                options.SetDefaults();
-                JObject joptions = (JObject)JToken.FromObject(options);
-                //---------------------------------------
-                Console.WriteLine("Processing:" + item.Name);
-                var jsonSample = DeployJsonSample(options, folder, referencePath, item);
-
                 string templatemd = GetTemplate(folder, referencePath, masterTemplate, item);
+                Console.WriteLine("Processing:" + item.Name);
+                if (typeOption.GetInterfaces().Contains(typeof(IOptions)))
+                {
+                    Console.WriteLine("Processing as IOptions");
+                    var options = (IOptions)Activator.CreateInstance(typeOption);
+                    options.SetDefaults();
+                    JObject joptions = (JObject)JToken.FromObject(options);
+                    //---------------------------------------
+                    var jsonSample = DeployJsonSample(options, folder, referencePath, item);
+                    templatemd = templatemd.Replace("<Description>", GetTypeSummary(item));
+                    templatemd = ProcessOptions(options, joptions, templatemd);
+                    templatemd = ProcessSamples(jsonSample, templatemd, referencePath);
+                }
+                if (typeOption.GetInterfaces().Contains(typeof(IFieldMap)))
+                {
+                    Console.WriteLine("Processing as IFieldMap");
+                    var options = (IFieldMap)Activator.CreateInstance(typeOption);
 
-                templatemd = templatemd.Replace("<ClassName>", item.Name);
+                }
+                    templatemd = templatemd.Replace("<ClassName>", item.Name);
                 templatemd = templatemd.Replace("<TypeName>", folder);
                 templatemd = ProcessBreadcrumbs(folder, item, templatemd);
-                templatemd = templatemd.Replace("<Description>", GetTypeSummary(item));
-                templatemd = ProcessOptions(options, joptions, templatemd);
-                templatemd = ProcessSamples(jsonSample, templatemd, referencePath);
                 File.WriteAllText(string.Format("../../../../../docs/Reference/{0}/{1}.md", folder, item.Name), templatemd);
             }
         }

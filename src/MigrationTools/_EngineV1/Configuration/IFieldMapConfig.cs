@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using MigrationTools.Options;
+using Newtonsoft.Json;
 
 namespace MigrationTools._EngineV1.Configuration
 {
@@ -8,5 +9,7 @@ namespace MigrationTools._EngineV1.Configuration
 
         [JsonIgnore]
         string FieldMap { get; }
+
+
     }
 }
