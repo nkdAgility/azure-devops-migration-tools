@@ -6,22 +6,22 @@ We provide a number of Processors that can be used to migrate diferent sorts of 
 
 | Processors | Data Type    | Description                              | Default Value                            |
 |------------------------|---------|------------------------------------------|------------------------------------------|
-| [FakeProcessor](/FakeProcessor.md) |  |  |  |
-| [TeamMigrationContext](/TeamMigrationContext.md) |  |  |  |
-| [TestConfigurationsMigrationContext](/TestConfigurationsMigrationContext.md) |  |  |  |
-| [TestPlandsAndSuitesMigrationContext](/TestPlandsAndSuitesMigrationContext.md) |  |  |  |
-| [TestVariablesMigrationContext](/TestVariablesMigrationContext.md) |  |  |  |
-| [WorkItemMigrationContext](/WorkItemMigrationContext.md) |  |  |  |
-| [WorkItemPostProcessingContext](/WorkItemPostProcessingContext.md) |  |  |  |
-| [WorkItemQueryMigrationContext](/WorkItemQueryMigrationContext.md) |  |  |  |
-| [CreateTeamFolders](/CreateTeamFolders.md) |  |  |  |
-| [ExportProfilePictureFromADContext](/ExportProfilePictureFromADContext.md) |  |  |  |
-| [ExportTeamList](/ExportTeamList.md) |  |  |  |
+| [FakeProcessor](./FakeProcessor.md) |  |  |  |
+| [TeamMigrationContext](./TeamMigrationContext.md) |  |  |  |
+| [TestConfigurationsMigrationContext](./TestConfigurationsMigrationContext.md) |  |  |  |
+| [TestPlandsAndSuitesMigrationContext](./TestPlandsAndSuitesMigrationContext.md) |  |  |  |
+| [TestVariablesMigrationContext](./TestVariablesMigrationContext.md) |  |  |  |
+| [WorkItemMigrationContext](./WorkItemMigrationContext.md) |  |  |  |
+| [WorkItemPostProcessingContext](./WorkItemPostProcessingContext.md) |  |  |  |
+| [WorkItemQueryMigrationContext](./WorkItemQueryMigrationContext.md) |  |  |  |
+| [CreateTeamFolders](./CreateTeamFolders.md) |  |  |  |
+| [ExportProfilePictureFromADContext](./ExportProfilePictureFromADContext.md) |  |  |  |
+| [ExportTeamList](./ExportTeamList.md) |  |  |  |
 | [FixGitCommitLinks](/FixGitCommitLinks.md) |  |  |  |
-| [ImportProfilePictureContext](/ImportProfilePictureContext.md) |  |  |  |
-| [WorkItemDelete](/WorkItemDelete.md) |  |  |  |
-| [WorkItemUpdate](/WorkItemUpdate.md) |  |  |  |
-| [WorkItemUpdateAreasAsTagsContext](/WorkItemUpdateAreasAsTagsContext.md) |  |  |  |
+| [ImportProfilePictureContext](./ImportProfilePictureContext.md) |  |  |  |
+| [WorkItemDelete](./WorkItemDelete.md) |  |  |  |
+| [WorkItemUpdate](./WorkItemUpdate.md) |  |  |  |
+| [WorkItemUpdateAreasAsTagsContext](./WorkItemUpdateAreasAsTagsContext.md) |  |  |  |
 
 
 ### Processor Options
