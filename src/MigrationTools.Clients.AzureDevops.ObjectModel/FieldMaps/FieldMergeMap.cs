@@ -20,13 +20,14 @@ namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
         public override void Configure(IFieldMapConfig config)
         {
             base.Configure(config);
-            foreach (string item in Config.sourceFields)
-            {
-                if (Config.targetField == item)
-                {
-                    throw new ArgumentNullException($"The source field `{item}` can not match target field `{Config.targetField}`. Please use diferent fields.");
-                }
-            }
+            // I think this is unessesary!
+            //foreach (string item in Config.sourceFields)
+            //{
+            //    if (Config.targetField == item)
+            //    {
+            //        throw new ArgumentNullException($"The source field `{item}` can not match target field `{Config.targetField}`. Please use diferent fields.");
+            //    }
+            //}
             
         }
 
