@@ -30,7 +30,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{2BC0808B-6
 		docs\faq.md = docs\faq.md
 		docs\getting-started.md = docs\getting-started.md
 		docs\index.md = docs\index.md
+		docs\Reference\index.md = docs\Reference\index.md
 		docs\server-configuration.md = docs\server-configuration.md
+		docs\Reference\template.md = docs\Reference\template.md
 		docs\_config.yml = docs\_config.yml
 	EndProjectSection
 EndProject
@@ -113,65 +115,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Clients.AzureDevops.ObjectModel.Tests", "src\MigrationTools.Clients.AzureDevops.ObjectModel.Tests\MigrationTools.Clients.AzureDevops.ObjectModel.Tests.csproj", "{72FA4853-D840-480E-A6FD-670EF66E9D5B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.ConsoleConfigGenerator", "src\MigrationTools.ConsoleConfigGenerator\MigrationTools.ConsoleConfigGenerator.csproj", "{B64B19C7-BD17-4B2A-83E6-B33B3D73B078}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Reference", "Reference", "{00238E4D-EBF6-4604-AA6C-792FC32C89A1}"
-	ProjectSection(SolutionItems) = preProject
-		docs\Reference\index.md = docs\Reference\index.md
-		docs\Reference\template.md = docs\Reference\template.md
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EndpointEnrichers", "EndpointEnrichers", "{E2FDAB96-3FA2-4A83-AFEA-49FE4A4DAFC4}"
-	ProjectSection(SolutionItems) = preProject
-		docs\Reference\EndpointEnrichers\index.md = docs\Reference\EndpointEnrichers\index.md
-		docs\Reference\EndpointEnrichers\TfsWorkItemAttachmentEnricher.json = docs\Reference\EndpointEnrichers\TfsWorkItemAttachmentEnricher.json
-		docs\Reference\EndpointEnrichers\TfsWorkItemAttachmentEnricher.md = docs\Reference\EndpointEnrichers\TfsWorkItemAttachmentEnricher.md
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Endpoints", "Endpoints", "{A433BB95-FC3C-4133-A289-7EDFC9E7E62F}"
-	ProjectSection(SolutionItems) = preProject
-		docs\Reference\Endpoints\FileSystemWorkItemEndpoint.json = docs\Reference\Endpoints\FileSystemWorkItemEndpoint.json
-		docs\Reference\Endpoints\FileSystemWorkItemEndpoint.md = docs\Reference\Endpoints\FileSystemWorkItemEndpoint.md
-		docs\Reference\Endpoints\index-template.md = docs\Reference\Endpoints\index-template.md
-		docs\Reference\Endpoints\index.md = docs\Reference\Endpoints\index.md
-		docs\Reference\Endpoints\TfsEndpoint.json = docs\Reference\Endpoints\TfsEndpoint.json
-		docs\Reference\Endpoints\TfsEndpoint.md = docs\Reference\Endpoints\TfsEndpoint.md
-		docs\Reference\Endpoints\TfsTeamSettingsEndpoint.json = docs\Reference\Endpoints\TfsTeamSettingsEndpoint.json
-		docs\Reference\Endpoints\TfsTeamSettingsEndpoint.md = docs\Reference\Endpoints\TfsTeamSettingsEndpoint.md
-		docs\Reference\Endpoints\TfsWorkItemEndpoint-template.md = docs\Reference\Endpoints\TfsWorkItemEndpoint-template.md
-		docs\Reference\Endpoints\TfsWorkItemEndpoint.json = docs\Reference\Endpoints\TfsWorkItemEndpoint.json
-		docs\Reference\Endpoints\TfsWorkItemEndpoint.md = docs\Reference\Endpoints\TfsWorkItemEndpoint.md
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Processors", "Processors", "{6B1F49FC-250D-4671-87BA-B95EB90C5A94}"
-	ProjectSection(SolutionItems) = preProject
-		docs\Reference\Processors\index.md = docs\Reference\Processors\index.md
-		docs\Reference\Processors\TfsSharedQueryProcessor.json = docs\Reference\Processors\TfsSharedQueryProcessor.json
-		docs\Reference\Processors\TfsSharedQueryProcessor.md = docs\Reference\Processors\TfsSharedQueryProcessor.md
-		docs\Reference\Processors\TfsTeamSettingsProcessor.json = docs\Reference\Processors\TfsTeamSettingsProcessor.json
-		docs\Reference\Processors\TfsTeamSettingsProcessor.md = docs\Reference\Processors\TfsTeamSettingsProcessor.md
-		docs\Reference\Processors\WorkItemTrackingProcessor-template.md = docs\Reference\Processors\WorkItemTrackingProcessor-template.md
-		docs\Reference\Processors\WorkItemTrackingProcessor.json = docs\Reference\Processors\WorkItemTrackingProcessor.json
-		docs\Reference\Processors\WorkItemTrackingProcessor.md = docs\Reference\Processors\WorkItemTrackingProcessor.md
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ProcessorEnrichers", "ProcessorEnrichers", "{73142CEF-17E1-47EA-8BEF-1A6A1EBDF1D7}"
-	ProjectSection(SolutionItems) = preProject
-		docs\Reference\ProcessorEnrichers\AppendMigrationToolSignatureFooter.json = docs\Reference\ProcessorEnrichers\AppendMigrationToolSignatureFooter.json
-		docs\Reference\ProcessorEnrichers\AppendMigrationToolSignatureFooter.md = docs\Reference\ProcessorEnrichers\AppendMigrationToolSignatureFooter.md
-		docs\Reference\ProcessorEnrichers\FilterWorkItemsThatAlreadyExistInTarget.json = docs\Reference\ProcessorEnrichers\FilterWorkItemsThatAlreadyExistInTarget.json
-		docs\Reference\ProcessorEnrichers\FilterWorkItemsThatAlreadyExistInTarget.md = docs\Reference\ProcessorEnrichers\FilterWorkItemsThatAlreadyExistInTarget.md
-		docs\Reference\ProcessorEnrichers\index.md = docs\Reference\ProcessorEnrichers\index.md
-		docs\Reference\ProcessorEnrichers\PauseAfterEachItem.json = docs\Reference\ProcessorEnrichers\PauseAfterEachItem.json
-		docs\Reference\ProcessorEnrichers\PauseAfterEachItem.md = docs\Reference\ProcessorEnrichers\PauseAfterEachItem.md
-		docs\Reference\ProcessorEnrichers\SkipToFinalRevisedWorkItemType.json = docs\Reference\ProcessorEnrichers\SkipToFinalRevisedWorkItemType.json
-		docs\Reference\ProcessorEnrichers\SkipToFinalRevisedWorkItemType.md = docs\Reference\ProcessorEnrichers\SkipToFinalRevisedWorkItemType.md
-		docs\Reference\ProcessorEnrichers\TfsEmbededImagesEnricher.md = docs\Reference\ProcessorEnrichers\TfsEmbededImagesEnricher.md
-		docs\Reference\ProcessorEnrichers\TfsGitRepositoryEnricher.md = docs\Reference\ProcessorEnrichers\TfsGitRepositoryEnricher.md
-		docs\Reference\ProcessorEnrichers\TfsNodeStructureEnricher.md = docs\Reference\ProcessorEnrichers\TfsNodeStructureEnricher.md
-		docs\Reference\ProcessorEnrichers\TfsValidateRequiredField.json = docs\Reference\ProcessorEnrichers\TfsValidateRequiredField.json
-		docs\Reference\ProcessorEnrichers\TfsValidateRequiredField.md = docs\Reference\ProcessorEnrichers\TfsValidateRequiredField.md
-		docs\Reference\ProcessorEnrichers\TfsWorkItemLinkEnricher.md = docs\Reference\ProcessorEnrichers\TfsWorkItemLinkEnricher.md
-	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Clients.AzureDevops.Rest.Tests", "src\MigrationTools.Clients.AzureDevops.Rest.Tests\MigrationTools.Clients.AzureDevops.Rest.Tests.csproj", "{70EA792C-E84C-4A5D-8280-FCC47F4AE150}"
 EndProject
@@ -293,11 +236,6 @@ Global
 		{AADA5B89-83F9-45E4-B713-EA1FEB9EBC89} = {5C05DA7B-B70F-4A87-920B-DCD14EA7670D}
 		{72FA4853-D840-480E-A6FD-670EF66E9D5B} = {13FE9FE2-9C6E-4866-BBAD-106F5BF765F1}
 		{B64B19C7-BD17-4B2A-83E6-B33B3D73B078} = {D0EE5917-21B2-49FA-9506-69857EE82DCD}
-		{00238E4D-EBF6-4604-AA6C-792FC32C89A1} = {2BC0808B-6F4D-4635-82FE-1118181DD64F}
-		{E2FDAB96-3FA2-4A83-AFEA-49FE4A4DAFC4} = {00238E4D-EBF6-4604-AA6C-792FC32C89A1}
-		{A433BB95-FC3C-4133-A289-7EDFC9E7E62F} = {00238E4D-EBF6-4604-AA6C-792FC32C89A1}
-		{6B1F49FC-250D-4671-87BA-B95EB90C5A94} = {00238E4D-EBF6-4604-AA6C-792FC32C89A1}
-		{73142CEF-17E1-47EA-8BEF-1A6A1EBDF1D7} = {00238E4D-EBF6-4604-AA6C-792FC32C89A1}
 		{70EA792C-E84C-4A5D-8280-FCC47F4AE150} = {13FE9FE2-9C6E-4866-BBAD-106F5BF765F1}
 		{4C16C19A-AF2D-4061-B2DE-87E39B1DF422} = {5C05DA7B-B70F-4A87-920B-DCD14EA7670D}
 	EndGlobalSection

@@ -42,6 +42,11 @@
             </remarks>
             <param name="targetPlan">The plan to remove invalid links drom</param>
         </member>
+        <member name="T:VstsSyncMigrator.Engine.WorkItemMigrationContext">
+            <summary>
+            WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links, and Attachments
+            </summary>
+        </member>
         <member name="F:VstsSyncMigrator.Engine.WorkItemQueryMigrationContext.config">
             <summary>
             The processor configuration

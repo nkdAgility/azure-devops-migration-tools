@@ -6,6 +6,28 @@ WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links,
 
 - Restart will skip completed work items in Tip, and will filter completed revisions in replay.
 
+UPDATE: [Updated new version of this document](../Reference/v1/Processors/WorkItemMigrationContext.md)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## Params
 
 | Parameter name                            | Type            | Description                                                                                                                                                                                                                                                                    | Default Value                                                                |
