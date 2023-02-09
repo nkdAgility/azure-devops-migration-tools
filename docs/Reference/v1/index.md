@@ -5,11 +5,11 @@
 
 [Overview](.././index.md) > **Reference**
 
-The system works by setting one or more [Processors](../Reference/v1/Processors/index.md) in the json 
-configuration file. You can configure one or more [FieldMaps](../Reference/v1/FieldMaps/index.md) to 
+The system works by setting one or more [Processors](../v1/Processors/index.md) in the json 
+configuration file. You can configure one or more [FieldMaps](../v1/FieldMaps/index.md) to 
 manipulate the data during a migration.
 
 ### What types of things do we have
 
-- **[Processors](../Reference/v1/Processors/index.md)** - Processors allow you to move different types of data between `Endpoints` and does not care what `Endpoint` you have on each end.
-- **[FieldMaps](../Reference/v1/FieldMaps/index.md)** - 
+- **[Processors](../v1/Processors/index.md)** - Processors allow you to move different types of data between `Endpoints` and does not care what `Endpoint` you have on each end.
+- **[FieldMaps](../v1/FieldMaps/index.md)** - 
