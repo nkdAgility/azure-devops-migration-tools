@@ -17,7 +17,7 @@ We provide a number of Processors that can be used to migrate diferent sorts of 
 | [CreateTeamFolders](./CreateTeamFolders.md) |  |  |  |
 | [ExportProfilePictureFromADContext](./ExportProfilePictureFromADContext.md) |  |  |  |
 | [ExportTeamList](./ExportTeamList.md) |  |  |  |
-| [FixGitCommitLinks](/FixGitCommitLinks.md) |  |  |  |
+| [FixGitCommitLinks](./FixGitCommitLinks.md) |  |  |  |
 | [ImportProfilePictureContext](./ImportProfilePictureContext.md) |  |  |  |
 | [WorkItemDelete](./WorkItemDelete.md) |  |  |  |
 | [WorkItemUpdate](./WorkItemUpdate.md) |  |  |  |

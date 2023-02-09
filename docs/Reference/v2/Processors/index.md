@@ -15,14 +15,14 @@ We provide a number of Processors that can be used to migrate diferent sorts of 
 
 | Processors | Data Type    | Description                              | Default Value                            |
 |------------------------|---------|------------------------------------------|------------------------------------------|
-| [WorkItemTrackingProcessor](/WorkItemTrackingProcessor.md) |  |  |  |
-| [TfsAreaAndIterationProcessor](/TfsAreaAndIterationProcessor.md) |  |  |  |
-| [TfsSharedQueryProcessor](/TfsSharedQueryProcessor.md) |  |  |  |
-| [TfsTeamSettingsProcessor](/TfsTeamSettingsProcessor.md) |  |  |  |
-| [AzureDevOpsPipelineProcessor](/AzureDevOpsPipelineProcessor.md) |  |  |  |
-| [ProcessDefinitionProcessor](/ProcessDefinitionProcessor.md) |  |  |  |
-| [KeepOutboundLinkTargetProcessor](/KeepOutboundLinkTargetProcessor.md) |  |  |  |
-| [OutboundLinkCheckingProcessor](/OutboundLinkCheckingProcessor.md) |  |  |  |
+| [WorkItemTrackingProcessor](./WorkItemTrackingProcessor.md) |  |  |  |
+| [TfsAreaAndIterationProcessor](./TfsAreaAndIterationProcessor.md) |  |  |  |
+| [TfsSharedQueryProcessor](./TfsSharedQueryProcessor.md) |  |  |  |
+| [TfsTeamSettingsProcessor](./TfsTeamSettingsProcessor.md) |  |  |  |
+| [AzureDevOpsPipelineProcessor](./AzureDevOpsPipelineProcessor.md) |  |  |  |
+| [ProcessDefinitionProcessor](./ProcessDefinitionProcessor.md) |  |  |  |
+| [KeepOutboundLinkTargetProcessor](./KeepOutboundLinkTargetProcessor.md) |  |  |  |
+| [OutboundLinkCheckingProcessor](./OutboundLinkCheckingProcessor.md) |  |  |  |
 
 
 ### Processor Options

@@ -242,7 +242,7 @@ namespace VstsSyncMigrator.ConsoleApp
             {
                 //JObject joptions = (JObject)JToken.FromObject(item);
                 //var jproperty = joptions.Properties();
-                properties.AppendLine(string.Format("| [{0}](/{0}.md) | {1} | {2} | {3} |", item.Name, "", "", ""));
+                properties.AppendLine(string.Format("| [{0}](./{0}.md) | {1} | {2} | {3} |", item.Name, "", "", ""));
             }
             templatemd = templatemd.Replace("<ItemList>", properties.ToString());
             return templatemd;
