@@ -12,7 +12,7 @@ WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links,
 |------------------------|---------|------------------------------------------|------------------------------------------|
 | Enabled | Boolean | If enabled then the processor will run | false |
 | ReplayRevisions | Boolean | You can choose to migrate the tip only (a single write) or all of the revisions (many writes).
-            If you are setting this to `false` to migrate only the tip then you should set `BuildFieldTable` to `true` | true |
+            If you are setting this to false to migrate only the tip then you should set BuildFieldTable to true | true |
 | PrefixProjectToNodes | Boolean | Prefix your iterations and areas with the project name. If you have enabled this in `NodeStructuresMigrationConfig` you must do it here too. | false |
 | UpdateCreatedDate | Boolean | If this is enabled the creation process on the target project will create the items with the original creation date.
             (Important: The item history is always pointed to the date of the migration, it's change only the data column CreateDate,
