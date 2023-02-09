@@ -95,13 +95,13 @@ namespace MigrationTools.Enrichers
 
             foreach (var mapper in mappers)
             {
-                if (Regex.IsMatch(sourceNodePath, mapper.Key))
+                if (Regex.IsMatch(sourceNodePath, mapper.Key, RegexOptions.IgnoreCase))
                 {
                     return Regex.Replace(sourceNodePath, mapper.Key, mapper.Value);
                 }
             }
 
-            if (!Regex.IsMatch(sourceNodePath, lastResortRule.Key))
+            if (!Regex.IsMatch(sourceNodePath, lastResortRule.Key, RegexOptions.IgnoreCase))
             {
                 throw new InvalidOperationException($"This path is not anchored in the source project name: {sourceNodePath}");
             }
