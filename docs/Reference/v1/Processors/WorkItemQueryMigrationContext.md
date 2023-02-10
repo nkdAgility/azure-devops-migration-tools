@@ -4,7 +4,7 @@
 
 [Overview](../././index.md) > [Reference](.././index.md) > [API v1](../index.md) > [Processors](./index.md)> **WorkItemQueryMigrationContext**
 
-missng XML code comments
+Moved Shared Queries best effort
 
 ### Options
 

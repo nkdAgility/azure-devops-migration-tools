@@ -33,7 +33,8 @@ namespace VstsSyncMigrator.Engine
     /// WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links, and Attachments.
     /// Use `WorkItemMigrationConfig` to configure.
     /// </summary>
-    /// <processingtarget>WorkItem</processingtarget>
+    /// <status>ready</status>
+    /// <processingtarget>Work Items</processingtarget>
     public class WorkItemMigrationContext : MigrationProcessorBase
     {
         private const string RegexPatternForAreaAndIterationPathsFix = "\\[?(?<key>System.AreaPath|System.IterationPath)+\\]?[^']*'(?<value>[^']*(?:''.[^']*)*)'";

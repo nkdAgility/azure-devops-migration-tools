@@ -16,6 +16,11 @@ using VstsSyncMigrator._EngineV1.Processors;
 
 namespace VstsSyncMigrator.Engine
 {
+    /// <summary>
+    /// Downloads corporate images and updates TFS/Azure DevOps profiles
+    /// </summary>
+    /// <status>alpha</status>
+    /// <processingtarget>Profiles</processingtarget>
     public class ExportProfilePictureFromADContext : StaticProcessorBase
     {
         private IIdentityManagementService2 ims2;

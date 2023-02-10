@@ -7,6 +7,11 @@ using MigrationTools._EngineV1.Processors;
 
 namespace VstsSyncMigrator.Engine
 {
+    /// <summary>
+    /// Moved Shared Queries best effort
+    /// </summary>
+    /// <status>preview</status>
+    /// <processingtarget>Shared Queries</processingtarget>
     [Obsolete("WorkItemQueryMigrationContext has been migrated to TfsSharedQueryProcessor: https://nkdagility.github.io/azure-devops-migration-tools/Reference/Processors/TfsSharedQueryProcessor.html")]
     public class WorkItemQueryMigrationContext : MigrationProcessorBase
     {

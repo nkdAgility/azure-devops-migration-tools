@@ -13,6 +13,11 @@ using VstsSyncMigrator._EngineV1.Processors;
 
 namespace VstsSyncMigrator.Engine
 {
+    /// <summary>
+    /// Creates folders in Sared Queries for each Team
+    /// </summary>
+    /// <status>preview</status>
+    /// <processingtarget>Shared Queries</processingtarget>
     public class CreateTeamFolders : StaticProcessorBase
     {
         public CreateTeamFolders(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<CreateTeamFolders> logger)

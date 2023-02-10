@@ -4,7 +4,7 @@
 
 [Overview](../././index.md) > [Reference](.././index.md) > [API v1](../index.md) > [Processors](./index.md)> **TeamMigrationContext**
 
-missng XML code comments
+Migrates Teams and Team Settings
 
 ### Options
 

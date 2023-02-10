@@ -4,7 +4,7 @@
 
 [Overview](../././index.md) > [Reference](.././index.md) > [API v1](../index.md) > [Processors](./index.md)> **WorkItemPostProcessingContext**
 
-missng XML code comments
+Reapply field mappings after a migration. Does not migtate Work Items, only reapplied changes to filed mappings.
 
 ### Options
 

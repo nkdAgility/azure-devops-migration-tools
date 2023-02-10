@@ -21,6 +21,11 @@ using VstsSyncMigrator.Engine.ComponentContext;
 
 namespace VstsSyncMigrator.Engine
 {
+    /// <summary>
+    /// Rebuilds Suits and plans for Test Cases migrated using the WorkItemMigration
+    /// </summary>
+    /// <status>Beta</status>
+    /// <processingtarget>Suites &amp; Plans</processingtarget>
     public class TestPlandsAndSuitesMigrationContext : MigrationProcessorBase
     {
         private int __currentSuite = 0;

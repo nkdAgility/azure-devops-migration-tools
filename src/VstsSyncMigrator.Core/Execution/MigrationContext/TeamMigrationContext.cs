@@ -7,6 +7,11 @@ using MigrationTools._EngineV1.Processors;
 
 namespace VstsSyncMigrator.Engine
 {
+    /// <summary>
+    /// Migrates Teams and Team Settings  
+    /// </summary>
+    /// <status>preview</status>
+    /// <processingtarget>Teams</processingtarget>
     public class TeamMigrationContext : MigrationProcessorBase
     {
         private TeamMigrationConfig _config;

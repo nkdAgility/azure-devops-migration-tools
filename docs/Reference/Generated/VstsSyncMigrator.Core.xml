@@ -4,6 +4,27 @@
         <name>VstsSyncMigrator.Core</name>
     </assembly>
     <members>
+        <member name="T:VstsSyncMigrator.Engine.TeamMigrationContext">
+            <summary>
+            Migrates Teams and Team Settings  
+            </summary>
+            <status>preview</status>
+            <processingtarget>Teams</processingtarget>
+        </member>
+        <member name="T:VstsSyncMigrator.Engine.TestConfigurationsMigrationContext">
+            <summary>
+            Migrates Test configurations  
+            </summary>
+            <status>Beta</status>
+            <processingtarget>Suites &amp; Plans</processingtarget>
+        </member>
+        <member name="T:VstsSyncMigrator.Engine.TestPlandsAndSuitesMigrationContext">
+            <summary>
+            Rebuilds Suits and plans for Test Cases migrated using the WorkItemMigration
+            </summary>
+            <status>Beta</status>
+            <processingtarget>Suites &amp; Plans</processingtarget>
+        </member>
         <member name="M:VstsSyncMigrator.Engine.TestPlandsAndSuitesMigrationContext.ApplyConfigurations(Microsoft.TeamFoundation.TestManagement.Client.ITestSuiteEntry,Microsoft.TeamFoundation.TestManagement.Client.ITestSuiteEntry)">
             <summary>
             Apply configurations to a single test case entry on the target, by copying from the source
@@ -42,23 +63,67 @@
             </remarks>
             <param name="targetPlan">The plan to remove invalid links drom</param>
         </member>
+        <member name="T:VstsSyncMigrator.Engine.TestVariablesMigrationContext">
+            <summary>
+            Migrates Test Variables 
+            </summary>
+            <status>Beta</status>
+            <processingtarget>Suites &amp; Plans</processingtarget>
+        </member>
         <member name="T:VstsSyncMigrator.Engine.WorkItemMigrationContext">
             <summary>
             WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links, and Attachments.
             Use `WorkItemMigrationConfig` to configure.
             </summary>
-            <processingtarget>WorkItem</processingtarget>
+            <status>ready</status>
+            <processingtarget>Work Items</processingtarget>
+        </member>
+        <member name="T:VstsSyncMigrator.Engine.WorkItemPostProcessingContext">
+            <summary>
+            Reapply field mappings after a migration. Does not migtate Work Items, only reapplied changes to filed mappings.
+            </summary>
+            <status>preview</status>
+            <processingtarget>Work Items</processingtarget>
+        </member>
+        <member name="T:VstsSyncMigrator.Engine.WorkItemQueryMigrationContext">
+            <summary>
+            Moved Shared Queries best effort
+            </summary>
+            <status>preview</status>
+            <processingtarget>Shared Queries</processingtarget>
         </member>
         <member name="F:VstsSyncMigrator.Engine.WorkItemQueryMigrationContext.config">
             <summary>
             The processor configuration
             </summary>
         </member>
+        <member name="T:VstsSyncMigrator.Engine.CreateTeamFolders">
+            <summary>
+            Creates folders in Sared Queries for each Team
+            </summary>
+            <status>preview</status>
+            <processingtarget>Shared Queries</processingtarget>
+        </member>
+        <member name="T:VstsSyncMigrator.Engine.ExportProfilePictureFromADContext">
+            <summary>
+            Downloads corporate images and updates TFS/Azure DevOps profiles
+            </summary>
+            <status>alpha</status>
+            <processingtarget>Profiles</processingtarget>
+        </member>
+        <member name="T:VstsSyncMigrator.Engine.ImportProfilePictureContext">
+            <summary>
+            Downloads corporate images and updates TFS/Azure DevOps profiles
+            </summary>
+            <status>alpha</status>
+            <processingtarget>Profiles</processingtarget>
+        </member>
         <member name="T:VstsSyncMigrator.Engine.WorkItemDelete">
             <summary>
             The `WorkItemDelete` processor allows you to delete any amount of work items that meet the query.
             **DANGER:** This is not a recoverable action and should be use with extream caution.
             </summary>
+            <status>ready</status>
             <processingtarget>WorkItem</processingtarget>
         </member>
         <member name="T:VstsSyncMigrator.Engine.WorkItemUpdate">
@@ -72,6 +137,7 @@
             A common issue with older *TFS/Azure DevOps* instances is the proliferation of `Area Paths`.
             \With the use of `Area Path` for `Teams` and the addition of the `Node Name` column option these extensive tag hierarchies should instad be moved to tags.
             </summary>
+            <status>Beta</status>
             <processingtarget>WorkItem</processingtarget>
         </member>
     </members>

@@ -26,6 +26,7 @@ namespace VstsSyncMigrator.ConsoleApp
     public class Program
     {
         public static AppDomain domain = AppDomain.CreateDomain("MigrationTools");
+        private static string docsPath = "../../../../../docs/";
         private static string referencePath = "../../../../../docs/Reference/";
 
         public static void Main(string[] args)
@@ -73,17 +74,18 @@ namespace VstsSyncMigrator.ConsoleApp
         {
             List<string> files = new List<string>
             {
-                "v1/index-template.md",
-                "v2/index-template.md"
+                "index-template.md",
+                "Reference/v1/index-template.md",
+                "Reference/v2/index-template.md"
             };
             foreach (string file in files)
             {
                 string templatemd = string.Empty;
-                string filepath = System.IO.Path.Combine(referencePath, file);
+                string filepath = System.IO.Path.Combine(docsPath, file);
                 if (System.IO.File.Exists(filepath))
                 {
                     templatemd = System.IO.File.ReadAllText(filepath);
-                    templatemd = ProcessImports(templatemd, referencePath);
+                    templatemd = ProcessImports(templatemd, file.Contains("Reference") ? referencePath : docsPath   );
                     System.IO.File.WriteAllText(filepath.Replace("-template", ""), templatemd);
                 }
                 //ProcessImports
@@ -108,9 +110,10 @@ namespace VstsSyncMigrator.ConsoleApp
             string templatemd = GetTemplate(apiVersion, folder, referencePath, masterTemplate, null);
             Console.WriteLine("Processing: index.md");
             templatemd = ProcessBreadcrumbs(apiVersion, folder, null, templatemd);
-            templatemd = ProcessTypes(types, templatemd, folder);
-            string filename = $"../../../../../docs/Reference/{apiVersion}/{folder}/index.md";
-            File.WriteAllText(filename, templatemd);
+            string typesTableMd = GetTypesTable(types, folder, apiVersion);
+            File.WriteAllText(System.IO.Path.Combine(docsPath, $"table-{folder}-{apiVersion}.md"), typesTableMd);
+            templatemd = templatemd.Replace("<ItemList>", typesTableMd);
+            File.WriteAllText(System.IO.Path.Combine(referencePath, apiVersion, folder, "index.md"), templatemd);
         }
 
         private static void ProcessItemFile(List<Type> targetTypes, List<Type> allTypes, string apiVersion, string folder, string masterTemplate, Type item, bool findConfig = true, string configEnd = "Options")
@@ -271,20 +274,20 @@ namespace VstsSyncMigrator.ConsoleApp
             return templatemd;
         }
 
-        private static string ProcessTypes(List<Type> types, string templatemd, string typeCatagoryName)
+        private static string GetTypesTable(List<Type> types, string typeCatagoryName, string apiVersion)
         {
             StringBuilder properties = new StringBuilder();
-            properties.AppendLine($"| {typeCatagoryName} | Data Type    | Description                              | Default Value                            |");
-            properties.AppendLine("|------------------------|---------|------------------------------------------|------------------------------------------|");
+            properties.AppendLine($"| {typeCatagoryName} | Status | Target    | Usage                              |");
+            properties.AppendLine("|------------------------|---------|---------|------------------------------------------|");
             foreach (var item in types)
             {
-              
+
                 string typeDocSummery = GetTypeData(item);
                 string typeDocdDatatype = GetTypeData(item, "processingtarget");
-                properties.AppendLine(string.Format("| [{0}](./{0}.md) | {1} | {2} | {3} |", item.Name, typeDocdDatatype, typeDocSummery, ""));
+                string typeDocdStatus = GetTypeData(item, "status");
+                properties.AppendLine($"| [{item.Name}](docs/Reference/{apiVersion}/{typeCatagoryName}/{item.Name}.md) | {typeDocdStatus} | {typeDocdDatatype} | {typeDocSummery} |");
             }
-            templatemd = templatemd.Replace("<ItemList>", properties.ToString());
-            return templatemd;
+            return properties.ToString();
         }
 
         private static object GetPropertyType(object options, JProperty jproperty)

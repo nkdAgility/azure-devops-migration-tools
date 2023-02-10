@@ -4,7 +4,7 @@
 
 [Overview](../././index.md) > [Reference](.././index.md) > [API v1](../index.md) > [Processors](./index.md)> **ExportProfilePictureFromADContext**
 
-missng XML code comments
+Downloads corporate images and updates TFS/Azure DevOps profiles
 
 ### Options
 
