@@ -30,8 +30,10 @@ using ILogger = Serilog.ILogger;
 namespace VstsSyncMigrator.Engine
 {
     /// <summary>
-    /// WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links, and Attachments
+    /// WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links, and Attachments.
+    /// Use `WorkItemMigrationConfig` to configure.
     /// </summary>
+    /// <processingtarget>WorkItem</processingtarget>
     public class WorkItemMigrationContext : MigrationProcessorBase
     {
         private const string RegexPatternForAreaAndIterationPathsFix = "\\[?(?<key>System.AreaPath|System.IterationPath)+\\]?[^']*'(?<value>[^']*(?:''.[^']*)*)'";

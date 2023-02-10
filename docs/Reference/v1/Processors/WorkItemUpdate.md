@@ -4,7 +4,7 @@
 
 [Overview](../././index.md) > [Reference](.././index.md) > [API v1](../index.md) > [Processors](./index.md)> **WorkItemUpdate**
 
-missng XML code comments
+This processor allows you to make changes in place where we load from teh Target and update the Target. This is used for bulk updates with the most common reason being a process template change.
 
 ### Options
 

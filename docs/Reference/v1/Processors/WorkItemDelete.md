@@ -4,7 +4,7 @@
 
 [Overview](../././index.md) > [Reference](.././index.md) > [API v1](../index.md) > [Processors](./index.md)> **WorkItemDelete**
 
-missng XML code comments
+The `WorkItemDelete` processor allows you to delete any amount of work items that meet the query. **DANGER:** This is not a recoverable action and should be use with extream caution.
 
 ### Options
 

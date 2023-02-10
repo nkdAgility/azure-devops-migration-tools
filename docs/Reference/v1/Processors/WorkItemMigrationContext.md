@@ -4,40 +4,40 @@
 
 [Overview](../././index.md) > [Reference](.././index.md) > [API v1](../index.md) > [Processors](./index.md)> **WorkItemMigrationContext**
 
-WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links, and Attachments
+WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links, and Attachments. Use `WorkItemMigrationConfig` to configure.
 
 ### Options
 
 | Parameter name         | Type    | Description                              | Default Value                            |
 |------------------------|---------|------------------------------------------|------------------------------------------|
 | Enabled | Boolean | If enabled then the processor will run | false |
-| ReplayRevisions | Boolean | You can choose to migrate the tip only (a single write) or all of the revisions (many writes).            If you are setting this to `false` to migrate only the tip then you should set `BuildFieldTable` to `true` | true |
+| ReplayRevisions | Boolean | You can choose to migrate the tip only (a single write) or all of the revisions (many writes). If you are setting this to `false` to migrate only the tip then you should set `BuildFieldTable` to `true`. | true |
 | PrefixProjectToNodes | Boolean | Prefix your iterations and areas with the project name. If you have enabled this in `NodeStructuresMigrationConfig` you must do it here too. | false |
-| UpdateCreatedDate | Boolean | If this is enabled the creation process on the target project will create the items with the original creation date.            (Important: The item history is always pointed to the date of the migration, it's change only the data column CreateDate,            not the internal create date) | true |
-| UpdateCreatedBy | Boolean | If this is enabled the creation process on the target project will create the items with the original creation date.            (Important: The item history is always pointed to the date of the migration, it's change only the data column CreateDate,            not the internal create date) | true |
+| UpdateCreatedDate | Boolean | If this is enabled the creation process on the target project will create the items with the original creation date. (Important: The item history is always pointed to the date of the migration, it's change only the data column CreateDate, not the internal create date) | true |
+| UpdateCreatedBy | Boolean | If this is enabled the creation process on the target project will create the items with the original creation date. (Important: The item history is always pointed to the date of the migration, it's change only the data column CreateDate, not the internal create date) | true |
 | WIQLQueryBit | String | A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits) | AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') |
 | WIQLOrderBit | String | A work item query to affect the order in which the work items are migrated. Don't leave this empty. | [System.ChangedDate] desc |
 | LinkMigration | Boolean | If enabled this will migrate the Links for the work item at the same time as the whole work item. | true |
 | AttachmentMigration | Boolean | If enabled this will migrate all of the attachments at the same time as the work item | true |
 | AttachmentWorkingPath | String | `AttachmentMigration` is set to true then you need to specify a working path for attachments to be saved locally. | C:\temp\Migration\ |
-| FixHtmlAttachmentLinks | Boolean | **beta** If enabled this will fix any image attachments URL's, work item mention URL's or user mentions in the HTML            fields as well as discussion comments. You must specify a PersonalAccessToken in the Source project for Azure DevOps;            TFS should use integrated authentication. | ? |
-| SkipToFinalRevisedWorkItemType | Boolean | **beta** If enabled this will fix any image attachments URL's, work item mention URL's or user mentions in the HTML fields as well as discussion comments. You must specify a            PersonalAccessToken in the Source project for Azure DevOps; TFS should use integrated authentication. | false |
-| WorkItemCreateRetryLimit | Int32 | **beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count.            This allows for periodic network glitches not to end the process. | 5 |
-| FilterWorkItemsThatAlreadyExistInTarget | Boolean | This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run.            While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart. | true |
+| FixHtmlAttachmentLinks | Boolean | **beta** If enabled this will fix any image attachments URL's, work item mention URL's or user mentions in the HTML fields as well as discussion comments. You must specify a PersonalAccessToken in the Source project for Azure DevOps; TFS should use integrated authentication. | ? |
+| SkipToFinalRevisedWorkItemType | Boolean | **beta** If enabled this will fix any image attachments URL's, work item mention URL's or user mentions in the HTML fields as well as discussion comments. You must specify a PersonalAccessToken in the Source project for Azure DevOps; TFS should use integrated authentication. | false |
+| WorkItemCreateRetryLimit | Int32 | **beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count. This allows for periodic network glitches not to end the process. | 5 |
+| FilterWorkItemsThatAlreadyExistInTarget | Boolean | This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run. While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart. | true |
 | PauseAfterEachWorkItem | Boolean | Pause after each work item is migrated | false |
-| AttachmentMaxSize | Int32 | `AttachmentMigration` is set to true then you need to specify a max file size for upload in bites.            For Azure DevOps Services the default is 480,000,000 bites (60mb), for TFS its 32,000,000 bites (4mb). | 480000000 |
+| AttachmentMaxSize | Int32 | `AttachmentMigration` is set to true then you need to specify a max file size for upload in bites. For Azure DevOps Services the default is 480,000,000 bites (60mb), for TFS its 32,000,000 bites (4mb). | 480000000 |
 | AttachRevisionHistory | Boolean | This will create a json file with the revision history and attach it to the work item. Best used with `MaxRevisions` or `ReplayRevisions`. | ? |
-| LinkMigrationSaveEachAsAdded | Boolean | If you have changed parents before re-running a sync you may get a `TF26194: unable to change the value of the 'Parent' field` error.            This will resolve it, but will slow migration. | false |
+| LinkMigrationSaveEachAsAdded | Boolean | If you have changed parents before re-running a sync you may get a `TF26194: unable to change the value of the 'Parent' field` error. This will resolve it, but will slow migration. | false |
 | GenerateMigrationComment | Boolean | If enabled, adds a comment recording the migration | false |
 | WorkItemIDs | IList | A list of work items to import | [] |
-| MaxRevisions | Int32 | Sets the maximum number of revisions that will be migrated. "First + Last N = Max".            If this was set to 5 and there were 10 revisions you would get the first 1 (creation) and the latest 4 migrated. | 0 |
+| MaxRevisions | Int32 | Sets the maximum number of revisions that will be migrated. "First + Last N = Max". If this was set to 5 and there were 10 revisions you would get the first 1 (creation) and the latest 4 migrated. | 0 |
 | NodeStructureEnricherEnabled | Nullable |  | ? |
 | UseCommonNodeStructureEnricherConfig | Boolean |  | ? |
 | StopMigrationOnMissingAreaIterationNodes | Boolean |  | ? |
 | NodeBasePaths | String[] | The root paths of the Ares / Iterations you want migrate. See [NodeBasePath Configuration](#nodebasepath-configuration) | ["/"] |
-| AreaMaps | Dictionary`2 | Remapping rules for area paths, implemented with regular expressions. The rules apply with a higher priority than the `PrefixProjectToNodes`,            that is, if no rule matches the path and the `PrefixProjectToNodes` option is enabled, then the old `PrefixProjectToNodes` behavior is applied. | {} |
-| IterationMaps | Dictionary`2 | Remapping rules for iteration paths, implemented with regular expressions. The rules apply with a higher priority than the `PrefixProjectToNodes`,            that is, if no rule matches the path and the `PrefixProjectToNodes` option is enabled, then the old `PrefixProjectToNodes` behavior is applied. | {} |
-| MaxGracefulFailures | Int32 | The maximum number of failures to tolerate before the migration fails. When set above zero, a work item migration error is logged but the migration will            continue until the number of failed items reaches the configured value, after which the migration fails. | 0 |
+| AreaMaps | Dictionary`2 | Remapping rules for area paths, implemented with regular expressions. The rules apply with a higher priority than the `PrefixProjectToNodes`, that is, if no rule matches the path and the `PrefixProjectToNodes` option is enabled, then the old `PrefixProjectToNodes` behavior is applied. | {} |
+| IterationMaps | Dictionary`2 | Remapping rules for iteration paths, implemented with regular expressions. The rules apply with a higher priority than the `PrefixProjectToNodes`, that is, if no rule matches the path and the `PrefixProjectToNodes` option is enabled, then the old `PrefixProjectToNodes` behavior is applied. | {} |
+| MaxGracefulFailures | Int32 | The maximum number of failures to tolerate before the migration fails. When set above zero, a work item migration error is logged but the migration will continue until the number of failed items reaches the configured value, after which the migration fails. | 0 |
 | SkipRevisionWithInvalidIterationPath | Boolean | This will skip a revision if the source iteration has not been migrated i.e. it was deleted | missng XML code comments |
 
 

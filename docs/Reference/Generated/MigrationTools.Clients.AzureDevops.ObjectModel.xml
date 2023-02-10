@@ -4,6 +4,12 @@
         <name>MigrationTools.Clients.AzureDevops.ObjectModel</name>
     </assembly>
     <members>
+        <member name="T:MigrationTools.EndpointEnrichers.TfsWorkItemAttachmentEnricher">
+            <summary>
+            The `TfsWorkItemAttachmentEnricher` processes the attachements for a specific work item.
+            </summary>
+            <processingtarget>WorkItem</processingtarget>
+        </member>
         <member name="M:MigrationTools.Enrichers.TfsEmbededImagesEnricher.FixEmbededImages(MigrationTools.DataContracts.WorkItemData,System.String,System.String,System.String)">
             from https://gist.github.com/pietergheysens/792ed505f09557e77ddfc1b83531e4fb
         </member>

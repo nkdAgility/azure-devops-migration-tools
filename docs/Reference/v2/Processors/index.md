@@ -15,14 +15,14 @@ We provide a number of Processors that can be used to migrate diferent sorts of 
 
 | Processors | Data Type    | Description                              | Default Value                            |
 |------------------------|---------|------------------------------------------|------------------------------------------|
-| [WorkItemTrackingProcessor](./WorkItemTrackingProcessor.md) |  |  |  |
-| [TfsAreaAndIterationProcessor](./TfsAreaAndIterationProcessor.md) |  |  |  |
-| [TfsSharedQueryProcessor](./TfsSharedQueryProcessor.md) |  |  |  |
-| [TfsTeamSettingsProcessor](./TfsTeamSettingsProcessor.md) |  |  |  |
-| [AzureDevOpsPipelineProcessor](./AzureDevOpsPipelineProcessor.md) |  |  |  |
-| [ProcessDefinitionProcessor](./ProcessDefinitionProcessor.md) |  |  |  |
-| [KeepOutboundLinkTargetProcessor](./KeepOutboundLinkTargetProcessor.md) |  |  |  |
-| [OutboundLinkCheckingProcessor](./OutboundLinkCheckingProcessor.md) |  |  |  |
+| [WorkItemTrackingProcessor](./WorkItemTrackingProcessor.md) | missng XML code comments | This processor is intended, with the aid of [ProcessorEnrichers](../ProcessorEnrichers/index.md), to allow the migration of Work Items between two [Endpoints](../Endpoints/index.md). |  |
+| [TfsAreaAndIterationProcessor](./TfsAreaAndIterationProcessor.md) | missng XML code comments | The `TfsAreaAndIterationProcessor` migrates all of the Area nd Iteraion paths. |  |
+| [TfsSharedQueryProcessor](./TfsSharedQueryProcessor.md) | missng XML code comments | The TfsSharedQueryProcessor enabled you to migrate queries from one locatio nto another. |  |
+| [TfsTeamSettingsProcessor](./TfsTeamSettingsProcessor.md) | missng XML code comments | Native TFS Processor, does not work with any other Endpoints. |  |
+| [AzureDevOpsPipelineProcessor](./AzureDevOpsPipelineProcessor.md) | missng XML code comments | Azure DevOps Processor that migrates Taskgroups, Build- and Release Pipelines. |  |
+| [ProcessDefinitionProcessor](./ProcessDefinitionProcessor.md) | missng XML code comments | Process definition processor used to keep processes between two orgs in sync |  |
+| [KeepOutboundLinkTargetProcessor](./KeepOutboundLinkTargetProcessor.md) | missng XML code comments | missng XML code comments |  |
+| [OutboundLinkCheckingProcessor](./OutboundLinkCheckingProcessor.md) | missng XML code comments | missng XML code comments |  |
 
 
 ### Processor Options

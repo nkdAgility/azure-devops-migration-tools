@@ -4,7 +4,7 @@
 
 [Overview](../././index.md) > [Reference](.././index.md) > [API v2](../index.md) > [EndpointEnrichers](./index.md)> **TfsWorkItemAttachmentEnricher**
 
-missng XML code comments
+The `TfsWorkItemAttachmentEnricher` processes the attachements for a specific work item.
 
 ### Options
 

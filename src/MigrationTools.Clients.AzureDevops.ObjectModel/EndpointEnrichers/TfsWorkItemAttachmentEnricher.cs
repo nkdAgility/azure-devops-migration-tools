@@ -5,6 +5,10 @@ using MigrationTools.Endpoints;
 
 namespace MigrationTools.EndpointEnrichers
 {
+    /// <summary>
+    /// The `TfsWorkItemAttachmentEnricher` processes the attachements for a specific work item.
+    /// </summary>
+    /// <processingtarget>WorkItem</processingtarget>
     public class TfsWorkItemAttachmentEnricher : WorkItemAttachmentEnricher
     {
         private WorkItemAttachmentEnricherOptions _Options;

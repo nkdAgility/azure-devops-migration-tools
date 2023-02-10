@@ -132,7 +132,7 @@ namespace VstsSyncMigrator.ConsoleApp
                     jsonSample = DeployJsonSample(targetItem, apiVersion, folder, referencePath, item);
 
                 }
-                templatemd = templatemd.Replace("<Description>", GetTypeSummary(item));
+                templatemd = templatemd.Replace("<Description>", GetTypeData(item));
                 templatemd = ProcessSamples(jsonSample, templatemd, referencePath);
                 templatemd = templatemd.Replace("<ClassName>", item.Name);
                 templatemd = templatemd.Replace("<TypeName>", folder);
@@ -142,12 +142,21 @@ namespace VstsSyncMigrator.ConsoleApp
             }
         }
 
-        private static string GetTypeSummary(Type item)
+        private static string GetTypeData(Type item, string element = "summary")
         {
-            // Query the data and write out a subset of contacts
-            var query = (from c in GetXDocument(item).Root.Descendants("member")
-                         where c.Attribute("name").Value == $"T:{item.FullName}"
-                         select c.Element("summary").Value).SingleOrDefault();
+            string query = "missng XML code comments";
+            try
+            {
+                // Query the data and write out a subset of contacts
+                query = (from c in GetXDocument(item).Root.Descendants("member")
+                                where c.Attribute("name").Value == $"T:{item.FullName}"
+                                select c.Element(element).Value).SingleOrDefault();
+            }
+            catch (Exception)
+            {
+                
+            }
+            
             if (query != null)
             {
                 Console.WriteLine($"- Description Loaded: {item.FullName}");
@@ -157,12 +166,17 @@ namespace VstsSyncMigrator.ConsoleApp
                 query = "missng XML code comments";
                 // Console.WriteLine($"- Description FAILED: {item.FullName}");
             }
-            return query.Replace(Environment.NewLine, "").Trim();
+            return query.Replace(Environment.NewLine, "").Replace("\r", "").Replace("\n", "").Replace("            ", " ").Trim();
         }
 
-        private static string GetPropertyData(object options, JObject joptions, JProperty jproperty, string element)
+        private static string GetPropertyData(object targetObject, JObject joptions, JProperty jproperty, string element)
         {
-            var optionsType = options.GetType().GetProperty(jproperty.Name).DeclaringType;
+            return GetPropertyData(targetObject.GetType(), joptions, jproperty, element);
+        }
+
+        private static string GetPropertyData(Type targetType, JObject joptions, JProperty jproperty, string element)
+        {
+            var optionsType = targetType.GetProperty(jproperty.Name).DeclaringType;
             // Query the data and write out a subset of contacts
             var query = (from c in GetXDocument(optionsType).Root.Descendants("member")
                          where c.Attribute("name").Value == $"P:{optionsType.FullName}.{jproperty.Name}"
@@ -176,7 +190,7 @@ namespace VstsSyncMigrator.ConsoleApp
                 // Console.WriteLine($"- Description FAILED: {item.FullName}");
                 query = "missng XML code comments";
             }
-            return query.Replace(Environment.NewLine, "").Trim();
+            return query.Replace(Environment.NewLine, "").Replace("\r", "").Replace("\n", "").Replace("            ", " ").Trim();
         }
 
         private static string GetPropertyDefault(IOptions options, JObject joptions, JProperty jproperty)
@@ -202,7 +216,7 @@ namespace VstsSyncMigrator.ConsoleApp
                 defaultvalue = "missng XML code comments";
             }
 
-            return defaultvalue.Replace(Environment.NewLine, "").Trim();
+            return defaultvalue.Replace(Environment.NewLine, "").Replace("\r", "").Replace("\n", "").Replace("            ", " ").Trim();
         }
 
         private static XDocument GetXDocument(Type item)
@@ -221,7 +235,7 @@ namespace VstsSyncMigrator.ConsoleApp
                 var jpropertys = joptions.Properties();
                 foreach (JProperty jproperty in jpropertys)
                 {
-                    string PropertyValue = GetPropertyData(options, joptions, jproperty, "summary").Replace("\r", "").Replace("\n", "").Trim();
+                    string PropertyValue = GetPropertyData(options, joptions, jproperty, "summary");
                     properties.AppendLine(string.Format("| {0} | {1} | {2} | {3} |", jproperty.Name, GetPropertyType(options, jproperty), PropertyValue, GetPropertyData(options, joptions, jproperty, "default")));
                 }
                 templatemd = templatemd.Replace("<Options>", properties.ToString());
@@ -240,9 +254,10 @@ namespace VstsSyncMigrator.ConsoleApp
             properties.AppendLine("|------------------------|---------|------------------------------------------|------------------------------------------|");
             foreach (var item in types)
             {
-                //JObject joptions = (JObject)JToken.FromObject(item);
-                //var jproperty = joptions.Properties();
-                properties.AppendLine(string.Format("| [{0}](./{0}.md) | {1} | {2} | {3} |", item.Name, "", "", ""));
+              
+                string typeDocSummery = GetTypeData(item);
+                string typeDocdDatatype = GetTypeData(item, "processingtarget");
+                properties.AppendLine(string.Format("| [{0}](./{0}.md) | {1} | {2} | {3} |", item.Name, typeDocdDatatype, typeDocSummery, ""));
             }
             templatemd = templatemd.Replace("<ItemList>", properties.ToString());
             return templatemd;
