@@ -30,7 +30,7 @@
     <PackageReference Update="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
 
-	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+	<!--<Target Name="PostBuild" AfterTargets="PostBuildEvent">
 		<Exec Command="cd $(TargetDir)&#xD;&#xA;$(TargetName).exe init --config &quot;$(SolutionDir)\docs\Reference\Generated\configuration.config&quot;&#xD;&#xA;$(TargetName).exe init --options Full --config &quot;$(SolutionDir)\docs\Reference\Generated\configuration-full.config&quot;&#xD;&#xA;$(TargetName).exe init --options WorkItemTracking --config &quot;$(SolutionDir)\docs\Reference\Generated\configuration-WorkItemTracking.config&quot;&#xD;&#xA;$(TargetName).exe init --options Fullv2 --config &quot;$(SolutionDir)\docs\Reference\Generated\configuration-Fullv2.config&quot;&#xD;&#xA;$(TargetName).exe init --options WorkItemTrackingv2--config &quot;$(SolutionDir)\docs\Reference\Generated\configuration-WorkItemTrackingv2.config&quot;" />
-	</Target>
+	</Target>-->
 </Project>
