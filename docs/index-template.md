@@ -109,7 +109,7 @@ These tools are build by naked Agility Limited's DevOps & Agility consultants to
 There are a number processors that can be used to migrate, or process, different sorts of data in different ways. Which one is right for you depends on the situation at hand. 
 Most of these processors need to be run in order. If you try to migrate work items before you have migrated Area and Iterations then ***bang*** you need to go back.
 
-<Import:table-Processors-v1.md>                                                                     |
+<Import:table-Processors-v1.md>
 
 ## Processors (v2 Architecture) [ PREVIEW ]
 

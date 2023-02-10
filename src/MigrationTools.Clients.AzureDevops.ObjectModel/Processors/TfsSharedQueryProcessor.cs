@@ -11,6 +11,8 @@ namespace MigrationTools.Processors
     /// <summary>
     /// The TfsSharedQueryProcessor enabled you to migrate queries from one locatio nto another.
     /// </summary>
+    /// <status>Beta</status>
+    /// <processingtarget>Queries</processingtarget>
     public class TfsSharedQueryProcessor : Processor
     {
         private TfsSharedQueryProcessorOptions _options;

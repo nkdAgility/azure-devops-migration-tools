@@ -127,7 +127,7 @@ Most of these processors need to be run in order. If you try to migrate work ite
 | [WorkItemQueryMigrationContext](/docs/Reference/v1/Processors/WorkItemQueryMigrationContext.md) | preview | Shared Queries | This processor can migrate queries for work items. Only shared queries are included. Personal queries can't migrate with this tool. |
 | [WorkItemUpdate](/docs/Reference/v1/Processors/WorkItemUpdate.md) | missng XML code comments | WorkItem | This processor allows you to make changes in place where we load from teh Target and update the Target. This is used for bulk updates with the most common reason being a process template change. |
 | [WorkItemUpdateAreasAsTagsContext](/docs/Reference/v1/Processors/WorkItemUpdateAreasAsTagsContext.md) | Beta | WorkItem | A common issue with older *TFS/Azure DevOps* instances is the proliferation of `Area Paths`. \With the use of `Area Path` for `Teams` and the addition of the `Node Name` column option these extensive tag hierarchies should instad be moved to tags. |
-                                                                     |
+
 
 ## Processors (v2 Architecture) [ PREVIEW ]
 
@@ -139,9 +139,9 @@ The new processor configuration is designed to allow the Migration Tools to supp
 |------------------------|---------|---------|------------------------------------------|
 | [AzureDevOpsPipelineProcessor](/docs/Reference/v2/Processors/AzureDevOpsPipelineProcessor.md) | Beta | Pipelines | Azure DevOps Processor that migrates Taskgroups, Build- and Release Pipelines. |
 | [ProcessDefinitionProcessor](/docs/Reference/v2/Processors/ProcessDefinitionProcessor.md) | Beta | Pipelines | Process definition processor used to keep processes between two orgs in sync |
-| [TfsAreaAndIterationProcessor](/docs/Reference/v2/Processors/TfsAreaAndIterationProcessor.md) | missng XML code comments | missng XML code comments | The `TfsAreaAndIterationProcessor` migrates all of the Area nd Iteraion paths. |
-| [TfsSharedQueryProcessor](/docs/Reference/v2/Processors/TfsSharedQueryProcessor.md) | missng XML code comments | missng XML code comments | The TfsSharedQueryProcessor enabled you to migrate queries from one locatio nto another. |
-| [TfsTeamSettingsProcessor](/docs/Reference/v2/Processors/TfsTeamSettingsProcessor.md) | missng XML code comments | missng XML code comments | Native TFS Processor, does not work with any other Endpoints. |
+| [TfsAreaAndIterationProcessor](/docs/Reference/v2/Processors/TfsAreaAndIterationProcessor.md) | Beta | Work Items | The `TfsAreaAndIterationProcessor` migrates all of the Area nd Iteraion paths. |
+| [TfsSharedQueryProcessor](/docs/Reference/v2/Processors/TfsSharedQueryProcessor.md) | Beta | Queries | The TfsSharedQueryProcessor enabled you to migrate queries from one locatio nto another. |
+| [TfsTeamSettingsProcessor](/docs/Reference/v2/Processors/TfsTeamSettingsProcessor.md) | Beta | Teams | Native TFS Processor, does not work with any other Endpoints. |
 | [WorkItemTrackingProcessor](/docs/Reference/v2/Processors/WorkItemTrackingProcessor.md) | missng XML code comments | missng XML code comments | This processor is intended, with the aid of [ProcessorEnrichers](../ProcessorEnrichers/index.md), to allow the migration of Work Items between two [Endpoints](../Endpoints/index.md). |
 
 
