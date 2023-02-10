@@ -4,16 +4,16 @@
 
 [Overview](/docs/index.md) > [Reference](/docs/Reference/index.md) > [API v1](/docs/Reference/v1/index.md) > [Processors](/docs/Reference/v1/Processors/index.md)> **WorkItemQueryMigrationContext**
 
-Moved Shared Queries best effort
+This processor can migrate queries for work items. Only shared queries are included. Personal queries can't migrate with this tool.
 
 ### Options
 
 | Parameter name         | Type    | Description                              | Default Value                            |
 |------------------------|---------|------------------------------------------|------------------------------------------|
 | Enabled | Boolean | missng XML code comments | missng XML code comments |
-| PrefixProjectToNodes | Boolean | Do we add the source project name into the folder path | missng XML code comments |
-| SharedFolderName | String | The name of the shared folder, made a parameter incase it every needs to be edited | missng XML code comments |
-| SourceToTargetFieldMappings | Dictionary`2 | missng XML code comments | missng XML code comments |
+| PrefixProjectToNodes | Boolean | Prefix your iterations and areas with the project name. If you have enabled this in `NodeStructuresMigrationConfig` you must do it here too. | false |
+| SharedFolderName | String | The name of the shared folder, made a parameter incase it every needs to be edited | none |
+| SourceToTargetFieldMappings | Dictionary`2 | Any field mappings | none |
 
 
 ### Example JSON

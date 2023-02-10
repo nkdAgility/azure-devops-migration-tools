@@ -4,16 +4,16 @@
 
 [Overview](/docs/index.md) > [Reference](/docs/Reference/index.md) > [API v1](/docs/Reference/v1/index.md) > [Processors](/docs/Reference/v1/Processors/index.md)> **TeamMigrationContext**
 
-Migrates Teams and Team Settings
+Migrates Teams and Team Settings: This should be run after `NodeStructuresMigrationConfig` and before all other processors.
 
 ### Options
 
 | Parameter name         | Type    | Description                              | Default Value                            |
 |------------------------|---------|------------------------------------------|------------------------------------------|
 | Enabled | Boolean | missng XML code comments | missng XML code comments |
-| EnableTeamSettingsMigration | Boolean | missng XML code comments | missng XML code comments |
-| FixTeamSettingsForExistingTeams | Boolean | missng XML code comments | missng XML code comments |
-| PrefixProjectToNodes | Boolean | missng XML code comments | missng XML code comments |
+| EnableTeamSettingsMigration | Boolean | Migrate original team settings after their creation on target team project | true |
+| FixTeamSettingsForExistingTeams | Boolean | Reset the target team settings to match the source if the team exists | true |
+| PrefixProjectToNodes | Boolean | Prefix your iterations and areas with the project name. If you have enabled this in `NodeStructuresMigrationConfig` you must do it here too. | false |
 
 
 ### Example JSON

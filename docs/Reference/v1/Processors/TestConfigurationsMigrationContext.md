@@ -4,7 +4,7 @@
 
 [Overview](/docs/index.md) > [Reference](/docs/Reference/index.md) > [API v1](/docs/Reference/v1/index.md) > [Processors](/docs/Reference/v1/Processors/index.md)> **TestConfigurationsMigrationContext**
 
-Migrates Test configurations
+This processor can migrate `test configuration`. This should be run before `LinkMigrationConfig`.
 
 ### Options
 

@@ -147,6 +147,8 @@
             <summary>
             Azure DevOps Processor that migrates Taskgroups, Build- and Release Pipelines.
             </summary>
+            <status>Beta</status>
+            <processingtarget>Pipelines</processingtarget>
         </member>
         <member name="M:MigrationTools.Processors.AzureDevOpsPipelineProcessor.MigratePipelinesAsync">
             <summary>

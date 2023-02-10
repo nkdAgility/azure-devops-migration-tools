@@ -4,7 +4,7 @@
 
 [Overview](/docs/index.md) > [Reference](/docs/Reference/index.md) > [API v1](/docs/Reference/v1/index.md) > [Processors](/docs/Reference/v1/Processors/index.md)> **FakeProcessor**
 
-missng XML code comments
+Note: this is only for internal usage. Don't use this in your configurations.
 
 ### Options
 

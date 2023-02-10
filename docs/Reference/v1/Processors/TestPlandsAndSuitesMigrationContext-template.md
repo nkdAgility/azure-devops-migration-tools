@@ -1,10 +1,10 @@
-## Processors: TestPlandsAndSuitesMigrationContext
+## <TypeName>: <ClassName>
 
 >**_This documentation is for a preview version of the Azure DevOps Migration Tools._ If you are not using the preview version then please head over to the main [documentation](https://nkdagility.github.io/azure-devops-migration-tools).**
 
-[Overview](/docs/index.md) > [Reference](/docs/Reference/index.md) > [API v1](/docs/Reference/v1/index.md) > [Processors](/docs/Reference/v1/Processors/index.md)> **TestPlandsAndSuitesMigrationContext**
+<Breadcrumbs>
 
-Rebuilds Suits and plans for Test Cases migrated using the WorkItemMigration
+<Description>
 
 > Warning: This migration can result in data lost because unsafe links are not able to migrate! (see description for parameter `RemoveInvalidTestSuiteLinks` or [this issue](https://github.com/nkdAgility/azure-devops-migration-tools/issues/178).)
 
@@ -15,7 +15,7 @@ Rebuilds Suits and plans for Test Cases migrated using the WorkItemMigration
 ### Example JSON
 
 ```JSON
-Not currently runnable. Needs a little work
+<ExampleJson>
 ```
 
 ### Additional Samples & Info

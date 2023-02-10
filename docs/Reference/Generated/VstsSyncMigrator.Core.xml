@@ -4,16 +4,21 @@
         <name>VstsSyncMigrator.Core</name>
     </assembly>
     <members>
+        <member name="T:VstsSyncMigrator.Engine.FakeProcessor">
+            <summary>
+            Note: this is only for internal usage. Don't use this in your configurations.
+            </summary>
+        </member>
         <member name="T:VstsSyncMigrator.Engine.TeamMigrationContext">
             <summary>
-            Migrates Teams and Team Settings  
+            Migrates Teams and Team Settings: This should be run after `NodeStructuresMigrationConfig` and before all other processors.
             </summary>
             <status>preview</status>
             <processingtarget>Teams</processingtarget>
         </member>
         <member name="T:VstsSyncMigrator.Engine.TestConfigurationsMigrationContext">
             <summary>
-            Migrates Test configurations  
+            This processor can migrate `test configuration`. This should be run before `LinkMigrationConfig`.
             </summary>
             <status>Beta</status>
             <processingtarget>Suites &amp; Plans</processingtarget>
@@ -65,7 +70,7 @@
         </member>
         <member name="T:VstsSyncMigrator.Engine.TestVariablesMigrationContext">
             <summary>
-            Migrates Test Variables 
+            This processor can migrate test variables that are defined in the test plans / suites. This must run before ` TestPlansAndSuitesMigrationConfig`
             </summary>
             <status>Beta</status>
             <processingtarget>Suites &amp; Plans</processingtarget>
@@ -87,7 +92,7 @@
         </member>
         <member name="T:VstsSyncMigrator.Engine.WorkItemQueryMigrationContext">
             <summary>
-            Moved Shared Queries best effort
+            This processor can migrate queries for work items. Only shared queries are included. Personal queries can't migrate with this tool.
             </summary>
             <status>preview</status>
             <processingtarget>Shared Queries</processingtarget>
