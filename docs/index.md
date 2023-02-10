@@ -114,22 +114,22 @@ Most of these processors need to be run in order. If you try to migrate work ite
 
 | Processors | Status | Target    | Usage                              |
 |------------------------|---------|---------|------------------------------------------|
-| [FakeProcessor](docs/Reference/v1/Processors/FakeProcessor.md) | missng XML code comments | missng XML code comments | missng XML code comments |
-| [TeamMigrationContext](docs/Reference/v1/Processors/TeamMigrationContext.md) | preview | Teams | Migrates Teams and Team Settings |
-| [TestConfigurationsMigrationContext](docs/Reference/v1/Processors/TestConfigurationsMigrationContext.md) | Beta | Suites & Plans | Migrates Test configurations |
-| [TestPlandsAndSuitesMigrationContext](docs/Reference/v1/Processors/TestPlandsAndSuitesMigrationContext.md) | Beta | Suites & Plans | Rebuilds Suits and plans for Test Cases migrated using the WorkItemMigration |
-| [TestVariablesMigrationContext](docs/Reference/v1/Processors/TestVariablesMigrationContext.md) | Beta | Suites & Plans | Migrates Test Variables |
-| [WorkItemMigrationContext](docs/Reference/v1/Processors/WorkItemMigrationContext.md) | ready | Work Items | WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links, and Attachments. Use `WorkItemMigrationConfig` to configure. |
-| [WorkItemPostProcessingContext](docs/Reference/v1/Processors/WorkItemPostProcessingContext.md) | preview | Work Items | Reapply field mappings after a migration. Does not migtate Work Items, only reapplied changes to filed mappings. |
-| [WorkItemQueryMigrationContext](docs/Reference/v1/Processors/WorkItemQueryMigrationContext.md) | preview | Shared Queries | Moved Shared Queries best effort |
-| [CreateTeamFolders](docs/Reference/v1/Processors/CreateTeamFolders.md) | preview | Shared Queries | Creates folders in Sared Queries for each Team |
-| [ExportProfilePictureFromADContext](docs/Reference/v1/Processors/ExportProfilePictureFromADContext.md) | alpha | Profiles | Downloads corporate images and updates TFS/Azure DevOps profiles |
-| [ExportTeamList](docs/Reference/v1/Processors/ExportTeamList.md) | missng XML code comments | missng XML code comments | missng XML code comments |
-| [FixGitCommitLinks](docs/Reference/v1/Processors/FixGitCommitLinks.md) | missng XML code comments | missng XML code comments | missng XML code comments |
-| [ImportProfilePictureContext](docs/Reference/v1/Processors/ImportProfilePictureContext.md) | alpha | Profiles | Downloads corporate images and updates TFS/Azure DevOps profiles |
-| [WorkItemDelete](docs/Reference/v1/Processors/WorkItemDelete.md) | ready | WorkItem | The `WorkItemDelete` processor allows you to delete any amount of work items that meet the query. **DANGER:** This is not a recoverable action and should be use with extream caution. |
-| [WorkItemUpdate](docs/Reference/v1/Processors/WorkItemUpdate.md) | missng XML code comments | WorkItem | This processor allows you to make changes in place where we load from teh Target and update the Target. This is used for bulk updates with the most common reason being a process template change. |
-| [WorkItemUpdateAreasAsTagsContext](docs/Reference/v1/Processors/WorkItemUpdateAreasAsTagsContext.md) | Beta | WorkItem | A common issue with older *TFS/Azure DevOps* instances is the proliferation of `Area Paths`. \With the use of `Area Path` for `Teams` and the addition of the `Node Name` column option these extensive tag hierarchies should instad be moved to tags. |
+| [FakeProcessor](/docs/Reference/v1/Processors/FakeProcessor.md) | missng XML code comments | missng XML code comments | missng XML code comments |
+| [TeamMigrationContext](/docs/Reference/v1/Processors/TeamMigrationContext.md) | preview | Teams | Migrates Teams and Team Settings |
+| [TestConfigurationsMigrationContext](/docs/Reference/v1/Processors/TestConfigurationsMigrationContext.md) | Beta | Suites & Plans | Migrates Test configurations |
+| [TestPlandsAndSuitesMigrationContext](/docs/Reference/v1/Processors/TestPlandsAndSuitesMigrationContext.md) | Beta | Suites & Plans | Rebuilds Suits and plans for Test Cases migrated using the WorkItemMigration |
+| [TestVariablesMigrationContext](/docs/Reference/v1/Processors/TestVariablesMigrationContext.md) | Beta | Suites & Plans | Migrates Test Variables |
+| [WorkItemMigrationContext](/docs/Reference/v1/Processors/WorkItemMigrationContext.md) | ready | Work Items | WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links, and Attachments. Use `WorkItemMigrationConfig` to configure. |
+| [WorkItemPostProcessingContext](/docs/Reference/v1/Processors/WorkItemPostProcessingContext.md) | preview | Work Items | Reapply field mappings after a migration. Does not migtate Work Items, only reapplied changes to filed mappings. |
+| [WorkItemQueryMigrationContext](/docs/Reference/v1/Processors/WorkItemQueryMigrationContext.md) | preview | Shared Queries | Moved Shared Queries best effort |
+| [CreateTeamFolders](/docs/Reference/v1/Processors/CreateTeamFolders.md) | preview | Shared Queries | Creates folders in Sared Queries for each Team |
+| [ExportProfilePictureFromADContext](/docs/Reference/v1/Processors/ExportProfilePictureFromADContext.md) | alpha | Profiles | Downloads corporate images and updates TFS/Azure DevOps profiles |
+| [ExportTeamList](/docs/Reference/v1/Processors/ExportTeamList.md) | missng XML code comments | missng XML code comments | missng XML code comments |
+| [FixGitCommitLinks](/docs/Reference/v1/Processors/FixGitCommitLinks.md) | missng XML code comments | missng XML code comments | missng XML code comments |
+| [ImportProfilePictureContext](/docs/Reference/v1/Processors/ImportProfilePictureContext.md) | alpha | Profiles | Downloads corporate images and updates TFS/Azure DevOps profiles |
+| [WorkItemDelete](/docs/Reference/v1/Processors/WorkItemDelete.md) | ready | WorkItem | The `WorkItemDelete` processor allows you to delete any amount of work items that meet the query. **DANGER:** This is not a recoverable action and should be use with extream caution. |
+| [WorkItemUpdate](/docs/Reference/v1/Processors/WorkItemUpdate.md) | missng XML code comments | WorkItem | This processor allows you to make changes in place where we load from teh Target and update the Target. This is used for bulk updates with the most common reason being a process template change. |
+| [WorkItemUpdateAreasAsTagsContext](/docs/Reference/v1/Processors/WorkItemUpdateAreasAsTagsContext.md) | Beta | WorkItem | A common issue with older *TFS/Azure DevOps* instances is the proliferation of `Area Paths`. \With the use of `Area Path` for `Teams` and the addition of the `Node Name` column option these extensive tag hierarchies should instad be moved to tags. |
 
 
 | Processor                                                                                    | Status  | Target            | Usage                                                                                                      |
@@ -155,14 +155,14 @@ The new processor configuration is designed to allow the Migration Tools to supp
 
 | Processors | Status | Target    | Usage                              |
 |------------------------|---------|---------|------------------------------------------|
-| [WorkItemTrackingProcessor](docs/Reference/v2/Processors/WorkItemTrackingProcessor.md) | missng XML code comments | missng XML code comments | This processor is intended, with the aid of [ProcessorEnrichers](../ProcessorEnrichers/index.md), to allow the migration of Work Items between two [Endpoints](../Endpoints/index.md). |
-| [TfsAreaAndIterationProcessor](docs/Reference/v2/Processors/TfsAreaAndIterationProcessor.md) | missng XML code comments | missng XML code comments | The `TfsAreaAndIterationProcessor` migrates all of the Area nd Iteraion paths. |
-| [TfsSharedQueryProcessor](docs/Reference/v2/Processors/TfsSharedQueryProcessor.md) | missng XML code comments | missng XML code comments | The TfsSharedQueryProcessor enabled you to migrate queries from one locatio nto another. |
-| [TfsTeamSettingsProcessor](docs/Reference/v2/Processors/TfsTeamSettingsProcessor.md) | missng XML code comments | missng XML code comments | Native TFS Processor, does not work with any other Endpoints. |
-| [AzureDevOpsPipelineProcessor](docs/Reference/v2/Processors/AzureDevOpsPipelineProcessor.md) | missng XML code comments | missng XML code comments | Azure DevOps Processor that migrates Taskgroups, Build- and Release Pipelines. |
-| [ProcessDefinitionProcessor](docs/Reference/v2/Processors/ProcessDefinitionProcessor.md) | missng XML code comments | missng XML code comments | Process definition processor used to keep processes between two orgs in sync |
-| [KeepOutboundLinkTargetProcessor](docs/Reference/v2/Processors/KeepOutboundLinkTargetProcessor.md) | missng XML code comments | missng XML code comments | missng XML code comments |
-| [OutboundLinkCheckingProcessor](docs/Reference/v2/Processors/OutboundLinkCheckingProcessor.md) | missng XML code comments | missng XML code comments | missng XML code comments |
+| [WorkItemTrackingProcessor](/docs/Reference/v2/Processors/WorkItemTrackingProcessor.md) | missng XML code comments | missng XML code comments | This processor is intended, with the aid of [ProcessorEnrichers](../ProcessorEnrichers/index.md), to allow the migration of Work Items between two [Endpoints](../Endpoints/index.md). |
+| [TfsAreaAndIterationProcessor](/docs/Reference/v2/Processors/TfsAreaAndIterationProcessor.md) | missng XML code comments | missng XML code comments | The `TfsAreaAndIterationProcessor` migrates all of the Area nd Iteraion paths. |
+| [TfsSharedQueryProcessor](/docs/Reference/v2/Processors/TfsSharedQueryProcessor.md) | missng XML code comments | missng XML code comments | The TfsSharedQueryProcessor enabled you to migrate queries from one locatio nto another. |
+| [TfsTeamSettingsProcessor](/docs/Reference/v2/Processors/TfsTeamSettingsProcessor.md) | missng XML code comments | missng XML code comments | Native TFS Processor, does not work with any other Endpoints. |
+| [AzureDevOpsPipelineProcessor](/docs/Reference/v2/Processors/AzureDevOpsPipelineProcessor.md) | missng XML code comments | missng XML code comments | Azure DevOps Processor that migrates Taskgroups, Build- and Release Pipelines. |
+| [ProcessDefinitionProcessor](/docs/Reference/v2/Processors/ProcessDefinitionProcessor.md) | missng XML code comments | missng XML code comments | Process definition processor used to keep processes between two orgs in sync |
+| [KeepOutboundLinkTargetProcessor](/docs/Reference/v2/Processors/KeepOutboundLinkTargetProcessor.md) | missng XML code comments | missng XML code comments | missng XML code comments |
+| [OutboundLinkCheckingProcessor](/docs/Reference/v2/Processors/OutboundLinkCheckingProcessor.md) | missng XML code comments | missng XML code comments | missng XML code comments |
 
 
 | Processor                                                                                            | Status  | Target         | Usage                                                                                                      |
@@ -181,17 +181,17 @@ However sometimes you want to move data to another field, or use a regex to pars
 
 | FieldMaps | Status | Target    | Usage                              |
 |------------------------|---------|---------|------------------------------------------|
-| [FieldBlankMapConfig](docs/Reference/v1/FieldMaps/FieldBlankMapConfig.md) | missng XML code comments | missng XML code comments | missng XML code comments |
-| [FieldLiteralMapConfig](docs/Reference/v1/FieldMaps/FieldLiteralMapConfig.md) | missng XML code comments | missng XML code comments | missng XML code comments |
-| [FieldMergeMapConfig](docs/Reference/v1/FieldMaps/FieldMergeMapConfig.md) | missng XML code comments | missng XML code comments | missng XML code comments |
-| [FieldtoFieldMapConfig](docs/Reference/v1/FieldMaps/FieldtoFieldMapConfig.md) | missng XML code comments | missng XML code comments | missng XML code comments |
-| [FieldtoFieldMultiMapConfig](docs/Reference/v1/FieldMaps/FieldtoFieldMultiMapConfig.md) | missng XML code comments | missng XML code comments | missng XML code comments |
-| [FieldtoTagMapConfig](docs/Reference/v1/FieldMaps/FieldtoTagMapConfig.md) | missng XML code comments | missng XML code comments | missng XML code comments |
-| [FieldValueMapConfig](docs/Reference/v1/FieldMaps/FieldValueMapConfig.md) | missng XML code comments | missng XML code comments | missng XML code comments |
-| [FieldValuetoTagMapConfig](docs/Reference/v1/FieldMaps/FieldValuetoTagMapConfig.md) | missng XML code comments | missng XML code comments | missng XML code comments |
-| [MultiValueConditionalMapConfig](docs/Reference/v1/FieldMaps/MultiValueConditionalMapConfig.md) | missng XML code comments | missng XML code comments | missng XML code comments |
-| [RegexFieldMapConfig](docs/Reference/v1/FieldMaps/RegexFieldMapConfig.md) | missng XML code comments | missng XML code comments | missng XML code comments |
-| [TreeToTagMapConfig](docs/Reference/v1/FieldMaps/TreeToTagMapConfig.md) | missng XML code comments | missng XML code comments | missng XML code comments |
+| [FieldBlankMapConfig](/docs/Reference/v1/FieldMaps/FieldBlankMapConfig.md) | missng XML code comments | missng XML code comments | missng XML code comments |
+| [FieldLiteralMapConfig](/docs/Reference/v1/FieldMaps/FieldLiteralMapConfig.md) | missng XML code comments | missng XML code comments | missng XML code comments |
+| [FieldMergeMapConfig](/docs/Reference/v1/FieldMaps/FieldMergeMapConfig.md) | missng XML code comments | missng XML code comments | missng XML code comments |
+| [FieldtoFieldMapConfig](/docs/Reference/v1/FieldMaps/FieldtoFieldMapConfig.md) | missng XML code comments | missng XML code comments | missng XML code comments |
+| [FieldtoFieldMultiMapConfig](/docs/Reference/v1/FieldMaps/FieldtoFieldMultiMapConfig.md) | missng XML code comments | missng XML code comments | missng XML code comments |
+| [FieldtoTagMapConfig](/docs/Reference/v1/FieldMaps/FieldtoTagMapConfig.md) | missng XML code comments | missng XML code comments | missng XML code comments |
+| [FieldValueMapConfig](/docs/Reference/v1/FieldMaps/FieldValueMapConfig.md) | missng XML code comments | missng XML code comments | missng XML code comments |
+| [FieldValuetoTagMapConfig](/docs/Reference/v1/FieldMaps/FieldValuetoTagMapConfig.md) | missng XML code comments | missng XML code comments | missng XML code comments |
+| [MultiValueConditionalMapConfig](/docs/Reference/v1/FieldMaps/MultiValueConditionalMapConfig.md) | missng XML code comments | missng XML code comments | missng XML code comments |
+| [RegexFieldMapConfig](/docs/Reference/v1/FieldMaps/RegexFieldMapConfig.md) | missng XML code comments | missng XML code comments | missng XML code comments |
+| [TreeToTagMapConfig](/docs/Reference/v1/FieldMaps/TreeToTagMapConfig.md) | missng XML code comments | missng XML code comments | missng XML code comments |
 
 
 * **FieldtoFieldMap** - Just want to map one field to another? This is the one for you.

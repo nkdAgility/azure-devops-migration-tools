@@ -285,7 +285,7 @@ namespace VstsSyncMigrator.ConsoleApp
                 string typeDocSummery = GetTypeData(item);
                 string typeDocdDatatype = GetTypeData(item, "processingtarget");
                 string typeDocdStatus = GetTypeData(item, "status");
-                properties.AppendLine($"| [{item.Name}](docs/Reference/{apiVersion}/{typeCatagoryName}/{item.Name}.md) | {typeDocdStatus} | {typeDocdDatatype} | {typeDocSummery} |");
+                properties.AppendLine($"| [{item.Name}](/docs/Reference/{apiVersion}/{typeCatagoryName}/{item.Name}.md) | {typeDocdStatus} | {typeDocdDatatype} | {typeDocSummery} |");
             }
             return properties.ToString();
         }
