@@ -200,6 +200,11 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         /// </summary>
         public bool SkipRevisionWithInvalidIterationPath { get; set; }
 
+        /// <summary>
+        /// When set to true, this setting will skip a revision if the source area has not been migrated, has been deleted or is somehow invalid, etc.
+        /// </summary>
+        public bool SkipRevisionWithInvalidAreaPath { get; set; }
+
         /// <inheritdoc />
         public bool IsProcessorCompatible(IReadOnlyList<IProcessorConfig> otherProcessors)
         {
@@ -235,6 +240,7 @@ namespace MigrationTools._EngineV1.Configuration.Processing
             IterationMaps = new Dictionary<string, string>();
             MaxGracefulFailures = 0;
             SkipRevisionWithInvalidIterationPath = false;
+            SkipRevisionWithInvalidAreaPath = false;
         }
     }
 }
