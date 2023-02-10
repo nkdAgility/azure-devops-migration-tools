@@ -46,13 +46,17 @@ namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
             List<string> sourceData  = new List<string>();
             foreach (string item in Config.sourceFields)
             {
-                if (source.Fields[item].Value != null) {
+                if (source.Fields[item].Value != null)
+                {
                     sourceData.Add(source.Fields[item].Value.ToString());
+                }
+                else
+                {
+                    sourceData.Add("");
                 }
             }
             var newValT = string.Format(Config.formatExpression, sourceData.ToArray());
             target.Fields[Config.targetField].Value = newValT;
-
         }
     }
 }
