@@ -70,7 +70,7 @@
         </member>
         <member name="T:VstsSyncMigrator.Engine.TestVariablesMigrationContext">
             <summary>
-            This processor can migrate test variables that are defined in the test plans / suites. This must run before ` TestPlansAndSuitesMigrationConfig`
+            This processor can migrate test variables that are defined in the test plans / suites. This must run before `TestPlansAndSuitesMigrationConfig`. 
             </summary>
             <status>Beta</status>
             <processingtarget>Suites &amp; Plans</processingtarget>
@@ -139,11 +139,10 @@
         </member>
         <member name="T:VstsSyncMigrator.Engine.WorkItemUpdateAreasAsTagsContext">
             <summary>
-            A common issue with older *TFS/Azure DevOps* instances is the proliferation of `Area Paths`.
-            \With the use of `Area Path` for `Teams` and the addition of the `Node Name` column option these extensive tag hierarchies should instad be moved to tags.
+            A common issue with older *TFS/Azure DevOps* instances is the proliferation of `Area Paths`. With the use of `Area Path` for `Teams` and the addition of the `Node Name` column option these extensive tag hierarchies should instad be moved to tags.
             </summary>
             <status>Beta</status>
-            <processingtarget>WorkItem</processingtarget>
+            <processingtarget>Work Item</processingtarget>
         </member>
     </members>
 </doc>

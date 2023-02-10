@@ -236,3 +236,6 @@ The default [WorkItemMigrationConfig](/docs/Reference/v1/Processors/WorkItemMigr
 1. From the `C:\tools\MigrationTools\` path run `.\migration.exe execute --config .\configuration.json`
 
 **Remember:** if you want a processor to run, it's `Enabled` attribute must be set to `true`. 
+
+Refer to the [Reference Guide](/docs/reference/index.md) for more details.
+
