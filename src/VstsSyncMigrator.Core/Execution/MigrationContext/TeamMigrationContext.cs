@@ -8,7 +8,7 @@ using MigrationTools._EngineV1.Processors;
 namespace VstsSyncMigrator.Engine
 {
     /// <summary>
-    /// Migrates Teams and Team Settings  
+    /// Migrates Teams and Team Settings: This should be run after `NodeStructuresMigrationConfig` and before all other processors.
     /// </summary>
     /// <status>preview</status>
     /// <processingtarget>Teams</processingtarget>

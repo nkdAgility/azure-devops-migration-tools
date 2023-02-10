@@ -116,7 +116,6 @@ Most of these processors need to be run in order. If you try to migrate work ite
 
 | Processor                                                                                    | Status  | Target            | Usage                                                                                                      |
 | :------------------------------------------------------------------------------------------- | :------ | :---------------- | ---------------------------------------------------------------------------------------------------------- |
-| [WorkItemMigrationConfig](./Reference/v1/Processors/WorkItemMigrationConfig.md)                           | ready   | Work Items        | Migrates either tip or history of work items with Links & Attachments based on a query with field mappings |
 | [TfsTeamSettingsProcessor](./Reference/Processors/TfsTeamSettingsProcessor.md)               | preview | Teams             | Migrates Teams and Team Settings                                                                           |
 | [TfsAreaAndIterationProcessor](./Reference/Processors/TfsAreaAndIterationProcessor.md)       | preview | Area & Iterations | Migrates Nodes before run                                                                                  |
 | [WorkItemDelete](./Processors/WorkItemDeleteConfig.md)                                       | ready   | Work Items        | Bulk delete of work items **WARNING DANGEROUS**                                                            |

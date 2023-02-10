@@ -10,7 +10,7 @@ using VstsSyncMigrator.Engine.ComponentContext;
 namespace VstsSyncMigrator.Engine
 {
     /// <summary>
-    /// Migrates Test configurations  
+    /// This processor can migrate `test configuration`. This should be run before `LinkMigrationConfig`.
     /// </summary>
     /// <status>Beta</status>
     /// <processingtarget>Suites &amp; Plans</processingtarget>

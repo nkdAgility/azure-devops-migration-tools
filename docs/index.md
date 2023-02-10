@@ -134,7 +134,6 @@ Most of these processors need to be run in order. If you try to migrate work ite
 
 | Processor                                                                                    | Status  | Target            | Usage                                                                                                      |
 | :------------------------------------------------------------------------------------------- | :------ | :---------------- | ---------------------------------------------------------------------------------------------------------- |
-| [WorkItemMigrationConfig](./Reference/v1/Processors/WorkItemMigrationConfig.md)                           | ready   | Work Items        | Migrates either tip or history of work items with Links & Attachments based on a query with field mappings |
 | [TfsTeamSettingsProcessor](./Reference/Processors/TfsTeamSettingsProcessor.md)               | preview | Teams             | Migrates Teams and Team Settings                                                                           |
 | [TfsAreaAndIterationProcessor](./Reference/Processors/TfsAreaAndIterationProcessor.md)       | preview | Area & Iterations | Migrates Nodes before run                                                                                  |
 | [WorkItemDelete](./Processors/WorkItemDeleteConfig.md)                                       | ready   | Work Items        | Bulk delete of work items **WARNING DANGEROUS**                                                            |
@@ -193,16 +192,6 @@ However sometimes you want to move data to another field, or use a regex to pars
 | [RegexFieldMapConfig](/docs/Reference/v1/FieldMaps/RegexFieldMapConfig.md) | ready | Work Item Field | I just need that bit of a field... need to send "2016.2" to two fields, one for year and one for release? Done. |
 | [TreeToTagMapConfig](/docs/Reference/v1/FieldMaps/TreeToTagMapConfig.md) | ready | Work Item Field | Need to clear out those nasty Area tree hierarchies? This creates Tags for each node in the Area Path... |
 
-
-* **FieldtoFieldMap** - Just want to map one field to another? This is the one for you.
-* **FieldtoFieldMultiMap** - Allows you to create a list of one to one field maps.
-* **FieldMergeMap** - Ever wanted to merge two or three fields? This mapping will let you do just that.
-* **FieldBlankMap** - Allows you to set an already populated field to empty
-* **FieldtoTagMap** - Want to take a field and convert its value to a tag? Done...
-* **FieldValueMap** - Need to map not just the field but also values? This is the default value mapper.
-* **FieldValuetoTagMap** - Need to create a Tag based on a field value? Just create a regex match and choose how to populate the target.
-* **RegexFieldMap** - I just need that bit of a field... need to send "2016.2" to two fields, one for year and one for release? Done.
-* **TreeToTagMap** - Need to clear out those nasty Area tree hierarchies? This creates Tags for each node in the Area Path...
 
 ## Code (TFVC)
 
