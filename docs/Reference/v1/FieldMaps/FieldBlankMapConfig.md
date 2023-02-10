@@ -4,7 +4,7 @@
 
 [Overview](/docs/index.md) > [Reference](/docs/Reference/index.md) > [API v1](/docs/Reference/v1/index.md) > [FieldMaps](/docs/Reference/v1/FieldMaps/index.md)> **FieldBlankMapConfig**
 
-missng XML code comments
+Allows you to blank an already populated field
 
 ### Options
 
@@ -19,7 +19,7 @@ missng XML code comments
 ```JSON
 {
   "$type": "FieldBlankMapConfig",
-  "WorkItemTypeName": null,
-  "targetField": null
+  "WorkItemTypeName": "*",
+  "targetField": "System.Description"
 }
 ```

@@ -4,7 +4,7 @@
 
 [Overview](/docs/index.md) > [Reference](/docs/Reference/index.md) > [API v2](/docs/Reference/v2/index.md) > [FieldMaps](/docs/Reference/v2/FieldMaps/index.md)> **RegexFieldMapConfig**
 
-missng XML code comments
+I just need that bit of a field... need to send "2016.2" to two fields, one for year and one for release? Done.
 
 ### Options
 
@@ -22,10 +22,10 @@ missng XML code comments
 ```JSON
 {
   "$type": "RegexFieldMapConfig",
-  "WorkItemTypeName": null,
-  "sourceField": null,
-  "targetField": null,
-  "pattern": null,
-  "replacement": null
+  "WorkItemTypeName": "*",
+  "sourceField": "Custom.MyVersion",
+  "targetField": "Custom.MyVersionYearOnly",
+  "pattern": "([0-9]{4})",
+  "replacement": "$1"
 }
 ```

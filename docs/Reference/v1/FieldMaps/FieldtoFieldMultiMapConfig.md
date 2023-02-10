@@ -4,7 +4,7 @@
 
 [Overview](/docs/index.md) > [Reference](/docs/Reference/index.md) > [API v1](/docs/Reference/v1/index.md) > [FieldMaps](/docs/Reference/v1/FieldMaps/index.md)> **FieldtoFieldMultiMapConfig**
 
-missng XML code comments
+Want to setup a bunch of field maps in a single go. Use this shortcut!
 
 ### Options
 
@@ -19,7 +19,12 @@ missng XML code comments
 ```JSON
 {
   "$type": "FieldtoFieldMultiMapConfig",
-  "WorkItemTypeName": null,
-  "SourceToTargetMappings": null
+  "WorkItemTypeName": "*",
+  "SourceToTargetMappings": {
+    "$type": "Dictionary`2",
+    "Custom.Field1": "Custom.Field4",
+    "Custom.Field2": "Custom.Field5",
+    "Custom.Field3": "Custom.Field6"
+  }
 }
 ```

@@ -4,7 +4,7 @@
 
 [Overview](/docs/index.md) > [Reference](/docs/Reference/index.md) > [API v2](/docs/Reference/v2/index.md) > [FieldMaps](/docs/Reference/v2/FieldMaps/index.md)> **MultiValueConditionalMapConfig**
 
-missng XML code comments
+??? If you know how to use this please send a PR :)
 
 ### Options
 
@@ -20,8 +20,14 @@ missng XML code comments
 ```JSON
 {
   "$type": "MultiValueConditionalMapConfig",
-  "WorkItemTypeName": null,
-  "sourceFieldsAndValues": null,
-  "targetFieldsAndValues": null
+  "WorkItemTypeName": "*",
+  "sourceFieldsAndValues": {
+    "$type": "Dictionary`2",
+    "Something": "SomethingElse"
+  },
+  "targetFieldsAndValues": {
+    "$type": "Dictionary`2",
+    "Something": "SomethingElse"
+  }
 }
 ```

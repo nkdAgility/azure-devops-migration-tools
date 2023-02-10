@@ -4,7 +4,7 @@
 
 [Overview](/docs/index.md) > [Reference](/docs/Reference/index.md) > [API v1](/docs/Reference/v1/index.md) > [FieldMaps](/docs/Reference/v1/FieldMaps/index.md)> **FieldtoFieldMapConfig**
 
-missng XML code comments
+Just want to map one field to another? This is the one for you.
 
 ### Options
 
@@ -21,9 +21,9 @@ missng XML code comments
 ```JSON
 {
   "$type": "FieldtoFieldMapConfig",
-  "WorkItemTypeName": null,
-  "sourceField": null,
-  "targetField": null,
-  "defaultValue": null
+  "WorkItemTypeName": "*",
+  "sourceField": "System.StackRank",
+  "targetField": "System.Rank",
+  "defaultValue": "1000"
 }
 ```

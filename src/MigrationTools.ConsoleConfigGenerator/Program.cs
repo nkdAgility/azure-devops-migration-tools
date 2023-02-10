@@ -149,6 +149,7 @@ namespace VstsSyncMigrator.ConsoleApp
                 {
                     Console.WriteLine("Processing as IFieldMapConfig");
                     var options = (IFieldMapConfig)Activator.CreateInstance(typeOption);
+                    options.SetExampleConfigDefaults();
                     targetItem = options;
                 }
                 if (targetItem != null)

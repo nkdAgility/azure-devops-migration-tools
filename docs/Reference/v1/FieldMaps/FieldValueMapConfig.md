@@ -4,7 +4,7 @@
 
 [Overview](/docs/index.md) > [Reference](/docs/Reference/index.md) > [API v1](/docs/Reference/v1/index.md) > [FieldMaps](/docs/Reference/v1/FieldMaps/index.md)> **FieldValueMapConfig**
 
-missng XML code comments
+Need to map not just the field but also values? This is the default value mapper.
 
 ### Options
 
@@ -22,10 +22,16 @@ missng XML code comments
 ```JSON
 {
   "$type": "FieldValueMapConfig",
-  "WorkItemTypeName": null,
-  "sourceField": null,
-  "targetField": null,
-  "defaultValue": null,
-  "valueMapping": null
+  "WorkItemTypeName": "*",
+  "sourceField": "System.Status",
+  "targetField": "System.Status",
+  "defaultValue": "New",
+  "valueMapping": {
+    "$type": "Dictionary`2",
+    "New": "New",
+    "Active": "Committed",
+    "Resolved": "Committed",
+    "Closed": "Done"
+  }
 }
 ```

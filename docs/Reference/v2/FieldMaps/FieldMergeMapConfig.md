@@ -4,7 +4,7 @@
 
 [Overview](/docs/index.md) > [Reference](/docs/Reference/index.md) > [API v2](/docs/Reference/v2/index.md) > [FieldMaps](/docs/Reference/v2/FieldMaps/index.md)> **FieldMergeMapConfig**
 
-missng XML code comments
+Ever wanted to merge two or three fields? This mapping will let you do just that.
 
 ### Options
 
@@ -14,7 +14,6 @@ missng XML code comments
 | sourceFields | List | missng XML code comments | missng XML code comments |
 | targetField | String | missng XML code comments | missng XML code comments |
 | formatExpression | String | missng XML code comments | missng XML code comments |
-| doneMatch | String | missng XML code comments | missng XML code comments |
 
 
 ### Example JSON
@@ -22,10 +21,12 @@ missng XML code comments
 ```JSON
 {
   "$type": "FieldMergeMapConfig",
-  "WorkItemTypeName": null,
-  "sourceFields": null,
-  "targetField": null,
-  "formatExpression": null,
-  "doneMatch": "##DONE##"
+  "WorkItemTypeName": "*",
+  "sourceFields": [
+    "System.Description",
+    "System.Status"
+  ],
+  "targetField": "System.Description",
+  "formatExpression": "{0} \n {1}"
 }
 ```

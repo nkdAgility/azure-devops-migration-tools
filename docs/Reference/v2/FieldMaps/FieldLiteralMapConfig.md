@@ -4,7 +4,7 @@
 
 [Overview](/docs/index.md) > [Reference](/docs/Reference/index.md) > [API v2](/docs/Reference/v2/index.md) > [FieldMaps](/docs/Reference/v2/FieldMaps/index.md)> **FieldLiteralMapConfig**
 
-missng XML code comments
+Sets a field on the `target` to b a specific value.
 
 ### Options
 
@@ -20,8 +20,8 @@ missng XML code comments
 ```JSON
 {
   "$type": "FieldLiteralMapConfig",
-  "WorkItemTypeName": null,
-  "targetField": null,
-  "value": null
+  "WorkItemTypeName": "*",
+  "targetField": "System.Status",
+  "value": "New"
 }
 ```

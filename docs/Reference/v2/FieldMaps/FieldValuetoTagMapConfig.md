@@ -4,7 +4,7 @@
 
 [Overview](/docs/index.md) > [Reference](/docs/Reference/index.md) > [API v2](/docs/Reference/v2/index.md) > [FieldMaps](/docs/Reference/v2/FieldMaps/index.md)> **FieldValuetoTagMapConfig**
 
-missng XML code comments
+Need to create a Tag based on a field value? Just create a regex match and choose how to populate the target.
 
 ### Options
 
@@ -21,9 +21,9 @@ missng XML code comments
 ```JSON
 {
   "$type": "FieldValuetoTagMapConfig",
-  "WorkItemTypeName": null,
-  "sourceField": null,
-  "pattern": null,
-  "formatExpression": null
+  "WorkItemTypeName": "*",
+  "sourceField": "System.Status",
+  "pattern": "(Active|Resolved)",
+  "formatExpression": "Status: {0}"
 }
 ```

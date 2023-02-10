@@ -4,7 +4,7 @@
 
 [Overview](/docs/index.md) > [Reference](/docs/Reference/index.md) > [API v2](/docs/Reference/v2/index.md) > [FieldMaps](/docs/Reference/v2/FieldMaps/index.md)> **TreeToTagMapConfig**
 
-missng XML code comments
+Need to clear out those nasty Area tree hierarchies? This creates Tags for each node in the Area Path...
 
 ### Options
 
@@ -20,8 +20,8 @@ missng XML code comments
 ```JSON
 {
   "$type": "TreeToTagMapConfig",
-  "WorkItemTypeName": null,
-  "toSkip": 0,
+  "WorkItemTypeName": "*",
+  "toSkip": 2,
   "timeTravel": 0
 }
 ```
