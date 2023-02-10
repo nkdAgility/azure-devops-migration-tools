@@ -2,13 +2,24 @@
 
 The Azure DevOps Migration Tools allow you to bulk edit and migrate data between Team Projects on both Microsoft Team Foundation Server (TFS) and Azure DevOps Services. Take a look at the  [documentation](http://nkdagility.github.io/azure-devops-migration-tools/) to find out how. This project is published as [code on GitHub](https://github.com/nkdAgility/azure-devops-migration-tools/) as well as a [Azure DevOps Migration Tools on Chocolatey](https://chocolatey.org/packages/vsts-sync-migrator/).
 
-<a href="https://stackoverflow.com/questions/tagged/azure-devops-migration-tools" title="Ask Questions on Stack Overflow"><img src="http://cdn.sstatic.net/stackexchange/img/logos/so/so-logo.png" width="250"></a>
+<a href="https://github.com/nkdAgility/azure-devops-migration-tools/discussions" title="Ask Questions in GitHub Discussions">Ask Questions in GitHub Discussions</a>
 
-**Ask Questions on Stack Overflow: https://stackoverflow.com/questions/tagged/azure-devops-migration-tools**
+**Ask Questions on Stack Overflow: https://github.com/nkdAgility/azure-devops-migration-tools/discussions**
 
-![alt text](https://raw.githubusercontent.com/nkdAgility/azure-devops-migration-tools/master/src/MigrationTools.Extension/images/azure-devops-migration-tools-naked-agility-martin-hinshelwood.png)
+## Some Data from the last 30 days (as of 01/04/2022)
 
-**INFO: This tool was developed to support the scenarios below, and the edge cases that have been encountered by the 30+ contributors from around the Azure DevOps community. You should be comfortable with the TFS/Azure DevOps object model, as well as debugging code in Visual Studio.**
+| Catagory  | Metric | Notes |
+| ------------- | ------------- | ------------- |
+| Work Item Revisions | **14m** | A single Work Item may have many revisions that we need to migrate |
+| Average Work item Migration Time  | **35s** | Work Item (inlcudes all revisions, links, and attachements for the work item) |
+| Git Commit Links  | **480k** |  |
+| Attachments | **252.37k**  | Total number of attachments migrated |
+| Migration Run Ave  | **14 minutes** | Includes dryruns as well.  |
+| Migration Run Total   |  **19bn Seconds** |  |
+
+
+**INFO: This tool was developed to support the scenarios below, and the edge cases that have been encountered by the 30+ contributors from around the Azure DevOps community. 
+You should be comfortable with the TFS/Azure DevOps object model, as well as debugging code in Visual Studio.**
 **Community support is available through [GitHub](https://github.com/nkdAgility/azure-devops-migration-tools/discussions); Paid support is available through our [recommended consultants](http://nkdagility.github.io/azure-devops-migration-tools/#support) as well as our contributors and many DevOps consultants around the world.**
 
 ## What can you do with this tool?
@@ -40,9 +51,10 @@ The Azure DevOps Migration Tools allow you to bulk edit and migrate data between
 
  - [Video Overview](https://youtu.be/RCJsST0xBCE)
  - [Getting Started](./getting-started.md)
+ - [Reference](./Reference/index.md)
  - [FAQ](./faq.md)
- - _!preview v2_ [How To Migrate Things](./HowTo/index.md)
- - _!preview v2_ [Reference](./Reference/index.md)
+ - [How To Migrate Things](./HowTo/index.md)
+
 
 #### Extras
 
@@ -97,8 +109,7 @@ These tools are build by naked Agility Limited's DevOps & Agility consultants to
 
 ## Processors (v1 Architecture)
 
-There are other processors that can be used to migrate, or process, different sorts of data in different ways. Which one is right for you depends on the situation at hand.
-
+There are a number processors that can be used to migrate, or process, different sorts of data in different ways. Which one is right for you depends on the situation at hand. 
 Most of these processors need to be run in order. If you try to migrate work items before you have migrated Area and Iterations then ***bang*** you need to go back.
 
 | Processor                                                                                    | Status  | Target            | Usage                                                                                                      |
@@ -128,14 +139,6 @@ The new processor configuration is designed to allow the Migration Tools to supp
 | [TfsTeamSettingsProcessor](./Reference/Processors/TfsTeamSettingsProcessor.md)                       | preview | Teams          | Migrates Teams and Team Settings                                                                           |
 | [TfsSharedQueryProcessor](./Reference/Processors/TfsTeamSettingsProcessor.md)                        | preview | Shared Queries | Moved Shared Queries best effort                                                                           |
 | [AzureDevOpsPipelineProcessorOptions](./Reference/Processors/AzureDevOpsPipelineProcessorOptions.md) | preview | Pipelines      | Migrate build and release pipelines                                                                        |
-
-### Reference: A Deep Dive
-
-  - _!preview v2_ [Reference](./Reference/index.md)
-  - _!preview v2_ [Processors](./Reference/Processors/index.md)
-  - _!preview v2_ [ProcessorEnrichers](./Reference/ProcessorEnrichers/index.md)
-  - _!preview v2_ [Endpoints](./Reference/Endpoints/index.md)
-  - _!preview v2_ [EndpointEnrichers](./Reference/EndpointEnrichers/index.md)
 
 
 ## Field Maps
