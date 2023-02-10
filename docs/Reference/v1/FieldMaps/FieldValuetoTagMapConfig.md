@@ -10,10 +10,10 @@ Need to create a Tag based on a field value? Just create a regex match and choos
 
 | Parameter name         | Type    | Description                              | Default Value                            |
 |------------------------|---------|------------------------------------------|------------------------------------------|
-| WorkItemTypeName | String | missng XML code comments | missng XML code comments |
-| sourceField | String | missng XML code comments | missng XML code comments |
-| pattern | String | missng XML code comments | missng XML code comments |
 | formatExpression | String | missng XML code comments | missng XML code comments |
+| pattern | String | missng XML code comments | missng XML code comments |
+| sourceField | String | missng XML code comments | missng XML code comments |
+| WorkItemTypeName | String | missng XML code comments | missng XML code comments |
 
 
 ### Example JSON

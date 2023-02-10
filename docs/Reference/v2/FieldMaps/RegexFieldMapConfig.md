@@ -10,11 +10,11 @@ I just need that bit of a field... need to send "2016.2" to two fields, one for 
 
 | Parameter name         | Type    | Description                              | Default Value                            |
 |------------------------|---------|------------------------------------------|------------------------------------------|
-| WorkItemTypeName | String | missng XML code comments | missng XML code comments |
-| sourceField | String | missng XML code comments | missng XML code comments |
-| targetField | String | missng XML code comments | missng XML code comments |
 | pattern | String | missng XML code comments | missng XML code comments |
 | replacement | String | missng XML code comments | missng XML code comments |
+| sourceField | String | missng XML code comments | missng XML code comments |
+| targetField | String | missng XML code comments | missng XML code comments |
+| WorkItemTypeName | String | missng XML code comments | missng XML code comments |
 
 
 ### Example JSON

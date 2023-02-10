@@ -96,7 +96,7 @@ namespace VstsSyncMigrator.ConsoleApp
         private static void Process(List<Type> targetTypes, List<Type> allTypes, Type type, string apiVersion, string folder, bool findConfig = true, string configEnd = "Options")
         {
             string masterTemplate = System.IO.Path.Combine(referencePath, "template.md");
-            var founds = targetTypes.Where(t => type.IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface).ToList();
+            var founds = targetTypes.Where(t => type.IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface).OrderBy(t => t.Name).ToList();
             ProcessIndexFile(founds, apiVersion, folder, masterTemplate);
             // Each File
             foreach (var item in founds)
@@ -260,7 +260,7 @@ namespace VstsSyncMigrator.ConsoleApp
             {
                 properties.AppendLine("| Parameter name         | Type    | Description                              | Default Value                            |");
                 properties.AppendLine("|------------------------|---------|------------------------------------------|------------------------------------------|");
-                var jpropertys = joptions.Properties();
+                var jpropertys = joptions.Properties().OrderBy(t => t.Name);
                 foreach (JProperty jproperty in jpropertys)
                 {
                     string PropertyValue = GetPropertyData(options, joptions, jproperty, "summary");

@@ -10,8 +10,8 @@ Allows you to blank an already populated field
 
 | Parameter name         | Type    | Description                              | Default Value                            |
 |------------------------|---------|------------------------------------------|------------------------------------------|
-| WorkItemTypeName | String | missng XML code comments | missng XML code comments |
 | targetField | String | missng XML code comments | missng XML code comments |
+| WorkItemTypeName | String | missng XML code comments | missng XML code comments |
 
 
 ### Example JSON

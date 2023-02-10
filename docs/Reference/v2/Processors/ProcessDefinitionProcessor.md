@@ -22,14 +22,14 @@ Process definition processor used to keep processes between two orgs in sync
 | Parameter name         | Type    | Description                              | Default Value                            |
 |------------------------|---------|------------------------------------------|------------------------------------------|
 | Enabled | Boolean | If set to `true` then the processor will run. Set to `false` and the processor will not run. | missng XML code comments |
+| MaxDegreeOfParallelism | Int32 | missng XML code comments | missng XML code comments |
 | Processes | Dictionary`2 | missng XML code comments | missng XML code comments |
 | ProcessMaps | Dictionary`2 | missng XML code comments | missng XML code comments |
-| UpdateProcessDetails | Boolean | missng XML code comments | missng XML code comments |
-| MaxDegreeOfParallelism | Int32 | missng XML code comments | missng XML code comments |
 | ProcessorEnrichers | List | List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors. | missng XML code comments |
+| RefName | String | `Refname` will be used in the future to allow for using named Options without the need to copy all of the options. | missng XML code comments |
 | SourceName | String | missng XML code comments | missng XML code comments |
 | TargetName | String | missng XML code comments | missng XML code comments |
-| RefName | String | `Refname` will be used in the future to allow for using named Options without the need to copy all of the options. | missng XML code comments |
+| UpdateProcessDetails | Boolean | missng XML code comments | missng XML code comments |
 
 
 ### Supported Endpoints

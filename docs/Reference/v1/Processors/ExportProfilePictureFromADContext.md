@@ -10,11 +10,11 @@ Downloads corporate images and updates TFS/Azure DevOps profiles
 
 | Parameter name         | Type    | Description                              | Default Value                            |
 |------------------------|---------|------------------------------------------|------------------------------------------|
-| Enabled | Boolean | missng XML code comments | missng XML code comments |
 | Domain | String | missng XML code comments | missng XML code comments |
-| Username | String | missng XML code comments | missng XML code comments |
+| Enabled | Boolean | missng XML code comments | missng XML code comments |
 | Password | String | missng XML code comments | missng XML code comments |
 | PictureEmpIDFormat | String | missng XML code comments | missng XML code comments |
+| Username | String | missng XML code comments | missng XML code comments |
 
 
 ### Example JSON

@@ -10,9 +10,9 @@ Need to clear out those nasty Area tree hierarchies? This creates Tags for each 
 
 | Parameter name         | Type    | Description                              | Default Value                            |
 |------------------------|---------|------------------------------------------|------------------------------------------|
-| WorkItemTypeName | String | missng XML code comments | missng XML code comments |
-| toSkip | Int32 | missng XML code comments | missng XML code comments |
 | timeTravel | Int32 | missng XML code comments | missng XML code comments |
+| toSkip | Int32 | missng XML code comments | missng XML code comments |
+| WorkItemTypeName | String | missng XML code comments | missng XML code comments |
 
 
 ### Example JSON

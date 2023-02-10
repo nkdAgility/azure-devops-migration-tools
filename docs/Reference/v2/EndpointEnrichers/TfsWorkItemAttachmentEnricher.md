@@ -11,9 +11,9 @@ The `TfsWorkItemAttachmentEnricher` processes the attachements for a specific wo
 | Parameter name         | Type    | Description                              | Default Value                            |
 |------------------------|---------|------------------------------------------|------------------------------------------|
 | Enabled | Boolean | missng XML code comments | missng XML code comments |
-| WorkingPath | String | missng XML code comments | missng XML code comments |
 | MaxSize | Int32 | missng XML code comments | missng XML code comments |
 | RefName | String | missng XML code comments | missng XML code comments |
+| WorkingPath | String | missng XML code comments | missng XML code comments |
 
 
 ### Example JSON

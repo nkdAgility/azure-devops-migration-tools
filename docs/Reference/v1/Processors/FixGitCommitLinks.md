@@ -11,9 +11,9 @@ missng XML code comments
 | Parameter name         | Type    | Description                              | Default Value                            |
 |------------------------|---------|------------------------------------------|------------------------------------------|
 | Enabled | Boolean | missng XML code comments | missng XML code comments |
-| TargetRepository | String | missng XML code comments | missng XML code comments |
-| QueryBit | String | missng XML code comments | missng XML code comments |
 | OrderBit | String | missng XML code comments | missng XML code comments |
+| QueryBit | String | missng XML code comments | missng XML code comments |
+| TargetRepository | String | missng XML code comments | missng XML code comments |
 
 
 ### Example JSON

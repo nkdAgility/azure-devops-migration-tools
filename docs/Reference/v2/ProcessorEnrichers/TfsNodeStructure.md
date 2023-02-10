@@ -10,11 +10,11 @@ missng XML code comments
 
 | Parameter name         | Type    | Description                              | Default Value                            |
 |------------------------|---------|------------------------------------------|------------------------------------------|
-| Enabled | Boolean | missng XML code comments | missng XML code comments |
-| PrefixProjectToNodes | Boolean | missng XML code comments | missng XML code comments |
-| NodeBasePaths | String[] | missng XML code comments | missng XML code comments |
 | AreaMaps | Dictionary`2 | missng XML code comments | missng XML code comments |
+| Enabled | Boolean | missng XML code comments | missng XML code comments |
 | IterationMaps | Dictionary`2 | missng XML code comments | missng XML code comments |
+| NodeBasePaths | String[] | missng XML code comments | missng XML code comments |
+| PrefixProjectToNodes | Boolean | missng XML code comments | missng XML code comments |
 | RefName | String | missng XML code comments | missng XML code comments |
 
 

@@ -11,9 +11,9 @@ Migrates Teams and Team Settings
 | Parameter name         | Type    | Description                              | Default Value                            |
 |------------------------|---------|------------------------------------------|------------------------------------------|
 | Enabled | Boolean | missng XML code comments | missng XML code comments |
-| PrefixProjectToNodes | Boolean | missng XML code comments | missng XML code comments |
 | EnableTeamSettingsMigration | Boolean | missng XML code comments | missng XML code comments |
 | FixTeamSettingsForExistingTeams | Boolean | missng XML code comments | missng XML code comments |
+| PrefixProjectToNodes | Boolean | missng XML code comments | missng XML code comments |
 
 
 ### Example JSON

@@ -11,9 +11,9 @@ missng XML code comments
 | Parameter name         | Type    | Description                              | Default Value                            |
 |------------------------|---------|------------------------------------------|------------------------------------------|
 | Enabled | Boolean | missng XML code comments | missng XML code comments |
-| ReplayRevisions | Boolean | missng XML code comments | missng XML code comments |
 | MaxRevisions | Int32 | missng XML code comments | missng XML code comments |
 | RefName | String | missng XML code comments | missng XML code comments |
+| ReplayRevisions | Boolean | missng XML code comments | missng XML code comments |
 
 
 ### Example JSON

@@ -10,8 +10,8 @@ A common issue with older *TFS/Azure DevOps* instances is the proliferation of `
 
 | Parameter name         | Type    | Description                              | Default Value                            |
 |------------------------|---------|------------------------------------------|------------------------------------------|
-| Enabled | Boolean | missng XML code comments | missng XML code comments |
 | AreaIterationPath | String | missng XML code comments | missng XML code comments |
+| Enabled | Boolean | missng XML code comments | missng XML code comments |
 
 
 ### Example JSON

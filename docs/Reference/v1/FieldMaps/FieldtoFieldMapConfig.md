@@ -10,10 +10,10 @@ Just want to map one field to another? This is the one for you.
 
 | Parameter name         | Type    | Description                              | Default Value                            |
 |------------------------|---------|------------------------------------------|------------------------------------------|
-| WorkItemTypeName | String | missng XML code comments | missng XML code comments |
+| defaultValue | String | missng XML code comments | missng XML code comments |
 | sourceField | String | missng XML code comments | missng XML code comments |
 | targetField | String | missng XML code comments | missng XML code comments |
-| defaultValue | String | missng XML code comments | missng XML code comments |
+| WorkItemTypeName | String | missng XML code comments | missng XML code comments |
 
 
 ### Example JSON

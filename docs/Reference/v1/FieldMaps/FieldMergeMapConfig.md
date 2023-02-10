@@ -10,10 +10,10 @@ Ever wanted to merge two or three fields? This mapping will let you do just that
 
 | Parameter name         | Type    | Description                              | Default Value                            |
 |------------------------|---------|------------------------------------------|------------------------------------------|
-| WorkItemTypeName | String | missng XML code comments | missng XML code comments |
+| formatExpression | String | missng XML code comments | missng XML code comments |
 | sourceFields | List | missng XML code comments | missng XML code comments |
 | targetField | String | missng XML code comments | missng XML code comments |
-| formatExpression | String | missng XML code comments | missng XML code comments |
+| WorkItemTypeName | String | missng XML code comments | missng XML code comments |
 
 
 ### Example JSON

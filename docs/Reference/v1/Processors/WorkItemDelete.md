@@ -11,12 +11,12 @@ The `WorkItemDelete` processor allows you to delete any amount of work items tha
 | Parameter name         | Type    | Description                              | Default Value                            |
 |------------------------|---------|------------------------------------------|------------------------------------------|
 | Enabled | Boolean | missng XML code comments | missng XML code comments |
-| WIQLQueryBit | String | missng XML code comments | missng XML code comments |
-| WIQLOrderBit | String | missng XML code comments | missng XML code comments |
-| WorkItemIDs | IList | missng XML code comments | missng XML code comments |
 | FilterWorkItemsThatAlreadyExistInTarget | Boolean | missng XML code comments | missng XML code comments |
 | PauseAfterEachWorkItem | Boolean | missng XML code comments | missng XML code comments |
+| WIQLOrderBit | String | missng XML code comments | missng XML code comments |
+| WIQLQueryBit | String | missng XML code comments | missng XML code comments |
 | WorkItemCreateRetryLimit | Int32 | missng XML code comments | missng XML code comments |
+| WorkItemIDs | IList | missng XML code comments | missng XML code comments |
 
 
 ### Example JSON
