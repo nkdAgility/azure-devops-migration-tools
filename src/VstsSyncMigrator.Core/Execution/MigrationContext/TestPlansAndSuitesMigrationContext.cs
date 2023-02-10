@@ -26,7 +26,7 @@ namespace VstsSyncMigrator.Engine
     /// </summary>
     /// <status>Beta</status>
     /// <processingtarget>Suites &amp; Plans</processingtarget>
-    public class TestPlandsAndSuitesMigrationContext : MigrationProcessorBase
+    public class TestPlansAndSuitesMigrationContext : MigrationProcessorBase
     {
         private int __currentSuite = 0;
         private int __totalSuites = 0;
@@ -44,10 +44,10 @@ namespace VstsSyncMigrator.Engine
         private TfsNodeStructure _nodeStructureEnricher;
         private readonly EngineConfiguration _engineConfig;
 
-        public TestPlandsAndSuitesMigrationContext(IMigrationEngine engine,
+        public TestPlansAndSuitesMigrationContext(IMigrationEngine engine,
                                                    IServiceProvider services,
                                                    ITelemetryLogger telemetry,
-                                                   ILogger<TestPlandsAndSuitesMigrationContext> logger,
+                                                   ILogger<TestPlansAndSuitesMigrationContext> logger,
                                                    TfsNodeStructure nodeStructureEnricher,
                                                    IOptions<EngineConfiguration> engineConfig)
             : base(engine, services, telemetry, logger)
