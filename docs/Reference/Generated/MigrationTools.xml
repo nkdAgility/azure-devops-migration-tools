@@ -366,6 +366,11 @@
             This will skip a revision if the source iteration has not been migrated i.e. it was deleted
             </summary>
         </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.SkipRevisionWithInvalidAreaPath">
+            <summary>
+            When set to true, this setting will skip a revision if the source area has not been migrated, has been deleted or is somehow invalid, etc.
+            </summary>
+        </member>
         <member name="M:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
             <inheritdoc />
         </member>

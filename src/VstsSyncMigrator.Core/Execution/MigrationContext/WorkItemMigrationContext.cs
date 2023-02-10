@@ -163,7 +163,7 @@ namespace VstsSyncMigrator.Engine
                     if (_config.StopMigrationOnMissingAreaIterationNodes)
                     {
                         throw new Exception("Missing Iterations in Target preventing progress, check log for list. If you resolve with a FieldMap set StopMigrationOnMissingAreaIterationNodes = false in the config to continue.");
-                    }                    
+                    }
                 }
                 //////////////////////////////////////////////////
                 contextLog.Information("Found target project as {@destProject}", Engine.Target.WorkItems.Project.Name);
@@ -679,9 +679,10 @@ namespace VstsSyncMigrator.Engine
                     ProcessHTMLFieldAttachements(targetWorkItem);
                     ProcessWorkItemEmbeddedLinks(sourceWorkItem, targetWorkItem);
 
-                    var skipRevision = SkipRevisionWithInvalidIterationPath(targetWorkItem);
+                    var skipIterationRevision = SkipRevisionWithInvalidIterationPath(targetWorkItem);
+                    var skipAreaRevision = SkipRevisionWithInvalidAreaPath(targetWorkItem);
 
-                    if (!skipRevision)
+                    if (!skipIterationRevision && !skipAreaRevision)
                     {
                         targetWorkItem.SaveToAzureDevOps();
                     }
@@ -750,6 +751,21 @@ namespace VstsSyncMigrator.Engine
                 return false;
             }
 
+            return ValidateRevisionField(targetWorkItemData, "System.IterationPath");
+        }
+
+        private bool SkipRevisionWithInvalidAreaPath(WorkItemData targetWorkItemData)
+        {
+            if (!_config.SkipRevisionWithInvalidAreaPath)
+            {
+                return false;
+            }
+
+            return ValidateRevisionField(targetWorkItemData, "System.AreaPath"); ;
+        }
+
+        private bool ValidateRevisionField(WorkItemData targetWorkItemData, string fieldReferenceName)
+        {
             var workItem = targetWorkItemData.ToWorkItem();
             var invalidFields = workItem.Validate();
 
@@ -760,8 +776,8 @@ namespace VstsSyncMigrator.Engine
 
             foreach (Field invalidField in invalidFields)
             {
-                // We cannot save a revision when it has no IterationPath
-                if (invalidField.ReferenceName == "System.IterationPath")
+                // We cannot save a revision when it has no IterationPath and/or AreaPath
+                if (invalidField.ReferenceName == fieldReferenceName)
                 {
                     return true;
                 }
