@@ -19,7 +19,8 @@
     <PackageReference Update="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="cd $(TargetDir)&#xD;&#xA;$(TargetName).exe" />
-  </Target>
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition=" '$(Configuration)' == 'Release' ">
+		<Exec Command="cd $(TargetDir)&#xD;&#xA;$(TargetName).exe" />
+	</Target>
+  
 </Project>

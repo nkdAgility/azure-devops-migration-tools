@@ -65,6 +65,23 @@ namespace VstsSyncMigrator.ConsoleApp
             Process(newTypes, allTypes, typeof(IFieldMapConfig), "v1", "FieldMaps", false);
             Process(newTypes, allTypes, typeof(IFieldMapConfig), "v2", "FieldMaps", false);
             Console.WriteLine("--------------------------");
+            ProcessAllFiles();
+        }
+
+        private static void ProcessAllFiles()
+        {
+            foreach (string file in Directory.EnumerateFiles(referencePath, "*.md", SearchOption.AllDirectories))
+            {
+                string templatemd = string.Empty;
+                if (System.IO.File.Exists(file))
+                {
+                    templatemd = System.IO.File.ReadAllText(file);
+                    ProcessImports(templatemd, referencePath);
+                    System.IO.File.WriteAllText(file, templatemd);
+                }
+                //ProcessImports
+                Console.WriteLine(file);
+            }
         }
 
         private static void Process(List<Type> targetTypes, List<Type> allTypes, Type type, string apiVersion, string folder, bool findConfig = true, string configEnd = "Options")
@@ -271,11 +288,17 @@ namespace VstsSyncMigrator.ConsoleApp
         private static string ProcessSamples(string jsonSample, string templatemd, string referencePath)
         {
             templatemd = templatemd.Replace("<ExampleJson>", jsonSample);
-            var match = new Regex(@"<Import:([\s\S]*)>");
+            templatemd = ProcessImports(templatemd, referencePath);
+            return templatemd;
+        }
+
+        private static string ProcessImports(string templatemd, string referencePath)
+        {
+            var match = new Regex(@"<Import:(.*)>");
             MatchCollection matches = match.Matches(templatemd);
             foreach (Match item in matches)
             {
-                string importPath = Path.Combine(referencePath, item.Value);
+                string importPath = Path.Combine(referencePath, item.Groups[1].Value);
                 string importFile = System.IO.File.ReadAllText(importPath);
                 templatemd = templatemd.Replace(string.Format($"<Import:{item.Value}>"), importFile);
             }

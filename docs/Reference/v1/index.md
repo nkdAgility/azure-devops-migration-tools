@@ -13,3 +13,7 @@ manipulate the data during a migration.
 
 - **[Processors](../v1/Processors/index.md)** - Processors allow you to move different types of data between `Endpoints` and does not care what `Endpoint` you have on each end.
 - **[FieldMaps](../v1/FieldMaps/index.md)** - 
+
+## Full Config File
+
+<Import:Generated\configuration-full.config>
