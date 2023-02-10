@@ -10,6 +10,7 @@ namespace MigrationTools._EngineV1.Configuration
         [JsonIgnore]
         string FieldMap { get; }
 
+        void SetExampleConfigDefaults();
 
     }
 }

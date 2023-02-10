@@ -1,6 +1,6 @@
 {
   "$type": "FieldLiteralMapConfig",
-  "WorkItemTypeName": null,
-  "targetField": null,
-  "value": null
+  "WorkItemTypeName": "*",
+  "targetField": "System.Status",
+  "value": "New"
 }

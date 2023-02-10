@@ -9,6 +9,11 @@ using VstsSyncMigrator.Engine.ComponentContext;
 
 namespace VstsSyncMigrator.Engine
 {
+    /// <summary>
+    /// This processor can migrate `test configuration`. This should be run before `LinkMigrationConfig`.
+    /// </summary>
+    /// <status>Beta</status>
+    /// <processingtarget>Suites &amp; Plans</processingtarget>
     public class TestConfigurationsMigrationContext : MigrationProcessorBase
     {
         // http://blogs.microsoft.co.il/shair/2015/02/02/tfs-api-part-56-test-configurations/

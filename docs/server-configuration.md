@@ -1,18 +1,18 @@
 # Server Configuration and Requirements
 
-There are some requirements that you will need to meet in order to use the tool against your TFS or VSTS server. The VSTS Bulk Data Editor uses a flag to Bypass the Work Item rules engine and write data into TFS\VSTS that may not comply with the rules. For example you can write data directly into the `Closed` state without starting at `New`. This is very useful for migrations but requires some pre-requisites.
+There are some requirements that you will need to meet in order to use the tool against your TFS or VSTS server. The Azure DevOps Migration Tools use a flag to Bypass the Work Item rules engine and write data into TFS\VSTS that may not comply with the rules. For example you can write data directly into the `Closed` state without starting at `New`. This is very useful for migrations but requires some pre-requisites.
 
 ## Bypass Rules
 
-For on-premises TFS instances you need to be part of the `Project Collection Service Accounts` group. You can do this by calling the following command:
+For on-premises instances you need to be part of the `Project Collection Service Accounts` group. You can do this by calling the following command:
 
 `tfssecurity /g+ "Project Collection Service Accounts" n:domainusername ALLOW /server:http://myserver:8080/tfs`
 
-This is not required for VSTS targets.
+This is not required for Azure DevOps Service targets, but you do need to be a Collection Admin on the Target.
 
 ## Migration State
 
-In order to store the state for the migration you need to use a custom field, the `ReflectedWorkItemId` field. The way you add this depends on the platform you are using.
+In order to store the state for the migration you need to use a custom field, the `ReflectedWorkItemId` field which needs added to the Target only. The way you add this depends on the platform you are using.
 
 ### Azure DevOps
 
@@ -35,7 +35,7 @@ See [MSDN for more details](https://msdn.microsoft.com/en-us/library/dd236914.as
 
 ### Visual Studio Team Services (VSTS)
 
-With the advent of the [VSTS Migration Tool](https://blogs.msdn.microsoft.com/visualstudioalm/2016/11/16/import-your-tfs-database-into-visual-studio-team-services/) there are potentially two ways you need to consider when customising a VSTS process template. It all depends how the Team Project was created.
+With the advent of the [data migration tool for Azure DevOps](https://learn.microsoft.com/en-us/azure/devops/migrate/migration-overview) there are potentially two ways you need to consider when customising a VSTS process template. It all depends how the Team Project was created.
 
 #### Inherited Templates - the future ####
 
@@ -45,7 +45,7 @@ The name you should use for the custom field on a VSTS instance is not `TfsMigra
 
 #### Custom Templates ####
 
-If you migrated a TPC to VSTS using the [VSTS Migration Tool](https://blogs.msdn.microsoft.com/visualstudioalm/2016/11/16/import-your-tfs-database-into-visual-studio-team-services/) that already had customisations then it will not allow creating an inherited process. You have to exit you customisation in a different manner:
+If you migrated a TPC to VSTS using the [data migration tool for Azure DevOps](https://learn.microsoft.com/en-us/azure/devops/migrate/migration-overview) that already had customisations then it will not allow creating an inherited process. You have to exit you customisation in a different manner:
 
 - Export the current process (this is done from the same Account > Settings page where you do any process customisation in VSTS); this downloads the current customised process as a .ZIP file. 
 - Once you have the .ZIP file, unpack it and edit the work item type definitions as detailed above for an on-premises installation.
@@ -67,7 +67,6 @@ Once you have created the `ReflectedWorkItemId` field and confirmed you have the
 
 ```JSON
 {
-	"ChangeSetMappingFile": null,
 	"Source": {
 		...
 		"ReflectedWorkItemIDFieldName": "TfsMigrationTool.ReflectedWorkItemId",
@@ -81,12 +80,6 @@ Once you have created the `ReflectedWorkItemId` field and confirmed you have the
 
     	...... other stuff
 
- 	"Processors": [
-		{
-			...
-			"WIQLQueryBit": "AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')"
-			...
-		}
 	],
 	
 	...... other stuff

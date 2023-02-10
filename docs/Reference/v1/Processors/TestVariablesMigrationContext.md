@@ -2,9 +2,9 @@
 
 >**_This documentation is for a preview version of the Azure DevOps Migration Tools._ If you are not using the preview version then please head over to the main [documentation](https://nkdagility.github.io/azure-devops-migration-tools).**
 
-[Overview](../././index.md) > [Reference](.././index.md) > [API v1](../index.md) > [Processors](./index.md)> **TestVariablesMigrationContext**
+[Overview](/docs/index.md) > [Reference](/docs/Reference/index.md) > [API v1](/docs/Reference/v1/index.md) > [Processors](/docs/Reference/v1/Processors/index.md)> **TestVariablesMigrationContext**
 
-missng XML code comments
+This processor can migrate test variables that are defined in the test plans / suites. This must run before ` TestPlansAndSuitesMigrationConfig`
 
 ### Options
 

@@ -21,7 +21,12 @@ using VstsSyncMigrator.Engine.ComponentContext;
 
 namespace VstsSyncMigrator.Engine
 {
-    public class TestPlandsAndSuitesMigrationContext : MigrationProcessorBase
+    /// <summary>
+    /// Rebuilds Suits and plans for Test Cases migrated using the WorkItemMigration
+    /// </summary>
+    /// <status>Beta</status>
+    /// <processingtarget>Suites &amp; Plans</processingtarget>
+    public class TestPlansAndSuitesMigrationContext : MigrationProcessorBase
     {
         private int __currentSuite = 0;
         private int __totalSuites = 0;
@@ -39,10 +44,10 @@ namespace VstsSyncMigrator.Engine
         private TfsNodeStructure _nodeStructureEnricher;
         private readonly EngineConfiguration _engineConfig;
 
-        public TestPlandsAndSuitesMigrationContext(IMigrationEngine engine,
+        public TestPlansAndSuitesMigrationContext(IMigrationEngine engine,
                                                    IServiceProvider services,
                                                    ITelemetryLogger telemetry,
-                                                   ILogger<TestPlandsAndSuitesMigrationContext> logger,
+                                                   ILogger<TestPlansAndSuitesMigrationContext> logger,
                                                    TfsNodeStructure nodeStructureEnricher,
                                                    IOptions<EngineConfiguration> engineConfig)
             : base(engine, services, telemetry, logger)

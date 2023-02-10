@@ -13,5 +13,10 @@ namespace MigrationTools.Engine.Containers.Tests
                 return "SimpleFieldMapMock";
             }
         }
+
+        public void SetExampleConfigDefaults()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

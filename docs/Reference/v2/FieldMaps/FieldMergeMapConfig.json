@@ -1,8 +1,10 @@
 {
   "$type": "FieldMergeMapConfig",
-  "WorkItemTypeName": null,
-  "sourceFields": null,
-  "targetField": null,
-  "formatExpression": null,
-  "doneMatch": "##DONE##"
+  "WorkItemTypeName": "*",
+  "sourceFields": [
+    "System.Description",
+    "System.Status"
+  ],
+  "targetField": "System.Description",
+  "formatExpression": "{0} \n {1}"
 }

@@ -1,6 +1,6 @@
 {
   "$type": "FieldtoTagMapConfig",
-  "WorkItemTypeName": null,
-  "sourceField": null,
-  "formatExpression": null
+  "WorkItemTypeName": "*",
+  "sourceField": "Custom.ProjectName",
+  "formatExpression": "Project: {0}"
 }
