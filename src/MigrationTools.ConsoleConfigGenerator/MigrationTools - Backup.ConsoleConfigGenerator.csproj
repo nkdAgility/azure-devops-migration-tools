@@ -20,6 +20,6 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="cd $(TargetDir)&#xD;&#xA;$(TargetName).exe" />
+    <Exec Command="$(TargetDir)ConfigGenerator.exe" />
   </Target>
 </Project>
