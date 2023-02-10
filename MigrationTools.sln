@@ -33,7 +33,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{2BC0808B-6
 		docs\Reference\index.md = docs\Reference\index.md
 		docs\server-configuration.md = docs\server-configuration.md
 		docs\Reference\template.md = docs\Reference\template.md
-		docs\_config.yml = docs\_config.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A05A7847-4C75-4E92-B156-F529483688CC}"
@@ -48,19 +47,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		GitVersion2.yml = GitVersion2.yml
 		mkdocs.yml = mkdocs.yml
 		README.md = README.md
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Processors", "Processors", "{E9399C6D-A5E0-43ED-8412-6C4A6BC86EC8}"
-	ProjectSection(SolutionItems) = preProject
-		docs\Processors\ImportProfilePictureConfig.md = docs\Processors\ImportProfilePictureConfig.md
-		docs\Processors\TestConfigurationsMigrationConfig.md = docs\Processors\TestConfigurationsMigrationConfig.md
-		docs\Processors\TestPlansAndSuitesMigrationConfig.md = docs\Processors\TestPlansAndSuitesMigrationConfig.md
-		docs\Processors\TestVeriablesMigrationConfig.md = docs\Processors\TestVeriablesMigrationConfig.md
-		docs\Processors\WorkItemDeleteConfig.md = docs\Processors\WorkItemDeleteConfig.md
-		docs\Processors\WorkItemMigrationConfig.md = docs\Processors\WorkItemMigrationConfig.md
-		docs\Processors\WorkItemPostProcessingConfig.md = docs\Processors\WorkItemPostProcessingConfig.md
-		docs\Processors\WorkItemUpdateAreasAsTagsConfig.md = docs\Processors\WorkItemUpdateAreasAsTagsConfig.md
-		docs\Processors\WorkItemUpdateConfig.md = docs\Processors\WorkItemUpdateConfig.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "images", "images", "{F29B9C2E-7EE3-49A5-8341-1277FA8BE0DB}"
@@ -218,7 +204,6 @@ Global
 		{AB3922F0-E801-474A-A498-892C3EA99799} = {E5294FF3-167A-49A5-A453-19332DA32B01}
 		{243265E4-0E5A-4E95-BE7C-B92B7666FF79} = {32E2956A-9056-4D9D-8018-14DFD0E6CA41}
 		{2BC0808B-6F4D-4635-82FE-1118181DD64F} = {A05A7847-4C75-4E92-B156-F529483688CC}
-		{E9399C6D-A5E0-43ED-8412-6C4A6BC86EC8} = {2BC0808B-6F4D-4635-82FE-1118181DD64F}
 		{F29B9C2E-7EE3-49A5-8341-1277FA8BE0DB} = {243265E4-0E5A-4E95-BE7C-B92B7666FF79}
 		{32E2956A-9056-4D9D-8018-14DFD0E6CA41} = {A05A7847-4C75-4E92-B156-F529483688CC}
 		{A314A07F-1D5E-44B8-9973-3AB2C41F17D5} = {D0EE5917-21B2-49FA-9506-69857EE82DCD}

@@ -2,11 +2,9 @@
 
 The Azure DevOps Migration Tools allow you to bulk edit and migrate data between Team Projects on both Microsoft Team Foundation Server (TFS) and Azure DevOps Services. Take a look at the  [documentation](http://nkdagility.github.io/azure-devops-migration-tools/) to find out how. This project is published as [code on GitHub](https://github.com/nkdAgility/azure-devops-migration-tools/) as well as a [Azure DevOps Migration Tools on Chocolatey](https://chocolatey.org/packages/vsts-sync-migrator/).
 
-<a href="https://github.com/nkdAgility/azure-devops-migration-tools/discussions" title="Ask Questions in GitHub Discussions">Ask Questions in GitHub Discussions</a>
+**[Ask Questions in GitHub Discussions](https://github.com/nkdAgility/azure-devops-migration-tools/discussions)**
 
-**Ask Questions on Stack Overflow: https://github.com/nkdAgility/azure-devops-migration-tools/discussions**
-
-## Some Data from the last 30 days (as of 01/04/2022)
+## Some Data from the last 30 days (as of 01/02/2023)
 
 | Catagory  | Metric | Notes |
 | ------------- | ------------- | ------------- |
@@ -16,7 +14,6 @@ The Azure DevOps Migration Tools allow you to bulk edit and migrate data between
 | Attachments | **252.37k**  | Total number of attachments migrated |
 | Migration Run Ave  | **14 minutes** | Includes dryruns as well.  |
 | Migration Run Total   |  **19bn Seconds** |  |
-
 
 **INFO: This tool was developed to support the scenarios below, and the edge cases that have been encountered by the 30+ contributors from around the Azure DevOps community. 
 You should be comfortable with the TFS/Azure DevOps object model, as well as debugging code in Visual Studio.**
@@ -112,21 +109,7 @@ These tools are build by naked Agility Limited's DevOps & Agility consultants to
 There are a number processors that can be used to migrate, or process, different sorts of data in different ways. Which one is right for you depends on the situation at hand. 
 Most of these processors need to be run in order. If you try to migrate work items before you have migrated Area and Iterations then ***bang*** you need to go back.
 
-<Import:table-Processors-v1.md>
-
-| Processor                                                                                    | Status  | Target            | Usage                                                                                                      |
-| :------------------------------------------------------------------------------------------- | :------ | :---------------- | ---------------------------------------------------------------------------------------------------------- |
-| [TfsTeamSettingsProcessor](./Reference/Processors/TfsTeamSettingsProcessor.md)               | preview | Teams             | Migrates Teams and Team Settings                                                                           |
-| [TfsAreaAndIterationProcessor](./Reference/Processors/TfsAreaAndIterationProcessor.md)       | preview | Area & Iterations | Migrates Nodes before run                                                                                  |
-| [WorkItemDelete](./Processors/WorkItemDeleteConfig.md)                                       | ready   | Work Items        | Bulk delete of work items **WARNING DANGEROUS**                                                            |
-| [WorkItemUpdate](./Processors/WorkItemUpdateConfig.md)                                       | ready   | Work Items        | Bulk update of Work Items based on a query and field mappings                                              |
-| [TfsSharedQueryProcessor](./Reference/Processors/TfsSharedQueryProcessor.md)                 | preview | Shared Queries    | Moved Shared Queries best effort                                                                           |
-| [TestVariablesMigration](./Processors/TestVariablesMigrationConfig.md)                       | Beta    | Suites & Plans    | Migrates Test Variables                                                                                    |
-| [TestConfigurationsMigration](./Processors/TestConfigurationsMigrationConfig.md)             | Beta    | Suites & Plans    | Migrates Test configurations                                                                               |
-| [TestPlansAndSuitesMigration](./Processors/TestPlansAndSuitesMigrationConfig.md)             | Beta    | Suites & Plans    | Rebuilds Suits and plans for Test Cases migrated using the WorkItemMigration                               |
-| [ImportProfilePicture](./Processors/ImportProfilePictureConfig) & ExportProfilePictureFromAD | Beta    | Profiles          | Downloads corporate images and updates TFS/Azure DevOps profiles                                           |
-| [WorkItemUpdateAreasAsTags](./Processors/WorkItemUpdateAreasAsTagsConfig)                    | Beta    | Work Items        | Adds tags to work items  to reflect area paths on source system                                            |
-| TestRunsMigration                                                                            | Alpha   | Suits & Plans     | Migrates the history of Test Runs                                                                          |
+<Import:table-Processors-v1.md>                                                                     |
 
 ## Processors (v2 Architecture) [ PREVIEW ]
 
@@ -135,14 +118,6 @@ Most of these processors need to be run in order. If you try to migrate work ite
 The new processor configuration is designed to allow the Migration Tools to support different Source and targets than just TFS/Azure DevOps, and we moved the Endpoints to the processor to allow both Object Model & REST in different processors.
 
 <Import:table-Processors-v2.md>
-
-| Processor                                                                                            | Status  | Target         | Usage                                                                                                      |
-| :--------------------------------------------------------------------------------------------------- | :------ | :------------- | :--------------------------------------------------------------------------------------------------------- |
-| [WorkItemTrackingProcessor](./Reference/Processors/WorkItemTrackingProcessor.md)                     | Alpha   | Work Items     | Migrates either tip or history of work items with Links & Attachments based on a query with field mappings |
-| [TfsTeamSettingsProcessor](./Reference/Processors/TfsTeamSettingsProcessor.md)                       | preview | Teams          | Migrates Teams and Team Settings                                                                           |
-| [TfsSharedQueryProcessor](./Reference/Processors/TfsTeamSettingsProcessor.md)                        | preview | Shared Queries | Moved Shared Queries best effort                                                                           |
-| [AzureDevOpsPipelineProcessorOptions](./Reference/Processors/AzureDevOpsPipelineProcessorOptions.md) | preview | Pipelines      | Migrate build and release pipelines                                                                        |
-
 
 ## Field Maps
 

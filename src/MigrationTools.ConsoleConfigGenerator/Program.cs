@@ -42,7 +42,7 @@ namespace VstsSyncMigrator.ConsoleApp
 
             List<Type> newTypes = domain.GetAssemblies()
                   .Where(a => !a.IsDynamic && a.FullName.StartsWith("MigrationTools"))
-                  .SelectMany(a => a.GetTypes()).ToList();
+                  .SelectMany(a => a.GetTypes()).ToList() ;
             List<Type> oldTypes = domain.GetAssemblies()
                  .Where(a => !a.IsDynamic && a.FullName.StartsWith("VstsSyncMigrator"))
                  .SelectMany(a => a.GetTypes()).ToList();
@@ -96,7 +96,7 @@ namespace VstsSyncMigrator.ConsoleApp
         private static void Process(List<Type> targetTypes, List<Type> allTypes, Type type, string apiVersion, string folder, bool findConfig = true, string configEnd = "Options")
         {
             string masterTemplate = System.IO.Path.Combine(referencePath, "template.md");
-            var founds = targetTypes.Where(t => type.IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface).OrderBy(t => t.Name).ToList();
+            var founds = targetTypes.Where(t => type.IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface && t.IsPublic).OrderBy(t => t.Name).ToList();
             ProcessIndexFile(founds, apiVersion, folder, masterTemplate);
             // Each File
             foreach (var item in founds)

@@ -244,11 +244,6 @@
             Map of Source Repository to Target Repository Names 
             </summary>
         </member>
-        <member name="T:MigrationTools.Processors.ProcessorModel">
-            <summary>
-            Data model used by Process Definition Processor to keep track of it' state
-            </summary>
-        </member>
         <member name="T:MigrationTools.Processors.ProcessDefinitionModel">
             <summary>
             Model that carries meta and state of an individual process definition
@@ -263,6 +258,8 @@
             <summary>
             Process definition processor used to keep processes between two orgs in sync
             </summary>
+            <status>Beta</status>
+            <processingtarget>Pipelines</processingtarget>
         </member>
     </members>
 </doc>
