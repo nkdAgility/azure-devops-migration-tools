@@ -75,6 +75,7 @@ namespace VstsSyncMigrator.ConsoleApp
             List<string> files = new List<string>
             {
                 "index-template.md",
+                "getting-started-template.md",
                 "Reference/v1/index-template.md",
                 "Reference/v2/index-template.md"
             };
