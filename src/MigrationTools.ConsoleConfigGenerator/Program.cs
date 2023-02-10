@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Microsoft.Extensions.Options;
+using Microsoft.TeamFoundation.WorkItemTracking.Common.Internal;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Containers;
 using MigrationTools.EndpointEnrichers;
@@ -70,14 +71,20 @@ namespace VstsSyncMigrator.ConsoleApp
 
         private static void ProcessAllFiles()
         {
-            foreach (string file in Directory.EnumerateFiles(referencePath, "*.md", SearchOption.AllDirectories))
+            List<string> files = new List<string>
+            {
+                "v1/index-template.md",
+                "v2/index-template.md"
+            };
+            foreach (string file in files)
             {
                 string templatemd = string.Empty;
-                if (System.IO.File.Exists(file))
+                string filepath = System.IO.Path.Combine(referencePath, file);
+                if (System.IO.File.Exists(filepath))
                 {
-                    templatemd = System.IO.File.ReadAllText(file);
-                    ProcessImports(templatemd, referencePath);
-                    System.IO.File.WriteAllText(file, templatemd);
+                    templatemd = System.IO.File.ReadAllText(filepath);
+                    templatemd = ProcessImports(templatemd, referencePath);
+                    System.IO.File.WriteAllText(filepath.Replace("-template", ""), templatemd);
                 }
                 //ProcessImports
                 Console.WriteLine(file);
@@ -300,7 +307,7 @@ namespace VstsSyncMigrator.ConsoleApp
             {
                 string importPath = Path.Combine(referencePath, item.Groups[1].Value);
                 string importFile = System.IO.File.ReadAllText(importPath);
-                templatemd = templatemd.Replace(string.Format($"<Import:{item.Value}>"), importFile);
+                templatemd = templatemd.Replace(item.Value, importFile);
             }
             return templatemd;
         }
