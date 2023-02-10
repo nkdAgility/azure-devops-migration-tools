@@ -8,7 +8,7 @@ using MigrationTools._EngineV1.Processors;
 namespace VstsSyncMigrator.Engine
 {
     /// <summary>
-    /// Moved Shared Queries best effort
+    /// This processor can migrate queries for work items. Only shared queries are included. Personal queries can't migrate with this tool.
     /// </summary>
     /// <status>preview</status>
     /// <processingtarget>Shared Queries</processingtarget>
