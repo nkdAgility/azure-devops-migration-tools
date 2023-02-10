@@ -6,7 +6,7 @@ We provide a number of Processors that can be used to migrate diferent sorts of 
 
 | Processors | Status | Target    | Usage                              |
 |------------------------|---------|---------|------------------------------------------|
-| [CreateTeamFolders](/docs/Reference/v1/Processors/CreateTeamFolders.md) | preview | Shared Queries | Creates folders in Sared Queries for each Team |
+| [CreateTeamFolders](/docs/Reference/v1/Processors/CreateTeamFolders.md) | alpha | Shared Queries | Creates folders in Sared Queries for each Team |
 | [ExportProfilePictureFromADContext](/docs/Reference/v1/Processors/ExportProfilePictureFromADContext.md) | alpha | Profiles | Downloads corporate images and updates TFS/Azure DevOps profiles |
 | [ExportTeamList](/docs/Reference/v1/Processors/ExportTeamList.md) | missng XML code comments | missng XML code comments | missng XML code comments |
 | [FakeProcessor](/docs/Reference/v1/Processors/FakeProcessor.md) | missng XML code comments | missng XML code comments | missng XML code comments |

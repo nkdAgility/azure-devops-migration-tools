@@ -16,7 +16,7 @@ namespace VstsSyncMigrator.Engine
     /// <summary>
     /// Creates folders in Sared Queries for each Team
     /// </summary>
-    /// <status>preview</status>
+    /// <status>alpha</status>
     /// <processingtarget>Shared Queries</processingtarget>
     public class CreateTeamFolders : StaticProcessorBase
     {

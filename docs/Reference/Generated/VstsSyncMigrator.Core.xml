@@ -101,7 +101,7 @@
             <summary>
             Creates folders in Sared Queries for each Team
             </summary>
-            <status>preview</status>
+            <status>alpha</status>
             <processingtarget>Shared Queries</processingtarget>
         </member>
         <member name="T:VstsSyncMigrator.Engine.ExportProfilePictureFromADContext">

@@ -124,12 +124,14 @@ namespace VstsSyncMigrator.ConsoleApp
             {
                 objectName = objectName.Replace("Context", "");
                 typeOption = allTypes.Where(t => t.Name == $"{objectName}{configEnd}" && !t.IsAbstract && !t.IsInterface).SingleOrDefault();
+            } else
+            {
+                Console.WriteLine("No config");
             }
-
+            string templatemd = GetTemplate(apiVersion, folder, referencePath, masterTemplate, item);
+            Console.WriteLine("Processing:" + item.Name);
             if (typeOption != null)
             {
-                string templatemd = GetTemplate(apiVersion, folder, referencePath, masterTemplate, item);
-                Console.WriteLine("Processing:" + item.Name);
                 string jsonSample = "";
                 object targetItem = null;
                 if (typeOption.GetInterfaces().Contains(typeof(IProcessorConfig)))
@@ -158,16 +160,19 @@ namespace VstsSyncMigrator.ConsoleApp
                     JObject joptions = (JObject)JToken.FromObject(targetItem);
                     templatemd = ProcessOptions(targetItem, joptions, templatemd);
                     jsonSample = DeployJsonSample(targetItem, apiVersion, folder, referencePath, item);
-
                 }
-                templatemd = templatemd.Replace("<Description>", GetTypeData(item));
-                templatemd = ProcessSamples(jsonSample, templatemd, referencePath);
-                templatemd = templatemd.Replace("<ClassName>", item.Name);
-                templatemd = templatemd.Replace("<TypeName>", folder);
-                templatemd = ProcessBreadcrumbs(apiVersion, folder, item, templatemd);
-                string filename = $"../../../../../docs/Reference/{apiVersion}/{folder}/{item.Name}.md";
-                File.WriteAllText(filename, templatemd);
+                templatemd = templatemd.Replace("<ExampleJson>", jsonSample);
+            } else
+            {
+                templatemd = templatemd.Replace("<ExampleJson>", "Not currently runnable. Needs a little work");
             }
+            templatemd = ProcessImports(templatemd, referencePath);
+            templatemd = templatemd.Replace("<Description>", GetTypeData(item));
+            templatemd = templatemd.Replace("<ClassName>", item.Name);
+            templatemd = templatemd.Replace("<TypeName>", folder);
+            templatemd = ProcessBreadcrumbs(apiVersion, folder, item, templatemd);
+            string filename = $"../../../../../docs/Reference/{apiVersion}/{folder}/{item.Name}.md";
+            File.WriteAllText(filename, templatemd);
         }
 
         private static string GetTypeData(Type item, string element = "summary")
@@ -294,13 +299,6 @@ namespace VstsSyncMigrator.ConsoleApp
         private static object GetPropertyType(object options, JProperty jproperty)
         {
             return options.GetType().GetProperty(jproperty.Name).PropertyType.Name.Replace("`1", "");
-        }
-
-        private static string ProcessSamples(string jsonSample, string templatemd, string referencePath)
-        {
-            templatemd = templatemd.Replace("<ExampleJson>", jsonSample);
-            templatemd = ProcessImports(templatemd, referencePath);
-            return templatemd;
         }
 
         private static string ProcessImports(string templatemd, string referencePath)

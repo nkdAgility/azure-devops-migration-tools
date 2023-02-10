@@ -153,16 +153,6 @@ However sometimes you want to move data to another field, or use a regex to pars
 
 <Import:table-FieldMaps-v1.md>
 
-* **FieldtoFieldMap** - Just want to map one field to another? This is the one for you.
-* **FieldtoFieldMultiMap** - Allows you to create a list of one to one field maps.
-* **FieldMergeMap** - Ever wanted to merge two or three fields? This mapping will let you do just that.
-* **FieldBlankMap** - Allows you to set an already populated field to empty
-* **FieldtoTagMap** - Want to take a field and convert its value to a tag? Done...
-* **FieldValueMap** - Need to map not just the field but also values? This is the default value mapper.
-* **FieldValuetoTagMap** - Need to create a Tag based on a field value? Just create a regex match and choose how to populate the target.
-* **RegexFieldMap** - I just need that bit of a field... need to send "2016.2" to two fields, one for year and one for release? Done.
-* **TreeToTagMap** - Need to clear out those nasty Area tree hierarchies? This creates Tags for each node in the Area Path...
-
 ## Code (TFVC)
 
 There are no good tools for migrating TFVC code. All of them suffer from "time-dilation" as one can't control the dates of the Check-ins. While you can use tools like TaskTop, TFS Integration Tools, or others there is no support. We prefer to recommend that you use Git-TFS and migrate from TFVC to Git with full history and branches. If your resulting repository is too large we recommend creating a full clone of TFVC for posterity, and then create a limited branch clone with limited history for work.
