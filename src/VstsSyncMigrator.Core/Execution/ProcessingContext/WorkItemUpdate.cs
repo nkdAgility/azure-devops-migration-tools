@@ -10,6 +10,10 @@ using VstsSyncMigrator._EngineV1.Processors;
 
 namespace VstsSyncMigrator.Engine
 {
+    /// <summary>
+    /// This processor allows you to make changes in place where we load from teh Target and update the Target. This is used for bulk updates with the most common reason being a process template change.
+    /// </summary>
+    /// <processingtarget>WorkItem</processingtarget>
     public class WorkItemUpdate : StaticProcessorBase
     {
         private WorkItemUpdateConfig _config;

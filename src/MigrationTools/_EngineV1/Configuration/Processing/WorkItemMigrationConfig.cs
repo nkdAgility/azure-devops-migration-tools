@@ -7,7 +7,7 @@ namespace MigrationTools._EngineV1.Configuration.Processing
     {
         /// <summary>
         /// You can choose to migrate the tip only (a single write) or all of the revisions (many writes).
-        /// If you are setting this to `false` to migrate only the tip then you should set `BuildFieldTable` to `true`
+        /// If you are setting this to `false` to migrate only the tip then you should set `BuildFieldTable` to `true`.
         /// </summary>
         /// <default>true</default>
         public bool ReplayRevisions { get; set; }

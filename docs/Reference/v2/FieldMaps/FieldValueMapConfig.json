@@ -1,8 +1,14 @@
 {
   "$type": "FieldValueMapConfig",
-  "WorkItemTypeName": null,
-  "sourceField": null,
-  "targetField": null,
-  "defaultValue": null,
-  "valueMapping": null
+  "WorkItemTypeName": "*",
+  "sourceField": "System.Status",
+  "targetField": "System.Status",
+  "defaultValue": "New",
+  "valueMapping": {
+    "$type": "Dictionary`2",
+    "New": "New",
+    "Active": "Committed",
+    "Resolved": "Committed",
+    "Closed": "Done"
+  }
 }

@@ -15,6 +15,11 @@ using MigrationTools.DataContracts;
 
 namespace VstsSyncMigrator.Engine
 {
+    /// <summary>
+    /// Reapply field mappings after a migration. Does not migtate Work Items, only reapplied changes to filed mappings.
+    /// </summary>
+    /// <status>preview</status>
+    /// <processingtarget>Work Items</processingtarget>
     public class WorkItemPostProcessingContext : MigrationProcessorBase
     {
         private WorkItemPostProcessingConfig _config;

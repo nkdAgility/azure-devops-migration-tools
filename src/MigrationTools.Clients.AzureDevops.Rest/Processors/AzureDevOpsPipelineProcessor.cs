@@ -14,6 +14,8 @@ namespace MigrationTools.Processors
     /// <summary>
     /// Azure DevOps Processor that migrates Taskgroups, Build- and Release Pipelines.
     /// </summary>
+    /// <status>Beta</status>
+    /// <processingtarget>Pipelines</processingtarget>
     public partial class AzureDevOpsPipelineProcessor : Processor
     {
         private AzureDevOpsPipelineProcessorOptions _Options;

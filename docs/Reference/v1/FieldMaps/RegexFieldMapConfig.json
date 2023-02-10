@@ -1,8 +1,8 @@
 {
   "$type": "RegexFieldMapConfig",
-  "WorkItemTypeName": null,
-  "sourceField": null,
-  "targetField": null,
-  "pattern": null,
-  "replacement": null
+  "WorkItemTypeName": "*",
+  "sourceField": "Custom.MyVersion",
+  "targetField": "Custom.MyVersionYearOnly",
+  "pattern": "([0-9]{4})",
+  "replacement": "$1"
 }

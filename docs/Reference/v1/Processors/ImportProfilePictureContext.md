@@ -2,9 +2,9 @@
 
 >**_This documentation is for a preview version of the Azure DevOps Migration Tools._ If you are not using the preview version then please head over to the main [documentation](https://nkdagility.github.io/azure-devops-migration-tools).**
 
-[Overview](../././index.md) > [Reference](.././index.md) > [API v1](../index.md) > [Processors](./index.md)> **ImportProfilePictureContext**
+[Overview](/docs/index.md) > [Reference](/docs/Reference/index.md) > [API v1](/docs/Reference/v1/index.md) > [Processors](/docs/Reference/v1/Processors/index.md)> **ImportProfilePictureContext**
 
-missng XML code comments
+Downloads corporate images and updates TFS/Azure DevOps profiles
 
 ### Options
 

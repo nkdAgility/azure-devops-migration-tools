@@ -15,9 +15,7 @@ using Task = System.Threading.Tasks.Task;
 
 namespace MigrationTools.Processors
 {
-    /// <summary>
-    /// Data model used by Process Definition Processor to keep track of it' state
-    /// </summary>
+    
     internal class ProcessorModel
     {
         public Dictionary<string, ProcessDefinitionModel> ProcessDefinitions { get; set; } = new Dictionary<string, ProcessDefinitionModel>();
@@ -54,6 +52,8 @@ namespace MigrationTools.Processors
     /// <summary>
     /// Process definition processor used to keep processes between two orgs in sync
     /// </summary>
+    /// <status>Beta</status>
+    /// <processingtarget>Pipelines</processingtarget>
     public partial class ProcessDefinitionProcessor : Processor
     {
         private ProcessDefinitionProcessorOptions _Options;

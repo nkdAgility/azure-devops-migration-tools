@@ -8,6 +8,8 @@ namespace MigrationTools.Processors
     /// <summary>
     /// The `TfsAreaAndIterationProcessor` migrates all of the Area nd Iteraion paths.
     /// </summary>
+    /// <status>Beta</status>
+    /// <processingtarget>Work Items</processingtarget>
     public class TfsAreaAndIterationProcessor : Processor
     {
         private TfsAreaAndIterationProcessorOptions _options;

@@ -1,6 +1,12 @@
 {
   "$type": "MultiValueConditionalMapConfig",
-  "WorkItemTypeName": null,
-  "sourceFieldsAndValues": null,
-  "targetFieldsAndValues": null
+  "WorkItemTypeName": "*",
+  "sourceFieldsAndValues": {
+    "$type": "Dictionary`2",
+    "Something": "SomethingElse"
+  },
+  "targetFieldsAndValues": {
+    "$type": "Dictionary`2",
+    "Something": "SomethingElse"
+  }
 }

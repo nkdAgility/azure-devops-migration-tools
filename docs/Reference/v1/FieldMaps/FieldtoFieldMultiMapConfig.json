@@ -1,5 +1,10 @@
 {
   "$type": "FieldtoFieldMultiMapConfig",
-  "WorkItemTypeName": null,
-  "SourceToTargetMappings": null
+  "WorkItemTypeName": "*",
+  "SourceToTargetMappings": {
+    "$type": "Dictionary`2",
+    "Custom.Field1": "Custom.Field4",
+    "Custom.Field2": "Custom.Field5",
+    "Custom.Field3": "Custom.Field6"
+  }
 }

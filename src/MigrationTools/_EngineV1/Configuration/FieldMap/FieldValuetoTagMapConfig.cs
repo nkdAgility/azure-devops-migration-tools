@@ -1,5 +1,10 @@
 ﻿namespace MigrationTools._EngineV1.Configuration.FieldMap
 {
+    /// <summary>
+    /// Need to create a Tag based on a field value? Just create a regex match and choose how to populate the target.
+    /// </summary>
+    /// <status>ready</status>
+    /// <processingtarget>Work Item Field</processingtarget>
     public class FieldValuetoTagMapConfig : IFieldMapConfig
     {
         public string WorkItemTypeName { get; set; }
@@ -13,6 +18,14 @@
             {
                 return "FieldValuetoTagMap";
             }
+        }
+
+        public void SetExampleConfigDefaults()
+        {
+            WorkItemTypeName = "*";
+            sourceField = "System.Status";
+            pattern = "(Active|Resolved)";
+            formatExpression = "Status: {0}";
         }
     }
 }

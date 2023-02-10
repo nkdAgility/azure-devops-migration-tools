@@ -12,6 +12,12 @@ using VstsSyncMigrator._EngineV1.Processors;
 
 namespace VstsSyncMigrator.Engine
 {
+    /// <summary>
+    /// The `WorkItemDelete` processor allows you to delete any amount of work items that meet the query.
+    /// **DANGER:** This is not a recoverable action and should be use with extream caution.
+    /// </summary>
+    /// <status>ready</status>
+    /// <processingtarget>WorkItem</processingtarget>
     public class WorkItemDelete : StaticProcessorBase
     {
         private WorkItemDeleteConfig _config;

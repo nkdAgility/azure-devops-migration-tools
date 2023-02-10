@@ -1,6 +1,11 @@
 ﻿
 namespace MigrationTools._EngineV1.Configuration.FieldMap
 {
+    /// <summary>
+    /// Just want to map one field to another? This is the one for you.
+    /// </summary>
+    /// <status>ready</status>
+    /// <processingtarget>Work Item Field</processingtarget>
     public class FieldtoFieldMapConfig : IFieldMapConfig
     {
         public string WorkItemTypeName { get; set; }
@@ -14,6 +19,14 @@ namespace MigrationTools._EngineV1.Configuration.FieldMap
             {
                 return "FieldToFieldMap";
             }
+        }
+
+        public void SetExampleConfigDefaults()
+        {
+            WorkItemTypeName = "*";
+            sourceField = "System.StackRank";
+            targetField = "System.Rank";
+            defaultValue = "1000";
         }
     }
 }

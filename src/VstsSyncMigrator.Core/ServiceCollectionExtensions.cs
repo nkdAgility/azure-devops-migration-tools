@@ -12,7 +12,7 @@ namespace MigrationTools
             context.AddSingleton<WorkItemMigrationContext>();
             context.AddSingleton<TeamMigrationContext>();
             context.AddSingleton<TestConfigurationsMigrationContext>();
-            context.AddSingleton<TestPlandsAndSuitesMigrationContext>();
+            context.AddSingleton<TestPlansAndSuitesMigrationContext>();
             context.AddSingleton<TestVariablesMigrationContext>();
             context.AddSingleton<WorkItemPostProcessingContext>();
             context.AddSingleton<WorkItemQueryMigrationContext>();
