@@ -111,8 +111,16 @@ namespace VstsSyncMigrator.ConsoleApp
             string templatemd = GetTemplate(apiVersion, folder, referencePath, masterTemplate, null);
             Console.WriteLine("Processing: index.md");
             templatemd = ProcessBreadcrumbs(apiVersion, folder, null, templatemd);
-            string typesTableMd = GetTypesTable(types, folder, apiVersion);
+
+            string typesTableMd = string.Empty;
+
+            typesTableMd = GetTypesTable(types, folder, apiVersion, $"Reference/{apiVersion}/{folder}/");
             File.WriteAllText(System.IO.Path.Combine(docsPath, $"table-{folder}-{apiVersion}.md"), typesTableMd);
+
+            typesTableMd = GetTypesTable(types, folder, apiVersion, $"");
+            File.WriteAllText(System.IO.Path.Combine(referencePath, apiVersion, folder, $"table-{folder}-{apiVersion}.md"), typesTableMd);
+
+
             templatemd = templatemd.Replace("<ItemList>", typesTableMd);
             File.WriteAllText(System.IO.Path.Combine(referencePath, apiVersion, folder, "index.md"), templatemd);
         }
@@ -281,7 +289,7 @@ namespace VstsSyncMigrator.ConsoleApp
             return templatemd;
         }
 
-        private static string GetTypesTable(List<Type> types, string typeCatagoryName, string apiVersion)
+        private static string GetTypesTable(List<Type> types, string typeCatagoryName, string apiVersion, string pathRoute)
         {
             StringBuilder properties = new StringBuilder();
             properties.AppendLine($"| {typeCatagoryName} | Status | Target    | Usage                              |");
@@ -292,7 +300,7 @@ namespace VstsSyncMigrator.ConsoleApp
                 string typeDocSummery = GetTypeData(item);
                 string typeDocdDatatype = GetTypeData(item, "processingtarget");
                 string typeDocdStatus = GetTypeData(item, "status");
-                properties.AppendLine($"| [{item.Name}](/docs/Reference/{apiVersion}/{typeCatagoryName}/{item.Name}.md) | {typeDocdStatus} | {typeDocdDatatype} | {typeDocSummery} |");
+                properties.AppendLine($"| [{item.Name}]({pathRoute}{item.Name}.md) | {typeDocdStatus} | {typeDocdDatatype} | {typeDocSummery} |");
             }
             return properties.ToString();
         }
@@ -317,7 +325,7 @@ namespace VstsSyncMigrator.ConsoleApp
 
         private static string ProcessBreadcrumbs(string apiVersion, string folder, Type item, string templatemd)
         {
-            string breadcrumbs = $"[Overview](/docs/index.md) > [Reference](/docs/Reference/index.md) > [API {apiVersion}](/docs/Reference/{apiVersion}/index.md) > [{folder}](/docs/Reference/{apiVersion}/{folder}/index.md)";
+            string breadcrumbs = $"[Overview](../../../index.md) > [Reference](../../index.md) > [API {apiVersion}](../index.md) > [{folder}](index.md)";
             if (item != null)
             {
                 breadcrumbs += $"> **{item.Name}**";

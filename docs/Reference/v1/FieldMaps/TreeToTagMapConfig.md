@@ -2,7 +2,7 @@
 
 >**_This documentation is for a preview version of the Azure DevOps Migration Tools._ If you are not using the preview version then please head over to the main [documentation](https://nkdagility.github.io/azure-devops-migration-tools).**
 
-[Overview](/docs/index.md) > [Reference](/docs/Reference/index.md) > [API v1](/docs/Reference/v1/index.md) > [FieldMaps](/docs/Reference/v1/FieldMaps/index.md)> **TreeToTagMapConfig**
+[Overview](../../../index.md) > [Reference](../../index.md) > [API v1](../index.md) > [FieldMaps](index.md)> **TreeToTagMapConfig**
 
 Need to clear out those nasty Area tree hierarchies? This creates Tags for each node in the Area Path...
 
