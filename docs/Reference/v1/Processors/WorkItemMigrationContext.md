@@ -2,7 +2,7 @@
 
 >**_This documentation is for a preview version of the Azure DevOps Migration Tools._ If you are not using the preview version then please head over to the main [documentation](https://nkdagility.github.io/azure-devops-migration-tools).**
 
-[Overview](/docs/index.md) > [Reference](/docs/Reference/index.md) > [API v1](/docs/Reference/v1/index.md) > [Processors](/docs/Reference/v1/Processors/index.md)> **WorkItemMigrationContext**
+[Overview](../../../index.md) > [Reference](../../index.md) > [API v1](../index.md) > [Processors](index.md)> **WorkItemMigrationContext**
 
 WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links, and Attachments. Use `WorkItemMigrationConfig` to configure.
 
@@ -29,6 +29,7 @@ WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links,
 | PauseAfterEachWorkItem | Boolean | Pause after each work item is migrated | false |
 | PrefixProjectToNodes | Boolean | Prefix your iterations and areas with the project name. If you have enabled this in `NodeStructuresMigrationConfig` you must do it here too. | false |
 | ReplayRevisions | Boolean | You can choose to migrate the tip only (a single write) or all of the revisions (many writes). If you are setting this to `false` to migrate only the tip then you should set `BuildFieldTable` to `true`. | true |
+| SkipRevisionWithInvalidAreaPath | Boolean | When set to true, this setting will skip a revision if the source area has not been migrated, has been deleted or is somehow invalid, etc. | missng XML code comments |
 | SkipRevisionWithInvalidIterationPath | Boolean | This will skip a revision if the source iteration has not been migrated i.e. it was deleted | missng XML code comments |
 | SkipToFinalRevisedWorkItemType | Boolean | **beta** If enabled this will fix any image attachments URL's, work item mention URL's or user mentions in the HTML fields as well as discussion comments. You must specify a PersonalAccessToken in the Source project for Azure DevOps; TFS should use integrated authentication. | false |
 | StopMigrationOnMissingAreaIterationNodes | Boolean |  | ? |
@@ -78,7 +79,8 @@ WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links,
     "$type": "Dictionary`2"
   },
   "MaxGracefulFailures": 0,
-  "SkipRevisionWithInvalidIterationPath": false
+  "SkipRevisionWithInvalidIterationPath": false,
+  "SkipRevisionWithInvalidAreaPath": false
 }
 ```
 

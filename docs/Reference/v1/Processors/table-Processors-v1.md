@@ -1,9 +1,3 @@
-## Processors
-
-[Overview](.././index.md) > [Reference](../index.md) > *Processors_v1*
-
-We provide a number of Processors that can be used to migrate diferent sorts of data. These processors are the original traditional processors.
-
 | Processors | Status | Target    | Usage                              |
 |------------------------|---------|---------|------------------------------------------|
 | [CreateTeamFolders](CreateTeamFolders.md) | alpha | Shared Queries | Creates folders in Sared Queries for each Team |
@@ -22,19 +16,3 @@ We provide a number of Processors that can be used to migrate diferent sorts of 
 | [WorkItemQueryMigrationContext](WorkItemQueryMigrationContext.md) | preview | Shared Queries | This processor can migrate queries for work items. Only shared queries are included. Personal queries can't migrate with this tool. |
 | [WorkItemUpdate](WorkItemUpdate.md) | missng XML code comments | WorkItem | This processor allows you to make changes in place where we load from teh Target and update the Target. This is used for bulk updates with the most common reason being a process template change. |
 | [WorkItemUpdateAreasAsTagsContext](WorkItemUpdateAreasAsTagsContext.md) | Beta | Work Item | A common issue with older *TFS/Azure DevOps* instances is the proliferation of `Area Paths`. With the use of `Area Path` for `Teams` and the addition of the `Node Name` column option these extensive tag hierarchies should instad be moved to tags. |
-
-
-### Processor Options
-
- All processors have a minimum set of options that are required to run. 
-
-#### Minimum Options to run
-The `Enabled` options is common to all processors.
-
-
-```JSON
-     {
-      "$type": "ProcessorConfig",
-      "Enabled": true,
-    }
-```
