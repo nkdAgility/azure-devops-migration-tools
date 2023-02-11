@@ -16,7 +16,7 @@ The TfsSharedQueryProcessor enabled you to migrate queries from one locatio nto 
 | RefName | String | `Refname` will be used in the future to allow for using named Options without the need to copy all of the options. | missng XML code comments |
 | SharedFolderName | String | The name of the shared folder, made a parameter incase it every needs to be edited | Shared Queries |
 | SourceName | String | missng XML code comments | missng XML code comments |
-| SourceToTargetFieldMappings | Dictionary`2 | Mapping of the source to the target | missng XML code comments |
+| SourceToTargetFieldMappings | Dictionary | Mapping of the source to the target | missng XML code comments |
 | TargetName | String | missng XML code comments | missng XML code comments |
 
 

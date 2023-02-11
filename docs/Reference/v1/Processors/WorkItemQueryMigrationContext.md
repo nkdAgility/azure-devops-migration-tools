@@ -13,7 +13,7 @@ This processor can migrate queries for work items. Only shared queries are inclu
 | Enabled | Boolean | missng XML code comments | missng XML code comments |
 | PrefixProjectToNodes | Boolean | Prefix your iterations and areas with the project name. If you have enabled this in `NodeStructuresMigrationConfig` you must do it here too. | false |
 | SharedFolderName | String | The name of the shared folder, made a parameter incase it every needs to be edited | none |
-| SourceToTargetFieldMappings | Dictionary`2 | Any field mappings | none |
+| SourceToTargetFieldMappings | Dictionary | Any field mappings | none |
 
 
 ### Example JSON

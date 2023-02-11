@@ -307,7 +307,7 @@ namespace VstsSyncMigrator.ConsoleApp
 
         private static object GetPropertyType(object options, JProperty jproperty)
         {
-            return options.GetType().GetProperty(jproperty.Name).PropertyType.Name.Replace("`1", "");
+            return options.GetType().GetProperty(jproperty.Name).PropertyType.Name.Replace("`1", "").Replace("`2", "").Replace("`", "");
         }
 
         private static string ProcessImports(string templatemd, string referencePath)

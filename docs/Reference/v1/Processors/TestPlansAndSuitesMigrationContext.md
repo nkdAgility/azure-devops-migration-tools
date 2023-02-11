@@ -12,10 +12,10 @@ Rebuilds Suits and plans for Test Cases migrated using the WorkItemMigration
 
 | Parameter name         | Type    | Description                              | Default Value                            |
 |------------------------|---------|------------------------------------------|------------------------------------------|
-| AreaMaps | Dictionary`2 | See documentation for [NodeStructure](/docs/Reference/v1/Processors/WorkItemMigrationConfig.md) | null |
+| AreaMaps | Dictionary | See documentation for [NodeStructure](/docs/Reference/v1/Processors/WorkItemMigrationConfig.md) | null |
 | Enabled | Boolean | missng XML code comments | missng XML code comments |
 | FilterCompleted | Boolean | missng XML code comments | missng XML code comments |
-| IterationMaps | Dictionary`2 | See documentation for [NodeStructure](/docs/Reference/v1/Processors/WorkItemMigrationConfig.md) | null |
+| IterationMaps | Dictionary | See documentation for [NodeStructure](/docs/Reference/v1/Processors/WorkItemMigrationConfig.md) | null |
 | MigrationDelay | Int32 | ??Not sure what this does. Check code. | 0 |
 | NodeBasePaths | String[] | See documentation for [NodeStructure](/docs/Reference/v1/Processors/WorkItemMigrationConfig.md) | [] |
 | OnlyElementsWithTag | String | The tag name that is present on all elements that must be migrated. If this option isn't present this processor will migrate all. | `String.Empty` |
