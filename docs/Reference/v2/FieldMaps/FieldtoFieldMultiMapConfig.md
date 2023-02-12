@@ -10,7 +10,7 @@ Want to setup a bunch of field maps in a single go. Use this shortcut!
 
 | Parameter name         | Type    | Description                              | Default Value                            |
 |------------------------|---------|------------------------------------------|------------------------------------------|
-| SourceToTargetMappings | Dictionary`2 | missng XML code comments | missng XML code comments |
+| SourceToTargetMappings | Dictionary | missng XML code comments | missng XML code comments |
 | WorkItemTypeName | String | missng XML code comments | missng XML code comments |
 
 

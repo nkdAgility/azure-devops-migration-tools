@@ -10,9 +10,9 @@ The `TfsAreaAndIterationProcessor` migrates all of the Area nd Iteraion paths.
 
 | Parameter name         | Type    | Description                              | Default Value                            |
 |------------------------|---------|------------------------------------------|------------------------------------------|
-| AreaMaps | Dictionary`2 | missng XML code comments | missng XML code comments |
+| AreaMaps | Dictionary | missng XML code comments | missng XML code comments |
 | Enabled | Boolean | If set to `true` then the processor will run. Set to `false` and the processor will not run. | missng XML code comments |
-| IterationMaps | Dictionary`2 | missng XML code comments | missng XML code comments |
+| IterationMaps | Dictionary | missng XML code comments | missng XML code comments |
 | NodeBasePaths | String[] | missng XML code comments | missng XML code comments |
 | PrefixProjectToNodes | Boolean | Prefix your iterations and areas with the project name. If you have enabled this in `NodeStructuresMigrationConfig` you must do it here too. | false |
 | ProcessorEnrichers | List | List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors. | missng XML code comments |

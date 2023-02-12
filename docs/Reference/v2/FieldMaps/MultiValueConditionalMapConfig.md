@@ -10,8 +10,8 @@
 
 | Parameter name         | Type    | Description                              | Default Value                            |
 |------------------------|---------|------------------------------------------|------------------------------------------|
-| sourceFieldsAndValues | Dictionary`2 | missng XML code comments | missng XML code comments |
-| targetFieldsAndValues | Dictionary`2 | missng XML code comments | missng XML code comments |
+| sourceFieldsAndValues | Dictionary | missng XML code comments | missng XML code comments |
+| targetFieldsAndValues | Dictionary | missng XML code comments | missng XML code comments |
 | WorkItemTypeName | String | missng XML code comments | missng XML code comments |
 
 

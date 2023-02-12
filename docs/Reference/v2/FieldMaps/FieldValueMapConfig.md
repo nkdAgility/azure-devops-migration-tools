@@ -13,7 +13,7 @@ Need to map not just the field but also values? This is the default value mapper
 | defaultValue | String | missng XML code comments | missng XML code comments |
 | sourceField | String | missng XML code comments | missng XML code comments |
 | targetField | String | missng XML code comments | missng XML code comments |
-| valueMapping | Dictionary`2 | missng XML code comments | missng XML code comments |
+| valueMapping | Dictionary | missng XML code comments | missng XML code comments |
 | WorkItemTypeName | String | missng XML code comments | missng XML code comments |
 
 
