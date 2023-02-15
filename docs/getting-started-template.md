@@ -33,7 +33,7 @@ You can now customise the configuration depending on what you need to do. Howeve
 <Import:Reference/Generated/configuration.config>
 ```
 
-The default [WorkItemMigrationConfig](/docs/Reference/v1/Processors/WorkItemMigrationConfig.md) processor will perform the following operations:
+The default [WorkItemMigrationConfig](Reference/v1/Processors/WorkItemMigrationConfig.md) processor will perform the following operations:
 
 * Migrate interations and sprints
 * Attachments
@@ -41,7 +41,7 @@ The default [WorkItemMigrationConfig](/docs/Reference/v1/Processors/WorkItemMigr
 
 ## How to execute configuration.json with minimal adjustments
 
-> Remember to add custom field ['ReflectedWorkItemId'](/docs/server-configuration.md) to both, the source and the target team project before starting migration!
+> Remember to add custom field ['ReflectedWorkItemId'](server-configuration.md) to both, the source and the target team project before starting migration!
 
 1. Adjust the value of the `Collection` attribute for Source and Target
 1. Adjust the value of the `Project` attribute for Source and Target
@@ -57,10 +57,10 @@ The default [WorkItemMigrationConfig](/docs/Reference/v1/Processors/WorkItemMigr
 
 1. Enable the `WorkItemMigrationConfig` processor by setting `Enabled` to `true`
 1. [OPTIONAL] Modify the `WIQLQueryBit` to migrate only the work items you want. The default WIQL will migrate all open work items and revisions excluding test suites and plans
-1. Adjust the [`NodeBasePaths`](/docs/Reference/v1/Processors/WorkItemMigrationConfig.md) or leave empty to migrate all nodes
+1. Adjust the [`NodeBasePaths`](Reference/v1/Processors/WorkItemMigrationConfig.md) or leave empty to migrate all nodes
 1. From the `C:\tools\MigrationTools\` path run `.\migration.exe execute --config .\configuration.json`
 
 **Remember:** if you want a processor to run, it's `Enabled` attribute must be set to `true`. 
 
-Refer to the [Reference Guide](/docs/reference/index.md) for more details.
+Refer to the [Reference Guide](reference/index.md) for more details.
 
