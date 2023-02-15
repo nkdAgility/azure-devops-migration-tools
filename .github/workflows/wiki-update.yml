@@ -19,7 +19,7 @@ jobs:
         # The username of the repo owner
         username: MrHinsh
         access_token: "{{ secrets.GITHUB_TOKEN }}"
-        wiki_folder: "docs"
+        wiki_folder: docs
         commit_message: "Update Wiki"
         commit_username: "MrHinsh"
         commit_email: "martin@nkdagility.com"
