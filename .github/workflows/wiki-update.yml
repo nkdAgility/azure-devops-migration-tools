@@ -7,8 +7,7 @@ on:
   pull_request:
     branches:
       - "master"
-    paths:
-      - '/docs/**'
+ 
 
 jobs:
   stale:
