@@ -97,6 +97,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".workflows", ".workflows", "{8A70932A-F6C7-45D1-8E72-608B6BF0F9FD}"
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\build.yml = .github\workflows\build.yml
+		.github\workflows\stale.yml = .github\workflows\stale.yml
+		.github\workflows\UpdateRestImplementationFromMaster.yml = .github\workflows\UpdateRestImplementationFromMaster.yml
+		.github\workflows\wiki-update.yml = .github\workflows\wiki-update.yml
 	EndProjectSection
 EndProject
 Global
