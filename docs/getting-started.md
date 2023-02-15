@@ -30,185 +30,10 @@ Follow the [setup instructions](/docs/server-configuration.md) to make sure that
 You can now customise the configuration depending on what you need to do. However a basic config that you can use to migrate from one team project to another with the same process template is:
 
 ```JSON
-{
-  "ChangeSetMappingFile": null,
-  "Source": {
-    "$type": "TfsTeamProjectConfig",
-    "Collection": "https://dev.azure.com/nkdagility-preview/",
-    "Project": "myProjectName",
-    "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
-    "AllowCrossProjectLinking": false,
-    "AuthenticationMode": "Prompt",
-    "PersonalAccessToken": "",
-    "PersonalAccessTokenVariableName": "",
-    "LanguageMaps": {
-      "AreaPath": "Area",
-      "IterationPath": "Iteration"
-    }
-  },
-  "Target": {
-    "$type": "TfsTeamProjectConfig",
-    "Collection": "https://dev.azure.com/nkdagility-preview/",
-    "Project": "myProjectName",
-    "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
-    "AllowCrossProjectLinking": false,
-    "AuthenticationMode": "Prompt",
-    "PersonalAccessToken": "",
-    "PersonalAccessTokenVariableName": "",
-    "LanguageMaps": {
-      "AreaPath": "Area",
-      "IterationPath": "Iteration"
-    }
-  },
-  "FieldMaps": [
-    {
-      "$type": "MultiValueConditionalMapConfig",
-      "WorkItemTypeName": "*",
-      "sourceFieldsAndValues": {
-        "Field1": "Value1",
-        "Field2": "Value2"
-      },
-      "targetFieldsAndValues": {
-        "Field1": "Value1",
-        "Field2": "Value2"
-      }
-    },
-    {
-      "$type": "FieldBlankMapConfig",
-      "WorkItemTypeName": "*",
-      "targetField": "TfsMigrationTool.ReflectedWorkItemId"
-    },
-    {
-      "$type": "FieldValueMapConfig",
-      "WorkItemTypeName": "*",
-      "sourceField": "System.State",
-      "targetField": "System.State",
-      "defaultValue": "New",
-      "valueMapping": {
-        "Approved": "New",
-        "New": "New",
-        "Committed": "Active",
-        "In Progress": "Active",
-        "To Do": "New",
-        "Done": "Closed",
-        "Removed": "Removed"
-      }
-    },
-    {
-      "$type": "FieldtoFieldMapConfig",
-      "WorkItemTypeName": "*",
-      "sourceField": "Microsoft.VSTS.Common.BacklogPriority",
-      "targetField": "Microsoft.VSTS.Common.StackRank",
-      "defaultValue": null
-    },
-    {
-      "$type": "FieldtoFieldMultiMapConfig",
-      "WorkItemTypeName": "*",
-      "SourceToTargetMappings": {
-        "SourceField1": "TargetField1",
-        "SourceField2": "TargetField2"
-      }
-    },
-    {
-      "$type": "FieldtoTagMapConfig",
-      "WorkItemTypeName": "*",
-      "sourceField": "System.State",
-      "formatExpression": "ScrumState:{0}"
-    },
-    {
-      "$type": "FieldMergeMapConfig",
-      "WorkItemTypeName": "*",
-      "sourceFields": [
-        "System.Description",
-        "Microsoft.VSTS.Common.AcceptanceCriteria"
-      ],
-      "targetField": "System.Description",
-      "formatExpression": "{0} <br/><br/><h3>Acceptance Criteria</h3>{1}",
-      "doneMatch": "##DONE##"
-    },
-    {
-      "$type": "RegexFieldMapConfig",
-      "WorkItemTypeName": "*",
-      "sourceField": "COMPANY.PRODUCT.Release",
-      "targetField": "COMPANY.DEVISION.MinorReleaseVersion",
-      "pattern": "PRODUCT \\d{4}.(\\d{1})",
-      "replacement": "$1"
-    },
-    {
-      "$type": "FieldValuetoTagMapConfig",
-      "WorkItemTypeName": "*",
-      "sourceField": "Microsoft.VSTS.CMMI.Blocked",
-      "pattern": "Yes",
-      "formatExpression": "{0}"
-    },
-    {
-      "$type": "TreeToTagMapConfig",
-      "WorkItemTypeName": "*",
-      "toSkip": 3,
-      "timeTravel": 1
-    }
-  ],
-  "GitRepoMapping": null,
-  "LogLevel": "Information",
-  "CommonEnrichersConfig": null,
-  "Processors": [
-    {
-      "$type": "WorkItemMigrationConfig",
-      "Enabled": false,
-      "ReplayRevisions": true,
-      "PrefixProjectToNodes": false,
-      "UpdateCreatedDate": true,
-      "UpdateCreatedBy": true,
-      "WIQLQueryBit": "AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')",
-      "WIQLOrderBit": "[System.ChangedDate] desc",
-      "LinkMigration": true,
-      "AttachmentMigration": true,
-      "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
-      "FixHtmlAttachmentLinks": false,
-      "SkipToFinalRevisedWorkItemType": true,
-      "WorkItemCreateRetryLimit": 5,
-      "FilterWorkItemsThatAlreadyExistInTarget": true,
-      "PauseAfterEachWorkItem": false,
-      "AttachmentMaxSize": 480000000,
-      "AttachRevisionHistory": false,
-      "LinkMigrationSaveEachAsAdded": false,
-      "GenerateMigrationComment": true,
-      "WorkItemIDs": null,
-      "MaxRevisions": 0,
-      "NodeStructureEnricherEnabled": null,
-      "UseCommonNodeStructureEnricherConfig": false,
-      "StopMigrationOnMissingAreaIterationNodes": true,
-      "NodeBasePaths": [
-        "Product\\Area\\Path1",
-        "Product\\Area\\Path2"
-      ],
-      "AreaMaps": {},
-      "IterationMaps": {},
-      "MaxGracefulFailures": 0,
-      "SkipRevisionWithInvalidIterationPath": false
-    }
-  ],
-  "Version": "0.0",
-  "workaroundForQuerySOAPBugEnabled": false,
-  "WorkItemTypeDefinition": {
-    "sourceWorkItemTypeName": "targetWorkItemTypeName"
-  },
-  "Endpoints": {
-    "InMemoryWorkItemEndpoints": [
-      {
-        "Name": "Source",
-        "EndpointEnrichers": null
-      },
-      {
-        "Name": "Target",
-        "EndpointEnrichers": null
-      }
-    ]
-  }
-}
+<Import:Reference/Generated/configuration.config>
 ```
 
-The default [WorkItemMigrationConfig](/docs/Reference/v1/Processors/WorkItemMigrationConfig.md) processor will perform the following operations:
+The default [WorkItemMigrationConfig](Reference/v1/Processors/WorkItemMigrationConfig.md) processor will perform the following operations:
 
 * Migrate interations and sprints
 * Attachments
@@ -216,7 +41,7 @@ The default [WorkItemMigrationConfig](/docs/Reference/v1/Processors/WorkItemMigr
 
 ## How to execute configuration.json with minimal adjustments
 
-> Remember to add custom field ['ReflectedWorkItemId'](/docs/server-configuration.md) to both, the source and the target team project before starting migration!
+> Remember to add custom field ['ReflectedWorkItemId'](server-configuration.md) to both, the source and the target team project before starting migration!
 
 1. Adjust the value of the `Collection` attribute for Source and Target
 1. Adjust the value of the `Project` attribute for Source and Target
@@ -232,10 +57,10 @@ The default [WorkItemMigrationConfig](/docs/Reference/v1/Processors/WorkItemMigr
 
 1. Enable the `WorkItemMigrationConfig` processor by setting `Enabled` to `true`
 1. [OPTIONAL] Modify the `WIQLQueryBit` to migrate only the work items you want. The default WIQL will migrate all open work items and revisions excluding test suites and plans
-1. Adjust the [`NodeBasePaths`](/docs/Reference/v1/Processors/WorkItemMigrationConfig.md) or leave empty to migrate all nodes
+1. Adjust the [`NodeBasePaths`](Reference/v1/Processors/WorkItemMigrationConfig.md) or leave empty to migrate all nodes
 1. From the `C:\tools\MigrationTools\` path run `.\migration.exe execute --config .\configuration.json`
 
 **Remember:** if you want a processor to run, it's `Enabled` attribute must be set to `true`. 
 
-Refer to the [Reference Guide](/docs/reference/index.md) for more details.
+Refer to the [Reference Guide](reference/index.md) for more details.
 
