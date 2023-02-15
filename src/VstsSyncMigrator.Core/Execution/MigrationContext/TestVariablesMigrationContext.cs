@@ -10,6 +10,11 @@ using VstsSyncMigrator.Engine.ComponentContext;
 
 namespace VstsSyncMigrator.Engine
 {
+    /// <summary>
+    /// This processor can migrate test variables that are defined in the test plans / suites. This must run before `TestPlansAndSuitesMigrationConfig`. 
+    /// </summary>
+    /// <status>Beta</status>
+    /// <processingtarget>Suites &amp; Plans</processingtarget>
     public class TestVariablesMigrationContext : MigrationProcessorBase
     {
         public TestVariablesMigrationContext(IMigrationEngine engine, IServiceProvider services, ITelemetryLogger telemetry, ILogger<TestVariablesMigrationContext> logger) : base(engine, services, telemetry, logger)

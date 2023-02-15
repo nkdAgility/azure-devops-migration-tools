@@ -26,64 +26,86 @@ The model should also work for other data `Teams`, `SharedQueries`, `PlansAndSui
 
 ### How the Configuration file flows
 
-```JSON
+This config is for reference only. It has things configured that you will not need, and that may conflict with each other.
+
+```
 {
-  "Version": "0.0",
-  "LogLevel": "Verbose",
-  "MappingTools": [
-    {
-      "$type": "MappingToolA",
-      "Enabled": true
-    },
-    {
-      "$type": "MappingToolA",
-      "Enabled": true
-    }
-  ],
+  "ChangeSetMappingFile": null,
+  "Source": null,
+  "Target": null,
+  "FieldMaps": [],
+  "GitRepoMapping": null,
+  "LogLevel": "Information",
+  "CommonEnrichersConfig": null,
   "Processors": [
     {
-      "$type": "ProcessorA",
+      "$type": "WorkItemTrackingProcessorOptions",
       "Enabled": true,
-      "Enrichers": [
+      "ReplayRevisions": true,
+      "PrefixProjectToNodes": false,
+      "CollapseRevisions": false,
+      "WorkItemCreateRetryLimit": 5,
+      "ProcessorEnrichers": [
         {
-          "$type": "EnricherA",
+          "$type": "PauseAfterEachItemOptions",
           "Enabled": true
         },
         {
-          "$type": "EnricherB",
+          "$type": "AppendMigrationToolSignatureFooterOptions",
           "Enabled": true
+        },
+        {
+          "$type": "FilterWorkItemsThatAlreadyExistInTargetOptions",
+          "Enabled": true,
+          "Query": {
+            "Query": "SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan') ORDER BY [System.ChangedDate] desc",
+            "Parameters": null
+          }
+        },
+        {
+          "$type": "SkipToFinalRevisedWorkItemTypeOptions",
+          "Enabled": true
+        },
+        {
+          "$type": "TfsValidateRequiredFieldOptions",
+          "Enabled": true
+        },
+        {
+          "$type": "TfsNodeStructureOptions",
+          "Enabled": true,
+          "PrefixProjectToNodes": false,
+          "NodeBasePaths": null,
+          "AreaMaps": {},
+          "IterationMaps": {}
+        },
+        {
+          "$type": "TfsRevisionManagerOptions",
+          "Enabled": true,
+          "ReplayRevisions": false,
+          "MaxRevisions": 0
         }
       ],
-      "Endpoints": [
-        {
-          "$type": "EndPointA",
-          "Direction": "Source",
-          "Enrichers": [
-            {
-              "$type": "EnricherA",
-              "Enabled": true,
-            },
-            {
-              "$type": "EnricherB",
-              "Enabled": true,
-            }
-          ]
-        },
-        {
-          "$type": "EndPointB",
-          "Direction": "Target",
-          "Enrichers": [
-            {
-              "$type": "EnricherA",
-              "Enabled": true,
-              "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
-              "AttachmentMaxSize": 480000000
-            }
-          ]
-        }
-      ]
+      "SourceName": "Source",
+      "TargetName": "Target"
     }
-  ]
+  ],
+  "Version": "0.0",
+  "workaroundForQuerySOAPBugEnabled": false,
+  "WorkItemTypeDefinition": {
+    "sourceWorkItemTypeName": "targetWorkItemTypeName"
+  },
+  "Endpoints": {
+    "InMemoryWorkItemEndpoints": [
+      {
+        "Name": "Source",
+        "EndpointEnrichers": null
+      },
+      {
+        "Name": "Target",
+        "EndpointEnrichers": null
+      }
+    ]
+  }
 }
 ```
 

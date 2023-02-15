@@ -4,6 +4,12 @@
         <name>MigrationTools.Clients.AzureDevops.ObjectModel</name>
     </assembly>
     <members>
+        <member name="T:MigrationTools.EndpointEnrichers.TfsWorkItemAttachmentEnricher">
+            <summary>
+            The `TfsWorkItemAttachmentEnricher` processes the attachements for a specific work item.
+            </summary>
+            <processingtarget>WorkItem</processingtarget>
+        </member>
         <member name="M:MigrationTools.Enrichers.TfsEmbededImagesEnricher.FixEmbededImages(MigrationTools.DataContracts.WorkItemData,System.String,System.String,System.String)">
             from https://gist.github.com/pietergheysens/792ed505f09557e77ddfc1b83531e4fb
         </member>
@@ -26,6 +32,8 @@
             <summary>
             The `TfsAreaAndIterationProcessor` migrates all of the Area nd Iteraion paths.
             </summary>
+            <status>Beta</status>
+            <processingtarget>Work Items</processingtarget>
         </member>
         <member name="P:MigrationTools.Processors.TfsAreaAndIterationProcessorOptions.PrefixProjectToNodes">
             <summary>
@@ -37,6 +45,8 @@
             <summary>
             The TfsSharedQueryProcessor enabled you to migrate queries from one locatio nto another.
             </summary>
+            <status>Beta</status>
+            <processingtarget>Queries</processingtarget>
         </member>
         <member name="M:MigrationTools.Processors.TfsSharedQueryProcessor.MigrateFolder(Microsoft.TeamFoundation.WorkItemTracking.Client.QueryHierarchy,Microsoft.TeamFoundation.WorkItemTracking.Client.QueryFolder,Microsoft.TeamFoundation.WorkItemTracking.Client.QueryFolder)">
             <summary>
@@ -80,6 +90,8 @@
             <summary>
             Native TFS Processor, does not work with any other Endpoints.
             </summary>
+            <status>Beta</status>
+            <processingtarget>Teams</processingtarget>
         </member>
         <member name="P:MigrationTools.Processors.TfsTeamSettingsProcessorOptions.MigrateTeamSettings">
             <summary>

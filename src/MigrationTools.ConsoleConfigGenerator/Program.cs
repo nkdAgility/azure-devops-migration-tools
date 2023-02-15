@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Microsoft.Extensions.Options;
+using Microsoft.TeamFoundation.WorkItemTracking.Common.Internal;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Containers;
 using MigrationTools.EndpointEnrichers;
@@ -25,6 +26,7 @@ namespace VstsSyncMigrator.ConsoleApp
     public class Program
     {
         public static AppDomain domain = AppDomain.CreateDomain("MigrationTools");
+        private static string docsPath = "../../../../../docs/";
         private static string referencePath = "../../../../../docs/Reference/";
 
         public static void Main(string[] args)
@@ -40,7 +42,7 @@ namespace VstsSyncMigrator.ConsoleApp
 
             List<Type> newTypes = domain.GetAssemblies()
                   .Where(a => !a.IsDynamic && a.FullName.StartsWith("MigrationTools"))
-                  .SelectMany(a => a.GetTypes()).ToList();
+                  .SelectMany(a => a.GetTypes()).ToList() ;
             List<Type> oldTypes = domain.GetAssemblies()
                  .Where(a => !a.IsDynamic && a.FullName.StartsWith("VstsSyncMigrator"))
                  .SelectMany(a => a.GetTypes()).ToList();
@@ -65,12 +67,37 @@ namespace VstsSyncMigrator.ConsoleApp
             Process(newTypes, allTypes, typeof(IFieldMapConfig), "v1", "FieldMaps", false);
             Process(newTypes, allTypes, typeof(IFieldMapConfig), "v2", "FieldMaps", false);
             Console.WriteLine("--------------------------");
+            ProcessAllFiles();
+        }
+
+        private static void ProcessAllFiles()
+        {
+            List<string> files = new List<string>
+            {
+                "index-template.md",
+                "getting-started-template.md",
+                "Reference/v1/index-template.md",
+                "Reference/v2/index-template.md"
+            };
+            foreach (string file in files)
+            {
+                string templatemd = string.Empty;
+                string filepath = System.IO.Path.Combine(docsPath, file);
+                if (System.IO.File.Exists(filepath))
+                {
+                    templatemd = System.IO.File.ReadAllText(filepath);
+                    templatemd = ProcessImports(templatemd, file.Contains("Reference") ? referencePath : docsPath   );
+                    System.IO.File.WriteAllText(filepath.Replace("-template", ""), templatemd);
+                }
+                //ProcessImports
+                Console.WriteLine(file);
+            }
         }
 
         private static void Process(List<Type> targetTypes, List<Type> allTypes, Type type, string apiVersion, string folder, bool findConfig = true, string configEnd = "Options")
         {
             string masterTemplate = System.IO.Path.Combine(referencePath, "template.md");
-            var founds = targetTypes.Where(t => type.IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface).ToList();
+            var founds = targetTypes.Where(t => type.IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface && t.IsPublic).OrderBy(t => t.Name).ToList();
             ProcessIndexFile(founds, apiVersion, folder, masterTemplate);
             // Each File
             foreach (var item in founds)
@@ -84,9 +111,18 @@ namespace VstsSyncMigrator.ConsoleApp
             string templatemd = GetTemplate(apiVersion, folder, referencePath, masterTemplate, null);
             Console.WriteLine("Processing: index.md");
             templatemd = ProcessBreadcrumbs(apiVersion, folder, null, templatemd);
-            templatemd = ProcessTypes(types, templatemd, folder);
-            string filename = $"../../../../../docs/Reference/{apiVersion}/{folder}/index.md";
-            File.WriteAllText(filename, templatemd);
+
+            string typesTableMd = string.Empty;
+
+            typesTableMd = GetTypesTable(types, folder, apiVersion, $"Reference/{apiVersion}/{folder}/");
+            File.WriteAllText(System.IO.Path.Combine(docsPath, $"table-{folder}-{apiVersion}.md"), typesTableMd);
+
+            typesTableMd = GetTypesTable(types, folder, apiVersion, $"");
+            File.WriteAllText(System.IO.Path.Combine(referencePath, apiVersion, folder, $"table-{folder}-{apiVersion}.md"), typesTableMd);
+
+
+            templatemd = templatemd.Replace("<ItemList>", typesTableMd);
+            File.WriteAllText(System.IO.Path.Combine(referencePath, apiVersion, folder, "index.md"), templatemd);
         }
 
         private static void ProcessItemFile(List<Type> targetTypes, List<Type> allTypes, string apiVersion, string folder, string masterTemplate, Type item, bool findConfig = true, string configEnd = "Options")
@@ -97,12 +133,14 @@ namespace VstsSyncMigrator.ConsoleApp
             {
                 objectName = objectName.Replace("Context", "");
                 typeOption = allTypes.Where(t => t.Name == $"{objectName}{configEnd}" && !t.IsAbstract && !t.IsInterface).SingleOrDefault();
+            } else
+            {
+                Console.WriteLine("No config");
             }
-
+            string templatemd = GetTemplate(apiVersion, folder, referencePath, masterTemplate, item);
+            Console.WriteLine("Processing:" + item.Name);
             if (typeOption != null)
             {
-                string templatemd = GetTemplate(apiVersion, folder, referencePath, masterTemplate, item);
-                Console.WriteLine("Processing:" + item.Name);
                 string jsonSample = "";
                 object targetItem = null;
                 if (typeOption.GetInterfaces().Contains(typeof(IProcessorConfig)))
@@ -122,6 +160,7 @@ namespace VstsSyncMigrator.ConsoleApp
                 {
                     Console.WriteLine("Processing as IFieldMapConfig");
                     var options = (IFieldMapConfig)Activator.CreateInstance(typeOption);
+                    options.SetExampleConfigDefaults();
                     targetItem = options;
                 }
                 if (targetItem != null)
@@ -130,24 +169,36 @@ namespace VstsSyncMigrator.ConsoleApp
                     JObject joptions = (JObject)JToken.FromObject(targetItem);
                     templatemd = ProcessOptions(targetItem, joptions, templatemd);
                     jsonSample = DeployJsonSample(targetItem, apiVersion, folder, referencePath, item);
-
                 }
-                templatemd = templatemd.Replace("<Description>", GetTypeSummary(item));
-                templatemd = ProcessSamples(jsonSample, templatemd, referencePath);
-                templatemd = templatemd.Replace("<ClassName>", item.Name);
-                templatemd = templatemd.Replace("<TypeName>", folder);
-                templatemd = ProcessBreadcrumbs(apiVersion, folder, item, templatemd);
-                string filename = $"../../../../../docs/Reference/{apiVersion}/{folder}/{item.Name}.md";
-                File.WriteAllText(filename, templatemd);
+                templatemd = templatemd.Replace("<ExampleJson>", jsonSample);
+            } else
+            {
+                templatemd = templatemd.Replace("<ExampleJson>", "Not currently runnable. Needs a little work");
             }
+            templatemd = ProcessImports(templatemd, referencePath);
+            templatemd = templatemd.Replace("<Description>", GetTypeData(item));
+            templatemd = templatemd.Replace("<ClassName>", item.Name);
+            templatemd = templatemd.Replace("<TypeName>", folder);
+            templatemd = ProcessBreadcrumbs(apiVersion, folder, item, templatemd);
+            string filename = $"../../../../../docs/Reference/{apiVersion}/{folder}/{item.Name}.md";
+            File.WriteAllText(filename, templatemd);
         }
 
-        private static string GetTypeSummary(Type item)
+        private static string GetTypeData(Type item, string element = "summary")
         {
-            // Query the data and write out a subset of contacts
-            var query = (from c in GetXDocument(item).Root.Descendants("member")
-                         where c.Attribute("name").Value == $"T:{item.FullName}"
-                         select c.Element("summary").Value).SingleOrDefault();
+            string query = "missng XML code comments";
+            try
+            {
+                // Query the data and write out a subset of contacts
+                query = (from c in GetXDocument(item).Root.Descendants("member")
+                                where c.Attribute("name").Value == $"T:{item.FullName}"
+                                select c.Element(element).Value).SingleOrDefault();
+            }
+            catch (Exception)
+            {
+                
+            }
+            
             if (query != null)
             {
                 Console.WriteLine($"- Description Loaded: {item.FullName}");
@@ -157,12 +208,17 @@ namespace VstsSyncMigrator.ConsoleApp
                 query = "missng XML code comments";
                 // Console.WriteLine($"- Description FAILED: {item.FullName}");
             }
-            return query.Replace(Environment.NewLine, "").Trim();
+            return query.Replace(Environment.NewLine, "").Replace("\r", "").Replace("\n", "").Replace("            ", " ").Trim();
         }
 
-        private static string GetPropertyData(object options, JObject joptions, JProperty jproperty, string element)
+        private static string GetPropertyData(object targetObject, JObject joptions, JProperty jproperty, string element)
         {
-            var optionsType = options.GetType().GetProperty(jproperty.Name).DeclaringType;
+            return GetPropertyData(targetObject.GetType(), joptions, jproperty, element);
+        }
+
+        private static string GetPropertyData(Type targetType, JObject joptions, JProperty jproperty, string element)
+        {
+            var optionsType = targetType.GetProperty(jproperty.Name).DeclaringType;
             // Query the data and write out a subset of contacts
             var query = (from c in GetXDocument(optionsType).Root.Descendants("member")
                          where c.Attribute("name").Value == $"P:{optionsType.FullName}.{jproperty.Name}"
@@ -176,7 +232,7 @@ namespace VstsSyncMigrator.ConsoleApp
                 // Console.WriteLine($"- Description FAILED: {item.FullName}");
                 query = "missng XML code comments";
             }
-            return query.Replace(Environment.NewLine, "").Trim();
+            return query.Replace(Environment.NewLine, "").Replace("\r", "").Replace("\n", "").Replace("            ", " ").Trim();
         }
 
         private static string GetPropertyDefault(IOptions options, JObject joptions, JProperty jproperty)
@@ -202,7 +258,7 @@ namespace VstsSyncMigrator.ConsoleApp
                 defaultvalue = "missng XML code comments";
             }
 
-            return defaultvalue.Replace(Environment.NewLine, "").Trim();
+            return defaultvalue.Replace(Environment.NewLine, "").Replace("\r", "").Replace("\n", "").Replace("            ", " ").Trim();
         }
 
         private static XDocument GetXDocument(Type item)
@@ -218,10 +274,10 @@ namespace VstsSyncMigrator.ConsoleApp
             {
                 properties.AppendLine("| Parameter name         | Type    | Description                              | Default Value                            |");
                 properties.AppendLine("|------------------------|---------|------------------------------------------|------------------------------------------|");
-                var jpropertys = joptions.Properties();
+                var jpropertys = joptions.Properties().OrderBy(t => t.Name);
                 foreach (JProperty jproperty in jpropertys)
                 {
-                    string PropertyValue = GetPropertyData(options, joptions, jproperty, "summary").Replace("\r", "").Replace("\n", "").Trim();
+                    string PropertyValue = GetPropertyData(options, joptions, jproperty, "summary");
                     properties.AppendLine(string.Format("| {0} | {1} | {2} | {3} |", jproperty.Name, GetPropertyType(options, jproperty), PropertyValue, GetPropertyData(options, joptions, jproperty, "default")));
                 }
                 templatemd = templatemd.Replace("<Options>", properties.ToString());
@@ -233,43 +289,43 @@ namespace VstsSyncMigrator.ConsoleApp
             return templatemd;
         }
 
-        private static string ProcessTypes(List<Type> types, string templatemd, string typeCatagoryName)
+        private static string GetTypesTable(List<Type> types, string typeCatagoryName, string apiVersion, string pathRoute)
         {
             StringBuilder properties = new StringBuilder();
-            properties.AppendLine($"| {typeCatagoryName} | Data Type    | Description                              | Default Value                            |");
-            properties.AppendLine("|------------------------|---------|------------------------------------------|------------------------------------------|");
+            properties.AppendLine($"| {typeCatagoryName} | Status | Target    | Usage                              |");
+            properties.AppendLine("|------------------------|---------|---------|------------------------------------------|");
             foreach (var item in types)
             {
-                //JObject joptions = (JObject)JToken.FromObject(item);
-                //var jproperty = joptions.Properties();
-                properties.AppendLine(string.Format("| [{0}](./{0}.md) | {1} | {2} | {3} |", item.Name, "", "", ""));
+
+                string typeDocSummery = GetTypeData(item);
+                string typeDocdDatatype = GetTypeData(item, "processingtarget");
+                string typeDocdStatus = GetTypeData(item, "status");
+                properties.AppendLine($"| [{item.Name}]({pathRoute}{item.Name}.md) | {typeDocdStatus} | {typeDocdDatatype} | {typeDocSummery} |");
             }
-            templatemd = templatemd.Replace("<ItemList>", properties.ToString());
-            return templatemd;
+            return properties.ToString();
         }
 
         private static object GetPropertyType(object options, JProperty jproperty)
         {
-            return options.GetType().GetProperty(jproperty.Name).PropertyType.Name.Replace("`1", "");
+            return options.GetType().GetProperty(jproperty.Name).PropertyType.Name.Replace("`1", "").Replace("`2", "").Replace("`", "");
         }
 
-        private static string ProcessSamples(string jsonSample, string templatemd, string referencePath)
+        private static string ProcessImports(string templatemd, string referencePath)
         {
-            templatemd = templatemd.Replace("<ExampleJson>", jsonSample);
-            var match = new Regex(@"<Import:([\s\S]*)>");
+            var match = new Regex(@"<Import:(.*)>");
             MatchCollection matches = match.Matches(templatemd);
             foreach (Match item in matches)
             {
-                string importPath = Path.Combine(referencePath, item.Value);
+                string importPath = Path.Combine(referencePath, item.Groups[1].Value);
                 string importFile = System.IO.File.ReadAllText(importPath);
-                templatemd = templatemd.Replace(string.Format($"<Import:{item.Value}>"), importFile);
+                templatemd = templatemd.Replace(item.Value, importFile);
             }
             return templatemd;
         }
 
         private static string ProcessBreadcrumbs(string apiVersion, string folder, Type item, string templatemd)
         {
-            string breadcrumbs = $"[Overview](../././index.md) > [Reference](.././index.md) > [API {apiVersion}](../index.md) > [{folder}](./index.md)";
+            string breadcrumbs = $"[Overview](../../../index.md) > [Reference](../../index.md) > [API {apiVersion}](../index.md) > [{folder}](index.md)";
             if (item != null)
             {
                 breadcrumbs += $"> **{item.Name}**";

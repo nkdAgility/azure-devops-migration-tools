@@ -9,6 +9,9 @@ using MigrationTools.DataContracts;
 
 namespace VstsSyncMigrator.Engine
 {
+    /// <summary>
+    /// Note: this is only for internal usage. Don't use this in your configurations.
+    /// </summary>
     public class FakeProcessor : MigrationProcessorBase
     {
         public FakeProcessor(IMigrationEngine engine, IServiceProvider services, ITelemetryLogger telemetry, ILogger<FakeProcessor> logger) : base(engine, services, telemetry, logger)

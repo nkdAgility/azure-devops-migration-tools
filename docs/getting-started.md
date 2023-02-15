@@ -1,4 +1,4 @@
-# Getting Started with the VSTS Sync Migrator
+# Getting Started with the Azure DevOps Migration Tools
 
 If you want to perform a bulk edit or a migration then you need to start here. This tool has been tested on updating from 100 to 250,000 work items by its users.
 
@@ -19,7 +19,7 @@ The tools are now installed. To run them you will need to switch to `c:\tools\Mi
 
 ## Server configuration and setup
 
-Follow the [setup instructions](./server-configuration.md) to make sure that you can run the tool against your environments and importantly add the required custom field 'ReflectedWorkItemId'
+Follow the [setup instructions](/docs/server-configuration.md) to make sure that you can run the tool against your environments and importantly add the required custom field 'ReflectedWorkItemId'
 
 ## Create a default configuration file
 
@@ -40,6 +40,7 @@ You can now customise the configuration depending on what you need to do. Howeve
     "AllowCrossProjectLinking": false,
     "AuthenticationMode": "Prompt",
     "PersonalAccessToken": "",
+    "PersonalAccessTokenVariableName": "",
     "LanguageMaps": {
       "AreaPath": "Area",
       "IterationPath": "Iteration"
@@ -53,6 +54,7 @@ You can now customise the configuration depending on what you need to do. Howeve
     "AllowCrossProjectLinking": false,
     "AuthenticationMode": "Prompt",
     "PersonalAccessToken": "",
+    "PersonalAccessTokenVariableName": "",
     "LanguageMaps": {
       "AreaPath": "Area",
       "IterationPath": "Iteration"
@@ -116,9 +118,10 @@ You can now customise the configuration depending on what you need to do. Howeve
     {
       "$type": "FieldMergeMapConfig",
       "WorkItemTypeName": "*",
-      "sourceField1": "System.Description",
-      "sourceField2": "Microsoft.VSTS.Common.AcceptanceCriteria",
-      "sourceField3": null,
+      "sourceFields": [
+        "System.Description",
+        "Microsoft.VSTS.Common.AcceptanceCriteria"
+      ],
       "targetField": "System.Description",
       "formatExpression": "{0} <br/><br/><h3>Acceptance Criteria</h3>{1}",
       "doneMatch": "##DONE##"
@@ -147,6 +150,7 @@ You can now customise the configuration depending on what you need to do. Howeve
   ],
   "GitRepoMapping": null,
   "LogLevel": "Information",
+  "CommonEnrichersConfig": null,
   "Processors": [
     {
       "$type": "WorkItemMigrationConfig",
@@ -155,7 +159,7 @@ You can now customise the configuration depending on what you need to do. Howeve
       "PrefixProjectToNodes": false,
       "UpdateCreatedDate": true,
       "UpdateCreatedBy": true,
-      "WIQLQueryBit": "AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
+      "WIQLQueryBit": "AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')",
       "WIQLOrderBit": "[System.ChangedDate] desc",
       "LinkMigration": true,
       "AttachmentMigration": true,
@@ -169,16 +173,22 @@ You can now customise the configuration depending on what you need to do. Howeve
       "AttachRevisionHistory": false,
       "LinkMigrationSaveEachAsAdded": false,
       "GenerateMigrationComment": true,
+      "WorkItemIDs": null,
+      "MaxRevisions": 0,
       "NodeStructureEnricherEnabled": null,
+      "UseCommonNodeStructureEnricherConfig": false,
+      "StopMigrationOnMissingAreaIterationNodes": true,
       "NodeBasePaths": [
         "Product\\Area\\Path1",
         "Product\\Area\\Path2"
       ],
-      "WorkItemIDs": null,
-      "MaxRevisions": 0
+      "AreaMaps": {},
+      "IterationMaps": {},
+      "MaxGracefulFailures": 0,
+      "SkipRevisionWithInvalidIterationPath": false
     }
   ],
-  "Version": "11.12",
+  "Version": "0.0",
   "workaroundForQuerySOAPBugEnabled": false,
   "WorkItemTypeDefinition": {
     "sourceWorkItemTypeName": "targetWorkItemTypeName"
@@ -198,7 +208,7 @@ You can now customise the configuration depending on what you need to do. Howeve
 }
 ```
 
-The default [WorkItemMigrationConfig](./Processors/WorkItemMigrationConfig.md) processor will perform the following operations:
+The default [WorkItemMigrationConfig](/docs/Reference/v1/Processors/WorkItemMigrationConfig.md) processor will perform the following operations:
 
 * Migrate interations and sprints
 * Attachments
@@ -206,7 +216,7 @@ The default [WorkItemMigrationConfig](./Processors/WorkItemMigrationConfig.md) p
 
 ## How to execute configuration.json with minimal adjustments
 
-> Remember to add custom field ['ReflectedWorkItemId'](./server-configuration.md) to both, the source and the target team project before starting migration!
+> Remember to add custom field ['ReflectedWorkItemId'](/docs/server-configuration.md) to both, the source and the target team project before starting migration!
 
 1. Adjust the value of the `Collection` attribute for Source and Target
 1. Adjust the value of the `Project` attribute for Source and Target
@@ -222,7 +232,10 @@ The default [WorkItemMigrationConfig](./Processors/WorkItemMigrationConfig.md) p
 
 1. Enable the `WorkItemMigrationConfig` processor by setting `Enabled` to `true`
 1. [OPTIONAL] Modify the `WIQLQueryBit` to migrate only the work items you want. The default WIQL will migrate all open work items and revisions excluding test suites and plans
-1. Adjust the [`NodeBasePaths`](./Processors/WorkItemMigrationConfig.md) or leave empty to migrate all nodes
+1. Adjust the [`NodeBasePaths`](/docs/Reference/v1/Processors/WorkItemMigrationConfig.md) or leave empty to migrate all nodes
 1. From the `C:\tools\MigrationTools\` path run `.\migration.exe execute --config .\configuration.json`
 
 **Remember:** if you want a processor to run, it's `Enabled` attribute must be set to `true`. 
+
+Refer to the [Reference Guide](/docs/reference/index.md) for more details.
+

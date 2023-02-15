@@ -1,5 +1,10 @@
 ﻿namespace MigrationTools._EngineV1.Configuration.FieldMap
 {
+    /// <summary>
+    ///  I just need that bit of a field... need to send "2016.2" to two fields, one for year and one for release? Done.
+    /// </summary>
+    /// <status>ready</status>
+    /// <processingtarget>Work Item Field</processingtarget>
     public class RegexFieldMapConfig : IFieldMapConfig
     {
         public string WorkItemTypeName { get; set; }
@@ -14,6 +19,15 @@
             {
                 return "RegexFieldMap";
             }
+        }
+
+        public void SetExampleConfigDefaults()
+        {
+            WorkItemTypeName = "*";
+            sourceField = "Custom.MyVersion";
+            targetField = "Custom.MyVersionYearOnly";
+            pattern = "([0-9]{4})";
+            replacement = "$1";
         }
     }
 }

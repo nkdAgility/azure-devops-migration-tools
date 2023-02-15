@@ -17,6 +17,8 @@ namespace MigrationTools.Processors
     /// <summary>
     /// Native TFS Processor, does not work with any other Endpoints.
     /// </summary>
+    /// <status>Beta</status>
+    /// <processingtarget>Teams</processingtarget>
     public class TfsTeamSettingsProcessor : Processor
     {
         private const string LogTypeName = nameof(TfsTeamSettingsProcessor);

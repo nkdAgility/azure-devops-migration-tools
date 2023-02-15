@@ -32,5 +32,6 @@
     "$type": "Dictionary`2"
   },
   "MaxGracefulFailures": 0,
-  "SkipRevisionWithInvalidIterationPath": false
+  "SkipRevisionWithInvalidIterationPath": false,
+  "SkipRevisionWithInvalidAreaPath": false
 }

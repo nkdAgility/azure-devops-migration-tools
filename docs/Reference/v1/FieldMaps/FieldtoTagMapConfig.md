@@ -2,17 +2,17 @@
 
 >**_This documentation is for a preview version of the Azure DevOps Migration Tools._ If you are not using the preview version then please head over to the main [documentation](https://nkdagility.github.io/azure-devops-migration-tools).**
 
-[Overview](../././index.md) > [Reference](.././index.md) > [API v1](../index.md) > [FieldMaps](./index.md)> **FieldtoTagMapConfig**
+[Overview](../../../index.md) > [Reference](../../index.md) > [API v1](../index.md) > [FieldMaps](index.md)> **FieldtoTagMapConfig**
 
-missng XML code comments
+Want to take a field and convert its value to a tag? Done...
 
 ### Options
 
 | Parameter name         | Type    | Description                              | Default Value                            |
 |------------------------|---------|------------------------------------------|------------------------------------------|
-| WorkItemTypeName | String | missng XML code comments | missng XML code comments |
-| sourceField | String | missng XML code comments | missng XML code comments |
 | formatExpression | String | missng XML code comments | missng XML code comments |
+| sourceField | String | missng XML code comments | missng XML code comments |
+| WorkItemTypeName | String | missng XML code comments | missng XML code comments |
 
 
 ### Example JSON
@@ -20,8 +20,8 @@ missng XML code comments
 ```JSON
 {
   "$type": "FieldtoTagMapConfig",
-  "WorkItemTypeName": null,
-  "sourceField": null,
-  "formatExpression": null
+  "WorkItemTypeName": "*",
+  "sourceField": "Custom.ProjectName",
+  "formatExpression": "Project: {0}"
 }
 ```
