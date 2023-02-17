@@ -472,8 +472,8 @@ namespace MigrationTools.Enrichers
         /// <exception cref="NotImplementedException"></exception>
         private bool CheckIsParentOfSelectedBasePath(string userFriendlyPath)
         {
-            return _nodeBasePaths.Where(onePath => !onePath.StartsWith("!"))
-                                 .Any(onePath => onePath.StartsWith(userFriendlyPath));
+            return _nodeBasePaths != null ? _nodeBasePaths.Where(onePath => !onePath.StartsWith("!"))
+                                 .Any(onePath => onePath.StartsWith(userFriendlyPath)) : false;
         }
 
         public List<string> CheckForMissingPaths(List<WorkItemData> workItems, TfsNodeStructureType nodeType)
