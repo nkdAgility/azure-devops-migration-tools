@@ -61,7 +61,7 @@ namespace MigrationTools._EngineV1.Configuration.Processing
 
         public string Processor
         {
-            get { return "TestPlandsAndSuitesMigrationContext"; }
+            get { return "TestPlansAndSuitesMigrationContext"; }
         }
 
         /// <summary>

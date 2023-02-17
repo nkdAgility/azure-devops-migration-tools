@@ -115,7 +115,7 @@ namespace VstsSyncMigrator.Engine
                 toProcess = sourcePlans;
             }
 
-            Log.LogInformation("TestPlandsAndSuitesMigrationContext: Plan to copy {0} Plans?", toProcess.Count());
+            Log.LogInformation("TestPlansAndSuitesMigrationContext: Plan to copy {0} Plans?", toProcess.Count());
             _currentPlan = 0;
             _totalPlans = toProcess.Count;
 
@@ -125,7 +125,7 @@ namespace VstsSyncMigrator.Engine
 
                 if (CanSkipElementBecauseOfTags(sourcePlan.Id))
                 {
-                    Log.LogInformation("TestPlandsAndSuitesMigrationContext: Skipping Test Plan {Id}:'{Name}' as is not tagged with '{Tag}'.", sourcePlan.Id, sourcePlan.Name, _config.OnlyElementsWithTag);
+                    Log.LogInformation("TestPlansAndSuitesMigrationContext: Skipping Test Plan {Id}:'{Name}' as is not tagged with '{Tag}'.", sourcePlan.Id, sourcePlan.Name, _config.OnlyElementsWithTag);
                     continue;
                 }
                 ProcessTestPlan(sourcePlan);
@@ -133,7 +133,7 @@ namespace VstsSyncMigrator.Engine
             _currentPlan = 0;
             _totalPlans = 0;
             stopwatch.Stop();
-            Log.LogInformation("TestPlandsAndSuitesMigrationContext:  DONE in {Elapsed}", stopwatch.Elapsed.ToString("c"));
+            Log.LogInformation("TestPlansAndSuitesMigrationContext:  DONE in {Elapsed}", stopwatch.Elapsed.ToString("c"));
         }
 
         private void AddChildTestCases(ITestSuiteBase source, ITestSuiteBase target, ITestPlan targetPlan)
@@ -152,7 +152,7 @@ namespace VstsSyncMigrator.Engine
 
             if (CanSkipElementBecauseOfTags(source.Id))
             {
-                Log.LogInformation("TestPlandsAndSuitesMigrationContext::AddChildTestCases: Skipping Test Case {Id}:'{Name}' as is not tagged with '{Tag}'.", source.Id, source.Title, _config.OnlyElementsWithTag);
+                Log.LogInformation("TestPlansAndSuitesMigrationContext::AddChildTestCases: Skipping Test Case {Id}:'{Name}' as is not tagged with '{Tag}'.", source.Id, source.Title, _config.OnlyElementsWithTag);
                 return;
             }
 
@@ -169,7 +169,7 @@ namespace VstsSyncMigrator.Engine
 
                 if (CanSkipElementBecauseOfTags(sourceTestCaseEntry.Id))
                 {
-                    Log.LogInformation("TestPlandsAndSuitesMigrationContext::AddChildTestCases: Skipping Test Suite {Id}:'{Name}' as is not tagged with '{Tag}'.", sourceTestCaseEntry.Id, sourceTestCaseEntry.Title, _config.OnlyElementsWithTag);
+                    Log.LogInformation("TestPlansAndSuitesMigrationContext::AddChildTestCases: Skipping Test Suite {Id}:'{Name}' as is not tagged with '{Tag}'.", sourceTestCaseEntry.Id, sourceTestCaseEntry.Title, _config.OnlyElementsWithTag);
                     continue;
                 }
 
