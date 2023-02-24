@@ -3,10 +3,14 @@ mode: ContinuousDeployment
 continuous-delivery-fallback-tag: ''
 next-version: 12.5
 branches:
-  master:
+  main:
+    regex: ^master$|^main$
     mode: ContinuousDeployment
     tag: ''
-  ((?!(master)|(feature)|(pull)).):
+    is-release-branch: true
+    is-mainline: true
+  preview:
+     regex: ^((?!(master)|(feature)|(pull)).)
      tag: 'Preview'
 ignore:
   sha: []
