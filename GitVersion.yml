@@ -14,6 +14,7 @@ branches:
     regex: ^((?!(master)|(feature)|(pull)).)
     is-release-branch: false
     is-mainline: false
+    source-branches: [ 'main', 'master' ]
 ignore:
   sha: []
 merge-message-formats: {}
