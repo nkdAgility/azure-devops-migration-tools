@@ -57,6 +57,9 @@ namespace MigrationTools.Enrichers
             string oldTfsurl = Engine.Source.Config.AsTeamProjectConfig().Collection.ToString();
             string newTfsurl = Engine.Target.Config.AsTeamProjectConfig().Collection.ToString();
 
+            string oldTfsProject = Engine.Source.Config.AsTeamProjectConfig().Project;
+            string newTfsProject = Engine.Target.Config.AsTeamProjectConfig().Project;
+
             Log.LogInformation("{LogTypeName}: Fixing embedded mention links on target work item {targetWorkItemId} from {oldTfsurl} to {newTfsurl}", LogTypeName, targetWorkItem.Id, oldTfsurl, newTfsurl);
 
             foreach (Field field in targetWorkItem.ToWorkItem().Fields)
@@ -93,7 +96,10 @@ namespace MigrationTools.Enrichers
                                 var linkWI = Engine.Target.WorkItems.FindReflectedWorkItemByReflectedWorkItemId(sourceLinkWi);
                                 if (linkWI != null)
                                 {
-                                    var replaceValue = anchorTagMatch.Value.Replace(workItemId, linkWI.Id);
+                                    var replaceValue = anchorTagMatch.Value
+                                        .Replace(workItemId, linkWI.Id)
+                                        .Replace(oldTfsProject, newTfsProject)
+                                        .Replace(oldTfsurl, newTfsurl);
                                     field.Value = field.Value.ToString().Replace(anchorTagMatch.Value, replaceValue);
                                     Log.LogInformation("{LogTypeName}: Source work item {workItemId} mention link was successfully replaced with target work item {linkWIId} mention link on field {fieldName} on target work item {targetWorkItemId}.", LogTypeName, workItemId, linkWI.Id, field.Name, targetWorkItem.Id);
                                 }
