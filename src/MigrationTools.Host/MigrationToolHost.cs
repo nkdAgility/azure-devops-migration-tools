@@ -153,7 +153,6 @@ namespace MigrationTools.Host
                 return;
             }
             await host.RunAsync();
-            startupService.RunExitLogic();
         }
 
         private static string CreateLogsPath()
