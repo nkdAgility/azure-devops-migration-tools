@@ -7,7 +7,7 @@ assignees: ''
 
 ---
 
-__This is for issues: For questions on usage please use https://stackoverflow.com/questions/tagged/azure-devops-migration-tools and tag with `azure-devops-migration-tools`__
+__This is for issues: For questions on usage and sugestions for features please use [https://github.com/nkdAgility/azure-devops-migration-tools/discussions](https://github.com/nkdAgility/azure-devops-migration-tools/discussions)__
 
 ## Describe your issue: 
 
