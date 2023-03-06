@@ -11,12 +11,14 @@ namespace MigrationTools.Enrichers
         public string[] NodeBasePaths { get; set; }
         public Dictionary<string, string> AreaMaps { get; set; }
         public Dictionary<string, string> IterationMaps { get; set; }
+        public bool ShouldCreateMissingRevisionPaths { get; set; }
 
         public override void SetDefaults()
         {
             Enabled = true;
             AreaMaps = new Dictionary<string, string>();
             IterationMaps = new Dictionary<string, string>();
+            ShouldCreateMissingRevisionPaths = true;
         }
     }
 
