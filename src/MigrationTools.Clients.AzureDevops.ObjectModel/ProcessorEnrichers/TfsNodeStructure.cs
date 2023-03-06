@@ -492,7 +492,13 @@ namespace MigrationTools.Enrichers
                     break;
 
             }
-            List<string> areaPaths = (from workItem in workItems where workItem.Fields[fieldName].Value.ToString().Contains("\\") select workItem.Fields[fieldName].Value.ToString()).Distinct().ToList();
+
+            List<string> areaPaths = workItems.SelectMany(x => x.Revisions.Values)
+                .Where(x => x.Fields[fieldName].Value.ToString().Contains("\\"))
+                .Select(x => x.Fields[fieldName].Value.ToString())
+                .Distinct()
+                .ToList();
+
             List<string> missingPaths = new List<string>();
 
             foreach (var areaPath in areaPaths)
@@ -505,7 +511,11 @@ namespace MigrationTools.Enrichers
                 }
                 catch
                 {
-                    missingPaths.Add(newpath);
+                    if (_Options.ShouldCreateMissingRevisionPaths && ShouldCreateNode(systempath))
+                        GetOrCreateNode(systempath, null, null);
+                    else
+                        missingPaths.Add(newpath);
+
                 }
             }
             return missingPaths;
