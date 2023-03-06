@@ -13,7 +13,7 @@ branches:
     is-mainline: true
   pull-request:
     regex: ^(pull|pull\-requests|pr)[/-]
-    mode: ContinuousDeployment
+    mode: ContinuousDelivery
     tag: PullRequest
     increment: Patch
     prevent-increment-of-merged-branch-version: false
