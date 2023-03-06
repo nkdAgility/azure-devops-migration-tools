@@ -38,7 +38,7 @@
       }
     },
     {
-      "ObjectType": "FieldBlankMapConfig",
+      "ObjectType": "FieldSkipMapConfig",
       "WorkItemTypeName": "*",
       "targetField": "TfsMigrationTool.ReflectedWorkItemId"
     },

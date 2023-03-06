@@ -7,7 +7,7 @@ namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
 {
     public class FieldClearMap : FieldMapBase
     {
-        public FieldClearMap(ILogger<FieldBlankMap> logger) : base(logger)
+        public FieldClearMap(ILogger<FieldSkipMap> logger) : base(logger)
         {
         }
 

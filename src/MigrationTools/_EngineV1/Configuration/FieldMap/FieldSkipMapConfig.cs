@@ -5,7 +5,7 @@
     /// </summary>
     /// <status>ready</status>
     /// <processingtarget>Work Item</processingtarget>
-    public class FieldBlankMapConfig : IFieldMapConfig
+    public class FieldSkipMapConfig : IFieldMapConfig
     {
         public string WorkItemTypeName { get; set; }
         public string targetField { get; set; }
@@ -14,7 +14,7 @@
         {
             get
             {
-                return "FieldBlankMap";
+                return "FieldSkipMap";
             }
         }
 

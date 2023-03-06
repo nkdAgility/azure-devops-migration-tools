@@ -19,7 +19,7 @@ namespace MigrationTools.ConsoleCore
                 .ConfigureServices((context, services) =>
                 {
                     // Field Mapps
-                    services.AddTransient<FieldBlankMap>();
+                    services.AddTransient<FieldSkipMap>();
                     services.AddTransient<FieldLiteralMap>();
                     services.AddTransient<FieldMergeMap>();
                     services.AddTransient<FieldToFieldMap>();

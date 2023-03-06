@@ -41,7 +41,7 @@ namespace MigrationTools
         public static void AddMigrationToolServicesForClientLegacyAzureDevOpsObjectModel(this IServiceCollection context)
         {
             // Field Mapps
-            context.AddTransient<FieldBlankMap>();
+            context.AddTransient<FieldSkipMap>();
             context.AddTransient<FieldLiteralMap>();
             context.AddTransient<FieldMergeMap>();
             context.AddTransient<FieldToFieldMap>();

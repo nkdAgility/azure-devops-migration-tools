@@ -85,13 +85,6 @@
             This processor is intended, with the aid of [ProcessorEnrichers](../ProcessorEnrichers/index.md), to allow the migration of Work Items between two [Endpoints](../Endpoints/index.md).
             </summary>
         </member>
-        <member name="T:MigrationTools._EngineV1.Configuration.FieldMap.FieldBlankMapConfig">
-            <summary>
-            Allows you to skip populating an existing field. Value in target with be reset to its OriginalValue.
-            </summary>
-            <status>ready</status>
-            <processingtarget>Work Item</processingtarget>
-        </member>
         <member name="T:MigrationTools._EngineV1.Configuration.FieldMap.FieldClearMapConfig">
             <summary>
             Allows you to set an already populated field to Null. This will only work with fields that support null.
@@ -112,6 +105,13 @@
             </summary>
             <status>ready</status>
             <processingtarget>Work Item Field</processingtarget>
+        </member>
+        <member name="T:MigrationTools._EngineV1.Configuration.FieldMap.FieldSkipMapConfig">
+            <summary>
+            Allows you to skip populating an existing field. Value in target with be reset to its OriginalValue.
+            </summary>
+            <status>ready</status>
+            <processingtarget>Work Item</processingtarget>
         </member>
         <member name="T:MigrationTools._EngineV1.Configuration.FieldMap.FieldtoFieldMapConfig">
             <summary>
