@@ -1,6 +1,7 @@
 assembly-versioning-scheme: MajorMinorPatch
 mode: ContinuousDeployment
 continuous-delivery-fallback-tag: ''
+increment: Patch
 next-version: 12.5.0
 branches:
   main:
