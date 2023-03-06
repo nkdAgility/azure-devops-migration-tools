@@ -87,10 +87,17 @@
         </member>
         <member name="T:MigrationTools._EngineV1.Configuration.FieldMap.FieldBlankMapConfig">
             <summary>
-            Allows you to blank an already populated field
+            Allows you to skip populating an existing field. Value in target with be reset to its OriginalValue.
             </summary>
             <status>ready</status>
-            <processingtarget>Work Item Field</processingtarget>
+            <processingtarget>Work Item</processingtarget>
+        </member>
+        <member name="T:MigrationTools._EngineV1.Configuration.FieldMap.FieldClearMapConfig">
+            <summary>
+            Allows you to set an already populated field to Null. This will only work with fields that support null.
+            </summary>
+            <status>ready</status>
+            <processingtarget>Work Item</processingtarget>
         </member>
         <member name="T:MigrationTools._EngineV1.Configuration.FieldMap.FieldLiteralMapConfig">
             <summary>

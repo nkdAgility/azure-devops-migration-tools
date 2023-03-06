@@ -1,10 +1,10 @@
-## FieldMaps: FieldBlankMapConfig
+## FieldMaps: FieldClearMapConfig
 
 >**_This documentation is for a preview version of the Azure DevOps Migration Tools._ If you are not using the preview version then please head over to the main [documentation](https://nkdagility.github.io/azure-devops-migration-tools).**
 
-[Overview](../../../index.md) > [Reference](../../index.md) > [API v1](../index.md) > [FieldMaps](index.md)> **FieldBlankMapConfig**
+[Overview](../../../index.md) > [Reference](../../index.md) > [API v2](../index.md) > [FieldMaps](index.md)> **FieldClearMapConfig**
 
-Allows you to skip populating an existing field. Value in target with be reset to its OriginalValue.
+Allows you to set an already populated field to Null. This will only work with fields that support null.
 
 ### Options
 
@@ -18,7 +18,7 @@ Allows you to skip populating an existing field. Value in target with be reset t
 
 ```JSON
 {
-  "$type": "FieldBlankMapConfig",
+  "$type": "FieldClearMapConfig",
   "WorkItemTypeName": "*",
   "targetField": "System.Description"
 }

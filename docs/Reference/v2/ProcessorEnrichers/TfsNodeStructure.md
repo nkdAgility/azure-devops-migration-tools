@@ -16,6 +16,7 @@ missng XML code comments
 | NodeBasePaths | String[] | missng XML code comments | missng XML code comments |
 | PrefixProjectToNodes | Boolean | missng XML code comments | missng XML code comments |
 | RefName | String | missng XML code comments | missng XML code comments |
+| ShouldCreateMissingRevisionPaths | Boolean | missng XML code comments | missng XML code comments |
 
 
 ### Example JSON
@@ -31,6 +32,7 @@ missng XML code comments
   },
   "IterationMaps": {
     "$type": "Dictionary`2"
-  }
+  },
+  "ShouldCreateMissingRevisionPaths": true
 }
 ```

@@ -12,7 +12,7 @@ namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
         }
 
         public override string MappingDisplayName => $"{Config.targetField}";
-        private FieldBlankMapConfig Config { get { return (FieldClearMapConfig)_Config; } }
+        private FieldClearMapConfig Config { get { return (FieldClearMapConfig)_Config; } }
 
         internal override void InternalExecute(WorkItem source, WorkItem target)
         {

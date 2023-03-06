@@ -1,6 +1,7 @@
 | FieldMaps | Status | Target    | Usage                              |
 |------------------------|---------|---------|------------------------------------------|
-| [FieldBlankMapConfig](FieldBlankMapConfig.md) | ready | Work Item Field | Allows you to blank an already populated field |
+| [FieldBlankMapConfig](FieldBlankMapConfig.md) | ready | Work Item | Allows you to skip populating an existing field. Value in target with be reset to its OriginalValue. |
+| [FieldClearMapConfig](FieldClearMapConfig.md) | ready | Work Item | Allows you to set an already populated field to Null. This will only work with fields that support null. |
 | [FieldLiteralMapConfig](FieldLiteralMapConfig.md) | ready | Work Item Field | Sets a field on the `target` to b a specific value. |
 | [FieldMergeMapConfig](FieldMergeMapConfig.md) | ready | Work Item Field | Ever wanted to merge two or three fields? This mapping will let you do just that. |
 | [FieldtoFieldMapConfig](FieldtoFieldMapConfig.md) | ready | Work Item Field | Just want to map one field to another? This is the one for you. |
