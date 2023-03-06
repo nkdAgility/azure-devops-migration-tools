@@ -163,7 +163,7 @@ namespace MigrationTools._EngineV1.Configuration
                      { "Field2", "Value2" }
                  }
             });
-            ec.FieldMaps.Add(new FieldBlankMapConfig()
+            ec.FieldMaps.Add(new FieldSkipMapConfig()
             {
                 WorkItemTypeName = "*",
                 targetField = "TfsMigrationTool.ReflectedWorkItemId"

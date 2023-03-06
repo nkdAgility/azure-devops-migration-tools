@@ -5,9 +5,9 @@ using MigrationTools._EngineV1.Configuration.FieldMap;
 
 namespace MigrationTools.Clients.AzureDevops.Rest.FieldMaps
 {
-    public class FieldBlankMap : FieldMapBase
+    public class FieldSkipMap : FieldMapBase
     {
-        private FieldBlankMapConfig Config { get { return (FieldBlankMapConfig)_Config; } }
+        private FieldSkipMapConfig Config { get { return (FieldSkipMapConfig)_Config; } }
 
         public override string MappingDisplayName => $"{Config.targetField}";
 
