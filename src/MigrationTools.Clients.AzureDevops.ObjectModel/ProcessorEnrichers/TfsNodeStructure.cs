@@ -105,6 +105,7 @@ namespace MigrationTools.Enrichers
 
             if (!Regex.IsMatch(sourceNodePath, lastResortRule.Key, RegexOptions.IgnoreCase))
             {
+                Log.LogWarning("NodeStructureEnricher.NodePathNotAnchoredException({sourceNodePath}, {nodeStructureType})", sourceNodePath, nodeStructureType.ToString());
                 throw new NodePathNotAnchoredException($"This path is not anchored in the source project name: {sourceNodePath}");
             }
 
@@ -478,14 +479,11 @@ namespace MigrationTools.Enrichers
                                  .Any(onePath => onePath.StartsWith(userFriendlyPath)) : false;
         }
 
-        public List<string> CheckForMissingPaths(List<WorkItemData> workItems, TfsNodeStructureType nodeType)
+        public string GetFieldNameFromTfsNodeStructureType(TfsNodeStructureType nodeType)
         {
-            EntryForProcessorType(null);
-            _targetCommonStructureService.ClearProjectInfoCache();
-
             string fieldName = "";
             switch (nodeType)
-             {
+            {
                 case TfsNodeStructureType.Iteration:
                     fieldName = "System.IterationPath";
                     break;
@@ -494,6 +492,15 @@ namespace MigrationTools.Enrichers
                     break;
 
             }
+            return fieldName;
+        }
+
+        public List<string> CheckForMissingPaths(List<WorkItemData> workItems, TfsNodeStructureType nodeType)
+        {
+            EntryForProcessorType(null);
+            _targetCommonStructureService.ClearProjectInfoCache();
+
+            string fieldName = GetFieldNameFromTfsNodeStructureType(nodeType);
 
             List<string> areaPaths = workItems.SelectMany(x => x.Revisions.Values)
                 .Where(x => x.Fields[fieldName].Value.ToString().Contains("\\"))
@@ -533,24 +540,6 @@ namespace MigrationTools.Enrichers
             }
             return missingPaths;
         }
-
-        public string CreateFieldValueMappingForMissingFields()
-        {
-            StringBuilder builder = new StringBuilder();
-            builder.AppendLine("{");
-            builder.AppendLine("\"$type\": \"FieldValueMapConfig\",");
-            builder.AppendLine("\"WorkItemTypeName\": \"*\",");
-            builder.AppendLine("\"sourceField\": \"System.AreaPath\",");
-            builder.AppendLine("\"targetField\": \"System.AreaPath\",");
-            builder.AppendLine("\"defaultValue\": \"New\",");
-            builder.AppendLine("\"valueMapping\": {");
-            builder.AppendLine("\"Approved\": \"New\",");
-            builder.AppendLine("}");
-
-
-         return builder.ToString();
-
- }
             
 
         public bool ValidateTargetNodesExist(List<WorkItemData> workItems)
