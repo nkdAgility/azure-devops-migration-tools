@@ -562,7 +562,7 @@ namespace MigrationTools.Enrichers
                 contextLog.Fatal("!! There are {missingIterationPaths} IterationPaths found in the history of the Source that are missing from the Target. These MUST be added or mapped with a fieldMap before we can continue.", missingIterationPaths.Count);
                 foreach (string iterationPath in missingIterationPaths)
                 {
-                    contextLog.Warning("MISSING Iterationea: {iterationPath}", iterationPath);
+                    contextLog.Warning("MISSING Iteration: {iterationPath}", iterationPath);
                 }
                 passedValidation = false;
             }
