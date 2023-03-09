@@ -1,0 +1,5 @@
+{
+  "$type": "FieldSkipMapConfig",
+  "WorkItemTypeName": "*",
+  "targetField": "System.Description"
+}

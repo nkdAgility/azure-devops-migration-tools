@@ -4,7 +4,7 @@
 
 [Overview](../../../index.md) > [Reference](../../index.md) > [API v2](../index.md) > [FieldMaps](index.md)> **FieldBlankMapConfig**
 
-Allows you to blank an already populated field
+Allows you to skip populating an existing field. Value in target with be reset to its OriginalValue.
 
 ### Options
 
