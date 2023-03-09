@@ -1,8 +1,9 @@
 | FieldMaps | Status | Target    | Usage                              |
 |------------------------|---------|---------|------------------------------------------|
-| [FieldBlankMapConfig](Reference/v2/FieldMaps/FieldBlankMapConfig.md) | ready | Work Item Field | Allows you to blank an already populated field |
+| [FieldClearMapConfig](Reference/v2/FieldMaps/FieldClearMapConfig.md) | ready | Work Item | Allows you to set an already populated field to Null. This will only work with fields that support null. |
 | [FieldLiteralMapConfig](Reference/v2/FieldMaps/FieldLiteralMapConfig.md) | ready | Work Item Field | Sets a field on the `target` to b a specific value. |
 | [FieldMergeMapConfig](Reference/v2/FieldMaps/FieldMergeMapConfig.md) | ready | Work Item Field | Ever wanted to merge two or three fields? This mapping will let you do just that. |
+| [FieldSkipMapConfig](Reference/v2/FieldMaps/FieldSkipMapConfig.md) | ready | Work Item | Allows you to skip populating an existing field. Value in target with be reset to its OriginalValue. |
 | [FieldtoFieldMapConfig](Reference/v2/FieldMaps/FieldtoFieldMapConfig.md) | ready | Work Item Field | Just want to map one field to another? This is the one for you. |
 | [FieldtoFieldMultiMapConfig](Reference/v2/FieldMaps/FieldtoFieldMultiMapConfig.md) | ready | Work Item Field | Want to setup a bunch of field maps in a single go. Use this shortcut! |
 | [FieldtoTagMapConfig](Reference/v2/FieldMaps/FieldtoTagMapConfig.md) | ready | Work Item Field | Want to take a field and convert its value to a tag? Done... |

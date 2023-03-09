@@ -8,5 +8,6 @@
   },
   "IterationMaps": {
     "$type": "Dictionary`2"
-  }
+  },
+  "ShouldCreateMissingRevisionPaths": true
 }
