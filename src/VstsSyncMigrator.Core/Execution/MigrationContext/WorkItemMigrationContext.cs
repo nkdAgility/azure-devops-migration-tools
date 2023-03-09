@@ -161,8 +161,10 @@ namespace VstsSyncMigrator.Engine
                     sourceWorkItems.Count);
 
                 //////////////////////////////////////////////////
+                contextLog.Information("ValidateTargetNodesExist::Checking all Nodes on Work items");
                 if (!_nodeStructureEnricher.ValidateTargetNodesExist(sourceWorkItems))
                 {
+                    contextLog.Debug("ValidateTargetNodesExist::StopMigrationOnMissingAreaIterationNodes:{StopMigrationOnMissingAreaIterationNodes}", _config.StopMigrationOnMissingAreaIterationNodes);
                     if (_config.StopMigrationOnMissingAreaIterationNodes)
                     {
                         throw new Exception("Missing Iterations in Target preventing progress, check log for list. If you resolve with a FieldMap set StopMigrationOnMissingAreaIterationNodes = false in the config to continue.");

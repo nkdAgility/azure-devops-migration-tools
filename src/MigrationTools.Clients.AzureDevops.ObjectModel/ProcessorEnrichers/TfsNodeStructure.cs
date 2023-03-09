@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,6 +10,7 @@ using Microsoft.TeamFoundation.Server;
 using MigrationTools._EngineV1.Clients;
 using MigrationTools.DataContracts;
 using MigrationTools.Endpoints;
+using MigrationTools.FieldMaps;
 using MigrationTools.Processors;
 using Newtonsoft.Json;
 using Serilog.Context;
@@ -103,7 +105,8 @@ namespace MigrationTools.Enrichers
 
             if (!Regex.IsMatch(sourceNodePath, lastResortRule.Key, RegexOptions.IgnoreCase))
             {
-                throw new InvalidOperationException($"This path is not anchored in the source project name: {sourceNodePath}");
+                Log.LogWarning("NodeStructureEnricher.NodePathNotAnchoredException({sourceNodePath}, {nodeStructureType})", sourceNodePath, nodeStructureType.ToString());
+                throw new NodePathNotAnchoredException($"This path is not anchored in the source project name: {sourceNodePath}");
             }
 
             return Regex.Replace(sourceNodePath, lastResortRule.Key, lastResortRule.Value);
@@ -476,14 +479,11 @@ namespace MigrationTools.Enrichers
                                  .Any(onePath => onePath.StartsWith(userFriendlyPath)) : false;
         }
 
-        public List<string> CheckForMissingPaths(List<WorkItemData> workItems, TfsNodeStructureType nodeType)
+        public string GetFieldNameFromTfsNodeStructureType(TfsNodeStructureType nodeType)
         {
-            EntryForProcessorType(null);
-            _targetCommonStructureService.ClearProjectInfoCache();
-
             string fieldName = "";
             switch (nodeType)
-             {
+            {
                 case TfsNodeStructureType.Iteration:
                     fieldName = "System.IterationPath";
                     break;
@@ -492,6 +492,15 @@ namespace MigrationTools.Enrichers
                     break;
 
             }
+            return fieldName;
+        }
+
+        public List<string> CheckForMissingPaths(List<WorkItemData> workItems, TfsNodeStructureType nodeType)
+        {
+            EntryForProcessorType(null);
+            _targetCommonStructureService.ClearProjectInfoCache();
+
+            string fieldName = GetFieldNameFromTfsNodeStructureType(nodeType);
 
             List<string> areaPaths = workItems.SelectMany(x => x.Revisions.Values)
                 .Where(x => x.Fields[fieldName].Value.ToString().Contains("\\"))
@@ -503,23 +512,35 @@ namespace MigrationTools.Enrichers
 
             foreach (var areaPath in areaPaths)
             {
-                var newpath = GetNewNodeName(areaPath, nodeType);
-                var systempath  = GetSystemPath(newpath, nodeType);
+                var newpath = "";
+                bool keepProcessing = true;
                 try
                 {
-                    NodeInfo c = _targetCommonStructureService.GetNodeFromPath(systempath);
+                    newpath = GetNewNodeName(areaPath, nodeType);
                 }
-                catch
-                {
-                    if (_Options.ShouldCreateMissingRevisionPaths && ShouldCreateNode(systempath))
-                        GetOrCreateNode(systempath, null, null);
-                    else
-                        missingPaths.Add(newpath);
+                catch(NodePathNotAnchoredException ex) {
+                    keepProcessing = false;
+                    missingPaths.Add(newpath);
+                }
+                if (!keepProcessing) {
+                    var systempath  = GetSystemPath(newpath, nodeType);
+                    try
+                    {
+                        NodeInfo c = _targetCommonStructureService.GetNodeFromPath(systempath);
+                    }
+                    catch
+                    {
+                        if (_Options.ShouldCreateMissingRevisionPaths && ShouldCreateNode(systempath))
+                            GetOrCreateNode(systempath, null, null);
+                        else
+                            missingPaths.Add(newpath);
 
+                    }
                 }
             }
             return missingPaths;
         }
+            
 
         public bool ValidateTargetNodesExist(List<WorkItemData> workItems)
         {
@@ -532,6 +553,7 @@ namespace MigrationTools.Enrichers
                 {
                     contextLog.Warning("MISSING Area: {areaPath}", areaPath);
                 }
+
                 passedValidation = false;
             }
             List<string> missingIterationPaths = CheckForMissingPaths(workItems, TfsNodeStructureType.Iteration);
@@ -540,7 +562,7 @@ namespace MigrationTools.Enrichers
                 contextLog.Fatal("!! There are {missingIterationPaths} IterationPaths found in the history of the Source that are missing from the Target. These MUST be added or mapped with a fieldMap before we can continue.", missingIterationPaths.Count);
                 foreach (string iterationPath in missingIterationPaths)
                 {
-                    contextLog.Warning("MISSING Iterationea: {iterationPath}", iterationPath);
+                    contextLog.Warning("MISSING Iteration: {iterationPath}", iterationPath);
                 }
                 passedValidation = false;
             }
