@@ -163,8 +163,7 @@ namespace MigrationTools.Enrichers
                     _pathToKnownNodeMap.TryGetValue(currentAncestorPath, out parentNode);
                     if (parentNode == null)
                     {
-                        parentNode = _sourceRootNodes.Where(n => n.Path.ToLower().StartsWith(currentAncestorPath)).SingleOrDefault();
-                        _pathToKnownNodeMap[parentNode.Path] = parentNode;
+                        parentNode= _targetCommonStructureService.GetNodeFromPath(currentAncestorPath);
                     }
                 }
                 else
