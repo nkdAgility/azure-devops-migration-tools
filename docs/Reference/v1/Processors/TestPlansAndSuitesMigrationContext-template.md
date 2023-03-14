@@ -20,6 +20,8 @@
 
 ### Additional Samples & Info
 
+To run a full plans and suits you should run the three processors in this order below.  `TestVariablesMigrationConfig` and `TestConfigurationsMigrationConfig` only need run once.
+
 ```json
 "Processors": [
     {
