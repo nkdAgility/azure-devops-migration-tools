@@ -230,6 +230,7 @@ namespace MigrationTools._EngineV1.Configuration.Processing
             UpdateCreatedDate = true;
             SkipToFinalRevisedWorkItemType = true;
             StopMigrationOnMissingAreaIterationNodes = true;
+
             LinkMigrationSaveEachAsAdded = false;
             GenerateMigrationComment = true;
             WIQLQueryBit = @"AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')";
