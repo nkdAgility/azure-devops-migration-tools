@@ -496,12 +496,6 @@
             </summary>
             <default>0</default>
         </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.NodeStructureEnricherEnabled">
-            <summary>
-            
-            </summary>
-            <default>?</default>
-        </member>
         <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.UseCommonNodeStructureEnricherConfig">
             <summary>
             

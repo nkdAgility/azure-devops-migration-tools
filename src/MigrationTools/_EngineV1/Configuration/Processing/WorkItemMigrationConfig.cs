@@ -154,12 +154,6 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         /// 
         /// </summary>
         /// <default>?</default>
-        public bool? NodeStructureEnricherEnabled { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <default>?</default>
         public bool UseCommonNodeStructureEnricherConfig { get; set; }
 
         /// <summary>
