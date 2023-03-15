@@ -161,6 +161,10 @@ namespace MigrationTools.Enrichers
                         ? match.Groups["parentPath"].Value
                         : string.Empty;
                     _pathToKnownNodeMap.TryGetValue(currentAncestorPath, out parentNode);
+                    if (parentNode == null)
+                    {
+                        parentNode= _targetCommonStructureService.GetNodeFromPath(currentAncestorPath);
+                    }
                 }
                 else
                 {
@@ -498,6 +502,7 @@ namespace MigrationTools.Enrichers
         public List<string> CheckForMissingPaths(List<WorkItemData> workItems, TfsNodeStructureType nodeType)
         {
             EntryForProcessorType(null);
+            contextLog.Debug("TfsNodeStructure:CheckForMissingPaths");
             _targetCommonStructureService.ClearProjectInfoCache();
 
             string fieldName = GetFieldNameFromTfsNodeStructureType(nodeType);
@@ -512,29 +517,41 @@ namespace MigrationTools.Enrichers
 
             foreach (var areaPath in areaPaths)
             {
+                contextLog.Debug($"TfsNodeStructure:CheckForMissingPaths:Checking::{areaPath}");
                 var newpath = "";
                 bool keepProcessing = true;
                 try
                 {
                     newpath = GetNewNodeName(areaPath, nodeType);
+                    contextLog.Debug($"TfsNodeStructure:CheckForMissingPaths:newpath::{newpath}");
                 }
                 catch(NodePathNotAnchoredException ex) {
+                    contextLog.Debug($"TfsNodeStructure:CheckForMissingPaths:NodePathNotAnchoredException::{areaPath}");
                     keepProcessing = false;
                     missingPaths.Add(newpath);
                 }
-                if (!keepProcessing) {
+                if (keepProcessing) {
                     var systempath  = GetSystemPath(newpath, nodeType);
                     try
                     {
+                        contextLog.Debug($"TfsNodeStructure:CheckForMissingPaths:CheckTarget::{systempath}");
                         NodeInfo c = _targetCommonStructureService.GetNodeFromPath(systempath);
+                        contextLog.Debug($"TfsNodeStructure:CheckForMissingPaths:CheckTarget::{systempath}::FOUND");
                     }
                     catch
                     {
+                        contextLog.Debug($"TfsNodeStructure:CheckForMissingPaths:CheckTarget::{systempath}::NOTFOUND");
                         if (_Options.ShouldCreateMissingRevisionPaths && ShouldCreateNode(systempath))
+                        {
+                        
+                            contextLog.Debug($"TfsNodeStructure:CheckForMissingPaths:CheckTarget::{systempath}::CREATE");
                             GetOrCreateNode(systempath, null, null);
+                        }
                         else
+                        { 
                             missingPaths.Add(newpath);
-
+                            contextLog.Debug($"TfsNodeStructure:CheckForMissingPaths:CheckTarget::{systempath}::LOG-ONLY");
+                        }
                     }
                 }
             }

@@ -9,7 +9,7 @@
     "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
     "AuthenticationMode": "AccessToken",
     "AllowCrossProjectLinking": false,
-    "PersonalAccessToken": "skakun6of2s6bbkxpav6pj7altpko5uirtl6msjqh2qkuxaovwja",
+    "PersonalAccessToken": "rrsne75npwj5ctn5vm337nrxiqlvdkfmcbkqrubl6ushts6syi5a",
     "LanguageMaps": {
       "AreaPath": "Area",
       "IterationPath": "Iteration"
@@ -22,7 +22,7 @@
     "ReflectedWorkItemIDFieldName": "nkdScrum.ReflectedWorkItemId",
     "AuthenticationMode": "AccessToken",
     "AllowCrossProjectLinking": false,
-    "PersonalAccessToken": "skakun6of2s6bbkxpav6pj7altpko5uirtl6msjqh2qkuxaovwja",
+    "PersonalAccessToken": "rrsne75npwj5ctn5vm337nrxiqlvdkfmcbkqrubl6ushts6syi5a",
     "LanguageMaps": {
       "AreaPath": "Area",
       "IterationPath": "Iteration"
@@ -40,6 +40,16 @@
     "sourceWorkItemTypeName": "targetWorkItemTypeName"
   },
   "GitRepoMapping": null,
+  "CommonEnrichersConfig": [
+    {
+      "$type": "TfsNodeStructureOptions",
+      "PrefixProjectToNodes": false,
+      "NodeBasePaths": [],
+      "AreaMaps": {},
+      "IterationMaps": {},
+      "ShouldCreateMissingRevisionPaths": false
+    }
+  ],
   "Processors": [
     //{
     //  "$type": "WorkItemDeleteConfig",
@@ -71,7 +81,8 @@
       "WorkItemIDs": null,
       "MaxRevisions": 0,
       "NodeStructureEnricherEnabled": true,
-      "UseCommonNodeStructureEnricherConfig": false,
+      "UseCommonNodeStructureEnricherConfig": true,
+      "StopMigrationOnMissingAreaIterationNodes": false,
       "NodeBasePaths": [],
       "AreaMaps": {},
       "IterationMaps": {},
