@@ -496,11 +496,13 @@
             </summary>
             <default>0</default>
         </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.StopMigrationOnMissingAreaIterationNodes">
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.UseCommonNodeStructureEnricherConfig">
             <summary>
             
             </summary>
-            <default>?</default>public bool UseCommonNodeStructureEnricherConfig { get; set; }
+            <default>?</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.StopMigrationOnMissingAreaIterationNodes">
             <summary>
             
             </summary>
