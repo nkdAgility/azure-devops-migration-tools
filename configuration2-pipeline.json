@@ -1,0 +1,63 @@
+{
+  "Version": "0.0",
+  "LogLevel": "Verbose",
+  "MappingTools": [],
+  "Endpoints": {
+    "AzureDevOpsEndpoints": [
+      {
+        "Name": "Source",
+        "AccessToken": "rrsne75npwj5ctn5vm337nrxiqlvdkfmcbkqrubl6ushts6syi5a",
+        "Query": {
+          "Query": "SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan') ORDER BY [System.ChangedDate] desc",
+          "Parameters": {
+            "TeamProject": "MigrationSource1"
+          }
+        },
+        "Organisation": "https://dev.azure.com/nkdagility-preview/",
+        "Project": "migrationSource1",
+        "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
+        "AuthenticationMode": "AccessToken",
+        "AllowCrossProjectLinking": false,
+        "LanguageMaps": {
+          "AreaPath": "Area",
+          "IterationPath": "Iteration"
+        }
+      },
+      {
+        "Name": "Target",
+        "AccessToken": "rrsne75npwj5ctn5vm337nrxiqlvdkfmcbkqrubl6ushts6syi5a",
+        "Query": {
+          "Query": "SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan') ORDER BY [System.ChangedDate] desc"
+        },
+        "Organisation": "https://dev.azure.com/nkdagility-preview/",
+        "Project": "migrationTarget1",
+        "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
+        "AuthenticationMode": "AccessToken",
+        "AllowCrossProjectLinking": false,
+        "LanguageMaps": {
+          "AreaPath": "Area",
+          "IterationPath": "Iteration"
+        }
+      }
+    ]
+  },
+  "Source": null,
+  "Target": null,
+  "Processors": [
+    {
+      "$type": "AzureDevOpsPipelineProcessorOptions",
+      "Enabled": true,
+      "MigrateBuildPipelines": true,
+      "MigrateReleasePipelines": true,
+      "MigrateTaskGroups": true,
+      "MigrateVariableGroups": true,
+      "MigrateServiceConnections": true,
+      "BuildPipelines": null,
+      "ReleasePipelines": null,
+      "RefName": null,
+      "SourceName": "Source",
+      "TargetName": "Target",
+      "RepositoryNameMaps": {}
+    }
+  ]
+}
