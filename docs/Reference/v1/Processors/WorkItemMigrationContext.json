@@ -21,7 +21,6 @@
   "GenerateMigrationComment": true,
   "WorkItemIDs": null,
   "MaxRevisions": 0,
-  "NodeStructureEnricherEnabled": null,
   "UseCommonNodeStructureEnricherConfig": false,
   "StopMigrationOnMissingAreaIterationNodes": true,
   "NodeBasePaths": null,

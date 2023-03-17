@@ -101,7 +101,7 @@ namespace VstsSyncMigrator.Engine
             {
                 _nodeStructureEnricher.Configure(new TfsNodeStructureOptions
                 {
-                    Enabled = _config.NodeStructureEnricherEnabled ?? true,
+                    Enabled = true,
                     NodeBasePaths = _config.NodeBasePaths,
                     PrefixProjectToNodes = _config.PrefixProjectToNodes,
                     AreaMaps = _config.AreaMaps ?? new Dictionary<string, string>(),

@@ -25,7 +25,6 @@ WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links,
 | MaxGracefulFailures | Int32 | The maximum number of failures to tolerate before the migration fails. When set above zero, a work item migration error is logged but the migration will continue until the number of failed items reaches the configured value, after which the migration fails. | 0 |
 | MaxRevisions | Int32 | Sets the maximum number of revisions that will be migrated. "First + Last N = Max". If this was set to 5 and there were 10 revisions you would get the first 1 (creation) and the latest 4 migrated. | 0 |
 | NodeBasePaths | String[] | The root paths of the Ares / Iterations you want migrate. See [NodeBasePath Configuration](#nodebasepath-configuration) | ["/"] |
-| NodeStructureEnricherEnabled | Nullable |  | ? |
 | PauseAfterEachWorkItem | Boolean | Pause after each work item is migrated | false |
 | PrefixProjectToNodes | Boolean | Prefix your iterations and areas with the project name. If you have enabled this in `NodeStructuresMigrationConfig` you must do it here too. | false |
 | ReplayRevisions | Boolean | You can choose to migrate the tip only (a single write) or all of the revisions (many writes). If you are setting this to `false` to migrate only the tip then you should set `BuildFieldTable` to `true`. | true |
@@ -68,7 +67,6 @@ WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links,
   "GenerateMigrationComment": true,
   "WorkItemIDs": null,
   "MaxRevisions": 0,
-  "NodeStructureEnricherEnabled": null,
   "UseCommonNodeStructureEnricherConfig": false,
   "StopMigrationOnMissingAreaIterationNodes": true,
   "NodeBasePaths": null,
