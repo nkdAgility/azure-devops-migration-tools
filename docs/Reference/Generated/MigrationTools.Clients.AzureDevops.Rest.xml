@@ -175,12 +175,28 @@
             <param name="targetDefinitions"></param>
             <returns>List of filtered Definitions</returns>
         </member>
+        <member name="M:MigrationTools.Processors.AzureDevOpsPipelineProcessor.FilterOutIncompatibleBuildDefinitions(System.Collections.Generic.IEnumerable{MigrationTools.DataContracts.Pipelines.BuildDefinition},System.Collections.Generic.IEnumerable{MigrationTools.DataContracts.Pipelines.TaskDefinition})">
+            <summary>
+            Filter incompatible TaskGroups
+            </summary>
+            <param name="filteredTaskGroups"></param>
+            <param name="availableTasks"></param>
+            <returns>List of filtered Definitions</returns>
+        </member>
         <member name="M:MigrationTools.Processors.AzureDevOpsPipelineProcessor.FilterOutExistingTaskGroups(System.Collections.Generic.IEnumerable{MigrationTools.DataContracts.Pipelines.TaskGroup},System.Collections.Generic.IEnumerable{MigrationTools.DataContracts.Pipelines.TaskGroup})">
             <summary>
             Filter existing TaskGroups
             </summary>
             <param name="sourceDefinitions"></param>
             <param name="targetDefinitions"></param>
+            <returns>List of filtered Definitions</returns>
+        </member>
+        <member name="M:MigrationTools.Processors.AzureDevOpsPipelineProcessor.FilterOutIncompatibleTaskGroups(System.Collections.Generic.IEnumerable{MigrationTools.DataContracts.Pipelines.TaskGroup},System.Collections.Generic.IEnumerable{MigrationTools.DataContracts.Pipelines.TaskDefinition})">
+            <summary>
+            Filter incompatible TaskGroups
+            </summary>
+            <param name="filteredTaskGroups"></param>
+            <param name="availableTasks"></param>
             <returns>List of filtered Definitions</returns>
         </member>
         <member name="M:MigrationTools.Processors.AzureDevOpsPipelineProcessor.SortDefinitionsByVersion(System.Collections.Generic.IEnumerable{MigrationTools.DataContracts.Pipelines.TaskGroup})">
