@@ -4,6 +4,10 @@
       "commandName": "Project",
       "commandLineArgs": "execute -c configuration.json"
     },
+    "executepipe": {
+      "commandName": "Project",
+      "commandLineArgs": "execute -c configuration2-pipeline.json"
+    },
     "init": {
       "commandName": "Project",
       "commandLineArgs": "init --options Full"
