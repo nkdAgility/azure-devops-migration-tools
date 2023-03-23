@@ -362,7 +362,7 @@ namespace MigrationTools.Processors
         private void MapRepositoriesInBuidDefinition(IEnumerable<GitRepository> sourceRepositories, IEnumerable<GitRepository> targetRepositories, BuildDefinition definitionToBeMigrated)
         {
             var sourceRepoId = definitionToBeMigrated.Repository.Id;
-            string sourceRepositoryName = sourceRepositories.FirstOrDefault(s => s.Id == sourceRepoId)?.Name;
+            string sourceRepositoryName = sourceRepositories.FirstOrDefault(s => s.Id == sourceRepoId)?.Name ?? string.Empty;
             string targetRepoId;
 
             if (_Options.RepositoryNameMaps.ContainsKey(sourceRepositoryName))  //Map repository name if configured
