@@ -2,8 +2,12 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.VisualStudio.Services.Common;
+using Microsoft.VisualStudio.Services.UserMapping;
 using MigrationTools.DataContracts;
 using MigrationTools.DataContracts.Pipelines;
 using MigrationTools.Endpoints;
@@ -310,6 +314,7 @@ namespace MigrationTools.Processors
 
 
                 MapRepositoriesInBuidDefinition(sourceRepositories, targetRepositories, definitionToBeMigrated);
+                MapServiceConnectionsInBuidDefinition(sourceServiceConnections, targetServiceConnections, definitionToBeMigrated);
 
                 if (TaskGroupMapping is not null)
                 {
@@ -359,6 +364,38 @@ namespace MigrationTools.Processors
             return mappings;
         }
 
+        private void MapServiceConnectionsInBuidDefinition(IEnumerable<ServiceConnection> sourceServiceConnections, IEnumerable<ServiceConnection> targetServiceConnections, BuildDefinition definitionToBeMigrated)
+        {
+            definitionToBeMigrated.Process.Phases.ForEach(p =>
+            {
+                p.Steps.ForEach(s =>
+                {
+                    var mappings = new List<KeyValuePair<string, string>>();
+                    s.Inputs.ForEach(i =>
+                    {
+                        if (Guid.TryParse(i.Value.ToString(), out Guid currentGuid))
+                        {
+                            var sourceServiceConnection = sourceServiceConnections.FirstOrDefault(ssc => ssc.Id == i.Value.ToString());
+                            if (sourceServiceConnection == null) return;
+                            var targetServiceConnection = targetServiceConnections.FirstOrDefault(tsc => tsc.Name == sourceServiceConnection.Name);
+                            if (targetServiceConnection == null) return;
+                            Log.LogInformation($"- Updating service connection {p.Name}/{s.DisplayName}/{i.Key} {sourceServiceConnection.Id} to {targetServiceConnection.Id}...");
+                            mappings.Add(new KeyValuePair<string, string>(i.Key, i.Value.ToString()));
+                        }
+                    });
+                    mappings.ForEach(m =>
+                    {
+                        s.Inputs.AddOrUpdate(m.Key,m.Value, Update);
+                    });
+                });
+            });
+        }
+
+        private object Update(object arg1, object arg2)
+        {
+            return arg2;
+        }
+
         private void MapRepositoriesInBuidDefinition(IEnumerable<GitRepository> sourceRepositories, IEnumerable<GitRepository> targetRepositories, BuildDefinition definitionToBeMigrated)
         {
             var sourceRepoId = definitionToBeMigrated.Repository.Id;
@@ -373,6 +410,7 @@ namespace MigrationTools.Processors
             {
                 targetRepoId = targetRepositories.FirstOrDefault(r => sourceRepositoryName == r.Name)?.Id;
             }
+            Log.LogInformation($"- Updating repository {definitionToBeMigrated.Name} {definitionToBeMigrated.Repository.Id} to {targetRepoId}...");
             definitionToBeMigrated.Repository.Id = targetRepoId;
         }
 
@@ -591,9 +629,33 @@ namespace MigrationTools.Processors
 
             var sourceDefinitions = await Source.GetApiDefinitionsAsync<ServiceConnection>();
             var targetDefinitions = await Target.GetApiDefinitionsAsync<ServiceConnection>();
-            var mappings = await Target.CreateApiDefinitionsAsync(FilterOutExistingDefinitions(sourceDefinitions, targetDefinitions));
-            mappings.AddRange(FindExistingMappings(sourceDefinitions, targetDefinitions, mappings));
+
+            var updatedSourceDefinitions = UpdateProjectReferences(sourceDefinitions, targetDefinitions, await Source.GetProject(), await Target.GetProject());
+            var mappings = await Target.CreateApiDefinitionsAsync(FilterOutExistingDefinitions(updatedSourceDefinitions, targetDefinitions));
+            mappings.AddRange(FindExistingMappings(updatedSourceDefinitions, targetDefinitions, mappings));
             return mappings;
+        }
+
+        private IEnumerable<ServiceConnection> UpdateProjectReferences(IEnumerable<ServiceConnection> sourceDefinitions, IEnumerable<ServiceConnection> targetDefinitions, Project sourceProject, Project targetProject)
+        {
+            Log.LogInformation($"Updating Service Connections project references..");
+
+            var projectReference = targetDefinitions.First().ServiceEndpointProjectReferences.First().ProjectReference;
+            sourceDefinitions.ForEach(sc =>
+            {
+                sc.ServiceEndpointProjectReferences.ForEach(sepr =>
+                {
+                    if (sepr.ProjectReference.Id == sourceProject.Id)
+                    {
+                        Log.LogInformation($"- Updating {sc.Name} with {targetProject.Id} and {targetProject.Name}");
+
+                        sepr.ProjectReference.Id = targetProject.Id;
+                        sepr.ProjectReference.Name = targetProject.Name;
+                    }
+                });
+            });
+
+            return sourceDefinitions;
         }
 
         private async Task<IEnumerable<Mapping>> CreateTaskGroupDefinitionsAsync()

@@ -247,6 +247,27 @@ namespace MigrationTools.Endpoints
             return await httpResponse.Content.ReadAsAsync<DefinitionType>();
         }
 
+        public async Task<Project> GetProject()
+        {
+            var apiPathAttribute = typeof(Project).GetCustomAttributes(typeof(ApiPathAttribute), false).OfType<ApiPathAttribute>().FirstOrDefault();
+            if (apiPathAttribute == null)
+            {
+                throw new ArgumentNullException($"On the class defintion of '{typeof(Project).Name}' is the attribute 'ApiName' misssing. Please add the 'ApiName' Attribute to your class");
+            }
+
+            var baseUrl = new UriBuilder(Options.Organisation);
+            baseUrl.AppendPathSegments("_apis", apiPathAttribute.Path,Options.Project);
+            var client = CreateHttpClientWithHeaders(baseUrl.Uri.AbsoluteUri.ToString(), "api-version=7.0");
+
+            var httpResponse = await client.GetAsync("");
+            if (!httpResponse.IsSuccessStatusCode)
+            {
+                throw new Exception($"Failed on call to get individual [{typeof(Project).Name}].\r\nUrl: GET {httpResponse.RequestMessage.RequestUri}\r\n{await httpResponse.Content.ReadAsStringAsync()}");
+            }
+
+            return await httpResponse.Content.ReadAsAsync<Project>();
+        }
+
         /// <summary>
         /// Make HTTP Request to add Revision / Version of Task Group
         /// </summary>

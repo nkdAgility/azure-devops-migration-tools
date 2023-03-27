@@ -277,23 +277,6 @@ namespace MigrationTools.DataContracts.Pipelines
         public int Type { get; set; }
     }
 
-    public partial class Project
-    {
-        public string Id { get; set; }
-
-        public string Name { get; set; }
-
-        public Uri Url { get; set; }
-
-        public string State { get; set; }
-
-        public long Revision { get; set; }
-
-        public string Visibility { get; set; }
-
-        public DateTimeOffset LastUpdateTime { get; set; }
-    }
-
     public partial class Queue
     {
         public QueueLinks Links { get; set; }

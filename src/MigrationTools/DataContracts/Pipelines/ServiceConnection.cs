@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Microsoft.VisualStudio.Services.Common.Internal;
+using Microsoft.VisualStudio.Services.ServiceEndpoints;
 using Microsoft.VisualStudio.Services.ServiceEndpoints.WebApi;
 using Microsoft.VisualStudio.Services.WebApi;
 using Newtonsoft.Json.Linq;
@@ -18,6 +19,13 @@ namespace MigrationTools.DataContracts.Pipelines
         // Summary: Gets or sets the type of the endpoint.
         [DataMember(EmitDefaultValue = false)]
         public string Type
+        {
+            get;
+            set;
+        }
+
+        [DataMember(EmitDefaultValue = false)]
+        public ServiceEndpointProjectReference[] ServiceEndpointProjectReferences
         {
             get;
             set;
