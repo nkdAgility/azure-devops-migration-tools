@@ -65,3 +65,9 @@ It supports, new fields, updated fields, moved fields, new groups, updated group
 ...
 }
 ```
+
+#### Example Full
+
+```
+<Import:v2\processors\ProcessDefinitionProcessor-Full.json>
+```
