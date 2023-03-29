@@ -185,8 +185,7 @@ namespace MigrationTools.Endpoints
             {
                 var definitions = await httpResponse.Content.ReadAsAsync<RestResultDefinition<DefinitionType>>();
 
-                // Taskgroups only have a LIST option, so the following step is not needed
-                if (!typeof(DefinitionType).ToString().Contains("TaskGroup") && queryForDetails)
+                if (queryForDetails)
                 {
                     var client2 = GetHttpClient<DefinitionType>(routeParameters);
                     foreach (RestApiDefinition definition in definitions.Value)

@@ -157,6 +157,39 @@ namespace MigrationTools.Processors
         }
 
         /// <summary>
+        /// Filter incompatible TaskGroups
+        /// </summary>
+        /// <param name="filteredTaskGroups"></param>
+        /// <param name="availableTasks"></param>
+        /// <returns>List of filtered Definitions</returns>
+        private IEnumerable<BuildDefinition> FilterOutIncompatibleBuildDefinitions(IEnumerable<BuildDefinition> sourceDefinitions, IEnumerable<TaskDefinition> availableTasks)
+        {
+            var objectsToMigrate = sourceDefinitions.Where(g =>
+            {
+                var missingTasksNames = new List<string>();
+                var allTasksAreAvailable = g.Process.Phases.Select(p => p.Steps).SelectMany(s => s).All(t =>
+                {
+                    if (availableTasks.Any(a => a.Id == t.Task.Id))
+                    {
+                        return true;
+                    }
+                    missingTasksNames.Add(t.DisplayName);
+                    return false;
+                });
+
+                if (!allTasksAreAvailable)
+                {
+                    Log.LogWarning(
+                        @"{DefinitionType} ""{DefinitionName}"" cannot be migrated because the Task(s) ""{MissingTaskNames}"" are not available. This usually happens if the extension for the task is not installed.",
+                        typeof(BuildDefinition).Name, g.Name, string.Join(",", missingTasksNames));
+                    return false;
+                }
+                return true;
+            });
+            return objectsToMigrate;
+        }
+
+        /// <summary>
         /// Filter existing TaskGroups
         /// </summary>
         /// <param name="sourceDefinitions"></param>
@@ -167,6 +200,39 @@ namespace MigrationTools.Processors
             var objectsToMigrate = sourceDefinitions.Where(s => !targetDefinitions.Any(t => t.Name == s.Name));
             var rootSourceDefinitions = SortDefinitionsByVersion(objectsToMigrate).First();
             Log.LogInformation("{ObjectsToBeMigrated} of {TotalObjects} source {DefinitionType}(s) are going to be migrated..", objectsToMigrate.GroupBy(o => o.Name).Where(o => o.Count() >= 1).Count(), rootSourceDefinitions.Count(), typeof(TaskGroup).Name);
+            return objectsToMigrate;
+        }
+
+        /// <summary>
+        /// Filter incompatible TaskGroups
+        /// </summary>
+        /// <param name="filteredTaskGroups"></param>
+        /// <param name="availableTasks"></param>
+        /// <returns>List of filtered Definitions</returns>
+        private IEnumerable<TaskGroup> FilterOutIncompatibleTaskGroups(IEnumerable<TaskGroup> filteredTaskGroups, IEnumerable<TaskDefinition> availableTasks)
+        {
+            var objectsToMigrate = filteredTaskGroups.Where(g =>
+            {
+                var missingTasksNames = new List<string>();
+                var allTasksAreAvailable = g.Tasks.All(t =>
+                {
+                    if (availableTasks.Any(a => a.Id == t.Task.Id))
+                    {
+                        return true;
+                    }
+                    missingTasksNames.Add(t.DisplayName);
+                    return false;
+                });
+
+                if (!allTasksAreAvailable)
+                {
+                    Log.LogWarning(
+                        @"{DefinitionType} ""{DefinitionName}"" cannot be migrated because the Task(s) ""{MissingTaskNames}"" are not available. This usually happens if the extension for the task is not installed.",
+                        typeof(TaskGroup).Name, g.Name ,string.Join(",", missingTasksNames));
+                    return false;
+                }
+                return true;
+            });
             return objectsToMigrate;
         }
 
@@ -195,7 +261,7 @@ namespace MigrationTools.Processors
         /// <param name="definitionNames">The list of definitions to query for. If the value is <c>null</c> or an empty list, all definitions will be queried.</param>
         /// <returns></returns>
         private async Task<IEnumerable<DefinitionType>> GetSelectedDefinitionsFromEndpointAsync<DefinitionType>(AzureDevOpsEndpoint endpoint, List<string> definitionNames)
-            where DefinitionType: RestApiDefinition, new()
+            where DefinitionType : RestApiDefinition, new()
         {
             IEnumerable<Task<IEnumerable<DefinitionType>>> GetDefinitionListTasks(AzureDevOpsEndpoint endpoint, List<string> definitionNames) =>
                 definitionNames switch
@@ -225,13 +291,15 @@ namespace MigrationTools.Processors
 
             var sourceDefinitions = await GetSelectedDefinitionsFromEndpointAsync<BuildDefinition>(Source, _Options.BuildPipelines);
             var targetDefinitions = await GetSelectedDefinitionsFromEndpointAsync<BuildDefinition>(Target, _Options.BuildPipelines);
+            var availableTasks = await Target.GetApiDefinitionsAsync<TaskDefinition>(queryForDetails: false);
             var sourceServiceConnections = await Source.GetApiDefinitionsAsync<ServiceConnection>();
             var targetServiceConnections = await Target.GetApiDefinitionsAsync<ServiceConnection>();
             var sourceRepositories = await Source.GetApiDefinitionsAsync<GitRepository>(queryForDetails: false);
             var targetRepositories = await Target.GetApiDefinitionsAsync<GitRepository>(queryForDetails: false);
             var definitionsToBeMigrated = FilterOutExistingDefinitions(sourceDefinitions, targetDefinitions);
-
+            definitionsToBeMigrated = FilterOutIncompatibleBuildDefinitions(definitionsToBeMigrated, availableTasks).ToList();
             definitionsToBeMigrated = FilterAwayIfAnyMapsAreMissing(definitionsToBeMigrated, TaskGroupMapping, VariableGroupMapping);
+
             // Replace taskgroup and variablegroup sIds with tIds
             foreach (var definitionToBeMigrated in definitionsToBeMigrated)
             {
@@ -240,7 +308,7 @@ namespace MigrationTools.Processors
                     .FirstOrDefault(c => c.Id == sourceConnectedServiceId)?.Name == s.Name)?.Id;
                 definitionToBeMigrated.Repository.Properties.ConnectedServiceId = targetConnectedServiceId;
 
-                
+
                 MapRepositoriesInBuidDefinition(sourceRepositories, targetRepositories, definitionToBeMigrated);
 
                 if (TaskGroupMapping is not null)
@@ -294,7 +362,7 @@ namespace MigrationTools.Processors
         private void MapRepositoriesInBuidDefinition(IEnumerable<GitRepository> sourceRepositories, IEnumerable<GitRepository> targetRepositories, BuildDefinition definitionToBeMigrated)
         {
             var sourceRepoId = definitionToBeMigrated.Repository.Id;
-            string sourceRepositoryName = sourceRepositories.FirstOrDefault(s => s.Id == sourceRepoId)?.Name;
+            string sourceRepositoryName = sourceRepositories.FirstOrDefault(s => s.Id == sourceRepoId)?.Name ?? string.Empty;
             string targetRepoId;
 
             if (_Options.RepositoryNameMaps.ContainsKey(sourceRepositoryName))  //Map repository name if configured
@@ -532,9 +600,12 @@ namespace MigrationTools.Processors
         {
             Log.LogInformation($"Processing Taskgroups..");
 
-            var sourceDefinitions = await Source.GetApiDefinitionsAsync<TaskGroup>();
-            var targetDefinitions = await Target.GetApiDefinitionsAsync<TaskGroup>();
+            var sourceDefinitions = await Source.GetApiDefinitionsAsync<TaskGroup>(queryForDetails: false);
+            var targetDefinitions = await Target.GetApiDefinitionsAsync<TaskGroup>(queryForDetails: false);
+            var availableTasks = await Target.GetApiDefinitionsAsync<TaskDefinition>(queryForDetails: false);
             var filteredTaskGroups = FilterOutExistingTaskGroups(sourceDefinitions, targetDefinitions);
+            filteredTaskGroups = FilterOutIncompatibleTaskGroups(filteredTaskGroups, availableTasks).ToList();
+
             var rootSourceDefinitions = SortDefinitionsByVersion(filteredTaskGroups).First();
             var updatedSourceDefinitions = SortDefinitionsByVersion(filteredTaskGroups).Last();
 
@@ -572,8 +643,6 @@ namespace MigrationTools.Processors
             var mappings = await Target.CreateApiDefinitionsAsync(filteredDefinition);
             mappings.AddRange(FindExistingMappings(sourceDefinitions, targetDefinitions, mappings));
             return mappings;
-
-            
         }
     }
 }
