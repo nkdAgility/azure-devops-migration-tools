@@ -93,3 +93,59 @@ Process definition processor used to keep processes between two orgs in sync
 ...
 }
 ```
+
+#### Example Full
+
+```
+{
+  "Version": "12.8",
+  "ChangeSetMappingFile": null,
+  "Source": null,
+  "Target": null,
+  "FieldMaps": [],
+  "GitRepoMapping": null,
+  "LogLevel": "Debug",
+  "CommonEnrichersConfig": null,
+  "workaroundForQuerySOAPBugEnabled": false,
+  "WorkItemTypeDefinition": null,
+  "Endpoints": {
+    "AzureDevOpsEndpoints": [
+      {
+        "name": "Source",
+        "$type": "AzureDevOpsEndpointOptions",
+        "Organisation": "https://dev.azure.com/xxxx",
+        "Project": "SAM",
+        "AuthenticationMode": "AccessToken",
+        "AccessToken": "xxxxx",
+        "EndpointEnrichers": null
+      },
+      {
+        "Name": "Target",
+        "$type": "AzureDevOpsEndpointOptions",
+        "Organisation": "https://dev.azure.com/xxxx",
+        "Project": "SAM",
+        "AuthenticationMode": "AccessToken",
+        "AccessToken": "xxxx",
+        "EndpointEnrichers": null
+      }
+    ]
+  },
+  "Processors": [
+    {
+      "$type": "ProcessDefinitionProcessorOptions",
+      "Enabled": true,
+      "Processes": {
+        "Agile SAM - Migration Template": [
+          "User Story"
+        ]
+      },
+      "ProcessMaps": {
+        "Agile SAM - Migration Template": "SAM Agile Migrator"
+      },
+      "SourceName": "Source",
+      "TargetName": "Target",
+      "UpdateProcessDetails": true
+    }
+  ]
+}
+```
