@@ -26,8 +26,11 @@ plugins:
 
 kramdown:
   math_engine: mathjax
-  syntax_highlighter: rouge
+  syntax_highlighter: coderay
   auto_ids: true
+  syntax_highlighter_opts:
+    wrap: div
+
 
 relative_links:
   enabled:     true
