@@ -12,7 +12,7 @@ namespace VstsSyncMigrator.Engine
     /// </summary>
     /// <status>preview</status>
     /// <processingtarget>Shared Queries</processingtarget>
-    [Obsolete("WorkItemQueryMigrationContext has been migrated to TfsSharedQueryProcessor: https://nkdagility.github.io/azure-devops-migration-tools/Reference/Processors/TfsSharedQueryProcessor.html")]
+    [Obsolete("WorkItemQueryMigrationContext has been migrated to TfsSharedQueryProcessor: https://nkdagility.com/docs/azure-devops-migration-tools/Reference/Processors/TfsSharedQueryProcessor.html")]
     public class WorkItemQueryMigrationContext : MigrationProcessorBase
     {
         /// <summary>
@@ -40,7 +40,7 @@ namespace VstsSyncMigrator.Engine
         protected override void InternalExecute()
         {
             Log.LogCritical("*************MIGRATION ALERT!!!!!!!!!");
-            Log.LogCritical("WorkItemQueryMigrationContext has been migrated to TfsSharedQueryProcessor: https://nkdagility.github.io/azure-devops-migration-tools/Reference/Processors/TfsSharedQueryProcessor.html");
+            Log.LogCritical("WorkItemQueryMigrationContext has been migrated to TfsSharedQueryProcessor: https://nkdagility.com/docs/azure-devops-migration-tools/Reference/Processors/TfsSharedQueryProcessor.html");
         }
     }
 }
