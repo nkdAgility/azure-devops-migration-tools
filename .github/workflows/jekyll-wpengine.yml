@@ -38,13 +38,13 @@ jobs:
         uses: Dylan700/sftp-upload-action@v1.1.4
         with:
           server: nakedalmweb.sftp.wpengine.com
-          username: nakedalmweb-githubAzDo
+          username: nakedalmweb-learn
           password: ${{ secrets.SFTP_PASSWORD }}
           port: 2222
           # If true, outputs the results of the upload, without actually uploading.
           dry-run: false
           # A list of folders to upload in the format of `folder/ => upload_folder/`
           uploads: | 
-              ./_site/ => ./
+              ./_site/ => ./azure-devops-migration-tools
           # If true, any existing files in the remote upload directories are deleted.
           delete: true
