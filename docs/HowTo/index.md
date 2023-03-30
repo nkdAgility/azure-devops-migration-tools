@@ -18,7 +18,7 @@ You should be comfortable with the TFS/Azure DevOps/Github API's, as well as deb
 
 **Community support is available through [GitHub](https://github.com/nkdAgility/azure-devops-migration-tools) 
 and [StackOverflow](https://stackoverflow.com/questions/tagged/azure-devops-migration-tools); 
-Paid support is available through our [recommended consultants](http://nkdagility.github.io/azure-devops-migration-tools/#support) 
+Paid support is available through our [recommended consultants](https://nkdagility.com/docs/azure-devops-migration-tools/#support) 
 as well as our contributors and many DevOps consultants around the world.**
 
 

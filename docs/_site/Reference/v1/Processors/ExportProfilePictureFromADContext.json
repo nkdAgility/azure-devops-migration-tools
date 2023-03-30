@@ -1,8 +1,0 @@
-{
-  "$type": "ExportProfilePictureFromADConfig",
-  "Enabled": false,
-  "Domain": null,
-  "Username": null,
-  "Password": null,
-  "PictureEmpIDFormat": null
-}
