@@ -50,14 +50,24 @@
                 </article>
             </div>
             <div class="p-2 flex-fill d-none d-xl-block" style="min-width: 15vw;">
+                
+
                 {% if page.toc == true %}
-                <div class="card">
+                <div class="card mb-3">
                     <h5 class="no_toc card-header">In this article</h5>
                     <div class="card-body">
                         {{ content | toc_only }}
                     </div>
                 </div>
                 {% endif %}
+                <div class="card mb-3">
+                    <h5 class="no_toc card-header">Project Details</h5>
+                    <div class="card-body">
+                     <a href="https://chocolatey.org/packages/vsts-sync-migrator/"><img src="https://img.shields.io/chocolatey/dt/vsts-sync-migrator.svg" alt="Chocolatey"></a> 
+                     <a href="https://github.com/nkdAgility/azure-devops-migration-tools/releases"><img src="https://img.shields.io/github/release/nkdAgility/vsts-sync-migration.svg" alt="GitHub release"></a> 
+                     <img src="https://nkdagility.visualstudio.com/_apis/public/build/definitions/1b52ce63-eccc-41c8-88f9-ae6ebeefdc63/94/badge" alt="Build on VSTS"></p>
+                    </div>
+                </div>
             </div>
 
         </div>
