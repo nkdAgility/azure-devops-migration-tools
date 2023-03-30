@@ -1,0 +1,107 @@
+<h2 id="processors-keepoutboundlinktargetprocessor">Processors: KeepOutboundLinkTargetProcessor</h2>
+
+<blockquote>
+  <p><strong><em>This documentation is for a preview version of the Azure DevOps Migration Tools.</em> If you are not using the preview version then please head over to the main <a href="https://nkdagility.github.io/azure-devops-migration-tools">documentation</a>.</strong></p>
+</blockquote>
+
+<p><a href="/docs/index.md">Overview</a> &gt; <a href="/docs/Reference/index.md">Reference</a> &gt; <a href="/docs/Reference/v2/index.md">API v2</a> &gt; <a href="/docs/Reference/v2/Processors/index.md">Processors</a>&gt; <strong>KeepOutboundLinkTargetProcessor</strong></p>
+
+<p>missng XML code comments</p>
+
+<h3 id="options">Options</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>CleanupFileName</td>
+      <td>String</td>
+      <td>missng XML code comments</td>
+      <td>missng XML code comments</td>
+    </tr>
+    <tr>
+      <td>DryRun</td>
+      <td>Boolean</td>
+      <td>missng XML code comments</td>
+      <td>missng XML code comments</td>
+    </tr>
+    <tr>
+      <td>Enabled</td>
+      <td>Boolean</td>
+      <td>If set to <code class="language-plaintext highlighter-rouge">true</code> then the processor will run. Set to <code class="language-plaintext highlighter-rouge">false</code> and the processor will not run.</td>
+      <td>missng XML code comments</td>
+    </tr>
+    <tr>
+      <td>PrependCommand</td>
+      <td>String</td>
+      <td>missng XML code comments</td>
+      <td>missng XML code comments</td>
+    </tr>
+    <tr>
+      <td>ProcessorEnrichers</td>
+      <td>List</td>
+      <td>List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.</td>
+      <td>missng XML code comments</td>
+    </tr>
+    <tr>
+      <td>RefName</td>
+      <td>String</td>
+      <td><code class="language-plaintext highlighter-rouge">Refname</code> will be used in the future to allow for using named Options without the need to copy all of the options.</td>
+      <td>missng XML code comments</td>
+    </tr>
+    <tr>
+      <td>SourceName</td>
+      <td>String</td>
+      <td>missng XML code comments</td>
+      <td>missng XML code comments</td>
+    </tr>
+    <tr>
+      <td>TargetLinksToKeepOrganization</td>
+      <td>String</td>
+      <td>missng XML code comments</td>
+      <td>missng XML code comments</td>
+    </tr>
+    <tr>
+      <td>TargetLinksToKeepProject</td>
+      <td>String</td>
+      <td>missng XML code comments</td>
+      <td>missng XML code comments</td>
+    </tr>
+    <tr>
+      <td>TargetName</td>
+      <td>String</td>
+      <td>missng XML code comments</td>
+      <td>missng XML code comments</td>
+    </tr>
+    <tr>
+      <td>WIQLQueryBit</td>
+      <td>String</td>
+      <td>missng XML code comments</td>
+      <td>missng XML code comments</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="example-json">Example JSON</h3>
+
+<pre><code class="language-JSON">{
+  "$type": "KeepOutboundLinkTargetProcessorOptions",
+  "Enabled": false,
+  "WIQLQueryBit": "Select [System.Id] From WorkItems Where [System.TeamProject] = @project and not [System.WorkItemType] contains 'Test Suite, Test Plan,Shared Steps,Shared Parameter,Feedback Request'",
+  "TargetLinksToKeepOrganization": "https://dev.azure.com/nkdagility",
+  "TargetLinksToKeepProject": "9041895e-cb41-4ffb-9be2-c905bdb249f6",
+  "CleanupFileName": "c:/temp/OutboundLinkTargets.bat",
+  "PrependCommand": "start",
+  "DryRun": true,
+  "ProcessorEnrichers": null,
+  "SourceName": null,
+  "TargetName": null
+}
+</code></pre>

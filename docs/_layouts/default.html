@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    {% seo %}
+    <link rel="canonical" href="{{site.website}}{{site.baseurl}}{{page.url}}" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/3e6b2f4808.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="{{site.baseurl}}/assets/css/main.css">
+</head>
+<body>
+    {%- include header.html -%} 
+    <div class="mainContainer">
+        <div class="container-flow mt-5 m-5 d-flex mb-3">
+            <div class="p-2 justify-content-end d-none d-lg-block">
+                {%- include sidebar.html -%} 
+            </div>
+            <div class="p-2 flex-grow-1">
+                <article>
+                    <div class="container-flow content">
+                        <div class="d-flex justify-content-between">
+                            <div class="">
+                                {% include breadcrumbs.html %}
+                            </div>
+                            <div class="p-2 text-end">
+                                <a class="" target="_blank" title="Discuss this document" data-proofer-ignore href="https://github.com/nkdAgility/Scrum-Delivery-Kit-for-Software-Organisations/discussions/{% if page.discussionId != null %}{{ page.discussionId }}{% else %}new?category=general&title={{ page.title }}&body=%3E%20Title: {{ page.title }}%0d%0a%3E%20Path: {{ page.path }}%0d%0a%0d%0a--Start the discussion here ---{% endif %}">
+                                    <i class="fa-regular fa-comments"></i>
+                                </a>
+                                <a class="p-2" title="Edit this document" data-proofer-ignore href="https://github.com/nkdAgility/Scrum-Delivery-Kit-for-Software-Organisations/edit/main/src/{{ page.path }}">
+                                    <i class="fa-sharp fa-light fa-file-pen"></i> 
+                                </a>
+                            </div>
+                        </div>
+                        <div>
+                            <h1>{{ page.title }}</h1>
+                        </div>
+                        <div class="d-flex">
+                            <p>Article</p>
+                            <span>&nbsp;<i class="fa-solid fa-pipe"></i>&nbsp;</span>
+                            <p>{{ content | reading_time_as_i }} to read</p>
+                            <span>&nbsp;<i class="fa-solid fa-pipe"></i>&nbsp;</span>
+                            <p>{{ page.last_modified_at }}</p>
+                        </div>
+                        <div class="">
+                            {% include article-alert.html %}
+                            {{ content | inject_anchors }}
+                        </div>
+                    </div>
+                </article>
+            </div>
+            <div class="p-2 flex-fill d-none d-xl-block" style="min-width: 15vw;">
+                {% if page.toc == true %}
+                <div class="card">
+                    <h5 class="no_toc card-header">In this article</h5>
+                    <div class="card-body">
+                        {{ content | toc_only }}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+    <div class="container-fluid p-5 bg-secondary text-white text-center">
+        {%- include footer.html -%}
+    </div>
+</body>
+</html>
+

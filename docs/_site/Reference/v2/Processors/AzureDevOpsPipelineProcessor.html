@@ -1,0 +1,189 @@
+<h2 id="processors-azuredevopspipelineprocessor">Processors: AzureDevOpsPipelineProcessor</h2>
+
+<blockquote>
+  <p><strong><em>This documentation is for a preview version of the Azure DevOps Migration Tools.</em> If you are not using the preview version then please head over to the main <a href="https://nkdagility.github.io/azure-devops-migration-tools">documentation</a>.</strong></p>
+</blockquote>
+
+<p><a href="/azure-devops-migration-tools/">Overview</a> &gt; <a href="/azure-devops-migration-tools/Reference/">Reference</a> &gt; <a href="/azure-devops-migration-tools/Reference/v2/">API v2</a> &gt; <a href="/azure-devops-migration-tools/Reference/v2/Processors/">Processors</a>&gt; <strong>AzureDevOpsPipelineProcessor</strong></p>
+
+<p>Azure DevOps Processor that migrates Taskgroups, Build- and Release Pipelines.</p>
+
+<h3 id="features">Features</h3>
+<ul>
+  <li>Migrates service connections</li>
+  <li>Migrates variable groups</li>
+  <li>Migrates task groups</li>
+  <li>Migrates classic and yml build pipelines</li>
+  <li>Migrates release pipelines</li>
+</ul>
+
+<h3 id="options">Options</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>BuildPipelines</td>
+      <td>List</td>
+      <td>List of Build Pipelines to process. If this is <code class="language-plaintext highlighter-rouge">null</code> then all Build Pipelines will be processed.</td>
+      <td>missng XML code comments</td>
+    </tr>
+    <tr>
+      <td>Enabled</td>
+      <td>Boolean</td>
+      <td>If set to <code class="language-plaintext highlighter-rouge">true</code> then the processor will run. Set to <code class="language-plaintext highlighter-rouge">false</code> and the processor will not run.</td>
+      <td>missng XML code comments</td>
+    </tr>
+    <tr>
+      <td>MigrateBuildPipelines</td>
+      <td>Boolean</td>
+      <td>Migrate Build Pipelines</td>
+      <td>true</td>
+    </tr>
+    <tr>
+      <td>MigrateReleasePipelines</td>
+      <td>Boolean</td>
+      <td>Migrate Release Pipelines</td>
+      <td>true</td>
+    </tr>
+    <tr>
+      <td>MigrateServiceConnections</td>
+      <td>Boolean</td>
+      <td>Migrate Service Connections <strong>secrets need to be entered manually</strong></td>
+      <td>true</td>
+    </tr>
+    <tr>
+      <td>MigrateTaskGroups</td>
+      <td>Boolean</td>
+      <td>Migrate Task Groups</td>
+      <td>true</td>
+    </tr>
+    <tr>
+      <td>MigrateVariableGroups</td>
+      <td>Boolean</td>
+      <td>Migrate Valiable Groups</td>
+      <td>true</td>
+    </tr>
+    <tr>
+      <td>ProcessorEnrichers</td>
+      <td>List</td>
+      <td>List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.</td>
+      <td>missng XML code comments</td>
+    </tr>
+    <tr>
+      <td>RefName</td>
+      <td>String</td>
+      <td><code class="language-plaintext highlighter-rouge">Refname</code> will be used in the future to allow for using named Options without the need to copy all of the options.</td>
+      <td>missng XML code comments</td>
+    </tr>
+    <tr>
+      <td>ReleasePipelines</td>
+      <td>List</td>
+      <td>List of Release Pipelines to process. If this is <code class="language-plaintext highlighter-rouge">null</code> then all Release Pipelines will be processed.</td>
+      <td>missng XML code comments</td>
+    </tr>
+    <tr>
+      <td>RepositoryNameMaps</td>
+      <td>Dictionary</td>
+      <td>Map of Source Repository to Target Repository Names</td>
+      <td>missng XML code comments</td>
+    </tr>
+    <tr>
+      <td>SourceName</td>
+      <td>String</td>
+      <td>missng XML code comments</td>
+      <td>missng XML code comments</td>
+    </tr>
+    <tr>
+      <td>TargetName</td>
+      <td>String</td>
+      <td>missng XML code comments</td>
+      <td>missng XML code comments</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="example-json">Example JSON</h3>
+
+<pre><code class="language-JSON">{
+  "$type": "AzureDevOpsPipelineProcessorOptions",
+  "Enabled": false,
+  "MigrateBuildPipelines": true,
+  "MigrateReleasePipelines": true,
+  "MigrateTaskGroups": true,
+  "MigrateVariableGroups": true,
+  "MigrateServiceConnections": true,
+  "BuildPipelines": null,
+  "ReleasePipelines": null,
+  "RepositoryNameMaps": null,
+  "ProcessorEnrichers": null,
+  "SourceName": "sourceName",
+  "TargetName": "targetName"
+}
+</code></pre>
+
+<h3 id="example-full-migration-from-v120">Example Full Migration from v12.0</h3>
+
+<p>The following file is an example that can be used in your <code class="language-plaintext highlighter-rouge">configuration.json</code> file to migrate Azure DevOps pipelines.</p>
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+    </span><span class="nl">"GitRepoMapping"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"LogLevel"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Information"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Processors"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+      </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"$type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"AzureDevOpsPipelineProcessorOptions"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"Enabled"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"MigrateBuildPipelines"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"MigrateReleasePipelines"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"MigrateTaskGroups"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"MigrateVariableGroups"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"MigrateServiceConnections"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"BuildPipelines"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"ReleasePipelines"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"RefName"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"SourceName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Source"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"TargetName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Target"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"RepositoryNameMaps"</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w">
+      </span><span class="p">}</span><span class="w">
+    </span><span class="p">],</span><span class="w">
+    </span><span class="nl">"Version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"12.0"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Endpoints"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"AzureDevOpsEndpoints"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+          </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Source"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"$type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"AzureDevOpsEndpointOptions"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"Organisation"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://dev.azure.com/source-org/"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"Project"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Awesome project"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"AuthenticationMode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"AccessToken"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"AccessToken"</span><span class="p">:</span><span class="w"> </span><span class="s2">"xxxxxx"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"EndpointEnrichers"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+          </span><span class="nl">"Name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Target"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"$type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"AzureDevOpsEndpointOptions"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"Organisation"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://dev.azure.com/target-org/"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"Project"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Cool project"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"AuthenticationMode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"AccessToken"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"AccessToken"</span><span class="p">:</span><span class="w"> </span><span class="s2">"xxxxxx"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"EndpointEnrichers"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+      </span><span class="p">]</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>If the repository in the target has a different name from the one that was used in the source project, you should map it.
+In the example above replace <code class="language-plaintext highlighter-rouge">"RepositoryNameMaps": {}</code> with the following:</p>
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nl">"RepositoryNameMaps"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"Awesome project"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Cool project"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<h1 id="important-note">Important note</h1>
+<p>When the application is creating service connections make sure you have proper permissions on Azure Active Directory and you can grant Contributor role to the subscription that was chosen.</p>

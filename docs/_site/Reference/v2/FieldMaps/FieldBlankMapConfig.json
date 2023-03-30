@@ -1,0 +1,5 @@
+{
+  "$type": "FieldBlankMapConfig",
+  "WorkItemTypeName": "*",
+  "targetField": "System.Description"
+}

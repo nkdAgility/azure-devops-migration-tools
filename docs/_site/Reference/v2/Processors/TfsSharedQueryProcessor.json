@@ -1,0 +1,10 @@
+{
+  "$type": "TfsSharedQueryProcessorOptions",
+  "Enabled": false,
+  "PrefixProjectToNodes": false,
+  "SharedFolderName": "Shared Queries",
+  "SourceToTargetFieldMappings": null,
+  "ProcessorEnrichers": null,
+  "SourceName": "sourceName",
+  "TargetName": "targetName"
+}

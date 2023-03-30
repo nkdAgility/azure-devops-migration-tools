@@ -1,0 +1,7 @@
+{
+  "$type": "FieldtoFieldMapConfig",
+  "WorkItemTypeName": "*",
+  "sourceField": "System.StackRank",
+  "targetField": "System.Rank",
+  "defaultValue": "1000"
+}

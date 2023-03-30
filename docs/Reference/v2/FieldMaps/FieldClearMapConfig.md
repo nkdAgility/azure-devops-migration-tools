@@ -1,8 +1,16 @@
-## FieldMaps: FieldClearMapConfig
+---
+title: FieldClearMapConfig
+layout: default
+pageType: reference
+classType: FieldMaps
+architecture: v2
+toc: true
+pageStatus: generated
+discussionId: 
+---
+
 
 >**_This documentation is for a preview version of the Azure DevOps Migration Tools._ If you are not using the preview version then please head over to the main [documentation](https://nkdagility.github.io/azure-devops-migration-tools).**
-
-[Overview](../../../index.md) > [Reference](../../index.md) > [API v2](../index.md) > [FieldMaps](index.md)> **FieldClearMapConfig**
 
 Allows you to set an already populated field to Null. This will only work with fields that support null.
 

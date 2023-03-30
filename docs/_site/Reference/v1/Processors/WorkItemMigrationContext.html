@@ -1,0 +1,523 @@
+<h2 id="processors-workitemmigrationcontext">Processors: WorkItemMigrationContext</h2>
+
+<blockquote>
+  <p><strong><em>This documentation is for a preview version of the Azure DevOps Migration Tools.</em> If you are not using the preview version then please head over to the main <a href="https://nkdagility.github.io/azure-devops-migration-tools">documentation</a>.</strong></p>
+</blockquote>
+
+<p><a href="/azure-devops-migration-tools/">Overview</a> &gt; <a href="/azure-devops-migration-tools/Reference/">Reference</a> &gt; <a href="/azure-devops-migration-tools/Reference/v1/">API v1</a> &gt; <a href="/azure-devops-migration-tools/Reference/v1/Processors/">Processors</a>&gt; <strong>WorkItemMigrationContext</strong></p>
+
+<p>WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links, and Attachments. Use <code class="language-plaintext highlighter-rouge">WorkItemMigrationConfig</code> to configure.</p>
+
+<h3 id="options">Options</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>AreaMaps</td>
+      <td>Dictionary</td>
+      <td>Remapping rules for area paths, implemented with regular expressions. The rules apply with a higher priority than the <code class="language-plaintext highlighter-rouge">PrefixProjectToNodes</code>, that is, if no rule matches the path and the <code class="language-plaintext highlighter-rouge">PrefixProjectToNodes</code> option is enabled, then the old <code class="language-plaintext highlighter-rouge">PrefixProjectToNodes</code> behavior is applied.</td>
+      <td>{}</td>
+    </tr>
+    <tr>
+      <td>AttachmentMaxSize</td>
+      <td>Int32</td>
+      <td><code class="language-plaintext highlighter-rouge">AttachmentMigration</code> is set to true then you need to specify a max file size for upload in bites. For Azure DevOps Services the default is 480,000,000 bites (60mb), for TFS its 32,000,000 bites (4mb).</td>
+      <td>480000000</td>
+    </tr>
+    <tr>
+      <td>AttachmentMigration</td>
+      <td>Boolean</td>
+      <td>If enabled this will migrate all of the attachments at the same time as the work item</td>
+      <td>true</td>
+    </tr>
+    <tr>
+      <td>AttachmentWorkingPath</td>
+      <td>String</td>
+      <td><code class="language-plaintext highlighter-rouge">AttachmentMigration</code> is set to true then you need to specify a working path for attachments to be saved locally.</td>
+      <td>C:\temp\Migration\</td>
+    </tr>
+    <tr>
+      <td>AttachRevisionHistory</td>
+      <td>Boolean</td>
+      <td>This will create a json file with the revision history and attach it to the work item. Best used with <code class="language-plaintext highlighter-rouge">MaxRevisions</code> or <code class="language-plaintext highlighter-rouge">ReplayRevisions</code>.</td>
+      <td>?</td>
+    </tr>
+    <tr>
+      <td>Enabled</td>
+      <td>Boolean</td>
+      <td>If enabled then the processor will run</td>
+      <td>false</td>
+    </tr>
+    <tr>
+      <td>FilterWorkItemsThatAlreadyExistInTarget</td>
+      <td>Boolean</td>
+      <td>This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run. While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.</td>
+      <td>true</td>
+    </tr>
+    <tr>
+      <td>FixHtmlAttachmentLinks</td>
+      <td>Boolean</td>
+      <td><strong>beta</strong> If enabled this will fix any image attachments URL’s, work item mention URL’s or user mentions in the HTML fields as well as discussion comments. You must specify a PersonalAccessToken in the Source project for Azure DevOps; TFS should use integrated authentication.</td>
+      <td>?</td>
+    </tr>
+    <tr>
+      <td>GenerateMigrationComment</td>
+      <td>Boolean</td>
+      <td>If enabled, adds a comment recording the migration</td>
+      <td>false</td>
+    </tr>
+    <tr>
+      <td>IterationMaps</td>
+      <td>Dictionary</td>
+      <td>Remapping rules for iteration paths, implemented with regular expressions. The rules apply with a higher priority than the <code class="language-plaintext highlighter-rouge">PrefixProjectToNodes</code>, that is, if no rule matches the path and the <code class="language-plaintext highlighter-rouge">PrefixProjectToNodes</code> option is enabled, then the old <code class="language-plaintext highlighter-rouge">PrefixProjectToNodes</code> behavior is applied.</td>
+      <td>{}</td>
+    </tr>
+    <tr>
+      <td>LinkMigration</td>
+      <td>Boolean</td>
+      <td>If enabled this will migrate the Links for the work item at the same time as the whole work item.</td>
+      <td>true</td>
+    </tr>
+    <tr>
+      <td>LinkMigrationSaveEachAsAdded</td>
+      <td>Boolean</td>
+      <td>If you have changed parents before re-running a sync you may get a <code class="language-plaintext highlighter-rouge">TF26194: unable to change the value of the 'Parent' field</code> error. This will resolve it, but will slow migration.</td>
+      <td>false</td>
+    </tr>
+    <tr>
+      <td>MaxGracefulFailures</td>
+      <td>Int32</td>
+      <td>The maximum number of failures to tolerate before the migration fails. When set above zero, a work item migration error is logged but the migration will continue until the number of failed items reaches the configured value, after which the migration fails.</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>MaxRevisions</td>
+      <td>Int32</td>
+      <td>Sets the maximum number of revisions that will be migrated. “First + Last N = Max”. If this was set to 5 and there were 10 revisions you would get the first 1 (creation) and the latest 4 migrated.</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>NodeBasePaths</td>
+      <td>String[]</td>
+      <td>The root paths of the Ares / Iterations you want migrate. See <a href="#nodebasepath-configuration">NodeBasePath Configuration</a></td>
+      <td>[”/”]</td>
+    </tr>
+    <tr>
+      <td>PauseAfterEachWorkItem</td>
+      <td>Boolean</td>
+      <td>Pause after each work item is migrated</td>
+      <td>false</td>
+    </tr>
+    <tr>
+      <td>PrefixProjectToNodes</td>
+      <td>Boolean</td>
+      <td>Prefix your iterations and areas with the project name. If you have enabled this in <code class="language-plaintext highlighter-rouge">NodeStructuresMigrationConfig</code> you must do it here too.</td>
+      <td>false</td>
+    </tr>
+    <tr>
+      <td>ReplayRevisions</td>
+      <td>Boolean</td>
+      <td>You can choose to migrate the tip only (a single write) or all of the revisions (many writes). If you are setting this to <code class="language-plaintext highlighter-rouge">false</code> to migrate only the tip then you should set <code class="language-plaintext highlighter-rouge">BuildFieldTable</code> to <code class="language-plaintext highlighter-rouge">true</code>.</td>
+      <td>true</td>
+    </tr>
+    <tr>
+      <td>SkipRevisionWithInvalidAreaPath</td>
+      <td>Boolean</td>
+      <td>When set to true, this setting will skip a revision if the source area has not been migrated, has been deleted or is somehow invalid, etc.</td>
+      <td>missng XML code comments</td>
+    </tr>
+    <tr>
+      <td>SkipRevisionWithInvalidIterationPath</td>
+      <td>Boolean</td>
+      <td>This will skip a revision if the source iteration has not been migrated i.e. it was deleted</td>
+      <td>missng XML code comments</td>
+    </tr>
+    <tr>
+      <td>SkipToFinalRevisedWorkItemType</td>
+      <td>Boolean</td>
+      <td><strong>beta</strong> If enabled this will fix any image attachments URL’s, work item mention URL’s or user mentions in the HTML fields as well as discussion comments. You must specify a PersonalAccessToken in the Source project for Azure DevOps; TFS should use integrated authentication.</td>
+      <td>false</td>
+    </tr>
+    <tr>
+      <td>StopMigrationOnMissingAreaIterationNodes</td>
+      <td>Boolean</td>
+      <td> </td>
+      <td>?</td>
+    </tr>
+    <tr>
+      <td>UpdateCreatedBy</td>
+      <td>Boolean</td>
+      <td>If this is enabled the creation process on the target project will create the items with the original creation date. (Important: The item history is always pointed to the date of the migration, it’s change only the data column CreateDate, not the internal create date)</td>
+      <td>true</td>
+    </tr>
+    <tr>
+      <td>UpdateCreatedDate</td>
+      <td>Boolean</td>
+      <td>If this is enabled the creation process on the target project will create the items with the original creation date. (Important: The item history is always pointed to the date of the migration, it’s change only the data column CreateDate, not the internal create date)</td>
+      <td>true</td>
+    </tr>
+    <tr>
+      <td>UseCommonNodeStructureEnricherConfig</td>
+      <td>Boolean</td>
+      <td> </td>
+      <td>?</td>
+    </tr>
+    <tr>
+      <td>WIQLOrderBit</td>
+      <td>String</td>
+      <td>A work item query to affect the order in which the work items are migrated. Don’t leave this empty.</td>
+      <td>[System.ChangedDate] desc</td>
+    </tr>
+    <tr>
+      <td>WIQLQueryBit</td>
+      <td>String</td>
+      <td>A work item query based on WIQL to select only important work items. To migrate all leave this empty. See <a href="#wiql-query-bits">WIQL Query Bits</a></td>
+      <td>AND  [Microsoft.VSTS.Common.ClosedDate] = ‘’ AND [System.WorkItemType] NOT IN (‘Test Suite’, ‘Test Plan’,’Shared Steps’,’Shared Parameter’,’Feedback Request’)</td>
+    </tr>
+    <tr>
+      <td>WorkItemCreateRetryLimit</td>
+      <td>Int32</td>
+      <td><strong>beta</strong> If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count. This allows for periodic network glitches not to end the process.</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <td>WorkItemIDs</td>
+      <td>IList</td>
+      <td>A list of work items to import</td>
+      <td>[]</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="example-json">Example JSON</h3>
+
+<pre><code class="language-JSON">{
+  "$type": "WorkItemMigrationConfig",
+  "Enabled": false,
+  "ReplayRevisions": true,
+  "PrefixProjectToNodes": false,
+  "UpdateCreatedDate": true,
+  "UpdateCreatedBy": true,
+  "WIQLQueryBit": "AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')",
+  "WIQLOrderBit": "[System.ChangedDate] desc",
+  "LinkMigration": true,
+  "AttachmentMigration": true,
+  "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
+  "FixHtmlAttachmentLinks": false,
+  "SkipToFinalRevisedWorkItemType": true,
+  "WorkItemCreateRetryLimit": 5,
+  "FilterWorkItemsThatAlreadyExistInTarget": true,
+  "PauseAfterEachWorkItem": false,
+  "AttachmentMaxSize": 480000000,
+  "AttachRevisionHistory": false,
+  "LinkMigrationSaveEachAsAdded": false,
+  "GenerateMigrationComment": true,
+  "WorkItemIDs": null,
+  "MaxRevisions": 0,
+  "UseCommonNodeStructureEnricherConfig": false,
+  "StopMigrationOnMissingAreaIterationNodes": true,
+  "NodeBasePaths": null,
+  "AreaMaps": {
+    "$type": "Dictionary`2"
+  },
+  "IterationMaps": {
+    "$type": "Dictionary`2"
+  },
+  "MaxGracefulFailures": 0,
+  "SkipRevisionWithInvalidIterationPath": false,
+  "SkipRevisionWithInvalidAreaPath": false
+}
+</code></pre>
+
+<h2 id="wiql-query-bits"><a name="WIQLQueryBits"></a>WIQL Query Bits</h2>
+
+<p>The Work Item queries are all built using Work Item <a href="https://docs.microsoft.com/en-us/azure/devops/boards/queries/wiql-syntax">Query Language (WIQL)</a>.</p>
+
+<blockquote>
+  <p>Note: A useful Azure DevOps Extension to explore WIQL is the <a href="https://marketplace.visualstudio.com/items?itemName=ottostreifel.wiql-editor">WIQL Editor</a></p>
+</blockquote>
+
+<h3 id="examples">Examples</h3>
+
+<p>You can use the <a href="https://marketplace.visualstudio.com/items?itemName=ottostreifel.wiql-editor">WIQL Editor</a> to craft a query in Azure DevOps.</p>
+
+<p>Typical way that queries are built:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> var targetQuery =
+     string.Format(
+         @"SELECT [System.Id], [{ReflectedWorkItemIDFieldName}] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {WIQLQueryBit} ORDER BY {WIQLOrderBit}",
+         Engine.Target.Config.ReflectedWorkItemIDFieldName,
+         _config.WIQLQueryBit,
+         _config.WIQLOrderBit
+      );
+var targetFoundItems = Engine.Target.WorkItems.GetWorkItems(targetQuery);
+</code></pre></div></div>
+
+<p>A simple example config:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>"WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
+"WIQLOrderBit": "[System.ChangedDate] desc",
+</code></pre></div></div>
+<p>Scope to Area Path (Team data):</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>"WIQLQueryBit": "AND [System.AreaPath] UNDER 'project\Team 1\' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
+"WIQLOrderBit": "[System.ChangedDate] desc",
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>"WIQLQueryBit": "AND [System.ChangedDate] &gt; 'project\Team 1\' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
+"WIQLOrderBit": "[System.ChangedDate] desc",
+</code></pre></div></div>
+
+<h2 id="nodebasepath-configuration"><a name="NodeBasePath"></a>NodeBasePath Configuration</h2>
+<p>The <code class="language-plaintext highlighter-rouge">NodeBasePaths</code> entry allows the filtering of the nodes to be replicated on the target projects. To try to explain the correct usage let us assume that we have a source team project <code class="language-plaintext highlighter-rouge">SourceProj</code> with the following node structures</p>
+
+<ul>
+  <li>AreaPath
+    <ul>
+      <li>SourceProj</li>
+      <li>SourceProj\Team 1</li>
+      <li>SourceProj\Team 2</li>
+      <li>SourceProj\Team 2\Sub-Area</li>
+      <li>SourceProj\Team 3</li>
+    </ul>
+  </li>
+  <li>IterationPath
+    <ul>
+      <li>SourceProj</li>
+      <li>SourceProj\Sprint 1</li>
+      <li>SourceProj\Sprint 2</li>
+      <li>SourceProj\Sprint 2\Sub-Iteration</li>
+      <li>SourceProj\Sprint 3</li>
+    </ul>
+  </li>
+</ul>
+
+<p>Depending upon what node structures you wish to migrate you would need the following settings. Exclusions are also possible by prefixing a path with an exclamation mark <code class="language-plaintext highlighter-rouge">!</code>. Example are</p>
+
+<table>
+  <thead>
+    <tr>
+      <th> </th>
+      <th> </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Intention</td>
+      <td>Migrate all areas and iterations and all Work Items</td>
+    </tr>
+    <tr>
+      <td>NodeBasePath</td>
+      <td><code class="language-plaintext highlighter-rouge">[]</code></td>
+    </tr>
+    <tr>
+      <td>Comment</td>
+      <td>The same AreaPath and Iteration Paths are created on the target as on the source. Hence, all migrated WI remain in their existing area and iteration paths</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>Intention</td>
+      <td>Only migrate area path <code class="language-plaintext highlighter-rouge">Team 2</code> and it associated Work Items, but all iteration paths</td>
+    </tr>
+    <tr>
+      <td>NodeBasePath</td>
+      <td><code class="language-plaintext highlighter-rouge">["Team 2", "Sprint"]</code></td>
+    </tr>
+    <tr>
+      <td>Comment</td>
+      <td>Only the area path ending <code class="language-plaintext highlighter-rouge">Team 2</code> will be migrated. <br />The <code class="language-plaintext highlighter-rouge">WIQLQueryBit</code> should be edited to limit the WI migrated to this area path e.g. add <code class="language-plaintext highlighter-rouge">AND [System.AreaPath] UNDER 'SampleProject\\Team 2'</code> . <br /> The migrated WI will have an area path of <code class="language-plaintext highlighter-rouge">TargetProj\Team 2</code> but retain their iteration paths matching the sprint name on the source</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>Intention</td>
+      <td>Only migrate iterations structure</td>
+    </tr>
+    <tr>
+      <td>NodeBasePath</td>
+      <td><code class="language-plaintext highlighter-rouge">["Sprint"]</code></td>
+    </tr>
+    <tr>
+      <td>Comment</td>
+      <td>Only the area path ending <code class="language-plaintext highlighter-rouge">Team 2</code> will be migrated<br />All the iteration paths will be migrated. <br /> The migrated WI will have the default area path of <code class="language-plaintext highlighter-rouge">TargetProj</code> as their source area path was not migrated i.e. <code class="language-plaintext highlighter-rouge">TargetProj</code><br /> The migrated WI will have an iteration path match the sprint name on the source</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>Intention</td>
+      <td>Move all WI to the existing area and iteration paths on the targetProj</td>
+    </tr>
+    <tr>
+      <td>NodeBasePath</td>
+      <td><code class="language-plaintext highlighter-rouge">["DUMMY VALUE"]</code></td>
+    </tr>
+    <tr>
+      <td>Comment</td>
+      <td>As the <code class="language-plaintext highlighter-rouge">NodeBasePath</code> does not match any source area or iteration path no nodes are migrated. <br />Migrated WI will be assigned to any matching area or iteration paths. If no matching ones can be found they will default to the respective root values</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>Intention</td>
+      <td>Move the <code class="language-plaintext highlighter-rouge">Team 2</code> area, but not its <code class="language-plaintext highlighter-rouge">Sub-Area</code></td>
+    </tr>
+    <tr>
+      <td>NodeBasePath</td>
+      <td><code class="language-plaintext highlighter-rouge">["Team 2", "!Team 2\\SubArea"]</code></td>
+    </tr>
+    <tr>
+      <td>Comment</td>
+      <td>The Work Items will have to be restricted to the right areas, e.g. with <code class="language-plaintext highlighter-rouge">AND [System.AreaPath] UNDER 'SampleProject\\Team 2' AND [System.AreaPath] NOT UNDER 'SampleProject\\Team 2\\Sub-Area'</code>, otherwise their migratin will fail</td>
+    </tr>
+  </tbody>
+</table>
+
+<h1 id="iteration-maps-and-area-maps">Iteration Maps and Area Maps</h1>
+
+<p>These two configuration elements apply after the <code class="language-plaintext highlighter-rouge">NodeBasePaths</code> selector, i.e.
+only on Areas and Iterations that have been selected for migration. They allow
+to change the area path, respectively the iteration path, of migrated work items.</p>
+
+<p>These remapping rules are applied both while creating path nodes in the target
+project and when migrating work items.</p>
+
+<p>These remapping rules are applied with a higher priority than the
+<code class="language-plaintext highlighter-rouge">PrefixProjectToNodes</code> option. This means that if no declared rule matches the
+path and the <code class="language-plaintext highlighter-rouge">PrefixProjectToNodes</code> option is enabled, then the old behavior is
+used.</p>
+
+<p>The syntax is a dictionary of regular expressions and the replacement text.</p>
+
+<p><em>Warning</em>: These follow the
+<a href="https://docs.microsoft.com/en-us/dotnet/standard/base-types/regular-expression-language-quick-reference">.net regular expression language</a>.
+The key in the dictionary is a regular expression search pattern, while the
+value is a regular expression replacement pattern. It is therefore possible to
+use back-references in the replacement string.</p>
+
+<p><em>Warning</em>: Special characters in the acceptation of regular expressions <em>and</em>
+json both need to be escaped. For a key, this means, for example, that a
+literal backslash must be escaped for the regular expression language <code class="language-plaintext highlighter-rouge">\\</code>
+<em>and</em> each of these backslashes must then be escaped for the json encoding:
+<code class="language-plaintext highlighter-rouge">\\\\</code>. In the replacement string, a literal <code class="language-plaintext highlighter-rouge">$</code> must be escaped with an
+additional <code class="language-plaintext highlighter-rouge">$</code> if it is followed by a number (due to the special meaning in
+regular expression replacement strings), while a backslash must be escaped
+(<code class="language-plaintext highlighter-rouge">\\</code>) due to the special meaning in json.</p>
+
+<p><em>Advice</em>: To avoid unexpected results, always match terminating backslashes in
+the search pattern and replacement string: if a search pattern ends with a
+backslash, you should also put one in the replacement string, and if the search
+pattern does not include a terminating backslash, then none should be included
+in the replacement string.</p>
+
+<h4 id="examples-explained">Examples explained</h4>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nl">"IterationMaps"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+  </span><span class="nl">"^OriginalProject\\\\Path1(?=\\\\Sprint 2022)"</span><span class="p">:</span><span class="w"> </span><span class="s2">"TargetProject</span><span class="se">\\</span><span class="s2">AnotherPath</span><span class="se">\\</span><span class="s2">NewTeam"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"^OriginalProject\\\\Path1(?=\\\\Sprint 2020)"</span><span class="p">:</span><span class="w"> </span><span class="s2">"TargetProject</span><span class="se">\\</span><span class="s2">AnotherPath</span><span class="se">\\</span><span class="s2">Archives</span><span class="se">\\</span><span class="s2">Sprints 2020"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"^OriginalProject\\\\Path2"</span><span class="p">:</span><span class="w"> </span><span class="s2">"TargetProject</span><span class="se">\\</span><span class="s2">YetAnotherPath</span><span class="se">\\</span><span class="s2">Path2"</span><span class="p">,</span><span class="w">
+</span><span class="p">}</span><span class="err">,</span><span class="w">
+</span><span class="nl">"AreaMaps"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+  </span><span class="nl">"^OriginalProject\\\\(DescopeThis|DescopeThat)"</span><span class="p">:</span><span class="w"> </span><span class="s2">"TargetProject</span><span class="se">\\</span><span class="s2">Archive</span><span class="se">\\</span><span class="s2">Descoped</span><span class="se">\\</span><span class="s2">"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"^OriginalProject\\\\(?!DescopeThis|DescopeThat)"</span><span class="p">:</span><span class="w"> </span><span class="s2">"TargetProject</span><span class="se">\\</span><span class="s2">NewArea</span><span class="se">\\</span><span class="s2">"</span><span class="p">,</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<ul>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">"^OriginalProject\\\\Path1(?=\\\\Sprint 2022)": "TargetProject\\AnotherPath\\NewTeam",</code></p>
+
+    <p>In an iteration path, <code class="language-plaintext highlighter-rouge">OriginalProject\Path1</code> found at the beginning of the
+path, when followed by <code class="language-plaintext highlighter-rouge">\Sprint 2022</code>, will be replaced by
+<code class="language-plaintext highlighter-rouge">TargetProject\AnotherPath\NewTeam</code>.</p>
+
+    <p><code class="language-plaintext highlighter-rouge">OriginalProject\Path1\Sprint 2022\Sprint 01</code> will become
+<code class="language-plaintext highlighter-rouge">TargetProject\AnotherPath\NewTeam\Sprint 2022\Sprint 01</code> but
+<code class="language-plaintext highlighter-rouge">OriginalProject\Path1\Sprint 2020\Sprint 03</code> will <em>not</em> be transformed by
+this rule.</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">"^OriginalProject\\\\Path1(?=\\\\Sprint 2020)": "TargetProject\\AnotherPath\\Archives\\Sprints 2020",</code></p>
+
+    <p>In an iteration path, <code class="language-plaintext highlighter-rouge">OriginalProject\Path1</code> found at the beginning of the
+path, when followed by <code class="language-plaintext highlighter-rouge">\Sprint 2020</code>, will be replaced by
+<code class="language-plaintext highlighter-rouge">TargetProject\AnotherPath\Archives\\Sprints 2020</code>.</p>
+
+    <p><code class="language-plaintext highlighter-rouge">OriginalProject\Path1\Sprint 2020\Sprint 01</code> will become
+<code class="language-plaintext highlighter-rouge">TargetProject\AnotherPath\Archives\Sprint 2020\Sprint 01</code> but
+<code class="language-plaintext highlighter-rouge">OriginalProject\Path1\Sprint 2021\Sprint 03</code> will <em>not</em> be transformed by
+this rule.</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">"^OriginalProject\\\\Path2": "TargetProject\\YetAnotherPath\\Path2",</code></p>
+
+    <p>In an iteration path, <code class="language-plaintext highlighter-rouge">OriginalProject\Path2</code> will be replaced by
+<code class="language-plaintext highlighter-rouge">TargetProject\YetAnotherPath\Path2</code>.</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">"^OriginalProject\\\\(DescopeThis|DescopeThat)": "TargetProject\\Archive\\Descoped\\",</code></p>
+
+    <p>In an area path, <code class="language-plaintext highlighter-rouge">OriginalProject\</code> found at the beginning of the path, when
+followed by either <code class="language-plaintext highlighter-rouge">DescopeThis</code> or <code class="language-plaintext highlighter-rouge">DescopeThat</code> will be replaced by <code class="language-plaintext highlighter-rouge">TargetProject\Archive\Descoped\</code>.</p>
+
+    <p><code class="language-plaintext highlighter-rouge">OriginalProject\DescopeThis\Area</code> will be transformed to
+<code class="language-plaintext highlighter-rouge">TargetProject\Archive\Descoped\DescopeThis\Area</code>.
+<code class="language-plaintext highlighter-rouge">OriginalProject\DescopeThat\Product</code> will be transformed to
+<code class="language-plaintext highlighter-rouge">TargetProject\Archive\Descoped\DescopeThat\Product</code>.</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">"^OriginalProject\\\\(?!DescopeThis|DescopeThat)": "TargetProject\\NewArea\\",</code></p>
+
+    <p>In an area path, <code class="language-plaintext highlighter-rouge">OriginalProject\</code> found at the beginning of the path will be
+replaced by <code class="language-plaintext highlighter-rouge">TargetProject\NewArea\</code> unless it is followed by <code class="language-plaintext highlighter-rouge">DescopeThis</code> or
+<code class="language-plaintext highlighter-rouge">DescopeThat</code>.</p>
+
+    <p><code class="language-plaintext highlighter-rouge">OriginalProject\ValidArea\</code> would be replaced by
+<code class="language-plaintext highlighter-rouge">TargetProject\NewArea\ValidArea\</code> but <code class="language-plaintext highlighter-rouge">OriginalProject\DescopeThis</code> would not
+be modified by this rule.</p>
+  </li>
+</ul>
+
+<h2 id="more-complex-team-migrations">More Complex Team Migrations</h2>
+<p>The above options allow you to bring over a sub-set of the WIs (using the <code class="language-plaintext highlighter-rouge">WIQLQueryBit</code>) and move their area or iteration path to a default location. However you may wish to do something more complex e.g. re-map the team structure. This can be done with addition of a <code class="language-plaintext highlighter-rouge">FieldMaps</code> block to configuration in addition to the <code class="language-plaintext highlighter-rouge">NodeBasePaths</code>.</p>
+
+<p>Using the above sample structure, if you wanted to map the source project <code class="language-plaintext highlighter-rouge">Team 1</code>  to target project <code class="language-plaintext highlighter-rouge">Team A</code> etc. you could add the field map as follows</p>
+
+<p>A complete list of <a href="../Reference/v1/FieldMaps/index.md">FieldMaps</a> are available.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> "FieldMaps": [
+   {
+      "$type": "FieldValueMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceField": "System.AreaPath",
+      "targetField": "System.AreaPath",
+      "defaultValue": "TargetProg",
+      "valueMapping": {
+        "SampleProj\\Team 1": "TargetProg\\Team A",
+        "SampleProj\\Team 2": "TargetProg\\Team B"
+        "SampleProj\\Team 3": "TargetProg\\Team C"
+      }
+    },
+  ],
+
+</code></pre></div></div>
+
+<blockquote>
+  <p>Note: This mappings could also be achieved with other forms of Field mapper e.g. <code class="language-plaintext highlighter-rouge">RegexFieldMapConfig</code>, but the value mapper as an example is easy to understand</p>
+</blockquote>

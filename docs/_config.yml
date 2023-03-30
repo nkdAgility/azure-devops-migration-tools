@@ -1,3 +1,33 @@
-theme: jekyll-theme-cayman
-title: "Azure DevOps Migration Tools"
-description: "A tool for experienced Azure DevOps consultants to migrate, merge, and split Projects on Azure DevOps and TFS"
+title: Azure DevOps Migration Tools
+description: Azure DevOps Migration Tools
+parent_title: naked Agility with Martin Hinshelwood
+parent_url: https://nkdagility.com
+
+website: https://nkdagility.com
+baseurl: /azure-devops-migration-tools
+url: "https://nkdagility.com"
+source: ./
+destination: ./_site
+
+include:
+ - "**/*.md"
+ - "*.md"
+
+plugins:
+  - jekyll-relative-links
+  - jekyll-seo-tag
+  - jekyll-sitemap
+  - jekyll-toc
+  - jekyll-time-to-read
+  # - jekyll-github-metadata
+  - jekyll-optional-front-matter
+  - jekyll-last-modified-at
+
+kramdown:
+  math_engine: mathjax
+  syntax_highlighter: rouge
+  auto_ids: true
+
+relative_links:
+  enabled:     true
+  collections: false

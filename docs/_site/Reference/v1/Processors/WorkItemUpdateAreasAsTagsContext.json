@@ -1,0 +1,5 @@
+{
+  "$type": "WorkItemUpdateAreasAsTagsConfig",
+  "Enabled": false,
+  "AreaIterationPath": null
+}

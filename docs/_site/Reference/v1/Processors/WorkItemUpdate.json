@@ -1,0 +1,11 @@
+{
+  "$type": "WorkItemUpdateConfig",
+  "Enabled": false,
+  "WhatIf": false,
+  "WIQLQueryBit": "AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')",
+  "WIQLOrderBit": null,
+  "WorkItemIDs": null,
+  "FilterWorkItemsThatAlreadyExistInTarget": false,
+  "PauseAfterEachWorkItem": false,
+  "WorkItemCreateRetryLimit": 0
+}
