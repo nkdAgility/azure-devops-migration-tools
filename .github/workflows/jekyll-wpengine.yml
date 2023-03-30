@@ -34,11 +34,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Build Jekyll
-        uses: jerryjvl/jekyll-build-action@v1
+        working-directory: ./docs
+        uses: jerryjvl/jekyll-build-action@v1        
       - name: SFTP Upload
+        working-directory: ./docs
         # You may pin to the exact commit or the version.
         # uses: Dylan700/sftp-upload-action@f90db607d9fe1acdc0eefccee84d37c119b268fe
-        uses: Dylan700/sftp-upload-action@v1.1.4
+        uses: Dylan700/sftp-upload-action@v1.1.4c
         with:
           server: ${{ secrets.SFTP_SERVER }}
           username: ${{ secrets.SFTP_USERNAME }}
