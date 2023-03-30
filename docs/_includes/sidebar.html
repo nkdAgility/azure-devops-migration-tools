@@ -15,11 +15,11 @@
           <li class="mb-1">
             <strong class="bd-links-heading d-flex w-100 align-items-center fw-semibold">v1</strong>
               <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ps-2">
-                  <li class="align-items-center"><a href="{{ site.baseurl }}/reference/v1/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a></li>
+                  <li class="align-items-center"><a href="{{ site.baseurl }}/Reference/v1/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a></li>
                   <li class="mb-1">
                     <strong class="bd-links-heading d-flex w-100 align-items-center fw-semibold">FieldMaps</strong>
                       <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                        <li class="align-items-center"><a href="{{ site.baseurl }}/reference/v1/FieldMaps/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a></li>
+                        <li class="align-items-center"><a href="{{ site.baseurl }}/Reference/v1/FieldMaps/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a></li>
                         {% assign pages = site.pages | where: "pageType", "reference" | where: "architecture", "v1" | where: "classType", "FieldMaps" %}
                         {% for page in pages %}
                         <li class="align-items-center"><a href="{{ site.baseurl }}{{ page.url }}" class="link-body-emphasis d-inline-flex text-decoration-none rounded">{{ page.title }}</a>&nbsp;<small>{% if page.pageStatus != "production" %}<i class="fa-regular {% if page.pageStatus == null %}fa-triangle-exclamation{% else %}fa-circle-exclamation{% endif %}"></i>{% endif %}</small></li>
@@ -29,7 +29,7 @@
                   <li class="mb-1">
                     <strong class="bd-links-heading d-flex w-100 align-items-center fw-semibold">Processors</strong>
                       <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                        <li class="align-items-center"><a href="{{ site.baseurl }}/reference/v1/Processors/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a></li>
+                        <li class="align-items-center"><a href="{{ site.baseurl }}/Reference/v1/Processors/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a></li>
                         {% assign pages = site.pages | where: "pageType", "reference" | where: "architecture", "v1" | where: "classType", "Processors" %}
                         {% for page in pages %}
                         <li class="align-items-center"><a href="{{ site.baseurl }}{{ page.url }}" class="link-body-emphasis d-inline-flex text-decoration-none rounded">{{ page.title }}</a>&nbsp;<small>{% if page.pageStatus != "production" %}<i class="fa-regular {% if page.pageStatus == null %}fa-triangle-exclamation{% else %}fa-circle-exclamation{% endif %}"></i>{% endif %}</small></li>
@@ -41,11 +41,11 @@
           <li class="mb-1">
             <strong class="bd-links-heading d-flex w-100 align-items-center fw-semibold">v2</strong>
               <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ps-2">
-                  <li class="align-items-center"><a href="{{ site.baseurl }}/reference/v2/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a></li>
+                  <li class="align-items-center"><a href="{{ site.baseurl }}/Reference/v2/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a></li>
                   <li class="mb-1">
                     <strong class="bd-links-heading d-flex w-100 align-items-center fw-semibold">EndpointEnrichers</strong>
                       <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                        <li class="align-items-center"><a href="{{ site.baseurl }}/reference/v2/Endpoints/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a></li>
+                        <li class="align-items-center"><a href="{{ site.baseurl }}/Reference/v2/Endpoints/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a></li>
                         {% assign pages = site.pages | where: "pageType", "reference" | where: "architecture", "v2" | where: "classType", "EndpointEnrichers" %}
                         {% for page in pages %}
                         <li class="align-items-center"><a href="{{ site.baseurl }}{{ page.url }}" class="link-body-emphasis d-inline-flex text-decoration-none rounded">{{ page.title }}</a>&nbsp;<small>{% if page.pageStatus != "production" %}<i class="fa-regular {% if page.pageStatus == null %}fa-triangle-exclamation{% else %}fa-circle-exclamation{% endif %}"></i>{% endif %}</small></li>
@@ -55,7 +55,7 @@
                   <li class="mb-1">
                     <strong class="bd-links-heading d-flex w-100 align-items-center fw-semibold">Endpoints</strong>
                       <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                        <li class="align-items-center"><a href="{{ site.baseurl }}/reference/v2/Endpoints/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a></li>
+                        <li class="align-items-center"><a href="{{ site.baseurl }}/Reference/v2/Endpoints/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a></li>
                         {% assign pages = site.pages | where: "pageType", "reference" | where: "architecture", "v2" | where: "classType", "Endpoints" %}
                         {% for page in pages %}
                         <li class="align-items-center"><a href="{{ site.baseurl }}{{ page.url }}" class="link-body-emphasis d-inline-flex text-decoration-none rounded">{{ page.title }}</a>&nbsp;<small>{% if page.pageStatus != "production" %}<i class="fa-regular {% if page.pageStatus == null %}fa-triangle-exclamation{% else %}fa-circle-exclamation{% endif %}"></i>{% endif %}</small></li>
@@ -65,7 +65,7 @@
                   <li class="mb-1">
                     <strong class="bd-links-heading d-flex w-100 align-items-center fw-semibold">FieldMaps</strong>
                       <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                        <li class="align-items-center"><a href="{{ site.baseurl }}/reference/v2/FieldMaps/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a></li>
+                        <li class="align-items-center"><a href="{{ site.baseurl }}/Reference/v2/FieldMaps/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a></li>
                         {% assign pages = site.pages | where: "pageType", "reference" | where: "architecture", "v2" | where: "classType", "FieldMaps" %}
                         {% for page in pages %}
                         <li class="align-items-center"><a href="{{ site.baseurl }}{{ page.url }}" class="link-body-emphasis d-inline-flex text-decoration-none rounded">{{ page.title }}</a>&nbsp;<small>{% if page.pageStatus != "production" %}<i class="fa-regular {% if page.pageStatus == null %}fa-triangle-exclamation{% else %}fa-circle-exclamation{% endif %}"></i>{% endif %}</small></li>
@@ -75,7 +75,7 @@
                   <li class="mb-1">
                     <strong class="bd-links-heading d-flex w-100 align-items-center fw-semibold">MappingTools</strong>
                       <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                        <li class="align-items-center"><a href="{{ site.baseurl }}/reference/v2/MappingTools/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a></li>
+                        <li class="align-items-center"><a href="{{ site.baseurl }}/Reference/v2/MappingTools/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a></li>
                         {% assign pages = site.pages | where: "pageType", "reference" | where: "architecture", "v2" | where: "classType", "MappingTools" %}
                         {% for page in pages %}
                         <li class="align-items-center"><a href="{{ site.baseurl }}{{ page.url }}" class="link-body-emphasis d-inline-flex text-decoration-none rounded">{{ page.title }}</a>&nbsp;<small>{% if page.pageStatus != "production" %}<i class="fa-regular {% if page.pageStatus == null %}fa-triangle-exclamation{% else %}fa-circle-exclamation{% endif %}"></i>{% endif %}</small></li>
@@ -85,7 +85,7 @@
                   <li class="mb-1">
                     <strong class="bd-links-heading d-flex w-100 align-items-center fw-semibold">ProcessorEnrichers</strong>
                       <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                        <li class="align-items-center"><a href="{{ site.baseurl }}/reference/v2/ProcessorEnrichers/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a></li>
+                        <li class="align-items-center"><a href="{{ site.baseurl }}/Reference/v2/ProcessorEnrichers/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a></li>
                         {% assign pages = site.pages | where: "pageType", "reference" | where: "architecture", "v2" | where: "classType", "ProcessorEnrichers" %}
                         {% for page in pages %}
                         <li class="align-items-center"><a href="{{ site.baseurl }}{{ page.url }}" class="link-body-emphasis d-inline-flex text-decoration-none rounded">{{ page.title }}</a>&nbsp;<small>{% if page.pageStatus != "production" %}<i class="fa-regular {% if page.pageStatus == null %}fa-triangle-exclamation{% else %}fa-circle-exclamation{% endif %}"></i>{% endif %}</small></li>
@@ -95,7 +95,7 @@
                   <li class="mb-1">
                     <strong class="bd-links-heading d-flex w-100 align-items-center fw-semibold">Processors</strong>
                       <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                        <li class="align-items-center"><a href="{{ site.baseurl }}/reference/v2/Processors/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a></li>
+                        <li class="align-items-center"><a href="{{ site.baseurl }}/Reference/v2/Processors/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a></li>
                         {% assign pages = site.pages | where: "pageType", "reference" | where: "architecture", "v2" | where: "classType", "Processors" %}
                         {% for page in pages %}
                         <li class="align-items-center"><a href="{{ site.baseurl }}{{ page.url }}" class="link-body-emphasis d-inline-flex text-decoration-none rounded">{{ page.title }}</a>&nbsp;<small>{% if page.pageStatus != "production" %}<i class="fa-regular {% if page.pageStatus == null %}fa-triangle-exclamation{% else %}fa-circle-exclamation{% endif %}"></i>{% endif %}</small></li>
