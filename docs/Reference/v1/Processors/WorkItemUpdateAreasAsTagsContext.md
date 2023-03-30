@@ -1,6 +1,7 @@
 ---
 title: WorkItemUpdateAreasAsTagsContext
 layout: default
+template: default
 pageType: reference
 classType: Processors
 architecture: v1

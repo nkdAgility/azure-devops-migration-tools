@@ -1,6 +1,7 @@
 ---
 title: WorkItemDelete
 layout: default
+template: default
 pageType: reference
 classType: Processors
 architecture: v1

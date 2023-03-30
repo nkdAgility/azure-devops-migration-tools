@@ -1,6 +1,7 @@
 ---
 title: FieldMergeMapConfig
 layout: default
+template: default
 pageType: reference
 classType: FieldMaps
 architecture: v2

@@ -1,8 +1,8 @@
 ---
 title: <ClassName>
 layout: default
+template: default
 pageType: reference
-template: <template>
 classType: <TypeName>
 architecture: <architecture>
 toc: true

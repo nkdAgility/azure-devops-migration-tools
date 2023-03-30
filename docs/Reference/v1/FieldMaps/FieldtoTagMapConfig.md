@@ -1,6 +1,7 @@
 ---
 title: FieldtoTagMapConfig
 layout: default
+template: default
 pageType: reference
 classType: FieldMaps
 architecture: v1

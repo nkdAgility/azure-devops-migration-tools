@@ -1,6 +1,7 @@
 ---
 title: TfsSharedQueryProcessor
 layout: default
+template: default
 pageType: reference
 classType: Processors
 architecture: v2

@@ -1,6 +1,7 @@
 ---
 title: FieldMaps
 layout: default
+template: index-template.md
 pageType: index
 toc: true
 pageStatus: production

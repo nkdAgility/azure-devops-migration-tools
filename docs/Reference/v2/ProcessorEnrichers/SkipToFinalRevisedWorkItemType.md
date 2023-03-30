@@ -1,6 +1,7 @@
 ---
 title: SkipToFinalRevisedWorkItemType
 layout: default
+template: default
 pageType: reference
 classType: ProcessorEnrichers
 architecture: v2
