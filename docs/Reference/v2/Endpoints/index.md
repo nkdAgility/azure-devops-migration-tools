@@ -3,7 +3,7 @@ title: Endpoints
 layout: default
 pageType: index
 toc: true
-pageStatus: production
+pageStatus: generated
 discussionId: 
 ---
 
