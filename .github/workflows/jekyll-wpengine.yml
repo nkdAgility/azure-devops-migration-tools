@@ -38,7 +38,7 @@ jobs:
       - name: SFTP Upload
         # You may pin to the exact commit or the version.
         # uses: Dylan700/sftp-upload-action@f90db607d9fe1acdc0eefccee84d37c119b268fe
-        uses: Dylan700/sftp-upload-action@v1.1.4c
+        uses: Dylan700/sftp-upload-action@v1.1.4
         with:
           server: ${{ secrets.SFTP_SERVER }}
           username: ${{ secrets.SFTP_USERNAME }}
