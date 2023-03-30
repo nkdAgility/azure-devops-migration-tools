@@ -1,17 +1,13 @@
 ---
 title: v2 Reference Overview
 layout: default
+template: <template>
 pageType: index
 toc: true
-pageStatus: production
+pageStatus: generated
 discussionId: 
 ---
 
-
->**_This documentation is for a preview version of the Azure DevOps Migration Tools._ If you are not using the preview version then please head over to the main [documentation](https://nkdagility.github.io/azure-devops-migration-tools).**
-
-
-[Overview](.././index.md) > **Reference**
 
 The system works by setting one or more [Processors](../v2/Processors/index.md) in the json 
 configuration file. This processor can have many [ProcessorEnrichers](../v2/ProcessorEnrichers/index.md) that 

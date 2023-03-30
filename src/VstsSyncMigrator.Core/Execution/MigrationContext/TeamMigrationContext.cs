@@ -36,7 +36,7 @@ namespace VstsSyncMigrator.Engine
         protected override void InternalExecute()
         {
             Log.LogCritical("*************MIGRATION ALERT!!!!!!!!!");
-            Log.LogCritical("TeamMigrationContext has been migrated to TfsTeamSettingsProcessor: https://nkdagility.github.io/azure-devops-migration-tools/Reference/Processors/TfsTeamSettingsProcessor.html");
+            Log.LogCritical("TeamMigrationContext has been migrated to TfsTeamSettingsProcessor: https://nkdagility.com/docs/azure-devops-migration-tools/Reference/Processors/TfsTeamSettingsProcessor.html");
         }
     }
 }

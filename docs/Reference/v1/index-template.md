@@ -1,17 +1,12 @@
 ---
 title: v1 Reference Overview
 layout: default
+template: <template>
 pageType: index
 toc: true
-pageStatus: production
+pageStatus: generated
 discussionId: 
 ---
-
-
->**_This documentation is for a preview version of the Azure DevOps Migration Tools._ If you are not using the preview version then please head over to the main [documentation](https://nkdagility.github.io/azure-devops-migration-tools).**
-
-
-[Overview](.././index.md) > **Reference**
 
 The system works by setting one or more [Processors](../v1/Processors/index.md) in the json 
 configuration file. You can configure one or more [FieldMaps](../v1/FieldMaps/index.md) to 

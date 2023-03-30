@@ -1,14 +1,12 @@
 ---
 title: Processors
 layout: default
+template: <template>
 pageType: index
 toc: true
-pageStatus: production
+pageStatus: generated
 discussionId: 
 ---
-
-
-[Overview](.././index.md) > [Reference](../index.md) > *Processors_v1*
 
 We provide a number of Processors that can be used to migrate diferent sorts of data. These processors are the original traditional processors.
 

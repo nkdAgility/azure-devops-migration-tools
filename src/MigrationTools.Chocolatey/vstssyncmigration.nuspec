@@ -10,10 +10,10 @@
     <description>Azure Devops Migration Tools allow you to bulk edit data in Microsoft Team Foundation Server (TFS) and Azure DevOps Services. Supports both migration and bulk update scenarios.</description>
     <projectUrl>https://github.com/nkdAgility/azure-devops-migration-tools/</projectUrl>
     <packageSourceUrl>https://chocolatey.org/packages/vsts-sync-migrator/</packageSourceUrl>
-    <docsUrl>http://nkdagility.github.io/azure-devops-migration-tools/</docsUrl>
+    <docsUrl>https://nkdagility.com/docs/azure-devops-migration-tools/</docsUrl>
     <bugTrackerUrl>https://github.com/nkdAgility/azure-devops-migration-tools/issues</bugTrackerUrl>
     <tags>WIT WorkItem AzureDevOps TFS VSTS VSO VisualStudioOnline DevOps Microsoft TestManagement</tags>
-    <releaseNotes>http://nkdagility.github.io/azure-devops-migration-tools/</releaseNotes>
+    <releaseNotes>https://nkdagility.com/docs/azure-devops-migration-tools/</releaseNotes>
     <licenseUrl>https://github.com/nkdAgility/azure-devops-migration-tools/blob/master/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <iconUrl>http://nkdagility.com/wp-content/uploads/2014/03/cropped-nakedalm-logo-260.png</iconUrl>

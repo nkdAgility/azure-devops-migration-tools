@@ -1,6 +1,7 @@
 ---
 title: Changeset Migration
 layout: default
+template: default
 pageType: index
 toc: true
 pageStatus: production
