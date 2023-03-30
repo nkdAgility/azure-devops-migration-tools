@@ -6,6 +6,7 @@ parent_url: https://nkdagility.com
 website: https://nkdagility.com
 baseurl: /docs/azure-devops-migration-tools
 url: "https://nkdagility.com"
+githuburl: https://github.com/nkdAgility/Scrum-Delivery-Kit-for-Software-Organisations
 source: ./docs
 destination: ./_site
 
