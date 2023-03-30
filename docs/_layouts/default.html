@@ -27,9 +27,11 @@
                                 <a class="" target="_blank" title="Discuss this document" data-proofer-ignore href="{{site.githuburl}}/discussions/{% if page.discussionId != null %}{{ page.discussionId }}{% else %}new?category=general&title={{ page.title }}&body=%3E%20Title: {{ page.title }}%0d%0a%3E%20Path: {{ page.path }}%0d%0a%0d%0a--Start the discussion here ---{% endif %}">
                                     <i class="fa-regular fa-comments"></i>
                                 </a>
+                                {% if page.pageStatus != "generated" %}
                                 <a class="p-2" title="Edit this document" data-proofer-ignore href="{{site.githuburl}}/edit/main/src/{{ page.path }}">
                                     <i class="fa-sharp fa-light fa-file-pen"></i> 
                                 </a>
+                                {% endif %}
                             </div>
                         </div>
                         <div>

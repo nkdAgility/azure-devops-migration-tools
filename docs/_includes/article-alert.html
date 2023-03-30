@@ -2,6 +2,10 @@
 {% if page.pageStatus != "production" %}
 <div class="alert alert-{% if page.pageStatus == null %}danger{% else %}secondary{% endif %}" role="alert">
     <p><i class="fa-regular {% if page.pageStatus == null %}fa-triangle-exclamation{% else %}fa-circle-exclamation{% endif %}"></i> {% if page.pageStatus == null %}Construction{% else %}{{page.pageStatus}}{% endif %}</p>
+    {% if page.pageStatus == "generated" %}
+    <p>This page was generated from code comments and should not be edited directly. To customize the description, tables of variables, or the default `example json` you will need to edit the code comments. If you want to add more information and help to this file then you will need to edit the `filename-template.md` file in the same folder. If it does not exist then you can copy `/Reference/template.md` and rename it to `thisfilename-template.md`. Then regenerate the docs by executing `ConsoleConfigGenerator.exe.`</p>
+    {% else %} 
     <p>This page is {% if page.pageStatus == null %}under construction{% else %}in {{page.pageStatus}}{% endif %} and may include errors or omissions. Please check the <a class="" target="_blank" title="Discuss this document" data-proofer-ignore href="https://github.com/nkdAgility/Scrum-Delivery-Kit-for-Software-Organisations/discussions/{% if page.discussionId != null %}{{ page.discussionId }}{% else %}new?category=general&title={{ page.title }}&body=%3E%20Title: {{ page.title }}%0d%0a%3E%20Path: {{ page.path }}%0d%0a%0d%0a--Start the discussion here ---{% endif %}">discussions</a> for any pending updates and changes to the content or to suggest your own changes.</p>
+    {% endif %} 
 </div>
 {% endif %} 
