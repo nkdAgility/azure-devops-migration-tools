@@ -1,8 +1,16 @@
-## FieldMaps: FieldSkipMapConfig
+---
+title: FieldSkipMapConfig
+layout: default
+pageType: reference
+classType: FieldMaps
+architecture: v1
+toc: true
+pageStatus: generated
+discussionId: 
+---
+
 
 >**_This documentation is for a preview version of the Azure DevOps Migration Tools._ If you are not using the preview version then please head over to the main [documentation](https://nkdagility.github.io/azure-devops-migration-tools).**
-
-[Overview](../../../index.md) > [Reference](../../index.md) > [API v1](../index.md) > [FieldMaps](index.md)> **FieldSkipMapConfig**
 
 Allows you to skip populating an existing field. Value in target with be reset to its OriginalValue.
 

@@ -1,0 +1,662 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Getting Started | Azure DevOps Migration Tools</title>
+<meta name="generator" content="Jekyll v4.3.2" />
+<meta property="og:title" content="Getting Started" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Azure DevOps Migration Tools" />
+<meta property="og:description" content="Azure DevOps Migration Tools" />
+<link rel="canonical" href="http://localhost:4000/azure-devops-migration-tools/getting-started-template.html" />
+<meta property="og:url" content="http://localhost:4000/azure-devops-migration-tools/getting-started-template.html" />
+<meta property="og:site_name" content="Azure DevOps Migration Tools" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Getting Started" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","dateModified":"2023-03-30T16:17:38+01:00","description":"Azure DevOps Migration Tools","headline":"Getting Started","url":"http://localhost:4000/azure-devops-migration-tools/getting-started-template.html"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="canonical" href="https://nkdagility.com/azure-devops-migration-tools/getting-started-template.html" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/3e6b2f4808.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="/azure-devops-migration-tools/assets/css/main.css">
+</head>
+<body><nav class="navbar navbar-expand-sm navbar-dark bg-brand-menu" aria-label="Third navbar example">
+    <div class="container">
+        <a class="navbar-brand" href="https://nkdagility.com" title="The Azure DevOps Migration Tools allow you to bulk edit and migrate data between Team Projects on both Microsoft Team Foundation Server (TFS) and Azure DevOps Services."><img src="https://nkdagility.com/wp-content/uploads/2020/11/nkdagility-with-martin-hinshelwood-dark-200.png" /></a>
+        <div class="collapse navbar-collapse" id="navbarsExample03">
+            <ul class="navbar-nav me-auto mb-2 mb-sm-0">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" title="About | The Azure DevOps Migration Tools allow you to bulk edit and migrate data between Team Projects on both Microsoft Team Foundation Server (TFS) and Azure DevOps Services." href="https://nkdagility.com/company/about-us">About</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" title="Training | The Azure DevOps Migration Tools allow you to bulk edit and migrate data between Team Projects on both Microsoft Team Foundation Server (TFS) and Azure DevOps Services." href="https://nkdagility.com/training/">Training</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" title="Consulting | The Azure DevOps Migration Tools allow you to bulk edit and migrate data between Team Projects on both Microsoft Team Foundation Server (TFS) and Azure DevOps Services." href="https://nkdagility.com/agile-consulting-coaching/">Consulting</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" title="Community | The Azure DevOps Migration Tools allow you to bulk edit and migrate data between Team Projects on both Microsoft Team Foundation Server (TFS) and Azure DevOps Services." href="https://nkdagility.com/community/">Community</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" title="Resources | The Azure DevOps Migration Tools allow you to bulk edit and migrate data between Team Projects on both Microsoft Team Foundation Server (TFS) and Azure DevOps Services." href="https://nkdagility.com/resources/">Resources</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container-fluid p-5 bg-brand-primary text-white text-center">
+    <h1>Azure DevOps Migration Tools</h1>
+    <p>Developed by Martin Hinshelwood as a kickstart for organizations that build software in developing their ways of working.</p>
+</div>   
+<nav class="navbar navbar-expand-sm navbar-dark bg-dark" aria-label="Third navbar example">
+    <div class="container-fluid">
+        <a class="btn btn-outline-light d-flex" href="https://nkdagility.com" title="naked Agility with Martin Hinshelwood"><i class="fa-solid fa-turn-down-left fa-rotate-90"></i><span class="d-none d-lg-block">&nbsp;Return to naked Agility</span></a>
+        <!-- <div class="collapse navbar-collapse" id="navbarsExample03">
+            <ul class="navbar-nav me-auto mb-2 mb-sm-0">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" title="Start | Azure DevOps Migration Tools" href="/azure-devops-migration-tools/"><i class="fa-sharp fa-solid fa-flag-checkered"></i> Start</a>
+                </li>
+            </ul>
+        </div> -->
+        <a class="d-lg-none btn btn-outline-light" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" aria-controls="offcanvasExample" title="Start | Azure DevOps Migration Tools" href="/azure-devops-migration-tools/"><i class="fa-solid fa-bars"></i></a>
+    </div>
+</nav>
+<div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offcanvasExampleLabel">Overview</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body"><div class="flex-shrink-0 p-3" style="width: 280px;">
+    <ul class="bd-links-nav list-unstyled mb-0 pb-3 pb-md-2 pe-lg-2">
+      <li class="mb-1">
+        <strong class="bd-links-heading d-flex w-100 align-items-center fw-semibold">Getting Started</strong>
+          <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ps-2">
+            <li><a href="/azure-devops-migration-tools/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a></li>
+            <li><a href="/azure-devops-migration-tools/getting-started.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Getting Started</a></li>
+            <li><a href="/azure-devops-migration-tools/server-configuration.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Server Configuration</a></li>
+            <li><a href="/azure-devops-migration-tools/changeset-migration.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Changeset Migration</a></li>
+          </ul>
+      </li>
+      <li class="mb-1">
+        <strong class="bd-links-heading d-flex w-100 align-items-center fw-semibold">Reference</strong>
+        <ul class="bd-links-nav list-unstyled mb-0 pb-3 pb-md-2 pe-lg-2 ps-2">
+          <li class="mb-1">
+            <strong class="bd-links-heading d-flex w-100 align-items-center fw-semibold">v1</strong>
+              <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ps-2">
+                  <li class="align-items-center"><a href="/azure-devops-migration-tools/reference/v1/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a></li>
+                  <li class="mb-1">
+                    <strong class="bd-links-heading d-flex w-100 align-items-center fw-semibold">FieldMaps</strong>
+                      <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/reference/v1/FieldMaps/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a></li>
+                        
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/FieldMaps/FieldClearMapConfig.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">FieldClearMapConfig</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/FieldMaps/FieldLiteralMapConfig.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">FieldLiteralMapConfig</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/FieldMaps/FieldMergeMapConfig.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">FieldMergeMapConfig</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/FieldMaps/FieldSkipMapConfig.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">FieldSkipMapConfig</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/FieldMaps/FieldValueMapConfig.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">FieldValueMapConfig</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/FieldMaps/FieldValuetoTagMapConfig.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">FieldValuetoTagMapConfig</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/FieldMaps/FieldtoFieldMapConfig.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">FieldtoFieldMapConfig</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/FieldMaps/FieldtoFieldMultiMapConfig.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">FieldtoFieldMultiMapConfig</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/FieldMaps/FieldtoTagMapConfig.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">FieldtoTagMapConfig</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/FieldMaps/MultiValueConditionalMapConfig.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">MultiValueConditionalMapConfig</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/FieldMaps/RegexFieldMapConfig.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">RegexFieldMapConfig</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/FieldMaps/TreeToTagMapConfig.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">TreeToTagMapConfig</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                      </ul>
+                  </li>
+                  <li class="mb-1">
+                    <strong class="bd-links-heading d-flex w-100 align-items-center fw-semibold">Processors</strong>
+                      <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/reference/v1/Processors/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a></li>
+                        
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/Processors/CreateTeamFolders.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">CreateTeamFolders</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/Processors/ExportProfilePictureFromADContext.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">ExportProfilePictureFromADContext</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/Processors/ExportTeamList.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">ExportTeamList</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/Processors/FakeProcessor.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">FakeProcessor</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/Processors/FixGitCommitLinks.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">FixGitCommitLinks</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/Processors/ImportProfilePictureContext.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">ImportProfilePictureContext</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/Processors/TeamMigrationContext.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">TeamMigrationContext</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/Processors/TestConfigurationsMigrationContext.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">TestConfigurationsMigrationContext</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/Processors/TestVariablesMigrationContext.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">TestVariablesMigrationContext</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/Processors/WorkItemDelete.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">WorkItemDelete</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/Processors/WorkItemPostProcessingContext.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">WorkItemPostProcessingContext</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/Processors/WorkItemQueryMigrationContext.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">WorkItemQueryMigrationContext</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/Processors/WorkItemUpdate.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">WorkItemUpdate</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/Processors/WorkItemUpdateAreasAsTagsContext.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">WorkItemUpdateAreasAsTagsContext</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                      </ul>
+                  </li>
+              </ul>
+          </li>
+          <li class="mb-1">
+            <strong class="bd-links-heading d-flex w-100 align-items-center fw-semibold">v2</strong>
+              <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ps-2">
+                  <li class="align-items-center"><a href="/azure-devops-migration-tools/reference/v2/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a></li>
+                  <li class="mb-1">
+                    <strong class="bd-links-heading d-flex w-100 align-items-center fw-semibold">EndpointEnrichers</strong>
+                      <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/reference/v2/Endpoints/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a></li>
+                        
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/EndpointEnrichers/TfsWorkItemAttachmentEnricher.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">TfsWorkItemAttachmentEnricher</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                      </ul>
+                  </li>
+                  <li class="mb-1">
+                    <strong class="bd-links-heading d-flex w-100 align-items-center fw-semibold">Endpoints</strong>
+                      <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/reference/v2/Endpoints/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a></li>
+                        
+                        
+                      </ul>
+                  </li>
+                  <li class="mb-1">
+                    <strong class="bd-links-heading d-flex w-100 align-items-center fw-semibold">FieldMaps</strong>
+                      <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/reference/v2/FieldMaps/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a></li>
+                        
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/FieldMaps/FieldClearMapConfig.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">FieldClearMapConfig</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/FieldMaps/FieldLiteralMapConfig.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">FieldLiteralMapConfig</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/FieldMaps/FieldMergeMapConfig.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">FieldMergeMapConfig</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/FieldMaps/FieldSkipMapConfig.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">FieldSkipMapConfig</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/FieldMaps/FieldValueMapConfig.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">FieldValueMapConfig</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/FieldMaps/FieldValuetoTagMapConfig.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">FieldValuetoTagMapConfig</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/FieldMaps/FieldtoFieldMapConfig.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">FieldtoFieldMapConfig</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/FieldMaps/FieldtoFieldMultiMapConfig.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">FieldtoFieldMultiMapConfig</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/FieldMaps/FieldtoTagMapConfig.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">FieldtoTagMapConfig</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/FieldMaps/MultiValueConditionalMapConfig.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">MultiValueConditionalMapConfig</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/FieldMaps/RegexFieldMapConfig.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">RegexFieldMapConfig</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/FieldMaps/TreeToTagMapConfig.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">TreeToTagMapConfig</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                      </ul>
+                  </li>
+                  <li class="mb-1">
+                    <strong class="bd-links-heading d-flex w-100 align-items-center fw-semibold">MappingTools</strong>
+                      <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/reference/v2/MappingTools/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a></li>
+                        
+                        
+                      </ul>
+                  </li>
+                  <li class="mb-1">
+                    <strong class="bd-links-heading d-flex w-100 align-items-center fw-semibold">ProcessorEnrichers</strong>
+                      <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/reference/v2/ProcessorEnrichers/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a></li>
+                        
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/ProcessorEnrichers/AppendMigrationToolSignatureFooter.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">AppendMigrationToolSignatureFooter</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/ProcessorEnrichers/EmbededImagesRepairEnricher.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">EmbededImagesRepairEnricher</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/ProcessorEnrichers/FilterWorkItemsThatAlreadyExistInTarget.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">FilterWorkItemsThatAlreadyExistInTarget</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/ProcessorEnrichers/PauseAfterEachItem.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">PauseAfterEachItem</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/ProcessorEnrichers/SkipToFinalRevisedWorkItemType.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">SkipToFinalRevisedWorkItemType</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/ProcessorEnrichers/TfsEmbededImagesEnricher.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">TfsEmbededImagesEnricher</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/ProcessorEnrichers/TfsGitRepositoryEnricher.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">TfsGitRepositoryEnricher</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/ProcessorEnrichers/TfsNodeStructure.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">TfsNodeStructure</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/ProcessorEnrichers/TfsRevisionManager.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">TfsRevisionManager</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/ProcessorEnrichers/TfsValidateRequiredField.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">TfsValidateRequiredField</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/ProcessorEnrichers/TfsWorkItemEmbededLinkEnricher.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">TfsWorkItemEmbededLinkEnricher</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/ProcessorEnrichers/TfsWorkItemLinkEnricher.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">TfsWorkItemLinkEnricher</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                      </ul>
+                  </li>
+                  <li class="mb-1">
+                    <strong class="bd-links-heading d-flex w-100 align-items-center fw-semibold">Processors</strong>
+                      <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/reference/v2/Processors/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a></li>
+                        
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/Processors/TfsAreaAndIterationProcessor.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">TfsAreaAndIterationProcessor</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/Processors/TfsSharedQueryProcessor.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">TfsSharedQueryProcessor</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/Processors/TfsTeamSettingsProcessor.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">TfsTeamSettingsProcessor</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                      </ul>
+                  </li>
+              </ul>
+          </li> 
+        </ul>
+      </li>   
+      <li class="border-top my-3"></li>
+    </ul>
+  </div>
+
+  </div>
+</div><div class="mainContainer">
+        <div class="container-flow mt-5 m-5 d-flex mb-3">
+            <div class="p-2 justify-content-end d-none d-lg-block"><div class="flex-shrink-0 p-3" style="width: 280px;">
+    <ul class="bd-links-nav list-unstyled mb-0 pb-3 pb-md-2 pe-lg-2">
+      <li class="mb-1">
+        <strong class="bd-links-heading d-flex w-100 align-items-center fw-semibold">Getting Started</strong>
+          <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ps-2">
+            <li><a href="/azure-devops-migration-tools/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a></li>
+            <li><a href="/azure-devops-migration-tools/getting-started.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Getting Started</a></li>
+            <li><a href="/azure-devops-migration-tools/server-configuration.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Server Configuration</a></li>
+            <li><a href="/azure-devops-migration-tools/changeset-migration.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Changeset Migration</a></li>
+          </ul>
+      </li>
+      <li class="mb-1">
+        <strong class="bd-links-heading d-flex w-100 align-items-center fw-semibold">Reference</strong>
+        <ul class="bd-links-nav list-unstyled mb-0 pb-3 pb-md-2 pe-lg-2 ps-2">
+          <li class="mb-1">
+            <strong class="bd-links-heading d-flex w-100 align-items-center fw-semibold">v1</strong>
+              <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ps-2">
+                  <li class="align-items-center"><a href="/azure-devops-migration-tools/reference/v1/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a></li>
+                  <li class="mb-1">
+                    <strong class="bd-links-heading d-flex w-100 align-items-center fw-semibold">FieldMaps</strong>
+                      <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/reference/v1/FieldMaps/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a></li>
+                        
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/FieldMaps/FieldClearMapConfig.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">FieldClearMapConfig</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/FieldMaps/FieldLiteralMapConfig.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">FieldLiteralMapConfig</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/FieldMaps/FieldMergeMapConfig.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">FieldMergeMapConfig</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/FieldMaps/FieldSkipMapConfig.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">FieldSkipMapConfig</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/FieldMaps/FieldValueMapConfig.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">FieldValueMapConfig</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/FieldMaps/FieldValuetoTagMapConfig.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">FieldValuetoTagMapConfig</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/FieldMaps/FieldtoFieldMapConfig.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">FieldtoFieldMapConfig</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/FieldMaps/FieldtoFieldMultiMapConfig.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">FieldtoFieldMultiMapConfig</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/FieldMaps/FieldtoTagMapConfig.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">FieldtoTagMapConfig</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/FieldMaps/MultiValueConditionalMapConfig.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">MultiValueConditionalMapConfig</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/FieldMaps/RegexFieldMapConfig.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">RegexFieldMapConfig</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/FieldMaps/TreeToTagMapConfig.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">TreeToTagMapConfig</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                      </ul>
+                  </li>
+                  <li class="mb-1">
+                    <strong class="bd-links-heading d-flex w-100 align-items-center fw-semibold">Processors</strong>
+                      <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/reference/v1/Processors/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a></li>
+                        
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/Processors/CreateTeamFolders.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">CreateTeamFolders</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/Processors/ExportProfilePictureFromADContext.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">ExportProfilePictureFromADContext</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/Processors/ExportTeamList.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">ExportTeamList</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/Processors/FakeProcessor.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">FakeProcessor</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/Processors/FixGitCommitLinks.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">FixGitCommitLinks</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/Processors/ImportProfilePictureContext.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">ImportProfilePictureContext</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/Processors/TeamMigrationContext.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">TeamMigrationContext</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/Processors/TestConfigurationsMigrationContext.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">TestConfigurationsMigrationContext</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/Processors/TestVariablesMigrationContext.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">TestVariablesMigrationContext</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/Processors/WorkItemDelete.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">WorkItemDelete</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/Processors/WorkItemPostProcessingContext.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">WorkItemPostProcessingContext</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/Processors/WorkItemQueryMigrationContext.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">WorkItemQueryMigrationContext</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/Processors/WorkItemUpdate.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">WorkItemUpdate</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v1/Processors/WorkItemUpdateAreasAsTagsContext.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">WorkItemUpdateAreasAsTagsContext</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                      </ul>
+                  </li>
+              </ul>
+          </li>
+          <li class="mb-1">
+            <strong class="bd-links-heading d-flex w-100 align-items-center fw-semibold">v2</strong>
+              <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ps-2">
+                  <li class="align-items-center"><a href="/azure-devops-migration-tools/reference/v2/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a></li>
+                  <li class="mb-1">
+                    <strong class="bd-links-heading d-flex w-100 align-items-center fw-semibold">EndpointEnrichers</strong>
+                      <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/reference/v2/Endpoints/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a></li>
+                        
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/EndpointEnrichers/TfsWorkItemAttachmentEnricher.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">TfsWorkItemAttachmentEnricher</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                      </ul>
+                  </li>
+                  <li class="mb-1">
+                    <strong class="bd-links-heading d-flex w-100 align-items-center fw-semibold">Endpoints</strong>
+                      <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/reference/v2/Endpoints/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a></li>
+                        
+                        
+                      </ul>
+                  </li>
+                  <li class="mb-1">
+                    <strong class="bd-links-heading d-flex w-100 align-items-center fw-semibold">FieldMaps</strong>
+                      <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/reference/v2/FieldMaps/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a></li>
+                        
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/FieldMaps/FieldClearMapConfig.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">FieldClearMapConfig</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/FieldMaps/FieldLiteralMapConfig.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">FieldLiteralMapConfig</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/FieldMaps/FieldMergeMapConfig.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">FieldMergeMapConfig</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/FieldMaps/FieldSkipMapConfig.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">FieldSkipMapConfig</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/FieldMaps/FieldValueMapConfig.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">FieldValueMapConfig</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/FieldMaps/FieldValuetoTagMapConfig.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">FieldValuetoTagMapConfig</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/FieldMaps/FieldtoFieldMapConfig.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">FieldtoFieldMapConfig</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/FieldMaps/FieldtoFieldMultiMapConfig.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">FieldtoFieldMultiMapConfig</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/FieldMaps/FieldtoTagMapConfig.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">FieldtoTagMapConfig</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/FieldMaps/MultiValueConditionalMapConfig.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">MultiValueConditionalMapConfig</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/FieldMaps/RegexFieldMapConfig.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">RegexFieldMapConfig</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/FieldMaps/TreeToTagMapConfig.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">TreeToTagMapConfig</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                      </ul>
+                  </li>
+                  <li class="mb-1">
+                    <strong class="bd-links-heading d-flex w-100 align-items-center fw-semibold">MappingTools</strong>
+                      <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/reference/v2/MappingTools/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a></li>
+                        
+                        
+                      </ul>
+                  </li>
+                  <li class="mb-1">
+                    <strong class="bd-links-heading d-flex w-100 align-items-center fw-semibold">ProcessorEnrichers</strong>
+                      <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/reference/v2/ProcessorEnrichers/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a></li>
+                        
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/ProcessorEnrichers/AppendMigrationToolSignatureFooter.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">AppendMigrationToolSignatureFooter</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/ProcessorEnrichers/EmbededImagesRepairEnricher.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">EmbededImagesRepairEnricher</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/ProcessorEnrichers/FilterWorkItemsThatAlreadyExistInTarget.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">FilterWorkItemsThatAlreadyExistInTarget</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/ProcessorEnrichers/PauseAfterEachItem.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">PauseAfterEachItem</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/ProcessorEnrichers/SkipToFinalRevisedWorkItemType.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">SkipToFinalRevisedWorkItemType</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/ProcessorEnrichers/TfsEmbededImagesEnricher.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">TfsEmbededImagesEnricher</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/ProcessorEnrichers/TfsGitRepositoryEnricher.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">TfsGitRepositoryEnricher</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/ProcessorEnrichers/TfsNodeStructure.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">TfsNodeStructure</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/ProcessorEnrichers/TfsRevisionManager.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">TfsRevisionManager</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/ProcessorEnrichers/TfsValidateRequiredField.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">TfsValidateRequiredField</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/ProcessorEnrichers/TfsWorkItemEmbededLinkEnricher.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">TfsWorkItemEmbededLinkEnricher</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/ProcessorEnrichers/TfsWorkItemLinkEnricher.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">TfsWorkItemLinkEnricher</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                      </ul>
+                  </li>
+                  <li class="mb-1">
+                    <strong class="bd-links-heading d-flex w-100 align-items-center fw-semibold">Processors</strong>
+                      <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/reference/v2/Processors/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a></li>
+                        
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/Processors/TfsAreaAndIterationProcessor.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">TfsAreaAndIterationProcessor</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/Processors/TfsSharedQueryProcessor.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">TfsSharedQueryProcessor</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                        <li class="align-items-center"><a href="/azure-devops-migration-tools/Reference/v2/Processors/TfsTeamSettingsProcessor.html" class="link-body-emphasis d-inline-flex text-decoration-none rounded">TfsTeamSettingsProcessor</a>&nbsp;<small><i class="fa-regular fa-circle-exclamation"></i></small></li>
+                        
+                      </ul>
+                  </li>
+              </ul>
+          </li> 
+        </ul>
+      </li>   
+      <li class="border-top my-3"></li>
+    </ul>
+  </div>
+
+  </div>
+            <div class="p-2 flex-grow-1">
+                <article>
+                    <div class="container-flow content">
+                        <div class="d-flex justify-content-between">
+                            <div class="">
+                                <div class="container">
+    <div class="d-flex flex-row mb-3">
+        <div><a href='/azure-devops-migration-tools/'>Overview</a></div>
+
+
+  
+  <div> &nbsp;&rsaquo;&nbsp; </div>
+  <div><a>Getting Started Template</a></div>
+  
+
+</div>
+</div>
+
+                            </div>
+                            <div class="p-2 text-end">
+                                <a class="" target="_blank" title="Discuss this document" data-proofer-ignore href="https://github.com/nkdAgility/Scrum-Delivery-Kit-for-Software-Organisations/discussions/new?category=general&title=Getting Started&body=%3E%20Title: Getting Started%0d%0a%3E%20Path: getting-started-template.md%0d%0a%0d%0a--Start the discussion here ---">
+                                    <i class="fa-regular fa-comments"></i>
+                                </a>
+                                <a class="p-2" title="Edit this document" data-proofer-ignore href="https://github.com/nkdAgility/Scrum-Delivery-Kit-for-Software-Organisations/edit/main/src/getting-started-template.md">
+                                    <i class="fa-sharp fa-light fa-file-pen"></i> 
+                                </a>
+                            </div>
+                        </div>
+                        <div>
+                            <h1>Getting Started</h1>
+                        </div>
+                        <div class="d-flex">
+                            <p>Article</p>
+                            <span>&nbsp;<i class="fa-solid fa-pipe"></i>&nbsp;</span>
+                            <p>2 minutes to read</p>
+                            <span>&nbsp;<i class="fa-solid fa-pipe"></i>&nbsp;</span>
+                            <p>2023-03-30 16:17:38 +0100</p>
+                        </div>
+                        <div class="">
+                            
+ 
+                            <p>If you want to perform a bulk edit or a migration then you need to start here. This tool has been tested on updating from 100 to 250,000 work items by its users.</p>
+
+<p>Watch the <a href="https://youtu.be/RCJsST0xBCE">Video Overview</a> to get you started in 30 minutes. This tool is complicated and it’s not always easy to discover what you need to do.</p>
+
+<h2 id="install">
+<a class="anchor" href="#install" aria-hidden="true"><span class="octicon octicon-link"></span></a>Install</h2>
+
+<p>In order to run the migration you will need to install the tools first.</p>
+
+<ol>
+  <li>Install Chocolatey from <a href="https://chocolatey.org/install">https://chocolatey.org/install</a>
+</li>
+  <li>Run <code class="language-plaintext highlighter-rouge">choco install vsts-sync-migrator</code> to install the tools <a href="https://chocolatey.org/packages/vsts-sync-migrator">source</a>
+</li>
+</ol>
+
+<p>The tools are now installed. To run them you will need to switch to <code class="language-plaintext highlighter-rouge">c:\tools\MigrationTools\</code> and run <code class="language-plaintext highlighter-rouge">migration.exe</code>.</p>
+
+<h2 id="upgrade">
+<a class="anchor" href="#upgrade" aria-hidden="true"><span class="octicon octicon-link"></span></a>Upgrade</h2>
+
+<ol>
+  <li>Run <code class="language-plaintext highlighter-rouge">choco upgrade  vsts-sync-migrator</code> to upgrade the tools <a href="https://chocolatey.org/packages/vsts-sync-migrator">source</a>
+</li>
+</ol>
+
+<h2 id="server-configuration-and-setup">
+<a class="anchor" href="#server-configuration-and-setup" aria-hidden="true"><span class="octicon octicon-link"></span></a>Server configuration and setup</h2>
+
+<p>Follow the <a href="/docs/server-configuration.md">setup instructions</a> to make sure that you can run the tool against your environments and importantly add the required custom field ‘ReflectedWorkItemId’</p>
+
+<h2 id="create-a-default-configuration-file">
+<a class="anchor" href="#create-a-default-configuration-file" aria-hidden="true"><span class="octicon octicon-link"></span></a>Create a default configuration file</h2>
+
+<ol>
+  <li>Open a command prompt or PowerShell window at <code class="language-plaintext highlighter-rouge">C:\tools\MigrationTools\</code>
+</li>
+  <li>Run <code class="language-plaintext highlighter-rouge">./migration.exe init</code> to create a default configuration</li>
+  <li>Open <code class="language-plaintext highlighter-rouge">configuration.json</code> from the current directory</li>
+</ol>
+
+<p>You can now customise the configuration depending on what you need to do. However a basic config that you can use to migrate from one team project to another with the same process template is:</p>
+
+<pre><code class="language-JSON">&lt;Import:Reference/Generated/configuration.config&gt;
+</code></pre>
+
+<p>The default <a href="/docs/Reference/v1/Processors/WorkItemMigrationConfig.md">WorkItemMigrationConfig</a> processor will perform the following operations:</p>
+
+<ul>
+  <li>Migrate interations and sprints</li>
+  <li>Attachments</li>
+  <li>Links including for source code. Optionally clone the repositories before starting the migration to have links maintained on the initial pass.</li>
+</ul>
+
+<h2 id="how-to-execute-configurationjson-with-minimal-adjustments">
+<a class="anchor" href="#how-to-execute-configurationjson-with-minimal-adjustments" aria-hidden="true"><span class="octicon octicon-link"></span></a>How to execute configuration.json with minimal adjustments</h2>
+
+<blockquote>
+  <p>Remember to add custom field <a href="/docs/server-configuration.md">‘ReflectedWorkItemId’</a> to both, the source and the target team project before starting migration!</p>
+</blockquote>
+
+<ol>
+  <li>Adjust the value of the <code class="language-plaintext highlighter-rouge">Collection</code> attribute for Source and Target</li>
+  <li>Adjust the value of the <code class="language-plaintext highlighter-rouge">Project</code> attribute for Source and Target</li>
+  <li>
+    <p>Set the <code class="language-plaintext highlighter-rouge">AuthenticationMode</code> (<code class="language-plaintext highlighter-rouge">Prompt</code> or <code class="language-plaintext highlighter-rouge">AccessToken</code>) for Source and Target</p>
+
+    <p>If you set Authentication mode to <code class="language-plaintext highlighter-rouge">AccessToken</code>, enter a valid PAT as value
+ for the <code class="language-plaintext highlighter-rouge">PersonalAccessToken</code> attribute, or set the
+ <code class="language-plaintext highlighter-rouge">PersonalAccessTokenVariableName</code> to the name of an environment variable containing your PAT.</p>
+  </li>
+  <li>
+    <p>Adjust the value of the <code class="language-plaintext highlighter-rouge">ReflectedWorkItemIDFieldName</code> attribute (field name of the migration tracking field) for Source and Target</p>
+
+    <p>For example: <code class="language-plaintext highlighter-rouge">TfsMigrationTool.ReflectedWorkItemId</code> for TFS, <code class="language-plaintext highlighter-rouge">ReflectedWorkItemId</code> for VSTS or <code class="language-plaintext highlighter-rouge">Custom.ReflectedWorkItemId</code> for Azure DevOps</p>
+  </li>
+  <li>Enable the <code class="language-plaintext highlighter-rouge">WorkItemMigrationConfig</code> processor by setting <code class="language-plaintext highlighter-rouge">Enabled</code> to <code class="language-plaintext highlighter-rouge">true</code>
+</li>
+  <li>[OPTIONAL] Modify the <code class="language-plaintext highlighter-rouge">WIQLQueryBit</code> to migrate only the work items you want. The default WIQL will migrate all open work items and revisions excluding test suites and plans</li>
+  <li>Adjust the <a href="/docs/Reference/v1/Processors/WorkItemMigrationConfig.md"><code class="language-plaintext highlighter-rouge">NodeBasePaths</code></a> or leave empty to migrate all nodes</li>
+  <li>From the <code class="language-plaintext highlighter-rouge">C:\tools\MigrationTools\</code> path run <code class="language-plaintext highlighter-rouge">.\migration.exe execute --config .\configuration.json</code>
+</li>
+</ol>
+
+<p><strong>Remember:</strong> if you want a processor to run, it’s <code class="language-plaintext highlighter-rouge">Enabled</code> attribute must be set to <code class="language-plaintext highlighter-rouge">true</code>.</p>
+
+<p>Refer to the <a href="/docs/reference/index.md">Reference Guide</a> for more details.</p>
+
+
+                        </div>
+                    </div>
+                </article>
+            </div>
+            <div class="p-2 flex-fill d-none d-xl-block" style="min-width: 15vw;">
+                
+
+                
+                <div class="card mb-3">
+                    <h5 class="no_toc card-header">In this article</h5>
+                    <div class="card-body">
+                        <ul id="toc" class="section-nav">
+<li class="toc-entry toc-h2"><a href="#install">Install</a></li>
+<li class="toc-entry toc-h2"><a href="#upgrade">Upgrade</a></li>
+<li class="toc-entry toc-h2"><a href="#server-configuration-and-setup">Server configuration and setup</a></li>
+<li class="toc-entry toc-h2"><a href="#create-a-default-configuration-file">Create a default configuration file</a></li>
+<li class="toc-entry toc-h2"><a href="#how-to-execute-configurationjson-with-minimal-adjustments">How to execute configuration.json with minimal adjustments</a></li>
+</ul>
+                    </div>
+                </div>
+                
+                <div class="card mb-3">
+                    <h5 class="no_toc card-header">Project Details</h5>
+                    <div class="card-body">
+                     <a href="https://chocolatey.org/packages/vsts-sync-migrator/"><img src="https://img.shields.io/chocolatey/dt/vsts-sync-migrator.svg" alt="Chocolatey"></a> 
+                     <a href="https://github.com/nkdAgility/azure-devops-migration-tools/releases"><img src="https://img.shields.io/github/release/nkdAgility/vsts-sync-migration.svg" alt="GitHub release"></a> 
+                     <img src="https://nkdagility.visualstudio.com/_apis/public/build/definitions/1b52ce63-eccc-41c8-88f9-ae6ebeefdc63/94/badge" alt="Build on VSTS"></p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="container-fluid p-5 bg-secondary text-white text-center"><footer>
+  <div class="grid">
+    <div class="unit one-third center-on-mobiles">
+      <p>© 2023 <a href="https://nkdagility.com/" title="naked Agility with Martin Hinshelwood">Martin Hinshelwood and naked Agility Ltd</a>. This publication is offered for license under the Attribution Share-Alike license of Creative Commons, accessible at https://creativecommons.org/licenses/by-sa/4.0/legalcode and also described in summary form at https://creativecommons.org/licenses/by-sa/4.0/. By utilizing this Scrum Guide, you acknowledge and agree that you have read and agree to be bound by the terms of the Attribution Share-Alike license of Creative Commons.</p>
+      <p>Find the fill licence at <a href="/blob/master/LICENSE">MIT&nbsp;License</a>.</p>
+    </div>   
+  </div>
+</footer>
+
+
+</div>
+</body>
+</html>
+

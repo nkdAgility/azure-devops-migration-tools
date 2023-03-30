@@ -1,0 +1,36 @@
+{
+  "$type": "WorkItemMigrationConfig",
+  "Enabled": false,
+  "ReplayRevisions": true,
+  "PrefixProjectToNodes": false,
+  "UpdateCreatedDate": true,
+  "UpdateCreatedBy": true,
+  "WIQLQueryBit": "AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')",
+  "WIQLOrderBit": "[System.ChangedDate] desc",
+  "LinkMigration": true,
+  "AttachmentMigration": true,
+  "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
+  "FixHtmlAttachmentLinks": false,
+  "SkipToFinalRevisedWorkItemType": true,
+  "WorkItemCreateRetryLimit": 5,
+  "FilterWorkItemsThatAlreadyExistInTarget": true,
+  "PauseAfterEachWorkItem": false,
+  "AttachmentMaxSize": 480000000,
+  "AttachRevisionHistory": false,
+  "LinkMigrationSaveEachAsAdded": false,
+  "GenerateMigrationComment": true,
+  "WorkItemIDs": null,
+  "MaxRevisions": 0,
+  "UseCommonNodeStructureEnricherConfig": false,
+  "StopMigrationOnMissingAreaIterationNodes": true,
+  "NodeBasePaths": null,
+  "AreaMaps": {
+    "$type": "Dictionary`2"
+  },
+  "IterationMaps": {
+    "$type": "Dictionary`2"
+  },
+  "MaxGracefulFailures": 0,
+  "SkipRevisionWithInvalidIterationPath": false,
+  "SkipRevisionWithInvalidAreaPath": false
+}

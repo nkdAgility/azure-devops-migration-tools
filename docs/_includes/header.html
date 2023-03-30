@@ -1,0 +1,50 @@
+<nav class="navbar navbar-expand-sm navbar-dark bg-brand-menu" aria-label="Third navbar example">
+    <div class="container">
+        <a class="navbar-brand" href="{{site.parent_url}}" title="{{site.parent_title}}"><img src="{{site.parent_url}}/wp-content/uploads/2020/11/nkdagility-with-martin-hinshelwood-dark-200.png" /></a>
+        <div class="collapse navbar-collapse" id="navbarsExample03">
+            <ul class="navbar-nav me-auto mb-2 mb-sm-0">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" title="About | {{site.parent_title}}" href="{{site.parent_url}}/company/about-us">About</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" title="Training | {{site.parent_title}}" href="{{site.parent_url}}/training/">Training</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" title="Consulting | {{site.parent_title}}" href="{{site.parent_url}}/agile-consulting-coaching/">Consulting</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" title="Community | {{site.parent_title}}" href="{{site.parent_url}}/community/">Community</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" title="Resources | {{site.parent_title}}" href="{{site.parent_url}}/resources/">Resources</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container-fluid p-5 bg-brand-primary text-white text-center">
+    <h1>{{site.title}}</h1>
+    <p>Developed by Martin Hinshelwood as a kickstart for organizations that build software in developing their ways of working.</p>
+</div>   
+<nav class="navbar navbar-expand-sm navbar-dark bg-dark" aria-label="Third navbar example">
+    <div class="container-fluid">
+        <a class="btn btn-outline-light d-flex" href="{{site.parent_url}}" title="naked Agility with Martin Hinshelwood"><i class="fa-solid fa-turn-down-left fa-rotate-90"></i><span class="d-none d-lg-block">&nbsp;Return to naked Agility</span></a>
+        <!-- <div class="collapse navbar-collapse" id="navbarsExample03">
+            <ul class="navbar-nav me-auto mb-2 mb-sm-0">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" title="Start | {{site.title}}" href="{{site.baseurl}}/"><i class="fa-sharp fa-solid fa-flag-checkered"></i> Start</a>
+                </li>
+            </ul>
+        </div> -->
+        <a class="d-lg-none btn btn-outline-light" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" aria-controls="offcanvasExample" title="Start | {{site.title}}" href="{{site.baseurl}}/"><i class="fa-solid fa-bars"></i></a>
+    </div>
+</nav>
+<div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offcanvasExampleLabel">Overview</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        {%- include sidebar.html -%}
+    </div>
+</div>

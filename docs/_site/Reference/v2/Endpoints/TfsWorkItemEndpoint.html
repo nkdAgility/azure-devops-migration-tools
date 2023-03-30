@@ -1,0 +1,78 @@
+<h2 id="endpoint-tfsworkitemendpoint">Endpoint: TfsWorkItemEndpoint</h2>
+
+<blockquote>
+  <p><strong><em>This documentation is for a preview version of the Azure DevOps Migration Tools.</em> If you are not using the preview version then please head over to the main <a href="https://nkdagility.github.io/azure-devops-migration-tools">documentation</a>.</strong></p>
+</blockquote>
+
+<p><a href="/azure-devops-migration-tools/Reference/v2/">Overview</a> &gt; <a href="/azure-devops-migration-tools/Reference/v2/">Reference</a> &gt; <a href="/azure-devops-migration-tools/Reference/v2/Endpoints/">Endpoints</a> &gt; TfsWorkItemEndpoint</p>
+
+<p>The Work Item endpoint is super awesome.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Client</th>
+      <th>WriteTo/ReadFrom</th>
+      <th>Endpoint</th>
+      <th>Data Target</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>AzureDevops.ObjectModel</td>
+      <td>Tfs Object Model</td>
+      <td><code class="language-plaintext highlighter-rouge">TfsWorkItemEndPoint</code></td>
+      <td>WorkItems</td>
+      <td>TBA</td>
+    </tr>
+    <tr>
+      <td>AzureDevops.Rest</td>
+      <td>Azure DevOps REST</td>
+      <td>?</td>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>FileSystem</td>
+      <td>Local Files</td>
+      <td><code class="language-plaintext highlighter-rouge">FileSystemWorkItemEndpoint</code></td>
+      <td>WorkItems</td>
+      <td>TBA</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="endpoints-options">Endpoints Options</h3>
+
+<p>All Endpoints have a minimum set of options that are required to run.</p>
+
+<h4 id="minimum-options-to-run">Minimum Options to run</h4>
+
+<p>The <code class="language-plaintext highlighter-rouge">Direction</code> option is required to allow the system to set direction. At a minimum you need to set a <code class="language-plaintext highlighter-rouge">Source</code>.</p>
+
+<pre><code class="language-JSON">    {
+      {
+  "$type": "TfsWorkItemEndpointOptions",
+  "Organisation": "https://dev.azure.com/nkdagility-preview/",
+  "Project": "NeedToSetThis",
+  "Query": {
+    "$type": "QueryOptions",
+    "Query": "SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan') ORDER BY [System.ChangedDate] desc",
+    "Paramiters": {
+      "$type": "Dictionary`2",
+      "TeamProject": "migrationSource1"
+    }
+  },
+  "AuthenticationMode": "AccessToken",
+  "AccessToken": "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
+  "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
+  "LanguageMaps": {
+    "$type": "TfsLanguageMapOptions",
+    "AreaPath": "Area",
+    "IterationPath": "Iteration"
+  },
+  "EndpointEnrichers": null
+}
+    }
+</code></pre>

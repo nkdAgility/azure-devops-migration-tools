@@ -1,0 +1,15 @@
+<div class="container">
+    <div class="d-flex flex-row mb-3">
+        <div><a href='{{ site.baseurl }}/'>Overview</a></div>
+{% assign crumbs = page.url | split: '/' %}
+{% for crumb in crumbs offset: 1 %}
+  {% if forloop.last %}
+  <div> &nbsp;&rsaquo;&nbsp; </div>
+  <div><a>{{ crumb | replace:'-',' ' | remove:'/index.html' | replace:'.html',' ' | capitalize_all }}</a></div>
+  {% else %}
+  <div> &nbsp;&rsaquo;&nbsp; </div>
+  <div><a href="{% assign crumb_limit = forloop.index | plus: 1 %}{{site.baseurl}}{% for crumb in crumbs limit: crumb_limit %}{{ crumb | append: '/' }}{% endfor %}">{{ crumb | replace:'-',' ' | remove:'/index.html'| replace:'.html',' ' | capitalize_all }}</a></div>
+  {% endif %}
+{% endfor %}
+</div>
+</div>

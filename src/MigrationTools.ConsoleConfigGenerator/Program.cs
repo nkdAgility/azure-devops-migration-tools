@@ -179,6 +179,7 @@ namespace VstsSyncMigrator.ConsoleApp
             templatemd = templatemd.Replace("<Description>", GetTypeData(item));
             templatemd = templatemd.Replace("<ClassName>", item.Name);
             templatemd = templatemd.Replace("<TypeName>", folder);
+            templatemd = templatemd.Replace("<architecture>", apiVersion);
             templatemd = ProcessBreadcrumbs(apiVersion, folder, item, templatemd);
             string filename = $"../../../../../docs/Reference/{apiVersion}/{folder}/{item.Name}.md";
             File.WriteAllText(filename, templatemd);

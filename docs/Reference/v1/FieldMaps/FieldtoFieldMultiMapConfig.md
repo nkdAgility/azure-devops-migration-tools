@@ -1,8 +1,16 @@
-## FieldMaps: FieldtoFieldMultiMapConfig
+---
+title: FieldtoFieldMultiMapConfig
+layout: default
+pageType: reference
+classType: FieldMaps
+architecture: v1
+toc: true
+pageStatus: generated
+discussionId: 
+---
+
 
 >**_This documentation is for a preview version of the Azure DevOps Migration Tools._ If you are not using the preview version then please head over to the main [documentation](https://nkdagility.github.io/azure-devops-migration-tools).**
-
-[Overview](../../../index.md) > [Reference](../../index.md) > [API v1](../index.md) > [FieldMaps](index.md)> **FieldtoFieldMultiMapConfig**
 
 Want to setup a bunch of field maps in a single go. Use this shortcut!
 

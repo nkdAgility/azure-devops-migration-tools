@@ -1,0 +1,7 @@
+{
+  "$type": "TeamMigrationConfig",
+  "Enabled": false,
+  "PrefixProjectToNodes": false,
+  "EnableTeamSettingsMigration": true,
+  "FixTeamSettingsForExistingTeams": false
+}

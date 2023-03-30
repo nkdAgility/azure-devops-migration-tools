@@ -1,0 +1,69 @@
+<h1 id="azure-devops-migration-tools-faq">Azure DevOps Migration Tools FAQ</h1>
+
+<h2 id="what-is-this-tool-for">What is this tool for?</h2>
+
+<p>The Azure DevOps Migration Tools allow you to bulk edit and migrate data between Team Projects on both Microsoft Team Foundation Server (TFS) and Azure DevOps Services.</p>
+
+<h2 id="what-processors-are-available">What processors are available?</h2>
+
+<p>As this is an active project the list of processors is ever changing. The current list can be seen on this <a href="/azure-devops-migration-tools/">documentation’s home page</a></p>
+
+<h2 id="can-this-tool-move-source-code-too">Can this tool move source code too?</h2>
+
+<p>No, this tools has no processors for source code migration. You need to use other tools to do that.</p>
+
+<h2 id="i-run-migrator-execute--c-configurationjson-but-nothing-happens">I run ‘migrator execute -c configuration.json` but nothing happens</h2>
+
+<p>If you have generated the default <code class="language-plaintext highlighter-rouge">configuration.json</code> configuration file using the <code class="language-plaintext highlighter-rouge">migrator init</code> command then the chances are nothing is happening because all the processors are set to <code class="language-plaintext highlighter-rouge">"Enabled": false</code>.</p>
+
+<p>You need to enable at least one processor before anything will happen.</p>
+
+<h2 id="wow-that-configuration-file-looks-complex">Wow that configuration file looks complex!</h2>
+
+<p>Chances are you will not need all the section in the default generated <code class="language-plaintext highlighter-rouge">configuration.json</code> configuration file.</p>
+
+<p>It is often best to use this file as ane example and to build up your own configuration file up from scratch with just the settings you need.</p>
+
+<h2 id="the-processors-are-not-running-in-the-order-i-need">The processors are not running in the order I need.</h2>
+
+<p>If you find processors are running in an incorrect order for your needs just re-order their declarations in the <code class="language-plaintext highlighter-rouge">configuration.json</code> configuration file. The processors are run in the order they are shown.</p>
+
+<h2 id="every-test-migration-i-do-is-slow">Every test migration I do is slow</h2>
+
+<p>You can often speed up your testing by disabling processors that have previous run successfully by editing processors  <code class="language-plaintext highlighter-rouge">"Enabled": true</code> settings.</p>
+
+<p>You do have to be careful with this process, it does assume that you are not clearing down the target system between tests, and that what has been migrated in past test runs is correct for the processor you are testing.</p>
+
+<p>That said it is often a good idea to build up your configuration processor by processor. Proving each one works as required before adding the next one.</p>
+
+<h2 id="work-items-are-not-migrated">Work items are not migrated</h2>
+
+<p>Maybe you see a <code class="language-plaintext highlighter-rouge">TF237124: Work Item is not ready to save</code> error when you attempt to do a migration.</p>
+
+<p>A number of processors have a setting <code class="language-plaintext highlighter-rouge">"PrefixProjectToNodes": false</code>. If set to true this inserts the name of the source Team Project into the created structure e.g. Area path, Iteration path, or Work Item queries. It is also used by the migration processor.</p>
+
+<p>This setting <strong>must</strong> be consistent across all processors in a configuration file. If it not it can often cause migrations to fail as expected paths are not present.</p>
+
+<h2 id="my-test-migration-is-skipping-items">My test migration is skipping items</h2>
+
+<p>This tools is designed to do sync and/or migrations. This means it detects if an item has already been migrated. If it finds a migrated item it will be skipped.</p>
+
+<p>If you want to fully test a migration it is often easiest to delete the target Team Project and recreate it, rather than try to delete all the previously migrated items.</p>
+
+<p>Also remember that the <code class="language-plaintext highlighter-rouge">ReflectedWorkItemId</code> value will have been set on the source system. This can mean the work item select queries may not give the expect results, unless this field is cleared between test runs.</p>
+
+<h2 id="i-dont-understand-what-the-reflectedworkitemid-is-for">I don’t understand what the ‘ReflectedWorkItemId’ is for?</h2>
+
+<p>To provide sync as well as migration it is important that the tools knows which items have already been migrated. This is the purpose of the <code class="language-plaintext highlighter-rouge">ReflectedWorkItemId</code> field.</p>
+
+<p>This field needs to be added to both the source and target team projects. On both system the URL pointing to the migrated item on the other system is stored here. This means there is an easy way for a user to trace work items between the source and target systems (and vice versa).</p>
+
+<p>How the <code class="language-plaintext highlighter-rouge">ReflectedWorkItemId</code> field is added depends on whether the system, there are three options</p>
+
+<ul>
+  <li>TFS</li>
+  <li>Azure DevOps Services using the new <a href="https://docs.microsoft.com/en-us/azure/devops/organizations/settings/work/add-custom-field?view=azure-devops">process customisation</a></li>
+  <li>Azure DevOps Services when the instance has been imported using the <a href="https://blogs.msdn.microsoft.com/visualstudioalm/2016/11/16/import-your-tfs-database-into-visual-studio-team-services/">VSTS Migration Tool</a></li>
+</ul>
+
+<p>For details on how to add the field in each case, and trouble shooting check the <a href="/azure-devops-migration-tools/server-configuration.html">server configuration page</a></p>

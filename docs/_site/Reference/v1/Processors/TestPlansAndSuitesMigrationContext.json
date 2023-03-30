@@ -1,0 +1,15 @@
+{
+  "$type": "TestPlansAndSuitesMigrationConfig",
+  "Enabled": false,
+  "PrefixProjectToNodes": false,
+  "OnlyElementsWithTag": null,
+  "TestPlanQueryBit": null,
+  "RemoveAllLinks": false,
+  "MigrationDelay": 0,
+  "UseCommonNodeStructureEnricherConfig": false,
+  "NodeBasePaths": null,
+  "AreaMaps": null,
+  "IterationMaps": null,
+  "RemoveInvalidTestSuiteLinks": false,
+  "FilterCompleted": false
+}

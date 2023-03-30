@@ -1,0 +1,7 @@
+{
+  "$type": "WorkItemQueryMigrationConfig",
+  "Enabled": false,
+  "PrefixProjectToNodes": false,
+  "SharedFolderName": "Shared Queries",
+  "SourceToTargetFieldMappings": null
+}
