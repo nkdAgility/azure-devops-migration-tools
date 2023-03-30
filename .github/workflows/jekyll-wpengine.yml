@@ -40,10 +40,10 @@ jobs:
         # uses: Dylan700/sftp-upload-action@f90db607d9fe1acdc0eefccee84d37c119b268fe
         uses: Dylan700/sftp-upload-action@v1.1.4
         with:
-          server: ${{ secrets.SFTP_SERVER }}
-          username: ${{ secrets.SFTP_USERNAME }}
+          server: nakedalmweb.sftp.wpengine.com
+          username: nakedalmweb-githubAzDo
           password: ${{ secrets.SFTP_PASSWORD }}
-          port: ${{ secrets.SFTP_PORT }}
+          port: 2222
           # If true, outputs the results of the upload, without actually uploading.
           dry-run: false
           # A list of folders to upload in the format of `folder/ => upload_folder/`
@@ -51,21 +51,3 @@ jobs:
               ./_site/ => ./
           # If true, any existing files in the remote upload directories are deleted.
           delete: true
-
-      #- name: SFTP Deploy
-      #  # You may pin to the exact commit or the version.
-      #  # uses: wlixcc/SFTP-Deploy-Action@da88a4dbe95286266bbac3c0b2b8284048d20c8f
-      #  uses: wlixcc/SFTP-Deploy-Action@v1.2.4
-      #  with:
-      #    # username
-      #    username: ${{ secrets.SFTP_USERNAME }}
-      #    # your sftp server
-      #    server: ${{ secrets.SFTP_SERVER }}
-      #    # your sftp server port, default to 22
-      #    port: ${{ secrets.SFTP_PORT }}
-      #    # will put all file under this path
-      #    local_path: ./_site
-      #    # files will copy to under remote_path
-      #    remote_path: /test-deploy
-      #    # SSH passsword，If a password is set, the secret key pair is ignored
-      #    password: ${{ secrets.SFTP_PASSWORD }}
