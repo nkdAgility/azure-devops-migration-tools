@@ -1,9 +1,0 @@
-site_name: VSTS Sync Migrator
-pages:
-- Home: index.md
-- Getting Started: getting-started.md
-- Configuration: configuration.md
-- Server Configuration: server-configuration.md 
-- Why: why.md 
-- FAQ: faq.md
-theme: readthedocs

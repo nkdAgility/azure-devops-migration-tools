@@ -6,7 +6,7 @@ parent_url: https://nkdagility.com
 website: https://nkdagility.com
 baseurl: /azure-devops-migration-tools
 url: "https://nkdagility.com"
-source: ./
+source: ./docs
 destination: ./_site
 
 include:
