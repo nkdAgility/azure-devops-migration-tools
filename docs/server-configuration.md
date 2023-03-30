@@ -2,6 +2,7 @@
 title: Server Configuration and Requirements
 layout: default
 pageType: index
+template: default
 toc: true
 pageStatus: production
 discussionId: 

@@ -87,6 +87,7 @@ namespace VstsSyncMigrator.ConsoleApp
                 {
                     templatemd = System.IO.File.ReadAllText(filepath);
                     templatemd = ProcessImports(templatemd, file.Contains("Reference") ? referencePath : docsPath   );
+                    templatemd = templatemd.Replace("<template>", System.IO.Path.GetFileName(file));
                     System.IO.File.WriteAllText(filepath.Replace("-template", ""), templatemd);
                 }
                 //ProcessImports
@@ -343,10 +344,12 @@ namespace VstsSyncMigrator.ConsoleApp
             if (System.IO.File.Exists(templateFile))
             {
                 templatemd = System.IO.File.ReadAllText(templateFile);
+                templatemd = templatemd.Replace("<template>", System.IO.Path.GetFileName(templateFile));
             }
             else
             {
                 templatemd = System.IO.File.ReadAllText(masterTemplate);
+                templatemd = templatemd.Replace("<template>", "default");
             }
 
             return templatemd;

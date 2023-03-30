@@ -1,6 +1,7 @@
 ---
 title: <ClassName>
 layout: default
+template: <template>
 pageType: reference
 classType: <TypeName>
 architecture: <architecture>

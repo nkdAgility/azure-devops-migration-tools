@@ -1,6 +1,7 @@
 ---
 title: v2 Reference Overview
 layout: default
+template: <template>
 pageType: index
 toc: true
 pageStatus: production

@@ -2,6 +2,7 @@
 title: <ClassName>
 layout: default
 pageType: reference
+template: <template>
 classType: <TypeName>
 architecture: <architecture>
 toc: true

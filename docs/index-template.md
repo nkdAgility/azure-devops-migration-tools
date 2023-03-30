@@ -2,6 +2,7 @@
 title: Azure DevOps Migration Tools
 layout: default
 pageType: index
+template: <template>
 toc: true
 pageStatus: production
 discussionId: 

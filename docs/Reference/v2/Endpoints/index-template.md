@@ -1,6 +1,7 @@
 ---
 title: Endpoints
 layout: default
+template: <template>
 pageType: index
 toc: true
 pageStatus: production

@@ -2,6 +2,7 @@
 title: Getting Started
 layout: default
 pageType: index
+template: <template>
 toc: true
 pageStatus: production
 discussionId: 
