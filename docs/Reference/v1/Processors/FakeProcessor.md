@@ -21,6 +21,7 @@ Note: this is only for internal usage. Don't use this in your configurations.
 |------------------------|---------|------------------------------------------|------------------------------------------|
 | Enabled | Boolean | missng XML code comments | missng XML code comments |
 
+{: .table .table-striped .table-bordered .d-none .d-md-block}
 
 ### Example JSON
 

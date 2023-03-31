@@ -28,6 +28,7 @@ The TfsSharedQueryProcessor enabled you to migrate queries from one locatio nto 
 | SourceToTargetFieldMappings | Dictionary | Mapping of the source to the target | missng XML code comments |
 | TargetName | String | missng XML code comments | missng XML code comments |
 
+{: .table .table-striped .table-bordered .d-none .d-md-block}
 
 ### Example JSON
 

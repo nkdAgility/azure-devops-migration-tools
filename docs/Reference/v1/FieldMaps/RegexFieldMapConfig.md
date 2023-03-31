@@ -25,6 +25,7 @@ I just need that bit of a field... need to send "2016.2" to two fields, one for 
 | targetField | String | missng XML code comments | missng XML code comments |
 | WorkItemTypeName | String | missng XML code comments | missng XML code comments |
 
+{: .table .table-striped .table-bordered .d-none .d-md-block}
 
 ### Example JSON
 

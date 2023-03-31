@@ -138,6 +138,7 @@ Most of these processors need to be run in order. If you try to migrate work ite
 | [WorkItemUpdate](Reference/v1/Processors/WorkItemUpdate.md) | missng XML code comments | WorkItem | This processor allows you to make changes in place where we load from teh Target and update the Target. This is used for bulk updates with the most common reason being a process template change. |
 | [WorkItemUpdateAreasAsTagsContext](Reference/v1/Processors/WorkItemUpdateAreasAsTagsContext.md) | Beta | Work Item | A common issue with older *TFS/Azure DevOps* instances is the proliferation of `Area Paths`. With the use of `Area Path` for `Teams` and the addition of the `Node Name` column option these extensive tag hierarchies should instad be moved to tags. |
 
+{: .table .table-striped .table-bordered .d-none .d-md-block}
 
 ## Processors (v2 Architecture) [ PREVIEW ]
 
@@ -154,6 +155,7 @@ The new processor configuration is designed to allow the Migration Tools to supp
 | [TfsTeamSettingsProcessor](Reference/v2/Processors/TfsTeamSettingsProcessor.md) | Beta | Teams | Native TFS Processor, does not work with any other Endpoints. |
 | [WorkItemTrackingProcessor](Reference/v2/Processors/WorkItemTrackingProcessor.md) | missng XML code comments | missng XML code comments | This processor is intended, with the aid of [ProcessorEnrichers](../ProcessorEnrichers/index.md), to allow the migration of Work Items between two [Endpoints](../Endpoints/index.md). |
 
+{: .table .table-striped .table-bordered .d-none .d-md-block}
 
 ## Field Maps
 
@@ -176,6 +178,7 @@ However sometimes you want to move data to another field, or use a regex to pars
 | [RegexFieldMapConfig](Reference/v1/FieldMaps/RegexFieldMapConfig.md) | ready | Work Item Field | I just need that bit of a field... need to send "2016.2" to two fields, one for year and one for release? Done. |
 | [TreeToTagMapConfig](Reference/v1/FieldMaps/TreeToTagMapConfig.md) | ready | Work Item Field | Need to clear out those nasty Area tree hierarchies? This creates Tags for each node in the Area Path... |
 
+{: .table .table-striped .table-bordered .d-none .d-md-block}
 
 ## Code (TFVC)
 

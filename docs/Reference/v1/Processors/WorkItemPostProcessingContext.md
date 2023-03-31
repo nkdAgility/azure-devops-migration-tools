@@ -27,6 +27,7 @@ Reapply field mappings after a migration. Does not migtate Work Items, only reap
 | WorkItemCreateRetryLimit | Int32 | **beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count. This allows for periodic network glitches not to end the process. | 5 |
 | WorkItemIDs | IList | A list of work items to import | [] |
 
+{: .table .table-striped .table-bordered .d-none .d-md-block}
 
 ### Example JSON
 

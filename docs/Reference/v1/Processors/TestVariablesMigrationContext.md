@@ -21,6 +21,7 @@ This processor can migrate test variables that are defined in the test plans / s
 |------------------------|---------|------------------------------------------|------------------------------------------|
 | Enabled | Boolean | missng XML code comments | missng XML code comments |
 
+{: .table .table-striped .table-bordered .d-none .d-md-block}
 
 ### Example JSON
 

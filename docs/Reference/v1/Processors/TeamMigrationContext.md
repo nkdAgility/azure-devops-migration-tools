@@ -24,6 +24,7 @@ Migrates Teams and Team Settings: This should be run after `NodeStructuresMigrat
 | FixTeamSettingsForExistingTeams | Boolean | Reset the target team settings to match the source if the team exists | true |
 | PrefixProjectToNodes | Boolean | Prefix your iterations and areas with the project name. If you have enabled this in `NodeStructuresMigrationConfig` you must do it here too. | false |
 
+{: .table .table-striped .table-bordered .d-none .d-md-block}
 
 ### Example JSON
 

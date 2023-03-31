@@ -24,6 +24,7 @@ Just want to map one field to another? This is the one for you.
 | targetField | String | missng XML code comments | missng XML code comments |
 | WorkItemTypeName | String | missng XML code comments | missng XML code comments |
 
+{: .table .table-striped .table-bordered .d-none .d-md-block}
 
 ### Example JSON
 

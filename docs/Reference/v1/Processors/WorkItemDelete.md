@@ -27,6 +27,7 @@ The `WorkItemDelete` processor allows you to delete any amount of work items tha
 | WorkItemCreateRetryLimit | Int32 | missng XML code comments | missng XML code comments |
 | WorkItemIDs | IList | missng XML code comments | missng XML code comments |
 
+{: .table .table-striped .table-bordered .d-none .d-md-block}
 
 ### Example JSON
 
