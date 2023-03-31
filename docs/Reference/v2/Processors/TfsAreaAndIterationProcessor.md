@@ -28,8 +28,8 @@ The `TfsAreaAndIterationProcessor` migrates all of the Area nd Iteraion paths.
 | RefName | String | `Refname` will be used in the future to allow for using named Options without the need to copy all of the options. | missng XML code comments |
 | SourceName | String | missng XML code comments | missng XML code comments |
 | TargetName | String | missng XML code comments | missng XML code comments |
-
 {: .table .table-striped .table-bordered .d-none .d-md-block}
+
 
 ### Example JSON
 

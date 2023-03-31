@@ -18,7 +18,6 @@ missng XML code comments
 ### Options
 
 <Options>
-{: .table .table-striped .table-bordered .d-none .d-md-block}
 
 ### Example JSON
 

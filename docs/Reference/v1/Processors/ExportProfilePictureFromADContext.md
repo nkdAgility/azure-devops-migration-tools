@@ -24,8 +24,8 @@ Downloads corporate images and updates TFS/Azure DevOps profiles
 | Password | String | The password of the user that is used to export the pictures. | String.Empty |
 | PictureEmpIDFormat | String | TODO: You wpuld need to customise this for your system. Clone repo and run in Debug | String.Empty |
 | Username | String | The user name of the user that is used to export the pictures. | String.Empty |
-
 {: .table .table-striped .table-bordered .d-none .d-md-block}
+
 
 ### Example JSON
 

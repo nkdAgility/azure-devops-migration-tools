@@ -22,8 +22,8 @@ Need to clear out those nasty Area tree hierarchies? This creates Tags for each 
 | timeTravel | Int32 | missng XML code comments | missng XML code comments |
 | toSkip | Int32 | missng XML code comments | missng XML code comments |
 | WorkItemTypeName | String | missng XML code comments | missng XML code comments |
-
 {: .table .table-striped .table-bordered .d-none .d-md-block}
+
 
 ### Example JSON
 

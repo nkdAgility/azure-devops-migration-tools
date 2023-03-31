@@ -20,8 +20,8 @@ Note: this is only for internal usage. Don't use this in your configurations.
 | Parameter name         | Type    | Description                              | Default Value                            |
 |------------------------|---------|------------------------------------------|------------------------------------------|
 | Enabled | Boolean | missng XML code comments | missng XML code comments |
-
 {: .table .table-striped .table-bordered .d-none .d-md-block}
+
 
 ### Example JSON
 

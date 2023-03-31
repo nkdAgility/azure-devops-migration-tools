@@ -23,8 +23,8 @@ This processor can migrate queries for work items. Only shared queries are inclu
 | PrefixProjectToNodes | Boolean | Prefix your iterations and areas with the project name. If you have enabled this in `NodeStructuresMigrationConfig` you must do it here too. | false |
 | SharedFolderName | String | The name of the shared folder, made a parameter incase it every needs to be edited | none |
 | SourceToTargetFieldMappings | Dictionary | Any field mappings | none |
-
 {: .table .table-striped .table-bordered .d-none .d-md-block}
+
 
 ### Example JSON
 

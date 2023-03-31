@@ -110,6 +110,7 @@ These tools are build by naked Agility Limited's DevOps & Agility consultants to
 | Builds & Releases | [Azure Pipelines](https://dev.azure.com/nkdagility/migration-tools/)                   |
 |   Releases Output | [Github Releases](https://github.com/nkdAgility/azure-devops-migration-tools/releases) |
 |     Documentation | [Github Pages](https://nkdagility.com/docs/azure-devops-migration-tools/)              |
+{: .table .table-striped .table-bordered .d-none .d-md-block}
 
 **Watch the [Video Overview](https://youtu.be/RCJsST0xBCE) to get you started in 30 minutes. This tool is complicated and its not always easy to discover what you need to do.**
 

@@ -22,8 +22,8 @@ discussionId:
 | sourceFieldsAndValues | Dictionary | missng XML code comments | missng XML code comments |
 | targetFieldsAndValues | Dictionary | missng XML code comments | missng XML code comments |
 | WorkItemTypeName | String | missng XML code comments | missng XML code comments |
-
 {: .table .table-striped .table-bordered .d-none .d-md-block}
+
 
 ### Example JSON
 
