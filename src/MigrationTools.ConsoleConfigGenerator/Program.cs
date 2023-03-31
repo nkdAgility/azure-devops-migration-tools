@@ -327,12 +327,13 @@ namespace VstsSyncMigrator.ConsoleApp
 
         private static string ProcessBreadcrumbs(string apiVersion, string folder, Type item, string templatemd)
         {
-            string breadcrumbs = $"[Overview](../../../index.md) > [Reference](../../index.md) > [API {apiVersion}](../index.md) > [{folder}](index.md)";
-            if (item != null)
-            {
-                breadcrumbs += $"> **{item.Name}**";
-            }
-            templatemd = templatemd.Replace("<Breadcrumbs>", breadcrumbs);
+            //string breadcrumbs = $"[Overview](../../../index.md) > [Reference](../../index.md) > [API {apiVersion}](../index.md) > [{folder}](index.md)";
+            //if (item != null)
+            //{
+            //    breadcrumbs += $"> **{item.Name}**";
+            //}
+            //templatemd = templatemd.Replace("<Breadcrumbs>", breadcrumbs);
+            templatemd = templatemd.Replace("<Breadcrumbs>", "");
             return templatemd;
         }
 
