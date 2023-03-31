@@ -9,6 +9,26 @@ url: "https://nkdagility.com"
 githuburl: https://github.com/nkdAgility/azure-devops-migration-tools
 source: ./docs
 destination: ./_site
+logo: https://nkdagility.com/wp-content/uploads/2020/11/nkdagility-with-martin-hinshelwood-dark-200.png
+permalink: pretty
+
+defaults:
+  - scope:
+      path: ""
+    values:
+      image: /assets/images/naked-agility-Learn-Azure-DevOps-Migration-Tools-1600x900.jpg
+      toc: true
+
+toc:
+  min_level: 1
+  max_level: 2
+  ordered_list: false
+  no_toc_section_class: no_toc_section
+  list_id: toc
+  list_class: section-nav bd-links-nav list-unstyled pb-1 small
+  sublist_class: ''
+  item_class: toc-entry align-items-center pb-2
+  item_prefix: toc-
 
 include:
  - "**/*.md"
