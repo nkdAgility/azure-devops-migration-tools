@@ -30,7 +30,9 @@ Azure DevOps Processor that migrates Taskgroups, Build- and Release Pipelines.
 | RepositoryNameMaps | Dictionary | Map of Source Repository to Target Repository Names | missng XML code comments |
 | SourceName | String | missng XML code comments | missng XML code comments |
 | TargetName | String | missng XML code comments | missng XML code comments |
+{: .table .table-striped .table-bordered .d-none .d-md-block}
 
+{: .table .table-striped .table-bordered .d-none .d-md-block}
 
 ### Example JSON
 

@@ -26,6 +26,7 @@ It supports, new fields, updated fields, moved fields, new groups, updated group
 ### Properties
 
 <Options>
+{: .table .table-striped .table-bordered .d-none .d-md-block}
 
 ### Supported Endpoints
 

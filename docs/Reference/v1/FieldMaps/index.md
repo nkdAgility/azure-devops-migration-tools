@@ -26,6 +26,7 @@ These fieldMaps are provided to allow you to mondify the data as you do the migr
 | [MultiValueConditionalMapConfig](MultiValueConditionalMapConfig.md) | ready | Work Item Field | ??? If you know how to use this please send a PR :) |
 | [RegexFieldMapConfig](RegexFieldMapConfig.md) | ready | Work Item Field | I just need that bit of a field... need to send "2016.2" to two fields, one for year and one for release? Done. |
 | [TreeToTagMapConfig](TreeToTagMapConfig.md) | ready | Work Item Field | Need to clear out those nasty Area tree hierarchies? This creates Tags for each node in the Area Path... |
+{: .table .table-striped .table-bordered .d-none .d-md-block}
 
 
 

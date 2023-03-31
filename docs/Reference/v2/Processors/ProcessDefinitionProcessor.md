@@ -36,7 +36,9 @@ Process definition processor used to keep processes between two orgs in sync
 | SourceName | String | missng XML code comments | missng XML code comments |
 | TargetName | String | missng XML code comments | missng XML code comments |
 | UpdateProcessDetails | Boolean | missng XML code comments | missng XML code comments |
+{: .table .table-striped .table-bordered .d-none .d-md-block}
 
+{: .table .table-striped .table-bordered .d-none .d-md-block}
 
 ### Supported Endpoints
 

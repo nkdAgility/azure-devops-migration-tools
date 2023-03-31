@@ -282,6 +282,7 @@ namespace VstsSyncMigrator.ConsoleApp
                     string PropertyValue = GetPropertyData(options, joptions, jproperty, "summary");
                     properties.AppendLine(string.Format("| {0} | {1} | {2} | {3} |", jproperty.Name, GetPropertyType(options, jproperty), PropertyValue, GetPropertyData(options, joptions, jproperty, "default")));
                 }
+                properties.AppendLine("{: .table .table-striped .table-bordered .d-none .d-md-block}");
                 templatemd = templatemd.Replace("<Options>", properties.ToString());
             }
             else
@@ -304,6 +305,7 @@ namespace VstsSyncMigrator.ConsoleApp
                 string typeDocdStatus = GetTypeData(item, "status");
                 properties.AppendLine($"| [{item.Name}]({pathRoute}{item.Name}.md) | {typeDocdStatus} | {typeDocdDatatype} | {typeDocSummery} |");
             }
+            properties.AppendLine("{: .table .table-striped .table-bordered .d-none .d-md-block}");
             return properties.ToString();
         }
 

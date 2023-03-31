@@ -21,6 +21,7 @@ A common issue with older *TFS/Azure DevOps* instances is the proliferation of `
 |------------------------|---------|------------------------------------------|------------------------------------------|
 | AreaIterationPath | String | This is a required parameter. That define the root path of the iteration. To get the full path use `\` | \ |
 | Enabled | Boolean | missng XML code comments | missng XML code comments |
+{: .table .table-striped .table-bordered .d-none .d-md-block}
 
 
 ### Example JSON

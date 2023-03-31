@@ -29,6 +29,7 @@ Native TFS Processor, does not work with any other Endpoints.
 | TargetName | String | missng XML code comments | missng XML code comments |
 | Teams | List | List of Teams to process. If this is `null` then all teams will be processed. | missng XML code comments |
 | UpdateTeamSettings | Boolean | Reset the target team settings to match the source if the team exists | false |
+{: .table .table-striped .table-bordered .d-none .d-md-block}
 
 
 ### Example JSON

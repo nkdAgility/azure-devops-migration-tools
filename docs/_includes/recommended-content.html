@@ -1,0 +1,21 @@
+{% assign recommendations = page.recommendedContent %}
+{% if recommendations.size > 0 %}
+<hr />
+<h2>Recommended Content</h2>
+<ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+    {% for recommendation in recommendations %}
+    {% assign page = site.pages | where: "path", recommendation | first %}
+    {% if page != null %}
+    <li class="align-items-center">
+        <div class="alert alert-info" role="alert">
+            <a href="{{ site.baseurl }}{{ page.url }}" class="link-body-emphasis d-inline-flex text-decoration-none rounded">{{ page.title }}</a>
+            <p>{{ page.description }}</p>
+        </div>
+        
+    </li>
+    {% else %}
+    notFound: {{recommendation}}
+    {% endif %}
+    {% endfor %}
+</ul>
+{% endif %}
