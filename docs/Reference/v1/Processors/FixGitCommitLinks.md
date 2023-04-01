@@ -23,6 +23,7 @@ missng XML code comments
 | OrderBit | String | missng XML code comments | missng XML code comments |
 | QueryBit | String | missng XML code comments | missng XML code comments |
 | TargetRepository | String | missng XML code comments | missng XML code comments |
+{: .table .table-striped .table-bordered .d-none .d-md-block}
 
 
 ### Example JSON

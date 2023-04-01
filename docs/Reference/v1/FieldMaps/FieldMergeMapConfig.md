@@ -23,6 +23,7 @@ Ever wanted to merge two or three fields? This mapping will let you do just that
 | sourceFields | List | missng XML code comments | missng XML code comments |
 | targetField | String | missng XML code comments | missng XML code comments |
 | WorkItemTypeName | String | missng XML code comments | missng XML code comments |
+{: .table .table-striped .table-bordered .d-none .d-md-block}
 
 
 ### Example JSON

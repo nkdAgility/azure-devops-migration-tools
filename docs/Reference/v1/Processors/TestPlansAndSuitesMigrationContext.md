@@ -1,8 +1,16 @@
-## Processors: TestPlansAndSuitesMigrationContext
+---
+title: TestPlansAndSuitesMigrationContext
+layout: default
+template: TestPlansAndSuitesMigrationContext-template.md
+pageType: reference
+classType: Processors
+architecture: v1
+toc: true
+pageStatus: generated
+discussionId: 
+---
 
 >**_This documentation is for a preview version of the Azure DevOps Migration Tools._ If you are not using the preview version then please head over to the main [documentation](https://nkdagility.com/docs/azure-devops-migration-tools).**
-
-[Overview](../../../index.md) > [Reference](../../index.md) > [API v1](../index.md) > [Processors](index.md)> **TestPlansAndSuitesMigrationContext**
 
 Rebuilds Suits and plans for Test Cases migrated using the WorkItemMigration
 
@@ -24,6 +32,7 @@ Rebuilds Suits and plans for Test Cases migrated using the WorkItemMigration
 | RemoveInvalidTestSuiteLinks | Boolean | Remove Invalid Links, see https://github.com/nkdAgility/azure-devops-migration-tools/issues/178 | missng XML code comments |
 | TestPlanQueryBit | String | Filtering conditions to decide whether to migrate a test plan or not. When provided, this partial query is added after `Select * From TestPlan Where` when selecting test plans. Among filtering options, `AreaPath`, `PlanName` and `PlanState` are known to work. There is unfortunately no documentation regarding the available fields. | `String.Empty` |
 | UseCommonNodeStructureEnricherConfig | Boolean | Indicates whether the configuration for node structure transformation should be taken from the common enricher configs. Otherwise the configuration elements below are used | false |
+{: .table .table-striped .table-bordered .d-none .d-md-block}
 
 
 ### Example JSON
