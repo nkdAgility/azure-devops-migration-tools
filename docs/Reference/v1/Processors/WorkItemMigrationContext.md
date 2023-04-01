@@ -1,8 +1,18 @@
-## Processors: WorkItemMigrationContext
+---
+title: WorkItemMigrationContext
+layout: default
+template: WorkItemMigrationContext-template.md
+pageType: reference
+classType: Processors
+architecture: v1
+toc: true
+pageStatus: generated
+discussionId: 
+---
 
->**_This documentation is for a preview version of the Azure DevOps Migration Tools._ If you are not using the preview version then please head over to the main [documentation](https://nkdagility.github.io/azure-devops-migration-tools).**
+>**_This documentation is for a preview version of the Azure DevOps Migration Tools._ If you are not using the preview version then please head over to the main [documentation](https://nkdagility.com/docs/azure-devops-migration-tools).**
 
-[Overview](../../../index.md) > [Reference](../../index.md) > [API v1](../index.md) > [Processors](index.md)> **WorkItemMigrationContext**
+
 
 WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links, and Attachments. Use `WorkItemMigrationConfig` to configure.
 
@@ -39,7 +49,9 @@ WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links,
 | WIQLQueryBit | String | A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits) | AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') |
 | WorkItemCreateRetryLimit | Int32 | **beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count. This allows for periodic network glitches not to end the process. | 5 |
 | WorkItemIDs | IList | A list of work items to import | [] |
+{: .table .table-striped .table-bordered .d-none .d-md-block}
 
+{: .table .table-striped .table-bordered .d-none .d-md-block}
 
 ### Example JSON
 

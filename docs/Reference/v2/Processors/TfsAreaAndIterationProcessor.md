@@ -1,8 +1,17 @@
-## Processors: TfsAreaAndIterationProcessor
+---
+title: TfsAreaAndIterationProcessor
+layout: default
+template: default
+pageType: reference
+classType: Processors
+architecture: v2
+toc: true
+pageStatus: generated
+discussionId: 
+---
 
->**_This documentation is for a preview version of the Azure DevOps Migration Tools._ If you are not using the preview version then please head over to the main [documentation](https://nkdagility.github.io/azure-devops-migration-tools).**
 
-[Overview](../../../index.md) > [Reference](../../index.md) > [API v2](../index.md) > [Processors](index.md)> **TfsAreaAndIterationProcessor**
+>**_This documentation is for a preview version of the Azure DevOps Migration Tools._ If you are not using the preview version then please head over to the main [documentation](https://nkdagility.com/docs/azure-devops-migration-tools).**
 
 The `TfsAreaAndIterationProcessor` migrates all of the Area nd Iteraion paths.
 
@@ -19,6 +28,7 @@ The `TfsAreaAndIterationProcessor` migrates all of the Area nd Iteraion paths.
 | RefName | String | `Refname` will be used in the future to allow for using named Options without the need to copy all of the options. | missng XML code comments |
 | SourceName | String | missng XML code comments | missng XML code comments |
 | TargetName | String | missng XML code comments | missng XML code comments |
+{: .table .table-striped .table-bordered .d-none .d-md-block}
 
 
 ### Example JSON

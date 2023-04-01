@@ -1,8 +1,17 @@
-## Processors: TfsTeamSettingsProcessor
+---
+title: TfsTeamSettingsProcessor
+layout: default
+template: default
+pageType: reference
+classType: Processors
+architecture: v2
+toc: true
+pageStatus: generated
+discussionId: 
+---
 
->**_This documentation is for a preview version of the Azure DevOps Migration Tools._ If you are not using the preview version then please head over to the main [documentation](https://nkdagility.github.io/azure-devops-migration-tools).**
 
-[Overview](../../../index.md) > [Reference](../../index.md) > [API v2](../index.md) > [Processors](index.md)> **TfsTeamSettingsProcessor**
+>**_This documentation is for a preview version of the Azure DevOps Migration Tools._ If you are not using the preview version then please head over to the main [documentation](https://nkdagility.com/docs/azure-devops-migration-tools).**
 
 Native TFS Processor, does not work with any other Endpoints.
 
@@ -20,6 +29,7 @@ Native TFS Processor, does not work with any other Endpoints.
 | TargetName | String | missng XML code comments | missng XML code comments |
 | Teams | List | List of Teams to process. If this is `null` then all teams will be processed. | missng XML code comments |
 | UpdateTeamSettings | Boolean | Reset the target team settings to match the source if the team exists | false |
+{: .table .table-striped .table-bordered .d-none .d-md-block}
 
 
 ### Example JSON

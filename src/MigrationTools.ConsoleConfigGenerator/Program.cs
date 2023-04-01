@@ -87,6 +87,7 @@ namespace VstsSyncMigrator.ConsoleApp
                 {
                     templatemd = System.IO.File.ReadAllText(filepath);
                     templatemd = ProcessImports(templatemd, file.Contains("Reference") ? referencePath : docsPath   );
+                    templatemd = templatemd.Replace("<template>", System.IO.Path.GetFileName(file));
                     System.IO.File.WriteAllText(filepath.Replace("-template", ""), templatemd);
                 }
                 //ProcessImports
@@ -179,6 +180,7 @@ namespace VstsSyncMigrator.ConsoleApp
             templatemd = templatemd.Replace("<Description>", GetTypeData(item));
             templatemd = templatemd.Replace("<ClassName>", item.Name);
             templatemd = templatemd.Replace("<TypeName>", folder);
+            templatemd = templatemd.Replace("<architecture>", apiVersion);
             templatemd = ProcessBreadcrumbs(apiVersion, folder, item, templatemd);
             string filename = $"../../../../../docs/Reference/{apiVersion}/{folder}/{item.Name}.md";
             File.WriteAllText(filename, templatemd);
@@ -280,6 +282,7 @@ namespace VstsSyncMigrator.ConsoleApp
                     string PropertyValue = GetPropertyData(options, joptions, jproperty, "summary");
                     properties.AppendLine(string.Format("| {0} | {1} | {2} | {3} |", jproperty.Name, GetPropertyType(options, jproperty), PropertyValue, GetPropertyData(options, joptions, jproperty, "default")));
                 }
+                properties.AppendLine("{: .table .table-striped .table-bordered .d-none .d-md-block}");
                 templatemd = templatemd.Replace("<Options>", properties.ToString());
             }
             else
@@ -302,6 +305,7 @@ namespace VstsSyncMigrator.ConsoleApp
                 string typeDocdStatus = GetTypeData(item, "status");
                 properties.AppendLine($"| [{item.Name}]({pathRoute}{item.Name}.md) | {typeDocdStatus} | {typeDocdDatatype} | {typeDocSummery} |");
             }
+            properties.AppendLine("{: .table .table-striped .table-bordered .d-none .d-md-block}");
             return properties.ToString();
         }
 
@@ -325,12 +329,13 @@ namespace VstsSyncMigrator.ConsoleApp
 
         private static string ProcessBreadcrumbs(string apiVersion, string folder, Type item, string templatemd)
         {
-            string breadcrumbs = $"[Overview](../../../index.md) > [Reference](../../index.md) > [API {apiVersion}](../index.md) > [{folder}](index.md)";
-            if (item != null)
-            {
-                breadcrumbs += $"> **{item.Name}**";
-            }
-            templatemd = templatemd.Replace("<Breadcrumbs>", breadcrumbs);
+            //string breadcrumbs = $"[Overview](../../../index.md) > [Reference](../../index.md) > [API {apiVersion}](../index.md) > [{folder}](index.md)";
+            //if (item != null)
+            //{
+            //    breadcrumbs += $"> **{item.Name}**";
+            //}
+            //templatemd = templatemd.Replace("<Breadcrumbs>", breadcrumbs);
+            templatemd = templatemd.Replace("<Breadcrumbs>", "");
             return templatemd;
         }
 
@@ -342,10 +347,12 @@ namespace VstsSyncMigrator.ConsoleApp
             if (System.IO.File.Exists(templateFile))
             {
                 templatemd = System.IO.File.ReadAllText(templateFile);
+                templatemd = templatemd.Replace("<template>", System.IO.Path.GetFileName(templateFile));
             }
             else
             {
                 templatemd = System.IO.File.ReadAllText(masterTemplate);
+                templatemd = templatemd.Replace("<template>", "default");
             }
 
             return templatemd;

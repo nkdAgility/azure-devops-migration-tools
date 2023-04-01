@@ -1,0 +1,21 @@
+.mainContainer
+{
+    max-width: 1768px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.bg-brand-primary
+{
+    background-color: #713183;
+}
+
+.bg-brand-menu
+{
+    background-color: #43464c;
+}
+
+.highlighter-coderay
+{
+    
+}

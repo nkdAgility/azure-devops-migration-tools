@@ -1,6 +1,16 @@
-# Azure DevOps Migration Tools [![Chocolatey](https://img.shields.io/chocolatey/dt/vsts-sync-migrator.svg)](https://chocolatey.org/packages/vsts-sync-migrator/) [![GitHub release](https://img.shields.io/github/release/nkdAgility/vsts-sync-migration.svg)](https://github.com/nkdAgility/azure-devops-migration-tools/releases) ![Build on VSTS](https://nkdagility.visualstudio.com/_apis/public/build/definitions/1b52ce63-eccc-41c8-88f9-ae6ebeefdc63/94/badge) 
+---
+title: Azure DevOps Migration Tools
+layout: default
+pageType: index
+template: index-template.md
+toc: true
+pageStatus: production
+discussionId: 
+---
 
-The Azure DevOps Migration Tools allow you to bulk edit and migrate data between Team Projects on both Microsoft Team Foundation Server (TFS) and Azure DevOps Services. Take a look at the  [documentation](http://nkdagility.github.io/azure-devops-migration-tools/) to find out how. This project is published as [code on GitHub](https://github.com/nkdAgility/azure-devops-migration-tools/) as well as a [Azure DevOps Migration Tools on Chocolatey](https://chocolatey.org/packages/vsts-sync-migrator/).
+[![Chocolatey](https://img.shields.io/chocolatey/dt/vsts-sync-migrator.svg)](https://chocolatey.org/packages/vsts-sync-migrator/) [![GitHub release](https://img.shields.io/github/release/nkdAgility/vsts-sync-migration.svg)](https://github.com/nkdAgility/azure-devops-migration-tools/releases) ![Build on VSTS](https://nkdagility.visualstudio.com/_apis/public/build/definitions/1b52ce63-eccc-41c8-88f9-ae6ebeefdc63/94/badge) 
+
+The Azure DevOps Migration Tools allow you to bulk edit and migrate data between Team Projects on both Microsoft Team Foundation Server (TFS) and Azure DevOps Services. Take a look at the  [documentation](https://nkdagility.com/docs/azure-devops-migration-tools/) to find out how. This project is published as [code on GitHub](https://github.com/nkdAgility/azure-devops-migration-tools/) as well as a [Azure DevOps Migration Tools on Chocolatey](https://chocolatey.org/packages/vsts-sync-migrator/).
 
 **[Ask Questions in GitHub Discussions](https://github.com/nkdAgility/azure-devops-migration-tools/discussions)**
 
@@ -17,7 +27,7 @@ The Azure DevOps Migration Tools allow you to bulk edit and migrate data between
 
 **INFO: This tool was developed to support the scenarios below, and the edge cases that have been encountered by the 30+ contributors from around the Azure DevOps community. 
 You should be comfortable with the TFS/Azure DevOps object model, as well as debugging code in Visual Studio.**
-**Community support is available through [GitHub](https://github.com/nkdAgility/azure-devops-migration-tools/discussions); Paid support is available through our [recommended consultants](http://nkdagility.github.io/azure-devops-migration-tools/#support) as well as our contributors and many DevOps consultants around the world.**
+**Community support is available through [GitHub](https://github.com/nkdAgility/azure-devops-migration-tools/discussions); Paid support is available through our [recommended consultants](https://nkdagility.com/docs/azure-devops-migration-tools/#support) as well as our contributors and many DevOps consultants around the world.**
 
 ## What can you do with this tool?
 
@@ -99,7 +109,8 @@ These tools are build by naked Agility Limited's DevOps & Agility consultants to
 |     Public Issues | [GitHub Issues](https://github.com/nkdAgility/azure-devops-migration-tools/)           |
 | Builds & Releases | [Azure Pipelines](https://dev.azure.com/nkdagility/migration-tools/)                   |
 |   Releases Output | [Github Releases](https://github.com/nkdAgility/azure-devops-migration-tools/releases) |
-|     Documentation | [Github Pages](http://nkdagility.github.io/azure-devops-migration-tools/)              |
+|     Documentation | [Github Pages](https://nkdagility.com/docs/azure-devops-migration-tools/)              |
+{: .table .table-striped .table-bordered .d-none .d-md-block}
 
 **Watch the [Video Overview](https://youtu.be/RCJsST0xBCE) to get you started in 30 minutes. This tool is complicated and its not always easy to discover what you need to do.**
 
@@ -127,7 +138,9 @@ Most of these processors need to be run in order. If you try to migrate work ite
 | [WorkItemQueryMigrationContext](Reference/v1/Processors/WorkItemQueryMigrationContext.md) | preview | Shared Queries | This processor can migrate queries for work items. Only shared queries are included. Personal queries can't migrate with this tool. |
 | [WorkItemUpdate](Reference/v1/Processors/WorkItemUpdate.md) | missng XML code comments | WorkItem | This processor allows you to make changes in place where we load from teh Target and update the Target. This is used for bulk updates with the most common reason being a process template change. |
 | [WorkItemUpdateAreasAsTagsContext](Reference/v1/Processors/WorkItemUpdateAreasAsTagsContext.md) | Beta | Work Item | A common issue with older *TFS/Azure DevOps* instances is the proliferation of `Area Paths`. With the use of `Area Path` for `Teams` and the addition of the `Node Name` column option these extensive tag hierarchies should instad be moved to tags. |
+{: .table .table-striped .table-bordered .d-none .d-md-block}
 
+{: .table .table-striped .table-bordered .d-none .d-md-block}
 
 ## Processors (v2 Architecture) [ PREVIEW ]
 
@@ -143,7 +156,9 @@ The new processor configuration is designed to allow the Migration Tools to supp
 | [TfsSharedQueryProcessor](Reference/v2/Processors/TfsSharedQueryProcessor.md) | Beta | Queries | The TfsSharedQueryProcessor enabled you to migrate queries from one locatio nto another. |
 | [TfsTeamSettingsProcessor](Reference/v2/Processors/TfsTeamSettingsProcessor.md) | Beta | Teams | Native TFS Processor, does not work with any other Endpoints. |
 | [WorkItemTrackingProcessor](Reference/v2/Processors/WorkItemTrackingProcessor.md) | missng XML code comments | missng XML code comments | This processor is intended, with the aid of [ProcessorEnrichers](../ProcessorEnrichers/index.md), to allow the migration of Work Items between two [Endpoints](../Endpoints/index.md). |
+{: .table .table-striped .table-bordered .d-none .d-md-block}
 
+{: .table .table-striped .table-bordered .d-none .d-md-block}
 
 ## Field Maps
 
@@ -165,7 +180,9 @@ However sometimes you want to move data to another field, or use a regex to pars
 | [MultiValueConditionalMapConfig](Reference/v1/FieldMaps/MultiValueConditionalMapConfig.md) | ready | Work Item Field | ??? If you know how to use this please send a PR :) |
 | [RegexFieldMapConfig](Reference/v1/FieldMaps/RegexFieldMapConfig.md) | ready | Work Item Field | I just need that bit of a field... need to send "2016.2" to two fields, one for year and one for release? Done. |
 | [TreeToTagMapConfig](Reference/v1/FieldMaps/TreeToTagMapConfig.md) | ready | Work Item Field | Need to clear out those nasty Area tree hierarchies? This creates Tags for each node in the Area Path... |
+{: .table .table-striped .table-bordered .d-none .d-md-block}
 
+{: .table .table-striped .table-bordered .d-none .d-md-block}
 
 ## Code (TFVC)
 

@@ -1,17 +1,17 @@
-## Processors
+---
+title: Processors
+layout: default
+template: index-template.md
+pageType: index
+toc: true
+pageStatus: generated
+discussionId: 
+---
 
->**_This documentation is for a preview version of the Azure DevOps Migration Tools._ If you are not using the preview version then please head over to the main [documentation](https://nkdagility.github.io/azure-devops-migration-tools).**
+>**_This documentation is for a preview version of the Azure DevOps Migration Tools._ If you are not using the preview version then please head over to the main [documentation](https://nkdagility.com/docs/azure-devops-migration-tools).**
 
-[Overview](.././index.md) > [Reference](../index.md) > *Processors*
 
 We provide a number of Processors that can be used to migrate diferent sorts of data.
-
-| Processor                                                         | Data Type      | Description                                                              |
-| :---------------------------------------------------------------- | :------------- | :----------------------------------------------------------------------- |
-| [WorkItemTrackingProcessor](./WorkItemTrackingProcessor.md)       | Work Items     | Migrated any number of work items, their revisions, links, & attachments |
-| [TfsTeamSettingsProcessor](./TfsTeamSettingsProcessor.md)         | Teams          | Migrate Teams and Team Settings to a new environment                     |
-| [TfsSharedQueryProcessor](./TfsSharedQueryProcessor.md)           | Shared Queries | Migrates all of the Shared Queries from one Project to Another.          |
-| [AzureDevOpsPipelineProcessor](./AzureDevOpsPipelineProcessor.md) | Pipelines      | Migrates Taskgroups, Build and Release Pipelines.                        |
 
 | Processors | Status | Target    | Usage                              |
 |------------------------|---------|---------|------------------------------------------|
@@ -21,6 +21,7 @@ We provide a number of Processors that can be used to migrate diferent sorts of 
 | [TfsSharedQueryProcessor](TfsSharedQueryProcessor.md) | Beta | Queries | The TfsSharedQueryProcessor enabled you to migrate queries from one locatio nto another. |
 | [TfsTeamSettingsProcessor](TfsTeamSettingsProcessor.md) | Beta | Teams | Native TFS Processor, does not work with any other Endpoints. |
 | [WorkItemTrackingProcessor](WorkItemTrackingProcessor.md) | missng XML code comments | missng XML code comments | This processor is intended, with the aid of [ProcessorEnrichers](../ProcessorEnrichers/index.md), to allow the migration of Work Items between two [Endpoints](../Endpoints/index.md). |
+{: .table .table-striped .table-bordered .d-none .d-md-block}
 
 
 ### Processor Options

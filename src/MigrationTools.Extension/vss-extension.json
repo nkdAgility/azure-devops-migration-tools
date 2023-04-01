@@ -31,13 +31,13 @@
   ],
   "links": {
     "home": {
-      "uri": "https://nkdagility.github.io/azure-devops-migration-tools/"
+      "uri": "https://nkdagility.com/docs/azure-devops-migration-tools/"
     },
     "getstarted": {
-      "uri": "http://nkdagility.github.io/azure-devops-migration-tools/getting-started"
+      "uri": "https://nkdagility.com/learn/azure-devops-migration-tools/getting-started/"
     },
     "learn": {
-      "uri": "https://nkdagility.github.io/azure-devops-migration-tools/"
+      "uri": "https://nkdagility.com/docs/azure-devops-migration-tools/"
     },
     "support": {
       "uri": "https://github.com/nkdAgility/azure-devops-migration-tools/discussions"

@@ -1,4 +1,12 @@
-# Azure DevOps Migration Tools FAQ
+---
+title: FAQ
+layout: default
+template: default
+pageType: index
+toc: true
+pageStatus: production
+discussionId: 
+---
 
 ## What is this tool for?
 
