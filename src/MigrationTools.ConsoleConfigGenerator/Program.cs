@@ -54,7 +54,7 @@ namespace VstsSyncMigrator.ConsoleApp
             Process(newTypes, allTypes, typeof(IEndpointEnricher), "v2", "EndpointEnrichers");
             Console.WriteLine("--------------------------");
             Console.WriteLine("---------Endpoints");
-            // Process(types, typeof(IEndpoint), "Endpoints");
+            Process(newTypes, allTypes, typeof(IEndpoint), "v2", "Endpoints");
             Console.WriteLine("--------------------------");
             Console.WriteLine("---------ProcessorEnrichers");
             Process(newTypes, allTypes, typeof(IProcessorEnricher), "v2", "ProcessorEnrichers");
@@ -183,6 +183,7 @@ namespace VstsSyncMigrator.ConsoleApp
             templatemd = templatemd.Replace("<architecture>", apiVersion);
             templatemd = ProcessBreadcrumbs(apiVersion, folder, item, templatemd);
             string filename = $"../../../../../docs/Reference/{apiVersion}/{folder}/{item.Name}.md";
+            Console.WriteLine($"SAVING: {filename}");
             File.WriteAllText(filename, templatemd);
         }
 
