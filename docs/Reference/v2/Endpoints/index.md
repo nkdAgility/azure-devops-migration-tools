@@ -1,6 +1,7 @@
 ---
 title: Endpoints
 layout: default
+template: index-template.md
 pageType: index
 toc: true
 pageStatus: generated
@@ -12,12 +13,12 @@ discussionId:
 
 [Overview](.././index.md) > [Reference](../index.md) > *Endpoints*
 
-Azure DevOps Migration Tools provides _endpoints_ for reading and writing `WorkItems`, `PlansAndSuits`, `Teams`, or `Queries`. 
+Azyre DevOps Migration Tools provides _endpoints_ for reading and writing `WorkItems`, `PlansAndSuits`, `Teams`, or `Queries`. 
 
 Client  | WriteTo/ReadFrom | Endpoint | Data Target | Description
-----------|-----------|------------ |------------ |------------
+----------|-----------|------------
 AzureDevops.ObjectModel | Tfs Object Model | `TfsWorkItemEndPoint` | WorkItems | TBA
-AzureDevops.Rest | Azure DevOps REST | `AzureDevOpsEndpoint` | Pipelines | TBA
+AzureDevops.Rest | Azure DevOps REST | ?
 FileSystem | Local Files | `FileSystemWorkItemEndpoint` | WorkItems | TBA
 
 ### Endpoints Options

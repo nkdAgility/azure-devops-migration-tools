@@ -14,16 +14,19 @@ The Azure DevOps Migration Tools allow you to bulk edit and migrate data between
 
 **[Ask Questions in GitHub Discussions](https://github.com/nkdAgility/azure-devops-migration-tools/discussions)**
 
-## Some Data from the last 30 days (as of 01/02/2023)
+## Some Data from the last 30 days (as of 06/04/2023)
 
 | Catagory  | Metric | Notes |
 | ------------- | ------------- | ------------- |
 | Work Item Revisions | **14m** | A single Work Item may have many revisions that we need to migrate |
 | Average Work item Migration Time  | **35s** | Work Item (inlcudes all revisions, links, and attachements for the work item) |
+| RelatedLinkCount | **5m** | Each work item may have many links or none. |
 | Git Commit Links  | **480k** |  |
 | Attachments | **252.37k**  | Total number of attachments migrated |
-| Migration Run Ave  | **14 minutes** | Includes dryruns as well.  |
-| Migration Run Total   |  **19bn Seconds** |  |
+| Test Suits | 52k | total suits migrated | 
+| Test Cases Mapped | **800k** | Total test cases mapped into Suits |
+| Migration Run Ave  | **14 minutes** | Includes dry-runs as well.  |
+| Migration Run Total   |  **19bn Seconds** | Thats **316m hours** or **13m days** of run time in the last 30 days. |
 
 **INFO: This tool was developed to support the scenarios below, and the edge cases that have been encountered by the 30+ contributors from around the Azure DevOps community. 
 You should be comfortable with the TFS/Azure DevOps object model, as well as debugging code in Visual Studio.**
