@@ -1,5 +1,5 @@
 ---
-title: TfsEndpoint
+title: GenericTfsEndpoint`1
 layout: default
 template: default
 pageType: reference
@@ -22,5 +22,5 @@ missng XML code comments
 ### Example JSON
 
 ```JSON
-
+Not currently runnable. Needs a little work
 ```
