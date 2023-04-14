@@ -338,7 +338,7 @@ namespace MigrationTools.Processors
                 {
                     foreach (var variableGroup in definitionToBeMigrated.VariableGroups)
                     {
-                        if (variableGroup != null)
+                        if (variableGroup == null)
                         {
                             continue;
                         }
