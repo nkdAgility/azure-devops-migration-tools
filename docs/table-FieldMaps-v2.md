@@ -12,4 +12,3 @@
 | [MultiValueConditionalMapConfig](Reference/v2/FieldMaps/MultiValueConditionalMapConfig.md) | ready | Work Item Field | ??? If you know how to use this please send a PR :) |
 | [RegexFieldMapConfig](Reference/v2/FieldMaps/RegexFieldMapConfig.md) | ready | Work Item Field | I just need that bit of a field... need to send "2016.2" to two fields, one for year and one for release? Done. |
 | [TreeToTagMapConfig](Reference/v2/FieldMaps/TreeToTagMapConfig.md) | ready | Work Item Field | Need to clear out those nasty Area tree hierarchies? This creates Tags for each node in the Area Path... |
-{: .table .table-striped .table-bordered .d-none .d-md-block}

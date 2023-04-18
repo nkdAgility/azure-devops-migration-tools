@@ -113,7 +113,6 @@ These tools are build by naked Agility Limited's DevOps & Agility consultants to
 | Builds & Releases | [Azure Pipelines](https://dev.azure.com/nkdagility/migration-tools/)                   |
 |   Releases Output | [Github Releases](https://github.com/nkdAgility/azure-devops-migration-tools/releases) |
 |     Documentation | [Github Pages](https://nkdagility.com/docs/azure-devops-migration-tools/)              |
-{: .table .table-striped .table-bordered .d-none .d-md-block}
 
 **Watch the [Video Overview](https://youtu.be/RCJsST0xBCE) to get you started in 30 minutes. This tool is complicated and its not always easy to discover what you need to do.**
 
@@ -124,7 +123,6 @@ There are a number processors that can be used to migrate, or process, different
 Most of these processors need to be run in order. If you try to migrate work items before you have migrated Area and Iterations then ***bang*** you need to go back.
 
 <Import:table-Processors-v1.md>
-{: .table .table-striped .table-bordered .d-none .d-md-block}
 
 ## Processors (v2 Architecture) [ PREVIEW ]
 
@@ -133,7 +131,6 @@ Most of these processors need to be run in order. If you try to migrate work ite
 The new processor configuration is designed to allow the Migration Tools to support different Source and targets than just TFS/Azure DevOps, and we moved the Endpoints to the processor to allow both Object Model & REST in different processors.
 
 <Import:table-Processors-v2.md>
-{: .table .table-striped .table-bordered .d-none .d-md-block}
 
 ## Field Maps
 
@@ -142,7 +139,6 @@ By default, when you are moving from source to target the system will map all of
 However sometimes you want to move data to another field, or use a regex to parse out just the bits that you want. To help we have built a number of mapping tools that should give you the versatility you need.
 
 <Import:table-FieldMaps-v1.md>
-{: .table .table-striped .table-bordered .d-none .d-md-block}
 
 ## Code (TFVC)
 

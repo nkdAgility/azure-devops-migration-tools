@@ -2,6 +2,7 @@
 
 >**_This documentation is for a preview version of the Azure DevOps Migration Tools._ If you are not using the preview version then please head over to the main [documentation](https://nkdagility.com/docs/azure-devops-migration-tools).**
 
+[Overview](.././index.md) > [Reference](../index.md) > [Endpoints](./index.md) > TfsWorkItemEndpoint
 
 The Work Item endpoint is super awesome.
 
@@ -10,7 +11,6 @@ Client  | WriteTo/ReadFrom | Endpoint | Data Target | Description
 AzureDevops.ObjectModel | Tfs Object Model | `TfsWorkItemEndPoint` | WorkItems | TBA
 AzureDevops.Rest | Azure DevOps REST | ?
 FileSystem | Local Files | `FileSystemWorkItemEndpoint` | WorkItems | TBA
-{: .table .table-striped .table-bordered .d-none .d-md-block}
 
 ### Endpoints Options
 

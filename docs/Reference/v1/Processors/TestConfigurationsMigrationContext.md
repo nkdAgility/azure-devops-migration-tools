@@ -20,7 +20,6 @@ This processor can migrate `test configuration`. This should be run before `Link
 | Parameter name         | Type    | Description                              | Default Value                            |
 |------------------------|---------|------------------------------------------|------------------------------------------|
 | Enabled | Boolean | missng XML code comments | missng XML code comments |
-{: .table .table-striped .table-bordered .d-none .d-md-block}
 
 
 ### Example JSON

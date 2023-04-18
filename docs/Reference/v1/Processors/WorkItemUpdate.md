@@ -27,7 +27,6 @@ This processor allows you to make changes in place where we load from teh Target
 | WIQLQueryBit | String | A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits) | AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') |
 | WorkItemCreateRetryLimit | Int32 | **beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count. This allows for periodic network glitches not to end the process. | 5 |
 | WorkItemIDs | IList | A list of work items to import | [] |
-{: .table .table-striped .table-bordered .d-none .d-md-block}
 
 
 ### Example JSON

@@ -12,4 +12,3 @@
 | [TfsValidateRequiredField](Reference/v2/ProcessorEnrichers/TfsValidateRequiredField.md) | missng XML code comments | missng XML code comments | missng XML code comments |
 | [TfsWorkItemEmbededLinkEnricher](Reference/v2/ProcessorEnrichers/TfsWorkItemEmbededLinkEnricher.md) | missng XML code comments | missng XML code comments | missng XML code comments |
 | [TfsWorkItemLinkEnricher](Reference/v2/ProcessorEnrichers/TfsWorkItemLinkEnricher.md) | missng XML code comments | missng XML code comments | missng XML code comments |
-{: .table .table-striped .table-bordered .d-none .d-md-block}
