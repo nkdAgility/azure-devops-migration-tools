@@ -20,9 +20,7 @@ This processor is intended, with the aid of [ProcessorEnrichers](../ProcessorEnr
 | SourceName | String | missng XML code comments | missng XML code comments |
 | TargetName | String | missng XML code comments | missng XML code comments |
 | WorkItemCreateRetryLimit | Int32 | missng XML code comments | missng XML code comments |
-{: .table .table-striped .table-bordered .d-none .d-md-block}
 
-{: .table .table-striped .table-bordered .d-none .d-md-block}
 
 ### Supported Endpoints
 

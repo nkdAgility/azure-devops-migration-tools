@@ -20,7 +20,6 @@ Downloads corporate images and updates TFS/Azure DevOps profiles
 | Parameter name         | Type    | Description                              | Default Value                            |
 |------------------------|---------|------------------------------------------|------------------------------------------|
 | Enabled | Boolean | missng XML code comments | missng XML code comments |
-{: .table .table-striped .table-bordered .d-none .d-md-block}
 
 
 ### Example JSON

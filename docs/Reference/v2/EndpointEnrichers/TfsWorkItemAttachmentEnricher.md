@@ -23,7 +23,6 @@ The `TfsWorkItemAttachmentEnricher` processes the attachements for a specific wo
 | MaxSize | Int32 | missng XML code comments | missng XML code comments |
 | RefName | String | missng XML code comments | missng XML code comments |
 | WorkingPath | String | missng XML code comments | missng XML code comments |
-{: .table .table-striped .table-bordered .d-none .d-md-block}
 
 
 ### Example JSON
