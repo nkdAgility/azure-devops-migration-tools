@@ -23,7 +23,6 @@ Need to create a Tag based on a field value? Just create a regex match and choos
 | pattern | String | missng XML code comments | missng XML code comments |
 | sourceField | String | missng XML code comments | missng XML code comments |
 | WorkItemTypeName | String | missng XML code comments | missng XML code comments |
-{: .table .table-striped .table-bordered .d-none .d-md-block}
 
 
 ### Example JSON

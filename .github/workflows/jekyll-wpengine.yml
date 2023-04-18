@@ -1,4 +1,4 @@
-﻿name: Deploy to WPEngine - Jekyll with dependencies preinstalled
+﻿name: Deploy to WPEngine
 
 on:
   # Runs on pushes targeting the default branch
