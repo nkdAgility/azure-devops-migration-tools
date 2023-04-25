@@ -10,9 +10,37 @@ githuburl: https://github.com/nkdAgility/azure-devops-migration-tools
 source: ./docs
 destination: ./_site
 
+permalink: pretty
+
+exclude:
+ - "**/*template*.md"
+ - "*template.md"
+ - "/Reference/template.md"
+ - "**/*template"
 include:
  - "**/*.md"
  - "*.md"
+
+
+defaults:
+ - scope:
+     path: ""
+   values:
+     toc: true
+     pageType: article
+     pageStatus: draft
+     author: mrhinsh
+
+toc:
+  min_level: 1
+  max_level: 2
+  ordered_list: false
+  no_toc_section_class: no_toc_section
+  list_id: toc
+  list_class: section-nav bd-links-nav list-unstyled pb-1 small
+  sublist_class: list-unstyled pb-2
+  item_class: toc-entry align-items-center pb-2 ps-2
+  item_prefix: toc-
 
 plugins:
   - jekyll-relative-links
@@ -23,6 +51,7 @@ plugins:
   # - jekyll-github-metadata
   - jekyll-optional-front-matter
   - jekyll-last-modified-at
+  - jekyll-redirect-from
 
 kramdown:
   math_engine: mathjax

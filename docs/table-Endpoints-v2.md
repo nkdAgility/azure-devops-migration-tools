@@ -6,4 +6,3 @@
 | [TfsEndpoint](Reference/v2/Endpoints/TfsEndpoint.md) | missng XML code comments | missng XML code comments | missng XML code comments |
 | [TfsTeamSettingsEndpoint](Reference/v2/Endpoints/TfsTeamSettingsEndpoint.md) | missng XML code comments | missng XML code comments | missng XML code comments |
 | [TfsWorkItemEndpoint](Reference/v2/Endpoints/TfsWorkItemEndpoint.md) | missng XML code comments | missng XML code comments | missng XML code comments |
-{: .table .table-striped .table-bordered .d-none .d-md-block}
