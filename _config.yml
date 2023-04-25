@@ -4,7 +4,7 @@ parent_title: The Azure DevOps Migration Tools allow you to bulk edit and migrat
 parent_url: https://nkdagility.com
 
 website: https://nkdagility.com
-baseurl: /learn/azure-devops-migration-tools
+baseurl: /azure-devops-migration-tools
 url: "https://nkdagility.com"
 githuburl: https://github.com/nkdAgility/azure-devops-migration-tools
 source: ./docs
@@ -22,6 +22,7 @@ defaults:
      pageType: article
      pageStatus: draft
      author: mrhinsh
+     redirect_to: https://nkdagility.com/learn/:path
 
 plugins:
   - jekyll-relative-links
