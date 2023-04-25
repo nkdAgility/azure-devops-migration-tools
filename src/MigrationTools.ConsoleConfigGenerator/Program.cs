@@ -121,6 +121,7 @@ namespace VstsSyncMigrator.ConsoleApp
             typesTableMd = GetTypesTable(types, folder, apiVersion, $"");
             File.WriteAllText(System.IO.Path.Combine(referencePath, apiVersion, folder, $"table-{folder}-{apiVersion}.md"), typesTableMd);
 
+            templatemd = templatemd.Replace("oldHtmlFile", $"/Reference/{apiVersion}/{folder}.html");
 
             templatemd = templatemd.Replace("<ItemList>", typesTableMd);
             File.WriteAllText(System.IO.Path.Combine(referencePath, apiVersion, folder, "index.md"), templatemd);
@@ -182,6 +183,7 @@ namespace VstsSyncMigrator.ConsoleApp
             templatemd = templatemd.Replace("<TypeName>", folder);
             templatemd = templatemd.Replace("<architecture>", apiVersion);
             templatemd = ProcessBreadcrumbs(apiVersion, folder, item, templatemd);
+            templatemd = templatemd.Replace("oldHtmlFile", $"/Reference/{apiVersion}/{folder}/{item.Name}.html");
             string filename = $"../../../../../docs/Reference/{apiVersion}/{folder}/{item.Name}.md";
             Console.WriteLine($"SAVING: {filename}");
             File.WriteAllText(filename, templatemd);

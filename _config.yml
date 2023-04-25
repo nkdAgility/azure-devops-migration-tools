@@ -12,9 +12,14 @@ destination: ./_site
 
 permalink: pretty
 
+exclude:
+ - "**/*template*.md"
+ - "*template.md"
+ - "/Reference/template.md"
 include:
  - "**/*.md"
  - "*.md"
+
 
 defaults:
  - scope:
