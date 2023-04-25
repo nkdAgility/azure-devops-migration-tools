@@ -6,6 +6,7 @@ pageType: index
 toc: true
 pageStatus: production
 discussionId: 
+redirect_from: /faq.html
 ---
 
 ## What is this tool for?
