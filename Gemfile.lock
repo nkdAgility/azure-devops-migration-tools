@@ -43,6 +43,8 @@ GEM
       posix-spawn (~> 0.3.9)
     jekyll-optional-front-matter (0.3.2)
       jekyll (>= 3.0, < 5.0)
+    jekyll-redirect-from (0.16.0)
+      jekyll (>= 3.3, < 5.0)
     jekyll-relative-links (0.7.0)
       jekyll (>= 3.3, < 5.0)
     jekyll-sass-converter (3.0.0)
@@ -101,6 +103,7 @@ DEPENDENCIES
   jekyll-github-metadata
   jekyll-last-modified-at
   jekyll-optional-front-matter
+  jekyll-redirect-from
   jekyll-relative-links
   jekyll-seo-tag
   jekyll-sitemap
