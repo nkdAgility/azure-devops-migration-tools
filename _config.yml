@@ -22,7 +22,6 @@ defaults:
      pageType: article
      pageStatus: draft
      author: mrhinsh
-     redirect_to: https://nkdagility.com/learn/:path
 
 plugins:
   - jekyll-relative-links
