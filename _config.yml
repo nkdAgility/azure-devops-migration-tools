@@ -13,6 +13,16 @@ destination: ./_site
 include:
  - "**/*.md"
  - "*.md"
+ 
+defaults:
+ - scope:
+     path: ""
+   values:
+     toc: true
+     pageType: article
+     pageStatus: draft
+     author: mrhinsh
+     redirect_from: https://nkdagility.com/learn/:path
 
 plugins:
   - jekyll-relative-links
