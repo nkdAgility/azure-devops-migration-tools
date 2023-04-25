@@ -33,6 +33,7 @@ plugins:
   # - jekyll-github-metadata
   - jekyll-optional-front-matter
   - jekyll-last-modified-at
+  - jekyll-redirect-from
 
 kramdown:
   math_engine: mathjax
