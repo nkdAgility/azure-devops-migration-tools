@@ -16,6 +16,7 @@ exclude:
  - "**/*template*.md"
  - "*template.md"
  - "/Reference/template.md"
+ - "**/*template"
 include:
  - "**/*.md"
  - "*.md"
