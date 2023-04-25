@@ -8,6 +8,7 @@ architecture: v1
 toc: true
 pageStatus: generated
 discussionId: 
+redirect_from: /Reference/v1/Processors/TestVariablesMigrationContext.html
 ---
 
 
