@@ -6,6 +6,7 @@ pageType: index
 toc: true
 pageStatus: generated
 discussionId: 
+redirect_to: https://nkdagility.com/learn/azure-devops-migration-tools/Reference/v1/
 ---
 
 The system works by setting one or more [Processors](../v1/Processors/index.md) in the json 

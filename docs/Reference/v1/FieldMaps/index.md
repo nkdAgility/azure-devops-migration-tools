@@ -6,6 +6,7 @@ pageType: index
 toc: true
 pageStatus: generated
 discussionId: 
+redirect_to: https://nkdagility.com/learn/azure-devops-migration-tools/Reference/v1/FieldMaps/
 ---
 
 [Overview](.././index.md) > [Reference](../index.md) > *FieldMaps*

@@ -6,6 +6,7 @@ pageType: index
 toc: true
 pageStatus: generated
 discussionId: 
+redirect_to: https://nkdagility.com/learn/azure-devops-migration-tools/Reference/v1/Processors/
 ---
 
 We provide a number of Processors that can be used to migrate diferent sorts of data. These processors are the original traditional processors.

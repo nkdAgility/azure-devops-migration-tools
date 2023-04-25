@@ -5,6 +5,7 @@ pageType: index
 toc: true
 pageStatus: production
 discussionId: 
+redirect_to: https://nkdagility.com/learn/azure-devops-migration-tools/Reference/
 ---
 
 

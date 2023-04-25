@@ -6,6 +6,7 @@ pageType: index
 toc: true
 pageStatus: production
 discussionId: 
+redirect_to: https://nkdagility.com/learn/azure-devops-migration-tools/changeset-migration.html
 ---
 
 Azure DevOps Migration Tools enable migrating work item changesets with cross project links from tfvc or git.
