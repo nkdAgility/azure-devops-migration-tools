@@ -1,0 +1,66 @@
+{
+  "$type": "ReferenceDataGroup",
+  "Name": "Endpoints",
+  "Items": [
+    {
+      "$type": "ReferenceDataItem",
+      "OptionsClass": "MigrationTools.Endpoints.AzureDevOpsEndpointOptions",
+      "ConfigurationSample": null,
+      "Description": "missng XML code comments",
+      "ClassName": "AzureDevOpsEndpoint",
+      "TypeName": "Endpoints",
+      "Architecture": "v2",
+      "Options": []
+    },
+    {
+      "$type": "ReferenceDataItem",
+      "OptionsClass": "MigrationTools.Endpoints.FileSystemWorkItemEndpointOptions",
+      "ConfigurationSample": null,
+      "Description": "missng XML code comments",
+      "ClassName": "FileSystemWorkItemEndpoint",
+      "TypeName": "Endpoints",
+      "Architecture": "v2",
+      "Options": []
+    },
+    {
+      "$type": "ReferenceDataItem",
+      "OptionsClass": null,
+      "ConfigurationSample": "",
+      "Description": "missng XML code comments",
+      "ClassName": "GenericTfsEndpoint`1",
+      "TypeName": "Endpoints",
+      "Architecture": "v2",
+      "Options": []
+    },
+    {
+      "$type": "ReferenceDataItem",
+      "OptionsClass": "MigrationTools.Endpoints.TfsEndpointOptions",
+      "ConfigurationSample": null,
+      "Description": "missng XML code comments",
+      "ClassName": "TfsEndpoint",
+      "TypeName": "Endpoints",
+      "Architecture": "v2",
+      "Options": []
+    },
+    {
+      "$type": "ReferenceDataItem",
+      "OptionsClass": "MigrationTools.Endpoints.TfsTeamSettingsEndpointOptions",
+      "ConfigurationSample": null,
+      "Description": "missng XML code comments",
+      "ClassName": "TfsTeamSettingsEndpoint",
+      "TypeName": "Endpoints",
+      "Architecture": "v2",
+      "Options": []
+    },
+    {
+      "$type": "ReferenceDataItem",
+      "OptionsClass": "MigrationTools.Endpoints.TfsWorkItemEndpointOptions",
+      "ConfigurationSample": null,
+      "Description": "missng XML code comments",
+      "ClassName": "TfsWorkItemEndpoint",
+      "TypeName": "Endpoints",
+      "Architecture": "v2",
+      "Options": []
+    }
+  ]
+}

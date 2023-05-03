@@ -1,0 +1,342 @@
+name: FieldMaps
+items:
+- optionsClass: MigrationTools._EngineV1.Configuration.FieldMap.FieldClearMapConfig
+  configurationSample: >-
+    {
+      "$type": "FieldClearMapConfig",
+      "WorkItemTypeName": "*",
+      "targetField": "System.Description"
+    }
+  description: Allows you to set an already populated field to Null. This will only work with fields that support null.
+  className: FieldClearMapConfig
+  typeName: FieldMaps
+  architecture: v1
+  options:
+  - parameterName: targetField
+    type: String
+    description: missng XML code comments
+    defaultValue: missng XML code comments
+  - parameterName: WorkItemTypeName
+    type: String
+    description: missng XML code comments
+    defaultValue: missng XML code comments
+- optionsClass: MigrationTools._EngineV1.Configuration.FieldMap.FieldLiteralMapConfig
+  configurationSample: >-
+    {
+      "$type": "FieldLiteralMapConfig",
+      "WorkItemTypeName": "*",
+      "targetField": "System.Status",
+      "value": "New"
+    }
+  description: Sets a field on the `target` to b a specific value.
+  className: FieldLiteralMapConfig
+  typeName: FieldMaps
+  architecture: v1
+  options:
+  - parameterName: targetField
+    type: String
+    description: missng XML code comments
+    defaultValue: missng XML code comments
+  - parameterName: value
+    type: String
+    description: missng XML code comments
+    defaultValue: missng XML code comments
+  - parameterName: WorkItemTypeName
+    type: String
+    description: missng XML code comments
+    defaultValue: missng XML code comments
+- optionsClass: MigrationTools._EngineV1.Configuration.FieldMap.FieldMergeMapConfig
+  configurationSample: >-
+    {
+      "$type": "FieldMergeMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceFields": [
+        "System.Description",
+        "System.Status"
+      ],
+      "targetField": "System.Description",
+      "formatExpression": "{0} \n {1}"
+    }
+  description: Ever wanted to merge two or three fields? This mapping will let you do just that.
+  className: FieldMergeMapConfig
+  typeName: FieldMaps
+  architecture: v1
+  options:
+  - parameterName: formatExpression
+    type: String
+    description: missng XML code comments
+    defaultValue: missng XML code comments
+  - parameterName: sourceFields
+    type: List
+    description: missng XML code comments
+    defaultValue: missng XML code comments
+  - parameterName: targetField
+    type: String
+    description: missng XML code comments
+    defaultValue: missng XML code comments
+  - parameterName: WorkItemTypeName
+    type: String
+    description: missng XML code comments
+    defaultValue: missng XML code comments
+- optionsClass: MigrationTools._EngineV1.Configuration.FieldMap.FieldSkipMapConfig
+  configurationSample: >-
+    {
+      "$type": "FieldSkipMapConfig",
+      "WorkItemTypeName": "*",
+      "targetField": "System.Description"
+    }
+  description: Allows you to skip populating an existing field. Value in target with be reset to its OriginalValue.
+  className: FieldSkipMapConfig
+  typeName: FieldMaps
+  architecture: v1
+  options:
+  - parameterName: targetField
+    type: String
+    description: missng XML code comments
+    defaultValue: missng XML code comments
+  - parameterName: WorkItemTypeName
+    type: String
+    description: missng XML code comments
+    defaultValue: missng XML code comments
+- optionsClass: MigrationTools._EngineV1.Configuration.FieldMap.FieldtoFieldMapConfig
+  configurationSample: >-
+    {
+      "$type": "FieldtoFieldMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceField": "System.StackRank",
+      "targetField": "System.Rank",
+      "defaultValue": "1000"
+    }
+  description: Just want to map one field to another? This is the one for you.
+  className: FieldtoFieldMapConfig
+  typeName: FieldMaps
+  architecture: v1
+  options:
+  - parameterName: defaultValue
+    type: String
+    description: missng XML code comments
+    defaultValue: missng XML code comments
+  - parameterName: sourceField
+    type: String
+    description: missng XML code comments
+    defaultValue: missng XML code comments
+  - parameterName: targetField
+    type: String
+    description: missng XML code comments
+    defaultValue: missng XML code comments
+  - parameterName: WorkItemTypeName
+    type: String
+    description: missng XML code comments
+    defaultValue: missng XML code comments
+- optionsClass: MigrationTools._EngineV1.Configuration.FieldMap.FieldtoFieldMultiMapConfig
+  configurationSample: >-
+    {
+      "$type": "FieldtoFieldMultiMapConfig",
+      "WorkItemTypeName": "*",
+      "SourceToTargetMappings": {
+        "$type": "Dictionary`2",
+        "Custom.Field1": "Custom.Field4",
+        "Custom.Field2": "Custom.Field5",
+        "Custom.Field3": "Custom.Field6"
+      }
+    }
+  description: Want to setup a bunch of field maps in a single go. Use this shortcut!
+  className: FieldtoFieldMultiMapConfig
+  typeName: FieldMaps
+  architecture: v1
+  options:
+  - parameterName: SourceToTargetMappings
+    type: Dictionary
+    description: missng XML code comments
+    defaultValue: missng XML code comments
+  - parameterName: WorkItemTypeName
+    type: String
+    description: missng XML code comments
+    defaultValue: missng XML code comments
+- optionsClass: MigrationTools._EngineV1.Configuration.FieldMap.FieldtoTagMapConfig
+  configurationSample: >-
+    {
+      "$type": "FieldtoTagMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceField": "Custom.ProjectName",
+      "formatExpression": "Project: {0}"
+    }
+  description: Want to take a field and convert its value to a tag? Done...
+  className: FieldtoTagMapConfig
+  typeName: FieldMaps
+  architecture: v1
+  options:
+  - parameterName: formatExpression
+    type: String
+    description: missng XML code comments
+    defaultValue: missng XML code comments
+  - parameterName: sourceField
+    type: String
+    description: missng XML code comments
+    defaultValue: missng XML code comments
+  - parameterName: WorkItemTypeName
+    type: String
+    description: missng XML code comments
+    defaultValue: missng XML code comments
+- optionsClass: MigrationTools._EngineV1.Configuration.FieldMap.FieldValueMapConfig
+  configurationSample: >-
+    {
+      "$type": "FieldValueMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceField": "System.Status",
+      "targetField": "System.Status",
+      "defaultValue": "New",
+      "valueMapping": {
+        "$type": "Dictionary`2",
+        "New": "New",
+        "Active": "Committed",
+        "Resolved": "Committed",
+        "Closed": "Done"
+      }
+    }
+  description: Need to map not just the field but also values? This is the default value mapper.
+  className: FieldValueMapConfig
+  typeName: FieldMaps
+  architecture: v1
+  options:
+  - parameterName: defaultValue
+    type: String
+    description: missng XML code comments
+    defaultValue: missng XML code comments
+  - parameterName: sourceField
+    type: String
+    description: missng XML code comments
+    defaultValue: missng XML code comments
+  - parameterName: targetField
+    type: String
+    description: missng XML code comments
+    defaultValue: missng XML code comments
+  - parameterName: valueMapping
+    type: Dictionary
+    description: missng XML code comments
+    defaultValue: missng XML code comments
+  - parameterName: WorkItemTypeName
+    type: String
+    description: missng XML code comments
+    defaultValue: missng XML code comments
+- optionsClass: MigrationTools._EngineV1.Configuration.FieldMap.FieldValuetoTagMapConfig
+  configurationSample: >-
+    {
+      "$type": "FieldValuetoTagMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceField": "System.Status",
+      "pattern": "(Active|Resolved)",
+      "formatExpression": "Status: {0}"
+    }
+  description: Need to create a Tag based on a field value? Just create a regex match and choose how to populate the target.
+  className: FieldValuetoTagMapConfig
+  typeName: FieldMaps
+  architecture: v1
+  options:
+  - parameterName: formatExpression
+    type: String
+    description: missng XML code comments
+    defaultValue: missng XML code comments
+  - parameterName: pattern
+    type: String
+    description: missng XML code comments
+    defaultValue: missng XML code comments
+  - parameterName: sourceField
+    type: String
+    description: missng XML code comments
+    defaultValue: missng XML code comments
+  - parameterName: WorkItemTypeName
+    type: String
+    description: missng XML code comments
+    defaultValue: missng XML code comments
+- optionsClass: MigrationTools._EngineV1.Configuration.FieldMap.MultiValueConditionalMapConfig
+  configurationSample: >-
+    {
+      "$type": "MultiValueConditionalMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceFieldsAndValues": {
+        "$type": "Dictionary`2",
+        "Something": "SomethingElse"
+      },
+      "targetFieldsAndValues": {
+        "$type": "Dictionary`2",
+        "Something": "SomethingElse"
+      }
+    }
+  description: ??? If you know how to use this please send a PR :)
+  className: MultiValueConditionalMapConfig
+  typeName: FieldMaps
+  architecture: v1
+  options:
+  - parameterName: sourceFieldsAndValues
+    type: Dictionary
+    description: missng XML code comments
+    defaultValue: missng XML code comments
+  - parameterName: targetFieldsAndValues
+    type: Dictionary
+    description: missng XML code comments
+    defaultValue: missng XML code comments
+  - parameterName: WorkItemTypeName
+    type: String
+    description: missng XML code comments
+    defaultValue: missng XML code comments
+- optionsClass: MigrationTools._EngineV1.Configuration.FieldMap.RegexFieldMapConfig
+  configurationSample: >-
+    {
+      "$type": "RegexFieldMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceField": "Custom.MyVersion",
+      "targetField": "Custom.MyVersionYearOnly",
+      "pattern": "([0-9]{4})",
+      "replacement": "$1"
+    }
+  description: I just need that bit of a field... need to send "2016.2" to two fields, one for year and one for release? Done.
+  className: RegexFieldMapConfig
+  typeName: FieldMaps
+  architecture: v1
+  options:
+  - parameterName: pattern
+    type: String
+    description: missng XML code comments
+    defaultValue: missng XML code comments
+  - parameterName: replacement
+    type: String
+    description: missng XML code comments
+    defaultValue: missng XML code comments
+  - parameterName: sourceField
+    type: String
+    description: missng XML code comments
+    defaultValue: missng XML code comments
+  - parameterName: targetField
+    type: String
+    description: missng XML code comments
+    defaultValue: missng XML code comments
+  - parameterName: WorkItemTypeName
+    type: String
+    description: missng XML code comments
+    defaultValue: missng XML code comments
+- optionsClass: MigrationTools._EngineV1.Configuration.FieldMap.TreeToTagMapConfig
+  configurationSample: >-
+    {
+      "$type": "TreeToTagMapConfig",
+      "WorkItemTypeName": "*",
+      "toSkip": 2,
+      "timeTravel": 0
+    }
+  description: Need to clear out those nasty Area tree hierarchies? This creates Tags for each node in the Area Path...
+  className: TreeToTagMapConfig
+  typeName: FieldMaps
+  architecture: v1
+  options:
+  - parameterName: timeTravel
+    type: Int32
+    description: missng XML code comments
+    defaultValue: missng XML code comments
+  - parameterName: toSkip
+    type: Int32
+    description: missng XML code comments
+    defaultValue: missng XML code comments
+  - parameterName: WorkItemTypeName
+    type: String
+    description: missng XML code comments
+    defaultValue: missng XML code comments

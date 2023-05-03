@@ -1,0 +1,45 @@
+{
+  "$type": "ReferenceDataGroup",
+  "Name": "EndpointEnrichers",
+  "Items": [
+    {
+      "$type": "ReferenceDataItem",
+      "OptionsClass": "MigrationTools.EndpointEnrichers.TfsWorkItemAttachmentEnricherOptions",
+      "ConfigurationSample": "{\r\n  \"$type\": \"TfsWorkItemAttachmentEnricherOptions\",\r\n  \"Enabled\": true,\r\n  \"WorkingPath\": \"c:\\\\temp\\\\WorkItemAttachmentWorkingFolder\\\\\",\r\n  \"MaxSize\": 480000000\r\n}",
+      "Description": "The `TfsWorkItemAttachmentEnricher` processes the attachements for a specific work item.",
+      "ClassName": "TfsWorkItemAttachmentEnricher",
+      "TypeName": "EndpointEnrichers",
+      "Architecture": "v2",
+      "Options": [
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "Enabled",
+          "Type": "Boolean",
+          "Description": "missng XML code comments",
+          "DefaultValue": "missng XML code comments"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "MaxSize",
+          "Type": "Int32",
+          "Description": "missng XML code comments",
+          "DefaultValue": "missng XML code comments"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "RefName",
+          "Type": "String",
+          "Description": "missng XML code comments",
+          "DefaultValue": "missng XML code comments"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "WorkingPath",
+          "Type": "String",
+          "Description": "missng XML code comments",
+          "DefaultValue": "missng XML code comments"
+        }
+      ]
+    }
+  ]
+}

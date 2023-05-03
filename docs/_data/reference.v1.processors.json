@@ -1,0 +1,782 @@
+{
+  "$type": "ReferenceDataGroup",
+  "Name": "Processors",
+  "Items": [
+    {
+      "$type": "ReferenceDataItem",
+      "OptionsClass": null,
+      "ConfigurationSample": "",
+      "Description": "Creates folders in Sared Queries for each Team",
+      "ClassName": "CreateTeamFolders",
+      "TypeName": "Processors",
+      "Architecture": "v1",
+      "Options": []
+    },
+    {
+      "$type": "ReferenceDataItem",
+      "OptionsClass": "MigrationTools._EngineV1.Configuration.Processing.ExportProfilePictureFromADConfig",
+      "ConfigurationSample": "{\r\n  \"$type\": \"ExportProfilePictureFromADConfig\",\r\n  \"Enabled\": false,\r\n  \"Domain\": null,\r\n  \"Username\": null,\r\n  \"Password\": null,\r\n  \"PictureEmpIDFormat\": null\r\n}",
+      "Description": "Downloads corporate images and updates TFS/Azure DevOps profiles",
+      "ClassName": "ExportProfilePictureFromADContext",
+      "TypeName": "Processors",
+      "Architecture": "v1",
+      "Options": [
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "Domain",
+          "Type": "String",
+          "Description": "The source domain where the pictures should be exported.",
+          "DefaultValue": "String.Empty"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "Enabled",
+          "Type": "Boolean",
+          "Description": "missng XML code comments",
+          "DefaultValue": "missng XML code comments"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "Password",
+          "Type": "String",
+          "Description": "The password of the user that is used to export the pictures.",
+          "DefaultValue": "String.Empty"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "PictureEmpIDFormat",
+          "Type": "String",
+          "Description": "TODO: You wpuld need to customise this for your system. Clone repo and run in Debug",
+          "DefaultValue": "String.Empty"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "Username",
+          "Type": "String",
+          "Description": "The user name of the user that is used to export the pictures.",
+          "DefaultValue": "String.Empty"
+        }
+      ]
+    },
+    {
+      "$type": "ReferenceDataItem",
+      "OptionsClass": null,
+      "ConfigurationSample": "",
+      "Description": "missng XML code comments",
+      "ClassName": "ExportTeamList",
+      "TypeName": "Processors",
+      "Architecture": "v1",
+      "Options": []
+    },
+    {
+      "$type": "ReferenceDataItem",
+      "OptionsClass": "MigrationTools._EngineV1.Configuration.Processing.FakeProcessorConfig",
+      "ConfigurationSample": "{\r\n  \"$type\": \"FakeProcessorConfig\",\r\n  \"Enabled\": false\r\n}",
+      "Description": "Note: this is only for internal usage. Don't use this in your configurations.",
+      "ClassName": "FakeProcessor",
+      "TypeName": "Processors",
+      "Architecture": "v1",
+      "Options": [
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "Enabled",
+          "Type": "Boolean",
+          "Description": "missng XML code comments",
+          "DefaultValue": "missng XML code comments"
+        }
+      ]
+    },
+    {
+      "$type": "ReferenceDataItem",
+      "OptionsClass": "MigrationTools._EngineV1.Configuration.Processing.FixGitCommitLinksConfig",
+      "ConfigurationSample": "{\r\n  \"$type\": \"FixGitCommitLinksConfig\",\r\n  \"Enabled\": false,\r\n  \"TargetRepository\": null,\r\n  \"QueryBit\": null,\r\n  \"OrderBit\": null\r\n}",
+      "Description": "missng XML code comments",
+      "ClassName": "FixGitCommitLinks",
+      "TypeName": "Processors",
+      "Architecture": "v1",
+      "Options": [
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "Enabled",
+          "Type": "Boolean",
+          "Description": "missng XML code comments",
+          "DefaultValue": "missng XML code comments"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "OrderBit",
+          "Type": "String",
+          "Description": "missng XML code comments",
+          "DefaultValue": "missng XML code comments"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "QueryBit",
+          "Type": "String",
+          "Description": "missng XML code comments",
+          "DefaultValue": "missng XML code comments"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "TargetRepository",
+          "Type": "String",
+          "Description": "missng XML code comments",
+          "DefaultValue": "missng XML code comments"
+        }
+      ]
+    },
+    {
+      "$type": "ReferenceDataItem",
+      "OptionsClass": "MigrationTools._EngineV1.Configuration.Processing.ImportProfilePictureConfig",
+      "ConfigurationSample": "{\r\n  \"$type\": \"ImportProfilePictureConfig\",\r\n  \"Enabled\": false\r\n}",
+      "Description": "Downloads corporate images and updates TFS/Azure DevOps profiles",
+      "ClassName": "ImportProfilePictureContext",
+      "TypeName": "Processors",
+      "Architecture": "v1",
+      "Options": [
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "Enabled",
+          "Type": "Boolean",
+          "Description": "missng XML code comments",
+          "DefaultValue": "missng XML code comments"
+        }
+      ]
+    },
+    {
+      "$type": "ReferenceDataItem",
+      "OptionsClass": "MigrationTools._EngineV1.Configuration.Processing.TeamMigrationConfig",
+      "ConfigurationSample": "{\r\n  \"$type\": \"TeamMigrationConfig\",\r\n  \"Enabled\": false,\r\n  \"PrefixProjectToNodes\": false,\r\n  \"EnableTeamSettingsMigration\": true,\r\n  \"FixTeamSettingsForExistingTeams\": false\r\n}",
+      "Description": "Migrates Teams and Team Settings: This should be run after `NodeStructuresMigrationConfig` and before all other processors.",
+      "ClassName": "TeamMigrationContext",
+      "TypeName": "Processors",
+      "Architecture": "v1",
+      "Options": [
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "Enabled",
+          "Type": "Boolean",
+          "Description": "missng XML code comments",
+          "DefaultValue": "missng XML code comments"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "EnableTeamSettingsMigration",
+          "Type": "Boolean",
+          "Description": "Migrate original team settings after their creation on target team project",
+          "DefaultValue": "true"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "FixTeamSettingsForExistingTeams",
+          "Type": "Boolean",
+          "Description": "Reset the target team settings to match the source if the team exists",
+          "DefaultValue": "true"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "PrefixProjectToNodes",
+          "Type": "Boolean",
+          "Description": "Prefix your iterations and areas with the project name. If you have enabled this in `NodeStructuresMigrationConfig` you must do it here too.",
+          "DefaultValue": "false"
+        }
+      ]
+    },
+    {
+      "$type": "ReferenceDataItem",
+      "OptionsClass": "MigrationTools._EngineV1.Configuration.Processing.TestConfigurationsMigrationConfig",
+      "ConfigurationSample": "{\r\n  \"$type\": \"TestConfigurationsMigrationConfig\",\r\n  \"Enabled\": false\r\n}",
+      "Description": "This processor can migrate `test configuration`. This should be run before `LinkMigrationConfig`.",
+      "ClassName": "TestConfigurationsMigrationContext",
+      "TypeName": "Processors",
+      "Architecture": "v1",
+      "Options": [
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "Enabled",
+          "Type": "Boolean",
+          "Description": "missng XML code comments",
+          "DefaultValue": "missng XML code comments"
+        }
+      ]
+    },
+    {
+      "$type": "ReferenceDataItem",
+      "OptionsClass": "MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationConfig",
+      "ConfigurationSample": "{\r\n  \"$type\": \"TestPlansAndSuitesMigrationConfig\",\r\n  \"Enabled\": false,\r\n  \"PrefixProjectToNodes\": false,\r\n  \"OnlyElementsWithTag\": null,\r\n  \"TestPlanQueryBit\": null,\r\n  \"RemoveAllLinks\": false,\r\n  \"MigrationDelay\": 0,\r\n  \"UseCommonNodeStructureEnricherConfig\": false,\r\n  \"NodeBasePaths\": null,\r\n  \"AreaMaps\": null,\r\n  \"IterationMaps\": null,\r\n  \"RemoveInvalidTestSuiteLinks\": false,\r\n  \"FilterCompleted\": false\r\n}",
+      "Description": "Rebuilds Suits and plans for Test Cases migrated using the WorkItemMigration",
+      "ClassName": "TestPlansAndSuitesMigrationContext",
+      "TypeName": "Processors",
+      "Architecture": "v1",
+      "Options": [
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "AreaMaps",
+          "Type": "Dictionary",
+          "Description": "See documentation for [NodeStructure](/docs/Reference/v1/Processors/WorkItemMigrationConfig.md)",
+          "DefaultValue": "null"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "Enabled",
+          "Type": "Boolean",
+          "Description": "missng XML code comments",
+          "DefaultValue": "missng XML code comments"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "FilterCompleted",
+          "Type": "Boolean",
+          "Description": "missng XML code comments",
+          "DefaultValue": "missng XML code comments"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "IterationMaps",
+          "Type": "Dictionary",
+          "Description": "See documentation for [NodeStructure](/docs/Reference/v1/Processors/WorkItemMigrationConfig.md)",
+          "DefaultValue": "null"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "MigrationDelay",
+          "Type": "Int32",
+          "Description": "??Not sure what this does. Check code.",
+          "DefaultValue": "0"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "NodeBasePaths",
+          "Type": "String[]",
+          "Description": "See documentation for [NodeStructure](/docs/Reference/v1/Processors/WorkItemMigrationConfig.md)",
+          "DefaultValue": "[]"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "OnlyElementsWithTag",
+          "Type": "String",
+          "Description": "The tag name that is present on all elements that must be migrated. If this option isn't present this processor will migrate all.",
+          "DefaultValue": "`String.Empty`"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "PrefixProjectToNodes",
+          "Type": "Boolean",
+          "Description": "Prefix the nodes with the new project name.",
+          "DefaultValue": "false"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "RemoveAllLinks",
+          "Type": "Boolean",
+          "Description": "??Not sure what this does. Check code.",
+          "DefaultValue": "false"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "RemoveInvalidTestSuiteLinks",
+          "Type": "Boolean",
+          "Description": "Remove Invalid Links, see https://github.com/nkdAgility/azure-devops-migration-tools/issues/178",
+          "DefaultValue": "missng XML code comments"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "TestPlanQueryBit",
+          "Type": "String",
+          "Description": "Filtering conditions to decide whether to migrate a test plan or not. When provided, this partial query is added after `Select * From TestPlan Where` when selecting test plans. Among filtering options, `AreaPath`, `PlanName` and `PlanState` are known to work. There is unfortunately no documentation regarding the available fields.",
+          "DefaultValue": "`String.Empty`"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "UseCommonNodeStructureEnricherConfig",
+          "Type": "Boolean",
+          "Description": "Indicates whether the configuration for node structure transformation should be taken from the common enricher configs. Otherwise the configuration elements below are used",
+          "DefaultValue": "false"
+        }
+      ]
+    },
+    {
+      "$type": "ReferenceDataItem",
+      "OptionsClass": "MigrationTools._EngineV1.Configuration.Processing.TestVariablesMigrationConfig",
+      "ConfigurationSample": "{\r\n  \"$type\": \"TestVariablesMigrationConfig\",\r\n  \"Enabled\": false\r\n}",
+      "Description": "This processor can migrate test variables that are defined in the test plans / suites. This must run before `TestPlansAndSuitesMigrationConfig`.",
+      "ClassName": "TestVariablesMigrationContext",
+      "TypeName": "Processors",
+      "Architecture": "v1",
+      "Options": [
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "Enabled",
+          "Type": "Boolean",
+          "Description": "missng XML code comments",
+          "DefaultValue": "missng XML code comments"
+        }
+      ]
+    },
+    {
+      "$type": "ReferenceDataItem",
+      "OptionsClass": "MigrationTools._EngineV1.Configuration.Processing.WorkItemDeleteConfig",
+      "ConfigurationSample": "{\r\n  \"$type\": \"WorkItemDeleteConfig\",\r\n  \"Enabled\": false,\r\n  \"WIQLQueryBit\": \"AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')\",\r\n  \"WIQLOrderBit\": \"[System.ChangedDate] desc\",\r\n  \"WorkItemIDs\": null,\r\n  \"FilterWorkItemsThatAlreadyExistInTarget\": false,\r\n  \"PauseAfterEachWorkItem\": false,\r\n  \"WorkItemCreateRetryLimit\": 0\r\n}",
+      "Description": "The `WorkItemDelete` processor allows you to delete any amount of work items that meet the query. **DANGER:** This is not a recoverable action and should be use with extream caution.",
+      "ClassName": "WorkItemDelete",
+      "TypeName": "Processors",
+      "Architecture": "v1",
+      "Options": [
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "Enabled",
+          "Type": "Boolean",
+          "Description": "missng XML code comments",
+          "DefaultValue": "missng XML code comments"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "FilterWorkItemsThatAlreadyExistInTarget",
+          "Type": "Boolean",
+          "Description": "missng XML code comments",
+          "DefaultValue": "missng XML code comments"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "PauseAfterEachWorkItem",
+          "Type": "Boolean",
+          "Description": "missng XML code comments",
+          "DefaultValue": "missng XML code comments"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "WIQLOrderBit",
+          "Type": "String",
+          "Description": "missng XML code comments",
+          "DefaultValue": "missng XML code comments"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "WIQLQueryBit",
+          "Type": "String",
+          "Description": "missng XML code comments",
+          "DefaultValue": "missng XML code comments"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "WorkItemCreateRetryLimit",
+          "Type": "Int32",
+          "Description": "missng XML code comments",
+          "DefaultValue": "missng XML code comments"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "WorkItemIDs",
+          "Type": "IList",
+          "Description": "missng XML code comments",
+          "DefaultValue": "missng XML code comments"
+        }
+      ]
+    },
+    {
+      "$type": "ReferenceDataItem",
+      "OptionsClass": "MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig",
+      "ConfigurationSample": "{\r\n  \"$type\": \"WorkItemMigrationConfig\",\r\n  \"Enabled\": false,\r\n  \"ReplayRevisions\": true,\r\n  \"PrefixProjectToNodes\": false,\r\n  \"UpdateCreatedDate\": true,\r\n  \"UpdateCreatedBy\": true,\r\n  \"WIQLQueryBit\": \"AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')\",\r\n  \"WIQLOrderBit\": \"[System.ChangedDate] desc\",\r\n  \"LinkMigration\": true,\r\n  \"AttachmentMigration\": true,\r\n  \"AttachmentWorkingPath\": \"c:\\\\temp\\\\WorkItemAttachmentWorkingFolder\\\\\",\r\n  \"FixHtmlAttachmentLinks\": false,\r\n  \"SkipToFinalRevisedWorkItemType\": true,\r\n  \"WorkItemCreateRetryLimit\": 5,\r\n  \"FilterWorkItemsThatAlreadyExistInTarget\": true,\r\n  \"PauseAfterEachWorkItem\": false,\r\n  \"AttachmentMaxSize\": 480000000,\r\n  \"AttachRevisionHistory\": false,\r\n  \"LinkMigrationSaveEachAsAdded\": false,\r\n  \"GenerateMigrationComment\": true,\r\n  \"WorkItemIDs\": null,\r\n  \"MaxRevisions\": 0,\r\n  \"UseCommonNodeStructureEnricherConfig\": false,\r\n  \"StopMigrationOnMissingAreaIterationNodes\": true,\r\n  \"NodeBasePaths\": null,\r\n  \"AreaMaps\": {\r\n    \"$type\": \"Dictionary`2\"\r\n  },\r\n  \"IterationMaps\": {\r\n    \"$type\": \"Dictionary`2\"\r\n  },\r\n  \"MaxGracefulFailures\": 0,\r\n  \"SkipRevisionWithInvalidIterationPath\": false,\r\n  \"SkipRevisionWithInvalidAreaPath\": false\r\n}",
+      "Description": "WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links, and Attachments. Use `WorkItemMigrationConfig` to configure.",
+      "ClassName": "WorkItemMigrationContext",
+      "TypeName": "Processors",
+      "Architecture": "v1",
+      "Options": [
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "AreaMaps",
+          "Type": "Dictionary",
+          "Description": "Remapping rules for area paths, implemented with regular expressions. The rules apply with a higher priority than the `PrefixProjectToNodes`, that is, if no rule matches the path and the `PrefixProjectToNodes` option is enabled, then the old `PrefixProjectToNodes` behavior is applied.",
+          "DefaultValue": "{}"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "AttachmentMaxSize",
+          "Type": "Int32",
+          "Description": "`AttachmentMigration` is set to true then you need to specify a max file size for upload in bites. For Azure DevOps Services the default is 480,000,000 bites (60mb), for TFS its 32,000,000 bites (4mb).",
+          "DefaultValue": "480000000"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "AttachmentMigration",
+          "Type": "Boolean",
+          "Description": "If enabled this will migrate all of the attachments at the same time as the work item",
+          "DefaultValue": "true"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "AttachmentWorkingPath",
+          "Type": "String",
+          "Description": "`AttachmentMigration` is set to true then you need to specify a working path for attachments to be saved locally.",
+          "DefaultValue": "C:\\temp\\Migration\\"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "AttachRevisionHistory",
+          "Type": "Boolean",
+          "Description": "This will create a json file with the revision history and attach it to the work item. Best used with `MaxRevisions` or `ReplayRevisions`.",
+          "DefaultValue": "?"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "Enabled",
+          "Type": "Boolean",
+          "Description": "If enabled then the processor will run",
+          "DefaultValue": "false"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "FilterWorkItemsThatAlreadyExistInTarget",
+          "Type": "Boolean",
+          "Description": "This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run. While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.",
+          "DefaultValue": "true"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "FixHtmlAttachmentLinks",
+          "Type": "Boolean",
+          "Description": "**beta** If enabled this will fix any image attachments URL's, work item mention URL's or user mentions in the HTML fields as well as discussion comments. You must specify a PersonalAccessToken in the Source project for Azure DevOps; TFS should use integrated authentication.",
+          "DefaultValue": "?"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "GenerateMigrationComment",
+          "Type": "Boolean",
+          "Description": "If enabled, adds a comment recording the migration",
+          "DefaultValue": "false"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "IterationMaps",
+          "Type": "Dictionary",
+          "Description": "Remapping rules for iteration paths, implemented with regular expressions. The rules apply with a higher priority than the `PrefixProjectToNodes`, that is, if no rule matches the path and the `PrefixProjectToNodes` option is enabled, then the old `PrefixProjectToNodes` behavior is applied.",
+          "DefaultValue": "{}"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "LinkMigration",
+          "Type": "Boolean",
+          "Description": "If enabled this will migrate the Links for the work item at the same time as the whole work item.",
+          "DefaultValue": "true"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "LinkMigrationSaveEachAsAdded",
+          "Type": "Boolean",
+          "Description": "If you have changed parents before re-running a sync you may get a `TF26194: unable to change the value of the 'Parent' field` error. This will resolve it, but will slow migration.",
+          "DefaultValue": "false"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "MaxGracefulFailures",
+          "Type": "Int32",
+          "Description": "The maximum number of failures to tolerate before the migration fails. When set above zero, a work item migration error is logged but the migration will continue until the number of failed items reaches the configured value, after which the migration fails.",
+          "DefaultValue": "0"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "MaxRevisions",
+          "Type": "Int32",
+          "Description": "Sets the maximum number of revisions that will be migrated. \"First + Last N = Max\". If this was set to 5 and there were 10 revisions you would get the first 1 (creation) and the latest 4 migrated.",
+          "DefaultValue": "0"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "NodeBasePaths",
+          "Type": "String[]",
+          "Description": "The root paths of the Ares / Iterations you want migrate. See [NodeBasePath Configuration](#nodebasepath-configuration)",
+          "DefaultValue": "[\"/\"]"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "PauseAfterEachWorkItem",
+          "Type": "Boolean",
+          "Description": "Pause after each work item is migrated",
+          "DefaultValue": "false"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "PrefixProjectToNodes",
+          "Type": "Boolean",
+          "Description": "Prefix your iterations and areas with the project name. If you have enabled this in `NodeStructuresMigrationConfig` you must do it here too.",
+          "DefaultValue": "false"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "ReplayRevisions",
+          "Type": "Boolean",
+          "Description": "You can choose to migrate the tip only (a single write) or all of the revisions (many writes). If you are setting this to `false` to migrate only the tip then you should set `BuildFieldTable` to `true`.",
+          "DefaultValue": "true"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "SkipRevisionWithInvalidAreaPath",
+          "Type": "Boolean",
+          "Description": "When set to true, this setting will skip a revision if the source area has not been migrated, has been deleted or is somehow invalid, etc.",
+          "DefaultValue": "missng XML code comments"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "SkipRevisionWithInvalidIterationPath",
+          "Type": "Boolean",
+          "Description": "This will skip a revision if the source iteration has not been migrated i.e. it was deleted",
+          "DefaultValue": "missng XML code comments"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "SkipToFinalRevisedWorkItemType",
+          "Type": "Boolean",
+          "Description": "**beta** If enabled this will fix any image attachments URL's, work item mention URL's or user mentions in the HTML fields as well as discussion comments. You must specify a PersonalAccessToken in the Source project for Azure DevOps; TFS should use integrated authentication.",
+          "DefaultValue": "false"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "StopMigrationOnMissingAreaIterationNodes",
+          "Type": "Boolean",
+          "Description": "",
+          "DefaultValue": "?"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "UpdateCreatedBy",
+          "Type": "Boolean",
+          "Description": "If this is enabled the creation process on the target project will create the items with the original creation date. (Important: The item history is always pointed to the date of the migration, it's change only the data column CreateDate, not the internal create date)",
+          "DefaultValue": "true"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "UpdateCreatedDate",
+          "Type": "Boolean",
+          "Description": "If this is enabled the creation process on the target project will create the items with the original creation date. (Important: The item history is always pointed to the date of the migration, it's change only the data column CreateDate, not the internal create date)",
+          "DefaultValue": "true"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "UseCommonNodeStructureEnricherConfig",
+          "Type": "Boolean",
+          "Description": "",
+          "DefaultValue": "?"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "WIQLOrderBit",
+          "Type": "String",
+          "Description": "A work item query to affect the order in which the work items are migrated. Don't leave this empty.",
+          "DefaultValue": "[System.ChangedDate] desc"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "WIQLQueryBit",
+          "Type": "String",
+          "Description": "A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)",
+          "DefaultValue": "AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "WorkItemCreateRetryLimit",
+          "Type": "Int32",
+          "Description": "**beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count. This allows for periodic network glitches not to end the process.",
+          "DefaultValue": "5"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "WorkItemIDs",
+          "Type": "IList",
+          "Description": "A list of work items to import",
+          "DefaultValue": "[]"
+        }
+      ]
+    },
+    {
+      "$type": "ReferenceDataItem",
+      "OptionsClass": "MigrationTools._EngineV1.Configuration.Processing.WorkItemPostProcessingConfig",
+      "ConfigurationSample": "{\r\n  \"$type\": \"WorkItemPostProcessingConfig\",\r\n  \"Enabled\": false,\r\n  \"WorkItemIDs\": null,\r\n  \"WIQLQueryBit\": \"AND [TfsMigrationTool.ReflectedWorkItemId] = '' \",\r\n  \"WIQLOrderBit\": null,\r\n  \"FilterWorkItemsThatAlreadyExistInTarget\": false,\r\n  \"PauseAfterEachWorkItem\": false,\r\n  \"WorkItemCreateRetryLimit\": 0\r\n}",
+      "Description": "Reapply field mappings after a migration. Does not migtate Work Items, only reapplied changes to filed mappings.",
+      "ClassName": "WorkItemPostProcessingContext",
+      "TypeName": "Processors",
+      "Architecture": "v1",
+      "Options": [
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "Enabled",
+          "Type": "Boolean",
+          "Description": "missng XML code comments",
+          "DefaultValue": "missng XML code comments"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "FilterWorkItemsThatAlreadyExistInTarget",
+          "Type": "Boolean",
+          "Description": "This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run. While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.",
+          "DefaultValue": "true"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "PauseAfterEachWorkItem",
+          "Type": "Boolean",
+          "Description": "Pause after each work item is migrated",
+          "DefaultValue": "false"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "WIQLOrderBit",
+          "Type": "String",
+          "Description": "A work item query to affect the order in which the work items are migrated. Don't leave this empty.",
+          "DefaultValue": "[System.ChangedDate] desc"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "WIQLQueryBit",
+          "Type": "String",
+          "Description": "A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)",
+          "DefaultValue": "AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "WorkItemCreateRetryLimit",
+          "Type": "Int32",
+          "Description": "**beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count. This allows for periodic network glitches not to end the process.",
+          "DefaultValue": "5"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "WorkItemIDs",
+          "Type": "IList",
+          "Description": "A list of work items to import",
+          "DefaultValue": "[]"
+        }
+      ]
+    },
+    {
+      "$type": "ReferenceDataItem",
+      "OptionsClass": "MigrationTools._EngineV1.Configuration.Processing.WorkItemQueryMigrationConfig",
+      "ConfigurationSample": "{\r\n  \"$type\": \"WorkItemQueryMigrationConfig\",\r\n  \"Enabled\": false,\r\n  \"PrefixProjectToNodes\": false,\r\n  \"SharedFolderName\": \"Shared Queries\",\r\n  \"SourceToTargetFieldMappings\": null\r\n}",
+      "Description": "This processor can migrate queries for work items. Only shared queries are included. Personal queries can't migrate with this tool.",
+      "ClassName": "WorkItemQueryMigrationContext",
+      "TypeName": "Processors",
+      "Architecture": "v1",
+      "Options": [
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "Enabled",
+          "Type": "Boolean",
+          "Description": "missng XML code comments",
+          "DefaultValue": "missng XML code comments"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "PrefixProjectToNodes",
+          "Type": "Boolean",
+          "Description": "Prefix your iterations and areas with the project name. If you have enabled this in `NodeStructuresMigrationConfig` you must do it here too.",
+          "DefaultValue": "false"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "SharedFolderName",
+          "Type": "String",
+          "Description": "The name of the shared folder, made a parameter incase it every needs to be edited",
+          "DefaultValue": "none"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "SourceToTargetFieldMappings",
+          "Type": "Dictionary",
+          "Description": "Any field mappings",
+          "DefaultValue": "none"
+        }
+      ]
+    },
+    {
+      "$type": "ReferenceDataItem",
+      "OptionsClass": "MigrationTools._EngineV1.Configuration.Processing.WorkItemUpdateConfig",
+      "ConfigurationSample": "{\r\n  \"$type\": \"WorkItemUpdateConfig\",\r\n  \"Enabled\": false,\r\n  \"WhatIf\": false,\r\n  \"WIQLQueryBit\": \"AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')\",\r\n  \"WIQLOrderBit\": null,\r\n  \"WorkItemIDs\": null,\r\n  \"FilterWorkItemsThatAlreadyExistInTarget\": false,\r\n  \"PauseAfterEachWorkItem\": false,\r\n  \"WorkItemCreateRetryLimit\": 0\r\n}",
+      "Description": "This processor allows you to make changes in place where we load from teh Target and update the Target. This is used for bulk updates with the most common reason being a process template change.",
+      "ClassName": "WorkItemUpdate",
+      "TypeName": "Processors",
+      "Architecture": "v1",
+      "Options": [
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "Enabled",
+          "Type": "Boolean",
+          "Description": "missng XML code comments",
+          "DefaultValue": "missng XML code comments"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "FilterWorkItemsThatAlreadyExistInTarget",
+          "Type": "Boolean",
+          "Description": "This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run. While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.",
+          "DefaultValue": "true"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "PauseAfterEachWorkItem",
+          "Type": "Boolean",
+          "Description": "Pause after each work item is migrated",
+          "DefaultValue": "false"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "WhatIf",
+          "Type": "Boolean",
+          "Description": "missng XML code comments",
+          "DefaultValue": "missng XML code comments"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "WIQLOrderBit",
+          "Type": "String",
+          "Description": "A work item query to affect the order in which the work items are migrated. Don't leave this empty.",
+          "DefaultValue": "[System.ChangedDate] desc"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "WIQLQueryBit",
+          "Type": "String",
+          "Description": "A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)",
+          "DefaultValue": "AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "WorkItemCreateRetryLimit",
+          "Type": "Int32",
+          "Description": "**beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count. This allows for periodic network glitches not to end the process.",
+          "DefaultValue": "5"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "WorkItemIDs",
+          "Type": "IList",
+          "Description": "A list of work items to import",
+          "DefaultValue": "[]"
+        }
+      ]
+    },
+    {
+      "$type": "ReferenceDataItem",
+      "OptionsClass": "MigrationTools._EngineV1.Configuration.Processing.WorkItemUpdateAreasAsTagsConfig",
+      "ConfigurationSample": "{\r\n  \"$type\": \"WorkItemUpdateAreasAsTagsConfig\",\r\n  \"Enabled\": false,\r\n  \"AreaIterationPath\": null\r\n}",
+      "Description": "A common issue with older *TFS/Azure DevOps* instances is the proliferation of `Area Paths`. With the use of `Area Path` for `Teams` and the addition of the `Node Name` column option these extensive tag hierarchies should instad be moved to tags.",
+      "ClassName": "WorkItemUpdateAreasAsTagsContext",
+      "TypeName": "Processors",
+      "Architecture": "v1",
+      "Options": [
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "AreaIterationPath",
+          "Type": "String",
+          "Description": "This is a required parameter. That define the root path of the iteration. To get the full path use `\\`",
+          "DefaultValue": "\\"
+        },
+        {
+          "$type": "ReferenceDataOptionsItem",
+          "ParameterName": "Enabled",
+          "Type": "Boolean",
+          "Description": "missng XML code comments",
+          "DefaultValue": "missng XML code comments"
+        }
+      ]
+    }
+  ]
+}

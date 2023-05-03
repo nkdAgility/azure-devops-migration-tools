@@ -98,6 +98,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".workflows", ".workflows", 
 		.github\workflows\build.yml = .github\workflows\build.yml
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MigrationTools.ConsoleDataGenerator", "src\MigrationTools.ConsoleDataGenerator\MigrationTools.ConsoleDataGenerator.csproj", "{6A259EA6-860B-448A-8943-594DC1A15105}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -180,6 +182,10 @@ Global
 		{4C16C19A-AF2D-4061-B2DE-87E39B1DF422}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4C16C19A-AF2D-4061-B2DE-87E39B1DF422}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4C16C19A-AF2D-4061-B2DE-87E39B1DF422}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6A259EA6-860B-448A-8943-594DC1A15105}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A259EA6-860B-448A-8943-594DC1A15105}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A259EA6-860B-448A-8943-594DC1A15105}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A259EA6-860B-448A-8943-594DC1A15105}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -209,6 +215,7 @@ Global
 		{B64B19C7-BD17-4B2A-83E6-B33B3D73B078} = {D0EE5917-21B2-49FA-9506-69857EE82DCD}
 		{70EA792C-E84C-4A5D-8280-FCC47F4AE150} = {13FE9FE2-9C6E-4866-BBAD-106F5BF765F1}
 		{4C16C19A-AF2D-4061-B2DE-87E39B1DF422} = {5C05DA7B-B70F-4A87-920B-DCD14EA7670D}
+		{6A259EA6-860B-448A-8943-594DC1A15105} = {D0EE5917-21B2-49FA-9506-69857EE82DCD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {62EE0B27-C55A-46EE-8D17-1691DE9BBD50}

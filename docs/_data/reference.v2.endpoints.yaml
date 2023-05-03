@@ -1,0 +1,44 @@
+name: Endpoints
+items:
+- optionsClass: MigrationTools.Endpoints.AzureDevOpsEndpointOptions
+  configurationSample: 
+  description: missng XML code comments
+  className: AzureDevOpsEndpoint
+  typeName: Endpoints
+  architecture: v2
+  options: []
+- optionsClass: MigrationTools.Endpoints.FileSystemWorkItemEndpointOptions
+  configurationSample: 
+  description: missng XML code comments
+  className: FileSystemWorkItemEndpoint
+  typeName: Endpoints
+  architecture: v2
+  options: []
+- optionsClass: 
+  configurationSample: ''
+  description: missng XML code comments
+  className: GenericTfsEndpoint`1
+  typeName: Endpoints
+  architecture: v2
+  options: []
+- optionsClass: MigrationTools.Endpoints.TfsEndpointOptions
+  configurationSample: 
+  description: missng XML code comments
+  className: TfsEndpoint
+  typeName: Endpoints
+  architecture: v2
+  options: []
+- optionsClass: MigrationTools.Endpoints.TfsTeamSettingsEndpointOptions
+  configurationSample: 
+  description: missng XML code comments
+  className: TfsTeamSettingsEndpoint
+  typeName: Endpoints
+  architecture: v2
+  options: []
+- optionsClass: MigrationTools.Endpoints.TfsWorkItemEndpointOptions
+  configurationSample: 
+  description: missng XML code comments
+  className: TfsWorkItemEndpoint
+  typeName: Endpoints
+  architecture: v2
+  options: []
