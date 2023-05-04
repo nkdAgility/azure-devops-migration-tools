@@ -11,10 +11,25 @@ options: []
 redirectFrom: []
 layout: reference
 toc: true
-permalink: /Reference2/v2/Endpoints/TfsWorkItemEndpoint/
+permalink: /Reference/v2/Endpoints/TfsWorkItemEndpoint/
 title: TfsWorkItemEndpoint
 categories:
 - Endpoints
 - v2
+notes: >+
+  The Work Item endpoint is super awesome.
+
+
+  Client  | WriteTo/ReadFrom | Endpoint | Data Target | Description
+
+  ----------|-----------|------------
+
+  AzureDevops.ObjectModel | Tfs Object Model | `TfsWorkItemEndPoint` | WorkItems | TBA
+
+  AzureDevops.Rest | Azure DevOps REST | ?
+
+  FileSystem | Local Files | `FileSystemWorkItemEndpoint` | WorkItems | TBA
+
+introduction: ''
 
 ---

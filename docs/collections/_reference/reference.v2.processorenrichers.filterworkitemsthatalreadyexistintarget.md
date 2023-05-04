@@ -36,10 +36,12 @@ options:
 redirectFrom: []
 layout: reference
 toc: true
-permalink: /Reference2/v2/ProcessorEnrichers/FilterWorkItemsThatAlreadyExistInTarget/
+permalink: /Reference/v2/ProcessorEnrichers/FilterWorkItemsThatAlreadyExistInTarget/
 title: FilterWorkItemsThatAlreadyExistInTarget
 categories:
 - ProcessorEnrichers
 - v2
+notes: ''
+introduction: ''
 
 ---

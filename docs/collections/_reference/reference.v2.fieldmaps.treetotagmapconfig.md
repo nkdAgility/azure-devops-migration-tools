@@ -33,10 +33,12 @@ options:
 redirectFrom: []
 layout: reference
 toc: true
-permalink: /Reference2/v2/FieldMaps/TreeToTagMapConfig/
+permalink: /Reference/v2/FieldMaps/TreeToTagMapConfig/
 title: TreeToTagMapConfig
 categories:
 - FieldMaps
 - v2
+notes: ''
+introduction: ''
 
 ---

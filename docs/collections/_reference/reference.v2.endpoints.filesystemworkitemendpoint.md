@@ -11,10 +11,12 @@ options: []
 redirectFrom: []
 layout: reference
 toc: true
-permalink: /Reference2/v2/Endpoints/FileSystemWorkItemEndpoint/
+permalink: /Reference/v2/Endpoints/FileSystemWorkItemEndpoint/
 title: FileSystemWorkItemEndpoint
 categories:
 - Endpoints
 - v2
+notes: ''
+introduction: ''
 
 ---

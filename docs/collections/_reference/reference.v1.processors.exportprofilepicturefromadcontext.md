@@ -43,10 +43,12 @@ options:
 redirectFrom: []
 layout: reference
 toc: true
-permalink: /Reference2/v1/Processors/ExportProfilePictureFromADContext/
+permalink: /Reference/v1/Processors/ExportProfilePictureFromADContext/
 title: ExportProfilePictureFromADContext
 categories:
 - Processors
 - v1
+notes: ''
+introduction: ''
 
 ---

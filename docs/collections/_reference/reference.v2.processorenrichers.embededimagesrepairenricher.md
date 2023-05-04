@@ -11,10 +11,12 @@ options: []
 redirectFrom: []
 layout: reference
 toc: true
-permalink: /Reference2/v2/ProcessorEnrichers/EmbededImagesRepairEnricher/
+permalink: /Reference/v2/ProcessorEnrichers/EmbededImagesRepairEnricher/
 title: EmbededImagesRepairEnricher
 categories:
 - ProcessorEnrichers
 - v2
+notes: ''
+introduction: ''
 
 ---

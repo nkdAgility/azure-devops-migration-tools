@@ -58,10 +58,12 @@ options:
 redirectFrom: []
 layout: reference
 toc: true
-permalink: /Reference2/v1/Processors/WorkItemUpdate/
+permalink: /Reference/v1/Processors/WorkItemUpdate/
 title: WorkItemUpdate
 categories:
 - Processors
 - v1
+notes: ''
+introduction: ''
 
 ---

@@ -27,10 +27,12 @@ options:
 redirectFrom: []
 layout: reference
 toc: true
-permalink: /Reference2/v2/ProcessorEnrichers/PauseAfterEachItem/
+permalink: /Reference/v2/ProcessorEnrichers/PauseAfterEachItem/
 title: PauseAfterEachItem
 categories:
 - ProcessorEnrichers
 - v2
+notes: ''
+introduction: ''
 
 ---

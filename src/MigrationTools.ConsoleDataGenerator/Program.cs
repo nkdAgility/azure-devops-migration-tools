@@ -88,18 +88,38 @@ class Program
     private static JekyllData GetJekyllData(ClassData classData)
     {
         JekyllData data = new JekyllData();
-        data.Permalink = $"/Reference2/{classData.Architecture}/{classData.TypeName}/{classData.ClassName}/";
+        data.Permalink = $"/Reference/{classData.Architecture}/{classData.TypeName}/{classData.ClassName}/";
         data.layout = "reference";
         data.toc = true;
         data.title = classData.ClassName;
         data.categories.Add(classData.TypeName);
         data.categories.Add(classData.Architecture);
+        data.notes = LoadMarkdown(classData, "notes");
+        data.introduction = LoadMarkdown(classData, "introduction");
         string posibleOldUrl = $"/Reference/{classData.Architecture}/{classData.TypeName}/{classData.OptionsClassName}/";
         if (posibleOldUrl != data.Permalink)
         {
            // data.Redirect_from.Add(posibleOldUrl);
         }
         return data;
+    }
+
+    private static string LoadMarkdown(ClassData classData, string topic)
+    {
+        string notesLocation = "../../../../../docs/Reference/";
+        string noteFile = System.IO.Path.Combine(notesLocation, $"{classData.Architecture}/{classData.TypeName}/{classData.ClassName}-{topic}.md");
+        string notes = "";
+        Console.WriteLine(noteFile);
+        if (System.IO.File.Exists(noteFile))
+        {
+            notes = System.IO.File.ReadAllText(noteFile);
+            Console.Write($"[{topic} ]");
+
+        } else
+        {
+            Console.WriteLine($"[{topic} missing]");
+        }
+        return notes;
     }
 
   

@@ -11,10 +11,12 @@ options: []
 redirectFrom: []
 layout: reference
 toc: true
-permalink: /Reference2/v2/Endpoints/GenericTfsEndpoint`1/
+permalink: /Reference/v2/Endpoints/GenericTfsEndpoint`1/
 title: GenericTfsEndpoint`1
 categories:
 - Endpoints
 - v2
+notes: ''
+introduction: ''
 
 ---

@@ -41,10 +41,12 @@ options:
 redirectFrom: []
 layout: reference
 toc: true
-permalink: /Reference2/v2/FieldMaps/FieldMergeMapConfig/
+permalink: /Reference/v2/FieldMaps/FieldMergeMapConfig/
 title: FieldMergeMapConfig
 categories:
 - FieldMaps
 - v2
+notes: ''
+introduction: ''
 
 ---

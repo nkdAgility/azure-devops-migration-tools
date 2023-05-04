@@ -49,10 +49,12 @@ options:
 redirectFrom: []
 layout: reference
 toc: true
-permalink: /Reference2/v1/FieldMaps/FieldValueMapConfig/
+permalink: /Reference/v1/FieldMaps/FieldValueMapConfig/
 title: FieldValueMapConfig
 categories:
 - FieldMaps
 - v1
+notes: ''
+introduction: ''
 
 ---

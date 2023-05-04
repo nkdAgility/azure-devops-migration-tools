@@ -53,10 +53,12 @@ options:
 redirectFrom: []
 layout: reference
 toc: true
-permalink: /Reference2/v1/Processors/WorkItemPostProcessingContext/
+permalink: /Reference/v1/Processors/WorkItemPostProcessingContext/
 title: WorkItemPostProcessingContext
 categories:
 - Processors
 - v1
+notes: ''
+introduction: ''
 
 ---

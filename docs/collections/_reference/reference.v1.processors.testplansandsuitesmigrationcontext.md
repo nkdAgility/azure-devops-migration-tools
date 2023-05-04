@@ -78,10 +78,60 @@ options:
 redirectFrom: []
 layout: reference
 toc: true
-permalink: /Reference2/v1/Processors/TestPlansAndSuitesMigrationContext/
+permalink: /Reference/v1/Processors/TestPlansAndSuitesMigrationContext/
 title: TestPlansAndSuitesMigrationContext
 categories:
 - Processors
 - v1
+notes: >2-
+
+  ## Additional Samples & Info
+
+
+  To run a full plans and suits you should run the three processors in this order below.  `TestVariablesMigrationConfig` and `TestConfigurationsMigrationConfig` only need run once.
+
+
+  ```json
+
+  "Processors": [
+      {
+        "$type": "TestVariablesMigrationConfig",
+        "Enabled": false
+      },
+      {
+        "$type": "TestConfigurationsMigrationConfig",
+        "Enabled": true
+      },
+      {
+        "$type": "TestPlansAndSuitesMigrationConfig",
+        "Enabled": true,
+        "PrefixProjectToNodes": false,
+        "OnlyElementsWithTag": null,
+        "TestPlanQueryBit": null,
+        "RemoveAllLinks": false,
+        "MigrationDelay": 0,
+        "UseCommonNodeStructureEnricherConfig": false,
+        "NodeBasePaths": [],
+        "AreaMaps": null,
+        "IterationMaps": null,
+        "RemoveInvalidTestSuiteLinks": false,
+        "FilterCompleted": false
+      }
+  ]
+
+  ```
+
+  ## Known working TestPlanQueryBit filter fields names
+
+
+  `AreaPath`, `PlanName` and `PlanState`
+
+
+  ```json
+
+  "TestPlanQueryBit": "PlanName = 'ABC'"
+
+  ```
+introduction: ''
 
 ---

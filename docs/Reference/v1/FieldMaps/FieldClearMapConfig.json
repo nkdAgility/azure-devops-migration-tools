@@ -1,5 +1,0 @@
-{
-  "$type": "FieldClearMapConfig",
-  "WorkItemTypeName": "*",
-  "targetField": "System.Description"
-}

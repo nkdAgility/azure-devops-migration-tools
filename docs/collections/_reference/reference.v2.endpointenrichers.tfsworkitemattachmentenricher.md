@@ -37,10 +37,12 @@ options:
 redirectFrom: []
 layout: reference
 toc: true
-permalink: /Reference2/v2/EndpointEnrichers/TfsWorkItemAttachmentEnricher/
+permalink: /Reference/v2/EndpointEnrichers/TfsWorkItemAttachmentEnricher/
 title: TfsWorkItemAttachmentEnricher
 categories:
 - EndpointEnrichers
 - v2
+notes: ''
+introduction: ''
 
 ---

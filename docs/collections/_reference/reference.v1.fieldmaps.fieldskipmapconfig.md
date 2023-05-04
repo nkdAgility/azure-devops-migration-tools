@@ -28,10 +28,12 @@ options:
 redirectFrom: []
 layout: reference
 toc: true
-permalink: /Reference2/v1/FieldMaps/FieldSkipMapConfig/
+permalink: /Reference/v1/FieldMaps/FieldSkipMapConfig/
 title: FieldSkipMapConfig
 categories:
 - FieldMaps
 - v1
+notes: ''
+introduction: ''
 
 ---

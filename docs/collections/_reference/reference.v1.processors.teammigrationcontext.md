@@ -38,10 +38,12 @@ options:
 redirectFrom: []
 layout: reference
 toc: true
-permalink: /Reference2/v1/Processors/TeamMigrationContext/
+permalink: /Reference/v1/Processors/TeamMigrationContext/
 title: TeamMigrationContext
 categories:
 - Processors
 - v1
+notes: ''
+introduction: ''
 
 ---

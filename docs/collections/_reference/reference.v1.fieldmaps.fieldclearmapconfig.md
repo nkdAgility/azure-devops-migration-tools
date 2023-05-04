@@ -28,10 +28,12 @@ options:
 redirectFrom: []
 layout: reference
 toc: true
-permalink: /Reference2/v1/FieldMaps/FieldClearMapConfig/
+permalink: /Reference/v1/FieldMaps/FieldClearMapConfig/
 title: FieldClearMapConfig
 categories:
 - FieldMaps
 - v1
+notes: ''
+introduction: ''
 
 ---

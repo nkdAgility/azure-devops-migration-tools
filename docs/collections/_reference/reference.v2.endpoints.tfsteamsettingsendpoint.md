@@ -11,10 +11,12 @@ options: []
 redirectFrom: []
 layout: reference
 toc: true
-permalink: /Reference2/v2/Endpoints/TfsTeamSettingsEndpoint/
+permalink: /Reference/v2/Endpoints/TfsTeamSettingsEndpoint/
 title: TfsTeamSettingsEndpoint
 categories:
 - Endpoints
 - v2
+notes: ''
+introduction: ''
 
 ---

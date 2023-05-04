@@ -13,18 +13,21 @@ layout: default
 </div>
 <div class="">
     {% include article-alert.html %}
+
+
     <p>{{ page.description }}</p>
+
+    <p>{{ page.introduction }}</p>
     
     <h2>Options</h2>
-    <table>
+    <div class="table-responsive">
+    <table class="table table-striped table-hover">
         <tr>
             <td>Parameter name</td>
             <td>Type</td>
             <td>Description</td>
             <td>Default Value</td>
         </tr>
-
-
     {% assign options = page.options %}
     {% for option in options %}
         <tr>
@@ -35,16 +38,16 @@ layout: default
         </tr>
     {% endfor %}
 </table>
+</div>
 
 <h2>Example</h2>
+<p>A basic sample for {{ page.className }} configuration.</p>
     {% assign sample = page.configurationSamples | where: "name", "default" | last %}
-    ```JSON    
-     {{sample.code}}
-    ```
-    {{page.path}}notes.md
-    {% capture notes %}{% include {{page.path}}notes.md %}{% endcapture %}
-    {{ notes | markdownify }}
+    <div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+        {{sample.code}}
+    </code></pre></div></div>
+
+    {{page.notes | markdownify }}
 
     {{ content | inject_anchors }}
 </div>
-

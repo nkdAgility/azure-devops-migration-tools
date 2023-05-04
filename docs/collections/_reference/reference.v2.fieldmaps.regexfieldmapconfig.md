@@ -43,10 +43,12 @@ options:
 redirectFrom: []
 layout: reference
 toc: true
-permalink: /Reference2/v2/FieldMaps/RegexFieldMapConfig/
+permalink: /Reference/v2/FieldMaps/RegexFieldMapConfig/
 title: RegexFieldMapConfig
 categories:
 - FieldMaps
 - v2
+notes: ''
+introduction: ''
 
 ---

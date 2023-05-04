@@ -33,10 +33,12 @@ options:
 redirectFrom: []
 layout: reference
 toc: true
-permalink: /Reference2/v1/FieldMaps/FieldLiteralMapConfig/
+permalink: /Reference/v1/FieldMaps/FieldLiteralMapConfig/
 title: FieldLiteralMapConfig
 categories:
 - FieldMaps
 - v1
+notes: ''
+introduction: ''
 
 ---

@@ -27,10 +27,12 @@ options:
 redirectFrom: []
 layout: reference
 toc: true
-permalink: /Reference2/v2/ProcessorEnrichers/AppendMigrationToolSignatureFooter/
+permalink: /Reference/v2/ProcessorEnrichers/AppendMigrationToolSignatureFooter/
 title: AppendMigrationToolSignatureFooter
 categories:
 - ProcessorEnrichers
 - v2
+notes: ''
+introduction: ''
 
 ---

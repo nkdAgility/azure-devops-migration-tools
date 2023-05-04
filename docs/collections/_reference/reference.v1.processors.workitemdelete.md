@@ -53,10 +53,12 @@ options:
 redirectFrom: []
 layout: reference
 toc: true
-permalink: /Reference2/v1/Processors/WorkItemDelete/
+permalink: /Reference/v1/Processors/WorkItemDelete/
 title: WorkItemDelete
 categories:
 - Processors
 - v1
+notes: ''
+introduction: ''
 
 ---

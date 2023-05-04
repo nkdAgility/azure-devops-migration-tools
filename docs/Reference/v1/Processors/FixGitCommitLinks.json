@@ -1,7 +1,0 @@
-{
-  "$type": "FixGitCommitLinksConfig",
-  "Enabled": false,
-  "TargetRepository": null,
-  "QueryBit": null,
-  "OrderBit": null
-}

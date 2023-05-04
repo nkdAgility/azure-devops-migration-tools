@@ -56,10 +56,12 @@ options:
 redirectFrom: []
 layout: reference
 toc: true
-permalink: /Reference2/v2/ProcessorEnrichers/TfsNodeStructure/
+permalink: /Reference/v2/ProcessorEnrichers/TfsNodeStructure/
 title: TfsNodeStructure
 categories:
 - ProcessorEnrichers
 - v2
+notes: ''
+introduction: ''
 
 ---

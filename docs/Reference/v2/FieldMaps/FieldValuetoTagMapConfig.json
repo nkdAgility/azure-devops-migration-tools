@@ -1,7 +1,0 @@
-{
-  "$type": "FieldValuetoTagMapConfig",
-  "WorkItemTypeName": "*",
-  "sourceField": "System.Status",
-  "pattern": "(Active|Resolved)",
-  "formatExpression": "Status: {0}"
-}

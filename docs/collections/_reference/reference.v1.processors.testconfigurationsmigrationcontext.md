@@ -23,10 +23,12 @@ options:
 redirectFrom: []
 layout: reference
 toc: true
-permalink: /Reference2/v1/Processors/TestConfigurationsMigrationContext/
+permalink: /Reference/v1/Processors/TestConfigurationsMigrationContext/
 title: TestConfigurationsMigrationContext
 categories:
 - Processors
 - v1
+notes: ''
+introduction: ''
 
 ---

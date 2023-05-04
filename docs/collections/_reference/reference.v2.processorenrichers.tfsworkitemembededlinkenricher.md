@@ -11,10 +11,12 @@ options: []
 redirectFrom: []
 layout: reference
 toc: true
-permalink: /Reference2/v2/ProcessorEnrichers/TfsWorkItemEmbededLinkEnricher/
+permalink: /Reference/v2/ProcessorEnrichers/TfsWorkItemEmbededLinkEnricher/
 title: TfsWorkItemEmbededLinkEnricher
 categories:
 - ProcessorEnrichers
 - v2
+notes: ''
+introduction: ''
 
 ---
