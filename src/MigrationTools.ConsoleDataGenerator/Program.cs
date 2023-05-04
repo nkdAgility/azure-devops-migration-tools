@@ -14,12 +14,14 @@ using YamlDotNet.Serialization.NamingConventions;
 using YamlDotNet.Serialization;
 using MigrationTools.Options;
 using System.Text;
+using MigrationTools.ConsoleDataGenerator.ReferenceData;
 
 namespace MigrationTools.ConsoleDataGenerator;
 class Program
 {
     private static DataSerialization saveData = new DataSerialization("../../../../../docs/_data/");
     private static CodeDocumentation codeDocs = new CodeDocumentation("../../../../../docs/Reference/Generated/");
+    private static ClassDataLoader cdLoader = new ClassDataLoader(saveData);
 
     static void Main(string[] args)
     {
@@ -30,15 +32,6 @@ class Program
         currentDomain.Load("MigrationTools.Clients.AzureDevops.Rest");
         currentDomain.Load("MigrationTools.Clients.FileSystem");
         currentDomain.Load("VstsSyncMigrator.Core");
-
-        //AssemblyLoadContext.EnterContextualReflection();
-        //
-        //domain = AssemblyLoadContext.CurrentContextualReflectionContext;
-        //domain.LoadFromAssemblyPath(Path.Combine(dir,"MigrationTools.dll"));
-        //domain.LoadFromAssemblyPath(Path.Combine(dir, "MigrationTools.Clients.AzureDevops.ObjectModel.dll"));
-        //domain.LoadFromAssemblyPath(Path.Combine(dir, "MigrationTools.Clients.AzureDevops.Rest.dll"));
-        //domain.LoadFromAssemblyPath(Path.Combine(dir, "MigrationTools.Clients.FileSystem.dll"));
-        //domain.LoadFromAssemblyPath(Path.Combine(dir, "VstsSyncMigrator.Core.dll"));
 
         Console.WriteLine("Assemblies");
         List<Assembly> asses = currentDomain.GetAssemblies().ToList();
@@ -61,6 +54,8 @@ class Program
 
 
         // V1
+        //ClassGroup v1Processors = cdLoader.CreateClassGroup(oldTypes, allTypes, typeof(MigrationTools._EngineV1.Containers.IProcessor), "v1", "Processors", true, "Config");
+
         BuildJekyllDataFile(oldTypes, allTypes, typeof(MigrationTools._EngineV1.Containers.IProcessor), "v1", "Processors", true, "Config");
         BuildJekyllDataFile(newTypes, allTypes, typeof(IFieldMapConfig), "v1", "FieldMaps", false);
         // V2
@@ -75,7 +70,7 @@ class Program
     {
        Console.WriteLine();
         Console.WriteLine($"BuildJekyllDataFile: {dataTypeName}");
-        ReferenceDataGroup data = new ReferenceDataGroup();
+        ClassGroup data = new ClassGroup();
         data.Name = dataTypeName;
         var founds = targetTypes.Where(t => type.IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface && t.IsPublic).OrderBy(t => t.Name).ToList();
         Console.WriteLine($"----------- Found {founds.Count}");
@@ -92,14 +87,15 @@ class Program
     }
 
 
-    private static void PopulateReferenceData(ref ReferenceDataGroup data, List<Type> targetTypes, List<Type> allTypes, string apiVersion, string dataTypeName, Type item, bool findConfig = true, string configEnd = "Options")
+    private static void PopulateReferenceData(ref ClassGroup data, List<Type> targetTypes, List<Type> allTypes, string apiVersion, string dataTypeName, Type item, bool findConfig = true, string configEnd = "Options")
     {
         Type typeOption = item;
         string objectName = item.Name;
-        ReferenceDataItem dataItem = new ReferenceDataItem();
-        dataItem.ClassName = item.Name;
-        dataItem.TypeName = dataTypeName;
-        dataItem.Architecture = apiVersion;
+        DataItem dataItem = new DataItem();
+        dataItem.classData.ClassName = item.Name;
+        dataItem.classData.TypeName = dataTypeName;
+        dataItem.classData.Architecture = apiVersion;
+        dataItem.jekyllData.Permalink = $"/Reference/{apiVersion}/{dataItem.classData.TypeName}/{dataItem.classData.ClassName}/";
 
         if (findConfig)
         {
@@ -109,14 +105,21 @@ class Program
         }
         else
         {
-            dataItem.OptionsClass = "";
+            dataItem.classData.OptionsClassName = "";
+            dataItem.classData.OptionsClassFullName = "";
             Console.WriteLine("No config");
         }
 
 
         if (typeOption != null)
         {
-            dataItem.OptionsClass = typeOption.FullName;
+            string posibleOldUrl = $"/Reference/{apiVersion}/{dataItem.classData.TypeName}/{typeOption.Name}/";
+            if (posibleOldUrl != dataItem.jekyllData.Permalink)
+            {
+                dataItem.jekyllData.Redirect_from.Add(posibleOldUrl);
+            }            
+            dataItem.classData.OptionsClassFullName = typeOption.FullName;
+            dataItem.classData.OptionsClassName = typeOption.Name;
             object targetItem = null;
             if (typeOption.GetInterfaces().Contains(typeof(IProcessorConfig)))
             {
@@ -143,29 +146,30 @@ class Program
                 Console.WriteLine("targetItem");
                 JObject joptions = (JObject)JToken.FromObject(targetItem);
 
-                dataItem.Options = populateOptions(targetItem, joptions);
-
-                dataItem.ConfigurationSample = saveData.SeraliseDataToJson(targetItem);
+                dataItem.classData.Options = populateOptions(targetItem, joptions);
+                dataItem.classData.ConfigurationSamples.Add(new ConfigurationSample() { Name = "default", SampleFor = dataItem.classData.OptionsClassFullName, Sample = saveData.SeraliseDataToJson(targetItem) });
             }
 
         }
         else
         {
-            dataItem.ConfigurationSample = "";
+
         }
-        dataItem.Description = codeDocs.GetTypeData(item);
+        dataItem.classData.Description = codeDocs.GetTypeData(item);
+
+        saveData.SeraliseData(dataItem, apiVersion, dataTypeName);
         data.Items.Add(dataItem);
     }
 
-    private static List<ReferenceDataOptionsItem> populateOptions(object item, JObject joptions)
+    private static List<OptionsItem> populateOptions(object item, JObject joptions)
     {
-        List<ReferenceDataOptionsItem> options = new List<ReferenceDataOptionsItem>();
+        List<OptionsItem> options = new List<OptionsItem>();
         if (!(joptions is null))
         {
             var jpropertys = joptions.Properties().OrderBy(t => t.Name);
             foreach (JProperty jproperty in jpropertys)
             {
-                ReferenceDataOptionsItem optionsItem = new ReferenceDataOptionsItem();
+                OptionsItem optionsItem = new OptionsItem();
                 optionsItem.ParameterName = jproperty.Name;
                 optionsItem.Type = codeDocs.GetPropertyType(item, jproperty);
                 optionsItem.Description = codeDocs.GetPropertyData(item, joptions, jproperty, "summary");

@@ -1,0 +1,61 @@
+---
+classData:
+  optionsClassName: TfsNodeStructureOptions
+  optionsClassFullName: MigrationTools.Enrichers.TfsNodeStructureOptions
+  configurationSamples:
+  - name: default
+    description: 
+    sample: >-
+      {
+        "$type": "TfsNodeStructureOptions",
+        "Enabled": true,
+        "PrefixProjectToNodes": false,
+        "NodeBasePaths": null,
+        "AreaMaps": {
+          "$type": "Dictionary`2"
+        },
+        "IterationMaps": {
+          "$type": "Dictionary`2"
+        },
+        "ShouldCreateMissingRevisionPaths": true
+      }
+    sampleFor: MigrationTools.Enrichers.TfsNodeStructureOptions
+  description: missng XML code comments
+  className: TfsNodeStructure
+  typeName: ProcessorEnrichers
+  architecture: v2
+  options:
+  - parameterName: AreaMaps
+    type: Dictionary
+    description: missng XML code comments
+    defaultValue: missng XML code comments
+  - parameterName: Enabled
+    type: Boolean
+    description: missng XML code comments
+    defaultValue: missng XML code comments
+  - parameterName: IterationMaps
+    type: Dictionary
+    description: missng XML code comments
+    defaultValue: missng XML code comments
+  - parameterName: NodeBasePaths
+    type: String[]
+    description: missng XML code comments
+    defaultValue: missng XML code comments
+  - parameterName: PrefixProjectToNodes
+    type: Boolean
+    description: missng XML code comments
+    defaultValue: missng XML code comments
+  - parameterName: RefName
+    type: String
+    description: missng XML code comments
+    defaultValue: missng XML code comments
+  - parameterName: ShouldCreateMissingRevisionPaths
+    type: Boolean
+    description: missng XML code comments
+    defaultValue: missng XML code comments
+jekyllData:
+  redirectFrom:
+  - /Reference/v2/ProcessorEnrichers/TfsNodeStructureOptions/
+  permalink: /Reference/v2/ProcessorEnrichers/TfsNodeStructure/
+
+---

@@ -7,6 +7,7 @@ using MigrationTools.Helpers;
 using Newtonsoft.Json;
 using YamlDotNet.Serialization.NamingConventions;
 using YamlDotNet.Serialization;
+using MigrationTools.ConsoleDataGenerator.ReferenceData;
 
 namespace MigrationTools.ConsoleDataGenerator
 {
@@ -14,11 +15,26 @@ namespace MigrationTools.ConsoleDataGenerator
     {
 
         private static string dataPath = "../../../../../docs/_data/";
+        private static string referencePath = "../../../../../docs/collections/_reference";
+
         public DataSerialization(string saveDataTo) {
             dataPath = saveDataTo;
         }
 
-        public string SeraliseData(object data, string apiVersion, string dataTypeName)
+        public string SeraliseData(DataItem data, string apiVersion, string dataTypeName)
+        {
+            string filename = $"reference.{apiVersion}.{dataTypeName}.{data.classData.ClassName}";
+            string filePath = Path.Combine(dataPath, filename.ToLower());
+            string yaml = SeraliseDataToYaml(data);
+            File.WriteAllText($"{filePath}.yaml", yaml);
+            yaml = "---" + '\n' + yaml;
+            yaml = yaml + '\n' + "---";
+             filePath = Path.Combine(referencePath, filename.ToLower());
+            File.WriteAllText($"{filePath}.md", yaml);
+            return yaml;
+        }
+
+        public string SeraliseData(ClassGroup data, string apiVersion, string dataTypeName)
         {
             string filename = $"reference.{apiVersion}.{dataTypeName}";
             string filePath = Path.Combine(dataPath, filename.ToLower());

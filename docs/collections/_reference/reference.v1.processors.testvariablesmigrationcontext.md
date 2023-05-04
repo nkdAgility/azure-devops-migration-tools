@@ -1,0 +1,28 @@
+---
+classData:
+  optionsClassName: TestVariablesMigrationConfig
+  optionsClassFullName: MigrationTools._EngineV1.Configuration.Processing.TestVariablesMigrationConfig
+  configurationSamples:
+  - name: default
+    description: 
+    sample: >-
+      {
+        "$type": "TestVariablesMigrationConfig",
+        "Enabled": false
+      }
+    sampleFor: MigrationTools._EngineV1.Configuration.Processing.TestVariablesMigrationConfig
+  description: This processor can migrate test variables that are defined in the test plans / suites. This must run before `TestPlansAndSuitesMigrationConfig`.
+  className: TestVariablesMigrationContext
+  typeName: Processors
+  architecture: v1
+  options:
+  - parameterName: Enabled
+    type: Boolean
+    description: missng XML code comments
+    defaultValue: missng XML code comments
+jekyllData:
+  redirectFrom:
+  - /Reference/v1/Processors/TestVariablesMigrationConfig/
+  permalink: /Reference/v1/Processors/TestVariablesMigrationContext/
+
+---

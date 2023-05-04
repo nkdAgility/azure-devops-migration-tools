@@ -1,287 +1,465 @@
 {
-  "$type": "ReferenceDataGroup",
+  "$type": "ClassGroup",
   "Name": "ProcessorEnrichers",
   "Items": [
     {
-      "$type": "ReferenceDataItem",
-      "OptionsClass": "MigrationTools.Enrichers.AppendMigrationToolSignatureFooterOptions",
-      "ConfigurationSample": "{\r\n  \"$type\": \"AppendMigrationToolSignatureFooterOptions\",\r\n  \"Enabled\": true\r\n}",
-      "Description": "missng XML code comments",
-      "ClassName": "AppendMigrationToolSignatureFooter",
-      "TypeName": "ProcessorEnrichers",
-      "Architecture": "v2",
-      "Options": [
-        {
-          "$type": "ReferenceDataOptionsItem",
-          "ParameterName": "Enabled",
-          "Type": "Boolean",
-          "Description": "missng XML code comments",
-          "DefaultValue": "missng XML code comments"
-        },
-        {
-          "$type": "ReferenceDataOptionsItem",
-          "ParameterName": "RefName",
-          "Type": "String",
-          "Description": "missng XML code comments",
-          "DefaultValue": "missng XML code comments"
-        }
-      ]
+      "$type": "DataItem",
+      "classData": {
+        "$type": "ClassData",
+        "OptionsClassName": "AppendMigrationToolSignatureFooterOptions",
+        "OptionsClassFullName": "MigrationTools.Enrichers.AppendMigrationToolSignatureFooterOptions",
+        "ConfigurationSamples": [
+          {
+            "$type": "ConfigurationSample",
+            "Name": "default",
+            "Description": null,
+            "Sample": "{\r\n  \"$type\": \"AppendMigrationToolSignatureFooterOptions\",\r\n  \"Enabled\": true\r\n}",
+            "SampleFor": "MigrationTools.Enrichers.AppendMigrationToolSignatureFooterOptions"
+          }
+        ],
+        "Description": "missng XML code comments",
+        "ClassName": "AppendMigrationToolSignatureFooter",
+        "TypeName": "ProcessorEnrichers",
+        "Architecture": "v2",
+        "Options": [
+          {
+            "$type": "OptionsItem",
+            "ParameterName": "Enabled",
+            "Type": "Boolean",
+            "Description": "missng XML code comments",
+            "DefaultValue": "missng XML code comments"
+          },
+          {
+            "$type": "OptionsItem",
+            "ParameterName": "RefName",
+            "Type": "String",
+            "Description": "missng XML code comments",
+            "DefaultValue": "missng XML code comments"
+          }
+        ]
+      },
+      "jekyllData": {
+        "$type": "JekyllData",
+        "Redirect_from": [
+          "/Reference/v2/ProcessorEnrichers/AppendMigrationToolSignatureFooterOptions/"
+        ],
+        "Permalink": "/Reference/v2/ProcessorEnrichers/AppendMigrationToolSignatureFooter/"
+      }
     },
     {
-      "$type": "ReferenceDataItem",
-      "OptionsClass": null,
-      "ConfigurationSample": "",
-      "Description": "missng XML code comments",
-      "ClassName": "EmbededImagesRepairEnricher",
-      "TypeName": "ProcessorEnrichers",
-      "Architecture": "v2",
-      "Options": []
+      "$type": "DataItem",
+      "classData": {
+        "$type": "ClassData",
+        "OptionsClassName": null,
+        "OptionsClassFullName": null,
+        "ConfigurationSamples": [],
+        "Description": "missng XML code comments",
+        "ClassName": "EmbededImagesRepairEnricher",
+        "TypeName": "ProcessorEnrichers",
+        "Architecture": "v2",
+        "Options": []
+      },
+      "jekyllData": {
+        "$type": "JekyllData",
+        "Redirect_from": [],
+        "Permalink": "/Reference/v2/ProcessorEnrichers/EmbededImagesRepairEnricher/"
+      }
     },
     {
-      "$type": "ReferenceDataItem",
-      "OptionsClass": "MigrationTools.Enrichers.FilterWorkItemsThatAlreadyExistInTargetOptions",
-      "ConfigurationSample": "{\r\n  \"$type\": \"FilterWorkItemsThatAlreadyExistInTargetOptions\",\r\n  \"Enabled\": true,\r\n  \"Query\": {\r\n    \"$type\": \"QueryOptions\",\r\n    \"Query\": \"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan') ORDER BY [System.ChangedDate] desc\",\r\n    \"Parameters\": null\r\n  }\r\n}",
-      "Description": "missng XML code comments",
-      "ClassName": "FilterWorkItemsThatAlreadyExistInTarget",
-      "TypeName": "ProcessorEnrichers",
-      "Architecture": "v2",
-      "Options": [
-        {
-          "$type": "ReferenceDataOptionsItem",
-          "ParameterName": "Enabled",
-          "Type": "Boolean",
-          "Description": "missng XML code comments",
-          "DefaultValue": "missng XML code comments"
-        },
-        {
-          "$type": "ReferenceDataOptionsItem",
-          "ParameterName": "Query",
-          "Type": "QueryOptions",
-          "Description": "missng XML code comments",
-          "DefaultValue": "missng XML code comments"
-        },
-        {
-          "$type": "ReferenceDataOptionsItem",
-          "ParameterName": "RefName",
-          "Type": "String",
-          "Description": "missng XML code comments",
-          "DefaultValue": "missng XML code comments"
-        }
-      ]
+      "$type": "DataItem",
+      "classData": {
+        "$type": "ClassData",
+        "OptionsClassName": "FilterWorkItemsThatAlreadyExistInTargetOptions",
+        "OptionsClassFullName": "MigrationTools.Enrichers.FilterWorkItemsThatAlreadyExistInTargetOptions",
+        "ConfigurationSamples": [
+          {
+            "$type": "ConfigurationSample",
+            "Name": "default",
+            "Description": null,
+            "Sample": "{\r\n  \"$type\": \"FilterWorkItemsThatAlreadyExistInTargetOptions\",\r\n  \"Enabled\": true,\r\n  \"Query\": {\r\n    \"$type\": \"QueryOptions\",\r\n    \"Query\": \"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan') ORDER BY [System.ChangedDate] desc\",\r\n    \"Parameters\": null\r\n  }\r\n}",
+            "SampleFor": "MigrationTools.Enrichers.FilterWorkItemsThatAlreadyExistInTargetOptions"
+          }
+        ],
+        "Description": "missng XML code comments",
+        "ClassName": "FilterWorkItemsThatAlreadyExistInTarget",
+        "TypeName": "ProcessorEnrichers",
+        "Architecture": "v2",
+        "Options": [
+          {
+            "$type": "OptionsItem",
+            "ParameterName": "Enabled",
+            "Type": "Boolean",
+            "Description": "missng XML code comments",
+            "DefaultValue": "missng XML code comments"
+          },
+          {
+            "$type": "OptionsItem",
+            "ParameterName": "Query",
+            "Type": "QueryOptions",
+            "Description": "missng XML code comments",
+            "DefaultValue": "missng XML code comments"
+          },
+          {
+            "$type": "OptionsItem",
+            "ParameterName": "RefName",
+            "Type": "String",
+            "Description": "missng XML code comments",
+            "DefaultValue": "missng XML code comments"
+          }
+        ]
+      },
+      "jekyllData": {
+        "$type": "JekyllData",
+        "Redirect_from": [
+          "/Reference/v2/ProcessorEnrichers/FilterWorkItemsThatAlreadyExistInTargetOptions/"
+        ],
+        "Permalink": "/Reference/v2/ProcessorEnrichers/FilterWorkItemsThatAlreadyExistInTarget/"
+      }
     },
     {
-      "$type": "ReferenceDataItem",
-      "OptionsClass": "MigrationTools.Enrichers.PauseAfterEachItemOptions",
-      "ConfigurationSample": "{\r\n  \"$type\": \"PauseAfterEachItemOptions\",\r\n  \"Enabled\": true\r\n}",
-      "Description": "missng XML code comments",
-      "ClassName": "PauseAfterEachItem",
-      "TypeName": "ProcessorEnrichers",
-      "Architecture": "v2",
-      "Options": [
-        {
-          "$type": "ReferenceDataOptionsItem",
-          "ParameterName": "Enabled",
-          "Type": "Boolean",
-          "Description": "missng XML code comments",
-          "DefaultValue": "missng XML code comments"
-        },
-        {
-          "$type": "ReferenceDataOptionsItem",
-          "ParameterName": "RefName",
-          "Type": "String",
-          "Description": "missng XML code comments",
-          "DefaultValue": "missng XML code comments"
-        }
-      ]
+      "$type": "DataItem",
+      "classData": {
+        "$type": "ClassData",
+        "OptionsClassName": "PauseAfterEachItemOptions",
+        "OptionsClassFullName": "MigrationTools.Enrichers.PauseAfterEachItemOptions",
+        "ConfigurationSamples": [
+          {
+            "$type": "ConfigurationSample",
+            "Name": "default",
+            "Description": null,
+            "Sample": "{\r\n  \"$type\": \"PauseAfterEachItemOptions\",\r\n  \"Enabled\": true\r\n}",
+            "SampleFor": "MigrationTools.Enrichers.PauseAfterEachItemOptions"
+          }
+        ],
+        "Description": "missng XML code comments",
+        "ClassName": "PauseAfterEachItem",
+        "TypeName": "ProcessorEnrichers",
+        "Architecture": "v2",
+        "Options": [
+          {
+            "$type": "OptionsItem",
+            "ParameterName": "Enabled",
+            "Type": "Boolean",
+            "Description": "missng XML code comments",
+            "DefaultValue": "missng XML code comments"
+          },
+          {
+            "$type": "OptionsItem",
+            "ParameterName": "RefName",
+            "Type": "String",
+            "Description": "missng XML code comments",
+            "DefaultValue": "missng XML code comments"
+          }
+        ]
+      },
+      "jekyllData": {
+        "$type": "JekyllData",
+        "Redirect_from": [
+          "/Reference/v2/ProcessorEnrichers/PauseAfterEachItemOptions/"
+        ],
+        "Permalink": "/Reference/v2/ProcessorEnrichers/PauseAfterEachItem/"
+      }
     },
     {
-      "$type": "ReferenceDataItem",
-      "OptionsClass": "MigrationTools.Enrichers.SkipToFinalRevisedWorkItemTypeOptions",
-      "ConfigurationSample": "{\r\n  \"$type\": \"SkipToFinalRevisedWorkItemTypeOptions\",\r\n  \"Enabled\": true\r\n}",
-      "Description": "missng XML code comments",
-      "ClassName": "SkipToFinalRevisedWorkItemType",
-      "TypeName": "ProcessorEnrichers",
-      "Architecture": "v2",
-      "Options": [
-        {
-          "$type": "ReferenceDataOptionsItem",
-          "ParameterName": "Enabled",
-          "Type": "Boolean",
-          "Description": "missng XML code comments",
-          "DefaultValue": "missng XML code comments"
-        },
-        {
-          "$type": "ReferenceDataOptionsItem",
-          "ParameterName": "RefName",
-          "Type": "String",
-          "Description": "missng XML code comments",
-          "DefaultValue": "missng XML code comments"
-        }
-      ]
+      "$type": "DataItem",
+      "classData": {
+        "$type": "ClassData",
+        "OptionsClassName": "SkipToFinalRevisedWorkItemTypeOptions",
+        "OptionsClassFullName": "MigrationTools.Enrichers.SkipToFinalRevisedWorkItemTypeOptions",
+        "ConfigurationSamples": [
+          {
+            "$type": "ConfigurationSample",
+            "Name": "default",
+            "Description": null,
+            "Sample": "{\r\n  \"$type\": \"SkipToFinalRevisedWorkItemTypeOptions\",\r\n  \"Enabled\": true\r\n}",
+            "SampleFor": "MigrationTools.Enrichers.SkipToFinalRevisedWorkItemTypeOptions"
+          }
+        ],
+        "Description": "missng XML code comments",
+        "ClassName": "SkipToFinalRevisedWorkItemType",
+        "TypeName": "ProcessorEnrichers",
+        "Architecture": "v2",
+        "Options": [
+          {
+            "$type": "OptionsItem",
+            "ParameterName": "Enabled",
+            "Type": "Boolean",
+            "Description": "missng XML code comments",
+            "DefaultValue": "missng XML code comments"
+          },
+          {
+            "$type": "OptionsItem",
+            "ParameterName": "RefName",
+            "Type": "String",
+            "Description": "missng XML code comments",
+            "DefaultValue": "missng XML code comments"
+          }
+        ]
+      },
+      "jekyllData": {
+        "$type": "JekyllData",
+        "Redirect_from": [
+          "/Reference/v2/ProcessorEnrichers/SkipToFinalRevisedWorkItemTypeOptions/"
+        ],
+        "Permalink": "/Reference/v2/ProcessorEnrichers/SkipToFinalRevisedWorkItemType/"
+      }
     },
     {
-      "$type": "ReferenceDataItem",
-      "OptionsClass": null,
-      "ConfigurationSample": "",
-      "Description": "missng XML code comments",
-      "ClassName": "TfsEmbededImagesEnricher",
-      "TypeName": "ProcessorEnrichers",
-      "Architecture": "v2",
-      "Options": []
+      "$type": "DataItem",
+      "classData": {
+        "$type": "ClassData",
+        "OptionsClassName": null,
+        "OptionsClassFullName": null,
+        "ConfigurationSamples": [],
+        "Description": "missng XML code comments",
+        "ClassName": "TfsEmbededImagesEnricher",
+        "TypeName": "ProcessorEnrichers",
+        "Architecture": "v2",
+        "Options": []
+      },
+      "jekyllData": {
+        "$type": "JekyllData",
+        "Redirect_from": [],
+        "Permalink": "/Reference/v2/ProcessorEnrichers/TfsEmbededImagesEnricher/"
+      }
     },
     {
-      "$type": "ReferenceDataItem",
-      "OptionsClass": null,
-      "ConfigurationSample": "",
-      "Description": "missng XML code comments",
-      "ClassName": "TfsGitRepositoryEnricher",
-      "TypeName": "ProcessorEnrichers",
-      "Architecture": "v2",
-      "Options": []
+      "$type": "DataItem",
+      "classData": {
+        "$type": "ClassData",
+        "OptionsClassName": null,
+        "OptionsClassFullName": null,
+        "ConfigurationSamples": [],
+        "Description": "missng XML code comments",
+        "ClassName": "TfsGitRepositoryEnricher",
+        "TypeName": "ProcessorEnrichers",
+        "Architecture": "v2",
+        "Options": []
+      },
+      "jekyllData": {
+        "$type": "JekyllData",
+        "Redirect_from": [],
+        "Permalink": "/Reference/v2/ProcessorEnrichers/TfsGitRepositoryEnricher/"
+      }
     },
     {
-      "$type": "ReferenceDataItem",
-      "OptionsClass": "MigrationTools.Enrichers.TfsNodeStructureOptions",
-      "ConfigurationSample": "{\r\n  \"$type\": \"TfsNodeStructureOptions\",\r\n  \"Enabled\": true,\r\n  \"PrefixProjectToNodes\": false,\r\n  \"NodeBasePaths\": null,\r\n  \"AreaMaps\": {\r\n    \"$type\": \"Dictionary`2\"\r\n  },\r\n  \"IterationMaps\": {\r\n    \"$type\": \"Dictionary`2\"\r\n  },\r\n  \"ShouldCreateMissingRevisionPaths\": true\r\n}",
-      "Description": "missng XML code comments",
-      "ClassName": "TfsNodeStructure",
-      "TypeName": "ProcessorEnrichers",
-      "Architecture": "v2",
-      "Options": [
-        {
-          "$type": "ReferenceDataOptionsItem",
-          "ParameterName": "AreaMaps",
-          "Type": "Dictionary",
-          "Description": "missng XML code comments",
-          "DefaultValue": "missng XML code comments"
-        },
-        {
-          "$type": "ReferenceDataOptionsItem",
-          "ParameterName": "Enabled",
-          "Type": "Boolean",
-          "Description": "missng XML code comments",
-          "DefaultValue": "missng XML code comments"
-        },
-        {
-          "$type": "ReferenceDataOptionsItem",
-          "ParameterName": "IterationMaps",
-          "Type": "Dictionary",
-          "Description": "missng XML code comments",
-          "DefaultValue": "missng XML code comments"
-        },
-        {
-          "$type": "ReferenceDataOptionsItem",
-          "ParameterName": "NodeBasePaths",
-          "Type": "String[]",
-          "Description": "missng XML code comments",
-          "DefaultValue": "missng XML code comments"
-        },
-        {
-          "$type": "ReferenceDataOptionsItem",
-          "ParameterName": "PrefixProjectToNodes",
-          "Type": "Boolean",
-          "Description": "missng XML code comments",
-          "DefaultValue": "missng XML code comments"
-        },
-        {
-          "$type": "ReferenceDataOptionsItem",
-          "ParameterName": "RefName",
-          "Type": "String",
-          "Description": "missng XML code comments",
-          "DefaultValue": "missng XML code comments"
-        },
-        {
-          "$type": "ReferenceDataOptionsItem",
-          "ParameterName": "ShouldCreateMissingRevisionPaths",
-          "Type": "Boolean",
-          "Description": "missng XML code comments",
-          "DefaultValue": "missng XML code comments"
-        }
-      ]
+      "$type": "DataItem",
+      "classData": {
+        "$type": "ClassData",
+        "OptionsClassName": "TfsNodeStructureOptions",
+        "OptionsClassFullName": "MigrationTools.Enrichers.TfsNodeStructureOptions",
+        "ConfigurationSamples": [
+          {
+            "$type": "ConfigurationSample",
+            "Name": "default",
+            "Description": null,
+            "Sample": "{\r\n  \"$type\": \"TfsNodeStructureOptions\",\r\n  \"Enabled\": true,\r\n  \"PrefixProjectToNodes\": false,\r\n  \"NodeBasePaths\": null,\r\n  \"AreaMaps\": {\r\n    \"$type\": \"Dictionary`2\"\r\n  },\r\n  \"IterationMaps\": {\r\n    \"$type\": \"Dictionary`2\"\r\n  },\r\n  \"ShouldCreateMissingRevisionPaths\": true\r\n}",
+            "SampleFor": "MigrationTools.Enrichers.TfsNodeStructureOptions"
+          }
+        ],
+        "Description": "missng XML code comments",
+        "ClassName": "TfsNodeStructure",
+        "TypeName": "ProcessorEnrichers",
+        "Architecture": "v2",
+        "Options": [
+          {
+            "$type": "OptionsItem",
+            "ParameterName": "AreaMaps",
+            "Type": "Dictionary",
+            "Description": "missng XML code comments",
+            "DefaultValue": "missng XML code comments"
+          },
+          {
+            "$type": "OptionsItem",
+            "ParameterName": "Enabled",
+            "Type": "Boolean",
+            "Description": "missng XML code comments",
+            "DefaultValue": "missng XML code comments"
+          },
+          {
+            "$type": "OptionsItem",
+            "ParameterName": "IterationMaps",
+            "Type": "Dictionary",
+            "Description": "missng XML code comments",
+            "DefaultValue": "missng XML code comments"
+          },
+          {
+            "$type": "OptionsItem",
+            "ParameterName": "NodeBasePaths",
+            "Type": "String[]",
+            "Description": "missng XML code comments",
+            "DefaultValue": "missng XML code comments"
+          },
+          {
+            "$type": "OptionsItem",
+            "ParameterName": "PrefixProjectToNodes",
+            "Type": "Boolean",
+            "Description": "missng XML code comments",
+            "DefaultValue": "missng XML code comments"
+          },
+          {
+            "$type": "OptionsItem",
+            "ParameterName": "RefName",
+            "Type": "String",
+            "Description": "missng XML code comments",
+            "DefaultValue": "missng XML code comments"
+          },
+          {
+            "$type": "OptionsItem",
+            "ParameterName": "ShouldCreateMissingRevisionPaths",
+            "Type": "Boolean",
+            "Description": "missng XML code comments",
+            "DefaultValue": "missng XML code comments"
+          }
+        ]
+      },
+      "jekyllData": {
+        "$type": "JekyllData",
+        "Redirect_from": [
+          "/Reference/v2/ProcessorEnrichers/TfsNodeStructureOptions/"
+        ],
+        "Permalink": "/Reference/v2/ProcessorEnrichers/TfsNodeStructure/"
+      }
     },
     {
-      "$type": "ReferenceDataItem",
-      "OptionsClass": "MigrationTools.Enrichers.TfsRevisionManagerOptions",
-      "ConfigurationSample": "{\r\n  \"$type\": \"TfsRevisionManagerOptions\",\r\n  \"Enabled\": true,\r\n  \"ReplayRevisions\": false,\r\n  \"MaxRevisions\": 0\r\n}",
-      "Description": "missng XML code comments",
-      "ClassName": "TfsRevisionManager",
-      "TypeName": "ProcessorEnrichers",
-      "Architecture": "v2",
-      "Options": [
-        {
-          "$type": "ReferenceDataOptionsItem",
-          "ParameterName": "Enabled",
-          "Type": "Boolean",
-          "Description": "missng XML code comments",
-          "DefaultValue": "missng XML code comments"
-        },
-        {
-          "$type": "ReferenceDataOptionsItem",
-          "ParameterName": "MaxRevisions",
-          "Type": "Int32",
-          "Description": "missng XML code comments",
-          "DefaultValue": "missng XML code comments"
-        },
-        {
-          "$type": "ReferenceDataOptionsItem",
-          "ParameterName": "RefName",
-          "Type": "String",
-          "Description": "missng XML code comments",
-          "DefaultValue": "missng XML code comments"
-        },
-        {
-          "$type": "ReferenceDataOptionsItem",
-          "ParameterName": "ReplayRevisions",
-          "Type": "Boolean",
-          "Description": "missng XML code comments",
-          "DefaultValue": "missng XML code comments"
-        }
-      ]
+      "$type": "DataItem",
+      "classData": {
+        "$type": "ClassData",
+        "OptionsClassName": "TfsRevisionManagerOptions",
+        "OptionsClassFullName": "MigrationTools.Enrichers.TfsRevisionManagerOptions",
+        "ConfigurationSamples": [
+          {
+            "$type": "ConfigurationSample",
+            "Name": "default",
+            "Description": null,
+            "Sample": "{\r\n  \"$type\": \"TfsRevisionManagerOptions\",\r\n  \"Enabled\": true,\r\n  \"ReplayRevisions\": false,\r\n  \"MaxRevisions\": 0\r\n}",
+            "SampleFor": "MigrationTools.Enrichers.TfsRevisionManagerOptions"
+          }
+        ],
+        "Description": "missng XML code comments",
+        "ClassName": "TfsRevisionManager",
+        "TypeName": "ProcessorEnrichers",
+        "Architecture": "v2",
+        "Options": [
+          {
+            "$type": "OptionsItem",
+            "ParameterName": "Enabled",
+            "Type": "Boolean",
+            "Description": "missng XML code comments",
+            "DefaultValue": "missng XML code comments"
+          },
+          {
+            "$type": "OptionsItem",
+            "ParameterName": "MaxRevisions",
+            "Type": "Int32",
+            "Description": "missng XML code comments",
+            "DefaultValue": "missng XML code comments"
+          },
+          {
+            "$type": "OptionsItem",
+            "ParameterName": "RefName",
+            "Type": "String",
+            "Description": "missng XML code comments",
+            "DefaultValue": "missng XML code comments"
+          },
+          {
+            "$type": "OptionsItem",
+            "ParameterName": "ReplayRevisions",
+            "Type": "Boolean",
+            "Description": "missng XML code comments",
+            "DefaultValue": "missng XML code comments"
+          }
+        ]
+      },
+      "jekyllData": {
+        "$type": "JekyllData",
+        "Redirect_from": [
+          "/Reference/v2/ProcessorEnrichers/TfsRevisionManagerOptions/"
+        ],
+        "Permalink": "/Reference/v2/ProcessorEnrichers/TfsRevisionManager/"
+      }
     },
     {
-      "$type": "ReferenceDataItem",
-      "OptionsClass": "MigrationTools.ProcessorEnrichers.TfsValidateRequiredFieldOptions",
-      "ConfigurationSample": "{\r\n  \"$type\": \"TfsValidateRequiredFieldOptions\",\r\n  \"Enabled\": true\r\n}",
-      "Description": "missng XML code comments",
-      "ClassName": "TfsValidateRequiredField",
-      "TypeName": "ProcessorEnrichers",
-      "Architecture": "v2",
-      "Options": [
-        {
-          "$type": "ReferenceDataOptionsItem",
-          "ParameterName": "Enabled",
-          "Type": "Boolean",
-          "Description": "missng XML code comments",
-          "DefaultValue": "missng XML code comments"
-        },
-        {
-          "$type": "ReferenceDataOptionsItem",
-          "ParameterName": "RefName",
-          "Type": "String",
-          "Description": "missng XML code comments",
-          "DefaultValue": "missng XML code comments"
-        }
-      ]
+      "$type": "DataItem",
+      "classData": {
+        "$type": "ClassData",
+        "OptionsClassName": "TfsValidateRequiredFieldOptions",
+        "OptionsClassFullName": "MigrationTools.ProcessorEnrichers.TfsValidateRequiredFieldOptions",
+        "ConfigurationSamples": [
+          {
+            "$type": "ConfigurationSample",
+            "Name": "default",
+            "Description": null,
+            "Sample": "{\r\n  \"$type\": \"TfsValidateRequiredFieldOptions\",\r\n  \"Enabled\": true\r\n}",
+            "SampleFor": "MigrationTools.ProcessorEnrichers.TfsValidateRequiredFieldOptions"
+          }
+        ],
+        "Description": "missng XML code comments",
+        "ClassName": "TfsValidateRequiredField",
+        "TypeName": "ProcessorEnrichers",
+        "Architecture": "v2",
+        "Options": [
+          {
+            "$type": "OptionsItem",
+            "ParameterName": "Enabled",
+            "Type": "Boolean",
+            "Description": "missng XML code comments",
+            "DefaultValue": "missng XML code comments"
+          },
+          {
+            "$type": "OptionsItem",
+            "ParameterName": "RefName",
+            "Type": "String",
+            "Description": "missng XML code comments",
+            "DefaultValue": "missng XML code comments"
+          }
+        ]
+      },
+      "jekyllData": {
+        "$type": "JekyllData",
+        "Redirect_from": [
+          "/Reference/v2/ProcessorEnrichers/TfsValidateRequiredFieldOptions/"
+        ],
+        "Permalink": "/Reference/v2/ProcessorEnrichers/TfsValidateRequiredField/"
+      }
     },
     {
-      "$type": "ReferenceDataItem",
-      "OptionsClass": null,
-      "ConfigurationSample": "",
-      "Description": "missng XML code comments",
-      "ClassName": "TfsWorkItemEmbededLinkEnricher",
-      "TypeName": "ProcessorEnrichers",
-      "Architecture": "v2",
-      "Options": []
+      "$type": "DataItem",
+      "classData": {
+        "$type": "ClassData",
+        "OptionsClassName": null,
+        "OptionsClassFullName": null,
+        "ConfigurationSamples": [],
+        "Description": "missng XML code comments",
+        "ClassName": "TfsWorkItemEmbededLinkEnricher",
+        "TypeName": "ProcessorEnrichers",
+        "Architecture": "v2",
+        "Options": []
+      },
+      "jekyllData": {
+        "$type": "JekyllData",
+        "Redirect_from": [],
+        "Permalink": "/Reference/v2/ProcessorEnrichers/TfsWorkItemEmbededLinkEnricher/"
+      }
     },
     {
-      "$type": "ReferenceDataItem",
-      "OptionsClass": null,
-      "ConfigurationSample": "",
-      "Description": "missng XML code comments",
-      "ClassName": "TfsWorkItemLinkEnricher",
-      "TypeName": "ProcessorEnrichers",
-      "Architecture": "v2",
-      "Options": []
+      "$type": "DataItem",
+      "classData": {
+        "$type": "ClassData",
+        "OptionsClassName": null,
+        "OptionsClassFullName": null,
+        "ConfigurationSamples": [],
+        "Description": "missng XML code comments",
+        "ClassName": "TfsWorkItemLinkEnricher",
+        "TypeName": "ProcessorEnrichers",
+        "Architecture": "v2",
+        "Options": []
+      },
+      "jekyllData": {
+        "$type": "JekyllData",
+        "Redirect_from": [],
+        "Permalink": "/Reference/v2/ProcessorEnrichers/TfsWorkItemLinkEnricher/"
+      }
     }
   ]
 }

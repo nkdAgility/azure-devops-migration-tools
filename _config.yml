@@ -21,6 +21,9 @@ include:
  - "**/*.md"
  - "*.md"
 
+ collections_dir: collections
+ collections:
+
 
 defaults:
  - scope:
@@ -60,4 +63,4 @@ kramdown:
 
 relative_links:
   enabled:     true
-  collections: false
+  collections: true

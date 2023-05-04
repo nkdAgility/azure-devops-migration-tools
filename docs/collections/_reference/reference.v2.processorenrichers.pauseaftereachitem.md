@@ -1,0 +1,32 @@
+---
+classData:
+  optionsClassName: PauseAfterEachItemOptions
+  optionsClassFullName: MigrationTools.Enrichers.PauseAfterEachItemOptions
+  configurationSamples:
+  - name: default
+    description: 
+    sample: >-
+      {
+        "$type": "PauseAfterEachItemOptions",
+        "Enabled": true
+      }
+    sampleFor: MigrationTools.Enrichers.PauseAfterEachItemOptions
+  description: missng XML code comments
+  className: PauseAfterEachItem
+  typeName: ProcessorEnrichers
+  architecture: v2
+  options:
+  - parameterName: Enabled
+    type: Boolean
+    description: missng XML code comments
+    defaultValue: missng XML code comments
+  - parameterName: RefName
+    type: String
+    description: missng XML code comments
+    defaultValue: missng XML code comments
+jekyllData:
+  redirectFrom:
+  - /Reference/v2/ProcessorEnrichers/PauseAfterEachItemOptions/
+  permalink: /Reference/v2/ProcessorEnrichers/PauseAfterEachItem/
+
+---

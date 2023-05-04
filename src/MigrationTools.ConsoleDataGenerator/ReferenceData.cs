@@ -5,33 +5,59 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.Services.CircuitBreaker;
 
-namespace MigrationTools.ConsoleDataGenerator
+namespace MigrationTools.ConsoleDataGenerator.ReferenceData
 {
-    public class ReferenceDataGroup
+    public class ClassGroup
     {
-        public ReferenceDataGroup() {
-            Items = new List<ReferenceDataItem>();
+        public ClassGroup() {
+            Items = new List<DataItem>();
         }
         public string Name { get; set; }
-        public List<ReferenceDataItem> Items { get; set; }
+        public List<DataItem> Items { get; set; }
     }
-    public class ReferenceDataItem
+    public class DataItem
     {
-        public ReferenceDataItem()
+        public ClassData classData { get; set; }
+        public JekyllData jekyllData { get; set; }
+
+        public DataItem()
         {
-            Options = new List<ReferenceDataOptionsItem>();
+            classData = new ClassData();
+            jekyllData = new JekyllData();
         }
 
-        public string? OptionsClass { get;  set; }
-        public string? ConfigurationSample { get;  set; }
-        public string? Description { get;  set; }
-        public string? ClassName { get;  set; }
-        public string? TypeName { get;  set; }
-        public string? Architecture { get;  set; }
-        public List<ReferenceDataOptionsItem> Options { get; internal set; }
     }
 
-    public class ReferenceDataOptionsItem
+    public class ClassData
+    {
+        public ClassData()
+        {
+            Options = new List<OptionsItem>();
+            ConfigurationSamples = new List<ConfigurationSample>();
+        }
+
+        public string? OptionsClassName { get; set; }
+        public string? OptionsClassFullName { get; set; }
+        public List<ConfigurationSample> ConfigurationSamples { get; set; }
+        public string? Description { get; set; }
+        public string? ClassName { get; set; }
+        public string? TypeName { get; set; }
+        public string? Architecture { get; set; }
+        public List<OptionsItem> Options { get; internal set; }
+    }
+
+    public class JekyllData
+    {
+        public List<string> Redirect_from;
+
+        public JekyllData()
+        {
+            Redirect_from = new List<string>();
+        }
+        public string Permalink { get; internal set; }
+    }
+
+    public class OptionsItem
     {
         public string ParameterName { get; internal set; }
         public object Type { get; internal set; }
@@ -39,5 +65,11 @@ namespace MigrationTools.ConsoleDataGenerator
         public object DefaultValue { get; internal set; }
     }
 
-
+    public class ConfigurationSample
+    {
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public string Sample { get; set; }
+        public string SampleFor { get;  set; }
+    }
 }

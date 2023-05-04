@@ -1,0 +1,16 @@
+---
+classData:
+  optionsClassName: AzureDevOpsEndpointOptions
+  optionsClassFullName: MigrationTools.Endpoints.AzureDevOpsEndpointOptions
+  configurationSamples: []
+  description: missng XML code comments
+  className: AzureDevOpsEndpoint
+  typeName: Endpoints
+  architecture: v2
+  options: []
+jekyllData:
+  redirectFrom:
+  - /Reference/v2/Endpoints/AzureDevOpsEndpointOptions/
+  permalink: /Reference/v2/Endpoints/AzureDevOpsEndpoint/
+
+---
