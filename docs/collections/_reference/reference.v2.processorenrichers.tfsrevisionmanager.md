@@ -1,42 +1,41 @@
 ---
-classData:
-  optionsClassName: TfsRevisionManagerOptions
-  optionsClassFullName: MigrationTools.Enrichers.TfsRevisionManagerOptions
-  configurationSamples:
-  - name: default
-    description: 
-    sample: >-
-      {
-        "$type": "TfsRevisionManagerOptions",
-        "Enabled": true,
-        "ReplayRevisions": false,
-        "MaxRevisions": 0
-      }
-    sampleFor: MigrationTools.Enrichers.TfsRevisionManagerOptions
+optionsClassName: TfsRevisionManagerOptions
+optionsClassFullName: MigrationTools.Enrichers.TfsRevisionManagerOptions
+configurationSamples:
+- name: default
+  description: 
+  sample: >-
+    {
+      "$type": "TfsRevisionManagerOptions",
+      "Enabled": true,
+      "ReplayRevisions": false,
+      "MaxRevisions": 0
+    }
+  sampleFor: MigrationTools.Enrichers.TfsRevisionManagerOptions
+description: missng XML code comments
+className: TfsRevisionManager
+typeName: ProcessorEnrichers
+architecture: v2
+options:
+- parameterName: Enabled
+  type: Boolean
   description: missng XML code comments
-  className: TfsRevisionManager
-  typeName: ProcessorEnrichers
-  architecture: v2
-  options:
-  - parameterName: Enabled
-    type: Boolean
-    description: missng XML code comments
-    defaultValue: missng XML code comments
-  - parameterName: MaxRevisions
-    type: Int32
-    description: missng XML code comments
-    defaultValue: missng XML code comments
-  - parameterName: RefName
-    type: String
-    description: missng XML code comments
-    defaultValue: missng XML code comments
-  - parameterName: ReplayRevisions
-    type: Boolean
-    description: missng XML code comments
-    defaultValue: missng XML code comments
-jekyllData:
-  redirectFrom:
-  - /Reference/v2/ProcessorEnrichers/TfsRevisionManagerOptions/
-  permalink: /Reference/v2/ProcessorEnrichers/TfsRevisionManager/
+  defaultValue: missng XML code comments
+- parameterName: MaxRevisions
+  type: Int32
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: RefName
+  type: String
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: ReplayRevisions
+  type: Boolean
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+
+redirectFrom:
+- /Reference/v2/ProcessorEnrichers/TfsRevisionManagerOptions/
+permalink: /Reference/v2/ProcessorEnrichers/TfsRevisionManager/
 
 ---

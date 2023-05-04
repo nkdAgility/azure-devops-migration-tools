@@ -1,15 +1,14 @@
 ---
-classData:
-  optionsClassName: 
-  optionsClassFullName: 
-  configurationSamples: []
-  description: missng XML code comments
-  className: GenericTfsEndpoint`1
-  typeName: Endpoints
-  architecture: v2
-  options: []
-jekyllData:
-  redirectFrom: []
-  permalink: /Reference/v2/Endpoints/GenericTfsEndpoint`1/
+optionsClassName: 
+optionsClassFullName: 
+configurationSamples: []
+description: missng XML code comments
+className: GenericTfsEndpoint`1
+typeName: Endpoints
+architecture: v2
+options: []
+
+redirectFrom: []
+permalink: /Reference/v2/Endpoints/GenericTfsEndpoint`1/
 
 ---

@@ -15,6 +15,7 @@ using YamlDotNet.Serialization;
 using MigrationTools.Options;
 using System.Text;
 using MigrationTools.ConsoleDataGenerator.ReferenceData;
+using Microsoft.VisualStudio.Services.Common;
 
 namespace MigrationTools.ConsoleDataGenerator;
 class Program
@@ -51,6 +52,10 @@ class Program
              .SelectMany(a => a.GetTypes()).ToList();
 
         List<Type> allTypes = newTypes.Concat(oldTypes).ToList();
+
+
+        List<ClassData> classDataList = new List<ClassData>();
+        classDataList.AddRange(cdLoader.GetClassData(oldTypes, allTypes, typeof(MigrationTools._EngineV1.Containers.IProcessor), "v1", "Processors", true, "Config"));
 
 
         // V1

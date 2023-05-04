@@ -27,7 +27,8 @@ namespace MigrationTools.ConsoleDataGenerator
             string filePath = Path.Combine(dataPath, filename.ToLower());
             string yaml = SeraliseDataToYaml(data);
             File.WriteAllText($"{filePath}.yaml", yaml);
-            yaml = "---" + '\n' + yaml;
+            yaml = "---" + '\n';
+            yaml = yaml + SeraliseDataToYaml(data.classData) + '\n' + SeraliseDataToYaml(data.jekyllData);
             yaml = yaml + '\n' + "---";
              filePath = Path.Combine(referencePath, filename.ToLower());
             File.WriteAllText($"{filePath}.md", yaml);

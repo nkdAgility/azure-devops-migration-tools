@@ -1,16 +1,15 @@
 ---
-classData:
-  optionsClassName: FileSystemWorkItemEndpointOptions
-  optionsClassFullName: MigrationTools.Endpoints.FileSystemWorkItemEndpointOptions
-  configurationSamples: []
-  description: missng XML code comments
-  className: FileSystemWorkItemEndpoint
-  typeName: Endpoints
-  architecture: v2
-  options: []
-jekyllData:
-  redirectFrom:
-  - /Reference/v2/Endpoints/FileSystemWorkItemEndpointOptions/
-  permalink: /Reference/v2/Endpoints/FileSystemWorkItemEndpoint/
+optionsClassName: FileSystemWorkItemEndpointOptions
+optionsClassFullName: MigrationTools.Endpoints.FileSystemWorkItemEndpointOptions
+configurationSamples: []
+description: missng XML code comments
+className: FileSystemWorkItemEndpoint
+typeName: Endpoints
+architecture: v2
+options: []
+
+redirectFrom:
+- /Reference/v2/Endpoints/FileSystemWorkItemEndpointOptions/
+permalink: /Reference/v2/Endpoints/FileSystemWorkItemEndpoint/
 
 ---

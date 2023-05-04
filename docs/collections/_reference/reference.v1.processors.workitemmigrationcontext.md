@@ -1,172 +1,171 @@
 ---
-classData:
-  optionsClassName: WorkItemMigrationConfig
-  optionsClassFullName: MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig
-  configurationSamples:
-  - name: default
-    description: 
-    sample: >-
-      {
-        "$type": "WorkItemMigrationConfig",
-        "Enabled": false,
-        "ReplayRevisions": true,
-        "PrefixProjectToNodes": false,
-        "UpdateCreatedDate": true,
-        "UpdateCreatedBy": true,
-        "WIQLQueryBit": "AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')",
-        "WIQLOrderBit": "[System.ChangedDate] desc",
-        "LinkMigration": true,
-        "AttachmentMigration": true,
-        "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
-        "FixHtmlAttachmentLinks": false,
-        "SkipToFinalRevisedWorkItemType": true,
-        "WorkItemCreateRetryLimit": 5,
-        "FilterWorkItemsThatAlreadyExistInTarget": true,
-        "PauseAfterEachWorkItem": false,
-        "AttachmentMaxSize": 480000000,
-        "AttachRevisionHistory": false,
-        "LinkMigrationSaveEachAsAdded": false,
-        "GenerateMigrationComment": true,
-        "WorkItemIDs": null,
-        "MaxRevisions": 0,
-        "UseCommonNodeStructureEnricherConfig": false,
-        "StopMigrationOnMissingAreaIterationNodes": true,
-        "NodeBasePaths": null,
-        "AreaMaps": {
-          "$type": "Dictionary`2"
-        },
-        "IterationMaps": {
-          "$type": "Dictionary`2"
-        },
-        "MaxGracefulFailures": 0,
-        "SkipRevisionWithInvalidIterationPath": false,
-        "SkipRevisionWithInvalidAreaPath": false
-      }
-    sampleFor: MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig
-  description: WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links, and Attachments. Use `WorkItemMigrationConfig` to configure.
-  className: WorkItemMigrationContext
-  typeName: Processors
-  architecture: v1
-  options:
-  - parameterName: AreaMaps
-    type: Dictionary
-    description: Remapping rules for area paths, implemented with regular expressions. The rules apply with a higher priority than the `PrefixProjectToNodes`, that is, if no rule matches the path and the `PrefixProjectToNodes` option is enabled, then the old `PrefixProjectToNodes` behavior is applied.
-    defaultValue: '{}'
-  - parameterName: AttachmentMaxSize
-    type: Int32
-    description: '`AttachmentMigration` is set to true then you need to specify a max file size for upload in bites. For Azure DevOps Services the default is 480,000,000 bites (60mb), for TFS its 32,000,000 bites (4mb).'
-    defaultValue: 480000000
-  - parameterName: AttachmentMigration
-    type: Boolean
-    description: If enabled this will migrate all of the attachments at the same time as the work item
-    defaultValue: true
-  - parameterName: AttachmentWorkingPath
-    type: String
-    description: '`AttachmentMigration` is set to true then you need to specify a working path for attachments to be saved locally.'
-    defaultValue: C:\temp\Migration\
-  - parameterName: AttachRevisionHistory
-    type: Boolean
-    description: This will create a json file with the revision history and attach it to the work item. Best used with `MaxRevisions` or `ReplayRevisions`.
-    defaultValue: '?'
-  - parameterName: Enabled
-    type: Boolean
-    description: If enabled then the processor will run
-    defaultValue: false
-  - parameterName: FilterWorkItemsThatAlreadyExistInTarget
-    type: Boolean
-    description: This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run. While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.
-    defaultValue: true
-  - parameterName: FixHtmlAttachmentLinks
-    type: Boolean
-    description: "**beta** If enabled this will fix any image attachments URL's, work item mention URL's or user mentions in the HTML fields as well as discussion comments. You must specify a PersonalAccessToken in the Source project for Azure DevOps; TFS should use integrated authentication."
-    defaultValue: '?'
-  - parameterName: GenerateMigrationComment
-    type: Boolean
-    description: If enabled, adds a comment recording the migration
-    defaultValue: false
-  - parameterName: IterationMaps
-    type: Dictionary
-    description: Remapping rules for iteration paths, implemented with regular expressions. The rules apply with a higher priority than the `PrefixProjectToNodes`, that is, if no rule matches the path and the `PrefixProjectToNodes` option is enabled, then the old `PrefixProjectToNodes` behavior is applied.
-    defaultValue: '{}'
-  - parameterName: LinkMigration
-    type: Boolean
-    description: If enabled this will migrate the Links for the work item at the same time as the whole work item.
-    defaultValue: true
-  - parameterName: LinkMigrationSaveEachAsAdded
-    type: Boolean
-    description: "If you have changed parents before re-running a sync you may get a `TF26194: unable to change the value of the 'Parent' field` error. This will resolve it, but will slow migration."
-    defaultValue: false
-  - parameterName: MaxGracefulFailures
-    type: Int32
-    description: The maximum number of failures to tolerate before the migration fails. When set above zero, a work item migration error is logged but the migration will continue until the number of failed items reaches the configured value, after which the migration fails.
-    defaultValue: 0
-  - parameterName: MaxRevisions
-    type: Int32
-    description: Sets the maximum number of revisions that will be migrated. "First + Last N = Max". If this was set to 5 and there were 10 revisions you would get the first 1 (creation) and the latest 4 migrated.
-    defaultValue: 0
-  - parameterName: NodeBasePaths
-    type: String[]
-    description: The root paths of the Ares / Iterations you want migrate. See [NodeBasePath Configuration](#nodebasepath-configuration)
-    defaultValue: '["/"]'
-  - parameterName: PauseAfterEachWorkItem
-    type: Boolean
-    description: Pause after each work item is migrated
-    defaultValue: false
-  - parameterName: PrefixProjectToNodes
-    type: Boolean
-    description: Prefix your iterations and areas with the project name. If you have enabled this in `NodeStructuresMigrationConfig` you must do it here too.
-    defaultValue: false
-  - parameterName: ReplayRevisions
-    type: Boolean
-    description: You can choose to migrate the tip only (a single write) or all of the revisions (many writes). If you are setting this to `false` to migrate only the tip then you should set `BuildFieldTable` to `true`.
-    defaultValue: true
-  - parameterName: SkipRevisionWithInvalidAreaPath
-    type: Boolean
-    description: When set to true, this setting will skip a revision if the source area has not been migrated, has been deleted or is somehow invalid, etc.
-    defaultValue: missng XML code comments
-  - parameterName: SkipRevisionWithInvalidIterationPath
-    type: Boolean
-    description: This will skip a revision if the source iteration has not been migrated i.e. it was deleted
-    defaultValue: missng XML code comments
-  - parameterName: SkipToFinalRevisedWorkItemType
-    type: Boolean
-    description: "**beta** If enabled this will fix any image attachments URL's, work item mention URL's or user mentions in the HTML fields as well as discussion comments. You must specify a PersonalAccessToken in the Source project for Azure DevOps; TFS should use integrated authentication."
-    defaultValue: false
-  - parameterName: StopMigrationOnMissingAreaIterationNodes
-    type: Boolean
-    description: ''
-    defaultValue: '?'
-  - parameterName: UpdateCreatedBy
-    type: Boolean
-    description: "If this is enabled the creation process on the target project will create the items with the original creation date. (Important: The item history is always pointed to the date of the migration, it's change only the data column CreateDate, not the internal create date)"
-    defaultValue: true
-  - parameterName: UpdateCreatedDate
-    type: Boolean
-    description: "If this is enabled the creation process on the target project will create the items with the original creation date. (Important: The item history is always pointed to the date of the migration, it's change only the data column CreateDate, not the internal create date)"
-    defaultValue: true
-  - parameterName: UseCommonNodeStructureEnricherConfig
-    type: Boolean
-    description: ''
-    defaultValue: '?'
-  - parameterName: WIQLOrderBit
-    type: String
-    description: A work item query to affect the order in which the work items are migrated. Don't leave this empty.
-    defaultValue: '[System.ChangedDate] desc'
-  - parameterName: WIQLQueryBit
-    type: String
-    description: A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)
-    defaultValue: AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')
-  - parameterName: WorkItemCreateRetryLimit
-    type: Int32
-    description: '**beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count. This allows for periodic network glitches not to end the process.'
-    defaultValue: 5
-  - parameterName: WorkItemIDs
-    type: IList
-    description: A list of work items to import
-    defaultValue: '[]'
-jekyllData:
-  redirectFrom:
-  - /Reference/v1/Processors/WorkItemMigrationConfig/
-  permalink: /Reference/v1/Processors/WorkItemMigrationContext/
+optionsClassName: WorkItemMigrationConfig
+optionsClassFullName: MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig
+configurationSamples:
+- name: default
+  description: 
+  sample: >-
+    {
+      "$type": "WorkItemMigrationConfig",
+      "Enabled": false,
+      "ReplayRevisions": true,
+      "PrefixProjectToNodes": false,
+      "UpdateCreatedDate": true,
+      "UpdateCreatedBy": true,
+      "WIQLQueryBit": "AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')",
+      "WIQLOrderBit": "[System.ChangedDate] desc",
+      "LinkMigration": true,
+      "AttachmentMigration": true,
+      "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
+      "FixHtmlAttachmentLinks": false,
+      "SkipToFinalRevisedWorkItemType": true,
+      "WorkItemCreateRetryLimit": 5,
+      "FilterWorkItemsThatAlreadyExistInTarget": true,
+      "PauseAfterEachWorkItem": false,
+      "AttachmentMaxSize": 480000000,
+      "AttachRevisionHistory": false,
+      "LinkMigrationSaveEachAsAdded": false,
+      "GenerateMigrationComment": true,
+      "WorkItemIDs": null,
+      "MaxRevisions": 0,
+      "UseCommonNodeStructureEnricherConfig": false,
+      "StopMigrationOnMissingAreaIterationNodes": true,
+      "NodeBasePaths": null,
+      "AreaMaps": {
+        "$type": "Dictionary`2"
+      },
+      "IterationMaps": {
+        "$type": "Dictionary`2"
+      },
+      "MaxGracefulFailures": 0,
+      "SkipRevisionWithInvalidIterationPath": false,
+      "SkipRevisionWithInvalidAreaPath": false
+    }
+  sampleFor: MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig
+description: WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links, and Attachments. Use `WorkItemMigrationConfig` to configure.
+className: WorkItemMigrationContext
+typeName: Processors
+architecture: v1
+options:
+- parameterName: AreaMaps
+  type: Dictionary
+  description: Remapping rules for area paths, implemented with regular expressions. The rules apply with a higher priority than the `PrefixProjectToNodes`, that is, if no rule matches the path and the `PrefixProjectToNodes` option is enabled, then the old `PrefixProjectToNodes` behavior is applied.
+  defaultValue: '{}'
+- parameterName: AttachmentMaxSize
+  type: Int32
+  description: '`AttachmentMigration` is set to true then you need to specify a max file size for upload in bites. For Azure DevOps Services the default is 480,000,000 bites (60mb), for TFS its 32,000,000 bites (4mb).'
+  defaultValue: 480000000
+- parameterName: AttachmentMigration
+  type: Boolean
+  description: If enabled this will migrate all of the attachments at the same time as the work item
+  defaultValue: true
+- parameterName: AttachmentWorkingPath
+  type: String
+  description: '`AttachmentMigration` is set to true then you need to specify a working path for attachments to be saved locally.'
+  defaultValue: C:\temp\Migration\
+- parameterName: AttachRevisionHistory
+  type: Boolean
+  description: This will create a json file with the revision history and attach it to the work item. Best used with `MaxRevisions` or `ReplayRevisions`.
+  defaultValue: '?'
+- parameterName: Enabled
+  type: Boolean
+  description: If enabled then the processor will run
+  defaultValue: false
+- parameterName: FilterWorkItemsThatAlreadyExistInTarget
+  type: Boolean
+  description: This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run. While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.
+  defaultValue: true
+- parameterName: FixHtmlAttachmentLinks
+  type: Boolean
+  description: "**beta** If enabled this will fix any image attachments URL's, work item mention URL's or user mentions in the HTML fields as well as discussion comments. You must specify a PersonalAccessToken in the Source project for Azure DevOps; TFS should use integrated authentication."
+  defaultValue: '?'
+- parameterName: GenerateMigrationComment
+  type: Boolean
+  description: If enabled, adds a comment recording the migration
+  defaultValue: false
+- parameterName: IterationMaps
+  type: Dictionary
+  description: Remapping rules for iteration paths, implemented with regular expressions. The rules apply with a higher priority than the `PrefixProjectToNodes`, that is, if no rule matches the path and the `PrefixProjectToNodes` option is enabled, then the old `PrefixProjectToNodes` behavior is applied.
+  defaultValue: '{}'
+- parameterName: LinkMigration
+  type: Boolean
+  description: If enabled this will migrate the Links for the work item at the same time as the whole work item.
+  defaultValue: true
+- parameterName: LinkMigrationSaveEachAsAdded
+  type: Boolean
+  description: "If you have changed parents before re-running a sync you may get a `TF26194: unable to change the value of the 'Parent' field` error. This will resolve it, but will slow migration."
+  defaultValue: false
+- parameterName: MaxGracefulFailures
+  type: Int32
+  description: The maximum number of failures to tolerate before the migration fails. When set above zero, a work item migration error is logged but the migration will continue until the number of failed items reaches the configured value, after which the migration fails.
+  defaultValue: 0
+- parameterName: MaxRevisions
+  type: Int32
+  description: Sets the maximum number of revisions that will be migrated. "First + Last N = Max". If this was set to 5 and there were 10 revisions you would get the first 1 (creation) and the latest 4 migrated.
+  defaultValue: 0
+- parameterName: NodeBasePaths
+  type: String[]
+  description: The root paths of the Ares / Iterations you want migrate. See [NodeBasePath Configuration](#nodebasepath-configuration)
+  defaultValue: '["/"]'
+- parameterName: PauseAfterEachWorkItem
+  type: Boolean
+  description: Pause after each work item is migrated
+  defaultValue: false
+- parameterName: PrefixProjectToNodes
+  type: Boolean
+  description: Prefix your iterations and areas with the project name. If you have enabled this in `NodeStructuresMigrationConfig` you must do it here too.
+  defaultValue: false
+- parameterName: ReplayRevisions
+  type: Boolean
+  description: You can choose to migrate the tip only (a single write) or all of the revisions (many writes). If you are setting this to `false` to migrate only the tip then you should set `BuildFieldTable` to `true`.
+  defaultValue: true
+- parameterName: SkipRevisionWithInvalidAreaPath
+  type: Boolean
+  description: When set to true, this setting will skip a revision if the source area has not been migrated, has been deleted or is somehow invalid, etc.
+  defaultValue: missng XML code comments
+- parameterName: SkipRevisionWithInvalidIterationPath
+  type: Boolean
+  description: This will skip a revision if the source iteration has not been migrated i.e. it was deleted
+  defaultValue: missng XML code comments
+- parameterName: SkipToFinalRevisedWorkItemType
+  type: Boolean
+  description: "**beta** If enabled this will fix any image attachments URL's, work item mention URL's or user mentions in the HTML fields as well as discussion comments. You must specify a PersonalAccessToken in the Source project for Azure DevOps; TFS should use integrated authentication."
+  defaultValue: false
+- parameterName: StopMigrationOnMissingAreaIterationNodes
+  type: Boolean
+  description: ''
+  defaultValue: '?'
+- parameterName: UpdateCreatedBy
+  type: Boolean
+  description: "If this is enabled the creation process on the target project will create the items with the original creation date. (Important: The item history is always pointed to the date of the migration, it's change only the data column CreateDate, not the internal create date)"
+  defaultValue: true
+- parameterName: UpdateCreatedDate
+  type: Boolean
+  description: "If this is enabled the creation process on the target project will create the items with the original creation date. (Important: The item history is always pointed to the date of the migration, it's change only the data column CreateDate, not the internal create date)"
+  defaultValue: true
+- parameterName: UseCommonNodeStructureEnricherConfig
+  type: Boolean
+  description: ''
+  defaultValue: '?'
+- parameterName: WIQLOrderBit
+  type: String
+  description: A work item query to affect the order in which the work items are migrated. Don't leave this empty.
+  defaultValue: '[System.ChangedDate] desc'
+- parameterName: WIQLQueryBit
+  type: String
+  description: A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)
+  defaultValue: AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')
+- parameterName: WorkItemCreateRetryLimit
+  type: Int32
+  description: '**beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count. This allows for periodic network glitches not to end the process.'
+  defaultValue: 5
+- parameterName: WorkItemIDs
+  type: IList
+  description: A list of work items to import
+  defaultValue: '[]'
+
+redirectFrom:
+- /Reference/v1/Processors/WorkItemMigrationConfig/
+permalink: /Reference/v1/Processors/WorkItemMigrationContext/
 
 ---

@@ -15,10 +15,12 @@ namespace MigrationTools.ConsoleDataGenerator
         private DataSerialization saveData;
         private static CodeDocumentation codeDocs = new CodeDocumentation("../../../../../docs/Reference/Generated/");
         public ClassDataLoader(DataSerialization saveData) {
+
             this.saveData = saveData;
         }
 
-        public ClassGroup CreateClassGroup(List<Type> targetTypes, List<Type> allTypes, Type type, string apiVersion, string dataTypeName, bool findConfig = true, string configEnd = "Options")
+        [Obsolete("Please use GetClassData instead")]
+        public ClassGroup GetClassGroup(List<Type> targetTypes, List<Type> allTypes, Type type, string apiVersion, string dataTypeName, bool findConfig = true, string configEnd = "Options")
         {
             Console.WriteLine();
             Console.WriteLine($"ClassDataLoader::BuildJekyllDataFile:: {dataTypeName}");
@@ -30,21 +32,40 @@ namespace MigrationTools.ConsoleDataGenerator
             // Each File
             foreach (var item in founds)
             {
+                DataItem dataItem = new DataItem();
+
                 Console.WriteLine($"ClassDataLoader::BuildJekyllDataFile::-PROCESS {item.Name}");
-                PopulateReferenceData(ref data, targetTypes, allTypes, apiVersion, dataTypeName, item, findConfig, configEnd);
+                dataItem.classData = CreateClassData(targetTypes, allTypes, apiVersion, dataTypeName, item, findConfig, configEnd);
             }
             Console.WriteLine("ClassDataLoader::BuildJekyllDataFile:: -----------");
             return data;
         }
 
-        private void PopulateReferenceData(ref ClassGroup data, List<Type> targetTypes, List<Type> allTypes, string apiVersion, string dataTypeName, Type item, bool findConfig = true, string configEnd = "Options")
+        public List<ClassData> GetClassData(List<Type> targetTypes, List<Type> allTypes, Type type, string apiVersion, string dataTypeName, bool findConfig = true, string configEnd = "Options")
+        {
+            Console.WriteLine();
+            Console.WriteLine($"ClassDataLoader::populateClassData:: {dataTypeName}");
+            List<ClassData> data = new List<ClassData>();
+            var founds = targetTypes.Where(t => type.IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface && t.IsPublic).OrderBy(t => t.Name).ToList();
+            Console.WriteLine($"ClassDataLoader::populateClassData:: ----------- Found {founds.Count}");
+            // Each File
+            foreach (var item in founds)
+            {
+                Console.WriteLine($"ClassDataLoader::populateClassData::-PROCESS {item.Name}");
+                data.Add(CreateClassData(targetTypes, allTypes, apiVersion, dataTypeName, item, findConfig, configEnd));
+            }
+            Console.WriteLine("ClassDataLoader::populateClassData:: -----------");
+            return data;
+        }
+
+        private ClassData CreateClassData(List<Type> targetTypes, List<Type> allTypes, string apiVersion, string dataTypeName, Type item, bool findConfig = true, string configEnd = "Options")
         {
             Type typeOption = item;
             string objectName = item.Name;
-            DataItem dataItem = new DataItem();
-            dataItem.classData.ClassName = item.Name;
-            dataItem.classData.TypeName = dataTypeName;
-            dataItem.classData.Architecture = apiVersion;
+            ClassData data = new ClassData();
+            data.ClassName = item.Name;
+            data.TypeName = dataTypeName;
+            data.Architecture = apiVersion;
 
             if (findConfig)
             {
@@ -54,16 +75,16 @@ namespace MigrationTools.ConsoleDataGenerator
             }
             else
             {
-                dataItem.classData.OptionsClassName = "";
-                dataItem.classData.OptionsClassFullName = "";
+                data.OptionsClassName = "";
+                data.OptionsClassFullName = "";
                 Console.WriteLine("No config");
             }
 
 
             if (typeOption != null)
             {
-                dataItem.classData.OptionsClassFullName = typeOption.FullName;
-                dataItem.classData.OptionsClassName = typeOption.Name;
+                data.OptionsClassFullName = typeOption.FullName;
+                data.OptionsClassName = typeOption.Name;
                 object targetItem = null;
                 if (typeOption.GetInterfaces().Contains(typeof(IProcessorConfig)))
                 {
@@ -90,8 +111,8 @@ namespace MigrationTools.ConsoleDataGenerator
                     Console.WriteLine("targetItem");
                     JObject joptions = (JObject)JToken.FromObject(targetItem);
 
-                    dataItem.classData.Options = populateOptions(targetItem, joptions);
-                    dataItem.classData.ConfigurationSamples.Add(new ConfigurationSample() { Name = "default", SampleFor = dataItem.classData.OptionsClassFullName, Sample = saveData.SeraliseDataToJson(targetItem) });
+                    data.Options = populateOptions(targetItem, joptions);
+                    data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "default", SampleFor = data.OptionsClassFullName, Sample = saveData.SeraliseDataToJson(targetItem) });
                 }
 
             }
@@ -99,8 +120,8 @@ namespace MigrationTools.ConsoleDataGenerator
             {
 
             }
-            dataItem.classData.Description = codeDocs.GetTypeData(item);
-            data.Items.Add(dataItem);
+            data.Description = codeDocs.GetTypeData(item);
+            return data;
         }
 
         private List<OptionsItem> populateOptions(object item, JObject joptions)

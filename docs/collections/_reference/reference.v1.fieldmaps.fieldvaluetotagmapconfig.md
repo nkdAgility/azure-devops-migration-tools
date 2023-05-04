@@ -1,42 +1,41 @@
 ---
-classData:
-  optionsClassName: FieldValuetoTagMapConfig
-  optionsClassFullName: MigrationTools._EngineV1.Configuration.FieldMap.FieldValuetoTagMapConfig
-  configurationSamples:
-  - name: default
-    description: 
-    sample: >-
-      {
-        "$type": "FieldValuetoTagMapConfig",
-        "WorkItemTypeName": "*",
-        "sourceField": "System.Status",
-        "pattern": "(Active|Resolved)",
-        "formatExpression": "Status: {0}"
-      }
-    sampleFor: MigrationTools._EngineV1.Configuration.FieldMap.FieldValuetoTagMapConfig
-  description: Need to create a Tag based on a field value? Just create a regex match and choose how to populate the target.
-  className: FieldValuetoTagMapConfig
-  typeName: FieldMaps
-  architecture: v1
-  options:
-  - parameterName: formatExpression
-    type: String
-    description: missng XML code comments
-    defaultValue: missng XML code comments
-  - parameterName: pattern
-    type: String
-    description: missng XML code comments
-    defaultValue: missng XML code comments
-  - parameterName: sourceField
-    type: String
-    description: missng XML code comments
-    defaultValue: missng XML code comments
-  - parameterName: WorkItemTypeName
-    type: String
-    description: missng XML code comments
-    defaultValue: missng XML code comments
-jekyllData:
-  redirectFrom: []
-  permalink: /Reference/v1/FieldMaps/FieldValuetoTagMapConfig/
+optionsClassName: FieldValuetoTagMapConfig
+optionsClassFullName: MigrationTools._EngineV1.Configuration.FieldMap.FieldValuetoTagMapConfig
+configurationSamples:
+- name: default
+  description: 
+  sample: >-
+    {
+      "$type": "FieldValuetoTagMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceField": "System.Status",
+      "pattern": "(Active|Resolved)",
+      "formatExpression": "Status: {0}"
+    }
+  sampleFor: MigrationTools._EngineV1.Configuration.FieldMap.FieldValuetoTagMapConfig
+description: Need to create a Tag based on a field value? Just create a regex match and choose how to populate the target.
+className: FieldValuetoTagMapConfig
+typeName: FieldMaps
+architecture: v1
+options:
+- parameterName: formatExpression
+  type: String
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: pattern
+  type: String
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: sourceField
+  type: String
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: WorkItemTypeName
+  type: String
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+
+redirectFrom: []
+permalink: /Reference/v1/FieldMaps/FieldValuetoTagMapConfig/
 
 ---

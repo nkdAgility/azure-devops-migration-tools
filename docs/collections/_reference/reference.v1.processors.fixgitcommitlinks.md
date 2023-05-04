@@ -1,43 +1,42 @@
 ---
-classData:
-  optionsClassName: FixGitCommitLinksConfig
-  optionsClassFullName: MigrationTools._EngineV1.Configuration.Processing.FixGitCommitLinksConfig
-  configurationSamples:
-  - name: default
-    description: 
-    sample: >-
-      {
-        "$type": "FixGitCommitLinksConfig",
-        "Enabled": false,
-        "TargetRepository": null,
-        "QueryBit": null,
-        "OrderBit": null
-      }
-    sampleFor: MigrationTools._EngineV1.Configuration.Processing.FixGitCommitLinksConfig
+optionsClassName: FixGitCommitLinksConfig
+optionsClassFullName: MigrationTools._EngineV1.Configuration.Processing.FixGitCommitLinksConfig
+configurationSamples:
+- name: default
+  description: 
+  sample: >-
+    {
+      "$type": "FixGitCommitLinksConfig",
+      "Enabled": false,
+      "TargetRepository": null,
+      "QueryBit": null,
+      "OrderBit": null
+    }
+  sampleFor: MigrationTools._EngineV1.Configuration.Processing.FixGitCommitLinksConfig
+description: missng XML code comments
+className: FixGitCommitLinks
+typeName: Processors
+architecture: v1
+options:
+- parameterName: Enabled
+  type: Boolean
   description: missng XML code comments
-  className: FixGitCommitLinks
-  typeName: Processors
-  architecture: v1
-  options:
-  - parameterName: Enabled
-    type: Boolean
-    description: missng XML code comments
-    defaultValue: missng XML code comments
-  - parameterName: OrderBit
-    type: String
-    description: missng XML code comments
-    defaultValue: missng XML code comments
-  - parameterName: QueryBit
-    type: String
-    description: missng XML code comments
-    defaultValue: missng XML code comments
-  - parameterName: TargetRepository
-    type: String
-    description: missng XML code comments
-    defaultValue: missng XML code comments
-jekyllData:
-  redirectFrom:
-  - /Reference/v1/Processors/FixGitCommitLinksConfig/
-  permalink: /Reference/v1/Processors/FixGitCommitLinks/
+  defaultValue: missng XML code comments
+- parameterName: OrderBit
+  type: String
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: QueryBit
+  type: String
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: TargetRepository
+  type: String
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+
+redirectFrom:
+- /Reference/v1/Processors/FixGitCommitLinksConfig/
+permalink: /Reference/v1/Processors/FixGitCommitLinks/
 
 ---

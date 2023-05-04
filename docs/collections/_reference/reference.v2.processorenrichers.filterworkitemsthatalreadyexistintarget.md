@@ -1,41 +1,40 @@
 ---
-classData:
-  optionsClassName: FilterWorkItemsThatAlreadyExistInTargetOptions
-  optionsClassFullName: MigrationTools.Enrichers.FilterWorkItemsThatAlreadyExistInTargetOptions
-  configurationSamples:
-  - name: default
-    description: 
-    sample: >-
-      {
-        "$type": "FilterWorkItemsThatAlreadyExistInTargetOptions",
-        "Enabled": true,
-        "Query": {
-          "$type": "QueryOptions",
-          "Query": "SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan') ORDER BY [System.ChangedDate] desc",
-          "Parameters": null
-        }
+optionsClassName: FilterWorkItemsThatAlreadyExistInTargetOptions
+optionsClassFullName: MigrationTools.Enrichers.FilterWorkItemsThatAlreadyExistInTargetOptions
+configurationSamples:
+- name: default
+  description: 
+  sample: >-
+    {
+      "$type": "FilterWorkItemsThatAlreadyExistInTargetOptions",
+      "Enabled": true,
+      "Query": {
+        "$type": "QueryOptions",
+        "Query": "SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan') ORDER BY [System.ChangedDate] desc",
+        "Parameters": null
       }
-    sampleFor: MigrationTools.Enrichers.FilterWorkItemsThatAlreadyExistInTargetOptions
+    }
+  sampleFor: MigrationTools.Enrichers.FilterWorkItemsThatAlreadyExistInTargetOptions
+description: missng XML code comments
+className: FilterWorkItemsThatAlreadyExistInTarget
+typeName: ProcessorEnrichers
+architecture: v2
+options:
+- parameterName: Enabled
+  type: Boolean
   description: missng XML code comments
-  className: FilterWorkItemsThatAlreadyExistInTarget
-  typeName: ProcessorEnrichers
-  architecture: v2
-  options:
-  - parameterName: Enabled
-    type: Boolean
-    description: missng XML code comments
-    defaultValue: missng XML code comments
-  - parameterName: Query
-    type: QueryOptions
-    description: missng XML code comments
-    defaultValue: missng XML code comments
-  - parameterName: RefName
-    type: String
-    description: missng XML code comments
-    defaultValue: missng XML code comments
-jekyllData:
-  redirectFrom:
-  - /Reference/v2/ProcessorEnrichers/FilterWorkItemsThatAlreadyExistInTargetOptions/
-  permalink: /Reference/v2/ProcessorEnrichers/FilterWorkItemsThatAlreadyExistInTarget/
+  defaultValue: missng XML code comments
+- parameterName: Query
+  type: QueryOptions
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: RefName
+  type: String
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+
+redirectFrom:
+- /Reference/v2/ProcessorEnrichers/FilterWorkItemsThatAlreadyExistInTargetOptions/
+permalink: /Reference/v2/ProcessorEnrichers/FilterWorkItemsThatAlreadyExistInTarget/
 
 ---

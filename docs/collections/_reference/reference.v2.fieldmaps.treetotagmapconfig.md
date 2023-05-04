@@ -1,37 +1,36 @@
 ---
-classData:
-  optionsClassName: TreeToTagMapConfig
-  optionsClassFullName: MigrationTools._EngineV1.Configuration.FieldMap.TreeToTagMapConfig
-  configurationSamples:
-  - name: default
-    description: 
-    sample: >-
-      {
-        "$type": "TreeToTagMapConfig",
-        "WorkItemTypeName": "*",
-        "toSkip": 2,
-        "timeTravel": 0
-      }
-    sampleFor: MigrationTools._EngineV1.Configuration.FieldMap.TreeToTagMapConfig
-  description: Need to clear out those nasty Area tree hierarchies? This creates Tags for each node in the Area Path...
-  className: TreeToTagMapConfig
-  typeName: FieldMaps
-  architecture: v2
-  options:
-  - parameterName: timeTravel
-    type: Int32
-    description: missng XML code comments
-    defaultValue: missng XML code comments
-  - parameterName: toSkip
-    type: Int32
-    description: missng XML code comments
-    defaultValue: missng XML code comments
-  - parameterName: WorkItemTypeName
-    type: String
-    description: missng XML code comments
-    defaultValue: missng XML code comments
-jekyllData:
-  redirectFrom: []
-  permalink: /Reference/v2/FieldMaps/TreeToTagMapConfig/
+optionsClassName: TreeToTagMapConfig
+optionsClassFullName: MigrationTools._EngineV1.Configuration.FieldMap.TreeToTagMapConfig
+configurationSamples:
+- name: default
+  description: 
+  sample: >-
+    {
+      "$type": "TreeToTagMapConfig",
+      "WorkItemTypeName": "*",
+      "toSkip": 2,
+      "timeTravel": 0
+    }
+  sampleFor: MigrationTools._EngineV1.Configuration.FieldMap.TreeToTagMapConfig
+description: Need to clear out those nasty Area tree hierarchies? This creates Tags for each node in the Area Path...
+className: TreeToTagMapConfig
+typeName: FieldMaps
+architecture: v2
+options:
+- parameterName: timeTravel
+  type: Int32
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: toSkip
+  type: Int32
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: WorkItemTypeName
+  type: String
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+
+redirectFrom: []
+permalink: /Reference/v2/FieldMaps/TreeToTagMapConfig/
 
 ---
