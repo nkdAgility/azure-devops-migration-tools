@@ -49,6 +49,8 @@ options:
   type: IList
   description: A list of work items to import
   defaultValue: '[]'
+status: preview
+processingTarget: Work Items
 
 redirectFrom: []
 layout: reference

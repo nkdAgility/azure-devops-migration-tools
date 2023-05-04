@@ -54,6 +54,8 @@ options:
   type: IList
   description: A list of work items to import
   defaultValue: '[]'
+status: missng XML code comments
+processingTarget: WorkItem
 
 redirectFrom: []
 layout: reference

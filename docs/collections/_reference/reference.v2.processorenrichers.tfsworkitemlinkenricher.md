@@ -7,6 +7,8 @@ className: TfsWorkItemLinkEnricher
 typeName: ProcessorEnrichers
 architecture: v2
 options: []
+status: missng XML code comments
+processingTarget: missng XML code comments
 
 redirectFrom: []
 layout: reference

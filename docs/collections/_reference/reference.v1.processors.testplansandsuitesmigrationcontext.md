@@ -74,6 +74,8 @@ options:
   type: Boolean
   description: Indicates whether the configuration for node structure transformation should be taken from the common enricher configs. Otherwise the configuration elements below are used
   defaultValue: false
+status: Beta
+processingTarget: Suites & Plans
 
 redirectFrom: []
 layout: reference

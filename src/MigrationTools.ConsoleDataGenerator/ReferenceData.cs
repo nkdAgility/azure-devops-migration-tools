@@ -44,6 +44,8 @@ namespace MigrationTools.ConsoleDataGenerator.ReferenceData
         public string? TypeName { get; set; }
         public string? Architecture { get; set; }
         public List<OptionsItem> Options { get;  set; }
+        public string Status { get; internal set; }
+        public string ProcessingTarget { get; internal set; }
     }
 
     public class JekyllData

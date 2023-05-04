@@ -67,6 +67,8 @@ options:
   type: Int32
   description: missng XML code comments
   defaultValue: missng XML code comments
+status: missng XML code comments
+processingTarget: missng XML code comments
 
 redirectFrom: []
 layout: reference

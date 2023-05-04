@@ -63,6 +63,8 @@ options:
   type: Boolean
   description: Reset the target team settings to match the source if the team exists
   defaultValue: false
+status: Beta
+processingTarget: Teams
 
 redirectFrom: []
 layout: reference

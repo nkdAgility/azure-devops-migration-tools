@@ -7,6 +7,8 @@ className: CreateTeamFolders
 typeName: Processors
 architecture: v1
 options: []
+status: alpha
+processingTarget: Shared Queries
 
 redirectFrom: []
 layout: reference

@@ -66,7 +66,9 @@ namespace MigrationTools.ConsoleDataGenerator
             data.ClassName = item.Name;
             data.TypeName = dataTypeName;
             data.Architecture = apiVersion;
-
+            data.Description = codeDocs.GetTypeData(item);
+            data.Status = codeDocs.GetTypeData(item, "status");
+            data.ProcessingTarget = codeDocs.GetTypeData(item, "processingtarget");
             if (findConfig)
             {
                 objectName = objectName.Replace("Context", "");
@@ -120,7 +122,6 @@ namespace MigrationTools.ConsoleDataGenerator
             {
 
             }
-            data.Description = codeDocs.GetTypeData(item);
             return data;
         }
 

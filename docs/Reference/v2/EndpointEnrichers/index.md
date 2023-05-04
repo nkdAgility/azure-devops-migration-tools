@@ -1,22 +1,15 @@
 ---
 title: Endpoint Enrichers
 layout: page
-template: index-template.md
 pageType: index
 toc: true
-pageStatus: generated
+pageStatus: published
 discussionId: 
 ---
 
 Endpoint Enrichers are run within the context of the Endpoint that they are configured for. Many endpoints are flexible, however there are also enrichers that only work with certain Endpoints.
 
-| Endpoint Enricher          | Data Target | Description |
-| -------------------------- | ----------- | ----------- |
-| WorkItemAttachmentEnricher | Attachments | TBA         |
-| WorkItemLinkEnricher       | Links       | TBA         |
-| WorkItemCreatedEnricher    | CreatedDate | TBA         |
-| WorkItemEmbedEnricher      | HTML Fields | TBA         |
-| WorkItemFieldTableEnricher | History     | TBA         |
+{% include content-collection-table.html collection = "reference" typeName = "EndpointEnrichers" architecture = "v2" %}
 
 
 ### Endpoint Enricher Options

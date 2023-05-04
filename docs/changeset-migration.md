@@ -4,7 +4,7 @@ layout: page
 template: default
 pageType: index
 toc: true
-pageStatus: production
+pageStatus: published
 discussionId: 
 redirect_from: /changeset-migration.html
 ---

@@ -24,6 +24,8 @@ options:
   type: Boolean
   description: missng XML code comments
   defaultValue: missng XML code comments
+status: Beta
+processingTarget: Work Item
 
 redirectFrom: []
 layout: reference

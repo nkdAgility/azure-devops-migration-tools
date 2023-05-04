@@ -49,6 +49,8 @@ options:
   type: IList
   description: missng XML code comments
   defaultValue: missng XML code comments
+status: ready
+processingTarget: WorkItem
 
 redirectFrom: []
 layout: reference

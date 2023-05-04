@@ -163,6 +163,8 @@ options:
   type: IList
   description: A list of work items to import
   defaultValue: '[]'
+status: ready
+processingTarget: Work Items
 
 redirectFrom: []
 layout: reference

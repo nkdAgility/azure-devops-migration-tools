@@ -39,6 +39,8 @@ options:
   type: String
   description: The user name of the user that is used to export the pictures.
   defaultValue: String.Empty
+status: alpha
+processingTarget: Profiles
 
 redirectFrom: []
 layout: reference

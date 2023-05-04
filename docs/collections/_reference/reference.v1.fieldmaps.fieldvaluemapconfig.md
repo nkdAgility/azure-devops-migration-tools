@@ -45,6 +45,8 @@ options:
   type: String
   description: missng XML code comments
   defaultValue: missng XML code comments
+status: ready
+processingTarget: Work Item Field
 
 redirectFrom: []
 layout: reference

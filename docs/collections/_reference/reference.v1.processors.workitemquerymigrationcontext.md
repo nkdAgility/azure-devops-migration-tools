@@ -34,6 +34,8 @@ options:
   type: Dictionary
   description: Any field mappings
   defaultValue: none
+status: preview
+processingTarget: Shared Queries
 
 redirectFrom: []
 layout: reference

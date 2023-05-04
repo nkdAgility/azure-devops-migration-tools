@@ -62,6 +62,8 @@ options:
   type: String
   description: missng XML code comments
   defaultValue: missng XML code comments
+status: Beta
+processingTarget: Work Items
 
 redirectFrom: []
 layout: reference

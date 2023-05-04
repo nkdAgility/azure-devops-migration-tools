@@ -19,6 +19,8 @@ options:
   type: Boolean
   description: missng XML code comments
   defaultValue: missng XML code comments
+status: Beta
+processingTarget: Suites & Plans
 
 redirectFrom: []
 layout: reference

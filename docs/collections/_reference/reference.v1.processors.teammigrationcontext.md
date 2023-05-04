@@ -34,6 +34,8 @@ options:
   type: Boolean
   description: Prefix your iterations and areas with the project name. If you have enabled this in `NodeStructuresMigrationConfig` you must do it here too.
   defaultValue: false
+status: preview
+processingTarget: Teams
 
 redirectFrom: []
 layout: reference

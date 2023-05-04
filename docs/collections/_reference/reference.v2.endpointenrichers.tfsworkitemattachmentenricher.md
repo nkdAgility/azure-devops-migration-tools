@@ -33,6 +33,8 @@ options:
   type: String
   description: missng XML code comments
   defaultValue: missng XML code comments
+status: missng XML code comments
+processingTarget: WorkItem
 
 redirectFrom: []
 layout: reference

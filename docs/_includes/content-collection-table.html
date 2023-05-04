@@ -1,0 +1,34 @@
+<div class="table-responsive">
+<table class="table table-striped table-hover">
+  <thead class="table-light">
+  <tr>
+      <td scope="col"><strong>Name</strong></td>
+      <td scope="col"><strong>Status</strong></td>
+      <td scope="col"><strong>Target</strong></td>
+      <td scope="col"><strong>Usage</strong></td>
+  </tr>
+</thead>
+<tbody class="table-group-divider">
+{% assign collection = site.collections | where: "label", include.collection | first %}
+{% if collection != null %} 
+  {% assign items = collection.docs | where: "typeName", include.typeName | where: "architecture", include.architecture %} 
+      {% for item in items %}
+      <tr>
+        <td scope="row"><a href="{{ site.baseurl }}{{ item.url }}">{{item.className}}</a></td>
+        <td>{{item.status}}</td>
+        <td>{{item.processingTarget}}</td>
+        <td>{{item.description | markdownify }}</td>
+    </tr>
+      {% endfor %}
+{% else %}
+<tr>
+  <td>NONE</td>
+  <td>NONE</td>
+  <td>NONE</td>
+  <td>NONE</td>
+</tr>
+{% endif %}
+</tbody>
+</table>
+</div>
+
