@@ -59,7 +59,7 @@ class Program
         classDataList.AddRange(cdLoader.GetClassData(oldTypes, allTypes, typeof(MigrationTools._EngineV1.Containers.IProcessor), "v1", "Processors", true, "Config"));
         classDataList.AddRange(cdLoader.GetClassData(newTypes, allTypes, typeof(IFieldMapConfig), "v1", "FieldMaps", false));
         // V2
-        classDataList.AddRange(cdLoader.GetClassData(oldTypes, allTypes, typeof(MigrationTools._EngineV1.Containers.IProcessor), "v1", "Processors", true, "Config"));
+        classDataList.AddRange(cdLoader.GetClassData(oldTypes, allTypes, typeof(MigrationTools.Processors.IProcessor), "v2", "Processors"));
         classDataList.AddRange(cdLoader.GetClassData(newTypes, allTypes, typeof(IProcessorEnricher), "v2", "ProcessorEnrichers"));
         classDataList.AddRange(cdLoader.GetClassData(newTypes, allTypes, typeof(IFieldMapConfig), "v2", "FieldMaps", false));
         classDataList.AddRange(cdLoader.GetClassData(newTypes, allTypes, typeof(IEndpoint), "v2", "Endpoints"));

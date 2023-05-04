@@ -53,7 +53,7 @@ plugins:
   - jekyll-toc
   - jekyll-time-to-read
   # - jekyll-github-metadata
-  - jekyll-optional-front-matter
+  #- jekyll-optional-front-matter
   - jekyll-last-modified-at
   - jekyll-redirect-from
 
