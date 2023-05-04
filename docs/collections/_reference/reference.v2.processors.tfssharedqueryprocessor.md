@@ -1,0 +1,68 @@
+---
+optionsClassName: TfsSharedQueryProcessorOptions
+optionsClassFullName: MigrationTools.Processors.TfsSharedQueryProcessorOptions
+configurationSamples:
+- name: default
+  description: 
+  code: >-
+    {
+      "$type": "TfsSharedQueryProcessorOptions",
+      "Enabled": false,
+      "PrefixProjectToNodes": false,
+      "SharedFolderName": "Shared Queries",
+      "SourceToTargetFieldMappings": null,
+      "ProcessorEnrichers": null,
+      "SourceName": "sourceName",
+      "TargetName": "targetName"
+    }
+  sampleFor: MigrationTools.Processors.TfsSharedQueryProcessorOptions
+description: The TfsSharedQueryProcessor enabled you to migrate queries from one locatio nto another.
+className: TfsSharedQueryProcessor
+typeName: Processors
+architecture: v2
+options:
+- parameterName: Enabled
+  type: Boolean
+  description: If set to `true` then the processor will run. Set to `false` and the processor will not run.
+  defaultValue: missng XML code comments
+- parameterName: PrefixProjectToNodes
+  type: Boolean
+  description: Do we add the source project name into the folder path
+  defaultValue: false
+- parameterName: ProcessorEnrichers
+  type: List
+  description: List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.
+  defaultValue: missng XML code comments
+- parameterName: RefName
+  type: String
+  description: '`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.'
+  defaultValue: missng XML code comments
+- parameterName: SharedFolderName
+  type: String
+  description: The name of the shared folder, made a parameter incase it every needs to be edited
+  defaultValue: Shared Queries
+- parameterName: SourceName
+  type: String
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: SourceToTargetFieldMappings
+  type: Dictionary
+  description: Mapping of the source to the target
+  defaultValue: missng XML code comments
+- parameterName: TargetName
+  type: String
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+
+redirectFrom: []
+layout: reference
+toc: true
+permalink: /Reference/v2/Processors/TfsSharedQueryProcessor/
+title: TfsSharedQueryProcessor
+categories:
+- Processors
+- v2
+notes: ''
+introduction: ''
+
+---
