@@ -4,7 +4,7 @@ optionsClassFullName: MigrationTools._EngineV1.Configuration.FieldMap.FieldClear
 configurationSamples:
 - name: default
   description: 
-  sample: >-
+  code: >-
     {
       "$type": "FieldClearMapConfig",
       "WorkItemTypeName": "*",
@@ -26,6 +26,12 @@ options:
   defaultValue: missng XML code comments
 
 redirectFrom: []
-permalink: /Reference/v2/FieldMaps/FieldClearMapConfig/
+layout: reference
+toc: true
+permalink: /Reference2/v2/FieldMaps/FieldClearMapConfig/
+title: FieldClearMapConfig
+categories:
+- FieldMaps
+- v2
 
 ---

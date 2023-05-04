@@ -4,7 +4,7 @@ optionsClassFullName: MigrationTools.ProcessorEnrichers.TfsValidateRequiredField
 configurationSamples:
 - name: default
   description: 
-  sample: >-
+  code: >-
     {
       "$type": "TfsValidateRequiredFieldOptions",
       "Enabled": true
@@ -24,8 +24,13 @@ options:
   description: missng XML code comments
   defaultValue: missng XML code comments
 
-redirectFrom:
-- /Reference/v2/ProcessorEnrichers/TfsValidateRequiredFieldOptions/
-permalink: /Reference/v2/ProcessorEnrichers/TfsValidateRequiredField/
+redirectFrom: []
+layout: reference
+toc: true
+permalink: /Reference2/v2/ProcessorEnrichers/TfsValidateRequiredField/
+title: TfsValidateRequiredField
+categories:
+- ProcessorEnrichers
+- v2
 
 ---

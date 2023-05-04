@@ -1,6 +1,6 @@
 ---
 title: Azure DevOps Migration Tools
-layout: default
+layout: page
 pageType: index
 template: <template>
 toc: true

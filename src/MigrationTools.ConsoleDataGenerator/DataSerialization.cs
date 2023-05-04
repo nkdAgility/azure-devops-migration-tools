@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using YamlDotNet.Serialization.NamingConventions;
 using YamlDotNet.Serialization;
 using MigrationTools.ConsoleDataGenerator.ReferenceData;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace MigrationTools.ConsoleDataGenerator
 {
@@ -34,6 +35,28 @@ namespace MigrationTools.ConsoleDataGenerator
             File.WriteAllText($"{filePath}.md", yaml);
             return yaml;
         }
+
+        public string WriteYamlDataToDataFolder(ClassData data)
+        {
+            string filename = $"reference.{data.Architecture}.{data.TypeName}.{data.ClassName}";
+            string filePath = Path.Combine(dataPath, filename.ToLower());
+            string yaml = SeraliseDataToYaml(data);
+            File.WriteAllText($"{filePath}.yaml", yaml);
+            return yaml;
+        }
+
+        public string WriteMarkdownDataToCollectionFolder(ClassData cdata, JekyllData jdata)
+        {
+            string filename = $"reference.{cdata.Architecture}.{cdata.TypeName}.{cdata.ClassName}";
+            string filePath = Path.Combine(referencePath, filename.ToLower());
+            string yaml = "---" + '\n';
+            yaml = yaml + SeraliseDataToYaml(cdata) + '\n';
+            yaml = yaml + SeraliseDataToYaml(jdata) + '\n';
+            yaml = yaml + "---";
+            File.WriteAllText($"{filePath}.md", yaml);
+            return yaml;
+        }
+
 
         public string SeraliseData(ClassGroup data, string apiVersion, string dataTypeName)
         {

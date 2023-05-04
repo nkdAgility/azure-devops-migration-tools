@@ -1,6 +1,6 @@
 ---
 title: WorkItemMigrationContext
-layout: default
+layout: page
 template: WorkItemMigrationContext-template.md
 pageType: reference
 classType: Processors

@@ -1,6 +1,6 @@
 ---
 title: GenericTfsEndpoint`1
-layout: default
+layout: page
 template: default
 pageType: reference
 classType: Endpoints

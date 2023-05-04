@@ -9,6 +9,12 @@ architecture: v1
 options: []
 
 redirectFrom: []
-permalink: /Reference/v1/Processors/CreateTeamFolders/
+layout: reference
+toc: true
+permalink: /Reference2/v1/Processors/CreateTeamFolders/
+title: CreateTeamFolders
+categories:
+- Processors
+- v1
 
 ---

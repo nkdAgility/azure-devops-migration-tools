@@ -1,6 +1,6 @@
 ---
 title: TestVariablesMigrationContext
-layout: default
+layout: page
 template: default
 pageType: reference
 classType: Processors

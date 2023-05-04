@@ -112,7 +112,7 @@ namespace MigrationTools.ConsoleDataGenerator
                     JObject joptions = (JObject)JToken.FromObject(targetItem);
 
                     data.Options = populateOptions(targetItem, joptions);
-                    data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "default", SampleFor = data.OptionsClassFullName, Sample = saveData.SeraliseDataToJson(targetItem) });
+                    data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "default", SampleFor = data.OptionsClassFullName, Code = saveData.SeraliseDataToJson(targetItem) });
                 }
 
             }

@@ -4,7 +4,7 @@ optionsClassFullName: MigrationTools._EngineV1.Configuration.FieldMap.FieldSkipM
 configurationSamples:
 - name: default
   description: 
-  sample: >-
+  code: >-
     {
       "$type": "FieldSkipMapConfig",
       "WorkItemTypeName": "*",
@@ -26,6 +26,12 @@ options:
   defaultValue: missng XML code comments
 
 redirectFrom: []
-permalink: /Reference/v2/FieldMaps/FieldSkipMapConfig/
+layout: reference
+toc: true
+permalink: /Reference2/v2/FieldMaps/FieldSkipMapConfig/
+title: FieldSkipMapConfig
+categories:
+- FieldMaps
+- v2
 
 ---

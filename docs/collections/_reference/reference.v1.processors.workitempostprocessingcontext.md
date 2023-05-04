@@ -4,7 +4,7 @@ optionsClassFullName: MigrationTools._EngineV1.Configuration.Processing.WorkItem
 configurationSamples:
 - name: default
   description: 
-  sample: >-
+  code: >-
     {
       "$type": "WorkItemPostProcessingConfig",
       "Enabled": false,
@@ -50,8 +50,13 @@ options:
   description: A list of work items to import
   defaultValue: '[]'
 
-redirectFrom:
-- /Reference/v1/Processors/WorkItemPostProcessingConfig/
-permalink: /Reference/v1/Processors/WorkItemPostProcessingContext/
+redirectFrom: []
+layout: reference
+toc: true
+permalink: /Reference2/v1/Processors/WorkItemPostProcessingContext/
+title: WorkItemPostProcessingContext
+categories:
+- Processors
+- v1
 
 ---

@@ -4,7 +4,7 @@ optionsClassFullName: MigrationTools._EngineV1.Configuration.Processing.ImportPr
 configurationSamples:
 - name: default
   description: 
-  sample: >-
+  code: >-
     {
       "$type": "ImportProfilePictureConfig",
       "Enabled": false
@@ -20,8 +20,13 @@ options:
   description: missng XML code comments
   defaultValue: missng XML code comments
 
-redirectFrom:
-- /Reference/v1/Processors/ImportProfilePictureConfig/
-permalink: /Reference/v1/Processors/ImportProfilePictureContext/
+redirectFrom: []
+layout: reference
+toc: true
+permalink: /Reference2/v1/Processors/ImportProfilePictureContext/
+title: ImportProfilePictureContext
+categories:
+- Processors
+- v1
 
 ---

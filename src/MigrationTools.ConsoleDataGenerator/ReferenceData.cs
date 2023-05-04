@@ -43,18 +43,24 @@ namespace MigrationTools.ConsoleDataGenerator.ReferenceData
         public string? ClassName { get; set; }
         public string? TypeName { get; set; }
         public string? Architecture { get; set; }
-        public List<OptionsItem> Options { get; internal set; }
+        public List<OptionsItem> Options { get;  set; }
     }
 
     public class JekyllData
     {
-        public List<string> Redirect_from;
+        public List<string> Redirect_from { get;  set; }
+        public string layout { get;  set; }
+        public bool toc { get;  set; }
+        public string Permalink { get;  set; }
+        public string title { get; internal set; }
+        public List<string> categories { get; internal set; }
 
         public JekyllData()
         {
             Redirect_from = new List<string>();
+            categories = new List<string>();
         }
-        public string Permalink { get; internal set; }
+       
     }
 
     public class OptionsItem
@@ -69,7 +75,7 @@ namespace MigrationTools.ConsoleDataGenerator.ReferenceData
     {
         public string Name { get; set; }
         public string Description { get; set; }
-        public string Sample { get; set; }
+        public string Code { get; set; }
         public string SampleFor { get;  set; }
     }
 }

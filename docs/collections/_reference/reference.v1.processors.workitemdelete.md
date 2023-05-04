@@ -4,7 +4,7 @@ optionsClassFullName: MigrationTools._EngineV1.Configuration.Processing.WorkItem
 configurationSamples:
 - name: default
   description: 
-  sample: >-
+  code: >-
     {
       "$type": "WorkItemDeleteConfig",
       "Enabled": false,
@@ -50,8 +50,13 @@ options:
   description: missng XML code comments
   defaultValue: missng XML code comments
 
-redirectFrom:
-- /Reference/v1/Processors/WorkItemDeleteConfig/
-permalink: /Reference/v1/Processors/WorkItemDelete/
+redirectFrom: []
+layout: reference
+toc: true
+permalink: /Reference2/v1/Processors/WorkItemDelete/
+title: WorkItemDelete
+categories:
+- Processors
+- v1
 
 ---

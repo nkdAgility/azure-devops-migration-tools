@@ -4,7 +4,7 @@ optionsClassFullName: MigrationTools._EngineV1.Configuration.Processing.FakeProc
 configurationSamples:
 - name: default
   description: 
-  sample: >-
+  code: >-
     {
       "$type": "FakeProcessorConfig",
       "Enabled": false
@@ -20,8 +20,13 @@ options:
   description: missng XML code comments
   defaultValue: missng XML code comments
 
-redirectFrom:
-- /Reference/v1/Processors/FakeProcessorConfig/
-permalink: /Reference/v1/Processors/FakeProcessor/
+redirectFrom: []
+layout: reference
+toc: true
+permalink: /Reference2/v1/Processors/FakeProcessor/
+title: FakeProcessor
+categories:
+- Processors
+- v1
 
 ---

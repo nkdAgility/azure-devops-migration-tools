@@ -1,6 +1,6 @@
 ---
 title: FieldtoFieldMultiMapConfig
-layout: default
+layout: page
 template: default
 pageType: reference
 classType: FieldMaps

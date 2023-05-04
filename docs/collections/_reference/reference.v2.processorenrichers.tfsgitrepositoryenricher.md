@@ -9,6 +9,12 @@ architecture: v2
 options: []
 
 redirectFrom: []
-permalink: /Reference/v2/ProcessorEnrichers/TfsGitRepositoryEnricher/
+layout: reference
+toc: true
+permalink: /Reference2/v2/ProcessorEnrichers/TfsGitRepositoryEnricher/
+title: TfsGitRepositoryEnricher
+categories:
+- ProcessorEnrichers
+- v2
 
 ---

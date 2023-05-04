@@ -1,6 +1,6 @@
 ---
 title: Server Configuration and Requirements
-layout: default
+layout: page
 pageType: index
 template: default
 toc: true

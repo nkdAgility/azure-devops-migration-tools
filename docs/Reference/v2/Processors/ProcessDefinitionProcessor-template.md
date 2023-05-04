@@ -1,6 +1,6 @@
 ---
 title: <ClassName>
-layout: default
+layout: page
 template: <template>
 pageType: reference
 classType: <TypeName>

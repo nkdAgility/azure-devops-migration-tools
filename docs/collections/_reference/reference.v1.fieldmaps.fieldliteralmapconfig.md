@@ -4,7 +4,7 @@ optionsClassFullName: MigrationTools._EngineV1.Configuration.FieldMap.FieldLiter
 configurationSamples:
 - name: default
   description: 
-  sample: >-
+  code: >-
     {
       "$type": "FieldLiteralMapConfig",
       "WorkItemTypeName": "*",
@@ -31,6 +31,12 @@ options:
   defaultValue: missng XML code comments
 
 redirectFrom: []
-permalink: /Reference/v1/FieldMaps/FieldLiteralMapConfig/
+layout: reference
+toc: true
+permalink: /Reference2/v1/FieldMaps/FieldLiteralMapConfig/
+title: FieldLiteralMapConfig
+categories:
+- FieldMaps
+- v1
 
 ---

@@ -4,7 +4,7 @@ optionsClassFullName: MigrationTools._EngineV1.Configuration.Processing.WorkItem
 configurationSamples:
 - name: default
   description: 
-  sample: >-
+  code: >-
     {
       "$type": "WorkItemUpdateAreasAsTagsConfig",
       "Enabled": false,
@@ -25,8 +25,13 @@ options:
   description: missng XML code comments
   defaultValue: missng XML code comments
 
-redirectFrom:
-- /Reference/v1/Processors/WorkItemUpdateAreasAsTagsConfig/
-permalink: /Reference/v1/Processors/WorkItemUpdateAreasAsTagsContext/
+redirectFrom: []
+layout: reference
+toc: true
+permalink: /Reference2/v1/Processors/WorkItemUpdateAreasAsTagsContext/
+title: WorkItemUpdateAreasAsTagsContext
+categories:
+- Processors
+- v1
 
 ---

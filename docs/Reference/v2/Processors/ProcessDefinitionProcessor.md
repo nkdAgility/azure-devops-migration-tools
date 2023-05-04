@@ -1,6 +1,6 @@
 ---
 title: ProcessDefinitionProcessor
-layout: default
+layout: page
 template: ProcessDefinitionProcessor-template.md
 pageType: reference
 classType: Processors

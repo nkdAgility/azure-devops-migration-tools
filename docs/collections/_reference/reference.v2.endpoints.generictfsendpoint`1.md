@@ -9,6 +9,12 @@ architecture: v2
 options: []
 
 redirectFrom: []
-permalink: /Reference/v2/Endpoints/GenericTfsEndpoint`1/
+layout: reference
+toc: true
+permalink: /Reference2/v2/Endpoints/GenericTfsEndpoint`1/
+title: GenericTfsEndpoint`1
+categories:
+- Endpoints
+- v2
 
 ---

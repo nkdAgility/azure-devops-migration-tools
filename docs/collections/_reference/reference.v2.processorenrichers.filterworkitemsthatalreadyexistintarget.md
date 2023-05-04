@@ -4,7 +4,7 @@ optionsClassFullName: MigrationTools.Enrichers.FilterWorkItemsThatAlreadyExistIn
 configurationSamples:
 - name: default
   description: 
-  sample: >-
+  code: >-
     {
       "$type": "FilterWorkItemsThatAlreadyExistInTargetOptions",
       "Enabled": true,
@@ -33,8 +33,13 @@ options:
   description: missng XML code comments
   defaultValue: missng XML code comments
 
-redirectFrom:
-- /Reference/v2/ProcessorEnrichers/FilterWorkItemsThatAlreadyExistInTargetOptions/
-permalink: /Reference/v2/ProcessorEnrichers/FilterWorkItemsThatAlreadyExistInTarget/
+redirectFrom: []
+layout: reference
+toc: true
+permalink: /Reference2/v2/ProcessorEnrichers/FilterWorkItemsThatAlreadyExistInTarget/
+title: FilterWorkItemsThatAlreadyExistInTarget
+categories:
+- ProcessorEnrichers
+- v2
 
 ---

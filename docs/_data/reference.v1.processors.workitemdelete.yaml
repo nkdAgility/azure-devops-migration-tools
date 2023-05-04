@@ -1,55 +1,50 @@
-classData:
-  optionsClassName: WorkItemDeleteConfig
-  optionsClassFullName: MigrationTools._EngineV1.Configuration.Processing.WorkItemDeleteConfig
-  configurationSamples:
-  - name: default
-    description: 
-    sample: >-
-      {
-        "$type": "WorkItemDeleteConfig",
-        "Enabled": false,
-        "WIQLQueryBit": "AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
-        "WIQLOrderBit": "[System.ChangedDate] desc",
-        "WorkItemIDs": null,
-        "FilterWorkItemsThatAlreadyExistInTarget": false,
-        "PauseAfterEachWorkItem": false,
-        "WorkItemCreateRetryLimit": 0
-      }
-    sampleFor: MigrationTools._EngineV1.Configuration.Processing.WorkItemDeleteConfig
-  description: The `WorkItemDelete` processor allows you to delete any amount of work items that meet the query. **DANGER:** This is not a recoverable action and should be use with extream caution.
-  className: WorkItemDelete
-  typeName: Processors
-  architecture: v1
-  options:
-  - parameterName: Enabled
-    type: Boolean
-    description: missng XML code comments
-    defaultValue: missng XML code comments
-  - parameterName: FilterWorkItemsThatAlreadyExistInTarget
-    type: Boolean
-    description: missng XML code comments
-    defaultValue: missng XML code comments
-  - parameterName: PauseAfterEachWorkItem
-    type: Boolean
-    description: missng XML code comments
-    defaultValue: missng XML code comments
-  - parameterName: WIQLOrderBit
-    type: String
-    description: missng XML code comments
-    defaultValue: missng XML code comments
-  - parameterName: WIQLQueryBit
-    type: String
-    description: missng XML code comments
-    defaultValue: missng XML code comments
-  - parameterName: WorkItemCreateRetryLimit
-    type: Int32
-    description: missng XML code comments
-    defaultValue: missng XML code comments
-  - parameterName: WorkItemIDs
-    type: IList
-    description: missng XML code comments
-    defaultValue: missng XML code comments
-jekyllData:
-  redirectFrom:
-  - /Reference/v1/Processors/WorkItemDeleteConfig/
-  permalink: /Reference/v1/Processors/WorkItemDelete/
+optionsClassName: WorkItemDeleteConfig
+optionsClassFullName: MigrationTools._EngineV1.Configuration.Processing.WorkItemDeleteConfig
+configurationSamples:
+- name: default
+  description: 
+  code: >-
+    {
+      "$type": "WorkItemDeleteConfig",
+      "Enabled": false,
+      "WIQLQueryBit": "AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
+      "WIQLOrderBit": "[System.ChangedDate] desc",
+      "WorkItemIDs": null,
+      "FilterWorkItemsThatAlreadyExistInTarget": false,
+      "PauseAfterEachWorkItem": false,
+      "WorkItemCreateRetryLimit": 0
+    }
+  sampleFor: MigrationTools._EngineV1.Configuration.Processing.WorkItemDeleteConfig
+description: The `WorkItemDelete` processor allows you to delete any amount of work items that meet the query. **DANGER:** This is not a recoverable action and should be use with extream caution.
+className: WorkItemDelete
+typeName: Processors
+architecture: v1
+options:
+- parameterName: Enabled
+  type: Boolean
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: FilterWorkItemsThatAlreadyExistInTarget
+  type: Boolean
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: PauseAfterEachWorkItem
+  type: Boolean
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: WIQLOrderBit
+  type: String
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: WIQLQueryBit
+  type: String
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: WorkItemCreateRetryLimit
+  type: Int32
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: WorkItemIDs
+  type: IList
+  description: missng XML code comments
+  defaultValue: missng XML code comments

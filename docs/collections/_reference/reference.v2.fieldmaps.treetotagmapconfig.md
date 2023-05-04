@@ -4,7 +4,7 @@ optionsClassFullName: MigrationTools._EngineV1.Configuration.FieldMap.TreeToTagM
 configurationSamples:
 - name: default
   description: 
-  sample: >-
+  code: >-
     {
       "$type": "TreeToTagMapConfig",
       "WorkItemTypeName": "*",
@@ -31,6 +31,12 @@ options:
   defaultValue: missng XML code comments
 
 redirectFrom: []
-permalink: /Reference/v2/FieldMaps/TreeToTagMapConfig/
+layout: reference
+toc: true
+permalink: /Reference2/v2/FieldMaps/TreeToTagMapConfig/
+title: TreeToTagMapConfig
+categories:
+- FieldMaps
+- v2
 
 ---

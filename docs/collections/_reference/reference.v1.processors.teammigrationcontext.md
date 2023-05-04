@@ -4,7 +4,7 @@ optionsClassFullName: MigrationTools._EngineV1.Configuration.Processing.TeamMigr
 configurationSamples:
 - name: default
   description: 
-  sample: >-
+  code: >-
     {
       "$type": "TeamMigrationConfig",
       "Enabled": false,
@@ -35,8 +35,13 @@ options:
   description: Prefix your iterations and areas with the project name. If you have enabled this in `NodeStructuresMigrationConfig` you must do it here too.
   defaultValue: false
 
-redirectFrom:
-- /Reference/v1/Processors/TeamMigrationConfig/
-permalink: /Reference/v1/Processors/TeamMigrationContext/
+redirectFrom: []
+layout: reference
+toc: true
+permalink: /Reference2/v1/Processors/TeamMigrationContext/
+title: TeamMigrationContext
+categories:
+- Processors
+- v1
 
 ---

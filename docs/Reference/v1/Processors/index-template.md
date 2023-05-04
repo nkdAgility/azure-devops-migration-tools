@@ -1,6 +1,6 @@
 ---
 title: Processors
-layout: default
+layout: page
 template: <template>
 pageType: index
 toc: true

@@ -1,6 +1,6 @@
 ---
 title: FieldLiteralMapConfig
-layout: default
+layout: page
 template: default
 pageType: reference
 classType: FieldMaps

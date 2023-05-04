@@ -4,7 +4,7 @@ optionsClassFullName: MigrationTools._EngineV1.Configuration.Processing.ExportPr
 configurationSamples:
 - name: default
   description: 
-  sample: >-
+  code: >-
     {
       "$type": "ExportProfilePictureFromADConfig",
       "Enabled": false,
@@ -40,8 +40,13 @@ options:
   description: The user name of the user that is used to export the pictures.
   defaultValue: String.Empty
 
-redirectFrom:
-- /Reference/v1/Processors/ExportProfilePictureFromADConfig/
-permalink: /Reference/v1/Processors/ExportProfilePictureFromADContext/
+redirectFrom: []
+layout: reference
+toc: true
+permalink: /Reference2/v1/Processors/ExportProfilePictureFromADContext/
+title: ExportProfilePictureFromADContext
+categories:
+- Processors
+- v1
 
 ---

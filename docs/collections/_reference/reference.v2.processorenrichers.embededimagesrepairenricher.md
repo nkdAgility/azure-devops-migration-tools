@@ -9,6 +9,12 @@ architecture: v2
 options: []
 
 redirectFrom: []
-permalink: /Reference/v2/ProcessorEnrichers/EmbededImagesRepairEnricher/
+layout: reference
+toc: true
+permalink: /Reference2/v2/ProcessorEnrichers/EmbededImagesRepairEnricher/
+title: EmbededImagesRepairEnricher
+categories:
+- ProcessorEnrichers
+- v2
 
 ---

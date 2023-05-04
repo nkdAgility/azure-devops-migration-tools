@@ -4,7 +4,7 @@ optionsClassFullName: MigrationTools._EngineV1.Configuration.Processing.TestVari
 configurationSamples:
 - name: default
   description: 
-  sample: >-
+  code: >-
     {
       "$type": "TestVariablesMigrationConfig",
       "Enabled": false
@@ -20,8 +20,13 @@ options:
   description: missng XML code comments
   defaultValue: missng XML code comments
 
-redirectFrom:
-- /Reference/v1/Processors/TestVariablesMigrationConfig/
-permalink: /Reference/v1/Processors/TestVariablesMigrationContext/
+redirectFrom: []
+layout: reference
+toc: true
+permalink: /Reference2/v1/Processors/TestVariablesMigrationContext/
+title: TestVariablesMigrationContext
+categories:
+- Processors
+- v1
 
 ---

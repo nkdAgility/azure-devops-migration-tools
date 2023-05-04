@@ -4,7 +4,7 @@ optionsClassFullName: MigrationTools._EngineV1.Configuration.FieldMap.FieldValue
 configurationSamples:
 - name: default
   description: 
-  sample: >-
+  code: >-
     {
       "$type": "FieldValueMapConfig",
       "WorkItemTypeName": "*",
@@ -47,6 +47,12 @@ options:
   defaultValue: missng XML code comments
 
 redirectFrom: []
-permalink: /Reference/v1/FieldMaps/FieldValueMapConfig/
+layout: reference
+toc: true
+permalink: /Reference2/v1/FieldMaps/FieldValueMapConfig/
+title: FieldValueMapConfig
+categories:
+- FieldMaps
+- v1
 
 ---

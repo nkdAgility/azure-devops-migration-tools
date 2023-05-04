@@ -9,6 +9,12 @@ architecture: v2
 options: []
 
 redirectFrom: []
-permalink: /Reference/v2/ProcessorEnrichers/TfsEmbededImagesEnricher/
+layout: reference
+toc: true
+permalink: /Reference2/v2/ProcessorEnrichers/TfsEmbededImagesEnricher/
+title: TfsEmbededImagesEnricher
+categories:
+- ProcessorEnrichers
+- v2
 
 ---

@@ -1,6 +1,6 @@
 ---
 title: FAQ
-layout: default
+layout: page
 template: default
 pageType: index
 toc: true

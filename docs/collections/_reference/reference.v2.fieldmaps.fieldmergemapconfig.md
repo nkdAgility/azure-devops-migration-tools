@@ -4,7 +4,7 @@ optionsClassFullName: MigrationTools._EngineV1.Configuration.FieldMap.FieldMerge
 configurationSamples:
 - name: default
   description: 
-  sample: >-
+  code: >-
     {
       "$type": "FieldMergeMapConfig",
       "WorkItemTypeName": "*",
@@ -39,6 +39,12 @@ options:
   defaultValue: missng XML code comments
 
 redirectFrom: []
-permalink: /Reference/v2/FieldMaps/FieldMergeMapConfig/
+layout: reference
+toc: true
+permalink: /Reference2/v2/FieldMaps/FieldMergeMapConfig/
+title: FieldMergeMapConfig
+categories:
+- FieldMaps
+- v2
 
 ---

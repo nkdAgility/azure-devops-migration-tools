@@ -1,6 +1,6 @@
 ---
 title: TfsWorkItemAttachmentEnricher
-layout: default
+layout: page
 template: default
 pageType: reference
 classType: EndpointEnrichers

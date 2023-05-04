@@ -55,136 +55,54 @@ class Program
 
 
         List<ClassData> classDataList = new List<ClassData>();
-        classDataList.AddRange(cdLoader.GetClassData(oldTypes, allTypes, typeof(MigrationTools._EngineV1.Containers.IProcessor), "v1", "Processors", true, "Config"));
-
-
         // V1
-        //ClassGroup v1Processors = cdLoader.CreateClassGroup(oldTypes, allTypes, typeof(MigrationTools._EngineV1.Containers.IProcessor), "v1", "Processors", true, "Config");
-
-        BuildJekyllDataFile(oldTypes, allTypes, typeof(MigrationTools._EngineV1.Containers.IProcessor), "v1", "Processors", true, "Config");
-        BuildJekyllDataFile(newTypes, allTypes, typeof(IFieldMapConfig), "v1", "FieldMaps", false);
+        classDataList.AddRange(cdLoader.GetClassData(oldTypes, allTypes, typeof(MigrationTools._EngineV1.Containers.IProcessor), "v1", "Processors", true, "Config"));
+        classDataList.AddRange(cdLoader.GetClassData(newTypes, allTypes, typeof(IFieldMapConfig), "v1", "FieldMaps", false));
         // V2
-        BuildJekyllDataFile(oldTypes, allTypes, typeof(MigrationTools._EngineV1.Containers.IProcessor), "v1", "Processors", true, "Config");
-        BuildJekyllDataFile(newTypes, allTypes, typeof(IProcessorEnricher), "v2", "ProcessorEnrichers");
-        BuildJekyllDataFile(newTypes, allTypes, typeof(IFieldMapConfig), "v2", "FieldMaps", false);
-        BuildJekyllDataFile(newTypes, allTypes, typeof(IEndpoint), "v2", "Endpoints");
-        BuildJekyllDataFile(newTypes, allTypes, typeof(IEndpointEnricher), "v2", "EndpointEnrichers");
-    }
+        classDataList.AddRange(cdLoader.GetClassData(oldTypes, allTypes, typeof(MigrationTools._EngineV1.Containers.IProcessor), "v1", "Processors", true, "Config"));
+        classDataList.AddRange(cdLoader.GetClassData(newTypes, allTypes, typeof(IProcessorEnricher), "v2", "ProcessorEnrichers"));
+        classDataList.AddRange(cdLoader.GetClassData(newTypes, allTypes, typeof(IFieldMapConfig), "v2", "FieldMaps", false));
+        classDataList.AddRange(cdLoader.GetClassData(newTypes, allTypes, typeof(IEndpoint), "v2", "Endpoints"));
+        classDataList.AddRange(cdLoader.GetClassData(newTypes, allTypes, typeof(IEndpointEnricher), "v2", "EndpointEnrichers"));
 
-    private static void BuildJekyllDataFile(List<Type> targetTypes, List<Type> allTypes, Type type, string apiVersion, string dataTypeName, bool findConfig = true, string configEnd = "Options")
-    {
-       Console.WriteLine();
-        Console.WriteLine($"BuildJekyllDataFile: {dataTypeName}");
-        ClassGroup data = new ClassGroup();
-        data.Name = dataTypeName;
-        var founds = targetTypes.Where(t => type.IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface && t.IsPublic).OrderBy(t => t.Name).ToList();
-        Console.WriteLine($"----------- Found {founds.Count}");
-
-        // Each File
-        foreach (var item in founds)
+        Console.WriteLine("-----------");
+        Console.WriteLine("Output");
+        Console.WriteLine("-----------");
+        foreach (var classData in classDataList)
         {
-           Console.WriteLine($"-PROCESS {item.Name}");
-            PopulateReferenceData(ref data, targetTypes, allTypes, apiVersion, dataTypeName, item, findConfig, configEnd);
+            Console.Write($"Out: {classData.ClassName}");
+            saveData.WriteYamlDataToDataFolder(classData);
+            Console.Write($" [Yaml]");
+            JekyllData jekyllData = GetJekyllData(classData);
+
+
+
+            saveData.WriteMarkdownDataToCollectionFolder(classData, jekyllData);
+            Console.Write($" [Markdown]");
+            Console.WriteLine();
         }
-        saveData.SeraliseData(data, apiVersion, dataTypeName);
         Console.WriteLine("-----------");
 
     }
 
-
-    private static void PopulateReferenceData(ref ClassGroup data, List<Type> targetTypes, List<Type> allTypes, string apiVersion, string dataTypeName, Type item, bool findConfig = true, string configEnd = "Options")
+    private static JekyllData GetJekyllData(ClassData classData)
     {
-        Type typeOption = item;
-        string objectName = item.Name;
-        DataItem dataItem = new DataItem();
-        dataItem.classData.ClassName = item.Name;
-        dataItem.classData.TypeName = dataTypeName;
-        dataItem.classData.Architecture = apiVersion;
-        dataItem.jekyllData.Permalink = $"/Reference/{apiVersion}/{dataItem.classData.TypeName}/{dataItem.classData.ClassName}/";
-
-        if (findConfig)
+        JekyllData data = new JekyllData();
+        data.Permalink = $"/Reference2/{classData.Architecture}/{classData.TypeName}/{classData.ClassName}/";
+        data.layout = "reference";
+        data.toc = true;
+        data.title = classData.ClassName;
+        data.categories.Add(classData.TypeName);
+        data.categories.Add(classData.Architecture);
+        string posibleOldUrl = $"/Reference/{classData.Architecture}/{classData.TypeName}/{classData.OptionsClassName}/";
+        if (posibleOldUrl != data.Permalink)
         {
-            objectName = objectName.Replace("Context", "");
-            typeOption = allTypes.Where(t => t.Name == $"{objectName}{configEnd}" && !t.IsAbstract && !t.IsInterface).SingleOrDefault();
-            
+           // data.Redirect_from.Add(posibleOldUrl);
         }
-        else
-        {
-            dataItem.classData.OptionsClassName = "";
-            dataItem.classData.OptionsClassFullName = "";
-            Console.WriteLine("No config");
-        }
-
-
-        if (typeOption != null)
-        {
-            string posibleOldUrl = $"/Reference/{apiVersion}/{dataItem.classData.TypeName}/{typeOption.Name}/";
-            if (posibleOldUrl != dataItem.jekyllData.Permalink)
-            {
-                dataItem.jekyllData.Redirect_from.Add(posibleOldUrl);
-            }            
-            dataItem.classData.OptionsClassFullName = typeOption.FullName;
-            dataItem.classData.OptionsClassName = typeOption.Name;
-            object targetItem = null;
-            if (typeOption.GetInterfaces().Contains(typeof(IProcessorConfig)))
-            {
-                Console.WriteLine("Processing as IProcessorConfig");
-                var options = (IProcessorConfig)Activator.CreateInstance(typeOption);
-                targetItem = options;
-            }
-            if (typeOption.GetInterfaces().Contains(typeof(IOptions)))
-            {
-                Console.WriteLine("Processing as IOptions");
-                var options = (IOptions)Activator.CreateInstance(typeOption);
-                options.SetDefaults();
-                targetItem = options;
-            }
-            if (typeOption.GetInterfaces().Contains(typeof(IFieldMapConfig)))
-            {
-                Console.WriteLine("Processing as IFieldMapConfig");
-                var options = (IFieldMapConfig)Activator.CreateInstance(typeOption); 
-                options.SetExampleConfigDefaults();
-                targetItem = options;
-            }
-            if (targetItem != null)
-            {
-                Console.WriteLine("targetItem");
-                JObject joptions = (JObject)JToken.FromObject(targetItem);
-
-                dataItem.classData.Options = populateOptions(targetItem, joptions);
-                dataItem.classData.ConfigurationSamples.Add(new ConfigurationSample() { Name = "default", SampleFor = dataItem.classData.OptionsClassFullName, Sample = saveData.SeraliseDataToJson(targetItem) });
-            }
-
-        }
-        else
-        {
-
-        }
-        dataItem.classData.Description = codeDocs.GetTypeData(item);
-
-        saveData.SeraliseData(dataItem, apiVersion, dataTypeName);
-        data.Items.Add(dataItem);
+        return data;
     }
 
-    private static List<OptionsItem> populateOptions(object item, JObject joptions)
-    {
-        List<OptionsItem> options = new List<OptionsItem>();
-        if (!(joptions is null))
-        {
-            var jpropertys = joptions.Properties().OrderBy(t => t.Name);
-            foreach (JProperty jproperty in jpropertys)
-            {
-                OptionsItem optionsItem = new OptionsItem();
-                optionsItem.ParameterName = jproperty.Name;
-                optionsItem.Type = codeDocs.GetPropertyType(item, jproperty);
-                optionsItem.Description = codeDocs.GetPropertyData(item, joptions, jproperty, "summary");
-                optionsItem.DefaultValue = codeDocs.GetPropertyData(item, joptions, jproperty, "default");
-                options.Add(optionsItem);
-            }
-        }
-        return options;
-    }
-
+  
 
 
 }

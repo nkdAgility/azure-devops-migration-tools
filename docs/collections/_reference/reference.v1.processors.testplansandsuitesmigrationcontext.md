@@ -4,7 +4,7 @@ optionsClassFullName: MigrationTools._EngineV1.Configuration.Processing.TestPlan
 configurationSamples:
 - name: default
   description: 
-  sample: >-
+  code: >-
     {
       "$type": "TestPlansAndSuitesMigrationConfig",
       "Enabled": false,
@@ -75,8 +75,13 @@ options:
   description: Indicates whether the configuration for node structure transformation should be taken from the common enricher configs. Otherwise the configuration elements below are used
   defaultValue: false
 
-redirectFrom:
-- /Reference/v1/Processors/TestPlansAndSuitesMigrationConfig/
-permalink: /Reference/v1/Processors/TestPlansAndSuitesMigrationContext/
+redirectFrom: []
+layout: reference
+toc: true
+permalink: /Reference2/v1/Processors/TestPlansAndSuitesMigrationContext/
+title: TestPlansAndSuitesMigrationContext
+categories:
+- Processors
+- v1
 
 ---

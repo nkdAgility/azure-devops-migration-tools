@@ -9,6 +9,12 @@ architecture: v2
 options: []
 
 redirectFrom: []
-permalink: /Reference/v2/ProcessorEnrichers/TfsWorkItemLinkEnricher/
+layout: reference
+toc: true
+permalink: /Reference2/v2/ProcessorEnrichers/TfsWorkItemLinkEnricher/
+title: TfsWorkItemLinkEnricher
+categories:
+- ProcessorEnrichers
+- v2
 
 ---

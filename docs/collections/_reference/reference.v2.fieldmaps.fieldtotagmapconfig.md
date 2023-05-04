@@ -4,7 +4,7 @@ optionsClassFullName: MigrationTools._EngineV1.Configuration.FieldMap.FieldtoTag
 configurationSamples:
 - name: default
   description: 
-  sample: >-
+  code: >-
     {
       "$type": "FieldtoTagMapConfig",
       "WorkItemTypeName": "*",
@@ -31,6 +31,12 @@ options:
   defaultValue: missng XML code comments
 
 redirectFrom: []
-permalink: /Reference/v2/FieldMaps/FieldtoTagMapConfig/
+layout: reference
+toc: true
+permalink: /Reference2/v2/FieldMaps/FieldtoTagMapConfig/
+title: FieldtoTagMapConfig
+categories:
+- FieldMaps
+- v2
 
 ---

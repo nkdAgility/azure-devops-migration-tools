@@ -4,7 +4,7 @@ optionsClassFullName: MigrationTools.Enrichers.TfsRevisionManagerOptions
 configurationSamples:
 - name: default
   description: 
-  sample: >-
+  code: >-
     {
       "$type": "TfsRevisionManagerOptions",
       "Enabled": true,
@@ -34,8 +34,13 @@ options:
   description: missng XML code comments
   defaultValue: missng XML code comments
 
-redirectFrom:
-- /Reference/v2/ProcessorEnrichers/TfsRevisionManagerOptions/
-permalink: /Reference/v2/ProcessorEnrichers/TfsRevisionManager/
+redirectFrom: []
+layout: reference
+toc: true
+permalink: /Reference2/v2/ProcessorEnrichers/TfsRevisionManager/
+title: TfsRevisionManager
+categories:
+- ProcessorEnrichers
+- v2
 
 ---

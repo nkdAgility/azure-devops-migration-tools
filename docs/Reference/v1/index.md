@@ -1,6 +1,6 @@
 ---
 title: v1 Reference Overview
-layout: default
+layout: page
 template: index-template.md
 pageType: index
 toc: true

@@ -1,6 +1,6 @@
 ---
 title: Mapping Tools
-layout: default
+layout: page
 pageType: index
 toc: true
 pageStatus: production

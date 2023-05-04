@@ -4,7 +4,7 @@ optionsClassFullName: MigrationTools.Enrichers.PauseAfterEachItemOptions
 configurationSamples:
 - name: default
   description: 
-  sample: >-
+  code: >-
     {
       "$type": "PauseAfterEachItemOptions",
       "Enabled": true
@@ -24,8 +24,13 @@ options:
   description: missng XML code comments
   defaultValue: missng XML code comments
 
-redirectFrom:
-- /Reference/v2/ProcessorEnrichers/PauseAfterEachItemOptions/
-permalink: /Reference/v2/ProcessorEnrichers/PauseAfterEachItem/
+redirectFrom: []
+layout: reference
+toc: true
+permalink: /Reference2/v2/ProcessorEnrichers/PauseAfterEachItem/
+title: PauseAfterEachItem
+categories:
+- ProcessorEnrichers
+- v2
 
 ---

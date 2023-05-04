@@ -8,8 +8,13 @@ typeName: Endpoints
 architecture: v2
 options: []
 
-redirectFrom:
-- /Reference/v2/Endpoints/TfsTeamSettingsEndpointOptions/
-permalink: /Reference/v2/Endpoints/TfsTeamSettingsEndpoint/
+redirectFrom: []
+layout: reference
+toc: true
+permalink: /Reference2/v2/Endpoints/TfsTeamSettingsEndpoint/
+title: TfsTeamSettingsEndpoint
+categories:
+- Endpoints
+- v2
 
 ---

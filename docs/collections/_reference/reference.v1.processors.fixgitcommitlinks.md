@@ -4,7 +4,7 @@ optionsClassFullName: MigrationTools._EngineV1.Configuration.Processing.FixGitCo
 configurationSamples:
 - name: default
   description: 
-  sample: >-
+  code: >-
     {
       "$type": "FixGitCommitLinksConfig",
       "Enabled": false,
@@ -35,8 +35,13 @@ options:
   description: missng XML code comments
   defaultValue: missng XML code comments
 
-redirectFrom:
-- /Reference/v1/Processors/FixGitCommitLinksConfig/
-permalink: /Reference/v1/Processors/FixGitCommitLinks/
+redirectFrom: []
+layout: reference
+toc: true
+permalink: /Reference2/v1/Processors/FixGitCommitLinks/
+title: FixGitCommitLinks
+categories:
+- Processors
+- v1
 
 ---

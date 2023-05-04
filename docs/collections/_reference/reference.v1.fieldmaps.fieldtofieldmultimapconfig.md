@@ -4,7 +4,7 @@ optionsClassFullName: MigrationTools._EngineV1.Configuration.FieldMap.FieldtoFie
 configurationSamples:
 - name: default
   description: 
-  sample: >-
+  code: >-
     {
       "$type": "FieldtoFieldMultiMapConfig",
       "WorkItemTypeName": "*",
@@ -31,6 +31,12 @@ options:
   defaultValue: missng XML code comments
 
 redirectFrom: []
-permalink: /Reference/v1/FieldMaps/FieldtoFieldMultiMapConfig/
+layout: reference
+toc: true
+permalink: /Reference2/v1/FieldMaps/FieldtoFieldMultiMapConfig/
+title: FieldtoFieldMultiMapConfig
+categories:
+- FieldMaps
+- v1
 
 ---

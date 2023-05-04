@@ -4,7 +4,7 @@ optionsClassFullName: MigrationTools._EngineV1.Configuration.Processing.WorkItem
 configurationSamples:
 - name: default
   description: 
-  sample: >-
+  code: >-
     {
       "$type": "WorkItemQueryMigrationConfig",
       "Enabled": false,
@@ -35,8 +35,13 @@ options:
   description: Any field mappings
   defaultValue: none
 
-redirectFrom:
-- /Reference/v1/Processors/WorkItemQueryMigrationConfig/
-permalink: /Reference/v1/Processors/WorkItemQueryMigrationContext/
+redirectFrom: []
+layout: reference
+toc: true
+permalink: /Reference2/v1/Processors/WorkItemQueryMigrationContext/
+title: WorkItemQueryMigrationContext
+categories:
+- Processors
+- v1
 
 ---

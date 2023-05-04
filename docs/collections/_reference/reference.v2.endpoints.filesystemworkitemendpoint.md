@@ -8,8 +8,13 @@ typeName: Endpoints
 architecture: v2
 options: []
 
-redirectFrom:
-- /Reference/v2/Endpoints/FileSystemWorkItemEndpointOptions/
-permalink: /Reference/v2/Endpoints/FileSystemWorkItemEndpoint/
+redirectFrom: []
+layout: reference
+toc: true
+permalink: /Reference2/v2/Endpoints/FileSystemWorkItemEndpoint/
+title: FileSystemWorkItemEndpoint
+categories:
+- Endpoints
+- v2
 
 ---

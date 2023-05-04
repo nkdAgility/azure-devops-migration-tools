@@ -1,29 +1,24 @@
-classData:
-  optionsClassName: TfsValidateRequiredFieldOptions
-  optionsClassFullName: MigrationTools.ProcessorEnrichers.TfsValidateRequiredFieldOptions
-  configurationSamples:
-  - name: default
-    description: 
-    sample: >-
-      {
-        "$type": "TfsValidateRequiredFieldOptions",
-        "Enabled": true
-      }
-    sampleFor: MigrationTools.ProcessorEnrichers.TfsValidateRequiredFieldOptions
+optionsClassName: TfsValidateRequiredFieldOptions
+optionsClassFullName: MigrationTools.ProcessorEnrichers.TfsValidateRequiredFieldOptions
+configurationSamples:
+- name: default
+  description: 
+  code: >-
+    {
+      "$type": "TfsValidateRequiredFieldOptions",
+      "Enabled": true
+    }
+  sampleFor: MigrationTools.ProcessorEnrichers.TfsValidateRequiredFieldOptions
+description: missng XML code comments
+className: TfsValidateRequiredField
+typeName: ProcessorEnrichers
+architecture: v2
+options:
+- parameterName: Enabled
+  type: Boolean
   description: missng XML code comments
-  className: TfsValidateRequiredField
-  typeName: ProcessorEnrichers
-  architecture: v2
-  options:
-  - parameterName: Enabled
-    type: Boolean
-    description: missng XML code comments
-    defaultValue: missng XML code comments
-  - parameterName: RefName
-    type: String
-    description: missng XML code comments
-    defaultValue: missng XML code comments
-jekyllData:
-  redirectFrom:
-  - /Reference/v2/ProcessorEnrichers/TfsValidateRequiredFieldOptions/
-  permalink: /Reference/v2/ProcessorEnrichers/TfsValidateRequiredField/
+  defaultValue: missng XML code comments
+- parameterName: RefName
+  type: String
+  description: missng XML code comments
+  defaultValue: missng XML code comments

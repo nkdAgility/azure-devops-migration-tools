@@ -1,6 +1,6 @@
 ---
 title: TestPlansAndSuitesMigrationContext
-layout: default
+layout: page
 template: TestPlansAndSuitesMigrationContext-template.md
 pageType: reference
 classType: Processors

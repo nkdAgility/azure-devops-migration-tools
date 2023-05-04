@@ -9,6 +9,12 @@ architecture: v1
 options: []
 
 redirectFrom: []
-permalink: /Reference/v1/Processors/ExportTeamList/
+layout: reference
+toc: true
+permalink: /Reference2/v1/Processors/ExportTeamList/
+title: ExportTeamList
+categories:
+- Processors
+- v1
 
 ---

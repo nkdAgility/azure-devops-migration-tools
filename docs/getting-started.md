@@ -1,6 +1,6 @@
 ---
 title: Getting Started
-layout: default
+layout: page
 pageType: index
 template: getting-started-template.md
 toc: true

@@ -4,7 +4,7 @@ optionsClassFullName: MigrationTools.EndpointEnrichers.TfsWorkItemAttachmentEnri
 configurationSamples:
 - name: default
   description: 
-  sample: >-
+  code: >-
     {
       "$type": "TfsWorkItemAttachmentEnricherOptions",
       "Enabled": true,
@@ -34,8 +34,13 @@ options:
   description: missng XML code comments
   defaultValue: missng XML code comments
 
-redirectFrom:
-- /Reference/v2/EndpointEnrichers/TfsWorkItemAttachmentEnricherOptions/
-permalink: /Reference/v2/EndpointEnrichers/TfsWorkItemAttachmentEnricher/
+redirectFrom: []
+layout: reference
+toc: true
+permalink: /Reference2/v2/EndpointEnrichers/TfsWorkItemAttachmentEnricher/
+title: TfsWorkItemAttachmentEnricher
+categories:
+- EndpointEnrichers
+- v2
 
 ---

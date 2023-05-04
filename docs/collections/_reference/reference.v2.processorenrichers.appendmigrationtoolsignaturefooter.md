@@ -4,7 +4,7 @@ optionsClassFullName: MigrationTools.Enrichers.AppendMigrationToolSignatureFoote
 configurationSamples:
 - name: default
   description: 
-  sample: >-
+  code: >-
     {
       "$type": "AppendMigrationToolSignatureFooterOptions",
       "Enabled": true
@@ -24,8 +24,13 @@ options:
   description: missng XML code comments
   defaultValue: missng XML code comments
 
-redirectFrom:
-- /Reference/v2/ProcessorEnrichers/AppendMigrationToolSignatureFooterOptions/
-permalink: /Reference/v2/ProcessorEnrichers/AppendMigrationToolSignatureFooter/
+redirectFrom: []
+layout: reference
+toc: true
+permalink: /Reference2/v2/ProcessorEnrichers/AppendMigrationToolSignatureFooter/
+title: AppendMigrationToolSignatureFooter
+categories:
+- ProcessorEnrichers
+- v2
 
 ---

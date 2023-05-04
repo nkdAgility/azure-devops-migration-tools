@@ -4,7 +4,7 @@ optionsClassFullName: MigrationTools._EngineV1.Configuration.FieldMap.RegexField
 configurationSamples:
 - name: default
   description: 
-  sample: >-
+  code: >-
     {
       "$type": "RegexFieldMapConfig",
       "WorkItemTypeName": "*",
@@ -41,6 +41,12 @@ options:
   defaultValue: missng XML code comments
 
 redirectFrom: []
-permalink: /Reference/v2/FieldMaps/RegexFieldMapConfig/
+layout: reference
+toc: true
+permalink: /Reference2/v2/FieldMaps/RegexFieldMapConfig/
+title: RegexFieldMapConfig
+categories:
+- FieldMaps
+- v2
 
 ---

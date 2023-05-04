@@ -4,7 +4,7 @@ optionsClassFullName: MigrationTools.Enrichers.TfsNodeStructureOptions
 configurationSamples:
 - name: default
   description: 
-  sample: >-
+  code: >-
     {
       "$type": "TfsNodeStructureOptions",
       "Enabled": true,
@@ -53,8 +53,13 @@ options:
   description: missng XML code comments
   defaultValue: missng XML code comments
 
-redirectFrom:
-- /Reference/v2/ProcessorEnrichers/TfsNodeStructureOptions/
-permalink: /Reference/v2/ProcessorEnrichers/TfsNodeStructure/
+redirectFrom: []
+layout: reference
+toc: true
+permalink: /Reference2/v2/ProcessorEnrichers/TfsNodeStructure/
+title: TfsNodeStructure
+categories:
+- ProcessorEnrichers
+- v2
 
 ---

@@ -4,7 +4,7 @@ optionsClassFullName: MigrationTools._EngineV1.Configuration.Processing.WorkItem
 configurationSamples:
 - name: default
   description: 
-  sample: >-
+  code: >-
     {
       "$type": "WorkItemMigrationConfig",
       "Enabled": false,
@@ -164,8 +164,13 @@ options:
   description: A list of work items to import
   defaultValue: '[]'
 
-redirectFrom:
-- /Reference/v1/Processors/WorkItemMigrationConfig/
-permalink: /Reference/v1/Processors/WorkItemMigrationContext/
+redirectFrom: []
+layout: reference
+toc: true
+permalink: /Reference2/v1/Processors/WorkItemMigrationContext/
+title: WorkItemMigrationContext
+categories:
+- Processors
+- v1
 
 ---

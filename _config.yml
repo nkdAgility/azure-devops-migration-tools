@@ -12,6 +12,11 @@ destination: ./_site
 
 permalink: pretty
 
+collections_dir: collections
+collections:
+ reference:
+   output: true
+
 exclude:
  - "**/*template*.md"
  - "*template.md"
@@ -20,10 +25,6 @@ exclude:
 include:
  - "**/*.md"
  - "*.md"
-
- collections_dir: collections
- collections:
-
 
 defaults:
  - scope:

@@ -8,8 +8,13 @@ typeName: Endpoints
 architecture: v2
 options: []
 
-redirectFrom:
-- /Reference/v2/Endpoints/AzureDevOpsEndpointOptions/
-permalink: /Reference/v2/Endpoints/AzureDevOpsEndpoint/
+redirectFrom: []
+layout: reference
+toc: true
+permalink: /Reference2/v2/Endpoints/AzureDevOpsEndpoint/
+title: AzureDevOpsEndpoint
+categories:
+- Endpoints
+- v2
 
 ---

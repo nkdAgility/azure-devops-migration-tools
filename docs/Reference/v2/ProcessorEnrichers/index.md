@@ -1,6 +1,6 @@
 ---
 title: Processor Enrichers
-layout: default
+layout: page
 template: index-template.md
 pageType: index
 toc: true

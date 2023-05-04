@@ -1,6 +1,6 @@
 ---
 title: FilterWorkItemsThatAlreadyExistInTarget
-layout: default
+layout: page
 template: default
 pageType: reference
 classType: ProcessorEnrichers
