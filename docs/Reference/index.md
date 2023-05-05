@@ -1,6 +1,6 @@
 ---
 title: Reference Overview
-layout: default
+layout: page
 pageType: index
 toc: true
 pageStatus: production

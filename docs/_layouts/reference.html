@@ -1,0 +1,67 @@
+---
+layout: default
+---
+<div class="d-flex justify-content-between">
+    <div class="">
+        {% include breadcrumbs.html %}
+    </div>
+    <div class="p-2 text-end">
+        <a class="" target="_blank" title="Discuss this document" data-proofer-ignore href="{{site.githuburl}}/discussions/{% if page.discussionId != null %}{{ page.discussionId }}{% else %}new?category=general&title={{ page.title }}&body=%3E%20Title: {{ page.title }}%0d%0a%3E%20Path: {{ page.path }}%0d%0a%0d%0a--Start the discussion here ---{% endif %}">
+            <i class="fa-regular fa-comments"></i>
+        </a>
+        <a class="p-2 {% if page.pageStatus == 'generated' %}disabled{% endif %}" title="{% if page.pageStatus == 'generated' %}Unable to edit generated files{% else %}Edit this document{% endif %}" data-proofer-ignore href="{{site.githuburl}}/edit/main/src/{{ page.path }}">
+            <i class="fa-sharp fa-light fa-file-pen"></i> 
+        </a>
+        
+    </div>
+</div>
+<div>
+    <h1>{{ page.className }}</h1>
+</div>
+<div class="d-flex">
+    <p>Ref</p>
+    <span>&nbsp;<i class="fa-solid fa-pipe"></i>&nbsp;</span>
+    <p>{{ content | reading_time_as_i }} to read</p>
+    <span>&nbsp;<i class="fa-solid fa-pipe"></i>&nbsp;</span>
+    <p>{{ page.last_modified_at }}</p>
+</div>
+<div class="">
+    {% include article-alert.html %}
+
+
+    <p>{{ page.description }}</p>
+
+    <p>{{ page.introduction }}</p>
+    
+    <h2>Options</h2>
+    <div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <tr>
+            <td>Parameter name</td>
+            <td>Type</td>
+            <td>Description</td>
+            <td>Default Value</td>
+        </tr>
+    {% assign options = page.options %}
+    {% for option in options %}
+        <tr>
+            <td>{{option.parameterName}}</td>
+            <td>{{option.type}}</td>
+            <td>{{option.description}}</td>
+            <td>{{option.defaultValue}}</td>
+        </tr>
+    {% endfor %}
+</table>
+</div>
+
+<h2>Example</h2>
+<p>A basic sample for {{ page.className }} configuration.</p>
+    {% assign sample = page.configurationSamples | where: "name", "default" | last %}
+    <div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+        {{sample.code}}
+    </code></pre></div></div>
+
+    {{page.notes | markdownify }}
+
+    {{ content | inject_anchors }}
+</div>

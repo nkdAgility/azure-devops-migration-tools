@@ -12,6 +12,11 @@ destination: ./_site
 
 permalink: pretty
 
+collections_dir: collections
+collections:
+ reference:
+   output: true
+
 exclude:
  - "**/*template*.md"
  - "*template.md"
@@ -20,7 +25,6 @@ exclude:
 include:
  - "**/*.md"
  - "*.md"
-
 
 defaults:
  - scope:
@@ -49,7 +53,7 @@ plugins:
   - jekyll-toc
   - jekyll-time-to-read
   # - jekyll-github-metadata
-  - jekyll-optional-front-matter
+  #- jekyll-optional-front-matter
   - jekyll-last-modified-at
   - jekyll-redirect-from
 
@@ -60,4 +64,4 @@ kramdown:
 
 relative_links:
   enabled:     true
-  collections: false
+  collections: true

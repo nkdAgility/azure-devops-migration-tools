@@ -1,6 +1,0 @@
-{
-  "$type": "FieldtoTagMapConfig",
-  "WorkItemTypeName": "*",
-  "sourceField": "Custom.ProjectName",
-  "formatExpression": "Project: {0}"
-}

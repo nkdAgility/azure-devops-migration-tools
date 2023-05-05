@@ -1,10 +1,10 @@
 ---
 title: Azure DevOps Migration Tools
-layout: default
+layout: page
 pageType: index
 template: index-template.md
 toc: true
-pageStatus: production
+pageStatus: published
 discussionId: 
 ---
 
@@ -122,25 +122,7 @@ These tools are build by naked Agility Limited's DevOps & Agility consultants to
 There are a number processors that can be used to migrate, or process, different sorts of data in different ways. Which one is right for you depends on the situation at hand. 
 Most of these processors need to be run in order. If you try to migrate work items before you have migrated Area and Iterations then ***bang*** you need to go back.
 
-| Processors | Status | Target    | Usage                              |
-|------------------------|---------|---------|------------------------------------------|
-| [CreateTeamFolders](Reference/v1/Processors/CreateTeamFolders.md) | alpha | Shared Queries | Creates folders in Sared Queries for each Team |
-| [ExportProfilePictureFromADContext](Reference/v1/Processors/ExportProfilePictureFromADContext.md) | alpha | Profiles | Downloads corporate images and updates TFS/Azure DevOps profiles |
-| [ExportTeamList](Reference/v1/Processors/ExportTeamList.md) | missng XML code comments | missng XML code comments | missng XML code comments |
-| [FakeProcessor](Reference/v1/Processors/FakeProcessor.md) | missng XML code comments | missng XML code comments | Note: this is only for internal usage. Don't use this in your configurations. |
-| [FixGitCommitLinks](Reference/v1/Processors/FixGitCommitLinks.md) | missng XML code comments | missng XML code comments | missng XML code comments |
-| [ImportProfilePictureContext](Reference/v1/Processors/ImportProfilePictureContext.md) | alpha | Profiles | Downloads corporate images and updates TFS/Azure DevOps profiles |
-| [TeamMigrationContext](Reference/v1/Processors/TeamMigrationContext.md) | preview | Teams | Migrates Teams and Team Settings: This should be run after `NodeStructuresMigrationConfig` and before all other processors. |
-| [TestConfigurationsMigrationContext](Reference/v1/Processors/TestConfigurationsMigrationContext.md) | Beta | Suites & Plans | This processor can migrate `test configuration`. This should be run before `LinkMigrationConfig`. |
-| [TestPlansAndSuitesMigrationContext](Reference/v1/Processors/TestPlansAndSuitesMigrationContext.md) | Beta | Suites & Plans | Rebuilds Suits and plans for Test Cases migrated using the WorkItemMigration |
-| [TestVariablesMigrationContext](Reference/v1/Processors/TestVariablesMigrationContext.md) | Beta | Suites & Plans | This processor can migrate test variables that are defined in the test plans / suites. This must run before `TestPlansAndSuitesMigrationConfig`. |
-| [WorkItemDelete](Reference/v1/Processors/WorkItemDelete.md) | ready | WorkItem | The `WorkItemDelete` processor allows you to delete any amount of work items that meet the query. **DANGER:** This is not a recoverable action and should be use with extream caution. |
-| [WorkItemMigrationContext](Reference/v1/Processors/WorkItemMigrationContext.md) | ready | Work Items | WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links, and Attachments. Use `WorkItemMigrationConfig` to configure. |
-| [WorkItemPostProcessingContext](Reference/v1/Processors/WorkItemPostProcessingContext.md) | preview | Work Items | Reapply field mappings after a migration. Does not migtate Work Items, only reapplied changes to filed mappings. |
-| [WorkItemQueryMigrationContext](Reference/v1/Processors/WorkItemQueryMigrationContext.md) | preview | Shared Queries | This processor can migrate queries for work items. Only shared queries are included. Personal queries can't migrate with this tool. |
-| [WorkItemUpdate](Reference/v1/Processors/WorkItemUpdate.md) | missng XML code comments | WorkItem | This processor allows you to make changes in place where we load from teh Target and update the Target. This is used for bulk updates with the most common reason being a process template change. |
-| [WorkItemUpdateAreasAsTagsContext](Reference/v1/Processors/WorkItemUpdateAreasAsTagsContext.md) | Beta | Work Item | A common issue with older *TFS/Azure DevOps* instances is the proliferation of `Area Paths`. With the use of `Area Path` for `Teams` and the addition of the `Node Name` column option these extensive tag hierarchies should instad be moved to tags. |
-
+{% include content-collection-table.html collection = "reference" typeName = "Processors" architecture = "v1" %}
 
 ## Processors (v2 Architecture) [ PREVIEW ]
 
@@ -148,14 +130,7 @@ Most of these processors need to be run in order. If you try to migrate work ite
 
 The new processor configuration is designed to allow the Migration Tools to support different Source and targets than just TFS/Azure DevOps, and we moved the Endpoints to the processor to allow both Object Model & REST in different processors.
 
-| Processors | Status | Target    | Usage                              |
-|------------------------|---------|---------|------------------------------------------|
-| [AzureDevOpsPipelineProcessor](Reference/v2/Processors/AzureDevOpsPipelineProcessor.md) | Beta | Pipelines | Azure DevOps Processor that migrates Taskgroups, Build- and Release Pipelines. |
-| [ProcessDefinitionProcessor](Reference/v2/Processors/ProcessDefinitionProcessor.md) | Beta | Pipelines | Process definition processor used to keep processes between two orgs in sync |
-| [TfsAreaAndIterationProcessor](Reference/v2/Processors/TfsAreaAndIterationProcessor.md) | Beta | Work Items | The `TfsAreaAndIterationProcessor` migrates all of the Area nd Iteraion paths. |
-| [TfsSharedQueryProcessor](Reference/v2/Processors/TfsSharedQueryProcessor.md) | Beta | Queries | The TfsSharedQueryProcessor enabled you to migrate queries from one locatio nto another. |
-| [TfsTeamSettingsProcessor](Reference/v2/Processors/TfsTeamSettingsProcessor.md) | Beta | Teams | Native TFS Processor, does not work with any other Endpoints. |
-| [WorkItemTrackingProcessor](Reference/v2/Processors/WorkItemTrackingProcessor.md) | missng XML code comments | missng XML code comments | This processor is intended, with the aid of [ProcessorEnrichers](../ProcessorEnrichers/index.md), to allow the migration of Work Items between two [Endpoints](../Endpoints/index.md). |
+{% include content-collection-table.html collection = "reference" typeName = "Processors" architecture = "v2" %}
 
 
 ## Field Maps
@@ -164,21 +139,7 @@ By default, when you are moving from source to target the system will map all of
 
 However sometimes you want to move data to another field, or use a regex to parse out just the bits that you want. To help we have built a number of mapping tools that should give you the versatility you need.
 
-| FieldMaps | Status | Target    | Usage                              |
-|------------------------|---------|---------|------------------------------------------|
-| [FieldClearMapConfig](Reference/v1/FieldMaps/FieldClearMapConfig.md) | ready | Work Item | Allows you to set an already populated field to Null. This will only work with fields that support null. |
-| [FieldLiteralMapConfig](Reference/v1/FieldMaps/FieldLiteralMapConfig.md) | ready | Work Item Field | Sets a field on the `target` to b a specific value. |
-| [FieldMergeMapConfig](Reference/v1/FieldMaps/FieldMergeMapConfig.md) | ready | Work Item Field | Ever wanted to merge two or three fields? This mapping will let you do just that. |
-| [FieldSkipMapConfig](Reference/v1/FieldMaps/FieldSkipMapConfig.md) | ready | Work Item | Allows you to skip populating an existing field. Value in target with be reset to its OriginalValue. |
-| [FieldtoFieldMapConfig](Reference/v1/FieldMaps/FieldtoFieldMapConfig.md) | ready | Work Item Field | Just want to map one field to another? This is the one for you. |
-| [FieldtoFieldMultiMapConfig](Reference/v1/FieldMaps/FieldtoFieldMultiMapConfig.md) | ready | Work Item Field | Want to setup a bunch of field maps in a single go. Use this shortcut! |
-| [FieldtoTagMapConfig](Reference/v1/FieldMaps/FieldtoTagMapConfig.md) | ready | Work Item Field | Want to take a field and convert its value to a tag? Done... |
-| [FieldValueMapConfig](Reference/v1/FieldMaps/FieldValueMapConfig.md) | ready | Work Item Field | Need to map not just the field but also values? This is the default value mapper. |
-| [FieldValuetoTagMapConfig](Reference/v1/FieldMaps/FieldValuetoTagMapConfig.md) | ready | Work Item Field | Need to create a Tag based on a field value? Just create a regex match and choose how to populate the target. |
-| [MultiValueConditionalMapConfig](Reference/v1/FieldMaps/MultiValueConditionalMapConfig.md) | ready | Work Item Field | ??? If you know how to use this please send a PR :) |
-| [RegexFieldMapConfig](Reference/v1/FieldMaps/RegexFieldMapConfig.md) | ready | Work Item Field | I just need that bit of a field... need to send "2016.2" to two fields, one for year and one for release? Done. |
-| [TreeToTagMapConfig](Reference/v1/FieldMaps/TreeToTagMapConfig.md) | ready | Work Item Field | Need to clear out those nasty Area tree hierarchies? This creates Tags for each node in the Area Path... |
-
+{% include content-collection-table.html collection = "reference" typeName = "FieldMaps" architecture = "v1" %}
 
 ## Code (TFVC)
 
