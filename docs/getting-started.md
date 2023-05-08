@@ -28,7 +28,7 @@ The tools are now installed. To run them you will need to switch to `c:\tools\Mi
 
 ## Server configuration and setup
 
-Follow the [setup instructions](/docs/server-configuration.md) to make sure that you can run the tool against your environments and importantly add the required custom field 'ReflectedWorkItemId'
+Follow the [setup instructions](server-configuration.md) to make sure that you can run the tool against your environments and importantly add the required custom field 'ReflectedWorkItemId'
 
 ## Create a default configuration file
 
@@ -50,24 +50,27 @@ The default [WorkItemMigrationConfig](/docs/Reference/v1/Processors/WorkItemMigr
 
 ## How to execute configuration.json with minimal adjustments
 
-> Remember to add custom field ['ReflectedWorkItemId'](/docs/server-configuration.md) to both, the source and the target team project before starting migration!
+> Remember to add custom field ['ReflectedWorkItemId'](/docs/server-configuration.md) to only the target team project before starting migration!
+
+> [NOTE!]
+> In older version of the tool we updated the Source work items with a link back to the Target to make migration easier. This has been removed and replaced with the `FilterWorkItemsThatAlreadyExistInTarget` option insead. **You do not need to add the reflected work item ID custom field to the Source environment.**
 
 1. Adjust the value of the `Collection` attribute for Source and Target
-1. Adjust the value of the `Project` attribute for Source and Target
-1. Set the `AuthenticationMode` (`Prompt` or `AccessToken`) for Source and Target
+2. Adjust the value of the `Project` attribute for Source and Target
+3. Set the `AuthenticationMode` (`Prompt` or `AccessToken`) for Source and Target
 
     If you set Authentication mode to `AccessToken`, enter a valid PAT as value
     for the `PersonalAccessToken` attribute, or set the
     `PersonalAccessTokenVariableName` to the name of an environment variable containing your PAT.
 
-1. Adjust the value of the `ReflectedWorkItemIDFieldName` attribute (field name of the migration tracking field) for Source and Target
+4. Adjust the value of the `ReflectedWorkItemIDFieldName` attribute (field name of the migration tracking field) for Source and Target
 
    For example: `TfsMigrationTool.ReflectedWorkItemId` for TFS, `ReflectedWorkItemId` for VSTS or `Custom.ReflectedWorkItemId` for Azure DevOps
 
-1. Enable the `WorkItemMigrationConfig` processor by setting `Enabled` to `true`
-1. [OPTIONAL] Modify the `WIQLQueryBit` to migrate only the work items you want. The default WIQL will migrate all open work items and revisions excluding test suites and plans
-1. Adjust the [`NodeBasePaths`](/docs/Reference/v1/Processors/WorkItemMigrationConfig.md) or leave empty to migrate all nodes
-1. From the `C:\tools\MigrationTools\` path run `.\migration.exe execute --config .\configuration.json`
+5. Enable the `WorkItemMigrationConfig` processor by setting `Enabled` to `true`
+6. [OPTIONAL] Modify the `WIQLQueryBit` to migrate only the work items you want. The default WIQL will migrate all open work items and revisions excluding test suites and plans
+7. Adjust the [`NodeBasePaths`](/docs/Reference/v1/Processors/WorkItemMigrationConfig.md) or leave empty to migrate all nodes
+8. From the `C:\tools\MigrationTools\` path run `.\migration.exe execute --config .\configuration.json`
 
 **Remember:** if you want a processor to run, it's `Enabled` attribute must be set to `true`. 
 
