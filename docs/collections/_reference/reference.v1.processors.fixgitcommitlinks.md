@@ -49,11 +49,11 @@ categories:
 - v1
 topics:
 - topic: notes
-  path: ../../../../../docs/Reference/v1/Processors/FixGitCommitLinks-notes.md
+  path: /docs/Reference/v1/Processors/FixGitCommitLinks-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: ../../../../../docs/Reference/v1/Processors/FixGitCommitLinks-introduction.md
+  path: /docs/Reference/v1/Processors/FixGitCommitLinks-introduction.md
   exists: false
   markdown: ''
 

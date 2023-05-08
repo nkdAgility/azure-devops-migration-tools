@@ -44,11 +44,11 @@ categories:
 - v2
 topics:
 - topic: notes
-  path: ../../../../../docs/Reference/v2/FieldMaps/TreeToTagMapConfig-notes.md
+  path: /docs/Reference/v2/FieldMaps/TreeToTagMapConfig-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: ../../../../../docs/Reference/v2/FieldMaps/TreeToTagMapConfig-introduction.md
+  path: /docs/Reference/v2/FieldMaps/TreeToTagMapConfig-introduction.md
   exists: false
   markdown: ''
 

@@ -93,7 +93,7 @@ categories:
 - v2
 topics:
 - topic: notes
-  path: ../../../../../docs/Reference/v2/Processors/AzureDevOpsPipelineProcessor-notes.md
+  path: /docs/Reference/v2/Processors/AzureDevOpsPipelineProcessor-notes.md
   exists: true
   markdown: >2-
 
@@ -168,7 +168,7 @@ topics:
 
     When the application is creating service connections make sure you have proper permissions on Azure Active Directory and you can grant Contributor role to the subscription that was chosen.
 - topic: introduction
-  path: ../../../../../docs/Reference/v2/Processors/AzureDevOpsPipelineProcessor-introduction.md
+  path: /docs/Reference/v2/Processors/AzureDevOpsPipelineProcessor-introduction.md
   exists: true
   markdown: >2-
 

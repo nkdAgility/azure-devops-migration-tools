@@ -64,11 +64,11 @@ categories:
 - v1
 topics:
 - topic: notes
-  path: ../../../../../docs/Reference/v1/Processors/WorkItemDelete-notes.md
+  path: /docs/Reference/v1/Processors/WorkItemDelete-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: ../../../../../docs/Reference/v1/Processors/WorkItemDelete-introduction.md
+  path: /docs/Reference/v1/Processors/WorkItemDelete-introduction.md
   exists: false
   markdown: ''
 

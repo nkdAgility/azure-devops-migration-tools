@@ -44,11 +44,11 @@ categories:
 - v2
 topics:
 - topic: notes
-  path: ../../../../../docs/Reference/v2/FieldMaps/FieldLiteralMapConfig-notes.md
+  path: /docs/Reference/v2/FieldMaps/FieldLiteralMapConfig-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: ../../../../../docs/Reference/v2/FieldMaps/FieldLiteralMapConfig-introduction.md
+  path: /docs/Reference/v2/FieldMaps/FieldLiteralMapConfig-introduction.md
   exists: false
   markdown: ''
 

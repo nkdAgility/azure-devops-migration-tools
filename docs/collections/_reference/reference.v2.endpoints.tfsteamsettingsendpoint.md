@@ -22,11 +22,11 @@ categories:
 - v2
 topics:
 - topic: notes
-  path: ../../../../../docs/Reference/v2/Endpoints/TfsTeamSettingsEndpoint-notes.md
+  path: /docs/Reference/v2/Endpoints/TfsTeamSettingsEndpoint-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: ../../../../../docs/Reference/v2/Endpoints/TfsTeamSettingsEndpoint-introduction.md
+  path: /docs/Reference/v2/Endpoints/TfsTeamSettingsEndpoint-introduction.md
   exists: false
   markdown: ''
 

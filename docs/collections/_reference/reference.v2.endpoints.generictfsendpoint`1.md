@@ -22,11 +22,11 @@ categories:
 - v2
 topics:
 - topic: notes
-  path: ../../../../../docs/Reference/v2/Endpoints/GenericTfsEndpoint`1-notes.md
+  path: /docs/Reference/v2/Endpoints/GenericTfsEndpoint`1-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: ../../../../../docs/Reference/v2/Endpoints/GenericTfsEndpoint`1-introduction.md
+  path: /docs/Reference/v2/Endpoints/GenericTfsEndpoint`1-introduction.md
   exists: false
   markdown: ''
 

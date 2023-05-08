@@ -80,7 +80,7 @@ categories:
 - v2
 topics:
 - topic: notes
-  path: ../../../../../docs/Reference/v2/Processors/ProcessDefinitionProcessor-notes.md
+  path: /docs/Reference/v2/Processors/ProcessDefinitionProcessor-notes.md
   exists: true
   markdown: >2+
 
@@ -124,7 +124,7 @@ topics:
 
     ```
 - topic: introduction
-  path: ../../../../../docs/Reference/v2/Processors/ProcessDefinitionProcessor-introduction.md
+  path: /docs/Reference/v2/Processors/ProcessDefinitionProcessor-introduction.md
   exists: true
   markdown: >2-
 

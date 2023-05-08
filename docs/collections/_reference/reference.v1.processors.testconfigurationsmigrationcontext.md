@@ -34,11 +34,11 @@ categories:
 - v1
 topics:
 - topic: notes
-  path: ../../../../../docs/Reference/v1/Processors/TestConfigurationsMigrationContext-notes.md
+  path: /docs/Reference/v1/Processors/TestConfigurationsMigrationContext-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: ../../../../../docs/Reference/v1/Processors/TestConfigurationsMigrationContext-introduction.md
+  path: /docs/Reference/v1/Processors/TestConfigurationsMigrationContext-introduction.md
   exists: false
   markdown: ''
 

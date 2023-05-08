@@ -39,11 +39,11 @@ categories:
 - v1
 topics:
 - topic: notes
-  path: ../../../../../docs/Reference/v1/FieldMaps/FieldSkipMapConfig-notes.md
+  path: /docs/Reference/v1/FieldMaps/FieldSkipMapConfig-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: ../../../../../docs/Reference/v1/FieldMaps/FieldSkipMapConfig-introduction.md
+  path: /docs/Reference/v1/FieldMaps/FieldSkipMapConfig-introduction.md
   exists: false
   markdown: ''
 
