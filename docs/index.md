@@ -38,6 +38,13 @@ You should be comfortable with the TFS/Azure DevOps object model, as well as deb
 - Migrate `Work Items`, `TestPlans & Suits`, `Teams`, `Shared Queries`, & `Pipelines` from one `Organisation` to another
 - Bulk edit of `Work Items` across an entire `Project`.
 
+## What you should not do with this tool?
+
+While this tool can do the things below there are other tools and ways provided by MSFT that are way better at doing these perticular jobs!
+
+- **Change Azure AD Tenant** - If you are wanting to move your entire Org from one Azure AD tenant to another then you should follow the Microsoft documentation to [Change your organization connection to a different Azure AD](https://learn.microsoft.com/en-us/azure/devops/organizations/accounts/change-azure-ad-connection?view=azure-devops)
+- **Migrate your entire Collection to Azure DevOps Services** - If you want to move your entire Collection from local TFS/Azure DevOps then you should use the [Azure DevOps Migration Service](https://azure.microsoft.com/services/devops/migrate/) provided by Microsoft. (If you need to do a Proces Template change before the migration then you can use our tool to facilitate that.)
+
 ### What versions of Azure DevOps & TFS do you support?
 
 - Work Item Migration Supports all versions of TFS 2013+ and all versions of Azure DevOps (Many tools also work all the way back to TFS 2010 but are not supported)
@@ -53,8 +60,6 @@ You should be comfortable with the TFS/Azure DevOps object model, as well as deb
 - Migration of Test Suites & Test Plans
 - _new_ Migration of Builds & Pipelines
 - Migrate from one Language version of TFS / Azure Devops to another (*new v9.0*)
-
-**NOTE: If you are able to migrate your entire Collection to Azure DevOps Services you should use [Azure DevOps Migration Service](https://azure.microsoft.com/services/devops/migrate/) from Microsoft. If you have a requirement to change Process Template then you will need to do that before you move t
 
 
 ## Quick Links

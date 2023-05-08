@@ -82,7 +82,7 @@ categories:
 - v2
 topics:
 - topic: notes
-  path: ../../../../../docs/Reference/v2/Processors/WorkItemTrackingProcessor-notes.md
+  path: /docs/Reference/v2/Processors/WorkItemTrackingProcessor-notes.md
   exists: true
   markdown: >2+
 
@@ -205,7 +205,7 @@ topics:
         }
     ```
 - topic: introduction
-  path: ../../../../../docs/Reference/v2/Processors/WorkItemTrackingProcessor-introduction.md
+  path: /docs/Reference/v2/Processors/WorkItemTrackingProcessor-introduction.md
   exists: false
   markdown: ''
 

@@ -38,11 +38,11 @@ categories:
 - v2
 topics:
 - topic: notes
-  path: ../../../../../docs/Reference/v2/ProcessorEnrichers/TfsValidateRequiredField-notes.md
+  path: /docs/Reference/v2/ProcessorEnrichers/TfsValidateRequiredField-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: ../../../../../docs/Reference/v2/ProcessorEnrichers/TfsValidateRequiredField-introduction.md
+  path: /docs/Reference/v2/ProcessorEnrichers/TfsValidateRequiredField-introduction.md
   exists: false
   markdown: ''
 

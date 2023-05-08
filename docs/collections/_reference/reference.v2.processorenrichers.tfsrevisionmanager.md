@@ -48,11 +48,11 @@ categories:
 - v2
 topics:
 - topic: notes
-  path: ../../../../../docs/Reference/v2/ProcessorEnrichers/TfsRevisionManager-notes.md
+  path: /docs/Reference/v2/ProcessorEnrichers/TfsRevisionManager-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: ../../../../../docs/Reference/v2/ProcessorEnrichers/TfsRevisionManager-introduction.md
+  path: /docs/Reference/v2/ProcessorEnrichers/TfsRevisionManager-introduction.md
   exists: false
   markdown: ''
 

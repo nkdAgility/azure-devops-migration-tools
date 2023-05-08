@@ -1,10 +1,9 @@
 ---
 title: Endpoints
 layout: page
-template: index-template.md
 pageType: index
 toc: true
-pageStatus: generated
+pageStatus: published
 discussionId: 
 ---
 

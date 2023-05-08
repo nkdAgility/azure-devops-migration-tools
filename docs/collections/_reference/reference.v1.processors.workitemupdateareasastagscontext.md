@@ -39,11 +39,11 @@ categories:
 - v1
 topics:
 - topic: notes
-  path: ../../../../../docs/Reference/v1/Processors/WorkItemUpdateAreasAsTagsContext-notes.md
+  path: /docs/Reference/v1/Processors/WorkItemUpdateAreasAsTagsContext-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: ../../../../../docs/Reference/v1/Processors/WorkItemUpdateAreasAsTagsContext-introduction.md
+  path: /docs/Reference/v1/Processors/WorkItemUpdateAreasAsTagsContext-introduction.md
   exists: false
   markdown: ''
 

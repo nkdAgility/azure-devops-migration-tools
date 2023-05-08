@@ -34,11 +34,11 @@ categories:
 - v1
 topics:
 - topic: notes
-  path: ../../../../../docs/Reference/v1/Processors/ImportProfilePictureContext-notes.md
+  path: /docs/Reference/v1/Processors/ImportProfilePictureContext-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: ../../../../../docs/Reference/v1/Processors/ImportProfilePictureContext-introduction.md
+  path: /docs/Reference/v1/Processors/ImportProfilePictureContext-introduction.md
   exists: false
   markdown: ''
 

@@ -38,11 +38,11 @@ categories:
 - v2
 topics:
 - topic: notes
-  path: ../../../../../docs/Reference/v2/ProcessorEnrichers/PauseAfterEachItem-notes.md
+  path: /docs/Reference/v2/ProcessorEnrichers/PauseAfterEachItem-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: ../../../../../docs/Reference/v2/ProcessorEnrichers/PauseAfterEachItem-introduction.md
+  path: /docs/Reference/v2/ProcessorEnrichers/PauseAfterEachItem-introduction.md
   exists: false
   markdown: ''
 

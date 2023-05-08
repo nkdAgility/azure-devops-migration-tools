@@ -52,11 +52,11 @@ categories:
 - v1
 topics:
 - topic: notes
-  path: ../../../../../docs/Reference/v1/FieldMaps/FieldMergeMapConfig-notes.md
+  path: /docs/Reference/v1/FieldMaps/FieldMergeMapConfig-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: ../../../../../docs/Reference/v1/FieldMaps/FieldMergeMapConfig-introduction.md
+  path: /docs/Reference/v1/FieldMaps/FieldMergeMapConfig-introduction.md
   exists: false
   markdown: ''
 

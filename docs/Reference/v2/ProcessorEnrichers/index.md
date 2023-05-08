@@ -1,11 +1,9 @@
 ---
 title: Processor Enrichers
 layout: page
-template: index-template.md
 pageType: index
 toc: true
-pageStatus: generated
-discussionId: 
+pageStatus: published
 ---
 
 

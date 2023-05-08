@@ -1,12 +1,9 @@
 ---
-title: <ClassName>
+title: Field Maps
 layout: page
 template: default
-pageType: reference
-classType: <TypeName>
-architecture: <architecture>
 toc: true
-pageStatus: generated
+pageStatus: published
 discussionId: 
 redirect_from: 
  - /Reference/v2/FieldMaps.html

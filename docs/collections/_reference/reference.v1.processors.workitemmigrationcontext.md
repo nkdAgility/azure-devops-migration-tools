@@ -178,7 +178,7 @@ categories:
 - v1
 topics:
 - topic: notes
-  path: ../../../../../docs/Reference/v1/Processors/WorkItemMigrationContext-notes.md
+  path: /docs/Reference/v1/Processors/WorkItemMigrationContext-notes.md
   exists: true
   markdown: >-
     ## <a name="WIQLQueryBits"></a>WIQL Query Bits
@@ -472,7 +472,7 @@ topics:
 
     > Note: This mappings could also be achieved with other forms of Field mapper e.g. `RegexFieldMapConfig`, but the value mapper as an example is easy to understand
 - topic: introduction
-  path: ../../../../../docs/Reference/v1/Processors/WorkItemMigrationContext-introduction.md
+  path: /docs/Reference/v1/Processors/WorkItemMigrationContext-introduction.md
   exists: false
   markdown: ''
 

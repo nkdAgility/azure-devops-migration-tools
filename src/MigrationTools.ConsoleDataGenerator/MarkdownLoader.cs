@@ -26,9 +26,10 @@ namespace MigrationTools.ConsoleDataGenerator
         {
             MarkdownInfo markdownInfo = new MarkdownInfo();
             markdownInfo.Topic = topic;
-            markdownInfo.Path = GetMarkdownTopicPath(classData, topic);
-            markdownInfo.Exists = System.IO.File.Exists(markdownInfo.Path);
-            markdownInfo.Markdown = LoadMarkdown(markdownInfo.Path);
+            string relativePath = GetMarkdownTopicPath(classData, topic);
+            markdownInfo.Path = relativePath.Replace("../../../../..", "").Replace("\\", "/");
+            markdownInfo.Exists = System.IO.File.Exists(relativePath);
+            markdownInfo.Markdown = LoadMarkdown(relativePath);
             return markdownInfo;
         }
 

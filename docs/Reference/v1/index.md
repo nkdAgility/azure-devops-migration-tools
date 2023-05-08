@@ -1,10 +1,9 @@
 ---
 title: v1 Reference Overview
 layout: page
-template: <template>
 pageType: index
 toc: true
-pageStatus: generated
+pageStatus: published
 discussionId: 
 ---
 

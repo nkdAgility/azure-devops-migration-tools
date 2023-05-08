@@ -60,11 +60,11 @@ categories:
 - v1
 topics:
 - topic: notes
-  path: ../../../../../docs/Reference/v1/FieldMaps/FieldValueMapConfig-notes.md
+  path: /docs/Reference/v1/FieldMaps/FieldValueMapConfig-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: ../../../../../docs/Reference/v1/FieldMaps/FieldValueMapConfig-introduction.md
+  path: /docs/Reference/v1/FieldMaps/FieldValueMapConfig-introduction.md
   exists: false
   markdown: ''
 

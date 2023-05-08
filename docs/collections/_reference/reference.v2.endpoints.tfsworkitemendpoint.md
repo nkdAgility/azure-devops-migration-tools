@@ -22,7 +22,7 @@ categories:
 - v2
 topics:
 - topic: notes
-  path: ../../../../../docs/Reference/v2/Endpoints/TfsWorkItemEndpoint-notes.md
+  path: /docs/Reference/v2/Endpoints/TfsWorkItemEndpoint-notes.md
   exists: true
   markdown: >+
     The Work Item endpoint is super awesome.
@@ -39,7 +39,7 @@ topics:
     FileSystem | Local Files | `FileSystemWorkItemEndpoint` | WorkItems | TBA
 
 - topic: introduction
-  path: ../../../../../docs/Reference/v2/Endpoints/TfsWorkItemEndpoint-introduction.md
+  path: /docs/Reference/v2/Endpoints/TfsWorkItemEndpoint-introduction.md
   exists: false
   markdown: ''
 
