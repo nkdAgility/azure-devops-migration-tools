@@ -1,0 +1,25 @@
+name: Bug Report
+description: File a bug report
+title: "[Bug]: "
+labels: ["bug", "triage"]
+body:
+  - type: checkboxes
+    attributes:
+      label: Version
+      description: Are you using the latest version of our software?
+      options:
+        - label: I confirm that I am using the latest version
+          required: true
+  - type: dropdown
+    id: sourceVersion
+    attributes:
+      label: Source Version
+      description: What version of our software are you running?
+      options:
+        - 13.x
+        - 12.x
+        - 11.x
+        - 10.x
+    validations:
+      required: true
+ 
