@@ -9,6 +9,8 @@ architecture: v2
 options: []
 status: missng XML code comments
 processingTarget: missng XML code comments
+classFile: /src/MigrationTools.Clients.AzureDevops.Rest/Endpoints/AzureDevOpsEndpoint.cs
+optionsClassFile: /src/MigrationTools.Clients.AzureDevops.Rest/Endpoints/AzureDevOpsEndpointOptions.cs
 
 redirectFrom: []
 layout: reference

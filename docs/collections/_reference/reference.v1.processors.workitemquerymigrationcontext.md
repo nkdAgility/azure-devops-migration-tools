@@ -36,6 +36,8 @@ options:
   defaultValue: none
 status: preview
 processingTarget: Shared Queries
+classFile: /src/VstsSyncMigrator.Core/Execution/MigrationContext/WorkItemQueryMigrationContext.cs
+optionsClassFile: /src/MigrationTools/_EngineV1/Configuration/Processing/WorkItemQueryMigrationConfig.cs
 
 redirectFrom: []
 layout: reference

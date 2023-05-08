@@ -26,6 +26,8 @@ options:
   defaultValue: missng XML code comments
 status: ready
 processingTarget: Work Item
+classFile: /src/MigrationTools/_EngineV1/Configuration/FieldMap/FieldSkipMapConfig.cs
+optionsClassFile: /src/MigrationTools/_EngineV1/Configuration/FieldMap/FieldSkipMapConfig.cs
 
 redirectFrom: []
 layout: reference

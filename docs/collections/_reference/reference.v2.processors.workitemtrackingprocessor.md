@@ -69,6 +69,8 @@ options:
   defaultValue: missng XML code comments
 status: missng XML code comments
 processingTarget: missng XML code comments
+classFile: /src/MigrationTools/Processors/WorkItemProcessor/WorkItemTrackingProcessor.cs
+optionsClassFile: /src/MigrationTools/Processors/WorkItemProcessor/WorkItemTrackingProcessorOptions.cs
 
 redirectFrom: []
 layout: reference

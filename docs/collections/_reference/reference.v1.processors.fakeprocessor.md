@@ -21,6 +21,8 @@ options:
   defaultValue: missng XML code comments
 status: missng XML code comments
 processingTarget: missng XML code comments
+classFile: /src/VstsSyncMigrator.Core/Execution/MigrationContext/FakeProcessor.cs
+optionsClassFile: /src/MigrationTools/_EngineV1/Configuration/Processing/FakeProcessorConfig.cs
 
 redirectFrom: []
 layout: reference

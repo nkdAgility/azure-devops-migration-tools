@@ -9,6 +9,8 @@ architecture: v1
 options: []
 status: alpha
 processingTarget: Shared Queries
+classFile: /src/VstsSyncMigrator.Core/Execution/ProcessingContext/CreateTeamFolders.cs
+optionsClassFile: 
 
 redirectFrom: []
 layout: reference

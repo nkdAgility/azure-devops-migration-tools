@@ -67,6 +67,8 @@ options:
   defaultValue: missng XML code comments
 status: Beta
 processingTarget: Pipelines
+classFile: /src/MigrationTools.Clients.AzureDevops.Rest/Processors/ProcessDefinitionProcessor.cs
+optionsClassFile: /src/MigrationTools.Clients.AzureDevops.Rest/Processors/ProcessDefinitionProcessorOptions.cs
 
 redirectFrom: []
 layout: reference

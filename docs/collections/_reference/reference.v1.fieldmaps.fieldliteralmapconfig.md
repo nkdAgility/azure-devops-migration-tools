@@ -31,6 +31,8 @@ options:
   defaultValue: missng XML code comments
 status: ready
 processingTarget: Work Item Field
+classFile: /src/MigrationTools/_EngineV1/Configuration/FieldMap/FieldLiteralMapConfig.cs
+optionsClassFile: /src/MigrationTools/_EngineV1/Configuration/FieldMap/FieldLiteralMapConfig.cs
 
 redirectFrom: []
 layout: reference

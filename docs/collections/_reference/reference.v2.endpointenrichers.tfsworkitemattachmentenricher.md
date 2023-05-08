@@ -35,6 +35,8 @@ options:
   defaultValue: missng XML code comments
 status: missng XML code comments
 processingTarget: WorkItem
+classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/EndpointEnrichers/TfsWorkItemAttachmentEnricher.cs
+optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/EndpointEnrichers/TfsWorkItemAttachmentEnricherOptions.cs
 
 redirectFrom: []
 layout: reference

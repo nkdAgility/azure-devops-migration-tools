@@ -64,6 +64,8 @@ options:
   defaultValue: missng XML code comments
 status: Beta
 processingTarget: Work Items
+classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/TfsAreaAndIterationProcessor.cs
+optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/TfsAreaAndIterationProcessorOptions.cs
 
 redirectFrom: []
 layout: reference

@@ -9,6 +9,8 @@ architecture: v2
 options: []
 status: missng XML code comments
 processingTarget: missng XML code comments
+classFile: /src/MigrationTools.Clients.FileSystem/Endpoints/FileSystemWorkItemEndpoint.cs
+optionsClassFile: /src/MigrationTools.Clients.FileSystem/Endpoints/FileSystemWorkItemEndpointOptions.cs
 
 redirectFrom: []
 layout: reference

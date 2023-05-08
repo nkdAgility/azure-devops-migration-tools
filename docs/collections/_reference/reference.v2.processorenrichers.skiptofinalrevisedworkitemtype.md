@@ -25,6 +25,8 @@ options:
   defaultValue: missng XML code comments
 status: missng XML code comments
 processingTarget: missng XML code comments
+classFile: /src/MigrationTools/ProcessorEnrichers/WorkItemProcessorEnrichers/SkipToFinalRevisedWorkItemType.cs
+optionsClassFile: /src/MigrationTools/ProcessorEnrichers/WorkItemProcessorEnrichers/SkipToFinalRevisedWorkItemTypeOptions.cs
 
 redirectFrom: []
 layout: reference

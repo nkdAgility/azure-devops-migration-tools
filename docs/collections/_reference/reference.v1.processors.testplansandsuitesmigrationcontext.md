@@ -76,6 +76,8 @@ options:
   defaultValue: false
 status: Beta
 processingTarget: Suites & Plans
+classFile: /src/VstsSyncMigrator.Core/Execution/MigrationContext/TestPlansAndSuitesMigrationContext.cs
+optionsClassFile: /src/MigrationTools/_EngineV1/Configuration/Processing/TestPlansAndSuitesMigrationConfig.cs
 
 redirectFrom: []
 layout: reference

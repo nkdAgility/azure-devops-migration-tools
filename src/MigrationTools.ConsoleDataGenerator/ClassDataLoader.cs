@@ -14,6 +14,7 @@ namespace MigrationTools.ConsoleDataGenerator
     {
         private DataSerialization saveData;
         private static CodeDocumentation codeDocs = new CodeDocumentation("../../../../../docs/Reference/Generated/");
+        private static CodeFileFinder codeFinder = new CodeFileFinder("../../../../../src/");
         public ClassDataLoader(DataSerialization saveData) {
 
             this.saveData = saveData;
@@ -64,6 +65,7 @@ namespace MigrationTools.ConsoleDataGenerator
             string objectName = item.Name;
             ClassData data = new ClassData();
             data.ClassName = item.Name;
+            data.ClassFile = codeFinder.FindCodeFile(item);
             data.TypeName = dataTypeName;
             data.Architecture = apiVersion;
             data.Description = codeDocs.GetTypeData(item);
@@ -82,11 +84,11 @@ namespace MigrationTools.ConsoleDataGenerator
                 Console.WriteLine("No config");
             }
 
-
             if (typeOption != null)
             {
                 data.OptionsClassFullName = typeOption.FullName;
                 data.OptionsClassName = typeOption.Name;
+                data.OptionsClassFile = codeFinder.FindCodeFile(typeOption);
                 object targetItem = null;
                 if (typeOption.GetInterfaces().Contains(typeof(IProcessorConfig)))
                 {
@@ -124,6 +126,7 @@ namespace MigrationTools.ConsoleDataGenerator
             }
             return data;
         }
+
 
         private List<OptionsItem> populateOptions(object item, JObject joptions)
         {

@@ -35,6 +35,8 @@ options:
   defaultValue: missng XML code comments
 status: missng XML code comments
 processingTarget: missng XML code comments
+classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/ProcessorEnrichers/TfsRevisionManager.cs
+optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/ProcessorEnrichers/TfsRevisionManagerOptions.cs
 
 redirectFrom: []
 layout: reference

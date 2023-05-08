@@ -56,6 +56,8 @@ options:
   defaultValue: '[]'
 status: missng XML code comments
 processingTarget: WorkItem
+classFile: /src/VstsSyncMigrator.Core/Execution/ProcessingContext/WorkItemUpdate.cs
+optionsClassFile: /src/MigrationTools/_EngineV1/Configuration/Processing/WorkItemUpdateConfig.cs
 
 redirectFrom: []
 layout: reference

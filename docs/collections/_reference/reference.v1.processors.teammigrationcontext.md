@@ -36,6 +36,8 @@ options:
   defaultValue: false
 status: preview
 processingTarget: Teams
+classFile: /src/VstsSyncMigrator.Core/Execution/MigrationContext/TeamMigrationContext.cs
+optionsClassFile: /src/MigrationTools/_EngineV1/Configuration/Processing/TeamMigrationConfig.cs
 
 redirectFrom: []
 layout: reference

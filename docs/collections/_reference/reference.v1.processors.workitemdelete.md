@@ -51,6 +51,8 @@ options:
   defaultValue: missng XML code comments
 status: ready
 processingTarget: WorkItem
+classFile: /src/VstsSyncMigrator.Core/Execution/ProcessingContext/WorkItemDelete.cs
+optionsClassFile: /src/MigrationTools/_EngineV1/Configuration/Processing/WorkItemDeleteConfig.cs
 
 redirectFrom: []
 layout: reference

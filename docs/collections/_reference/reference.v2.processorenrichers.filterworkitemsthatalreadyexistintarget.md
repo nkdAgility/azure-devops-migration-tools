@@ -34,6 +34,8 @@ options:
   defaultValue: missng XML code comments
 status: missng XML code comments
 processingTarget: missng XML code comments
+classFile: /src/MigrationTools/ProcessorEnrichers/WorkItemProcessorEnrichers/FilterWorkItemsThatAlreadyExistInTarget.cs
+optionsClassFile: /src/MigrationTools/ProcessorEnrichers/WorkItemProcessorEnrichers/FilterWorkItemsThatAlreadyExistInTargetOptions.cs
 
 redirectFrom: []
 layout: reference

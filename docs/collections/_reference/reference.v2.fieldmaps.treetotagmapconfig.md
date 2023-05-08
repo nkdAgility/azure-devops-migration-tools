@@ -31,6 +31,8 @@ options:
   defaultValue: missng XML code comments
 status: ready
 processingTarget: Work Item Field
+classFile: /src/MigrationTools/_EngineV1/Configuration/FieldMap/TreeToTagMapConfig.cs
+optionsClassFile: /src/MigrationTools/_EngineV1/Configuration/FieldMap/TreeToTagMapConfig.cs
 
 redirectFrom: []
 layout: reference
