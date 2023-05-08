@@ -80,126 +80,133 @@ title: WorkItemTrackingProcessor
 categories:
 - Processors
 - v2
-notes: >2+
+topics:
+- topic: notes
+  path: ../../../../../docs/Reference/v2/Processors/WorkItemTrackingProcessor-notes.md
+  exists: true
+  markdown: >2+
 
-  ### Supported Endpoints
-
-
-  - TfsWorkItemEndpoint
-
-  - FileSystemWorkItemEndpoint
-
-  - InMemoryWorkItemEndpoint
+    ### Supported Endpoints
 
 
-  ### Supported Processor Enrichers
+    - TfsWorkItemEndpoint
+
+    - FileSystemWorkItemEndpoint
+
+    - InMemoryWorkItemEndpoint
 
 
-  - PauseAfterEachWorkItem
-
-  - AppendMigrationToolSignatureFooter
-
-  - FilterWorkItemsThatAlreadyExistInTarget
-
-  - SkipToFinalRevisedWorkItemType
+    ### Supported Processor Enrichers
 
 
-  #### Full Example with Enpoints & Enrichers
+    - PauseAfterEachWorkItem
+
+    - AppendMigrationToolSignatureFooter
+
+    - FilterWorkItemsThatAlreadyExistInTarget
+
+    - SkipToFinalRevisedWorkItemType
+
+
+    #### Full Example with Enpoints & Enrichers
 
 
 
-  ```JSON
-      {
-        "ObjectType": "WorkItemMigrationProcessorOptions",
-        "Enabled": true,
-        "ReplayRevisions": true,
-        "PrefixProjectToNodes": false,
-        "CollapseRevisions": false,
-        "WorkItemCreateRetryLimit": 5,
-        "Enrichers": [
-          {
-            "ObjectType": "PauseAfterEachItemOptions",
-            "Enabled": true
-          },
-          {
-            "ObjectType": "FilterWorkItemsThatAlreadyExistInTargetOptions",
-            "Enabled": true,
-            "Query": {
-              "WhereBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
-              "OrderBit": "[System.ChangedDate] desc"
+    ```JSON
+        {
+          "ObjectType": "WorkItemMigrationProcessorOptions",
+          "Enabled": true,
+          "ReplayRevisions": true,
+          "PrefixProjectToNodes": false,
+          "CollapseRevisions": false,
+          "WorkItemCreateRetryLimit": 5,
+          "Enrichers": [
+            {
+              "ObjectType": "PauseAfterEachItemOptions",
+              "Enabled": true
+            },
+            {
+              "ObjectType": "FilterWorkItemsThatAlreadyExistInTargetOptions",
+              "Enabled": true,
+              "Query": {
+                "WhereBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
+                "OrderBit": "[System.ChangedDate] desc"
+              }
+            },
+            {
+              "ObjectType": "AppendMigrationToolSignatureFooterOptions",
+              "Enabled": false
+            },
+            {
+              "ObjectType": "SkipToFinalRevisedWorkItemTypeOptions",
+              "Enabled": false
             }
-          },
-          {
-            "ObjectType": "AppendMigrationToolSignatureFooterOptions",
-            "Enabled": false
-          },
-          {
-            "ObjectType": "SkipToFinalRevisedWorkItemTypeOptions",
-            "Enabled": false
-          }
-        ],
-        "Endpoints": [
-          {
-            "ObjectType": "FileSystemWorkItemEndpointOptions",
-            "Direction": "Source",
-            "FileStore": ".\\Store\\Source\\",
-            "Query": {
-              "WhereBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
-              "OrderBit": "[System.ChangedDate] desc"
+          ],
+          "Endpoints": [
+            {
+              "ObjectType": "FileSystemWorkItemEndpointOptions",
+              "Direction": "Source",
+              "FileStore": ".\\Store\\Source\\",
+              "Query": {
+                "WhereBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
+                "OrderBit": "[System.ChangedDate] desc"
+              },
+              "Enrichers": [
+                {
+                  "ObjectType": "WorkItemAttachmentEnricherOptions",
+                  "Enabled": true,
+                  "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
+                  "AttachmentMaxSize": 480000000
+                },
+                {
+                  "ObjectType": "WorkItemLinkEnricherOptions",
+                  "Enabled": true,
+                  "LinkMigrationSaveEachAsAdded": true
+                }
+              ]
             },
-            "Enrichers": [
-              {
-                "ObjectType": "WorkItemAttachmentEnricherOptions",
-                "Enabled": true,
-                "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
-                "AttachmentMaxSize": 480000000
+            {
+              "ObjectType": "TfsWorkItemEndPointOptions",
+              "Direction": "Target",
+              "AccessToken": "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
+              "Query": {
+                "Query": "SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan') ORDER BY [System.ChangedDate] desc"
               },
-              {
-                "ObjectType": "WorkItemLinkEnricherOptions",
-                "Enabled": true,
-                "LinkMigrationSaveEachAsAdded": true
-              }
-            ]
-          },
-          {
-            "ObjectType": "TfsWorkItemEndPointOptions",
-            "Direction": "Target",
-            "AccessToken": "6i4jyylsadkjanjniaydxnjsi4zsz3qarxhl2y5ngzzffiqdostq",
-            "Query": {
-              "Query": "SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan') ORDER BY [System.ChangedDate] desc"
-            },
-            "Enrichers": [
-              {
-                "ObjectType": "WorkItemAttachmentEnricherOptions",
-                "Enabled": true,
-                "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
-                "AttachmentMaxSize": 480000000
-              },
-              {
-                "ObjectType": "WorkItemEmbedEnricherOptions",
-                "Enabled": true,
-                "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\"
-              },
-              {
-                "ObjectType": "WorkItemLinkEnricherOptions",
-                "Enabled": true,
-                "LinkMigrationSaveEachAsAdded": true
-              },
-              {
-                "ObjectType": "WorkItemCreatedEnricherOptions",
-                "Enabled": true,
-                "UpdateCreatedDate": true,
-                "UpdateCreatedBy": true
-              },
-              {
-                "ObjectType": "WorkItemFieldTableEnricherOptions",
-                "Enabled": true
-              }
-            ]
-          }
-        ]
-      }
-  ```
-introduction: ''
+              "Enrichers": [
+                {
+                  "ObjectType": "WorkItemAttachmentEnricherOptions",
+                  "Enabled": true,
+                  "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
+                  "AttachmentMaxSize": 480000000
+                },
+                {
+                  "ObjectType": "WorkItemEmbedEnricherOptions",
+                  "Enabled": true,
+                  "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\"
+                },
+                {
+                  "ObjectType": "WorkItemLinkEnricherOptions",
+                  "Enabled": true,
+                  "LinkMigrationSaveEachAsAdded": true
+                },
+                {
+                  "ObjectType": "WorkItemCreatedEnricherOptions",
+                  "Enabled": true,
+                  "UpdateCreatedDate": true,
+                  "UpdateCreatedBy": true
+                },
+                {
+                  "ObjectType": "WorkItemFieldTableEnricherOptions",
+                  "Enabled": true
+                }
+              ]
+            }
+          ]
+        }
+    ```
+- topic: introduction
+  path: ../../../../../docs/Reference/v2/Processors/WorkItemTrackingProcessor-introduction.md
+  exists: false
+  markdown: ''
 
 ---

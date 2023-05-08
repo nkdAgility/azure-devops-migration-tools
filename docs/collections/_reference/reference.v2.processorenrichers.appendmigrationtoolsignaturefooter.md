@@ -36,7 +36,14 @@ title: AppendMigrationToolSignatureFooter
 categories:
 - ProcessorEnrichers
 - v2
-notes: ''
-introduction: ''
+topics:
+- topic: notes
+  path: ../../../../../docs/Reference/v2/ProcessorEnrichers/AppendMigrationToolSignatureFooter-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: ../../../../../docs/Reference/v2/ProcessorEnrichers/AppendMigrationToolSignatureFooter-introduction.md
+  exists: false
+  markdown: ''
 
 ---

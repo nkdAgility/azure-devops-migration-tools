@@ -20,7 +20,14 @@ title: TfsTeamSettingsEndpoint
 categories:
 - Endpoints
 - v2
-notes: ''
-introduction: ''
+topics:
+- topic: notes
+  path: ../../../../../docs/Reference/v2/Endpoints/TfsTeamSettingsEndpoint-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: ../../../../../docs/Reference/v2/Endpoints/TfsTeamSettingsEndpoint-introduction.md
+  exists: false
+  markdown: ''
 
 ---

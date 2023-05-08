@@ -76,7 +76,14 @@ title: TfsTeamSettingsProcessor
 categories:
 - Processors
 - v2
-notes: ''
-introduction: ''
+topics:
+- topic: notes
+  path: ../../../../../docs/Reference/v2/Processors/TfsTeamSettingsProcessor-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: ../../../../../docs/Reference/v2/Processors/TfsTeamSettingsProcessor-introduction.md
+  exists: false
+  markdown: ''
 
 ---

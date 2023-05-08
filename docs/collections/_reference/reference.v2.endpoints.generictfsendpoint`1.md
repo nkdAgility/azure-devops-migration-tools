@@ -20,7 +20,14 @@ title: GenericTfsEndpoint`1
 categories:
 - Endpoints
 - v2
-notes: ''
-introduction: ''
+topics:
+- topic: notes
+  path: ../../../../../docs/Reference/v2/Endpoints/GenericTfsEndpoint`1-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: ../../../../../docs/Reference/v2/Endpoints/GenericTfsEndpoint`1-introduction.md
+  exists: false
+  markdown: ''
 
 ---

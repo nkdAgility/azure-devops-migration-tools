@@ -42,7 +42,14 @@ title: FieldLiteralMapConfig
 categories:
 - FieldMaps
 - v2
-notes: ''
-introduction: ''
+topics:
+- topic: notes
+  path: ../../../../../docs/Reference/v2/FieldMaps/FieldLiteralMapConfig-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: ../../../../../docs/Reference/v2/FieldMaps/FieldLiteralMapConfig-introduction.md
+  exists: false
+  markdown: ''
 
 ---

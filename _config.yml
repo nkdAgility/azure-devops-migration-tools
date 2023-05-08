@@ -58,8 +58,6 @@ plugins:
   - jekyll-redirect-from
   - rouge
 
-markdown: kramdown
-highlighter: rouge
 
 kramdown:
   input: GFM
@@ -67,8 +65,6 @@ kramdown:
   syntax_highlighter: rouge 
   auto_ids: true
   syntax_highlighter_opts: 
-   line_numbers: true
-   wrap: true
 
 
 relative_links:

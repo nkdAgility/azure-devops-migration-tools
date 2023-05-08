@@ -20,7 +20,14 @@ title: TfsEmbededImagesEnricher
 categories:
 - ProcessorEnrichers
 - v2
-notes: ''
-introduction: ''
+topics:
+- topic: notes
+  path: ../../../../../docs/Reference/v2/ProcessorEnrichers/TfsEmbededImagesEnricher-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: ../../../../../docs/Reference/v2/ProcessorEnrichers/TfsEmbededImagesEnricher-introduction.md
+  exists: false
+  markdown: ''
 
 ---

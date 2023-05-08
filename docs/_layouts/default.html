@@ -34,16 +34,6 @@
                 </article>
             </div>
             <div class="p-2 flex-fill d-none d-xl-block" style="min-width: 15vw;">
-                
-
-                {% if page.toc == true %}
-                <div class="card mb-3">
-                    <h5 class="no_toc card-header">In this article</h5>
-                    <div class="card-body">
-                        {{ content | toc_only }}
-                    </div>
-                </div>
-                {% endif %}
                 <div class="card mb-3">
                     <h5 class="no_toc card-header">Project Details</h5>
                     <div class="card-body">
@@ -52,6 +42,41 @@
                      <img src="https://nkdagility.visualstudio.com/_apis/public/build/definitions/1b52ce63-eccc-41c8-88f9-ae6ebeefdc63/94/badge" alt="Build on VSTS"></p>
                     </div>
                 </div>
+                <div class="card mb-3">
+                    <h5 class="no_toc card-header">Contribute</h5>
+                    <div class="card-body">
+                        <ul class="btn-toggle-nav fw-normal pb-1 small list-unstyled">
+                              <li class="align-items-center">
+                                <a class="p-2" target="_blank" title="Discuss this document" data-proofer-ignore href="{{site.githuburl}}/discussions/{% if page.discussionId != null %}{{ page.discussionId }}{% else %}new?category=general&title={{ page.title }}&body=%3E%20Title: {{ page.title }}%0d%0a%3E%20Path: {{ page.path }}%0d%0a%0d%0a--Start the discussion here ---{% endif %}">
+                                    <i class="fa-regular fa-comments"></i> Discuss
+                                </a>
+                              </li>
+                              {% if page.classFile != '' %}
+                              <li class="align-items-center">
+                                <a class="p-2 " target="_blank" title="Edit this documents class file" data-proofer-ignore href="{{site.githuburl}}/edit/master/{{ page.classFile }}">
+                                    <i class="fa-kit fa-solid-square-code-pen"></i> Edit Class
+                                </a>
+                              </li>
+                              {% endif %}
+                              {% if page.optionsClassFile != '' %}
+                              <li class="align-items-center">
+                                <a class="p-2 " target="_blank" title="Edit this documents configuration/options file" data-proofer-ignore href="{{site.githuburl}}/edit/master/{{ page.optionsClassFile }}">
+                                    <i class="fa-kit fa-solid-gear-code-pen"></i> Edit Configuration / Options
+                                </a>
+                                </li>
+                                {% endif %}
+                              
+                          </ul>             
+                    </div>
+                </div>
+                {% if page.toc == true %}
+                <div class="card mb-3">
+                    <h5 class="no_toc card-header">In this article</h5>
+                    <div class="card-body">
+                        {{ content | toc_only }}
+                    </div>
+                </div>
+                {% endif %}
             </div>
 
         </div>

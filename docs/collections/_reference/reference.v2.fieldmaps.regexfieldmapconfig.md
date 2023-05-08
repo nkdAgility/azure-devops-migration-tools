@@ -52,7 +52,14 @@ title: RegexFieldMapConfig
 categories:
 - FieldMaps
 - v2
-notes: ''
-introduction: ''
+topics:
+- topic: notes
+  path: ../../../../../docs/Reference/v2/FieldMaps/RegexFieldMapConfig-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: ../../../../../docs/Reference/v2/FieldMaps/RegexFieldMapConfig-introduction.md
+  exists: false
+  markdown: ''
 
 ---

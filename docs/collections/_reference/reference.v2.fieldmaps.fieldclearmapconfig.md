@@ -37,7 +37,14 @@ title: FieldClearMapConfig
 categories:
 - FieldMaps
 - v2
-notes: ''
-introduction: ''
+topics:
+- topic: notes
+  path: ../../../../../docs/Reference/v2/FieldMaps/FieldClearMapConfig-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: ../../../../../docs/Reference/v2/FieldMaps/FieldClearMapConfig-introduction.md
+  exists: false
+  markdown: ''
 
 ---

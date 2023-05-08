@@ -20,7 +20,14 @@ title: FileSystemWorkItemEndpoint
 categories:
 - Endpoints
 - v2
-notes: ''
-introduction: ''
+topics:
+- topic: notes
+  path: ../../../../../docs/Reference/v2/Endpoints/FileSystemWorkItemEndpoint-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: ../../../../../docs/Reference/v2/Endpoints/FileSystemWorkItemEndpoint-introduction.md
+  exists: false
+  markdown: ''
 
 ---

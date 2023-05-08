@@ -42,7 +42,14 @@ title: FieldtoTagMapConfig
 categories:
 - FieldMaps
 - v1
-notes: ''
-introduction: ''
+topics:
+- topic: notes
+  path: ../../../../../docs/Reference/v1/FieldMaps/FieldtoTagMapConfig-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: ../../../../../docs/Reference/v1/FieldMaps/FieldtoTagMapConfig-introduction.md
+  exists: false
+  markdown: ''
 
 ---

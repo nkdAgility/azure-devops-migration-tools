@@ -110,6 +110,7 @@ DEPENDENCIES
   jekyll-sitemap
   jekyll-time-to-read
   jekyll-toc
+  kramdown
   pygments.rb
   rouge
 

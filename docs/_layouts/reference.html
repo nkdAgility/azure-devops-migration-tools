@@ -35,9 +35,10 @@ layout: default
     {% include article-alert.html %}
 
 
-    <p>{{ page.description }}</p>
+    <p>{{ page.description | markdownify }}</p>
 
-    <p>{{ page.introduction }}</p>
+    {% assign mdInfo = page.topics | where: "topic", "introduction" | last %}
+    <p>{{ mdInfo.markdown | markdownify }}</p>
     
     <h2>Options</h2>
     <div class="table-responsive">
@@ -68,7 +69,11 @@ layout: default
 {{sample.code}}
 {% endhighlight %}
 
-    {{page.notes | markdownify }}
+{% assign mdInfo = page.topics | where: "topic", "notes" | last %}
+    <p>{{ mdInfo.markdown | markdownify }}</p>
 
     {{ content | inject_anchors }}
+
+
+
 </div>

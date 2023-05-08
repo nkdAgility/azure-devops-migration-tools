@@ -45,7 +45,14 @@ title: FilterWorkItemsThatAlreadyExistInTarget
 categories:
 - ProcessorEnrichers
 - v2
-notes: ''
-introduction: ''
+topics:
+- topic: notes
+  path: ../../../../../docs/Reference/v2/ProcessorEnrichers/FilterWorkItemsThatAlreadyExistInTarget-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: ../../../../../docs/Reference/v2/ProcessorEnrichers/FilterWorkItemsThatAlreadyExistInTarget-introduction.md
+  exists: false
+  markdown: ''
 
 ---

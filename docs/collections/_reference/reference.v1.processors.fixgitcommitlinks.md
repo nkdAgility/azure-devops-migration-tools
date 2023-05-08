@@ -47,7 +47,14 @@ title: FixGitCommitLinks
 categories:
 - Processors
 - v1
-notes: ''
-introduction: ''
+topics:
+- topic: notes
+  path: ../../../../../docs/Reference/v1/Processors/FixGitCommitLinks-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: ../../../../../docs/Reference/v1/Processors/FixGitCommitLinks-introduction.md
+  exists: false
+  markdown: ''
 
 ---

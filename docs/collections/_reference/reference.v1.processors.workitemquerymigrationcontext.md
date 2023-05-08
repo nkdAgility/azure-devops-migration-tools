@@ -47,7 +47,14 @@ title: WorkItemQueryMigrationContext
 categories:
 - Processors
 - v1
-notes: ''
-introduction: ''
+topics:
+- topic: notes
+  path: ../../../../../docs/Reference/v1/Processors/WorkItemQueryMigrationContext-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: ../../../../../docs/Reference/v1/Processors/WorkItemQueryMigrationContext-introduction.md
+  exists: false
+  markdown: ''
 
 ---

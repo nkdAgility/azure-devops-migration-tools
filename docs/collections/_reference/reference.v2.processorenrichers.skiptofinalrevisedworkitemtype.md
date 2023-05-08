@@ -36,7 +36,14 @@ title: SkipToFinalRevisedWorkItemType
 categories:
 - ProcessorEnrichers
 - v2
-notes: ''
-introduction: ''
+topics:
+- topic: notes
+  path: ../../../../../docs/Reference/v2/ProcessorEnrichers/SkipToFinalRevisedWorkItemType-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: ../../../../../docs/Reference/v2/ProcessorEnrichers/SkipToFinalRevisedWorkItemType-introduction.md
+  exists: false
+  markdown: ''
 
 ---

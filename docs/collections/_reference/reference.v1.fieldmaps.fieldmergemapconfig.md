@@ -50,7 +50,14 @@ title: FieldMergeMapConfig
 categories:
 - FieldMaps
 - v1
-notes: ''
-introduction: ''
+topics:
+- topic: notes
+  path: ../../../../../docs/Reference/v1/FieldMaps/FieldMergeMapConfig-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: ../../../../../docs/Reference/v1/FieldMaps/FieldMergeMapConfig-introduction.md
+  exists: false
+  markdown: ''
 
 ---

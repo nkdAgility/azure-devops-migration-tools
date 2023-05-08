@@ -20,7 +20,14 @@ title: AzureDevOpsEndpoint
 categories:
 - Endpoints
 - v2
-notes: ''
-introduction: ''
+topics:
+- topic: notes
+  path: ../../../../../docs/Reference/v2/Endpoints/AzureDevOpsEndpoint-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: ../../../../../docs/Reference/v2/Endpoints/AzureDevOpsEndpoint-introduction.md
+  exists: false
+  markdown: ''
 
 ---

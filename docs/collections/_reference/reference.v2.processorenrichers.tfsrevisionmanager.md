@@ -46,7 +46,14 @@ title: TfsRevisionManager
 categories:
 - ProcessorEnrichers
 - v2
-notes: ''
-introduction: ''
+topics:
+- topic: notes
+  path: ../../../../../docs/Reference/v2/ProcessorEnrichers/TfsRevisionManager-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: ../../../../../docs/Reference/v2/ProcessorEnrichers/TfsRevisionManager-introduction.md
+  exists: false
+  markdown: ''
 
 ---
