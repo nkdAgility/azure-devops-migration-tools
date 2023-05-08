@@ -56,11 +56,20 @@ plugins:
   #- jekyll-optional-front-matter
   - jekyll-last-modified-at
   - jekyll-redirect-from
+  - rouge
+
+markdown: kramdown
+highlighter: rouge
 
 kramdown:
+  input: GFM
   math_engine: mathjax
-  syntax_highlighter: rouge
+  syntax_highlighter: rouge 
   auto_ids: true
+  syntax_highlighter_opts: 
+   line_numbers: true
+   wrap: true
+
 
 relative_links:
   enabled:     true

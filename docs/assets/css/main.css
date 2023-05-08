@@ -14,3 +14,7 @@
 {
     background-color: #43464c;
 }
+
+pre {
+    max-width: 1024px;;
+}
