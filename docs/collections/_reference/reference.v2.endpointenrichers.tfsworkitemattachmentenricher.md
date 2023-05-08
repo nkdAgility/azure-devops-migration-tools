@@ -35,6 +35,8 @@ options:
   defaultValue: missng XML code comments
 status: missng XML code comments
 processingTarget: WorkItem
+classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/EndpointEnrichers/TfsWorkItemAttachmentEnricher.cs
+optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/EndpointEnrichers/TfsWorkItemAttachmentEnricherOptions.cs
 
 redirectFrom: []
 layout: reference
@@ -44,7 +46,14 @@ title: TfsWorkItemAttachmentEnricher
 categories:
 - EndpointEnrichers
 - v2
-notes: ''
-introduction: ''
+topics:
+- topic: notes
+  path: ../../../../../docs/Reference/v2/EndpointEnrichers/TfsWorkItemAttachmentEnricher-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: ../../../../../docs/Reference/v2/EndpointEnrichers/TfsWorkItemAttachmentEnricher-introduction.md
+  exists: false
+  markdown: ''
 
 ---

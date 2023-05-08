@@ -9,6 +9,8 @@ architecture: v1
 options: []
 status: alpha
 processingTarget: Shared Queries
+classFile: /src/VstsSyncMigrator.Core/Execution/ProcessingContext/CreateTeamFolders.cs
+optionsClassFile: 
 
 redirectFrom: []
 layout: reference
@@ -18,7 +20,14 @@ title: CreateTeamFolders
 categories:
 - Processors
 - v1
-notes: ''
-introduction: ''
+topics:
+- topic: notes
+  path: ../../../../../docs/Reference/v1/Processors/CreateTeamFolders-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: ../../../../../docs/Reference/v1/Processors/CreateTeamFolders-introduction.md
+  exists: false
+  markdown: ''
 
 ---

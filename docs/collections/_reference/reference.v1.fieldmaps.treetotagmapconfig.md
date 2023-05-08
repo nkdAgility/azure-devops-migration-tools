@@ -31,6 +31,8 @@ options:
   defaultValue: missng XML code comments
 status: ready
 processingTarget: Work Item Field
+classFile: /src/MigrationTools/_EngineV1/Configuration/FieldMap/TreeToTagMapConfig.cs
+optionsClassFile: /src/MigrationTools/_EngineV1/Configuration/FieldMap/TreeToTagMapConfig.cs
 
 redirectFrom: []
 layout: reference
@@ -40,7 +42,14 @@ title: TreeToTagMapConfig
 categories:
 - FieldMaps
 - v1
-notes: ''
-introduction: ''
+topics:
+- topic: notes
+  path: ../../../../../docs/Reference/v1/FieldMaps/TreeToTagMapConfig-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: ../../../../../docs/Reference/v1/FieldMaps/TreeToTagMapConfig-introduction.md
+  exists: false
+  markdown: ''
 
 ---

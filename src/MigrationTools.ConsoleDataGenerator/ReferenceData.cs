@@ -46,6 +46,8 @@ namespace MigrationTools.ConsoleDataGenerator.ReferenceData
         public List<OptionsItem> Options { get;  set; }
         public string Status { get; internal set; }
         public string ProcessingTarget { get; internal set; }
+        public string ClassFile { get; internal set; }
+        public string OptionsClassFile { get; internal set; }
     }
 
     public class JekyllData
@@ -56,13 +58,12 @@ namespace MigrationTools.ConsoleDataGenerator.ReferenceData
         public string Permalink { get;  set; }
         public string title { get; internal set; }
         public List<string> categories { get; internal set; }
-        public string notes { get; internal set; }
-        public string introduction { get; internal set; }
-
+        public List<MarkdownInfo> Topics { get; internal set; }
         public JekyllData()
         {
             Redirect_from = new List<string>();
             categories = new List<string>();
+            Topics = new List<MarkdownInfo>();  
         }
        
     }

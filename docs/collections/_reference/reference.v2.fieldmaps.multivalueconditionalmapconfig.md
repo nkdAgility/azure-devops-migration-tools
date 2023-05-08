@@ -37,6 +37,8 @@ options:
   defaultValue: missng XML code comments
 status: ready
 processingTarget: Work Item Field
+classFile: /src/MigrationTools/_EngineV1/Configuration/FieldMap/MultiValueConditionalMapConfig.cs
+optionsClassFile: /src/MigrationTools/_EngineV1/Configuration/FieldMap/MultiValueConditionalMapConfig.cs
 
 redirectFrom: []
 layout: reference
@@ -46,7 +48,14 @@ title: MultiValueConditionalMapConfig
 categories:
 - FieldMaps
 - v2
-notes: ''
-introduction: ''
+topics:
+- topic: notes
+  path: ../../../../../docs/Reference/v2/FieldMaps/MultiValueConditionalMapConfig-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: ../../../../../docs/Reference/v2/FieldMaps/MultiValueConditionalMapConfig-introduction.md
+  exists: false
+  markdown: ''
 
 ---

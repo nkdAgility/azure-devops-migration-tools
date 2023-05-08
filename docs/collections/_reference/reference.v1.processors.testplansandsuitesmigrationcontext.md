@@ -76,6 +76,8 @@ options:
   defaultValue: false
 status: Beta
 processingTarget: Suites & Plans
+classFile: /src/VstsSyncMigrator.Core/Execution/MigrationContext/TestPlansAndSuitesMigrationContext.cs
+optionsClassFile: /src/MigrationTools/_EngineV1/Configuration/Processing/TestPlansAndSuitesMigrationConfig.cs
 
 redirectFrom: []
 layout: reference
@@ -85,55 +87,62 @@ title: TestPlansAndSuitesMigrationContext
 categories:
 - Processors
 - v1
-notes: >2-
+topics:
+- topic: notes
+  path: ../../../../../docs/Reference/v1/Processors/TestPlansAndSuitesMigrationContext-notes.md
+  exists: true
+  markdown: >2-
 
-  ## Additional Samples & Info
-
-
-  To run a full plans and suits you should run the three processors in this order below.  `TestVariablesMigrationConfig` and `TestConfigurationsMigrationConfig` only need run once.
-
-
-  ```json
-
-  "Processors": [
-      {
-        "$type": "TestVariablesMigrationConfig",
-        "Enabled": false
-      },
-      {
-        "$type": "TestConfigurationsMigrationConfig",
-        "Enabled": true
-      },
-      {
-        "$type": "TestPlansAndSuitesMigrationConfig",
-        "Enabled": true,
-        "PrefixProjectToNodes": false,
-        "OnlyElementsWithTag": null,
-        "TestPlanQueryBit": null,
-        "RemoveAllLinks": false,
-        "MigrationDelay": 0,
-        "UseCommonNodeStructureEnricherConfig": false,
-        "NodeBasePaths": [],
-        "AreaMaps": null,
-        "IterationMaps": null,
-        "RemoveInvalidTestSuiteLinks": false,
-        "FilterCompleted": false
-      }
-  ]
-
-  ```
-
-  ## Known working TestPlanQueryBit filter fields names
+    ## Additional Samples & Info
 
 
-  `AreaPath`, `PlanName` and `PlanState`
+    To run a full plans and suits you should run the three processors in this order below.  `TestVariablesMigrationConfig` and `TestConfigurationsMigrationConfig` only need run once.
 
 
-  ```json
+    ```json
 
-  "TestPlanQueryBit": "PlanName = 'ABC'"
+    "Processors": [
+        {
+          "$type": "TestVariablesMigrationConfig",
+          "Enabled": false
+        },
+        {
+          "$type": "TestConfigurationsMigrationConfig",
+          "Enabled": true
+        },
+        {
+          "$type": "TestPlansAndSuitesMigrationConfig",
+          "Enabled": true,
+          "PrefixProjectToNodes": false,
+          "OnlyElementsWithTag": null,
+          "TestPlanQueryBit": null,
+          "RemoveAllLinks": false,
+          "MigrationDelay": 0,
+          "UseCommonNodeStructureEnricherConfig": false,
+          "NodeBasePaths": [],
+          "AreaMaps": null,
+          "IterationMaps": null,
+          "RemoveInvalidTestSuiteLinks": false,
+          "FilterCompleted": false
+        }
+    ]
 
-  ```
-introduction: ''
+    ```
+
+    ## Known working TestPlanQueryBit filter fields names
+
+
+    `AreaPath`, `PlanName` and `PlanState`
+
+
+    ```json
+
+    "TestPlanQueryBit": "PlanName = 'ABC'"
+
+    ```
+- topic: introduction
+  path: ../../../../../docs/Reference/v1/Processors/TestPlansAndSuitesMigrationContext-introduction.md
+  exists: false
+  markdown: ''
 
 ---

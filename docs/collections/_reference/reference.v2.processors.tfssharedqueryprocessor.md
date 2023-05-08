@@ -55,6 +55,8 @@ options:
   defaultValue: missng XML code comments
 status: Beta
 processingTarget: Queries
+classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/TfsSharedQueryProcessor.cs
+optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/TfsSharedQueryProcessorOptions.cs
 
 redirectFrom: []
 layout: reference
@@ -64,7 +66,14 @@ title: TfsSharedQueryProcessor
 categories:
 - Processors
 - v2
-notes: ''
-introduction: ''
+topics:
+- topic: notes
+  path: ../../../../../docs/Reference/v2/Processors/TfsSharedQueryProcessor-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: ../../../../../docs/Reference/v2/Processors/TfsSharedQueryProcessor-introduction.md
+  exists: false
+  markdown: ''
 
 ---

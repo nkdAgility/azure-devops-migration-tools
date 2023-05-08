@@ -36,6 +36,8 @@ options:
   defaultValue: missng XML code comments
 status: missng XML code comments
 processingTarget: missng XML code comments
+classFile: /src/VstsSyncMigrator.Core/Execution/ProcessingContext/FixGitCommitLinks.cs
+optionsClassFile: /src/MigrationTools/_EngineV1/Configuration/Processing/FixGitCommitLinksConfig.cs
 
 redirectFrom: []
 layout: reference
@@ -45,7 +47,14 @@ title: FixGitCommitLinks
 categories:
 - Processors
 - v1
-notes: ''
-introduction: ''
+topics:
+- topic: notes
+  path: ../../../../../docs/Reference/v1/Processors/FixGitCommitLinks-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: ../../../../../docs/Reference/v1/Processors/FixGitCommitLinks-introduction.md
+  exists: false
+  markdown: ''
 
 ---

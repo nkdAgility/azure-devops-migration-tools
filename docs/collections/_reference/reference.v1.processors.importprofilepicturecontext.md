@@ -21,6 +21,8 @@ options:
   defaultValue: missng XML code comments
 status: alpha
 processingTarget: Profiles
+classFile: /src/VstsSyncMigrator.Core/Execution/ProcessingContext/ImportProfilePictureContext.cs
+optionsClassFile: /src/MigrationTools/_EngineV1/Configuration/Processing/ImportProfilePictureConfig.cs
 
 redirectFrom: []
 layout: reference
@@ -30,7 +32,14 @@ title: ImportProfilePictureContext
 categories:
 - Processors
 - v1
-notes: ''
-introduction: ''
+topics:
+- topic: notes
+  path: ../../../../../docs/Reference/v1/Processors/ImportProfilePictureContext-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: ../../../../../docs/Reference/v1/Processors/ImportProfilePictureContext-introduction.md
+  exists: false
+  markdown: ''
 
 ---

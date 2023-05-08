@@ -31,6 +31,8 @@ options:
   defaultValue: missng XML code comments
 status: ready
 processingTarget: Work Item Field
+classFile: /src/MigrationTools/_EngineV1/Configuration/FieldMap/FieldLiteralMapConfig.cs
+optionsClassFile: /src/MigrationTools/_EngineV1/Configuration/FieldMap/FieldLiteralMapConfig.cs
 
 redirectFrom: []
 layout: reference
@@ -40,7 +42,14 @@ title: FieldLiteralMapConfig
 categories:
 - FieldMaps
 - v2
-notes: ''
-introduction: ''
+topics:
+- topic: notes
+  path: ../../../../../docs/Reference/v2/FieldMaps/FieldLiteralMapConfig-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: ../../../../../docs/Reference/v2/FieldMaps/FieldLiteralMapConfig-introduction.md
+  exists: false
+  markdown: ''
 
 ---

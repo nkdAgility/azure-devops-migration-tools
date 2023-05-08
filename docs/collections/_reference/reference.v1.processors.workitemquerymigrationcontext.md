@@ -36,6 +36,8 @@ options:
   defaultValue: none
 status: preview
 processingTarget: Shared Queries
+classFile: /src/VstsSyncMigrator.Core/Execution/MigrationContext/WorkItemQueryMigrationContext.cs
+optionsClassFile: /src/MigrationTools/_EngineV1/Configuration/Processing/WorkItemQueryMigrationConfig.cs
 
 redirectFrom: []
 layout: reference
@@ -45,7 +47,14 @@ title: WorkItemQueryMigrationContext
 categories:
 - Processors
 - v1
-notes: ''
-introduction: ''
+topics:
+- topic: notes
+  path: ../../../../../docs/Reference/v1/Processors/WorkItemQueryMigrationContext-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: ../../../../../docs/Reference/v1/Processors/WorkItemQueryMigrationContext-introduction.md
+  exists: false
+  markdown: ''
 
 ---

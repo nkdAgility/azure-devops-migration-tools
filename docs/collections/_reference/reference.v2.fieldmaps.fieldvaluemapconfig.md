@@ -47,6 +47,8 @@ options:
   defaultValue: missng XML code comments
 status: ready
 processingTarget: Work Item Field
+classFile: /src/MigrationTools/_EngineV1/Configuration/FieldMap/FieldValueMapConfig.cs
+optionsClassFile: /src/MigrationTools/_EngineV1/Configuration/FieldMap/FieldValueMapConfig.cs
 
 redirectFrom: []
 layout: reference
@@ -56,7 +58,14 @@ title: FieldValueMapConfig
 categories:
 - FieldMaps
 - v2
-notes: ''
-introduction: ''
+topics:
+- topic: notes
+  path: ../../../../../docs/Reference/v2/FieldMaps/FieldValueMapConfig-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: ../../../../../docs/Reference/v2/FieldMaps/FieldValueMapConfig-introduction.md
+  exists: false
+  markdown: ''
 
 ---

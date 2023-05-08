@@ -26,6 +26,8 @@ options:
   defaultValue: missng XML code comments
 status: ready
 processingTarget: Work Item
+classFile: /src/MigrationTools/_EngineV1/Configuration/FieldMap/FieldSkipMapConfig.cs
+optionsClassFile: /src/MigrationTools/_EngineV1/Configuration/FieldMap/FieldSkipMapConfig.cs
 
 redirectFrom: []
 layout: reference
@@ -35,7 +37,14 @@ title: FieldSkipMapConfig
 categories:
 - FieldMaps
 - v1
-notes: ''
-introduction: ''
+topics:
+- topic: notes
+  path: ../../../../../docs/Reference/v1/FieldMaps/FieldSkipMapConfig-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: ../../../../../docs/Reference/v1/FieldMaps/FieldSkipMapConfig-introduction.md
+  exists: false
+  markdown: ''
 
 ---

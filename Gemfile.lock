@@ -78,6 +78,7 @@ GEM
       forwardable-extended (~> 2.6)
     posix-spawn (0.3.15)
     public_suffix (5.0.1)
+    pygments.rb (2.4.0)
     racc (1.6.2)
     rb-fsevent (0.11.2)
     rb-inotify (0.10.1)
@@ -109,6 +110,9 @@ DEPENDENCIES
   jekyll-sitemap
   jekyll-time-to-read
   jekyll-toc
+  kramdown
+  pygments.rb
+  rouge
 
 BUNDLED WITH
    2.4.10

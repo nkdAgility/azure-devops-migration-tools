@@ -65,6 +65,8 @@ options:
   defaultValue: false
 status: Beta
 processingTarget: Teams
+classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/TfsTeamSettingsProcessor.cs
+optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/TfsTeamSettingsProcessorOptions.cs
 
 redirectFrom: []
 layout: reference
@@ -74,7 +76,14 @@ title: TfsTeamSettingsProcessor
 categories:
 - Processors
 - v2
-notes: ''
-introduction: ''
+topics:
+- topic: notes
+  path: ../../../../../docs/Reference/v2/Processors/TfsTeamSettingsProcessor-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: ../../../../../docs/Reference/v2/Processors/TfsTeamSettingsProcessor-introduction.md
+  exists: false
+  markdown: ''
 
 ---

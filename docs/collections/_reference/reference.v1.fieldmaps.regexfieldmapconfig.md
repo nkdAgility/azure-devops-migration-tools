@@ -41,6 +41,8 @@ options:
   defaultValue: missng XML code comments
 status: ready
 processingTarget: Work Item Field
+classFile: /src/MigrationTools/_EngineV1/Configuration/FieldMap/RegexFieldMapConfig.cs
+optionsClassFile: /src/MigrationTools/_EngineV1/Configuration/FieldMap/RegexFieldMapConfig.cs
 
 redirectFrom: []
 layout: reference
@@ -50,7 +52,14 @@ title: RegexFieldMapConfig
 categories:
 - FieldMaps
 - v1
-notes: ''
-introduction: ''
+topics:
+- topic: notes
+  path: ../../../../../docs/Reference/v1/FieldMaps/RegexFieldMapConfig-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: ../../../../../docs/Reference/v1/FieldMaps/RegexFieldMapConfig-introduction.md
+  exists: false
+  markdown: ''
 
 ---

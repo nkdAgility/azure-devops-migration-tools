@@ -36,6 +36,8 @@ options:
   defaultValue: false
 status: preview
 processingTarget: Teams
+classFile: /src/VstsSyncMigrator.Core/Execution/MigrationContext/TeamMigrationContext.cs
+optionsClassFile: /src/MigrationTools/_EngineV1/Configuration/Processing/TeamMigrationConfig.cs
 
 redirectFrom: []
 layout: reference
@@ -45,7 +47,14 @@ title: TeamMigrationContext
 categories:
 - Processors
 - v1
-notes: ''
-introduction: ''
+topics:
+- topic: notes
+  path: ../../../../../docs/Reference/v1/Processors/TeamMigrationContext-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: ../../../../../docs/Reference/v1/Processors/TeamMigrationContext-introduction.md
+  exists: false
+  markdown: ''
 
 ---

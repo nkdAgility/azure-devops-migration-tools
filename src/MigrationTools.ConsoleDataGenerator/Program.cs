@@ -23,6 +23,7 @@ class Program
     private static DataSerialization saveData = new DataSerialization("../../../../../docs/_data/");
     private static CodeDocumentation codeDocs = new CodeDocumentation("../../../../../docs/Reference/Generated/");
     private static ClassDataLoader cdLoader = new ClassDataLoader(saveData);
+    private static MarkdownLoader mdLoader = new MarkdownLoader();
 
     static void Main(string[] args)
     {
@@ -94,8 +95,8 @@ class Program
         data.title = classData.ClassName;
         data.categories.Add(classData.TypeName);
         data.categories.Add(classData.Architecture);
-        data.notes = LoadMarkdown(classData, "notes");
-        data.introduction = LoadMarkdown(classData, "introduction");
+        data.Topics.Add(mdLoader.GetMarkdownForTopic(classData, "notes"));
+        data.Topics.Add(mdLoader.GetMarkdownForTopic(classData, "introduction"));
         string posibleOldUrl = $"/Reference/{classData.Architecture}/{classData.TypeName}/{classData.OptionsClassName}/";
         if (posibleOldUrl != data.Permalink)
         {
@@ -104,25 +105,7 @@ class Program
         return data;
     }
 
-    private static string LoadMarkdown(ClassData classData, string topic)
-    {
-        string notesLocation = "../../../../../docs/Reference/";
-        string noteFile = System.IO.Path.Combine(notesLocation, $"{classData.Architecture}/{classData.TypeName}/{classData.ClassName}-{topic}.md");
-        string notes = "";
-// Console.WriteLine(noteFile);
-        if (System.IO.File.Exists(noteFile))
-        {
-            notes = System.IO.File.ReadAllText(noteFile);
-            Console.Write($"[{topic} ]");
-
-        } else
-        {
-            Console.WriteLine($"[{topic} missing]");
-        }
-        return notes;
-    }
-
-  
+ 
 
 
 }

@@ -56,6 +56,8 @@ options:
   defaultValue: '[]'
 status: missng XML code comments
 processingTarget: WorkItem
+classFile: /src/VstsSyncMigrator.Core/Execution/ProcessingContext/WorkItemUpdate.cs
+optionsClassFile: /src/MigrationTools/_EngineV1/Configuration/Processing/WorkItemUpdateConfig.cs
 
 redirectFrom: []
 layout: reference
@@ -65,7 +67,14 @@ title: WorkItemUpdate
 categories:
 - Processors
 - v1
-notes: ''
-introduction: ''
+topics:
+- topic: notes
+  path: ../../../../../docs/Reference/v1/Processors/WorkItemUpdate-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: ../../../../../docs/Reference/v1/Processors/WorkItemUpdate-introduction.md
+  exists: false
+  markdown: ''
 
 ---

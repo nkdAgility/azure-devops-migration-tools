@@ -32,9 +32,10 @@ The model should also work for other data `Teams`, `SharedQueries`, `PlansAndSui
 
 This config is for reference only. It has things configured that you will not need, and that may conflict with each other.
 
-```JSON
+{% highlight JSON %}
 {% include sampleConfig/configuration-Fullv2.json %}
-```
+{% endhighlight %}
+
 
 ### What was added here
 

@@ -51,6 +51,8 @@ options:
   defaultValue: '[]'
 status: preview
 processingTarget: Work Items
+classFile: /src/VstsSyncMigrator.Core/Execution/MigrationContext/WorkItemPostProcessingContext.cs
+optionsClassFile: /src/MigrationTools/_EngineV1/Configuration/Processing/WorkItemPostProcessingConfig.cs
 
 redirectFrom: []
 layout: reference
@@ -60,7 +62,14 @@ title: WorkItemPostProcessingContext
 categories:
 - Processors
 - v1
-notes: ''
-introduction: ''
+topics:
+- topic: notes
+  path: ../../../../../docs/Reference/v1/Processors/WorkItemPostProcessingContext-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: ../../../../../docs/Reference/v1/Processors/WorkItemPostProcessingContext-introduction.md
+  exists: false
+  markdown: ''
 
 ---

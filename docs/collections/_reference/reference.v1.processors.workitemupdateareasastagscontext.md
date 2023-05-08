@@ -26,6 +26,8 @@ options:
   defaultValue: missng XML code comments
 status: Beta
 processingTarget: Work Item
+classFile: /src/VstsSyncMigrator.Core/Execution/ProcessingContext/WorkItemUpdateAreasAsTagsContext.cs
+optionsClassFile: /src/MigrationTools/_EngineV1/Configuration/Processing/WorkItemUpdateAreasAsTagsConfig.cs
 
 redirectFrom: []
 layout: reference
@@ -35,7 +37,14 @@ title: WorkItemUpdateAreasAsTagsContext
 categories:
 - Processors
 - v1
-notes: ''
-introduction: ''
+topics:
+- topic: notes
+  path: ../../../../../docs/Reference/v1/Processors/WorkItemUpdateAreasAsTagsContext-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: ../../../../../docs/Reference/v1/Processors/WorkItemUpdateAreasAsTagsContext-introduction.md
+  exists: false
+  markdown: ''
 
 ---

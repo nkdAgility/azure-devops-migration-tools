@@ -21,6 +21,8 @@ options:
   defaultValue: missng XML code comments
 status: Beta
 processingTarget: Suites & Plans
+classFile: /src/VstsSyncMigrator.Core/Execution/MigrationContext/TestVariablesMigrationContext.cs
+optionsClassFile: /src/MigrationTools/_EngineV1/Configuration/Processing/TestVariablesMigrationConfig.cs
 
 redirectFrom: []
 layout: reference
@@ -30,7 +32,14 @@ title: TestVariablesMigrationContext
 categories:
 - Processors
 - v1
-notes: ''
-introduction: ''
+topics:
+- topic: notes
+  path: ../../../../../docs/Reference/v1/Processors/TestVariablesMigrationContext-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: ../../../../../docs/Reference/v1/Processors/TestVariablesMigrationContext-introduction.md
+  exists: false
+  markdown: ''
 
 ---

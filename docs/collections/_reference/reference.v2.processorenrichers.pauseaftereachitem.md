@@ -25,6 +25,8 @@ options:
   defaultValue: missng XML code comments
 status: missng XML code comments
 processingTarget: missng XML code comments
+classFile: /src/MigrationTools/ProcessorEnrichers/PauseAfterEachItem.cs
+optionsClassFile: /src/MigrationTools/ProcessorEnrichers/PauseAfterEachItemOptions.cs
 
 redirectFrom: []
 layout: reference
@@ -34,7 +36,14 @@ title: PauseAfterEachItem
 categories:
 - ProcessorEnrichers
 - v2
-notes: ''
-introduction: ''
+topics:
+- topic: notes
+  path: ../../../../../docs/Reference/v2/ProcessorEnrichers/PauseAfterEachItem-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: ../../../../../docs/Reference/v2/ProcessorEnrichers/PauseAfterEachItem-introduction.md
+  exists: false
+  markdown: ''
 
 ---
