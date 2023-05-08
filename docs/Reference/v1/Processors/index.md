@@ -1,7 +1,6 @@
 ---
 title: Processors
 layout: page
-template: index-template.md
 pageType: index
 toc: true
 pageStatus: published
