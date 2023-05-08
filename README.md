@@ -2,7 +2,6 @@
 
 The Azure DevOps Migration Tools allow you to bulk edit and migrate data between Team Projects on both Microsoft Team Foundation Server (TFS) and Azure DevOps Services. Take a look at the  [documentation](https://nkdagility.com/docs/azure-devops-migration-tools/) to find out how. This project is published as [code on GitHub](https://github.com/nkdAgility/azure-devops-migration-tools/) as well as a [Azure DevOps Migration Tools on Chocolatey](https://chocolatey.org/packages/vsts-sync-migrator/).
 
-
 **Ask Questions on Github: https://github.com/nkdAgility/azure-devops-migration-tools/discussions**
 
 ## Some Data from the last 30 days (as of 06/04/2023)
@@ -18,7 +17,6 @@ The Azure DevOps Migration Tools allow you to bulk edit and migrate data between
 | Test Cases Mapped | **800k** | Total test cases mapped into Suits |
 | Migration Run Ave  | **14 minutes** | Includes dry-runs as well.  |
 | Migration Run Total   |  **19bn Seconds** | Thats **316m hours** or **13m days** of run time in the last 30 days. |
-
 
 
 ## What can you do with this tool?
@@ -53,9 +51,9 @@ The Azure DevOps Migration Tools allow you to bulk edit and migrate data between
 
  - [Video Overview](https://www.youtube.com/watch?v=RCJsST0xBCE)
  - [Getting Started](https://nkdagility.com/learn/azure-devops-migration-tools/getting-started.html)
- - [Documentation](https://nkdagility.com/docs/azure-devops-migration-tools/)
+ - [Documentation](https://nkdagility.com/learn/azure-devops-migration-tools/)
  - [Questions on Usage](https://github.com/nkdAgility/azure-devops-migration-tools/discussions)
- - [Bugs and New Features](https://github.com/nkdAgility/azure-devops-migration-tools)
+ - [Bugs](https://github.com/nkdAgility/azure-devops-migration-tools)
 
 ## Support
 
@@ -74,6 +72,7 @@ We use these tools with our customers, and for fun, to do real world migrations 
 
 ## Change Log
 
+- 13.0 - Update to .net 7.0 with all dependancies. Focus on documentation improvements to support future updates.
 - 12.1 - Make embedded images regex lazy
 - 12.1 - Added a stop when there are area or iteration nodes in the source history that are not in the target. This causes missing of data. System will now list the areas and iteration that are missing, and then stop. You can decide to add them manually, or add a field mapping.
 - v11.11 - Refactored revision manager to have more tests and support limiting the number of revisions. CollapseRevisions has been replaced by setting MaxRevisions to 1 and setting AttachRevisionHistory to true; MaxRevisions sets the maximum number of revisions that will be migrated. "First + Last*N = Max". If this was set to 5 and there were 10 revisions you would get the first 1 (creation) and the latest 4 migrated. This is done after all of the existing revisions are created but before anything newer that target is removed.
