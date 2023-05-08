@@ -231,8 +231,16 @@ namespace MigrationTools.Enrichers
             throw new NotImplementedException();
         }
 
+        private int _DummyWorkItemCount = 0;
+
         private WorkItem GetDummyWorkItem(WorkItemType type = null)
         {
+            if (_DummyWorkItemCount > 900)
+            {
+                Log.LogDebug("EmbededImagesRepairEnricher: Dummy workitem {id} is neering capacity. Creating a new one!", _targetDummyWorkItem.Id);
+                _targetDummyWorkItem = null;
+                _DummyWorkItemCount = 0;
+            }
             if (_targetDummyWorkItem == null)
             {
                 if (_targetProject.WorkItemTypes.Count == 0) return null;
@@ -252,6 +260,7 @@ namespace MigrationTools.Enrichers
                 Log.LogDebug("EmbededImagesRepairEnricher: Dummy workitem {id} created on the target collection.", _targetDummyWorkItem.Id);
                 //_targetProject.Store.DestroyWorkItems(new List<int> { _targetDummyWorkItem.Id });
             }
+            _DummyWorkItemCount ++;
             return _targetDummyWorkItem;
         }
     }
