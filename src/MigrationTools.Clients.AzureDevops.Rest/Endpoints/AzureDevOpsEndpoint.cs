@@ -148,6 +148,10 @@ namespace MigrationTools.Endpoints
                     builder.Query = "api-version=5.1";
                 }
             }
+            else if (apiNameAttribute.Name == "Service Connections")
+            {
+                builder.Query = "api-version=5.1";
+            }
             else
             {
                 builder.Query = "api-version=6.0";
