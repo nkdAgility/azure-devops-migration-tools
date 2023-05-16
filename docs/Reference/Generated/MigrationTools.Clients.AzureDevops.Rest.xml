@@ -175,7 +175,7 @@
             <param name="targetDefinitions"></param>
             <returns>List of filtered Definitions</returns>
         </member>
-        <member name="M:MigrationTools.Processors.AzureDevOpsPipelineProcessor.FilterOutIncompatibleBuildDefinitions(System.Collections.Generic.IEnumerable{MigrationTools.DataContracts.Pipelines.BuildDefinition},System.Collections.Generic.IEnumerable{MigrationTools.DataContracts.Pipelines.TaskDefinition})">
+        <member name="M:MigrationTools.Processors.AzureDevOpsPipelineProcessor.FilterOutIncompatibleBuildDefinitions(System.Collections.Generic.IEnumerable{MigrationTools.DataContracts.Pipelines.BuildDefinition},System.Collections.Generic.IEnumerable{MigrationTools.DataContracts.Pipelines.TaskDefinition},System.Collections.Generic.IEnumerable{MigrationTools.DataContracts.Mapping})">
             <summary>
             Filter incompatible TaskGroups
             </summary>

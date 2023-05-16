@@ -92,7 +92,7 @@ namespace MigrationTools.Processors
             }
             if (_Options.MigrateBuildPipelines)
             {
-                await CreateBuildPipelinesAsync(taskGroupMappings, variableGroupMappings);
+                await CreateBuildPipelinesAsync(taskGroupMappings, variableGroupMappings, serviceConnectionMappings);
             }
 
             if (_Options.MigrateReleasePipelines)
@@ -162,14 +162,14 @@ namespace MigrationTools.Processors
         /// <param name="filteredTaskGroups"></param>
         /// <param name="availableTasks"></param>
         /// <returns>List of filtered Definitions</returns>
-        private IEnumerable<BuildDefinition> FilterOutIncompatibleBuildDefinitions(IEnumerable<BuildDefinition> sourceDefinitions, IEnumerable<TaskDefinition> availableTasks)
+        private IEnumerable<BuildDefinition> FilterOutIncompatibleBuildDefinitions(IEnumerable<BuildDefinition> sourceDefinitions, IEnumerable<TaskDefinition> availableTasks, IEnumerable<Mapping> taskGroupMapping)
         {
             var objectsToMigrate = sourceDefinitions.Where(g =>
             {
                 var missingTasksNames = new List<string>();
                 var allTasksAreAvailable = g.Process.Phases.Select(p => p.Steps).SelectMany(s => s).All(t =>
                 {
-                    if (availableTasks.Any(a => a.Id == t.Task.Id))
+                    if (availableTasks.Any(a => a.Id == t.Task.Id) || taskGroupMapping.Any(m => m.SourceId == t.Task.Id))
                     {
                         return true;
                     }
@@ -285,7 +285,7 @@ namespace MigrationTools.Processors
                 .ToList();
         }
 
-        private async Task<IEnumerable<Mapping>> CreateBuildPipelinesAsync(IEnumerable<Mapping> TaskGroupMapping = null, IEnumerable<Mapping> VariableGroupMapping = null)
+        private async Task<IEnumerable<Mapping>> CreateBuildPipelinesAsync(IEnumerable<Mapping> TaskGroupMapping = null, IEnumerable<Mapping> VariableGroupMapping = null, IEnumerable<Mapping> serviceConnectionMappings = null)
         {
             Log.LogInformation("Processing Build Pipelines..");
 
@@ -297,7 +297,7 @@ namespace MigrationTools.Processors
             var sourceRepositories = await Source.GetApiDefinitionsAsync<GitRepository>(queryForDetails: false);
             var targetRepositories = await Target.GetApiDefinitionsAsync<GitRepository>(queryForDetails: false);
             var definitionsToBeMigrated = FilterOutExistingDefinitions(sourceDefinitions, targetDefinitions);
-            definitionsToBeMigrated = FilterOutIncompatibleBuildDefinitions(definitionsToBeMigrated, availableTasks).ToList();
+            definitionsToBeMigrated = FilterOutIncompatibleBuildDefinitions(definitionsToBeMigrated, availableTasks, TaskGroupMapping).ToList();
             definitionsToBeMigrated = FilterAwayIfAnyMapsAreMissing(definitionsToBeMigrated, TaskGroupMapping, VariableGroupMapping);
 
             // Replace taskgroup and variablegroup sIds with tIds
@@ -350,6 +350,31 @@ namespace MigrationTools.Processors
                         else
                         {
                             variableGroup.Id = mapping.TargetId;
+                        }
+                    }
+                }
+
+                if (serviceConnectionMappings is not null)
+                {
+                    foreach (var phase in definitionToBeMigrated.Process.Phases)
+                    {
+                        foreach (var step in phase.Steps)
+                        {
+                            var newInputs = new Dictionary<string, object>();
+                            foreach (var input in (IDictionary<String, Object>)step.Inputs)
+                            {
+                                var mapping = serviceConnectionMappings.FirstOrDefault(d => d.SourceId == input.Value.ToString());
+                                if (mapping != null)
+                                {
+                                    newInputs.Add(input.Key, mapping.TargetId);
+                                }
+                            }
+
+                            foreach (var input in newInputs)
+                            {
+                                ((IDictionary<String, Object>)step.Inputs).Remove(input.Key);
+                                ((IDictionary<String, Object>)step.Inputs).Add(input.Key, input.Value);
+                            }
                         }
                     }
                 }
@@ -611,11 +636,11 @@ namespace MigrationTools.Processors
 
             var mappings = await Target.CreateApiDefinitionsAsync(rootSourceDefinitions);
 
-            targetDefinitions = await Target.GetApiDefinitionsAsync<TaskGroup>();
+            targetDefinitions = await Target.GetApiDefinitionsAsync<TaskGroup>(queryForDetails: false);
             var rootTargetDefinitions = SortDefinitionsByVersion(targetDefinitions).First();
             await Target.UpdateTaskGroupsAsync(targetDefinitions, rootTargetDefinitions, updatedSourceDefinitions);
 
-            targetDefinitions = await Target.GetApiDefinitionsAsync<TaskGroup>();
+            targetDefinitions = await Target.GetApiDefinitionsAsync<TaskGroup>(queryForDetails: false);
             mappings.AddRange(FindExistingMappings(sourceDefinitions, targetDefinitions.Where(d => d.Name != null), mappings));
             return mappings;
         }
