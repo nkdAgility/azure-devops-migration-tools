@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Proxy;
 using MigrationTools._EngineV1.Enrichers;
@@ -61,7 +62,7 @@ namespace MigrationTools.Enrichers
                     Log.Debug("AttachmentMigrationEnricher: Exported {Filename} to disk", System.IO.Path.GetFileName(filepath));
                     if (filepath != null)
                     {
-                        ImportAttachemnt(target.ToWorkItem(), wia, filepath, save);
+                        ImportAttachment(target.ToWorkItem(), wia, filepath, save);
                         Log.Debug("AttachmentMigrationEnricher: Imported {Filename} from disk", System.IO.Path.GetFileName(filepath));
                     }
                 }
@@ -122,17 +123,31 @@ namespace MigrationTools.Enrichers
             return fpath;
         }
 
-        private void ImportAttachemnt(WorkItem targetWorkItem, Attachment wia, string filepath, bool save = true)
+        private void ImportAttachment(WorkItem targetWorkItem, Attachment wia, string filepath, bool save = true)
         {
             var filename = System.IO.Path.GetFileName(filepath);
             FileInfo fi = new FileInfo(filepath);
             if (_maxAttachmentSize > fi.Length)
             {
+                string originalId = "[originalId:" + wia.Id + "]";
                 var attachments = targetWorkItem.Attachments.Cast<Attachment>();
-                var attachment = attachments.Where(a => a.Name == wia.Name && a.Length == wia.Length).FirstOrDefault();
+                var attachment = attachments.Where(a => a.Name == wia.Name && a.Length == wia.Length && a.Comment.Contains(originalId)).FirstOrDefault();
                 if (attachment == null)
                 {
                     Attachment a = new Attachment(filepath);
+                    a.Comment = originalId;
+                    if (wia.Comment != "")
+                    {
+                        string originalComment = wia.Comment;
+                        string regexPatternOriginalId = @"(\[originalId:\d+\])";
+                        MatchCollection matches = Regex.Matches(originalComment, regexPatternOriginalId);
+                        foreach (Match match in matches)
+                        {
+                            originalComment = originalComment.Replace(match.Value, "");
+                        }
+                        originalComment = originalComment.Trim();
+                        a.Comment = originalComment + " " + originalId;
+                    }
                     targetWorkItem.Attachments.Add(a);
                 }
                 else
@@ -142,7 +157,7 @@ namespace MigrationTools.Enrichers
             }
             else
             {
-                Log.Warning(" [SKIP] Attachemnt {filename} on Work Item {targetWorkItemId} is bigger than the limit of {maxAttachmentSize} bites for Azure DevOps.", filename, targetWorkItem.Id, _maxAttachmentSize);
+                Log.Warning(" [SKIP] Attachment {filename} on Work Item {targetWorkItemId} is bigger than the limit of {maxAttachmentSize} bites for Azure DevOps.", filename, targetWorkItem.Id, _maxAttachmentSize);
             }
         }
 
