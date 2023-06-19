@@ -103,11 +103,12 @@ namespace MigrationTools.Enrichers
             if (sourceWorkItemLinkStart.Type == "Test Case")
             {
                 MigrateSharedSteps(sourceWorkItemLinkStart, targetWorkItemLinkStart);
+                MigrateSharedParameters(sourceWorkItemLinkStart, targetWorkItemLinkStart);
             }
             return 0;
         }
 
-        private void MigrateSharedSteps(WorkItemData wiSourceL, WorkItemData wiTargetL)
+        public void MigrateSharedSteps(WorkItemData wiSourceL, WorkItemData wiTargetL)
         {
             const string microsoftVstsTcmSteps = "Microsoft.VSTS.TCM.Steps";
             var oldSteps = wiTargetL.ToWorkItem().Fields[microsoftVstsTcmSteps].Value.ToString();
@@ -132,6 +133,38 @@ namespace MigrationTools.Enrichers
                     // DevOps doesn't seem to take impersonation very nicely here - as of 13.05.22 the following line would get you an error:
                     // System.FormatException: The string 'Microsoft.TeamFoundation.WorkItemTracking.Common.ServerDefaultFieldValue' is not a valid AllXsd value.
                     // target.ToWorkItem().Fields["System.ModifiedBy"].Value = "Migration";
+                }
+            }
+
+            if (wiTargetL.ToWorkItem().IsDirty && _save)
+            {
+                wiTargetL.SaveToAzureDevOps();
+            }
+        }
+
+        public void MigrateSharedParameters(WorkItemData wiSourceL, WorkItemData wiTargetL)
+        {
+            const string microsoftVstsTcmLocalDataSource = "Microsoft.VSTS.TCM.LocalDataSource";
+            var oldSteps = wiTargetL.ToWorkItem().Fields[microsoftVstsTcmLocalDataSource].Value.ToString();
+            var newSteps = oldSteps;
+
+            var sourceSharedParametersLinks = wiSourceL.ToWorkItem().Links.OfType<RelatedLink>()
+                .Where(x => x.LinkTypeEnd.ImmutableName == "Microsoft.VSTS.TestCase.SharedParameterReferencedBy-Reverse").ToList();
+            var sourceSharedParameters =
+                sourceSharedParametersLinks.Select(x => Engine.Source.WorkItems.GetWorkItem(x.RelatedWorkItemId.ToString()));
+
+            foreach (WorkItemData sourceSharedParameter in sourceSharedParameters)
+            {
+                WorkItemData matchingTargetSharedParameter =
+                    Engine.Target.WorkItems.FindReflectedWorkItemByReflectedWorkItemId(sourceSharedParameter);
+
+                if (matchingTargetSharedParameter != null)
+                {
+                    newSteps = newSteps.Replace($"sharedParameterDataSetId\":{sourceSharedParameter.Id}",
+                        $"sharedParameterDataSetId\":{matchingTargetSharedParameter.Id}");
+                    newSteps = newSteps.Replace($"sharedParameterDataSetIds\":[{sourceSharedParameter.Id}]",
+                        $"sharedParameterDataSetIds\":[{matchingTargetSharedParameter.Id}]");
+                    wiTargetL.ToWorkItem().Fields[microsoftVstsTcmLocalDataSource].Value = newSteps;
                 }
             }
 
