@@ -220,7 +220,7 @@ namespace MigrationTools.Enrichers
                             startDate, finishDate);
                     }
                 }
-            } while (string.Equals(parentNode.Path, nodePath, StringComparison.InvariantCultureIgnoreCase));
+            } while (!string.Equals(parentNode.Path, nodePath, StringComparison.InvariantCultureIgnoreCase));
 
             return parentNode;
         }
