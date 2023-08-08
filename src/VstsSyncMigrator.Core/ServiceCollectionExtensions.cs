@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using VstsSyncMigrator.Core.Execution.MigrationContext;
 using VstsSyncMigrator.Engine;
 
 namespace MigrationTools
@@ -15,7 +16,8 @@ namespace MigrationTools
             context.AddSingleton<TestPlansAndSuitesMigrationContext>();
             context.AddSingleton<TestVariablesMigrationContext>();
             context.AddSingleton<WorkItemPostProcessingContext>();
-            context.AddSingleton<WorkItemQueryMigrationContext>();
+            context.AddSingleton<WorkItemPostProcessingContext>();
+            context.AddSingleton<ExportUsersForMapping>();
             context.AddSingleton<CreateTeamFolders>();
             context.AddSingleton<ExportProfilePictureFromADContext>();
             context.AddSingleton<ExportTeamList>();

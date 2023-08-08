@@ -136,7 +136,7 @@
             {
               "$type": "TfsWorkItemLinkEnricherOptions",
               "Enabled": true,
-              "LinkMigrationSaveEachAsAdded": true
+              "LinkMigrationSaveEachAsAdded": false
             },
             {
               "$type": "TfsWorkItemCreatedEnricherOptions",
