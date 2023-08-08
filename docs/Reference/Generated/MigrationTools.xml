@@ -217,6 +217,9 @@
         <member name="M:MigrationTools._EngineV1.Configuration.Processing.ExportProfilePictureFromADConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
             <inheritdoc />
         </member>
+        <member name="M:MigrationTools._EngineV1.Configuration.Processing.ExportUsersForMappingConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
+            <inheritdoc />
+        </member>
         <member name="P:MigrationTools._EngineV1.Configuration.Processing.FakeProcessorConfig.Enabled">
             <inheritdoc />
         </member>

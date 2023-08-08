@@ -76,3 +76,10 @@ The default [WorkItemMigrationConfig](/docs/Reference/v1/Processors/WorkItemMigr
 
 Refer to the [Reference Guide](/docs/reference/index.md) for more details.
 
+## Other Configuration Options
+When running `./migration.exe init` you can also pass `--options` with one of the following:
+
+- *Full* - 
+- *WorkItemTracking* - 
+- *Fullv2* - 
+- *WorkItemTrackingv2* - 
