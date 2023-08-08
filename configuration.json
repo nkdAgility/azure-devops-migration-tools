@@ -7,7 +7,7 @@
     "Collection": "https://dev.azure.com/nkdagility-preview/",
     "Project": "migrationSource1",
     "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
-    "AuthenticationMode": "AccessToken",
+    "AuthenticationMode": "Prompt",
     "AllowCrossProjectLinking": false,
     "PersonalAccessToken": "rrsne75npwj5ctn5vm337nrxiqlvdkfmcbkqrubl6ushts6syi5a",
     "LanguageMaps": {
@@ -20,7 +20,7 @@
     "Collection": "https://dev.azure.com/nkdagility-preview/",
     "Project": "migration Target 1",
     "ReflectedWorkItemIDFieldName": "nkdScrum.ReflectedWorkItemId",
-    "AuthenticationMode": "AccessToken",
+    "AuthenticationMode": "Prompt",
     "AllowCrossProjectLinking": false,
     "PersonalAccessToken": "rrsne75npwj5ctn5vm337nrxiqlvdkfmcbkqrubl6ushts6syi5a",
     "LanguageMaps": {
@@ -53,7 +53,7 @@
   "Processors": [
     {
       "$type": "ExportUsersForMappingConfig",
-      "Enabled": false,
+      "Enabled": true,
       "LocalExportJsonFile": "c:\\temp\\ExportUsersForMappingConfig.json",
       "WIQLQuery": "SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan') ORDER BY [System.ChangedDate] desc",
       "IdentityFieldsToCheck": [
