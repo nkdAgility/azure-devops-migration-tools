@@ -72,7 +72,8 @@ We use these tools with our customers, and for fun, to do real world migrations 
 
 ## Change Log
 
-- 13.1 - Added [ExportUsersForMapping](https://nkdagility.com/learn/azure-devops-migration-tools/Reference/v1/Processors/TeamMigrationContext/) to export a json file with a list of users ready for a field mapping.
+- 13.2 - Added [ExportUsersForMapping](https://nkdagility.com/learn/azure-devops-migration-tools/Reference/v1/Processors/TeamMigrationContext/) to export a json file with a list of users ready for a field mapping.
+- 13.1 - Update all NuGet packages to latest version.
 - 13.0 - Update to .net 7.0 with all dependancies. Focus on documentation improvements to support future updates.
 - 12.1 - Make embedded images regex lazy
 - 12.1 - Added a stop when there are area or iteration nodes in the source history that are not in the target. This causes missing of data. System will now list the areas and iteration that are missing, and then stop. You can decide to add them manually, or add a field mapping.

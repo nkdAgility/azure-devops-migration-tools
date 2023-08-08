@@ -613,6 +613,11 @@ namespace VstsSyncMigrator.Engine
                 int fixedLinkCount = gitRepositoryEnricher.Enrich(sourceWorkItem, targetWorkItem);
                 AddMetric("FixedGitLinkCount", processWorkItemMetrics, fixedLinkCount);
             }
+            else if (targetWorkItem != null && sourceWorkItem.ToWorkItem().Links.Count > 0 && sourceWorkItem.Type == "Test Case" )
+            {
+                _workItemLinkEnricher.MigrateSharedSteps(sourceWorkItem, targetWorkItem);
+                _workItemLinkEnricher.MigrateSharedParameters(sourceWorkItem, targetWorkItem);
+            }
         }
 
         private WorkItemData ReplayRevisions(List<RevisionItem> revisionsToMigrate, WorkItemData sourceWorkItem, WorkItemData targetWorkItem)

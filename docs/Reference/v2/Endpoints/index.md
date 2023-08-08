@@ -13,8 +13,8 @@ discussionId:
 
 Azure DevOps Migration Tools provides _endpoints_ for reading and writing `WorkItems`, `PlansAndSuits`, `Teams`, or `Queries`. 
 
-Client  | WriteTo/ReadFrom | Endpoint | Data Target | Description
-----------|-----------|------------
+| Client   | WriteTo/ReadFrom | Endpoint | Data Target | Description |
+|:-:|:-:|:-:|:-:|:-:|
 AzureDevops.ObjectModel | Tfs Object Model | `TfsWorkItemEndPoint` | WorkItems | TBA
 AzureDevops.Rest | Azure DevOps REST | ?
 FileSystem | Local Files | `FileSystemWorkItemEndpoint` | WorkItems | TBA
