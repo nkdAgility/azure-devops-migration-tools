@@ -33,12 +33,12 @@ namespace MigrationTools.Host
                 return null;
             }
 
-            bool SendTelemitery = true;
+            bool sendTelemetry = true;
             if (executeOptions is not null)
             {
                 if (executeOptions.Telemetry is not null)
                 {
-                    SendTelemitery = false;
+                    sendTelemetry = false;
                 }
             }
 
@@ -104,7 +104,7 @@ namespace MigrationTools.Host
 
                  // Application Insights
                 
-                 if (SendTelemitery)
+                 if (sendTelemetry)
                  { 
                     services.AddApplicationInsightsTelemetryWorkerService(new ApplicationInsightsServiceOptions { InstrumentationKey = "2d666f84-b3fb-4dcf-9aad-65de038d2772" });
                  }
