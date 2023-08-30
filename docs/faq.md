@@ -74,3 +74,11 @@ How the `ReflectedWorkItemId` field is added depends on whether the system, ther
 - Azure DevOps Services when the instance has been imported using the [VSTS Migration Tool](https://blogs.msdn.microsoft.com/visualstudioalm/2016/11/16/import-your-tfs-database-into-visual-studio-team-services/)
 
 For details on how to add the field in each case, and trouble shooting check the [server configuration page](server-configuration.md)
+
+## Can I disable the telemetry collected and sent to Application Insights?
+
+Yes! You can turn off telemetry from v13.2 by passing `off` as a value for `--telemetry` on the command line.
+
+```
+migration.exe --config configuration.json --telemetry off
+```
