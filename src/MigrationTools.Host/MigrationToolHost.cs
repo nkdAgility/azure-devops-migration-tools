@@ -33,6 +33,16 @@ namespace MigrationTools.Host
                 return null;
             }
 
+            bool sendTelemetry = true;
+            if (executeOptions is not null)
+            {
+                if (executeOptions.Telemetry is not null)
+                {
+                    sendTelemetry = false;
+                }
+            }
+
+
             var hostBuilder = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args)
              .UseSerilog((hostingContext, services, loggerConfiguration) =>
              {
@@ -93,7 +103,11 @@ namespace MigrationTools.Host
                  });
 
                  // Application Insights
-                 services.AddApplicationInsightsTelemetryWorkerService(new ApplicationInsightsServiceOptions { InstrumentationKey = "2d666f84-b3fb-4dcf-9aad-65de038d2772" });
+                
+                 if (sendTelemetry)
+                 { 
+                    services.AddApplicationInsightsTelemetryWorkerService(new ApplicationInsightsServiceOptions { InstrumentationKey = "2d666f84-b3fb-4dcf-9aad-65de038d2772" });
+                 }
 
                  // Services
                  services.AddTransient<IDetectOnlineService, DetectOnlineService>();

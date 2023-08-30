@@ -25,5 +25,8 @@ namespace MigrationTools.Host.CommandLine
 
         [Option("targetPassword", Required = false, HelpText = "Password used to connect to target TFS instance.")]
         public string TargetPassword { get; set; }
+
+        [Option("telemetry", Required = false, HelpText = "Pass 'off' to turn temimetery off. No data will be colected.")]
+        public string Telemetry { get; set; }
     }
 }
