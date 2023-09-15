@@ -91,7 +91,7 @@ namespace MigrationTools.Host
             var version = Assembly.GetEntryAssembly().GetName().Version;
             _logger.LogInformation("Application Starting");
             AsciiLogo(version);
-            _logger.LogInformation("Telemetry Note: We use Application Insights to collect telemetry on performance & feature usage for the tools to help our developers target features. This data is tied to a session ID that is generated and shown in the logs. This can help with debugging.");
+            _logger.LogInformation("Telemetry Note: We use Application Insights to collect telemetry on performance & feature usage for the tools to help our developers target features. This data is tied to a session ID that is generated and shown in the logs. This can help with debugging. If you want to disable telemitery you can run the tool with '--disableTelemitery true' on the command prompt.");
             _logger.LogInformation("Start Time: {StartTime}", DateTime.Now.ToUniversalTime().ToLocalTime());
             _logger.LogInformation("Running with args: {@Args}", args);
             _logger.LogInformation("OSVersion: {OSVersion}", Environment.OSVersion.ToString());

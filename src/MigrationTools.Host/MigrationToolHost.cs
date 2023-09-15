@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using CommandLine;
 using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.ApplicationInsights.WorkerService;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,17 +33,6 @@ namespace MigrationTools.Host
             {
                 return null;
             }
-
-            bool sendTelemetry = true;
-            if (executeOptions is not null)
-            {
-                if (executeOptions.Telemetry is not null)
-                {
-                    sendTelemetry = false;
-                }
-            }
-
-
             var hostBuilder = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args)
              .UseSerilog((hostingContext, services, loggerConfiguration) =>
              {
@@ -103,12 +93,8 @@ namespace MigrationTools.Host
                  });
 
                  // Application Insights
-                
-                 if (sendTelemetry)
-                 { 
-                    services.AddApplicationInsightsTelemetryWorkerService(new ApplicationInsightsServiceOptions { InstrumentationKey = "2d666f84-b3fb-4dcf-9aad-65de038d2772" });
-                 }
-
+                 services.AddApplicationInsightsTelemetryWorkerService(new ApplicationInsightsServiceOptions { ApplicationVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString(), ConnectionString = "InstrumentationKey=2d666f84-b3fb-4dcf-9aad-65de038d2772" });
+                 
                  // Services
                  services.AddTransient<IDetectOnlineService, DetectOnlineService>();
                  services.AddTransient<IDetectVersionService, DetectVersionService>();
@@ -155,6 +141,8 @@ namespace MigrationTools.Host
                  }
              })
              .UseConsoleLifetime();
+
+
             return hostBuilder;
         }
 
@@ -166,6 +154,23 @@ namespace MigrationTools.Host
             {
                 return;
             }
+
+
+            // Disanle telemitery from options
+            (var initOptions, var executeOptions) = ParseOptions(args);
+            if (initOptions is null && executeOptions is null)
+            {
+                return;
+            }
+            bool DisableTelemetry = false;
+            Serilog.ILogger logger = host.Services.GetService<Serilog.ILogger>();
+            if (bool.TryParse(executeOptions.DisableTelemetry, out DisableTelemetry))
+            {
+                TelemetryConfiguration ai = host.Services.GetService<TelemetryConfiguration>();
+                ai.DisableTelemetry = DisableTelemetry;
+            }
+            logger.Information("Telemetry: {status}", !DisableTelemetry);
+
             await host.RunAsync();
         }
 
