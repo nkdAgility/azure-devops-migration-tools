@@ -95,11 +95,16 @@ namespace MigrationTools.Enrichers
             var mappers = GetMaps(nodeStructureType);
             var lastResortRule = GetLastResortRemappingRule();
 
+            Log.LogDebug("NodeStructureEnricher.GetNewNodeName::Mappers", mappers);
             foreach (var mapper in mappers)
             {
+                Log.LogDebug("NodeStructureEnricher.GetNewNodeName::MapperToRun::{key}", mapper.Key);
                 if (Regex.IsMatch(sourceNodePath, mapper.Key, RegexOptions.IgnoreCase))
                 {
-                    return Regex.Replace(sourceNodePath, mapper.Key, mapper.Value);
+                    Log.LogDebug("NodeStructureEnricher.GetNewNodeName::MapperMatched::{key}", mapper.Key);
+                    string replacement = Regex.Replace(sourceNodePath, mapper.Key, mapper.Value);
+                    Log.LogDebug("NodeStructureEnricher.GetNewNodeName::MapperMatched::{key}::replaceWith({replace})", mapper.Key, replacement);
+                    return replacement;
                 }
             }
 
