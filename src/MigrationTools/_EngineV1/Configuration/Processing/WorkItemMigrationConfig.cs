@@ -234,8 +234,8 @@ namespace MigrationTools._EngineV1.Configuration.Processing
             AreaMaps = new Dictionary<string, string>();
             IterationMaps = new Dictionary<string, string>();
             MaxGracefulFailures = 0;
-            SkipRevisionWithInvalidIterationPath = false;
-            SkipRevisionWithInvalidAreaPath = false;
+            SkipRevisionWithInvalidIterationPath = true;
+            SkipRevisionWithInvalidAreaPath = true;
         }
     }
 }

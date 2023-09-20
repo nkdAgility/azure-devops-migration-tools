@@ -4,12 +4,11 @@
   "workaroundForQuerySOAPBugEnabled": false,
   "Source": {
     "$type": "TfsTeamProjectConfig",
-    "Collection": "https://dev.azure.com/nkdagility-preview/",
-    "Project": "migrationSource1",
+    "Collection": "https://dev.azure.com/vialto/",
+    "Project": "GMS_Calculator",
     "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
     "AuthenticationMode": "Prompt",
     "AllowCrossProjectLinking": false,
-    "PersonalAccessToken": "rrsne75npwj5ctn5vm337nrxiqlvdkfmcbkqrubl6ushts6syi5a",
     "LanguageMaps": {
       "AreaPath": "Area",
       "IterationPath": "Iteration"
@@ -17,12 +16,11 @@
   },
   "Target": {
     "$type": "TfsTeamProjectConfig",
-    "Collection": "https://dev.azure.com/nkdagility-preview/",
-    "Project": "migration Target 1",
-    "ReflectedWorkItemIDFieldName": "nkdScrum.ReflectedWorkItemId",
+    "Collection": "https://dev.azure.com/vialto/",
+    "Project": "Digital Product Enablement",
+    "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
     "AuthenticationMode": "Prompt",
     "AllowCrossProjectLinking": false,
-    "PersonalAccessToken": "rrsne75npwj5ctn5vm337nrxiqlvdkfmcbkqrubl6ushts6syi5a",
     "LanguageMaps": {
       "AreaPath": "Area",
       "IterationPath": "Iteration"
@@ -51,20 +49,20 @@
     }
   ],
   "Processors": [
-    {
-      "$type": "ExportUsersForMappingConfig",
-      "Enabled": true,
-      "LocalExportJsonFile": "c:\\temp\\ExportUsersForMappingConfig.json",
-      "WIQLQuery": "SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan') ORDER BY [System.ChangedDate] desc",
-      "IdentityFieldsToCheck": [
-        "System.AssignedTo",
-        "System.ChangedBy",
-        "System.CreatedBy",
-        "Microsoft.VSTS.Common.ActivatedBy",
-        "Microsoft.VSTS.Common.ResolvedBy",
-        "Microsoft.VSTS.Common.ClosedBy"
-      ]
-    },
+    //{
+    //  "$type": "ExportUsersForMappingConfig",
+    //  "Enabled": false,
+    //  "LocalExportJsonFile": "c:\\temp\\ExportUsersForMappingConfig.json",
+    //  "WIQLQuery": "SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] IN ('Product Backlog Item', 'Feature', 'Epic') ORDER BY [System.ChangedDate] desc",
+    //  "IdentityFieldsToCheck": [
+    //    "System.AssignedTo",
+    //    "System.ChangedBy",
+    //    "System.CreatedBy",
+    //    "Microsoft.VSTS.Common.ActivatedBy",
+    //    "Microsoft.VSTS.Common.ResolvedBy",
+    //    "Microsoft.VSTS.Common.ClosedBy"
+    //  ]
+    //},
     //{
     //  "$type": "WorkItemDeleteConfig",
     //  "Enabled": true,
@@ -73,12 +71,12 @@
     //},
     {
       "$type": "WorkItemMigrationConfig",
-      "Enabled": false,
+      "Enabled": true,
       "ReplayRevisions": true,
       "PrefixProjectToNodes": false,
       "UpdateCreatedDate": true,
       "UpdateCreatedBy": true,
-      "WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
+      "WIQLQueryBit": "AND [System.WorkItemType] IN ('Product Backlog Item', 'Feature', 'Epic')",
       "WIQLOrderBit": "[System.ChangedDate] desc",
       "LinkMigration": true,
       "AttachmentMigration": true,
