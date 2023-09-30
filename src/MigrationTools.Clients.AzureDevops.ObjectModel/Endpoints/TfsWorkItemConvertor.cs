@@ -43,6 +43,7 @@ namespace MigrationTools.Endpoints
         {
             var items = tfsRevisions.OfType<Revision>().Select(x => new RevisionItem()
             {
+                WorkItemId = x.WorkItem.Id,
                 Index = x.Index,
                 Number = (int)x.Fields["System.Rev"].Value,
                 ChangedDate = (DateTime)x.Fields["System.ChangedDate"].Value,

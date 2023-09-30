@@ -157,7 +157,7 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         public bool UseCommonNodeStructureEnricherConfig { get; set; }
 
         /// <summary>
-        /// 
+        /// With this enabled the system will stop after the check for missing nodes if detected.
         /// </summary>
         /// <default>?</default>
         public bool StopMigrationOnMissingAreaIterationNodes { get; set; }
@@ -199,6 +199,11 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         /// </summary>
         public bool SkipRevisionWithInvalidAreaPath { get; set; }
 
+        /// <summary>
+        /// When set to True the susyem will try to create any missing missing area or iteration paths from the revisions.
+        /// </summary>
+       public bool ShouldCreateMissingRevisionPaths { get; set; }
+
         /// <inheritdoc />
         public bool IsProcessorCompatible(IReadOnlyList<IProcessorConfig> otherProcessors)
         {
@@ -236,6 +241,7 @@ namespace MigrationTools._EngineV1.Configuration.Processing
             MaxGracefulFailures = 0;
             SkipRevisionWithInvalidIterationPath = false;
             SkipRevisionWithInvalidAreaPath = false;
+            ShouldCreateMissingRevisionPaths = true;
         }
     }
 }

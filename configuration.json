@@ -47,13 +47,13 @@
       "NodeBasePaths": [],
       "AreaMaps": {},
       "IterationMaps": {},
-      "ShouldCreateMissingRevisionPaths": false
+      "ShouldCreateMissingRevisionPaths": true
     }
   ],
   "Processors": [
     {
       "$type": "ExportUsersForMappingConfig",
-      "Enabled": true,
+      "Enabled": false,
       "LocalExportJsonFile": "c:\\temp\\ExportUsersForMappingConfig.json",
       "WIQLQuery": "SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan') ORDER BY [System.ChangedDate] desc",
       "IdentityFieldsToCheck": [
@@ -73,7 +73,7 @@
     //},
     {
       "$type": "WorkItemMigrationConfig",
-      "Enabled": false,
+      "Enabled": true,
       "ReplayRevisions": true,
       "PrefixProjectToNodes": false,
       "UpdateCreatedDate": true,
@@ -95,11 +95,14 @@
       "WorkItemIDs": null,
       "MaxRevisions": 0,
       "NodeStructureEnricherEnabled": true,
-      "UseCommonNodeStructureEnricherConfig": true,
+      "UseCommonNodeStructureEnricherConfig": false,
       "StopMigrationOnMissingAreaIterationNodes": false,
+      "ShouldCreateMissingRevisionPaths": true,
       "NodeBasePaths": [],
       "AreaMaps": {},
-      "IterationMaps": {},
+      "IterationMaps": {
+        "^Skypoint Cloud\\\\Sprint 1": "migration Target 1\\NewArea"
+      },
       "MaxGracefulFailures": 0
     }
 
