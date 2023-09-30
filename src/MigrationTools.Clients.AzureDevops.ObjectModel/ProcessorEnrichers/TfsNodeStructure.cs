@@ -6,7 +6,9 @@ using System.Text.RegularExpressions;
 using System.Xml;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.TeamFoundation.Common;
 using Microsoft.TeamFoundation.Server;
+using Microsoft.TeamFoundation.Work.WebApi;
 using MigrationTools._EngineV1.Clients;
 using MigrationTools.DataContracts;
 using MigrationTools.Endpoints;
@@ -593,24 +595,43 @@ namespace MigrationTools.Enrichers
 
         public bool ValidateTargetNodesExist(List<NodeStructureMissingItem> missingItems)
         {
-            bool passedValidation = true;
             if (missingItems.Count > 0)
             {
-                contextLog.Fatal("!! There are MISSING Area or Iteration Paths");
-                contextLog.Fatal("!! There are {missingAreaPaths} Nodes (Area or Iteration) found in the history of the Source that are missing from the Target. These MUST be added or mapped before we can continue using the instructions on https://nkdagility.com/learn/azure-devops-migration-tools/Reference/v1/Processors/WorkItemMigrationContext/#iteration-maps-and-area-maps", missingPaths.Count);
+                contextLog.Warning("!! There are MISSING Area or Iteration Paths");
+                contextLog.Warning("!! There are {missingAreaPaths} Nodes (Area or Iteration) found in the history of the Source that are missing from the Target! These MUST be added or mapped before we can continue using the instructions on https://nkdagility.com/learn/azure-devops-migration-tools/Reference/v1/Processors/WorkItemMigrationContext/#iteration-maps-and-area-maps", missingItems.Count);
                 foreach (NodeStructureMissingItem missingItem in missingItems)
                 {
-                    string workItemList = "n/a";
+                    string mapper = GetMappingForMissingItem(missingItem);
+                    bool isMapped = mapper.IsNullOrEmpty()?false:true;
+                   string workItemList = "n/a";
                     if (missingItem.workItems != null)
                     {
                         workItemList = string.Join(",", missingItem.workItems);
                     }
-                    contextLog.Warning("MISSING {nodeType}: sourcePath={sourcePath}, targetPath={targetPath}, anchored={anchored}, IDs={workItems}", missingItem.nodeType, missingItem.sourcePath, missingItem.targetPath, missingItem.anchored, workItemList);
+                    if (isMapped)
+                    {
+                        contextLog.Warning("MAPPED {nodeType}: sourcePath={sourcePath}, mapper={mapper}", missingItem.nodeType, missingItem.sourcePath, mapper);
+                    } else { 
+                        contextLog.Warning("MISSING {nodeType}: sourcePath={sourcePath}, targetPath={targetPath}, anchored={anchored}, IDs={workItems}", missingItem.nodeType, missingItem.sourcePath, missingItem.targetPath, missingItem.anchored, workItemList);
+                    }
                 }
 
                 return true;
             }
             return false;
+        }
+
+        public string GetMappingForMissingItem(NodeStructureMissingItem missingItem)
+        {
+            var mappers = GetMaps((TfsNodeStructureType)Enum.Parse(typeof(TfsNodeStructureType), missingItem.nodeType, true));
+            foreach (var mapper in mappers)
+            {
+                if (Regex.IsMatch(missingItem.sourcePath, mapper.Key, RegexOptions.IgnoreCase))
+                {
+                    return mapper.Key;
+                }
+            }
+            return null;
         }
 
     }
