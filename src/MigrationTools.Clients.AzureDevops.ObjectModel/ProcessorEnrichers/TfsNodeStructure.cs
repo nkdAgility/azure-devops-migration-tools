@@ -572,27 +572,33 @@ namespace MigrationTools.Enrichers
             }
             return missingPaths;
         }
-            
 
-        public bool ValidateTargetNodesExist(List<WorkItemData> workItems)
+        public List<NodeStructureMissingItem> GetMissingRevisionNodes(List<WorkItemData> workItems)
         {
-            bool passedValidation = true;
             List<NodeStructureMissingItem> missingPaths = CheckForMissingPaths(workItems, TfsNodeStructureType.Area);
             missingPaths.AddRange(CheckForMissingPaths(workItems, TfsNodeStructureType.Iteration));
-            if (OutputMissingNodeItems(missingPaths, TfsNodeStructureType.Area.ToString()))
-            {
-                passedValidation = false;
-            }           
-            return passedValidation;
+            return missingPaths;
         }
 
-        private bool OutputMissingNodeItems(List<NodeStructureMissingItem> missingPaths, string nodeType)
+        public List<int> GetWorkItemIDsFromMissingRevisionNodes(List<NodeStructureMissingItem> missingItems)
         {
-            if (missingPaths.Count > 0)
+            List<int> workItemsNotAncored = missingItems
+                .Where(x => x.anchored = false)
+                .SelectMany(x => x.workItems)
+                .Distinct()
+                .ToList();
+            return workItemsNotAncored;
+        }
+
+
+        public bool ValidateTargetNodesExist(List<NodeStructureMissingItem> missingItems)
+        {
+            bool passedValidation = true;
+            if (missingItems.Count > 0)
             {
                 contextLog.Fatal("!! There are MISSING Area or Iteration Paths");
-                contextLog.Fatal("!! There are {missingAreaPaths} Nodes (Area or Iteration) found in the history of the Source that are missing from the Target. These MUST be added or mapped before we can continue using the instructions on https://nkdagility.com/learn/azure-devops-migration-tools/Reference/v1/Processors/WorkItemMigrationContext/#iteration-maps-and-area-maps", missingPaths.Count, nodeType);
-                foreach (NodeStructureMissingItem missingItem in missingPaths)
+                contextLog.Fatal("!! There are {missingAreaPaths} Nodes (Area or Iteration) found in the history of the Source that are missing from the Target. These MUST be added or mapped before we can continue using the instructions on https://nkdagility.com/learn/azure-devops-migration-tools/Reference/v1/Processors/WorkItemMigrationContext/#iteration-maps-and-area-maps", missingPaths.Count);
+                foreach (NodeStructureMissingItem missingItem in missingItems)
                 {
                     string workItemList = "n/a";
                     if (missingItem.workItems != null)
@@ -606,5 +612,6 @@ namespace MigrationTools.Enrichers
             }
             return false;
         }
+
     }
 }

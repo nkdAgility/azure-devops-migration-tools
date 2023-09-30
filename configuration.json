@@ -47,7 +47,7 @@
       "NodeBasePaths": [],
       "AreaMaps": {},
       "IterationMaps": {},
-      "ShouldCreateMissingRevisionPaths": false
+      "ShouldCreateMissingRevisionPaths": true
     }
   ],
   "Processors": [
@@ -95,8 +95,9 @@
       "WorkItemIDs": null,
       "MaxRevisions": 0,
       "NodeStructureEnricherEnabled": true,
-      "UseCommonNodeStructureEnricherConfig": true,
+      "UseCommonNodeStructureEnricherConfig": false,
       "StopMigrationOnMissingAreaIterationNodes": false,
+      "ShouldCreateMissingRevisionPaths": true,
       "NodeBasePaths": [],
       "AreaMaps": {},
       "IterationMaps": {},

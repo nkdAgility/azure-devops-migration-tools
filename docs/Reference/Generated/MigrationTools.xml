@@ -507,7 +507,7 @@
         </member>
         <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.StopMigrationOnMissingAreaIterationNodes">
             <summary>
-            
+            With this enabled the system will stop after the check for missing nodes if detected.
             </summary>
             <default>?</default>
         </member>
@@ -546,6 +546,11 @@
         <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.SkipRevisionWithInvalidAreaPath">
             <summary>
             When set to true, this setting will skip a revision if the source area has not been migrated, has been deleted or is somehow invalid, etc.
+            </summary>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.ShouldCreateMissingRevisionPaths">
+            <summary>
+            When set to True the susyem will try to create any missing missing area or iteration paths from the revisions.
             </summary>
         </member>
         <member name="M:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
