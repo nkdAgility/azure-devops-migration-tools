@@ -531,7 +531,7 @@ namespace MigrationTools.Enrichers
                     contextLog.Debug($"TfsNodeStructure:CheckForMissingPaths:newpath::{newpath}");
                 }
                 catch(NodePathNotAnchoredException ex) {
-                    contextLog.Debug($"TfsNodeStructure:CheckForMissingPaths:NodePathNotAnchoredException::{areaPath}");
+                    contextLog.Debug($"TfsNodeStructure:CheckForMissingPaths:NodePathNotAnchoredException::SourcePath::{areaPath}");
                     keepProcessing = false;
                     missingPaths.Add(newpath);
                 }
@@ -559,6 +559,10 @@ namespace MigrationTools.Enrichers
                         }
                     }
                 }
+            }
+            if(_Options.ShouldCreateMissingRevisionPaths )
+            {
+                _targetCommonStructureService.ClearProjectInfoCache();
             }
             return missingPaths;
         }
