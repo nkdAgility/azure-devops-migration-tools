@@ -100,7 +100,9 @@
       "ShouldCreateMissingRevisionPaths": true,
       "NodeBasePaths": [],
       "AreaMaps": {},
-      "IterationMaps": {},
+      "IterationMaps": {
+        "^Skypoint Cloud\\\\Sprint 1": "migration Target 1\\NewArea"
+      },
       "MaxGracefulFailures": 0
     }
 
