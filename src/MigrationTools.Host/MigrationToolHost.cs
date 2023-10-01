@@ -164,7 +164,7 @@ namespace MigrationTools.Host
             }
             bool DisableTelemetry = false;
             Serilog.ILogger logger = host.Services.GetService<Serilog.ILogger>();
-            if (bool.TryParse(executeOptions.DisableTelemetry, out DisableTelemetry))
+            if (executeOptions is not null && bool.TryParse(executeOptions.DisableTelemetry, out DisableTelemetry))
             {
                 TelemetryConfiguration ai = host.Services.GetService<TelemetryConfiguration>();
                 ai.DisableTelemetry = DisableTelemetry;
