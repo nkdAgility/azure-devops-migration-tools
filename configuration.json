@@ -96,12 +96,11 @@
       "MaxRevisions": 0,
       "NodeStructureEnricherEnabled": true,
       "UseCommonNodeStructureEnricherConfig": false,
-      "StopMigrationOnMissingAreaIterationNodes": false,
-      "ShouldCreateMissingRevisionPaths": true,
+      "StopMigrationOnMissingAreaIterationNodes": true,
+      "ShouldCreateMissingRevisionPaths": false,
       "NodeBasePaths": [],
       "AreaMaps": {},
       "IterationMaps": {
-        "^Skypoint Cloud\\\\Sprint 1": "migration Target 1\\NewArea"
       },
       "MaxGracefulFailures": 0
     }
