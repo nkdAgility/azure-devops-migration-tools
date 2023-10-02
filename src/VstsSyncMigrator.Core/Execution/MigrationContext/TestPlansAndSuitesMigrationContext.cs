@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -20,6 +21,7 @@ using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Configuration.Processing;
 using MigrationTools._EngineV1.Processors;
 using MigrationTools.DataContracts;
+using MigrationTools.DataContracts.Pipelines;
 using MigrationTools.Enrichers;
 using VstsSyncMigrator.Engine.ComponentContext;
 
@@ -605,12 +607,36 @@ namespace VstsSyncMigrator.Engine
 
         private ITestSuiteBase FindSuiteEntry(IStaticTestSuite staticSuite, string titleToFind)
         {
-            return (from s in staticSuite.SubSuites where s.Title == titleToFind select s).SingleOrDefault();
+            ITestSuiteBase testSuit = (from s in staticSuite.SubSuites where s.Title == titleToFind select s).SingleOrDefault();
+            if (testSuit != null)
+            {
+                //Check test suit is in fact the right one
+                var sourceWI = Engine.Source.WorkItems.GetWorkItem(testSuit.Id.ToString());
+                string expectedReflectedId = Engine.Source.WorkItems.CreateReflectedWorkItemId(sourceWI).ToString();
+                string workItemReflectedId = (string)sourceWI.Fields[Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName].Value;
+                if (workItemReflectedId != expectedReflectedId)
+                {
+                    testSuit = null;
+                }
+            }
+            return testSuit;
         }
 
         private ITestPlan FindTestPlan(TestManagementContext tmc, string name)
         {
-            return (from p in tmc.Project.TestPlans.Query("Select * From TestPlan") where p.Name == name select p).SingleOrDefault();
+            ITestPlan testPlan = (from p in tmc.Project.TestPlans.Query("Select * From TestPlan") where p.Name == name select p).SingleOrDefault();
+            if (testPlan != null)
+            {
+                //Check test plan is in fact the right one
+                var sourceWI = Engine.Source.WorkItems.GetWorkItem(testPlan.Id.ToString());
+                string expectedReflectedId = Engine.Source.WorkItems.CreateReflectedWorkItemId(sourceWI).ToString();
+                string workItemReflectedId = (string)sourceWI.Fields[Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName].Value;
+                if (workItemReflectedId != expectedReflectedId)
+                {
+                    testPlan = null;
+                }
+            }
+            return testPlan;
         }
 
         private void FixAssignedToValue(int sourceWIId, int targetWIId)
