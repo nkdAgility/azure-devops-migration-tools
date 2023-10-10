@@ -28,9 +28,9 @@ topics:
     The Work Item endpoint is super awesome.
 
 
-    Client  | WriteTo/ReadFrom | Endpoint | Data Target | Description
+    |Client  | WriteTo/ReadFrom | Endpoint | Data Target | Description |
 
-    ----------|-----------|------------
+    |:-:|:-:|:-:|:-:|:-:|
 
     AzureDevops.ObjectModel | Tfs Object Model | `TfsWorkItemEndPoint` | WorkItems | TBA
 
