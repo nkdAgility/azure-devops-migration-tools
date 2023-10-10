@@ -38,7 +38,8 @@ configurationSamples:
       },
       "MaxGracefulFailures": 0,
       "SkipRevisionWithInvalidIterationPath": false,
-      "SkipRevisionWithInvalidAreaPath": false
+      "SkipRevisionWithInvalidAreaPath": false,
+      "ShouldCreateMissingRevisionPaths": true
     }
   sampleFor: MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig
 description: WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links, and Attachments. Use `WorkItemMigrationConfig` to configure.
@@ -118,6 +119,10 @@ options:
   type: Boolean
   description: You can choose to migrate the tip only (a single write) or all of the revisions (many writes). If you are setting this to `false` to migrate only the tip then you should set `BuildFieldTable` to `true`.
   defaultValue: true
+- parameterName: ShouldCreateMissingRevisionPaths
+  type: Boolean
+  description: When set to True the susyem will try to create any missing missing area or iteration paths from the revisions.
+  defaultValue: missng XML code comments
 - parameterName: SkipRevisionWithInvalidAreaPath
   type: Boolean
   description: When set to true, this setting will skip a revision if the source area has not been migrated, has been deleted or is somehow invalid, etc.
@@ -132,7 +137,7 @@ options:
   defaultValue: false
 - parameterName: StopMigrationOnMissingAreaIterationNodes
   type: Boolean
-  description: ''
+  description: With this enabled the system will stop after the check for missing nodes if detected.
   defaultValue: '?'
 - parameterName: UpdateCreatedBy
   type: Boolean

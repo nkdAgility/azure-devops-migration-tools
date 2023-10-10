@@ -17,14 +17,14 @@ Watch the [Video Overview](https://youtu.be/RCJsST0xBCE) to get started in 30 mi
 
 In order to run the migration you will need to install the tools first.
 
-1. Install Chocolatey from [https://chocolatey.org/install](https://chocolatey.org/install)
-1. Run `choco install vsts-sync-migrator` to install the tools [source](https://chocolatey.org/packages/vsts-sync-migrator)
+1. Install [winget](https://learn.microsoft.com/en-us/windows/package-manager/winget/)
+1. Run `winget install nkdAgility.AzureDevOpsMigrationTools` from the [Windows Terminal](https://learn.microsoft.com/en-us/windows/terminal/) to install on Windows 10 and Windows 11. For other operating systems you can download the [latest release](https://github.com/nkdAgility/azure-devops-migration-tools/releases/latest) and unzip it to a folder of your choice.
 
-The tools are now installed. To run them, you must switch to `c:\tools\MigrationTools\` and run `migration.exe`.
+The tools will be installed to `%Localappdata%\Microsoft\WinGet\Packages\nkdAgility.AzureDevOpsMigrationTools_Microsoft.Winget.Source_XXXXXXXXXX` and a symbolic link to `devops-migration.exe` that lets you run it from anywhere using `devops-migration init`.
 
 ## Upgrade
 
-1. Run `choco upgrade  vsts-sync-migrator` to upgrade the tools [source](https://chocolatey.org/packages/vsts-sync-migrator)
+1. Run `winget upgrade  nkdAgility.AzureDevOpsMigrationTools` to upgrade the tools.
 
 ## Server configuration and setup
 
@@ -32,8 +32,8 @@ Follow the [setup instructions](server-configuration.md) to make sure that you c
 
 ## Create a default configuration file
 
-1. Open a command prompt or PowerShell window at `C:\tools\MigrationTools\`
-2. Run `./migration.exe init` to create a default configuration
+1. Open your [Windows Terminal](https://learn.microsoft.com/en-us/windows/terminal/) in your chosen working folder
+2. Run `migration init` to create a default configuration
 3. Open `configuration.json` from the current directory
 
 You can now customize the configuration depending on what you need to do. However, a basic config that you can use to migrate from one team project to another with the same process template is:
@@ -70,14 +70,14 @@ The default [WorkItemMigrationConfig](/docs/Reference/v1/Processors/WorkItemMigr
 5. Enable the `WorkItemMigrationConfig` processor by setting `Enabled` to `true`
 6. [OPTIONAL] Modify the `WIQLQueryBit` to migrate only the work items you want. The default WIQL will migrate all open work items and revisions excluding test suites and plans
 7. Adjust the [`NodeBasePaths`](/docs/Reference/v1/Processors/WorkItemMigrationConfig.md) or leave empty to migrate all nodes
-8. From the `C:\tools\MigrationTools\` path run `.\migration.exe execute --config .\configuration.json`
+8. From your working folder run `devops-migration execute --config .\configuration.json`
 
 **Remember:** If you want a processor to run, its `Enabled` attribute must be set to `true`. 
 
 Refer to the [Reference Guide](/docs/Reference/index.md) for more details.
 
 ## Other Configuration Options
-When running `./migration.exe init` you can also pass `--options` with one of the following:
+When running `devops-migration init` you can also pass `--options` with one of the following:
 
 - *Full* - 
 - *WorkItemTracking* - 

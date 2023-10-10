@@ -33,7 +33,7 @@ namespace MigrationTools.Host.Services
             try
             {
                 //Connect to the official package repository
-                IEnumerable<NuGetVersion> versions = GetVersions(packageID);
+                IEnumerable<NuGetVersion> versions = GetChocoVersions(packageID);
                 latestPackageVersion = versions.Max(p => p.Version);
                 if (latestPackageVersion != null)
                 {
@@ -52,7 +52,7 @@ namespace MigrationTools.Host.Services
             return latestPackageVersion;
         }
 
-        private IEnumerable<NuGetVersion> GetVersions(string packageId, string sourceUrl = "https://chocolatey.org/api/v2/")
+        private IEnumerable<NuGetVersion> GetChocoVersions(string packageId, string sourceUrl = "https://chocolatey.org/api/v2/")
         {
             NuGet.Common.ILogger logger = NullLogger.Instance;
             CancellationToken cancellationToken = CancellationToken.None;

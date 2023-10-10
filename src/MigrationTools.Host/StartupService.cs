@@ -46,7 +46,7 @@ namespace MigrationTools.Host
                 var version = Assembly.GetEntryAssembly().GetName().Version;
                 if (latestVersion > version && args.Contains("skipVersionCheck"))
                 {
-                    _logger.LogWarning("You are currently running version {Version} and a newer version ({LatestVersion}) is available. You should upgrade now using Chocolatey command 'choco upgrade vsts-sync-migrator' from the command line.", version, latestVersion);
+                    _logger.LogWarning("You are currently running version {Version} and a newer version ({LatestVersion}) is available. You should update now using Winget command 'winget nkdAgility.AzureDevOpsMigrationTools' from the Windows Terminal.", version, latestVersion);
 #if !DEBUG
                     Console.WriteLine("Do you want to continue? (y/n)");
                     if (Console.ReadKey().Key != ConsoleKey.Y)
@@ -91,7 +91,7 @@ namespace MigrationTools.Host
             var version = Assembly.GetEntryAssembly().GetName().Version;
             _logger.LogInformation("Application Starting");
             AsciiLogo(version);
-            _logger.LogInformation("Telemetry Note: We use Application Insights to collect telemetry on performance & feature usage for the tools to help our developers target features. This data is tied to a session ID that is generated and shown in the logs. This can help with debugging. If you want to disable telemitery you can run the tool with '--disableTelemitery true' on the command prompt.");
+            TelemetryNote();
             _logger.LogInformation("Start Time: {StartTime}", DateTime.Now.ToUniversalTime().ToLocalTime());
             _logger.LogInformation("Running with args: {@Args}", args);
             _logger.LogInformation("OSVersion: {OSVersion}", Environment.OSVersion.ToString());
@@ -103,6 +103,19 @@ namespace MigrationTools.Host
             _logger.LogError((Exception)e.ExceptionObject, "An Unhandled exception occured.");
             //_logger.LogCloseAndFlush();
             System.Threading.Thread.Sleep(5000);
+        }
+
+        private void TelemetryNote()
+        {
+            _logger.LogInformation("Telemetry Note:");
+            _logger.LogInformation("   We use Application Insights to collect usage and error information in order to improve the quality of the tools.");
+            _logger.LogInformation("   Currently we collect the following anonymous data:");
+            _logger.LogInformation("     -Event data: application version, client city/country, hosting type, item count, error count, warning count, elapsed time.");
+            _logger.LogInformation("     -Exceptions: application errors and warnings.");
+            _logger.LogInformation("     -Dependencies: REST/ObjectModel calls to Azure DevOps to help us understand performance issues.");
+            _logger.LogInformation("   This data is tied to a session ID that is generated on each run of the application and shown in the logs. This can help with debugging. If you want to disable telemetry you can run the tool with '--disableTelemetry true' on the command prompt.");
+            _logger.LogInformation("   Note: Exception data cannot be 100% guaranteed to not leak production data");
+            _logger.LogInformation("--------------------------------------");
         }
 
         private void AsciiLogo(Version thisVersion)
