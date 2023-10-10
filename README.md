@@ -58,7 +58,7 @@ The Azure DevOps Migration Tools allow you to bulk edit and migrate data between
 
 We use [winget](https://learn.microsoft.com/en-us/windows/package-manager/winget/) to host the tools, and you can use the command `winget install nkdAgility.AzureDevOpsMigrationTools` to install them on Windows 10 and Windows 11. For other operating systems you can download the [latest release](https://github.com/nkdAgility/azure-devops-migration-tools/releases/latest) and unzip it to a folder of your choice.
 
-The tools will be installed to `%Localappdata%\Microsoft\WinGet\Packages\nkdAgility.AzureDevOpsMigrationTools_Microsoft.Winget.Source_XXXXXXXXXX` and a symbolic link to `migration.exe` that lets you run it from anywhere using `migration init`.
+The tools will be installed to `%Localappdata%\Microsoft\WinGet\Packages\nkdAgility.AzureDevOpsMigrationTools_Microsoft.Winget.Source_XXXXXXXXXX` and a symbolic link to `devops-migration.exe` that lets you run it from anywhere using `devops-migration init`.
 
 For a more detailed getting started guide please see the [documentation](https://nkdagility.com/docs/azure-devops-migration-tools/getting-started.html).
 
@@ -79,7 +79,7 @@ We use these tools with our customers, and for fun, to do real world migrations 
 
 ## Change Log
 
-- 14.0 - Move from Chocolaty to Winget as the base installer. We will continue to publish to Chocolaty, but we recommend using `winget install nkdAgility.AzureDevOpsMigrationTools` for future installs.
+- 14.0 - Move from Chocolaty to Winget as the base installer. We will continue to publish to Chocolaty, but we recommend using `winget install nkdAgility.AzureDevOpsMigrationTools` for future installs. Main executable renamed to "devops-migration.exe" to prevent conflict with other applications with symbolic links.
 - 13.2 - Added [ExportUsersForMapping](https://nkdagility.com/learn/azure-devops-migration-tools/Reference/v1/Processors/TeamMigrationContext/) to export a json file with a list of users ready for a field mapping.
 - 13.1 - Update all NuGet packages to latest version.
 - 13.0 - Update to .net 7.0 with all dependancies. Focus on documentation improvements to support future updates.

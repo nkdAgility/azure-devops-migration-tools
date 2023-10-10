@@ -77,8 +77,8 @@ For details on how to add the field in each case, and trouble shooting check the
 
 ## Can I disable the telemetry collected and sent to Application Insights?
 
-Yes! You can turn off telemetry from v13.2 by passing `off` as a value for `--telemetry` on the command line.
+Yes! You can turn off telemetry from v13.2 by passing `true` as a value for `--disableTelemetry` on the command line.
 
 ```
-migration.exe --config configuration.json --telemetry off
+devops-migration.exe --config configuration.json --disableTelemetry true
 ```
