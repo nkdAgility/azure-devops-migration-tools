@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net7.0</TargetFramework>
     <Product>Azure DevOps Migration Tools [REST API]</Product>
-    <AssemblyName>migration</AssemblyName>
+    <AssemblyName>devopsmigration</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

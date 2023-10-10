@@ -80,5 +80,5 @@ For details on how to add the field in each case, and trouble shooting check the
 Yes! You can turn off telemetry from v13.2 by passing `true` as a value for `--disableTelemetry` on the command line.
 
 ```
-devops-migration.exe --config configuration.json --disableTelemetry true
+devopsmigration.exe --config configuration.json --disableTelemetry true
 ```

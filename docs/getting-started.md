@@ -20,7 +20,7 @@ In order to run the migration you will need to install the tools first.
 1. Install [winget](https://learn.microsoft.com/en-us/windows/package-manager/winget/)
 1. Run `winget install nkdAgility.AzureDevOpsMigrationTools` from the [Windows Terminal](https://learn.microsoft.com/en-us/windows/terminal/) to install on Windows 10 and Windows 11. For other operating systems you can download the [latest release](https://github.com/nkdAgility/azure-devops-migration-tools/releases/latest) and unzip it to a folder of your choice.
 
-The tools will be installed to `%Localappdata%\Microsoft\WinGet\Packages\nkdAgility.AzureDevOpsMigrationTools_Microsoft.Winget.Source_XXXXXXXXXX` and a symbolic link to `devops-migration.exe` that lets you run it from anywhere using `devops-migration init`.
+The tools will be installed to `%Localappdata%\Microsoft\WinGet\Packages\nkdAgility.AzureDevOpsMigrationTools_Microsoft.Winget.Source_XXXXXXXXXX` and a symbolic link to `devopsmigration.exe` that lets you run it from anywhere using `devopsmigration init`.
 
 ## Upgrade
 
@@ -70,14 +70,14 @@ The default [WorkItemMigrationConfig](/docs/Reference/v1/Processors/WorkItemMigr
 5. Enable the `WorkItemMigrationConfig` processor by setting `Enabled` to `true`
 6. [OPTIONAL] Modify the `WIQLQueryBit` to migrate only the work items you want. The default WIQL will migrate all open work items and revisions excluding test suites and plans
 7. Adjust the [`NodeBasePaths`](/docs/Reference/v1/Processors/WorkItemMigrationConfig.md) or leave empty to migrate all nodes
-8. From your working folder run `devops-migration execute --config .\configuration.json`
+8. From your working folder run `devopsmigration execute --config .\configuration.json`
 
 **Remember:** If you want a processor to run, its `Enabled` attribute must be set to `true`. 
 
 Refer to the [Reference Guide](/docs/Reference/index.md) for more details.
 
 ## Other Configuration Options
-When running `devops-migration init` you can also pass `--options` with one of the following:
+When running `devopsmigration init` you can also pass `--options` with one of the following:
 
 - *Full* - 
 - *WorkItemTracking* - 

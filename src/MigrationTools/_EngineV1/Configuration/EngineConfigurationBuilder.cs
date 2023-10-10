@@ -48,7 +48,7 @@ namespace MigrationTools._EngineV1.Configuration
                 _logger.LogTrace(ex, "Configuration Error");
                 _logger.LogCritical("Your configuration file was loaded but was unable to be mapped to ");
                 _logger.LogError(ex.Message);
-                _logger.LogError("How to Solve: Malformed configurations are usually a result of changes between versions. The best way to understand the change is to run 'devops-migration init' to create a new wel formed config and determin where the problem is!");
+                _logger.LogError("How to Solve: Malformed configurations are usually a result of changes between versions. The best way to understand the change is to run 'devopsmigration init' to create a new wel formed config and determin where the problem is!");
                 Environment.Exit(-1);
                 return null;
             }
