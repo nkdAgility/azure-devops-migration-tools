@@ -44,17 +44,21 @@ namespace MigrationTools.Host
 
                 _logger.LogInformation($"Latest version detected as {{{nameof(latestVersion)}}}", latestVersion);
                 var version = Assembly.GetEntryAssembly().GetName().Version;
-                if (latestVersion > version && args.Contains("skipVersionCheck"))
+                if (latestVersion > version)
                 {
                     _logger.LogWarning("You are currently running version {Version} and a newer version ({LatestVersion}) is available. You should update now using Winget command 'winget nkdAgility.AzureDevOpsMigrationTools' from the Windows Terminal.", version, latestVersion);
+                    if (!args.Contains("skipVersionCheck"))
+                    {                    
 #if !DEBUG
                     Console.WriteLine("Do you want to continue? (y/n)");
                     if (Console.ReadKey().Key != ConsoleKey.Y)
                     {
-                        _logger.LogWarning("User aborted to update version");
+                        _logger.LogWarning("User aborted to update version");                       
                         throw new Exception("User Abort");
+                      
                     }
 #endif
+                    }
                 }
             }
         }
