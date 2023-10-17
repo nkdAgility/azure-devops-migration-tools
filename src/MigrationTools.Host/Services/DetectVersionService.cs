@@ -18,9 +18,13 @@ namespace MigrationTools.Host.Services
     {
         private readonly ITelemetryLogger _Telemetry;
 
+        public string PackageId { get; set; }
+
+
         public DetectVersionService(ITelemetryLogger telemetry)
         {
             _Telemetry = telemetry;
+            PackageId = "nkdAgility.AzureDevOpsMigrationTools";
         }
 
         public Version GetLatestVersion()
@@ -29,30 +33,28 @@ namespace MigrationTools.Host.Services
             Stopwatch mainTimer = Stopwatch.StartNew();
             //////////////////////////////////
             Version latestPackageVersion = null;
-            string packageID = "nkdAgility.AzureDevOpsMigrationTools";
             bool sucess = false;
             try
             {
                 WinGetPackageManager packageManager = new WinGetPackageManager();
-                var package = packageManager.SearchPackage(packageID).SingleOrDefault();
+                var package = packageManager.SearchPackage(PackageId).SingleOrDefault();
 
                 latestPackageVersion = new Version(package.AvailableVersion);
                 if (latestPackageVersion != null)
                 {
                     sucess = true;
                 }
-                _Telemetry.TrackDependency(new DependencyTelemetry("PackageRepository", "winget", packageID, latestPackageVersion == null ? "nullVersion" : latestPackageVersion.ToString(), startTime, mainTimer.Elapsed, "200", sucess));
+                _Telemetry.TrackDependency(new DependencyTelemetry("PackageRepository", "winget", PackageId, latestPackageVersion == null ? "nullVersion" : latestPackageVersion.ToString(), startTime, mainTimer.Elapsed, "200", sucess));
             }
             catch (Exception ex)
             {
                 Log.Error(ex, "DetectVersionService");
                 sucess = false;
-                _Telemetry.TrackDependency(new DependencyTelemetry("PackageRepository", "winget", packageID, latestPackageVersion == null ? "nullVersion" : latestPackageVersion.ToString(), startTime, mainTimer.Elapsed, "500", sucess));
+                _Telemetry.TrackDependency(new DependencyTelemetry("PackageRepository", "winget", PackageId, latestPackageVersion == null ? "nullVersion" : latestPackageVersion.ToString(), startTime, mainTimer.Elapsed, "500", sucess));
             }
             /////////////////
             mainTimer.Stop();
             return latestPackageVersion;
         }
-
     }
 }
