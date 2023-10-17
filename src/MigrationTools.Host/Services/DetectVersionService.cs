@@ -10,6 +10,7 @@ using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
 using NuGet.Versioning;
 using Serilog;
+using WGetNET;
 
 namespace MigrationTools.Host.Services
 {
@@ -28,40 +29,30 @@ namespace MigrationTools.Host.Services
             Stopwatch mainTimer = Stopwatch.StartNew();
             //////////////////////////////////
             Version latestPackageVersion = null;
-            string packageID = "vsts-sync-migrator";
+            string packageID = "nkdAgility.AzureDevOpsMigrationTools";
             bool sucess = false;
             try
             {
-                //Connect to the official package repository
-                IEnumerable<NuGetVersion> versions = GetChocoVersions(packageID);
-                latestPackageVersion = versions.Max(p => p.Version);
+                WinGetPackageManager packageManager = new WinGetPackageManager();
+                var package = packageManager.SearchPackage(packageID).SingleOrDefault();
+
+                latestPackageVersion = new Version(package.AvailableVersion);
                 if (latestPackageVersion != null)
                 {
                     sucess = true;
                 }
-                _Telemetry.TrackDependency(new DependencyTelemetry("PackageRepository", "chocolatey.org", "vsts-sync-migrator", latestPackageVersion == null ? "nullVersion" : latestPackageVersion.ToString(), startTime, mainTimer.Elapsed, "200", sucess));
+                _Telemetry.TrackDependency(new DependencyTelemetry("PackageRepository", "winget", packageID, latestPackageVersion == null ? "nullVersion" : latestPackageVersion.ToString(), startTime, mainTimer.Elapsed, "200", sucess));
             }
             catch (Exception ex)
             {
                 Log.Error(ex, "DetectVersionService");
                 sucess = false;
-                _Telemetry.TrackDependency(new DependencyTelemetry("PackageRepository", "chocolatey.org", "vsts-sync-migrator", latestPackageVersion == null ? "nullVersion" : latestPackageVersion.ToString(), startTime, mainTimer.Elapsed, "500", sucess));
+                _Telemetry.TrackDependency(new DependencyTelemetry("PackageRepository", "winget", packageID, latestPackageVersion == null ? "nullVersion" : latestPackageVersion.ToString(), startTime, mainTimer.Elapsed, "500", sucess));
             }
             /////////////////
             mainTimer.Stop();
             return latestPackageVersion;
         }
 
-        private IEnumerable<NuGetVersion> GetChocoVersions(string packageId, string sourceUrl = "https://chocolatey.org/api/v2/")
-        {
-            NuGet.Common.ILogger logger = NullLogger.Instance;
-            CancellationToken cancellationToken = CancellationToken.None;
-            SourceCacheContext cache = new SourceCacheContext();
-            PackageSource ps = new PackageSource(sourceUrl);
-            var sourceRepository = Repository.Factory.GetCoreV2(ps);
-            FindPackageByIdResource resource = sourceRepository.GetResourceAsync<FindPackageByIdResource>().GetAwaiter().GetResult();
-            IEnumerable<NuGetVersion> versions = resource.GetAllVersionsAsync(packageId, cache, logger, cancellationToken).GetAwaiter().GetResult();
-            return versions;
-        }
     }
 }
