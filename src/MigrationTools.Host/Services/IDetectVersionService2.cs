@@ -12,5 +12,8 @@ public Version RunningVersion { get; }
 
         public bool IsPackageManagerInstalled { get; }
 
+        public bool IsPackageInstalled { get; }
+
+        void UpdateFromSource();
     }
 }

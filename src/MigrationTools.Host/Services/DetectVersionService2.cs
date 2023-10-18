@@ -5,7 +5,9 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using Microsoft.ApplicationInsights.DataContracts;
+using Microsoft.Extensions.Logging;
 using MigrationTools.DataContracts.Pipelines;
+using MigrationTools.EndpointEnrichers;
 using NuGet.Common;
 using NuGet.Configuration;
 using NuGet.Protocol;
@@ -22,10 +24,16 @@ namespace MigrationTools.Host.Services
         private readonly ITelemetryLogger _Telemetry;
 
         public string PackageId { get; set; }
+
+        private WinGetPackageManager packageManager;
+        private WinGetPackage package = null;
+
         public Version RunningVersion { get; private set; }
         public Version AvailableVersion { get; private set; }
 
         public Version InstalledVersion { get; private set; }
+
+        public bool IsPackageInstalled { get; private set; } = false;
 
         public bool IsPackageManagerInstalled { get; private set; } = false;
 
@@ -34,6 +42,7 @@ namespace MigrationTools.Host.Services
         {
             _Telemetry = telemetry;
             PackageId = "nkdAgility.AzureDevOpsMigrationTools";
+
             RunningVersion = Assembly.GetEntryAssembly().GetName().Version;
             InitialiseService();
         }
@@ -41,35 +50,43 @@ namespace MigrationTools.Host.Services
         private void InitialiseService()
         {
             DateTime startTime = DateTime.Now;
-            Stopwatch mainTimer = Stopwatch.StartNew();
-            //////////////////////////////////
-            bool sucess = false;
-            try
+            using (var bench = new Benchmark("DetectVersionService2::InitialiseService"))
             {
+                //////////////////////////////////
                 WinGetInfo wingetInfo = new WinGetInfo();
                 IsPackageManagerInstalled = wingetInfo.WinGetInstalled;
                 if (IsPackageManagerInstalled)
                 {
-                    WinGetPackageManager packageManager = new WinGetPackageManager();
-                    var package = packageManager.GetInstalledPackages(PackageId).GroupBy(e => e.Id, (id, g) => g.First()).SingleOrDefault();
-                    //RunningVersion = version;
-                    AvailableVersion = new Version(package.AvailableVersion);
-                    InstalledVersion = new Version(package.Version);
-                    if (package != null)
+                    packageManager = new WinGetPackageManager();
+                }
+                else
+                {
+                    Log.Error("The Windows Package Manager is not installed, we use it to determine if you have the latest version, and to make sure that this applicaiton is up to date. You can download and install it from https://aka.ms/getwinget. After which you can call `winget install {PackageId}` from the Windows Terminal to get a manged version of this program.", PackageId);
+                }
+                try
+                {
+
+                    if (IsPackageManagerInstalled)
                     {
-                        sucess = true;
+                        packageManager.GetInstalledPackages(PackageId);
+                        package = packageManager.GetInstalledPackages(PackageId).GroupBy(e => e.Id, (id, g) => g.First()).SingleOrDefault();
+                        //RunningVersion = version;
+                        AvailableVersion = new Version(package.AvailableVersion);
+                        InstalledVersion = new Version(package.Version);
+                        if (package != null)
+                        {
+                            IsPackageInstalled = true;
+                        }
+                        _Telemetry.TrackDependency(new DependencyTelemetry("PackageRepository", "winget", PackageId, AvailableVersion == null ? "nullVersion" : AvailableVersion.ToString(), startTime, bench.Elapsed, "200", IsPackageInstalled));
                     }
-                    _Telemetry.TrackDependency(new DependencyTelemetry("PackageRepository", "winget", PackageId, AvailableVersion == null ? "nullVersion" : AvailableVersion.ToString(), startTime, mainTimer.Elapsed, "200", sucess));
-                } 
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "DetectVersionService");
+                    IsPackageInstalled = false;
+                    _Telemetry.TrackDependency(new DependencyTelemetry("PackageRepository", "winget", PackageId, AvailableVersion == null ? "nullVersion" : AvailableVersion.ToString(), startTime, bench.Elapsed, "500", IsPackageInstalled));
+                }
             }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "DetectVersionService");
-                sucess = false;
-                _Telemetry.TrackDependency(new DependencyTelemetry("PackageRepository", "winget", PackageId, AvailableVersion == null ? "nullVersion" : AvailableVersion.ToString(), startTime, mainTimer.Elapsed, "500", sucess));
-            }
-            /////////////////
-            mainTimer.Stop();
         }
 
         public bool IsRunningInDebug()
@@ -86,5 +103,65 @@ namespace MigrationTools.Host.Services
         {
             return !(RunningVersion >= InstalledVersion);
         }
+
+        public void UpdateFromSource()
+        {
+            using (var bench = new Benchmark("DetectVersionService2::UpdateFromSource"))
+            {
+                if (IsPackageInstalled) && IsUpdateAvailable())
+                {
+                    Log.Information("Running winget update {PackageId} from v{InstalledVersion} to v{AvailableVersion}", PackageId, InstalledVersion, AvailableVersion);
+                    System.Threading.Tasks.Task t = packageManager.UpgradePackageAsync(PackageId);
+                    while (!t.IsCompleted)
+                    {
+                        Log.Information("Update running...");
+                        System.Threading.Thread.Sleep(3000);
+                    }
+                    Log.Information("Update Complete...");
+
+                }
+                else if (!IsPackageInstalled)
+                {
+                    Log.Information("Running winget install {PackageId} from v{InstalledVersion} to v{AvailableVersion}", PackageId, InstalledVersion, AvailableVersion);
+
+                    System.Threading.Tasks.Task t = packageManager.InstallPackageAsync(PackageId);
+                    while (!t.IsCompleted)
+                    {
+                        Log.Information("Install running...");
+                        System.Threading.Thread.Sleep(5000);
+                    }
+                    Log.Information("Install Complete...");
+                }
+            }
+
+        }
     }
+
+    public class Benchmark : IDisposable
+    {
+        private readonly Stopwatch timer = new Stopwatch();
+        private readonly string benchmarkName;
+
+        public TimeSpan Elapsed
+        {
+            get
+            {
+                return timer.Elapsed;
+            }
+        }
+
+        public Benchmark(string benchmarkName)
+        {
+            this.benchmarkName = benchmarkName;
+            timer.Start();
+            Log.Debug("{benchmarkName}||START", benchmarkName);
+        }
+
+        public void Dispose()
+        {
+            timer.Stop();
+            Log.Debug("{benchmarkName}||STOP Elapsed: {timerElapsed}", benchmarkName, timer.Elapsed);
+        }
+    }
+
 }
