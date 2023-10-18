@@ -37,7 +37,7 @@ namespace MigrationTools.Host.Services
             try
             {
                 WinGetPackageManager packageManager = new WinGetPackageManager();
-                var package = packageManager.GetInstalledPackages(PackageId).SingleOrDefault();
+                var package = packageManager.GetInstalledPackages(PackageId).GroupBy(e => e.Id, (id, g) => g.First()).SingleOrDefault();
 
                 latestPackageVersion = new Version(package.AvailableVersion);
                 if (latestPackageVersion != null)
