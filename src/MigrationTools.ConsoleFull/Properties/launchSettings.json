@@ -10,7 +10,7 @@
     },
     "init": {
       "commandName": "Project",
-      "commandLineArgs": "init --options Full"
+      "commandLineArgs": "init --options Full skipVersionCheck"
     },
     "execute2": {
       "commandName": "Project",

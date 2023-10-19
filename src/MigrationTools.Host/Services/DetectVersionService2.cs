@@ -37,6 +37,28 @@ namespace MigrationTools.Host.Services
 
         public bool IsPackageManagerInstalled { get; private set; } = false;
 
+       public bool IsUpdateAvailable {
+            get
+            {
+                return (InstalledVersion < AvailableVersion);
+            }
+        }
+
+        public bool IsRunningInDebug
+        {
+            get
+            {
+                return RunningVersion == new Version("0.0.0.1");
+            }
+        }
+
+        public bool IsNewLocalVersionAvailable
+        {
+            get
+            {
+                return (RunningVersion >= InstalledVersion);
+            }
+        }
 
         public DetectVersionService2(ITelemetryLogger telemetry)
         {
@@ -57,24 +79,21 @@ namespace MigrationTools.Host.Services
                 IsPackageManagerInstalled = wingetInfo.WinGetInstalled;
                 if (IsPackageManagerInstalled)
                 {
+                    Log.Debug("The Windows Package Manager is installed!");
                     packageManager = new WinGetPackageManager();
-                }
-                else
-                {
-                    Log.Error("The Windows Package Manager is not installed, we use it to determine if you have the latest version, and to make sure that this applicaiton is up to date. You can download and install it from https://aka.ms/getwinget. After which you can call `winget install {PackageId}` from the Windows Terminal to get a manged version of this program.", PackageId);
                 }
                 try
                 {
 
                     if (IsPackageManagerInstalled)
                     {
-                        packageManager.GetInstalledPackages(PackageId);
+                        Log.Debug("Searching for package!");
                         package = packageManager.GetInstalledPackages(PackageId).GroupBy(e => e.Id, (id, g) => g.First()).SingleOrDefault();
-                        //RunningVersion = version;
-                        AvailableVersion = new Version(package.AvailableVersion);
-                        InstalledVersion = new Version(package.Version);
                         if (package != null)
                         {
+                            AvailableVersion = new Version(package.AvailableVersion);
+                            InstalledVersion = new Version(package.Version);
+                            Log.Debug("Found package with id {PackageId}", PackageId);
                             IsPackageInstalled = true;
                         }
                         _Telemetry.TrackDependency(new DependencyTelemetry("PackageRepository", "winget", PackageId, AvailableVersion == null ? "nullVersion" : AvailableVersion.ToString(), startTime, bench.Elapsed, "200", IsPackageInstalled));
@@ -89,26 +108,12 @@ namespace MigrationTools.Host.Services
             }
         }
 
-        public bool IsRunningInDebug()
-        {
-            return RunningVersion == new Version("0.0.0.1");
-        }
-
-        public bool IsUpdateAvailable()
-        {
-            return !(InstalledVersion >= AvailableVersion);
-        }
-
-        public bool IsNewLocalVersionAvailable()
-        {
-            return !(RunningVersion >= InstalledVersion);
-        }
 
         public void UpdateFromSource()
         {
             using (var bench = new Benchmark("DetectVersionService2::UpdateFromSource"))
             {
-                if (IsPackageInstalled) && IsUpdateAvailable())
+                if (IsPackageInstalled && IsUpdateAvailable)
                 {
                     Log.Information("Running winget update {PackageId} from v{InstalledVersion} to v{AvailableVersion}", PackageId, InstalledVersion, AvailableVersion);
                     System.Threading.Tasks.Task t = packageManager.UpgradePackageAsync(PackageId);
@@ -118,7 +123,7 @@ namespace MigrationTools.Host.Services
                         System.Threading.Thread.Sleep(3000);
                     }
                     Log.Information("Update Complete...");
-
+                    InitialiseService();
                 }
                 else if (!IsPackageInstalled)
                 {
@@ -131,6 +136,7 @@ namespace MigrationTools.Host.Services
                         System.Threading.Thread.Sleep(5000);
                     }
                     Log.Information("Install Complete...");
+                    InitialiseService();
                 }
             }
 

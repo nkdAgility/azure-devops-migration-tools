@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MigrationTools.Host.Services;
+using Serilog;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace MigrationTools.Host
 {
@@ -20,12 +24,12 @@ namespace MigrationTools.Host
     {
         private readonly IHostApplicationLifetime _LifeTime;
         private readonly IDetectOnlineService _detectOnlineService;
-        private readonly IDetectVersionService _detectVersionService;
+        private readonly IDetectVersionService2 _detectVersionService;
         private readonly ILogger<StartupService> _logger;
         private readonly ITelemetryLogger _telemetryLogger;
         private static Stopwatch _mainTimer = new Stopwatch();
 
-        public StartupService(IHostApplicationLifetime lifeTime, IDetectOnlineService detectOnlineService, IDetectVersionService detectVersionService, ILogger<StartupService> logger, ITelemetryLogger telemetryLogger)
+        public StartupService(IHostApplicationLifetime lifeTime, IDetectOnlineService detectOnlineService, IDetectVersionService2 detectVersionService, ILogger<StartupService> logger, ITelemetryLogger telemetryLogger)
         {
             _LifeTime = lifeTime;
             _detectOnlineService = detectOnlineService;
@@ -38,28 +42,64 @@ namespace MigrationTools.Host
         {
             ApplicationStartup(args);
             Configure(_LifeTime);
-            if (_detectOnlineService.IsOnline())
+            if (_detectOnlineService.IsOnline() && !args.Contains("skipVersionCheck"))
             {
-                Version latestVersion = _detectVersionService.GetLatestVersion();
+                Log.Verbose("Package Management Info:");
+                Log.Debug("     IsPackageManagerInstalled: {IsPackageManagerInstalled}", _detectVersionService.IsPackageManagerInstalled);
+                Log.Debug("     IsPackageInstalled: {IsPackageInstalled}", _detectVersionService.IsPackageInstalled);
+                Log.Debug("     IsUpdateAvailable: {IsUpdateAvailable}", _detectVersionService.IsUpdateAvailable);
+                Log.Debug("     IsNewLocalVersionAvailable: {IsNewLocalVersionAvailable}", _detectVersionService.IsNewLocalVersionAvailable);
+                Log.Debug("     IsRunningInDebug: {IsRunningInDebug}", _detectVersionService.IsRunningInDebug);
+                Log.Verbose("Full version data: ${_detectVersionService}", _detectVersionService);
 
-                _logger.LogInformation($"Latest version detected as {{{nameof(latestVersion)}}}", latestVersion);
-                var version = Assembly.GetEntryAssembly().GetName().Version;
-                if (latestVersion > version)
+                Log.Information("Verion Info:");
+                Log.Information("     Running: {RunningVersion}", _detectVersionService.RunningVersion);
+                Log.Information("     Installed: {InstalledVersion}", _detectVersionService.InstalledVersion);
+                Log.Information("     Available: {AvailableVersion}", _detectVersionService.AvailableVersion);
+                
+               
+                if (!_detectVersionService.IsPackageManagerInstalled)
                 {
-                    _logger.LogWarning("You are currently running version {Version} and a newer version ({LatestVersion}) is available. You should update now using Winget command 'winget nkdAgility.AzureDevOpsMigrationTools' from the Windows Terminal.", version, latestVersion);
-                    if (!args.Contains("skipVersionCheck"))
-                    {                    
-#if !DEBUG
-                    Console.WriteLine("Do you want to continue? (y/n)");
-                    if (Console.ReadKey().Key != ConsoleKey.Y)
+                    Log.Warning("Windows Client: The Windows Package Manager is not installed, we use it to determine if you have the latest version, and to make sure that this application is up to date. You can download and install it from https://aka.ms/getwinget. After which you can call `winget install {PackageId}` from the Windows Terminal to get a manged version of this program.", _detectVersionService.PackageId);
+                    Log.Warning("Windows Server: If you are running on Windows Server you can use the experimental version of Winget, or you can still use Chocolatey to manage the install. Install chocolatey from https://chocolatey.org/install and then use `choco install vsts-sync-migrator` to install, and `choco upgrade vsts-sync-migrator` to upgrade to newer versions.", _detectVersionService.PackageId);
+                } else
+                {
+                    if (!_detectVersionService.IsPackageInstalled)
                     {
-                        _logger.LogWarning("User aborted to update version");                       
-                        throw new Exception("User Abort");
-                      
+                        Log.Information("It looks like this application has been installed from a zip, would you like to use the managed version?");
+                        Console.WriteLine("Do you want install the managed version? (y/n)");
+                        if (Console.ReadKey().Key == ConsoleKey.Y)
+                        {
+                            
+                            _detectVersionService.UpdateFromSource();
+                        }
                     }
-#endif
+                    if (_detectVersionService.IsUpdateAvailable && _detectVersionService.IsPackageInstalled)
+                    {
+                        Log.Information("It looks like this application has been installed from a zip, would you like to use the managed version from Winget?");
+                        Console.WriteLine("Do you want install the managed version? (y/n)");
+                        if (Console.ReadKey().Key == ConsoleKey.Y)
+                        {
+                            _detectVersionService.UpdateFromSource();
+                        }
+                    }
+                    if (_detectVersionService.IsNewLocalVersionAvailable && _detectVersionService.IsPackageInstalled)
+                    {
+                        Log.Information("It looks like this package ({PackageId}) has been updated locally to version {InstalledVersion} and you are not running the latest version?", _detectVersionService.PackageId, _detectVersionService.InstalledVersion);
+                        Console.WriteLine("Do you want to quit and restart? (y/n)");
+                        if (Console.ReadKey().Key == ConsoleKey.Y)
+                        {
+                            Log.Information("Restarting as {CommandLine}", Environment.CommandLine);
+                            Process.Start("devopsmigration", string.Join(" ", Environment.GetCommandLineArgs().Skip(1)));
+                            Thread.Sleep(2000);
+                            Environment.Exit(0);
+                        }
                     }
                 }
+            } else
+            {
+                /// not online or you have specified not to
+                Log.Warning("You are either not online or have chosen `skipVersionCheck`. We will not check for a newer version of the tools.", _detectVersionService.PackageId);
             }
         }
 
