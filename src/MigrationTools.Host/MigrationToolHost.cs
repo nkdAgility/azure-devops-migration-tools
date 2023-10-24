@@ -97,7 +97,8 @@ namespace MigrationTools.Host
                  
                  // Services
                  services.AddTransient<IDetectOnlineService, DetectOnlineService>();
-                 services.AddTransient<IDetectVersionService, DetectVersionService>();
+                 //services.AddTransient<IDetectVersionService, DetectVersionService>();
+                 services.AddTransient<IDetectVersionService2, DetectVersionService2>();
 
                  // Config
                  services.AddSingleton<IEngineConfigurationBuilder, EngineConfigurationBuilder>();
