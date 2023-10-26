@@ -78,7 +78,7 @@ namespace MigrationTools.Host.Services
                 IsPackageManagerInstalled = wingetInfo.WinGetInstalled;
                 if (IsPackageManagerInstalled)
                 {
-                    Log.Debug("The Windows Package Manager is installed!");
+                    Log.Verbose("The Windows Package Manager is installed!");
                     packageManager = new WinGetPackageManager();
                 }
                 try
@@ -86,7 +86,7 @@ namespace MigrationTools.Host.Services
                     RunningVersion = GetRunningVersion();
                     if (IsPackageManagerInstalled)
                     {
-                        Log.Debug("Searching for package!");
+                        Log.Verbose("Searching for package!");
                         package = packageManager.GetInstalledPackages(PackageId).GroupBy(e => e.Id, (id, g) => g.First()).SingleOrDefault();
                         if (package != null)
                         {
@@ -107,7 +107,7 @@ namespace MigrationTools.Host.Services
             }
         }
 
-        public Version GetRunningVersion()
+        public static Version GetRunningVersion()
         {
             Version assver = Assembly.GetEntryAssembly()?.GetName().Version;
             if (assver == null) {
@@ -175,13 +175,13 @@ namespace MigrationTools.Host.Services
         {
             this.benchmarkName = benchmarkName;
             timer.Start();
-            Log.Debug("{benchmarkName}||START", benchmarkName);
+            Log.Verbose("{benchmarkName}||START", benchmarkName);
         }
 
         public void Dispose()
         {
             timer.Stop();
-            Log.Debug("{benchmarkName}||STOP Elapsed: {timerElapsed}", benchmarkName, timer.Elapsed);
+            Log.Verbose("{benchmarkName}||STOP Elapsed: {timerElapsed}", benchmarkName, timer.Elapsed);
         }
     }
 
