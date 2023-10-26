@@ -150,8 +150,8 @@ namespace MigrationTools.Host
 
         private static string GetVersionTextForLog()
         {
-            Version runningVersion = Assembly.GetEntryAssembly()?.GetName().Version;
-            string textVersion = $"v" + ((runningVersion.Major > 12) ? runningVersion : "Local");
+            Version runningVersion = DetectVersionService2.GetRunningVersion();
+            string textVersion = $"v" + ((runningVersion.Major > 1) ? runningVersion : "Local");
            return textVersion;
         }
 

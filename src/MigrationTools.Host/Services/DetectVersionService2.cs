@@ -37,10 +37,11 @@ namespace MigrationTools.Host.Services
 
         public bool IsPackageManagerInstalled { get; private set; } = false;
 
-       public bool IsUpdateAvailable {
+        public bool IsUpdateAvailable
+        {
             get
             {
-                return (InstalledVersion < AvailableVersion);
+                return (IsPackageInstalled) ? (InstalledVersion < AvailableVersion) : false;
             }
         }
 
@@ -48,7 +49,7 @@ namespace MigrationTools.Host.Services
         {
             get
             {
-                return RunningVersion == new Version("0.0.0.1");
+                return RunningVersion == new Version("0.0.0");
             }
         }
 
@@ -56,7 +57,7 @@ namespace MigrationTools.Host.Services
         {
             get
             {
-                return (RunningVersion >= InstalledVersion);
+                return (IsPackageInstalled) ? (RunningVersion >= InstalledVersion) : false;
             }
         }
 
@@ -64,8 +65,6 @@ namespace MigrationTools.Host.Services
         {
             _Telemetry = telemetry;
             PackageId = "nkdAgility.AzureDevOpsMigrationTools";
-
-            RunningVersion = Assembly.GetEntryAssembly().GetName().Version;
             InitialiseService();
         }
 
@@ -79,15 +78,15 @@ namespace MigrationTools.Host.Services
                 IsPackageManagerInstalled = wingetInfo.WinGetInstalled;
                 if (IsPackageManagerInstalled)
                 {
-                    Log.Debug("The Windows Package Manager is installed!");
+                    Log.Verbose("The Windows Package Manager is installed!");
                     packageManager = new WinGetPackageManager();
                 }
                 try
                 {
-
+                    RunningVersion = GetRunningVersion();
                     if (IsPackageManagerInstalled)
                     {
-                        Log.Debug("Searching for package!");
+                        Log.Verbose("Searching for package!");
                         package = packageManager.GetInstalledPackages(PackageId).GroupBy(e => e.Id, (id, g) => g.First()).SingleOrDefault();
                         if (package != null)
                         {
@@ -108,36 +107,52 @@ namespace MigrationTools.Host.Services
             }
         }
 
+        public static Version GetRunningVersion()
+        {
+            Version assver = Assembly.GetEntryAssembly()?.GetName().Version;
+            if (assver == null) {
+                return new Version("0.0.0");
+            }
+            return new Version(assver.Major, assver.Minor, assver.Build);
+        }
+
 
         public void UpdateFromSource()
         {
-            using (var bench = new Benchmark("DetectVersionService2::UpdateFromSource"))
+            if (IsPackageManagerInstalled)
             {
-                if (IsPackageInstalled && IsUpdateAvailable)
+                using (var bench = new Benchmark("DetectVersionService2::UpdateFromSource"))
                 {
-                    Log.Information("Running winget update {PackageId} from v{InstalledVersion} to v{AvailableVersion}", PackageId, InstalledVersion, AvailableVersion);
-                    System.Threading.Tasks.Task t = packageManager.UpgradePackageAsync(PackageId);
-                    while (!t.IsCompleted)
+                    if (IsPackageInstalled && IsUpdateAvailable)
                     {
-                        Log.Information("Update running...");
-                        System.Threading.Thread.Sleep(3000);
+                        Log.Information("Running winget update {PackageId} from v{InstalledVersion} to v{AvailableVersion}", PackageId, InstalledVersion, AvailableVersion);
+                        System.Threading.Tasks.Task t = packageManager.UpgradePackageAsync(PackageId);
+                        while (!t.IsCompleted)
+                        {
+                            Log.Information("Update running...");
+                            System.Threading.Thread.Sleep(3000);
+                        }
+                        Log.Information("Update Complete...");
+                        InitialiseService();
                     }
-                    Log.Information("Update Complete...");
-                    InitialiseService();
-                }
-                else if (!IsPackageInstalled)
-                {
-                    Log.Information("Running winget install {PackageId} from v{InstalledVersion} to v{AvailableVersion}", PackageId, InstalledVersion, AvailableVersion);
+                    else if (!IsPackageInstalled)
+                    {
+                        Log.Information("Running winget install {PackageId} from v{InstalledVersion} to v{AvailableVersion}", PackageId, InstalledVersion, AvailableVersion);
 
-                    System.Threading.Tasks.Task t = packageManager.InstallPackageAsync(PackageId);
-                    while (!t.IsCompleted)
-                    {
-                        Log.Information("Install running...");
-                        System.Threading.Thread.Sleep(5000);
+                        System.Threading.Tasks.Task t = packageManager.InstallPackageAsync(PackageId);
+                        while (!t.IsCompleted)
+                        {
+                            Log.Information("Install running...");
+                            System.Threading.Thread.Sleep(5000);
+                        }
+                        Log.Information("Install Complete...");
+                        InitialiseService();
                     }
-                    Log.Information("Install Complete...");
-                    InitialiseService();
                 }
+            }
+            else
+            {
+                Log.Information("Package Manager not installed");
             }
 
         }
@@ -160,13 +175,13 @@ namespace MigrationTools.Host.Services
         {
             this.benchmarkName = benchmarkName;
             timer.Start();
-            Log.Debug("{benchmarkName}||START", benchmarkName);
+            Log.Verbose("{benchmarkName}||START", benchmarkName);
         }
 
         public void Dispose()
         {
             timer.Stop();
-            Log.Debug("{benchmarkName}||STOP Elapsed: {timerElapsed}", benchmarkName, timer.Elapsed);
+            Log.Verbose("{benchmarkName}||STOP Elapsed: {timerElapsed}", benchmarkName, timer.Elapsed);
         }
     }
 

@@ -64,7 +64,7 @@ namespace MigrationTools.Host
                     Log.Warning("Windows Server: If you are running on Windows Server you can use the experimental version of Winget, or you can still use Chocolatey to manage the install. Install chocolatey from https://chocolatey.org/install and then use `choco install vsts-sync-migrator` to install, and `choco upgrade vsts-sync-migrator` to upgrade to newer versions.", _detectVersionService.PackageId);
                 } else
                 {
-                    if (!_detectVersionService.IsPackageInstalled)
+                    if (!_detectVersionService.IsPackageInstalled && !_detectVersionService.IsRunningInDebug)
                     {
                         Log.Information("It looks like this application has been installed from a zip, would you like to use the managed version?");
                         Console.WriteLine("Do you want install the managed version? (y/n)");
@@ -139,7 +139,7 @@ namespace MigrationTools.Host
             _logger.LogInformation("Start Time: {StartTime}", DateTime.Now.ToUniversalTime().ToLocalTime());
             _logger.LogInformation("Running with args: {@Args}", args);
             _logger.LogInformation("OSVersion: {OSVersion}", Environment.OSVersion.ToString());
-            _logger.LogInformation("Version: {Version}", version);
+            _logger.LogInformation("Version (Assembly): {Version}", version);
         }
 
         protected void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)

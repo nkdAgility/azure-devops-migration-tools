@@ -26,6 +26,7 @@ namespace MigrationTools.Host.Services.Tests
         {
             IDetectVersionService2 dos = new DetectVersionService2(new TelemetryLoggerMock());
             Assert.IsNotNull(dos);
+
         }
 
         [TestMethod, TestCategory("L3")]
