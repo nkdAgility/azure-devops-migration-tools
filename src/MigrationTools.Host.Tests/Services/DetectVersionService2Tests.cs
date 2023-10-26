@@ -22,14 +22,14 @@ namespace MigrationTools.Host.Services.Tests
 
 
         [TestMethod, TestCategory("L3")]
-        public void DetectVersionServiceTest_Initialise()
+        public void DetectVersionService2Test_Initialise()
         {
             IDetectVersionService2 dos = new DetectVersionService2(new TelemetryLoggerMock());
             Assert.IsNotNull(dos);
         }
 
         [TestMethod, TestCategory("L3")]
-        public void DetectVersionServiceTest_Update()
+        public void DetectVersionService2Test_Update()
         {
             IDetectVersionService2 dos = new DetectVersionService2(new TelemetryLoggerMock());
             dos.UpdateFromSource();
