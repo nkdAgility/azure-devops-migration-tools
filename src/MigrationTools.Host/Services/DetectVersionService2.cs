@@ -41,7 +41,7 @@ namespace MigrationTools.Host.Services
         {
             get
             {
-                return (InstalledVersion < AvailableVersion);
+                return (IsPackageInstalled) ? (InstalledVersion < AvailableVersion) : false;
             }
         }
 
@@ -49,7 +49,7 @@ namespace MigrationTools.Host.Services
         {
             get
             {
-                return RunningVersion == new Version("0.0.0.1");
+                return RunningVersion == new Version("0.0.0");
             }
         }
 
@@ -57,7 +57,7 @@ namespace MigrationTools.Host.Services
         {
             get
             {
-                return (RunningVersion >= InstalledVersion);
+                return (IsPackageInstalled) ? (RunningVersion >= InstalledVersion) : false;
             }
         }
 
@@ -83,7 +83,7 @@ namespace MigrationTools.Host.Services
                 }
                 try
                 {
-                    RunningVersion = Assembly.GetEntryAssembly()?.GetName().Version;
+                    RunningVersion = GetRunningVersion();
                     if (IsPackageManagerInstalled)
                     {
                         Log.Debug("Searching for package!");
@@ -105,6 +105,15 @@ namespace MigrationTools.Host.Services
                     _Telemetry.TrackDependency(new DependencyTelemetry("PackageRepository", "winget", PackageId, AvailableVersion == null ? "nullVersion" : AvailableVersion.ToString(), startTime, bench.Elapsed, "500", IsPackageInstalled));
                 }
             }
+        }
+
+        public Version GetRunningVersion()
+        {
+            Version assver = Assembly.GetEntryAssembly()?.GetName().Version;
+            if (assver == null) {
+                return new Version("0.0.0");
+            }
+            return new Version(assver.Major, assver.Minor, assver.Build);
         }
 
 
