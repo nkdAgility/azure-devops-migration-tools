@@ -37,7 +37,8 @@ namespace MigrationTools.Host.Services
 
         public bool IsPackageManagerInstalled { get; private set; } = false;
 
-       public bool IsUpdateAvailable {
+        public bool IsUpdateAvailable
+        {
             get
             {
                 return (InstalledVersion < AvailableVersion);
@@ -64,8 +65,6 @@ namespace MigrationTools.Host.Services
         {
             _Telemetry = telemetry;
             PackageId = "nkdAgility.AzureDevOpsMigrationTools";
-
-            RunningVersion = Assembly.GetEntryAssembly().GetName().Version;
             InitialiseService();
         }
 
@@ -84,7 +83,7 @@ namespace MigrationTools.Host.Services
                 }
                 try
                 {
-
+                    RunningVersion = Assembly.GetEntryAssembly()?.GetName().Version;
                     if (IsPackageManagerInstalled)
                     {
                         Log.Debug("Searching for package!");
@@ -111,33 +110,40 @@ namespace MigrationTools.Host.Services
 
         public void UpdateFromSource()
         {
-            using (var bench = new Benchmark("DetectVersionService2::UpdateFromSource"))
+            if (IsPackageManagerInstalled)
             {
-                if (IsPackageInstalled && IsUpdateAvailable)
+                using (var bench = new Benchmark("DetectVersionService2::UpdateFromSource"))
                 {
-                    Log.Information("Running winget update {PackageId} from v{InstalledVersion} to v{AvailableVersion}", PackageId, InstalledVersion, AvailableVersion);
-                    System.Threading.Tasks.Task t = packageManager.UpgradePackageAsync(PackageId);
-                    while (!t.IsCompleted)
+                    if (IsPackageInstalled && IsUpdateAvailable)
                     {
-                        Log.Information("Update running...");
-                        System.Threading.Thread.Sleep(3000);
+                        Log.Information("Running winget update {PackageId} from v{InstalledVersion} to v{AvailableVersion}", PackageId, InstalledVersion, AvailableVersion);
+                        System.Threading.Tasks.Task t = packageManager.UpgradePackageAsync(PackageId);
+                        while (!t.IsCompleted)
+                        {
+                            Log.Information("Update running...");
+                            System.Threading.Thread.Sleep(3000);
+                        }
+                        Log.Information("Update Complete...");
+                        InitialiseService();
                     }
-                    Log.Information("Update Complete...");
-                    InitialiseService();
-                }
-                else if (!IsPackageInstalled)
-                {
-                    Log.Information("Running winget install {PackageId} from v{InstalledVersion} to v{AvailableVersion}", PackageId, InstalledVersion, AvailableVersion);
+                    else if (!IsPackageInstalled)
+                    {
+                        Log.Information("Running winget install {PackageId} from v{InstalledVersion} to v{AvailableVersion}", PackageId, InstalledVersion, AvailableVersion);
 
-                    System.Threading.Tasks.Task t = packageManager.InstallPackageAsync(PackageId);
-                    while (!t.IsCompleted)
-                    {
-                        Log.Information("Install running...");
-                        System.Threading.Thread.Sleep(5000);
+                        System.Threading.Tasks.Task t = packageManager.InstallPackageAsync(PackageId);
+                        while (!t.IsCompleted)
+                        {
+                            Log.Information("Install running...");
+                            System.Threading.Thread.Sleep(5000);
+                        }
+                        Log.Information("Install Complete...");
+                        InitialiseService();
                     }
-                    Log.Information("Install Complete...");
-                    InitialiseService();
                 }
+            }
+            else
+            {
+                Log.Information("Package Manager not installed");
             }
 
         }
