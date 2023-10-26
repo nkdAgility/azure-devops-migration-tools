@@ -33,7 +33,7 @@ Follow the [setup instructions](server-configuration.md) to make sure that you c
 ## Create a default configuration file
 
 1. Open your [Windows Terminal](https://learn.microsoft.com/en-us/windows/terminal/) in your chosen working folder
-2. Run `migration init` to create a default configuration
+2. Run `devopsmigration init` to create a default configuration
 3. Open `configuration.json` from the current directory
 
 You can now customize the configuration depending on what you need to do. However, a basic config that you can use to migrate from one team project to another with the same process template is:
