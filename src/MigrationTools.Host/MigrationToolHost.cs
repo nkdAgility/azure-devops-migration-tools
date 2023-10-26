@@ -36,6 +36,7 @@ namespace MigrationTools.Host
             var hostBuilder = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args)
              .UseSerilog((hostingContext, services, loggerConfiguration) =>
              {
+                 string outputTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] [" + GetVersionTextForLog() + "] {Message:lj}{NewLine}{Exception}";
                  string logsPath = CreateLogsPath();
                  var logPath = Path.Combine(logsPath, "migration.log");
                  var logLevel = hostingContext.Configuration.GetValue<LogEventLevel>("LogLevel");
@@ -46,7 +47,7 @@ namespace MigrationTools.Host
                      .Enrich.FromLogContext()
                      .Enrich.WithMachineName()
                      .Enrich.WithProcessId()
-                     .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Debug, theme: AnsiConsoleTheme.Code, outputTemplate:"[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
+                     .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Debug, theme: AnsiConsoleTheme.Code, outputTemplate: outputTemplate)
                      .WriteTo.ApplicationInsights(services.GetService<TelemetryClient>(), new CustomConverter(), LogEventLevel.Error)
                      .WriteTo.File(logPath, LogEventLevel.Verbose);
              })
@@ -145,6 +146,13 @@ namespace MigrationTools.Host
 
 
             return hostBuilder;
+        }
+
+        private static string GetVersionTextForLog()
+        {
+            Version runningVersion = Assembly.GetEntryAssembly()?.GetName().Version;
+            string textVersion = $"v" + ((runningVersion.Major > 12) ? runningVersion : "Local");
+           return textVersion;
         }
 
         public static async Task RunMigrationTools(this IHostBuilder hostBuilder, string[] args)
