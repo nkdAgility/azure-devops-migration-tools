@@ -57,7 +57,7 @@ namespace MigrationTools.Host.Services
         {
             get
             {
-                return (IsPackageInstalled) ? (RunningVersion >= InstalledVersion) : false;
+                return (IsPackageInstalled) ? !(RunningVersion >= InstalledVersion) : false;
             }
         }
 
@@ -109,7 +109,7 @@ namespace MigrationTools.Host.Services
 
         public static Version GetRunningVersion()
         {
-            Version assver = Assembly.GetEntryAssembly()?.GetName().Version;
+            Version assver = new Version(14, 0,0) ;// Assembly.GetEntryAssembly()?.GetName().Version;
             if (assver == null) {
                 return new Version("0.0.0");
             }
