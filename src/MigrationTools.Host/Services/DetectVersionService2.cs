@@ -57,7 +57,7 @@ namespace MigrationTools.Host.Services
         {
             get
             {
-                return (IsPackageInstalled) ? (RunningVersion >= InstalledVersion) : false;
+                return (IsPackageInstalled) ? !(RunningVersion >= InstalledVersion) : false;
             }
         }
 
