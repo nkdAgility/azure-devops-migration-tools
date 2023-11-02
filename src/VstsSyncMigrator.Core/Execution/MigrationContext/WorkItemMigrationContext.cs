@@ -170,7 +170,7 @@ namespace VstsSyncMigrator.Engine
                 //////////////////////////////////////////////////
                 contextLog.Information("ValidateTargetNodesExist::Checking all Nodes on Work items");
                 List<NodeStructureMissingItem> nodeStructureMissingItems = _nodeStructureEnricher.GetMissingRevisionNodes(sourceWorkItems);
-                if (!_nodeStructureEnricher.ValidateTargetNodesExist(nodeStructureMissingItems))
+                if (_nodeStructureEnricher.ValidateTargetNodesExist(nodeStructureMissingItems))
                 {
                         throw new Exception("Missing Iterations in Target preventing progress, check log for list. To continue you MUST configure IterationMaps or AreaMaps that matches the missing paths..");
                 }
