@@ -96,7 +96,6 @@
       "MaxRevisions": 0,
       "NodeStructureEnricherEnabled": true,
       "UseCommonNodeStructureEnricherConfig": false,
-      "StopMigrationOnMissingAreaIterationNodes": true,
       "ShouldCreateMissingRevisionPaths": false,
       "NodeBasePaths": [],
       "AreaMaps": {},

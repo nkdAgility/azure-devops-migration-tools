@@ -29,7 +29,6 @@ configurationSamples:
       "WorkItemIDs": null,
       "MaxRevisions": 0,
       "UseCommonNodeStructureEnricherConfig": false,
-      "StopMigrationOnMissingAreaIterationNodes": true,
       "NodeBasePaths": null,
       "AreaMaps": {
         "$type": "Dictionary`2"
@@ -136,10 +135,6 @@ options:
   type: Boolean
   description: "**beta** If enabled this will fix any image attachments URL's, work item mention URL's or user mentions in the HTML fields as well as discussion comments. You must specify a PersonalAccessToken in the Source project for Azure DevOps; TFS should use integrated authentication."
   defaultValue: false
-- parameterName: StopMigrationOnMissingAreaIterationNodes
-  type: Boolean
-  description: With this enabled the system will stop after the check for missing nodes if detected.
-  defaultValue: '?'
 - parameterName: UpdateCreatedBy
   type: Boolean
   description: "If this is enabled the creation process on the target project will create the items with the original creation date. (Important: The item history is always pointed to the date of the migration, it's change only the data column CreateDate, not the internal create date)"

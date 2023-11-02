@@ -157,12 +157,6 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         public bool UseCommonNodeStructureEnricherConfig { get; set; }
 
         /// <summary>
-        /// With this enabled the system will stop after the check for missing nodes if detected.
-        /// </summary>
-        /// <default>?</default>
-        public bool StopMigrationOnMissingAreaIterationNodes { get; set; }
-
-        /// <summary>
         /// The root paths of the Ares / Iterations you want migrate. See [NodeBasePath Configuration](#nodebasepath-configuration)
         /// </summary>
         /// <default>["/"]</default>
@@ -228,8 +222,6 @@ namespace MigrationTools._EngineV1.Configuration.Processing
             PrefixProjectToNodes = false;
             UpdateCreatedDate = true;
             SkipToFinalRevisedWorkItemType = true;
-            StopMigrationOnMissingAreaIterationNodes = true;
-
             LinkMigrationSaveEachAsAdded = false;
             GenerateMigrationComment = true;
             WIQLQueryBit = @"AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')";
