@@ -83,7 +83,7 @@ namespace MigrationTools.Host
                             _detectVersionService.UpdateFromSource();
                         }
                     }
-                    if (_detectVersionService.IsNewLocalVersionAvailable && _detectVersionService.IsPackageInstalled)
+                    if ((_detectVersionService.IsNewLocalVersionAvailable && _detectVersionService.IsPackageInstalled) && !_detectVersionService.IsRunningInDebug)
                     {
                         Log.Information("It looks like this package ({PackageId}) has been updated locally to version {InstalledVersion} and you are not running the latest version?", _detectVersionService.PackageId, _detectVersionService.InstalledVersion);
                         Console.WriteLine("Do you want to quit and restart? (y/n)");
