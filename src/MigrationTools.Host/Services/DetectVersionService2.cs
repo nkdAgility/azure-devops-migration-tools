@@ -87,11 +87,11 @@ namespace MigrationTools.Host.Services
                     if (IsPackageManagerInstalled)
                     {
                         Log.Verbose("Searching for package!");
-                        package = packageManager.GetInstalledPackages(PackageId).GroupBy(e => e.Id, (id, g) => g.First()).SingleOrDefault();
+                        package = packageManager.GetInstalledPackages(PackageId, true).FirstOrDefault();
                         if (package != null)
                         {
-                            AvailableVersion = new Version(package.AvailableVersion);
-                            InstalledVersion = new Version(package.Version);
+                            AvailableVersion = package.AvailableVersionObject;
+                            InstalledVersion = package.VersionObject;
                             Log.Debug("Found package with id {PackageId}", PackageId);
                             IsPackageInstalled = true;
                         }
