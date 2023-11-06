@@ -83,18 +83,18 @@ We use these tools with our customers, and for fun, to do real world migrations 
 - 14.1 - Enabled auto update on client devices, server still used choco
 - 14.0 - Move from Chocolaty to Winget as the base installer. We will continue to publish to Chocolaty, but we recommend using `winget install nkdAgility.AzureDevOpsMigrationTools` for future installs. Main executable renamed to "devopsmigration.exe" to prevent conflict with other applications with symbolic links.
 - 13.2 - Added [ExportUsersForMapping](https://nkdagility.com/learn/azure-devops-migration-tools/Reference/v1/Processors/TeamMigrationContext/) to export a json file with a list of users ready for a field mapping.
-- 13.1 - Update all NuGet packages to latest version.
+- 13.1 - Update all NuGet packages to the latest version.
 - 13.0 - Update to .net 7.0 with all dependencies. Focus on documentation improvements to support future updates.
 - 12.1 - Make embedded images regex lazy
-- 12.1 - Added a stop when there are area or iteration nodes in the source history that are not in the target. This causes missing of data. System will now list the areas and iteration that are missing, and then stop. You can decide to add them manually, or add a field mapping.
-- v11.11 - Refactored revision manager to have more tests and support limiting the number of revisions. CollapseRevisions has been replaced by setting MaxRevisions to 1 and setting AttachRevisionHistory to true; MaxRevisions sets the maximum number of revisions that will be migrated. "First + Last*N = Max". If this was set to 5 and there were 10 revisions you would get the first 1 (creation) and the latest 4 migrated. This is done after all of the existing revisions are created but before anything newer that target is removed.
-- v11.10 - Added ability to limit the number of revisions migrated with `MaxRevisions` on `WorkItemMigration` processor. 0 = All, and any other number should migrate the first revision + the latest up to MAX.
+- 12.1 - Added a stop when there are area or iteration nodes in the source history that are not in the target. This causes missing data. System will now list the areas and iteration that are missing, and then stop. You can decide to add them manually, or add a field mapping.
+- v11.11 - Refactored revision manager to have more tests and support limiting the number of revisions. CollapseRevisions has been replaced by setting MaxRevisions to 1 and setting AttachRevisionHistory to true; MaxRevisions sets the maximum number of revisions that will be migrated. "First + Last*N = Max". If this was set to 5 and there were 10 revisions you would get the first 1 (creation) and the latest 4 migrated. This is done after all of the existing revisions are created but before anything newer than that target is removed.
+- v11.10 - Added ability to limit the number of revisions migrated with `MaxRevisions` on the `WorkItemMigration` processor. 0 = All, and any other number should migrate the first revision + the latest up to MAX.
 - v11.9 - Dark launch of `Process` migration by @akanieski 
 - v11.9 - Dark launch of `Pipelines` & `Builds` migration by @tomfrenzel
 - v11.8 - As part of moving to the new architecture we moved to default newtonsoft type handling with `$type` properties instead of `ObjectType` ___To Migrate rename "ObjectType" to "$type" in your configuration!___
 - v11.5 - Added more useful logging levels. Replace `"TelemetryEnableTrace": false` with `"LogLevel": "Verbose"` in the config. Verbose will only be logged to the logfile.
 - v11.2.1 - Removed NodeMigrationContext and converted it to an enricher for Work Items. Still needs work, so that it migrates individual nodes, but currently migrates all.
-- v10.1 - Changed config design to have only the Name and not FullName of the class. Remove `MigrationTools.Core.Configuration.FieldMap.` and `MigrationTools.Core.Configuration.Processing.` from the config leaving only the Name of the class in ObjectType field.
+- v10.1 - Changed config design to have only the Name and not FullName of the class. Remove `MigrationTools.Core.Configuration.FieldMap.` and `MigrationTools.Core.Configuration.Processing.` from the config leaving only the Name of the class in the ObjectType field.
 - v10.0 - Start of the great refactor over to .NET Core and the REST API as the Object Model has been retired.
 - v9.0 - Added support for migration between other language versions of Azure DevOps. Developed for German -> English
 - v8.9 - Added 'Collapse Revisions' feature to collapse and attache revisions instead of replaying them
