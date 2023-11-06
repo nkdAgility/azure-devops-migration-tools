@@ -505,12 +505,6 @@
             </summary>
             <default>?</default>
         </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.StopMigrationOnMissingAreaIterationNodes">
-            <summary>
-            With this enabled the system will stop after the check for missing nodes if detected.
-            </summary>
-            <default>?</default>
-        </member>
         <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.NodeBasePaths">
             <summary>
             The root paths of the Ares / Iterations you want migrate. See [NodeBasePath Configuration](#nodebasepath-configuration)

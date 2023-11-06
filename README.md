@@ -79,6 +79,8 @@ We use these tools with our customers, and for fun, to do real world migrations 
 
 ## Change Log
 
+- 14.2 - Removed the `StopMigrationOnMissingAreaIterationNodes` flag. All missing nodes MUST be present or mapped using `AreaMaps` and `IterationMaps`. System will always stop on missing nodes.
+- 14.1 - Enabled auto update on clinet devices, server stull ised choco
 - 14.0 - Move from Chocolaty to Winget as the base installer. We will continue to publish to Chocolaty, but we recommend using `winget install nkdAgility.AzureDevOpsMigrationTools` for future installs. Main executable renamed to "devopsmigration.exe" to prevent conflict with other applications with symbolic links.
 - 13.2 - Added [ExportUsersForMapping](https://nkdagility.com/learn/azure-devops-migration-tools/Reference/v1/Processors/TeamMigrationContext/) to export a json file with a list of users ready for a field mapping.
 - 13.1 - Update all NuGet packages to latest version.

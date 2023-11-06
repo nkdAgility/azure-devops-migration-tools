@@ -170,13 +170,9 @@ namespace VstsSyncMigrator.Engine
                 //////////////////////////////////////////////////
                 contextLog.Information("ValidateTargetNodesExist::Checking all Nodes on Work items");
                 List<NodeStructureMissingItem> nodeStructureMissingItems = _nodeStructureEnricher.GetMissingRevisionNodes(sourceWorkItems);
-                if (!_nodeStructureEnricher.ValidateTargetNodesExist(nodeStructureMissingItems))
+                if (_nodeStructureEnricher.ValidateTargetNodesExist(nodeStructureMissingItems))
                 {
-                    contextLog.Debug("ValidateTargetNodesExist::StopMigrationOnMissingAreaIterationNodes:{StopMigrationOnMissingAreaIterationNodes}", _config.StopMigrationOnMissingAreaIterationNodes);
-                    if (_config.StopMigrationOnMissingAreaIterationNodes)
-                    {
-                        throw new Exception("Missing Iterations in Target preventing progress, check log for list. If you resolve with a mapping set StopMigrationOnMissingAreaIterationNodes = false in the config to continue.");
-                    }
+                        throw new Exception("Missing Iterations in Target preventing progress, check log for list. To continue you MUST configure IterationMaps or AreaMaps that matches the missing paths..");
                 }
 
                 //////////////////////////////////////////////////
