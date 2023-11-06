@@ -37,11 +37,11 @@ namespace MigrationTools.Host.Services
             try
             {
                 WinGetPackageManager packageManager = new WinGetPackageManager();
-                var package = packageManager.GetInstalledPackages(PackageId).GroupBy(e => e.Id, (id, g) => g.First()).SingleOrDefault();
+                var package = packageManager.GetInstalledPackages(PackageId, true).FirstOrDefault();
 
-                latestPackageVersion = new Version(package.AvailableVersion);
-                if (latestPackageVersion != null)
+                if (package != null)
                 {
+                    latestPackageVersion = package.AvailableVersionObject;
                     sucess = true;
                 }
                 _Telemetry.TrackDependency(new DependencyTelemetry("PackageRepository", "winget", PackageId, latestPackageVersion == null ? "nullVersion" : latestPackageVersion.ToString(), startTime, mainTimer.Elapsed, "200", sucess));
