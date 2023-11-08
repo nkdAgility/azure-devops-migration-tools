@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question
+    url: https://github.com/nkdAgility/azure-devops-migration-tools/discussions/new?category=q-a
+    about: Please ask and answer questions here.
+  - name: Feature Idea
+    url: https://github.com/nkdAgility/azure-devops-migration-tools/discussions/new?category=ideas
+    about: If you have ideas fo changes or new capabilities please add them here
