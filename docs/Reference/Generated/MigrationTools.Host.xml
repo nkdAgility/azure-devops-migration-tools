@@ -4,5 +4,100 @@
         <name>MigrationTools.Host</name>
     </assembly>
     <members>
+        <member name="F:ThisAssembly.Git.IsDirty">
+            <summary>
+            Gets whether the current repository is dirty.
+            </summary>
+        </member>
+        <member name="F:ThisAssembly.Git.IsDirtyString">
+            <summary>
+            => @"true"
+            </summary>
+        </member>
+        <member name="F:ThisAssembly.Git.RepositoryUrl">
+            <summary>
+            => @"https://github.com/nkdAgility/azure-devops-migration-tools.git"
+            </summary>
+        </member>
+        <member name="F:ThisAssembly.Git.Branch">
+            <summary>
+            => @"gitVersion"
+            </summary>
+        </member>
+        <member name="F:ThisAssembly.Git.Commit">
+            <summary>
+            => @"06bc3d1"
+            </summary>
+        </member>
+        <member name="F:ThisAssembly.Git.Sha">
+            <summary>
+            => @"06bc3d128891322b87b3cae2f5985a7ece396f17"
+            </summary>
+        </member>
+        <member name="F:ThisAssembly.Git.CommitDate">
+            <summary>
+            => @"2023-11-08T13:00:08+00:00"
+            </summary>
+        </member>
+        <member name="F:ThisAssembly.Git.Commits">
+            <summary>
+            => @"0"
+            </summary>
+        </member>
+        <member name="F:ThisAssembly.Git.Tag">
+            <summary>
+            => @"v14.2.1"
+            </summary>
+        </member>
+        <member name="F:ThisAssembly.Git.BaseTag">
+            <summary>
+            => @"v14.2.1"
+            </summary>
+        </member>
+        <member name="F:ThisAssembly.Git.BaseVersion.Major">
+            <summary>
+            => @"14"
+            </summary>
+        </member>
+        <member name="F:ThisAssembly.Git.BaseVersion.Minor">
+            <summary>
+            => @"2"
+            </summary>
+        </member>
+        <member name="F:ThisAssembly.Git.BaseVersion.Patch">
+            <summary>
+            => @"1"
+            </summary>
+        </member>
+        <member name="F:ThisAssembly.Git.SemVer.Major">
+            <summary>
+            => @"14"
+            </summary>
+        </member>
+        <member name="F:ThisAssembly.Git.SemVer.Minor">
+            <summary>
+            => @"2"
+            </summary>
+        </member>
+        <member name="F:ThisAssembly.Git.SemVer.Patch">
+            <summary>
+            => @"1"
+            </summary>
+        </member>
+        <member name="F:ThisAssembly.Git.SemVer.Label">
+            <summary>
+            => @""
+            </summary>
+        </member>
+        <member name="F:ThisAssembly.Git.SemVer.DashLabel">
+            <summary>
+            => @""
+            </summary>
+        </member>
+        <member name="F:ThisAssembly.Git.SemVer.Source">
+            <summary>
+            => @"Tag"
+            </summary>
+        </member>
     </members>
 </doc>
