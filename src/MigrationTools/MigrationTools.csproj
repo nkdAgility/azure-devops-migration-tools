@@ -28,7 +28,7 @@
     <PackageReference Include="Microsoft.IdentityModel.Clients.ActiveDirectory" Version="5.3.0" />
     <PackageReference Include="Microsoft.VisualStudio.Services.Client" Version="16.205.1" />
     <PackageReference Include="Microsoft.VisualStudio.Services.ServiceEndpoints.WebApi" Version="16.205.1" />
-    <PackageReference Include="Serilog" Version="3.0.1" />
+    <PackageReference Include="Serilog" Version="3.1.0" />
     <PackageReference Include="System.Security.Principal.Windows" Version="5.0.0" />
   </ItemGroup>
 

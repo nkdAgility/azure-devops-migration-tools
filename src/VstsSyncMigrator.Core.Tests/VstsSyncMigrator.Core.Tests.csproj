@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.ApplicationInsights.WorkerService" Version="2.21.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
     <PackageReference Include="Moq" Version="4.20.69" />
     <PackageReference Include="MSTest.TestAdapter" Version="3.1.1" />
     <PackageReference Include="MSTest.TestFramework" Version="3.1.1" />
