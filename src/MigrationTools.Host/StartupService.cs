@@ -56,8 +56,17 @@ namespace MigrationTools.Host
                 Log.Information("     Running: {RunningVersion}", _detectVersionService.RunningVersion);
                 Log.Information("     Installed: {InstalledVersion}", _detectVersionService.InstalledVersion);
                 Log.Information("     Available: {AvailableVersion}", _detectVersionService.AvailableVersion);
-                
-               
+
+                if (_detectVersionService.RunningVersion.Major == 0)
+                {
+                    Log.Information("Git Info:");
+                    Log.Information("     Repo: {GitRepositoryUrl}", ThisAssembly.Git.RepositoryUrl);
+                    Log.Information("     Tag: {GitTag}", ThisAssembly.Git.Tag);
+                    Log.Information("     Branch: {GitBranch}", ThisAssembly.Git.Branch);
+                    Log.Information("     Commits: {GitCommits}", ThisAssembly.Git.Commits);
+
+                }
+
                 if (!_detectVersionService.IsPackageManagerInstalled)
                 {
                     Log.Warning("Windows Client: The Windows Package Manager is not installed, we use it to determine if you have the latest version, and to make sure that this application is up to date. You can download and install it from https://aka.ms/getwinget. After which you can call `winget install {PackageId}` from the Windows Terminal to get a manged version of this program.", _detectVersionService.PackageId);

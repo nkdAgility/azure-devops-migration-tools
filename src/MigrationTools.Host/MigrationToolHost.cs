@@ -151,8 +151,8 @@ namespace MigrationTools.Host
         private static string GetVersionTextForLog()
         {
             Version runningVersion = DetectVersionService2.GetRunningVersion();
-            string textVersion = $"v" + ((runningVersion.Major > 1) ? runningVersion : "Local");
-           return textVersion;
+            string textVersion = ((runningVersion.Major > 1) ? "$v" + runningVersion : ThisAssembly.Git.BaseTag + "-" + ThisAssembly.Git.Commits + "-local");
+            return textVersion;
         }
 
         public static async Task RunMigrationTools(this IHostBuilder hostBuilder, string[] args)
