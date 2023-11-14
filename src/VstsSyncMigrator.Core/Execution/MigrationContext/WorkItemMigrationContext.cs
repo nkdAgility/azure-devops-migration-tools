@@ -29,6 +29,7 @@ using MigrationTools._EngineV1.Processors;
 using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
 using MigrationTools.ProcessorEnrichers;
+using Newtonsoft.Json.Linq;
 using Serilog.Context;
 using Serilog.Events;
 using ILogger = Serilog.ILogger;
@@ -668,6 +669,12 @@ namespace VstsSyncMigrator.Engine
                         destType = Engine.TypeDefinitionMaps.Items[destType].Map();
                     }
                     bool typeChange = (destType != targetWorkItem.Type);
+                    if (Engine.Target.Config.AsTeamProjectConfig().PersonalAccessToken == null)
+                    {
+                        var ex = new InvalidOperationException("PersonalAccessToken for target is missing");
+                        Log.LogError(ex,"You have not filled out a PersonalAccessToken for the target environment. This is required when there are any work item type changes. Please fill out the PAT token on the target config and re-run!");
+                        throw ex;
+                    }
                     if (typeChange)
                     {
                         Uri collectionUri = Engine.Target.Config.AsTeamProjectConfig().Collection;
