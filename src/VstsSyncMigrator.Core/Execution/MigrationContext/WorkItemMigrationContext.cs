@@ -143,17 +143,7 @@ namespace VstsSyncMigrator.Engine
                 throw new Exception("You must call Configure() first");
             }
             //////////////////////////////////////////////////
-            string collUrl = Engine.Target.Config.AsTeamProjectConfig().Collection.ToString();
-            if (collUrl.Contains("dev.azure.com") || collUrl.Contains(".visualstudio.com"))
-            {
-                // Test that
-                if (Engine.Target.Config.AsTeamProjectConfig().PersonalAccessToken.IsNullOrEmpty())
-                {
-                    var ex = new InvalidOperationException("Missing PersonalAccessToken from Target");
-                    Log.LogError(ex, "When you are migrating to Azure DevOps you MUST provide an PAT so that we can call the REST API for certain actions. For example we would be unable to deal with a Work item Type change.");
-                    throw ex;
-                }
-            }
+            ValidatePatTokenRequirement();
             //////////////////////////////////////////////////
             var workItemServer = Engine.Source.GetService<WorkItemServer>();
             attachmentEnricher = new TfsAttachmentEnricher(workItemServer, _config.AttachmentWorkingPath, _config.AttachmentMaxSize);
@@ -181,14 +171,14 @@ namespace VstsSyncMigrator.Engine
                 contextLog.Information("Replay all revisions of {sourceWorkItemsCount} work items?",
                     sourceWorkItems.Count);
 
-                
+
 
                 //////////////////////////////////////////////////
                 contextLog.Information("ValidateTargetNodesExist::Checking all Nodes on Work items");
                 List<NodeStructureMissingItem> nodeStructureMissingItems = _nodeStructureEnricher.GetMissingRevisionNodes(sourceWorkItems);
                 if (_nodeStructureEnricher.ValidateTargetNodesExist(nodeStructureMissingItems))
                 {
-                        throw new Exception("Missing Iterations in Target preventing progress, check log for list. To continue you MUST configure IterationMaps or AreaMaps that matches the missing paths..");
+                    throw new Exception("Missing Iterations in Target preventing progress, check log for list. To continue you MUST configure IterationMaps or AreaMaps that matches the missing paths..");
                 }
 
                 //////////////////////////////////////////////////
@@ -284,6 +274,21 @@ namespace VstsSyncMigrator.Engine
                     contextLog.Warning("The following items could not be migrated: {ItemIds}", string.Join(", ", _itemsInError));
                 }
                 contextLog.Information("DONE in {Elapsed}", stopwatch.Elapsed.ToString("c"));
+            }
+        }
+
+        private void ValidatePatTokenRequirement()
+        {
+            string collUrl = Engine.Target.Config.AsTeamProjectConfig().Collection.ToString();
+            if (collUrl.Contains("dev.azure.com") || collUrl.Contains(".visualstudio.com"))
+            {
+                // Test that
+                if (Engine.Target.Config.AsTeamProjectConfig().PersonalAccessToken.IsNullOrEmpty())
+                {
+                    var ex = new InvalidOperationException("Missing PersonalAccessToken from Target");
+                    Log.LogError(ex, "When you are migrating to Azure DevOps you MUST provide an PAT so that we can call the REST API for certain actions. For example we would be unable to deal with a Work item Type change.");
+                    throw ex;
+                }
             }
         }
 
@@ -684,14 +689,10 @@ namespace VstsSyncMigrator.Engine
                         destType = Engine.TypeDefinitionMaps.Items[destType].Map();
                     }
                     bool typeChange = (destType != targetWorkItem.Type);
-                    if (Engine.Target.Config.AsTeamProjectConfig().PersonalAccessToken == null)
-                    {
-                        var ex = new InvalidOperationException("PersonalAccessToken for target is missing");
-                        Log.LogError(ex,"You have not filled out a PersonalAccessToken for the target environment. This is required when there are any work item type changes. Please fill out the PAT token on the target config and re-run!");
-                        throw ex;
-                    }
+                    
                     if (typeChange)
                     {
+                        ValidatePatTokenRequirement();
                         Uri collectionUri = Engine.Target.Config.AsTeamProjectConfig().Collection;
                         string token = Engine.Target.Config.AsTeamProjectConfig().PersonalAccessToken;
                         VssConnection connection = new VssConnection(collectionUri, new VssBasicCredential(string.Empty, token));
