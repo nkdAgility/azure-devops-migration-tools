@@ -5,7 +5,8 @@
         EngineConfiguration BuildDefault();
 
         EngineConfiguration BuildDefault2();
-
+        EngineConfiguration BuildGettingStarted();
+        EngineConfiguration BuildReference();
         EngineConfiguration BuildWorkItemMigration();
 
         EngineConfiguration BuildWorkItemMigration2();

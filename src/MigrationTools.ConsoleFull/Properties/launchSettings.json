@@ -2,7 +2,7 @@
   "profiles": {
     "execute": {
       "commandName": "Project",
-      "commandLineArgs": "execute -c configuration.json"
+      "commandLineArgs": "execute -c \"C:\\temp\\configuration.json\""
     },
     "executepipe": {
       "commandName": "Project",
@@ -10,7 +10,7 @@
     },
     "init": {
       "commandName": "Project",
-      "commandLineArgs": "init --options Full"
+      "commandLineArgs": "init --options Basic"
     },
     "execute2": {
       "commandName": "Project",

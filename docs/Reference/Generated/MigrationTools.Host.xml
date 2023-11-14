@@ -21,22 +21,22 @@
         </member>
         <member name="F:ThisAssembly.Git.Branch">
             <summary>
-            => @"gitVersion"
+            => @"fixPATTokenRequirement"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commit">
             <summary>
-            => @"a92ccb6"
+            => @"c9106fc"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Sha">
             <summary>
-            => @"a92ccb6aa51d120b32bd050e66dbb92b277b98bd"
+            => @"c9106fc819aa016243c4aa7ff62624afa232c892"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.CommitDate">
             <summary>
-            => @"2023-11-08T18:29:08+00:00"
+            => @"2023-11-14T12:12:43+00:00"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commits">
@@ -46,12 +46,12 @@
         </member>
         <member name="F:ThisAssembly.Git.Tag">
             <summary>
-            => @"v14.2.1-3-ga92ccb6"
+            => @"v14.2.2-3-gc9106fc"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseTag">
             <summary>
-            => @"v14.2.1"
+            => @"v14.2.2"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseVersion.Major">
@@ -66,7 +66,7 @@
         </member>
         <member name="F:ThisAssembly.Git.BaseVersion.Patch">
             <summary>
-            => @"1"
+            => @"2"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Major">
@@ -81,7 +81,7 @@
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Patch">
             <summary>
-            => @"4"
+            => @"5"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Label">

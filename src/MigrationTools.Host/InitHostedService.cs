@@ -63,8 +63,11 @@ namespace MigrationTools.Host
                             EngineConfiguration config;
                             switch (_initOptions.Options)
                             {
-                                case OptionsMode.Full:
-                                    config = _configurationBuilder.BuildDefault();
+                                case OptionsMode.Reference:
+                                    config = _configurationBuilder.BuildReference();
+                                    break;
+                                case OptionsMode.Basic:
+                                    config = _configurationBuilder.BuildGettingStarted();
                                     break;
 
                                 case OptionsMode.WorkItemTracking:
@@ -80,7 +83,7 @@ namespace MigrationTools.Host
                                     break;
 
                                 default:
-                                    config = _configurationBuilder.BuildDefault();
+                                    config = _configurationBuilder.BuildGettingStarted();
                                     break;
                             }
                             _settingWriter.WriteSettings(config, configFile);
