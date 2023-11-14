@@ -106,6 +106,30 @@ namespace MigrationTools._EngineV1.Configuration
             return ec;
         }
 
+        public EngineConfiguration BuildReference()
+        {
+            EngineConfiguration ec = CreateEmptyConfig();
+            AddExampleFieldMapps(ec);
+            AddWorkItemMigrationDefault(ec);
+            AddTestPlansMigrationDefault(ec);
+            ec.Processors.Add(new ImportProfilePictureConfig());
+            ec.Processors.Add(new ExportProfilePictureFromADConfig());
+            ec.Processors.Add(new FixGitCommitLinksConfig() { TargetRepository = "targetProjectName" });
+            ec.Processors.Add(new WorkItemUpdateConfig());
+            ec.Processors.Add(new WorkItemPostProcessingConfig() { WorkItemIDs = new List<int> { 1, 2, 3 } });
+            ec.Processors.Add(new WorkItemDeleteConfig());
+            ec.Processors.Add(new WorkItemQueryMigrationConfig() { SourceToTargetFieldMappings = new Dictionary<string, string>() { { "SourceFieldRef", "TargetFieldRef" } } });
+            ec.Processors.Add(new TeamMigrationConfig());
+            return ec;
+        }
+
+        public EngineConfiguration BuildGettingStarted()
+        {
+            EngineConfiguration ec = CreateEmptyConfig();
+            AddWorkItemMigrationDefault(ec);
+            return ec;
+        }
+
         public EngineConfiguration BuildWorkItemMigration()
         {
             EngineConfiguration ec = CreateEmptyConfig();
@@ -116,10 +140,7 @@ namespace MigrationTools._EngineV1.Configuration
 
         private void AddWorkItemMigrationDefault(EngineConfiguration ec)
         {
-            var config = new WorkItemMigrationConfig
-            {
-                NodeBasePaths = new[] { "Product\\Area\\Path1", "Product\\Area\\Path2" }
-            };
+            var config = new WorkItemMigrationConfig();
             ec.Processors.Add(config);
         }
 
@@ -337,5 +358,7 @@ namespace MigrationTools._EngineV1.Configuration
 
             File.WriteAllText(settingsFileName, json);
         }
+
+   
     }
 }
