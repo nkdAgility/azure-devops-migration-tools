@@ -12,6 +12,7 @@ using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.TeamFoundation.Common;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Proxy;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
@@ -141,7 +142,19 @@ namespace VstsSyncMigrator.Engine
             {
                 throw new Exception("You must call Configure() first");
             }
-
+            //////////////////////////////////////////////////
+            string collUrl = Engine.Target.Config.AsTeamProjectConfig().Collection.ToString();
+            if (collUrl.Contains("dev.azure.com") || collUrl.Contains(".visualstudio.com"))
+            {
+                // Test that
+                if (Engine.Target.Config.AsTeamProjectConfig().PersonalAccessToken.IsNullOrEmpty())
+                {
+                    var ex = new InvalidOperationException("Missing PersonalAccessToken from Target");
+                    Log.LogError(ex, "When you are migrating to Azure DevOps you MUST provide an PAT so that we can call the REST API for certain actions. For example we would be unable to deal with a Work item Type change.");
+                    throw ex;
+                }
+            }
+            //////////////////////////////////////////////////
             var workItemServer = Engine.Source.GetService<WorkItemServer>();
             attachmentEnricher = new TfsAttachmentEnricher(workItemServer, _config.AttachmentWorkingPath, _config.AttachmentMaxSize);
             embededImagesEnricher = Services.GetRequiredService<TfsEmbededImagesEnricher>();
@@ -167,6 +180,8 @@ namespace VstsSyncMigrator.Engine
                 var sourceWorkItems = Engine.Source.WorkItems.GetWorkItems(sourceQuery);
                 contextLog.Information("Replay all revisions of {sourceWorkItemsCount} work items?",
                     sourceWorkItems.Count);
+
+                
 
                 //////////////////////////////////////////////////
                 contextLog.Information("ValidateTargetNodesExist::Checking all Nodes on Work items");
