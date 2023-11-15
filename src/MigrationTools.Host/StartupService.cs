@@ -73,7 +73,9 @@ namespace MigrationTools.Host
                     Log.Warning("Windows Server: If you are running on Windows Server you can use the experimental version of Winget, or you can still use Chocolatey to manage the install. Install chocolatey from https://chocolatey.org/install and then use `choco install vsts-sync-migrator` to install, and `choco upgrade vsts-sync-migrator` to upgrade to newer versions.", _detectVersionService.PackageId);
                 } else
                 {
-                    if (!_detectVersionService.IsPackageInstalled && !_detectVersionService.IsRunningInDebug)
+                    if (!_detectVersionService.IsRunningInDebug)
+                    { 
+                    if (!_detectVersionService.IsPackageInstalled)
                     {
                         Log.Information("It looks like this application has been installed from a zip, would you like to use the managed version?");
                         Console.WriteLine("Do you want install the managed version? (y/n)");
@@ -85,14 +87,14 @@ namespace MigrationTools.Host
                     }
                     if (_detectVersionService.IsUpdateAvailable && _detectVersionService.IsPackageInstalled)
                     {
-                        Log.Information("It looks like this application has been installed from a zip, would you like to use the managed version from Winget?");
+                        Log.Information("It looks like an updated version is available from Winget, would you like to update?");
                         Console.WriteLine("Do you want install the managed version? (y/n)");
                         if (Console.ReadKey().Key == ConsoleKey.Y)
                         {
                             _detectVersionService.UpdateFromSource();
                         }
                     }
-                    if ((_detectVersionService.IsNewLocalVersionAvailable && _detectVersionService.IsPackageInstalled) && !_detectVersionService.IsRunningInDebug)
+                    if (_detectVersionService.IsNewLocalVersionAvailable && _detectVersionService.IsPackageInstalled)
                     {
                         Log.Information("It looks like this package ({PackageId}) has been updated locally to version {InstalledVersion} and you are not running the latest version?", _detectVersionService.PackageId, _detectVersionService.InstalledVersion);
                         Console.WriteLine("Do you want to quit and restart? (y/n)");
@@ -103,6 +105,10 @@ namespace MigrationTools.Host
                             Thread.Sleep(2000);
                             Environment.Exit(0);
                         }
+                    }
+                    } else
+                    {
+                        Log.Information("Running in Debug! No further version checkes.....");
                     }
                 }
             } else

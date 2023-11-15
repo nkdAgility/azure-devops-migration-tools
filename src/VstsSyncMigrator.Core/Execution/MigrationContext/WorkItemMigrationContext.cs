@@ -115,7 +115,8 @@ namespace VstsSyncMigrator.Engine
                     AreaMaps = _config.AreaMaps ?? new Dictionary<string, string>(),
                     IterationMaps = _config.IterationMaps ?? new Dictionary<string, string>(),
                     ShouldCreateMissingRevisionPaths = _config.ShouldCreateMissingRevisionPaths,
-                });
+                    ShouldCreateNodesUpFront = _config.ShouldCreateNodesUpFront
+                }); ;
             }
 
             _revisionManager.Configure(new TfsRevisionManagerOptions() { Enabled = true, MaxRevisions = _config.MaxRevisions, ReplayRevisions = _config.ReplayRevisions });
@@ -149,6 +150,7 @@ namespace VstsSyncMigrator.Engine
             attachmentEnricher = new TfsAttachmentEnricher(workItemServer, _config.AttachmentWorkingPath, _config.AttachmentMaxSize);
             embededImagesEnricher = Services.GetRequiredService<TfsEmbededImagesEnricher>();
             gitRepositoryEnricher = Services.GetRequiredService<TfsGitRepositoryEnricher>();
+
 
             _nodeStructureEnricher.ProcessorExecutionBegin(null);
 

@@ -170,7 +170,15 @@ namespace MigrationTools.Enrichers
                     _pathToKnownNodeMap.TryGetValue(currentAncestorPath, out parentNode);
                     if (parentNode == null)
                     {
-                        parentNode= _targetCommonStructureService.GetNodeFromPath(currentAncestorPath);
+                        try
+                        {
+                            parentNode = _targetCommonStructureService.GetNodeFromPath(currentAncestorPath);
+                        } catch (Exception ex)
+                        {
+                            Log.LogDebug("  Not Found:", currentAncestorPath);
+                            parentNode = null;
+                        }
+                        
                     }
                 }
                 else
@@ -251,7 +259,10 @@ namespace MigrationTools.Enrichers
             {
                 Log.LogInformation("Migrating all Nodes before the Processor run.");
                 EntryForProcessorType(processor);
-                MigrateAllNodeStructures();
+                if (Options.ShouldCreateNodesUpFront) // FLAG for Expermiment to Do on Demand.
+                {
+                    MigrateAllNodeStructures();
+                }
                 RefreshForProcessorType(processor);
             }
         }

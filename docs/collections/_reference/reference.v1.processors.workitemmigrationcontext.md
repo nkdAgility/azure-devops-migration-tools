@@ -18,7 +18,7 @@ configurationSamples:
       "AttachmentMigration": true,
       "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
       "FixHtmlAttachmentLinks": false,
-      "SkipToFinalRevisedWorkItemType": true,
+      "SkipToFinalRevisedWorkItemType": false,
       "WorkItemCreateRetryLimit": 5,
       "FilterWorkItemsThatAlreadyExistInTarget": true,
       "PauseAfterEachWorkItem": false,
@@ -39,7 +39,8 @@ configurationSamples:
       "MaxGracefulFailures": 0,
       "SkipRevisionWithInvalidIterationPath": false,
       "SkipRevisionWithInvalidAreaPath": false,
-      "ShouldCreateMissingRevisionPaths": true
+      "ShouldCreateMissingRevisionPaths": true,
+      "ShouldCreateNodesUpFront": true
     }
   sampleFor: MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig
 description: WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links, and Attachments. Use `WorkItemMigrationConfig` to configure.
@@ -122,6 +123,10 @@ options:
 - parameterName: ShouldCreateMissingRevisionPaths
   type: Boolean
   description: When set to True the susyem will try to create any missing missing area or iteration paths from the revisions.
+  defaultValue: missng XML code comments
+- parameterName: ShouldCreateNodesUpFront
+  type: Boolean
+  description: missng XML code comments
   defaultValue: missng XML code comments
 - parameterName: SkipRevisionWithInvalidAreaPath
   type: Boolean
@@ -439,6 +444,76 @@ topics:
       `OriginalProject\ValidArea\` would be replaced by
       `TargetProject\NewArea\ValidArea\` but `OriginalProject\DescopeThis` would not
       be modified by this rule.
+
+    ### More Complex Regex
+
+
+    Before your migration starts it will validate that all of the Areas and Iterations from the **Source** work items revisions exist on the **Target**. Any that do not exist will be flagged in the logs and if and the migration will stop just after it outputs a list of the missing nodes.
+
+
+    Our algorithm that converts the Source nodes to Target nodes processes the [mappings](https://nkdagility.com/learn/azure-devops-migration-tools/Reference/v1/Processors/WorkItemMigrationContext/#iteration-maps-and-area-maps) at that time. This means that any valid mapped nodes will never be caught by the `This path is not anchored in the source project` message as they are already altered to be valid.
+
+
+    > We recently updated the logging for this part of the system to more easily debug both your mappings and to see what they system is doing with the nodes and their current state. You can set `"LogLevel": "Debug"` to see the details.
+
+
+    To add a mapping, you can follow [the documentation](https://nkdagility.com/learn/azure-devops-migration-tools/Reference/v1/Processors/WorkItemMigrationContext/#iteration-maps-and-area-maps) with this being the simplest way:
+
+
+    ```
+
+    "IterationMaps": {
+      "WorkItemMovedFromProjectName\\\\Iteration 1": "TargetProject\\Sprint 1",
+    },
+
+    "AreaMaps": {
+       "WorkItemMovedFromProjectName\\\\Team 2": "TargetProject\\ProductA\\Team 2",
+    }
+
+    ```
+
+    Or you can use regular expressions to match the missing area or iteration paths:
+
+
+    ```
+
+    "IterationMaps": {
+      "^OriginalProject\\\\Path1(?=\\\\Sprint 2022)": "TargetProject\\AnotherPath\\NewTeam",
+      "^OriginalProject\\\\Path1(?=\\\\Sprint 2020)": "TargetProject\\AnotherPath\\Archives\\Sprints 2020",
+      "^OriginalProject\\\\Path2": "TargetProject\\YetAnotherPath\\Path2",
+    },
+
+    "AreaMaps": {
+      "^OriginalProject\\\\(DescopeThis|DescopeThat)": "TargetProject\\Archive\\Descoped\\",
+      "^OriginalProject\\\\(?!DescopeThis|DescopeThat)": "TargetProject\\NewArea\\",
+    }
+
+    ```
+
+
+    If you want to use the matches in the replacement you can use the following:
+
+
+    ```
+
+    "IterationMaps": {
+      "^\\\\oldproject1(?:\\\\([^\\\\]+))?\\\\([^\\\\]+)$": "TargetProject\\Q1\$2",
+    }
+
+    ```
+
+    If the olf iteration path was `\oldproject1\Custom Reporting\Sprint 13`, then this would result in a match for each Iteration node after the project node. You would then be able to reference any of the nodes using "$" and then the number of the match.
+
+
+
+    Regular expressions are much more difficult to build and debug so it is a good idea to use a [regular expression tester](https://regex101.com/) to check that you are matching the right things and to build them in ChatGTP.
+
+
+    _NOTE: You need `\\` to escape a `\` the pattern, and `\\` to escape a `\` in JSON. Therefor on the left of the match you need 4 `\` to represent the `\\` for the pattern and only 2 `\` in the match_ 
+
+
+    ![image](https://github.com/nkdAgility/azure-devops-migration-tools/assets/5205575/2cf50929-7ea9-4a71-beab-dd8ff3b5b2a8)
+
 
     ## More Complex Team Migrations
 
