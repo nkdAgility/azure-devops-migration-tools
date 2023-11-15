@@ -150,6 +150,7 @@ namespace VstsSyncMigrator.Engine
             embededImagesEnricher = Services.GetRequiredService<TfsEmbededImagesEnricher>();
             gitRepositoryEnricher = Services.GetRequiredService<TfsGitRepositoryEnricher>();
 
+
             _nodeStructureEnricher.ProcessorExecutionBegin(null);
 
             var stopwatch = Stopwatch.StartNew();
