@@ -79,6 +79,7 @@ We use these tools with our customers, and for fun, to do real world migrations 
 
 ## Change Log
 
+- 14.3 - Created a flag for `ShouldCreateNodesUpFront`, while the default is `true` this is a private preview of a new feature. Instead of creating the area and iteration paths up front, this new feature instead creates the Area & Iteration paths at validation time. For each missing path it will create it, and for those that exist it will simply pass over after a `GetNodeFromPath` call. For tose wishing to participate in the preview please set `ShouldCreateNodesUpFront` to `false`, and to create the nodes rather than just list them set `ShouldCreateMissingRevisionPaths` to `true` as well. It will still list nodes that are not able to be created and require a mapping. NOTE: You can also run with `"ShouldCreateMissingRevisionPaths": false` to list all the nodes that will be created so that you can create more elaborate mappings. 
 - 14.2 - Removed the `StopMigrationOnMissingAreaIterationNodes` flag. All missing nodes MUST be present or mapped using `AreaMaps` and `IterationMaps`. System will always stop on missing nodes.
 - 14.1 - Enabled auto update on client devices, server still used choco
 - 14.0 - Move from Chocolaty to Winget as the base installer. We will continue to publish to Chocolaty, but we recommend using `winget install nkdAgility.AzureDevOpsMigrationTools` for future installs. Main executable renamed to "devopsmigration.exe" to prevent conflict with other applications with symbolic links.
