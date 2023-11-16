@@ -110,7 +110,7 @@ namespace MigrationTools._EngineV1.Clients
         {
             var startTime = DateTime.UtcNow;
             var timer = System.Diagnostics.Stopwatch.StartNew();
-            TfsTeamProjectCollection y;
+            TfsTeamProjectCollection y = null;
             try
             {
                 Log.Information("TfsMigrationClient::GetDependantTfsCollection:AuthenticationMode({0})", _config.AuthenticationMode.ToString());
