@@ -166,8 +166,8 @@ namespace MigrationTools._EngineV1.Clients
                        new Dictionary<string, double> {
                             { "Time",timer.ElapsedMilliseconds }
                        });
-                Log.Error(ex, "Unable to configure store");
-                throw;
+                Log.Error(ex, "Unable to configure store: Check persmissions and credentials for {AuthenticationMode}", _config.AuthenticationMode);
+                Environment.Exit(-1);
             }
             return y;
         }
