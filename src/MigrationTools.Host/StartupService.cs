@@ -81,31 +81,32 @@ namespace MigrationTools.Host
                         Console.WriteLine("Do you want install the managed version? (y/n)");
                         if (Console.ReadKey().Key == ConsoleKey.Y)
                         {
-                            
                             _detectVersionService.UpdateFromSource();
                         }
                     }
                     if (_detectVersionService.IsUpdateAvailable && _detectVersionService.IsPackageInstalled)
                     {
-                        Log.Information("It looks like an updated version is available from Winget, would you like to update?");
+                        Log.Information("It looks like an updated version is available from Winget, would you like to exit and update?");
                         Console.WriteLine("Do you want install the managed version? (y/n)");
                         if (Console.ReadKey().Key == ConsoleKey.Y)
                         {
-                            _detectVersionService.UpdateFromSource();
+                                Thread.Sleep(2000);
+                                Environment.Exit(0);
+                                //_detectVersionService.UpdateFromSource();
                         }
                     }
-                    if (_detectVersionService.IsNewLocalVersionAvailable && _detectVersionService.IsPackageInstalled)
-                    {
-                        Log.Information("It looks like this package ({PackageId}) has been updated locally to version {InstalledVersion} and you are not running the latest version?", _detectVersionService.PackageId, _detectVersionService.InstalledVersion);
-                        Console.WriteLine("Do you want to quit and restart? (y/n)");
-                        if (Console.ReadKey().Key == ConsoleKey.Y)
-                        {
-                            Log.Information("Restarting as {CommandLine}", Environment.CommandLine);
-                            Process.Start("devopsmigration", string.Join(" ", Environment.GetCommandLineArgs().Skip(1)));
-                            Thread.Sleep(2000);
-                            Environment.Exit(0);
-                        }
-                    }
+                    //if (_detectVersionService.IsNewLocalVersionAvailable && _detectVersionService.IsPackageInstalled)
+                    //{
+                    //    Log.Information("It looks like this package ({PackageId}) has been updated locally to version {InstalledVersion} and you are not running the latest version?", _detectVersionService.PackageId, _detectVersionService.InstalledVersion);
+                    //    Console.WriteLine("Do you want to quit and restart? (y/n)");
+                    //    if (Console.ReadKey().Key == ConsoleKey.Y)
+                    //    {
+                    //        Log.Information("Restarting as {CommandLine}", Environment.CommandLine);
+                    //        Process.Start("devopsmigration", string.Join(" ", Environment.GetCommandLineArgs().Skip(1)));
+                    //        Thread.Sleep(2000);
+                    //        Environment.Exit(0);
+                    //    }
+                    //}
                     } else
                     {
                         Log.Information("Running in Debug! No further version checkes.....");
