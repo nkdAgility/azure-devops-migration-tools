@@ -658,9 +658,9 @@ namespace VstsSyncMigrator.Engine
                         TraceWriteLine(LogEventLevel.Information, $"WorkItem has changed type at one of the revisions, from {targetType} to {finalDestType}");
                     }
 
-                    if (skipToFinalRevisedWorkItemType && Engine.TypeDefinitionMaps.Items.ContainsKey(finalDestType))
+                    if (skipToFinalRevisedWorkItemType)
                     {
-                        finalDestType = Engine.TypeDefinitionMaps.Items[finalDestType].Map();
+                        targetType = finalDestType;
                     }
 
                     if (Engine.TypeDefinitionMaps.Items.ContainsKey(targetType))
