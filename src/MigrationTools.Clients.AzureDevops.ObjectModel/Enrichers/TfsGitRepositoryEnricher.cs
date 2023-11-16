@@ -34,14 +34,6 @@ namespace MigrationTools.Enrichers
         {
             Engine = Services.GetRequiredService<IMigrationEngine>();
             _Logger = logger ?? throw new ArgumentNullException(nameof(logger));
-
-            sourceRepoService = Engine.Source.GetService<GitRepositoryService>();
-            sourceRepos = sourceRepoService.QueryRepositories(Engine.Source.Config.AsTeamProjectConfig().Project);
-            allSourceRepos = sourceRepoService.QueryRepositories("");
-            //////////////////////////////////////////////////
-            targetRepoService = Engine.Target.GetService<GitRepositoryService>();
-            targetRepos = targetRepoService.QueryRepositories(Engine.Target.Config.AsTeamProjectConfig().Project);
-            allTargetRepos = targetRepoService.QueryRepositories("");
             gitWits = new List<string>
                 {
                     "Branch",
@@ -56,6 +48,27 @@ namespace MigrationTools.Enrichers
         {
             _filter = filter;
             _save = save;
+        }
+
+        public void SetupRepoBits()
+        {
+            if (sourceRepoService == null)
+            {
+                try
+                {
+                    sourceRepoService = Engine.Source.GetService<GitRepositoryService>();
+                    sourceRepos = sourceRepoService.QueryRepositories(Engine.Source.Config.AsTeamProjectConfig().Project);
+                    allSourceRepos = sourceRepoService.QueryRepositories("");
+                    //////////////////////////////////////////////////
+                    targetRepoService = Engine.Target.GetService<GitRepositoryService>();
+                    targetRepos = targetRepoService.QueryRepositories(Engine.Target.Config.AsTeamProjectConfig().Project);
+                    allTargetRepos = targetRepoService.QueryRepositories("");
+                } catch (Exception ex)
+                {
+                    sourceRepoService = null;
+                }
+                
+            }            
         }
 
         [Obsolete]
@@ -80,7 +93,7 @@ namespace MigrationTools.Enrichers
                 if (l is ExternalLink && gitWits.Contains(l.ArtifactLinkType.Name))
                 {
                     ExternalLink el = (ExternalLink)l;
-
+                    SetupRepoBits();
                     TfsGitRepositoryInfo sourceRepoInfo = TfsGitRepositoryInfo.Create(el, sourceRepos, Engine, sourceWorkItem?.ProjectName);
 
                     // if sourceRepo is null ignore this link and keep processing further links
