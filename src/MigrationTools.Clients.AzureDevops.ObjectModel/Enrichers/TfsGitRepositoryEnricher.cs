@@ -88,12 +88,18 @@ namespace MigrationTools.Enrichers
             List<ExternalLink> newEL = new List<ExternalLink>();
             List<ExternalLink> removeEL = new List<ExternalLink>();
             int count = 0;
+            SetupRepoBits();
+            if (sourceRepoService == null)
+            {
+                Log.LogWarning("Unable to configure connection to git!");
+                return -1;
+            }
             foreach (Link l in targetWorkItem.ToWorkItem().Links)
             {
                 if (l is ExternalLink && gitWits.Contains(l.ArtifactLinkType.Name))
                 {
                     ExternalLink el = (ExternalLink)l;
-                    SetupRepoBits();
+                    
                     TfsGitRepositoryInfo sourceRepoInfo = TfsGitRepositoryInfo.Create(el, sourceRepos, Engine, sourceWorkItem?.ProjectName);
 
                     // if sourceRepo is null ignore this link and keep processing further links
