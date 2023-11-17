@@ -127,7 +127,7 @@ namespace MigrationTools.Enrichers
         {
             var filename = System.IO.Path.GetFileName(filepath);
             FileInfo fi = new FileInfo(filepath);
-            if (_maxAttachmentSize > fi.Length)
+            if (_maxAttachmentSize < fi.Length)
             {
                 string originalId = "[originalId:" + wia.Id + "]";
                 var attachments = targetWorkItem.Attachments.Cast<Attachment>();
