@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace MigrationTools.DataContracts
 {
-    public class NodeStructureMissingItem
+    public class NodeStructureItem
     {
         public bool anchored { get; set; } = true;
 
@@ -15,7 +15,7 @@ namespace MigrationTools.DataContracts
 
         public override bool Equals(object obj)
         {
-            var item = obj as NodeStructureMissingItem;
+            var item = obj as NodeStructureItem;
 
             if (item == null)
             {
