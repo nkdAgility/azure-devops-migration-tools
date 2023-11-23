@@ -110,7 +110,7 @@ namespace MigrationTools._EngineV1.Clients
         {
             var startTime = DateTime.UtcNow;
             var timer = System.Diagnostics.Stopwatch.StartNew();
-            TfsTeamProjectCollection y;
+            TfsTeamProjectCollection y = null;
             try
             {
                 Log.Information("TfsMigrationClient::GetDependantTfsCollection:AuthenticationMode({0})", _config.AuthenticationMode.ToString());
@@ -148,7 +148,7 @@ namespace MigrationTools._EngineV1.Clients
                         break;
                 }
                 Log.Information("MigrationClient: Connecting to {CollectionUrl} ", TfsConfig.Collection);
-                Log.Information("MigrationClient: validating security for {@AuthorizedIdentity} ", y.AuthorizedIdentity);
+                Log.Debug("MigrationClient: validating security for {@AuthorizedIdentity} ", y.AuthorizedIdentity);
                 y.EnsureAuthenticated();
                 timer.Stop();
                 Log.Information("MigrationClient: Access granted to {CollectionUrl} for {Name} ({Account})", TfsConfig.Collection, y.AuthorizedIdentity.DisplayName, y.AuthorizedIdentity.UniqueName);
@@ -166,8 +166,8 @@ namespace MigrationTools._EngineV1.Clients
                        new Dictionary<string, double> {
                             { "Time",timer.ElapsedMilliseconds }
                        });
-                Log.Error(ex, "Unable to configure store");
-                throw;
+                Log.Error(ex, "Unable to configure store: Check persmissions and credentials for {AuthenticationMode}", _config.AuthenticationMode);
+                Environment.Exit(-1);
             }
             return y;
         }

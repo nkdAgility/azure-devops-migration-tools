@@ -370,7 +370,9 @@ namespace MigrationTools.Enrichers
 
         private string GetSystemPath(string newUserPath, TfsNodeStructureType structureType)
         {
-            var match = Regex.Match(newUserPath, @"^(?<projectName>[^\\]+)\\(?<restOfThePath>.*)$");
+
+            string matchtext = @"^(?<projectName>[^\\]+)(\\(?<restOfThePath>.*))?$"; //^(?<projectName>[^\\]+)\\(?<restOfThePath>.*)$
+            var match = Regex.Match(newUserPath, matchtext);
             if (!match.Success)
             {
                 throw new InvalidOperationException($"This path is not a valid area or iteration path: {newUserPath}");
@@ -378,7 +380,12 @@ namespace MigrationTools.Enrichers
 
             var structureName = GetTargetLocalizedNodeStructureTypeName(structureType);
 
-            return $"\\{match.Groups["projectName"].Value}\\{structureName}\\{match.Groups["restOfThePath"]}";
+            var systemPath = $"\\{match.Groups["projectName"].Value}\\{structureName}";
+            if (match.Groups["restOfThePath"].Success)
+            {
+                systemPath  +=  $"\\{match.Groups["restOfThePath"]}";
+            }
+            return systemPath;
         }
 
         private static string GetUserFriendlyPath(string systemNodePath)
@@ -517,7 +524,7 @@ namespace MigrationTools.Enrichers
             return fieldName;
         }
 
-        public List<NodeStructureMissingItem> CheckForMissingPaths(List<WorkItemData> workItems, TfsNodeStructureType nodeType)
+        public List<NodeStructureItem> CheckForMissingPaths(List<WorkItemData> workItems, TfsNodeStructureType nodeType)
         {
             EntryForProcessorType(null);
             contextLog.Debug("TfsNodeStructure:CheckForMissingPaths");
@@ -525,15 +532,17 @@ namespace MigrationTools.Enrichers
 
             string fieldName = GetFieldNameFromTfsNodeStructureType(nodeType);
 
-            List<NodeStructureMissingItem> areaPaths = workItems.SelectMany(x => x.Revisions.Values)
-                .Where(x => x.Fields[fieldName].Value.ToString().Contains("\\"))
-                .Select(x => new NodeStructureMissingItem() { sourcePath = x.Fields[fieldName].Value.ToString(), nodeType = nodeType.ToString() })
+            List<NodeStructureItem> nodePaths = workItems.SelectMany(x => x.Revisions.Values)
+                //.Where(x => x.Fields[fieldName].Value.ToString().Contains("\\"))
+                .Select(x => new NodeStructureItem() { sourcePath = x.Fields[fieldName].Value.ToString(), nodeType = nodeType.ToString() })
                 .Distinct()
                 .ToList();
 
-            List<NodeStructureMissingItem> missingPaths = new List<NodeStructureMissingItem>();
+            contextLog.Debug("TfsNodeStructure:CheckForMissingPaths::{nodeType}Nodes::{count}", nodeType.ToString(), nodePaths.Count);
 
-            foreach (var missingItem in areaPaths)
+            List<NodeStructureItem> missingPaths = new List<NodeStructureItem>();
+
+            foreach (var missingItem in nodePaths)
             {
                 contextLog.Debug("TfsNodeStructure:CheckForMissingPaths:Checking::{@missingItem}", missingItem);
                 bool keepProcessing = true;
@@ -586,14 +595,14 @@ namespace MigrationTools.Enrichers
             return missingPaths;
         }
 
-        public List<NodeStructureMissingItem> GetMissingRevisionNodes(List<WorkItemData> workItems)
+        public List<NodeStructureItem> GetMissingRevisionNodes(List<WorkItemData> workItems)
         {
-            List<NodeStructureMissingItem> missingPaths = CheckForMissingPaths(workItems, TfsNodeStructureType.Area);
+            List<NodeStructureItem> missingPaths = CheckForMissingPaths(workItems, TfsNodeStructureType.Area);
             missingPaths.AddRange(CheckForMissingPaths(workItems, TfsNodeStructureType.Iteration));
             return missingPaths;
         }
 
-        public List<int> GetWorkItemIDsFromMissingRevisionNodes(List<NodeStructureMissingItem> missingItems)
+        public List<int> GetWorkItemIDsFromMissingRevisionNodes(List<NodeStructureItem> missingItems)
         {
             List<int> workItemsNotAncored = missingItems
                 .Where(x => x.anchored = false)
@@ -604,13 +613,13 @@ namespace MigrationTools.Enrichers
         }
 
 
-        public bool ValidateTargetNodesExist(List<NodeStructureMissingItem> missingItems)
+        public bool ValidateTargetNodesExist(List<NodeStructureItem> missingItems)
         {
             if (missingItems.Count > 0)
             {
                 contextLog.Warning("!! There are MISSING Area or Iteration Paths");
                 contextLog.Warning("!! There are {missingAreaPaths} Nodes (Area or Iteration) found in the history of the Source that are missing from the Target! These MUST be added or mapped before we can continue using the instructions on https://nkdagility.com/learn/azure-devops-migration-tools/Reference/v1/Processors/WorkItemMigrationContext/#iteration-maps-and-area-maps", missingItems.Count);
-                foreach (NodeStructureMissingItem missingItem in missingItems)
+                foreach (NodeStructureItem missingItem in missingItems)
                 {
                     string mapper = GetMappingForMissingItem(missingItem);
                     bool isMapped = mapper.IsNullOrEmpty()?false:true;
@@ -632,7 +641,7 @@ namespace MigrationTools.Enrichers
             return false;
         }
 
-        public string GetMappingForMissingItem(NodeStructureMissingItem missingItem)
+        public string GetMappingForMissingItem(NodeStructureItem missingItem)
         {
             var mappers = GetMaps((TfsNodeStructureType)Enum.Parse(typeof(TfsNodeStructureType), missingItem.nodeType, true));
             foreach (var mapper in mappers)
