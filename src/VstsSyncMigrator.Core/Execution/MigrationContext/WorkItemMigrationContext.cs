@@ -649,7 +649,6 @@ namespace VstsSyncMigrator.Engine
                 //If work item hasn't been created yet, create a shell
                 if (targetWorkItem == null)
                 {
-                    var skipToFinalRevisedWorkItemType = _config.SkipToFinalRevisedWorkItemType;
                     var finalDestType = revisionsToMigrate.Last().Type;
                     var targetType = revisionsToMigrate.First().Type;
 
@@ -658,16 +657,11 @@ namespace VstsSyncMigrator.Engine
                         TraceWriteLine(LogEventLevel.Information, $"WorkItem has changed type at one of the revisions, from {targetType} to {finalDestType}");
                     }
 
-                    if (skipToFinalRevisedWorkItemType)
-                    {
-                        targetType = finalDestType;
-                    }
-
                     if (Engine.TypeDefinitionMaps.Items.ContainsKey(targetType))
                     {
                         targetType = Engine.TypeDefinitionMaps.Items[targetType].Map();
                     }
-                    targetWorkItem = CreateWorkItem_Shell(Engine.Target.WorkItems.Project, sourceWorkItem, skipToFinalRevisedWorkItemType ? finalDestType : targetType);
+                    targetWorkItem = CreateWorkItem_Shell(Engine.Target.WorkItems.Project, sourceWorkItem, targetType);
                 }
 
                 if (_config.AttachRevisionHistory)
@@ -691,8 +685,10 @@ namespace VstsSyncMigrator.Engine
                         destType = Engine.TypeDefinitionMaps.Items[destType].Map();
                     }
                     bool typeChange = (destType != targetWorkItem.Type);
-                    
-                    if (typeChange)
+
+                    int workItemId = Int32.Parse(targetWorkItem.Id);
+
+                    if (typeChange && workItemId > 0)
                     {
                         ValidatePatTokenRequirement();
                         Uri collectionUri = Engine.Target.Config.AsTeamProjectConfig().Collection;
@@ -700,7 +696,7 @@ namespace VstsSyncMigrator.Engine
                         VssConnection connection = new VssConnection(collectionUri, new VssBasicCredential(string.Empty, token));
                         WorkItemTrackingHttpClient workItemTrackingClient = connection.GetClient<WorkItemTrackingHttpClient>();
                         JsonPatchDocument patchDocument = new JsonPatchDocument();
-                        DateTime changedDate = ((DateTime) currentRevisionWorkItem.Fields["System.ChangedDate"].Value).AddMilliseconds(-3);
+                        DateTime changedDate = ((DateTime)currentRevisionWorkItem.Fields["System.ChangedDate"].Value).AddMilliseconds(-3);
 
                         patchDocument.Add(
                             new JsonPatchOperation()
@@ -734,9 +730,16 @@ namespace VstsSyncMigrator.Engine
                                 Value = changedDate
                             }
                         );
-                        int id = Int32.Parse(targetWorkItem.Id);
-                        var result = workItemTrackingClient.UpdateWorkItemAsync(patchDocument, id, bypassRules:true).Result;
-                        targetWorkItem = Engine.Target.WorkItems.GetWorkItem(id);
+                        patchDocument.Add(
+                        new JsonPatchOperation()
+                        {
+                            Operation = Operation.Add,
+                            Path = "/fields/System.ChangedBy",
+                            Value = currentRevisionWorkItem.Fields["System.ChangedBy"].Value.ToString()
+                        }
+                        );
+                        var result = workItemTrackingClient.UpdateWorkItemAsync(patchDocument, workItemId, bypassRules: true).Result;
+                        targetWorkItem = Engine.Target.WorkItems.GetWorkItem(workItemId);
                     }
                     PopulateWorkItem(currentRevisionWorkItem, targetWorkItem, destType);
 
@@ -748,7 +751,8 @@ namespace VstsSyncMigrator.Engine
                             if (f.AllowedValues.Count > 0)
                             {
                                 targetWorkItem.ToWorkItem().Fields[f.Name].Value = f.AllowedValues[0];
-                            } else if (f.FieldDefinition.AllowedValues.Count > 0)
+                            }
+                            else if (f.FieldDefinition.AllowedValues.Count > 0)
                             {
                                 targetWorkItem.ToWorkItem().Fields[f.Name].Value = f.FieldDefinition.AllowedValues[0];
                             }
