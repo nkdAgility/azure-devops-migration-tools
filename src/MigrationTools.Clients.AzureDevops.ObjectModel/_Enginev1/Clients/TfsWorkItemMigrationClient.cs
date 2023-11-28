@@ -151,6 +151,10 @@ namespace MigrationTools._EngineV1.Clients
 
         public override WorkItemData GetWorkItem(int id)
         {
+            if (id == 0)
+            {
+                throw new ArgumentOutOfRangeException("id", id, "id cant be empty.");
+            }
             var startTime = DateTime.UtcNow;
             var timer = System.Diagnostics.Stopwatch.StartNew();
             WorkItem y;
