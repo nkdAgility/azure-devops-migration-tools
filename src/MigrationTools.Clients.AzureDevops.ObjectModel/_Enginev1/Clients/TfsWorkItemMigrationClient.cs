@@ -9,6 +9,7 @@ using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.DataContracts;
 using MigrationTools.DataContracts;
 using Serilog;
+using static Microsoft.TeamFoundation.Client.CommandLine.Options;
 
 namespace MigrationTools._EngineV1.Clients
 {
@@ -150,19 +151,22 @@ namespace MigrationTools._EngineV1.Clients
 
         public override WorkItemData GetWorkItem(int id)
         {
+            if (id == 0)
+            {
+                throw new ArgumentOutOfRangeException("id", id, "id cant be empty.");
+            }
             var startTime = DateTime.UtcNow;
             var timer = System.Diagnostics.Stopwatch.StartNew();
             WorkItem y;
             try
             {
+                Log.Debug("TfsWorkItemMigrationClient::GetWorkItem({id})", id);
                 y = Store.GetWorkItem(id);
                 timer.Stop();
                 Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", MigrationClient.Config.AsTeamProjectConfig().Collection.ToString(), "GetWorkItem", null, startTime, timer.Elapsed, "200", true));
             }
             catch (Exception ex)
             {
-                timer.Stop();
-                Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", MigrationClient.Config.AsTeamProjectConfig().Collection.ToString(), "GetWorkItem", null, startTime, timer.Elapsed, "500", false));
                 Telemetry.TrackException(ex,
                        new Dictionary<string, string> {
                             { "CollectionUrl", MigrationClient.Config.AsTeamProjectConfig().Collection.ToString() }
@@ -170,8 +174,13 @@ namespace MigrationTools._EngineV1.Clients
                        new Dictionary<string, double> {
                             { "Time",timer.ElapsedMilliseconds }
                        });
-                Log.Error(ex, "Unable to configure store");
+                Log.Error(ex, "Unable to GetWorkItem with id[{id}]", id);
                 throw;
+            } finally
+            {
+                timer.Stop();
+                Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", MigrationClient.Config.AsTeamProjectConfig().Collection.ToString(), "GetWorkItem", null, startTime, timer.Elapsed, "500", false));
+                
             }
             return y?.AsWorkItemData();
         }
@@ -273,6 +282,7 @@ namespace MigrationTools._EngineV1.Clients
             WorkItemStore store;
             try
             {
+                Log.Debug("TfsWorkItemMigrationClient::GetWorkItemStore({InternalCollection}, {bypassRules})", _config.AsTeamProjectConfig().Collection, _bypassRules);
                 store = new WorkItemStore((TfsTeamProjectCollection)MigrationClient.InternalCollection, _bypassRules);
                 timer.Stop();
                 Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", MigrationClient.Config.AsTeamProjectConfig().Collection.ToString(), "GetWorkItemStore", null, startTime, timer.Elapsed, "200", true));
