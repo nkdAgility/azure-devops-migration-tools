@@ -633,7 +633,7 @@ namespace VstsSyncMigrator.Engine
                 //Check test plan is in fact the right one
                 var sourceWI = Engine.Source.WorkItems.GetWorkItem(sourcePlanId);
                 string expectedReflectedId = Engine.Source.WorkItems.CreateReflectedWorkItemId(sourceWI).ToString();
-                var targetWI = Engine.Source.WorkItems.GetWorkItem(testPlan.Id.ToString());
+                var targetWI = Engine.Target.WorkItems.GetWorkItem(testPlan.Id.ToString());
                 string workItemReflectedId = (string)targetWI.Fields[Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName].Value;
 
                 if (workItemReflectedId != expectedReflectedId)
