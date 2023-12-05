@@ -26,17 +26,17 @@
         </member>
         <member name="F:ThisAssembly.Git.Commit">
             <summary>
-            => @"3351d3f"
+            => @"6a99c83"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Sha">
             <summary>
-            => @"3351d3f7d0ea9699e65e5c1ed2b3e26e5547bed3"
+            => @"6a99c8370a13b1807e23ff34c7b12888435a15d6"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.CommitDate">
             <summary>
-            => @"2023-11-23T10:22:02+00:00"
+            => @"2023-11-23T13:43:28+00:00"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commits">
@@ -46,12 +46,12 @@
         </member>
         <member name="F:ThisAssembly.Git.Tag">
             <summary>
-            => @"v14.3.1"
+            => @"v14.3.2"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseTag">
             <summary>
-            => @"v14.3.1"
+            => @"v14.3.2"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseVersion.Major">
@@ -66,7 +66,7 @@
         </member>
         <member name="F:ThisAssembly.Git.BaseVersion.Patch">
             <summary>
-            => @"1"
+            => @"2"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Major">
@@ -81,7 +81,7 @@
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Patch">
             <summary>
-            => @"1"
+            => @"2"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Label">
