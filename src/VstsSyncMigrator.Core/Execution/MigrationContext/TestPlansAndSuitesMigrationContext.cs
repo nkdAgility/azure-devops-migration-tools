@@ -622,27 +622,28 @@ namespace VstsSyncMigrator.Engine
             return testSuit;
         }
 
-        private ITestPlan FindTestPlan(TestManagementContext tmc, string name)
+        private ITestPlan FindTestPlan(string planName, int sourcePlanId)
         {
             Log.LogDebug("TestPlansAndSuitesMigrationContext::FindTestPlan");
-            ITestPlan testPlan = (from p in tmc.Project.TestPlans.Query("Select * From TestPlan") where p.Name == name select p).SingleOrDefault();
+            ITestPlan testPlan = (from p in _targetTestStore.Project.TestPlans.Query("Select * From TestPlan") where p.Name == planName select p).SingleOrDefault();
  
             if (testPlan != null)
             {
-                Log.LogDebug("TestPlansAndSuitesMigrationContext::FindTestPlan:: FOUND Test Plan with {name}", name);
+                Log.LogDebug("TestPlansAndSuitesMigrationContext::FindTestPlan:: FOUND Test Plan with {name}", planName);
                 //Check test plan is in fact the right one
-                var sourceWI = Engine.Source.WorkItems.GetWorkItem(testPlan.Id.ToString());
+                var sourceWI = Engine.Source.WorkItems.GetWorkItem(sourcePlanId);
                 string expectedReflectedId = Engine.Source.WorkItems.CreateReflectedWorkItemId(sourceWI).ToString();
-                string workItemReflectedId = (string)sourceWI.Fields[Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName].Value;
+                var targetWI = Engine.Source.WorkItems.GetWorkItem(testPlan.Id.ToString());
+                string workItemReflectedId = (string)targetWI.Fields[Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName].Value;
                 if (workItemReflectedId != expectedReflectedId)
                 {
-                    Log.LogDebug("TestPlansAndSuitesMigrationContext::FindTestPlan:: Fouund test plan with name {name} does not match {workItemReflectedId} ", name, workItemReflectedId);
+                    Log.LogDebug("TestPlansAndSuitesMigrationContext::FindTestPlan:: Found test plan with name {name} does not match {workItemReflectedId} ", planName, workItemReflectedId);
                     testPlan = null;
                 }
             }
             else
             {
-                Log.LogDebug("TestPlansAndSuitesMigrationContext::FindTestPlan:: NOT FOUND Test Plan with {name}", name);
+                Log.LogDebug("TestPlansAndSuitesMigrationContext::FindTestPlan:: NOT FOUND Test Plan with {name}", planName);
             }
             return testPlan;
         }
@@ -861,7 +862,7 @@ namespace VstsSyncMigrator.Engine
                 ? $"{Engine.Source.WorkItems.GetProject().Name}-{sourcePlan.Name}"
                 : $"{sourcePlan.Name}";
             InnerLog(sourcePlan, $"Process Plan {newPlanName}", 0, true);
-            var targetPlan = FindTestPlan(_targetTestStore, newPlanName);
+            var targetPlan = FindTestPlan(newPlanName, sourcePlan.Id);
             //if (targetPlan != null && TargetPlanContansTag(targetPlan.Id))
             //{
             //    return;
@@ -921,7 +922,7 @@ namespace VstsSyncMigrator.Engine
             targetPlan.Save();
             // Load the plan again, because somehow it doesn't let me set configurations on the already loaded plan
             InnerLog(sourcePlan, $"ApplyConfigurationsAndAssignTesters {targetPlan.Name}", 5); ;
-            ITestPlan targetPlan2 = FindTestPlan(_targetTestStore, targetPlan.Name);
+            ITestPlan targetPlan2 = FindTestPlan(targetPlan.Name, sourcePlan.Id);
             if (targetPlan2 !=  null)
             {
                 ApplyConfigurationsAndAssignTesters(sourcePlan.RootSuite, targetPlan2.RootSuite);
