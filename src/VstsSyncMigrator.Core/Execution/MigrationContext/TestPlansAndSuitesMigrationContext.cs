@@ -624,17 +624,25 @@ namespace VstsSyncMigrator.Engine
 
         private ITestPlan FindTestPlan(TestManagementContext tmc, string name)
         {
+            Log.LogDebug("TestPlansAndSuitesMigrationContext::FindTestPlan");
             ITestPlan testPlan = (from p in tmc.Project.TestPlans.Query("Select * From TestPlan") where p.Name == name select p).SingleOrDefault();
+ 
             if (testPlan != null)
             {
+                Log.LogDebug("TestPlansAndSuitesMigrationContext::FindTestPlan:: FOUND Test Plan with {name}", name);
                 //Check test plan is in fact the right one
                 var sourceWI = Engine.Source.WorkItems.GetWorkItem(testPlan.Id.ToString());
                 string expectedReflectedId = Engine.Source.WorkItems.CreateReflectedWorkItemId(sourceWI).ToString();
                 string workItemReflectedId = (string)sourceWI.Fields[Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName].Value;
                 if (workItemReflectedId != expectedReflectedId)
                 {
+                    Log.LogDebug("TestPlansAndSuitesMigrationContext::FindTestPlan:: Fouund test plan with name {name} does not match {workItemReflectedId} ", name, workItemReflectedId);
                     testPlan = null;
                 }
+            }
+            else
+            {
+                Log.LogDebug("TestPlansAndSuitesMigrationContext::FindTestPlan:: NOT FOUND Test Plan with {name}", name);
             }
             return testPlan;
         }
@@ -914,9 +922,17 @@ namespace VstsSyncMigrator.Engine
             // Load the plan again, because somehow it doesn't let me set configurations on the already loaded plan
             InnerLog(sourcePlan, $"ApplyConfigurationsAndAssignTesters {targetPlan.Name}", 5); ;
             ITestPlan targetPlan2 = FindTestPlan(_targetTestStore, targetPlan.Name);
-            ApplyConfigurationsAndAssignTesters(sourcePlan.RootSuite, targetPlan2.RootSuite);
-            //////////////////////////////
-            TagCompletedTargetPlan(targetPlan.Id);
+            if (targetPlan2 !=  null)
+            {
+                ApplyConfigurationsAndAssignTesters(sourcePlan.RootSuite, targetPlan2.RootSuite);
+                //////////////////////////////
+                TagCompletedTargetPlan(targetPlan.Id);
+            }
+            else
+            {
+                Log.LogError("Unable to ApplyConfigurationsAndAssignTesters: When loading the test plan again with the name it was found that they do not match!");
+            }
+           
             ///////////////////////////////////////////////
             metrics.Add("ElapsedMS", stopwatch.ElapsedMilliseconds);
             Telemetry.TrackEvent("MigrateTestPlan", parameters, metrics);
