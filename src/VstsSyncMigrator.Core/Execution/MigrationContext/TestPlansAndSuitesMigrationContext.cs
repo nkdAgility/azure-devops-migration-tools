@@ -635,6 +635,7 @@ namespace VstsSyncMigrator.Engine
                 string expectedReflectedId = Engine.Source.WorkItems.CreateReflectedWorkItemId(sourceWI).ToString();
                 var targetWI = Engine.Source.WorkItems.GetWorkItem(testPlan.Id.ToString());
                 string workItemReflectedId = (string)targetWI.Fields[Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName].Value;
+
                 if (workItemReflectedId != expectedReflectedId)
                 {
                     Log.LogDebug("TestPlansAndSuitesMigrationContext::FindTestPlan:: Found test plan with name {name} does not match {workItemReflectedId} ", planName, workItemReflectedId);
