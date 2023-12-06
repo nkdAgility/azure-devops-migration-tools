@@ -11,6 +11,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation.Framework.Client;
 using Microsoft.TeamFoundation.Framework.Common;
 using Microsoft.TeamFoundation.TestManagement.Client;
+using Microsoft.TeamFoundation.TestManagement.WebApi;
 using Microsoft.VisualStudio.Services.Client;
 using Microsoft.VisualStudio.Services.Common;
 using Microsoft.VisualStudio.Services.TestManagement.TestPlanning.WebApi;
@@ -605,17 +606,27 @@ namespace VstsSyncMigrator.Engine
             return targetPlan;
         }
 
-        private ITestSuiteBase FindSuiteEntry(IStaticTestSuite staticSuite, string titleToFind)
+        private ITestSuiteBase FindSuiteEntry(IStaticTestSuite staticSuite, string titleToFind, ITestSuiteBase sourceSuit)
         {
+            Log.LogDebug("TestPlansAndSuitesMigrationContext::FindSuiteEntry");
             ITestSuiteBase testSuit = (from s in staticSuite.SubSuites where s.Title == titleToFind select s).SingleOrDefault();
             if (testSuit != null)
             {
-                //Check test suit is in fact the right one
-                var sourceWI = Engine.Source.WorkItems.GetWorkItem(testSuit.Id.ToString());
+                Log.LogDebug("TestPlansAndSuitesMigrationContext::FindSuiteEntry::FOUND Test Suit {id}", testSuit.Id);
+                //Get Source ReflectedWorkItemId
+                var sourceWI = Engine.Source.WorkItems.GetWorkItem(sourceSuit.Id.ToString());
+                Log.LogDebug("TestPlansAndSuitesMigrationContext::FindSuiteEntry::SourceWorkItem[{workItemId]", sourceWI.Id);
                 string expectedReflectedId = Engine.Source.WorkItems.CreateReflectedWorkItemId(sourceWI).ToString();
-                string workItemReflectedId = (string)sourceWI.Fields[Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName].Value;
+                Log.LogDebug("TestPlansAndSuitesMigrationContext::FindSuiteEntry::SourceWorkItem[{workItemId] ~[{ReflectedWorkItemId]", sourceWI.Id, expectedReflectedId);
+                //Get Target ReflectedWorkItemId
+                var targetWI = Engine.Target.WorkItems.GetWorkItem(testSuit.Id.ToString());
+                Log.LogDebug("TestPlansAndSuitesMigrationContext::FindSuiteEntry::TargetWorkItem[{workItemId]", targetWI.Id);
+                string workItemReflectedId = (string)targetWI.Fields[Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName].Value;
+                Log.LogDebug("TestPlansAndSuitesMigrationContext::FindSuiteEntry::TargetWorkItem[{workItemId] [{ReflectedWorkItemId]", targetWI.Id, workItemReflectedId);
+                //Compaire
                 if (workItemReflectedId != expectedReflectedId)
                 {
+                    Log.LogDebug("TestPlansAndSuitesMigrationContext::FindSuiteEntry: Source ReflectedWorkItemId and Target ReflectedWorkItemId do not match");
                     testSuit = null;
                 }
             }
@@ -630,15 +641,20 @@ namespace VstsSyncMigrator.Engine
             if (testPlan != null)
             {
                 Log.LogDebug("TestPlansAndSuitesMigrationContext::FindTestPlan:: FOUND Test Plan with {name}", planName);
-                //Check test plan is in fact the right one
+                //Get Source ReflectedWorkItemId
                 var sourceWI = Engine.Source.WorkItems.GetWorkItem(sourcePlanId);
+                Log.LogDebug("TestPlansAndSuitesMigrationContext::FindTestPlan::SourceWorkItem[{workItemId]", sourceWI.Id);
                 string expectedReflectedId = Engine.Source.WorkItems.CreateReflectedWorkItemId(sourceWI).ToString();
+                Log.LogDebug("TestPlansAndSuitesMigrationContext::FindTestPlan::SourceWorkItem[{workItemId] ~[{ReflectedWorkItemId]", sourceWI.Id, expectedReflectedId);
+                //Get Target ReflectedWorkItemId
                 var targetWI = Engine.Target.WorkItems.GetWorkItem(testPlan.Id.ToString());
+                Log.LogDebug("TestPlansAndSuitesMigrationContext::FindTestPlan::TargetWorkItem[{workItemId]", targetWI.Id);
                 string workItemReflectedId = (string)targetWI.Fields[Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName].Value;
-
+                Log.LogDebug("TestPlansAndSuitesMigrationContext::FindTestPlan::TargetWorkItem[{workItemId] [{ReflectedWorkItemId]", targetWI.Id, workItemReflectedId);
+                //Compaire
                 if (workItemReflectedId != expectedReflectedId)
                 {
-                    Log.LogDebug("TestPlansAndSuitesMigrationContext::FindTestPlan:: Found test plan with name {name} does not match {workItemReflectedId} ", planName, workItemReflectedId);
+                    Log.LogDebug("TestPlansAndSuitesMigrationContext::FindTestPlan: Source ReflectedWorkItemId and Target ReflectedWorkItemId do not match");
                     testPlan = null;
                 }
             }
@@ -959,7 +975,7 @@ namespace VstsSyncMigrator.Engine
             ////////////////////////////////////
 
             InnerLog(sourceSuite, $"    Processing {sourceSuite.TestSuiteType} : {sourceSuite.Id} - {sourceSuite.Title} ", 5);
-            var targetSuiteChild = FindSuiteEntry((IStaticTestSuite)targetParent, sourceSuite.Title);
+            var targetSuiteChild = FindSuiteEntry((IStaticTestSuite)targetParent, sourceSuite.Title, sourceSuite);
 
             // Target suite is not found in target system. We should create it.
             if (targetSuiteChild == null)
