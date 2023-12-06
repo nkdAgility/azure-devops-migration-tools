@@ -544,7 +544,7 @@ namespace VstsSyncMigrator.Engine
                         Id = int.Parse(targetSuite.Id)
                     }
                 };
-                TestSuite suite = testPlanHttpClient.CreateTestSuiteAsync(testSuiteCreateParams, project, int.Parse(targetPlan.Id)).Result;
+                Microsoft.VisualStudio.Services.TestManagement.TestPlanning.WebApi.TestSuite suite = testPlanHttpClient.CreateTestSuiteAsync(testSuiteCreateParams, project, int.Parse(targetPlan.Id)).Result;
                 targetSuiteChild = (IRequirementTestSuite)_targetTestStore.Project.TestSuites.Find(suite.Id);
                 //Replaced soap api with rest api because work item type Bug is no longer part of the Microsoft.Requirement.Category
                 //targetSuiteChild = _targetTestStore.Project.TestSuites.CreateRequirement(requirement.ToWorkItem());
