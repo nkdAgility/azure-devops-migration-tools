@@ -212,7 +212,7 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         {
             Enabled = false;
             WorkItemCreateRetryLimit = 5;
-            FilterWorkItemsThatAlreadyExistInTarget = true;
+            FilterWorkItemsThatAlreadyExistInTarget = false;
             ReplayRevisions = true;
             LinkMigration = true;
             AttachmentMigration = true;
@@ -235,7 +235,7 @@ namespace MigrationTools._EngineV1.Configuration.Processing
             SkipRevisionWithInvalidIterationPath = false;
             SkipRevisionWithInvalidAreaPath = false;
             ShouldCreateMissingRevisionPaths = true;
-            ShouldCreateNodesUpFront = true;
+            ShouldCreateNodesUpFront = false;
         }
     }
 }
