@@ -2,6 +2,7 @@
 using MigrationTools.Endpoints;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using TfsUrlParser;
 
 namespace MigrationTools._EngineV1.Configuration
 {
@@ -19,6 +20,8 @@ namespace MigrationTools._EngineV1.Configuration
         public string PersonalAccessTokenVariableName { get; set; }
         public TfsLanguageMapOptions LanguageMaps { get; set; }
 
+        public string CollectionName { get { return GetCollectionName(); } }
+
         public IMigrationClientConfig PopulateWithDefault()
         {
             Project = "myProjectName";
@@ -30,6 +33,12 @@ namespace MigrationTools._EngineV1.Configuration
             AuthenticationMode = AuthenticationMode.Prompt;
             LanguageMaps = new TfsLanguageMapOptions() { AreaPath = "Area", IterationPath = "Iteration" };
             return this;
+        }
+
+        public string GetCollectionName()
+        {
+            var repositoryDescription =  new RepositoryDescription(Collection);
+            return repositoryDescription.CollectionName;
         }
 
         public override string ToString()

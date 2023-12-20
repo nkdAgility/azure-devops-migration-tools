@@ -8,6 +8,7 @@ using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Microsoft.ApplicationInsights.Channel;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -61,6 +62,7 @@ namespace VstsSyncMigrator.Engine
         private IWorkItemProcessorEnricher _workItemEmbededLinkEnricher;
         private TfsGitRepositoryEnricher gitRepositoryEnricher;
         private TfsNodeStructure _nodeStructureEnricher;
+        private ITelemetryLogger _telemetry;
         private readonly EngineConfiguration _engineConfig;
         private TfsRevisionManager _revisionManager;
         private TfsValidateRequiredField _validateConfig;
@@ -82,6 +84,7 @@ namespace VstsSyncMigrator.Engine
                                         IOptions<EngineConfiguration> engineConfig)
             : base(engine, services, telemetry, logger)
         {
+            _telemetry = telemetry;
             _engineConfig = engineConfig.Value;
             contextLog = Serilog.Log.ForContext<WorkItemMigrationContext>();
             _nodeStructureEnricher = nodeStructureEnricher;

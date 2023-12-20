@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.ApplicationInsights.Channel;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
@@ -15,6 +16,7 @@ namespace MigrationTools._EngineV1.Clients
 {
     public class TfsWorkItemMigrationClient : WorkItemMigrationClientBase
     {
+        private ITelemetryLogger _telemetry;
         private readonly IWorkItemQueryBuilderFactory _workItemQueryBuilderFactory;
         private WorkItemStoreFlags _bypassRules;
         private IMigrationClientConfig _config;
@@ -24,6 +26,7 @@ namespace MigrationTools._EngineV1.Clients
         public TfsWorkItemMigrationClient(IWorkItemQueryBuilderFactory workItemQueryBuilderFactory, ITelemetryLogger telemetry)
             : base(telemetry)
         {
+            _telemetry = telemetry;
             _workItemQueryBuilderFactory = workItemQueryBuilderFactory;
         }
 
@@ -54,10 +57,11 @@ namespace MigrationTools._EngineV1.Clients
                 .Where(x=> x != null)
                 .ToList();
             //////////////////////////////////////////////////////////
-            sourceWorkItems = sourceWorkItems.Where(p => targetFoundIds.All(p2 => p2.ToString() != sourceWorkItemMigrationClient.CreateReflectedWorkItemId(p).ToString())).ToList();
+           var sourceWorkItems2 = sourceWorkItems.Where(p => targetFoundIds.All(p2 => p2.ToString() != sourceWorkItemMigrationClient.CreateReflectedWorkItemId(p).ToString())).ToList();
             Log.Debug("FilterByTarget: After removing all found work items there are {SourceWorkItemCount} remaining to be migrated.", sourceWorkItems.Count);
             Log.Debug("FilterByTarget: END");
-            return sourceWorkItems;
+            _telemetry.TrackEvent("FilterExistingWorkItems", new Dictionary<string, string> { { "Project", sourceWorkItemMigrationClient.Config.AsTeamProjectConfig().Project }, { "CollectionName", sourceWorkItemMigrationClient.Config.AsTeamProjectConfig().CollectionName } }, new Dictionary<string, double> { { "sourceWorkItems", sourceWorkItems.Count }, { "targetWorkItems", targetFoundItems.Count }, { "resultWorkItems", sourceWorkItems2.Count } });
+            return sourceWorkItems2;
         }
 
         public override WorkItemData FindReflectedWorkItem(WorkItemData workItemToReflect, bool cache)
