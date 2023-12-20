@@ -20,7 +20,7 @@ configurationSamples:
       "FixHtmlAttachmentLinks": false,
       "SkipToFinalRevisedWorkItemType": false,
       "WorkItemCreateRetryLimit": 5,
-      "FilterWorkItemsThatAlreadyExistInTarget": true,
+      "FilterWorkItemsThatAlreadyExistInTarget": false,
       "PauseAfterEachWorkItem": false,
       "AttachmentMaxSize": 480000000,
       "AttachRevisionHistory": false,
@@ -39,8 +39,7 @@ configurationSamples:
       "MaxGracefulFailures": 0,
       "SkipRevisionWithInvalidIterationPath": false,
       "SkipRevisionWithInvalidAreaPath": false,
-      "ShouldCreateMissingRevisionPaths": true,
-      "ShouldCreateNodesUpFront": true
+      "ShouldCreateMissingRevisionPaths": true
     }
   sampleFor: MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig
 description: WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links, and Attachments. Use `WorkItemMigrationConfig` to configure.
@@ -123,10 +122,6 @@ options:
 - parameterName: ShouldCreateMissingRevisionPaths
   type: Boolean
   description: When set to True the susyem will try to create any missing missing area or iteration paths from the revisions.
-  defaultValue: missng XML code comments
-- parameterName: ShouldCreateNodesUpFront
-  type: Boolean
-  description: missng XML code comments
   defaultValue: missng XML code comments
 - parameterName: SkipRevisionWithInvalidAreaPath
   type: Boolean
