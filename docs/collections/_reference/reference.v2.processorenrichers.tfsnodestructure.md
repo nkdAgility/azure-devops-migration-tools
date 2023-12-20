@@ -16,8 +16,7 @@ configurationSamples:
       "IterationMaps": {
         "$type": "Dictionary`2"
       },
-      "ShouldCreateMissingRevisionPaths": true,
-      "ShouldCreateNodesUpFront": true
+      "ShouldCreateMissingRevisionPaths": true
     }
   sampleFor: MigrationTools.Enrichers.TfsNodeStructureOptions
 description: missng XML code comments
@@ -50,10 +49,6 @@ options:
   description: missng XML code comments
   defaultValue: missng XML code comments
 - parameterName: ShouldCreateMissingRevisionPaths
-  type: Boolean
-  description: missng XML code comments
-  defaultValue: missng XML code comments
-- parameterName: ShouldCreateNodesUpFront
   type: Boolean
   description: missng XML code comments
   defaultValue: missng XML code comments
