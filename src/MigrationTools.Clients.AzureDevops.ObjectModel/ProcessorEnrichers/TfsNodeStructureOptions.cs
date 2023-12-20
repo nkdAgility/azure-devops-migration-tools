@@ -12,7 +12,6 @@ namespace MigrationTools.Enrichers
         public Dictionary<string, string> AreaMaps { get; set; }
         public Dictionary<string, string> IterationMaps { get; set; }
         public bool ShouldCreateMissingRevisionPaths { get; set; }
-        public bool ShouldCreateNodesUpFront { get; set; }   // FLAG for Expermiment to Do on Demand.
 
         public override void SetDefaults()
         {
@@ -20,7 +19,6 @@ namespace MigrationTools.Enrichers
             AreaMaps = new Dictionary<string, string>();
             IterationMaps = new Dictionary<string, string>();
             ShouldCreateMissingRevisionPaths = true;
-            ShouldCreateNodesUpFront = true;  // FLAG for Expermiment to Do on Demand.
         }
     }
 

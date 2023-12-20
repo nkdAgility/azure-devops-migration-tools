@@ -259,10 +259,6 @@ namespace MigrationTools.Enrichers
             {
                 Log.LogInformation("Migrating all Nodes before the Processor run.");
                 EntryForProcessorType(processor);
-                if (Options.ShouldCreateNodesUpFront) // FLAG for Expermiment to Do on Demand.
-                {
-                    MigrateAllNodeStructures();
-                }
                 RefreshForProcessorType(processor);
             }
         }

@@ -114,8 +114,7 @@ namespace VstsSyncMigrator.Engine
                     PrefixProjectToNodes = _config.PrefixProjectToNodes,
                     AreaMaps = _config.AreaMaps ?? new Dictionary<string, string>(),
                     IterationMaps = _config.IterationMaps ?? new Dictionary<string, string>(),
-                    ShouldCreateMissingRevisionPaths = _config.ShouldCreateMissingRevisionPaths,
-                    ShouldCreateNodesUpFront = _config.ShouldCreateNodesUpFront
+                    ShouldCreateMissingRevisionPaths = _config.ShouldCreateMissingRevisionPaths
                 }); ;
             }
 

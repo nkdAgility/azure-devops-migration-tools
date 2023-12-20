@@ -197,7 +197,6 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         /// When set to True the susyem will try to create any missing missing area or iteration paths from the revisions.
         /// </summary>
        public bool ShouldCreateMissingRevisionPaths { get; set; }
-        public bool ShouldCreateNodesUpFront { get; set; }  // FLAG for Expermiment to Do on Demand.
 
         /// <inheritdoc />
         public bool IsProcessorCompatible(IReadOnlyList<IProcessorConfig> otherProcessors)
@@ -235,7 +234,6 @@ namespace MigrationTools._EngineV1.Configuration.Processing
             SkipRevisionWithInvalidIterationPath = false;
             SkipRevisionWithInvalidAreaPath = false;
             ShouldCreateMissingRevisionPaths = true;
-            ShouldCreateNodesUpFront = false;
         }
     }
 }
