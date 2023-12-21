@@ -37,8 +37,10 @@ namespace MigrationTools._EngineV1.Configuration
 
         public string GetCollectionName()
         {
-            var repositoryDescription =  new RepositoryDescription(Collection);
-            return repositoryDescription.CollectionName;
+            //var repositoryDescription =  new RepositoryDescription(Collection);
+            //return repositoryDescription.CollectionName;
+            // Pending fix from https://github.com/bbtsoftware/TfsUrlParser
+            return Collection.ToString();
         }
 
         public override string ToString()
