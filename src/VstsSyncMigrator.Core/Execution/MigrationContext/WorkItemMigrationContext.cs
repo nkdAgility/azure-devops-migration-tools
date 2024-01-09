@@ -788,8 +788,11 @@ namespace VstsSyncMigrator.Engine
                     var skipIterationRevision = SkipRevisionWithInvalidIterationPath(targetWorkItem);
                     var skipAreaRevision = SkipRevisionWithInvalidAreaPath(targetWorkItem);
 
+                    CheckClosedDateIsValid(targetWorkItem);
+
                     if (!skipIterationRevision && !skipAreaRevision)
                     {
+
                         targetWorkItem.SaveToAzureDevOps();
                     }
                     TraceWriteLine(LogEventLevel.Information,
@@ -848,6 +851,15 @@ namespace VstsSyncMigrator.Engine
             }
 
             return targetWorkItem;
+        }
+
+        private void CheckClosedDateIsValid(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
+        {
+            if (targetWorkItem.ToWorkItem().Fields["System.ClosedDate"].Value == null && (targetWorkItem.ToWorkItem().Fields["System.State"].Value.ToString() == "Closed" || targetWorkItem.ToWorkItem().Fields["System.State"].Value.ToString() == "Done"))
+            {
+                Log.LogWarning("The field System.ClosedDate is set to Null and will revert to the current date on save! ");
+                Log.LogWarning("Source Closed Date [#{sourceId}][Rev{sourceRev}]: {sourceClosedDate} ", sourceWorkItem.ToWorkItem().Id, sourceWorkItem.ToWorkItem().Rev, sourceWorkItem.ToWorkItem().Fields["System.ClosedDate"].Value);
+            }
         }
 
         private bool SkipRevisionWithInvalidIterationPath(WorkItemData targetWorkItemData)
