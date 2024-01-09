@@ -17,6 +17,7 @@ using MigrationTools.Processors;
 using Newtonsoft.Json;
 using Serilog.Context;
 using Serilog.Events;
+using static Microsoft.TeamFoundation.WorkItemTracking.Client.Node;
 using ILogger = Serilog.ILogger;
 
 
@@ -259,6 +260,10 @@ namespace MigrationTools.Enrichers
             {
                 Log.LogInformation("Migrating all Nodes before the Processor run.");
                 EntryForProcessorType(processor);
+                if (Options.ReplicateAllExistingNodes)
+                {
+                    MigrateAllNodeStructures();
+                }
                 RefreshForProcessorType(processor);
             }
         }
@@ -559,8 +564,10 @@ namespace MigrationTools.Enrichers
                     keepProcessing = false;
                     missingPaths.Add(missingItem);
                 }
-                if (keepProcessing) {
+                if (keepProcessing)
+                {
                     missingItem.systemPath = GetSystemPath(missingItem.targetPath, nodeType);
+                    PopulateIterationDatesFronSource(missingItem);
                     try
                     {
                         contextLog.Debug("TfsNodeStructure:CheckForMissingPaths:CheckTarget::{@missingItem}", missingItem);
@@ -572,12 +579,11 @@ namespace MigrationTools.Enrichers
                         contextLog.Debug("TfsNodeStructure:CheckForMissingPaths:CheckTarget::NOTFOUND::{@missingItem}::NOTFOUND", missingItem);
                         if (_Options.ShouldCreateMissingRevisionPaths && ShouldCreateNode(missingItem.systemPath))
                         {
-                        
                             contextLog.Debug("TfsNodeStructure:CheckForMissingPaths:CheckTarget::CREATE::{@missingItem}", missingItem);
-                            GetOrCreateNode(missingItem.systemPath, null, null);
+                            GetOrCreateNode(missingItem.systemPath, missingItem.startDate, missingItem.finishDate);
                         }
                         else
-                        { 
+                        {
                             missingPaths.Add(missingItem);
                             contextLog.Debug("TfsNodeStructure:CheckForMissingPaths:CheckTarget::LOG-ONLY::{@missingItem}", missingItem);
                         }
@@ -589,6 +595,16 @@ namespace MigrationTools.Enrichers
                 _targetCommonStructureService.ClearProjectInfoCache();
             }
             return missingPaths;
+        }
+
+        private void PopulateIterationDatesFronSource(NodeStructureItem missingItem)
+        {
+            if (missingItem.nodeType == "Iteration")
+            {
+                var sourceNode = _sourceCommonStructureService.GetNodeFromPath(missingItem.sourcePath);
+                missingItem.startDate = sourceNode.StartDate;
+                missingItem.finishDate = sourceNode.FinishDate;
+            }
         }
 
         public List<NodeStructureItem> GetMissingRevisionNodes(List<WorkItemData> workItems)
