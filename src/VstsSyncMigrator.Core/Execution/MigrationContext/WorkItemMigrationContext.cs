@@ -788,7 +788,7 @@ namespace VstsSyncMigrator.Engine
                     var skipIterationRevision = SkipRevisionWithInvalidIterationPath(targetWorkItem);
                     var skipAreaRevision = SkipRevisionWithInvalidAreaPath(targetWorkItem);
 
-                    CheckClosedDateIsValid(targetWorkItem);
+                    CheckClosedDateIsValid(sourceWorkItem, targetWorkItem);
 
                     if (!skipIterationRevision && !skipAreaRevision)
                     {
