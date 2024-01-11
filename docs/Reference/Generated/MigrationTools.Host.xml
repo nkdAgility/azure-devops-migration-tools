@@ -11,7 +11,7 @@
         </member>
         <member name="F:ThisAssembly.Git.IsDirtyString">
             <summary>
-            => @"false"
+            => @"true"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.RepositoryUrl">
@@ -21,37 +21,37 @@
         </member>
         <member name="F:ThisAssembly.Git.Branch">
             <summary>
-            => @"bug/1826"
+            => @"bug/1832-processTemplateChangeCausesError"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commit">
             <summary>
-            => @"d624da0"
+            => @"77adbfe"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Sha">
             <summary>
-            => @"d624da012527785e20ad31f225de1072977f4a6c"
+            => @"77adbfe0309d57bae73ef82585f90a67c37b5c35"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.CommitDate">
             <summary>
-            => @"2024-01-09T10:57:08+00:00"
+            => @"2024-01-09T11:47:49+00:00"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commits">
             <summary>
-            => @"1"
+            => @"0"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Tag">
             <summary>
-            => @"v14.3.10-1-gd624da0"
+            => @"v14.3.11"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseTag">
             <summary>
-            => @"v14.3.10"
+            => @"v14.3.11"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseVersion.Major">
@@ -66,7 +66,7 @@
         </member>
         <member name="F:ThisAssembly.Git.BaseVersion.Patch">
             <summary>
-            => @"10"
+            => @"11"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Major">
