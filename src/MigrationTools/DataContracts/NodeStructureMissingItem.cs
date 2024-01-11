@@ -11,6 +11,10 @@ namespace MigrationTools.DataContracts
         public string targetPath { get; set; }
         public string systemPath { get; set; }
         public string nodeType { get; set; }
+
+        public DateTime? startDate { get; set; }
+        public DateTime? finishDate { get; set; }
+
         public List<int> workItems { get; set; }
 
         public override bool Equals(object obj)
@@ -29,5 +33,6 @@ namespace MigrationTools.DataContracts
         {
             return this.sourcePath.GetHashCode();
         }
+
     }
 }
