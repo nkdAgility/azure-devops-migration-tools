@@ -21,37 +21,37 @@
         </member>
         <member name="F:ThisAssembly.Git.Branch">
             <summary>
-            => @"bug/1832-processTemplateChangeCausesError"
+            => @"warningOnClodesDateInvalid"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commit">
             <summary>
-            => @"77adbfe"
+            => @"1c37048"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Sha">
             <summary>
-            => @"77adbfe0309d57bae73ef82585f90a67c37b5c35"
+            => @"1c37048913b99ea4fd25e10916332c9ca58df931"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.CommitDate">
             <summary>
-            => @"2024-01-09T11:47:49+00:00"
+            => @"2024-01-09T11:02:08+00:00"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commits">
             <summary>
-            => @"0"
+            => @"2"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Tag">
             <summary>
-            => @"v14.3.11"
+            => @"v14.3.10-2-g1c37048"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseTag">
             <summary>
-            => @"v14.3.11"
+            => @"v14.3.10"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseVersion.Major">
@@ -66,7 +66,7 @@
         </member>
         <member name="F:ThisAssembly.Git.BaseVersion.Patch">
             <summary>
-            => @"11"
+            => @"10"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Major">
@@ -81,7 +81,7 @@
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Patch">
             <summary>
-            => @"11"
+            => @"12"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Label">
