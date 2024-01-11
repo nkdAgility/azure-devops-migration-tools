@@ -25,6 +25,7 @@ using MigrationTools;
 using MigrationTools._EngineV1.Clients;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Configuration.Processing;
+using MigrationTools._EngineV1.Containers;
 using MigrationTools._EngineV1.DataContracts;
 using MigrationTools._EngineV1.Enrichers;
 using MigrationTools._EngineV1.Processors;
@@ -161,7 +162,8 @@ namespace VstsSyncMigrator.Engine
 
             try
             {
-                //Validation: make sure that the ReflectedWorkItemId field name specified in the config exists in the target process, preferably on each work item type.
+
+
                 PopulateIgnoreList();
 
                 string sourceQuery =
@@ -175,10 +177,25 @@ namespace VstsSyncMigrator.Engine
                 contextLog.Information("Replay all revisions of {sourceWorkItemsCount} work items?",
                     sourceWorkItems.Count);
 
+                //Validation: make sure that the ReflectedWorkItemId field name specified in the config exists in the target process, preferably on each work item type.
+                //////////////////////////////////////////////////
+                contextLog.Information("Validating::Check all Target Work Items have the RefectedWorkItemId field");
 
+                var result = _validateConfig.ValidatingRequiredField(
+                    Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName, sourceWorkItems);
+                if (!result)
+                {
+                    var ex = new InvalidFieldValueException(
+                        "Not all work items in scope contain a valid ReflectedWorkItemId Field!");
+                    Log.LogError(ex, "Not all work items in scope contain a valid ReflectedWorkItemId Field!");
+                    throw ex;
+                }
 
                 //////////////////////////////////////////////////
-                contextLog.Information("ValidateTargetNodesExist::Checking all Nodes on Work items");
+                ValiddateWorkItemTypesExistInTarget(sourceWorkItems);
+                //////////////////////////////////////////////////
+
+                contextLog.Information("Validating::Check that all Area & Iteration paths from Source have a valid mapping on Target");
                 List<NodeStructureItem> nodeStructureMissingItems = _nodeStructureEnricher.GetMissingRevisionNodes(sourceWorkItems);
                 if (_nodeStructureEnricher.ValidateTargetNodesExist(nodeStructureMissingItems))
                 {
@@ -186,8 +203,11 @@ namespace VstsSyncMigrator.Engine
                 }
 
                 //////////////////////////////////////////////////
+
                 contextLog.Information("Found target project as {@destProject}", Engine.Target.WorkItems.Project.Name);
+
                 //////////////////////////////////////////////////////////FilterCompletedByQuery
+
                 if (_config.FilterWorkItemsThatAlreadyExistInTarget)
                 {
                     contextLog.Information(
@@ -204,19 +224,10 @@ namespace VstsSyncMigrator.Engine
                         "!! After removing all found work items there are {SourceWorkItemCount} remaining to be migrated.",
                         sourceWorkItems.Count());
                 }
-                //////////////////////////////////////////////////
-
-                var result = _validateConfig.ValidatingRequiredField(
-                    Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName, sourceWorkItems);
-                if (!result)
-                {
-                    var ex = new InvalidFieldValueException(
-                        "Not all work items in scope contain a valid ReflectedWorkItemId Field!");
-                    Log.LogError(ex, "Not all work items in scope contain a valid ReflectedWorkItemId Field!");
-                    throw ex;
-                }
 
                 //////////////////////////////////////////////////
+
+
                 _current = 1;
                 _count = sourceWorkItems.Count;
                 _elapsedms = 0;
@@ -278,6 +289,47 @@ namespace VstsSyncMigrator.Engine
                     contextLog.Warning("The following items could not be migrated: {ItemIds}", string.Join(", ", _itemsInError));
                 }
                 contextLog.Information("DONE in {Elapsed}", stopwatch.Elapsed.ToString("c"));
+            }
+        }
+
+        private void ValiddateWorkItemTypesExistInTarget(List<WorkItemData> sourceWorkItems)
+        {
+            contextLog.Information("Validating::Check that all work item types needed in the Target exist or are mapped");
+            // get list of all work item types
+            List<String> sourceWorkItemTypes = sourceWorkItems.SelectMany(x => x.Revisions.Values)
+            //.Where(x => x.Fields[fieldName].Value.ToString().Contains("\\"))
+            .Select(x => x.Type)
+            .Distinct()
+            .ToList();
+
+            Log.LogDebug("Validating::WorkItemTypes::sourceWorkItemTypes: {count} WorkItemTypes in the full source history {sourceWorkItemTypesString}", sourceWorkItemTypes.Count(), string.Join(",", sourceWorkItemTypes));
+
+            var targetWorkItemTypes = Engine.Target.WorkItems.Project.ToProject().WorkItemTypes.Cast<WorkItemType>().Select(x => x.Name);
+            Log.LogDebug("Validating::WorkItemTypes::targetWorkItemTypes::{count} WorkItemTypes in Target process: {targetWorkItemTypesString}", targetWorkItemTypes.Count(), string.Join(",", targetWorkItemTypes));
+
+            var missingWorkItemTypes = sourceWorkItemTypes.Where(sourceWit => !targetWorkItemTypes.Contains(sourceWit)); // the real one
+            if (missingWorkItemTypes.Count() > 0)
+            {
+                Log.LogWarning("Validating::WorkItemTypes::targetWorkItemTypes::There are {count} WorkItemTypes that are used in the history of the Source and that do not exist in the Target. These will all need mapped using `WorkItemTypeDefinition` in the config. ", missingWorkItemTypes.Count());
+
+                bool allTypesMapped = true;
+                foreach (var missingWorkItemType in missingWorkItemTypes)
+                {
+                    bool thisTypeMapped = true;
+                    if (!Engine.TypeDefinitionMaps.Items.ContainsKey(missingWorkItemType))
+                    {
+                        thisTypeMapped = false;
+                    }
+                    Log.LogWarning("Validating::WorkItemTypes::targetWorkItemTypes::{missingWorkItemType}::Mapped? {thisTypeMapped}", missingWorkItemType, thisTypeMapped.ToString());
+                    allTypesMapped &= thisTypeMapped;
+                }
+                if (!allTypesMapped)
+                {
+                    var ex = new Exception(
+                       "Not all WorkItemTypes present in the Source are present in the Target or mapped!");
+                    Log.LogError(ex, "Not all WorkItemTypes present in the Source are present in the Target or mapped using `WorkItemTypeDefinition` in the config.");
+                    throw ex;
+                }
             }
         }
 
