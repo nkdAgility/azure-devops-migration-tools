@@ -8,8 +8,9 @@ namespace MigrationTools.DataContracts
         public bool anchored { get; set; } = true;
 
         public string sourcePath { get; set; }
+        public string sourceSystemPath { get; set; }
         public string targetPath { get; set; }
-        public string systemPath { get; set; }
+        public string targetSystemPath { get; set; }
         public string nodeType { get; set; }
 
         public DateTime? startDate { get; set; }

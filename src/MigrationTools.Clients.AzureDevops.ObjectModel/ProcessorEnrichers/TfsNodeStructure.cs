@@ -355,7 +355,7 @@ namespace MigrationTools.Enrichers
                     }
 
                     var newUserPath = GetNewNodeName(userFriendlyPath, nodeStructureType);
-                    var newSystemPath = GetSystemPath(newUserPath, nodeStructureType);
+                    var newSystemPath = GetSystemPath(newUserPath, nodeStructureType, _targetLanguageMaps);
 
                     var targetNode = GetOrCreateNode(newSystemPath, startDate, finishDate);
                     _pathToKnownNodeMap[targetNode.Path] = targetNode;
@@ -369,7 +369,7 @@ namespace MigrationTools.Enrichers
             }
         }
 
-        private string GetSystemPath(string newUserPath, TfsNodeStructureType structureType)
+        private string GetSystemPath(string newUserPath, TfsNodeStructureType structureType, TfsLanguageMapOptions languageMap)
         {
 
             string matchtext = @"^(?<projectName>[^\\]+)(\\(?<restOfThePath>.*))?$"; //^(?<projectName>[^\\]+)\\(?<restOfThePath>.*)$
@@ -379,7 +379,7 @@ namespace MigrationTools.Enrichers
                 throw new InvalidOperationException($"This path is not a valid area or iteration path: {newUserPath}");
             }
 
-            var structureName = GetTargetLocalizedNodeStructureTypeName(structureType);
+            var structureName = GetLocalizedNodeStructureTypeName(structureType, languageMap);
 
             var systemPath = $"\\{match.Groups["projectName"].Value}\\{structureName}";
             if (match.Groups["restOfThePath"].Success)
@@ -413,15 +413,15 @@ namespace MigrationTools.Enrichers
             //////////////////////////////////////////////////
         }
 
-        private string GetTargetLocalizedNodeStructureTypeName(TfsNodeStructureType value)
+        private string GetLocalizedNodeStructureTypeName(TfsNodeStructureType value, TfsLanguageMapOptions languageMap)
         {
             switch (value)
             {
                 case TfsNodeStructureType.Area:
-                    return _targetLanguageMaps.AreaPath;
+                    return languageMap.AreaPath;
 
                 case TfsNodeStructureType.Iteration:
-                    return _targetLanguageMaps.IterationPath;
+                    return languageMap.IterationPath;
 
                 default:
                     throw new InvalidOperationException("Not a valid NodeStructureType ");
@@ -566,21 +566,22 @@ namespace MigrationTools.Enrichers
                 }
                 if (keepProcessing)
                 {
-                    missingItem.systemPath = GetSystemPath(missingItem.targetPath, nodeType);
+                    missingItem.targetSystemPath = GetSystemPath(missingItem.targetPath, nodeType, _targetLanguageMaps);
+                    missingItem.sourceSystemPath = GetSystemPath(missingItem.sourcePath, nodeType, _sourceLanguageMaps);
                     PopulateIterationDatesFronSource(missingItem);
                     try
                     {
                         contextLog.Debug("TfsNodeStructure:CheckForMissingPaths:CheckTarget::{@missingItem}", missingItem);
-                        NodeInfo c = _targetCommonStructureService.GetNodeFromPath(missingItem.systemPath);
+                        NodeInfo c = _targetCommonStructureService.GetNodeFromPath(missingItem.targetSystemPath);
                         contextLog.Debug("TfsNodeStructure:CheckForMissingPaths:CheckTarget::FOUND::{@missingItem}::FOUND", missingItem);
                     }
                     catch
                     {
                         contextLog.Debug("TfsNodeStructure:CheckForMissingPaths:CheckTarget::NOTFOUND::{@missingItem}::NOTFOUND", missingItem);
-                        if (_Options.ShouldCreateMissingRevisionPaths && ShouldCreateNode(missingItem.systemPath))
+                        if (_Options.ShouldCreateMissingRevisionPaths && ShouldCreateNode(missingItem.targetSystemPath))
                         {
                             contextLog.Debug("TfsNodeStructure:CheckForMissingPaths:CheckTarget::CREATE::{@missingItem}", missingItem);
-                            GetOrCreateNode(missingItem.systemPath, missingItem.startDate, missingItem.finishDate);
+                            GetOrCreateNode(missingItem.targetSystemPath, missingItem.startDate, missingItem.finishDate);
                         }
                         else
                         {
@@ -601,7 +602,7 @@ namespace MigrationTools.Enrichers
         {
             if (missingItem.nodeType == "Iteration")
             {
-                var sourceNode = _sourceCommonStructureService.GetNodeFromPath(missingItem.sourcePath);
+                var sourceNode = _sourceCommonStructureService.GetNodeFromPath(missingItem.sourceSystemPath);
                 missingItem.startDate = sourceNode.StartDate;
                 missingItem.finishDate = sourceNode.FinishDate;
             }
