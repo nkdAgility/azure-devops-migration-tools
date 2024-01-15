@@ -21,37 +21,37 @@
         </member>
         <member name="F:ThisAssembly.Git.Branch">
             <summary>
-            => @"warningOnClodesDateInvalid"
+            => @"master"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commit">
             <summary>
-            => @"1c37048"
+            => @"6798a24"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Sha">
             <summary>
-            => @"1c37048913b99ea4fd25e10916332c9ca58df931"
+            => @"6798a247bb0f003a664529167f68b7105f01d4f0"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.CommitDate">
             <summary>
-            => @"2024-01-09T11:02:08+00:00"
+            => @"2024-01-11T12:13:59+00:00"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commits">
             <summary>
-            => @"2"
+            => @"0"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Tag">
             <summary>
-            => @"v14.3.10-2-g1c37048"
+            => @"v14.4.1"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseTag">
             <summary>
-            => @"v14.3.10"
+            => @"v14.4.1"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseVersion.Major">
@@ -61,12 +61,12 @@
         </member>
         <member name="F:ThisAssembly.Git.BaseVersion.Minor">
             <summary>
-            => @"3"
+            => @"4"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseVersion.Patch">
             <summary>
-            => @"10"
+            => @"1"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Major">
@@ -76,12 +76,12 @@
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Minor">
             <summary>
-            => @"3"
+            => @"4"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Patch">
             <summary>
-            => @"12"
+            => @"1"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Label">
