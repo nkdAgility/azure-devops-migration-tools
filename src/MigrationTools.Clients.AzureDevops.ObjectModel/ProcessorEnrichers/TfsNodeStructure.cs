@@ -419,10 +419,10 @@ namespace MigrationTools.Enrichers
             switch (value)
             {
                 case TfsNodeStructureType.Area:
-                    return languageMap.AreaPath;
+                    return languageMap.AreaPath.IsNullOrEmpty() ? "Area" : languageMap.AreaPath; // a ? "if_true" : "if_false";
 
                 case TfsNodeStructureType.Iteration:
-                    return languageMap.IterationPath;
+                    return languageMap.IterationPath.IsNullOrEmpty() ? "Iteration" : languageMap.IterationPath;
 
                 default:
                     throw new InvalidOperationException("Not a valid NodeStructureType ");
