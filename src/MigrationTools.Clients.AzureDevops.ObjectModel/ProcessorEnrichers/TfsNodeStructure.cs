@@ -602,9 +602,19 @@ namespace MigrationTools.Enrichers
         {
             if (missingItem.nodeType == "Iteration")
             {
-                var sourceNode = _sourceCommonStructureService.GetNodeFromPath(missingItem.sourceSystemPath);
-                missingItem.startDate = sourceNode.StartDate;
-                missingItem.finishDate = sourceNode.FinishDate;
+                try
+                {
+                    var sourceNode = _sourceCommonStructureService.GetNodeFromPath(missingItem.sourceSystemPath);
+                    missingItem.startDate = sourceNode.StartDate;
+                    missingItem.finishDate = sourceNode.FinishDate;
+                    missingItem.sourcePathExists = true;
+                }
+                catch (Exception)
+                {
+                    missingItem.startDate = null;
+                    missingItem.finishDate = null;
+                    missingItem.sourcePathExists = false;
+                }
             }
         }
 

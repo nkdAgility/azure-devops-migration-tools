@@ -17,6 +17,7 @@ namespace MigrationTools.DataContracts
         public DateTime? finishDate { get; set; }
 
         public List<int> workItems { get; set; }
+        public bool sourcePathExists { get; set; }
 
         public override bool Equals(object obj)
         {
