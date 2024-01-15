@@ -142,6 +142,7 @@ namespace MigrationTools.Enrichers
 
         private NodeInfo GetOrCreateNode(string nodePath, DateTime? startDate, DateTime? finishDate)
         {
+            contextLog.Debug("TfsNodeStructure:GetOrCreateNode({nodePath}, {startDate}, {finishDate})", nodePath, startDate, finishDate);
             if (_pathToKnownNodeMap.TryGetValue(nodePath, out var info))
             {
                 Log.LogInformation(" Node {0} already migrated, nothing to do", nodePath);
@@ -545,15 +546,17 @@ namespace MigrationTools.Enrichers
 
             foreach (var missingItem in nodePaths)
             {
-                contextLog.Debug("TfsNodeStructure:CheckForMissingPaths:Checking::{@missingItem}", missingItem);
+                contextLog.Debug("TfsNodeStructure:CheckForMissingPaths:Checking::{sourceSystemPath}", missingItem.sourceSystemPath);
+                contextLog.Verbose("TfsNodeStructure:CheckForMissingPaths:Checking::{@missingItem}", missingItem);
                 bool keepProcessing = true;
                 try
                 {
                     missingItem.targetPath = GetNewNodeName(missingItem.sourcePath, nodeType);
-                    contextLog.Debug("TfsNodeStructure:CheckForMissingPaths:GetNewNodeName::{@missingItem}", missingItem);
+                    contextLog.Verbose("TfsNodeStructure:CheckForMissingPaths:GetNewNodeName::{@missingItem}", missingItem);
                 }
                 catch (NodePathNotAnchoredException ex) {
-                    contextLog.Debug("TfsNodeStructure:CheckForMissingPaths:NodePathNotAnchoredException::{@missingItem}", missingItem);
+                    contextLog.Debug("TfsNodeStructure:CheckForMissingPaths:NodePathNotAnchoredException::{sourceSystemPath}", missingItem.sourceSystemPath);
+                    contextLog.Verbose("TfsNodeStructure:CheckForMissingPaths:NodePathNotAnchoredException::{@missingItem}", missingItem);
                     missingItem.anchored = false;
                     List<int> workItemsNotAncored = workItems.SelectMany(x => x.Revisions.Values)
                         .Where(x => x.Fields[fieldName].Value.ToString().Contains(missingItem.sourcePath))
@@ -571,22 +574,22 @@ namespace MigrationTools.Enrichers
                     PopulateIterationDatesFronSource(missingItem);
                     try
                     {
-                        contextLog.Debug("TfsNodeStructure:CheckForMissingPaths:CheckTarget::{@missingItem}", missingItem);
+                        contextLog.Debug("TfsNodeStructure:CheckForMissingPaths:CheckTarget::{targetSystemPath}", missingItem.targetSystemPath);
                         NodeInfo c = _targetCommonStructureService.GetNodeFromPath(missingItem.targetSystemPath);
-                        contextLog.Debug("TfsNodeStructure:CheckForMissingPaths:CheckTarget::FOUND::{@missingItem}::FOUND", missingItem);
+                        contextLog.Verbose("TfsNodeStructure:CheckForMissingPaths:CheckTarget::FOUND::{@missingItem}::FOUND", missingItem);
                     }
                     catch
                     {
-                        contextLog.Debug("TfsNodeStructure:CheckForMissingPaths:CheckTarget::NOTFOUND::{@missingItem}::NOTFOUND", missingItem);
+                        contextLog.Debug("TfsNodeStructure:CheckForMissingPaths:CheckTarget::NOTFOUND:{targetSystemPath}", missingItem.targetSystemPath);
                         if (_Options.ShouldCreateMissingRevisionPaths && ShouldCreateNode(missingItem.targetSystemPath))
                         {
-                            contextLog.Debug("TfsNodeStructure:CheckForMissingPaths:CheckTarget::CREATE::{@missingItem}", missingItem);
+                           
                             GetOrCreateNode(missingItem.targetSystemPath, missingItem.startDate, missingItem.finishDate);
                         }
                         else
                         {
                             missingPaths.Add(missingItem);
-                            contextLog.Debug("TfsNodeStructure:CheckForMissingPaths:CheckTarget::LOG-ONLY::{@missingItem}", missingItem);
+                            contextLog.Verbose("TfsNodeStructure:CheckForMissingPaths:CheckTarget::LOG-ONLY::{@missingItem}", missingItem);
                         }
                     }
                 }
@@ -602,6 +605,7 @@ namespace MigrationTools.Enrichers
         {
             if (missingItem.nodeType == "Iteration")
             {
+                contextLog.Debug("TfsNodeStructure:PopulateIterationDatesFronSource:{sourceSystemPath}", missingItem.sourceSystemPath);
                 try
                 {
                     var sourceNode = _sourceCommonStructureService.GetNodeFromPath(missingItem.sourceSystemPath);
@@ -611,6 +615,7 @@ namespace MigrationTools.Enrichers
                 }
                 catch (Exception)
                 {
+                    contextLog.Verbose("TfsNodeStructure:PopulateIterationDatesFronSource:{@missingItem}", missingItem);
                     missingItem.startDate = null;
                     missingItem.finishDate = null;
                     missingItem.sourcePathExists = false;

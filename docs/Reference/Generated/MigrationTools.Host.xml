@@ -11,7 +11,7 @@
         </member>
         <member name="F:ThisAssembly.Git.IsDirtyString">
             <summary>
-            => @"true"
+            => @"false"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.RepositoryUrl">
@@ -21,37 +21,37 @@
         </member>
         <member name="F:ThisAssembly.Git.Branch">
             <summary>
-            => @"master"
+            => @"bug/1826-part2"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commit">
             <summary>
-            => @"6798a24"
+            => @"82338e3"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Sha">
             <summary>
-            => @"6798a247bb0f003a664529167f68b7105f01d4f0"
+            => @"82338e38ae4cd0a4755e4b5841a39d6560132f5c"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.CommitDate">
             <summary>
-            => @"2024-01-11T12:13:59+00:00"
+            => @"2024-01-15T14:51:52+00:00"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commits">
             <summary>
-            => @"0"
+            => @"1"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Tag">
             <summary>
-            => @"v14.4.1"
+            => @"v14.4.2-1-g82338e3"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseTag">
             <summary>
-            => @"v14.4.1"
+            => @"v14.4.2"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseVersion.Major">
@@ -66,7 +66,7 @@
         </member>
         <member name="F:ThisAssembly.Git.BaseVersion.Patch">
             <summary>
-            => @"1"
+            => @"2"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Major">
@@ -81,7 +81,7 @@
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Patch">
             <summary>
-            => @"1"
+            => @"3"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Label">
