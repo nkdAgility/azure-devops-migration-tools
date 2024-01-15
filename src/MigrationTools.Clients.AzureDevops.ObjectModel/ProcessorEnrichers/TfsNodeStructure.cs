@@ -416,6 +416,11 @@ namespace MigrationTools.Enrichers
 
         private string GetLocalizedNodeStructureTypeName(TfsNodeStructureType value, TfsLanguageMapOptions languageMap)
         {
+            if (languageMap.AreaPath.IsNullOrEmpty() || languageMap.IterationPath.IsNullOrEmpty())
+            {
+                contextLog.Warning("TfsNodeStructure::GetLocalizedNodeStructureTypeName - Language map is empty for either Area or Iteration!");
+                contextLog.Verbose("languageMap: {@languageMap}", languageMap);
+            }
             switch (value)
             {
                 case TfsNodeStructureType.Area:
