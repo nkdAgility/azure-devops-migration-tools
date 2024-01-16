@@ -74,8 +74,8 @@ namespace MigrationTools.Host.Services
             using (var bench = new Benchmark("DetectVersionService2::InitialiseService"))
             {
                 //////////////////////////////////
-                WinGetInfo wingetInfo = new WinGetInfo();
-                IsPackageManagerInstalled = wingetInfo.WinGetInstalled;
+                WinGet winget = new WinGet();
+                IsPackageManagerInstalled = winget.IsInstalled;
                 if (IsPackageManagerInstalled)
                 {
                     Log.Verbose("The Windows Package Manager is installed!");
@@ -90,8 +90,8 @@ namespace MigrationTools.Host.Services
                         package = packageManager.GetInstalledPackages(PackageId, true).FirstOrDefault();
                         if (package != null)
                         {
-                            AvailableVersion = package.AvailableVersionObject;
-                            InstalledVersion = package.VersionObject;
+                            AvailableVersion = package.AvailableVersion;
+                            InstalledVersion = package.Version;
                             Log.Debug("Found package with id {PackageId}", PackageId);
                             IsPackageInstalled = true;
                         }
@@ -110,7 +110,8 @@ namespace MigrationTools.Host.Services
         public static Version GetRunningVersion()
         {
             Version assver = Assembly.GetEntryAssembly()?.GetName().Version;
-            if (assver == null) {
+            if (assver == null)
+            {
                 return new Version("0.0.0");
             }
             return new Version(assver.Major, assver.Minor, assver.Build);

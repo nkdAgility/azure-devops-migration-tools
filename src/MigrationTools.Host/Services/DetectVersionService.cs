@@ -41,7 +41,7 @@ namespace MigrationTools.Host.Services
 
                 if (package != null)
                 {
-                    latestPackageVersion = package.AvailableVersionObject;
+                    latestPackageVersion = package.AvailableVersion;
                     sucess = true;
                 }
                 _Telemetry.TrackDependency(new DependencyTelemetry("PackageRepository", "winget", PackageId, latestPackageVersion == null ? "nullVersion" : latestPackageVersion.ToString(), startTime, mainTimer.Elapsed, "200", sucess));
