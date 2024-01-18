@@ -19,6 +19,6 @@ public Version RunningVersion { get; }
         bool IsRunningInDebug { get; }
         bool IsNewLocalVersionAvailable { get; }
 
-        void UpdateFromSource();
+       // void UpdateFromSource();
     }
 }

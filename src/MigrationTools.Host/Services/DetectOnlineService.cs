@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Net.NetworkInformation;
 using Microsoft.ApplicationInsights.DataContracts;
+using Microsoft.Extensions.Logging;
 using Serilog;
 
 namespace MigrationTools.Host.Services
@@ -9,14 +10,17 @@ namespace MigrationTools.Host.Services
     public class DetectOnlineService : IDetectOnlineService
     {
         private readonly ITelemetryLogger _Telemetry;
+        private ILogger<DetectOnlineService> _logger;
 
-        public DetectOnlineService(ITelemetryLogger telemetry)
+        public DetectOnlineService(ITelemetryLogger telemetry, ILogger<DetectOnlineService> logger)
         {
             _Telemetry = telemetry;
+            _logger = logger;
         }
 
         public bool IsOnline()
         {
+            _logger.LogDebug("DetectOnlineService::IsOnline");
             DateTime startTime = DateTime.Now;
             Stopwatch mainTimer = Stopwatch.StartNew();
             //////////////////////////////////
