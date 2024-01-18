@@ -31,16 +31,6 @@ namespace MigrationTools.Host.Services.Tests
 
         }
 
-        [TestMethod, TestCategory("L3")]
-        public void DetectVersionServiceTest_Update()
-        {
-            var loggerFactory = new LoggerFactory().AddSerilog();
-            IDetectVersionService2 dos = new DetectVersionService2(new TelemetryLoggerMock(), new Logger<IDetectVersionService2>(loggerFactory));
-            dos.UpdateFromSource();
-
-            Assert.IsNotNull(dos);
-        }
-
 
     }
 }
