@@ -907,11 +907,36 @@ namespace VstsSyncMigrator.Engine
 
         private void CheckClosedDateIsValid(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
         {
-            if (targetWorkItem.ToWorkItem().Fields["System.ClosedDate"].Value == null && (targetWorkItem.ToWorkItem().Fields["System.State"].Value.ToString() == "Closed" || targetWorkItem.ToWorkItem().Fields["System.State"].Value.ToString() == "Done"))
-            {
-                Log.LogWarning("The field System.ClosedDate is set to Null and will revert to the current date on save! ");
-                Log.LogWarning("Source Closed Date [#{sourceId}][Rev{sourceRev}]: {sourceClosedDate} ", sourceWorkItem.ToWorkItem().Id, sourceWorkItem.ToWorkItem().Rev, sourceWorkItem.ToWorkItem().Fields["System.ClosedDate"].Value);
+            var closedDateField = "System.ClosedDate";
+            if (targetWorkItem.ToWorkItem().Fields.Contains("Microsoft.VSTS.Common.ClosedDate")) {
+                closedDateField = "Microsoft.VSTS.Common.ClosedDate";
             }
+            if (targetWorkItem.ToWorkItem().Fields[closedDateField].Value == null && (targetWorkItem.ToWorkItem().Fields["System.State"].Value.ToString() == "Closed" || targetWorkItem.ToWorkItem().Fields["System.State"].Value.ToString() == "Done"))
+            {
+                Log.LogWarning("The field {closedDateField} is set to Null and will revert to the current date on save! ", closedDateField);
+                Log.LogWarning("Source Closed Date [#{sourceId}][Rev{sourceRev}]: {sourceClosedDate} ", sourceWorkItem.ToWorkItem().Id, sourceWorkItem.ToWorkItem().Rev, sourceWorkItem.ToWorkItem().Fields[closedDateField].Value);
+            }
+            if (!sourceWorkItem.ToWorkItem().Fields.Contains(closedDateField))
+            {
+                Log.LogWarning("The ClosedDate field {closedDateField} on the Target does not exist in the source! You can fix this with a mapping!", closedDateField);
+                if (sourceWorkItem.ToWorkItem().Fields.Contains("Microsoft.VSTS.Common.ClosedDate"))
+                {
+                    Log.LogWarning("Source ClosedDate Field: ", "Microsoft.VSTS.Common.ClosedDate");
+                }
+                if (sourceWorkItem.ToWorkItem().Fields.Contains("System.ClosedDate"))
+                {
+                    Log.LogWarning("Source ClosedDate Field: ", "System.ClosedDate");
+                }
+                if (targetWorkItem.ToWorkItem().Fields.Contains("Microsoft.VSTS.Common.ClosedDate"))
+                {
+                    Log.LogWarning("Target ClosedDate Field: ", "Microsoft.VSTS.Common.ClosedDate");
+                }
+                if (targetWorkItem.ToWorkItem().Fields.Contains("System.ClosedDate"))
+                {
+                    Log.LogWarning("Target ClosedDate Field: ", "System.ClosedDate");
+                }
+            }
+
         }
 
         private bool SkipRevisionWithInvalidIterationPath(WorkItemData targetWorkItemData)
