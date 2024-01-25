@@ -186,14 +186,9 @@ namespace VstsSyncMigrator.Engine
 
                 PopulateIgnoreList();
 
-                string sourceQuery =
-                    string.Format(
-                        @"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY {1}",
-                        _config.WIQLQueryBit, _config.WIQLOrderBit);
-
                 // Inform the user that he maybe has to be patient now
-                contextLog.Information("Querying items to be migrated: {SourceQuery} ...", sourceQuery);
-                var sourceWorkItems = Engine.Source.WorkItems.GetWorkItems(sourceQuery);
+                contextLog.Information("Querying items to be migrated: {SourceQuery} ...", _config.WIQLQuery);
+                var sourceWorkItems = Engine.Source.WorkItems.GetWorkItems(_config.WIQLQuery);
                 contextLog.Information("Replay all revisions of {sourceWorkItemsCount} work items?",
                     sourceWorkItems.Count);
 
@@ -234,11 +229,11 @@ namespace VstsSyncMigrator.Engine
                         "[FilterWorkItemsThatAlreadyExistInTarget] is enabled. Searching for work items that have already been migrated to the target...",
                         sourceWorkItems.Count());
 
-                    string targetWIQLQueryBit = FixAreaPathAndIterationPathForTargetQuery(_config.WIQLQueryBit,
+                    string targetWIQLQuery = FixAreaPathAndIterationPathForTargetQuery(_config.WIQLQuery,
                         Engine.Source.WorkItems.Project.Name, Engine.Target.WorkItems.Project.Name, contextLog);
+
                     sourceWorkItems = ((TfsWorkItemMigrationClient)Engine.Target.WorkItems).FilterExistingWorkItems(
-                        sourceWorkItems,
-                        new TfsWiqlDefinition() { OrderBit = _config.WIQLOrderBit, QueryBit = targetWIQLQueryBit },
+                        sourceWorkItems, _config.WIQLQuery,
                         (TfsWorkItemMigrationClient)Engine.Source.WorkItems);
                     contextLog.Information(
                         "!! After removing all found work items there are {SourceWorkItemCount} remaining to be migrated.",
@@ -368,24 +363,24 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        internal string FixAreaPathAndIterationPathForTargetQuery(string sourceWIQLQueryBit, string sourceProject, string targetProject, ILogger? contextLog)
+        internal string FixAreaPathAndIterationPathForTargetQuery(string sourceWIQLQuery, string sourceProject, string targetProject, ILogger? contextLog)
         {
 
-            string targetWIQLQueryBit = sourceWIQLQueryBit;
+            string targetWIQLQuery = sourceWIQLQuery;
 
-            if (string.IsNullOrWhiteSpace(targetWIQLQueryBit))
+            if (string.IsNullOrWhiteSpace(targetWIQLQuery))
             {
-                return targetWIQLQueryBit;
+                return targetWIQLQuery;
             }
 
-            var matches = Regex.Matches(targetWIQLQueryBit, RegexPatternForAreaAndIterationPathsFix);
+            var matches = Regex.Matches(targetWIQLQuery, RegexPatternForAreaAndIterationPathsFix);
 
 
             if (string.IsNullOrWhiteSpace(sourceProject)
                 || string.IsNullOrWhiteSpace(targetProject)
                 || sourceProject == targetProject)
             {
-                return targetWIQLQueryBit;
+                return targetWIQLQuery;
             }
 
             foreach (Match match in matches)
@@ -409,12 +404,12 @@ namespace VstsSyncMigrator.Engine
                 }
 
                 var remappedPath = _nodeStructureEnricher.GetNewNodeName(value, structureType);
-                targetWIQLQueryBit = targetWIQLQueryBit.Replace(value, remappedPath);
+                targetWIQLQuery = targetWIQLQuery.Replace(value, remappedPath);
             }
 
-            contextLog?.Information("[FilterWorkItemsThatAlreadyExistInTarget] is enabled. Source project {sourceProject} is replaced with target project {targetProject} on the WIQLQueryBit which resulted into this target WIQLQueryBit \"{targetWIQLQueryBit}\" .", sourceProject, targetProject, targetWIQLQueryBit);
+            contextLog?.Information("[FilterWorkItemsThatAlreadyExistInTarget] is enabled. Source project {sourceProject} is replaced with target project {targetProject} on the WIQLQueryBit which resulted into this target WIQLQueryBit \"{targetWIQLQueryBit}\" .", sourceProject, targetProject, targetWIQLQuery);
 
-            return targetWIQLQueryBit;
+            return targetWIQLQuery;
         }
 
         private static bool IsNumeric(string val, NumberStyles numberStyle)

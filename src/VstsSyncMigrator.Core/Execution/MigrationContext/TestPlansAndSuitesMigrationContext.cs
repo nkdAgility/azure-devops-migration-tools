@@ -85,7 +85,7 @@ namespace VstsSyncMigrator.Engine
 
         protected override void InternalExecute()
         {
-            _sourceTestStore = new TestManagementContext(Engine.Source, _config.TestPlanQueryBit);
+            _sourceTestStore = new TestManagementContext(Engine.Source, _config.TestPlanQuery);
             _targetTestStore = new TestManagementContext(Engine.Target);
             _sourceTestConfigs = _sourceTestStore.Project.TestConfigurations.Query("Select * From TestConfiguration");
             _targetTestConfigs = _targetTestStore.Project.TestConfigurations.Query("Select * From TestConfiguration");
