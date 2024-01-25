@@ -41,12 +41,6 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         public string Processor => "WorkItemMigrationContext";
 
         /// <summary>
-        /// If enabled this will migrate the Links for the work item at the same time as the whole work item.
-        /// </summary>
-        /// <default>true</default>
-        public bool LinkMigration { get; set; }
-
-        /// <summary>
         /// If enabled this will migrate all of the attachments at the same time as the work item
         /// </summary>
         /// <default>true</default>
@@ -157,7 +151,6 @@ namespace MigrationTools._EngineV1.Configuration.Processing
             Enabled = false;
             WorkItemCreateRetryLimit = 5;
             FilterWorkItemsThatAlreadyExistInTarget = false;
-            LinkMigration = true;
             AttachmentMigration = true;
             FixHtmlAttachmentLinks = false;
             AttachmentWorkingPath = "c:\\temp\\WorkItemAttachmentWorkingFolder\\";

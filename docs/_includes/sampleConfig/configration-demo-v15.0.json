@@ -75,7 +75,6 @@
       "PauseAfterEachWorkItem": false,
       "AttachmentMaxSize": 480000000,
       "AttachRevisionHistory": false,
-      "LinkMigrationSaveEachAsAdded": false,
       "GenerateMigrationComment": true,
       "WorkItemIDs": null,
       "MaxGracefulFailures": 0,
@@ -83,7 +82,7 @@
       "SkipRevisionWithInvalidAreaPath": false
     }
   ],
-  "Version": "14.2",
+  "Version": "15.0",
   "workaroundForQuerySOAPBugEnabled": false,
   "WorkItemTypeDefinition": {
     "sourceWorkItemTypeName": "targetWorkItemTypeName"
