@@ -4,11 +4,7 @@ namespace MigrationTools._EngineV1.Configuration.Processing
 {
     public class TestPlansAndSuitesMigrationConfig : IProcessorConfig
     {
-        /// <summary>
-        /// Prefix the nodes with the new project name.
-        /// </summary>
-        /// <default>false</default>
-        public bool PrefixProjectToNodes { get; set; }
+
         public bool Enabled { get; set; }
 
         /// <summary>
@@ -39,25 +35,6 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         /// Indicates whether the configuration for node structure transformation should be taken from the common enricher configs. Otherwise the configuration elements below are used
         /// </summary>
         /// <default>false</default>
-        public bool UseCommonNodeStructureEnricherConfig { get; set; }
-
-        /// <summary>
-        /// See documentation for [NodeStructure](/docs/Reference/v1/Processors/WorkItemMigrationConfig.md)
-        /// </summary>
-        /// <default>[]</default>
-        public string[] NodeBasePaths { get; set; }
-
-        /// <summary>
-        /// See documentation for [NodeStructure](/docs/Reference/v1/Processors/WorkItemMigrationConfig.md)
-        /// </summary>
-        /// <default>null</default>
-        public Dictionary<string, string> AreaMaps { get; set; }
-
-        /// <summary>
-        /// See documentation for [NodeStructure](/docs/Reference/v1/Processors/WorkItemMigrationConfig.md)
-        /// </summary>
-        /// <default>null</default>
-        public Dictionary<string, string> IterationMaps { get; set; }
 
         public string Processor
         {

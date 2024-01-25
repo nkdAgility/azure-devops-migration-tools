@@ -75,24 +75,12 @@ namespace VstsSyncMigrator.Engine
         {
             _config = (TestPlansAndSuitesMigrationConfig)config;
 
-            if (_config.UseCommonNodeStructureEnricherConfig)
-            {
+
                 var nodeStructureOptions =
                     _engineConfig.CommonEnrichersConfig.OfType<TfsNodeStructureOptions>().FirstOrDefault()
                     ?? throw new InvalidOperationException("Cannot use common node structure because it is not found.");
                 _nodeStructureEnricher.Configure(nodeStructureOptions);
-            }
-            else
-            {
-                _nodeStructureEnricher.Configure(new TfsNodeStructureOptions()
-                {
-                    Enabled = true,
-                    NodeBasePaths = _config.NodeBasePaths,
-                    PrefixProjectToNodes = _config.PrefixProjectToNodes,
-                    AreaMaps = _config.AreaMaps ?? new Dictionary<string, string>(),
-                    IterationMaps = _config.IterationMaps ?? new Dictionary<string, string>(),
-                });
-            }
+            
         }
 
         protected override void InternalExecute()
@@ -709,7 +697,8 @@ namespace VstsSyncMigrator.Engine
                 Log.LogInformation("Team Project names dont match. We need to fix the query in dynamic test suite {0} - {1}.", source.Id, source.Title);
                 Log.LogInformation("Replacing old project name {1} in query {0} with new team project name {2}", targetSuiteChild.Query.QueryText, source.Plan.Project.TeamProjectName, targetTestStore.Project.TeamProjectName);
                 // First need to check is prefix project nodes has been applied for the migration
-                if (_config.PrefixProjectToNodes)
+                
+                if (_nodeStructureEnricher.Options.PrefixProjectToNodes)
                 {
                     // if prefix project nodes has been applied we need to take the original area/iteration value and prefix
                     targetSuiteChild.Query =
@@ -875,7 +864,7 @@ namespace VstsSyncMigrator.Engine
             var parameters = new Dictionary<string, string>();
             AddParameter("PlanId", parameters, sourcePlan.Id.ToString());
             ////////////////////////////////////
-            var newPlanName = _config.PrefixProjectToNodes
+            var newPlanName = _nodeStructureEnricher.Options.PrefixProjectToNodes
                 ? $"{Engine.Source.WorkItems.GetProject().Name}-{sourcePlan.Name}"
                 : $"{sourcePlan.Name}";
             InnerLog(sourcePlan, $"Process Plan {newPlanName}", 0, true);

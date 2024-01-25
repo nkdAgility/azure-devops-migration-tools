@@ -54,14 +54,7 @@ namespace VstsSyncMigrator.Core.Tests
                                                       _services.GetRequiredService<IOptions<EngineConfiguration>>());
             _underTest.Configure(new WorkItemMigrationConfig
             {
-                AreaMaps = new Dictionary<string, string>
-                {
-                    {"SourceServer", "TargetServer"}
-                },
-                IterationMaps = new Dictionary<string, string>
-                {
-                    {"SourceServer", "TargetServer"}
-                },
+               
             });
         }
 

@@ -17,6 +17,7 @@ namespace MigrationTools.Enrichers
         public override void SetDefaults()
         {
             Enabled = true;
+            PrefixProjectToNodes = false;
             AreaMaps = new Dictionary<string, string>();
             IterationMaps = new Dictionary<string, string>();
             ShouldCreateMissingRevisionPaths = true;

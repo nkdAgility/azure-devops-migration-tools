@@ -101,26 +101,12 @@ namespace VstsSyncMigrator.Engine
         {
             _config = (WorkItemMigrationConfig)config;
 
-            if (_config.UseCommonNodeStructureEnricherConfig)
-            {
+
                 var nseConfig = _engineConfig.CommonEnrichersConfig.OfType<TfsNodeStructureOptions>()
                                     .FirstOrDefault() ??
                                 throw new InvalidOperationException(
                                     "Cannot use common node structure because it is not found.");
                 _nodeStructureEnricher.Configure(nseConfig);
-            }
-            else
-            {
-                _nodeStructureEnricher.Configure(new TfsNodeStructureOptions
-                {
-                    Enabled = true,
-                    NodeBasePaths = _config.NodeBasePaths,
-                    PrefixProjectToNodes = _config.PrefixProjectToNodes,
-                    AreaMaps = _config.AreaMaps ?? new Dictionary<string, string>(),
-                    IterationMaps = _config.IterationMaps ?? new Dictionary<string, string>(),
-                    ShouldCreateMissingRevisionPaths = _config.ShouldCreateMissingRevisionPaths
-                }); ;
-            }
 
             _revisionManager.Configure(new TfsRevisionManagerOptions() { Enabled = true, MaxRevisions = _config.MaxRevisions, ReplayRevisions = _config.ReplayRevisions });
 

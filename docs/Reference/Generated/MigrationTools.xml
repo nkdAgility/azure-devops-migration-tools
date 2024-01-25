@@ -499,32 +499,6 @@
             </summary>
             <default>0</default>
         </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.UseCommonNodeStructureEnricherConfig">
-            <summary>
-            
-            </summary>
-            <default>?</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.NodeBasePaths">
-            <summary>
-            The root paths of the Ares / Iterations you want migrate. See [NodeBasePath Configuration](#nodebasepath-configuration)
-            </summary>
-            <default>["/"]</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.AreaMaps">
-            <summary>
-            Remapping rules for area paths, implemented with regular expressions. The rules apply with a higher priority than the `PrefixProjectToNodes`,
-            that is, if no rule matches the path and the `PrefixProjectToNodes` option is enabled, then the old `PrefixProjectToNodes` behavior is applied.
-            </summary>
-            <default>{}</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.IterationMaps">
-            <summary>
-            Remapping rules for iteration paths, implemented with regular expressions. The rules apply with a higher priority than the `PrefixProjectToNodes`,
-            that is, if no rule matches the path and the `PrefixProjectToNodes` option is enabled, then the old `PrefixProjectToNodes` behavior is applied.
-            </summary>
-            <default>{}</default>
-        </member>
         <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.MaxGracefulFailures">
             <summary>
             The maximum number of failures to tolerate before the migration fails. When set above zero, a work item migration error is logged but the migration will
@@ -540,11 +514,6 @@
         <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.SkipRevisionWithInvalidAreaPath">
             <summary>
             When set to true, this setting will skip a revision if the source area has not been migrated, has been deleted or is somehow invalid, etc.
-            </summary>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.ShouldCreateMissingRevisionPaths">
-            <summary>
-            When set to True the susyem will try to create any missing missing area or iteration paths from the revisions.
             </summary>
         </member>
         <member name="M:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
