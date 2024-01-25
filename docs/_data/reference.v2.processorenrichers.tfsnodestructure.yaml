@@ -30,7 +30,7 @@ options:
   defaultValue: '{}'
 - parameterName: Enabled
   type: Boolean
-  description: missng XML code comments
+  description: For internal use
   defaultValue: missng XML code comments
 - parameterName: IterationMaps
   type: Dictionary
@@ -46,7 +46,7 @@ options:
   defaultValue: false
 - parameterName: RefName
   type: String
-  description: missng XML code comments
+  description: For internal use
   defaultValue: missng XML code comments
 - parameterName: ReplicateAllExistingNodes
   type: Boolean

@@ -64,6 +64,25 @@
             When set to True the susyem will try to create any missing missing area or iteration paths from the revisions.
             </summary>
         </member>
+        <member name="T:MigrationTools.Enrichers.TfsRevisionManager">
+            <summary>
+            The TfsRevisionManager manipulates the revisions of a work item to reduce the number of revisions that are migrated.
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Enrichers.TfsRevisionManagerOptions.ReplayRevisions">
+            <summary>
+            You can choose to migrate the tip only (a single write) or all of the revisions (many writes).
+            If you are setting this to `false` to migrate only the tip then you should set `BuildFieldTable` to `true`.
+            </summary>
+            <default>true</default>
+        </member>
+        <member name="P:MigrationTools.Enrichers.TfsRevisionManagerOptions.MaxRevisions">
+            <summary>
+            Sets the maximum number of revisions that will be migrated. "First + Last N = Max".
+            If this was set to 5 and there were 10 revisions you would get the first 1 (creation) and the latest 4 migrated.
+            </summary>
+            <default>0</default>
+        </member>
         <member name="T:MigrationTools.Processors.TfsAreaAndIterationProcessor">
             <summary>
             The `TfsAreaAndIterationProcessor` migrates all of the Area nd Iteraion paths.

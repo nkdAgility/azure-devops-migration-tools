@@ -100,9 +100,8 @@ namespace VstsSyncMigrator.Engine
         public override void Configure(IProcessorConfig config)
         {
             _config = (WorkItemMigrationConfig)config;
-            ImportCommonEnricherConfigs();
 
-            _revisionManager.Configure(new TfsRevisionManagerOptions() { Enabled = true, MaxRevisions = _config.MaxRevisions, ReplayRevisions = _config.ReplayRevisions });
+            ImportCommonEnricherConfigs();
 
             _workItemLinkEnricher.Configure(_config.LinkMigrationSaveEachAsAdded, _config.FilterWorkItemsThatAlreadyExistInTarget);
         }
@@ -126,7 +125,17 @@ namespace VstsSyncMigrator.Engine
             {
                 _nodeStructureEnricher.Configure(nseConfig);
             }
-
+            // TfsNodeStructureOptions
+            var revmanConfig = _engineConfig.CommonEnrichersConfig.OfType<TfsRevisionManagerOptions>().FirstOrDefault();
+            if (revmanConfig == null)
+            {
+                _revisionManager.Configure(TfsRevisionManagerOptions.GetDefaults());
+                Log.LogWarning("Default `TfsRevisionManagerOptions` used... add a `TfsRevisionManagerOptions` entry to `CommonEnrichersConfig` to customise the settings.");
+            }
+            else
+            {
+                _revisionManager.Configure(revmanConfig);
+            }
         }
 
         internal void TraceWriteLine(LogEventLevel level, string message, Dictionary<string, object> properties = null)
@@ -567,7 +576,7 @@ namespace VstsSyncMigrator.Engine
                     TraceWriteLine(LogEventLevel.Information, "Work Item has {sourceWorkItemRev} revisions and revision migration is set to {ReplayRevisions}",
                         new Dictionary<string, object>(){
                             { "sourceWorkItemRev", sourceWorkItem.Rev },
-                            { "ReplayRevisions", _config.ReplayRevisions }}
+                            { "ReplayRevisions", _revisionManager.Options.ReplayRevisions }}
                         );
                     List<RevisionItem> revisionsToMigrate = _revisionManager.GetRevisionsToMigrate(sourceWorkItem, targetWorkItem);
                     if (targetWorkItem == null)
