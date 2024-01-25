@@ -21,7 +21,7 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         /// Filtering conditions to decide whether to migrate a test plan or not. When provided, this partial query is added after `Select * From TestPlan Where` when selecting test plans. Among filtering options, `AreaPath`, `PlanName` and `PlanState` are known to work. There is unfortunately no documentation regarding the available fields.
         /// </summary>
         /// <default>`String.Empty`</default>
-        public string TestPlanQueryBit { get; set; }
+        public string TestPlanQuery { get; set; }
 
         /// <summary>
         /// ??Not sure what this does. Check code.

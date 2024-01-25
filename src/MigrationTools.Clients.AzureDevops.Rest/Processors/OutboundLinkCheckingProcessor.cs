@@ -35,9 +35,9 @@ namespace MigrationTools.Clients.AzureDevops.Rest.Processors
             base.Configure(options);
             Log.LogInformation("AzureDevOpsPipelineProcessor::Configure");
             _options = (OutboundLinkCheckingProcessorOptions)options;
-            if(string.IsNullOrEmpty(_options.WIQLQueryBit))
+            if(string.IsNullOrEmpty(_options.WIQLQuery))
             {
-                throw new Exception($"The {nameof(_options.WIQLQueryBit)} needs to be set");
+                throw new Exception($"The {nameof(_options.WIQLQuery)} needs to be set");
             }
             if (string.IsNullOrEmpty(_options.ResultFileName))
             {
@@ -77,7 +77,7 @@ namespace MigrationTools.Clients.AzureDevops.Rest.Processors
             var wiqlClient = Source.GetHttpClient("wit/wiql");
             var query = new WiqlRequest
             {
-                Query = _options.WIQLQueryBit
+                Query = _options.WIQLQuery
             };
 
             var wiqlResult = await wiqlClient.PostAsJsonAsync("", query);

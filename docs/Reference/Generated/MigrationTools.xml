@@ -226,9 +226,6 @@
         <member name="M:MigrationTools._EngineV1.Configuration.Processing.FakeProcessorConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
             <inheritdoc />
         </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.FixGitCommitLinksConfig.OrderBit">
-            <inheritdoc />
-        </member>
         <member name="M:MigrationTools._EngineV1.Configuration.Processing.FixGitCommitLinksConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
             <inheritdoc />
         </member>
@@ -289,7 +286,7 @@
             </summary>
             <default>`String.Empty`</default>
         </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationConfig.TestPlanQueryBit">
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationConfig.TestPlanQuery">
             <summary>
             Filtering conditions to decide whether to migrate a test plan or not. When provided, this partial query is added after `Select * From TestPlan Where` when selecting test plans. Among filtering options, `AreaPath`, `PlanName` and `PlanState` are known to work. There is unfortunately no documentation regarding the available fields.
             </summary>

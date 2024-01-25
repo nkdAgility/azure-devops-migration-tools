@@ -65,12 +65,6 @@
         "Microsoft.VSTS.Common.ClosedBy"
       ]
     },
-    //{
-    //  "$type": "WorkItemDeleteConfig",
-    //  "Enabled": true,
-    //  "WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
-    //  "WIQLOrderBit": "[System.ChangedDate] desc"
-    //},
     {
       "$type": "WorkItemMigrationConfig",
       "Enabled": true,

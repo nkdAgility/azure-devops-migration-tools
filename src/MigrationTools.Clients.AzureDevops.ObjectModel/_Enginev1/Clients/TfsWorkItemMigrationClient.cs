@@ -45,7 +45,7 @@ namespace MigrationTools._EngineV1.Clients
             Log.Debug("FilterByTarget: Query Execute...");
             var targetFoundItems = GetWorkItems(query);
             Log.Debug("FilterByTarget: ... query complete.");
-            Log.Debug("FilterByTarget: Found {TargetWorkItemCount} based on the WIQLQueryBit in the target system.", targetFoundItems.Count);
+            Log.Debug("FilterByTarget: Found {TargetWorkItemCount} based on the WIQLQuery in the target system.", targetFoundItems.Count);
             var targetFoundIds = (from WorkItemData twi in targetFoundItems select GetReflectedWorkItemId(twi))
                 //exclude null IDs
                 .Where(x=> x != null)

@@ -209,7 +209,7 @@ namespace VstsSyncMigrator.Engine
                         "[FilterWorkItemsThatAlreadyExistInTarget] is enabled. Searching for work items that have already been migrated to the target...",
                         sourceWorkItems.Count());
 
-                    string targetWIQLQueryBit = FixAreaPathAndIterationPathForTargetQuery(_config.WIQLQuery,
+                    string targetWIQLQuery = FixAreaPathAndIterationPathForTargetQuery(_config.WIQLQuery,
                         Engine.Source.WorkItems.Project.Name, Engine.Target.WorkItems.Project.Name, contextLog);
 
                     sourceWorkItems = ((TfsWorkItemMigrationClient)Engine.Target.WorkItems).FilterExistingWorkItems(
@@ -343,24 +343,24 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        internal string FixAreaPathAndIterationPathForTargetQuery(string sourceWIQLQueryBit, string sourceProject, string targetProject, ILogger? contextLog)
+        internal string FixAreaPathAndIterationPathForTargetQuery(string sourceWIQLQuery, string sourceProject, string targetProject, ILogger? contextLog)
         {
 
-            string targetWIQLQueryBit = sourceWIQLQueryBit;
+            string targetWIQLQuery = sourceWIQLQuery;
 
-            if (string.IsNullOrWhiteSpace(targetWIQLQueryBit))
+            if (string.IsNullOrWhiteSpace(targetWIQLQuery))
             {
-                return targetWIQLQueryBit;
+                return targetWIQLQuery;
             }
 
-            var matches = Regex.Matches(targetWIQLQueryBit, RegexPatternForAreaAndIterationPathsFix);
+            var matches = Regex.Matches(targetWIQLQuery, RegexPatternForAreaAndIterationPathsFix);
 
 
             if (string.IsNullOrWhiteSpace(sourceProject)
                 || string.IsNullOrWhiteSpace(targetProject)
                 || sourceProject == targetProject)
             {
-                return targetWIQLQueryBit;
+                return targetWIQLQuery;
             }
 
             foreach (Match match in matches)
@@ -384,12 +384,12 @@ namespace VstsSyncMigrator.Engine
                 }
 
                 var remappedPath = _nodeStructureEnricher.GetNewNodeName(value, structureType);
-                targetWIQLQueryBit = targetWIQLQueryBit.Replace(value, remappedPath);
+                targetWIQLQuery = targetWIQLQuery.Replace(value, remappedPath);
             }
 
-            contextLog?.Information("[FilterWorkItemsThatAlreadyExistInTarget] is enabled. Source project {sourceProject} is replaced with target project {targetProject} on the WIQLQueryBit which resulted into this target WIQLQueryBit \"{targetWIQLQueryBit}\" .", sourceProject, targetProject, targetWIQLQueryBit);
+            contextLog?.Information("[FilterWorkItemsThatAlreadyExistInTarget] is enabled. Source project {sourceProject} is replaced with target project {targetProject} on the WIQLQueryBit which resulted into this target WIQLQueryBit \"{targetWIQLQueryBit}\" .", sourceProject, targetProject, targetWIQLQuery);
 
-            return targetWIQLQueryBit;
+            return targetWIQLQuery;
         }
 
         private static bool IsNumeric(string val, NumberStyles numberStyle)
