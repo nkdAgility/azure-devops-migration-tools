@@ -37,14 +37,8 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         /// <summary>
         /// A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)
         /// </summary>
-        /// <default>AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')</default>
-        public string WIQLQueryBit { get; set; }
-
-        /// <summary>
-        /// A work item query to affect the order in which the work items are migrated. Don't leave this empty.
-        /// </summary>
-        /// <default>[System.ChangedDate] desc</default>
-        public string WIQLOrderBit { get; set; }
+        /// <default>SELECT [System.Id], [{0}] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [[System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc</default>
+        public string WIQLQuery { get; set; }
 
         /// <summary>
         /// If enabled then the processor will run
@@ -224,8 +218,7 @@ namespace MigrationTools._EngineV1.Configuration.Processing
             SkipToFinalRevisedWorkItemType = false;
             LinkMigrationSaveEachAsAdded = false;
             GenerateMigrationComment = true;
-            WIQLQueryBit = @"AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')";
-            WIQLOrderBit = "[System.ChangedDate] desc";
+            WIQLQuery = @"SELECT [System.Id], [{0}] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc";
             MaxRevisions = 0;
             AttachRevisionHistory = false;
             AreaMaps = new Dictionary<string, string>();

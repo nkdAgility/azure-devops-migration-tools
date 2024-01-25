@@ -166,14 +166,9 @@ namespace VstsSyncMigrator.Engine
 
                 PopulateIgnoreList();
 
-                string sourceQuery =
-                    string.Format(
-                        @"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY {1}",
-                        _config.WIQLQueryBit, _config.WIQLOrderBit);
-
                 // Inform the user that he maybe has to be patient now
-                contextLog.Information("Querying items to be migrated: {SourceQuery} ...", sourceQuery);
-                var sourceWorkItems = Engine.Source.WorkItems.GetWorkItems(sourceQuery);
+                contextLog.Information("Querying items to be migrated: {SourceQuery} ...", _config.WIQLQuery);
+                var sourceWorkItems = Engine.Source.WorkItems.GetWorkItems(_config.WIQLQuery);
                 contextLog.Information("Replay all revisions of {sourceWorkItemsCount} work items?",
                     sourceWorkItems.Count);
 
@@ -214,11 +209,11 @@ namespace VstsSyncMigrator.Engine
                         "[FilterWorkItemsThatAlreadyExistInTarget] is enabled. Searching for work items that have already been migrated to the target...",
                         sourceWorkItems.Count());
 
-                    string targetWIQLQueryBit = FixAreaPathAndIterationPathForTargetQuery(_config.WIQLQueryBit,
+                    string targetWIQLQueryBit = FixAreaPathAndIterationPathForTargetQuery(_config.WIQLQuery,
                         Engine.Source.WorkItems.Project.Name, Engine.Target.WorkItems.Project.Name, contextLog);
+
                     sourceWorkItems = ((TfsWorkItemMigrationClient)Engine.Target.WorkItems).FilterExistingWorkItems(
-                        sourceWorkItems,
-                        new TfsWiqlDefinition() { OrderBit = _config.WIQLOrderBit, QueryBit = targetWIQLQueryBit },
+                        sourceWorkItems, _config.WIQLQuery,
                         (TfsWorkItemMigrationClient)Engine.Source.WorkItems);
                     contextLog.Information(
                         "!! After removing all found work items there are {SourceWorkItemCount} remaining to be migrated.",

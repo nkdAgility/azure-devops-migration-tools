@@ -23,13 +23,8 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         /// A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)
         /// </summary>
         /// <default>AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')</default>
-        public string WIQLQueryBit { get; set; }
+        public string WIQLQuery { get; set; }
 
-        /// <summary>
-        /// A work item query to affect the order in which the work items are migrated. Don't leave this empty.
-        /// </summary>
-        /// <default>[System.ChangedDate] desc</default>
-        public string WIQLOrderBit { get; set; }
 
         /// <summary>
         /// This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run.
@@ -59,7 +54,7 @@ namespace MigrationTools._EngineV1.Configuration.Processing
 
         public WorkItemPostProcessingConfig()
         {
-            WIQLQueryBit = "AND [TfsMigrationTool.ReflectedWorkItemId] = '' ";
+            WIQLQuery = @"SELECT [System.Id], [@ReflectedWorkItemIdFieldName] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [@ReflectedWorkItemIdFieldName] = ''  AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc";
         }
     }
 }

@@ -181,9 +181,6 @@
             </summary>
             <param name="otherProcessors">List of already configured processors.</param>
         </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.IWorkItemProcessorConfig.WIQLOrderBit">
-            <inheritdoc />
-        </member>
         <member name="P:MigrationTools._EngineV1.Configuration.Processing.ExportProfilePictureFromADConfig.Domain">
             <summary>
             The source domain where the pictures should be exported. 
@@ -383,17 +380,11 @@
             </summary>
             <default>true</default>
         </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.WIQLQueryBit">
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.WIQLQuery">
             <summary>
             A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)
             </summary>
-            <default>AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.WIQLOrderBit">
-            <summary>
-            A work item query to affect the order in which the work items are migrated. Don't leave this empty.
-            </summary>
-            <default>[System.ChangedDate] desc</default>
+            <default>SELECT [System.Id], [{0}] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [[System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc</default>
         </member>
         <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.Enabled">
             <summary>
@@ -567,17 +558,11 @@
         <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemPostProcessingConfig.Processor">
             <inheritdoc />
         </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemPostProcessingConfig.WIQLQueryBit">
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemPostProcessingConfig.WIQLQuery">
             <summary>
             A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)
             </summary>
             <default>AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemPostProcessingConfig.WIQLOrderBit">
-            <summary>
-            A work item query to affect the order in which the work items are migrated. Don't leave this empty.
-            </summary>
-            <default>[System.ChangedDate] desc</default>
         </member>
         <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemPostProcessingConfig.FilterWorkItemsThatAlreadyExistInTarget">
             <summary>
@@ -650,17 +635,11 @@
         <member name="M:MigrationTools._EngineV1.Configuration.Processing.WorkItemUpdateAreasAsTagsConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
             <inheritdoc />
         </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemUpdateConfig.WIQLQueryBit">
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemUpdateConfig.WIQLQuery">
             <summary>
             A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)
             </summary>
             <default>AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemUpdateConfig.WIQLOrderBit">
-            <summary>
-            A work item query to affect the order in which the work items are migrated. Don't leave this empty.
-            </summary>
-            <default>[System.ChangedDate] desc</default>
         </member>
         <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemUpdateConfig.WorkItemIDs">
             <summary>
