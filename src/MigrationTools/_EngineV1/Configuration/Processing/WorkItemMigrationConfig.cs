@@ -37,7 +37,7 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         /// <summary>
         /// A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)
         /// </summary>
-        /// <default>SELECT [System.Id], [{0}] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [[System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc</default>
+        /// <default>SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [[System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc</default>
         public string WIQLQuery { get; set; }
 
         /// <summary>
@@ -218,7 +218,7 @@ namespace MigrationTools._EngineV1.Configuration.Processing
             SkipToFinalRevisedWorkItemType = false;
             LinkMigrationSaveEachAsAdded = false;
             GenerateMigrationComment = true;
-            WIQLQuery = @"SELECT [System.Id], [{0}] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc";
+            WIQLQuery = @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc";
             MaxRevisions = 0;
             AttachRevisionHistory = false;
             AreaMaps = new Dictionary<string, string>();
