@@ -83,6 +83,16 @@
             </summary>
             <default>0</default>
         </member>
+        <member name="P:MigrationTools.Enrichers.TfsWorkItemLinkEnricherOptions.FilterIfLinkCountMatches">
+            <summary>
+            Skip validating links if the number of links in the source and the target matches!
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Enrichers.TfsWorkItemLinkEnricherOptions.SaveAfterEachLinkIsAdded">
+            <summary>
+            Save the work item after each link is added. This will slow the migration as it will cause many saves to the TFS database.
+            </summary>
+        </member>
         <member name="T:MigrationTools.Processors.TfsAreaAndIterationProcessor">
             <summary>
             The `TfsAreaAndIterationProcessor` migrates all of the Area nd Iteraion paths.

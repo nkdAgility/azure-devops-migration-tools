@@ -102,8 +102,6 @@ namespace VstsSyncMigrator.Engine
             _config = (WorkItemMigrationConfig)config;
 
             ImportCommonEnricherConfigs();
-
-            _workItemLinkEnricher.Configure(_config.LinkMigrationSaveEachAsAdded, _config.FilterWorkItemsThatAlreadyExistInTarget);
         }
 
         private void ImportCommonEnricherConfigs()
@@ -135,6 +133,17 @@ namespace VstsSyncMigrator.Engine
             else
             {
                 _revisionManager.Configure(revmanConfig);
+            }
+            // TfsNodeStructureOptions
+            var wileConfig = _engineConfig.CommonEnrichersConfig.OfType<TfsWorkItemLinkEnricherOptions>().FirstOrDefault();
+            if (revmanConfig == null)
+            {
+                _workItemLinkEnricher.Configure(TfsWorkItemLinkEnricherOptions.GetDefaults());
+                Log.LogWarning("Default `TfsWorkItemLinkEnricherOptions` used... add a `TfsWorkItemLinkEnricherOptions` entry to `CommonEnrichersConfig` to customise the settings.");
+            }
+            else
+            {
+                _workItemLinkEnricher.Configure(wileConfig);
             }
         }
 
