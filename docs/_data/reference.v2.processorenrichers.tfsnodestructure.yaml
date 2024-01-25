@@ -19,7 +19,7 @@ configurationSamples:
       "ReplicateAllExistingNodes": false
     }
   sampleFor: MigrationTools.Enrichers.TfsNodeStructureOptions
-description: missng XML code comments
+description: The TfsNodeStructureEnricher is used to create missing nodes in the target project. To configure it add a `TfsNodeStructureOptions` section to `CommonEnrichersConfig` in the config file. Otherwise defaults will be applied.
 className: TfsNodeStructure
 typeName: ProcessorEnrichers
 architecture: v2

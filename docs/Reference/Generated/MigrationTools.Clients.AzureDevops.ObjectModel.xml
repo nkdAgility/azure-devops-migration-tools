@@ -13,6 +13,11 @@
         <member name="M:MigrationTools.Enrichers.TfsEmbededImagesEnricher.FixEmbededImages(MigrationTools.DataContracts.WorkItemData,System.String,System.String,System.String)">
             from https://gist.github.com/pietergheysens/792ed505f09557e77ddfc1b83531e4fb
         </member>
+        <member name="T:MigrationTools.Enrichers.TfsNodeStructure">
+            <summary>
+            The TfsNodeStructureEnricher is used to create missing nodes in the target project. To configure it add a `TfsNodeStructureOptions` section to `CommonEnrichersConfig` in the config file. Otherwise defaults will be applied. 
+            </summary>
+        </member>
         <member name="M:MigrationTools.Enrichers.TfsNodeStructure.ShouldCreateNode(System.String)">
             <summary>
             Checks node-to-be-created with allowed BasePath's
