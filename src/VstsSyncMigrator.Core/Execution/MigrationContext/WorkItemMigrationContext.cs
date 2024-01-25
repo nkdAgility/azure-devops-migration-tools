@@ -100,17 +100,33 @@ namespace VstsSyncMigrator.Engine
         public override void Configure(IProcessorConfig config)
         {
             _config = (WorkItemMigrationConfig)config;
-
-
-                var nseConfig = _engineConfig.CommonEnrichersConfig.OfType<TfsNodeStructureOptions>()
-                                    .FirstOrDefault() ??
-                                throw new InvalidOperationException(
-                                    "Cannot use common node structure because it is not found.");
-                _nodeStructureEnricher.Configure(nseConfig);
+            ImportCommonEnricherConfigs();
 
             _revisionManager.Configure(new TfsRevisionManagerOptions() { Enabled = true, MaxRevisions = _config.MaxRevisions, ReplayRevisions = _config.ReplayRevisions });
 
             _workItemLinkEnricher.Configure(_config.LinkMigrationSaveEachAsAdded, _config.FilterWorkItemsThatAlreadyExistInTarget);
+        }
+
+        private void ImportCommonEnricherConfigs()
+        {
+            /// setup _engineConfig.CommonEnrichersConfig
+            if (_engineConfig.CommonEnrichersConfig == null)
+            {
+                Log.LogError("CommonEnrichersConfig cant be Null! it must be a minimum of `[]`");
+                Environment.Exit(-1);
+            }
+            // TfsNodeStructureOptions
+            var nseConfig = _engineConfig.CommonEnrichersConfig.OfType<TfsNodeStructureOptions>().FirstOrDefault();
+            if (nseConfig == null)
+            {
+                _nodeStructureEnricher.Configure(TfsNodeStructureOptions.GetDefaults());
+                Log.LogWarning("Default `TfsNodeStructureOptions` used... add a `TfsNodeStructureOptions` entry to `CommonEnrichersConfig` to customise the settings.");
+            }
+            else
+            {
+                _nodeStructureEnricher.Configure(nseConfig);
+            }
+
         }
 
         internal void TraceWriteLine(LogEventLevel level, string message, Dictionary<string, object> properties = null)

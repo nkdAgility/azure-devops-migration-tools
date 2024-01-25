@@ -1,15 +1,14 @@
 {
-  "Version": "0.0",
-  "LogLevel": "Verbose",
-  "workaroundForQuerySOAPBugEnabled": false,
+  "ChangeSetMappingFile": null,
   "Source": {
     "$type": "TfsTeamProjectConfig",
     "Collection": "https://dev.azure.com/nkdagility-preview/",
     "Project": "migrationSource1",
-    "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
-    "AuthenticationMode": "Prompt",
+    "ReflectedWorkItemIDFieldName": "nkdScrum.ReflectedWorkItemId",
     "AllowCrossProjectLinking": false,
-    "PersonalAccessToken": "rrsne75npwj5ctn5vm337nrxiqlvdkfmcbkqrubl6ushts6syi5a",
+    "AuthenticationMode": "Prompt",
+    "PersonalAccessToken": "",
+    "PersonalAccessTokenVariableName": "",
     "LanguageMaps": {
       "AreaPath": "Area",
       "IterationPath": "Iteration"
@@ -18,59 +17,36 @@
   "Target": {
     "$type": "TfsTeamProjectConfig",
     "Collection": "https://dev.azure.com/nkdagility-preview/",
-    "Project": "migration Target 1",
+    "Project": "migrationTest5",
     "ReflectedWorkItemIDFieldName": "nkdScrum.ReflectedWorkItemId",
-    "AuthenticationMode": "Prompt",
     "AllowCrossProjectLinking": false,
-    "PersonalAccessToken": "rrsne75npwj5ctn5vm337nrxiqlvdkfmcbkqrubl6ushts6syi5a",
+    "AuthenticationMode": "Prompt",
+    "PersonalAccessToken": "njp3kcec4nbev63fmbepvdpn35drawmonk5qf5yqsw77dgfwnjda",
+    "PersonalAccessTokenVariableName": "",
     "LanguageMaps": {
       "AreaPath": "Area",
       "IterationPath": "Iteration"
     }
   },
-  "FieldMaps": [
-    {
-      "$type": "TreeToTagMapConfig",
-      "WorkItemTypeName": "*",
-      "toSkip": 3,
-      "timeTravel": 1
-    }
-  ],
-  "WorkItemTypeDefinition": {
-    "sourceWorkItemTypeName": "targetWorkItemTypeName"
-  },
+  "FieldMaps": [],
   "GitRepoMapping": null,
+  "LogLevel": "Debug",
   "CommonEnrichersConfig": [
     {
       "$type": "TfsNodeStructureOptions",
       "PrefixProjectToNodes": false,
       "NodeBasePaths": [],
-      "AreaMaps": {},
-      "IterationMaps": {},
-      "ShouldCreateMissingRevisionPaths": true
+      "AreaMaps": {
+        "^Skypoint Cloud$": "MigrationTest5"
+      },
+      "IterationMaps": {
+        "^Skypoint Cloud\\\\Sprint 1$": "MigrationTest5\\Sprint 1"
+      },
+      "ShouldCreateMissingRevisionPaths": true,
+      "ReplicateAllExistingNodes": true
     }
   ],
   "Processors": [
-    {
-      "$type": "ExportUsersForMappingConfig",
-      "Enabled": false,
-      "LocalExportJsonFile": "c:\\temp\\ExportUsersForMappingConfig.json",
-      "WIQLQuery": "SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan') ORDER BY [System.ChangedDate] desc",
-      "IdentityFieldsToCheck": [
-        "System.AssignedTo",
-        "System.ChangedBy",
-        "System.CreatedBy",
-        "Microsoft.VSTS.Common.ActivatedBy",
-        "Microsoft.VSTS.Common.ResolvedBy",
-        "Microsoft.VSTS.Common.ClosedBy"
-      ]
-    },
-    //{
-    //  "$type": "WorkItemDeleteConfig",
-    //  "Enabled": true,
-    //  "WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
-    //  "WIQLOrderBit": "[System.ChangedDate] desc"
-    //},
     {
       "$type": "WorkItemMigrationConfig",
       "Enabled": true,
@@ -78,8 +54,7 @@
       "PrefixProjectToNodes": false,
       "UpdateCreatedDate": true,
       "UpdateCreatedBy": true,
-      "WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
-      "WIQLOrderBit": "[System.ChangedDate] desc",
+      "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
       "LinkMigration": true,
       "AttachmentMigration": true,
       "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
@@ -91,18 +66,29 @@
       "AttachmentMaxSize": 480000000,
       "AttachRevisionHistory": false,
       "LinkMigrationSaveEachAsAdded": false,
-      "GenerateMigrationComment": true,
+      "GenerateMigrationComment": false,
       "WorkItemIDs": null,
       "MaxRevisions": 0,
-      "NodeStructureEnricherEnabled": true,
-      "UseCommonNodeStructureEnricherConfig": false,
-      "ShouldCreateMissingRevisionPaths": false,
-      "NodeBasePaths": [],
-      "AreaMaps": {},
-      "IterationMaps": {
-      },
-      "MaxGracefulFailures": 0
+      "MaxGracefulFailures": 0,
+      "SkipRevisionWithInvalidIterationPath": false,
+      "SkipRevisionWithInvalidAreaPath": false
     }
-
-  ]
+  ],
+  "Version": "14.2",
+  "workaroundForQuerySOAPBugEnabled": false,
+  "WorkItemTypeDefinition": {
+    "sourceWorkItemTypeName": "targetWorkItemTypeName"
+  },
+  "Endpoints": {
+    "InMemoryWorkItemEndpoints": [
+      {
+        "Name": "Source",
+        "EndpointEnrichers": null
+      },
+      {
+        "Name": "Target",
+        "EndpointEnrichers": null
+      }
+    ]
+  }
 }

@@ -280,12 +280,6 @@
         <member name="M:MigrationTools._EngineV1.Configuration.Processing.TestConfigurationsMigrationConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
             <inheritdoc />
         </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationConfig.PrefixProjectToNodes">
-            <summary>
-            Prefix the nodes with the new project name.
-            </summary>
-            <default>false</default>
-        </member>
         <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationConfig.OnlyElementsWithTag">
             <summary>
             The tag name that is present on all elements that must be migrated. If this option isn't present this processor will migrate all.
@@ -310,29 +304,11 @@
             </summary>
             <default>0</default>
         </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationConfig.UseCommonNodeStructureEnricherConfig">
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationConfig.Processor">
             <summary>
             Indicates whether the configuration for node structure transformation should be taken from the common enricher configs. Otherwise the configuration elements below are used
             </summary>
             <default>false</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationConfig.NodeBasePaths">
-            <summary>
-            See documentation for [NodeStructure](/docs/Reference/v1/Processors/WorkItemMigrationConfig.md)
-            </summary>
-            <default>[]</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationConfig.AreaMaps">
-            <summary>
-            See documentation for [NodeStructure](/docs/Reference/v1/Processors/WorkItemMigrationConfig.md)
-            </summary>
-            <default>null</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationConfig.IterationMaps">
-            <summary>
-            See documentation for [NodeStructure](/docs/Reference/v1/Processors/WorkItemMigrationConfig.md)
-            </summary>
-            <default>null</default>
         </member>
         <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationConfig.RemoveInvalidTestSuiteLinks">
             <summary>
@@ -360,12 +336,6 @@
             If you are setting this to `false` to migrate only the tip then you should set `BuildFieldTable` to `true`.
             </summary>
             <default>true</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.PrefixProjectToNodes">
-            <summary>
-            Prefix your iterations and areas with the project name. If you have enabled this in `NodeStructuresMigrationConfig` you must do it here too.
-            </summary>
-            <default>false</default>
         </member>
         <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.UpdateCreatedDate">
             <summary>

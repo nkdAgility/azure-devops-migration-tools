@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.TeamFoundation.Build.Client;
 
 namespace MigrationTools.Enrichers
 {
@@ -22,6 +23,13 @@ namespace MigrationTools.Enrichers
             IterationMaps = new Dictionary<string, string>();
             ShouldCreateMissingRevisionPaths = true;
             ReplicateAllExistingNodes = false;
+        }
+
+        static public TfsNodeStructureOptions GetDefaults()
+        {
+            var result = new TfsNodeStructureOptions();
+            result.SetDefaults();
+            return result;
         }
     }
 
