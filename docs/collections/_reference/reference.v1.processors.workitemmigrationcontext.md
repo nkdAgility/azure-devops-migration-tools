@@ -9,7 +9,6 @@ configurationSamples:
       "$type": "WorkItemMigrationConfig",
       "Enabled": false,
       "ReplayRevisions": true,
-      "PrefixProjectToNodes": false,
       "UpdateCreatedDate": true,
       "UpdateCreatedBy": true,
       "WIQLQueryBit": "AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')",
@@ -28,18 +27,9 @@ configurationSamples:
       "GenerateMigrationComment": true,
       "WorkItemIDs": null,
       "MaxRevisions": 0,
-      "UseCommonNodeStructureEnricherConfig": false,
-      "NodeBasePaths": null,
-      "AreaMaps": {
-        "$type": "Dictionary`2"
-      },
-      "IterationMaps": {
-        "$type": "Dictionary`2"
-      },
       "MaxGracefulFailures": 0,
       "SkipRevisionWithInvalidIterationPath": false,
-      "SkipRevisionWithInvalidAreaPath": false,
-      "ShouldCreateMissingRevisionPaths": true
+      "SkipRevisionWithInvalidAreaPath": false
     }
   sampleFor: MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig
 description: WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links, and Attachments. Use `WorkItemMigrationConfig` to configure.
@@ -47,10 +37,6 @@ className: WorkItemMigrationContext
 typeName: Processors
 architecture: v1
 options:
-- parameterName: AreaMaps
-  type: Dictionary
-  description: Remapping rules for area paths, implemented with regular expressions. The rules apply with a higher priority than the `PrefixProjectToNodes`, that is, if no rule matches the path and the `PrefixProjectToNodes` option is enabled, then the old `PrefixProjectToNodes` behavior is applied.
-  defaultValue: '{}'
 - parameterName: AttachmentMaxSize
   type: Int32
   description: '`AttachmentMigration` is set to true then you need to specify a max file size for upload in bites. For Azure DevOps Services the default is 480,000,000 bites (60mb), for TFS its 32,000,000 bites (4mb).'
@@ -83,10 +69,6 @@ options:
   type: Boolean
   description: If enabled, adds a comment recording the migration
   defaultValue: false
-- parameterName: IterationMaps
-  type: Dictionary
-  description: Remapping rules for iteration paths, implemented with regular expressions. The rules apply with a higher priority than the `PrefixProjectToNodes`, that is, if no rule matches the path and the `PrefixProjectToNodes` option is enabled, then the old `PrefixProjectToNodes` behavior is applied.
-  defaultValue: '{}'
 - parameterName: LinkMigration
   type: Boolean
   description: If enabled this will migrate the Links for the work item at the same time as the whole work item.
@@ -103,26 +85,14 @@ options:
   type: Int32
   description: Sets the maximum number of revisions that will be migrated. "First + Last N = Max". If this was set to 5 and there were 10 revisions you would get the first 1 (creation) and the latest 4 migrated.
   defaultValue: 0
-- parameterName: NodeBasePaths
-  type: String[]
-  description: The root paths of the Ares / Iterations you want migrate. See [NodeBasePath Configuration](#nodebasepath-configuration)
-  defaultValue: '["/"]'
 - parameterName: PauseAfterEachWorkItem
   type: Boolean
   description: Pause after each work item is migrated
-  defaultValue: false
-- parameterName: PrefixProjectToNodes
-  type: Boolean
-  description: Prefix your iterations and areas with the project name. If you have enabled this in `NodeStructuresMigrationConfig` you must do it here too.
   defaultValue: false
 - parameterName: ReplayRevisions
   type: Boolean
   description: You can choose to migrate the tip only (a single write) or all of the revisions (many writes). If you are setting this to `false` to migrate only the tip then you should set `BuildFieldTable` to `true`.
   defaultValue: true
-- parameterName: ShouldCreateMissingRevisionPaths
-  type: Boolean
-  description: When set to True the susyem will try to create any missing missing area or iteration paths from the revisions.
-  defaultValue: missng XML code comments
 - parameterName: SkipRevisionWithInvalidAreaPath
   type: Boolean
   description: When set to true, this setting will skip a revision if the source area has not been migrated, has been deleted or is somehow invalid, etc.
@@ -143,10 +113,6 @@ options:
   type: Boolean
   description: "If this is enabled the creation process on the target project will create the items with the original creation date. (Important: The item history is always pointed to the date of the migration, it's change only the data column CreateDate, not the internal create date)"
   defaultValue: true
-- parameterName: UseCommonNodeStructureEnricherConfig
-  type: Boolean
-  description: ''
-  defaultValue: '?'
 - parameterName: WIQLOrderBit
   type: String
   description: A work item query to affect the order in which the work items are migrated. Don't leave this empty.

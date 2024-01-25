@@ -8,15 +8,10 @@ configurationSamples:
     {
       "$type": "TestPlansAndSuitesMigrationConfig",
       "Enabled": false,
-      "PrefixProjectToNodes": false,
       "OnlyElementsWithTag": null,
       "TestPlanQueryBit": null,
       "RemoveAllLinks": false,
       "MigrationDelay": 0,
-      "UseCommonNodeStructureEnricherConfig": false,
-      "NodeBasePaths": null,
-      "AreaMaps": null,
-      "IterationMaps": null,
       "RemoveInvalidTestSuiteLinks": false,
       "FilterCompleted": false
     }
@@ -26,10 +21,6 @@ className: TestPlansAndSuitesMigrationContext
 typeName: Processors
 architecture: v1
 options:
-- parameterName: AreaMaps
-  type: Dictionary
-  description: See documentation for [NodeStructure](/docs/Reference/v1/Processors/WorkItemMigrationConfig.md)
-  defaultValue: null
 - parameterName: Enabled
   type: Boolean
   description: missng XML code comments
@@ -38,26 +29,14 @@ options:
   type: Boolean
   description: missng XML code comments
   defaultValue: missng XML code comments
-- parameterName: IterationMaps
-  type: Dictionary
-  description: See documentation for [NodeStructure](/docs/Reference/v1/Processors/WorkItemMigrationConfig.md)
-  defaultValue: null
 - parameterName: MigrationDelay
   type: Int32
   description: ??Not sure what this does. Check code.
   defaultValue: 0
-- parameterName: NodeBasePaths
-  type: String[]
-  description: See documentation for [NodeStructure](/docs/Reference/v1/Processors/WorkItemMigrationConfig.md)
-  defaultValue: '[]'
 - parameterName: OnlyElementsWithTag
   type: String
   description: The tag name that is present on all elements that must be migrated. If this option isn't present this processor will migrate all.
   defaultValue: '`String.Empty`'
-- parameterName: PrefixProjectToNodes
-  type: Boolean
-  description: Prefix the nodes with the new project name.
-  defaultValue: false
 - parameterName: RemoveAllLinks
   type: Boolean
   description: ??Not sure what this does. Check code.
@@ -70,10 +49,6 @@ options:
   type: String
   description: Filtering conditions to decide whether to migrate a test plan or not. When provided, this partial query is added after `Select * From TestPlan Where` when selecting test plans. Among filtering options, `AreaPath`, `PlanName` and `PlanState` are known to work. There is unfortunately no documentation regarding the available fields.
   defaultValue: '`String.Empty`'
-- parameterName: UseCommonNodeStructureEnricherConfig
-  type: Boolean
-  description: Indicates whether the configuration for node structure transformation should be taken from the common enricher configs. Otherwise the configuration elements below are used
-  defaultValue: false
 status: Beta
 processingTarget: Suites & Plans
 classFile: /src/VstsSyncMigrator.Core/Execution/MigrationContext/TestPlansAndSuitesMigrationContext.cs
