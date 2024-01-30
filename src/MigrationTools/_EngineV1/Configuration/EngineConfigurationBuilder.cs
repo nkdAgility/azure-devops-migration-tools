@@ -126,6 +126,7 @@ namespace MigrationTools._EngineV1.Configuration
         public EngineConfiguration BuildGettingStarted()
         {
             EngineConfiguration ec = CreateEmptyConfig();
+            ec.CommonEnrichersConfig = new List<IProcessorEnricherOptions>();
             AddWorkItemMigrationDefault(ec);
             return ec;
         }

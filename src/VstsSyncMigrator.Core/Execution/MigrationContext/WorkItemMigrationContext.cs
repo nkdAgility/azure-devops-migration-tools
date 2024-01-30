@@ -101,30 +101,50 @@ namespace VstsSyncMigrator.Engine
         {
             _config = (WorkItemMigrationConfig)config;
 
-            if (_config.UseCommonNodeStructureEnricherConfig)
+            ImportCommonEnricherConfigs();
+        }
+
+        private void ImportCommonEnricherConfigs()
+        {
+            /// setup _engineConfig.CommonEnrichersConfig
+            if (_engineConfig.CommonEnrichersConfig == null)
             {
-                var nseConfig = _engineConfig.CommonEnrichersConfig.OfType<TfsNodeStructureOptions>()
-                                    .FirstOrDefault() ??
-                                throw new InvalidOperationException(
-                                    "Cannot use common node structure because it is not found.");
-                _nodeStructureEnricher.Configure(nseConfig);
+                Log.LogError("CommonEnrichersConfig cant be Null! it must be a minimum of `[]`");
+                Environment.Exit(-1);
+            }
+            // TfsNodeStructureOptions
+            var nseConfig = _engineConfig.CommonEnrichersConfig.OfType<TfsNodeStructureOptions>().FirstOrDefault();
+            if (nseConfig == null)
+            {
+                _nodeStructureEnricher.Configure(TfsNodeStructureOptions.GetDefaults());
+                Log.LogWarning("Default `TfsNodeStructureOptions` used... add a `TfsNodeStructureOptions` entry to `CommonEnrichersConfig` to customise the settings.");
             }
             else
             {
-                _nodeStructureEnricher.Configure(new TfsNodeStructureOptions
-                {
-                    Enabled = true,
-                    NodeBasePaths = _config.NodeBasePaths,
-                    PrefixProjectToNodes = _config.PrefixProjectToNodes,
-                    AreaMaps = _config.AreaMaps ?? new Dictionary<string, string>(),
-                    IterationMaps = _config.IterationMaps ?? new Dictionary<string, string>(),
-                    ShouldCreateMissingRevisionPaths = _config.ShouldCreateMissingRevisionPaths
-                }); ;
+                _nodeStructureEnricher.Configure(nseConfig);
             }
-
-            _revisionManager.Configure(new TfsRevisionManagerOptions() { Enabled = true, MaxRevisions = _config.MaxRevisions, ReplayRevisions = _config.ReplayRevisions });
-
-            _workItemLinkEnricher.Configure(_config.LinkMigrationSaveEachAsAdded, _config.FilterWorkItemsThatAlreadyExistInTarget);
+            // TfsNodeStructureOptions
+            var revmanConfig = _engineConfig.CommonEnrichersConfig.OfType<TfsRevisionManagerOptions>().FirstOrDefault();
+            if (revmanConfig == null)
+            {
+                _revisionManager.Configure(TfsRevisionManagerOptions.GetDefaults());
+                Log.LogWarning("Default `TfsRevisionManagerOptions` used... add a `TfsRevisionManagerOptions` entry to `CommonEnrichersConfig` to customise the settings.");
+            }
+            else
+            {
+                _revisionManager.Configure(revmanConfig);
+            }
+            // TfsNodeStructureOptions
+            var wileConfig = _engineConfig.CommonEnrichersConfig.OfType<TfsWorkItemLinkEnricherOptions>().FirstOrDefault();
+            if (revmanConfig == null)
+            {
+                _workItemLinkEnricher.Configure(TfsWorkItemLinkEnricherOptions.GetDefaults());
+                Log.LogWarning("Default `TfsWorkItemLinkEnricherOptions` used... add a `TfsWorkItemLinkEnricherOptions` entry to `CommonEnrichersConfig` to customise the settings.");
+            }
+            else
+            {
+                _workItemLinkEnricher.Configure(wileConfig);
+            }
         }
 
         internal void TraceWriteLine(LogEventLevel level, string message, Dictionary<string, object> properties = null)
@@ -166,14 +186,9 @@ namespace VstsSyncMigrator.Engine
 
                 PopulateIgnoreList();
 
-                string sourceQuery =
-                    string.Format(
-                        @"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY {1}",
-                        _config.WIQLQueryBit, _config.WIQLOrderBit);
-
                 // Inform the user that he maybe has to be patient now
-                contextLog.Information("Querying items to be migrated: {SourceQuery} ...", sourceQuery);
-                var sourceWorkItems = Engine.Source.WorkItems.GetWorkItems(sourceQuery);
+                contextLog.Information("Querying items to be migrated: {SourceQuery} ...", _config.WIQLQuery);
+                var sourceWorkItems = Engine.Source.WorkItems.GetWorkItems(_config.WIQLQuery);
                 contextLog.Information("Replay all revisions of {sourceWorkItemsCount} work items?",
                     sourceWorkItems.Count);
 
@@ -214,11 +229,11 @@ namespace VstsSyncMigrator.Engine
                         "[FilterWorkItemsThatAlreadyExistInTarget] is enabled. Searching for work items that have already been migrated to the target...",
                         sourceWorkItems.Count());
 
-                    string targetWIQLQueryBit = FixAreaPathAndIterationPathForTargetQuery(_config.WIQLQueryBit,
+                    string targetWIQLQuery = FixAreaPathAndIterationPathForTargetQuery(_config.WIQLQuery,
                         Engine.Source.WorkItems.Project.Name, Engine.Target.WorkItems.Project.Name, contextLog);
+
                     sourceWorkItems = ((TfsWorkItemMigrationClient)Engine.Target.WorkItems).FilterExistingWorkItems(
-                        sourceWorkItems,
-                        new TfsWiqlDefinition() { OrderBit = _config.WIQLOrderBit, QueryBit = targetWIQLQueryBit },
+                        sourceWorkItems, _config.WIQLQuery,
                         (TfsWorkItemMigrationClient)Engine.Source.WorkItems);
                     contextLog.Information(
                         "!! After removing all found work items there are {SourceWorkItemCount} remaining to be migrated.",
@@ -348,24 +363,24 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        internal string FixAreaPathAndIterationPathForTargetQuery(string sourceWIQLQueryBit, string sourceProject, string targetProject, ILogger? contextLog)
+        internal string FixAreaPathAndIterationPathForTargetQuery(string sourceWIQLQuery, string sourceProject, string targetProject, ILogger? contextLog)
         {
 
-            string targetWIQLQueryBit = sourceWIQLQueryBit;
+            string targetWIQLQuery = sourceWIQLQuery;
 
-            if (string.IsNullOrWhiteSpace(targetWIQLQueryBit))
+            if (string.IsNullOrWhiteSpace(targetWIQLQuery))
             {
-                return targetWIQLQueryBit;
+                return targetWIQLQuery;
             }
 
-            var matches = Regex.Matches(targetWIQLQueryBit, RegexPatternForAreaAndIterationPathsFix);
+            var matches = Regex.Matches(targetWIQLQuery, RegexPatternForAreaAndIterationPathsFix);
 
 
             if (string.IsNullOrWhiteSpace(sourceProject)
                 || string.IsNullOrWhiteSpace(targetProject)
                 || sourceProject == targetProject)
             {
-                return targetWIQLQueryBit;
+                return targetWIQLQuery;
             }
 
             foreach (Match match in matches)
@@ -389,12 +404,12 @@ namespace VstsSyncMigrator.Engine
                 }
 
                 var remappedPath = _nodeStructureEnricher.GetNewNodeName(value, structureType);
-                targetWIQLQueryBit = targetWIQLQueryBit.Replace(value, remappedPath);
+                targetWIQLQuery = targetWIQLQuery.Replace(value, remappedPath);
             }
 
-            contextLog?.Information("[FilterWorkItemsThatAlreadyExistInTarget] is enabled. Source project {sourceProject} is replaced with target project {targetProject} on the WIQLQueryBit which resulted into this target WIQLQueryBit \"{targetWIQLQueryBit}\" .", sourceProject, targetProject, targetWIQLQueryBit);
+            contextLog?.Information("[FilterWorkItemsThatAlreadyExistInTarget] is enabled. Source project {sourceProject} is replaced with target project {targetProject} on the WIQLQueryBit which resulted into this target WIQLQueryBit \"{targetWIQLQueryBit}\" .", sourceProject, targetProject, targetWIQLQuery);
 
-            return targetWIQLQueryBit;
+            return targetWIQLQuery;
         }
 
         private static bool IsNumeric(string val, NumberStyles numberStyle)
@@ -565,7 +580,7 @@ namespace VstsSyncMigrator.Engine
                     TraceWriteLine(LogEventLevel.Information, "Work Item has {sourceWorkItemRev} revisions and revision migration is set to {ReplayRevisions}",
                         new Dictionary<string, object>(){
                             { "sourceWorkItemRev", sourceWorkItem.Rev },
-                            { "ReplayRevisions", _config.ReplayRevisions }}
+                            { "ReplayRevisions", _revisionManager.Options.ReplayRevisions }}
                         );
                     List<RevisionItem> revisionsToMigrate = _revisionManager.GetRevisionsToMigrate(sourceWorkItem, targetWorkItem);
                     if (targetWorkItem == null)
@@ -681,9 +696,9 @@ namespace VstsSyncMigrator.Engine
 
         private void ProcessWorkItemLinks(IWorkItemMigrationClient sourceStore, IWorkItemMigrationClient targetStore, WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
         {
-            if (targetWorkItem != null && _config.LinkMigration && sourceWorkItem.ToWorkItem().Links.Count > 0)
+            if (targetWorkItem != null && _workItemLinkEnricher.Options.Enabled && sourceWorkItem.ToWorkItem().Links.Count > 0)
             {
-                TraceWriteLine(LogEventLevel.Information, "Links {SourceWorkItemLinkCount} | LinkMigrator:{LinkMigration}", new Dictionary<string, object>() { { "SourceWorkItemLinkCount", sourceWorkItem.ToWorkItem().Links.Count }, { "LinkMigration", _config.LinkMigration } });
+                TraceWriteLine(LogEventLevel.Information, "Links {SourceWorkItemLinkCount} | LinkMigrator:{LinkMigration}", new Dictionary<string, object>() { { "SourceWorkItemLinkCount", sourceWorkItem.ToWorkItem().Links.Count }, { "LinkMigration", _workItemLinkEnricher.Options.Enabled } });
                 _workItemLinkEnricher.Enrich(sourceWorkItem, targetWorkItem);
                 AddMetric("RelatedLinkCount", processWorkItemMetrics, targetWorkItem.ToWorkItem().Links.Count);
                 int fixedLinkCount = gitRepositoryEnricher.Enrich(sourceWorkItem, targetWorkItem);

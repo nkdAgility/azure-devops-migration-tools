@@ -117,8 +117,7 @@
     {
       "ObjectType": "WorkItemDeleteConfig",
       "Enabled": true,
-      "QueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
-      "OrderBit": "[System.ChangedDate] desc"
+      "Query": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
     },
     {
       "ObjectType": "WorkItemMigrationConfig",
@@ -128,8 +127,7 @@
       "UpdateCreatedBy": true,
       "BuildFieldTable": false,
       "AppendMigrationToolSignatureFooter": false,
-      "QueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
-      "OrderBit": "[System.ChangedDate] desc",
+      "WiqlQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
       "Enabled": true,
       "LinkMigration": true,
       "AttachmentMigration": true,

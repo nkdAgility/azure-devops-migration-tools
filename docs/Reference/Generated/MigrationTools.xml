@@ -45,6 +45,16 @@
             Active the enricher if it true.
             </summary>
         </member>
+        <member name="P:MigrationTools.Enrichers.ProcessorEnricherOptions.Enabled">
+            <summary>
+            For internal use
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Enrichers.ProcessorEnricherOptions.RefName">
+            <summary>
+            For internal use
+            </summary>
+        </member>
         <member name="P:MigrationTools.Options.IOptions.RefName">
             <summary>
             If you set a `RefName` then this configration will be added to a Catalog of configurations that can be refernced using tha `RefName` so tha tyou dont have to keep adding the ame items with the same configuration.
@@ -181,9 +191,6 @@
             </summary>
             <param name="otherProcessors">List of already configured processors.</param>
         </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.IWorkItemProcessorConfig.WIQLOrderBit">
-            <inheritdoc />
-        </member>
         <member name="P:MigrationTools._EngineV1.Configuration.Processing.ExportProfilePictureFromADConfig.Domain">
             <summary>
             The source domain where the pictures should be exported. 
@@ -227,9 +234,6 @@
             <inheritdoc />
         </member>
         <member name="M:MigrationTools._EngineV1.Configuration.Processing.FakeProcessorConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
-            <inheritdoc />
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.FixGitCommitLinksConfig.OrderBit">
             <inheritdoc />
         </member>
         <member name="M:MigrationTools._EngineV1.Configuration.Processing.FixGitCommitLinksConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
@@ -280,19 +284,13 @@
         <member name="M:MigrationTools._EngineV1.Configuration.Processing.TestConfigurationsMigrationConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
             <inheritdoc />
         </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationConfig.PrefixProjectToNodes">
-            <summary>
-            Prefix the nodes with the new project name.
-            </summary>
-            <default>false</default>
-        </member>
         <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationConfig.OnlyElementsWithTag">
             <summary>
             The tag name that is present on all elements that must be migrated. If this option isn't present this processor will migrate all.
             </summary>
             <default>`String.Empty`</default>
         </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationConfig.TestPlanQueryBit">
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationConfig.TestPlanQuery">
             <summary>
             Filtering conditions to decide whether to migrate a test plan or not. When provided, this partial query is added after `Select * From TestPlan Where` when selecting test plans. Among filtering options, `AreaPath`, `PlanName` and `PlanState` are known to work. There is unfortunately no documentation regarding the available fields.
             </summary>
@@ -310,29 +308,11 @@
             </summary>
             <default>0</default>
         </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationConfig.UseCommonNodeStructureEnricherConfig">
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationConfig.Processor">
             <summary>
             Indicates whether the configuration for node structure transformation should be taken from the common enricher configs. Otherwise the configuration elements below are used
             </summary>
             <default>false</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationConfig.NodeBasePaths">
-            <summary>
-            See documentation for [NodeStructure](/docs/Reference/v1/Processors/WorkItemMigrationConfig.md)
-            </summary>
-            <default>[]</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationConfig.AreaMaps">
-            <summary>
-            See documentation for [NodeStructure](/docs/Reference/v1/Processors/WorkItemMigrationConfig.md)
-            </summary>
-            <default>null</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationConfig.IterationMaps">
-            <summary>
-            See documentation for [NodeStructure](/docs/Reference/v1/Processors/WorkItemMigrationConfig.md)
-            </summary>
-            <default>null</default>
         </member>
         <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationConfig.RemoveInvalidTestSuiteLinks">
             <summary>
@@ -354,19 +334,6 @@
         <member name="M:MigrationTools._EngineV1.Configuration.Processing.WorkItemDeleteConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
             <inheritdoc />
         </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.ReplayRevisions">
-            <summary>
-            You can choose to migrate the tip only (a single write) or all of the revisions (many writes).
-            If you are setting this to `false` to migrate only the tip then you should set `BuildFieldTable` to `true`.
-            </summary>
-            <default>true</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.PrefixProjectToNodes">
-            <summary>
-            Prefix your iterations and areas with the project name. If you have enabled this in `NodeStructuresMigrationConfig` you must do it here too.
-            </summary>
-            <default>false</default>
-        </member>
         <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.UpdateCreatedDate">
             <summary>
             If this is enabled the creation process on the target project will create the items with the original creation date.
@@ -383,17 +350,11 @@
             </summary>
             <default>true</default>
         </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.WIQLQueryBit">
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.WIQLQuery">
             <summary>
             A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)
             </summary>
-            <default>AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.WIQLOrderBit">
-            <summary>
-            A work item query to affect the order in which the work items are migrated. Don't leave this empty.
-            </summary>
-            <default>[System.ChangedDate] desc</default>
+            <default>SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [[System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc</default>
         </member>
         <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.Enabled">
             <summary>
@@ -492,39 +453,6 @@
             </summary>
             <default>[]</default>
         </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.MaxRevisions">
-            <summary>
-            Sets the maximum number of revisions that will be migrated. "First + Last N = Max".
-            If this was set to 5 and there were 10 revisions you would get the first 1 (creation) and the latest 4 migrated.
-            </summary>
-            <default>0</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.UseCommonNodeStructureEnricherConfig">
-            <summary>
-            
-            </summary>
-            <default>?</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.NodeBasePaths">
-            <summary>
-            The root paths of the Ares / Iterations you want migrate. See [NodeBasePath Configuration](#nodebasepath-configuration)
-            </summary>
-            <default>["/"]</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.AreaMaps">
-            <summary>
-            Remapping rules for area paths, implemented with regular expressions. The rules apply with a higher priority than the `PrefixProjectToNodes`,
-            that is, if no rule matches the path and the `PrefixProjectToNodes` option is enabled, then the old `PrefixProjectToNodes` behavior is applied.
-            </summary>
-            <default>{}</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.IterationMaps">
-            <summary>
-            Remapping rules for iteration paths, implemented with regular expressions. The rules apply with a higher priority than the `PrefixProjectToNodes`,
-            that is, if no rule matches the path and the `PrefixProjectToNodes` option is enabled, then the old `PrefixProjectToNodes` behavior is applied.
-            </summary>
-            <default>{}</default>
-        </member>
         <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.MaxGracefulFailures">
             <summary>
             The maximum number of failures to tolerate before the migration fails. When set above zero, a work item migration error is logged but the migration will
@@ -540,11 +468,6 @@
         <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.SkipRevisionWithInvalidAreaPath">
             <summary>
             When set to true, this setting will skip a revision if the source area has not been migrated, has been deleted or is somehow invalid, etc.
-            </summary>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.ShouldCreateMissingRevisionPaths">
-            <summary>
-            When set to True the susyem will try to create any missing missing area or iteration paths from the revisions.
             </summary>
         </member>
         <member name="M:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
@@ -567,17 +490,11 @@
         <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemPostProcessingConfig.Processor">
             <inheritdoc />
         </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemPostProcessingConfig.WIQLQueryBit">
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemPostProcessingConfig.WIQLQuery">
             <summary>
             A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)
             </summary>
             <default>AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemPostProcessingConfig.WIQLOrderBit">
-            <summary>
-            A work item query to affect the order in which the work items are migrated. Don't leave this empty.
-            </summary>
-            <default>[System.ChangedDate] desc</default>
         </member>
         <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemPostProcessingConfig.FilterWorkItemsThatAlreadyExistInTarget">
             <summary>
@@ -650,17 +567,11 @@
         <member name="M:MigrationTools._EngineV1.Configuration.Processing.WorkItemUpdateAreasAsTagsConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
             <inheritdoc />
         </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemUpdateConfig.WIQLQueryBit">
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemUpdateConfig.WIQLQuery">
             <summary>
             A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)
             </summary>
             <default>AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemUpdateConfig.WIQLOrderBit">
-            <summary>
-            A work item query to affect the order in which the work items are migrated. Don't leave this empty.
-            </summary>
-            <default>[System.ChangedDate] desc</default>
         </member>
         <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemUpdateConfig.WorkItemIDs">
             <summary>
