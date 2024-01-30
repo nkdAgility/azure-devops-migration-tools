@@ -368,12 +368,6 @@
             </summary>
             <default>?</default>
         </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.LinkMigration">
-            <summary>
-            If enabled this will migrate the Links for the work item at the same time as the whole work item.
-            </summary>
-            <default>true</default>
-        </member>
         <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.AttachmentMigration">
             <summary>
             If enabled this will migrate all of the attachments at the same time as the work item
