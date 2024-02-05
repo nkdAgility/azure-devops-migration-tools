@@ -27,9 +27,9 @@ namespace MigrationTools.Enrichers
             SaveAfterEachLinkIsAdded = false;
         }
 
-        static public TfsNodeStructureOptions GetDefaults()
+        static public TfsWorkItemLinkEnricherOptions GetDefaults()
         {
-            var result = new TfsNodeStructureOptions();
+            var result = new TfsWorkItemLinkEnricherOptions();
             result.SetDefaults();
             return result;
         }
