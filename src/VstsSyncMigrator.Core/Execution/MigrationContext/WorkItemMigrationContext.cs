@@ -14,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation.Common;
+using Microsoft.TeamFoundation.TestManagement;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Proxy;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
@@ -511,10 +512,14 @@ namespace VstsSyncMigrator.Engine
                     Log.LogDebug("PopulateWorkItem:FieldUpdate: {ReferenceName} | Source:{OldReferenceValue} Target:{NewReferenceValue}", f.ReferenceName, oldWorkItem.Fields[f.ReferenceName].Value, newWorkItem.Fields[f.ReferenceName].Value);
 
                     newWorkItem.Fields[f.ReferenceName].Value = oldWorkItem.Fields[f.ReferenceName].Value;
-                } else
-                {
 
-                }
+                    if (newWorkItem.Fields[f.ReferenceName].FieldDefinition.IsLongText)
+                    {
+                        // Truncate field to max length
+                        newWorkItem.Fields[f.ReferenceName].Value = newWorkItem.Fields[f.ReferenceName].Value.ToString().Substring(0, 1000000);
+                    }
+
+                } 
             }
 
             if (_nodeStructureEnricher.Options.Enabled)
