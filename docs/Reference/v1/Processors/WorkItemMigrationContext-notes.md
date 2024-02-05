@@ -1,4 +1,3 @@
-
 ## <a name="WIQLQueryBits"></a>WIQL Query Bits
 
 The Work Item queries are all built using Work Item [Query Language (WIQL)](https://docs.microsoft.com/en-us/azure/devops/boards/queries/wiql-syntax).
@@ -48,6 +47,8 @@ Moved to the ProcessorEnricher [TfsNodeStructure](../Reference/v2/ProcessorEnric
 
 Moved to the ProcessorEnricher [TfsNodeStructure](../Reference/v2/ProcessorEnrichers/TfsNodeStructure/)
 
+
+
 ## More Complex Team Migrations
 The above options allow you to bring over a sub-set of the WIs (using the `WIQLQueryBit`) and move their area or iteration path to a default location. However you may wish to do something more complex e.g. re-map the team structure. This can be done with addition of a `FieldMaps` block to configuration in addition to the `NodeBasePaths`.
 
@@ -74,3 +75,7 @@ A complete list of [FieldMaps](../Reference/v1/FieldMaps/index.md) are available
 ```
 
 > Note: This mappings could also be achieved with other forms of Field mapper e.g. `RegexFieldMapConfig`, but the value mapper as an example is easy to understand
+
+# Removed Properties
+
+- PrefixProjectToNodes - This option was removed in favour of the Area and Iteration Maps on [TfsNodeStructure](../Reference/v2/ProcessorEnrichers/TfsNodeStructure/)
