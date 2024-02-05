@@ -34,7 +34,6 @@
   "CommonEnrichersConfig": [
     {
       "$type": "TfsNodeStructureOptions",
-      "PrefixProjectToNodes": false,
       "NodeBasePaths": [],
       "AreaMaps": {
         "^Skypoint Cloud$": "MigrationTest5"

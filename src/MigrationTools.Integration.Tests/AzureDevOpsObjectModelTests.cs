@@ -44,7 +44,6 @@ namespace MigrationTools.Integration.Tests
                 CollapseRevisions = false,
                 ReplayRevisions = true,
                 WorkItemCreateRetryLimit = 5,
-                PrefixProjectToNodes = false,
                 SourceName = "Source",
                 TargetName = "Target"
             };

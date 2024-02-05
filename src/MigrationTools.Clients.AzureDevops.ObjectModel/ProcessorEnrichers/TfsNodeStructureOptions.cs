@@ -10,12 +10,6 @@ namespace MigrationTools.Enrichers
 
 
         /// <summary>
-        /// Prefix the nodes with the new project name.
-        /// </summary>
-        /// <default>false</default>
-        public bool PrefixProjectToNodes { get; set; }
-
-        /// <summary>
         /// The root paths of the Ares / Iterations you want migrate. See [NodeBasePath Configuration](#nodebasepath-configuration)
         /// </summary>
         /// <default>["/"]</default>
@@ -44,7 +38,6 @@ namespace MigrationTools.Enrichers
         public override void SetDefaults()
         {
             Enabled = true;
-            PrefixProjectToNodes = false;
             AreaMaps = new Dictionary<string, string>();
             IterationMaps = new Dictionary<string, string>();
             ShouldCreateMissingRevisionPaths = true;
@@ -61,7 +54,6 @@ namespace MigrationTools.Enrichers
 
     public interface ITfsNodeStructureOptions
     {
-        public bool PrefixProjectToNodes { get; set; }
         public string[] NodeBasePaths { get; set; }
         public Dictionary<string, string> AreaMaps { get; set; }
         public Dictionary<string, string> IterationMaps { get; set; }

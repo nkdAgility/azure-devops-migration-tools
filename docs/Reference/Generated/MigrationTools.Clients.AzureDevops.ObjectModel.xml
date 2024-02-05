@@ -33,12 +33,6 @@
             <returns>A boolean indicating whether the path is a parent of any positively selected base path.</returns>
             <exception cref="T:System.NotImplementedException"></exception>
         </member>
-        <member name="P:MigrationTools.Enrichers.TfsNodeStructureOptions.PrefixProjectToNodes">
-            <summary>
-            Prefix the nodes with the new project name.
-            </summary>
-            <default>false</default>
-        </member>
         <member name="P:MigrationTools.Enrichers.TfsNodeStructureOptions.NodeBasePaths">
             <summary>
             The root paths of the Ares / Iterations you want migrate. See [NodeBasePath Configuration](#nodebasepath-configuration)
@@ -99,12 +93,6 @@
             </summary>
             <status>Beta</status>
             <processingtarget>Work Items</processingtarget>
-        </member>
-        <member name="P:MigrationTools.Processors.TfsAreaAndIterationProcessorOptions.PrefixProjectToNodes">
-            <summary>
-            Prefix your iterations and areas with the project name. If you have enabled this in `NodeStructuresMigrationConfig` you must do it here too.
-            </summary>
-            <default>false</default>
         </member>
         <member name="T:MigrationTools.Processors.TfsSharedQueryProcessor">
             <summary>

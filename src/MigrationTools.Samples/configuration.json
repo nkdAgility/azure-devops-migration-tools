@@ -122,7 +122,6 @@
     {
       "ObjectType": "WorkItemMigrationConfig",
       "ReplayRevisions": true,
-      "PrefixProjectToNodes": false,
       "UpdateCreatedDate": true,
       "UpdateCreatedBy": true,
       "BuildFieldTable": false,

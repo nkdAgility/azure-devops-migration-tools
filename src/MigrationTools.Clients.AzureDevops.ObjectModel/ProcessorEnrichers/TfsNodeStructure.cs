@@ -135,9 +135,7 @@ namespace MigrationTools.Enrichers
                 var replaceEscapedSourceProjectName = _sourceProjectName.Replace("$", "$$");
                 var replaceEscapedTargetProjectName = _targetProjectName.Replace("$", "$$");
 
-                _lastResortRemapRule = _Options.PrefixProjectToNodes
-                    ? new KeyValuePair<string, string>($"^{searchEscapedSourceProjectName}", $"{replaceEscapedTargetProjectName}\\{replaceEscapedSourceProjectName}")
-                    : new KeyValuePair<string, string>($"^{searchEscapedSourceProjectName}", $"{replaceEscapedTargetProjectName}");
+                _lastResortRemapRule = new KeyValuePair<string, string>($"^{searchEscapedSourceProjectName}", $"{replaceEscapedTargetProjectName}");
             }
 
             return _lastResortRemapRule.Value;
