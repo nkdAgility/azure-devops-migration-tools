@@ -90,7 +90,6 @@ namespace VstsSyncMigrator.Core.Tests
             {
                 AreaMaps = new Dictionary<string, string>(),
                 IterationMaps = new Dictionary<string, string>(),
-                PrefixProjectToNodes = true,
             });
 
             string WIQLQueryBit = @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.AreaPath] = 'SourceServer\Area\Path1' AND   [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
@@ -145,7 +144,6 @@ namespace VstsSyncMigrator.Core.Tests
             {
                 AreaMaps = new Dictionary<string, string>(),
                 IterationMaps = new Dictionary<string, string>(),
-                PrefixProjectToNodes = true,
             });
 
             var WIQLQueryBit = @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.AreaPath] = 'Source Project\Area\Path1' AND   [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";

@@ -287,7 +287,6 @@ namespace MigrationTools._EngineV1.Configuration
                 {
                     Enabled = true,
                     CollapseRevisions = false,
-                    PrefixProjectToNodes = false,
                     ReplayRevisions = true,
                     WorkItemCreateRetryLimit = 5,
                     ProcessorEnrichers = GetAllTypes<IProcessorEnricherOptions>(),

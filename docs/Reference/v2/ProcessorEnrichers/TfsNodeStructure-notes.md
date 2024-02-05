@@ -185,6 +185,21 @@ _NOTE: You need `\\` to escape a `\` the pattern, and `\\` to escape a `\` in JS
 
 ![image](https://github.com/nkdAgility/azure-devops-migration-tools/assets/5205575/2cf50929-7ea9-4a71-beab-dd8ff3b5b2a8)
 
+### Example with PrefixProjectToNodes 
+
+This will prepend a bucket to the area and iteration paths. This is useful when you want to keep the original paths but also want to be able to identify them as being from the original project.
+
+```json
+
+```json
+"AreaMaps": {
+  "^OriginalProject(?:\\\\([^\\\\]+))?\\\\([^\\\\]+)$": "TargetProject\\BucketForIncommingAreas\$2",
+},
+"IterationMaps": {
+  "^OriginalProject(?:\\\\([^\\\\]+))?\\\\([^\\\\]+)$": "TargetProject\\BucketForIncommingInterations\$2",
+}
+```
+
 ### Example with AreaMaps and IterationMaps
 
 ```

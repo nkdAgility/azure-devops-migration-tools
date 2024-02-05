@@ -8,7 +8,6 @@ configurationSamples:
     {
       "$type": "TfsNodeStructureOptions",
       "Enabled": true,
-      "PrefixProjectToNodes": false,
       "NodeBasePaths": null,
       "AreaMaps": {
         "$type": "Dictionary`2"
@@ -41,10 +40,6 @@ options:
   type: String[]
   description: The root paths of the Ares / Iterations you want migrate. See [NodeBasePath Configuration](#nodebasepath-configuration)
   defaultValue: '["/"]'
-- parameterName: PrefixProjectToNodes
-  type: Boolean
-  description: Prefix the nodes with the new project name.
-  defaultValue: false
 - parameterName: RefName
   type: String
   description: For internal use

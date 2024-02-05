@@ -10,9 +10,7 @@ configurationSamples:
       "Enabled": false,
       "UpdateCreatedDate": true,
       "UpdateCreatedBy": true,
-      "WIQLQueryBit": "AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')",
-      "WIQLOrderBit": "[System.ChangedDate] desc",
-      "LinkMigration": true,
+      "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
       "AttachmentMigration": true,
       "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
       "FixHtmlAttachmentLinks": false,
@@ -67,10 +65,6 @@ options:
   type: Boolean
   description: If enabled, adds a comment recording the migration
   defaultValue: false
-- parameterName: LinkMigration
-  type: Boolean
-  description: If enabled this will migrate the Links for the work item at the same time as the whole work item.
-  defaultValue: true
 - parameterName: LinkMigrationSaveEachAsAdded
   type: Boolean
   description: "If you have changed parents before re-running a sync you may get a `TF26194: unable to change the value of the 'Parent' field` error. This will resolve it, but will slow migration."
@@ -103,14 +97,10 @@ options:
   type: Boolean
   description: "If this is enabled the creation process on the target project will create the items with the original creation date. (Important: The item history is always pointed to the date of the migration, it's change only the data column CreateDate, not the internal create date)"
   defaultValue: true
-- parameterName: WIQLOrderBit
-  type: String
-  description: A work item query to affect the order in which the work items are migrated. Don't leave this empty.
-  defaultValue: '[System.ChangedDate] desc'
-- parameterName: WIQLQueryBit
+- parameterName: WIQLQuery
   type: String
   description: A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)
-  defaultValue: AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')
+  defaultValue: SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [[System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc
 - parameterName: WorkItemCreateRetryLimit
   type: Int32
   description: '**beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count. This allows for periodic network glitches not to end the process.'
