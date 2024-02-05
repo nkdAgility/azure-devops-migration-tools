@@ -136,7 +136,7 @@ namespace VstsSyncMigrator.Engine
             }
             // TfsNodeStructureOptions
             var wileConfig = _engineConfig.CommonEnrichersConfig.OfType<TfsWorkItemLinkEnricherOptions>().FirstOrDefault();
-            if (revmanConfig == null)
+            if (wileConfig == null)
             {
                 _workItemLinkEnricher.Configure(TfsWorkItemLinkEnricherOptions.GetDefaults());
                 Log.LogWarning("Default `TfsWorkItemLinkEnricherOptions` used... add a `TfsWorkItemLinkEnricherOptions` entry to `CommonEnrichersConfig` to customise the settings.");
@@ -500,7 +500,7 @@ namespace VstsSyncMigrator.Engine
                     var missedMigratedValue = oldWorkItem.Fields[f.ReferenceName].Value;
                     if (missedMigratedValue != null && !string.Empty.Equals(missedMigratedValue))
                     {
-                        Log.LogDebug("PopulateWorkItem:FieldUpdate: Missing field in target workitem, Source WorkItemId: {WorkitemId}, Field: {MissingField}, Value: {SourceValue}", oldWi.Id, f.ReferenceName, missedMigratedValue);
+                        Log.LogWarning("PopulateWorkItem:FieldUpdate: Missing field in target workitem, Source WorkItemId: {WorkitemId}, Field: {MissingField}, Value: {SourceValue}", oldWi.Id, f.ReferenceName, missedMigratedValue);
                     }
                     continue;
                 }
@@ -508,8 +508,12 @@ namespace VstsSyncMigrator.Engine
                     (!newWorkItem.Fields[f.ReferenceName].IsChangedInRevision || newWorkItem.Fields[f.ReferenceName].IsEditable)
                     && oldWorkItem.Fields[f.ReferenceName].Value != newWorkItem.Fields[f.ReferenceName].Value)
                 {
-                    Log.LogDebug("PopulateWorkItem:FieldUpdate: {ReferenceName} | Old:{OldReferenceValue} New:{NewReferenceValue}", f.ReferenceName, oldWorkItem.Fields[f.ReferenceName].Value, newWorkItem.Fields[f.ReferenceName].Value);
+                    Log.LogDebug("PopulateWorkItem:FieldUpdate: {ReferenceName} | Source:{OldReferenceValue} Target:{NewReferenceValue}", f.ReferenceName, oldWorkItem.Fields[f.ReferenceName].Value, newWorkItem.Fields[f.ReferenceName].Value);
+
                     newWorkItem.Fields[f.ReferenceName].Value = oldWorkItem.Fields[f.ReferenceName].Value;
+                } else
+                {
+
                 }
             }
 
