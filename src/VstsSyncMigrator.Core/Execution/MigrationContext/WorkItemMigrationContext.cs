@@ -118,7 +118,7 @@ namespace VstsSyncMigrator.Engine
             if (nseConfig == null)
             {
                 _nodeStructureEnricher.Configure(TfsNodeStructureOptions.GetDefaults());
-                Log.LogWarning("Default `TfsNodeStructureOptions` used... add a `TfsNodeStructureOptions` entry to `CommonEnrichersConfig` to customise the settings.");
+                Log.LogWarning("`TfsNodeStructureOptions` Default used! Add a `TfsNodeStructureOptions` entry to `CommonEnrichersConfig` to customise the settings.");
             }
             else
             {
@@ -129,7 +129,7 @@ namespace VstsSyncMigrator.Engine
             if (revmanConfig == null)
             {
                 _revisionManager.Configure(TfsRevisionManagerOptions.GetDefaults());
-                Log.LogWarning("Default `TfsRevisionManagerOptions` used... add a `TfsRevisionManagerOptions` entry to `CommonEnrichersConfig` to customise the settings.");
+                Log.LogWarning("`TfsRevisionManagerOptions` Default used! Add a `TfsRevisionManagerOptions` entry to `CommonEnrichersConfig` to customise the settings.");
             }
             else
             {
@@ -140,7 +140,7 @@ namespace VstsSyncMigrator.Engine
             if (wileConfig == null)
             {
                 _workItemLinkEnricher.Configure(TfsWorkItemLinkEnricherOptions.GetDefaults());
-                Log.LogWarning("Default `TfsWorkItemLinkEnricherOptions` used... add a `TfsWorkItemLinkEnricherOptions` entry to `CommonEnrichersConfig` to customise the settings.");
+                Log.LogWarning("`TfsWorkItemLinkEnricherOptions` Default used! Add a `TfsWorkItemLinkEnricherOptions` entry to `CommonEnrichersConfig` to customise the settings.");
             }
             else
             {
@@ -162,7 +162,7 @@ namespace VstsSyncMigrator.Engine
 
         protected override void InternalExecute()
         {
-            Log.LogInformation("WorkItemMigrationContext::InternalExecute ");
+            Log.LogDebug("WorkItemMigrationContext::InternalExecute ");
             if (_config == null)
             {
                 throw new Exception("You must call Configure() first");
@@ -938,16 +938,8 @@ namespace VstsSyncMigrator.Engine
             Log.LogDebug("CheckClosedDateIsValid::ClosedDate field is {closedDateField}", closedDateField);
             if (targetWorkItem.ToWorkItem().Fields[closedDateField].Value == null && (targetWorkItem.ToWorkItem().Fields["System.State"].Value.ToString() == "Closed" || targetWorkItem.ToWorkItem().Fields["System.State"].Value.ToString() == "Done"))
             {
-                if (sourceWorkItem.ToWorkItem().Fields.Contains(closedDateField) && sourceWorkItem.ToWorkItem().Fields[closedDateField].Value != null)
-                {
-                    Log.LogDebug("CheckClosedDateIsValid::Setting Closed Date [#{sourceId}][Rev{sourceRev}]: {sourceClosedDate} ", sourceWorkItem.ToWorkItem().Id, sourceWorkItem.ToWorkItem().Rev, sourceWorkItem.ToWorkItem().Fields[closedDateField].Value);
-                    targetWorkItem.ToWorkItem().Fields[closedDateField].Value = sourceWorkItem.ToWorkItem().Fields[closedDateField].Value;
-                }
-                else
-                {
-                    Log.LogWarning("The field {closedDateField} is set to Null and will revert to the current date on save! ", closedDateField);
-                    Log.LogWarning("Source Closed Date [#{sourceId}][Rev{sourceRev}]: {sourceClosedDate} ", sourceWorkItem.ToWorkItem().Id, sourceWorkItem.ToWorkItem().Rev, sourceWorkItem.ToWorkItem().Fields[closedDateField].Value);
-                }               
+                Log.LogWarning("The field {closedDateField} is set to Null and will revert to the current date on save! ", closedDateField);
+                Log.LogWarning("Source Closed Date [#{sourceId}][Rev{sourceRev}]: {sourceClosedDate} ", sourceWorkItem.ToWorkItem().Id, sourceWorkItem.ToWorkItem().Rev, sourceWorkItem.ToWorkItem().Fields[closedDateField].Value);            
             }
             if (!sourceWorkItem.ToWorkItem().Fields.Contains(closedDateField))
             {
