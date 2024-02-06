@@ -5,7 +5,19 @@ namespace MigrationTools._EngineV1.Configuration.Processing
 
     public class WorkItemMigrationConfig : IWorkItemProcessorConfig
     {
-     
+        /// <summary>
+        /// You can choose to migrate the tip only (a single write) or all of the revisions (many writes).
+        /// If you are setting this to `false` to migrate only the tip then you should set `BuildFieldTable` to `true`.
+        /// </summary>
+        /// <default>true</default>
+        public bool ReplayRevisions { get; set; }
+
+        /// <summary>
+        /// Prefix your iterations and areas with the project name. If you have enabled this in `NodeStructuresMigrationConfig` you must do it here too.
+        /// </summary>
+        /// <default>false</default>
+        public bool PrefixProjectToNodes { get; set; }
+
         /// <summary>
         /// If this is enabled the creation process on the target project will create the items with the original creation date.
         /// (Important: The item history is always pointed to the date of the migration, it's change only the data column CreateDate,
@@ -25,8 +37,14 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         /// <summary>
         /// A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)
         /// </summary>
-        /// <default>SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [[System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc</default>
-        public string WIQLQuery { get; set; }
+        /// <default>AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')</default>
+        public string WIQLQueryBit { get; set; }
+
+        /// <summary>
+        /// A work item query to affect the order in which the work items are migrated. Don't leave this empty.
+        /// </summary>
+        /// <default>[System.ChangedDate] desc</default>
+        public string WIQLOrderBit { get; set; }
 
         /// <summary>
         /// If enabled then the processor will run
@@ -39,6 +57,12 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         /// </summary>
         /// <default>?</default>
         public string Processor => "WorkItemMigrationContext";
+
+        /// <summary>
+        /// If enabled this will migrate the Links for the work item at the same time as the whole work item.
+        /// </summary>
+        /// <default>true</default>
+        public bool LinkMigration { get; set; }
 
         /// <summary>
         /// If enabled this will migrate all of the attachments at the same time as the work item
@@ -119,7 +143,39 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         /// <default>[]</default>
         public IList<int> WorkItemIDs { get; set; }
 
-    
+        /// <summary>
+        /// Sets the maximum number of revisions that will be migrated. "First + Last N = Max".
+        /// If this was set to 5 and there were 10 revisions you would get the first 1 (creation) and the latest 4 migrated.
+        /// </summary>
+        /// <default>0</default>
+        public int MaxRevisions { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <default>?</default>
+        public bool UseCommonNodeStructureEnricherConfig { get; set; }
+
+        /// <summary>
+        /// The root paths of the Ares / Iterations you want migrate. See [NodeBasePath Configuration](#nodebasepath-configuration)
+        /// </summary>
+        /// <default>["/"]</default>
+        public string[] NodeBasePaths { get; set; }
+
+        /// <summary>
+        /// Remapping rules for area paths, implemented with regular expressions. The rules apply with a higher priority than the `PrefixProjectToNodes`,
+        /// that is, if no rule matches the path and the `PrefixProjectToNodes` option is enabled, then the old `PrefixProjectToNodes` behavior is applied.
+        /// </summary>
+        /// <default>{}</default>
+        public Dictionary<string, string> AreaMaps { get; set; }
+
+        /// <summary>
+        /// Remapping rules for iteration paths, implemented with regular expressions. The rules apply with a higher priority than the `PrefixProjectToNodes`,
+        /// that is, if no rule matches the path and the `PrefixProjectToNodes` option is enabled, then the old `PrefixProjectToNodes` behavior is applied.
+        /// </summary>
+        /// <default>{}</default>
+        public Dictionary<string, string> IterationMaps { get; set; }
+
         /// <summary>
         /// The maximum number of failures to tolerate before the migration fails. When set above zero, a work item migration error is logged but the migration will
         /// continue until the number of failed items reaches the configured value, after which the migration fails.
@@ -137,6 +193,11 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         /// </summary>
         public bool SkipRevisionWithInvalidAreaPath { get; set; }
 
+        /// <summary>
+        /// When set to True the susyem will try to create any missing missing area or iteration paths from the revisions.
+        /// </summary>
+       public bool ShouldCreateMissingRevisionPaths { get; set; }
+
         /// <inheritdoc />
         public bool IsProcessorCompatible(IReadOnlyList<IProcessorConfig> otherProcessors)
         {
@@ -151,20 +212,28 @@ namespace MigrationTools._EngineV1.Configuration.Processing
             Enabled = false;
             WorkItemCreateRetryLimit = 5;
             FilterWorkItemsThatAlreadyExistInTarget = false;
+            ReplayRevisions = true;
+            LinkMigration = true;
             AttachmentMigration = true;
             FixHtmlAttachmentLinks = false;
             AttachmentWorkingPath = "c:\\temp\\WorkItemAttachmentWorkingFolder\\";
             AttachmentMaxSize = 480000000;
             UpdateCreatedBy = true;
+            PrefixProjectToNodes = false;
             UpdateCreatedDate = true;
             SkipToFinalRevisedWorkItemType = false;
             LinkMigrationSaveEachAsAdded = false;
             GenerateMigrationComment = true;
-            WIQLQuery = @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc";
+            WIQLQueryBit = @"AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')";
+            WIQLOrderBit = "[System.ChangedDate] desc";
+            MaxRevisions = 0;
             AttachRevisionHistory = false;
+            AreaMaps = new Dictionary<string, string>();
+            IterationMaps = new Dictionary<string, string>();
             MaxGracefulFailures = 0;
             SkipRevisionWithInvalidIterationPath = false;
             SkipRevisionWithInvalidAreaPath = false;
+            ShouldCreateMissingRevisionPaths = true;
         }
     }
 }

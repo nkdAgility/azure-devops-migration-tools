@@ -5,7 +5,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools._EngineV1.Clients;
 using MigrationTools.DataContracts;
-using MigrationTools.Enrichers;
 using MigrationTools.Exceptions;
 using MigrationTools.Processors;
 
@@ -13,9 +12,9 @@ namespace MigrationTools.Enrichers
 {
     public class TfsWorkItemLinkEnricher : WorkItemProcessorEnricher
     {
+        private bool _save = true;
+        private bool _filterWorkItemsThatAlreadyExistInTarget = true;
         private IMigrationEngine Engine;
-
-        public TfsWorkItemLinkEnricherOptions Options { get; private set; }
 
         public TfsWorkItemLinkEnricher(IServiceProvider services, ILogger<TfsWorkItemLinkEnricher> logger)
             : base(services, logger)
@@ -23,9 +22,13 @@ namespace MigrationTools.Enrichers
             Engine = services.GetRequiredService<IMigrationEngine>();
         }
 
-        public override void Configure(IProcessorEnricherOptions options)
+        [Obsolete]
+        public override void Configure(
+            bool save = true,
+            bool filterWorkItemsThatAlreadyExistInTarget = true)
         {
-            Options = (TfsWorkItemLinkEnricherOptions)options;
+            _save = save;
+            _filterWorkItemsThatAlreadyExistInTarget = filterWorkItemsThatAlreadyExistInTarget;
         }
 
         [Obsolete]
@@ -47,7 +50,7 @@ namespace MigrationTools.Enrichers
 
             if (ShouldCopyLinks(sourceWorkItemLinkStart, targetWorkItemLinkStart))
             {
-                Log.LogTrace("Links = '{@sourceWorkItemLinkStartLinks}", sourceWorkItemLinkStart.Links);
+                Log.LogDebug("Links = '{@sourceWorkItemLinkStartLinks}", sourceWorkItemLinkStart.Links);
                 foreach (Link item in sourceWorkItemLinkStart.ToWorkItem().Links)
                 {
                     try
@@ -133,7 +136,7 @@ namespace MigrationTools.Enrichers
                 }
             }
 
-            if (wiTargetL.ToWorkItem().IsDirty && Options.SaveAfterEachLinkIsAdded)
+            if (wiTargetL.ToWorkItem().IsDirty && _save)
             {
                 wiTargetL.SaveToAzureDevOps();
             }
@@ -165,7 +168,7 @@ namespace MigrationTools.Enrichers
                 }
             }
 
-            if (wiTargetL.ToWorkItem().IsDirty && Options.SaveAfterEachLinkIsAdded)
+            if (wiTargetL.ToWorkItem().IsDirty && _save)
             {
                 wiTargetL.SaveToAzureDevOps();
             }
@@ -174,7 +177,7 @@ namespace MigrationTools.Enrichers
         private void CreateExternalLink(ExternalLink sourceLink, WorkItemData target)
         {
             var exist = (from Link l in target.ToWorkItem().Links
-                         where l is ExternalLink && ((ExternalLink)l).LinkedArtifactUri == sourceLink.LinkedArtifactUri
+                         where l is ExternalLink && ((ExternalLink)l).LinkedArtifactUri == ((ExternalLink)sourceLink).LinkedArtifactUri
                          select (ExternalLink)l).SingleOrDefault();
             if (exist == null)
             {
@@ -188,7 +191,7 @@ namespace MigrationTools.Enrichers
                 // DevOps doesn't seem to take impersonation very nicely here - as of 13.05.22 the following line would get you an error:
                 // System.FormatException: The string 'Microsoft.TeamFoundation.WorkItemTracking.Common.ServerDefaultFieldValue' is not a valid AllXsd value.
                 // target.ToWorkItem().Fields["System.ModifiedBy"].Value = "Migration";
-                if (Options.SaveAfterEachLinkIsAdded)
+                if (_save)
                 {
                     try
                     {
@@ -197,7 +200,7 @@ namespace MigrationTools.Enrichers
                     catch (Exception ex)
                     {
                         // Ignore this link because the TFS server didn't recognize its type (There's no point in crashing the rest of the migration due to a link)
-                        if (ex.Message.Contains("Unrecognized Resource link"))
+                        if(ex.Message.Contains("Unrecognized Resource link"))
                         {
                             Log.LogError(ex, "[{ExceptionType}] Failed to save link {SourceLinkType} on {TargetId}", ex.GetType().Name, sourceLink.GetType().Name, target.Id);
                             // Remove the link from the target so it doesn't cause problems downstream
@@ -235,7 +238,7 @@ namespace MigrationTools.Enrichers
             WorkItemData wiSourceR = null;
             WorkItemData wiTargetR = null;
 
-            Log.LogDebug("RelatedLink is of ArtifactLinkType='{ArtifactLinkType}':LinkTypeEnd='{LinkTypeEndImmutableName}' on WorkItemId s:{ids} t:{idt}", rl.ArtifactLinkType.Name, rl.LinkTypeEnd == null ? "null" : rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiTargetL.Id);
+            Log.LogDebug("RelatedLink is of ArtifactLinkType='{ArtifactLinkType}':LinkTypeEnd='{LinkTypeEndImmutableName}' on WorkItemId s:{ids} t:{idt}", rl.ArtifactLinkType.Name, rl.LinkTypeEnd == null? "null" : rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiTargetL.Id);
 
             if (rl.LinkTypeEnd != null) // On a registered link type these will for sure fail as target is not in the system.
             {
@@ -258,7 +261,7 @@ namespace MigrationTools.Enrichers
                     return;
                 }
             }
-
+            
             if (wiTargetR != null)
             {
                 bool IsExisting = false;
@@ -270,11 +273,11 @@ namespace MigrationTools.Enrichers
                             && ((RelatedLink)l).RelatedWorkItemId.ToString() == wiTargetR.Id
                             && ((RelatedLink)l).LinkTypeEnd.ImmutableName == item.LinkTypeEnd.ImmutableName
                         select (RelatedLink)l).SingleOrDefault();
-                    IsExisting = exist != null;
+                    IsExisting = (exist != null);
                 }
                 catch (Exception ex)
                 {
-                    Log.LogError(ex, "  [SKIP] Unable to migrate links where wiSourceL={0}, wiSourceR={1}, wiTargetL={2}", wiSourceL != null ? wiSourceL.Id.ToString() : "NotFound", wiSourceR != null ? wiSourceR.Id.ToString() : "NotFound", wiTargetL != null ? wiTargetL.Id.ToString() : "NotFound");
+                    Log.LogError(ex, "  [SKIP] Unable to migrate links where wiSourceL={0}, wiSourceR={1}, wiTargetL={2}", ((wiSourceL != null) ? wiSourceL.Id.ToString() : "NotFound"), ((wiSourceR != null) ? wiSourceR.Id.ToString() : "NotFound"), ((wiTargetL != null) ? wiTargetL.Id.ToString() : "NotFound"));
                     return;
                 }
 
@@ -331,7 +334,7 @@ namespace MigrationTools.Enrichers
                             // DevOps doesn't seem to take impersonation very nicely here - as of 13.05.22 the following line would get you an error:
                             // System.FormatException: The string 'Microsoft.TeamFoundation.WorkItemTracking.Common.ServerDefaultFieldValue' is not a valid AllXsd value.
                             // wiTargetL.ToWorkItem().Fields["System.ModifiedBy"].Value = "Migration";
-                            if (Options.SaveAfterEachLinkIsAdded)
+                            if (_save)
                             {
                                 wiTargetL.SaveToAzureDevOps();
                             }
@@ -361,7 +364,7 @@ namespace MigrationTools.Enrichers
             }
             else
             {
-                Log.LogWarning("[SKIP] [LINK_CAPTURE_RELATED] [{RegisteredLinkType}] target not found. wiSourceL={wiSourceL}, wiSourceR={wiSourceR}, wiTargetL={wiTargetL}", rl.ArtifactLinkType.GetType().Name, wiSourceL == null ? "null" : wiSourceL.Id, wiSourceR == null ? "null" : wiSourceR.Id, wiTargetL == null ? "null" : wiTargetL.Id);
+                Log.LogWarning("[SKIP] [LINK_CAPTURE_RELATED] [{RegisteredLinkType}] target not found. wiSourceL={wiSourceL}, wiSourceR={wiSourceR}, wiTargetL={wiTargetL}", rl.ArtifactLinkType.GetType().Name, wiSourceL == null ? "null" : wiSourceL.Id , wiSourceR == null ? "null" : wiSourceR.Id, wiTargetL == null? "null": wiTargetL.Id);
             }
         }
 
@@ -425,7 +428,7 @@ namespace MigrationTools.Enrichers
             // DevOps doesn't seem to take impersonation very nicely here - as of 13.05.22 the following line would get you an error:
             // System.FormatException: The string 'Microsoft.TeamFoundation.WorkItemTracking.Common.ServerDefaultFieldValue' is not a valid AllXsd value.
             // target.ToWorkItem().Fields["System.ModifiedBy"].Value = "Migration";
-            if (Options.SaveAfterEachLinkIsAdded)
+            if (_save)
             {
                 target.SaveToAzureDevOps();
             }
@@ -446,7 +449,7 @@ namespace MigrationTools.Enrichers
 
         private bool ShouldCopyLinks(WorkItemData sourceWorkItemLinkStart, WorkItemData targetWorkItemLinkStart)
         {
-            if (Options.FilterIfLinkCountMatches)
+            if (_filterWorkItemsThatAlreadyExistInTarget)
             {
                 if (targetWorkItemLinkStart.ToWorkItem().Links.Count == sourceWorkItemLinkStart.ToWorkItem().Links.Count) // we should never have this as the target should not have existed in this path
                 {
@@ -460,6 +463,12 @@ namespace MigrationTools.Enrichers
         private bool IsHyperlink(Link item)
         {
             return item is Hyperlink;
+        }
+
+        [Obsolete("v2 Archtecture: use Configure(bool save = true, bool filter = true) instead", true)]
+        public override void Configure(IProcessorEnricherOptions options)
+        {
+            throw new NotImplementedException();
         }
 
         protected override void RefreshForProcessorType(IProcessor processor)

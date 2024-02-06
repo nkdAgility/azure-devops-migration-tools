@@ -21,5 +21,5 @@ manipulate the data during a migration.
 This config is for reference only. It has things configured that you will not need, and that may conflict with each other.
 
 {% highlight JSON %}
-{% include sampleConfig/configration-demo-v15.0.json %}
+{% include sampleConfig/configuration-full.json %}
 {% endhighlight %}

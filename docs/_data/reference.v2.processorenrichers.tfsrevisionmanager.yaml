@@ -7,31 +7,31 @@ configurationSamples:
     {
       "$type": "TfsRevisionManagerOptions",
       "Enabled": true,
-      "ReplayRevisions": true,
+      "ReplayRevisions": false,
       "MaxRevisions": 0
     }
   sampleFor: MigrationTools.Enrichers.TfsRevisionManagerOptions
-description: The TfsRevisionManager manipulates the revisions of a work item to reduce the number of revisions that are migrated.
+description: missng XML code comments
 className: TfsRevisionManager
 typeName: ProcessorEnrichers
 architecture: v2
 options:
 - parameterName: Enabled
   type: Boolean
-  description: For internal use
+  description: missng XML code comments
   defaultValue: missng XML code comments
 - parameterName: MaxRevisions
   type: Int32
-  description: Sets the maximum number of revisions that will be migrated. "First + Last N = Max". If this was set to 5 and there were 10 revisions you would get the first 1 (creation) and the latest 4 migrated.
-  defaultValue: 0
+  description: missng XML code comments
+  defaultValue: missng XML code comments
 - parameterName: RefName
   type: String
-  description: For internal use
+  description: missng XML code comments
   defaultValue: missng XML code comments
 - parameterName: ReplayRevisions
   type: Boolean
-  description: You can choose to migrate the tip only (a single write) or all of the revisions (many writes). If you are setting this to `false` to migrate only the tip then you should set `BuildFieldTable` to `true`.
-  defaultValue: true
+  description: missng XML code comments
+  defaultValue: missng XML code comments
 status: missng XML code comments
 processingTarget: missng XML code comments
 classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/ProcessorEnrichers/TfsRevisionManager.cs

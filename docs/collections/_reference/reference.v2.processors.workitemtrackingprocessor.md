@@ -9,6 +9,7 @@ configurationSamples:
       "$type": "WorkItemTrackingProcessorOptions",
       "Enabled": true,
       "ReplayRevisions": true,
+      "PrefixProjectToNodes": false,
       "CollapseRevisions": false,
       "WorkItemCreateRetryLimit": 5,
       "ProcessorEnrichers": [
@@ -37,6 +38,10 @@ options:
 - parameterName: Enabled
   type: Boolean
   description: If set to `true` then the processor will run. Set to `false` and the processor will not run.
+  defaultValue: missng XML code comments
+- parameterName: PrefixProjectToNodes
+  type: Boolean
+  description: missng XML code comments
   defaultValue: missng XML code comments
 - parameterName: ProcessorEnrichers
   type: List

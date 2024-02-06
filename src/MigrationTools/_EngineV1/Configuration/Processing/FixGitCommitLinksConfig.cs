@@ -6,7 +6,10 @@ namespace MigrationTools._EngineV1.Configuration.Processing
     {
         public string TargetRepository { get; set; }
         public bool Enabled { get; set; }
-        public string Query { get; set; }
+        public string QueryBit { get; set; }
+
+        /// <inheritdoc />
+        public string OrderBit { get; set; }
 
         public string Processor
         {

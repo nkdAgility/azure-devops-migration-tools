@@ -38,9 +38,9 @@ namespace MigrationTools.Clients.AzureDevops.Rest.Processors
             base.Configure(options);
             Log.LogInformation("AzureDevOpsPipelineProcessor::Configure");
             _options = (KeepOutboundLinkTargetProcessorOptions)options;
-            if (string.IsNullOrEmpty(_options.WIQLQuery))
+            if (string.IsNullOrEmpty(_options.WIQLQueryBit))
             {
-                throw new Exception($"The {nameof(_options.WIQLQuery)} needs to be set");
+                throw new Exception($"The {nameof(_options.WIQLQueryBit)} needs to be set");
             }
         }
 
@@ -74,7 +74,7 @@ namespace MigrationTools.Clients.AzureDevops.Rest.Processors
         private async Task AddLinksToWorkItems()
         {
             var wiqlClient = Source.GetHttpClient("wit/wiql");
-            WiqlResponse workItems = await GetWorkItemsBasedOnWiql(wiqlClient, _options.WIQLQuery);
+            WiqlResponse workItems = await GetWorkItemsBasedOnWiql(wiqlClient, _options.WIQLQueryBit);
 
             var client = Source.GetHttpClient("wit/workitemsbatch");
 

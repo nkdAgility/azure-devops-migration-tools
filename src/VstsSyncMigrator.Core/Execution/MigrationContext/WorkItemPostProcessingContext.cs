@@ -49,7 +49,8 @@ namespace VstsSyncMigrator.Engine
             var wiqbFactory = Services.GetRequiredService<IWorkItemQueryBuilderFactory>();
             var wiqb = wiqbFactory.Create();
             //Builds the constraint part of the query
-            wiqb.Query = _config.WIQLQuery;
+            string constraints = BuildQueryBitConstraints();
+            wiqb.Query = string.Format(@"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY [System.Id] ", constraints);
 
             List<WorkItemData> sourceWIS = Engine.Target.WorkItems.GetWorkItems(wiqb);
             Log.LogInformation("Migrate {0} work items?", sourceWIS.Count);
@@ -106,5 +107,39 @@ namespace VstsSyncMigrator.Engine
             Log.LogInformation("DONE in {Elapsed}", stopwatch.Elapsed.ToString("c"));
         }
 
+        private string BuildQueryBitConstraints()
+        {
+            string constraints = "";
+
+            if (_config.WorkItemIDs != null && _config.WorkItemIDs.Count > 0)
+            {
+                if (_config.WorkItemIDs.Count == 1)
+                {
+                    constraints += string.Format(" AND [System.Id] = {0} ", _config.WorkItemIDs[0]);
+                }
+                else
+                {
+                    constraints += string.Format(" AND [System.Id] IN ({0}) ", string.Join(",", _config.WorkItemIDs));
+                }
+            }
+
+            if (Engine.TypeDefinitionMaps.Items != null && Engine.TypeDefinitionMaps.Items.Count > 0)
+            {
+                if (Engine.TypeDefinitionMaps.Items.Count == 1)
+                {
+                    constraints += string.Format(" AND [System.WorkItemType] = '{0}' ", Engine.TypeDefinitionMaps.Items.Keys.First());
+                }
+                else
+                {
+                    constraints += string.Format(" AND [System.WorkItemType] IN ('{0}') ", string.Join("','", Engine.TypeDefinitionMaps.Items.Keys));
+                }
+            }
+
+            if (!string.IsNullOrEmpty(_config.WIQLQueryBit))
+            {
+                constraints += _config.WIQLQueryBit;
+            }
+            return constraints;
+        }
     }
 }

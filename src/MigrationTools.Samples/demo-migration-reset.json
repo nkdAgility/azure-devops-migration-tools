@@ -23,6 +23,6 @@
         "ObjectType": "WorkItemUpdateConfig",
         "WhatIf": false,
         "Enabled": true,
-        "Query": "AND [TfsMigrationTool.ReflectedWorkItemId] <> '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')"
+        "QueryBit": "AND [TfsMigrationTool.ReflectedWorkItemId] <> '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')"
     }]
 }
