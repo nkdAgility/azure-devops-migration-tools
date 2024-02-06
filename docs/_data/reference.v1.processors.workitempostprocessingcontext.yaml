@@ -8,8 +8,7 @@ configurationSamples:
       "$type": "WorkItemPostProcessingConfig",
       "Enabled": false,
       "WorkItemIDs": null,
-      "WIQLQueryBit": "AND [TfsMigrationTool.ReflectedWorkItemId] = '' ",
-      "WIQLOrderBit": null,
+      "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [@ReflectedWorkItemIdFieldName] = ''  AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
       "FilterWorkItemsThatAlreadyExistInTarget": false,
       "PauseAfterEachWorkItem": false,
       "WorkItemCreateRetryLimit": 0
@@ -32,11 +31,7 @@ options:
   type: Boolean
   description: Pause after each work item is migrated
   defaultValue: false
-- parameterName: WIQLOrderBit
-  type: String
-  description: A work item query to affect the order in which the work items are migrated. Don't leave this empty.
-  defaultValue: '[System.ChangedDate] desc'
-- parameterName: WIQLQueryBit
+- parameterName: WIQLQuery
   type: String
   description: A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)
   defaultValue: AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')

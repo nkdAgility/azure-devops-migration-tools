@@ -39,8 +39,7 @@ namespace VstsSyncMigrator.Engine
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
             //////////////////////////////////////////////////
-            var Query = string.Format(@"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY [System.ChangedDate] desc", _config.WIQLQueryBit);
-            List<WorkItemData> workitems = Engine.Target.WorkItems.GetWorkItems(Query);
+            List<WorkItemData> workitems = Engine.Target.WorkItems.GetWorkItems(_config.WIQLQuery);
             Log.LogInformation("Update {0} work items?", workitems.Count);
             //////////////////////////////////////////////////
             int current = workitems.Count;
