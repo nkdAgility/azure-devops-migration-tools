@@ -285,6 +285,7 @@ namespace MigrationTools._EngineV1.Clients
                 store = new WorkItemStore((TfsTeamProjectCollection)MigrationClient.InternalCollection, _bypassRules);
                 timer.Stop();
                 Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", MigrationClient.Config.AsTeamProjectConfig().Collection.ToString(), "GetWorkItemStore", null, startTime, timer.Elapsed, "200", true));
+                Log.Information("Work Item Store connected to {InternalCollection} with BypassRules set to {bypassRules}", _config.AsTeamProjectConfig().Collection, store.BypassRules);
                 if (_bypassRules == WorkItemStoreFlags.BypassRules)
                 {
                     if (store.BypassRules == false)
@@ -292,6 +293,7 @@ namespace MigrationTools._EngineV1.Clients
                         Log.Warning("TfsWorkItemMigrationClient::BypassRules Is not Enabled. Check your permissions on the server!");
                     }
                 }
+
             }
             catch (Exception ex)
             {
