@@ -28,7 +28,9 @@ namespace MigrationTools.Host.Services
 
         private WinGetPackageManager _packageManager;
         private WinGetPackage _package = null;
+        private bool _packageChecked = false;
         private bool _ServiceInitialised = false;
+        private Guid UniqueID = Guid.NewGuid();
 
         private WinGetPackage Package
         {
@@ -138,12 +140,16 @@ namespace MigrationTools.Host.Services
 
         private WinGetPackage GetPackage()
         {
-            if (IsPackageManagerInstalled && _package == null)
+            if (!_packageChecked)
             {
-                _packageManager = new WinGetPackageManager();
-                Log.Debug("Searching for package!");
-                _package = _packageManager.GetInstalledPackages(PackageId, true).FirstOrDefault();
-                Log.Debug("Found package with id {PackageId}", PackageId);
+                if (IsPackageManagerInstalled && _package == null)
+                {
+                    _packageManager = new WinGetPackageManager();
+                    Log.Debug("Searching for package!");
+                    _package = _packageManager.GetInstalledPackages(PackageId, true).FirstOrDefault();
+                    Log.Debug("Found package with id {PackageId}", PackageId);
+                }
+                _packageChecked = true;
             }
             return _package;
         }
