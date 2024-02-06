@@ -75,17 +75,29 @@ namespace VstsSyncMigrator.Engine
         {
             _config = (TestPlansAndSuitesMigrationConfig)config;
 
-
+            if (_config.UseCommonNodeStructureEnricherConfig)
+            {
                 var nodeStructureOptions =
                     _engineConfig.CommonEnrichersConfig.OfType<TfsNodeStructureOptions>().FirstOrDefault()
                     ?? throw new InvalidOperationException("Cannot use common node structure because it is not found.");
                 _nodeStructureEnricher.Configure(nodeStructureOptions);
-            
+            }
+            else
+            {
+                _nodeStructureEnricher.Configure(new TfsNodeStructureOptions()
+                {
+                    Enabled = true,
+                    NodeBasePaths = _config.NodeBasePaths,
+                    PrefixProjectToNodes = _config.PrefixProjectToNodes,
+                    AreaMaps = _config.AreaMaps ?? new Dictionary<string, string>(),
+                    IterationMaps = _config.IterationMaps ?? new Dictionary<string, string>(),
+                });
+            }
         }
 
         protected override void InternalExecute()
         {
-            _sourceTestStore = new TestManagementContext(Engine.Source, _config.TestPlanQuery);
+            _sourceTestStore = new TestManagementContext(Engine.Source, _config.TestPlanQueryBit);
             _targetTestStore = new TestManagementContext(Engine.Target);
             _sourceTestConfigs = _sourceTestStore.Project.TestConfigurations.Query("Select * From TestConfiguration");
             _targetTestConfigs = _targetTestStore.Project.TestConfigurations.Query("Select * From TestConfiguration");
@@ -697,12 +709,21 @@ namespace VstsSyncMigrator.Engine
                 Log.LogInformation("Team Project names dont match. We need to fix the query in dynamic test suite {0} - {1}.", source.Id, source.Title);
                 Log.LogInformation("Replacing old project name {1} in query {0} with new team project name {2}", targetSuiteChild.Query.QueryText, source.Plan.Project.TeamProjectName, targetTestStore.Project.TeamProjectName);
                 // First need to check is prefix project nodes has been applied for the migration
-
+                if (_config.PrefixProjectToNodes)
+                {
+                    // if prefix project nodes has been applied we need to take the original area/iteration value and prefix
+                    targetSuiteChild.Query =
+                        targetSuiteChild.Project.CreateTestQuery(targetSuiteChild.Query.QueryText.Replace(
+                            string.Format(@"'{0}", source.Plan.Project.TeamProjectName),
+                            string.Format(@"'{0}\{1}", targetTestStore.Project.TeamProjectName, source.Plan.Project.TeamProjectName)));
+                }
+                else
+                {
                     // If we are not profixing project nodes then we just need to take the old value for the project and replace it with the new project value
                     targetSuiteChild.Query = targetSuiteChild.Project.CreateTestQuery(targetSuiteChild.Query.QueryText.Replace(
                             string.Format(@"'{0}", source.Plan.Project.TeamProjectName),
                             string.Format(@"'{0}", targetTestStore.Project.TeamProjectName)));
-
+                }
                 Log.LogInformation("New query is now {0}", targetSuiteChild.Query.QueryText);
             }
         }
@@ -854,7 +875,9 @@ namespace VstsSyncMigrator.Engine
             var parameters = new Dictionary<string, string>();
             AddParameter("PlanId", parameters, sourcePlan.Id.ToString());
             ////////////////////////////////////
-            var newPlanName = $"{sourcePlan.Name}";
+            var newPlanName = _config.PrefixProjectToNodes
+                ? $"{Engine.Source.WorkItems.GetProject().Name}-{sourcePlan.Name}"
+                : $"{sourcePlan.Name}";
             InnerLog(sourcePlan, $"Process Plan {newPlanName}", 0, true);
             var targetPlan = FindTestPlan(newPlanName, sourcePlan.Id);
             //if (targetPlan != null && TargetPlanContansTag(targetPlan.Id))

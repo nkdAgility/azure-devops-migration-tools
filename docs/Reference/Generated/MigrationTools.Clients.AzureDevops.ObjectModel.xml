@@ -13,11 +13,6 @@
         <member name="M:MigrationTools.Enrichers.TfsEmbededImagesEnricher.FixEmbededImages(MigrationTools.DataContracts.WorkItemData,System.String,System.String,System.String)">
             from https://gist.github.com/pietergheysens/792ed505f09557e77ddfc1b83531e4fb
         </member>
-        <member name="T:MigrationTools.Enrichers.TfsNodeStructure">
-            <summary>
-            The TfsNodeStructureEnricher is used to create missing nodes in the target project. To configure it add a `TfsNodeStructureOptions` section to `CommonEnrichersConfig` in the config file. Otherwise defaults will be applied. 
-            </summary>
-        </member>
         <member name="M:MigrationTools.Enrichers.TfsNodeStructure.ShouldCreateNode(System.String)">
             <summary>
             Checks node-to-be-created with allowed BasePath's
@@ -33,66 +28,18 @@
             <returns>A boolean indicating whether the path is a parent of any positively selected base path.</returns>
             <exception cref="T:System.NotImplementedException"></exception>
         </member>
-        <member name="P:MigrationTools.Enrichers.TfsNodeStructureOptions.NodeBasePaths">
-            <summary>
-            The root paths of the Ares / Iterations you want migrate. See [NodeBasePath Configuration](#nodebasepath-configuration)
-            </summary>
-            <default>["/"]</default>
-        </member>
-        <member name="P:MigrationTools.Enrichers.TfsNodeStructureOptions.AreaMaps">
-            <summary>
-            Remapping rules for area paths, implemented with regular expressions. The rules apply with a higher priority than the `PrefixProjectToNodes`,
-            that is, if no rule matches the path and the `PrefixProjectToNodes` option is enabled, then the old `PrefixProjectToNodes` behavior is applied.
-            </summary>
-            <default>{}</default>
-        </member>
-        <member name="P:MigrationTools.Enrichers.TfsNodeStructureOptions.IterationMaps">
-            <summary>
-            Remapping rules for iteration paths, implemented with regular expressions. The rules apply with a higher priority than the `PrefixProjectToNodes`,
-            that is, if no rule matches the path and the `PrefixProjectToNodes` option is enabled, then the old `PrefixProjectToNodes` behavior is applied.
-            </summary>
-            <default>{}</default>
-        </member>
-        <member name="P:MigrationTools.Enrichers.TfsNodeStructureOptions.ShouldCreateMissingRevisionPaths">
-            <summary>
-            When set to True the susyem will try to create any missing missing area or iteration paths from the revisions.
-            </summary>
-        </member>
-        <member name="T:MigrationTools.Enrichers.TfsRevisionManager">
-            <summary>
-            The TfsRevisionManager manipulates the revisions of a work item to reduce the number of revisions that are migrated.
-            </summary>
-        </member>
-        <member name="P:MigrationTools.Enrichers.TfsRevisionManagerOptions.ReplayRevisions">
-            <summary>
-            You can choose to migrate the tip only (a single write) or all of the revisions (many writes).
-            If you are setting this to `false` to migrate only the tip then you should set `BuildFieldTable` to `true`.
-            </summary>
-            <default>true</default>
-        </member>
-        <member name="P:MigrationTools.Enrichers.TfsRevisionManagerOptions.MaxRevisions">
-            <summary>
-            Sets the maximum number of revisions that will be migrated. "First + Last N = Max".
-            If this was set to 5 and there were 10 revisions you would get the first 1 (creation) and the latest 4 migrated.
-            </summary>
-            <default>0</default>
-        </member>
-        <member name="P:MigrationTools.Enrichers.TfsWorkItemLinkEnricherOptions.FilterIfLinkCountMatches">
-            <summary>
-            Skip validating links if the number of links in the source and the target matches!
-            </summary>
-        </member>
-        <member name="P:MigrationTools.Enrichers.TfsWorkItemLinkEnricherOptions.SaveAfterEachLinkIsAdded">
-            <summary>
-            Save the work item after each link is added. This will slow the migration as it will cause many saves to the TFS database.
-            </summary>
-        </member>
         <member name="T:MigrationTools.Processors.TfsAreaAndIterationProcessor">
             <summary>
             The `TfsAreaAndIterationProcessor` migrates all of the Area nd Iteraion paths.
             </summary>
             <status>Beta</status>
             <processingtarget>Work Items</processingtarget>
+        </member>
+        <member name="P:MigrationTools.Processors.TfsAreaAndIterationProcessorOptions.PrefixProjectToNodes">
+            <summary>
+            Prefix your iterations and areas with the project name. If you have enabled this in `NodeStructuresMigrationConfig` you must do it here too.
+            </summary>
+            <default>false</default>
         </member>
         <member name="T:MigrationTools.Processors.TfsSharedQueryProcessor">
             <summary>

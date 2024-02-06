@@ -14,9 +14,6 @@ using Newtonsoft.Json;
 namespace MigrationTools.Enrichers
 {
 
-    /// <summary>
-    /// The TfsRevisionManager manipulates the revisions of a work item to reduce the number of revisions that are migrated.
-    /// </summary>
     public class TfsRevisionManager : WorkItemProcessorEnricher
     {
         public TfsRevisionManager(IServiceProvider services, ILogger<TfsRevisionManager> logger)
@@ -24,7 +21,7 @@ namespace MigrationTools.Enrichers
         {
         }
 
-        public TfsRevisionManagerOptions Options { get; private set;}
+        private TfsRevisionManagerOptions Options { get; set; }
 
         [Obsolete("Old v1 arch: this is a v2 class", true)]
         public override void Configure(bool save = true, bool filter = true)

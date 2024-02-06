@@ -69,6 +69,7 @@
       "$type": "WorkItemTrackingProcessorOptions",
       "Enabled": false,
       "ReplayRevisions": true,
+      "PrefixProjectToNodes": false,
       "CollapseRevisions": false,
       "WorkItemCreateRetryLimit": 5,
       "Enrichers": [

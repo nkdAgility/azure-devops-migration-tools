@@ -7,6 +7,7 @@ configurationSamples:
     {
       "$type": "TfsAreaAndIterationProcessorOptions",
       "Enabled": false,
+      "PrefixProjectToNodes": false,
       "NodeBasePaths": null,
       "AreaMaps": {
         "$type": "Dictionary`2"
@@ -40,6 +41,10 @@ options:
   type: String[]
   description: missng XML code comments
   defaultValue: missng XML code comments
+- parameterName: PrefixProjectToNodes
+  type: Boolean
+  description: Prefix your iterations and areas with the project name. If you have enabled this in `NodeStructuresMigrationConfig` you must do it here too.
+  defaultValue: false
 - parameterName: ProcessorEnrichers
   type: List
   description: List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.

@@ -42,7 +42,13 @@ namespace VstsSyncMigrator.Engine
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
             //////////////////////////////////////////////////
-            List<WorkItemData> workitems = Engine.Target.WorkItems.GetWorkItems(_config.Query);
+            var query =
+                string.Format(
+                    @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {0} ORDER BY {1}",
+                    _config.QueryBit,
+                    _config.OrderBit
+                    );
+            List<WorkItemData> workitems = Engine.Target.WorkItems.GetWorkItems(query);
             Log.LogInformation("Update {0} work items?", workitems.Count);
             /////////////////////////////////////////////////
             int current = workitems.Count;

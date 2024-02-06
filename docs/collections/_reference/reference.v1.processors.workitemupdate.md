@@ -9,7 +9,8 @@ configurationSamples:
       "$type": "WorkItemUpdateConfig",
       "Enabled": false,
       "WhatIf": false,
-      "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [@ReflectedWorkItemIdFieldName] = ''  AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
+      "WIQLQueryBit": "AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')",
+      "WIQLOrderBit": null,
       "WorkItemIDs": null,
       "FilterWorkItemsThatAlreadyExistInTarget": false,
       "PauseAfterEachWorkItem": false,
@@ -37,7 +38,11 @@ options:
   type: Boolean
   description: missng XML code comments
   defaultValue: missng XML code comments
-- parameterName: WIQLQuery
+- parameterName: WIQLOrderBit
+  type: String
+  description: A work item query to affect the order in which the work items are migrated. Don't leave this empty.
+  defaultValue: '[System.ChangedDate] desc'
+- parameterName: WIQLQueryBit
   type: String
   description: A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)
   defaultValue: AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')

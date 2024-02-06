@@ -14,10 +14,12 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         public WorkItemDeleteConfig()
         {
             Enabled = false;
-            WIQLQuery = @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc";
+            WIQLQueryBit = @"AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
+            WIQLOrderBit = "[System.ChangedDate] desc";
         }
 
-        public string WIQLQuery { get; set; }
+        public string WIQLQueryBit { get; set; }
+        public string WIQLOrderBit { get; set; }
         public IList<int> WorkItemIDs { get; set; }
         public bool FilterWorkItemsThatAlreadyExistInTarget { get; set; }
         public bool PauseAfterEachWorkItem { get; set; }

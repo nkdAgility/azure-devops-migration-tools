@@ -4,8 +4,10 @@ namespace MigrationTools._EngineV1.Configuration
 {
     public interface IWorkItemProcessorConfig : IProcessorConfig
     {
-        public string WIQLQuery { get; set; }
+        public string WIQLQueryBit { get; set; }
 
+        /// <inheritdoc />
+        public string WIQLOrderBit { get; set; }
 
         public IList<int> WorkItemIDs { get; set; }
         public bool FilterWorkItemsThatAlreadyExistInTarget { get; set; }

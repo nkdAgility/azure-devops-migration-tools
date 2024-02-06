@@ -9,7 +9,8 @@ configurationSamples:
       "$type": "FixGitCommitLinksConfig",
       "Enabled": false,
       "TargetRepository": null,
-      "Query": null
+      "QueryBit": null,
+      "OrderBit": null
     }
   sampleFor: MigrationTools._EngineV1.Configuration.Processing.FixGitCommitLinksConfig
 description: missng XML code comments
@@ -21,7 +22,11 @@ options:
   type: Boolean
   description: missng XML code comments
   defaultValue: missng XML code comments
-- parameterName: Query
+- parameterName: OrderBit
+  type: String
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: QueryBit
   type: String
   description: missng XML code comments
   defaultValue: missng XML code comments

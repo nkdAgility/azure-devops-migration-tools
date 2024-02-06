@@ -16,11 +16,11 @@ architecture: v2
 options:
 - parameterName: Enabled
   type: Boolean
-  description: For internal use
+  description: missng XML code comments
   defaultValue: missng XML code comments
 - parameterName: RefName
   type: String
-  description: For internal use
+  description: missng XML code comments
   defaultValue: missng XML code comments
 status: missng XML code comments
 processingTarget: missng XML code comments

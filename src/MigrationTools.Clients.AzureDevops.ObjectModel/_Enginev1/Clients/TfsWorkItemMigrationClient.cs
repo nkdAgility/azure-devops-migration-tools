@@ -36,16 +36,22 @@ namespace MigrationTools._EngineV1.Clients
 
         public List<WorkItemData> FilterExistingWorkItems(
             List<WorkItemData> sourceWorkItems,
-            string query,
+            TfsWiqlDefinition wiqlDefinition,
             TfsWorkItemMigrationClient sourceWorkItemMigrationClient)
         {
             Log.Debug("FilterExistingWorkItems: START | ");
 
+            var targetQuery =
+                string.Format(
+                    @"SELECT [System.Id], [{0}] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {1} ORDER BY {2}",
+                     _config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName,
+                    wiqlDefinition.QueryBit,
+                    wiqlDefinition.OrderBit);
 
             Log.Debug("FilterByTarget: Query Execute...");
-            var targetFoundItems = GetWorkItems(query);
+            var targetFoundItems = GetWorkItems(targetQuery);
             Log.Debug("FilterByTarget: ... query complete.");
-            Log.Debug("FilterByTarget: Found {TargetWorkItemCount} based on the WIQLQuery in the target system.", targetFoundItems.Count);
+            Log.Debug("FilterByTarget: Found {TargetWorkItemCount} based on the WIQLQueryBit in the target system.", targetFoundItems.Count);
             var targetFoundIds = (from WorkItemData twi in targetFoundItems select GetReflectedWorkItemId(twi))
                 //exclude null IDs
                 .Where(x=> x != null)
@@ -211,7 +217,6 @@ namespace MigrationTools._EngineV1.Clients
             var wiqb = _workItemQueryBuilderFactory.Create();
             wiqb.Query = WIQLQuery;
             wiqb.AddParameter("TeamProject", MigrationClient.Config.AsTeamProjectConfig().Project);
-            wiqb.AddParameter("ReflectedWorkItemIdFieldName", MigrationClient.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName);
             return wiqb.BuildWIQLQuery(MigrationClient);
         }
 
