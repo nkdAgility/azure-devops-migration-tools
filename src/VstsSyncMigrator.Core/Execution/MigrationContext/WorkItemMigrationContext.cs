@@ -938,16 +938,8 @@ namespace VstsSyncMigrator.Engine
             Log.LogDebug("CheckClosedDateIsValid::ClosedDate field is {closedDateField}", closedDateField);
             if (targetWorkItem.ToWorkItem().Fields[closedDateField].Value == null && (targetWorkItem.ToWorkItem().Fields["System.State"].Value.ToString() == "Closed" || targetWorkItem.ToWorkItem().Fields["System.State"].Value.ToString() == "Done"))
             {
-                if (sourceWorkItem.ToWorkItem().Fields.Contains(closedDateField) && sourceWorkItem.ToWorkItem().Fields[closedDateField].Value != null)
-                {
-                    Log.LogDebug("CheckClosedDateIsValid::Setting Closed Date [#{sourceId}][Rev{sourceRev}]: {sourceClosedDate} ", sourceWorkItem.ToWorkItem().Id, sourceWorkItem.ToWorkItem().Rev, sourceWorkItem.ToWorkItem().Fields[closedDateField].Value);
-                    targetWorkItem.ToWorkItem().Fields[closedDateField].Value = sourceWorkItem.ToWorkItem().Fields[closedDateField].Value;
-                }
-                else
-                {
-                    Log.LogWarning("The field {closedDateField} is set to Null and will revert to the current date on save! ", closedDateField);
-                    Log.LogWarning("Source Closed Date [#{sourceId}][Rev{sourceRev}]: {sourceClosedDate} ", sourceWorkItem.ToWorkItem().Id, sourceWorkItem.ToWorkItem().Rev, sourceWorkItem.ToWorkItem().Fields[closedDateField].Value);
-                }               
+                Log.LogWarning("The field {closedDateField} is set to Null and will revert to the current date on save! ", closedDateField);
+                Log.LogWarning("Source Closed Date [#{sourceId}][Rev{sourceRev}]: {sourceClosedDate} ", sourceWorkItem.ToWorkItem().Id, sourceWorkItem.ToWorkItem().Rev, sourceWorkItem.ToWorkItem().Fields[closedDateField].Value);            
             }
             if (!sourceWorkItem.ToWorkItem().Fields.Contains(closedDateField))
             {
