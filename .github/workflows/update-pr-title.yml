@@ -6,6 +6,6 @@ jobs:
     name: Update PR Title with a base branch label
     steps:
       - name: Update the Pull Request title with a base branch label
-        uses: lirantal/github-action-pr-title-update-branch@v1
+        uses: lirantal/github-action-pr-title-update-branch@v1.1.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
