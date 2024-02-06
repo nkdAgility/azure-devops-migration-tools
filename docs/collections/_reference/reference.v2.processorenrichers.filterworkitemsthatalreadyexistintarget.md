@@ -22,7 +22,7 @@ architecture: v2
 options:
 - parameterName: Enabled
   type: Boolean
-  description: missng XML code comments
+  description: For internal use
   defaultValue: missng XML code comments
 - parameterName: Query
   type: QueryOptions
@@ -30,7 +30,7 @@ options:
   defaultValue: missng XML code comments
 - parameterName: RefName
   type: String
-  description: missng XML code comments
+  description: For internal use
   defaultValue: missng XML code comments
 status: missng XML code comments
 processingTarget: missng XML code comments
