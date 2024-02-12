@@ -58,7 +58,7 @@ namespace MigrationTools.Endpoints
             }
             catch (ArgumentException e)
             {
-                Log.Error(e, "ArgumentException");
+                Log.Warning(e, "For some Reason there are multiple Revisions on {WorkItemId} with the same System.Rev. We will create a renumbered list...", items[0].WorkItemId);
                 var currentNumber = -1;
                 foreach (var item in items)
                 {
