@@ -55,6 +55,20 @@
       "Enabled": true,
       "ReplayRevisions": true,
       "MaxRevisions": 0
+    },
+    {
+      "$type": "StringManipulatorEnricherOptions",
+      "Enabled": true,
+      "MaxStringLength": 1000000,
+      "Manipulators": [
+        {
+          "$type": "RegexStringManipulator",
+          "Enabled": true,
+          "Pattern": "[^( -~)\n\r\t]+",
+          "Replacement": "",
+          "Description": "Remove invalid characters from the end of the string"
+        }
+      ]
     }
   ],
   "Processors": [

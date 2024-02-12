@@ -126,8 +126,7 @@ topics:
 - topic: notes
   path: /docs/Reference/v1/Processors/WorkItemMigrationContext-notes.md
   exists: true
-  markdown: >2-
-
+  markdown: >-
     ## <a name="WIQLQueryBits"></a>WIQL Query Bits
 
 
@@ -203,6 +202,8 @@ topics:
     Moved to the ProcessorEnricher [TfsNodeStructure](../Reference/v2/ProcessorEnrichers/TfsNodeStructure/)
 
 
+
+
     ## More Complex Team Migrations
 
     The above options allow you to bring over a sub-set of the WIs (using the `WIQLQueryBit`) and move their area or iteration path to a default location. However you may wish to do something more complex e.g. re-map the team structure. This can be done with addition of a `FieldMaps` block to configuration in addition to the `NodeBasePaths`.
@@ -234,6 +235,12 @@ topics:
 
 
     > Note: This mappings could also be achieved with other forms of Field mapper e.g. `RegexFieldMapConfig`, but the value mapper as an example is easy to understand
+
+
+    # Removed Properties
+
+
+    - PrefixProjectToNodes - This option was removed in favour of the Area and Iteration Maps on [TfsNodeStructure](../Reference/v2/ProcessorEnrichers/TfsNodeStructure/)
 - topic: introduction
   path: /docs/Reference/v1/Processors/WorkItemMigrationContext-introduction.md
   exists: true

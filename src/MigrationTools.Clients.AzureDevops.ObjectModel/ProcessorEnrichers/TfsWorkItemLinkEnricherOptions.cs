@@ -17,6 +17,7 @@ namespace MigrationTools.Enrichers
         /// <summary>
         /// Save the work item after each link is added. This will slow the migration as it will cause many saves to the TFS database.
         /// </summary>
+        /// <default>false</default>
         public bool SaveAfterEachLinkIsAdded { get; set; }
 
 

@@ -31,7 +31,7 @@ options:
 - parameterName: SaveAfterEachLinkIsAdded
   type: Boolean
   description: Save the work item after each link is added. This will slow the migration as it will cause many saves to the TFS database.
-  defaultValue: missng XML code comments
+  defaultValue: false
 status: missng XML code comments
 processingTarget: missng XML code comments
 classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/ProcessorEnrichers/TfsWorkItemLinkEnricher.cs

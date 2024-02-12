@@ -33,6 +33,7 @@ using MigrationTools._EngineV1.Processors;
 using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
 using MigrationTools.ProcessorEnrichers;
+using MigrationTools.ProcessorEnrichers.WorkItemProcessorEnrichers;
 using Newtonsoft.Json.Linq;
 using Serilog.Context;
 using Serilog.Events;
@@ -62,6 +63,7 @@ namespace VstsSyncMigrator.Engine
         private IAttachmentMigrationEnricher attachmentEnricher;
         private IWorkItemProcessorEnricher embededImagesEnricher;
         private IWorkItemProcessorEnricher _workItemEmbededLinkEnricher;
+        private StringManipulatorEnricher _stringManipulatorEnricher;
         private TfsGitRepositoryEnricher gitRepositoryEnricher;
         private TfsNodeStructure _nodeStructureEnricher;
         private ITelemetryLogger _telemetry;
@@ -81,6 +83,7 @@ namespace VstsSyncMigrator.Engine
                                         TfsNodeStructure nodeStructureEnricher,
                                         TfsRevisionManager revisionManager,
                                         TfsWorkItemLinkEnricher workItemLinkEnricher,
+                                        StringManipulatorEnricher stringManipulatorEnricher,
                                         TfsWorkItemEmbededLinkEnricher workItemEmbeddedLinkEnricher,
                                         TfsValidateRequiredField requiredFieldValidator,
                                         IOptions<EngineConfiguration> engineConfig)
@@ -93,6 +96,7 @@ namespace VstsSyncMigrator.Engine
             _revisionManager = revisionManager;
             _workItemLinkEnricher = workItemLinkEnricher;
             _workItemEmbededLinkEnricher = workItemEmbeddedLinkEnricher;
+            _stringManipulatorEnricher = stringManipulatorEnricher;
             _validateConfig = requiredFieldValidator;
         }
 
@@ -113,39 +117,11 @@ namespace VstsSyncMigrator.Engine
                 Log.LogError("CommonEnrichersConfig cant be Null! it must be a minimum of `[]`");
                 Environment.Exit(-1);
             }
-            // TfsNodeStructureOptions
-            var nseConfig = _engineConfig.CommonEnrichersConfig.OfType<TfsNodeStructureOptions>().FirstOrDefault();
-            if (nseConfig == null)
-            {
-                _nodeStructureEnricher.Configure(TfsNodeStructureOptions.GetDefaults());
-                Log.LogWarning("`TfsNodeStructureOptions` Default used! Add a `TfsNodeStructureOptions` entry to `CommonEnrichersConfig` to customise the settings.");
-            }
-            else
-            {
-                _nodeStructureEnricher.Configure(nseConfig);
-            }
-            // TfsNodeStructureOptions
-            var revmanConfig = _engineConfig.CommonEnrichersConfig.OfType<TfsRevisionManagerOptions>().FirstOrDefault();
-            if (revmanConfig == null)
-            {
-                _revisionManager.Configure(TfsRevisionManagerOptions.GetDefaults());
-                Log.LogWarning("`TfsRevisionManagerOptions` Default used! Add a `TfsRevisionManagerOptions` entry to `CommonEnrichersConfig` to customise the settings.");
-            }
-            else
-            {
-                _revisionManager.Configure(revmanConfig);
-            }
-            // TfsNodeStructureOptions
-            var wileConfig = _engineConfig.CommonEnrichersConfig.OfType<TfsWorkItemLinkEnricherOptions>().FirstOrDefault();
-            if (wileConfig == null)
-            {
-                _workItemLinkEnricher.Configure(TfsWorkItemLinkEnricherOptions.GetDefaults());
-                Log.LogWarning("`TfsWorkItemLinkEnricherOptions` Default used! Add a `TfsWorkItemLinkEnricherOptions` entry to `CommonEnrichersConfig` to customise the settings.");
-            }
-            else
-            {
-                _workItemLinkEnricher.Configure(wileConfig);
-            }
+            PullCommonEnrichersConfig<TfsNodeStructure, TfsNodeStructureOptions>(_engineConfig.CommonEnrichersConfig, _nodeStructureEnricher);
+            PullCommonEnrichersConfig<TfsRevisionManager, TfsRevisionManagerOptions>(_engineConfig.CommonEnrichersConfig, _revisionManager);
+            PullCommonEnrichersConfig<TfsWorkItemLinkEnricher, TfsWorkItemLinkEnricherOptions>(_engineConfig.CommonEnrichersConfig, _workItemLinkEnricher);
+            PullCommonEnrichersConfig<StringManipulatorEnricher, StringManipulatorEnricherOptions>(_engineConfig.CommonEnrichersConfig, _stringManipulatorEnricher);
+
         }
 
         internal void TraceWriteLine(LogEventLevel level, string message, Dictionary<string, object> properties = null)
@@ -479,10 +455,10 @@ namespace VstsSyncMigrator.Engine
         }
 
         // TODO : Make this into the Work Item mapping tool
-        private void PopulateWorkItem(WorkItemData oldWi, WorkItemData newwit, string destType)
+        private void PopulateWorkItem(WorkItemData oldWorkItemData, WorkItemData newWorkItemData, string destType)
         {
-            var oldWorkItem = oldWi.ToWorkItem();
-            var newWorkItem = newwit.ToWorkItem();
+            var oldWorkItem = oldWorkItemData.ToWorkItem();
+            var newWorkItem = newWorkItemData.ToWorkItem();
             var fieldMappingTimer = Stopwatch.StartNew();
 
             if (newWorkItem.IsPartialOpen || !newWorkItem.IsOpen)
@@ -501,7 +477,7 @@ namespace VstsSyncMigrator.Engine
                     var missedMigratedValue = oldWorkItem.Fields[f.ReferenceName].Value;
                     if (missedMigratedValue != null && !string.Empty.Equals(missedMigratedValue))
                     {
-                        Log.LogWarning("PopulateWorkItem:FieldUpdate: Missing field in target workitem, Source WorkItemId: {WorkitemId}, Field: {MissingField}, Value: {SourceValue}", oldWi.Id, f.ReferenceName, missedMigratedValue);
+                        Log.LogWarning("PopulateWorkItem:FieldUpdate: Missing field in target workitem, Source WorkItemId: {WorkitemId}, Field: {MissingField}, Value: {SourceValue}", oldWorkItemData.Id, f.ReferenceName, missedMigratedValue);
                     }
                     continue;
                 }
@@ -511,12 +487,15 @@ namespace VstsSyncMigrator.Engine
                 {
                     Log.LogDebug("PopulateWorkItem:FieldUpdate: {ReferenceName} | Source:{OldReferenceValue} Target:{NewReferenceValue}", f.ReferenceName, oldWorkItem.Fields[f.ReferenceName].Value, newWorkItem.Fields[f.ReferenceName].Value);
 
-                    newWorkItem.Fields[f.ReferenceName].Value = oldWorkItem.Fields[f.ReferenceName].Value;
-
-                    if (newWorkItem.Fields[f.ReferenceName].FieldDefinition.IsLongText)
+                    switch (f.FieldDefinition.FieldType)
                     {
-                        // Truncate field to max length
-                        newWorkItem.Fields[f.ReferenceName].Value = newWorkItem.Fields[f.ReferenceName].Value.ToString().Substring(0, 1000000);
+                        case FieldType.String:
+                            _stringManipulatorEnricher.ProcessorExecutionWithFieldItem(null, oldWorkItemData.Fields[f.ReferenceName]);
+                            newWorkItem.Fields[f.ReferenceName].Value = oldWorkItemData.Fields[f.ReferenceName].Value;
+                            break;
+                        default:
+                            newWorkItem.Fields[f.ReferenceName].Value = oldWorkItem.Fields[f.ReferenceName].Value;
+                            break;
                     }
 
                 } 

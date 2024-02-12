@@ -80,6 +80,7 @@ namespace MigrationTools.Endpoints
                 Name = x.Name,
                 ReferenceName = x.ReferenceName,
                 Value = x.Value,
+                FieldType = x.FieldDefinition.FieldType.ToString(),
                 internalObject = x
             })
             .ToDictionary(r => r.ReferenceName);
