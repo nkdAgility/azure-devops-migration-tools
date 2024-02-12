@@ -8,6 +8,7 @@ using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Configuration.Processing;
 using MigrationTools.Enrichers;
 using MigrationTools.ProcessorEnrichers;
+using MigrationTools.ProcessorEnrichers.WorkItemProcessorEnrichers;
 using MigrationTools.Tests;
 using VstsSyncMigrator.Engine;
 
@@ -48,13 +49,14 @@ namespace VstsSyncMigrator.Core.Tests
                                                       _services.GetRequiredService<ILogger<WorkItemMigrationContext>>(),
                                                       nodeStructure,
                                                       _services.GetRequiredService<TfsRevisionManager>(),
-                                                      _services.GetRequiredService<TfsWorkItemLinkEnricher>(),
+                                                        _services.GetRequiredService<TfsWorkItemLinkEnricher>(),
+                                                        _services.GetRequiredService<StringManipulatorEnricher>(),
                                                       _services.GetRequiredService<TfsWorkItemEmbededLinkEnricher>(),
                                                       _services.GetRequiredService<TfsValidateRequiredField>(),
                                                       _services.GetRequiredService<IOptions<EngineConfiguration>>());
             _underTest.Configure(new WorkItemMigrationConfig
             {
-               
+
             });
         }
 
