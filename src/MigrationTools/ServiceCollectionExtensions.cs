@@ -4,6 +4,7 @@ using MigrationTools._EngineV1.Containers;
 using MigrationTools.EndpointEnrichers;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
+using MigrationTools.ProcessorEnrichers.WorkItemProcessorEnrichers;
 using MigrationTools.Processors;
 
 namespace MigrationTools
@@ -23,6 +24,7 @@ namespace MigrationTools
             context.AddTransient<FilterWorkItemsThatAlreadyExistInTarget>();
             context.AddTransient<SkipToFinalRevisedWorkItemType>();
             // WorkItem Endpoint Enrichers
+            context.AddTransient<StringManipulatorEnricher>();
             //context.AddTransient<WorkItemAttachmentEnricher>();
             //context.AddTransient<WorkItemCreatedEnricher>();
             //context.AddTransient<WorkItemEmbedEnricher>();

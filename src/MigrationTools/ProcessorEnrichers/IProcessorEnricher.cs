@@ -16,6 +16,8 @@ namespace MigrationTools.Enrichers
 
         void ProcessorExecutionBeforeProcessWorkItem(IProcessor processor, WorkItemData workitem);
 
+        void ProcessorExecutionWithFieldItem(IProcessor processor, FieldItem fieldItem);
+
         void Configure(IProcessorEnricherOptions options);
     }
 }
