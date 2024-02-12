@@ -9,7 +9,16 @@ namespace MigrationTools.Enrichers
     {
         public override Type ToConfigure => typeof(StringManipulatorEnricher);
 
+        /// <summary>
+        /// Max number of chars in a string. Applied last, and set to 1000000 by default.
+        /// </summary>
+        /// <default>1000000</default>
         public int MaxStringLength { get; set; }
+
+        /// <summary>
+        /// List of regex based string manipulations to apply to all string fields. Each regex replacement is applied in order and can be enabled or disabled.
+        /// </summary>
+        /// <default>{}</default>
         public List<RegexStringManipulator> Manipulators { get; set; }
 
         public override void SetDefaults()
@@ -19,7 +28,7 @@ namespace MigrationTools.Enrichers
             Manipulators = new List<RegexStringManipulator> {
                 new RegexStringManipulator()
                 {
-                    Enabled = true,
+                    Enabled = false,
                     Pattern = @"[^( -~)\n\r\t]+",
                     Replacement = "",
                     Description = "Remove all non-ASKI characters between ^ and ~."

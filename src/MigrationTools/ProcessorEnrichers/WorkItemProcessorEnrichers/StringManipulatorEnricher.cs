@@ -9,6 +9,9 @@ using MigrationTools.Processors;
 
 namespace MigrationTools.ProcessorEnrichers.WorkItemProcessorEnrichers
 {
+    /// <summary>
+    /// Used to process the String fields of a work item. This is useful for cleaning up data. It will limit fields to a max length and apply regex replacements based on what is configured. Each regex replacement is applied in order and can be enabled or disabled.
+    /// </summary>
     public class StringManipulatorEnricher : WorkItemProcessorEnricher
     {
         private Serilog.ILogger contextLog;
@@ -30,7 +33,7 @@ namespace MigrationTools.ProcessorEnrichers.WorkItemProcessorEnrichers
             {
                 throw new InvalidCastException(nameof(options));
             }
-           _options = (StringManipulatorEnricherOptions)options;
+            _options = (StringManipulatorEnricherOptions)options;
         }
 
         protected override void EntryForProcessorType(IProcessor processor)
@@ -44,19 +47,30 @@ namespace MigrationTools.ProcessorEnrichers.WorkItemProcessorEnrichers
         }
         public override void ProcessorExecutionWithFieldItem(IProcessor processor, FieldItem fieldItem)
         {
-          Log.LogDebug("{WorkItemProcessorEnricher}::ProcessorExecutionWithFieldItem", this.GetType().Name);
-          if (fieldItem.FieldType == "String")
+            Log.LogDebug("{WorkItemProcessorEnricher}::ProcessorExecutionWithFieldItem", this.GetType().Name);
+            if (!_options.Enabled)
+            {
+                Log.LogDebug("{WorkItemProcessorEnricher}::ProcessorExecutionWithFieldItem::Disabled", this.GetType().Name);
+                return;
+            }
+            if (fieldItem.FieldType == "String")
             {
                 foreach (var manipulator in _options.Manipulators)
                 {
                     if (manipulator.Enabled)
                     {
+                        Log.LogDebug("{WorkItemProcessorEnricher}::ProcessorExecutionWithFieldItem::Running::{Description}", this.GetType().Name, manipulator.Description);
                         fieldItem.Value = Regex.Replace((string)fieldItem.Value, manipulator.Pattern, manipulator.Replacement);
                     }
+                    else
+                    {
+                        Log.LogDebug("{WorkItemProcessorEnricher}::ProcessorExecutionWithFieldItem::Disabled::{Description}", this.GetType().Name, manipulator.Description);
+                    }
                 }
-                fieldItem.Value.ToString().Substring(0, Math.Min(fieldItem.Value.ToString().Length, _options.MaxStringLength));
             }
+            fieldItem.Value.ToString().Substring(0, Math.Min(fieldItem.Value.ToString().Length, _options.MaxStringLength));
         }
-
     }
+
 }
+

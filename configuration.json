@@ -66,10 +66,10 @@
           "Enabled": true,
           "Pattern": "[^( -~)\n\r\t]+",
           "Replacement": "",
-          "Description": "Remove invalid characters from the end of the string",
-          "
+          "Description": "Remove invalid characters from the end of the string"
         }
       ]
+    }
   ],
   "Processors": [
     {

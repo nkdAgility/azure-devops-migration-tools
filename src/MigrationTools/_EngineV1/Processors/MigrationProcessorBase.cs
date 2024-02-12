@@ -96,7 +96,7 @@ namespace MigrationTools._EngineV1.Processors
                 var result = new TEnricherOptions();
                 result.SetDefaults();
                 commonEnricher.Configure(result);
-                Log.LogWarning("Default `{TEnricherOptions}` used... add a `{TEnricherOptions}` entry to `CommonEnrichersConfig` to customise the settings.", typeof(TEnricherOptions).Name);
+                Log.LogWarning("Using `{TEnricherOptions}` with Defaults... add a `{TEnricherOptions}` entry to `CommonEnrichersConfig` to customise the settings.", typeof(TEnricherOptions).Name);
             }
             else
             {
