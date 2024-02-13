@@ -68,7 +68,7 @@ namespace MigrationTools.ProcessorEnrichers.WorkItemProcessorEnrichers
                     }
                 }
             }
-            fieldItem.Value.ToString().Substring(0, Math.Min(fieldItem.Value.ToString().Length, _options.MaxStringLength));
+            fieldItem.Value.ToString().Substring(0, Math.Min(fieldItem.Value.ToString().Length-1, _options.MaxStringLength-1));
         }
     }
 
