@@ -31,11 +31,10 @@ jobs:
     displayName: gitversion/setup
     inputs:
       versionSpec: 5.x
-  - task: gittools.gittools.execute-gitversion-task.gitversion/execute@0
-    displayName: gitversion/execute
+  - task: gitversion/execute@0
     inputs:
       useConfigFile: true
-      configFilePath: GitVersion.yml
+      configFilePath: 'GitVersion.yml'
       updateAssemblyInfo: true
   - task: UseDotNet@2
     displayName: Use .NET Core sdk 7.x
