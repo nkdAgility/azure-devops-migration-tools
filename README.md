@@ -79,6 +79,7 @@ We use these tools with our customers, and for fun, to do real world migrations 
 
 ## Change Log
 
+- [v15.0.0](https://github.com/nkdAgility/azure-devops-migration-tools/releases/tag/v15.0.0) - Release v15! Query and CommonEnrichersConfig changes 
 - 14.3 - Created a flag for `ShouldCreateNodesUpFront`, while the default is `true` this is a private preview of a new feature. Instead of creating the area and iteration paths up front, this new feature instead creates the Area & Iteration paths at validation time. For each missing path it will create it, and for those that exist it will simply pass over after a `GetNodeFromPath` call. For tose wishing to participate in the preview please set `ShouldCreateNodesUpFront` to `false`, and to create the nodes rather than just list them set `ShouldCreateMissingRevisionPaths` to `true` as well. It will still list nodes that are not able to be created and require a mapping. NOTE: You can also run with `"ShouldCreateMissingRevisionPaths": false` to list all the nodes that will be created so that you can create more elaborate mappings. 
 - 14.2 - Removed the `StopMigrationOnMissingAreaIterationNodes` flag. All missing nodes MUST be present or mapped using `AreaMaps` and `IterationMaps`. System will always stop on missing nodes.
 - 14.1 - Enabled auto update on client devices, server still used choco
