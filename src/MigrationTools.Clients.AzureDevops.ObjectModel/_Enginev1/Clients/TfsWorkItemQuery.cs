@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Windows.Forms;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools.DataContracts;
@@ -55,14 +56,32 @@ namespace MigrationTools._EngineV1.Clients
                     Log.Information("{0} Work items received, verifying", workItemCollection.Count);
                     foreach (WorkItem item in workItemCollection)
                     {
+                        int id= 0;
                         try
                         {
+                            id = item.Id;
                             if (!string.IsNullOrEmpty(item.Title)) // Force to read WI
                                 results.Add(item);
                         }
                         catch (DeniedOrNotExistException ex)
                         {
-                            Log.Error(ex, "Deleted Item detected.");
+                            if (ex.InnerException is WorkItemTypeDeniedOrNotExistException)
+                            {
+                                Log.Warning(ex, "The Work Item {id} has a Work Item Type that is in its histroy that has been subsiquently deleted! It will not be posible to migrate this item untill this has been resovled", id);
+                            } else
+                            {
+                                Log.Warning(ex, "The Work Item {id} cant be accessed and returned a DeniedOrNotExistException! The specific error will be listed below.", id);
+                            }
+                            
+                            Telemetry.TrackException(ex, 
+                                                               new Dictionary<string, string>
+                                                               {
+                                    { "CollectionUrl", wiClient.Store.TeamProjectCollection.Uri.ToString() }
+                                },
+                                                                                              new Dictionary<string, double>
+                                                                                              {
+                                    { "QueryTime",timer.ElapsedMilliseconds }
+                                });
                         }
                     }
                 }
