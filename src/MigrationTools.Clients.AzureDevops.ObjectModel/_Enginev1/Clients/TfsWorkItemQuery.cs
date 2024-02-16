@@ -65,14 +65,8 @@ namespace MigrationTools._EngineV1.Clients
                         }
                         catch (DeniedOrNotExistException ex)
                         {
-                            if (ex.InnerException is WorkItemTypeDeniedOrNotExistException)
-                            {
-                                Log.Warning(ex, "The Work Item {id} has a Work Item Type that is in its histroy that has been subsiquently deleted! It will not be posible to migrate this item untill this has been resovled", id);
-                            } else
-                            {
-                                Log.Warning(ex, "The Work Item {id} cant be accessed and returned a DeniedOrNotExistException! The specific error will be listed below.", id);
-                            }
-                            
+                           
+                            Log.Warning(ex, "The Work Item {id} cant be accessed for some reason and returned a DeniedOrNotExistException! The specific error will be listed below.", id);
                             Telemetry.TrackException(ex, 
                                                                new Dictionary<string, string>
                                                                {
