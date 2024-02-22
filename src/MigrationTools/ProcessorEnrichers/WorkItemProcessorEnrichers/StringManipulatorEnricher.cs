@@ -53,22 +53,40 @@ namespace MigrationTools.ProcessorEnrichers.WorkItemProcessorEnrichers
                 Log.LogDebug("{WorkItemProcessorEnricher}::ProcessorExecutionWithFieldItem::Disabled", this.GetType().Name);
                 return;
             }
-            if (fieldItem.FieldType == "String")
+            if (fieldItem.FieldType == "String" && fieldItem.Value !=null)
             {
-                foreach (var manipulator in _options.Manipulators)
+                if (HasManipulators())
                 {
-                    if (manipulator.Enabled)
+                    foreach (var manipulator in _options.Manipulators)
                     {
-                        Log.LogDebug("{WorkItemProcessorEnricher}::ProcessorExecutionWithFieldItem::Running::{Description}", this.GetType().Name, manipulator.Description);
-                        fieldItem.Value = Regex.Replace((string)fieldItem.Value, manipulator.Pattern, manipulator.Replacement);
-                    }
-                    else
-                    {
-                        Log.LogDebug("{WorkItemProcessorEnricher}::ProcessorExecutionWithFieldItem::Disabled::{Description}", this.GetType().Name, manipulator.Description);
+                        if (manipulator.Enabled)
+                        {
+                            Log.LogDebug("{WorkItemProcessorEnricher}::ProcessorExecutionWithFieldItem::Running::{Description} with {pattern}", this.GetType().Name, manipulator.Description, manipulator.Pattern);
+                            fieldItem.Value = Regex.Replace((string)fieldItem.Value, manipulator.Pattern, manipulator.Replacement);
+
+                        }
+                        else
+                        {
+                            Log.LogDebug("{WorkItemProcessorEnricher}::ProcessorExecutionWithFieldItem::Disabled::{Description}", this.GetType().Name, manipulator.Description);
+                        }
                     }
                 }
+                if (HasStringTooLong(fieldItem))
+                {
+                    fieldItem.Value = fieldItem.Value.ToString().Substring(0, Math.Min(fieldItem.Value.ToString().Length, _options.MaxStringLength));
+                }
             }
-            fieldItem.Value.ToString().Substring(0, Math.Min(fieldItem.Value.ToString().Length-1, _options.MaxStringLength-1));
+
+        }
+
+        private bool HasStringTooLong(FieldItem fieldItem)
+        {
+            return fieldItem.Value.ToString().Length > 0 && fieldItem.Value.ToString().Length > _options.MaxStringLength;
+        }
+
+        private bool HasManipulators()
+        {
+            return _options.Manipulators != null && _options.Manipulators.Count > 0;
         }
     }
 
