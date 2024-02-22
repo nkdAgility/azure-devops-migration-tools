@@ -3,6 +3,7 @@ using MigrationTools._EngineV1.Containers;
 using MigrationTools.EndpointEnrichers;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
+using MigrationTools.ProcessorEnrichers.WorkItemProcessorEnrichers;
 using MigrationTools.Processors;
 using MigrationTools.TestExtensions;
 
@@ -28,6 +29,9 @@ namespace MigrationTools.Tests
             // Processors
             services.AddSingleton<WorkItemTrackingProcessor>();
             services.AddTransient<ProcessorEnricherContainer>();
+
+            // ProcessorEnrichers
+            services.AddSingleton<StringManipulatorEnricher>();
 
             //Endpoints
             services.AddTransient<InMemoryWorkItemEndpoint>();
