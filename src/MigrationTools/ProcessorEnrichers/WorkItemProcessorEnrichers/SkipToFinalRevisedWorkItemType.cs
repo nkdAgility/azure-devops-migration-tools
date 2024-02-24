@@ -8,9 +8,9 @@ namespace MigrationTools.Enrichers
 {
     public class SkipToFinalRevisedWorkItemType : WorkItemProcessorEnricher
     {
-        private SkipToFinalRevisedWorkItemTypeOptions _Options;
+        private StringManipulatorEnricherOptions _Options;
 
-        public SkipToFinalRevisedWorkItemTypeOptions Options
+        public StringManipulatorEnricherOptions Options
         {
             get { return _Options; }
         }
@@ -22,21 +22,9 @@ namespace MigrationTools.Enrichers
             Engine = Services.GetRequiredService<IMigrationEngine>();
         }
 
-        [Obsolete("Old v1 arch: this is a v2 class", true)]
-        public override void Configure(bool save = true, bool filter = true)
-        {
-            throw new System.NotImplementedException();
-        }
-
         public override void Configure(IProcessorEnricherOptions options)
         {
-            _Options = (SkipToFinalRevisedWorkItemTypeOptions)options;
-        }
-
-        [Obsolete("Old v1 arch: this is a v2 class", true)]
-        public override int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
-        {
-            throw new System.NotImplementedException();
+            _Options = (StringManipulatorEnricherOptions)options;
         }
 
         protected override void RefreshForProcessorType(IProcessor processor)
@@ -48,5 +36,6 @@ namespace MigrationTools.Enrichers
         {
             throw new NotImplementedException();
         }
+
     }
 }

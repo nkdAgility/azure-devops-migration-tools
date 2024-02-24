@@ -8,7 +8,7 @@ namespace VstsSyncMigrator.Engine.ComponentContext
 {
     public class TestManagementContext
     {
-        private readonly string testPlanQueryBit;
+        private readonly string testPlanQuery;
         private readonly IMigrationClient _source;
         private ITestManagementService tms;
 
@@ -18,9 +18,9 @@ namespace VstsSyncMigrator.Engine.ComponentContext
         {
         }
 
-        public TestManagementContext(IMigrationClient source, string testPlanQueryBit)
+        public TestManagementContext(IMigrationClient source, string testPlanQuery)
         {
-            this.testPlanQueryBit = testPlanQueryBit;
+            this.testPlanQuery = testPlanQuery;
             _source = source;
             tms = _source.GetService<ITestManagementService>();
             Project = tms.GetTeamProject(source.Config.AsTeamProjectConfig().Project);
@@ -28,9 +28,9 @@ namespace VstsSyncMigrator.Engine.ComponentContext
 
         internal List<ITestPlan> GetTestPlans()
         {
-            var query = (string.IsNullOrWhiteSpace(testPlanQueryBit))
+            var query = (string.IsNullOrWhiteSpace(testPlanQuery))
                 ? "Select * From TestPlan"
-                : $"Select * From TestPlan Where {testPlanQueryBit}";
+                : $"Select * From TestPlan Where {testPlanQuery}";
 
             var testPlans = Project.TestPlans.Query(query);
 

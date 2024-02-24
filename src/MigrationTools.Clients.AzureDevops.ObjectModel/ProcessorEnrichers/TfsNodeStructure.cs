@@ -37,6 +37,9 @@ namespace MigrationTools.Enrichers
         public Dictionary<string, bool> FoundNodes;
     }
 
+    /// <summary>
+    /// The TfsNodeStructureEnricher is used to create missing nodes in the target project. To configure it add a `TfsNodeStructureOptions` section to `CommonEnrichersConfig` in the config file. Otherwise defaults will be applied. 
+    /// </summary>
     public class TfsNodeStructure : WorkItemProcessorEnricher
     {
         private readonly Dictionary<string, NodeInfo> _pathToKnownNodeMap = new Dictionary<string, NodeInfo>();
@@ -132,9 +135,7 @@ namespace MigrationTools.Enrichers
                 var replaceEscapedSourceProjectName = _sourceProjectName.Replace("$", "$$");
                 var replaceEscapedTargetProjectName = _targetProjectName.Replace("$", "$$");
 
-                _lastResortRemapRule = _Options.PrefixProjectToNodes
-                    ? new KeyValuePair<string, string>($"^{searchEscapedSourceProjectName}", $"{replaceEscapedTargetProjectName}\\{replaceEscapedSourceProjectName}")
-                    : new KeyValuePair<string, string>($"^{searchEscapedSourceProjectName}", $"{replaceEscapedTargetProjectName}");
+                _lastResortRemapRule = new KeyValuePair<string, string>($"^{searchEscapedSourceProjectName}", $"{replaceEscapedTargetProjectName}");
             }
 
             return _lastResortRemapRule.Value;

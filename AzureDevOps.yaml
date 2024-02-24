@@ -1,0 +1,197 @@
+# 'Allow scripts to access the OAuth token' was selected in pipeline.  Add the following YAML to any steps requiring access:
+#       env:
+#           MY_ACCESS_TOKEN: $(System.AccessToken)
+# Variable 'agent.diagnostic' was defined in the Variables tab
+# Variable 'azuredevopsToken' was defined in the Variables tab
+# Variable 'githubToken' was defined in the Variables tab
+# Variable 'wingetPAT' was defined in the Variables tab
+trigger:
+  branches:
+    include:
+    - refs/heads/master
+    - refs/heads/preview
+
+  paths:
+    exclude:
+    - /.github/*
+    - /docs/*
+
+name: $(GITVERSION_SemVer)
+jobs:
+- job: Build
+  displayName: Build
+  cancelTimeoutInMinutes: 1
+  pool:
+    vmImage: windows-latest
+  steps:
+  - checkout: self
+    fetchTags: true
+    persistCredentials: True
+  - task: gittools.gittools.setup-gitversion-task.gitversion/setup@0
+    displayName: gitversion/setup
+    inputs:
+      versionSpec: 5.x
+  - task: gitversion/execute@0
+    inputs:
+      useConfigFile: true
+      configFilePath: 'GitVersion.yml'
+      updateAssemblyInfo: true
+  - task: UseDotNet@2
+    displayName: Use .NET Core sdk 7.x
+    inputs:
+      version: 7.x
+  - task: DotNetCoreCLI@2
+    displayName: dotnet restore
+    inputs:
+      command: restore
+      projects: '**/*.sln'
+  - task: SonarSource.sonarcloud.14d9cde6-c1da-4d55-aa01-2965cd301255.SonarCloudPrepare@1
+    displayName: Prepare analysis on SonarCloud
+    continueOnError: True
+    inputs:
+      SonarCloud: f98e494c-4566-47a7-9d9d-5c39533c2ff4
+      organization: nkdagility
+      projectKey: vsts-sync-migrator:master
+      projectName: vsts-sync-migrator
+      projectVersion: $(GITVERSION.SemVer)
+  - task: DotNetCoreCLI@2
+    displayName: dotnet build
+    inputs:
+      arguments: -c $(BuildConfiguration) --no-restore /p:Version=$(GitVersion.AssemblySemVer)
+  - task: DotNetCoreCLI@2
+    displayName: dotnet test (L0 & L1)
+    continueOnError: True
+    inputs:
+      command: test
+      projects: '**/*Tests/*.csproj'
+      arguments: -c $(BuildConfiguration) --collect "Code coverage" --no-build --filter (TestCategory=L0|TestCategory=L1)
+      testRunTitle: $(GitVersion.SemVer)
+  - task: DotNetCoreCLI@2
+    displayName: dotnet test (L2 & L3)
+    continueOnError: True
+    inputs:
+      command: test
+      projects: '**/*Tests/*.csproj'
+      arguments: -c $(BuildConfiguration) --collect "Code coverage" --no-build  --filter (TestCategory=L2|TestCategory=L3)
+      testRunTitle: $(GitVersion.SemVer)
+  - task: DotNetCoreCLI@2
+    displayName: dotnet test (L?) - tests with No Catagory
+    continueOnError: True
+    inputs:
+      command: test
+      projects: '**/*Tests/*.csproj'
+      arguments: -c $(BuildConfiguration) --collect "Code coverage" --no-build  --filter (TestCategory!=L0&TestCategory!=L1&TestCategory!=L2&TestCategory!=L3)
+      testRunTitle: $(GitVersion.SemVer)
+  - task: SonarSource.sonarcloud.ce096e50-6155-4de8-8800-4221aaeed4a1.SonarCloudAnalyze@1
+    displayName: Run Code Analysis
+    continueOnError: True
+  - task: PublishSymbols@2
+    name: PublishSymbols_7
+    displayName: 'Publish symbols path: '
+    continueOnError: True
+    inputs:
+      SymbolsFolder: ''
+      SearchPattern: '**\bin\**\*.pdb'
+      SymbolServerType: TeamServices
+      SymbolsMaximumWaitTime: 5
+  - task: CopyFiles@2
+    displayName: 'Copy : ConsoleFull'
+    inputs:
+      SourceFolder: $(Build.SourcesDirectory)\src\MigrationTools.ConsoleFull\bin\Release\net472\
+      TargetFolder: $(Build.ArtifactStagingDirectory)/MigrationTools/
+  - task: CopyFiles@2
+    displayName: 'Copy : ConsoleCore'
+    inputs:
+      SourceFolder: $(Build.SourcesDirectory)\src\MigrationTools.ConsoleCore\bin\Release\net7.0\
+      TargetFolder: $(Build.ArtifactStagingDirectory)/MigrationTools/preview/
+  - task: CopyFiles@2
+    displayName: 'Copy : Samples'
+    inputs:
+      SourceFolder: $(Build.SourcesDirectory)\src\MigrationTools.Samples\
+      TargetFolder: $(Build.ArtifactStagingDirectory)/MigrationTools/ConfigSamples
+  - task: ms-devlabs.utilitytasks.task-zip.zip@0
+    name: zip_8
+    displayName: Zip MigrationTools
+    condition: succeededOrFailed()
+    inputs:
+      pathToZipFolder: $(Build.ArtifactStagingDirectory)/MigrationTools/
+      pathToZipFile: $(Build.ArtifactStagingDirectory)/MigrationTools-$(GITVERSION.SemVer).zip
+      overwrite: true
+  - task: DeleteFiles@1
+    displayName: Delete MigrationTools Staging folder
+    continueOnError: True
+    inputs:
+      SourceFolder: $(Build.ArtifactStagingDirectory)/MigrationTools
+      Contents: '*'
+      RemoveSourceFolder: true
+  - task: PowerShell@2
+    name: PowerShell_9
+    displayName: Get-FileHash (.net)
+    inputs:
+      targetType: inline
+      script: >-
+        $ZipHash = Get-FileHash $Env:Build_ArtifactStagingDirectory/MigrationTools-$Env:GITVERSION_SemVer.zip -Algorithm SHA256
+
+        Write-Host "##vso[task.setvariable variable=Chocolatey.FileHash;]$($ZipHash.Hash)"
+
+        Write-Host "##vso[task.setvariable variable=Chocolatey.FullHash;]$ZipHash"
+  - task: qetza.replacetokens.replacetokens-task.replacetokens@5
+    name: replacetokens_10
+    displayName: Replace tokens in **\*.json **\*.md **\*.ps1
+    inputs:
+      rootDirectory: $(System.DefaultWorkingDirectory)
+      targetFiles: >-
+        **\*.json
+
+        **\*.md
+
+        **\*.ps1
+      escapeType: none
+  - task: ms-devlabs.vsts-developer-tools-build-tasks.tfx-installer-build-task.TfxInstaller@4
+    displayName: 'Use Node CLI for Azure DevOps (tfx-cli): v0.7.x'
+    inputs:
+      version: v0.7.x
+  - task: ms-devlabs.vsts-developer-tools-build-tasks.package-extension-build-task.PackageAzureDevOpsExtension@4
+    name: PackageVSTSExtension_11
+    displayName: 'Package Extension: src\MigrationTools.Extension'
+    inputs:
+      rootFolder: src\MigrationTools.Extension
+      outputPath: $(Build.ArtifactStagingDirectory)
+      extensionVisibility: public
+      extensionPricing: free
+  - task: gep13.chocolatey-azuredevops.chocolatey-azuredevops.ChocolateyCommand@0
+    displayName: Chocolatey pack
+    continueOnError: True
+    inputs:
+      packWorkingDirectory: src/MigrationTools.Chocolatey/
+      packNuspecFileName: nkdAgility.AzureDevOpsMigrationTools.nuspec
+      packVersion: $(GitVersion.NuGetVersion)
+  - task: CopyFiles@2
+    displayName: 'Copy : MigrationTools.nupkg'
+    inputs:
+      SourceFolder: $(Build.SourcesDirectory)\src\MigrationTools\bin\
+      Contents: '**\*.nupkg'
+      TargetFolder: $(Build.ArtifactStagingDirectory)
+      flattenFolders: true
+  - task: CopyFiles@2
+    displayName: 'Copy : MigrationTools Winget'
+    inputs:
+      SourceFolder: $(Build.SourcesDirectory)\src\MigrationTools.WinGet\
+      Contents: '**\*'
+      TargetFolder: $(Build.ArtifactStagingDirectory)\WinGet
+      flattenFolders: true
+  - task: nkdagility.variablehydration.variabledehydration-task.variabledehydration@0
+    name: variabledehydration_14
+    displayName: (de)Hydrate Build Veriables GITVERSION,BUILD,Extension,Chocolatey
+    condition: succeededOrFailed()
+    inputs:
+      prefixes: GITVERSION,BUILD,Extension,Chocolatey
+  - task: PublishBuildArtifacts@1
+    name: PublishBuildArtifacts_15
+    displayName: 'Publish Artifact: drop'
+    condition: succeededOrFailed()
+    inputs:
+      PathtoPublish: $(build.artifactstagingdirectory)
+      TargetPath: '\\my\share\$(Build.DefinitionName)\$(Build.BuildNumber)'
+  - task: SonarSource.sonarcloud.38b27399-a642-40af-bb7d-9971f69712e8.SonarCloudPublish@1
+    displayName: Publish Analysis Result
