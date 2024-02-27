@@ -113,11 +113,11 @@ in the replacement string.
 
 Before your migration starts it will validate that all of the Areas and Iterations from the **Source** work items revisions exist on the **Target**. Any that do not exist will be flagged in the logs and if and the migration will stop just after it outputs a list of the missing nodes.
 
-Our algorithm that converts the Source nodes to Target nodes processes the [mappings](https://nkdagility.com/learn/azure-devops-migration-tools/Reference/v1/Processors/WorkItemMigrationContext/#iteration-maps-and-area-maps) at that time. This means that any valid mapped nodes will never be caught by the `This path is not anchored in the source project` message as they are already altered to be valid.
+Our algorithm that converts the Source nodes to Target nodes processes the mappings at that time. This means that any valid mapped nodes will never be caught by the `This path is not anchored in the source project` message as they are already altered to be valid.
 
 > We recently updated the logging for this part of the system to more easily debug both your mappings and to see what they system is doing with the nodes and their current state. You can set `"LogLevel": "Debug"` to see the details.
 
-To add a mapping, you can follow [the documentation](https://nkdagility.com/learn/azure-devops-migration-tools/Reference/v1/Processors/WorkItemMigrationContext/#iteration-maps-and-area-maps) with this being the simplest way:
+To add a mapping, you can follow the documentation with this being the simplest way:
 
 ```
 "IterationMaps": {
