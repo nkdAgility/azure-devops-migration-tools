@@ -652,6 +652,7 @@ namespace MigrationTools.Enrichers
             if (missingItems.Count > 0)
             {
                 contextLog.Warning("!! There are MISSING Area or Iteration Paths");
+                contextLog.Warning("NOTE: It is NOT posible to migrate a work item if the Area or Iteration path does not exist on the target project. This is because the work item will be created with the same Area and Iteration path as the source work item with the project name swapped. If the path does not exist, the work item will not be created. The only way to resove this is to follow the instrucations:");
                 contextLog.Warning("!! There are {missingAreaPaths} Nodes (Area or Iteration) found in the history of the Source that are missing from the Target! These MUST be added or mapped before we can continue using the instructions on https://nkdagility.com/learn/azure-devops-migration-tools//Reference/v2/ProcessorEnrichers/TfsNodeStructure/#iteration-maps-and-area-maps", missingItems.Count);
                 foreach (NodeStructureItem missingItem in missingItems)
                 {
