@@ -1,7 +1,7 @@
 
 
 
-# Iteration Maps and Area Maps
+## Iteration Maps and Area Maps
 
 **NOTE: It is NOT posible to migrate a work item if the Area or Iteration path does not exist on the target project. This is because the work item will be created with the same Area and Iteration path as the source work item. If the path does not exist, the work item will not be created. _There is not way around this!_**
 
@@ -10,7 +10,7 @@ You have two options to solve this problem:
 1. You can manualy create the mentioned work items. This is a good option if you have a small number of work items or a small number of missing nodes. This will not work if you have work items that were moved from one project to another. Those Nodes are imposible to create in the target project.
 1. You can use the `AreaMaps` and `IterationMaps` to remap the nodes to existing nodes in the target project. This is a good option if you have a large number of work items or a large number of missing nodes.
 
-## Overview
+### Overview
 
 These two configuration elements apply after the `NodeBasePaths` selector, i.e.
 only on Areas and Iterations that have been selected for migration. They allow
@@ -48,7 +48,7 @@ pattern does not include a terminating backslash, then none should be included
 in the replacement string.
 
 
-## Configuration
+### Configuration
 
 ```json
 "IterationMaps": {
@@ -192,7 +192,7 @@ This will prepend a bucket to the area and iteration paths. This is useful when 
 ],
 ```
 
-## <a name="NodeBasePath"></a>NodeBasePath Configuration ##
+## <a name="NodeBasePath"></a>NodeBasePath Configuration
 The `NodeBasePaths` entry allows the filtering of the nodes to be replicated on the target projects. To try to explain the correct usage let us assume that we have a source team project `SourceProj` with the following node structures
 
 - AreaPath
