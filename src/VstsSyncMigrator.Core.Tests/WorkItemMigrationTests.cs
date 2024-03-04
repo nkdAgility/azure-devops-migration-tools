@@ -43,6 +43,10 @@ namespace VstsSyncMigrator.Core.Tests
                 },
             });
 
+            //IMigrationEngine xx = _services.GetRequiredService<IMigrationEngine>();
+           // IOptions < EngineConfiguration> engine =  _services.GetRequiredService<IOptions<EngineConfiguration>>();
+
+
             _underTest = new WorkItemMigrationContext(_services.GetRequiredService<IMigrationEngine>(),
                                                       _services,
                                                       _services.GetRequiredService<ITelemetryLogger>(),
@@ -54,13 +58,15 @@ namespace VstsSyncMigrator.Core.Tests
                                                       _services.GetRequiredService<TfsWorkItemEmbededLinkEnricher>(),
                                                       _services.GetRequiredService<TfsValidateRequiredField>(),
                                                       _services.GetRequiredService<IOptions<EngineConfiguration>>());
+
             _underTest.Configure(new WorkItemMigrationConfig
             {
 
             });
+           
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("L0")]
         public void TestFixAreaPath_WhenNoAreaPathOrIterationPath_DoesntChangeQuery()
         {
             string WIQLQueryBit = @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
@@ -71,7 +77,7 @@ namespace VstsSyncMigrator.Core.Tests
         }
 
 
-        [TestMethod]
+        [TestMethod, TestCategory("L0")]
         public void TestFixAreaPath_WhenAreaPathInQuery_ChangesQuery()
         {
             string WIQLQueryBit = @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.AreaPath] = 'SourceServer\Area\Path1' AND   [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
@@ -82,7 +88,7 @@ namespace VstsSyncMigrator.Core.Tests
             Assert.AreEqual(expectTargetQueryBit, targetWIQLQueryBit);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("L1")]
         public void TestFixAreaPath_WhenAreaPathInQuery_WithPrefixProjectToNodesEnabled_ChangesQuery()
         {
             var nodeStructure = _services.GetRequiredService<TfsNodeStructure>();
@@ -102,7 +108,7 @@ namespace VstsSyncMigrator.Core.Tests
             Assert.AreEqual(expectTargetQueryBit, targetWIQLQuery);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("L1")]
         public void TestFixAreaPath_WhenAreaPathInQuery_WithPrefixProjectToNodesDisabled_SupportsWhitespaces()
         {
             var nodeStructure = _services.GetRequiredService<TfsNodeStructure>();
@@ -129,7 +135,7 @@ namespace VstsSyncMigrator.Core.Tests
             Assert.AreEqual(expectTargetQueryBit, targetWIQLQueryBit);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("L1")]
         public void TestFixAreaPath_WhenAreaPathInQuery_WithPrefixProjectToNodesEnabled_SupportsWhitespaces()
         {
             var nodeStructure = _services.GetRequiredService<TfsNodeStructure>();
@@ -156,7 +162,7 @@ namespace VstsSyncMigrator.Core.Tests
             Assert.AreEqual(expectTargetQueryBit, targetWIQLQueryBit);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("L0")]
         public void TestFixAreaPath_WhenMultipleAreaPathInQuery_ChangesQuery()
         {
             string WIQLQueryBit = @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.AreaPath] = 'SourceServer\Area\Path1' OR [System.AreaPath] = 'SourceServer\Area\Path2' AND [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
@@ -167,7 +173,7 @@ namespace VstsSyncMigrator.Core.Tests
             Assert.AreEqual(expectTargetQueryBit, targetWIQLQueryBit);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("L0")]
         public void TestFixAreaPath_WhenAreaPathAtEndOfQuery_ChangesQuery()
         {
             string WIQLQueryBit = @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan') AND [System.AreaPath] = 'SourceServer\Area\Path1'";
@@ -178,7 +184,7 @@ namespace VstsSyncMigrator.Core.Tests
             Assert.AreEqual(expectTargetQueryBit, targetWIQLQueryBit);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("L0")]
         public void TestFixIterationPath_WhenInQuery_ChangesQuery()
         {
             string WIQLQueryBit = @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.IterationPath] = 'SourceServer\Iteration\Path1' AND   [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
@@ -189,7 +195,7 @@ namespace VstsSyncMigrator.Core.Tests
             Assert.AreEqual(expectTargetQueryBit, targetWIQLQueryBit);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("L0")]
         public void TestFixAreaPathAndIteration_WhenMultipleOccuranceInQuery_ChangesQuery()
         {
             string WIQLQueryBit = @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND ([System.AreaPath] = 'SourceServer\Area\Path1' OR [System.AreaPath] = 'SourceServer\Area\Path2') AND ([System.IterationPath] = 'SourceServer\Iteration\Path1' OR [System.IterationPath] = 'SourceServer\Iteration\Path2') AND [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
@@ -200,7 +206,7 @@ namespace VstsSyncMigrator.Core.Tests
             Assert.AreEqual(expectTargetQueryBit, targetWIQLQueryBit);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("L0")]
         public void TestFixAreaPathAndIteration_WhenMultipleOccuranceWithMixtureOrEqualAndUnderOperatorsInQuery_ChangesQuery()
         {
             string WIQLQueryBit = @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND ([System.AreaPath] = 'SourceServer\Area\Path1' OR [System.AreaPath] UNDER 'SourceServer\Area\Path2') AND ([System.IterationPath] UNDER 'SourceServer\Iteration\Path1' OR [System.IterationPath] = 'SourceServer\Iteration\Path2') AND [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
