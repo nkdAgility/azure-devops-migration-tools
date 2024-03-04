@@ -36,22 +36,16 @@ namespace MigrationTools._EngineV1.Clients
 
         public List<WorkItemData> FilterExistingWorkItems(
             List<WorkItemData> sourceWorkItems,
-            TfsWiqlDefinition wiqlDefinition,
+            string query,
             TfsWorkItemMigrationClient sourceWorkItemMigrationClient)
         {
             Log.Debug("FilterExistingWorkItems: START | ");
 
-            var targetQuery =
-                string.Format(
-                    @"SELECT [System.Id], [{0}] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {1} ORDER BY {2}",
-                     _config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName,
-                    wiqlDefinition.QueryBit,
-                    wiqlDefinition.OrderBit);
 
             Log.Debug("FilterByTarget: Query Execute...");
-            var targetFoundItems = GetWorkItems(targetQuery);
+            var targetFoundItems = GetWorkItems(query);
             Log.Debug("FilterByTarget: ... query complete.");
-            Log.Debug("FilterByTarget: Found {TargetWorkItemCount} based on the WIQLQueryBit in the target system.", targetFoundItems.Count);
+            Log.Debug("FilterByTarget: Found {TargetWorkItemCount} based on the WIQLQuery in the target system.", targetFoundItems.Count);
             var targetFoundIds = (from WorkItemData twi in targetFoundItems select GetReflectedWorkItemId(twi))
                 //exclude null IDs
                 .Where(x=> x != null)
@@ -217,6 +211,7 @@ namespace MigrationTools._EngineV1.Clients
             var wiqb = _workItemQueryBuilderFactory.Create();
             wiqb.Query = WIQLQuery;
             wiqb.AddParameter("TeamProject", MigrationClient.Config.AsTeamProjectConfig().Project);
+            wiqb.AddParameter("ReflectedWorkItemIdFieldName", MigrationClient.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName);
             return wiqb.BuildWIQLQuery(MigrationClient);
         }
 
@@ -290,6 +285,15 @@ namespace MigrationTools._EngineV1.Clients
                 store = new WorkItemStore((TfsTeamProjectCollection)MigrationClient.InternalCollection, _bypassRules);
                 timer.Stop();
                 Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", MigrationClient.Config.AsTeamProjectConfig().Collection.ToString(), "GetWorkItemStore", null, startTime, timer.Elapsed, "200", true));
+                Log.Information("Work Item Store connected to {InternalCollection} with BypassRules set to {bypassRules}", _config.AsTeamProjectConfig().Collection, store.BypassRules);
+                if (_bypassRules == WorkItemStoreFlags.BypassRules)
+                {
+                    if (store.BypassRules == false)
+                    {
+                        Log.Warning("TfsWorkItemMigrationClient::BypassRules Is not Enabled. Check your permissions on the server!");
+                    }
+                }
+
             }
             catch (Exception ex)
             {

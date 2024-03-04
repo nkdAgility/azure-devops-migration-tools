@@ -59,5 +59,10 @@ namespace MigrationTools.Enrichers
         {
             Log.LogDebug("{WorkItemProcessorEnricher}::ProcessorExecutionBeforeProcessWorkItem::NoAction", this.GetType().Name);
         }
+
+        public virtual void ProcessorExecutionWithFieldItem(IProcessor processor, FieldItem fieldItem)
+        {
+            Log.LogDebug("{WorkItemProcessorEnricher}::ProcessorExecutionWithFieldItem::NoAction", this.GetType().Name);
+        }
     }
 }

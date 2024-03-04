@@ -177,7 +177,6 @@
       "$type": "WorkItemTrackingProcessorOptions",
       "Enabled": false,
       "ReplayRevisions": true,
-      "PrefixProjectToNodes": false,
       "CollapseRevisions": false,
       "WorkItemCreateRetryLimit": 5,
       "Enrichers": [
@@ -263,7 +262,6 @@
     {
       "$type": "TfsAreaAndIterationProcessorOptions",
       "Enabled": true,
-      "PrefixProjectToNodes": false,
       "SourceName": "Source",
       "TargetName": "Target"
     }
