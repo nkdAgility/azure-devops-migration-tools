@@ -43,6 +43,10 @@ namespace VstsSyncMigrator.Core.Tests
                 },
             });
 
+            //IMigrationEngine xx = _services.GetRequiredService<IMigrationEngine>();
+           // IOptions < EngineConfiguration> engine =  _services.GetRequiredService<IOptions<EngineConfiguration>>();
+
+
             _underTest = new WorkItemMigrationContext(_services.GetRequiredService<IMigrationEngine>(),
                                                       _services,
                                                       _services.GetRequiredService<ITelemetryLogger>(),
@@ -54,6 +58,7 @@ namespace VstsSyncMigrator.Core.Tests
                                                       _services.GetRequiredService<TfsWorkItemEmbededLinkEnricher>(),
                                                       _services.GetRequiredService<TfsValidateRequiredField>(),
                                                       _services.GetRequiredService<IOptions<EngineConfiguration>>());
+
             _underTest.Configure(new WorkItemMigrationConfig
             {
 

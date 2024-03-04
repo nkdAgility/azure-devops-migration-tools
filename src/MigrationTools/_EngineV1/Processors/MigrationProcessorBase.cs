@@ -90,7 +90,11 @@ namespace MigrationTools._EngineV1.Processors
             where TEnricherOptions : IProcessorEnricherOptions, new()
             where TEnricher : IProcessorEnricher
         {
-            var config = commonEnrichersStore.OfType<TEnricherOptions>().FirstOrDefault();
+            TEnricherOptions config = default(TEnricherOptions);
+            if (commonEnrichersStore != null)
+            {
+                config = commonEnrichersStore.OfType<TEnricherOptions>().FirstOrDefault();
+            }
             if (config == null)
             {
                 var result = new TEnricherOptions();

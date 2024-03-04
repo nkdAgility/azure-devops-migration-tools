@@ -74,7 +74,7 @@
   "Processors": [
     {
       "$type": "WorkItemMigrationConfig",
-      "Enabled": false,
+      "Enabled": true,
       "UpdateCreatedDate": true,
       "UpdateCreatedBy": true,
       "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
@@ -96,7 +96,7 @@
       "SkipRevisionWithInvalidAreaPath": false
     }
   ],
-  "Version": "14.2",
+  "Version": "15.0",
   "workaroundForQuerySOAPBugEnabled": false,
   "WorkItemTypeDefinition": {
     "sourceWorkItemTypeName": "targetWorkItemTypeName"
