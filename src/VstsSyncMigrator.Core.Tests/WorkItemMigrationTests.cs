@@ -94,10 +94,17 @@ namespace VstsSyncMigrator.Core.Tests
             var nodeStructure = _services.GetRequiredService<TfsNodeStructure>();
 
             // For this test we use the prefixing of the project node and no remapping rule
+
+
             nodeStructure.Configure(new TfsNodeStructureOptions
             {
-                AreaMaps = new Dictionary<string, string>(),
-                IterationMaps = new Dictionary<string, string>(),
+                AreaMaps = new Dictionary<string, string>( )
+                {
+                    { "^SourceServer\\\\(.*)" , "TargetServer\\SourceServer\\$1" }
+                },
+                IterationMaps = new Dictionary<string, string>(){
+                    { "^SourceServer\\\\(.*)" , "TargetServer\\SourceServer\\$1" }
+                },
             });
 
             string WIQLQueryBit = @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.AreaPath] = 'SourceServer\Area\Path1' AND   [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
@@ -150,8 +157,13 @@ namespace VstsSyncMigrator.Core.Tests
             // For this test we use the prefixing of the project node and no remapping rules
             nodeStructure.Configure(new TfsNodeStructureOptions
             {
-                AreaMaps = new Dictionary<string, string>(),
-                IterationMaps = new Dictionary<string, string>(),
+                AreaMaps = new Dictionary<string, string>()
+                {
+                    { "^SourceServer\\\\(.*)" , "TargetServer\\SourceServer\\$1" }
+                },
+                IterationMaps = new Dictionary<string, string>(){
+                    { "^SourceServer\\\\(.*)" , "TargetServer\\SourceServer\\$1" }
+                },
             });
 
             var WIQLQueryBit = @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.AreaPath] = 'Source Project\Area\Path1' AND   [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
