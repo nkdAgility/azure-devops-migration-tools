@@ -78,6 +78,16 @@ The tools will be installed to `C:\Tools\MigrationTools\` which should be added 
 
 You can download the [latest release](https://github.com/nkdAgility/azure-devops-migration-tools/releases/latest) and unzip it to a folder of your choice.
 
+## Advanced tools
+
+There are additional advanced tooling available on [Azure DevOps Automation Tools](https://github.com/nkdAgility/azure-devops-automation-tools). These are a collection of Powershell scripts that can be used to;
+
+- Generate Migration Tools configurations across many projects on many organisations
+- Export Stats on many projects on many organisations
+- Publish Custom fields across many projects on many organisations
+- Output the fields and other data for many projects on many organisations
+
+These tools are designed to help you manage migration of Work Items at scale.
 
 ## Support
 
