@@ -26,8 +26,11 @@ namespace MigrationTools.ProcessorEnrichers
         private TfsAttachmentEnricherOptions _options;
         private WorkItemServer _workItemServer;
 
+        public TfsAttachmentEnricherOptions Options {  get { return _options; } } 
+
         public TfsAttachmentEnricher(IServiceProvider services, ILogger<WorkItemProcessorEnricher> logger) : base(services, logger)
         {
+             
         }
 
         public void ProcessAttachemnts(WorkItemData source, WorkItemData target, bool save = true)

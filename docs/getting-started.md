@@ -18,9 +18,11 @@ Watch the [Video Overview](https://youtu.be/RCJsST0xBCE) to get started in 30 mi
 In order to run the migration you will need to install the tools first.
 
 1. Install [winget](https://learn.microsoft.com/en-us/windows/package-manager/winget/)
-1. Run `winget install nkdAgility.AzureDevOpsMigrationTools` from the [Windows Terminal](https://learn.microsoft.com/en-us/windows/terminal/) to install on Windows 10 and Windows 11. For other operating systems you can download the [latest release](https://github.com/nkdAgility/azure-devops-migration-tools/releases/latest) and unzip it to a folder of your choice.
+1. Run `winget install nkdAgility.AzureDevOpsMigrationTools` from the [Windows Terminal](https://learn.microsoft.com/en-us/windows/terminal/) (Not eleveated) to install on Windows 10 and Windows 11. For other operating systems you can download the [latest release](https://github.com/nkdAgility/azure-devops-migration-tools/releases/latest) and unzip it to a folder of your choice.
 
-The tools will be installed to `%Localappdata%\Microsoft\WinGet\Packages\nkdAgility.AzureDevOpsMigrationTools_Microsoft.Winget.Source_XXXXXXXXXX` and a symbolic link to `devopsmigration.exe` that lets you run it from anywhere using `devopsmigration init`.
+Note: The tools will be installed to `%Localappdata%\Microsoft\WinGet\Packages\nkdAgility.AzureDevOpsMigrationTools_Microsoft.Winget.Source_XXXXXXXXXX` and a symbolic link to `devopsmigration.exe` that lets you run it from anywhere using `devopsmigration init`.
+
+**Note: There is a known issue with the winget package that it does not add the tools to the PATH if you use an elevated Terminal. You can add the tools to the PATH manually by adding `%Localappdata%\Microsoft\WinGet\Packages\nkdAgility.AzureDevOpsMigrationTools_Microsoft.Winget.Source_XXXXXXXXXX\tools` to the PATH.**
 
 ## Upgrade
 
