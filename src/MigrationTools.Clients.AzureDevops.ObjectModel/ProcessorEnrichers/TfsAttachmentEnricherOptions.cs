@@ -22,13 +22,13 @@ namespace MigrationTools.Enrichers
         /// For Azure DevOps Services the default is 480,000,000 bites (60mb), for TFS its 32,000,000 bites (4mb).
         /// </summary>
         /// <default>480000000</default>
-        public string MaxAttachmentSize { get; set; }
+        public int MaxAttachmentSize { get; set; }
 
         public override void SetDefaults()
         {
             Enabled = true;
             ExportBasePath = @"c:\temp\WorkItemAttachmentExport";
-            MaxAttachmentSize = "480000000";
+            MaxAttachmentSize = 480000000;
         }
 
         static public TfsAttachmentEnricherOptions GetDefaults()
@@ -42,7 +42,7 @@ namespace MigrationTools.Enrichers
     public interface ITfsAttachmentEnricherOptions
     {
         public string ExportBasePath { get; set; }
-    public string MaxAttachmentSize { get; set; }
+    public int MaxAttachmentSize { get; set; }
 
     }
 }
