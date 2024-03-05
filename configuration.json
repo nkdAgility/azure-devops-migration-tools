@@ -102,7 +102,15 @@
       "$type": "ExportUsersForMappingConfig",
       "Enabled": true,
       "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
-      "IdentityFieldsToCheck": [ "System.AssignedTo" ]
+      "LocalExportJsonFile": "c:\\temp\\userExport.json",
+      "IdentityFieldsToCheck": [
+        "System.AssignedTo",
+        "System.ChangedBy",
+        "System.CreatedBy",
+        "Microsoft.VSTS.Common.ActivatedBy",
+        "Microsoft.VSTS.Common.ResolvedBy",
+        "Microsoft.VSTS.Common.ClosedBy"
+      ]
     }
   ],
   "Version": "15.0",
