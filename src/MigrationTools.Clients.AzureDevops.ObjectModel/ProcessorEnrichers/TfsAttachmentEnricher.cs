@@ -2,30 +2,37 @@
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.TeamFoundation.Server;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Proxy;
+using MigrationTools._EngineV1.Configuration.Processing;
 using MigrationTools._EngineV1.Enrichers;
 using MigrationTools.DataContracts;
+using MigrationTools.Endpoints;
+using MigrationTools.Enrichers;
+using MigrationTools.Processors;
 using Serilog;
 
-namespace MigrationTools.Enrichers
+namespace MigrationTools.ProcessorEnrichers
 {
-    public class TfsAttachmentEnricher : IAttachmentMigrationEnricher
+    public class TfsAttachmentEnricher : WorkItemProcessorEnricher, IAttachmentMigrationEnricher
     {
         private WorkItemServer _server;
         private string _exportBasePath;
         private string _exportWiPath;
         private int _maxAttachmentSize;
+        private TfsAttachmentEnricherOptions _options;
+        private WorkItemServer _workItemServer;
 
-        public TfsAttachmentEnricher(WorkItemServer workItemServer, string exportBasePath, int maxAttachmentSize = 480000000)
+        public TfsAttachmentEnricher(IServiceProvider services, ILogger<WorkItemProcessorEnricher> logger) : base(services, logger)
         {
-            _server = workItemServer;
-            _exportBasePath = exportBasePath;
-            _maxAttachmentSize = maxAttachmentSize;
         }
 
         public void ProcessAttachemnts(WorkItemData source, WorkItemData target, bool save = true)
         {
+            SetupWorkItemServer();
             if (source is null)
             {
                 throw new ArgumentNullException(nameof(source));
@@ -35,14 +42,13 @@ namespace MigrationTools.Enrichers
             {
                 throw new ArgumentNullException(nameof(target));
             }
-
-            Log.Information("AttachmentMigrationEnricher: Migrating  {AttachmentCount} attachemnts from {SourceWorkItemID} to {TargetWorkItemID}", source.ToWorkItem().Attachments.Count, source.Id, target.Id);
+            Log.LogInformation("AttachmentMigrationEnricher: Migrating  {AttachmentCount} attachemnts from {SourceWorkItemID} to {TargetWorkItemID}", source.ToWorkItem().Attachments.Count, source.Id, target.Id);
             _exportWiPath = Path.Combine(_exportBasePath, source.ToWorkItem().Id.ToString());
-            if (System.IO.Directory.Exists(_exportWiPath))
+            if (Directory.Exists(_exportWiPath))
             {
-                System.IO.Directory.Delete(_exportWiPath, true);
+                Directory.Delete(_exportWiPath, true);
             }
-            System.IO.Directory.CreateDirectory(_exportWiPath);
+            Directory.CreateDirectory(_exportWiPath);
 
 
             int count = 0;
@@ -51,60 +57,62 @@ namespace MigrationTools.Enrichers
                 count++;
                 if (count > 100)
                 {
-                    break; 
+                    break;
                 }
 
                 try
                 {
                     string filepath = null;
-                    System.IO.Directory.CreateDirectory(Path.Combine(_exportWiPath, wia.Id.ToString()));
+                    Directory.CreateDirectory(Path.Combine(_exportWiPath, wia.Id.ToString()));
                     filepath = ExportAttachment(source.ToWorkItem(), wia, _exportWiPath);
-                    Log.Debug("AttachmentMigrationEnricher: Exported {Filename} to disk", System.IO.Path.GetFileName(filepath));
+                    Log.LogDebug("AttachmentMigrationEnricher: Exported {Filename} to disk", Path.GetFileName(filepath));
                     if (filepath != null)
                     {
                         ImportAttachment(target.ToWorkItem(), wia, filepath, save);
-                        Log.Debug("AttachmentMigrationEnricher: Imported {Filename} from disk", System.IO.Path.GetFileName(filepath));
+                        Log.LogDebug("AttachmentMigrationEnricher: Imported {Filename} from disk", Path.GetFileName(filepath));
                     }
                 }
                 catch (Exception ex)
                 {
-                    Log.Error(ex, "AttachmentMigrationEnricher:Unable to process atachment from source wi {SourceWorkItemId} called {AttachmentName}", source.ToWorkItem().Id, wia.Name);
+                    Log.LogError(ex, "AttachmentMigrationEnricher:Unable to process atachment from source wi {SourceWorkItemId} called {AttachmentName}", source.ToWorkItem().Id, wia.Name);
                 }
             }
             if (save)
             {
                 target.SaveToAzureDevOps();
-                Log.Information("Work iTem now has {AttachmentCount} attachemnts", source.ToWorkItem().Attachments.Count);
+                Log.LogInformation("Work iTem now has {AttachmentCount} attachemnts", source.ToWorkItem().Attachments.Count);
                 CleanUpAfterSave();
             }
         }
 
         public void CleanUpAfterSave()
         {
-            if (_exportWiPath != null && System.IO.Directory.Exists(_exportWiPath))
+            SetupWorkItemServer();
+            if (_exportWiPath != null && Directory.Exists(_exportWiPath))
             {
                 try
                 {
-                    System.IO.Directory.Delete(_exportWiPath, true);
+                    Directory.Delete(_exportWiPath, true);
                     _exportWiPath = null;
                 }
                 catch (Exception)
                 {
-                    Log.Warning(" ERROR: Unable to delete folder {0}", _exportWiPath);
+                    Log.LogWarning(" ERROR: Unable to delete folder {0}", _exportWiPath);
                 }
             }
         }
 
         private string ExportAttachment(WorkItem wi, Attachment wia, string exportpath)
         {
+            SetupWorkItemServer();
             string fname = GetSafeFilename(wia.Name);
-            Log.Debug(fname);
-            
+            Log.LogDebug(fname);
+
             string fpath = Path.Combine(exportpath, wia.Id.ToString(), fname);
-            
+
             if (!File.Exists(fpath))
             {
-                Log.Debug(string.Format("...downloading {0} to {1}", fname, exportpath));
+                Log.LogDebug(string.Format("...downloading {0} to {1}", fname, exportpath));
                 try
                 {
                     var fileLocation = _server.DownloadFile(wia.Id);
@@ -112,20 +120,21 @@ namespace MigrationTools.Enrichers
                 }
                 catch (Exception ex)
                 {
-                    Log.Error(ex, "Exception downloading attachements");
+                    Log.LogError(ex, "Exception downloading attachements");
                     return null;
                 }
             }
             else
             {
-                Log.Debug("...already downloaded");
+                Log.LogDebug("...already downloaded");
             }
             return fpath;
         }
 
         private void ImportAttachment(WorkItem targetWorkItem, Attachment wia, string filepath, bool save = true)
         {
-            var filename = System.IO.Path.GetFileName(filepath);
+            SetupWorkItemServer();
+            var filename = Path.GetFileName(filepath);
             FileInfo fi = new FileInfo(filepath);
             if (_maxAttachmentSize > fi.Length)
             {
@@ -152,18 +161,43 @@ namespace MigrationTools.Enrichers
                 }
                 else
                 {
-                    Log.Debug(" [SKIP] WorkItem {0} already contains attachment {1}", targetWorkItem.Id, filepath);
+                    Log.LogDebug(" [SKIP] WorkItem {0} already contains attachment {1}", targetWorkItem.Id, filepath);
                 }
             }
             else
             {
-                Log.Warning(" [SKIP] Attachment {filename} on Work Item {targetWorkItemId} is bigger than the limit of {maxAttachmentSize} bites for Azure DevOps.", filename, targetWorkItem.Id, _maxAttachmentSize);
+                Log.LogWarning(" [SKIP] Attachment {filename} on Work Item {targetWorkItemId} is bigger than the limit of {maxAttachmentSize} bites for Azure DevOps.", filename, targetWorkItem.Id, _maxAttachmentSize);
             }
         }
 
         public string GetSafeFilename(string filename)
         {
             return string.Join("_", filename.Split(Path.GetInvalidFileNameChars()));
+        }
+
+        private void SetupWorkItemServer()
+        {
+            if (_workItemServer != null)
+            {
+                IMigrationEngine engine = Services.GetRequiredService<IMigrationEngine>();
+                _workItemServer = engine.Source.GetService<WorkItemServer>();
+            }
+        }
+
+        protected override void RefreshForProcessorType(IProcessor processor)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void EntryForProcessorType(IProcessor processor)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Configure(IProcessorEnricherOptions options)
+        {
+            _options = (TfsAttachmentEnricherOptions)options;
+
         }
     }
 }

@@ -60,7 +60,7 @@ namespace VstsSyncMigrator.Engine
         private List<string> _ignore;
 
         private ILogger contextLog;
-        private IAttachmentMigrationEnricher attachmentEnricher;
+        private TfsAttachmentEnricher attachmentEnricher;
         private IWorkItemProcessorEnricher embededImagesEnricher;
         private IWorkItemProcessorEnricher _workItemEmbededLinkEnricher;
         private StringManipulatorEnricher _stringManipulatorEnricher;
@@ -121,7 +121,7 @@ namespace VstsSyncMigrator.Engine
             PullCommonEnrichersConfig<TfsRevisionManager, TfsRevisionManagerOptions>(_engineConfig.CommonEnrichersConfig, _revisionManager);
             PullCommonEnrichersConfig<TfsWorkItemLinkEnricher, TfsWorkItemLinkEnricherOptions>(_engineConfig.CommonEnrichersConfig, _workItemLinkEnricher);
             PullCommonEnrichersConfig<StringManipulatorEnricher, StringManipulatorEnricherOptions>(_engineConfig.CommonEnrichersConfig, _stringManipulatorEnricher);
-
+            PullCommonEnrichersConfig<TfsAttachmentEnricher, TfsAttachmentEnricherOptions>(_engineConfig.CommonEnrichersConfig, attachmentEnricher);
         }
 
         internal void TraceWriteLine(LogEventLevel level, string message, Dictionary<string, object> properties = null)
@@ -146,8 +146,7 @@ namespace VstsSyncMigrator.Engine
             //////////////////////////////////////////////////
             ValidatePatTokenRequirement();
             //////////////////////////////////////////////////
-            var workItemServer = Engine.Source.GetService<WorkItemServer>();
-            attachmentEnricher = new TfsAttachmentEnricher(workItemServer, _config.AttachmentWorkingPath, _config.AttachmentMaxSize);
+     
             embededImagesEnricher = Services.GetRequiredService<TfsEmbededImagesEnricher>();
             gitRepositoryEnricher = Services.GetRequiredService<TfsGitRepositoryEnricher>();
 
