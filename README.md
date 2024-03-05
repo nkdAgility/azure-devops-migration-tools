@@ -4,19 +4,20 @@ The Azure DevOps Migration Tools allow you to bulk edit and migrate data between
 
 **Ask Questions on Github: https://github.com/nkdAgility/azure-devops-migration-tools/discussions**
 
-## Some Data from the last 30 days (as of 06/04/2023)
+## Some Data from the last 30 days (as of 05/03/2024)
 
 | Category  | Metric | Notes |
 | ------------- | ------------- | ------------- |
-| Work Item Revisions | **14m** | A single Work Item may have many revisions that we need to migrate |
-| Average Work item Migration Time  | **35s** | Work Item (includes all revisions, links, and attachments for the work item) |
-| RelatedLinkCount | **5m** | Each work item may have many links or none. |
-| Git Commit Links  | **480k** |  |
-| Attachments | **252.37k**  | Total number of attachments migrated |
+| Work Items | **1m** | A single Work Item may have many revisions that we need to migrate |
+| Work Item Revisions | **23m** | A single Work Item may have many revisions that we need to migrate |
+| RelatedLinkCount | **11m** | Each work item may have many links or none. |
+| Git Commit Links  | **1.3m** |  |
+| Attachments | **1.2m**  | Total number of attachments migrated |
 | Test Suits | 52k | total suits migrated | 
-| Test Cases Mapped | **800k** | Total test cases mapped into Suits |
+| Test Cases Mapped | **1.4m** | Total test cases mapped into Suits |
 | Migration Run Ave  | **14 minutes** | Includes dry-runs as well.  |
 | Migration Run Total   |  **19bn Seconds** | Thats **316m hours** or **13m days** of run time in the last 30 days. |
+| Average Work item Migration Time  | **22s** | Work Item (includes all revisions, links, and attachments for the work item) |
 
 
 ## What can you do with this tool?
@@ -42,7 +43,7 @@ The Azure DevOps Migration Tools allow you to bulk edit and migrate data between
 - Bulk edit of Work Items
 - Migration of Test Suites & Test Plans
 - _new_ Migration of Builds & Pipelines
-- Migrate from one Language version of TFS / Azure Devops to another (*new v9.0*)
+- Migrate from one Language version of TFS / Azure Devops to another (*new v9.0*)1.34
 - _new_  Migration of Processes
 
 **NOTE: If you are able to migrate your entire Collection to Azure DevOps Services you should use [Azure DevOps Migration Service](https://azure.microsoft.com/services/devops/migrate/) from Microsoft. If you have a requirement to change Process Template then you will need to do that before you move to Azure DevOps Services.**
@@ -56,11 +57,27 @@ The Azure DevOps Migration Tools allow you to bulk edit and migrate data between
 
 ## Installing and running the tools
 
-We use [winget](https://learn.microsoft.com/en-us/windows/package-manager/winget/) to host the tools, and you can use the command `winget install nkdAgility.AzureDevOpsMigrationTools` to install them on Windows 10 and Windows 11. For other operating systems you can download the [latest release](https://github.com/nkdAgility/azure-devops-migration-tools/releases/latest) and unzip it to a folder of your choice.
+These tools are available as a portable application and can be installed in a number of ways, including manually from a zip.
+For a more detailed getting started guide please see the [documentation](https://nkdagility.com/docs/azure-devops-migration-tools/getting-started.html).
+
+### Option 1: Winget
+
+We use [winget](https://learn.microsoft.com/en-us/windows/package-manager/winget/) to host the tools, and you can use the command `winget install nkdAgility.AzureDevOpsMigrationTools` to install them on Windows 10 and Windows 11. 
 
 The tools will be installed to `%Localappdata%\Microsoft\WinGet\Packages\nkdAgility.AzureDevOpsMigrationTools_Microsoft.Winget.Source_XXXXXXXXXX` and a symbolic link to `devopsmigration.exe` that lets you run it from anywhere using `devopsmigration init`.
 
-For a more detailed getting started guide please see the [documentation](https://nkdagility.com/docs/azure-devops-migration-tools/getting-started.html).
+**NOTE: Do not install using an elevated command prompt!**
+
+### Option 2: Chocolatey
+
+We also deploy to [Chocolatey](https://chocolatey.org/packages/nkdagility.azuredevopsmigrationtools) and you can use the command `choco install vsts-sync-migrator` to install them on Windows Server. 
+
+The tools will be installed to `C:\Tools\MigrationTools\` which should be added to the path. You can run `devopsmigration.exe`
+
+### Option 3: Manual
+
+You can download the [latest release](https://github.com/nkdAgility/azure-devops-migration-tools/releases/latest) and unzip it to a folder of your choice.
+
 
 ## Support
 
