@@ -10,6 +10,9 @@ branches:
     regex: ^master$|^main$
     is-release-branch: true
     is-mainline: true
+    prevent-increment-of-merged-branch-version: true
+    track-merge-target: false
+    tracks-release-branches: false
   preview:
     mode: ContinuousDeployment
     tag: Preview
@@ -17,6 +20,17 @@ branches:
     is-release-branch: false
     is-mainline: false
     source-branches: [ 'main', 'master' ]
+    prevent-increment-of-merged-branch-version: false
+    track-merge-target: false
+    tracks-release-branches: true
+  feature:
+    mode: ContinuousDelivery
+    tag: useBranchName
+    increment: Inherit
+    regex: features?[/-]
+    prevent-increment-of-merged-branch-version: false
+    track-merge-target: false
+    tracks-release-branches: false
 ignore:
   sha: []
 merge-message-formats: {}
