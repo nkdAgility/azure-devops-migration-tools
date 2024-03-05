@@ -109,6 +109,20 @@ in the replacement string.
   `TargetProject\NewArea\ValidArea\` but `OriginalProject\DescopeThis` would not
   be modified by this rule.
 
+### PrefixProjectToNodes
+
+The `PrefixProjectToNodes` was an option that was used to prepend the source project name to the target set of nodes. This was super valuable when the target Project already has nodes and you dont want to merge them all together. This is now replaced by the `AreaMaps` and `IterationMaps` options.
+
+```
+"IterationMaps": {
+  "^SourceServer\\\\(.*)" , "TargetServer\\SourceServer\\$1",
+},
+"AreaMaps": {
+   "^SourceServer\\\\(.*)" , "TargetServer\\SourceServer\\$1",
+}
+```
+
+
 ### More Complex Regex
 
 Before your migration starts it will validate that all of the Areas and Iterations from the **Source** work items revisions exist on the **Target**. Any that do not exist will be flagged in the logs and if and the migration will stop just after it outputs a list of the missing nodes.
