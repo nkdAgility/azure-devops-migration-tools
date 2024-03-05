@@ -7,9 +7,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.Services.Commerce;
 using MigrationTools.DataContracts;
+using MigrationTools.Enrichers;
 using MigrationTools.Processors;
 
-namespace MigrationTools.Enrichers
+namespace MigrationTools.ProcessorEnrichers
 {
     public class TfsUserMappingEnricher : WorkItemProcessorEnricher
     {
@@ -43,15 +44,22 @@ namespace MigrationTools.Enrichers
             throw new NotImplementedException();
         }
 
+        //private List<string> findIdentityFieldsToCheck()
+        //{
+
+        //}
+
         private List<string> extractUserList(List<WorkItemData> workitems, List<string> identityFieldsToCheck)
         {
             List<string> foundUsers = new List<string>();
             foreach (var wItem in workitems)
             {
-                foreach (var rItem in wItem.Revisions.Values) {
+                foreach (var rItem in wItem.Revisions.Values)
+                {
                     foreach (var fItem in rItem.Fields.Values)
                     {
-                       if (identityFieldsToCheck.Contains( fItem.ReferenceName, new CaseInsensativeStringComparer())) {
+                        if (identityFieldsToCheck.Contains(fItem.ReferenceName, new CaseInsensativeStringComparer()))
+                        {
                             if (!foundUsers.Contains(fItem.Value))
                             {
                                 foundUsers.Add(fItem.Value.ToString());
@@ -70,15 +78,15 @@ namespace MigrationTools.Enrichers
         }
     }
 
-    public class CaseInsensativeStringComparer : IEqualityComparer<String>
+    public class CaseInsensativeStringComparer : IEqualityComparer<string>
     {
 
-        public bool Equals(String x, String y)
+        public bool Equals(string x, string y)
         {
-            return x?.IndexOf(y,  StringComparison.OrdinalIgnoreCase) >= 0;
+            return x?.IndexOf(y, StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
-        public int GetHashCode(String obj)
+        public int GetHashCode(string obj)
         {
             return obj.GetHashCode();
         }

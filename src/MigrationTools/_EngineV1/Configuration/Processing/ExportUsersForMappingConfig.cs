@@ -11,7 +11,7 @@ namespace MigrationTools._EngineV1.Configuration.Processing
 
         public string Processor
         {
-            get { return "ExportUsersForMapping"; }
+            get { return "ExportUsersForMappingContext"; }
         }
 
         /// <inheritdoc />

@@ -64,6 +64,7 @@ namespace VstsSyncMigrator.Engine
         private IWorkItemProcessorEnricher embededImagesEnricher;
         private IWorkItemProcessorEnricher _workItemEmbededLinkEnricher;
         private StringManipulatorEnricher _stringManipulatorEnricher;
+        private TfsUserMappingEnricher _userMappingEnricher;
         private TfsGitRepositoryEnricher gitRepositoryEnricher;
         private TfsNodeStructure _nodeStructureEnricher;
         private ITelemetryLogger _telemetry;
@@ -80,6 +81,7 @@ namespace VstsSyncMigrator.Engine
                                         IServiceProvider services,
                                         ITelemetryLogger telemetry,
                                         ILogger<WorkItemMigrationContext> logger,
+                                        TfsUserMappingEnricher userMappingEnricher,
                                         TfsAttachmentEnricher attachmentEnricher,
                                         TfsNodeStructure nodeStructureEnricher,
                                         TfsRevisionManager revisionManager,
@@ -95,6 +97,7 @@ namespace VstsSyncMigrator.Engine
             contextLog = Serilog.Log.ForContext<WorkItemMigrationContext>();
             _attachmentEnricher = attachmentEnricher;
             _nodeStructureEnricher = nodeStructureEnricher;
+            _userMappingEnricher = userMappingEnricher;
             _revisionManager = revisionManager;
             _workItemLinkEnricher = workItemLinkEnricher;
             _workItemEmbededLinkEnricher = workItemEmbeddedLinkEnricher;
@@ -124,6 +127,7 @@ namespace VstsSyncMigrator.Engine
             PullCommonEnrichersConfig<TfsWorkItemLinkEnricher, TfsWorkItemLinkEnricherOptions>(_engineConfig.CommonEnrichersConfig, _workItemLinkEnricher);
             PullCommonEnrichersConfig<StringManipulatorEnricher, StringManipulatorEnricherOptions>(_engineConfig.CommonEnrichersConfig, _stringManipulatorEnricher);
             PullCommonEnrichersConfig<TfsAttachmentEnricher, TfsAttachmentEnricherOptions>(_engineConfig.CommonEnrichersConfig, _attachmentEnricher);
+            PullCommonEnrichersConfig<TfsUserMappingEnricher, TfsUserMappingEnricherOptions>(_engineConfig.CommonEnrichersConfig, _userMappingEnricher);
         }
 
         internal void TraceWriteLine(LogEventLevel level, string message, Dictionary<string, object> properties = null)
@@ -170,31 +174,11 @@ namespace VstsSyncMigrator.Engine
                 contextLog.Information("Replay all revisions of {sourceWorkItemsCount} work items?",
                     sourceWorkItems.Count);
 
-                //Validation: make sure that the ReflectedWorkItemId field name specified in the config exists in the target process, preferably on each work item type.
                 //////////////////////////////////////////////////
-                contextLog.Information("Validating::Check all Target Work Items have the RefectedWorkItemId field");
-
-                var result = _validateConfig.ValidatingRequiredField(
-                    Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName, sourceWorkItems);
-                if (!result)
-                {
-                    var ex = new InvalidFieldValueException(
-                        "Not all work items in scope contain a valid ReflectedWorkItemId Field!");
-                    Log.LogError(ex, "Not all work items in scope contain a valid ReflectedWorkItemId Field!");
-                    throw ex;
-                }
-
-                //////////////////////////////////////////////////
+                ValidateAllWorkItemTypesHaveReflectedWorkItemIdField(sourceWorkItems);
                 ValiddateWorkItemTypesExistInTarget(sourceWorkItems);
-                //////////////////////////////////////////////////
-
-                contextLog.Information("Validating::Check that all Area & Iteration paths from Source have a valid mapping on Target");
-                List<NodeStructureItem> nodeStructureMissingItems = _nodeStructureEnricher.GetMissingRevisionNodes(sourceWorkItems);
-                if (_nodeStructureEnricher.ValidateTargetNodesExist(nodeStructureMissingItems))
-                {
-                    throw new Exception("Missing Iterations in Target preventing progress, check log for list. To continue you MUST configure IterationMaps or AreaMaps that matches the missing paths..");
-                }
-
+                ValidateAllNodesExistOrAreMapped(sourceWorkItems);
+                ValidateAllUsersExistOrAreMapped(sourceWorkItems);
                 //////////////////////////////////////////////////
 
                 contextLog.Information("Found target project as {@destProject}", Engine.Target.WorkItems.Project.Name);
@@ -282,6 +266,37 @@ namespace VstsSyncMigrator.Engine
                     contextLog.Warning("The following items could not be migrated: {ItemIds}", string.Join(", ", _itemsInError));
                 }
                 contextLog.Information("DONE in {Elapsed}", stopwatch.Elapsed.ToString("c"));
+            }
+        }
+
+        private void ValidateAllUsersExistOrAreMapped(List<WorkItemData> sourceWorkItems)
+        {
+            
+            throw new NotImplementedException();
+        }
+
+        private void ValidateAllNodesExistOrAreMapped(List<WorkItemData> sourceWorkItems)
+        {
+            contextLog.Information("Validating::Check that all Area & Iteration paths from Source have a valid mapping on Target");
+            List<NodeStructureItem> nodeStructureMissingItems = _nodeStructureEnricher.GetMissingRevisionNodes(sourceWorkItems);
+            if (_nodeStructureEnricher.ValidateTargetNodesExist(nodeStructureMissingItems))
+            {
+                throw new Exception("Missing Iterations in Target preventing progress, check log for list. To continue you MUST configure IterationMaps or AreaMaps that matches the missing paths..");
+            }
+        }
+
+        private void ValidateAllWorkItemTypesHaveReflectedWorkItemIdField(List<WorkItemData> sourceWorkItems)
+        {
+            contextLog.Information("Validating::Check all Target Work Items have the RefectedWorkItemId field");
+
+            var result = _validateConfig.ValidatingRequiredField(
+                Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName, sourceWorkItems);
+            if (!result)
+            {
+                var ex = new InvalidFieldValueException(
+                    "Not all work items in scope contain a valid ReflectedWorkItemId Field!");
+                Log.LogError(ex, "Not all work items in scope contain a valid ReflectedWorkItemId Field!");
+                throw ex;
             }
         }
 

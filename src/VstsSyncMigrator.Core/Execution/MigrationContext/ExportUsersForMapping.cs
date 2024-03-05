@@ -9,17 +9,17 @@ using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Configuration.Processing;
 using MigrationTools.DataContracts;
 using MigrationTools.DataContracts.Process;
-using MigrationTools.Enrichers;
+using MigrationTools.ProcessorEnrichers;
 using VstsSyncMigrator._EngineV1.Processors;
 
 namespace VstsSyncMigrator.Core.Execution.MigrationContext
 {
-    public class ExportUsersForMapping : StaticProcessorBase
+    public class ExportUsersForMappingContext : StaticProcessorBase
     {
         private ExportUsersForMappingConfig _config;
         private TfsUserMappingEnricher _TfsUserMappingEnricher;
 
-        public ExportUsersForMapping(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<ExportUsersForMapping> logger) : base(services, me, telemetry, logger)
+        public ExportUsersForMappingContext(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<ExportUsersForMappingContext> logger) : base(services, me, telemetry, logger)
         {
             Logger = logger;
         }
@@ -28,11 +28,11 @@ namespace VstsSyncMigrator.Core.Execution.MigrationContext
         {
             get
             {
-                return "ExportUsersForMapping";
+                return "ExportUsersForMappingContext";
             }
         }
 
-        public ILogger<ExportUsersForMapping> Logger { get; }
+        public ILogger<ExportUsersForMappingContext> Logger { get; }
 
         public override void Configure(IProcessorConfig config)
         {
