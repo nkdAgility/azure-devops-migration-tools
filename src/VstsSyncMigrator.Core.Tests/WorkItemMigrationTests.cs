@@ -51,6 +51,7 @@ namespace VstsSyncMigrator.Core.Tests
                                                       _services,
                                                       _services.GetRequiredService<ITelemetryLogger>(),
                                                       _services.GetRequiredService<ILogger<WorkItemMigrationContext>>(),
+                                                      _services.GetRequiredService< TfsAttachmentEnricher>(),
                                                       nodeStructure,
                                                       _services.GetRequiredService<TfsRevisionManager>(),
                                                         _services.GetRequiredService<TfsWorkItemLinkEnricher>(),
@@ -159,10 +160,10 @@ namespace VstsSyncMigrator.Core.Tests
             {
                 AreaMaps = new Dictionary<string, string>()
                 {
-                    { "^SourceServer\\\\(.*)" , "TargetServer\\SourceServer\\$1" }
+                    { "^Source Project\\\\(.*)" , "Target Project\\Source Project\\$1" }
                 },
                 IterationMaps = new Dictionary<string, string>(){
-                    { "^SourceServer\\\\(.*)" , "TargetServer\\SourceServer\\$1" }
+                    { "^Source Project\\\\(.*)" , "Target Project\\Source Project\\$1" }
                 },
             });
 
