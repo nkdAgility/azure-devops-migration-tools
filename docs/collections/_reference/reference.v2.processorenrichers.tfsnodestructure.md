@@ -30,8 +30,8 @@ options:
   defaultValue: '{}'
 - parameterName: Enabled
   type: Boolean
-  description: For internal use
-  defaultValue: missng XML code comments
+  description: If enabled this will run this migrator
+  defaultValue: true
 - parameterName: IterationMaps
   type: Dictionary
   description: Remapping rules for iteration paths, implemented with regular expressions. The rules apply with a higher priority than the `PrefixProjectToNodes`, that is, if no rule matches the path and the `PrefixProjectToNodes` option is enabled, then the old `PrefixProjectToNodes` behavior is applied.
@@ -219,6 +219,26 @@ topics:
       `OriginalProject\ValidArea\` would be replaced by
       `TargetProject\NewArea\ValidArea\` but `OriginalProject\DescopeThis` would not
       be modified by this rule.
+
+    ### PrefixProjectToNodes
+
+
+    The `PrefixProjectToNodes` was an option that was used to prepend the source project name to the target set of nodes. This was super valuable when the target Project already has nodes and you dont want to merge them all together. This is now replaced by the `AreaMaps` and `IterationMaps` options.
+
+
+    ```
+
+    "IterationMaps": {
+      "^SourceServer\\\\(.*)" , "TargetServer\\SourceServer\\$1",
+    },
+
+    "AreaMaps": {
+       "^SourceServer\\\\(.*)" , "TargetServer\\SourceServer\\$1",
+    }
+
+    ```
+
+
 
     ### More Complex Regex
 

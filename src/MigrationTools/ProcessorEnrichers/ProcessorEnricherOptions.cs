@@ -5,8 +5,9 @@ namespace MigrationTools.Enrichers
     public abstract class ProcessorEnricherOptions : IProcessorEnricherOptions
     {
         /// <summary>
-        /// For internal use
+        /// If enabled this will run this migrator
         /// </summary>
+        /// <default>true</default>
         public bool Enabled { get; set; }
 
         public abstract Type ToConfigure { get; }

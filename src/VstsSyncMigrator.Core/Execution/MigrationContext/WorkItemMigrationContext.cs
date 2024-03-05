@@ -60,7 +60,7 @@ namespace VstsSyncMigrator.Engine
         private List<string> _ignore;
 
         private ILogger contextLog;
-        private IAttachmentMigrationEnricher attachmentEnricher;
+        private TfsAttachmentEnricher _attachmentEnricher;
         private IWorkItemProcessorEnricher embededImagesEnricher;
         private IWorkItemProcessorEnricher _workItemEmbededLinkEnricher;
         private StringManipulatorEnricher _stringManipulatorEnricher;
@@ -80,6 +80,7 @@ namespace VstsSyncMigrator.Engine
                                         IServiceProvider services,
                                         ITelemetryLogger telemetry,
                                         ILogger<WorkItemMigrationContext> logger,
+                                        TfsAttachmentEnricher attachmentEnricher,
                                         TfsNodeStructure nodeStructureEnricher,
                                         TfsRevisionManager revisionManager,
                                         TfsWorkItemLinkEnricher workItemLinkEnricher,
@@ -92,6 +93,7 @@ namespace VstsSyncMigrator.Engine
             _telemetry = telemetry;
             _engineConfig = engineConfig.Value;
             contextLog = Serilog.Log.ForContext<WorkItemMigrationContext>();
+            _attachmentEnricher = attachmentEnricher;
             _nodeStructureEnricher = nodeStructureEnricher;
             _revisionManager = revisionManager;
             _workItemLinkEnricher = workItemLinkEnricher;
@@ -121,7 +123,7 @@ namespace VstsSyncMigrator.Engine
             PullCommonEnrichersConfig<TfsRevisionManager, TfsRevisionManagerOptions>(_engineConfig.CommonEnrichersConfig, _revisionManager);
             PullCommonEnrichersConfig<TfsWorkItemLinkEnricher, TfsWorkItemLinkEnricherOptions>(_engineConfig.CommonEnrichersConfig, _workItemLinkEnricher);
             PullCommonEnrichersConfig<StringManipulatorEnricher, StringManipulatorEnricherOptions>(_engineConfig.CommonEnrichersConfig, _stringManipulatorEnricher);
-
+            PullCommonEnrichersConfig<TfsAttachmentEnricher, TfsAttachmentEnricherOptions>(_engineConfig.CommonEnrichersConfig, _attachmentEnricher);
         }
 
         internal void TraceWriteLine(LogEventLevel level, string message, Dictionary<string, object> properties = null)
@@ -146,8 +148,7 @@ namespace VstsSyncMigrator.Engine
             //////////////////////////////////////////////////
             ValidatePatTokenRequirement();
             //////////////////////////////////////////////////
-            var workItemServer = Engine.Source.GetService<WorkItemServer>();
-            attachmentEnricher = new TfsAttachmentEnricher(workItemServer, _config.AttachmentWorkingPath, _config.AttachmentMaxSize);
+     
             embededImagesEnricher = Services.GetRequiredService<TfsEmbededImagesEnricher>();
             gitRepositoryEnricher = Services.GetRequiredService<TfsGitRepositoryEnricher>();
 
@@ -674,10 +675,10 @@ namespace VstsSyncMigrator.Engine
 
         private void ProcessWorkItemAttachments(WorkItemData sourceWorkItem, WorkItemData targetWorkItem, bool save = true)
         {
-            if (targetWorkItem != null && _config.AttachmentMigration && sourceWorkItem.ToWorkItem().Attachments.Count > 0)
+            if (targetWorkItem != null && _attachmentEnricher.Options.Enabled && sourceWorkItem.ToWorkItem().Attachments.Count > 0)
             {
-                TraceWriteLine(LogEventLevel.Information, "Attachemnts {SourceWorkItemAttachmentCount} | LinkMigrator:{AttachmentMigration}", new Dictionary<string, object>() { { "SourceWorkItemAttachmentCount", sourceWorkItem.ToWorkItem().Attachments.Count }, { "AttachmentMigration", _config.AttachmentMigration } });
-                attachmentEnricher.ProcessAttachemnts(sourceWorkItem, targetWorkItem, save);
+                TraceWriteLine(LogEventLevel.Information, "Attachemnts {SourceWorkItemAttachmentCount} | LinkMigrator:{AttachmentMigration}", new Dictionary<string, object>() { { "SourceWorkItemAttachmentCount", sourceWorkItem.ToWorkItem().Attachments.Count }, { "AttachmentMigration", _attachmentEnricher.Options.Enabled } });
+                _attachmentEnricher.ProcessAttachemnts(sourceWorkItem, targetWorkItem, save);
                 AddMetric("Attachments", processWorkItemMetrics, targetWorkItem.ToWorkItem().AttachedFileCount);
             }
         }
@@ -882,7 +883,7 @@ namespace VstsSyncMigrator.Engine
                     }
                     targetWorkItem.SaveToAzureDevOps();
 
-                    attachmentEnricher.CleanUpAfterSave();
+                    _attachmentEnricher.CleanUpAfterSave();
                     TraceWriteLine(LogEventLevel.Information, "...Saved as {TargetWorkItemId}", new Dictionary<string, object> { { "TargetWorkItemId", targetWorkItem.Id } });
                 }
             }

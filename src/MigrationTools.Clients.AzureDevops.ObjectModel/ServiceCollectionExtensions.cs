@@ -26,6 +26,7 @@ namespace MigrationTools
             context.AddTransient<TfsAreaAndIterationProcessor>();
 
             // Enrichers
+            context.AddSingleton<TfsAttachmentEnricher>();
             context.AddSingleton<TfsValidateRequiredField>();
             context.AddSingleton<TfsWorkItemLinkEnricher>();
             context.AddSingleton<TfsWorkItemEmbededLinkEnricher>();

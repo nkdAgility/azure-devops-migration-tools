@@ -18,8 +18,8 @@ architecture: v2
 options:
 - parameterName: Enabled
   type: Boolean
-  description: For internal use
-  defaultValue: missng XML code comments
+  description: If enabled this will run this migrator
+  defaultValue: true
 - parameterName: MaxRevisions
   type: Int32
   description: Sets the maximum number of revisions that will be migrated. "First + Last N = Max". If this was set to 5 and there were 10 revisions you would get the first 1 (creation) and the latest 4 migrated.
