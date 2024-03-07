@@ -112,9 +112,23 @@ namespace MigrationTools.ProcessorEnrichers
         private Dictionary<string, string> GetMappingFileData() {
             if (_UserMappings == null && System.IO.File.Exists(Options.UserMappingFile)) {
                 var fileData = System.IO.File.ReadAllText(Options.UserMappingFile);
-                var fileMaps = Newtonsoft.Json.JsonConvert.DeserializeObject<List<IdentityMapData>>(fileData);
-                _UserMappings = fileMaps.ToDictionary(x => x.Source.FriendlyName, x => x.target?.FriendlyName);
+                try
+                {
+                    var fileMaps = Newtonsoft.Json.JsonConvert.DeserializeObject<List<IdentityMapData>>(fileData);
+                    _UserMappings = fileMaps.ToDictionary(x => x.Source.FriendlyName, x => x.target?.FriendlyName);
+                }
+                catch (Exception)
+                {
+                    _UserMappings = new Dictionary<string, string>();
+                    Log.LogError($"TfsUserMappingEnricher::GetMappingFileData [UserMappingFile|{Options.UserMappingFile}] <-- invalid - No mapping are applied!");
+                }
+                
+            } else
+            {
+                Log.LogError($"TfsUserMappingEnricher::GetMappingFileData::No User Mapping file Provided! Provide file or disable TfsUserMappingEnricher");
+                _UserMappings = new Dictionary<string, string>();
             }
+
             return _UserMappings;
 
         }
