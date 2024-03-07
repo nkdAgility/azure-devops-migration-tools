@@ -51,6 +51,7 @@ namespace VstsSyncMigrator.Core.Tests
                                                       _services,
                                                       _services.GetRequiredService<ITelemetryLogger>(),
                                                       _services.GetRequiredService<ILogger<WorkItemMigrationContext>>(),
+                                                      _services.GetRequiredService<TfsUserMappingEnricher>(),
                                                       _services.GetRequiredService< TfsAttachmentEnricher>(),
                                                       nodeStructure,
                                                       _services.GetRequiredService<TfsRevisionManager>(),
