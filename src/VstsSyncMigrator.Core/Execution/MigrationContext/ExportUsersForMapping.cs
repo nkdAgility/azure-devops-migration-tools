@@ -20,6 +20,12 @@ using VstsSyncMigrator._EngineV1.Processors;
 
 namespace VstsSyncMigrator.Core.Execution.MigrationContext
 {
+    /// <summary>
+    /// ExportUsersForMappingContext is a tool used to create a starter mapping file for users between the source and target systems.
+    /// Use `ExportUsersForMappingConfig` to configure.
+    /// </summary>
+    /// <status>ready</status>
+    /// <processingtarget>Work Items</processingtarget>
     public class ExportUsersForMappingContext : MigrationProcessorBase
     {
         private ExportUsersForMappingConfig _config;

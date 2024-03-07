@@ -144,5 +144,13 @@
             <status>Beta</status>
             <processingtarget>Work Item</processingtarget>
         </member>
+        <member name="T:VstsSyncMigrator.Core.Execution.MigrationContext.ExportUsersForMappingContext">
+            <summary>
+            ExportUsersForMappingContext is a tool used to create a starter mapping file for users between the source and target systems.
+            Use `ExportUsersForMappingConfig` to configure.
+            </summary>
+            <status>ready</status>
+            <processingtarget>Work Items</processingtarget>
+        </member>
     </members>
 </doc>

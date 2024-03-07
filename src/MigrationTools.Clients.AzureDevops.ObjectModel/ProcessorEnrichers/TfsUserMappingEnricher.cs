@@ -15,6 +15,9 @@ using MigrationTools.Processors;
 
 namespace MigrationTools.ProcessorEnrichers
 {
+    /// <summary>
+    /// The TfsUserMappingEnricher is used to map users from the source to the target system. Run it with the ExportUsersForMappingContext to create a mapping file then with WorkItemMigrationContext to use the mapping file to update the users in the target system as you migrate the work items.
+    /// </summary>
     public class TfsUserMappingEnricher : WorkItemProcessorEnricher
     {
 

@@ -7,12 +7,11 @@ configurationSamples:
     {
       "$type": "ExportUsersForMappingConfig",
       "Enabled": false,
-      "LocalExportJsonFile": null,
       "WIQLQuery": null,
-      "IdentityFieldsToCheck": null
+      "OnlyListUsersInWorkItems": true
     }
   sampleFor: MigrationTools._EngineV1.Configuration.Processing.ExportUsersForMappingConfig
-description: missng XML code comments
+description: ExportUsersForMappingContext is a tool used to create a starter mapping file for users between the source and target systems. Use `ExportUsersForMappingConfig` to configure.
 className: ExportUsersForMappingContext
 typeName: Processors
 architecture: v1
@@ -21,19 +20,15 @@ options:
   type: Boolean
   description: missng XML code comments
   defaultValue: missng XML code comments
-- parameterName: IdentityFieldsToCheck
-  type: List
-  description: missng XML code comments
-  defaultValue: missng XML code comments
-- parameterName: LocalExportJsonFile
-  type: String
+- parameterName: OnlyListUsersInWorkItems
+  type: Boolean
   description: missng XML code comments
   defaultValue: missng XML code comments
 - parameterName: WIQLQuery
   type: String
   description: missng XML code comments
   defaultValue: missng XML code comments
-status: missng XML code comments
-processingTarget: missng XML code comments
+status: ready
+processingTarget: Work Items
 classFile: ''
 optionsClassFile: /src/MigrationTools/_EngineV1/Configuration/Processing/ExportUsersForMappingConfig.cs

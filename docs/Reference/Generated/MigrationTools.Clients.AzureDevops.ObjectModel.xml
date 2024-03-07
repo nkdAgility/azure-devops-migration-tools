@@ -92,7 +92,7 @@
         </member>
         <member name="P:MigrationTools.Enrichers.TfsUserMappingEnricherOptions.IdentityFieldsToCheck">
             <summary>
-            List the Itentity Fiells to chech for users that need mapped
+            This is a list of the Identiy fields in the Source to check for user mapping purposes. You should list all identiy fields that you wan to map.
             </summary>
         </member>
         <member name="P:MigrationTools.Enrichers.TfsUserMappingEnricherOptions.UserMappingFile">
@@ -110,6 +110,11 @@
             Save the work item after each link is added. This will slow the migration as it will cause many saves to the TFS database.
             </summary>
             <default>false</default>
+        </member>
+        <member name="T:MigrationTools.ProcessorEnrichers.TfsUserMappingEnricher">
+            <summary>
+            The TfsUserMappingEnricher is used to map users from the source to the target system. Run it with the ExportUsersForMappingContext to create a mapping file then with WorkItemMigrationContext to use the mapping file to update the users in the target system as you migrate the work items.
+            </summary>
         </member>
         <member name="T:MigrationTools.Processors.TfsAreaAndIterationProcessor">
             <summary>

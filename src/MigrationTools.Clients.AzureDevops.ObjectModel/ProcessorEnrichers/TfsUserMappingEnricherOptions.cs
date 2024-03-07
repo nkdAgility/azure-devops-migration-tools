@@ -12,7 +12,7 @@ namespace MigrationTools.Enrichers
         public override Type ToConfigure => typeof(TfsUserMappingEnricher);
 
         /// <summary>
-        /// List the Itentity Fiells to chech for users that need mapped
+        /// This is a list of the Identiy fields in the Source to check for user mapping purposes. You should list all identiy fields that you wan to map.
         /// </summary>
         public List<string> IdentityFieldsToCheck { get; set; }
 
@@ -43,6 +43,7 @@ namespace MigrationTools.Enrichers
 
     public interface ITfsUserMappingEnricherOptions
     {
-
+         List<string> IdentityFieldsToCheck { get; set; }
+        string UserMappingFile { get; set; }
     }
 }
