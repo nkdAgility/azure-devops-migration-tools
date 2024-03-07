@@ -242,6 +242,7 @@
         <member name="M:MigrationTools._EngineV1.Configuration.Processing.ExportProfilePictureFromADConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
             <inheritdoc />
         </member>
+        <!-- Badly formed XML comment ignored for member "P:MigrationTools._EngineV1.Configuration.Processing.ExportUsersForMappingConfig.OnlyListUsersInWorkItems" -->
         <member name="M:MigrationTools._EngineV1.Configuration.Processing.ExportUsersForMappingConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
             <inheritdoc />
         </member>

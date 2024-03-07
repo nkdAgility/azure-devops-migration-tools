@@ -11,5 +11,6 @@ namespace MigrationTools.DataContracts
         public string Name { get; set; }
         public object Value { get; set; }
         public string FieldType { get; set; }
+        public bool IsIdentity { get; set; }
     }
 }

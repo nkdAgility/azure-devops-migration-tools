@@ -26,6 +26,7 @@ namespace MigrationTools.Endpoints
                     fieldItems[revField.Key] = new FieldItem
                     {
                         Name = revField.Value.Name,
+                        FieldType = revField.Value.FieldType,
                         ReferenceName = revField.Value.ReferenceName,
                         Value = revField.Value.Value,
                         internalObject = revField.Value.internalObject,
@@ -81,6 +82,7 @@ namespace MigrationTools.Endpoints
                 ReferenceName = x.ReferenceName,
                 Value = x.Value,
                 FieldType = x.FieldDefinition.FieldType.ToString(),
+                IsIdentity = x.FieldDefinition.IsIdentity,
                 internalObject = x
             })
             .ToDictionary(r => r.ReferenceName);

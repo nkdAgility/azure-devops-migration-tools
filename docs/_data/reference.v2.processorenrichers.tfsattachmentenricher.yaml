@@ -8,7 +8,7 @@ configurationSamples:
       "$type": "TfsAttachmentEnricherOptions",
       "Enabled": true,
       "ExportBasePath": "c:\\temp\\WorkItemAttachmentExport",
-      "MaxAttachmentSize": "480000000"
+      "MaxAttachmentSize": 480000000
     }
   sampleFor: MigrationTools.Enrichers.TfsAttachmentEnricherOptions
 description: missng XML code comments
@@ -25,7 +25,7 @@ options:
   description: '`AttachmentMigration` is set to true then you need to specify a working path for attachments to be saved locally.'
   defaultValue: C:\temp\Migration\
 - parameterName: MaxAttachmentSize
-  type: String
+  type: Int32
   description: '`AttachmentMigration` is set to true then you need to specify a max file size for upload in bites. For Azure DevOps Services the default is 480,000,000 bites (60mb), for TFS its 32,000,000 bites (4mb).'
   defaultValue: 480000000
 - parameterName: RefName
