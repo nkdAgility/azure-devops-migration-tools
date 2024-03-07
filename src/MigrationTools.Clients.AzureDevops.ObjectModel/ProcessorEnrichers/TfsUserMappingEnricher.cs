@@ -16,6 +16,7 @@ namespace MigrationTools.ProcessorEnrichers
     {
 
         private readonly IMigrationEngine Engine;
+        private TfsUserMappingEnricherOptions _options;
 
         public TfsUserMappingEnricher(IServiceProvider services, ILogger<TfsUserMappingEnricher> logger) : base(services, logger)
         {
@@ -25,7 +26,7 @@ namespace MigrationTools.ProcessorEnrichers
 
         public override void Configure(IProcessorEnricherOptions options)
         {
-            throw new NotImplementedException();
+            _options = (TfsUserMappingEnricherOptions)options;
         }
 
         protected override void EntryForProcessorType(IProcessor processor)
