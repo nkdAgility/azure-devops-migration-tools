@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Enrichers;
@@ -91,6 +92,10 @@ namespace MigrationTools._EngineV1.Processors
             where TEnricher : IProcessorEnricher
         {
             TEnricherOptions config = default(TEnricherOptions);
+            if (commonEnricher == null)
+            {
+                commonEnricher= Services.GetService<TEnricher>();
+            }
             if (commonEnrichersStore != null)
             {
                 config = commonEnrichersStore.OfType<TEnricherOptions>().FirstOrDefault();

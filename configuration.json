@@ -2,8 +2,8 @@
   "ChangeSetMappingFile": null,
   "Source": {
     "$type": "TfsTeamProjectConfig",
-    "Collection": "https://dev.azure.com/nkdagility-preview/",
-    "Project": "migrationSource1",
+    "Collection": "https://dev.azure.com/nkdagility/",
+    "Project": "AzureDevOps-Tools",
     "ReflectedWorkItemIDFieldName": "nkdScrum.ReflectedWorkItemId",
     "AllowCrossProjectLinking": false,
     "AuthenticationMode": "Prompt",
@@ -75,6 +75,19 @@
           "Description": "Remove invalid characters from the end of the string"
         }
       ]
+    },
+    {
+      "$type": "TfsUserMappingEnricherOptions",
+      "Enabled": true,
+      "UserMappingFile": "C:\\temp\\userExport.json",
+      "IdentityFieldsToCheck": [
+        "System.AssignedTo",
+        "System.ChangedBy",
+        "System.CreatedBy",
+        "Microsoft.VSTS.Common.ActivatedBy",
+        "Microsoft.VSTS.Common.ResolvedBy",
+        "Microsoft.VSTS.Common.ClosedBy"
+      ]
     }
   ],
   "Processors": [
@@ -102,15 +115,7 @@
       "$type": "ExportUsersForMappingConfig",
       "Enabled": true,
       "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
-      "LocalExportJsonFile": "c:\\temp\\userExport.json",
-      "IdentityFieldsToCheck": [
-        "System.AssignedTo",
-        "System.ChangedBy",
-        "System.CreatedBy",
-        "Microsoft.VSTS.Common.ActivatedBy",
-        "Microsoft.VSTS.Common.ResolvedBy",
-        "Microsoft.VSTS.Common.ClosedBy"
-      ]
+      "OnlyListUsersInWorkItems": true
     }
   ],
   "Version": "15.0",

@@ -90,6 +90,16 @@
             </summary>
             <default>0</default>
         </member>
+        <member name="P:MigrationTools.Enrichers.TfsUserMappingEnricherOptions.IdentityFieldsToCheck">
+            <summary>
+            List the Itentity Fiells to chech for users that need mapped
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Enrichers.TfsUserMappingEnricherOptions.UserMappingFile">
+            <summary>
+            This is the file that will be used to export or import the user mappings. Use the ExportUsersForMapping processor to create the file.
+            </summary>
+        </member>
         <member name="P:MigrationTools.Enrichers.TfsWorkItemLinkEnricherOptions.FilterIfLinkCountMatches">
             <summary>
             Skip validating links if the number of links in the source and the target matches!
