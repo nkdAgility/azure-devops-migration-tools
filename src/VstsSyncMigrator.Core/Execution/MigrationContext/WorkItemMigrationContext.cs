@@ -341,7 +341,7 @@ namespace VstsSyncMigrator.Engine
                 if (!allTypesMapped)
                 {
                     var ex = new Exception(
-                       "Not all WorkItemTypes present in the Source are present in the Target or mapped!");
+                       "Not all WorkItemTypes present in the Source are present in the Target or mapped! Filter them from the query, or map the to target types.");
                     Log.LogError(ex, "Not all WorkItemTypes present in the Source are present in the Target or mapped using `WorkItemTypeDefinition` in the config.");
                     throw ex;
                 }

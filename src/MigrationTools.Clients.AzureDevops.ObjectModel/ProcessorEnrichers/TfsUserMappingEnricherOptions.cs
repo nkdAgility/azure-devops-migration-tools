@@ -23,7 +23,8 @@ namespace MigrationTools.Enrichers
 
         public override void SetDefaults()
         {
-            Enabled = true;
+            Enabled = false;
+            UserMappingFile = "usermapping.json";
             IdentityFieldsToCheck = new List<string> {
                 "System.AssignedTo",
         "System.ChangedBy",

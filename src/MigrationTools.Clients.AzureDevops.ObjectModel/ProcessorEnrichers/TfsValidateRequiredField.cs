@@ -43,22 +43,30 @@ namespace MigrationTools.ProcessorEnrichers
             var result = true;
             foreach (WorkItemType sourceWorkItemType in sourceWorkItemTypes)
             {
-                var workItemTypeName = sourceWorkItemType.Name;
-                if (Engine.TypeDefinitionMaps.Items.ContainsKey(workItemTypeName))
+                try
                 {
-                    workItemTypeName = Engine.TypeDefinitionMaps.Items[workItemTypeName].Map();
-                }
-                var targetType = targetTypes[workItemTypeName];
+                    var workItemTypeName = sourceWorkItemType.Name;
+                    if (Engine.TypeDefinitionMaps.Items.ContainsKey(workItemTypeName))
+                    {
+                        workItemTypeName = Engine.TypeDefinitionMaps.Items[workItemTypeName].Map();
+                    }
+                    var targetType = targetTypes[workItemTypeName];
 
-                if (targetType.FieldDefinitions.Contains(fieldToFind))
-                {
-                    Log.LogDebug("ValidatingRequiredField: {WorkItemTypeName} contains {fieldToFind}", targetType.Name, fieldToFind);
+                    if (targetType.FieldDefinitions.Contains(fieldToFind))
+                    {
+                        Log.LogDebug("ValidatingRequiredField: {WorkItemTypeName} contains {fieldToFind}", targetType.Name, fieldToFind);
+                    }
+                    else
+                    {
+                        Log.LogWarning("ValidatingRequiredField: {WorkItemTypeName} does not contain {fieldToFind}", targetType.Name, fieldToFind);
+                        result = false;
+                    }
                 }
-                else
+                catch (WorkItemTypeDeniedOrNotExistException ex)
                 {
-                    Log.LogWarning("ValidatingRequiredField: {WorkItemTypeName} does not contain {fieldToFind}", targetType.Name, fieldToFind);
-                    result = false;
+                    Log.LogWarning(ex, "ValidatingRequiredField: Unable to validate one of the work items as its returned by TFS but has been deleted");
                 }
+               
             }
             return result;
         }

@@ -104,13 +104,16 @@ namespace MigrationTools.Enrichers
             Log.LogDebug("NodeStructureEnricher.GetNewNodeName::Mappers", mappers);
             foreach (var mapper in mappers)
             {
-                Log.LogDebug("NodeStructureEnricher.GetNewNodeName::MapperToRun::{key}", mapper.Key);
+                Log.LogDebug("NodeStructureEnricher.GetNewNodeName::Mappers::{key}", mapper.Key);
                 if (Regex.IsMatch(sourceNodePath, mapper.Key, RegexOptions.IgnoreCase))
                 {
-                    Log.LogDebug("NodeStructureEnricher.GetNewNodeName::MapperMatched::{key}", mapper.Key);
+                    Log.LogDebug("NodeStructureEnricher.GetNewNodeName::Mappers::{key}::Match", mapper.Key);
                     string replacement = Regex.Replace(sourceNodePath, mapper.Key, mapper.Value);
-                    Log.LogDebug("NodeStructureEnricher.GetNewNodeName::MapperMatched::{key}::replaceWith({replace})", mapper.Key, replacement);
+                    Log.LogDebug("NodeStructureEnricher.GetNewNodeName::Mappers::{key}::replaceWith({replace})", mapper.Key, replacement);
                     return replacement;
+                } else
+                {
+                    Log.LogDebug("NodeStructureEnricher.GetNewNodeName::Mappers::{key}::NoMatch", mapper.Key);
                 }
             }
 

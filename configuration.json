@@ -36,9 +36,11 @@
       "$type": "TfsNodeStructureOptions",
       "NodeBasePaths": [],
       "AreaMaps": {
+        "^nkdProducts([\\\\]?.*)$": "MigrationTest5$1",
         "^Skypoint Cloud$": "MigrationTest5"
       },
       "IterationMaps": {
+        "^nkdProducts([\\\\]?.*)$": "MigrationTest5$1",
         "^Skypoint Cloud\\\\Sprint 1$": "MigrationTest5\\Sprint 1"
       },
       "ShouldCreateMissingRevisionPaths": true,
@@ -93,10 +95,10 @@
   "Processors": [
     {
       "$type": "WorkItemMigrationConfig",
-      "Enabled": false,
+      "Enabled": true,
       "UpdateCreatedDate": true,
       "UpdateCreatedBy": true,
-      "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
+      "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Program', 'Portfolio', 'Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
       "LinkMigration": true,
       "FixHtmlAttachmentLinks": false,
       "SkipToFinalRevisedWorkItemType": false,
@@ -113,8 +115,8 @@
     },
     {
       "$type": "ExportUsersForMappingConfig",
-      "Enabled": true,
-      "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
+      "Enabled": false,
+      "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Program', 'Portfolio', 'Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
       "OnlyListUsersInWorkItems": true
     }
   ],
