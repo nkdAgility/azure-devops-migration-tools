@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
@@ -77,6 +78,9 @@ namespace MigrationTools.Enrichers
         {
             // Revisions have been sorted already on object creation. Values of the Dictionary are sorted by RevisionItem.Number
             var sortedRevisions = sourceWorkItem.Revisions.Values.ToList();
+
+            EnforceDatesMustBeIncreasing(sortedRevisions);
+
             LogDebugCurrentSortedRevisions(sourceWorkItem, sortedRevisions);
             Log.LogDebug("TfsRevisionManager::GetRevisionsToMigrate: Raw Source {sourceWorkItem} Has {sortedRevisions} revisions", sourceWorkItem.Id, sortedRevisions.Count);
 
@@ -89,6 +93,21 @@ namespace MigrationTools.Enrichers
             LogDebugCurrentSortedRevisions(sourceWorkItem, sortedRevisions);
 
             return sortedRevisions;
+        }
+
+        private void EnforceDatesMustBeIncreasing(List<RevisionItem> sortedRevisions)
+        {
+            Log.LogDebug("TfsRevisionManager::EnforceDatesMustBeIncreasing");
+            DateTime lastDateTime = DateTime.MinValue;
+            foreach (var revision in sortedRevisions)
+            {
+                if (revision.OriginalChangedDate == lastDateTime || revision.OriginalChangedDate < lastDateTime)
+                {
+                    revision.ChangedDate = lastDateTime.AddSeconds(1);
+                    Log.LogDebug("TfsRevisionManager::EnforceDatesMustBeIncreasing[{revision}]::Fix", revision.Number);
+                }
+                lastDateTime = revision.ChangedDate;
+            }
         }
 
         private void LogDebugCurrentSortedRevisions(WorkItemData sourceWorkItem, List<RevisionItem> sortedRevisions)

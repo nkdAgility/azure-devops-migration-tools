@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools.DataContracts;
@@ -30,18 +31,20 @@ namespace MigrationTools.ProcessorEnrichers.Tests
             return migrationConfig;
         }
 
-        private static WorkItemData GetWorkItemWithRevisions(DateTime currentDateTime, int startHours = 1, int endHours = 1)
+        private static WorkItemData GetWorkItemWithRevisions(DateTime currentDateTime, int startHours = 1, int endHours = 1, bool dateIncreasing = true)
         {
             var fakeWorkItem = new WorkItemData();
             fakeWorkItem.Id = Guid.NewGuid().ToString();
             fakeWorkItem.Revisions = new System.Collections.Generic.SortedDictionary<int, RevisionItem>();
             for (int i = startHours; i < endHours + startHours; i++)
             {
-                fakeWorkItem.Revisions.Add(i, new RevisionItem() { Index = i, Number = i, ChangedDate = currentDateTime.AddHours(-i) });
+                DateTime dateTime = dateIncreasing ? currentDateTime.AddHours(-i) : currentDateTime;
+                fakeWorkItem.Revisions.Add(i, new RevisionItem() { Index = i, Number = i, ChangedDate = dateTime, OriginalChangedDate = dateTime });
             }
 
             return fakeWorkItem;
         }
+
 
         [TestMethod(), TestCategory("L0"), TestCategory("AzureDevOps.ObjectModel")]
         public void TfsRevisionManagerInSync1()
@@ -177,5 +180,33 @@ namespace MigrationTools.ProcessorEnrichers.Tests
             Assert.AreEqual(5, revs.Count);
         }
 
+        [TestMethod(), TestCategory("L0"), TestCategory("AzureDevOps.ObjectModel")]
+        public void TfsRevisionManagerDatesMustBeIncreasing()
+        {
+            var peOptions = GetTfsRevisionManagerOptions();
+            var processorEnricher = Services.GetRequiredService<TfsRevisionManager>();
+            processorEnricher.Configure(peOptions);
+
+            var currentDateTime = DateTime.Now;
+            WorkItemData source = GetWorkItemWithRevisions(currentDateTime.AddHours(-1000), 1, 10, false);
+
+            var revs = processorEnricher.GetRevisionsToMigrate(source, null);
+            Assert.AreEqual(true, CheckDateIncreasing(revs));
+        }
+
+        private static bool CheckDateIncreasing(List<RevisionItem> revs)
+        {
+            DateTime lastDatetime = DateTime.MinValue;
+            bool increasing = true;
+            foreach (var rev in revs)
+            {
+                if (rev.ChangedDate == lastDatetime)
+                {
+                    increasing = false;
+                }
+                lastDatetime = rev.ChangedDate;
+            }
+            return increasing;
+        }
     }
 }
