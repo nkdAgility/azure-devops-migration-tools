@@ -48,6 +48,7 @@ namespace MigrationTools.Endpoints
                 Index = x.Index,
                 Number = (int)x.Fields["System.Rev"].Value,
                 ChangedDate = (DateTime)x.Fields["System.ChangedDate"].Value,
+                OriginalChangedDate = (DateTime)x.Fields["System.ChangedDate"].Value,
                 Type = x.Fields["System.WorkItemType"].Value as string,
                 Fields = GetFieldItems(x.Fields)
             }).ToList();
