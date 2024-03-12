@@ -49,7 +49,6 @@ namespace VstsSyncMigrator.Engine
     /// <processingtarget>Work Items</processingtarget>
     public class WorkItemMigrationContext : MigrationProcessorBase
     {
-        private const string RegexPatternForAreaAndIterationPathsFix = "\\[?(?<key>System.AreaPath|System.IterationPath)+\\]?[^']*'(?<value>[^']*(?:''.[^']*)*)'";
 
         private static int _count = 0;
         private static int _current = 0;
@@ -191,7 +190,7 @@ namespace VstsSyncMigrator.Engine
                         "[FilterWorkItemsThatAlreadyExistInTarget] is enabled. Searching for work items that have already been migrated to the target...",
                         sourceWorkItems.Count());
 
-                    string targetWIQLQuery = FixAreaPathAndIterationPathForTargetQuery(_config.WIQLQuery,
+                    string targetWIQLQuery = _nodeStructureEnricher.FixAreaPathAndIterationPathForTargetQuery(_config.WIQLQuery,
                         Engine.Source.WorkItems.Project.Name, Engine.Target.WorkItems.Project.Name, contextLog);
 
                     sourceWorkItems = ((TfsWorkItemMigrationClient)Engine.Target.WorkItems).FilterExistingWorkItems(
@@ -361,55 +360,6 @@ namespace VstsSyncMigrator.Engine
                     throw ex;
                 }
             }
-        }
-
-        internal string FixAreaPathAndIterationPathForTargetQuery(string sourceWIQLQuery, string sourceProject, string targetProject, ILogger? contextLog)
-        {
-
-            string targetWIQLQuery = sourceWIQLQuery;
-
-            if (string.IsNullOrWhiteSpace(targetWIQLQuery))
-            {
-                return targetWIQLQuery;
-            }
-
-            var matches = Regex.Matches(targetWIQLQuery, RegexPatternForAreaAndIterationPathsFix);
-
-
-            if (string.IsNullOrWhiteSpace(sourceProject)
-                || string.IsNullOrWhiteSpace(targetProject)
-                || sourceProject == targetProject)
-            {
-                return targetWIQLQuery;
-            }
-
-            foreach (Match match in matches)
-            {
-                var value = match.Groups["value"].Value;
-                if (string.IsNullOrWhiteSpace(value) || !value.StartsWith(sourceProject))
-                    continue;
-
-                var fieldType = match.Groups["key"].Value;
-                TfsNodeStructureType structureType;
-                switch (fieldType)
-                {
-                    case "System.AreaPath":
-                        structureType = TfsNodeStructureType.Area;
-                        break;
-                    case "System.IterationPath":
-                        structureType = TfsNodeStructureType.Iteration;
-                        break;
-                    default:
-                        throw new InvalidOperationException($"Field type {fieldType} is not supported for query remapping.");
-                }
-
-                var remappedPath = _nodeStructureEnricher.GetNewNodeName(value, structureType);
-                targetWIQLQuery = targetWIQLQuery.Replace(value, remappedPath);
-            }
-
-            contextLog?.Information("[FilterWorkItemsThatAlreadyExistInTarget] is enabled. Source project {sourceProject} is replaced with target project {targetProject} on the WIQLQueryBit which resulted into this target WIQLQueryBit \"{targetWIQLQueryBit}\" .", sourceProject, targetProject, targetWIQLQuery);
-
-            return targetWIQLQuery;
         }
 
         private static bool IsNumeric(string val, NumberStyles numberStyle)
