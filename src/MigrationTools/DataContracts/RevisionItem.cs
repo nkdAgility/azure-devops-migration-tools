@@ -9,6 +9,8 @@ namespace MigrationTools.DataContracts
         public int Index { get; set; }
         public int Number { get; set; }
         public DateTime ChangedDate { get; set; }
+
+        public DateTime OriginalChangedDate { get; set; }
         public string Type { get; set; }
         public Dictionary<string, FieldItem> Fields { get; set; }
         public Dictionary<string, EnricherData> EnricherData { get; set; }
