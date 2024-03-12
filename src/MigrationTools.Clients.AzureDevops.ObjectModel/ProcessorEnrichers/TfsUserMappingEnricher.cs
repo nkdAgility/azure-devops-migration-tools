@@ -25,13 +25,32 @@ namespace MigrationTools.ProcessorEnrichers
         IGroupSecurityService _gssSourse;
         private IGroupSecurityService _gssTarget;
 
+        private IGroupSecurityService GssSource
+        { get {
+                if (_gssSourse == null)
+                {
+                    _gssSourse = Engine.Source.GetService<IGroupSecurityService>();
+                }
+                return _gssSourse;
+            } }
+
+        private IGroupSecurityService GssTarget
+        {
+            get
+            {
+                if (_gssTarget == null)
+                {
+                    _gssTarget = Engine.Target.GetService<IGroupSecurityService>();
+                }
+                return _gssTarget;
+            }
+        }
+
         public TfsUserMappingEnricherOptions Options { get; private set; }
 
         public TfsUserMappingEnricher(IServiceProvider services, ILogger<TfsUserMappingEnricher> logger) : base(services, logger)
         {
             Engine = services.GetRequiredService<IMigrationEngine>();
-            _gssSourse = Engine.Source.GetService<IGroupSecurityService>();
-            _gssTarget = Engine.Target.GetService<IGroupSecurityService>();
         }
 
         public override void Configure(IProcessorEnricherOptions options)
@@ -154,9 +173,9 @@ namespace MigrationTools.ProcessorEnrichers
             Log.LogDebug("TfsUserMappingEnricher::GetUsersInSourceMappedToTarget");
             if (Options.Enabled)
             {
-                var sourceUsers = GetUsersListFromServer(_gssSourse);
+                var sourceUsers = GetUsersListFromServer(GssSource);
                 Log.LogDebug($"TfsUserMappingEnricher::GetUsersInSourceMappedToTarget [SourceUsersCount|{sourceUsers.Count}]");
-                var targetUsers = GetUsersListFromServer(_gssTarget);
+                var targetUsers = GetUsersListFromServer(GssTarget);
                 Log.LogDebug($"TfsUserMappingEnricher::GetUsersInSourceMappedToTarget [targetUsersCount|{targetUsers.Count}]");
                 return sourceUsers.Select(sUser => new IdentityMapData { Source = sUser, target = targetUsers.SingleOrDefault(tUser => tUser.FriendlyName == sUser.FriendlyName) }).ToList();
             }
