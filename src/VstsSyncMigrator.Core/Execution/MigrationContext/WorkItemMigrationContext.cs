@@ -544,7 +544,7 @@ namespace VstsSyncMigrator.Engine
                             { "sourceWorkItemRev", sourceWorkItem.Rev },
                             { "ReplayRevisions", _revisionManager.Options.ReplayRevisions }}
                         );
-                    List<RevisionItem> revisionsToMigrate = _revisionManager.GetRevisionsToMigrate(sourceWorkItem, targetWorkItem);
+                    List<RevisionItem> revisionsToMigrate = _revisionManager.GetRevisionsToMigrate(sourceWorkItem.Revisions.Values.ToList(), targetWorkItem.Revisions.Values.ToList());
                     if (targetWorkItem == null)
                     {
                         targetWorkItem = ReplayRevisions(revisionsToMigrate, sourceWorkItem, null);

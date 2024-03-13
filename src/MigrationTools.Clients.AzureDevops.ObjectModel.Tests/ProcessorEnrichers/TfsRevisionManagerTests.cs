@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools.DataContracts;
@@ -31,18 +32,16 @@ namespace MigrationTools.ProcessorEnrichers.Tests
             return migrationConfig;
         }
 
-        private static WorkItemData GetWorkItemWithRevisions(DateTime currentDateTime, int startHours = 1, int endHours = 1, bool dateIncreasing = true)
+        private static List<RevisionItem> GetWorkItemWithRevisions(DateTime currentDateTime, int startHours = 1, int endHours = 1, bool dateIncreasing = true)
         {
-            var fakeWorkItem = new WorkItemData();
-            fakeWorkItem.Id = Guid.NewGuid().ToString();
-            fakeWorkItem.Revisions = new System.Collections.Generic.SortedDictionary<int, RevisionItem>();
+            var revisions = new System.Collections.Generic.SortedDictionary<int, RevisionItem>();
             for (int i = startHours; i < endHours + startHours; i++)
             {
-                DateTime dateTime = dateIncreasing ? currentDateTime.AddHours(-i) : currentDateTime;
-                fakeWorkItem.Revisions.Add(i, new RevisionItem() { Index = i, Number = i, ChangedDate = dateTime, OriginalChangedDate = dateTime });
+                DateTime dateTime = dateIncreasing ? currentDateTime.AddHours(i) : currentDateTime;
+                revisions.Add(i, new RevisionItem() { Index = i, Number = i, ChangedDate = dateTime, OriginalChangedDate = dateTime });
             }
 
-            return fakeWorkItem;
+            return revisions.Values.ToList();
         }
 
 
@@ -54,8 +53,8 @@ namespace MigrationTools.ProcessorEnrichers.Tests
             processorEnricher.Configure(peOptions);
 
             var currentDateTime = System.DateTime.Now;
-            WorkItemData source = GetWorkItemWithRevisions(currentDateTime, 1, 1);
-            WorkItemData target = GetWorkItemWithRevisions(currentDateTime, 1, 1);
+            List<RevisionItem> source = GetWorkItemWithRevisions(currentDateTime, 1, 1);
+            List<RevisionItem> target = GetWorkItemWithRevisions(currentDateTime, 1, 1);
 
             var revs = processorEnricher.GetRevisionsToMigrate(source, target);
 
@@ -71,12 +70,12 @@ namespace MigrationTools.ProcessorEnrichers.Tests
             processorEnricher.Configure(peOptions);
 
             var currentDateTime = System.DateTime.Now;
-            WorkItemData source = GetWorkItemWithRevisions(currentDateTime, 1, 10);
-            WorkItemData target = GetWorkItemWithRevisions(currentDateTime, 1, 10);
+            List<RevisionItem> source = GetWorkItemWithRevisions(currentDateTime, 1, 10);
+            List<RevisionItem> target = GetWorkItemWithRevisions(currentDateTime, 1, 10);
 
             var revs = processorEnricher.GetRevisionsToMigrate(source, target);
 
-            Assert.AreEqual(revs.Count, 0);
+            Assert.AreEqual(0, revs.Count);
 
         }
 
@@ -88,8 +87,8 @@ namespace MigrationTools.ProcessorEnrichers.Tests
             processorEnricher.Configure(peOptions);
 
             var currentDateTime = System.DateTime.Now;
-            WorkItemData source = GetWorkItemWithRevisions(currentDateTime, 1, 2);
-            WorkItemData target = GetWorkItemWithRevisions(currentDateTime, 2, 1);
+            List<RevisionItem> source = GetWorkItemWithRevisions(currentDateTime, 1, 2);
+            List<RevisionItem> target = GetWorkItemWithRevisions(currentDateTime, 1, 1);
 
             var revs = processorEnricher.GetRevisionsToMigrate(source, target);
 
@@ -104,8 +103,8 @@ namespace MigrationTools.ProcessorEnrichers.Tests
             processorEnricher.Configure(peOptions);
 
             var currentDateTime = DateTime.Now;
-            WorkItemData source = GetWorkItemWithRevisions(currentDateTime, 1, 11);
-            WorkItemData target = GetWorkItemWithRevisions(currentDateTime, 11, 1);
+            List<RevisionItem> source = GetWorkItemWithRevisions(currentDateTime, 1, 11);
+            List<RevisionItem> target = GetWorkItemWithRevisions(currentDateTime, 1, 1);
 
             var revs = processorEnricher.GetRevisionsToMigrate(source, target);
 
@@ -120,9 +119,9 @@ namespace MigrationTools.ProcessorEnrichers.Tests
             var processorEnricher = Services.GetRequiredService<TfsRevisionManager>();
             processorEnricher.Configure(peOptions);
 
-            var currentDateTime = DateTime.Now;
-            WorkItemData source = GetWorkItemWithRevisions(currentDateTime, 1, 4);
-            WorkItemData target = GetWorkItemWithRevisions(currentDateTime, 4, 1);
+            var currentDateTime = DateTime.Now.AddDays(-100);
+            List<RevisionItem> source = GetWorkItemWithRevisions(currentDateTime, 1, 4);
+            List<RevisionItem> target = GetWorkItemWithRevisions(currentDateTime, 1, 1);
 
             var revs = processorEnricher.GetRevisionsToMigrate(source, target);
 
@@ -139,12 +138,12 @@ namespace MigrationTools.ProcessorEnrichers.Tests
             processorEnricher.Configure(peOptions);
 
             var currentDateTime = DateTime.Now;
-            WorkItemData source = GetWorkItemWithRevisions(currentDateTime, 1, 2);
-            WorkItemData target = GetWorkItemWithRevisions(currentDateTime, 2, 1);
+            List<RevisionItem> source = GetWorkItemWithRevisions(currentDateTime, 1, 2);
+            List<RevisionItem> target = GetWorkItemWithRevisions(currentDateTime, 2, 2);
 
             var revs = processorEnricher.GetRevisionsToMigrate(source, target);
 
-            Assert.AreEqual(1, revs.Count);
+            Assert.AreEqual(0, revs.Count);
         }
 
         [TestMethod(), TestCategory("L0"), TestCategory("AzureDevOps.ObjectModel")]
@@ -156,8 +155,8 @@ namespace MigrationTools.ProcessorEnrichers.Tests
             processorEnricher.Configure(peOptions);
 
             var currentDateTime = DateTime.Now;
-            WorkItemData source = GetWorkItemWithRevisions(currentDateTime, 1, 7);
-            WorkItemData target = GetWorkItemWithRevisions(currentDateTime, 7, 1);
+            List<RevisionItem> source = GetWorkItemWithRevisions(currentDateTime, 1, 7);
+            List<RevisionItem> target = GetWorkItemWithRevisions(currentDateTime, 1, 1);
 
             var revs = processorEnricher.GetRevisionsToMigrate(source, target);
 
@@ -173,7 +172,7 @@ namespace MigrationTools.ProcessorEnrichers.Tests
             processorEnricher.Configure(peOptions);
 
             var currentDateTime = DateTime.Now;
-            WorkItemData source = GetWorkItemWithRevisions(currentDateTime, 1, 10);
+            List<RevisionItem> source = GetWorkItemWithRevisions(currentDateTime, 1, 10);
 
             var revs = processorEnricher.GetRevisionsToMigrate(source, null);
 
@@ -188,7 +187,7 @@ namespace MigrationTools.ProcessorEnrichers.Tests
             processorEnricher.Configure(peOptions);
 
             var currentDateTime = DateTime.Now;
-            WorkItemData source = GetWorkItemWithRevisions(currentDateTime.AddHours(-1000), 1, 10, false);
+            List<RevisionItem> source = GetWorkItemWithRevisions(currentDateTime, 1, 10, false);
 
             var revs = processorEnricher.GetRevisionsToMigrate(source, null);
             Assert.AreEqual(true, CheckDateIncreasing(revs));
