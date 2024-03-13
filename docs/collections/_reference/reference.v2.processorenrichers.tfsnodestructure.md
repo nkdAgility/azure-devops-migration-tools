@@ -82,7 +82,15 @@ topics:
     You have two options to solve this problem:
 
 
+    <<<<<<< HEAD
+
     1. You can manually create the mentioned work items. This is a good option if you have a small number of work items or a small number of missing nodes. This will not work if you have work items that were moved from one project to another. Those Nodes are impossible to create in the target project.
+
+    =======
+
+    1. You can manualy create the mentioned work items. This is a good option if you have a small number of work items or a small number of missing nodes. This will not work if you have work items that were moved from one project to another. Those Nodes are imposible to create in the target project.
+
+    >>>>>>> origin/master
 
     1. You can use the `AreaMaps` and `IterationMaps` to remap the nodes to existing nodes in the target project. This is a good option if you have a large number of work items or a large number of missing nodes.
 
@@ -220,6 +228,8 @@ topics:
       `TargetProject\NewArea\ValidArea\` but `OriginalProject\DescopeThis` would not
       be modified by this rule.
 
+    <<<<<<< HEAD
+
     ### PrefixProjectToNodes
 
 
@@ -239,6 +249,10 @@ topics:
     ```
 
 
+
+    =======
+
+    >>>>>>> origin/master
 
     ### More Complex Regex
 

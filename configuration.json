@@ -2,8 +2,8 @@
   "ChangeSetMappingFile": null,
   "Source": {
     "$type": "TfsTeamProjectConfig",
-    "Collection": "https://dev.azure.com/nkdagility/",
-    "Project": "AzureDevOps-Tools",
+    "Collection": "https://dev.azure.com/nkdagility-preview/",
+    "Project": "migrationSource1",
     "ReflectedWorkItemIDFieldName": "nkdScrum.ReflectedWorkItemId",
     "AllowCrossProjectLinking": false,
     "AuthenticationMode": "Prompt",

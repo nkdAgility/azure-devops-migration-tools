@@ -7,7 +7,7 @@ configurationSamples:
   code: >-
     {
       "$type": "TfsUserMappingEnricherOptions",
-      "Enabled": true,
+      "Enabled": false,
       "IdentityFieldsToCheck": [
         "System.AssignedTo",
         "System.ChangedBy",
@@ -16,7 +16,7 @@ configurationSamples:
         "Microsoft.VSTS.Common.ResolvedBy",
         "Microsoft.VSTS.Common.ClosedBy"
       ],
-      "UserMappingFile": null
+      "UserMappingFile": "usermapping.json"
     }
   sampleFor: MigrationTools.Enrichers.TfsUserMappingEnricherOptions
 description: The TfsUserMappingEnricher is used to map users from the source to the target system. Run it with the ExportUsersForMappingContext to create a mapping file then with WorkItemMigrationContext to use the mapping file to update the users in the target system as you migrate the work items.

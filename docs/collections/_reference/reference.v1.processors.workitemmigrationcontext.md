@@ -111,7 +111,7 @@ topics:
 - topic: notes
   path: /docs/Reference/v1/Processors/WorkItemMigrationContext-notes.md
   exists: true
-  markdown: >-
+  markdown: >+
     ## <a name="WIQLQueryBits"></a>WIQL Query Bits
 
 
@@ -178,6 +178,8 @@ topics:
     ## <a name="NodeBasePath"></a>NodeBasePath Configuration 
 
 
+    <<<<<<< HEAD
+
     Moved to the ProcessorEnricher [TfsNodeStructure](/Reference/v2/ProcessorEnrichers/TfsNodeStructure/)
 
 
@@ -185,6 +187,18 @@ topics:
 
 
     Moved to the ProcessorEnricher [TfsNodeStructure](/Reference/v2/ProcessorEnrichers/TfsNodeStructure/)
+
+    =======
+
+    Moved to the ProcessorEnricher [TfsNodeStructure](../Reference/v2/ProcessorEnrichers/TfsNodeStructure/)
+
+
+    # Iteration Maps and Area Maps
+
+
+    Moved to the ProcessorEnricher [TfsNodeStructure](../Reference/v2/ProcessorEnrichers/TfsNodeStructure/)
+
+    >>>>>>> origin/master
 
 
 
@@ -225,11 +239,19 @@ topics:
     # Removed Properties
 
 
+    <<<<<<< HEAD
+
     - PrefixProjectToNodes - This option was removed in favour of the Area and Iteration Maps on [TfsNodeStructure](/Reference/v2/ProcessorEnrichers/TfsNodeStructure/)
+
+    =======
+
+    - PrefixProjectToNodes - This option was removed in favour of the Area and Iteration Maps on [TfsNodeStructure](../Reference/v2/ProcessorEnrichers/TfsNodeStructure/)
+
+    >>>>>>> origin/master
 - topic: introduction
   path: /docs/Reference/v1/Processors/WorkItemMigrationContext-introduction.md
   exists: true
-  markdown: >
+  markdown: >+
     The `WorkItemMigrationContext` processor is used for migrating work items from one Azure DevOps instance to another. This encompasses a variety of activities:
 
 
