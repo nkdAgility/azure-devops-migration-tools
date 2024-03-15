@@ -9,7 +9,7 @@ namespace MigrationTools._EngineV1.Containers
 {
     public class TypeDefinitionMapContainer : EngineContainer<ReadOnlyDictionary<string, IWitdMapper>>
     {
-        private Dictionary<string, IWitdMapper> _TypeDefinitions = new Dictionary<string, IWitdMapper>();
+        private Dictionary<string, IWitdMapper> _TypeDefinitions = new Dictionary<string, IWitdMapper>(StringComparer.InvariantCultureIgnoreCase);
         private readonly ILogger<TypeDefinitionMapContainer> _logger;
 
         public override ReadOnlyDictionary<string, IWitdMapper> Items { get { return new ReadOnlyDictionary<string, IWitdMapper>(_TypeDefinitions); } }

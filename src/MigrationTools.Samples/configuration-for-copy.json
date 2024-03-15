@@ -1,0 +1,85 @@
+{
+  "Version": "0.0",
+  "LogLevel": "Verbose",
+  "workaroundForQuerySOAPBugEnabled": false,
+  "Source": {
+    "$type": "TfsTeamProjectConfig",
+    "Collection": "https://dev.azure.com/nkdagility-preview/",
+    "Project": "migrationSource1",
+    "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
+    "AuthenticationMode": "AccessToken",
+    "AllowCrossProjectLinking": false,
+    "PersonalAccessToken": "rrsne75npwj5ctn5vm337nrxiqlvdkfmcbkqrubl6ushts6syi5a",
+    "LanguageMaps": {
+      "AreaPath": "Area",
+      "IterationPath": "Iteration"
+    }
+  },
+  "Target": {
+    "$type": "TfsTeamProjectConfig",
+    "Collection": "https://dev.azure.com/nkdagility-preview/",
+    "Project": "migration Target 1",
+    "ReflectedWorkItemIDFieldName": "nkdScrum.ReflectedWorkItemId",
+    "AuthenticationMode": "AccessToken",
+    "AllowCrossProjectLinking": false,
+    "PersonalAccessToken": "rrsne75npwj5ctn5vm337nrxiqlvdkfmcbkqrubl6ushts6syi5a",
+    "LanguageMaps": {
+      "AreaPath": "Area",
+      "IterationPath": "Iteration"
+    }
+  },
+  "FieldMaps": [],
+  "WorkItemTypeDefinition": {
+    "sourceWorkItemTypeName": "targetWorkItemTypeName"
+  },
+  "GitRepoMapping": null,
+  "CommonEnrichersConfig": [
+    {
+      "$type": "TfsNodeStructureOptions",
+      "PrefixProjectToNodes": false,
+      "NodeBasePaths": [],
+      "AreaMaps": {},
+      "IterationMaps": {},
+      "ShouldCreateMissingRevisionPaths": false
+    }
+  ],
+  "Processors": [
+    //{
+    //  "$type": "WorkItemDeleteConfig",
+    //  "Enabled": true,
+    //  "WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
+    //  "WIQLOrderBit": "[System.ChangedDate] desc"
+    //},
+    {
+      "$type": "WorkItemMigrationConfig",
+      "Enabled": true,
+      "ReplayRevisions": false,
+      "PrefixProjectToNodes": false,
+      "UpdateCreatedDate": false,
+      "UpdateCreatedBy": false,
+      "WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
+      "WIQLOrderBit": "[System.ChangedDate] desc",
+      "LinkMigration": true,
+      "AttachmentMigration": true,
+      "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
+      "FixHtmlAttachmentLinks": false,
+      "SkipToFinalRevisedWorkItemType": false,
+      "WorkItemCreateRetryLimit": 5,
+      "FilterWorkItemsThatAlreadyExistInTarget": false,
+      "PauseAfterEachWorkItem": false,
+      "AttachmentMaxSize": 480000000,
+      "AttachRevisionHistory": false,
+      "LinkMigrationSaveEachAsAdded": false,
+      "GenerateMigrationComment": false,
+      "WorkItemIDs": null,
+      "MaxRevisions": 0,
+      "NodeStructureEnricherEnabled": true,
+      "UseCommonNodeStructureEnricherConfig": true,
+      "NodeBasePaths": [],
+      "AreaMaps": {},
+      "IterationMaps": {},
+      "MaxGracefulFailures": 0
+    }
+
+  ]
+}

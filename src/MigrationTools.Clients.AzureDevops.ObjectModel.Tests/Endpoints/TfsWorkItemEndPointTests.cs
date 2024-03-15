@@ -42,7 +42,7 @@ namespace MigrationTools.Endpoints.Tests
             var endpoint = Services.GetRequiredService<TfsWorkItemEndpoint>();
             endpoint.Configure(GetTfsWorkItemEndPointOptions("migrationSource1"));
             IEnumerable<WorkItemData> result = endpoint.GetWorkItems();
-            Assert.AreEqual(9, result.Count());
+            Assert.AreEqual(12, result.Count());
         }
 
         [TestMethod(), TestCategory("L3"), TestCategory("AzureDevOps.ObjectModel")]
@@ -56,7 +56,7 @@ namespace MigrationTools.Endpoints.Tests
                 Parameters = new Dictionary<string, string>() { { "TeamProject", "migrationSource1" } }
             };
             IEnumerable<WorkItemData> result = endpoint.GetWorkItems(qo);
-            Assert.AreEqual(9, result.Count());
+            Assert.AreEqual(12, result.Count());
         }
 
         private static TfsWorkItemEndpointOptions GetTfsWorkItemEndPointOptions(string project)

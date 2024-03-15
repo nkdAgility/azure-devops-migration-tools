@@ -7,8 +7,7 @@ configurationSamples:
     {
       "$type": "WorkItemDeleteConfig",
       "Enabled": false,
-      "WIQLQueryBit": "AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
-      "WIQLOrderBit": "[System.ChangedDate] desc",
+      "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
       "WorkItemIDs": null,
       "FilterWorkItemsThatAlreadyExistInTarget": false,
       "PauseAfterEachWorkItem": false,
@@ -32,11 +31,7 @@ options:
   type: Boolean
   description: missng XML code comments
   defaultValue: missng XML code comments
-- parameterName: WIQLOrderBit
-  type: String
-  description: missng XML code comments
-  defaultValue: missng XML code comments
-- parameterName: WIQLQueryBit
+- parameterName: WIQLQuery
   type: String
   description: missng XML code comments
   defaultValue: missng XML code comments

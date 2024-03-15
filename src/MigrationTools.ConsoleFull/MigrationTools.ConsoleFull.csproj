@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net472</TargetFramework>
     <Product>Azure DevOps Migration Tools [Object Model]</Product>
-    <AssemblyName>migration</AssemblyName>
+    <AssemblyName>devopsmigration</AssemblyName>
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
 

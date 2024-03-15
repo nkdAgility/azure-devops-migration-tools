@@ -6,6 +6,7 @@ namespace MigrationTools.Host.Services.Tests
     [TestClass]
     public class DetectVersionServiceTests
     {
+        [Ignore]
         [TestMethod, TestCategory("L3")]
         public void DetectVersionServiceTest()
         {

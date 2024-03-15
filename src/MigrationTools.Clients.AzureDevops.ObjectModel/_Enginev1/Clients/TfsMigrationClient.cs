@@ -110,14 +110,14 @@ namespace MigrationTools._EngineV1.Clients
         {
             var startTime = DateTime.UtcNow;
             var timer = System.Diagnostics.Stopwatch.StartNew();
-            TfsTeamProjectCollection y;
+            TfsTeamProjectCollection y = null;
             try
             {
-                Log.Information("TfsMigrationClient::GetDependantTfsCollection:AuthenticationMode({0})", _config.AuthenticationMode.ToString());
+                Log.Debug("TfsMigrationClient::GetDependantTfsCollection:AuthenticationMode({0})", _config.AuthenticationMode.ToString());
                 switch (_config.AuthenticationMode)
                 {
                     case AuthenticationMode.AccessToken:
-                        Log.Information("TfsMigrationClient::GetDependantTfsCollection: Connecting with AccessToken ");
+                        Log.Information("Connecting with AccessToken ");
                         var pat = TfsConfig.PersonalAccessToken;
                         if (!string.IsNullOrEmpty(TfsConfig.PersonalAccessTokenVariableName))
                         {
@@ -128,7 +128,7 @@ namespace MigrationTools._EngineV1.Clients
                         break;
 
                     case AuthenticationMode.Windows:
-                        Log.Information("TfsMigrationClient::GetDependantTfsCollection: Connecting with NetworkCredential passes on CommandLine ");
+                        Log.Information("Connecting with NetworkCredential passes on CommandLine ");
                         if (credentials is null)
                         {
                             throw new InvalidOperationException("If AuthenticationMode = Windows then you must pass credentails on the command line.");
@@ -138,20 +138,20 @@ namespace MigrationTools._EngineV1.Clients
                         break;
 
                     case AuthenticationMode.Prompt:
-                        Log.Information("TfsMigrationClient::GetDependantTfsCollection: Prompting for credentials ");
+                        Log.Information("Prompting for credentials ");
                         y = new TfsTeamProjectCollection(TfsConfig.Collection);
                         break;
 
                     default:
-                        Log.Information("TfsMigrationClient::GetDependantTfsCollection: Setting _vssCredentials to Null ");
+                        Log.Information("Setting _vssCredentials to Null ");
                         y = new TfsTeamProjectCollection(TfsConfig.Collection);
                         break;
                 }
-                Log.Information("MigrationClient: Connecting to {CollectionUrl} ", TfsConfig.Collection);
-                Log.Information("MigrationClient: validating security for {@AuthorizedIdentity} ", y.AuthorizedIdentity);
+                Log.Debug("MigrationClient: Connecting to {CollectionUrl} ", TfsConfig.Collection);
+                Log.Verbose("MigrationClient: validating security for {@AuthorizedIdentity} ", y.AuthorizedIdentity);
                 y.EnsureAuthenticated();
                 timer.Stop();
-                Log.Information("MigrationClient: Access granted to {CollectionUrl} for {Name} ({Account})", TfsConfig.Collection, y.AuthorizedIdentity.DisplayName, y.AuthorizedIdentity.UniqueName);
+                Log.Information("Access granted to {CollectionUrl} for {Name} ({Account})", TfsConfig.Collection, y.AuthorizedIdentity.DisplayName, y.AuthorizedIdentity.UniqueName);
                 _Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", TfsConfig.Collection.ToString(), "GetWorkItem", null, startTime, timer.Elapsed, "200", true));
             }
             catch (Exception ex)
@@ -166,8 +166,8 @@ namespace MigrationTools._EngineV1.Clients
                        new Dictionary<string, double> {
                             { "Time",timer.ElapsedMilliseconds }
                        });
-                Log.Error(ex, "Unable to configure store");
-                throw;
+                Log.Error(ex, "Unable to configure store: Check persmissions and credentials for {AuthenticationMode}", _config.AuthenticationMode);
+                Environment.Exit(-1);
             }
             return y;
         }

@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using CommandLine;
 using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.ApplicationInsights.WorkerService;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,10 +33,10 @@ namespace MigrationTools.Host
             {
                 return null;
             }
-
             var hostBuilder = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args)
              .UseSerilog((hostingContext, services, loggerConfiguration) =>
              {
+                 string outputTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] [" + GetVersionTextForLog() + "] {Message:lj}{NewLine}{Exception}";
                  string logsPath = CreateLogsPath();
                  var logPath = Path.Combine(logsPath, "migration.log");
                  var logLevel = hostingContext.Configuration.GetValue<LogEventLevel>("LogLevel");
@@ -46,7 +47,7 @@ namespace MigrationTools.Host
                      .Enrich.FromLogContext()
                      .Enrich.WithMachineName()
                      .Enrich.WithProcessId()
-                     .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Debug, theme: AnsiConsoleTheme.Code, outputTemplate:"[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
+                     .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Debug, theme: AnsiConsoleTheme.Code, outputTemplate: outputTemplate)
                      .WriteTo.ApplicationInsights(services.GetService<TelemetryClient>(), new CustomConverter(), LogEventLevel.Error)
                      .WriteTo.File(logPath, LogEventLevel.Verbose);
              })
@@ -93,11 +94,12 @@ namespace MigrationTools.Host
                  });
 
                  // Application Insights
-                 services.AddApplicationInsightsTelemetryWorkerService(new ApplicationInsightsServiceOptions { InstrumentationKey = "2d666f84-b3fb-4dcf-9aad-65de038d2772" });
-
+                 services.AddApplicationInsightsTelemetryWorkerService(new ApplicationInsightsServiceOptions { ApplicationVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString(), ConnectionString = "InstrumentationKey=2d666f84-b3fb-4dcf-9aad-65de038d2772" });
+                 
                  // Services
                  services.AddTransient<IDetectOnlineService, DetectOnlineService>();
-                 services.AddTransient<IDetectVersionService, DetectVersionService>();
+                 //services.AddTransient<IDetectVersionService, DetectVersionService>();
+                 services.AddTransient<IDetectVersionService2, DetectVersionService2>();
 
                  // Config
                  services.AddSingleton<IEngineConfigurationBuilder, EngineConfigurationBuilder>();
@@ -141,7 +143,16 @@ namespace MigrationTools.Host
                  }
              })
              .UseConsoleLifetime();
+
+
             return hostBuilder;
+        }
+
+        private static string GetVersionTextForLog()
+        {
+            Version runningVersion = DetectVersionService2.GetRunningVersion();
+            string textVersion = ((runningVersion.Major > 1) ? "v" + runningVersion : ThisAssembly.Git.BaseTag + "-" + ThisAssembly.Git.Commits + "-local");
+            return textVersion;
         }
 
         public static async Task RunMigrationTools(this IHostBuilder hostBuilder, string[] args)
@@ -152,6 +163,23 @@ namespace MigrationTools.Host
             {
                 return;
             }
+
+
+            // Disanle telemitery from options
+            (var initOptions, var executeOptions) = ParseOptions(args);
+            if (initOptions is null && executeOptions is null)
+            {
+                return;
+            }
+            bool DisableTelemetry = false;
+            Serilog.ILogger logger = host.Services.GetService<Serilog.ILogger>();
+            if (executeOptions is not null && bool.TryParse(executeOptions.DisableTelemetry, out DisableTelemetry))
+            {
+                TelemetryConfiguration ai = host.Services.GetService<TelemetryConfiguration>();
+                ai.DisableTelemetry = DisableTelemetry;
+            }
+            logger.Information("Telemetry: {status}", !DisableTelemetry);
+
             await host.RunAsync();
         }
 

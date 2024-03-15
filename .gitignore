@@ -158,3 +158,7 @@ $RECYCLE.BIN/
 /AttachmentExportData
 /TfsWitMigrator.sln.ide
 /.vs
+
+
+docs/Reference/Generated/MigrationTools.Host.xml
+/docs/Reference/Generated/MigrationTools.Host.xml

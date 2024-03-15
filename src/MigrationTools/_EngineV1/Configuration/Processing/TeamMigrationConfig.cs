@@ -8,12 +8,6 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         public bool Enabled { get; set; }
 
         /// <summary>
-        /// Prefix your iterations and areas with the project name. If you have enabled this in `NodeStructuresMigrationConfig` you must do it here too.
-        /// </summary>
-        /// <default>false</default>
-        public bool PrefixProjectToNodes { get; set; }
-
-        /// <summary>
         /// Migrate original team settings after their creation on target team project
         /// </summary>
         /// <default>true</default>

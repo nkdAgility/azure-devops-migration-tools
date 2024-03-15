@@ -48,7 +48,7 @@ namespace MigrationTools._EngineV1.Configuration
                 _logger.LogTrace(ex, "Configuration Error");
                 _logger.LogCritical("Your configuration file was loaded but was unable to be mapped to ");
                 _logger.LogError(ex.Message);
-                _logger.LogError("How to Solve: Malformed configurations are usually a result of changes between versions. The best way to understand the change is to run 'migration.exe init' to create a new wel formed config and determin where the problem is!");
+                _logger.LogError("How to Solve: Malformed configurations are usually a result of changes between versions. The best way to understand the change is to run 'devopsmigration init' to create a new wel formed config and determin where the problem is!");
                 Environment.Exit(-1);
                 return null;
             }
@@ -106,6 +106,31 @@ namespace MigrationTools._EngineV1.Configuration
             return ec;
         }
 
+        public EngineConfiguration BuildReference()
+        {
+            EngineConfiguration ec = CreateEmptyConfig();
+            AddExampleFieldMapps(ec);
+            AddWorkItemMigrationDefault(ec);
+            AddTestPlansMigrationDefault(ec);
+            ec.Processors.Add(new ImportProfilePictureConfig());
+            ec.Processors.Add(new ExportProfilePictureFromADConfig());
+            ec.Processors.Add(new FixGitCommitLinksConfig() { TargetRepository = "targetProjectName" });
+            ec.Processors.Add(new WorkItemUpdateConfig());
+            ec.Processors.Add(new WorkItemPostProcessingConfig() { WorkItemIDs = new List<int> { 1, 2, 3 } });
+            ec.Processors.Add(new WorkItemDeleteConfig());
+            ec.Processors.Add(new WorkItemQueryMigrationConfig() { SourceToTargetFieldMappings = new Dictionary<string, string>() { { "SourceFieldRef", "TargetFieldRef" } } });
+            ec.Processors.Add(new TeamMigrationConfig());
+            return ec;
+        }
+
+        public EngineConfiguration BuildGettingStarted()
+        {
+            EngineConfiguration ec = CreateEmptyConfig();
+            ec.CommonEnrichersConfig = new List<IProcessorEnricherOptions>();
+            AddWorkItemMigrationDefault(ec);
+            return ec;
+        }
+
         public EngineConfiguration BuildWorkItemMigration()
         {
             EngineConfiguration ec = CreateEmptyConfig();
@@ -116,10 +141,7 @@ namespace MigrationTools._EngineV1.Configuration
 
         private void AddWorkItemMigrationDefault(EngineConfiguration ec)
         {
-            var config = new WorkItemMigrationConfig
-            {
-                NodeBasePaths = new[] { "Product\\Area\\Path1", "Product\\Area\\Path2" }
-            };
+            var config = new WorkItemMigrationConfig();
             ec.Processors.Add(config);
         }
 
@@ -265,7 +287,6 @@ namespace MigrationTools._EngineV1.Configuration
                 {
                     Enabled = true,
                     CollapseRevisions = false,
-                    PrefixProjectToNodes = false,
                     ReplayRevisions = true,
                     WorkItemCreateRetryLimit = 5,
                     ProcessorEnrichers = GetAllTypes<IProcessorEnricherOptions>(),
@@ -337,5 +358,7 @@ namespace MigrationTools._EngineV1.Configuration
 
             File.WriteAllText(settingsFileName, json);
         }
+
+   
     }
 }

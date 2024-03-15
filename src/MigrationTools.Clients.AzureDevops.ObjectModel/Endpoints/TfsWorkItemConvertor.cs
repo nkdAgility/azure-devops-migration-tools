@@ -43,6 +43,7 @@ namespace MigrationTools.Endpoints
         {
             var items = tfsRevisions.OfType<Revision>().Select(x => new RevisionItem()
             {
+                WorkItemId = x.WorkItem.Id,
                 Index = x.Index,
                 Number = (int)x.Fields["System.Rev"].Value,
                 ChangedDate = (DateTime)x.Fields["System.ChangedDate"].Value,
@@ -57,7 +58,7 @@ namespace MigrationTools.Endpoints
             }
             catch (ArgumentException e)
             {
-                Log.Error(e, "ArgumentException");
+                Log.Warning(e, "For some Reason there are multiple Revisions on {WorkItemId} with the same System.Rev. We will create a renumbered list...", items[0].WorkItemId);
                 var currentNumber = -1;
                 foreach (var item in items)
                 {
@@ -79,6 +80,7 @@ namespace MigrationTools.Endpoints
                 Name = x.Name,
                 ReferenceName = x.ReferenceName,
                 Value = x.Value,
+                FieldType = x.FieldDefinition.FieldType.ToString(),
                 internalObject = x
             })
             .ToDictionary(r => r.ReferenceName);
