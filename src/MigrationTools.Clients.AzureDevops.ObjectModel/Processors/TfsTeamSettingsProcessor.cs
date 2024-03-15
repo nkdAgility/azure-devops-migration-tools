@@ -296,7 +296,33 @@ namespace MigrationTools.Processors
                                 sourceDisplayName = sourceDisplayName.Substring(0, index).Trim();
                             }
 
+                            // Match:
+                            //   "Doe, John" to "Doe, John"
+                            //   "John Doe" to "John Doe"
                             var targetTeamFoundatationIdentity = _targetTeamFoundationIdentitiesLazyCache.Value.FirstOrDefault(i => i.DisplayName == sourceDisplayName);
+                            if (targetTeamFoundatationIdentity == null)
+                            {
+                                if (sourceDisplayName.Contains(", ")) 
+                                {
+                                    // Match:
+                                    //   "Doe, John" to "John Doe"
+                                    var splitName = sourceDisplayName.Split(',');
+                                    sourceDisplayName = $"{splitName[1].Trim()} {splitName[0].Trim()}";
+                                    targetTeamFoundatationIdentity = _targetTeamFoundationIdentitiesLazyCache.Value.FirstOrDefault(i => i.DisplayName == sourceDisplayName);
+                                }
+                                else
+                                {
+                                    if (sourceDisplayName.Contains(' '))
+                                    {
+                                        // Match:
+                                        //   "John Doe" to "Doe, John"
+                                        var splitName = sourceDisplayName.Split(' ');
+                                        sourceDisplayName = $"{splitName[1].Trim()}, {splitName[0].Trim()}";
+                                        targetTeamFoundatationIdentity = _targetTeamFoundationIdentitiesLazyCache.Value.FirstOrDefault(i => i.DisplayName == sourceDisplayName);
+                                    }
+                                }
+                            }
+
                             if (targetTeamFoundatationIdentity != null)
                             {
                                 targetCapacities.Add(new TeamMemberCapacityIdentityRef
