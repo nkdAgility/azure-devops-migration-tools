@@ -13,6 +13,19 @@
         <member name="M:MigrationTools.Enrichers.TfsEmbededImagesEnricher.FixEmbededImages(MigrationTools.DataContracts.WorkItemData,System.String,System.String,System.String)">
             from https://gist.github.com/pietergheysens/792ed505f09557e77ddfc1b83531e4fb
         </member>
+        <member name="P:MigrationTools.Enrichers.TfsAttachmentEnricherOptions.ExportBasePath">
+            <summary>
+            `AttachmentMigration` is set to true then you need to specify a working path for attachments to be saved locally.
+            </summary>
+            <default>C:\temp\Migration\</default>
+        </member>
+        <member name="P:MigrationTools.Enrichers.TfsAttachmentEnricherOptions.MaxAttachmentSize">
+            <summary>
+            `AttachmentMigration` is set to true then you need to specify a max file size for upload in bites.
+            For Azure DevOps Services the default is 480,000,000 bites (60mb), for TFS its 32,000,000 bites (4mb).
+            </summary>
+            <default>480000000</default>
+        </member>
         <member name="T:MigrationTools.Enrichers.TfsNodeStructure">
             <summary>
             The TfsNodeStructureEnricher is used to create missing nodes in the target project. To configure it add a `TfsNodeStructureOptions` section to `CommonEnrichersConfig` in the config file. Otherwise defaults will be applied. 
@@ -77,6 +90,16 @@
             </summary>
             <default>0</default>
         </member>
+        <member name="P:MigrationTools.Enrichers.TfsUserMappingEnricherOptions.IdentityFieldsToCheck">
+            <summary>
+            This is a list of the Identiy fields in the Source to check for user mapping purposes. You should list all identiy fields that you wan to map.
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Enrichers.TfsUserMappingEnricherOptions.UserMappingFile">
+            <summary>
+            This is the file that will be used to export or import the user mappings. Use the ExportUsersForMapping processor to create the file.
+            </summary>
+        </member>
         <member name="P:MigrationTools.Enrichers.TfsWorkItemLinkEnricherOptions.FilterIfLinkCountMatches">
             <summary>
             Skip validating links if the number of links in the source and the target matches!
@@ -87,6 +110,11 @@
             Save the work item after each link is added. This will slow the migration as it will cause many saves to the TFS database.
             </summary>
             <default>false</default>
+        </member>
+        <member name="T:MigrationTools.ProcessorEnrichers.TfsUserMappingEnricher">
+            <summary>
+            The TfsUserMappingEnricher is used to map users from the source to the target system. Run it with the ExportUsersForMappingContext to create a mapping file then with WorkItemMigrationContext to use the mapping file to update the users in the target system as you migrate the work items.
+            </summary>
         </member>
         <member name="T:MigrationTools.Processors.TfsAreaAndIterationProcessor">
             <summary>

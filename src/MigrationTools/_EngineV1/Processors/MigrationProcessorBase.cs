@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Enrichers;
@@ -90,13 +91,21 @@ namespace MigrationTools._EngineV1.Processors
             where TEnricherOptions : IProcessorEnricherOptions, new()
             where TEnricher : IProcessorEnricher
         {
-            var config = commonEnrichersStore.OfType<TEnricherOptions>().FirstOrDefault();
+            TEnricherOptions config = default(TEnricherOptions);
+            if (commonEnricher == null)
+            {
+                commonEnricher= Services.GetService<TEnricher>();
+            }
+            if (commonEnrichersStore != null)
+            {
+                config = commonEnrichersStore.OfType<TEnricherOptions>().FirstOrDefault();
+            }
             if (config == null)
             {
                 var result = new TEnricherOptions();
                 result.SetDefaults();
                 commonEnricher.Configure(result);
-                Log.LogWarning("Using `{TEnricherOptions}` with Defaults... add a `{TEnricherOptions}` entry to `CommonEnrichersConfig` to customise the settings.", typeof(TEnricherOptions).Name);
+                Log.LogInformation("Using `{TEnricherOptions}` with Defaults... add a `{TEnricherOptions}` entry to `CommonEnrichersConfig` to customise the settings.", typeof(TEnricherOptions).Name);
             }
             else
             {

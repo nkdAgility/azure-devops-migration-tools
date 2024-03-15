@@ -17,7 +17,7 @@ namespace MigrationTools
             context.AddSingleton<TestVariablesMigrationContext>();
             context.AddSingleton<WorkItemPostProcessingContext>();
             context.AddSingleton<WorkItemPostProcessingContext>();
-            context.AddSingleton<ExportUsersForMapping>();
+            context.AddSingleton<ExportUsersForMappingContext>();
             context.AddSingleton<CreateTeamFolders>();
             context.AddSingleton<ExportProfilePictureFromADContext>();
             context.AddSingleton<ExportTeamList>();
@@ -26,6 +26,7 @@ namespace MigrationTools
             context.AddSingleton<WorkItemDelete>();
             context.AddSingleton<WorkItemUpdate>();
             context.AddSingleton<WorkItemUpdateAreasAsTagsContext>();
+
         }
     }
 }

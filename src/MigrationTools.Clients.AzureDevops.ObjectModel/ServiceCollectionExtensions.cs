@@ -8,6 +8,7 @@ using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
 using MigrationTools.FieldMaps.AzureDevops.ObjectModel;
 using MigrationTools.ProcessorEnrichers;
+using MigrationTools.ProcessorEnrichers.WorkItemProcessorEnrichers;
 using MigrationTools.Processors;
 
 namespace MigrationTools
@@ -26,6 +27,8 @@ namespace MigrationTools
             context.AddTransient<TfsAreaAndIterationProcessor>();
 
             // Enrichers
+            context.AddSingleton<TfsAttachmentEnricher>();
+            context.AddSingleton<TfsUserMappingEnricher>();
             context.AddSingleton<TfsValidateRequiredField>();
             context.AddSingleton<TfsWorkItemLinkEnricher>();
             context.AddSingleton<TfsWorkItemEmbededLinkEnricher>();

@@ -4,54 +4,105 @@ using System.Diagnostics;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MigrationTools;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Configuration.Processing;
+using MigrationTools._EngineV1.Processors;
 using MigrationTools.DataContracts;
 using MigrationTools.DataContracts.Process;
+using MigrationTools.EndpointEnrichers;
 using MigrationTools.Enrichers;
+using MigrationTools.ProcessorEnrichers;
+using MigrationTools.ProcessorEnrichers.WorkItemProcessorEnrichers;
+using Newtonsoft.Json;
 using VstsSyncMigrator._EngineV1.Processors;
 
 namespace VstsSyncMigrator.Core.Execution.MigrationContext
 {
-    public class ExportUsersForMapping : StaticProcessorBase
+    /// <summary>
+    /// ExportUsersForMappingContext is a tool used to create a starter mapping file for users between the source and target systems.
+    /// Use `ExportUsersForMappingConfig` to configure.
+    /// </summary>
+    /// <status>ready</status>
+    /// <processingtarget>Work Items</processingtarget>
+    public class ExportUsersForMappingContext : MigrationProcessorBase
     {
         private ExportUsersForMappingConfig _config;
         private TfsUserMappingEnricher _TfsUserMappingEnricher;
 
-        public ExportUsersForMapping(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<ExportUsersForMapping> logger) : base(services, me, telemetry, logger)
-        {
-            Logger = logger;
-        }
+
 
         public override string Name
         {
             get
             {
-                return "ExportUsersForMapping";
+                return "ExportUsersForMappingContext";
             }
         }
 
-        public ILogger<ExportUsersForMapping> Logger { get; }
+        public ILogger<ExportUsersForMappingContext> Logger { get; }
+
+        private EngineConfiguration _engineConfig;
+
+        public ExportUsersForMappingContext(IMigrationEngine engine, IServiceProvider services, ITelemetryLogger telemetry, ILogger<ExportUsersForMappingContext> logger, IOptions<EngineConfiguration> engineConfig, TfsUserMappingEnricher userMappingEnricher) : base(engine, services, telemetry, logger)
+        {
+                Logger = logger;
+                _engineConfig = engineConfig.Value;
+            _TfsUserMappingEnricher = userMappingEnricher;
+        }
 
         public override void Configure(IProcessorConfig config)
         {
             _config = (ExportUsersForMappingConfig)config;
-            _TfsUserMappingEnricher = Services.GetRequiredService<TfsUserMappingEnricher>();
+            ImportCommonEnricherConfigs();
+
+        }
+
+        private void ImportCommonEnricherConfigs()
+        {
+            /// setup _engineConfig.CommonEnrichersConfig
+            if (_engineConfig.CommonEnrichersConfig == null)
+            {
+                Log.LogError("CommonEnrichersConfig cant be Null! it must be a minimum of `[]`");
+                Environment.Exit(-1);
+            }
+            PullCommonEnrichersConfig<TfsUserMappingEnricher, TfsUserMappingEnricherOptions>(_engineConfig.CommonEnrichersConfig, _TfsUserMappingEnricher);
         }
 
         protected override void InternalExecute()
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
-            //////////////////////////////////////////////////
-            List<WorkItemData> sourceWorkItems = Engine.Source.WorkItems.GetWorkItems(_config.WIQLQuery);
-            Log.LogInformation("Processing {0} work items from Source", sourceWorkItems.Count);
-            /////////////////////////////////////////////////
 
-           Dictionary<string,string> usersToMap = _TfsUserMappingEnricher.findUsersToMap(sourceWorkItems, _config.IdentityFieldsToCheck);
+            if(string.IsNullOrEmpty(_TfsUserMappingEnricher.Options.UserMappingFile))
+            {
+                Log.LogError("UserMappingFile is not set");
 
-            System.IO.File.WriteAllText(_config.LocalExportJsonFile, Newtonsoft.Json.JsonConvert.SerializeObject(usersToMap));
+                throw new ArgumentNullException("UserMappingFile must be set on the TfsUserMappingEnricherOptions in CommonEnrichersConfig.");
+                       }
+         
+            List<IdentityMapData> usersToMap = new List<IdentityMapData>();
+            if (_config.OnlyListUsersInWorkItems)
+            {
+                Log.LogInformation("OnlyListUsersInWorkItems is true, only users in work items will be listed");
+                List<WorkItemData> sourceWorkItems = Engine.Source.WorkItems.GetWorkItems(_config.WIQLQuery);
+                Log.LogInformation("Processed {0} work items from Source", sourceWorkItems.Count);
 
+                usersToMap = _TfsUserMappingEnricher.GetUsersInSourceMappedToTargetForWorkItems(sourceWorkItems);
+                Log.LogInformation("Found {usersToMap} total mapped", usersToMap.Count);
+            }
+            else
+            {
+                Log.LogInformation("OnlyListUsersInWorkItems is false, all users will be listed");
+                usersToMap = _TfsUserMappingEnricher.GetUsersInSourceMappedToTarget();
+                Log.LogInformation("Found {usersToMap} total mapped", usersToMap.Count);
+            }
+
+            usersToMap = usersToMap.Where(x => x.Source.FriendlyName != x.target?.FriendlyName).ToList();
+            Log.LogInformation("Filtered to {usersToMap} total viable mappings", usersToMap.Count);
+            Dictionary<string, string> usermappings = usersToMap.ToDictionary(x => x.Source.FriendlyName, x => x.target?.FriendlyName);
+            System.IO.File.WriteAllText(_TfsUserMappingEnricher.Options.UserMappingFile, Newtonsoft.Json.JsonConvert.SerializeObject(usermappings, Formatting.Indented));
+            Log.LogInformation("Writen to: {LocalExportJsonFile}", _TfsUserMappingEnricher.Options.UserMappingFile);
             //////////////////////////////////////////////////
             stopwatch.Stop();
             Log.LogInformation("DONE in {Elapsed} seconds");

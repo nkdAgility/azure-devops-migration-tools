@@ -17,8 +17,8 @@ architecture: v2
 options:
 - parameterName: Enabled
   type: Boolean
-  description: For internal use
-  defaultValue: missng XML code comments
+  description: If enabled this will run this migrator
+  defaultValue: true
 - parameterName: RefName
   type: String
   description: For internal use

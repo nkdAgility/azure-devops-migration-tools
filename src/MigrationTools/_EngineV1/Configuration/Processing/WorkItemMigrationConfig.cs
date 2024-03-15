@@ -41,18 +41,6 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         public string Processor => "WorkItemMigrationContext";
 
         /// <summary>
-        /// If enabled this will migrate all of the attachments at the same time as the work item
-        /// </summary>
-        /// <default>true</default>
-        public bool AttachmentMigration { get; set; }
-
-        /// <summary>
-        /// `AttachmentMigration` is set to true then you need to specify a working path for attachments to be saved locally.
-        /// </summary>
-        /// <default>C:\temp\Migration\</default>
-        public string AttachmentWorkingPath { get; set; }
-
-        /// <summary>
         /// **beta** If enabled this will fix any image attachments URL's, work item mention URL's or user mentions in the HTML
         /// fields as well as discussion comments. You must specify a PersonalAccessToken in the Source project for Azure DevOps;
         /// TFS should use integrated authentication.
@@ -88,13 +76,6 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         public bool PauseAfterEachWorkItem { get; set; }
 
         /// <summary>
-        /// `AttachmentMigration` is set to true then you need to specify a max file size for upload in bites.
-        /// For Azure DevOps Services the default is 480,000,000 bites (60mb), for TFS its 32,000,000 bites (4mb).
-        /// </summary>
-        /// <default>480000000</default>
-        public int AttachmentMaxSize { get; set; }
-
-        /// <summary>
         /// This will create a json file with the revision history and attach it to the work item. Best used with `MaxRevisions` or `ReplayRevisions`.
         /// </summary>
         /// <default>?</default>
@@ -119,7 +100,6 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         /// <default>[]</default>
         public IList<int> WorkItemIDs { get; set; }
 
-    
         /// <summary>
         /// The maximum number of failures to tolerate before the migration fails. When set above zero, a work item migration error is logged but the migration will
         /// continue until the number of failed items reaches the configured value, after which the migration fails.
@@ -151,10 +131,7 @@ namespace MigrationTools._EngineV1.Configuration.Processing
             Enabled = false;
             WorkItemCreateRetryLimit = 5;
             FilterWorkItemsThatAlreadyExistInTarget = false;
-            AttachmentMigration = true;
             FixHtmlAttachmentLinks = false;
-            AttachmentWorkingPath = "c:\\temp\\WorkItemAttachmentWorkingFolder\\";
-            AttachmentMaxSize = 480000000;
             UpdateCreatedBy = true;
             UpdateCreatedDate = true;
             SkipToFinalRevisedWorkItemType = false;

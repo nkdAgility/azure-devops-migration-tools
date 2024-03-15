@@ -47,8 +47,9 @@
         </member>
         <member name="P:MigrationTools.Enrichers.ProcessorEnricherOptions.Enabled">
             <summary>
-            For internal use
+            If enabled this will run this migrator
             </summary>
+            <default>true</default>
         </member>
         <member name="P:MigrationTools.Enrichers.ProcessorEnricherOptions.RefName">
             <summary>
@@ -241,6 +242,7 @@
         <member name="M:MigrationTools._EngineV1.Configuration.Processing.ExportProfilePictureFromADConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
             <inheritdoc />
         </member>
+        <!-- Badly formed XML comment ignored for member "P:MigrationTools._EngineV1.Configuration.Processing.ExportUsersForMappingConfig.OnlyListUsersInWorkItems" -->
         <member name="M:MigrationTools._EngineV1.Configuration.Processing.ExportUsersForMappingConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
             <inheritdoc />
         </member>
@@ -379,18 +381,6 @@
             </summary>
             <default>?</default>
         </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.AttachmentMigration">
-            <summary>
-            If enabled this will migrate all of the attachments at the same time as the work item
-            </summary>
-            <default>true</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.AttachmentWorkingPath">
-            <summary>
-            `AttachmentMigration` is set to true then you need to specify a working path for attachments to be saved locally.
-            </summary>
-            <default>C:\temp\Migration\</default>
-        </member>
         <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.FixHtmlAttachmentLinks">
             <summary>
             **beta** If enabled this will fix any image attachments URL's, work item mention URL's or user mentions in the HTML
@@ -425,13 +415,6 @@
             Pause after each work item is migrated
             </summary>
             <default>false</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.AttachmentMaxSize">
-            <summary>
-            `AttachmentMigration` is set to true then you need to specify a max file size for upload in bites.
-            For Azure DevOps Services the default is 480,000,000 bites (60mb), for TFS its 32,000,000 bites (4mb).
-            </summary>
-            <default>480000000</default>
         </member>
         <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.AttachRevisionHistory">
             <summary>

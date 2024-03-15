@@ -11,6 +11,7 @@ namespace MigrationTools
 
         public TelemetryClientAdapter(TelemetryClient telemetryClient)
         {
+            telemetryClient.InstrumentationKey = "2d666f84-b3fb-4dcf-9aad-65de038d2772";
             telemetryClient.Context.Session.Id = Guid.NewGuid().ToString();
             telemetryClient.Context.Device.OperatingSystem = Environment.OSVersion.ToString();
             if (!(System.Reflection.Assembly.GetEntryAssembly() is null))

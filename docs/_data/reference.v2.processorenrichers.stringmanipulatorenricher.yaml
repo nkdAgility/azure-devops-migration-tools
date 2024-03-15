@@ -26,8 +26,8 @@ architecture: v2
 options:
 - parameterName: Enabled
   type: Boolean
-  description: For internal use
-  defaultValue: missng XML code comments
+  description: If enabled this will run this migrator
+  defaultValue: true
 - parameterName: Manipulators
   type: List
   description: List of regex based string manipulations to apply to all string fields. Each regex replacement is applied in order and can be enabled or disabled.

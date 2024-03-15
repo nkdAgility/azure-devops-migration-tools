@@ -30,8 +30,8 @@ options:
   defaultValue: '{}'
 - parameterName: Enabled
   type: Boolean
-  description: For internal use
-  defaultValue: missng XML code comments
+  description: If enabled this will run this migrator
+  defaultValue: true
 - parameterName: IterationMaps
   type: Dictionary
   description: Remapping rules for iteration paths, implemented with regular expressions. The rules apply with a higher priority than the `PrefixProjectToNodes`, that is, if no rule matches the path and the `PrefixProjectToNodes` option is enabled, then the old `PrefixProjectToNodes` behavior is applied.
@@ -69,73 +69,33 @@ topics:
 - topic: notes
   path: /docs/Reference/v2/ProcessorEnrichers/TfsNodeStructure-notes.md
   exists: true
-  markdown: >-
-    ## <a name="NodeBasePath"></a>NodeBasePath Configuration ##
-
-    The `NodeBasePaths` entry allows the filtering of the nodes to be replicated on the target projects. To try to explain the correct usage let us assume that we have a source team project `SourceProj` with the following node structures
-
-
-    - AreaPath
-       - SourceProj
-       - SourceProj\Team 1
-       - SourceProj\Team 2
-       - SourceProj\Team 2\Sub-Area
-       - SourceProj\Team 3
-    - IterationPath
-       - SourceProj
-       - SourceProj\Sprint 1
-       - SourceProj\Sprint 2
-       - SourceProj\Sprint 2\Sub-Iteration
-       - SourceProj\Sprint 3
-
-    Depending upon what node structures you wish to migrate you would need the following settings. Exclusions are also possible by prefixing a path with an exclamation mark `!`. Example are
-
-
-    | | |
-
-    |-|-|
-
-    | Intention    | Migrate all areas and iterations and all Work Items
-
-    | NodeBasePath | `[]`
-
-    | Comment      | The same AreaPath and Iteration Paths are created on the target as on the source. Hence, all migrated WI remain in their existing area and iteration paths
-
-    ||
-
-    | Intention    | Only migrate area path `Team 2` and it associated Work Items, but all iteration paths
-
-    | NodeBasePath | `["Team 2", "Sprint"]`
-
-    | Comment      | Only the area path ending `Team 2` will be migrated. <br>The `WIQLQueryBit` should be edited to limit the WI migrated to this area path e.g. add `AND [System.AreaPath] UNDER 'SampleProject\\Team 2'` . <br> The migrated WI will have an area path of `TargetProj\Team 2` but retain their iteration paths matching the sprint name on the source
-
-    ||
-
-    | Intention    | Only migrate iterations structure
-
-    | NodeBasePath | `["Sprint"]`
-
-    | Comment      | Only the area path ending `Team 2` will be migrated<br>All the iteration paths will be migrated. <br> The migrated WI will have the default area path of `TargetProj` as their source area path was not migrated i.e. `TargetProj`<br> The migrated WI will have an iteration path match the sprint name on the source
-
-    ||
-
-    | Intention    | Move all WI to the existing area and iteration paths on the targetProj
-
-    | NodeBasePath | `["DUMMY VALUE"]`
-
-    | Comment      | As the `NodeBasePath` does not match any source area or iteration path no nodes are migrated. <br>Migrated WI will be assigned to any matching area or iteration paths. If no matching ones can be found they will default to the respective root values
-
-    ||
-
-    | Intention    | Move the `Team 2` area, but not its `Sub-Area`
-
-    | NodeBasePath | `["Team 2", "!Team 2\\SubArea"]`
-
-    | Comment      | The Work Items will have to be restricted to the right areas, e.g. with `AND [System.AreaPath] UNDER 'SampleProject\\Team 2' AND [System.AreaPath] NOT UNDER 'SampleProject\\Team 2\\Sub-Area'`, otherwise their migratin will fail
+  markdown: >2-
 
 
 
-    # Iteration Maps and Area Maps
+    ## Iteration Maps and Area Maps
+
+
+    **NOTE: It is NOT posible to migrate a work item if the Area or Iteration path does not exist on the target project. This is because the work item will be created with the same Area and Iteration path as the source work item. If the path does not exist, the work item will not be created. _There is not way around this!_**
+
+
+    You have two options to solve this problem:
+
+
+    <<<<<<< HEAD
+
+    1. You can manually create the mentioned work items. This is a good option if you have a small number of work items or a small number of missing nodes. This will not work if you have work items that were moved from one project to another. Those Nodes are impossible to create in the target project.
+
+    =======
+
+    1. You can manualy create the mentioned work items. This is a good option if you have a small number of work items or a small number of missing nodes. This will not work if you have work items that were moved from one project to another. Those Nodes are imposible to create in the target project.
+
+    >>>>>>> origin/master
+
+    1. You can use the `AreaMaps` and `IterationMaps` to remap the nodes to existing nodes in the target project. This is a good option if you have a large number of work items or a large number of missing nodes.
+
+
+    ### Overview
 
 
     These two configuration elements apply after the `NodeBasePaths` selector, i.e.
@@ -201,7 +161,8 @@ topics:
     in the replacement string.
 
 
-    #### Examples explained
+
+    ### Configuration
 
 
     ```json
@@ -267,19 +228,45 @@ topics:
       `TargetProject\NewArea\ValidArea\` but `OriginalProject\DescopeThis` would not
       be modified by this rule.
 
+    <<<<<<< HEAD
+
+    ### PrefixProjectToNodes
+
+
+    The `PrefixProjectToNodes` was an option that was used to prepend the source project name to the target set of nodes. This was super valuable when the target Project already has nodes and you dont want to merge them all together. This is now replaced by the `AreaMaps` and `IterationMaps` options.
+
+
+    ```
+
+    "IterationMaps": {
+      "^SourceServer\\\\(.*)" , "TargetServer\\SourceServer\\$1",
+    },
+
+    "AreaMaps": {
+       "^SourceServer\\\\(.*)" , "TargetServer\\SourceServer\\$1",
+    }
+
+    ```
+
+
+
+    =======
+
+    >>>>>>> origin/master
+
     ### More Complex Regex
 
 
     Before your migration starts it will validate that all of the Areas and Iterations from the **Source** work items revisions exist on the **Target**. Any that do not exist will be flagged in the logs and if and the migration will stop just after it outputs a list of the missing nodes.
 
 
-    Our algorithm that converts the Source nodes to Target nodes processes the [mappings](https://nkdagility.com/learn/azure-devops-migration-tools/Reference/v1/Processors/WorkItemMigrationContext/#iteration-maps-and-area-maps) at that time. This means that any valid mapped nodes will never be caught by the `This path is not anchored in the source project` message as they are already altered to be valid.
+    Our algorithm that converts the Source nodes to Target nodes processes the mappings at that time. This means that any valid mapped nodes will never be caught by the `This path is not anchored in the source project` message as they are already altered to be valid.
 
 
     > We recently updated the logging for this part of the system to more easily debug both your mappings and to see what they system is doing with the nodes and their current state. You can set `"LogLevel": "Debug"` to see the details.
 
 
-    To add a mapping, you can follow [the documentation](https://nkdagility.com/learn/azure-devops-migration-tools/Reference/v1/Processors/WorkItemMigrationContext/#iteration-maps-and-area-maps) with this being the simplest way:
+    To add a mapping, you can follow the documentation with this being the simplest way:
 
 
     ```
@@ -381,6 +368,70 @@ topics:
     ],
 
     ```
+
+
+    ## <a name="NodeBasePath"></a>NodeBasePath Configuration
+
+    The `NodeBasePaths` entry allows the filtering of the nodes to be replicated on the target projects. To try to explain the correct usage let us assume that we have a source team project `SourceProj` with the following node structures
+
+
+    - AreaPath
+       - SourceProj
+       - SourceProj\Team 1
+       - SourceProj\Team 2
+       - SourceProj\Team 2\Sub-Area
+       - SourceProj\Team 3
+    - IterationPath
+       - SourceProj
+       - SourceProj\Sprint 1
+       - SourceProj\Sprint 2
+       - SourceProj\Sprint 2\Sub-Iteration
+       - SourceProj\Sprint 3
+
+    Depending upon what node structures you wish to migrate you would need the following settings. Exclusions are also possible by prefixing a path with an exclamation mark `!`. Example are
+
+
+    | | |
+
+    |-|-|
+
+    | Intention    | Migrate all areas and iterations and all Work Items
+
+    | NodeBasePath | `[]`
+
+    | Comment      | The same AreaPath and Iteration Paths are created on the target as on the source. Hence, all migrated WI remain in their existing area and iteration paths
+
+    ||
+
+    | Intention    | Only migrate area path `Team 2` and it associated Work Items, but all iteration paths
+
+    | NodeBasePath | `["Team 2", "Sprint"]`
+
+    | Comment      | Only the area path ending `Team 2` will be migrated. <br>The `WIQLQueryBit` should be edited to limit the WI migrated to this area path e.g. add `AND [System.AreaPath] UNDER 'SampleProject\\Team 2'` . <br> The migrated WI will have an area path of `TargetProj\Team 2` but retain their iteration paths matching the sprint name on the source
+
+    ||
+
+    | Intention    | Only migrate iterations structure
+
+    | NodeBasePath | `["Sprint"]`
+
+    | Comment      | Only the area path ending `Team 2` will be migrated<br>All the iteration paths will be migrated. <br> The migrated WI will have the default area path of `TargetProj` as their source area path was not migrated i.e. `TargetProj`<br> The migrated WI will have an iteration path match the sprint name on the source
+
+    ||
+
+    | Intention    | Move all WI to the existing area and iteration paths on the targetProj
+
+    | NodeBasePath | `["DUMMY VALUE"]`
+
+    | Comment      | As the `NodeBasePath` does not match any source area or iteration path no nodes are migrated. <br>Migrated WI will be assigned to any matching area or iteration paths. If no matching ones can be found they will default to the respective root values
+
+    ||
+
+    | Intention    | Move the `Team 2` area, but not its `Sub-Area`
+
+    | NodeBasePath | `["Team 2", "!Team 2\\SubArea"]`
+
+    | Comment      | The Work Items will have to be restricted to the right areas, e.g. with `AND [System.AreaPath] UNDER 'SampleProject\\Team 2' AND [System.AreaPath] NOT UNDER 'SampleProject\\Team 2\\Sub-Area'`, otherwise their migratin will fail
 - topic: introduction
   path: /docs/Reference/v2/ProcessorEnrichers/TfsNodeStructure-introduction.md
   exists: true

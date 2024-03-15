@@ -49,7 +49,7 @@ namespace MigrationTools.Host
                      .Enrich.WithProcessId()
                      .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Debug, theme: AnsiConsoleTheme.Code, outputTemplate: outputTemplate)
                      .WriteTo.ApplicationInsights(services.GetService<TelemetryClient>(), new CustomConverter(), LogEventLevel.Error)
-                     .WriteTo.File(logPath, LogEventLevel.Verbose);
+                     .WriteTo.File(logPath, LogEventLevel.Verbose, outputTemplate: outputTemplate);
              })
              .ConfigureLogging((context, logBuilder) =>
              {
@@ -94,7 +94,13 @@ namespace MigrationTools.Host
                  });
 
                  // Application Insights
-                 services.AddApplicationInsightsTelemetryWorkerService(new ApplicationInsightsServiceOptions { ApplicationVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString(), ConnectionString = "InstrumentationKey=2d666f84-b3fb-4dcf-9aad-65de038d2772" });
+                 ApplicationInsightsServiceOptions aiso = new ApplicationInsightsServiceOptions();
+                 aiso.ApplicationVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+                 aiso.ConnectionString = "InstrumentationKey=2d666f84-b3fb-4dcf-9aad-65de038d2772";
+                 //# if DEBUG
+                 //aiso.DeveloperMode = true;
+                 //#endif
+                 services.AddApplicationInsightsTelemetryWorkerService(aiso);
                  
                  // Services
                  services.AddTransient<IDetectOnlineService, DetectOnlineService>();

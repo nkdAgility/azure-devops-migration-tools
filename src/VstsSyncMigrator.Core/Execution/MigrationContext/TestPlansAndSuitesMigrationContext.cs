@@ -75,11 +75,7 @@ namespace VstsSyncMigrator.Engine
         {
             _config = (TestPlansAndSuitesMigrationConfig)config;
 
-
-                var nodeStructureOptions =
-                    _engineConfig.CommonEnrichersConfig.OfType<TfsNodeStructureOptions>().FirstOrDefault()
-                    ?? throw new InvalidOperationException("Cannot use common node structure because it is not found.");
-                _nodeStructureEnricher.Configure(nodeStructureOptions);
+            PullCommonEnrichersConfig<TfsNodeStructure, TfsNodeStructureOptions>(_engineConfig.CommonEnrichersConfig, _nodeStructureEnricher);
             
         }
 

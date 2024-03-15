@@ -41,11 +41,19 @@ Scope to Area Path (Team data):
 
 ## <a name="NodeBasePath"></a>NodeBasePath Configuration 
 
+<<<<<<< HEAD
+Moved to the ProcessorEnricher [TfsNodeStructure](/Reference/v2/ProcessorEnrichers/TfsNodeStructure/)
+
+# Iteration Maps and Area Maps
+
+Moved to the ProcessorEnricher [TfsNodeStructure](/Reference/v2/ProcessorEnrichers/TfsNodeStructure/)
+=======
 Moved to the ProcessorEnricher [TfsNodeStructure](../Reference/v2/ProcessorEnrichers/TfsNodeStructure/)
 
 # Iteration Maps and Area Maps
 
 Moved to the ProcessorEnricher [TfsNodeStructure](../Reference/v2/ProcessorEnrichers/TfsNodeStructure/)
+>>>>>>> origin/master
 
 
 
@@ -78,4 +86,8 @@ A complete list of [FieldMaps](../Reference/v1/FieldMaps/index.md) are available
 
 # Removed Properties
 
+<<<<<<< HEAD
+- PrefixProjectToNodes - This option was removed in favour of the Area and Iteration Maps on [TfsNodeStructure](/Reference/v2/ProcessorEnrichers/TfsNodeStructure/)
+=======
 - PrefixProjectToNodes - This option was removed in favour of the Area and Iteration Maps on [TfsNodeStructure](../Reference/v2/ProcessorEnrichers/TfsNodeStructure/)
+>>>>>>> origin/master

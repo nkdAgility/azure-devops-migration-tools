@@ -11,14 +11,11 @@ configurationSamples:
       "UpdateCreatedDate": true,
       "UpdateCreatedBy": true,
       "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
-      "AttachmentMigration": true,
-      "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
       "FixHtmlAttachmentLinks": false,
       "SkipToFinalRevisedWorkItemType": false,
       "WorkItemCreateRetryLimit": 5,
       "FilterWorkItemsThatAlreadyExistInTarget": false,
       "PauseAfterEachWorkItem": false,
-      "AttachmentMaxSize": 480000000,
       "AttachRevisionHistory": false,
       "LinkMigrationSaveEachAsAdded": false,
       "GenerateMigrationComment": true,
@@ -33,18 +30,6 @@ className: WorkItemMigrationContext
 typeName: Processors
 architecture: v1
 options:
-- parameterName: AttachmentMaxSize
-  type: Int32
-  description: '`AttachmentMigration` is set to true then you need to specify a max file size for upload in bites. For Azure DevOps Services the default is 480,000,000 bites (60mb), for TFS its 32,000,000 bites (4mb).'
-  defaultValue: 480000000
-- parameterName: AttachmentMigration
-  type: Boolean
-  description: If enabled this will migrate all of the attachments at the same time as the work item
-  defaultValue: true
-- parameterName: AttachmentWorkingPath
-  type: String
-  description: '`AttachmentMigration` is set to true then you need to specify a working path for attachments to be saved locally.'
-  defaultValue: C:\temp\Migration\
 - parameterName: AttachRevisionHistory
   type: Boolean
   description: This will create a json file with the revision history and attach it to the work item. Best used with `MaxRevisions` or `ReplayRevisions`.
@@ -126,7 +111,7 @@ topics:
 - topic: notes
   path: /docs/Reference/v1/Processors/WorkItemMigrationContext-notes.md
   exists: true
-  markdown: >-
+  markdown: >+
     ## <a name="WIQLQueryBits"></a>WIQL Query Bits
 
 
@@ -193,6 +178,18 @@ topics:
     ## <a name="NodeBasePath"></a>NodeBasePath Configuration 
 
 
+    <<<<<<< HEAD
+
+    Moved to the ProcessorEnricher [TfsNodeStructure](/Reference/v2/ProcessorEnrichers/TfsNodeStructure/)
+
+
+    # Iteration Maps and Area Maps
+
+
+    Moved to the ProcessorEnricher [TfsNodeStructure](/Reference/v2/ProcessorEnrichers/TfsNodeStructure/)
+
+    =======
+
     Moved to the ProcessorEnricher [TfsNodeStructure](../Reference/v2/ProcessorEnrichers/TfsNodeStructure/)
 
 
@@ -200,6 +197,8 @@ topics:
 
 
     Moved to the ProcessorEnricher [TfsNodeStructure](../Reference/v2/ProcessorEnrichers/TfsNodeStructure/)
+
+    >>>>>>> origin/master
 
 
 
@@ -240,7 +239,15 @@ topics:
     # Removed Properties
 
 
+    <<<<<<< HEAD
+
+    - PrefixProjectToNodes - This option was removed in favour of the Area and Iteration Maps on [TfsNodeStructure](/Reference/v2/ProcessorEnrichers/TfsNodeStructure/)
+
+    =======
+
     - PrefixProjectToNodes - This option was removed in favour of the Area and Iteration Maps on [TfsNodeStructure](../Reference/v2/ProcessorEnrichers/TfsNodeStructure/)
+
+    >>>>>>> origin/master
 - topic: introduction
   path: /docs/Reference/v1/Processors/WorkItemMigrationContext-introduction.md
   exists: true

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
@@ -73,33 +74,54 @@ namespace MigrationTools.Enrichers
             }
         }
 
-        public List<RevisionItem> GetRevisionsToMigrate(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
+        public List<RevisionItem> GetRevisionsToMigrate(List<RevisionItem> sourceRevisions, List<RevisionItem> targetRevisions)
         {
-            // Revisions have been sorted already on object creation. Values of the Dictionary are sorted by RevisionItem.Number
-            var sortedRevisions = sourceWorkItem.Revisions.Values.ToList();
-            LogDebugCurrentSortedRevisions(sourceWorkItem, sortedRevisions);
-            Log.LogDebug("TfsRevisionManager::GetRevisionsToMigrate: Raw Source {sourceWorkItem} Has {sortedRevisions} revisions", sourceWorkItem.Id, sortedRevisions.Count);
+            EnforceDatesMustBeIncreasing(sourceRevisions);
 
-            sortedRevisions = RemoveRevisionsAlreadyOnTarget(targetWorkItem, sortedRevisions);
+            LogDebugCurrentSortedRevisions(sourceRevisions, "Source");
+            LogDebugCurrentSortedRevisions(targetRevisions, "Target");
+            Log.LogDebug("TfsRevisionManager::GetRevisionsToMigrate: Raw {sourceWorkItem} Has {sortedRevisions} revisions", "Source", sourceRevisions.Count);
 
-            RemoveRevisionsAllExceptLatest(sortedRevisions);
+            sourceRevisions = RemoveRevisionsAlreadyOnTarget(targetRevisions, sourceRevisions);
 
-            RemoveRevisionsMoreThanMaxRevisions(sortedRevisions);
+            RemoveRevisionsAllExceptLatest(sourceRevisions);
 
-            LogDebugCurrentSortedRevisions(sourceWorkItem, sortedRevisions);
+            RemoveRevisionsMoreThanMaxRevisions(sourceRevisions);
 
-            return sortedRevisions;
+            LogDebugCurrentSortedRevisions(sourceRevisions);
+
+            return sourceRevisions;
         }
 
-        private void LogDebugCurrentSortedRevisions(WorkItemData sourceWorkItem, List<RevisionItem> sortedRevisions)
+        public void EnforceDatesMustBeIncreasing(List<RevisionItem> sortedRevisions)
         {
-            Log.LogInformation("Found {RevisionsCount} revisions to migrate on  Work item:{sourceWorkItemId}", sortedRevisions.Count, sourceWorkItem.Id);
-            Log.LogDebug("RevisionsToMigrate:----------------------------------------------------");
+            Log.LogDebug("TfsRevisionManager::EnforceDatesMustBeIncreasing");
+            DateTime lastDateTime = DateTime.MinValue;
+            foreach (var revision in sortedRevisions)
+            {
+                if (revision.ChangedDate == lastDateTime || revision.OriginalChangedDate < lastDateTime)
+                {
+                    revision.ChangedDate = lastDateTime.AddSeconds(1);
+                    Log.LogDebug("TfsRevisionManager::EnforceDatesMustBeIncreasing[{revision}]::Fix", revision.Number);
+                }
+                lastDateTime = revision.ChangedDate;
+            }
+        }
+
+        public void LogDebugCurrentSortedRevisions(List<RevisionItem> sortedRevisions, string designation = "Source")
+        {
+            if (sortedRevisions == null)
+            {
+                Log.LogDebug("{designation}: RevisionsToMigrate: No revisions to migrate", designation);
+                return;
+            }
+            Log.LogInformation("{designation}: Found {RevisionsCount} revisions to migrate on  Work item:{sourceWorkItemId}", designation, sortedRevisions.Count, designation);
+            Log.LogDebug("{designation}: RevisionsToMigrate:----------------------------------------------------", designation);
             foreach (RevisionItem item in sortedRevisions)
             {
                 Log.LogDebug("RevisionsToMigrate: Index:{Index} - Number:{Number} - ChangedDate:{ChangedDate}", item.Index, item.Number, item.ChangedDate);
             }
-            Log.LogDebug("RevisionsToMigrate:----------------------------------------------------");
+            Log.LogDebug("{designation}: RevisionsToMigrate:----------------------------------------------------", designation);
         }
 
         private void RemoveRevisionsMoreThanMaxRevisions(List<RevisionItem> sortedRevisions)
@@ -111,7 +133,7 @@ namespace MigrationTools.Enrichers
             {
                 var revisionsToRemove = sortedRevisions.Count - Options.MaxRevisions;
                 sortedRevisions.RemoveRange(0, revisionsToRemove);
-                Log.LogDebug("TfsRevisionManager::GetRevisionsToMigrate: MaxRevisions={MaxRevisions}! There are {sortedRevisionsCount} left", Options.MaxRevisions, sortedRevisions.Count);
+                Log.LogDebug("TfsRevisionManager::GetRevisionsToMigrate::RemoveRevisionsMoreThanMaxRevisions MaxRevisions={MaxRevisions}! There are {sortedRevisionsCount} left", Options.MaxRevisions, sortedRevisions.Count);
             }
         }
 
@@ -121,29 +143,32 @@ namespace MigrationTools.Enrichers
             {
                 // Remove all but the latest revision if we are not replaying revisions
                 sortedRevisions.RemoveRange(0, sortedRevisions.Count - 1);
-                Log.LogDebug("TfsRevisionManager::GetRevisionsToMigrate: ReplayRevisions=false! There are {sortedRevisionsCount} left", sortedRevisions.Count);
+                Log.LogDebug("TfsRevisionManager::GetRevisionsToMigrate::RemoveRevisionsAllExceptLatest ReplayRevisions=false! There are {sortedRevisionsCount} left", sortedRevisions.Count);
             }
         }
 
-        private List<RevisionItem> RemoveRevisionsAlreadyOnTarget(WorkItemData targetWorkItem, List<RevisionItem> sortedRevisions)
+        private List<RevisionItem> RemoveRevisionsAlreadyOnTarget(List<RevisionItem> targetRevisions, List<RevisionItem> sourceRevisions)
         {
-            if (targetWorkItem != null)
+            if (targetRevisions != null)
             {
-                Log.LogDebug("TfsRevisionManager::GetRevisionsToMigrate: Raw Target {targetWorkItemId} Has {targetWorkItemRevCount} revisions", targetWorkItem.Id, targetWorkItem.Revisions.Count);
+                Log.LogDebug("TfsRevisionManager::GetRevisionsToMigrate::RemoveRevisionsAlreadyOnTarget Raw Target Has {targetWorkItemRevCount} revisions", targetRevisions.Count);
                 // Target exists so remove any Changed Date matches between them
-                var targetChangedDates = (from RevisionItem x in targetWorkItem.Revisions.Values select x.ChangedDate).ToList();
+                var targetChangedDates = (from RevisionItem x in targetRevisions select x.ChangedDate).ToList();
                 if (Options.ReplayRevisions)
                 {
-                    sortedRevisions = sortedRevisions.Where(x => !targetChangedDates.Contains(x.ChangedDate)).ToList();
-                    Log.LogDebug("TfsRevisionManager::GetRevisionsToMigrate: After removing Date Matches there are {sortedRevisionsCount} left", sortedRevisions.Count);
+                    sourceRevisions = sourceRevisions.Where(x => !targetChangedDates.Contains(x.ChangedDate)).ToList();
+                    Log.LogDebug("TfsRevisionManager::GetRevisionsToMigrate::RemoveRevisionsAlreadyOnTarget After removing Date Matches there are {sortedRevisionsCount} left", sourceRevisions.Count);
                 }
                 // Find Max target date and remove all source revisions that are newer
                 var targetLatestDate = targetChangedDates.Max();
-                sortedRevisions = sortedRevisions.Where(x => x.ChangedDate > targetLatestDate).ToList();
-                Log.LogDebug("TfsRevisionManager::GetRevisionsToMigrate: After removing revisions before target latest date {targetLatestDate} there are {sortedRevisionsCount} left", targetLatestDate, sortedRevisions.Count);
+                sourceRevisions = sourceRevisions.Where(x => x.ChangedDate > targetLatestDate).ToList();
+                Log.LogDebug("TfsRevisionManager::GetRevisionsToMigrate::RemoveRevisionsAlreadyOnTarget After removing revisions before target latest date {targetLatestDate} there are {sortedRevisionsCount} left", targetLatestDate, sourceRevisions.Count);
             }
-
-            return sortedRevisions;
+            else
+            {
+                Log.LogDebug("TfsRevisionManager::GetRevisionsToMigrate::RemoveRevisionsAlreadyOnTarget Target is null");
+            }
+            return sourceRevisions;
         }
 
         public void AttachSourceRevisionHistoryJsonToTarget(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)

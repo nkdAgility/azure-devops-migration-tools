@@ -104,13 +104,16 @@ namespace MigrationTools.Enrichers
             Log.LogDebug("NodeStructureEnricher.GetNewNodeName::Mappers", mappers);
             foreach (var mapper in mappers)
             {
-                Log.LogDebug("NodeStructureEnricher.GetNewNodeName::MapperToRun::{key}", mapper.Key);
+                Log.LogDebug("NodeStructureEnricher.GetNewNodeName::Mappers::{key}", mapper.Key);
                 if (Regex.IsMatch(sourceNodePath, mapper.Key, RegexOptions.IgnoreCase))
                 {
-                    Log.LogDebug("NodeStructureEnricher.GetNewNodeName::MapperMatched::{key}", mapper.Key);
+                    Log.LogDebug("NodeStructureEnricher.GetNewNodeName::Mappers::{key}::Match", mapper.Key);
                     string replacement = Regex.Replace(sourceNodePath, mapper.Key, mapper.Value);
-                    Log.LogDebug("NodeStructureEnricher.GetNewNodeName::MapperMatched::{key}::replaceWith({replace})", mapper.Key, replacement);
+                    Log.LogDebug("NodeStructureEnricher.GetNewNodeName::Mappers::{key}::replaceWith({replace})", mapper.Key, replacement);
                     return replacement;
+                } else
+                {
+                    Log.LogDebug("NodeStructureEnricher.GetNewNodeName::Mappers::{key}::NoMatch", mapper.Key);
                 }
             }
 
@@ -687,6 +690,57 @@ namespace MigrationTools.Enrichers
                 }
             }
             return null;
+        }
+
+        private const string RegexPatternForAreaAndIterationPathsFix = "\\[?(?<key>System.AreaPath|System.IterationPath)+\\]?[^']*'(?<value>[^']*(?:''.[^']*)*)'";
+
+        public string FixAreaPathAndIterationPathForTargetQuery(string sourceWIQLQuery, string sourceProject, string targetProject, ILogger? contextLog)
+        {
+
+            string targetWIQLQuery = sourceWIQLQuery;
+
+            if (string.IsNullOrWhiteSpace(targetWIQLQuery))
+            {
+                return targetWIQLQuery;
+            }
+
+            var matches = Regex.Matches(targetWIQLQuery, RegexPatternForAreaAndIterationPathsFix);
+
+
+            if (string.IsNullOrWhiteSpace(sourceProject)
+                || string.IsNullOrWhiteSpace(targetProject)
+                || sourceProject == targetProject)
+            {
+                return targetWIQLQuery;
+            }
+
+            foreach (Match match in matches)
+            {
+                var value = match.Groups["value"].Value;
+                if (string.IsNullOrWhiteSpace(value) || !value.StartsWith(sourceProject))
+                    continue;
+
+                var fieldType = match.Groups["key"].Value;
+                TfsNodeStructureType structureType;
+                switch (fieldType)
+                {
+                    case "System.AreaPath":
+                        structureType = TfsNodeStructureType.Area;
+                        break;
+                    case "System.IterationPath":
+                        structureType = TfsNodeStructureType.Iteration;
+                        break;
+                    default:
+                        throw new InvalidOperationException($"Field type {fieldType} is not supported for query remapping.");
+                }
+
+                var remappedPath = GetNewNodeName(value, structureType);
+                targetWIQLQuery = targetWIQLQuery.Replace(value, remappedPath);
+            }
+
+            contextLog?.Information("[FilterWorkItemsThatAlreadyExistInTarget] is enabled. Source project {sourceProject} is replaced with target project {targetProject} on the WIQLQueryBit which resulted into this target WIQLQueryBit \"{targetWIQLQueryBit}\" .", sourceProject, targetProject, targetWIQLQuery);
+
+            return targetWIQLQuery;
         }
 
     }

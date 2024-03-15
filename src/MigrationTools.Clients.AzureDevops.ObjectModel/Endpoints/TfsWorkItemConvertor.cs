@@ -26,6 +26,7 @@ namespace MigrationTools.Endpoints
                     fieldItems[revField.Key] = new FieldItem
                     {
                         Name = revField.Value.Name,
+                        FieldType = revField.Value.FieldType,
                         ReferenceName = revField.Value.ReferenceName,
                         Value = revField.Value.Value,
                         internalObject = revField.Value.internalObject,
@@ -47,6 +48,7 @@ namespace MigrationTools.Endpoints
                 Index = x.Index,
                 Number = (int)x.Fields["System.Rev"].Value,
                 ChangedDate = (DateTime)x.Fields["System.ChangedDate"].Value,
+                OriginalChangedDate = (DateTime)x.Fields["System.ChangedDate"].Value,
                 Type = x.Fields["System.WorkItemType"].Value as string,
                 Fields = GetFieldItems(x.Fields)
             }).ToList();
@@ -81,6 +83,7 @@ namespace MigrationTools.Endpoints
                 ReferenceName = x.ReferenceName,
                 Value = x.Value,
                 FieldType = x.FieldDefinition.FieldType.ToString(),
+                IsIdentity = x.FieldDefinition.IsIdentity,
                 internalObject = x
             })
             .ToDictionary(r => r.ReferenceName);
