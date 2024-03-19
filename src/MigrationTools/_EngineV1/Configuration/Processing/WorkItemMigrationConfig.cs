@@ -49,13 +49,6 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         public bool FixHtmlAttachmentLinks { get; set; }
 
         /// <summary>
-        /// **beta** If enabled this will fix any image attachments URL's, work item mention URL's or user mentions in the HTML fields as well as discussion comments. You must specify a
-        /// PersonalAccessToken in the Source project for Azure DevOps; TFS should use integrated authentication.
-        /// </summary>
-        /// <default>false</default>
-        public bool SkipToFinalRevisedWorkItemType { get; set; }
-
-        /// <summary>
         /// **beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count.
         /// This allows for periodic network glitches not to end the process.
         /// </summary>
@@ -80,13 +73,6 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         /// </summary>
         /// <default>?</default>
         public bool AttachRevisionHistory { get; set; }
-
-        /// <summary>
-        /// If you have changed parents before re-running a sync you may get a `TF26194: unable to change the value of the 'Parent' field` error.
-        /// This will resolve it, but will slow migration.
-        /// </summary>
-        /// <default>false</default>
-        public bool LinkMigrationSaveEachAsAdded { get; set; }
 
         /// <summary>
         /// If enabled, adds a comment recording the migration
@@ -134,8 +120,6 @@ namespace MigrationTools._EngineV1.Configuration.Processing
             FixHtmlAttachmentLinks = false;
             UpdateCreatedBy = true;
             UpdateCreatedDate = true;
-            SkipToFinalRevisedWorkItemType = false;
-            LinkMigrationSaveEachAsAdded = false;
             GenerateMigrationComment = true;
             WIQLQuery = @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc";
             AttachRevisionHistory = false;
