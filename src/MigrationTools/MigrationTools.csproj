@@ -25,7 +25,6 @@
     <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="8.0.2" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
-    <PackageReference Include="Microsoft.IdentityModel.Clients.ActiveDirectory" Version="5.3.0" />
     <PackageReference Include="Microsoft.VisualStudio.Services.Client" Version="19.225.1" />
     <PackageReference Include="Microsoft.VisualStudio.Services.ServiceEndpoints.WebApi" Version="19.225.1" />
     <PackageReference Include="Serilog" Version="3.1.1" />
