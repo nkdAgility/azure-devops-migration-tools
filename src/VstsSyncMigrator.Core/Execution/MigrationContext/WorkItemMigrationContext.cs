@@ -274,7 +274,7 @@ namespace VstsSyncMigrator.Engine
             contextLog.Information("Validating::Check that all users in the source exist in the target or are mapped!");
             List<IdentityMapData> usersToMap = new List<IdentityMapData>();
             usersToMap = _userMappingEnricher.GetUsersInSourceMappedToTargetForWorkItems(sourceWorkItems);
-            if (usersToMap.Count > 0)
+            if (usersToMap != null && usersToMap?.Count > 0)
             {
                 Log.LogWarning("Validating Failed! There are {usersToMap} users that exist in the source that do not exist in the target. This will not cause any errors, but may result in disconnected users that could have been mapped. Use the ExportUsersForMapping processor to create a list of mappable users. Then Import using ", usersToMap.Count);
             }
