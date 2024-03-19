@@ -34,12 +34,15 @@
   "CommonEnrichersConfig": [
     {
       "$type": "TfsNodeStructureOptions",
+      "Enabled": false,
       "NodeBasePaths": [],
       "AreaMaps": {
+        "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1",
         "^nkdProducts([\\\\]?.*)$": "MigrationTest5$1",
         "^Skypoint Cloud$": "MigrationTest5"
       },
       "IterationMaps": {
+        "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1",
         "^nkdProducts([\\\\]?.*)$": "MigrationTest5$1",
         "^Skypoint Cloud\\\\Sprint 1$": "MigrationTest5\\Sprint 1"
       },
@@ -120,7 +123,7 @@
   "Version": "15.0",
   "workaroundForQuerySOAPBugEnabled": false,
   "WorkItemTypeDefinition": {
-    "sourceWorkItemTypeName": "targetWorkItemTypeName"
+    "User Story": "Product Backlog Item"
   },
   "Endpoints": {
     "InMemoryWorkItemEndpoints": [
