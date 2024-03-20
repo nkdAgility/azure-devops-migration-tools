@@ -6,7 +6,7 @@
     "Project": "migrationSource1",
     "ReflectedWorkItemIDFieldName": "nkdScrum.ReflectedWorkItemId",
     "AllowCrossProjectLinking": false,
-    "AuthenticationMode": "Prompt",
+    "AuthenticationMode": "AccessToken",
     "PersonalAccessToken": "",
     "PersonalAccessTokenVariableName": "",
     "LanguageMaps": {
@@ -20,8 +20,8 @@
     "Project": "migrationTest5",
     "ReflectedWorkItemIDFieldName": "nkdScrum.ReflectedWorkItemId",
     "AllowCrossProjectLinking": false,
-    "AuthenticationMode": "Prompt",
-    "PersonalAccessToken": "njp3kcec4nbev63fmbepvdpn35drawmonk5qf5yqsw77dgfwnjda",
+    "AuthenticationMode": "AccessToken",
+    "PersonalAccessToken": "",
     "PersonalAccessTokenVariableName": "",
     "LanguageMaps": {
       "AreaPath": "Area",
@@ -34,12 +34,15 @@
   "CommonEnrichersConfig": [
     {
       "$type": "TfsNodeStructureOptions",
+      "Enabled": false,
       "NodeBasePaths": [],
       "AreaMaps": {
+        "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1",
         "^nkdProducts([\\\\]?.*)$": "MigrationTest5$1",
         "^Skypoint Cloud$": "MigrationTest5"
       },
       "IterationMaps": {
+        "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1",
         "^nkdProducts([\\\\]?.*)$": "MigrationTest5$1",
         "^Skypoint Cloud\\\\Sprint 1$": "MigrationTest5\\Sprint 1"
       },
@@ -98,15 +101,12 @@
       "Enabled": true,
       "UpdateCreatedDate": true,
       "UpdateCreatedBy": true,
-      "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Program', 'Portfolio', 'Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
-      "LinkMigration": true,
+      "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.Id] =137 AND [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Program', 'Portfolio', 'Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
       "FixHtmlAttachmentLinks": false,
-      "SkipToFinalRevisedWorkItemType": false,
       "WorkItemCreateRetryLimit": 5,
       "FilterWorkItemsThatAlreadyExistInTarget": false,
       "PauseAfterEachWorkItem": false,
       "AttachRevisionHistory": false,
-      "LinkMigrationSaveEachAsAdded": false,
       "GenerateMigrationComment": true,
       "WorkItemIDs": null,
       "MaxGracefulFailures": 0,
@@ -123,7 +123,7 @@
   "Version": "15.0",
   "workaroundForQuerySOAPBugEnabled": false,
   "WorkItemTypeDefinition": {
-    "sourceWorkItemTypeName": "targetWorkItemTypeName"
+    "User Story": "Product Backlog Item"
   },
   "Endpoints": {
     "InMemoryWorkItemEndpoints": [

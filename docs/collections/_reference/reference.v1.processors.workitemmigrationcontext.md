@@ -12,12 +12,10 @@ configurationSamples:
       "UpdateCreatedBy": true,
       "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
       "FixHtmlAttachmentLinks": false,
-      "SkipToFinalRevisedWorkItemType": false,
       "WorkItemCreateRetryLimit": 5,
       "FilterWorkItemsThatAlreadyExistInTarget": false,
       "PauseAfterEachWorkItem": false,
       "AttachRevisionHistory": false,
-      "LinkMigrationSaveEachAsAdded": false,
       "GenerateMigrationComment": true,
       "WorkItemIDs": null,
       "MaxGracefulFailures": 0,
@@ -50,10 +48,6 @@ options:
   type: Boolean
   description: If enabled, adds a comment recording the migration
   defaultValue: false
-- parameterName: LinkMigrationSaveEachAsAdded
-  type: Boolean
-  description: "If you have changed parents before re-running a sync you may get a `TF26194: unable to change the value of the 'Parent' field` error. This will resolve it, but will slow migration."
-  defaultValue: false
 - parameterName: MaxGracefulFailures
   type: Int32
   description: The maximum number of failures to tolerate before the migration fails. When set above zero, a work item migration error is logged but the migration will continue until the number of failed items reaches the configured value, after which the migration fails.
@@ -70,10 +64,6 @@ options:
   type: Boolean
   description: This will skip a revision if the source iteration has not been migrated i.e. it was deleted
   defaultValue: missng XML code comments
-- parameterName: SkipToFinalRevisedWorkItemType
-  type: Boolean
-  description: "**beta** If enabled this will fix any image attachments URL's, work item mention URL's or user mentions in the HTML fields as well as discussion comments. You must specify a PersonalAccessToken in the Source project for Azure DevOps; TFS should use integrated authentication."
-  defaultValue: false
 - parameterName: UpdateCreatedBy
   type: Boolean
   description: "If this is enabled the creation process on the target project will create the items with the original creation date. (Important: The item history is always pointed to the date of the migration, it's change only the data column CreateDate, not the internal create date)"
@@ -251,7 +241,7 @@ topics:
 - topic: introduction
   path: /docs/Reference/v1/Processors/WorkItemMigrationContext-introduction.md
   exists: true
-  markdown: >+
+  markdown: >
     The `WorkItemMigrationContext` processor is used for migrating work items from one Azure DevOps instance to another. This encompasses a variety of activities:
 
 

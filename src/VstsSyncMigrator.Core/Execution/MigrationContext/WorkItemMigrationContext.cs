@@ -155,8 +155,14 @@ namespace VstsSyncMigrator.Engine
             embededImagesEnricher = Services.GetRequiredService<TfsEmbededImagesEnricher>();
             gitRepositoryEnricher = Services.GetRequiredService<TfsGitRepositoryEnricher>();
 
-
-            _nodeStructureEnricher.ProcessorExecutionBegin(null);
+            if (_nodeStructureEnricher.Options.Enabled)
+            {
+                _nodeStructureEnricher.ProcessorExecutionBegin(null);
+            } else
+            {
+                Log.LogWarning("WorkItemMigrationContext::InternalExecute: nodeStructureEnricher is disabled! This may cause work item migration errors! ");
+            }
+            
 
             var stopwatch = Stopwatch.StartNew();
             _itemsInError = new List<string>();
@@ -274,7 +280,7 @@ namespace VstsSyncMigrator.Engine
             contextLog.Information("Validating::Check that all users in the source exist in the target or are mapped!");
             List<IdentityMapData> usersToMap = new List<IdentityMapData>();
             usersToMap = _userMappingEnricher.GetUsersInSourceMappedToTargetForWorkItems(sourceWorkItems);
-            if (usersToMap.Count > 0)
+            if (usersToMap != null && usersToMap?.Count > 0)
             {
                 Log.LogWarning("Validating Failed! There are {usersToMap} users that exist in the source that do not exist in the target. This will not cause any errors, but may result in disconnected users that could have been mapped. Use the ExportUsersForMapping processor to create a list of mappable users. Then Import using ", usersToMap.Count);
             }
@@ -284,11 +290,21 @@ namespace VstsSyncMigrator.Engine
         private void ValidateAllNodesExistOrAreMapped(List<WorkItemData> sourceWorkItems)
         {
             contextLog.Information("Validating::Check that all Area & Iteration paths from Source have a valid mapping on Target");
-            List<NodeStructureItem> nodeStructureMissingItems = _nodeStructureEnricher.GetMissingRevisionNodes(sourceWorkItems);
-            if (_nodeStructureEnricher.ValidateTargetNodesExist(nodeStructureMissingItems))
+            if (!_nodeStructureEnricher.Options.Enabled && Engine.Target.Config.AsTeamProjectConfig().Project != Engine.Source.Config.AsTeamProjectConfig().Project)
             {
-                throw new Exception("Missing Iterations in Target preventing progress, check log for list. To continue you MUST configure IterationMaps or AreaMaps that matches the missing paths..");
+                throw new ConfigException("Source and Target projects have different names, but  NodeStructureEnricher is not enabled. Cant continue... please enable nodeStructureEnricher in the config and restart.");
             }
+            if ( _nodeStructureEnricher.Options.Enabled)
+            {
+                List<NodeStructureItem> nodeStructureMissingItems = _nodeStructureEnricher.GetMissingRevisionNodes(sourceWorkItems);
+                if (_nodeStructureEnricher.ValidateTargetNodesExist(nodeStructureMissingItems))
+                {
+                    throw new Exception("Missing Iterations in Target preventing progress, check log for list. To continue you MUST configure IterationMaps or AreaMaps that matches the missing paths..");
+                }
+            } else
+            {
+                contextLog.Error("nodeStructureEnricher is disabled! Please enable it in the config.");
+            }            
         }
 
         private void ValidateAllWorkItemTypesHaveReflectedWorkItemIdField(List<WorkItemData> sourceWorkItems)
@@ -477,8 +493,13 @@ namespace VstsSyncMigrator.Engine
 
             if (_nodeStructureEnricher.Options.Enabled)
             {
+
                 newWorkItem.AreaPath = _nodeStructureEnricher.GetNewNodeName(oldWorkItem.AreaPath, TfsNodeStructureType.Area);
                 newWorkItem.IterationPath = _nodeStructureEnricher.GetNewNodeName(oldWorkItem.IterationPath, TfsNodeStructureType.Iteration);
+            }
+            else
+            {
+                Log.LogWarning("WorkItemMigrationContext::PopulateWorkItem::nodeStructureEnricher::Disabled! This needs to be set to true!");
             }
 
             switch (destType)
@@ -544,7 +565,7 @@ namespace VstsSyncMigrator.Engine
                             { "sourceWorkItemRev", sourceWorkItem.Rev },
                             { "ReplayRevisions", _revisionManager.Options.ReplayRevisions }}
                         );
-                    List<RevisionItem> revisionsToMigrate = _revisionManager.GetRevisionsToMigrate(sourceWorkItem.Revisions.Values.ToList(), targetWorkItem.Revisions.Values.ToList());
+                    List<RevisionItem> revisionsToMigrate = _revisionManager.GetRevisionsToMigrate(sourceWorkItem.Revisions.Values.ToList(), targetWorkItem?.Revisions.Values.ToList());
                     if (targetWorkItem == null)
                     {
                         targetWorkItem = ReplayRevisions(revisionsToMigrate, sourceWorkItem, null);
