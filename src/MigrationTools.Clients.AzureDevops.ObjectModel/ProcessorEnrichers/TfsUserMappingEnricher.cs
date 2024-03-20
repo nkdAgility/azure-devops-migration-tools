@@ -158,11 +158,29 @@ namespace MigrationTools.ProcessorEnrichers
             var people = SIDS.Members.ToList().Where(x => x.Contains("\\")).Select(x => x);
 
             List<IdentityItemData> foundUsers = new List<IdentityItemData>();
+            Log.LogTrace("TfsUserMappingEnricher::GetUsersListFromServer:foundUsers\\ {@foundUsers}", foundUsers);
             foreach (string user in people)
             {
-                var bits = user.Split('\\');
-                Identity sids = gss.ReadIdentity(SearchFactor.AccountName, bits[1], QueryMembership.Expanded);
-                foundUsers.Add(new IdentityItemData() { FriendlyName = sids.DisplayName, AccountName = sids.AccountName });
+                Log.LogDebug("TfsUserMappingEnricher::GetUsersListFromServer::[user:{user}] Atempting to load user", user);
+                try
+                {
+                    var bits = user.Split('\\');
+                    Identity sids = gss.ReadIdentity(SearchFactor.AccountName, bits[1], QueryMembership.Expanded);
+                    if (sids != null)
+                    {
+                        foundUsers.Add(new IdentityItemData() { FriendlyName = sids.DisplayName, AccountName = sids.AccountName });
+                    }
+                    else
+                    {
+                        Log.LogDebug("TfsUserMappingEnricher::GetUsersListFromServer::[user:{user}] ReadIdentity returned null for {@bits}", user, bits);
+                    }
+                   
+                }
+                catch (Exception ex)
+                {
+                    Log.LogWarning("TfsUserMappingEnricher::GetUsersListFromServer::[user:{user}] Failed With {Exception}", user, ex.Message);
+                }
+                
             }
             return foundUsers;
         }
