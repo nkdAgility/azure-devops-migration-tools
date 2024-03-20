@@ -128,17 +128,13 @@
       "AppendMigrationToolSignatureFooter": false,
       "WiqlQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
       "Enabled": true,
-      "LinkMigration": true,
       "AttachmentMigration": true,
       "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
       "FixHtmlAttachmentLinks": false,
-      "SkipToFinalRevisedWorkItemType": false,
       "WorkItemCreateRetryLimit": 5,
       "FilterWorkItemsThatAlreadyExistInTarget": true,
       "PauseAfterEachWorkItem": false,
-      "AttachmentMaxSize": 480000000,
-      "CollapseRevisions": false,
-      "LinkMigrationSaveEachAsAdded": false
+      "CollapseRevisions": false
     }
   ]
 }
