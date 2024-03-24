@@ -20,17 +20,15 @@ namespace MigrationTools.ProcessorEnrichers
     public class TfsAttachmentEnricher : WorkItemProcessorEnricher, IAttachmentMigrationEnricher
     {
         private WorkItemServer _server;
-        private string _exportBasePath;
         private string _exportWiPath;
-        private int _maxAttachmentSize;
-        private TfsAttachmentEnricherOptions _options;
+        private TfsAttachmentEnricherOptions _options; 
         private WorkItemServer _workItemServer;
 
         public TfsAttachmentEnricherOptions Options {  get { return _options; } } 
 
         public TfsAttachmentEnricher(IServiceProvider services, ILogger<WorkItemProcessorEnricher> logger) : base(services, logger)
         {
-             
+          
         }
 
         public void ProcessAttachemnts(WorkItemData source, WorkItemData target, bool save = true)
@@ -46,7 +44,7 @@ namespace MigrationTools.ProcessorEnrichers
                 throw new ArgumentNullException(nameof(target));
             }
             Log.LogInformation("AttachmentMigrationEnricher: Migrating  {AttachmentCount} attachemnts from {SourceWorkItemID} to {TargetWorkItemID}", source.ToWorkItem().Attachments.Count, source.Id, target.Id);
-            _exportWiPath = Path.Combine(_exportBasePath, source.ToWorkItem().Id.ToString());
+            _exportWiPath = Path.Combine(Options.ExportBasePath, source.ToWorkItem().Id.ToString());
             if (Directory.Exists(_exportWiPath))
             {
                 Directory.Delete(_exportWiPath, true);
@@ -139,7 +137,7 @@ namespace MigrationTools.ProcessorEnrichers
             SetupWorkItemServer();
             var filename = Path.GetFileName(filepath);
             FileInfo fi = new FileInfo(filepath);
-            if (_maxAttachmentSize > fi.Length)
+            if (Options.MaxAttachmentSize > fi.Length)
             {
                 string originalId = "[originalId:" + wia.Id + "]";
                 var attachments = targetWorkItem.Attachments.Cast<Attachment>();
@@ -169,7 +167,7 @@ namespace MigrationTools.ProcessorEnrichers
             }
             else
             {
-                Log.LogWarning(" [SKIP] Attachment {filename} on Work Item {targetWorkItemId} is bigger than the limit of {maxAttachmentSize} bites for Azure DevOps.", filename, targetWorkItem.Id, _maxAttachmentSize);
+                Log.LogWarning(" [SKIP] Attachment {filename} on Work Item {targetWorkItemId} is bigger than the limit of {maxAttachmentSize} bites for Azure DevOps.", filename, targetWorkItem.Id, Options.MaxAttachmentSize);
             }
         }
 
