@@ -21,7 +21,7 @@ namespace MigrationTools.ProcessorEnrichers
     {
         private WorkItemServer _server;
         private string _exportWiPath;
-        private TfsAttachmentEnricherOptions _options;
+        private TfsAttachmentEnricherOptions _options; 
         private WorkItemServer _workItemServer;
 
         public TfsAttachmentEnricherOptions Options {  get { return _options; } } 
