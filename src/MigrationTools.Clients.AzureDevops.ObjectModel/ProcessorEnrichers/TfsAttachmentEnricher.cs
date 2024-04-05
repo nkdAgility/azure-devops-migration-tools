@@ -19,7 +19,6 @@ namespace MigrationTools.ProcessorEnrichers
 {
     public class TfsAttachmentEnricher : WorkItemProcessorEnricher, IAttachmentMigrationEnricher
     {
-        private WorkItemServer _server;
         private string _exportWiPath;
         private TfsAttachmentEnricherOptions _options; 
         private WorkItemServer _workItemServer;
@@ -116,7 +115,7 @@ namespace MigrationTools.ProcessorEnrichers
                 Log.LogDebug(string.Format("...downloading {0} to {1}", fname, exportpath));
                 try
                 {
-                    var fileLocation = _server.DownloadFile(wia.Id);
+                    var fileLocation = _workItemServer.DownloadFile(wia.Id);
                     File.Copy(fileLocation, fpath, true);
                 }
                 catch (Exception ex)
@@ -178,7 +177,7 @@ namespace MigrationTools.ProcessorEnrichers
 
         private void SetupWorkItemServer()
         {
-            if (_workItemServer != null)
+            if (_workItemServer == null)
             {
                 IMigrationEngine engine = Services.GetRequiredService<IMigrationEngine>();
                 _workItemServer = engine.Source.GetService<WorkItemServer>();
