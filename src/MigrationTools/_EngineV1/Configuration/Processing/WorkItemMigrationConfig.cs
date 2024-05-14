@@ -117,7 +117,7 @@ namespace MigrationTools._EngineV1.Configuration.Processing
             Enabled = false;
             WorkItemCreateRetryLimit = 5;
             FilterWorkItemsThatAlreadyExistInTarget = false;
-            FixHtmlAttachmentLinks = false;
+            FixHtmlAttachmentLinks = true;
             UpdateCreatedBy = true;
             UpdateCreatedDate = true;
             GenerateMigrationComment = true;
