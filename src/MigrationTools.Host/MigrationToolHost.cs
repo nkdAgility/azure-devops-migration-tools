@@ -33,6 +33,9 @@ namespace MigrationTools.Host
             {
                 return null;
             }
+
+
+
             var hostBuilder = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args)
              .UseSerilog((hostingContext, services, loggerConfiguration) =>
              {
