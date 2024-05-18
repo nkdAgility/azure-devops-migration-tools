@@ -34,7 +34,6 @@
   "CommonEnrichersConfig": [
     {
       "$type": "TfsNodeStructureOptions",
-      "Invalid":  "Woops",
       "RefName": "TfsNodeStructure",
       "Enabled": false,
       "NodeBasePaths": [],
