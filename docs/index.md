@@ -118,9 +118,18 @@ At this time the documented minimum required permissions for running the tools a
 - Account in both the source and target projects with "Project Collection Administrator" rights
 - PAT with "full access" for both the Source and the Target
 
-Note: I have been informed by the Azure DevOps product team information that ObjectModel API only works with full scoped PATs, so it won't work with any PAT that has specific scopes. 
+*Note: I have been informed by the Azure DevOps product team information that ObjectModel API only works with full scoped PATs, so it won't work with any PAT that has specific scopes.**
 
-_Advanced (Unsupported): We have seen that the tools may work with less permissions, but this is the minimum that we have documented & tested. We have been able to run a work item migration (WorkItemMigrationContext processor) in a limited test environment with a scope of "Project and Team(Read, write, & manage); Work Items (Read, Write & Manage)" only. Extensive testing has not been done with anything other than the supported permissions._
+#### Advanced Unsupported Permission Options
+
+We have seen that the tools may work with less permissions however the following has not been full tested and is not currently supported:
+
+- Project and Team (Read, write, & manage)
+- Work Items (Read, Write & Manage)
+- Identity (Read & Manage)
+- Security (Manage)
+
+If you do try this out then please let us know how you get on!
 
 ## Advanced tools
 
