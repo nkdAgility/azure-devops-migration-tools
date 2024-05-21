@@ -34,6 +34,7 @@
   "CommonEnrichersConfig": [
     {
       "$type": "TfsNodeStructureOptions",
+      "RefName": "TfsNodeStructure",
       "Enabled": false,
       "NodeBasePaths": [],
       "AreaMaps": {
@@ -51,24 +52,28 @@
     },
     {
       "$type": "TfsWorkItemLinkEnricherOptions",
+      "RefName": "TfsWorkItemLinkEnricher",
       "Enabled": true,
       "FilterIfLinkCountMatches": true,
       "SaveAfterEachLinkIsAdded": false
     },
     {
       "$type": "TfsRevisionManagerOptions",
+      "RefName": "TfsRevisionManager",
       "Enabled": true,
       "ReplayRevisions": true,
       "MaxRevisions": 0
     },
     {
       "$type": "TfsAttachmentEnricherOptions",
+      "RefName": "TfsAttachmentEnricher",
       "Enabled": true,
       "ExportBasePath": "c:\\temp\\WorkItemAttachmentExport",
       "MaxRevisions": 480000000
     },
     {
       "$type": "StringManipulatorEnricherOptions",
+      "RefName": "StringManipulator",
       "Enabled": true,
       "MaxStringLength": 1000000,
       "Manipulators": [
@@ -83,6 +88,7 @@
     },
     {
       "$type": "TfsUserMappingEnricherOptions",
+      "RefName": "TfsUserMappingEnricher",
       "Enabled": true,
       "UserMappingFile": "C:\\temp\\userExport.json",
       "IdentityFieldsToCheck": [

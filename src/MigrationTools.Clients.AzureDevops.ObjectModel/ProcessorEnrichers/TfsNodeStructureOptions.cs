@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using Microsoft.TeamFoundation.Build.Client;
+using Newtonsoft.Json.Schema;
 
 namespace MigrationTools.Enrichers
 {
+    
     public class TfsNodeStructureOptions : ProcessorEnricherOptions, ITfsNodeStructureOptions
     {
         public override Type ToConfigure => typeof(TfsNodeStructure);
