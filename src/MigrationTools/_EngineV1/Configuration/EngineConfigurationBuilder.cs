@@ -6,6 +6,7 @@ using System.Reflection;
 using Microsoft.Extensions.Logging;
 using MigrationTools._EngineV1.Configuration.FieldMap;
 using MigrationTools._EngineV1.Configuration.Processing;
+using MigrationTools.DataContracts.Pipelines;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
 using MigrationTools.Helpers;
@@ -13,6 +14,8 @@ using MigrationTools.Options;
 using MigrationTools.Processors;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Schema;
+using Newtonsoft.Json.Schema.Generation;
 
 namespace MigrationTools._EngineV1.Configuration
 {
@@ -32,7 +35,13 @@ namespace MigrationTools._EngineV1.Configuration
             {
                 string configurationjson = File.ReadAllText(configFile);
                 configurationjson = Upgrade118(configFile, configurationjson);
+
+
+                IList<string> validationResults = NewtonsoftHelpers.GetValidationResults<EngineConfiguration>(configurationjson);
+
+
                 ec = NewtonsoftHelpers.DeserializeObject<EngineConfiguration>(configurationjson);
+               
             }
             catch (JsonSerializationException ex)
             {
@@ -40,7 +49,7 @@ namespace MigrationTools._EngineV1.Configuration
                 _logger.LogCritical("Your configuration file is malformed and cant be loaded!");
                 _logger.LogError(ex.Message);
                 _logger.LogError("How to Solve: Malformed Json is usually a result of editing errors. Validate that your {configFile} is valid Json!", configFile);
-                Environment.Exit(-1);
+                System.Environment.Exit(-1);
                 return null;
             }
             catch (JsonReaderException ex)
@@ -49,7 +58,7 @@ namespace MigrationTools._EngineV1.Configuration
                 _logger.LogCritical("Your configuration file was loaded but was unable to be mapped to ");
                 _logger.LogError(ex.Message);
                 _logger.LogError("How to Solve: Malformed configurations are usually a result of changes between versions. The best way to understand the change is to run 'devopsmigration init' to create a new wel formed config and determin where the problem is!");
-                Environment.Exit(-1);
+                System.Environment.Exit(-1);
                 return null;
             }
 
