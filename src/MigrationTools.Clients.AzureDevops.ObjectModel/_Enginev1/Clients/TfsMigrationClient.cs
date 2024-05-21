@@ -166,7 +166,15 @@ namespace MigrationTools._EngineV1.Clients
                        new Dictionary<string, double> {
                             { "Time",timer.ElapsedMilliseconds }
                        });
-                Log.Error(ex, "Unable to configure store: Check persmissions and credentials for {AuthenticationMode}", _config.AuthenticationMode);
+                Log.Error(ex, "Unable to configure store: Check persmissions and credentials for {AuthenticationMode}!", _config.AuthenticationMode);
+                switch (_config.AuthenticationMode)
+                {
+                    case AuthenticationMode.AccessToken:
+                        Log.Error("The PAT MUST be 'full access' for it to work with the Object Model API.");
+                        break;
+                    default:
+                        break;
+                }
                 Environment.Exit(-1);
             }
             return y;
