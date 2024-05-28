@@ -36,7 +36,7 @@ namespace MigrationTools
             ILogger<MigrationEngine> logger)
         {
             _logger = logger;
-            _logger.LogInformation("Creating Migration Engine {SessionId}", telemetry.SessionId);
+            _logger.LogInformation("Creating Migration Engine Session[{SessionId}] on {datetime}", telemetry.SessionId, DateTime.Now);
             _services = services;
             FieldMaps = fieldMaps;
             _networkCredentials = networkCredentials.Value;

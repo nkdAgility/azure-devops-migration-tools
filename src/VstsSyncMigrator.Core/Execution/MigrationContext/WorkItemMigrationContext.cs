@@ -812,10 +812,6 @@ namespace VstsSyncMigrator.Engine
                     }
                     // Impersonate revision author. Mapping will apply later and may change this.
                     targetWorkItem.ToWorkItem().Fields["System.ChangedDate"].Value = revision.Fields["System.ChangedDate"].Value;
-                    if (targetWorkItem.ToWorkItem().Fields.Contains("System.RevisedDate"))
-                    {
-                        targetWorkItem.ToWorkItem().Fields["System.RevisedDate"].Value = revision.Fields["System.ChangedDate"].Value;
-                    }
                     targetWorkItem.ToWorkItem().Fields["System.ChangedBy"].Value = revision.Fields["System.ChangedBy"].Value.ToString();
                     targetWorkItem.ToWorkItem().Fields["System.History"].Value = revision.Fields["System.History"].Value;
 
