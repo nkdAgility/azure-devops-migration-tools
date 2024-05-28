@@ -456,6 +456,7 @@ namespace VstsSyncMigrator.Engine
             }
 
             newWorkItem.Title = oldWorkItem.Title;
+            newWorkItem.Fields["Microsoft.VSTS.Common.ClosedDate"].Value = oldWorkItem.Fields["Microsoft.VSTS.Common.ClosedDate"].Value;
             newWorkItem.State = oldWorkItem.State;
             newWorkItem.Reason = oldWorkItem.Reason;
 
