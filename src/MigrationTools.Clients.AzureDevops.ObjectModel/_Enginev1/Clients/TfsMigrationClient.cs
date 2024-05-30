@@ -4,6 +4,7 @@ using System.Net;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.VisualStudio.Services.Common;
+using Microsoft.VisualStudio.Services.WebApi;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Endpoints;
 using Serilog;
@@ -184,6 +185,12 @@ namespace MigrationTools._EngineV1.Clients
         {
             EnsureCollection();
             return _collection.GetService<T>();
+        }
+
+        public T GetClient<T>() where T : IVssHttpClient
+        {
+            EnsureCollection();
+            return _collection.GetClient<T>();
         }
     }
 }

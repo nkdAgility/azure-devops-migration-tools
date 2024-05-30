@@ -1,0 +1,69 @@
+---
+optionsClassName: TfsTeamSettingsEnricherOptions
+optionsClassFullName: MigrationTools.Enrichers.TfsTeamSettingsEnricherOptions
+configurationSamples:
+- name: default
+  description: 
+  code: >-
+    {
+      "$type": "TfsTeamSettingsEnricherOptions",
+      "Enabled": false,
+      "MigrateTeamSettings": true,
+      "UpdateTeamSettings": true,
+      "MigrateTeamCapacities": true,
+      "Teams": null
+    }
+  sampleFor: MigrationTools.Enrichers.TfsTeamSettingsEnricherOptions
+description: The TfsUserMappingEnricher is used to map users from the source to the target system. Run it with the ExportUsersForMappingContext to create a mapping file then with WorkItemMigrationContext to use the mapping file to update the users in the target system as you migrate the work items.
+className: TfsTeamSettingsEnricher
+typeName: ProcessorEnrichers
+architecture: v2
+options:
+- parameterName: Enabled
+  type: Boolean
+  description: If enabled this will run this migrator
+  defaultValue: true
+- parameterName: MigrateTeamCapacities
+  type: Boolean
+  description: 'Migrate original team member capacities after their creation on the target team project. Note: It will only migrate team member capacity if the team member with same display name exists on the target collection otherwise it will be ignored.'
+  defaultValue: false
+- parameterName: MigrateTeamSettings
+  type: Boolean
+  description: Migrate original team settings after their creation on target team project
+  defaultValue: false
+- parameterName: RefName
+  type: String
+  description: For internal use
+  defaultValue: missng XML code comments
+- parameterName: Teams
+  type: List
+  description: List of Teams to process. If this is `null` then all teams will be processed.
+  defaultValue: missng XML code comments
+- parameterName: UpdateTeamSettings
+  type: Boolean
+  description: Reset the target team settings to match the source if the team exists
+  defaultValue: false
+status: missng XML code comments
+processingTarget: missng XML code comments
+classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/ProcessorEnrichers/TfsTeamSettingsEnricher.cs
+optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/ProcessorEnrichers/TfsTeamSettingsEnricherOptions.cs
+
+redirectFrom: []
+layout: reference
+toc: true
+permalink: /Reference/v2/ProcessorEnrichers/TfsTeamSettingsEnricher/
+title: TfsTeamSettingsEnricher
+categories:
+- ProcessorEnrichers
+- v2
+topics:
+- topic: notes
+  path: /docs/Reference/v2/ProcessorEnrichers/TfsTeamSettingsEnricher-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: /docs/Reference/v2/ProcessorEnrichers/TfsTeamSettingsEnricher-introduction.md
+  exists: false
+  markdown: ''
+
+---

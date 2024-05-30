@@ -75,6 +75,7 @@ namespace VstsSyncMigrator.Engine
         private TfsWorkItemLinkEnricher _workItemLinkEnricher;
         private ILogger workItemLog;
         private List<string> _itemsInError;
+        private TfsTeamSettingsEnricher _teamSettingsEnricher;
 
         public WorkItemMigrationContext(IMigrationEngine engine,
                                         IServiceProvider services,
@@ -88,6 +89,7 @@ namespace VstsSyncMigrator.Engine
                                         StringManipulatorEnricher stringManipulatorEnricher,
                                         TfsWorkItemEmbededLinkEnricher workItemEmbeddedLinkEnricher,
                                         TfsValidateRequiredField requiredFieldValidator,
+                                        TfsTeamSettingsEnricher teamSettingsEnricher,
                                         IOptions<EngineConfiguration> engineConfig)
             : base(engine, services, telemetry, logger)
         {
@@ -101,6 +103,7 @@ namespace VstsSyncMigrator.Engine
             _workItemLinkEnricher = workItemLinkEnricher;
             _workItemEmbededLinkEnricher = workItemEmbeddedLinkEnricher;
             _stringManipulatorEnricher = stringManipulatorEnricher;
+            _teamSettingsEnricher = teamSettingsEnricher;
             _validateConfig = requiredFieldValidator;
         }
 
@@ -127,6 +130,7 @@ namespace VstsSyncMigrator.Engine
             PullCommonEnrichersConfig<StringManipulatorEnricher, StringManipulatorEnricherOptions>(_engineConfig.CommonEnrichersConfig, _stringManipulatorEnricher);
             PullCommonEnrichersConfig<TfsAttachmentEnricher, TfsAttachmentEnricherOptions>(_engineConfig.CommonEnrichersConfig, _attachmentEnricher);
             PullCommonEnrichersConfig<TfsUserMappingEnricher, TfsUserMappingEnricherOptions>(_engineConfig.CommonEnrichersConfig, _userMappingEnricher);
+            PullCommonEnrichersConfig<TfsTeamSettingsEnricher, TfsTeamSettingsEnricherOptions>(_engineConfig.CommonEnrichersConfig, _teamSettingsEnricher);
         }
 
         internal void TraceWriteLine(LogEventLevel level, string message, Dictionary<string, object> properties = null)
@@ -161,6 +165,14 @@ namespace VstsSyncMigrator.Engine
             } else
             {
                 Log.LogWarning("WorkItemMigrationContext::InternalExecute: nodeStructureEnricher is disabled! This may cause work item migration errors! ");
+            }
+
+            if (_teamSettingsEnricher.Options.Enabled)
+            {
+                _teamSettingsEnricher.ProcessorExecutionBegin(null);
+            } else
+            {
+                Log.LogWarning("WorkItemMigrationContext::InternalExecute: teamSettingsEnricher is disabled!");
             }
             
 
