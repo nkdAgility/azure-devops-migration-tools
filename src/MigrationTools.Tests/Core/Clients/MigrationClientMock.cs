@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using Microsoft.VisualStudio.Services.Common;
+using Microsoft.VisualStudio.Services.WebApi;
 using MigrationTools._EngineV1.Clients;
 using MigrationTools._EngineV1.Configuration;
 
@@ -27,6 +28,11 @@ namespace MigrationTools.Tests.Core.Clients
 
         public void Configure(IMigrationClientConfig config, NetworkCredential credentials = null)
         {
+        }
+
+        public T GetClient<T>() where T : IVssHttpClient
+        {
+            return default(T);
         }
 
         public T GetService<T>()
