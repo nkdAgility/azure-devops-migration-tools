@@ -90,6 +90,29 @@
             </summary>
             <default>0</default>
         </member>
+        <member name="P:MigrationTools.Enrichers.TfsTeamSettingsEnricherOptions.MigrateTeamSettings">
+            <summary>
+            Migrate original team settings after their creation on target team project
+            </summary>
+            <default>false</default>
+        </member>
+        <member name="P:MigrationTools.Enrichers.TfsTeamSettingsEnricherOptions.UpdateTeamSettings">
+            <summary>
+            Reset the target team settings to match the source if the team exists
+            </summary>
+            <default>false</default>
+        </member>
+        <member name="P:MigrationTools.Enrichers.TfsTeamSettingsEnricherOptions.MigrateTeamCapacities">
+            <summary>
+            Migrate original team member capacities after their creation on the target team project. Note: It will only migrate team member capacity if the team member with same display name exists on the target collection otherwise it will be ignored.
+            </summary>
+            <default>false</default>
+        </member>
+        <member name="P:MigrationTools.Enrichers.TfsTeamSettingsEnricherOptions.Teams">
+            <summary>
+            List of Teams to process. If this is `null` then all teams will be processed.
+            </summary>
+        </member>
         <member name="P:MigrationTools.Enrichers.TfsUserMappingEnricherOptions.IdentityFieldsToCheck">
             <summary>
             This is a list of the Identiy fields in the Source to check for user mapping purposes. You should list all identiy fields that you wan to map.
@@ -110,6 +133,11 @@
             Save the work item after each link is added. This will slow the migration as it will cause many saves to the TFS database.
             </summary>
             <default>false</default>
+        </member>
+        <member name="T:MigrationTools.ProcessorEnrichers.TfsTeamSettingsEnricher">
+            <summary>
+            The TfsUserMappingEnricher is used to map users from the source to the target system. Run it with the ExportUsersForMappingContext to create a mapping file then with WorkItemMigrationContext to use the mapping file to update the users in the target system as you migrate the work items.
+            </summary>
         </member>
         <member name="T:MigrationTools.ProcessorEnrichers.TfsUserMappingEnricher">
             <summary>

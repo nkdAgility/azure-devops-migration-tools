@@ -129,6 +129,8 @@ namespace MigrationTools
             {
                 Id = project.Id.ToString(),
                 Name = project.Name,
+                Url = project.Uri.ToString(),
+                Guid = project.Guid,
                 internalObject = project
             };
             return internalObject;

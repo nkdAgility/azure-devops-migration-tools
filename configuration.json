@@ -51,6 +51,14 @@
       "ReplicateAllExistingNodes": true
     },
     {
+      "$type": "TfsTeamSettingsEnricherOptions",
+      "Enabled": true,
+      "MigrateTeamSettings": true,
+      "UpdateTeamSettings": true,
+      "MigrateTeamCapacities": true,
+      "Teams": null
+    },
+    {
       "$type": "TfsWorkItemLinkEnricherOptions",
       "RefName": "TfsWorkItemLinkEnricher",
       "Enabled": true,
