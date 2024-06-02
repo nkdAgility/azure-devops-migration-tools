@@ -12,6 +12,7 @@ using MigrationTools._EngineV1.Configuration.Processing;
 using MigrationTools._EngineV1.DataContracts;
 using MigrationTools._EngineV1.Processors;
 using MigrationTools.DataContracts;
+using MigrationTools.Enrichers;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -23,10 +24,17 @@ namespace VstsSyncMigrator.Engine
     public class WorkItemPostProcessingContext : MigrationProcessorBase
     {
         private WorkItemPostProcessingConfig _config;
+        private TfsWorkItemEmbededLinkEnricher _workItemEmbeddedLinkEnricher;
 
-        public WorkItemPostProcessingContext(IMigrationEngine engine, IServiceProvider services, ITelemetryLogger telemetry, ILogger<WorkItemPostProcessingContext> logger)
+        public WorkItemPostProcessingContext(
+            IMigrationEngine engine,
+            IServiceProvider services,
+            ITelemetryLogger telemetry,
+            TfsWorkItemEmbededLinkEnricher workItemEmbeddedLinkEnricher,
+            ILogger<WorkItemPostProcessingContext> logger)
             : base(engine, services, telemetry, logger)
         {
+            _workItemEmbeddedLinkEnricher = workItemEmbeddedLinkEnricher;
         }
 
         public override string Name
@@ -75,6 +83,8 @@ namespace VstsSyncMigrator.Engine
                     Log.LogInformation("...Exists");
                     TfsExtensions.ToWorkItem(targetFound).Open();
                     Engine.FieldMaps.ApplyFieldMappings(sourceWI, targetFound);
+                    _workItemEmbeddedLinkEnricher.Enrich(null, targetFound);
+                    _workItemEmbeddedLinkEnricher.Enrich(sourceWI, targetFound);
                     if (TfsExtensions.ToWorkItem(targetFound).IsDirty)
                     {
                         try

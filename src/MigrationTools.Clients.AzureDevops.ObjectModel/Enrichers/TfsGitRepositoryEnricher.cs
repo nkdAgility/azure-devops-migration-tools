@@ -161,6 +161,7 @@ namespace MigrationTools.Enrichers
                                 case "Fixed in Commit":
                                     newLink = new ExternalLink(((TfsWorkItemMigrationClient)Engine.Target.WorkItems).Store.RegisteredLinkTypes[ArtifactLinkIds.Commit],
                                         $"vstfs:///git/commit/{targetRepoInfo.GitRepo.ProjectReference.Id}%2f{targetRepoInfo.GitRepo.Id}%2f{sourceRepoInfo.CommitID}");
+                                    newLink.Comment = el.Comment;
                                     break;
 
                                 case "Pull Request":
