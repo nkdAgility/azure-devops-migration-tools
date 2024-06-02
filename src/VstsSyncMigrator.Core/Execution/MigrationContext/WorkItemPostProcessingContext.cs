@@ -25,16 +25,19 @@ namespace VstsSyncMigrator.Engine
     {
         private WorkItemPostProcessingConfig _config;
         private TfsWorkItemEmbededLinkEnricher _workItemEmbeddedLinkEnricher;
+        private TfsEmbededImagesEnricher _workItemEmbededImagesEnricher;
 
         public WorkItemPostProcessingContext(
             IMigrationEngine engine,
             IServiceProvider services,
             ITelemetryLogger telemetry,
             TfsWorkItemEmbededLinkEnricher workItemEmbeddedLinkEnricher,
+            TfsEmbededImagesEnricher embededImagesEnricher,
             ILogger<WorkItemPostProcessingContext> logger)
             : base(engine, services, telemetry, logger)
         {
             _workItemEmbeddedLinkEnricher = workItemEmbeddedLinkEnricher;
+            _workItemEmbededImagesEnricher = embededImagesEnricher;
         }
 
         public override string Name
@@ -59,7 +62,7 @@ namespace VstsSyncMigrator.Engine
             //Builds the constraint part of the query
             wiqb.Query = _config.WIQLQuery;
 
-            List<WorkItemData> sourceWIS = Engine.Target.WorkItems.GetWorkItems(wiqb);
+            List<WorkItemData> sourceWIS = Engine.Source.WorkItems.GetWorkItems(wiqb);
             Log.LogInformation("Migrate {0} work items?", sourceWIS.Count);
             //////////////////////////////////////////////////
             ProjectData destProject = Engine.Target.WorkItems.GetProject();
@@ -84,11 +87,12 @@ namespace VstsSyncMigrator.Engine
                     TfsExtensions.ToWorkItem(targetFound).Open();
                     Engine.FieldMaps.ApplyFieldMappings(sourceWI, targetFound);
                     _workItemEmbeddedLinkEnricher.Enrich(null, targetFound);
-                    _workItemEmbeddedLinkEnricher.Enrich(sourceWI, targetFound);
+                    _workItemEmbededImagesEnricher.Enrich(sourceWI, targetFound);
                     if (TfsExtensions.ToWorkItem(targetFound).IsDirty)
                     {
                         try
                         {
+                            targetFound.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
                             TfsExtensions.SaveToAzureDevOps(targetFound);
                             Log.LogInformation("          Updated");
                         }
