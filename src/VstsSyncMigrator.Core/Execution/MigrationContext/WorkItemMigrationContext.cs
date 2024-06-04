@@ -468,8 +468,15 @@ namespace VstsSyncMigrator.Engine
             }
 
             newWorkItem.Title = oldWorkItem.Title;
-            newWorkItem.Fields["Microsoft.VSTS.Common.ClosedDate"].Value = oldWorkItem.Fields["Microsoft.VSTS.Common.ClosedDate"].Value;
+            if (newWorkItem.Fields["Microsoft.VSTS.Common.ClosedDate"].IsEditable)
+            {
+                newWorkItem.Fields["Microsoft.VSTS.Common.ClosedDate"].Value = oldWorkItem.Fields["Microsoft.VSTS.Common.ClosedDate"].Value;
+            }            
             newWorkItem.State = oldWorkItem.State;
+            if (newWorkItem.Fields["Microsoft.VSTS.Common.ClosedDate"].IsEditable)
+            {
+                newWorkItem.Fields["Microsoft.VSTS.Common.ClosedDate"].Value = oldWorkItem.Fields["Microsoft.VSTS.Common.ClosedDate"].Value;
+            }
             newWorkItem.Reason = oldWorkItem.Reason;
 
             foreach (Field f in oldWorkItem.Fields)
