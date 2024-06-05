@@ -108,7 +108,7 @@ namespace MigrationTools.Enrichers
                 if (Regex.IsMatch(sourceNodePath, mapper.Key, RegexOptions.IgnoreCase))
                 {
                     Log.LogDebug("NodeStructureEnricher.GetNewNodeName::Mappers::{key}::Match", mapper.Key);
-                    string replacement = Regex.Replace(sourceNodePath, mapper.Key, mapper.Value);
+                    string replacement = Regex.Replace(sourceNodePath, mapper.Key, mapper.Value.Replace("#target#", _targetProjectName));
                     Log.LogDebug("NodeStructureEnricher.GetNewNodeName::Mappers::{key}::replaceWith({replace})", mapper.Key, replacement);
                     return replacement;
                 } else

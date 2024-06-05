@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools._EngineV1.Clients;
 using MigrationTools.DataContracts;
+using MigrationTools.DataContracts.Pipelines;
 using MigrationTools.Enrichers;
 using MigrationTools.Exceptions;
 using MigrationTools.Processors;
@@ -135,6 +136,7 @@ namespace MigrationTools.Enrichers
 
             if (wiTargetL.ToWorkItem().IsDirty && Options.SaveAfterEachLinkIsAdded)
             {
+                wiTargetL.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
                 wiTargetL.SaveToAzureDevOps();
             }
         }
@@ -167,6 +169,7 @@ namespace MigrationTools.Enrichers
 
             if (wiTargetL.ToWorkItem().IsDirty && Options.SaveAfterEachLinkIsAdded)
             {
+                wiTargetL.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
                 wiTargetL.SaveToAzureDevOps();
             }
         }
@@ -192,6 +195,7 @@ namespace MigrationTools.Enrichers
                 {
                     try
                     {
+                        target.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
                         target.SaveToAzureDevOps();
                     }
                     catch (Exception ex)
@@ -310,6 +314,7 @@ namespace MigrationTools.Enrichers
                             // DevOps doesn't seem to take impersonation very nicely here - as of 13.05.22 the following line would get you an error:
                             // System.FormatException: The string 'Microsoft.TeamFoundation.WorkItemTracking.Common.ServerDefaultFieldValue' is not a valid AllXsd value.
                             // wiTargetR.ToWorkItem().Fields["System.ModifiedBy"].Value = "Migration";
+                            wiTargetR.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
                             wiTargetR.SaveToAzureDevOps();
                         }
                         else
@@ -333,6 +338,7 @@ namespace MigrationTools.Enrichers
                             // wiTargetL.ToWorkItem().Fields["System.ModifiedBy"].Value = "Migration";
                             if (Options.SaveAfterEachLinkIsAdded)
                             {
+                                wiTargetL.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
                                 wiTargetL.SaveToAzureDevOps();
                             }
                         }
@@ -427,6 +433,7 @@ namespace MigrationTools.Enrichers
             // target.ToWorkItem().Fields["System.ModifiedBy"].Value = "Migration";
             if (Options.SaveAfterEachLinkIsAdded)
             {
+                target.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
                 target.SaveToAzureDevOps();
             }
         }

@@ -31,6 +31,7 @@ using MigrationTools._EngineV1.DataContracts;
 using MigrationTools._EngineV1.Enrichers;
 using MigrationTools._EngineV1.Processors;
 using MigrationTools.DataContracts;
+using MigrationTools.DataContracts.Pipelines;
 using MigrationTools.Enrichers;
 using MigrationTools.ProcessorEnrichers;
 using MigrationTools.ProcessorEnrichers.WorkItemProcessorEnrichers;
@@ -601,6 +602,7 @@ namespace VstsSyncMigrator.Engine
                             ProcessWorkItemEmbeddedLinks(sourceWorkItem, targetWorkItem);
                             TraceWriteLine(LogEventLevel.Information, "Skipping as work item exists and no revisions to sync detected");
                             processWorkItemMetrics.Add("Revisions", 0);
+                            targetWorkItem.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
                         }
                         else
                         {
