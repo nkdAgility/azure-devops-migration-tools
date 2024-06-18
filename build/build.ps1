@@ -153,13 +153,13 @@ Copy-Item  -Path ".\src\MigrationTools.WinGet\**" -Destination "./output/WinGet"
  Remove-Item -Path ".\output\MigrationTools" -Recurse -Force
  #==============================================================================
 # Publish
-Write-Output "PUBLISH ABBWorkItemClone"
-Write-Output "--------------"
-$files = Get-ChildItem -Path ".\output\*" -Recurse
-if ($versionInfo.PreReleaseTag -eq "") {
-    Write-Output "Publishing Release"
-   gh release create $versionText $files --generate-notes --generate-notes --discussion-category "General"
-} else {
-    Write-Output "Publishing PreRelease"
-   gh release create $versionText $files --generate-notes --generate-notes --prerelease --discussion-category "General"
-}
+#Write-Output "PUBLISH ABBWorkItemClone"
+#Write-Output "--------------"
+#$files = Get-ChildItem -Path ".\output\*" -Recurse
+#if ($versionInfo.PreReleaseTag -eq "") {
+#    Write-Output "Publishing Release"
+#   #gh release create $versionText $files --generate-notes --generate-notes --discussion-category "General"
+#} else {
+#    Write-Output "Publishing PreRelease"
+#   #gh release create $versionText $files --generate-notes --generate-notes --prerelease --discussion-category "General"
+#}
