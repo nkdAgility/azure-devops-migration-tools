@@ -140,7 +140,14 @@ tfx extension create --root src\MigrationTools.Extension --output-path output/ -
 
 # Build Chocolatey Package
 choco pack src/MigrationTools.Chocolatey/nkdAgility.AzureDevOpsMigrationTools.nuspec --version $versionInfo.NuGetVersion configuration=release --outputdirectory output
-
+#-------------------------------------------
+# Copy MigrationTools.nupkg
+Copy-Item  -Path ".\src\MigrationTools\bin\**\*.nupkg" -Destination "./output/" -Recurse
+#-------------------------------------------
+# Copy MigrationTools.nupkg
+New-Item -Name "output/WinGet/" -ItemType Directory
+Copy-Item  -Path ".\src\MigrationTools.WinGet\**" -Destination "./output/WinGet" -Recurse
+#-------------------------------------------
  #==============================================================================
  # Cleanup
  Remove-Item -Path ".\output\MigrationTools" -Recurse -Force
