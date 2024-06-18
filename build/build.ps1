@@ -81,8 +81,8 @@ New-Item -Name "output/MigrationTools/" -ItemType Directory
 New-Item -Name "output/MigrationTools/preview/" -ItemType Directory
 New-Item -Name "output/MigrationTools/ConfigSamples/" -ItemType Directory
 # Copy Files
-Copy-Item  -Path ".\src\MigrationTools.ConsoleFull\bin\Release\net472\*" -Destination "./output/MigrationTools/" -Recurse
-Copy-Item  -Path ".\src\MigrationTools.ConsoleCore\bin\Release\net7.0\*" -Destination "./output/MigrationTools/preview/" -Recurse
+Copy-Item  -Path ".\src\MigrationTools.ConsoleFull\bin\Debug\net472\*" -Destination "./output/MigrationTools/" -Recurse
+Copy-Item  -Path ".\src\MigrationTools.ConsoleCore\bin\Debug\net7.0\*" -Destination "./output/MigrationTools/preview/" -Recurse
 Copy-Item  -Path ".\src\MigrationTools.Samples\*" -Destination "./output/MigrationTools/ConfigSamples/" -Recurse
 
 #==============================================================================
