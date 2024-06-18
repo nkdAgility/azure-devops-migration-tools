@@ -30,7 +30,9 @@ Write-Output "Detect Version"
 Write-Output "--------------"
 
 $IsLocal = $False
-if ($Build.BuildId -eq $Null -and $github.run_id -eq $Null)
+Write-Output "Azure DevOps Build ID: $($Env:Build_BuildId)"
+Write-Output "GitHub Run ID: $($github.run_id)"
+if ($Env:Build_BuildId -eq $Null -and $github.run_id -eq $Null)
 {
     $IsLocal = $True
 }
