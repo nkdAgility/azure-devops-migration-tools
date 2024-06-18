@@ -30,7 +30,7 @@ Write-Output "Detect Version"
 Write-Output "--------------"
 
 $IsLocal = $False
-if ($Build.BuildId -eq $Null -or $github.run_id -eq $Null)
+if ($Build.BuildId -eq $Null -and $github.run_id -eq $Null)
 {
     $IsLocal = $True
 }
@@ -44,7 +44,7 @@ If ($IsLocal) {
     $versionInfoJson
 }
 $versionInfo = $versionInfoJson | ConvertFrom-Json
-
+$versionInfo | ConvertTo-Json |  Set-Content -Path ".\output\GitVersion.json"
 Write-Output "FullSemVer: $($versionInfo.FullSemVer)"
 Write-Output "SemVer: $($versionInfo.SemVer)"
 Write-Output "PreReleaseTag: $($versionInfo.PreReleaseTag)"
