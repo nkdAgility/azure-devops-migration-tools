@@ -44,5 +44,7 @@ If ($IsAzureDevOps)
     foreach ($property in $properties) {
         Write-Output "##vso[task.setvariable variable=$($property.Name);isOutput=true;issecret=false;]$($property.Value)"
         Write-Output "##vso[task.setvariable variable=GitVersion_$($property.Name);isOutput=true;issecret=false;]$($property.Value)"
+        Write-Output "##vso[task.setvariable variable=$($property.Name);isOutput=false;issecret=false;]$($property.Value)"
+        Write-Output "##vso[task.setvariable variable=GitVersion_$($property.Name);isOutput=false;issecret=false;]$($property.Value)"
       }
 }

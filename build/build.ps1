@@ -85,7 +85,12 @@ Write-InfoLog "Find and replace tokens"
 $tokens = @("**\chocolatey*.ps1", "**\vss-extension.json")
 $files = Get-ChildItem -Path $tokens -Recurse -Exclude "output"
 Write-InfoLog "Found $($files.Count) files that might have tokens"
-$hash = @{ "#{GITVERSION.SEMVER}#" = $versionInfo.SemVer; "#{Chocolatey.FileHash}#" = $obj.Hash;}
+
+$hash = @{ 
+    "#{GITVERSION.SEMVER}#" = $versionInfo.SemVer; 
+    "#{Chocolatey.FileHash}#" = $obj.Hash;
+}
+
 foreach ($file in $files) {
     Write-InfoLog "Processing $($file.Name)"
     $contents = Get-Content $file.FullName
