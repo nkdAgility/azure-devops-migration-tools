@@ -28,34 +28,7 @@ if (Get-Item -Path ".\output" -ErrorAction SilentlyContinue) {
 New-Item -Name "output" -ItemType Directory
 
 #==============================================================================
-
-Write-InfoLog "Detect Version"
-Write-InfoLog "--------------"
-
-$IsLocal = $False
-Write-InfoLog "Azure DevOps Build ID: $($Env:Build_BuildId)"
-Write-InfoLog "GitHub Run ID: $($github.run_id)"
-if ($Env:Build_BuildId -eq $Null -and $github.run_id -eq $Null)
-{
-    $IsLocal = $True
-}
-Write-InfoLog "IsLocal: $IsLocal"
-
-# Get Version Numbers
-$versionInfoJson = dotnet-gitversion
-If ($IsLocal) {
-    $versionInfoJson = $versionInfoJson | foreach {$_.replace("Preview","Local")}
-    $versionInfoJson = $versionInfoJson | foreach {$_.replace("preview","Local")}
-    $versionInfoJson
-}
-$versionInfo = $versionInfoJson | ConvertFrom-Json
-$versionInfo | ConvertTo-Json |  Set-Content -Path ".\output\GitVersion.json"
-Write-InfoLog "FullSemVer: $($versionInfo.FullSemVer)"
-Write-InfoLog "SemVer: $($versionInfo.SemVer)"
-Write-InfoLog "PreReleaseTag: $($versionInfo.PreReleaseTag)"
-Write-InfoLog "InformationalVersion: $($versionInfo.InformationalVersion)"
-Write-InfoLog "--------------"
-
+.\build\versioning.ps1
  #==============================================================================
 
  Write-InfoLog "Complile and Test"
