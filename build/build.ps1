@@ -90,6 +90,7 @@ $hash = @{
     "#{GITVERSION.SEMVER}#" = $versionInfo.SemVer; 
     "#{Chocolatey.FileHash}#" = $obj.Hash;
 }
+$hash
 
 foreach ($file in $files) {
     Write-InfoLog "Processing $($file.Name)"
@@ -114,21 +115,26 @@ foreach ($file in $files) {
 Write-InfoLog "--------------"
 #-------------------------------------------
 # Build TFS Extension
+Write-InfoLog "Build TFS Extension"
 tfx extension create --root src\MigrationTools.Extension --output-path output/ --manifest-globs vss-extension.json
 #-------------------------------------------
 
 # Build Chocolatey Package
+Write-InfoLog "Build Chocolatey Package with version [$($versionInfo.NuGetVersion)]"
 choco pack src/MigrationTools.Chocolatey/nkdAgility.AzureDevOpsMigrationTools.nuspec --version $versionInfo.NuGetVersion configuration=release --outputdirectory output
 #-------------------------------------------
 # Copy MigrationTools.nupkg
+Write-InfoLog "Copy MigrationTools.nupkg"
 Copy-Item  -Path ".\src\MigrationTools\bin\**\*.nupkg" -Destination "./output/" -Recurse
 #-------------------------------------------
-# Copy MigrationTools.nupkg
+# Copy Winget
+Write-InfoLog "Copy Winget"
 New-Item -Name "output/WinGet/" -ItemType Directory
 Copy-Item  -Path ".\src\MigrationTools.WinGet\**" -Destination "./output/WinGet" -Recurse
 #-------------------------------------------
  #==============================================================================
  # Cleanup
+ Write-InfoLog "Cleanup"
  Remove-Item -Path ".\output\MigrationTools" -Recurse -Force
  #==============================================================================
 # Publish
@@ -147,4 +153,3 @@ Copy-Item  -Path ".\src\MigrationTools.WinGet\**" -Destination "./output/WinGet"
  # Final
  Write-InfoLog "Build ran in $((Get-Date) - $StartTimeBuild)"
  #==============================================================================
- Close-Logger

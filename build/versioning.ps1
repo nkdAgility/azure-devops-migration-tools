@@ -29,14 +29,13 @@ $versionInfoJson = dotnet-gitversion
 If ($IsLocal) {
     $versionInfoJson = $versionInfoJson | foreach {$_.replace("Preview","Local")}
     $versionInfoJson = $versionInfoJson | foreach {$_.replace("preview","Local")}
-    $versionInfoJson
 }
 $versionInfo = $versionInfoJson | ConvertFrom-Json
 $versionInfo | ConvertTo-Json |  Set-Content -Path ".\output\GitVersion.json"
-Write-InfoLog "FullSemVer: $($versionInfo.FullSemVer)"
-Write-InfoLog "SemVer: $($versionInfo.SemVer)"
-Write-InfoLog "PreReleaseTag: $($versionInfo.PreReleaseTag)"
-Write-InfoLog "InformationalVersion: $($versionInfo.InformationalVersion)"
+$properties =  $versionInfo.PSObject.Properties
+foreach ($property in $properties) {
+    Write-InfoLog "$($property.Name): $($property.Value)"
+}
 Write-InfoLog "--------------"
 If ($IsAzureDevOps)
 {
