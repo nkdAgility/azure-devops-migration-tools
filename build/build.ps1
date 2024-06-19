@@ -1,6 +1,6 @@
 cls
 $StartTimeBuild = Get-Date;
-.\build\logging.ps1
+. .\build\logging.ps1
 
 Write-InfoLog "BUILD Azure DevOps Migration Tools"
 Write-InfoLog "======================"
@@ -28,7 +28,7 @@ if (Get-Item -Path ".\output" -ErrorAction SilentlyContinue) {
 New-Item -Name "output" -ItemType Directory
 
 #==============================================================================
-.\build\versioning.ps1
+. .\build\versioning.ps1
  #==============================================================================
  Write-InfoLog "Complile and Test"
  Write-InfoLog "--------------"
@@ -41,7 +41,7 @@ if ($SkipCompile) {
     Write-InfoLog "Skipping Compile & Test"
 } else {
     Write-InfoLog "Running Compile"
-    .\build\compile-and-test.ps1
+    . .\build\compile-and-test.ps1
 }
 Write-InfoLog "--------------"
 #==============================================================================

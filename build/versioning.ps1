@@ -1,4 +1,4 @@
-.\build\logging.ps1
+. .\build\logging.ps1
 Write-InfoLog "Detect Version"
 Write-InfoLog "--------------"
 
