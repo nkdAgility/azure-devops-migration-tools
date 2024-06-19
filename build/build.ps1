@@ -1,7 +1,10 @@
+cls
+$StartTimeBuild = Get-Date;
+.\build\logging.ps1
 
-Write-Output "BUILD Azure DevOps Migration Tools"
-Write-Output "======================"
-Write-Output "Running from $($MyInvocation.MyCommand.Path)"
+Write-InfoLog "BUILD Azure DevOps Migration Tools"
+Write-InfoLog "======================"
+Write-InfoLog "Running from $($MyInvocation.MyCommand.Path)"
  #==============================================================================
 
 $SkipPreRequisits = $false
@@ -10,33 +13,33 @@ if ($args -contains "-SkipPreRequisits") {
 }
 
 if ($SkipPreRequisits) {
-    Write-Output "Skipping PreRequisits"
+    Write-InfoLog "Skipping PreRequisits"
 } else {
-    Write-Output "Installing PreRequisits"
+    Write-InfoLog "Installing PreRequisits"
     .\build\install-prerequsits.ps1
 }
  #==============================================================================
 
  # Create output folder
 if (Get-Item -Path ".\output" -ErrorAction SilentlyContinue) {
-    Write-Output "Cleanning up output folder"
+    Write-InfoLog "Cleanning up output folder"
     Remove-Item -Path ".\output\" -Recurse -Force
 }
 New-Item -Name "output" -ItemType Directory
 
 #==============================================================================
 
-Write-Output "Detect Version"
-Write-Output "--------------"
+Write-InfoLog "Detect Version"
+Write-InfoLog "--------------"
 
 $IsLocal = $False
-Write-Output "Azure DevOps Build ID: $($Env:Build_BuildId)"
-Write-Output "GitHub Run ID: $($github.run_id)"
+Write-InfoLog "Azure DevOps Build ID: $($Env:Build_BuildId)"
+Write-InfoLog "GitHub Run ID: $($github.run_id)"
 if ($Env:Build_BuildId -eq $Null -and $github.run_id -eq $Null)
 {
     $IsLocal = $True
 }
-Write-Output "IsLocal: $IsLocal"
+Write-InfoLog "IsLocal: $IsLocal"
 
 # Get Version Numbers
 $versionInfoJson = dotnet-gitversion
@@ -47,35 +50,35 @@ If ($IsLocal) {
 }
 $versionInfo = $versionInfoJson | ConvertFrom-Json
 $versionInfo | ConvertTo-Json |  Set-Content -Path ".\output\GitVersion.json"
-Write-Output "FullSemVer: $($versionInfo.FullSemVer)"
-Write-Output "SemVer: $($versionInfo.SemVer)"
-Write-Output "PreReleaseTag: $($versionInfo.PreReleaseTag)"
-Write-Output "InformationalVersion: $($versionInfo.InformationalVersion)"
-Write-Output "--------------"
+Write-InfoLog "FullSemVer: $($versionInfo.FullSemVer)"
+Write-InfoLog "SemVer: $($versionInfo.SemVer)"
+Write-InfoLog "PreReleaseTag: $($versionInfo.PreReleaseTag)"
+Write-InfoLog "InformationalVersion: $($versionInfo.InformationalVersion)"
+Write-InfoLog "--------------"
 
  #==============================================================================
 
- Write-Output "Complile and Test"
- Write-Output "--------------"
+ Write-InfoLog "Complile and Test"
+ Write-InfoLog "--------------"
 
 $SkipCompile = $false
 if ($args -contains "-SkipCompile") {
     $SkipCompile = $true
 }
-Write-Output "-SkipCompile $SkipCompile"
+Write-InfoLog "-SkipCompile $SkipCompile"
 
 if ($SkipCompile) {
-    Write-Output "Skipping Compile & Test"
+    Write-InfoLog "Skipping Compile & Test"
 } else {
-    Write-Output "Running Compile"
+    Write-InfoLog "Running Compile"
     .\build\compile-and-test.ps1
 }
-Write-Output "--------------"
+Write-InfoLog "--------------"
 
 #==============================================================================
 
-Write-Output "Azure DevOps Migration Tools (PACKAGING)"
-Write-Output "----------------------------------------"
+Write-InfoLog "Azure DevOps Migration Tools (PACKAGING)"
+Write-InfoLog "----------------------------------------"
 # Create output sub folders
 New-Item -Name "output/MigrationTools/" -ItemType Directory
 New-Item -Name "output/MigrationTools/preview/" -ItemType Directory
@@ -88,17 +91,17 @@ Copy-Item  -Path ".\src\MigrationTools.Samples\*" -Destination "./output/Migrati
 #==============================================================================
 
 $versionText = "v$($versionInfo.SemVer)";
-Write-Output "Version: $versionText"
+Write-InfoLog "Version: $versionText"
 $ZipName = "MigrationTools-$($versionInfo.SemVer).zip"
-Write-Output "ZipName: $ZipName"
+Write-InfoLog "ZipName: $ZipName"
 $ZipFilePath = ".\output\$ZipName"
-Write-Output "ZipFilePath: $ZipFilePath"
+Write-InfoLog "ZipFilePath: $ZipFilePath"
 #-------------------------------------------
 # Create Zip
 7z a -tzip  $ZipFilePath .\output\MigrationTools\**
 #-------------------------------------------
 # create hash
-Write-Output "Creating Hash for $ZipFilePath"
+Write-InfoLog "Creating Hash for $ZipFilePath"
 $ZipHash = Get-FileHash $ZipFilePath -Algorithm SHA256
 $obj = @{
     "Hash" = $($ZipHash.Hash)
@@ -106,35 +109,35 @@ $obj = @{
     }
 $hashSaveFile = ".\output\MigrationTools-$($versionInfo.SemVer).txt"
 $obj | ConvertTo-Json |  Set-Content -Path ".\output\MigrationTools-$($versionInfo.SemVer).txt"
-Write-Output "Hash saved to $hashSaveFile"
+Write-InfoLog "Hash saved to $hashSaveFile"
 #-------------------------------------------
 # Replace tokens
-Write-Output "Find and replace tokens"
+Write-InfoLog "Find and replace tokens"
 $tokens = @("**\chocolatey*.ps1", "**\vss-extension.json")
 $files = Get-ChildItem -Path $tokens -Recurse -Exclude "output"
-Write-Output "Found $($files.Count) files that might have tokens"
+Write-InfoLog "Found $($files.Count) files that might have tokens"
 $hash = @{ "#{GITVERSION.SEMVER}#" = $versionInfo.SemVer; "#{Chocolatey.FileHash}#" = $obj.Hash;}
 foreach ($file in $files) {
-    Write-Output "Processing $($file.Name)"
+    Write-InfoLog "Processing $($file.Name)"
     $contents = Get-Content $file.FullName
     if ($contents -eq $null) {
-        Write-Output "$($file.Name) is empty"
+        Write-InfoLog "$($file.Name) is empty"
        continue;
     }
     $updated = $false;
     foreach ($key in $hash.Keys) {
         if ($contents | %{$_ -match $key}) {
-            Write-Output "Found token $key in $($file.Name)"
+            Write-InfoLog "Found token $key in $($file.Name)"
             $contents = $contents | ForEach-Object { $_ -replace $key, $hash[$key] }
             $updated = $true
         }        
     }
     if ($updated) {
         Set-Content $file.FullName $contents 
-        Write-Output "Replaced tokens in $($file.Name)"
+        Write-InfoLog "Replaced tokens in $($file.Name)"
     }
 }
-Write-Output "--------------"
+Write-InfoLog "--------------"
 #-------------------------------------------
 # Build TFS Extension
 tfx extension create --root src\MigrationTools.Extension --output-path output/ --manifest-globs vss-extension.json
@@ -155,13 +158,21 @@ Copy-Item  -Path ".\src\MigrationTools.WinGet\**" -Destination "./output/WinGet"
  Remove-Item -Path ".\output\MigrationTools" -Recurse -Force
  #==============================================================================
 # Publish
-#Write-Output "PUBLISH ABBWorkItemClone"
-#Write-Output "--------------"
+#Write-InfoLog "PUBLISH ABBWorkItemClone"
+#Write-InfoLog "--------------"
 #$files = Get-ChildItem -Path ".\output\*" -Recurse
 #if ($versionInfo.PreReleaseTag -eq "") {
-#    Write-Output "Publishing Release"
+#    Write-InfoLog "Publishing Release"
 #   #gh release create $versionText $files --generate-notes --generate-notes --discussion-category "General"
 #} else {
-#    Write-Output "Publishing PreRelease"
+#    Write-InfoLog "Publishing PreRelease"
 #   #gh release create $versionText $files --generate-notes --generate-notes --prerelease --discussion-category "General"
 #}
+
+ #==============================================================================
+ # Final
+ Write-InfoLog "Build ran in $((Get-Date) - $StartTimeBuild)"
+ #==============================================================================
+ Close-Logger
+
+ Get-ChildItem -Path ".\**\*.coverage" -Recurse
