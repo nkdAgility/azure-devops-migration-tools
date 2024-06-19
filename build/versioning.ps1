@@ -29,6 +29,7 @@ $versionInfoJson = dotnet-gitversion
 If ($IsLocal) {
     $versionInfoJson = $versionInfoJson | foreach {$_.replace("Preview","Local")}
     $versionInfoJson = $versionInfoJson | foreach {$_.replace("preview","Local")}
+    $versionInfoJson
 }
 $versionInfo = $versionInfoJson | ConvertFrom-Json
 $versionInfo | ConvertTo-Json |  Set-Content -Path ".\output\GitVersion.json"
@@ -39,8 +40,9 @@ Write-InfoLog "InformationalVersion: $($versionInfo.InformationalVersion)"
 Write-InfoLog "--------------"
 If ($IsAzureDevOps)
 {
-    $versionInfo.PSObject.Properties | ForEach-Object {
-        Write-Output "##vso[task.setvariable variable=$_.Name;isOutput=true;issecret=false;]$_.Value"
-        Write-Output "##vso[task.setvariable variable=GitVersion_$_.Name;isOutput=true;issecret=false;]$_.Value"
+    $properties =  $versionInfo.PSObject.Properties
+    foreach ($property in $properties) {
+        Write-Output "##vso[task.setvariable variable=$($property.Name);isOutput=true;issecret=false;]$($property.Value)"
+        Write-Output "##vso[task.setvariable variable=GitVersion_$($property.Name);isOutput=true;issecret=false;]$($property.Value)"
       }
 }

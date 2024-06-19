@@ -30,16 +30,13 @@ New-Item -Name "output" -ItemType Directory
 #==============================================================================
 .\build\versioning.ps1
  #==============================================================================
-
  Write-InfoLog "Complile and Test"
  Write-InfoLog "--------------"
-
 $SkipCompile = $false
 if ($args -contains "-SkipCompile") {
     $SkipCompile = $true
 }
 Write-InfoLog "-SkipCompile $SkipCompile"
-
 if ($SkipCompile) {
     Write-InfoLog "Skipping Compile & Test"
 } else {
@@ -47,7 +44,6 @@ if ($SkipCompile) {
     .\build\compile-and-test.ps1
 }
 Write-InfoLog "--------------"
-
 #==============================================================================
 
 Write-InfoLog "Azure DevOps Migration Tools (PACKAGING)"
