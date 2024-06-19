@@ -174,5 +174,3 @@ Copy-Item  -Path ".\src\MigrationTools.WinGet\**" -Destination "./output/WinGet"
  Write-InfoLog "Build ran in $((Get-Date) - $StartTimeBuild)"
  #==============================================================================
  Close-Logger
-
- Get-ChildItem -Path ".\**\*.coverage" -Recurse
