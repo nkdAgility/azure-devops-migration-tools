@@ -1,3 +1,5 @@
+.\build\install-prerequsits.ps1
+
 if ((Get-Module -Name PoShLog -ListAvailable).count -eq 0) {
     Write-Warning -Message ('Module PoshLog Missing.')
     Install-Module -Name PoShLog -AllowClobber -Scope CurrentUser -force
