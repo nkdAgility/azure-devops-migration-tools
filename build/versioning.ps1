@@ -1,4 +1,6 @@
 . .\build\logging.ps1
+.\build\install-prerequsits.ps1
+
 Write-InfoLog "Detect Version"
 Write-InfoLog "--------------"
 
