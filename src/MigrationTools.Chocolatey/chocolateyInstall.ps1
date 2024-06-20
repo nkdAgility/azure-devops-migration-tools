@@ -13,5 +13,5 @@ if(test-path $migrationtoolspath) {
   Remove-Item "$($migrationtoolspath)\*" -recurse -force -exclude *.json
 }
 
-Install-ChocolateyZipPackage 'MigrationTools' 'https://github.com/nkdAgility/azure-devops-migration-tools/releases/download/v#{GITVERSION.SEMVER}#/MigrationTools-#{GITVERSION.SEMVER}#.zip' $migrationtoolspath -Checksum #{Chocolatey.FileHash}# -ChecksumType SHA256
+Install-ChocolateyZipPackage 'MigrationTools' 'https://github.com/nkdAgility/azure-devops-migration-tools/releases/download/v0.0.1/MigrationTools-0.0.1.zip' $migrationtoolspath -Checksum 9AB038099B52F7D39938518A2449301F82B9113888A494A00F82F2B769861D96 -ChecksumType SHA256
 write-host 'Azure DevOps Migration have been installed. Call `migration` from the command line to see options. You may need to close and reopen the command shell.'

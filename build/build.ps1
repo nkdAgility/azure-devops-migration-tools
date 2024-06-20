@@ -30,7 +30,7 @@ if ($version -eq $null) {
 .\build\packageExtension.ps1 -version $version -outfolder $outfolder.FullName
 #-------------------------------------------
 # Azure DevOps Migration Tools (Chocolatey) Packaging
-.\build\packageCocolatey.ps1 -version $version -outfolder $outfolder.FullName
+.\build\packageChocolatey.ps1 -version $version -outfolder $outfolder.FullName
 #-------------------------------------------
 # Azure DevOps Migration Tools (Nuget) Packaging
 .\build\packageNuget.ps1 -version $version -outfolder $outfolder.FullName
