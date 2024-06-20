@@ -6,7 +6,7 @@
 trigger:
 - main
 
-name: $(GITVERSION_SemVer)
+name: Name
 
 pool:
   vmImage: 'windows-latest'
