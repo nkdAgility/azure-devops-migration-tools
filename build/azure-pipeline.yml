@@ -138,7 +138,7 @@ stages:
     environment: AzureDevOpsMigrationTools-Release
     pool:
       vmImage: 'windows-latest'
-    variables:
+    #variables:
     #- group: 'Release'
     strategy:
       runOnce:
