@@ -32,7 +32,7 @@ Write-Output "Hash saved to $hashSaveFile"
 
 $fileToUpdate = Get-Item -Path "src\MigrationTools.Extension\vss-extension.json"
 Write-Output "Processing $($fileToUpdate.Name)"
-$contents = Get-Content $fileToUpdate.FullName
+$contents = Get-Content -Path $fileToUpdate.FullName
 $contents = $contents | ForEach-Object { $_ -replace "#{GITVERSION.SEMVER}#", $version }
 $contents = $contents | ForEach-Object { $_ -replace "#{Chocolatey.FileHash}#", $obj.Hash }
 Set-Content -Path $file.FullName -Value $contents 
