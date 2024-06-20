@@ -135,6 +135,7 @@ stages:
   condition:  succeeded()
   jobs:
   - deployment: Deploy
+    environment: production
     pool:
       vmImage: 'windows-latest'
     variables:
