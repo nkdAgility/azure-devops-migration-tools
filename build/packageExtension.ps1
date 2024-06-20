@@ -39,6 +39,11 @@ Set-Content -Path $fileToUpdate.FullName -Value $contents
 Write-Output "Replaced tokens in $($fileToUpdate.Name)"
 
 #-------------------------------------------
+if (((npm list -g tfx-cli) -join "," ).Contains("empty")) {
+    Write-Output "Installing tfx-cli"
+    npm i -g tfx-cli
+} else { Write-Output "Detected tfx-cli"}
+#-------------------------------------------
 # Build TFS Extension
 Write-Output "Build TFS Extension"
 tfx extension create --root src\MigrationTools.Extension --output-path $outfolder --manifest-globs vss-extension.json
