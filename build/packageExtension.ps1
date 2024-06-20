@@ -31,15 +31,15 @@ $obj | ConvertTo-Json |  Set-Content -Path "$outfolder\MigrationTools-$version-h
 Write-Output "Hash saved to $hashSaveFile"
 
 $fileToUpdate = Get-Item -Path "src\MigrationTools.Extension\vss-extension.json"
-Write-InfoLog "Processing $($fileToUpdate.Name)"
+Write-Output "Processing $($fileToUpdate.Name)"
 $contents = Get-Content $fileToUpdate.FullName
 $contents = $contents | ForEach-Object { $_ -replace "#{GITVERSION.SEMVER}#", $version }
 $contents = $contents | ForEach-Object { $_ -replace "#{Chocolatey.FileHash}#", $obj.Hash }
 Set-Content $file.FullName $contents 
-Write-InfoLog "Replaced tokens in $($file.Name)"
+Write-Output "Replaced tokens in $($file.Name)"
 
 #-------------------------------------------
 # Build TFS Extension
-Write-InfoLog "Build TFS Extension"
+Write-Output "Build TFS Extension"
 tfx extension create --root src\MigrationTools.Extension --output-path output\ --manifest-globs vss-extension.json
 #-------------------------------------------
