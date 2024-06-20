@@ -6,6 +6,8 @@
 trigger:
 - main
 
+name: $(GITVERSION_SemVer)
+
 pool:
   vmImage: 'windows-latest'
 
@@ -15,6 +17,9 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
+- checkout: self
+    fetchDepth: 0
+    clean: true
 
 - task: gitversion/setup@1
   inputs:
