@@ -26,8 +26,8 @@ $obj = @{
     "Hash" = $($ZipHash.Hash)
     "FullHash" = $ZipHash
     }
-$hashSaveFile = "$outfolder\MigrationTools-$($versionInfo.SemVer).txt"
-$obj | ConvertTo-Json |  Set-Content -Path "$outfolder\MigrationTools-$version-hash.txt"
+$hashSaveFile = "$outfolder\MigrationTools-$version.txt"
+$obj | ConvertTo-Json |  Set-Content -Path $hashSaveFile
 Write-Output "Hash saved to $hashSaveFile"
 
 $fileToUpdate = Get-Item -Path "src\MigrationTools.Extension\vss-extension.json"
@@ -35,11 +35,11 @@ Write-Output "Processing $($fileToUpdate.Name)"
 $contents = Get-Content $fileToUpdate.FullName
 $contents = $contents | ForEach-Object { $_ -replace "#{GITVERSION.SEMVER}#", $version }
 $contents = $contents | ForEach-Object { $_ -replace "#{Chocolatey.FileHash}#", $obj.Hash }
-Set-Content $file.FullName $contents 
+Set-Content -Path $file.FullName -Value $contents 
 Write-Output "Replaced tokens in $($file.Name)"
 
 #-------------------------------------------
 # Build TFS Extension
 Write-Output "Build TFS Extension"
-tfx extension create --root src\MigrationTools.Extension --output-path output\ --manifest-globs vss-extension.json
+tfx extension create --root src\MigrationTools.Extension --output-path $outfolder --manifest-globs vss-extension.json
 #-------------------------------------------
