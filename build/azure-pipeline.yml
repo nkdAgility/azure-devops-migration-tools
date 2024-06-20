@@ -6,7 +6,7 @@
 trigger:
 - main
 
-name: Name
+name: $(GITVERSION_SemVer)
 
 pool:
   vmImage: 'windows-latest'
@@ -15,11 +15,9 @@ variables:
   solution: '**/*.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
+  Agent.Source.Git.ShallowFetchDepth: 0
 
 steps:
-- checkout: self
-    fetchDepth: 0
-    clean: true
 
 - task: gitversion/setup@1
   inputs:
