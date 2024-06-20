@@ -21,7 +21,7 @@ $outfolder = New-Item -Name "output" -ItemType Directory
 #==============================================================================
 $version = $versionInfo.SemVer
 if ($version -eq $null) {
-    $version = "0.0.1"
+    $version = "0.0.2"
 }
 # Azure DevOps Migration Tools (Executable) Packaging
 .\build\packageExecutable.ps1 -version $version -outfolder $outfolder.FullName

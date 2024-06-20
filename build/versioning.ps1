@@ -1,6 +1,3 @@
-. .\build\logging.ps1
-.\build\install-prerequsits.ps1
-
 Write-InfoLog "Detect Version"
 Write-InfoLog "--------------"
 
@@ -25,6 +22,12 @@ if ($IsAzureDevOps -and $IsGitHubAction)
 Write-InfoLog "IsGitHubAction: $IsGitHubAction"
 Write-InfoLog "IsAzureDevOps: $IsAzureDevOps"
 Write-InfoLog "IsLocal: $IsLocal"
+
+# Install GitVersion
+if (($installedStuff -like "*GitVersion.Portable*").Count -eq 0) {
+    Write-Output "Installing GitVersion"
+    choco install gitversion.portable --confirm --accept-license -y
+} else { Write-Output "Detected GitVersion"}
 
 # Get Version Numbers
 $versionInfoJson = dotnet-gitversion

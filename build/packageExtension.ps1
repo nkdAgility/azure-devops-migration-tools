@@ -16,25 +16,16 @@ Write-Output "Azure DevOps Migration Tools (Extension) Packaging"
 Write-Output "----------------------------------------"
 Write-Output "Version: $version"
 Write-Output "Output Folder: $outfolder"
-$MigrationToolsFilename = "MigrationTools-$version.zip"
-Write-Output "MigrationTools Filename: $MigrationToolsFilename"
 
-# create hash
-Write-Output "Creating Hash for $MigrationToolsFilename"
-$ZipHash = Get-FileHash $outfolder\$MigrationToolsFilename -Algorithm SHA256
-$obj = @{
-    "Hash" = $($ZipHash.Hash)
-    "FullHash" = $ZipHash
-    }
-$hashSaveFile = "$outfolder\MigrationTools-$version.txt"
-$obj | ConvertTo-Json |  Set-Content -Path $hashSaveFile
-Write-Output "Hash saved to $hashSaveFile"
+# Copy out Extension Files
+New-Item -Path $outfolder -Name "\MigrationTools.Extension\" -ItemType Directory
+Copy-Item  -Path ".\src\MigrationTools.Extension\**" -Destination "$outfolder\MigrationTools.Extension\" -Recurse
 
-$fileToUpdate = Get-Item -Path "src\MigrationTools.Extension\vss-extension.json"
+
+$fileToUpdate = Get-Item -Path "$outfolder\MigrationTools.Extension\vss-extension.json"
 Write-Output "Processing $($fileToUpdate.Name)"
 $contents = Get-Content -Path $fileToUpdate.FullName
 $contents = $contents | ForEach-Object { $_ -replace "#{GITVERSION.SEMVER}#", $version }
-$contents = $contents | ForEach-Object { $_ -replace "#{Chocolatey.FileHash}#", $obj.Hash }
 Set-Content -Path $fileToUpdate.FullName -Value $contents 
 Write-Output "Replaced tokens in $($fileToUpdate.Name)"
 
@@ -46,5 +37,7 @@ if (((npm list -g tfx-cli) -join "," ).Contains("empty")) {
 #-------------------------------------------
 # Build TFS Extension
 Write-Output "Build TFS Extension"
-tfx extension create --root src\MigrationTools.Extension --output-path $outfolder --manifest-globs vss-extension.json
+tfx extension create --root "$outfolder\MigrationTools.Extension\" --output-path $outfolder --manifest-globs vss-extension.json
 #-------------------------------------------
+# Cleanup
+# Remove-Item -Path "$outfolder\MigrationTools.Extension" -Recurse -Force
