@@ -135,7 +135,7 @@ stages:
   condition:  succeeded()
   jobs:
   - deployment: Deploy
-    environment: production
+    environment: AzureDevOpsMigrationTools-Release
     pool:
       vmImage: 'windows-latest'
     variables:
