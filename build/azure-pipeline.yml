@@ -8,6 +8,9 @@ trigger:
 
 name: $(GITVERSION_SemVer)
 
+variables:
+  isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]
+
 stages:
 - stage: 'Build'
   displayName: 'Build Test & Package'
@@ -132,7 +135,7 @@ stages:
 - stage: 'Release'
   displayName: 'Release to GitHub Releases'
   dependsOn: Build
-  condition:  succeeded()
+  condition:  and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
   jobs:
   - deployment: Deploy
     environment: AzureDevOpsMigrationTools-Release
