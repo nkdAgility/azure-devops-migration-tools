@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "id": "vsts-sync-migration",
   "name": "Migration Tools for Azure DevOps",
-  "version": "0.0.1",
+  "version": "#{GITVERSION.SEMVER}#",
   "public": false,
   "publisher": "nkdAgility",
   "galleryFlags": [
