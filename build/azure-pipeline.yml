@@ -25,7 +25,14 @@ steps:
 - task: gitversion/execute@1
   inputs:
     updateAssemblyInfo: true
-
+- task: PowerShell@2
+  inputs:
+    targetType: 'inline'
+    script: |     
+      Write-Host "GITVERSION.SemVer: $(GITVERSION.SemVer)"
+      Write-Host "GitVersion.SemVer: $(GitVersion.SemVer)"
+      Write-Host "GitVersion.AssemblySemVer: $(GitVersion.AssemblySemVer)"
+      Write-Host "GitVersion.InformationalVersion: $(GetVersion.InformationalVersion)"
 
 - task: SonarCloudPrepare@2
   inputs:
@@ -75,27 +82,27 @@ steps:
   displayName: "Packaging (Executable)"
   inputs:
     filePath: '.\build\packageExecutable.ps1'
-    arguments: '--version $GitVersion_SemVer --outfolder $(Build.ArtifactStagingDirectory)' 
+    arguments: '--version $(GitVersion.SemVer) --outfolder $(Build.ArtifactStagingDirectory)' 
 - task: PowerShell@2
   displayName: "Packaging (Extension)"
   inputs:
     filePath: '.\build\packageExtension.ps1'
-    arguments: '--version $GitVersion_SemVer --outfolder $(Build.ArtifactStagingDirectory)' 
+    arguments: '--version $(GitVersion.SemVer) --outfolder $(Build.ArtifactStagingDirectory)' 
 - task: PowerShell@2
   displayName: "Packaging (Chocolatey)"
   inputs:
     filePath: '.\build\packageChocolatey.ps1'
-    arguments: '--version $GitVersion_SemVer --outfolder $(Build.ArtifactStagingDirectory)' 
+    arguments: '--version $(GitVersion.SemVer) --outfolder $(Build.ArtifactStagingDirectory)' 
 - task: PowerShell@2
   displayName: "Packaging (Nuget)"
   inputs:
     filePath: '.\build\packageNuget.ps1'
-    arguments: '--version $GitVersion_SemVer --outfolder $(Build.ArtifactStagingDirectory)' 
+    arguments: '--version $(GitVersion.SemVer) --outfolder $(Build.ArtifactStagingDirectory)' 
 - task: PowerShell@2
   displayName: "Packaging (Winget)"
   inputs:
     filePath: '.\build\packageWinget.ps1'
-    arguments: '--version $GitVersion_SemVer --outfolder $(Build.ArtifactStagingDirectory)' 
+    arguments: '--version $(GitVersion.SemVer) --outfolder $(Build.ArtifactStagingDirectory)' 
 
 - task: PublishBuildArtifacts@1
   inputs:
