@@ -26,6 +26,7 @@ steps:
   inputs:
     updateAssemblyInfo: true
 - task: PowerShell@2
+  displayName: GetVersion Data Check
   inputs:
     targetType: 'inline'
     script: |     
