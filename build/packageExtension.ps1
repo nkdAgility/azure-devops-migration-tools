@@ -40,4 +40,4 @@ Write-Output "Build TFS Extension"
 tfx extension create --root "$outfolder\MigrationTools.Extension\" --output-path $outfolder --manifest-globs vss-extension.json
 #-------------------------------------------
 # Cleanup
-# Remove-Item -Path "$outfolder\MigrationTools.Extension" -Recurse -Force
+Remove-Item -Path "$outfolder\MigrationTools.Extension" -Recurse -Force
