@@ -134,9 +134,9 @@ stages:
 
 # Release Stage
 
-- stage: 'Release'
+- stage: ReleaseStage
   displayName: 'Release to GitHub Releases'
-  dependsOn: Build
+  dependsOn: BuildStage
   condition:  and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
   jobs:
   - deployment: Deploy
