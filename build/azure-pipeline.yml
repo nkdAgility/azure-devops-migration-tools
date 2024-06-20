@@ -33,7 +33,7 @@ steps:
       Write-Host "GITVERSION.SemVer: $(GITVERSION.SemVer)"
       Write-Host "GitVersion.SemVer: $(GitVersion.SemVer)"
       Write-Host "GitVersion.AssemblySemVer: $(GitVersion.AssemblySemVer)"
-      Write-Host "GitVersion.InformationalVersion: $(GetVersion.InformationalVersion)"
+      Write-Host "GitVersion.InformationalVersion: $(GitVersion.InformationalVersion)"
 
 - task: SonarCloudPrepare@2
   inputs:
