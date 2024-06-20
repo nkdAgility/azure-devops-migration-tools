@@ -133,18 +133,16 @@ stages:
   displayName: 'Release to GitHub Releases'
   dependsOn: Build
   condition:  succeeded()
-  jobs: 
-  - job: 'Build'
-    displayName: 'Build job'
+  jobs:
+  - deployment: Deploy
     pool:
       vmImage: 'windows-latest'
-      demands:
-      - npm
     variables:
-      solution: '**/*.sln'
-      buildPlatform: 'Any CPU'
-      buildConfiguration: 'Release'
-      Agent.Source.Git.ShallowFetchDepth: 0
-    steps:
-    - download: current
-              artifact: drop
+    - group: 'Release'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: drop
+          - script: echo Hi!
