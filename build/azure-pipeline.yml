@@ -1,0 +1,105 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- main
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  solution: '**/*.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+
+steps:
+
+- task: gitversion/setup@1
+  inputs:
+    versionSpec: '5.x'
+- task: gitversion/execute@1
+  inputs:
+    updateAssemblyInfo: true
+
+- task: SonarCloudPrepare@2
+  inputs:
+    SonarCloud: 'Martins Sonar Cloud'
+    organization: 'nkdagility'
+    scannerMode: 'MSBuild'
+    projectKey: 'vsts-sync-migrator:master'
+    projectName: 'azure-devopsmigration-tools'
+    projectVersion: '$(GITVERSION.SemVer)'
+
+- task: DotNetCoreCLI@2
+  displayName: "Restore"
+  inputs:
+    command: 'restore'
+    feedsToUse: 'select'
+- task: DotNetCoreCLI@2
+  displayName: "Complie"
+  inputs:
+    command: 'build'
+    arguments: '/p:Version=$GitVersion_AssemblySemVer /p:FileVersion=GitVersion_AssemblySemVer /p:InformationalVersion=$GetVersion_InformationalVersion'
+- task: DotNetCoreCLI@2
+  displayName: "Test L0 & L1"
+  inputs:
+    command: 'test'
+    arguments: '--collect "Code coverage" --no-build --filter "(TestCategory=L0|TestCategory=L1)" --logger trx'
+- task: DotNetCoreCLI@2
+  displayName: "Test L2 & L3"
+  inputs:
+    command: 'test'
+    arguments: '--collect "Code coverage" --no-build --filter "(TestCategory=L2|TestCategory=L3)" --logger trx'
+- task: DotNetCoreCLI@2
+  displayName: "Test (other)"
+  inputs:
+    command: 'test'
+    arguments: '--collect "Code coverage" --no-build --filter "(TestCategory!=L0&TestCategory!=L1&TestCategory!=L2&TestCategory!=L3)" --logger trx'
+
+- task: SonarCloudAnalyze@2
+  inputs:
+    jdkversion: 'JAVA_HOME_17_X64'
+
+- task: PublishSymbols@2
+  inputs:
+    SearchPattern: '**/bin/**/*.pdb'
+    SymbolServerType: TeamServices
+
+- task: PowerShell@2
+  displayName: "Azure DevOps Migration Tools (Executable) Packaging"
+  inputs:
+    filePath: '.\build\packageExecutable.ps1'
+    arguments: '--version $GitVersion_SemVer --outfolder $(Build.ArtifactStagingDirectory)' 
+- task: PowerShell@2
+  displayName: "Azure DevOps Migration Tools (Extension) Packaging"
+  inputs:
+    filePath: '.\build\packageExtension.ps1'
+    arguments: '--version $GitVersion_SemVer --outfolder $(Build.ArtifactStagingDirectory)' 
+- task: PowerShell@2
+  displayName: "Azure DevOps Migration Tools (Chocolatey) Packaging"
+  inputs:
+    filePath: '.\build\packageChocolatey.ps1'
+    arguments: '--version $GitVersion_SemVer --outfolder $(Build.ArtifactStagingDirectory)' 
+- task: PowerShell@2
+  displayName: "Azure DevOps Migration Tools (Nuget) Packaging"
+  inputs:
+    filePath: '.\build\packageNuget.ps1'
+    arguments: '--version $GitVersion_SemVer --outfolder $(Build.ArtifactStagingDirectory)' 
+- task: PowerShell@2
+  displayName: "Azure DevOps Migration Tools (Winget) Packaging"
+  inputs:
+    filePath: '.\build\packageWinget.ps1'
+    arguments: '--version $GitVersion_SemVer --outfolder $(Build.ArtifactStagingDirectory)' 
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
+
+- task: SonarCloudPublish@2
+  inputs:
+    pollingTimeoutSec: '300'
+
