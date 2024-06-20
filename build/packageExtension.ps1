@@ -35,8 +35,8 @@ Write-Output "Processing $($fileToUpdate.Name)"
 $contents = Get-Content -Path $fileToUpdate.FullName
 $contents = $contents | ForEach-Object { $_ -replace "#{GITVERSION.SEMVER}#", $version }
 $contents = $contents | ForEach-Object { $_ -replace "#{Chocolatey.FileHash}#", $obj.Hash }
-Set-Content -Path $file.FullName -Value $contents 
-Write-Output "Replaced tokens in $($file.Name)"
+Set-Content -Path $fileToUpdate.FullName -Value $contents 
+Write-Output "Replaced tokens in $($fileToUpdate.Name)"
 
 #-------------------------------------------
 # Build TFS Extension
