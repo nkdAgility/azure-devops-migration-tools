@@ -139,7 +139,7 @@ stages:
     pool:
       vmImage: 'windows-latest'
     variables:
-    - group: 'Release'
+    #- group: 'Release'
     strategy:
       runOnce:
         deploy:
