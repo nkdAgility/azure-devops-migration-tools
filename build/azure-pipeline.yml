@@ -12,10 +12,10 @@ variables:
   isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]
 
 stages:
-- stage: 'Build'
+- stage: BuildStage
   displayName: 'Build Test & Package'
   jobs: 
-  - job: 'Build'
+  - job: BuildJob
     displayName: 'Build job'
     pool:
       vmImage: 'windows-latest'
@@ -31,6 +31,8 @@ stages:
       inputs:
         versionSpec: '5.x'
     - task: gitversion/execute@1
+      displayName: 'GitVersion'
+      name: GitVersion
       inputs:
         updateAssemblyInfo: true
     - task: PowerShell@2
@@ -141,12 +143,12 @@ stages:
     environment: AzureDevOpsMigrationTools-Release
     pool:
       vmImage: 'windows-latest'
-    #variables:
-    #- group: 'Release'
+    variables:
+      SemVer: $[ stageDependencies.BuildStage.BuildJob.outputs['BuildJob.GitVersion.SemVer'] ] # remember to use single quotes
     strategy:
       runOnce:
         deploy:
           steps:
           - download: current
             artifact: drop
-          - script: echo Hi!
+          - script: echo Hi $(SemVer) !
