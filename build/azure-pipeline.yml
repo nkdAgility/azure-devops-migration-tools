@@ -127,3 +127,24 @@ stages:
       inputs:
         pollingTimeoutSec: '300'
 
+# Release Stage
+
+- stage: 'Release'
+  displayName: 'Release to GitHub Releases'
+  dependsOn: Build
+  condition:  succeeded()
+  jobs: 
+  - job: 'Build'
+    displayName: 'Build job'
+    pool:
+      vmImage: 'windows-latest'
+      demands:
+      - npm
+    variables:
+      solution: '**/*.sln'
+      buildPlatform: 'Any CPU'
+      buildConfiguration: 'Release'
+      Agent.Source.Git.ShallowFetchDepth: 0
+    steps:
+    - download: current
+              artifact: drop
