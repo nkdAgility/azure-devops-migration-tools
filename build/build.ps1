@@ -19,20 +19,24 @@ New-Item -Name "output" -ItemType Directory
 #==============================================================================
 . .\build\compile-and-test.ps1
 #==============================================================================
+$version = $versionInfo.SemVer
+if ($version -eq $null) {
+    $version = "0.0.1"
+}
 # Azure DevOps Migration Tools (Executable) Packaging
-.\build\packageMigrationTools.ps1 -version $versionInfo.SemVer -outfolder ".\output"
+.\build\packageExecutable.ps1 -version $version -outfolder ".\output"
 #-------------------------------------------
 # Azure DevOps Migration Tools (Extension) Packaging
-.\build\packageExtension.ps1 -version $versionInfo.SemVer -outfolder ".\output"
+.\build\packageExtension.ps1 -version $version -outfolder ".\output"
 #-------------------------------------------
 # Azure DevOps Migration Tools (Chocolatey) Packaging
-.\build\packageCocolatey.ps1 -version $versionInfo.SemVer -outfolder ".\output"
+.\build\packageCocolatey.ps1 -version $version -outfolder ".\output"
 #-------------------------------------------
 # Azure DevOps Migration Tools (Nuget) Packaging
-.\build\packageNuget.ps1 -version $versionInfo.SemVer -outfolder ".\output"
+.\build\packageNuget.ps1 -version $version -outfolder ".\output"
 #-------------------------------------------
 # Azure DevOps Migration Tools (Winget) Packaging
-.\build\packageWinget.ps1 -version $versionInfo.SemVer -outfolder ".\output"
+.\build\packageWinget.ps1 -version $version -outfolder ".\output"
 #-------------------------------------------
  #==============================================================================
  # Cleanup
