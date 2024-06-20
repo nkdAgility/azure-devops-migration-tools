@@ -26,6 +26,7 @@ steps:
   inputs:
     updateAssemblyInfo: true
 
+
 - task: SonarCloudPrepare@2
   inputs:
     SonarCloud: 'Martins Sonar Cloud'
@@ -44,7 +45,7 @@ steps:
   displayName: "Complie"
   inputs:
     command: 'build'
-    arguments: '/p:Version=$GitVersion_AssemblySemVer /p:FileVersion=GitVersion_AssemblySemVer /p:InformationalVersion=$GetVersion_InformationalVersion'
+    arguments: '/p:Version=$Env:GitVersion_AssemblySemVer /p:FileVersion=$Env:GitVersion_AssemblySemVer /p:InformationalVersion=$Env:GetVersion_InformationalVersion'
 - task: DotNetCoreCLI@2
   displayName: "Test L0 & L1"
   inputs:
@@ -71,27 +72,27 @@ steps:
     SymbolServerType: TeamServices
 
 - task: PowerShell@2
-  displayName: "Azure DevOps Migration Tools (Executable) Packaging"
+  displayName: "Packaging (Executable)"
   inputs:
     filePath: '.\build\packageExecutable.ps1'
     arguments: '--version $GitVersion_SemVer --outfolder $(Build.ArtifactStagingDirectory)' 
 - task: PowerShell@2
-  displayName: "Azure DevOps Migration Tools (Extension) Packaging"
+  displayName: "Packaging (Extension)"
   inputs:
     filePath: '.\build\packageExtension.ps1'
     arguments: '--version $GitVersion_SemVer --outfolder $(Build.ArtifactStagingDirectory)' 
 - task: PowerShell@2
-  displayName: "Azure DevOps Migration Tools (Chocolatey) Packaging"
+  displayName: "Packaging (Chocolatey)"
   inputs:
     filePath: '.\build\packageChocolatey.ps1'
     arguments: '--version $GitVersion_SemVer --outfolder $(Build.ArtifactStagingDirectory)' 
 - task: PowerShell@2
-  displayName: "Azure DevOps Migration Tools (Nuget) Packaging"
+  displayName: "Packaging (Nuget)"
   inputs:
     filePath: '.\build\packageNuget.ps1'
     arguments: '--version $GitVersion_SemVer --outfolder $(Build.ArtifactStagingDirectory)' 
 - task: PowerShell@2
-  displayName: "Azure DevOps Migration Tools (Winget) Packaging"
+  displayName: "Packaging (Winget)"
   inputs:
     filePath: '.\build\packageWinget.ps1'
     arguments: '--version $GitVersion_SemVer --outfolder $(Build.ArtifactStagingDirectory)' 
