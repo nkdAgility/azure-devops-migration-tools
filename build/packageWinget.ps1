@@ -17,5 +17,5 @@ Write-Output "----------------------------------------"
 Write-Output "Version: $version"
 Write-Output "Output Folder: $outfolder"
 #==============================================================================
-New-Item -Name "$outfolder/WinGet/" -ItemType Directory
-Copy-Item  -Path ".\src\MigrationTools.WinGet\**" -Destination "$outfolder/WinGet" -Recurse
+New-Item -Name "$outfolder\WinGet\" -ItemType Directory
+Copy-Item  -Path ".\src\MigrationTools.WinGet\**" -Destination "$outfolder\WinGet" -Recurse

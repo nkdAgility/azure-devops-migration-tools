@@ -41,5 +41,5 @@ Write-InfoLog "Replaced tokens in $($file.Name)"
 #-------------------------------------------
 # Build TFS Extension
 Write-InfoLog "Build TFS Extension"
-tfx extension create --root src\MigrationTools.Extension --output-path output/ --manifest-globs vss-extension.json
+tfx extension create --root src\MigrationTools.Extension --output-path output\ --manifest-globs vss-extension.json
 #-------------------------------------------

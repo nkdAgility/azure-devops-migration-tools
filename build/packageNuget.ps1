@@ -18,4 +18,4 @@ Write-Output "Version: $version"
 Write-Output "Output Folder: $outfolder"
 #==============================================================================
 
-Copy-Item  -Path ".\src\MigrationTools\bin\**\*.nupkg" -Destination "$outfolder/" -Recurse
+Copy-Item  -Path ".\src\MigrationTools\bin\**\*.nupkg" -Destination "$outfolder\" -Recurse

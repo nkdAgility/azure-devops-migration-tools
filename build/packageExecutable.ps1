@@ -29,16 +29,16 @@ if (($installedStuff -like "*7zip*").Count -eq 0) {
 } else { Write-Output "Detected 7zip"}
 #==============================================================================
 # Create output sub folders
-Write-Output "Create folders in $outfolder/MigrationTools/"
-New-Item -Name "$outfolder/MigrationTools/" -ItemType Directory
-New-Item -Name "$outfolder/MigrationTools/preview/" -ItemType Directory
-New-Item -Name "$outfolder/MigrationTools/ConfigSamples/" -ItemType Directory
+Write-Output "Create folders in $outfolder\MigrationTools\"
+New-Item -Name "$outfolder\MigrationTools\" -ItemType Directory
+New-Item -Name "$outfolder\MigrationTools\preview\" -ItemType Directory
+New-Item -Name "$outfolder\MigrationTools\ConfigSamples\" -ItemType Directory
 #==============================================================================
 # Copy Files
-Write-Output "Copy files to $outfolder/MigrationTools/"
-Copy-Item  -Path ".\src\MigrationTools.ConsoleFull\bin\Debug\net472\*" -Destination "$outfolder/MigrationTools/" -Recurse
-Copy-Item  -Path ".\src\MigrationTools.ConsoleCore\bin\Debug\net7.0\*" -Destination "$outfolder/MigrationTools/preview/" -Recurse
-Copy-Item  -Path ".\src\MigrationTools.Samples\*" -Destination "$outfolder/MigrationTools/ConfigSamples/" -Recurse
+Write-Output "Copy files to $outfolder\MigrationTools\"
+Copy-Item  -Path ".\src\MigrationTools.ConsoleFull\bin\Debug\net472\*" -Destination "$outfolder\MigrationTools\" -Recurse -overwrite
+Copy-Item  -Path ".\src\MigrationTools.ConsoleCore\bin\Debug\net7.0\*" -Destination "$outfolder\MigrationTools\preview\" -Recurse -overwrite
+Copy-Item  -Path ".\src\MigrationTools.Samples\*" -Destination "$outfolder\MigrationTools\ConfigSamples\" -Recurse -overwrite
 #==============================================================================
 # Create Zip
 7z a -tzip  $OutputFullName $outfolder\MigrationTools\**
