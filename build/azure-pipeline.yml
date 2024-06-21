@@ -243,7 +243,8 @@ stages:
                 Write-Host "isPreview: $(isPreview)"
                 Write-Host "shouldDeploy: $(shouldDeploy)"
                 Write-Host "GitVersion.SemVer: $(GitVersion.SemVer)"
-                Write-Host "GitVersion.PreReleaseTag: $(GitVersion.PreReleaseTag)"                
+                Write-Host "GitVersion.PreReleaseTag: $(GitVersion.PreReleaseTag)"     
+                Write-Host "GitVersion.PreReleaseTag: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.PreReleaseTag'] ]"
 
 # Release to Azure DevOps Extension Marketplace
 
