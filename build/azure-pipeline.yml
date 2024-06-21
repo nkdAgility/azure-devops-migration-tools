@@ -12,22 +12,19 @@ name: $(GITVERSION_SemVer)
 
 variables:
   isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]
-  doCompileTest: false
+  skipCompileTest: true
+
+# Versioning of repo
 
 stages:
-- stage: Build
-  displayName: 'Build Test & Package'
+- stage: Versioning
+  displayName: 'Versioning'
   jobs: 
-  - job: BuildJob
-    displayName: 'Build job'
+  - job: VersionJob
+    displayName: 'Version job'
     pool:
       vmImage: 'windows-latest'
-      demands:
-      - npm
     variables:
-      solution: '**/*.sln'
-      buildPlatform: 'Any CPU'
-      buildConfiguration: 'Release'
       Agent.Source.Git.ShallowFetchDepth: 0
     steps:
     - task: gitversion/setup@1
@@ -40,7 +37,6 @@ stages:
         updateAssemblyInfo: true
     - task: PowerShell@2
       displayName: GetVersion Data Check
-      condition: and(succeeded(), eq(variables['doCompileTest'], 'true'))
       continueOnError: true
       inputs:
         targetType: 'inline'
@@ -50,44 +46,59 @@ stages:
           Write-Host "GitVersion.AssemblySemVer: $(GitVersion.AssemblySemVer)"
           Write-Host "GitVersion.InformationalVersion: $(GitVersion.InformationalVersion)"
 
+# Build, Test and Package
+
+- stage: Build
+  displayName: 'Build Test & Package'
+  dependsOn: Versioning
+  condition:  and(succeeded(), eq(variables['skipCompileTest'], 'true'))
+  jobs: 
+  - job: BuildJob
+    displayName: 'Build job'
+    pool:
+      vmImage: 'windows-latest'
+      demands:
+      - npm
+    variables:
+      solution: '**/*.sln'
+      buildPlatform: 'Any CPU'
+      buildConfiguration: 'Release'
+      GitVersion.SemVer: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.SemVer'] ]
+      GitVersion.AssemblySemVer: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.AssemblySemVer'] ]
+      GitVersion.InformationalVersion: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.InformationalVersion'] ]
+    steps:
     - task: SonarCloudPrepare@2
-      condition: and(succeeded(), eq(variables['doCompileTest'], 'true'))
       inputs:
         SonarCloud: 'Martins Sonar Cloud'
         organization: 'nkdagility'
         scannerMode: 'MSBuild'
         projectKey: 'vsts-sync-migrator:master'
         projectName: 'azure-devops-migration-tools'
-        projectVersion: '$(GITVERSION.SemVer)'
+        projectVersion: '$(GitVersion.SemVer)'
 
     - task: DotNetCoreCLI@2
-      condition: and(succeeded(), eq(variables['doCompileTest'], 'true'))
       displayName: "Restore"
       inputs:
         command: 'restore'
         feedsToUse: 'select'
     - task: DotNetCoreCLI@2
-      condition: and(succeeded(), eq(variables['doCompileTest'], 'true'))
       displayName: "Complie"
       inputs:
         command: 'build'
         arguments: '/p:Version=$(GitVersion.AssemblySemVer) /p:FileVersion=$(GitVersion.AssemblySemVer) /p:InformationalVersion=$(GetVersion.InformationalVersion)'
     - task: DotNetCoreCLI@2
-      condition: and(succeeded(), eq(variables['doCompileTest'], 'true'))
       displayName: "Test L0 & L1"
       inputs:
         command: 'test'
         arguments: '--collect "Code coverage" --no-build --filter "(TestCategory=L0|TestCategory=L1)" --logger trx'
       continueOnError: true
     - task: DotNetCoreCLI@2
-      condition: and(succeeded(), eq(variables['doCompileTest'], 'true'))
       displayName: "Test L2 & L3"
       inputs:
         command: 'test'
         arguments: '--collect "Code coverage" --no-build --filter "(TestCategory=L2|TestCategory=L3)" --logger trx'
       continueOnError: true
     - task: DotNetCoreCLI@2
-      condition: and(succeeded(), eq(variables['doCompileTest'], 'true'))
       displayName: "Test (other)"
       inputs:
         command: 'test'
@@ -95,58 +106,49 @@ stages:
       continueOnError: true
 
     - task: SonarCloudAnalyze@2
-      condition: and(succeeded(), eq(variables['doCompileTest'], 'true'))
       inputs:
         jdkversion: 'JAVA_HOME_17_X64'
       continueOnError: true
 
     - task: PublishSymbols@2
-      condition: and(succeeded(), eq(variables['doCompileTest'], 'true'))
       inputs:
         SearchPattern: '**/bin/**/*.pdb'
         SymbolServerType: TeamServices
       continueOnError: true
 
     - task: PowerShell@2
-      condition: and(succeeded(), eq(variables['doCompileTest'], 'true'))
       displayName: "Packaging (Executable)"
       inputs:
         filePath: '.\build\packageExecutable.ps1'
         arguments: '-version $(GitVersion.SemVer) -outfolder "$(Build.ArtifactStagingDirectory)"' 
     - task: PowerShell@2
       displayName: "Packaging (Extension)"
-      condition: and(succeeded(), eq(variables['doCompileTest'], 'true'))
       inputs:
         filePath: '.\build\packageExtension.ps1'
         arguments: '-version $(GitVersion.SemVer) -outfolder "$(Build.ArtifactStagingDirectory)"' 
     - task: PowerShell@2
       displayName: "Packaging (Chocolatey)"
-      condition: and(succeeded(), eq(variables['doCompileTest'], 'true'))
       inputs:
         filePath: '.\build\packageChocolatey.ps1'
         arguments: '-version $(GitVersion.SemVer) -outfolder "$(Build.ArtifactStagingDirectory)"' 
     - task: PowerShell@2
       displayName: "Packaging (Nuget)"
-      condition: and(succeeded(), eq(variables['doCompileTest'], 'true'))
       inputs:
         filePath: '.\build\packageNuget.ps1'
         arguments: '-version $(GitVersion.SemVer) -outfolder "$(Build.ArtifactStagingDirectory)"' 
     - task: PowerShell@2
       displayName: "Packaging (Winget)"
-      condition: and(succeeded(), eq(variables['doCompileTest'], 'true'))
       inputs:
         filePath: '.\build\packageWinget.ps1'
         arguments: '-version $(GitVersion.SemVer) -outfolder "$(Build.ArtifactStagingDirectory)"' 
 
     - task: PublishBuildArtifacts@1
-      condition: and(succeeded(), eq(variables['doCompileTest'], 'true'))
       inputs:
         PathtoPublish: '$(Build.ArtifactStagingDirectory)'
         ArtifactName: 'drop'
         publishLocation: 'Container'
 
     - task: SonarCloudPublish@2
-      condition: and(succeeded(), eq(variables['doCompileTest'], 'true'))
       inputs:
         pollingTimeoutSec: '300'
 
@@ -155,7 +157,7 @@ stages:
 - stage: ReleaseGitHub
   displayName: 'Release to GitHub Releases'
   dependsOn: Build
-  condition:  succeeded()
+  condition:  or(succeeded(), eq(variables['skipCompileTest'], 'true'))
   # condition:  and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'), eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/preview'))
   jobs:
   - deployment: GitHubRelease
@@ -179,7 +181,7 @@ stages:
 - stage: ReleaseExtension
   displayName: 'Release to Azure DevOps Extension Marketplace'
   dependsOn: ReleaseGitHub
-  condition:  succeeded()
+  condition:  or(succeeded(), eq(variables['skipCompileTest'], 'true'))
   # condition:  and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'), eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/preview'))
   jobs:
   - deployment: tfxcliRelease
@@ -203,7 +205,7 @@ stages:
 - stage: ReleaseChocolatey
   displayName: 'Release to Chocolatey Community Repository'
   dependsOn: ReleaseGitHub
-  condition:  succeeded()
+  condition:  or(succeeded(), eq(variables['skipCompileTest'], 'true'))
   # condition:  and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'), eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/preview'))
   jobs:
   - deployment: ChocoRelease
@@ -227,7 +229,7 @@ stages:
 - stage: ReleaseWinget
   displayName: 'Release to Winget package Repository'
   dependsOn: ReleaseGitHub
-  condition:  succeeded()
+  condition: or(succeeded(), eq(variables['skipCompileTest'], 'true'))
   # condition:  and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'), eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/preview'))
   jobs:
   - deployment: WingetRelease
