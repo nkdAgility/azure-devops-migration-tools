@@ -10,17 +10,10 @@ trigger:
 
 name: $(GITVERSION_SemVer)
 
+## TODO: THESE WILL NOT WORK! NEED TO USE Versioning Reference instead with $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.SemVer'] ]
 variables:
   isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]
-  environmentName: 'AzureDevOpsMigrationTools-Dev'
-  environmentTag: 'Dev'
-  isRelease: false
-  isPreview: false
-  shouldDeploy: false
   skipCompileTest: true
-  fakeBuildAssets: false
-  PreReleaseTag: ""
-  SemVer: "0.0.0-Dev"
 
 # Versioning of repo
 
@@ -51,25 +44,28 @@ stages:
       inputs:
         targetType: 'inline'
         script: |
+          Write-Host "##vso[task.setvariable variable=environmentName;isoutput=true]AzureDevOpsMigrationTools-Dev"
+          Write-Host "##vso[task.setvariable variable=environmentTag;isoutput=true]Dev"
+          Write-Host "##vso[task.setvariable variable=isRelease;isoutput=true]false"
+          Write-Host "##vso[task.setvariable variable=isPreview;isoutput=true]false"
+          Write-Host "##vso[task.setvariable variable=shouldDeploy;isoutput=true]false"
+
           if ("$(GitVersion.PreReleaseTag)" -eq "")
           {
-            Write-Host "##vso[task.setvariable variable=environmentName;]AzureDevOpsMigrationTools-Release"
-            Write-Host "##vso[task.setvariable variable=environmentTag;]Release"
-            Write-Host "##vso[task.setvariable variable=isRelease;]true"
-            Write-Host "##vso[task.setvariable variable=isPreview;]false"
-            Write-Host "##vso[task.setvariable variable=shouldDeploy;]true"
+            Write-Host "##vso[task.setvariable variable=environmentName;isoutput=true]AzureDevOpsMigrationTools-Release"
+            Write-Host "##vso[task.setvariable variable=environmentTag;isoutput=true]Release"
+            Write-Host "##vso[task.setvariable variable=isRelease;isoutput=true]true"
+            Write-Host "##vso[task.setvariable variable=isPreview;isoutput=true]false"
+            Write-Host "##vso[task.setvariable variable=shouldDeploy;isoutput=true]true"
           }
           if ("$(GitVersion.PreReleaseLabel)" -contains "Preview")
           {
-            Write-Host "##vso[task.setvariable variable=environmentName;]AzureDevOpsMigrationTools-Preview"
-            Write-Host "##vso[task.setvariable variable=environmentTag;]Preview"
-            Write-Host "##vso[task.setvariable variable=isRelease;]false"
-            Write-Host "##vso[task.setvariable variable=isPreview;]true"
-            Write-Host "##vso[task.setvariable variable=shouldDeploy;]true"
+            Write-Host "##vso[task.setvariable variable=environmentName;isoutput=true]AzureDevOpsMigrationTools-Preview"
+            Write-Host "##vso[task.setvariable variable=environmentTag;isoutput=true]Preview"
+            Write-Host "##vso[task.setvariable variable=isRelease;isoutput=true]false"
+            Write-Host "##vso[task.setvariable variable=isPreview;isoutput=true]true"
+            Write-Host "##vso[task.setvariable variable=shouldDeploy;isoutput=true]true"
           }
-          Write-Host "Updating Variables: "
-          Write-Host "##vso[task.setvariable variable=PreReleaseTag;]$(GITVERSION.PreReleaseTag)"
-          Write-Host "##vso[task.setvariable variable=SemVer;]$(GITVERSION.SemVer)"
           # Output the variables for debugging
           Write-Host "GITVERSION.PreReleaseLabel: $(GITVERSION.PreReleaseLabel)"
           Write-Host "GITVERSION.SemVer: $(GITVERSION.SemVer)"
@@ -232,6 +228,11 @@ stages:
     pool:
       vmImage: 'windows-latest'
     variables:
+      environmentName: $[ stageDependencies.Versioning.VersionJob.outputs['environmentName'] ]
+      environmentTag: $[ stageDependencies.Versioning.VersionJob.outputs['environmentTag'] ]
+      isRelease: $[ stageDependencies.Versioning.VersionJob.outputs['isRelease'] ]
+      isPreview: $[ stageDependencies.Versioning.VersionJob.outputs['isPreview'] ]
+      shouldDeploy: $[ stageDependencies.Versioning.VersionJob.outputs['shouldDeploy'] ]
       GitVersion.SemVer: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.SemVer'] ]
       GitVersion.PreReleaseTag: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.PreReleaseTag'] ]
     strategy:
@@ -252,15 +253,15 @@ stages:
                 Write-Host "isPreview: $(isPreview)"
                 Write-Host "shouldDeploy: $(shouldDeploy)"
                 Write-Host "GitVersion.SemVer: $(GitVersion.SemVer)"
-                Write-Host "GitVersion.PreReleaseTag: $(GitVersion.PreReleaseTag)"     
-                Write-Host "SemVer: $(SemVer)"
-                Write-Host "PreReleaseTag: $(PreReleaseTag)"     
+                Write-Host "GitVersion.PreReleaseTag: $(GitVersion.PreReleaseTag)"      
 
 # Release to Azure DevOps Extension Marketplace
 
 - stage: ReleaseExtension
   displayName: 'Release to Azure DevOps Extension Marketplace'
-  dependsOn: ReleaseGitHub
+  dependsOn: 
+   - ReleaseGitHub
+   - Versioning
   condition:  succeeded()
   # condition:  and(succeeded(), eq(variables['shouldDeploy'], 'true'))
   jobs:
@@ -269,8 +270,13 @@ stages:
     pool:
       vmImage: 'windows-latest'
     variables:
-      SemVer: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.SemVer'] ]
-      PreReleaseTag: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.PreReleaseTag'] ]
+      environmentName: $[ stageDependencies.Versioning.VersionJob.outputs['environmentName'] ]
+      environmentTag: $[ stageDependencies.Versioning.VersionJob.outputs['environmentTag'] ]
+      isRelease: $[ stageDependencies.Versioning.VersionJob.outputs['isRelease'] ]
+      isPreview: $[ stageDependencies.Versioning.VersionJob.outputs['isPreview'] ]
+      shouldDeploy: $[ stageDependencies.Versioning.VersionJob.outputs['shouldDeploy'] ]
+      GitVersion.SemVer: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.SemVer'] ]
+      GitVersion.PreReleaseTag: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.PreReleaseTag'] ]
     strategy:
       runOnce:
         deploy:
@@ -295,7 +301,9 @@ stages:
 
 - stage: ReleaseChocolatey
   displayName: 'Release to Chocolatey Community Repository'
-  dependsOn: ReleaseGitHub
+  dependsOn: 
+   - ReleaseGitHub
+   - Versioning
   condition:  succeeded()
   # condition:  and(succeeded(), eq(variables['shouldDeploy'], 'true'))
   jobs:
@@ -304,8 +312,13 @@ stages:
     pool:
       vmImage: 'windows-latest'
     variables:
-      SemVer: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.SemVer'] ]
-      PreReleaseTag: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.PreReleaseTag'] ]
+      environmentName: $[ stageDependencies.Versioning.VersionJob.outputs['environmentName'] ]
+      environmentTag: $[ stageDependencies.Versioning.VersionJob.outputs['environmentTag'] ]
+      isRelease: $[ stageDependencies.Versioning.VersionJob.outputs['isRelease'] ]
+      isPreview: $[ stageDependencies.Versioning.VersionJob.outputs['isPreview'] ]
+      shouldDeploy: $[ stageDependencies.Versioning.VersionJob.outputs['shouldDeploy'] ]
+      GitVersion.SemVer: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.SemVer'] ]
+      GitVersion.PreReleaseTag: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.PreReleaseTag'] ]
     strategy:
       runOnce:
         deploy:
@@ -330,7 +343,9 @@ stages:
 
 - stage: ReleaseWinget
   displayName: 'Release to Winget package Repository'
-  dependsOn: ReleaseGitHub
+  dependsOn: 
+   - ReleaseGitHub
+   - Versioning
   condition:  succeeded()
   # condition:  and(succeeded(), eq(variables['shouldDeploy'], 'true'))
   jobs:
@@ -339,8 +354,13 @@ stages:
     pool:
       vmImage: 'windows-latest'
     variables:
-      SemVer: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.SemVer'] ]
-      PreReleaseTag: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.PreReleaseTag'] ]
+      environmentName: $[ stageDependencies.Versioning.VersionJob.outputs['environmentName'] ]
+      environmentTag: $[ stageDependencies.Versioning.VersionJob.outputs['environmentTag'] ]
+      isRelease: $[ stageDependencies.Versioning.VersionJob.outputs['isRelease'] ]
+      isPreview: $[ stageDependencies.Versioning.VersionJob.outputs['isPreview'] ]
+      shouldDeploy: $[ stageDependencies.Versioning.VersionJob.outputs['shouldDeploy'] ]
+      GitVersion.SemVer: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.SemVer'] ]
+      GitVersion.PreReleaseTag: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.PreReleaseTag'] ]
     strategy:
       runOnce:
         deploy:
