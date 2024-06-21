@@ -211,7 +211,7 @@ stages:
   condition:  succeeded()
   # condition:  and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'), eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/preview'))
   jobs:
-  - deployment: Winget-Release
+  - deployment: WingetRelease
     environment: AzureDevOpsMigrationTools-Release
     pool:
       vmImage: 'windows-latest'
