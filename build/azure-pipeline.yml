@@ -185,7 +185,6 @@ stages:
 
   - job: "BuildSimulationJob"
     displayName: 'Build Simulation Job'
-    dependsOn: Versioning
     condition:  and(succeeded(), eq(variables['skipCompileTest'], 'true'))
     pool:
       vmImage: 'windows-latest'
