@@ -20,7 +20,7 @@ variables:
   skipCompileTest: true
   fakeBuildAssets: false
   PreReleaseTag: ""
-  SemVer: ""
+  SemVer: "0.0.0-Dev"
 
 # Versioning of repo
 
@@ -67,6 +67,7 @@ stages:
             Write-Host "##vso[task.setvariable variable=isPreview;]true"
             Write-Host "##vso[task.setvariable variable=shouldDeploy;]true"
           }
+          Write-Host "Updating Variables: "
           Write-Host "##vso[task.setvariable variable=PreReleaseTag;]$(GITVERSION.PreReleaseTag)"
           Write-Host "##vso[task.setvariable variable=SemVer;]$(GITVERSION.SemVer)"
           # Output the variables for debugging
