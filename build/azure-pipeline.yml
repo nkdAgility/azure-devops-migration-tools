@@ -18,10 +18,14 @@ variables:
   isPreview: false
   shouldDeploy: false
   skipCompileTest: true
+  fakeBuildAssets: false
 
 # Versioning of repo
 
 stages:
+
+# Versioning
+
 - stage: Versioning
   displayName: 'Versioning'
   jobs: 
@@ -196,10 +200,11 @@ stages:
           targetType: 'inline'
           script: |
             Write-Host "Run Simulation Build"
+             Write-Host "##vso[task.setvariable variable=fakeBuildAssets;]true"
             New-Item -Path $(Build.ArtifactStagingDirectory) -Name "MigrationTools-$(GitVersion.SemVer).zip" -ItemType "file" -Force
             New-Item -Path $(Build.ArtifactStagingDirectory) -Name "nkdAgility.vsts-sync-migration-$(GitVersion.SemVer).vsix" -ItemType "file" -Force
             New-Item -Path $(Build.ArtifactStagingDirectory) -Name "MigrationTools.15.0.5.nupkg" -ItemType "file" -Force
-            New-Item -Path $(Build.ArtifactStagingDirectory) -Name "MigrationTools-$(GitVersion.SemVer).zip" -ItemType "file" -Force
+            New-Item -Path $(Build.ArtifactStagingDirectory) -Name "vsts-sync-migration-$(GitVersion.SemVer).zip" -ItemType "file" -Force
       - task: PublishBuildArtifacts@1
         inputs:
           PathtoPublish: '$(Build.ArtifactStagingDirectory)'
@@ -211,7 +216,7 @@ stages:
 - stage: ReleaseGitHub
   displayName: 'Release to GitHub Releases'
   dependsOn: Build
-  condition:  or(succeeded(), eq(variables['skipCompileTest'], 'true'))
+  condition:  succeeded()
   # condition:  and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'), eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/preview'))
   jobs:
   - deployment: GitHubRelease
@@ -219,14 +224,13 @@ stages:
     pool:
       vmImage: 'windows-latest'
     variables:
-      SemVer: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.SemVer'] ]
-      PreReleaseTag: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.PreReleaseTag'] ]
+      GitVersion.SemVer: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.SemVer'] ]
+      GitVersion.PreReleaseTag: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.PreReleaseTag'] ]
     strategy:
       runOnce:
         deploy:
           steps:
           - download: current
-            condition: and(succeeded(), eq(variables['doCompileTest'], 'true'))
             artifact: drop
           - task: PowerShell@2
             displayName: Read Environment Variables
@@ -234,20 +238,20 @@ stages:
             inputs:
               targetType: 'inline'
               script: |
-                Write-Host "environmentName: $(GenvironmentName)"
+                Write-Host "environmentName: $(environmentName)"
                 Write-Host "environmentTag: $(environmentTag)"
                 Write-Host "isRelease: $(isRelease)"
                 Write-Host "isPreview: $(isPreview)"
                 Write-Host "shouldDeploy: $(shouldDeploy)"
-                Write-Host "SemVer: $(SemVer)"
-                Write-Host "PreReleaseTag: $(PreReleaseTag)"                
+                Write-Host "GitVersion.SemVer: $(GitVersion.SemVer)"
+                Write-Host "GitVersion.PreReleaseTag: $(GitVersion.PreReleaseTag)"                
 
 # Release to Azure DevOps Extension Marketplace
 
 - stage: ReleaseExtension
   displayName: 'Release to Azure DevOps Extension Marketplace'
   dependsOn: ReleaseGitHub
-  condition:  or(succeeded(), eq(variables['skipCompileTest'], 'true'))
+  condition:  and(succeeded(), eq(variables['skipCompileTest'], 'true'))
   # condition:  and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'), eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/preview'))
   jobs:
   - deployment: tfxcliRelease
@@ -283,7 +287,7 @@ stages:
 - stage: ReleaseChocolatey
   displayName: 'Release to Chocolatey Community Repository'
   dependsOn: ReleaseGitHub
-  condition:  or(succeeded(), eq(variables['skipCompileTest'], 'true'))
+  condition:  and(succeeded(), eq(variables['skipCompileTest'], 'true'))
   # condition:  and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'), eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/preview'))
   jobs:
   - deployment: ChocoRelease
@@ -319,7 +323,7 @@ stages:
 - stage: ReleaseWinget
   displayName: 'Release to Winget package Repository'
   dependsOn: ReleaseGitHub
-  condition: or(succeeded(), eq(variables['skipCompileTest'], 'true'))
+  condition: and(succeeded(), eq(variables['skipCompileTest'], 'true'))
   # condition:  and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'), eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/preview'))
   jobs:
   - deployment: WingetRelease
