@@ -175,7 +175,7 @@ stages:
         pollingTimeoutSec: '300'
 
   - job: "BuildSimulationJob"
-    displayName: 'Build djob'
+    displayName: 'Build Simulation Job'
     condition:  and(succeeded(), eq(variables['skipCompileTest'], 'true'))
     pool:
       vmImage: 'windows-latest'
@@ -190,7 +190,7 @@ stages:
       GitVersion.InformationalVersion: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.InformationalVersion'] ]
     steps:
       - task: PowerShell@2
-        displayName: Read Environment Variables
+        displayName: Create fake build assets
         continueOnError: true
         inputs:
           targetType: 'inline'
