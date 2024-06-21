@@ -221,7 +221,9 @@ stages:
 
 - stage: ReleaseGitHub
   displayName: 'Release to GitHub Releases'
-  dependsOn: Build
+  dependsOn: 
+   - Build
+   - Versioning
   condition:  succeeded()
   # condition:  and(succeeded(), eq(variables['shouldDeploy'], 'true'))
   jobs:
