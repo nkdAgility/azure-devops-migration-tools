@@ -51,7 +51,7 @@ stages:
 - stage: Build
   displayName: 'Build Test & Package'
   dependsOn: Versioning
-  condition:  and(succeeded(), eq(variables['skipCompileTest'], 'true'))
+  condition:  and(succeeded(), eq(variables['skipCompileTest'], 'false'))
   jobs: 
   - job: BuildJob
     displayName: 'Build job'
@@ -233,7 +233,8 @@ stages:
   # condition:  and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'), eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/preview'))
   jobs:
   - deployment: WingetRelease
-    environment: AzureDevOpsMigrationTools-Release
+    ${{ if eq(variables['Build.SourceBranchName'], 'master') }}: environment: AzureDevOpsMigrationTools-Release
+    ${{ if ne(variables['Build.SourceBranchName'], 'master') }}: environment: AzureDevOpsMigrationTools-Release
     pool:
       vmImage: 'windows-latest'
     variables:
