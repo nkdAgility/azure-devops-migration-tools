@@ -195,7 +195,6 @@ stages:
     steps:
       - task: PowerShell@2
         displayName: Create fake build assets
-        continueOnError: true
         inputs:
           targetType: 'inline'
           script: |
@@ -217,7 +216,7 @@ stages:
   displayName: 'Release to GitHub Releases'
   dependsOn: Build
   condition:  succeeded()
-  # condition:  and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'), eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/preview'))
+  # condition:  and(succeeded(), eq(variables['shouldDeploy'], 'true'))
   jobs:
   - deployment: GitHubRelease
     environment: $(environmentName)
@@ -251,8 +250,8 @@ stages:
 - stage: ReleaseExtension
   displayName: 'Release to Azure DevOps Extension Marketplace'
   dependsOn: ReleaseGitHub
-  condition:  and(succeeded(), eq(variables['skipCompileTest'], 'true'))
-  # condition:  and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'), eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/preview'))
+  condition:  succeeded()
+  # condition:  and(succeeded(), eq(variables['shouldDeploy'], 'true'))
   jobs:
   - deployment: tfxcliRelease
     environment: $(environmentName)
@@ -274,7 +273,7 @@ stages:
             inputs:
               targetType: 'inline'
               script: |
-                Write-Host "environmentName: $(GenvironmentName)"
+                Write-Host "environmentName: $(environmentName)"
                 Write-Host "environmentTag: $(environmentTag)"
                 Write-Host "isRelease: $(isRelease)"
                 Write-Host "isPreview: $(isPreview)"
@@ -287,8 +286,8 @@ stages:
 - stage: ReleaseChocolatey
   displayName: 'Release to Chocolatey Community Repository'
   dependsOn: ReleaseGitHub
-  condition:  and(succeeded(), eq(variables['skipCompileTest'], 'true'))
-  # condition:  and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'), eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/preview'))
+  condition:  succeeded()
+  # condition:  and(succeeded(), eq(variables['shouldDeploy'], 'true'))
   jobs:
   - deployment: ChocoRelease
     environment: $(environmentName)
@@ -310,7 +309,7 @@ stages:
             inputs:
               targetType: 'inline'
               script: |
-                Write-Host "environmentName: $(GenvironmentName)"
+                Write-Host "environmentName: $(environmentName)"
                 Write-Host "environmentTag: $(environmentTag)"
                 Write-Host "isRelease: $(isRelease)"
                 Write-Host "isPreview: $(isPreview)"
@@ -323,8 +322,8 @@ stages:
 - stage: ReleaseWinget
   displayName: 'Release to Winget package Repository'
   dependsOn: ReleaseGitHub
-  condition: and(succeeded(), eq(variables['skipCompileTest'], 'true'))
-  # condition:  and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'), eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/preview'))
+  condition:  succeeded()
+  # condition:  and(succeeded(), eq(variables['shouldDeploy'], 'true'))
   jobs:
   - deployment: WingetRelease
     environment: $(environmentName)
@@ -346,7 +345,7 @@ stages:
             inputs:
               targetType: 'inline'
               script: |
-                Write-Host "environmentName: $(GenvironmentName)"
+                Write-Host "environmentName: $(environmentName)"
                 Write-Host "environmentTag: $(environmentTag)"
                 Write-Host "isRelease: $(isRelease)"
                 Write-Host "isPreview: $(isPreview)"
