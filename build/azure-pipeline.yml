@@ -46,7 +46,7 @@ stages:
       inputs:
         targetType: 'inline'
         script: |
-          if ($(GitVersion.PreReleaseTag) -eq "")
+          if ("$(GitVersion.PreReleaseTag)" -eq "")
           {
             Write-Host "##vso[task.setvariable variable=environmentName;]AzureDevOpsMigrationTools-Release"
             Write-Host "##vso[task.setvariable variable=environmentTag;]Release"
@@ -54,7 +54,7 @@ stages:
             Write-Host "##vso[task.setvariable variable=isPreview;]false"
             Write-Host "##vso[task.setvariable variable=shouldDeploy;]true"
           }
-          if ($(GitVersion.PreReleaseLabel) -contains "Preview")
+          if ("$(GitVersion.PreReleaseLabel)" -contains "Preview")
           {
             Write-Host "##vso[task.setvariable variable=environmentName;]AzureDevOpsMigrationTools-Preview"
             Write-Host "##vso[task.setvariable variable=environmentTag;]Preview"
