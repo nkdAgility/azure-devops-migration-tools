@@ -19,6 +19,8 @@ variables:
   shouldDeploy: false
   skipCompileTest: true
   fakeBuildAssets: false
+  PreReleaseTag: ""
+  SemVer: ""
 
 # Versioning of repo
 
@@ -65,8 +67,10 @@ stages:
             Write-Host "##vso[task.setvariable variable=isPreview;]true"
             Write-Host "##vso[task.setvariable variable=shouldDeploy;]true"
           }
-
-          Write-Host "GITVERSION.SemVer: $(GITVERSION.PreReleaseLabel)"
+          Write-Host "##vso[task.setvariable variable=PreReleaseTag;]$(GITVERSION.PreReleaseTag)"
+          Write-Host "##vso[task.setvariable variable=SemVer;]$(GITVERSION.SemVer)"
+          # Output the variables for debugging
+          Write-Host "GITVERSION.PreReleaseLabel: $(GITVERSION.PreReleaseLabel)"
           Write-Host "GITVERSION.SemVer: $(GITVERSION.SemVer)"
           Write-Host "GitVersion.SemVer: $(GitVersion.SemVer)"
           Write-Host "GitVersion.AssemblySemVer: $(GitVersion.AssemblySemVer)"
@@ -77,6 +81,7 @@ stages:
 - stage: Build
   displayName: 'Build Test & Package'
   dependsOn: Versioning
+  condition: succeeded()
   jobs: 
   - job: BuildJob
     displayName: 'Build job'
@@ -180,6 +185,7 @@ stages:
 
   - job: "BuildSimulationJob"
     displayName: 'Build Simulation Job'
+    dependsOn: Versioning
     condition:  and(succeeded(), eq(variables['skipCompileTest'], 'true'))
     pool:
       vmImage: 'windows-latest'
@@ -192,6 +198,7 @@ stages:
       GitVersion.SemVer: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.SemVer'] ]
       GitVersion.AssemblySemVer: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.AssemblySemVer'] ]
       GitVersion.InformationalVersion: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.InformationalVersion'] ]
+      GitVersion.MajorMinorPatch: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.MajorMinorPatch'] ]
     steps:
       - task: PowerShell@2
         displayName: Create fake build assets
@@ -202,7 +209,7 @@ stages:
              Write-Host "##vso[task.setvariable variable=fakeBuildAssets;]true"
             New-Item -Path $(Build.ArtifactStagingDirectory) -Name "MigrationTools-$(GitVersion.SemVer).zip" -ItemType "file" -Force
             New-Item -Path $(Build.ArtifactStagingDirectory) -Name "nkdAgility.vsts-sync-migration-$(GitVersion.SemVer).vsix" -ItemType "file" -Force
-            New-Item -Path $(Build.ArtifactStagingDirectory) -Name "MigrationTools.15.0.5.nupkg" -ItemType "file" -Force
+            New-Item -Path $(Build.ArtifactStagingDirectory) -Name "MigrationTools.$(GitVersion.MajorMinorPatch).nupkg" -ItemType "file" -Force
             New-Item -Path $(Build.ArtifactStagingDirectory) -Name "vsts-sync-migration-$(GitVersion.SemVer).zip" -ItemType "file" -Force
       - task: PublishBuildArtifacts@1
         inputs:
@@ -244,7 +251,8 @@ stages:
                 Write-Host "shouldDeploy: $(shouldDeploy)"
                 Write-Host "GitVersion.SemVer: $(GitVersion.SemVer)"
                 Write-Host "GitVersion.PreReleaseTag: $(GitVersion.PreReleaseTag)"     
-                Write-Host "GitVersion.PreReleaseTag: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.PreReleaseTag'] ]"
+                Write-Host "SemVer: $(SemVer)"
+                Write-Host "PreReleaseTag: $(PreReleaseTag)"     
 
 # Release to Azure DevOps Extension Marketplace
 
@@ -266,7 +274,6 @@ stages:
         deploy:
           steps:
           - download: current
-            condition: and(succeeded(), eq(variables['doCompileTest'], 'true'))
             artifact: drop
           - task: PowerShell@2
             displayName: Read Environment Variables
@@ -302,7 +309,6 @@ stages:
         deploy:
           steps:
           - download: current
-            condition: and(succeeded(), eq(variables['doCompileTest'], 'true'))
             artifact: drop
           - task: PowerShell@2
             displayName: Read Environment Variables
@@ -338,7 +344,6 @@ stages:
         deploy:
           steps:
           - download: current
-            condition: and(succeeded(), eq(variables['doCompileTest'], 'true'))
             artifact: drop
           - task: PowerShell@2
             displayName: Read Environment Variables
