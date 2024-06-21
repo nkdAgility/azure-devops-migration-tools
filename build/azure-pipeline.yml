@@ -12,8 +12,8 @@ name: $(GITVERSION_SemVer)
 
 variables:
   isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]
-  environmentName: ''
-  environmentTag: ''
+  environmentName: 'AzureDevOpsMigrationTools-Dev'
+  environmentTag: 'Dev'
   isRelease: false
   isPreview: false
   shouldDeploy: false
