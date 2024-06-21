@@ -14,7 +14,7 @@ variables:
   isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]
 
 stages:
-- stage: BuildStage
+- stage: Build
   displayName: 'Build Test & Package'
   jobs: 
   - job: BuildJob
@@ -134,20 +134,90 @@ stages:
       inputs:
         pollingTimeoutSec: '300'
 
-# Release Stage
+# Release to GitHub Releases
 
-- stage: ReleaseStage
+- stage: ReleaseGitHub
   displayName: 'Release to GitHub Releases'
-  dependsOn: BuildStage
+  dependsOn: Build
   condition:  succeeded()
   # condition:  and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'), eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/preview'))
   jobs:
-  - deployment: Deploy
+  - deployment: GitHub-Release
     environment: AzureDevOpsMigrationTools-Release
     pool:
       vmImage: 'windows-latest'
     variables:
-      SemVer: $[ stageDependencies.BuildStage.BuildJob.outputs['BuildJob.GitVersion.SemVer'] ] # remember to use single quotes
+      SemVer: $[ stageDependencies.Build.BuildJob.outputs['BuildJob.GitVersion.SemVer'] ]
+      PreReleaseTag: $[ stageDependencies.Build.BuildJob.outputs['BuildJob.GitVersion.PreReleaseTag'] ]
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: drop
+          - script: echo Hi $(SemVer) !
+
+# Release to Azure DevOps Extension Marketplace
+
+- stage: ReleaseExtension
+  displayName: 'Release to Azure DevOps Extension Marketplace'
+  dependsOn: ReleaseGitHub
+  condition:  succeeded()
+  # condition:  and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'), eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/preview'))
+  jobs:
+  - deployment: tfx-cli-Release
+    environment: AzureDevOpsMigrationTools-Release
+    pool:
+      vmImage: 'windows-latest'
+    variables:
+      SemVer: $[ stageDependencies.Build.BuildJob.outputs['BuildJob.GitVersion.SemVer'] ]
+      PreReleaseTag: $[ stageDependencies.Build.BuildJob.outputs['BuildJob.GitVersion.PreReleaseTag'] ]
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: drop
+          - script: echo Hi $(SemVer) !
+
+# Release to Chocolatey Community Repository
+
+- stage: ReleaseChocolatey
+  displayName: 'Release to Chocolatey Community Repository'
+  dependsOn: ReleaseGitHub
+  condition:  succeeded()
+  # condition:  and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'), eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/preview'))
+  jobs:
+  - deployment: Choco-Release
+    environment: AzureDevOpsMigrationTools-Release
+    pool:
+      vmImage: 'windows-latest'
+    variables:
+      SemVer: $[ stageDependencies.Build.BuildJob.outputs['BuildJob.GitVersion.SemVer'] ]
+      PreReleaseTag: $[ stageDependencies.Build.BuildJob.outputs['BuildJob.GitVersion.PreReleaseTag'] ]
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: drop
+          - script: echo Hi $(SemVer) !
+
+# Release to Winget package Repository
+
+- stage: ReleaseWinget
+  displayName: 'Release to Winget package Repository'
+  dependsOn: ReleaseGitHub
+  condition:  succeeded()
+  # condition:  and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'), eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/preview'))
+  jobs:
+  - deployment: Winget-Release
+    environment: AzureDevOpsMigrationTools-Release
+    pool:
+      vmImage: 'windows-latest'
+    variables:
+      SemVer: $[ stageDependencies.Build.BuildJob.outputs['BuildJob.GitVersion.SemVer'] ]
+      PreReleaseTag: $[ stageDependencies.Build.BuildJob.outputs['BuildJob.GitVersion.PreReleaseTag'] ]
     strategy:
       runOnce:
         deploy:
