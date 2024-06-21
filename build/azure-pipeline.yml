@@ -42,7 +42,6 @@ stages:
         updateAssemblyInfo: true
     - task: PowerShell@2
       displayName: Set Environment Variables
-      continueOnError: true
       inputs:
         targetType: 'inline'
         script: |
