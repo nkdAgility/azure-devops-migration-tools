@@ -5,6 +5,8 @@
 
 trigger:
 - main
+- preview
+- master
 
 name: $(GITVERSION_SemVer)
 
