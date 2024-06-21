@@ -233,8 +233,7 @@ stages:
   # condition:  and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'), eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/preview'))
   jobs:
   - deployment: WingetRelease
-    ${{ if eq(variables['Build.SourceBranchName'], 'master') }}: environment: AzureDevOpsMigrationTools-Release
-    ${{ if ne(variables['Build.SourceBranchName'], 'master') }}: environment: AzureDevOpsMigrationTools-Release
+    environment: AzureDevOpsMigrationTools-Release
     pool:
       vmImage: 'windows-latest'
     variables:
