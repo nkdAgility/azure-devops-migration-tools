@@ -139,7 +139,7 @@ stages:
 - stage: ReleaseStage
   displayName: 'Release to GitHub Releases'
   dependsOn: BuildStage
-  condition:  and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+  condition:  and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'), eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/preview'))
   jobs:
   - deployment: Deploy
     environment: AzureDevOpsMigrationTools-Release
