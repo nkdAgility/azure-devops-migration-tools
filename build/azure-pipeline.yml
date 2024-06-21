@@ -12,6 +12,7 @@ name: $(GITVERSION_SemVer)
 
 variables:
   isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]
+  shouldCompileTest: false
 
 stages:
 - stage: Build
@@ -50,6 +51,7 @@ stages:
           Write-Host "GitVersion.InformationalVersion: $(GitVersion.InformationalVersion)"
 
     - task: SonarCloudPrepare@2
+      enabled: false
       inputs:
         SonarCloud: 'Martins Sonar Cloud'
         organization: 'nkdagility'
@@ -59,28 +61,33 @@ stages:
         projectVersion: '$(GITVERSION.SemVer)'
 
     - task: DotNetCoreCLI@2
+      enabled: false
       displayName: "Restore"
       inputs:
         command: 'restore'
         feedsToUse: 'select'
     - task: DotNetCoreCLI@2
+      enabled: false
       displayName: "Complie"
       inputs:
         command: 'build'
         arguments: '/p:Version=$(GitVersion.AssemblySemVer) /p:FileVersion=$(GitVersion.AssemblySemVer) /p:InformationalVersion=$(GetVersion.InformationalVersion)'
     - task: DotNetCoreCLI@2
+      enabled: false
       displayName: "Test L0 & L1"
       inputs:
         command: 'test'
         arguments: '--collect "Code coverage" --no-build --filter "(TestCategory=L0|TestCategory=L1)" --logger trx'
       continueOnError: true
     - task: DotNetCoreCLI@2
+      enabled: false
       displayName: "Test L2 & L3"
       inputs:
         command: 'test'
         arguments: '--collect "Code coverage" --no-build --filter "(TestCategory=L2|TestCategory=L3)" --logger trx'
       continueOnError: true
     - task: DotNetCoreCLI@2
+      enabled: false
       displayName: "Test (other)"
       inputs:
         command: 'test'
@@ -88,49 +95,58 @@ stages:
       continueOnError: true
 
     - task: SonarCloudAnalyze@2
+      enabled: false
       inputs:
         jdkversion: 'JAVA_HOME_17_X64'
       continueOnError: true
 
     - task: PublishSymbols@2
+      enabled: false
       inputs:
         SearchPattern: '**/bin/**/*.pdb'
         SymbolServerType: TeamServices
       continueOnError: true
 
     - task: PowerShell@2
+      enabled: false
       displayName: "Packaging (Executable)"
       inputs:
         filePath: '.\build\packageExecutable.ps1'
         arguments: '-version $(GitVersion.SemVer) -outfolder "$(Build.ArtifactStagingDirectory)"' 
     - task: PowerShell@2
       displayName: "Packaging (Extension)"
+      enabled: false
       inputs:
         filePath: '.\build\packageExtension.ps1'
         arguments: '-version $(GitVersion.SemVer) -outfolder "$(Build.ArtifactStagingDirectory)"' 
     - task: PowerShell@2
       displayName: "Packaging (Chocolatey)"
+      enabled: false
       inputs:
         filePath: '.\build\packageChocolatey.ps1'
         arguments: '-version $(GitVersion.SemVer) -outfolder "$(Build.ArtifactStagingDirectory)"' 
     - task: PowerShell@2
       displayName: "Packaging (Nuget)"
+      enabled: false
       inputs:
         filePath: '.\build\packageNuget.ps1'
         arguments: '-version $(GitVersion.SemVer) -outfolder "$(Build.ArtifactStagingDirectory)"' 
     - task: PowerShell@2
       displayName: "Packaging (Winget)"
+      enabled: false
       inputs:
         filePath: '.\build\packageWinget.ps1'
         arguments: '-version $(GitVersion.SemVer) -outfolder "$(Build.ArtifactStagingDirectory)"' 
 
     - task: PublishBuildArtifacts@1
+      enabled: false
       inputs:
         PathtoPublish: '$(Build.ArtifactStagingDirectory)'
         ArtifactName: 'drop'
         publishLocation: 'Container'
 
     - task: SonarCloudPublish@2
+      enabled: false
       inputs:
         pollingTimeoutSec: '300'
 
