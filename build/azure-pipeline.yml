@@ -1,0 +1,154 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- main
+
+name: $(GITVERSION_SemVer)
+
+variables:
+  isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]
+
+stages:
+- stage: BuildStage
+  displayName: 'Build Test & Package'
+  jobs: 
+  - job: BuildJob
+    displayName: 'Build job'
+    pool:
+      vmImage: 'windows-latest'
+      demands:
+      - npm
+    variables:
+      solution: '**/*.sln'
+      buildPlatform: 'Any CPU'
+      buildConfiguration: 'Release'
+      Agent.Source.Git.ShallowFetchDepth: 0
+    steps:
+    - task: gitversion/setup@1
+      inputs:
+        versionSpec: '5.x'
+    - task: gitversion/execute@1
+      displayName: 'GitVersion'
+      name: GitVersion
+      inputs:
+        updateAssemblyInfo: true
+    - task: PowerShell@2
+      displayName: GetVersion Data Check
+      enabled: false
+      continueOnError: true
+      inputs:
+        targetType: 'inline'
+        script: |     
+          Write-Host "GITVERSION.SemVer: $(GITVERSION.SemVer)"
+          Write-Host "GitVersion.SemVer: $(GitVersion.SemVer)"
+          Write-Host "GitVersion.AssemblySemVer: $(GitVersion.AssemblySemVer)"
+          Write-Host "GitVersion.InformationalVersion: $(GitVersion.InformationalVersion)"
+
+    - task: SonarCloudPrepare@2
+      inputs:
+        SonarCloud: 'Martins Sonar Cloud'
+        organization: 'nkdagility'
+        scannerMode: 'MSBuild'
+        projectKey: 'vsts-sync-migrator:master'
+        projectName: 'azure-devops-migration-tools'
+        projectVersion: '$(GITVERSION.SemVer)'
+
+    - task: DotNetCoreCLI@2
+      displayName: "Restore"
+      inputs:
+        command: 'restore'
+        feedsToUse: 'select'
+    - task: DotNetCoreCLI@2
+      displayName: "Complie"
+      inputs:
+        command: 'build'
+        arguments: '/p:Version=$(GitVersion.AssemblySemVer) /p:FileVersion=$(GitVersion.AssemblySemVer) /p:InformationalVersion=$(GetVersion.InformationalVersion)'
+    - task: DotNetCoreCLI@2
+      displayName: "Test L0 & L1"
+      inputs:
+        command: 'test'
+        arguments: '--collect "Code coverage" --no-build --filter "(TestCategory=L0|TestCategory=L1)" --logger trx'
+      continueOnError: true
+    - task: DotNetCoreCLI@2
+      displayName: "Test L2 & L3"
+      inputs:
+        command: 'test'
+        arguments: '--collect "Code coverage" --no-build --filter "(TestCategory=L2|TestCategory=L3)" --logger trx'
+      continueOnError: true
+    - task: DotNetCoreCLI@2
+      displayName: "Test (other)"
+      inputs:
+        command: 'test'
+        arguments: '--collect "Code coverage" --no-build --filter "(TestCategory!=L0&TestCategory!=L1&TestCategory!=L2&TestCategory!=L3)" --logger trx'
+      continueOnError: true
+
+    - task: SonarCloudAnalyze@2
+      inputs:
+        jdkversion: 'JAVA_HOME_17_X64'
+      continueOnError: true
+
+    - task: PublishSymbols@2
+      inputs:
+        SearchPattern: '**/bin/**/*.pdb'
+        SymbolServerType: TeamServices
+      continueOnError: true
+
+    - task: PowerShell@2
+      displayName: "Packaging (Executable)"
+      inputs:
+        filePath: '.\build\packageExecutable.ps1'
+        arguments: '-version $(GitVersion.SemVer) -outfolder "$(Build.ArtifactStagingDirectory)"' 
+    - task: PowerShell@2
+      displayName: "Packaging (Extension)"
+      inputs:
+        filePath: '.\build\packageExtension.ps1'
+        arguments: '-version $(GitVersion.SemVer) -outfolder "$(Build.ArtifactStagingDirectory)"' 
+    - task: PowerShell@2
+      displayName: "Packaging (Chocolatey)"
+      inputs:
+        filePath: '.\build\packageChocolatey.ps1'
+        arguments: '-version $(GitVersion.SemVer) -outfolder "$(Build.ArtifactStagingDirectory)"' 
+    - task: PowerShell@2
+      displayName: "Packaging (Nuget)"
+      inputs:
+        filePath: '.\build\packageNuget.ps1'
+        arguments: '-version $(GitVersion.SemVer) -outfolder "$(Build.ArtifactStagingDirectory)"' 
+    - task: PowerShell@2
+      displayName: "Packaging (Winget)"
+      inputs:
+        filePath: '.\build\packageWinget.ps1'
+        arguments: '-version $(GitVersion.SemVer) -outfolder "$(Build.ArtifactStagingDirectory)"' 
+
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop'
+        publishLocation: 'Container'
+
+    - task: SonarCloudPublish@2
+      inputs:
+        pollingTimeoutSec: '300'
+
+# Release Stage
+
+- stage: ReleaseStage
+  displayName: 'Release to GitHub Releases'
+  dependsOn: BuildStage
+  condition:  and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+  jobs:
+  - deployment: Deploy
+    environment: AzureDevOpsMigrationTools-Release
+    pool:
+      vmImage: 'windows-latest'
+    variables:
+      SemVer: $[ stageDependencies.BuildStage.BuildJob.outputs['BuildJob.GitVersion.SemVer'] ] # remember to use single quotes
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: drop
+          - script: echo Hi $(SemVer) !

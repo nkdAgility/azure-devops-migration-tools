@@ -1,4 +1,4 @@
-Uninstall-ChocolateyZipPackage 'vstssyncmigrator' 'vstssyncmigrator-#{GITVERSION.SEMVER}#.zip'
-Uninstall-ChocolateyZipPackage 'MigrationTools' 'MigrationTools-#{GITVERSION.SEMVER}#.zip'
+Uninstall-ChocolateyZipPackage 'vstssyncmigrator' 'vstssyncmigrator-0.0.1.zip'
+Uninstall-ChocolateyZipPackage 'MigrationTools' 'MigrationTools-0.0.1.zip'
 
 write-host 'Azure DevOps Migration Tools has been uninstalled.'
