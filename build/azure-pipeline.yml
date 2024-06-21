@@ -165,8 +165,8 @@ stages:
     pool:
       vmImage: 'windows-latest'
     variables:
-      SemVer: $[ stageDependencies.Build.BuildJob.outputs['GitVersion.SemVer'] ]
-      PreReleaseTag: $[ stageDependencies.Build.BuildJob.outputs['GitVersion.PreReleaseTag'] ]
+      SemVer: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.SemVer'] ]
+      PreReleaseTag: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.PreReleaseTag'] ]
     strategy:
       runOnce:
         deploy:
@@ -189,8 +189,8 @@ stages:
     pool:
       vmImage: 'windows-latest'
     variables:
-      SemVer: $[ stageDependencies.Build.BuildJob.outputs['BuildJob.GitVersion.SemVer'] ]
-      PreReleaseTag: $[ stageDependencies.Build.BuildJob.outputs['BuildJob.GitVersion.PreReleaseTag'] ]
+      SemVer: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.SemVer'] ]
+      PreReleaseTag: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.PreReleaseTag'] ]
     strategy:
       runOnce:
         deploy:
@@ -213,8 +213,8 @@ stages:
     pool:
       vmImage: 'windows-latest'
     variables:
-      SemVer: $[ stageDependencies.Build.BuildJob.outputs['BuildJob.GitVersion.SemVer'] ]
-      PreReleaseTag: $[ stageDependencies.Build.BuildJob.outputs['BuildJob.GitVersion.PreReleaseTag'] ]
+      SemVer: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.SemVer'] ]
+      PreReleaseTag: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.PreReleaseTag'] ]
     strategy:
       runOnce:
         deploy:
@@ -237,8 +237,8 @@ stages:
     pool:
       vmImage: 'windows-latest'
     variables:
-      SemVer: $[ stageDependencies.Build.BuildJob.outputs['BuildJob.GitVersion.SemVer'] ]
-      PreReleaseTag: $[ stageDependencies.Build.BuildJob.outputs['BuildJob.GitVersion.PreReleaseTag'] ]
+      SemVer: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.SemVer'] ]
+      PreReleaseTag: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.PreReleaseTag'] ]
     strategy:
       runOnce:
         deploy:
