@@ -12,6 +12,11 @@ name: $(GITVERSION_SemVer)
 
 variables:
   isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]
+  environmentName: 'AzureDevOpsMigrationTools-NONE'
+  environmentTag: 'NONE'
+  isRelease: false
+  isPreview: false
+  shouldDeploy: false
   skipCompileTest: true
 
 # Versioning of repo
@@ -36,11 +41,28 @@ stages:
       inputs:
         updateAssemblyInfo: true
     - task: PowerShell@2
-      displayName: GetVersion Data Check
+      displayName: Set Environment Variables
       continueOnError: true
       inputs:
         targetType: 'inline'
-        script: |     
+        script: |
+          if ($(GitVersion.PreReleaseTag) -eq "")
+          {
+            Write-Host "##vso[task.setvariable variable=environmentName;]AzureDevOpsMigrationTools-Release"
+            Write-Host "##vso[task.setvariable variable=environmentTag;]Release"
+            Write-Host "##vso[task.setvariable variable=isRelease;]true"
+            Write-Host "##vso[task.setvariable variable=isPreview;]false"
+            Write-Host "##vso[task.setvariable variable=shouldDeploy;]true"
+          }
+          if ($(GitVersion.PreReleaseTag) - -Match "Preview")
+          {
+            Write-Host "##vso[task.setvariable variable=environmentName;]AzureDevOpsMigrationTools-Preview"
+            Write-Host "##vso[task.setvariable variable=environmentTag;]Preview"
+            Write-Host "##vso[task.setvariable variable=isRelease;]false"
+            Write-Host "##vso[task.setvariable variable=isPreview;]true"
+            Write-Host "##vso[task.setvariable variable=shouldDeploy;]true"
+          }
+
           Write-Host "GITVERSION.SemVer: $(GITVERSION.SemVer)"
           Write-Host "GitVersion.SemVer: $(GitVersion.SemVer)"
           Write-Host "GitVersion.AssemblySemVer: $(GitVersion.AssemblySemVer)"
@@ -161,7 +183,7 @@ stages:
   # condition:  and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'), eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/preview'))
   jobs:
   - deployment: GitHubRelease
-    environment: AzureDevOpsMigrationTools-Release
+    environment: $(environmentName)
     pool:
       vmImage: 'windows-latest'
     variables:
@@ -174,7 +196,19 @@ stages:
           - download: current
             condition: and(succeeded(), eq(variables['doCompileTest'], 'true'))
             artifact: drop
-          - script: echo Hi $(SemVer) !
+          - task: PowerShell@2
+            displayName: Read Environment Variables
+            continueOnError: true
+            inputs:
+              targetType: 'inline'
+              script: |
+                Write-Host "environmentName: $(GenvironmentName)"
+                Write-Host "environmentTag: $(environmentTag)"
+                Write-Host "isRelease: $(isRelease)"
+                Write-Host "isPreview: $(isPreview)"
+                Write-Host "shouldDeploy: $(shouldDeploy)"
+                Write-Host "SemVer: $(SemVer)"
+                Write-Host "PreReleaseTag: $(PreReleaseTag)"                
 
 # Release to Azure DevOps Extension Marketplace
 
@@ -185,7 +219,7 @@ stages:
   # condition:  and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'), eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/preview'))
   jobs:
   - deployment: tfxcliRelease
-    environment: AzureDevOpsMigrationTools-Release
+    environment: $(environmentName)
     pool:
       vmImage: 'windows-latest'
     variables:
@@ -198,7 +232,19 @@ stages:
           - download: current
             condition: and(succeeded(), eq(variables['doCompileTest'], 'true'))
             artifact: drop
-          - script: echo Hi $(SemVer) !
+          - task: PowerShell@2
+            displayName: Read Environment Variables
+            continueOnError: true
+            inputs:
+              targetType: 'inline'
+              script: |
+                Write-Host "environmentName: $(GenvironmentName)"
+                Write-Host "environmentTag: $(environmentTag)"
+                Write-Host "isRelease: $(isRelease)"
+                Write-Host "isPreview: $(isPreview)"
+                Write-Host "shouldDeploy: $(shouldDeploy)"
+                Write-Host "SemVer: $(SemVer)"
+                Write-Host "PreReleaseTag: $(PreReleaseTag)"  
 
 # Release to Chocolatey Community Repository
 
@@ -209,7 +255,7 @@ stages:
   # condition:  and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'), eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/preview'))
   jobs:
   - deployment: ChocoRelease
-    environment: AzureDevOpsMigrationTools-Release
+    environment: $(environmentName)
     pool:
       vmImage: 'windows-latest'
     variables:
@@ -222,7 +268,19 @@ stages:
           - download: current
             condition: and(succeeded(), eq(variables['doCompileTest'], 'true'))
             artifact: drop
-          - script: echo Hi $(SemVer) !
+          - task: PowerShell@2
+            displayName: Read Environment Variables
+            continueOnError: true
+            inputs:
+              targetType: 'inline'
+              script: |
+                Write-Host "environmentName: $(GenvironmentName)"
+                Write-Host "environmentTag: $(environmentTag)"
+                Write-Host "isRelease: $(isRelease)"
+                Write-Host "isPreview: $(isPreview)"
+                Write-Host "shouldDeploy: $(shouldDeploy)"
+                Write-Host "SemVer: $(SemVer)"
+                Write-Host "PreReleaseTag: $(PreReleaseTag)"  
 
 # Release to Winget package Repository
 
@@ -233,7 +291,7 @@ stages:
   # condition:  and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'), eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/preview'))
   jobs:
   - deployment: WingetRelease
-    environment: AzureDevOpsMigrationTools-Release
+    environment: $(environmentName)
     pool:
       vmImage: 'windows-latest'
     variables:
@@ -246,4 +304,16 @@ stages:
           - download: current
             condition: and(succeeded(), eq(variables['doCompileTest'], 'true'))
             artifact: drop
-          - script: echo Hi $(SemVer) !
+          - task: PowerShell@2
+            displayName: Read Environment Variables
+            continueOnError: true
+            inputs:
+              targetType: 'inline'
+              script: |
+                Write-Host "environmentName: $(GenvironmentName)"
+                Write-Host "environmentTag: $(environmentTag)"
+                Write-Host "isRelease: $(isRelease)"
+                Write-Host "isPreview: $(isPreview)"
+                Write-Host "shouldDeploy: $(shouldDeploy)"
+                Write-Host "SemVer: $(SemVer)"
+                Write-Host "PreReleaseTag: $(PreReleaseTag)"  
