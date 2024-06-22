@@ -108,7 +108,7 @@ stages:
   condition: succeeded()
   jobs: 
   - job: BuildJob
-    displayName: 'Build job'
+    displayName: 'Build Test & Package job'
     condition:  and(succeeded(), eq(variables['skipCompileTest'], 'false'))
     pool:
       vmImage: 'windows-latest'
