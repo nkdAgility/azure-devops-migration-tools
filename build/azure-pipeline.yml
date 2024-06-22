@@ -13,7 +13,7 @@ name: $(GITVERSION_SemVer)
 ## TODO: THESE WILL NOT WORK! NEED TO USE Versioning Reference instead with $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.SemVer'] ]
 variables:
   isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]
-  skipCompileTest: true
+  skipCompileTest: false
 
 # Versioning of repo
 
