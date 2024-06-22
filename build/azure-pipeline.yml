@@ -75,7 +75,7 @@ stages:
 
 # Build, Test and Package
 
-- stage: Build
+- stage: BuildStage
   displayName: 'Build Test & Package'
   dependsOn: SetupStage
   condition: succeeded()
@@ -180,7 +180,7 @@ stages:
       inputs:
         pollingTimeoutSec: '300'
 
-  - job: "BuildSimulationJob"
+  - job: BuildSimulationJob
     displayName: 'Build Simulation Job'
     condition:  and(succeeded(), eq(variables['skipCompileTest'], 'true'))
     pool:
@@ -215,13 +215,13 @@ stages:
 
 # Debug Value Check
 
-- stage: Validator
-  displayName: 'Validate that which needs validated'
+- stage: SetupValidatorStage
+  displayName: 'Setup Validator Stage'
   dependsOn: 
    - SetupStage
   condition: succeeded()
   jobs:
-  - job: VariableLog
+  - job: LogVariablesJob
     pool:
       vmImage: 'windows-latest'
     variables:
@@ -245,13 +245,13 @@ stages:
 # Release to GitHub Releases
 
 - stage: GitHubReleaseStage
-  displayName: 'Release to GitHub Releases'
+  displayName: 'GitHub Releases Release Stage'
   dependsOn: 
-   - Build
+   - BuildStage
    - SetupStage
   condition:  and(succeeded(), eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.runRelease'], true))
   jobs:
-  - job: GitHubRelease
+  - job: GitHubReleaseJob
     pool:
       vmImage: 'windows-latest'
     variables:
@@ -275,14 +275,14 @@ stages:
 
 # Release to Azure DevOps Extension Marketplace
 
-- stage: ReleaseExtension
-  displayName: 'Release to Azure DevOps Extension Marketplace'
+- stage: ReleaseMarketplaceStage
+  displayName: 'Extension Marketplace Release Stage'
   dependsOn: 
    - GitHubReleaseStage
    - SetupStage
   condition:  and(succeeded(), eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.environmentName'], 'Release'))
   jobs:
-  - job: tfxcliRelease
+  - job: MarketplaceJob
     pool:
       vmImage: 'windows-latest'
     variables:
@@ -312,14 +312,14 @@ stages:
 
 # Release to Chocolatey Community Repository
 
-- stage: ReleaseChocolatey
-  displayName: 'Release to Chocolatey Community Repository'
+- stage: ChocolateyReleaseStage
+  displayName: 'Chocolatey Release Stage'
   dependsOn: 
    - GitHubReleaseStage
    - SetupStage
   condition:  and(succeeded(), eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.environmentName'], 'Release'))
   jobs:
-  - job: ChocoRelease
+  - job: ChocoReleaseJob
     pool:
       vmImage: 'windows-latest'
     variables:
@@ -349,14 +349,14 @@ stages:
 
 # Release to Winget package Repository
 
-- stage: ReleaseWinget
-  displayName: 'Release to Winget package Repository'
+- stage: WingetReleaseStage
+  displayName: 'Winget Release Stage'
   dependsOn: 
    - GitHubReleaseStage
    - SetupStage
   condition:  and(succeeded(), eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.environmentName'], 'Release'))
   jobs:
-  - job: WingetRelease
+  - job: WingetReleaseJob
     pool:
       vmImage: 'windows-latest'
     variables:
