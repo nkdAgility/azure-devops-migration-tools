@@ -4,12 +4,16 @@
 param (
     # height of largest column without top bar
     [Parameter(Mandatory=$true)]
-    [string]$version
+    [string]$version,
+
+    # name of the output folder
+    [Parameter(Mandatory=$true)]
+    [string]$outfolder
 )
 #Publish
 Write-Output "Azure DevOps Migration Tools (GitHub Release) Release"
 Write-Output "--------------"
-$files = Get-ChildItem -Recurse
+$files = Get-ChildItem -Path $outfolder -Recurse
 foreach ($file in $files) {
     Write-Output $file.FullName
 }
