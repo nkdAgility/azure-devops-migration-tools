@@ -5,12 +5,10 @@
 
 trigger:
 - main
-- preview
-- master
 
 name: $(GITVERSION_SemVer)
 
-## TODO: THESE WILL NOT WORK! NEED TO USE Versioning Reference instead with $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.SemVer'] ]
+## TODO: THESE WILL NOT WORK! NEED TO USE Versioning Reference instead with $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.SemVer'] ]
 variables:
   isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]
   skipCompileTest: false
@@ -19,12 +17,11 @@ variables:
 
 stages:
 
-# Versioning
-
-- stage: Versioning
-  displayName: 'Versioning'
+# Setup with: Versioning
+- stage: SetupStage
+  displayName: 'Setup Stage'
   jobs: 
-  - job: VersionJob
+  - job: ConfigJob
     displayName: 'Version job'
     pool:
       vmImage: 'windows-latest'
@@ -48,27 +45,21 @@ stages:
           $releaseTag = "Dev";
           Write-Host "##vso[task.setvariable variable=environmentName;isoutput=true]AzureDevOpsMigrationTools-Dev"
           Write-Host "##vso[task.setvariable variable=releaseTag;isoutput=true]Dev"
-          Write-Host "##vso[task.setvariable variable=isRelease;isoutput=true]false"
-          Write-Host "##vso[task.setvariable variable=isPreview;isoutput=true]false"
-          Write-Host "##vso[task.setvariable variable=shouldDeploy;isoutput=true]false"
+          Write-Host "##vso[task.setvariable variable=runRelease;isoutput=true]false"
 
           if ("$(GitVersion.PreReleaseTag)" -eq "")
           {
             $releaseTag = "Release";
             Write-Host "##vso[task.setvariable variable=environmentName;isoutput=true]AzureDevOpsMigrationTools-Release"
             Write-Host "##vso[task.setvariable variable=releaseTag;isoutput=true]Release"
-            Write-Host "##vso[task.setvariable variable=isRelease;isoutput=true]true"
-            Write-Host "##vso[task.setvariable variable=isPreview;isoutput=true]false"
-            Write-Host "##vso[task.setvariable variable=shouldDeploy;isoutput=true]true"
+            Write-Host "##vso[task.setvariable variable=runRelease;isoutput=true]true"
           }
           if ("$(GitVersion.PreReleaseLabel)" -contains "Preview")
           {
             $releaseTag = "Preview";
             Write-Host "##vso[task.setvariable variable=environmmentName;isoutput=true]AzureDevOpsMigrationTools-Preview"
             Write-Host "##vso[task.setvariable variable=releaseTag;isoutput=true]Preview"
-            Write-Host "##vso[task.setvariable variable=isRelease;isoutput=true]false"
-            Write-Host "##vso[task.setvariable variable=isPreview;isoutput=true]true"
-            Write-Host "##vso[task.setvariable variable=shouldDeploy;isoutput=true]true"
+            Write-Host "##vso[task.setvariable variable=runRelease;isoutput=true]true"
           }
           Write-Host "##vso[build.addbuildtag]$releaseTag"
 
@@ -79,15 +70,45 @@ stages:
           Write-Host "GitVersion.AssemblySemVer: $(GitVersion.AssemblySemVer)"
           Write-Host "GitVersion.InformationalVersion: $(GitVersion.InformationalVersion)"
 
-# Build, Test and Package
 
-- stage: Build
-  displayName: 'Build Test & Package'
-  dependsOn: Versioning
+# Debug Value Check
+- stage: SetupValidatorStage
+  displayName: 'Setup Validator Stage'
+  dependsOn: 
+   - SetupStage
+  condition: succeeded()
+  jobs:
+  - job: LogVariablesJob
+    displayName: 'Log Variables Job'
+    pool:
+      vmImage: 'windows-latest'
+    variables:
+      environmentName: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.environmentName'] ]
+      releaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.releaseTag'] ]
+      runRelease: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.runRelease'] ]
+      GitVersion.SemVer: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.SemVer'] ]
+      GitVersion.PreReleaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.PreReleaseTag'] ]
+    steps:
+    - task: PowerShell@2
+      displayName: Read Variables
+      inputs:
+        targetType: 'inline'
+        script: |
+          Write-Host "environmentName: $(environmentName)"
+          Write-Host "releaseTag: $(releaseTag)"
+          Write-Host "runRelease: $(runRelease)"
+          Write-Host "GitVersion.SemVer: $(GitVersion.SemVer)"
+          Write-Host "GitVersion.PreReleaseTag: $(GitVersion.PreReleaseTag)"
+
+
+# Build, Test and Package
+- stage: BuildStage
+  displayName: 'Build Test & Package Stage'
+  dependsOn: SetupStage
   condition: succeeded()
   jobs: 
   - job: BuildJob
-    displayName: 'Build job'
+    displayName: 'Build Test & Package job'
     condition:  and(succeeded(), eq(variables['skipCompileTest'], 'false'))
     pool:
       vmImage: 'windows-latest'
@@ -97,9 +118,9 @@ stages:
       solution: '**/*.sln'
       buildPlatform: 'Any CPU'
       buildConfiguration: 'Release'
-      GitVersion.SemVer: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.SemVer'] ]
-      GitVersion.AssemblySemVer: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.AssemblySemVer'] ]
-      GitVersion.InformationalVersion: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.InformationalVersion'] ]
+      GitVersion.SemVer: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.SemVer'] ]
+      GitVersion.AssemblySemVer: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.AssemblySemVer'] ]
+      GitVersion.InformationalVersion: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.InformationalVersion'] ]
     steps:
     - task: SonarCloudPrepare@2
       inputs:
@@ -186,7 +207,7 @@ stages:
       inputs:
         pollingTimeoutSec: '300'
 
-  - job: "BuildSimulationJob"
+  - job: BuildSimulationJob
     displayName: 'Build Simulation Job'
     condition:  and(succeeded(), eq(variables['skipCompileTest'], 'true'))
     pool:
@@ -197,10 +218,10 @@ stages:
       solution: '**/*.sln'
       buildPlatform: 'Any CPU'
       buildConfiguration: 'Release'
-      GitVersion.SemVer: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.SemVer'] ]
-      GitVersion.AssemblySemVer: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.AssemblySemVer'] ]
-      GitVersion.InformationalVersion: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.InformationalVersion'] ]
-      GitVersion.MajorMinorPatch: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.MajorMinorPatch'] ]
+      GitVersion.SemVer: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.SemVer'] ]
+      GitVersion.AssemblySemVer: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.AssemblySemVer'] ]
+      GitVersion.InformationalVersion: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.InformationalVersion'] ]
+      GitVersion.MajorMinorPatch: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.MajorMinorPatch'] ]
     steps:
       - task: PowerShell@2
         displayName: Create fake build assets
@@ -220,25 +241,22 @@ stages:
           publishLocation: 'Container'
 
 # Release to GitHub Releases
-
-- stage: ReleaseGitHub
-  displayName: 'Release to GitHub Releases'
+- stage: GitHubReleaseStage
+  displayName: 'GitHub Release Stage'
   dependsOn: 
-   - Build
-   - Versioning
-  condition:  and(succeeded(), or(eq(dependencies.Versioning.outputs['VersionOut.releaseTag'], 'Release'), eq(dependencies.Versioning.outputs['VersionOut.releaseTag'], 'Preview')))
+   - BuildStage
+   - SetupStage
+  condition:  and(succeeded(), eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.runRelease'], true))
   jobs:
-  - job: GitHubRelease
+  - job: GitHubReleaseJob
     pool:
       vmImage: 'windows-latest'
     variables:
-      environmentName: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.environmentName'] ]
-      releaseTag: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.releaseTag'] ]
-      isRelease: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.isRelease'] ]
-      isPreview: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.isPreview'] ]
-      shouldDeploy: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.shouldDeploy'] ]
-      GitVersion.SemVer: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.SemVer'] ]
-      GitVersion.PreReleaseTag: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.PreReleaseTag'] ]
+      environmentName: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.environmentName'] ]
+      releaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.releaseTag'] ]
+      runRelease: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.runRelease'] ]
+      GitVersion.SemVer: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.SemVer'] ]
+      GitVersion.PreReleaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.PreReleaseTag'] ]
     steps:
     - task: DownloadBuildArtifacts@1
       inputs:
@@ -246,19 +264,6 @@ stages:
         downloadType: 'single'
         artifactName: 'drop'
         downloadPath: '$(System.ArtifactsDirectory)'
-    - task: PowerShell@2
-      displayName: Read Environment Variables
-      continueOnError: true
-      inputs:
-        targetType: 'inline'
-        script: |
-          Write-Host "environmentName: $(environmentName)"
-          Write-Host "releaseTag: $(releaseTag)"
-          Write-Host "isRelease: $(isRelease)"
-          Write-Host "isPreview: $(isPreview)"
-          Write-Host "shouldDeploy: $(shouldDeploy)"
-          Write-Host "GitVersion.SemVer: $(GitVersion.SemVer)"
-          Write-Host "GitVersion.PreReleaseTag: $(GitVersion.PreReleaseTag)"
     - task: PowerShell@2
       displayName: Create GitHub Release
       inputs:
@@ -266,26 +271,22 @@ stages:
         arguments: '-version $(GitVersion.SemVer) -artifactFolder "$(System.ArtifactsDirectory)" -releaseTag $(releaseTag) -GH_TOKEN $(GH_TOKEN)' 
 
 # Release to Azure DevOps Extension Marketplace
-
-- stage: ReleaseExtension
-  displayName: 'Release to Azure DevOps Extension Marketplace'
+- stage: ReleaseMarketplaceStage
+  displayName: 'Marketplace Release Stage'
   dependsOn: 
-   - ReleaseGitHub
-   - Versioning
-  condition:  succeeded()
-  # condition:  and(succeeded(), eq(dependencies.Versioning.outputs['VersionOut.releaseTag'], 'Release'))
+   - GitHubReleaseStage
+   - SetupStage
+  condition:  and(succeeded(), eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.environmentName'], 'Release'))
   jobs:
-  - job: tfxcliRelease
+  - job: MarketplaceJob
     pool:
       vmImage: 'windows-latest'
     variables:
-      environmentName: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.environmentName'] ]
-      releaseTag: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.releaseTag'] ]
-      isRelease: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.isRelease'] ]
-      isPreview: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.isPreview'] ]
-      shouldDeploy: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.shouldDeploy'] ]
-      GitVersion.SemVer: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.SemVer'] ]
-      GitVersion.PreReleaseTag: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.PreReleaseTag'] ]
+      environmentName: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.environmentName'] ]
+      releaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.releaseTag'] ]
+      runRelease: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.runRelease'] ]
+      GitVersion.SemVer: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.SemVer'] ]
+      GitVersion.PreReleaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.PreReleaseTag'] ]
     steps:
     - task: DownloadBuildArtifacts@1
       inputs:
@@ -301,33 +302,27 @@ stages:
         script: |
           Write-Host "environmentName: $(environmentName)"
           Write-Host "releaseTag: $(releaseTag)"
-          Write-Host "isRelease: $(isRelease)"
-          Write-Host "isPreview: $(isPreview)"
-          Write-Host "shouldDeploy: $(shouldDeploy)"
+          Write-Host "runRelease: $(runRelease)"
           Write-Host "GitVersion.SemVer: $(GitVersion.SemVer)"
           Write-Host "GitVersion.PreReleaseTag: $(GitVersion.PreReleaseTag)"
 
 # Release to Chocolatey Community Repository
-
-- stage: ReleaseChocolatey
-  displayName: 'Release to Chocolatey Community Repository'
+- stage: ChocolateyReleaseStage
+  displayName: 'Chocolatey Release Stage'
   dependsOn: 
-   - ReleaseGitHub
-   - Versioning
-  condition:  succeeded()
-  # condition:  and(succeeded(), eq(variables['shouldDeploy'], 'true'))
+   - GitHubReleaseStage
+   - SetupStage
+  condition:  and(succeeded(), eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.environmentName'], 'Release'))
   jobs:
-  - job: ChocoRelease
+  - job: ChocoReleaseJob
     pool:
       vmImage: 'windows-latest'
     variables:
-      environmentName: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.environmentName'] ]
-      releaseTag: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.releaseTag'] ]
-      isRelease: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.isRelease'] ]
-      isPreview: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.isPreview'] ]
-      shouldDeploy: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.shouldDeploy'] ]
-      GitVersion.SemVer: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.SemVer'] ]
-      GitVersion.PreReleaseTag: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.PreReleaseTag'] ]
+      environmentName: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.environmentName'] ]
+      releaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.releaseTag'] ]
+      runRelease: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.runRelease'] ]
+      GitVersion.SemVer: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.SemVer'] ]
+      GitVersion.PreReleaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.PreReleaseTag'] ]
     steps:
     - task: DownloadBuildArtifacts@1
       inputs:
@@ -343,33 +338,27 @@ stages:
         script: |
           Write-Host "environmentName: $(environmentName)"
           Write-Host "releaseTag: $(releaseTag)"
-          Write-Host "isRelease: $(isRelease)"
-          Write-Host "isPreview: $(isPreview)"
-          Write-Host "shouldDeploy: $(shouldDeploy)"
+          Write-Host "runRelease: $(runRelease)"
           Write-Host "GitVersion.SemVer: $(GitVersion.SemVer)"
           Write-Host "GitVersion.PreReleaseTag: $(GitVersion.PreReleaseTag)"
 
 # Release to Winget package Repository
-
-- stage: ReleaseWinget
-  displayName: 'Release to Winget package Repository'
+- stage: WingetReleaseStage
+  displayName: 'Winget Release Stage'
   dependsOn: 
-   - ReleaseGitHub
-   - Versioning
-  condition:  succeeded()
-  # condition:  and(succeeded(), eq(variables['shouldDeploy'], 'true'))
+   - GitHubReleaseStage
+   - SetupStage
+  condition:  and(succeeded(), eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.environmentName'], 'Release'))
   jobs:
-  - job: WingetRelease
+  - job: WingetReleaseJob
     pool:
       vmImage: 'windows-latest'
     variables:
-      environmentName: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.environmentName'] ]
-      releaseTag: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.releaseTag'] ]
-      isRelease: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.isRelease'] ]
-      isPreview: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.isPreview'] ]
-      shouldDeploy: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.shouldDeploy'] ]
-      GitVersion.SemVer: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.SemVer'] ]
-      GitVersion.PreReleaseTag: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.PreReleaseTag'] ]
+      environmentName: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.environmentName'] ]
+      releaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.releaseTag'] ]
+      runRelease: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.runRelease'] ]
+      GitVersion.SemVer: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.SemVer'] ]
+      GitVersion.PreReleaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.PreReleaseTag'] ]
     steps:
     - task: DownloadBuildArtifacts@1
       inputs:
@@ -385,8 +374,6 @@ stages:
         script: |
           Write-Host "environmentName: $(environmentName)"
           Write-Host "releaseTag: $(releaseTag)"
-          Write-Host "isRelease: $(isRelease)"
-          Write-Host "isPreview: $(isPreview)"
-          Write-Host "shouldDeploy: $(shouldDeploy)"
+          Write-Host "runRelease: $(runRelease)"
           Write-Host "GitVersion.SemVer: $(GitVersion.SemVer)"
           Write-Host "GitVersion.PreReleaseTag: $(GitVersion.PreReleaseTag)"
