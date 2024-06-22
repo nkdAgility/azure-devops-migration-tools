@@ -276,7 +276,7 @@ stages:
   dependsOn: 
    - GitHubReleaseStage
    - SetupStage
-  condition:  and(succeeded(), eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.environmentName'], 'Release'))
+  condition:  and(succeeded(), eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.releaseTag'], 'Release'))
   jobs:
   - job: MarketplaceJob
     pool:
@@ -311,7 +311,7 @@ stages:
   dependsOn: 
    - GitHubReleaseStage
    - SetupStage
-  condition:  and(succeeded(), or(eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.environmentName'], 'Release'), eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.environmentName'], 'Preview')))
+  condition:  and(succeeded(), or(eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.releaseTag'], 'Release'), eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.releaseTag'], 'Preview')))
   jobs:
   - job: ChocoReleaseJob
     pool:
@@ -343,7 +343,7 @@ stages:
   dependsOn: 
    - GitHubReleaseStage
    - SetupStage
-  condition:  and(succeeded(), or(eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.environmentName'], 'Release'), eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.environmentName'], 'Preview')))
+  condition:  and(succeeded(), or(eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.releaseTag'], 'Release'), eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.releaseTag'], 'Preview')))
   jobs:
   - job: WingetReleaseJob
     pool:
