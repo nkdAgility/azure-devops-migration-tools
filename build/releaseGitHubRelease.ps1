@@ -41,7 +41,7 @@ if ($GH_TOKEN -eq $null) {
 Write-Output "Logging in to GitHub with $GH_TOKEN"
 Write-Output "--------------"
 $env:GITHUB_TOKEN = $GH_TOKEN
-$env:GGH_TOKEN = $GH_TOKEN
+$env:GH_TOKEN = $GH_TOKEN
 "$GH_TOKEN" | gh auth login --with-token 
 Write-Output "--------------"
 Write-Output "GitHub Login Status"
