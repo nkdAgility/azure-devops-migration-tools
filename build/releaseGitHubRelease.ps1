@@ -38,7 +38,7 @@ if ($GH_TOKEN -eq $null) {
     return 1;
 }
 
-gh auth login --with-token $env:GITHUB_TOKEN
+gh auth login --with-token $GH_TOKEN
 
 
 Write-Output "Release tag: $releaseTag"
