@@ -219,6 +219,39 @@ stages:
           ArtifactName: 'drop'
           publishLocation: 'Container'
 
+# Debug Value Check
+
+- stage: VariableChecker
+  displayName: 'Check value of Variables'
+  dependsOn: 
+   - Versioning
+  condition: succeeded()
+  jobs:
+  - job: VariableLog
+    pool:
+      vmImage: 'windows-latest'
+    variables:
+      environmentName: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.environmentName'] ]
+      releaseTag: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.releaseTag'] ]
+      isRelease: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.isRelease'] ]
+      isPreview: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.isPreview'] ]
+      shouldDeploy: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.shouldDeploy'] ]
+      GitVersion.SemVer: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.SemVer'] ]
+      GitVersion.PreReleaseTag: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.PreReleaseTag'] ]
+    steps:
+    - task: PowerShell@2
+      displayName: Read Variables
+      inputs:
+        targetType: 'inline'
+        script: |
+          Write-Host "environmentName: $(environmentName)"
+          Write-Host "releaseTag: $(releaseTag)"
+          Write-Host "isRelease: $(isRelease)"
+          Write-Host "isPreview: $(isPreview)"
+          Write-Host "shouldDeploy: $(shouldDeploy)"
+          Write-Host "GitVersion.SemVer: $(GitVersion.SemVer)"
+          Write-Host "GitVersion.PreReleaseTag: $(GitVersion.PreReleaseTag)"
+
 # Release to GitHub Releases
 
 - stage: ReleaseGitHub
@@ -226,7 +259,7 @@ stages:
   dependsOn: 
    - Build
    - Versioning
-  condition:  and(succeeded(), or(eq(dependencies.Versioning.outputs['VersionOut.releaseTag'], 'Release'), eq(dependencies.Versioning.outputs['VersionOut.releaseTag'], 'Preview')))
+  condition:  and(succeeded(), or(eq(dependencies.Versioning.VersionJob.outputs['VersionOut.releaseTag'], 'Release'), eq(dependencies.Versioning.VersionJob.outputs['VersionOut.releaseTag'], 'Preview')))
   jobs:
   - job: GitHubRelease
     pool:
