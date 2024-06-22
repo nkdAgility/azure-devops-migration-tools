@@ -26,6 +26,7 @@ $files = Get-ChildItem -Path $artifactFolder -Recurse
 foreach ($file in $files) {
     Write-Output $file.FullName
 }
+$fileNames = $files | Join-String -Property FullName -DoubleQuote -Separator ' '
 
 Write-Output "Install GitHub CLI if needed"
 if (($installedStuff -like "*gh*").Count -eq 0) {
@@ -49,29 +50,42 @@ gh auth status
 Write-Output "--------------"
 Write-Output "Release tag: $releaseTag"
 Write-Output "Version: $version"
-Write-Output "Filed for Upload: $artifactFolder\drop\**"
+Write-Output "Filed for Upload: $artifactFolder\*"
 Write-Output "--------------"
-switch ($releaseTag)
-{
-    "Local"    {
-        Write-Output "Running Local"
-        gh release create $version "$artifactFolder\drop\**" --title "$version **DELETEME** FAKE TEST" --generate-notes --prerelease --draft --repo "nkdAgility/azure-devops-migration-tools"
+
+$result = gh release view $version --repo "nkdAgility/azure-devops-migration-tools"
+if ($result -ne $null) {
+    Write-Output "Release $version already exists add assets only"
+} else {
+    switch ($releaseTag)
+    {
+        "Local"    {
+            Write-Output "Creating Local Release"
+            gh release create $version --title "$version **DELETEME** FAKE TEST" --generate-notes --prerelease --draft --repo "nkdAgility/azure-devops-migration-tools"
         }
-    "Dev"    {
-        Write-Output "Running Dev"
-        gh release create $version "$artifactFolder\drop\**" --title "$version **DELETEME** FAKE TEST" --generate-notes --prerelease --draft --repo "nkdAgility/azure-devops-migration-tools"
-        }
-    "preview"    {
-        Write-Output "Running Preview"
-        gh release create $version "$artifactFolder\drop\**" --generate-notes --prerelease --repo "nkdAgility/azure-devops-migration-tools"
-        }
-    "Release"    {
-        Write-Output "Running Release"
-        gh release create $version "$artifactFolder\drop\**" --generate-notes --discussion-category "AnouncementDiscussions" --repo "nkdAgility/azure-devops-migration-tools"
-        }
-    default { 
-        Write-Output "Unknown Release tag of $releaseTag";
-        return 3;
-     }
+        "Dev"    {
+            Write-Output "Creating Dev Release"
+            gh release create $version --title "$version **DELETEME** FAKE TEST" --generate-notes --prerelease --draft --repo "nkdAgility/azure-devops-migration-tools"
+            }
+        "preview"    {
+            Write-Output "Creating Previwe Release"
+            gh release create $version --generate-notes --prerelease --repo "nkdAgility/azure-devops-migration-tools"
+            }
+        "Release"    {
+            Write-Output "Creating Production Release"
+            gh release create $version --generate-notes --discussion-category "AnouncementDiscussions" --repo "nkdAgility/azure-devops-migration-tools"
+            }
+        default { 
+            Write-Output "Unknown Release tag of $releaseTag";
+            return 3;
+         }
+    }
 }
+Write-Output "--------------"
+Write-Output "Add Assets to $version"
+foreach ($file in $files) {
+    Write-Output "Upload $version $file.FullName"
+    gh release upload $version $file.FullName
+}
+
 Write-Output "--------------"
