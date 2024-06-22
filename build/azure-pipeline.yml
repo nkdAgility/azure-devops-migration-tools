@@ -269,7 +269,7 @@ stages:
         inputs:
           targetType: 'inline'
           script: |
-            Install-Module -Name PowerShellForGitHub -AcceptLicense -Force
+            Install-Module -Name PowerShellForGitHub -AcceptLicense -Force 
             Write-Host "Imported Module PowerShellForGitHub "
             $pulls = Get-GitHubPullRequest -OwnerName nkdAgility -RepositoryName azure-devops-migration-tools -State Closed -Base master
             Write-Host "Found $($pulls.Count) pull requests on Preview"
