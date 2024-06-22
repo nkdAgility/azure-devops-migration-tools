@@ -50,7 +50,7 @@ stages:
           Write-Host "##vso[task.setvariable variable=releaseTag;isoutput=true]Dev"
           Write-Host "##vso[task.setvariable variable=isRelease;isoutput=true]false"
           Write-Host "##vso[task.setvariable variable=isPreview;isoutput=true]false"
-          Write-Host "##vso[task.setvariable variable=shouldDeploy;isoutput=true]false"
+          Write-Host "##vso[task.setvariable variable=runRelease;isoutput=true]false"
 
           if ("$(GitVersion.PreReleaseTag)" -eq "")
           {
@@ -59,7 +59,7 @@ stages:
             Write-Host "##vso[task.setvariable variable=releaseTag;isoutput=true]Release"
             Write-Host "##vso[task.setvariable variable=isRelease;isoutput=true]true"
             Write-Host "##vso[task.setvariable variable=isPreview;isoutput=true]false"
-            Write-Host "##vso[task.setvariable variable=shouldDeploy;isoutput=true]true"
+            Write-Host "##vso[task.setvariable variable=runRelease;isoutput=true]true"
           }
           if ("$(GitVersion.PreReleaseLabel)" -contains "Preview")
           {
@@ -68,7 +68,7 @@ stages:
             Write-Host "##vso[task.setvariable variable=releaseTag;isoutput=true]Preview"
             Write-Host "##vso[task.setvariable variable=isRelease;isoutput=true]false"
             Write-Host "##vso[task.setvariable variable=isPreview;isoutput=true]true"
-            Write-Host "##vso[task.setvariable variable=shouldDeploy;isoutput=true]true"
+            Write-Host "##vso[task.setvariable variable=runRelease;isoutput=true]true"
           }
           Write-Host "##vso[build.addbuildtag]$releaseTag"
 
@@ -221,8 +221,8 @@ stages:
 
 # Debug Value Check
 
-- stage: VariableChecker
-  displayName: 'Check value of Variables'
+- stage: Validator
+  displayName: 'Validate that which needs validated'
   dependsOn: 
    - Versioning
   condition: succeeded()
@@ -235,7 +235,7 @@ stages:
       releaseTag: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.releaseTag'] ]
       isRelease: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.isRelease'] ]
       isPreview: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.isPreview'] ]
-      shouldDeploy: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.shouldDeploy'] ]
+      runRelease: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.runRelease'] ]
       GitVersion.SemVer: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.SemVer'] ]
       GitVersion.PreReleaseTag: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.PreReleaseTag'] ]
     steps:
@@ -248,7 +248,7 @@ stages:
           Write-Host "releaseTag: $(releaseTag)"
           Write-Host "isRelease: $(isRelease)"
           Write-Host "isPreview: $(isPreview)"
-          Write-Host "shouldDeploy: $(shouldDeploy)"
+          Write-Host "runRelease: $(runRelease)"
           Write-Host "GitVersion.SemVer: $(GitVersion.SemVer)"
           Write-Host "GitVersion.PreReleaseTag: $(GitVersion.PreReleaseTag)"
 
@@ -259,7 +259,7 @@ stages:
   dependsOn: 
    - Build
    - Versioning
-  condition:  and(succeeded(), or(eq(dependencies.Versioning.VersionJob.outputs['VersionOut.releaseTag'], 'Release'), eq(dependencies.Versioning.VersionJob.outputs['VersionOut.releaseTag'], 'Preview')))
+  condition:  and(succeeded(), eq(dependencies.Versioning.VersionJob.outputs['VersionOut.runRelease'], true))
   jobs:
   - job: GitHubRelease
     pool:
@@ -269,7 +269,7 @@ stages:
       releaseTag: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.releaseTag'] ]
       isRelease: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.isRelease'] ]
       isPreview: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.isPreview'] ]
-      shouldDeploy: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.shouldDeploy'] ]
+      runRelease: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.runRelease'] ]
       GitVersion.SemVer: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.SemVer'] ]
       GitVersion.PreReleaseTag: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.PreReleaseTag'] ]
     steps:
@@ -289,7 +289,7 @@ stages:
           Write-Host "releaseTag: $(releaseTag)"
           Write-Host "isRelease: $(isRelease)"
           Write-Host "isPreview: $(isPreview)"
-          Write-Host "shouldDeploy: $(shouldDeploy)"
+          Write-Host "runRelease: $(runRelease)"
           Write-Host "GitVersion.SemVer: $(GitVersion.SemVer)"
           Write-Host "GitVersion.PreReleaseTag: $(GitVersion.PreReleaseTag)"
     - task: PowerShell@2
@@ -316,7 +316,7 @@ stages:
       releaseTag: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.releaseTag'] ]
       isRelease: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.isRelease'] ]
       isPreview: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.isPreview'] ]
-      shouldDeploy: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.shouldDeploy'] ]
+      runRelease: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.runRelease'] ]
       GitVersion.SemVer: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.SemVer'] ]
       GitVersion.PreReleaseTag: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.PreReleaseTag'] ]
     steps:
@@ -336,7 +336,7 @@ stages:
           Write-Host "releaseTag: $(releaseTag)"
           Write-Host "isRelease: $(isRelease)"
           Write-Host "isPreview: $(isPreview)"
-          Write-Host "shouldDeploy: $(shouldDeploy)"
+          Write-Host "runRelease: $(runRelease)"
           Write-Host "GitVersion.SemVer: $(GitVersion.SemVer)"
           Write-Host "GitVersion.PreReleaseTag: $(GitVersion.PreReleaseTag)"
 
@@ -348,7 +348,7 @@ stages:
    - ReleaseGitHub
    - Versioning
   condition:  succeeded()
-  # condition:  and(succeeded(), eq(variables['shouldDeploy'], 'true'))
+  # condition:  and(succeeded(), eq(variables['runRelease'], 'true'))
   jobs:
   - job: ChocoRelease
     pool:
@@ -358,7 +358,7 @@ stages:
       releaseTag: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.releaseTag'] ]
       isRelease: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.isRelease'] ]
       isPreview: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.isPreview'] ]
-      shouldDeploy: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.shouldDeploy'] ]
+      runRelease: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.runRelease'] ]
       GitVersion.SemVer: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.SemVer'] ]
       GitVersion.PreReleaseTag: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.PreReleaseTag'] ]
     steps:
@@ -378,7 +378,7 @@ stages:
           Write-Host "releaseTag: $(releaseTag)"
           Write-Host "isRelease: $(isRelease)"
           Write-Host "isPreview: $(isPreview)"
-          Write-Host "shouldDeploy: $(shouldDeploy)"
+          Write-Host "runRelease: $(runRelease)"
           Write-Host "GitVersion.SemVer: $(GitVersion.SemVer)"
           Write-Host "GitVersion.PreReleaseTag: $(GitVersion.PreReleaseTag)"
 
@@ -390,7 +390,7 @@ stages:
    - ReleaseGitHub
    - Versioning
   condition:  succeeded()
-  # condition:  and(succeeded(), eq(variables['shouldDeploy'], 'true'))
+  # condition:  and(succeeded(), eq(variables['runRelease'], 'true'))
   jobs:
   - job: WingetRelease
     pool:
@@ -400,7 +400,7 @@ stages:
       releaseTag: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.releaseTag'] ]
       isRelease: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.isRelease'] ]
       isPreview: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.isPreview'] ]
-      shouldDeploy: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.shouldDeploy'] ]
+      runRelease: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.runRelease'] ]
       GitVersion.SemVer: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.SemVer'] ]
       GitVersion.PreReleaseTag: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.PreReleaseTag'] ]
     steps:
@@ -420,6 +420,6 @@ stages:
           Write-Host "releaseTag: $(releaseTag)"
           Write-Host "isRelease: $(isRelease)"
           Write-Host "isPreview: $(isPreview)"
-          Write-Host "shouldDeploy: $(shouldDeploy)"
+          Write-Host "runRelease: $(runRelease)"
           Write-Host "GitVersion.SemVer: $(GitVersion.SemVer)"
           Write-Host "GitVersion.PreReleaseTag: $(GitVersion.PreReleaseTag)"
