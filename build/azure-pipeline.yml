@@ -280,8 +280,7 @@ stages:
   dependsOn: 
    - ReleaseGitHub
    - Versioning
-  condition:  succeeded()
-  # condition:  and(succeeded(), eq(dependencies.Versioning.outputs['VersionOut.releaseTag'], 'Release'))
+  condition:  and(succeeded(), eq(dependencies.Versioning.outputs['VersionOut.environmentName'], 'Release'))
   jobs:
   - job: tfxcliRelease
     pool:
@@ -318,8 +317,7 @@ stages:
   dependsOn: 
    - ReleaseGitHub
    - Versioning
-  condition:  succeeded()
-  # condition:  and(succeeded(), eq(variables['runRelease'], 'true'))
+  condition:  and(succeeded(), eq(dependencies.Versioning.outputs['VersionOut.environmentName'], 'Release'))
   jobs:
   - job: ChocoRelease
     pool:
@@ -356,8 +354,7 @@ stages:
   dependsOn: 
    - ReleaseGitHub
    - Versioning
-  condition:  succeeded()
-  # condition:  and(succeeded(), eq(variables['runRelease'], 'true'))
+  condition:  and(succeeded(), eq(dependencies.Versioning.outputs['VersionOut.environmentName'], 'Release'))
   jobs:
   - job: WingetRelease
     pool:
