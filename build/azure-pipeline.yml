@@ -5,6 +5,10 @@
 
 trigger:
 - main
+- releases/*
+
+pr:
+- main
 
 name: $(GITVERSION_SemVer)
 
@@ -271,7 +275,7 @@ stages:
         script: |
           Install-Module -Name PowerShellForGitHub -AcceptLicense -Force 
           Write-Host "Imported Module PowerShellForGitHub "
-          $pulls = Get-GitHubPullRequest -OwnerName nkdAgility -RepositoryName azure-devops-migration-tools -State Closed -Base master
+          $pulls = Get-GitHubPullRequest -OwnerName nkdAgility -RepositoryName azure-devops-migration-tools -State Closed -Base main
           Write-Host "Found $($pulls.Count) pull requests on Preview"
           $pulls | ForEach-Object {Write-Host $_.title}
           Write-Host "----------"
@@ -293,17 +297,16 @@ stages:
         gitHubConnection: 'GitHub connection 4'
         tagSource: userSpecifiedTag
         tag: 'v$(Build.BuildNumber)'
-        title: 'v$(Build.BuildNumber) - $(BUILD_SOURCEVERSIONMESSAGE)'
+        title: 'v$(Build.BuildNumber) - $(Build.SourceVersionMessage)'
         releaseNotesSource: inline
         releaseNotesInline: |
           $(prbody)
-            
-          $(BUILD_SOURCEVERSIONMESSAGE) for $(BUILD_SOURCEVERSIONAUTHOR)
-          assets: |
+        assets: |
           $(System.ArtifactsDirectory)/drop/*.zip
           $(System.ArtifactsDirectory)/drop/*.vsix
           $(System.ArtifactsDirectory)/drop/*.nupkg
-          changeLogType: issueBased
+        changeLogType: issueBased
+
     - task: PowerShell@2
       displayName: Create GitHub Release
       enabled: false
@@ -405,6 +408,6 @@ stages:
     - task: PowerShell@2
       displayName: Create GitHub Release
       inputs:
-        filePath: '.\build\releaseGitHubRelease.ps1'
+        filePath: '.\build\releaseWingetPackage.ps1'
         arguments: '-version $(GitVersion.SemVer) -releaseTag $(releaseTag) -GH_TOKEN $(GH_TOKEN)' 
          
