@@ -10,7 +10,7 @@ trigger:
 
 name: $(GITVERSION_SemVer)
 
-## TODO: THESE WILL NOT WORK! NEED TO USE Versioning Reference instead with $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.SemVer'] ]
+## TODO: THESE WILL NOT WORK! NEED TO USE Versioning Reference instead with $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.SemVer'] ]
 variables:
   isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]
   skipCompileTest: false
@@ -24,7 +24,7 @@ stages:
 - stage: SetupStage
   displayName: 'Setup Stage'
   jobs: 
-  - job: VersionJob
+  - job: ConfigJob
     displayName: 'Version job'
     pool:
       vmImage: 'windows-latest'
@@ -77,7 +77,7 @@ stages:
 
 - stage: Build
   displayName: 'Build Test & Package'
-  dependsOn: Versioning
+  dependsOn: SetupStage
   condition: succeeded()
   jobs: 
   - job: BuildJob
@@ -91,9 +91,9 @@ stages:
       solution: '**/*.sln'
       buildPlatform: 'Any CPU'
       buildConfiguration: 'Release'
-      GitVersion.SemVer: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.SemVer'] ]
-      GitVersion.AssemblySemVer: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.AssemblySemVer'] ]
-      GitVersion.InformationalVersion: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.InformationalVersion'] ]
+      GitVersion.SemVer: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.SemVer'] ]
+      GitVersion.AssemblySemVer: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.AssemblySemVer'] ]
+      GitVersion.InformationalVersion: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.InformationalVersion'] ]
     steps:
     - task: SonarCloudPrepare@2
       inputs:
@@ -191,10 +191,10 @@ stages:
       solution: '**/*.sln'
       buildPlatform: 'Any CPU'
       buildConfiguration: 'Release'
-      GitVersion.SemVer: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.SemVer'] ]
-      GitVersion.AssemblySemVer: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.AssemblySemVer'] ]
-      GitVersion.InformationalVersion: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.InformationalVersion'] ]
-      GitVersion.MajorMinorPatch: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.MajorMinorPatch'] ]
+      GitVersion.SemVer: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.SemVer'] ]
+      GitVersion.AssemblySemVer: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.AssemblySemVer'] ]
+      GitVersion.InformationalVersion: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.InformationalVersion'] ]
+      GitVersion.MajorMinorPatch: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.MajorMinorPatch'] ]
     steps:
       - task: PowerShell@2
         displayName: Create fake build assets
@@ -225,11 +225,11 @@ stages:
     pool:
       vmImage: 'windows-latest'
     variables:
-      environmentName: $[ stageDependencies.SetupStage.VersionJob.outputs['VersionOut.environmentName'] ]
-      releaseTag: $[ stageDependencies.SetupStage.VersionJob.outputs['VersionOut.releaseTag'] ]
-      runRelease: $[ stageDependencies.SetupStage.VersionJob.outputs['VersionOut.runRelease'] ]
-      GitVersion.SemVer: $[ stageDependencies.SetupStage.VersionJob.outputs['GitVersion.SemVer'] ]
-      GitVersion.PreReleaseTag: $[ stageDependencies.SetupStage.VersionJob.outputs['GitVersion.PreReleaseTag'] ]
+      environmentName: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.environmentName'] ]
+      releaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.releaseTag'] ]
+      runRelease: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.runRelease'] ]
+      GitVersion.SemVer: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.SemVer'] ]
+      GitVersion.PreReleaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.PreReleaseTag'] ]
     steps:
     - task: PowerShell@2
       displayName: Read Variables
@@ -249,17 +249,17 @@ stages:
   dependsOn: 
    - Build
    - SetupStage
-  condition:  and(succeeded(), eq(dependencies.SetupStage.outputs['VersionJob.VersionOut.runRelease'], true))
+  condition:  and(succeeded(), eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.runRelease'], true))
   jobs:
   - job: GitHubRelease
     pool:
       vmImage: 'windows-latest'
     variables:
-      environmentName: $[ stageDependencies.SetupStage.VersionJob.outputs['VersionOut.environmentName'] ]
-      releaseTag: $[ stageDependencies.SetupStage.VersionJob.outputs['VersionOut.releaseTag'] ]
-      runRelease: $[ stageDependencies.SetupStage.VersionJob.outputs['VersionOut.runRelease'] ]
-      GitVersion.SemVer: $[ stageDependencies.SetupStage.VersionJob.outputs['GitVersion.SemVer'] ]
-      GitVersion.PreReleaseTag: $[ stageDependencies.SetupStage.VersionJob.outputs['GitVersion.PreReleaseTag'] ]
+      environmentName: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.environmentName'] ]
+      releaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.releaseTag'] ]
+      runRelease: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.runRelease'] ]
+      GitVersion.SemVer: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.SemVer'] ]
+      GitVersion.PreReleaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.PreReleaseTag'] ]
     steps:
     - task: DownloadBuildArtifacts@1
       inputs:
@@ -280,17 +280,17 @@ stages:
   dependsOn: 
    - GitHubReleaseStage
    - SetupStage
-  condition:  and(succeeded(), eq(dependencies.SetupStage.outputs['VersionJob.VersionOut.environmentName'], 'Release'))
+  condition:  and(succeeded(), eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.environmentName'], 'Release'))
   jobs:
   - job: tfxcliRelease
     pool:
       vmImage: 'windows-latest'
     variables:
-      environmentName: $[ stageDependencies.SetupStage.VersionJob.outputs['VersionOut.environmentName'] ]
-      releaseTag: $[ stageDependencies.SetupStage.VersionJob.outputs['VersionOut.releaseTag'] ]
-      runRelease: $[ stageDependencies.SetupStage.VersionJob.outputs['VersionOut.runRelease'] ]
-      GitVersion.SemVer: $[ stageDependencies.SetupStage.VersionJob.outputs['GitVersion.SemVer'] ]
-      GitVersion.PreReleaseTag: $[ stageDependencies.SetupStage.VersionJob.outputs['GitVersion.PreReleaseTag'] ]
+      environmentName: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.environmentName'] ]
+      releaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.releaseTag'] ]
+      runRelease: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.runRelease'] ]
+      GitVersion.SemVer: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.SemVer'] ]
+      GitVersion.PreReleaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.PreReleaseTag'] ]
     steps:
     - task: DownloadBuildArtifacts@1
       inputs:
@@ -317,17 +317,17 @@ stages:
   dependsOn: 
    - GitHubReleaseStage
    - SetupStage
-  condition:  and(succeeded(), eq(dependencies.SetupStage.outputs['VersionJob.VersionOut.environmentName'], 'Release'))
+  condition:  and(succeeded(), eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.environmentName'], 'Release'))
   jobs:
   - job: ChocoRelease
     pool:
       vmImage: 'windows-latest'
     variables:
-      environmentName: $[ stageDependencies.SetupStage.VersionJob.outputs['VersionOut.environmentName'] ]
-      releaseTag: $[ stageDependencies.SetupStage.VersionJob.outputs['VersionOut.releaseTag'] ]
-      runRelease: $[ stageDependencies.SetupStage.VersionJob.outputs['VersionOut.runRelease'] ]
-      GitVersion.SemVer: $[ stageDependencies.SetupStage.VersionJob.outputs['GitVersion.SemVer'] ]
-      GitVersion.PreReleaseTag: $[ stageDependencies.SetupStage.VersionJob.outputs['GitVersion.PreReleaseTag'] ]
+      environmentName: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.environmentName'] ]
+      releaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.releaseTag'] ]
+      runRelease: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.runRelease'] ]
+      GitVersion.SemVer: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.SemVer'] ]
+      GitVersion.PreReleaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.PreReleaseTag'] ]
     steps:
     - task: DownloadBuildArtifacts@1
       inputs:
@@ -354,17 +354,17 @@ stages:
   dependsOn: 
    - GitHubReleaseStage
    - SetupStage
-  condition:  and(succeeded(), eq(dependencies.SetupStage.outputs['VersionJob.VersionOut.environmentName'], 'Release'))
+  condition:  and(succeeded(), eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.environmentName'], 'Release'))
   jobs:
   - job: WingetRelease
     pool:
       vmImage: 'windows-latest'
     variables:
-      environmentName: $[ stageDependencies.SetupStage.VersionJob.outputs['VersionOut.environmentName'] ]
-      releaseTag: $[ stageDependencies.SetupStage.VersionJob.outputs['VersionOut.releaseTag'] ]
-      runRelease: $[ stageDependencies.SetupStage.VersionJob.outputs['VersionOut.runRelease'] ]
-      GitVersion.SemVer: $[ stageDependencies.SetupStage.VersionJob.outputs['GitVersion.SemVer'] ]
-      GitVersion.PreReleaseTag: $[ stageDependencies.SetupStage.VersionJob.outputs['GitVersion.PreReleaseTag'] ]
+      environmentName: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.environmentName'] ]
+      releaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.releaseTag'] ]
+      runRelease: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.runRelease'] ]
+      GitVersion.SemVer: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.SemVer'] ]
+      GitVersion.PreReleaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.PreReleaseTag'] ]
     steps:
     - task: DownloadBuildArtifacts@1
       inputs:
