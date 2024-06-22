@@ -258,6 +258,52 @@ stages:
       GitVersion.SemVer: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.SemVer'] ]
       GitVersion.PreReleaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.PreReleaseTag'] ]
     steps:
+    - task: DownloadBuildArtifacts@1
+      inputs:
+        buildType: 'current'
+        downloadType: 'single'
+        artifactName: 'drop'
+        downloadPath: '$(System.ArtifactsDirectory)'
+    - task: PowerShell@2
+      displayName: Create fake build assets
+      inputs:
+        targetType: 'inline'
+        script: |
+          Install-Module -Name PowerShellForGitHub -AcceptLicense -Force 
+          Write-Host "Imported Module PowerShellForGitHub "
+          $pulls = Get-GitHubPullRequest -OwnerName nkdAgility -RepositoryName azure-devops-migration-tools -State Closed -Base master
+          Write-Host "Found $($pulls.Count) pull requests on Preview"
+          $pulls | ForEach-Object {Write-Host $_.title}
+          Write-Host "----------"
+          $VERSIONMESSAGE = $env:BUILD_SOURCEVERSIONMESSAGE
+          $VERSIONMESSAGE = $VERSIONMESSAGE.Substring(0, $VERSIONMESSAGE.LastIndexOf(" (#"))
+          Write-Host "Looking for '$($VERSIONMESSAGE)'"
+          $pull = $pulls | Where-Object {$_.title -eq $VERSIONMESSAGE}
+          if ($pull -eq $null) {
+              Write-Host "No PR found for '$($VERSIONMESSAGE)'"
+              exit 0
+          }
+          Write-Host "Found PR $($pull.PullRequestNumber) <---"
+          $encoded_string = $pull.body -replace "`r`n", "\\n"
+          Write-Host "##vso[task.setvariable variable=prbody;]$encoded_string"
+
+    - task: GitHubRelease@1
+      displayName: 'GitHub release (create)'
+      inputs:
+        gitHubConnection: 'GitHub connection 4'
+        tagSource: userSpecifiedTag
+        tag: 'v$(Build.BuildNumber)'
+        title: 'v$(Build.BuildNumber) - $(BUILD_SOURCEVERSIONMESSAGE)'
+        releaseNotesSource: inline
+        releaseNotesInline: |
+          $(prbody)
+            
+          $(BUILD_SOURCEVERSIONMESSAGE) for $(BUILD_SOURCEVERSIONAUTHOR)
+          assets: |
+          $(System.ArtifactsDirectory)/drop/*.zip
+          $(System.ArtifactsDirectory)/drop/*.vsix
+          $(System.ArtifactsDirectory)/drop/*.nupkg
+          changeLogType: issueBased
     - task: PowerShell@2
       displayName: Create GitHub Release
       enabled: false
