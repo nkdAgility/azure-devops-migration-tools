@@ -28,35 +28,25 @@ if (($installedStuff -like "*gh*").Count -eq 0) {
     choco install gh --confirm --accept-license -y
 } else { Write-Output "Detected gh"}
 
-
-
 Write-Output "Release tag: $releaseTag! Version: $version"
 Write-Output "Version: $version"
 Write-Output "--------------"
 switch ($releaseTag)
 {
     "Dev"    {
-        Write-Output "Running Dev Release"
-        #gh release create $versionText $files --generate-notes --generate-notes --prerelease --discussion-category "General"
+        Write-Output "Running Dev"
+        gh release create "$versionText **DELETEME** FAKE RELASE BUILD TEST " $files --generate-notes --prerelease
         }
     "preview"    {
-        Write-Output "Running Dev Release"
-        #gh release create $versionText $files --generate-notes --generate-notes --prerelease --discussion-category "General"
+        Write-Output "Running Preview"
+        gh release create $versionText $files --generate-notes --prerelease --discussion-category "General"
         }
     "Release"    {
-        Write-Output "Running Dev Release"
-        #gh release create $versionText $files --generate-notes --generate-notes --prerelease --discussion-category "General"
+        Write-Output "Running Release"
+        gh release create $versionText $files --generate-notes --discussion-category "General"
         }
     default { 
         Write-Output "Unknown Release tag of $releaseTag";
         return -1;
-     } # optional
+     }
 }
-
-# if ($versionInfo.PreReleaseTag -eq "") {
-#    Write-Output "Publishing Release"
-#   #gh release create $versionText $files --generate-notes --generate-notes --discussion-category "General"
-# } else {
-#    Write-Output "Publishing PreRelease"
-#   #gh release create $versionText $files --generate-notes --generate-notes --prerelease --discussion-category "General"
-# }
