@@ -18,7 +18,6 @@ variables:
 stages:
 
 # Setup with: Versioning
-
 - stage: SetupStage
   displayName: 'Setup Stage'
   jobs: 
@@ -71,8 +70,38 @@ stages:
           Write-Host "GitVersion.AssemblySemVer: $(GitVersion.AssemblySemVer)"
           Write-Host "GitVersion.InformationalVersion: $(GitVersion.InformationalVersion)"
 
-# Build, Test and Package
 
+# Debug Value Check
+- stage: SetupValidatorStage
+  displayName: 'Setup Validator Stage'
+  dependsOn: 
+   - SetupStage
+  condition: succeeded()
+  jobs:
+  - job: LogVariablesJob
+    displayName: 'Log Variables Job'
+    pool:
+      vmImage: 'windows-latest'
+    variables:
+      environmentName: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.environmentName'] ]
+      releaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.releaseTag'] ]
+      runRelease: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.runRelease'] ]
+      GitVersion.SemVer: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.SemVer'] ]
+      GitVersion.PreReleaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.PreReleaseTag'] ]
+    steps:
+    - task: PowerShell@2
+      displayName: Read Variables
+      inputs:
+        targetType: 'inline'
+        script: |
+          Write-Host "environmentName: $(environmentName)"
+          Write-Host "releaseTag: $(releaseTag)"
+          Write-Host "runRelease: $(runRelease)"
+          Write-Host "GitVersion.SemVer: $(GitVersion.SemVer)"
+          Write-Host "GitVersion.PreReleaseTag: $(GitVersion.PreReleaseTag)"
+
+
+# Build, Test and Package
 - stage: BuildStage
   displayName: 'Build Test & Package Stage'
   dependsOn: SetupStage
@@ -211,37 +240,7 @@ stages:
           ArtifactName: 'drop'
           publishLocation: 'Container'
 
-# Debug Value Check
-
-- stage: SetupValidatorStage
-  displayName: 'Setup Validator Stage'
-  dependsOn: 
-   - SetupStage
-  condition: succeeded()
-  jobs:
-  - job: LogVariablesJob
-    pool:
-      vmImage: 'windows-latest'
-    variables:
-      environmentName: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.environmentName'] ]
-      releaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.releaseTag'] ]
-      runRelease: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.runRelease'] ]
-      GitVersion.SemVer: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.SemVer'] ]
-      GitVersion.PreReleaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.PreReleaseTag'] ]
-    steps:
-    - task: PowerShell@2
-      displayName: Read Variables
-      inputs:
-        targetType: 'inline'
-        script: |
-          Write-Host "environmentName: $(environmentName)"
-          Write-Host "releaseTag: $(releaseTag)"
-          Write-Host "runRelease: $(runRelease)"
-          Write-Host "GitVersion.SemVer: $(GitVersion.SemVer)"
-          Write-Host "GitVersion.PreReleaseTag: $(GitVersion.PreReleaseTag)"
-
 # Release to GitHub Releases
-
 - stage: GitHubReleaseStage
   displayName: 'GitHub Release Stage'
   dependsOn: 
@@ -272,7 +271,6 @@ stages:
         arguments: '-version $(GitVersion.SemVer) -artifactFolder "$(System.ArtifactsDirectory)" -releaseTag $(releaseTag) -GH_TOKEN $(GH_TOKEN)' 
 
 # Release to Azure DevOps Extension Marketplace
-
 - stage: ReleaseMarketplaceStage
   displayName: 'Marketplace Release Stage'
   dependsOn: 
@@ -309,7 +307,6 @@ stages:
           Write-Host "GitVersion.PreReleaseTag: $(GitVersion.PreReleaseTag)"
 
 # Release to Chocolatey Community Repository
-
 - stage: ChocolateyReleaseStage
   displayName: 'Chocolatey Release Stage'
   dependsOn: 
@@ -346,7 +343,6 @@ stages:
           Write-Host "GitVersion.PreReleaseTag: $(GitVersion.PreReleaseTag)"
 
 # Release to Winget package Repository
-
 - stage: WingetReleaseStage
   displayName: 'Winget Release Stage'
   dependsOn: 
