@@ -1,36 +1,27 @@
 assembly-versioning-scheme: MajorMinorPatch
-mode: ContinuousDeployment
+mode: ContinuousDelivery
 continuous-delivery-fallback-tag: ''
 next-version: 15.0.1
-branches:
+branches: 
   main:
-    mode: ContinuousDeployment
-    tag: ''
-    increment: Patch
-    regex: ^master$|^main$
-    is-release-branch: true
-    is-mainline: true
-    prevent-increment-of-merged-branch-version: true
-    track-merge-target: false
-    tracks-release-branches: false
-  preview:
-    mode: ContinuousDeployment
-    tag: Preview
-    regex: ^((?!(master)|(feature)|(pull)).)
-    is-release-branch: false
-    is-mainline: false
-    source-branches: [ 'main', 'master' ]
-    prevent-increment-of-merged-branch-version: false
-    track-merge-target: false
-    tracks-release-branches: true
-  feature:
+      mode: ContinuousDelivery
+      tag: 'preview'
+      increment: Patch
+      is-mainline: true
+      prevent-increment-of-merged-branch-version: false
+      tracks-release-branches: true
+      regex: ^master$|^main$
+  release:
     mode: ContinuousDelivery
-    tag: useBranchName
-    increment: Inherit
-    regex: features?[/-]
-    prevent-increment-of-merged-branch-version: false
+    tag: ""
+    increment: Patch
     track-merge-target: false
-    tracks-release-branches: false
+    regex: ^release(s)?[\/-]
+    source-branches:
+    - master
+    - main
+    is-release-branch: true
+    is-mainline: false
 ignore:
   sha: []
 merge-message-formats: {}

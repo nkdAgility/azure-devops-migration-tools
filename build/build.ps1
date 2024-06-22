@@ -26,26 +26,33 @@ $version = $versionInfo.SemVer
 if ($version -eq $null) {
     $version = "0.0.2"
 }
+Write-Output "Version: $version"
+$stagingfolder = New-Item -Name "output\Staging" -ItemType Directory
+
 # Azure DevOps Migration Tools (Executable) Packaging
-.\build\packageExecutable.ps1 -version $version -outfolder $outfolder.FullName
+.\build\packageExecutable.ps1 -version $version -outfolder $stagingfolder
 #-------------------------------------------
 # Azure DevOps Migration Tools (Extension) Packaging
-.\build\packageExtension.ps1 -version $version -outfolder $outfolder.FullName
+.\build\packageExtension.ps1 -version $version -outfolder $stagingfolder
 #-------------------------------------------
 # Azure DevOps Migration Tools (Chocolatey) Packaging
-.\build\packageChocolatey.ps1 -version $version -outfolder $outfolder.FullName
+.\build\packageChocolatey.ps1 -version $version -outfolder $stagingfolder
 #-------------------------------------------
 # Azure DevOps Migration Tools (Nuget) Packaging
-.\build\packageNuget.ps1 -version $version -outfolder $outfolder.FullName
+.\build\packageNuget.ps1 -version $version -outfolder $stagingfolder
 #-------------------------------------------
 # Azure DevOps Migration Tools (Winget) Packaging
-.\build\packageWinget.ps1 -version $version -outfolder $outfolder.FullName
+.\build\packageWinget.ps1 -version $version -outfolder $stagingfolder
 #-------------------------------------------
- #==============================================================================
- # Cleanup
- Write-Output "Cleanup"
- Remove-Item -Path "$($outfolder.FullName)\MigrationTools" -Recurse -Force
- #==============================================================================
+#==============================================================================
+#==============================================================================
+# Publish
+#-------------------------------------------
+# Azure DevOps Migration Tools (Winget) Packaging
+
+.\build\releaseGitHubRelease.ps1 -version $version -artifactFolder $stagingfolder -releaseTag "Local" -GH_TOKEN $env:GITHUB
+#-------------------------------------------
+
 # Publish
 #Write-Output "PUBLISH ABBWorkItemClone"
 #Write-Output "--------------"
