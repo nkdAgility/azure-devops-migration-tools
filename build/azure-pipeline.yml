@@ -262,7 +262,6 @@ stages:
           Write-Host "GitVersion.PreReleaseTag: $(GitVersion.PreReleaseTag)"
     - task: PowerShell@2
       displayName: Create GitHub Release
-      continueOnError: true
       inputs:
         filePath: '.\build\releaseGitHubRelease.ps1'
         arguments: '-version $(GitVersion.SemVer) -artifactFolder "$(System.ArtifactsDirectory)" -releaseTag $(releaseTag) -GH_TOKEN $(GH_TOKEN)' 

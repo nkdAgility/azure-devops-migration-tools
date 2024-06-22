@@ -39,7 +39,7 @@ if ($GH_TOKEN -eq $null) {
 }
 
 Write-Output "Logging in to GitHub with $GH_TOKEN"
-gh auth login --with-token $GH_TOKEN
+"$GH_TOKEN" | gh auth login --with-token 
 
 gh auth status
 
