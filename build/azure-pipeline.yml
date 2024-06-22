@@ -244,7 +244,7 @@ stages:
 
 # Release to GitHub Releases
 
-- stage: ReleaseGitHub
+- stage: GitHubReleaseStage
   displayName: 'Release to GitHub Releases'
   dependsOn: 
    - Build
@@ -278,7 +278,7 @@ stages:
 - stage: ReleaseExtension
   displayName: 'Release to Azure DevOps Extension Marketplace'
   dependsOn: 
-   - ReleaseGitHub
+   - GitHubReleaseStage
    - SetupStage
   condition:  and(succeeded(), eq(dependencies.SetupStage.outputs['VersionJob.VersionOut.environmentName'], 'Release'))
   jobs:
@@ -315,7 +315,7 @@ stages:
 - stage: ReleaseChocolatey
   displayName: 'Release to Chocolatey Community Repository'
   dependsOn: 
-   - ReleaseGitHub
+   - GitHubReleaseStage
    - SetupStage
   condition:  and(succeeded(), eq(dependencies.SetupStage.outputs['VersionJob.VersionOut.environmentName'], 'Release'))
   jobs:
@@ -352,7 +352,7 @@ stages:
 - stage: ReleaseWinget
   displayName: 'Release to Winget package Repository'
   dependsOn: 
-   - ReleaseGitHub
+   - GitHubReleaseStage
    - SetupStage
   condition:  and(succeeded(), eq(dependencies.SetupStage.outputs['VersionJob.VersionOut.environmentName'], 'Release'))
   jobs:
