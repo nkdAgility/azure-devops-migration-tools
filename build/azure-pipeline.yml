@@ -46,7 +46,7 @@ stages:
         targetType: 'inline'
         script: |
           Write-Host "##vso[task.setvariable variable=environmentName;isoutput=true]AzureDevOpsMigrationTools-Dev"
-          Write-Host "##vso[task.setvariable variable=environmentTag;isoutput=true]Dev"
+          Write-Host "##vso[task.setvariable variable=releaseTag;isoutput=true]Dev"
           Write-Host "##vso[task.setvariable variable=isRelease;isoutput=true]false"
           Write-Host "##vso[task.setvariable variable=isPreview;isoutput=true]false"
           Write-Host "##vso[task.setvariable variable=shouldDeploy;isoutput=true]false"
@@ -54,15 +54,15 @@ stages:
           if ("$(GitVersion.PreReleaseTag)" -eq "")
           {
             Write-Host "##vso[task.setvariable variable=environmentName;isoutput=true]AzureDevOpsMigrationTools-Release"
-            Write-Host "##vso[task.setvariable variable=environmentTag;isoutput=true]Release"
+            Write-Host "##vso[task.setvariable variable=releaseTag;isoutput=true]Release"
             Write-Host "##vso[task.setvariable variable=isRelease;isoutput=true]true"
             Write-Host "##vso[task.setvariable variable=isPreview;isoutput=true]false"
             Write-Host "##vso[task.setvariable variable=shouldDeploy;isoutput=true]true"
           }
           if ("$(GitVersion.PreReleaseLabel)" -contains "Preview")
           {
-            Write-Host "##vso[task.setvariable variable=environmentName;isoutput=true]AzureDevOpsMigrationTools-Preview"
-            Write-Host "##vso[task.setvariable variable=environmentTag;isoutput=true]Preview"
+            Write-Host "##vso[task.setvariable variable=environmmentName;isoutput=true]AzureDevOpsMigrationTools-Preview"
+            Write-Host "##vso[task.setvariable variable=releaseTag;isoutput=true]Preview"
             Write-Host "##vso[task.setvariable variable=isRelease;isoutput=true]false"
             Write-Host "##vso[task.setvariable variable=isPreview;isoutput=true]true"
             Write-Host "##vso[task.setvariable variable=shouldDeploy;isoutput=true]true"
@@ -229,7 +229,7 @@ stages:
       vmImage: 'windows-latest'
     variables:
       environmentName: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.environmentName'] ]
-      environmentTag: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.environmentTag'] ]
+      releaseTag: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.releaseTag'] ]
       isRelease: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.isRelease'] ]
       isPreview: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.isPreview'] ]
       shouldDeploy: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.shouldDeploy'] ]
@@ -249,7 +249,7 @@ stages:
         targetType: 'inline'
         script: |
           Write-Host "environmentName: $(environmentName)"
-          Write-Host "environmentTag: $(environmentTag)"
+          Write-Host "releaseTag: $(releaseTag)"
           Write-Host "isRelease: $(isRelease)"
           Write-Host "isPreview: $(isPreview)"
           Write-Host "shouldDeploy: $(shouldDeploy)"
@@ -260,7 +260,7 @@ stages:
       continueOnError: true
       inputs:
         filePath: '.\build\releaseGitHubRelease.ps1'
-        arguments: '-version $(GitVersion.SemVer) -artifactFolder "$(System.ArtifactsDirectory)" -environmentTag $(environmentTag)' 
+        arguments: '-version $(GitVersion.SemVer) -artifactFolder "$(System.ArtifactsDirectory)" -releaseTag $(releaseTag)' 
 
 # Release to Azure DevOps Extension Marketplace
 
@@ -277,7 +277,7 @@ stages:
       vmImage: 'windows-latest'
     variables:
       environmentName: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.environmentName'] ]
-      environmentTag: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.environmentTag'] ]
+      releaseTag: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.releaseTag'] ]
       isRelease: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.isRelease'] ]
       isPreview: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.isPreview'] ]
       shouldDeploy: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.shouldDeploy'] ]
@@ -297,7 +297,7 @@ stages:
         targetType: 'inline'
         script: |
           Write-Host "environmentName: $(environmentName)"
-          Write-Host "environmentTag: $(environmentTag)"
+          Write-Host "releaseTag: $(releaseTag)"
           Write-Host "isRelease: $(isRelease)"
           Write-Host "isPreview: $(isPreview)"
           Write-Host "shouldDeploy: $(shouldDeploy)"
@@ -319,7 +319,7 @@ stages:
       vmImage: 'windows-latest'
     variables:
       environmentName: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.environmentName'] ]
-      environmentTag: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.environmentTag'] ]
+      releaseTag: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.releaseTag'] ]
       isRelease: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.isRelease'] ]
       isPreview: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.isPreview'] ]
       shouldDeploy: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.shouldDeploy'] ]
@@ -339,7 +339,7 @@ stages:
         targetType: 'inline'
         script: |
           Write-Host "environmentName: $(environmentName)"
-          Write-Host "environmentTag: $(environmentTag)"
+          Write-Host "releaseTag: $(releaseTag)"
           Write-Host "isRelease: $(isRelease)"
           Write-Host "isPreview: $(isPreview)"
           Write-Host "shouldDeploy: $(shouldDeploy)"
@@ -361,7 +361,7 @@ stages:
       vmImage: 'windows-latest'
     variables:
       environmentName: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.environmentName'] ]
-      environmentTag: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.environmentTag'] ]
+      releaseTag: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.releaseTag'] ]
       isRelease: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.isRelease'] ]
       isPreview: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.isPreview'] ]
       shouldDeploy: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.shouldDeploy'] ]
@@ -381,7 +381,7 @@ stages:
         targetType: 'inline'
         script: |
           Write-Host "environmentName: $(environmentName)"
-          Write-Host "environmentTag: $(environmentTag)"
+          Write-Host "releaseTag: $(releaseTag)"
           Write-Host "isRelease: $(isRelease)"
           Write-Host "isPreview: $(isPreview)"
           Write-Host "shouldDeploy: $(shouldDeploy)"
