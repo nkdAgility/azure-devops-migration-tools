@@ -377,7 +377,7 @@ stages:
       displayName: 'NuGet push'
       inputs:
         command: push
-        packagesToPush: '**\*vsts-sync-migrator.*.nupkg'
+        packagesToPush: '$(System.ArtifactsDirectory)\**\*vsts-sync-migrator.*.nupkg'
         nuGetFeedType: external
         publishFeedCredentials: Chocolate.org
 
