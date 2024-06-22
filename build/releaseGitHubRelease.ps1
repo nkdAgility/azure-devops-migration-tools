@@ -39,10 +39,14 @@ if ($GH_TOKEN -eq $null) {
 }
 
 Write-Output "Logging in to GitHub with $GH_TOKEN"
+Write-Output "--------------"
+$env:GITHUB_TOKEN = $GH_TOKEN
 "$GH_TOKEN" | gh auth login --with-token 
-
+Write-Output "--------------"
+Write-Output "GitHub Login Status"
+Write-Output "--------------"
 gh auth status
-
+Write-Output "--------------"
 Write-Output "Release tag: $releaseTag"
 Write-Output "Version: $version"
 Write-Output "Filed for Upload: $artifactFolder\**"
@@ -70,3 +74,4 @@ switch ($releaseTag)
         return 3;
      }
 }
+Write-Output "--------------"

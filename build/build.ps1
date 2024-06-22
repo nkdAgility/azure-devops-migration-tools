@@ -50,7 +50,7 @@ $stagingfolder = New-Item -Name "output\Staging" -ItemType Directory
 #-------------------------------------------
 # Azure DevOps Migration Tools (Winget) Packaging
 
-.\build\releaseGitHubRelease.ps1 -version $version -artifactFolder $stagingfolder -releaseTag "Local --GH_TOKEN $env:GITHUB"
+.\build\releaseGitHubRelease.ps1 -version $version -artifactFolder $stagingfolder -releaseTag "Local" -GH_TOKEN $env:GITHUB
 #-------------------------------------------
 
 # Publish
