@@ -26,7 +26,6 @@ $files = Get-ChildItem -Path $artifactFolder -Recurse
 foreach ($file in $files) {
     Write-Output $file.FullName
 }
-$fileNames = $files | Join-String -Property FullName -DoubleQuote -Separator ' '
 
 Write-Output "Install GitHub CLI if needed"
 if (($installedStuff -like "*gh*").Count -eq 0) {
