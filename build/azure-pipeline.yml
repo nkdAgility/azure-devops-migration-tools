@@ -223,8 +223,7 @@ stages:
   condition:  succeeded()
   # condition:  and(succeeded(), eq(variables['shouldDeploy'], 'true'))
   jobs:
-  - deployment: GitHubRelease
-    environment: $[ stageDependencies.Versioning.VersionJob.outputs['environmentName'] ]
+  - job: GitHubRelease
     pool:
       vmImage: 'windows-latest'
     variables:
@@ -265,8 +264,7 @@ stages:
   condition:  succeeded()
   # condition:  and(succeeded(), eq(variables['shouldDeploy'], 'true'))
   jobs:
-  - deployment: tfxcliRelease
-    environment: $[ stageDependencies.Versioning.VersionJob.outputs['environmentName'] ]
+  - job: tfxcliRelease
     pool:
       vmImage: 'windows-latest'
     variables:
@@ -307,8 +305,7 @@ stages:
   condition:  succeeded()
   # condition:  and(succeeded(), eq(variables['shouldDeploy'], 'true'))
   jobs:
-  - deployment: ChocoRelease
-    environment: $[ stageDependencies.Versioning.VersionJob.outputs['environmentName'] ]
+  - job: ChocoRelease
     pool:
       vmImage: 'windows-latest'
     variables:
@@ -349,8 +346,7 @@ stages:
   condition:  succeeded()
   # condition:  and(succeeded(), eq(variables['shouldDeploy'], 'true'))
   jobs:
-  - deployment: WingetRelease
-    environment: $[ stageDependencies.Versioning.VersionJob.outputs['environmentName'] ]
+  - job: WingetRelease
     pool:
       vmImage: 'windows-latest'
     variables:
