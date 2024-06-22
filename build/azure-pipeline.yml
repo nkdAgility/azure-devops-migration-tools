@@ -280,19 +280,6 @@ stages:
         artifactName: 'drop'
         downloadPath: '$(System.ArtifactsDirectory)'
     - task: PowerShell@2
-      displayName: Read Environment Variables
-      continueOnError: true
-      inputs:
-        targetType: 'inline'
-        script: |
-          Write-Host "environmentName: $(environmentName)"
-          Write-Host "releaseTag: $(releaseTag)"
-          Write-Host "isRelease: $(isRelease)"
-          Write-Host "isPreview: $(isPreview)"
-          Write-Host "runRelease: $(runRelease)"
-          Write-Host "GitVersion.SemVer: $(GitVersion.SemVer)"
-          Write-Host "GitVersion.PreReleaseTag: $(GitVersion.PreReleaseTag)"
-    - task: PowerShell@2
       displayName: Create GitHub Release
       inputs:
         filePath: '.\build\releaseGitHubRelease.ps1'
