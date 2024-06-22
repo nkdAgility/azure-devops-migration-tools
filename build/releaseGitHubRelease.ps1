@@ -8,12 +8,12 @@ param (
 
     # name of the output folder
     [Parameter(Mandatory=$true)]
-    [string]$outfolder
+    [string]$artifactFolder
 )
 #Publish
 Write-Output "Azure DevOps Migration Tools (GitHub Release) Release"
 Write-Output "--------------"
-$files = Get-ChildItem -Path $outfolder -Recurse
+$files = Get-ChildItem -Path $artifactFolder -Recurse
 foreach ($file in $files) {
     Write-Output $file.FullName
 }
