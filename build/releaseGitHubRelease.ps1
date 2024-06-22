@@ -40,7 +40,6 @@ if ($GH_TOKEN -eq $null) {
 
 Write-Output "Logging in to GitHub with $GH_TOKEN"
 Write-Output "--------------"
-$env:GITHUB_TOKEN = $GH_TOKEN
 $env:GH_TOKEN = $GH_TOKEN
 "$GH_TOKEN" | gh auth login --with-token 
 Write-Output "--------------"
@@ -50,25 +49,25 @@ gh auth status
 Write-Output "--------------"
 Write-Output "Release tag: $releaseTag"
 Write-Output "Version: $version"
-Write-Output "Filed for Upload: $artifactFolder\**"
+Write-Output "Filed for Upload: $artifactFolder\drop\**"
 Write-Output "--------------"
 switch ($releaseTag)
 {
     "Local"    {
         Write-Output "Running Local"
-        gh release create $version "$artifactFolder\**" --title "$version **DELETEME** FAKE TEST" --generate-notes --prerelease --draft --repo "nkdAgility/azure-devops-migration-tools"
+        gh release create $version "$artifactFolder\drop\**" --title "$version **DELETEME** FAKE TEST" --generate-notes --prerelease --draft --repo "nkdAgility/azure-devops-migration-tools"
         }
     "Dev"    {
         Write-Output "Running Dev"
-        gh release create $version "$artifactFolder\**" --title "$version **DELETEME** FAKE TEST" --generate-notes --prerelease --draft --repo "nkdAgility/azure-devops-migration-tools"
+        gh release create $version "$artifactFolder\drop\**" --title "$version **DELETEME** FAKE TEST" --generate-notes --prerelease --draft --repo "nkdAgility/azure-devops-migration-tools"
         }
     "preview"    {
         Write-Output "Running Preview"
-        gh release create $version "$artifactFolder\**" --generate-notes --prerelease --repo "nkdAgility/azure-devops-migration-tools"
+        gh release create $version "$artifactFolder\drop\**" --generate-notes --prerelease --repo "nkdAgility/azure-devops-migration-tools"
         }
     "Release"    {
         Write-Output "Running Release"
-        gh release create $version "$artifactFolder\**" --generate-notes --discussion-category "AnouncementDiscussions" --repo "nkdAgility/azure-devops-migration-tools"
+        gh release create $version "$artifactFolder\drop\**" --generate-notes --discussion-category "AnouncementDiscussions" --repo "nkdAgility/azure-devops-migration-tools"
         }
     default { 
         Write-Output "Unknown Release tag of $releaseTag";
