@@ -35,11 +35,13 @@ if (($installedStuff -like "*gh*").Count -eq 0) {
 
 if ($GH_TOKEN -eq $null) {
     Write-Output "Please set the GH_TOKEN variable"
-    return 1;
+    return 2;
 }
 
+Write-Output "Logging in to GitHub with $GH_TOKEN"
 gh auth login --with-token $GH_TOKEN
 
+gh auth status
 
 Write-Output "Release tag: $releaseTag"
 Write-Output "Version: $version"
@@ -49,22 +51,22 @@ switch ($releaseTag)
 {
     "Local"    {
         Write-Output "Running Local"
-        gh release create $version "$artifactFolder\**" --title "$version **DELETEME** FAKE TEST" --generate-notes --prerelease --draft
+        gh release create $version "$artifactFolder\**" --title "$version **DELETEME** FAKE TEST" --generate-notes --prerelease --draft --repo "nkdAgility/azure-devops-migration-tools"
         }
     "Dev"    {
         Write-Output "Running Dev"
-        gh release create $version "$artifactFolder\**" --title "$version **DELETEME** FAKE TEST" --generate-notes --prerelease --draft
+        gh release create $version "$artifactFolder\**" --title "$version **DELETEME** FAKE TEST" --generate-notes --prerelease --draft --repo "nkdAgility/azure-devops-migration-tools"
         }
     "preview"    {
         Write-Output "Running Preview"
-        gh release create $version "$artifactFolder\**" --generate-notes --prerelease
+        gh release create $version "$artifactFolder\**" --generate-notes --prerelease --repo "nkdAgility/azure-devops-migration-tools"
         }
     "Release"    {
         Write-Output "Running Release"
-        gh release create $version "$artifactFolder\**" --generate-notes --discussion-category "AnouncementDiscussions"
+        gh release create $version "$artifactFolder\**" --generate-notes --discussion-category "AnouncementDiscussions" --repo "nkdAgility/azure-devops-migration-tools"
         }
     default { 
         Write-Output "Unknown Release tag of $releaseTag";
-        return -1;
+        return 3;
      }
 }
