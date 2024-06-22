@@ -294,17 +294,16 @@ stages:
         downloadType: 'single'
         artifactName: 'drop'
         downloadPath: '$(System.ArtifactsDirectory)'
-    - task: PowerShell@2
-      displayName: Read Environment Variables
-      continueOnError: true
+    - task: ms-devlabs.vsts-developer-tools-build-tasks.tfx-installer-build-task.TfxInstaller@4
+      displayName: 'Use Node CLI for Azure DevOps (tfx-cli): v0.7.x'
       inputs:
-        targetType: 'inline'
-        script: |
-          Write-Host "environmentName: $(environmentName)"
-          Write-Host "releaseTag: $(releaseTag)"
-          Write-Host "runRelease: $(runRelease)"
-          Write-Host "GitVersion.SemVer: $(GitVersion.SemVer)"
-          Write-Host "GitVersion.PreReleaseTag: $(GitVersion.PreReleaseTag)"
+        version: v0.7.x
+    - task: ms-devlabs.vsts-developer-tools-build-tasks.publish-extension-build-task.PublishAzureDevOpsExtension@4
+      displayName: 'Publish Extension'
+      inputs:
+        connectedServiceName: 'nkdAgility-Marketplace'
+        fileType: vsix
+        vsixFile: '$(System.DefaultWorkingDirectory)/vsts-sync-migration/drop/nkdAgility.vsts-sync-migration-$(GitVersion.SemVer).vsix'
 
 # Release to Chocolatey Community Repository
 - stage: ChocolateyReleaseStage
@@ -312,7 +311,7 @@ stages:
   dependsOn: 
    - GitHubReleaseStage
    - SetupStage
-  condition:  and(succeeded(), eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.environmentName'], 'Release'))
+  condition:  and(succeeded(), or(eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.environmentName'], 'Release'), eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.environmentName'], 'Preview')))
   jobs:
   - job: ChocoReleaseJob
     pool:
@@ -330,17 +329,13 @@ stages:
         downloadType: 'single'
         artifactName: 'drop'
         downloadPath: '$(System.ArtifactsDirectory)'
-    - task: PowerShell@2
-      displayName: Read Environment Variables
-      continueOnError: true
+    - task: NuGetCommand@2
+      displayName: 'NuGet push'
       inputs:
-        targetType: 'inline'
-        script: |
-          Write-Host "environmentName: $(environmentName)"
-          Write-Host "releaseTag: $(releaseTag)"
-          Write-Host "runRelease: $(runRelease)"
-          Write-Host "GitVersion.SemVer: $(GitVersion.SemVer)"
-          Write-Host "GitVersion.PreReleaseTag: $(GitVersion.PreReleaseTag)"
+        command: push
+        packagesToPush: '**\*vsts-sync-migrator.*.nupkg'
+        nuGetFeedType: external
+        publishFeedCredentials: Chocolate.org
 
 # Release to Winget package Repository
 - stage: WingetReleaseStage
@@ -348,7 +343,7 @@ stages:
   dependsOn: 
    - GitHubReleaseStage
    - SetupStage
-  condition:  and(succeeded(), eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.environmentName'], 'Release'))
+  condition:  and(succeeded(), or(eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.environmentName'], 'Release'), eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.environmentName'], 'Preview')))
   jobs:
   - job: WingetReleaseJob
     pool:
@@ -367,13 +362,8 @@ stages:
         artifactName: 'drop'
         downloadPath: '$(System.ArtifactsDirectory)'
     - task: PowerShell@2
-      displayName: Read Environment Variables
-      continueOnError: true
+      displayName: Create GitHub Release
       inputs:
-        targetType: 'inline'
-        script: |
-          Write-Host "environmentName: $(environmentName)"
-          Write-Host "releaseTag: $(releaseTag)"
-          Write-Host "runRelease: $(runRelease)"
-          Write-Host "GitVersion.SemVer: $(GitVersion.SemVer)"
-          Write-Host "GitVersion.PreReleaseTag: $(GitVersion.PreReleaseTag)"
+        filePath: '.\build\releaseGitHubRelease.ps1'
+        arguments: '-version $(GitVersion.SemVer) -releaseTag $(releaseTag) -GH_TOKEN $(GH_TOKEN)' 
+         
