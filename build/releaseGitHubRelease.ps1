@@ -43,24 +43,25 @@ gh auth login --with-token $env:GITHUB_TOKEN
 
 Write-Output "Release tag: $releaseTag"
 Write-Output "Version: $version"
+Write-Output "Filed for Upload: $artifactFolder\**"
 Write-Output "--------------"
 switch ($releaseTag)
 {
     "Local"    {
         Write-Output "Running Local"
-        gh release create $version $files --title "$version **DELETEME** FAKE TEST" --generate-notes --prerelease --draft
+        gh release create $version "$artifactFolder\**" --title "$version **DELETEME** FAKE TEST" --generate-notes --prerelease --draft
         }
     "Dev"    {
         Write-Output "Running Dev"
-        gh release create $version $files --title "$version **DELETEME** FAKE TEST" --generate-notes --prerelease --draft
+        gh release create $version "$artifactFolder\**" --title "$version **DELETEME** FAKE TEST" --generate-notes --prerelease --draft
         }
     "preview"    {
         Write-Output "Running Preview"
-        gh release create $version $files --generate-notes --prerelease
+        gh release create $version "$artifactFolder\**" --generate-notes --prerelease
         }
     "Release"    {
         Write-Output "Running Release"
-        gh release create $version $files --generate-notes --discussion-category "AnouncementDiscussions"
+        gh release create $version "$artifactFolder\**" --generate-notes --discussion-category "AnouncementDiscussions"
         }
     default { 
         Write-Output "Unknown Release tag of $releaseTag";
