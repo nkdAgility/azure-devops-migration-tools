@@ -226,8 +226,7 @@ stages:
   dependsOn: 
    - Build
    - Versioning
-  condition:  succeeded()
-  # condition:  and(succeeded(), or(eq(dependencies.Versioning.outputs['VersionOut.releaseTag'], 'Release'), eq(dependencies.Versioning.outputs['VersionOut.releaseTag'], 'Preview')))
+  condition:  and(succeeded(), or(eq(dependencies.Versioning.outputs['VersionOut.releaseTag'], 'Release'), eq(dependencies.Versioning.outputs['VersionOut.releaseTag'], 'Preview')))
   jobs:
   - job: GitHubRelease
     pool:
