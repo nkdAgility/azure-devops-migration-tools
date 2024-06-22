@@ -45,6 +45,7 @@ stages:
       inputs:
         targetType: 'inline'
         script: |
+          $releaseTag = "Dev";
           Write-Host "##vso[task.setvariable variable=environmentName;isoutput=true]AzureDevOpsMigrationTools-Dev"
           Write-Host "##vso[task.setvariable variable=releaseTag;isoutput=true]Dev"
           Write-Host "##vso[task.setvariable variable=isRelease;isoutput=true]false"
@@ -53,6 +54,7 @@ stages:
 
           if ("$(GitVersion.PreReleaseTag)" -eq "")
           {
+            $releaseTag = "Release";
             Write-Host "##vso[task.setvariable variable=environmentName;isoutput=true]AzureDevOpsMigrationTools-Release"
             Write-Host "##vso[task.setvariable variable=releaseTag;isoutput=true]Release"
             Write-Host "##vso[task.setvariable variable=isRelease;isoutput=true]true"
@@ -61,13 +63,14 @@ stages:
           }
           if ("$(GitVersion.PreReleaseLabel)" -contains "Preview")
           {
+            $releaseTag = "Preview";
             Write-Host "##vso[task.setvariable variable=environmmentName;isoutput=true]AzureDevOpsMigrationTools-Preview"
             Write-Host "##vso[task.setvariable variable=releaseTag;isoutput=true]Preview"
             Write-Host "##vso[task.setvariable variable=isRelease;isoutput=true]false"
             Write-Host "##vso[task.setvariable variable=isPreview;isoutput=true]true"
             Write-Host "##vso[task.setvariable variable=shouldDeploy;isoutput=true]true"
           }
-          Write-Host "##vso[build.addbuildtag]$(VersionOut.releaseTag)"
+          Write-Host "##vso[build.addbuildtag]$releaseTag"
 
           # Output the variables for debugging
           Write-Host "GITVERSION.PreReleaseLabel: $(GITVERSION.PreReleaseLabel)"
@@ -272,7 +275,7 @@ stages:
    - ReleaseGitHub
    - Versioning
   condition:  succeeded()
-  # condition:  and(succeeded(), eq(variables['shouldDeploy'], 'true'))
+  # condition:  and(succeeded(), eq(dependencies.Versioning.outputs['VersionOut.releaseTag'], 'Release'))
   jobs:
   - job: tfxcliRelease
     pool:
