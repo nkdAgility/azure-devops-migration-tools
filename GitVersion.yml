@@ -5,7 +5,7 @@ next-version: 15.0.1
 branches: 
   main:
       mode: ContinuousDelivery
-      tag: 'preview'
+      tag: 'Preview'
       increment: Patch
       is-mainline: true
       prevent-increment-of-merged-branch-version: false
