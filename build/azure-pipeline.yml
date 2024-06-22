@@ -41,6 +41,7 @@ stages:
         updateAssemblyInfo: true
     - task: PowerShell@2
       displayName: Set Environment Variables
+      name: VersionOut
       inputs:
         targetType: 'inline'
         script: |
@@ -227,11 +228,11 @@ stages:
     pool:
       vmImage: 'windows-latest'
     variables:
-      environmentName: $[ stageDependencies.Versioning.VersionJob.outputs['environmentName'] ]
-      environmentTag: $[ stageDependencies.Versioning.VersionJob.outputs['environmentTag'] ]
-      isRelease: $[ stageDependencies.Versioning.VersionJob.outputs['isRelease'] ]
-      isPreview: $[ stageDependencies.Versioning.VersionJob.outputs['isPreview'] ]
-      shouldDeploy: $[ stageDependencies.Versioning.VersionJob.outputs['shouldDeploy'] ]
+      environmentName: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.environmentName'] ]
+      environmentTag: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.environmentTag'] ]
+      isRelease: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.isRelease'] ]
+      isPreview: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.isPreview'] ]
+      shouldDeploy: $[ stageDependencies.Versioning.VersionJob.outputs['VersionOut.shouldDeploy'] ]
       GitVersion.SemVer: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.SemVer'] ]
       GitVersion.PreReleaseTag: $[ stageDependencies.Versioning.VersionJob.outputs['GitVersion.PreReleaseTag'] ]
     steps:
