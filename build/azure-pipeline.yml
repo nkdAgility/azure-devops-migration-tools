@@ -76,7 +76,7 @@ stages:
 # Build, Test and Package
 
 - stage: BuildStage
-  displayName: 'Build Test & Package'
+  displayName: 'Build Test & Package Stage'
   dependsOn: SetupStage
   condition: succeeded()
   jobs: 
@@ -245,7 +245,7 @@ stages:
 # Release to GitHub Releases
 
 - stage: GitHubReleaseStage
-  displayName: 'GitHub Releases Release Stage'
+  displayName: 'GitHub Release Stage'
   dependsOn: 
    - BuildStage
    - SetupStage
@@ -276,7 +276,7 @@ stages:
 # Release to Azure DevOps Extension Marketplace
 
 - stage: ReleaseMarketplaceStage
-  displayName: 'Extension Marketplace Release Stage'
+  displayName: 'Marketplace Release Stage'
   dependsOn: 
    - GitHubReleaseStage
    - SetupStage
