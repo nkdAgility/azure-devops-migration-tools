@@ -28,6 +28,11 @@ if (($installedStuff -like "*gh*").Count -eq 0) {
     choco install gh --confirm --accept-license -y
 } else { Write-Output "Detected gh"}
 
+if ($env:GITHUB_TOKEN -eq $null) {
+    Write-Output "Please set the GITHUB_TOKEN environment variable"
+    return -1
+}
+
 gh auth login --with-token $env:GITHUB_TOKEN
 
 
