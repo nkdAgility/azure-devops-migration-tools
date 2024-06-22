@@ -10,9 +10,14 @@ param (
     [Parameter(Mandatory=$true)]
     [string]$artifactFolder,
 
-      # name of the releaseTag
-      [Parameter(Mandatory=$true)]
-      [string]$releaseTag
+    # name of the releaseTag
+    [Parameter(Mandatory=$true)]
+    [string]$releaseTag,
+
+    # GH_TOKEN
+    [Parameter(Mandatory=$true)]
+    [string]$GH_TOKEN
+
 )
 #Publish
 Write-Output "Azure DevOps Migration Tools (GitHub Release) Release"
@@ -30,7 +35,7 @@ if (($installedStuff -like "*gh*").Count -eq 0) {
 
 if ($env:GITHUB_TOKEN -eq $null) {
     Write-Output "Please set the GITHUB_TOKEN environment variable"
-    return -1
+    return -1;
 }
 
 gh auth login --with-token $env:GITHUB_TOKEN

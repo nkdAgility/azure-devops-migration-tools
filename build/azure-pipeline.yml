@@ -67,6 +67,8 @@ stages:
             Write-Host "##vso[task.setvariable variable=isPreview;isoutput=true]true"
             Write-Host "##vso[task.setvariable variable=shouldDeploy;isoutput=true]true"
           }
+          Write-Host "##vso[build.addbuildtag]$(VersionOut.releaseTag)"
+
           # Output the variables for debugging
           Write-Host "GITVERSION.PreReleaseLabel: $(GITVERSION.PreReleaseLabel)"
           Write-Host "GITVERSION.SemVer: $(GITVERSION.SemVer)"
@@ -260,7 +262,7 @@ stages:
       continueOnError: true
       inputs:
         filePath: '.\build\releaseGitHubRelease.ps1'
-        arguments: '-version $(GitVersion.SemVer) -artifactFolder "$(System.ArtifactsDirectory)" -releaseTag $(releaseTag)' 
+        arguments: '-version $(GitVersion.SemVer) -artifactFolder "$(System.ArtifactsDirectory)" -releaseTag $(releaseTag) --GH_TOKEN $(GH_TOKEN)' 
 
 # Release to Azure DevOps Extension Marketplace
 
