@@ -265,7 +265,7 @@ stages:
       continueOnError: true
       inputs:
         filePath: '.\build\releaseGitHubRelease.ps1'
-        arguments: '-version $(GitVersion.SemVer) -artifactFolder "$(System.ArtifactsDirectory)" -releaseTag $(releaseTag) --GH_TOKEN $(GH_TOKEN)' 
+        arguments: '-version $(GitVersion.SemVer) -artifactFolder "$(System.ArtifactsDirectory)" -releaseTag $(releaseTag) -GH_TOKEN $(GH_TOKEN)' 
 
 # Release to Azure DevOps Extension Marketplace
 
