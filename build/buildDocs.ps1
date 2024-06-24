@@ -6,11 +6,7 @@
 param (
     # height of largest column without top bar
     [Parameter(Mandatory=$true)]
-    [string]$version,
-    
-    # name of the output folder
-    [Parameter(Mandatory=$true)]
-    [string]$outfolder
+    [string]$version
 )
 Write-Output "Azure DevOps Migration Tools (Documentation) Build"
 Write-Output "----------------------------------------"

@@ -263,11 +263,10 @@ stages:
         versionSpec: '>= 2.5'
         addToPath: true
     - task: PowerShell@2
-      displayName: Create GitHub Release
-      enabled: false
+      displayName: Compile Docs
       inputs:
         filePath: '.\build\buildDocs.ps1'
-        arguments: '-version $(GitVersion.SemVer) -artifactFolder "$(System.ArtifactsDirectory)" -releaseTag $(releaseTag) -GH_TOKEN $(GH_TOKEN)' 
+        arguments: '-version $(GitVersion.SemVer)' 
     - task: CopyFiles@2
       condition: succeeded()
       displayName: 'Copy Files to: $(Build.ArtifactStagingDirectory)'
