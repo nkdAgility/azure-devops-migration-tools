@@ -96,7 +96,7 @@ stages:
       runRelease: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.runRelease'] ]
       GitVersion.SemVer: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.SemVer'] ]
       GitVersion.PreReleaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.PreReleaseTag'] ]
-      isPreRelease: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.VersionOut.isPreRelease'] ]
+      isPreRelease: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.isPreRelease'] ]
     steps:
     - task: PowerShell@2
       displayName: Read Variables
@@ -301,7 +301,7 @@ stages:
       runRelease: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.runRelease'] ]
       GitVersion.SemVer: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.SemVer'] ]
       GitVersion.PreReleaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.PreReleaseTag'] ]
-      isPreRelease: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.VersionOut.isPreRelease'] ]
+      isPreRelease: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.isPreRelease'] ]
     steps:
     - task: DownloadBuildArtifacts@1
       inputs:
