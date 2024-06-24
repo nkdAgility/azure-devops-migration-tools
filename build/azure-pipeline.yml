@@ -16,6 +16,7 @@ name: $(GITVERSION_SemVer)
 variables:
   isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]
   skipCompileTest: false
+  buildDocs: false
 
 # Versioning of repo
 
@@ -125,6 +126,7 @@ stages:
       GitVersion.SemVer: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.SemVer'] ]
       GitVersion.AssemblySemVer: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.AssemblySemVer'] ]
       GitVersion.InformationalVersion: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.InformationalVersion'] ]
+      GitVersion.NuGetVersion: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.NuGetVersion'] ]
     steps:
     - task: SonarCloudPrepare@2
       inputs:
@@ -189,12 +191,7 @@ stages:
       displayName: "Packaging (Chocolatey)"
       inputs:
         filePath: '.\build\packageChocolatey.ps1'
-        arguments: '-version $(GitVersion.SemVer) -outfolder "$(Build.ArtifactStagingDirectory)"' 
-    - task: PowerShell@2
-      displayName: "Packaging (Nuget)"
-      inputs:
-        filePath: '.\build\packageNuget.ps1'
-        arguments: '-version $(GitVersion.SemVer) -outfolder "$(Build.ArtifactStagingDirectory)"' 
+        arguments: '-SemVer $(GitVersion.SemVer) -NuGetVersion $(GitVersion.NuGetVersion) -outfolder "$(Build.ArtifactStagingDirectory)"' 
     - task: PowerShell@2
       displayName: "Packaging (Winget)"
       inputs:
@@ -244,6 +241,46 @@ stages:
           ArtifactName: 'drop'
           publishLocation: 'Container'
 
+# Docs Build
+- stage: DocsBuildStage
+  displayName: 'Docs Build Stage'
+  dependsOn: 
+   - SetupStage
+  condition:  and(succeeded(), eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.runRelease'], true), eq(variables['buildDocs'], true))
+  jobs:
+  - job: JekyllBuildJob
+    pool:
+      vmImage: 'windows-latest'
+    variables:
+      environmentName: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.environmentName'] ]
+      releaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.releaseTag'] ]
+      runRelease: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.runRelease'] ]
+      GitVersion.SemVer: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.SemVer'] ]
+      GitVersion.PreReleaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.PreReleaseTag'] ]
+      isPreRelease: $[ ne(dependencies.SetupStage.outputs['ConfigJob.VersionOut.releaseTag'], '') ]
+    steps:
+    - task: UseRubyVersion@0
+      inputs:
+        versionSpec: '>= 3.0.7'
+        addToPath: true
+    - task: PowerShell@2
+      displayName: Compile Docs
+      inputs:
+        filePath: '.\build\buildDocs.ps1'
+        arguments: '-version $(GitVersion.SemVer)' 
+    - task: CopyFiles@2
+      condition: succeeded()
+      displayName: 'Copy Files to: $(Build.ArtifactStagingDirectory)'
+      inputs:
+        SourceFolder: '_site'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)'
+    - task: PublishBuildArtifacts@1
+      condition: succeeded()
+      inputs:
+        pathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        artifactName: site
+
+
 # Release to GitHub Releases
 - stage: GitHubReleaseStage
   displayName: 'GitHub Release Stage'
@@ -261,6 +298,7 @@ stages:
       runRelease: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.runRelease'] ]
       GitVersion.SemVer: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.SemVer'] ]
       GitVersion.PreReleaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.PreReleaseTag'] ]
+      isPreRelease: $[ ne(dependencies.SetupStage.outputs['ConfigJob.VersionOut.releaseTag'], '') ]
     steps:
     - task: DownloadBuildArtifacts@1
       inputs:
@@ -306,6 +344,7 @@ stages:
           $(System.ArtifactsDirectory)/drop/*.vsix
           $(System.ArtifactsDirectory)/drop/*.nupkg
         changeLogType: issueBased
+        isPreRelease: $(isPreRelease)
 
     - task: PowerShell@2
       displayName: Create GitHub Release
@@ -410,5 +449,33 @@ stages:
       displayName: Create GitHub Release
       inputs:
         filePath: '.\build\releaseWingetPackage.ps1'
-        arguments: '-version $(GitVersion.NuGetVersion) -releaseTag $(releaseTag) -GH_TOKEN $(GH_TOKEN)' 
+        arguments: '-version $(GitVersion.SemVer) -releaseTag $(releaseTag) -GH_TOKEN $(GH_TOKEN)' 
+         
+# Documentation release Stage
+- stage: DocsReleaseStage
+  displayName: 'Docs Release Stage'
+  dependsOn: 
+   - GitHubReleaseStage
+   - DocsBuildStage
+   - SetupStage
+  condition:  and(succeeded(), or(eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.releaseTag'], 'Release'), eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.releaseTag'], 'Preview')))
+  jobs:
+  - job: DocsReleaseJob
+    pool:
+      vmImage: 'windows-latest'
+    variables:
+      environmentName: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.environmentName'] ]
+      releaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.releaseTag'] ]
+      runRelease: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.runRelease'] ]
+      GitVersion.SemVer: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.SemVer'] ]
+      GitVersion.PreReleaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.PreReleaseTag'] ]
+    steps:
+    - task: DownloadBuildArtifacts@1
+      inputs:
+        buildType: 'current'
+        downloadType: 'single'
+        artifactName: 'site'
+        downloadPath: '$(System.ArtifactsDirectory)'
+    - script: |
+        "Hi!"
          
