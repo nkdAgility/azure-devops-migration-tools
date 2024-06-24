@@ -6,8 +6,6 @@
 trigger:
 - main
 - releases/*
-- fixes/*
-- features/*
 
 pr:
 - main
