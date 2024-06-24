@@ -241,7 +241,7 @@ stages:
           publishLocation: 'Container'
 
 # Jekyll Build
-- stage: Jekyll Build Stage
+- stage: JekyllBuildStage
   displayName: 'Jekyll Build Stage'
   dependsOn: 
    - SetupStage
