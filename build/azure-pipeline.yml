@@ -260,7 +260,7 @@ stages:
     steps:
     - task: UseRubyVersion@0
       inputs:
-        versionSpec: '>= 2.5'
+        versionSpec: '>= 3.0.7'
         addToPath: true
     - task: PowerShell@2
       displayName: Compile Docs
