@@ -125,6 +125,7 @@ stages:
       GitVersion.SemVer: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.SemVer'] ]
       GitVersion.AssemblySemVer: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.AssemblySemVer'] ]
       GitVersion.InformationalVersion: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.InformationalVersion'] ]
+      GitVersion.NuGetVersion: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.NuGetVersion'] ]
     steps:
     - task: SonarCloudPrepare@2
       inputs:
@@ -189,12 +190,7 @@ stages:
       displayName: "Packaging (Chocolatey)"
       inputs:
         filePath: '.\build\packageChocolatey.ps1'
-        arguments: '-version $(GitVersion.SemVer) -outfolder "$(Build.ArtifactStagingDirectory)"' 
-    - task: PowerShell@2
-      displayName: "Packaging (Nuget)"
-      inputs:
-        filePath: '.\build\packageNuget.ps1'
-        arguments: '-version $(GitVersion.SemVer) -outfolder "$(Build.ArtifactStagingDirectory)"' 
+        arguments: '-version $(GitVersion.NuGetVersion) -outfolder "$(Build.ArtifactStagingDirectory)"' 
     - task: PowerShell@2
       displayName: "Packaging (Winget)"
       inputs:
