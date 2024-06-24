@@ -110,7 +110,7 @@ stages:
           Write-Host "GitVersion.PreReleaseTag: $(GitVersion.PreReleaseTag)"
           Write-Host "isPreRelease: $(isPreRelease)"
           Write-Host "buildDocs: $(buildDocs)"
-          Write-Host "skipCompileTest: $(skipCompileTest)
+          Write-Host "skipCompileTest: $(skipCompileTest)"
 
 
 # Build, Test and Package
