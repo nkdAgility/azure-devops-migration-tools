@@ -245,7 +245,7 @@ stages:
   displayName: 'Jekyll Build Stage'
   dependsOn: 
    - SetupStage
-  condition:  and(succeeded(), eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.runRelease'], true))
+  condition:  succeeded()
   jobs:
   - job: JekyllBuildJob
     pool:
