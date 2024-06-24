@@ -455,7 +455,7 @@ stages:
   displayName: 'Docs Release Stage'
   dependsOn: 
    - GitHubReleaseStage
-   - JekyllBuildStage
+   - DocsBuildStage
    - SetupStage
   condition:  and(succeeded(), or(eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.releaseTag'], 'Release'), eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.releaseTag'], 'Preview')))
   jobs:
