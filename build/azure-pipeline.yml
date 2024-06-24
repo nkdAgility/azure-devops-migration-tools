@@ -246,8 +246,6 @@ stages:
   dependsOn: 
    - SetupStage
   condition:  succeeded()
-  continueOnError: true
-
   jobs:
   - job: JekyllBuildJob
     pool:
@@ -264,26 +262,27 @@ stages:
       inputs:
         versionSpec: '>= 2.5'
         addToPath: true
-
     - script: |
         gem update --system
         gem install jekyll bundler
         bundle install --retry=3 --jobs=4
       displayName: 'bundle install'
+      continueOnError: true
     - script: |
         bundle install
         jekyll build
       displayName: 'jekyll'
     - task: CopyFiles@2
+      condition: succeeded()
       displayName: 'Copy Files to: $(Build.ArtifactStagingDirectory)'
       inputs:
         SourceFolder: '_site'
         TargetFolder: '$(Build.ArtifactStagingDirectory)'
     - task: PublishBuildArtifacts@1
+      condition: succeeded()
       inputs:
         pathtoPublish: '$(Build.ArtifactStagingDirectory)'
         artifactName: site
-
 # Release to GitHub Releases
 - stage: GitHubReleaseStage
   displayName: 'GitHub Release Stage'
