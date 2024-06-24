@@ -51,6 +51,7 @@ stages:
           Write-Host "##vso[task.setvariable variable=environmentName;isoutput=true]AzureDevOpsMigrationTools-Dev"
           Write-Host "##vso[task.setvariable variable=releaseTag;isoutput=true]Dev"
           Write-Host "##vso[task.setvariable variable=runRelease;isoutput=true]false"
+          Write-Host "##vso[task.setvariable variable=isPreRelease;isoutput=true]true"
 
           if ("$(GitVersion.PreReleaseTag)" -eq "")
           {
@@ -58,6 +59,7 @@ stages:
             Write-Host "##vso[task.setvariable variable=environmentName;isoutput=true]AzureDevOpsMigrationTools-Release"
             Write-Host "##vso[task.setvariable variable=releaseTag;isoutput=true]Release"
             Write-Host "##vso[task.setvariable variable=runRelease;isoutput=true]true"
+            Write-Host "##vso[task.setvariable variable=isPreRelease;isoutput=true]false"
           }
           if ("$(GitVersion.PreReleaseLabel)" -contains "Preview")
           {
@@ -65,6 +67,7 @@ stages:
             Write-Host "##vso[task.setvariable variable=environmmentName;isoutput=true]AzureDevOpsMigrationTools-Preview"
             Write-Host "##vso[task.setvariable variable=releaseTag;isoutput=true]Preview"
             Write-Host "##vso[task.setvariable variable=runRelease;isoutput=true]true"
+            Write-Host "##vso[task.setvariable variable=isPreRelease;isoutput=true]true"
           }
           Write-Host "##vso[build.addbuildtag]$releaseTag"
 
@@ -93,6 +96,7 @@ stages:
       runRelease: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.runRelease'] ]
       GitVersion.SemVer: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.SemVer'] ]
       GitVersion.PreReleaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.PreReleaseTag'] ]
+      isPreRelease: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.isPreRelease'] ]
     steps:
     - task: PowerShell@2
       displayName: Read Variables
@@ -104,6 +108,9 @@ stages:
           Write-Host "runRelease: $(runRelease)"
           Write-Host "GitVersion.SemVer: $(GitVersion.SemVer)"
           Write-Host "GitVersion.PreReleaseTag: $(GitVersion.PreReleaseTag)"
+          Write-Host "isPreRelease: $(isPreRelease)"
+          Write-Host "buildDocs: $(buildDocs)"
+          Write-Host "skipCompileTest: $(skipCompileTest)"
 
 
 # Build, Test and Package
@@ -257,7 +264,6 @@ stages:
       runRelease: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.runRelease'] ]
       GitVersion.SemVer: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.SemVer'] ]
       GitVersion.PreReleaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.PreReleaseTag'] ]
-      isPreRelease: $[ ne(dependencies.SetupStage.outputs['ConfigJob.VersionOut.releaseTag'], '') ]
     steps:
     - task: UseRubyVersion@0
       inputs:
@@ -298,7 +304,7 @@ stages:
       runRelease: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.runRelease'] ]
       GitVersion.SemVer: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.SemVer'] ]
       GitVersion.PreReleaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.PreReleaseTag'] ]
-      isPreRelease: $[ ne(dependencies.SetupStage.outputs['ConfigJob.VersionOut.releaseTag'], '') ]
+      isPreRelease: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.isPreRelease'] ]
     steps:
     - task: DownloadBuildArtifacts@1
       inputs:
