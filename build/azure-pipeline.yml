@@ -240,11 +240,12 @@ stages:
           ArtifactName: 'drop'
           publishLocation: 'Container'
 
-# Jekyll Build
-- stage: JekyllBuildStage
-  displayName: 'Jekyll Build Stage'
+# Docs Build
+- stage: DocsBuildStage
+  displayName: 'Docs Build Stage'
   dependsOn: 
    - SetupStage
+   - BuildStage
   condition:  succeeded()
   jobs:
   - job: JekyllBuildJob
@@ -258,6 +259,9 @@ stages:
       GitVersion.PreReleaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.PreReleaseTag'] ]
       isPreRelease: $[ ne(dependencies.SetupStage.outputs['ConfigJob.VersionOut.releaseTag'], '') ]
     steps:
+    - task: UseRubyVersion@0
+      inputs:
+        versionSpec: '>= 2.5'
     - script: |
         gem install jekyll bundler
         bundle install --retry=3 --jobs=4
@@ -445,4 +449,32 @@ stages:
       inputs:
         filePath: '.\build\releaseWingetPackage.ps1'
         arguments: '-version $(GitVersion.SemVer) -releaseTag $(releaseTag) -GH_TOKEN $(GH_TOKEN)' 
+         
+# Documentation release Stage
+- stage: DocsReleaseStage
+  displayName: 'Docs Release Stage'
+  dependsOn: 
+   - GitHubReleaseStage
+   - JekyllBuildStage
+   - SetupStage
+  condition:  and(succeeded(), or(eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.releaseTag'], 'Release'), eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.releaseTag'], 'Preview')))
+  jobs:
+  - job: DocsReleaseJob
+    pool:
+      vmImage: 'windows-latest'
+    variables:
+      environmentName: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.environmentName'] ]
+      releaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.releaseTag'] ]
+      runRelease: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.runRelease'] ]
+      GitVersion.SemVer: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.SemVer'] ]
+      GitVersion.PreReleaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.PreReleaseTag'] ]
+    steps:
+    - task: DownloadBuildArtifacts@1
+      inputs:
+        buildType: 'current'
+        downloadType: 'single'
+        artifactName: 'site'
+        downloadPath: '$(System.ArtifactsDirectory)'
+    - script: |
+        "Hi!"
          
