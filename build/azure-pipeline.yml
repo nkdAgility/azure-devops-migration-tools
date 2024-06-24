@@ -246,7 +246,7 @@ stages:
   displayName: 'Docs Build Stage'
   dependsOn: 
    - SetupStage
-  condition:  and(succeeded(), eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.runRelease'], true), eq(variables['buildDocs'], true)
+  condition:  and(succeeded(), eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.runRelease'], true), eq(variables['buildDocs'], true))
   jobs:
   - job: JekyllBuildJob
     pool:
