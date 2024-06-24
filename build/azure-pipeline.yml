@@ -240,6 +240,42 @@ stages:
           ArtifactName: 'drop'
           publishLocation: 'Container'
 
+# Jekyll Build
+- stage: Jekyll Build Stage
+  displayName: 'Jekyll Build Stage'
+  dependsOn: 
+   - SetupStage
+  condition:  and(succeeded(), eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.runRelease'], true))
+  jobs:
+  - job: JekyllBuildJob
+    pool:
+      vmImage: 'windows-latest'
+    variables:
+      environmentName: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.environmentName'] ]
+      releaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.releaseTag'] ]
+      runRelease: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.runRelease'] ]
+      GitVersion.SemVer: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.SemVer'] ]
+      GitVersion.PreReleaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.PreReleaseTag'] ]
+      isPreRelease: $[ ne(dependencies.SetupStage.outputs['ConfigJob.VersionOut.releaseTag'], '') ]
+    steps:
+    - script: |
+        gem install jekyll bundler
+        bundle install --retry=3 --jobs=4
+      displayName: 'bundle install'
+    - script: |
+        bundle install
+        jekyll build
+      displayName: 'jekyll'
+    - task: CopyFiles@2
+      displayName: 'Copy Files to: $(Build.ArtifactStagingDirectory)'
+      inputs:
+        SourceFolder: '_site'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)'
+    - task: PublishBuildArtifacts@1
+      inputs:
+        pathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        artifactName: site
+
 # Release to GitHub Releases
 - stage: GitHubReleaseStage
   displayName: 'GitHub Release Stage'
