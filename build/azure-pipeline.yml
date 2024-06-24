@@ -16,7 +16,7 @@ name: $(GITVERSION_SemVer)
 variables:
   isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]
   skipCompileTest: false
-  buildDocs: $(buildDocs)
+  buildDocs: false
 
 # Versioning of repo
 
@@ -109,6 +109,9 @@ stages:
           Write-Host "GitVersion.SemVer: $(GitVersion.SemVer)"
           Write-Host "GitVersion.PreReleaseTag: $(GitVersion.PreReleaseTag)"
           Write-Host "isPreRelease: $(isPreRelease)"
+          Write-Host "buildDocs: $(buildDocs)"
+          Write-Host "skipCompileTest: $(skipCompileTest)
+
 
 # Build, Test and Package
 - stage: BuildStage
