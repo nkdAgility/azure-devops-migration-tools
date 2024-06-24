@@ -257,6 +257,7 @@ stages:
       runRelease: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.runRelease'] ]
       GitVersion.SemVer: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.SemVer'] ]
       GitVersion.PreReleaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.PreReleaseTag'] ]
+      isPreRelease: $[ ne(dependencies.SetupStage.outputs['ConfigJob.VersionOut.releaseTag'], '') ]
     steps:
     - task: DownloadBuildArtifacts@1
       inputs:
@@ -302,6 +303,7 @@ stages:
           $(System.ArtifactsDirectory)/drop/*.vsix
           $(System.ArtifactsDirectory)/drop/*.nupkg
         changeLogType: issueBased
+        isPreRelease: $(isPreRelease)
 
     - task: PowerShell@2
       displayName: Create GitHub Release
