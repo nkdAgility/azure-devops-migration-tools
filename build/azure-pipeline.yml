@@ -406,5 +406,5 @@ stages:
       displayName: Create GitHub Release
       inputs:
         filePath: '.\build\releaseWingetPackage.ps1'
-        arguments: '-version $(GitVersion.NuGetVersion) -releaseTag $(releaseTag) -GH_TOKEN $(GH_TOKEN)' 
+        arguments: '-version $(GitVersion.SemVer) -releaseTag $(releaseTag) -GH_TOKEN $(GH_TOKEN)' 
          
