@@ -6,7 +6,11 @@
 param (
     # height of largest column without top bar
     [Parameter(Mandatory=$true)]
-    [string]$version,
+    [string]$SemVer,
+
+     # height of largest column without top bar
+     [Parameter(Mandatory=$true)]
+     [string]$NuGetVersion,
     
     # name of the output folder
     [Parameter(Mandatory=$true)]
@@ -14,9 +18,10 @@ param (
 )
 Write-Output "Azure DevOps Migration Tools (Chocolatey) Packaging"
 Write-Output "----------------------------------------"
-Write-Output "Version: $version"
+Write-Output "SemVer: $SemVer"
+Write-Output "NuGetVersion: $NuGetVersion"
 Write-Output "Output Folder: $outfolder"
-$MigrationToolsFilename = "MigrationTools-$version.zip"
+$MigrationToolsFilename = "MigrationTools-$SemVer.zip"
 Write-Output "MigrationTools Filename: $MigrationToolsFilename"
 
 # create hash
@@ -26,8 +31,8 @@ $obj = @{
     "Hash" = $($ZipHash.Hash)
     "FullHash" = $ZipHash
     }
-$hashSaveFile = "$outfolder\MigrationTools-$($versionInfo.SemVer).txt"
-$obj | ConvertTo-Json |  Set-Content -Path "$outfolder\MigrationTools-$version-hash.txt"
+$hashSaveFile = "$outfolder\MigrationTools-$SemVer.hash.txt"
+$obj | ConvertTo-Json |  Set-Content -Path $hashSaveFile
 Write-Output "Hash saved to $hashSaveFile"
 
 #-------------------------------------------
@@ -38,7 +43,7 @@ $files = Get-ChildItem -Path $tokens -Recurse -Exclude "output"
 Write-Output "Found $($files.Count) files that might have tokens"
 
 $hash = @{ 
-    "#{GITVERSION.SEMVER}#" = $version; 
+    "#{GITVERSION.SEMVER}#" = $SemVer; 
     "#{Chocolatey.FileHash}#" = $obj.Hash;
 }
 $hash
@@ -67,6 +72,7 @@ Write-Output "--------------"
 
 #-------------------------------------------
 # Build Chocolatey Package
-Write-Output "Build Chocolatey Package with version [$version]"
-choco pack src/MigrationTools.Chocolatey/nkdAgility.AzureDevOpsMigrationTools.nuspec --version $version configuration=release --outputdirectory $outfolder
+Write-Output "Build Chocolatey Package with version [$NuGetVersion]"
+
+choco pack src/MigrationTools.Chocolatey/nkdAgility.AzureDevOpsMigrationTools.nuspec --version $NuGetVersion configuration=release --outputdirectory $outfolder
 #-------------------------------------------
