@@ -16,6 +16,7 @@ name: $(GITVERSION_SemVer)
 variables:
   isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]
   skipCompileTest: false
+  buildDocs: false
 
 # Versioning of repo
 
@@ -245,8 +246,7 @@ stages:
   displayName: 'Docs Build Stage'
   dependsOn: 
    - SetupStage
-  condition:  and(succeeded(), eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.runRelease'], true))
-  enabled: false
+  condition:  and(succeeded(), eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.runRelease'], true), eq(variables['buildDocs'], true)
   jobs:
   - job: JekyllBuildJob
     pool:
