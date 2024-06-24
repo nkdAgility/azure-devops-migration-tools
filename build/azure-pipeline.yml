@@ -262,16 +262,12 @@ stages:
       inputs:
         versionSpec: '>= 2.5'
         addToPath: true
-    - script: |
-        gem update --system
-        gem install jekyll bundler
-        bundle install --retry=3 --jobs=4
-      displayName: 'bundle install'
-      continueOnError: true
-    - script: |
-        bundle install
-        bundle exec jekyll build
-      displayName: 'jekyll'
+    - task: PowerShell@2
+      displayName: Create GitHub Release
+      enabled: false
+      inputs:
+        filePath: '.\build\buildDocs.ps1'
+        arguments: '-version $(GitVersion.SemVer) -artifactFolder "$(System.ArtifactsDirectory)" -releaseTag $(releaseTag) -GH_TOKEN $(GH_TOKEN)' 
     - task: CopyFiles@2
       condition: succeeded()
       displayName: 'Copy Files to: $(Build.ArtifactStagingDirectory)'
