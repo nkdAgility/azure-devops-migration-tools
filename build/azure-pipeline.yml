@@ -365,6 +365,7 @@ stages:
       releaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.releaseTag'] ]
       runRelease: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.runRelease'] ]
       GitVersion.SemVer: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.SemVer'] ]
+      GitVersion.NuGetVersion: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.NuGetVersion'] ]
       GitVersion.PreReleaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.PreReleaseTag'] ]
     steps:
     - task: DownloadBuildArtifacts@1
@@ -409,5 +410,5 @@ stages:
       displayName: Create GitHub Release
       inputs:
         filePath: '.\build\releaseWingetPackage.ps1'
-        arguments: '-version $(GitVersion.SemVer) -releaseTag $(releaseTag) -GH_TOKEN $(GH_TOKEN)' 
+        arguments: '-version $(GitVersion.NuGetVersion) -releaseTag $(releaseTag) -GH_TOKEN $(GH_TOKEN)' 
          

@@ -31,14 +31,14 @@ $installURL = "https://github.com/nkdAgility/azure-devops-migration-tools/releas
 
 Write-Host $"##[warning] $installURL"
 
-
 $wigetPackageId = "nkdAgility.AzureDevOpsMigrationTools"
 
-if ($(releaseTag) -eq "Preview")
+if ($releaseTag -eq "Preview")
 {
   $wigetPackageId = "$wigetPackageId.Preview"
 }
 Write-Host "Winget Create with $wigetPackageId"
+
 ./wingetcreate.exe update --submit --token $GH_TOKEN --urls $installURL --version $version $wigetPackageId
 
 Write-Host "Deployed : $wigetPackageId"
