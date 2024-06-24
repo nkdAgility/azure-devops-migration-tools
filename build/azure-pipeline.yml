@@ -245,7 +245,6 @@ stages:
   displayName: 'Docs Build Stage'
   dependsOn: 
    - SetupStage
-   - BuildStage
   condition:  succeeded()
   jobs:
   - job: JekyllBuildJob
