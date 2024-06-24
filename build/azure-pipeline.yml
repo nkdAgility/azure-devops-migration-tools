@@ -190,7 +190,7 @@ stages:
       displayName: "Packaging (Chocolatey)"
       inputs:
         filePath: '.\build\packageChocolatey.ps1'
-        arguments: '-version $(GitVersion.NuGetVersion) -outfolder "$(Build.ArtifactStagingDirectory)"' 
+        arguments: '-SemVer $(GitVersion.SemVer) -NuGetVersion $(GitVersion.NuGetVersion) -outfolder "$(Build.ArtifactStagingDirectory)"' 
     - task: PowerShell@2
       displayName: "Packaging (Winget)"
       inputs:
