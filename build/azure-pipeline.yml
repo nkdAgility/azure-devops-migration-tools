@@ -246,6 +246,8 @@ stages:
   dependsOn: 
    - SetupStage
   condition:  succeeded()
+  continueOnError: true
+
   jobs:
   - job: JekyllBuildJob
     pool:
@@ -261,7 +263,10 @@ stages:
     - task: UseRubyVersion@0
       inputs:
         versionSpec: '>= 2.5'
+        addToPath: true
+
     - script: |
+        gem update --system
         gem install jekyll bundler
         bundle install --retry=3 --jobs=4
       displayName: 'bundle install'
