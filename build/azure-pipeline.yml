@@ -283,8 +283,9 @@ stages:
     - task: replacetokens@6
       inputs:
         sources: |
-          *.md
-          *.html
+          **/*.md
+          **/*.html
+          /docs/_includes/header.html
         addBOM: true
         ifNoFilesFound: error
 
