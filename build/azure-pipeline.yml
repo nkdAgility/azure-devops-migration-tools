@@ -279,8 +279,12 @@ stages:
           
     - task: replacetokens@6
       inputs:
-        sources: '**\*.md;**\*.html'
+        sources: |
+          **\*.md
+          **\*.html
         addBOM: true
+        ifNoFilesFound: error
+
     - script: |
         gem install jekyll bundler
         bundle install --retry=3 --jobs=4
