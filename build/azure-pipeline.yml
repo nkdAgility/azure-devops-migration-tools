@@ -275,13 +275,16 @@ stages:
         script: |
           Write-Host "DefaultWorkingDirectory: $(System.DefaultWorkingDirectory)"
           Write-Host "ArtifactStagingDirectory: $(Build.ArtifactStagingDirectory)"
-          Get-ChildItem -Path .\ -Recurse -Directory | Select-Object FullName
+          Write-Host "Find all: *.md"
+          Get-ChildItem -Path *.md -Recurse -File | Select-Object FullName
+          Write-Host "Find all: *.html"
+          Get-ChildItem -Path *.html -Recurse -File | Select-Object FullName
           
     - task: replacetokens@6
       inputs:
         sources: |
-          **\*.md
-          **\*.html
+          *.md
+          *.html
         addBOM: true
         ifNoFilesFound: error
 
