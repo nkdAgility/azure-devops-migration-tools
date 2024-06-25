@@ -482,6 +482,7 @@ stages:
       runRelease: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.runRelease'] ]
       GitVersion.SemVer: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.SemVer'] ]
       GitVersion.PreReleaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.PreReleaseTag'] ]
+      isPreRelease: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.isPreRelease'] ]
     steps:
     - task: DownloadBuildArtifacts@1
       inputs:
@@ -489,6 +490,30 @@ stages:
         downloadType: 'single'
         artifactName: 'site'
         downloadPath: '$(System.ArtifactsDirectory)'
-    - script: |
-        "Hi!"
+    - task: PowerShell@2
+      displayName: Create fake build assets
+      name: SetRemoteDirectory
+      inputs:
+        targetType: 'inline'
+        script: |
+          $remoteDirectory = "./azure-devops-migration-tools/"
+          if ($isPreRelease -eq $true)
+          {
+            $remoteDirectory = "./azure-devops-migration-tools/preview/"
+          }
+          Write-Host "Remote Path: $remoteDirectory"
+          Write-Host "##vso[task.setvariable variable=remoteDirectory;isOutput=true]$remoteDirectory"
+    - task: FtpUpload@2
+      inputs:
+        credentialsOption: 'inputs'
+        serverUrl: 'ftps://nakedalmweb.sftp.wpengine.com:2222'
+        username: 'nakedalmweb-learn'
+        password: '$(SFTP_PASSWORD)'
+        rootDirectory: '$(System.ArtifactsDirectory)\site'
+        filePatterns: '**'
+        remoteDirectory: $(SetRemoteDirectory.remoteDirectory)
+        clean: false
+        cleanContents: false
+        preservePaths: true
+        trustSSL: false
          
