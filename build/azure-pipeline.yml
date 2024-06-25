@@ -281,7 +281,7 @@ stages:
           Write-Host "Find all: *.html"
           Get-ChildItem -Path *.html -Recurse -File | Select-Object FullName
     - task: replacetokens@6
-      name: replace-tokens
+      name: ReplaceTokens
       inputs:
         sources: |
           **/*.md
@@ -295,11 +295,11 @@ stages:
         targetType: 'inline'
         script: |
           Write-Host "DefaultWorkingDirectory: $(System.DefaultWorkingDirectory)"
-          Write-Host  "defaults  : $(replace-tokens.defaults }}"
-          Write-Host  "files     : $(replace-tokens.files }}"
-          Write-Host  "replaced  : $(replace-tokens.replaced }}"
-          Write-Host  "tokens    : $(replace-tokens.tokens }}"
-          Write-Host  "transforms: $(replace-tokens.transforms }}
+          Write-Host  "defaults  : $(ReplaceTokens.defaults }}"
+          Write-Host  "files     : $(ReplaceTokens.files }}"
+          Write-Host  "replaced  : $(ReplaceTokens.replaced }}"
+          Write-Host  "tokens    : $(ReplaceTokens.tokens }}"
+          Write-Host  "transforms: $(ReplaceTokens.transforms }}
     - script: |
         gem install jekyll bundler
         bundle install --retry=3 --jobs=4
