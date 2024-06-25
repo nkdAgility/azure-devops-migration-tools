@@ -268,6 +268,15 @@ stages:
       inputs:
         versionSpec: '>= 3.0.7'
         addToPath: true
+    - task: PowerShell@2
+      displayName: Folders
+      inputs:
+        targetType: 'inline'
+        script: |
+          Write-Host "DefaultWorkingDirectory: $(System.DefaultWorkingDirectory)"
+          Write-Host "ArtifactStagingDirectory: $(Build.ArtifactStagingDirectory)"
+          Get-ChildItem -Path .\ -Recurse -Directory | Select-Object FullName
+          
     - task: replacetokens@6
       inputs:
         sources: '**\*.md;**\*.html'
