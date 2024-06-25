@@ -75,4 +75,5 @@ Write-Output "--------------"
 Write-Output "Build Chocolatey Package with version [$NuGetVersion]"
 
 choco pack src/MigrationTools.Chocolatey/nkdAgility.AzureDevOpsMigrationTools.nuspec --version $NuGetVersion configuration=release --outputdirectory $outfolder
+
 #-------------------------------------------
