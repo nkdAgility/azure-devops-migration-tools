@@ -256,7 +256,7 @@ stages:
   jobs:
   - job: JekyllBuildJob
     pool:
-      vmImage: 'windows-latest'
+      vmImage: 'ubuntu-latest'
     variables:
       environmentName: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.environmentName'] ]
       releaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.releaseTag'] ]
@@ -268,11 +268,14 @@ stages:
       inputs:
         versionSpec: '>= 3.0.7'
         addToPath: true
-    - task: PowerShell@2
-      displayName: Compile Docs
-      inputs:
-        filePath: '.\build\buildDocs.ps1'
-        arguments: '-version $(GitVersion.SemVer)' 
+    - script: |
+        gem install jekyll bundler
+        bundle install --retry=3 --jobs=4
+      displayName: 'bundle install'
+    - script: |
+        bundle install
+        jekyll build
+      displayName: 'jekyll'
     - task: CopyFiles@2
       condition: succeeded()
       displayName: 'Copy Files to: $(Build.ArtifactStagingDirectory)'
