@@ -268,13 +268,19 @@ stages:
       inputs:
         versionSpec: '>= 3.0.7'
         addToPath: true
+    - task: PowerShell@2
+      displayName: Update Files
+      inputs:
+        targetType: 'inline'
+        script: |
+          Write-Host "Hi from PowerShell"
     - script: |
         gem install jekyll bundler
         bundle install --retry=3 --jobs=4
       displayName: 'bundle install'
     - script: |
         bundle install
-        jekyll build
+        bundle exec jekyll build
       displayName: 'jekyll'
     - task: CopyFiles@2
       condition: succeeded()

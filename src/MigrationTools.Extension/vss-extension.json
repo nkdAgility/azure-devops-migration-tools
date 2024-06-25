@@ -55,14 +55,9 @@
   },
   "badges": [
     {
-      "href": "https://dev.azure.com/nkdagility/migration-tools/_build/index?path=%5C&definitionId=94",
-      "uri": "https://dev.azure.com/nkdagility/migration-tools/_apis/build/status/vsts-sync-migration",
+      "href": "https://dev.azure.com/nkdagility/AzureDevOps-Tools/_apis/build/status%2FMigrationTools-CIv2?branchName=main",
+      "uri": "https://dev.azure.com/nkdagility/AzureDevOps-Tools/_build?definitionId=115",
       "description": "Azure Pipline CI for this project"
-    },
-    {
-      "href": "https://dev.azure.com/nkdagility/migration-tools/_releases2?definitionId=6",
-      "uri": "https://vsrm.dev.azure.com/nkdagility/_apis/public/Release/badge/1b52ce63-eccc-41c8-88f9-ae6ebeefdc63/6/11",
-      "description": "Azure Pipeline CD for the project"
     },
     {
       "href": "https://sonarcloud.io/dashboard?id=vsts-sync-migrator%3Amaster",
