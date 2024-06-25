@@ -288,7 +288,7 @@ stages:
           **/*.html
           /docs/_includes/header.html
         additionalVariables: |
-          - GitVersion.SemVer: '${{ GitVersion.SemVer }}'
+          - GitVersion.SemVer: '$(GitVersion.SemVer)'
         addBOM: true
         ifNoFilesFound: error
     - task: PowerShell@2
