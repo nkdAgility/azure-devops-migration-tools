@@ -300,7 +300,7 @@ stages:
           Write-Host  "files     : $(ReplaceTokens.files)"
           Write-Host  "replaced  : $(ReplaceTokens.replaced)"
           Write-Host  "tokens    : $(ReplaceTokens.tokens)"
-          Write-Host  "transforms: $(ReplaceTokens.transforms)
+          Write-Host  "transforms: $(ReplaceTokens.transforms)"
     - script: |
         gem install jekyll bundler
         bundle install --retry=3 --jobs=4
