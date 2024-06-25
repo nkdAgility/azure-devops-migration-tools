@@ -272,6 +272,7 @@ stages:
       displayName: Folders
       inputs:
         targetType: 'inline'
+        enabled: $[ eq(variables['System.Debug'], true) ]
         script: |
           Write-Host "DefaultWorkingDirectory: $(System.DefaultWorkingDirectory)"
           Write-Host "ArtifactStagingDirectory: $(Build.ArtifactStagingDirectory)"
@@ -279,8 +280,8 @@ stages:
           Get-ChildItem -Path *.md -Recurse -File | Select-Object FullName
           Write-Host "Find all: *.html"
           Get-ChildItem -Path *.html -Recurse -File | Select-Object FullName
-          
     - task: replacetokens@6
+      name: replace-tokens
       inputs:
         sources: |
           **/*.md
@@ -288,7 +289,17 @@ stages:
           /docs/_includes/header.html
         addBOM: true
         ifNoFilesFound: error
-
+    - task: PowerShell@2
+      displayName: Output
+      inputs:
+        targetType: 'inline'
+        script: |
+          Write-Host "DefaultWorkingDirectory: $(System.DefaultWorkingDirectory)"
+          Write-Host  "defaults  : $(replace-tokens.defaults }}"
+          Write-Host  "files     : $(replace-tokens.files }}"
+          Write-Host  "replaced  : $(replace-tokens.replaced }}"
+          Write-Host  "tokens    : $(replace-tokens.tokens }}"
+          Write-Host  "transforms: $(replace-tokens.transforms }}
     - script: |
         gem install jekyll bundler
         bundle install --retry=3 --jobs=4
