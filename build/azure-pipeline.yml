@@ -268,12 +268,11 @@ stages:
       inputs:
         versionSpec: '>= 3.0.7'
         addToPath: true
-    - task: PowerShell@2
-      displayName: Update Files
+    - task: replacetokens@6
       inputs:
-        targetType: 'inline'
-        script: |
-          Write-Host "Hi from PowerShell"
+        root: '$(System.DefaultWorkingDirectory)'
+        sources: '**\*.md'
+        addBOM: true
     - script: |
         gem install jekyll bundler
         bundle install --retry=3 --jobs=4
