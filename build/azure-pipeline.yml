@@ -291,11 +291,11 @@ stages:
         ifNoFilesFound: error
     - task: PowerShell@2
       displayName: Output
+      continueOnError: true
       inputs:
         targetType: 'inline'
         script: |
           Write-Host "DefaultWorkingDirectory: $(System.DefaultWorkingDirectory)"
-          Write-Host  "tokens    : $(tokens)"
           Write-Host  "defaults  : $(ReplaceTokens.defaults)"
           Write-Host  "files     : $(ReplaceTokens.files)"
           Write-Host  "replaced  : $(ReplaceTokens.replaced)"
