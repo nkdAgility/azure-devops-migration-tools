@@ -295,11 +295,12 @@ stages:
         targetType: 'inline'
         script: |
           Write-Host "DefaultWorkingDirectory: $(System.DefaultWorkingDirectory)"
-          Write-Host  "defaults  : $(ReplaceTokens.defaults }}"
-          Write-Host  "files     : $(ReplaceTokens.files }}"
-          Write-Host  "replaced  : $(ReplaceTokens.replaced }}"
-          Write-Host  "tokens    : $(ReplaceTokens.tokens }}"
-          Write-Host  "transforms: $(ReplaceTokens.transforms }}
+          Write-Host  "tokens    : $(tokens)"
+          Write-Host  "defaults  : $(ReplaceTokens.defaults)"
+          Write-Host  "files     : $(ReplaceTokens.files)"
+          Write-Host  "replaced  : $(ReplaceTokens.replaced)"
+          Write-Host  "tokens    : $(ReplaceTokens.tokens)"
+          Write-Host  "transforms: $(ReplaceTokens.transforms)
     - script: |
         gem install jekyll bundler
         bundle install --retry=3 --jobs=4
