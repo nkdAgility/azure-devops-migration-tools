@@ -28,7 +28,7 @@ stages:
   - job: ConfigJob
     displayName: 'Version job'
     pool:
-      vmImage: 'windows-latest'
+      vmImage: 'ubuntu-latest'
     variables:
       Agent.Source.Git.ShallowFetchDepth: 0
     steps:
@@ -88,7 +88,7 @@ stages:
   - job: LogVariablesJob
     displayName: 'Log Variables Job'
     pool:
-      vmImage: 'windows-latest'
+      vmImage: 'ubuntu-latest'
     variables:
       environmentName: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.environmentName'] ]
       releaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.releaseTag'] ]
