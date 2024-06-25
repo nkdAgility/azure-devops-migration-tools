@@ -16,7 +16,6 @@ name: $(GITVERSION_SemVer)
 variables:
   isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]
   skipCompileTest: false
-  buildDocs: false
 
 # Versioning of repo
 
