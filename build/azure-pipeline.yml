@@ -108,7 +108,10 @@ stages:
           Write-Host "GitVersion.SemVer: $(GitVersion.SemVer)"
           Write-Host "GitVersion.PreReleaseTag: $(GitVersion.PreReleaseTag)"
           Write-Host "isPreRelease: $(isPreRelease)"
-          Write-Host "buildDocs: $(buildDocs)"
+          Write-Host "deployChocolatey: $(deployChocolatey)"
+          Write-Host "deployDocs: $(deployDocs)"
+          Write-Host "deployMarketplace: $(deployMarketplace)"
+          Write-Host "deployWinget: $(deployWinget)"
           Write-Host "skipCompileTest: $(skipCompileTest)"
 
 
@@ -218,7 +221,7 @@ stages:
     displayName: 'Build Simulation Job'
     condition:  and(succeeded(), eq(variables['skipCompileTest'], 'true'))
     pool:
-      vmImage: 'ubuntu-latest'
+      vmImage: 'windows-latest'
       demands:
       - npm
     variables:
@@ -252,7 +255,7 @@ stages:
   displayName: 'Docs Build Stage'
   dependsOn: 
    - SetupStage
-  condition:  and(succeeded(), or(eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.runRelease'], true), eq(variables['buildDocs'], true)))
+  condition:  succeeded()
   jobs:
   - job: JekyllBuildJob
     pool:
@@ -335,7 +338,7 @@ stages:
   jobs:
   - job: GitHubReleaseJob
     pool:
-      vmImage: 'ubuntu-latest'
+      vmImage: 'windows-latest'
     variables:
       environmentName: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.environmentName'] ]
       releaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.releaseTag'] ]
@@ -403,11 +406,11 @@ stages:
   dependsOn: 
    - GitHubReleaseStage
    - SetupStage
-  condition:  and(succeeded(), eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.releaseTag'], 'Release'))
+  condition:  and(succeeded(), or(eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.releaseTag'], 'Release'), eq(variables['deployMarketplace'], true)))
   jobs:
   - job: MarketplaceJob
     pool:
-      vmImage: 'ubuntu-latest'
+      vmImage: 'windows-latest'
     variables:
       environmentName: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.environmentName'] ]
       releaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.releaseTag'] ]
@@ -438,11 +441,11 @@ stages:
   dependsOn: 
    - GitHubReleaseStage
    - SetupStage
-  condition:  and(succeeded(), or(eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.releaseTag'], 'Release'), eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.releaseTag'], 'Preview')))
+  condition:  and(succeeded(), or(eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.runRelease'], true), eq(variables['deployChocolatey'], true)))
   jobs:
   - job: ChocoReleaseJob
     pool:
-      vmImage: 'ubuntu-latest'
+      vmImage: 'windows-latest'
     variables:
       environmentName: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.environmentName'] ]
       releaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.releaseTag'] ]
@@ -471,11 +474,11 @@ stages:
   dependsOn: 
    - GitHubReleaseStage
    - SetupStage
-  condition:  and(succeeded(), or(eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.releaseTag'], 'Release'), eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.releaseTag'], 'Preview')))
+  condition:  and(succeeded(), or(eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.runRelease'], true), eq(variables['deployWinget'], true)))
   jobs:
   - job: WingetReleaseJob
     pool:
-      vmImage: 'ubuntu-latest'
+      vmImage: 'windows-latest'
     variables:
       environmentName: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.environmentName'] ]
       releaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.releaseTag'] ]
@@ -502,11 +505,11 @@ stages:
    - GitHubReleaseStage
    - DocsBuildStage
    - SetupStage
-  condition:  and(succeeded(), or(eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.runRelease'], true), eq(variables['buildDocs'], true)))
+  condition:  and(succeeded(), or(eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.runRelease'], true), eq(variables['deployDocs'], true)))
   jobs:
   - job: DocsReleaseJob
     pool:
-      vmImage: 'ubuntu-latest'
+      vmImage: 'windows-latest'
     variables:
       environmentName: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.environmentName'] ]
       releaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.releaseTag'] ]
@@ -527,22 +530,25 @@ stages:
       inputs:
         targetType: 'inline'
         script: |
-          Write-Host "isPreRelease: $(isPreRelease)"
+          Write-Host "isPreRelease: $isPreRelease"
           $remoteDirectory = "./azure-devops-migration-tools/"
-          if ($(isPreRelease) -eq $true)
+          if ($isPreRelease -eq $true)
           {
             $remoteDirectory = "./azure-devops-migration-tools/preview/"
           }
           Write-Host "Remote Path: $remoteDirectory"
           Write-Host "##vso[task.setvariable variable=remoteDirectory;isOutput=true]$remoteDirectory"
-    - task: CopyFilesOverSSH@0
+    - task: FtpUpload@2
       inputs:
         credentialsOption: 'inputs'
-        sshEndpoint: 'nakedalmweb-learn'
-        sourceFolder: '$(System.ArtifactsDirectory)\site'
-        contents: '**'
-        targetFolder: $(SetRemoteDirectory.remoteDirectory)
-        overwrite: true
-        failOnEmptySource: true
-
+        serverUrl: 'ftps://nakedalmweb.sftp.wpengine.com:2222'
+        username: 'nakedalmweb-learn'
+        password: '$(SFTP_PASSWORD)'
+        rootDirectory: '$(System.ArtifactsDirectory)\site'
+        filePatterns: '**'
+        remoteDirectory: $(SetRemoteDirectory.remoteDirectory)
+        clean: false
+        cleanContents: false
+        preservePaths: true
+        trustSSL: false
          
