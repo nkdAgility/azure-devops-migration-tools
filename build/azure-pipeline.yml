@@ -161,6 +161,8 @@ stages:
       GitVersion.AssemblySemVer: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.AssemblySemVer'] ]
       GitVersion.InformationalVersion: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.InformationalVersion'] ]
       GitVersion.NuGetVersion: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.NuGetVersion'] ]
+      GitVersion.MajorMinorPatch: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.MajorMinorPatch'] ]
+      GitVersion.PreReleaseNumber: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.PreReleaseNumber'] ]
     steps:
     - task: SonarCloudPrepare@2
       inputs:
@@ -220,7 +222,7 @@ stages:
       displayName: "Packaging (Extension)"
       inputs:
         filePath: '.\build\packageExtension.ps1'
-        arguments: '-version $(GitVersion.SemVer) -outfolder "$(Build.ArtifactStagingDirectory)"' 
+        arguments: '-version $(GitVersion.AssemblySemVer) -outfolder "$(Build.ArtifactStagingDirectory)"' 
     - task: PowerShell@2
       displayName: "Packaging (Chocolatey)"
       inputs:
@@ -431,7 +433,7 @@ stages:
   dependsOn: 
    - GitHubReleaseStage
    - SetupStage
-  condition:  and(succeeded(), or(eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.releaseTag'], 'Release'), eq(${{ parameters.deployMarketplace }}, true)))
+  condition:  and(succeeded(), eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.releaseTag'], 'Release'), eq(${{ parameters.deployMarketplace }}, true))
   jobs:
   - job: MarketplaceJob
     pool:
