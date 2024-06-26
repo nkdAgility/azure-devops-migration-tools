@@ -495,7 +495,7 @@ stages:
     - task: PowerShell@2
       displayName: Create GitHub Release
       inputs:
-        filePath: '.\build\releaseWingetPackage.ps1'
+        filePath: 'build/releaseWingetPackage.ps1'
         arguments: '-version $(GitVersion.SemVer) -releaseTag $(releaseTag) -GH_TOKEN $(GH_TOKEN)' 
          
 # Documentation release Stage
@@ -530,9 +530,9 @@ stages:
       inputs:
         targetType: 'inline'
         script: |
-          Write-Host "isPreRelease: $isPreRelease"
+          Write-Host "isPreRelease: $(isPreRelease)"
           $remoteDirectory = "./azure-devops-migration-tools/"
-          if ($isPreRelease -eq $true)
+          if ($(isPreRelease) -eq $true)
           {
             $remoteDirectory = "./azure-devops-migration-tools/preview/"
           }
@@ -544,7 +544,7 @@ stages:
         serverUrl: 'ftps://nakedalmweb.sftp.wpengine.com:2222'
         username: 'nakedalmweb-learn'
         password: '$(SFTP_PASSWORD)'
-        rootDirectory: '$(System.ArtifactsDirectory)\site'
+        rootDirectory: '$(System.ArtifactsDirectory)/site'
         filePatterns: '**'
         remoteDirectory: $(SetRemoteDirectory.remoteDirectory)
         clean: false
