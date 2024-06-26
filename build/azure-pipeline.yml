@@ -527,9 +527,9 @@ stages:
       inputs:
         targetType: 'inline'
         script: |
-          Write-Host "isPreRelease: $isPreRelease"
+          Write-Host "isPreRelease: $(isPreRelease)"
           $remoteDirectory = "./azure-devops-migration-tools/"
-          if ($isPreRelease -eq $true)
+          if ($(isPreRelease) -eq $true)
           {
             $remoteDirectory = "./azure-devops-migration-tools/preview/"
           }
