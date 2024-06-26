@@ -117,18 +117,15 @@ stages:
       GitVersion.PreReleaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.PreReleaseTag'] ]
       isPreRelease: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.isPreRelease'] ]
     steps:
-    - ${{ each parameter in parameters }}:
-      - script: echo ${{ parameter.Key }} 
-      - script: echo ${{ parameter.Value }}
     - task: PowerShell@2
       displayName: Read Parameters
       inputs:
         targetType: 'inline'
         script: |
-          Write-Host "deployChocolatey: ${{ parameter.deployChocolatey }}"
-          Write-Host "deployDocs: ${{ parameter.deployDocs }}"
-          Write-Host "deployMarketplace: ${{ parameter.deployMarketplace }}"
-          Write-Host "deployWinget: ${{ parameter.deployWinget }}"
+          Write-Host "deployChocolatey: ${{ parameters.deployChocolatey }}"
+          Write-Host "deployDocs: ${{ parameters.deployDocs }}"
+          Write-Host "deployMarketplace: ${{ parameters.deployMarketplace }}"
+          Write-Host "deployWinget: ${{ parameters.deployWinget }}"
     - task: PowerShell@2
       displayName: Read Variables
       inputs:
@@ -140,10 +137,6 @@ stages:
           Write-Host "GitVersion.SemVer: $(GitVersion.SemVer)"
           Write-Host "GitVersion.PreReleaseTag: $(GitVersion.PreReleaseTag)"
           Write-Host "isPreRelease: $(isPreRelease)"
-          Write-Host "deployChocolatey: $(deployChocolatey)
-          Write-Host "deployDocs: $(deployDocs)"
-          Write-Host "deployMarketplace: $(deployMarketplace)"
-          Write-Host "deployWinget: $(deployWinget) "
           Write-Host "skipCompileTest: $(skipCompileTest)"
 
 
@@ -438,7 +431,7 @@ stages:
   dependsOn: 
    - GitHubReleaseStage
    - SetupStage
-  condition:  and(succeeded(), or(eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.releaseTag'], 'Release'), eq(variables['deployMarketplace'], true)))
+  condition:  and(succeeded(), or(eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.releaseTag'], 'Release'), eq(${{ parameters.deployMarketplace }}, true)))
   jobs:
   - job: MarketplaceJob
     pool:
@@ -473,7 +466,7 @@ stages:
   dependsOn: 
    - GitHubReleaseStage
    - SetupStage
-  condition:  and(succeeded(), or(eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.runRelease'], true), eq(variables['deployChocolatey'], true)))
+  condition:  and(succeeded(), or(eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.runRelease'], true), eq(${{ parameters.deployChocolatey }}, true)))
   jobs:
   - job: ChocoReleaseJob
     pool:
@@ -506,7 +499,7 @@ stages:
   dependsOn: 
    - GitHubReleaseStage
    - SetupStage
-  condition:  and(succeeded(), or(eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.runRelease'], true), eq(variables['deployWinget'], true)))
+  condition:  and(succeeded(), or(eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.runRelease'], true), eq(${{ parameters.deployWinget }}, true)))
   jobs:
   - job: WingetReleaseJob
     pool:
@@ -537,7 +530,7 @@ stages:
    - GitHubReleaseStage
    - DocsBuildStage
    - SetupStage
-  condition:  and(succeeded(), or(eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.runRelease'], true), eq(variables['deployDocs'], true)))
+  condition:  and(succeeded(), or(eq(dependencies.SetupStage.outputs['ConfigJob.VersionOut.runRelease'], true), eq(${{ parameters.deployDocs }}, true)))
   jobs:
   - job: DocsReleaseJob
     pool:
