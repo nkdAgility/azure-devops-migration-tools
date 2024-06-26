@@ -25,7 +25,7 @@ Copy-Item  -Path ".\src\MigrationTools.Extension\**" -Destination "$outfolder\Mi
 $fileToUpdate = Get-Item -Path "$outfolder\MigrationTools.Extension\vss-extension.json"
 Write-Output "Processing $($fileToUpdate.Name)"
 $contents = Get-Content -Path $fileToUpdate.FullName
-$contents = $contents | ForEach-Object { $_ -replace "#{GITVERSION.SEMVER}#", $version }
+$contents = $contents | ForEach-Object { $_ -replace "#{EXTENSION-VERSION}#", $version }
 Set-Content -Path $fileToUpdate.FullName -Value $contents 
 Write-Output "Replaced tokens in $($fileToUpdate.Name)"
 
