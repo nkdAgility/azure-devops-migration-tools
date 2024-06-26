@@ -14,7 +14,7 @@ parameters:
 - name: deployMarketplace
   displayName: Deploy Entension to Azure DevOps marketplace?
   type: boolean
-  default: true
+  default: false
 - name: deployWinget
   displayName: Deploy Installer to Winget?
   type: boolean
