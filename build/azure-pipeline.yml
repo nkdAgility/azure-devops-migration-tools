@@ -218,7 +218,7 @@ stages:
     displayName: 'Build Simulation Job'
     condition:  and(succeeded(), eq(variables['skipCompileTest'], 'true'))
     pool:
-      vmImage: 'windows-latest'
+      vmImage: 'ubuntu-latest'
       demands:
       - npm
     variables:
@@ -335,7 +335,7 @@ stages:
   jobs:
   - job: GitHubReleaseJob
     pool:
-      vmImage: 'windows-latest'
+      vmImage: 'ubuntu-latest'
     variables:
       environmentName: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.environmentName'] ]
       releaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.releaseTag'] ]
@@ -407,7 +407,7 @@ stages:
   jobs:
   - job: MarketplaceJob
     pool:
-      vmImage: 'windows-latest'
+      vmImage: 'ubuntu-latest'
     variables:
       environmentName: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.environmentName'] ]
       releaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.releaseTag'] ]
@@ -442,7 +442,7 @@ stages:
   jobs:
   - job: ChocoReleaseJob
     pool:
-      vmImage: 'windows-latest'
+      vmImage: 'ubuntu-latest'
     variables:
       environmentName: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.environmentName'] ]
       releaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.releaseTag'] ]
@@ -475,7 +475,7 @@ stages:
   jobs:
   - job: WingetReleaseJob
     pool:
-      vmImage: 'windows-latest'
+      vmImage: 'ubuntu-latest'
     variables:
       environmentName: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.environmentName'] ]
       releaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.releaseTag'] ]
@@ -506,7 +506,7 @@ stages:
   jobs:
   - job: DocsReleaseJob
     pool:
-      vmImage: 'windows-latest'
+      vmImage: 'ubuntu-latest'
     variables:
       environmentName: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.environmentName'] ]
       releaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.releaseTag'] ]
@@ -535,17 +535,14 @@ stages:
           }
           Write-Host "Remote Path: $remoteDirectory"
           Write-Host "##vso[task.setvariable variable=remoteDirectory;isOutput=true]$remoteDirectory"
-    - task: FtpUpload@2
+    - task: CopyFilesOverSSH@0
       inputs:
         credentialsOption: 'inputs'
-        serverUrl: 'ftps://nakedalmweb.sftp.wpengine.com:2222'
-        username: 'nakedalmweb-learn'
-        password: '$(SFTP_PASSWORD)'
-        rootDirectory: '$(System.ArtifactsDirectory)\site'
-        filePatterns: '**'
-        remoteDirectory: $(SetRemoteDirectory.remoteDirectory)
-        clean: false
-        cleanContents: false
-        preservePaths: true
-        trustSSL: false
+        sshEndpoint: 'nakedalmweb-learn'
+        sourceFolder: '$(System.ArtifactsDirectory)\site'
+        contents: '**'
+        targetFolder: $(SetRemoteDirectory.remoteDirectory)
+        overwrite: true
+        failOnEmptySource: true
+
          
