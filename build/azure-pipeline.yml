@@ -2,6 +2,24 @@
 # Start with a minimal pipeline that you can customize to build and deploy your code.
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
+parameters:
+- name: deployChocolatey
+  displayName: Deploy installer to Chocolatey?
+  type: boolean
+  default: true
+- name: deployDocs
+  displayName: Deploy Documentation to WPEngine?
+  type: boolean
+  default: true
+- name: deployMarketplace
+  displayName: Deploy Entension to Azure DevOps marketplace?
+  type: boolean
+  default: true
+- name: deployWinget
+  displayName: Deploy Installer to Winget?
+  type: boolean
+  default: true
+
 
 trigger:
 - main
@@ -11,6 +29,8 @@ pr:
 - main
 
 name: $(GITVERSION_SemVer)
+
+
 
 ## TODO: THESE WILL NOT WORK! NEED TO USE Versioning Reference instead with $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.SemVer'] ]
 variables:
@@ -108,10 +128,10 @@ stages:
           Write-Host "GitVersion.SemVer: $(GitVersion.SemVer)"
           Write-Host "GitVersion.PreReleaseTag: $(GitVersion.PreReleaseTag)"
           Write-Host "isPreRelease: $(isPreRelease)"
-          Write-Host "deployChocolatey: $(deployChocolatey)"
-          Write-Host "deployDocs: $(deployDocs)"
-          Write-Host "deployMarketplace: $(deployMarketplace)"
-          Write-Host "deployWinget: $(deployWinget)"
+          Write-Host "deployChocolatey: $(deployChocolatey) ${{ parameter.deployChocolatey }}"
+          Write-Host "deployDocs: $(deployDocs) ${{ parameter.deployDocs }}"
+          Write-Host "deployMarketplace: $(deployMarketplace) ${{ parameter.deployMarketplace }}"
+          Write-Host "deployWinget: $(deployWinget) ${{ parameter.deployWinget }}"
           Write-Host "skipCompileTest: $(skipCompileTest)"
 
 
@@ -530,8 +550,9 @@ stages:
       inputs:
         targetType: 'inline'
         script: |
-          Write-Host "isPreRelease: $(isPreRelease)"
-          if ($(isPreRelease))
+          Write-Host "isPreRelease: $(isPreRelease)";
+          $isPreRelease = $(isPreRelease);
+          if ($isPreRelease)
           {
             Write-Host "PreRelease"
             $remoteDirectory = "./azure-devops-migration-tools/preview/"
