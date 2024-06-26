@@ -118,6 +118,15 @@ stages:
       isPreRelease: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.isPreRelease'] ]
     steps:
     - task: PowerShell@2
+      displayName: Read Parameters
+      inputs:
+        targetType: 'inline'
+        script: |
+          Write-Host "deployChocolatey: ${{ parameter.deployChocolatey }}"
+          Write-Host "deployDocs: ${{ parameter.deployDocs }}"
+          Write-Host "deployMarketplace: ${{ parameter.deployMarketplace }}"
+          Write-Host "deployWinget: ${{ parameter.deployWinget }}"
+    - task: PowerShell@2
       displayName: Read Variables
       inputs:
         targetType: 'inline'
@@ -128,10 +137,10 @@ stages:
           Write-Host "GitVersion.SemVer: $(GitVersion.SemVer)"
           Write-Host "GitVersion.PreReleaseTag: $(GitVersion.PreReleaseTag)"
           Write-Host "isPreRelease: $(isPreRelease)"
-          Write-Host "deployChocolatey: $(deployChocolatey) ${{ parameter.deployChocolatey }}"
-          Write-Host "deployDocs: $(deployDocs) ${{ parameter.deployDocs }}"
-          Write-Host "deployMarketplace: $(deployMarketplace) ${{ parameter.deployMarketplace }}"
-          Write-Host "deployWinget: $(deployWinget) ${{ parameter.deployWinget }}"
+          Write-Host "deployChocolatey: $(deployChocolatey)
+          Write-Host "deployDocs: $(deployDocs)"
+          Write-Host "deployMarketplace: $(deployMarketplace)"
+          Write-Host "deployWinget: $(deployWinget) "
           Write-Host "skipCompileTest: $(skipCompileTest)"
 
 
