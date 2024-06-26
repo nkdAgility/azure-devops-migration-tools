@@ -117,6 +117,9 @@ stages:
       GitVersion.PreReleaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.PreReleaseTag'] ]
       isPreRelease: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.isPreRelease'] ]
     steps:
+    - ${{ each parameter in parameters }}:
+      - script: echo ${{ parameter.Key }} 
+      - script: echo ${{ parameter.Value }}
     - task: PowerShell@2
       displayName: Read Parameters
       inputs:
