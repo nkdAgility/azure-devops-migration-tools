@@ -433,7 +433,7 @@ stages:
       inputs:
         connectedServiceName: 'nkdAgility-Marketplace'
         fileType: vsix
-        vsixFile: '$(System.DefaultWorkingDirectory)/vsts-sync-migration/drop/nkdAgility.vsts-sync-migration-$(GitVersion.SemVer).vsix'
+        vsixFile: '$(System.ArtifactsDirectory)/drop/nkdAgility.vsts-sync-migration-$(GitVersion.SemVer).vsix'
 
 # Release to Chocolatey Community Repository
 - stage: ChocolateyReleaseStage
@@ -531,7 +531,7 @@ stages:
         targetType: 'inline'
         script: |
           Write-Host "isPreRelease: $(isPreRelease)"
-          if ($(isPreRelease) -eq $true)
+          if ($(isPreRelease))
           {
             Write-Host "PreRelease"
             $remoteDirectory = "./azure-devops-migration-tools/preview/"
@@ -541,17 +541,9 @@ stages:
           }
           Write-Host "Remote Path: $remoteDirectory"
           Write-Host "##vso[task.setvariable variable=remoteDirectory;isOutput=true]$remoteDirectory"
-    - task: FtpUpload@2
+    - task: CopyFilesOverSSH@0
       inputs:
-        credentialsOption: 'inputs'
-        serverUrl: 'ftps://nakedalmweb.sftp.wpengine.com:2222'
-        username: 'nakedalmweb-learn'
-        password: '$(SFTP_PASSWORD)'
-        rootDirectory: '$(System.ArtifactsDirectory)/site'
-        filePatterns: '**'
-        remoteDirectory: $(SetRemoteDirectory.remoteDirectory)
-        clean: false
-        cleanContents: false
-        preservePaths: true
-        trustSSL: false
-         
+        sshEndpoint: 'nakedalmweb-learn'
+        sourceFolder: '$(System.ArtifactsDirectory)/site'
+        contents: '**'
+        targetFolder: $(SetRemoteDirectory.remoteDirectory)
