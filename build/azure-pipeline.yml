@@ -542,8 +542,8 @@ stages:
           Write-Host "Remote Path: $remoteDirectory"
           Write-Host "##vso[task.setvariable variable=remoteDirectory;isOutput=true]$remoteDirectory"
     - task: CopyFilesOverSSH@0
-        inputs:
-          sshEndpoint: 'nakedalmweb-learn'
-          sourceFolder: '$(System.ArtifactsDirectory)/site'
-          contents: '**'
-          targetFolder: $(SetRemoteDirectory.remoteDirectory)
+      inputs:
+        sshEndpoint: 'nakedalmweb-learn'
+        sourceFolder: '$(System.ArtifactsDirectory)/site'
+        contents: '**'
+        targetFolder: $(SetRemoteDirectory.remoteDirectory)
