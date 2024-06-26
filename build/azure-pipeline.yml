@@ -493,7 +493,7 @@ stages:
         artifactName: 'drop'
         downloadPath: '$(System.ArtifactsDirectory)'
     - task: PowerShell@2
-      displayName: Create GitHub Release
+      displayName: Create Winget Release
       inputs:
         filePath: 'build/releaseWingetPackage.ps1'
         arguments: '-version $(GitVersion.SemVer) -releaseTag $(releaseTag) -GH_TOKEN $(GH_TOKEN)' 
@@ -525,16 +525,19 @@ stages:
         artifactName: 'site'
         downloadPath: '$(System.ArtifactsDirectory)'
     - task: PowerShell@2
-      displayName: Create fake build assets
+      displayName: Select Directory
       name: SetRemoteDirectory
       inputs:
         targetType: 'inline'
         script: |
           Write-Host "isPreRelease: $(isPreRelease)"
-          $remoteDirectory = "./azure-devops-migration-tools/"
           if ($(isPreRelease) -eq $true)
           {
+            Write-Host "PreRelease"
             $remoteDirectory = "./azure-devops-migration-tools/preview/"
+          } else {
+            Write-Host "Release"
+            $remoteDirectory = "./azure-devops-migration-tools/"
           }
           Write-Host "Remote Path: $remoteDirectory"
           Write-Host "##vso[task.setvariable variable=remoteDirectory;isOutput=true]$remoteDirectory"
