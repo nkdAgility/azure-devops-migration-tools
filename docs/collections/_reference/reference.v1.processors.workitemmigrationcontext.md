@@ -117,30 +117,12 @@ topics:
     You can use the [WIQL Editor](https://marketplace.visualstudio.com/items?itemName=ottostreifel.wiql-editor) to craft a query in Azure DevOps.
 
 
-    Typical way that queries are built:
-
-
-    ```
-     var targetQuery =
-         string.Format(
-             @"SELECT [System.Id], [{ReflectedWorkItemIDFieldName}] FROM WorkItems WHERE [System.TeamProject] = @TeamProject {WIQLQueryBit} ORDER BY {WIQLOrderBit}",
-             Engine.Target.Config.ReflectedWorkItemIDFieldName,
-             _config.WIQLQueryBit,
-             _config.WIQLOrderBit
-          );
-    var targetFoundItems = Engine.Target.WorkItems.GetWorkItems(targetQuery);
-
-    ```
-
-
     A simple example config:
 
 
     ```
 
-    "WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
-
-    "WIQLOrderBit": "[System.ChangedDate] desc",
+    "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc"
 
     ```
 
@@ -149,25 +131,12 @@ topics:
 
     ```
 
-    "WIQLQueryBit": "AND [System.AreaPath] UNDER 'project\Team 1\' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
-
-    "WIQLOrderBit": "[System.ChangedDate] desc",
-
-    ```
-
-
-    ```
-
-    "WIQLQueryBit": "AND [System.ChangedDate] > 'project\Team 1\' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
-
-    "WIQLOrderBit": "[System.ChangedDate] desc",
+    "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.AreaPath] UNDER 'project\Team 1\' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc"
 
     ```
 
 
     ## <a name="NodeBasePath"></a>NodeBasePath Configuration 
-
-
 
 
     Moved to the ProcessorEnricher [TfsNodeStructure](/Reference/v2/ProcessorEnrichers/TfsNodeStructure/)
@@ -177,6 +146,8 @@ topics:
 
 
     Moved to the ProcessorEnricher [TfsNodeStructure](/Reference/v2/ProcessorEnrichers/TfsNodeStructure/)
+
+
 
 
     ## More Complex Team Migrations
@@ -214,12 +185,8 @@ topics:
 
     # Removed Properties
 
+
     - PrefixProjectToNodes - This option was removed in favour of the Area and Iteration Maps on [TfsNodeStructure](/Reference/v2/ProcessorEnrichers/TfsNodeStructure/)
-
-    =======
-
-    - PrefixProjectToNodes - This option was removed in favour of the Area and Iteration Maps on [TfsNodeStructure](../Reference/v2/ProcessorEnrichers/TfsNodeStructure/)
-
 - topic: introduction
   path: /docs/Reference/v1/Processors/WorkItemMigrationContext-introduction.md
   exists: true
