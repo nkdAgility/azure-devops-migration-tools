@@ -175,43 +175,20 @@ The global configuration created by the `init` command look like this:
   "Processors": [
     {
       "$type": "WorkItemMigrationConfig",
-      "ReplayRevisions": true,
-      "AttachRevisionHistory": false,
-      "MaxRevisions": 0,
-      "PrefixProjectToNodes": false,
+      "Enabled": false,
       "UpdateCreatedDate": true,
       "UpdateCreatedBy": true,
-      "BuildFieldTable": false,
-      "AppendMigrationToolSignatureFooter": false,
-      "WIQLQueryBit": "AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
-      "WIQLOrderBit": "[System.ChangedDate] desc",
-      "Enabled": false,
-      "LinkMigration": true,
-      "AttachmentMigration": true,
-      "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
+      "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
       "FixHtmlAttachmentLinks": false,
-      "SkipToFinalRevisedWorkItemType": true,
       "WorkItemCreateRetryLimit": 5,
-      "FilterWorkItemsThatAlreadyExistInTarget": true,
+      "FilterWorkItemsThatAlreadyExistInTarget": false,
       "PauseAfterEachWorkItem": false,
-      "AttachmentMaxSize": 480000000,
-      "LinkMigrationSaveEachAsAdded": false,
+      "AttachRevisionHistory": false,
       "GenerateMigrationComment": true,
-      "UseCommonNodeStructureEnricherConfig": false,
-      "NodeBasePaths": [
-        "Product\\Area\\Path1",
-        "Product\\Area\\Path2"
-      ],
-      "IterationMaps": {
-        "^OriginalProject\\\\Path1(?=\\\\Sprint 2022)": "TargetProject\\AnotherPath\\NewTeam",
-        "^OriginalProject\\\\Path1(?=\\\\Sprint 2020)": "TargetProject\\AnotherPath\\Archives\\Sprints 2020",
-        "^OriginalProject\\\\Path2": "TargetProject\\YetAnotherPath\\Path2"
-      },
-      "AreaMaps": {
-        "^OriginalProject\\\\(DescopeThis|DescopeThat)": "TargetProject\\Archive\\Descoped\\",
-        "^OriginalProject\\\\(?!DescopeThis|DescopeThat)": "TargetProject\\NewArea\\"
-      },
-      "WorkItemIDs": null
+      "WorkItemIDs": null,
+      "MaxGracefulFailures": 0,
+      "SkipRevisionWithInvalidIterationPath": false,
+      "SkipRevisionWithInvalidAreaPath": false
     },
     {
       "$type": "TestConfigurationsMigrationConfig",

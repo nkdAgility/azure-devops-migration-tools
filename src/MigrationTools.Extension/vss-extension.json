@@ -55,6 +55,16 @@
   },
   "badges": [
     {
+      "href": "https://github.com/nkdAgility/azure-devops-migration-tools/releases/latest",
+      "uri": "https://img.shields.io/github/v/release/nkdagility/vsts-sync-migration",
+      "description": "GitHub Release"
+    },
+    {
+      "href": "https://github.com/nkdAgility/azure-devops-migration-tools/releases/",
+      "uri": "https://img.shields.io/github/v/release/nkdagility/vsts-sync-migration?include_prereleases",
+      "description": "GitHub Pre-Release"
+    },
+    {
       "href": "https://dev.azure.com/nkdagility/AzureDevOps-Tools/_apis/build/status%2FMigrationTools-CIv2?branchName=main",
       "uri": "https://dev.azure.com/nkdagility/AzureDevOps-Tools/_build?definitionId=115",
       "description": "Azure Pipline CI for this project"

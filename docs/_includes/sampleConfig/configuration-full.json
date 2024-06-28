@@ -118,41 +118,101 @@
   ],
   "GitRepoMapping": null,
   "LogLevel": "Information",
-  "CommonEnrichersConfig": null,
+  "CommonEnrichersConfig": [
+    {
+      "$type": "TfsNodeStructureOptions",
+      "RefName": "TfsNodeStructure",
+      "Enabled": true,
+      "NodeBasePaths": [],
+      "AreaMaps": {
+        "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1",
+        "^nkdProducts([\\\\]?.*)$": "MigrationTest5$1",
+        "^Skypoint Cloud$": "MigrationTest5"
+      },
+      "IterationMaps": {
+        "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1",
+        "^nkdProducts([\\\\]?.*)$": "MigrationTest5$1",
+        "^Skypoint Cloud\\\\Sprint 1$": "MigrationTest5\\Sprint 1"
+      },
+      "ShouldCreateMissingRevisionPaths": true,
+      "ReplicateAllExistingNodes": true
+    },
+    {
+      "$type": "TfsTeamSettingsEnricherOptions",
+      "Enabled": true,
+      "MigrateTeamSettings": true,
+      "UpdateTeamSettings": true,
+      "MigrateTeamCapacities": true,
+      "Teams": null
+    },
+    {
+      "$type": "TfsWorkItemLinkEnricherOptions",
+      "RefName": "TfsWorkItemLinkEnricher",
+      "Enabled": true,
+      "FilterIfLinkCountMatches": true,
+      "SaveAfterEachLinkIsAdded": false
+    },
+    {
+      "$type": "TfsRevisionManagerOptions",
+      "RefName": "TfsRevisionManager",
+      "Enabled": true,
+      "ReplayRevisions": true,
+      "MaxRevisions": 0
+    },
+    {
+      "$type": "TfsAttachmentEnricherOptions",
+      "RefName": "TfsAttachmentEnricher",
+      "Enabled": true,
+      "ExportBasePath": "c:\\temp\\WorkItemAttachmentExport",
+      "MaxRevisions": 480000000
+    },
+    {
+      "$type": "StringManipulatorEnricherOptions",
+      "RefName": "StringManipulator",
+      "Enabled": true,
+      "MaxStringLength": 1000000,
+      "Manipulators": [
+        {
+          "$type": "RegexStringManipulator",
+          "Enabled": true,
+          "Pattern": "[^( -~)\n\r\t]+",
+          "Replacement": "",
+          "Description": "Remove invalid characters from the end of the string"
+        }
+      ]
+    },
+    {
+      "$type": "TfsUserMappingEnricherOptions",
+      "RefName": "TfsUserMappingEnricher",
+      "Enabled": true,
+      "UserMappingFile": "C:\\temp\\userExport.json",
+      "IdentityFieldsToCheck": [
+        "System.AssignedTo",
+        "System.ChangedBy",
+        "System.CreatedBy",
+        "Microsoft.VSTS.Common.ActivatedBy",
+        "Microsoft.VSTS.Common.ResolvedBy",
+        "Microsoft.VSTS.Common.ClosedBy"
+      ]
+    }
+  ],
   "Processors": [
     {
       "$type": "WorkItemMigrationConfig",
       "Enabled": false,
-      "ReplayRevisions": true,
-      "PrefixProjectToNodes": false,
       "UpdateCreatedDate": true,
       "UpdateCreatedBy": true,
-      "WIQLQueryBit": "AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')",
-      "WIQLOrderBit": "[System.ChangedDate] desc",
-      "LinkMigration": true,
-      "AttachmentMigration": true,
-      "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
+      "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
       "FixHtmlAttachmentLinks": false,
-      "SkipToFinalRevisedWorkItemType": true,
       "WorkItemCreateRetryLimit": 5,
-      "FilterWorkItemsThatAlreadyExistInTarget": true,
+      "FilterWorkItemsThatAlreadyExistInTarget": false,
       "PauseAfterEachWorkItem": false,
-      "AttachmentMaxSize": 480000000,
       "AttachRevisionHistory": false,
-      "LinkMigrationSaveEachAsAdded": false,
       "GenerateMigrationComment": true,
       "WorkItemIDs": null,
-      "MaxRevisions": 0,
-      "NodeStructureEnricherEnabled": null,
-      "UseCommonNodeStructureEnricherConfig": false,
-      "NodeBasePaths": [
-        "Product\\Area\\Path1",
-        "Product\\Area\\Path2"
-      ],
-      "AreaMaps": {},
-      "IterationMaps": {},
       "MaxGracefulFailures": 0,
-      "SkipRevisionWithInvalidIterationPath": false
+      "SkipRevisionWithInvalidIterationPath": false,
+      "SkipRevisionWithInvalidAreaPath": false
     },
     {
       "$type": "TestVariablesMigrationConfig",
@@ -200,8 +260,7 @@
       "$type": "WorkItemUpdateConfig",
       "Enabled": false,
       "WhatIf": false,
-      "WIQLQueryBit": "AND [TfsMigrationTool.ReflectedWorkItemId] = '' AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] IN ('Shared Steps', 'Shared Parameter', 'Test Case', 'Requirement', 'Task', 'User Story', 'Bug')",
-      "WIQLOrderBit": null,
+      "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
       "WorkItemIDs": null,
       "FilterWorkItemsThatAlreadyExistInTarget": false,
       "PauseAfterEachWorkItem": false,
@@ -215,8 +274,7 @@
         2,
         3
       ],
-      "WIQLQueryBit": "AND [TfsMigrationTool.ReflectedWorkItemId] = '' ",
-      "WIQLOrderBit": null,
+      "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
       "FilterWorkItemsThatAlreadyExistInTarget": false,
       "PauseAfterEachWorkItem": false,
       "WorkItemCreateRetryLimit": 0
@@ -224,8 +282,7 @@
     {
       "$type": "WorkItemDeleteConfig",
       "Enabled": false,
-      "WIQLQueryBit": "AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
-      "WIQLOrderBit": "[System.ChangedDate] desc",
+      "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
       "WorkItemIDs": null,
       "FilterWorkItemsThatAlreadyExistInTarget": false,
       "PauseAfterEachWorkItem": false,

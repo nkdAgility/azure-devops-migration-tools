@@ -409,11 +409,11 @@ stages:
         gitHubConnection: 'GitHub connection 4'
         tagSource: userSpecifiedTag
         tag: 'v$(Build.BuildNumber)'
-        title: 'v$(Build.BuildNumber) - $(Build.SourceVersionMessage)'
+        title: 'Azure DevOps Migration Tools v$(Build.BuildNumber)'
         releaseNotesSource: inline
         releaseNotesInline: |
           $(prbody)
-        assets: |
+        assets: | 
           $(System.ArtifactsDirectory)/drop/*.zip
           $(System.ArtifactsDirectory)/drop/*.vsix
           $(System.ArtifactsDirectory)/drop/*.nupkg
@@ -557,8 +557,11 @@ stages:
       inputs:
         targetType: 'inline'
         script: |
-          Write-Host "isPreRelease: $(isPreRelease)";
-          $isPreRelease = $(isPreRelease);
+          Write-Host "isPreRelease(incomming): $(isPreRelease)";
+          $isPreRelease = "$(isPreRelease)" -eq "true";
+          Write-Host "isPreRelease: $isPreRelease";
+          Write-Host "isPreRelease(type): $isPreRelease.GetType().Name";
+
           if ($isPreRelease)
           {
             Write-Host "PreRelease"
