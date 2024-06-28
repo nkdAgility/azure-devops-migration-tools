@@ -47,39 +47,25 @@
     //{
     //  "$type": "WorkItemDeleteConfig",
     //  "Enabled": true,
-    //  "WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
-    //  "WIQLOrderBit": "[System.ChangedDate] desc"
+    //  "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
     //},
     {
       "$type": "WorkItemMigrationConfig",
-      "Enabled": true,
-      "ReplayRevisions": false,
-      "PrefixProjectToNodes": false,
-      "UpdateCreatedDate": false,
-      "UpdateCreatedBy": false,
-      "WIQLQueryBit": "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
-      "WIQLOrderBit": "[System.ChangedDate] desc",
-      "LinkMigration": true,
-      "AttachmentMigration": true,
-      "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
+      "Enabled": false,
+      "UpdateCreatedDate": true,
+      "UpdateCreatedBy": true,
+      "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
       "FixHtmlAttachmentLinks": false,
-      "SkipToFinalRevisedWorkItemType": false,
       "WorkItemCreateRetryLimit": 5,
       "FilterWorkItemsThatAlreadyExistInTarget": false,
       "PauseAfterEachWorkItem": false,
-      "AttachmentMaxSize": 480000000,
       "AttachRevisionHistory": false,
-      "LinkMigrationSaveEachAsAdded": false,
-      "GenerateMigrationComment": false,
+      "GenerateMigrationComment": true,
       "WorkItemIDs": null,
-      "MaxRevisions": 0,
-      "NodeStructureEnricherEnabled": true,
-      "UseCommonNodeStructureEnricherConfig": true,
-      "NodeBasePaths": [],
-      "AreaMaps": {},
-      "IterationMaps": {},
-      "MaxGracefulFailures": 0
-    }
+      "MaxGracefulFailures": 0,
+      "SkipRevisionWithInvalidIterationPath": false,
+      "SkipRevisionWithInvalidAreaPath": false
+    },
 
   ]
 }
