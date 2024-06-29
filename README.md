@@ -1,6 +1,6 @@
 ![azure-devops-migration-tools](https://socialify.git.ci/nkdAgility/azure-devops-migration-tools/image?description=1&descriptionEditable=Azure%20DevOps%20Migration%20Tools%20allow%20you%20to%20migrate%20Work%20Items%2C%20Plans%20%26%20Suits%2C%20%26%20Pipelines%20from%20one%20Azure%20DevOps%20%2F%20TFS%20to%20another!&font=Inter&forks=1&name=1&owner=1&pattern=Signal&stargazers=1&theme=Light)
-[GitHub release](https://img.shields.io/github/release/nkdAgility/vsts-sync-migration.svg)
-[GitHub pre-release](https://img.shields.io/github/v/release/nkdagility/vsts-sync-migration?include_prereleases)
+[![GitHub release](https://img.shields.io/github/release/nkdAgility/vsts-sync-migration.svg)]
+[![GitHub pre-release](https://img.shields.io/github/v/release/nkdagility/vsts-sync-migration?include_prereleases)]
 [![Build Status](https://dev.azure.com/nkdagility/AzureDevOps-Tools/_apis/build/status%2FMigrationTools-CIv2?branchName=main)](https://dev.azure.com/nkdagility/AzureDevOps-Tools/_build/latest?definitionId=115&branchName=main)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=vsts-sync-migrator%3Amaster&metric=coverage)](https://sonarcloud.io/dashboard?id=vsts-sync-migrator%3Amaster)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=vsts-sync-migrator%3Amaster&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=vsts-sync-migrator%3Amaster)
