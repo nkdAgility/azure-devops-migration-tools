@@ -1,4 +1,17 @@
-# Azure DevOps Migration Tools [![GitHub release](https://img.shields.io/github/release/nkdAgility/vsts-sync-migration.svg)](https://github.com/nkdAgility/azure-devops-migration-tools/releases) ![GitHub pre-release](https://img.shields.io/github/v/release/nkdagility/vsts-sync-migration?include_prereleases) 
+![azure-devops-migration-tools](https://socialify.git.ci/nkdAgility/azure-devops-migration-tools/image?description=1&descriptionEditable=Azure%20DevOps%20Migration%20Tools%20allow%20you%20to%20migrate%20Work%20Items%2C%20Plans%20%26%20Suits%2C%20%26%20Pipelines%20from%20one%20Azure%20DevOps%20%2F%20TFS%20to%20another!&font=Inter&forks=1&name=1&owner=1&pattern=Signal&stargazers=1&theme=Light)
+[GitHub release](https://img.shields.io/github/release/nkdAgility/vsts-sync-migration.svg)
+[GitHub pre-release](https://img.shields.io/github/v/release/nkdagility/vsts-sync-migration?include_prereleases)
+[![Build Status](https://dev.azure.com/nkdagility/AzureDevOps-Tools/_apis/build/status%2FMigrationTools-CIv2?branchName=main)](https://dev.azure.com/nkdagility/AzureDevOps-Tools/_build/latest?definitionId=115&branchName=main)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=vsts-sync-migrator%3Amaster&metric=coverage)](https://sonarcloud.io/dashboard?id=vsts-sync-migrator%3Amaster)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=vsts-sync-migrator%3Amaster&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=vsts-sync-migrator%3Amaster)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=vsts-sync-migrator%3Amaster&metric=security_rating)](https://sonarcloud.io/dashboard?id=vsts-sync-migrator%3Amaster)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=vsts-sync-migrator%3Amaster&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=vsts-sync-migrator%3Amaster)
+![Visual Studio Marketplace Rating](https://img.shields.io/visual-studio-marketplace/stars/nkdagility.vsts-sync-migration?logo=visualstudio)
+![Chocolatey Downloads](https://img.shields.io/chocolatey/dt/vsts-sync-migrator)
+
+
+
+# Azure DevOps Migration Tools
 
 The Azure DevOps Migration Tools allow you to bulk edit and migrate data between Team Projects on both Microsoft Team Foundation Server (TFS) and Azure DevOps Services. Take a look at the  [documentation](https://nkdagility.com/docs/azure-devops-migration-tools/) to find out how. This project is published as [code on GitHub](https://github.com/nkdAgility/azure-devops-migration-tools/) as well as a Winget package a `nkdAgility.AzureDevOpsMigrationTools`.
 
@@ -160,13 +173,5 @@ We use these tools with our customers, and for fun, to do real world migrations 
 	- v8.0 - Merge of Work Item, Link, & attachment migrators into one.
 - [v7.5.74](https://github.com/nkdAgility/azure-devops-migration-tools/releases/tag/7.5.74) Sep 18, 2019
 - [v6.3.1](https://github.com/nkdAgility/azure-devops-migration-tools/releases/tag/6.3.1) Feb 23, 2017
-## The Technical Details
 
-|-| Technical Overview |
-|-------------:|:-------------|
-| Azure Pipeline | ![Build on VSTS](https://nkdagility.visualstudio.com/_apis/public/build/definitions/1b52ce63-eccc-41c8-88f9-ae6ebeefdc63/94/badge) |
-| Coverage | [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=vsts-sync-migrator%3Amaster&metric=coverage)](https://sonarcloud.io/dashboard?id=vsts-sync-migrator%3Amaster) |
-| Maintainability | [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=vsts-sync-migrator%3Amaster&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=vsts-sync-migrator%3Amaster) |
-| Security Rating | [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=vsts-sync-migrator%3Amaster&metric=security_rating)](https://sonarcloud.io/dashboard?id=vsts-sync-migrator%3Amaster) |
-| Vulnerabilities | [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=vsts-sync-migrator%3Amaster&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=vsts-sync-migrator%3Amaster) |
-| Release | [![GitHub release](https://img.shields.io/github/release/nkdAgility/vsts-sync-migration.svg)](https://github.com/nkdAgility/azure-devops-migration-tools/releases) |
+- 
