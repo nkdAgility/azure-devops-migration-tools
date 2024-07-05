@@ -69,7 +69,7 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 8.x
-      - run: dotnet build /p:Version=$GitVersion_AssemblySemVer /p:FileVersion=$GitVersion_AssemblySemVer /p:InformationalVersion=$GitVersion_InformationalVersion
+      - run: dotnet build **/*.sln /p:Version=$GitVersion_AssemblySemVer /p:FileVersion=$GitVersion_AssemblySemVer /p:InformationalVersion=$GitVersion_InformationalVersion
           
       - run: dotnet test
   
