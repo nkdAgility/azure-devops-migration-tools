@@ -11,7 +11,8 @@
 ![Visual Studio Marketplace Rating](https://img.shields.io/visual-studio-marketplace/stars/nkdagility.vsts-sync-migration?logo=visualstudio)
 ![Chocolatey Downloads](https://img.shields.io/chocolatey/dt/vsts-sync-migrator)
 
-Created and maintained by http://nkdagility.com 
+Created and maintained by [Martin Hinshelwood](https://www.linkedin.com/in/martinhinshelwood/) (http://nkdagility.com)
+
 ![YouTube Channel Subscribers](https://img.shields.io/youtube/channel/subscribers/UCkYqhFNmhCzkefHsHS652hw)
 ![YouTube Channel Views](https://img.shields.io/youtube/channel/views/UCkYqhFNmhCzkefHsHS652hw)
 
