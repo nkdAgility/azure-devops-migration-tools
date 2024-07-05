@@ -45,9 +45,6 @@ jobs:
     runs-on: windows-latest
     needs: Setup
     steps:
-      - uses: actions/checkout@v4
-      - name: Setup MSBuild Path
-        uses: warrenbuckley/Setup-MSBuild@v1
       # - name: Setup NuGet
       #   uses: NuGet/setup-nuget@v1.0.2
       # - name: Restore NuGet Packages
@@ -57,7 +54,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: 4.x
+          dotnet-version: 8.x
       - run: dotnet build 
           
       - run: dotnet test
