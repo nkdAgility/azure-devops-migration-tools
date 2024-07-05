@@ -16,6 +16,8 @@ jobs:
       GitVersion_BranchName: ${{ steps.gitversion.outputs.GitVersion_BranchName }}
       GitVersion_SemVer: ${{ steps.gitversion.outputs.GitVersion_SemVer }}
       GitVersion_PreReleaseLabel: ${{ steps.gitversion.outputs.GitVersion_PreReleaseLabel }}
+      GitVersion_AssemblySemVer: ${{ steps.gitversion.outputs.GitVersion_AssemblySemVer }}
+      GitVersion_InformationalVersion: ${{ steps.gitversion.outputs.GitVersion_InformationalVersion }}
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -43,11 +45,19 @@ jobs:
             Write-Output "GitVersion_BranchName: ${{needs.Setup.outputs.GitVersion_BranchName}}"
             Write-Output "GitVersion_SemVer: ${{needs.Setup.outputs.GitVersion_SemVer}}"
             Write-Output "GitVersion_PreReleaseLabel: ${{needs.Setup.outputs.GitVersion_PreReleaseLabel}}"
+            Write-Output "GitVersion_AssemblySemVer: ${{needs.Setup.outputs.GitVersion_AssemblySemVer}}"
+            Write-Output "GitVersion_InformationalVersion: ${{needs.Setup.outputs.GitVersion_InformationalVersion}}"
 
   build:
     name: "Build & Test"
     runs-on: windows-latest
     needs: Setup
+    env:
+      solution: '**/*.sln'
+      buildPlatform: 'Any CPU'
+      buildConfiguration: 'Release'
+      GitVersion_AssemblySemVer: ${{ needs.Setup.outputs.GitVersion_AssemblySemVer }}
+      GitVersion_InformationalVersion: ${{ needs.Setup.outputs.GitVersion_InformationalVersion }}
     steps:
       # - name: Setup NuGet
       #   uses: NuGet/setup-nuget@v1.0.2
@@ -59,7 +69,7 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 8.x
-      - run: dotnet build 
+      - run: dotnet build /p:Version=$GitVersion_AssemblySemVer /p:FileVersion=$GitVersion_AssemblySemVer /p:InformationalVersion=$GitVersion_InformationalVersion
           
       - run: dotnet test
   
