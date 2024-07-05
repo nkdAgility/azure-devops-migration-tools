@@ -1,0 +1,102 @@
+name: Azure DevOps Migration Tools Build & Release
+
+on: 
+  push:
+  workflow_dispatch:
+
+jobs:
+  Setup:
+    name: "Setup & Configuration"
+    runs-on: ubuntu-latest
+    outputs:
+      GitVersion_BranchName: ${{ steps.gitversion.outputs.GitVersion_BranchName }}
+      GitVersion_SemVer: ${{ steps.gitversion.outputs.GitVersion_SemVer }}
+      GitVersion_PreReleaseLabel: ${{ steps.gitversion.outputs.GitVersion_PreReleaseLabel }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Install GitVersion
+      uses: gittools/actions/gitversion/setup@v1.1.1
+      with:
+        versionSpec: '5.x'
+        includePrerelease: true
+    - name: Execute GitVersion
+      id: gitversion
+      uses: gittools/actions/gitversion/execute@v1.1.1
+      with:
+        useConfigFile: true
+
+  SetupValidatorStage:
+    name: "Setup Validator"
+    runs-on: ubuntu-latest
+    needs: Setup
+    steps:
+      - name: "Release WorkItemClone"
+        shell: pwsh
+        run: |
+            Write-Output "GitVersion_BranchName: ${{needs.Setup.outputs.GitVersion_BranchName}}"
+            Write-Output "GitVersion_SemVer: ${{needs.Setup.outputs.GitVersion_SemVer}}"
+            Write-Output "GitVersion_PreReleaseLabel: ${{needs.Setup.outputs.GitVersion_PreReleaseLabel}}"
+
+  build:
+    name: "Build & Test"
+    runs-on: windows-latest
+    needs: Setup
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 4.x
+      - run: dotnet build
+      - run: dotnet test
+  
+  BuildDocs:
+    name: "Release to GitHub Wiki"
+    runs-on: ubuntu-latest
+    needs: [build]
+    if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
+    steps:
+      - uses: actions/checkout@v3
+
+  GitHubRelease:
+    name: "Release to GitHub Releases"
+    runs-on: ubuntu-latest
+    needs: [build, Setup]
+    if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
+    steps:
+      - uses: actions/checkout@v4
+  
+  MarketplaceRelease:
+    name: "Release to Marketplace"
+    runs-on: ubuntu-latest
+    needs: [build, Setup, GitHubRelease]
+    if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
+    steps:
+      - uses: actions/checkout@v4
+  
+  ChocolateyRelease:
+    name: "Release to Chocolatey"
+    runs-on: ubuntu-latest
+    needs: [build, Setup, GitHubRelease]
+    if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
+    steps:
+      - uses: actions/checkout@v4        
+
+  WingetRelease:
+    name: "Release to Chocolatey"
+    runs-on: ubuntu-latest
+    needs: [build, Setup, GitHubRelease]
+    if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
+    steps:
+      - uses: actions/checkout@v4   
+
+  DocsRelease:
+    name: "Release to Docs"
+    runs-on: ubuntu-latest
+    needs: [BuildDocs, Setup, GitHubRelease]
+    if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
+    steps:
+      - uses: actions/checkout@v4   
