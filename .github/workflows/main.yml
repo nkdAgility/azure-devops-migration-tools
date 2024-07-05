@@ -4,6 +4,10 @@ on:
   push:
   workflow_dispatch:
 
+env:
+   APP_ID: "Iv23li9aYvt0VW9x4Jhh"
+   PRIVATE_KEY: ${{ secrets.NKDAGILITY_BOT_CLIENTSECRET }}
+
 jobs:
   Setup:
     name: "Setup & Configuration"
@@ -73,6 +77,11 @@ jobs:
     needs: [build, Setup]
     if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
     steps:
+      - uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app-id: ${{ env.APP_ID }}
+          private-key: ${{ env.PRIVATE_KEY }}
       - uses: actions/checkout@v4
   
   MarketplaceRelease:
