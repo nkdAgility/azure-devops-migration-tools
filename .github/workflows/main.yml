@@ -65,6 +65,8 @@ jobs:
       #   run: nuget restore MigrationTools.sln
       # - name: Build and Publish Web App
       #   run: msbuild MigrationTools.sln 
+      - name: Checkout
+        uses: actions/checkout@v2
       - name: Setup .NET
         uses: actions/setup-dotnet@v1
         with:
