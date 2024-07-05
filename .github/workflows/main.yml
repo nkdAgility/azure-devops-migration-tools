@@ -1,4 +1,4 @@
-name: Azure DevOps Migration Tools Build & Release
+name: Build & Release (Azure DevOps Migration Tools)
 
 on: 
   push:
@@ -46,11 +46,20 @@ jobs:
     needs: Setup
     steps:
       - uses: actions/checkout@v4
+      - name: Setup MSBuild Path
+        uses: warrenbuckley/Setup-MSBuild@v1
+      # - name: Setup NuGet
+      #   uses: NuGet/setup-nuget@v1.0.2
+      # - name: Restore NuGet Packages
+      #   run: nuget restore MigrationTools.sln
+      # - name: Build and Publish Web App
+      #   run: msbuild MigrationTools.sln 
       - name: Setup .NET
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 4.x
-      - run: dotnet build
+      - run: dotnet build 
+          
       - run: dotnet test
   
   BuildDocs:
