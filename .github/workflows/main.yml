@@ -69,9 +69,15 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 8.x
-      - run: dotnet build **/*.sln /p:Version=$GitVersion_AssemblySemVer /p:FileVersion=$GitVersion_AssemblySemVer /p:InformationalVersion=$GitVersion_InformationalVersion
+      - name: "Release WorkItemClone"
+        shell: pwsh
+        run: |
+            Get-ChildItem -Path .\ -Recurse -Filter '*.sln' | ForEach-Object { $_.FullName }
+      - run: dotnet build MigrationTools.sln /p:Version=$GitVersion_AssemblySemVer /p:FileVersion=$GitVersion_AssemblySemVer /p:InformationalVersion=$GitVersion_InformationalVersion
           
-      - run: dotnet test
+      - run: dotnet test --logger trx --collect "Code coverage" --no-build --filter (TestCategory=L0|TestCategory=L1)
+      - run: dotnet test --logger trx --collect "Code coverage" --no-build --filter (TestCategory=L2|TestCategory=L3)
+      - run: dotnet test --logger trx --collect "Code coverage" --no-build --filter (TestCategory!=L0&TestCategory!=L1&TestCategory!=L2&TestCategory!=L3)
   
   BuildDocs:
     name: "Release to GitHub Wiki"
