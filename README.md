@@ -1,13 +1,18 @@
 ![azure-devops-migration-tools](https://socialify.git.ci/nkdAgility/azure-devops-migration-tools/image?description=1&descriptionEditable=Azure%20DevOps%20Migration%20Tools%20allow%20you%20to%20migrate%20Work%20Items%2C%20Plans%20%26%20Suits%2C%20%26%20Pipelines%20from%20one%20Azure%20DevOps%20%2F%20TFS%20to%20another!&font=Inter&forks=1&name=1&owner=1&pattern=Signal&stargazers=1&theme=Light)
 ![GitHub release](https://img.shields.io/github/release/nkdAgility/vsts-sync-migration.svg)
 ![GitHub pre-release](https://img.shields.io/github/v/release/nkdagility/vsts-sync-migration?include_prereleases)
+
 [![Build Status](https://dev.azure.com/nkdagility/AzureDevOps-Tools/_apis/build/status%2FMigrationTools-CIv2?branchName=main)](https://dev.azure.com/nkdagility/AzureDevOps-Tools/_build/latest?definitionId=115&branchName=main)
+![Azure DevOps tests](https://img.shields.io/azure-devops/tests/nkdagility/AzureDevOps-Tools/115?compact_message&style=plastic&logo=azuredevops&label=Tests)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=vsts-sync-migrator%3Amaster&metric=coverage)](https://sonarcloud.io/dashboard?id=vsts-sync-migrator%3Amaster)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=vsts-sync-migrator%3Amaster&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=vsts-sync-migrator%3Amaster)
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=vsts-sync-migrator%3Amaster&metric=security_rating)](https://sonarcloud.io/dashboard?id=vsts-sync-migrator%3Amaster)
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=vsts-sync-migrator%3Amaster&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=vsts-sync-migrator%3Amaster)
 ![Visual Studio Marketplace Rating](https://img.shields.io/visual-studio-marketplace/stars/nkdagility.vsts-sync-migration?logo=visualstudio)
 ![Chocolatey Downloads](https://img.shields.io/chocolatey/dt/vsts-sync-migrator)
+
+Creator: This tool was developed by http://nkdagility.com ![YouTube Channel Subscribers](https://img.shields.io/youtube/channel/subscribers/UCkYqhFNmhCzkefHsHS652hw)
+![YouTube Channel Views](https://img.shields.io/youtube/channel/views/UCkYqhFNmhCzkefHsHS652hw)
 
 
 
