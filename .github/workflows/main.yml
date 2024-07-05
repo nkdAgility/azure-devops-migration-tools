@@ -77,9 +77,9 @@ jobs:
             Get-ChildItem -Path .\ -Recurse -Filter '*.sln' | ForEach-Object { $_.FullName }
       - run: dotnet build MigrationTools.sln /p:Version=${{ env.GitVersion_AssemblySemVer }} /p:FileVersion=${{ env.GitVersion_AssemblySemVer }} /p:InformationalVersion=${{ env.GitVersion_InformationalVersion }}
           
-      - run: dotnet test --logger trx --collect "Code coverage" --no-build --filter (TestCategory=L0|TestCategory=L1)
-      - run: dotnet test --logger trx --collect "Code coverage" --no-build --filter (TestCategory=L2|TestCategory=L3)
-      - run: dotnet test --logger trx --collect "Code coverage" --no-build --filter (TestCategory!=L0&TestCategory!=L1&TestCategory!=L2&TestCategory!=L3)
+      - run: dotnet test MigrationTools.sln --logger trx --collect "Code coverage" --no-build --filter (TestCategory=L0|TestCategory=L1)
+      - run: dotnet test MigrationTools.sln --logger trx --collect "Code coverage" --no-build --filter (TestCategory=L2|TestCategory=L3)
+      - run: dotnet test MigrationTools.sln --logger trx --collect "Code coverage" --no-build --filter (TestCategory!=L0&TestCategory!=L1&TestCategory!=L2&TestCategory!=L3)
   
   BuildDocs:
     name: "Release to GitHub Wiki"
