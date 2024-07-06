@@ -109,6 +109,8 @@ jobs:
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
         with:
+            check_name: 'Test Results L0 & L1'
+            comment_title: "L0 & L1 Tests"
             files: |
                 test-results/**/*.xml
                 test-results/**/*.trx
@@ -141,6 +143,8 @@ jobs:
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
         with:
+            check_name: 'Test Results L2 & L3'
+            comment_title: "L2 & L3 Tests"
             files: |
                 test-results/**/*.xml
                 test-results/**/*.trx
@@ -148,7 +152,7 @@ jobs:
                 
 
   test-long:
-    name: "Test Other"
+    name: "Test (L?) - tests with No Catagory"
     runs-on: windows-latest
     needs: build
     env:
@@ -168,6 +172,8 @@ jobs:
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
         with:
+            check_name: 'Test Results Long'
+            comment_title: "L? Tests"
             files: |
                 test-results/**/*.xml
                 test-results/**/*.trx
