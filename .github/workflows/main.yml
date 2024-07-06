@@ -139,7 +139,7 @@ jobs:
   BuildDocs:
     name: "Release to GitHub Wiki"
     runs-on: ubuntu-latest
-    needs: [build, test-fast, test-slow, test-long]
+    needs: [build]
     if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
     steps:
       - uses: actions/checkout@v3
@@ -147,7 +147,7 @@ jobs:
   GitHubRelease:
     name: "Release to GitHub Releases"
     runs-on: ubuntu-latest
-    needs: [build, Setup]
+    needs: [build, Setup, test-fast, test-slow, test-long]
     if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
     steps:
       - uses: actions/create-github-app-token@v1
