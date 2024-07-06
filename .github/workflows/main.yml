@@ -100,7 +100,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: AzureDevOpsMigrationBuild
-      - name: "Find solution files"
+      - name: "Find Test Input files"
         shell: pwsh
         run: |
             Get-Item -Path .\ 
