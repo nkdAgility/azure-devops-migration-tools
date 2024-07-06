@@ -111,7 +111,7 @@ jobs:
           dotnet-version: 8.x
       - run: dotnet test "MigrationTools.sln" --output ".\test-results\" --logger trx --collect "Code coverage" --no-build --filter "(TestCategory=L0|TestCategory=L1)"
       - name: Publish Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v2
+        uses: EnricoMi/publish-unit-test-result-action/windows@v2
         if: always()
         with:
             check_name: 'Test Results L0 & L1'
@@ -145,7 +145,7 @@ jobs:
           dotnet-version: 8.x
       - run: dotnet test "MigrationTools.sln" --output ".\test-results\" --logger trx --collect "Code coverage" --no-build --filter "(TestCategory=L2|TestCategory=L3)"
       - name: Publish Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v2
+        uses: EnricoMi/publish-unit-test-result-action/windows@v2
         if: always()
         with:
             check_name: 'Test Results L2 & L3'
@@ -174,7 +174,7 @@ jobs:
           dotnet-version: 8.x
       - run: dotnet test "MigrationTools.sln" --output ".\test-results\" --logger trx --collect "Code coverage" --no-build --filter "(TestCategory!=L0&TestCategory!=L1&TestCategory!=L2&TestCategory!=L3)"
       - name: Publish Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v2
+        uses: EnricoMi/publish-unit-test-result-action/windows@v2
         if: always()
         with:
             check_name: 'Test Results Long'
@@ -189,7 +189,6 @@ jobs:
     name: "Build Documentation output"
     runs-on: ubuntu-latest
     needs: [Setup]
-    if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
     steps:
       - uses: actions/checkout@v3
   
