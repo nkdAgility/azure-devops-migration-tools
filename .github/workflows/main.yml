@@ -104,7 +104,15 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 8.x
-      - run: dotnet test MigrationTools.sln --logger trx --collect "Code coverage" --no-build --filter "(TestCategory=L0|TestCategory=L1)"
+      - run: dotnet test "**/*Tests/*.csproj" --output ".\test-results\" --logger trx --collect "Code coverage" --no-build --filter "(TestCategory=L0|TestCategory=L1)"
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+            files: |
+                test-results/**/*.xml
+                test-results/**/*.trx
+                test-results/**/*.json
 
   
   test-slow:
@@ -128,8 +136,17 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 8.x
-      - run: dotnet test MigrationTools.sln --logger trx --collect "Code coverage" --no-build --filter "(TestCategory=L2|TestCategory=L3)"
-  
+      - run: dotnet test "**/*Tests/*.csproj" --output ".\test-results\" --logger trx --collect "Code coverage" --no-build --filter "(TestCategory=L2|TestCategory=L3)"
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+            files: |
+                test-results/**/*.xml
+                test-results/**/*.trx
+                test-results/**/*.json
+                
+
   test-long:
     name: "Test Other"
     runs-on: windows-latest
@@ -146,8 +163,17 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 8.x
-      - run: dotnet test MigrationTools.sln --logger trx --collect "Code coverage" --no-build --filter "(TestCategory!=L0&TestCategory!=L1&TestCategory!=L2&TestCategory!=L3)"
-        
+      - run: dotnet test "**/*Tests/*.csproj" --output ".\test-results\" --logger trx --collect "Code coverage" --no-build --filter "(TestCategory!=L0&TestCategory!=L1&TestCategory!=L2&TestCategory!=L3)"
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+            files: |
+                test-results/**/*.xml
+                test-results/**/*.trx
+                test-results/**/*.json
+                
+
   BuildDocs:
     name: "Release to GitHub Wiki"
     runs-on: ubuntu-latest
