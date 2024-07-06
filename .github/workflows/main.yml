@@ -105,7 +105,7 @@ jobs:
         run: |
             Get-Item -Path .\ 
             Get-ChildItem -Path .\ -Recurse -Filter '*.sln' | ForEach-Object { $_.FullName }
-            Get-ChildItem -Path .\ -Recurse -Filter '*Test/*.csproj' | ForEach-Object { $_.FullName }  
+            Get-ChildItem -Path .\ -Recurse -Filter '*.csproj' | ForEach-Object { $_.FullName }  
       - name: Setup .NET
         uses: actions/setup-dotnet@v1
         with:
@@ -145,7 +145,7 @@ jobs:
         run: |
             Get-Item -Path .\ 
             Get-ChildItem -Path .\ -Recurse -Filter '*.sln' | ForEach-Object { $_.FullName }
-            Get-ChildItem -Path .\ -Recurse -Filter '**/*Test/*.csproj' | ForEach-Object { $_.FullName }  
+            Get-ChildItem -Path .\ -Recurse -Filter '*Test/*.csproj' | ForEach-Object { $_.FullName }  
       - name: Setup .NET
         uses: actions/setup-dotnet@v1
         with:
@@ -185,7 +185,7 @@ jobs:
         run: |
             Get-Item -Path .\ 
             Get-ChildItem -Path .\ -Recurse -Filter '*.sln' | ForEach-Object { $_.FullName }
-            Get-ChildItem -Path .\ -Recurse -Filter '**/*Test/*.csproj' | ForEach-Object { $_.FullName }  
+            Get-ChildItem -Path .\ -Recurse -Filter '*.csproj' | ForEach-Object { $_.FullName }  
       - name: Setup .NET
         uses: actions/setup-dotnet@v1
         with:
