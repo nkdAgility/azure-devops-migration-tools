@@ -49,7 +49,7 @@ jobs:
             Write-Output "GitVersion_InformationalVersion: ${{needs.Setup.outputs.GitVersion_InformationalVersion}}"
 
   build:
-    name: "Build & Test"
+    name: "Build"
     runs-on: windows-latest
     needs: Setup
     env:
@@ -79,7 +79,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: AzureDevOpsMigrationBuild
-          path: .\azure-devops-migration-tools\azure-devops-migration-tools\**
+          path: .\**
 
   test-fast:
     name: "Test L0 & L1"
@@ -93,6 +93,11 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: AzureDevOpsMigrationBuild
+      - name: "Find solution files"
+        shell: pwsh
+        run: |
+            Get-Item -Path .\ 
+            Get-ChildItem -Path .\ -Recurse -Filter '*.sln' | ForEach-Object { $_.FullName }
       - name: Setup .NET
         uses: actions/setup-dotnet@v1
         with:
