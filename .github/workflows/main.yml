@@ -83,7 +83,7 @@ jobs:
       - run: dotnet build MigrationTools.sln /p:Version=${{ env.GitVersion_AssemblySemVer }} /p:FileVersion=${{ env.GitVersion_AssemblySemVer }} /p:InformationalVersion=${{ env.GitVersion_InformationalVersion }}
       - uses: actions/upload-artifact@v4
         with:
-          name: AzureDevOpsMigrationBuild
+          name: AzureDevOpsMigration-Build
 
           path: .\**
 
@@ -99,13 +99,13 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: AzureDevOpsMigrationBuild
+          name: AzureDevOpsMigration-Build
       - name: "Find Test Input files"
         shell: pwsh
         run: |
             Get-Item -Path .\ 
             Get-ChildItem -Path .\ -Recurse -Filter '*.sln' | ForEach-Object { $_.FullName }
-            Get-ChildItem -Path .\ -Recurse -Filter '**/*Test/*.csproj' | ForEach-Object { $_.FullName }  
+            Get-ChildItem -Path .\ -Recurse -Filter '*Test/*.csproj' | ForEach-Object { $_.FullName }  
       - name: Setup .NET
         uses: actions/setup-dotnet@v1
         with:
@@ -139,7 +139,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: AzureDevOpsMigrationBuild
+          name: AzureDevOpsMigration-Build
       - name: "Find input files"
         shell: pwsh
         run: |
@@ -179,7 +179,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: AzureDevOpsMigrationBuild
+          name: AzureDevOpsMigration-Build
       - name: "Find input files"
         shell: pwsh
         run: |
@@ -230,7 +230,7 @@ jobs:
         uses: jerryjvl/jekyll-build-action@v1
       - uses: actions/upload-artifact@v3
         with:
-          name: AzureDevOpsMigrationToolsSite
+          name: AzureDevOpsMigrationTools-Site
           path: ./_site/**/*
   
   # Package Chocolatey
@@ -357,7 +357,7 @@ jobs:
       - name: Download a single artifact
         uses: actions/download-artifact@v3
         with:
-          name: AzureDevOpsMigrationToolsSite
+          name: AzureDevOpsMigrationTools-Site
           path: ./_site
       - name: SFTP Upload
         # You may pin to the exact commit or the version.
