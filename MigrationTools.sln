@@ -94,7 +94,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.TestExtensio
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".workflows", ".workflows", "{8A70932A-F6C7-45D1-8E72-608B6BF0F9FD}"
 	ProjectSection(SolutionItems) = preProject
-		AzureDevOps.yaml = AzureDevOps.yaml
 		.github\workflows\main.yml = .github\workflows\main.yml
 	EndProjectSection
 EndProject
