@@ -49,7 +49,7 @@ jobs:
             Write-Output "GitVersion_InformationalVersion: ${{needs.Setup.outputs.GitVersion_InformationalVersion}}"
 
   build:
-    name: "Build"
+    name: "Build .NET Framework App"
     runs-on: windows-latest
     needs: Setup
     env:
@@ -74,11 +74,13 @@ jobs:
       - name: "Find solution files"
         shell: pwsh
         run: |
+            Get-Item -Path .\ 
             Get-ChildItem -Path .\ -Recurse -Filter '*.sln' | ForEach-Object { $_.FullName }
       - run: dotnet build MigrationTools.sln /p:Version=${{ env.GitVersion_AssemblySemVer }} /p:FileVersion=${{ env.GitVersion_AssemblySemVer }} /p:InformationalVersion=${{ env.GitVersion_InformationalVersion }}
       - uses: actions/upload-artifact@v4
         with:
           name: AzureDevOpsMigrationBuild
+
           path: .\**
 
   test-fast:
@@ -117,6 +119,11 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: AzureDevOpsMigrationBuild
+      - name: "Find solution files"
+        shell: pwsh
+        run: |
+            Get-Item -Path .\ 
+            Get-ChildItem -Path .\ -Recurse -Filter '*.sln' | ForEach-Object { $_.FullName }
       - name: Setup .NET
         uses: actions/setup-dotnet@v1
         with:
@@ -148,11 +155,53 @@ jobs:
     if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
     steps:
       - uses: actions/checkout@v3
+  
+  PackageChocolatey:
+    name: "Package Chocolatey"
+    runs-on: ubuntu-latest
+    needs: [build, Setup, test-fast, test-slow, test-long]
+    if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: AzureDevOpsMigrationBuild
+      - name: "Find solution files"
+        shell: pwsh
+        run: |
+            Get-Item -Path .\ 
+            Get-ChildItem -Path .\ -Recurse -Filter '*.sln' | ForEach-Object { $_.FullName }
+      - uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app-id: ${{ env.APP_ID }}
+          private-key: ${{ env.PRIVATE_KEY }}
+      - uses: actions/checkout@v4
+
+  PackageMarketplace:
+    name: "Package Marketplace"
+    runs-on: ubuntu-latest
+    needs: [build, Setup, test-fast, test-slow, test-long]
+    if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: AzureDevOpsMigrationBuild
+      - name: "Find solution files"
+        shell: pwsh
+        run: |
+            Get-Item -Path .\ 
+            Get-ChildItem -Path .\ -Recurse -Filter '*.sln' | ForEach-Object { $_.FullName }
+      - uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app-id: ${{ env.APP_ID }}
+          private-key: ${{ env.PRIVATE_KEY }}
+      - uses: actions/checkout@v4
 
   GitHubRelease:
     name: "Release to GitHub Releases"
     runs-on: ubuntu-latest
-    needs: [build, Setup, test-fast, test-slow, test-long]
+    needs: [build, Setup, test-fast, test-slow, test-long, PackageChocolatey, PackageMarketplace]
     if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
     steps:
       - uses: actions/create-github-app-token@v1
@@ -165,26 +214,47 @@ jobs:
   MarketplaceRelease:
     name: "Release to Marketplace"
     runs-on: ubuntu-latest
-    needs: [build, Setup, GitHubRelease]
+    needs: [Setup, GitHubRelease, PackageMarketplace]
     if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: AzureDevOpsMigrationBuild
+      - name: "Find solution files"
+        shell: pwsh
+        run: |
+            Get-Item -Path .\ 
+            Get-ChildItem -Path .\ -Recurse -Filter '*.sln' | ForEach-Object { $_.FullName }
   
   ChocolateyRelease:
     name: "Release to Chocolatey"
     runs-on: ubuntu-latest
-    needs: [build, Setup, GitHubRelease]
+    needs: [Setup, GitHubRelease, PackageChocolatey]
     if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
     steps:
-      - uses: actions/checkout@v4        
+      - uses: actions/download-artifact@v4
+        with:
+          name: AzureDevOpsMigrationBuild
+      - name: "Find solution files"
+        shell: pwsh
+        run: |
+            Get-Item -Path .\ 
+            Get-ChildItem -Path .\ -Recurse -Filter '*.sln' | ForEach-Object { $_.FullName }   
 
   WingetRelease:
-    name: "Release to Chocolatey"
+    name: "Release to Winget"
     runs-on: ubuntu-latest
-    needs: [build, Setup, GitHubRelease]
+    needs: [Setup, GitHubRelease]
     if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
     steps:
-      - uses: actions/checkout@v4   
+      - uses: actions/download-artifact@v4
+        with:
+          name: AzureDevOpsMigrationBuild
+      - name: "Find solution files"
+        shell: pwsh
+        run: |
+            Get-Item -Path .\ 
+            Get-ChildItem -Path .\ -Recurse -Filter '*.sln' | ForEach-Object { $_.FullName }
 
   DocsRelease:
     name: "Release to Docs"
@@ -192,4 +262,11 @@ jobs:
     needs: [BuildDocs, Setup, GitHubRelease]
     if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
     steps:
-      - uses: actions/checkout@v4   
+      - uses: actions/download-artifact@v4
+        with:
+          name: AzureDevOpsMigrationBuild
+      - name: "Find solution files"
+        shell: pwsh
+        run: |
+            Get-Item -Path .\ 
+            Get-ChildItem -Path .\ -Recurse -Filter '*.sln' | ForEach-Object { $_.FullName }
