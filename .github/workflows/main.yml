@@ -191,7 +191,7 @@ jobs:
   PackageChocolatey:
     name: "Package Chocolatey"
     runs-on: ubuntu-latest
-    needs: [build, Setup, test-fast, test-slow, test-long]
+    needs: [build, Setup]
     if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
     steps:
       - uses: actions/download-artifact@v4
@@ -212,7 +212,7 @@ jobs:
   PackageMarketplace:
     name: "Package Marketplace"
     runs-on: ubuntu-latest
-    needs: [build, Setup, test-fast, test-slow, test-long]
+    needs: [build, Setup]
     if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
     steps:
       - uses: actions/download-artifact@v4
