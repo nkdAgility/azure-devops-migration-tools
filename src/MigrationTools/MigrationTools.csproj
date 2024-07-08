@@ -10,7 +10,7 @@
     <RepositoryType>Git</RepositoryType>
     <PackageTags>Migration Tools, Azure DevOps, API</PackageTags>
     <PackageLicenseExpression></PackageLicenseExpression>
-    <Copyright>naked Agility with Martin Hinshelwood 2016-2021</Copyright>
+    <Copyright>naked Agility with Martin Hinshelwood 2016-2025</Copyright>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
   </PropertyGroup>
