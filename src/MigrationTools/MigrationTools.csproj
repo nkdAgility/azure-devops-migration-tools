@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+	<TargetFrameworks>netstandard2.0;net8.0</TargetFrameworks>
     <Product>Azure DevOps Migration Tools API</Product>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Description>Reference API for creating plugins for the Azure DevOps Migration Tools</Description>
