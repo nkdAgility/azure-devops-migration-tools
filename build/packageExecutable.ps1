@@ -37,7 +37,7 @@ New-Item  -Path $outfolder -Name "\MigrationTools\ConfigSamples\" -ItemType Dire
 # Copy Files
 Write-Output "Copy files to $outfolder\MigrationTools\"
 Copy-Item  -Path ".\src\MigrationTools.ConsoleFull\bin\Debug\net472\*" -Destination "$outfolder\MigrationTools\" -Recurse
-Copy-Item  -Path ".\src\MigrationTools.ConsoleCore\bin\Debug\net7.0\*" -Destination "$outfolder\MigrationTools\preview\" -Recurse
+Copy-Item  -Path ".\src\MigrationTools.ConsoleCore\bin\Debug\net8.0\*" -Destination "$outfolder\MigrationTools\preview\" -Recurse
 Copy-Item  -Path ".\src\MigrationTools.Samples\*" -Destination "$outfolder\MigrationTools\ConfigSamples\" -Recurse 
 #==============================================================================
 # Create Zip

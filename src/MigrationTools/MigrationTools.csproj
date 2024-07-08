@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+	<TargetFrameworks>netstandard2.0;net8.0</TargetFrameworks>
     <Product>Azure DevOps Migration Tools API</Product>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Description>Reference API for creating plugins for the Azure DevOps Migration Tools</Description>
@@ -10,7 +10,7 @@
     <RepositoryType>Git</RepositoryType>
     <PackageTags>Migration Tools, Azure DevOps, API</PackageTags>
     <PackageLicenseExpression></PackageLicenseExpression>
-    <Copyright>naked Agility with Martin Hinshelwood 2016-2021</Copyright>
+    <Copyright>naked Agility with Martin Hinshelwood 2016-2025</Copyright>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
   </PropertyGroup>

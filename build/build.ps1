@@ -26,6 +26,10 @@ $version = $versionInfo.SemVer
 if ($version -eq $null) {
     $version = "0.0.2"
 }
+$NuGetVersion = $versionInfo.NuGetVersion
+if ($NuGetVersion -eq $null) {
+	$NuGetVersion = "0.0.2"
+}
 Write-Output "Version: $version"
 $stagingfolder = New-Item -Name "output\Staging" -ItemType Directory
 
@@ -33,7 +37,7 @@ $stagingfolder = New-Item -Name "output\Staging" -ItemType Directory
 .\build\packageExecutable.ps1 -version $version -outfolder $stagingfolder
 #-------------------------------------------
 # Azure DevOps Migration Tools (Extension) Packaging
-.\build\packageExtension.ps1 -version $version -outfolder $stagingfolder
+.\build\packageExtension.ps1 -SemVer $version -NuGetVersion $NuGetVersion -outfolder $stagingfolder
 #-------------------------------------------
 # Azure DevOps Migration Tools (Chocolatey) Packaging
 .\build\packageChocolatey.ps1 -version $version -outfolder $stagingfolder
