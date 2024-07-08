@@ -226,6 +226,11 @@ jobs:
       #   run: nuget restore MigrationTools.sln
       # - name: Build and Publish Web App
       #   run: msbuild MigrationTools.sln 
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          distribution: 'zulu'
       - name: Checkout
         uses: actions/checkout@v2
       - name: Setup .NET
