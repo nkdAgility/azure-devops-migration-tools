@@ -114,7 +114,7 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 8.x
-      - run: dotnet test "${{ steps.findSolution.outputs.solution}}" --results-directory ".\test-results\" --logger trx --collect "Code coverage" --no-build --filter "(TestCategory=L0|TestCategory=L1)"
+      - run: dotnet test "${{ steps.findSolution.outputs.solution}}" --results-directory ".\test-results\" --logger trx --collect "Code coverage" --filter "(TestCategory=L0|TestCategory=L1)"
       - name: "Find Test Output files"
         shell: pwsh
         run: |
@@ -144,17 +144,20 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: AzureDevOpsMigration-Build
-      - name: "Find input files"
+      - name: "Find Test Input files"
+        id: findSolution
         shell: pwsh
         run: |
             Get-Item -Path .\ 
-            Get-ChildItem -Path .\ -Recurse -Filter '*.sln' | ForEach-Object { $_.FullName }
+            $Solution = (Get-ChildItem -Path .\ -Recurse -Filter '*.sln').FullName
+            $Solution
+            Write-Output "solution=$Solution" >> $Env:GITHUB_OUTPUT
             Get-ChildItem -Path .\ -Recurse -Filter '*.csproj' | ForEach-Object { $_.FullName }  
       - name: Setup .NET
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 8.x
-      - run: dotnet test "azure-devops-migration-tools\MigrationTools.sln" --results-directory ".\test-results\" --logger trx --collect "Code coverage" --no-build --filter "(TestCategory=L2|TestCategory=L3)"
+      - run: dotnet test "${{ steps.findSolution.outputs.solution}}" --results-directory ".\test-results\" --logger trx --collect "Code coverage" --filter "(TestCategory=L2|TestCategory=L3)"
       - name: "Find Test Output files"
         shell: pwsh
         run: |
@@ -184,17 +187,20 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: AzureDevOpsMigration-Build
-      - name: "Find input files"
+      - name: "Find Test Input files"
+        id: findSolution
         shell: pwsh
         run: |
             Get-Item -Path .\ 
-            Get-ChildItem -Path .\ -Recurse -Filter '*.sln' | ForEach-Object { $_.FullName }
+            $Solution = (Get-ChildItem -Path .\ -Recurse -Filter '*.sln').FullName
+            $Solution
+            Write-Output "solution=$Solution" >> $Env:GITHUB_OUTPUT
             Get-ChildItem -Path .\ -Recurse -Filter '*.csproj' | ForEach-Object { $_.FullName }  
       - name: Setup .NET
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 8.x
-      - run: dotnet test "\azure-devops-migration-tools\MigrationTools.sln" --results-directory ".\test-results\" --logger trx --collect "Code coverage" --no-build --filter "(TestCategory!=L0&TestCategory!=L1&TestCategory!=L2&TestCategory!=L3)"
+      - run: dotnet test "${{ steps.findSolution.outputs.solution}}" --results-directory ".\test-results\" --logger trx --collect "Code coverage" --filter "(TestCategory!=L0&TestCategory!=L1&TestCategory!=L2&TestCategory!=L3)"
       - name: "Find Test Output files"
         shell: pwsh
         run: |
