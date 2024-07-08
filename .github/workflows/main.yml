@@ -295,7 +295,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: AzureDevOpsMigrationBuild
+          name: AzureDevOpsMigration-Build
       - name: "Find solution files"
         shell: pwsh
         run: |
@@ -321,7 +321,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: AzureDevOpsMigrationBuild
+          name: AzureDevOpsMigration-Build
       - name: "Find solution files"
         shell: pwsh
         run: |
@@ -364,7 +364,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: AzureDevOpsMigrationBuild
+          name: AzureDevOpsMigration-Build
       - name: "Find solution files"
         shell: pwsh
         run: |
@@ -380,7 +380,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: AzureDevOpsMigrationBuild
+          name: AzureDevOpsMigration-Build
       - name: "Find solution files"
         shell: pwsh
         run: |
@@ -396,7 +396,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: AzureDevOpsMigrationBuild
+          name: AzureDevOpsMigration-Build
       - name: "Find solution files"
         shell: pwsh
         run: |
@@ -412,7 +412,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: AzureDevOpsMigrationBuild
+          name: AzureDevOpsMigration-Build
       - name: "Find solution files"
         shell: pwsh
         run: |
