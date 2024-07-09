@@ -52,9 +52,9 @@ jobs:
             Write-Output "GitVersion_AssemblySemVer: ${{needs.Setup.outputs.GitVersion_AssemblySemVer}}"
             Write-Output "GitVersion_InformationalVersion: ${{needs.Setup.outputs.GitVersion_InformationalVersion}}"
     
-  # Build, Test, & Sonar Cloud Analysis
+  # Build, Test, Sonar Cloud Analysis, & Package
   build:
-    name: "Build, Test, & Sonar Cloud Analysis"
+    name: "Build, Test, Sonar Cloud Analysis, & Package"
     runs-on: windows-latest
     needs: Setup
     env:
@@ -96,6 +96,8 @@ jobs:
               /d:sonar.host.url="https://sonarcloud.io" 
               /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
       - run: dotnet build MigrationTools.sln /p:Version=${{ env.GitVersion_AssemblySemVer }} /p:FileVersion=${{ env.GitVersion_AssemblySemVer }} /p:InformationalVersion=${{ env.GitVersion_InformationalVersion }}
+        name: Build MigrationTools.sln
+        id: Build
       - run: dotnet test "MigrationTools.sln" --results-directory ".\test-results\" --logger trx --collect "Code coverage" --no-build --filter "(TestCategory=L0|TestCategory=L1)"
       - run: dotnet test "MigrationTools.sln" --results-directory ".\test-results\" --logger trx --collect "Code coverage" --no-build --filter "(TestCategory=L2|TestCategory=L3)"
       - run: dotnet test "MigrationTools.sln" --results-directory ".\test-results\" --logger trx --collect "Code coverage" --no-build --filter "(TestCategory!=L0&TestCategory!=L1&TestCategory!=L2&TestCategory!=L3)"
@@ -104,19 +106,29 @@ jobs:
         with:
           name: AzureDevOpsMigrationTools-Build
           path: .\**
-      - name: "Package Files"
+      - name: "Package Executable Files"
+        id: packageExecutable
         shell: pwsh
+        if: ${{ steps.Build.outcome == 'success' }}
         run: |
            ./build/packageExecutable.ps1 -version ${{ env.GitVersion_SemVer }} -outfolder "./staging"
-      - name: "Package Marketplace Files"
+      - name: "Package Chocolatey Files"
         shell: pwsh
+        if: ${{ steps.packageExecutable.outcome == 'success' }}
         run: |
-            $item = Get-ChildItem -Path .\ -Recurse -Filter 'MigrationTools-${{ env.GitVersion_SemVer }}.zip' | Select-Object -First 1
-            .\build\packageChocolatey.ps1 -SemVer ${{ env.GitVersion_SemVer }} -NuGetVersion ${{ env.GitVersion_NuGetVersion }} -outfolder "./staging" -migrationToolsZip $item.FullName
-      - name: "Package Marketplace Files"
+            $item = Get-ChildItem -Path ./staging/ -Recurse -Filter 'MigrationTools-${{ env.GitVersion_SemVer }}.zip' | Select-Object -First 1
+            Write-Output "Found: $item.FullName"
+            .\build\packageChocolatey.ps1 -SemVer ${{ env.GitVersion_SemVer }} -NuGetVersion ${{ env.GitVersion_NuGetVersion }} -outfolder "./staging" -migrationToolsFilename $item.FullName
+      - name: "Package Extension Files"
         shell: pwsh
+        if: ${{ steps.Build.outcome == 'success' }}
         run: |
-                .\build\packageExtension.ps1 -version ${{ env.GitVersion_AssemblySemVer }} -outfolder "./staging" 
+            .\build\packageExtension.ps1 -version ${{ env.GitVersion_AssemblySemVer }} -outfolder "./staging" 
+      - name: "List Package Files"
+        shell: pwsh
+        if: ${{ steps.Build.outcome == 'success' }}
+        run: |
+                 Get-ChildItem -Path ./staging/ -Recurse | ForEach-Object { $_.FullName }
       - uses: actions/upload-artifact@v4
         with:
           name: AzureDevOpsMigrationTools-Packages
