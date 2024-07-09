@@ -82,7 +82,6 @@ jobs:
         with:
           dotnet-version: |
               8.x
-              7.x
       - name: "Find solution files"
         shell: pwsh
         run: |
@@ -165,7 +164,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: AzureDevOpsMigrationTools-Executables
-          path: ./staging/**/*   
+          path: ./staging/*   
 
   # Package Chocolatey
   PackageChocolatey:
@@ -200,7 +199,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: AzureDevOpsMigrationTools-Chocolatey
-          path: ./staging/**/*     
+          path: ./staging/*     
 
   # Package Marketplace
   PackageMarketplace:
@@ -235,7 +234,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: AzureDevOpsMigrationTools-Extension
-          path: ./staging/**/*     
+          path: ./staging/*     
 
   # GitHubRelease
   GitHubRelease:
