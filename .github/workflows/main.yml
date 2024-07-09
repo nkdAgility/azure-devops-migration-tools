@@ -102,10 +102,9 @@ jobs:
       - run: dotnet test "MigrationTools.sln" --results-directory ".\test-results\" --logger trx --collect "Code coverage" --no-build --filter "(TestCategory!=L0&TestCategory!=L1&TestCategory!=L2&TestCategory!=L3)"
         if: always()  
       - run: dotnet sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
-        if: always()
       - uses: actions/upload-artifact@v4
         with:
-          name: AzureDevOpsMigration-Build
+          name: AzureDevOpsMigrationTools-Build
           path: .\**
 
 
@@ -149,7 +148,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: AzureDevOpsMigration-Build
+          name: AzureDevOpsMigrationTools-Build
       - name: "Find solution files"
         shell: pwsh
         run: |
@@ -182,7 +181,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: AzureDevOpsMigration-Executables
+          name: AzureDevOpsMigrationTools-Executables
       - name: "Find solution files"
         shell: pwsh
         run: |
@@ -219,7 +218,7 @@ jobs:
           node-version: 18
       - uses: actions/download-artifact@v4
         with:
-          name: AzureDevOpsMigration-Build
+          name: AzureDevOpsMigrationTools-Build
       - name: "Find solution files"
         shell: pwsh
         run: |
@@ -265,7 +264,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: AzureDevOpsMigration-Build
+          name: AzureDevOpsMigrationTools-Build
       - name: "Find solution files"
         shell: pwsh
         run: |
@@ -281,7 +280,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: AzureDevOpsMigration-Build
+          name: AzureDevOpsMigrationTools-Build
       - name: "Find solution files"
         shell: pwsh
         run: |
@@ -297,7 +296,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: AzureDevOpsMigration-Build
+          name: AzureDevOpsMigrationTools-Build
       - name: "Find solution files"
         shell: pwsh
         run: |
@@ -313,7 +312,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: AzureDevOpsMigration-Build
+          name: AzureDevOpsMigrationTools-Build
       - name: "Find solution files"
         shell: pwsh
         run: |
