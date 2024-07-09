@@ -160,122 +160,12 @@ jobs:
           name: AzureDevOpsMigrationTools-Site
           path: ./_site/**/*
   
-  # Package Executables
-  PackageApplication:
-    name: "Package Executables"
-    runs-on: ubuntu-latest
-    needs: [build, Setup]
-    if: ${{ success() }}
-    env:
-      GitVersion_SemVer: ${{ needs.Setup.outputs.GitVersion_SemVer }}
-      GitVersion_AssemblySemVer: ${{ needs.Setup.outputs.GitVersion_AssemblySemVer }}
-      GitVersion_InformationalVersion: ${{ needs.Setup.outputs.GitVersion_InformationalVersion }}
-      GitVersion_NuGetVersion: ${{ needs.Setup.outputs.GitVersion_NuGetVersion }}
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: AzureDevOpsMigrationTools-Build
-      - name: "Find solution files"
-        shell: pwsh
-        run: |
-            Get-Item -Path ./ 
-      - uses: actions/create-github-app-token@v1
-        id: app-token
-        with:
-          app-id: ${{ env.APP_ID }}
-          private-key: ${{ env.PRIVATE_KEY }}
-      - name: "Package Files"
-        shell: pwsh
-        run: |
-            ./build/packageExecutable.ps1 -version ${{ env.GitVersion_SemVer }} -outfolder "./staging"
-      - name: "Find solution files"
-        shell: pwsh
-        run: |
-            Get-Item -Path ./
-            Get-ChildItem -Path ./staging -Recurse | ForEach-Object { $_.FullName }
-      - uses: actions/upload-artifact@v3
-        with:
-          name: AzureDevOpsMigrationTools-Executables
-          path: ./staging/*   
-          if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn`
-
-  # Package Chocolatey
-  PackageChocolatey:
-    name: "Package Chocolatey"
-    runs-on: ubuntu-latest
-    needs: [PackageApplication, Setup]
-    if: ${{ success() }}
-    env:
-      GitVersion_SemVer: ${{ needs.Setup.outputs.GitVersion_SemVer }}
-      GitVersion_AssemblySemVer: ${{ needs.Setup.outputs.GitVersion_AssemblySemVer }}
-      GitVersion_InformationalVersion: ${{ needs.Setup.outputs.GitVersion_InformationalVersion }}
-      GitVersion_NuGetVersion: ${{ needs.Setup.outputs.GitVersion_NuGetVersion }}
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: AzureDevOpsMigrationTools-Executables
-      - name: "Find solution files"
-        shell: pwsh
-        run: |
-            Get-Item -Path .\
-            Get-ChildItem -Path .\ -Recurse -Filter '*.zip' | ForEach-Object { $_.FullName }
-      - uses: actions/create-github-app-token@v1
-        id: app-token
-        with:
-          app-id: ${{ env.APP_ID }}
-          private-key: ${{ env.PRIVATE_KEY }}
-      - name: "Package Marketplace Files"
-        shell: pwsh
-        run: |
-            $item = Get-ChildItem -Path .\ -Recurse -Filter 'MigrationTools-${{ env.GitVersion_SemVer }}.zip' | Select-Object -First 1
-            .\build\packageChocolatey.ps1 -SemVer ${{ env.GitVersion_SemVer }} -NuGetVersion ${{ env.GitVersion_NuGetVersion }} -outfolder "./staging" -migrationToolsZip $item.FullName
-      - uses: actions/upload-artifact@v3
-        with:
-          name: AzureDevOpsMigrationTools-Chocolatey
-          path: ./staging/*
-          if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn`
-
-  # Package Marketplace
-  PackageMarketplace:
-    name: "Package Marketplace"
-    runs-on: ubuntu-latest
-    needs: [build, Setup]
-    if: ${{ success() }}
-    env:
-      GitVersion_SemVer: ${{ needs.Setup.outputs.GitVersion_SemVer }}
-      GitVersion_AssemblySemVer: ${{ needs.Setup.outputs.GitVersion_AssemblySemVer }}
-      GitVersion_InformationalVersion: ${{ needs.Setup.outputs.GitVersion_InformationalVersion }}
-    steps:
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 18
-      - uses: actions/download-artifact@v4
-        with:
-          name: AzureDevOpsMigrationTools-Build
-      - name: "Find solution files"
-        shell: pwsh
-        run: |
-            Get-Item -Path .\ 
-      - uses: actions/create-github-app-token@v1
-        id: app-token
-        with:
-          app-id: ${{ env.APP_ID }}
-          private-key: ${{ env.PRIVATE_KEY }}
-      - name: "Package Marketplace Files"
-        shell: pwsh
-        run: |
-            .\build\packageExtension.ps1 -version ${{ env.GitVersion_AssemblySemVer }} -outfolder "./staging" 
-      - uses: actions/upload-artifact@v3
-        with:
-          name: AzureDevOpsMigrationTools-Extension
-          path: ./staging/*    
-          if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn` 
 
   # GitHubRelease
   GitHubRelease:
     name: "(fake) Release to GitHub Releases"
     runs-on: ubuntu-latest
-    needs: [build, Setup, PackageChocolatey, PackageMarketplace, PackageApplication]
+    needs: [build, Setup]
     #if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
     steps:
       - uses: actions/create-github-app-token@v1
@@ -341,7 +231,7 @@ jobs:
   DocsRelease:
     name: "Release to Docs"
     runs-on: ubuntu-latest
-    needs: [BuildDocs, Setup, GitHubRelease]
+    needs: [BuildDocs, GitHubRelease]
     #if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
     steps:
       - name: Download a single artifact
