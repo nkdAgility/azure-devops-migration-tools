@@ -172,7 +172,7 @@ jobs:
   PackageChocolatey:
     name: "Package Chocolatey"
     runs-on: ubuntu-latest
-    needs: [build, Setup]
+    needs: [PackageApplication, Setup]
     if: ${{ success() }}
     env:
       GitVersion_SemVer: ${{ needs.Setup.outputs.GitVersion_SemVer }}
@@ -182,11 +182,12 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: AzureDevOpsMigration-Build
+          name: AzureDevOpsMigration-Executables
       - name: "Find solution files"
         shell: pwsh
         run: |
-            Get-Item -Path .\ 
+            Get-Item -Path .\
+            Get-ChildItem -Path .\ -Recurse -Filter '*.zip' | ForEach-Object { $_.FullName }
       - uses: actions/create-github-app-token@v1
         id: app-token
         with:
@@ -195,7 +196,8 @@ jobs:
       - name: "Package Marketplace Files"
         shell: pwsh
         run: |
-            .\build\packageChocolatey.ps1 -SemVer ${{ env.GitVersion_SemVer }} -NuGetVersion ${{ env.GitVersion_NuGetVersion }} -outfolder "./staging"
+            $item = Get-ChildItem -Path .\ -Recurse -Filter 'MigrationTools-${{ env.GitVersion_SemVer }}.zip' | Select-Object -First 1
+            .\build\packageChocolatey.ps1 -SemVer ${{ env.GitVersion_SemVer }} -NuGetVersion ${{ env.GitVersion_NuGetVersion }} -outfolder "./staging" -migrationToolsZip $item.FullName
       - uses: actions/upload-artifact@v3
         with:
           name: AzureDevOpsMigrationTools-Chocolatey

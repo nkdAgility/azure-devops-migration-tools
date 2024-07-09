@@ -14,14 +14,17 @@ param (
     
     # name of the output folder
     [Parameter(Mandatory=$true)]
-    [string]$outfolder
+    [string]$outfolder,
+
+       # name of the migrationToolsZip File path
+    [Parameter(Mandatory=$true)]
+    [string]$migrationToolsFilename
 )
 Write-Output "Azure DevOps Migration Tools (Chocolatey) Packaging"
 Write-Output "----------------------------------------"
 Write-Output "SemVer: $SemVer"
 Write-Output "NuGetVersion: $NuGetVersion"
 Write-Output "Output Folder: $outfolder"
-$MigrationToolsFilename = "MigrationTools-$SemVer.zip"
 Write-Output "MigrationTools Filename: $MigrationToolsFilename"
 
 # create hash
