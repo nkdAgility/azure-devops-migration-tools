@@ -1,6 +1,6 @@
 cls
 
-
+$env:RUNNER_OS = "Windows"
 
 $StartTimeBuild = Get-Date;
 Write-Output "BUILD Azure DevOps Migration Tools"
@@ -73,5 +73,3 @@ $stagingfolder = New-Item -Name "output\Staging" -ItemType Directory
  # Final
  Write-Output "Build ran in $((Get-Date) - $StartTimeBuild)"
  #==============================================================================
-
- .\build\packageExtension.ps1 version $version -NuGetVersion "1.0.0" -outfolder ".\staging"
