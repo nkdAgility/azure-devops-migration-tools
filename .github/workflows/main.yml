@@ -61,8 +61,10 @@ jobs:
       solution: '**/*.sln'
       buildPlatform: 'Any CPU'
       buildConfiguration: 'Release'
+      GitVersion_SemVer: ${{ needs.Setup.outputs.GitVersion_SemVer }}
       GitVersion_AssemblySemVer: ${{ needs.Setup.outputs.GitVersion_AssemblySemVer }}
       GitVersion_InformationalVersion: ${{ needs.Setup.outputs.GitVersion_InformationalVersion }}
+      GitVersion_NuGetVersion: ${{ needs.Setup.outputs.GitVersion_NuGetVersion }}
     steps:
       # - name: Setup NuGet
       #   uses: NuGet/setup-nuget@v1.0.2
@@ -102,7 +104,23 @@ jobs:
         with:
           name: AzureDevOpsMigrationTools-Build
           path: .\**
-
+      - name: "Package Files"
+        shell: pwsh
+        run: |
+           ./build/packageExecutable.ps1 -version ${{ env.GitVersion_SemVer }} -outfolder "./staging"
+      - name: "Package Marketplace Files"
+        shell: pwsh
+        run: |
+            $item = Get-ChildItem -Path .\ -Recurse -Filter 'MigrationTools-${{ env.GitVersion_SemVer }}.zip' | Select-Object -First 1
+            .\build\packageChocolatey.ps1 -SemVer ${{ env.GitVersion_SemVer }} -NuGetVersion ${{ env.GitVersion_NuGetVersion }} -outfolder "./staging" -migrationToolsZip $item.FullName
+      - name: "Package Marketplace Files"
+        shell: pwsh
+        run: |
+                .\build\packageExtension.ps1 -version ${{ env.GitVersion_AssemblySemVer }} -outfolder "./staging" 
+      - uses: actions/upload-artifact@v4
+        with:
+          name: AzureDevOpsMigrationTools-Packages
+          path: ./staging/**
 
   # Build Docs
   BuildDocs:
@@ -154,7 +172,7 @@ jobs:
         with:
           app-id: ${{ env.APP_ID }}
           private-key: ${{ env.PRIVATE_KEY }}
-      - name: "Package Marketplace Files"
+      - name: "Package Files"
         shell: pwsh
         run: |
             ./build/packageExecutable.ps1 -version ${{ env.GitVersion_SemVer }} -outfolder "./staging"
