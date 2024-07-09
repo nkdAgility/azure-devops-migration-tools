@@ -29,19 +29,19 @@ Write-Output "MigrationTools Filename: $MigrationToolsFilename"
 
 # create hash
 Write-Output "Creating Hash for $MigrationToolsFilename"
-$ZipHash = Get-FileHash $outfolder\$MigrationToolsFilename -Algorithm SHA256
+$ZipHash = Get-FileHash $outfolder/$MigrationToolsFilename -Algorithm SHA256
 $obj = @{
     "Hash" = $($ZipHash.Hash)
     "FullHash" = $ZipHash
     }
-$hashSaveFile = "$outfolder\MigrationTools-$SemVer.hash.txt"
+$hashSaveFile = "$outfolder/MigrationTools-$SemVer.hash.txt"
 $obj | ConvertTo-Json |  Set-Content -Path $hashSaveFile
 Write-Output "Hash saved to $hashSaveFile"
 
 #-------------------------------------------
 # Replace tokens
 Write-Output "Find and replace tokens"
-$tokens = @("**\chocolatey*.ps1")
+$tokens = @("**/chocolatey*.ps1")
 $files = Get-ChildItem -Path $tokens -Recurse -Exclude "output"
 Write-Output "Found $($files.Count) files that might have tokens"
 

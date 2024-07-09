@@ -95,11 +95,8 @@ jobs:
               /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
       - run: dotnet build MigrationTools.sln /p:Version=${{ env.GitVersion_AssemblySemVer }} /p:FileVersion=${{ env.GitVersion_AssemblySemVer }} /p:InformationalVersion=${{ env.GitVersion_InformationalVersion }}
       - run: dotnet test "MigrationTools.sln" --results-directory ".\test-results\" --logger trx --collect "Code coverage" --no-build --filter "(TestCategory=L0|TestCategory=L1)"
-        if: always()
       - run: dotnet test "MigrationTools.sln" --results-directory ".\test-results\" --logger trx --collect "Code coverage" --no-build --filter "(TestCategory=L2|TestCategory=L3)"
-        if: always()
       - run: dotnet test "MigrationTools.sln" --results-directory ".\test-results\" --logger trx --collect "Code coverage" --no-build --filter "(TestCategory!=L0&TestCategory!=L1&TestCategory!=L2&TestCategory!=L3)"
-        if: always()  
       - run: dotnet sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
       - uses: actions/upload-artifact@v4
         with:
@@ -151,7 +148,7 @@ jobs:
       - name: "Find solution files"
         shell: pwsh
         run: |
-            Get-Item -Path .\ 
+            Get-Item -Path ./ 
       - uses: actions/create-github-app-token@v1
         id: app-token
         with:
@@ -160,11 +157,17 @@ jobs:
       - name: "Package Marketplace Files"
         shell: pwsh
         run: |
-            .\build\packageExecutable.ps1 -version ${{ env.GitVersion_SemVer }} -outfolder "./staging"
+            ./build/packageExecutable.ps1 -version ${{ env.GitVersion_SemVer }} -outfolder "./staging"
+      - name: "Find solution files"
+        shell: pwsh
+        run: |
+            Get-Item -Path ./
+            Get-ChildItem -Path ./staging -Recurse | ForEach-Object { $_.FullName }
       - uses: actions/upload-artifact@v3
         with:
           name: AzureDevOpsMigrationTools-Executables
           path: ./staging/*   
+          if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn`
 
   # Package Chocolatey
   PackageChocolatey:
@@ -199,7 +202,8 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: AzureDevOpsMigrationTools-Chocolatey
-          path: ./staging/*     
+          path: ./staging/*
+          if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn`
 
   # Package Marketplace
   PackageMarketplace:
@@ -234,7 +238,8 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: AzureDevOpsMigrationTools-Extension
-          path: ./staging/*     
+          path: ./staging/*    
+          if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn` 
 
   # GitHubRelease
   GitHubRelease:

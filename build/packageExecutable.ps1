@@ -18,7 +18,7 @@ Write-Output "Version: $version"
 Write-Output "Output Folder: $outfolder"
 $OutputFilename = "MigrationTools-$version.zip"
 Write-Output "Filename: $OutputFilename"
-$OutputFullName = "$outfolder\$OutputFilename"
+$OutputFullName = "$outfolder/$OutputFilename"
 Write-Output "Full Name: $OutputFullName"
 Write-Output "OS: $env:RUNNER_OS"
 #==============================================================================
@@ -71,19 +71,19 @@ switch ($env:RUNNER_OS)
 Write-Output "----------------------------------------"
 # Create output sub folders
 Write-Output "Create folders in $outfolder"
-New-Item -Path $outfolder -Name "\MigrationTools\" -ItemType Directory
-New-Item -Path $outfolder -Name "\MigrationTools\preview\" -ItemType Directory
-New-Item  -Path $outfolder -Name "\MigrationTools\ConfigSamples\" -ItemType Directory
+New-Item -Path $outfolder -Name "/MigrationTools/" -ItemType Directory
+New-Item -Path $outfolder -Name "/MigrationTools/preview/" -ItemType Directory
+New-Item  -Path $outfolder -Name "/MigrationTools/ConfigSamples/" -ItemType Directory
 Write-Output "----------------------------------------"
 # Copy Files
-Write-Output "Copy files to $outfolder\MigrationTools\"
-Copy-Item  -Path ".\src\MigrationTools.ConsoleFull\bin\Debug\net472\*" -Destination "$outfolder\MigrationTools\" -Recurse
-Copy-Item  -Path ".\src\MigrationTools.ConsoleCore\bin\Debug\net8.0\*" -Destination "$outfolder\MigrationTools\preview\" -Recurse
-Copy-Item  -Path ".\src\MigrationTools.Samples\*" -Destination "$outfolder\MigrationTools\ConfigSamples\" -Recurse 
+Write-Output "Copy files to $outfolder/MigrationTools/"
+Copy-Item  -Path "./src/MigrationTools.ConsoleFull/bin/Debug/net472/*" -Destination "$outfolder/MigrationTools/" -Recurse
+Copy-Item  -Path "./src/MigrationTools.ConsoleCore/bin/Debug/net8.0/*" -Destination "$outfolder/MigrationTools/preview/" -Recurse
+Copy-Item  -Path "./src/MigrationTools.Samples/*" -Destination "$outfolder/MigrationTools/ConfigSamples/" -Recurse 
 Write-Output "----------------------------------------"
 # Create Zip
-7z a -tzip  $OutputFullName $outfolder\MigrationTools\**
+7z a -tzip  $OutputFullName $outfolder/MigrationTools/**
 Write-Output "----------------------------------------"
 # Cleanup
-Remove-Item -Path "$outfolder\MigrationTools" -Recurse -Force
+Remove-Item -Path "$outfolder/MigrationTools" -Recurse -Force
 Write-Output "========================================="
