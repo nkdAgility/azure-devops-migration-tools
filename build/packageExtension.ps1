@@ -33,9 +33,10 @@ if (((npm list -g tfx-cli) -join "," ).Contains("empty")) {
     npm i -g tfx-cli
 } else { Write-Output "Detected tfx-cli"}
 Write-Output "----------------------------------------"
+Get-ChildItem -Path $outfolder -Recurse | ForEach-Object { $_.FullName }
+Write-Output "----------------------------------------"
 # Build TFS Extension
 Write-Output ">>>>> Build TFS Extension"
-
 tfx extension create --root "$outfolder/MigrationTools.Extension/" --output-path $outfolder --manifest-globs vss-extension.json
 Write-Output "----------------------------------------"
 # Cleanup
