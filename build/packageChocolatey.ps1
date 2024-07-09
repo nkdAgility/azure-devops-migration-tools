@@ -29,7 +29,7 @@ Write-Output "MigrationTools Filename: $MigrationToolsFilename"
 
 # create hash
 Write-Output "Creating Hash for $MigrationToolsFilename"
-$ZipHash = Get-FileHash $outfolder/$MigrationToolsFilename -Algorithm SHA256
+$ZipHash = Get-FileHash $MigrationToolsFilename -Algorithm SHA256
 $obj = @{
     "Hash" = $($ZipHash.Hash)
     "FullHash" = $ZipHash
