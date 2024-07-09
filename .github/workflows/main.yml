@@ -20,6 +20,7 @@ jobs:
       GitVersion_PreReleaseLabel: ${{ steps.gitversion.outputs.GitVersion_PreReleaseLabel }}
       GitVersion_AssemblySemVer: ${{ steps.gitversion.outputs.GitVersion_AssemblySemVer }}
       GitVersion_InformationalVersion: ${{ steps.gitversion.outputs.GitVersion_InformationalVersion }}
+      GitVersion_NuGetVersion: ${{ steps.gitversion.outputs.GitVersion_NuGetVersion }}
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -257,7 +258,7 @@ jobs:
   MarketplaceRelease:
     name: "(fake) Release to Marketplace"
     runs-on: ubuntu-latest
-    needs: [Setup, GitHubRelease, PackageMarketplace]
+    needs: [Setup, GitHubRelease]
     if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
     steps:
       - uses: actions/download-artifact@v4
@@ -273,7 +274,7 @@ jobs:
   ChocolateyRelease:
     name: "(fake) Release to Chocolatey"
     runs-on: ubuntu-latest
-    needs: [Setup, GitHubRelease, PackageChocolatey]
+    needs: [Setup, GitHubRelease]
     if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
     steps:
       - uses: actions/download-artifact@v4
