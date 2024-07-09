@@ -161,6 +161,11 @@ jobs:
   GitHubRelease:
     name: "(fake) Release to GitHub Releases"
     runs-on: ubuntu-latest
+    env:
+      GitVersion_SemVer: ${{ needs.Setup.outputs.GitVersion_SemVer }}
+      GitVersion_AssemblySemVer: ${{ needs.Setup.outputs.GitVersion_AssemblySemVer }}
+      GitVersion_InformationalVersion: ${{ needs.Setup.outputs.GitVersion_InformationalVersion }}
+      GitVersion_NuGetVersion: ${{ needs.Setup.outputs.GitVersion_NuGetVersion }}
     needs: [build, Setup]
     #if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
     steps:
@@ -172,11 +177,23 @@ jobs:
         with:
           app-id: ${{ env.APP_ID }}
           private-key: ${{ env.PRIVATE_KEY }}
-      - uses: actions/download-artifact@v4
       - name: "Package  Files"
         shell: pwsh
         run: |
              Get-ChildItem -Path .\ -Recurse | ForEach-Object { $_.FullName }
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            MigrationTools-*.zip
+            nkdAgility.vsts-sync-migration-*.vsix
+            vsts-sync-migrator.*.nupkg
+          generate_release_notes: true
+          tag_name: v${{ needs.Setup.outputs.GitVersion_SemVer }}
+          name: Azure DevOps Migration Tools v${{ needs.Setup.outputs.GitVersion_SemVer }}
+          token: ${{ steps.app-token.outputs.token }}
+          draft: true
+          prerelease: true
   
   # Release to Marketplace
   MarketplaceRelease:
@@ -231,7 +248,7 @@ jobs:
     name: "Release to Docs"
     runs-on: ubuntu-latest
     needs: [BuildDocs, GitHubRelease]
-    #if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
+    if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
     steps:
       - name: Download a single artifact
         uses: actions/download-artifact@v3
