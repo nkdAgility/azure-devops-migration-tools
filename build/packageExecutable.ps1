@@ -24,7 +24,27 @@ Write-Output "OS: $env:RUNNER_OS"
 #==============================================================================
 Write-Output "----------------------------------------"
 # Install Prerequisits
-Write-Output "Install Prerequisits for $env:RUNNER_OS"
+Write-Output "Install Prerequisits for GH($env:RUNNER_OS) | ADO($env:AGENT_OS)"
+If ($env:AGENT_OS -ne $null)
+{
+    switch ($env:AGENT_OS)
+    {
+        "Windows_NT" {
+            $env:RUNNER_OS = "Windows"
+            break;
+        }
+        "Linux" {
+            $env:RUNNER_OS = "Linux"
+            break;
+        }
+        default {
+            Write-Output "We dont support $env:AGENT_OS!"
+            exit 1
+            break;
+        }
+    }
+}
+
 switch ($env:RUNNER_OS)
 {
     "Windows" {
