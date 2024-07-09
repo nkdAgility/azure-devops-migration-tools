@@ -134,9 +134,42 @@ jobs:
           name: AzureDevOpsMigrationTools-Site
           path: ./_site/**/*
   
+  # Package Executables
+  PackageApplication:
+    name: "Package Executables"
+    runs-on: ubuntu-latest
+    needs: [build, Setup]
+    if: ${{ success() }}
+    env:
+      GitVersion_SemVer: ${{ needs.Setup.outputs.GitVersion_SemVer }}
+      GitVersion_AssemblySemVer: ${{ needs.Setup.outputs.GitVersion_AssemblySemVer }}
+      GitVersion_InformationalVersion: ${{ needs.Setup.outputs.GitVersion_InformationalVersion }}
+      GitVersion_NuGetVersion: ${{ needs.Setup.outputs.GitVersion_NuGetVersion }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: AzureDevOpsMigration-Build
+      - name: "Find solution files"
+        shell: pwsh
+        run: |
+            Get-Item -Path .\ 
+      - uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app-id: ${{ env.APP_ID }}
+          private-key: ${{ env.PRIVATE_KEY }}
+      - name: "Package Marketplace Files"
+        shell: pwsh
+        run: |
+            .\build\packageExecutable.ps1 -version ${{ env.GitVersion_SemVer }} -outfolder "./staging"
+      - uses: actions/upload-artifact@v3
+        with:
+          name: AzureDevOpsMigrationTools-Executables
+          path: ./staging/**/*   
+
   # Package Chocolatey
   PackageChocolatey:
-    name: "(fake) Package Chocolatey"
+    name: "Package Chocolatey"
     runs-on: ubuntu-latest
     needs: [build, Setup]
     if: ${{ success() }}
@@ -206,7 +239,7 @@ jobs:
   GitHubRelease:
     name: "(fake) Release to GitHub Releases"
     runs-on: ubuntu-latest
-    needs: [build, Setup, PackageChocolatey, PackageMarketplace]
+    needs: [build, Setup, PackageChocolatey, PackageMarketplace, PackageApplication]
     if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
     steps:
       - uses: actions/create-github-app-token@v1
