@@ -22,6 +22,9 @@ $OutputFullName = "$outfolder\$OutputFilename"
 Write-Output "Full Name: $OutputFullName"
 #==============================================================================
 # Install Prerequisits
+Write-Output "Install Prerequisits for $env:RUNNER_OS"
+
+sudo apt install p7zip-full p7zip-rar
 $installedStuff = choco list -i 
 if (($installedStuff -like "*7zip*").Count -eq 0) {
    Write-Output "Installing 7zip"
