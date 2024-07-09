@@ -23,13 +23,29 @@ Write-Output "Full Name: $OutputFullName"
 #==============================================================================
 # Install Prerequisits
 Write-Output "Install Prerequisits for $env:RUNNER_OS"
+switch ($env:RUNNER_OS)
+{
+    "Windows" {
+        Write-Output "Detected Windows"
+        $installedStuff = choco list -i 
+        if (($installedStuff -like "*7zip*").Count -eq 0) {
+        Write-Output "Installing 7zip"
+        choco install 7zip --confirm --accept-license -y
+        } else { Write-Output "Detected 7zip"}
+        break;
+    }
+    "Linux" {
+        Write-Output "Detected Linux"
+        sudo apt install p7zip-full p7zip-rar
+        break;
+    }
+    default {
+        Write-Output "We dont support $env:RUNNER_OS!"
+        exit 1
+        break;
+    }
 
-sudo apt install p7zip-full p7zip-rar
-$installedStuff = choco list -i 
-if (($installedStuff -like "*7zip*").Count -eq 0) {
-   Write-Output "Installing 7zip"
-   choco install 7zip --confirm --accept-license -y
-} else { Write-Output "Detected 7zip"}
+}
 #==============================================================================
 # Create output sub folders
 Write-Output "Create folders in $outfolder"
