@@ -102,10 +102,6 @@ jobs:
       - run: dotnet test "MigrationTools.sln" --results-directory ".\test-results\" --logger trx --collect "Code coverage" --no-build --filter "(TestCategory=L2|TestCategory=L3)"
       - run: dotnet test "MigrationTools.sln" --results-directory ".\test-results\" --logger trx --collect "Code coverage" --no-build --filter "(TestCategory!=L0&TestCategory!=L1&TestCategory!=L2&TestCategory!=L3)"
       - run: dotnet sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
-      - uses: actions/upload-artifact@v4
-        with:
-          name: AzureDevOpsMigrationTools-Build
-          path: .\**
       - name: "Package Executable Files"
         id: packageExecutable
         shell: pwsh
