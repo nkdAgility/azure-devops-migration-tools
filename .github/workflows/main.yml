@@ -241,7 +241,7 @@ jobs:
     name: "(fake) Release to GitHub Releases"
     runs-on: ubuntu-latest
     needs: [build, Setup, PackageChocolatey, PackageMarketplace, PackageApplication]
-    if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
+    #if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
     steps:
       - uses: actions/create-github-app-token@v1
         id: app-token
@@ -249,21 +249,21 @@ jobs:
           app-id: ${{ env.APP_ID }}
           private-key: ${{ env.PRIVATE_KEY }}
       - uses: actions/download-artifact@v4
-      - name: "Package Marketplace Files"
+      - name: "Package  Files"
         shell: pwsh
         run: |
              Get-ChildItem -Path .\ -Recurse | ForEach-Object { $_.FullName }
   
   # Release to Marketplace
   MarketplaceRelease:
-    name: "(fake) Release to Marketplace"
+    name: "(stub) Release to Marketplace"
     runs-on: ubuntu-latest
     needs: [Setup, GitHubRelease]
-    if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
+    #if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: AzureDevOpsMigrationTools-Build
+          name: AzureDevOpsMigrationTools-Extension
       - name: "Find solution files"
         shell: pwsh
         run: |
@@ -272,14 +272,14 @@ jobs:
   
   # Release to Chocolatey
   ChocolateyRelease:
-    name: "(fake) Release to Chocolatey"
+    name: "(stub) Release to Chocolatey"
     runs-on: ubuntu-latest
     needs: [Setup, GitHubRelease]
-    if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
+    #if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: AzureDevOpsMigrationTools-Build
+          name: AzureDevOpsMigrationTools-Chocolatey
       - name: "Find solution files"
         shell: pwsh
         run: |
@@ -291,7 +291,7 @@ jobs:
     name: "(fake) Release to Winget"
     runs-on: ubuntu-latest
     needs: [Setup, GitHubRelease]
-    if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
+    #if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -307,21 +307,17 @@ jobs:
     name: "Release to Docs"
     runs-on: ubuntu-latest
     needs: [BuildDocs, Setup, GitHubRelease]
-    if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
+    #if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
     steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: AzureDevOpsMigrationTools-Build
-      - name: "Find solution files"
-        shell: pwsh
-        run: |
-            Get-Item -Path .\ 
-            Get-ChildItem -Path .\ -Recurse -Filter '*.sln' | ForEach-Object { $_.FullName }
       - name: Download a single artifact
         uses: actions/download-artifact@v3
         with:
           name: AzureDevOpsMigrationTools-Site
           path: ./_site
+      - name: "Find  files"
+        shell: pwsh
+        run: |
+            Get-Item -Path .\ 
       - name: SFTP Upload
         # You may pin to the exact commit or the version.
         # uses: Dylan700/sftp-upload-action@f90db607d9fe1acdc0eefccee84d37c119b268fe
