@@ -164,6 +164,9 @@ jobs:
     needs: [build, Setup]
     #if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
     steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: AzureDevOpsMigrationTools-Packages
       - uses: actions/create-github-app-token@v1
         id: app-token
         with:
@@ -184,7 +187,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: AzureDevOpsMigrationTools-Extension
+          name: AzureDevOpsMigrationTools-Packages
       - name: "Find solution files"
         shell: pwsh
         run: |
@@ -200,7 +203,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: AzureDevOpsMigrationTools-Chocolatey
+          name: AzureDevOpsMigrationTools-Packages
       - name: "Find solution files"
         shell: pwsh
         run: |
@@ -216,7 +219,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: AzureDevOpsMigrationTools-Build
+          name: AzureDevOpsMigrationTools-Packages
       - name: "Find solution files"
         shell: pwsh
         run: |
