@@ -159,7 +159,7 @@ jobs:
 
   # GitHubRelease
   GitHubRelease:
-    name: "(fake) Release to GitHub Releases"
+    name: "(test) Release to GitHub Releases"
     runs-on: ubuntu-latest
     env:
       GitVersion_SemVer: ${{ needs.Setup.outputs.GitVersion_SemVer }}
@@ -190,7 +190,7 @@ jobs:
             vsts-sync-migrator.*.nupkg
           generate_release_notes: true
           tag_name: v${{ needs.Setup.outputs.GitVersion_SemVer }}
-          name: Azure DevOps Migration Tools v${{ needs.Setup.outputs.GitVersion_SemVer }}
+          name: (TEST) Azure DevOps Migration Tools v${{ needs.Setup.outputs.GitVersion_SemVer }}
           token: ${{ steps.app-token.outputs.token }}
           draft: true
           prerelease: true
