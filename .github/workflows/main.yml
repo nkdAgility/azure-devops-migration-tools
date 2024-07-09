@@ -102,6 +102,11 @@ jobs:
         if: always()  
       - run: dotnet sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
         if: always()
+      - uses: actions/upload-artifact@v4
+        with:
+          name: AzureDevOpsMigration-Build
+          path: .\**
+
 
   # Build Docs
   BuildDocs:
@@ -135,6 +140,11 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build, Setup]
     if: ${{ success() }}
+    env:
+      GitVersion_SemVer: ${{ needs.Setup.outputs.GitVersion_SemVer }}
+      GitVersion_AssemblySemVer: ${{ needs.Setup.outputs.GitVersion_AssemblySemVer }}
+      GitVersion_InformationalVersion: ${{ needs.Setup.outputs.GitVersion_InformationalVersion }}
+      GitVersion_NuGetVersion: ${{ needs.Setup.outputs.GitVersion_NuGetVersion }}
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -143,15 +153,21 @@ jobs:
         shell: pwsh
         run: |
             Get-Item -Path .\ 
-            Get-ChildItem -Path .\ -Recurse -Filter '*.sln' | ForEach-Object { $_.FullName }
       - uses: actions/create-github-app-token@v1
         id: app-token
         with:
           app-id: ${{ env.APP_ID }}
           private-key: ${{ env.PRIVATE_KEY }}
-      - uses: actions/checkout@v4
+      - name: "Package Marketplace Files"
+        shell: pwsh
+        run: |
+            .\build\packageChocolatey.ps1 -SemVer ${{ env.GitVersion_SemVer }} -NuGetVersion ${{ env.GitVersion_NuGetVersion }} -outfolder "./staging"
+      - uses: actions/upload-artifact@v3
+        with:
+          name: AzureDevOpsMigrationTools-Chocolatey
+          path: ./staging/**/*     
 
-  # PackageMarketplace
+  # Package Marketplace
   PackageMarketplace:
     name: "Package Marketplace"
     runs-on: ubuntu-latest
@@ -198,7 +214,11 @@ jobs:
         with:
           app-id: ${{ env.APP_ID }}
           private-key: ${{ env.PRIVATE_KEY }}
-      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+      - name: "Package Marketplace Files"
+        shell: pwsh
+        run: |
+             Get-ChildItem -Path .\ -Recurse | ForEach-Object { $_.FullName }
   
   # Release to Marketplace
   MarketplaceRelease:
