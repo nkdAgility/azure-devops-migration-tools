@@ -230,7 +230,7 @@ stages:
         targetType: 'inline'
         script: |
           $item = Get-ChildItem -Path .\ -Recurse -Filter 'MigrationTools-$(GitVersion.SemVer).zip' | Select-Object -First 1;
-          .\build\packageChocolatey.ps1 -SemVer $(GitVersion.SemVer) -NuGetVersion $(GitVersion.NuGetVersion) -outfolder "$(Build.ArtifactStagingDirectory)" -migrationToolsZip $item.FullName
+          .\build\packageChocolatey.ps1 -SemVer $(GitVersion.SemVer) -NuGetVersion $(GitVersion.NuGetVersion) -outfolder "$(Build.ArtifactStagingDirectory)" -migrationToolsFilename $item.FullName
     - task: PowerShell@2
       displayName: "Packaging (Winget)"
       inputs:
