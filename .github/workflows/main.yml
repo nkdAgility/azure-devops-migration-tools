@@ -166,8 +166,9 @@ jobs:
       GitVersion_AssemblySemVer: ${{ needs.Setup.outputs.GitVersion_AssemblySemVer }}
       GitVersion_InformationalVersion: ${{ needs.Setup.outputs.GitVersion_InformationalVersion }}
       GitVersion_NuGetVersion: ${{ needs.Setup.outputs.GitVersion_NuGetVersion }}
+      GitVersion_PreReleaseLabel: ${{ needs.Setup.outputs.GitVersion_PreReleaseLabel }}
     needs: [build, Setup]
-    #if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
+    if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -190,10 +191,10 @@ jobs:
             vsts-sync-migrator.*.nupkg
           generate_release_notes: true
           tag_name: v${{ needs.Setup.outputs.GitVersion_SemVer }}
-          name: (TEST) Azure DevOps Migration Tools v${{ needs.Setup.outputs.GitVersion_SemVer }}
+          name: Azure DevOps Migration Tools v${{ needs.Setup.outputs.GitVersion_SemVer }}
           token: ${{ steps.app-token.outputs.token }}
-          draft: true
-          prerelease: true
+          prerelease: ${{ needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' }}
+          discussion_category_name: "Anouncement"
   
   # Release to Marketplace
   MarketplaceRelease:
