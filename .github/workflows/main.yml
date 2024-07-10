@@ -151,7 +151,7 @@ jobs:
         name: Spellcheck
       - name: Build Jekyll
         uses: jerryjvl/jekyll-build-action@v1
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: AzureDevOpsMigrationTools-Site
           path: ./_site/**/*
