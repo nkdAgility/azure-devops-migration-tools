@@ -10,6 +10,7 @@
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=vsts-sync-migrator%3Amaster&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=vsts-sync-migrator%3Amaster)
 ![Visual Studio Marketplace Rating](https://img.shields.io/visual-studio-marketplace/stars/nkdagility.vsts-sync-migration?logo=visualstudio)
 ![Chocolatey Downloads](https://img.shields.io/chocolatey/dt/vsts-sync-migrator)
+[![Elmah.io](https://img.shields.io/badge/sponsored_by-elmah_io-0da58e)](https://elmah.io)
 
 Created and maintained by [Martin Hinshelwood](https://www.linkedin.com/in/martinhinshelwood/) (http://nkdagility.com)
 
@@ -36,6 +37,9 @@ The Azure DevOps Migration Tools allow you to bulk edit and migrate data between
 | Migration Run Ave  | **14 minutes** | Includes dry-runs as well.  |
 | Migration Run Total   |  **19bn Seconds** | Thats **316m hours** or **13m days** of run time in the last 30 days. |
 | Average Work item Migration Time  | **22s** | Work Item (includes all revisions, links, and attachments for the work item) |
+
+Exceptions shipped to Application Insights and [Elmah.io](https://elmah.io) for analysis and improvement.
+
 
 
 ## What can you do with this tool?
