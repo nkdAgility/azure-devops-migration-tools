@@ -168,7 +168,7 @@ jobs:
       GitVersion_NuGetVersion: ${{ needs.Setup.outputs.GitVersion_NuGetVersion }}
       GitVersion_PreReleaseLabel: ${{ needs.Setup.outputs.GitVersion_PreReleaseLabel }}
     needs: [build, Setup]
-    if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
+    #if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -183,6 +183,7 @@ jobs:
         run: |
              Get-ChildItem -Path .\ -Recurse | ForEach-Object { $_.FullName }
       - name: Release
+        if: ${{ false }}
         uses: softprops/action-gh-release@v2
         with:
           files: |
