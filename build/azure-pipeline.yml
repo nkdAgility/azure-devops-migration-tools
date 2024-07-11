@@ -224,10 +224,13 @@ stages:
         filePath: '.\build\packageExtension.ps1'
         arguments: '-version $(GitVersion.AssemblySemVer) -outfolder "$(Build.ArtifactStagingDirectory)"' 
     - task: PowerShell@2
-      displayName: "Packaging (Chocolatey)"
+      displayName: Packaging (Chocolatey)
+      name: ChocolateyPack
       inputs:
-        filePath: '.\build\packageChocolatey.ps1'
-        arguments: '-SemVer $(GitVersion.SemVer) -NuGetVersion $(GitVersion.NuGetVersion) -outfolder "$(Build.ArtifactStagingDirectory)"' 
+        targetType: 'inline'
+        script: |
+          $item = Get-ChildItem -Path .\ -Recurse -Filter 'MigrationTools-$(GitVersion.SemVer).zip' | Select-Object -First 1;
+          .\build\packageChocolatey.ps1 -SemVer $(GitVersion.SemVer) -NuGetVersion $(GitVersion.NuGetVersion) -outfolder "$(Build.ArtifactStagingDirectory)" -migrationToolsFilename $item.FullName
     - task: PowerShell@2
       displayName: "Packaging (Winget)"
       inputs:
