@@ -1,6 +1,6 @@
 cls
 
-
+$env:RUNNER_OS = "Windows"
 
 $StartTimeBuild = Get-Date;
 Write-Output "BUILD Azure DevOps Migration Tools"
@@ -40,7 +40,8 @@ $stagingfolder = New-Item -Name "output\Staging" -ItemType Directory
 .\build\packageExtension.ps1 -SemVer $version -NuGetVersion $NuGetVersion -outfolder $stagingfolder
 #-------------------------------------------
 # Azure DevOps Migration Tools (Chocolatey) Packaging
-.\build\packageChocolatey.ps1 -version $version -outfolder $stagingfolder
+$item = Get-ChildItem -Path .\ -Recurse -Filter 'MigrationTools-$version.zip' | Select-Object -First 1
+.\build\packageChocolatey.ps1 -version $version -outfolder $stagingfolder -migrationToolsFilename $item.FullName
 #-------------------------------------------
 # Azure DevOps Migration Tools (Nuget) Packaging
 .\build\packageNuget.ps1 -version $version -outfolder $stagingfolder
@@ -73,3 +74,5 @@ $stagingfolder = New-Item -Name "output\Staging" -ItemType Directory
  # Final
  Write-Output "Build ran in $((Get-Date) - $StartTimeBuild)"
  #==============================================================================
+ 
+ .\build\packageExecutable.ps1 -version "1.0.0" -outfolder ".\staging"

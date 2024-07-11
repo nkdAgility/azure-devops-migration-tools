@@ -14,31 +14,34 @@ param (
     
     # name of the output folder
     [Parameter(Mandatory=$true)]
-    [string]$outfolder
+    [string]$outfolder,
+
+       # name of the migrationToolsZip File path
+    [Parameter(Mandatory=$true)]
+    [string]$migrationToolsFilename
 )
 Write-Output "Azure DevOps Migration Tools (Chocolatey) Packaging"
 Write-Output "----------------------------------------"
 Write-Output "SemVer: $SemVer"
 Write-Output "NuGetVersion: $NuGetVersion"
 Write-Output "Output Folder: $outfolder"
-$MigrationToolsFilename = "MigrationTools-$SemVer.zip"
 Write-Output "MigrationTools Filename: $MigrationToolsFilename"
 
 # create hash
 Write-Output "Creating Hash for $MigrationToolsFilename"
-$ZipHash = Get-FileHash $outfolder\$MigrationToolsFilename -Algorithm SHA256
+$ZipHash = Get-FileHash $MigrationToolsFilename -Algorithm SHA256
 $obj = @{
     "Hash" = $($ZipHash.Hash)
     "FullHash" = $ZipHash
     }
-$hashSaveFile = "$outfolder\MigrationTools-$SemVer.hash.txt"
+$hashSaveFile = "$outfolder/MigrationTools-$SemVer.hash.txt"
 $obj | ConvertTo-Json |  Set-Content -Path $hashSaveFile
 Write-Output "Hash saved to $hashSaveFile"
 
 #-------------------------------------------
 # Replace tokens
 Write-Output "Find and replace tokens"
-$tokens = @("**\chocolatey*.ps1")
+$tokens = @("**/chocolatey*.ps1")
 $files = Get-ChildItem -Path $tokens -Recurse -Exclude "output"
 Write-Output "Found $($files.Count) files that might have tokens"
 

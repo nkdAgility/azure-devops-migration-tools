@@ -1,0 +1,282 @@
+name: Build & Release (Azure DevOps Migration Tools)
+
+on: 
+  push:
+  workflow_dispatch:
+
+env:
+   APP_ID: "Iv23li9aYvt0VW9x4Jhh"
+   PRIVATE_KEY: ${{ secrets.NKDAGILITY_BOT_CLIENTSECRET }}
+
+jobs:
+
+   # Setup & Configuration
+  Setup:
+    name: "Setup & Configuration"
+    runs-on: ubuntu-latest
+    outputs:
+      GitVersion_BranchName: ${{ steps.gitversion.outputs.GitVersion_BranchName }}
+      GitVersion_SemVer: ${{ steps.gitversion.outputs.GitVersion_SemVer }}
+      GitVersion_PreReleaseLabel: ${{ steps.gitversion.outputs.GitVersion_PreReleaseLabel }}
+      GitVersion_AssemblySemVer: ${{ steps.gitversion.outputs.GitVersion_AssemblySemVer }}
+      GitVersion_InformationalVersion: ${{ steps.gitversion.outputs.GitVersion_InformationalVersion }}
+      GitVersion_NuGetVersion: ${{ steps.gitversion.outputs.GitVersion_NuGetVersion }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Install GitVersion
+      uses: gittools/actions/gitversion/setup@v1.1.1
+      with:
+        versionSpec: '5.x'
+        includePrerelease: true
+    - name: Execute GitVersion
+      id: gitversion
+      uses: gittools/actions/gitversion/execute@v1.1.1
+      with:
+        useConfigFile: true
+
+  # Setup Validator
+  SetupValidatorStage:
+    name: "Setup Validator"
+    runs-on: ubuntu-latest
+    needs: Setup
+    steps:
+      - name: "Release WorkItemClone"
+        shell: pwsh
+        run: |
+            Write-Output "GitVersion_BranchName: ${{needs.Setup.outputs.GitVersion_BranchName}}"
+            Write-Output "GitVersion_SemVer: ${{needs.Setup.outputs.GitVersion_SemVer}}"
+            Write-Output "GitVersion_PreReleaseLabel: ${{needs.Setup.outputs.GitVersion_PreReleaseLabel}}"
+            Write-Output "GitVersion_AssemblySemVer: ${{needs.Setup.outputs.GitVersion_AssemblySemVer}}"
+            Write-Output "GitVersion_InformationalVersion: ${{needs.Setup.outputs.GitVersion_InformationalVersion}}"
+    
+  # Build, Test, Sonar Cloud Analysis, & Package
+  build:
+    name: "Build, Test, Sonar Cloud Analysis, & Package"
+    runs-on: windows-latest
+    needs: Setup
+    env:
+      solution: '**/*.sln'
+      buildPlatform: 'Any CPU'
+      buildConfiguration: 'Release'
+      GitVersion_SemVer: ${{ needs.Setup.outputs.GitVersion_SemVer }}
+      GitVersion_AssemblySemVer: ${{ needs.Setup.outputs.GitVersion_AssemblySemVer }}
+      GitVersion_InformationalVersion: ${{ needs.Setup.outputs.GitVersion_InformationalVersion }}
+      GitVersion_NuGetVersion: ${{ needs.Setup.outputs.GitVersion_NuGetVersion }}
+    steps:
+      # - name: Setup NuGet
+      #   uses: NuGet/setup-nuget@v1.0.2
+      # - name: Restore NuGet Packages
+      #   run: nuget restore MigrationTools.sln
+      # - name: Build and Publish Web App
+      #   run: msbuild MigrationTools.sln 
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          distribution: 'zulu'
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: |
+              8.x
+      - name: "Find solution files"
+        shell: pwsh
+        run: |
+            Get-Item -Path .\ 
+            Get-ChildItem -Path .\ -Recurse -Filter '*.sln' | ForEach-Object { $_.FullName }
+      - run: dotnet tool install --global dotnet-sonarscanner
+      - run: dotnet sonarscanner begin 
+              /o:"nkdagility" 
+              /k:"vsts-sync-migrator:master" 
+              /d:sonar.host.url="https://sonarcloud.io" 
+              /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+      - run: dotnet build MigrationTools.sln /p:Version=${{ env.GitVersion_AssemblySemVer }} /p:FileVersion=${{ env.GitVersion_AssemblySemVer }} /p:InformationalVersion=${{ env.GitVersion_InformationalVersion }}
+        name: Build MigrationTools.sln
+        id: Build
+      - run: dotnet test "MigrationTools.sln" --results-directory ".\test-results\" --logger trx --collect "Code coverage" --no-build --filter "(TestCategory=L0|TestCategory=L1)"
+      - run: dotnet test "MigrationTools.sln" --results-directory ".\test-results\" --logger trx --collect "Code coverage" --no-build --filter "(TestCategory=L2|TestCategory=L3)"
+      - run: dotnet test "MigrationTools.sln" --results-directory ".\test-results\" --logger trx --collect "Code coverage" --no-build --filter "(TestCategory!=L0&TestCategory!=L1&TestCategory!=L2&TestCategory!=L3)"
+      - run: dotnet sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+      - name: "Package Executable Files"
+        id: packageExecutable
+        shell: pwsh
+        if: ${{ steps.Build.outcome == 'success' }}
+        run: |
+           ./build/packageExecutable.ps1 -version ${{ env.GitVersion_SemVer }} -outfolder "./staging"
+      - name: "Package Chocolatey Files"
+        shell: pwsh
+        if: ${{ steps.packageExecutable.outcome == 'success' }}
+        run: |
+            $item = Get-ChildItem -Path ./staging/ -Recurse -Filter 'MigrationTools-${{ env.GitVersion_SemVer }}.zip' | Select-Object -First 1
+            Write-Output "Found: $item.FullName"
+            .\build\packageChocolatey.ps1 -SemVer ${{ env.GitVersion_SemVer }} -NuGetVersion ${{ env.GitVersion_NuGetVersion }} -outfolder "./staging" -migrationToolsFilename $item.FullName
+      - name: "Package Extension Files"
+        shell: pwsh
+        if: ${{ steps.Build.outcome == 'success' }}
+        run: |
+            .\build\packageExtension.ps1 -version ${{ env.GitVersion_AssemblySemVer }} -outfolder "./staging" 
+      - name: "List Package Files"
+        shell: pwsh
+        if: ${{ steps.Build.outcome == 'success' }}
+        run: |
+                 Get-ChildItem -Path ./staging/ -Recurse | ForEach-Object { $_.FullName }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: AzureDevOpsMigrationTools-Packages
+          path: ./staging/**
+
+  # Build Docs
+  BuildDocs:
+    name: "Build Documentation output"
+    runs-on: ubuntu-latest
+    needs: [Setup]
+    env:
+      GitVersion_SemVer: ${{ needs.Setup.outputs.GitVersion_SemVer }}
+      GitVersion_AssemblySemVer: ${{ needs.Setup.outputs.GitVersion_AssemblySemVer }}
+      GitVersion_InformationalVersion: ${{ needs.Setup.outputs.GitVersion_InformationalVersion }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: cschleiden/replace-tokens@v1
+        with:
+          files: '["**/*.html"]'
+          tokenPrefix: "${"
+          tokenSuffix: "}"
+      - uses: igsekor/pyspelling-any@v1.0.4
+        id: spellcheck
+        name: Spellcheck
+      - name: Build Jekyll
+        uses: jerryjvl/jekyll-build-action@v1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: AzureDevOpsMigrationTools-Site
+          path: ./_site/**/*
+  
+
+  # GitHubRelease
+  GitHubRelease:
+    name: "Release to GitHub Releases (Not Migrated)"
+    runs-on: ubuntu-latest
+    env:
+      GitVersion_SemVer: ${{ needs.Setup.outputs.GitVersion_SemVer }}
+      GitVersion_AssemblySemVer: ${{ needs.Setup.outputs.GitVersion_AssemblySemVer }}
+      GitVersion_InformationalVersion: ${{ needs.Setup.outputs.GitVersion_InformationalVersion }}
+      GitVersion_NuGetVersion: ${{ needs.Setup.outputs.GitVersion_NuGetVersion }}
+      GitVersion_PreReleaseLabel: ${{ needs.Setup.outputs.GitVersion_PreReleaseLabel }}
+    needs: [build, Setup]
+    if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: AzureDevOpsMigrationTools-Packages
+      - uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app-id: ${{ env.APP_ID }}
+          private-key: ${{ env.PRIVATE_KEY }}
+      - name: "Package  Files"
+        shell: pwsh
+        run: |
+             Get-ChildItem -Path .\ -Recurse | ForEach-Object { $_.FullName }
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            MigrationTools-*.zip
+            nkdAgility.vsts-sync-migration-*.vsix
+            vsts-sync-migrator.*.nupkg
+          generate_release_notes: true
+          tag_name: v${{ needs.Setup.outputs.GitVersion_SemVer }}
+          name: Azure DevOps Migration Tools v${{ needs.Setup.outputs.GitVersion_SemVer }}
+          token: ${{ steps.app-token.outputs.token }}
+          prerelease: ${{ needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' }}
+          discussion_category_name: "Anouncement"
+  
+  # Release to Marketplace
+  MarketplaceRelease:
+    name: "Release to Marketplace (Not Migrated)"
+    runs-on: ubuntu-latest
+    needs: [Setup, GitHubRelease]
+    if: ${{ false }}
+    #if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: AzureDevOpsMigrationTools-Packages
+      - name: "Find solution files"
+        shell: pwsh
+        run: |
+            Get-Item -Path .\ 
+            Get-ChildItem -Path .\ -Recurse -Filter '*.sln' | ForEach-Object { $_.FullName }
+  
+  # Release to Chocolatey
+  ChocolateyRelease:
+    name: "Release to Chocolatey (Not Migrated)"
+    runs-on: ubuntu-latest
+    needs: [Setup, GitHubRelease]
+    if: ${{ false }}
+    #if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: AzureDevOpsMigrationTools-Packages
+      - name: "Find solution files"
+        shell: pwsh
+        run: |
+            Get-Item -Path .\ 
+            Get-ChildItem -Path .\ -Recurse -Filter '*.sln' | ForEach-Object { $_.FullName }   
+
+  # Release to Winget
+  WingetRelease:
+    name: "Release to Winget (Not Migrated)"
+    runs-on: ubuntu-latest
+    needs: [Setup, GitHubRelease]
+    if: ${{ false }}
+    #if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: AzureDevOpsMigrationTools-Packages
+      - name: "Find solution files"
+        shell: pwsh
+        run: |
+            Get-Item -Path .\ 
+            Get-ChildItem -Path .\ -Recurse -Filter '*.sln' | ForEach-Object { $_.FullName }
+
+  # Release to Docs
+  DocsRelease:
+    name: "Release to Docs"
+    runs-on: ubuntu-latest
+    needs: [BuildDocs, GitHubRelease]
+    if: ${{ false }}
+    #if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
+    steps:
+      - name: Download a single artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: AzureDevOpsMigrationTools-Site
+          path: ./_site
+      - name: "Find  files"
+        shell: pwsh
+        run: |
+            Get-Item -Path .\ 
+      - name: SFTP Upload
+        # You may pin to the exact commit or the version.
+        # uses: Dylan700/sftp-upload-action@f90db607d9fe1acdc0eefccee84d37c119b268fe
+        uses: Dylan700/sftp-upload-action@v1.1.4
+        with:
+          server: nakedalmweb.sftp.wpengine.com
+          username: nakedalmweb-learn
+          password: ${{ secrets.SFTP_PASSWORD }}
+          port: 2222
+          # If true, outputs the results of the upload, without actually uploading.
+          dry-run: false
+          # A list of folders to upload in the format of `folder/ => upload_folder/`
+          uploads: | 
+              ./_site/ => ./azure-devops-migration-tools
+          # If true, any existing files in the remote upload directories are deleted.
+          delete: false
