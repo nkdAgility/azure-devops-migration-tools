@@ -80,10 +80,10 @@ namespace MigrationTools
                 Source = baseException.Source,
                 User = Environment.UserName,
                 Hostname = System.Environment.GetEnvironmentVariable("COMPUTERNAME"),
-                Application = "Exception Visualizer",
+                Application = "Azure-DevOps-Migration-Tools",
                 ServerVariables = new List<Item>
                     {
-                        new Item("User-Agent", $"X-ELMAHIO-APPLICATION; OS={Environment.OSVersion.Platform}; OSVERSION={Environment.OSVersion.Version}; ENGINE=VisualStudio"),
+                        new Item("User-Agent", $"X-ELMAHIO-APPLICATION; OS={Environment.OSVersion.Platform}; OSVERSION={Environment.OSVersion.Version}; ENGINE=Azure-DevOps-Migration-Tools"),
                     }
             };
 
