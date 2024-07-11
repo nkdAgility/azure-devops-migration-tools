@@ -86,6 +86,14 @@ namespace MigrationTools
                         new Item("User-Agent", $"X-ELMAHIO-APPLICATION; OS={Environment.OSVersion.Platform}; OSVERSION={Environment.OSVersion.Version}; ENGINE=Azure-DevOps-Migration-Tools"),
                     }
             };
+            foreach (var property in properties)
+            {
+                createMessage.Data.Add(new Item(property.Key, property.Value));
+            }
+            foreach (var measurement in measurements)
+            {
+                createMessage.Data.Add(new Item(measurement.Key, measurement.Value.ToString()));
+            }
 
             elmahIoClient.Messages.CreateAndNotify(new Guid("24086b6d-4f58-47f4-8ac7-68d8bc05ca9e"), createMessage);
 
