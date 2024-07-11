@@ -164,3 +164,4 @@ docs/Reference/Generated/MigrationTools.Host.xml
 /docs/.obsidian
 /output/
 logs/
+/staging
