@@ -95,7 +95,7 @@ jobs:
               /k:"vsts-sync-migrator:master" 
               /d:sonar.host.url="https://sonarcloud.io" 
               /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
-      - run: dotnet build MigrationTools.sln /p:Version=${{ env.GitVersion_AssemblySemVer }} /p:FileVersion=${{ env.GitVersion_AssemblySemVer }} /p:InformationalVersion=${{ env.GitVersion_InformationalVersion }}
+      - run: dotnet build MigrationTools.sln /p:Version=${{ env.GitVersion_SemVer }} /p:FileVersion=${{ env.GitVersion_AssemblySemVer }} /p:InformationalVersion=${{ env.GitVersion_InformationalVersion }}
         name: Build MigrationTools.sln
         id: Build
       - run: dotnet test "MigrationTools.sln" --results-directory ".\test-results\" --logger trx --collect "Code coverage" --no-build --filter "(TestCategory=L0|TestCategory=L1)"
