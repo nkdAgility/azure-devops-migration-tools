@@ -65,6 +65,7 @@ jobs:
       GitVersion_AssemblySemVer: ${{ needs.Setup.outputs.GitVersion_AssemblySemVer }}
       GitVersion_InformationalVersion: ${{ needs.Setup.outputs.GitVersion_InformationalVersion }}
       GitVersion_NuGetVersion: ${{ needs.Setup.outputs.GitVersion_NuGetVersion }}
+      GitVersion_PreReleaseLabel: ${{ needs.Setup.outputs.GitVersion_PreReleaseLabel }}
     steps:
       # - name: Setup NuGet
       #   uses: NuGet/setup-nuget@v1.0.2
@@ -79,6 +80,11 @@ jobs:
           distribution: 'zulu'
       - name: Checkout
         uses: actions/checkout@v2
+      - uses: cschleiden/replace-tokens@v1
+        with:
+          files: '["**/StaticVariables.cs"]'
+          tokenPrefix: "${"
+          tokenSuffix: "}"
       - name: Setup .NET
         uses: actions/setup-dotnet@v1
         with:
@@ -95,7 +101,7 @@ jobs:
               /k:"vsts-sync-migrator:master" 
               /d:sonar.host.url="https://sonarcloud.io" 
               /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
-      - run: dotnet build MigrationTools.sln /p:Version=${{ env.GitVersion_AssemblySemVer }} /p:FileVersion=${{ env.GitVersion_AssemblySemVer }} /p:InformationalVersion=${{ env.GitVersion_InformationalVersion }}
+      - run: dotnet build MigrationTools.sln /p:Version=${{ env.GitVersion_SemVer }} /p:FileVersion=${{ env.GitVersion_AssemblySemVer }} /p:InformationalVersion=${{ env.GitVersion_InformationalVersion }} /p:GitVersionTag=${{ env.GitVersion_PreReleaseLabel }}
         name: Build MigrationTools.sln
         id: Build
       - run: dotnet test "MigrationTools.sln" --results-directory ".\test-results\" --logger trx --collect "Code coverage" --no-build --filter "(TestCategory=L0|TestCategory=L1)"

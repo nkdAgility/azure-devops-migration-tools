@@ -135,15 +135,14 @@ namespace MigrationTools.Host
         private void ApplicationStartup(string[] args)
         {
             _mainTimer.Start();
-            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
-            var version = Assembly.GetEntryAssembly().GetName().Version;
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;            
             _logger.LogInformation("Application Starting");
-            AsciiLogo(version);
+            AsciiLogo(DetectVersionService2.GetRunningVersion().versionString);
             TelemetryNote();
             _logger.LogInformation("Start Time: {StartTime}", DateTime.Now.ToUniversalTime().ToLocalTime());
             _logger.LogInformation("Running with args: {@Args}", args);
             _logger.LogInformation("OSVersion: {OSVersion}", Environment.OSVersion.ToString());
-            _logger.LogInformation("Version (Assembly): {Version}", version);
+            _logger.LogInformation("Version (Assembly): {Version}", DetectVersionService2.GetRunningVersion().versionString);
         }
 
         protected void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
@@ -166,7 +165,7 @@ namespace MigrationTools.Host
             _logger.LogInformation("--------------------------------------");
         }
 
-        private void AsciiLogo(Version thisVersion)
+        private void AsciiLogo(string thisVersion)
         {
             _logger.LogInformation("                                      &@&                                      ");
             _logger.LogInformation("                                   @@(((((@                                    ");
@@ -209,7 +208,7 @@ namespace MigrationTools.Host
             var productName = ((AssemblyProductAttribute)Assembly.GetEntryAssembly()
                 .GetCustomAttributes(typeof(AssemblyProductAttribute), true)[0]).Product;
             _logger.LogInformation("{productName} ", productName);
-            _logger.LogInformation("v{thisVersion}", thisVersion);
+            _logger.LogInformation("{thisVersion}", thisVersion);
             var companyName = ((AssemblyCompanyAttribute)Assembly.GetEntryAssembly()
                 .GetCustomAttributes(typeof(AssemblyCompanyAttribute), true)[0]).Company;
             _logger.LogInformation("{companyName} ", companyName);

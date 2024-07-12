@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Threading;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.Logging;
@@ -44,7 +45,7 @@ namespace MigrationTools.Host.Services
         {
             get
             {
-                return GetRunningVersion();
+                return GetRunningVersion().version;
             }
         }
         public Version AvailableVersion
@@ -107,6 +108,14 @@ namespace MigrationTools.Host.Services
             return winget.IsInstalled;
         }
 
+        public bool IsPreviewVersion
+        {
+            get
+            {
+                return !string.IsNullOrEmpty( GetRunningVersion().PreReleaseLabel);
+            }
+        }
+
         public bool IsUpdateAvailable
         {
             get
@@ -119,7 +128,7 @@ namespace MigrationTools.Host.Services
         {
             get
             {
-                return RunningVersion == new Version("0.0.0");
+                return GetRunningVersion().PreReleaseLabel.ToLower() == "local";
             }
         }
 
@@ -127,7 +136,7 @@ namespace MigrationTools.Host.Services
         {
             get
             {
-                return (IsPackageInstalled) ? !(RunningVersion >= InstalledVersion) : false;
+                return (IsRunningInDebug) ? false : (IsPackageInstalled) ? !(RunningVersion >= InstalledVersion) : false;
             }
         }
 
@@ -135,7 +144,14 @@ namespace MigrationTools.Host.Services
         {
             _Telemetry = telemetry;
             _logger = logger;
-            PackageId = "nkdAgility.AzureDevOpsMigrationTools";
+            if (IsPreviewVersion)
+            {
+                PackageId = "nkdAgility.AzureDevOpsMigrationTools.Preview";
+            } else
+            {
+                PackageId = "nkdAgility.AzureDevOpsMigrationTools";
+            }
+            
         }
 
         private WinGetPackage GetPackage()
@@ -146,7 +162,7 @@ namespace MigrationTools.Host.Services
                 {
                     _packageManager = new WinGetPackageManager();
                     Log.Debug("Searching for package!");
-                    _package = _packageManager.GetInstalledPackages(PackageId, true).FirstOrDefault();
+                    _package = _packageManager.GetInstalledPackages(PackageId).Find(p => p.Id == PackageId);
                     Log.Debug("Found package with id {PackageId}", PackageId);
                 }
                 _packageChecked = true;
@@ -154,46 +170,13 @@ namespace MigrationTools.Host.Services
             return _package;
         }
 
-        //private void InitialiseService()
-        //{
-        //    _logger.LogDebug("DetectVersionService2::InitialiseService");
-        //    DateTime startTime = DateTime.Now;
-        //    using (var bench = new Benchmark("DetectVersionService2::InitialiseService"))
-        //    {
-        //        //////////////////////////////////
-               
-                
-        //        try
-        //        {
-        //            if (IsPackageManagerInstalled)
-        //            {
-                        
-        //                if (package != null)
-        //                {
-   
-                            
-        //                    IsPackageInstalled = true;
-        //                }
-        //                _Telemetry.TrackDependency(new DependencyTelemetry("PackageRepository", "winget", PackageId, AvailableVersion == null ? "nullVersion" : AvailableVersion.ToString(), startTime, bench.Elapsed, "200", IsPackageInstalled));
-        //            }
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            Log.Error(ex, "DetectVersionService");
-        //            IsPackageInstalled = false;
-        //            _Telemetry.TrackDependency(new DependencyTelemetry("PackageRepository", "winget", PackageId, AvailableVersion == null ? "nullVersion" : AvailableVersion.ToString(), startTime, bench.Elapsed, "500", IsPackageInstalled));
-        //        }
-        //    }
-        //}
-
-        public static Version GetRunningVersion()
+        public static (Version version, string PreReleaseLabel, string versionString) GetRunningVersion()
         {
-            Version assver = Assembly.GetEntryAssembly()?.GetName().Version;
-            if (assver == null)
-            {
-                return new Version("0.0.0");
-            }
-            return new Version(assver.Major, assver.Minor, assver.Build);
+            FileVersionInfo myFileVersionInfo = FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly()?.Location);
+            var matches = Regex.Matches(myFileVersionInfo.ProductVersion, @"^(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)\.(?<build>0|[1-9]\d*)(?:-((?<label>:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?<fullEnd>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$");
+            Version version = new Version(myFileVersionInfo.FileVersion);
+            string textVersion = "v" + version.Major + "." + version.Minor + "." + version.Build + "-" + matches[0].Groups[1].Value;
+            return (version, matches[0].Groups[1].Value, textVersion);
         }
     }
 
