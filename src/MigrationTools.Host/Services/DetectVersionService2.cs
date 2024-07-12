@@ -170,11 +170,13 @@ namespace MigrationTools.Host.Services
             return _package;
         }
 
-        public static (Version version, string PreReleaseLabel) GetRunningVersion()
+        public static (Version version, string PreReleaseLabel, string versionString) GetRunningVersion()
         {
             FileVersionInfo myFileVersionInfo = FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly()?.Location);
             var matches = Regex.Matches(myFileVersionInfo.ProductVersion, @"^(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)\.(?<build>0|[1-9]\d*)(?:-((?<label>:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?<fullEnd>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$");
-            return (new Version(myFileVersionInfo.FileVersion), matches[0].Groups[1].Value);
+            Version version = new Version(myFileVersionInfo.FileVersion);
+            string textVersion = "v" + version.Major + "." + version.Minor + "." + version.Build + "-" + matches[0].Groups[1].Value;
+            return (version, matches[0].Groups[1].Value, textVersion);
         }
     }
 
