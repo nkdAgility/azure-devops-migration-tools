@@ -159,8 +159,8 @@ namespace MigrationTools.Host
 
         private static string GetVersionTextForLog()
         {
-            Version runningVersion = DetectVersionService2.GetRunningVersion();
-            string textVersion = ((runningVersion.Major > 1) ? "v" + runningVersion : ThisAssembly.Git.BaseTag + "-" + ThisAssembly.Git.Commits + "-local");
+            Version runningVersion = DetectVersionService2.GetRunningVersion().version;
+            string textVersion = "v" + DetectVersionService2.GetRunningVersion().version + "-" + DetectVersionService2.GetRunningVersion().PreReleaseLabel;
             return textVersion;
         }
 

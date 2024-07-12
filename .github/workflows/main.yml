@@ -80,6 +80,11 @@ jobs:
           distribution: 'zulu'
       - name: Checkout
         uses: actions/checkout@v2
+      - uses: cschleiden/replace-tokens@v1
+        with:
+          files: '["**/StaticVariables.cs"]'
+          tokenPrefix: "${"
+          tokenSuffix: "}"
       - name: Setup .NET
         uses: actions/setup-dotnet@v1
         with:
