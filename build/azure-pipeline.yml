@@ -182,7 +182,7 @@ stages:
       displayName: "Complie"
       inputs:
         command: 'build'
-        arguments: '/p:Version=$(GitVersion.AssemblySemVer) /p:FileVersion=$(GitVersion.AssemblySemVer) /p:InformationalVersion=$(GetVersion.InformationalVersion)'
+        arguments: '/p:Version=$(GitVersion.AssemblySemVer) /p:FileVersion=$(GitVersion.AssemblySemVer) /p:InformationalVersion=$(GitVersion.InformationalVersion)'
     - task: DotNetCoreCLI@2
       displayName: "Test L0 & L1"
       inputs:
