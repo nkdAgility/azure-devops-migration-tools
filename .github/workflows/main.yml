@@ -9,6 +9,10 @@ on:
      - main
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
    APP_ID: "Iv23li9aYvt0VW9x4Jhh"
    PRIVATE_KEY: ${{ secrets.NKDAGILITY_BOT_CLIENTSECRET }}
