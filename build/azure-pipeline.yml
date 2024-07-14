@@ -23,6 +23,8 @@ parameters:
 
 trigger:
   branches:
+    include:
+    - main
     exclude:
     - build/*
   tags:
