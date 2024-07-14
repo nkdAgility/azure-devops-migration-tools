@@ -14,7 +14,7 @@ namespace MigrationTools.ProcessorEnrichers
     {
         private TfsValidateRequiredFieldOptions _Options;
 
-        public TfsValidateRequiredField(IServiceProvider services, ILogger<TfsValidateRequiredField> logger) : base(services, logger)
+        public TfsValidateRequiredField(IServiceProvider services, ILogger<TfsValidateRequiredField> logger, ITelemetryLogger telemetryLogger) : base(services, logger, telemetryLogger)
         {
             Engine = services.GetRequiredService<IMigrationEngine>();
         }

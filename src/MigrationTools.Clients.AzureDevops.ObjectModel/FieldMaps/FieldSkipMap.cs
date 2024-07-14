@@ -7,7 +7,7 @@ namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
 {
     public class FieldSkipMap : FieldMapBase
     {
-        public FieldSkipMap(ILogger<FieldSkipMap> logger) : base(logger)
+        public FieldSkipMap(ILogger<FieldSkipMap> logger, ITelemetryLogger telemetryLogger) : base(logger, telemetryLogger)
         {
         }
 

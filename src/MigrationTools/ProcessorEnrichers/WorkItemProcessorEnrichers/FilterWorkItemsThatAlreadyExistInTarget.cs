@@ -17,7 +17,7 @@ namespace MigrationTools.Enrichers
 
         public IMigrationEngine Engine { get; private set; }
 
-        public FilterWorkItemsThatAlreadyExistInTarget(IServiceProvider services, ILogger<FilterWorkItemsThatAlreadyExistInTarget> logger) : base(services, logger)
+        public FilterWorkItemsThatAlreadyExistInTarget(IServiceProvider services, ILogger<FilterWorkItemsThatAlreadyExistInTarget> logger, ITelemetryLogger telemetryLogger) : base(services, logger, telemetryLogger)
         {
             Engine = Services.GetRequiredService<IMigrationEngine>();
         }

@@ -238,7 +238,7 @@ namespace VstsSyncMigrator.Engine
                 catch (Exception ex)
                 {
                     // SOmetimes this will error out for no reason.
-                    Log.LogError(ex, "Applying Configurations");
+                    Log.LogWarning(ex, "Applying Configurations");
                 }
             }
         }

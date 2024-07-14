@@ -32,7 +32,7 @@ namespace MigrationTools.Enrichers
 
         public IMigrationEngine Engine { get; private set; }
 
-        public TfsEmbededImagesEnricher(IServiceProvider services, ILogger<TfsEmbededImagesEnricher> logger) : base(services, logger)
+        public TfsEmbededImagesEnricher(IServiceProvider services, ILogger<TfsEmbededImagesEnricher> logger, ITelemetryLogger telemetryLogger) : base(services, logger, telemetryLogger)
         {
             Engine = services.GetRequiredService<IMigrationEngine>();
             _targetProject = Engine.Target.WorkItems.Project.ToProject();
@@ -118,6 +118,7 @@ namespace MigrationTools.Enrichers
                 catch (Exception ex)
                 {
                     Log.LogError(ex, "EmbededImagesRepairEnricher: Unable to fix HTML field attachments for work item {wiId} from {oldTfsurl} to {newTfsurl}", wi.Id, oldTfsurl, newTfsurl);
+                    Telemetry.TrackException(ex, null, null);
                 }
             }
         }

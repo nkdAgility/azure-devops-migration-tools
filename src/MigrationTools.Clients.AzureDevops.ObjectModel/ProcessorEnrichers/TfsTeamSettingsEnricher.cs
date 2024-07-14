@@ -45,7 +45,7 @@ namespace MigrationTools.ProcessorEnrichers
 
         public TfsTeamSettingsEnricherOptions Options { get; private set; }
 
-        public TfsTeamSettingsEnricher(IServiceProvider services, ILogger<TfsTeamSettingsEnricher> logger) : base(services, logger)
+        public TfsTeamSettingsEnricher(IServiceProvider services, ILogger<TfsTeamSettingsEnricher> logger, ITelemetryLogger telemetryLogger) : base(services, logger, telemetryLogger)
         {
             Services = services;
             Engine = services.GetRequiredService<IMigrationEngine>();
@@ -60,6 +60,7 @@ namespace MigrationTools.ProcessorEnrichers
                 catch (Exception ex)
                 {
                     Log.LogError(ex, "{LogTypeName}: Unable load list of identities from target collection.", LogTypeName);
+                    Telemetry.TrackException(ex, null, null);
                     return new List<TeamFoundationIdentity>();
                 }
             });
@@ -336,6 +337,7 @@ namespace MigrationTools.ProcessorEnrichers
                     }
                     catch (Exception ex)
                     {
+                        Telemetry.TrackException(ex, null, null);
                         Log.LogError(ex, "[SKIP] Problem migrating team capacities for iteration {iteration}.", sourceIteration.Path);
                     }
 
@@ -343,6 +345,7 @@ namespace MigrationTools.ProcessorEnrichers
             }
             catch (Exception ex)
             {
+                Telemetry.TrackException(ex, null, null);
                 Log.LogError(ex, "[SKIP] Problem migrating team capacities.");
             }
 

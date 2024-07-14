@@ -18,7 +18,7 @@ namespace MigrationTools._EngineV1.Enrichers
       *  from https://gist.github.com/pietergheysens/792ed505f09557e77ddfc1b83531e4fb
       */
 
-        public EmbededImagesRepairEnricherBase(IServiceProvider services, ILogger<EmbededImagesRepairEnricherBase> logger) : base(services, logger)
+        public EmbededImagesRepairEnricherBase(IServiceProvider services, ILogger<EmbededImagesRepairEnricherBase> logger, ITelemetryLogger telemetryLogger) : base(services, logger, telemetryLogger)
         {
             _httpClientHandler = new HttpClientHandler { AllowAutoRedirect = false, UseDefaultCredentials = true, AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate };
         }
