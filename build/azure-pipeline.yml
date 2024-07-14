@@ -22,7 +22,7 @@ parameters:
 
 
 trigger:
-  branch:
+  branches:
     include:
     - main
   tags:
