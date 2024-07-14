@@ -22,8 +22,12 @@ parameters:
 
 
 trigger:
-- main
-- releases/*
+  branches:
+    include:
+    - main
+  tags:
+    exclude:
+    - v*-*
 
 pr:
 - main

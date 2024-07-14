@@ -2,6 +2,9 @@ name: Build & Release (Azure DevOps Migration Tools)
 
 on: 
   push:
+   tags-ignore:
+      - 'v*-*' 
+
   workflow_dispatch:
 
 env:
