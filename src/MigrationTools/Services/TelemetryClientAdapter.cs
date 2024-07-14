@@ -77,6 +77,7 @@ namespace MigrationTools
                 Type = baseException.GetType().FullName,
                 Title = baseException.Message ?? "An error occurred",
                 Severity = "Error",
+                Data = new List<Item>(),
                 Source = baseException.Source,
                 User = Environment.UserName,
                 Hostname = System.Environment.GetEnvironmentVariable("COMPUTERNAME"),
@@ -95,8 +96,8 @@ namespace MigrationTools
                 createMessage.Data.Add(new Item(measurement.Key, measurement.Value.ToString()));
             }
 
-            elmahIoClient.Messages.CreateAndNotify(new Guid("24086b6d-4f58-47f4-8ac7-68d8bc05ca9e"), createMessage);
-
+           var result = elmahIoClient.Messages.CreateAndNotify(new Guid("24086b6d-4f58-47f4-8ac7-68d8bc05ca9e"), createMessage);
+            Console.WriteLine($"Error logged to Elmah.io");
         }
 
         public void TrackRequest(string name, DateTimeOffset startTime, TimeSpan duration, string responseCode, bool success)

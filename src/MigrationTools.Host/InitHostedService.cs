@@ -93,6 +93,7 @@ namespace MigrationTools.Host
                     }
                     catch (Exception ex)
                     {
+                        _telemetryLogger.TrackException(ex, null, null);
                         _logger.LogError(ex, "Unhandled exception!");
                         _exitCode = 1;
                     }

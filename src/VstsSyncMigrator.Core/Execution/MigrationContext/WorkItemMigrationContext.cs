@@ -666,6 +666,7 @@ namespace VstsSyncMigrator.Engine
             {
                 Log.LogError(ex, ex.ToString());
                 Telemetry.TrackRequest("ProcessWorkItem", startTime, witStopWatch.Elapsed, "502", false);
+                Telemetry.TrackException(ex);
                 throw ex;
             }
             witStopWatch.Stop();
@@ -903,6 +904,13 @@ namespace VstsSyncMigrator.Engine
             }
             catch (Exception ex)
             {
+                Dictionary<string, string> parameters = new Dictionary<string, string>();
+                if (targetWorkItem != null)
+                {
+                    foreach (Field f in targetWorkItem.ToWorkItem().Fields)
+                        parameters.Add($"{f.ReferenceName} ({f.Name})", f.Value.ToString());
+                }
+                _telemetry.TrackException(ex, parameters);
                 TraceWriteLine(LogEventLevel.Information, "...FAILED to Save");
                 Log.LogInformation("===============================================================");
                 if (targetWorkItem != null)

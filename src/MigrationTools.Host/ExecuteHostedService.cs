@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.ApplicationInsights.Channel;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -12,14 +13,16 @@ namespace MigrationTools.Host
         private readonly IServiceProvider _services;
         private readonly ILogger _logger;
         private readonly IHostApplicationLifetime _appLifetime;
+        private readonly ITelemetryLogger Telemetery;
 
         private int? _exitCode;
 
         public ExecuteHostedService(
             IServiceProvider services,
             ILogger<ExecuteHostedService> logger,
-            IHostApplicationLifetime appLifetime)
+            IHostApplicationLifetime appLifetime, ITelemetryLogger telemetryLogger)
         {
+            Telemetery = telemetryLogger;
             _services = services;
             _logger = logger;
             _appLifetime = appLifetime;
@@ -39,6 +42,7 @@ namespace MigrationTools.Host
                     }
                     catch (Exception ex)
                     {
+                        Telemetery.TrackException(ex, null, null);
                         _logger.LogError(ex, "Unhandled exception!");
                         _exitCode = 1;
                     }

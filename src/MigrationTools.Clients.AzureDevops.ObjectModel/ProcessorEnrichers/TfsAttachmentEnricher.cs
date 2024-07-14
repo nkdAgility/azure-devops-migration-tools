@@ -25,7 +25,7 @@ namespace MigrationTools.ProcessorEnrichers
 
         public TfsAttachmentEnricherOptions Options {  get { return _options; } } 
 
-        public TfsAttachmentEnricher(IServiceProvider services, ILogger<WorkItemProcessorEnricher> logger) : base(services, logger)
+        public TfsAttachmentEnricher(IServiceProvider services, ILogger<WorkItemProcessorEnricher> logger, ITelemetryLogger telemetryLogger) : base(services, logger, telemetryLogger)
         {
           
         }
@@ -75,6 +75,7 @@ namespace MigrationTools.ProcessorEnrichers
                 catch (Exception ex)
                 {
                     Log.LogError(ex, "AttachmentMigrationEnricher:Unable to process atachment from source wi {SourceWorkItemId} called {AttachmentName}", source.ToWorkItem().Id, wia.Name);
+                    Telemetry.TrackException(ex, null, null);
                 }
             }
             if (save)
@@ -95,9 +96,10 @@ namespace MigrationTools.ProcessorEnrichers
                     Directory.Delete(_exportWiPath, true);
                     _exportWiPath = null;
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     Log.LogWarning(" ERROR: Unable to delete folder {0}", _exportWiPath);
+                    Telemetry.TrackException(ex, null, null);
                 }
             }
         }
@@ -121,6 +123,7 @@ namespace MigrationTools.ProcessorEnrichers
                 catch (Exception ex)
                 {
                     Log.LogError(ex, "Exception downloading attachements");
+                    Telemetry.TrackException(ex, null, null);
                     return null;
                 }
             }

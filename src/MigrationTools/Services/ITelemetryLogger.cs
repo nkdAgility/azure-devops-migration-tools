@@ -19,7 +19,7 @@ namespace MigrationTools
         //void TrackRequest(RequestTelemetry requestTelemetry);
         void TrackRequest(string name, DateTimeOffset startTime, TimeSpan duration, string responseCode, bool success);
 
-        void TrackException(Exception ex, IDictionary<string, string> properties, IDictionary<string, double> measurements);
+        void TrackException(Exception ex, IDictionary<string, string> properties = null, IDictionary<string, double> measurements = null);
 
         void CloseAndFlush();
     }

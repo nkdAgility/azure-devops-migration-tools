@@ -8,7 +8,7 @@ namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
 {
     public class MultiValueConditionalMap : FieldMapBase
     {
-        public MultiValueConditionalMap(ILogger<MultiValueConditionalMap> logger) : base(logger)
+        public MultiValueConditionalMap(ILogger<MultiValueConditionalMap> logger, ITelemetryLogger telemetryLogger) : base(logger, telemetryLogger)
         {
         }
 

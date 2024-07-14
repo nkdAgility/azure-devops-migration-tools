@@ -10,7 +10,7 @@ namespace MigrationTools.Clients.AzureDevops.Rest.Enrichers
 {
     public class EmbededImagesRepairEnricher : EmbededImagesRepairEnricherBase
     {
-        public EmbededImagesRepairEnricher(IServiceProvider services, ILogger<EmbededImagesRepairEnricher> logger) : base(services, logger)
+        public EmbededImagesRepairEnricher(IServiceProvider services, ILogger<EmbededImagesRepairEnricher> logger, ITelemetryLogger telemetryLogger) : base(services, logger, telemetryLogger)
         {
             Engine = services.GetRequiredService<IMigrationEngine>();
         }

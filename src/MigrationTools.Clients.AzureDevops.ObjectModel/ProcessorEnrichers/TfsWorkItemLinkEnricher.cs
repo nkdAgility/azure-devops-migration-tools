@@ -17,8 +17,8 @@ namespace MigrationTools.Enrichers
 
         public TfsWorkItemLinkEnricherOptions Options { get; private set; }
 
-        public TfsWorkItemLinkEnricher(IServiceProvider services, ILogger<TfsWorkItemLinkEnricher> logger)
-            : base(services, logger)
+        public TfsWorkItemLinkEnricher(IServiceProvider services, ILogger<TfsWorkItemLinkEnricher> logger, ITelemetryLogger telemetryLogger)
+            : base(services, logger, telemetryLogger)
         {
             Engine = services.GetRequiredService<IMigrationEngine>();
         }
@@ -196,9 +196,11 @@ namespace MigrationTools.Enrichers
                     }
                     catch (Exception ex)
                     {
+                        Telemetry.TrackException(ex, null, null);
                         // Ignore this link because the TFS server didn't recognize its type (There's no point in crashing the rest of the migration due to a link)
                         if (ex.Message.Contains("Unrecognized Resource link"))
                         {
+                            
                             Log.LogError(ex, "[{ExceptionType}] Failed to save link {SourceLinkType} on {TargetId}", ex.GetType().Name, sourceLink.GetType().Name, target.Id);
                             // Remove the link from the target so it doesn't cause problems downstream
                             target.ToWorkItem().Links.Remove(el);
@@ -245,6 +247,7 @@ namespace MigrationTools.Enrichers
                 }
                 catch (Exception ex)
                 {
+                    Telemetry.TrackException( ex, null, null);
                     Log.LogError(ex, "  [FIND-FAIL] Adding Link of type {0} where wiSourceL={1}, wiTargetL={2} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiTargetL.Id);
                     return;
                 }
@@ -254,6 +257,7 @@ namespace MigrationTools.Enrichers
                 }
                 catch (Exception ex)
                 {
+                    Telemetry.TrackException(ex, null, null);
                     Log.LogError(ex, "  [FIND-FAIL] Adding Link of type {0} where wiSourceL={1}, wiTargetL={2} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiTargetL.Id);
                     return;
                 }
@@ -274,7 +278,7 @@ namespace MigrationTools.Enrichers
                 }
                 catch (Exception ex)
                 {
-                    Log.LogError(ex, "  [SKIP] Unable to migrate links where wiSourceL={0}, wiSourceR={1}, wiTargetL={2}", wiSourceL != null ? wiSourceL.Id.ToString() : "NotFound", wiSourceR != null ? wiSourceR.Id.ToString() : "NotFound", wiTargetL != null ? wiTargetL.Id.ToString() : "NotFound");
+                    Log.LogWarning(ex, "  [SKIP] Unable to migrate links where wiSourceL={0}, wiSourceR={1}, wiTargetL={2}", wiSourceL != null ? wiSourceL.Id.ToString() : "NotFound", wiSourceR != null ? wiSourceR.Id.ToString() : "NotFound", wiTargetL != null ? wiTargetL.Id.ToString() : "NotFound");
                     return;
                 }
 
@@ -286,7 +290,7 @@ namespace MigrationTools.Enrichers
                         var client = (TfsWorkItemMigrationClient)Engine.Target.WorkItems;
                         if (!client.Store.WorkItemLinkTypes.LinkTypeEnds.Contains(rl.LinkTypeEnd.ImmutableName))
                         {
-                            Log.LogError($"  [SKIP] Unable to migrate Link because type {rl.LinkTypeEnd.ImmutableName} does not exist in the target project.");
+                            Log.LogWarning($"  [SKIP] Unable to migrate Link because type {rl.LinkTypeEnd.ImmutableName} does not exist in the target project.");
                             return;
                         }
 
@@ -342,7 +346,7 @@ namespace MigrationTools.Enrichers
                     }
                     else
                     {
-                        Log.LogInformation(
+                        Log.LogWarning(
                                   "  [SKIP] Unable to migrate link where Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} as target WI has not been migrated",
                                   rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id);
                     }
@@ -351,7 +355,7 @@ namespace MigrationTools.Enrichers
                 {
                     if (IsExisting)
                     {
-                        Log.LogInformation("  [SKIP] Already Exists a Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id);
+                        Log.LogWarning("  [SKIP] Already Exists a Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id);
                     }
                     if (wiTargetR.ToWorkItem().IsAccessDenied)
                     {

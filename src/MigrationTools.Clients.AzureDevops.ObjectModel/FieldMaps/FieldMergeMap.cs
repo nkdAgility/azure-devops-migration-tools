@@ -10,7 +10,7 @@ namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
 {
     public class FieldMergeMap : FieldMapBase
     {
-        public FieldMergeMap(ILogger<FieldMergeMap> logger) : base(logger)
+        public FieldMergeMap(ILogger<FieldMergeMap> logger, ITelemetryLogger telemetryLogger) : base(logger, telemetryLogger)
         {
         }
 

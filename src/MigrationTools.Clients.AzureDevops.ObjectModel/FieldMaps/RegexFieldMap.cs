@@ -10,7 +10,7 @@ namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
 {
     public class RegexFieldMap : FieldMapBase
     {
-        public RegexFieldMap(ILogger<RegexFieldMap> logger) : base(logger)
+        public RegexFieldMap(ILogger<RegexFieldMap> logger, ITelemetryLogger telemetryLogger) : base(logger, telemetryLogger)
         {
         }
 

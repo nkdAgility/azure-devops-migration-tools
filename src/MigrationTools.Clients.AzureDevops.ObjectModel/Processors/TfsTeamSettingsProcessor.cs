@@ -45,6 +45,7 @@ namespace MigrationTools.Processors
                 }
                 catch (Exception ex)
                 {
+                    Telemetry.TrackException(ex, null, null);
                     Log.LogError(ex, "{LogTypeName}: Unable load list of identities from target collection.", LogTypeName);
                     return new List<TeamFoundationIdentity>();
                 }
@@ -357,14 +358,16 @@ namespace MigrationTools.Processors
                     }
                     catch (Exception ex)
                     {
-                        Log.LogError(ex, "[SKIP] Problem migrating team capacities for iteration {iteration}.", sourceIteration.Path);
+                        Telemetry.TrackException(ex, null, null);
+                        Log.LogWarning(ex, "[SKIP] Problem migrating team capacities for iteration {iteration}.", sourceIteration.Path);
                     }
 
                 }
             }
             catch (Exception ex)
             {
-                Log.LogError(ex, "[SKIP] Problem migrating team capacities.");
+                Telemetry.TrackException(ex, null, null);
+                Log.LogWarning(ex, "[SKIP] Problem migrating team capacities.");
             }
 
             Log.LogInformation("Team capacities migration done..");
