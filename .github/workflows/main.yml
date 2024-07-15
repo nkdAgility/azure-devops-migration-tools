@@ -33,7 +33,7 @@ jobs:
       Filter_src: ${{ steps.filter.outputs.src }}
       Filter_docs: ${{ steps.filter.outputs.docs }}
       Filter_automation: ${{ steps.filter.outputs.automation }}
-      nkdAgility_Ring: ${{ steps.ring-discovery.outputs.Ring }}
+      nkdAgility_Ring: ${{ steps.nkdagility-outputs.outputs.Ring }}
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -60,14 +60,18 @@ jobs:
           automation:
             - 'build/**'
             - '.github/workflows/**'
-    - name: "Discover Ring!"
+    - name: "Build NKDAgility Outputs"
       shell: pwsh
-      id: ring-discovery
+      id: nkdagility-outputs
       run: |
-            $Ring = "Preview"
+            $Ring = "Canary"
             if (!$Env:GitVersion_SemVer.contains("-"))
             {
                $Ring = "Release"
+            }
+            if ($Env:GitVersion_SemVer.contains("-Preview"))
+            {
+               $Ring = "Preview"
             }
             Write-Output "Ring=$Ring"
             echo "Ring=$Ring" >> $env:GITHUB_OUTPUT
