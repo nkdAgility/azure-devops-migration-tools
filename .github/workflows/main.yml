@@ -2,10 +2,16 @@ name: Build & Release (Azure DevOps Migration Tools)
 
 on: 
   push:
-   tags-ignore:
+    tags-ignore:
       - 'v*-*' 
-
+  pull_request:
+    branches:
+     - main
   workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
    APP_ID: "Iv23li9aYvt0VW9x4Jhh"

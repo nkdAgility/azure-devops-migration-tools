@@ -25,6 +25,8 @@ trigger:
   branches:
     include:
     - main
+    exclude:
+    - build/*
   tags:
     exclude:
     - v*-*
