@@ -11,7 +11,7 @@
                 </a>
               </li>
               <li class="align-items-center">
-              <a class="p-2 {% if page.pageStatus == 'generated' %}disabled{% endif %}" title="{% if page.pageStatus == 'generated' %}Unable to edit generated files{% else %}Edit this document{% endif %}" data-proofer-ignore href="{{site.githuburl}}/edit/master/docs/{{ page.path }}">
+              <a class="p-2 {% if page.pageStatus == 'generated' %}disabled{% endif %}" title="{% if page.pageStatus == 'generated' %}Unable to edit generated files{% else %}Edit this document{% endif %}" data-proofer-ignore href="{{site.githuburl}}/edit/main/docs/{{ page.path }}">
                   <i class="fa-sharp fa-light fa-file-pen"></i>{% if include.expand %} Edit Page{% endif %}
               </a>
               </li>
@@ -27,23 +27,23 @@
               
               {% if page.classFile != null %}
               <li class="align-items-center">
-                <a class="p-2 " target="_blank" title="Edit this documents class file" data-proofer-ignore href="{{site.githuburl}}/edit/master/{{ page.classFile }}">
-                    <i class="fa-kit fa-solid-square-code-pen"></i>{% if include.expand %} Edit Class{% endif %}
-                </a>
+                  <a class="p-2 " target="_blank" title="Edit this documents class file" data-proofer-ignore href="{{site.githuburl}}/edit/main/{{ page.classFile }}">
+                      <i class="fa-kit fa-solid-square-code-pen"></i>{% if include.expand %} Edit Class{% endif %}
+                  </a>
               </li>
               {% endif %}
               {% if page.optionsClassFile != null %}
               <li class="align-items-center">
-                <a class="p-2 " target="_blank" title="Edit this documents configuration/options file" data-proofer-ignore href="{{site.githuburl}}/edit/master/{{ page.optionsClassFile }}">
-                    <i class="fa-kit fa-solid-gear-code-pen"></i>{% if include.expand %} Edit Configuration / Options{% endif %}
-                </a>
+                  <a class="p-2 " target="_blank" title="Edit this documents configuration/options file" data-proofer-ignore href="{{site.githuburl}}/edit/main/{{ page.optionsClassFile }}">
+                      <i class="fa-kit fa-solid-gear-code-pen"></i>{% if include.expand %} Edit Configuration / Options{% endif %}
+                  </a>
                 </li>
                {% endif %}
                {% for item in page.topics %}
                <li class="align-items-center">
-               <a class="p-2 " target="_blank" title="{% if item.exists %}Edit{% else %}Create{% endif %} this topic file" data-proofer-ignore href="{{site.githuburl}}/{% if item.exists %}edit{% else %}new{% endif %}/master{{ item.path }}">
-                  <i class="fa-brands fa-markdown"></i>{% if include.expand %} {% if item.exists %}Edit{% else %}Create{% endif %} {{ item.topic }}{% endif %}
-                </a>
+                   <a class="p-2 " target="_blank" title="{% if item.exists %}Edit{% else %}Create{% endif %} this topic file" data-proofer-ignore href="{{site.githuburl}}/{% if item.exists %}edit{% else %}new{% endif %}/main{{ item.path }}">
+                       <i class="fa-brands fa-markdown"></i>{% if include.expand %} {% if item.exists %}Edit{% else %}Create{% endif %} {{ item.topic }}{% endif %}
+                   </a>
                 </li>
                {% endfor %}  
               {% endif %}
