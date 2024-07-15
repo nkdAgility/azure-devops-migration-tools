@@ -22,7 +22,7 @@ jobs:
 
    # Setup & Configuration
   Setup:
-    name: "Setup & Configuration"
+    name: "Setup & Configuration "
     runs-on: ubuntu-latest
     outputs:
       GitVersion_BranchName: ${{ steps.gitversion.outputs.GitVersion_BranchName }}
