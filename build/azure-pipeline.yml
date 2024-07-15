@@ -556,7 +556,7 @@ stages:
          
 # Documentation release Stage
 - stage: DocsReleaseStage
-  displayName: "Docs Release Stage (R:${{stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.nkdAgility_Ring'] }})"
+  displayName: 'Docs Release Stage'
   dependsOn: 
    - GitHubReleaseStage
    - DocsBuildStage
