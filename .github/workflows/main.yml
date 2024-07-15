@@ -65,15 +65,18 @@ jobs:
       id: nkdagility-outputs
       run: |
             $Ring = "Canary"
-            if (!$Env:GitVersion_SemVer.contains("-"))
-            {
-               $Ring = "Release"
+            switch ($Env:GitVersion_PreReleaseLabel) {
+                "" {
+                    $Ring = "Release";
+                }    
+                "Preview" {
+                    $Ring = "Preview";
+                }
+                default {
+                    $Ring = "Canary";
+                }
             }
-            if ($Env:GitVersion_SemVer.contains("-Preview"))
-            {
-               $Ring = "Preview"
-            }
-            Write-Output "Ring=$Ring"
+            Write-Output "We are running for the $Ring Ring!"
             echo "Ring=$Ring" >> $env:GITHUB_OUTPUT
 
   # Setup Validator
