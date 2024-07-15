@@ -69,6 +69,7 @@ jobs:
             {
                $Ring = "Release"
             }
+            Write-Output "Ring=$Ring"
             echo "Ring=$Ring" >> $GITHUB_OUTPUT
 
   # Setup Validator
