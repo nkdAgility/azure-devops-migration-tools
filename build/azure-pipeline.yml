@@ -96,12 +96,30 @@ stages:
           }
           Write-Host "##vso[build.addbuildtag]$releaseTag"
 
+          $Ring = "Canary"
+            switch ($Env:GitVersion_PreReleaseLabel) {
+                "" {
+                    $Ring = "Release";
+                }    
+                "Preview" {
+                    $Ring = "Preview";
+                }
+                default {
+                    $Ring = "Canary";
+                }
+            }
+            Write-Output "We are running for the $Ring Ring!"
+            Write-Host "##vso[task.setvariable variable=nkdAgility_Ring;isoutput=true]true"
+
           # Output the variables for debugging
           Write-Host "GITVERSION.PreReleaseLabel: $(GITVERSION.PreReleaseLabel)"
           Write-Host "GITVERSION.SemVer: $(GITVERSION.SemVer)"
           Write-Host "GitVersion.SemVer: $(GitVersion.SemVer)"
           Write-Host "GitVersion.AssemblySemVer: $(GitVersion.AssemblySemVer)"
           Write-Host "GitVersion.InformationalVersion: $(GitVersion.InformationalVersion)"
+          Write-Host "GitVersion.NuGetVersion: $(GitVersion.NuGetVersion)"
+          Write-Host "GitVersion.MajorMinorPatch: $(GitVersion.MajorMinorPatch)"
+          Write-Host "GitVersion.PreReleaseNumber: $(GitVersion.PreReleaseNumber)"
 
 
 # Debug Value Check
@@ -122,6 +140,7 @@ stages:
       GitVersion.SemVer: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.SemVer'] ]
       GitVersion.PreReleaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.PreReleaseTag'] ]
       isPreRelease: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.isPreRelease'] ]
+      nkdAgility_Ring: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.nkdAgility_Ring'] ]
     steps:
     - task: PowerShell@2
       displayName: Read Parameters
@@ -144,6 +163,7 @@ stages:
           Write-Host "GitVersion.PreReleaseTag: $(GitVersion.PreReleaseTag)"
           Write-Host "isPreRelease: $(isPreRelease)"
           Write-Host "skipCompileTest: $(skipCompileTest)"
+          Write-Host "nkdAgility_Ring: $(nkdAgility_Ring)"
 
 
 # Build, Test and Package
@@ -536,7 +556,7 @@ stages:
          
 # Documentation release Stage
 - stage: DocsReleaseStage
-  displayName: 'Docs Release Stage'
+  displayName: "Docs Release Stage (R:${{stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.nkdAgility_Ring'] }})"
   dependsOn: 
    - GitHubReleaseStage
    - DocsBuildStage
@@ -553,6 +573,7 @@ stages:
       GitVersion.SemVer: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.SemVer'] ]
       GitVersion.PreReleaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.PreReleaseTag'] ]
       isPreRelease: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.isPreRelease'] ]
+      nkdAgility_Ring: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.nkdAgility_Ring'] ]
     steps:
     - task: DownloadBuildArtifacts@1
       inputs:
@@ -582,6 +603,7 @@ stages:
           Write-Host "Remote Path: $remoteDirectory"
           Write-Host "##vso[task.setvariable variable=remoteDirectory;isOutput=true]$remoteDirectory"
     - task: CopyFilesOverSSH@0
+      condition: and(succeeded(), ne(dependencies.SetupStage.outputs['ConfigJob.VersionOut.nkdAgility_Ring'], "Canary"))
       inputs:
         sshEndpoint: 'nakedalmweb-learn'
         sourceFolder: '$(System.ArtifactsDirectory)/site'
