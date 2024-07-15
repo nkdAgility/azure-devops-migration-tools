@@ -2,6 +2,7 @@ name: Build & Release (Azure DevOps Migration Tools)
 
 on: 
   push:
+    branches:
     tags-ignore:
       - 'v*-*' 
   pull_request:
@@ -223,7 +224,7 @@ jobs:
       GitVersion_NuGetVersion: ${{ needs.Setup.outputs.GitVersion_NuGetVersion }}
       GitVersion_PreReleaseLabel: ${{ needs.Setup.outputs.GitVersion_PreReleaseLabel }}
     needs: [build, Setup]
-    #if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
+    #if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring != 'Canary' ) }}
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -258,7 +259,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [Setup, GitHubRelease]
     if: ${{ (needs.Setup.outputs.Filter_src) && (false) }}
-    #if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
+    #if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring != 'Canary' ) && (needs.Setup.outputs.Filter_src) }}
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -275,7 +276,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [Setup, GitHubRelease]
     if: ${{ (needs.Setup.outputs.Filter_src) && (false) }}
-    #if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
+    #if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring != 'Canary' ) && (needs.Setup.outputs.Filter_src) }}
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -292,7 +293,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [Setup, GitHubRelease]
     if: ${{ (needs.Setup.outputs.Filter_src) && (false) }}
-    #if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
+    #if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring != 'Canary' ) && (needs.Setup.outputs.Filter_src) }}
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -309,7 +310,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [BuildDocs, GitHubRelease]
     if: ${{ (needs.Setup.outputs.Filter_docs) && (false) }}
-    #if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
+    #if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring != 'Canary' ) }}
     steps:
       - name: Download a single artifact
         uses: actions/download-artifact@v3
