@@ -174,7 +174,7 @@ jobs:
 
   # GitHubRelease
   GitHubRelease:
-    name: "Release to GitHub Releases (Not Migrated)"
+    name: "Release to GitHub Releases"
     runs-on: ubuntu-latest
     env:
       GitVersion_SemVer: ${{ needs.Setup.outputs.GitVersion_SemVer }}
@@ -211,6 +211,7 @@ jobs:
           token: ${{ steps.app-token.outputs.token }}
           prerelease: ${{ needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' }}
           discussion_category_name: "Anouncement"
+          draft: true
   
 # ElmahDeployment
   ElmahDeployemnt:
