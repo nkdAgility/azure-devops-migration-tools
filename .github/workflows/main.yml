@@ -83,7 +83,7 @@ jobs:
             $isBuild = false;
             if (($Env:GitVersion_PreReleaseLabel).contains("build")) {
                 $isBuild = true;
-            })
+            }
             echo "isBuild=$isBuild" >> $env:GITHUB_OUTPUT    
 
   # Setup Validator
