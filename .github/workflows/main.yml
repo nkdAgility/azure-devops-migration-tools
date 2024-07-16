@@ -396,7 +396,7 @@ jobs:
         with:
           server: nakedalmweb.sftp.wpengine.com
           username: nakedalmweb-learn
-          password: ${{ secrets.LEARN_PASSWORD }}
+          password: ${{ secrets.NKDAGILITY_LEARN_SFTP }}
           port: 2222
           # If true, outputs the results of the upload, without actually uploading.
           dry-run: ${{ (needs.Setup.outputs.nkdAgility_Ring) == 'Canary' }}
