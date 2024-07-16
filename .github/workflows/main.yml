@@ -271,7 +271,7 @@ jobs:
           token: ${{ steps.app-token.outputs.token }}
           prerelease: ${{ needs.Setup.outputs.GitVersion_PreReleaseLabel != '' }}
           discussion_category_name: ${{ steps.release-options.outputs.discussion_category_name }}
-          draft: ${{ needs.Setup.outputs.nkdAgility_Ring = 'Canary' }}
+          draft: ${{ needs.Setup.outputs.nkdAgility_Ring == 'Canary' }}
   
 # ElmahDeployment
   ElmahDeployemnt:
