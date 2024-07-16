@@ -113,7 +113,7 @@ jobs:
                ## NKDAgility
                  - nkdAgility_Ring: ${{needs.Setup.outputs.nkdAgility_Ring}}
             "@
-            echo $markdown >> $GITHUB_STEP_SUMMARY
+            echo $markdown >> $Env:GITHUB_STEP_SUMMARY
     
   # Build, Test, Sonar Cloud Analysis, & Package
   build:
