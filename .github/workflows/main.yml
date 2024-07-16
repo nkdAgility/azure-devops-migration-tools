@@ -3,7 +3,6 @@ name: Build & Release (Azure DevOps Migration Tools)
 on: 
   push:
     branches:
-      - '*'
     tags-ignore:
       - 'v*-*' 
   pull_request:
