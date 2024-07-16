@@ -379,14 +379,17 @@ jobs:
         shell: pwsh
         run: |
             if ($Env:nkdAgility_Ring -ne 'Release') {
-               echo "subfolder=$Env:nkdAgility_Ring" >> $env:GITHUB_OUTPUT    
-            }
+               echo "subfolder=$Env:nkdAgility_Ring" >> $env:GITHUB_OUTPUT
+               Write-Output "subfolder=$Env:nkdAgility_Ring"
+            } else {
+              Write-Output "subfolder="
+            }            
       - name: SFTP Upload ${{ (needs.Setup.outputs.nkdAgility_Ring) }}
         uses: Dylan700/sftp-upload-action@v1.1.4
         with:
           server: nakedalmweb.sftp.wpengine.com
           username: nakedalmweb-learn
-          password: ${{ secrets.SFTP_PASSWORD }}
+          password: ${{ secrets.LEARN_PASSWORD }}
           port: 2222
           # If true, outputs the results of the upload, without actually uploading.
           dry-run: ${{ (needs.Setup.outputs.nkdAgility_Ring) == 'Canary' }}
