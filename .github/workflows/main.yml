@@ -18,6 +18,10 @@ env:
    APP_ID: "Iv23li9aYvt0VW9x4Jhh"
    PRIVATE_KEY: ${{ secrets.NKDAGILITY_BOT_CLIENTSECRET }}
 
+defaults:
+  run:
+    shell: pwsh
+
 jobs:
 
    # Setup & Configuration
