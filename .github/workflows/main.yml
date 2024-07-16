@@ -217,10 +217,15 @@ jobs:
     needs: [Setup]
     if: ${{ github.event_name == 'pull_request' }}
     steps:
+      - uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app-id: ${{ env.APP_ID }}
+          private-key: ${{ env.PRIVATE_KEY }}
       - uses: fitomad/github-chatgpt-integration@main
         with:
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
-          github-token: ${{ secrets.GH_TOKEN }}
+          github-token: ${{ steps.app-token.outputs.token }}
           github-pr-id: ${{ github.event.number }}
           dev-lang: c#
           openai-max-tokens: 4096
