@@ -348,7 +348,6 @@ jobs:
     name: "Release to Winget (Not Migrated)"
     runs-on: ubuntu-latest
     needs: [Setup, GitHubRelease]
-    if: ${{ (needs.Setup.outputs.HasChanged_src) && (false) }}
     #if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring != 'Canary' ) && (needs.Setup.outputs.HasChanged_src) }}
     steps:
       - uses: actions/download-artifact@v4
