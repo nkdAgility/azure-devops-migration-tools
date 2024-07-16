@@ -36,8 +36,8 @@ jobs:
       HasChanged_src: ${{ steps.filter.outputs.src }}
       HasChanged_docs: ${{ steps.filter.outputs.docs }}
       HasChanged_automation: ${{ steps.filter.outputs.automation }}
-      nkdAgility_Ring: ${{ steps.nkdagility-outputs.outputs.Ring }}
-      nkdAgility_IsBuildEditBranch: ${{ steps.nkdagility-outputs.outputs.IsBuildEditBranch }}
+      nkdAgility_Ring: ${{ steps.nkdagility.outputs.Ring }}
+      nkdAgility_IsBuildEditBranch: ${{ steps.nkdagility.outputs.IsBuildEditBranch }}
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -66,7 +66,7 @@ jobs:
             - '.github/workflows/**'
     - name: "Build NKDAgility Outputs"
       shell: pwsh
-      id: nkdagility-outputs
+      id: nkdagility
       run: |
             $Ring = "Canary"
             switch ($Env:GitVersion_PreReleaseLabel) {
@@ -87,7 +87,10 @@ jobs:
             if (("${{ github.ref_name }}").contains("build/")) {
                 $IsBuildEditBranch = true;
             }
+            Write-Output "IsBuildEditBranch=$IsBuildEditBranch"
             echo "IsBuildEditBranch=$IsBuildEditBranch" >> $env:GITHUB_OUTPUT   
+
+
             
 
   # Setup Validator
