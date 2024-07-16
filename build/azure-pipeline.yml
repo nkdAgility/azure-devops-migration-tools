@@ -555,7 +555,7 @@ stages:
       condition: and(succeeded(), ne(variables['nkdAgility_Ring'], "Canary"))
       inputs:
         filePath: 'build/releaseWingetPackage.ps1'
-        arguments: '-version $(GitVersion.SemVer) -releaseTag $(releaseTag) -GH_TOKEN $(GH_TOKEN)' 
+        arguments: '-version $(GitVersion.SemVer) -ring $(nkdAgility_Ring) -GH_TOKEN $(GH_TOKEN)' 
          
 # Documentation release Stage
 - stage: DocsReleaseStage

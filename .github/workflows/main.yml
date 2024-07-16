@@ -321,7 +321,7 @@ jobs:
                 Write-Output "No VSIX file found"
                 exit 1
             } else {
-              Write-Output $"Running with {$vsixFile.FullName}"
+              Write-Output $"Running with {$vsixFile}"
             }
             .\build\releaseExtension.ps1 -vsixFile $vsixFile.FullName -marketplaceToken ${{ secrets.VS_MARKET_TOKEN }}
   
@@ -342,6 +342,7 @@ jobs:
             Get-Item -Path .\ 
             Get-ChildItem -Path .\ -Recurse -Filter '*.sln' | ForEach-Object { $_.FullName }   
 
+
   # Release to Winget
   WingetRelease:
     name: "Release to Winget (Not Migrated)"
@@ -353,11 +354,10 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: AzureDevOpsMigrationTools-Packages
-      - name: "Find solution files"
+      - name: "Winget Release"
         shell: pwsh
         run: |
-            Get-Item -Path .\ 
-            Get-ChildItem -Path .\ -Recurse -Filter '*.sln' | ForEach-Object { $_.FullName }
+            .\build\releaseWingetPackage.ps1 -version ${{ needs.Setup.outputs.GitVersion_SemVer }} -ring ${{needs.Setup.outputs.nkdAgility_Ring}} -GH_TOKEN ${{ secrets.GITHUB_TOKEN }}
 
   # Release to Docs
   DocsRelease:
