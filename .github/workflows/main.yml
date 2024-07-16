@@ -212,6 +212,23 @@ jobs:
           prerelease: ${{ needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' }}
           discussion_category_name: "Anouncement"
   
+# ElmahDeployment
+  ElmahDeployemnt:
+    name: "Create Elmah.io Deployment"
+    runs-on: ubuntu-latest
+    env:
+      GitVersion_SemVer: ${{ needs.Setup.outputs.GitVersion_SemVer }}
+    needs: [GitHubRelease, Setup]
+    #if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
+    steps:
+     - name: Create Deployment on elmah.io
+       uses: elmahio/github-create-deployment-action@v1
+       with:
+         apiKey: ${{ secrets.ELMAH_IO_API_KEY }}
+         version: ${{ needs.Setup.outputs.GitVersion_SemVer }}
+         logId: ${{ secrets.ELMAH_IO_LOG_ID }}
+
+
   # Release to Marketplace
   MarketplaceRelease:
     name: "Release to Marketplace (Not Migrated)"
