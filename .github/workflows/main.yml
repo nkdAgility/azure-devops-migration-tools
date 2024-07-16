@@ -80,6 +80,12 @@ jobs:
             Write-Output "We are running for the $Ring Ring!"
             echo "Ring=$Ring" >> $env:GITHUB_OUTPUT    
 
+            $isBuild = false;
+            if (($Env:GitVersion_PreReleaseLabel).contains("build")) {
+                $isBuild = true;
+            })
+            echo "isBuild=$isBuild" >> $env:GITHUB_OUTPUT    
+
   # Setup Validator
   SetupSummeryStage:
     name: "Summery"
