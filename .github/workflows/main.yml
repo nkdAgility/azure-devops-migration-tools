@@ -236,7 +236,6 @@ jobs:
   GitHubRelease:
     name: "Release to GitHub Releases"
     runs-on: ubuntu-latest
-    if: ${{ needs.Setup.outputs.HasChanged_src }}
     env:
       nkdAgility_Ring: ${{ needs.Setup.outputs.nkdAgility_Ring }}
       GitVersion_SemVer: ${{ needs.Setup.outputs.GitVersion_SemVer }}
