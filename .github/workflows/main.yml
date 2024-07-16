@@ -325,6 +325,7 @@ jobs:
             }
             .\build\releaseExtension.ps1 -vsixFile $vsixFile.FullName -marketplaceToken ${{ secrets.VS_MARKET_TOKEN }}
   
+
   # Release to Chocolatey
   ChocolateyRelease:
     name: "Release to Chocolatey (Not Migrated)"
@@ -336,11 +337,17 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: AzureDevOpsMigrationTools-Packages
-      - name: "Find solution files"
+      - name: "Choco"
         shell: pwsh
         run: |
-            Get-Item -Path .\ 
-            Get-ChildItem -Path .\ -Recurse -Filter '*.sln' | ForEach-Object { $_.FullName }   
+            $chocoFile =  Get-ChildItem -Path .\ -Recurse -Filter 'vsts-sync-migrator.${{ needs.Setup.outputs.GitVersion_NuGetVersion }}.nupkg'
+            if ($chocoFile -eq $null) {
+                Write-Output "No Choco file found"
+                exit 1
+            } else {
+              Write-Output $"Running with {$chocoFile}"
+            }
+            choco push $chocoFile.FullName --version $NuGetVersion --key ${{ secrets.CHOCO_APIKEY }}
 
 
   # Release to Winget
