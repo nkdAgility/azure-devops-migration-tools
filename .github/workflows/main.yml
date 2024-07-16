@@ -82,7 +82,7 @@ jobs:
             echo "Ring=$Ring" >> $env:GITHUB_OUTPUT    
 
             $IsBuildEdit = false;
-            if (($Env:GitVersion_PreReleaseLabel).contains("build")) {
+            if (("${{ github.ref_name }}").contains("build/")) {
                 $IsBuildEdit = true;
             }
             echo "IsBuildEdit=$IsBuildEdit" >> $env:GITHUB_OUTPUT    
@@ -262,7 +262,7 @@ jobs:
           tag_name: v${{ needs.Setup.outputs.GitVersion_SemVer }}
           name: Azure DevOps Migration Tools v${{ needs.Setup.outputs.GitVersion_SemVer }}
           token: ${{ steps.app-token.outputs.token }}
-          prerelease: ${{ needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' }}
+          prerelease: ${{ needs.Setup.outputs.GitVersion_PreReleaseLabel != '' }}
           discussion_category_name: "Anouncement"
           draft: true
   
