@@ -92,6 +92,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".workflows", ".workflows", 
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\code-review.yml = .github\workflows\code-review.yml
 		.github\workflows\main.yml = .github\workflows\main.yml
+		.github\workflows\open-pr-describer.yml = .github\workflows\open-pr-describer.yml
 		.github\workflows\opencommit.yml = .github\workflows\opencommit.yml
 		.github\workflows\stale.yml = .github\workflows\stale.yml
 		triggertest.yml = triggertest.yml
