@@ -251,6 +251,9 @@ jobs:
       GitVersion_InformationalVersion: ${{ needs.Setup.outputs.GitVersion_InformationalVersion }}
       GitVersion_NuGetVersion: ${{ needs.Setup.outputs.GitVersion_NuGetVersion }}
       GitVersion_PreReleaseLabel: ${{ needs.Setup.outputs.GitVersion_PreReleaseLabel }}
+      HasChanged_src: ${{ needs.Setup.outputs.HasChanged_src }}
+      HasChanged_docs: ${{ needs.Setup.outputs.HasChanged_docs }}
+      HasChanged_automation: ${{ needs.Setup.outputs.HasChanged_automation }}
     needs: [build, Setup]
     if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring != 'Canary' ) }}
     steps:
@@ -270,7 +273,7 @@ jobs:
         id: release-options
         shell: pwsh
         run: |
-             if ($Env:nkdAgility_Ring -ne 'Canary') {
+             if ($Env:nkdAgility_Ring -ne 'Canary' && ($Env:HasChanged_src || $Env:HasChanged_docs )) {
                 echo "discussion_category_name=Anouncement" >> $env:GITHUB_OUTPUT    
              }
       - name: Release
