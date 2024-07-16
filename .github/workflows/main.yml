@@ -35,7 +35,7 @@ jobs:
       HasChanged_docs: ${{ steps.filter.outputs.docs }}
       HasChanged_automation: ${{ steps.filter.outputs.automation }}
       nkdAgility_Ring: ${{ steps.nkdagility-outputs.outputs.Ring }}
-      nkdAgility_IsBuildEdit: ${{ steps.nkdagility-outputs.outputs.IsBuildEdit }}
+      nkdAgility_IsBuildEditBranch: ${{ steps.nkdagility-outputs.outputs.IsBuildEditBranch }}
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -81,11 +81,11 @@ jobs:
             Write-Output "We are running for the $Ring Ring!"
             echo "Ring=$Ring" >> $env:GITHUB_OUTPUT    
 
-            $IsBuildEdit = false;
+            $IsBuildEditBranch = false;
             if (("${{ github.ref_name }}").contains("build/")) {
-                $IsBuildEdit = true;
+                $IsBuildEditBranch = true;
             }
-            echo "IsBuildEdit=$IsBuildEdit" >> $env:GITHUB_OUTPUT    
+            echo "IsBuildEditBranch=$IsBuildEditBranch" >> $env:GITHUB_OUTPUT    
 
   # Setup Validator
   SetupSummeryStage:
@@ -102,7 +102,7 @@ jobs:
                ## ${{needs.Setup.outputs.GitVersion_SemVer}} (${{needs.Setup.outputs.nkdAgility_Ring}})
                ### NKDAgility
                  - nkdAgility_Ring: ${{needs.Setup.outputs.nkdAgility_Ring}}
-                 - nkdAgility_IsBuildEdit: ${{needs.Setup.outputs.nkdAgility_IsBuildEdit}}
+                 - nkdAgility_IsBuildEditBranch: ${{needs.Setup.outputs.nkdAgility_IsBuildEditBranch}}
                ### GitVersion
                  - GitVersion_BranchName: ${{needs.Setup.outputs.GitVersion_BranchName}}
                  - GitVersion_SemVer: ${{needs.Setup.outputs.GitVersion_SemVer}}
