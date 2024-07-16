@@ -111,7 +111,8 @@ jobs:
                  - HasChanged_docs: ${{needs.Setup.outputs.HasChanged_docs}}
                  - HasChanged_automation: ${{needs.Setup.outputs.HasChanged_automation}}
                ## NKDAgility
-                 - nkdAgility_Ring: ${{needs.Setup.outputs.nkdAgility_Ring}}"@
+                 - nkdAgility_Ring: ${{needs.Setup.outputs.nkdAgility_Ring}}
+            "@
     
   # Build, Test, Sonar Cloud Analysis, & Package
   build:
