@@ -47,7 +47,7 @@ switch ($ring) {
 		$wigetPackageId = "nkdAgility.AzureDevOpsMigrationTools.Canary"
         Write-Host "We dont ship canary builds!"
 	}
-})
+}
 
 Write-Host "Deployed : $wigetPackageId"
 

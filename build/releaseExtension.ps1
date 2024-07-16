@@ -6,7 +6,7 @@
 param (    
     # name of the output folder
     [Parameter(Mandatory=$true)]
-    [string]$vsixFile
+    [string]$vsixFile,
     [Parameter(Mandatory=$true)]
     [string]$marketplaceToken
 )
