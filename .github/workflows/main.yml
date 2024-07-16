@@ -83,9 +83,9 @@ jobs:
             Write-Output "We are running for the $Ring Ring!"
             echo "Ring=$Ring" >> $env:GITHUB_OUTPUT    
 
-            $IsBuildEditBranch = false;
+            $IsBuildEditBranch = $false;
             if (("${{ github.ref_name }}").contains("build/")) {
-                $IsBuildEditBranch = true;
+                $IsBuildEditBranch = $true;
             }
             Write-Output "IsBuildEditBranch=$IsBuildEditBranch"
             echo "IsBuildEditBranch=$IsBuildEditBranch" >> $env:GITHUB_OUTPUT   
