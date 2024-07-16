@@ -214,10 +214,9 @@ jobs:
           name: AzureDevOpsMigrationTools-Packages
           path: ./staging/**
 
-
+  # Code Review
   code-review:
     name: "Code Review Bot"
-    if: ${{ false}}
     runs-on: ubuntu-latest
     needs: [Setup]
     steps:
