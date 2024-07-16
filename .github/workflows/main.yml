@@ -2,6 +2,8 @@ name: Build & Release (Azure DevOps Migration Tools)
 
 on: 
   push:
+    branches:
+      - '*'
     tags-ignore:
       - 'v*-*' 
   pull_request:
@@ -21,7 +23,7 @@ jobs:
 
    # Setup & Configuration
   Setup:
-    name: "Setup & Configuration"
+    name: "Setup & Configuration "
     runs-on: ubuntu-latest
     outputs:
       GitVersion_BranchName: ${{ steps.gitversion.outputs.GitVersion_BranchName }}
@@ -30,6 +32,10 @@ jobs:
       GitVersion_AssemblySemVer: ${{ steps.gitversion.outputs.GitVersion_AssemblySemVer }}
       GitVersion_InformationalVersion: ${{ steps.gitversion.outputs.GitVersion_InformationalVersion }}
       GitVersion_NuGetVersion: ${{ steps.gitversion.outputs.GitVersion_NuGetVersion }}
+      Filter_src: ${{ steps.filter.outputs.src }}
+      Filter_docs: ${{ steps.filter.outputs.docs }}
+      Filter_automation: ${{ steps.filter.outputs.automation }}
+      nkdAgility_Ring: ${{ steps.nkdagility-outputs.outputs.Ring }}
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -45,6 +51,35 @@ jobs:
       uses: gittools/actions/gitversion/execute@v1.1.1
       with:
         useConfigFile: true
+    - uses: dorny/paths-filter@v3
+      id: filter
+      with:
+        filters: |
+          src:
+            - 'src/**'
+          docs:
+            - 'docs/**'
+          automation:
+            - 'build/**'
+            - '.github/workflows/**'
+    - name: "Build NKDAgility Outputs"
+      shell: pwsh
+      id: nkdagility-outputs
+      run: |
+            $Ring = "Canary"
+            switch ($Env:GitVersion_PreReleaseLabel) {
+                "" {
+                    $Ring = "Release";
+                }    
+                "Preview" {
+                    $Ring = "Preview";
+                }
+                default {
+                    $Ring = "Canary";
+                }
+            }
+            Write-Output "We are running for the $Ring Ring!"
+            echo "Ring=$Ring" >> $env:GITHUB_OUTPUT
 
   # Setup Validator
   SetupValidatorStage:
@@ -60,12 +95,18 @@ jobs:
             Write-Output "GitVersion_PreReleaseLabel: ${{needs.Setup.outputs.GitVersion_PreReleaseLabel}}"
             Write-Output "GitVersion_AssemblySemVer: ${{needs.Setup.outputs.GitVersion_AssemblySemVer}}"
             Write-Output "GitVersion_InformationalVersion: ${{needs.Setup.outputs.GitVersion_InformationalVersion}}"
+            Write-Output "GitVersion_NuGetVersion: ${{needs.Setup.outputs.GitVersion_NuGetVersion}}"
+            Write-Output "Filter_src: ${{needs.Setup.outputs.Filter_src}}"
+            Write-Output "Filter_docs: ${{needs.Setup.outputs.Filter_docs}}"
+            Write-Output "Filter_automation: ${{needs.Setup.outputs.Filter_automation}}"
+            Write-Output "nkdAgility_Ring: ${{needs.Setup.outputs.nkdAgility_Ring}}"
     
   # Build, Test, Sonar Cloud Analysis, & Package
   build:
     name: "Build, Test, Sonar Cloud Analysis, & Package"
     runs-on: windows-latest
     needs: Setup
+    if: ${{ needs.Setup.outputs.Filter_src }}
     env:
       solution: '**/*.sln'
       buildPlatform: 'Any CPU'
@@ -176,6 +217,7 @@ jobs:
   GitHubRelease:
     name: "Release to GitHub Releases"
     runs-on: ubuntu-latest
+    if: ${{ needs.Setup.outputs.Filter_src }}
     env:
       GitVersion_SemVer: ${{ needs.Setup.outputs.GitVersion_SemVer }}
       GitVersion_AssemblySemVer: ${{ needs.Setup.outputs.GitVersion_AssemblySemVer }}
@@ -183,7 +225,7 @@ jobs:
       GitVersion_NuGetVersion: ${{ needs.Setup.outputs.GitVersion_NuGetVersion }}
       GitVersion_PreReleaseLabel: ${{ needs.Setup.outputs.GitVersion_PreReleaseLabel }}
     needs: [build, Setup]
-    #if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
+    #if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring != 'Canary' ) }}
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -235,8 +277,8 @@ jobs:
     name: "Release to Marketplace (Not Migrated)"
     runs-on: ubuntu-latest
     needs: [Setup, GitHubRelease]
-    if: ${{ false }}
-    #if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
+    if: ${{ (needs.Setup.outputs.Filter_src) && (false) }}
+    #if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring != 'Canary' ) && (needs.Setup.outputs.Filter_src) }}
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -252,8 +294,8 @@ jobs:
     name: "Release to Chocolatey (Not Migrated)"
     runs-on: ubuntu-latest
     needs: [Setup, GitHubRelease]
-    if: ${{ false }}
-    #if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
+    if: ${{ (needs.Setup.outputs.Filter_src) && (false) }}
+    #if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring != 'Canary' ) && (needs.Setup.outputs.Filter_src) }}
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -269,8 +311,8 @@ jobs:
     name: "Release to Winget (Not Migrated)"
     runs-on: ubuntu-latest
     needs: [Setup, GitHubRelease]
-    if: ${{ false }}
-    #if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
+    if: ${{ (needs.Setup.outputs.Filter_src) && (false) }}
+    #if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring != 'Canary' ) && (needs.Setup.outputs.Filter_src) }}
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -286,8 +328,8 @@ jobs:
     name: "Release to Docs"
     runs-on: ubuntu-latest
     needs: [BuildDocs, GitHubRelease]
-    if: ${{ false }}
-    #if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
+    if: ${{ (needs.Setup.outputs.Filter_docs) && (false) }}
+    #if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring != 'Canary' ) }}
     steps:
       - name: Download a single artifact
         uses: actions/download-artifact@v3
