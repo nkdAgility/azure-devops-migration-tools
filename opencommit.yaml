@@ -1,4 +1,4 @@
-name: 'OpenCommit Action'
+name: 'OpenCommit AI'
 
 on:
   push:
