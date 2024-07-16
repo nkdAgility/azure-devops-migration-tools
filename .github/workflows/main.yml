@@ -323,7 +323,7 @@ jobs:
             } else {
               Write-Output $"Running with {$vsixFile.FullName}"
             }
-            .\build\releaseMarketplace.ps1 -vsixFile $vsixFile.FullName -marketplaceToken ${{ secrets.VS_MARKET_TOKEN }}
+            .\build\releaseExtension.ps1 -vsixFile $vsixFile.FullName -marketplaceToken ${{ secrets.VS_MARKET_TOKEN }}
   
   # Release to Chocolatey
   ChocolateyRelease:
@@ -367,7 +367,7 @@ jobs:
     #if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring != 'Canary' ) }}
     steps:
       - name: Download a single artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: AzureDevOpsMigrationTools-Site
           path: ./_site
