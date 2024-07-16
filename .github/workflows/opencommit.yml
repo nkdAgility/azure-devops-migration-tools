@@ -1,5 +1,9 @@
 name: 'OpenCommit AI'
 
+permissions:
+  contents: write
+  pull-requests: write
+
 on:
   push:
     # this list of branches is often enough,
