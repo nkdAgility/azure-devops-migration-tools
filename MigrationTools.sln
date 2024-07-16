@@ -91,6 +91,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".workflows", ".workflows", "{8A70932A-F6C7-45D1-8E72-608B6BF0F9FD}"
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\main.yml = .github\workflows\main.yml
+		opencommit.yaml = opencommit.yaml
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.ConsoleDataGenerator", "src\MigrationTools.ConsoleDataGenerator\MigrationTools.ConsoleDataGenerator.csproj", "{6A259EA6-860B-448A-8943-594DC1A15105}"
