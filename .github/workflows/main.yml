@@ -216,7 +216,7 @@ jobs:
 
   # Code Review
   code-review:
-    name: "Code Review Bot"
+    name: "Code Review Bot "
     runs-on: ubuntu-latest
     needs: [Setup]
     steps:
