@@ -379,7 +379,7 @@ jobs:
       - name: "Winget Release"
         shell: pwsh
         run: |
-            .\build\releaseWingetPackage.ps1 -version ${{ needs.Setup.outputs.GitVersion_SemVer }} -ring ${{needs.Setup.outputs.nkdAgility_Ring}} -GH_TOKEN ${{ secrets.GITHUB_TOKEN }}
+            .\build\releaseWingetPackage.ps1 -version ${{ needs.Setup.outputs.GitVersion_SemVer }} -ring ${{needs.Setup.outputs.nkdAgility_Ring}} -GH_TOKEN ${{ secrets.NKD_MRHINSH_TOKEN }}
 
   # Release to Docs
   DocsRelease:
