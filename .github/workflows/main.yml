@@ -90,9 +90,6 @@ jobs:
             Write-Output "IsBuildEditBranch=$IsBuildEditBranch"
             echo "IsBuildEditBranch=$IsBuildEditBranch" >> $env:GITHUB_OUTPUT   
 
-
-            
-
   # Setup Validator
   SetupSummeryStage:
     name: "Build Run Data"
