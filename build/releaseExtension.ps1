@@ -25,8 +25,6 @@ tfx login --service-url https://marketplace.visualstudio.com --token $marketplac
 Write-Output "----------------------------------------"
 Write-Output "----------------------------------------"
 # Build TFS Extension
-Write-Output ">>>>> Build TFS Extension"
-tfx extension publish --vsix "$vsixFile"
+Write-Output ">>>>> Send TFS Extension"
+tfx extension publish --vsix "$vsixFile" --token $marketplaceToken
 Write-Output "----------------------------------------"
-# Cleanup
-Remove-Item -Path "$outfolder/MigrationTools.Extension" -Recurse -Force
