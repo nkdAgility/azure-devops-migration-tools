@@ -363,7 +363,7 @@ jobs:
   # Release to Winget
   WingetRelease:
     name: "Release to Winget"
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     needs: [Setup, GitHubRelease]
     if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring != 'Canary' ) && (needs.Setup.outputs.HasChanged_src) }}
     steps:
