@@ -486,6 +486,7 @@ stages:
         version: v0.7.x
     - task: ms-devlabs.vsts-developer-tools-build-tasks.publish-extension-build-task.PublishAzureDevOpsExtension@4
       displayName: 'Publish Extension'
+      condition: and(succeeded(), ne(variables['nkdAgility_Ring'], "Canary"))
       inputs:
         connectedServiceName: 'nkdAgility-Marketplace'
         fileType: vsix
@@ -518,6 +519,7 @@ stages:
         downloadPath: '$(System.ArtifactsDirectory)'
     - task: NuGetCommand@2
       displayName: 'NuGet push'
+      condition: and(succeeded(), ne(variables['nkdAgility_Ring'], "Canary"))
       inputs:
         command: push
         packagesToPush: '$(System.ArtifactsDirectory)\**\*vsts-sync-migrator.*.nupkg'
@@ -550,9 +552,10 @@ stages:
         downloadPath: '$(System.ArtifactsDirectory)'
     - task: PowerShell@2
       displayName: Create Winget Release
+      condition: and(succeeded(), ne(variables['nkdAgility_Ring'], "Canary"))
       inputs:
         filePath: 'build/releaseWingetPackage.ps1'
-        arguments: '-version $(GitVersion.SemVer) -releaseTag $(releaseTag) -GH_TOKEN $(GH_TOKEN)' 
+        arguments: '-version $(GitVersion.SemVer) -ring $(nkdAgility_Ring) -GH_TOKEN $(GH_TOKEN)' 
          
 # Documentation release Stage
 - stage: DocsReleaseStage
@@ -603,7 +606,7 @@ stages:
           Write-Host "Remote Path: $remoteDirectory"
           Write-Host "##vso[task.setvariable variable=remoteDirectory;isOutput=true]$remoteDirectory"
     - task: CopyFilesOverSSH@0
-      condition: and(succeeded(), ne(dependencies.SetupStage.outputs['ConfigJob.VersionOut.nkdAgility_Ring'], "Canary"))
+      condition: and(succeeded(), ne(variables['nkdAgility_Ring'], "Canary"))
       inputs:
         sshEndpoint: 'nakedalmweb-learn'
         sourceFolder: '$(System.ArtifactsDirectory)/site'

@@ -90,7 +90,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.TestExtensio
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".workflows", ".workflows", "{8A70932A-F6C7-45D1-8E72-608B6BF0F9FD}"
 	ProjectSection(SolutionItems) = preProject
+		.github\workflows\code-review.yml = .github\workflows\code-review.yml
 		.github\workflows\main.yml = .github\workflows\main.yml
+		.github\workflows\opencommit.yml = .github\workflows\opencommit.yml
+		.github\workflows\stale.yml = .github\workflows\stale.yml
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.ConsoleDataGenerator", "src\MigrationTools.ConsoleDataGenerator\MigrationTools.ConsoleDataGenerator.csproj", "{6A259EA6-860B-448A-8943-594DC1A15105}"
@@ -113,6 +116,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".build", ".build", "{88C358
 		build\packageExtension.ps1 = build\packageExtension.ps1
 		build\packageNuget.ps1 = build\packageNuget.ps1
 		build\packageWinget.ps1 = build\packageWinget.ps1
+		build\releaseExtension.ps1 = build\releaseExtension.ps1
 		build\releaseGitHubRelease.ps1 = build\releaseGitHubRelease.ps1
 		build\releaseWingetPackage.ps1 = build\releaseWingetPackage.ps1
 		build\versioning.ps1 = build\versioning.ps1

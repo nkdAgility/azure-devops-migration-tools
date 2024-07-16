@@ -1,0 +1,21 @@
+name: Code Review
+
+permissions:
+  contents: read
+  pull-requests: write
+
+on:
+  pull_request:
+    types: [opened, reopened]
+
+jobs:
+  code-review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: fitomad/github-chatgpt-integration@main
+        with:
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          github-token: ${{ secrets.GH_TOKEN }}
+          github-pr-id: ${{ github.event.number }}
+          dev-lang: c#
+          openai-max-tokens: 4096
