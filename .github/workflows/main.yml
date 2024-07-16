@@ -356,7 +356,7 @@ jobs:
               Write-Output $"Running with {$chocoFile}"
             }
 
-            choco push $chocoFile.FullName --version $NuGetVersion --key ${{ secrets.CHOCO_APIKEY }} --source https://push.chocolatey.org/
+            choco push "$chocoFile" --version $NuGetVersion --key ${{ secrets.CHOCO_APIKEY }} --source https://push.chocolatey.org/
 
 
   # Release to Winget
