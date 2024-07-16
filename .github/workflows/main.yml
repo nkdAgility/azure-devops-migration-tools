@@ -297,7 +297,7 @@ jobs:
 
   # Release to Marketplace
   MarketplaceRelease:
-    name: "Release to Marketplace (Not Migrated)"
+    name: "Release to Marketplace"
     runs-on: ubuntu-latest
     needs: [Setup, GitHubRelease]
     #if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring != 'Canary' ) && (needs.Setup.outputs.HasChanged_src) }}
@@ -313,7 +313,14 @@ jobs:
       - name: "Marketplace"
         shell: pwsh
         run: |
-            .\build\releaseMarketplace.ps1 -version ${{ needs.Setup.outputs.GitVersion_SemVer }} -outfolder "./staging"
+            $vsixFile =  Get-ChildItem -Path .\ -Recurse -Filter '*.vsix'
+            if ($vsixFile -eq $null) {
+                Write-Output "No VSIX file found"
+                exit 1
+            } else {
+              Write-Output $"Running with {$vsixFile.FullName}"
+            }
+            .\build\releaseMarketplace.ps1 -vsixFile $vsixFile.FullName -marketplaceToken ${{ secrets.VS_MARKET_TOKEN }}
   
   # Release to Chocolatey
   ChocolateyRelease:
