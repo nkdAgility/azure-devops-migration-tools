@@ -113,6 +113,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".build", ".build", "{88C358
 		build\packageExtension.ps1 = build\packageExtension.ps1
 		build\packageNuget.ps1 = build\packageNuget.ps1
 		build\packageWinget.ps1 = build\packageWinget.ps1
+		build\releaseExtension.ps1 = build\releaseExtension.ps1
 		build\releaseGitHubRelease.ps1 = build\releaseGitHubRelease.ps1
 		build\releaseWingetPackage.ps1 = build\releaseWingetPackage.ps1
 		build\versioning.ps1 = build\versioning.ps1
