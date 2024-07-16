@@ -32,9 +32,9 @@ jobs:
       GitVersion_AssemblySemVer: ${{ steps.gitversion.outputs.GitVersion_AssemblySemVer }}
       GitVersion_InformationalVersion: ${{ steps.gitversion.outputs.GitVersion_InformationalVersion }}
       GitVersion_NuGetVersion: ${{ steps.gitversion.outputs.GitVersion_NuGetVersion }}
-      Filter_src: ${{ steps.filter.outputs.src }}
-      Filter_docs: ${{ steps.filter.outputs.docs }}
-      Filter_automation: ${{ steps.filter.outputs.automation }}
+      HasChanged_src: ${{ steps.filter.outputs.src }}
+      HasChanged_docs: ${{ steps.filter.outputs.docs }}
+      HasChanged_automation: ${{ steps.filter.outputs.automation }}
       nkdAgility_Ring: ${{ steps.nkdagility-outputs.outputs.Ring }}
     steps:
     - name: Checkout
@@ -79,34 +79,41 @@ jobs:
                 }
             }
             Write-Output "We are running for the $Ring Ring!"
-            echo "Ring=$Ring" >> $env:GITHUB_OUTPUT
+            echo "Ring=$Ring" >> $env:GITHUB_OUTPUT    
 
   # Setup Validator
-  SetupValidatorStage:
+  SetupSummeryStage:
     name: "Setup Validator"
     runs-on: ubuntu-latest
     needs: Setup
     steps:
-      - name: "Release WorkItemClone"
-        shell: pwsh
-        run: |
-            Write-Output "GitVersion_BranchName: ${{needs.Setup.outputs.GitVersion_BranchName}}"
-            Write-Output "GitVersion_SemVer: ${{needs.Setup.outputs.GitVersion_SemVer}}"
-            Write-Output "GitVersion_PreReleaseLabel: ${{needs.Setup.outputs.GitVersion_PreReleaseLabel}}"
-            Write-Output "GitVersion_AssemblySemVer: ${{needs.Setup.outputs.GitVersion_AssemblySemVer}}"
-            Write-Output "GitVersion_InformationalVersion: ${{needs.Setup.outputs.GitVersion_InformationalVersion}}"
-            Write-Output "GitVersion_NuGetVersion: ${{needs.Setup.outputs.GitVersion_NuGetVersion}}"
-            Write-Output "Filter_src: ${{needs.Setup.outputs.Filter_src}}"
-            Write-Output "Filter_docs: ${{needs.Setup.outputs.Filter_docs}}"
-            Write-Output "Filter_automation: ${{needs.Setup.outputs.Filter_automation}}"
-            Write-Output "nkdAgility_Ring: ${{needs.Setup.outputs.nkdAgility_Ring}}"
+    - name: "Create Summery"
+      if: always()
+      shell: pwsh
+      id: nkdagility-summery
+      run: |
+            $markdown = @"
+               # Setup & Configuration
+               ## GitVersion
+                 - GitVersion_BranchName: ${{needs.Setup.outputs.GitVersion_BranchName}}
+                 - GitVersion_SemVer: ${{needs.Setup.outputs.GitVersion_SemVer}}
+                 - GitVersion_PreReleaseLabel: ${{needs.Setup.outputs.GitVersion_PreReleaseLabel}}
+                 - GitVersion_AssemblySemVer: ${{needs.Setup.outputs.GitVersion_AssemblySemVer}}
+                 - GitVersion_InformationalVersion: ${{needs.Setup.outputs.GitVersion_InformationalVersion}}
+                 - GitVersion_NuGetVersion: ${{needs.Setup.outputs.GitVersion_NuGetVersion}}
+               ## Has Changed
+                 - HasChanged_src: ${{needs.Setup.outputs.HasChanged_src}}
+                 - HasChanged_docs: ${{needs.Setup.outputs.HasChanged_docs}}
+                 - HasChanged_automation: ${{needs.Setup.outputs.HasChanged_automation}}
+               ## NKDAgility
+                 - nkdAgility_Ring: ${{needs.Setup.outputs.nkdAgility_Ring}}
     
   # Build, Test, Sonar Cloud Analysis, & Package
   build:
     name: "Build, Test, Sonar Cloud Analysis, & Package"
     runs-on: windows-latest
     needs: Setup
-    if: ${{ needs.Setup.outputs.Filter_src }}
+    if: ${{ needs.Setup.outputs.HasChanged_src }}
     env:
       solution: '**/*.sln'
       buildPlatform: 'Any CPU'
@@ -217,7 +224,7 @@ jobs:
   GitHubRelease:
     name: "Release to GitHub Releases"
     runs-on: ubuntu-latest
-    if: ${{ needs.Setup.outputs.Filter_src }}
+    if: ${{ needs.Setup.outputs.HasChanged_src }}
     env:
       GitVersion_SemVer: ${{ needs.Setup.outputs.GitVersion_SemVer }}
       GitVersion_AssemblySemVer: ${{ needs.Setup.outputs.GitVersion_AssemblySemVer }}
@@ -277,8 +284,8 @@ jobs:
     name: "Release to Marketplace (Not Migrated)"
     runs-on: ubuntu-latest
     needs: [Setup, GitHubRelease]
-    if: ${{ (needs.Setup.outputs.Filter_src) && (false) }}
-    #if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring != 'Canary' ) && (needs.Setup.outputs.Filter_src) }}
+    if: ${{ (needs.Setup.outputs.HasChanged_src) && (false) }}
+    #if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring != 'Canary' ) && (needs.Setup.outputs.HasChanged_src) }}
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -294,8 +301,8 @@ jobs:
     name: "Release to Chocolatey (Not Migrated)"
     runs-on: ubuntu-latest
     needs: [Setup, GitHubRelease]
-    if: ${{ (needs.Setup.outputs.Filter_src) && (false) }}
-    #if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring != 'Canary' ) && (needs.Setup.outputs.Filter_src) }}
+    if: ${{ (needs.Setup.outputs.HasChanged_src) && (false) }}
+    #if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring != 'Canary' ) && (needs.Setup.outputs.HasChanged_src) }}
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -311,8 +318,8 @@ jobs:
     name: "Release to Winget (Not Migrated)"
     runs-on: ubuntu-latest
     needs: [Setup, GitHubRelease]
-    if: ${{ (needs.Setup.outputs.Filter_src) && (false) }}
-    #if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring != 'Canary' ) && (needs.Setup.outputs.Filter_src) }}
+    if: ${{ (needs.Setup.outputs.HasChanged_src) && (false) }}
+    #if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring != 'Canary' ) && (needs.Setup.outputs.HasChanged_src) }}
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -328,7 +335,7 @@ jobs:
     name: "Release to Docs"
     runs-on: ubuntu-latest
     needs: [BuildDocs, GitHubRelease]
-    if: ${{ (needs.Setup.outputs.Filter_docs) && (false) }}
+    if: ${{ (needs.Setup.outputs.HasChanged_docs) && (false) }}
     #if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring != 'Canary' ) }}
     steps:
       - name: Download a single artifact
