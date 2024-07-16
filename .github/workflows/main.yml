@@ -260,7 +260,7 @@ jobs:
         id: release-options
         shell: pwsh
         run: |
-             if (Env:nkdAgility_Ring -ne 'Canary') {
+             if ($Env:nkdAgility_Ring -ne 'Canary') {
                 echo "discussion_category_name=Anouncement" >> $env:GITHUB_OUTPUT    
              }
       - name: Release
