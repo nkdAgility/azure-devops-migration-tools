@@ -15,8 +15,8 @@ jobs:
       - uses: actions/create-github-app-token@v1
         id: app-token
         with:
-          app-id: ${{ env.APP_ID }}
-          private-key: ${{ env.PRIVATE_KEY }}
+          app-id: ${{ secrets.NKDAGILITY_BOT_APP_ID }}
+          private-key: ${{ secrets.NKDAGILITY_BOT_CLIENTSECRET }}
       - uses: fitomad/github-chatgpt-integration@main
         with:
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
