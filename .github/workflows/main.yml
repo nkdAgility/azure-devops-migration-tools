@@ -7,7 +7,6 @@ permissions:
 on: 
   push:
     branches:
-      - "*"
     tags:
       - '!v*-*' 
   pull_request:
@@ -18,10 +17,6 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
-
-env:
-   APP_ID: "Iv23li9aYvt0VW9x4Jhh"
-   PRIVATE_KEY: ${{ secrets.NKDAGILITY_BOT_CLIENTSECRET }}
 
 defaults:
   run:
@@ -253,6 +248,9 @@ jobs:
       GitVersion_InformationalVersion: ${{ needs.Setup.outputs.GitVersion_InformationalVersion }}
       GitVersion_NuGetVersion: ${{ needs.Setup.outputs.GitVersion_NuGetVersion }}
       GitVersion_PreReleaseLabel: ${{ needs.Setup.outputs.GitVersion_PreReleaseLabel }}
+      HasChanged_src: ${{ needs.Setup.outputs.HasChanged_src }}
+      HasChanged_docs: ${{ needs.Setup.outputs.HasChanged_docs }}
+      HasChanged_automation: ${{ needs.Setup.outputs.HasChanged_automation }}
     needs: [build, Setup]
     if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring != 'Canary' ) }}
     steps:
@@ -262,8 +260,8 @@ jobs:
       - uses: actions/create-github-app-token@v1
         id: app-token
         with:
-          app-id: ${{ env.APP_ID }}
-          private-key: ${{ env.PRIVATE_KEY }}
+          app-id: ${{ secrets.NKDAGILITY_BOT_APP_ID }}
+          private-key: ${{ secrets.NKDAGILITY_BOT_CLIENTSECRET }}
       - name: "Package  Files"
         shell: pwsh
         run: |
@@ -272,7 +270,7 @@ jobs:
         id: release-options
         shell: pwsh
         run: |
-             if ($Env:nkdAgility_Ring -ne 'Canary') {
+             if ($Env:nkdAgility_Ring -ne 'Canary' && ($Env:HasChanged_src || $Env:HasChanged_docs )) {
                 echo "discussion_category_name=Anouncement" >> $env:GITHUB_OUTPUT    
              }
       - name: Release
@@ -357,7 +355,7 @@ jobs:
               Write-Output $"Running with {$chocoFile}"
             }
 
-            choco push $chocoFile.FullName --version $NuGetVersion --key ${{ secrets.CHOCO_APIKEY }} --source https://push.chocolatey.org/
+            choco push "$chocoFile" --version $NuGetVersion --key ${{ secrets.CHOCO_APIKEY }} --source https://push.chocolatey.org/
 
 
   # Release to Winget
@@ -379,7 +377,7 @@ jobs:
       - name: "Winget Release"
         shell: pwsh
         run: |
-            .\build\releaseWingetPackage.ps1 -version ${{ needs.Setup.outputs.GitVersion_SemVer }} -ring ${{needs.Setup.outputs.nkdAgility_Ring}} -GH_TOKEN ${{ secrets.GITHUB_TOKEN }}
+            .\build\releaseWingetPackage.ps1 -version ${{ needs.Setup.outputs.GitVersion_SemVer }} -ring ${{needs.Setup.outputs.nkdAgility_Ring}} -GH_TOKEN ${{ secrets.NKD_MRHINSH_TOKEN }}
 
   # Release to Docs
   DocsRelease:
