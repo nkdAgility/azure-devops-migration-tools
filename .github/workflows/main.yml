@@ -8,7 +8,8 @@ on:
   push:
     branches: ["**"]
     tags-ignore: ["v*-*"]
-      
+  pull_request:
+      branches: ["main"]
   workflow_dispatch:
 
 concurrency:
