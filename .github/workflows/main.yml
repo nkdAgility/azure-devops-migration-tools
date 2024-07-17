@@ -6,7 +6,7 @@ permissions:
 
 on:
   push:
-    branches: ["*"]
+    branches: ["**"]
     tags-ignore: ["v*-*"]
       
   pull_request:
