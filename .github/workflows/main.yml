@@ -6,15 +6,14 @@ permissions:
 
 on:
   push:
-    branches: ["*"]
+    branches: ["main"]
     tags-ignore: ["v*-*"]
-      
   pull_request:
-    branches: [ "main" ]
+      branches: ["main"]
   workflow_dispatch:
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }} 
   cancel-in-progress: true
 
 defaults:
@@ -353,8 +352,8 @@ jobs:
             } else {
               Write-Output $"Running with {$chocoFile}"
             }
-
-            choco push "$chocoFile" --version $NuGetVersion --key ${{ secrets.CHOCO_APIKEY }} --source https://push.chocolatey.org/
+            Write-Output 'choco push "$chocoFile" --key "${{ secrets.CHOCO_APIKEY }}" --source "https://push.chocolatey.org/"'
+            choco push "$chocoFile" --key "${{ secrets.CHOCO_APIKEY }}" --source "https://push.chocolatey.org/"
 
 
   # Release to Winget
