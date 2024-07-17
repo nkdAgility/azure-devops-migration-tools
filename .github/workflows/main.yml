@@ -353,8 +353,8 @@ jobs:
             } else {
               Write-Output $"Running with {$chocoFile}"
             }
-
-            choco push "$chocoFile" --version $NuGetVersion --key ${{ secrets.CHOCO_APIKEY }} --source https://push.chocolatey.org/
+            Write-Output 'choco push "$chocoFile" --key "${{ secrets.CHOCO_APIKEY }}" --source "https://push.chocolatey.org/"'
+            choco push "$chocoFile" --key "${{ secrets.CHOCO_APIKEY }}" --source "https://push.chocolatey.org/"
 
 
   # Release to Winget
