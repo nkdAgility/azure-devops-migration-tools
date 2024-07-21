@@ -18,5 +18,19 @@ jobs:
       - uses: Ant0wan/openai-pr@v1
         with:
           api-key: ${{ secrets.OPENAI_API_KEY }}
+          model: "gtp-4"
+          template: |
+            ## Description
+
+            This pull request addresses the following issues:
+
+            - Issue 1
+            - Issue 2
+
+            ## Changes
+
+            - Change 1
+            - Change 2
+          header: "Based on the output of the command 'git diff', could you please generate a pull request description using the provided information? Be concise. Description must follow this format:"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
