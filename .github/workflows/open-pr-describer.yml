@@ -31,6 +31,5 @@ jobs:
 
             - Change 1
             - Change 2
-          header: "Based on the output of the command 'git diff', could you please generate a pull request description using the provided information? Be concise. Description must follow this format:"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
