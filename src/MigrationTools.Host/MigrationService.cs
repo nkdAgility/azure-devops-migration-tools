@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -25,7 +26,7 @@ namespace MigrationTools.Host
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            await AppCommand.RunAsync(Environment.GetCommandLineArgs());
+            await AppCommand.RunAsync(Environment.GetCommandLineArgs().Skip(1));
             AppLifetime.StopApplication();
         }
     }

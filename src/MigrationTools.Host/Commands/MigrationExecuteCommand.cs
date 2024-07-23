@@ -18,7 +18,7 @@ namespace MigrationTools.Host.Commands
         private readonly ITelemetryLogger Telemetery;
 
         public MigrationExecuteCommand(IServiceProvider services,
-            ILogger<ExecuteHostedService> logger,
+            ILogger<MigrationExecuteCommand> logger,
             IHostApplicationLifetime appLifetime, ITelemetryLogger telemetryLogger)
         {
             Telemetery = telemetryLogger;

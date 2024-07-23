@@ -3,6 +3,9 @@
     "MigrationTools.ConsoleUI": {
       "commandName": "Project",
       "commandLineArgs": "execute --config \"configuration.json\""
+    },
+    "empty": {
+      "commandName": "Project"
     }
   }
 }

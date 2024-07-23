@@ -23,7 +23,7 @@ namespace MigrationTools.Host.Commands
         public MigrationInitCommand(
             IEngineConfigurationBuilder configurationBuilder,
             ISettingsWriter settingsWriter,
-            ILogger<InitHostedService> logger,
+            ILogger<MigrationInitCommand> logger,
             ITelemetryLogger telemetryLogger,
             IHostApplicationLifetime appLifetime)
         {
@@ -35,7 +35,7 @@ namespace MigrationTools.Host.Commands
         }
 
 
-        public override Task<int> ExecuteAsync(CommandContext context, MigrationInitCommandSettings settings)
+        public override async Task<int> ExecuteAsync(CommandContext context, MigrationInitCommandSettings settings)
         {
             int _exitCode;
             try
