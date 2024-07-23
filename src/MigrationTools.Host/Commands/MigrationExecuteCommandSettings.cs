@@ -4,7 +4,7 @@ using Spectre.Console.Cli;
 
 namespace MigrationTools.Host.Commands
 {
-    internal class MigrationExecuteCommandSettings : BaseMigrationCommandSettings
+    internal class MigrationExecuteCommandSettings : CommandSettingsBase
     {
         [Description("Domain used to connect to the source TFS instance.")]
         [CommandOption("--sourceDomain")]
@@ -29,9 +29,5 @@ namespace MigrationTools.Host.Commands
         [Description("Password used to connect to target TFS instance.")]
         [CommandOption("--targetPassword")]
         public string TargetPassword { get; set; }
-
-        [Description("Add this paramiter to turn Telemetry off")]
-        [CommandOption("--disableTelemetry")]
-        public bool DisableTelemetry { get; set; }
     }
 }
