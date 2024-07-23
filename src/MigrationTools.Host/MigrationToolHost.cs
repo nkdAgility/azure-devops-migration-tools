@@ -2,7 +2,6 @@
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
-using CommandLine;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.ApplicationInsights.WorkerService;
@@ -12,7 +11,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MigrationTools._EngineV1.Configuration;
-using MigrationTools.Host.CommandLine;
 using MigrationTools.Host.CustomDiagnostics;
 using MigrationTools.Host.Services;
 using MigrationTools.Options;
