@@ -1,0 +1,10 @@
+# Add 'Documentation' label to any changes within 'docs' folder or any subfolders
+documentation:
+- changed-files:
+  - any-glob-to-any-file: docs/**
+
+# Add 'source' label to any change to src files within the source dir EXCEPT for the docs sub-folder
+build-action:
+- changed-files:
+  - any-glob-to-any-file: 'build/**'
+  - any-glob-to-any-file: '.github/workflows/**'
