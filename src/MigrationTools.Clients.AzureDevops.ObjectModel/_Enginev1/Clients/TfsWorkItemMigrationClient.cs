@@ -155,7 +155,7 @@ namespace MigrationTools._EngineV1.Clients
             }
             var startTime = DateTime.UtcNow;
             var timer = System.Diagnostics.Stopwatch.StartNew();
-            WorkItem y;
+            WorkItem y = null ;
             try
             {
                 Log.Debug("TfsWorkItemMigrationClient::GetWorkItem({id})", id);
