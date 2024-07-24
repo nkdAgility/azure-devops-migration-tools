@@ -25,6 +25,7 @@ using MigrationTools.DataContracts;
 using MigrationTools.DataContracts.Pipelines;
 using MigrationTools.Enrichers;
 using VstsSyncMigrator.Engine.ComponentContext;
+using Environment = System.Environment;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -633,6 +634,11 @@ namespace VstsSyncMigrator.Engine
                 //Get Target ReflectedWorkItemId
                 var targetWI = Engine.Target.WorkItems.GetWorkItem(testPlan.Id.ToString());
                 Log.LogDebug("TestPlansAndSuitesMigrationContext::FindTestPlan::TargetWorkItem[{workItemId]", targetWI.Id);
+                if (!targetWI.Fields.ContainsKey(Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName))
+                {
+                    Log.LogError("TestPlansAndSuitesMigrationContext::FindTestPlan::TargetWorkItem[{workItemId} does not have ReflectedWorkItemId field {ReflectedWorkItemIDFieldName}", targetWI.Id, Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName);
+                    Environment.Exit(-1);
+                }
                 string workItemReflectedId = (string)targetWI.Fields[Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName].Value;
                 Log.LogDebug("TestPlansAndSuitesMigrationContext::FindTestPlan::TargetWorkItem[{workItemId] [{ReflectedWorkItemId]", targetWI.Id, workItemReflectedId);
                 //Compaire
