@@ -372,7 +372,7 @@ namespace VstsSyncMigrator.Engine
                     var ex = new Exception(
                        "Not all WorkItemTypes present in the Source are present in the Target or mapped! Filter them from the query, or map the to target types.");
                     Log.LogError(ex, "Not all WorkItemTypes present in the Source are present in the Target or mapped using `WorkItemTypeDefinition` in the config.");
-                    throw ex;
+                    Environment.Exit(-1);
                 }
             }
         }
@@ -387,7 +387,7 @@ namespace VstsSyncMigrator.Engine
                 {
                     var ex = new InvalidOperationException("Missing PersonalAccessToken from Target");
                     Log.LogError(ex, "When you are migrating to Azure DevOps you MUST provide an PAT so that we can call the REST API for certain actions. For example we would be unable to deal with a Work item Type change.");
-                    throw ex;
+                    Environment.Exit(-1);
                 }
             }
         }
