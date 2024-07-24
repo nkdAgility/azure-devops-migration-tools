@@ -7,7 +7,7 @@ changelog:
         - '*'
       exclude:
         labels:
-          - dependencies
-    - title: 👒 Dependencies
+          - architecture
+    - title: 👒 Architecture Improvements
       labels:
-        - dependencies
+        - architecture

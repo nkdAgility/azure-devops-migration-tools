@@ -39,6 +39,7 @@ jobs:
       HasChanged_docs: ${{ steps.filter.outputs.docs }}
       HasChanged_automation: ${{ steps.filter.outputs.automation }}
       nkdAgility_Ring: ${{ steps.nkdagility.outputs.Ring }}
+      nkdAgility_WingetApplicationId: ${{ steps.nkdagility.outputs.WingetApplicationId }}
       nkdAgility_IsBuildEditBranch: ${{ steps.nkdagility.outputs.IsBuildEditBranch }}
     steps:
     - name: Checkout
@@ -71,19 +72,25 @@ jobs:
       id: nkdagility
       run: |
             $Ring = "Canary"
+            $WingetApplicationId = "nkdagility.azure-devops-migration-tools"
             switch ($Env:GitVersion_PreReleaseLabel) {
                 "" {
                     $Ring = "Release";
+                    $WingetApplicationId = "nkdagility.azure-devops-migration-tools";
                 }    
                 "Preview" {
                     $Ring = "Preview";
+                    $WingetApplicationId = "nkdagility.azure-devops-migration-tools.Preview";
                 }
                 default {
                     $Ring = "Canary";
+                    $WingetApplicationId = "nkdagility.azure-devops-migration-tools.Canary";
                 }
             }
             Write-Output "We are running for the $Ring Ring!"
-            echo "Ring=$Ring" >> $env:GITHUB_OUTPUT    
+            Write-Output "We are focused on Winget ID $WingetApplicationId!"
+            echo "Ring=$Ring" >> $env:GITHUB_OUTPUT
+            echo "WingetApplicationId=$WingetApplicationId" >> $env:GITHUB_OUTPUT
 
             $IsBuildEditBranch = $false;
             if (("${{ github.ref_name }}").contains("build/")) {
@@ -108,6 +115,7 @@ jobs:
                ### NKDAgility
                  - nkdAgility_Ring: ${{needs.Setup.outputs.nkdAgility_Ring}}
                  - nkdAgility_IsBuildEditBranch: ${{needs.Setup.outputs.nkdAgility_IsBuildEditBranch}}
+                 - nkdAgility_WingetApplicationId: ${{needs.Setup.outputs.nkdAgility_WingetApplicationId}}
                ### GitVersion
                  - GitVersion_BranchName: ${{needs.Setup.outputs.GitVersion_BranchName}}
                  - GitVersion_SemVer: ${{needs.Setup.outputs.GitVersion_SemVer}}
@@ -271,6 +279,7 @@ jobs:
              if ($Env:nkdAgility_Ring -ne 'Canary' && ($Env:HasChanged_src || $Env:HasChanged_docs )) {
                 echo "discussion_category_name=Anouncement" >> $env:GITHUB_OUTPUT    
              }
+             
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
@@ -285,6 +294,18 @@ jobs:
           prerelease: ${{ needs.Setup.outputs.nkdAgility_Ring != 'Release' }}
           discussion_category_name: ${{ steps.release-options.outputs.discussion_category_name }}
           draft: ${{ needs.Setup.outputs.nkdAgility_Ring == 'Canary' }}
+          body: |
+            ## Azure DevOps Migration Tools v${{ needs.Setup.outputs.GitVersion_SemVer }} 
+            Version: ${{ needs.Setup.outputs.GitVersion_SemVer }}
+            Ring: (${{ needs.Setup.outputs.nkdAgility_Ring }})
+
+            ## Get the tools
+
+            - Download the [MigrationTools-${{ needs.Setup.outputs.GitVersion_SemVer }}.zip](https://github.com/nkdAgility/azure-devops-migration-tools/releases/download/v${{ needs.Setup.outputs.GitVersion_SemVer }}/MigrationTools-${{ needs.Setup.outputs.GitVersion_SemVer }}.zip) file below
+            - Install with Winget with `winget install ${{needs.Setup.outputs.nkdAgility_WingetApplicationId}} --version ${{ needs.Setup.outputs.GitVersion_SemVer }}` . There is a delay for aprovals on the winget store, so you may need to wait a few days before this is available.
+            - Install with Chocolatey with `choco install nkdagility.azure-devops-migration-tools --version ${{ needs.Setup.outputs.GitVersion_NuGetVersion }}`. There is a delay for aprovals on the chocolatey store, so you may need to wait a few hours before this is available.
+
+          append_body: true
   
 # ElmahDeployment
   ElmahDeployemnt:

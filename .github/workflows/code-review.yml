@@ -1,4 +1,4 @@
-name: Code Review
+name: OpenAI - Code Review
 
 permissions:
   contents: read
