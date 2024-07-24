@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Reflection;
 using System.Security.Principal;
+using System.Text.RegularExpressions;
 using Elmah.Io.Client;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
@@ -19,7 +22,7 @@ namespace MigrationTools
             telemetryClient.Context.Device.OperatingSystem = Environment.OSVersion.ToString();
             if (!(System.Reflection.Assembly.GetEntryAssembly() is null))
             {
-                telemetryClient.Context.Component.Version = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString();
+                telemetryClient.Context.Component.Version = GetRunningVersion().versionString;
             }
             _telemetryClient = telemetryClient;
 
@@ -28,7 +31,7 @@ namespace MigrationTools
                 Timeout = TimeSpan.FromSeconds(30),
                 UserAgent = "Azure-DevOps-Migration-Tools",
             });
-            elmahIoClient.Messages.OnMessage += (sender, args) => args.Message.Version = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString();
+            elmahIoClient.Messages.OnMessage += (sender, args) => args.Message.Version = GetRunningVersion().versionString;
 
         }
 
@@ -84,15 +87,19 @@ namespace MigrationTools
                 Application = "Azure-DevOps-Migration-Tools",
                 ServerVariables = new List<Item>
                     {
-                        new Item("User-Agent", $"X-ELMAHIO-APPLICATION; OS={Environment.OSVersion.Platform}; OSVERSION={Environment.OSVersion.Version}; ENGINE=Azure-DevOps-Migration-Tools"),
+                        new Item("User-Agent", $"X-ELMAHIO-APPLICATION; OS={Environment.OSVersion.Platform}; OSVERSION={Environment.OSVersion.Version}; ENGINEVERSION={GetRunningVersion().versionString}; ENGINE=Azure-DevOps-Migration-Tools"),
                     }
             };
+            createMessage.Data.Add(new Item("SessionId", SessionId));
+            createMessage.Data.Add(new Item("Version", GetRunningVersion().versionString));
+
             if (properties != null)
             {
                 foreach (var property in properties)
                 {
                     createMessage.Data.Add(new Item(property.Key, property.Value));
                 }
+
             }
             if (measurements != null)
             {
@@ -108,6 +115,15 @@ namespace MigrationTools
         public void TrackRequest(string name, DateTimeOffset startTime, TimeSpan duration, string responseCode, bool success)
         {
             _telemetryClient.TrackRequest(name, startTime, duration, responseCode, success);
+        }
+
+        public static (Version version, string PreReleaseLabel, string versionString) GetRunningVersion()
+        {
+            FileVersionInfo myFileVersionInfo = FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly()?.Location);
+            var matches = Regex.Matches(myFileVersionInfo.ProductVersion, @"^(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)\.(?<build>0|[1-9]\d*)(?:-((?<label>:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?<fullEnd>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$");
+            Version version = new Version(myFileVersionInfo.FileVersion);
+            string textVersion = "v" + version.Major + "." + version.Minor + "." + version.Build + "-" + matches[0].Groups[1].Value;
+            return (version, matches[0].Groups[1].Value, textVersion);
         }
     }
 }
