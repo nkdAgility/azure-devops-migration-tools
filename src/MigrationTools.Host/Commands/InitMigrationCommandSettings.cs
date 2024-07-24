@@ -3,7 +3,7 @@ using Spectre.Console.Cli;
 
 namespace MigrationTools.Host.Commands
 {
-    internal class MigrationInitCommandSettings : CommandSettingsBase
+    internal class InitMigrationCommandSettings : CommandSettingsBase
     {
         [Description("What type of config do you want to output? WorkItemTracking is the default.")]
         [CommandOption("--outputMode|--options")]

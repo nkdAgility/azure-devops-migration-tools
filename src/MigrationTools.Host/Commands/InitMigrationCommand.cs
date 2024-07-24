@@ -12,7 +12,7 @@ using Spectre.Console.Cli;
 
 namespace MigrationTools.Host.Commands
 {
-    internal class MigrationInitCommand : AsyncCommand<MigrationInitCommandSettings>
+    internal class InitMigrationCommand : AsyncCommand<InitMigrationCommandSettings>
     {
         private readonly IEngineConfigurationBuilder _configurationBuilder;
         private readonly ISettingsWriter _settingWriter;
@@ -20,10 +20,10 @@ namespace MigrationTools.Host.Commands
         private readonly ITelemetryLogger Telemetery;
         private readonly IHostApplicationLifetime _appLifetime;
 
-        public MigrationInitCommand(
+        public InitMigrationCommand(
             IEngineConfigurationBuilder configurationBuilder,
             ISettingsWriter settingsWriter,
-            ILogger<MigrationInitCommand> logger,
+            ILogger<InitMigrationCommand> logger,
             ITelemetryLogger telemetryLogger,
             IHostApplicationLifetime appLifetime)
         {
@@ -35,7 +35,7 @@ namespace MigrationTools.Host.Commands
         }
 
 
-        public override async Task<int> ExecuteAsync(CommandContext context, MigrationInitCommandSettings settings)
+        public override async Task<int> ExecuteAsync(CommandContext context, InitMigrationCommandSettings settings)
         {
             int _exitCode;
             try

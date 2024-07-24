@@ -122,8 +122,8 @@ namespace MigrationTools.Host
                 app.Configure(config =>
                 {
                     config.PropagateExceptions();
-                    config.AddCommand<Commands.MigrationExecuteCommand>("execute");
-                    config.AddCommand<Commands.MigrationInitCommand>("init");
+                    config.AddCommand<Commands.ExecuteMigrationCommand>("execute");
+                    config.AddCommand<Commands.InitMigrationCommand>("init");
 
                 });
                 services.AddSingleton<ICommandApp>(app);

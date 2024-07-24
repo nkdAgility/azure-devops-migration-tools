@@ -4,7 +4,7 @@ using Spectre.Console.Cli;
 
 namespace MigrationTools.Host.Commands
 {
-    internal class MigrationExecuteCommandSettings : CommandSettingsBase
+    internal class ExecuteMigrationCommandSettings : CommandSettingsBase
     {
         [Description("Domain used to connect to the source TFS instance.")]
         [CommandOption("--sourceDomain")]

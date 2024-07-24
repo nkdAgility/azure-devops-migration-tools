@@ -6,20 +6,21 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MigrationTools.Host.Commands;
+using MigrationTools.Host.Services;
 using Spectre.Console.Cli;
 
 namespace MigrationTools.Host.Commands
 {
-    internal class MigrationExecuteCommand : AsyncCommand<MigrationExecuteCommandSettings>
+    internal class ExecuteMigrationCommand : CommandBase<ExecuteMigrationCommandSettings>
     {
         private readonly IServiceProvider _services;
         private readonly ILogger _logger;
         private readonly IHostApplicationLifetime _appLifetime;
         private readonly ITelemetryLogger Telemetery;
 
-        public MigrationExecuteCommand(IServiceProvider services,
-            ILogger<MigrationExecuteCommand> logger,
-            IHostApplicationLifetime appLifetime, ITelemetryLogger telemetryLogger)
+        public ExecuteMigrationCommand(IServiceProvider services,
+            ILogger<ExecuteMigrationCommand> logger,
+            IHostApplicationLifetime appLifetime, ITelemetryLogger telemetryLogger, IDetectOnlineService detectOnlineService, IDetectVersionService2 detectVersionService) : base(appLifetime, detectOnlineService, detectVersionService, logger, telemetryLogger)
         {
             Telemetery = telemetryLogger;
             _services = services;
@@ -27,7 +28,7 @@ namespace MigrationTools.Host.Commands
             _appLifetime = appLifetime;
         }
 
-        public override async Task<int> ExecuteAsync(CommandContext context, MigrationExecuteCommandSettings settings)
+        internal override async Task<int> ExecuteInternalAsync(CommandContext context, ExecuteMigrationCommandSettings settings)
         {
              int _exitCode;
             try
