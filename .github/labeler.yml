@@ -8,3 +8,15 @@ build-action:
 - changed-files:
   - any-glob-to-any-file: 'build/**'
   - any-glob-to-any-file: '.github/workflows/**'
+- head-branch: ['^build', 'build']
+  
+
+# Add 'feature' label to any PR where the head branch name starts with `feature` or has a `feature` section in the name
+feature:
+- head-branch: ['^feature', 'feature', '^topic', 'topic']
+ 
+# Add 'bug' label to any PR 
+bug:
+- head-branch: ['^fix', 'fix','^bug', 'bug']
+
+
