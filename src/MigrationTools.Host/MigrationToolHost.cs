@@ -20,20 +20,24 @@ using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
 using Spectre.Console.Cli.Extensions.DependencyInjection;
 using Spectre.Console.Cli;
+using Serilog.Filters;
 
 namespace MigrationTools.Host
 {
     public static class MigrationToolHost
     {
+        static int logs = 1;
+
         public static IHostBuilder CreateDefaultBuilder(string[] args)
         {
             var hostBuilder = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args);
 
             hostBuilder.UseSerilog((hostingContext, services, loggerConfiguration) =>
             {
-                string outputTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] [" + GetVersionTextForLog() + "] {Message:lj}{NewLine}{Exception}";
+                string outputTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] [" + GetVersionTextForLog() + "] {Message:lj}{NewLine}{Exception}"; // {SourceContext}
                 string logsPath = CreateLogsPath();
-                var logPath = Path.Combine(logsPath, "migration.log");
+                var logPath = Path.Combine(logsPath, $"migration{logs}.log");
+
                 var logLevel = hostingContext.Configuration.GetValue<LogEventLevel>("LogLevel");
                 var levelSwitch = new LoggingLevelSwitch(logLevel);
                 loggerConfiguration
@@ -42,9 +46,15 @@ namespace MigrationTools.Host
                     .Enrich.FromLogContext()
                     .Enrich.WithMachineName()
                     .Enrich.WithProcessId()
-                    .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Debug, theme: AnsiConsoleTheme.Code, outputTemplate: outputTemplate)
-                    .WriteTo.ApplicationInsights(services.GetService<TelemetryClient>(), new CustomConverter(), LogEventLevel.Error)
-                    .WriteTo.File(logPath, LogEventLevel.Verbose, outputTemplate: outputTemplate);
+                    .WriteTo.File(logPath, LogEventLevel.Verbose, outputTemplate)
+                    .WriteTo.Logger(lc => lc
+                        .Filter.ByExcluding(Matching.FromSource("Microsoft"))
+                        .Filter.ByExcluding(Matching.FromSource("MigrationTools.Host.StartupService"))
+                        .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Debug, theme: AnsiConsoleTheme.Code, outputTemplate: outputTemplate))
+                    .WriteTo.Logger(lc => lc
+                        .Filter.ByExcluding(Matching.FromSource("Microsoft"))
+                        .WriteTo.ApplicationInsights(services.GetService<TelemetryClient>(), new CustomConverter(), LogEventLevel.Error));
+                logs++;
             });
 
             hostBuilder.ConfigureLogging((context, logBuilder) =>
@@ -61,35 +71,35 @@ namespace MigrationTools.Host
             hostBuilder.ConfigureServices((context, services) =>
              {
                  services.AddOptions();
-                 services.Configure<EngineConfiguration>((config) =>
-                 {
-                     var sp = services.BuildServiceProvider();
-                     var logger = sp.GetService<ILoggerFactory>().CreateLogger<EngineConfiguration>();
-                     //if (!File.Exists(executeOptions.ConfigFile))
-                     //{
-                     //    logger.LogInformation("The config file {ConfigFile} does not exist, nor does the default 'configuration.json'. Use '{ExecutableName}.exe init' to create a configuration file first", executeOptions.ConfigFile, Assembly.GetEntryAssembly().GetName().Name);
-                     //    throw new ArgumentException("missing configfile");
-                     //}
-                     //logger.LogInformation("Config Found, creating engine host");
-                     //var reader = sp.GetRequiredService<IEngineConfigurationReader>();
-                     //var parsed = reader.BuildFromFile(executeOptions.ConfigFile);
-                     //config.ChangeSetMappingFile = parsed.ChangeSetMappingFile;
-                     //config.FieldMaps = parsed.FieldMaps;
-                     //config.GitRepoMapping = parsed.GitRepoMapping;
-                     //config.CommonEnrichersConfig = parsed.CommonEnrichersConfig;
-                     //config.Processors = parsed.Processors;
-                     //config.Source = parsed.Source;
-                     //config.Target = parsed.Target;
-                     //config.Version = parsed.Version;
-                     //config.workaroundForQuerySOAPBugEnabled = parsed.workaroundForQuerySOAPBugEnabled;
-                     //config.WorkItemTypeDefinition = parsed.WorkItemTypeDefinition;
-                 });
+                 //services.Configure<EngineConfiguration>((config) =>
+                 //{
+                 //    var sp = services.BuildServiceProvider();
+                 //    var logger = sp.GetService<ILoggerFactory>().CreateLogger<EngineConfiguration>();
+                 //    //if (!File.Exists(executeOptions.ConfigFile))
+                 //    //{
+                 //    //    logger.LogInformation("The config file {ConfigFile} does not exist, nor does the default 'configuration.json'. Use '{ExecutableName}.exe init' to create a configuration file first", executeOptions.ConfigFile, Assembly.GetEntryAssembly().GetName().Name);
+                 //    //    throw new ArgumentException("missing configfile");
+                 //    //}
+                 //    //logger.LogInformation("Config Found, creating engine host");
+                 //    //var reader = sp.GetRequiredService<IEngineConfigurationReader>();
+                 //    //var parsed = reader.BuildFromFile(executeOptions.ConfigFile);
+                 //    //config.ChangeSetMappingFile = parsed.ChangeSetMappingFile;
+                 //    //config.FieldMaps = parsed.FieldMaps;
+                 //    //config.GitRepoMapping = parsed.GitRepoMapping;
+                 //    //config.CommonEnrichersConfig = parsed.CommonEnrichersConfig;
+                 //    //config.Processors = parsed.Processors;
+                 //    //config.Source = parsed.Source;
+                 //    //config.Target = parsed.Target;
+                 //    //config.Version = parsed.Version;
+                 //    //config.workaroundForQuerySOAPBugEnabled = parsed.workaroundForQuerySOAPBugEnabled;
+                 //    //config.WorkItemTypeDefinition = parsed.WorkItemTypeDefinition;
+                 //});
 
                  
                  // Application Insights
                  ApplicationInsightsServiceOptions aiso = new ApplicationInsightsServiceOptions();
                  aiso.ApplicationVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-                 aiso.ConnectionString = "InstrumentationKey=2d666f84-b3fb-4dcf-9aad-65de038d2772";
+                 aiso.ConnectionString = "InstrumentationKey=2d666f84-b3fb-4dcf-9aad-65de038d2772;IngestionEndpoint=https://northeurope-0.in.applicationinsights.azure.com/;LiveEndpoint=https://northeurope.livediagnostics.monitor.azure.com/;ApplicationId=9146fe72-5c18-48d7-a0f2-8fb891ef1277";
                  //# if DEBUG
                  //aiso.DeveloperMode = true;
                  //#endif
@@ -171,11 +181,13 @@ namespace MigrationTools.Host
             await host.RunAsync();
         }
 
+        static string logDate =  DateTime.Now.ToString("yyyyMMddHHmmss");
+
         private static string CreateLogsPath()
         {
             string exportPath;
             string assPath = Assembly.GetEntryAssembly().Location;
-            exportPath = Path.Combine(Path.GetDirectoryName(assPath), "logs", DateTime.Now.ToString("yyyyMMddHHmmss"));
+            exportPath = Path.Combine(Path.GetDirectoryName(assPath), "logs", logDate);
             if (!Directory.Exists(exportPath))
             {
                 Directory.CreateDirectory(exportPath);

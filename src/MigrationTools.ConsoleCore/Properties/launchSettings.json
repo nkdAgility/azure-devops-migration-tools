@@ -1,11 +1,11 @@
 {
   "profiles": {
-    "MigrationTools.ConsoleUI": {
-      "commandName": "Project",
-      "commandLineArgs": "execute --config \"configuration.json\""
-    },
     "empty": {
       "commandName": "Project"
+    },
+    "execute ": {
+      "commandName": "Project",
+      "commandLineArgs": "execute --config \"configuration.json\""
     }
   }
 }
