@@ -175,7 +175,7 @@ namespace MigrationTools._EngineV1.Clients
                             { "Time",timer.ElapsedMilliseconds }
                        });
                 Log.Error(ex, "Unable to GetWorkItem with id[{id}]", id);
-                throw;
+                Environment.Exit(-1);
             } finally
             {
                 timer.Stop();
