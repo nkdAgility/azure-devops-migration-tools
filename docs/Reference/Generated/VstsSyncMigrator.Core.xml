@@ -123,18 +123,18 @@
             <status>alpha</status>
             <processingtarget>Profiles</processingtarget>
         </member>
+        <member name="T:VstsSyncMigrator.Engine.WorkItemBulkEditProcessor">
+            <summary>
+            This processor allows you to make changes in place where we load from teh Target and update the Target. This is used for bulk updates with the most common reason being a process template change.
+            </summary>
+            <processingtarget>WorkItem</processingtarget>
+        </member>
         <member name="T:VstsSyncMigrator.Engine.WorkItemDelete">
             <summary>
             The `WorkItemDelete` processor allows you to delete any amount of work items that meet the query.
             **DANGER:** This is not a recoverable action and should be use with extream caution.
             </summary>
             <status>ready</status>
-            <processingtarget>WorkItem</processingtarget>
-        </member>
-        <member name="T:VstsSyncMigrator.Engine.WorkItemBulkEditProcessor">
-            <summary>
-            This processor allows you to make changes in place where we load from teh Target and update the Target. This is used for bulk updates with the most common reason being a process template change.
-            </summary>
             <processingtarget>WorkItem</processingtarget>
         </member>
         <member name="T:VstsSyncMigrator.Engine.WorkItemUpdateAreasAsTagsContext">

@@ -51,9 +51,8 @@ options:
   defaultValue: '[]'
 status: missng XML code comments
 processingTarget: WorkItem
-classFile: ''
-optionsClassFile: ''
-
+classFile: /src/VstsSyncMigrator.Core/Execution/ProcessingContext/WorkItemBulkEditProcessor.cs
+optionsClassFile: /src/MigrationTools/_EngineV1/Configuration/Processing/WorkItemBulkEditProcessorConfig.cs
 redirectFrom: []
 layout: reference
 toc: true
