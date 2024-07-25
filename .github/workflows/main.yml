@@ -205,7 +205,7 @@ jobs:
         shell: pwsh
         if: ${{ steps.Build.outcome == 'success' }}
         run: |
-            .\build\packageExtension.ps1 -version ${{ env.GitVersion_MajorMinorPatch }}.${{ env.GitVersion_PreReleaseNumber }} -outfolder "./staging" 
+            .\build\packageExtension.ps1 -version ${{ env.GitVersion_AssemblySemVer }} -outfolder "./staging" 
       - name: "List Package Files"
         shell: pwsh
         if: ${{ steps.Build.outcome == 'success' }}
