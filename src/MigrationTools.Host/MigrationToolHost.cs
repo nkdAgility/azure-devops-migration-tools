@@ -21,6 +21,7 @@ using Serilog.Sinks.SystemConsole.Themes;
 using Spectre.Console.Cli.Extensions.DependencyInjection;
 using Spectre.Console.Cli;
 using Serilog.Filters;
+using MigrationTools.Host.Commands;
 
 namespace MigrationTools.Host
 {
@@ -30,6 +31,8 @@ namespace MigrationTools.Host
 
         public static IHostBuilder CreateDefaultBuilder(string[] args)
         {
+           var configFile =  CommandSettingsBase.ForceGetConfigFile(args);
+
             var hostBuilder = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args);
 
             hostBuilder.UseSerilog((hostingContext, services, loggerConfiguration) =>
@@ -59,43 +62,40 @@ namespace MigrationTools.Host
 
             hostBuilder.ConfigureLogging((context, logBuilder) =>
              {
-             });
-            //.ConfigureAppConfiguration(builder =>
-            //{
-            //    if (executeOptions is not null)
-            //    {
-            //        builder.AddJsonFile(executeOptions.ConfigFile);
-            //    }
-            //})
+             })
+            .ConfigureAppConfiguration(builder =>
+            {
+                    builder.AddJsonFile(configFile);
+            });
 
             hostBuilder.ConfigureServices((context, services) =>
              {
                  services.AddOptions();
-                 //services.Configure<EngineConfiguration>((config) =>
-                 //{
-                 //    var sp = services.BuildServiceProvider();
-                 //    var logger = sp.GetService<ILoggerFactory>().CreateLogger<EngineConfiguration>();
-                 //    //if (!File.Exists(executeOptions.ConfigFile))
-                 //    //{
-                 //    //    logger.LogInformation("The config file {ConfigFile} does not exist, nor does the default 'configuration.json'. Use '{ExecutableName}.exe init' to create a configuration file first", executeOptions.ConfigFile, Assembly.GetEntryAssembly().GetName().Name);
-                 //    //    throw new ArgumentException("missing configfile");
-                 //    //}
-                 //    //logger.LogInformation("Config Found, creating engine host");
-                 //    //var reader = sp.GetRequiredService<IEngineConfigurationReader>();
-                 //    //var parsed = reader.BuildFromFile(executeOptions.ConfigFile);
-                 //    //config.ChangeSetMappingFile = parsed.ChangeSetMappingFile;
-                 //    //config.FieldMaps = parsed.FieldMaps;
-                 //    //config.GitRepoMapping = parsed.GitRepoMapping;
-                 //    //config.CommonEnrichersConfig = parsed.CommonEnrichersConfig;
-                 //    //config.Processors = parsed.Processors;
-                 //    //config.Source = parsed.Source;
-                 //    //config.Target = parsed.Target;
-                 //    //config.Version = parsed.Version;
-                 //    //config.workaroundForQuerySOAPBugEnabled = parsed.workaroundForQuerySOAPBugEnabled;
-                 //    //config.WorkItemTypeDefinition = parsed.WorkItemTypeDefinition;
-                 //});
+                 services.Configure<EngineConfiguration>((config) =>
+                 {
+                     var sp = services.BuildServiceProvider();
+                     var logger = sp.GetService<ILoggerFactory>().CreateLogger<EngineConfiguration>();
+                     if (!File.Exists(configFile))
+                     {
+                         logger.LogInformation("The config file {ConfigFile} does not exist, nor does the default 'configuration.json'. Use '{ExecutableName}.exe init' to create a configuration file first", configFile, Assembly.GetEntryAssembly().GetName().Name);
+                         throw new ArgumentException("missing configfile");
+                     }
+                     logger.LogInformation("Config Found, creating engine host");
+                     var reader = sp.GetRequiredService<IEngineConfigurationReader>();
+                     var parsed = reader.BuildFromFile(configFile);
+                     config.ChangeSetMappingFile = parsed.ChangeSetMappingFile;
+                     config.FieldMaps = parsed.FieldMaps;
+                     config.GitRepoMapping = parsed.GitRepoMapping;
+                     config.CommonEnrichersConfig = parsed.CommonEnrichersConfig;
+                     config.Processors = parsed.Processors;
+                     config.Source = parsed.Source;
+                     config.Target = parsed.Target;
+                     config.Version = parsed.Version;
+                     config.workaroundForQuerySOAPBugEnabled = parsed.workaroundForQuerySOAPBugEnabled;
+                     config.WorkItemTypeDefinition = parsed.WorkItemTypeDefinition;
+                 });
 
-                 
+
                  // Application Insights
                  ApplicationInsightsServiceOptions aiso = new ApplicationInsightsServiceOptions();
                  aiso.ApplicationVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
@@ -122,7 +122,7 @@ namespace MigrationTools.Host
 
                  // Host Services
                  services.AddTransient<IStartupService, StartupService>();
-                
+
              });
 
             hostBuilder.ConfigureServices((context, services) =>
@@ -144,7 +144,7 @@ namespace MigrationTools.Host
                 services.AddHostedService<MigrationService>();
             });
 
-            hostBuilder.UseConsoleLifetime();      
+            hostBuilder.UseConsoleLifetime();
 
 
 
@@ -181,7 +181,7 @@ namespace MigrationTools.Host
             await host.RunAsync();
         }
 
-        static string logDate =  DateTime.Now.ToString("yyyyMMddHHmmss");
+        static string logDate = DateTime.Now.ToString("yyyyMMddHHmmss");
 
         private static string CreateLogsPath()
         {

@@ -1,20 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Text;
-using System.Xml.Serialization;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+﻿using System.ComponentModel;
 using Newtonsoft.Json;
 using Spectre.Console.Cli;
 using YamlDotNet.Serialization;
+using System.CommandLine;
 
 namespace MigrationTools.Host.Commands
 {
     internal class CommandSettingsBase : CommandSettings
     {
         [Description("Pre configure paramiters using this config file. Run `Init` to create it.")]
-        [CommandOption("--config|--configFile")]
+        [CommandOption("--config|--configFile|-c")]
         [DefaultValue("configuration.json")]
         [JsonIgnore, YamlIgnore]
         public string ConfigFile { get; set; }
@@ -27,5 +22,19 @@ namespace MigrationTools.Host.Commands
         [CommandOption("--skipVersionCheck")]
         public bool skipVersionCheck { get; set; }
 
+        public static string ForceGetConfigFile(string[] args)
+        {
+            var fileOption = new Option<string?>("--config");
+            fileOption.AddAlias("-c");
+            fileOption.AddAlias("--configFile");
+
+            var rootCommand = new RootCommand();
+            rootCommand.AddOption(fileOption);
+
+            var file = rootCommand.Parse(args);
+            return file.GetValueForOption<string>(fileOption);
+
+        }
     }
+
 }
