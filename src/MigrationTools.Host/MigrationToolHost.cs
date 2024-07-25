@@ -54,7 +54,7 @@ namespace MigrationTools.Host
                     .WriteTo.File(logPath, LogEventLevel.Verbose, outputTemplate)
                     .WriteTo.Logger(lc => lc
                         .Filter.ByExcluding(Matching.FromSource("Microsoft"))
-                        //.Filter.ByExcluding(Matching.FromSource("MigrationTools.Host.StartupService"))
+                        .Filter.ByExcluding(Matching.FromSource("MigrationTools.Host.StartupService"))
                         .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Debug, theme: AnsiConsoleTheme.Code, outputTemplate: outputTemplate))
                     .WriteTo.Logger(lc => lc
                         .Filter.ByExcluding(Matching.FromSource("Microsoft"))
@@ -67,7 +67,10 @@ namespace MigrationTools.Host
              })
             .ConfigureAppConfiguration(builder =>
             {
+                if (!string.IsNullOrEmpty(configFile) &&  File.Exists(configFile))
+                {
                     builder.AddJsonFile(configFile);
+                }
             });
 
             hostBuilder.ConfigureServices((context, services) =>
