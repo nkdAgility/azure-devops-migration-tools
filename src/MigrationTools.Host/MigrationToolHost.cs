@@ -22,6 +22,8 @@ using Spectre.Console.Cli.Extensions.DependencyInjection;
 using Spectre.Console.Cli;
 using Serilog.Filters;
 using MigrationTools.Host.Commands;
+using System.Diagnostics;
+using System.Text.RegularExpressions;
 
 namespace MigrationTools.Host
 {
@@ -37,7 +39,7 @@ namespace MigrationTools.Host
 
             hostBuilder.UseSerilog((hostingContext, services, loggerConfiguration) =>
             {
-                string outputTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] [" + GetVersionTextForLog() + "] {Message:lj}{NewLine}{Exception}"; // {SourceContext}
+                string outputTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] [" + GetRunningVersion().versionString + "] {Message:lj}{NewLine}{Exception}"; // {SourceContext}
                 string logsPath = CreateLogsPath();
                 var logPath = Path.Combine(logsPath, $"migration{logs}.log");
 
@@ -52,7 +54,7 @@ namespace MigrationTools.Host
                     .WriteTo.File(logPath, LogEventLevel.Verbose, outputTemplate)
                     .WriteTo.Logger(lc => lc
                         .Filter.ByExcluding(Matching.FromSource("Microsoft"))
-                        .Filter.ByExcluding(Matching.FromSource("MigrationTools.Host.StartupService"))
+                        //.Filter.ByExcluding(Matching.FromSource("MigrationTools.Host.StartupService"))
                         .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Debug, theme: AnsiConsoleTheme.Code, outputTemplate: outputTemplate))
                     .WriteTo.Logger(lc => lc
                         .Filter.ByExcluding(Matching.FromSource("Microsoft"))
@@ -151,11 +153,21 @@ namespace MigrationTools.Host
             return hostBuilder;
         }
 
-        private static string GetVersionTextForLog()
+        public static (Version version, string PreReleaseLabel, string versionString) GetRunningVersion()
         {
-            Version runningVersion = DetectVersionService2.GetRunningVersion().version;
-            string textVersion = "v" + DetectVersionService2.GetRunningVersion().version + "-" + DetectVersionService2.GetRunningVersion().PreReleaseLabel;
-            return textVersion;
+            FileVersionInfo myFileVersionInfo = FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly()?.Location);
+            var matches = Regex.Matches(myFileVersionInfo.ProductVersion, @"^(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)\.(?<build>0|[1-9]\d*)(?:-((?<label>:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?<fullEnd>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$");
+            Version version = new Version(myFileVersionInfo.FileVersion);
+            string textVersion = "0.0.0-local";
+            if (version.CompareTo(new Version(0, 0, 0, 0)) == 0)
+            {
+                textVersion = ThisAssembly.Git.SemVer.Major + "." + ThisAssembly.Git.SemVer.Minor + "." + ThisAssembly.Git.SemVer.Patch + "-" + matches[0].Groups[1].Value;
+            }
+            else
+            {
+                textVersion = version.Major + "." + version.Minor + "." + version.Build + "-" + matches[0].Groups[1].Value;
+            }
+            return (version, matches[0].Groups[1].Value, textVersion);
         }
 
         public static async Task RunMigrationTools(this IHostBuilder hostBuilder, string[] args)

@@ -15,6 +15,10 @@
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
+	<PropertyGroup>
+		<GitVersion>false</GitVersion>
+	</PropertyGroup>
+
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>..\..\docs\Reference\Generated\MigrationTools.xml</DocumentationFile>
   </PropertyGroup>
