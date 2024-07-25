@@ -2,7 +2,6 @@
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
-using CommandLine;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.ApplicationInsights.WorkerService;
@@ -12,7 +11,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MigrationTools._EngineV1.Configuration;
-using MigrationTools.Host.CommandLine;
 using MigrationTools.Host.CustomDiagnostics;
 using MigrationTools.Host.Services;
 using MigrationTools.Options;
@@ -20,70 +18,76 @@ using Serilog;
 using Serilog.Core;
 using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
+using Spectre.Console.Cli.Extensions.DependencyInjection;
+using Spectre.Console.Cli;
+using Serilog.Filters;
+using MigrationTools.Host.Commands;
+using System.Diagnostics;
+using System.Text.RegularExpressions;
 
 namespace MigrationTools.Host
 {
     public static class MigrationToolHost
     {
+        static int logs = 1;
+
         public static IHostBuilder CreateDefaultBuilder(string[] args)
         {
-            (var initOptions, var executeOptions) = ParseOptions(args);
+           var configFile =  CommandSettingsBase.ForceGetConfigFile(args);
 
-            if (initOptions is null && executeOptions is null)
+            var hostBuilder = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args);
+
+            hostBuilder.UseSerilog((hostingContext, services, loggerConfiguration) =>
             {
-                return null;
-            }
+                string outputTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] [" + DetectVersionService2.GetRunningVersion().versionString + "] {Message:lj}{NewLine}{Exception}"; // {SourceContext}
+                string logsPath = CreateLogsPath();
+                var logPath = Path.Combine(logsPath, $"migration{logs}.log");
 
+                var logLevel = hostingContext.Configuration.GetValue<LogEventLevel>("LogLevel");
+                var levelSwitch = new LoggingLevelSwitch(logLevel);
+                loggerConfiguration
+                    .MinimumLevel.ControlledBy(levelSwitch)
+                    .ReadFrom.Configuration(hostingContext.Configuration)
+                    .Enrich.FromLogContext()
+                    .Enrich.WithMachineName()
+                    .Enrich.WithProcessId()
+                    .WriteTo.File(logPath, LogEventLevel.Verbose, outputTemplate)
+                    .WriteTo.Logger(lc => lc
+                        .Filter.ByExcluding(Matching.FromSource("Microsoft"))
+                        .Filter.ByExcluding(Matching.FromSource("MigrationTools.Host.StartupService"))
+                        .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Debug, theme: AnsiConsoleTheme.Code, outputTemplate: outputTemplate))
+                    .WriteTo.Logger(lc => lc
+                        .Filter.ByExcluding(Matching.FromSource("Microsoft"))
+                        .WriteTo.ApplicationInsights(services.GetService<TelemetryClient>(), new CustomConverter(), LogEventLevel.Error));
+                logs++;
+            });
 
+            hostBuilder.ConfigureLogging((context, logBuilder) =>
+             {
+             })
+            .ConfigureAppConfiguration(builder =>
+            {
+                if (!string.IsNullOrEmpty(configFile) &&  File.Exists(configFile))
+                {
+                    builder.AddJsonFile(configFile);
+                }
+            });
 
-            var hostBuilder = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args)
-             .UseSerilog((hostingContext, services, loggerConfiguration) =>
-             {
-                 string outputTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] [" + GetVersionTextForLog() + "] {Message:lj}{NewLine}{Exception}";
-                 string logsPath = CreateLogsPath();
-                 var logPath = Path.Combine(logsPath, "migration.log");
-                 var logLevel = hostingContext.Configuration.GetValue<LogEventLevel>("LogLevel");
-                 var levelSwitch = new LoggingLevelSwitch(logLevel);
-                 loggerConfiguration
-                     .MinimumLevel.ControlledBy(levelSwitch)
-                     .ReadFrom.Configuration(hostingContext.Configuration)
-                     .Enrich.FromLogContext()
-                     .Enrich.WithMachineName()
-                     .Enrich.WithProcessId()
-                     .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Debug, theme: AnsiConsoleTheme.Code, outputTemplate: outputTemplate)
-                     .WriteTo.ApplicationInsights(services.GetService<TelemetryClient>(), new CustomConverter(), LogEventLevel.Error)
-                     .WriteTo.File(logPath, LogEventLevel.Verbose, outputTemplate: outputTemplate);
-             })
-             .ConfigureLogging((context, logBuilder) =>
-             {
-             })
-             .ConfigureAppConfiguration(builder =>
-             {
-                 if (executeOptions is not null)
-                 {
-                     builder.AddJsonFile(executeOptions.ConfigFile);
-                 }
-             })
-             .ConfigureServices((context, services) =>
+            hostBuilder.ConfigureServices((context, services) =>
              {
                  services.AddOptions();
                  services.Configure<EngineConfiguration>((config) =>
                  {
-                     if(executeOptions is null)
-                     {
-                         return;
-                     }
-
                      var sp = services.BuildServiceProvider();
                      var logger = sp.GetService<ILoggerFactory>().CreateLogger<EngineConfiguration>();
-                     if (!File.Exists(executeOptions.ConfigFile))
+                     if (!File.Exists(configFile))
                      {
-                         logger.LogInformation("The config file {ConfigFile} does not exist, nor does the default 'configuration.json'. Use '{ExecutableName}.exe init' to create a configuration file first", executeOptions.ConfigFile, Assembly.GetEntryAssembly().GetName().Name);
+                         logger.LogInformation("The config file {ConfigFile} does not exist, nor does the default 'configuration.json'. Use '{ExecutableName}.exe init' to create a configuration file first", configFile, Assembly.GetEntryAssembly().GetName().Name);
                          throw new ArgumentException("missing configfile");
                      }
                      logger.LogInformation("Config Found, creating engine host");
                      var reader = sp.GetRequiredService<IEngineConfigurationReader>();
-                     var parsed = reader.BuildFromFile(executeOptions.ConfigFile);
+                     var parsed = reader.BuildFromFile(configFile);
                      config.ChangeSetMappingFile = parsed.ChangeSetMappingFile;
                      config.FieldMaps = parsed.FieldMaps;
                      config.GitRepoMapping = parsed.GitRepoMapping;
@@ -96,15 +100,16 @@ namespace MigrationTools.Host
                      config.WorkItemTypeDefinition = parsed.WorkItemTypeDefinition;
                  });
 
+
                  // Application Insights
                  ApplicationInsightsServiceOptions aiso = new ApplicationInsightsServiceOptions();
                  aiso.ApplicationVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-                 aiso.ConnectionString = "InstrumentationKey=2d666f84-b3fb-4dcf-9aad-65de038d2772";
+                 aiso.ConnectionString = "InstrumentationKey=2d666f84-b3fb-4dcf-9aad-65de038d2772;IngestionEndpoint=https://northeurope-0.in.applicationinsights.azure.com/;LiveEndpoint=https://northeurope.livediagnostics.monitor.azure.com/;ApplicationId=9146fe72-5c18-48d7-a0f2-8fb891ef1277";
                  //# if DEBUG
                  //aiso.DeveloperMode = true;
                  //#endif
                  services.AddApplicationInsightsTelemetryWorkerService(aiso);
-                 
+
                  // Services
                  services.AddTransient<IDetectOnlineService, DetectOnlineService>();
                  //services.AddTransient<IDetectVersionService, DetectVersionService>();
@@ -122,46 +127,33 @@ namespace MigrationTools.Host
 
                  // Host Services
                  services.AddTransient<IStartupService, StartupService>();
-                 if (initOptions is not null)
-                 {
-                     services.Configure<InitOptions>((opts) =>
-                     {
-                         opts.ConfigFile = initOptions.ConfigFile;
-                         opts.Options = initOptions.Options;
-                     });
-                     services.AddHostedService<InitHostedService>();
-                 }
-                 if (executeOptions is not null)
-                 {
-                     services.Configure<NetworkCredentialsOptions>(cred =>
-                     {
-                         cred.Source = new Credentials
-                         {
-                             Domain = executeOptions.SourceDomain,
-                             UserName = executeOptions.SourceUserName,
-                             Password = executeOptions.SourcePassword
-                         };
-                         cred.Target = new Credentials
-                         {
-                             Domain = executeOptions.TargetDomain,
-                             UserName = executeOptions.TargetUserName,
-                             Password = executeOptions.TargetPassword
-                         };
-                     });
-                     services.AddHostedService<ExecuteHostedService>();
-                 }
-             })
-             .UseConsoleLifetime();
+
+             });
+
+            hostBuilder.ConfigureServices((context, services) =>
+            {
+                using var registrar = new DependencyInjectionRegistrar(services);
+                var app = new CommandApp(registrar);
+                app.Configure(config =>
+                {
+                    config.PropagateExceptions();
+                    config.AddCommand<Commands.ExecuteMigrationCommand>("execute");
+                    config.AddCommand<Commands.InitMigrationCommand>("init");
+
+                });
+                services.AddSingleton<ICommandApp>(app);
+            });
+
+            hostBuilder.ConfigureServices((context, services) =>
+            {
+                services.AddHostedService<MigrationService>();
+            });
+
+            hostBuilder.UseConsoleLifetime();
+
 
 
             return hostBuilder;
-        }
-
-        private static string GetVersionTextForLog()
-        {
-            Version runningVersion = DetectVersionService2.GetRunningVersion().version;
-            string textVersion = "v" + DetectVersionService2.GetRunningVersion().version + "-" + DetectVersionService2.GetRunningVersion().PreReleaseLabel;
-            return textVersion;
         }
 
         public static async Task RunMigrationTools(this IHostBuilder hostBuilder, string[] args)
@@ -175,50 +167,31 @@ namespace MigrationTools.Host
 
 
             // Disanle telemitery from options
-            (var initOptions, var executeOptions) = ParseOptions(args);
-            if (initOptions is null && executeOptions is null)
-            {
-                return;
-            }
-            bool DisableTelemetry = false;
-            Serilog.ILogger logger = host.Services.GetService<Serilog.ILogger>();
-            if (executeOptions is not null && bool.TryParse(executeOptions.DisableTelemetry, out DisableTelemetry))
-            {
-                TelemetryConfiguration ai = host.Services.GetService<TelemetryConfiguration>();
-                ai.DisableTelemetry = DisableTelemetry;
-            }
-            logger.Information("Telemetry: {status}", !DisableTelemetry);
+            //bool DisableTelemetry = false;
+            //Serilog.ILogger logger = host.Services.GetService<Serilog.ILogger>();
+            //if (executeOptions is not null && bool.TryParse(executeOptions.DisableTelemetry, out DisableTelemetry))
+            //{
+            //    TelemetryConfiguration ai = host.Services.GetService<TelemetryConfiguration>();
+            //    ai.DisableTelemetry = DisableTelemetry;
+            //}
+            //logger.Information("Telemetry: {status}", !DisableTelemetry);
 
             await host.RunAsync();
         }
+
+        static string logDate = DateTime.Now.ToString("yyyyMMddHHmmss");
 
         private static string CreateLogsPath()
         {
             string exportPath;
             string assPath = Assembly.GetEntryAssembly().Location;
-            exportPath = Path.Combine(Path.GetDirectoryName(assPath), "logs", DateTime.Now.ToString("yyyyMMddHHmmss"));
+            exportPath = Path.Combine(Path.GetDirectoryName(assPath), "logs", logDate);
             if (!Directory.Exists(exportPath))
             {
                 Directory.CreateDirectory(exportPath);
             }
 
             return exportPath;
-        }
-
-        private static (InitOptions init, ExecuteOptions execute) ParseOptions(string[] args)
-        {
-            InitOptions initOptions = null;
-            ExecuteOptions executeOptions = null;
-            Parser.Default.ParseArguments<InitOptions, ExecuteOptions>(args)
-                            .WithParsed<InitOptions>(opts =>
-                            {
-                                initOptions = opts;
-                            })
-                            .WithParsed<ExecuteOptions>(opts =>
-                            {
-                                executeOptions = opts;
-                            });
-            return (initOptions, executeOptions);
         }
     }
 }
