@@ -1,4 +1,4 @@
-name: 'OpenCommit AI'
+name: 'OpenAI - OpenCommit AI'
 
 permissions:
   contents: write
