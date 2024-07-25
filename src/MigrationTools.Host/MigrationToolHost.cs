@@ -39,7 +39,7 @@ namespace MigrationTools.Host
 
             hostBuilder.UseSerilog((hostingContext, services, loggerConfiguration) =>
             {
-                string outputTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] [" + GetRunningVersion().versionString + "] {Message:lj}{NewLine}{Exception}"; // {SourceContext}
+                string outputTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] [" + DetectVersionService2.GetRunningVersion().versionString + "] {Message:lj}{NewLine}{Exception}"; // {SourceContext}
                 string logsPath = CreateLogsPath();
                 var logPath = Path.Combine(logsPath, $"migration{logs}.log");
 
@@ -151,23 +151,6 @@ namespace MigrationTools.Host
 
 
             return hostBuilder;
-        }
-
-        public static (Version version, string PreReleaseLabel, string versionString) GetRunningVersion()
-        {
-            FileVersionInfo myFileVersionInfo = FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly()?.Location);
-            var matches = Regex.Matches(myFileVersionInfo.ProductVersion, @"^(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)\.(?<build>0|[1-9]\d*)(?:-((?<label>:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?<fullEnd>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$");
-            Version version = new Version(myFileVersionInfo.FileVersion);
-            string textVersion = "0.0.0-local";
-            if (version.CompareTo(new Version(0, 0, 0, 0)) == 0)
-            {
-                textVersion = ThisAssembly.Git.SemVer.Major + "." + ThisAssembly.Git.SemVer.Minor + "." + ThisAssembly.Git.SemVer.Patch + "-" + matches[0].Groups[1].Value;
-            }
-            else
-            {
-                textVersion = version.Major + "." + version.Minor + "." + version.Build + "-" + matches[0].Groups[1].Value;
-            }
-            return (version, matches[0].Groups[1].Value, textVersion);
         }
 
         public static async Task RunMigrationTools(this IHostBuilder hostBuilder, string[] args)
