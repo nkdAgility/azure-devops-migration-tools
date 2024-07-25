@@ -79,7 +79,8 @@ namespace MigrationTools._EngineV1.Configuration
                 }
                 else
                 {
-                    throw new Exception("Version in Config does not match X.X in Application. Please check and revert.");
+                    _logger.LogCritical("Version in Config does not match X.X in Application. Please check and revert.");
+                    System.Environment.Exit(-1);
                 }
             }
             //#endif
