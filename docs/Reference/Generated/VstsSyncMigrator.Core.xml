@@ -131,7 +131,7 @@
             <status>ready</status>
             <processingtarget>WorkItem</processingtarget>
         </member>
-        <member name="T:VstsSyncMigrator.Engine.WorkItemUpdate">
+        <member name="T:VstsSyncMigrator.Engine.WorkItemBulkEditProcessor">
             <summary>
             This processor allows you to make changes in place where we load from teh Target and update the Target. This is used for bulk updates with the most common reason being a process template change.
             </summary>

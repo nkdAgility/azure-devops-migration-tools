@@ -108,7 +108,7 @@ namespace MigrationTools._EngineV1.Configuration
             ec.Processors.Add(new ImportProfilePictureConfig());
             ec.Processors.Add(new ExportProfilePictureFromADConfig());
             ec.Processors.Add(new FixGitCommitLinksConfig() { TargetRepository = "targetProjectName" });
-            ec.Processors.Add(new WorkItemUpdateConfig());
+            ec.Processors.Add(new WorkItemBulkEditProcessorConfig());
             ec.Processors.Add(new WorkItemPostProcessingConfig() { WorkItemIDs = new List<int> { 1, 2, 3 } });
             ec.Processors.Add(new WorkItemDeleteConfig());
             ec.Processors.Add(new WorkItemQueryMigrationConfig() { SourceToTargetFieldMappings = new Dictionary<string, string>() { { "SourceFieldRef", "TargetFieldRef" } } });
@@ -125,7 +125,7 @@ namespace MigrationTools._EngineV1.Configuration
             ec.Processors.Add(new ImportProfilePictureConfig());
             ec.Processors.Add(new ExportProfilePictureFromADConfig());
             ec.Processors.Add(new FixGitCommitLinksConfig() { TargetRepository = "targetProjectName" });
-            ec.Processors.Add(new WorkItemUpdateConfig());
+            ec.Processors.Add(new WorkItemBulkEditProcessorConfig());
             ec.Processors.Add(new WorkItemPostProcessingConfig() { WorkItemIDs = new List<int> { 1, 2, 3 } });
             ec.Processors.Add(new WorkItemDeleteConfig());
             ec.Processors.Add(new WorkItemQueryMigrationConfig() { SourceToTargetFieldMappings = new Dictionary<string, string>() { { "SourceFieldRef", "TargetFieldRef" } } });

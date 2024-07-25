@@ -1,12 +1,12 @@
 ---
-optionsClassName: WorkItemUpdateConfig
-optionsClassFullName: MigrationTools._EngineV1.Configuration.Processing.WorkItemUpdateConfig
+optionsClassName: WorkItemBulkEditProcessorConfig
+optionsClassFullName: MigrationTools._EngineV1.Configuration.Processing.WorkItemBulkEditProcessorConfig
 configurationSamples:
 - name: default
   description: 
   code: >-
     {
-      "$type": "WorkItemUpdateConfig",
+      "$type": "WorkItemBulkEditProcessorConfig",
       "Enabled": false,
       "WhatIf": false,
       "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [@ReflectedWorkItemIdFieldName] = ''  AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
@@ -15,9 +15,9 @@ configurationSamples:
       "PauseAfterEachWorkItem": false,
       "WorkItemCreateRetryLimit": 0
     }
-  sampleFor: MigrationTools._EngineV1.Configuration.Processing.WorkItemUpdateConfig
+  sampleFor: MigrationTools._EngineV1.Configuration.Processing.WorkItemBulkEditProcessorConfig
 description: This processor allows you to make changes in place where we load from teh Target and update the Target. This is used for bulk updates with the most common reason being a process template change.
-className: WorkItemUpdate
+className: WorkItemBulkEditProcessor
 typeName: Processors
 architecture: v1
 options:
@@ -51,24 +51,24 @@ options:
   defaultValue: '[]'
 status: missng XML code comments
 processingTarget: WorkItem
-classFile: /src/VstsSyncMigrator.Core/Execution/ProcessingContext/WorkItemUpdate.cs
-optionsClassFile: /src/MigrationTools/_EngineV1/Configuration/Processing/WorkItemUpdateConfig.cs
+classFile: ''
+optionsClassFile: ''
 
 redirectFrom: []
 layout: reference
 toc: true
-permalink: /Reference/v1/Processors/WorkItemUpdate/
-title: WorkItemUpdate
+permalink: /Reference/v1/Processors/WorkItemBulkEditProcessor/
+title: WorkItemBulkEditProcessor
 categories:
 - Processors
 - v1
 topics:
 - topic: notes
-  path: /docs/Reference/v1/Processors/WorkItemUpdate-notes.md
+  path: /docs/Reference/v1/Processors/WorkItemBulkEditProcessor-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /docs/Reference/v1/Processors/WorkItemUpdate-introduction.md
+  path: /docs/Reference/v1/Processors/WorkItemBulkEditProcessor-introduction.md
   exists: false
   markdown: ''
 
