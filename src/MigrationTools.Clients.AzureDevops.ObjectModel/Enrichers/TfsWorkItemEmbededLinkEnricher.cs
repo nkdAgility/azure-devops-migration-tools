@@ -21,8 +21,8 @@ namespace MigrationTools.Enrichers
         private readonly Lazy<List<TeamFoundationIdentity>> _targetTeamFoundationIdentitiesLazyCache;
         private readonly IMigrationEngine Engine;
 
-        public TfsWorkItemEmbededLinkEnricher(IServiceProvider services, ILogger<TfsWorkItemEmbededLinkEnricher> logger)
-            : base(services, logger)
+        public TfsWorkItemEmbededLinkEnricher(IServiceProvider services, ILogger<TfsWorkItemEmbededLinkEnricher> logger, ITelemetryLogger telemetryLogger)
+            : base(services, logger, telemetryLogger)
         {
             Engine = services.GetRequiredService<IMigrationEngine>();
 
@@ -40,6 +40,7 @@ namespace MigrationTools.Enrichers
                 catch (Exception ex)
                 {
                     Log.LogError(ex, "{LogTypeName}: Unable load list of identities from target collection.", LogTypeName);
+                    Telemetry.TrackException(ex, null,null);
                     return new List<TeamFoundationIdentity>();
                 }
             });
@@ -136,6 +137,7 @@ namespace MigrationTools.Enrichers
                 catch (Exception ex)
                 {
                     Log.LogError(ex, "{LogTypeName}: Unable to fix embedded mention links on field {fieldName} on target work item {targetWorkItemId} from {oldTfsurl} to {newTfsurl}", LogTypeName, field.Name, targetWorkItem.Id, oldTfsurl, newTfsurl);
+                    Telemetry.TrackException(ex, null, null);
                 }
             }
 

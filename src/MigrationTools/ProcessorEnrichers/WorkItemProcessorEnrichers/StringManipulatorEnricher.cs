@@ -17,8 +17,8 @@ namespace MigrationTools.ProcessorEnrichers.WorkItemProcessorEnrichers
         private Serilog.ILogger contextLog;
         private StringManipulatorEnricherOptions _options;
 
-        public StringManipulatorEnricher(IServiceProvider services, ILogger<StringManipulatorEnricher> logger)
-           : base(services, logger)
+        public StringManipulatorEnricher(IServiceProvider services, ILogger<StringManipulatorEnricher> logger, ITelemetryLogger telemetryLogger)
+           : base(services, logger, telemetryLogger)
         {
             contextLog = Serilog.Log.ForContext<StringManipulatorEnricher>();
         }

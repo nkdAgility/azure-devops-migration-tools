@@ -16,7 +16,7 @@ namespace MigrationTools.Processors.Tests
             Services = ServiceProviderHelper.GetWorkItemMigrationProcessor();
         }
 
-        [TestMethod(), TestCategory("L0"), TestCategory("Generic.Processor")]
+        [TestMethod(), TestCategory("L0")]
         public void WorkItemMigrationProcessorConfigureTest()
         {
             var y = new WorkItemTrackingProcessorOptions
@@ -33,7 +33,7 @@ namespace MigrationTools.Processors.Tests
             Assert.IsNotNull(x);
         }
 
-        [TestMethod(), TestCategory("L1"), TestCategory("Generic.Processor")]
+        [TestMethod(), TestCategory("L1")]
         public void WorkItemMigrationProcessorRunTest()
         {
             var y = new WorkItemTrackingProcessorOptions

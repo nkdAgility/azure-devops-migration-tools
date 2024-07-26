@@ -17,7 +17,7 @@ namespace MigrationTools.Enrichers
 
         public IMigrationEngine Engine { get; private set; }
 
-        public PauseAfterEachItem(IServiceProvider services, ILogger<PauseAfterEachItem> logger) : base(services, logger)
+        public PauseAfterEachItem(IServiceProvider services, ILogger<PauseAfterEachItem> logger, ITelemetryLogger telemetryLogger) : base(services, logger, telemetryLogger)
         {
             Engine = Services.GetRequiredService<IMigrationEngine>();
         }

@@ -17,7 +17,7 @@ namespace MigrationTools.Enrichers
 
         public IMigrationEngine Engine { get; }
 
-        public AppendMigrationToolSignatureFooter(IServiceProvider services, ILogger<WorkItemProcessorEnricher> logger) : base(services, logger)
+        public AppendMigrationToolSignatureFooter(IServiceProvider services, ILogger<WorkItemProcessorEnricher> logger, ITelemetryLogger telemetryLogger) : base(services, logger, telemetryLogger)
         {
             Engine = Services.GetRequiredService<IMigrationEngine>();
         }

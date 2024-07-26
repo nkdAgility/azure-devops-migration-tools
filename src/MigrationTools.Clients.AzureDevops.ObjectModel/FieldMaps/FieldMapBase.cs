@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.ApplicationInsights.Channel;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools._EngineV1.Configuration;
@@ -11,10 +12,12 @@ namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
     public abstract class FieldMapBase : IFieldMap
     {
         protected IFieldMapConfig _Config;
+        protected ITelemetryLogger Telemetry;
 
-        public FieldMapBase(ILogger<FieldMapBase> logger)
+        public FieldMapBase(ILogger<FieldMapBase> logger, ITelemetryLogger telemetryLogger)
         {
             Log = logger;
+            Telemetry = telemetryLogger;
         }
 
         public virtual void Configure(IFieldMapConfig config)
@@ -42,6 +45,7 @@ namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
                             { "Source", source.ToWorkItem().Id.ToString() },
                             { "Target",  target.ToWorkItem().Id.ToString()}
                        });
+                Telemetry.TrackException(ex, null, null);
             }
         }
 

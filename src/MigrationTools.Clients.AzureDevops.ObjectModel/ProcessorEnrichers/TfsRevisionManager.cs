@@ -20,8 +20,8 @@ namespace MigrationTools.Enrichers
     /// </summary>
     public class TfsRevisionManager : WorkItemProcessorEnricher
     {
-        public TfsRevisionManager(IServiceProvider services, ILogger<TfsRevisionManager> logger)
-            : base(services, logger)
+        public TfsRevisionManager(IServiceProvider services, ILogger<TfsRevisionManager> logger, ITelemetryLogger telemetryLogger)
+            : base(services, logger, telemetryLogger)
         {
         }
 

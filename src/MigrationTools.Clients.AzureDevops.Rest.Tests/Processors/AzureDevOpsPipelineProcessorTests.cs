@@ -11,14 +11,14 @@ namespace MigrationTools.Processors.Tests
     [TestClass()]
     public class AzureDevOpsPipelineProcessorTests : AzureDevOpsProcessorTests
     {
-        [TestMethod(), TestCategory("L0"), TestCategory("AzureDevOps.REST")]
+        [TestMethod(), TestCategory("L0")]
         public void AzureDevOpsPipelineProcessorTest()
         {
             var x = Services.GetRequiredService<AzureDevOpsPipelineProcessor>();
             Assert.IsNotNull(x);
         }
 
-        [TestMethod(), TestCategory("L0"), TestCategory("AzureDevOps.REST")]
+        [TestMethod(), TestCategory("L0")]
         public void AzureDevOpsPipelineProcessorConfigureTest()
         {
             var y = new AzureDevOpsPipelineProcessorOptions
@@ -32,7 +32,7 @@ namespace MigrationTools.Processors.Tests
             Assert.IsNotNull(x);
         }
 
-        [TestMethod(), TestCategory("L0"), TestCategory("AzureDevOps.REST")]
+        [TestMethod(), TestCategory("L0")]
         public void AzureDevOpsPipelineProcessorRunTest()
         {
             var y = new AzureDevOpsPipelineProcessorOptions
@@ -46,7 +46,7 @@ namespace MigrationTools.Processors.Tests
             Assert.IsNotNull(x);
         }
 
-        [TestMethod(), TestCategory("L3"), TestCategory("AzureDevOps.REST")]
+        [TestMethod(), TestCategory("L3")]
         public void AzureDevOpsPipelineProcessorNoEnrichersTest()
         {
             // Senario 1 Migration from Tfs to Tfs with no Enrichers.
@@ -57,7 +57,7 @@ namespace MigrationTools.Processors.Tests
             Assert.AreEqual(ProcessingStatus.Complete, processor.Status);
         }
 
-        [TestMethod, TestCategory("L3"), TestCategory("AzureDevOps.REST")]        
+        [TestMethod, TestCategory("L3")]        
         public void AzureDevOpsPipelineProcessorSelectedBuildDefinitionsTest()
         {
             var config = new AzureDevOpsPipelineProcessorOptions
@@ -89,7 +89,7 @@ namespace MigrationTools.Processors.Tests
             Assert.AreEqual(2, InMemorySink.Instance.LogEvents.Count(configuredMessageFilter));
         }
 
-        [TestMethod, TestCategory("L3"), TestCategory("AzureDevOps.REST")]
+        [TestMethod, TestCategory("L3")]
         public void AzureDevOpsPipelineProcessorSelectedReleaseDefinitionsTest()
         {
             var config = new AzureDevOpsPipelineProcessorOptions

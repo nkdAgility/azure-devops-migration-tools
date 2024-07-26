@@ -115,6 +115,7 @@ namespace MigrationTools.Endpoints
                 {
                     timer.Stop();
                     Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", Options.Organisation, "GetTfsCollection", null, startTime, timer.Elapsed, "500", false));
+                    Telemetry.TrackException(ex, null, null);
                     Log.LogError(ex, "Unable to connect to {Organisation}", Options.Organisation);
                     throw;
                 }
@@ -131,15 +132,17 @@ namespace MigrationTools.Endpoints
                 try
                 {
                     _Store = new WorkItemStore(tfs, bypassRules);
-                    timer.Stop();
-                    Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", Options.Organisation, "GetWorkItemStore", null, startTime, timer.Elapsed, "200", true));
                 }
                 catch (Exception ex)
                 {
-                    timer.Stop();
-                    Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", Options.Organisation, "GetWorkItemStore", null, startTime, timer.Elapsed, "500", false));
+                    Telemetry.TrackException(ex, null, null);
                     Log.LogError(ex, "Unable to connect to {Organisation} Store", Options.Organisation);
                     throw;
+                }
+                finally
+                {
+                    timer.Stop();
+                    Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", Options.Organisation, "GetWorkItemStore", null, startTime, timer.Elapsed, "200", true));
                 }
             }
 

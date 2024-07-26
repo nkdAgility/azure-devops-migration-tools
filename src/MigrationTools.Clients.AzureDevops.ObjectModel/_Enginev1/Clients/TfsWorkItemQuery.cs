@@ -82,6 +82,13 @@ namespace MigrationTools._EngineV1.Clients
                 timer.Stop();
                 Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", MigrationClient.Config.AsTeamProjectConfig().Collection.ToString(), "GetWorkItemsFromQuery", null, startTime, timer.Elapsed, "200", true));
             }
+            catch (ValidationException ex)
+            {
+                timer.Stop();
+                Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", MigrationClient.Config.AsTeamProjectConfig().Collection.ToString(), "GetWorkItemsFromQuery", null, startTime, timer.Elapsed, "500", false));
+                Log.Error(ex, " Error running query");
+                Environment.Exit(-1);
+            }
             catch (Exception ex)
             {
                 timer.Stop();

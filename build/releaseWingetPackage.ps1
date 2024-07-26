@@ -8,7 +8,7 @@ param (
 
     # name of the releaseTag
     [Parameter(Mandatory=$true)]
-    [string]$releaseTag,
+    [string]$ring,
 
     # GH_TOKEN
     [Parameter(Mandatory=$true)]
@@ -33,13 +33,21 @@ Write-Host $"##[warning] $installURL"
 
 $wigetPackageId = "nkdAgility.AzureDevOpsMigrationTools"
 
-if ($releaseTag -eq "Preview")
-{
-  $wigetPackageId = "$wigetPackageId.Preview"
-}
 Write-Host "Winget Create with $wigetPackageId"
-
-./wingetcreate.exe update --submit --token $GH_TOKEN --urls $installURL --version $version $wigetPackageId
+switch ($ring) {
+	"Preview" {
+		$wigetPackageId = "$wigetPackageId.Preview"
+        ./wingetcreate.exe update --submit --token $GH_TOKEN --urls $installURL --version $version $wigetPackageId
+	}
+	"Release" {
+		$wigetPackageId = "nkdAgility.AzureDevOpsMigrationTools"
+        ./wingetcreate.exe update --submit --token $GH_TOKEN --urls $installURL --version $version $wigetPackageId
+	}
+	default {
+		$wigetPackageId = "nkdAgility.AzureDevOpsMigrationTools.Canary"
+        Write-Host "We dont ship canary builds!"
+	}
+}
 
 Write-Host "Deployed : $wigetPackageId"
 

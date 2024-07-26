@@ -30,7 +30,7 @@ namespace MigrationTools.Enrichers
 
         public IMigrationEngine Engine { get => _Engine; set => _Engine = value; }
 
-        public TfsGitRepositoryEnricher(IServiceProvider services, ILogger<TfsGitRepositoryEnricher> logger) : base(services, logger)
+        public TfsGitRepositoryEnricher(IServiceProvider services, ILogger<TfsGitRepositoryEnricher> logger, ITelemetryLogger telemetryLogger) : base(services, logger, telemetryLogger)
         {
             Engine = Services.GetRequiredService<IMigrationEngine>();
             _Logger = logger ?? throw new ArgumentNullException(nameof(logger));

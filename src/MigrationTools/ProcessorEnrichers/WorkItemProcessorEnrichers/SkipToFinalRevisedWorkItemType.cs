@@ -17,7 +17,7 @@ namespace MigrationTools.Enrichers
 
         public IMigrationEngine Engine { get; private set; }
 
-        public SkipToFinalRevisedWorkItemType(IServiceProvider services, ILogger<SkipToFinalRevisedWorkItemType> logger) : base(services, logger)
+        public SkipToFinalRevisedWorkItemType(IServiceProvider services, ILogger<SkipToFinalRevisedWorkItemType> logger, ITelemetryLogger telemetryLogger) : base(services, logger, telemetryLogger)
         {
             Engine = Services.GetRequiredService<IMigrationEngine>();
         }

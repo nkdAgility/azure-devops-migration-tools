@@ -8,13 +8,15 @@ namespace MigrationTools.Enrichers
 {
     public abstract class WorkItemProcessorEnricher : IWorkItemProcessorEnricher
     {
+        protected ITelemetryLogger Telemetry { get; }
         protected IServiceProvider Services { get; }
         protected ILogger<IWorkItemProcessorEnricher> Log { get; }
 
-        public WorkItemProcessorEnricher(IServiceProvider services, ILogger<WorkItemProcessorEnricher> logger)
+        public WorkItemProcessorEnricher(IServiceProvider services, ILogger<WorkItemProcessorEnricher> logger, ITelemetryLogger telemetry)
         {
             Services = services;
             Log = logger;
+            Telemetry = telemetry;
         }
 
         protected abstract void RefreshForProcessorType(IProcessor processor);

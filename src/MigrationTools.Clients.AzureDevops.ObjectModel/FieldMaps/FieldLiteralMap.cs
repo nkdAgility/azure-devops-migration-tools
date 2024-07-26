@@ -8,7 +8,7 @@ namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
 {
     public class FieldLiteralMap : FieldMapBase
     {
-        public FieldLiteralMap(ILogger<FieldLiteralMap> logger) : base(logger)
+        public FieldLiteralMap(ILogger<FieldLiteralMap> logger, ITelemetryLogger telemetryLogger) : base(logger, telemetryLogger)
         {
         }
 

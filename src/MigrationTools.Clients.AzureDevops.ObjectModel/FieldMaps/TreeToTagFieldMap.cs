@@ -9,7 +9,7 @@ namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
 {
     public class TreeToTagFieldMap : FieldMapBase
     {
-        public TreeToTagFieldMap(ILogger<TreeToTagFieldMap> logger) : base(logger)
+        public TreeToTagFieldMap(ILogger<TreeToTagFieldMap> logger, ITelemetryLogger telemetryLogger) : base(logger, telemetryLogger)
         {
         }
 

@@ -48,7 +48,7 @@ namespace MigrationTools.ProcessorEnrichers
 
         public TfsUserMappingEnricherOptions Options { get; private set; }
 
-        public TfsUserMappingEnricher(IServiceProvider services, ILogger<TfsUserMappingEnricher> logger) : base(services, logger)
+        public TfsUserMappingEnricher(IServiceProvider services, ILogger<TfsUserMappingEnricher> logger, ITelemetryLogger telemetryLogger) : base(services, logger, telemetryLogger)
         {
             Engine = services.GetRequiredService<IMigrationEngine>();
         }
@@ -178,6 +178,7 @@ namespace MigrationTools.ProcessorEnrichers
                 }
                 catch (Exception ex)
                 {
+                    Telemetry.TrackException(ex, null, null);
                     Log.LogWarning("TfsUserMappingEnricher::GetUsersListFromServer::[user:{user}] Failed With {Exception}", user, ex.Message);
                 }
                 

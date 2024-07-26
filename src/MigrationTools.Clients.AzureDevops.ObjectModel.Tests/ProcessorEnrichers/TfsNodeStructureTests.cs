@@ -37,7 +37,7 @@ namespace MigrationTools.ProcessorEnrichers.Tests
             });
         }
 
-        [TestMethod(), TestCategory("L0"), TestCategory("AzureDevOps.ObjectModel")]
+        [TestMethod(), TestCategory("L0")]
         public void GetTfsNodeStructure_WithDifferentAreaPath()
         {
             var nodeStructure = _services.GetRequiredService<TfsNodeStructure>();

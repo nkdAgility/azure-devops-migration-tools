@@ -10,7 +10,7 @@ namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
 {
     public class FieldValuetoTagMap : FieldMapBase
     {
-        public FieldValuetoTagMap(ILogger<FieldValuetoTagMap> logger) : base(logger)
+        public FieldValuetoTagMap(ILogger<FieldValuetoTagMap> logger, ITelemetryLogger telemetryLogger) : base(logger, telemetryLogger)
         {
         }
 

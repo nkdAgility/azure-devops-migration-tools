@@ -6,14 +6,14 @@ namespace MigrationTools.Processors.Tests
     [TestClass()]
     public class TfsTeamSettingsProcessorTests : TfsProcessorTests
     {
-        [TestMethod(), TestCategory("L0"), TestCategory("AzureDevOps.ObjectModel")]
+        [TestMethod(), TestCategory("L0")]
         public void TfsTeamSettingsProcessorTest()
         {
             var x = Services.GetRequiredService<TfsTeamSettingsProcessor>();
             Assert.IsNotNull(x);
         }
 
-        [TestMethod(), TestCategory("L0"), TestCategory("AzureDevOps.ObjectModel")]
+        [TestMethod(), TestCategory("L0")]
         public void TfsTeamSettingsProcessorConfigureTest()
         {
             var y = new TfsTeamSettingsProcessorOptions
@@ -30,7 +30,7 @@ namespace MigrationTools.Processors.Tests
             Assert.IsNotNull(x);
         }
 
-        [TestMethod(), TestCategory("L0"), TestCategory("AzureDevOps.ObjectModel")]
+        [TestMethod(), TestCategory("L0")]
         public void TfsTeamSettingsProcessorRunTest()
         {
             var y = new TfsTeamSettingsProcessorOptions
@@ -47,7 +47,7 @@ namespace MigrationTools.Processors.Tests
             Assert.IsNotNull(x);
         }
 
-        [TestMethod(), TestCategory("L3"), TestCategory("AzureDevOps.ObjectModel")]
+        [TestMethod(), TestCategory("L3")]
         public void TfsTeamSettingsProcessorNoEnrichersTest()
         {
             // Senario 1 Migration from Tfs to Tfs with no Enrichers.

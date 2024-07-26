@@ -45,7 +45,7 @@ namespace MigrationTools.ProcessorEnrichers.Tests
         }
 
 
-        [TestMethod(), TestCategory("L0"), TestCategory("AzureDevOps.ObjectModel")]
+        [TestMethod(), TestCategory("L0")]
         public void TfsRevisionManagerInSync1()
         {
             var peOptions = GetTfsRevisionManagerOptions();
@@ -62,7 +62,7 @@ namespace MigrationTools.ProcessorEnrichers.Tests
 
         }
 
-        [TestMethod(), TestCategory("L0"), TestCategory("AzureDevOps.ObjectModel")]
+        [TestMethod(), TestCategory("L0")]
         public void TfsRevisionManagerInSync10()
         {
             var peOptions = GetTfsRevisionManagerOptions();
@@ -79,7 +79,7 @@ namespace MigrationTools.ProcessorEnrichers.Tests
 
         }
 
-        [TestMethod(), TestCategory("L0"), TestCategory("AzureDevOps.ObjectModel")]
+        [TestMethod(), TestCategory("L0")]
         public void TfsRevisionManagerSync1()
         {
             var peOptions = GetTfsRevisionManagerOptions();
@@ -95,7 +95,7 @@ namespace MigrationTools.ProcessorEnrichers.Tests
             Assert.AreEqual(1, revs.Count);
         }
 
-        [TestMethod(), TestCategory("L0"), TestCategory("AzureDevOps.ObjectModel")]
+        [TestMethod(), TestCategory("L0")]
         public void TfsRevisionManagerSync10()
         {
             var peOptions = GetTfsRevisionManagerOptions();
@@ -111,7 +111,7 @@ namespace MigrationTools.ProcessorEnrichers.Tests
             Assert.AreEqual(10, revs.Count);
         }
 
-        [TestMethod(), TestCategory("L0"), TestCategory("AzureDevOps.ObjectModel")]
+        [TestMethod(), TestCategory("L0")]
         public void TfsRevisionManagerReplayRevisionsOff()
         {
             var peOptions = GetTfsRevisionManagerOptions();
@@ -129,7 +129,7 @@ namespace MigrationTools.ProcessorEnrichers.Tests
         }
 
 
-        [TestMethod(), TestCategory("L0"), TestCategory("AzureDevOps.ObjectModel")]
+        [TestMethod(), TestCategory("L0")]
         public void TfsRevisionManagerMaxRevision51()
         {
             var peOptions = GetTfsRevisionManagerOptions();
@@ -146,7 +146,7 @@ namespace MigrationTools.ProcessorEnrichers.Tests
             Assert.AreEqual(0, revs.Count);
         }
 
-        [TestMethod(), TestCategory("L0"), TestCategory("AzureDevOps.ObjectModel")]
+        [TestMethod(), TestCategory("L0")]
         public void TfsRevisionManagerMaxRevision56()
         {
             var peOptions = GetTfsRevisionManagerOptions();
@@ -163,7 +163,7 @@ namespace MigrationTools.ProcessorEnrichers.Tests
             Assert.AreEqual(5, revs.Count);
         }
 
-        [TestMethod(), TestCategory("L0"), TestCategory("AzureDevOps.ObjectModel")]
+        [TestMethod(), TestCategory("L0")]
         public void TfsRevisionManagerMaxRevision59()
         {
             var peOptions = GetTfsRevisionManagerOptions();
@@ -179,7 +179,7 @@ namespace MigrationTools.ProcessorEnrichers.Tests
             Assert.AreEqual(5, revs.Count);
         }
 
-        [TestMethod(), TestCategory("L0"), TestCategory("AzureDevOps.ObjectModel")]
+        [TestMethod(), TestCategory("L0")]
         public void TfsRevisionManagerDatesMustBeIncreasing()
         {
             var peOptions = GetTfsRevisionManagerOptions();
