@@ -121,7 +121,10 @@ namespace MigrationTools.Host
                  services.AddTransient<IDetectOnlineService, DetectOnlineService>();
                  //services.AddTransient<IDetectVersionService, DetectVersionService>();
                  services.AddTransient<IDetectVersionService2, DetectVersionService2>();
-                 
+
+                 services.AddSingleton<IMigrationToolVersionInfo, MigrationToolVersionInfo>();
+                 services.AddSingleton<IMigrationToolVersion, MigrationToolVersion>();
+
 
                  // Config
                  services.AddSingleton<IEngineConfigurationBuilder, EngineConfigurationBuilder>();
