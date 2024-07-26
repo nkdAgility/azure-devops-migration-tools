@@ -9,6 +9,7 @@ using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.Logging;
 using MigrationTools.DataContracts.Pipelines;
 using MigrationTools.EndpointEnrichers;
+using MigrationTools.Services;
 using NuGet.Common;
 using NuGet.Configuration;
 using NuGet.Protocol;
@@ -22,6 +23,7 @@ namespace MigrationTools.Host.Services
 {
     public class DetectVersionService2 : IDetectVersionService2
     {
+        private IMigrationToolVersion _VerionsInfo;
         private readonly ITelemetryLogger _Telemetry;
         private ILogger<IDetectVersionService2> _logger;
 
@@ -45,7 +47,7 @@ namespace MigrationTools.Host.Services
         {
             get
             {
-                return GetRunningVersion().version;
+                return _VerionsInfo.GetRunningVersion().version;
             }
         }
         public Version AvailableVersion
@@ -62,7 +64,7 @@ namespace MigrationTools.Host.Services
             {
                 return Package.AvailableVersion;
             }
-           return new Version("0.0.0");
+            return new Version("0.0.0");
         }
 
         public Version InstalledVersion
@@ -95,12 +97,13 @@ namespace MigrationTools.Host.Services
             return Package != null;
         }
 
-        public bool IsPackageManagerInstalled {
+        public bool IsPackageManagerInstalled
+        {
             get
             {
                 return GetIsPackageManagerInstalled();
             }
-                }
+        }
 
         private bool GetIsPackageManagerInstalled()
         {
@@ -112,7 +115,7 @@ namespace MigrationTools.Host.Services
         {
             get
             {
-                return !string.IsNullOrEmpty( GetRunningVersion().PreReleaseLabel);
+                return !string.IsNullOrEmpty(_VerionsInfo.GetRunningVersion().PreReleaseLabel);
             }
         }
 
@@ -128,7 +131,7 @@ namespace MigrationTools.Host.Services
         {
             get
             {
-                return GetRunningVersion().PreReleaseLabel.ToLower() == "local";
+                return _VerionsInfo.GetRunningVersion().PreReleaseLabel.ToLower() == "local";
             }
         }
 
@@ -140,18 +143,20 @@ namespace MigrationTools.Host.Services
             }
         }
 
-        public DetectVersionService2(ITelemetryLogger telemetry, ILogger<IDetectVersionService2> logger)
+        public DetectVersionService2(ITelemetryLogger telemetry, ILogger<IDetectVersionService2> logger, IMigrationToolVersion verionsInfo)
         {
+            _VerionsInfo = verionsInfo;
             _Telemetry = telemetry;
             _logger = logger;
             if (IsPreviewVersion)
             {
                 PackageId = "nkdAgility.AzureDevOpsMigrationTools.Preview";
-            } else
+            }
+            else
             {
                 PackageId = "nkdAgility.AzureDevOpsMigrationTools";
             }
-            
+
         }
 
         private WinGetPackage GetPackage()
@@ -170,41 +175,32 @@ namespace MigrationTools.Host.Services
             return _package;
         }
 
-        public static (Version version, string PreReleaseLabel, string versionString) GetRunningVersion()
+        public class Benchmark : IDisposable
         {
-            FileVersionInfo myFileVersionInfo = FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly()?.Location);
-            var matches = Regex.Matches(myFileVersionInfo.ProductVersion, @"^(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)\.(?<build>0|[1-9]\d*)(?:-((?<label>:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?<fullEnd>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$");
-            Version version = new Version(myFileVersionInfo.FileVersion);
-            string textVersion = "v" + version.Major + "." + version.Minor + "." + version.Build + "-" + matches[0].Groups[1].Value;
-            return (version, matches[0].Groups[1].Value, textVersion);
-        }
-    }
+            private readonly Stopwatch timer = new Stopwatch();
+            private readonly string benchmarkName;
 
-    public class Benchmark : IDisposable
-    {
-        private readonly Stopwatch timer = new Stopwatch();
-        private readonly string benchmarkName;
-
-        public TimeSpan Elapsed
-        {
-            get
+            public TimeSpan Elapsed
             {
-                return timer.Elapsed;
+                get
+                {
+                    return timer.Elapsed;
+                }
+            }
+
+            public Benchmark(string benchmarkName)
+            {
+                this.benchmarkName = benchmarkName;
+                timer.Start();
+                Log.Verbose("{benchmarkName}||START", benchmarkName);
+            }
+
+            public void Dispose()
+            {
+                timer.Stop();
+                Log.Verbose("{benchmarkName}||STOP Elapsed: {timerElapsed}", benchmarkName, timer.Elapsed);
             }
         }
 
-        public Benchmark(string benchmarkName)
-        {
-            this.benchmarkName = benchmarkName;
-            timer.Start();
-            Log.Verbose("{benchmarkName}||START", benchmarkName);
-        }
-
-        public void Dispose()
-        {
-            timer.Stop();
-            Log.Verbose("{benchmarkName}||STOP Elapsed: {timerElapsed}", benchmarkName, timer.Elapsed);
-        }
     }
-
 }

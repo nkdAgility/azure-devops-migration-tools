@@ -155,7 +155,7 @@ namespace MigrationTools._EngineV1.Clients
             }
             var startTime = DateTime.UtcNow;
             var timer = System.Diagnostics.Stopwatch.StartNew();
-            WorkItem y;
+            WorkItem y = null ;
             try
             {
                 Log.Debug("TfsWorkItemMigrationClient::GetWorkItem({id})", id);
@@ -167,13 +167,15 @@ namespace MigrationTools._EngineV1.Clients
             {
                 Telemetry.TrackException(ex,
                        new Dictionary<string, string> {
-                            { "CollectionUrl", MigrationClient.Config.AsTeamProjectConfig().Collection.ToString() }
+                            { "CollectionUrl", MigrationClient.Config.AsTeamProjectConfig().Collection.ToString() },
+                             { "Project", MigrationClient.Config.AsTeamProjectConfig().Project.ToString() },
+                             { "WorkItem", id.ToString() }
                        },
                        new Dictionary<string, double> {
                             { "Time",timer.ElapsedMilliseconds }
                        });
                 Log.Error(ex, "Unable to GetWorkItem with id[{id}]", id);
-                throw;
+                Environment.Exit(-1);
             } finally
             {
                 timer.Stop();

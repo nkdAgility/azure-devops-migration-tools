@@ -304,14 +304,16 @@ namespace VstsSyncMigrator.Engine
             contextLog.Information("Validating::Check that all Area & Iteration paths from Source have a valid mapping on Target");
             if (!_nodeStructureEnricher.Options.Enabled && Engine.Target.Config.AsTeamProjectConfig().Project != Engine.Source.Config.AsTeamProjectConfig().Project)
             {
-                throw new ConfigException("Source and Target projects have different names, but  NodeStructureEnricher is not enabled. Cant continue... please enable nodeStructureEnricher in the config and restart.");
+                Log.LogError("Source and Target projects have different names, but  NodeStructureEnricher is not enabled. Cant continue... please enable nodeStructureEnricher in the config and restart.");
+                Environment.Exit(-1);
             }
             if ( _nodeStructureEnricher.Options.Enabled)
             {
                 List<NodeStructureItem> nodeStructureMissingItems = _nodeStructureEnricher.GetMissingRevisionNodes(sourceWorkItems);
                 if (_nodeStructureEnricher.ValidateTargetNodesExist(nodeStructureMissingItems))
                 {
-                    throw new Exception("Missing Iterations in Target preventing progress, check log for list. To continue you MUST configure IterationMaps or AreaMaps that matches the missing paths..");
+                    Log.LogError("Missing Iterations in Target preventing progress, check log for list. To continue you MUST configure IterationMaps or AreaMaps that matches the missing paths..");
+                    Environment.Exit(-1);
                 }
             } else
             {
@@ -330,7 +332,7 @@ namespace VstsSyncMigrator.Engine
                 var ex = new InvalidFieldValueException(
                     "Not all work items in scope contain a valid ReflectedWorkItemId Field!");
                 Log.LogError(ex, "Not all work items in scope contain a valid ReflectedWorkItemId Field!");
-                throw ex;
+                Environment.Exit(-1);
             }
         }
 
@@ -370,7 +372,7 @@ namespace VstsSyncMigrator.Engine
                     var ex = new Exception(
                        "Not all WorkItemTypes present in the Source are present in the Target or mapped! Filter them from the query, or map the to target types.");
                     Log.LogError(ex, "Not all WorkItemTypes present in the Source are present in the Target or mapped using `WorkItemTypeDefinition` in the config.");
-                    throw ex;
+                    Environment.Exit(-1);
                 }
             }
         }
@@ -385,7 +387,7 @@ namespace VstsSyncMigrator.Engine
                 {
                     var ex = new InvalidOperationException("Missing PersonalAccessToken from Target");
                     Log.LogError(ex, "When you are migrating to Azure DevOps you MUST provide an PAT so that we can call the REST API for certain actions. For example we would be unable to deal with a Work item Type change.");
-                    throw ex;
+                    Environment.Exit(-1);
                 }
             }
         }

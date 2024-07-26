@@ -96,12 +96,30 @@ stages:
           }
           Write-Host "##vso[build.addbuildtag]$releaseTag"
 
+          $Ring = "Canary"
+            switch ($Env:GitVersion_PreReleaseLabel) {
+                "" {
+                    $Ring = "Release";
+                }    
+                "Preview" {
+                    $Ring = "Preview";
+                }
+                default {
+                    $Ring = "Canary";
+                }
+            }
+            Write-Output "We are running for the $Ring Ring!"
+            Write-Host "##vso[task.setvariable variable=nkdAgility_Ring;isoutput=true]true"
+
           # Output the variables for debugging
           Write-Host "GITVERSION.PreReleaseLabel: $(GITVERSION.PreReleaseLabel)"
           Write-Host "GITVERSION.SemVer: $(GITVERSION.SemVer)"
           Write-Host "GitVersion.SemVer: $(GitVersion.SemVer)"
           Write-Host "GitVersion.AssemblySemVer: $(GitVersion.AssemblySemVer)"
           Write-Host "GitVersion.InformationalVersion: $(GitVersion.InformationalVersion)"
+          Write-Host "GitVersion.NuGetVersion: $(GitVersion.NuGetVersion)"
+          Write-Host "GitVersion.MajorMinorPatch: $(GitVersion.MajorMinorPatch)"
+          Write-Host "GitVersion.PreReleaseNumber: $(GitVersion.PreReleaseNumber)"
 
 
 # Debug Value Check
@@ -122,6 +140,7 @@ stages:
       GitVersion.SemVer: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.SemVer'] ]
       GitVersion.PreReleaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.PreReleaseTag'] ]
       isPreRelease: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.isPreRelease'] ]
+      nkdAgility_Ring: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.nkdAgility_Ring'] ]
     steps:
     - task: PowerShell@2
       displayName: Read Parameters
@@ -144,6 +163,7 @@ stages:
           Write-Host "GitVersion.PreReleaseTag: $(GitVersion.PreReleaseTag)"
           Write-Host "isPreRelease: $(isPreRelease)"
           Write-Host "skipCompileTest: $(skipCompileTest)"
+          Write-Host "nkdAgility_Ring: $(nkdAgility_Ring)"
 
 
 # Build, Test and Package
@@ -466,6 +486,7 @@ stages:
         version: v0.7.x
     - task: ms-devlabs.vsts-developer-tools-build-tasks.publish-extension-build-task.PublishAzureDevOpsExtension@4
       displayName: 'Publish Extension'
+      condition: and(succeeded(), ne(variables['nkdAgility_Ring'], "Canary"))
       inputs:
         connectedServiceName: 'nkdAgility-Marketplace'
         fileType: vsix
@@ -498,6 +519,7 @@ stages:
         downloadPath: '$(System.ArtifactsDirectory)'
     - task: NuGetCommand@2
       displayName: 'NuGet push'
+      condition: and(succeeded(), ne(variables['nkdAgility_Ring'], "Canary"))
       inputs:
         command: push
         packagesToPush: '$(System.ArtifactsDirectory)\**\*vsts-sync-migrator.*.nupkg'
@@ -530,9 +552,10 @@ stages:
         downloadPath: '$(System.ArtifactsDirectory)'
     - task: PowerShell@2
       displayName: Create Winget Release
+      condition: and(succeeded(), ne(variables['nkdAgility_Ring'], "Canary"))
       inputs:
         filePath: 'build/releaseWingetPackage.ps1'
-        arguments: '-version $(GitVersion.SemVer) -releaseTag $(releaseTag) -GH_TOKEN $(GH_TOKEN)' 
+        arguments: '-version $(GitVersion.SemVer) -ring $(nkdAgility_Ring) -GH_TOKEN $(GH_TOKEN)' 
          
 # Documentation release Stage
 - stage: DocsReleaseStage
@@ -553,6 +576,7 @@ stages:
       GitVersion.SemVer: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.SemVer'] ]
       GitVersion.PreReleaseTag: $[ stageDependencies.SetupStage.ConfigJob.outputs['GitVersion.PreReleaseTag'] ]
       isPreRelease: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.isPreRelease'] ]
+      nkdAgility_Ring: $[ stageDependencies.SetupStage.ConfigJob.outputs['VersionOut.nkdAgility_Ring'] ]
     steps:
     - task: DownloadBuildArtifacts@1
       inputs:
@@ -582,6 +606,7 @@ stages:
           Write-Host "Remote Path: $remoteDirectory"
           Write-Host "##vso[task.setvariable variable=remoteDirectory;isOutput=true]$remoteDirectory"
     - task: CopyFilesOverSSH@0
+      condition: and(succeeded(), ne(variables['nkdAgility_Ring'], "Canary"))
       inputs:
         sshEndpoint: 'nakedalmweb-learn'
         sourceFolder: '$(System.ArtifactsDirectory)/site'

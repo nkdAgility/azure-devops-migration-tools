@@ -1,0 +1,25 @@
+name: Trigger Test
+
+on: 
+  push:
+    branches:
+      - '*'
+      - main
+    tags:
+      - '*'
+      - '!v*-*' 
+  pull_request:
+    branches:
+     - main
+  workflow_dispatch:
+  
+  jobs:
+    Test:
+        name: "Test "
+        runs-on: ubuntu-latest
+        steps:
+        - name: "Test"
+          shell: pwsh
+          id: nkdagility
+          run: |
+                Write-Output "Hello World" 

@@ -1,27 +1,30 @@
 name: Build & Release (Azure DevOps Migration Tools)
 
-on: 
+permissions:
+  contents: read
+  pull-requests: write
+
+on:
   push:
-    tags-ignore:
-      - 'v*-*' 
+    branches: ["main"]
+    tags-ignore: ["v*-*"]
   pull_request:
-    branches:
-     - main
+      branches: ["main"]
   workflow_dispatch:
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }} 
   cancel-in-progress: true
 
-env:
-   APP_ID: "Iv23li9aYvt0VW9x4Jhh"
-   PRIVATE_KEY: ${{ secrets.NKDAGILITY_BOT_CLIENTSECRET }}
+defaults:
+  run:
+    shell: pwsh
 
 jobs:
 
    # Setup & Configuration
   Setup:
-    name: "Setup & Configuration"
+    name: "Setup & Configuration "
     runs-on: ubuntu-latest
     outputs:
       GitVersion_BranchName: ${{ steps.gitversion.outputs.GitVersion_BranchName }}
@@ -30,6 +33,14 @@ jobs:
       GitVersion_AssemblySemVer: ${{ steps.gitversion.outputs.GitVersion_AssemblySemVer }}
       GitVersion_InformationalVersion: ${{ steps.gitversion.outputs.GitVersion_InformationalVersion }}
       GitVersion_NuGetVersion: ${{ steps.gitversion.outputs.GitVersion_NuGetVersion }}
+      GitVersion_PreReleaseNumber: ${{ steps.gitversion.outputs.GitVersion_PreReleaseNumber }}
+      GitVersion_MajorMinorPatch: ${{ steps.gitversion.outputs.GitVersion_MajorMinorPatch }}
+      HasChanged_src: ${{ steps.filter.outputs.src }}
+      HasChanged_docs: ${{ steps.filter.outputs.docs }}
+      HasChanged_automation: ${{ steps.filter.outputs.automation }}
+      nkdAgility_Ring: ${{ steps.nkdagility.outputs.Ring }}
+      nkdAgility_WingetApplicationId: ${{ steps.nkdagility.outputs.WingetApplicationId }}
+      nkdAgility_IsBuildEditBranch: ${{ steps.nkdagility.outputs.IsBuildEditBranch }}
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -45,43 +56,99 @@ jobs:
       uses: gittools/actions/gitversion/execute@v1.1.1
       with:
         useConfigFile: true
+    - uses: dorny/paths-filter@v3
+      id: filter
+      with:
+        filters: |
+          src:
+            - 'src/**'
+          docs:
+            - 'docs/**'
+          automation:
+            - 'build/**'
+            - '.github/workflows/**'
+    - name: "Build NKDAgility Outputs"
+      shell: pwsh
+      id: nkdagility
+      run: |
+            $Ring = "Canary"
+            $WingetApplicationId = "nkdagility.azure-devops-migration-tools"
+            switch ($Env:GitVersion_PreReleaseLabel) {
+                "" {
+                    $Ring = "Release";
+                    $WingetApplicationId = "nkdagility.azure-devops-migration-tools";
+                }    
+                "Preview" {
+                    $Ring = "Preview";
+                    $WingetApplicationId = "nkdagility.azure-devops-migration-tools.Preview";
+                }
+                default {
+                    $Ring = "Canary";
+                    $WingetApplicationId = "nkdagility.azure-devops-migration-tools.Canary";
+                }
+            }
+            Write-Output "We are running for the $Ring Ring!"
+            Write-Output "We are focused on Winget ID $WingetApplicationId!"
+            echo "Ring=$Ring" >> $env:GITHUB_OUTPUT
+            echo "WingetApplicationId=$WingetApplicationId" >> $env:GITHUB_OUTPUT
+
+            $IsBuildEditBranch = $false;
+            if (("${{ github.ref_name }}").contains("build/")) {
+                $IsBuildEditBranch = $true;
+            }
+            Write-Output "IsBuildEditBranch=$IsBuildEditBranch"
+            echo "IsBuildEditBranch=$IsBuildEditBranch" >> $env:GITHUB_OUTPUT   
 
   # Setup Validator
-  SetupValidatorStage:
-    name: "Setup Validator"
+  SetupSummeryStage:
+    name: "Build Run Data"
     runs-on: ubuntu-latest
     needs: Setup
     steps:
-      - name: "Release WorkItemClone"
-        shell: pwsh
-        run: |
-            Write-Output "GitVersion_BranchName: ${{needs.Setup.outputs.GitVersion_BranchName}}"
-            Write-Output "GitVersion_SemVer: ${{needs.Setup.outputs.GitVersion_SemVer}}"
-            Write-Output "GitVersion_PreReleaseLabel: ${{needs.Setup.outputs.GitVersion_PreReleaseLabel}}"
-            Write-Output "GitVersion_AssemblySemVer: ${{needs.Setup.outputs.GitVersion_AssemblySemVer}}"
-            Write-Output "GitVersion_InformationalVersion: ${{needs.Setup.outputs.GitVersion_InformationalVersion}}"
+    - name: "Create Summery"
+      if: always()
+      shell: pwsh
+      id: nkdagility-summery
+      run: |
+            $markdown = @"
+               ## ${{needs.Setup.outputs.GitVersion_SemVer}} (${{needs.Setup.outputs.nkdAgility_Ring}})
+               ### NKDAgility
+                 - nkdAgility_Ring: ${{needs.Setup.outputs.nkdAgility_Ring}}
+                 - nkdAgility_IsBuildEditBranch: ${{needs.Setup.outputs.nkdAgility_IsBuildEditBranch}}
+                 - nkdAgility_WingetApplicationId: ${{needs.Setup.outputs.nkdAgility_WingetApplicationId}}
+               ### GitVersion
+                 - GitVersion_BranchName: ${{needs.Setup.outputs.GitVersion_BranchName}}
+                 - GitVersion_SemVer: ${{needs.Setup.outputs.GitVersion_SemVer}}
+                 - GitVersion_PreReleaseLabel: ${{needs.Setup.outputs.GitVersion_PreReleaseLabel}}
+                 - GitVersion_AssemblySemVer: ${{needs.Setup.outputs.GitVersion_AssemblySemVer}}
+                 - GitVersion_InformationalVersion: ${{needs.Setup.outputs.GitVersion_InformationalVersion}}
+                 - GitVersion_NuGetVersion: ${{needs.Setup.outputs.GitVersion_NuGetVersion}}
+               ### Has Changed
+                 - HasChanged_src: ${{needs.Setup.outputs.HasChanged_src}}
+                 - HasChanged_docs: ${{needs.Setup.outputs.HasChanged_docs}}
+                 - HasChanged_automation: ${{needs.Setup.outputs.HasChanged_automation}}
+            "@
+            echo $markdown >> $Env:GITHUB_STEP_SUMMARY
     
   # Build, Test, Sonar Cloud Analysis, & Package
   build:
     name: "Build, Test, Sonar Cloud Analysis, & Package"
     runs-on: windows-latest
     needs: Setup
+    if: ${{ needs.Setup.outputs.HasChanged_src }}
     env:
       solution: '**/*.sln'
       buildPlatform: 'Any CPU'
       buildConfiguration: 'Release'
-      GitVersion_SemVer: ${{ needs.Setup.outputs.GitVersion_SemVer }}
+      nkdAgility_Ring: ${{ needs.Setup.outputs.nkdAgility_Ring }}
+      GitVersion_SemVer: ${{ needs.Setup.outputs.GitVersion_SemVer }}      
       GitVersion_AssemblySemVer: ${{ needs.Setup.outputs.GitVersion_AssemblySemVer }}
       GitVersion_InformationalVersion: ${{ needs.Setup.outputs.GitVersion_InformationalVersion }}
       GitVersion_NuGetVersion: ${{ needs.Setup.outputs.GitVersion_NuGetVersion }}
       GitVersion_PreReleaseLabel: ${{ needs.Setup.outputs.GitVersion_PreReleaseLabel }}
+      GitVersion_PreReleaseNumber: ${{ needs.Setup.outputs.GitVersion_PreReleaseNumber }}
+      GitVersion_MajorMinorPatch: ${{ needs.Setup.outputs.GitVersion_MajorMinorPatch }}
     steps:
-      # - name: Setup NuGet
-      #   uses: NuGet/setup-nuget@v1.0.2
-      # - name: Restore NuGet Packages
-      #   run: nuget restore MigrationTools.sln
-      # - name: Build and Publish Web App
-      #   run: msbuild MigrationTools.sln 
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
@@ -94,6 +161,10 @@ jobs:
           files: '["**/StaticVariables.cs"]'
           tokenPrefix: "${"
           tokenSuffix: "}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: AzureDevOpsMigrationTools-BuildScripts
+          path: ./build/**
       - name: Setup .NET
         uses: actions/setup-dotnet@v1
         with:
@@ -170,20 +241,24 @@ jobs:
         with:
           name: AzureDevOpsMigrationTools-Site
           path: ./_site/**/*
-  
+ 
 
   # GitHubRelease
   GitHubRelease:
-    name: "Release to GitHub Releases (Not Migrated)"
+    name: "Release to GitHub Releases"
     runs-on: ubuntu-latest
     env:
+      nkdAgility_Ring: ${{ needs.Setup.outputs.nkdAgility_Ring }}
       GitVersion_SemVer: ${{ needs.Setup.outputs.GitVersion_SemVer }}
       GitVersion_AssemblySemVer: ${{ needs.Setup.outputs.GitVersion_AssemblySemVer }}
       GitVersion_InformationalVersion: ${{ needs.Setup.outputs.GitVersion_InformationalVersion }}
       GitVersion_NuGetVersion: ${{ needs.Setup.outputs.GitVersion_NuGetVersion }}
       GitVersion_PreReleaseLabel: ${{ needs.Setup.outputs.GitVersion_PreReleaseLabel }}
+      HasChanged_src: ${{ needs.Setup.outputs.HasChanged_src }}
+      HasChanged_docs: ${{ needs.Setup.outputs.HasChanged_docs }}
+      HasChanged_automation: ${{ needs.Setup.outputs.HasChanged_automation }}
     needs: [build, Setup]
-    #if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
+    if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring != 'Canary' ) }}
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -191,14 +266,21 @@ jobs:
       - uses: actions/create-github-app-token@v1
         id: app-token
         with:
-          app-id: ${{ env.APP_ID }}
-          private-key: ${{ env.PRIVATE_KEY }}
+          app-id: ${{ secrets.NKDAGILITY_BOT_APP_ID }}
+          private-key: ${{ secrets.NKDAGILITY_BOT_CLIENTSECRET }}
       - name: "Package  Files"
         shell: pwsh
         run: |
              Get-ChildItem -Path .\ -Recurse | ForEach-Object { $_.FullName }
+      - name: "Release options"
+        id: release-options
+        shell: pwsh
+        run: |
+             if ($Env:nkdAgility_Ring -ne 'Canary' && ($Env:HasChanged_src || $Env:HasChanged_docs )) {
+                echo "discussion_category_name=Anouncement" >> $env:GITHUB_OUTPUT    
+             }
+             
       - name: Release
-        if: ${{ false }}
         uses: softprops/action-gh-release@v2
         with:
           files: |
@@ -207,72 +289,124 @@ jobs:
             vsts-sync-migrator.*.nupkg
           generate_release_notes: true
           tag_name: v${{ needs.Setup.outputs.GitVersion_SemVer }}
-          name: Azure DevOps Migration Tools v${{ needs.Setup.outputs.GitVersion_SemVer }}
+          name: v${{ needs.Setup.outputs.GitVersion_SemVer }} (${{ needs.Setup.outputs.nkdAgility_Ring }})
           token: ${{ steps.app-token.outputs.token }}
-          prerelease: ${{ needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' }}
-          discussion_category_name: "Anouncement"
+          prerelease: ${{ needs.Setup.outputs.nkdAgility_Ring != 'Release' }}
+          discussion_category_name: ${{ steps.release-options.outputs.discussion_category_name }}
+          draft: ${{ needs.Setup.outputs.nkdAgility_Ring == 'Canary' }}
+          body: |
+            ## Azure DevOps Migration Tools v${{ needs.Setup.outputs.GitVersion_SemVer }} 
+            Version: ${{ needs.Setup.outputs.GitVersion_SemVer }}
+            Ring: (${{ needs.Setup.outputs.nkdAgility_Ring }})
+
+            ## Get the tools
+
+            - Download the [MigrationTools-${{ needs.Setup.outputs.GitVersion_SemVer }}.zip](https://github.com/nkdAgility/azure-devops-migration-tools/releases/download/v${{ needs.Setup.outputs.GitVersion_SemVer }}/MigrationTools-${{ needs.Setup.outputs.GitVersion_SemVer }}.zip) file below
+            - Install with Winget with `winget install ${{needs.Setup.outputs.nkdAgility_WingetApplicationId}} --version ${{ needs.Setup.outputs.GitVersion_SemVer }}` . There is a delay for aprovals on the winget store, so you may need to wait a few days before this is available.
+            - Install with Chocolatey with `choco install nkdagility.azure-devops-migration-tools --version ${{ needs.Setup.outputs.GitVersion_NuGetVersion }}`. There is a delay for aprovals on the chocolatey store, so you may need to wait a few hours before this is available.
+
+          append_body: true
   
+# ElmahDeployment
+  ElmahDeployemnt:
+    name: "Create Elmah.io Deployment"
+    runs-on: ubuntu-latest
+    env:
+      GitVersion_SemVer: ${{ needs.Setup.outputs.GitVersion_SemVer }}
+    needs: [GitHubRelease, Setup]
+    if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring != 'Canary' ) }}
+    steps:
+     - name: Create Deployment on elmah.io
+       uses: elmahio/github-create-deployment-action@v1
+       with:
+         apiKey: ${{ secrets.ELMAH_IO_API_KEY }}
+         version: ${{ needs.Setup.outputs.GitVersion_SemVer }}
+         logId: ${{ secrets.ELMAH_IO_LOG_ID }}
+
+
   # Release to Marketplace
   MarketplaceRelease:
-    name: "Release to Marketplace (Not Migrated)"
+    name: "Release to Marketplace"
     runs-on: ubuntu-latest
     needs: [Setup, GitHubRelease]
-    if: ${{ false }}
-    #if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
+    if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring != 'Canary' ) && (needs.Setup.outputs.HasChanged_src) }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
       - uses: actions/download-artifact@v4
-        with:
-          name: AzureDevOpsMigrationTools-Packages
-      - name: "Find solution files"
+      - name: "Find files"
         shell: pwsh
         run: |
-            Get-Item -Path .\ 
-            Get-ChildItem -Path .\ -Recurse -Filter '*.sln' | ForEach-Object { $_.FullName }
+            Get-Item -Path .\
+            Write-Output "Build Files"
+            Get-ChildItem -Path .\ -Recurse -Filter '*.ps1' | ForEach-Object { $_.FullName }
+      - name: "Marketplace"
+        shell: pwsh
+        run: |
+            $vsixFile =  Get-ChildItem -Path .\ -Recurse -Filter '*.vsix'
+            if ($vsixFile -eq $null) {
+                Write-Output "No VSIX file found"
+                exit 1
+            } else {
+              Write-Output $"Running with {$vsixFile}"
+            }
+            .\build\releaseExtension.ps1 -vsixFile $vsixFile.FullName -marketplaceToken ${{ secrets.VS_MARKET_TOKEN }}
   
+
   # Release to Chocolatey
   ChocolateyRelease:
-    name: "Release to Chocolatey (Not Migrated)"
-    runs-on: ubuntu-latest
+    name: "Release to Chocolatey"
+    runs-on: windows-latest
     needs: [Setup, GitHubRelease]
-    if: ${{ false }}
-    #if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
+    if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring != 'Canary' ) && (needs.Setup.outputs.HasChanged_src) }}
     steps:
       - uses: actions/download-artifact@v4
         with:
           name: AzureDevOpsMigrationTools-Packages
-      - name: "Find solution files"
+      - name: "Choco"
         shell: pwsh
         run: |
-            Get-Item -Path .\ 
-            Get-ChildItem -Path .\ -Recurse -Filter '*.sln' | ForEach-Object { $_.FullName }   
+            $chocoFile =  Get-ChildItem -Path .\ -Recurse -Filter 'vsts-sync-migrator.${{ needs.Setup.outputs.GitVersion_NuGetVersion }}.nupkg'
+            if ($chocoFile -eq $null) {
+                Write-Output "No Choco file found"
+                exit 1
+            } else {
+              Write-Output $"Running with {$chocoFile}"
+            }
+            Write-Output 'choco push "$chocoFile" --key "${{ secrets.CHOCO_APIKEY }}" --source "https://push.chocolatey.org/"'
+            choco push "$chocoFile" --key "${{ secrets.CHOCO_APIKEY }}" --source "https://push.chocolatey.org/"
+
 
   # Release to Winget
   WingetRelease:
-    name: "Release to Winget (Not Migrated)"
-    runs-on: ubuntu-latest
+    name: "Release to Winget"
+    runs-on: windows-latest
     needs: [Setup, GitHubRelease]
-    if: ${{ false }}
-    #if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
+    if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring != 'Canary' ) && (needs.Setup.outputs.HasChanged_src) }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
       - uses: actions/download-artifact@v4
-        with:
-          name: AzureDevOpsMigrationTools-Packages
-      - name: "Find solution files"
+      - name: "Find files"
         shell: pwsh
         run: |
-            Get-Item -Path .\ 
-            Get-ChildItem -Path .\ -Recurse -Filter '*.sln' | ForEach-Object { $_.FullName }
+            Get-Item -Path .\
+            Write-Output "Build Files"
+            Get-ChildItem -Path .\ -Recurse -Filter '*.ps1' | ForEach-Object { $_.FullName }
+      - name: "Winget Release"
+        shell: pwsh
+        run: |
+            .\build\releaseWingetPackage.ps1 -version ${{ needs.Setup.outputs.GitVersion_SemVer }} -ring ${{needs.Setup.outputs.nkdAgility_Ring}} -GH_TOKEN ${{ secrets.NKD_MRHINSH_TOKEN }}
 
   # Release to Docs
   DocsRelease:
     name: "Release to Docs"
     runs-on: ubuntu-latest
-    needs: [BuildDocs, GitHubRelease]
-    if: ${{ false }}
-    #if: ${{ success() && ( needs.Setup.outputs.GitVersion_PreReleaseLabel == 'Preview' || needs.Setup.outputs.GitVersion_PreReleaseLabel == '' ) }}
+    needs: [Setup, BuildDocs, GitHubRelease]
+    if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring != 'Canary' ) }}
     steps:
       - name: Download a single artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: AzureDevOpsMigrationTools-Site
           path: ./_site
@@ -280,19 +414,27 @@ jobs:
         shell: pwsh
         run: |
             Get-Item -Path .\ 
-      - name: SFTP Upload
-        # You may pin to the exact commit or the version.
-        # uses: Dylan700/sftp-upload-action@f90db607d9fe1acdc0eefccee84d37c119b268fe
+      - name: "Folder Desider"
+        id: Folder-Decision
+        shell: pwsh
+        run: |
+            if ($Env:nkdAgility_Ring -ne 'Release') {
+               echo "subfolder=$Env:nkdAgility_Ring" >> $env:GITHUB_OUTPUT
+               Write-Output "subfolder=$Env:nkdAgility_Ring"
+            } else {
+              Write-Output "subfolder="
+            }            
+      - name: SFTP Upload ${{ (needs.Setup.outputs.nkdAgility_Ring) }}
         uses: Dylan700/sftp-upload-action@v1.1.4
         with:
           server: nakedalmweb.sftp.wpengine.com
           username: nakedalmweb-learn
-          password: ${{ secrets.SFTP_PASSWORD }}
+          password: ${{ secrets.NKDAGILITY_LEARN_SFTP }}
           port: 2222
           # If true, outputs the results of the upload, without actually uploading.
-          dry-run: false
+          dry-run: ${{ (needs.Setup.outputs.nkdAgility_Ring) == 'Canary' }}
           # A list of folders to upload in the format of `folder/ => upload_folder/`
           uploads: | 
-              ./_site/ => ./azure-devops-migration-tools
+              ./_site/ => ./azure-devops-migration-tools/${{ steps.Folder-Decision.outputs.subfolder }}
           # If true, any existing files in the remote upload directories are deleted.
           delete: false

@@ -1,9 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Reflection;
 using System.Security.Principal;
+using System.Text.RegularExpressions;
 using Elmah.Io.Client;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
+using Microsoft.ApplicationInsights.Extensibility;
+using MigrationTools.Services;
 
 namespace MigrationTools
 {
@@ -11,15 +16,17 @@ namespace MigrationTools
     {
         private TelemetryClient _telemetryClient;
         private static IElmahioAPI elmahIoClient;
+        private static IMigrationToolVersion _MigrationToolVersion;
 
-        public TelemetryClientAdapter(TelemetryClient telemetryClient)
+        public TelemetryClientAdapter(TelemetryConfiguration telemetryConfiguration, IMigrationToolVersion migrationToolVersion)
         {
-            telemetryClient.InstrumentationKey = "2d666f84-b3fb-4dcf-9aad-65de038d2772";
+            TelemetryClient telemetryClient = new TelemetryClient(telemetryConfiguration);
+            _MigrationToolVersion = migrationToolVersion;
             telemetryClient.Context.Session.Id = Guid.NewGuid().ToString();
             telemetryClient.Context.Device.OperatingSystem = Environment.OSVersion.ToString();
             if (!(System.Reflection.Assembly.GetEntryAssembly() is null))
             {
-                telemetryClient.Context.Component.Version = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString();
+                telemetryClient.Context.Component.Version = migrationToolVersion.GetRunningVersion().versionString;
             }
             _telemetryClient = telemetryClient;
 
@@ -28,7 +35,7 @@ namespace MigrationTools
                 Timeout = TimeSpan.FromSeconds(30),
                 UserAgent = "Azure-DevOps-Migration-Tools",
             });
-            elmahIoClient.Messages.OnMessage += (sender, args) => args.Message.Version = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString();
+            elmahIoClient.Messages.OnMessage += (sender, args) => args.Message.Version = migrationToolVersion.GetRunningVersion().versionString;
 
         }
 
@@ -84,18 +91,27 @@ namespace MigrationTools
                 Application = "Azure-DevOps-Migration-Tools",
                 ServerVariables = new List<Item>
                     {
-                        new Item("User-Agent", $"X-ELMAHIO-APPLICATION; OS={Environment.OSVersion.Platform}; OSVERSION={Environment.OSVersion.Version}; ENGINE=Azure-DevOps-Migration-Tools"),
+                        new Item("User-Agent", $"X-ELMAHIO-APPLICATION; OS={Environment.OSVersion.Platform}; OSVERSION={Environment.OSVersion.Version}; ENGINEVERSION={_MigrationToolVersion.GetRunningVersion().versionString}; ENGINE=Azure-DevOps-Migration-Tools"),
                     }
             };
-            foreach (var property in properties)
-            {
-                createMessage.Data.Add(new Item(property.Key, property.Value));
-            }
-            foreach (var measurement in measurements)
-            {
-                createMessage.Data.Add(new Item(measurement.Key, measurement.Value.ToString()));
-            }
+            createMessage.Data.Add(new Item("SessionId", SessionId));
+            createMessage.Data.Add(new Item("Version", _MigrationToolVersion.GetRunningVersion().versionString));
 
+            if (properties != null)
+            {
+                foreach (var property in properties)
+                {
+                    createMessage.Data.Add(new Item(property.Key, property.Value));
+                }
+
+            }
+            if (measurements != null)
+            {
+                foreach (var measurement in measurements)
+                {
+                    createMessage.Data.Add(new Item(measurement.Key, measurement.Value.ToString()));
+                }
+            }
            var result = elmahIoClient.Messages.CreateAndNotify(new Guid("24086b6d-4f58-47f4-8ac7-68d8bc05ca9e"), createMessage);
             Console.WriteLine($"Error logged to Elmah.io");
         }

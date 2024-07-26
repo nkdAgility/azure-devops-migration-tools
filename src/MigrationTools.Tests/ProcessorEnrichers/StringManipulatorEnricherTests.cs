@@ -21,7 +21,7 @@ namespace MigrationTools.ProcessorEnrichers.Tests
             Services = ServiceProviderHelper.GetWorkItemMigrationProcessor();
         }
 
-        [TestMethod(), TestCategory("L0"), TestCategory("Generic.Processor")]
+        [TestMethod(), TestCategory("L0")]
         public void StringManipulatorEnricher_ConfigureTest()
         {
             var y = new StringManipulatorEnricherOptions
@@ -45,7 +45,7 @@ namespace MigrationTools.ProcessorEnrichers.Tests
             Assert.IsNotNull(x);
         }
 
-        [TestMethod(), TestCategory("L1"), TestCategory("ProcessorEnrichers")]
+        [TestMethod(), TestCategory("L1")]
         public void StringManipulatorEnricher_RegexTest()
         {
             var y = new StringManipulatorEnricherOptions
@@ -82,7 +82,7 @@ namespace MigrationTools.ProcessorEnrichers.Tests
             Assert.AreEqual("Test 2", fieldItem.Value);
         }
 
-        [TestMethod(), TestCategory("L1"), TestCategory("ProcessorEnrichers")]
+        [TestMethod(), TestCategory("L1")]
         public void StringManipulatorEnricher_LengthShorterThanMaxTest()
         {
             var y = new StringManipulatorEnricherOptions
@@ -108,7 +108,7 @@ namespace MigrationTools.ProcessorEnrichers.Tests
             Assert.AreEqual(4, fieldItem.Value.ToString().Length);
         }
 
-        [TestMethod(), TestCategory("L1"), TestCategory("ProcessorEnrichers")]
+        [TestMethod(), TestCategory("L1")]
         public void StringManipulatorEnricher_LengthLongerThanMaxTest()
         {
             var y = new StringManipulatorEnricherOptions
