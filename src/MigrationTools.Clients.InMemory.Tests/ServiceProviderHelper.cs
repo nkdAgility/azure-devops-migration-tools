@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using MigrationTools.Fakes;
+using MigrationTools.Services;
 using MigrationTools.TestExtensions;
 
 namespace MigrationTools.Tests
@@ -12,6 +14,9 @@ namespace MigrationTools.Tests
 
             services.AddMigrationToolServices();
             services.AddMigrationToolServicesForClientInMemory();
+
+            services.AddSingleton<IMigrationToolVersionInfo, FakeMigrationToolVersionInfo>();
+            services.AddSingleton<IMigrationToolVersion, FakeMigrationToolVersion>();
 
             return services.BuildServiceProvider();
         }

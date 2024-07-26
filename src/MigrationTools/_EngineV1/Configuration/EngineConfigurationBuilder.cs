@@ -19,6 +19,7 @@ using Newtonsoft.Json.Schema.Generation;
 
 namespace MigrationTools._EngineV1.Configuration
 {
+
     public class EngineConfigurationBuilder : IEngineConfigurationBuilder, IEngineConfigurationReader, ISettingsWriter
     {
         private readonly ILogger<EngineConfigurationBuilder> _logger;
@@ -72,14 +73,15 @@ namespace MigrationTools._EngineV1.Configuration
             string appVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString(2);
             if (ec?.Version != appVersion)
             {
-                _logger.LogError("The config version {Version} does not match the current app version {appVersion}. There may be compatability issues and we recommend that you generate a new default config and then tranfer the settings accross.", ec.Version, appVersion);
+                _logger.LogCritical("The config version {Version} does not match the current app version {appVersion}. There may be compatability issues and we recommend that you generate a new default config and then tranfer the settings accross.", ec.Version, appVersion);
                 if (System.Diagnostics.Debugger.IsAttached)
                 {
                     _logger.LogInformation("But since you're running in Debug, let's move on");
                 }
                 else
                 {
-                    throw new Exception("Version in Config does not match X.X in Application. Please check and revert.");
+                    _logger.LogCritical("Version in Config does not match X.X in Application. Please check and revert.");
+                    System.Environment.Exit(-1);
                 }
             }
             //#endif
@@ -107,7 +109,7 @@ namespace MigrationTools._EngineV1.Configuration
             ec.Processors.Add(new ImportProfilePictureConfig());
             ec.Processors.Add(new ExportProfilePictureFromADConfig());
             ec.Processors.Add(new FixGitCommitLinksConfig() { TargetRepository = "targetProjectName" });
-            ec.Processors.Add(new WorkItemUpdateConfig());
+            ec.Processors.Add(new WorkItemBulkEditProcessorConfig());
             ec.Processors.Add(new WorkItemPostProcessingConfig() { WorkItemIDs = new List<int> { 1, 2, 3 } });
             ec.Processors.Add(new WorkItemDeleteConfig());
             ec.Processors.Add(new WorkItemQueryMigrationConfig() { SourceToTargetFieldMappings = new Dictionary<string, string>() { { "SourceFieldRef", "TargetFieldRef" } } });
@@ -124,7 +126,7 @@ namespace MigrationTools._EngineV1.Configuration
             ec.Processors.Add(new ImportProfilePictureConfig());
             ec.Processors.Add(new ExportProfilePictureFromADConfig());
             ec.Processors.Add(new FixGitCommitLinksConfig() { TargetRepository = "targetProjectName" });
-            ec.Processors.Add(new WorkItemUpdateConfig());
+            ec.Processors.Add(new WorkItemBulkEditProcessorConfig());
             ec.Processors.Add(new WorkItemPostProcessingConfig() { WorkItemIDs = new List<int> { 1, 2, 3 } });
             ec.Processors.Add(new WorkItemDeleteConfig());
             ec.Processors.Add(new WorkItemQueryMigrationConfig() { SourceToTargetFieldMappings = new Dictionary<string, string>() { { "SourceFieldRef", "TargetFieldRef" } } });

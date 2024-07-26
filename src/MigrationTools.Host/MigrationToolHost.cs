@@ -24,42 +24,49 @@ using Serilog.Filters;
 using MigrationTools.Host.Commands;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using MigrationTools.Services;
 
 namespace MigrationTools.Host
 {
+
+    
+
     public static class MigrationToolHost
     {
         static int logs = 1;
+        private static bool LoggerHasBeenBuilt = false;
 
         public static IHostBuilder CreateDefaultBuilder(string[] args)
         {
            var configFile =  CommandSettingsBase.ForceGetConfigFile(args);
+            var mtv = new MigrationToolVersion();
 
             var hostBuilder = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args);
 
             hostBuilder.UseSerilog((hostingContext, services, loggerConfiguration) =>
             {
-                string outputTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] [" + DetectVersionService2.GetRunningVersion().versionString + "] {Message:lj}{NewLine}{Exception}"; // {SourceContext}
-                string logsPath = CreateLogsPath();
-                var logPath = Path.Combine(logsPath, $"migration{logs}.log");
+                    string outputTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] [" + mtv.GetRunningVersion().versionString + "] {Message:lj}{NewLine}{Exception}"; // {SourceContext}
+                    string logsPath = CreateLogsPath();
+                    var logPath = Path.Combine(logsPath, $"migration-{logs}.log");
 
-                var logLevel = hostingContext.Configuration.GetValue<LogEventLevel>("LogLevel");
-                var levelSwitch = new LoggingLevelSwitch(logLevel);
-                loggerConfiguration
-                    .MinimumLevel.ControlledBy(levelSwitch)
-                    .ReadFrom.Configuration(hostingContext.Configuration)
-                    .Enrich.FromLogContext()
-                    .Enrich.WithMachineName()
-                    .Enrich.WithProcessId()
-                    .WriteTo.File(logPath, LogEventLevel.Verbose, outputTemplate)
-                    .WriteTo.Logger(lc => lc
-                        .Filter.ByExcluding(Matching.FromSource("Microsoft"))
-                        .Filter.ByExcluding(Matching.FromSource("MigrationTools.Host.StartupService"))
-                        .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Debug, theme: AnsiConsoleTheme.Code, outputTemplate: outputTemplate))
-                    .WriteTo.Logger(lc => lc
-                        .Filter.ByExcluding(Matching.FromSource("Microsoft"))
-                        .WriteTo.ApplicationInsights(services.GetService<TelemetryClient>(), new CustomConverter(), LogEventLevel.Error));
-                logs++;
+                    var logLevel = hostingContext.Configuration.GetValue<LogEventLevel>("LogLevel");
+                    var levelSwitch = new LoggingLevelSwitch(logLevel);
+                    loggerConfiguration
+                        .MinimumLevel.ControlledBy(levelSwitch)
+                        .ReadFrom.Configuration(hostingContext.Configuration)
+                        .Enrich.FromLogContext()
+                        .Enrich.WithMachineName()
+                        .Enrich.WithProcessId()
+                        .WriteTo.File(logPath, LogEventLevel.Verbose, outputTemplate)
+                        .WriteTo.Logger(lc => lc
+                            .Filter.ByExcluding(Matching.FromSource("Microsoft"))
+                            .Filter.ByExcluding(Matching.FromSource("MigrationTools.Host.StartupService"))
+                            .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Debug, theme: AnsiConsoleTheme.Code, outputTemplate: outputTemplate))
+                        .WriteTo.Logger(lc => lc
+                            .Filter.ByExcluding(Matching.FromSource("Microsoft"))
+                            .WriteTo.ApplicationInsights(services.GetService<TelemetryConfiguration> (), new CustomConverter(), LogEventLevel.Error));
+                    logs++;
+                    LoggerHasBeenBuilt = true;                
             });
 
             hostBuilder.ConfigureLogging((context, logBuilder) =>
@@ -114,6 +121,7 @@ namespace MigrationTools.Host
                  services.AddTransient<IDetectOnlineService, DetectOnlineService>();
                  //services.AddTransient<IDetectVersionService, DetectVersionService>();
                  services.AddTransient<IDetectVersionService2, DetectVersionService2>();
+                 
 
                  // Config
                  services.AddSingleton<IEngineConfigurationBuilder, EngineConfigurationBuilder>();

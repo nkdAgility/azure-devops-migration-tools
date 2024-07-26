@@ -16,14 +16,14 @@ namespace MigrationTools.Host.Tests
             host = MigrationToolHost.CreateDefaultBuilder(new string[] { "execute", "-c", "configuration.json" }).Build();
         }
 
-        [TestMethod, TestCategory("L2"), TestCategory("Host")]
+        [TestMethod, TestCategory("L2")]
         [Ignore("need to ignore for now, missing a good config file for non-objectmodel")]
         public void MigrationHostTest()
         {
             IMigrationEngine mh = host.Services.GetRequiredService<IMigrationEngine>();
         }
 
-        [TestMethod, TestCategory("L1"), TestCategory("Host")]
+        [TestMethod, TestCategory("L1")]
         [Ignore("need to ignore for now, untill we get some generic field maps")]
         public void TestEngineExecuteEmptyProcessors()
         {
@@ -33,7 +33,7 @@ namespace MigrationTools.Host.Tests
             me.Run();
         }
 
-        [TestMethod, TestCategory("L1"), TestCategory("Host")]
+        [TestMethod, TestCategory("L1")]
         [Ignore("need to ignore for now, missing a good config file for non-objectmodel")]
         public void TestEngineExecuteEmptyFieldMaps()
         {
@@ -44,7 +44,7 @@ namespace MigrationTools.Host.Tests
             me.Run();
         }
 
-        [TestMethod, TestCategory("L3"), TestCategory("L2"), TestCategory("Host")]
+        [TestMethod, TestCategory("L3"), TestCategory("L2")]
         [Ignore("need to ignore for now, missing a good config file for non-objectmodel")]
         public void TestEngineExecuteProcessors()
         {

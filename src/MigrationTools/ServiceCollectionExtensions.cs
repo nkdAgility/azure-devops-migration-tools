@@ -6,6 +6,7 @@ using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
 using MigrationTools.ProcessorEnrichers.WorkItemProcessorEnrichers;
 using MigrationTools.Processors;
+using MigrationTools.Services;
 
 namespace MigrationTools
 {
@@ -32,6 +33,8 @@ namespace MigrationTools
             //context.AddTransient<WorkItemLinkEnricher>();
             // processor Enrichers
             context.AddTransient<PauseAfterEachItem>();
+
+            
         }
 
         [Obsolete("This is the v1 Archtiecture, we are movign to V2", false)]

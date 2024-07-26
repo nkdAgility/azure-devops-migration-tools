@@ -22,6 +22,7 @@
     <ProjectReference Include="..\MigrationTools.Clients.AzureDevops.ObjectModel\MigrationTools.Clients.AzureDevops.ObjectModel.csproj" />
     <ProjectReference Include="..\MigrationTools.TestExtensions\MigrationTools.TestExtensions.csproj" />
     <ProjectReference Include="..\VstsSyncMigrator.Core\VstsSyncMigrator.Core.csproj" />
+	  <ProjectReference Include="..\MigrationTools.Fakes\MigrationTools.Helpers.Tests.csproj" />
   </ItemGroup>
 
   <ItemGroup>
