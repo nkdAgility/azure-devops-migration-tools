@@ -19,6 +19,7 @@ using Newtonsoft.Json.Schema.Generation;
 
 namespace MigrationTools._EngineV1.Configuration
 {
+
     public class EngineConfigurationBuilder : IEngineConfigurationBuilder, IEngineConfigurationReader, ISettingsWriter
     {
         private readonly ILogger<EngineConfigurationBuilder> _logger;

@@ -170,24 +170,29 @@ namespace MigrationTools.Host.Services
             return _package;
         }
 
-        public static (Version version, string PreReleaseLabel, string versionString) GetRunningVersion()
+        public static (Version version, string PreReleaseLabel, string versionString) GetRunningVersion(IMigrationToolVersionInfo versionInfo = null)
         {
-            FileVersionInfo myFileVersionInfo = FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly()?.Location);
-            var matches = Regex.Matches(myFileVersionInfo.ProductVersion, @"^(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)\.(?<build>0|[1-9]\d*)(?:-((?<label>:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?<fullEnd>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$");
-            Version version = new Version(myFileVersionInfo.FileVersion);
+            if (versionInfo == null)
+            {
+                versionInfo = new MigrationToolVersionInfo();
+            }            
+            var matches = Regex.Matches(versionInfo.ProductVersion, @"^(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)\.(?<build>0|[1-9]\d*)(?:-((?<label>:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?<fullEnd>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$");
+            Version version = new Version(versionInfo.FileVersion);
             string textVersion = "0.0.0-local";
             if (version.CompareTo(new Version(0, 0, 0, 0)) == 0)
             {
-                textVersion = ThisAssembly.Git.Tag.Replace("Preview", "Local");
-                //textVersion = ThisAssembly.Git.SemVer.Major + "." + ThisAssembly.Git.SemVer.Minor + "." + ThisAssembly.Git.SemVer.Patch + "-" + matches[0].Groups[1].Value;
-                //if (!string.IsNullOrEmpty(ThisAssembly.Git.Commits))
-                //{
-                //    textVersion += "." + ThisAssembly.Git.Commits;
-                //}
+                textVersion = versionInfo.GitTag.Replace("Preview", "Local").Replace("v", "");
             }
             else
             {
-                textVersion = version.Major + "." + version.Minor + "." + version.Build + "-" + matches[0].Groups[1].Value;
+                if (matches[0].Groups[1].Success)
+                {
+                    textVersion = version.Major + "." + version.Minor + "." + version.Build + "-" + matches[0].Groups[1].Value;
+                } else
+                {
+                    textVersion = version.Major + "." + version.Minor + "." + version.Build;
+                }
+                
             }
             return (version, matches[0].Groups[1].Value, textVersion);
         }
