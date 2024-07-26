@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MigrationTools.Host.Services;
+using MigrationTools.Services;
 using Serilog;
 using Spectre.Console;
 using Spectre.Console.Cli;
@@ -17,6 +18,7 @@ namespace MigrationTools.Host.Commands
 {
     internal abstract class CommandBase<TSettings> : AsyncCommand<TSettings> where TSettings : CommandSettingsBase
     {
+        private IMigrationToolVersion _MigrationToolVersion;
         private readonly IHostApplicationLifetime _LifeTime;
         private readonly IDetectOnlineService _detectOnlineService;
         private readonly IDetectVersionService2 _detectVersionService;
@@ -24,8 +26,9 @@ namespace MigrationTools.Host.Commands
         private readonly ITelemetryLogger _telemetryLogger;
         private static Stopwatch _mainTimer = new Stopwatch();
 
-        public CommandBase(IHostApplicationLifetime appLifetime, IDetectOnlineService detectOnlineService, IDetectVersionService2 detectVersionService, ILogger<CommandBase<TSettings>> logger, ITelemetryLogger telemetryLogger)
+        public CommandBase(IHostApplicationLifetime appLifetime, IDetectOnlineService detectOnlineService, IDetectVersionService2 detectVersionService, ILogger<CommandBase<TSettings>> logger, ITelemetryLogger telemetryLogger, IMigrationToolVersion migrationToolVersion)
         {
+            _MigrationToolVersion = migrationToolVersion;
             _LifeTime = appLifetime;
             _detectOnlineService = detectOnlineService;
             _detectVersionService = detectVersionService;
@@ -138,12 +141,12 @@ namespace MigrationTools.Host.Commands
         private void ApplicationStartup( TSettings settings)
         {
             _mainTimer.Start();
-            AsciiLogo(DetectVersionService2.GetRunningVersion().versionString);
+            AsciiLogo(_MigrationToolVersion.GetRunningVersion().versionString);
             TelemetryNote();
             _logger.LogInformation("Start Time: {StartTime}", DateTime.Now.ToUniversalTime().ToLocalTime());
             _logger.LogInformation("Running with settings: {@settings}", settings);
             _logger.LogInformation("OSVersion: {OSVersion}", Environment.OSVersion.ToString());
-            _logger.LogInformation("Version (Assembly): {Version}", DetectVersionService2.GetRunningVersion().versionString);
+            _logger.LogInformation("Version (Assembly): {Version}", _MigrationToolVersion.GetRunningVersion().versionString);
         }
 
         private void TelemetryNote()

@@ -24,6 +24,7 @@ using Serilog.Filters;
 using MigrationTools.Host.Commands;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using MigrationTools.Services;
 
 namespace MigrationTools.Host
 {
@@ -38,12 +39,13 @@ namespace MigrationTools.Host
         public static IHostBuilder CreateDefaultBuilder(string[] args)
         {
            var configFile =  CommandSettingsBase.ForceGetConfigFile(args);
+            var mtv = new MigrationToolVersion();
 
             var hostBuilder = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args);
 
             hostBuilder.UseSerilog((hostingContext, services, loggerConfiguration) =>
             {
-                    string outputTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] [" + DetectVersionService2.GetRunningVersion().versionString + "] {Message:lj}{NewLine}{Exception}"; // {SourceContext}
+                    string outputTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] [" + mtv.GetRunningVersion().versionString + "] {Message:lj}{NewLine}{Exception}"; // {SourceContext}
                     string logsPath = CreateLogsPath();
                     var logPath = Path.Combine(logsPath, $"migration-{logs}.log");
 
@@ -119,6 +121,8 @@ namespace MigrationTools.Host
                  services.AddTransient<IDetectOnlineService, DetectOnlineService>();
                  //services.AddTransient<IDetectVersionService, DetectVersionService>();
                  services.AddTransient<IDetectVersionService2, DetectVersionService2>();
+                 services.AddSingleton<IMigrationToolVersionInfo, MigrationToolVersionInfo>();
+                 services.AddSingleton<IMigrationToolVersion, MigrationToolVersion>();
 
                  // Config
                  services.AddSingleton<IEngineConfigurationBuilder, EngineConfigurationBuilder>();

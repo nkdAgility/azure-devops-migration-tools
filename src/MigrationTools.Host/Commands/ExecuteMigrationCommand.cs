@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MigrationTools.Host.Commands;
 using MigrationTools.Host.Services;
+using MigrationTools.Services;
 using Spectre.Console.Cli;
 
 namespace MigrationTools.Host.Commands
@@ -20,7 +21,7 @@ namespace MigrationTools.Host.Commands
 
         public ExecuteMigrationCommand(IServiceProvider services,
             ILogger<ExecuteMigrationCommand> logger,
-            IHostApplicationLifetime appLifetime, ITelemetryLogger telemetryLogger, IDetectOnlineService detectOnlineService, IDetectVersionService2 detectVersionService) : base(appLifetime, detectOnlineService, detectVersionService, logger, telemetryLogger)
+            IHostApplicationLifetime appLifetime, ITelemetryLogger telemetryLogger, IDetectOnlineService detectOnlineService, IDetectVersionService2 detectVersionService, IMigrationToolVersion migrationToolVersion) : base(appLifetime, detectOnlineService, detectVersionService, logger, telemetryLogger, migrationToolVersion)
         {
             Telemetery = telemetryLogger;
             _services = services;

@@ -5,16 +5,12 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using MigrationTools.Host.Services;
+using MigrationTools.Services;
 
-namespace MigrationTools.Host.Tests.Services
+namespace MigrationTools.Tests
 {
-    class FakeMigrationToolVersionInfo : IMigrationToolVersionInfo
+    class FakeMigrationToolVersionInfo : MigrationToolVersionInfo
     {
-        public string ProductVersion { get; private set; }
-        public string FileVersion { get; private set; }
-        public string GitTag { get; private set; }
-
         public FakeMigrationToolVersionInfo(string productVersion, string fileVersion, string gitTag)
         {
             ProductVersion = productVersion;
