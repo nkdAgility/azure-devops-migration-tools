@@ -128,7 +128,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{BB4972
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NKDAgility.AzureDevOps.Tools.CommandHost", "src\NKDAgility.AzureDevOps.Tools.CommandHost\NKDAgility.AzureDevOps.Tools.CommandHost.csproj", "{60EF98A1-5AA4-4589-8B6F-A77B3940025D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MigrationTools.Fakes", "src\MigrationTools.Fakes\MigrationTools.Fakes.csproj", "{EB20ED85-8876-4585-BC90-E6976C11DEE3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Helpers.Tests", "src\MigrationTools.Fakes\MigrationTools.Helpers.Tests.csproj", "{EB20ED85-8876-4585-BC90-E6976C11DEE3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
