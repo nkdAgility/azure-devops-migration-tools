@@ -5,6 +5,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools.Services;
 using Serilog;
 using Serilog.Events;
+using MigrationTools.Host.Tests;
+using MigrationTools.Tests;
 
 namespace MigrationTools.Host.Services.Tests
 {
@@ -27,7 +29,7 @@ namespace MigrationTools.Host.Services.Tests
         public void DetectVersionServiceTest_Initialise()
         {
             var loggerFactory = new LoggerFactory().AddSerilog();
-            IDetectVersionService2 dos = new DetectVersionService2(new TelemetryLoggerMock(), new Logger<IDetectVersionService2>(loggerFactory));
+            IDetectVersionService2 dos = new DetectVersionService2(new TelemetryLoggerMock(), new Logger<IDetectVersionService2>(loggerFactory), new FakeMigrationToolVersion());
             Assert.IsNotNull(dos);
 
         }
