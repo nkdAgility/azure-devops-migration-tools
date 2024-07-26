@@ -22,6 +22,7 @@
   <ItemGroup>
     <ProjectReference Include="..\MigrationTools.Clients.InMemory\MigrationTools.Clients.InMemory.csproj" />
     <ProjectReference Include="..\MigrationTools.Fakes\MigrationTools.Fakes.csproj" />
+    <ProjectReference Include="..\MigrationTools.Fakes\MigrationTools.Helpers.Tests.csproj" />
     <ProjectReference Include="..\MigrationTools.TestExtensions\MigrationTools.TestExtensions.csproj" />
     <ProjectReference Include="..\MigrationTools\MigrationTools.csproj" />
   </ItemGroup>
