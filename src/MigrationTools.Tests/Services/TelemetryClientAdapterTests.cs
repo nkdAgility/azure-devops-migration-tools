@@ -13,10 +13,6 @@ namespace MigrationTools.Tests
     [TestClass()]
     public class TelemetryClientAdapterTests
     {
-        [TestMethod()]
-        public void TrackExceptionTest()
-        {
-            TelemetryClientAdapter x = new TelemetryClientAdapter(null,);
-        }
+       
     }
 }

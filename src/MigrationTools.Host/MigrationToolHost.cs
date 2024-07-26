@@ -64,7 +64,7 @@ namespace MigrationTools.Host
                             .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Debug, theme: AnsiConsoleTheme.Code, outputTemplate: outputTemplate))
                         .WriteTo.Logger(lc => lc
                             .Filter.ByExcluding(Matching.FromSource("Microsoft"))
-                            .WriteTo.ApplicationInsights(services.GetService<TelemetryClient>(), new CustomConverter(), LogEventLevel.Error));
+                            .WriteTo.ApplicationInsights(services.GetService<TelemetryConfiguration> (), new CustomConverter(), LogEventLevel.Error));
                     logs++;
                     LoggerHasBeenBuilt = true;                
             });
