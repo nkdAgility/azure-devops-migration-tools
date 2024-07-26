@@ -7,6 +7,8 @@ using System.Text.RegularExpressions;
 using Elmah.Io.Client;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
+using Microsoft.ApplicationInsights.Extensibility;
+using MigrationTools.Services;
 
 namespace MigrationTools
 {
@@ -14,15 +16,17 @@ namespace MigrationTools
     {
         private TelemetryClient _telemetryClient;
         private static IElmahioAPI elmahIoClient;
+        private static IMigrationToolVersion _MigrationToolVersion;
 
-        public TelemetryClientAdapter(TelemetryClient telemetryClient)
+        public TelemetryClientAdapter(TelemetryConfiguration telemetryConfiguration, IMigrationToolVersion migrationToolVersion)
         {
-            telemetryClient.InstrumentationKey = "2d666f84-b3fb-4dcf-9aad-65de038d2772";
+            TelemetryClient telemetryClient = new TelemetryClient(telemetryConfiguration);
+            _MigrationToolVersion = migrationToolVersion;
             telemetryClient.Context.Session.Id = Guid.NewGuid().ToString();
             telemetryClient.Context.Device.OperatingSystem = Environment.OSVersion.ToString();
             if (!(System.Reflection.Assembly.GetEntryAssembly() is null))
             {
-                telemetryClient.Context.Component.Version = GetRunningVersion().versionString;
+                telemetryClient.Context.Component.Version = migrationToolVersion.GetRunningVersion().versionString;
             }
             _telemetryClient = telemetryClient;
 
@@ -31,7 +35,7 @@ namespace MigrationTools
                 Timeout = TimeSpan.FromSeconds(30),
                 UserAgent = "Azure-DevOps-Migration-Tools",
             });
-            elmahIoClient.Messages.OnMessage += (sender, args) => args.Message.Version = GetRunningVersion().versionString;
+            elmahIoClient.Messages.OnMessage += (sender, args) => args.Message.Version = migrationToolVersion.GetRunningVersion().versionString;
 
         }
 
@@ -87,11 +91,11 @@ namespace MigrationTools
                 Application = "Azure-DevOps-Migration-Tools",
                 ServerVariables = new List<Item>
                     {
-                        new Item("User-Agent", $"X-ELMAHIO-APPLICATION; OS={Environment.OSVersion.Platform}; OSVERSION={Environment.OSVersion.Version}; ENGINEVERSION={GetRunningVersion().versionString}; ENGINE=Azure-DevOps-Migration-Tools"),
+                        new Item("User-Agent", $"X-ELMAHIO-APPLICATION; OS={Environment.OSVersion.Platform}; OSVERSION={Environment.OSVersion.Version}; ENGINEVERSION={_MigrationToolVersion.GetRunningVersion().versionString}; ENGINE=Azure-DevOps-Migration-Tools"),
                     }
             };
             createMessage.Data.Add(new Item("SessionId", SessionId));
-            createMessage.Data.Add(new Item("Version", GetRunningVersion().versionString));
+            createMessage.Data.Add(new Item("Version", _MigrationToolVersion.GetRunningVersion().versionString));
 
             if (properties != null)
             {
@@ -115,22 +119,6 @@ namespace MigrationTools
         public void TrackRequest(string name, DateTimeOffset startTime, TimeSpan duration, string responseCode, bool success)
         {
             _telemetryClient.TrackRequest(name, startTime, duration, responseCode, success);
-        }
-
-        public static (Version version, string PreReleaseLabel, string versionString) GetRunningVersion()
-        {
-            FileVersionInfo myFileVersionInfo = FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly()?.Location);
-            var matches = Regex.Matches(myFileVersionInfo.ProductVersion, @"^(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)\.(?<build>0|[1-9]\d*)(?:-((?<label>:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?<fullEnd>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$");
-            Version version = new Version(myFileVersionInfo.FileVersion);
-            string textVersion = "0.0.0-local";
-            if (version.CompareTo(new Version(0, 0, 0, 0)) == 0)
-            {
-                textVersion = ThisAssembly.Git.SemVer.Major + "." + ThisAssembly.Git.SemVer.Minor + "." + ThisAssembly.Git.SemVer.Patch + "-" + matches[0].Groups[1].Value;
-            } else
-            {
-                textVersion = version.Major + "." + version.Minor + "." + version.Build + "-" + matches[0].Groups[1].Value;
-            }
-            return (version, matches[0].Groups[1].Value, textVersion);
         }
     }
 }
