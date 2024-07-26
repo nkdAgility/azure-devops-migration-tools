@@ -73,7 +73,7 @@ namespace MigrationTools._EngineV1.Configuration
             string appVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString(2);
             if (ec?.Version != appVersion)
             {
-                _logger.LogError("The config version {Version} does not match the current app version {appVersion}. There may be compatability issues and we recommend that you generate a new default config and then tranfer the settings accross.", ec.Version, appVersion);
+                _logger.LogCritical("The config version {Version} does not match the current app version {appVersion}. There may be compatability issues and we recommend that you generate a new default config and then tranfer the settings accross.", ec.Version, appVersion);
                 if (System.Diagnostics.Debugger.IsAttached)
                 {
                     _logger.LogInformation("But since you're running in Debug, let's move on");
