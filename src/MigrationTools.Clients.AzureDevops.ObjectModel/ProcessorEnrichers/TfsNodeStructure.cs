@@ -182,7 +182,6 @@ namespace MigrationTools.Enrichers
                         } catch (Exception ex)
                         {
                             Log.LogDebug("  Not Found:", currentAncestorPath);
-                            Telemetry.TrackException(ex, null, null);
                             parentNode = null;
                         }
                         
@@ -196,8 +195,8 @@ namespace MigrationTools.Enrichers
 
             if (parentNode == null)
             {
-                throw new InvalidOperationException(
-                    $"Path {nodePath} is not anchored in the target project, it cannot be created.");
+                Log.LogCritical($"Path {nodePath} is not anchored in the target project, it cannot be created.");
+                Environment.Exit(-1);
             }
 
             // Now that we have a parent, we can start creating nodes down the tree from that point

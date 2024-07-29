@@ -58,11 +58,10 @@ namespace MigrationTools.Host
                         .Enrich.WithProcessId()
                         .WriteTo.File(logPath, LogEventLevel.Verbose, outputTemplate)
                         .WriteTo.Logger(lc => lc
-                            .Filter.ByExcluding(Matching.FromSource("Microsoft"))
-                            .Filter.ByExcluding(Matching.FromSource("MigrationTools.Host.StartupService"))
+                            .Filter.ByExcluding(Matching.FromSource("Microsoft.Hosting.Lifetime"))
+                            .Filter.ByExcluding(Matching.FromSource("Microsoft.Extensions.Hosting.Internal.Host"))
                             .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Debug, theme: AnsiConsoleTheme.Code, outputTemplate: outputTemplate))
                         .WriteTo.Logger(lc => lc
-                            .Filter.ByExcluding(Matching.FromSource("Microsoft"))
                             .WriteTo.ApplicationInsights(services.GetService<TelemetryConfiguration> (), new CustomConverter(), LogEventLevel.Error));
                     logs++;
                     LoggerHasBeenBuilt = true;                
@@ -88,8 +87,8 @@ namespace MigrationTools.Host
                      var logger = sp.GetService<ILoggerFactory>().CreateLogger<EngineConfiguration>();
                      if (!File.Exists(configFile))
                      {
-                         logger.LogInformation("The config file {ConfigFile} does not exist, nor does the default 'configuration.json'. Use '{ExecutableName}.exe init' to create a configuration file first", configFile, Assembly.GetEntryAssembly().GetName().Name);
-                         throw new ArgumentException("missing configfile");
+                         logger.LogCritical("The config file {ConfigFile} does not exist, nor does the default 'configuration.json'. Use '{ExecutableName}.exe init' to create a configuration file first", configFile, Assembly.GetEntryAssembly().GetName().Name);
+                         Environment.Exit(-1);
                      }
                      logger.LogInformation("Config Found, creating engine host");
                      var reader = sp.GetRequiredService<IEngineConfigurationReader>();
