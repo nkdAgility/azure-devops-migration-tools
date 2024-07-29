@@ -182,7 +182,6 @@ namespace MigrationTools.Enrichers
                         } catch (Exception ex)
                         {
                             Log.LogDebug("  Not Found:", currentAncestorPath);
-                            Telemetry.TrackException(ex, null, null);
                             parentNode = null;
                         }
                         
