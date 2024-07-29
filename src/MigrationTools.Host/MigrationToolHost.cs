@@ -59,11 +59,11 @@ namespace MigrationTools.Host
                         .Enrich.WithProcessId()
                         .WriteTo.File(logPath, LogEventLevel.Verbose, outputTemplate)
                         .WriteTo.Logger(lc => lc
-                            .Filter.ByExcluding(Matching.FromSource("Microsoft"))
-                            .Filter.ByExcluding(Matching.FromSource("MigrationTools.Host.StartupService"))
+                            //.Filter.ByExcluding(Matching.FromSource("Microsoft"))
+                            //.Filter.ByExcluding(Matching.FromSource("MigrationTools.Host.StartupService"))
                             .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Debug, theme: AnsiConsoleTheme.Code, outputTemplate: outputTemplate))
                         .WriteTo.Logger(lc => lc
-                            .Filter.ByExcluding(Matching.FromSource("Microsoft"))
+                            //.Filter.ByExcluding(Matching.FromSource("Microsoft"))
                             .WriteTo.ApplicationInsights(services.GetService<TelemetryConfiguration> (), new CustomConverter(), LogEventLevel.Error));
                     logs++;
                     LoggerHasBeenBuilt = true;                
@@ -175,18 +175,6 @@ namespace MigrationTools.Host
             {
                 return;
             }
-
-
-            // Disanle telemitery from options
-            //bool DisableTelemetry = false;
-            //Serilog.ILogger logger = host.Services.GetService<Serilog.ILogger>();
-            //if (executeOptions is not null && bool.TryParse(executeOptions.DisableTelemetry, out DisableTelemetry))
-            //{
-            //    TelemetryConfiguration ai = host.Services.GetService<TelemetryConfiguration>();
-            //    ai.DisableTelemetry = DisableTelemetry;
-            //}
-            //logger.Information("Telemetry: {status}", !DisableTelemetry);
-
             await host.RunAsync();
         }
 
