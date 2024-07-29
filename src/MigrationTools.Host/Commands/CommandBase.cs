@@ -6,6 +6,8 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.ApplicationInsights.Extensibility;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MigrationTools.Host.Services;
@@ -18,6 +20,7 @@ namespace MigrationTools.Host.Commands
 {
     internal abstract class CommandBase<TSettings> : AsyncCommand<TSettings> where TSettings : CommandSettingsBase
     {
+        private IServiceProvider _services;
         private IMigrationToolVersion _MigrationToolVersion;
         private readonly IHostApplicationLifetime _LifeTime;
         private readonly IDetectOnlineService _detectOnlineService;
@@ -26,8 +29,9 @@ namespace MigrationTools.Host.Commands
         private readonly ITelemetryLogger _telemetryLogger;
         private static Stopwatch _mainTimer = new Stopwatch();
 
-        public CommandBase(IHostApplicationLifetime appLifetime, IDetectOnlineService detectOnlineService, IDetectVersionService2 detectVersionService, ILogger<CommandBase<TSettings>> logger, ITelemetryLogger telemetryLogger, IMigrationToolVersion migrationToolVersion)
+        public CommandBase(IHostApplicationLifetime appLifetime, IServiceProvider services, IDetectOnlineService detectOnlineService, IDetectVersionService2 detectVersionService, ILogger<CommandBase<TSettings>> logger, ITelemetryLogger telemetryLogger, IMigrationToolVersion migrationToolVersion)
         {
+            _services = services;
             _MigrationToolVersion = migrationToolVersion;
             _LifeTime = appLifetime;
             _detectOnlineService = detectOnlineService;
@@ -39,7 +43,11 @@ namespace MigrationTools.Host.Commands
         public override async Task<int> ExecuteAsync(CommandContext context, TSettings settings)
         {
             _mainTimer.Start();
-            _logger.LogTrace("Starting {CommandName}", this.GetType().Name);
+            // Disable Telemetry
+            TelemetryConfiguration ai = _services.GetService<TelemetryConfiguration>();
+            ai.DisableTelemetry = settings.DisableTelemetry;
+            // Run the command
+            Log.Debug("Starting {CommandName}", this.GetType().Name);
             _telemetryLogger.TrackEvent(this.GetType().Name);
             RunStartupLogic(settings);
             try
@@ -142,23 +150,31 @@ namespace MigrationTools.Host.Commands
         {
             _mainTimer.Start();
             AsciiLogo(_MigrationToolVersion.GetRunningVersion().versionString);
-            TelemetryNote();
+            TelemetryNote(settings);
             _logger.LogInformation("Start Time: {StartTime}", DateTime.Now.ToUniversalTime().ToLocalTime());
             _logger.LogInformation("Running with settings: {@settings}", settings);
             _logger.LogInformation("OSVersion: {OSVersion}", Environment.OSVersion.ToString());
             _logger.LogInformation("Version (Assembly): {Version}", _MigrationToolVersion.GetRunningVersion().versionString);
         }
 
-        private void TelemetryNote()
+        private void TelemetryNote(TSettings settings)
         {
+            _logger.LogInformation("--------------------------------------");
             _logger.LogInformation("Telemetry Note:");
-            _logger.LogInformation("   We use Application Insights to collect usage and error information in order to improve the quality of the tools.");
-            _logger.LogInformation("   Currently we collect the following anonymous data:");
-            _logger.LogInformation("     -Event data: application version, client city/country, hosting type, item count, error count, warning count, elapsed time.");
-            _logger.LogInformation("     -Exceptions: application errors and warnings.");
-            _logger.LogInformation("     -Dependencies: REST/ObjectModel calls to Azure DevOps to help us understand performance issues.");
-            _logger.LogInformation("   This data is tied to a session ID that is generated on each run of the application and shown in the logs. This can help with debugging. If you want to disable telemetry you can run the tool with '--disableTelemetry' on the command prompt.");
-            _logger.LogInformation("   Note: Exception data cannot be 100% guaranteed to not leak production data");
+            if (settings.DisableTelemetry)
+            {
+                _logger.LogInformation("   Telemetry is disabled by the user.");
+            } else
+            {
+                _logger.LogInformation("   We use Application Insights to collect usage and error information in order to improve the quality of the tools.");
+                _logger.LogInformation("   Currently we collect the following anonymous data:");
+                _logger.LogInformation("     -Event data: application version, client city/country, hosting type, item count, error count, warning count, elapsed time.");
+                _logger.LogInformation("     -Exceptions: application errors and warnings.");
+                _logger.LogInformation("     -Dependencies: REST/ObjectModel calls to Azure DevOps to help us understand performance issues.");
+                _logger.LogInformation("   This data is tied to a session ID that is generated on each run of the application and shown in the logs. This can help with debugging. If you want to disable telemetry you can run the tool with '--disableTelemetry' on the command prompt.");
+                _logger.LogInformation("   Note: Exception data cannot be 100% guaranteed to not leak production data");
+            }
+            
             _logger.LogInformation("--------------------------------------");
         }
 
