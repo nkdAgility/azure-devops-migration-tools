@@ -18,13 +18,13 @@ using Serilog;
 using Serilog.Core;
 using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
-using Spectre.Console.Cli.Extensions.DependencyInjection;
 using Spectre.Console.Cli;
 using Serilog.Filters;
 using MigrationTools.Host.Commands;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using MigrationTools.Services;
+using Spectre.Console.Extensions.Hosting;
 
 namespace MigrationTools.Host
 {
@@ -42,7 +42,6 @@ namespace MigrationTools.Host
             var mtv = new MigrationToolVersion();
 
             var hostBuilder = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args);
-
             hostBuilder.UseSerilog((hostingContext, services, loggerConfiguration) =>
             {
                     string outputTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] [" + mtv.GetRunningVersion().versionString + "] {Message:lj}{NewLine}{Exception}"; // {SourceContext}
@@ -134,47 +133,19 @@ namespace MigrationTools.Host
                  services.AddMigrationToolServicesLegacy();
                  // New v2Bits
                  services.AddMigrationToolServices();
-
-                 // Host Services
-                 services.AddTransient<IStartupService, StartupService>();
-
              });
 
-            hostBuilder.ConfigureServices((context, services) =>
+            hostBuilder.UseSpectreConsole(config =>
             {
-                using var registrar = new DependencyInjectionRegistrar(services);
-                var app = new CommandApp(registrar);
-                app.Configure(config =>
-                {
-                    config.PropagateExceptions();
-                    config.AddCommand<Commands.ExecuteMigrationCommand>("execute");
-                    config.AddCommand<Commands.InitMigrationCommand>("init");
-
-                });
-                services.AddSingleton<ICommandApp>(app);
+                config.AddCommand<Commands.ExecuteMigrationCommand>("execute");
+                config.AddCommand<Commands.InitMigrationCommand>("init");
+                config.PropagateExceptions();
             });
-
-            hostBuilder.ConfigureServices((context, services) =>
-            {
-                services.AddHostedService<MigrationService>();
-            });
-
             hostBuilder.UseConsoleLifetime();
 
 
 
             return hostBuilder;
-        }
-
-        public static async Task RunMigrationTools(this IHostBuilder hostBuilder, string[] args)
-        {
-            var host = hostBuilder.Build();
-            var startupService = host.InitializeMigrationSetup(args);
-            if (startupService == null)
-            {
-                return;
-            }
-            await host.RunAsync();
         }
 
         static string logDate = DateTime.Now.ToString("yyyyMMddHHmmss");

@@ -26,7 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MigrationTools.Fakes\MigrationTools.Fakes.csproj" />
+    <ProjectReference Include="..\MigrationTools.Helpers.Tests\MigrationTools.Helpers.Tests.csproj" />
     <ProjectReference Include="..\MigrationTools.Host\MigrationTools.Host.csproj" />
     <ProjectReference Include="..\MigrationTools.Tests\MigrationTools.Tests.csproj" />
   </ItemGroup>

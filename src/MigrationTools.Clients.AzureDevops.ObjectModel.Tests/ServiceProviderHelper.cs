@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MigrationTools.Endpoints;
-using MigrationTools.Fakes;
+using MigrationTools.Helpers.Tests;
 using MigrationTools.Services;
 using MigrationTools.TestExtensions;
 

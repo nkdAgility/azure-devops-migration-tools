@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MigrationTools.Services;
 
-namespace MigrationTools.Fakes
+namespace MigrationTools.Helpers.Tests
 {
     public class FakeMigrationToolVersionInfo : MigrationToolVersionInfo
     {
