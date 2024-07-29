@@ -98,7 +98,7 @@ namespace MigrationTools.ProcessorEnrichers
                 }
                 catch (Exception ex)
                 {
-                    Log.LogWarning(" ERROR: Unable to delete folder {0}! Should be cleanned up at the end.", _exportWiPath);
+                    Log.LogWarning(" ERROR: Unable to delete folder {0}! Should be cleaned up at the end.", _exportWiPath);
                 }
             }
         }
