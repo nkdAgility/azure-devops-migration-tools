@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using MigrationTools.Fakes;
 using MigrationTools.Services;
 using MigrationTools.TestExtensions;
+using MigrationTools.Helpers.Tests;
 
 namespace MigrationTools.Tests
 {

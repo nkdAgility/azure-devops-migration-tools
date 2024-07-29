@@ -7,7 +7,7 @@ using Serilog;
 using Serilog.Events;
 using MigrationTools.Host.Tests;
 using MigrationTools.Tests;
-using MigrationTools.Fakes;
+using MigrationTools.Helpers.Tests;
 
 namespace MigrationTools.Host.Services.Tests
 {
