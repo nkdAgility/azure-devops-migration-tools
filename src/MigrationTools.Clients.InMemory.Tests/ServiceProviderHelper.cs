@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using MigrationTools.Fakes;
+using MigrationTools.Helpers.Tests;
 using MigrationTools.Services;
 using MigrationTools.TestExtensions;
 

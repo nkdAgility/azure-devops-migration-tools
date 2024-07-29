@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Microsoft.Extensions.Hosting;
 using MigrationTools;
 using MigrationTools.Host;
 
@@ -27,7 +28,7 @@ namespace VstsSyncMigrator.ConsoleApp
                     services.AddMigrationToolServicesForClientLegacyCore();
                 });
 
-            await hostBuilder.RunMigrationTools(args);
+            await hostBuilder.RunConsoleAsync();
         }
     }
 }

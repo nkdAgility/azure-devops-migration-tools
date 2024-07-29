@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using MigrationTools.Clients.AzureDevops.Rest.FieldMaps;
 using MigrationTools.Host;
 
@@ -35,7 +36,7 @@ namespace MigrationTools.ConsoleCore
                     // Core
                     // services.AddTransient<IMigrationClient, MigrationRestClient>();
                 });
-            await hostBuilder.RunMigrationTools(args);
+            await hostBuilder.RunConsoleAsync();
         }
     }
 }
