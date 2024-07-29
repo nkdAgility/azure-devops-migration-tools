@@ -276,7 +276,7 @@ jobs:
         id: release-options
         shell: pwsh
         run: |
-             if ($Env:nkdAgility_Ring -ne 'Canary' && ($Env:HasChanged_src || $Env:HasChanged_docs )) {
+             if ($Env:nkdAgility_Ring -eq 'Release') {
                 echo "discussion_category_name=Anouncement" >> $env:GITHUB_OUTPUT    
              }
              
