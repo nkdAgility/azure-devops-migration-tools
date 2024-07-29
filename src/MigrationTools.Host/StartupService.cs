@@ -46,10 +46,18 @@ namespace MigrationTools.Host
 
         public void Configure(IHostApplicationLifetime appLifetime)
         {
+
             appLifetime.ApplicationStarted.Register(() =>
             {
-                _logger.LogInformation("Press Ctrl+C to shut down.");
+                //_logger.LogInformation("Press Ctrl+C to shut down.");
             });
+
+
+            appLifetime.ApplicationStopping.Register(() =>
+            {
+                //_logger.LogInformation("Stopping");
+            });
+            
 
             appLifetime.ApplicationStopped.Register(() =>
             {
@@ -59,6 +67,10 @@ namespace MigrationTools.Host
 
         public void RunExitLogic()
         {
+           if (Environment.ExitCode <0 )
+            {
+                _logger.LogError("The application ended with an error code of {ExitCode}", Environment.ExitCode);
+            }
             _logger.LogTrace("Application Ending");
             _mainTimer.Stop();
             _telemetryLogger.TrackEvent("ApplicationEnd", null,
@@ -66,7 +78,7 @@ namespace MigrationTools.Host
             { "Application_Elapsed", _mainTimer.ElapsedMilliseconds }
                 });
             _telemetryLogger.CloseAndFlush();
-            _logger.LogInformation("The application ran in {Application_Elapsed} and finished at {Application_EndTime}", _mainTimer.Elapsed.ToString("c"), DateTime.Now.ToUniversalTime().ToLocalTime());
+            _logger.LogDebug("The application ran in {Application_Elapsed} and finished at {Application_EndTime}", _mainTimer.Elapsed.ToString("c"), DateTime.Now.ToUniversalTime().ToLocalTime());
         }
 
         private void ApplicationStartup(string[] args)
@@ -79,6 +91,7 @@ namespace MigrationTools.Host
         protected void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             _logger.LogError((Exception)e.ExceptionObject, "An Unhandled exception occured.");
+            _telemetryLogger.TrackException((Exception)e.ExceptionObject);
             //_logger.LogCloseAndFlush();
             System.Threading.Thread.Sleep(5000);
         }

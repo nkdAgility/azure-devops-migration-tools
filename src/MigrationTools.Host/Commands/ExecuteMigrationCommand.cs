@@ -19,9 +19,10 @@ namespace MigrationTools.Host.Commands
         private readonly IHostApplicationLifetime _appLifetime;
         private readonly ITelemetryLogger Telemetery;
 
+
         public ExecuteMigrationCommand(IServiceProvider services,
             ILogger<ExecuteMigrationCommand> logger,
-            IHostApplicationLifetime appLifetime, ITelemetryLogger telemetryLogger, IDetectOnlineService detectOnlineService, IDetectVersionService2 detectVersionService, IMigrationToolVersion migrationToolVersion) : base(appLifetime, detectOnlineService, detectVersionService, logger, telemetryLogger, migrationToolVersion)
+            IHostApplicationLifetime appLifetime, ITelemetryLogger telemetryLogger, IDetectOnlineService detectOnlineService, IDetectVersionService2 detectVersionService, IMigrationToolVersion migrationToolVersion) : base(appLifetime, services, detectOnlineService, detectVersionService, logger, telemetryLogger, migrationToolVersion)
         {
             Telemetery = telemetryLogger;
             _services = services;
