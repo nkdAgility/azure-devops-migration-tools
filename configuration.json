@@ -3,112 +3,123 @@
   "Source": {
     "$type": "TfsTeamProjectConfig",
     "Collection": "https://dev.azure.com/nkdagility-preview/",
-    "Project": "migrationSource1",
+    "Project": "myProjectName",
     "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
     "AllowCrossProjectLinking": false,
-    "AuthenticationMode": "AccessToken",
+    "AuthenticationMode": "Prompt",
     "PersonalAccessToken": "",
     "PersonalAccessTokenVariableName": "",
     "LanguageMaps": {
       "AreaPath": "Area",
       "IterationPath": "Iteration"
-    }
+    },
+    "CollectionName": "https://dev.azure.com/nkdagility-preview/"
   },
   "Target": {
     "$type": "TfsTeamProjectConfig",
     "Collection": "https://dev.azure.com/nkdagility-preview/",
-    "Project": "migrationTest5",
-    "ReflectedWorkItemIDFieldName": "nkdScrum.ReflectedWorkItemId",
+    "Project": "myProjectName",
+    "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
     "AllowCrossProjectLinking": false,
-    "AuthenticationMode": "AccessToken",
+    "AuthenticationMode": "Prompt",
     "PersonalAccessToken": "",
     "PersonalAccessTokenVariableName": "",
     "LanguageMaps": {
       "AreaPath": "Area",
       "IterationPath": "Iteration"
-    }
+    },
+    "CollectionName": "https://dev.azure.com/nkdagility-preview/"
   },
-  "FieldMaps": [],
-  "GitRepoMapping": null,
-  "LogLevel": "Debug",
-  "CommonEnrichersConfig": [
+  "FieldMaps": [
     {
-      "$type": "TfsNodeStructureOptions",
-      "RefName": "TfsNodeStructure",
-      "Enabled": true,
-      "NodeBasePaths": [],
-      "AreaMaps": {
-        "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1",
-        "^nkdProducts([\\\\]?.*)$": "MigrationTest5$1",
-        "^Skypoint Cloud$": "MigrationTest5"
+      "$type": "MultiValueConditionalMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceFieldsAndValues": {
+        "Field1": "Value1",
+        "Field2": "Value2"
       },
-      "IterationMaps": {
-        "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1",
-        "^nkdProducts([\\\\]?.*)$": "MigrationTest5$1",
-        "^Skypoint Cloud\\\\Sprint 1$": "MigrationTest5\\Sprint 1"
-      },
-      "ShouldCreateMissingRevisionPaths": true,
-      "ReplicateAllExistingNodes": true
+      "targetFieldsAndValues": {
+        "Field1": "Value1",
+        "Field2": "Value2"
+      }
     },
     {
-      "$type": "TfsTeamSettingsEnricherOptions",
-      "Enabled": true,
-      "MigrateTeamSettings": true,
-      "UpdateTeamSettings": true,
-      "MigrateTeamCapacities": true,
-      "Teams": null
+      "$type": "FieldSkipMapConfig",
+      "WorkItemTypeName": "*",
+      "targetField": "TfsMigrationTool.ReflectedWorkItemId"
     },
     {
-      "$type": "TfsWorkItemLinkEnricherOptions",
-      "RefName": "TfsWorkItemLinkEnricher",
-      "Enabled": true,
-      "FilterIfLinkCountMatches": true,
-      "SaveAfterEachLinkIsAdded": false
+      "$type": "FieldValueMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceField": "System.State",
+      "targetField": "System.State",
+      "defaultValue": "New",
+      "valueMapping": {
+        "Approved": "New",
+        "New": "New",
+        "Committed": "Active",
+        "In Progress": "Active",
+        "To Do": "New",
+        "Done": "Closed",
+        "Removed": "Removed"
+      }
     },
     {
-      "$type": "TfsRevisionManagerOptions",
-      "RefName": "TfsRevisionManager",
-      "Enabled": true,
-      "ReplayRevisions": true,
-      "MaxRevisions": 0
+      "$type": "FieldtoFieldMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceField": "Microsoft.VSTS.Common.BacklogPriority",
+      "targetField": "Microsoft.VSTS.Common.StackRank",
+      "defaultValue": null
     },
     {
-      "$type": "TfsAttachmentEnricherOptions",
-      "RefName": "TfsAttachmentEnricher",
-      "Enabled": true,
-      "ExportBasePath": "c:\\temp\\WorkItemAttachmentExport",
-      "MaxRevisions": 480000000
+      "$type": "FieldtoFieldMultiMapConfig",
+      "WorkItemTypeName": "*",
+      "SourceToTargetMappings": {
+        "SourceField1": "TargetField1",
+        "SourceField2": "TargetField2"
+      }
     },
     {
-      "$type": "StringManipulatorEnricherOptions",
-      "RefName": "StringManipulator",
-      "Enabled": true,
-      "MaxStringLength": 1000000,
-      "Manipulators": [
-        {
-          "$type": "RegexStringManipulator",
-          "Enabled": true,
-          "Pattern": "[^( -~)\n\r\t]+",
-          "Replacement": "",
-          "Description": "Remove invalid characters from the end of the string"
-        }
-      ]
+      "$type": "FieldtoTagMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceField": "System.State",
+      "formatExpression": "ScrumState:{0}"
     },
     {
-      "$type": "TfsUserMappingEnricherOptions",
-      "RefName": "TfsUserMappingEnricher",
-      "Enabled": true,
-      "UserMappingFile": "C:\\temp\\userExport.json",
-      "IdentityFieldsToCheck": [
-        "System.AssignedTo",
-        "System.ChangedBy",
-        "System.CreatedBy",
-        "Microsoft.VSTS.Common.ActivatedBy",
-        "Microsoft.VSTS.Common.ResolvedBy",
-        "Microsoft.VSTS.Common.ClosedBy"
-      ]
+      "$type": "FieldMergeMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceFields": [
+        "System.Description",
+        "Microsoft.VSTS.Common.AcceptanceCriteria"
+      ],
+      "targetField": "System.Description",
+      "formatExpression": "{0} <br/><br/><h3>Acceptance Criteria</h3>{1}"
+    },
+    {
+      "$type": "RegexFieldMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceField": "COMPANY.PRODUCT.Release",
+      "targetField": "COMPANY.DEVISION.MinorReleaseVersion",
+      "pattern": "PRODUCT \\d{4}.(\\d{1})",
+      "replacement": "$1"
+    },
+    {
+      "$type": "FieldValuetoTagMapConfig",
+      "WorkItemTypeName": "*",
+      "sourceField": "Microsoft.VSTS.CMMI.Blocked",
+      "pattern": "Yes",
+      "formatExpression": "{0}"
+    },
+    {
+      "$type": "TreeToTagMapConfig",
+      "WorkItemTypeName": "*",
+      "toSkip": 3,
+      "timeTravel": 1
     }
   ],
+  "GitRepoMapping": {},
+  "LogLevel": "Information",
+  "CommonEnrichersConfig": [],
   "Processors": [
     {
       "$type": "WorkItemMigrationConfig",
@@ -116,7 +127,7 @@
       "UpdateCreatedDate": true,
       "UpdateCreatedBy": true,
       "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
-      "FixHtmlAttachmentLinks": false,
+      "FixHtmlAttachmentLinks": true,
       "WorkItemCreateRetryLimit": 5,
       "FilterWorkItemsThatAlreadyExistInTarget": false,
       "PauseAfterEachWorkItem": false,
@@ -126,26 +137,12 @@
       "MaxGracefulFailures": 0,
       "SkipRevisionWithInvalidIterationPath": false,
       "SkipRevisionWithInvalidAreaPath": false
-    },
-    {
-      "$type": "WorkItemPostProcessingConfig",
-      "Enabled": true,
-      "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
-      "WorkItemCreateRetryLimit": 5,
-      "FilterWorkItemsThatAlreadyExistInTarget": false,
-      "PauseAfterEachWorkItem": false
-    },
-    {
-      "$type": "ExportUsersForMappingConfig",
-      "Enabled": false,
-      "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
-      "OnlyListUsersInWorkItems": true
     }
   ],
-  "Version": "15.0",
+  "Version": "15.1",
   "workaroundForQuerySOAPBugEnabled": false,
   "WorkItemTypeDefinition": {
-    "User Story": "Product Backlog Item"
+    "sourceWorkItemTypeName": "targetWorkItemTypeName"
   },
   "Endpoints": {
     "InMemoryWorkItemEndpoints": [

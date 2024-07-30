@@ -22,6 +22,10 @@
     },
     "empty": {
       "commandName": "Project"
+    },
+    "Execute -noconfig": {
+      "commandName": "Project",
+      "commandLineArgs": "execute"
     }
   }
 }

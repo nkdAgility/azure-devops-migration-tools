@@ -48,9 +48,12 @@ namespace MigrationTools.Host
             {
                 string outputTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] [" + mtv.GetRunningVersion().versionString + "] {Message:lj}{NewLine}{Exception}"; // {SourceContext}
                 string logsPath = CreateLogsPath();
+
                 var logPath = Path.Combine(logsPath, $"migration-{logs}.log");
 
                 var logLevel = hostingContext.Configuration.GetValue<LogEventLevel>("LogLevel");
+               
+
                 var levelSwitch = new LoggingLevelSwitch(logLevel);
                 loggerConfiguration
                     .MinimumLevel.ControlledBy(levelSwitch)
@@ -78,7 +81,9 @@ namespace MigrationTools.Host
                 {
                     builder.AddJsonFile(configFile);
                 }
+                builder.AddEnvironmentVariables();
             });
+
             hostBuilder.ConfigureServices((context, services) =>
              {
 
