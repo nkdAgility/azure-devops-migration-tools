@@ -25,11 +25,13 @@ using System.Diagnostics;
 using System.Text.RegularExpressions;
 using MigrationTools.Services;
 using Spectre.Console.Extensions.Hosting;
+using System.Configuration;
+using NuGet.Protocol.Plugins;
 
 namespace MigrationTools.Host
 {
 
-    
+
 
     public static class MigrationToolHost
     {
@@ -38,33 +40,33 @@ namespace MigrationTools.Host
 
         public static IHostBuilder CreateDefaultBuilder(string[] args)
         {
-           var configFile =  CommandSettingsBase.ForceGetConfigFile(args);
+            var configFile = CommandSettingsBase.ForceGetConfigFile(args);
             var mtv = new MigrationToolVersion();
 
             var hostBuilder = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args);
             hostBuilder.UseSerilog((hostingContext, services, loggerConfiguration) =>
             {
-                    string outputTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] [" + mtv.GetRunningVersion().versionString + "] {Message:lj}{NewLine}{Exception}"; // {SourceContext}
-                    string logsPath = CreateLogsPath();
-                    var logPath = Path.Combine(logsPath, $"migration-{logs}.log");
+                string outputTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] [" + mtv.GetRunningVersion().versionString + "] {Message:lj}{NewLine}{Exception}"; // {SourceContext}
+                string logsPath = CreateLogsPath();
+                var logPath = Path.Combine(logsPath, $"migration-{logs}.log");
 
-                    var logLevel = hostingContext.Configuration.GetValue<LogEventLevel>("LogLevel");
-                    var levelSwitch = new LoggingLevelSwitch(logLevel);
-                    loggerConfiguration
-                        .MinimumLevel.ControlledBy(levelSwitch)
-                        .ReadFrom.Configuration(hostingContext.Configuration)
-                        .Enrich.FromLogContext()
-                        .Enrich.WithMachineName()
-                        .Enrich.WithProcessId()
-                        .WriteTo.File(logPath, LogEventLevel.Verbose, outputTemplate)
-                        .WriteTo.Logger(lc => lc
-                            .Filter.ByExcluding(Matching.FromSource("Microsoft.Hosting.Lifetime"))
-                            .Filter.ByExcluding(Matching.FromSource("Microsoft.Extensions.Hosting.Internal.Host"))
-                            .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Debug, theme: AnsiConsoleTheme.Code, outputTemplate: outputTemplate))
-                        .WriteTo.Logger(lc => lc
-                            .WriteTo.ApplicationInsights(services.GetService<TelemetryConfiguration> (), new CustomConverter(), LogEventLevel.Error));
-                    logs++;
-                    LoggerHasBeenBuilt = true;                
+                var logLevel = hostingContext.Configuration.GetValue<LogEventLevel>("LogLevel");
+                var levelSwitch = new LoggingLevelSwitch(logLevel);
+                loggerConfiguration
+                    .MinimumLevel.ControlledBy(levelSwitch)
+                    .ReadFrom.Configuration(hostingContext.Configuration)
+                    .Enrich.FromLogContext()
+                    .Enrich.WithMachineName()
+                    .Enrich.WithProcessId()
+                    .WriteTo.File(logPath, LogEventLevel.Verbose, outputTemplate)
+                    .WriteTo.Logger(lc => lc
+                        .Filter.ByExcluding(Matching.FromSource("Microsoft.Hosting.Lifetime"))
+                        .Filter.ByExcluding(Matching.FromSource("Microsoft.Extensions.Hosting.Internal.Host"))
+                        .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Debug, theme: AnsiConsoleTheme.Code, outputTemplate: outputTemplate))
+                    .WriteTo.Logger(lc => lc
+                        .WriteTo.ApplicationInsights(services.GetService<TelemetryConfiguration>(), new CustomConverter(), LogEventLevel.Error));
+                logs++;
+                LoggerHasBeenBuilt = true;
             });
 
             hostBuilder.ConfigureLogging((context, logBuilder) =>
@@ -72,39 +74,38 @@ namespace MigrationTools.Host
              })
             .ConfigureAppConfiguration(builder =>
             {
-                if (!string.IsNullOrEmpty(configFile) &&  File.Exists(configFile))
+                if (!string.IsNullOrEmpty(configFile) && File.Exists(configFile))
                 {
                     builder.AddJsonFile(configFile);
                 }
             });
-
             hostBuilder.ConfigureServices((context, services) =>
              {
-                 services.AddOptions();
-                 services.Configure<EngineConfiguration>((config) =>
-                 {
-                     var sp = services.BuildServiceProvider();
-                     var logger = sp.GetService<ILoggerFactory>().CreateLogger<EngineConfiguration>();
-                     if (!File.Exists(configFile))
-                     {
-                         logger.LogCritical("The config file {ConfigFile} does not exist, nor does the default 'configuration.json'. Use '{ExecutableName}.exe init' to create a configuration file first", configFile, Assembly.GetEntryAssembly().GetName().Name);
-                         Environment.Exit(-1);
-                     }
-                     logger.LogInformation("Config Found, creating engine host");
-                     var reader = sp.GetRequiredService<IEngineConfigurationReader>();
-                     var parsed = reader.BuildFromFile(configFile);
-                     config.ChangeSetMappingFile = parsed.ChangeSetMappingFile;
-                     config.FieldMaps = parsed.FieldMaps;
-                     config.GitRepoMapping = parsed.GitRepoMapping;
-                     config.CommonEnrichersConfig = parsed.CommonEnrichersConfig;
-                     config.Processors = parsed.Processors;
-                     config.Source = parsed.Source;
-                     config.Target = parsed.Target;
-                     config.Version = parsed.Version;
-                     config.workaroundForQuerySOAPBugEnabled = parsed.workaroundForQuerySOAPBugEnabled;
-                     config.WorkItemTypeDefinition = parsed.WorkItemTypeDefinition;
-                 });
 
+                 services.AddOptions();
+                 services.AddOptions<EngineConfiguration>().Configure<IEngineConfigurationReader, ILogger<EngineConfiguration>>(
+                   (options, reader, logger) =>
+                   {
+                       if (!File.Exists(configFile))
+                       {
+                           logger.LogCritical("The config file {ConfigFile} does not exist, nor does the default 'configuration.json'. Use '{ExecutableName}.exe init' to create a configuration file first", configFile, Assembly.GetEntryAssembly().GetName().Name);
+                           Environment.Exit(-1);
+                       }
+                       logger.LogInformation("Config Found, creating engine host");
+                       var parsed = reader.BuildFromFile(configFile);
+                       options.ChangeSetMappingFile = parsed.ChangeSetMappingFile;
+                       options.FieldMaps = parsed.FieldMaps;
+                       options.GitRepoMapping = parsed.GitRepoMapping;
+                       options.CommonEnrichersConfig = parsed.CommonEnrichersConfig;
+                       options.Processors = parsed.Processors;
+                       options.Source = parsed.Source;
+                       options.Target = parsed.Target;
+                       options.Version = parsed.Version;
+                       options.workaroundForQuerySOAPBugEnabled = parsed.workaroundForQuerySOAPBugEnabled;
+                       options.WorkItemTypeDefinition = parsed.WorkItemTypeDefinition;
+                   }
+
+               );
 
                  // Application Insights
                  ApplicationInsightsServiceOptions aiso = new ApplicationInsightsServiceOptions();

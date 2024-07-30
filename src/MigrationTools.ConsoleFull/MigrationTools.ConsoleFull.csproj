@@ -16,6 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="..\..\appsettings.json" Link="appsettings.json" />
     <Content Include="..\..\configuration.json" Link="configuration.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

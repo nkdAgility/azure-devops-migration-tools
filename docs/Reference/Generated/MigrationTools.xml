@@ -604,22 +604,22 @@
         </member>
         <member name="F:ThisAssembly.Git.Branch">
             <summary>
-            => @"main"
+            => @"feature/configuration-builder"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commit">
             <summary>
-            => @"cd49e40"
+            => @"e6daec8"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Sha">
             <summary>
-            => @"cd49e4061f2759b8ba15da035f13f8d39f6dbf0a"
+            => @"e6daec87e4e4a5d9fe6d6a99d00f6e1df61bb7a5"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.CommitDate">
             <summary>
-            => @"2024-07-26T15:59:36+01:00"
+            => @"2024-07-29T17:05:12+01:00"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commits">
@@ -629,12 +629,12 @@
         </member>
         <member name="F:ThisAssembly.Git.Tag">
             <summary>
-            => @"v15.1.6"
+            => @"v15.1.7-Preview.3"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseTag">
             <summary>
-            => @"v15.1.6"
+            => @"v15.1.7-Preview.3"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseVersion.Major">
@@ -649,7 +649,7 @@
         </member>
         <member name="F:ThisAssembly.Git.BaseVersion.Patch">
             <summary>
-            => @"6"
+            => @"7"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Major">
@@ -664,17 +664,17 @@
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Patch">
             <summary>
-            => @"6"
+            => @"7"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Label">
             <summary>
-            => @""
+            => @"Preview.3"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.DashLabel">
             <summary>
-            => @""
+            => @"-Preview.3"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Source">
