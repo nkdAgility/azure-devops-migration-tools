@@ -26,6 +26,9 @@
     <Content Include="..\..\configuration2.json" Link="configuration2.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\..\configuration3.json" Link="configuration3.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>

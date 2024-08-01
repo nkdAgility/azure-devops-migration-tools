@@ -7,8 +7,10 @@ using Newtonsoft.Json.Schema;
 namespace MigrationTools.Enrichers
 {
     
-    public class TfsNodeStructureOptions : ProcessorEnricherOptions, ITfsNodeStructureOptions
+    public sealed class TfsNodeStructureOptions : ProcessorEnricherOptions, ITfsNodeStructureOptions
     {
+        public const string ConfigurationSectionName = "MigrationTools:CommonEnrichers:TfsNodeStructure";
+
         public override Type ToConfigure => typeof(TfsNodeStructure);
 
 

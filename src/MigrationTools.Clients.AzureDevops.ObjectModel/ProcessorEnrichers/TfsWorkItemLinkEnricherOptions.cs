@@ -6,7 +6,8 @@ namespace MigrationTools.Enrichers
 {
     public class TfsWorkItemLinkEnricherOptions : ProcessorEnricherOptions, ITfsWorkItemLinkEnricherOptions
     {
-        public override Type ToConfigure => typeof(TfsNodeStructure);
+        public const string ConfigurationSectionName = "MigrationTools:CommonEnrichers:TfsWorkItemLinkEnricher";
+        public override Type ToConfigure => typeof(TfsWorkItemLinkEnricher);
 
         /// <summary>
         /// Skip validating links if the number of links in the source and the target matches!

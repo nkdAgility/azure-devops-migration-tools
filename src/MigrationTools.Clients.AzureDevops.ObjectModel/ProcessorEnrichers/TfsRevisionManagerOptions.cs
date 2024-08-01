@@ -4,6 +4,7 @@ namespace MigrationTools.Enrichers
 {
     public class TfsRevisionManagerOptions : ProcessorEnricherOptions
     {
+        public const string ConfigurationSectionName = "MigrationTools:CommonEnrichers:TfsRevisionManager";
         public override Type ToConfigure => typeof(TfsRevisionManager);
 
         /// <summary>

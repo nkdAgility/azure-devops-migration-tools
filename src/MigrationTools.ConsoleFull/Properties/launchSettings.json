@@ -26,6 +26,10 @@
     "Execute -noconfig": {
       "commandName": "Project",
       "commandLineArgs": "execute"
+    },
+    "Execute v3": {
+      "commandName": "Project",
+      "commandLineArgs": "execute -c \"configuration3.json\""
     }
   }
 }

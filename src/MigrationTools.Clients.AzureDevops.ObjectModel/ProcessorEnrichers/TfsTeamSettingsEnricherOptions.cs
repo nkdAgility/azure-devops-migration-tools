@@ -8,7 +8,7 @@ namespace MigrationTools.Enrichers
     public class TfsTeamSettingsEnricherOptions : ProcessorEnricherOptions, ITfsTeamSettingsEnricherOptions
     {
 
-
+        public const string ConfigurationSectionName = "MigrationTools:CommonEnrichers:TfsTeamSettingsEnricher";
         public override Type ToConfigure => typeof(TfsTeamSettingsEnricher);
 
         /// <summary>

@@ -27,6 +27,11 @@ using MigrationTools.Services;
 using Spectre.Console.Extensions.Hosting;
 using System.Configuration;
 using NuGet.Protocol.Plugins;
+using System.Collections.Generic;
+using System.Linq;
+using System.Data;
+using static System.Collections.Specialized.BitVector32;
+using System.Text.Json;
 
 namespace MigrationTools.Host
 {
@@ -82,32 +87,82 @@ namespace MigrationTools.Host
                     builder.AddJsonFile(configFile);
                 }
                 builder.AddEnvironmentVariables();
+                builder.AddCommandLine(args);
             });
 
             hostBuilder.ConfigureServices((context, services) =>
              {
 
                  services.AddOptions();
-                 services.AddOptions<EngineConfiguration>().Configure<IEngineConfigurationReader, ILogger<EngineConfiguration>>(
-                   (options, reader, logger) =>
+
+                 services.AddOptions<EngineConfiguration>().Configure<IEngineConfigurationReader, ILogger<EngineConfiguration>, IConfiguration>(
+                   (options, reader, logger, configuration) =>
                    {
                        if (!File.Exists(configFile))
                        {
                            logger.LogCritical("The config file {ConfigFile} does not exist, nor does the default 'configuration.json'. Use '{ExecutableName}.exe init' to create a configuration file first", configFile, Assembly.GetEntryAssembly().GetName().Name);
                            Environment.Exit(-1);
                        }
+                       string configVersionString = configuration.GetValue<string>("MigrationTools:Version");
+                       if (string.IsNullOrEmpty(configVersionString))
+                       {
+                           configVersionString = configuration.GetValue<string>("Version");
+                       }
+                       if (string.IsNullOrEmpty(configVersionString))
+                       {
+                           configVersionString = "0.0";
+                       }
+                       Version.TryParse(configVersionString, out Version configVersion);
                        logger.LogInformation("Config Found, creating engine host");
-                       var parsed = reader.BuildFromFile(configFile);
-                       options.ChangeSetMappingFile = parsed.ChangeSetMappingFile;
-                       options.FieldMaps = parsed.FieldMaps;
-                       options.GitRepoMapping = parsed.GitRepoMapping;
-                       options.CommonEnrichersConfig = parsed.CommonEnrichersConfig;
-                       options.Processors = parsed.Processors;
-                       options.Source = parsed.Source;
-                       options.Target = parsed.Target;
-                       options.Version = parsed.Version;
-                       options.workaroundForQuerySOAPBugEnabled = parsed.workaroundForQuerySOAPBugEnabled;
-                       options.WorkItemTypeDefinition = parsed.WorkItemTypeDefinition;
+                       if (configVersion < Version.Parse("16.0"))
+                       {
+                           logger.LogCritical("Config is from an older version of the tooling and will need updated. For now we will load it, but at some point this ability will be removed.");
+                           var parsed = reader.BuildFromFile(configFile); // TODO revert tp 
+                           options.ChangeSetMappingFile = parsed.ChangeSetMappingFile;
+                           options.FieldMaps = parsed.FieldMaps;
+                           options.GitRepoMapping = parsed.GitRepoMapping;
+                           options.CommonEnrichersConfig = parsed.CommonEnrichersConfig;
+                           options.Processors = parsed.Processors;
+                           options.Source = parsed.Source;
+                           options.Target = parsed.Target;
+                           options.Version = parsed.Version;
+                           options.WorkItemTypeDefinition = parsed.WorkItemTypeDefinition;
+                       } else
+                       {
+                           // This code Converts the new config format to the v1 and v2 runtme format.
+                           options.Version = configuration.GetValue<string>("MigrationTools:Version");
+                           options.ChangeSetMappingFile = configuration.GetValue<string>("MigrationTools:ChangeSetMappingFile");
+                           //options.FieldMaps = configuration.GetSection("MigrationTools:FieldMaps").Get<IFieldMap[]>();
+                           options.GitRepoMapping = configuration.GetValue<Dictionary<string, string>>("MigrationTools:MappingTools:WorkItemGitRepoMapping:WorkItemGitRepos");
+                           options.CommonEnrichersConfig = configuration.GetSection("MigrationTools:CommonEnrichers")?.GetChildren()?.ToList().ConvertAll<Enrichers.IProcessorEnricherOptions>(x => x.GetMigrationOptionFromConfig<Enrichers.IProcessorEnricherOptions>());
+                           var processorsSection = configuration.GetSection("MigrationTools:Processors");
+                           var jsonOptions = new JsonSerializerOptions();
+                           jsonOptions.Converters.Add(new ProcessorOptionsConverter());
+                          options.Processors = processorsSection.GetChildren()
+                               .Select(processor =>
+                               {
+                                  var processorTypeString = processor.GetValue<string>("ProcessorType");
+                                  var processorType = GetProcessorFromTypeString(processorTypeString);
+                                   var obj = Activator.CreateInstance(processorType);
+                                   processor.Bind(obj);
+                                   return (IProcessorConfig)obj;
+ 
+                               })
+                               .ToList();
+                           options.Source = null;
+                           options.Target = null;
+                           options.Version = null;
+                           options.WorkItemTypeDefinition = null;
+                           Log.Information("CommonEnrichersConfig: {CommonEnrichersConfig}", options.CommonEnrichersConfig);
+                       }
+
+
+
+
+
+
+
+
                    }
 
                );
@@ -168,5 +223,25 @@ namespace MigrationTools.Host
 
             return exportPath;
         }
+
+        private static Type GetProcessorFromTypeString(string processorType)
+        {
+            // Get all loaded assemblies in the current application domain
+
+            // Get all types from each assembly
+            IEnumerable<Type> prosserOptionTypes = GetTypesImplementingInterface<IProcessorConfig>();
+            return prosserOptionTypes.SingleOrDefault(type => type.Name.StartsWith(processorType));
+        }
+
+        private static IEnumerable<Type> GetTypesImplementingInterface<TInterface>()
+        {
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(ass => (ass.FullName.StartsWith("MigrationTools") || ass.FullName.StartsWith("VstsSyncMigrator")));
+            var interfaceType = typeof(TInterface);
+            return assemblies
+                        .SelectMany(assembly => assembly.GetTypes())
+                        .Where(type => interfaceType.IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract);
+        }
+
+
     }
 }
