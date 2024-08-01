@@ -49,7 +49,7 @@ namespace MigrationTools.Tests
 
         private static void AddEndpoint(IServiceCollection services, string name)
         {
-            services.AddEndpoint(name, (provider) =>
+            services.AddMigrationToolsEndpoint(name, (provider) =>
             {
                 var options = new InMemoryWorkItemEndpointOptions();
                 var endpoint = provider.GetRequiredService<InMemoryWorkItemEndpoint>();

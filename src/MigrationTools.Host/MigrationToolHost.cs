@@ -135,20 +135,14 @@ namespace MigrationTools.Host
                            //options.FieldMaps = configuration.GetSection("MigrationTools:FieldMaps").Get<IFieldMap[]>();
                            options.GitRepoMapping = configuration.GetValue<Dictionary<string, string>>("MigrationTools:MappingTools:WorkItemGitRepoMapping:WorkItemGitRepos");
                            options.CommonEnrichersConfig = configuration.GetSection("MigrationTools:CommonEnrichers")?.GetChildren()?.ToList().ConvertAll<Enrichers.IProcessorEnricherOptions>(x => x.GetMigrationOptionFromConfig<Enrichers.IProcessorEnricherOptions>());
-                           var processorsSection = configuration.GetSection("MigrationTools:Processors");
-                           var jsonOptions = new JsonSerializerOptions();
-                           jsonOptions.Converters.Add(new ProcessorOptionsConverter());
-                          options.Processors = processorsSection.GetChildren()
-                               .Select(processor =>
-                               {
-                                  var processorTypeString = processor.GetValue<string>("ProcessorType");
-                                  var processorType = GetProcessorFromTypeString(processorTypeString);
-                                   var obj = Activator.CreateInstance(processorType);
-                                   processor.Bind(obj);
-                                   return (IProcessorConfig)obj;
- 
-                               })
-                               .ToList();
+                          options.Processors = configuration.GetSection("MigrationTools:Processors").GetChildren()?.ToList().ConvertAll<IProcessorConfig>(config =>
+                          {
+                              var processorTypeString = config.GetValue<string>("ProcessorType");
+                              var processorType = GetProcessorFromTypeString(processorTypeString);
+                              var obj = Activator.CreateInstance(processorType);
+                              config.Bind(obj);
+                              return (IProcessorConfig)obj;
+                          });
                            options.Source = null;
                            options.Target = null;
                            options.Version = null;

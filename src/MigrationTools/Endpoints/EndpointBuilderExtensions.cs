@@ -5,7 +5,7 @@ namespace MigrationTools.Endpoints
 {
     public static class EndpointBuilderExtensions
     {
-        public static IEndpointBuilder ConfigureEndpoint(this IEndpointBuilder builder, Func<IServiceProvider, IEndpoint> createEndpoint)
+        public static IEndpointBuilder ConfigureMigrationToolsEndpoint(this IEndpointBuilder builder, Func<IServiceProvider, IEndpoint> createEndpoint)
         {
             if (builder == null)
             {

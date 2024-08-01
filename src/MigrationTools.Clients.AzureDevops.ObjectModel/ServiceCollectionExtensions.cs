@@ -18,9 +18,9 @@ namespace MigrationTools
     {
         public static void AddMigrationToolServicesForClientAzureDevOpsObjectModel(this IServiceCollection context, IConfiguration configuration)
         {
-            context.AddEndPoints<TfsEndpointOptions, TfsEndpoint>(configuration, "TfsEndpoints");
-            context.AddEndPoints<TfsWorkItemEndpointOptions, TfsWorkItemEndpoint>(configuration, "TfsWorkItemEndpoints");
-            context.AddEndPoints<TfsTeamSettingsEndpointOptions, TfsTeamSettingsEndpoint>(configuration, "TfsTeamSettingsEndpoints");
+            context.AddMigrationToolsEndPoints<TfsEndpointOptions, TfsEndpoint>(configuration, "TfsEndpoints");
+            context.AddMigrationToolsEndPoints<TfsWorkItemEndpointOptions, TfsWorkItemEndpoint>(configuration, "TfsWorkItemEndpoints");
+            context.AddMigrationToolsEndPoints<TfsTeamSettingsEndpointOptions, TfsTeamSettingsEndpoint>(configuration, "TfsTeamSettingsEndpoints");
 
             //Processors
             context.AddTransient<TfsTeamSettingsProcessor>();

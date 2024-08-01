@@ -2,33 +2,32 @@
   "MigrationTools": {
     "Version": "16.0",
     "Source": {
-      "TfsTeamProject": {
-        "Collection": "https://dev.azure.com/nkdagility-preview/",
-        "Project": "myProjectName",
-        "TfsVersion": "Tfs2013",
-        "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
-        "AllowCrossProjectLinking": false,
-        "AuthenticationMode": "Prompt",
-        "PersonalAccessToken": "",
-        "LanguageMaps": {
-          "AreaPath": "Area",
-          "IterationPath": "Iteration"
-        }
+      "EndpointType": "TfsTeamProject",
+      "Collection": "https://dev.azure.com/nkdagility-preview/",
+      "Project": "myProjectName",
+      "TfsVersion": "Tfs2013",
+      "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
+      "AllowCrossProjectLinking": false,
+      "AuthenticationMode": "Prompt",
+      "PersonalAccessToken": "",
+      "LanguageMaps": {
+        "AreaPath": "Area",
+        "IterationPath": "Iteration"
+
       }
     },
     "Target": {
-      "TfsTeamProject": {
-        "Collection": "https://dev.azure.com/nkdagility-preview/",
-        "Project": "myProjectName",
-        "TfsVersion": "AzureDevOps",
-        "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
-        "AllowCrossProjectLinking": false,
-        "AuthenticationMode": "Prompt",
-        "PersonalAccessToken": "",
-        "LanguageMaps": {
-          "AreaPath": "Area",
-          "IterationPath": "Iteration"
-        }
+      "EndpointType": "TfsTeamProject",
+      "Collection": "https://dev.azure.com/nkdagility-preview/",
+      "Project": "myProjectName",
+      "TfsVersion": "AzureDevOps",
+      "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
+      "AllowCrossProjectLinking": false,
+      "AuthenticationMode": "Prompt",
+      "PersonalAccessToken": "",
+      "LanguageMaps": {
+        "AreaPath": "Area",
+        "IterationPath": "Iteration"
       }
     },
     "MappingTools": {

@@ -7,7 +7,7 @@ namespace MigrationTools.Endpoints
 {
     public static class EndpointFactoryServiceCollectionExtensions
     {
-        public static IServiceCollection AddEndpoint(this IServiceCollection services)
+        public static IServiceCollection AddMigrationToolsEndpoint(this IServiceCollection services)
         {
             if (services == null)
             {
@@ -23,7 +23,7 @@ namespace MigrationTools.Endpoints
             return services;
         }
 
-        public static IServiceCollection AddEndPoints<TOptions, TEndpoint>(this IServiceCollection services, IConfiguration configuration, string settingsName)
+        public static IServiceCollection AddMigrationToolsEndPoints<TOptions, TEndpoint>(this IServiceCollection services, IConfiguration configuration, string settingsName)
             where TOptions : EndpointOptions
             where TEndpoint : Endpoint<TOptions>
         {
@@ -34,7 +34,7 @@ namespace MigrationTools.Endpoints
             foreach (var child in children)
             {
                 var options = child.Get<TOptions>();
-                services.AddEndpoint(options.Name, (provider) =>
+                services.AddMigrationToolsEndpoint(options.Name, (provider) =>
                 {
                     var endpoint = provider.GetRequiredService<TEndpoint>();
                     endpoint.Configure(options);
@@ -44,7 +44,7 @@ namespace MigrationTools.Endpoints
             return services;
         }
 
-        public static IEndpointBuilder AddEndpoint(this IServiceCollection services, string name, Func<IServiceProvider, IEndpoint> createEndpoint)
+        public static IEndpointBuilder AddMigrationToolsEndpoint(this IServiceCollection services, string name, Func<IServiceProvider, IEndpoint> createEndpoint)
         {
             if (services == null)
             {
@@ -61,10 +61,10 @@ namespace MigrationTools.Endpoints
                 throw new ArgumentNullException(nameof(createEndpoint));
             }
 
-            AddEndpoint(services);
+            AddMigrationToolsEndpoint(services);
 
             var builder = new EndpointBuilder(services, name);
-            builder.ConfigureEndpoint(createEndpoint);
+            builder.ConfigureMigrationToolsEndpoint(createEndpoint);
             return builder;
         }
     }

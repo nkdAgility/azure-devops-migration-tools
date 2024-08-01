@@ -33,7 +33,7 @@ namespace MigrationTools.Tests
 
         private static void AddTfsTeamEndpoint(IServiceCollection services, string name, string project)
         {
-            services.AddEndpoint(name, (provider) =>
+            services.AddMigrationToolsEndpoint(name, (provider) =>
             {
                 var options = GetTfsTeamEndPointOptions(project);
                 var endpoint = provider.GetRequiredService<TfsTeamSettingsEndpoint>();
@@ -55,7 +55,7 @@ namespace MigrationTools.Tests
 
         private static void AddTfsEndpoint(IServiceCollection services, string name, string project)
         {
-            services.AddEndpoint(name, (provider) =>
+            services.AddMigrationToolsEndpoint(name, (provider) =>
             {
                 var options = GetTfsEndPointOptions(project);
                 var endpoint = provider.GetRequiredService<TfsEndpoint>();
