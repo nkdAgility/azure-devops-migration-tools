@@ -910,7 +910,7 @@ namespace VstsSyncMigrator.Engine
                 if (targetWorkItem != null)
                 {
                     foreach (Field f in targetWorkItem.ToWorkItem().Fields)
-                        parameters.Add($"{f.ReferenceName} ({f.Name})", f.Value.ToString());
+                        parameters.Add($"{f.ReferenceName} ({f.Name})", f.Value?.ToString());
                 }
                 _telemetry.TrackException(ex, parameters);
                 TraceWriteLine(LogEventLevel.Information, "...FAILED to Save");
