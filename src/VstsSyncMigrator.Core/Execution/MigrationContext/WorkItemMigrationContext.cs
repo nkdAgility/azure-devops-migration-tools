@@ -212,7 +212,7 @@ namespace VstsSyncMigrator.Engine
                         Engine.Source.WorkItems.Project.Name, Engine.Target.WorkItems.Project.Name, contextLog);
 
                     sourceWorkItems = ((TfsWorkItemMigrationClient)Engine.Target.WorkItems).FilterExistingWorkItems(
-                        sourceWorkItems, _config.WIQLQuery,
+                        sourceWorkItems, targetWIQLQuery,
                         (TfsWorkItemMigrationClient)Engine.Source.WorkItems);
                     contextLog.Information(
                         "!! After removing all found work items there are {SourceWorkItemCount} remaining to be migrated.",
