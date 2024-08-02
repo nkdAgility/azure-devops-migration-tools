@@ -18,5 +18,18 @@ jobs:
       - uses: Ant0wan/openai-pr@v1
         with:
           api-key: ${{ secrets.OPENAI_API_KEY }}
+          model: "gpt-3.5-turbo-instruct"
+          template: |
+            ## Description
+
+            This pull request addresses the following issues:
+
+            - Issue 1
+            - Issue 2
+
+            ## Changes
+
+            - Change 1
+            - Change 2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
