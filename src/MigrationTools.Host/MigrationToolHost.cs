@@ -32,6 +32,7 @@ using System.Linq;
 using System.Data;
 using static System.Collections.Specialized.BitVector32;
 using System.Text.Json;
+using MigrationTools.Enrichers;
 
 namespace MigrationTools.Host
 {
@@ -137,17 +138,14 @@ namespace MigrationTools.Host
                            options.GitRepoMapping = configuration.GetValue<Dictionary<string, string>>("MigrationTools:CommonEnrichers:TfsGitRepoMappings:WorkItemGitRepos");
                            options.WorkItemTypeDefinition = configuration.GetValue<Dictionary<string, string>>("MigrationTools:CommonEnrichers:TfsWorkItemTypeMapping:WorkItemTypeDefinition");
 
-                           options.CommonEnrichersConfig = configuration.GetSection("MigrationTools:CommonEnrichers")?.ToMigrationToolsList<Enrichers.IProcessorEnricherOptions>();
+                           options.CommonEnrichersConfig = configuration.GetSection("MigrationTools:CommonEnrichers")?.ToMigrationToolsList<IProcessorEnricherOptions>(c => c.GetMigrationToolsNamedOption<IProcessorEnricherOptions>());
 
-                           options.CommonEnrichersConfig = configuration.GetSection("MigrationTools:CommonEnrichers")?.GetChildren()?.ToList().ConvertAll<Enrichers.IProcessorEnricherOptions>(x => x.GetMigrationToolsNamedOption<Enrichers.IProcessorEnricherOptions>());
-                          options.Processors = configuration.GetSection("MigrationTools:Processors").GetChildren()?.ToList().ConvertAll<IProcessorConfig>(config =>
-                          {
-                              return config.GetMigrationToolsOption<IProcessorConfig>("ProcessorType");
-                          });
+                           options.Processors = configuration.GetSection("MigrationTools:Processors")?.ToMigrationToolsList<IProcessorConfig>(child => child.GetMigrationToolsOption<IProcessorConfig>("ProcessorType"));
+
                            options.Source = null;
                            options.Target = null;
                            
-                           Log.Information("CommonEnrichersConfig: {CommonEnrichersConfig}", options.CommonEnrichersConfig);
+               
                            throw new NotImplementedException("This code is not yet implemented");
                        }
 
