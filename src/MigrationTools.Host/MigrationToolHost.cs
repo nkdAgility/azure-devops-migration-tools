@@ -83,7 +83,6 @@ namespace MigrationTools.Host
              })
             .ConfigureAppConfiguration(builder =>
             {
-
                 if (!string.IsNullOrEmpty(configFile) && File.Exists(configFile))
                 {
                     builder.AddJsonFile(configFile);
