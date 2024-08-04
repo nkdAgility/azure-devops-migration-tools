@@ -138,14 +138,14 @@ namespace MigrationTools.Host
                            options.GitRepoMapping = configuration.GetValue<Dictionary<string, string>>("MigrationTools:CommonEnrichers:TfsGitRepoMappings:WorkItemGitRepos");
                            options.WorkItemTypeDefinition = configuration.GetValue<Dictionary<string, string>>("MigrationTools:CommonEnrichers:TfsWorkItemTypeMapping:WorkItemTypeDefinition");
 
-                           options.CommonEnrichersConfig = configuration.GetSection("MigrationTools:CommonEnrichers")?.ToMigrationToolsList<IProcessorEnricherOptions>(c => c.GetMigrationToolsNamedOption<IProcessorEnricherOptions>());
+                           options.CommonEnrichersConfig = configuration.GetSection("MigrationTools:CommonEnrichers")?.ToMigrationToolsList<IProcessorEnricherOptions>(child => child.GetMigrationToolsNamedOption<IProcessorEnricherOptions>());
 
                            options.Processors = configuration.GetSection("MigrationTools:Processors")?.ToMigrationToolsList<IProcessorConfig>(child => child.GetMigrationToolsOption<IProcessorConfig>("ProcessorType"));
 
-                           options.Source = null;
-                           options.Target = null;
-                           
-               
+                           options.Source = configuration.GetSection("MigrationTools:Source")?.GetMigrationToolsOption<IMigrationClientConfig>("EndpointType");
+                           options.Target = configuration.GetSection("MigrationTools:Target")?.GetMigrationToolsOption<IMigrationClientConfig>("EndpointType");
+
+
                            throw new NotImplementedException("This code is not yet implemented");
                        }
 
