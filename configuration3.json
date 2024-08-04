@@ -127,23 +127,6 @@
     },
     "Processors": [
       {
-        "ProcessorType": "DoesNotExist",
-        "Enabled": true,
-        "UpdateCreatedDate": true,
-        "UpdateCreatedBy": true,
-        "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
-        "FixHtmlAttachmentLinks": false,
-        "WorkItemCreateRetryLimit": 5,
-        "FilterWorkItemsThatAlreadyExistInTarget": false,
-        "PauseAfterEachWorkItem": false,
-        "AttachRevisionHistory": false,
-        "GenerateMigrationComment": true,
-        "WorkItemIDs": [ 12 ],
-        "MaxGracefulFailures": 0,
-        "SkipRevisionWithInvalidIterationPath": false,
-        "SkipRevisionWithInvalidAreaPath": false
-      },
-      {
         "ProcessorType": "WorkItemMigration",
         "Enabled": true,
         "UpdateCreatedDate": true,
