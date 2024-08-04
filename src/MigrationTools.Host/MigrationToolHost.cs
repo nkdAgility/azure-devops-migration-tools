@@ -82,6 +82,7 @@ namespace MigrationTools.Host
              })
             .ConfigureAppConfiguration(builder =>
             {
+
                 if (!string.IsNullOrEmpty(configFile) && File.Exists(configFile))
                 {
                     builder.AddJsonFile(configFile);
@@ -131,23 +132,23 @@ namespace MigrationTools.Host
                        {
                            // This code Converts the new config format to the v1 and v2 runtme format.
                            options.Version = configuration.GetValue<string>("MigrationTools:Version");
-                           options.ChangeSetMappingFile = configuration.GetValue<string>("MigrationTools:ChangeSetMappingFile");
+                           options.ChangeSetMappingFile = configuration.GetValue<string>("MigrationTools:CommonEnrichers:TfsChangeSetMapping:File");
                            //options.FieldMaps = configuration.GetSection("MigrationTools:FieldMaps").Get<IFieldMap[]>();
-                           options.GitRepoMapping = configuration.GetValue<Dictionary<string, string>>("MigrationTools:MappingTools:WorkItemGitRepoMapping:WorkItemGitRepos");
-                           options.CommonEnrichersConfig = configuration.GetSection("MigrationTools:CommonEnrichers")?.GetChildren()?.ToList().ConvertAll<Enrichers.IProcessorEnricherOptions>(x => x.GetMigrationOptionFromConfig<Enrichers.IProcessorEnricherOptions>());
+                           options.GitRepoMapping = configuration.GetValue<Dictionary<string, string>>("MigrationTools:CommonEnrichers:TfsGitRepoMappings:WorkItemGitRepos");
+                           options.WorkItemTypeDefinition = configuration.GetValue<Dictionary<string, string>>("MigrationTools:CommonEnrichers:TfsWorkItemTypeMapping:WorkItemTypeDefinition");
+
+                           options.CommonEnrichersConfig = configuration.GetSection("MigrationTools:CommonEnrichers")?.ToMigrationToolsList<Enrichers.IProcessorEnricherOptions>();
+
+                           options.CommonEnrichersConfig = configuration.GetSection("MigrationTools:CommonEnrichers")?.GetChildren()?.ToList().ConvertAll<Enrichers.IProcessorEnricherOptions>(x => x.GetMigrationToolsNamedOption<Enrichers.IProcessorEnricherOptions>());
                           options.Processors = configuration.GetSection("MigrationTools:Processors").GetChildren()?.ToList().ConvertAll<IProcessorConfig>(config =>
                           {
-                              var processorTypeString = config.GetValue<string>("ProcessorType");
-                              var processorType = GetProcessorFromTypeString(processorTypeString);
-                              var obj = Activator.CreateInstance(processorType);
-                              config.Bind(obj);
-                              return (IProcessorConfig)obj;
+                              return config.GetMigrationToolsOption<IProcessorConfig>("ProcessorType");
                           });
                            options.Source = null;
                            options.Target = null;
-                           options.Version = null;
-                           options.WorkItemTypeDefinition = null;
+                           
                            Log.Information("CommonEnrichersConfig: {CommonEnrichersConfig}", options.CommonEnrichersConfig);
+                           throw new NotImplementedException("This code is not yet implemented");
                        }
 
 
@@ -220,20 +221,8 @@ namespace MigrationTools.Host
 
         private static Type GetProcessorFromTypeString(string processorType)
         {
-            // Get all loaded assemblies in the current application domain
-
             // Get all types from each assembly
-            IEnumerable<Type> prosserOptionTypes = GetTypesImplementingInterface<IProcessorConfig>();
-            return prosserOptionTypes.SingleOrDefault(type => type.Name.StartsWith(processorType));
-        }
-
-        private static IEnumerable<Type> GetTypesImplementingInterface<TInterface>()
-        {
-            var assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(ass => (ass.FullName.StartsWith("MigrationTools") || ass.FullName.StartsWith("VstsSyncMigrator")));
-            var interfaceType = typeof(TInterface);
-            return assemblies
-                        .SelectMany(assembly => assembly.GetTypes())
-                        .Where(type => interfaceType.IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract);
+            return AppDomain.CurrentDomain.GetMigrationToolsTypes().WithInterface<IProcessorConfig>().WithNameString(processorType);
         }
 
 

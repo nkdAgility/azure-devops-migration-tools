@@ -30,37 +30,6 @@
         "IterationPath": "Iteration"
       }
     },
-    "MappingTools": {
-      "WorkItemTypeMapping": {
-        "Enabled": true,
-        "WorkItemTypeDefinition": {
-          "Product Backlog Item": "User Story"
-        }
-      },
-      "WorkItemGitRepoMapping": {
-        "Enabled": true,
-        "WorkItemGitRepos": {
-          "sourceRepoName": "targetRepoName"
-        }
-      },
-      "WorkItemFieldMapping": {
-        "Enabled": true,
-        "FieldMaps": [
-          {
-            "FieldMapType": "FieldToFieledMap",
-            "sourceField": "System.AcceptanceCriteria",
-            "targetField": "System.AcceptanceCriteria2"
-
-          },
-          {
-            "FieldMapType": "FieldToFieledMap",
-            "sourceField": "System.Description",
-            "targetField": "System.Description2"
-
-          }
-        ]
-      }
-    },
     "CommonEnrichers": {
       "TfsNodeStructure": {
         "Enabled": true,
@@ -121,6 +90,39 @@
           "Microsoft.VSTS.Common.ResolvedBy",
           "Microsoft.VSTS.Common.ClosedBy"
         ]
+      },
+      "TfsWorkItemTypeMapping": {
+        "Enabled": true,
+        "WorkItemTypeDefinition": {
+          "Product Backlog Item": "User Story"
+        }
+      },
+      "TfsGitRepoMappings": {
+        "Enabled": true,
+        "WorkItemGitRepos": {
+          "sourceRepoName": "targetRepoName"
+        }
+      },
+      "TfsFieldMappings": {
+        "Enabled": true,
+        "FieldMaps": [
+          {
+            "FieldMapType": "FieldToFieledMap",
+            "sourceField": "System.AcceptanceCriteria",
+            "targetField": "System.AcceptanceCriteria2"
+
+          },
+          {
+            "FieldMapType": "FieldToFieledMap",
+            "sourceField": "System.Description",
+            "targetField": "System.Description2"
+
+          }
+        ]
+      },
+      "TfsChangeSetMapping": {
+        "Enabled": true,
+        "File": "C:\\temp\\ChangeSetMappingFile.json"
       }
     },
     "Processors": [
