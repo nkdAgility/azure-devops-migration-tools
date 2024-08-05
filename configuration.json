@@ -139,7 +139,7 @@
       "SkipRevisionWithInvalidAreaPath": false
     }
   ],
-  "Version": "15.1",
+  "Version": "16.0",
   "workaroundForQuerySOAPBugEnabled": false,
   "WorkItemTypeDefinition": {
     "sourceWorkItemTypeName": "targetWorkItemTypeName"

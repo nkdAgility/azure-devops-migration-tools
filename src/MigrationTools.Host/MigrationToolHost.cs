@@ -49,31 +49,30 @@ namespace MigrationTools.Host
             var configFile = CommandSettingsBase.ForceGetConfigFile(args);
             var mtv = new MigrationToolVersion();
 
+
+
+
+
             var hostBuilder = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args);
             hostBuilder.UseSerilog((hostingContext, services, loggerConfiguration) =>
             {
-                string outputTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] [" + mtv.GetRunningVersion().versionString + "] {Message:lj}{NewLine}{Exception}"; // {SourceContext}
+                string outputTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] [{versionString}] {Message:lj} {NewLine}{Exception}"; // {SourceContext}
                 string logsPath = CreateLogsPath();
 
                 var logPath = Path.Combine(logsPath, $"migration-{logs}.log");
 
-                var logLevel = hostingContext.Configuration.GetValue<LogEventLevel>("LogLevel");
-               
-
-                var levelSwitch = new LoggingLevelSwitch(logLevel);
+                string configLogLevelString = hostingContext.Configuration.GetValue<string>("LogLevel");
+                LogEventLevel logLevel = LogEventLevel.Information;
+                if (configLogLevelString != null)
+                {
+                    logLevel = (LogEventLevel)Enum.Parse(typeof(LogEventLevel), configLogLevelString);
+                    var levelSwitch = new LoggingLevelSwitch(logLevel);
+                    loggerConfiguration.MinimumLevel.ControlledBy(levelSwitch);
+                }                             
                 loggerConfiguration
-                    .MinimumLevel.ControlledBy(levelSwitch)
                     .ReadFrom.Configuration(hostingContext.Configuration)
-                    .Enrich.FromLogContext()
-                    .Enrich.WithMachineName()
-                    .Enrich.WithProcessId()
-                    .WriteTo.File(logPath, LogEventLevel.Verbose, outputTemplate)
-                    .WriteTo.Logger(lc => lc
-                        .Filter.ByExcluding(Matching.FromSource("Microsoft.Hosting.Lifetime"))
-                        .Filter.ByExcluding(Matching.FromSource("Microsoft.Extensions.Hosting.Internal.Host"))
-                        .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Debug, theme: AnsiConsoleTheme.Code, outputTemplate: outputTemplate))
-                    .WriteTo.Logger(lc => lc
-                        .WriteTo.ApplicationInsights(services.GetService<TelemetryConfiguration>(), new CustomConverter(), LogEventLevel.Error));
+                    .Enrich.WithProperty("versionString", mtv.GetRunningVersion().versionString)
+                    .WriteTo.ApplicationInsights(services.GetService<TelemetryConfiguration>(), new CustomConverter(), LogEventLevel.Error);
                 logs++;
                 LoggerHasBeenBuilt = true;
             });
@@ -115,6 +114,21 @@ namespace MigrationTools.Host
                        }
                        Version.TryParse(configVersionString, out Version configVersion);
                        logger.LogInformation("Config Found, creating engine host");
+                   //    MigrationConfigVersion configVersion = GetMigrationConfigVersion(configuration);
+                   //    switch (configVersion)
+                   //    {
+                   //       case MigrationConfigVersion.V1:
+                   //            logger.LogInformation("Config Version: V1");
+                   //         break;
+                   //        case MigrationConfigVersion.V2:
+                   //                     logger.LogInformation("Config Version: V2");
+                   //         break;
+                   //        case MigrationConfigVersion.V3:
+                   //                     logger.LogInformation("Config Version: V3");
+                   //}
+
+
+
                        if (configVersion < Version.Parse("16.0"))
                        {
                            logger.LogCritical("Config is from an older version of the tooling and will need updated. For now we will load it, but at some point this ability will be removed.");
@@ -130,6 +144,7 @@ namespace MigrationTools.Host
                            options.WorkItemTypeDefinition = parsed.WorkItemTypeDefinition;
                        } else
                        {
+                       
                            // This code Converts the new config format to the v1 and v2 runtme format.
                            options.Version = configuration.GetValue<string>("MigrationTools:Version");
                            options.ChangeSetMappingFile = configuration.GetValue<string>("MigrationTools:CommonEnrichers:TfsChangeSetMapping:File");
@@ -143,9 +158,6 @@ namespace MigrationTools.Host
 
                            options.Source = configuration.GetSection("MigrationTools:Source")?.GetMigrationToolsOption<IMigrationClientConfig>("EndpointType");
                            options.Target = configuration.GetSection("MigrationTools:Target")?.GetMigrationToolsOption<IMigrationClientConfig>("EndpointType");
-
-
-                           throw new NotImplementedException("This code is not yet implemented");
                        }
 
 
@@ -223,5 +235,12 @@ namespace MigrationTools.Host
         }
 
 
+    }
+}
+
+namespace MigrationTools.Host
+{
+    public enum MigrationConfigVersion
+    {
     }
 }
