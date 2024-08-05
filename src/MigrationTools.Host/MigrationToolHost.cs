@@ -61,7 +61,7 @@ namespace MigrationTools.Host
 
             var hostBuilder = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args);
 
-            var outputTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] [{versionString}] {Message:lj} {NewLine}{Exception} "; // 
+            var outputTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] [{versionString}] {Message:lj} {NewLine}{Exception}"; // 
 
             hostBuilder.UseSerilog((hostingContext, services, loggerConfiguration) =>
             {
@@ -74,8 +74,8 @@ namespace MigrationTools.Host
                     .WriteTo.File(Path.Combine(logsPath, $"migration.log"), LogEventLevel.Verbose, shared: true,outputTemplate: outputTemplate)
                     .WriteTo.File(new Serilog.Formatting.Json.JsonFormatter(), Path.Combine(logsPath, $"migration-errors.log"), LogEventLevel.Error, shared: true)
                     .WriteTo.Logger(lc => lc
-                            //.Filter.ByExcluding(Matching.FromSource("Microsoft.Hosting.Lifetime"))
-                            //.Filter.ByExcluding(Matching.FromSource("Microsoft.Extensions.Hosting.Internal.Host"))
+                            .Filter.ByExcluding(Matching.FromSource("Microsoft.Hosting.Lifetime"))
+                            .Filter.ByExcluding(Matching.FromSource("Microsoft.Extensions.Hosting.Internal.Host"))
                             .WriteTo.Console(theme: AnsiConsoleTheme.Code, outputTemplate: outputTemplate))
                     ;
                     
@@ -108,72 +108,44 @@ namespace MigrationTools.Host
                            logger.LogCritical("The config file {ConfigFile} does not exist, nor does the default 'configuration.json'. Use '{ExecutableName}.exe init' to create a configuration file first", configFile, Assembly.GetEntryAssembly().GetName().Name);
                            Environment.Exit(-1);
                        }
-                       string configVersionString = configuration.GetValue<string>("MigrationTools:Version");
-                       if (string.IsNullOrEmpty(configVersionString))
-                       {
-                           configVersionString = configuration.GetValue<string>("Version");
-                       }
-                       if (string.IsNullOrEmpty(configVersionString))
-                       {
-                           configVersionString = "0.0";
-                       }
-                       Version.TryParse(configVersionString, out Version configVersion);
                        logger.LogInformation("Config Found, creating engine host");
-                   //    MigrationConfigVersion configVersion = GetMigrationConfigVersion(configuration);
-                   //    switch (configVersion)
-                   //    {
-                   //       case MigrationConfigVersion.V1:
-                   //            logger.LogInformation("Config Version: V1");
-                   //         break;
-                   //        case MigrationConfigVersion.V2:
-                   //                     logger.LogInformation("Config Version: V2");
-                   //         break;
-                   //        case MigrationConfigVersion.V3:
-                   //                     logger.LogInformation("Config Version: V3");
-                   //}
-
-
-
-                       if (configVersion < Version.Parse("16.0"))
+                       MigrationConfigVersion configVersion = GetMigrationConfigVersion(configuration);
+                       switch (configVersion)
                        {
-                           logger.LogCritical("Config is from an older version of the tooling and will need updated. For now we will load it, but at some point this ability will be removed.");
-                           var parsed = reader.BuildFromFile(configFile); // TODO revert tp 
-                           options.ChangeSetMappingFile = parsed.ChangeSetMappingFile;
-                           options.FieldMaps = parsed.FieldMaps;
-                           options.GitRepoMapping = parsed.GitRepoMapping;
-                           options.CommonEnrichersConfig = parsed.CommonEnrichersConfig;
-                           options.Processors = parsed.Processors;
-                           options.Source = parsed.Source;
-                           options.Target = parsed.Target;
-                           options.Version = parsed.Version;
-                           options.WorkItemTypeDefinition = parsed.WorkItemTypeDefinition;
-                       } else
-                       {
-                       
-                           // This code Converts the new config format to the v1 and v2 runtme format.
-                           options.Version = configuration.GetValue<string>("MigrationTools:Version");
-                           options.ChangeSetMappingFile = configuration.GetValue<string>("MigrationTools:CommonEnrichers:TfsChangeSetMapping:File");
-                           //options.FieldMaps = configuration.GetSection("MigrationTools:FieldMaps").Get<IFieldMap[]>();
-                           options.GitRepoMapping = configuration.GetValue<Dictionary<string, string>>("MigrationTools:CommonEnrichers:TfsGitRepoMappings:WorkItemGitRepos");
-                           options.WorkItemTypeDefinition = configuration.GetValue<Dictionary<string, string>>("MigrationTools:CommonEnrichers:TfsWorkItemTypeMapping:WorkItemTypeDefinition");
+                           case MigrationConfigVersion.v15:
+                               logger.LogCritical("The config file {ConfigFile} uses an outdated format. We are continuing to support this format through a grace period. Use '{ExecutableName}.exe init' to create a new configuration file and port over your old configuration.", configFile, Assembly.GetEntryAssembly().GetName().Name);
+                               var parsed = reader.BuildFromFile(configFile); // TODO revert tp 
+                               options.ChangeSetMappingFile = parsed.ChangeSetMappingFile;
+                               options.FieldMaps = parsed.FieldMaps;
+                               options.GitRepoMapping = parsed.GitRepoMapping;
+                               options.CommonEnrichersConfig = parsed.CommonEnrichersConfig;
+                               options.Processors = parsed.Processors;
+                               options.Source = parsed.Source;
+                               options.Target = parsed.Target;
+                               options.Version = parsed.Version;
+                               options.WorkItemTypeDefinition = parsed.WorkItemTypeDefinition;
+                               break;
+                           case MigrationConfigVersion.v16:
+                               // This code Converts the new config format to the v1 and v2 runtme format.
+                               options.Version = configuration.GetValue<string>("MigrationTools:Version");
+                               options.ChangeSetMappingFile = configuration.GetValue<string>("MigrationTools:CommonEnrichers:TfsChangeSetMapping:File");
+                               //options.FieldMaps = configuration.GetSection("MigrationTools:FieldMaps").Get<IFieldMap[]>();
+                               options.GitRepoMapping = configuration.GetValue<Dictionary<string, string>>("MigrationTools:CommonEnrichers:TfsGitRepoMappings:WorkItemGitRepos");
+                               options.WorkItemTypeDefinition = configuration.GetValue<Dictionary<string, string>>("MigrationTools:CommonEnrichers:TfsWorkItemTypeMapping:WorkItemTypeDefinition");
 
-                           options.CommonEnrichersConfig = configuration.GetSection("MigrationTools:CommonEnrichers")?.ToMigrationToolsList<IProcessorEnricherOptions>(child => child.GetMigrationToolsNamedOption<IProcessorEnricherOptions>());
+                               options.CommonEnrichersConfig = configuration.GetSection("MigrationTools:CommonEnrichers")?.ToMigrationToolsList<IProcessorEnricherOptions>(child => child.GetMigrationToolsNamedOption<IProcessorEnricherOptions>());
 
-                           options.Processors = configuration.GetSection("MigrationTools:Processors")?.ToMigrationToolsList<IProcessorConfig>(child => child.GetMigrationToolsOption<IProcessorConfig>("ProcessorType"));
+                               options.Processors = configuration.GetSection("MigrationTools:Processors")?.ToMigrationToolsList<IProcessorConfig>(child => child.GetMigrationToolsOption<IProcessorConfig>("ProcessorType"));
 
-                           options.Source = configuration.GetSection("MigrationTools:Source")?.GetMigrationToolsOption<IMigrationClientConfig>("EndpointType");
-                           options.Target = configuration.GetSection("MigrationTools:Target")?.GetMigrationToolsOption<IMigrationClientConfig>("EndpointType");
+                               options.Source = configuration.GetSection("MigrationTools:Source")?.GetMigrationToolsOption<IMigrationClientConfig>("EndpointType");
+                               options.Target = configuration.GetSection("MigrationTools:Target")?.GetMigrationToolsOption<IMigrationClientConfig>("EndpointType");
+                               break;
+                           default:
+                               logger.LogCritical("The config file {ConfigFile} is not of the correct format. Use '{ExecutableName}.exe init' to create a new configuration file and port over your old configuration.", configFile, Assembly.GetEntryAssembly().GetName().Name);
+                               Environment.Exit(-1);
+                               break;
                        }
-
-
-
-
-
-
-
-
                    }
-
                );
 
                  // Application Insights
@@ -218,6 +190,27 @@ namespace MigrationTools.Host
             return hostBuilder;
         }
 
+        private static MigrationConfigVersion GetMigrationConfigVersion(IConfiguration configuration)
+        {
+            string configVersionString = configuration.GetValue<string>("MigrationTools:Version");
+            if (string.IsNullOrEmpty(configVersionString))
+            {
+                configVersionString = configuration.GetValue<string>("Version");
+            }
+            if (string.IsNullOrEmpty(configVersionString))
+            {
+                configVersionString = "0.0";
+            }
+            Version.TryParse(configVersionString, out Version configVersion);
+            if (configVersion < Version.Parse("16.0"))
+            {
+                return MigrationConfigVersion.v15;
+            } else
+            {
+                return MigrationConfigVersion.v16;
+            }
+        }
+
         static string logDate = DateTime.Now.ToString("yyyyMMddHHmmss");
 
         private static string CreateLogsPath()
@@ -247,5 +240,7 @@ namespace MigrationTools.Host
 {
     public enum MigrationConfigVersion
     {
+        v15,
+        v16
     }
 }

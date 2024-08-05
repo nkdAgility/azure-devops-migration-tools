@@ -1,10 +1,9 @@
 {
   "Serilog": {
-    "MinimumLevel": "Debug"
+    "MinimumLevel": "Information"
   },
   "MigrationTools": {
     "Version": "16.0",
-    "LogLevel": "Debug",
     "Source": {
       "EndpointType": "TfsTeamProject",
       "Collection": "https://dev.azure.com/nkdagility-preview/",
