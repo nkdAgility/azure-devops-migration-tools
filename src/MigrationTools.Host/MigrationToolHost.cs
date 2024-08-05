@@ -61,7 +61,7 @@ namespace MigrationTools.Host
 
             var hostBuilder = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args);
 
-            var outputTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] [{versionString}] {Message:lj} {NewLine}{Exception}" ; // 
+            var outputTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] [{versionString}] {Message:lj} {NewLine}{Exception} "; // 
 
             hostBuilder.UseSerilog((hostingContext, services, loggerConfiguration) =>
             {
@@ -76,7 +76,7 @@ namespace MigrationTools.Host
                     .WriteTo.Logger(lc => lc
                             //.Filter.ByExcluding(Matching.FromSource("Microsoft.Hosting.Lifetime"))
                             //.Filter.ByExcluding(Matching.FromSource("Microsoft.Extensions.Hosting.Internal.Host"))
-                            .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Debug, theme: AnsiConsoleTheme.Code, outputTemplate: outputTemplate))
+                            .WriteTo.Console(theme: AnsiConsoleTheme.Code, outputTemplate: outputTemplate))
                     ;
                     
                 LoggerHasBeenBuilt = true;
