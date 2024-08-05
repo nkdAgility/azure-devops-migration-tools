@@ -60,15 +60,23 @@ namespace MigrationTools.Host
             string logsPath = CreateLogsPath();
 
             var hostBuilder = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args);
+
+            var outputTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] [{versionString}] {Message:lj} {NewLine}{Exception}" ; // 
+
             hostBuilder.UseSerilog((hostingContext, services, loggerConfiguration) =>
             {
                 loggerConfiguration
                     .ReadFrom.Configuration(hostingContext.Configuration)
                     .Enrich.WithProperty("versionString", mtv.GetRunningVersion().versionString)
+                    .Enrich.FromLogContext()
+                    .Enrich.WithProcessId()
                     .WriteTo.ApplicationInsights(services.GetService<TelemetryConfiguration>(), new CustomConverter(), LogEventLevel.Error)
-                    .WriteTo.File(Path.Combine(logsPath, $"migration.log"), LogEventLevel.Verbose, shared: true,outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [{versionString}] {Message:lj} {NewLine}{Exception}")
-                    .WriteTo.File(Path.Combine(logsPath, $"migration-errors.log"), LogEventLevel.Error, shared: true, outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [{versionString}] {Message:lj} {NewLine}{Exception}")
-                    .WriteTo.Console(theme: AnsiConsoleTheme.Code, outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [{versionString}] {Message:lj} {NewLine}{Exception}")
+                    .WriteTo.File(Path.Combine(logsPath, $"migration.log"), LogEventLevel.Verbose, shared: true,outputTemplate: outputTemplate)
+                    .WriteTo.File(new Serilog.Formatting.Json.JsonFormatter(), Path.Combine(logsPath, $"migration-errors.log"), LogEventLevel.Error, shared: true)
+                    .WriteTo.Logger(lc => lc
+                            //.Filter.ByExcluding(Matching.FromSource("Microsoft.Hosting.Lifetime"))
+                            //.Filter.ByExcluding(Matching.FromSource("Microsoft.Extensions.Hosting.Internal.Host"))
+                            .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Debug, theme: AnsiConsoleTheme.Code, outputTemplate: outputTemplate))
                     ;
                     
                 LoggerHasBeenBuilt = true;
