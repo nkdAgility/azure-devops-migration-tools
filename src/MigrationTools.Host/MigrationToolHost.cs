@@ -57,14 +57,20 @@ namespace MigrationTools.Host
             var configFile = CommandSettingsBase.ForceGetConfigFile(args);
             var mtv = new MigrationToolVersion();
 
+            string logsPath = CreateLogsPath();
+
             var hostBuilder = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args);
             hostBuilder.UseSerilog((hostingContext, services, loggerConfiguration) =>
             {
                 loggerConfiguration
                     .ReadFrom.Configuration(hostingContext.Configuration)
                     .Enrich.WithProperty("versionString", mtv.GetRunningVersion().versionString)
-                    .WriteTo.ApplicationInsights(services.GetService<TelemetryConfiguration>(), new CustomConverter(), LogEventLevel.Error);
-                logs++;
+                    .WriteTo.ApplicationInsights(services.GetService<TelemetryConfiguration>(), new CustomConverter(), LogEventLevel.Error)
+                    .WriteTo.File(Path.Combine(logsPath, $"migration.log"), LogEventLevel.Verbose, shared: true,outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [{versionString}] {Message:lj} {NewLine}{Exception}")
+                    .WriteTo.File(Path.Combine(logsPath, $"migration-errors.log"), LogEventLevel.Error, shared: true, outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [{versionString}] {Message:lj} {NewLine}{Exception}")
+                    .WriteTo.Console(theme: AnsiConsoleTheme.Code, outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [{versionString}] {Message:lj} {NewLine}{Exception}")
+                    ;
+                    
                 LoggerHasBeenBuilt = true;
             });
 
