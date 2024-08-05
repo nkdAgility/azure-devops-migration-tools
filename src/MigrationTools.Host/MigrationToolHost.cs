@@ -33,6 +33,7 @@ using System.Data;
 using static System.Collections.Specialized.BitVector32;
 using System.Text.Json;
 using MigrationTools.Enrichers;
+using Newtonsoft.Json;
 
 namespace MigrationTools.Host
 {
@@ -44,31 +45,21 @@ namespace MigrationTools.Host
         static int logs = 1;
         private static bool LoggerHasBeenBuilt = false;
 
+        public static IEnumerable<T> GetAll<T>(this IServiceProvider provider)
+        {
+            var site = typeof(ServiceProvider).GetProperty("CallSiteFactory", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(provider);
+            var desc = site.GetType().GetField("_descriptors", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(site) as ServiceDescriptor[];
+            return desc.Select(s => provider.GetRequiredService(s.ServiceType)).OfType<T>();
+        }
+
         public static IHostBuilder CreateDefaultBuilder(string[] args)
         {
             var configFile = CommandSettingsBase.ForceGetConfigFile(args);
             var mtv = new MigrationToolVersion();
 
-
-
-
-
             var hostBuilder = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args);
             hostBuilder.UseSerilog((hostingContext, services, loggerConfiguration) =>
             {
-                string outputTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] [{versionString}] {Message:lj} {NewLine}{Exception}"; // {SourceContext}
-                string logsPath = CreateLogsPath();
-
-                var logPath = Path.Combine(logsPath, $"migration-{logs}.log");
-
-                string configLogLevelString = hostingContext.Configuration.GetValue<string>("LogLevel");
-                LogEventLevel logLevel = LogEventLevel.Information;
-                if (configLogLevelString != null)
-                {
-                    logLevel = (LogEventLevel)Enum.Parse(typeof(LogEventLevel), configLogLevelString);
-                    var levelSwitch = new LoggingLevelSwitch(logLevel);
-                    loggerConfiguration.MinimumLevel.ControlledBy(levelSwitch);
-                }                             
                 loggerConfiguration
                     .ReadFrom.Configuration(hostingContext.Configuration)
                     .Enrich.WithProperty("versionString", mtv.GetRunningVersion().versionString)
