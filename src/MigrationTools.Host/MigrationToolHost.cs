@@ -52,7 +52,7 @@ namespace MigrationTools.Host
             return desc.Select(s => provider.GetRequiredService(s.ServiceType)).OfType<T>();
         }
 
-        public static IHostBuilder CreateDefaultBuilder(string[] args)
+        public static IHostBuilder CreateDefaultBuilder(string[] args, Action<IConfigurator> extraCommands = null)
         {
             var configFile = CommandSettingsBase.ForceGetConfigFile(args);
             var mtv = new MigrationToolVersion();
@@ -179,8 +179,16 @@ namespace MigrationTools.Host
 
             hostBuilder.UseSpectreConsole(config =>
             {
-                config.AddCommand<Commands.ExecuteMigrationCommand>("execute");
-                config.AddCommand<Commands.InitMigrationCommand>("init");
+                config.AddCommand<Commands.ExecuteMigrationCommand>("execute")
+                            .WithDescription("Executes the enables processors specified in the configuration file.")
+                            .WithExample("execute -config \"configuration.json\"")
+                            .WithExample("execute -config \"configuration.json\" --skipVersionCheck ");
+                config.AddCommand<Commands.InitMigrationCommand>("init")
+                            .WithDescription("Creates an default configuration file")
+                            .WithExample("init -options Basic")
+                            .WithExample("init -options WorkItemTracking ")
+                            .WithExample("init -options Reference ");
+                extraCommands?.Invoke(config);
                 config.PropagateExceptions();
             });
             hostBuilder.UseConsoleLifetime();
@@ -192,9 +200,11 @@ namespace MigrationTools.Host
 
         private static MigrationConfigVersion GetMigrationConfigVersion(IConfiguration configuration)
         {
+            bool isOldFormat = false;
             string configVersionString = configuration.GetValue<string>("MigrationTools:Version");
             if (string.IsNullOrEmpty(configVersionString))
             {
+                isOldFormat = true;
                 configVersionString = configuration.GetValue<string>("Version");
             }
             if (string.IsNullOrEmpty(configVersionString))
@@ -202,7 +212,7 @@ namespace MigrationTools.Host
                 configVersionString = "0.0";
             }
             Version.TryParse(configVersionString, out Version configVersion);
-            if (configVersion < Version.Parse("16.0"))
+            if (configVersion < Version.Parse("16.0") || isOldFormat)
             {
                 return MigrationConfigVersion.v15;
             } else
@@ -225,13 +235,6 @@ namespace MigrationTools.Host
 
             return exportPath;
         }
-
-        private static Type GetProcessorFromTypeString(string processorType)
-        {
-            // Get all types from each assembly
-            return AppDomain.CurrentDomain.GetMigrationToolsTypes().WithInterface<IProcessorConfig>().WithNameString(processorType);
-        }
-
 
     }
 }
