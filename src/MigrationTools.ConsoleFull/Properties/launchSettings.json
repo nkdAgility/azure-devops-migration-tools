@@ -1,25 +1,5 @@
 {
   "profiles": {
-    "execute": {
-      "commandName": "Project",
-      "commandLineArgs": "execute -c \"configuration.json\""
-    },
-    "executepipe": {
-      "commandName": "Project",
-      "commandLineArgs": "execute -c configuration2-pipeline.json"
-    },
-    "init": {
-      "commandName": "Project",
-      "commandLineArgs": "init --options Basic"
-    },
-    "execute2": {
-      "commandName": "Project",
-      "commandLineArgs": "execute -c configuration2.json"
-    },
-    "init2": {
-      "commandName": "Project",
-      "commandLineArgs": "init -c configuration2.json --options Fullv2"
-    },
     "empty": {
       "commandName": "Project"
     },
@@ -27,13 +7,33 @@
       "commandName": "Project",
       "commandLineArgs": "execute"
     },
+    "execute": {
+      "commandName": "Project",
+      "commandLineArgs": "execute -c \"configuration.json\""
+    },
     "Execute v3": {
       "commandName": "Project",
       "commandLineArgs": "execute -c \"configuration3.json\""
     },
+    "executepipe": {
+      "commandName": "Project",
+      "commandLineArgs": "execute -c configuration2-pipeline.json"
+    },
+    "execute2": {
+      "commandName": "Project",
+      "commandLineArgs": "execute -c configuration2.json"
+    },
     "execute --help": {
       "commandName": "Project",
       "commandLineArgs": "execute --help"
+    },
+    "init Options-Basic": {
+      "commandName": "Project",
+      "commandLineArgs": "init --options Basic"
+    },
+    "init Options-Fullv2": {
+      "commandName": "Project",
+      "commandLineArgs": "init -c configuration2.json --options Fullv2"
     }
   }
 }

@@ -188,6 +188,10 @@ namespace MigrationTools.Host
                             .WithExample("init -options Basic")
                             .WithExample("init -options WorkItemTracking ")
                             .WithExample("init -options Reference ");
+
+                //config.AddCommand<Commands.MigrationConfigCommand>("config")
+                //            .WithDescription("Creates or edits a configuration file")
+                //            .WithExample("config -config \"configuration.json\"");
                 extraCommands?.Invoke(config);
                 config.PropagateExceptions();
             });
