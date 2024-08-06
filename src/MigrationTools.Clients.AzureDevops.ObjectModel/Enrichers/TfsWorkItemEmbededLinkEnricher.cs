@@ -108,7 +108,7 @@ namespace MigrationTools.Enrichers
                                 {
                                     var replaceValue = value;
                                     field.Value = field.Value.ToString().Replace(anchorTagMatch.Value, replaceValue);
-                                    Log.LogError("{LogTypeName}: [SKIP] Matching target work item mention link for source work item {workItemId} mention link on field {fieldName} on target work item {targetWorkItemId} was not found on the target collection. So link is replaced with just simple text.", LogTypeName, workItemId, field.Name, targetWorkItem.Id);
+                                    Log.LogWarning("{LogTypeName}: [SKIP] Matching target work item mention link for source work item {workItemId} mention link on field {fieldName} on target work item {targetWorkItemId} was not found on the target collection. So link is replaced with just simple text.", LogTypeName, workItemId, field.Name, targetWorkItem.Id);
                                 }
                             }
                             else
