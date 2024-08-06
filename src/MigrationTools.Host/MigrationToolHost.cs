@@ -157,7 +157,7 @@ namespace MigrationTools.Host
                  //#endif
                  services.AddApplicationInsightsTelemetryWorkerService(aiso);
 
-                 // Services
+                 //// Services
                  services.AddTransient<IDetectOnlineService, DetectOnlineService>();
                  //services.AddTransient<IDetectVersionService, DetectVersionService>();
                  services.AddTransient<IDetectVersionService2, DetectVersionService2>();
@@ -166,14 +166,14 @@ namespace MigrationTools.Host
                  services.AddSingleton<IMigrationToolVersion, MigrationToolVersion>();
 
 
-                 // Config
+                 //// Config
                  services.AddSingleton<IEngineConfigurationBuilder, EngineConfigurationBuilder>();
                  services.AddTransient((provider) => provider.GetRequiredService<IEngineConfigurationBuilder>() as IEngineConfigurationReader);
                  services.AddTransient((provider) => provider.GetRequiredService<IEngineConfigurationBuilder>() as ISettingsWriter);
 
-                 // Add Old v1Bits
+                 //// Add Old v1Bits
                  services.AddMigrationToolServicesLegacy();
-                 // New v2Bits
+                 //// New v2Bits
                  services.AddMigrationToolServices();
              });
 
@@ -189,9 +189,9 @@ namespace MigrationTools.Host
                             .WithExample("init -options WorkItemTracking ")
                             .WithExample("init -options Reference ");
 
-                //config.AddCommand<Commands.MigrationConfigCommand>("config")
-                //            .WithDescription("Creates or edits a configuration file")
-                //            .WithExample("config -config \"configuration.json\"");
+                config.AddCommand<Commands.MigrationConfigCommand>("config")
+                            .WithDescription("Creates or edits a configuration file")
+                           .WithExample("config -config \"configuration.json\"");
                 extraCommands?.Invoke(config);
                 config.PropagateExceptions();
             });

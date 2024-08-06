@@ -40,7 +40,7 @@ namespace MigrationTools.Host.Commands
             int _exitCode;
             try
             {
-                Telemetery.TrackEvent(new EventTelemetry("InitCommand"));
+                Telemetery.TrackEvent(new EventTelemetry("MigrationConfigCommand"));
                 string configFile = settings.ConfigFile;
                 if (string.IsNullOrEmpty(configFile))
                 {
@@ -49,8 +49,8 @@ namespace MigrationTools.Host.Commands
                 _logger.LogInformation("ConfigFile: {configFile}", configFile);
                 if (File.Exists(configFile))
                 {
-                    _logger.LogInformation("Deleting old configuration.json reference file");
-                    File.Delete(configFile);
+                   //
+                   throw new Exception("File already exists! We dont yet support edit");
                 }
                 if (!File.Exists(configFile))
                 {
