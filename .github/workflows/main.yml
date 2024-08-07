@@ -41,6 +41,7 @@ jobs:
       nkdAgility_Ring: ${{ steps.nkdagility.outputs.Ring }}
       nkdAgility_WingetApplicationId: ${{ steps.nkdagility.outputs.WingetApplicationId }}
       nkdAgility_IsBuildEditBranch: ${{ steps.nkdagility.outputs.IsBuildEditBranch }}
+      nkdAgility_ReleaseDescription: ${{ steps.nkdagility.outputs.release_description }}
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -97,7 +98,16 @@ jobs:
                 $IsBuildEditBranch = $true;
             }
             Write-Output "IsBuildEditBranch=$IsBuildEditBranch"
-            echo "IsBuildEditBranch=$IsBuildEditBranch" >> $env:GITHUB_OUTPUT   
+            echo "IsBuildEditBranch=$IsBuildEditBranch" >> $env:GITHUB_OUTPUT
+
+             . .\build\include\Get-ReleaseDescription.ps1
+             $description = Get-ReleaseDescription -mode log -OPEN_AI_KEY ${{ secrets.OPENAI_API_KEY }}
+             echo "release_description=$description" >> $env:GITHUB_OUTPUT    
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: AzureDevOpsMigrationTools-Scripts
+        path: ./build/**
 
   # Setup Validator
   SetupSummeryStage:
@@ -161,10 +171,6 @@ jobs:
           files: '["**/StaticVariables.cs"]'
           tokenPrefix: "${"
           tokenSuffix: "}"
-      - uses: actions/upload-artifact@v4
-        with:
-          name: AzureDevOpsMigrationTools-BuildScripts
-          path: ./build/**
       - name: Setup .NET
         uses: actions/setup-dotnet@v1
         with:
@@ -215,10 +221,6 @@ jobs:
         with:
           name: AzureDevOpsMigrationTools-Packages
           path: ./staging/**
-      - uses: actions/upload-artifact@v4
-        with:
-          name: AzureDevOpsMigrationTools-Scripts
-          path: ./build/**
 
   # Build Docs
   BuildDocs:
@@ -310,7 +312,7 @@ jobs:
             Version: ${{ needs.Setup.outputs.GitVersion_SemVer }}
             Ring: (${{ needs.Setup.outputs.nkdAgility_Ring }})
 
-            ${{ steps.release-options.outputs.release_description }}
+            ${{ needs.Setup.outputs.nkdAgility_ReleaseDescription }}
 
             ## Get the tools
 
