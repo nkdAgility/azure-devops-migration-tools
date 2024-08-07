@@ -39,14 +39,15 @@ function Get-ReleaseDescription {
         $compairTo = "main"
     }
     Write-Host "Comparing: $compairFrom...$compairTo"
-    Write-Host "-----------------------------------------"
-    
+    Write-Host "-----------------------------------------"    
     switch ($mode)
     {
         "log" {
+            Write-Host "Running: git log"
             $result = git log --pretty=format:'{\"hash\": \"%H\", \"author\": \"%an\", \"date\": \"%ad\", \"message\": \"%s\"}' "$compairFrom...$compairTo"
         }
         "diff" {
+            Write-Host "Running: git diff"
             $diffOutPut  = git diff "$compairFrom...$compairTo"
             $joineddiffOutPut = $diffOutPut -join "`n"
             $splitdiffOutPut = $joineddiffOutPut -split "diff --git"
@@ -57,7 +58,7 @@ function Get-ReleaseDescription {
             return
         }
     }
-
+    Write-Host "-----------------------------------------"
     If ([string]::IsNullOrEmpty($result) ) {
         Write-Host "No changes found"
         return
