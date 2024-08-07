@@ -279,6 +279,9 @@ jobs:
              if ($Env:nkdAgility_Ring -eq 'Release') {
                 echo "discussion_category_name=Anouncement" >> $env:GITHUB_OUTPUT    
              }
+             . ./build/include/Get-ReleaseDescription.ps1
+             $description = Get-ReleaseDescription -mode log -OPEN_AI_KEY ${{ secrets.OPENAI_API_KEY }}
+             echo "release_description=$description" >> $env:GITHUB_OUTPUT    
              
       - name: Release
         uses: softprops/action-gh-release@v2
@@ -298,6 +301,8 @@ jobs:
             ## Azure DevOps Migration Tools v${{ needs.Setup.outputs.GitVersion_SemVer }} 
             Version: ${{ needs.Setup.outputs.GitVersion_SemVer }}
             Ring: (${{ needs.Setup.outputs.nkdAgility_Ring }})
+
+            ${{ steps.release-options.outputs.release_description }}
 
             ## Get the tools
 
