@@ -100,9 +100,10 @@ jobs:
             Write-Output "IsBuildEditBranch=$IsBuildEditBranch"
             echo "IsBuildEditBranch=$IsBuildEditBranch" >> $env:GITHUB_OUTPUT
 
-             . .\build\include\Get-ReleaseDescription.ps1
-             $description = Get-ReleaseDescription -mode log -OPEN_AI_KEY ${{ secrets.OPENAI_API_KEY }}
-             echo "release_description=$description" >> $env:GITHUB_OUTPUT    
+            Write-Output "Running Get-ReleaseDescription.ps1"
+            . .\build\include\Get-ReleaseDescription.ps1
+            $description = Get-ReleaseDescription -mode log -OPEN_AI_KEY ${{ secrets.OPENAI_API_KEY }}
+            echo "release_description=$description" >> $env:GITHUB_OUTPUT    
 
     - uses: actions/upload-artifact@v4
       with:

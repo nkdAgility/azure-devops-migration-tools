@@ -28,9 +28,9 @@ function Get-ReleaseDescription {
         [Parameter(Mandatory=$true)]
         [string]$OPEN_AI_KEY
     )
-    Write-Output "Azure DevOps Migration Tools (Release) Description"
-    Write-Output "========================================="
-    Write-Output "Mode: $mode"
+    Write-Host "Azure DevOps Migration Tools (Release) Description"
+    Write-Host "========================================="
+    Write-Host "Mode: $mode"
     if ([string]::IsNullOrEmpty($compairFrom) ){
         $lastRelease = gh release list --exclude-pre-releases --json name,tagName,publishedAt --limit 1 | ConvertFrom-Json
         $compairFrom = $lastRelease.tagName
@@ -38,8 +38,8 @@ function Get-ReleaseDescription {
     If ([string]::IsNullOrEmpty($compairTo) ) {
         $compairTo = "main"
     }
-    Write-Output "Comparing: $compairFrom...$compairTo"
-    Write-Output "-----------------------------------------"
+    Write-Host "Comparing: $compairFrom...$compairTo"
+    Write-Host "-----------------------------------------"
     
     switch ($mode)
     {
@@ -53,13 +53,13 @@ function Get-ReleaseDescription {
             $result = $splitdiffOutPut | ConvertTo-Json
         }
         default {
-            Write-Output "Invalid mode"
+            Write-Host "Invalid mode"
             return
         }
     }
 
     If ([string]::IsNullOrEmpty($result) ) {
-        Write-Output "No changes found"
+        Write-Host "No changes found"
         return
     }
     
