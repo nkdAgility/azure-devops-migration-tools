@@ -126,6 +126,7 @@ jobs:
                  - nkdAgility_Ring: ${{needs.Setup.outputs.nkdAgility_Ring}}
                  - nkdAgility_IsBuildEditBranch: ${{needs.Setup.outputs.nkdAgility_IsBuildEditBranch}}
                  - nkdAgility_WingetApplicationId: ${{needs.Setup.outputs.nkdAgility_WingetApplicationId}}
+                 - nkdAgility_ReleaseDescription: ${{needs.Setup.outputs.nkdAgility_ReleaseDescription}}
                ### GitVersion
                  - GitVersion_BranchName: ${{needs.Setup.outputs.GitVersion_BranchName}}
                  - GitVersion_SemVer: ${{needs.Setup.outputs.GitVersion_SemVer}}
