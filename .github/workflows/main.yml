@@ -215,6 +215,10 @@ jobs:
         with:
           name: AzureDevOpsMigrationTools-Packages
           path: ./staging/**
+      - uses: actions/upload-artifact@v4
+        with:
+          name: AzureDevOpsMigrationTools-Scripts
+          path: ./build/**
 
   # Build Docs
   BuildDocs:
@@ -263,6 +267,9 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: AzureDevOpsMigrationTools-Packages
+      - uses: actions/download-artifact@v4
+        with:
+          name: AzureDevOpsMigrationTools-Scripts
       - uses: actions/create-github-app-token@v1
         id: app-token
         with:
