@@ -258,7 +258,7 @@ jobs:
       HasChanged_docs: ${{ needs.Setup.outputs.HasChanged_docs }}
       HasChanged_automation: ${{ needs.Setup.outputs.HasChanged_automation }}
     needs: [build, Setup]
-    if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring != 'Canary' ) }}
+    if: ${{ success() }} #&& ( needs.Setup.outputs.nkdAgility_Ring != 'Canary' )
     steps:
       - uses: actions/download-artifact@v4
         with:
