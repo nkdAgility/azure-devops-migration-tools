@@ -270,6 +270,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: AzureDevOpsMigrationTools-Scripts
+          path: ./build/
       - uses: actions/create-github-app-token@v1
         id: app-token
         with:
