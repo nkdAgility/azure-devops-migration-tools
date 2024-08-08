@@ -28,6 +28,7 @@ function Get-ReleaseDescription {
         [Parameter(Mandatory=$true)]
         [string]$OPEN_AI_KEY
     )
+    Write-Host "========================================="
     Write-Host "Azure DevOps Migration Tools (Release) Description"
     Write-Host "========================================="
     Write-Host "Mode: $mode"
@@ -44,7 +45,8 @@ function Get-ReleaseDescription {
     {
         "log" {
             Write-Host "Running: git log"
-            $result = git log --pretty=format:'{\"hash\": \"%H\", \"author\": \"%an\", \"date\": \"%ad\", \"message\": \"%s\"}' "$compairFrom...$compairTo"
+            $result = git log "$compairFrom...$compairTo" #--pretty=format:'{\"hash\": \"%H\", \"author\": \"%an\", \"date\": \"%ad\", \"message\": \"%s\"}' 
+            Write-Host "Complete: git log"
         }
         "diff" {
             Write-Host "Running: git diff"
@@ -52,6 +54,7 @@ function Get-ReleaseDescription {
             $joineddiffOutPut = $diffOutPut -join "`n"
             $splitdiffOutPut = $joineddiffOutPut -split "diff --git"
             $result = $splitdiffOutPut | ConvertTo-Json
+            Write-Host "Complete: git diff"
         }
         default {
             Write-Host "Invalid mode"
