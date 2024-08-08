@@ -20,7 +20,6 @@ namespace MigrationTools._EngineV1.Configuration
         public List<IProcessorEnricherOptions> CommonEnrichersConfig { get; set; } = new List<IProcessorEnricherOptions>();
         public List<IProcessorConfig> Processors { get; set; }
         public string Version { get; set; }
-        public bool workaroundForQuerySOAPBugEnabled { get; set; }
         public Dictionary<string, string> WorkItemTypeDefinition { get; set; } = new Dictionary<string, string>();
     }
 }

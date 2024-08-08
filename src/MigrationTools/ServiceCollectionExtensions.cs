@@ -14,7 +14,7 @@ namespace MigrationTools
     {
         public static void AddMigrationToolServices(this IServiceCollection context)
         {
-            context.AddEndpoint();
+            context.AddMigrationToolsEndpoint();
             //Containers
             context.AddTransient<ProcessorEnricherContainer>();
             context.AddTransient<EndpointEnricherContainer>();

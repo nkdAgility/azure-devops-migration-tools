@@ -25,46 +25,61 @@ using System.Diagnostics;
 using System.Text.RegularExpressions;
 using MigrationTools.Services;
 using Spectre.Console.Extensions.Hosting;
+using System.Configuration;
+using NuGet.Protocol.Plugins;
+using System.Collections.Generic;
+using System.Linq;
+using System.Data;
+using static System.Collections.Specialized.BitVector32;
+using System.Text.Json;
+using MigrationTools.Enrichers;
+using Newtonsoft.Json;
 
 namespace MigrationTools.Host
 {
 
-    
+
 
     public static class MigrationToolHost
     {
         static int logs = 1;
         private static bool LoggerHasBeenBuilt = false;
 
-        public static IHostBuilder CreateDefaultBuilder(string[] args)
+        public static IEnumerable<T> GetAll<T>(this IServiceProvider provider)
         {
-           var configFile =  CommandSettingsBase.ForceGetConfigFile(args);
+            var site = typeof(ServiceProvider).GetProperty("CallSiteFactory", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(provider);
+            var desc = site.GetType().GetField("_descriptors", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(site) as ServiceDescriptor[];
+            return desc.Select(s => provider.GetRequiredService(s.ServiceType)).OfType<T>();
+        }
+
+        public static IHostBuilder CreateDefaultBuilder(string[] args, Action<IConfigurator> extraCommands = null)
+        {
+            var configFile = CommandSettingsBase.ForceGetConfigFile(args);
             var mtv = new MigrationToolVersion();
 
+            string logsPath = CreateLogsPath();
+
             var hostBuilder = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args);
+
+            var outputTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] [{versionString}] {Message:lj} {NewLine}{Exception}"; // 
+
             hostBuilder.UseSerilog((hostingContext, services, loggerConfiguration) =>
             {
-                    string outputTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] [" + mtv.GetRunningVersion().versionString + "] {Message:lj}{NewLine}{Exception}"; // {SourceContext}
-                    string logsPath = CreateLogsPath();
-                    var logPath = Path.Combine(logsPath, $"migration-{logs}.log");
-
-                    var logLevel = hostingContext.Configuration.GetValue<LogEventLevel>("LogLevel");
-                    var levelSwitch = new LoggingLevelSwitch(logLevel);
-                    loggerConfiguration
-                        .MinimumLevel.ControlledBy(levelSwitch)
-                        .ReadFrom.Configuration(hostingContext.Configuration)
-                        .Enrich.FromLogContext()
-                        .Enrich.WithMachineName()
-                        .Enrich.WithProcessId()
-                        .WriteTo.File(logPath, LogEventLevel.Verbose, outputTemplate)
-                        .WriteTo.Logger(lc => lc
+                loggerConfiguration
+                    .ReadFrom.Configuration(hostingContext.Configuration)
+                    .Enrich.WithProperty("versionString", mtv.GetRunningVersion().versionString)
+                    .Enrich.FromLogContext()
+                    .Enrich.WithProcessId()
+                    .WriteTo.ApplicationInsights(services.GetService<TelemetryConfiguration>(), new CustomConverter(), LogEventLevel.Error)
+                    .WriteTo.File(Path.Combine(logsPath, $"migration.log"), LogEventLevel.Verbose, shared: true,outputTemplate: outputTemplate)
+                    .WriteTo.File(new Serilog.Formatting.Json.JsonFormatter(), Path.Combine(logsPath, $"migration-errors.log"), LogEventLevel.Error, shared: true)
+                    .WriteTo.Logger(lc => lc
                             .Filter.ByExcluding(Matching.FromSource("Microsoft.Hosting.Lifetime"))
                             .Filter.ByExcluding(Matching.FromSource("Microsoft.Extensions.Hosting.Internal.Host"))
-                            .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Debug, theme: AnsiConsoleTheme.Code, outputTemplate: outputTemplate))
-                        .WriteTo.Logger(lc => lc
-                            .WriteTo.ApplicationInsights(services.GetService<TelemetryConfiguration> (), new CustomConverter(), LogEventLevel.Error));
-                    logs++;
-                    LoggerHasBeenBuilt = true;                
+                            .WriteTo.Console(theme: AnsiConsoleTheme.Code, outputTemplate: outputTemplate))
+                    ;
+                    
+                LoggerHasBeenBuilt = true;
             });
 
             hostBuilder.ConfigureLogging((context, logBuilder) =>
@@ -72,39 +87,66 @@ namespace MigrationTools.Host
              })
             .ConfigureAppConfiguration(builder =>
             {
-                if (!string.IsNullOrEmpty(configFile) &&  File.Exists(configFile))
+                if (!string.IsNullOrEmpty(configFile) && File.Exists(configFile))
                 {
                     builder.AddJsonFile(configFile);
                 }
+                builder.AddEnvironmentVariables();
+                builder.AddCommandLine(args);
             });
 
             hostBuilder.ConfigureServices((context, services) =>
              {
-                 services.AddOptions();
-                 services.Configure<EngineConfiguration>((config) =>
-                 {
-                     var sp = services.BuildServiceProvider();
-                     var logger = sp.GetService<ILoggerFactory>().CreateLogger<EngineConfiguration>();
-                     if (!File.Exists(configFile))
-                     {
-                         logger.LogCritical("The config file {ConfigFile} does not exist, nor does the default 'configuration.json'. Use '{ExecutableName}.exe init' to create a configuration file first", configFile, Assembly.GetEntryAssembly().GetName().Name);
-                         Environment.Exit(-1);
-                     }
-                     logger.LogInformation("Config Found, creating engine host");
-                     var reader = sp.GetRequiredService<IEngineConfigurationReader>();
-                     var parsed = reader.BuildFromFile(configFile);
-                     config.ChangeSetMappingFile = parsed.ChangeSetMappingFile;
-                     config.FieldMaps = parsed.FieldMaps;
-                     config.GitRepoMapping = parsed.GitRepoMapping;
-                     config.CommonEnrichersConfig = parsed.CommonEnrichersConfig;
-                     config.Processors = parsed.Processors;
-                     config.Source = parsed.Source;
-                     config.Target = parsed.Target;
-                     config.Version = parsed.Version;
-                     config.workaroundForQuerySOAPBugEnabled = parsed.workaroundForQuerySOAPBugEnabled;
-                     config.WorkItemTypeDefinition = parsed.WorkItemTypeDefinition;
-                 });
 
+                 services.AddOptions();
+
+                 services.AddOptions<EngineConfiguration>().Configure<IEngineConfigurationReader, ILogger<EngineConfiguration>, IConfiguration>(
+                   (options, reader, logger, configuration) =>
+                   {
+                       if (!File.Exists(configFile))
+                       {
+                           logger.LogCritical("The config file {ConfigFile} does not exist, nor does the default 'configuration.json'. Use '{ExecutableName}.exe init' to create a configuration file first", configFile, Assembly.GetEntryAssembly().GetName().Name);
+                           Environment.Exit(-1);
+                       }
+                       logger.LogInformation("Config Found, creating engine host");
+                       MigrationConfigVersion configVersion = GetMigrationConfigVersion(configuration);
+                       switch (configVersion)
+                       {
+                           case MigrationConfigVersion.v15:
+                               logger.LogCritical("The config file {ConfigFile} uses an outdated format. We are continuing to support this format through a grace period. Use '{ExecutableName}.exe init' to create a new configuration file and port over your old configuration.", configFile, Assembly.GetEntryAssembly().GetName().Name);
+                               var parsed = reader.BuildFromFile(configFile); // TODO revert tp 
+                               options.ChangeSetMappingFile = parsed.ChangeSetMappingFile;
+                               options.FieldMaps = parsed.FieldMaps;
+                               options.GitRepoMapping = parsed.GitRepoMapping;
+                               options.CommonEnrichersConfig = parsed.CommonEnrichersConfig;
+                               options.Processors = parsed.Processors;
+                               options.Source = parsed.Source;
+                               options.Target = parsed.Target;
+                               options.Version = parsed.Version;
+                               options.WorkItemTypeDefinition = parsed.WorkItemTypeDefinition;
+                               break;
+                           case MigrationConfigVersion.v16:
+                               // This code Converts the new config format to the v1 and v2 runtme format.
+                               options.Version = configuration.GetValue<string>("MigrationTools:Version");
+                               options.ChangeSetMappingFile = configuration.GetValue<string>("MigrationTools:CommonEnrichers:TfsChangeSetMapping:File");
+                               //options.FieldMaps = configuration.GetSection("MigrationTools:FieldMaps").Get<IFieldMap[]>();
+                               options.GitRepoMapping = configuration.GetValue<Dictionary<string, string>>("MigrationTools:CommonEnrichers:TfsGitRepoMappings:WorkItemGitRepos");
+                               options.WorkItemTypeDefinition = configuration.GetValue<Dictionary<string, string>>("MigrationTools:CommonEnrichers:TfsWorkItemTypeMapping:WorkItemTypeDefinition");
+
+                               options.CommonEnrichersConfig = configuration.GetSection("MigrationTools:CommonEnrichers")?.ToMigrationToolsList<IProcessorEnricherOptions>(child => child.GetMigrationToolsNamedOption<IProcessorEnricherOptions>());
+
+                               options.Processors = configuration.GetSection("MigrationTools:Processors")?.ToMigrationToolsList<IProcessorConfig>(child => child.GetMigrationToolsOption<IProcessorConfig>("ProcessorType"));
+
+                               options.Source = configuration.GetSection("MigrationTools:Source")?.GetMigrationToolsOption<IMigrationClientConfig>("EndpointType");
+                               options.Target = configuration.GetSection("MigrationTools:Target")?.GetMigrationToolsOption<IMigrationClientConfig>("EndpointType");
+                               break;
+                           default:
+                               logger.LogCritical("The config file {ConfigFile} is not of the correct format. Use '{ExecutableName}.exe init' to create a new configuration file and port over your old configuration.", configFile, Assembly.GetEntryAssembly().GetName().Name);
+                               Environment.Exit(-1);
+                               break;
+                       }
+                   }
+               );
 
                  // Application Insights
                  ApplicationInsightsServiceOptions aiso = new ApplicationInsightsServiceOptions();
@@ -115,7 +157,7 @@ namespace MigrationTools.Host
                  //#endif
                  services.AddApplicationInsightsTelemetryWorkerService(aiso);
 
-                 // Services
+                 //// Services
                  services.AddTransient<IDetectOnlineService, DetectOnlineService>();
                  //services.AddTransient<IDetectVersionService, DetectVersionService>();
                  services.AddTransient<IDetectVersionService2, DetectVersionService2>();
@@ -124,21 +166,33 @@ namespace MigrationTools.Host
                  services.AddSingleton<IMigrationToolVersion, MigrationToolVersion>();
 
 
-                 // Config
+                 //// Config
                  services.AddSingleton<IEngineConfigurationBuilder, EngineConfigurationBuilder>();
                  services.AddTransient((provider) => provider.GetRequiredService<IEngineConfigurationBuilder>() as IEngineConfigurationReader);
                  services.AddTransient((provider) => provider.GetRequiredService<IEngineConfigurationBuilder>() as ISettingsWriter);
 
-                 // Add Old v1Bits
+                 //// Add Old v1Bits
                  services.AddMigrationToolServicesLegacy();
-                 // New v2Bits
+                 //// New v2Bits
                  services.AddMigrationToolServices();
              });
 
             hostBuilder.UseSpectreConsole(config =>
             {
-                config.AddCommand<Commands.ExecuteMigrationCommand>("execute");
-                config.AddCommand<Commands.InitMigrationCommand>("init");
+                config.AddCommand<Commands.ExecuteMigrationCommand>("execute")
+                            .WithDescription("Executes the enables processors specified in the configuration file.")
+                            .WithExample("execute -config \"configuration.json\"")
+                            .WithExample("execute -config \"configuration.json\" --skipVersionCheck ");
+                config.AddCommand<Commands.InitMigrationCommand>("init")
+                            .WithDescription("Creates an default configuration file")
+                            .WithExample("init -options Basic")
+                            .WithExample("init -options WorkItemTracking ")
+                            .WithExample("init -options Reference ");
+
+                config.AddCommand<Commands.MigrationConfigCommand>("config")
+                            .WithDescription("Creates or edits a configuration file")
+                           .WithExample("config -config \"configuration.json\"");
+                extraCommands?.Invoke(config);
                 config.PropagateExceptions();
             });
             hostBuilder.UseConsoleLifetime();
@@ -146,6 +200,29 @@ namespace MigrationTools.Host
 
 
             return hostBuilder;
+        }
+
+        private static MigrationConfigVersion GetMigrationConfigVersion(IConfiguration configuration)
+        {
+            bool isOldFormat = false;
+            string configVersionString = configuration.GetValue<string>("MigrationTools:Version");
+            if (string.IsNullOrEmpty(configVersionString))
+            {
+                isOldFormat = true;
+                configVersionString = configuration.GetValue<string>("Version");
+            }
+            if (string.IsNullOrEmpty(configVersionString))
+            {
+                configVersionString = "0.0";
+            }
+            Version.TryParse(configVersionString, out Version configVersion);
+            if (configVersion < Version.Parse("16.0") || isOldFormat)
+            {
+                return MigrationConfigVersion.v15;
+            } else
+            {
+                return MigrationConfigVersion.v16;
+            }
         }
 
         static string logDate = DateTime.Now.ToString("yyyyMMddHHmmss");
@@ -162,5 +239,15 @@ namespace MigrationTools.Host
 
             return exportPath;
         }
+
+    }
+}
+
+namespace MigrationTools.Host
+{
+    public enum MigrationConfigVersion
+    {
+        v15,
+        v16
     }
 }

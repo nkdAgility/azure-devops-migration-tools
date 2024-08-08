@@ -105,6 +105,7 @@ namespace VstsSyncMigrator.Engine
             _stringManipulatorEnricher = stringManipulatorEnricher;
             _teamSettingsEnricher = teamSettingsEnricher;
             _validateConfig = requiredFieldValidator;
+
         }
 
         public override string Name => "WorkItemMigration";

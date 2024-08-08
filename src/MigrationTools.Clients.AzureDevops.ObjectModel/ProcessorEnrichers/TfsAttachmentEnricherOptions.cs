@@ -7,8 +7,8 @@ namespace MigrationTools.Enrichers
 {
     public class TfsAttachmentEnricherOptions : ProcessorEnricherOptions, ITfsAttachmentEnricherOptions
     {
-        
 
+        public const string ConfigurationSectionName = "MigrationTools:CommonEnrichers:TfsAttachmentEnricher";
         public override Type ToConfigure => typeof(TfsAttachmentEnricher);
 
         /// <summary>

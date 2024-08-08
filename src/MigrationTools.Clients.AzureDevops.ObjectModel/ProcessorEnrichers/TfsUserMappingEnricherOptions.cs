@@ -8,7 +8,7 @@ namespace MigrationTools.Enrichers
     public class TfsUserMappingEnricherOptions : ProcessorEnricherOptions, ITfsUserMappingEnricherOptions
     {
 
-
+        public const string ConfigurationSectionName = "MigrationTools:CommonEnrichers:TfsUserMappingEnricher";
         public override Type ToConfigure => typeof(TfsUserMappingEnricher);
 
         /// <summary>

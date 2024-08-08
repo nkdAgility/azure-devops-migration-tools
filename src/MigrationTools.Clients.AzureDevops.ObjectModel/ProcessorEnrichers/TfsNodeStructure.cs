@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Xml;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation.Common;
 using Microsoft.TeamFoundation.Server;
 using Microsoft.TeamFoundation.Work.WebApi;
@@ -60,7 +61,7 @@ namespace MigrationTools.Enrichers
         private string _targetProjectName;
         private KeyValuePair<string, string>? _lastResortRemapRule;
 
-        public TfsNodeStructure(IServiceProvider services, ILogger<TfsNodeStructure> logger, ITelemetryLogger telemetryLogger)
+        public TfsNodeStructure(IOptions<TfsNodeStructureOptions> options, IServiceProvider services, ILogger<TfsNodeStructure> logger, ITelemetryLogger telemetryLogger)
             : base(services, logger, telemetryLogger)
         {
             contextLog = Serilog.Log.ForContext<TfsNodeStructure>();
