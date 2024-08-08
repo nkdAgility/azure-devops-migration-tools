@@ -113,14 +113,15 @@ jobs:
             $description = Get-ReleaseDescription -mode log -OPEN_AI_KEY ${{ secrets.OPENAI_API_KEY }}
             if ($description -eq $null) {
                 $description = "No release description found";
-                "release_description_state=false" | Out-File -FilePath $env:GITHUB_ENV -Append
+                echo "release_description_state=false" >> $env:GITHUB_OUTPUT
             } else {
-                "release_description_state=true" | Out-File -FilePath $env:GITHUB_ENV -Append
+                echo "release_description_state=true" >> $env:GITHUB_OUTPUT
+
             }
             $EOF = -join (1..15 | ForEach {[char]((48..57)+(65..90)+(97..122) | Get-Random)})
-            "release_description<<$EOF" | Out-File -FilePath $env:GITHUB_ENV -Append
-            $description | Out-File -FilePath $env:GITHUB_ENV -Append
-            "$EOF" | Out-File -FilePath $env:GITHUB_ENV -Append
+            echo "release_description<<$EOF" >> $env:GITHUB_OUTPUT
+            echo $description >> $env:GITHUB_OUTPUT
+            echo "$EOF" >> $env:GITHUB_OUTPUT
             
 
     - uses: actions/upload-artifact@v4
