@@ -110,11 +110,13 @@ jobs:
             Write-Output "Running Get-ReleaseDescription.ps1"
             . .\build\include\Get-ReleaseDescription.ps1
             $description = Get-ReleaseDescription -mode log -OPEN_AI_KEY ${{ secrets.OPENAI_API_KEY }}
-
+            if ($description -eq $null) {
+                $description = "No release description found";
+            }
             $EOF = -join (1..15 | ForEach {[char]((48..57)+(65..90)+(97..122) | Get-Random)})
-            echo "release_description<<$EOF" >> "${GITHUB_OUTPUT}"
-            echo $description >> "${GITHUB_OUTPUT}"
-            echo "$EOF" >> "${GITHUB_OUTPUT}"
+            "release_description<<$EOF" | Out-File -FilePath $env:GITHUB_ENV -Append
+            $description | Out-File -FilePath $env:GITHUB_ENV -Append
+            "$EOF" | Out-File -FilePath $env:GITHUB_ENV -Append
             #echo "release_description=$description" >> $env:GITHUB_OUTPUT    
 
     - uses: actions/upload-artifact@v4
