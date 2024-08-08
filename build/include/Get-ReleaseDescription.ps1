@@ -202,7 +202,7 @@ function Get-ReleaseDescription {
         "temperature" = 0
         "max_tokens"  = 2048
     } | ConvertTo-Json
-     Write-Host "Body:"
+    Write-Host "Body:"
     Write-Host $body
 
 
@@ -214,9 +214,15 @@ function Get-ReleaseDescription {
         "Authorization" = "Bearer $OPEN_AI_KEY"
     } -Body $body
     
-     Write-Host "-----------------------------------------"
-      Write-Host "Extracting Output.."
+    Write-Host "-----------------------------------------"
+    Write-Host "Extracting Output.."
     # Extract and display the response content
     $result = $response.choices[0].message.content
+    Write-Host "-----------------------------------------"
+    Write-Host "result:"
+    Write-Host $result
+    Write-Host "-----------------------------------------"
+    Write-Host "-----------------------------------------"
+    Write-Host "Returning.."
     return $result
 }
