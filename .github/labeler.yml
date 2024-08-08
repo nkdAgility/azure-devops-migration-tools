@@ -19,7 +19,7 @@ enhancement-classic:
 
 enhancement-modern:
 - changed-files:
-  - all-globs-to-any-files: ['src/**', '!src/MigrationTools/_EngineV1/**', '!src/VstsSyncMigrator*/**']
+  - all-globs-to-any-file: ['src/**', '!src/MigrationTools/_EngineV1/**', '!src/VstsSyncMigrator*/**']
 
 # Add 'feature' label to any PR where the head branch name starts with `feature` or has a `feature` section in the name
 feature:
