@@ -65,6 +65,8 @@ function Get-ReleaseDescription {
     If ([string]::IsNullOrEmpty($result) ) {
         Write-Host "No changes found"
         return
+    } else {
+        Write-Host "Changes found to create comment with!"
     }
     
     $prompt = @"
@@ -178,7 +180,13 @@ function Get-ReleaseDescription {
     # Prepare the full prompt with the git diff results appended
     $fullPrompt = $prompt + "`n`nUse the folowing json:`n`n" + $result
     
+    Write-Host "-----------------------------------------"
+    Write-Host "Prompt:"
+    Write-Host $fullPrompt
+    
+    Write-Host "-----------------------------------------"
     # Create the body for the API request
+    Write-Host "Create the body for the API request..."
     $body = @{
         "model"       = "gpt-4-turbo"
         "messages"    = @(
@@ -194,13 +202,20 @@ function Get-ReleaseDescription {
         "temperature" = 0
         "max_tokens"  = 2048
     } | ConvertTo-Json
-    
+     Write-Host "Body:"
+    Write-Host $body
+
+
+    Write-Host "-----------------------------------------"
+    Write-Host "Sending request to the ChatGPT API..."
     # Send the request to the ChatGPT API
     $response = Invoke-RestMethod -Uri $apiUrl -Method Post -Headers @{
         "Content-Type" = "application/json"
         "Authorization" = "Bearer $OPEN_AI_KEY"
     } -Body $body
     
+     Write-Host "-----------------------------------------"
+      Write-Host "Extracting Output.."
     # Extract and display the response content
     $result = $response.choices[0].message.content
     return $result
