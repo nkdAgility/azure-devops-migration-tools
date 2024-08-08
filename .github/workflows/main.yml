@@ -147,7 +147,7 @@ jobs:
                  - nkdAgility_IsBuildEditBranch: ${{needs.Setup.outputs.nkdAgility_IsBuildEditBranch}}
                  - nkdAgility_WingetApplicationId: ${{needs.Setup.outputs.nkdAgility_WingetApplicationId}}
                  - nkdAgility_ReleaseDescriptionState: ${{needs.Setup.outputs.nkdAgility_ReleaseDescriptionState}}
-                 - nkdAgility_ReleaseDescription: ${{needs.Setup.outputs.nkdAgility_ReleaseDescription}}
+             
                ### GitVersion
                  - GitVersion_BranchName: ${{needs.Setup.outputs.GitVersion_BranchName}}
                  - GitVersion_SemVer: ${{needs.Setup.outputs.GitVersion_SemVer}}
@@ -159,6 +159,8 @@ jobs:
                  - HasChanged_src: ${{needs.Setup.outputs.HasChanged_src}}
                  - HasChanged_docs: ${{needs.Setup.outputs.HasChanged_docs}}
                  - HasChanged_automation: ${{needs.Setup.outputs.HasChanged_automation}}
+               ## nkdAgility_ReleaseDescription
+               ${{needs.Setup.outputs.nkdAgility_ReleaseDescription}}
             "@
             echo $markdown >> $Env:GITHUB_STEP_SUMMARY
     
