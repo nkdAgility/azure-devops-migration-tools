@@ -45,7 +45,7 @@ function Get-ReleaseDescription {
     {
         "log" {
             Write-Host "Running: git log"
-            $result = git log "$compairFrom...$compairTo" #--pretty=format:'{\"hash\": \"%H\", \"author\": \"%an\", \"date\": \"%ad\", \"message\": \"%s\"}' 
+            $result = git log --pretty=format:'{\"hash\": \"%H\", \"author\": \"%an\", \"date\": \"%ad\", \"message\": \"%s\"}' "$compairFrom...$compairTo" #
             Write-Host "Complete: git log"
         }
         "diff" {
@@ -170,6 +170,33 @@ function Get-ReleaseDescription {
     - Lines must not be longer than 74 characters.
     - Use en-gb for the commit message.
 "@
+
+$prompt2 = @"
+    You are an expert in software development and business communication. You are given the JSON output of a git log or git diff command, capturing changes made between the last software release and the current one. Your task is to create a clear, detailed, and business-friendly summary of these changes.
+
+Instructions:
+
+1. Group by Intent: Organize the changes into categories based on the intent of the changes. Possible categories include  (title, emoji, description):
+    - New Features, ✨, Describe any new functionalities added.
+    - Enhancements, 💡,Outline improvements to existing features.
+    - Bug Fixes, 🐛,Summarize issues resolved.
+    - Performance Improvements, ⚡️,Note optimizations made for better performance.
+    - Refactoring, ♻️,Explain changes aimed at code structure improvement without altering functionality.
+    - Security Updates, 🔒️,Highlight security-related changes.
+    - Documentation Updates, 📝, Mention improvements or additions to documentation.
+    - Dependency Updates, 📌,Specify updates to libraries, packages, or tools.
+    - Other, 🧱,Capture any other changes that don’t fit the above categories.
+2. Link to Pull Requests: Where applicable, reference the relevant Pull Requests (PRs) by number or link, providing context on the reason for the changes.
+3. Provide Context: For each category, offer a brief explanation of why these changes were necessary or beneficial from a business perspective.
+4. Output Structure:
+    - Overview: Begin with a high-level summary of the release.
+    - Detailed Changes: Break down the changes by the categories above, including a description and the impact of each change.
+    - Conclusion: Finish with a conclusion that provides a brief outlook on the impact these changes are expected to have on the overall project or business goals.
+5. Tone: The summary should be written in a professional tone that is accessible to non-technical stakeholders but detailed enough for technical team members.
+6. Aditional information:
+    - Use the present tense.
+    - Use en-gb for the commit message.
+"@
     
     # Set the API endpoint and API key
     $apiUrl = "https://api.openai.com/v1/chat/completions"
@@ -178,7 +205,7 @@ function Get-ReleaseDescription {
     #$resultItemsString = $resultItems -join "`n"
     
     # Prepare the full prompt with the git diff results appended
-    $fullPrompt = $prompt + "`n`nUse the folowing json:`n`n" + $result
+    $fullPrompt = $prompt2 + "`n`nUse the folowing json:`n`n" + $result
     
     Write-Host "-----------------------------------------"
     Write-Host "Prompt:"
