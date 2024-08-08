@@ -5,9 +5,12 @@
   comment: >
     **Please create a GitHub Discussion instead of this issue.**
 
+
     As this issue has been labeled as `needs-discussion` by a maintainer it is being automatically closed and locked. It will later be deleted to avoid polluting repository searches with duplicate or incorrect content.
 
-    This doesn't necessarily mean that what you've reported isn't a problem or a reasonable idea, but it does mean that it should be raised as a Discussion first and not an Issue. Please create a Discussion now, assuming you still wish to discuss it.
+
+    This doesn't necessarily mean that what you've reported isn't a problem or a reasonable idea, but it does mean that it should be raised as a Discussion first and not an Issue. _Please create a Discussion now, assuming you still wish to discuss it._
+
 
     Thanks, Azure DevOps Migration Tools team
   close: true
@@ -19,7 +22,9 @@
   comment: >
     Hi, you need to format code or logs here so that they're more readable for others.
 
+
     You can find a Markdown code formatting guide [here](https://www.markdownguide.org/basic-syntax/#code) as well as some GitHub-specific information formatting code blocks [here](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/creating-and-highlighting-code-blocks).
+
 
     Thanks, Azure DevOps Migration Tools team
 
@@ -27,9 +32,12 @@
   comment: >
     Hi there,
 
+
     You're reporting a problem with an old version of the Azure DevOps Migration Tools.
     Please try the latest version and tell us if that fixes your problem.
 
+
     Good luck,
+
 
     Thanks, Azure DevOps Migration Tools team
