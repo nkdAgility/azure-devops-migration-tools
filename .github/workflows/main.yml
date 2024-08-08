@@ -316,7 +316,7 @@ jobs:
     env:
       GitVersion_SemVer: ${{ needs.Setup.outputs.GitVersion_SemVer }}
     needs: [GitHubRelease, Setup]
-    if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring != 'Canary' ) && (needs.Setup.outputs.HasChanged_src == 'true') }}
+    if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring != 'Canary' ) }}
     steps:
      - name: Create Deployment on elmah.io
        uses: elmahio/github-create-deployment-action@v1
