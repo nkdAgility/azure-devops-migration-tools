@@ -11,7 +11,7 @@ build-action:
 
 enhancement:
 - changed-files:
-  - all-glob-to-any-file: ['src/**']
+  - all-globs-to-any-file: ['src/**']
 
 enhancement-classic:
 - changed-files:
