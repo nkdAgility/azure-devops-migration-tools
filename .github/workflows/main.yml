@@ -112,6 +112,8 @@ jobs:
             $description = Get-ReleaseDescription -mode log -OPEN_AI_KEY ${{ secrets.OPENAI_API_KEY }}
             if ($description -eq $null) {
                 $description = "No release description found";
+            } else {
+                Write-Output "Release Description: $description"
             }
             $EOF = -join (1..15 | ForEach {[char]((48..57)+(65..90)+(97..122) | Get-Random)})
             "release_description<<$EOF" | Out-File -FilePath $env:GITHUB_ENV -Append
