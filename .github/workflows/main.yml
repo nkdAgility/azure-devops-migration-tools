@@ -131,11 +131,12 @@ jobs:
             echo $markdown >> $Env:GITHUB_STEP_SUMMARY
     
   # Build, Test, Sonar Cloud Analysis, & Package
+
   build:
     name: "Build, Test, Sonar Cloud Analysis, & Package"
     runs-on: windows-latest
     needs: Setup
-    if: ${{ needs.Setup.outputs.HasChanged_src }}
+    if: ${{ success() && ( needs.Setup.outputs.HasChanged_src ) }}
     env:
       solution: '**/*.sln'
       buildPlatform: 'Any CPU'
@@ -220,6 +221,7 @@ jobs:
   BuildDocs:
     name: "Build Documentation output"
     runs-on: ubuntu-latest
+    if: ${{ success() && ( needs.Setup.outputs.HasChanged_docs ) }}
     needs: [Setup]
     env:
       GitVersion_SemVer: ${{ needs.Setup.outputs.GitVersion_SemVer }}
@@ -258,7 +260,7 @@ jobs:
       HasChanged_docs: ${{ needs.Setup.outputs.HasChanged_docs }}
       HasChanged_automation: ${{ needs.Setup.outputs.HasChanged_automation }}
     needs: [build, Setup]
-    if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring != 'Canary' ) }}
+    if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring != 'Canary' ) && ( needs.Setup.outputs.HasChanged_src ) }}
     steps:
       - uses: actions/download-artifact@v4
         with:
