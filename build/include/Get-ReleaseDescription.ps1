@@ -196,6 +196,7 @@ Instructions:
 6. Aditional information:
     - Use the present tense.
     - Use en-gb for the commit message.
+    - Use https://github.com/nkdAgility/azure-devops-migration-tools as the github repository
 "@
     
     # Set the API endpoint and API key
