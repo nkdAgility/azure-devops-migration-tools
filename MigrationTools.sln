@@ -126,6 +126,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".build", ".build", "{88C358
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{BB497233-248C-49DF-AE12-F7A76F775E74}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Helpers.Tests", "src\MigrationTools.Helpers.Tests\MigrationTools.Helpers.Tests.csproj", "{EB20ED85-8876-4585-BC90-E6976C11DEE3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -208,6 +210,10 @@ Global
 		{6A259EA6-860B-448A-8943-594DC1A15105}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6A259EA6-860B-448A-8943-594DC1A15105}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6A259EA6-860B-448A-8943-594DC1A15105}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EB20ED85-8876-4585-BC90-E6976C11DEE3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB20ED85-8876-4585-BC90-E6976C11DEE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB20ED85-8876-4585-BC90-E6976C11DEE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB20ED85-8876-4585-BC90-E6976C11DEE3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -241,6 +247,7 @@ Global
 		{6A259EA6-860B-448A-8943-594DC1A15105} = {83F36820-E9BC-4F48-8202-5EAF9530405E}
 		{AC3B5101-83F5-4C28-976C-C325425D1988} = {1F5E9C8C-AD05-4C4F-B370-FF3D080A6541}
 		{BB497233-248C-49DF-AE12-F7A76F775E74} = {83F36820-E9BC-4F48-8202-5EAF9530405E}
+		{EB20ED85-8876-4585-BC90-E6976C11DEE3} = {BB497233-248C-49DF-AE12-F7A76F775E74}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {62EE0B27-C55A-46EE-8D17-1691DE9BBD50}

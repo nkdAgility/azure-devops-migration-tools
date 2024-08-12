@@ -24,7 +24,7 @@ namespace MigrationTools
             context.AddSingleton<FixGitCommitLinks>();
             context.AddSingleton<ImportProfilePictureContext>();
             context.AddSingleton<WorkItemDelete>();
-            context.AddSingleton<WorkItemUpdate>();
+            context.AddSingleton<WorkItemBulkEditProcessor>();
             context.AddSingleton<WorkItemUpdateAreasAsTagsContext>();
 
         }

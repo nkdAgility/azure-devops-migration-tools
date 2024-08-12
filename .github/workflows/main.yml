@@ -11,6 +11,17 @@ on:
   pull_request:
       branches: ["main"]
   workflow_dispatch:
+    inputs:
+      ForceHasChanged_src:
+        description: 'Force the src folder to be considered changed'
+        required: false
+        default: false
+        type: boolean
+      ForceHasChanged_docs:
+        description: 'Force the docs folder to be considered changed'
+        required: false
+        default: false
+        type: boolean
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }} 
@@ -40,7 +51,14 @@ jobs:
       HasChanged_automation: ${{ steps.filter.outputs.automation }}
       nkdAgility_Ring: ${{ steps.nkdagility.outputs.Ring }}
       nkdAgility_WingetApplicationId: ${{ steps.nkdagility.outputs.WingetApplicationId }}
-      nkdAgility_IsBuildEditBranch: ${{ steps.nkdagility.outputs.IsBuildEditBranch }}
+      nkdAgility_ReleaseDescription: ${{ steps.nkdagility.outputs.release_description }}
+      nkdAgility_ReleaseDescriptionState: ${{ steps.nkdagility.outputs.release_description_state }}
+      nkdAgility_HasChanged_src: ${{ steps.nkdagility.outputs.HasChanged_src }}
+      nkdAgility_HasChanged_docs: ${{ steps.nkdagility.outputs.HasChanged_docs }}
+      nkdAgility_HasChanged_automation: ${{ steps.nkdagility.outputs.HasChanged_automation }}
+      nkdAgility_DocsDeployFolder: ${{ steps.nkdagility.outputs.docs_deploy_folder }}
+      nkdAgility_DocsVersionFolder: ${{ steps.nkdagility.outputs.docs_version_folder }}
+      nkdAgility_RunRelease: ${{ steps.nkdagility.outputs.RunRelease }}
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -56,6 +74,11 @@ jobs:
       uses: gittools/actions/gitversion/execute@v1.1.1
       with:
         useConfigFile: true
+    - uses: actions/create-github-app-token@v1
+      id: app-token
+      with:
+        app-id: ${{ secrets.NKDAGILITY_BOT_APP_ID }}
+        private-key: ${{ secrets.NKDAGILITY_BOT_CLIENTSECRET }}
     - uses: dorny/paths-filter@v3
       id: filter
       with:
@@ -70,34 +93,108 @@ jobs:
     - name: "Build NKDAgility Outputs"
       shell: pwsh
       id: nkdagility
+      env:
+         GH_TOKEN: ${{ steps.app-token.outputs.token }}
       run: |
+            # Ring Setup
+            Write-Output "-------------------------------------------"
+            Write-Output "Ring Control Setup"
+            Write-Output "-------------------------------------------"
             $Ring = "Canary"
             $WingetApplicationId = "nkdagility.azure-devops-migration-tools"
+            $docs_deploy_folder = "./azure-devops-migration-tools/";
+            $RunCodeRelease = 'false'
+            $RunDocsRelease = 'false'
             switch ($Env:GitVersion_PreReleaseLabel) {
                 "" {
                     $Ring = "Release";
                     $WingetApplicationId = "nkdagility.azure-devops-migration-tools";
+                    $docs_deploy_folder = "./azure-devops-migration-tools/"
+                    $RunRelease = 'true'
                 }    
                 "Preview" {
                     $Ring = "Preview";
                     $WingetApplicationId = "nkdagility.azure-devops-migration-tools.Preview";
+                    $docs_deploy_folder = "./azure-devops-migration-tools/preview/";
+                    $RunRelease = (('${{ steps.filter.outputs.src }}' -eq 'true') -or ('${{ steps.filter.outputs.docs }}' -eq 'true') )
                 }
                 default {
                     $Ring = "Canary";
                     $WingetApplicationId = "nkdagility.azure-devops-migration-tools.Canary";
+                    $docs_deploy_folder = "./azure-devops-migration-tools/canary/"
+                    $RunRelease = 'false'
                 }
             }
             Write-Output "We are running for the $Ring Ring!"
-            Write-Output "We are focused on Winget ID $WingetApplicationId!"
             echo "Ring=$Ring" >> $env:GITHUB_OUTPUT
+            Write-Output "We are focused on Winget ID $WingetApplicationId!"            
             echo "WingetApplicationId=$WingetApplicationId" >> $env:GITHUB_OUTPUT
+            Write-Output "docs_deploy_folder=$docs_deploy_folder"
+            echo "docs_deploy_folder=$docs_deploy_folder" >> $env:GITHUB_OUTPUT
+            Write-Output "RunRelease=$RunRelease"
+            echo "RunRelease=$RunRelease" >> $env:GITHUB_OUTPUT
+            Write-Output "-------------------------------------------"
+            # Docs Setup
+            Write-Output "-------------------------------------------"
+            Write-Output "Docs"
+            Write-Output "-------------------------------------------"
+            $docs_version_folder = "/azure-devops-migration-tools/$Env:GitVersion_SemVer"
+             Write-Output "docs_version_folder=$docs_version_folder"
+            echo "docs_version_folder=$docs_version_folder" >> $env:GITHUB_OUTPUT
+            Write-Output "-------------------------------------------"
 
-            $IsBuildEditBranch = $false;
-            if (("${{ github.ref_name }}").contains("build/")) {
-                $IsBuildEditBranch = $true;
+             # Get-ReleaseDescription
+            Write-Output "-------------------------------------------"
+            Write-Output "Get-ReleaseDescription"
+            Write-Output "-------------------------------------------"
+            Write-Output "Running Get-ReleaseDescription.ps1"
+            . .\build\include\Get-ReleaseDescription.ps1
+            $description = Get-ReleaseDescription -mode log -OPEN_AI_KEY ${{ secrets.OPENAI_API_KEY }}
+            if ($description -eq $null) {
+                $description = "No release description found";
+                echo "release_description_state=false" >> $env:GITHUB_OUTPUT
+            } else {
+                echo "release_description_state=true" >> $env:GITHUB_OUTPUT
+
             }
-            Write-Output "IsBuildEditBranch=$IsBuildEditBranch"
-            echo "IsBuildEditBranch=$IsBuildEditBranch" >> $env:GITHUB_OUTPUT   
+            $EOF = -join (1..15 | ForEach {[char]((48..57)+(65..90)+(97..122) | Get-Random)})
+            echo "release_description<<$EOF" >> $env:GITHUB_OUTPUT
+            echo $description >> $env:GITHUB_OUTPUT
+            echo "$EOF" >> $env:GITHUB_OUTPUT
+            Write-Output "-------------------------------------------"
+             # HasChanged Setup
+            Write-Output "-------------------------------------------"
+            Write-Output "HasChanged Setup"
+            Write-Output "-------------------------------------------"
+            if ('${{ steps.filter.outputs.src }}' -eq 'true') {
+                echo "HasChanged_src=true" >> $env:GITHUB_OUTPUT;
+            } else {
+                if ('${{ inputs.ForceHasChanged_src }}' -eq 'true') {
+                    echo "HasChanged_src=true" >> $env:GITHUB_OUTPUT;
+                } else {
+                    echo "HasChanged_src=false" >> $env:GITHUB_OUTPUT;
+                }
+            }
+            if ('${{ steps.filter.outputs.docs }}' -eq 'true') {
+                echo "HasChanged_docs=true" >> $env:GITHUB_OUTPUT;
+            } else {
+                if ('${{ inputs.ForceHasChanged_docs }}' -eq 'true') {
+                    echo "HasChanged_docs=true" >> $env:GITHUB_OUTPUT;
+                } else {
+                    echo "HasChanged_docs=false" >> $env:GITHUB_OUTPUT;
+                }
+            }
+            if ('${{ steps.filter.outputs.automation }}' -eq 'true') {
+                echo "HasChanged_automation=true" >> $env:GITHUB_OUTPUT;
+            } else {
+                echo "HasChanged_automation=false" >> $env:GITHUB_OUTPUT;
+            }
+            Write-Output "-------------------------------------------"
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: AzureDevOpsMigrationTools-Scripts
+        path: ./build/**
 
   # Setup Validator
   SetupSummeryStage:
@@ -114,8 +211,14 @@ jobs:
                ## ${{needs.Setup.outputs.GitVersion_SemVer}} (${{needs.Setup.outputs.nkdAgility_Ring}})
                ### NKDAgility
                  - nkdAgility_Ring: ${{needs.Setup.outputs.nkdAgility_Ring}}
-                 - nkdAgility_IsBuildEditBranch: ${{needs.Setup.outputs.nkdAgility_IsBuildEditBranch}}
                  - nkdAgility_WingetApplicationId: ${{needs.Setup.outputs.nkdAgility_WingetApplicationId}}
+                 - nkdAgility_DocsVersionFolder: ${{needs.Setup.outputs.nkdAgility_DocsVersionFolder}}
+                 - nkdAgility_DocsDeployFolder: ${{needs.Setup.outputs.nkdAgility_DocsDeployFolder}}
+                 - nkdAgility_ReleaseDescriptionState: ${{needs.Setup.outputs.nkdAgility_ReleaseDescriptionState}}
+                 - nkdAgility_HasChanged_src: ${{needs.Setup.outputs.nkdAgility_HasChanged_src}}
+                 - nkdAgility_HasChanged_docs: ${{needs.Setup.outputs.nkdAgility_HasChanged_docs}}
+                 - nkdAgility_HasChanged_automation: ${{needs.Setup.outputs.nkdAgility_HasChanged_automation}}
+                 - nkdAgility_RunRelease: ${{needs.Setup.outputs.nkdAgility_RunRelease}}
                ### GitVersion
                  - GitVersion_BranchName: ${{needs.Setup.outputs.GitVersion_BranchName}}
                  - GitVersion_SemVer: ${{needs.Setup.outputs.GitVersion_SemVer}}
@@ -127,15 +230,18 @@ jobs:
                  - HasChanged_src: ${{needs.Setup.outputs.HasChanged_src}}
                  - HasChanged_docs: ${{needs.Setup.outputs.HasChanged_docs}}
                  - HasChanged_automation: ${{needs.Setup.outputs.HasChanged_automation}}
+               ## nkdAgility_ReleaseDescription
+               ${{needs.Setup.outputs.nkdAgility_ReleaseDescription}}
             "@
             echo $markdown >> $Env:GITHUB_STEP_SUMMARY
     
   # Build, Test, Sonar Cloud Analysis, & Package
+
   build:
     name: "Build, Test, Sonar Cloud Analysis, & Package"
     runs-on: windows-latest
     needs: Setup
-    if: ${{ needs.Setup.outputs.HasChanged_src }}
+    if: ${{ success() }}
     env:
       solution: '**/*.sln'
       buildPlatform: 'Any CPU'
@@ -161,10 +267,6 @@ jobs:
           files: '["**/StaticVariables.cs"]'
           tokenPrefix: "${"
           tokenSuffix: "}"
-      - uses: actions/upload-artifact@v4
-        with:
-          name: AzureDevOpsMigrationTools-BuildScripts
-          path: ./build/**
       - name: Setup .NET
         uses: actions/setup-dotnet@v1
         with:
@@ -220,6 +322,7 @@ jobs:
   BuildDocs:
     name: "Build Documentation output"
     runs-on: ubuntu-latest
+    if: ${{ success() }}
     needs: [Setup]
     env:
       GitVersion_SemVer: ${{ needs.Setup.outputs.GitVersion_SemVer }}
@@ -230,8 +333,13 @@ jobs:
       - uses: cschleiden/replace-tokens@v1
         with:
           files: '["**/*.html"]'
-          tokenPrefix: "${"
-          tokenSuffix: "}"
+          tokenPrefix: "#{"
+          tokenSuffix: "}#"
+        env: 
+          GitVersion_SemVer: ${{ needs.Setup.outputs.GitVersion_SemVer }}
+          GitVersion_AssemblySemVer: ${{ needs.Setup.outputs.GitVersion_AssemblySemVer }}
+          GitVersion_InformationalVersion: ${{ needs.Setup.outputs.GitVersion_InformationalVersion }}
+          GitVersion.SemVer: ${{ needs.Setup.outputs.GitVersion_SemVer }}
       - uses: igsekor/pyspelling-any@v1.0.4
         id: spellcheck
         name: Spellcheck
@@ -254,15 +362,16 @@ jobs:
       GitVersion_InformationalVersion: ${{ needs.Setup.outputs.GitVersion_InformationalVersion }}
       GitVersion_NuGetVersion: ${{ needs.Setup.outputs.GitVersion_NuGetVersion }}
       GitVersion_PreReleaseLabel: ${{ needs.Setup.outputs.GitVersion_PreReleaseLabel }}
-      HasChanged_src: ${{ needs.Setup.outputs.HasChanged_src }}
-      HasChanged_docs: ${{ needs.Setup.outputs.HasChanged_docs }}
-      HasChanged_automation: ${{ needs.Setup.outputs.HasChanged_automation }}
     needs: [build, Setup]
-    if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring != 'Canary' ) }}
+    if: ${{ success() && ( needs.Setup.outputs.nkdAgility_RunRelease == 'true' ) }}
     steps:
       - uses: actions/download-artifact@v4
         with:
           name: AzureDevOpsMigrationTools-Packages
+      - uses: actions/download-artifact@v4
+        with:
+          name: AzureDevOpsMigrationTools-Scripts
+          path: ./build/
       - uses: actions/create-github-app-token@v1
         id: app-token
         with:
@@ -276,10 +385,9 @@ jobs:
         id: release-options
         shell: pwsh
         run: |
-             if ($Env:nkdAgility_Ring -ne 'Canary' && ($Env:HasChanged_src || $Env:HasChanged_docs )) {
+             if ($Env:nkdAgility_Ring -eq 'Release') {
                 echo "discussion_category_name=Anouncement" >> $env:GITHUB_OUTPUT    
-             }
-             
+             }             
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
@@ -299,11 +407,13 @@ jobs:
             Version: ${{ needs.Setup.outputs.GitVersion_SemVer }}
             Ring: (${{ needs.Setup.outputs.nkdAgility_Ring }})
 
+            ${{ needs.Setup.outputs.nkdAgility_ReleaseDescription }}
+
             ## Get the tools
 
             - Download the [MigrationTools-${{ needs.Setup.outputs.GitVersion_SemVer }}.zip](https://github.com/nkdAgility/azure-devops-migration-tools/releases/download/v${{ needs.Setup.outputs.GitVersion_SemVer }}/MigrationTools-${{ needs.Setup.outputs.GitVersion_SemVer }}.zip) file below
             - Install with Winget with `winget install ${{needs.Setup.outputs.nkdAgility_WingetApplicationId}} --version ${{ needs.Setup.outputs.GitVersion_SemVer }}` . There is a delay for aprovals on the winget store, so you may need to wait a few days before this is available.
-            - Install with Chocolatey with `choco install nkdagility.azure-devops-migration-tools --version ${{ needs.Setup.outputs.GitVersion_NuGetVersion }}`. There is a delay for aprovals on the chocolatey store, so you may need to wait a few hours before this is available.
+            - Install with Chocolatey with `choco install vsts-sync-migrator --version ${{ needs.Setup.outputs.GitVersion_NuGetVersion }}`. There is a delay for aprovals on the chocolatey store, so you may need to wait a few hours before this is available.
 
           append_body: true
   
@@ -314,7 +424,7 @@ jobs:
     env:
       GitVersion_SemVer: ${{ needs.Setup.outputs.GitVersion_SemVer }}
     needs: [GitHubRelease, Setup]
-    if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring != 'Canary' ) }}
+    if: ${{ success() && ( needs.Setup.outputs.nkdAgility_RunRelease == 'true' ) }}
     steps:
      - name: Create Deployment on elmah.io
        uses: elmahio/github-create-deployment-action@v1
@@ -329,7 +439,7 @@ jobs:
     name: "Release to Marketplace"
     runs-on: ubuntu-latest
     needs: [Setup, GitHubRelease]
-    if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring != 'Canary' ) && (needs.Setup.outputs.HasChanged_src) }}
+    if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring == 'Release' ) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -358,7 +468,7 @@ jobs:
     name: "Release to Chocolatey"
     runs-on: windows-latest
     needs: [Setup, GitHubRelease]
-    if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring != 'Canary' ) && (needs.Setup.outputs.HasChanged_src) }}
+    if: ${{ success() && ( needs.Setup.outputs.nkdAgility_RunRelease == 'true' ) }}
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -382,7 +492,7 @@ jobs:
     name: "Release to Winget"
     runs-on: windows-latest
     needs: [Setup, GitHubRelease]
-    if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring != 'Canary' ) && (needs.Setup.outputs.HasChanged_src) }}
+    if: ${{ success() && ( needs.Setup.outputs.nkdAgility_RunRelease == 'true' ) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -403,7 +513,7 @@ jobs:
     name: "Release to Docs"
     runs-on: ubuntu-latest
     needs: [Setup, BuildDocs, GitHubRelease]
-    if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring != 'Canary' ) }}
+    if: ${{ success() && ( needs.Setup.outputs.nkdAgility_RunRelease == 'true' ) }}
     steps:
       - name: Download a single artifact
         uses: actions/download-artifact@v4
@@ -413,17 +523,7 @@ jobs:
       - name: "Find  files"
         shell: pwsh
         run: |
-            Get-Item -Path .\ 
-      - name: "Folder Desider"
-        id: Folder-Decision
-        shell: pwsh
-        run: |
-            if ($Env:nkdAgility_Ring -ne 'Release') {
-               echo "subfolder=$Env:nkdAgility_Ring" >> $env:GITHUB_OUTPUT
-               Write-Output "subfolder=$Env:nkdAgility_Ring"
-            } else {
-              Write-Output "subfolder="
-            }            
+            Get-Item -Path .\         
       - name: SFTP Upload ${{ (needs.Setup.outputs.nkdAgility_Ring) }}
         uses: Dylan700/sftp-upload-action@v1.1.4
         with:
@@ -435,6 +535,6 @@ jobs:
           dry-run: ${{ (needs.Setup.outputs.nkdAgility_Ring) == 'Canary' }}
           # A list of folders to upload in the format of `folder/ => upload_folder/`
           uploads: | 
-              ./_site/ => ./azure-devops-migration-tools/${{ steps.Folder-Decision.outputs.subfolder }}
+              ./_site/ => ${{needs.Setup.outputs.nkdAgility_DocsDeployFolder}}
           # If true, any existing files in the remote upload directories are deleted.
           delete: false

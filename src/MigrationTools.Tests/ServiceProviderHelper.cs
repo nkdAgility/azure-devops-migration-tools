@@ -3,8 +3,10 @@ using MigrationTools._EngineV1.Containers;
 using MigrationTools.EndpointEnrichers;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
+using MigrationTools.Helpers.Tests;
 using MigrationTools.ProcessorEnrichers.WorkItemProcessorEnrichers;
 using MigrationTools.Processors;
+using MigrationTools.Services;
 using MigrationTools.TestExtensions;
 
 namespace MigrationTools.Tests
@@ -38,6 +40,9 @@ namespace MigrationTools.Tests
             services.AddTransient<EndpointEnricherContainer>();
             AddEndpoint(services, "Source");
             AddEndpoint(services, "Target");
+
+            services.AddSingleton<IMigrationToolVersionInfo, FakeMigrationToolVersionInfo>();
+            services.AddSingleton<IMigrationToolVersion, FakeMigrationToolVersion>();
 
             return services.BuildServiceProvider();
         }

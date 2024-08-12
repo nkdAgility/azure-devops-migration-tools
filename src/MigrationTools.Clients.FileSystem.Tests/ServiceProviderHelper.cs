@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using MigrationTools.Services;
 using MigrationTools.TestExtensions;
+using MigrationTools.Helpers.Tests;
 
 namespace MigrationTools.Tests
 {
@@ -12,6 +14,9 @@ namespace MigrationTools.Tests
 
             services.AddMigrationToolServices();
             services.AddMigrationToolServicesForClientFileSystem();
+
+            services.AddSingleton<IMigrationToolVersionInfo, FakeMigrationToolVersionInfo>();
+            services.AddSingleton<IMigrationToolVersion, FakeMigrationToolVersion>();
 
             return services.BuildServiceProvider();
         }

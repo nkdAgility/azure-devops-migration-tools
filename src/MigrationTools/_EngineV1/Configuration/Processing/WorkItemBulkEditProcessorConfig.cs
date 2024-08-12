@@ -2,7 +2,7 @@
 
 namespace MigrationTools._EngineV1.Configuration.Processing
 {
-    public class WorkItemUpdateConfig : IWorkItemProcessorConfig
+    public class WorkItemBulkEditProcessorConfig : IWorkItemProcessorConfig
     {
         public bool WhatIf { get; set; }
 
@@ -10,7 +10,7 @@ namespace MigrationTools._EngineV1.Configuration.Processing
 
         public string Processor
         {
-            get { return "WorkItemUpdate"; }
+            get { return "WorkItemBulkEditProcessor"; }
         }
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace MigrationTools._EngineV1.Configuration.Processing
             return true;
         }
 
-        public WorkItemUpdateConfig()
+        public WorkItemBulkEditProcessorConfig()
         {
             WIQLQuery = @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [@ReflectedWorkItemIdFieldName] = ''  AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc";
         }

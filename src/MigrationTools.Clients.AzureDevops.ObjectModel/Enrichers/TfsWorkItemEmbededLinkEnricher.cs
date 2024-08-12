@@ -91,7 +91,7 @@ namespace MigrationTools.Enrichers
                         {
                             var workItemId = workItemLinkMatch.Groups["id"].Value;
                             Log.LogDebug("{LogTypeName}: Source work item {workItemId} mention link traced on field {fieldName} on target work item {targetWorkItemId}.", LogTypeName, workItemId, field.Name, targetWorkItem.Id);
-                            var sourceLinkWi = Engine.Source.WorkItems.GetWorkItem(workItemId);
+                            var sourceLinkWi = Engine.Source.WorkItems.GetWorkItem(workItemId, false);
                             if (sourceLinkWi != null)
                             {
                                 var linkWI = Engine.Target.WorkItems.FindReflectedWorkItemByReflectedWorkItemId(sourceLinkWi);
@@ -108,12 +108,14 @@ namespace MigrationTools.Enrichers
                                 {
                                     var replaceValue = value;
                                     field.Value = field.Value.ToString().Replace(anchorTagMatch.Value, replaceValue);
-                                    Log.LogError("{LogTypeName}: [SKIP] Matching target work item mention link for source work item {workItemId} mention link on field {fieldName} on target work item {targetWorkItemId} was not found on the target collection. So link is replaced with just simple text.", LogTypeName, workItemId, field.Name, targetWorkItem.Id);
+                                    Log.LogWarning("{LogTypeName}: [SKIP] Matching target work item mention link for source work item {workItemId} mention link on field {fieldName} on target work item {targetWorkItemId} was not found on the target collection. So link is replaced with just simple text.", LogTypeName, workItemId, field.Name, targetWorkItem.Id);
                                 }
                             }
                             else
                             {
-                                Log.LogInformation("{LogTypeName}: [SKIP] Source work item {workItemId} mention link on field {fieldName} on target work item {targetWorkItemId} was not found on the source collection.", LogTypeName, workItemId, field.Name, targetWorkItem.Id);
+                                var replaceValue = value;
+                                field.Value = field.Value.ToString().Replace(anchorTagMatch.Value, replaceValue);
+                                Log.LogInformation("{LogTypeName}: [SKIP] Source work item {workItemId} mention link on field {fieldName} was not found on the source collection.", LogTypeName, workItemId, field.Name, targetWorkItem.Id);
                             }
                         }
                         else if ((href.StartsWith("mailto:") || href.StartsWith("#")) && value.StartsWith("@"))

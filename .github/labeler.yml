@@ -11,7 +11,7 @@ build-action:
 
 enhancement:
 - changed-files:
-  - any-glob-to-any-file: ['src/**']
+  - all-globs-to-any-file: ['src/**']
 
 enhancement-classic:
 - changed-files:
@@ -19,8 +19,7 @@ enhancement-classic:
 
 enhancement-modern:
 - changed-files:
-  - any-glob-to-any-file: ['src/**']
-  - all-globs-to-all-files: ['!src/MigrationTools/_EngineV1/**', '!src/VstsSyncMigrator*/**']
+  - all-globs-to-any-file: ['src/**', '!src/MigrationTools/_EngineV1/**', '!src/VstsSyncMigrator*/**']
 
 # Add 'feature' label to any PR where the head branch name starts with `feature` or has a `feature` section in the name
 feature:

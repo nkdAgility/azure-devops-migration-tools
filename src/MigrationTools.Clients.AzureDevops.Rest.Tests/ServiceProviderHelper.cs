@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MigrationTools.Endpoints;
+using MigrationTools.Helpers.Tests;
+using MigrationTools.Services;
 using MigrationTools.TestExtensions;
 
 namespace MigrationTools.Tests
@@ -15,8 +17,12 @@ namespace MigrationTools.Tests
 
             services.AddMigrationToolServices();
             services.AddMigrationToolServicesForClientAzureDevopsRest(configuration);
+
             AddEndpoint(services, "Source", "migrationSource1");
             AddEndpoint(services, "Target", "migrationTarget1");
+
+            services.AddSingleton<IMigrationToolVersionInfo, FakeMigrationToolVersionInfo>();
+            services.AddSingleton<IMigrationToolVersion, FakeMigrationToolVersion>();
 
             return services.BuildServiceProvider();
         }

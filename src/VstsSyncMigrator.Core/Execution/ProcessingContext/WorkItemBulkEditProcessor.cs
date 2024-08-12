@@ -14,17 +14,17 @@ namespace VstsSyncMigrator.Engine
     /// This processor allows you to make changes in place where we load from teh Target and update the Target. This is used for bulk updates with the most common reason being a process template change.
     /// </summary>
     /// <processingtarget>WorkItem</processingtarget>
-    public class WorkItemUpdate : StaticProcessorBase
+    public class WorkItemBulkEditProcessor : StaticProcessorBase
     {
-        private WorkItemUpdateConfig _config;
+        private WorkItemBulkEditProcessorConfig _config;
 
-        public WorkItemUpdate(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<WorkItemUpdate> logger) : base(services, me, telemetry, logger)
+        public WorkItemBulkEditProcessor(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<WorkItemBulkEditProcessor> logger) : base(services, me, telemetry, logger)
         {
         }
 
         public override void Configure(IProcessorConfig config)
         {
-            _config = (WorkItemUpdateConfig)config;
+            _config = (WorkItemBulkEditProcessorConfig)config;
         }
 
         public override string Name

@@ -22,7 +22,7 @@ namespace VstsSyncMigrator.Engine
     {
         private WorkItemDeleteConfig _config;
 
-        public WorkItemDelete(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<WorkItemUpdate> logger)
+        public WorkItemDelete(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<WorkItemDelete> logger)
             : base(services, me, telemetry, logger)
         {
         }

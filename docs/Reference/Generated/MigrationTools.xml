@@ -344,6 +344,41 @@
         <member name="M:MigrationTools._EngineV1.Configuration.Processing.TestVariablesMigrationConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
             <inheritdoc />
         </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemBulkEditProcessorConfig.WIQLQuery">
+            <summary>
+            A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)
+            </summary>
+            <default>AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemBulkEditProcessorConfig.WorkItemIDs">
+            <summary>
+            A list of work items to import
+            </summary>
+            <default>[]</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemBulkEditProcessorConfig.FilterWorkItemsThatAlreadyExistInTarget">
+            <summary>
+            This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run.
+            While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.
+            </summary>
+            <default>true</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemBulkEditProcessorConfig.PauseAfterEachWorkItem">
+            <summary>
+            Pause after each work item is migrated
+            </summary>
+            <default>false</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemBulkEditProcessorConfig.WorkItemCreateRetryLimit">
+            <summary>
+            **beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count.
+            This allows for periodic network glitches not to end the process.
+            </summary>
+            <default>5</default>
+        </member>
+        <member name="M:MigrationTools._EngineV1.Configuration.Processing.WorkItemBulkEditProcessorConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
+            <inheritdoc />
+        </member>
         <member name="M:MigrationTools._EngineV1.Configuration.Processing.WorkItemDeleteConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
             <inheritdoc />
         </member>
@@ -541,41 +576,6 @@
         <member name="M:MigrationTools._EngineV1.Configuration.Processing.WorkItemUpdateAreasAsTagsConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
             <inheritdoc />
         </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemUpdateConfig.WIQLQuery">
-            <summary>
-            A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)
-            </summary>
-            <default>AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemUpdateConfig.WorkItemIDs">
-            <summary>
-            A list of work items to import
-            </summary>
-            <default>[]</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemUpdateConfig.FilterWorkItemsThatAlreadyExistInTarget">
-            <summary>
-            This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run.
-            While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.
-            </summary>
-            <default>true</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemUpdateConfig.PauseAfterEachWorkItem">
-            <summary>
-            Pause after each work item is migrated
-            </summary>
-            <default>false</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemUpdateConfig.WorkItemCreateRetryLimit">
-            <summary>
-            **beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count.
-            This allows for periodic network glitches not to end the process.
-            </summary>
-            <default>5</default>
-        </member>
-        <member name="M:MigrationTools._EngineV1.Configuration.Processing.WorkItemUpdateConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
-            <inheritdoc />
-        </member>
         <member name="M:MigrationTools._EngineV1.Enrichers.EmbededImagesRepairEnricherBase.#ctor(System.IServiceProvider,Microsoft.Extensions.Logging.ILogger{MigrationTools._EngineV1.Enrichers.EmbededImagesRepairEnricherBase},MigrationTools.ITelemetryLogger)">
             from https://gist.github.com/pietergheysens/792ed505f09557e77ddfc1b83531e4fb
         </member>
@@ -609,32 +609,32 @@
         </member>
         <member name="F:ThisAssembly.Git.Commit">
             <summary>
-            => @"d10bad5"
+            => @"e3c4db3"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Sha">
             <summary>
-            => @"d10bad52221de4cd9849d63033095613211d5ce0"
+            => @"e3c4db3b671341c147f9da376578f29329e6f116"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.CommitDate">
             <summary>
-            => @"2024-07-24T16:56:23+01:00"
+            => @"2024-08-08T15:58:09+01:00"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commits">
             <summary>
-            => @"0"
+            => @"36"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Tag">
             <summary>
-            => @"v15.1.4-Preview.7"
+            => @"v15.1.8-Preview.4-36-ge3c4db3"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseTag">
             <summary>
-            => @"v15.1.4-Preview.7"
+            => @"v15.1.8-Preview.4"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseVersion.Major">
@@ -649,7 +649,7 @@
         </member>
         <member name="F:ThisAssembly.Git.BaseVersion.Patch">
             <summary>
-            => @"4"
+            => @"8"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Major">
@@ -664,17 +664,17 @@
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Patch">
             <summary>
-            => @"4"
+            => @"44"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Label">
             <summary>
-            => @"Preview.7"
+            => @"Preview.4"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.DashLabel">
             <summary>
-            => @"-Preview.7"
+            => @"-Preview.4"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Source">

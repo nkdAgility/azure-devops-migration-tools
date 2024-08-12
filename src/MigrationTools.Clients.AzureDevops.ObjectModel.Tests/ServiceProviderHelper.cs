@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MigrationTools.Endpoints;
+using MigrationTools.Helpers.Tests;
+using MigrationTools.Services;
 using MigrationTools.TestExtensions;
 
 namespace MigrationTools.Tests
@@ -22,6 +24,9 @@ namespace MigrationTools.Tests
 
             AddTfsTeamEndpoint(services, "TfsTeamSettingsSource", "migrationSource1");
             AddTfsTeamEndpoint(services, "TfsTeamSettingsTarget", "migrationTarget1");
+
+            services.AddSingleton<IMigrationToolVersionInfo, FakeMigrationToolVersionInfo>();
+            services.AddSingleton<IMigrationToolVersion, FakeMigrationToolVersion>();
 
             return services.BuildServiceProvider();
         }

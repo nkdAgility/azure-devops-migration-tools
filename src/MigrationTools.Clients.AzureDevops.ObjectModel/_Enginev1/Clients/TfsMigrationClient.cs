@@ -175,7 +175,7 @@ namespace MigrationTools._EngineV1.Clients
                        new Dictionary<string, double> {
                             { "Time",timer.ElapsedMilliseconds }
                        });
-                Log.Error(ex, "Unable to configure store: Check persmissions and credentials for {AuthenticationMode}!", _config.AuthenticationMode);
+                Log.Error("Unable to configure store: Check persmissions and credentials for {AuthenticationMode}: " + ex.Message, _config.AuthenticationMode);
                 switch (_config.AuthenticationMode)
                 {
                     case AuthenticationMode.AccessToken:
