@@ -112,7 +112,7 @@ namespace MigrationTools.Clients.Tests
             throw new System.NotImplementedException();
         }
 
-        public WorkItemData GetWorkItem(string id)
+        public WorkItemData GetWorkItem(string id, bool stopOnError = true)
         {
             throw new System.NotImplementedException();
         }
@@ -127,7 +127,7 @@ namespace MigrationTools.Clients.Tests
             throw new System.NotImplementedException();
         }
 
-        public WorkItemData GetWorkItem(int id)
+        public WorkItemData GetWorkItem(int id, bool stopOnError = true)
         {
             throw new System.NotImplementedException();
         }

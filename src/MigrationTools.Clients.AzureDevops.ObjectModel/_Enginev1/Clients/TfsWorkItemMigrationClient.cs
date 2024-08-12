@@ -142,12 +142,12 @@ namespace MigrationTools._EngineV1.Clients
             throw new NotImplementedException("GetRevision in combination with WorkItemData is buggy");
         }
 
-        public override WorkItemData GetWorkItem(string id)
+        public override WorkItemData GetWorkItem(string id, bool stopOnError = true)
         {
-            return GetWorkItem(int.Parse(id));
+            return GetWorkItem(int.Parse(id), stopOnError);
         }
 
-        public override WorkItemData GetWorkItem(int id)
+        public override WorkItemData GetWorkItem(int id, bool stopOnError = true)
         {
             if (id == 0)
             {
@@ -175,7 +175,10 @@ namespace MigrationTools._EngineV1.Clients
                             { "Time",timer.ElapsedMilliseconds }
                        });
                 Log.Error(ex, "Unable to GetWorkItem with id[{id}]", id);
-                Environment.Exit(-1);
+                if (stopOnError)
+                {
+                    Environment.Exit(-1);
+                }                   
             } finally
             {
                 timer.Stop();

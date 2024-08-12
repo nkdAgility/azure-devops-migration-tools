@@ -609,32 +609,32 @@
         </member>
         <member name="F:ThisAssembly.Git.Commit">
             <summary>
-            => @"cd49e40"
+            => @"e3c4db3"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Sha">
             <summary>
-            => @"cd49e4061f2759b8ba15da035f13f8d39f6dbf0a"
+            => @"e3c4db3b671341c147f9da376578f29329e6f116"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.CommitDate">
             <summary>
-            => @"2024-07-26T15:59:36+01:00"
+            => @"2024-08-08T15:58:09+01:00"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commits">
             <summary>
-            => @"0"
+            => @"36"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Tag">
             <summary>
-            => @"v15.1.6"
+            => @"v15.1.8-Preview.4-36-ge3c4db3"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseTag">
             <summary>
-            => @"v15.1.6"
+            => @"v15.1.8-Preview.4"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseVersion.Major">
@@ -649,7 +649,7 @@
         </member>
         <member name="F:ThisAssembly.Git.BaseVersion.Patch">
             <summary>
-            => @"6"
+            => @"8"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Major">
@@ -664,17 +664,17 @@
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Patch">
             <summary>
-            => @"6"
+            => @"44"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Label">
             <summary>
-            => @""
+            => @"Preview.4"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.DashLabel">
             <summary>
-            => @""
+            => @"-Preview.4"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Source">
