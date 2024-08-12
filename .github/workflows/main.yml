@@ -137,25 +137,25 @@ jobs:
             echo $description >> $env:GITHUB_OUTPUT
             echo "$EOF" >> $env:GITHUB_OUTPUT
             
-            if ('${{ steps.filter.outputs.src }}' == 'true') {
+            if ('${{ steps.filter.outputs.src }}' -eq 'true') {
                 echo "HasChanged_src=true" >> $env:GITHUB_OUTPUT;
             } else {
-                if ('${{ inputs.ForceHasChanged_src }}' == 'true') {
+                if ('${{ inputs.ForceHasChanged_src }}' -eq 'true') {
                     echo "HasChanged_src=true" >> $env:GITHUB_OUTPUT;
                 } else {
                     echo "HasChanged_src=false" >> $env:GITHUB_OUTPUT;
                 }
             }
-            if ('${{ steps.filter.outputs.docs }}' == 'true') {
+            if ('${{ steps.filter.outputs.docs }}' -eq 'true') {
                 echo "HasChanged_docs=true" >> $env:GITHUB_OUTPUT;
             } else {
-                if ('${{ inputs.ForceHasChanged_docs }}' == 'true') {
+                if ('${{ inputs.ForceHasChanged_docs }}' -eq 'true') {
                     echo "HasChanged_docs=true" >> $env:GITHUB_OUTPUT;
                 } else {
                     echo "HasChanged_docs=false" >> $env:GITHUB_OUTPUT;
                 }
             }
-            if ('${{ steps.filter.outputs.automation }}' == 'true') {
+            if ('${{ steps.filter.outputs.automation }}' -eq 'true') {
                 echo "HasChanged_automation=true" >> $env:GITHUB_OUTPUT;
             } else {
                 echo "HasChanged_automation=false" >> $env:GITHUB_OUTPUT;
