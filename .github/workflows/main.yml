@@ -116,7 +116,7 @@ jobs:
                     $Ring = "Preview";
                     $WingetApplicationId = "nkdagility.azure-devops-migration-tools.Preview";
                     $docs_deploy_folder = "./azure-devops-migration-tools/preview/";
-                    $RunRelease = ('${{ steps.filter.outputs.src }}' -eq 'true')
+                    $RunRelease = (('${{ steps.filter.outputs.src }}' -eq 'true') -or ('${{ steps.filter.outputs.docs }}' -eq 'true') )
                 }
                 default {
                     $Ring = "Canary";
