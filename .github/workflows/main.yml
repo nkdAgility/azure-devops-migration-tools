@@ -483,7 +483,7 @@ jobs:
     name: "Release to Winget"
     runs-on: windows-latest
     needs: [Setup, GitHubRelease]
-    if: ${{ success() && ( ( needs.Setup.outputs.nkdAgility_Ring == 'Preview' ) && (needs.Setup.outputs.nkdAgility_HasChanged_src == 'true') ) || ( needs.Setup.outputs.nkdAgility_Ring = 'Release' ) }}
+    if: ${{ success() && ( ( needs.Setup.outputs.nkdAgility_Ring == 'Preview' ) && (needs.Setup.outputs.nkdAgility_HasChanged_src == 'true') ) || ( needs.Setup.outputs.nkdAgility_Ring == 'Release' ) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
