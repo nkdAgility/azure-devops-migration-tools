@@ -16,9 +16,9 @@ namespace MigrationTools._EngineV1.Clients
 
         List<WorkItemData> GetWorkItems();
 
-        WorkItemData GetWorkItem(string id);
+        WorkItemData GetWorkItem(string id, bool stopOnError = true);
 
-        WorkItemData GetWorkItem(int id);
+        WorkItemData GetWorkItem(int id, bool stopOnError = true);
 
         List<int> GetWorkItemIds(string WIQLQuery);
 
