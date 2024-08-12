@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
 using MigrationTools.Processors;
@@ -17,9 +18,10 @@ namespace MigrationTools.ProcessorEnrichers.WorkItemProcessorEnrichers
         private Serilog.ILogger contextLog;
         private StringManipulatorEnricherOptions _options;
 
-        public StringManipulatorEnricher(IServiceProvider services, ILogger<StringManipulatorEnricher> logger, ITelemetryLogger telemetryLogger)
+        public StringManipulatorEnricher(IOptions<StringManipulatorEnricherOptions> options,IServiceProvider services, ILogger<StringManipulatorEnricher> logger, ITelemetryLogger telemetryLogger)
            : base(services, logger, telemetryLogger)
         {
+            _options = options.Value;
             contextLog = Serilog.Log.ForContext<StringManipulatorEnricher>();
         }
 

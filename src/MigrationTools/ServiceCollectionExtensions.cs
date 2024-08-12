@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Configuration;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MigrationTools._EngineV1.Containers;
 using MigrationTools.EndpointEnrichers;
@@ -12,7 +14,7 @@ namespace MigrationTools
 {
     public static partial class ServiceCollectionExtensions
     {
-        public static void AddMigrationToolServices(this IServiceCollection context)
+        public static void AddMigrationToolServices(this IServiceCollection context, IConfiguration configuration)
         {
             context.AddMigrationToolsEndpoint();
             //Containers
@@ -25,7 +27,11 @@ namespace MigrationTools
             context.AddTransient<FilterWorkItemsThatAlreadyExistInTarget>();
             context.AddTransient<SkipToFinalRevisedWorkItemType>();
             // WorkItem Endpoint Enrichers
-            context.AddTransient<StringManipulatorEnricher>();
+            context.AddSingleton<StringManipulatorEnricher>();
+            context.AddOptions<StringManipulatorEnricherOptions>().Bind(configuration.GetSection(StringManipulatorEnricherOptions.ConfigurationSectionName));
+            // WorkItemTypeMappingEnricher
+            context.AddSingleton<WorkItemTypeMappingEnricher>();
+            context.AddOptions<WorkItemTypeMappingEnricherOptions>().Bind(configuration.GetSection(WorkItemTypeMappingEnricherOptions.ConfigurationSectionName));
             //context.AddTransient<WorkItemAttachmentEnricher>();
             //context.AddTransient<WorkItemCreatedEnricher>();
             //context.AddTransient<WorkItemEmbedEnricher>();

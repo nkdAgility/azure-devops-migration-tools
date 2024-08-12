@@ -68,12 +68,29 @@
             </summary>
             <default>{}</default>
         </member>
+        <member name="P:MigrationTools.Enrichers.WorkItemTypeMappingEnricherOptions.MaxStringLength">
+            <summary>
+            Max number of chars in a string. Applied last, and set to 1000000 by default.
+            </summary>
+            <default>1000000</default>
+        </member>
+        <member name="P:MigrationTools.Enrichers.WorkItemTypeMappingEnricherOptions.Manipulators">
+            <summary>
+            List of regex based string manipulations to apply to all string fields. Each regex replacement is applied in order and can be enabled or disabled.
+            </summary>
+            <default>{}</default>
+        </member>
         <member name="P:MigrationTools.Options.IOptions.RefName">
             <summary>
             If you set a `RefName` then this configration will be added to a Catalog of configurations that can be refernced using tha `RefName` so tha tyou dont have to keep adding the ame items with the same configuration.
             </summary>
         </member>
         <member name="T:MigrationTools.ProcessorEnrichers.WorkItemProcessorEnrichers.StringManipulatorEnricher">
+            <summary>
+            Used to process the String fields of a work item. This is useful for cleaning up data. It will limit fields to a max length and apply regex replacements based on what is configured. Each regex replacement is applied in order and can be enabled or disabled.
+            </summary>
+        </member>
+        <member name="T:MigrationTools.ProcessorEnrichers.WorkItemProcessorEnrichers.WorkItemTypeMappingEnricher">
             <summary>
             Used to process the String fields of a work item. This is useful for cleaning up data. It will limit fields to a max length and apply regex replacements based on what is configured. Each regex replacement is applied in order and can be enabled or disabled.
             </summary>
@@ -609,32 +626,32 @@
         </member>
         <member name="F:ThisAssembly.Git.Commit">
             <summary>
-            => @"e2aa7eb"
+            => @"c2a8065"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Sha">
             <summary>
-            => @"e2aa7ebfb0e4c957e56b07f43f53f77fb7d45d6c"
+            => @"c2a806525d8f263ee8f3dafdb7dd7c97d2140bd4"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.CommitDate">
             <summary>
-            => @"2024-08-06T11:49:02+01:00"
+            => @"2024-08-08T15:59:14+01:00"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commits">
             <summary>
-            => @"20"
+            => @"61"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Tag">
             <summary>
-            => @"v15.1.7-20-ge2aa7eb"
+            => @"v15.1.8-Preview.4-61-gc2a8065"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseTag">
             <summary>
-            => @"v15.1.7"
+            => @"v15.1.8-Preview.4"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseVersion.Major">
@@ -649,7 +666,7 @@
         </member>
         <member name="F:ThisAssembly.Git.BaseVersion.Patch">
             <summary>
-            => @"7"
+            => @"8"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Major">
@@ -664,17 +681,17 @@
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Patch">
             <summary>
-            => @"27"
+            => @"69"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Label">
             <summary>
-            => @""
+            => @"Preview.4"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.DashLabel">
             <summary>
-            => @""
+            => @"-Preview.4"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Source">

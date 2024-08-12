@@ -174,7 +174,7 @@ namespace MigrationTools.Host
                  //// Add Old v1Bits
                  services.AddMigrationToolServicesLegacy();
                  //// New v2Bits
-                 services.AddMigrationToolServices();
+                 services.AddMigrationToolServices(context.Configuration);
              });
 
             hostBuilder.UseSpectreConsole(config =>

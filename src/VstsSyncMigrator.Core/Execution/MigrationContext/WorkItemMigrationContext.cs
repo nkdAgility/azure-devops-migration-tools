@@ -73,6 +73,7 @@ namespace VstsSyncMigrator.Engine
         private IDictionary<string, double> processWorkItemMetrics = null;
         private IDictionary<string, string> processWorkItemParamiters = null;
         private TfsWorkItemLinkEnricher _workItemLinkEnricher;
+        private WorkItemTypeMappingEnricher _witMappEnricher;
         private ILogger workItemLog;
         private List<string> _itemsInError;
         private TfsTeamSettingsEnricher _teamSettingsEnricher;
@@ -90,7 +91,8 @@ namespace VstsSyncMigrator.Engine
                                         TfsWorkItemEmbededLinkEnricher workItemEmbeddedLinkEnricher,
                                         TfsValidateRequiredField requiredFieldValidator,
                                         TfsTeamSettingsEnricher teamSettingsEnricher,
-                                        IOptions<EngineConfiguration> engineConfig)
+                                        IOptions<EngineConfiguration> engineConfig,
+                                        WorkItemTypeMappingEnricher witMappEnricher)
             : base(engine, services, telemetry, logger)
         {
             _telemetry = telemetry;
@@ -105,7 +107,7 @@ namespace VstsSyncMigrator.Engine
             _stringManipulatorEnricher = stringManipulatorEnricher;
             _teamSettingsEnricher = teamSettingsEnricher;
             _validateConfig = requiredFieldValidator;
-
+            _witMappEnricher = witMappEnricher;
         }
 
         public override string Name => "WorkItemMigration";
@@ -132,6 +134,7 @@ namespace VstsSyncMigrator.Engine
             PullCommonEnrichersConfig<TfsAttachmentEnricher, TfsAttachmentEnricherOptions>(_engineConfig.CommonEnrichersConfig, _attachmentEnricher);
             PullCommonEnrichersConfig<TfsUserMappingEnricher, TfsUserMappingEnricherOptions>(_engineConfig.CommonEnrichersConfig, _userMappingEnricher);
             PullCommonEnrichersConfig<TfsTeamSettingsEnricher, TfsTeamSettingsEnricherOptions>(_engineConfig.CommonEnrichersConfig, _teamSettingsEnricher);
+            PullCommonEnrichersConfig<WorkItemTypeMappingEnricher, WorkItemTypeMappingEnricherOptions>(_engineConfig.CommonEnrichersConfig, _witMappEnricher);
         }
 
         internal void TraceWriteLine(LogEventLevel level, string message, Dictionary<string, object> properties = null)
