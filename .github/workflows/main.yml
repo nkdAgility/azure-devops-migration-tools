@@ -138,27 +138,27 @@ jobs:
             echo "$EOF" >> $env:GITHUB_OUTPUT
             
             if ("${{ steps.filter.outputs.src }}" = 'true') {
-                echo "HasChanged_src=true" >> $env:GITHUB_OUTPUT
+                echo "HasChanged_src=true" >> $env:GITHUB_OUTPUT;
             } else {
-                if (${{ inputs.ForceHasChanged_src }} = 'true') {
-                    echo "HasChanged_src=true" >> $env:GITHUB_OUTPUT
+                if ("${{ inputs.ForceHasChanged_src }}" = 'true') {
+                    echo "HasChanged_src=true" >> $env:GITHUB_OUTPUT;
                 } else {
-                    echo "HasChanged_src=false" >> $env:GITHUB_OUTPUT
-                })
+                    echo "HasChanged_src=false" >> $env:GITHUB_OUTPUT;
+                }
             }
             if ("${{ steps.filter.outputs.docs }}" = 'true') {
-                echo "HasChanged_docs=true" >> $env:GITHUB_OUTPUT
+                echo "HasChanged_docs=true" >> $env:GITHUB_OUTPUT;
             } else {
-                if (${{ inputs.ForceHasChanged_docs }} = 'true') {
-                    echo "HasChanged_docs=true" >> $env:GITHUB_OUTPUT
+                if ("${{ inputs.ForceHasChanged_docs }}" = 'true') {
+                    echo "HasChanged_docs=true" >> $env:GITHUB_OUTPUT;
                 } else {
-                    echo "HasChanged_docs=false" >> $env:GITHUB_OUTPUT
+                    echo "HasChanged_docs=false" >> $env:GITHUB_OUTPUT;
                 }
             }
             if ("${{ steps.filter.outputs.automation }}" = 'true') {
-                echo "HasChanged_automation=true" >> $env:GITHUB_OUTPUT
+                echo "HasChanged_automation=true" >> $env:GITHUB_OUTPUT;
             } else {
-                echo "HasChanged_automation=false" >> $env:GITHUB_OUTPUT
+                echo "HasChanged_automation=false" >> $env:GITHUB_OUTPUT;
             }
 
     - uses: actions/upload-artifact@v4
