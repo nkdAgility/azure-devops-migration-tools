@@ -301,8 +301,8 @@ jobs:
       - uses: cschleiden/replace-tokens@v1
         with:
           files: '["**/*.html"]'
-          tokenPrefix: "${"
-          tokenSuffix: "}"
+          tokenPrefix: "#{"
+          tokenSuffix: "}#"
         env: 
           GitVersion_SemVer: ${{ needs.Setup.outputs.GitVersion_SemVer }}
           GitVersion_AssemblySemVer: ${{ needs.Setup.outputs.GitVersion_AssemblySemVer }}
