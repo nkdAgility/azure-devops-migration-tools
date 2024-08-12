@@ -101,22 +101,22 @@ jobs:
             Write-Output "-------------------------------------------"
             $Ring = "Canary"
             $WingetApplicationId = "nkdagility.azure-devops-migration-tools"
-            $docs_deploy_folder = "/azure-devops-migration-tools/";
+            $docs_deploy_folder = "./azure-devops-migration-tools/";
             switch ($Env:GitVersion_PreReleaseLabel) {
                 "" {
                     $Ring = "Release";
                     $WingetApplicationId = "nkdagility.azure-devops-migration-tools";
-                    $docs_deploy_folder = "/azure-devops-migration-tools/"
+                    $docs_deploy_folder = "./azure-devops-migration-tools/"
                 }    
                 "Preview" {
                     $Ring = "Preview";
                     $WingetApplicationId = "nkdagility.azure-devops-migration-tools.Preview";
-                    $docs_deploy_folder = "/azure-devops-migration-tools/preview/";
+                    $docs_deploy_folder = "./azure-devops-migration-tools/preview/";
                 }
                 default {
                     $Ring = "Canary";
                     $WingetApplicationId = "nkdagility.azure-devops-migration-tools.Canary";
-                    $docs_deploy_folder = "/azure-devops-migration-tools/canary/"
+                    $docs_deploy_folder = "./azure-devops-migration-tools/canary/"
                 }
             }
             Write-Output "We are running for the $Ring Ring!"
@@ -514,17 +514,7 @@ jobs:
       - name: "Find  files"
         shell: pwsh
         run: |
-            Get-Item -Path .\ 
-      - name: "Folder Desider"
-        id: Folder-Decision
-        shell: pwsh
-        run: |
-            if ($Env:nkdAgility_Ring -ne 'Release') {
-               echo "subfolder=$Env:nkdAgility_Ring" >> $env:GITHUB_OUTPUT
-               Write-Output "subfolder=$Env:nkdAgility_Ring"
-            } else {
-              Write-Output "subfolder="
-            }            
+            Get-Item -Path .\         
       - name: SFTP Upload ${{ (needs.Setup.outputs.nkdAgility_Ring) }}
         uses: Dylan700/sftp-upload-action@v1.1.4
         with:
@@ -536,6 +526,6 @@ jobs:
           dry-run: ${{ (needs.Setup.outputs.nkdAgility_Ring) == 'Canary' }}
           # A list of folders to upload in the format of `folder/ => upload_folder/`
           uploads: | 
-              ./_site/ => ./azure-devops-migration-tools/${{ steps.Folder-Decision.outputs.subfolder }}
+              ./_site/ => ${{needs.Setup.outputs.nkdAgility_DocsDeployFolder}}
           # If true, any existing files in the remote upload directories are deleted.
           delete: false
