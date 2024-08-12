@@ -51,12 +51,13 @@ jobs:
       HasChanged_automation: ${{ steps.filter.outputs.automation }}
       nkdAgility_Ring: ${{ steps.nkdagility.outputs.Ring }}
       nkdAgility_WingetApplicationId: ${{ steps.nkdagility.outputs.WingetApplicationId }}
-      nkdAgility_IsBuildEditBranch: ${{ steps.nkdagility.outputs.IsBuildEditBranch }}
       nkdAgility_ReleaseDescription: ${{ steps.nkdagility.outputs.release_description }}
       nkdAgility_ReleaseDescriptionState: ${{ steps.nkdagility.outputs.release_description_state }}
       nkdAgility_HasChanged_src: ${{ steps.nkdagility.outputs.HasChanged_src }}
       nkdAgility_HasChanged_docs: ${{ steps.nkdagility.outputs.HasChanged_docs }}
       nkdAgility_HasChanged_automation: ${{ steps.nkdagility.outputs.HasChanged_automation }}
+      nkdAgility_DocsDeployFolder: ${{ steps.nkdagility.outputs.docs_deploy_folder }}
+      nkdAgility_DocsVersionFolder: ${{ steps.nkdagility.outputs.docs_version_folder }}
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -94,34 +95,50 @@ jobs:
       env:
          GH_TOKEN: ${{ steps.app-token.outputs.token }}
       run: |
+            # Ring Setup
+            Write-Output "-------------------------------------------"
+            Write-Output "Ring Setup"
+            Write-Output "-------------------------------------------"
             $Ring = "Canary"
             $WingetApplicationId = "nkdagility.azure-devops-migration-tools"
+            $docs_deploy_folder = "/azure-devops-migration-tools/";
             switch ($Env:GitVersion_PreReleaseLabel) {
                 "" {
                     $Ring = "Release";
                     $WingetApplicationId = "nkdagility.azure-devops-migration-tools";
+                    $docs_deploy_folder = "/azure-devops-migration-tools/"
                 }    
                 "Preview" {
                     $Ring = "Preview";
                     $WingetApplicationId = "nkdagility.azure-devops-migration-tools.Preview";
+                    $docs_deploy_folder = "/azure-devops-migration-tools/preview/";
                 }
                 default {
                     $Ring = "Canary";
                     $WingetApplicationId = "nkdagility.azure-devops-migration-tools.Canary";
+                    $docs_deploy_folder = "/azure-devops-migration-tools/canary/"
                 }
             }
             Write-Output "We are running for the $Ring Ring!"
-            Write-Output "We are focused on Winget ID $WingetApplicationId!"
             echo "Ring=$Ring" >> $env:GITHUB_OUTPUT
+            Write-Output "We are focused on Winget ID $WingetApplicationId!"            
             echo "WingetApplicationId=$WingetApplicationId" >> $env:GITHUB_OUTPUT
+            Write-Output "docs_deploy_folder=$docs_deploy_folder"
+            echo "docs_deploy_folder=$docs_deploy_folder" >> $env:GITHUB_OUTPUT
+            Write-Output "-------------------------------------------"
+            # Docs Setup
+            Write-Output "-------------------------------------------"
+            Write-Output "Docs"
+            Write-Output "-------------------------------------------"
+            $docs_version_folder = "/azure-devops-migration-tools/$Env:GitVersion_SemVer"
+             Write-Output "docs_version_folder=$docs_version_folder"
+            echo "docs_version_folder=$docs_version_folder" >> $env:GITHUB_OUTPUT
+            Write-Output "-------------------------------------------"
 
-            $IsBuildEditBranch = $false;
-            if (("${{ github.ref_name }}").contains("build/")) {
-                $IsBuildEditBranch = $true;
-            }
-            Write-Output "IsBuildEditBranch=$IsBuildEditBranch"
-            echo "IsBuildEditBranch=$IsBuildEditBranch" >> $env:GITHUB_OUTPUT
-
+             # Get-ReleaseDescription
+            Write-Output "-------------------------------------------"
+            Write-Output "Get-ReleaseDescription"
+            Write-Output "-------------------------------------------"
             Write-Output "Running Get-ReleaseDescription.ps1"
             . .\build\include\Get-ReleaseDescription.ps1
             $description = Get-ReleaseDescription -mode log -OPEN_AI_KEY ${{ secrets.OPENAI_API_KEY }}
@@ -136,7 +153,11 @@ jobs:
             echo "release_description<<$EOF" >> $env:GITHUB_OUTPUT
             echo $description >> $env:GITHUB_OUTPUT
             echo "$EOF" >> $env:GITHUB_OUTPUT
-            
+            Write-Output "-------------------------------------------"
+             # HasChanged Setup
+            Write-Output "-------------------------------------------"
+            Write-Output "HasChanged Setup"
+            Write-Output "-------------------------------------------"
             if ('${{ steps.filter.outputs.src }}' -eq 'true') {
                 echo "HasChanged_src=true" >> $env:GITHUB_OUTPUT;
             } else {
@@ -160,19 +181,6 @@ jobs:
             } else {
                 echo "HasChanged_automation=false" >> $env:GITHUB_OUTPUT;
             }
-            # Get Variables for Docs
-            Write-Output "-------------------------------------------"
-            Write-Output "Get Variables for Docs"
-            Write-Output "-------------------------------------------"
-            $docs_version_folder = "/azure-devops-migration-tools/$Env:GitVersion_SemVer"
-            $docs_deploy_folder = "/azure-devops-migration-tools/"
-            if ($Env:nkdAgility_Ring -ne 'Release') {
-               $docs_deploy_folder = Join-Path -Path $docs_deploy_folder -ChildPath $Env:nkdAgility_Ring
-            }
-            Write-Output "docs_deploy_folder=$docs_deploy_folder"
-            echo "docs_deploy_folder=$docs_deploy_folder" >> $env:GITHUB_OUTPUT
-             Write-Output "docs_version_folder=$docs_version_folder"
-            echo "docs_version_folder=$docs_version_folder" >> $env:GITHUB_OUTPUT
             Write-Output "-------------------------------------------"
 
     - uses: actions/upload-artifact@v4
@@ -195,8 +203,9 @@ jobs:
                ## ${{needs.Setup.outputs.GitVersion_SemVer}} (${{needs.Setup.outputs.nkdAgility_Ring}})
                ### NKDAgility
                  - nkdAgility_Ring: ${{needs.Setup.outputs.nkdAgility_Ring}}
-                 - nkdAgility_IsBuildEditBranch: ${{needs.Setup.outputs.nkdAgility_IsBuildEditBranch}}
                  - nkdAgility_WingetApplicationId: ${{needs.Setup.outputs.nkdAgility_WingetApplicationId}}
+                 - nkdAgility_DocsVersionFolder: ${{needs.Setup.outputs.nkdAgility_DocsVersionFolder}}
+                 - nkdAgility_DocsDeployFolder: ${{needs.Setup.outputs.nkdAgility_DocsDeployFolder}}
                  - nkdAgility_ReleaseDescriptionState: ${{needs.Setup.outputs.nkdAgility_ReleaseDescriptionState}}
                  - nkdAgility_HasChanged_src: ${{needs.Setup.outputs.nkdAgility_HasChanged_src}}
                  - nkdAgility_HasChanged_docs: ${{needs.Setup.outputs.nkdAgility_HasChanged_docs}}
