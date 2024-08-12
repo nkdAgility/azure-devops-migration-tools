@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.DataContracts;
@@ -44,9 +44,9 @@ namespace MigrationTools._EngineV1.Clients
 
         public abstract WorkItemData GetRevision(WorkItemData workItem, int revision);
 
-        public abstract WorkItemData GetWorkItem(string id);
+        public abstract WorkItemData GetWorkItem(string id, bool stopOnError = true);
 
-        public abstract WorkItemData GetWorkItem(int id);
+        public abstract WorkItemData GetWorkItem(int id, bool stopOnError = true);
 
         public abstract List<WorkItemData> GetWorkItems();
 
