@@ -11,6 +11,17 @@ on:
   pull_request:
       branches: ["main"]
   workflow_dispatch:
+    inputs:
+      ForceHasChanged_src:
+        description: 'Force the src folder to be considered changed'
+        required: false
+        default: false
+        type: boolean
+      ForceHasChanged_docs:
+        description: 'Force the docs folder to be considered changed'
+        required: false
+        default: false
+        type: boolean
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }} 
@@ -43,6 +54,9 @@ jobs:
       nkdAgility_IsBuildEditBranch: ${{ steps.nkdagility.outputs.IsBuildEditBranch }}
       nkdAgility_ReleaseDescription: ${{ steps.nkdagility.outputs.release_description }}
       nkdAgility_ReleaseDescriptionState: ${{ steps.nkdagility.outputs.release_description_state }}
+      nkdAgility_HasChanged_src: ${{ steps.nkdagility.outputs.HasChanged_src }}
+      nkdAgility_HasChanged_docs: ${{ steps.nkdagility.outputs.HasChanged_docs }}
+      nkdAgility_HasChanged_automation: ${{ steps.nkdagility.outputs.HasChanged_automation }}
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -123,6 +137,29 @@ jobs:
             echo $description >> $env:GITHUB_OUTPUT
             echo "$EOF" >> $env:GITHUB_OUTPUT
             
+            if ("${{ steps.filter.outputs.src }}" = 'true') {
+                echo "HasChanged_src=true" >> $env:GITHUB_OUTPUT
+            } else {
+                if (${{ inputs.ForceHasChanged_src }} = 'true') {
+                    echo "HasChanged_src=true" >> $env:GITHUB_OUTPUT
+                } else {
+                    echo "HasChanged_src=false" >> $env:GITHUB_OUTPUT
+                })
+            }
+            if ("${{ steps.filter.outputs.docs }}" = 'true') {
+                echo "HasChanged_docs=true" >> $env:GITHUB_OUTPUT
+            } else {
+                if (${{ inputs.ForceHasChanged_docs }} = 'true') {
+                    echo "HasChanged_docs=true" >> $env:GITHUB_OUTPUT
+                } else {
+                    echo "HasChanged_docs=false" >> $env:GITHUB_OUTPUT
+                }
+            }
+            if ("${{ steps.filter.outputs.automation }}" = 'true') {
+                echo "HasChanged_automation=true" >> $env:GITHUB_OUTPUT
+            } else {
+                echo "HasChanged_automation=false" >> $env:GITHUB_OUTPUT
+            }
 
     - uses: actions/upload-artifact@v4
       with:
@@ -147,7 +184,9 @@ jobs:
                  - nkdAgility_IsBuildEditBranch: ${{needs.Setup.outputs.nkdAgility_IsBuildEditBranch}}
                  - nkdAgility_WingetApplicationId: ${{needs.Setup.outputs.nkdAgility_WingetApplicationId}}
                  - nkdAgility_ReleaseDescriptionState: ${{needs.Setup.outputs.nkdAgility_ReleaseDescriptionState}}
-             
+                 - nkdAgility_HasChanged_src: ${{needs.Setup.outputs.nkdAgility_HasChanged_src}}
+                 - nkdAgility_HasChanged_docs: ${{needs.Setup.outputs.nkdAgility_HasChanged_docs}}
+                 - nkdAgility_HasChanged_automation: ${{needs.Setup.outputs.nkdAgility_HasChanged_automation}}
                ### GitVersion
                  - GitVersion_BranchName: ${{needs.Setup.outputs.GitVersion_BranchName}}
                  - GitVersion_SemVer: ${{needs.Setup.outputs.GitVersion_SemVer}}
