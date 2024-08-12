@@ -179,9 +179,6 @@ jobs:
                  - nkdAgility_DocsVersionFolder: ${{needs.Setup.outputs.nkdAgility_DocsVersionFolder}}
                  - nkdAgility_DocsDeployFolder: ${{needs.Setup.outputs.nkdAgility_DocsDeployFolder}}
                  - nkdAgility_ReleaseDescriptionState: ${{needs.Setup.outputs.nkdAgility_ReleaseDescriptionState}}
-                 - nkdAgility_HasChanged_src: ${{needs.Setup.outputs.nkdAgility_HasChanged_src}}
-                 - nkdAgility_HasChanged_docs: ${{needs.Setup.outputs.nkdAgility_HasChanged_docs}}
-                 - nkdAgility_HasChanged_automation: ${{needs.Setup.outputs.nkdAgility_HasChanged_automation}}
                  - nkdAgility_RunRelease: ${{needs.Setup.outputs.nkdAgility_RunRelease}}
                ### GitVersion
                  - GitVersion_BranchName: ${{needs.Setup.outputs.GitVersion_BranchName}}
