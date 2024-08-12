@@ -12,13 +12,8 @@ on:
       branches: ["main"]
   workflow_dispatch:
     inputs:
-      ForceHasChanged_src:
-        description: 'Force the src folder to be considered changed'
-        required: false
-        default: false
-        type: boolean
-      ForceHasChanged_docs:
-        description: 'Force the docs folder to be considered changed'
+      ForceRelease:
+        description: 'Force a release! Use when changes hapen out of sync and `src` and `docs` folder changes are not detected.'
         required: false
         default: false
         type: boolean
@@ -53,9 +48,6 @@ jobs:
       nkdAgility_WingetApplicationId: ${{ steps.nkdagility.outputs.WingetApplicationId }}
       nkdAgility_ReleaseDescription: ${{ steps.nkdagility.outputs.release_description }}
       nkdAgility_ReleaseDescriptionState: ${{ steps.nkdagility.outputs.release_description_state }}
-      nkdAgility_HasChanged_src: ${{ steps.nkdagility.outputs.HasChanged_src }}
-      nkdAgility_HasChanged_docs: ${{ steps.nkdagility.outputs.HasChanged_docs }}
-      nkdAgility_HasChanged_automation: ${{ steps.nkdagility.outputs.HasChanged_automation }}
       nkdAgility_DocsDeployFolder: ${{ steps.nkdagility.outputs.docs_deploy_folder }}
       nkdAgility_DocsVersionFolder: ${{ steps.nkdagility.outputs.docs_version_folder }}
       nkdAgility_RunRelease: ${{ steps.nkdagility.outputs.RunRelease }}
@@ -116,7 +108,7 @@ jobs:
                     $Ring = "Preview";
                     $WingetApplicationId = "nkdagility.azure-devops-migration-tools.Preview";
                     $docs_deploy_folder = "./azure-devops-migration-tools/preview/";
-                    $RunRelease = (('${{ steps.filter.outputs.src }}' -eq 'true') -or ('${{ steps.filter.outputs.docs }}' -eq 'true') )
+                    $RunRelease = ( ('${{ inputs.ForceRelease }}' -eq 'true' ) -or ('${{ steps.filter.outputs.src }}' -eq 'true') -or ('${{ steps.filter.outputs.docs }}' -eq 'true') )
                 }
                 default {
                     $Ring = "Canary";
@@ -162,34 +154,6 @@ jobs:
             echo $description >> $env:GITHUB_OUTPUT
             echo "$EOF" >> $env:GITHUB_OUTPUT
             Write-Output "-------------------------------------------"
-             # HasChanged Setup
-            Write-Output "-------------------------------------------"
-            Write-Output "HasChanged Setup"
-            Write-Output "-------------------------------------------"
-            if ('${{ steps.filter.outputs.src }}' -eq 'true') {
-                echo "HasChanged_src=true" >> $env:GITHUB_OUTPUT;
-            } else {
-                if ('${{ inputs.ForceHasChanged_src }}' -eq 'true') {
-                    echo "HasChanged_src=true" >> $env:GITHUB_OUTPUT;
-                } else {
-                    echo "HasChanged_src=false" >> $env:GITHUB_OUTPUT;
-                }
-            }
-            if ('${{ steps.filter.outputs.docs }}' -eq 'true') {
-                echo "HasChanged_docs=true" >> $env:GITHUB_OUTPUT;
-            } else {
-                if ('${{ inputs.ForceHasChanged_docs }}' -eq 'true') {
-                    echo "HasChanged_docs=true" >> $env:GITHUB_OUTPUT;
-                } else {
-                    echo "HasChanged_docs=false" >> $env:GITHUB_OUTPUT;
-                }
-            }
-            if ('${{ steps.filter.outputs.automation }}' -eq 'true') {
-                echo "HasChanged_automation=true" >> $env:GITHUB_OUTPUT;
-            } else {
-                echo "HasChanged_automation=false" >> $env:GITHUB_OUTPUT;
-            }
-            Write-Output "-------------------------------------------"
 
     - uses: actions/upload-artifact@v4
       with:
@@ -215,9 +179,6 @@ jobs:
                  - nkdAgility_DocsVersionFolder: ${{needs.Setup.outputs.nkdAgility_DocsVersionFolder}}
                  - nkdAgility_DocsDeployFolder: ${{needs.Setup.outputs.nkdAgility_DocsDeployFolder}}
                  - nkdAgility_ReleaseDescriptionState: ${{needs.Setup.outputs.nkdAgility_ReleaseDescriptionState}}
-                 - nkdAgility_HasChanged_src: ${{needs.Setup.outputs.nkdAgility_HasChanged_src}}
-                 - nkdAgility_HasChanged_docs: ${{needs.Setup.outputs.nkdAgility_HasChanged_docs}}
-                 - nkdAgility_HasChanged_automation: ${{needs.Setup.outputs.nkdAgility_HasChanged_automation}}
                  - nkdAgility_RunRelease: ${{needs.Setup.outputs.nkdAgility_RunRelease}}
                ### GitVersion
                  - GitVersion_BranchName: ${{needs.Setup.outputs.GitVersion_BranchName}}
