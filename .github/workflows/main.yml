@@ -160,6 +160,20 @@ jobs:
             } else {
                 echo "HasChanged_automation=false" >> $env:GITHUB_OUTPUT;
             }
+            # Get Variables for Docs
+            Write-Output "-------------------------------------------"
+            Write-Output "Get Variables for Docs"
+            Write-Output "-------------------------------------------"
+            $docs_version_folder = "/azure-devops-migration-tools/$Env:GitVersion_SemVer"
+            $docs_deploy_folder = "/azure-devops-migration-tools/"
+            if ($Env:nkdAgility_Ring -ne 'Release') {
+               $docs_deploy_folder = Join-Path -Path $docs_deploy_folder -ChildPath $Env:nkdAgility_Ring
+            }
+            Write-Output "docs_deploy_folder=$docs_deploy_folder"
+            echo "docs_deploy_folder=$docs_deploy_folder" >> $env:GITHUB_OUTPUT
+             Write-Output "docs_version_folder=$docs_version_folder"
+            echo "docs_version_folder=$docs_version_folder" >> $env:GITHUB_OUTPUT
+            Write-Output "-------------------------------------------"
 
     - uses: actions/upload-artifact@v4
       with:
