@@ -301,8 +301,13 @@ jobs:
       - uses: cschleiden/replace-tokens@v1
         with:
           files: '["**/*.html"]'
-          tokenPrefix: "${"
-          tokenSuffix: "}"
+          tokenPrefix: "#{"
+          tokenSuffix: "}#"
+        env: 
+          GitVersion_SemVer: ${{ needs.Setup.outputs.GitVersion_SemVer }}
+          GitVersion_AssemblySemVer: ${{ needs.Setup.outputs.GitVersion_AssemblySemVer }}
+          GitVersion_InformationalVersion: ${{ needs.Setup.outputs.GitVersion_InformationalVersion }}
+          GitVersion.SemVer: ${{ needs.Setup.outputs.GitVersion_SemVer }}
       - uses: igsekor/pyspelling-any@v1.0.4
         id: spellcheck
         name: Spellcheck
@@ -325,11 +330,8 @@ jobs:
       GitVersion_InformationalVersion: ${{ needs.Setup.outputs.GitVersion_InformationalVersion }}
       GitVersion_NuGetVersion: ${{ needs.Setup.outputs.GitVersion_NuGetVersion }}
       GitVersion_PreReleaseLabel: ${{ needs.Setup.outputs.GitVersion_PreReleaseLabel }}
-      HasChanged_src: ${{ needs.Setup.outputs.HasChanged_src }}
-      HasChanged_docs: ${{ needs.Setup.outputs.HasChanged_docs }}
-      HasChanged_automation: ${{ needs.Setup.outputs.HasChanged_automation }}
     needs: [build, Setup]
-    if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring != 'Canary' ) && ( needs.Setup.outputs.HasChanged_src == 'true' ) }}
+    if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring != 'Canary' ) && ( needs.Setup.outputs.nkdAgility_HasChanged_src == 'true' ) }}
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -405,7 +407,7 @@ jobs:
     name: "Release to Marketplace"
     runs-on: ubuntu-latest
     needs: [Setup, GitHubRelease]
-    if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring != 'Canary' ) && (needs.Setup.outputs.HasChanged_src == 'true') }}
+    if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring != 'Canary' ) && (needs.Setup.outputs.nkdAgility_HasChanged_src == 'true') }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -434,7 +436,7 @@ jobs:
     name: "Release to Chocolatey"
     runs-on: windows-latest
     needs: [Setup, GitHubRelease]
-    if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring != 'Canary' ) && (needs.Setup.outputs.HasChanged_src == 'true') }}
+    if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring != 'Canary' ) && (needs.Setup.outputs.nkdAgility_HasChanged_src == 'true') }}
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -458,7 +460,7 @@ jobs:
     name: "Release to Winget"
     runs-on: windows-latest
     needs: [Setup, GitHubRelease]
-    if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring != 'Canary' ) && (needs.Setup.outputs.HasChanged_src == 'true') }}
+    if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring != 'Canary' ) && (needs.Setup.outputs.nkdAgility_HasChanged_src == 'true') }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -479,7 +481,7 @@ jobs:
     name: "Release to Docs"
     runs-on: ubuntu-latest
     needs: [Setup, BuildDocs, GitHubRelease]
-    if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring != 'Canary' ) && (needs.Setup.outputs.HasChanged_docs == 'true') }}
+    if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring != 'Canary' ) && (needs.Setup.outputs.nkdAgility_HasChanged_docs == 'true') }}
     steps:
       - name: Download a single artifact
         uses: actions/download-artifact@v4
