@@ -31,7 +31,7 @@
                     <div class="container-flow content">
                         <div class="d-flex justify-content-between">
                             <div class="">
-                                {% include breadcrumbs.html %}
+                           
                             </div>
                             <div class="p-2 text-end">
                                 {% include cardpanel-contribute.html %}
@@ -45,12 +45,21 @@
                 <div class="card mb-3">
                     <h5 class="no_toc card-header">Project Details</h5>
                     <div class="card-body">
-                     <a href="https://chocolatey.org/packages/vsts-sync-migrator/"><img src="https://img.shields.io/chocolatey/dt/vsts-sync-migrator.svg" alt="Chocolatey"></a> 
-                     <a href="https://github.com/nkdAgility/azure-devops-migration-tools/releases"><img src="https://img.shields.io/github/release/nkdAgility/vsts-sync-migration.svg" alt="GitHub release"></a> 
-                     <img src="https://nkdagility.visualstudio.com/_apis/public/build/definitions/1b52ce63-eccc-41c8-88f9-ae6ebeefdc63/94/badge" alt="Build on VSTS"></p>
+                        <a href="https://chocolatey.org/packages/vsts-sync-migrator/"><img src="https://img.shields.io/chocolatey/dt/vsts-sync-migrator.svg" alt="Chocolatey"></a>
+                        <a href="https://github.com/nkdAgility/azure-devops-migration-tools/releases"><img src="https://img.shields.io/github/release/nkdAgility/vsts-sync-migration.svg" alt="GitHub release"></a>
+                        <img src="https://nkdagility.visualstudio.com/_apis/public/build/definitions/1b52ce63-eccc-41c8-88f9-ae6ebeefdc63/94/badge" alt="Build on VSTS"></p>
                     </div>
                 </div>
                 {% include cardpanel-contribute.html expand = true %}
+                <div class="card mb-3">
+                    <h5 class="no_toc card-header">Getting Support</h5>
+                    <div class="card-body">
+                        <p><strong>Open Source Support</strong></p>
+                        <p><a href="https://github.com/nkdAgility/azure-devops-migration-tools/discussions">Question & Discussion</a> - The first place to look for usage, configuration, and general help.</p>
+                        <p><strong>Professional Support</strong></p>
+                        <p>We provide training, ad-hoc support, and full service migrations through <a href="https://nkdagility.com/capabilities/azure-devops-migration-services/" title="Azure DevOps Migration Services with Naked Agiity Ltd." target="_blank">Azure DevOps Migration Services</a></p>
+                    </div>
+                </div>
                 {% if page.toc == true %}
                 <div class="card mb-3">
                     <h5 class="no_toc card-header">In this article</h5>
@@ -63,9 +72,7 @@
 
         </div>
     </div>
-    <div class="container-fluid p-5 bg-secondary text-white text-center">
-        {%- include footer.html -%}
-    </div>
+   {%- include footer.html -%}
 </body>
 </html>
 
