@@ -1,45 +1,66 @@
-<nav class="navbar navbar-expand-sm navbar-dark bg-brand-menu" aria-label="Third navbar example">
-    <div class="container">
-        <a class="navbar-brand" href="{{site.parent_url}}" title="{{site.parent_title}}"><img src="{{site.parent_url}}/wp-content/uploads/2020/11/nkdagility-with-martin-hinshelwood-dark-200.png" /></a>
-        <div class="collapse navbar-collapse" id="navbarsExample03">
-            <ul class="navbar-nav me-auto mb-2 mb-sm-0">
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" title="About | {{site.parent_title}}" href="{{site.parent_url}}/company/about-us">About</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" title="Training | {{site.parent_title}}" href="{{site.parent_url}}/training/">Training</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" title="Consulting | {{site.parent_title}}" href="{{site.parent_url}}/agile-consulting-coaching/">Consulting</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" title="Community | {{site.parent_title}}" href="{{site.parent_url}}/community/">Community</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" title="Resources | {{site.parent_title}}" href="{{site.parent_url}}/resources/">Resources</a>
-                </li>
-            </ul>
+<header class="">
+    <div class="container-fluid bg-brand-primary">
+        <div class="container">
+            <nav class="navbar navbar-dark">
+                <div class="container-fluid">
+                    <div class="d-flex w-100 justify-content-between">
+                        <div class="d-flex">
+                            <a class="navbar-brand navbar-brand-topbaritem" href="tel:+441413439621">+44 141 343 9621</a>
+                            <a class="navbar-brand navbar-brand-topbaritem" href="https://wa.me/message/HUH4LD467QPTB1"><i class="fa-brands fa-whatsapp"></i></a>
+                            <a class="navbar-brand navbar-brand-topbaritem" href="mailto:contact@nkdagility.com">contact@nkdagility.com</a>
+                            <a class="navbar-brand navbar-brand-topbaritem" href="#">Glasgow, Scotland</a>
+                        </div>
+                        <div class="d-flex text-uppercase">
+                            <a class="navbar-brand navbar-brand-topbaritem" href="{{site.parent_url}}/my-account/">My Account</a>
+                            <a class="navbar-brand navbar-brand-topbaritem" href="{{site.parent_url}}/capabilities/private-corporate-training/">Corporate Training</a>
+                            <a class="navbar-brand navbar-brand-topbaritem" href="{{site.parent_url}}/training-courses/course-schedule/">Course Schedule</a>
+                            <a class="navbar-brand navbar-brand-topbaritem" href="{{site.parent_url}}/blog/">Blog</a>
+                            <a class="navbar-brand navbar-brand-topbaritem" href="{{site.parent_url}}/company/general-inquiries/">Contact</a>
+                            <a class="navbar-brand navbar-brand-topbaritem" href="https://wa.me/message/HUH4LD467QPTB1"><i class="fa-brands fa-whatsapp"></i></a>
+                            <a class="navbar-brand navbar-brand-topbaritem" href="http://nakedagility.tv/"><i class="fa-brands fa-youtube"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
         </div>
     </div>
-</nav>
-<div class="container-fluid p-5 bg-brand-primary text-white text-center">
-    <h1>{{site.title}}</h1>
-    <p>v#{GitVersion.SemVer}#</p>
-    <p>{{site.description}}</p>
-</div>   
-<nav class="navbar navbar-expand-sm navbar-dark bg-dark" aria-label="Third navbar example">
     <div class="container-fluid">
-        <a class="btn btn-outline-light d-flex" href="{{site.parent_url}}" title="naked Agility with Martin Hinshelwood"><i class="fa-solid fa-turn-down-left fa-rotate-90"></i><span class="d-none d-lg-block">&nbsp;Return to naked Agility</span></a>
-        <!-- <div class="collapse navbar-collapse" id="navbarsExample03">
-            <ul class="navbar-nav me-auto mb-2 mb-sm-0">
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" title="Start | {{site.title}}" href="{{site.baseurl}}/"><i class="fa-sharp fa-solid fa-flag-checkered"></i> Start</a>
-                </li>
-            </ul>
-        </div> -->
-        <a class="d-lg-none btn btn-outline-light" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" aria-controls="offcanvasExample" title="Start | {{site.title}}" href="{{site.baseurl}}/"><i class="fa-solid fa-bars"></i></a>
+        <div class="container">
+            <nav class="navbar navbar-light">
+                <div class="container-fluid">
+                    <div class="d-flex w-100 justify-content-between">
+                        <div class="d-flex">
+                            <a class="navbar-brand" href="#">
+                                <img src="https://nkdagility.com/wp-content/uploads/2020/11/nkdagility-with-martin-hinshelwood-light.png" alt="Naked Agility Ltd" width="234" height="99">
+                            </a>
+                        </div>
+                        <div class="d-flex text-uppercase align-items-center">
+                            <a class="navbar-brand nkda-main-menu-item p-3" href="{{site.parent_url}}/company/about-us" title="About Naked Agility">Who We Are?</a>
+                            <a class="navbar-brand nkda-main-menu-item p-3" href="{{site.parent_url}}/capabilities/" title="Explore our tailored services and capabilities in Consulting, Coaching, and Mentoring. Specializing in Agile, DevOps, Scrum, and Kanban, we’re here to help you tackle challenges and drive success. Enhance your team’s performance and efficiency with our expert solutions!">What we Do?</a>
+                            <a class="navbar-brand nkda-main-menu-item p-3" href="{{site.parent_url}}/outcomes/" title="Outcomes: enhanced Team Effectiveness, superior Product Quality, and accelerated Time to Market. Our solutions drive continuous improvement and adaptability, setting your business apart in competitive markets.">What you Get?</a>
+                            <a class="navbar-brand nkda-main-menu-item p-3" href="{{site.parent_url}}/resources/" title="Featured Insights – Find out what we think about topics through Case Studies, Articles, Blog Posts, Videos, and Podcasts">What we Think?</a>
+                            <a class="navbar-brand nkda-main-menu-item p-3" href="{{site.parent_url}}/training-courses/" title="Agile, Scrum, Kanban, & DevOps training courses">Training</a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </div>
     </div>
-</nav>
+</header>
+<div class="container col-xxl-8 px-4 py-5">
+    <div class="row align-items-center g-5 py-5">
+        <div class="col-lg-6 col-md-12">
+            <h1 class="display-5 fw-bold lh-1 mb-3 nkda-text-primary">{{site.title}}</h1>
+            <h2>v#{GitVersion.SemVer}#</h2>
+        </div>
+        <div class="col-lg-6 col-md-12">
+            <p class="lead">{{site.description}}</p>
+        </div>
+    </div>
+    <div class="row">
+        {% include breadcrumbs.html %}
+    </div>
+</div>
 <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
     <div class="offcanvas-header">
         <h5 class="offcanvas-title" id="offcanvasExampleLabel">Overview</h5>
