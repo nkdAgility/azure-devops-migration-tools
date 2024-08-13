@@ -46,21 +46,32 @@
   comment: >
     Hi there,
 
+
     **_ACTION REQUIRED_**
+
 
     In order for us to help you will need to provide both the log, and the configration file that you are using.
 
+
     **Generate and Attach Log** 
+
 
     Steps:
 
+
     1. In the Config file, change `LogLevel` to `Debug`.
+
     2. Identify a work item ID that exhibits this issue and create a query that only selects this work item.
+
     3. Delete any existing copy of that work item from the target.
+
     4. Run the migration.
+
     5. Comment here with the full Log attached as well as the full (redacted) configration file that you are using.
 
+
     Your assistance is greatly appreciated!
+
 
     Thanks,  
     Azure DevOps Migration Tools team
@@ -71,21 +82,32 @@
 
     **_ACTION REQUIRED_**
 
+
     This looks to be a complex issue that you will need to debug locally to figure out what is going on.     
+
 
     **Debug in Visual Studio** 
 
+
     Steps:
 
+
     1. [Fork this repository](https://docs.github.com/en/get-started/exploring-projects-on-github/contributing-to-a-project#forking-a-repository)
-    3. [Open this project in Visual Studio](https://learn.microsoft.com/en-us/visualstudio/get-started/tutorial-open-project-from-repo?view=vs-2022#open-a-project-from-a-github-repo)
+
+    2. [Open this project in Visual Studio](https://learn.microsoft.com/en-us/visualstudio/get-started/tutorial-open-project-from-repo?view=vs-2022#open-a-project-from-a-github-repo)
+
     3. [Edit the Launch Profile](https://learn.microsoft.com/en-us/visualstudio/debugger/project-settings-for-csharp-debug-configurations-dotnetcore?view=vs-2022#launch-profile-net-core-net-5) to point to your config.<br />![image](https://github.com/nkdAgility/azure-devops-migration-tools/assets/5205575/1f55a278-8c8d-4481-8f2e-08d20640c8a8)
+
     4. Craft a [WIQL query](https://learn.microsoft.com/en-us/azure/devops/boards/queries/wiql-syntax) to only load the work item with the issue.
+
     5. Then [set some break points and debug](https://learn.microsoft.com/en-us/visualstudio/debugger/debugger-feature-tour) the issue.
+
     6. Comment here with the results.
 
 
+
     Your assistance is greatly appreciated!
+
 
     Thanks,  
     Azure DevOps Migration Tools team
