@@ -115,18 +115,6 @@
           "Microsoft.VSTS.Common.ResolvedBy",
           "Microsoft.VSTS.Common.ClosedBy"
         ]
-      },
-      "TfsWorkItemLinkEnricher": {
-        "Enabled": true,
-        "FilterIfLinkCountMatches": true,
-        "SaveAfterEachLinkIsAdded": false
-      },
-      "WorkItemTypeMappingEnricher": {
-        "Enabled": true,
-        "RefName": "Bob",
-        "WorkItemTypeDefinition": {
-          "User Story": "Product Backlog Item"
-        }
       }
     },
     "Processors": [
@@ -146,14 +134,6 @@
         "MaxGracefulFailures": 0,
         "SkipRevisionWithInvalidIterationPath": false,
         "SkipRevisionWithInvalidAreaPath": false
-      },
-      {
-        "ProcessorType": "WorkItemPostProcessing",
-        "Enabled": false,
-        "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
-        "WorkItemCreateRetryLimit": 5,
-        "FilterWorkItemsThatAlreadyExistInTarget": false,
-        "PauseAfterEachWorkItem": false
       }
     ]
   }
