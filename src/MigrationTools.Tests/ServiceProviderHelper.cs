@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using MigrationTools._EngineV1.Containers;
 using MigrationTools.EndpointEnrichers;
 using MigrationTools.Endpoints;
@@ -15,9 +16,10 @@ namespace MigrationTools.Tests
     {
         internal static ServiceProvider GetWorkItemMigrationProcessor()
         {
+            var configuration = new ConfigurationBuilder().Build();
             var services = new ServiceCollection();
             services.AddMigrationToolServicesForUnitTests();
-            services.AddMigrationToolServices();
+            services.AddMigrationToolServices(configuration);
 
             // Containers
             services.AddSingleton<ProcessorContainer>();

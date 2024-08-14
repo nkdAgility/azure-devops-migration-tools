@@ -611,7 +611,7 @@
         </member>
         <member name="F:ThisAssembly.Git.IsDirtyString">
             <summary>
-            => @"true"
+            => @"false"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.RepositoryUrl">
@@ -626,32 +626,32 @@
         </member>
         <member name="F:ThisAssembly.Git.Commit">
             <summary>
-            => @"c2a8065"
+            => @"de4db9d"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Sha">
             <summary>
-            => @"c2a806525d8f263ee8f3dafdb7dd7c97d2140bd4"
+            => @"de4db9d79578dfd2272f3d4dc44a20f07fc45fd6"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.CommitDate">
             <summary>
-            => @"2024-08-08T15:59:14+01:00"
+            => @"2024-08-13T10:40:33+01:00"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commits">
             <summary>
-            => @"61"
+            => @"28"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Tag">
             <summary>
-            => @"v15.1.8-Preview.4-61-gc2a8065"
+            => @"v15.1.8-Preview.7-28-gde4db9d"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseTag">
             <summary>
-            => @"v15.1.8-Preview.4"
+            => @"v15.1.8-Preview.7"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseVersion.Major">
@@ -681,17 +681,17 @@
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Patch">
             <summary>
-            => @"69"
+            => @"36"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Label">
             <summary>
-            => @"Preview.4"
+            => @"Preview.7"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.DashLabel">
             <summary>
-            => @"-Preview.4"
+            => @"-Preview.7"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Source">

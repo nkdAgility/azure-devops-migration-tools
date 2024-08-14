@@ -2,6 +2,7 @@
 using MigrationTools.Services;
 using MigrationTools.TestExtensions;
 using MigrationTools.Helpers.Tests;
+using Microsoft.Extensions.Configuration;
 
 namespace MigrationTools.Tests
 {
@@ -9,10 +10,11 @@ namespace MigrationTools.Tests
     {
         internal static ServiceProvider GetServices()
         {
+            var configuration = new ConfigurationBuilder().Build();
             var services = new ServiceCollection();
             services.AddMigrationToolServicesForUnitTests();
 
-            services.AddMigrationToolServices();
+            services.AddMigrationToolServices(configuration);
             services.AddMigrationToolServicesForClientFileSystem();
 
             services.AddSingleton<IMigrationToolVersionInfo, FakeMigrationToolVersionInfo>();
