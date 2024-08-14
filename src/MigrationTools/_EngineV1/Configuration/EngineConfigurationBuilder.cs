@@ -315,8 +315,8 @@ namespace MigrationTools._EngineV1.Configuration
         private object GetSpecificType(string typeName)
         {
             AppDomain.CurrentDomain.Load("MigrationTools");
-            AppDomain.CurrentDomain.Load("MigrationTools.Clients.InMemory");
-            //AppDomain.CurrentDomain.Load("MigrationTools.Clients.FileSystem");
+            //AppDomain.CurrentDomain.Load("MigrationTools.Clients.InMemory");
+            AppDomain.CurrentDomain.Load("MigrationTools.Clients.FileSystem");
             Type type = AppDomain.CurrentDomain.GetAssemblies()
                .Where(a => a.FullName.StartsWith("MigrationTools"))
                .SelectMany(a => a.GetTypes())
@@ -329,8 +329,8 @@ namespace MigrationTools._EngineV1.Configuration
         private List<TInterfaceToFind> GetAllTypes<TInterfaceToFind>() where TInterfaceToFind : IOptions
         {
             AppDomain.CurrentDomain.Load("MigrationTools");
-            AppDomain.CurrentDomain.Load("MigrationTools.Clients.InMemory");
-            //AppDomain.CurrentDomain.Load("MigrationTools.Clients.FileSystem");
+            //AppDomain.CurrentDomain.Load("MigrationTools.Clients.InMemory");
+            AppDomain.CurrentDomain.Load("MigrationTools.Clients.FileSystem");
             List<Type> types = AppDomain.CurrentDomain.GetAssemblies()
               .Where(a => a.FullName.StartsWith("MigrationTools"))
               .SelectMany(a => a.GetTypes())
@@ -351,11 +351,11 @@ namespace MigrationTools._EngineV1.Configuration
             var engine = JObject.Parse(json);
 
             var endpoints = new JArray();
-            var source = GetSpecificType("InMemoryWorkItemEndpointOptions") as EndpointOptions;
+            var source = GetSpecificType("FileSystemWorkItemEndpointOptions") as EndpointOptions;
             source.Name = "Source";
             var sourceobj = (JObject)JToken.FromObject(source);
             endpoints.Add(sourceobj);
-            var target = GetSpecificType("InMemoryWorkItemEndpointOptions") as EndpointOptions;
+            var target = GetSpecificType("FileSystemWorkItemEndpointOptions") as EndpointOptions;
             target.Name = "Target";
             var targetobj = (JObject)JToken.FromObject(target);
             endpoints.Add(targetobj);

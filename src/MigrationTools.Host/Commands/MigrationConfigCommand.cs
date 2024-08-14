@@ -47,6 +47,7 @@ namespace MigrationTools.Host.Commands
                     configFile = "configuration.json";
                 }
                 _logger.LogInformation("ConfigFile: {configFile}", configFile);
+
                 if (File.Exists(configFile))
                 {
                    //

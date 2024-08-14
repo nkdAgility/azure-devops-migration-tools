@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MigrationTools.Clients.FileSystem\MigrationTools.Clients.FileSystem.csproj" />
     <ProjectReference Include="..\MigrationTools.Helpers.Tests\MigrationTools.Helpers.Tests.csproj" />
     <ProjectReference Include="..\MigrationTools.TestExtensions\MigrationTools.TestExtensions.csproj" />
     <ProjectReference Include="..\MigrationTools\MigrationTools.csproj" />
