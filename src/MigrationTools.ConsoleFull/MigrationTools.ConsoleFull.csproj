@@ -19,10 +19,18 @@
     <Content Include="..\..\appsettings.json" Link="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\..\configuration-classic.json" Link="configuration-classic.json" />
-    <Content Include="..\..\configuration-classic2-pipeline.json" Link="configuration-classic2-pipeline.json" />
-    <Content Include="..\..\configuration-classic2-wit.json" Link="configuration-classic2-wit.json" />
-    <Content Include="..\..\configuration-classic2.json" Link="configuration-classic2.json" />
+    <Content Include="..\..\configuration-classic.json" Link="configuration-classic.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\configuration-classic2-pipeline.json" Link="configuration-classic2-pipeline.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\configuration-classic2-wit.json" Link="configuration-classic2-wit.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\configuration-classic2.json" Link="configuration-classic2.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\..\configuration.json" Link="configuration.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
