@@ -1,13 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.ApplicationInsights.DataContracts;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.VisualStudio.Services.Common;
 using MigrationTools._EngineV1.Configuration;
+using MigrationTools._EngineV1.Containers;
+using Newtonsoft.Json.Linq;
+using Spectre.Console;
 using Spectre.Console.Cli;
 
 namespace MigrationTools.Host.Commands
@@ -48,17 +54,61 @@ namespace MigrationTools.Host.Commands
                 }
                 _logger.LogInformation("ConfigFile: {configFile}", configFile);
 
-                if (File.Exists(configFile))
+                // Load configuration
+                var configuration = new ConfigurationBuilder()
+                    .SetBasePath(Directory.GetCurrentDirectory())
+                    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                    .AddJsonFile(configFile, optional: true, reloadOnChange: true)
+                    .Build();
+
+                var json = File.ReadAllText(configFile);
+                var jsonObj = JObject.Parse(json);
+
+
+                var configurationEditorOptions = new[]
                 {
-                   //
-                   throw new Exception("File already exists! We dont yet support edit");
-                }
-                if (!File.Exists(configFile))
+                    "Source", "Target", "CommonEnrichers",
+                    "Processors",
+                    "Save & Exit",
+                    "Exit"
+                };
+
+                // Prompt the user to select processors
+                bool shouldExit = false;
+                while (!shouldExit)
                 {
-                  
-                   // _settingWriter.WriteSettings(config, configFile);
-                    _logger.LogInformation($"New {configFile} file has been created");
+                   var selectedOption = AnsiConsole.Prompt(
+                        new SelectionPrompt<string>()
+                            .Title("Select a configuration section to edit:")
+                            .PageSize(10)
+                            .AddChoices(configurationEditorOptions));
+
+                    Console.WriteLine($"Selected option: {selectedOption}");
+
+                    switch (selectedOption)
+                    {
+                        case "Source":
+                            break;
+                        case "Target":
+                            break;
+                        case "CommonEnrichers":
+                            break;
+                        case "Processors":
+                            EditProcessors();
+                            break;
+                        case "Save & Exit":
+                            shouldExit = true;
+                            break;
+                        case "Exit":
+                            shouldExit = true;
+                            break;
+                        default:
+                            Console.WriteLine("Unknown Option");
+                            break;
+                    }
                 }
+               
+
                 _exitCode = 0;
             }
             catch (Exception ex)
@@ -73,6 +123,40 @@ namespace MigrationTools.Host.Commands
                 _appLifetime.StopApplication();
             }
             return _exitCode;
+        }
+
+        private void EditProcessors()
+        {
+            Console.Clear();
+            bool shouldExit = false;
+            while (!shouldExit)
+            {
+                var options = AppDomain.CurrentDomain.GetMigrationToolsTypes().WithInterface<IProcessor>().Select(c => c.Name.ToString()).OrderBy(c=> c).ToList();
+                options.AddRange(new[] { "Save & Exit", "Exit" });
+                var selectedOption = AnsiConsole.Prompt(
+                     new SelectionPrompt<string>()
+                         .Title("Select a configuration section to edit:")
+                         .PageSize(10)
+                         .AddChoices(options));
+
+                switch (selectedOption)
+                {
+                    case "Save & Exit":
+                        shouldExit = true;
+                        break;
+                    case "Exit":
+                        shouldExit = true;
+                        break;
+                    default:
+                        Console.WriteLine($"Selected option: {selectedOption}");
+                        break;
+                }
+            }
+
+            AppDomain.CurrentDomain.GetMigrationToolsTypes().WithInterface<IProcessor>().ToList().ForEach(x =>
+            {
+                Console.WriteLine(x.Name);
+            });
         }
     }
 }

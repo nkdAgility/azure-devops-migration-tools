@@ -34,6 +34,10 @@
     "execute classic2": {
       "commandName": "Project",
       "commandLineArgs": "execute -c configuration-classic2.json"
+    },
+    "Config": {
+      "commandName": "Project",
+      "commandLineArgs": "config -c \"configuration.json\""
     }
   }
 }
