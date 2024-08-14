@@ -68,23 +68,12 @@
             </summary>
             <default>{}</default>
         </member>
-        <member name="P:MigrationTools.Enrichers.WorkItemTypeMappingEnricherOptions.WorkItemTypeDefinition">
-            <summary>
-            List of work item mappings. 
-            </summary>
-            <default>{}</default>
-        </member>
         <member name="P:MigrationTools.Options.IOptions.RefName">
             <summary>
             If you set a `RefName` then this configration will be added to a Catalog of configurations that can be refernced using tha `RefName` so tha tyou dont have to keep adding the ame items with the same configuration.
             </summary>
         </member>
         <member name="T:MigrationTools.ProcessorEnrichers.WorkItemProcessorEnrichers.StringManipulatorEnricher">
-            <summary>
-            Used to process the String fields of a work item. This is useful for cleaning up data. It will limit fields to a max length and apply regex replacements based on what is configured. Each regex replacement is applied in order and can be enabled or disabled.
-            </summary>
-        </member>
-        <member name="T:MigrationTools.ProcessorEnrichers.WorkItemProcessorEnrichers.WorkItemTypeMappingEnricher">
             <summary>
             Used to process the String fields of a work item. This is useful for cleaning up data. It will limit fields to a max length and apply regex replacements based on what is configured. Each regex replacement is applied in order and can be enabled or disabled.
             </summary>
@@ -615,32 +604,32 @@
         </member>
         <member name="F:ThisAssembly.Git.Branch">
             <summary>
-            => @"feature/configuration-builder"
+            => @"main"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commit">
             <summary>
-            => @"1554669"
+            => @"53a6f76"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Sha">
             <summary>
-            => @"1554669cf16ead8c63fa5fa645e74996936c4688"
+            => @"53a6f768f70210ec49372a55cb94a1bd9bb06669"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.CommitDate">
             <summary>
-            => @"2024-08-14T15:11:45+01:00"
+            => @"2024-08-13T10:40:07+01:00"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commits">
             <summary>
-            => @"33"
+            => @"0"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Tag">
             <summary>
-            => @"v15.1.8-Preview.7-33-g1554669"
+            => @"v15.1.8-Preview.7"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseTag">
@@ -675,7 +664,7 @@
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Patch">
             <summary>
-            => @"41"
+            => @"8"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Label">
