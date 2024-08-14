@@ -140,7 +140,7 @@ jobs:
             Write-Output "Get-ReleaseDescription"
             Write-Output "-------------------------------------------"
             Write-Output "Running Get-ReleaseDescription.ps1"
-            . .\build\include\Get-ReleaseDescription.ps1
+            . .\build\include\Get-ReleaseDescription2.ps1
             $description = Get-ReleaseDescription -mode log -OPEN_AI_KEY ${{ secrets.OPENAI_API_KEY }}
             if ($description -eq $null) {
                 $description = "No release description found";
