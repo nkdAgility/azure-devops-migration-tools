@@ -59,13 +59,13 @@
         "Enabled": true,
         "FieldMaps": [
           {
-            "FieldMapType": "FieldToFieledMap",
+            "FieldMapType": "FieldtoFieldMap",
             "sourceField": "System.AcceptanceCriteria",
             "targetField": "System.AcceptanceCriteria2"
 
           },
           {
-            "FieldMapType": "FieldToFieledMap",
+            "FieldMapType": "FieldtoFieldMap",
             "sourceField": "System.Description",
             "targetField": "System.Description2"
 

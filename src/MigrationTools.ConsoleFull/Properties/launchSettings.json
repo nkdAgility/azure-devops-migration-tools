@@ -11,17 +11,9 @@
       "commandName": "Project",
       "commandLineArgs": "execute -c \"configuration.json\""
     },
-    "Execute v3": {
-      "commandName": "Project",
-      "commandLineArgs": "execute -c \"configuration3.json\""
-    },
     "executepipe": {
       "commandName": "Project",
       "commandLineArgs": "execute -c configuration2-pipeline.json"
-    },
-    "execute2": {
-      "commandName": "Project",
-      "commandLineArgs": "execute -c configuration2.json"
     },
     "execute --help": {
       "commandName": "Project",
@@ -34,6 +26,14 @@
     "init Options-Fullv2": {
       "commandName": "Project",
       "commandLineArgs": "init -c configuration2.json --options Fullv2"
+    },
+    "Execute Classic": {
+      "commandName": "Project",
+      "commandLineArgs": "execute -c \"configuration-classic.json\""
+    },
+    "execute classic2": {
+      "commandName": "Project",
+      "commandLineArgs": "execute -c configuration-classic2.json"
     }
   }
 }

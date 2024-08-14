@@ -130,7 +130,12 @@ namespace MigrationTools.Host
                                // This code Converts the new config format to the v1 and v2 runtme format.
                                options.Version = configuration.GetValue<string>("MigrationTools:Version");
                                options.ChangeSetMappingFile = configuration.GetValue<string>("MigrationTools:CommonEnrichers:TfsChangeSetMapping:File");
+
+
                                //options.FieldMaps = configuration.GetSection("MigrationTools:FieldMaps").Get<IFieldMap[]>();
+
+                               options.FieldMaps = configuration.GetSection("MigrationTools:CommonEnrichers:TfsFieldMappings:FieldMaps")?.ToMigrationToolsList<IFieldMapConfig>(child => child.GetMigrationToolsOption<IFieldMapConfig>("FieldMapType"));
+
                                options.GitRepoMapping = configuration.GetSection("MigrationTools:CommonEnrichers:TfsGitRepoMappings:WorkItemGitRepos").Get<Dictionary<string, string>>();
 
                                options.WorkItemTypeDefinition = configuration.GetSection("MigrationTools:CommonEnrichers:WorkItemTypeMappingEnricher:WorkItemTypeDefinition").Get<Dictionary<string, string>>();
