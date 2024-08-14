@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using MigrationTools.DataContracts;
 using MigrationTools.Processors;
 
@@ -18,6 +19,7 @@ namespace MigrationTools.Enrichers
 
         void ProcessorExecutionWithFieldItem(IProcessor processor, FieldItem fieldItem);
 
+        [Obsolete("Move to loading from Options pattern")]
         void Configure(IProcessorEnricherOptions options);
     }
 }

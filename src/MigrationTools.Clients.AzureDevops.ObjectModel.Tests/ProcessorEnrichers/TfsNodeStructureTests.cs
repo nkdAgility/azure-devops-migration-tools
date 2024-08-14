@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.TeamFoundation.TestManagement.WebApi;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools.Enrichers;
 using MigrationTools.Tests;
@@ -91,6 +92,7 @@ namespace MigrationTools.ProcessorEnrichers.Tests
         [TestMethod, TestCategory("L1")]
         public void TestFixAreaPath_WhenAreaPathInQuery_WithPrefixProjectToNodesEnabled_ChangesQuery()
         {
+            
             var nodeStructure = _services.GetRequiredService<TfsNodeStructure>();
 
             // For this test we use the prefixing of the project node and no remapping rule

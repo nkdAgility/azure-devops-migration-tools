@@ -26,12 +26,9 @@ namespace MigrationTools
             context.AddTransient<AppendMigrationToolSignatureFooter>();
             context.AddTransient<FilterWorkItemsThatAlreadyExistInTarget>();
             context.AddTransient<SkipToFinalRevisedWorkItemType>();
-            // WorkItem Endpoint Enrichers
-            context.AddSingleton<StringManipulatorEnricher>();
-            context.AddOptions<StringManipulatorEnricherOptions>().Bind(configuration.GetSection(StringManipulatorEnricherOptions.ConfigurationSectionName));
-            // WorkItemTypeMappingEnricher
-            context.AddSingleton<WorkItemTypeMappingEnricher>();
-            context.AddOptions<WorkItemTypeMappingEnricherOptions>().Bind(configuration.GetSection(WorkItemTypeMappingEnricherOptions.ConfigurationSectionName));
+
+            context.AddSingleton<StringManipulatorEnricher>().AddOptions<StringManipulatorEnricherOptions>().Bind(configuration.GetSection(StringManipulatorEnricherOptions.ConfigurationSectionName));
+            context.AddSingleton<WorkItemTypeMappingEnricher>().AddOptions<WorkItemTypeMappingEnricherOptions>().Bind(configuration.GetSection(WorkItemTypeMappingEnricherOptions.ConfigurationSectionName));
             //context.AddTransient<WorkItemAttachmentEnricher>();
             //context.AddTransient<WorkItemCreatedEnricher>();
             //context.AddTransient<WorkItemEmbedEnricher>();

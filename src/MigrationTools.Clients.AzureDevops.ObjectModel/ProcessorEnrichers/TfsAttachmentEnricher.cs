@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation.Server;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Proxy;
@@ -20,14 +21,14 @@ namespace MigrationTools.ProcessorEnrichers
     public class TfsAttachmentEnricher : WorkItemProcessorEnricher, IAttachmentMigrationEnricher
     {
         private string _exportWiPath;
-        private TfsAttachmentEnricherOptions _options; 
+        private TfsAttachmentEnricherOptions _options;
         private WorkItemServer _workItemServer;
 
-        public TfsAttachmentEnricherOptions Options {  get { return _options; } } 
+        public TfsAttachmentEnricherOptions Options { get { return _options; } }
 
-        public TfsAttachmentEnricher(IServiceProvider services, ILogger<WorkItemProcessorEnricher> logger, ITelemetryLogger telemetryLogger) : base(services, logger, telemetryLogger)
+        public TfsAttachmentEnricher(IOptions<TfsAttachmentEnricherOptions> options,IServiceProvider services, ILogger<WorkItemProcessorEnricher> logger, ITelemetryLogger telemetryLogger) : base(services, logger, telemetryLogger)
         {
-          
+            _options = options.Value;
         }
 
         public void ProcessAttachemnts(WorkItemData source, WorkItemData target, bool save = true)

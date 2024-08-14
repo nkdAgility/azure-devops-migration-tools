@@ -2,6 +2,7 @@
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools._EngineV1.Clients;
 using MigrationTools.DataContracts;
@@ -17,9 +18,10 @@ namespace MigrationTools.Enrichers
 
         public TfsWorkItemLinkEnricherOptions Options { get; private set; }
 
-        public TfsWorkItemLinkEnricher(IServiceProvider services, ILogger<TfsWorkItemLinkEnricher> logger, ITelemetryLogger telemetryLogger)
+        public TfsWorkItemLinkEnricher(IOptions<TfsWorkItemLinkEnricherOptions> options,IServiceProvider services, ILogger<TfsWorkItemLinkEnricher> logger, ITelemetryLogger telemetryLogger)
             : base(services, logger, telemetryLogger)
         {
+            Options = options.Value;
             Engine = services.GetRequiredService<IMigrationEngine>();
         }
 

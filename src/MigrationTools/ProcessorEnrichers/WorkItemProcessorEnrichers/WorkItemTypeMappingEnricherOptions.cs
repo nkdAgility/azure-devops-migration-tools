@@ -11,31 +11,17 @@ namespace MigrationTools.Enrichers
 
         public override Type ToConfigure => typeof(WorkItemTypeMappingEnricher);
 
-        /// <summary>
-        /// Max number of chars in a string. Applied last, and set to 1000000 by default.
-        /// </summary>
-        /// <default>1000000</default>
-        public int MaxStringLength { get; set; }
 
         /// <summary>
-        /// List of regex based string manipulations to apply to all string fields. Each regex replacement is applied in order and can be enabled or disabled.
+        /// List of work item mappings. 
         /// </summary>
         /// <default>{}</default>
-        public List<RegexWorkItemTypeMapping> Manipulators { get; set; }
+        public Dictionary<string, string> WorkItemTypeDefinition { get; set; }
 
         public override void SetDefaults()
         {
             Enabled = true;
-            MaxStringLength = 1000000;
-            Manipulators = new List<RegexWorkItemTypeMapping> {
-                new RegexWorkItemTypeMapping()
-                {
-                    Enabled = false,
-                    Pattern = @"[^( -~)\n\r\t]+",
-                    Replacement = "",
-                    Description = "Remove all non-ASKI characters between ^ and ~."
-                }
-            };
+            WorkItemTypeDefinition = new Dictionary<string, string> { { "Default", "Default2" } };
         }
     }
 

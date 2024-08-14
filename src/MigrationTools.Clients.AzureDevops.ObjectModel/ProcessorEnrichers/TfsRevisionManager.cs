@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools._EngineV1.Clients;
 using MigrationTools.DataContracts;
@@ -20,9 +21,10 @@ namespace MigrationTools.Enrichers
     /// </summary>
     public class TfsRevisionManager : WorkItemProcessorEnricher
     {
-        public TfsRevisionManager(IServiceProvider services, ILogger<TfsRevisionManager> logger, ITelemetryLogger telemetryLogger)
+        public TfsRevisionManager(IOptions<TfsRevisionManagerOptions> options, IServiceProvider services, ILogger<TfsRevisionManager> logger, ITelemetryLogger telemetryLogger)
             : base(services, logger, telemetryLogger)
         {
+            Options = options?.Value;
         }
 
         public TfsRevisionManagerOptions Options { get; private set;}

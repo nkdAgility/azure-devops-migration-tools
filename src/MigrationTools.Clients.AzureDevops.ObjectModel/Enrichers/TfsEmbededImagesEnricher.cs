@@ -7,6 +7,7 @@ using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
@@ -32,7 +33,7 @@ namespace MigrationTools.Enrichers
 
         public IMigrationEngine Engine { get; private set; }
 
-        public TfsEmbededImagesEnricher(IServiceProvider services, ILogger<TfsEmbededImagesEnricher> logger, ITelemetryLogger telemetryLogger) : base(services, logger, telemetryLogger)
+        public TfsEmbededImagesEnricher(IOptions<TfsEmbededImagesEnricherOptions> options, IServiceProvider services, ILogger<TfsEmbededImagesEnricher> logger, ITelemetryLogger telemetryLogger) : base(services, logger, telemetryLogger)
         {
             Engine = services.GetRequiredService<IMigrationEngine>();
             _targetProject = Engine.Target.WorkItems.Project.ToProject();

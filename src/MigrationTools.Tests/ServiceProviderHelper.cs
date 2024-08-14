@@ -37,11 +37,6 @@ namespace MigrationTools.Tests
             // ProcessorEnrichers
             services.AddSingleton<StringManipulatorEnricher>();
 
-            //Endpoints
-            services.AddTransient<InMemoryWorkItemEndpoint>();
-            services.AddTransient<EndpointEnricherContainer>();
-            AddEndpoint(services, "Source");
-            AddEndpoint(services, "Target");
 
             services.AddSingleton<IMigrationToolVersionInfo, FakeMigrationToolVersionInfo>();
             services.AddSingleton<IMigrationToolVersion, FakeMigrationToolVersion>();
@@ -49,15 +44,5 @@ namespace MigrationTools.Tests
             return services.BuildServiceProvider();
         }
 
-        private static void AddEndpoint(IServiceCollection services, string name)
-        {
-            services.AddMigrationToolsEndpoint(name, (provider) =>
-            {
-                var options = new InMemoryWorkItemEndpointOptions();
-                var endpoint = provider.GetRequiredService<InMemoryWorkItemEndpoint>();
-                endpoint.Configure(options);
-                return endpoint;
-            });
-        }
     }
 }

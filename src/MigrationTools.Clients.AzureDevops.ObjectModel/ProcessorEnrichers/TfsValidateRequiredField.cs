@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
@@ -14,8 +15,9 @@ namespace MigrationTools.ProcessorEnrichers
     {
         private TfsValidateRequiredFieldOptions _Options;
 
-        public TfsValidateRequiredField(IServiceProvider services, ILogger<TfsValidateRequiredField> logger, ITelemetryLogger telemetryLogger) : base(services, logger, telemetryLogger)
+        public TfsValidateRequiredField(IOptions<TfsValidateRequiredFieldOptions> options, IServiceProvider services, ILogger<TfsValidateRequiredField> logger, ITelemetryLogger telemetryLogger) : base(services, logger, telemetryLogger)
         {
+            _Options = options.Value;
             Engine = services.GetRequiredService<IMigrationEngine>();
         }
 

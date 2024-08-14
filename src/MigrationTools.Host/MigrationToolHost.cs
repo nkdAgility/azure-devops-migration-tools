@@ -113,7 +113,8 @@ namespace MigrationTools.Host
                        switch (configVersion)
                        {
                            case MigrationConfigVersion.v15:
-                               logger.LogCritical("The config file {ConfigFile} uses an outdated format. We are continuing to support this format through a grace period. Use '{ExecutableName}.exe init' to create a new configuration file and port over your old configuration.", configFile, Assembly.GetEntryAssembly().GetName().Name);
+                               logger.LogInformation("We are moving to a new configuration format. Dont worry, we are mapping the old format to the new one, and when we move over we will provide a convertor.");
+                               //logger.LogCritical("The config file {ConfigFile} uses an outdated format. We are continuing to support this format through a grace period. Use '{ExecutableName}.exe init' to create a new configuration file and port over your old configuration.", configFile, Assembly.GetEntryAssembly().GetName().Name);
                                var parsed = reader.BuildFromFile(configFile); // TODO revert tp 
                                options.ChangeSetMappingFile = parsed.ChangeSetMappingFile;
                                options.FieldMaps = parsed.FieldMaps;
@@ -130,8 +131,9 @@ namespace MigrationTools.Host
                                options.Version = configuration.GetValue<string>("MigrationTools:Version");
                                options.ChangeSetMappingFile = configuration.GetValue<string>("MigrationTools:CommonEnrichers:TfsChangeSetMapping:File");
                                //options.FieldMaps = configuration.GetSection("MigrationTools:FieldMaps").Get<IFieldMap[]>();
-                               options.GitRepoMapping = configuration.GetValue<Dictionary<string, string>>("MigrationTools:CommonEnrichers:TfsGitRepoMappings:WorkItemGitRepos");
-                               options.WorkItemTypeDefinition = configuration.GetValue<Dictionary<string, string>>("MigrationTools:CommonEnrichers:TfsWorkItemTypeMapping:WorkItemTypeDefinition");
+                               options.GitRepoMapping = configuration.GetSection("MigrationTools:CommonEnrichers:TfsGitRepoMappings:WorkItemGitRepos").Get<Dictionary<string, string>>();
+
+                               options.WorkItemTypeDefinition = configuration.GetSection("MigrationTools:CommonEnrichers:WorkItemTypeMappingEnricher:WorkItemTypeDefinition").Get<Dictionary<string, string>>();
 
                                options.CommonEnrichersConfig = configuration.GetSection("MigrationTools:CommonEnrichers")?.ToMigrationToolsList<IProcessorEnricherOptions>(child => child.GetMigrationToolsNamedOption<IProcessorEnricherOptions>());
 

@@ -29,7 +29,7 @@ namespace _VstsSyncMigrator.Engine.Tests
             // Core
             services.AddMigrationToolServicesForUnitTests();
             services.AddMigrationToolServicesForClientLegacyCore();
-            services.AddMigrationToolServices();
+            services.AddMigrationToolServices(configuration);
             services.AddMigrationToolServicesLegacy();
             // Clients
             services.AddMigrationToolServicesForClientAzureDevOpsObjectModel(configuration);

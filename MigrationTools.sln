@@ -29,10 +29,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
 		appsettings.json = appsettings.json
+		configuration-classic.json = configuration-classic.json
+		configuration-classic2-pipeline.json = configuration-classic2-pipeline.json
+		configuration-classic2-wit.json = configuration-classic2-wit.json
+		configuration-classic2.json = configuration-classic2.json
 		configuration.json = configuration.json
-		configuration2-wit.json = configuration2-wit.json
-		configuration2.json = configuration2.json
-		configuration3.json = configuration3.json
 		Directory.Build.props = Directory.Build.props
 		GitVersion.yml = GitVersion.yml
 		mkdocs.yml = mkdocs.yml
@@ -73,10 +74,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SampleConfigs", "SampleConf
 		src\MigrationTools.Samples\demo-migration-reset.json = src\MigrationTools.Samples\demo-migration-reset.json
 		src\MigrationTools.Samples\demo-migration.json = src\MigrationTools.Samples\demo-migration.json
 	EndProjectSection
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Clients.InMemory", "src\MigrationTools.Clients.InMemory\MigrationTools.Clients.InMemory.csproj", "{54DF41E6-9F94-42DD-877E-437DC6E9F3E2}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Clients.InMemory.Tests", "src\MigrationTools.Clients.InMemory.Tests\MigrationTools.Clients.InMemory.Tests.csproj", "{504D6953-E83D-498D-A1C7-E511F14B9563}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Clients.FileSystem.Tests", "src\MigrationTools.Clients.FileSystem.Tests\MigrationTools.Clients.FileSystem.Tests.csproj", "{3191B594-1C3A-4245-8AFE-076EA142B778}"
 EndProject
@@ -176,14 +173,6 @@ Global
 		{B400FC37-A4B7-4526-85DD-36784E3B56EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B400FC37-A4B7-4526-85DD-36784E3B56EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B400FC37-A4B7-4526-85DD-36784E3B56EC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{54DF41E6-9F94-42DD-877E-437DC6E9F3E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{54DF41E6-9F94-42DD-877E-437DC6E9F3E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{54DF41E6-9F94-42DD-877E-437DC6E9F3E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{54DF41E6-9F94-42DD-877E-437DC6E9F3E2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{504D6953-E83D-498D-A1C7-E511F14B9563}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{504D6953-E83D-498D-A1C7-E511F14B9563}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{504D6953-E83D-498D-A1C7-E511F14B9563}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{504D6953-E83D-498D-A1C7-E511F14B9563}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3191B594-1C3A-4245-8AFE-076EA142B778}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3191B594-1C3A-4245-8AFE-076EA142B778}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3191B594-1C3A-4245-8AFE-076EA142B778}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -238,8 +227,6 @@ Global
 		{E5294FF3-167A-49A5-A453-19332DA32B01} = {1F5E9C8C-AD05-4C4F-B370-FF3D080A6541}
 		{13FE9FE2-9C6E-4866-BBAD-106F5BF765F1} = {83F36820-E9BC-4F48-8202-5EAF9530405E}
 		{A6831354-6128-4F1A-A1F3-C6E598B0925F} = {32E2956A-9056-4D9D-8018-14DFD0E6CA41}
-		{54DF41E6-9F94-42DD-877E-437DC6E9F3E2} = {13FE9FE2-9C6E-4866-BBAD-106F5BF765F1}
-		{504D6953-E83D-498D-A1C7-E511F14B9563} = {13FE9FE2-9C6E-4866-BBAD-106F5BF765F1}
 		{3191B594-1C3A-4245-8AFE-076EA142B778} = {13FE9FE2-9C6E-4866-BBAD-106F5BF765F1}
 		{6F51CE1D-FEBD-4F7F-A462-27A4745924F4} = {BB497233-248C-49DF-AE12-F7A76F775E74}
 		{AADA5B89-83F9-45E4-B713-EA1FEB9EBC89} = {1F5E9C8C-AD05-4C4F-B370-FF3D080A6541}

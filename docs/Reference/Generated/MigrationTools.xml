@@ -68,15 +68,9 @@
             </summary>
             <default>{}</default>
         </member>
-        <member name="P:MigrationTools.Enrichers.WorkItemTypeMappingEnricherOptions.MaxStringLength">
+        <member name="P:MigrationTools.Enrichers.WorkItemTypeMappingEnricherOptions.WorkItemTypeDefinition">
             <summary>
-            Max number of chars in a string. Applied last, and set to 1000000 by default.
-            </summary>
-            <default>1000000</default>
-        </member>
-        <member name="P:MigrationTools.Enrichers.WorkItemTypeMappingEnricherOptions.Manipulators">
-            <summary>
-            List of regex based string manipulations to apply to all string fields. Each regex replacement is applied in order and can be enabled or disabled.
+            List of work item mappings. 
             </summary>
             <default>{}</default>
         </member>
@@ -626,27 +620,27 @@
         </member>
         <member name="F:ThisAssembly.Git.Commit">
             <summary>
-            => @"de4db9d"
+            => @"1554669"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Sha">
             <summary>
-            => @"de4db9d79578dfd2272f3d4dc44a20f07fc45fd6"
+            => @"1554669cf16ead8c63fa5fa645e74996936c4688"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.CommitDate">
             <summary>
-            => @"2024-08-13T10:40:33+01:00"
+            => @"2024-08-14T15:11:45+01:00"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commits">
             <summary>
-            => @"28"
+            => @"33"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Tag">
             <summary>
-            => @"v15.1.8-Preview.7-28-gde4db9d"
+            => @"v15.1.8-Preview.7-33-g1554669"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseTag">
@@ -681,7 +675,7 @@
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Patch">
             <summary>
-            => @"36"
+            => @"41"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Label">

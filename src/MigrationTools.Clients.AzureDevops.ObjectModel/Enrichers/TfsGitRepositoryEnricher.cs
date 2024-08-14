@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation;
 using Microsoft.TeamFoundation.Git.Client;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
@@ -30,7 +31,7 @@ namespace MigrationTools.Enrichers
 
         public IMigrationEngine Engine { get => _Engine; set => _Engine = value; }
 
-        public TfsGitRepositoryEnricher(IServiceProvider services, ILogger<TfsGitRepositoryEnricher> logger, ITelemetryLogger telemetryLogger) : base(services, logger, telemetryLogger)
+        public TfsGitRepositoryEnricher(IOptions<TfsGitRepositoryEnricherOptions> options, IServiceProvider services, ILogger<TfsGitRepositoryEnricher> logger, ITelemetryLogger telemetryLogger) : base(services, logger, telemetryLogger)
         {
             Engine = Services.GetRequiredService<IMigrationEngine>();
             _Logger = logger ?? throw new ArgumentNullException(nameof(logger));

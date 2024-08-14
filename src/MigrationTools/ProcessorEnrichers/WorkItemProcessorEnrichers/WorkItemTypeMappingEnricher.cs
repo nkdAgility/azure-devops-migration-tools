@@ -21,6 +21,10 @@ namespace MigrationTools.ProcessorEnrichers.WorkItemProcessorEnrichers
         public WorkItemTypeMappingEnricher(IOptions<WorkItemTypeMappingEnricherOptions> options, IServiceProvider services, ILogger<StringManipulatorEnricher> logger, ITelemetryLogger telemetryLogger)
            : base(services, logger, telemetryLogger)
         {
+            if (options is null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
             _options = options.Value;
             contextLog = Serilog.Log.ForContext<StringManipulatorEnricher>();
         }

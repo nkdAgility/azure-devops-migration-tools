@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.Framework.Client;
 using Microsoft.TeamFoundation.Framework.Common;
@@ -21,9 +22,10 @@ namespace MigrationTools.Enrichers
         private readonly Lazy<List<TeamFoundationIdentity>> _targetTeamFoundationIdentitiesLazyCache;
         private readonly IMigrationEngine Engine;
 
-        public TfsWorkItemEmbededLinkEnricher(IServiceProvider services, ILogger<TfsWorkItemEmbededLinkEnricher> logger, ITelemetryLogger telemetryLogger)
+        public TfsWorkItemEmbededLinkEnricher(IOptions<TfsWorkItemEmbededLinkEnricherOptions> options, IServiceProvider services, ILogger<TfsWorkItemEmbededLinkEnricher> logger, ITelemetryLogger telemetryLogger)
             : base(services, logger, telemetryLogger)
         {
+
             Engine = services.GetRequiredService<IMigrationEngine>();
 
             _targetTeamFoundationIdentitiesLazyCache = new Lazy<List<TeamFoundationIdentity>>(() =>

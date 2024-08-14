@@ -127,6 +127,7 @@ namespace VstsSyncMigrator.Engine
                 Log.LogError("CommonEnrichersConfig cant be Null! it must be a minimum of `[]`");
                 Environment.Exit(-1);
             }
+
             PullCommonEnrichersConfig<TfsNodeStructure, TfsNodeStructureOptions>(_engineConfig.CommonEnrichersConfig, _nodeStructureEnricher);
             PullCommonEnrichersConfig<TfsRevisionManager, TfsRevisionManagerOptions>(_engineConfig.CommonEnrichersConfig, _revisionManager);
             PullCommonEnrichersConfig<TfsWorkItemLinkEnricher, TfsWorkItemLinkEnricherOptions>(_engineConfig.CommonEnrichersConfig, _workItemLinkEnricher);
@@ -134,7 +135,6 @@ namespace VstsSyncMigrator.Engine
             PullCommonEnrichersConfig<TfsAttachmentEnricher, TfsAttachmentEnricherOptions>(_engineConfig.CommonEnrichersConfig, _attachmentEnricher);
             PullCommonEnrichersConfig<TfsUserMappingEnricher, TfsUserMappingEnricherOptions>(_engineConfig.CommonEnrichersConfig, _userMappingEnricher);
             PullCommonEnrichersConfig<TfsTeamSettingsEnricher, TfsTeamSettingsEnricherOptions>(_engineConfig.CommonEnrichersConfig, _teamSettingsEnricher);
-            PullCommonEnrichersConfig<WorkItemTypeMappingEnricher, WorkItemTypeMappingEnricherOptions>(_engineConfig.CommonEnrichersConfig, _witMappEnricher);
         }
 
         internal void TraceWriteLine(LogEventLevel level, string message, Dictionary<string, object> properties = null)

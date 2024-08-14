@@ -7,11 +7,9 @@
     "Source": {
       "EndpointType": "TfsTeamProject",
       "Collection": "https://dev.azure.com/nkdagility-preview/",
-      "Project": "myProjectName",
-      "TfsVersion": "Tfs2013",
-      "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
+      "Project": "migrationSource1",
       "AllowCrossProjectLinking": false,
-      "AuthenticationMode": "Prompt",
+      "AuthenticationMode": "AccessToken",
       "PersonalAccessToken": "",
       "LanguageMaps": {
         "AreaPath": "Area",
@@ -22,11 +20,11 @@
     "Target": {
       "EndpointType": "TfsTeamProject",
       "Collection": "https://dev.azure.com/nkdagility-preview/",
-      "Project": "myProjectName",
+      "Project": "migrationTest5",
       "TfsVersion": "AzureDevOps",
-      "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
+      "ReflectedWorkItemIDFieldName": "nkdScrum.ReflectedWorkItemId",
       "AllowCrossProjectLinking": false,
-      "AuthenticationMode": "Prompt",
+      "AuthenticationMode": "AccessToken",
       "PersonalAccessToken": "",
       "LanguageMaps": {
         "AreaPath": "Area",
@@ -34,41 +32,6 @@
       }
     },
     "CommonEnrichers": {
-      "TfsNodeStructure": {
-        "Enabled": true,
-        "NodeBasePaths": [],
-        "AreaMaps": {
-          "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1"
-        },
-        "IterationMaps": {
-          "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1"
-        },
-        "ShouldCreateMissingRevisionPaths": true,
-        "ReplicateAllExistingNodes": true
-      },
-      "TfsTeamSettingsEnricher": {
-        "Enabled": true,
-        "MigrateTeamSettings": true,
-        "UpdateTeamSettings": true,
-        "MigrateTeamCapacities": true,
-        "Teams": null
-      },
-      "TfsWorkItemLinkEnricher": {
-        "Enabled": true,
-        "FilterIfLinkCountMatches": true,
-        "SaveAfterEachLinkIsAdded": false
-      },
-      "TfsRevisionManager": {
-        "Enabled": true,
-        "ReplayRevisions": true,
-        "MaxRevisions": 0
-      },
-      "TfsAttachmentEnricher": {
-        "RefName": "TfsAttachmentEnricher",
-        "Enabled": true,
-        "ExportBasePath": "c:\\temp\\WorkItemAttachmentExport",
-        "MaxRevisions": 480000000
-      },
       "StringManipulatorEnricher": {
         "Enabled": true,
         "MaxStringLength": 1000000,
@@ -82,29 +45,15 @@
           }
         ]
       },
-      "TfsUserMappingEnricher": {
+      "TfsAttachmentEnricher": {
+        "RefName": "TfsAttachmentEnricher",
         "Enabled": true,
-        "UserMappingFile": "C:\\temp\\userExport.json",
-        "IdentityFieldsToCheck": [
-          "System.AssignedTo",
-          "System.ChangedBy",
-          "System.CreatedBy",
-          "Microsoft.VSTS.Common.ActivatedBy",
-          "Microsoft.VSTS.Common.ResolvedBy",
-          "Microsoft.VSTS.Common.ClosedBy"
-        ]
+        "ExportBasePath": "c:\\temp\\WorkItemAttachmentExport",
+        "MaxRevisions": 480000000
       },
-      "TfsWorkItemTypeMapping": {
+      "TfsChangeSetMapping": {
         "Enabled": true,
-        "WorkItemTypeDefinition": {
-          "Product Backlog Item": "User Story"
-        }
-      },
-      "TfsGitRepoMappings": {
-        "Enabled": true,
-        "WorkItemGitRepos": {
-          "sourceRepoName": "targetRepoName"
-        }
+        "File": "C:\\temp\\ChangeSetMappingFile.json"
       },
       "TfsFieldMappings": {
         "Enabled": true,
@@ -123,9 +72,61 @@
           }
         ]
       },
-      "TfsChangeSetMapping": {
+      "TfsGitRepoMappings": {
         "Enabled": true,
-        "File": "C:\\temp\\ChangeSetMappingFile.json"
+        "WorkItemGitRepos": {
+          "sourceRepoName": "targetRepoName"
+        }
+      },
+      "TfsNodeStructure": {
+        "Enabled": true,
+        "NodeBasePaths": [],
+        "AreaMaps": {
+          "^Skypoint Cloud([\\\\]?.*)$": "MigrationTest5$1",
+          "^7473924d-c47f-4089-8f5c-077c728b576e([\\\\]?.*)$": "MigrationTest5$1"
+        },
+        "IterationMaps": {
+          "^Skypoint Cloud([\\\\]?.*)$": "MigrationTest5$1",
+          "^7473924d-c47f-4089-8f5c-077c728b576e([\\\\]?.*)$": "MigrationTest5$1"
+        },
+        "ShouldCreateMissingRevisionPaths": true,
+        "ReplicateAllExistingNodes": true
+      },
+      "TfsRevisionManager": {
+        "Enabled": true,
+        "ReplayRevisions": true,
+        "MaxRevisions": 0
+      },
+      "TfsTeamSettingsEnricher": {
+        "Enabled": true,
+        "MigrateTeamSettings": true,
+        "UpdateTeamSettings": true,
+        "MigrateTeamCapacities": true,
+        "Teams": null
+      },
+      "TfsUserMappingEnricher": {
+        "Enabled": true,
+        "UserMappingFile": "C:\\temp\\userExport.json",
+        "IdentityFieldsToCheck": [
+          "System.AssignedTo",
+          "System.ChangedBy",
+          "System.CreatedBy",
+          "Microsoft.VSTS.Common.ActivatedBy",
+          "Microsoft.VSTS.Common.ResolvedBy",
+          "Microsoft.VSTS.Common.ClosedBy"
+        ]
+      },
+      "TfsWorkItemLinkEnricher": {
+        "Enabled": true,
+        "FilterIfLinkCountMatches": true,
+        "SaveAfterEachLinkIsAdded": false
+      },
+      "WorkItemTypeMappingEnricher": {
+        "Enabled": true,
+        "RefName": "Bob",
+        "WorkItemTypeDefinition": {
+          "User Story": "Product Backlog Item"
+        }
       }
     },
     "Processors": [

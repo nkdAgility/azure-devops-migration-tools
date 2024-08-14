@@ -19,16 +19,11 @@
     <Content Include="..\..\appsettings.json" Link="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\..\configuration-classic.json" Link="configuration-classic.json" />
+    <Content Include="..\..\configuration-classic2-pipeline.json" Link="configuration-classic2-pipeline.json" />
+    <Content Include="..\..\configuration-classic2-wit.json" Link="configuration-classic2-wit.json" />
+    <Content Include="..\..\configuration-classic2.json" Link="configuration-classic2.json" />
     <Content Include="..\..\configuration.json" Link="configuration.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\configuration2-pipeline.json" Link="configuration2-pipeline.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\configuration2.json" Link="configuration2.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\configuration3.json" Link="configuration3.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
@@ -47,7 +42,6 @@
   <ItemGroup>
     <ProjectReference Include="..\MigrationTools.Clients.AzureDevops.Rest\MigrationTools.Clients.AzureDevops.Rest.csproj" />
     <ProjectReference Include="..\MigrationTools.Clients.FileSystem\MigrationTools.Clients.FileSystem.csproj" />
-    <ProjectReference Include="..\MigrationTools.Clients.InMemory\MigrationTools.Clients.InMemory.csproj" />
     <ProjectReference Include="..\MigrationTools.Host\MigrationTools.Host.csproj" />
     <ProjectReference Include="..\MigrationTools.Clients.AzureDevops.ObjectModel\MigrationTools.Clients.AzureDevops.ObjectModel.csproj" />
     <ProjectReference Include="..\VstsSyncMigrator.Core\VstsSyncMigrator.Core.csproj" />

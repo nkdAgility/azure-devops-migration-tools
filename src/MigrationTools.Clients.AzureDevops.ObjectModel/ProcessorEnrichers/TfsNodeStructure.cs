@@ -64,6 +64,7 @@ namespace MigrationTools.Enrichers
         public TfsNodeStructure(IOptions<TfsNodeStructureOptions> options, IServiceProvider services, ILogger<TfsNodeStructure> logger, ITelemetryLogger telemetryLogger)
             : base(services, logger, telemetryLogger)
         {
+            _Options = options.Value;
             contextLog = Serilog.Log.ForContext<TfsNodeStructure>();
         }
 

@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.Common;
 using Microsoft.TeamFoundation.Core.WebApi.Types;
@@ -45,8 +46,9 @@ namespace MigrationTools.ProcessorEnrichers
 
         public TfsTeamSettingsEnricherOptions Options { get; private set; }
 
-        public TfsTeamSettingsEnricher(IServiceProvider services, ILogger<TfsTeamSettingsEnricher> logger, ITelemetryLogger telemetryLogger) : base(services, logger, telemetryLogger)
+        public TfsTeamSettingsEnricher(IOptions<TfsTeamSettingsEnricherOptions> options, IServiceProvider services, ILogger<TfsTeamSettingsEnricher> logger, ITelemetryLogger telemetryLogger) : base(services, logger, telemetryLogger)
         {
+            Options = options.Value;
             Services = services;
             Engine = services.GetRequiredService<IMigrationEngine>();
             _targetTeamFoundationIdentitiesLazyCache = new Lazy<List<TeamFoundationIdentity>>(() =>

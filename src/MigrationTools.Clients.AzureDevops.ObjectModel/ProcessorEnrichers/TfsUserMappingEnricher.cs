@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation.Common;
 using Microsoft.TeamFoundation.Server;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
@@ -48,14 +49,15 @@ namespace MigrationTools.ProcessorEnrichers
 
         public TfsUserMappingEnricherOptions Options { get; private set; }
 
-        public TfsUserMappingEnricher(IServiceProvider services, ILogger<TfsUserMappingEnricher> logger, ITelemetryLogger telemetryLogger) : base(services, logger, telemetryLogger)
+        public TfsUserMappingEnricher(IOptions<TfsUserMappingEnricherOptions> options, IServiceProvider services, ILogger<TfsUserMappingEnricher> logger, ITelemetryLogger telemetryLogger) : base(services, logger, telemetryLogger)
         {
+            Options = options.Value;
             Engine = services.GetRequiredService<IMigrationEngine>();
         }
 
         public override void Configure(IProcessorEnricherOptions options)
         {
-            Options = (TfsUserMappingEnricherOptions)options;
+           Options = (TfsUserMappingEnricherOptions)options;
         }
 
         protected override void EntryForProcessorType(IProcessor processor)

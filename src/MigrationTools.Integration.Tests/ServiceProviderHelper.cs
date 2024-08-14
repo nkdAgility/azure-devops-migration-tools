@@ -19,7 +19,6 @@ namespace MigrationTools.Tests
             services.AddMigrationToolServicesForUnitTests();
             /////////////////////////////////
             services.AddMigrationToolServices(configuration);
-            services.AddMigrationToolServicesForClientInMemory();
             services.AddMigrationToolServicesForClientFileSystem();
             services.AddMigrationToolServicesForClientAzureDevOpsObjectModel(configuration);
             services.AddMigrationToolServicesForClientAzureDevopsRest(configuration);
