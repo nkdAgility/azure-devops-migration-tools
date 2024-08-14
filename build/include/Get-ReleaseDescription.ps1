@@ -309,11 +309,168 @@ function Get-ReleaseDescription2 {
         globs: ['src/MigrationTools/_EngineV1/**', 'src/VstsSyncMigrator*/**']
     Documentation
         title: Documentation
-        globs: ["./docs/**", "./readme.md"]
+        globs: ["./docs/**", "./readme.md", "!docs/Reference/Generated/*"]
     DevOps
         title: DevOps
         globs: ['build/**', '.github/**', './*']
     ```
+"@
+    
+    # Prepare the full prompt with the git diff results appended
+    $fullPrompt = $prompt + "`n`nUse the folowing json:`n`n" + $GitResult
+
+    $result = Get-OpenAIResponse -prompt $fullPrompt -OPEN_AI_KEY $OPEN_AI_KEY
+    if ([string]::IsNullOrEmpty($GitResult)) {
+        Write-Host "No convo generated"
+        return
+    }
+    Write-Host "-----------------------------------------"
+    Write-Host "Returning.."
+    return $result
+}
+
+function Get-PullRequestData {
+    param (
+
+        [Parameter(Mandatory=$false)]
+        [string]$compairFrom,
+        
+        # name of the output folder
+        [Parameter(Mandatory=$false)]
+        [string]$compairTo,
+    
+        # name of the output folder
+        [Parameter(Mandatory=$true)]
+        [ExecutionMode]$mode,
+    
+        # name of the output folder
+        [Parameter(Mandatory=$true)]
+        [string]$OPEN_AI_KEY
+    )
+    Write-Host "========================================="
+    Write-Host "Get-PullRequestData"
+    Write-Host "========================================="
+    Write-Host "Mode: $mode"
+    Write-Host "Comparing: $compairFrom...$compairTo"
+    Write-Host "-----------------------------------------"
+    
+    $GitResult = Get-GitChanges -compairFrom $compairFrom -compairTo $compairTo -mode $mode
+    if ([string]::IsNullOrEmpty($GitResult)) {
+        Write-Host "No changes found"
+        return
+    }
+    
+    $prompt = @"
+
+ Create a JSON object with a "Title" and a "Content" element. The "Title" should be a encompass and overview the changes represented by the pull request, and the "Content" should be a single markdown string generated based on the following YML specification:
+
+For each entry in the YML:
+
+1. Create an `h4` title.
+2. Provide a description of the changes that match the provided glob specification.
+3. Based on the general ideas of [fix, feature, build, docs, style, refactor, performance, test, architecture], create a list of key changes that might impact users. Use the GitEmoji list below to format these changes.
+
+**GitEmoji List (icon, description):**
+
+- 🐛, Fix a bug
+- ✨, Introduce new features
+- 📝, Add or update documentation
+- 🚀, Deploy stuff
+- ✅, Add, update, or pass tests
+- ♻️, Refactor code
+- ⬆️, Upgrade dependencies
+- 🔧, Add or update configuration files
+- 🌐, Internationalization and localization
+- 💡, Add or update comments in source code
+- 🎨, Improve structure/format of the code
+- ⚡️, Improve performance
+- 🔥, Remove code or files
+- 🚑️, Critical hotfix
+- 💄, Add or update the UI and style files
+- 🎉, Begin a project
+- 🔒️, Fix security issues
+- 🔐, Add or update secrets
+- 🔖, Release / Version tags
+- 🚨, Fix compiler / linter warnings
+- 🚧, Work in progress
+- 💚, Fix CI Build
+- ⬇️, Downgrade dependencies
+- 📌, Pin dependencies to specific versions
+- 👷, Add or update CI build system
+- 📈, Add or update analytics or track code
+- ➕, Add a dependency
+- ➖, Remove a dependency
+- 🔨, Add or update development scripts
+- ✏️, Fix typos
+- 💩, Write bad code that needs to be improved
+- ⏪️, Revert changes
+- 🔀, Merge branches
+- 📦️, Add or update compiled files or packages
+- 👽️, Update code due to external API changes
+- 🚚, Move or rename resources (e.g., files, paths, routes)
+- 📄, Add or update license
+- 💥, Introduce breaking changes
+- 🍱, Add or update assets
+- ♿️, Improve accessibility
+- 🍻, Write code drunkenly
+- 💬, Add or update text and literals
+- 🗃️, Perform database related changes
+- 🔊, Add or update logs
+- 🔇, Remove logs
+- 👥, Add or update contributor(s)
+- 🚸, Improve user experience / usability
+- 🏗️, Make architectural changes
+- 📱, Work on responsive design
+- 🤡, Mock things
+- 🥚, Add or update an easter egg
+- 🙈, Add or update a .gitignore file
+- 📸, Add or update snapshots
+- ⚗️, Perform experiments
+- 🔍️, Improve SEO
+- 🏷️, Add or update types
+- 🌱, Add or update seed files
+- 🚩, Add, update, or remove feature flags
+- 🥅, Catch errors
+- 💫, Add or update animations and transitions
+- 🗑️, Deprecate code that needs to be cleaned up
+- 🛂, Work on code related to authorization, roles, and permissions
+- 🩹, Simple fix for a non-critical issue
+- 🧐, Data exploration/inspection
+- ⚰️, Remove dead code
+- 🧪, Add a failing test
+- 👔, Add or update business logic
+- 🩺, Add or update healthcheck
+- 🧱, Infrastructure related changes
+- 🧑‍💻, Improve developer experience
+- 💸, Add sponsorships or money-related infrastructure
+- 🧵, Add or update code related to multithreading or concurrency
+- 🦺, Add or update code related to validation
+
+**Conventional Commit Keywords:** fix, feat, build, chore, ci, docs, style, refactor, perf, test.
+
+**Controls:**
+
+- Use the present tense.
+- Do not create an entry if there are no changes.
+- Do not mention the globs in the output.
+
+**YML Example:**
+
+```YML
+MigrationTools
+    title: Migration Tools
+    globs: ['src/**', '!src/MigrationTools/_EngineV1/**', '!src/VstsSyncMigrator*/**']
+MigrationToolsClassic
+    title: Migration Tools Classic
+    globs: ['src/MigrationTools/_EngineV1/**', 'src/VstsSyncMigrator*/**']
+Documentation
+    title: Documentation
+    globs: globs: ["docs/**", "./readme.md", "!docs/Reference/Generated/*"]
+DevOps
+    title: DevOps
+    globs: ['build/**', '.github/**', '*']
+```
+
 "@
     
     # Prepare the full prompt with the git diff results appended
