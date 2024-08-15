@@ -594,7 +594,7 @@
         </member>
         <member name="F:ThisAssembly.Git.IsDirtyString">
             <summary>
-            => @"false"
+            => @"true"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.RepositoryUrl">
@@ -609,17 +609,17 @@
         </member>
         <member name="F:ThisAssembly.Git.Commit">
             <summary>
-            => @"53a6f76"
+            => @"300540f"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Sha">
             <summary>
-            => @"53a6f768f70210ec49372a55cb94a1bd9bb06669"
+            => @"300540fc7d62b0bf663655e4c1836cfe669e9f5b"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.CommitDate">
             <summary>
-            => @"2024-08-13T10:40:07+01:00"
+            => @"2024-08-14T10:15:08+01:00"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commits">
@@ -629,12 +629,12 @@
         </member>
         <member name="F:ThisAssembly.Git.Tag">
             <summary>
-            => @"v15.1.8-Preview.7"
+            => @"v15.1.8-Preview.8"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseTag">
             <summary>
-            => @"v15.1.8-Preview.7"
+            => @"v15.1.8-Preview.8"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseVersion.Major">
@@ -669,12 +669,12 @@
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Label">
             <summary>
-            => @"Preview.7"
+            => @"Preview.8"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.DashLabel">
             <summary>
-            => @"-Preview.7"
+            => @"-Preview.8"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Source">

@@ -205,12 +205,14 @@ namespace VstsSyncMigrator.Engine
                 if (_config.FilterWorkItemsThatAlreadyExistInTarget)
                 {
                     contextLog.Information(
-                        "[FilterWorkItemsThatAlreadyExistInTarget] is enabled. Searching for work items that have already been migrated to the target...",
+                        "[FilterWorkItemsThatAlreadyExistInTarget] is enabled. Searching for {sourceWorkItems} work items that may have already been migrated to the target...",
                         sourceWorkItems.Count());
 
                     string targetWIQLQuery = _nodeStructureEnricher.FixAreaPathAndIterationPathForTargetQuery(_config.WIQLQuery,
                         Engine.Source.WorkItems.Project.Name, Engine.Target.WorkItems.Project.Name, contextLog);
-
+                    // Also replace Project Name
+                    targetWIQLQuery = targetWIQLQuery.Replace(Engine.Source.WorkItems.Project.Name, Engine.Target.WorkItems.Project.Name);
+                    //Then run query
                     sourceWorkItems = ((TfsWorkItemMigrationClient)Engine.Target.WorkItems).FilterExistingWorkItems(
                         sourceWorkItems, targetWIQLQuery,
                         (TfsWorkItemMigrationClient)Engine.Source.WorkItems);
