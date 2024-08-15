@@ -22,8 +22,6 @@ namespace MigrationTools.Tests
             services.AddMigrationToolServicesForUnitTests();
             services.AddMigrationToolServices(configuration);
 
-            // Containers
-            services.AddSingleton<ProcessorContainer>();
 
             services.AddSingleton<ITelemetryLogger, TelemetryClientAdapter>();
 
@@ -38,6 +36,7 @@ namespace MigrationTools.Tests
             services.AddSingleton<IMigrationToolVersionInfo, FakeMigrationToolVersionInfo>();
             services.AddSingleton<IMigrationToolVersion, FakeMigrationToolVersion>();
             services.AddTransient<SimpleFieldMapMock>();
+ services.AddTransient<SimpleProcessorMock>();
 
             return services.BuildServiceProvider();
         }

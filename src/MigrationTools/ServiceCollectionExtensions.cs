@@ -68,10 +68,6 @@ namespace MigrationTools
             // Services
             context.AddSingleton<ITelemetryLogger, TelemetryClientAdapter>();
 
-
-
-            // Containers
-            context.AddSingleton<ProcessorContainer>();
             //Engine
             context.AddSingleton<IMigrationEngine, MigrationEngine>();
         }

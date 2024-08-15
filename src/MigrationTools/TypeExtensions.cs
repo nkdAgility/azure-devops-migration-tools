@@ -10,8 +10,12 @@ namespace MigrationTools
     {
         public static IEnumerable<Type> WithInterface<TInterface>(this IEnumerable<Type> types)
         {
-            var interfaceType = typeof(TInterface);
-            return types.Where(type => interfaceType.IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract);
+            return types.Where(type => typeof(TInterface).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract);
+        }
+
+        public static IEnumerable<Type> WithInterface<TInterface, TInterface2>(this IEnumerable<Type> types)
+        {
+            return types.Where(type => (typeof(TInterface).IsAssignableFrom(type) || typeof(TInterface2).IsAssignableFrom(type)) && !type.IsInterface && !type.IsAbstract);
         }
 
         public static IEnumerable<Type> WithConfigurationSectionName(this IEnumerable<Type> types)

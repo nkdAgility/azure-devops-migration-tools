@@ -6,6 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Containers;
 using MigrationTools.Processors;
+using MigrationTools.Tests;
 
 namespace MigrationTools.Engine.Containers.Tests
 {
@@ -23,10 +24,7 @@ namespace MigrationTools.Engine.Containers.Tests
 
         private IServiceProvider CreateServiceProvider()
         {
-            ServiceCollection sc = new ServiceCollection();
-            sc.AddTransient<SimpleProcessorMock>();
-            IServiceProvider sp = sc.BuildServiceProvider();
-            return sp;
+            return ServiceProviderHelper.GetWorkItemMigrationProcessor();
         }
 
         [TestMethod(), TestCategory("L0")]

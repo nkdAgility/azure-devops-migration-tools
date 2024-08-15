@@ -68,7 +68,7 @@ namespace VstsSyncMigrator.Engine
         private List<string> _itemsInError;
 
 
-        public WorkItemMigrationContext(IMigrationEngine engine,
+        public WorkItemMigrationContext(IOptions<WorkItemMigrationConfig> processorConfig,IMigrationEngine engine,
                                         IServiceProvider services,
                                         ITelemetryLogger telemetry,
                                         ILogger<WorkItemMigrationContext> logger,
@@ -77,6 +77,7 @@ namespace VstsSyncMigrator.Engine
                                         StaticEnrichers staticEnrichers)
             : base(engine, tfsStaticEnrichers, staticEnrichers, services, telemetry, logger)
         {
+            _config = processorConfig.Value;
             _telemetry = telemetry;
             _engineConfig = engineConfig.Value;
             contextLog = Serilog.Log.ForContext<WorkItemMigrationContext>();

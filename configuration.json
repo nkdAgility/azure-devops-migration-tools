@@ -33,9 +33,9 @@
     },
     "CommonEnrichers": {
       "WorkItemTypeMappingEnricher": {
-        "Enabled": false,
+        "Enabled": true,
         "Mappings": {
-          "Source Work Item Type Name": "Target Work Item Type Name"
+          "User Story": "Product Backlog Item"
         }
       },
       "StringManipulatorEnricher": {
@@ -111,18 +111,6 @@
         "UpdateTeamSettings": true,
         "MigrateTeamCapacities": true,
         "Teams": null
-      },
-      "TfsUserMappingEnricher": {
-        "Enabled": true,
-        "UserMappingFile": "C:\\temp\\userExport.json",
-        "IdentityFieldsToCheck": [
-          "System.AssignedTo",
-          "System.ChangedBy",
-          "System.CreatedBy",
-          "Microsoft.VSTS.Common.ActivatedBy",
-          "Microsoft.VSTS.Common.ResolvedBy",
-          "Microsoft.VSTS.Common.ClosedBy"
-        ]
       }
     },
     "Processors": [
