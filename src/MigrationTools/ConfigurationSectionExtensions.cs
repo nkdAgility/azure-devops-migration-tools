@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Enrichers;
 using Serilog;
+using static System.Collections.Specialized.BitVector32;
 
 namespace MigrationTools
 {
@@ -95,13 +96,28 @@ namespace MigrationTools
             v16
         }
 
-        public static IConfiguration GetSectionCommonEnrichers_v15<TEnricherOptions>(this IConfiguration configuration, string defaults) where TEnricherOptions : IProcessorEnricherOptions
+        public static TEnricherOptions GetSectionCommonEnrichers_v15<TEnricherOptions>(this IConfiguration configuration, string defaults) where TEnricherOptions : IProcessorEnricherOptions, new()
         {
-            var configOpptions = configuration.GetSection(defaults);
+            var options_default = configuration.GetSection(defaults);
             var optionsclass = typeof(TEnricherOptions).Name;
-            configOpptions.Bind(configuration.GetSection("CommonEnrichersConfig").GetChildren().Where(x => x.GetValue<string>("$type") == optionsclass).FirstOrDefault());
-            return configOpptions;
+            var options_v15 = configuration.GetSection("CommonEnrichersConfig").GetChildren().Where(x => x.GetValue<string>("$type") == optionsclass).FirstOrDefault();
+
+            var options = new TEnricherOptions();
+            if (options_default.Exists())
+            {
+                options_default.Bind(options);
+            }
+
+            // Bind the second section, overriding or merging the values
+            if (options_v15 != null && options_v15.Exists())
+            {
+                options_v15.Bind(options);
+            }
+
+
+            return options;
         }
+
 
         public static MigrationConfigVersion GetMigrationConfigVersion(this IConfiguration configuration)
         {

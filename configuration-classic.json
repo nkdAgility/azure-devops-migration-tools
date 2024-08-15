@@ -3,12 +3,12 @@
   "Source": {
     "$type": "TfsTeamProjectConfig",
     "Collection": "https://dev.azure.com/nkdagility-preview/",
-    "Project": "myProjectName",
+    "Project": "migrationSource1",
     "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
     "AllowCrossProjectLinking": false,
-    "AuthenticationMode": "AcessToken",
+    "AuthenticationMode": "AccessToken",
     "PersonalAccessToken": "",
-    "PersonalAccessTokenVariableName": "",
+    "PersonalAccessTokenVariableName": "MigrationTools__Source__PersonalAccessToken",
     "LanguageMaps": {
       "AreaPath": "Area",
       "IterationPath": "Iteration"
@@ -18,12 +18,12 @@
   "Target": {
     "$type": "TfsTeamProjectConfig",
     "Collection": "https://dev.azure.com/nkdagility-preview/",
-    "Project": "myProjectName",
-    "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
+    "Project": "migrationTest5",
+    "ReflectedWorkItemIDFieldName": "nkdScrum.ReflectedWorkItemId",
     "AllowCrossProjectLinking": false,
-    "AuthenticationMode": "AcessToken",
+    "AuthenticationMode": "AccessToken",
     "PersonalAccessToken": "",
-    "PersonalAccessTokenVariableName": "",
+    "PersonalAccessTokenVariableName": "MigrationTools__Source__PersonalAccessToken",
     "LanguageMaps": {
       "AreaPath": "Area",
       "IterationPath": "Iteration"
@@ -121,6 +121,13 @@
   "LogLevel": "Information",
   "CommonEnrichersConfig": [
     {
+      "$type": "WorkItemTypeMappingEnricherOptions",
+      "Enabled": false,
+      "Mappings": {
+        "User Story": "Product Backlog Item"
+      }
+    },
+    {
       "$type": "StringManipulatorEnricherOptions",
       "Enabled": true,
       "MaxStringLength": 1000000,
@@ -156,9 +163,6 @@
   ],
   "Version": "16.0",
   "workaroundForQuerySOAPBugEnabled": false,
-  "WorkItemTypeDefinition": {
-    "sourceWorkItemTypeName": "targetWorkItemTypeName"
-  },
   "Endpoints": {
     "InMemoryWorkItemEndpoints": [
       {

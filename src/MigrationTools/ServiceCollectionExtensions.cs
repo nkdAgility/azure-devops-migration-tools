@@ -3,6 +3,7 @@ using System.Configuration;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using MigrationTools._EngineV1.Containers;
 using MigrationTools.EndpointEnrichers;
 using MigrationTools.Endpoints;
@@ -10,7 +11,6 @@ using MigrationTools.Enrichers;
 using MigrationTools.ProcessorEnrichers;
 using MigrationTools.ProcessorEnrichers.WorkItemProcessorEnrichers;
 using MigrationTools.Processors;
-using MigrationTools.Services;
 
 namespace MigrationTools
 {
@@ -34,14 +34,15 @@ namespace MigrationTools
             switch (configuration.GetMigrationConfigVersion())
             {
                 case ConfigurationExtensions.MigrationConfigVersion.v15:
-                    context.AddSingleton<StringManipulatorEnricher>().AddOptions<StringManipulatorEnricherOptions>().Bind(configuration.GetSectionCommonEnrichers_v15< StringManipulatorEnricherOptions>(StringManipulatorEnricherOptions.ConfigurationSectionName));
-                    context.AddSingleton<WorkItemTypeMappingEnricher>().AddOptions<WorkItemTypeMappingEnricherOptions>().Bind(configuration.GetSectionCommonEnrichers_v15<WorkItemTypeMappingEnricherOptions>(WorkItemTypeMappingEnricherOptions.ConfigurationSectionName));
+                    context.AddSingleton<StringManipulatorEnricher>().AddSingleton<IOptions<StringManipulatorEnricherOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<StringManipulatorEnricherOptions>(StringManipulatorEnricherOptions.ConfigurationSectionName)));
+                    context.AddSingleton<WorkItemTypeMappingEnricher>().AddSingleton<IOptions<WorkItemTypeMappingEnricherOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<WorkItemTypeMappingEnricherOptions>(WorkItemTypeMappingEnricherOptions.ConfigurationSectionName)));
                     break;
                 case ConfigurationExtensions.MigrationConfigVersion.v16:
                     context.AddSingleton<StringManipulatorEnricher>().AddOptions<StringManipulatorEnricherOptions>().Bind(configuration.GetSection(StringManipulatorEnricherOptions.ConfigurationSectionName));
                     context.AddSingleton<WorkItemTypeMappingEnricher>().AddOptions<WorkItemTypeMappingEnricherOptions>().Bind(configuration.GetSection(WorkItemTypeMappingEnricherOptions.ConfigurationSectionName));
                     break;
             }
+  
             context.AddSingleton<StaticEnrichers>();
 
 

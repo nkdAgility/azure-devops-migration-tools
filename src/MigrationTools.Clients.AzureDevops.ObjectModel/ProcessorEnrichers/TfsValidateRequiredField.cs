@@ -53,7 +53,7 @@ namespace MigrationTools.ProcessorEnrichers
                 {
                     
                     var workItemTypeName = sourceWorkItemType.Name;
-                    if (workItemTypeMappingTool.Mappings.ContainsKey(workItemTypeName))
+                    if (workItemTypeMappingTool.Mappings != null && workItemTypeMappingTool.Mappings.ContainsKey(workItemTypeName))
                     {
                         workItemTypeName = workItemTypeMappingTool.Mappings[workItemTypeName];
                     }

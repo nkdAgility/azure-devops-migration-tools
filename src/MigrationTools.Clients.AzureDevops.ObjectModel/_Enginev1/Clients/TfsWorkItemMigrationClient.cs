@@ -91,9 +91,16 @@ namespace MigrationTools._EngineV1.Clients
             Project y;
             try
             {
-                y = (from Project x in Store.Projects where string.Equals(x.Name, MigrationClient.Config.AsTeamProjectConfig().Project, StringComparison.OrdinalIgnoreCase) select x).Single(); // Use Single instead of SingleOrDefault to force an exception here
+                y = (from Project x in Store.Projects where string.Equals(x.Name, MigrationClient.Config.AsTeamProjectConfig().Project, StringComparison.OrdinalIgnoreCase) select x).SingleOrDefault(); // Use Single instead of SingleOrDefault to force an exception here
+                if (y == null)
+                {
+                    Log.Fatal("The project `{ConfiguredProjectName}` does not exist in the collection. Please fix to continue.", MigrationClient.Config.AsTeamProjectConfig().Project);
+                    Log.Error("Valid options are: @{projects}", Store.Projects.Cast<Project>().Select(x => x.Name).ToList());
+                    Environment.Exit(-1);
+                }
                 timer.Stop();
                 Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", MigrationClient.Config.AsTeamProjectConfig().Collection.ToString(), "GetProject", null, startTime, timer.Elapsed, "200", true));
+                return y?.ToProjectData(); // With SingleOrDefault earlier this would result in a NullReferenceException which is hard to debug
             }
             catch (Exception ex)
             {
@@ -106,10 +113,9 @@ namespace MigrationTools._EngineV1.Clients
                        new Dictionary<string, double> {
                             { "Time",timer.ElapsedMilliseconds }
                        });
-                Log.Error(ex, "Unable to get project with name {ConfiguredProjectName}", MigrationClient.Config.AsTeamProjectConfig().Project);
+                Log.Error(ex, "The project `{ConfiguredProjectName}` does not exist in the collection. Please fix to continue.", MigrationClient.Config.AsTeamProjectConfig().Project);
                 throw;
             }
-            return y.ToProjectData(); // With SingleOrDefault earlier this would result in a NullReferenceException which is hard to debug
         }
 
         public override ReflectedWorkItemId CreateReflectedWorkItemId(WorkItemData workItem)

@@ -342,8 +342,13 @@ namespace VstsSyncMigrator.Engine
             string collUrl = Engine.Target.Config.AsTeamProjectConfig().Collection.ToString();
             if (collUrl.Contains("dev.azure.com") || collUrl.Contains(".visualstudio.com"))
             {
+                var token = Engine.Target.Config.AsTeamProjectConfig().PersonalAccessToken;
+                if (Engine.Target.Config.AsTeamProjectConfig().PersonalAccessTokenVariableName != null)
+                {
+                    token = Environment.GetEnvironmentVariable(Engine.Target.Config.AsTeamProjectConfig().PersonalAccessTokenVariableName);
+                }
                 // Test that
-                if (Engine.Target.Config.AsTeamProjectConfig().PersonalAccessToken.IsNullOrEmpty())
+                if (token.IsNullOrEmpty())
                 {
                     var ex = new InvalidOperationException("Missing PersonalAccessToken from Target");
                     Log.LogError(ex, "When you are migrating to Azure DevOps you MUST provide an PAT so that we can call the REST API for certain actions. For example we would be unable to deal with a Work item Type change.");
