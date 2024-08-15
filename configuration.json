@@ -80,10 +80,10 @@
           }
         ]
       },
-      "TfsGitRepoMappings": {
+      "GitRepoMappingTool": {
         "Enabled": true,
-        "WorkItemGitRepos": {
-          "sourceRepoName": "targetRepoName"
+        "Mappings": {
+          "Source Repo Name": "Target Repo Name"
         }
       },
       "TfsNodeStructure": {

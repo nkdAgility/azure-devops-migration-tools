@@ -1,39 +1,26 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
-using System.Threading.Tasks;
-using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.ApplicationInsights.WorkerService;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Host.CustomDiagnostics;
 using MigrationTools.Host.Services;
-using MigrationTools.Options;
 using Serilog;
-using Serilog.Core;
 using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
 using Spectre.Console.Cli;
 using Serilog.Filters;
 using MigrationTools.Host.Commands;
-using System.Diagnostics;
-using System.Text.RegularExpressions;
 using MigrationTools.Services;
 using Spectre.Console.Extensions.Hosting;
-using System.Configuration;
-using NuGet.Protocol.Plugins;
 using System.Collections.Generic;
 using System.Linq;
 using System.Data;
-using static System.Collections.Specialized.BitVector32;
-using System.Text.Json;
-using MigrationTools.Enrichers;
-using Newtonsoft.Json;
 using static MigrationTools.ConfigurationExtensions;
 
 namespace MigrationTools.Host
@@ -117,7 +104,6 @@ namespace MigrationTools.Host
                                Log.Warning("!!ACTION REQUIRED!! You are using a deprecated version of the configuration, please update to v16. backward compatability will be removed in a future version.");
                                //logger.LogCritical("The config file {ConfigFile} uses an outdated format. We are continuing to support this format through a grace period. Use '{ExecutableName}.exe init' to create a new configuration file and port over your old configuration.", configFile, Assembly.GetEntryAssembly().GetName().Name);
                                var parsed = reader.BuildFromFile(configFile); // TODO revert tp 
-                               options.GitRepoMapping = parsed.GitRepoMapping;
                                options.Processors = parsed.Processors;
                                options.Source = parsed.Source;
                                options.Target = parsed.Target;
@@ -126,8 +112,6 @@ namespace MigrationTools.Host
                            case MigrationConfigVersion.v16:
                                // This code Converts the new config format to the v1 and v2 runtme format.
                                options.Version = configuration.GetValue<string>("MigrationTools:Version");
-
-                               options.GitRepoMapping = configuration.GetSection("MigrationTools:CommonEnrichers:TfsGitRepoMappings:WorkItemGitRepos").Get<Dictionary<string, string>>();
 
                                options.Processors = configuration.GetSection("MigrationTools:Processors")?.ToMigrationToolsList<IProcessorConfig>(child => child.GetMigrationToolsOption<IProcessorConfig>("ProcessorType"));
 

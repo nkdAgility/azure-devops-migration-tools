@@ -12,6 +12,7 @@ using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools._EngineV1.Clients;
 using MigrationTools.DataContracts;
 using MigrationTools.ProcessorEnrichers;
+using MigrationTools.ProcessorEnrichers.WorkItemProcessorEnrichers;
 using MigrationTools.Processors;
 
 namespace MigrationTools.Enrichers
@@ -87,7 +88,8 @@ namespace MigrationTools.Enrichers
             }
 
             Log.LogInformation("GitRepositoryEnricher: Enriching {Id} To fix Git Repo Links", targetWorkItem.Id);
-            var changeSetMappings = Engine.Source.GetService<TfsChangeSetMappingTool>();
+            var changeSetMappings = Services.GetService<TfsChangeSetMappingTool>();
+            var gitRepoMaps = Services.GetService<GitRepoMappingTool>();
             List<ExternalLink> newEL = new List<ExternalLink>();
             List<ExternalLink> removeEL = new List<ExternalLink>();
             int count = 0;
@@ -116,7 +118,7 @@ namespace MigrationTools.Enrichers
                     {
                         var anyProjectSourceRepoInfo = TfsGitRepositoryInfo.Create(el, allSourceRepos, changeSetMappings, Engine, sourceWorkItem?.ProjectName);
                         // if repo is found in a different project and the repo Name is listed in repo mappings, use it
-                        if (anyProjectSourceRepoInfo.GitRepo != null && Engine.GitRepoMaps.Items.ContainsKey(anyProjectSourceRepoInfo.GitRepo.Name))
+                        if (anyProjectSourceRepoInfo.GitRepo != null && gitRepoMaps.Mappings.ContainsKey(anyProjectSourceRepoInfo.GitRepo.Name))
                         {
                             sourceRepoInfo = anyProjectSourceRepoInfo;
                         }
@@ -128,7 +130,7 @@ namespace MigrationTools.Enrichers
 
                     if (sourceRepoInfo.GitRepo != null)
                     {
-                        string targetRepoName = GetTargetRepoName(Engine.GitRepoMaps.Items, sourceRepoInfo);
+                        string targetRepoName = GetTargetRepoName(gitRepoMaps.Mappings, sourceRepoInfo);
                         string sourceProjectName = sourceRepoInfo?.GitRepo?.ProjectReference?.Name ?? Engine.Target.Config.AsTeamProjectConfig().Project;
                         string targetProjectName = Engine.Target.Config.AsTeamProjectConfig().Project;
 
@@ -136,7 +138,7 @@ namespace MigrationTools.Enrichers
                         // if repo was not found in the target project, try to find it in the whole target project collection
                         if (targetRepoInfo.GitRepo == null)
                         {
-                            if (Engine.GitRepoMaps.Items.Values.Contains(targetRepoName))
+                            if (gitRepoMaps.Mappings.Values.Contains(targetRepoName))
                             {
                                 var anyTargetRepoInCollectionInfo = TfsGitRepositoryInfo.Create(targetRepoName, sourceRepoInfo, allTargetRepos);
                                 if (anyTargetRepoInCollectionInfo.GitRepo != null)
