@@ -25,7 +25,6 @@ namespace MigrationTools.Tests
             services.AddSingleton<ProcessorContainer>();
             services.AddSingleton<GitRepoMapContainer>();
             services.AddSingleton<FieldMapContainer>();
-            services.AddSingleton<ChangeSetMappingContainer>();
 
             services.AddSingleton<ITelemetryLogger, TelemetryClientAdapter>();
 

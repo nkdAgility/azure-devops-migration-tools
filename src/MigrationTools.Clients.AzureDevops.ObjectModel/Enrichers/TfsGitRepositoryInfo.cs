@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using MigrationTools.ProcessorEnrichers;
 using Serilog;
 
 namespace MigrationTools.Enrichers
@@ -22,7 +23,7 @@ namespace MigrationTools.Enrichers
             this.GitRepo = GitRepo;
         }
 
-        public static TfsGitRepositoryInfo Create(ExternalLink gitExternalLink, IList<GitRepository> possibleRepos, IMigrationEngine migrationEngine, string workItemSourceProjectName)
+        public static TfsGitRepositoryInfo Create(ExternalLink gitExternalLink, IList<GitRepository> possibleRepos,TfsChangeSetMappingTool tfsChangeSetMappingTool, IMigrationEngine migrationEngine, string workItemSourceProjectName)
         {
             var repoType = DetermineFromLink(gitExternalLink.LinkedArtifactUri);
             switch (repoType)
@@ -31,7 +32,7 @@ namespace MigrationTools.Enrichers
                     return CreateFromGit(gitExternalLink, possibleRepos);
 
                 case RepistoryType.TFVC:
-                    return CreateFromTFVC(gitExternalLink, possibleRepos, migrationEngine.ChangeSetMapps.Items, migrationEngine.Source.Config.AsTeamProjectConfig().Project, workItemSourceProjectName);
+                    return CreateFromTFVC(gitExternalLink, possibleRepos, tfsChangeSetMappingTool.Items, migrationEngine.Source.Config.AsTeamProjectConfig().Project, workItemSourceProjectName);
             }
 
             return null;

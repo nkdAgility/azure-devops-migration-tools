@@ -14,7 +14,6 @@ namespace MigrationTools
         IMigrationClient Target { get; }
 
         GitRepoMapContainer GitRepoMaps { get; }
-        ChangeSetMappingContainer ChangeSetMapps { get; }
         FieldMapContainer FieldMaps { get; }
     }
 }

@@ -9,7 +9,7 @@ namespace MigrationTools._EngineV1.Configuration
         {
             LogLevel = "Information";
         }
-        public string ChangeSetMappingFile { get; set; }
+
         public IMigrationClientConfig Source { get; set; }
         public IMigrationClientConfig Target { get; set; }
 

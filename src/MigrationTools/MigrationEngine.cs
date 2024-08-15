@@ -29,7 +29,6 @@ namespace MigrationTools
             IOptions<EngineConfiguration> config,
             ProcessorContainer processors,
             GitRepoMapContainer gitRepoMaps,
-            ChangeSetMappingContainer changeSetMapps,
             FieldMapContainer fieldMaps,
             ITelemetryLogger telemetry,
             ILogger<MigrationEngine> logger)
@@ -41,12 +40,9 @@ namespace MigrationTools
             _networkCredentials = networkCredentials.Value;
             Processors = processors;
             GitRepoMaps = gitRepoMaps;
-            ChangeSetMapps = changeSetMapps;
             _telemetryLogger = telemetry;
             _engineConfiguration = config.Value;
         }
-
-        public ChangeSetMappingContainer ChangeSetMapps { get; }
         
         public FieldMapContainer FieldMaps { get; }
 
@@ -100,7 +96,6 @@ namespace MigrationTools
 
             Processors.EnsureConfigured();
             GitRepoMaps.EnsureConfigured();
-            ChangeSetMapps.EnsureConfigured();
             FieldMaps.EnsureConfigured();
 
             _logger.LogInformation("Beginning run of {ProcessorCount} processors", Processors.Count.ToString());

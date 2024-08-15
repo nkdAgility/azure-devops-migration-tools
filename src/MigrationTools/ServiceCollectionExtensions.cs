@@ -69,12 +69,10 @@ namespace MigrationTools
             context.AddSingleton<ProcessorContainer>();
             context.AddSingleton<GitRepoMapContainer>();
             context.AddSingleton<FieldMapContainer>();
-            context.AddSingleton<ChangeSetMappingContainer>();
             //Engine
             context.AddSingleton<FieldMapContainer>();
             context.AddSingleton<ProcessorContainer>();
             context.AddSingleton<GitRepoMapContainer>();
-            context.AddSingleton<ChangeSetMappingContainer>();
             context.AddSingleton<IMigrationEngine, MigrationEngine>();
         }
     }

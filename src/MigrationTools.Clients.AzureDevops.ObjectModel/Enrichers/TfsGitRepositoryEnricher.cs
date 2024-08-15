@@ -11,6 +11,7 @@ using Microsoft.TeamFoundation.SourceControl.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools._EngineV1.Clients;
 using MigrationTools.DataContracts;
+using MigrationTools.ProcessorEnrichers;
 using MigrationTools.Processors;
 
 namespace MigrationTools.Enrichers
@@ -86,6 +87,7 @@ namespace MigrationTools.Enrichers
             }
 
             Log.LogInformation("GitRepositoryEnricher: Enriching {Id} To fix Git Repo Links", targetWorkItem.Id);
+            var changeSetMappings = Engine.Source.GetService<TfsChangeSetMappingTool>();
             List<ExternalLink> newEL = new List<ExternalLink>();
             List<ExternalLink> removeEL = new List<ExternalLink>();
             int count = 0;
@@ -101,7 +103,7 @@ namespace MigrationTools.Enrichers
                 {
                     ExternalLink el = (ExternalLink)l;
                     
-                    TfsGitRepositoryInfo sourceRepoInfo = TfsGitRepositoryInfo.Create(el, sourceRepos, Engine, sourceWorkItem?.ProjectName);
+                    TfsGitRepositoryInfo sourceRepoInfo = TfsGitRepositoryInfo.Create(el, sourceRepos, changeSetMappings, Engine, sourceWorkItem?.ProjectName);
 
                     // if sourceRepo is null ignore this link and keep processing further links
                     if (sourceRepoInfo == null)
@@ -112,7 +114,7 @@ namespace MigrationTools.Enrichers
                     // if repo was not found in source project, try to find it by repoId in the whole project collection
                     if (sourceRepoInfo.GitRepo == null)
                     {
-                        var anyProjectSourceRepoInfo = TfsGitRepositoryInfo.Create(el, allSourceRepos, Engine, sourceWorkItem?.ProjectName);
+                        var anyProjectSourceRepoInfo = TfsGitRepositoryInfo.Create(el, allSourceRepos, changeSetMappings, Engine, sourceWorkItem?.ProjectName);
                         // if repo is found in a different project and the repo Name is listed in repo mappings, use it
                         if (anyProjectSourceRepoInfo.GitRepo != null && Engine.GitRepoMaps.Items.ContainsKey(anyProjectSourceRepoInfo.GitRepo.Name))
                         {
