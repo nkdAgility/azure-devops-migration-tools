@@ -12,6 +12,7 @@ using MigrationTools.FieldMaps.AzureDevops.ObjectModel;
 using MigrationTools.ProcessorEnrichers;
 using MigrationTools.ProcessorEnrichers.WorkItemProcessorEnrichers;
 using MigrationTools.Processors;
+using Serilog;
 
 namespace MigrationTools
 {
@@ -30,8 +31,7 @@ namespace MigrationTools
 
             switch (configuration.GetMigrationConfigVersion())
             {
-                case ConfigurationExtensions.MigrationConfigVersion.v15:
-
+                case ConfigurationExtensions.MigrationConfigVersion.before16:
 
                     context.AddSingleton<TfsAttachmentEnricher>().AddSingleton<IOptions<TfsAttachmentEnricherOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<TfsAttachmentEnricherOptions>(TfsAttachmentEnricherOptions.ConfigurationSectionName)));
                     context.AddSingleton<TfsUserMappingEnricher>().AddSingleton<IOptions<TfsUserMappingEnricherOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<TfsUserMappingEnricherOptions>(TfsUserMappingEnricherOptions.ConfigurationSectionName)));

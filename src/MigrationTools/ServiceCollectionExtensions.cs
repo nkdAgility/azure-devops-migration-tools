@@ -11,6 +11,7 @@ using MigrationTools.Enrichers;
 using MigrationTools.ProcessorEnrichers;
 using MigrationTools.ProcessorEnrichers.WorkItemProcessorEnrichers;
 using MigrationTools.Processors;
+using Serilog;
 
 namespace MigrationTools
 {
@@ -33,7 +34,8 @@ namespace MigrationTools
 
             switch (configuration.GetMigrationConfigVersion())
             {
-                case ConfigurationExtensions.MigrationConfigVersion.v15:
+                case ConfigurationExtensions.MigrationConfigVersion.before16:
+                    Console.WriteLine("!!ACTION REQUIRED!! You are using a deprecated version of the configuration, please update to v16. backward compatability will be removed in a future version.");
                     context.AddSingleton<StringManipulatorEnricher>().AddSingleton<IOptions<StringManipulatorEnricherOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<StringManipulatorEnricherOptions>(StringManipulatorEnricherOptions.ConfigurationSectionName)));
                     context.AddSingleton<WorkItemTypeMappingEnricher>().AddSingleton<IOptions<WorkItemTypeMappingEnricherOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<WorkItemTypeMappingEnricherOptions>(WorkItemTypeMappingEnricherOptions.ConfigurationSectionName)));
                     break;

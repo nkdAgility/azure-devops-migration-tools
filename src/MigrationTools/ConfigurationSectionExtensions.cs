@@ -92,7 +92,7 @@ namespace MigrationTools
     {
         public enum MigrationConfigVersion
         {
-            v15,
+            before16,
             v16
         }
 
@@ -135,7 +135,7 @@ namespace MigrationTools
             Version.TryParse(configVersionString, out Version configVersion);
             if (configVersion < Version.Parse("16.0") || isOldFormat)
             {
-                return MigrationConfigVersion.v15;
+                return MigrationConfigVersion.before16;
             }
             else
             {
