@@ -166,7 +166,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: Setup
     steps:
-    - name: "Create Summery"
+    - name: "Show Summery"
       if: always()
       shell: pwsh
       id: nkdagility-summery
@@ -192,6 +192,15 @@ jobs:
                  - HasChanged_src: ${{needs.Setup.outputs.HasChanged_src}}
                  - HasChanged_docs: ${{needs.Setup.outputs.HasChanged_docs}}
                  - HasChanged_automation: ${{needs.Setup.outputs.HasChanged_automation}}
+            "@
+            echo $markdown >> $Env:GITHUB_STEP_SUMMARY
+    - name: "Show Release Description"
+      if: always()
+      shell: pwsh
+      id: nkdAgility_ReleaseDescription
+      continue-on-error: true
+      run: |
+            $markdown = @"
                ## nkdAgility_ReleaseDescription
                ${{needs.Setup.outputs.nkdAgility_ReleaseDescription}}
             "@
