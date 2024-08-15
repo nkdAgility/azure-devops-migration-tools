@@ -1,4 +1,6 @@
-﻿using MigrationTools._EngineV1.Configuration;
+﻿using System;
+using System.Reflection;
+using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Processors;
 
 namespace MigrationTools._EngineV1.Containers
@@ -11,6 +13,7 @@ namespace MigrationTools._EngineV1.Containers
 
         void Execute();
 
+        [Obsolete]
         void Configure(IProcessorConfig config);
     }
 }

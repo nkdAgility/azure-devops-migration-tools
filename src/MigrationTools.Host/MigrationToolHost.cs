@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Data;
 using static MigrationTools.ConfigurationExtensions;
+using MigrationTools.Options;
 
 namespace MigrationTools.Host
 {
@@ -97,8 +98,7 @@ namespace MigrationTools.Host
                            Environment.Exit(-1);
                        }
                        logger.LogInformation("Config Found, creating engine host");
-                       MigrationConfigVersion configVersion = configuration.GetMigrationConfigVersion();
-                       switch (configVersion)
+                       switch (VersionOptions.ConfigureOptions.GetMigrationConfigVersion(context.Configuration))
                        {
                            case MigrationConfigVersion.before16:
                                Log.Warning("!!ACTION REQUIRED!! You are using a deprecated version of the configuration, please update to v16. backward compatability will be removed in a future version.");

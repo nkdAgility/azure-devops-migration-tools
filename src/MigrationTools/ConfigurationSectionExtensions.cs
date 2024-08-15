@@ -90,11 +90,7 @@ namespace MigrationTools
 
     public static partial class ConfigurationExtensions
     {
-        public enum MigrationConfigVersion
-        {
-            before16,
-            v16
-        }
+       
 
         public static TEnricherOptions GetSectionCommonEnrichers_v15<TEnricherOptions>(this IConfiguration configuration, string defaults) where TEnricherOptions : IProcessorEnricherOptions, new()
         {
@@ -118,30 +114,6 @@ namespace MigrationTools
             return options;
         }
 
-
-        public static MigrationConfigVersion GetMigrationConfigVersion(this IConfiguration configuration)
-        {
-            bool isOldFormat = false;
-            string configVersionString = configuration.GetValue<string>("MigrationTools:Version");
-            if (string.IsNullOrEmpty(configVersionString))
-            {
-                isOldFormat = true;
-                configVersionString = configuration.GetValue<string>("Version");
-            }
-            if (string.IsNullOrEmpty(configVersionString))
-            {
-                configVersionString = "0.0";
-            }
-            Version.TryParse(configVersionString, out Version configVersion);
-            if (configVersion < Version.Parse("16.0") || isOldFormat)
-            {
-                return MigrationConfigVersion.before16;
-            }
-            else
-            {
-                return MigrationConfigVersion.v16;
-            }
-        }
 
     }
 }

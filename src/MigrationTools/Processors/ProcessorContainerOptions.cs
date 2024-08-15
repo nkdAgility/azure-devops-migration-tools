@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Enrichers;
+using MigrationTools.Options;
 
 namespace MigrationTools.Processors
 {
@@ -31,13 +32,13 @@ namespace MigrationTools.Processors
 
             public void Configure(ProcessorContainerOptions options)
             {
-                switch (_configuration.GetMigrationConfigVersion())
+                switch (VersionOptions.ConfigureOptions.GetMigrationConfigVersion(_configuration))
                 {
-                    case ConfigurationExtensions.MigrationConfigVersion.v16:
+                    case MigrationConfigVersion.v16:
                         _configuration.GetSection(ConfigurationSectionName).Bind(options);
                         options.Processors = _configuration.GetSection(ProcessorContainerOptions.ConfigurationSectionName)?.ToMigrationToolsList(child => child.GetMigrationToolsOption<IProcessorConfig>("ProcessorType"));
                         break;
-                    case ConfigurationExtensions.MigrationConfigVersion.before16:
+                    case MigrationConfigVersion.before16:
                         options.Enabled = true;
                         options.Processors = _configuration.GetSection("Processors")?.ToMigrationToolsList(child => child.GetMigrationToolsOption<IProcessorConfig>("$type"));
                         break;
