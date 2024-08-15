@@ -6,6 +6,7 @@ using MigrationTools._EngineV1.Containers;
 using MigrationTools.EndpointEnrichers;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
+using MigrationTools.ProcessorEnrichers;
 using MigrationTools.ProcessorEnrichers.WorkItemProcessorEnrichers;
 using MigrationTools.Processors;
 using MigrationTools.Services;
@@ -23,12 +24,15 @@ namespace MigrationTools
             // Processors
             context.AddTransient<WorkItemTrackingProcessor>();
             // Endpoint Enrichers
-            context.AddTransient<AppendMigrationToolSignatureFooter>();
-            context.AddTransient<FilterWorkItemsThatAlreadyExistInTarget>();
-            context.AddTransient<SkipToFinalRevisedWorkItemType>();
+            //context.AddTransient<AppendMigrationToolSignatureFooter>();
+            //context.AddTransient<FilterWorkItemsThatAlreadyExistInTarget>();
+            //context.AddTransient<SkipToFinalRevisedWorkItemType>();
 
             context.AddSingleton<StringManipulatorEnricher>().AddOptions<StringManipulatorEnricherOptions>().Bind(configuration.GetSection(StringManipulatorEnricherOptions.ConfigurationSectionName));
             context.AddSingleton<WorkItemTypeMappingEnricher>().AddOptions<WorkItemTypeMappingEnricherOptions>().Bind(configuration.GetSection(WorkItemTypeMappingEnricherOptions.ConfigurationSectionName));
+            context.AddSingleton<StaticEnrichers>();
+
+
             //context.AddTransient<WorkItemAttachmentEnricher>();
             //context.AddTransient<WorkItemCreatedEnricher>();
             //context.AddTransient<WorkItemEmbedEnricher>();

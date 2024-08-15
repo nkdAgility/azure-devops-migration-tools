@@ -10,7 +10,7 @@ using MigrationTools.ProcessorEnrichers;
 
 namespace MigrationTools.Enrichers
 {
-    public class TfsEnricherGroup
+    public class TfsStaticEnrichers
     {
         public TfsUserMappingEnricher UserMapping { get; private set; }
         public TfsAttachmentEnricher Attachment { get; private set; }
@@ -25,8 +25,8 @@ namespace MigrationTools.Enrichers
 
         public TfsGitRepositoryEnricher GitRepository { get; private set; }
         
-        public TfsEnricherGroup(ITelemetryLogger telemetry,
-                                        ILogger<TfsEnricherGroup> logger,
+        public TfsStaticEnrichers(ITelemetryLogger telemetry,
+                                        ILogger<TfsStaticEnrichers> logger,
                                         TfsUserMappingEnricher userMappingEnricher,
                                         TfsAttachmentEnricher attachmentEnricher,
                                         TfsNodeStructure nodeStructureEnricher,

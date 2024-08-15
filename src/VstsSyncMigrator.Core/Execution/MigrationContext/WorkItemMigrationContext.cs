@@ -59,34 +59,31 @@ namespace VstsSyncMigrator.Engine
         private List<string> _ignore;
 
         private ILogger contextLog;
-        private StringManipulatorEnricher _stringManipulatorEnricher;
         private ITelemetryLogger _telemetry;
         private readonly EngineConfiguration _engineConfig;
         private IDictionary<string, double> processWorkItemMetrics = null;
         private IDictionary<string, string> processWorkItemParamiters = null;
-        private WorkItemTypeMappingEnricher _witMappEnricher;
         private ILogger workItemLog;
         private List<string> _itemsInError;
 
-        public TfsEnricherGroup TfsEnrichers { get; private set; }
+        public TfsStaticEnrichers TfsStaticEnrichers { get; private set; }
+        public StaticEnrichers StaticEnrichers { get; private set; }
 
         public WorkItemMigrationContext(IMigrationEngine engine,
                                         IServiceProvider services,
                                         ITelemetryLogger telemetry,
                                         ILogger<WorkItemMigrationContext> logger,
-                                        TfsEnricherGroup tfsEnricherGroup,
-                                        StringManipulatorEnricher stringManipulatorEnricher,
+                                        TfsStaticEnrichers tfsStaticEnrichers,
                                         IOptions<EngineConfiguration> engineConfig,
-                                        WorkItemTypeMappingEnricher witMappEnricher)
+                                        StaticEnrichers staticEnrichers)
             : base(engine, services, telemetry, logger)
         {
             _telemetry = telemetry;
             _engineConfig = engineConfig.Value;
             contextLog = Serilog.Log.ForContext<WorkItemMigrationContext>();
-            _stringManipulatorEnricher = stringManipulatorEnricher;
-            _witMappEnricher = witMappEnricher;
             //
-            TfsEnrichers = tfsEnricherGroup ?? throw new ArgumentNullException(nameof(tfsEnricherGroup));
+            TfsStaticEnrichers = tfsStaticEnrichers ?? throw new ArgumentNullException(nameof(tfsStaticEnrichers));
+            StaticEnrichers = staticEnrichers ?? throw new ArgumentNullException(nameof(staticEnrichers));
         }
 
         public override string Name => "WorkItemMigration";
@@ -107,13 +104,13 @@ namespace VstsSyncMigrator.Engine
                 Environment.Exit(-1);
             }
 
-            PullCommonEnrichersConfig<TfsNodeStructure, TfsNodeStructureOptions>(_engineConfig.CommonEnrichersConfig, TfsEnrichers.NodeStructure);
-            PullCommonEnrichersConfig<TfsRevisionManager, TfsRevisionManagerOptions>(_engineConfig.CommonEnrichersConfig,  TfsEnrichers.RevisionManager);
-            PullCommonEnrichersConfig<TfsWorkItemLinkEnricher, TfsWorkItemLinkEnricherOptions>(_engineConfig.CommonEnrichersConfig,  TfsEnrichers.WorkItemLink);
-            PullCommonEnrichersConfig<StringManipulatorEnricher, StringManipulatorEnricherOptions>(_engineConfig.CommonEnrichersConfig, _stringManipulatorEnricher);
-            PullCommonEnrichersConfig<TfsAttachmentEnricher, TfsAttachmentEnricherOptions>(_engineConfig.CommonEnrichersConfig,  TfsEnrichers.Attachment);
-            PullCommonEnrichersConfig<TfsUserMappingEnricher, TfsUserMappingEnricherOptions>(_engineConfig.CommonEnrichersConfig,  TfsEnrichers.UserMapping);
-            PullCommonEnrichersConfig<TfsTeamSettingsEnricher, TfsTeamSettingsEnricherOptions>(_engineConfig.CommonEnrichersConfig, TfsEnrichers.TeamSettings);
+            PullCommonEnrichersConfig<TfsNodeStructure, TfsNodeStructureOptions>(_engineConfig.CommonEnrichersConfig, TfsStaticEnrichers.NodeStructure);
+            PullCommonEnrichersConfig<TfsRevisionManager, TfsRevisionManagerOptions>(_engineConfig.CommonEnrichersConfig,  TfsStaticEnrichers.RevisionManager);
+            PullCommonEnrichersConfig<TfsWorkItemLinkEnricher, TfsWorkItemLinkEnricherOptions>(_engineConfig.CommonEnrichersConfig,  TfsStaticEnrichers.WorkItemLink);
+            PullCommonEnrichersConfig<StringManipulatorEnricher, StringManipulatorEnricherOptions>(_engineConfig.CommonEnrichersConfig, StaticEnrichers.StringManipulator);
+            PullCommonEnrichersConfig<TfsAttachmentEnricher, TfsAttachmentEnricherOptions>(_engineConfig.CommonEnrichersConfig,  TfsStaticEnrichers.Attachment);
+            PullCommonEnrichersConfig<TfsUserMappingEnricher, TfsUserMappingEnricherOptions>(_engineConfig.CommonEnrichersConfig,  TfsStaticEnrichers.UserMapping);
+            PullCommonEnrichersConfig<TfsTeamSettingsEnricher, TfsTeamSettingsEnricherOptions>(_engineConfig.CommonEnrichersConfig, TfsStaticEnrichers.TeamSettings);
         }
 
         internal void TraceWriteLine(LogEventLevel level, string message, Dictionary<string, object> properties = null)
@@ -139,17 +136,17 @@ namespace VstsSyncMigrator.Engine
             ValidatePatTokenRequirement();
             //////////////////////////////////////////////////
 
-            if (TfsEnrichers.NodeStructure.Options.Enabled)
+            if (TfsStaticEnrichers.NodeStructure.Options.Enabled)
             {
-                TfsEnrichers.NodeStructure.ProcessorExecutionBegin(null);
+                TfsStaticEnrichers.NodeStructure.ProcessorExecutionBegin(null);
             } else
             {
                 Log.LogWarning("WorkItemMigrationContext::InternalExecute: nodeStructureEnricher is disabled! This may cause work item migration errors! ");
             }
 
-            if (TfsEnrichers.TeamSettings.Options.Enabled)
+            if (TfsStaticEnrichers.TeamSettings.Options.Enabled)
             {
-                TfsEnrichers.TeamSettings.ProcessorExecutionBegin(null);
+                TfsStaticEnrichers.TeamSettings.ProcessorExecutionBegin(null);
             } else
             {
                 Log.LogWarning("WorkItemMigrationContext::InternalExecute: teamSettingsEnricher is disabled!");
@@ -188,7 +185,7 @@ namespace VstsSyncMigrator.Engine
                         "[FilterWorkItemsThatAlreadyExistInTarget] is enabled. Searching for {sourceWorkItems} work items that may have already been migrated to the target...",
                         sourceWorkItems.Count());
 
-                    string targetWIQLQuery = TfsEnrichers.NodeStructure.FixAreaPathAndIterationPathForTargetQuery(_config.WIQLQuery,
+                    string targetWIQLQuery = TfsStaticEnrichers.NodeStructure.FixAreaPathAndIterationPathForTargetQuery(_config.WIQLQuery,
                         Engine.Source.WorkItems.Project.Name, Engine.Target.WorkItems.Project.Name, contextLog);
                     // Also replace Project Name
                     targetWIQLQuery = targetWIQLQuery.Replace(Engine.Source.WorkItems.Project.Name, Engine.Target.WorkItems.Project.Name);
@@ -255,7 +252,7 @@ namespace VstsSyncMigrator.Engine
             {
                 if (_config.FixHtmlAttachmentLinks)
                 {
-                     TfsEnrichers.EmbededImages?.ProcessorExecutionEnd(null);
+                     TfsStaticEnrichers.EmbededImages?.ProcessorExecutionEnd(null);
                 }
 
                 stopwatch.Stop();
@@ -273,7 +270,7 @@ namespace VstsSyncMigrator.Engine
 
             contextLog.Information("Validating::Check that all users in the source exist in the target or are mapped!");
             List<IdentityMapData> usersToMap = new List<IdentityMapData>();
-            usersToMap = TfsEnrichers.UserMapping.GetUsersInSourceMappedToTargetForWorkItems(sourceWorkItems);
+            usersToMap = TfsStaticEnrichers.UserMapping.GetUsersInSourceMappedToTargetForWorkItems(sourceWorkItems);
             if (usersToMap != null && usersToMap?.Count > 0)
             {
                 Log.LogWarning("Validating Failed! There are {usersToMap} users that exist in the source that do not exist in the target. This will not cause any errors, but may result in disconnected users that could have been mapped. Use the ExportUsersForMapping processor to create a list of mappable users. Then Import using ", usersToMap.Count);
@@ -284,15 +281,15 @@ namespace VstsSyncMigrator.Engine
         private void ValidateAllNodesExistOrAreMapped(List<WorkItemData> sourceWorkItems)
         {
             contextLog.Information("Validating::Check that all Area & Iteration paths from Source have a valid mapping on Target");
-            if (!TfsEnrichers.NodeStructure.Options.Enabled && Engine.Target.Config.AsTeamProjectConfig().Project != Engine.Source.Config.AsTeamProjectConfig().Project)
+            if (!TfsStaticEnrichers.NodeStructure.Options.Enabled && Engine.Target.Config.AsTeamProjectConfig().Project != Engine.Source.Config.AsTeamProjectConfig().Project)
             {
                 Log.LogError("Source and Target projects have different names, but  NodeStructureEnricher is not enabled. Cant continue... please enable nodeStructureEnricher in the config and restart.");
                 Environment.Exit(-1);
             }
-            if ( TfsEnrichers.NodeStructure.Options.Enabled)
+            if ( TfsStaticEnrichers.NodeStructure.Options.Enabled)
             {
-                List<NodeStructureItem> nodeStructureMissingItems = TfsEnrichers.NodeStructure.GetMissingRevisionNodes(sourceWorkItems);
-                if (TfsEnrichers.NodeStructure.ValidateTargetNodesExist(nodeStructureMissingItems))
+                List<NodeStructureItem> nodeStructureMissingItems = TfsStaticEnrichers.NodeStructure.GetMissingRevisionNodes(sourceWorkItems);
+                if (TfsStaticEnrichers.NodeStructure.ValidateTargetNodesExist(nodeStructureMissingItems))
                 {
                     Log.LogError("Missing Iterations in Target preventing progress, check log for list. To continue you MUST configure IterationMaps or AreaMaps that matches the missing paths..");
                     Environment.Exit(-1);
@@ -307,7 +304,7 @@ namespace VstsSyncMigrator.Engine
         {
             contextLog.Information("Validating::Check all Target Work Items have the RefectedWorkItemId field");
 
-            var result =  TfsEnrichers.ValidateRequiredField.ValidatingRequiredField(
+            var result =  TfsStaticEnrichers.ValidateRequiredField.ValidatingRequiredField(
                 Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName, sourceWorkItems);
             if (!result)
             {
@@ -465,7 +462,7 @@ namespace VstsSyncMigrator.Engine
 
             foreach (Field f in oldWorkItem.Fields)
             {
-                TfsEnrichers.UserMapping.MapUserIdentityField(f);
+                TfsStaticEnrichers.UserMapping.MapUserIdentityField(f);
                 if (newWorkItem.Fields.Contains(f.ReferenceName) == false)
                 {
                     var missedMigratedValue = oldWorkItem.Fields[f.ReferenceName].Value;
@@ -484,7 +481,7 @@ namespace VstsSyncMigrator.Engine
                     switch (f.FieldDefinition.FieldType)
                     {
                         case FieldType.String:
-                            _stringManipulatorEnricher.ProcessorExecutionWithFieldItem(null, oldWorkItemData.Fields[f.ReferenceName]);
+                            StaticEnrichers.StringManipulator.ProcessorExecutionWithFieldItem(null, oldWorkItemData.Fields[f.ReferenceName]);
                             newWorkItem.Fields[f.ReferenceName].Value = oldWorkItemData.Fields[f.ReferenceName].Value;
                             break;
                         default:
@@ -495,11 +492,11 @@ namespace VstsSyncMigrator.Engine
                 } 
             }
 
-            if (TfsEnrichers.NodeStructure.Options.Enabled)
+            if (TfsStaticEnrichers.NodeStructure.Options.Enabled)
             {
 
-                newWorkItem.AreaPath = TfsEnrichers.NodeStructure.GetNewNodeName(oldWorkItem.AreaPath, TfsNodeStructureType.Area);
-                newWorkItem.IterationPath = TfsEnrichers.NodeStructure.GetNewNodeName(oldWorkItem.IterationPath, TfsNodeStructureType.Iteration);
+                newWorkItem.AreaPath = TfsStaticEnrichers.NodeStructure.GetNewNodeName(oldWorkItem.AreaPath, TfsNodeStructureType.Area);
+                newWorkItem.IterationPath = TfsStaticEnrichers.NodeStructure.GetNewNodeName(oldWorkItem.IterationPath, TfsNodeStructureType.Iteration);
             }
             else
             {
@@ -531,7 +528,7 @@ namespace VstsSyncMigrator.Engine
         {
             if (targetWorkItem != null && _config.FixHtmlAttachmentLinks)
             {
-                TfsEnrichers.EmbededImages.Enrich(null, targetWorkItem);
+                TfsStaticEnrichers.EmbededImages.Enrich(null, targetWorkItem);
             }
         }
 
@@ -539,7 +536,7 @@ namespace VstsSyncMigrator.Engine
         {
             if (sourceWorkItem != null && targetWorkItem != null && _config.FixHtmlAttachmentLinks)
             {
-                TfsEnrichers.WorkItemEmbededLink.Enrich(sourceWorkItem, targetWorkItem);
+                TfsStaticEnrichers.WorkItemEmbededLink.Enrich(sourceWorkItem, targetWorkItem);
             }
         }
 
@@ -567,9 +564,9 @@ namespace VstsSyncMigrator.Engine
                     TraceWriteLine(LogEventLevel.Information, "Work Item has {sourceWorkItemRev} revisions and revision migration is set to {ReplayRevisions}",
                         new Dictionary<string, object>(){
                             { "sourceWorkItemRev", sourceWorkItem.Rev },
-                            { "ReplayRevisions", TfsEnrichers.RevisionManager.Options.ReplayRevisions }}
+                            { "ReplayRevisions", TfsStaticEnrichers.RevisionManager.Options.ReplayRevisions }}
                         );
-                    List<RevisionItem> revisionsToMigrate = TfsEnrichers.RevisionManager.GetRevisionsToMigrate(sourceWorkItem.Revisions.Values.ToList(), targetWorkItem?.Revisions.Values.ToList());
+                    List<RevisionItem> revisionsToMigrate = TfsStaticEnrichers.RevisionManager.GetRevisionsToMigrate(sourceWorkItem.Revisions.Values.ToList(), targetWorkItem?.Revisions.Values.ToList());
                     if (targetWorkItem == null)
                     {
                         targetWorkItem = ReplayRevisions(revisionsToMigrate, sourceWorkItem, null);
@@ -674,28 +671,28 @@ namespace VstsSyncMigrator.Engine
 
         private void ProcessWorkItemAttachments(WorkItemData sourceWorkItem, WorkItemData targetWorkItem, bool save = true)
         {
-            if (targetWorkItem != null && TfsEnrichers.Attachment.Options.Enabled && sourceWorkItem.ToWorkItem().Attachments.Count > 0)
+            if (targetWorkItem != null && TfsStaticEnrichers.Attachment.Options.Enabled && sourceWorkItem.ToWorkItem().Attachments.Count > 0)
             {
-                TraceWriteLine(LogEventLevel.Information, "Attachemnts {SourceWorkItemAttachmentCount} | LinkMigrator:{AttachmentMigration}", new Dictionary<string, object>() { { "SourceWorkItemAttachmentCount", sourceWorkItem.ToWorkItem().Attachments.Count }, { "AttachmentMigration", TfsEnrichers.Attachment.Options.Enabled } });
-                TfsEnrichers.Attachment.ProcessAttachemnts(sourceWorkItem, targetWorkItem, save);
+                TraceWriteLine(LogEventLevel.Information, "Attachemnts {SourceWorkItemAttachmentCount} | LinkMigrator:{AttachmentMigration}", new Dictionary<string, object>() { { "SourceWorkItemAttachmentCount", sourceWorkItem.ToWorkItem().Attachments.Count }, { "AttachmentMigration", TfsStaticEnrichers.Attachment.Options.Enabled } });
+                TfsStaticEnrichers.Attachment.ProcessAttachemnts(sourceWorkItem, targetWorkItem, save);
                 AddMetric("Attachments", processWorkItemMetrics, targetWorkItem.ToWorkItem().AttachedFileCount);
             }
         }
 
         private void ProcessWorkItemLinks(IWorkItemMigrationClient sourceStore, IWorkItemMigrationClient targetStore, WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
         {
-            if (targetWorkItem != null && TfsEnrichers.WorkItemLink.Options.Enabled && sourceWorkItem.ToWorkItem().Links.Count > 0)
+            if (targetWorkItem != null && TfsStaticEnrichers.WorkItemLink.Options.Enabled && sourceWorkItem.ToWorkItem().Links.Count > 0)
             {
-                TraceWriteLine(LogEventLevel.Information, "Links {SourceWorkItemLinkCount} | LinkMigrator:{LinkMigration}", new Dictionary<string, object>() { { "SourceWorkItemLinkCount", sourceWorkItem.ToWorkItem().Links.Count }, { "LinkMigration", TfsEnrichers.WorkItemLink.Options.Enabled } });
-                TfsEnrichers.WorkItemLink.Enrich(sourceWorkItem, targetWorkItem);
+                TraceWriteLine(LogEventLevel.Information, "Links {SourceWorkItemLinkCount} | LinkMigrator:{LinkMigration}", new Dictionary<string, object>() { { "SourceWorkItemLinkCount", sourceWorkItem.ToWorkItem().Links.Count }, { "LinkMigration", TfsStaticEnrichers.WorkItemLink.Options.Enabled } });
+                TfsStaticEnrichers.WorkItemLink.Enrich(sourceWorkItem, targetWorkItem);
                 AddMetric("RelatedLinkCount", processWorkItemMetrics, targetWorkItem.ToWorkItem().Links.Count);
-                int fixedLinkCount = TfsEnrichers.GitRepository.Enrich(sourceWorkItem, targetWorkItem);
+                int fixedLinkCount = TfsStaticEnrichers.GitRepository.Enrich(sourceWorkItem, targetWorkItem);
                 AddMetric("FixedGitLinkCount", processWorkItemMetrics, fixedLinkCount);
             }
             else if (targetWorkItem != null && sourceWorkItem.ToWorkItem().Links.Count > 0 && sourceWorkItem.Type == "Test Case" )
             {
-                TfsEnrichers.WorkItemLink.MigrateSharedSteps(sourceWorkItem, targetWorkItem);
-                TfsEnrichers.WorkItemLink.MigrateSharedParameters(sourceWorkItem, targetWorkItem);
+                TfsStaticEnrichers.WorkItemLink.MigrateSharedSteps(sourceWorkItem, targetWorkItem);
+                TfsStaticEnrichers.WorkItemLink.MigrateSharedParameters(sourceWorkItem, targetWorkItem);
             }
         }
 
@@ -723,7 +720,7 @@ namespace VstsSyncMigrator.Engine
 
                 if (_config.AttachRevisionHistory)
                 {
-                    TfsEnrichers.RevisionManager.AttachSourceRevisionHistoryJsonToTarget(sourceWorkItem, targetWorkItem);
+                    TfsStaticEnrichers.RevisionManager.AttachSourceRevisionHistoryJsonToTarget(sourceWorkItem, targetWorkItem);
                 }
 
                 foreach (var revision in revisionsToMigrate)
@@ -882,7 +879,7 @@ namespace VstsSyncMigrator.Engine
                     }
                     targetWorkItem.SaveToAzureDevOps();
 
-                    TfsEnrichers.Attachment.CleanUpAfterSave();
+                    TfsStaticEnrichers.Attachment.CleanUpAfterSave();
                     TraceWriteLine(LogEventLevel.Information, "...Saved as {TargetWorkItemId}", new Dictionary<string, object> { { "TargetWorkItemId", targetWorkItem.Id } });
                 }
             }

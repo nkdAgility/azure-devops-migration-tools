@@ -38,7 +38,7 @@ namespace MigrationTools
             context.AddSingleton<TfsNodeStructure>().AddOptions<TfsNodeStructureOptions>().Bind(configuration.GetSection(TfsNodeStructureOptions.ConfigurationSectionName));
             context.AddSingleton<TfsRevisionManager>().AddOptions<TfsRevisionManagerOptions>().Bind(configuration.GetSection(TfsRevisionManagerOptions.ConfigurationSectionName));
             context.AddSingleton<TfsTeamSettingsEnricher>().AddOptions<TfsTeamSettingsEnricherOptions>().Bind(configuration.GetSection(TfsTeamSettingsEnricherOptions.ConfigurationSectionName));
-            context.AddSingleton<TfsEnricherGroup>();
+            context.AddSingleton<TfsStaticEnrichers>();
 
             // EndPoint Enrichers
            // context.AddTransient<TfsWorkItemAttachmentEnricher>().AddOptions<TfsWorkItemAttachmentEnricherOptions>().Bind(configuration.GetSection(TfsWorkItemAttachmentEnricherOptions.ConfigurationSectionName));
