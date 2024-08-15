@@ -175,7 +175,6 @@ jobs:
       if: always()
       shell: pwsh
       id: nkdagility-summery
-      continue-on-error: true
       run: |
             $markdown = @"
                ## ${{needs.Setup.outputs.GitVersion_SemVer}} (${{needs.Setup.outputs.nkdAgility_Ring}})
@@ -203,7 +202,6 @@ jobs:
       if: always()
       shell: pwsh
       id: nkdAgility_ReleaseDescription
-      continue-on-error: true
       run: |
             Write-Host "::debug::nkdAgility_ReleaseDescription | $Env:GITHUB_STEP_SUMMARY"
             $markdown = @"
