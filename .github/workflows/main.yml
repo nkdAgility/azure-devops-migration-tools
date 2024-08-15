@@ -89,6 +89,7 @@ jobs:
          GH_TOKEN: ${{ steps.app-token.outputs.token }}
       run: |
             # Ring Setup
+            Write-Output "::group::Ring Control Setup"
             Write-Output "-------------------------------------------"
             Write-Output "Ring Control Setup"
             Write-Output "-------------------------------------------"
@@ -126,7 +127,9 @@ jobs:
             Write-Output "RunRelease=$RunRelease"
             echo "RunRelease=$RunRelease" >> $env:GITHUB_OUTPUT
             Write-Output "-------------------------------------------"
+            Write-Output "::endgroup::"
             # Docs Setup
+            Write-Output "::group::Docs Setup"
             Write-Output "-------------------------------------------"
             Write-Output "Docs"
             Write-Output "-------------------------------------------"
@@ -134,8 +137,9 @@ jobs:
              Write-Output "docs_version_folder=$docs_version_folder"
             echo "docs_version_folder=$docs_version_folder" >> $env:GITHUB_OUTPUT
             Write-Output "-------------------------------------------"
-
+            Write-Output "::endgroup::"
              # Get-ReleaseDescription
+            Write-Output "::group::Release Description Setup"
             Write-Output "-------------------------------------------"
             Write-Output "Get-ReleaseDescription"
             Write-Output "-------------------------------------------"
@@ -154,6 +158,7 @@ jobs:
             echo $description >> $env:GITHUB_OUTPUT
             echo "$EOF" >> $env:GITHUB_OUTPUT
             Write-Output "-------------------------------------------"
+            Write-Output "::endgroup::"
 
     - uses: actions/upload-artifact@v4
       with:
@@ -200,6 +205,7 @@ jobs:
       id: nkdAgility_ReleaseDescription
       continue-on-error: true
       run: |
+            Write-Host "::debug::nkdAgility_ReleaseDescription | $Env:GITHUB_STEP_SUMMARY"
             $markdown = @"
                ## nkdAgility_ReleaseDescription
                ${{needs.Setup.outputs.nkdAgility_ReleaseDescription}}
