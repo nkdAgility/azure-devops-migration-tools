@@ -7,11 +7,12 @@ using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MigrationTools._EngineV1.Configuration;
+using MigrationTools.Enrichers;
 using Serilog;
 
 namespace MigrationTools
 {
-    public static partial  class ConfigurationSectionExtensions
+    public static partial class ConfigurationSectionExtensions
     {
         public static List<TMigrationOptions> ToMigrationToolsList<TMigrationOptions>(this IConfigurationSection section, Func<IConfigurationSection, TMigrationOptions> childAction)
         {
@@ -41,8 +42,6 @@ namespace MigrationTools
             Log.Debug("===================================");
             return options;
         }
-
-
 
         public static TMigrationOptions GetMigrationToolsNamedOption<TMigrationOptions>(this IConfigurationSection section)
         {
@@ -85,6 +84,48 @@ namespace MigrationTools
             return section.GetMigrationToolsOption<IProcessorConfig>("ProcessorType");
         }
 
+
+    }
+
+    public static partial class ConfigurationExtensions
+    {
+        public enum MigrationConfigVersion
+        {
+            v15,
+            v16
+        }
+
+        public static IConfiguration GetSectionCommonEnrichers_v15<TEnricherOptions>(this IConfiguration configuration, string defaults) where TEnricherOptions : IProcessorEnricherOptions
+        {
+            var configOpptions = configuration.GetSection(defaults);
+            var optionsclass = typeof(TEnricherOptions).Name;
+            configOpptions.Bind(configuration.GetSection("CommonEnrichersConfig").GetChildren().Where(x => x.GetValue<string>("$type") == optionsclass).FirstOrDefault());
+            return configOpptions;
+        }
+
+        public static MigrationConfigVersion GetMigrationConfigVersion(this IConfiguration configuration)
+        {
+            bool isOldFormat = false;
+            string configVersionString = configuration.GetValue<string>("MigrationTools:Version");
+            if (string.IsNullOrEmpty(configVersionString))
+            {
+                isOldFormat = true;
+                configVersionString = configuration.GetValue<string>("Version");
+            }
+            if (string.IsNullOrEmpty(configVersionString))
+            {
+                configVersionString = "0.0";
+            }
+            Version.TryParse(configVersionString, out Version configVersion);
+            if (configVersion < Version.Parse("16.0") || isOldFormat)
+            {
+                return MigrationConfigVersion.v15;
+            }
+            else
+            {
+                return MigrationConfigVersion.v16;
+            }
+        }
 
     }
 }

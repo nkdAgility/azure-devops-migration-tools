@@ -23,7 +23,6 @@ namespace MigrationTools.Tests
 
             // Containers
             services.AddSingleton<ProcessorContainer>();
-            services.AddSingleton<TypeDefinitionMapContainer>();
             services.AddSingleton<GitRepoMapContainer>();
             services.AddSingleton<FieldMapContainer>();
             services.AddSingleton<ChangeSetMappingContainer>();

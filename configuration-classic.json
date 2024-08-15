@@ -6,7 +6,7 @@
     "Project": "myProjectName",
     "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
     "AllowCrossProjectLinking": false,
-    "AuthenticationMode": "Prompt",
+    "AuthenticationMode": "AcessToken",
     "PersonalAccessToken": "",
     "PersonalAccessTokenVariableName": "",
     "LanguageMaps": {
@@ -21,7 +21,7 @@
     "Project": "myProjectName",
     "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
     "AllowCrossProjectLinking": false,
-    "AuthenticationMode": "Prompt",
+    "AuthenticationMode": "AcessToken",
     "PersonalAccessToken": "",
     "PersonalAccessTokenVariableName": "",
     "LanguageMaps": {
@@ -119,7 +119,22 @@
   ],
   "GitRepoMapping": {},
   "LogLevel": "Information",
-  "CommonEnrichersConfig": [],
+  "CommonEnrichersConfig": [
+    {
+      "$type": "StringManipulatorEnricherOptions",
+      "Enabled": true,
+      "MaxStringLength": 1000000,
+      "Manipulators": [
+        {
+          "$type": "RegexStringManipulator",
+          "Enabled": true,
+          "Pattern": "[^( -~)\n\r\t]+",
+          "Replacement": "",
+          "Description": "Remove invalid characters from the end of the string"
+        }
+      ]
+    }
+  ],
   "Processors": [
     {
       "$type": "WorkItemMigrationConfig",

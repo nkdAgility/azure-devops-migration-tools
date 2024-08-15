@@ -16,12 +16,12 @@ namespace MigrationTools.Enrichers
         /// List of work item mappings. 
         /// </summary>
         /// <default>{}</default>
-        public Dictionary<string, string> WorkItemTypeDefinition { get; set; }
+        public Dictionary<string, string> Mappings { get; set; }
 
         public override void SetDefaults()
         {
             Enabled = true;
-            WorkItemTypeDefinition = new Dictionary<string, string> { { "Default", "Default2" } };
+            Mappings = new Dictionary<string, string> { { "Default", "Default2" } };
         }
     }
 

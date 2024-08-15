@@ -27,7 +27,6 @@ namespace MigrationTools
             IServiceProvider services,
             IOptions<NetworkCredentialsOptions> networkCredentials,
             IOptions<EngineConfiguration> config,
-            TypeDefinitionMapContainer typeDefinitionMaps,
             ProcessorContainer processors,
             GitRepoMapContainer gitRepoMaps,
             ChangeSetMappingContainer changeSetMapps,
@@ -40,7 +39,6 @@ namespace MigrationTools
             _services = services;
             FieldMaps = fieldMaps;
             _networkCredentials = networkCredentials.Value;
-            TypeDefinitionMaps = typeDefinitionMaps;
             Processors = processors;
             GitRepoMaps = gitRepoMaps;
             ChangeSetMapps = changeSetMapps;
@@ -79,9 +77,7 @@ namespace MigrationTools
                 return _target;
             }
         }
-        
-        public TypeDefinitionMapContainer TypeDefinitionMaps { get; }
-
+    
         public ProcessingStatus Run()
         {
             _telemetryLogger.TrackEvent("EngineStart",
@@ -103,7 +99,6 @@ namespace MigrationTools
             ProcessingStatus ps = ProcessingStatus.Running;
 
             Processors.EnsureConfigured();
-            TypeDefinitionMaps.EnsureConfigured();
             GitRepoMaps.EnsureConfigured();
             ChangeSetMapps.EnsureConfigured();
             FieldMaps.EnsureConfigured();

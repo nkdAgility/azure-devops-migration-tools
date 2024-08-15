@@ -68,7 +68,7 @@
             </summary>
             <default>{}</default>
         </member>
-        <member name="P:MigrationTools.Enrichers.WorkItemTypeMappingEnricherOptions.WorkItemTypeDefinition">
+        <member name="P:MigrationTools.Enrichers.WorkItemTypeMappingEnricherOptions.Mappings">
             <summary>
             List of work item mappings. 
             </summary>
@@ -620,27 +620,27 @@
         </member>
         <member name="F:ThisAssembly.Git.Commit">
             <summary>
-            => @"cf47142"
+            => @"924a1ae"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Sha">
             <summary>
-            => @"cf47142374cd0eddb6b401e7aae9180051f6289c"
+            => @"924a1aed1b3ab8128d6d646c72e04f04882dc7f0"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.CommitDate">
             <summary>
-            => @"2024-08-15T09:44:40+01:00"
+            => @"2024-08-15T09:54:14+01:00"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commits">
             <summary>
-            => @"54"
+            => @"55"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Tag">
             <summary>
-            => @"v15.1.8-Preview.8-54-gcf47142"
+            => @"v15.1.8-Preview.8-55-g924a1ae"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseTag">
@@ -675,7 +675,7 @@
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Patch">
             <summary>
-            => @"62"
+            => @"63"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Label">

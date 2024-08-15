@@ -4,9 +4,11 @@ using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.TeamFoundation.TestManagement.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
+using MigrationTools.ProcessorEnrichers.WorkItemProcessorEnrichers;
 using MigrationTools.Processors;
 
 namespace MigrationTools.ProcessorEnrichers
@@ -14,6 +16,7 @@ namespace MigrationTools.ProcessorEnrichers
     public class TfsValidateRequiredField : WorkItemProcessorEnricher
     {
         private TfsValidateRequiredFieldOptions _Options;
+        
 
         public TfsValidateRequiredField(IOptions<TfsValidateRequiredFieldOptions> options, IServiceProvider services, ILogger<TfsValidateRequiredField> logger, ITelemetryLogger telemetryLogger) : base(services, logger, telemetryLogger)
         {
@@ -40,6 +43,7 @@ namespace MigrationTools.ProcessorEnrichers
 
         public bool ValidatingRequiredField(string fieldToFind, List<WorkItemData> sourceWorkItems)
         {
+            var workItemTypeMappingTool = Services.GetRequiredService<WorkItemTypeMappingEnricher>();
             var sourceWorkItemTypes = sourceWorkItems.Select(wid => wid.ToWorkItem().Type).Distinct();
             var targetTypes = Engine.Target.WorkItems.Project.ToProject().WorkItemTypes;
             var result = true;
@@ -47,10 +51,11 @@ namespace MigrationTools.ProcessorEnrichers
             {
                 try
                 {
+                    
                     var workItemTypeName = sourceWorkItemType.Name;
-                    if (Engine.TypeDefinitionMaps.Items.ContainsKey(workItemTypeName))
+                    if (workItemTypeMappingTool.Mappings.ContainsKey(workItemTypeName))
                     {
-                        workItemTypeName = Engine.TypeDefinitionMaps.Items[workItemTypeName].Map();
+                        workItemTypeName = workItemTypeMappingTool.Mappings[workItemTypeName];
                     }
                     var targetType = targetTypes[workItemTypeName];
 

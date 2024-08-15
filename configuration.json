@@ -32,6 +32,12 @@
       }
     },
     "CommonEnrichers": {
+      "WorkItemTypeMappingEnricher": {
+        "Enabled": false,
+        "Mappings": {
+          "Source Work Item Type Name": "Target Work Item Type Name"
+        }
+      },
       "StringManipulatorEnricher": {
         "Enabled": true,
         "MaxStringLength": 1000000,

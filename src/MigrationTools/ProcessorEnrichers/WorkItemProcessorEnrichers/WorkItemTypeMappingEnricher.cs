@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
 using MigrationTools.Processors;
+using static Microsoft.VisualStudio.Services.Graph.GraphResourceIds.Users;
 
 namespace MigrationTools.ProcessorEnrichers.WorkItemProcessorEnrichers
 {
@@ -18,6 +19,8 @@ namespace MigrationTools.ProcessorEnrichers.WorkItemProcessorEnrichers
         private Serilog.ILogger contextLog;
         private WorkItemTypeMappingEnricherOptions _options;
 
+        public Dictionary<string, string> Mappings { get; private set; }
+
         public WorkItemTypeMappingEnricher(IOptions<WorkItemTypeMappingEnricherOptions> options, IServiceProvider services, ILogger<StringManipulatorEnricher> logger, ITelemetryLogger telemetryLogger)
            : base(services, logger, telemetryLogger)
         {
@@ -26,9 +29,11 @@ namespace MigrationTools.ProcessorEnrichers.WorkItemProcessorEnrichers
                 throw new ArgumentNullException(nameof(options));
             }
             _options = options.Value;
+            Mappings = _options.Mappings;
             contextLog = Serilog.Log.ForContext<StringManipulatorEnricher>();
         }
 
+        [Obsolete]
         public override void Configure(IProcessorEnricherOptions options)
         {
             if (options is null)

@@ -137,7 +137,6 @@ namespace MigrationTools._EngineV1.Configuration
         public EngineConfiguration BuildGettingStarted()
         {
             EngineConfiguration ec = CreateEmptyConfig();
-            ec.CommonEnrichersConfig = new List<IProcessorEnricherOptions>();
             AddWorkItemMigrationDefault(ec);
             return ec;
         }
@@ -162,9 +161,6 @@ namespace MigrationTools._EngineV1.Configuration
             {
                 Version = Assembly.GetExecutingAssembly().GetName().Version.ToString(2),
                 FieldMaps = new List<IFieldMapConfig>(),
-                WorkItemTypeDefinition = new Dictionary<string, string> {
-                    { "sourceWorkItemTypeName", "targetWorkItemTypeName" }
-                },
                 Processors = new List<IProcessorConfig>(),
             };
             ec.Source = GetMigrationConfigDefault();
@@ -288,9 +284,6 @@ namespace MigrationTools._EngineV1.Configuration
             {
                 Version = Assembly.GetExecutingAssembly().GetName().Version.ToString(2),
                 FieldMaps = new List<IFieldMapConfig>(),
-                WorkItemTypeDefinition = new Dictionary<string, string> {
-                    { "sourceWorkItemTypeName", "targetWorkItemTypeName" }
-                },
                 Processors = new List<IProcessorConfig>(),
             };
             ec.Processors.Add(

@@ -27,17 +27,33 @@ namespace MigrationTools
             context.AddTransient<TfsSharedQueryProcessor>();
             context.AddTransient<TfsAreaAndIterationProcessor>();
 
-            // Singletons
-            context.AddSingleton<TfsAttachmentEnricher>().AddOptions<TfsAttachmentEnricherOptions>().Bind(configuration.GetSection(TfsAttachmentEnricherOptions.ConfigurationSectionName));
-            context.AddSingleton<TfsUserMappingEnricher>().AddOptions<TfsUserMappingEnricherOptions>().Bind(configuration.GetSection(TfsUserMappingEnricherOptions.ConfigurationSectionName));
-            context.AddSingleton<TfsValidateRequiredField>().AddOptions<TfsValidateRequiredFieldOptions>().Bind(configuration.GetSection(TfsValidateRequiredFieldOptions.ConfigurationSectionName));
-            context.AddSingleton<TfsWorkItemLinkEnricher>().AddOptions<TfsWorkItemLinkEnricherOptions>().Bind(configuration.GetSection(TfsWorkItemLinkEnricherOptions.ConfigurationSectionName));
-            context.AddSingleton<TfsWorkItemEmbededLinkEnricher>().AddOptions<TfsWorkItemEmbededLinkEnricherOptions>().Bind(configuration.GetSection(TfsWorkItemEmbededLinkEnricherOptions.ConfigurationSectionName));
-            context.AddSingleton<TfsEmbededImagesEnricher>().AddOptions<TfsEmbededImagesEnricherOptions>().Bind(configuration.GetSection(TfsEmbededImagesEnricherOptions.ConfigurationSectionName));
-            context.AddSingleton<TfsGitRepositoryEnricher>().AddOptions<TfsGitRepositoryEnricherOptions>().Bind(configuration.GetSection(TfsGitRepositoryEnricherOptions.ConfigurationSectionName));
-            context.AddSingleton<TfsNodeStructure>().AddOptions<TfsNodeStructureOptions>().Bind(configuration.GetSection(TfsNodeStructureOptions.ConfigurationSectionName));
-            context.AddSingleton<TfsRevisionManager>().AddOptions<TfsRevisionManagerOptions>().Bind(configuration.GetSection(TfsRevisionManagerOptions.ConfigurationSectionName));
-            context.AddSingleton<TfsTeamSettingsEnricher>().AddOptions<TfsTeamSettingsEnricherOptions>().Bind(configuration.GetSection(TfsTeamSettingsEnricherOptions.ConfigurationSectionName));
+            switch (configuration.GetMigrationConfigVersion())
+            {
+                case ConfigurationExtensions.MigrationConfigVersion.v15:
+                    context.AddSingleton<TfsAttachmentEnricher>().AddOptions<TfsAttachmentEnricherOptions>().Bind(configuration.GetSectionCommonEnrichers_v15<TfsAttachmentEnricherOptions>(TfsAttachmentEnricherOptions.ConfigurationSectionName));
+                    context.AddSingleton<TfsUserMappingEnricher>().AddOptions<TfsUserMappingEnricherOptions>().Bind(configuration.GetSectionCommonEnrichers_v15<TfsUserMappingEnricherOptions>(TfsUserMappingEnricherOptions.ConfigurationSectionName));
+                    context.AddSingleton<TfsValidateRequiredField>().AddOptions<TfsValidateRequiredFieldOptions>().Bind(configuration.GetSectionCommonEnrichers_v15<TfsValidateRequiredFieldOptions>(TfsValidateRequiredFieldOptions.ConfigurationSectionName));
+                    context.AddSingleton<TfsWorkItemLinkEnricher>().AddOptions<TfsWorkItemLinkEnricherOptions>().Bind(configuration.GetSectionCommonEnrichers_v15<TfsWorkItemLinkEnricherOptions>(TfsWorkItemLinkEnricherOptions.ConfigurationSectionName));
+                    context.AddSingleton<TfsWorkItemEmbededLinkEnricher>().AddOptions<TfsWorkItemEmbededLinkEnricherOptions>().Bind(configuration.GetSectionCommonEnrichers_v15<TfsWorkItemEmbededLinkEnricherOptions>(TfsWorkItemEmbededLinkEnricherOptions.ConfigurationSectionName));
+                    context.AddSingleton<TfsEmbededImagesEnricher>().AddOptions<TfsEmbededImagesEnricherOptions>().Bind(configuration.GetSectionCommonEnrichers_v15<TfsEmbededImagesEnricherOptions>(TfsEmbededImagesEnricherOptions.ConfigurationSectionName));
+                    context.AddSingleton<TfsGitRepositoryEnricher>().AddOptions<TfsGitRepositoryEnricherOptions>().Bind(configuration.GetSectionCommonEnrichers_v15<TfsGitRepositoryEnricherOptions>(TfsGitRepositoryEnricherOptions.ConfigurationSectionName));
+                    context.AddSingleton<TfsNodeStructure>().AddOptions<TfsNodeStructureOptions>().Bind(configuration.GetSectionCommonEnrichers_v15<TfsNodeStructureOptions>(TfsNodeStructureOptions.ConfigurationSectionName));
+                    context.AddSingleton<TfsRevisionManager>().AddOptions<TfsRevisionManagerOptions>().Bind(configuration.GetSectionCommonEnrichers_v15<TfsRevisionManagerOptions>(TfsRevisionManagerOptions.ConfigurationSectionName));
+                    context.AddSingleton<TfsTeamSettingsEnricher>().AddOptions<TfsTeamSettingsEnricherOptions>().Bind(configuration.GetSectionCommonEnrichers_v15<TfsTeamSettingsEnricherOptions>(TfsTeamSettingsEnricherOptions.ConfigurationSectionName));
+                    break;
+                case ConfigurationExtensions.MigrationConfigVersion.v16:
+                    context.AddSingleton<TfsAttachmentEnricher>().AddOptions<TfsAttachmentEnricherOptions>().Bind(configuration.GetSection(TfsAttachmentEnricherOptions.ConfigurationSectionName));
+                    context.AddSingleton<TfsUserMappingEnricher>().AddOptions<TfsUserMappingEnricherOptions>().Bind(configuration.GetSection(TfsUserMappingEnricherOptions.ConfigurationSectionName));
+                    context.AddSingleton<TfsValidateRequiredField>().AddOptions<TfsValidateRequiredFieldOptions>().Bind(configuration.GetSection(TfsValidateRequiredFieldOptions.ConfigurationSectionName));
+                    context.AddSingleton<TfsWorkItemLinkEnricher>().AddOptions<TfsWorkItemLinkEnricherOptions>().Bind(configuration.GetSection(TfsWorkItemLinkEnricherOptions.ConfigurationSectionName));
+                    context.AddSingleton<TfsWorkItemEmbededLinkEnricher>().AddOptions<TfsWorkItemEmbededLinkEnricherOptions>().Bind(configuration.GetSection(TfsWorkItemEmbededLinkEnricherOptions.ConfigurationSectionName));
+                    context.AddSingleton<TfsEmbededImagesEnricher>().AddOptions<TfsEmbededImagesEnricherOptions>().Bind(configuration.GetSection(TfsEmbededImagesEnricherOptions.ConfigurationSectionName));
+                    context.AddSingleton<TfsGitRepositoryEnricher>().AddOptions<TfsGitRepositoryEnricherOptions>().Bind(configuration.GetSection(TfsGitRepositoryEnricherOptions.ConfigurationSectionName));
+                    context.AddSingleton<TfsNodeStructure>().AddOptions<TfsNodeStructureOptions>().Bind(configuration.GetSection(TfsNodeStructureOptions.ConfigurationSectionName));
+                    context.AddSingleton<TfsRevisionManager>().AddOptions<TfsRevisionManagerOptions>().Bind(configuration.GetSection(TfsRevisionManagerOptions.ConfigurationSectionName));
+                    context.AddSingleton<TfsTeamSettingsEnricher>().AddOptions<TfsTeamSettingsEnricherOptions>().Bind(configuration.GetSection(TfsTeamSettingsEnricherOptions.ConfigurationSectionName));
+                    break;
+            }
             context.AddSingleton<TfsStaticEnrichers>();
 
             // EndPoint Enrichers

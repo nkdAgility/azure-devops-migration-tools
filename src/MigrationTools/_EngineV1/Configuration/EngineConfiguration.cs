@@ -17,9 +17,7 @@ namespace MigrationTools._EngineV1.Configuration
         public Dictionary<string, string> GitRepoMapping { get; set; } = new Dictionary<string, string>();
 
         public string LogLevel { get; private set; }
-        public List<IProcessorEnricherOptions> CommonEnrichersConfig { get; set; } = new List<IProcessorEnricherOptions>();
         public List<IProcessorConfig> Processors { get; set; }
         public string Version { get; set; }
-        public Dictionary<string, string> WorkItemTypeDefinition { get; set; } = new Dictionary<string, string>();
     }
 }

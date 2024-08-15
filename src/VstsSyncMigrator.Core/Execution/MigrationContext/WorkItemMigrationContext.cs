@@ -91,26 +91,6 @@ namespace VstsSyncMigrator.Engine
         public override void Configure(IProcessorConfig config)
         {
             _config = (WorkItemMigrationConfig)config;
-
-            ImportCommonEnricherConfigs();
-        }
-
-        private void ImportCommonEnricherConfigs()
-        {
-            /// setup _engineConfig.CommonEnrichersConfig
-            if (_engineConfig.CommonEnrichersConfig == null)
-            {
-                Log.LogError("CommonEnrichersConfig cant be Null! it must be a minimum of `[]`");
-                Environment.Exit(-1);
-            }
-
-            PullCommonEnrichersConfig<TfsNodeStructure, TfsNodeStructureOptions>(_engineConfig.CommonEnrichersConfig, TfsStaticEnrichers.NodeStructure);
-            PullCommonEnrichersConfig<TfsRevisionManager, TfsRevisionManagerOptions>(_engineConfig.CommonEnrichersConfig,  TfsStaticEnrichers.RevisionManager);
-            PullCommonEnrichersConfig<TfsWorkItemLinkEnricher, TfsWorkItemLinkEnricherOptions>(_engineConfig.CommonEnrichersConfig,  TfsStaticEnrichers.WorkItemLink);
-            PullCommonEnrichersConfig<StringManipulatorEnricher, StringManipulatorEnricherOptions>(_engineConfig.CommonEnrichersConfig, StaticEnrichers.StringManipulator);
-            PullCommonEnrichersConfig<TfsAttachmentEnricher, TfsAttachmentEnricherOptions>(_engineConfig.CommonEnrichersConfig,  TfsStaticEnrichers.Attachment);
-            PullCommonEnrichersConfig<TfsUserMappingEnricher, TfsUserMappingEnricherOptions>(_engineConfig.CommonEnrichersConfig,  TfsStaticEnrichers.UserMapping);
-            PullCommonEnrichersConfig<TfsTeamSettingsEnricher, TfsTeamSettingsEnricherOptions>(_engineConfig.CommonEnrichersConfig, TfsStaticEnrichers.TeamSettings);
         }
 
         internal void TraceWriteLine(LogEventLevel level, string message, Dictionary<string, object> properties = null)
@@ -318,6 +298,7 @@ namespace VstsSyncMigrator.Engine
         private void ValiddateWorkItemTypesExistInTarget(List<WorkItemData> sourceWorkItems)
         {
             contextLog.Information("Validating::Check that all work item types needed in the Target exist or are mapped");
+            var workItemTypeMappingTool = Services.GetRequiredService<WorkItemTypeMappingEnricher>();
             // get list of all work item types
             List<String> sourceWorkItemTypes = sourceWorkItems.SelectMany(x => x.Revisions.Values)
             //.Where(x => x.Fields[fieldName].Value.ToString().Contains("\\"))
@@ -339,7 +320,7 @@ namespace VstsSyncMigrator.Engine
                 foreach (var missingWorkItemType in missingWorkItemTypes)
                 {
                     bool thisTypeMapped = true;
-                    if (!Engine.TypeDefinitionMaps.Items.ContainsKey(missingWorkItemType))
+                    if (!workItemTypeMappingTool.Mappings.ContainsKey(missingWorkItemType))
                     {
                         thisTypeMapped = false;
                     }
@@ -698,6 +679,7 @@ namespace VstsSyncMigrator.Engine
 
         private WorkItemData ReplayRevisions(List<RevisionItem> revisionsToMigrate, WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
         {
+            var workItemTypeMappingTool = Services.GetRequiredService<WorkItemTypeMappingEnricher>();
             try
             {
                 //If work item hasn't been created yet, create a shell
@@ -711,9 +693,9 @@ namespace VstsSyncMigrator.Engine
                         TraceWriteLine(LogEventLevel.Information, $"WorkItem has changed type at one of the revisions, from {targetType} to {finalDestType}");
                     }
 
-                    if (Engine.TypeDefinitionMaps.Items.ContainsKey(targetType))
+                    if (workItemTypeMappingTool.Mappings.ContainsKey(targetType))
                     {
-                        targetType = Engine.TypeDefinitionMaps.Items[targetType].Map();
+                        targetType = workItemTypeMappingTool.Mappings[targetType];
                     }
                     targetWorkItem = CreateWorkItem_Shell(Engine.Target.WorkItems.Project, sourceWorkItem, targetType);
                 }
@@ -734,9 +716,9 @@ namespace VstsSyncMigrator.Engine
 
                     // Decide on WIT
                     var destType = currentRevisionWorkItem.Type;
-                    if (Engine.TypeDefinitionMaps.Items.ContainsKey(destType))
+                    if (workItemTypeMappingTool.Mappings.ContainsKey(destType))
                     {
-                        destType = Engine.TypeDefinitionMaps.Items[destType].Map();
+                        destType = workItemTypeMappingTool.Mappings[destType];
                     }
                     bool typeChange = (destType != targetWorkItem.Type);
 

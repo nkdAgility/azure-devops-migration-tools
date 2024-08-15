@@ -75,8 +75,6 @@ namespace VstsSyncMigrator.Engine
         public override void Configure(IProcessorConfig config)
         {
             _config = (TestPlansAndSuitesMigrationConfig)config;
-
-            PullCommonEnrichersConfig<TfsNodeStructure, TfsNodeStructureOptions>(_engineConfig.CommonEnrichersConfig, _nodeStructureEnricher);
             
         }
 

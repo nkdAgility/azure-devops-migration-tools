@@ -34,6 +34,7 @@ using static System.Collections.Specialized.BitVector32;
 using System.Text.Json;
 using MigrationTools.Enrichers;
 using Newtonsoft.Json;
+using static MigrationTools.ConfigurationExtensions;
 
 namespace MigrationTools.Host
 {
@@ -109,7 +110,7 @@ namespace MigrationTools.Host
                            Environment.Exit(-1);
                        }
                        logger.LogInformation("Config Found, creating engine host");
-                       MigrationConfigVersion configVersion = GetMigrationConfigVersion(configuration);
+                       MigrationConfigVersion configVersion = configuration.GetMigrationConfigVersion();
                        switch (configVersion)
                        {
                            case MigrationConfigVersion.v15:
@@ -119,12 +120,10 @@ namespace MigrationTools.Host
                                options.ChangeSetMappingFile = parsed.ChangeSetMappingFile;
                                options.FieldMaps = parsed.FieldMaps;
                                options.GitRepoMapping = parsed.GitRepoMapping;
-                               options.CommonEnrichersConfig = parsed.CommonEnrichersConfig;
                                options.Processors = parsed.Processors;
                                options.Source = parsed.Source;
                                options.Target = parsed.Target;
                                options.Version = parsed.Version;
-                               options.WorkItemTypeDefinition = parsed.WorkItemTypeDefinition;
                                break;
                            case MigrationConfigVersion.v16:
                                // This code Converts the new config format to the v1 and v2 runtme format.
@@ -137,10 +136,6 @@ namespace MigrationTools.Host
                                options.FieldMaps = configuration.GetSection("MigrationTools:CommonEnrichers:TfsFieldMappings:FieldMaps")?.ToMigrationToolsList<IFieldMapConfig>(child => child.GetMigrationToolsOption<IFieldMapConfig>("FieldMapType"));
 
                                options.GitRepoMapping = configuration.GetSection("MigrationTools:CommonEnrichers:TfsGitRepoMappings:WorkItemGitRepos").Get<Dictionary<string, string>>();
-
-                               options.WorkItemTypeDefinition = configuration.GetSection("MigrationTools:CommonEnrichers:WorkItemTypeMappingEnricher:WorkItemTypeDefinition").Get<Dictionary<string, string>>();
-
-                               options.CommonEnrichersConfig = configuration.GetSection("MigrationTools:CommonEnrichers")?.ToMigrationToolsList<IProcessorEnricherOptions>(child => child.GetMigrationToolsNamedOption<IProcessorEnricherOptions>());
 
                                options.Processors = configuration.GetSection("MigrationTools:Processors")?.ToMigrationToolsList<IProcessorConfig>(child => child.GetMigrationToolsOption<IProcessorConfig>("ProcessorType"));
 
@@ -209,29 +204,6 @@ namespace MigrationTools.Host
             return hostBuilder;
         }
 
-        private static MigrationConfigVersion GetMigrationConfigVersion(IConfiguration configuration)
-        {
-            bool isOldFormat = false;
-            string configVersionString = configuration.GetValue<string>("MigrationTools:Version");
-            if (string.IsNullOrEmpty(configVersionString))
-            {
-                isOldFormat = true;
-                configVersionString = configuration.GetValue<string>("Version");
-            }
-            if (string.IsNullOrEmpty(configVersionString))
-            {
-                configVersionString = "0.0";
-            }
-            Version.TryParse(configVersionString, out Version configVersion);
-            if (configVersion < Version.Parse("16.0") || isOldFormat)
-            {
-                return MigrationConfigVersion.v15;
-            } else
-            {
-                return MigrationConfigVersion.v16;
-            }
-        }
-
         static string logDate = DateTime.Now.ToString("yyyyMMddHHmmss");
 
         private static string CreateLogsPath()
@@ -247,14 +219,5 @@ namespace MigrationTools.Host
             return exportPath;
         }
 
-    }
-}
-
-namespace MigrationTools.Host
-{
-    public enum MigrationConfigVersion
-    {
-        v15,
-        v16
     }
 }

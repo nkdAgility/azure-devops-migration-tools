@@ -8,6 +8,7 @@ namespace MigrationTools.Enrichers
     public class StringManipulatorEnricherOptions : ProcessorEnricherOptions
     {
         public const string ConfigurationSectionName = "MigrationTools:CommonEnrichers:StringManipulatorEnricher";
+        public const string ConfigurationSectionName_clasic = "MigrationTools:CommonEnrichers:StringManipulatorEnricher";
 
         public override Type ToConfigure => typeof(StringManipulatorEnricher);
 

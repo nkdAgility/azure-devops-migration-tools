@@ -55,20 +55,8 @@ namespace VstsSyncMigrator.Core.Execution.MigrationContext
         public override void Configure(IProcessorConfig config)
         {
             _config = (ExportUsersForMappingConfig)config;
-            ImportCommonEnricherConfigs();
-
         }
 
-        private void ImportCommonEnricherConfigs()
-        {
-            /// setup _engineConfig.CommonEnrichersConfig
-            if (_engineConfig.CommonEnrichersConfig == null)
-            {
-                Log.LogError("CommonEnrichersConfig cant be Null! it must be a minimum of `[]`");
-                Environment.Exit(-1);
-            }
-            PullCommonEnrichersConfig<TfsUserMappingEnricher, TfsUserMappingEnricherOptions>(_engineConfig.CommonEnrichersConfig, _TfsUserMappingEnricher);
-        }
 
         protected override void InternalExecute()
         {
