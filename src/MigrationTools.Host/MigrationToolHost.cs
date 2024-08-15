@@ -104,7 +104,6 @@ namespace MigrationTools.Host
                                Log.Warning("!!ACTION REQUIRED!! You are using a deprecated version of the configuration, please update to v16. backward compatability will be removed in a future version.");
                                //logger.LogCritical("The config file {ConfigFile} uses an outdated format. We are continuing to support this format through a grace period. Use '{ExecutableName}.exe init' to create a new configuration file and port over your old configuration.", configFile, Assembly.GetEntryAssembly().GetName().Name);
                                var parsed = reader.BuildFromFile(configFile); // TODO revert tp 
-                               options.Processors = parsed.Processors;
                                options.Source = parsed.Source;
                                options.Target = parsed.Target;
                                options.Version = parsed.Version;
@@ -112,8 +111,6 @@ namespace MigrationTools.Host
                            case MigrationConfigVersion.v16:
                                // This code Converts the new config format to the v1 and v2 runtme format.
                                options.Version = configuration.GetValue<string>("MigrationTools:Version");
-
-                               options.Processors = configuration.GetSection("MigrationTools:Processors")?.ToMigrationToolsList<IProcessorConfig>(child => child.GetMigrationToolsOption<IProcessorConfig>("ProcessorType"));
 
                                options.Source = configuration.GetSection("MigrationTools:Source")?.GetMigrationToolsOption<IMigrationClientConfig>("EndpointType");
                                options.Target = configuration.GetSection("MigrationTools:Target")?.GetMigrationToolsOption<IMigrationClientConfig>("EndpointType");

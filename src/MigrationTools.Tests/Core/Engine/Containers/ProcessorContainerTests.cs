@@ -5,19 +5,21 @@ using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Containers;
+using MigrationTools.Processors;
 
 namespace MigrationTools.Engine.Containers.Tests
 {
     [TestClass()]
     public class ProcessorContainerTests
     {
-        private IOptions<EngineConfiguration> CreateEngineConfiguration()
+        private IOptions<ProcessorContainerOptions> CreateProcessorContainerOptions()
         {
-            var ecb = new EngineConfigurationBuilder(new NullLogger<EngineConfigurationBuilder>());
-            var ec = ecb.CreateEmptyConfig();
-            var opts = Microsoft.Extensions.Options.Options.Create(ec);
+            var options = new ProcessorContainerOptions();
+            options.Enabled = true;
+            var opts = Microsoft.Extensions.Options.Options.Create(options);
             return opts;
         }
+
 
         private IServiceProvider CreateServiceProvider()
         {
@@ -30,7 +32,7 @@ namespace MigrationTools.Engine.Containers.Tests
         [TestMethod(), TestCategory("L0")]
         public void ProcessorContainerTest()
         {
-            var config = CreateEngineConfiguration();
+            var config = CreateProcessorContainerOptions();
             var testSimple = new SimpleProcessorConfigMock();
 
             Assert.AreEqual(0, config.Value.Processors.Count);
@@ -39,9 +41,7 @@ namespace MigrationTools.Engine.Containers.Tests
             config.Value.Processors.Add(testSimple);
 
             Assert.AreEqual(1, config.Value.Processors.Count);
-
-            var processorContainer = new ProcessorContainer(CreateServiceProvider(), config, new NullLogger<ProcessorContainer>());
-
+            var processorContainer = ActivatorUtilities.CreateInstance<ProcessorContainer>(CreateServiceProvider(), config, new NullLogger<ProcessorContainer>());
             Assert.AreEqual(1, processorContainer.Count);
         }
     }

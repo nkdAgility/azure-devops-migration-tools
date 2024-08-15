@@ -86,10 +86,9 @@ namespace MigrationTools
 
             ProcessingStatus ps = ProcessingStatus.Running;
 
-            Processors.EnsureConfigured();
 
             _logger.LogInformation("Beginning run of {ProcessorCount} processors", Processors.Count.ToString());
-            foreach (_EngineV1.Containers.IProcessor process in Processors.Items)
+            foreach (_EngineV1.Containers.IProcessor process in Processors.Processors)
             {
                 _logger.LogInformation("Processor: {ProcessorName}", process.Name);
                 Stopwatch processorTimer = Stopwatch.StartNew();

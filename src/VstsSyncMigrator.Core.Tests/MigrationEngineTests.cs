@@ -52,7 +52,6 @@ namespace _VstsSyncMigrator.Engine.Tests
         public void TestEngineExecuteEmptyProcessors()
         {
             EngineConfiguration ec = _services.GetRequiredService<EngineConfiguration>();
-            ec.Processors.Clear();
             IMigrationEngine me = _services.GetRequiredService<IMigrationEngine>();
             me.Run();
         }

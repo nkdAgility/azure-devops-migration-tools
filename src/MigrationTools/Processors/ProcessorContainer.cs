@@ -2,40 +2,52 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MigrationTools._EngineV1.Configuration;
+using MigrationTools._EngineV1.Containers;
+using MigrationTools.DataContracts;
+using MigrationTools.Enrichers;
+using MigrationTools.Processors;
 
-namespace MigrationTools._EngineV1.Containers
+namespace MigrationTools.Processors
 {
-    public class ProcessorContainer : EngineContainer<ReadOnlyCollection<IProcessor>>
+    public class ProcessorContainer
     {
-        private List<IProcessor> _Processors = new List<IProcessor>();
-        private readonly ILogger<ProcessorContainer> _logger;
+        private IServiceProvider _services;
+        private ILogger<ProcessorContainer> _logger;
+        private ProcessorContainerOptions _Options;
 
-        public override ReadOnlyCollection<IProcessor> Items
+        private List<IProcessor> processors;
+
+        public int Count { get { return processors.Count; } }
+
+        public ReadOnlyCollection<IProcessor> Processors
         {
             get
             {
-                EnsureConfigured();
-                return _Processors.AsReadOnly();
+                return new ReadOnlyCollection<IProcessor>(processors);
             }
         }
 
-        public int Count { get { EnsureConfigured(); return _Processors.Count; } }
 
-        public ProcessorContainer(IServiceProvider services, IOptions<EngineConfiguration> config, ILogger<ProcessorContainer> logger) : base(services, config)
+        public ProcessorContainer(IOptions<ProcessorContainerOptions> options, IServiceProvider services, ILogger<ProcessorContainer> logger, ITelemetryLogger telemetry)
         {
+            _services = services;
             _logger = logger;
+            _Options = options.Value;
+            LoadProcessorsfromOptions(_Options);
         }
 
-        protected override void Configure()
+        private void LoadProcessorsfromOptions(ProcessorContainerOptions options)
         {
-            if (Config.Processors != null)
+            if (options.Processors != null)
             {
-                var enabledProcessors = Config.Processors.Where(x => x.Enabled).ToList();
-                _logger.LogInformation("ProcessorContainer: Of {ProcessorCount} configured Processors only {EnabledProcessorCount} are enabled", Config.Processors.Count, enabledProcessors.Count);
+                var enabledProcessors = options.Processors.Where(x => x.Enabled).ToList();
+                _logger.LogInformation("ProcessorContainer: Of {ProcessorCount} configured Processors only {EnabledProcessorCount} are enabled", options.Processors.Count, enabledProcessors.Count);
                 var allTypes = AppDomain.CurrentDomain.GetAssemblies()
                     .Where(a => !a.IsDynamic)
                     .SelectMany(a => a.GetTypes()).ToList();
@@ -56,9 +68,9 @@ namespace MigrationTools._EngineV1.Containers
                             throw new Exception("Type " + typePattern + " not found.");
                         }
 
-                        IProcessor pc = (IProcessor)Services.GetRequiredService(type);
+                        IProcessor pc = (IProcessor)_services.GetRequiredService(type);
                         pc.Configure(processorConfig);
-                        _Processors.Add(pc);
+                        processors.Add(pc);
                     }
                     else
                     {

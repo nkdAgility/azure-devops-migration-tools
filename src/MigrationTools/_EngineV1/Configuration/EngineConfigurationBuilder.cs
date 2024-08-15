@@ -106,14 +106,14 @@ namespace MigrationTools._EngineV1.Configuration
             AddExampleFieldMapps(ec);
             AddWorkItemMigrationDefault(ec);
             AddTestPlansMigrationDefault(ec);
-            ec.Processors.Add(new ImportProfilePictureConfig());
-            ec.Processors.Add(new ExportProfilePictureFromADConfig());
-            ec.Processors.Add(new FixGitCommitLinksConfig() { TargetRepository = "targetProjectName" });
-            ec.Processors.Add(new WorkItemBulkEditProcessorConfig());
-            ec.Processors.Add(new WorkItemPostProcessingConfig() { WorkItemIDs = new List<int> { 1, 2, 3 } });
-            ec.Processors.Add(new WorkItemDeleteConfig());
-            ec.Processors.Add(new WorkItemQueryMigrationConfig() { SourceToTargetFieldMappings = new Dictionary<string, string>() { { "SourceFieldRef", "TargetFieldRef" } } });
-            ec.Processors.Add(new TeamMigrationConfig());
+            //ec.Processors.Add(new ImportProfilePictureConfig());
+            //ec.Processors.Add(new ExportProfilePictureFromADConfig());
+            //ec.Processors.Add(new FixGitCommitLinksConfig() { TargetRepository = "targetProjectName" });
+            //ec.Processors.Add(new WorkItemBulkEditProcessorConfig());
+            //ec.Processors.Add(new WorkItemPostProcessingConfig() { WorkItemIDs = new List<int> { 1, 2, 3 } });
+            //ec.Processors.Add(new WorkItemDeleteConfig());
+            //ec.Processors.Add(new WorkItemQueryMigrationConfig() { SourceToTargetFieldMappings = new Dictionary<string, string>() { { "SourceFieldRef", "TargetFieldRef" } } });
+            //ec.Processors.Add(new TeamMigrationConfig());
             return ec;
         }
 
@@ -123,14 +123,14 @@ namespace MigrationTools._EngineV1.Configuration
             AddExampleFieldMapps(ec);
             AddWorkItemMigrationDefault(ec);
             AddTestPlansMigrationDefault(ec);
-            ec.Processors.Add(new ImportProfilePictureConfig());
-            ec.Processors.Add(new ExportProfilePictureFromADConfig());
-            ec.Processors.Add(new FixGitCommitLinksConfig() { TargetRepository = "targetProjectName" });
-            ec.Processors.Add(new WorkItemBulkEditProcessorConfig());
-            ec.Processors.Add(new WorkItemPostProcessingConfig() { WorkItemIDs = new List<int> { 1, 2, 3 } });
-            ec.Processors.Add(new WorkItemDeleteConfig());
-            ec.Processors.Add(new WorkItemQueryMigrationConfig() { SourceToTargetFieldMappings = new Dictionary<string, string>() { { "SourceFieldRef", "TargetFieldRef" } } });
-            ec.Processors.Add(new TeamMigrationConfig());
+            //ec.Processors.Add(new ImportProfilePictureConfig());
+            //ec.Processors.Add(new ExportProfilePictureFromADConfig());
+            //ec.Processors.Add(new FixGitCommitLinksConfig() { TargetRepository = "targetProjectName" });
+            //ec.Processors.Add(new WorkItemBulkEditProcessorConfig());
+            //ec.Processors.Add(new WorkItemPostProcessingConfig() { WorkItemIDs = new List<int> { 1, 2, 3 } });
+            //ec.Processors.Add(new WorkItemDeleteConfig());
+            //ec.Processors.Add(new WorkItemQueryMigrationConfig() { SourceToTargetFieldMappings = new Dictionary<string, string>() { { "SourceFieldRef", "TargetFieldRef" } } });
+            //ec.Processors.Add(new TeamMigrationConfig());
             return ec;
         }
 
@@ -152,7 +152,7 @@ namespace MigrationTools._EngineV1.Configuration
         private void AddWorkItemMigrationDefault(EngineConfiguration ec)
         {
             var config = new WorkItemMigrationConfig();
-            ec.Processors.Add(config);
+            //ec.Processors.Add(config);
         }
 
         public EngineConfiguration CreateEmptyConfig()
@@ -160,7 +160,7 @@ namespace MigrationTools._EngineV1.Configuration
             EngineConfiguration ec = new EngineConfiguration
             {
                 Version = Assembly.GetExecutingAssembly().GetName().Version.ToString(2),
-                Processors = new List<IProcessorConfig>(),
+                //Processors = new List<IProcessorConfig>(),
             };
             ec.Source = GetMigrationConfigDefault();
             ec.Target = GetMigrationConfigDefault();
@@ -169,9 +169,9 @@ namespace MigrationTools._EngineV1.Configuration
 
         private void AddTestPlansMigrationDefault(EngineConfiguration ec)
         {
-            ec.Processors.Add(new TestVariablesMigrationConfig());
-            ec.Processors.Add(new TestConfigurationsMigrationConfig());
-            ec.Processors.Add(new TestPlansAndSuitesMigrationConfig());
+            //ec.Processors.Add(new TestVariablesMigrationConfig());
+            //ec.Processors.Add(new TestConfigurationsMigrationConfig());
+            //ec.Processors.Add(new TestPlansAndSuitesMigrationConfig());
             //ec.Processors.Add(new TestRunsMigrationConfig());
         }
 
@@ -282,19 +282,19 @@ namespace MigrationTools._EngineV1.Configuration
             EngineConfiguration ec = new EngineConfiguration
             {
                 Version = Assembly.GetExecutingAssembly().GetName().Version.ToString(2),
-                Processors = new List<IProcessorConfig>(),
+                //Processors = new List<IProcessorConfig>(),
             };
-            ec.Processors.Add(
-                new WorkItemTrackingProcessorOptions
-                {
-                    Enabled = true,
-                    CollapseRevisions = false,
-                    ReplayRevisions = true,
-                    WorkItemCreateRetryLimit = 5,
-                    ProcessorEnrichers = GetAllTypes<IProcessorEnricherOptions>(),
-                    SourceName = "Source",
-                    TargetName = "Target",
-                });
+            //ec.Processors.Add(
+            //    new WorkItemTrackingProcessorOptions
+            //    {
+            //        Enabled = true,
+            //        CollapseRevisions = false,
+            //        ReplayRevisions = true,
+            //        WorkItemCreateRetryLimit = 5,
+            //        ProcessorEnrichers = GetAllTypes<IProcessorEnricherOptions>(),
+            //        SourceName = "Source",
+            //        TargetName = "Target",
+            //    });
             return ec;
         }
 

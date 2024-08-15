@@ -28,7 +28,7 @@ namespace MigrationTools.Host.Tests
         public void TestEngineExecuteEmptyProcessors()
         {
             EngineConfiguration ec = host.Services.GetRequiredService<EngineConfiguration>();
-            ec.Processors.Clear();
+            //ec.Processors.Clear();
             IMigrationEngine me = host.Services.GetRequiredService<IMigrationEngine>();
             me.Run();
         }
@@ -38,7 +38,7 @@ namespace MigrationTools.Host.Tests
         public void TestEngineExecuteEmptyFieldMaps()
         {
             EngineConfiguration ec = host.Services.GetRequiredService<EngineConfiguration>();
-            ec.Processors.Clear();
+            //ec.Processors.Clear();
             //ec.FieldMaps.Clear();
             IMigrationEngine me = host.Services.GetRequiredService<IMigrationEngine>();
             me.Run();
