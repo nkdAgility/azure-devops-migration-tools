@@ -193,7 +193,7 @@ jobs:
                  - HasChanged_automation: ${{needs.Setup.outputs.HasChanged_automation}}
                ## nkdAgility_ReleaseDescription
                ${{needs.Setup.outputs.nkdAgility_ReleaseDescription}}
-            "@
+"@
             echo $markdown >> $Env:GITHUB_STEP_SUMMARY
     
   # Build, Test, Sonar Cloud Analysis, & Package
