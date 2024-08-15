@@ -57,11 +57,11 @@
         "ExportBasePath": "c:\\temp\\WorkItemAttachmentExport",
         "MaxRevisions": 480000000
       },
-      "TfsChangeSetMapping": {
+      "TfsChangeSetMappingTool": {
         "Enabled": true,
         "File": "C:\\temp\\ChangeSetMappingFile.json"
       },
-      "TfsFieldMappings": {
+      "FieldMappingTool": {
         "Enabled": true,
         "FieldMaps": [
           {

@@ -4,6 +4,9 @@ using MigrationTools;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Configuration.Processing;
 using MigrationTools._EngineV1.Processors;
+using MigrationTools.Enrichers;
+using MigrationTools.ProcessorEnrichers;
+using VstsSyncMigrator.Core.Execution;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -13,14 +16,14 @@ namespace VstsSyncMigrator.Engine
     /// <status>preview</status>
     /// <processingtarget>Shared Queries</processingtarget>
     [Obsolete("WorkItemQueryMigrationContext has been migrated to TfsSharedQueryProcessor: https://nkdagility.com/docs/azure-devops-migration-tools/Reference/Processors/TfsSharedQueryProcessor.html")]
-    public class WorkItemQueryMigrationContext : MigrationProcessorBase
+    public class WorkItemQueryMigrationContext : TfsMigrationProcessorBase
     {
         /// <summary>
         /// The processor configuration
         /// </summary>
         private WorkItemQueryMigrationConfig config;
 
-        public WorkItemQueryMigrationContext(IMigrationEngine engine, IServiceProvider services, ITelemetryLogger telemetry, ILogger<WorkItemQueryMigrationContext> logger) : base(engine, services, telemetry, logger)
+        public WorkItemQueryMigrationContext(IMigrationEngine engine, TfsStaticEnrichers tfsStaticEnrichers, StaticEnrichers staticEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<MigrationProcessorBase> logger) : base(engine, tfsStaticEnrichers, staticEnrichers, services, telemetry, logger)
         {
         }
 

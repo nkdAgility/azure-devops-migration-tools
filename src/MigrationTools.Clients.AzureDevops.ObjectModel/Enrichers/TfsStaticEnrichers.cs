@@ -24,7 +24,6 @@ namespace MigrationTools.Enrichers
         public TfsEmbededImagesEnricher EmbededImages { get; private set; }
 
         public TfsGitRepositoryEnricher GitRepository { get; private set; }
-        
         public TfsStaticEnrichers(ITelemetryLogger telemetry,
                                         ILogger<TfsStaticEnrichers> logger,
                                         TfsUserMappingEnricher userMappingEnricher,
@@ -34,7 +33,10 @@ namespace MigrationTools.Enrichers
                                         TfsWorkItemLinkEnricher workItemLinkEnricher,
                                         TfsWorkItemEmbededLinkEnricher workItemEmbeddedLinkEnricher,
                                         TfsValidateRequiredField requiredFieldValidator,
-                                        TfsTeamSettingsEnricher teamSettingsEnricher, TfsEmbededImagesEnricher embededImagesEnricher, TfsGitRepositoryEnricher tfsGitRepositoryEnricher)
+                                        TfsTeamSettingsEnricher teamSettingsEnricher,
+                                        TfsEmbededImagesEnricher embededImagesEnricher,
+                                        TfsGitRepositoryEnricher tfsGitRepositoryEnricher
+            )
         {
             UserMapping = userMappingEnricher;
             Attachment = attachmentEnricher;
@@ -46,7 +48,6 @@ namespace MigrationTools.Enrichers
             TeamSettings = teamSettingsEnricher;
             EmbededImages = embededImagesEnricher;
             GitRepository = tfsGitRepositoryEnricher;
-
         }
 
     }

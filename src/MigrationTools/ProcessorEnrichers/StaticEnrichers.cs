@@ -9,10 +9,13 @@ namespace MigrationTools.ProcessorEnrichers
     {
         public StringManipulatorEnricher StringManipulator { get; private set; }
         public WorkItemTypeMappingEnricher WorkItemTypeMapping { get; private set; }
-        public StaticEnrichers(StringManipulatorEnricher stringManipulatorEnricher, WorkItemTypeMappingEnricher workItemTypeMapping)
+
+        public FieldMappingTool FieldMappingTool { get; private set; }
+        public StaticEnrichers(StringManipulatorEnricher stringManipulatorEnricher, WorkItemTypeMappingEnricher workItemTypeMapping, FieldMappingTool fieldMappingTool)
         {
             StringManipulator = stringManipulatorEnricher;
             WorkItemTypeMapping = workItemTypeMapping;
+            FieldMappingTool = fieldMappingTool;
         }
 
     }

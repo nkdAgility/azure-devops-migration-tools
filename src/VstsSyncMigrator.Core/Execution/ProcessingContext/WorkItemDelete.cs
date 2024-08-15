@@ -8,7 +8,10 @@ using MigrationTools;
 using MigrationTools._EngineV1.Clients;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Configuration.Processing;
+using MigrationTools.Enrichers;
+using MigrationTools.ProcessorEnrichers;
 using VstsSyncMigrator._EngineV1.Processors;
+using VstsSyncMigrator.Core.Execution;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -18,12 +21,11 @@ namespace VstsSyncMigrator.Engine
     /// </summary>
     /// <status>ready</status>
     /// <processingtarget>WorkItem</processingtarget>
-    public class WorkItemDelete : StaticProcessorBase
+    public class WorkItemDelete : TfsStaticProcessorBase
     {
         private WorkItemDeleteConfig _config;
 
-        public WorkItemDelete(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<WorkItemDelete> logger)
-            : base(services, me, telemetry, logger)
+        public WorkItemDelete(TfsStaticEnrichers tfsStaticEnrichers, StaticEnrichers staticEnrichers, IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<StaticProcessorBase> logger) : base(tfsStaticEnrichers, staticEnrichers, services, me, telemetry, logger)
         {
         }
 

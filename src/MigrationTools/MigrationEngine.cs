@@ -29,14 +29,12 @@ namespace MigrationTools
             IOptions<EngineConfiguration> config,
             ProcessorContainer processors,
             GitRepoMapContainer gitRepoMaps,
-            FieldMapContainer fieldMaps,
             ITelemetryLogger telemetry,
             ILogger<MigrationEngine> logger)
         {
             _logger = logger;
             _logger.LogInformation("Creating Migration Engine {SessionId}", telemetry.SessionId);
             _services = services;
-            FieldMaps = fieldMaps;
             _networkCredentials = networkCredentials.Value;
             Processors = processors;
             GitRepoMaps = gitRepoMaps;
@@ -44,8 +42,6 @@ namespace MigrationTools
             _engineConfiguration = config.Value;
         }
         
-        public FieldMapContainer FieldMaps { get; }
-
         public GitRepoMapContainer GitRepoMaps { get; }
 
         public ProcessorContainer Processors { get; }
@@ -81,8 +77,7 @@ namespace MigrationTools
                     { "Engine", "Migration" }
                 },
                 new Dictionary<string, double> {
-                    { "Processors", Processors.Count },
-                    { "Mappings", FieldMaps.Count }
+                    { "Processors", Processors.Count }
                 });
             Stopwatch engineTimer = Stopwatch.StartNew();
 
@@ -96,7 +91,6 @@ namespace MigrationTools
 
             Processors.EnsureConfigured();
             GitRepoMaps.EnsureConfigured();
-            FieldMaps.EnsureConfigured();
 
             _logger.LogInformation("Beginning run of {ProcessorCount} processors", Processors.Count.ToString());
             foreach (_EngineV1.Containers.IProcessor process in Processors.Items)

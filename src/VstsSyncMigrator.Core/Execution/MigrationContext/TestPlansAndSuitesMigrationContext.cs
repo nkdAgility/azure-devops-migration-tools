@@ -24,6 +24,8 @@ using MigrationTools._EngineV1.Processors;
 using MigrationTools.DataContracts;
 using MigrationTools.DataContracts.Pipelines;
 using MigrationTools.Enrichers;
+using MigrationTools.ProcessorEnrichers;
+using VstsSyncMigrator.Core.Execution;
 using VstsSyncMigrator.Engine.ComponentContext;
 using Environment = System.Environment;
 
@@ -34,7 +36,7 @@ namespace VstsSyncMigrator.Engine
     /// </summary>
     /// <status>Beta</status>
     /// <processingtarget>Suites &amp; Plans</processingtarget>
-    public class TestPlansAndSuitesMigrationContext : MigrationProcessorBase
+    public class TestPlansAndSuitesMigrationContext : TfsMigrationProcessorBase
     {
         private int __currentSuite = 0;
         private int __totalSuites = 0;
@@ -52,16 +54,9 @@ namespace VstsSyncMigrator.Engine
         private TfsNodeStructure _nodeStructureEnricher;
         private readonly EngineConfiguration _engineConfig;
 
-        public TestPlansAndSuitesMigrationContext(IMigrationEngine engine,
-                                                   IServiceProvider services,
-                                                   ITelemetryLogger telemetry,
-                                                   ILogger<TestPlansAndSuitesMigrationContext> logger,
-                                                   TfsNodeStructure nodeStructureEnricher,
-                                                   IOptions<EngineConfiguration> engineConfig)
-            : base(engine, services, telemetry, logger)
+        public TestPlansAndSuitesMigrationContext(IOptions<EngineConfiguration> engineConfig, IMigrationEngine engine, TfsStaticEnrichers tfsStaticEnrichers, StaticEnrichers staticEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<MigrationProcessorBase> logger) : base(engine, tfsStaticEnrichers, staticEnrichers, services, telemetry, logger)
         {
             _engineConfig = engineConfig.Value;
-            _nodeStructureEnricher = nodeStructureEnricher;
         }
 
         public override string Name
@@ -356,7 +351,7 @@ namespace VstsSyncMigrator.Engine
             targetWI.ToWorkItem().AreaPath = _nodeStructureEnricher.GetNewNodeName(sourceWI.ToWorkItem().AreaPath, TfsNodeStructureType.Area);
             targetWI.ToWorkItem().IterationPath = _nodeStructureEnricher.GetNewNodeName(sourceWI.ToWorkItem().IterationPath, TfsNodeStructureType.Iteration);
 
-            Engine.FieldMaps.ApplyFieldMappings(sourceWI, targetWI);
+            StaticEnrichers.FieldMappingTool.ApplyFieldMappings(sourceWI, targetWI);
             targetWI.SaveToAzureDevOps();
         }
 

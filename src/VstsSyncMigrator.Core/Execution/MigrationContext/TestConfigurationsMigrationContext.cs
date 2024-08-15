@@ -5,6 +5,9 @@ using Microsoft.TeamFoundation.TestManagement.Client;
 using MigrationTools;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Processors;
+using MigrationTools.Enrichers;
+using MigrationTools.ProcessorEnrichers;
+using VstsSyncMigrator.Core.Execution;
 using VstsSyncMigrator.Engine.ComponentContext;
 
 namespace VstsSyncMigrator.Engine
@@ -14,13 +17,15 @@ namespace VstsSyncMigrator.Engine
     /// </summary>
     /// <status>Beta</status>
     /// <processingtarget>Suites &amp; Plans</processingtarget>
-    public class TestConfigurationsMigrationContext : MigrationProcessorBase
+    public class TestConfigurationsMigrationContext : TfsMigrationProcessorBase
     {
-        // http://blogs.microsoft.co.il/shair/2015/02/02/tfs-api-part-56-test-configurations/
-
-        public TestConfigurationsMigrationContext(IMigrationEngine engine, IServiceProvider services, ITelemetryLogger telemetry, ILogger<TestConfigurationsMigrationContext> logger) : base(engine, services, telemetry, logger)
+        public TestConfigurationsMigrationContext(IMigrationEngine engine, TfsStaticEnrichers tfsStaticEnrichers, StaticEnrichers staticEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<MigrationProcessorBase> logger) : base(engine, tfsStaticEnrichers, staticEnrichers, services, telemetry, logger)
         {
         }
+
+        // http://blogs.microsoft.co.il/shair/2015/02/02/tfs-api-part-56-test-configurations/
+
+
 
         public override string Name
         {

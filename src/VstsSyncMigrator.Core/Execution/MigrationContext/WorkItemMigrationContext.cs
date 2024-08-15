@@ -37,6 +37,7 @@ using MigrationTools.ProcessorEnrichers.WorkItemProcessorEnrichers;
 using Newtonsoft.Json.Linq;
 using Serilog.Context;
 using Serilog.Events;
+using VstsSyncMigrator.Core.Execution;
 using ILogger = Serilog.ILogger;
 
 namespace VstsSyncMigrator.Engine
@@ -47,7 +48,7 @@ namespace VstsSyncMigrator.Engine
     /// </summary>
     /// <status>ready</status>
     /// <processingtarget>Work Items</processingtarget>
-    public class WorkItemMigrationContext : MigrationProcessorBase
+    public class WorkItemMigrationContext : TfsMigrationProcessorBase
     {
 
         private static int _count = 0;
@@ -66,8 +67,6 @@ namespace VstsSyncMigrator.Engine
         private ILogger workItemLog;
         private List<string> _itemsInError;
 
-        public TfsStaticEnrichers TfsStaticEnrichers { get; private set; }
-        public StaticEnrichers StaticEnrichers { get; private set; }
 
         public WorkItemMigrationContext(IMigrationEngine engine,
                                         IServiceProvider services,
@@ -76,14 +75,11 @@ namespace VstsSyncMigrator.Engine
                                         TfsStaticEnrichers tfsStaticEnrichers,
                                         IOptions<EngineConfiguration> engineConfig,
                                         StaticEnrichers staticEnrichers)
-            : base(engine, services, telemetry, logger)
+            : base(engine, tfsStaticEnrichers, staticEnrichers, services, telemetry, logger)
         {
             _telemetry = telemetry;
             _engineConfig = engineConfig.Value;
             contextLog = Serilog.Log.ForContext<WorkItemMigrationContext>();
-            //
-            TfsStaticEnrichers = tfsStaticEnrichers ?? throw new ArgumentNullException(nameof(tfsStaticEnrichers));
-            StaticEnrichers = staticEnrichers ?? throw new ArgumentNullException(nameof(staticEnrichers));
         }
 
         public override string Name => "WorkItemMigration";
@@ -805,7 +801,7 @@ namespace VstsSyncMigrator.Engine
                     targetWorkItem.ToWorkItem().Fields["System.History"].Value = revision.Fields["System.History"].Value;
 
                     // Todo: Ensure all field maps use WorkItemData.Fields to apply a correct mapping
-                    Engine.FieldMaps.ApplyFieldMappings(currentRevisionWorkItem, targetWorkItem);
+                    StaticEnrichers.FieldMappingTool.ApplyFieldMappings(currentRevisionWorkItem, targetWorkItem);
 
                     // Todo: Think about an "UpdateChangedBy" flag as this is expensive! (2s/WI instead of 1,5s when writing "Migration")
 

@@ -44,7 +44,7 @@ namespace MigrationTools
                     context.AddSingleton<WorkItemTypeMappingEnricher>().AddOptions<WorkItemTypeMappingEnricherOptions>().Bind(configuration.GetSection(WorkItemTypeMappingEnricherOptions.ConfigurationSectionName));
                     break;
             }
-  
+            context.AddSingleton<FieldMappingTool>().AddSingleton<IConfigureOptions<FieldMappingToolOptions>, FieldMappingToolOptions.ConfigureOptions>();
             context.AddSingleton<StaticEnrichers>();
 
 
@@ -70,11 +70,7 @@ namespace MigrationTools
             // Containers
             context.AddSingleton<ProcessorContainer>();
             context.AddSingleton<GitRepoMapContainer>();
-            context.AddSingleton<FieldMapContainer>();
             //Engine
-            context.AddSingleton<FieldMapContainer>();
-            context.AddSingleton<ProcessorContainer>();
-            context.AddSingleton<GitRepoMapContainer>();
             context.AddSingleton<IMigrationEngine, MigrationEngine>();
         }
     }

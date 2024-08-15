@@ -6,7 +6,10 @@ using MigrationTools;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Configuration.Processing;
 using MigrationTools.DataContracts;
+using MigrationTools.Enrichers;
+using MigrationTools.ProcessorEnrichers;
 using VstsSyncMigrator._EngineV1.Processors;
+using VstsSyncMigrator.Core.Execution;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -14,11 +17,11 @@ namespace VstsSyncMigrator.Engine
     /// This processor allows you to make changes in place where we load from teh Target and update the Target. This is used for bulk updates with the most common reason being a process template change.
     /// </summary>
     /// <processingtarget>WorkItem</processingtarget>
-    public class WorkItemBulkEditProcessor : StaticProcessorBase
+    public class WorkItemBulkEditProcessor : TfsStaticProcessorBase
     {
         private WorkItemBulkEditProcessorConfig _config;
 
-        public WorkItemBulkEditProcessor(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<WorkItemBulkEditProcessor> logger) : base(services, me, telemetry, logger)
+        public WorkItemBulkEditProcessor(TfsStaticEnrichers tfsStaticEnrichers, StaticEnrichers staticEnrichers, IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<StaticProcessorBase> logger) : base(tfsStaticEnrichers, staticEnrichers, services, me, telemetry, logger)
         {
         }
 
@@ -50,7 +53,7 @@ namespace VstsSyncMigrator.Engine
                 Stopwatch witstopwatch = Stopwatch.StartNew();
                 workitem.ToWorkItem().Open();
                 Log.LogInformation("Processing work item {0} - Type:{1} - ChangedDate:{2} - CreatedDate:{3}", workitem.Id, workitem.Type, workitem.ToWorkItem().ChangedDate.ToShortDateString(), workitem.ToWorkItem().CreatedDate.ToShortDateString());
-                Engine.FieldMaps.ApplyFieldMappings(workitem);
+               StaticEnrichers.FieldMappingTool.ApplyFieldMappings(workitem);
 
                 if (workitem.ToWorkItem().IsDirty)
                 {

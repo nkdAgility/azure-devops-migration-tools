@@ -1,38 +1,42 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MigrationTools._EngineV1.Configuration;
+using MigrationTools._EngineV1.Containers;
 using MigrationTools.DataContracts;
+using MigrationTools.Enrichers;
+using MigrationTools.Processors;
 
-namespace MigrationTools._EngineV1.Containers
+namespace MigrationTools.ProcessorEnrichers.WorkItemProcessorEnrichers
 {
-    public class FieldMapContainer : EngineContainer<Dictionary<string, List<IFieldMap>>>
+    public class FieldMappingTool : WorkItemProcessorEnricher
     {
-        private Dictionary<string, List<IFieldMap>> fieldMapps = new Dictionary<string, List<IFieldMap>>();
-        private readonly ILogger<FieldMapContainer> _logger;
+        private ILogger<WorkItemProcessorEnricher> _logger;
+        private FieldMappingToolOptions _Options;
 
-        public FieldMapContainer(IServiceProvider services, IOptions<EngineConfiguration> config, ILogger<FieldMapContainer> logger) : base(services, config)
-        {
-            _logger = logger;
-        }
+        private Dictionary<string, List<IFieldMap>> fieldMapps = new Dictionary<string, List<IFieldMap>>();
 
         public int Count { get { return fieldMapps.Count; } }
 
-        public override Dictionary<string, List<IFieldMap>> Items
+        public Dictionary<string, List<IFieldMap>> Items
         {
             get { return fieldMapps; }
         }
 
-        protected override void Configure()
+        public FieldMappingTool(IOptions<FieldMappingToolOptions> options, IServiceProvider services, ILogger<WorkItemProcessorEnricher> logger, ITelemetryLogger telemetry) : base(services, logger, telemetry)
         {
-            if (Config.FieldMaps != null)
+            _logger = logger;
+            _Options = options.Value;
+            if (_Options.FieldMaps != null)
             {
-                foreach (IFieldMapConfig fieldmapConfig in Config.FieldMaps)
+                foreach (IFieldMapConfig fieldmapConfig in _Options.FieldMaps)
                 {
-                    _logger.LogInformation("FieldMapContainer: Adding FieldMap {FieldMapName} for {WorkItemTypeName}", fieldmapConfig.FieldMap, fieldmapConfig.WorkItemTypeName);
+                    _logger.LogInformation("FieldMappingTool: Adding FieldMap {FieldMapName} for {WorkItemTypeName}", fieldmapConfig.FieldMap, fieldmapConfig.WorkItemTypeName);
                     string typePattern = $"MigrationTools.Sinks.*.FieldMaps.{fieldmapConfig.FieldMap}";
 
                     Type type = AppDomain.CurrentDomain.GetAssemblies()
@@ -50,7 +54,29 @@ namespace MigrationTools._EngineV1.Containers
                     AddFieldMap(fieldmapConfig.WorkItemTypeName, fm);
                 }
             }
+
         }
+
+
+        [Obsolete]
+        public override void Configure(IProcessorEnricherOptions options)
+        {
+            throw new NotImplementedException();
+        }
+
+
+        protected override void EntryForProcessorType(Processors.IProcessor processor)
+        {
+            throw new NotImplementedException();
+        }
+
+
+
+        protected override void RefreshForProcessorType(Processors.IProcessor processor)
+        {
+            throw new NotImplementedException();
+        }
+
 
         public void AddFieldMap(string workItemTypeName, IFieldMap fieldToTagFieldMap)
         {

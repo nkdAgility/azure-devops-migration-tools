@@ -160,7 +160,6 @@ namespace MigrationTools._EngineV1.Configuration
             EngineConfiguration ec = new EngineConfiguration
             {
                 Version = Assembly.GetExecutingAssembly().GetName().Version.ToString(2),
-                FieldMaps = new List<IFieldMapConfig>(),
                 Processors = new List<IProcessorConfig>(),
             };
             ec.Source = GetMigrationConfigDefault();
@@ -178,90 +177,90 @@ namespace MigrationTools._EngineV1.Configuration
 
         private void AddExampleFieldMapps(EngineConfiguration ec)
         {
-            ec.FieldMaps.Add(new MultiValueConditionalMapConfig()
-            {
-                WorkItemTypeName = "*",
-                sourceFieldsAndValues = new Dictionary<string, string>
-                 {
-                     { "Field1", "Value1" },
-                     { "Field2", "Value2" }
-                 },
-                targetFieldsAndValues = new Dictionary<string, string>
-                 {
-                     { "Field1", "Value1" },
-                     { "Field2", "Value2" }
-                 }
-            });
-            ec.FieldMaps.Add(new FieldSkipMapConfig()
-            {
-                WorkItemTypeName = "*",
-                targetField = "TfsMigrationTool.ReflectedWorkItemId"
-            });
-            ec.FieldMaps.Add(new FieldValueMapConfig()
-            {
-                WorkItemTypeName = "*",
-                sourceField = "System.State",
-                targetField = "System.State",
-                defaultValue = "New",
-                valueMapping = new Dictionary<string, string> {
-                    { "Approved", "New" },
-                    { "New", "New" },
-                    { "Committed", "Active" },
-                    { "In Progress", "Active" },
-                    { "To Do", "New" },
-                    { "Done", "Closed" },
-                    { "Removed", "Removed" }
-                }
-            });
-            ec.FieldMaps.Add(new FieldtoFieldMapConfig()
-            {
-                WorkItemTypeName = "*",
-                sourceField = "Microsoft.VSTS.Common.BacklogPriority",
-                targetField = "Microsoft.VSTS.Common.StackRank"
-            });
-            ec.FieldMaps.Add(new FieldtoFieldMultiMapConfig()
-            {
-                WorkItemTypeName = "*",
-                SourceToTargetMappings = new Dictionary<string, string>
-                {
-                    {"SourceField1", "TargetField1" },
-                    {"SourceField2", "TargetField2" }
-                }
-            });
-            ec.FieldMaps.Add(new FieldtoTagMapConfig()
-            {
-                WorkItemTypeName = "*",
-                sourceField = "System.State",
-                formatExpression = "ScrumState:{0}"
-            });
-            ec.FieldMaps.Add(new FieldMergeMapConfig()
-            {
-                WorkItemTypeName = "*",
-                sourceFields = new List<string> { "System.Description" , "Microsoft.VSTS.Common.AcceptanceCriteria" },
-                targetField = "System.Description",
-                formatExpression = @"{0} <br/><br/><h3>Acceptance Criteria</h3>{1}"
-            });
-            ec.FieldMaps.Add(new RegexFieldMapConfig()
-            {
-                WorkItemTypeName = "*",
-                sourceField = "COMPANY.PRODUCT.Release",
-                targetField = "COMPANY.DEVISION.MinorReleaseVersion",
-                pattern = @"PRODUCT \d{4}.(\d{1})",
-                replacement = "$1"
-            });
-            ec.FieldMaps.Add(new FieldValuetoTagMapConfig()
-            {
-                WorkItemTypeName = "*",
-                sourceField = "Microsoft.VSTS.CMMI.Blocked",
-                pattern = @"Yes",
-                formatExpression = "{0}"
-            });
-            ec.FieldMaps.Add(new TreeToTagMapConfig()
-            {
-                WorkItemTypeName = "*",
-                timeTravel = 1,
-                toSkip = 3
-            });
+            //ec.FieldMaps.Add(new MultiValueConditionalMapConfig()
+            //{
+            //    WorkItemTypeName = "*",
+            //    sourceFieldsAndValues = new Dictionary<string, string>
+            //     {
+            //         { "Field1", "Value1" },
+            //         { "Field2", "Value2" }
+            //     },
+            //    targetFieldsAndValues = new Dictionary<string, string>
+            //     {
+            //         { "Field1", "Value1" },
+            //         { "Field2", "Value2" }
+            //     }
+            //});
+            //ec.FieldMaps.Add(new FieldSkipMapConfig()
+            //{
+            //    WorkItemTypeName = "*",
+            //    targetField = "TfsMigrationTool.ReflectedWorkItemId"
+            //});
+            //ec.FieldMaps.Add(new FieldValueMapConfig()
+            //{
+            //    WorkItemTypeName = "*",
+            //    sourceField = "System.State",
+            //    targetField = "System.State",
+            //    defaultValue = "New",
+            //    valueMapping = new Dictionary<string, string> {
+            //        { "Approved", "New" },
+            //        { "New", "New" },
+            //        { "Committed", "Active" },
+            //        { "In Progress", "Active" },
+            //        { "To Do", "New" },
+            //        { "Done", "Closed" },
+            //        { "Removed", "Removed" }
+            //    }
+            //});
+            //ec.FieldMaps.Add(new FieldtoFieldMapConfig()
+            //{
+            //    WorkItemTypeName = "*",
+            //    sourceField = "Microsoft.VSTS.Common.BacklogPriority",
+            //    targetField = "Microsoft.VSTS.Common.StackRank"
+            //});
+            //ec.FieldMaps.Add(new FieldtoFieldMultiMapConfig()
+            //{
+            //    WorkItemTypeName = "*",
+            //    SourceToTargetMappings = new Dictionary<string, string>
+            //    {
+            //        {"SourceField1", "TargetField1" },
+            //        {"SourceField2", "TargetField2" }
+            //    }
+            //});
+            //ec.FieldMaps.Add(new FieldtoTagMapConfig()
+            //{
+            //    WorkItemTypeName = "*",
+            //    sourceField = "System.State",
+            //    formatExpression = "ScrumState:{0}"
+            //});
+            //ec.FieldMaps.Add(new FieldMergeMapConfig()
+            //{
+            //    WorkItemTypeName = "*",
+            //    sourceFields = new List<string> { "System.Description" , "Microsoft.VSTS.Common.AcceptanceCriteria" },
+            //    targetField = "System.Description",
+            //    formatExpression = @"{0} <br/><br/><h3>Acceptance Criteria</h3>{1}"
+            //});
+            //ec.FieldMaps.Add(new RegexFieldMapConfig()
+            //{
+            //    WorkItemTypeName = "*",
+            //    sourceField = "COMPANY.PRODUCT.Release",
+            //    targetField = "COMPANY.DEVISION.MinorReleaseVersion",
+            //    pattern = @"PRODUCT \d{4}.(\d{1})",
+            //    replacement = "$1"
+            //});
+            //ec.FieldMaps.Add(new FieldValuetoTagMapConfig()
+            //{
+            //    WorkItemTypeName = "*",
+            //    sourceField = "Microsoft.VSTS.CMMI.Blocked",
+            //    pattern = @"Yes",
+            //    formatExpression = "{0}"
+            //});
+            //ec.FieldMaps.Add(new TreeToTagMapConfig()
+            //{
+            //    WorkItemTypeName = "*",
+            //    timeTravel = 1,
+            //    toSkip = 3
+            //});
         }
 
         private IMigrationClientConfig GetMigrationConfigDefault()
@@ -283,7 +282,6 @@ namespace MigrationTools._EngineV1.Configuration
             EngineConfiguration ec = new EngineConfiguration
             {
                 Version = Assembly.GetExecutingAssembly().GetName().Version.ToString(2),
-                FieldMaps = new List<IFieldMapConfig>(),
                 Processors = new List<IProcessorConfig>(),
             };
             ec.Processors.Add(

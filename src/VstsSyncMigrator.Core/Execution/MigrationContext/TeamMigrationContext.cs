@@ -4,6 +4,9 @@ using MigrationTools;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Configuration.Processing;
 using MigrationTools._EngineV1.Processors;
+using MigrationTools.Enrichers;
+using MigrationTools.ProcessorEnrichers;
+using VstsSyncMigrator.Core.Execution;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -12,11 +15,11 @@ namespace VstsSyncMigrator.Engine
     /// </summary>
     /// <status>preview</status>
     /// <processingtarget>Teams</processingtarget>
-    public class TeamMigrationContext : MigrationProcessorBase
+    public class TeamMigrationContext : TfsMigrationProcessorBase
     {
         private TeamMigrationConfig _config;
 
-        public TeamMigrationContext(IMigrationEngine engine, IServiceProvider services, ITelemetryLogger telemetry, ILogger<TeamMigrationContext> logger) : base(engine, services, telemetry, logger)
+        public TeamMigrationContext(IMigrationEngine engine, TfsStaticEnrichers tfsStaticEnrichers, StaticEnrichers staticEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<MigrationProcessorBase> logger) : base(engine, tfsStaticEnrichers, staticEnrichers, services, telemetry, logger)
         {
         }
 

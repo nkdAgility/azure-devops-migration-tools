@@ -13,6 +13,8 @@ using MigrationTools._EngineV1.DataContracts;
 using MigrationTools._EngineV1.Processors;
 using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
+using MigrationTools.ProcessorEnrichers;
+using VstsSyncMigrator.Core.Execution;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -21,23 +23,12 @@ namespace VstsSyncMigrator.Engine
     /// </summary>
     /// <status>preview</status>
     /// <processingtarget>Work Items</processingtarget>
-    public class WorkItemPostProcessingContext : MigrationProcessorBase
+    public class WorkItemPostProcessingContext : TfsMigrationProcessorBase
     {
         private WorkItemPostProcessingConfig _config;
-        private TfsWorkItemEmbededLinkEnricher _workItemEmbeddedLinkEnricher;
-        private TfsEmbededImagesEnricher _workItemEmbededImagesEnricher;
 
-        public WorkItemPostProcessingContext(
-            IMigrationEngine engine,
-            IServiceProvider services,
-            ITelemetryLogger telemetry,
-            TfsWorkItemEmbededLinkEnricher workItemEmbeddedLinkEnricher,
-            TfsEmbededImagesEnricher embededImagesEnricher,
-            ILogger<WorkItemPostProcessingContext> logger)
-            : base(engine, services, telemetry, logger)
+        public WorkItemPostProcessingContext(IMigrationEngine engine, TfsStaticEnrichers tfsStaticEnrichers, StaticEnrichers staticEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<MigrationProcessorBase> logger) : base(engine, tfsStaticEnrichers, staticEnrichers, services, telemetry, logger)
         {
-            _workItemEmbeddedLinkEnricher = workItemEmbeddedLinkEnricher;
-            _workItemEmbededImagesEnricher = embededImagesEnricher;
         }
 
         public override string Name
@@ -85,9 +76,9 @@ namespace VstsSyncMigrator.Engine
                 {
                     Log.LogInformation("...Exists");
                     TfsExtensions.ToWorkItem(targetFound).Open();
-                    Engine.FieldMaps.ApplyFieldMappings(sourceWI, targetFound);
-                    _workItemEmbeddedLinkEnricher.Enrich(null, targetFound);
-                    _workItemEmbededImagesEnricher.Enrich(sourceWI, targetFound);
+                   StaticEnrichers.FieldMappingTool.ApplyFieldMappings(sourceWI, targetFound);
+                   TfsStaticEnrichers.WorkItemEmbededLink.Enrich(null, targetFound);
+                    TfsStaticEnrichers.EmbededImages.Enrich(sourceWI, targetFound);
                     if (TfsExtensions.ToWorkItem(targetFound).IsDirty)
                     {
                         try

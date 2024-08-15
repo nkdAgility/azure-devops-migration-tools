@@ -117,7 +117,6 @@ namespace MigrationTools.Host
                                Log.Warning("!!ACTION REQUIRED!! You are using a deprecated version of the configuration, please update to v16. backward compatability will be removed in a future version.");
                                //logger.LogCritical("The config file {ConfigFile} uses an outdated format. We are continuing to support this format through a grace period. Use '{ExecutableName}.exe init' to create a new configuration file and port over your old configuration.", configFile, Assembly.GetEntryAssembly().GetName().Name);
                                var parsed = reader.BuildFromFile(configFile); // TODO revert tp 
-                               options.FieldMaps = parsed.FieldMaps;
                                options.GitRepoMapping = parsed.GitRepoMapping;
                                options.Processors = parsed.Processors;
                                options.Source = parsed.Source;
@@ -127,10 +126,6 @@ namespace MigrationTools.Host
                            case MigrationConfigVersion.v16:
                                // This code Converts the new config format to the v1 and v2 runtme format.
                                options.Version = configuration.GetValue<string>("MigrationTools:Version");
-
-                               //options.FieldMaps = configuration.GetSection("MigrationTools:FieldMaps").Get<IFieldMap[]>();
-
-                               options.FieldMaps = configuration.GetSection("MigrationTools:CommonEnrichers:TfsFieldMappings:FieldMaps")?.ToMigrationToolsList<IFieldMapConfig>(child => child.GetMigrationToolsOption<IFieldMapConfig>("FieldMapType"));
 
                                options.GitRepoMapping = configuration.GetSection("MigrationTools:CommonEnrichers:TfsGitRepoMappings:WorkItemGitRepos").Get<Dictionary<string, string>>();
 

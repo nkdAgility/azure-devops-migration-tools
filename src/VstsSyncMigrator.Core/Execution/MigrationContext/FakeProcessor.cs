@@ -6,6 +6,7 @@ using MigrationTools;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Processors;
 using MigrationTools.DataContracts;
+using MigrationTools.ProcessorEnrichers;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -14,7 +15,7 @@ namespace VstsSyncMigrator.Engine
     /// </summary>
     public class FakeProcessor : MigrationProcessorBase
     {
-        public FakeProcessor(IMigrationEngine engine, IServiceProvider services, ITelemetryLogger telemetry, ILogger<FakeProcessor> logger) : base(engine, services, telemetry, logger)
+        public FakeProcessor(IMigrationEngine engine, StaticEnrichers staticEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<MigrationProcessorBase> logger) : base(engine, staticEnrichers, services, telemetry, logger)
         {
         }
 

@@ -32,17 +32,26 @@ namespace MigrationTools
             switch (configuration.GetMigrationConfigVersion())
             {
                 case ConfigurationExtensions.MigrationConfigVersion.before16:
-
                     context.AddSingleton<TfsAttachmentEnricher>().AddSingleton<IOptions<TfsAttachmentEnricherOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<TfsAttachmentEnricherOptions>(TfsAttachmentEnricherOptions.ConfigurationSectionName)));
+
                     context.AddSingleton<TfsUserMappingEnricher>().AddSingleton<IOptions<TfsUserMappingEnricherOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<TfsUserMappingEnricherOptions>(TfsUserMappingEnricherOptions.ConfigurationSectionName)));
+
                     context.AddSingleton<TfsValidateRequiredField>().AddSingleton<IOptions<TfsValidateRequiredFieldOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<TfsValidateRequiredFieldOptions>(TfsValidateRequiredFieldOptions.ConfigurationSectionName)));
+
                     context.AddSingleton<TfsWorkItemLinkEnricher>().AddSingleton<IOptions<TfsWorkItemLinkEnricherOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<TfsWorkItemLinkEnricherOptions>(TfsWorkItemLinkEnricherOptions.ConfigurationSectionName)));
+
                     context.AddSingleton<TfsWorkItemEmbededLinkEnricher>().AddSingleton<IOptions<TfsWorkItemEmbededLinkEnricherOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<TfsWorkItemEmbededLinkEnricherOptions>(TfsWorkItemEmbededLinkEnricherOptions.ConfigurationSectionName)));
+
                     context.AddSingleton<TfsEmbededImagesEnricher>().AddSingleton<IOptions<TfsEmbededImagesEnricherOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<TfsEmbededImagesEnricherOptions>(TfsEmbededImagesEnricherOptions.ConfigurationSectionName)));
+
                     context.AddSingleton<TfsGitRepositoryEnricher>().AddSingleton<IOptions<TfsGitRepositoryEnricherOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<TfsGitRepositoryEnricherOptions>(TfsGitRepositoryEnricherOptions.ConfigurationSectionName)));
+
                     context.AddSingleton<TfsNodeStructure>().AddSingleton<IOptions<TfsNodeStructureOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<TfsNodeStructureOptions>(TfsNodeStructureOptions.ConfigurationSectionName)));
+
                     context.AddSingleton<TfsRevisionManager>().AddSingleton<IOptions<TfsRevisionManagerOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<TfsRevisionManagerOptions>(TfsRevisionManagerOptions.ConfigurationSectionName)));
+
                     context.AddSingleton<TfsTeamSettingsEnricher>().AddSingleton<IOptions<TfsTeamSettingsEnricherOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<TfsTeamSettingsEnricherOptions>(TfsTeamSettingsEnricherOptions.ConfigurationSectionName)));
+
                     break;
                 case ConfigurationExtensions.MigrationConfigVersion.v16:
                     context.AddSingleton<TfsAttachmentEnricher>().AddOptions<TfsAttachmentEnricherOptions>().Bind(configuration.GetSection(TfsAttachmentEnricherOptions.ConfigurationSectionName));
@@ -57,6 +66,7 @@ namespace MigrationTools
                     context.AddSingleton<TfsTeamSettingsEnricher>().AddOptions<TfsTeamSettingsEnricherOptions>().Bind(configuration.GetSection(TfsTeamSettingsEnricherOptions.ConfigurationSectionName));
                     break;
             }
+
             context.AddSingleton<TfsStaticEnrichers>();
 
             // EndPoint Enrichers

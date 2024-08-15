@@ -12,7 +12,10 @@ using Microsoft.TeamFoundation.Framework.Common;
 using MigrationTools;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Configuration.Processing;
+using MigrationTools.Enrichers;
+using MigrationTools.ProcessorEnrichers;
 using VstsSyncMigrator._EngineV1.Processors;
+using VstsSyncMigrator.Core.Execution;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -21,10 +24,14 @@ namespace VstsSyncMigrator.Engine
     /// </summary>
     /// <status>alpha</status>
     /// <processingtarget>Profiles</processingtarget>
-    public class ExportProfilePictureFromADContext : StaticProcessorBase
+    public class ExportProfilePictureFromADContext : TfsStaticProcessorBase
     {
         private IIdentityManagementService2 ims2;
         private ExportProfilePictureFromADConfig config;
+
+        public ExportProfilePictureFromADContext(TfsStaticEnrichers tfsStaticEnrichers, StaticEnrichers staticEnrichers, IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<StaticProcessorBase> logger) : base(tfsStaticEnrichers, staticEnrichers, services, me, telemetry, logger)
+        {
+        }
 
         public override string Name
         {
@@ -34,9 +41,6 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        public ExportProfilePictureFromADContext(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<ExportProfilePictureFromADContext> logger) : base(services, me, telemetry, logger)
-        {
-        }
 
         public override void Configure(IProcessorConfig config)
         {

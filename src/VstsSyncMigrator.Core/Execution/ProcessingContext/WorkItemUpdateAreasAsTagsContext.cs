@@ -9,7 +9,10 @@ using MigrationTools._EngineV1.Clients;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Configuration.Processing;
 using MigrationTools.DataContracts;
+using MigrationTools.Enrichers;
+using MigrationTools.ProcessorEnrichers;
 using VstsSyncMigrator._EngineV1.Processors;
+using VstsSyncMigrator.Core.Execution;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -18,12 +21,11 @@ namespace VstsSyncMigrator.Engine
     /// </summary>
     /// <status>Beta</status>
     /// <processingtarget>Work Item</processingtarget>
-    public class WorkItemUpdateAreasAsTagsContext : StaticProcessorBase
+    public class WorkItemUpdateAreasAsTagsContext : TfsStaticProcessorBase
     {
         private WorkItemUpdateAreasAsTagsConfig config;
 
-        public WorkItemUpdateAreasAsTagsContext(IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<WorkItemUpdateAreasAsTagsContext> logger)
-            : base(services, me, telemetry, logger)
+        public WorkItemUpdateAreasAsTagsContext(TfsStaticEnrichers tfsStaticEnrichers, StaticEnrichers staticEnrichers, IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<StaticProcessorBase> logger) : base(tfsStaticEnrichers, staticEnrichers, services, me, telemetry, logger)
         {
         }
 

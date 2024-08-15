@@ -26,7 +26,7 @@ namespace VstsSyncMigrator.Core.Execution.MigrationContext
     /// </summary>
     /// <status>ready</status>
     /// <processingtarget>Work Items</processingtarget>
-    public class ExportUsersForMappingContext : MigrationProcessorBase
+    public class ExportUsersForMappingContext : TfsMigrationProcessorBase
     {
         private ExportUsersForMappingConfig _config;
         private TfsUserMappingEnricher _TfsUserMappingEnricher;
@@ -45,11 +45,10 @@ namespace VstsSyncMigrator.Core.Execution.MigrationContext
 
         private EngineConfiguration _engineConfig;
 
-        public ExportUsersForMappingContext(IMigrationEngine engine, IServiceProvider services, ITelemetryLogger telemetry, ILogger<ExportUsersForMappingContext> logger, IOptions<EngineConfiguration> engineConfig, TfsUserMappingEnricher userMappingEnricher) : base(engine, services, telemetry, logger)
+        public ExportUsersForMappingContext(IOptions<EngineConfiguration> engineConfig, IMigrationEngine engine, TfsStaticEnrichers tfsStaticEnrichers, StaticEnrichers staticEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<ExportUsersForMappingContext> logger) : base(engine, tfsStaticEnrichers, staticEnrichers, services, telemetry, logger)
         {
-                Logger = logger;
-                _engineConfig = engineConfig.Value;
-            _TfsUserMappingEnricher = userMappingEnricher;
+            Logger = logger;
+            _engineConfig =  engineConfig.Value;
         }
 
         public override void Configure(IProcessorConfig config)

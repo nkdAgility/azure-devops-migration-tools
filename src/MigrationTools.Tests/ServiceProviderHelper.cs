@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using MigrationTools._EngineV1.Containers;
 using MigrationTools.EndpointEnrichers;
 using MigrationTools.Endpoints;
+using MigrationTools.Engine.Containers.Tests;
 using MigrationTools.Enrichers;
 using MigrationTools.Helpers.Tests;
 using MigrationTools.ProcessorEnrichers.WorkItemProcessorEnrichers;
@@ -24,7 +25,6 @@ namespace MigrationTools.Tests
             // Containers
             services.AddSingleton<ProcessorContainer>();
             services.AddSingleton<GitRepoMapContainer>();
-            services.AddSingleton<FieldMapContainer>();
 
             services.AddSingleton<ITelemetryLogger, TelemetryClientAdapter>();
 
@@ -38,6 +38,7 @@ namespace MigrationTools.Tests
 
             services.AddSingleton<IMigrationToolVersionInfo, FakeMigrationToolVersionInfo>();
             services.AddSingleton<IMigrationToolVersion, FakeMigrationToolVersion>();
+            services.AddTransient<SimpleFieldMapMock>();
 
             return services.BuildServiceProvider();
         }
