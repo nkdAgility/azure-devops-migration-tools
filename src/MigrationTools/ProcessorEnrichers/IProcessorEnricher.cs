@@ -18,8 +18,5 @@ namespace MigrationTools.Enrichers
         void ProcessorExecutionBeforeProcessWorkItem(IProcessor processor, WorkItemData workitem);
 
         void ProcessorExecutionWithFieldItem(IProcessor processor, FieldItem fieldItem);
-
-        [Obsolete("Move to loading from Options pattern")]
-        void Configure(IProcessorEnricherOptions options);
     }
 }

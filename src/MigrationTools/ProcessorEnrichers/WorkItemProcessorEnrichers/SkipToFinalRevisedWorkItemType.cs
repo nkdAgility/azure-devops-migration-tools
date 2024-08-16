@@ -22,11 +22,6 @@ namespace MigrationTools.Enrichers
             Engine = Services.GetRequiredService<IMigrationEngine>();
         }
 
-        public override void Configure(IProcessorEnricherOptions options)
-        {
-            _Options = (StringManipulatorEnricherOptions)options;
-        }
-
         protected override void RefreshForProcessorType(IProcessor processor)
         {
             throw new NotImplementedException();

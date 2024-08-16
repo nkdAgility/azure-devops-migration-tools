@@ -25,19 +25,6 @@ namespace MigrationTools.ProcessorEnrichers.WorkItemProcessorEnrichers
             contextLog = Serilog.Log.ForContext<StringManipulatorEnricher>();
         }
 
-        public override void Configure(IProcessorEnricherOptions options)
-        {
-            if (options is null)
-            {
-                throw new ArgumentNullException(nameof(options));
-            }
-            if (!(options is StringManipulatorEnricherOptions))
-            {
-                throw new InvalidCastException(nameof(options));
-            }
-            _options = (StringManipulatorEnricherOptions)options;
-        }
-
         protected override void EntryForProcessorType(IProcessor processor)
         {
             throw new NotImplementedException();

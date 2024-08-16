@@ -23,14 +23,6 @@ namespace MigrationTools.Enrichers
 
         protected abstract void EntryForProcessorType(IProcessor processor);
 
-        [Obsolete("v1 Architecture: Here to support migration, use Configure(IProcessorEnricherOptions options) instead", false)]
-        public virtual void Configure(bool save = true, bool filter = true)
-        {
-            throw new InvalidOperationException("This is invalid for this Enricher type");
-        }
-
-        public abstract void Configure(IProcessorEnricherOptions options);
-
         [Obsolete("v1 Architecture: Here to support migration, use PhaseEnrichers: BeforeLoadData, AfterLoadData, etc", false)]
         public virtual int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
         {

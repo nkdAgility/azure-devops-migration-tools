@@ -1,7 +1,9 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MigrationTools.DataContracts;
+using MigrationTools.Options;
 using MigrationTools.Processors;
 
 namespace MigrationTools.Enrichers
@@ -17,14 +19,10 @@ namespace MigrationTools.Enrichers
 
         public IMigrationEngine Engine { get; private set; }
 
-        public FilterWorkItemsThatAlreadyExistInTarget(IServiceProvider services, ILogger<FilterWorkItemsThatAlreadyExistInTarget> logger, ITelemetryLogger telemetryLogger) : base(services, logger, telemetryLogger)
+        public FilterWorkItemsThatAlreadyExistInTarget(IOptions<FilterWorkItemsThatAlreadyExistInTargetOptions> options, IServiceProvider services, ILogger<FilterWorkItemsThatAlreadyExistInTarget> logger, ITelemetryLogger telemetryLogger) : base(services, logger, telemetryLogger)
         {
+            _Options = options.Value;
             Engine = Services.GetRequiredService<IMigrationEngine>();
-        }
-
-        public override void Configure(IProcessorEnricherOptions options)
-        {
-            _Options = (FilterWorkItemsThatAlreadyExistInTargetOptions)options;
         }
 
         [Obsolete("Old v1 arch: this is a v2 class", true)]

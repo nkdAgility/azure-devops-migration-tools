@@ -24,9 +24,6 @@ namespace MigrationTools._EngineV1.Enrichers
         }
 
         [Obsolete]
-        public override abstract void Configure(bool save = true, bool filter = true);
-
-        [Obsolete]
         public override abstract int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem);
 
         protected abstract void FixEmbededImages(WorkItemData wi, string oldTfsurl, string newTfsurl, string sourcePersonalAccessToken = "");
