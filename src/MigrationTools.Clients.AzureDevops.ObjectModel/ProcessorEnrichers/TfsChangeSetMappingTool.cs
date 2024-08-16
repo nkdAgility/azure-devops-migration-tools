@@ -60,12 +60,6 @@ namespace MigrationTools.ProcessorEnrichers
             }
         }
 
-        [Obsolete]
-        public override void Configure(IProcessorEnricherOptions options)
-        {
-            throw new NotImplementedException();
-        }
-
         protected override void EntryForProcessorType(IProcessor processor)
         {
             throw new NotImplementedException();

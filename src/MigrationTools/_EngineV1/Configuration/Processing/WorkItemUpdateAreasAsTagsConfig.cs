@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using MigrationTools.Enrichers;
 
 namespace MigrationTools._EngineV1.Configuration.Processing
 {
@@ -18,6 +19,8 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         {
             get { return "WorkItemUpdateAreasAsTagsContext"; }
         }
+
+        public List<IProcessorEnricher> Enrichers { get ; set ; }
 
         /// <inheritdoc />
         public bool IsProcessorCompatible(IReadOnlyList<IProcessorConfig> otherProcessors)

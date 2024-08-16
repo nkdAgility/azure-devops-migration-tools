@@ -28,7 +28,6 @@ namespace MigrationTools
             //Processors
             context.AddTransient<TfsTeamSettingsProcessor>();
             context.AddTransient<TfsSharedQueryProcessor>();
-            context.AddTransient<TfsAreaAndIterationProcessor>();
 
             switch (VersionOptions.ConfigureOptions.GetMigrationConfigVersion(configuration))
             {

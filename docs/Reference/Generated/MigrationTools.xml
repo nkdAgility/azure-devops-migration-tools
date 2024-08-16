@@ -120,6 +120,11 @@
             If set to `true` then the processor will run. Set to `false` and the processor will not run.
             </summary>
         </member>
+        <member name="P:MigrationTools.Processors.ProcessorOptions.Enrichers">
+            <summary>
+            A list of enrichers that can augment the proccessing of the data
+            </summary>
+        </member>
         <member name="P:MigrationTools.Processors.ProcessorOptions.ProcessorEnrichers">
             <summary>
             List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.
@@ -231,6 +236,11 @@
             </summary>
             <param name="otherProcessors">List of already configured processors.</param>
         </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.ExportProfilePictureFromADConfig.Enrichers">
+            <summary>
+            A list of enrichers that can augment the proccessing of the data
+            </summary>
+        </member>
         <member name="P:MigrationTools._EngineV1.Configuration.Processing.ExportProfilePictureFromADConfig.Domain">
             <summary>
             The source domain where the pictures should be exported. 
@@ -264,6 +274,11 @@
         <member name="M:MigrationTools._EngineV1.Configuration.Processing.ExportProfilePictureFromADConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
             <inheritdoc />
         </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.ExportUsersForMappingConfig.Enrichers">
+            <summary>
+            A list of enrichers that can augment the proccessing of the data
+            </summary>
+        </member>
         <!-- Badly formed XML comment ignored for member "P:MigrationTools._EngineV1.Configuration.Processing.ExportUsersForMappingConfig.OnlyListUsersInWorkItems" -->
         <member name="M:MigrationTools._EngineV1.Configuration.Processing.ExportUsersForMappingConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
             <inheritdoc />
@@ -271,17 +286,32 @@
         <member name="P:MigrationTools._EngineV1.Configuration.Processing.FakeProcessorConfig.Enabled">
             <inheritdoc />
         </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.FakeProcessorConfig.Enrichers">
+            <summary>
+            A list of enrichers that can augment the proccessing of the data
+            </summary>
+        </member>
         <member name="P:MigrationTools._EngineV1.Configuration.Processing.FakeProcessorConfig.Processor">
             <inheritdoc />
         </member>
         <member name="M:MigrationTools._EngineV1.Configuration.Processing.FakeProcessorConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
             <inheritdoc />
         </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.FixGitCommitLinksConfig.Enrichers">
+            <summary>
+            A list of enrichers that can augment the proccessing of the data
+            </summary>
+        </member>
         <member name="M:MigrationTools._EngineV1.Configuration.Processing.FixGitCommitLinksConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
             <inheritdoc />
         </member>
         <member name="P:MigrationTools._EngineV1.Configuration.Processing.ImportProfilePictureConfig.Enabled">
             <inheritdoc />
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.ImportProfilePictureConfig.Enrichers">
+            <summary>
+            A list of enrichers that can augment the proccessing of the data
+            </summary>
         </member>
         <member name="P:MigrationTools._EngineV1.Configuration.Processing.ImportProfilePictureConfig.Processor">
             <inheritdoc />
@@ -291,6 +321,11 @@
         </member>
         <member name="P:MigrationTools._EngineV1.Configuration.Processing.TeamMigrationConfig.Enabled">
             <inheritdoc />
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TeamMigrationConfig.Enrichers">
+            <summary>
+            A list of enrichers that can augment the proccessing of the data
+            </summary>
         </member>
         <member name="P:MigrationTools._EngineV1.Configuration.Processing.TeamMigrationConfig.EnableTeamSettingsMigration">
             <summary>
@@ -313,11 +348,21 @@
         <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestConfigurationsMigrationConfig.Enabled">
             <inheritdoc />
         </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestConfigurationsMigrationConfig.Enrichers">
+            <summary>
+            A list of enrichers that can augment the proccessing of the data
+            </summary>
+        </member>
         <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestConfigurationsMigrationConfig.Processor">
             <inheritdoc />
         </member>
         <member name="M:MigrationTools._EngineV1.Configuration.Processing.TestConfigurationsMigrationConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
             <inheritdoc />
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationConfig.Enrichers">
+            <summary>
+            A list of enrichers that can augment the proccessing of the data
+            </summary>
         </member>
         <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationConfig.OnlyElementsWithTag">
             <summary>
@@ -360,11 +405,21 @@
         <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestVariablesMigrationConfig.Enabled">
             <inheritdoc />
         </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestVariablesMigrationConfig.Enrichers">
+            <summary>
+            A list of enrichers that can augment the proccessing of the data
+            </summary>
+        </member>
         <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestVariablesMigrationConfig.Processor">
             <inheritdoc />
         </member>
         <member name="M:MigrationTools._EngineV1.Configuration.Processing.TestVariablesMigrationConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
             <inheritdoc />
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemBulkEditProcessorConfig.Enrichers">
+            <summary>
+            A list of enrichers that can augment the proccessing of the data
+            </summary>
         </member>
         <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemBulkEditProcessorConfig.WIQLQuery">
             <summary>
@@ -401,8 +456,18 @@
         <member name="M:MigrationTools._EngineV1.Configuration.Processing.WorkItemBulkEditProcessorConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
             <inheritdoc />
         </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemDeleteConfig.Enrichers">
+            <summary>
+            A list of enrichers that can augment the proccessing of the data
+            </summary>
+        </member>
         <member name="M:MigrationTools._EngineV1.Configuration.Processing.WorkItemDeleteConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
             <inheritdoc />
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.Enrichers">
+            <summary>
+            A list of enrichers that can augment the proccessing of the data
+            </summary>
         </member>
         <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.UpdateCreatedDate">
             <summary>
@@ -521,6 +586,11 @@
         <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemPostProcessingConfig.Processor">
             <inheritdoc />
         </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemPostProcessingConfig.Enrichers">
+            <summary>
+            A list of enrichers that can augment the proccessing of the data
+            </summary>
+        </member>
         <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemPostProcessingConfig.WIQLQuery">
             <summary>
             A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)
@@ -577,6 +647,11 @@
         <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemQueryMigrationConfig.Enabled">
             <inheritdoc />
         </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemQueryMigrationConfig.Enrichers">
+            <summary>
+            A list of enrichers that can augment the proccessing of the data
+            </summary>
+        </member>
         <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemQueryMigrationConfig.Processor">
             <inheritdoc />
         </member>
@@ -631,27 +706,27 @@
         </member>
         <member name="F:ThisAssembly.Git.Commit">
             <summary>
-            => @"e533689"
+            => @"a34dae7"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Sha">
             <summary>
-            => @"e533689a3239cb810de9507c65d20c4f94e2ab3f"
+            => @"a34dae7a6d3a6eaa0ce482eb7db93b8d56f59f97"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.CommitDate">
             <summary>
-            => @"2024-08-15T18:49:58+01:00"
+            => @"2024-08-16T11:18:36+01:00"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commits">
             <summary>
-            => @"62"
+            => @"63"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Tag">
             <summary>
-            => @"v15.1.8-Preview.9-62-ge533689"
+            => @"v15.1.8-Preview.9-63-ga34dae7"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseTag">
@@ -686,7 +761,7 @@
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Patch">
             <summary>
-            => @"70"
+            => @"71"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Label">

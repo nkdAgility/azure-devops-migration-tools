@@ -196,11 +196,5 @@ namespace MigrationTools.ProcessorEnrichers
         {
             throw new NotImplementedException();
         }
-
-        public override void Configure(IProcessorEnricherOptions options)
-        {
-            _options = (TfsAttachmentEnricherOptions)options;
-
-        }
     }
 }

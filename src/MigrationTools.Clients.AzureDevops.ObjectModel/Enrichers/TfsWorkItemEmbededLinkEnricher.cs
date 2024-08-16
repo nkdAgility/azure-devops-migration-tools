@@ -48,11 +48,6 @@ namespace MigrationTools.Enrichers
             });
         }
 
-        [Obsolete]
-        public override void Configure(bool save = false, bool filterWorkItemsThatAlreadyExistInTarget = true)
-        {
-            throw new NotImplementedException();
-        }
 
         [Obsolete]
         public override int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
@@ -146,12 +141,6 @@ namespace MigrationTools.Enrichers
             }
 
             return 0;
-        }
-
-        [Obsolete("v2 Archtecture: use Configure(bool save = true, bool filter = true) instead", true)]
-        public override void Configure(IProcessorEnricherOptions options)
-        {
-            throw new NotImplementedException();
         }
 
         protected override void RefreshForProcessorType(IProcessor processor)

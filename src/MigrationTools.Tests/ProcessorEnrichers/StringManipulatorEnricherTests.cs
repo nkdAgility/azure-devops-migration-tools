@@ -7,28 +7,22 @@ using MigrationTools.Enrichers;
 using MigrationTools.ProcessorEnrichers.WorkItemProcessorEnrichers;
 using MigrationTools.Processors;
 using MigrationTools.Tests;
+using MigrationTools.TestExtensions;
+using Microsoft.Extensions.Options;
 
 namespace MigrationTools.ProcessorEnrichers.Tests
 {
     [TestClass()]
     public class StringManipulatorEnricherTests
     {
-        private ServiceProvider Services;
 
-        [TestInitialize]
-        public void Setup()
-        {
-            Services = ServiceProviderHelper.GetWorkItemMigrationProcessor();
-        }
-
-        [TestMethod(), TestCategory("L0")]
+        [TestMethod(), TestCategory("L1")]
         public void StringManipulatorEnricher_ConfigureTest()
         {
-            var y = new StringManipulatorEnricherOptions
-            {
-                Enabled = true,
-                MaxStringLength = 10,
-                Manipulators = new List<RegexStringManipulator>
+            var options = new StringManipulatorEnricherOptions();
+            options.Enabled = true;
+            options.MaxStringLength = 10;
+                options.Manipulators = new List<RegexStringManipulator>
                 {
                     new RegexStringManipulator
                     {
@@ -37,22 +31,20 @@ namespace MigrationTools.ProcessorEnrichers.Tests
                         Replacement = "Test",
                         Description = "Test"
                     }
-                }
-                
-            };
-            var x = Services.GetRequiredService<StringManipulatorEnricher>();
-            x.Configure(y);
+                };
+
+            var x = GetStringManipulatorEnricher(options);
+
             Assert.IsNotNull(x);
         }
 
         [TestMethod(), TestCategory("L1")]
         public void StringManipulatorEnricher_RegexTest()
         {
-            var y = new StringManipulatorEnricherOptions
-            {
-                Enabled = true,
-                MaxStringLength = 10,
-                Manipulators = new List<RegexStringManipulator>
+           var options = new StringManipulatorEnricherOptions();
+            options.Enabled = true;
+                    options.MaxStringLength = 10;
+                    options.Manipulators = new List<RegexStringManipulator>
                 {
                     new RegexStringManipulator
                     {
@@ -61,11 +53,9 @@ namespace MigrationTools.ProcessorEnrichers.Tests
                         Replacement = "Test 2",
                         Description = "Test"
                     }
-                }
+                };
 
-            };
-            var x = Services.GetRequiredService<StringManipulatorEnricher>();
-            x.Configure(y);
+            var x = GetStringManipulatorEnricher(options);
 
             var fieldItem = new FieldItem
             {
@@ -75,7 +65,6 @@ namespace MigrationTools.ProcessorEnrichers.Tests
                 Name = "Test",
                 Value = "Test"
             };
-
 
             x.ProcessorExecutionWithFieldItem(null, fieldItem);
 
@@ -85,13 +74,10 @@ namespace MigrationTools.ProcessorEnrichers.Tests
         [TestMethod(), TestCategory("L1")]
         public void StringManipulatorEnricher_LengthShorterThanMaxTest()
         {
-            var y = new StringManipulatorEnricherOptions
-            {
-                Enabled = true,
-                MaxStringLength = 10,
-            };
-            var x = Services.GetRequiredService<StringManipulatorEnricher>();
-            x.Configure(y);
+            var options = new StringManipulatorEnricherOptions();
+            options.Enabled = true;
+                options.MaxStringLength = 10;
+            var x = GetStringManipulatorEnricher(options);
 
             var fieldItem = new FieldItem
             {
@@ -102,7 +88,6 @@ namespace MigrationTools.ProcessorEnrichers.Tests
                 Value = "Test"
             };
 
-
             x.ProcessorExecutionWithFieldItem(null, fieldItem);
 
             Assert.AreEqual(4, fieldItem.Value.ToString().Length);
@@ -111,13 +96,10 @@ namespace MigrationTools.ProcessorEnrichers.Tests
         [TestMethod(), TestCategory("L1")]
         public void StringManipulatorEnricher_LengthLongerThanMaxTest()
         {
-            var y = new StringManipulatorEnricherOptions
-            {
-                Enabled = true,
-                MaxStringLength = 10,
-            };
-            var x = Services.GetRequiredService<StringManipulatorEnricher>();
-            x.Configure(y);
+            var options = new StringManipulatorEnricherOptions();
+            options.Enabled = true;
+            options.MaxStringLength = 10;
+            var x = GetStringManipulatorEnricher(options);
 
             var fieldItem = new FieldItem
             {
@@ -128,10 +110,31 @@ namespace MigrationTools.ProcessorEnrichers.Tests
                 Value = "Test Test Test Test Test Test Test Test Test Test Test Test Test"
             };
 
-
             x.ProcessorExecutionWithFieldItem(null, fieldItem);
 
             Assert.AreEqual(10, fieldItem.Value.ToString().Length);
+        }
+
+        private static StringManipulatorEnricher GetStringManipulatorEnricher()
+        {
+            var options = new StringManipulatorEnricherOptions();
+            options.SetDefaults();
+           
+            return GetStringManipulatorEnricher(options);
+        }
+
+        private static StringManipulatorEnricher GetStringManipulatorEnricher(StringManipulatorEnricherOptions options)
+        {
+            var services = new ServiceCollection();
+            services.AddMigrationToolServicesForUnitTests();
+            services.AddSingleton<StringManipulatorEnricher>();
+            services.Configure<StringManipulatorEnricherOptions>(o =>
+            {
+                o.Enabled = options.Enabled;
+                o.MaxStringLength = options.MaxStringLength;
+                o.Manipulators = options.Manipulators;
+            });
+            return services.BuildServiceProvider().GetService<StringManipulatorEnricher>();
         }
     }
 }

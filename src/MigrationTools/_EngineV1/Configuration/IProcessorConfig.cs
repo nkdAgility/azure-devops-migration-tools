@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using MigrationTools.Enrichers;
 using Newtonsoft.Json;
 
 namespace MigrationTools._EngineV1.Configuration
@@ -13,6 +14,7 @@ namespace MigrationTools._EngineV1.Configuration
 
         [JsonIgnore]
         string Processor { get; }
+        List<IProcessorEnricher> Enrichers { get; set; }
 
         /// <summary>
         /// Indicates, if this processor can be added to the list of current processors or not.

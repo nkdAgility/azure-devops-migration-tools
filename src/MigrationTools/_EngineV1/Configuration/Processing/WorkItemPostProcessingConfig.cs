@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using MigrationTools.Enrichers;
 
 namespace MigrationTools._EngineV1.Configuration.Processing
 {
@@ -18,6 +19,11 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         {
             get { return "WorkItemPostProcessingContext"; }
         }
+
+        /// <summary>
+        /// A list of enrichers that can augment the proccessing of the data
+        /// </summary>
+        public List<IProcessorEnricher> Enrichers { get; set; }
 
         /// <summary>
         /// A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)

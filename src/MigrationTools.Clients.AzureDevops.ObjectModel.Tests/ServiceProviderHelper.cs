@@ -9,6 +9,14 @@ namespace MigrationTools.Tests
 {
     public static class ServiceProviderHelper
     {
+        public static ServiceCollection GetMigrationToolServicesForUnitTests()
+        {
+            var configuration = new ConfigurationBuilder().Build();
+            var services = new ServiceCollection();
+            services.AddMigrationToolServicesForUnitTests();
+            return services;
+        }
+
         public static ServiceProvider GetServices()
         {
             var configuration = new ConfigurationBuilder().Build();

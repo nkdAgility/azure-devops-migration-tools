@@ -13,24 +13,6 @@ namespace MigrationTools.ProcessorEnrichers.Tests
     [TestClass()]
     public class TfsRevisionManagerTests
     {
-        private ServiceProvider Services = ServiceProviderHelper.GetServices();
-
-        [TestInitialize]
-        public void Setup()
-        {
-        }
-
-        private static TfsRevisionManagerOptions GetTfsRevisionManagerOptions()
-        {
-            var migrationConfig = new TfsRevisionManagerOptions()
-            {
-                Enabled = true,
-                MaxRevisions = 0,
-                ReplayRevisions = true
-
-            };
-            return migrationConfig;
-        }
 
         private static List<RevisionItem> GetWorkItemWithRevisions(DateTime currentDateTime, int startHours = 1, int endHours = 1, bool dateIncreasing = true)
         {
@@ -48,9 +30,7 @@ namespace MigrationTools.ProcessorEnrichers.Tests
         [TestMethod(), TestCategory("L0")]
         public void TfsRevisionManagerInSync1()
         {
-            var peOptions = GetTfsRevisionManagerOptions();
-            var processorEnricher = Services.GetRequiredService<TfsRevisionManager>();
-            processorEnricher.Configure(peOptions);
+            var processorEnricher = GetTfsRevisionManager();
 
             var currentDateTime = System.DateTime.Now;
             List<RevisionItem> source = GetWorkItemWithRevisions(currentDateTime, 1, 1);
@@ -65,9 +45,7 @@ namespace MigrationTools.ProcessorEnrichers.Tests
         [TestMethod(), TestCategory("L0")]
         public void TfsRevisionManagerInSync10()
         {
-            var peOptions = GetTfsRevisionManagerOptions();
-            var processorEnricher = Services.GetRequiredService<TfsRevisionManager>();
-            processorEnricher.Configure(peOptions);
+            var processorEnricher = GetTfsRevisionManager();
 
             var currentDateTime = System.DateTime.Now;
             List<RevisionItem> source = GetWorkItemWithRevisions(currentDateTime, 1, 10);
@@ -82,9 +60,7 @@ namespace MigrationTools.ProcessorEnrichers.Tests
         [TestMethod(), TestCategory("L0")]
         public void TfsRevisionManagerSync1()
         {
-            var peOptions = GetTfsRevisionManagerOptions();
-            var processorEnricher = Services.GetRequiredService<TfsRevisionManager>();
-            processorEnricher.Configure(peOptions);
+            var processorEnricher = GetTfsRevisionManager();
 
             var currentDateTime = System.DateTime.Now;
             List<RevisionItem> source = GetWorkItemWithRevisions(currentDateTime, 1, 2);
@@ -98,9 +74,7 @@ namespace MigrationTools.ProcessorEnrichers.Tests
         [TestMethod(), TestCategory("L0")]
         public void TfsRevisionManagerSync10()
         {
-            var peOptions = GetTfsRevisionManagerOptions();
-            var processorEnricher = Services.GetRequiredService<TfsRevisionManager>();
-            processorEnricher.Configure(peOptions);
+            var processorEnricher = GetTfsRevisionManager();
 
             var currentDateTime = DateTime.Now;
             List<RevisionItem> source = GetWorkItemWithRevisions(currentDateTime, 1, 11);
@@ -114,10 +88,12 @@ namespace MigrationTools.ProcessorEnrichers.Tests
         [TestMethod(), TestCategory("L0")]
         public void TfsRevisionManagerReplayRevisionsOff()
         {
-            var peOptions = GetTfsRevisionManagerOptions();
-            peOptions.ReplayRevisions = false;
-            var processorEnricher = Services.GetRequiredService<TfsRevisionManager>();
-            processorEnricher.Configure(peOptions);
+            var processorEnricher = GetTfsRevisionManager(new TfsRevisionManagerOptions()
+            {
+                Enabled = true,
+                MaxRevisions = 0,
+                ReplayRevisions = false,
+            });
 
             var currentDateTime = DateTime.Now.AddDays(-100);
             List<RevisionItem> source = GetWorkItemWithRevisions(currentDateTime, 1, 4);
@@ -132,10 +108,12 @@ namespace MigrationTools.ProcessorEnrichers.Tests
         [TestMethod(), TestCategory("L0")]
         public void TfsRevisionManagerMaxRevision51()
         {
-            var peOptions = GetTfsRevisionManagerOptions();
-            peOptions.MaxRevisions = 5;
-            var processorEnricher = Services.GetRequiredService<TfsRevisionManager>();
-            processorEnricher.Configure(peOptions);
+            var processorEnricher = GetTfsRevisionManager(new TfsRevisionManagerOptions()
+            {
+                Enabled = true,
+                MaxRevisions = 5,
+                ReplayRevisions = true,
+            });
 
             var currentDateTime = DateTime.Now;
             List<RevisionItem> source = GetWorkItemWithRevisions(currentDateTime, 1, 2);
@@ -149,10 +127,12 @@ namespace MigrationTools.ProcessorEnrichers.Tests
         [TestMethod(), TestCategory("L0")]
         public void TfsRevisionManagerMaxRevision56()
         {
-            var peOptions = GetTfsRevisionManagerOptions();
-            peOptions.MaxRevisions = 5;
-            var processorEnricher = Services.GetRequiredService<TfsRevisionManager>();
-            processorEnricher.Configure(peOptions);
+            var processorEnricher = GetTfsRevisionManager(new TfsRevisionManagerOptions()
+            {
+                Enabled = true,
+                MaxRevisions = 5,
+                ReplayRevisions = true,
+            });
 
             var currentDateTime = DateTime.Now;
             List<RevisionItem> source = GetWorkItemWithRevisions(currentDateTime, 1, 7);
@@ -166,10 +146,12 @@ namespace MigrationTools.ProcessorEnrichers.Tests
         [TestMethod(), TestCategory("L0")]
         public void TfsRevisionManagerMaxRevision59()
         {
-            var peOptions = GetTfsRevisionManagerOptions();
-            peOptions.MaxRevisions = 5;
-            var processorEnricher = Services.GetRequiredService<TfsRevisionManager>();
-            processorEnricher.Configure(peOptions);
+            var processorEnricher = GetTfsRevisionManager(new TfsRevisionManagerOptions()
+            {
+                Enabled = true,
+                MaxRevisions = 5,
+                ReplayRevisions = true,
+            });
 
             var currentDateTime = DateTime.Now;
             List<RevisionItem> source = GetWorkItemWithRevisions(currentDateTime, 1, 10);
@@ -182,9 +164,7 @@ namespace MigrationTools.ProcessorEnrichers.Tests
         [TestMethod(), TestCategory("L0")]
         public void TfsRevisionManagerDatesMustBeIncreasing()
         {
-            var peOptions = GetTfsRevisionManagerOptions();
-            var processorEnricher = Services.GetRequiredService<TfsRevisionManager>();
-            processorEnricher.Configure(peOptions);
+            var processorEnricher = GetTfsRevisionManager();
 
             var currentDateTime = DateTime.Now;
             List<RevisionItem> source = GetWorkItemWithRevisions(currentDateTime, 1, 10, false);
@@ -206,6 +186,25 @@ namespace MigrationTools.ProcessorEnrichers.Tests
                 lastDatetime = rev.ChangedDate;
             }
             return increasing;
+        }
+
+        private static TfsRevisionManager GetTfsRevisionManager()
+        {
+            return GetTfsRevisionManager(new TfsRevisionManagerOptions() { Enabled = true, MaxRevisions = 0, ReplayRevisions = true });
+        }
+
+        private static TfsRevisionManager GetTfsRevisionManager(TfsRevisionManagerOptions options)
+        {
+
+            var sp = ServiceProviderHelper.GetMigrationToolServicesForUnitTests();
+            sp.AddSingleton<TfsRevisionManager>();
+            sp.Configure<TfsRevisionManagerOptions>(o =>
+            {
+                o.Enabled = options.Enabled;
+                o.MaxRevisions = options.MaxRevisions;
+                o.ReplayRevisions = options.ReplayRevisions;
+            });
+            return sp.BuildServiceProvider().GetService<TfsRevisionManager>();
         }
     }
 }

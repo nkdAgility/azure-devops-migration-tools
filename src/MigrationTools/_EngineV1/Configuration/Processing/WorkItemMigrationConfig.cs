@@ -1,11 +1,17 @@
 ﻿using System.Collections.Generic;
+using MigrationTools.Enrichers;
 
 namespace MigrationTools._EngineV1.Configuration.Processing
 {
 
     public class WorkItemMigrationConfig : IWorkItemProcessorConfig
     {
-     
+
+        /// <summary>
+        /// A list of enrichers that can augment the proccessing of the data
+        /// </summary>
+        public List<IProcessorEnricher> Enrichers { get; set; }
+
         /// <summary>
         /// If this is enabled the creation process on the target project will create the items with the original creation date.
         /// (Important: The item history is always pointed to the date of the migration, it's change only the data column CreateDate,

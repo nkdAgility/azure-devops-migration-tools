@@ -35,12 +35,6 @@ namespace MigrationTools.ProcessorEnrichers
         }
 
         public IMigrationEngine Engine { get; private set; }
-
-        public override void Configure(IProcessorEnricherOptions options)
-        {
-            _Options = (TfsValidateRequiredFieldOptions)options;
-        }
-
         public bool ValidatingRequiredField(string fieldToFind, List<WorkItemData> sourceWorkItems)
         {
             var workItemTypeMappingTool = Services.GetRequiredService<WorkItemTypeMappingEnricher>();

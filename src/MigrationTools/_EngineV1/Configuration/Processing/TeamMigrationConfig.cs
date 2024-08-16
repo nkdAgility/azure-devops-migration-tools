@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using MigrationTools.Enrichers;
 
 namespace MigrationTools._EngineV1.Configuration.Processing
 {
@@ -6,6 +7,11 @@ namespace MigrationTools._EngineV1.Configuration.Processing
     {
         /// <inheritdoc />
         public bool Enabled { get; set; }
+
+        /// <summary>
+        /// A list of enrichers that can augment the proccessing of the data
+        /// </summary>
+        public List<IProcessorEnricher> Enrichers { get; set; }
 
         /// <summary>
         /// Migrate original team settings after their creation on target team project

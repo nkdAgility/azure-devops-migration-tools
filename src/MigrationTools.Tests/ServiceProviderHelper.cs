@@ -18,6 +18,13 @@ namespace MigrationTools.Tests
         internal static ServiceProvider GetWorkItemMigrationProcessor()
         {
             var configuration = new ConfigurationBuilder().Build();
+            var services = GetServiceCollection();
+            return services.BuildServiceProvider();
+        }
+
+        internal static ServiceCollection GetServiceCollection()
+        {
+            var configuration = new ConfigurationBuilder().Build();
             var services = new ServiceCollection();
             services.AddMigrationToolServicesForUnitTests();
             services.AddMigrationToolServices(configuration);
@@ -36,9 +43,9 @@ namespace MigrationTools.Tests
             services.AddSingleton<IMigrationToolVersionInfo, FakeMigrationToolVersionInfo>();
             services.AddSingleton<IMigrationToolVersion, FakeMigrationToolVersion>();
             services.AddTransient<SimpleFieldMapMock>();
- services.AddTransient<SimpleProcessorMock>();
+            services.AddTransient<SimpleProcessorMock>();
 
-            return services.BuildServiceProvider();
+            return services;
         }
 
     }

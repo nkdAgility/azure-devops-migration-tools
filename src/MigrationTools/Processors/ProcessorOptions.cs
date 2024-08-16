@@ -12,8 +12,15 @@ namespace MigrationTools.Processors
         /// </summary>
         public bool Enabled { get; set; }
 
+        /// <summary>
+        /// A list of enrichers that can augment the proccessing of the data
+        /// </summary>
+        public List<IProcessorEnricher> Enrichers { get; set; }
+
+
         [Obsolete("Avoid using! V1 Architecture")]
         public string Processor => ToConfigure.Name;
+
 
         /// <summary>
         /// List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.

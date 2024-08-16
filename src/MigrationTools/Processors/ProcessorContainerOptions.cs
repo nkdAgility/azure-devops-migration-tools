@@ -37,6 +37,17 @@ namespace MigrationTools.Processors
                     case MigrationConfigVersion.v16:
                         _configuration.GetSection(ConfigurationSectionName).Bind(options);
                         options.Processors = _configuration.GetSection(ProcessorContainerOptions.ConfigurationSectionName)?.ToMigrationToolsList(child => child.GetMigrationToolsOption<IProcessorConfig>("ProcessorType"));
+                        foreach (var processor in options.Processors)
+                        {
+                            // Bind enrichers for each processor
+                            var enrichersSection = _configuration.GetSection($"MigrationTools:Processors:{options.Processors.IndexOf(processor)}:Enrichers");
+                            var enrichers = enrichersSection?.ToMigrationToolsList(child => child.GetMigrationToolsOption<IProcessorEnricher>("EnricherType"));
+                            if (processor.Enrichers != null)
+                            {
+                                processor.Enrichers = new List<IProcessorEnricher>();
+                            }
+                            processor.Enrichers.AddRange(enrichers);
+                        }
                         break;
                     case MigrationConfigVersion.before16:
                         options.Enabled = true;

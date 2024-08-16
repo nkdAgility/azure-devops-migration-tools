@@ -25,11 +25,6 @@ namespace MigrationTools.Enrichers
             Engine = services.GetRequiredService<IMigrationEngine>();
         }
 
-        public override void Configure(IProcessorEnricherOptions options)
-        {
-            Options = (TfsWorkItemLinkEnricherOptions)options;
-        }
-
         [Obsolete]
         public override int Enrich(WorkItemData sourceWorkItemLinkStart, WorkItemData targetWorkItemLinkStart)
         {

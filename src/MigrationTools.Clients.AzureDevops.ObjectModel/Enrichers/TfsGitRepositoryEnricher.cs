@@ -46,13 +46,6 @@ namespace MigrationTools.Enrichers
                 };
         }
 
-        [Obsolete]
-        public override void Configure(bool save = true, bool filter = true)
-        {
-            _filter = filter;
-            _save = save;
-        }
-
         public void SetupRepoBits()
         {
             if (sourceRepoService == null)
@@ -252,13 +245,6 @@ namespace MigrationTools.Enrichers
                 return repoInfo.GitRepo.Name;
             }
         }
-
-        [Obsolete("v2 Archtecture: use Configure(bool save = true, bool filter = true) instead", true)]
-        public override void Configure(IProcessorEnricherOptions options)
-        {
-            throw new NotImplementedException();
-        }
-
         protected override void RefreshForProcessorType(IProcessor processor)
         {
             throw new NotImplementedException();

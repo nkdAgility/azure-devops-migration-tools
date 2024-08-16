@@ -72,11 +72,6 @@ namespace MigrationTools.ProcessorEnrichers
             TargetTeamSettings = Engine.Target.GetService<TeamSettingsConfigurationService>();
         }
 
-        public override void Configure(IProcessorEnricherOptions options)
-        {
-            Options = (TfsTeamSettingsEnricherOptions)options;
-        }
-
         protected override void EntryForProcessorType(IProcessor processor)
         {
 

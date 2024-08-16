@@ -29,16 +29,6 @@ namespace MigrationTools.Enrichers
 
         public TfsRevisionManagerOptions Options { get; private set;}
 
-        [Obsolete("Old v1 arch: this is a v2 class", true)]
-        public override void Configure(bool save = true, bool filter = true)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void Configure(IProcessorEnricherOptions options)
-        {
-            Options = (TfsRevisionManagerOptions)options;
-        }
 
         [Obsolete("Old v1 arch: this is a v2 class", true)]
         public override int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)

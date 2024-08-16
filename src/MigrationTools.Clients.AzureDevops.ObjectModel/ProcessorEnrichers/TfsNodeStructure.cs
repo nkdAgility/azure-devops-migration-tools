@@ -73,17 +73,6 @@ namespace MigrationTools.Enrichers
             get { return _Options; }
         }
 
-        [Obsolete("Old v1 arch: this is a v2 class", true)]
-        public override void Configure(bool save = true, bool filter = true)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void Configure(IProcessorEnricherOptions options)
-        {
-            _Options = (TfsNodeStructureOptions)options;
-        }
-
         public void ApplySettings(TfsNodeStructureSettings settings)
         {
             _sourceProjectName = settings.SourceProjectName;

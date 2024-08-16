@@ -1,5 +1,6 @@
 ﻿using Microsoft.ApplicationInsights.WorkerService;
 using Microsoft.Extensions.DependencyInjection;
+using MigrationTools.Services;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.InMemory;
@@ -26,6 +27,9 @@ namespace MigrationTools.TestExtensions
             Log.Logger = loggers.CreateLogger();
             Log.Logger.Information("Logger is initialized");
             context.AddLogging(loggingBuilder => loggingBuilder.AddSerilog(dispose: true));
+            // Add Telemitery Adapter
+            context.AddSingleton<ITelemetryLogger, TelemetryClientAdapter>();
+            context.AddSingleton<IMigrationToolVersion, MigrationToolVersionFake>();
         }
     }
 }

@@ -18,16 +18,6 @@ namespace MigrationTools.Clients.AzureDevops.Rest.Enrichers
         public IMigrationEngine Engine { get; private set; }
 
         [Obsolete]
-        public override void Configure(bool save = true, bool filter = true)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void Configure(IProcessorEnricherOptions options)
-        {
-            throw new NotImplementedException();
-        }
-        [Obsolete]
         public override int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
         {
             throw new NotImplementedException();

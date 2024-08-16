@@ -1,47 +1,27 @@
 ﻿using System.Collections.Generic;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.TeamFoundation.TestManagement.WebApi;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools.Enrichers;
 using MigrationTools.Tests;
-
+using MigrationTools.TestExtensions;
+using System.Threading.Tasks;
 
 namespace MigrationTools.ProcessorEnrichers.Tests
 {
     [TestClass()]
     public class TfsNodeStructureTests
     {
-        private ServiceProvider _services;
-        private TfsNodeStructure _structure;
-
-        [TestInitialize]
-        public void Setup()
-        {
-            _services = ServiceProviderHelper.GetServices();
-            _structure = _services.GetRequiredService<TfsNodeStructure>();
-            _structure.ApplySettings(new TfsNodeStructureSettings
-            {
-                FoundNodes = new Dictionary<string, bool>(),
-                SourceProjectName = "SourceServer",
-                TargetProjectName = "TargetServer",
-            });
-            _structure.Configure(new TfsNodeStructureOptions
-            {
-                AreaMaps = new Dictionary<string, string>
-                {
-                    { "SourceServer", "TargetServer" }
-                },
-                IterationMaps = new Dictionary<string, string>
-                {
-                    { "SourceServer", "TargetServer" }
-                },
-            });
-        }
 
         [TestMethod(), TestCategory("L0")]
         public void GetTfsNodeStructure_WithDifferentAreaPath()
         {
-            var nodeStructure = _services.GetRequiredService<TfsNodeStructure>();
+            var options = new TfsNodeStructureOptions();
+            options.Enabled = true;
+            options.SetDefaults();
+            options.AreaMaps[@"^SourceProject\\PUL"] = "TargetProject\\test\\PUL";
+            var nodeStructure = GetTfsNodeStructure(options);
 
             nodeStructure.ApplySettings(new TfsNodeStructureSettings
             {
@@ -53,26 +33,23 @@ namespace MigrationTools.ProcessorEnrichers.Tests
                 }
             });
 
-            var options = new TfsNodeStructureOptions();
-            options.SetDefaults();
-            options.AreaMaps[@"^SourceProject\\PUL"] = "TargetProject\\test\\PUL";
-            nodeStructure.Configure(options);
-
             const string sourceNodeName = @"SourceProject\PUL";
             const TfsNodeStructureType nodeStructureType = TfsNodeStructureType.Area;
 
             var newNodeName = nodeStructure.GetNewNodeName(sourceNodeName, nodeStructureType);
 
-            Assert.AreEqual(newNodeName, @"TargetProject\test\PUL");
+            Assert.AreEqual(@"TargetProject\test\PUL", newNodeName);
 
         }
 
         [TestMethod, TestCategory("L0")]
         public void TestFixAreaPath_WhenNoAreaPathOrIterationPath_DoesntChangeQuery()
         {
+            var nodeStructure = GetTfsNodeStructure();
+
             string WIQLQueryBit = @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
 
-            string targetWIQLQueryBit = _structure.FixAreaPathAndIterationPathForTargetQuery(WIQLQueryBit, "SourceServer", "TargetServer", null);
+            string targetWIQLQueryBit = nodeStructure.FixAreaPathAndIterationPathForTargetQuery(WIQLQueryBit, "SourceServer", "TargetServer", null);
 
             Assert.AreEqual(WIQLQueryBit, targetWIQLQueryBit);
         }
@@ -81,10 +58,13 @@ namespace MigrationTools.ProcessorEnrichers.Tests
         [TestMethod, TestCategory("L0")]
         public void TestFixAreaPath_WhenAreaPathInQuery_ChangesQuery()
         {
+            var nodeStructure = GetTfsNodeStructure();
+
+
             string WIQLQueryBit = @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.AreaPath] = 'SourceServer\Area\Path1' AND   [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
             string expectTargetQueryBit = @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.AreaPath] = 'TargetServer\Area\Path1' AND   [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
 
-            string targetWIQLQueryBit = _structure.FixAreaPathAndIterationPathForTargetQuery(WIQLQueryBit, "SourceServer", "TargetServer", null);
+            string targetWIQLQueryBit = nodeStructure.FixAreaPathAndIterationPathForTargetQuery(WIQLQueryBit, "SourceServer", "TargetServer", null);
 
             Assert.AreEqual(expectTargetQueryBit, targetWIQLQueryBit);
         }
@@ -92,27 +72,22 @@ namespace MigrationTools.ProcessorEnrichers.Tests
         [TestMethod, TestCategory("L1")]
         public void TestFixAreaPath_WhenAreaPathInQuery_WithPrefixProjectToNodesEnabled_ChangesQuery()
         {
-            
-            var nodeStructure = _services.GetRequiredService<TfsNodeStructure>();
-
-            // For this test we use the prefixing of the project node and no remapping rule
-
-
-            nodeStructure.Configure(new TfsNodeStructureOptions
-            {
-                AreaMaps = new Dictionary<string, string>()
+            var options = new TfsNodeStructureOptions();
+            options.Enabled = true;
+            options.SetDefaults();
+            options.AreaMaps = new Dictionary<string, string>()
                 {
                     { "^SourceServer\\\\(.*)" , "TargetServer\\SourceServer\\$1" }
-                },
-                IterationMaps = new Dictionary<string, string>(){
+                };
+            options.IterationMaps = new Dictionary<string, string>(){
                     { "^SourceServer\\\\(.*)" , "TargetServer\\SourceServer\\$1" }
-                },
-            });
+                };
+            var nodeStructure = GetTfsNodeStructure(options);
 
             string WIQLQueryBit = @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.AreaPath] = 'SourceServer\Area\Path1' AND   [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
             string expectTargetQueryBit = @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.AreaPath] = 'TargetServer\SourceServer\Area\Path1' AND   [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
 
-            string targetWIQLQuery = _structure.FixAreaPathAndIterationPathForTargetQuery(WIQLQueryBit, "SourceServer", "TargetServer", null);
+            string targetWIQLQuery = nodeStructure.FixAreaPathAndIterationPathForTargetQuery(WIQLQueryBit, "SourceServer", "TargetServer", null);
 
             Assert.AreEqual(expectTargetQueryBit, targetWIQLQuery);
         }
@@ -120,26 +95,12 @@ namespace MigrationTools.ProcessorEnrichers.Tests
         [TestMethod, TestCategory("L1")]
         public void TestFixAreaPath_WhenAreaPathInQuery_WithPrefixProjectToNodesDisabled_SupportsWhitespaces()
         {
-            var nodeStructure = _services.GetRequiredService<TfsNodeStructure>();
-
-            nodeStructure.ApplySettings(new TfsNodeStructureSettings
-            {
-                FoundNodes = new Dictionary<string, bool>(),
-                SourceProjectName = "Source Project",
-                TargetProjectName = "Target Project",
-            });
-
-            // For this test we use no remapping rule
-            nodeStructure.Configure(new TfsNodeStructureOptions
-            {
-                AreaMaps = new Dictionary<string, string>(),
-                IterationMaps = new Dictionary<string, string>(),
-            });
+            var nodeStructure = GetTfsNodeStructure();
 
             string WIQLQueryBit = @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.AreaPath] = 'Source Project\Area\Path1' AND   [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
             string expectTargetQueryBit = @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.AreaPath] = 'Target Project\Area\Path1' AND   [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
 
-            string targetWIQLQueryBit = _structure.FixAreaPathAndIterationPathForTargetQuery(WIQLQueryBit, "Source Project", "Target Project", null);
+            string targetWIQLQueryBit = nodeStructure.FixAreaPathAndIterationPathForTargetQuery(WIQLQueryBit, "Source Project", "Target Project", null);
 
             Assert.AreEqual(expectTargetQueryBit, targetWIQLQueryBit);
         }
@@ -147,31 +108,23 @@ namespace MigrationTools.ProcessorEnrichers.Tests
         [TestMethod, TestCategory("L1")]
         public void TestFixAreaPath_WhenAreaPathInQuery_WithPrefixProjectToNodesEnabled_SupportsWhitespaces()
         {
-            var nodeStructure = _services.GetRequiredService<TfsNodeStructure>();
-
-            nodeStructure.ApplySettings(new TfsNodeStructureSettings
-            {
-                FoundNodes = new Dictionary<string, bool>(),
-                SourceProjectName = "Source Project",
-                TargetProjectName = "Target Project",
-            });
-
-            // For this test we use the prefixing of the project node and no remapping rules
-            nodeStructure.Configure(new TfsNodeStructureOptions
-            {
-                AreaMaps = new Dictionary<string, string>()
+            var options = new TfsNodeStructureOptions();
+            options.Enabled = true;
+            options.SetDefaults();
+            options.AreaMaps = new Dictionary<string, string>()
                 {
                     { "^Source Project\\\\(.*)" , "Target Project\\Source Project\\$1" }
-                },
-                IterationMaps = new Dictionary<string, string>(){
+                };
+            options.IterationMaps = new Dictionary<string, string>(){
                     { "^Source Project\\\\(.*)" , "Target Project\\Source Project\\$1" }
-                },
-            });
+                };
+            var settings = new TfsNodeStructureSettings() { SourceProjectName = "Source Project", TargetProjectName = "Target Project", FoundNodes = new Dictionary<string, bool>() };
+            var nodeStructure = GetTfsNodeStructure(options, settings);
 
             var WIQLQueryBit = @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.AreaPath] = 'Source Project\Area\Path1' AND   [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
             var expectTargetQueryBit = @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.AreaPath] = 'Target Project\Source Project\Area\Path1' AND   [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
 
-            var targetWIQLQueryBit = _structure.FixAreaPathAndIterationPathForTargetQuery(WIQLQueryBit, "Source Project", "Target Project", null);
+            var targetWIQLQueryBit = nodeStructure.FixAreaPathAndIterationPathForTargetQuery(WIQLQueryBit, "Source Project", "Target Project", null);
 
             Assert.AreEqual(expectTargetQueryBit, targetWIQLQueryBit);
         }
@@ -179,10 +132,12 @@ namespace MigrationTools.ProcessorEnrichers.Tests
         [TestMethod, TestCategory("L0")]
         public void TestFixAreaPath_WhenMultipleAreaPathInQuery_ChangesQuery()
         {
+            var nodeStructure = GetTfsNodeStructure();
+
             string WIQLQueryBit = @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.AreaPath] = 'SourceServer\Area\Path1' OR [System.AreaPath] = 'SourceServer\Area\Path2' AND [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
             string expectTargetQueryBit = @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.AreaPath] = 'TargetServer\Area\Path1' OR [System.AreaPath] = 'TargetServer\Area\Path2' AND [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
 
-            string targetWIQLQueryBit = _structure.FixAreaPathAndIterationPathForTargetQuery(WIQLQueryBit, "SourceServer", "TargetServer", null);
+            string targetWIQLQueryBit = nodeStructure.FixAreaPathAndIterationPathForTargetQuery(WIQLQueryBit, "SourceServer", "TargetServer", null);
 
             Assert.AreEqual(expectTargetQueryBit, targetWIQLQueryBit);
         }
@@ -190,10 +145,12 @@ namespace MigrationTools.ProcessorEnrichers.Tests
         [TestMethod, TestCategory("L0")]
         public void TestFixAreaPath_WhenAreaPathAtEndOfQuery_ChangesQuery()
         {
+            var nodeStructure = GetTfsNodeStructure();
+
             string WIQLQueryBit = @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan') AND [System.AreaPath] = 'SourceServer\Area\Path1'";
             string expectTargetQueryBit = @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan') AND [System.AreaPath] = 'TargetServer\Area\Path1'";
 
-            string targetWIQLQueryBit = _structure.FixAreaPathAndIterationPathForTargetQuery(WIQLQueryBit, "SourceServer", "TargetServer", null);
+            string targetWIQLQueryBit = nodeStructure.FixAreaPathAndIterationPathForTargetQuery(WIQLQueryBit, "SourceServer", "TargetServer", null);
 
             Assert.AreEqual(expectTargetQueryBit, targetWIQLQueryBit);
         }
@@ -201,10 +158,12 @@ namespace MigrationTools.ProcessorEnrichers.Tests
         [TestMethod, TestCategory("L0")]
         public void TestFixIterationPath_WhenInQuery_ChangesQuery()
         {
+            var nodeStructure = GetTfsNodeStructure();
+
             string WIQLQueryBit = @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.IterationPath] = 'SourceServer\Iteration\Path1' AND   [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
             string expectTargetQueryBit = @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.IterationPath] = 'TargetServer\Iteration\Path1' AND   [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
 
-            string targetWIQLQueryBit = _structure.FixAreaPathAndIterationPathForTargetQuery(WIQLQueryBit, "SourceServer", "TargetServer", null);
+            string targetWIQLQueryBit = nodeStructure.FixAreaPathAndIterationPathForTargetQuery(WIQLQueryBit, "SourceServer", "TargetServer", null);
 
             Assert.AreEqual(expectTargetQueryBit, targetWIQLQueryBit);
         }
@@ -212,10 +171,12 @@ namespace MigrationTools.ProcessorEnrichers.Tests
         [TestMethod, TestCategory("L0")]
         public void TestFixAreaPathAndIteration_WhenMultipleOccuranceInQuery_ChangesQuery()
         {
+            var nodeStructure = GetTfsNodeStructure();
+
             string WIQLQueryBit = @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND ([System.AreaPath] = 'SourceServer\Area\Path1' OR [System.AreaPath] = 'SourceServer\Area\Path2') AND ([System.IterationPath] = 'SourceServer\Iteration\Path1' OR [System.IterationPath] = 'SourceServer\Iteration\Path2') AND [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
             string expectTargetQueryBit = @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND ([System.AreaPath] = 'TargetServer\Area\Path1' OR [System.AreaPath] = 'TargetServer\Area\Path2') AND ([System.IterationPath] = 'TargetServer\Iteration\Path1' OR [System.IterationPath] = 'TargetServer\Iteration\Path2') AND [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
 
-            string targetWIQLQueryBit = _structure.FixAreaPathAndIterationPathForTargetQuery(WIQLQueryBit, "SourceServer", "TargetServer", null);
+            string targetWIQLQueryBit = nodeStructure.FixAreaPathAndIterationPathForTargetQuery(WIQLQueryBit, "SourceServer", "TargetServer", null);
 
             Assert.AreEqual(expectTargetQueryBit, targetWIQLQueryBit);
         }
@@ -223,12 +184,53 @@ namespace MigrationTools.ProcessorEnrichers.Tests
         [TestMethod, TestCategory("L0")]
         public void TestFixAreaPathAndIteration_WhenMultipleOccuranceWithMixtureOrEqualAndUnderOperatorsInQuery_ChangesQuery()
         {
+            var nodeStructure = GetTfsNodeStructure();
+
             string WIQLQueryBit = @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND ([System.AreaPath] = 'SourceServer\Area\Path1' OR [System.AreaPath] UNDER 'SourceServer\Area\Path2') AND ([System.IterationPath] UNDER 'SourceServer\Iteration\Path1' OR [System.IterationPath] = 'SourceServer\Iteration\Path2') AND [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
             string expectTargetQueryBit = @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND ([System.AreaPath] = 'TargetServer\Area\Path1' OR [System.AreaPath] UNDER 'TargetServer\Area\Path2') AND ([System.IterationPath] UNDER 'TargetServer\Iteration\Path1' OR [System.IterationPath] = 'TargetServer\Iteration\Path2') AND [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
 
-            string targetWIQLQueryBit = _structure.FixAreaPathAndIterationPathForTargetQuery(WIQLQueryBit, "SourceServer", "TargetServer", null);
+            string targetWIQLQueryBit = nodeStructure.FixAreaPathAndIterationPathForTargetQuery(WIQLQueryBit, "SourceServer", "TargetServer", null);
 
             Assert.AreEqual(expectTargetQueryBit, targetWIQLQueryBit);
         }
+
+        private static TfsNodeStructure GetTfsNodeStructure(TfsNodeStructureOptions options)
+        {
+            var settings = new TfsNodeStructureSettings() { SourceProjectName = "SourceProject", TargetProjectName = "TargetProject", FoundNodes = new Dictionary<string, bool>() };
+            return GetTfsNodeStructure(options, settings);
+        }
+
+        private static TfsNodeStructure GetTfsNodeStructure()
+        {
+            var options = new TfsNodeStructureOptions() { Enabled = true, AreaMaps = new Dictionary<string, string>(), IterationMaps = new Dictionary<string, string>() };
+            var settings = new TfsNodeStructureSettings() { SourceProjectName = "SourceServer", TargetProjectName = "TargetServer", FoundNodes = new Dictionary<string, bool>() };
+            return GetTfsNodeStructure(options, settings);
+        }
+
+        private static TfsNodeStructure GetTfsNodeStructure(TfsNodeStructureOptions options, TfsNodeStructureSettings settings)
+        {
+            var services = new ServiceCollection();
+            services.AddMigrationToolServicesForUnitTests();
+            services.AddSingleton<TfsNodeStructure>();
+            services.Configure<TfsNodeStructureOptions>(o =>
+            {
+                o.Enabled = options.Enabled;
+                options.SetDefaults();
+                o.AreaMaps = options.AreaMaps;
+                o.IterationMaps = options.IterationMaps;
+            });
+
+            var nodeStructure = services.BuildServiceProvider().GetService<TfsNodeStructure>();
+
+            nodeStructure.ApplySettings(new TfsNodeStructureSettings
+            {
+                SourceProjectName = settings.SourceProjectName,
+                TargetProjectName = settings.TargetProjectName,
+                FoundNodes = settings.FoundNodes
+            });
+
+            return nodeStructure;
+        }
+
     }
 }

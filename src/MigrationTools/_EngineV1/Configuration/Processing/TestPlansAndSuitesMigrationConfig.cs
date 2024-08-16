@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using MigrationTools.Enrichers;
 
 namespace MigrationTools._EngineV1.Configuration.Processing
 {
@@ -6,6 +7,11 @@ namespace MigrationTools._EngineV1.Configuration.Processing
     {
 
         public bool Enabled { get; set; }
+
+        /// <summary>
+        /// A list of enrichers that can augment the proccessing of the data
+        /// </summary>
+        public List<IProcessorEnricher> Enrichers { get; set; }
 
         /// <summary>
         /// The tag name that is present on all elements that must be migrated. If this option isn't present this processor will migrate all.

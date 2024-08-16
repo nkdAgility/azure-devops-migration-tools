@@ -1,9 +1,15 @@
 ﻿using System.Collections.Generic;
+using MigrationTools.Enrichers;
 
 namespace MigrationTools._EngineV1.Configuration.Processing
 {
     public class ExportProfilePictureFromADConfig : IProcessorConfig
     {
+        /// <summary>
+        /// A list of enrichers that can augment the proccessing of the data
+        /// </summary>
+        public List<IProcessorEnricher> Enrichers { get; set; }
+
         /// <summary>
         /// The source domain where the pictures should be exported. 
         /// </summary>

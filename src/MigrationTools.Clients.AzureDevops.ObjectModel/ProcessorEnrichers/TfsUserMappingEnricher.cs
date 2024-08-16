@@ -55,11 +55,6 @@ namespace MigrationTools.ProcessorEnrichers
             Engine = services.GetRequiredService<IMigrationEngine>();
         }
 
-        public override void Configure(IProcessorEnricherOptions options)
-        {
-           Options = (TfsUserMappingEnricherOptions)options;
-        }
-
         protected override void EntryForProcessorType(IProcessor processor)
         {
             throw new NotImplementedException();
