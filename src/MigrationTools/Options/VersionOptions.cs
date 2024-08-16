@@ -53,7 +53,7 @@ namespace MigrationTools.Options
                 Version.TryParse(configVersionString, out Version configVersion);
                 if (configVersion < Version.Parse("16.0") || isOldFormat)
                 {
-                    Console.WriteLine("!!ACTION REQUIRED!! You are using a deprecated version of the configuration, please update to v16. backward compatability will be removed in a future version.");
+                    //Console.WriteLine("!!ACTION REQUIRED!! You are using a deprecated version of the configuration, please update to v16. backward compatability will be removed in a future version.");
                     return (MigrationConfigSchema.v1, configVersionString);
                 }
                 else
