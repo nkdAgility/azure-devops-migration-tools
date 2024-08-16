@@ -33,7 +33,7 @@ namespace MigrationTools
 
 
 
-            switch (VersionOptions.ConfigureOptions.GetMigrationConfigVersion(configuration))
+            switch (VersionOptions.ConfigureOptions.GetMigrationConfigVersion(configuration).schema)
             {
                 case MigrationConfigSchema.v1:
                     context.AddSingleton<StringManipulatorEnricher>().AddSingleton<IOptions<StringManipulatorEnricherOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<StringManipulatorEnricherOptions>(StringManipulatorEnricherOptions.ConfigurationSectionName)));

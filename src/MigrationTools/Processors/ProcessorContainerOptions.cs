@@ -25,7 +25,7 @@ namespace MigrationTools.Processors
 
             public void Configure(ProcessorContainerOptions options)
             {
-                switch (VersionOptions.ConfigureOptions.GetMigrationConfigVersion(_configuration))
+                switch (VersionOptions.ConfigureOptions.GetMigrationConfigVersion(_configuration).schema)
                 {
                     case MigrationConfigSchema.v160:
                         _configuration.GetSection(ConfigurationSectionName).Bind(options);

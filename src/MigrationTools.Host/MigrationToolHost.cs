@@ -98,7 +98,7 @@ namespace MigrationTools.Host
                            Environment.Exit(-1);
                        }
                        logger.LogInformation("Config Found, creating engine host");
-                       switch (VersionOptions.ConfigureOptions.GetMigrationConfigVersion(context.Configuration))
+                       switch (VersionOptions.ConfigureOptions.GetMigrationConfigVersion(context.Configuration).schema)
                        {
                            case MigrationConfigSchema.v1:
                                //logger.LogCritical("The config file {ConfigFile} uses an outdated format. We are continuing to support this format through a grace period. Use '{ExecutableName}.exe init' to create a new configuration file and port over your old configuration.", configFile, Assembly.GetEntryAssembly().GetName().Name);

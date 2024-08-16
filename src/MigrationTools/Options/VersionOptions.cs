@@ -30,13 +30,14 @@ namespace MigrationTools.Options
 
             public void Configure(VersionOptions options)
             {
-                options.ConfigVersionString = _configuration.GetValue<string>("MigrationTools:Version");
+                (MigrationConfigSchema, string) result = GetMigrationConfigVersion(_configuration);
+                options.ConfigVersionString = result.Item2;
                 options.ConfigVersion = Version.Parse(options.ConfigVersionString);
-                options.ConfigSchemaVersion = GetMigrationConfigVersion(_configuration);
+                options.ConfigSchemaVersion = result.Item1;
                 
             }
 
-            public static MigrationConfigSchema GetMigrationConfigVersion(IConfiguration configuration)
+                public static (MigrationConfigSchema schema, string str) GetMigrationConfigVersion(IConfiguration configuration)
             {
                 bool isOldFormat = false;
                 string configVersionString = configuration.GetValue<string>("MigrationTools:Version");
@@ -53,11 +54,11 @@ namespace MigrationTools.Options
                 if (configVersion < Version.Parse("16.0") || isOldFormat)
                 {
                     Console.WriteLine("!!ACTION REQUIRED!! You are using a deprecated version of the configuration, please update to v16. backward compatability will be removed in a future version.");
-                    return MigrationConfigSchema.v1;
+                    return (MigrationConfigSchema.v1, configVersionString);
                 }
                 else
                 {
-                    return MigrationConfigSchema.v160;
+                    return (MigrationConfigSchema.v160, configVersionString);
                 }
             }
         }
