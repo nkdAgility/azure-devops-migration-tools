@@ -28,7 +28,7 @@ namespace MigrationTools.TestExtensions
             Log.Logger.Information("Logger is initialized");
             context.AddLogging(loggingBuilder => loggingBuilder.AddSerilog(dispose: true));
             // Add Telemitery Adapter
-            context.AddSingleton<ITelemetryLogger, TelemetryClientAdapter>();
+            context.AddSingleton<ITelemetryLogger, TelemetryLoggerFake>();
             context.AddSingleton<IMigrationToolVersion, MigrationToolVersionFake>();
         }
     }
