@@ -7,6 +7,7 @@ using MigrationTools.Enrichers;
 using MigrationTools.Tests;
 using MigrationTools.TestExtensions;
 using System.Threading.Tasks;
+using System;
 
 namespace MigrationTools.ProcessorEnrichers.Tests
 {
@@ -97,10 +98,10 @@ namespace MigrationTools.ProcessorEnrichers.Tests
         {
             var nodeStructure = GetTfsNodeStructure();
 
-            string WIQLQueryBit = @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.AreaPath] = 'Source Project\Area\Path1' AND   [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
-            string expectTargetQueryBit = @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.AreaPath] = 'Target Project\Area\Path1' AND   [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
+            string WIQLQueryBit = @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.AreaPath] = 'SourceServer\Area\Path1' AND   [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
+            string expectTargetQueryBit = @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.AreaPath] = 'TargetServer\Area\Path1' AND   [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
 
-            string targetWIQLQueryBit = nodeStructure.FixAreaPathAndIterationPathForTargetQuery(WIQLQueryBit, "Source Project", "Target Project", null);
+            string targetWIQLQueryBit = nodeStructure.FixAreaPathAndIterationPathForTargetQuery(WIQLQueryBit, "SourceServer", "TargetServer", null);
 
             Assert.AreEqual(expectTargetQueryBit, targetWIQLQueryBit);
         }
@@ -196,6 +197,10 @@ namespace MigrationTools.ProcessorEnrichers.Tests
 
         private static TfsNodeStructure GetTfsNodeStructure(TfsNodeStructureOptions options)
         {
+            if (options == null)
+            {
+                throw new Exception();
+            }
             var settings = new TfsNodeStructureSettings() { SourceProjectName = "SourceProject", TargetProjectName = "TargetProject", FoundNodes = new Dictionary<string, bool>() };
             return GetTfsNodeStructure(options, settings);
         }
