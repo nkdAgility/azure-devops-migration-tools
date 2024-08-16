@@ -16,7 +16,6 @@ namespace MigrationTools.Engine.Containers.Tests
         private IOptions<ProcessorContainerOptions> CreateProcessorContainerOptions()
         {
             var options = new ProcessorContainerOptions();
-            options.Enabled = true;
             var opts = Microsoft.Extensions.Options.Options.Create(options);
             return opts;
         }

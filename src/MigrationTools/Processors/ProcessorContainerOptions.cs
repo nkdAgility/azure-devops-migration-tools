@@ -8,18 +8,11 @@ using MigrationTools.Options;
 
 namespace MigrationTools.Processors
 {
-    public class ProcessorContainerOptions : ProcessorEnricherOptions
+    public class ProcessorContainerOptions 
     {
         public const string ConfigurationSectionName = "MigrationTools:Processors";
-        public override Type ToConfigure => typeof(ProcessorContainer);
 
         public List<IProcessorConfig> Processors { get; set; } = new List<IProcessorConfig>();
-
-        public override void SetDefaults()
-        {
-            Enabled = false;
-        }
-
 
         public class ConfigureOptions : IConfigureOptions<ProcessorContainerOptions>
         {
@@ -50,7 +43,6 @@ namespace MigrationTools.Processors
                         }
                         break;
                     case MigrationConfigVersion.before16:
-                        options.Enabled = true;
                         options.Processors = _configuration.GetSection("Processors")?.ToMigrationToolsList(child => child.GetMigrationToolsOption<IProcessorConfig>("$type"));
                         break;
                     default:

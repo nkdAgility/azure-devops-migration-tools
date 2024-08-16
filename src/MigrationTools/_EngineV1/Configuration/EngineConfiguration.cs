@@ -14,5 +14,8 @@ namespace MigrationTools._EngineV1.Configuration
         public IMigrationClientConfig Target { get; set; }
         public string LogLevel { get; private set; }
         public string Version { get; set; }
+
+
+
     }
 }
