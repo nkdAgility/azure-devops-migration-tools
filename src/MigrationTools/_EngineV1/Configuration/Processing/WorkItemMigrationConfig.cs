@@ -6,6 +6,7 @@ namespace MigrationTools._EngineV1.Configuration.Processing
 
     public class WorkItemMigrationConfig : IWorkItemProcessorConfig
     {
+        public const string ConfigurationSectionName = "MigrationTools:ProcessorDefaults:WorkItemMigration";
 
         /// <summary>
         /// A list of enrichers that can augment the proccessing of the data
