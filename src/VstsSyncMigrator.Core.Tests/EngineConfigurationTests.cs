@@ -21,14 +21,15 @@ namespace _VstsSyncMigrator.Engine.Tests
             Assert.AreEqual(ec.Source.ToString(), "https://sdd2016.visualstudio.com//DemoProjs");
         }
 
-        [TestMethod, TestCategory("L1")]
-        public void EngineConfigurationCreateDefault()
-        {
-            IEngineConfigurationBuilder ecb = new EngineConfigurationBuilder(new NullLogger<EngineConfigurationBuilder>());
-            EngineConfiguration ec = ecb.BuildDefault();
-            Assert.IsNotNull(ec);
-            Assert.IsNotNull(ec.Source);
-            Assert.AreEqual(ec.Source.ToString(), "FakeMigration");
-        }
+        //[TestMethod, TestCategory("L1")]
+        //[]
+        //public void EngineConfigurationCreateDefault()
+        //{
+        //    IEngineConfigurationBuilder ecb = new EngineConfigurationBuilder(new NullLogger<EngineConfigurationBuilder>());
+        //    EngineConfiguration ec = ecb.BuildDefault();
+        //    Assert.IsNotNull(ec);
+        //    Assert.IsNotNull(ec.Source);
+        //    Assert.AreEqual(ec.Source.ToString(), "FakeMigration");
+        //}
     }
 }

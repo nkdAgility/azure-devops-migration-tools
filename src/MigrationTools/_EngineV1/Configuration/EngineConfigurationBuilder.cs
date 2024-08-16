@@ -24,13 +24,13 @@ namespace MigrationTools._EngineV1.Configuration
     public class EngineConfigurationBuilder : IEngineConfigurationBuilder, IEngineConfigurationReader, ISettingsWriter
     {
         private readonly VersionOptions _versionOptions;
-        private readonly IServiceProvider _services;
+        //private readonly IServiceProvider _services;
         private readonly ILogger<EngineConfigurationBuilder> _logger;
 
-        public EngineConfigurationBuilder(IServiceProvider services, IOptions<VersionOptions> versionOptions, ILogger<EngineConfigurationBuilder> logger)
+        public EngineConfigurationBuilder(IOptions<VersionOptions> versionOptions, ILogger<EngineConfigurationBuilder> logger)
         {
             _versionOptions = versionOptions.Value;
-            _services = services;
+            //_services = services;
             _logger = logger;
         }
 

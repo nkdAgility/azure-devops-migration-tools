@@ -5,10 +5,12 @@ using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Helpers.Tests;
+using MigrationTools.Options;
 using MigrationTools.Services;
 using MigrationTools.TestExtensions;
 using Serilog;
@@ -24,7 +26,9 @@ namespace _VstsSyncMigrator.Engine.Tests
         public void Setup()
         {
             var configuration = new ConfigurationBuilder().Build();
-            var ecb = new EngineConfigurationBuilder(new NullLogger<EngineConfigurationBuilder>());
+            var VersionOptions = new VersionOptions();
+            IOptions<VersionOptions> options = Options.Create(VersionOptions);
+            var ecb = new EngineConfigurationBuilder(options, new NullLogger<EngineConfigurationBuilder>());
             var services = new ServiceCollection();
             // Core
             services.AddMigrationToolServicesForUnitTests();
