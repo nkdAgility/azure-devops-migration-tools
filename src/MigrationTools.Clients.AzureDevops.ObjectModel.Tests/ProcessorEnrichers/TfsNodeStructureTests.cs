@@ -220,7 +220,7 @@ namespace MigrationTools.ProcessorEnrichers.Tests
             services.Configure<TfsNodeStructureOptions>(o =>
             {
                 o.Enabled = options.Enabled;
-                options.SetDefaults();
+                o.SetDefaults();
                 o.AreaMaps = options.AreaMaps;
                 o.IterationMaps = options.IterationMaps;
             });
