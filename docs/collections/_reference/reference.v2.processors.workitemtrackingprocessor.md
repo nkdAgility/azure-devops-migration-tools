@@ -11,6 +11,7 @@ configurationSamples:
       "ReplayRevisions": true,
       "CollapseRevisions": false,
       "WorkItemCreateRetryLimit": 5,
+      "Enrichers": null,
       "ProcessorEnrichers": [
         {
           "$type": "PauseAfterEachItemOptions",
@@ -37,6 +38,10 @@ options:
 - parameterName: Enabled
   type: Boolean
   description: If set to `true` then the processor will run. Set to `false` and the processor will not run.
+  defaultValue: missng XML code comments
+- parameterName: Enrichers
+  type: List
+  description: A list of enrichers that can augment the proccessing of the data
   defaultValue: missng XML code comments
 - parameterName: ProcessorEnrichers
   type: List

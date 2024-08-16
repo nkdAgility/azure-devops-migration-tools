@@ -8,7 +8,7 @@ configurationSamples:
     {
       "$type": "WorkItemTypeMappingEnricherOptions",
       "Enabled": true,
-      "WorkItemTypeDefinition": {
+      "Mappings": {
         "$type": "Dictionary`2",
         "Default": "Default2"
       }
@@ -23,14 +23,14 @@ options:
   type: Boolean
   description: If enabled this will run this migrator
   defaultValue: true
+- parameterName: Mappings
+  type: Dictionary
+  description: List of work item mappings.
+  defaultValue: '{}'
 - parameterName: RefName
   type: String
   description: For internal use
   defaultValue: missng XML code comments
-- parameterName: WorkItemTypeDefinition
-  type: Dictionary
-  description: List of work item mappings.
-  defaultValue: '{}'
 status: missng XML code comments
 processingTarget: missng XML code comments
 classFile: /src/MigrationTools/ProcessorEnrichers/WorkItemProcessorEnrichers/WorkItemTypeMappingEnricher.cs

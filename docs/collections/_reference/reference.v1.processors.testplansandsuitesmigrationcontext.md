@@ -8,6 +8,7 @@ configurationSamples:
     {
       "$type": "TestPlansAndSuitesMigrationConfig",
       "Enabled": false,
+      "Enrichers": null,
       "OnlyElementsWithTag": null,
       "TestPlanQuery": null,
       "RemoveAllLinks": false,
@@ -24,6 +25,10 @@ options:
 - parameterName: Enabled
   type: Boolean
   description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: Enrichers
+  type: List
+  description: A list of enrichers that can augment the proccessing of the data
   defaultValue: missng XML code comments
 - parameterName: FilterCompleted
   type: Boolean

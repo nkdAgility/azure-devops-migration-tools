@@ -9,6 +9,7 @@ configurationSamples:
       "$type": "WorkItemPostProcessingConfig",
       "Enabled": false,
       "WorkItemIDs": null,
+      "Enrichers": null,
       "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [@ReflectedWorkItemIdFieldName] = ''  AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
       "FilterWorkItemsThatAlreadyExistInTarget": false,
       "PauseAfterEachWorkItem": false,
@@ -23,6 +24,10 @@ options:
 - parameterName: Enabled
   type: Boolean
   description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: Enrichers
+  type: List
+  description: A list of enrichers that can augment the proccessing of the data
   defaultValue: missng XML code comments
 - parameterName: FilterWorkItemsThatAlreadyExistInTarget
   type: Boolean

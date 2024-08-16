@@ -7,6 +7,7 @@ configurationSamples:
     {
       "$type": "WorkItemMigrationConfig",
       "Enabled": false,
+      "Enrichers": null,
       "UpdateCreatedDate": true,
       "UpdateCreatedBy": true,
       "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
@@ -35,6 +36,10 @@ options:
   type: Boolean
   description: If enabled then the processor will run
   defaultValue: false
+- parameterName: Enrichers
+  type: List
+  description: A list of enrichers that can augment the proccessing of the data
+  defaultValue: missng XML code comments
 - parameterName: FilterWorkItemsThatAlreadyExistInTarget
   type: Boolean
   description: This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run. While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.

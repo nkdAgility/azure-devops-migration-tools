@@ -9,7 +9,8 @@ configurationSamples:
       "$type": "FixGitCommitLinksConfig",
       "Enabled": false,
       "TargetRepository": null,
-      "Query": null
+      "Query": null,
+      "Enrichers": null
     }
   sampleFor: MigrationTools._EngineV1.Configuration.Processing.FixGitCommitLinksConfig
 description: missng XML code comments
@@ -20,6 +21,10 @@ options:
 - parameterName: Enabled
   type: Boolean
   description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: Enrichers
+  type: List
+  description: A list of enrichers that can augment the proccessing of the data
   defaultValue: missng XML code comments
 - parameterName: Query
   type: String

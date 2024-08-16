@@ -10,7 +10,8 @@ configurationSamples:
       "Enabled": false,
       "PrefixProjectToNodes": false,
       "SharedFolderName": "Shared Queries",
-      "SourceToTargetFieldMappings": null
+      "SourceToTargetFieldMappings": null,
+      "Enrichers": null
     }
   sampleFor: MigrationTools._EngineV1.Configuration.Processing.WorkItemQueryMigrationConfig
 description: This processor can migrate queries for work items. Only shared queries are included. Personal queries can't migrate with this tool.
@@ -21,6 +22,10 @@ options:
 - parameterName: Enabled
   type: Boolean
   description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: Enrichers
+  type: List
+  description: A list of enrichers that can augment the proccessing of the data
   defaultValue: missng XML code comments
 - parameterName: PrefixProjectToNodes
   type: Boolean

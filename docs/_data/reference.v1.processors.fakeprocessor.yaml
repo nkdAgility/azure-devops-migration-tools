@@ -6,7 +6,8 @@ configurationSamples:
   code: >-
     {
       "$type": "FakeProcessorConfig",
-      "Enabled": false
+      "Enabled": false,
+      "Enrichers": null
     }
   sampleFor: MigrationTools._EngineV1.Configuration.Processing.FakeProcessorConfig
 description: "Note: this is only for internal usage. Don't use this in your configurations."
@@ -17,6 +18,10 @@ options:
 - parameterName: Enabled
   type: Boolean
   description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: Enrichers
+  type: List
+  description: A list of enrichers that can augment the proccessing of the data
   defaultValue: missng XML code comments
 status: missng XML code comments
 processingTarget: missng XML code comments
