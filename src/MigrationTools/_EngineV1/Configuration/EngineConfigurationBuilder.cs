@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MigrationTools._EngineV1.Configuration.FieldMap;
 using MigrationTools._EngineV1.Configuration.Processing;
 using MigrationTools.DataContracts.Pipelines;
@@ -22,10 +23,14 @@ namespace MigrationTools._EngineV1.Configuration
 
     public class EngineConfigurationBuilder : IEngineConfigurationBuilder, IEngineConfigurationReader, ISettingsWriter
     {
+        private readonly VersionOptions _versionOptions;
+        private readonly IServiceProvider _services;
         private readonly ILogger<EngineConfigurationBuilder> _logger;
 
-        public EngineConfigurationBuilder(ILogger<EngineConfigurationBuilder> logger)
+        public EngineConfigurationBuilder(IServiceProvider services, IOptions<VersionOptions> versionOptions, ILogger<EngineConfigurationBuilder> logger)
         {
+            _versionOptions = versionOptions.Value;
+            _services = services;
             _logger = logger;
         }
 
@@ -71,9 +76,9 @@ namespace MigrationTools._EngineV1.Configuration
             //configuration.Bind(settings);
             //#if !DEBUG
             string appVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString(2);
-            if (ec?.Version != appVersion)
+            if (_versionOptions.ConfigVersionString != appVersion)
             {
-                _logger.LogCritical("The config version {Version} does not match the current app version {appVersion}. There may be compatability issues and we recommend that you generate a new default config and then tranfer the settings accross.", ec.Version, appVersion);
+                _logger.LogCritical("The config version {Version} does not match the current app version {appVersion}. There may be compatability issues and we recommend that you generate a new default config and then tranfer the settings accross.", _versionOptions.ConfigVersionString, appVersion);
                 if (System.Diagnostics.Debugger.IsAttached)
                 {
                     _logger.LogInformation("But since you're running in Debug, let's move on");
@@ -159,7 +164,7 @@ namespace MigrationTools._EngineV1.Configuration
         {
             EngineConfiguration ec = new EngineConfiguration
             {
-                Version = Assembly.GetExecutingAssembly().GetName().Version.ToString(2),
+                //Version = Assembly.GetExecutingAssembly().GetName().Version.ToString(2),
                 //Processors = new List<IProcessorConfig>(),
             };
             ec.Source = GetMigrationConfigDefault();
@@ -281,7 +286,7 @@ namespace MigrationTools._EngineV1.Configuration
         {
             EngineConfiguration ec = new EngineConfiguration
             {
-                Version = Assembly.GetExecutingAssembly().GetName().Version.ToString(2),
+                //Version = Assembly.GetExecutingAssembly().GetName().Version.ToString(2),
                 //Processors = new List<IProcessorConfig>(),
             };
             //ec.Processors.Add(
