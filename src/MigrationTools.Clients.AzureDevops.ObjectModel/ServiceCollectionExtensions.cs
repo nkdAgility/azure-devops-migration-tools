@@ -29,7 +29,7 @@ namespace MigrationTools
             context.AddTransient<TfsTeamSettingsProcessor>();
             context.AddTransient<TfsSharedQueryProcessor>();
 
-            switch (VersionOptions.ConfigureOptions.GetMigrationConfigVersion(configuration))
+            switch (VersionOptions.ConfigureOptions.GetMigrationConfigVersion(configuration).schema)
             {
                 case MigrationConfigSchema.v1:
                     context.AddSingleton<TfsAttachmentEnricher>().AddSingleton<IOptions<TfsAttachmentEnricherOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<TfsAttachmentEnricherOptions>(TfsAttachmentEnricherOptions.ConfigurationSectionName)));
