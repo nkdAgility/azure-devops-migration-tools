@@ -10,7 +10,7 @@ namespace MigrationTools.Options
     public enum MigrationConfigSchema
     {
         v1,
-        v2
+        v160
     }
 
     public class VersionOptions
@@ -54,7 +54,7 @@ namespace MigrationTools.Options
                 }
                 else
                 {
-                    return MigrationConfigSchema.v2;
+                    return MigrationConfigSchema.v160;
                 }
             }
         }

@@ -41,7 +41,7 @@ namespace MigrationTools
                     context.AddSingleton<WorkItemTypeMappingEnricher>().AddSingleton<IOptions<WorkItemTypeMappingEnricherOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<WorkItemTypeMappingEnricherOptions>(WorkItemTypeMappingEnricherOptions.ConfigurationSectionName)));
                     context.AddSingleton< GitRepoMappingTool>().AddSingleton<IOptions<GitRepoMappingToolOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<GitRepoMappingToolOptions>(GitRepoMappingToolOptions.ConfigurationSectionName)));
                     break;
-                case MigrationConfigSchema.v2:
+                case MigrationConfigSchema.v160:
                     context.AddSingleton<StringManipulatorEnricher>().AddOptions<StringManipulatorEnricherOptions>().Bind(configuration.GetSection(StringManipulatorEnricherOptions.ConfigurationSectionName));
                     context.AddSingleton<WorkItemTypeMappingEnricher>().AddOptions<WorkItemTypeMappingEnricherOptions>().Bind(configuration.GetSection(WorkItemTypeMappingEnricherOptions.ConfigurationSectionName));
                     context.AddSingleton<GitRepoMappingTool>().AddOptions<GitRepoMappingToolOptions>().Bind(configuration.GetSection(GitRepoMappingToolOptions.ConfigurationSectionName));

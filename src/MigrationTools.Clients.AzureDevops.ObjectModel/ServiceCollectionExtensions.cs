@@ -53,7 +53,7 @@ namespace MigrationTools
                     context.AddSingleton<TfsTeamSettingsEnricher>().AddSingleton<IOptions<TfsTeamSettingsEnricherOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<TfsTeamSettingsEnricherOptions>(TfsTeamSettingsEnricherOptions.ConfigurationSectionName)));
 
                     break;
-                case MigrationConfigSchema.v2:
+                case MigrationConfigSchema.v160:
                     context.AddSingleton<TfsAttachmentEnricher>().AddOptions<TfsAttachmentEnricherOptions>().Bind(configuration.GetSection(TfsAttachmentEnricherOptions.ConfigurationSectionName));
                     context.AddSingleton<TfsUserMappingEnricher>().AddOptions<TfsUserMappingEnricherOptions>().Bind(configuration.GetSection(TfsUserMappingEnricherOptions.ConfigurationSectionName));
                     context.AddSingleton<TfsValidateRequiredField>().AddOptions<TfsValidateRequiredFieldOptions>().Bind(configuration.GetSection(TfsValidateRequiredFieldOptions.ConfigurationSectionName));

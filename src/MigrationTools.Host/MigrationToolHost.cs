@@ -106,12 +106,9 @@ namespace MigrationTools.Host
                                var parsed = reader.BuildFromFile(configFile); // TODO revert tp 
                                options.Source = parsed.Source;
                                options.Target = parsed.Target;
-                               options.Version = parsed.Version;
                                break;
-                           case MigrationConfigSchema.v2:
+                           case MigrationConfigSchema.v160:
                                // This code Converts the new config format to the v1 and v2 runtme format.
-                               options.Version = configuration.GetValue<string>("MigrationTools:Version");
-
                                options.Source = configuration.GetSection("MigrationTools:Source")?.GetMigrationToolsOption<IMigrationClientConfig>("EndpointType");
                                options.Target = configuration.GetSection("MigrationTools:Target")?.GetMigrationToolsOption<IMigrationClientConfig>("EndpointType");
                                break;

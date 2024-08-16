@@ -27,7 +27,7 @@ namespace MigrationTools.Processors
             {
                 switch (VersionOptions.ConfigureOptions.GetMigrationConfigVersion(_configuration))
                 {
-                    case MigrationConfigSchema.v2:
+                    case MigrationConfigSchema.v160:
                         _configuration.GetSection(ConfigurationSectionName).Bind(options);
                         options.Processors = _configuration.GetSection(ProcessorContainerOptions.ConfigurationSectionName)?.ToMigrationToolsList(child => child.GetMigrationToolsOption<IProcessorConfig>("ProcessorType"));
                         foreach (var processor in options.Processors)

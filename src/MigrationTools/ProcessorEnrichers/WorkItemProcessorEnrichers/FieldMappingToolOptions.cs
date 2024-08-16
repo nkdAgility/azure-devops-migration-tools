@@ -34,7 +34,7 @@ namespace MigrationTools.ProcessorEnrichers.WorkItemProcessorEnrichers
             {
                 switch (VersionOptions.ConfigureOptions.GetMigrationConfigVersion(_configuration))
                 {
-                    case MigrationConfigSchema.v2:
+                    case MigrationConfigSchema.v160:
                         _configuration.GetSection(ConfigurationSectionName).Bind(options);
                         options.FieldMaps = _configuration.GetSection(FieldMappingToolOptions.ConfigurationSectionName+":FieldMaps")?.ToMigrationToolsList(child => child.GetMigrationToolsOption<IFieldMapConfig>("FieldMapType"));
                         break;
