@@ -16,6 +16,7 @@ namespace MigrationTools.Options
     public class VersionOptions
     {
         public MigrationConfigSchema ConfigSchemaVersion { get; set; }
+        public Version ConfigVersion { get; set; }
 
         public class ConfigureOptions : IConfigureOptions<VersionOptions>
         {
@@ -28,8 +29,9 @@ namespace MigrationTools.Options
 
             public void Configure(VersionOptions options)
             {
+                options.ConfigVersion = Version.Parse(_configuration.GetValue<string>("MigrationTools:Version"));
                 options.ConfigSchemaVersion = GetMigrationConfigVersion(_configuration);
-
+                
             }
 
             public static MigrationConfigSchema GetMigrationConfigVersion(IConfiguration configuration)
