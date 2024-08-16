@@ -34,11 +34,11 @@ namespace MigrationTools.ProcessorEnrichers.WorkItemProcessorEnrichers
             {
                 switch (VersionOptions.ConfigureOptions.GetMigrationConfigVersion(_configuration))
                 {
-                    case MigrationConfigVersion.v16:
+                    case MigrationConfigSchema.v2:
                         _configuration.GetSection(ConfigurationSectionName).Bind(options);
                         options.FieldMaps = _configuration.GetSection(FieldMappingToolOptions.ConfigurationSectionName+":FieldMaps")?.ToMigrationToolsList(child => child.GetMigrationToolsOption<IFieldMapConfig>("FieldMapType"));
                         break;
-                    case MigrationConfigVersion.before16:
+                    case MigrationConfigSchema.v1:
                         options.Enabled = true;
                         options.FieldMaps = _configuration.GetSection("FieldMaps")?.ToMigrationToolsList(child => child.GetMigrationToolsOption<IFieldMapConfig>("$type"));
                         break;

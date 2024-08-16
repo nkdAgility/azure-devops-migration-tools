@@ -100,7 +100,7 @@ namespace MigrationTools.Host
                        logger.LogInformation("Config Found, creating engine host");
                        switch (VersionOptions.ConfigureOptions.GetMigrationConfigVersion(context.Configuration))
                        {
-                           case MigrationConfigVersion.before16:
+                           case MigrationConfigSchema.v1:
                                Log.Warning("!!ACTION REQUIRED!! You are using a deprecated version of the configuration, please update to v16. backward compatability will be removed in a future version.");
                                //logger.LogCritical("The config file {ConfigFile} uses an outdated format. We are continuing to support this format through a grace period. Use '{ExecutableName}.exe init' to create a new configuration file and port over your old configuration.", configFile, Assembly.GetEntryAssembly().GetName().Name);
                                var parsed = reader.BuildFromFile(configFile); // TODO revert tp 
@@ -108,7 +108,7 @@ namespace MigrationTools.Host
                                options.Target = parsed.Target;
                                options.Version = parsed.Version;
                                break;
-                           case MigrationConfigVersion.v16:
+                           case MigrationConfigSchema.v2:
                                // This code Converts the new config format to the v1 and v2 runtme format.
                                options.Version = configuration.GetValue<string>("MigrationTools:Version");
 
@@ -149,7 +149,7 @@ namespace MigrationTools.Host
                  //// Add Old v1Bits
                  services.AddMigrationToolServicesLegacy();
                  //// New v2Bits
-                 services.AddMigrationToolServices(context.Configuration);
+                 services.AddMigrationToolServices(context.Configuration, configFile);
              });
 
             hostBuilder.UseSpectreConsole(config =>

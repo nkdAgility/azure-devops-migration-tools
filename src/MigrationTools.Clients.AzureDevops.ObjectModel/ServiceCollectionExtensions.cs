@@ -31,7 +31,7 @@ namespace MigrationTools
 
             switch (VersionOptions.ConfigureOptions.GetMigrationConfigVersion(configuration))
             {
-                case MigrationConfigVersion.before16:
+                case MigrationConfigSchema.v1:
                     context.AddSingleton<TfsAttachmentEnricher>().AddSingleton<IOptions<TfsAttachmentEnricherOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<TfsAttachmentEnricherOptions>(TfsAttachmentEnricherOptions.ConfigurationSectionName)));
 
                     context.AddSingleton<TfsUserMappingEnricher>().AddSingleton<IOptions<TfsUserMappingEnricherOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<TfsUserMappingEnricherOptions>(TfsUserMappingEnricherOptions.ConfigurationSectionName)));
@@ -53,7 +53,7 @@ namespace MigrationTools
                     context.AddSingleton<TfsTeamSettingsEnricher>().AddSingleton<IOptions<TfsTeamSettingsEnricherOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<TfsTeamSettingsEnricherOptions>(TfsTeamSettingsEnricherOptions.ConfigurationSectionName)));
 
                     break;
-                case MigrationConfigVersion.v16:
+                case MigrationConfigSchema.v2:
                     context.AddSingleton<TfsAttachmentEnricher>().AddOptions<TfsAttachmentEnricherOptions>().Bind(configuration.GetSection(TfsAttachmentEnricherOptions.ConfigurationSectionName));
                     context.AddSingleton<TfsUserMappingEnricher>().AddOptions<TfsUserMappingEnricherOptions>().Bind(configuration.GetSection(TfsUserMappingEnricherOptions.ConfigurationSectionName));
                     context.AddSingleton<TfsValidateRequiredField>().AddOptions<TfsValidateRequiredFieldOptions>().Bind(configuration.GetSection(TfsValidateRequiredFieldOptions.ConfigurationSectionName));

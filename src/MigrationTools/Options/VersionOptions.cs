@@ -7,15 +7,15 @@ using Microsoft.Extensions.Options;
 
 namespace MigrationTools.Options
 {
-    public enum MigrationConfigVersion
+    public enum MigrationConfigSchema
     {
-        before16,
-        v16
+        v1,
+        v2
     }
 
     public class VersionOptions
     {
-        public MigrationConfigVersion ConfigVersion { get; set; }
+        public MigrationConfigSchema ConfigSchemaVersion { get; set; }
 
         public class ConfigureOptions : IConfigureOptions<VersionOptions>
         {
@@ -28,11 +28,11 @@ namespace MigrationTools.Options
 
             public void Configure(VersionOptions options)
             {
-                options.ConfigVersion = GetMigrationConfigVersion(_configuration);
+                options.ConfigSchemaVersion = GetMigrationConfigVersion(_configuration);
 
             }
 
-            public static MigrationConfigVersion GetMigrationConfigVersion(IConfiguration configuration)
+            public static MigrationConfigSchema GetMigrationConfigVersion(IConfiguration configuration)
             {
                 bool isOldFormat = false;
                 string configVersionString = configuration.GetValue<string>("MigrationTools:Version");
@@ -48,11 +48,11 @@ namespace MigrationTools.Options
                 Version.TryParse(configVersionString, out Version configVersion);
                 if (configVersion < Version.Parse("16.0") || isOldFormat)
                 {
-                    return MigrationConfigVersion.before16;
+                    return MigrationConfigSchema.v1;
                 }
                 else
                 {
-                    return MigrationConfigVersion.v16;
+                    return MigrationConfigSchema.v2;
                 }
             }
         }

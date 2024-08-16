@@ -27,7 +27,7 @@ namespace MigrationTools.Processors
             {
                 switch (VersionOptions.ConfigureOptions.GetMigrationConfigVersion(_configuration))
                 {
-                    case MigrationConfigVersion.v16:
+                    case MigrationConfigSchema.v2:
                         _configuration.GetSection(ConfigurationSectionName).Bind(options);
                         options.Processors = _configuration.GetSection(ProcessorContainerOptions.ConfigurationSectionName)?.ToMigrationToolsList(child => child.GetMigrationToolsOption<IProcessorConfig>("ProcessorType"));
                         foreach (var processor in options.Processors)
@@ -42,7 +42,7 @@ namespace MigrationTools.Processors
                             processor.Enrichers.AddRange(enrichers);
                         }
                         break;
-                    case MigrationConfigVersion.before16:
+                    case MigrationConfigSchema.v1:
                         options.Processors = _configuration.GetSection("Processors")?.ToMigrationToolsList(child => child.GetMigrationToolsOption<IProcessorConfig>("$type"));
                         break;
                     default:
