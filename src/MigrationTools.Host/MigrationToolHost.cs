@@ -101,7 +101,6 @@ namespace MigrationTools.Host
                        switch (VersionOptions.ConfigureOptions.GetMigrationConfigVersion(context.Configuration))
                        {
                            case MigrationConfigSchema.v1:
-                               Log.Warning("!!ACTION REQUIRED!! You are using a deprecated version of the configuration, please update to v16. backward compatability will be removed in a future version.");
                                //logger.LogCritical("The config file {ConfigFile} uses an outdated format. We are continuing to support this format through a grace period. Use '{ExecutableName}.exe init' to create a new configuration file and port over your old configuration.", configFile, Assembly.GetEntryAssembly().GetName().Name);
                                var parsed = reader.BuildFromFile(configFile); // TODO revert tp 
                                options.Source = parsed.Source;
