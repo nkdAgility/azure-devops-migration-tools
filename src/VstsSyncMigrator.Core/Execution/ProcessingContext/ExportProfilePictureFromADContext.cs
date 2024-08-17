@@ -12,11 +12,10 @@ using Microsoft.TeamFoundation.Framework.Common;
 using MigrationTools;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Configuration.Processing;
-using MigrationTools.Enrichers;
-using MigrationTools.ProcessorEnrichers;
 using VstsSyncMigrator._EngineV1.Processors;
 using VstsSyncMigrator.Core.Execution;
 using Microsoft.Extensions.Options;
+using MigrationTools.Tools;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -30,7 +29,7 @@ namespace VstsSyncMigrator.Engine
         private IIdentityManagementService2 ims2;
         private ExportProfilePictureFromADConfig _config;
 
-        public ExportProfilePictureFromADContext(IOptions<ExportProfilePictureFromADConfig> options, TfsStaticEnrichers tfsStaticEnrichers, StaticEnrichers staticEnrichers, IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<StaticProcessorBase> logger) : base(tfsStaticEnrichers, staticEnrichers, services, me, telemetry, logger)
+        public ExportProfilePictureFromADContext(IOptions<ExportProfilePictureFromADConfig> options, TfsStaticTools tfsStaticEnrichers, StaticTools staticEnrichers, IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<StaticProcessorBase> logger) : base(tfsStaticEnrichers, staticEnrichers, services, me, telemetry, logger)
         {
             _config = options.Value;
             //http://www.codeproject.com/Articles/18102/Howto-Almost-Everything-In-Active-Directory-via-C

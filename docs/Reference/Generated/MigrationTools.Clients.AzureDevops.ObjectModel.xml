@@ -4,146 +4,6 @@
         <name>MigrationTools.Clients.AzureDevops.ObjectModel</name>
     </assembly>
     <members>
-        <member name="T:MigrationTools.EndpointEnrichers.TfsWorkItemAttachmentEnricher">
-            <summary>
-            The `TfsWorkItemAttachmentEnricher` processes the attachements for a specific work item.
-            </summary>
-            <processingtarget>WorkItem</processingtarget>
-        </member>
-        <member name="M:MigrationTools.Enrichers.TfsEmbededImagesEnricher.FixEmbededImages(MigrationTools.DataContracts.WorkItemData,System.String,System.String,System.String)">
-            from https://gist.github.com/pietergheysens/792ed505f09557e77ddfc1b83531e4fb
-        </member>
-        <member name="P:MigrationTools.Enrichers.TfsAttachmentEnricherOptions.ExportBasePath">
-            <summary>
-            `AttachmentMigration` is set to true then you need to specify a working path for attachments to be saved locally.
-            </summary>
-            <default>C:\temp\Migration\</default>
-        </member>
-        <member name="P:MigrationTools.Enrichers.TfsAttachmentEnricherOptions.MaxAttachmentSize">
-            <summary>
-            `AttachmentMigration` is set to true then you need to specify a max file size for upload in bites.
-            For Azure DevOps Services the default is 480,000,000 bites (60mb), for TFS its 32,000,000 bites (4mb).
-            </summary>
-            <default>480000000</default>
-        </member>
-        <member name="T:MigrationTools.Enrichers.TfsNodeStructure">
-            <summary>
-            The TfsNodeStructureEnricher is used to create missing nodes in the target project. To configure it add a `TfsNodeStructureOptions` section to `CommonEnrichersConfig` in the config file. Otherwise defaults will be applied. 
-            </summary>
-        </member>
-        <member name="M:MigrationTools.Enrichers.TfsNodeStructure.ShouldCreateNode(System.String)">
-            <summary>
-            Checks node-to-be-created with allowed BasePath's
-            </summary>
-            <param name="userFriendlyPath">The user-friendly path of the source node</param>
-            <returns>true/false</returns>
-        </member>
-        <member name="M:MigrationTools.Enrichers.TfsNodeStructure.CheckIsParentOfSelectedBasePath(System.String)">
-            <summary>
-            Checks whether a path is a parent of a selected base path (meaning we cannot skip it entirely)
-            </summary>
-            <param name="userFriendlyPath">The user-friendly path of the source node</param>
-            <returns>A boolean indicating whether the path is a parent of any positively selected base path.</returns>
-            <exception cref="T:System.NotImplementedException"></exception>
-        </member>
-        <member name="P:MigrationTools.Enrichers.TfsNodeStructureOptions.NodeBasePaths">
-            <summary>
-            The root paths of the Ares / Iterations you want migrate. See [NodeBasePath Configuration](#nodebasepath-configuration)
-            </summary>
-            <default>["/"]</default>
-        </member>
-        <member name="P:MigrationTools.Enrichers.TfsNodeStructureOptions.AreaMaps">
-            <summary>
-            Remapping rules for area paths, implemented with regular expressions. The rules apply with a higher priority than the `PrefixProjectToNodes`,
-            that is, if no rule matches the path and the `PrefixProjectToNodes` option is enabled, then the old `PrefixProjectToNodes` behavior is applied.
-            </summary>
-            <default>{}</default>
-        </member>
-        <member name="P:MigrationTools.Enrichers.TfsNodeStructureOptions.IterationMaps">
-            <summary>
-            Remapping rules for iteration paths, implemented with regular expressions. The rules apply with a higher priority than the `PrefixProjectToNodes`,
-            that is, if no rule matches the path and the `PrefixProjectToNodes` option is enabled, then the old `PrefixProjectToNodes` behavior is applied.
-            </summary>
-            <default>{}</default>
-        </member>
-        <member name="P:MigrationTools.Enrichers.TfsNodeStructureOptions.ShouldCreateMissingRevisionPaths">
-            <summary>
-            When set to True the susyem will try to create any missing missing area or iteration paths from the revisions.
-            </summary>
-        </member>
-        <member name="T:MigrationTools.Enrichers.TfsRevisionManager">
-            <summary>
-            The TfsRevisionManager manipulates the revisions of a work item to reduce the number of revisions that are migrated.
-            </summary>
-        </member>
-        <member name="P:MigrationTools.Enrichers.TfsRevisionManagerOptions.ReplayRevisions">
-            <summary>
-            You can choose to migrate the tip only (a single write) or all of the revisions (many writes).
-            If you are setting this to `false` to migrate only the tip then you should set `BuildFieldTable` to `true`.
-            </summary>
-            <default>true</default>
-        </member>
-        <member name="P:MigrationTools.Enrichers.TfsRevisionManagerOptions.MaxRevisions">
-            <summary>
-            Sets the maximum number of revisions that will be migrated. "First + Last N = Max".
-            If this was set to 5 and there were 10 revisions you would get the first 1 (creation) and the latest 4 migrated.
-            </summary>
-            <default>0</default>
-        </member>
-        <member name="P:MigrationTools.Enrichers.TfsTeamSettingsEnricherOptions.MigrateTeamSettings">
-            <summary>
-            Migrate original team settings after their creation on target team project
-            </summary>
-            <default>false</default>
-        </member>
-        <member name="P:MigrationTools.Enrichers.TfsTeamSettingsEnricherOptions.UpdateTeamSettings">
-            <summary>
-            Reset the target team settings to match the source if the team exists
-            </summary>
-            <default>false</default>
-        </member>
-        <member name="P:MigrationTools.Enrichers.TfsTeamSettingsEnricherOptions.MigrateTeamCapacities">
-            <summary>
-            Migrate original team member capacities after their creation on the target team project. Note: It will only migrate team member capacity if the team member with same display name exists on the target collection otherwise it will be ignored.
-            </summary>
-            <default>false</default>
-        </member>
-        <member name="P:MigrationTools.Enrichers.TfsTeamSettingsEnricherOptions.Teams">
-            <summary>
-            List of Teams to process. If this is `null` then all teams will be processed.
-            </summary>
-        </member>
-        <member name="P:MigrationTools.Enrichers.TfsUserMappingEnricherOptions.IdentityFieldsToCheck">
-            <summary>
-            This is a list of the Identiy fields in the Source to check for user mapping purposes. You should list all identiy fields that you wan to map.
-            </summary>
-        </member>
-        <member name="P:MigrationTools.Enrichers.TfsUserMappingEnricherOptions.UserMappingFile">
-            <summary>
-            This is the file that will be used to export or import the user mappings. Use the ExportUsersForMapping processor to create the file.
-            </summary>
-        </member>
-        <member name="P:MigrationTools.Enrichers.TfsWorkItemLinkEnricherOptions.FilterIfLinkCountMatches">
-            <summary>
-            Skip validating links if the number of links in the source and the target matches!
-            </summary>
-        </member>
-        <member name="P:MigrationTools.Enrichers.TfsWorkItemLinkEnricherOptions.SaveAfterEachLinkIsAdded">
-            <summary>
-            Save the work item after each link is added. This will slow the migration as it will cause many saves to the TFS database.
-            </summary>
-            <default>false</default>
-        </member>
-        <member name="T:MigrationTools.ProcessorEnrichers.TfsTeamSettingsEnricher">
-            <summary>
-            The TfsUserMappingEnricher is used to map users from the source to the target system. Run it with the ExportUsersForMappingContext to create a mapping file then with WorkItemMigrationContext to use the mapping file to update the users in the target system as you migrate the work items.
-            </summary>
-        </member>
-        <member name="T:MigrationTools.ProcessorEnrichers.TfsUserMappingEnricher">
-            <summary>
-            The TfsUserMappingEnricher is used to map users from the source to the target system. Run it with the ExportUsersForMappingContext to create a mapping file then with WorkItemMigrationContext to use the mapping file to update the users in the target system as you migrate the work items.
-            </summary>
-        </member>
         <member name="T:MigrationTools.Processors.TfsSharedQueryProcessor">
             <summary>
             The TfsSharedQueryProcessor enabled you to migrate queries from one locatio nto another.
@@ -224,6 +84,140 @@
             <summary>
             List of Teams to process. If this is `null` then all teams will be processed.
             </summary>
+        </member>
+        <member name="P:MigrationTools.Tools.TfsAttachmentToolOptions.ExportBasePath">
+            <summary>
+            `AttachmentMigration` is set to true then you need to specify a working path for attachments to be saved locally.
+            </summary>
+            <default>C:\temp\Migration\</default>
+        </member>
+        <member name="P:MigrationTools.Tools.TfsAttachmentToolOptions.MaxAttachmentSize">
+            <summary>
+            `AttachmentMigration` is set to true then you need to specify a max file size for upload in bites.
+            For Azure DevOps Services the default is 480,000,000 bites (60mb), for TFS its 32,000,000 bites (4mb).
+            </summary>
+            <default>480000000</default>
+        </member>
+        <member name="M:MigrationTools.Tools.TfsEmbededImagesTool.FixEmbededImages(MigrationTools.DataContracts.WorkItemData,System.String,System.String,System.String)">
+            from https://gist.github.com/pietergheysens/792ed505f09557e77ddfc1b83531e4fb
+        </member>
+        <member name="T:MigrationTools.Tools.TfsNodeStructureTool">
+            <summary>
+            The TfsNodeStructureToolEnricher is used to create missing nodes in the target project. To configure it add a `TfsNodeStructureToolOptions` section to `CommonEnrichersConfig` in the config file. Otherwise defaults will be applied. 
+            </summary>
+        </member>
+        <member name="M:MigrationTools.Tools.TfsNodeStructureTool.ShouldCreateNode(System.String)">
+            <summary>
+            Checks node-to-be-created with allowed BasePath's
+            </summary>
+            <param name="userFriendlyPath">The user-friendly path of the source node</param>
+            <returns>true/false</returns>
+        </member>
+        <member name="M:MigrationTools.Tools.TfsNodeStructureTool.CheckIsParentOfSelectedBasePath(System.String)">
+            <summary>
+            Checks whether a path is a parent of a selected base path (meaning we cannot skip it entirely)
+            </summary>
+            <param name="userFriendlyPath">The user-friendly path of the source node</param>
+            <returns>A boolean indicating whether the path is a parent of any positively selected base path.</returns>
+            <exception cref="T:System.NotImplementedException"></exception>
+        </member>
+        <member name="P:MigrationTools.Tools.TfsNodeStructureToolOptions.NodeBasePaths">
+            <summary>
+            The root paths of the Ares / Iterations you want migrate. See [NodeBasePath Configuration](#nodebasepath-configuration)
+            </summary>
+            <default>["/"]</default>
+        </member>
+        <member name="P:MigrationTools.Tools.TfsNodeStructureToolOptions.AreaMaps">
+            <summary>
+            Remapping rules for area paths, implemented with regular expressions. The rules apply with a higher priority than the `PrefixProjectToNodes`,
+            that is, if no rule matches the path and the `PrefixProjectToNodes` option is enabled, then the old `PrefixProjectToNodes` behavior is applied.
+            </summary>
+            <default>{}</default>
+        </member>
+        <member name="P:MigrationTools.Tools.TfsNodeStructureToolOptions.IterationMaps">
+            <summary>
+            Remapping rules for iteration paths, implemented with regular expressions. The rules apply with a higher priority than the `PrefixProjectToNodes`,
+            that is, if no rule matches the path and the `PrefixProjectToNodes` option is enabled, then the old `PrefixProjectToNodes` behavior is applied.
+            </summary>
+            <default>{}</default>
+        </member>
+        <member name="P:MigrationTools.Tools.TfsNodeStructureToolOptions.ShouldCreateMissingRevisionPaths">
+            <summary>
+            When set to True the susyem will try to create any missing missing area or iteration paths from the revisions.
+            </summary>
+        </member>
+        <member name="T:MigrationTools.Tools.TfsRevisionManagerTool">
+            <summary>
+            The TfsRevisionManagerTool manipulates the revisions of a work item to reduce the number of revisions that are migrated.
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Tools.TfsRevisionManagerToolOptions.ReplayRevisions">
+            <summary>
+            You can choose to migrate the tip only (a single write) or all of the revisions (many writes).
+            If you are setting this to `false` to migrate only the tip then you should set `BuildFieldTable` to `true`.
+            </summary>
+            <default>true</default>
+        </member>
+        <member name="P:MigrationTools.Tools.TfsRevisionManagerToolOptions.MaxRevisions">
+            <summary>
+            Sets the maximum number of revisions that will be migrated. "First + Last N = Max".
+            If this was set to 5 and there were 10 revisions you would get the first 1 (creation) and the latest 4 migrated.
+            </summary>
+            <default>0</default>
+        </member>
+        <member name="T:MigrationTools.Tools.TfsTeamSettingsTool">
+            <summary>
+            The TfsUserMappingTool is used to map users from the source to the target system. Run it with the ExportUsersForMappingContext to create a mapping file then with WorkItemMigrationContext to use the mapping file to update the users in the target system as you migrate the work items.
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Tools.TfsTeamSettingsToolOptions.MigrateTeamSettings">
+            <summary>
+            Migrate original team settings after their creation on target team project
+            </summary>
+            <default>false</default>
+        </member>
+        <member name="P:MigrationTools.Tools.TfsTeamSettingsToolOptions.UpdateTeamSettings">
+            <summary>
+            Reset the target team settings to match the source if the team exists
+            </summary>
+            <default>false</default>
+        </member>
+        <member name="P:MigrationTools.Tools.TfsTeamSettingsToolOptions.MigrateTeamCapacities">
+            <summary>
+            Migrate original team member capacities after their creation on the target team project. Note: It will only migrate team member capacity if the team member with same display name exists on the target collection otherwise it will be ignored.
+            </summary>
+            <default>false</default>
+        </member>
+        <member name="P:MigrationTools.Tools.TfsTeamSettingsToolOptions.Teams">
+            <summary>
+            List of Teams to process. If this is `null` then all teams will be processed.
+            </summary>
+        </member>
+        <member name="T:MigrationTools.Tools.TfsUserMappingTool">
+            <summary>
+            The TfsUserMappingTool is used to map users from the source to the target system. Run it with the ExportUsersForMappingContext to create a mapping file then with WorkItemMigrationContext to use the mapping file to update the users in the target system as you migrate the work items.
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Tools.TfsUserMappingToolOptions.IdentityFieldsToCheck">
+            <summary>
+            This is a list of the Identiy fields in the Source to check for user mapping purposes. You should list all identiy fields that you wan to map.
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Tools.TfsUserMappingToolOptions.UserMappingFile">
+            <summary>
+            This is the file that will be used to export or import the user mappings. Use the ExportUsersForMapping processor to create the file.
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Tools.TfsWorkItemLinkToolOptions.FilterIfLinkCountMatches">
+            <summary>
+            Skip validating links if the number of links in the source and the target matches!
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Tools.TfsWorkItemLinkToolOptions.SaveAfterEachLinkIsAdded">
+            <summary>
+            Save the work item after each link is added. This will slow the migration as it will cause many saves to the TFS database.
+            </summary>
+            <default>false</default>
         </member>
     </members>
 </doc>

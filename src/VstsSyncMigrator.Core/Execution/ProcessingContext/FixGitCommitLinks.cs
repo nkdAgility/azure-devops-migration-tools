@@ -8,8 +8,7 @@ using MigrationTools;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Configuration.Processing;
 using MigrationTools.DataContracts;
-using MigrationTools.Enrichers;
-using MigrationTools.ProcessorEnrichers;
+using MigrationTools.Tools;
 using VstsSyncMigrator._EngineV1.Processors;
 using VstsSyncMigrator.Core.Execution;
 
@@ -18,9 +17,9 @@ namespace VstsSyncMigrator.Engine
     public class FixGitCommitLinks : TfsStaticProcessorBase
     {
         private FixGitCommitLinksConfig _config;
-        private TfsStaticEnrichers _tfsStaticEnrichers;
+        private TfsStaticTools _tfsStaticEnrichers;
 
-        public FixGitCommitLinks(IOptions<FixGitCommitLinksConfig> options, TfsStaticEnrichers tfsStaticEnrichers, StaticEnrichers staticEnrichers, IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<FixGitCommitLinks> logger) : base(tfsStaticEnrichers, staticEnrichers, services, me, telemetry, logger)
+        public FixGitCommitLinks(IOptions<FixGitCommitLinksConfig> options, TfsStaticTools tfsStaticEnrichers, StaticTools staticEnrichers, IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<FixGitCommitLinks> logger) : base(tfsStaticEnrichers, staticEnrichers, services, me, telemetry, logger)
         {
             Logger = logger;
             _config = options.Value;

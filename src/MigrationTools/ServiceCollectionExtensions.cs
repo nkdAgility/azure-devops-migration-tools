@@ -9,9 +9,8 @@ using MigrationTools.EndpointEnrichers;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
 using MigrationTools.Options;
-using MigrationTools.ProcessorEnrichers;
-using MigrationTools.ProcessorEnrichers.WorkItemProcessorEnrichers;
 using MigrationTools.Processors;
+using MigrationTools.Tools;
 using Serilog;
 
 namespace MigrationTools
@@ -36,13 +35,13 @@ namespace MigrationTools
             switch (VersionOptions.ConfigureOptions.GetMigrationConfigVersion(configuration).schema)
             {
                 case MigrationConfigSchema.v1:
-                    context.AddSingleton<StringManipulatorEnricher>().AddSingleton<IOptions<StringManipulatorEnricherOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<StringManipulatorEnricherOptions>(StringManipulatorEnricherOptions.ConfigurationSectionName)));
-                    context.AddSingleton<WorkItemTypeMappingEnricher>().AddSingleton<IOptions<WorkItemTypeMappingEnricherOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<WorkItemTypeMappingEnricherOptions>(WorkItemTypeMappingEnricherOptions.ConfigurationSectionName)));
+                    context.AddSingleton<StringManipulatorTool>().AddSingleton<IOptions<StringManipulatorToolOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<StringManipulatorToolOptions>(StringManipulatorToolOptions.ConfigurationSectionName)));
+                    context.AddSingleton<WorkItemTypeMappingTool>().AddSingleton<IOptions<WorkItemTypeMappingToolOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<WorkItemTypeMappingToolOptions>(WorkItemTypeMappingToolOptions.ConfigurationSectionName)));
                     context.AddSingleton< GitRepoMappingTool>().AddSingleton<IOptions<GitRepoMappingToolOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<GitRepoMappingToolOptions>(GitRepoMappingToolOptions.ConfigurationSectionName)));
                     break;
                 case MigrationConfigSchema.v160:
-                    context.AddSingleton<StringManipulatorEnricher>().AddOptions<StringManipulatorEnricherOptions>().Bind(configuration.GetSection(StringManipulatorEnricherOptions.ConfigurationSectionName));
-                    context.AddSingleton<WorkItemTypeMappingEnricher>().AddOptions<WorkItemTypeMappingEnricherOptions>().Bind(configuration.GetSection(WorkItemTypeMappingEnricherOptions.ConfigurationSectionName));
+                    context.AddSingleton<StringManipulatorTool>().AddOptions<StringManipulatorToolOptions>().Bind(configuration.GetSection(StringManipulatorToolOptions.ConfigurationSectionName));
+                    context.AddSingleton<WorkItemTypeMappingTool>().AddOptions<WorkItemTypeMappingToolOptions>().Bind(configuration.GetSection(WorkItemTypeMappingToolOptions.ConfigurationSectionName));
                     context.AddSingleton<GitRepoMappingTool>().AddOptions<GitRepoMappingToolOptions>().Bind(configuration.GetSection(GitRepoMappingToolOptions.ConfigurationSectionName));
                     break;
             }
@@ -56,7 +55,7 @@ namespace MigrationTools
 
             context.AddSingleton<FieldMappingTool>().AddSingleton<IConfigureOptions<FieldMappingToolOptions>, FieldMappingToolOptions.ConfigureOptions>();
             context.AddSingleton<VersionOptions>().AddSingleton<IConfigureOptions<VersionOptions>, VersionOptions.ConfigureOptions>();
-            context.AddSingleton<StaticEnrichers>();
+            context.AddSingleton<StaticTools>();
 
 
             //context.AddTransient<WorkItemAttachmentEnricher>();

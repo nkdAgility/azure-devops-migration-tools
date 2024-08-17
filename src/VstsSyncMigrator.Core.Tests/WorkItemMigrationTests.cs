@@ -8,7 +8,6 @@ using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Configuration.Processing;
 using MigrationTools.Enrichers;
 using MigrationTools.ProcessorEnrichers;
-using MigrationTools.ProcessorEnrichers.WorkItemProcessorEnrichers;
 using MigrationTools.Tests;
 using VstsSyncMigrator.Engine;
 

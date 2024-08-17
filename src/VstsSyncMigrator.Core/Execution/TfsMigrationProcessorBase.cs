@@ -6,16 +6,15 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MigrationTools;
 using MigrationTools._EngineV1.Processors;
-using MigrationTools.Enrichers;
-using MigrationTools.ProcessorEnrichers;
+using MigrationTools.Tools;
 
 namespace VstsSyncMigrator.Core.Execution
 {
     public abstract class TfsMigrationProcessorBase : MigrationProcessorBase
     {
-        public TfsStaticEnrichers TfsStaticEnrichers { get; private set; }
+        public TfsStaticTools TfsStaticEnrichers { get; private set; }
 
-        protected TfsMigrationProcessorBase(IMigrationEngine engine, TfsStaticEnrichers tfsStaticEnrichers,  StaticEnrichers staticEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<MigrationProcessorBase> logger) : base(engine, staticEnrichers, services, telemetry, logger)
+        protected TfsMigrationProcessorBase(IMigrationEngine engine, TfsStaticTools tfsStaticEnrichers,  StaticTools staticEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<MigrationProcessorBase> logger) : base(engine, staticEnrichers, services, telemetry, logger)
         {
             TfsStaticEnrichers = tfsStaticEnrichers;
         }

@@ -26,10 +26,10 @@ namespace MigrationTools.Processors
             //    new InMemoryWorkItemEndpointOptions { Direction = EndpointDirection.Source },
             //    new InMemoryWorkItemEndpointOptions { Direction = EndpointDirection.Target }
             //    };
-            ProcessorEnrichers = new List<IProcessorEnricherOptions>() {
-                { new PauseAfterEachItemOptions { Enabled = true } },
-                { new AppendMigrationToolSignatureFooterOptions { Enabled = true } }
-            };
+            //ProcessorEnrichers = new List<IProcessorEnricherOptions>() {
+            //    { new PauseAfterEachItemOptions { Enabled = true } },
+            //    { new AppendMigrationToolSignatureFooterOptions { Enabled = true } }
+            //};
         }
     }
 }

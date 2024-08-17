@@ -9,11 +9,10 @@ using MigrationTools._EngineV1.Clients;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Configuration.Processing;
 using MigrationTools.DataContracts;
-using MigrationTools.Enrichers;
-using MigrationTools.ProcessorEnrichers;
 using VstsSyncMigrator._EngineV1.Processors;
 using VstsSyncMigrator.Core.Execution;
 using Microsoft.Extensions.Options;
+using MigrationTools.Tools;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -26,7 +25,7 @@ namespace VstsSyncMigrator.Engine
     {
         private WorkItemUpdateAreasAsTagsConfig _config;
 
-        public WorkItemUpdateAreasAsTagsContext(IOptions<WorkItemUpdateAreasAsTagsConfig> options, TfsStaticEnrichers tfsStaticEnrichers, StaticEnrichers staticEnrichers, IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<StaticProcessorBase> logger) : base(tfsStaticEnrichers, staticEnrichers, services, me, telemetry, logger)
+        public WorkItemUpdateAreasAsTagsContext(IOptions<WorkItemUpdateAreasAsTagsConfig> options, TfsStaticTools tfsStaticEnrichers, StaticTools staticEnrichers, IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<StaticProcessorBase> logger) : base(tfsStaticEnrichers, staticEnrichers, services, me, telemetry, logger)
         {
             _config = options.Value;
         }

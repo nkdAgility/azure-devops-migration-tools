@@ -4,14 +4,14 @@ using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools.DataContracts;
-using MigrationTools.Enrichers;
 using MigrationTools.Tests;
+using MigrationTools.Tools;
 
 
 namespace MigrationTools.ProcessorEnrichers.Tests
 {
     [TestClass()]
-    public class TfsRevisionManagerTests
+    public class TfsRevisionManagerToolTests
     {
 
         private static List<RevisionItem> GetWorkItemWithRevisions(DateTime currentDateTime, int startHours = 1, int endHours = 1, bool dateIncreasing = true)
@@ -28,9 +28,9 @@ namespace MigrationTools.ProcessorEnrichers.Tests
 
 
         [TestMethod(), TestCategory("L0")]
-        public void TfsRevisionManagerInSync1()
+        public void TfsRevisionManagerToolInSync1()
         {
-            var processorEnricher = GetTfsRevisionManager();
+            var processorEnricher = GetTfsRevisionManagerTool();
 
             var currentDateTime = System.DateTime.Now;
             List<RevisionItem> source = GetWorkItemWithRevisions(currentDateTime, 1, 1);
@@ -43,9 +43,9 @@ namespace MigrationTools.ProcessorEnrichers.Tests
         }
 
         [TestMethod(), TestCategory("L0")]
-        public void TfsRevisionManagerInSync10()
+        public void TfsRevisionManagerToolInSync10()
         {
-            var processorEnricher = GetTfsRevisionManager();
+            var processorEnricher = GetTfsRevisionManagerTool();
 
             var currentDateTime = System.DateTime.Now;
             List<RevisionItem> source = GetWorkItemWithRevisions(currentDateTime, 1, 10);
@@ -58,9 +58,9 @@ namespace MigrationTools.ProcessorEnrichers.Tests
         }
 
         [TestMethod(), TestCategory("L0")]
-        public void TfsRevisionManagerSync1()
+        public void TfsRevisionManagerToolSync1()
         {
-            var processorEnricher = GetTfsRevisionManager();
+            var processorEnricher = GetTfsRevisionManagerTool();
 
             var currentDateTime = System.DateTime.Now;
             List<RevisionItem> source = GetWorkItemWithRevisions(currentDateTime, 1, 2);
@@ -72,9 +72,9 @@ namespace MigrationTools.ProcessorEnrichers.Tests
         }
 
         [TestMethod(), TestCategory("L0")]
-        public void TfsRevisionManagerSync10()
+        public void TfsRevisionManagerToolSync10()
         {
-            var processorEnricher = GetTfsRevisionManager();
+            var processorEnricher = GetTfsRevisionManagerTool();
 
             var currentDateTime = DateTime.Now;
             List<RevisionItem> source = GetWorkItemWithRevisions(currentDateTime, 1, 11);
@@ -86,9 +86,9 @@ namespace MigrationTools.ProcessorEnrichers.Tests
         }
 
         [TestMethod(), TestCategory("L0")]
-        public void TfsRevisionManagerReplayRevisionsOff()
+        public void TfsRevisionManagerToolReplayRevisionsOff()
         {
-            var processorEnricher = GetTfsRevisionManager(new TfsRevisionManagerOptions()
+            var processorEnricher = GetTfsRevisionManagerTool(new TfsRevisionManagerToolOptions()
             {
                 Enabled = true,
                 MaxRevisions = 0,
@@ -106,9 +106,9 @@ namespace MigrationTools.ProcessorEnrichers.Tests
 
 
         [TestMethod(), TestCategory("L0")]
-        public void TfsRevisionManagerMaxRevision51()
+        public void TfsRevisionManagerToolMaxRevision51()
         {
-            var processorEnricher = GetTfsRevisionManager(new TfsRevisionManagerOptions()
+            var processorEnricher = GetTfsRevisionManagerTool(new TfsRevisionManagerToolOptions()
             {
                 Enabled = true,
                 MaxRevisions = 5,
@@ -125,9 +125,9 @@ namespace MigrationTools.ProcessorEnrichers.Tests
         }
 
         [TestMethod(), TestCategory("L0")]
-        public void TfsRevisionManagerMaxRevision56()
+        public void TfsRevisionManagerToolMaxRevision56()
         {
-            var processorEnricher = GetTfsRevisionManager(new TfsRevisionManagerOptions()
+            var processorEnricher = GetTfsRevisionManagerTool(new TfsRevisionManagerToolOptions()
             {
                 Enabled = true,
                 MaxRevisions = 5,
@@ -144,9 +144,9 @@ namespace MigrationTools.ProcessorEnrichers.Tests
         }
 
         [TestMethod(), TestCategory("L0")]
-        public void TfsRevisionManagerMaxRevision59()
+        public void TfsRevisionManagerToolMaxRevision59()
         {
-            var processorEnricher = GetTfsRevisionManager(new TfsRevisionManagerOptions()
+            var processorEnricher = GetTfsRevisionManagerTool(new TfsRevisionManagerToolOptions()
             {
                 Enabled = true,
                 MaxRevisions = 5,
@@ -162,9 +162,9 @@ namespace MigrationTools.ProcessorEnrichers.Tests
         }
 
         [TestMethod(), TestCategory("L0")]
-        public void TfsRevisionManagerDatesMustBeIncreasing()
+        public void TfsRevisionManagerToolDatesMustBeIncreasing()
         {
-            var processorEnricher = GetTfsRevisionManager();
+            var processorEnricher = GetTfsRevisionManagerTool();
 
             var currentDateTime = DateTime.Now;
             List<RevisionItem> source = GetWorkItemWithRevisions(currentDateTime, 1, 10, false);
@@ -188,23 +188,23 @@ namespace MigrationTools.ProcessorEnrichers.Tests
             return increasing;
         }
 
-        private static TfsRevisionManager GetTfsRevisionManager()
+        private static TfsRevisionManagerTool GetTfsRevisionManagerTool()
         {
-            return GetTfsRevisionManager(new TfsRevisionManagerOptions() { Enabled = true, MaxRevisions = 0, ReplayRevisions = true });
+            return GetTfsRevisionManagerTool(new TfsRevisionManagerToolOptions() { Enabled = true, MaxRevisions = 0, ReplayRevisions = true });
         }
 
-        private static TfsRevisionManager GetTfsRevisionManager(TfsRevisionManagerOptions options)
+        private static TfsRevisionManagerTool GetTfsRevisionManagerTool(TfsRevisionManagerToolOptions options)
         {
 
             var sp = ServiceProviderHelper.GetMigrationToolServicesForUnitTests();
-            sp.AddSingleton<TfsRevisionManager>();
-            sp.Configure<TfsRevisionManagerOptions>(o =>
+            sp.AddSingleton<TfsRevisionManagerTool>();
+            sp.Configure<TfsRevisionManagerToolOptions>(o =>
             {
                 o.Enabled = options.Enabled;
                 o.MaxRevisions = options.MaxRevisions;
                 o.ReplayRevisions = options.ReplayRevisions;
             });
-            return sp.BuildServiceProvider().GetService<TfsRevisionManager>();
+            return sp.BuildServiceProvider().GetService<TfsRevisionManagerTool>();
         }
     }
 }

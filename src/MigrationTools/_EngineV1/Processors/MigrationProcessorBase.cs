@@ -6,16 +6,16 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Enrichers;
-using MigrationTools.ProcessorEnrichers;
 using MigrationTools.Processors;
+using MigrationTools.Tools;
 
 namespace MigrationTools._EngineV1.Processors
 {
     public abstract class MigrationProcessorBase : Containers.IProcessor
     {
-        public StaticEnrichers StaticEnrichers { get; private set; }
+        public StaticTools StaticEnrichers { get; private set; }
 
-        protected MigrationProcessorBase(IMigrationEngine engine, StaticEnrichers staticEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<MigrationProcessorBase> logger)
+        protected MigrationProcessorBase(IMigrationEngine engine, StaticTools staticEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<MigrationProcessorBase> logger)
         {
             Engine = engine;
             Services = services;

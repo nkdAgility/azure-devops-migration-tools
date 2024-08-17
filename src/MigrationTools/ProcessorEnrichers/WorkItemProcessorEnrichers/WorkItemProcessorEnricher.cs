@@ -6,6 +6,7 @@ using MigrationTools.Processors;
 
 namespace MigrationTools.Enrichers
 {
+    [Obsolete]
     public abstract class WorkItemProcessorEnricher : IWorkItemProcessorEnricher
     {
         protected ITelemetryLogger Telemetry { get; }

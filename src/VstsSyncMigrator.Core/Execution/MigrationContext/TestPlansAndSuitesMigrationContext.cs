@@ -22,12 +22,11 @@ using MigrationTools._EngineV1.Configuration.Processing;
 using MigrationTools._EngineV1.Processors;
 using MigrationTools.DataContracts;
 using MigrationTools.DataContracts.Pipelines;
-using MigrationTools.Enrichers;
-using MigrationTools.ProcessorEnrichers;
 using VstsSyncMigrator.Core.Execution;
 using VstsSyncMigrator.Engine.ComponentContext;
 using Environment = System.Environment;
 using Microsoft.Extensions.Options;
+using MigrationTools.Tools;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -51,10 +50,10 @@ namespace VstsSyncMigrator.Engine
         private TestManagementContext _targetTestStore;
         private int _totalPlans = 0;
         private int _totalTestCases = 0;
-        private TfsNodeStructure _nodeStructureEnricher;
+        private TfsNodeStructureTool _nodeStructureEnricher;
         private readonly EngineConfiguration _engineConfig;
 
-        public TestPlansAndSuitesMigrationContext(IOptions<TestPlansAndSuitesMigrationConfig> options, IOptions<EngineConfiguration> engineConfig, IMigrationEngine engine, TfsStaticEnrichers tfsStaticEnrichers, StaticEnrichers staticEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<MigrationProcessorBase> logger) : base(engine, tfsStaticEnrichers, staticEnrichers, services, telemetry, logger)
+        public TestPlansAndSuitesMigrationContext(IOptions<TestPlansAndSuitesMigrationConfig> options, IOptions<EngineConfiguration> engineConfig, IMigrationEngine engine, TfsStaticTools tfsStaticEnrichers, StaticTools staticEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<MigrationProcessorBase> logger) : base(engine, tfsStaticEnrichers, staticEnrichers, services, telemetry, logger)
         {
             _engineConfig = engineConfig.Value;
             _config = options.Value;

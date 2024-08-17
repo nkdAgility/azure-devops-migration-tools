@@ -9,8 +9,7 @@ using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools;
 using MigrationTools._EngineV1.Clients;
 using MigrationTools._EngineV1.Configuration;
-using MigrationTools.Enrichers;
-using MigrationTools.ProcessorEnrichers;
+using MigrationTools.Tools;
 using VstsSyncMigrator._EngineV1.Processors;
 using VstsSyncMigrator.Core.Execution;
 
@@ -23,7 +22,7 @@ namespace VstsSyncMigrator.Engine
     /// <processingtarget>Shared Queries</processingtarget>
     public class CreateTeamFolders : TfsStaticProcessorBase
     {
-        public CreateTeamFolders(TfsStaticEnrichers tfsStaticEnrichers, StaticEnrichers staticEnrichers, IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<StaticProcessorBase> logger) : base(tfsStaticEnrichers, staticEnrichers, services, me, telemetry, logger)
+        public CreateTeamFolders(TfsStaticTools tfsStaticEnrichers, StaticTools staticEnrichers, IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<StaticProcessorBase> logger) : base(tfsStaticEnrichers, staticEnrichers, services, me, telemetry, logger)
         {
         }
 

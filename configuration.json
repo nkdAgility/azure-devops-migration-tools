@@ -31,14 +31,14 @@
         "IterationPath": "Iteration"
       }
     },
-    "CommonEnrichers": {
-      "WorkItemTypeMappingEnricher": {
+    "CommonTools": {
+      "WorkItemTypeMappingTool": {
         "Enabled": true,
         "Mappings": {
           "User Story": "Product Backlog Item"
         }
       },
-      "StringManipulatorEnricher": {
+      "StringManipulatorTool": {
         "Enabled": true,
         "MaxStringLength": 1000000,
         "Manipulators": [
@@ -51,8 +51,8 @@
           }
         ]
       },
-      "TfsAttachmentEnricher": {
-        "RefName": "TfsAttachmentEnricher",
+      "TfsAttachmentTool": {
+        "RefName": "TfsAttachmentTool",
         "Enabled": true,
         "ExportBasePath": "c:\\temp\\WorkItemAttachmentExport",
         "MaxRevisions": 480000000
@@ -86,7 +86,7 @@
           "Source Repo Name": "Target Repo Name"
         }
       },
-      "TfsNodeStructure": {
+      "TfsNodeStructureTool": {
         "Enabled": true,
         "NodeBasePaths": [],
         "AreaMaps": {
@@ -100,12 +100,12 @@
         "ShouldCreateMissingRevisionPaths": true,
         "ReplicateAllExistingNodes": true
       },
-      "TfsRevisionManager": {
+      "TfsRevisionManagerTool": {
         "Enabled": true,
         "ReplayRevisions": true,
         "MaxRevisions": 0
       },
-      "TfsTeamSettingsEnricher": {
+      "TfsTeamSettingsTool": {
         "Enabled": true,
         "MigrateTeamSettings": true,
         "UpdateTeamSettings": true,

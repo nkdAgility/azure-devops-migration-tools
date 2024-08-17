@@ -29,5 +29,7 @@
 
   <ItemGroup>
     <Folder Include="EndpointEnrichers\" />
+    <Folder Include="Enrichers\" />
+    <Folder Include="ProcessorEnrichers\" />
   </ItemGroup>
 </Project>

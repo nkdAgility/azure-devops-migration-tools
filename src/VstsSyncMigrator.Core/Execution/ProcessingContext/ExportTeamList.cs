@@ -7,8 +7,7 @@ using Microsoft.TeamFoundation.Framework.Common;
 using Microsoft.TeamFoundation.Server;
 using MigrationTools;
 using MigrationTools._EngineV1.Configuration;
-using MigrationTools.Enrichers;
-using MigrationTools.ProcessorEnrichers;
+using MigrationTools.Tools;
 using VstsSyncMigrator._EngineV1.Processors;
 using VstsSyncMigrator.Core.Execution;
 
@@ -16,7 +15,7 @@ namespace VstsSyncMigrator.Engine
 {
     public class ExportTeamList : TfsStaticProcessorBase
     {
-        public ExportTeamList(TfsStaticEnrichers tfsStaticEnrichers, StaticEnrichers staticEnrichers, IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<StaticProcessorBase> logger) : base(tfsStaticEnrichers, staticEnrichers, services, me, telemetry, logger)
+        public ExportTeamList(TfsStaticTools tfsStaticEnrichers, StaticTools staticEnrichers, IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<StaticProcessorBase> logger) : base(tfsStaticEnrichers, staticEnrichers, services, me, telemetry, logger)
         {
         }
 

@@ -133,7 +133,7 @@
               "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\"
             },
             {
-              "$type": "TfsWorkItemLinkEnricherOptions",
+              "$type": "TfsWorkItemLinkToolOptions",
               "Enabled": true
             },
             {

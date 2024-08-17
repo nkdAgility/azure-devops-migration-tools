@@ -5,8 +5,7 @@ using Microsoft.TeamFoundation.TestManagement.Client;
 using MigrationTools;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Processors;
-using MigrationTools.Enrichers;
-using MigrationTools.ProcessorEnrichers;
+using MigrationTools.Tools;
 using VstsSyncMigrator.Core.Execution;
 using VstsSyncMigrator.Engine.ComponentContext;
 
@@ -19,7 +18,7 @@ namespace VstsSyncMigrator.Engine
     /// <processingtarget>Suites &amp; Plans</processingtarget>
     public class TestConfigurationsMigrationContext : TfsMigrationProcessorBase
     {
-        public TestConfigurationsMigrationContext(IMigrationEngine engine, TfsStaticEnrichers tfsStaticEnrichers, StaticEnrichers staticEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<MigrationProcessorBase> logger) : base(engine, tfsStaticEnrichers, staticEnrichers, services, telemetry, logger)
+        public TestConfigurationsMigrationContext(IMigrationEngine engine, TfsStaticTools tfsStaticEnrichers, StaticTools staticEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<MigrationProcessorBase> logger) : base(engine, tfsStaticEnrichers, staticEnrichers, services, telemetry, logger)
         {
         }
 

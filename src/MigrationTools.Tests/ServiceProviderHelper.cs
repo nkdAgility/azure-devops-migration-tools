@@ -6,10 +6,10 @@ using MigrationTools.Endpoints;
 using MigrationTools.Engine.Containers.Tests;
 using MigrationTools.Enrichers;
 using MigrationTools.Helpers.Tests;
-using MigrationTools.ProcessorEnrichers.WorkItemProcessorEnrichers;
 using MigrationTools.Processors;
 using MigrationTools.Services;
 using MigrationTools.TestExtensions;
+using MigrationTools.Tools;
 
 namespace MigrationTools.Tests
 {
@@ -37,7 +37,7 @@ namespace MigrationTools.Tests
             services.AddTransient<ProcessorEnricherContainer>();
 
             // ProcessorEnrichers
-            services.AddSingleton<StringManipulatorEnricher>();
+            services.AddSingleton<StringManipulatorTool>();
 
 
             services.AddSingleton<IMigrationToolVersionInfo, FakeMigrationToolVersionInfo>();

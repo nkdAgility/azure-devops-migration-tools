@@ -121,14 +121,14 @@
   "LogLevel": "Information",
   "CommonEnrichersConfig": [
     {
-      "$type": "WorkItemTypeMappingEnricherOptions",
+      "$type": "WorkItemTypeMappingToolOptions",
       "Enabled": false,
       "Mappings": {
         "User Story": "Product Backlog Item"
       }
     },
     {
-      "$type": "StringManipulatorEnricherOptions",
+      "$type": "StringManipulatorToolOptions",
       "Enabled": true,
       "MaxStringLength": 1000000,
       "Manipulators": [

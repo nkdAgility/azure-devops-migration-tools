@@ -3,23 +3,22 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools.DataContracts;
 using MigrationTools.Endpoints;
-using MigrationTools.Enrichers;
-using MigrationTools.ProcessorEnrichers.WorkItemProcessorEnrichers;
 using MigrationTools.Processors;
 using MigrationTools.Tests;
 using MigrationTools.TestExtensions;
 using Microsoft.Extensions.Options;
+using MigrationTools.Tools;
 
 namespace MigrationTools.ProcessorEnrichers.Tests
 {
     [TestClass()]
-    public class StringManipulatorEnricherTests
+    public class StringManipulatorToolTests
     {
 
         [TestMethod(), TestCategory("L1")]
-        public void StringManipulatorEnricher_ConfigureTest()
+        public void StringManipulatorTool_ConfigureTest()
         {
-            var options = new StringManipulatorEnricherOptions();
+            var options = new StringManipulatorToolOptions();
             options.Enabled = true;
             options.MaxStringLength = 10;
                 options.Manipulators = new List<RegexStringManipulator>
@@ -33,15 +32,15 @@ namespace MigrationTools.ProcessorEnrichers.Tests
                     }
                 };
 
-            var x = GetStringManipulatorEnricher(options);
+            var x = GetStringManipulatorTool(options);
 
             Assert.IsNotNull(x);
         }
 
         [TestMethod(), TestCategory("L1")]
-        public void StringManipulatorEnricher_RegexTest()
+        public void StringManipulatorTool_RegexTest()
         {
-           var options = new StringManipulatorEnricherOptions();
+           var options = new StringManipulatorToolOptions();
             options.Enabled = true;
                     options.MaxStringLength = 10;
                     options.Manipulators = new List<RegexStringManipulator>
@@ -55,7 +54,7 @@ namespace MigrationTools.ProcessorEnrichers.Tests
                     }
                 };
 
-            var x = GetStringManipulatorEnricher(options);
+            var x = GetStringManipulatorTool(options);
 
             var fieldItem = new FieldItem
             {
@@ -72,12 +71,12 @@ namespace MigrationTools.ProcessorEnrichers.Tests
         }
 
         [TestMethod(), TestCategory("L1")]
-        public void StringManipulatorEnricher_LengthShorterThanMaxTest()
+        public void StringManipulatorTool_LengthShorterThanMaxTest()
         {
-            var options = new StringManipulatorEnricherOptions();
+            var options = new StringManipulatorToolOptions();
             options.Enabled = true;
                 options.MaxStringLength = 10;
-            var x = GetStringManipulatorEnricher(options);
+            var x = GetStringManipulatorTool(options);
 
             var fieldItem = new FieldItem
             {
@@ -94,12 +93,12 @@ namespace MigrationTools.ProcessorEnrichers.Tests
         }
 
         [TestMethod(), TestCategory("L1")]
-        public void StringManipulatorEnricher_LengthLongerThanMaxTest()
+        public void StringManipulatorTool_LengthLongerThanMaxTest()
         {
-            var options = new StringManipulatorEnricherOptions();
+            var options = new StringManipulatorToolOptions();
             options.Enabled = true;
             options.MaxStringLength = 10;
-            var x = GetStringManipulatorEnricher(options);
+            var x = GetStringManipulatorTool(options);
 
             var fieldItem = new FieldItem
             {
@@ -115,26 +114,26 @@ namespace MigrationTools.ProcessorEnrichers.Tests
             Assert.AreEqual(10, fieldItem.Value.ToString().Length);
         }
 
-        private static StringManipulatorEnricher GetStringManipulatorEnricher()
+        private static StringManipulatorTool GetStringManipulatorTool()
         {
-            var options = new StringManipulatorEnricherOptions();
+            var options = new StringManipulatorToolOptions();
             options.SetDefaults();
            
-            return GetStringManipulatorEnricher(options);
+            return GetStringManipulatorTool(options);
         }
 
-        private static StringManipulatorEnricher GetStringManipulatorEnricher(StringManipulatorEnricherOptions options)
+        private static StringManipulatorTool GetStringManipulatorTool(StringManipulatorToolOptions options)
         {
             var services = new ServiceCollection();
             services.AddMigrationToolServicesForUnitTests();
-            services.AddSingleton<StringManipulatorEnricher>();
-            services.Configure<StringManipulatorEnricherOptions>(o =>
+            services.AddSingleton<StringManipulatorTool>();
+            services.Configure<StringManipulatorToolOptions>(o =>
             {
                 o.Enabled = options.Enabled;
                 o.MaxStringLength = options.MaxStringLength;
                 o.Manipulators = options.Manipulators;
             });
-            return services.BuildServiceProvider().GetService<StringManipulatorEnricher>();
+            return services.BuildServiceProvider().GetService<StringManipulatorTool>();
         }
     }
 }

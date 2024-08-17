@@ -31,9 +31,7 @@ using MigrationTools._EngineV1.DataContracts;
 using MigrationTools._EngineV1.Enrichers;
 using MigrationTools._EngineV1.Processors;
 using MigrationTools.DataContracts;
-using MigrationTools.Enrichers;
-using MigrationTools.ProcessorEnrichers;
-using MigrationTools.ProcessorEnrichers.WorkItemProcessorEnrichers;
+using MigrationTools.Tools;
 using Newtonsoft.Json.Linq;
 using Serilog.Context;
 using Serilog.Events;
@@ -72,9 +70,9 @@ namespace VstsSyncMigrator.Engine
                                         IServiceProvider services,
                                         ITelemetryLogger telemetry,
                                         ILogger<WorkItemMigrationContext> logger,
-                                        TfsStaticEnrichers tfsStaticEnrichers,
+                                        TfsStaticTools tfsStaticEnrichers,
                                         IOptions<EngineConfiguration> engineConfig,
-                                        StaticEnrichers staticEnrichers)
+                                        StaticTools staticEnrichers)
             : base(engine, tfsStaticEnrichers, staticEnrichers, services, telemetry, logger)
         {
             _config = processorConfig.Value;
@@ -290,7 +288,7 @@ namespace VstsSyncMigrator.Engine
         private void ValiddateWorkItemTypesExistInTarget(List<WorkItemData> sourceWorkItems)
         {
             contextLog.Information("Validating::Check that all work item types needed in the Target exist or are mapped");
-            var workItemTypeMappingTool = Services.GetRequiredService<WorkItemTypeMappingEnricher>();
+            var workItemTypeMappingTool = Services.GetRequiredService<WorkItemTypeMappingTool>();
             // get list of all work item types
             List<String> sourceWorkItemTypes = sourceWorkItems.SelectMany(x => x.Revisions.Values)
             //.Where(x => x.Fields[fieldName].Value.ToString().Contains("\\"))
@@ -676,7 +674,7 @@ namespace VstsSyncMigrator.Engine
 
         private WorkItemData ReplayRevisions(List<RevisionItem> revisionsToMigrate, WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
         {
-            var workItemTypeMappingTool = Services.GetRequiredService<WorkItemTypeMappingEnricher>();
+            var workItemTypeMappingTool = Services.GetRequiredService<WorkItemTypeMappingTool>();
             try
             {
                 //If work item hasn't been created yet, create a shell

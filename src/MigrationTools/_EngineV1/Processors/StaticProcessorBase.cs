@@ -4,8 +4,8 @@ using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using MigrationTools;
 using MigrationTools._EngineV1.Configuration;
-using MigrationTools.ProcessorEnrichers;
 using MigrationTools.Processors;
+using MigrationTools.Tools;
 
 namespace VstsSyncMigrator._EngineV1.Processors
 {
@@ -14,9 +14,9 @@ namespace VstsSyncMigrator._EngineV1.Processors
         protected IMigrationEngine Engine { get; }
         protected IServiceProvider Services { get; }
 
-        public StaticEnrichers StaticEnrichers { get; private set; }
+        public StaticTools StaticEnrichers { get; private set; }
 
-        public StaticProcessorBase(StaticEnrichers staticEnrichers,IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<StaticProcessorBase> logger)
+        public StaticProcessorBase(StaticTools staticEnrichers,IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<StaticProcessorBase> logger)
         {
             Services = services;
             Engine = me;
