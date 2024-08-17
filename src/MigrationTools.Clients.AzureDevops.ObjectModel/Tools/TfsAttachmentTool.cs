@@ -9,26 +9,24 @@ using Microsoft.TeamFoundation.Server;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Proxy;
 using MigrationTools._EngineV1.Configuration.Processing;
-using MigrationTools._EngineV1.Enrichers;
 using MigrationTools.DataContracts;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
 using MigrationTools.Processors;
+using MigrationTools.Tools.Infra;
 using Serilog;
 
 namespace MigrationTools.Tools
 {
-    public class TfsAttachmentTool : WorkItemProcessorEnricher, IAttachmentMigrationEnricher
+    public class TfsAttachmentTool : Tool<TfsAttachmentToolOptions>, IAttachmentMigrationEnricher
     {
         private string _exportWiPath;
-        private TfsAttachmentToolOptions _options;
         private WorkItemServer _workItemServer;
 
-        public TfsAttachmentToolOptions Options { get { return _options; } }
 
-        public TfsAttachmentTool(IOptions<TfsAttachmentToolOptions> options, IServiceProvider services, ILogger<WorkItemProcessorEnricher> logger, ITelemetryLogger telemetryLogger) : base(services, logger, telemetryLogger)
+        public TfsAttachmentTool(IOptions<TfsAttachmentToolOptions> options, IServiceProvider services, ILogger<TfsAttachmentTool> logger, ITelemetryLogger telemetryLogger) : base(options,services, logger, telemetryLogger)
         {
-            _options = options.Value;
+
         }
 
         public void ProcessAttachemnts(WorkItemData source, WorkItemData target, bool save = true)
@@ -187,14 +185,5 @@ namespace MigrationTools.Tools
             }
         }
 
-        protected override void RefreshForProcessorType(IProcessor processor)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override void EntryForProcessorType(IProcessor processor)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

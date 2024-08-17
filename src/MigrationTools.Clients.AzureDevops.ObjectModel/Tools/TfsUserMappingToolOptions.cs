@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using Microsoft.TeamFoundation.Build.Client;
 using MigrationTools.Enrichers;
+using MigrationTools.Tools.Infra;
 
 namespace MigrationTools.Tools
 {
-    public class TfsUserMappingToolOptions : ProcessorEnricherOptions, ITfsUserMappingToolOptions
+    public class TfsUserMappingToolOptions : ToolOptions, ITfsUserMappingToolOptions
     {
 
         public const string ConfigurationSectionName = "MigrationTools:CommonTools:TfsUserMappingTool";
-        public override Type ToConfigure => typeof(TfsUserMappingTool);
 
         /// <summary>
         /// This is a list of the Identiy fields in the Source to check for user mapping purposes. You should list all identiy fields that you wan to map.
@@ -21,25 +21,6 @@ namespace MigrationTools.Tools
         /// </summary>
         public string UserMappingFile { get; set; }
 
-        public override void SetDefaults()
-        {
-            Enabled = false;
-            UserMappingFile = "usermapping.json";
-            IdentityFieldsToCheck = new List<string> {
-                "System.AssignedTo",
-        "System.ChangedBy",
-        "System.CreatedBy",
-        "Microsoft.VSTS.Common.ActivatedBy",
-        "Microsoft.VSTS.Common.ResolvedBy",
-        "Microsoft.VSTS.Common.ClosedBy" };
-        }
-
-        static public TfsUserMappingToolOptions GetDefaults()
-        {
-            var result = new TfsUserMappingToolOptions();
-            result.SetDefaults();
-            return result;
-        }
     }
 
     public interface ITfsUserMappingToolOptions

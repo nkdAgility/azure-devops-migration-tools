@@ -9,24 +9,21 @@ using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
 using MigrationTools.Exceptions;
 using MigrationTools.Processors;
+using MigrationTools.Tools.Infra;
 
 namespace MigrationTools.Tools
 {
-    public class TfsWorkItemLinkTool : WorkItemProcessorEnricher
+    public class TfsWorkItemLinkTool : Tool<TfsWorkItemLinkToolOptions>
     {
         private IMigrationEngine Engine;
 
-        public TfsWorkItemLinkToolOptions Options { get; private set; }
-
         public TfsWorkItemLinkTool(IOptions<TfsWorkItemLinkToolOptions> options, IServiceProvider services, ILogger<TfsWorkItemLinkTool> logger, ITelemetryLogger telemetryLogger)
-            : base(services, logger, telemetryLogger)
+            : base(options, services, logger, telemetryLogger)
         {
-            Options = options.Value;
             Engine = services.GetRequiredService<IMigrationEngine>();
         }
 
-        [Obsolete]
-        public override int Enrich(WorkItemData sourceWorkItemLinkStart, WorkItemData targetWorkItemLinkStart)
+        public  int Enrich(WorkItemData sourceWorkItemLinkStart, WorkItemData targetWorkItemLinkStart)
         {
             if (sourceWorkItemLinkStart is null)
             {
@@ -463,14 +460,5 @@ namespace MigrationTools.Tools
             return item is Hyperlink;
         }
 
-        protected override void RefreshForProcessorType(IProcessor processor)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override void EntryForProcessorType(IProcessor processor)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

@@ -2,24 +2,14 @@
 using System.Collections.Generic;
 using Microsoft.TeamFoundation.Build.Client;
 using MigrationTools.Enrichers;
+using MigrationTools.Tools.Infra;
 
 namespace MigrationTools.Tools
 {
-    public class TfsEmbededImagesToolOptions : ProcessorEnricherOptions
+    public class TfsEmbededImagesToolOptions : ToolOptions
     {
         public const string ConfigurationSectionName = "MigrationTools:CommonTools:TfsEmbededImagesTool";
-        public override Type ToConfigure => typeof(TfsEmbededImagesTool);
 
-        public override void SetDefaults()
-        {
-            Enabled = true;
-        }
-
-        static public TfsEmbededImagesToolOptions GetDefaults()
-        {
-            var result = new TfsEmbededImagesToolOptions();
-            result.SetDefaults();
-            return result;
-        }
+        
     }
 }

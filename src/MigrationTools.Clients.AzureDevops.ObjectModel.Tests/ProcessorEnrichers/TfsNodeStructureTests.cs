@@ -20,7 +20,6 @@ namespace MigrationTools.ProcessorEnrichers.Tests
         {
             var options = new TfsNodeStructureToolOptions();
             options.Enabled = true;
-            options.SetDefaults();
             options.AreaMaps[@"^SourceProject\\PUL"] = "TargetProject\\test\\PUL";
             var nodeStructure = GetTfsNodeStructureTool(options);
 
@@ -75,7 +74,6 @@ namespace MigrationTools.ProcessorEnrichers.Tests
         {
             var options = new TfsNodeStructureToolOptions();
             options.Enabled = true;
-            options.SetDefaults();
             options.AreaMaps = new Dictionary<string, string>()
                 {
                     { "^SourceServer\\\\(.*)" , "TargetServer\\SourceServer\\$1" }
@@ -111,7 +109,6 @@ namespace MigrationTools.ProcessorEnrichers.Tests
         {
             var options = new TfsNodeStructureToolOptions();
             options.Enabled = true;
-            options.SetDefaults();
             options.AreaMaps = new Dictionary<string, string>()
                 {
                     { "^Source Project\\\\(.*)" , "Target Project\\Source Project\\$1" }
@@ -220,7 +217,6 @@ namespace MigrationTools.ProcessorEnrichers.Tests
             services.Configure<TfsNodeStructureToolOptions>(o =>
             {
                 o.Enabled = options.Enabled;
-                o.SetDefaults();
                 o.AreaMaps = options.AreaMaps;
                 o.IterationMaps = options.IterationMaps;
             });

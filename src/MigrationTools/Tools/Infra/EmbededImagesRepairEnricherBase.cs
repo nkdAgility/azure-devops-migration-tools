@@ -5,26 +5,25 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
 
-namespace MigrationTools._EngineV1.Enrichers
+namespace MigrationTools.Tools.Infra
 {
-    public abstract class EmbededImagesRepairEnricherBase : WorkItemProcessorEnricher
+    public abstract class EmbededImagesRepairToolBase<ToolOptions> : Tool<ToolOptions> where ToolOptions : class, IToolOptions, new()
     {
         protected readonly HttpClientHandler _httpClientHandler;
         protected bool _ignore404Errors = true;
-        /**
-      *  from https://gist.github.com/pietergheysens/792ed505f09557e77ddfc1b83531e4fb
-      */
 
-        public EmbededImagesRepairEnricherBase(IServiceProvider services, ILogger<EmbededImagesRepairEnricherBase> logger, ITelemetryLogger telemetryLogger) : base(services, logger, telemetryLogger)
+        protected EmbededImagesRepairToolBase(IOptions<ToolOptions> options, IServiceProvider services, ILogger<ITool> logger, ITelemetryLogger telemetry) : base(options, services, logger, telemetry)
         {
             _httpClientHandler = new HttpClientHandler { AllowAutoRedirect = false, UseDefaultCredentials = true, AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate };
         }
 
-        [Obsolete]
-        public override abstract int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem);
+        /**
+*  from https://gist.github.com/pietergheysens/792ed505f09557e77ddfc1b83531e4fb
+*/
 
         protected abstract void FixEmbededImages(WorkItemData wi, string oldTfsurl, string newTfsurl, string sourcePersonalAccessToken = "");
 

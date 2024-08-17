@@ -13,10 +13,11 @@ using MigrationTools._EngineV1.Clients;
 using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
 using MigrationTools.Processors;
+using MigrationTools.Tools.Infra;
 
 namespace MigrationTools.Tools
 {
-    public class TfsGitRepositoryTool : WorkItemProcessorEnricher
+    public class TfsGitRepositoryTool : Tool<TfsGitRepositoryToolOptions>
     {
         private IMigrationEngine _Engine;
         private readonly ILogger<TfsGitRepositoryTool> _Logger;
@@ -32,7 +33,7 @@ namespace MigrationTools.Tools
 
         public IMigrationEngine Engine { get => _Engine; set => _Engine = value; }
 
-        public TfsGitRepositoryTool(IOptions<TfsGitRepositoryToolOptions> options, IServiceProvider services, ILogger<TfsGitRepositoryTool> logger, ITelemetryLogger telemetryLogger) : base(services, logger, telemetryLogger)
+        public TfsGitRepositoryTool(IOptions<TfsGitRepositoryToolOptions> options, IServiceProvider services, ILogger<TfsGitRepositoryTool> logger, ITelemetryLogger telemetryLogger) : base(options, services, logger, telemetryLogger)
         {
             Engine = Services.GetRequiredService<IMigrationEngine>();
             _Logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -67,8 +68,8 @@ namespace MigrationTools.Tools
             }
         }
 
-        [Obsolete]
-        public override int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
+
+        public  int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
         {
             if (sourceWorkItem is null)
             {
@@ -245,14 +246,6 @@ namespace MigrationTools.Tools
                 return repoInfo.GitRepo.Name;
             }
         }
-        protected override void RefreshForProcessorType(IProcessor processor)
-        {
-            throw new NotImplementedException();
-        }
 
-        protected override void EntryForProcessorType(IProcessor processor)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

@@ -13,13 +13,14 @@ using Microsoft.VisualStudio.Services.Commerce;
 using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
 using MigrationTools.Processors;
+using MigrationTools.Tools.Infra;
 
 namespace MigrationTools.Tools
 {
     /// <summary>
     /// The TfsUserMappingTool is used to map users from the source to the target system. Run it with the ExportUsersForMappingContext to create a mapping file then with WorkItemMigrationContext to use the mapping file to update the users in the target system as you migrate the work items.
     /// </summary>
-    public class TfsUserMappingTool : WorkItemProcessorEnricher
+    public class TfsUserMappingTool : Tool<TfsUserMappingToolOptions>
     {
 
         private readonly IMigrationEngine Engine;
@@ -52,27 +53,11 @@ namespace MigrationTools.Tools
 
         public TfsUserMappingToolOptions Options { get; private set; }
 
-        public TfsUserMappingTool(IOptions<TfsUserMappingToolOptions> options, IServiceProvider services, ILogger<TfsUserMappingTool> logger, ITelemetryLogger telemetryLogger) : base(services, logger, telemetryLogger)
+        public TfsUserMappingTool(IOptions<TfsUserMappingToolOptions> options, IServiceProvider services, ILogger<TfsUserMappingTool> logger, ITelemetryLogger telemetryLogger) : base(options, services, logger, telemetryLogger)
         {
-            Options = options.Value;
             Engine = services.GetRequiredService<IMigrationEngine>();
         }
 
-        protected override void EntryForProcessorType(IProcessor processor)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override void RefreshForProcessorType(IProcessor processor)
-        {
-            throw new NotImplementedException();
-        }
-
-        [Obsolete]
-        public override int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
-        {
-            throw new NotImplementedException();
-        }
 
         private List<string> GetUsersFromWorkItems(List<WorkItemData> workitems, List<string> identityFieldsToCheck)
         {

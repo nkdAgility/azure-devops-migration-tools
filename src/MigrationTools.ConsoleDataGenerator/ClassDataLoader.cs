@@ -96,10 +96,10 @@ namespace MigrationTools.ConsoleDataGenerator
                     var options = (IProcessorConfig)Activator.CreateInstance(typeOption);
                     targetItem = options;
                 }
-                if (typeOption.GetInterfaces().Contains(typeof(IOptions)))
+                if (typeOption.GetInterfaces().Contains(typeof(IOldOptions)))
                 {
                     Console.WriteLine("Processing as IOptions");
-                    var options = (IOptions)Activator.CreateInstance(typeOption);
+                    var options = (IOldOptions)Activator.CreateInstance(typeOption);
                     options.SetDefaults();
                     targetItem = options;
                 }

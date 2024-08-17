@@ -9,23 +9,22 @@ using Microsoft.Extensions.Options;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Enrichers;
 using MigrationTools.Processors;
+using MigrationTools.Tools.Infra;
 
 namespace MigrationTools.Tools
 {
-    public class TfsChangeSetMappingTool : WorkItemProcessorEnricher
+    public class TfsChangeSetMappingTool : Tool<TfsChangeSetMappingToolOptions>
     {
-        private TfsChangeSetMappingToolOptions _Options;
 
         private Dictionary<int, string> _ChangeSetMappings = new Dictionary<int, string>();
         public ReadOnlyDictionary<int, string> Items { get { return new ReadOnlyDictionary<int, string>(_ChangeSetMappings); } }
         public int Count { get { return _ChangeSetMappings.Count; } }
 
-        public TfsChangeSetMappingTool(IOptions<TfsChangeSetMappingToolOptions> options, IServiceProvider services, ILogger<WorkItemProcessorEnricher> logger, ITelemetryLogger telemetry) : base(services, logger, telemetry)
+        public TfsChangeSetMappingTool(IOptions<TfsChangeSetMappingToolOptions> options, IServiceProvider services, ILogger<TfsChangeSetMappingTool> logger, ITelemetryLogger telemetry) : base(options, services, logger, telemetry)
         {
-            _Options = options.Value;
-            if (_Options.ChangeSetMappingFile != null)
+            if (Options.ChangeSetMappingFile != null)
             {
-                if (System.IO.File.Exists(_Options.ChangeSetMappingFile))
+                if (System.IO.File.Exists(Options.ChangeSetMappingFile))
                 {
                     ImportMappings(_ChangeSetMappings);
                 }
@@ -34,9 +33,9 @@ namespace MigrationTools.Tools
 
         public void ImportMappings(Dictionary<int, string> changesetMappingStore)
         {
-            if (!string.IsNullOrWhiteSpace(_Options.ChangeSetMappingFile))
+            if (!string.IsNullOrWhiteSpace(Options.ChangeSetMappingFile))
             {
-                using (System.IO.StreamReader file = new System.IO.StreamReader(_Options.ChangeSetMappingFile))
+                using (System.IO.StreamReader file = new System.IO.StreamReader(Options.ChangeSetMappingFile))
                 {
                     string line = string.Empty;
                     while ((line = file.ReadLine()) != null)
@@ -60,14 +59,5 @@ namespace MigrationTools.Tools
             }
         }
 
-        protected override void EntryForProcessorType(IProcessor processor)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override void RefreshForProcessorType(IProcessor processor)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

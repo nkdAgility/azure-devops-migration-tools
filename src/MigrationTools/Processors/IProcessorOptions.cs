@@ -5,7 +5,7 @@ using MigrationTools.Options;
 
 namespace MigrationTools.Processors
 {
-    public interface IProcessorOptions : IProcessorConfig, IOptions
+    public interface IProcessorOptions : IProcessorConfig, IOldOptions
     {
         /// <summary>
         /// This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.

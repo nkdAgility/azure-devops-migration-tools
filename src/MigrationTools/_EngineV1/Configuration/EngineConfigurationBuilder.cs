@@ -322,7 +322,7 @@ namespace MigrationTools._EngineV1.Configuration
             return option;
         }
 
-        private List<TInterfaceToFind> GetAllTypes<TInterfaceToFind>() where TInterfaceToFind : IOptions
+        private List<TInterfaceToFind> GetAllTypes<TInterfaceToFind>() where TInterfaceToFind : IOldOptions
         {
             AppDomain.CurrentDomain.Load("MigrationTools");
             //AppDomain.CurrentDomain.Load("MigrationTools.Clients.InMemory");

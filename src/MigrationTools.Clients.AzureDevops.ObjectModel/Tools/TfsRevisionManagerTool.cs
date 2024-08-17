@@ -12,6 +12,7 @@ using MigrationTools.DataContracts;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
 using MigrationTools.Processors;
+using MigrationTools.Tools.Infra;
 using Newtonsoft.Json;
 
 namespace MigrationTools.Tools
@@ -20,40 +21,30 @@ namespace MigrationTools.Tools
     /// <summary>
     /// The TfsRevisionManagerTool manipulates the revisions of a work item to reduce the number of revisions that are migrated.
     /// </summary>
-    public class TfsRevisionManagerTool : WorkItemProcessorEnricher
+    public class TfsRevisionManagerTool : Tool<TfsRevisionManagerToolOptions>
     {
+
+        public bool ReplayRevisions => Options.ReplayRevisions;
+
         public TfsRevisionManagerTool(IOptions<TfsRevisionManagerToolOptions> options, IServiceProvider services, ILogger<TfsRevisionManagerTool> logger, ITelemetryLogger telemetryLogger)
-            : base(services, logger, telemetryLogger)
+            : base(options, services, logger, telemetryLogger)
         {
-            Options = options?.Value;
-        }
 
-        public TfsRevisionManagerToolOptions Options { get; private set; }
-
-
-        [Obsolete("Old v1 arch: this is a v2 class", true)]
-        public override int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
-        {
-            throw new NotImplementedException();
         }
 
 
-        public override void ProcessorExecutionBegin(IProcessor processor)
+        public  void ProcessorExecutionBegin(IProcessor processor) // Could be a IProcessorEnricher
         {
             if (Options.Enabled)
             {
                 Log.LogInformation("Filter Revisions.");
-                EntryForProcessorType(processor);
+
 
                 RefreshForProcessorType(processor);
             }
         }
 
-        protected override void EntryForProcessorType(IProcessor processor)
-        {
-        }
-
-        protected override void RefreshForProcessorType(IProcessor processor)
+        protected  void RefreshForProcessorType(IProcessor processor)
         {
             if (processor is null)
             {

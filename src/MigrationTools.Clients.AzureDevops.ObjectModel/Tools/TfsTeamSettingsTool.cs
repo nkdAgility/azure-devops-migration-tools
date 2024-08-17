@@ -23,15 +23,15 @@ using MigrationTools.DataContracts.Pipelines;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
 using MigrationTools.Processors;
+using MigrationTools.Tools.Infra;
 
 namespace MigrationTools.Tools
 {
     /// <summary>
     /// The TfsUserMappingTool is used to map users from the source to the target system. Run it with the ExportUsersForMappingContext to create a mapping file then with WorkItemMigrationContext to use the mapping file to update the users in the target system as you migrate the work items.
     /// </summary>
-    public class TfsTeamSettingsTool : WorkItemProcessorEnricher
+    public class TfsTeamSettingsTool : Tool<TfsTeamSettingsToolOptions>
     {
-        private IServiceProvider Services { get; }
 
         private const string LogTypeName = nameof(TfsTeamSettingsTool);
 
@@ -44,12 +44,8 @@ namespace MigrationTools.Tools
         public TfsTeamService TargetTeamService { get; }
         public TeamSettingsConfigurationService TargetTeamSettings { get; }
 
-        public TfsTeamSettingsToolOptions Options { get; private set; }
-
-        public TfsTeamSettingsTool(IOptions<TfsTeamSettingsToolOptions> options, IServiceProvider services, ILogger<TfsTeamSettingsTool> logger, ITelemetryLogger telemetryLogger) : base(services, logger, telemetryLogger)
+        public TfsTeamSettingsTool(IOptions<TfsTeamSettingsToolOptions> options, IServiceProvider services, ILogger<TfsTeamSettingsTool> logger, ITelemetryLogger telemetryLogger) : base(options, services, logger, telemetryLogger)
         {
-            Options = options.Value;
-            Services = services;
             Engine = services.GetRequiredService<IMigrationEngine>();
             _targetTeamFoundationIdentitiesLazyCache = new Lazy<List<TeamFoundationIdentity>>(() =>
             {
@@ -72,31 +68,15 @@ namespace MigrationTools.Tools
             TargetTeamSettings = Engine.Target.GetService<TeamSettingsConfigurationService>();
         }
 
-        protected override void EntryForProcessorType(IProcessor processor)
-        {
 
-        }
-
-        protected override void RefreshForProcessorType(IProcessor processor)
-        {
-
-        }
-
-        [Obsolete]
-        public override int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void ProcessorExecutionBegin(IProcessor processor)
+        public void ProcessorExecutionBegin(IProcessor processor) // Could be a IProcessorEnricher
         {
             if (Options.Enabled)
             {
                 Log.LogInformation("----------------------------------------------");
                 Log.LogInformation("Migrating all Teams before the Processor run.");
-                EntryForProcessorType(processor);
                 MigrateTeamSettings();
-                RefreshForProcessorType(processor);
+
             }
         }
 

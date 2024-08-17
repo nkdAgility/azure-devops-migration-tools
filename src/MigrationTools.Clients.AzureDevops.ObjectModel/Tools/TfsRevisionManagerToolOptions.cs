@@ -1,12 +1,12 @@
 ﻿using System;
 using MigrationTools.Enrichers;
+using MigrationTools.Tools.Infra;
 
 namespace MigrationTools.Tools
 {
-    public class TfsRevisionManagerToolOptions : ProcessorEnricherOptions
+    public class TfsRevisionManagerToolOptions : ToolOptions
     {
         public const string ConfigurationSectionName = "MigrationTools:CommonTools:TfsRevisionManagerTool";
-        public override Type ToConfigure => typeof(TfsRevisionManagerTool);
 
         /// <summary>
         /// You can choose to migrate the tip only (a single write) or all of the revisions (many writes).
@@ -21,19 +21,5 @@ namespace MigrationTools.Tools
         /// </summary>
         /// <default>0</default>
         public int MaxRevisions { get; set; }
-
-        public override void SetDefaults()
-        {
-            Enabled = true;
-            ReplayRevisions = true;
-            MaxRevisions = 0;
-        }
-
-        static public TfsRevisionManagerToolOptions GetDefaults()
-        {
-            var result = new TfsRevisionManagerToolOptions();
-            result.SetDefaults();
-            return result;
-        }
     }
 }

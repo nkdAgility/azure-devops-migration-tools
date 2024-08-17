@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using Microsoft.TeamFoundation.Build.Client;
 using MigrationTools.Enrichers;
+using MigrationTools.Tools.Infra;
 
 namespace MigrationTools.Tools
 {
-    public class TfsWorkItemLinkToolOptions : ProcessorEnricherOptions, ITfsWorkItemLinkToolOptions
+    public class TfsWorkItemLinkToolOptions : ToolOptions, ITfsWorkItemLinkToolOptions
     {
         public const string ConfigurationSectionName = "MigrationTools:CommonTools:TfsWorkItemLinkTool";
-        public override Type ToConfigure => typeof(TfsWorkItemLinkTool);
 
         /// <summary>
         /// Skip validating links if the number of links in the source and the target matches!
@@ -21,21 +21,6 @@ namespace MigrationTools.Tools
         /// </summary>
         /// <default>false</default>
         public bool SaveAfterEachLinkIsAdded { get; set; }
-
-
-        public override void SetDefaults()
-        {
-            Enabled = true;
-            FilterIfLinkCountMatches = true;
-            SaveAfterEachLinkIsAdded = false;
-        }
-
-        static public TfsWorkItemLinkToolOptions GetDefaults()
-        {
-            var result = new TfsWorkItemLinkToolOptions();
-            result.SetDefaults();
-            return result;
-        }
     }
 
     public interface ITfsWorkItemLinkToolOptions

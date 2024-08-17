@@ -69,7 +69,7 @@ namespace MigrationTools.ConsoleDataGenerator
             return query.Replace(Environment.NewLine, "").Replace("\r", "").Replace("\n", "").Replace("            ", " ").Trim();
         }
 
-        public string GetPropertyDefault(IOptions options, JObject joptions, JProperty jproperty)
+        public string GetPropertyDefault(IOldOptions options, JObject joptions, JProperty jproperty)
         {
             var optionsType = options.GetType().GetProperty(jproperty.Name).DeclaringType;
             // Query the data and write out a subset of contacts

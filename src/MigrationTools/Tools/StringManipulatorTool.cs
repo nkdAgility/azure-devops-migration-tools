@@ -13,31 +13,18 @@ namespace MigrationTools.Tools
     /// <summary>
     /// Used to process the String fields of a work item. This is useful for cleaning up data. It will limit fields to a max length and apply regex replacements based on what is configured. Each regex replacement is applied in order and can be enabled or disabled.
     /// </summary>
-    public class StringManipulatorTool : WorkItemProcessorEnricher
+    public class StringManipulatorTool : Infra.Tool<StringManipulatorToolOptions>
     {
-        private Serilog.ILogger contextLog;
-        private StringManipulatorToolOptions _options;
 
         public StringManipulatorTool(IOptions<StringManipulatorToolOptions> options, IServiceProvider services, ILogger<StringManipulatorTool> logger, ITelemetryLogger telemetryLogger)
-           : base(services, logger, telemetryLogger)
+           : base(options,services, logger, telemetryLogger)
         {
-            _options = options.Value;
-            contextLog = Serilog.Log.ForContext<StringManipulatorTool>();
         }
 
-        protected override void EntryForProcessorType(IProcessor processor)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override void RefreshForProcessorType(IProcessor processor)
-        {
-            throw new NotImplementedException();
-        }
-        public override void ProcessorExecutionWithFieldItem(IProcessor processor, FieldItem fieldItem)
+        public void ProcessorExecutionWithFieldItem(IProcessor processor, FieldItem fieldItem)
         {
             Log.LogDebug("{WorkItemProcessorEnricher}::ProcessorExecutionWithFieldItem", GetType().Name);
-            if (!_options.Enabled)
+            if (!Options.Enabled)
             {
                 Log.LogDebug("{WorkItemProcessorEnricher}::ProcessorExecutionWithFieldItem::Disabled", GetType().Name);
                 return;
@@ -46,7 +33,7 @@ namespace MigrationTools.Tools
             {
                 if (HasManipulators())
                 {
-                    foreach (var manipulator in _options.Manipulators)
+                    foreach (var manipulator in Options.Manipulators)
                     {
                         if (manipulator.Enabled)
                         {
@@ -62,7 +49,7 @@ namespace MigrationTools.Tools
                 }
                 if (HasStringTooLong(fieldItem))
                 {
-                    fieldItem.Value = fieldItem.Value.ToString().Substring(0, Math.Min(fieldItem.Value.ToString().Length, _options.MaxStringLength));
+                    fieldItem.Value = fieldItem.Value.ToString().Substring(0, Math.Min(fieldItem.Value.ToString().Length, Options.MaxStringLength));
                 }
             }
 
@@ -70,12 +57,12 @@ namespace MigrationTools.Tools
 
         private bool HasStringTooLong(FieldItem fieldItem)
         {
-            return fieldItem.Value.ToString().Length > 0 && fieldItem.Value.ToString().Length > _options.MaxStringLength;
+            return fieldItem.Value.ToString().Length > 0 && fieldItem.Value.ToString().Length > Options.MaxStringLength;
         }
 
         private bool HasManipulators()
         {
-            return _options.Manipulators != null && _options.Manipulators.Count > 0;
+            return Options.Manipulators != null && Options.Manipulators.Count > 0;
         }
     }
 

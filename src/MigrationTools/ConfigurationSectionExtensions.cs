@@ -8,6 +8,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Enrichers;
+using MigrationTools.Options;
+using MigrationTools.Tools.Infra;
 using Serilog;
 using static System.Collections.Specialized.BitVector32;
 
@@ -92,7 +94,7 @@ namespace MigrationTools
     {
        
 
-        public static TEnricherOptions GetSectionCommonEnrichers_v15<TEnricherOptions>(this IConfiguration configuration, string defaults) where TEnricherOptions : IProcessorEnricherOptions, new()
+        public static TEnricherOptions GetSectionCommonEnrichers_v15<TEnricherOptions>(this IConfiguration configuration, string defaults) where TEnricherOptions : IOptions, new()
         {
             var options_default = configuration.GetSection(defaults);
             var optionsclass = typeof(TEnricherOptions).Name;

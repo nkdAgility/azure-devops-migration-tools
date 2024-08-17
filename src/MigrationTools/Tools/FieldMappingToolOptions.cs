@@ -12,7 +12,6 @@ namespace MigrationTools.Tools
     public class FieldMappingToolOptions : ToolOptions
     {
         public const string ConfigurationSectionName = "MigrationTools:CommonTools:FieldMappingTool";
-        public override Type ToConfigure => typeof(FieldMappingTool);
 
         public List<IFieldMapConfig> FieldMaps { get; set; } = new List<IFieldMapConfig>();
 

@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
+using System.Windows.Forms;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -12,13 +13,13 @@ using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using MigrationTools._EngineV1.Configuration;
-using MigrationTools._EngineV1.Enrichers;
 using MigrationTools.DataContracts;
 using MigrationTools.Processors;
+using MigrationTools.Tools.Infra;
 
 namespace MigrationTools.Tools
 {
-    public class TfsEmbededImagesTool : EmbededImagesRepairEnricherBase
+    public class TfsEmbededImagesTool : EmbededImagesRepairToolBase<TfsEmbededImagesToolOptions>
     {
         private const string RegexPatternForImageUrl = "(?<=<img.*?src=\")[^\"]*";
         private const string RegexPatternForImageFileName = "(?<=FileName=)[^=]*";
@@ -33,7 +34,7 @@ namespace MigrationTools.Tools
 
         public IMigrationEngine Engine { get; private set; }
 
-        public TfsEmbededImagesTool(IOptions<TfsEmbededImagesToolOptions> options, IServiceProvider services, ILogger<TfsEmbededImagesTool> logger, ITelemetryLogger telemetryLogger) : base(services, logger, telemetryLogger)
+        public TfsEmbededImagesTool(IOptions<TfsEmbededImagesToolOptions> options, IServiceProvider services, ILogger<TfsEmbededImagesTool> logger, ITelemetryLogger telemetryLogger) : base(options, services, logger, telemetryLogger)
         {
             Engine = services.GetRequiredService<IMigrationEngine>();
             _targetProject = Engine.Target.WorkItems.Project.ToProject();
@@ -42,14 +43,14 @@ namespace MigrationTools.Tools
             _cachedUploadedUrisBySourceValue = new System.Collections.Concurrent.ConcurrentDictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
         }
 
-        [Obsolete]
-        public override int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
+
+        public int FixEmbededImages(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
         {
             FixEmbededImages(targetWorkItem, Engine.Source.Config.AsTeamProjectConfig().Collection.AbsoluteUri, Engine.Target.Config.AsTeamProjectConfig().Collection.AbsoluteUri, Engine.Source.Config.AsTeamProjectConfig().PersonalAccessToken);
             return 0;
         }
 
-        public override void ProcessorExecutionEnd(IProcessor processor)
+        public  void ProcessorExecutionEnd(IProcessor processor)
         {
             if (_targetDummyWorkItem != null)
             {
@@ -211,15 +212,6 @@ namespace MigrationTools.Tools
             return link;
         }
 
-        protected override void RefreshForProcessorType(IProcessor processor)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override void EntryForProcessorType(IProcessor processor)
-        {
-            throw new NotImplementedException();
-        }
 
         private int _DummyWorkItemCount = 0;
 

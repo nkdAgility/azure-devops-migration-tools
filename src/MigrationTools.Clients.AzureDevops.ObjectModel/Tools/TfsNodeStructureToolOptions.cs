@@ -3,16 +3,15 @@ using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using Microsoft.TeamFoundation.Build.Client;
 using MigrationTools.Enrichers;
+using MigrationTools.Tools.Infra;
 using Newtonsoft.Json.Schema;
 
 namespace MigrationTools.Tools
 {
 
-    public sealed class TfsNodeStructureToolOptions : ProcessorEnricherOptions, ITfsNodeStructureToolOptions
+    public sealed class TfsNodeStructureToolOptions : ToolOptions, ITfsNodeStructureToolOptions
     {
         public const string ConfigurationSectionName = "MigrationTools:CommonTools:TfsNodeStructureTool";
-
-        public override Type ToConfigure => typeof(TfsNodeStructureTool);
 
 
         /// <summary>
@@ -40,22 +39,6 @@ namespace MigrationTools.Tools
         /// </summary>
         public bool ShouldCreateMissingRevisionPaths { get; set; }
         public bool ReplicateAllExistingNodes { get; set; }
-
-        public override void SetDefaults()
-        {
-            Enabled = true;
-            AreaMaps = new Dictionary<string, string>();
-            IterationMaps = new Dictionary<string, string>();
-            ShouldCreateMissingRevisionPaths = true;
-            ReplicateAllExistingNodes = false;
-        }
-
-        static public TfsNodeStructureToolOptions GetDefaults()
-        {
-            var result = new TfsNodeStructureToolOptions();
-            result.SetDefaults();
-            return result;
-        }
     }
 
     public interface ITfsNodeStructureToolOptions

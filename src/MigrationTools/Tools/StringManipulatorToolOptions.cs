@@ -2,15 +2,14 @@
 using System.Collections.Generic;
 using MigrationTools.Enrichers;
 using MigrationTools.Options;
+using MigrationTools.Tools.Infra;
 
 namespace MigrationTools.Tools
 {
-    public class StringManipulatorToolOptions : ProcessorEnricherOptions
+    public class StringManipulatorToolOptions : ToolOptions
     {
         public const string ConfigurationSectionName = "MigrationTools:CommonTools:StringManipulatorTool";
-        public const string ConfigurationSectionName_clasic = "MigrationTools:CommonTools:StringManipulatorTool";
-
-        public override Type ToConfigure => typeof(StringManipulatorTool);
+        //public const string ConfigurationSectionName_clasic = "MigrationTools:CommonTools:StringManipulatorTool";
 
         /// <summary>
         /// Max number of chars in a string. Applied last, and set to 1000000 by default.
@@ -23,21 +22,6 @@ namespace MigrationTools.Tools
         /// </summary>
         /// <default>{}</default>
         public List<RegexStringManipulator> Manipulators { get; set; }
-
-        public override void SetDefaults()
-        {
-            Enabled = true;
-            MaxStringLength = 1000000;
-            Manipulators = new List<RegexStringManipulator> {
-                new RegexStringManipulator()
-                {
-                    Enabled = false,
-                    Pattern = @"[^( -~)\n\r\t]+",
-                    Replacement = "",
-                    Description = "Remove all non-ASKI characters between ^ and ~."
-                }
-            };
-        }
     }
 
     public class RegexStringManipulator

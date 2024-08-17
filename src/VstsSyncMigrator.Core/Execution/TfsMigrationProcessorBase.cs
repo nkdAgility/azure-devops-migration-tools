@@ -12,11 +12,11 @@ namespace VstsSyncMigrator.Core.Execution
 {
     public abstract class TfsMigrationProcessorBase : MigrationProcessorBase
     {
-        public TfsStaticTools TfsStaticEnrichers { get; private set; }
+        public TfsStaticTools TfsStaticTools { get; private set; }
 
-        protected TfsMigrationProcessorBase(IMigrationEngine engine, TfsStaticTools tfsStaticEnrichers,  StaticTools staticEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<MigrationProcessorBase> logger) : base(engine, staticEnrichers, services, telemetry, logger)
+        protected TfsMigrationProcessorBase(IMigrationEngine engine, TfsStaticTools tfsStaticTools,  StaticTools staticTools, IServiceProvider services, ITelemetryLogger telemetry, ILogger<MigrationProcessorBase> logger) : base(engine, staticTools, services, telemetry, logger)
         {
-            TfsStaticEnrichers = tfsStaticEnrichers;
+            TfsStaticTools = tfsStaticTools;
         }
     }
 }

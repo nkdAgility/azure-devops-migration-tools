@@ -1,6 +1,6 @@
 ﻿using MigrationTools.DataContracts;
 
-namespace MigrationTools._EngineV1.Enrichers
+namespace MigrationTools.Tools.Infra
 {
     public interface IAttachmentMigrationEnricher
     {

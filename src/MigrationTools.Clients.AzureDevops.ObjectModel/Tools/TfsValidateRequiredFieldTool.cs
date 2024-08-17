@@ -9,31 +9,21 @@ using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
 using MigrationTools.Processors;
+using MigrationTools.Tools.Infra;
 
 namespace MigrationTools.Tools
 {
-    public class TfsValidateRequiredFieldTool : WorkItemProcessorEnricher
+    public class TfsValidateRequiredFieldTool : Tool<TfsValidateRequiredFieldToolOptions>
     {
-        private TfsValidateRequiredFieldToolOptions _Options;
 
-
-        public TfsValidateRequiredFieldTool(IOptions<TfsValidateRequiredFieldToolOptions> options, IServiceProvider services, ILogger<TfsValidateRequiredFieldTool> logger, ITelemetryLogger telemetryLogger) : base(services, logger, telemetryLogger)
+        public TfsValidateRequiredFieldTool(IOptions<TfsValidateRequiredFieldToolOptions> options, IServiceProvider services, ILogger<TfsValidateRequiredFieldTool> logger, ITelemetryLogger telemetryLogger) : base(options, services, logger, telemetryLogger)
         {
-            _Options = options.Value;
             Engine = services.GetRequiredService<IMigrationEngine>();
         }
 
-        protected override void EntryForProcessorType(IProcessor processor)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override void RefreshForProcessorType(IProcessor processor)
-        {
-            throw new NotImplementedException();
-        }
 
         public IMigrationEngine Engine { get; private set; }
+
         public bool ValidatingRequiredField(string fieldToFind, List<WorkItemData> sourceWorkItems)
         {
             var workItemTypeMappingTool = Services.GetRequiredService<WorkItemTypeMappingTool>();

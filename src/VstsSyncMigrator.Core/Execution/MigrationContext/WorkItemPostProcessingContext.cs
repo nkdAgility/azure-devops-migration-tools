@@ -73,8 +73,8 @@ namespace VstsSyncMigrator.Engine
                     Log.LogInformation("...Exists");
                     TfsExtensions.ToWorkItem(targetFound).Open();
                    StaticEnrichers.FieldMappingTool.ApplyFieldMappings(sourceWI, targetFound);
-                   TfsStaticEnrichers.WorkItemEmbededLink.Enrich(null, targetFound);
-                    TfsStaticEnrichers.EmbededImages.Enrich(sourceWI, targetFound);
+                   TfsStaticTools.WorkItemEmbededLink.Enrich(null, targetFound);
+                    TfsStaticTools.EmbededImages.FixEmbededImages(sourceWI, targetFound);
                     if (TfsExtensions.ToWorkItem(targetFound).IsDirty)
                     {
                         try

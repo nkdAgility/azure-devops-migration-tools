@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using Microsoft.TeamFoundation.Build.Client;
 using MigrationTools.Enrichers;
+using MigrationTools.Tools.Infra;
 
 namespace MigrationTools.Tools
 {
-    public class TfsTeamSettingsToolOptions : ProcessorEnricherOptions, ITfsTeamSettingsToolOptions
+    public class TfsTeamSettingsToolOptions : ToolOptions, ITfsTeamSettingsToolOptions
     {
 
         public const string ConfigurationSectionName = "MigrationTools:CommonTools:TfsTeamSettingsTool";
-        public override Type ToConfigure => typeof(TfsTeamSettingsTool);
 
         /// <summary>
         /// Migrate original team settings after their creation on target team project
@@ -34,20 +34,6 @@ namespace MigrationTools.Tools
         /// </summary>
         public List<string> Teams { get; set; }
 
-        public override void SetDefaults()
-        {
-            Enabled = false;
-            MigrateTeamSettings = true;
-            UpdateTeamSettings = true;
-            MigrateTeamCapacities = true;
-        }
-
-        static public TfsTeamSettingsToolOptions GetDefaults()
-        {
-            var result = new TfsTeamSettingsToolOptions();
-            result.SetDefaults();
-            return result;
-        }
     }
 
     public interface ITfsTeamSettingsToolOptions

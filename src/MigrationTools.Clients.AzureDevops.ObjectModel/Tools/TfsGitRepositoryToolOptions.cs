@@ -2,24 +2,13 @@
 using System.Collections.Generic;
 using Microsoft.TeamFoundation.Build.Client;
 using MigrationTools.Enrichers;
+using MigrationTools.Tools.Infra;
 
 namespace MigrationTools.Tools
 {
-    public class TfsGitRepositoryToolOptions : ProcessorEnricherOptions
+    public class TfsGitRepositoryToolOptions : ToolOptions
     {
         public const string ConfigurationSectionName = "MigrationTools:CommonTools:TfsGitRepositoryTool";
-        public override Type ToConfigure => typeof(TfsGitRepositoryTool);
-
-        public override void SetDefaults()
-        {
-            Enabled = true;
-        }
-
-        static public TfsGitRepositoryToolOptions GetDefaults()
-        {
-            var result = new TfsGitRepositoryToolOptions();
-            result.SetDefaults();
-            return result;
-        }
+     
     }
 }

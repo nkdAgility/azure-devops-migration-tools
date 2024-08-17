@@ -116,9 +116,7 @@ namespace MigrationTools.ProcessorEnrichers.Tests
 
         private static StringManipulatorTool GetStringManipulatorTool()
         {
-            var options = new StringManipulatorToolOptions();
-            options.SetDefaults();
-           
+            var options = new StringManipulatorToolOptions();           
             return GetStringManipulatorTool(options);
         }
 

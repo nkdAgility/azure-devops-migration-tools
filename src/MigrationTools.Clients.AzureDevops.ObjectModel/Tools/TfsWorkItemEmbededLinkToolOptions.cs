@@ -2,24 +2,14 @@
 using System.Collections.Generic;
 using Microsoft.TeamFoundation.Build.Client;
 using MigrationTools.Enrichers;
+using MigrationTools.Tools.Infra;
 
 namespace MigrationTools.Tools
 {
-    public class TfsWorkItemEmbededLinkToolOptions : ProcessorEnricherOptions
+    public class TfsWorkItemEmbededLinkToolOptions : ToolOptions
     {
         public const string ConfigurationSectionName = "MigrationTools:CommonTools:TfsWorkItemEmbededLinkTool";
-        public override Type ToConfigure => typeof(TfsWorkItemEmbededLinkTool);
 
-        public override void SetDefaults()
-        {
-            Enabled = true;
-        }
 
-        static public TfsWorkItemLinkToolOptions GetDefaults()
-        {
-            var result = new TfsWorkItemLinkToolOptions();
-            result.SetDefaults();
-            return result;
-        }
     }
 }

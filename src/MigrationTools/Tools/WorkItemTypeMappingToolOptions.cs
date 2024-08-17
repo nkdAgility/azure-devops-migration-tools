@@ -2,15 +2,13 @@
 using System.Collections.Generic;
 using MigrationTools.Enrichers;
 using MigrationTools.Options;
+using MigrationTools.Tools.Infra;
 
 namespace MigrationTools.Tools
 {
-    public class WorkItemTypeMappingToolOptions : ProcessorEnricherOptions
+    public class WorkItemTypeMappingToolOptions : ToolOptions
     {
         public const string ConfigurationSectionName = "MigrationTools:CommonTools:WorkItemTypeMappingTool";
-
-        public override Type ToConfigure => typeof(WorkItemTypeMappingTool);
-
 
         /// <summary>
         /// List of work item mappings. 
@@ -18,11 +16,6 @@ namespace MigrationTools.Tools
         /// <default>{}</default>
         public Dictionary<string, string> Mappings { get; set; }
 
-        public override void SetDefaults()
-        {
-            Enabled = true;
-            Mappings = new Dictionary<string, string> { { "Default", "Default2" } };
-        }
     }
 
     public class RegexWorkItemTypeMapping

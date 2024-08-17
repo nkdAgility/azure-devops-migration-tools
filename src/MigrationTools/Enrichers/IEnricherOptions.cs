@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace MigrationTools.Enrichers
 {
-    public interface IEnricherOptions : IOptions
+    public interface IEnricherOptions : IOldOptions
     {
         /// <summary>
         /// Active the enricher if it true.

@@ -12,10 +12,11 @@ using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
 using MigrationTools.Processors;
+using MigrationTools.Tools.Infra;
 
 namespace MigrationTools.Tools
 {
-    public class TfsWorkItemEmbededLinkTool : WorkItemProcessorEnricher
+    public class TfsWorkItemEmbededLinkTool : Tool<TfsWorkItemEmbededLinkToolOptions>
     {
         private const string LogTypeName = nameof(TfsWorkItemEmbededLinkTool);
         private const string RegexPatternLinkAnchorTag = "<a[^>].*?(?:href=\"(?<href>[^\"]*)\".*?|(?<version>data-vss-mention=\"[^\"]*\").*?)*>(?<value>.*?)<\\/a?>";
@@ -24,7 +25,7 @@ namespace MigrationTools.Tools
         private readonly IMigrationEngine Engine;
 
         public TfsWorkItemEmbededLinkTool(IOptions<TfsWorkItemEmbededLinkToolOptions> options, IServiceProvider services, ILogger<TfsWorkItemEmbededLinkTool> logger, ITelemetryLogger telemetryLogger)
-            : base(services, logger, telemetryLogger)
+            : base(options, services, logger, telemetryLogger)
         {
 
             Engine = services.GetRequiredService<IMigrationEngine>();
@@ -49,9 +50,7 @@ namespace MigrationTools.Tools
             });
         }
 
-
-        [Obsolete]
-        public override int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
+        public  int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
         {
             string oldTfsurl = Engine.Source.Config.AsTeamProjectConfig().Collection.ToString();
             string newTfsurl = Engine.Target.Config.AsTeamProjectConfig().Collection.ToString();
@@ -144,14 +143,6 @@ namespace MigrationTools.Tools
             return 0;
         }
 
-        protected override void RefreshForProcessorType(IProcessor processor)
-        {
-            throw new NotImplementedException();
-        }
 
-        protected override void EntryForProcessorType(IProcessor processor)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

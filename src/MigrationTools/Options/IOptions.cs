@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace MigrationTools.Options
 {
-    public interface IOptions
+    public interface IOldOptions
     {
         /// <summary>
         /// If you set a `RefName` then this configration will be added to a Catalog of configurations that can be refernced using tha `RefName` so tha tyou dont have to keep adding the ame items with the same configuration.
@@ -14,5 +14,10 @@ namespace MigrationTools.Options
         Type ToConfigure { get; }
 
         void SetDefaults();
+    }
+
+    public interface IOptions
+    {
+
     }
 }

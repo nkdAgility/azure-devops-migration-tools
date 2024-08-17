@@ -16,6 +16,7 @@ using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
 using MigrationTools.FieldMaps;
 using MigrationTools.Processors;
+using MigrationTools.Tools.Infra;
 using Newtonsoft.Json;
 using Serilog.Context;
 using Serilog.Events;
@@ -42,36 +43,29 @@ namespace MigrationTools.Tools
     /// <summary>
     /// The TfsNodeStructureToolEnricher is used to create missing nodes in the target project. To configure it add a `TfsNodeStructureToolOptions` section to `CommonEnrichersConfig` in the config file. Otherwise defaults will be applied. 
     /// </summary>
-    public class TfsNodeStructureTool : WorkItemProcessorEnricher
+    public class TfsNodeStructureTool : Tool<TfsNodeStructureToolOptions>
     {
         private readonly Dictionary<string, NodeInfo> _pathToKnownNodeMap = new Dictionary<string, NodeInfo>();
         private string[] _nodeBasePaths;
-        private TfsNodeStructureToolOptions _Options;
 
         private ICommonStructureService4 _sourceCommonStructureService;
 
         private TfsLanguageMapOptions _sourceLanguageMaps;
-        private ProjectInfo _sourceProjectInfo;
+        private TfsLanguageMapOptions _targetLanguageMaps;
 
-        private ILogger contextLog;
+        private ProjectInfo _sourceProjectInfo;
 
         private string _sourceProjectName;
         private NodeInfo[] _sourceRootNodes;
         private ICommonStructureService4 _targetCommonStructureService;
-        private TfsLanguageMapOptions _targetLanguageMaps;
+        
         private string _targetProjectName;
         private KeyValuePair<string, string>? _lastResortRemapRule;
 
         public TfsNodeStructureTool(IOptions<TfsNodeStructureToolOptions> options, IServiceProvider services, ILogger<TfsNodeStructureTool> logger, ITelemetryLogger telemetryLogger)
-            : base(services, logger, telemetryLogger)
+            : base(options, services, logger, telemetryLogger)
         {
-            _Options = options.Value;
-            contextLog = Serilog.Log.ForContext<TfsNodeStructureTool>();
-        }
 
-        public TfsNodeStructureToolOptions Options
-        {
-            get { return _Options; }
         }
 
         public void ApplySettings(TfsNodeStructureToolSettings settings)
@@ -80,10 +74,27 @@ namespace MigrationTools.Tools
             _targetProjectName = settings.TargetProjectName;
         }
 
-        [Obsolete("Old v1 arch: this is a v2 class", true)]
-        public override int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
+        public void ValidateAllNodesExistOrAreMapped(List<WorkItemData> sourceWorkItems, string sourceProject,string targetProject)
         {
-            throw new NotImplementedException();
+            ContextLog.Information("Validating::Check that all Area & Iteration paths from Source have a valid mapping on Target");
+            if (!Options.Enabled && targetProject != sourceProject)
+            {
+                Log.LogError("Source and Target projects have different names, but  NodeStructureEnricher is not enabled. Cant continue... please enable nodeStructureEnricher in the config and restart.");
+                Environment.Exit(-1);
+            }
+            if (Options.Enabled)
+            {
+                List<NodeStructureItem> nodeStructureMissingItems = GetMissingRevisionNodes(sourceWorkItems);
+                if (ValidateTargetNodesExist(nodeStructureMissingItems))
+                {
+                    Log.LogError("Missing Iterations in Target preventing progress, check log for list. To continue you MUST configure IterationMaps or AreaMaps that matches the missing paths..");
+                    Environment.Exit(-1);
+                }
+            }
+            else
+            {
+                ContextLog.Error("nodeStructureEnricher is disabled! Please enable it in the config.");
+            }
         }
 
         public string GetNewNodeName(string sourceNodePath, TfsNodeStructureType nodeStructureType)
@@ -139,7 +150,7 @@ namespace MigrationTools.Tools
 
         private NodeInfo GetOrCreateNode(string nodePath, DateTime? startDate, DateTime? finishDate)
         {
-            contextLog.Debug("TfsNodeStructureTool:GetOrCreateNode({nodePath}, {startDate}, {finishDate})", nodePath, startDate, finishDate);
+             Log.LogDebug("TfsNodeStructureTool:GetOrCreateNode({nodePath}, {startDate}, {finishDate})", nodePath, startDate, finishDate);
             if (_pathToKnownNodeMap.TryGetValue(nodePath, out var info))
             {
                 Log.LogInformation(" Node {0} already migrated, nothing to do", nodePath);
@@ -245,15 +256,15 @@ namespace MigrationTools.Tools
             switch (nodeStructureType)
             {
                 case TfsNodeStructureType.Area:
-                    return _Options.AreaMaps;
+                    return Options.AreaMaps;
                 case TfsNodeStructureType.Iteration:
-                    return _Options.IterationMaps;
+                    return Options.IterationMaps;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(nodeStructureType), nodeStructureType, null);
             }
         }
 
-        public override void ProcessorExecutionBegin(IProcessor processor)
+        public  void ProcessorExecutionBegin(IProcessor processor)
         {
             if (Options.Enabled)
             {
@@ -264,10 +275,13 @@ namespace MigrationTools.Tools
                     MigrateAllNodeStructures();
                 }
                 RefreshForProcessorType(processor);
+            } else
+            {
+                Log.LogWarning("TfsNodeStructureTool: TfsNodeStructureTool is disabled! This may cause work item migration errors! ");
             }
         }
 
-        protected override void EntryForProcessorType(IProcessor processor)
+        protected  void EntryForProcessorType(IProcessor processor)
         {
             if (processor is null)
             {
@@ -308,7 +322,7 @@ namespace MigrationTools.Tools
             }
         }
 
-        protected override void RefreshForProcessorType(IProcessor processor)
+        protected  void RefreshForProcessorType(IProcessor processor)
         {
             if (processor is null)
             {
@@ -404,7 +418,7 @@ namespace MigrationTools.Tools
         {
             _nodeBasePaths = Options.NodeBasePaths;
 
-            Log.LogDebug("NodeStructureEnricher.MigrateAllNodeStructures({nodeBasePaths}, {areaMaps}, {iterationMaps})", _nodeBasePaths, _Options.AreaMaps, _Options.IterationMaps);
+            Log.LogDebug("NodeStructureEnricher.MigrateAllNodeStructures({nodeBasePaths}, {areaMaps}, {iterationMaps})", _nodeBasePaths, Options.AreaMaps, Options.IterationMaps);
             //////////////////////////////////////////////////
             ProcessCommonStructure(_sourceLanguageMaps.AreaPath, _targetLanguageMaps.AreaPath, _targetProjectName, TfsNodeStructureType.Area);
             //////////////////////////////////////////////////
@@ -416,8 +430,8 @@ namespace MigrationTools.Tools
         {
             if (languageMap.AreaPath.IsNullOrEmpty() || languageMap.IterationPath.IsNullOrEmpty())
             {
-                contextLog.Warning("TfsNodeStructureTool::GetLocalizedNodeStructureTypeName - Language map is empty for either Area or Iteration!");
-                contextLog.Verbose("languageMap: {@languageMap}", languageMap);
+                Log.LogWarning("TfsNodeStructureTool::GetLocalizedNodeStructureTypeName - Language map is empty for either Area or Iteration!");
+                Log.LogTrace("languageMap: {@languageMap}", languageMap);
             }
             switch (value)
             {
@@ -533,7 +547,7 @@ namespace MigrationTools.Tools
         public List<NodeStructureItem> CheckForMissingPaths(List<WorkItemData> workItems, TfsNodeStructureType nodeType)
         {
             EntryForProcessorType(null);
-            contextLog.Debug("TfsNodeStructureTool:CheckForMissingPaths");
+             Log.LogDebug("TfsNodeStructureTool:CheckForMissingPaths");
             _targetCommonStructureService.ClearProjectInfoCache();
 
             string fieldName = GetFieldNameFromTfsNodeStructureToolType(nodeType);
@@ -544,24 +558,24 @@ namespace MigrationTools.Tools
                 .Distinct()
                 .ToList();
 
-            contextLog.Debug("TfsNodeStructureTool:CheckForMissingPaths::{nodeType}Nodes::{count}", nodeType.ToString(), nodePaths.Count);
+             Log.LogDebug("TfsNodeStructureTool:CheckForMissingPaths::{nodeType}Nodes::{count}", nodeType.ToString(), nodePaths.Count);
 
             List<NodeStructureItem> missingPaths = new List<NodeStructureItem>();
 
             foreach (var missingItem in nodePaths)
             {
-                contextLog.Debug("TfsNodeStructureTool:CheckForMissingPaths:Checking::{sourceSystemPath}", missingItem.sourceSystemPath);
-                contextLog.Verbose("TfsNodeStructureTool:CheckForMissingPaths:Checking::{@missingItem}", missingItem);
+                 Log.LogDebug("TfsNodeStructureTool:CheckForMissingPaths:Checking::{sourceSystemPath}", missingItem.sourceSystemPath);
+                 Log.LogTrace("TfsNodeStructureTool:CheckForMissingPaths:Checking::{@missingItem}", missingItem);
                 bool keepProcessing = true;
                 try
                 {
                     missingItem.targetPath = GetNewNodeName(missingItem.sourcePath, nodeType);
-                    contextLog.Verbose("TfsNodeStructureTool:CheckForMissingPaths:GetNewNodeName::{@missingItem}", missingItem);
+                     Log.LogTrace("TfsNodeStructureTool:CheckForMissingPaths:GetNewNodeName::{@missingItem}", missingItem);
                 }
                 catch (NodePathNotAnchoredException ex)
                 {
-                    contextLog.Debug("TfsNodeStructureTool:CheckForMissingPaths:NodePathNotAnchoredException::{sourceSystemPath}", missingItem.sourceSystemPath);
-                    contextLog.Verbose("TfsNodeStructureTool:CheckForMissingPaths:NodePathNotAnchoredException::{@missingItem}", missingItem);
+                     Log.LogDebug("TfsNodeStructureTool:CheckForMissingPaths:NodePathNotAnchoredException::{sourceSystemPath}", missingItem.sourceSystemPath);
+                     Log.LogTrace("TfsNodeStructureTool:CheckForMissingPaths:NodePathNotAnchoredException::{@missingItem}", missingItem);
                     missingItem.anchored = false;
                     List<int> workItemsNotAncored = workItems.SelectMany(x => x.Revisions.Values)
                         .Where(x => x.Fields[fieldName].Value.ToString().Contains(missingItem.sourcePath))
@@ -579,14 +593,14 @@ namespace MigrationTools.Tools
                     PopulateIterationDatesFronSource(missingItem);
                     try
                     {
-                        contextLog.Debug("TfsNodeStructureTool:CheckForMissingPaths:CheckTarget::{targetSystemPath}", missingItem.targetSystemPath);
+                         Log.LogDebug("TfsNodeStructureTool:CheckForMissingPaths:CheckTarget::{targetSystemPath}", missingItem.targetSystemPath);
                         NodeInfo c = _targetCommonStructureService.GetNodeFromPath(missingItem.targetSystemPath);
-                        contextLog.Verbose("TfsNodeStructureTool:CheckForMissingPaths:CheckTarget::FOUND::{@missingItem}::FOUND", missingItem);
+                         Log.LogTrace("TfsNodeStructureTool:CheckForMissingPaths:CheckTarget::FOUND::{@missingItem}::FOUND", missingItem);
                     }
                     catch
                     {
-                        contextLog.Debug("TfsNodeStructureTool:CheckForMissingPaths:CheckTarget::NOTFOUND:{targetSystemPath}", missingItem.targetSystemPath);
-                        if (_Options.ShouldCreateMissingRevisionPaths && ShouldCreateNode(missingItem.targetSystemPath))
+                         Log.LogDebug("TfsNodeStructureTool:CheckForMissingPaths:CheckTarget::NOTFOUND:{targetSystemPath}", missingItem.targetSystemPath);
+                        if (Options.ShouldCreateMissingRevisionPaths && ShouldCreateNode(missingItem.targetSystemPath))
                         {
 
                             GetOrCreateNode(missingItem.targetSystemPath, missingItem.startDate, missingItem.finishDate);
@@ -594,12 +608,12 @@ namespace MigrationTools.Tools
                         else
                         {
                             missingPaths.Add(missingItem);
-                            contextLog.Verbose("TfsNodeStructureTool:CheckForMissingPaths:CheckTarget::LOG-ONLY::{@missingItem}", missingItem);
+                             Log.LogTrace("TfsNodeStructureTool:CheckForMissingPaths:CheckTarget::LOG-ONLY::{@missingItem}", missingItem);
                         }
                     }
                 }
             }
-            if (_Options.ShouldCreateMissingRevisionPaths)
+            if (Options.ShouldCreateMissingRevisionPaths)
             {
                 _targetCommonStructureService.ClearProjectInfoCache();
             }
@@ -610,7 +624,7 @@ namespace MigrationTools.Tools
         {
             if (missingItem.nodeType == "Iteration")
             {
-                contextLog.Debug("TfsNodeStructureTool:PopulateIterationDatesFronSource:{sourceSystemPath}", missingItem.sourceSystemPath);
+                 Log.LogDebug("TfsNodeStructureTool:PopulateIterationDatesFronSource:{sourceSystemPath}", missingItem.sourceSystemPath);
                 try
                 {
                     var sourceNode = _sourceCommonStructureService.GetNodeFromPath(missingItem.sourceSystemPath);
@@ -620,7 +634,7 @@ namespace MigrationTools.Tools
                 }
                 catch (Exception)
                 {
-                    contextLog.Verbose("TfsNodeStructureTool:PopulateIterationDatesFronSource:{@missingItem}", missingItem);
+                     Log.LogTrace("TfsNodeStructureTool:PopulateIterationDatesFronSource:{@missingItem}", missingItem);
                     missingItem.startDate = null;
                     missingItem.finishDate = null;
                     missingItem.sourcePathExists = false;
@@ -650,9 +664,9 @@ namespace MigrationTools.Tools
         {
             if (missingItems.Count > 0)
             {
-                contextLog.Warning("!! There are MISSING Area or Iteration Paths");
-                contextLog.Warning("NOTE: It is NOT possible to migrate a work item if the Area or Iteration path does not exist on the target project. This is because the work item will be created with the same Area and Iteration path as the source work item with the project name swapped. The work item will not be created if the path does not exist. The only way to resolve this is to follow the instructions:");
-                contextLog.Warning("!! There are {missingAreaPaths} Nodes (Area or Iteration) found in the history of the Source that are missing from the Target! These MUST be added or mapped before we can continue using the instructions on https://nkdagility.com/learn/azure-devops-migration-tools//Reference/v2/ProcessorEnrichers/TfsNodeStructureTool/#iteration-maps-and-area-maps", missingItems.Count);
+                Log.LogWarning("!! There are MISSING Area or Iteration Paths");
+                Log.LogWarning("NOTE: It is NOT possible to migrate a work item if the Area or Iteration path does not exist on the target project. This is because the work item will be created with the same Area and Iteration path as the source work item with the project name swapped. The work item will not be created if the path does not exist. The only way to resolve this is to follow the instructions:");
+                Log.LogWarning("!! There are {missingAreaPaths} Nodes (Area or Iteration) found in the history of the Source that are missing from the Target! These MUST be added or mapped before we can continue using the instructions on https://nkdagility.com/learn/azure-devops-migration-tools//Reference/v2/ProcessorEnrichers/TfsNodeStructureTool/#iteration-maps-and-area-maps", missingItems.Count);
                 foreach (NodeStructureItem missingItem in missingItems)
                 {
                     string mapper = GetMappingForMissingItem(missingItem);
@@ -664,11 +678,11 @@ namespace MigrationTools.Tools
                     }
                     if (isMapped)
                     {
-                        contextLog.Warning("MAPPED {nodeType}: sourcePath={sourcePath}, mapper={mapper}", missingItem.nodeType, missingItem.sourcePath, mapper);
+                        Log.LogWarning("MAPPED {nodeType}: sourcePath={sourcePath}, mapper={mapper}", missingItem.nodeType, missingItem.sourcePath, mapper);
                     }
                     else
                     {
-                        contextLog.Warning("MISSING {nodeType}: sourcePath={sourcePath}, targetPath={targetPath}, anchored={anchored}, IDs={workItems}", missingItem.nodeType, missingItem.sourcePath, missingItem.targetPath, missingItem.anchored, workItemList);
+                        Log.LogWarning("MISSING {nodeType}: sourcePath={sourcePath}, targetPath={targetPath}, anchored={anchored}, IDs={workItems}", missingItem.nodeType, missingItem.sourcePath, missingItem.targetPath, missingItem.anchored, workItemList);
                     }
                 }
 
@@ -692,7 +706,7 @@ namespace MigrationTools.Tools
 
         private const string RegexPatternForAreaAndIterationPathsFix = "\\[?(?<key>System.AreaPath|System.IterationPath)+\\]?[^']*'(?<value>[^']*(?:''.[^']*)*)'";
 
-        public string FixAreaPathAndIterationPathForTargetQuery(string sourceWIQLQuery, string sourceProject, string targetProject, ILogger contextLog)
+        public string FixAreaPathAndIterationPathForTargetQuery(string sourceWIQLQuery, string sourceProject, string targetProject, ILogger Log)
         {
 
             string targetWIQLQuery = sourceWIQLQuery;
@@ -736,7 +750,7 @@ namespace MigrationTools.Tools
                 targetWIQLQuery = targetWIQLQuery.Replace(value, remappedPath);
             }
 
-            contextLog?.Information("[FilterWorkItemsThatAlreadyExistInTarget] is enabled. Source project {sourceProject} is replaced with target project {targetProject} on the WIQLQuery which resulted into this target WIQLQuery \n \"{targetWIQLQuery}\" .", sourceProject, targetProject, targetWIQLQuery);
+            Log?.Information("[FilterWorkItemsThatAlreadyExistInTarget] is enabled. Source project {sourceProject} is replaced with target project {targetProject} on the WIQLQuery which resulted into this target WIQLQuery \n \"{targetWIQLQuery}\" .", sourceProject, targetProject, targetWIQLQuery);
 
             return targetWIQLQuery;
         }

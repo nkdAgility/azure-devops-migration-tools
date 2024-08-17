@@ -15,40 +15,16 @@ namespace MigrationTools.Tools
     /// <summary>
     /// Used to process the String fields of a work item. This is useful for cleaning up data. It will limit fields to a max length and apply regex replacements based on what is configured. Each regex replacement is applied in order and can be enabled or disabled.
     /// </summary>
-    public class GitRepoMappingTool : WorkItemProcessorEnricher
+    public class GitRepoMappingTool : Infra.Tool<GitRepoMappingToolOptions>
     {
-        private Serilog.ILogger contextLog;
-        private GitRepoMappingToolOptions _options;
-
         public ReadOnlyDictionary<string, string> Mappings { get; private set; }
 
         public GitRepoMappingTool(IOptions<GitRepoMappingToolOptions> options, IServiceProvider services, ILogger<GitRepoMappingTool> logger, ITelemetryLogger telemetryLogger)
-           : base(services, logger, telemetryLogger)
-        {
-            if (options is null)
-            {
-                throw new ArgumentNullException(nameof(options));
-            }
-            _options = options.Value;
-            Mappings = new ReadOnlyDictionary<string, string>(_options.Mappings);
-            contextLog = Serilog.Log.ForContext<GitRepoMappingTool>();
-        }
-
-        protected override void EntryForProcessorType(IProcessor processor)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override void RefreshForProcessorType(IProcessor processor)
-        {
-            throw new NotImplementedException();
-        }
-        public override void ProcessorExecutionWithFieldItem(IProcessor processor, FieldItem fieldItem)
+           : base(options, services, logger, telemetryLogger)
         {
 
-
+            Mappings = new ReadOnlyDictionary<string, string>(Options.Mappings);
         }
-
 
     }
 
