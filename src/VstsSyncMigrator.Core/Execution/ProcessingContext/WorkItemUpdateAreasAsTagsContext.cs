@@ -13,6 +13,7 @@ using MigrationTools.Enrichers;
 using MigrationTools.ProcessorEnrichers;
 using VstsSyncMigrator._EngineV1.Processors;
 using VstsSyncMigrator.Core.Execution;
+using Microsoft.Extensions.Options;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -23,10 +24,11 @@ namespace VstsSyncMigrator.Engine
     /// <processingtarget>Work Item</processingtarget>
     public class WorkItemUpdateAreasAsTagsContext : TfsStaticProcessorBase
     {
-        private WorkItemUpdateAreasAsTagsConfig config;
+        private WorkItemUpdateAreasAsTagsConfig _config;
 
-        public WorkItemUpdateAreasAsTagsContext(TfsStaticEnrichers tfsStaticEnrichers, StaticEnrichers staticEnrichers, IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<StaticProcessorBase> logger) : base(tfsStaticEnrichers, staticEnrichers, services, me, telemetry, logger)
+        public WorkItemUpdateAreasAsTagsContext(IOptions<WorkItemUpdateAreasAsTagsConfig> options, TfsStaticEnrichers tfsStaticEnrichers, StaticEnrichers staticEnrichers, IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<StaticProcessorBase> logger) : base(tfsStaticEnrichers, staticEnrichers, services, me, telemetry, logger)
         {
+            _config = options.Value;
         }
 
         public override string Name
@@ -37,18 +39,13 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        public override void Configure(IProcessorConfig config)
-        {
-            this.config = (WorkItemUpdateAreasAsTagsConfig)config;
-        }
-
         protected override void InternalExecute()
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
             //////////////////////////////////////////////////
 
             IWorkItemQueryBuilder wiqb = Services.GetRequiredService<IWorkItemQueryBuilder>();
-            wiqb.AddParameter("AreaPath", config.AreaIterationPath);
+            wiqb.AddParameter("AreaPath", _config.AreaIterationPath);
             wiqb.Query = @"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject and [System.AreaPath] under @AreaPath";
             List<WorkItemData> workitems = Engine.Target.WorkItems.GetWorkItems(wiqb);
             Log.LogInformation("Update {0} work items?", workitems.Count);

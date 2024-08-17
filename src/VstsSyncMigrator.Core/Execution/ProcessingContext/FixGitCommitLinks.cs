@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MigrationTools;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Configuration.Processing;
@@ -17,11 +18,13 @@ namespace VstsSyncMigrator.Engine
     public class FixGitCommitLinks : TfsStaticProcessorBase
     {
         private FixGitCommitLinksConfig _config;
-        private TfsGitRepositoryEnricher _GitRepositoryEnricher;
+        private TfsStaticEnrichers _tfsStaticEnrichers;
 
-        public FixGitCommitLinks(TfsStaticEnrichers tfsStaticEnrichers, StaticEnrichers staticEnrichers, IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<FixGitCommitLinks> logger) : base(tfsStaticEnrichers, staticEnrichers, services, me, telemetry, logger)
+        public FixGitCommitLinks(IOptions<FixGitCommitLinksConfig> options, TfsStaticEnrichers tfsStaticEnrichers, StaticEnrichers staticEnrichers, IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<FixGitCommitLinks> logger) : base(tfsStaticEnrichers, staticEnrichers, services, me, telemetry, logger)
         {
             Logger = logger;
+            _config = options.Value;
+            _tfsStaticEnrichers = tfsStaticEnrichers;
         }
 
         public override string Name
@@ -34,11 +37,6 @@ namespace VstsSyncMigrator.Engine
 
         public ILogger<FixGitCommitLinks> Logger { get; }
 
-        public override void Configure(IProcessorConfig config)
-        {
-            _config = (FixGitCommitLinksConfig)config;
-            _GitRepositoryEnricher = Services.GetRequiredService<TfsGitRepositoryEnricher>();
-        }
 
         protected override void InternalExecute()
         {
@@ -56,7 +54,7 @@ namespace VstsSyncMigrator.Engine
                 Stopwatch witstopwatch = Stopwatch.StartNew();
                 workitem.ToWorkItem().Open();
 
-                _GitRepositoryEnricher.Enrich(null, workitem);
+                _tfsStaticEnrichers.GitRepository.Enrich(null, workitem);
 
                 if (workitem.ToWorkItem().IsDirty)
                 {

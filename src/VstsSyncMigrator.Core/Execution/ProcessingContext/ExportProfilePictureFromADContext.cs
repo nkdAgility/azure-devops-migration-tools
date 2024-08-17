@@ -16,6 +16,7 @@ using MigrationTools.Enrichers;
 using MigrationTools.ProcessorEnrichers;
 using VstsSyncMigrator._EngineV1.Processors;
 using VstsSyncMigrator.Core.Execution;
+using Microsoft.Extensions.Options;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -27,10 +28,13 @@ namespace VstsSyncMigrator.Engine
     public class ExportProfilePictureFromADContext : TfsStaticProcessorBase
     {
         private IIdentityManagementService2 ims2;
-        private ExportProfilePictureFromADConfig config;
+        private ExportProfilePictureFromADConfig _config;
 
-        public ExportProfilePictureFromADContext(TfsStaticEnrichers tfsStaticEnrichers, StaticEnrichers staticEnrichers, IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<StaticProcessorBase> logger) : base(tfsStaticEnrichers, staticEnrichers, services, me, telemetry, logger)
+        public ExportProfilePictureFromADContext(IOptions<ExportProfilePictureFromADConfig> options, TfsStaticEnrichers tfsStaticEnrichers, StaticEnrichers staticEnrichers, IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<StaticProcessorBase> logger) : base(tfsStaticEnrichers, staticEnrichers, services, me, telemetry, logger)
         {
+            _config = options.Value;
+            //http://www.codeproject.com/Articles/18102/Howto-Almost-Everything-In-Active-Directory-via-C
+            ims2 = Engine.Target.GetService<IIdentityManagementService2>();
         }
 
         public override string Name
@@ -39,14 +43,6 @@ namespace VstsSyncMigrator.Engine
             {
                 return "ExportProfilePictureFromADContext";
             }
-        }
-
-
-        public override void Configure(IProcessorConfig config)
-        {
-            //http://www.codeproject.com/Articles/18102/Howto-Almost-Everything-In-Active-Directory-via-C
-            ims2 = Engine.Target.GetService<IIdentityManagementService2>();
-            this.config = (ExportProfilePictureFromADConfig)config;
         }
 
         protected override void InternalExecute()
@@ -73,7 +69,7 @@ namespace VstsSyncMigrator.Engine
             }
             var folks = (from IdentityDescriptor id in SIDS.Members where id.IdentityType == "System.Security.Principal.WindowsIdentity" select id);
 
-            DirectoryContext objContext = new DirectoryContext(DirectoryContextType.Domain, config.Domain, config.Username, config.Password);
+            DirectoryContext objContext = new DirectoryContext(DirectoryContextType.Domain, _config.Domain, _config.Username, _config.Password);
             Domain objDomain = Domain.GetDomain(objContext);
             string ldapName = string.Format("LDAP://{0}", objDomain.Name);
 
@@ -85,7 +81,7 @@ namespace VstsSyncMigrator.Engine
                     TeamFoundationIdentity i = ims2.ReadIdentity(IdentitySearchFactor.Identifier, id.Identifier, MembershipQuery.Direct, ReadIdentityOptions.None);
                     if (!(i == null) && i.IsContainer == false)
                     {
-                        DirectoryEntry d = new DirectoryEntry(ldapName, config.Username, config.Password);
+                        DirectoryEntry d = new DirectoryEntry(ldapName, _config.Username, _config.Password);
                         DirectorySearcher dssearch = new DirectorySearcher(d)
                         {
                             Filter = string.Format("(sAMAccountName={0})", i.UniqueName.Split(char.Parse(@"\"))[1])
@@ -100,9 +96,9 @@ namespace VstsSyncMigrator.Engine
                             string newImage = Path.Combine(exportPath, string.Format("{0}.jpg", i.UniqueName.Replace(@"\", "-")));
                             if (!File.Exists(newImage))
                             {
-                                DirectoryEntry deUser = new DirectoryEntry(sresult.Path, config.Username, config.Password);
+                                DirectoryEntry deUser = new DirectoryEntry(sresult.Path, _config.Username, _config.Password);
                                 Log.LogInformation("{0} [PROCESS] {1}: {2}", current, deUser.Name, newImage);
-                                string empPic = string.Format(config.PictureEmpIDFormat, deUser.Properties["employeeNumber"].Value);
+                                string empPic = string.Format(_config.PictureEmpIDFormat, deUser.Properties["employeeNumber"].Value);
                                 try
                                 {
                                     webClient.DownloadFile(empPic, newImage);

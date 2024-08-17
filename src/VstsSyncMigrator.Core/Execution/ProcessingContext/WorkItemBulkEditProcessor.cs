@@ -10,6 +10,7 @@ using MigrationTools.Enrichers;
 using MigrationTools.ProcessorEnrichers;
 using VstsSyncMigrator._EngineV1.Processors;
 using VstsSyncMigrator.Core.Execution;
+using Microsoft.Extensions.Options;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -21,14 +22,11 @@ namespace VstsSyncMigrator.Engine
     {
         private WorkItemBulkEditProcessorConfig _config;
 
-        public WorkItemBulkEditProcessor(TfsStaticEnrichers tfsStaticEnrichers, StaticEnrichers staticEnrichers, IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<StaticProcessorBase> logger) : base(tfsStaticEnrichers, staticEnrichers, services, me, telemetry, logger)
+        public WorkItemBulkEditProcessor(IOptions<WorkItemBulkEditProcessorConfig> options, TfsStaticEnrichers tfsStaticEnrichers, StaticEnrichers staticEnrichers, IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<StaticProcessorBase> logger) : base(tfsStaticEnrichers, staticEnrichers, services, me, telemetry, logger)
         {
+            _config = options.Value;
         }
 
-        public override void Configure(IProcessorConfig config)
-        {
-            _config = (WorkItemBulkEditProcessorConfig)config;
-        }
 
         public override string Name
         {

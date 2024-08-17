@@ -35,9 +35,6 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        public override void Configure(IProcessorConfig config)
-        {
-        }
 
         protected override void InternalExecute()
         {

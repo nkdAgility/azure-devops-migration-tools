@@ -94,10 +94,6 @@ namespace VstsSyncMigrator.Engine
             return ret;
         }
 
-        public override void Configure(IProcessorConfig config)
-        {
-        }
-
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Need to kill all errors")]
         public bool SetProfileImage(string identity, string imagePath, out string message)
         {

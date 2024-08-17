@@ -12,6 +12,7 @@ using MigrationTools.Enrichers;
 using MigrationTools.ProcessorEnrichers;
 using VstsSyncMigrator._EngineV1.Processors;
 using VstsSyncMigrator.Core.Execution;
+using Microsoft.Extensions.Options;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -25,8 +26,9 @@ namespace VstsSyncMigrator.Engine
     {
         private WorkItemDeleteConfig _config;
 
-        public WorkItemDelete(TfsStaticEnrichers tfsStaticEnrichers, StaticEnrichers staticEnrichers, IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<StaticProcessorBase> logger) : base(tfsStaticEnrichers, staticEnrichers, services, me, telemetry, logger)
+        public WorkItemDelete(IOptions<WorkItemDeleteConfig> options, TfsStaticEnrichers tfsStaticEnrichers, StaticEnrichers staticEnrichers, IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<StaticProcessorBase> logger) : base(tfsStaticEnrichers, staticEnrichers, services, me, telemetry, logger)
         {
+            _config = options.Value;
         }
 
         public override string Name
@@ -37,10 +39,6 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        public override void Configure(IProcessorConfig config)
-        {
-            _config = (WorkItemDeleteConfig)config;
-        }
 
         protected override void InternalExecute()
         {

@@ -25,8 +25,6 @@ namespace VstsSyncMigrator._EngineV1.Processors
             StaticEnrichers = staticEnrichers;
         }
 
-        public abstract void Configure(IProcessorConfig config);
-
         public abstract string Name { get; }
 
         public ProcessingStatus Status { get; private set; } = ProcessingStatus.None;
