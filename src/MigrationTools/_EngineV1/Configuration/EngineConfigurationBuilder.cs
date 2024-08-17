@@ -156,7 +156,7 @@ namespace MigrationTools._EngineV1.Configuration
 
         private void AddWorkItemMigrationDefault(EngineConfiguration ec)
         {
-            var config = new WorkItemMigrationConfig();
+            //var config = new WorkItemMigrationConfig();
             //ec.Processors.Add(config);
         }
 

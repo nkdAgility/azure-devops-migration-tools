@@ -4,6 +4,458 @@
         <name>MigrationTools.Clients.AzureDevops.ObjectModel</name>
     </assembly>
     <members>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.ExportProfilePictureFromADConfig.Enrichers">
+            <summary>
+            A list of enrichers that can augment the proccessing of the data
+            </summary>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.ExportProfilePictureFromADConfig.Domain">
+            <summary>
+            The source domain where the pictures should be exported. 
+            </summary>
+            <default>String.Empty</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.ExportProfilePictureFromADConfig.Username">
+            <summary>
+            The user name of the user that is used to export the pictures.
+            </summary>
+            <default>String.Empty</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.ExportProfilePictureFromADConfig.Password">
+            <summary>
+            The password of the user that is used to export the pictures.
+            </summary>
+            <default>String.Empty</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.ExportProfilePictureFromADConfig.PictureEmpIDFormat">
+            <summary>
+            TODO: You wpuld need to customise this for your system. Clone repo and run in Debug
+            </summary>
+            <default>String.Empty</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.ExportProfilePictureFromADConfig.Enabled">
+            <inheritdoc />
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.ExportProfilePictureFromADConfig.Processor">
+            <inheritdoc />
+        </member>
+        <member name="M:MigrationTools._EngineV1.Configuration.Processing.ExportProfilePictureFromADConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
+            <inheritdoc />
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.ExportUsersForMappingConfig.Enrichers">
+            <summary>
+            A list of enrichers that can augment the proccessing of the data
+            </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "P:MigrationTools._EngineV1.Configuration.Processing.ExportUsersForMappingConfig.OnlyListUsersInWorkItems" -->
+        <member name="M:MigrationTools._EngineV1.Configuration.Processing.ExportUsersForMappingConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
+            <inheritdoc />
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.FixGitCommitLinksConfig.Enrichers">
+            <summary>
+            A list of enrichers that can augment the proccessing of the data
+            </summary>
+        </member>
+        <member name="M:MigrationTools._EngineV1.Configuration.Processing.FixGitCommitLinksConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
+            <inheritdoc />
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.ImportProfilePictureConfig.Enabled">
+            <inheritdoc />
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.ImportProfilePictureConfig.Enrichers">
+            <summary>
+            A list of enrichers that can augment the proccessing of the data
+            </summary>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.ImportProfilePictureConfig.Processor">
+            <inheritdoc />
+        </member>
+        <member name="M:MigrationTools._EngineV1.Configuration.Processing.ImportProfilePictureConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
+            <inheritdoc />
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestConfigurationsMigrationConfig.Enabled">
+            <inheritdoc />
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestConfigurationsMigrationConfig.Enrichers">
+            <summary>
+            A list of enrichers that can augment the proccessing of the data
+            </summary>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestConfigurationsMigrationConfig.Processor">
+            <inheritdoc />
+        </member>
+        <member name="M:MigrationTools._EngineV1.Configuration.Processing.TestConfigurationsMigrationConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
+            <inheritdoc />
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationConfig.Enrichers">
+            <summary>
+            A list of enrichers that can augment the proccessing of the data
+            </summary>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationConfig.OnlyElementsWithTag">
+            <summary>
+            The tag name that is present on all elements that must be migrated. If this option isn't present this processor will migrate all.
+            </summary>
+            <default>`String.Empty`</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationConfig.TestPlanQuery">
+            <summary>
+            Filtering conditions to decide whether to migrate a test plan or not. When provided, this partial query is added after `Select * From TestPlan Where` when selecting test plans. Among filtering options, `AreaPath`, `PlanName` and `PlanState` are known to work. There is unfortunately no documentation regarding the available fields.
+            </summary>
+            <default>`String.Empty`</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationConfig.RemoveAllLinks">
+            <summary>
+            ??Not sure what this does. Check code.
+            </summary>
+            <default>false</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationConfig.MigrationDelay">
+            <summary>
+            ??Not sure what this does. Check code.
+            </summary>
+            <default>0</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationConfig.Processor">
+            <summary>
+            Indicates whether the configuration for node structure transformation should be taken from the common enricher configs. Otherwise the configuration elements below are used
+            </summary>
+            <default>false</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationConfig.RemoveInvalidTestSuiteLinks">
+            <summary>
+            Remove Invalid Links, see https://github.com/nkdAgility/azure-devops-migration-tools/issues/178
+            </summary>
+        </member>
+        <member name="M:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
+            <inheritdoc />
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestVariablesMigrationConfig.Enabled">
+            <inheritdoc />
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestVariablesMigrationConfig.Enrichers">
+            <summary>
+            A list of enrichers that can augment the proccessing of the data
+            </summary>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestVariablesMigrationConfig.Processor">
+            <inheritdoc />
+        </member>
+        <member name="M:MigrationTools._EngineV1.Configuration.Processing.TestVariablesMigrationConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
+            <inheritdoc />
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemBulkEditProcessorConfig.Enrichers">
+            <summary>
+            A list of enrichers that can augment the proccessing of the data
+            </summary>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemBulkEditProcessorConfig.WIQLQuery">
+            <summary>
+            A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)
+            </summary>
+            <default>AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemBulkEditProcessorConfig.WorkItemIDs">
+            <summary>
+            A list of work items to import
+            </summary>
+            <default>[]</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemBulkEditProcessorConfig.FilterWorkItemsThatAlreadyExistInTarget">
+            <summary>
+            This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run.
+            While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.
+            </summary>
+            <default>true</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemBulkEditProcessorConfig.PauseAfterEachWorkItem">
+            <summary>
+            Pause after each work item is migrated
+            </summary>
+            <default>false</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemBulkEditProcessorConfig.WorkItemCreateRetryLimit">
+            <summary>
+            **beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count.
+            This allows for periodic network glitches not to end the process.
+            </summary>
+            <default>5</default>
+        </member>
+        <member name="M:MigrationTools._EngineV1.Configuration.Processing.WorkItemBulkEditProcessorConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
+            <inheritdoc />
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemDeleteConfig.Enrichers">
+            <summary>
+            A list of enrichers that can augment the proccessing of the data
+            </summary>
+        </member>
+        <member name="M:MigrationTools._EngineV1.Configuration.Processing.WorkItemDeleteConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
+            <inheritdoc />
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.Enrichers">
+            <summary>
+            A list of enrichers that can augment the proccessing of the data
+            </summary>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.UpdateCreatedDate">
+            <summary>
+            If this is enabled the creation process on the target project will create the items with the original creation date.
+            (Important: The item history is always pointed to the date of the migration, it's change only the data column CreateDate,
+            not the internal create date)
+            </summary>
+            <default>true</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.UpdateCreatedBy">
+            <summary>
+            If this is enabled the creation process on the target project will create the items with the original creation date.
+            (Important: The item history is always pointed to the date of the migration, it's change only the data column CreateDate,
+            not the internal create date)
+            </summary>
+            <default>true</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.WIQLQuery">
+            <summary>
+            A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)
+            </summary>
+            <default>SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [[System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.Enabled">
+            <summary>
+            If enabled then the processor will run
+            </summary>
+            <default>false</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.Processor">
+            <summary>
+            Name used to identify this processor
+            </summary>
+            <default>?</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.FixHtmlAttachmentLinks">
+            <summary>
+            **beta** If enabled this will fix any image attachments URL's, work item mention URL's or user mentions in the HTML
+            fields as well as discussion comments. You must specify a PersonalAccessToken in the Source project for Azure DevOps;
+            TFS should use integrated authentication.
+            </summary>
+            <default>?</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.WorkItemCreateRetryLimit">
+            <summary>
+            **beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count.
+            This allows for periodic network glitches not to end the process.
+            </summary>
+            <default>5</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.FilterWorkItemsThatAlreadyExistInTarget">
+            <summary>
+            This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run.
+            While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.
+            </summary>
+            <default>true</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.PauseAfterEachWorkItem">
+            <summary>
+            Pause after each work item is migrated
+            </summary>
+            <default>false</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.AttachRevisionHistory">
+            <summary>
+            This will create a json file with the revision history and attach it to the work item. Best used with `MaxRevisions` or `ReplayRevisions`.
+            </summary>
+            <default>?</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.GenerateMigrationComment">
+            <summary>
+            If enabled, adds a comment recording the migration
+            </summary>
+            <default>false</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.WorkItemIDs">
+            <summary>
+            A list of work items to import
+            </summary>
+            <default>[]</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.MaxGracefulFailures">
+            <summary>
+            The maximum number of failures to tolerate before the migration fails. When set above zero, a work item migration error is logged but the migration will
+            continue until the number of failed items reaches the configured value, after which the migration fails.
+            </summary>
+            <default>0</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.SkipRevisionWithInvalidIterationPath">
+            <summary>
+            This will skip a revision if the source iteration has not been migrated i.e. it was deleted
+            </summary>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.SkipRevisionWithInvalidAreaPath">
+            <summary>
+            When set to true, this setting will skip a revision if the source area has not been migrated, has been deleted or is somehow invalid, etc.
+            </summary>
+        </member>
+        <member name="M:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
+            <inheritdoc />
+        </member>
+        <member name="M:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.#ctor">
+            <summary>
+            Creates a new workitemmigrationconfig with default values
+            </summary>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemPostProcessingConfig.WorkItemIDs">
+            <summary>
+            A list of work items to import
+            </summary>
+            <default>[]</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemPostProcessingConfig.Enabled">
+            <inheritdoc />
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemPostProcessingConfig.Processor">
+            <inheritdoc />
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemPostProcessingConfig.Enrichers">
+            <summary>
+            A list of enrichers that can augment the proccessing of the data
+            </summary>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemPostProcessingConfig.WIQLQuery">
+            <summary>
+            A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)
+            </summary>
+            <default>AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemPostProcessingConfig.FilterWorkItemsThatAlreadyExistInTarget">
+            <summary>
+            This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run.
+            While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.
+            </summary>
+            <default>true</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemPostProcessingConfig.PauseAfterEachWorkItem">
+            <summary>
+            Pause after each work item is migrated
+            </summary>
+            <default>false</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemPostProcessingConfig.WorkItemCreateRetryLimit">
+            <summary>
+            **beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count.
+            This allows for periodic network glitches not to end the process.
+            </summary>
+            <default>5</default>
+        </member>
+        <member name="M:MigrationTools._EngineV1.Configuration.Processing.WorkItemPostProcessingConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
+            <inheritdoc />
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemUpdateAreasAsTagsConfig.AreaIterationPath">
+            <summary>
+            This is a required parameter. That define the root path of the iteration. To get the full path use `\` 
+            </summary>
+            <default>\</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemUpdateAreasAsTagsConfig.Enabled">
+            <inheritdoc />
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemUpdateAreasAsTagsConfig.Processor">
+            <inheritdoc />
+        </member>
+        <member name="M:MigrationTools._EngineV1.Configuration.Processing.WorkItemUpdateAreasAsTagsConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
+            <inheritdoc />
+        </member>
+        <member name="T:MigrationTools.Processors.CreateTeamFolders">
+            <summary>
+            Creates folders in Sared Queries for each Team
+            </summary>
+            <status>alpha</status>
+            <processingtarget>Shared Queries</processingtarget>
+        </member>
+        <member name="T:MigrationTools.Processors.ExportProfilePictureFromADContext">
+            <summary>
+            Downloads corporate images and updates TFS/Azure DevOps profiles
+            </summary>
+            <status>alpha</status>
+            <processingtarget>Profiles</processingtarget>
+        </member>
+        <member name="T:MigrationTools.Processors.ExportUsersForMappingContext">
+            <summary>
+            ExportUsersForMappingContext is a tool used to create a starter mapping file for users between the source and target systems.
+            Use `ExportUsersForMappingConfig` to configure.
+            </summary>
+            <status>ready</status>
+            <processingtarget>Work Items</processingtarget>
+        </member>
+        <member name="T:MigrationTools.Processors.FakeProcessor">
+            <summary>
+            Note: this is only for internal usage. Don't use this in your configurations.
+            </summary>
+        </member>
+        <member name="T:MigrationTools.Processors.ImportProfilePictureContext">
+            <summary>
+            Downloads corporate images and updates TFS/Azure DevOps profiles
+            </summary>
+            <status>alpha</status>
+            <processingtarget>Profiles</processingtarget>
+        </member>
+        <member name="T:MigrationTools.Processors.TestConfigurationsMigrationContext">
+            <summary>
+            This processor can migrate `test configuration`. This should be run before `LinkMigrationConfig`.
+            </summary>
+            <status>Beta</status>
+            <processingtarget>Suites &amp; Plans</processingtarget>
+        </member>
+        <member name="T:MigrationTools.Processors.TestPlansAndSuitesMigrationContext">
+            <summary>
+            Rebuilds Suits and plans for Test Cases migrated using the WorkItemMigration
+            </summary>
+            <status>Beta</status>
+            <processingtarget>Suites &amp; Plans</processingtarget>
+        </member>
+        <member name="M:MigrationTools.Processors.TestPlansAndSuitesMigrationContext.ApplyConfigurations(Microsoft.TeamFoundation.TestManagement.Client.ITestSuiteEntry,Microsoft.TeamFoundation.TestManagement.Client.ITestSuiteEntry)">
+            <summary>
+            Apply configurations to a single test case entry on the target, by copying from the source
+            </summary>
+            <param name="sourceEntry"></param>
+            <param name="targetEntry"></param>
+        </member>
+        <member name="M:MigrationTools.Processors.TestPlansAndSuitesMigrationContext.ApplyDefaultConfigurations(Microsoft.TeamFoundation.TestManagement.Client.ITestSuiteBase,Microsoft.TeamFoundation.TestManagement.Client.ITestSuiteBase)">
+            <summary>
+            Sets default configurations on migrated test suites.
+            </summary>
+            <param name="source">The test suite to take as a source.</param>
+            <param name="target">The test suite to apply the default configurations to.</param>
+        </member>
+        <member name="M:MigrationTools.Processors.TestPlansAndSuitesMigrationContext.FixWorkItemIdInQuery(Microsoft.TeamFoundation.TestManagement.Client.ITestSuiteBase)">
+            <summary>
+            Fix work item ID's in query based suites
+            </summary>
+        </member>
+        <member name="M:MigrationTools.Processors.TestPlansAndSuitesMigrationContext.GetTargetIdentity(Microsoft.TeamFoundation.Framework.Client.IdentityDescriptor)">
+            <summary>
+            Retrieve the target identity for a given source descriptor
+            </summary>
+            <param name="sourceIdentityDescriptor">Source identity Descriptor</param>
+            <returns>Target Identity</returns>
+        </member>
+        <member name="M:MigrationTools.Processors.TestPlansAndSuitesMigrationContext.RemoveInvalidLinks(Microsoft.TeamFoundation.TestManagement.Client.ITestPlan)">
+            <summary>
+            Remove invalid links
+            </summary>
+            <remarks>
+            VSTS cannot store some links which have an invalid URI Scheme. You will get errors like "The URL specified has a potentially unsafe URL protocol"
+            For myself, the issue were urls that pointed to TFVC:    "vstfs:///VersionControl/Changeset/19415"
+            Unfortunately the API does not seem to allow access to the "raw" data, so there's nowhere to retrieve this as far as I can find.
+            Should take care of https://github.com/nkdAgility/azure-devops-migration-tools/issues/178
+            </remarks>
+            <param name="targetPlan">The plan to remove invalid links drom</param>
+        </member>
+        <member name="T:MigrationTools.Processors.TestVariablesMigrationContext">
+            <summary>
+            This processor can migrate test variables that are defined in the test plans / suites. This must run before `TestPlansAndSuitesMigrationConfig`. 
+            </summary>
+            <status>Beta</status>
+            <processingtarget>Suites &amp; Plans</processingtarget>
+        </member>
         <member name="T:MigrationTools.Processors.TfsSharedQueryProcessor">
             <summary>
             The TfsSharedQueryProcessor enabled you to migrate queries from one locatio nto another.
@@ -84,6 +536,42 @@
             <summary>
             List of Teams to process. If this is `null` then all teams will be processed.
             </summary>
+        </member>
+        <member name="T:MigrationTools.Processors.WorkItemBulkEditProcessor">
+            <summary>
+            This processor allows you to make changes in place where we load from teh Target and update the Target. This is used for bulk updates with the most common reason being a process template change.
+            </summary>
+            <processingtarget>WorkItem</processingtarget>
+        </member>
+        <member name="T:MigrationTools.Processors.WorkItemDelete">
+            <summary>
+            The `WorkItemDelete` processor allows you to delete any amount of work items that meet the query.
+            **DANGER:** This is not a recoverable action and should be use with extream caution.
+            </summary>
+            <status>ready</status>
+            <processingtarget>WorkItem</processingtarget>
+        </member>
+        <member name="T:MigrationTools.Processors.WorkItemMigrationContext">
+            <summary>
+            WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links, and Attachments.
+            Use `WorkItemMigrationConfig` to configure.
+            </summary>
+            <status>ready</status>
+            <processingtarget>Work Items</processingtarget>
+        </member>
+        <member name="T:MigrationTools.Processors.WorkItemPostProcessingContext">
+            <summary>
+            Reapply field mappings after a migration. Does not migtate Work Items, only reapplied changes to filed mappings.
+            </summary>
+            <status>preview</status>
+            <processingtarget>Work Items</processingtarget>
+        </member>
+        <member name="T:MigrationTools.Processors.WorkItemUpdateAreasAsTagsContext">
+            <summary>
+            A common issue with older *TFS/Azure DevOps* instances is the proliferation of `Area Paths`. With the use of `Area Path` for `Teams` and the addition of the `Node Name` column option these extensive tag hierarchies should instad be moved to tags.
+            </summary>
+            <status>Beta</status>
+            <processingtarget>Work Item</processingtarget>
         </member>
         <member name="P:MigrationTools.Tools.TfsAttachmentToolOptions.ExportBasePath">
             <summary>

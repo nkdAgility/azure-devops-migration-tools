@@ -27,6 +27,11 @@
     <PackageReference Update="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
+	<ItemGroup>
+		<Reference Include="System.DirectoryServices" />
+		<Reference Include="System.DirectoryServices.AccountManagement" />
+	</ItemGroup>
+
   <ItemGroup>
     <Folder Include="EndpointEnrichers\" />
     <Folder Include="Enrichers\" />
