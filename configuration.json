@@ -119,7 +119,7 @@
     },
     "Processors": [
       {
-        "ProcessorType": "WorkItemMigration",
+        "ProcessorType": "WorkItemMigrationProcessor",
         "Enabled": true,
         "UpdateCreatedDate": true,
         "UpdateCreatedBy": true,
