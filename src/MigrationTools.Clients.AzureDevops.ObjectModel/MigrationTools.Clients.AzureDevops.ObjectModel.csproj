@@ -28,6 +28,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="_Enginev1\" />
+    <Folder Include="EndpointEnrichers\" />
   </ItemGroup>
 </Project>
