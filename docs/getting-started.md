@@ -42,7 +42,7 @@ You can now customize the configuration depending on what you need to do. Howeve
 {% include sampleConfig/configuration.json %}
 ```
 
-The default [WorkItemMigrationConfig](/docs/Reference/v1/Processors/WorkItemMigrationConfig.md) processor will perform the following operations:
+The default [WorkItemMigrationConfig](_reference/reference.v1.processors.workitempostprocessingcontext.md) processor will perform the following operations:
 
 * Migrate iterations and sprints
 * Attachments
@@ -50,7 +50,7 @@ The default [WorkItemMigrationConfig](/docs/Reference/v1/Processors/WorkItemMigr
 
 ## How to execute configuration.json with minimal adjustments
 
-> Remember to add custom field ['ReflectedWorkItemId'](/docs/server-configuration.md) to only the target team project before starting migration!
+> Remember to add custom field ['ReflectedWorkItemId'](server-configuration.md) to only the target team project before starting migration!
 
 > [NOTE!]
 > In older versions of the tool we updated the Source work items with a link back to the Target to make migration easier. This has been removed and replaced with the `FilterWorkItemsThatAlreadyExistInTarget` option instead. **You do not need to add the reflected work item ID custom field to the Source environment.**
