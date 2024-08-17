@@ -24,12 +24,12 @@ namespace MigrationTools.Processors
     /// </summary>
     /// <status>alpha</status>
     /// <processingtarget>Profiles</processingtarget>
-    public class ExportProfilePictureFromADContext : TfsStaticProcessorBase
+    public class ExportProfilePictureFromADProcessor : TfsStaticProcessorBase
     {
         private IIdentityManagementService2 ims2;
-        private ExportProfilePictureFromADConfig _config;
+        private ExportProfilePictureFromADProcessorOptions _config;
 
-        public ExportProfilePictureFromADContext(IOptions<ExportProfilePictureFromADConfig> options, TfsStaticTools tfsStaticEnrichers, StaticTools staticEnrichers, IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<StaticProcessorBase> logger) : base(tfsStaticEnrichers, staticEnrichers, services, me, telemetry, logger)
+        public ExportProfilePictureFromADProcessor(IOptions<ExportProfilePictureFromADProcessorOptions> options, TfsStaticTools tfsStaticEnrichers, StaticTools staticEnrichers, IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<TfsStaticProcessorBase> logger) : base(tfsStaticEnrichers, staticEnrichers, services, me, telemetry, logger)
         {
             _config = options.Value;
             //http://www.codeproject.com/Articles/18102/Howto-Almost-Everything-In-Active-Directory-via-C
@@ -40,7 +40,7 @@ namespace MigrationTools.Processors
         {
             get
             {
-                return "ExportProfilePictureFromADContext";
+                return "ExportProfilePictureFromADProcessor";
             }
         }
 

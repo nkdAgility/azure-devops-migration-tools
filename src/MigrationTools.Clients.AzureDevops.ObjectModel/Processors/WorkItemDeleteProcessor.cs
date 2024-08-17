@@ -22,11 +22,11 @@ namespace MigrationTools.Processors
     /// </summary>
     /// <status>ready</status>
     /// <processingtarget>WorkItem</processingtarget>
-    public class WorkItemDelete : TfsStaticProcessorBase
+    public class WorkItemDeleteProcessor : TfsStaticProcessorBase
     {
-        private WorkItemDeleteConfig _config;
+        private WorkItemDeleteProcessorOptions _config;
 
-        public WorkItemDelete(IOptions<WorkItemDeleteConfig> options, TfsStaticTools tfsStaticEnrichers, StaticTools staticEnrichers, IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<StaticProcessorBase> logger) : base(tfsStaticEnrichers, staticEnrichers, services, me, telemetry, logger)
+        public WorkItemDeleteProcessor(IOptions<WorkItemDeleteProcessorOptions> options, TfsStaticTools tfsStaticEnrichers, StaticTools staticEnrichers, IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<TfsStaticProcessorBase> logger) : base(tfsStaticEnrichers, staticEnrichers, services, me, telemetry, logger)
         {
             _config = options.Value;
         }
@@ -35,7 +35,7 @@ namespace MigrationTools.Processors
         {
             get
             {
-                return "WorkItemDelete";
+                return typeof(WorkItemDeleteProcessor).Name;
             }
         }
 

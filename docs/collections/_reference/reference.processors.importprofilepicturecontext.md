@@ -26,8 +26,8 @@ options:
   defaultValue: missng XML code comments
 status: alpha
 processingTarget: Profiles
-classFile: /src/VstsSyncMigrator.Core/Execution/ProcessingContext/ImportProfilePictureContext.cs
-optionsClassFile: /src/MigrationTools/_EngineV1/Configuration/Processing/ImportProfilePictureConfig.cs
+classFile: ''
+optionsClassFile: ''
 
 redirectFrom:
 - /Reference/v1/Processors/ImportProfilePictureConfig/

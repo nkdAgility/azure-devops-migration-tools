@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
 using MigrationTools.Enrichers;
+using MigrationTools.Processors;
+using MigrationTools._EngineV1.Configuration;
 
-namespace MigrationTools._EngineV1.Configuration.Processing
+namespace MigrationTools.Processors
 {
-    public class WorkItemUpdateAreasAsTagsConfig : IProcessorConfig
+    public class WorkItemUpdateAreasAsTagsProcessorOptions : IProcessorConfig
     {
         /// <summary>
         /// This is a required parameter. That define the root path of the iteration. To get the full path use `\` 
@@ -17,7 +19,7 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         /// <inheritdoc />
         public string Processor
         {
-            get { return "WorkItemUpdateAreasAsTagsContext"; }
+            get { return typeof(WorkItemUpdateAreasAsTagsProcessor).Name; }
         }
 
         public List<IProcessorEnricher> Enrichers { get ; set ; }

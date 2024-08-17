@@ -45,7 +45,7 @@ namespace MigrationTools.Processors
     /// </summary>
     /// <status>ready</status>
     /// <processingtarget>Work Items</processingtarget>
-    public class WorkItemMigrationContext : TfsMigrationProcessorBase
+    public class WorkItemMigrationProcessor : TfsMigrationProcessorBase
     {
 
         private static int _count = 0;
@@ -53,7 +53,7 @@ namespace MigrationTools.Processors
         private static long _elapsedms = 0;
         private static int _totalWorkItem = 0;
         private static string workItemLogTemplate = "[{sourceWorkItemTypeName,20}][Complete:{currentWorkItem,6}/{totalWorkItems}][sid:{sourceWorkItemId,6}|Rev:{sourceRevisionInt,3}][tid:{targetWorkItemId,6} | ";
-        private WorkItemMigrationConfig _config;
+        private WorkItemMigrationProcessorOptions _config;
         private List<string> _ignore;
 
         private ILogger contextLog;
@@ -65,10 +65,10 @@ namespace MigrationTools.Processors
         private List<string> _itemsInError;
 
 
-        public WorkItemMigrationContext(IOptions<WorkItemMigrationConfig> processorConfig,IMigrationEngine engine,
+        public WorkItemMigrationProcessor(IOptions<WorkItemMigrationProcessorOptions> processorConfig,IMigrationEngine engine,
                                         IServiceProvider services,
                                         ITelemetryLogger telemetry,
-                                        ILogger<WorkItemMigrationContext> logger,
+                                        ILogger<WorkItemMigrationProcessor> logger,
                                         TfsStaticTools tfsStaticEnrichers,
                                         IOptions<EngineConfiguration> engineConfig,
                                         StaticTools staticEnrichers)
@@ -77,10 +77,10 @@ namespace MigrationTools.Processors
             _config = processorConfig.Value;
             _telemetry = telemetry;
             _engineConfig = engineConfig.Value;
-            contextLog = Serilog.Log.ForContext<WorkItemMigrationContext>();
+            contextLog = Serilog.Log.ForContext<WorkItemMigrationProcessor>();
         }
 
-        public override string Name => "WorkItemMigration";
+        public override string Name => typeof(WorkItemMigrationProcessor).Name;
 
         internal void TraceWriteLine(LogEventLevel level, string message, Dictionary<string, object> properties = null)
         {

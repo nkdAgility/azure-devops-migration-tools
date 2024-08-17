@@ -22,7 +22,7 @@ namespace MigrationTools.Processors
     /// <processingtarget>Shared Queries</processingtarget>
     public class CreateTeamFolders : TfsStaticProcessorBase
     {
-        public CreateTeamFolders(TfsStaticTools tfsStaticEnrichers, StaticTools staticEnrichers, IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<StaticProcessorBase> logger) : base(tfsStaticEnrichers, staticEnrichers, services, me, telemetry, logger)
+        public CreateTeamFolders(TfsStaticTools tfsStaticEnrichers, StaticTools staticEnrichers, IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<TfsStaticProcessorBase> logger) : base(tfsStaticEnrichers, staticEnrichers, services, me, telemetry, logger)
         {
         }
 

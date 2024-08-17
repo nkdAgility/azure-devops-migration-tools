@@ -23,11 +23,11 @@ namespace MigrationTools.Processors
     /// </summary>
     /// <status>preview</status>
     /// <processingtarget>Work Items</processingtarget>
-    public class WorkItemPostProcessingContext : TfsMigrationProcessorBase
+    public class WorkItemPostProcessingProcessor : TfsMigrationProcessorBase
     {
-        private WorkItemPostProcessingConfig _config;
+        private WorkItemPostProcessingProcessorOptions _config;
 
-        public WorkItemPostProcessingContext(IOptions<WorkItemPostProcessingConfig> options, IMigrationEngine engine, TfsStaticTools tfsStaticEnrichers, StaticTools staticEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<MigrationProcessorBase> logger) : base(engine, tfsStaticEnrichers, staticEnrichers, services, telemetry, logger)
+        public WorkItemPostProcessingProcessor(IOptions<WorkItemPostProcessingProcessorOptions> options, IMigrationEngine engine, TfsStaticTools tfsStaticEnrichers, StaticTools staticEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<MigrationProcessorBase> logger) : base(engine, tfsStaticEnrichers, staticEnrichers, services, telemetry, logger)
         {
             _config = options.Value;
         }
@@ -36,7 +36,7 @@ namespace MigrationTools.Processors
         {
             get
             {
-                return "WorkItemPostProcessingContext";
+                return typeof(WorkItemPostProcessingProcessor).Name;
             }
         }
 

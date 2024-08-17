@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
 using MigrationTools.Enrichers;
+using MigrationTools.Processors;
+using MigrationTools._EngineV1.Configuration;
 
-namespace MigrationTools._EngineV1.Configuration.Processing
+namespace MigrationTools.Processors
 {
-    public class WorkItemPostProcessingConfig : IWorkItemProcessorConfig
+    public class WorkItemPostProcessingProcessorOptions : IWorkItemProcessorConfig
     {
         /// <summary>
         /// A list of work items to import
@@ -17,7 +19,7 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         /// <inheritdoc />
         public string Processor
         {
-            get { return "WorkItemPostProcessingContext"; }
+            get { return typeof(WorkItemPostProcessingProcessor).Name; }
         }
 
         /// <summary>
@@ -58,7 +60,7 @@ namespace MigrationTools._EngineV1.Configuration.Processing
             return true;
         }
 
-        public WorkItemPostProcessingConfig()
+        public WorkItemPostProcessingProcessorOptions()
         {
             WIQLQuery = @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [@ReflectedWorkItemIdFieldName] = ''  AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc";
         }

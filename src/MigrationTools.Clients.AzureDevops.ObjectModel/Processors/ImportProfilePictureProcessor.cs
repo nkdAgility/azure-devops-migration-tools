@@ -22,11 +22,11 @@ namespace MigrationTools.Processors
     /// </summary>
     /// <status>alpha</status>
     /// <processingtarget>Profiles</processingtarget>
-    public class ImportProfilePictureContext : TfsStaticProcessorBase
+    public class ImportProfilePictureProcessor : TfsStaticProcessorBase
     {
         private readonly IIdentityManagementService2 ims2;
 
-        public ImportProfilePictureContext(TfsStaticTools tfsStaticEnrichers, StaticTools staticEnrichers, IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<StaticProcessorBase> logger) : base(tfsStaticEnrichers, staticEnrichers, services, me, telemetry, logger)
+        public ImportProfilePictureProcessor(TfsStaticTools tfsStaticEnrichers, StaticTools staticEnrichers, IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<TfsStaticProcessorBase> logger) : base(tfsStaticEnrichers, staticEnrichers, services, me, telemetry, logger)
         {
             //http://www.codeproject.com/Articles/18102/Howto-Almost-Everything-In-Active-Directory-via-C
             ims2 = (IIdentityManagementService2)me.Target.GetService<IIdentityManagementService2>();
@@ -36,7 +36,7 @@ namespace MigrationTools.Processors
         {
             get
             {
-                return "ImportProfilePictureContext";
+                return typeof(ImportProfilePictureProcessor).Name;
             }
         }
 

@@ -26,8 +26,8 @@ options:
   defaultValue: missng XML code comments
 status: Beta
 processingTarget: Suites & Plans
-classFile: /src/VstsSyncMigrator.Core/Execution/MigrationContext/TestConfigurationsMigrationContext.cs
-optionsClassFile: /src/MigrationTools/_EngineV1/Configuration/Processing/TestConfigurationsMigrationConfig.cs
+classFile: ''
+optionsClassFile: ''
 
 redirectFrom:
 - /Reference/v1/Processors/TestConfigurationsMigrationConfig/

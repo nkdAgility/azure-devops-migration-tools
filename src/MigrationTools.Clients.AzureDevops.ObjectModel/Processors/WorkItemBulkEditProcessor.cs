@@ -19,9 +19,9 @@ namespace MigrationTools.Processors
     /// <processingtarget>WorkItem</processingtarget>
     public class WorkItemBulkEditProcessor : TfsStaticProcessorBase
     {
-        private WorkItemBulkEditProcessorConfig _config;
+        private WorkItemBulkEditProcessorOptions _config;
 
-        public WorkItemBulkEditProcessor(IOptions<WorkItemBulkEditProcessorConfig> options, TfsStaticTools tfsStaticEnrichers, StaticTools staticEnrichers, IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<StaticProcessorBase> logger) : base(tfsStaticEnrichers, staticEnrichers, services, me, telemetry, logger)
+        public WorkItemBulkEditProcessor(IOptions<WorkItemBulkEditProcessorOptions> options, TfsStaticTools tfsStaticEnrichers, StaticTools staticEnrichers, IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<TfsStaticProcessorBase> logger) : base(tfsStaticEnrichers, staticEnrichers, services, me, telemetry, logger)
         {
             _config = options.Value;
         }
@@ -31,7 +31,7 @@ namespace MigrationTools.Processors
         {
             get
             {
-                return "WorkItemUpdate";
+                return typeof(WorkItemBulkEditProcessor).Name;
             }
         }
 

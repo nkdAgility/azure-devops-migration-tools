@@ -21,11 +21,11 @@ namespace MigrationTools.Processors
     /// </summary>
     /// <status>Beta</status>
     /// <processingtarget>Work Item</processingtarget>
-    public class WorkItemUpdateAreasAsTagsContext : TfsStaticProcessorBase
+    public class WorkItemUpdateAreasAsTagsProcessor : TfsStaticProcessorBase
     {
-        private WorkItemUpdateAreasAsTagsConfig _config;
+        private WorkItemUpdateAreasAsTagsProcessorOptions _config;
 
-        public WorkItemUpdateAreasAsTagsContext(IOptions<WorkItemUpdateAreasAsTagsConfig> options, TfsStaticTools tfsStaticEnrichers, StaticTools staticEnrichers, IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<StaticProcessorBase> logger) : base(tfsStaticEnrichers, staticEnrichers, services, me, telemetry, logger)
+        public WorkItemUpdateAreasAsTagsProcessor(IOptions<WorkItemUpdateAreasAsTagsProcessorOptions> options, TfsStaticTools tfsStaticEnrichers, StaticTools staticEnrichers, IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<TfsStaticProcessorBase> logger) : base(tfsStaticEnrichers, staticEnrichers, services, me, telemetry, logger)
         {
             _config = options.Value;
         }
@@ -34,7 +34,7 @@ namespace MigrationTools.Processors
         {
             get
             {
-                return "WorkItemUpdateAreasAsTagsContext";
+                return typeof(WorkItemUpdateAreasAsTagsProcessor).Name;
             }
         }
 

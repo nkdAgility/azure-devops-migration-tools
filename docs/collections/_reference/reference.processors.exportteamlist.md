@@ -9,7 +9,7 @@ architecture: v1
 options: []
 status: missng XML code comments
 processingTarget: missng XML code comments
-classFile: /src/VstsSyncMigrator.Core/Execution/ProcessingContext/ExportTeamList.cs
+classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/ExportTeamListProcessor.cs
 optionsClassFile: 
 
 redirectFrom:

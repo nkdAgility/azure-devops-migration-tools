@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
+using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Enrichers;
 
-namespace MigrationTools._EngineV1.Configuration.Processing
+namespace MigrationTools.Processors
 {
-    public class TestVariablesMigrationConfig : IProcessorConfig
+    public class TestVariablesMigrationProcessorOptions : IProcessorConfig
     {
         /// <inheritdoc />
         public bool Enabled { get; set; }

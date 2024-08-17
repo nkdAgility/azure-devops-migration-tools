@@ -56,8 +56,8 @@ options:
   defaultValue: '`String.Empty`'
 status: Beta
 processingTarget: Suites & Plans
-classFile: /src/VstsSyncMigrator.Core/Execution/MigrationContext/TestPlansAndSuitesMigrationContext.cs
-optionsClassFile: /src/MigrationTools/_EngineV1/Configuration/Processing/TestPlansAndSuitesMigrationConfig.cs
+classFile: ''
+optionsClassFile: ''
 
 redirectFrom:
 - /Reference/v1/Processors/TestPlansAndSuitesMigrationConfig/

@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
+using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Enrichers;
+using MigrationTools.Processors;
 
-namespace MigrationTools._EngineV1.Configuration.Processing
+namespace MigrationTools.Processors
 {
-    public class FixGitCommitLinksConfig : IProcessorConfig
+    public class FixGitCommitLinksProcessorOptions : IProcessorConfig
     {
         public string TargetRepository { get; set; }
         public bool Enabled { get; set; }
@@ -16,7 +18,7 @@ namespace MigrationTools._EngineV1.Configuration.Processing
 
         public string Processor
         {
-            get { return "FixGitCommitLinks"; }
+            get { return typeof(FixGitCommitLinksProcessor).Name; }
         }
 
         /// <inheritdoc />

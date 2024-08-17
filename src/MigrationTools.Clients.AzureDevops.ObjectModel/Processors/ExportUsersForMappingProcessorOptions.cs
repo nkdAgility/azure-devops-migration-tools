@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
+using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Enrichers;
 
-namespace MigrationTools._EngineV1.Configuration.Processing
+namespace MigrationTools.Processors
 {
-    public class ExportUsersForMappingConfig : IProcessorConfig
+    public class ExportUsersForMappingProcessorOptions : IProcessorConfig
     {
         public bool Enabled { get; set; }
 
@@ -22,7 +23,7 @@ namespace MigrationTools._EngineV1.Configuration.Processing
 
         public string Processor
         {
-            get { return "ExportUsersForMappingContext"; }
+            get { return "ExportUsersForMappingProcessor"; }
         }
 
         /// <inheritdoc />

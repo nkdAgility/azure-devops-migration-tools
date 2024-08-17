@@ -63,21 +63,21 @@ namespace MigrationTools
         [Obsolete("This is the v1 Archtiecture, we are movign to V2", false)]
         public static void AddMigrationToolServicesForClientLegacyCore(this IServiceCollection context)
         {
-            context.AddSingleton<WorkItemMigrationContext>();
-            context.AddSingleton<TestConfigurationsMigrationContext>();
-            context.AddSingleton<TestPlansAndSuitesMigrationContext>();
-            context.AddSingleton<TestVariablesMigrationContext>();
-            context.AddSingleton<WorkItemPostProcessingContext>();
-            context.AddSingleton<WorkItemPostProcessingContext>();
-            context.AddSingleton<ExportUsersForMappingContext>();
+            context.AddSingleton<WorkItemMigrationProcessor>();
+            context.AddSingleton<TestConfigurationsMigrationProcessor>();
+            context.AddSingleton<TestPlansAndSuitesMigrationProcessor>();
+            context.AddSingleton<TestVariablesMigrationProcessor>();
+            context.AddSingleton<WorkItemPostProcessingProcessor>();
+            context.AddSingleton<WorkItemPostProcessingProcessor>();
+            context.AddSingleton<ExportUsersForMappingProcessor>();
             context.AddSingleton<CreateTeamFolders>();
-            context.AddSingleton<ExportProfilePictureFromADContext>();
-            context.AddSingleton<ExportTeamList>();
-            context.AddSingleton<FixGitCommitLinks>();
-            context.AddSingleton<ImportProfilePictureContext>();
-            context.AddSingleton<WorkItemDelete>();
+            context.AddSingleton<ExportProfilePictureFromADProcessor>();
+            context.AddSingleton<ExportTeamListProcessor>();
+            context.AddSingleton<FixGitCommitLinksProcessor>();
+            context.AddSingleton<ImportProfilePictureProcessor>();
+            context.AddSingleton<WorkItemDeleteProcessor>();
             context.AddSingleton<WorkItemBulkEditProcessor>();
-            context.AddSingleton<WorkItemUpdateAreasAsTagsContext>();
+            context.AddSingleton<WorkItemUpdateAreasAsTagsProcessor>();
 
         }
 

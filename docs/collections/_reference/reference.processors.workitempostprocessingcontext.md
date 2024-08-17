@@ -51,8 +51,8 @@ options:
   defaultValue: '[]'
 status: preview
 processingTarget: Work Items
-classFile: /src/VstsSyncMigrator.Core/Execution/MigrationContext/WorkItemPostProcessingContext.cs
-optionsClassFile: /src/MigrationTools/_EngineV1/Configuration/Processing/WorkItemPostProcessingConfig.cs
+classFile: ''
+optionsClassFile: ''
 
 redirectFrom:
 - /Reference/v1/Processors/WorkItemPostProcessingConfig/

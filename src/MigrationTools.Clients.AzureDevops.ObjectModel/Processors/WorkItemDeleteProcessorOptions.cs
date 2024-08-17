@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
 using MigrationTools.Enrichers;
+using MigrationTools.Processors;
+using MigrationTools._EngineV1.Configuration;
 
-namespace MigrationTools._EngineV1.Configuration.Processing
+namespace MigrationTools.Processors
 {
-    public class WorkItemDeleteConfig : IWorkItemProcessorConfig
+    public class WorkItemDeleteProcessorOptions : IWorkItemProcessorConfig
     {
         public bool Enabled { get; set; }
 
@@ -14,10 +16,10 @@ namespace MigrationTools._EngineV1.Configuration.Processing
 
         public string Processor
         {
-            get { return "WorkItemDelete"; }
+            get { return typeof(WorkItemDeleteProcessor).Name; }
         }
 
-        public WorkItemDeleteConfig()
+        public WorkItemDeleteProcessorOptions()
         {
             Enabled = false;
             WIQLQuery = @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc";

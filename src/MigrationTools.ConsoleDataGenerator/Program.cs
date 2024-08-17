@@ -34,7 +34,6 @@ class Program
         currentDomain.Load("MigrationTools.Clients.AzureDevops.ObjectModel");
         currentDomain.Load("MigrationTools.Clients.AzureDevops.Rest");
         currentDomain.Load("MigrationTools.Clients.FileSystem");
-        currentDomain.Load("VstsSyncMigrator.Core");
 
         Console.WriteLine("Assemblies");
         List<Assembly> asses = currentDomain.GetAssemblies().ToList();
@@ -49,26 +48,21 @@ class Program
                 .Where(a => !a.IsDynamic && a.FullName.StartsWith("MigrationTools"))
                 .SelectMany(a => a.GetTypes()).ToList();
 
-        List<Type> oldTypes = asses
-             .Where(a => !a.IsDynamic && a.FullName.StartsWith("VstsSyncMigrator"))
-             .SelectMany(a => a.GetTypes()).ToList();
-
-        List<Type> allTypes = newTypes.Concat(oldTypes).ToList();
 
 
         List<ClassData> classDataList = new List<ClassData>();
         // V1
-        classDataList.AddRange(cdLoader.GetClassData(oldTypes, allTypes, typeof(MigrationTools._EngineV1.Containers.IProcessor), "v1", "Processors", true, "Config"));
-        classDataList.AddRange(cdLoader.GetClassData(newTypes, allTypes, typeof(IFieldMapConfig), "v1", "FieldMaps", false));
+        classDataList.AddRange(cdLoader.GetClassData(newTypes, newTypes, typeof(MigrationTools._EngineV1.Containers.IProcessor), "v1", "Processors", true, "Config"));
+        classDataList.AddRange(cdLoader.GetClassData(newTypes, newTypes, typeof(IFieldMapConfig), "v1", "FieldMaps", false));
         // V2
-        classDataList.AddRange(cdLoader.GetClassData(newTypes, allTypes, typeof(MigrationTools.Processors.IProcessor), "v2", "Processors"));
-        classDataList.AddRange(cdLoader.GetClassData(newTypes, allTypes, typeof(IProcessorEnricher), "v2", "ProcessorEnrichers"));
+        classDataList.AddRange(cdLoader.GetClassData(newTypes, newTypes, typeof(MigrationTools.Processors.IProcessor), "v2", "Processors"));
+        classDataList.AddRange(cdLoader.GetClassData(newTypes, newTypes, typeof(IProcessorEnricher), "v2", "ProcessorEnrichers"));
        
-        classDataList.AddRange(cdLoader.GetClassData(newTypes, allTypes, typeof(IFieldMapConfig), "v2", "FieldMaps", false));
-        classDataList.AddRange(cdLoader.GetClassData(newTypes, allTypes, typeof(IEndpoint), "v2", "Endpoints"));
-        classDataList.AddRange(cdLoader.GetClassData(newTypes, allTypes, typeof(IEndpointEnricher), "v2", "EndpointEnrichers"));
+        classDataList.AddRange(cdLoader.GetClassData(newTypes, newTypes, typeof(IFieldMapConfig), "v2", "FieldMaps", false));
+        classDataList.AddRange(cdLoader.GetClassData(newTypes, newTypes, typeof(IEndpoint), "v2", "Endpoints"));
+        classDataList.AddRange(cdLoader.GetClassData(newTypes, newTypes, typeof(IEndpointEnricher), "v2", "EndpointEnrichers"));
 
-        classDataList.AddRange(cdLoader.GetClassData(newTypes, allTypes, typeof(ITool), "v1", "Tools"));
+        classDataList.AddRange(cdLoader.GetClassData(newTypes, newTypes, typeof(ITool), "v1", "Tools"));
 
         Console.WriteLine("-----------");
         Console.WriteLine("Output");

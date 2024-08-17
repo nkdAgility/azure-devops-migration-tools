@@ -34,11 +34,11 @@ namespace MigrationTools.Processors
     /// </summary>
     /// <status>Beta</status>
     /// <processingtarget>Suites &amp; Plans</processingtarget>
-    public class TestPlansAndSuitesMigrationContext : TfsMigrationProcessorBase
+    public class TestPlansAndSuitesMigrationProcessor : TfsMigrationProcessorBase
     {
         private int __currentSuite = 0;
         private int __totalSuites = 0;
-        private TestPlansAndSuitesMigrationConfig _config;
+        private TestPlansAndSuitesMigrationProcessorOptions _config;
         private int _currentPlan = 0;
         private int _currentTestCases = 0;
         private IIdentityManagementService _sourceIdentityManagementService;
@@ -52,7 +52,7 @@ namespace MigrationTools.Processors
         private TfsNodeStructureTool _nodeStructureEnricher;
         private readonly EngineConfiguration _engineConfig;
 
-        public TestPlansAndSuitesMigrationContext(IOptions<TestPlansAndSuitesMigrationConfig> options, IOptions<EngineConfiguration> engineConfig, IMigrationEngine engine, TfsStaticTools tfsStaticEnrichers, StaticTools staticEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<MigrationProcessorBase> logger) : base(engine, tfsStaticEnrichers, staticEnrichers, services, telemetry, logger)
+        public TestPlansAndSuitesMigrationProcessor(IOptions<TestPlansAndSuitesMigrationProcessorOptions> options, IOptions<EngineConfiguration> engineConfig, IMigrationEngine engine, TfsStaticTools tfsStaticEnrichers, StaticTools staticEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<MigrationProcessorBase> logger) : base(engine, tfsStaticEnrichers, staticEnrichers, services, telemetry, logger)
         {
             _engineConfig = engineConfig.Value;
             _config = options.Value;
@@ -62,7 +62,7 @@ namespace MigrationTools.Processors
         {
             get
             {
-                return "TestPlansAndSuitesMigrationContext";
+                return typeof(TestPlansAndSuitesMigrationProcessor).Name;
             }
         }
 

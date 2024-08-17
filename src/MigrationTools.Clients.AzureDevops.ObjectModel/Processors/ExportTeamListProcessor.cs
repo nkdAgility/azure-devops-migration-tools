@@ -14,9 +14,9 @@ using VstsSyncMigrator._EngineV1.Processors;
 
 namespace MigrationTools.Processors
 {
-    public class ExportTeamList : TfsStaticProcessorBase
+    public class ExportTeamListProcessor : TfsStaticProcessorBase
     {
-        public ExportTeamList(TfsStaticTools tfsStaticEnrichers, StaticTools staticEnrichers, IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<StaticProcessorBase> logger) : base(tfsStaticEnrichers, staticEnrichers, services, me, telemetry, logger)
+        public ExportTeamListProcessor(TfsStaticTools tfsStaticEnrichers, StaticTools staticEnrichers, IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<TfsStaticProcessorBase> logger) : base(tfsStaticEnrichers, staticEnrichers, services, me, telemetry, logger)
         {
         }
 
@@ -24,7 +24,7 @@ namespace MigrationTools.Processors
         {
             get
             {
-                return "ExportTeamList";
+                return "ExportTeamListProcessor";
             }
         }
 

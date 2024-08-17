@@ -91,8 +91,8 @@ options:
   defaultValue: '[]'
 status: ready
 processingTarget: Work Items
-classFile: /src/VstsSyncMigrator.Core/Execution/MigrationContext/WorkItemMigrationContext.cs
-optionsClassFile: /src/MigrationTools/_EngineV1/Configuration/Processing/WorkItemMigrationConfig.cs
+classFile: ''
+optionsClassFile: ''
 
 redirectFrom:
 - /Reference/v1/Processors/WorkItemMigrationConfig/

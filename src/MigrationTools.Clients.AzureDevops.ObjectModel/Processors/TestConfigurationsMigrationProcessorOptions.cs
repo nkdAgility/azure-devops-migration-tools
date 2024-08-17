@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
+using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Enrichers;
+using MigrationTools.Processors;
 
-namespace MigrationTools._EngineV1.Configuration.Processing
+namespace MigrationTools.Processors
 {
-    public class TestConfigurationsMigrationConfig : IProcessorConfig
+    public class TestConfigurationsMigrationProcessorOptions : IProcessorConfig
     {
         /// <inheritdoc />
         public bool Enabled { get; set; }
@@ -16,7 +18,7 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         /// <inheritdoc />
         public string Processor
         {
-            get { return "TestConfigurationsMigrationContext"; }
+            get { return typeof(TestConfigurationsMigrationProcessor).Name; }
         }
 
         /// <inheritdoc />

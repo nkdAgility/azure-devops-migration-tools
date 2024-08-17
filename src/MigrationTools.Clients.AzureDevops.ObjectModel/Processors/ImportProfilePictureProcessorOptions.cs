@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
+using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Enrichers;
 
-namespace MigrationTools._EngineV1.Configuration.Processing
+namespace MigrationTools.Processors
 {
-    public class ImportProfilePictureConfig : IProcessorConfig
+    public class ImportProfilePictureProcessorOptions : IProcessorConfig
     {
         /// <inheritdoc />
         public bool Enabled { get; set; }
@@ -16,7 +17,7 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         /// <inheritdoc />
         public string Processor
         {
-            get { return "ImportProfilePictureContext"; }
+            get { return typeof(ImportProfilePictureProcessor).Name; }
         }
 
         /// <inheritdoc />

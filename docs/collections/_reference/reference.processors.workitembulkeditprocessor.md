@@ -56,8 +56,8 @@ options:
   defaultValue: '[]'
 status: missng XML code comments
 processingTarget: WorkItem
-classFile: /src/VstsSyncMigrator.Core/Execution/ProcessingContext/WorkItemBulkEditProcessor.cs
-optionsClassFile: /src/MigrationTools/_EngineV1/Configuration/Processing/WorkItemBulkEditProcessorConfig.cs
+classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/WorkItemBulkEditProcessor.cs
+optionsClassFile: ''
 
 redirectFrom:
 - /Reference/v1/Processors/WorkItemBulkEditProcessorConfig/

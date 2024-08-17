@@ -14,12 +14,12 @@ using VstsSyncMigrator._EngineV1.Processors;
 
 namespace MigrationTools.Processors
 {
-    public class FixGitCommitLinks : TfsStaticProcessorBase
+    public class FixGitCommitLinksProcessor : TfsStaticProcessorBase
     {
-        private FixGitCommitLinksConfig _config;
+        private FixGitCommitLinksProcessorOptions _config;
         private TfsStaticTools _tfsStaticEnrichers;
 
-        public FixGitCommitLinks(IOptions<FixGitCommitLinksConfig> options, TfsStaticTools tfsStaticEnrichers, StaticTools staticEnrichers, IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<FixGitCommitLinks> logger) : base(tfsStaticEnrichers, staticEnrichers, services, me, telemetry, logger)
+        public FixGitCommitLinksProcessor(IOptions<FixGitCommitLinksProcessorOptions> options, TfsStaticTools tfsStaticEnrichers, StaticTools staticEnrichers, IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<FixGitCommitLinksProcessor> logger) : base(tfsStaticEnrichers, staticEnrichers, services, me, telemetry, logger)
         {
             Logger = logger;
             _config = options.Value;
@@ -30,11 +30,11 @@ namespace MigrationTools.Processors
         {
             get
             {
-                return "FixGitCommitLinks";
+                return this.GetType().Name;
             }
         }
 
-        public ILogger<FixGitCommitLinks> Logger { get; }
+        public ILogger<FixGitCommitLinksProcessor> Logger { get; }
 
 
         protected override void InternalExecute()

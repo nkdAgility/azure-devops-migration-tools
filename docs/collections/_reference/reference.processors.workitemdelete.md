@@ -51,8 +51,8 @@ options:
   defaultValue: missng XML code comments
 status: ready
 processingTarget: WorkItem
-classFile: /src/VstsSyncMigrator.Core/Execution/ProcessingContext/WorkItemDelete.cs
-optionsClassFile: /src/MigrationTools/_EngineV1/Configuration/Processing/WorkItemDeleteConfig.cs
+classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/WorkItemDeleteProcessor.cs
+optionsClassFile: ''
 
 redirectFrom:
 - /Reference/v1/Processors/WorkItemDeleteConfig/

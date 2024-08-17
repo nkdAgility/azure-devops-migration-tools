@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using MigrationTools.Enrichers;
+using MigrationTools.Processors;
 
 namespace MigrationTools._EngineV1.Configuration.Processing
 {
-    public class TestPlansAndSuitesMigrationConfig : IProcessorConfig
+    public class TestPlansAndSuitesMigrationProcessorOptions : IProcessorConfig
     {
 
         public bool Enabled { get; set; }
@@ -44,7 +45,7 @@ namespace MigrationTools._EngineV1.Configuration.Processing
 
         public string Processor
         {
-            get { return "TestPlansAndSuitesMigrationContext"; }
+            get { return typeof(TestPlansAndSuitesMigrationProcessor).Name; }
         }
 
         /// <summary>
@@ -60,7 +61,7 @@ namespace MigrationTools._EngineV1.Configuration.Processing
             return true;
         }
 
-        public TestPlansAndSuitesMigrationConfig()
+        public TestPlansAndSuitesMigrationProcessorOptions()
         {
             MigrationDelay = 0;
             RemoveAllLinks = false;

@@ -46,8 +46,8 @@ options:
   defaultValue: String.Empty
 status: alpha
 processingTarget: Profiles
-classFile: /src/VstsSyncMigrator.Core/Execution/ProcessingContext/ExportProfilePictureFromADContext.cs
-optionsClassFile: /src/MigrationTools/_EngineV1/Configuration/Processing/ExportProfilePictureFromADConfig.cs
+classFile: ''
+optionsClassFile: ''
 
 redirectFrom:
 - /Reference/v1/Processors/ExportProfilePictureFromADConfig/

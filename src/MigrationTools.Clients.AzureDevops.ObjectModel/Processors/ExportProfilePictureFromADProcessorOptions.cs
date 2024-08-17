@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
+using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Enrichers;
 
-namespace MigrationTools._EngineV1.Configuration.Processing
+namespace MigrationTools.Processors
 {
-    public class ExportProfilePictureFromADConfig : IProcessorConfig
+    public class ExportProfilePictureFromADProcessorOptions : IProcessorConfig
     {
         /// <summary>
         /// A list of enrichers that can augment the proccessing of the data
@@ -40,7 +41,7 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         /// <inheritdoc />
         public string Processor
         {
-            get { return "ExportProfilePictureFromADContext"; }
+            get { return "ExportProfilePictureFromADProcessor"; }
         }
 
         /// <inheritdoc />

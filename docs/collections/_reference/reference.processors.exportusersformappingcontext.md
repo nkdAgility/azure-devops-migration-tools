@@ -37,7 +37,7 @@ options:
 status: ready
 processingTarget: Work Items
 classFile: ''
-optionsClassFile: /src/MigrationTools/_EngineV1/Configuration/Processing/ExportUsersForMappingConfig.cs
+optionsClassFile: ''
 
 redirectFrom:
 - /Reference/v1/Processors/ExportUsersForMappingConfig/

@@ -1,12 +1,14 @@
 ﻿using System.Collections.Generic;
 using MigrationTools.Enrichers;
+using MigrationTools.Processors;
+using MigrationTools._EngineV1.Configuration;
 
-namespace MigrationTools._EngineV1.Configuration.Processing
+namespace MigrationTools.Processors
 {
 
-    public class WorkItemMigrationConfig : IWorkItemProcessorConfig
+    public class WorkItemMigrationProcessorOptions : IWorkItemProcessorConfig
     {
-        public const string ConfigurationSectionName = "MigrationTools:ProcessorDefaults:WorkItemMigration";
+        public const string ConfigurationSectionName = "MigrationTools:ProcessorDefaults:WorkItemMigrationProcessor";
 
         /// <summary>
         /// A list of enrichers that can augment the proccessing of the data
@@ -45,7 +47,7 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         /// Name used to identify this processor
         /// </summary>
         /// <default>?</default>
-        public string Processor => "WorkItemMigrationContext";
+        public string Processor => typeof(WorkItemMigrationProcessor).Name;
 
         /// <summary>
         /// **beta** If enabled this will fix any image attachments URL's, work item mention URL's or user mentions in the HTML
@@ -119,7 +121,7 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         /// <summary>
         /// Creates a new workitemmigrationconfig with default values
         /// </summary>
-        public WorkItemMigrationConfig()
+        public WorkItemMigrationProcessorOptions()
         {
             Enabled = false;
             WorkItemCreateRetryLimit = 5;

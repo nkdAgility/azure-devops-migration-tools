@@ -8,6 +8,7 @@ using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Processors;
 using MigrationTools.Tools;
 using MigrationTools.Processors.Infra;
+using Microsoft.Extensions.Options;
 
 
 namespace MigrationTools.Processors
@@ -17,15 +18,15 @@ namespace MigrationTools.Processors
     /// </summary>
     /// <status>Beta</status>
     /// <processingtarget>Suites &amp; Plans</processingtarget>
-    public class TestVariablesMigrationContext : MigrationProcessorBase
+    public class TestVariablesMigrationProcessor : MigrationProcessorBase
     {
-        public TestVariablesMigrationContext(IMigrationEngine engine, StaticTools staticEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<MigrationProcessorBase> logger) : base(engine, staticEnrichers, services, telemetry, logger)
+        public TestVariablesMigrationProcessor(IOptions<TestVariablesMigrationProcessorOptions> options, IMigrationEngine engine, StaticTools staticEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<MigrationProcessorBase> logger) : base(engine, staticEnrichers, services, telemetry, logger)
         {
         }
 
         public override string Name
         {
-            get { return "TestVariablesMigrationContext"; }
+            get { return typeof(TestVariablesMigrationProcessor).Name; }
         }
 
         internal ITestVariableValue GetVal(ITestVariable targetVar, string valueToFind)

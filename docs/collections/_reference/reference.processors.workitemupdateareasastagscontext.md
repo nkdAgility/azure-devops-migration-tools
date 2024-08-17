@@ -31,8 +31,8 @@ options:
   defaultValue: missng XML code comments
 status: Beta
 processingTarget: Work Item
-classFile: /src/VstsSyncMigrator.Core/Execution/ProcessingContext/WorkItemUpdateAreasAsTagsContext.cs
-optionsClassFile: /src/MigrationTools/_EngineV1/Configuration/Processing/WorkItemUpdateAreasAsTagsConfig.cs
+classFile: ''
+optionsClassFile: ''
 
 redirectFrom:
 - /Reference/v1/Processors/WorkItemUpdateAreasAsTagsConfig/

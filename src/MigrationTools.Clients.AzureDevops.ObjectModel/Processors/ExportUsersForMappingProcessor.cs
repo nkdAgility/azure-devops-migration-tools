@@ -25,26 +25,24 @@ namespace MigrationTools.Processors
     /// </summary>
     /// <status>ready</status>
     /// <processingtarget>Work Items</processingtarget>
-    public class ExportUsersForMappingContext : TfsMigrationProcessorBase
+    public class ExportUsersForMappingProcessor : TfsMigrationProcessorBase
     {
-        private ExportUsersForMappingConfig _config;
+        private ExportUsersForMappingProcessorOptions _config;
         private TfsUserMappingTool _TfsUserMappingTool;
-
-
 
         public override string Name
         {
             get
             {
-                return "ExportUsersForMappingContext";
+                return "ExportUsersForMappingProcessor";
             }
         }
 
-        public ILogger<ExportUsersForMappingContext> Logger { get; }
+        public ILogger<ExportUsersForMappingProcessor> Logger { get; }
 
         private EngineConfiguration _engineConfig;
 
-        public ExportUsersForMappingContext(IOptions<ExportUsersForMappingConfig> options, IOptions<EngineConfiguration> engineConfig, IMigrationEngine engine, TfsStaticTools tfsStaticEnrichers, StaticTools staticEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<ExportUsersForMappingContext> logger) : base(engine, tfsStaticEnrichers, staticEnrichers, services, telemetry, logger)
+        public ExportUsersForMappingProcessor(IOptions<ExportUsersForMappingProcessorOptions> options, IOptions<EngineConfiguration> engineConfig, IMigrationEngine engine, TfsStaticTools tfsStaticEnrichers, StaticTools staticEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<ExportUsersForMappingProcessor> logger) : base(engine, tfsStaticEnrichers, staticEnrichers, services, telemetry, logger)
         {
             Logger = logger;
             _engineConfig =  engineConfig.Value;

@@ -12,7 +12,7 @@ namespace MigrationTools.Processors.Infra
 {
     public abstract class TfsStaticProcessorBase : StaticProcessorBase
     {
-        protected TfsStaticProcessorBase(TfsStaticTools tfsStaticEnrichers, StaticTools staticEnrichers, IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<StaticProcessorBase> logger) : base(staticEnrichers, services, me, telemetry, logger)
+        protected TfsStaticProcessorBase(TfsStaticTools tfsStaticEnrichers, StaticTools staticEnrichers, IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<TfsStaticProcessorBase> logger) : base(staticEnrichers, services, me, telemetry, logger)
         {
             TfsStaticEnrichers = tfsStaticEnrichers;
         }
