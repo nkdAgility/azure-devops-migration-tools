@@ -15,7 +15,7 @@ using MigrationTools.Processors.Infra;
 using MigrationTools.Tools;
 using VstsSyncMigrator._EngineV1.Processors;
 
-namespace VstsSyncMigrator.Engine
+namespace MigrationTools.Processors
 {
     /// <summary>
     /// Downloads corporate images and updates TFS/Azure DevOps profiles

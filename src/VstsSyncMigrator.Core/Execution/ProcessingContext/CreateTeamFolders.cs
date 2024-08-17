@@ -13,7 +13,7 @@ using MigrationTools.Processors.Infra;
 using MigrationTools.Tools;
 using VstsSyncMigrator._EngineV1.Processors;
 
-namespace VstsSyncMigrator.Engine
+namespace MigrationTools.Processors
 {
     /// <summary>
     /// Creates folders in Sared Queries for each Team

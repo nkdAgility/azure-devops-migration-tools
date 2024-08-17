@@ -14,7 +14,7 @@ using MigrationTools.Tools;
 using MigrationTools.Processors.Infra;
 
 
-namespace VstsSyncMigrator.Engine
+namespace MigrationTools.Processors
 {
     /// <summary>
     /// The `WorkItemDelete` processor allows you to delete any amount of work items that meet the query.

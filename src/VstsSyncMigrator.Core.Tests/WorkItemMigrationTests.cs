@@ -9,7 +9,6 @@ using MigrationTools._EngineV1.Configuration.Processing;
 using MigrationTools.Enrichers;
 using MigrationTools.ProcessorEnrichers;
 using MigrationTools.Tests;
-using VstsSyncMigrator.Engine;
 
 namespace VstsSyncMigrator.Core.Tests
 {

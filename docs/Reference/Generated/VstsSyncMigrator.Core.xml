@@ -91,34 +91,34 @@
             <status>preview</status>
             <processingtarget>Work Items</processingtarget>
         </member>
-        <member name="T:VstsSyncMigrator.Engine.CreateTeamFolders">
+        <member name="T:MigrationTools.Processors.CreateTeamFolders">
             <summary>
             Creates folders in Sared Queries for each Team
             </summary>
             <status>alpha</status>
             <processingtarget>Shared Queries</processingtarget>
         </member>
-        <member name="T:VstsSyncMigrator.Engine.ExportProfilePictureFromADContext">
+        <member name="T:MigrationTools.Processors.ExportProfilePictureFromADContext">
             <summary>
             Downloads corporate images and updates TFS/Azure DevOps profiles
             </summary>
             <status>alpha</status>
             <processingtarget>Profiles</processingtarget>
         </member>
-        <member name="T:VstsSyncMigrator.Engine.ImportProfilePictureContext">
+        <member name="T:MigrationTools.Processors.ImportProfilePictureContext">
             <summary>
             Downloads corporate images and updates TFS/Azure DevOps profiles
             </summary>
             <status>alpha</status>
             <processingtarget>Profiles</processingtarget>
         </member>
-        <member name="T:VstsSyncMigrator.Engine.WorkItemBulkEditProcessor">
+        <member name="T:MigrationTools.Processors.WorkItemBulkEditProcessor">
             <summary>
             This processor allows you to make changes in place where we load from teh Target and update the Target. This is used for bulk updates with the most common reason being a process template change.
             </summary>
             <processingtarget>WorkItem</processingtarget>
         </member>
-        <member name="T:VstsSyncMigrator.Engine.WorkItemDelete">
+        <member name="T:MigrationTools.Processors.WorkItemDelete">
             <summary>
             The `WorkItemDelete` processor allows you to delete any amount of work items that meet the query.
             **DANGER:** This is not a recoverable action and should be use with extream caution.
@@ -126,7 +126,7 @@
             <status>ready</status>
             <processingtarget>WorkItem</processingtarget>
         </member>
-        <member name="T:VstsSyncMigrator.Engine.WorkItemUpdateAreasAsTagsContext">
+        <member name="T:MigrationTools.Processors.WorkItemUpdateAreasAsTagsContext">
             <summary>
             A common issue with older *TFS/Azure DevOps* instances is the proliferation of `Area Paths`. With the use of `Area Path` for `Teams` and the addition of the `Node Name` column option these extensive tag hierarchies should instad be moved to tags.
             </summary>

@@ -11,7 +11,7 @@ using Microsoft.Extensions.Options;
 using MigrationTools.Tools;
 using MigrationTools.Processors.Infra;
 
-namespace VstsSyncMigrator.Engine
+namespace MigrationTools.Processors
 {
     /// <summary>
     /// This processor allows you to make changes in place where we load from teh Target and update the Target. This is used for bulk updates with the most common reason being a process template change.

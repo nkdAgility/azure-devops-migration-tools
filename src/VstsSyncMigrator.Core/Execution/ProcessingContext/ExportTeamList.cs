@@ -12,7 +12,7 @@ using MigrationTools.Tools;
 using VstsSyncMigrator._EngineV1.Processors;
 
 
-namespace VstsSyncMigrator.Engine
+namespace MigrationTools.Processors
 {
     public class ExportTeamList : TfsStaticProcessorBase
     {
