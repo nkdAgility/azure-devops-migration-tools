@@ -8,7 +8,7 @@ using MigrationTools;
 using MigrationTools.Tools;
 using VstsSyncMigrator._EngineV1.Processors;
 
-namespace VstsSyncMigrator.Core.Execution
+namespace MigrationTools.Processors.Infra
 {
     public abstract class TfsStaticProcessorBase : StaticProcessorBase
     {

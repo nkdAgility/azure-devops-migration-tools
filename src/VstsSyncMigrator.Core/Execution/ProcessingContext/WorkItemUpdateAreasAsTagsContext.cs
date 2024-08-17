@@ -10,9 +10,9 @@ using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Configuration.Processing;
 using MigrationTools.DataContracts;
 using VstsSyncMigrator._EngineV1.Processors;
-using VstsSyncMigrator.Core.Execution;
 using Microsoft.Extensions.Options;
 using MigrationTools.Tools;
+using MigrationTools.Processors.Infra;
 
 namespace VstsSyncMigrator.Engine
 {

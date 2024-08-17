@@ -1,7 +1,8 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
-using VstsSyncMigrator.Core.Execution.MigrationContext;
 using VstsSyncMigrator.Engine;
+using MigrationTools.Processors;
+
 
 namespace MigrationTools
 {

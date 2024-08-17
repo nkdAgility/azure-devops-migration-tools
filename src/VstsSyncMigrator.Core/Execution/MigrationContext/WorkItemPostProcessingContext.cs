@@ -12,11 +12,11 @@ using MigrationTools._EngineV1.Configuration.Processing;
 using MigrationTools._EngineV1.DataContracts;
 using MigrationTools._EngineV1.Processors;
 using MigrationTools.DataContracts;
-using VstsSyncMigrator.Core.Execution;
 using Microsoft.Extensions.Options;
 using MigrationTools.Tools;
+using MigrationTools.Processors.Infra;
 
-namespace VstsSyncMigrator.Engine
+namespace MigrationTools.Processors
 {
     /// <summary>
     /// Reapply field mappings after a migration. Does not migtate Work Items, only reapplied changes to filed mappings.

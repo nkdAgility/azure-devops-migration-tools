@@ -12,11 +12,12 @@ using MigrationTools._EngineV1.Processors;
 using MigrationTools.DataContracts;
 using MigrationTools.DataContracts.Process;
 using MigrationTools.EndpointEnrichers;
+using MigrationTools.Processors.Infra;
 using MigrationTools.Tools;
 using Newtonsoft.Json;
 using VstsSyncMigrator._EngineV1.Processors;
 
-namespace VstsSyncMigrator.Core.Execution.MigrationContext
+namespace MigrationTools.Processors
 {
     /// <summary>
     /// ExportUsersForMappingContext is a tool used to create a starter mapping file for users between the source and target systems.

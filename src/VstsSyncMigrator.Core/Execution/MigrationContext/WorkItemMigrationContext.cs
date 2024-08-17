@@ -30,14 +30,14 @@ using MigrationTools._EngineV1.Containers;
 using MigrationTools._EngineV1.DataContracts;
 using MigrationTools._EngineV1.Processors;
 using MigrationTools.DataContracts;
+using MigrationTools.Processors.Infra;
 using MigrationTools.Tools;
 using Newtonsoft.Json.Linq;
 using Serilog.Context;
 using Serilog.Events;
-using VstsSyncMigrator.Core.Execution;
 using ILogger = Serilog.ILogger;
 
-namespace VstsSyncMigrator.Engine
+namespace MigrationTools.Processors
 {
     /// <summary>
     /// WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links, and Attachments.

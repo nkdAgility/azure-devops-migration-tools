@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace VstsSyncMigrator.Engine
+namespace MigrationTools.Processors.Infra
 {
     [Serializable]
     internal class ConfigException : Exception

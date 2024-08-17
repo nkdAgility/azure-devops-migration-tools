@@ -8,9 +8,9 @@ using MigrationTools;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Configuration.Processing;
 using MigrationTools.DataContracts;
+using MigrationTools.Processors.Infra;
 using MigrationTools.Tools;
 using VstsSyncMigrator._EngineV1.Processors;
-using VstsSyncMigrator.Core.Execution;
 
 namespace VstsSyncMigrator.Engine
 {

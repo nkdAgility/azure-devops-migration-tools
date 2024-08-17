@@ -7,9 +7,10 @@ using MigrationTools;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Processors;
 using MigrationTools.Tools;
-using VstsSyncMigrator.Engine.ComponentContext;
+using MigrationTools.Processors.Infra;
 
-namespace VstsSyncMigrator.Engine
+
+namespace MigrationTools.Processors
 {
     /// <summary>
     /// This processor can migrate test variables that are defined in the test plans / suites. This must run before `TestPlansAndSuitesMigrationConfig`. 

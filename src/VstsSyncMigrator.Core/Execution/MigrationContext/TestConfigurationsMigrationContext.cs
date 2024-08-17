@@ -5,11 +5,10 @@ using Microsoft.TeamFoundation.TestManagement.Client;
 using MigrationTools;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Processors;
+using MigrationTools.Processors.Infra;
 using MigrationTools.Tools;
-using VstsSyncMigrator.Core.Execution;
-using VstsSyncMigrator.Engine.ComponentContext;
 
-namespace VstsSyncMigrator.Engine
+namespace MigrationTools.Processors
 {
     /// <summary>
     /// This processor can migrate `test configuration`. This should be run before `LinkMigrationConfig`.

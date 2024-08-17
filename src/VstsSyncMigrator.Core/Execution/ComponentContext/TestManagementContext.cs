@@ -4,7 +4,7 @@ using Microsoft.TeamFoundation.TestManagement.Client;
 using MigrationTools;
 using MigrationTools._EngineV1.Clients;
 
-namespace VstsSyncMigrator.Engine.ComponentContext
+namespace MigrationTools.Processors.Infra
 {
     public class TestManagementContext
     {

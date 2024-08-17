@@ -22,13 +22,12 @@ using MigrationTools._EngineV1.Configuration.Processing;
 using MigrationTools._EngineV1.Processors;
 using MigrationTools.DataContracts;
 using MigrationTools.DataContracts.Pipelines;
-using VstsSyncMigrator.Core.Execution;
-using VstsSyncMigrator.Engine.ComponentContext;
 using Environment = System.Environment;
 using Microsoft.Extensions.Options;
 using MigrationTools.Tools;
+using MigrationTools.Processors.Infra;
 
-namespace VstsSyncMigrator.Engine
+namespace MigrationTools.Processors
 {
     /// <summary>
     /// Rebuilds Suits and plans for Test Cases migrated using the WorkItemMigration
