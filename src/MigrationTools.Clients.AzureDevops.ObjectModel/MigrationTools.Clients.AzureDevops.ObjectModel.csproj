@@ -26,4 +26,8 @@
   <ItemGroup>
     <PackageReference Update="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="_Enginev1\" />
+  </ItemGroup>
 </Project>
