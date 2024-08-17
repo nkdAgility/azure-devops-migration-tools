@@ -11,7 +11,6 @@ namespace MigrationTools
         public static void AddMigrationToolServicesForClientLegacyCore(this IServiceCollection context)
         {
             context.AddSingleton<WorkItemMigrationContext>();
-            context.AddSingleton<TeamMigrationContext>();
             context.AddSingleton<TestConfigurationsMigrationContext>();
             context.AddSingleton<TestPlansAndSuitesMigrationContext>();
             context.AddSingleton<TestVariablesMigrationContext>();

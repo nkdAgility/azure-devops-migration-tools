@@ -38,8 +38,6 @@ namespace MigrationTools._EngineV1.Processors
 
         public ProcessorType Type => ProcessorType.Legacy;
 
-        public abstract void Configure(IProcessorConfig config);
-
         public void Execute()
         {
             Telemetry.TrackEvent(Name);

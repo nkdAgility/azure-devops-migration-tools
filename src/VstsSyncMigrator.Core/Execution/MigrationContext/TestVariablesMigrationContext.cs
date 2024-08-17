@@ -27,10 +27,6 @@ namespace VstsSyncMigrator.Engine
             get { return "TestVariablesMigrationContext"; }
         }
 
-        public override void Configure(IProcessorConfig config)
-        {
-        }
-
         internal ITestVariableValue GetVal(ITestVariable targetVar, string valueToFind)
         {
             // Test Variable values are case insensitive in VSTS so need ignore case in comparison

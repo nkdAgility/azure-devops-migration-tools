@@ -9,13 +9,6 @@
             Note: this is only for internal usage. Don't use this in your configurations.
             </summary>
         </member>
-        <member name="T:VstsSyncMigrator.Engine.TeamMigrationContext">
-            <summary>
-            Migrates Teams and Team Settings: This should be run after `NodeStructuresMigrationConfig` and before all other processors.
-            </summary>
-            <status>preview</status>
-            <processingtarget>Teams</processingtarget>
-        </member>
         <member name="T:VstsSyncMigrator.Engine.TestConfigurationsMigrationContext">
             <summary>
             This processor can migrate `test configuration`. This should be run before `LinkMigrationConfig`.
@@ -89,18 +82,6 @@
             </summary>
             <status>preview</status>
             <processingtarget>Work Items</processingtarget>
-        </member>
-        <member name="T:VstsSyncMigrator.Engine.WorkItemQueryMigrationContext">
-            <summary>
-            This processor can migrate queries for work items. Only shared queries are included. Personal queries can't migrate with this tool.
-            </summary>
-            <status>preview</status>
-            <processingtarget>Shared Queries</processingtarget>
-        </member>
-        <member name="F:VstsSyncMigrator.Engine.WorkItemQueryMigrationContext.config">
-            <summary>
-            The processor configuration
-            </summary>
         </member>
         <member name="T:VstsSyncMigrator.Engine.CreateTeamFolders">
             <summary>

@@ -27,11 +27,6 @@ namespace VstsSyncMigrator.Engine
             }
         }
 
-        public override void Configure(IProcessorConfig config)
-        {
-            // FakeProcessorConfig config
-        }
-
         protected override void InternalExecute()
         {
             Stopwatch stopwatch = Stopwatch.StartNew();

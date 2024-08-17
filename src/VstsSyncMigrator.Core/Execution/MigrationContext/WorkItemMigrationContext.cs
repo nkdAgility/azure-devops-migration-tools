@@ -85,11 +85,6 @@ namespace VstsSyncMigrator.Engine
 
         public override string Name => "WorkItemMigration";
 
-        public override void Configure(IProcessorConfig config)
-        {
-            _config = (WorkItemMigrationConfig)config;
-        }
-
         internal void TraceWriteLine(LogEventLevel level, string message, Dictionary<string, object> properties = null)
         {
             if (properties != null)

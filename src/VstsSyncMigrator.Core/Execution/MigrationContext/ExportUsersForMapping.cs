@@ -45,17 +45,12 @@ namespace VstsSyncMigrator.Core.Execution.MigrationContext
 
         private EngineConfiguration _engineConfig;
 
-        public ExportUsersForMappingContext(IOptions<EngineConfiguration> engineConfig, IMigrationEngine engine, TfsStaticEnrichers tfsStaticEnrichers, StaticEnrichers staticEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<ExportUsersForMappingContext> logger) : base(engine, tfsStaticEnrichers, staticEnrichers, services, telemetry, logger)
+        public ExportUsersForMappingContext(IOptions<ExportUsersForMappingConfig> options, IOptions<EngineConfiguration> engineConfig, IMigrationEngine engine, TfsStaticEnrichers tfsStaticEnrichers, StaticEnrichers staticEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<ExportUsersForMappingContext> logger) : base(engine, tfsStaticEnrichers, staticEnrichers, services, telemetry, logger)
         {
             Logger = logger;
             _engineConfig =  engineConfig.Value;
+            _config = options.Value;
         }
-
-        public override void Configure(IProcessorConfig config)
-        {
-            _config = (ExportUsersForMappingConfig)config;
-        }
-
 
         protected override void InternalExecute()
         {

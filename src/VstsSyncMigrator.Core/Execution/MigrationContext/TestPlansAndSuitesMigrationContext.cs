@@ -28,6 +28,7 @@ using MigrationTools.ProcessorEnrichers;
 using VstsSyncMigrator.Core.Execution;
 using VstsSyncMigrator.Engine.ComponentContext;
 using Environment = System.Environment;
+using Microsoft.Extensions.Options;
 
 namespace VstsSyncMigrator.Engine
 {
@@ -54,9 +55,10 @@ namespace VstsSyncMigrator.Engine
         private TfsNodeStructure _nodeStructureEnricher;
         private readonly EngineConfiguration _engineConfig;
 
-        public TestPlansAndSuitesMigrationContext(IOptions<EngineConfiguration> engineConfig, IMigrationEngine engine, TfsStaticEnrichers tfsStaticEnrichers, StaticEnrichers staticEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<MigrationProcessorBase> logger) : base(engine, tfsStaticEnrichers, staticEnrichers, services, telemetry, logger)
+        public TestPlansAndSuitesMigrationContext(IOptions<TestPlansAndSuitesMigrationConfig> options, IOptions<EngineConfiguration> engineConfig, IMigrationEngine engine, TfsStaticEnrichers tfsStaticEnrichers, StaticEnrichers staticEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<MigrationProcessorBase> logger) : base(engine, tfsStaticEnrichers, staticEnrichers, services, telemetry, logger)
         {
             _engineConfig = engineConfig.Value;
+            _config = options.Value;
         }
 
         public override string Name
@@ -65,12 +67,6 @@ namespace VstsSyncMigrator.Engine
             {
                 return "TestPlansAndSuitesMigrationContext";
             }
-        }
-
-        public override void Configure(IProcessorConfig config)
-        {
-            _config = (TestPlansAndSuitesMigrationConfig)config;
-            
         }
 
         protected override void InternalExecute()

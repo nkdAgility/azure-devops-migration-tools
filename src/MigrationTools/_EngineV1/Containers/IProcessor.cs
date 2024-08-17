@@ -12,8 +12,5 @@ namespace MigrationTools._EngineV1.Containers
         ProcessorType Type { get; }
 
         void Execute();
-
-        [Obsolete]
-        void Configure(IProcessorConfig config);
     }
 }
