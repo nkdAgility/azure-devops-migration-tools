@@ -38,7 +38,7 @@ namespace MigrationTools.ConsoleDataGenerator
 
         public string WriteYamlDataToDataFolder(ClassData data)
         {
-            string filename = $"reference.{data.Architecture}.{data.TypeName}.{data.ClassName}";
+            string filename = $"reference.{data.TypeName}.{data.ClassName}";
             string filePath = Path.Combine(dataPath, filename.ToLower());
             string yaml = SeraliseDataToYaml(data);
             File.WriteAllText($"{filePath}.yaml", yaml);
@@ -47,7 +47,7 @@ namespace MigrationTools.ConsoleDataGenerator
 
         public string WriteMarkdownDataToCollectionFolder(ClassData cdata, JekyllData jdata)
         {
-            string filename = $"reference.{cdata.Architecture}.{cdata.TypeName}.{cdata.ClassName}";
+            string filename = $"reference.{cdata.TypeName}.{cdata.ClassName}";
             string filePath = Path.Combine(referencePath, filename.ToLower());
             string yaml = "---" + '\n';
             yaml = yaml + SeraliseDataToYaml(cdata) + '\n';

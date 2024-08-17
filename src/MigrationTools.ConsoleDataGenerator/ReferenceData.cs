@@ -42,6 +42,7 @@ namespace MigrationTools.ConsoleDataGenerator.ReferenceData
         public string? Description { get; set; }
         public string? ClassName { get; set; }
         public string? TypeName { get; set; }
+        [Obsolete]
         public string? Architecture { get; set; }
         public List<OptionsItem> Options { get;  set; }
         public string Status { get; internal set; }

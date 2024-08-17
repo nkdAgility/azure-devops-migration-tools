@@ -16,6 +16,7 @@ using MigrationTools.Options;
 using System.Text;
 using MigrationTools.ConsoleDataGenerator.ReferenceData;
 using Microsoft.VisualStudio.Services.Common;
+using MigrationTools.Tools.Infra;
 
 namespace MigrationTools.ConsoleDataGenerator;
 class Program
@@ -62,9 +63,12 @@ class Program
         // V2
         classDataList.AddRange(cdLoader.GetClassData(newTypes, allTypes, typeof(MigrationTools.Processors.IProcessor), "v2", "Processors"));
         classDataList.AddRange(cdLoader.GetClassData(newTypes, allTypes, typeof(IProcessorEnricher), "v2", "ProcessorEnrichers"));
+       
         classDataList.AddRange(cdLoader.GetClassData(newTypes, allTypes, typeof(IFieldMapConfig), "v2", "FieldMaps", false));
         classDataList.AddRange(cdLoader.GetClassData(newTypes, allTypes, typeof(IEndpoint), "v2", "Endpoints"));
         classDataList.AddRange(cdLoader.GetClassData(newTypes, allTypes, typeof(IEndpointEnricher), "v2", "EndpointEnrichers"));
+
+        classDataList.AddRange(cdLoader.GetClassData(newTypes, allTypes, typeof(ITool), "v1", "Tools"));
 
         Console.WriteLine("-----------");
         Console.WriteLine("Output");
@@ -89,7 +93,7 @@ class Program
     private static JekyllData GetJekyllData(ClassData classData)
     {
         JekyllData data = new JekyllData();
-        data.Permalink = $"/Reference/{classData.Architecture}/{classData.TypeName}/{classData.ClassName}/";
+        data.Permalink = $"/Reference/{classData.TypeName}/{classData.ClassName}/";
         data.layout = "reference";
         data.toc = true;
         data.title = classData.ClassName;
@@ -97,10 +101,16 @@ class Program
         data.categories.Add(classData.Architecture);
         data.Topics.Add(mdLoader.GetMarkdownForTopic(classData, "notes"));
         data.Topics.Add(mdLoader.GetMarkdownForTopic(classData, "introduction"));
-        string posibleOldUrl = $"/Reference/{classData.Architecture}/{classData.TypeName}/{classData.OptionsClassName}/";
-        if (posibleOldUrl != data.Permalink)
+        List<string> posibleOldUrls = new List<string>()
         {
-           // data.Redirect_from.Add(posibleOldUrl);
+            $"/Reference/{classData.Architecture}/{classData.TypeName}/{classData.OptionsClassName}/"
+        };
+        foreach (var possible in posibleOldUrls)
+        {
+            if (possible != data.Permalink)
+            {
+                data.Redirect_from.Add(possible);
+            }
         }
         return data;
     }

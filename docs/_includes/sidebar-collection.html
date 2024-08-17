@@ -3,11 +3,11 @@
   <strong class="bd-links-heading d-flex w-100 align-items-center fw-semibold">{{include.typeName}}</strong>
   <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
     <li class="align-items-center">
-      <a href="{{ site.baseurl }}/Reference/{{include.architecture}}/{{include.typeName}}/"
+      <a href="{{ site.baseurl }}/Reference/{{include.typeName}}/"
         class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a>
     </li>
     {% if collection != null %} 
-    {% assign items = collection.docs | where: "typeName", include.typeName | where: "architecture", include.architecture  | sort: "importance" | reverse %} 
+    {% assign items = collection.docs | where: "typeName", include.typeName  | sort: "importance" %} 
     {% if items != empty %} 
     {% for item in items %}
     <li class="align-items-center">
