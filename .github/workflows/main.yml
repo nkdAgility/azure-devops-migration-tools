@@ -49,8 +49,10 @@ jobs:
       nkdAgility_ReleaseDescription: ${{ steps.nkdagility.outputs.release_description }}
       nkdAgility_ReleaseDescriptionState: ${{ steps.nkdagility.outputs.release_description_state }}
       nkdAgility_DocsDeployFolder: ${{ steps.nkdagility.outputs.docs_deploy_folder }}
+      nkdAgility_DocsBaseURL: ${{ steps.nkdagility.outputs.docs_baseURL }}
       nkdAgility_DocsVersionFolder: ${{ steps.nkdagility.outputs.docs_version_folder }}
       nkdAgility_RunRelease: ${{ steps.nkdagility.outputs.RunRelease }}
+      
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -96,6 +98,7 @@ jobs:
             $Ring = "Canary"
             $WingetApplicationId = "nkdagility.azure-devops-migration-tools"
             $docs_deploy_folder = "./azure-devops-migration-tools/";
+            $docs_baseURL = "/learn/azure-devops-migration-tools"
             $RunCodeRelease = 'false'
             $RunDocsRelease = 'false'
             switch ($Env:GitVersion_PreReleaseLabel) {
@@ -103,18 +106,21 @@ jobs:
                     $Ring = "Release";
                     $WingetApplicationId = "nkdagility.azure-devops-migration-tools";
                     $docs_deploy_folder = "./azure-devops-migration-tools/"
+                    $docs_baseURL = "/learn/azure-devops-migration-tools"
                     $RunRelease = 'true'
                 }    
                 "Preview" {
                     $Ring = "Preview";
                     $WingetApplicationId = "nkdagility.azure-devops-migration-tools.Preview";
                     $docs_deploy_folder = "./azure-devops-migration-tools/preview/";
+                    $docs_baseURL = "/learn/azure-devops-migration-tools/preview/"
                     $RunRelease = ( ('${{ inputs.ForceRelease }}' -eq 'true' ) -or ('${{ steps.filter.outputs.src }}' -eq 'true') -or ('${{ steps.filter.outputs.docs }}' -eq 'true') )
                 }
                 default {
                     $Ring = "Canary";
                     $WingetApplicationId = "nkdagility.azure-devops-migration-tools.Canary";
                     $docs_deploy_folder = "./azure-devops-migration-tools/canary/"
+                    $docs_baseURL = "/learn/azure-devops-migration-tools/canary/"
                     $RunRelease = 'false'
                 }
             }
@@ -124,6 +130,8 @@ jobs:
             echo "WingetApplicationId=$WingetApplicationId" >> $env:GITHUB_OUTPUT
             Write-Output "docs_deploy_folder=$docs_deploy_folder"
             echo "docs_deploy_folder=$docs_deploy_folder" >> $env:GITHUB_OUTPUT
+            Write-Output "docs_baseURL=$docs_baseURL"
+            echo "docs_baseURL=$docs_baseURL" >> $env:GITHUB_OUTPUT
             Write-Output "RunRelease=$RunRelease"
             echo "RunRelease=$RunRelease" >> $env:GITHUB_OUTPUT
             Write-Output "-------------------------------------------"
@@ -183,6 +191,7 @@ jobs:
                  - nkdAgility_WingetApplicationId: ${{needs.Setup.outputs.nkdAgility_WingetApplicationId}}
                  - nkdAgility_DocsVersionFolder: ${{needs.Setup.outputs.nkdAgility_DocsVersionFolder}}
                  - nkdAgility_DocsDeployFolder: ${{needs.Setup.outputs.nkdAgility_DocsDeployFolder}}
+                 - nkdAgility_DocsBaseURL: ${{needs.Setup.outputs.nkdAgility_DocsBaseURL}}
                  - nkdAgility_ReleaseDescriptionState: ${{needs.Setup.outputs.nkdAgility_ReleaseDescriptionState}}
                  - nkdAgility_RunRelease: ${{needs.Setup.outputs.nkdAgility_RunRelease}}
                ### GitVersion
@@ -305,6 +314,12 @@ jobs:
       GitVersion_InformationalVersion: ${{ needs.Setup.outputs.GitVersion_InformationalVersion }}
     steps:
       - uses: actions/checkout@v3
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@8575951200e472d5f2d95c625da0c7bec8217c42 # v1.161.0
+        with:
+          ruby-version: '3.1' # Not needed with a .ruby-version file
+          bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+          cache-version: 0 # Increment this number if you need to re-download cached gems
       - uses: cschleiden/replace-tokens@v1
         with:
           files: '["**/*.html"]'
@@ -318,8 +333,13 @@ jobs:
       - uses: igsekor/pyspelling-any@v1.0.4
         id: spellcheck
         name: Spellcheck
-      - name: Build Jekyll
-        uses: jerryjvl/jekyll-build-action@v1
+      - name: Build with Jekyll
+        # Outputs to the './_site' directory by default
+        run: bundle exec jekyll build --baseurl "${{needs.Setup.outputs.nkdAgility_DocsBaseURL}}"
+        env:
+          JEKYLL_ENV: production
+      # - name: Build Jekyll
+      #   uses: jerryjvl/jekyll-build-action@v1
       - uses: actions/upload-artifact@v4
         with:
           name: AzureDevOpsMigrationTools-Site
