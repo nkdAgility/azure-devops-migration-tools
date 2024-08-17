@@ -11,32 +11,22 @@ using MigrationTools._EngineV1.Containers;
 using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
 using MigrationTools.Processors;
+using MigrationTools.Tools.Infra;
 
 namespace MigrationTools.Tools
 {
-    public class FieldMappingTool : WorkItemProcessorEnricher
+    public class FieldMappingTool : Infra.Tool<FieldMappingToolOptions>
     {
-        private ILogger<WorkItemProcessorEnricher> _logger;
-        private FieldMappingToolOptions _Options;
 
         private Dictionary<string, List<IFieldMap>> fieldMapps = new Dictionary<string, List<IFieldMap>>();
 
-        public int Count { get { return fieldMapps.Count; } }
-
-        public Dictionary<string, List<IFieldMap>> Items
+        public FieldMappingTool(IOptions<FieldMappingToolOptions> options, IServiceProvider services, ILogger<ITool> logger, ITelemetryLogger telemetry) : base(options, services, logger, telemetry)
         {
-            get { return fieldMapps; }
-        }
-
-        public FieldMappingTool(IOptions<FieldMappingToolOptions> options, IServiceProvider services, ILogger<WorkItemProcessorEnricher> logger, ITelemetryLogger telemetry) : base(services, logger, telemetry)
-        {
-            _logger = logger;
-            _Options = options.Value;
-            if (_Options.FieldMaps != null)
+            if (Options.FieldMaps != null)
             {
-                foreach (IFieldMapConfig fieldmapConfig in _Options.FieldMaps)
+                foreach (IFieldMapConfig fieldmapConfig in Options.FieldMaps)
                 {
-                    _logger.LogInformation("FieldMappingTool: Adding FieldMap {FieldMapName} for {WorkItemTypeName}", fieldmapConfig.FieldMap, fieldmapConfig.WorkItemTypeName);
+                    Log.LogInformation("FieldMappingTool: Adding FieldMap {FieldMapName} for {WorkItemTypeName}", fieldmapConfig.FieldMap, fieldmapConfig.WorkItemTypeName);
                     string typePattern = $"MigrationTools.Sinks.*.FieldMaps.{fieldmapConfig.FieldMap}";
 
                     Type type = AppDomain.CurrentDomain.GetAssemblies()
@@ -46,7 +36,7 @@ namespace MigrationTools.Tools
 
                     if (type == null)
                     {
-                        _logger.LogError("Type " + typePattern + " not found.", typePattern);
+                        Log.LogError("Type " + typePattern + " not found.", typePattern);
                         throw new Exception("Type " + typePattern + " not found.");
                     }
                     IFieldMap fm = (IFieldMap)Services.GetRequiredService(type);
@@ -54,20 +44,13 @@ namespace MigrationTools.Tools
                     AddFieldMap(fieldmapConfig.WorkItemTypeName, fm);
                 }
             }
-
         }
 
+        public int Count { get { return fieldMapps.Count; } }
 
-        protected override void EntryForProcessorType(Processors.IProcessor processor)
+        public Dictionary<string, List<IFieldMap>> Items
         {
-            throw new NotImplementedException();
-        }
-
-
-
-        protected override void RefreshForProcessorType(Processors.IProcessor processor)
-        {
-            throw new NotImplementedException();
+            get { return fieldMapps; }
         }
 
 
@@ -112,7 +95,7 @@ namespace MigrationTools.Tools
         {
             foreach (IFieldMap map in list)
             {
-                _logger.LogDebug("Running Field Map: {MapName} {MappingDisplayName}", map.Name, map.MappingDisplayName);
+                Log.LogDebug("Running Field Map: {MapName} {MappingDisplayName}", map.Name, map.MappingDisplayName);
                 map.Execute(source, target);
             }
         }

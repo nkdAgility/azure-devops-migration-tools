@@ -4,33 +4,37 @@
   },
   "MigrationTools": {
     "Version": "16.0",
-    "Source": {
-      "EndpointType": "TfsTeamProject",
-      "Collection": "https://dev.azure.com/nkdagility-preview/",
-      "Project": "migrationSource1",
-      "AllowCrossProjectLinking": false,
-      "AuthenticationMode": "AccessToken",
-      "PersonalAccessToken": "",
-      "LanguageMaps": {
-        "AreaPath": "Area",
-        "IterationPath": "Iteration"
+    "Source": [
+      {
+        "EndpointType": "TfsTeamProject",
+        "Collection": "https://dev.azure.com/nkdagility-preview/",
+        "Project": "migrationSource1",
+        "AllowCrossProjectLinking": false,
+        "AuthenticationMode": "AccessToken",
+        "PersonalAccessToken": "",
+        "LanguageMaps": {
+          "AreaPath": "Area",
+          "IterationPath": "Iteration"
 
+        }
       }
-    },
-    "Target": {
-      "EndpointType": "TfsTeamProject",
-      "Collection": "https://dev.azure.com/nkdagility-preview/",
-      "Project": "migrationTest5",
-      "TfsVersion": "AzureDevOps",
-      "ReflectedWorkItemIDFieldName": "nkdScrum.ReflectedWorkItemId",
-      "AllowCrossProjectLinking": false,
-      "AuthenticationMode": "AccessToken",
-      "PersonalAccessToken": "",
-      "LanguageMaps": {
-        "AreaPath": "Area",
-        "IterationPath": "Iteration"
+    ],
+    "Target": [
+      {
+        "EndpointType": "TfsTeamProject",
+        "Collection": "https://dev.azure.com/nkdagility-preview/",
+        "Project": "migrationTest5",
+        "TfsVersion": "AzureDevOps",
+        "ReflectedWorkItemIDFieldName": "nkdScrum.ReflectedWorkItemId",
+        "AllowCrossProjectLinking": false,
+        "AuthenticationMode": "AccessToken",
+        "PersonalAccessToken": "",
+        "LanguageMaps": {
+          "AreaPath": "Area",
+          "IterationPath": "Iteration"
+        }
       }
-    },
+    ],
     "CommonTools": {
       "WorkItemTypeMappingTool": {
         "Enabled": true,

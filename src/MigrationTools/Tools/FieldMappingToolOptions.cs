@@ -5,20 +5,16 @@ using Microsoft.Extensions.Options;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Enrichers;
 using MigrationTools.Options;
+using MigrationTools.Tools.Infra;
 
 namespace MigrationTools.Tools
 {
-    public class FieldMappingToolOptions : ProcessorEnricherOptions
+    public class FieldMappingToolOptions : ToolOptions
     {
         public const string ConfigurationSectionName = "MigrationTools:CommonTools:FieldMappingTool";
         public override Type ToConfigure => typeof(FieldMappingTool);
 
         public List<IFieldMapConfig> FieldMaps { get; set; } = new List<IFieldMapConfig>();
-
-        public override void SetDefaults()
-        {
-            Enabled = false;
-        }
 
 
         public class ConfigureOptions : IConfigureOptions<FieldMappingToolOptions>
