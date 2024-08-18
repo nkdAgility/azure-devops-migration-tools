@@ -20,7 +20,7 @@ namespace MigrationTools.ProcessorEnrichers.Tests
         {
             var options = new TfsNodeStructureToolOptions();
             options.Enabled = true;
-            options.AreaMaps[@"^SourceProject\\PUL"] = "TargetProject\\test\\PUL";
+            options.AreaMaps = new Dictionary<string, string>() { { @"^SourceProject\\PUL", "TargetProject\\test\\PUL" } } ;
             var nodeStructure = GetTfsNodeStructureTool(options);
 
             nodeStructure.ApplySettings(new TfsNodeStructureToolSettings
