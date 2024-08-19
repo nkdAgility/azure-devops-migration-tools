@@ -1,26 +1,79 @@
 ---
 optionsClassName: AzureDevOpsEndpointOptions
 optionsClassFullName: MigrationTools.Endpoints.AzureDevOpsEndpointOptions
-configurationSamples: []
+configurationSamples:
+- name: defaults
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "EndpointDefaults": {
+          "AzureDevOpsEndpoint": {}
+        }
+      }
+    }
+  sampleFor: MigrationTools.Endpoints.AzureDevOpsEndpointOptions
+- name: Classic
+  description: 
+  code: >-
+    {
+      "$type": "AzureDevOpsEndpointOptions",
+      "AuthenticationMode": 0,
+      "AccessToken": null,
+      "Organisation": null,
+      "Project": null,
+      "ReflectedWorkItemIdField": null,
+      "Name": null,
+      "EndpointEnrichers": null
+    }
+  sampleFor: MigrationTools.Endpoints.AzureDevOpsEndpointOptions
 description: missng XML code comments
 className: AzureDevOpsEndpoint
 typeName: Endpoints
-architecture: v2
-options: []
+architecture: 
+options:
+- parameterName: AccessToken
+  type: String
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: AuthenticationMode
+  type: AuthenticationMode
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: EndpointEnrichers
+  type: List
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: Name
+  type: String
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: Organisation
+  type: String
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: Project
+  type: String
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: ReflectedWorkItemIdField
+  type: String
+  description: missng XML code comments
+  defaultValue: missng XML code comments
 status: missng XML code comments
 processingTarget: missng XML code comments
 classFile: /src/MigrationTools.Clients.AzureDevops.Rest/Endpoints/AzureDevOpsEndpoint.cs
 optionsClassFile: /src/MigrationTools.Clients.AzureDevops.Rest/Endpoints/AzureDevOpsEndpointOptions.cs
 
 redirectFrom:
-- /Reference/v2/Endpoints/AzureDevOpsEndpointOptions/
+- /Reference/Endpoints/AzureDevOpsEndpointOptions/
 layout: reference
 toc: true
 permalink: /Reference/Endpoints/AzureDevOpsEndpoint/
 title: AzureDevOpsEndpoint
 categories:
 - Endpoints
-- v2
+- 
 topics:
 - topic: notes
   path: /Endpoints/AzureDevOpsEndpoint-notes.md

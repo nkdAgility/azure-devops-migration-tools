@@ -1,26 +1,59 @@
 ---
 optionsClassName: FileSystemWorkItemEndpointOptions
 optionsClassFullName: MigrationTools.Endpoints.FileSystemWorkItemEndpointOptions
-configurationSamples: []
+configurationSamples:
+- name: defaults
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "EndpointDefaults": {
+          "FileSystemWorkItemEndpoint": {}
+        }
+      }
+    }
+  sampleFor: MigrationTools.Endpoints.FileSystemWorkItemEndpointOptions
+- name: Classic
+  description: 
+  code: >-
+    {
+      "$type": "FileSystemWorkItemEndpointOptions",
+      "FileStore": null,
+      "Name": null,
+      "EndpointEnrichers": null
+    }
+  sampleFor: MigrationTools.Endpoints.FileSystemWorkItemEndpointOptions
 description: missng XML code comments
 className: FileSystemWorkItemEndpoint
 typeName: Endpoints
-architecture: v2
-options: []
+architecture: 
+options:
+- parameterName: EndpointEnrichers
+  type: List
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: FileStore
+  type: String
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: Name
+  type: String
+  description: missng XML code comments
+  defaultValue: missng XML code comments
 status: missng XML code comments
 processingTarget: missng XML code comments
 classFile: /src/MigrationTools.Clients.FileSystem/Endpoints/FileSystemWorkItemEndpoint.cs
 optionsClassFile: /src/MigrationTools.Clients.FileSystem/Endpoints/FileSystemWorkItemEndpointOptions.cs
 
 redirectFrom:
-- /Reference/v2/Endpoints/FileSystemWorkItemEndpointOptions/
+- /Reference/Endpoints/FileSystemWorkItemEndpointOptions/
 layout: reference
 toc: true
 permalink: /Reference/Endpoints/FileSystemWorkItemEndpoint/
 title: FileSystemWorkItemEndpoint
 categories:
 - Endpoints
-- v2
+- 
 topics:
 - topic: notes
   path: /Endpoints/FileSystemWorkItemEndpoint-notes.md

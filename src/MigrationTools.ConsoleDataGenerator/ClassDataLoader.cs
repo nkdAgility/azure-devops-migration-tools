@@ -58,7 +58,15 @@ namespace MigrationTools.ConsoleDataGenerator
             foreach (var item in founds)
             {
                 Console.WriteLine($"ClassDataLoader::CreateClassDataFromOptions::-PROCESS {item.Name}");
-                data.Add(CreateClassDataFromOptions<TOptionsInterface>(allTypes, dataTypeName, item));
+                var itemData = CreateClassDataFromOptions<TOptionsInterface>(allTypes, dataTypeName, item);
+                if (itemData != null)
+                {
+                    data.Add(itemData);
+                } else
+                {
+                    Console.WriteLine($"BOOM::CreateClassDataFromOptions");
+                }
+                
             }
             Console.WriteLine("ClassDataLoader::GetOptionsData:: -----------");
             return data;
@@ -70,7 +78,11 @@ namespace MigrationTools.ConsoleDataGenerator
             TOptionsInterface instanceOfOption = (TOptionsInterface)Activator.CreateInstance(optionInFocus);
             string targetOfOption = instanceOfOption.OptionFor;
             var typeOftargetOfOption = allTypes.Where(t => t.Name == targetOfOption && !t.IsAbstract && !t.IsInterface).SingleOrDefault();
-
+            if (typeOftargetOfOption == null)
+            {
+                Console.WriteLine($"ClassDataLoader::CreateClassDataFromOptions:: {optionInFocus.Name} - {targetOfOption} not found");
+                return null;
+            }
             ClassData data = new ClassData();
             data.ClassName = typeOftargetOfOption.Name;
             data.ClassFile = codeFinder.FindCodeFile(typeOftargetOfOption);

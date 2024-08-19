@@ -24,7 +24,7 @@ configurationSamples:
 description: missng XML code comments
 className: PauseAfterEachItem
 typeName: ProcessorEnrichers
-architecture: v2
+architecture: 
 options:
 - parameterName: Enabled
   type: Boolean
@@ -40,14 +40,14 @@ classFile: /src/MigrationTools/Processors/Enrichers/PauseAfterEachItem.cs
 optionsClassFile: /src/MigrationTools/Processors/Enrichers/PauseAfterEachItemOptions.cs
 
 redirectFrom:
-- /Reference/v2/ProcessorEnrichers/PauseAfterEachItemOptions/
+- /Reference/ProcessorEnrichers/PauseAfterEachItemOptions/
 layout: reference
 toc: true
 permalink: /Reference/ProcessorEnrichers/PauseAfterEachItem/
 title: PauseAfterEachItem
 categories:
 - ProcessorEnrichers
-- v2
+- 
 topics:
 - topic: notes
   path: /ProcessorEnrichers/PauseAfterEachItem-notes.md

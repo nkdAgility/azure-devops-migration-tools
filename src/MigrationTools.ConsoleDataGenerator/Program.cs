@@ -43,7 +43,7 @@ class Program
         Console.WriteLine("Assemblies");
         List<Type> allMigrationTypes = currentDomain.GetMigrationToolsTypes().ToList();
         Console.WriteLine("-----------");
-        foreach (var item in currentDomain.GetAssemblies())
+        foreach (var item in currentDomain.GetAssemblies().Where(x => x.FullName.StartsWith("MigrationTools")))
         {
             Console.WriteLine(item.FullName);
         }
@@ -52,20 +52,14 @@ class Program
 
         List<ClassData> classDataList = new List<ClassData>();
 
-        classDataList.AddRange(cdLoader.GetClassDataFromOptions<IProcessorConfig>(allMigrationTypes, "Processors"));
+        classDataList.AddRange(cdLoader.GetClassDataFromOptions<IProcessorOptions>(allMigrationTypes, "Processors"));
         classDataList.AddRange(cdLoader.GetClassDataFromOptions<IToolOptions>(allMigrationTypes, "Tools"));
         classDataList.AddRange(cdLoader.GetClassDataFromOptions<IFieldMapOptions>(allMigrationTypes, "FieldMaps"));
+        classDataList.AddRange(cdLoader.GetClassDataFromOptions<IProcessorEnricherOptions>(allMigrationTypes, "ProcessorEnrichers"));
+        classDataList.AddRange(cdLoader.GetClassDataFromOptions<IEndpointOptions>(allMigrationTypes, "Endpoints"));
+        classDataList.AddRange(cdLoader.GetClassDataFromOptions<IEndpointEnricherOptions>(allMigrationTypes, "EndpointEnrichers"));
 
-        //classDataList.AddRange(cdLoader.GetClassDataFromOptions<IProcessorEnricher>(allMigrationTypes, "ProcessorEnrichers"));
 
-
-        //classDataList.AddRange(cdLoader.GetClassData(allMigrationTypes, typeof(IEndpoint), "v2", "Endpoints"));
-        //classDataList.AddRange(cdLoader.GetClassData(allMigrationTypes, typeof(IEndpointEnricher), "v2", "EndpointEnrichers"));
-
-        //
-
-        //classDataList.AddRange(cdLoader.GetClassData(allMigrationTypes, typeof(IFieldMap), "v2", "FieldMaps", false));
-        //classDataList.AddRange(cdLoader.GetClassData(allMigrationTypes, typeof(IFieldMap), "v1", "FieldMaps", false));
 
         Console.WriteLine("-----------");
         Console.WriteLine("Output");

@@ -23,7 +23,7 @@ configurationSamples:
 description: missng XML code comments
 className: PauseAfterEachItem
 typeName: ProcessorEnrichers
-architecture: v2
+architecture: 
 options:
 - parameterName: Enabled
   type: Boolean
