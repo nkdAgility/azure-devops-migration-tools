@@ -8,7 +8,22 @@ configurationSamples:
     {
       "MigrationTools": {
         "ProcessorDefaults": {
-          "WorkItemMigrationProcessor": {}
+          "WorkItemMigrationProcessor": {
+            "AttachRevisionHistory": "False",
+            "Enabled": "True",
+            "FilterWorkItemsThatAlreadyExistInTarget": "False",
+            "FixHtmlAttachmentLinks": "True",
+            "GenerateMigrationComment": "True",
+            "MaxGracefulFailures": "0",
+            "PauseAfterEachWorkItem": "False",
+            "SkipRevisionWithInvalidAreaPath": "False",
+            "SkipRevisionWithInvalidIterationPath": "False",
+            "UpdateCreatedBy": "True",
+            "UpdateCreatedDate": "True",
+            "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
+            "WorkItemCreateRetryLimit": "5",
+            "WorkItemIDs": {}
+          }
         }
       }
     }
@@ -18,7 +33,7 @@ configurationSamples:
   code: >-
     {
       "$type": "WorkItemMigrationProcessorOptions",
-      "Enabled": false,
+      "Enabled": true,
       "UpdateCreatedDate": true,
       "UpdateCreatedBy": true,
       "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
