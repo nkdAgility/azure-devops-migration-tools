@@ -40,5 +40,6 @@
     <Folder Include="EndpointEnrichers\" />
     <Folder Include="Enrichers\" />
     <Folder Include="ProcessorEnrichers\" />
+    <Folder Include="Tools\FieldMappingTool\" />
   </ItemGroup>
 </Project>
