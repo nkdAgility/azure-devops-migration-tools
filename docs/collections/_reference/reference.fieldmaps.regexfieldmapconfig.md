@@ -2,7 +2,7 @@
 optionsClassName: RegexFieldMapConfig
 optionsClassFullName: MigrationTools._EngineV1.Configuration.FieldMap.RegexFieldMapConfig
 configurationSamples:
-- name: default
+- name: Classic
   description: 
   code: >-
     {

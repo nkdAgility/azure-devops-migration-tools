@@ -2,7 +2,7 @@
 optionsClassName: TreeToTagMapConfig
 optionsClassFullName: MigrationTools._EngineV1.Configuration.FieldMap.TreeToTagMapConfig
 configurationSamples:
-- name: default
+- name: Classic
   description: 
   code: >-
     {

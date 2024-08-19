@@ -1,12 +1,43 @@
 ---
 optionsClassName: TfsChangeSetMappingToolOptions
 optionsClassFullName: MigrationTools.Tools.TfsChangeSetMappingToolOptions
-configurationSamples: []
+configurationSamples:
+- name: default
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "TfsChangeSetMappingTool": {
+            "Enabled": "False",
+            "File": ""
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.TfsChangeSetMappingToolOptions
+- name: Classic
+  description: 
+  code: >-
+    {
+      "$type": "TfsChangeSetMappingToolOptions",
+      "ChangeSetMappingFile": null,
+      "Enabled": false
+    }
+  sampleFor: MigrationTools.Tools.TfsChangeSetMappingToolOptions
 description: missng XML code comments
 className: TfsChangeSetMappingTool
 typeName: Tools
 architecture: v1
-options: []
+options:
+- parameterName: ChangeSetMappingFile
+  type: String
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: Enabled
+  type: Boolean
+  description: missng XML code comments
+  defaultValue: missng XML code comments
 status: missng XML code comments
 processingTarget: missng XML code comments
 classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Tools/TfsChangeSetMappingTool.cs

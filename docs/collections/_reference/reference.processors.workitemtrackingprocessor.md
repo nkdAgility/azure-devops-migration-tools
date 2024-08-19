@@ -2,7 +2,7 @@
 optionsClassName: WorkItemTrackingProcessorOptions
 optionsClassFullName: MigrationTools.Processors.WorkItemTrackingProcessorOptions
 configurationSamples:
-- name: default
+- name: Classic
   description: 
   code: >-
     {

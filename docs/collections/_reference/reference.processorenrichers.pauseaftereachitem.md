@@ -2,7 +2,7 @@
 optionsClassName: PauseAfterEachItemOptions
 optionsClassFullName: MigrationTools.Enrichers.PauseAfterEachItemOptions
 configurationSamples:
-- name: default
+- name: Classic
   description: 
   code: >-
     {

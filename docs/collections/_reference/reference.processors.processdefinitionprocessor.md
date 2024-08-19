@@ -2,7 +2,7 @@
 optionsClassName: ProcessDefinitionProcessorOptions
 optionsClassFullName: MigrationTools.Processors.ProcessDefinitionProcessorOptions
 configurationSamples:
-- name: default
+- name: Classic
   description: 
   code: >-
     {

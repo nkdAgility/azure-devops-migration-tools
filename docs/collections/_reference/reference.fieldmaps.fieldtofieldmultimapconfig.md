@@ -2,7 +2,7 @@
 optionsClassName: FieldtoFieldMultiMapConfig
 optionsClassFullName: MigrationTools._EngineV1.Configuration.FieldMap.FieldtoFieldMultiMapConfig
 configurationSamples:
-- name: default
+- name: Classic
   description: 
   code: >-
     {

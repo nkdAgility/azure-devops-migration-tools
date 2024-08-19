@@ -1,12 +1,77 @@
 ---
 optionsClassName: TfsNodeStructureToolOptions
 optionsClassFullName: MigrationTools.Tools.TfsNodeStructureToolOptions
-configurationSamples: []
+configurationSamples:
+- name: default
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "TfsNodeStructureTool": {
+            "AreaMaps": {
+              "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1"
+            },
+            "Enabled": "True",
+            "IterationMaps": {
+              "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1"
+            },
+            "NodeBasePaths": {},
+            "ReplicateAllExistingNodes": "True",
+            "ShouldCreateMissingRevisionPaths": "True"
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.TfsNodeStructureToolOptions
+- name: Classic
+  description: 
+  code: >-
+    {
+      "$type": "TfsNodeStructureToolOptions",
+      "NodeBasePaths": null,
+      "AreaMaps": {
+        "$type": "Dictionary`2",
+        "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1"
+      },
+      "IterationMaps": {
+        "$type": "Dictionary`2",
+        "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1"
+      },
+      "ShouldCreateMissingRevisionPaths": true,
+      "ReplicateAllExistingNodes": true,
+      "Enabled": true
+    }
+  sampleFor: MigrationTools.Tools.TfsNodeStructureToolOptions
 description: The TfsNodeStructureToolEnricher is used to create missing nodes in the target project. To configure it add a `TfsNodeStructureToolOptions` section to `CommonEnrichersConfig` in the config file. Otherwise defaults will be applied.
 className: TfsNodeStructureTool
 typeName: Tools
 architecture: v1
-options: []
+options:
+- parameterName: AreaMaps
+  type: Dictionary
+  description: Remapping rules for area paths, implemented with regular expressions. The rules apply with a higher priority than the `PrefixProjectToNodes`, that is, if no rule matches the path and the `PrefixProjectToNodes` option is enabled, then the old `PrefixProjectToNodes` behavior is applied.
+  defaultValue: '{}'
+- parameterName: Enabled
+  type: Boolean
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: IterationMaps
+  type: Dictionary
+  description: Remapping rules for iteration paths, implemented with regular expressions. The rules apply with a higher priority than the `PrefixProjectToNodes`, that is, if no rule matches the path and the `PrefixProjectToNodes` option is enabled, then the old `PrefixProjectToNodes` behavior is applied.
+  defaultValue: '{}'
+- parameterName: NodeBasePaths
+  type: String[]
+  description: The root paths of the Ares / Iterations you want migrate. See [NodeBasePath Configuration](#nodebasepath-configuration)
+  defaultValue: '["/"]'
+- parameterName: ReplicateAllExistingNodes
+  type: Boolean
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: ShouldCreateMissingRevisionPaths
+  type: Boolean
+  description: When set to True the susyem will try to create any missing missing area or iteration paths from the revisions.
+  defaultValue: missng XML code comments
 status: missng XML code comments
 processingTarget: missng XML code comments
 classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Tools/TfsNodeStructureTool.cs

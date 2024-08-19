@@ -1,12 +1,37 @@
 ---
 optionsClassName: TfsWorkItemEmbededLinkToolOptions
 optionsClassFullName: MigrationTools.Tools.TfsWorkItemEmbededLinkToolOptions
-configurationSamples: []
+configurationSamples:
+- name: default
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "TfsWorkItemEmbededLinkTool": {
+            "Enabled": "True"
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.TfsWorkItemEmbededLinkToolOptions
+- name: Classic
+  description: 
+  code: >-
+    {
+      "$type": "TfsWorkItemEmbededLinkToolOptions",
+      "Enabled": true
+    }
+  sampleFor: MigrationTools.Tools.TfsWorkItemEmbededLinkToolOptions
 description: missng XML code comments
 className: TfsWorkItemEmbededLinkTool
 typeName: Tools
 architecture: v1
-options: []
+options:
+- parameterName: Enabled
+  type: Boolean
+  description: missng XML code comments
+  defaultValue: missng XML code comments
 status: missng XML code comments
 processingTarget: missng XML code comments
 classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Tools/TfsWorkItemEmbededLinkTool.cs

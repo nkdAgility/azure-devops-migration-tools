@@ -2,7 +2,7 @@
 optionsClassName: TfsTeamSettingsProcessorOptions
 optionsClassFullName: MigrationTools.Processors.TfsTeamSettingsProcessorOptions
 configurationSamples:
-- name: default
+- name: Classic
   description: 
   code: >-
     {

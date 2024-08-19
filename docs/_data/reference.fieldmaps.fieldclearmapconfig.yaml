@@ -1,7 +1,7 @@
 optionsClassName: FieldClearMapConfig
 optionsClassFullName: MigrationTools._EngineV1.Configuration.FieldMap.FieldClearMapConfig
 configurationSamples:
-- name: default
+- name: Classic
   description: 
   code: >-
     {

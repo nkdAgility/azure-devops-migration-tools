@@ -3,10 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools.ConsoleDataGenerator.ReferenceData;
 using MigrationTools.Options;
 using Newtonsoft.Json.Linq;
+using MigrationTools;
+using System.Configuration;
+using Newtonsoft.Json;
 
 namespace MigrationTools.ConsoleDataGenerator
 {
@@ -15,9 +19,12 @@ namespace MigrationTools.ConsoleDataGenerator
         private DataSerialization saveData;
         private static CodeDocumentation codeDocs = new CodeDocumentation("../../../../../docs/Reference/Generated/");
         private static CodeFileFinder codeFinder = new CodeFileFinder("../../../../../src/");
-        public ClassDataLoader(DataSerialization saveData) {
+        private IConfiguration configuration;
+        public ClassDataLoader(DataSerialization saveData, Microsoft.Extensions.Configuration.IConfiguration configuration)
+        {
 
             this.saveData = saveData;
+            this.configuration = configuration;
         }
 
         [Obsolete("Please use GetClassData instead")]
@@ -90,6 +97,15 @@ namespace MigrationTools.ConsoleDataGenerator
                 data.OptionsClassName = typeOption.Name;
                 data.OptionsClassFile = codeFinder.FindCodeFile(typeOption);
                 object targetItem = null;
+                var ConfigurationSectionName = typeOption.GetField("ConfigurationSectionName")?.GetRawConstantValue().ToString();
+                if (!string.IsNullOrEmpty(ConfigurationSectionName))
+                {
+                    Console.WriteLine("Processing as ConfigurationSectionName");
+                    var section = configuration.GetSection(ConfigurationSectionName);
+                    targetItem = (IOptions)Activator.CreateInstance(typeOption);
+                    section.Bind(targetItem);
+                    data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "default", SampleFor = data.OptionsClassFullName, Code = ConvertSectionWithPathToJson(configuration, section).Trim() } );
+                }
                 if (typeOption.GetInterfaces().Contains(typeof(IProcessorConfig)))
                 {
                     Console.WriteLine("Processing as IProcessorConfig");
@@ -114,9 +130,8 @@ namespace MigrationTools.ConsoleDataGenerator
                 {
                     Console.WriteLine("targetItem");
                     JObject joptions = (JObject)JToken.FromObject(targetItem);
-
                     data.Options = populateOptions(targetItem, joptions);
-                    data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "default", SampleFor = data.OptionsClassFullName, Code = saveData.SeraliseDataToJson(targetItem) });
+                    data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "Classic", SampleFor = data.OptionsClassFullName, Code = saveData.SeraliseDataToJson(targetItem).Trim() });
                 }
 
             }
@@ -145,6 +160,62 @@ namespace MigrationTools.ConsoleDataGenerator
                 }
             }
             return options;
+        }
+
+        static string ConvertSectionWithPathToJson(IConfiguration configuration, IConfigurationSection section)
+        {
+            var pathSegments = section.Path.Split(':');
+            JObject root = new JObject();
+            JObject currentObject = root;
+
+            // Walk down the path from the root to the target section
+            for (int i = 0; i < pathSegments.Length; i++)
+            {
+                string key = pathSegments[i];
+                IConfigurationSection currentSection = configuration.GetSection(string.Join(':', pathSegments, 0, i + 1));
+
+                JObject parentObject = new JObject();
+
+                if (i == pathSegments.Length - 1)
+                {
+                    // We are at the target section, so only serialize this section
+                    foreach (var child in currentSection.GetChildren())
+                    {
+                        if (child.Value != null)
+                        {
+                            parentObject[child.Key] = child.Value;
+                        }
+                        else
+                        {
+                            parentObject[child.Key] = ConvertSectionToJson(child);
+                        }
+                    }
+                }
+
+                currentObject[key] = parentObject;
+                currentObject = parentObject;
+            }
+
+            return root.ToString(Formatting.Indented);
+        }
+
+        static JObject ConvertSectionToJson(IConfigurationSection section)
+        {
+            var jObject = new JObject();
+
+            foreach (var child in section.GetChildren())
+            {
+                if (child.Value != null)
+                {
+                    jObject[child.Key] = child.Value;
+                }
+                else
+                {
+                    jObject[child.Key] = ConvertSectionToJson(child);
+                }
+            }
+
+            return jObject;
         }
 
     }

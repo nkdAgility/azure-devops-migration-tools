@@ -2,7 +2,7 @@
 optionsClassName: FieldMergeMapConfig
 optionsClassFullName: MigrationTools._EngineV1.Configuration.FieldMap.FieldMergeMapConfig
 configurationSamples:
-- name: default
+- name: Classic
   description: 
   code: >-
     {

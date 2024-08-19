@@ -16,6 +16,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="..\..\appsettings.json" Link="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="YamlDotNet" Version="16.0.0" />
   </ItemGroup>
 
@@ -23,6 +29,7 @@
     <ProjectReference Include="..\MigrationTools.Clients.AzureDevops.ObjectModel\MigrationTools.Clients.AzureDevops.ObjectModel.csproj" />
     <ProjectReference Include="..\MigrationTools.Clients.AzureDevops.Rest\MigrationTools.Clients.AzureDevops.Rest.csproj" />
     <ProjectReference Include="..\MigrationTools.Clients.FileSystem\MigrationTools.Clients.FileSystem.csproj" />
+    <ProjectReference Include="..\MigrationTools\MigrationTools.csproj" />
   </ItemGroup>
 
   <ItemGroup>

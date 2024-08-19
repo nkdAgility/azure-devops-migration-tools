@@ -17,17 +17,21 @@ using System.Text;
 using MigrationTools.ConsoleDataGenerator.ReferenceData;
 using Microsoft.VisualStudio.Services.Common;
 using MigrationTools.Tools.Infra;
+using Microsoft.Extensions.Configuration;
 
 namespace MigrationTools.ConsoleDataGenerator;
 class Program
 {
+    private static IConfiguration configuration = GetConfiguration();
     private static DataSerialization saveData = new DataSerialization("../../../../../docs/_data/");
     private static CodeDocumentation codeDocs = new CodeDocumentation("../../../../../docs/Reference/Generated/");
-    private static ClassDataLoader cdLoader = new ClassDataLoader(saveData);
+    private static ClassDataLoader cdLoader = new ClassDataLoader(saveData, configuration);
     private static MarkdownLoader mdLoader = new MarkdownLoader();
+    
 
     static void Main(string[] args)
     {
+       
         string dir = AppDomain.CurrentDomain.BaseDirectory;
         AppDomain currentDomain = AppDomain.CurrentDomain;
         currentDomain.Load("MigrationTools");
@@ -109,7 +113,17 @@ class Program
         return data;
     }
 
- 
+ private static IConfiguration GetConfiguration()
+    {
+        // Create a new ConfigurationBuilder
+        var configurationBuilder = new ConfigurationBuilder();
+        // Set the base path for the configuration (optional)
+        configurationBuilder.SetBasePath(Directory.GetCurrentDirectory());
+        // Add configuration sources
+        configurationBuilder.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+        // Build the configuration
+       return configurationBuilder.Build();
+    }
 
 
 }

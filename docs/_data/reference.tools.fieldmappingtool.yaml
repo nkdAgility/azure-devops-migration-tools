@@ -1,11 +1,42 @@
 optionsClassName: FieldMappingToolOptions
 optionsClassFullName: MigrationTools.Tools.FieldMappingToolOptions
-configurationSamples: []
+configurationSamples:
+- name: default
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "FieldMappingTool": {
+            "Enabled": "False",
+            "FieldMaps": ""
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.FieldMappingToolOptions
+- name: Classic
+  description: 
+  code: >-
+    {
+      "$type": "FieldMappingToolOptions",
+      "FieldMaps": [],
+      "Enabled": false
+    }
+  sampleFor: MigrationTools.Tools.FieldMappingToolOptions
 description: missng XML code comments
 className: FieldMappingTool
 typeName: Tools
 architecture: v1
-options: []
+options:
+- parameterName: Enabled
+  type: Boolean
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: FieldMaps
+  type: List
+  description: missng XML code comments
+  defaultValue: missng XML code comments
 status: missng XML code comments
 processingTarget: missng XML code comments
 classFile: /src/MigrationTools/Tools/FieldMappingTool.cs

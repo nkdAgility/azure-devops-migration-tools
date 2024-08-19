@@ -2,7 +2,7 @@
 optionsClassName: FieldtoTagMapConfig
 optionsClassFullName: MigrationTools._EngineV1.Configuration.FieldMap.FieldtoTagMapConfig
 configurationSamples:
-- name: default
+- name: Classic
   description: 
   code: >-
     {

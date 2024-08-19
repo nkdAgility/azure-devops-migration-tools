@@ -2,7 +2,7 @@
 optionsClassName: AzureDevOpsPipelineProcessorOptions
 optionsClassFullName: MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions
 configurationSamples:
-- name: default
+- name: Classic
   description: 
   code: >-
     {

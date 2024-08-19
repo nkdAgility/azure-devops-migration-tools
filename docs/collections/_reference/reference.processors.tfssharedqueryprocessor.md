@@ -2,7 +2,7 @@
 optionsClassName: TfsSharedQueryProcessorOptions
 optionsClassFullName: MigrationTools.Processors.TfsSharedQueryProcessorOptions
 configurationSamples:
-- name: default
+- name: Classic
   description: 
   code: >-
     {

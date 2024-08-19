@@ -2,7 +2,7 @@
 optionsClassName: FieldSkipMapConfig
 optionsClassFullName: MigrationTools._EngineV1.Configuration.FieldMap.FieldSkipMapConfig
 configurationSamples:
-- name: default
+- name: Classic
   description: 
   code: >-
     {

@@ -1,12 +1,37 @@
 ---
 optionsClassName: TfsEmbededImagesToolOptions
 optionsClassFullName: MigrationTools.Tools.TfsEmbededImagesToolOptions
-configurationSamples: []
+configurationSamples:
+- name: default
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "TfsEmbededImagesTool": {
+            "Enabled": "True"
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.TfsEmbededImagesToolOptions
+- name: Classic
+  description: 
+  code: >-
+    {
+      "$type": "TfsEmbededImagesToolOptions",
+      "Enabled": true
+    }
+  sampleFor: MigrationTools.Tools.TfsEmbededImagesToolOptions
 description: missng XML code comments
 className: TfsEmbededImagesTool
 typeName: Tools
 architecture: v1
-options: []
+options:
+- parameterName: Enabled
+  type: Boolean
+  description: missng XML code comments
+  defaultValue: missng XML code comments
 status: missng XML code comments
 processingTarget: missng XML code comments
 classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Tools/TfsEmbededImagesTool.cs

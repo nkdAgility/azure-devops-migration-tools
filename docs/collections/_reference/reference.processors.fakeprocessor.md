@@ -2,7 +2,7 @@
 optionsClassName: FakeProcessorConfig
 optionsClassFullName: MigrationTools._EngineV1.Configuration.Processing.FakeProcessorConfig
 configurationSamples:
-- name: default
+- name: Classic
   description: 
   code: >-
     {

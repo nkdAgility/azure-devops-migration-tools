@@ -2,7 +2,7 @@
 optionsClassName: MultiValueConditionalMapConfig
 optionsClassFullName: MigrationTools._EngineV1.Configuration.FieldMap.MultiValueConditionalMapConfig
 configurationSamples:
-- name: default
+- name: Classic
   description: 
   code: >-
     {
