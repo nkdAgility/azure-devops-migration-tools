@@ -23,6 +23,7 @@ using MigrationTools.DataContracts.Pipelines;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
 using MigrationTools.Processors;
+using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Tools.Infra;
 
 namespace MigrationTools.Tools

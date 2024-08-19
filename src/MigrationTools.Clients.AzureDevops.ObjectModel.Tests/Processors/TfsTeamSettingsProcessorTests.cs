@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MigrationTools.Processors.Infrastructure;
 
 namespace MigrationTools.Processors.Tests
 {

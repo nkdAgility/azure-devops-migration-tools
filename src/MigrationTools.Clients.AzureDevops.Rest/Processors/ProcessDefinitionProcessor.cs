@@ -12,6 +12,7 @@ using MigrationTools.DataContracts.Process;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
 using Task = System.Threading.Tasks.Task;
+using MigrationTools.Processors.Infrastructure;
 
 namespace MigrationTools.Processors
 {

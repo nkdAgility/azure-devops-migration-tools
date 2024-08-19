@@ -8,14 +8,14 @@ using Microsoft.Extensions.Options;
 using MigrationTools;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Configuration.Processing;
-using MigrationTools._EngineV1.Processors;
+
 using MigrationTools.DataContracts;
 using MigrationTools.DataContracts.Process;
 using MigrationTools.EndpointEnrichers;
-using MigrationTools.Processors.Infra;
+using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Tools;
 using Newtonsoft.Json;
-using VstsSyncMigrator._EngineV1.Processors;
+
 
 namespace MigrationTools.Processors
 {

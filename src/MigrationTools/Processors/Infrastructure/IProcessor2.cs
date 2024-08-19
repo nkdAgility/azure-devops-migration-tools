@@ -2,7 +2,7 @@
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
 
-namespace MigrationTools.Processors
+namespace MigrationTools.Processors.Infrastructure
 {
     public interface IProcessor : IOldProcessor
     {

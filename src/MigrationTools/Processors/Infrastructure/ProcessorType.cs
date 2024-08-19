@@ -1,4 +1,4 @@
-﻿namespace MigrationTools
+﻿namespace MigrationTools.Processors.Infrastructure
 {
     public enum ProcessorType
     {

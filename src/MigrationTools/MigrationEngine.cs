@@ -10,6 +10,7 @@ using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Containers;
 using MigrationTools.Options;
 using MigrationTools.Processors;
+using MigrationTools.Processors.Infrastructure;
 
 namespace MigrationTools
 {
@@ -88,7 +89,7 @@ namespace MigrationTools
 
 
             _logger.LogInformation("Beginning run of {ProcessorCount} processors", Processors.Count.ToString());
-            foreach (_EngineV1.Containers.IOldProcessor process in Processors.Processors)
+            foreach (IOldProcessor process in Processors.Processors)
             {
                 _logger.LogInformation("Processor: {ProcessorName}", process.Name);
                 Stopwatch processorTimer = Stopwatch.StartNew();

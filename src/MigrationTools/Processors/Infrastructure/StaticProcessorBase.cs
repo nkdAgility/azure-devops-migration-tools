@@ -7,9 +7,9 @@ using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Processors;
 using MigrationTools.Tools;
 
-namespace VstsSyncMigrator._EngineV1.Processors
+namespace MigrationTools.Processors.Infrastructure
 {
-    public abstract class StaticProcessorBase : MigrationTools._EngineV1.Containers.IOldProcessor
+    public abstract class StaticProcessorBase : IOldProcessor
     {
         protected IMigrationEngine Engine { get; }
         protected IServiceProvider Services { get; }

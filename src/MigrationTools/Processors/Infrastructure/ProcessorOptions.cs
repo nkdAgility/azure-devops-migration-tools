@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Enrichers;
 
-namespace MigrationTools.Processors
+namespace MigrationTools.Processors.Infrastructure
 {
     public abstract class ProcessorOptions : IProcessorOptions
     {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using MigrationTools.Endpoints;
+using MigrationTools.Processors.Infrastructure;
 
 namespace MigrationTools.Processors
 {
@@ -8,6 +9,7 @@ namespace MigrationTools.Processors
     {
         public AzureDevOpsPipelineProcessorOptions()
         {
+            Enabled = false;
             MigrateBuildPipelines = true;
             MigrateReleasePipelines = true;
             MigrateTaskGroups = true;

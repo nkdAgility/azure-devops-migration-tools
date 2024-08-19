@@ -61,6 +61,101 @@
             If you set a `RefName` then this configration will be added to a Catalog of configurations that can be refernced using tha `RefName` so tha tyou dont have to keep adding the ame items with the same configuration.
             </summary>
         </member>
+        <member name="P:MigrationTools.Processors.Infrastructure.IProcessorOptions.SourceName">
+            <summary>
+            This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Processors.Infrastructure.IProcessorOptions.TargetName">
+            <summary>
+            This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Processors.Infrastructure.IProcessorOptions.ProcessorEnrichers">
+            <summary>
+            List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Processors.Infrastructure.ProcessorOptions.Enabled">
+            <summary>
+            If set to `true` then the processor will run. Set to `false` and the processor will not run.
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Processors.Infrastructure.ProcessorOptions.Enrichers">
+            <summary>
+            A list of enrichers that can augment the proccessing of the data
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Processors.Infrastructure.ProcessorOptions.ProcessorEnrichers">
+            <summary>
+            List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Processors.Infrastructure.ProcessorOptions.RefName">
+            <summary>
+            `Refname` will be used in the future to allow for using named Options without the need to copy all of the options.
+            </summary>
+        </member>
+        <member name="T:MigrationTools.Processors.WorkItemTrackingProcessor">
+            <summary>
+            This processor is intended, with the aid of [ProcessorEnrichers](../ProcessorEnrichers/index.md), to allow the migration of Work Items between two [Endpoints](../Endpoints/index.md).
+            </summary>
+        </member>
+        <member name="T:MigrationTools.Tools.GitRepoMappingTool">
+            <summary>
+            Used to process the String fields of a work item. This is useful for cleaning up data. It will limit fields to a max length and apply regex replacements based on what is configured. Each regex replacement is applied in order and can be enabled or disabled.
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Tools.GitRepoMappingToolOptions.Mappings">
+            <summary>
+            List of work item mappings. 
+            </summary>
+            <default>{}</default>
+        </member>
+        <member name="M:MigrationTools.Tools.Infra.EmbededImagesRepairToolBase`1.FixEmbededImages(MigrationTools.DataContracts.WorkItemData,System.String,System.String,System.String)">
+            from https://gist.github.com/pietergheysens/792ed505f09557e77ddfc1b83531e4fb
+        </member>
+        <member name="M:MigrationTools.Tools.Infra.EmbededImagesRepairToolBase`1.GetImageFormat(System.Byte[])">
+            <summary>
+            Retrieve Image Format for a given byte array
+            </summary>
+            <param name="bytes">Image to check</param>
+            <remarks>From https://stackoverflow.com/a/9446045/1317161</remarks>
+            <returns>Image format</returns>
+        </member>
+        <member name="P:MigrationTools.Tools.Infra.ToolOptions.Enabled">
+            <summary>
+            If set to `true` then the processor will run. Set to `false` and the processor will not run.
+            </summary>
+        </member>
+        <member name="T:MigrationTools.Tools.StringManipulatorTool">
+            <summary>
+            Used to process the String fields of a work item. This is useful for cleaning up data. It will limit fields to a max length and apply regex replacements based on what is configured. Each regex replacement is applied in order and can be enabled or disabled.
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Tools.StringManipulatorToolOptions.MaxStringLength">
+            <summary>
+            Max number of chars in a string. Applied last, and set to 1000000 by default.
+            </summary>
+            <default>1000000</default>
+        </member>
+        <member name="P:MigrationTools.Tools.StringManipulatorToolOptions.Manipulators">
+            <summary>
+            List of regex based string manipulations to apply to all string fields. Each regex replacement is applied in order and can be enabled or disabled.
+            </summary>
+            <default>{}</default>
+        </member>
+        <member name="T:MigrationTools.Tools.WorkItemTypeMappingTool">
+            <summary>
+            Used to process the String fields of a work item. This is useful for cleaning up data. It will limit fields to a max length and apply regex replacements based on what is configured. Each regex replacement is applied in order and can be enabled or disabled.
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Tools.WorkItemTypeMappingToolOptions.Mappings">
+            <summary>
+            List of work item mappings. 
+            </summary>
+            <default>{}</default>
+        </member>
         <member name="T:MigrationTools._EngineV1.Configuration.FieldMap.FieldClearMapConfig">
             <summary>
             Allows you to set an already populated field to Null. This will only work with fields that support null.
@@ -157,101 +252,6 @@
             </summary>
             <param name="otherProcessors">List of already configured processors.</param>
         </member>
-        <member name="P:MigrationTools.Processors.IProcessorOptions.SourceName">
-            <summary>
-            This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.
-            </summary>
-        </member>
-        <member name="P:MigrationTools.Processors.IProcessorOptions.TargetName">
-            <summary>
-            This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.
-            </summary>
-        </member>
-        <member name="P:MigrationTools.Processors.IProcessorOptions.ProcessorEnrichers">
-            <summary>
-            List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.
-            </summary>
-        </member>
-        <member name="P:MigrationTools.Processors.ProcessorOptions.Enabled">
-            <summary>
-            If set to `true` then the processor will run. Set to `false` and the processor will not run.
-            </summary>
-        </member>
-        <member name="P:MigrationTools.Processors.ProcessorOptions.Enrichers">
-            <summary>
-            A list of enrichers that can augment the proccessing of the data
-            </summary>
-        </member>
-        <member name="P:MigrationTools.Processors.ProcessorOptions.ProcessorEnrichers">
-            <summary>
-            List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.
-            </summary>
-        </member>
-        <member name="P:MigrationTools.Processors.ProcessorOptions.RefName">
-            <summary>
-            `Refname` will be used in the future to allow for using named Options without the need to copy all of the options.
-            </summary>
-        </member>
-        <member name="T:MigrationTools.Processors.WorkItemTrackingProcessor">
-            <summary>
-            This processor is intended, with the aid of [ProcessorEnrichers](../ProcessorEnrichers/index.md), to allow the migration of Work Items between two [Endpoints](../Endpoints/index.md).
-            </summary>
-        </member>
-        <member name="T:MigrationTools.Tools.GitRepoMappingTool">
-            <summary>
-            Used to process the String fields of a work item. This is useful for cleaning up data. It will limit fields to a max length and apply regex replacements based on what is configured. Each regex replacement is applied in order and can be enabled or disabled.
-            </summary>
-        </member>
-        <member name="P:MigrationTools.Tools.GitRepoMappingToolOptions.Mappings">
-            <summary>
-            List of work item mappings. 
-            </summary>
-            <default>{}</default>
-        </member>
-        <member name="M:MigrationTools.Tools.Infra.EmbededImagesRepairToolBase`1.FixEmbededImages(MigrationTools.DataContracts.WorkItemData,System.String,System.String,System.String)">
-            from https://gist.github.com/pietergheysens/792ed505f09557e77ddfc1b83531e4fb
-        </member>
-        <member name="M:MigrationTools.Tools.Infra.EmbededImagesRepairToolBase`1.GetImageFormat(System.Byte[])">
-            <summary>
-            Retrieve Image Format for a given byte array
-            </summary>
-            <param name="bytes">Image to check</param>
-            <remarks>From https://stackoverflow.com/a/9446045/1317161</remarks>
-            <returns>Image format</returns>
-        </member>
-        <member name="P:MigrationTools.Tools.Infra.ToolOptions.Enabled">
-            <summary>
-            If set to `true` then the processor will run. Set to `false` and the processor will not run.
-            </summary>
-        </member>
-        <member name="T:MigrationTools.Tools.StringManipulatorTool">
-            <summary>
-            Used to process the String fields of a work item. This is useful for cleaning up data. It will limit fields to a max length and apply regex replacements based on what is configured. Each regex replacement is applied in order and can be enabled or disabled.
-            </summary>
-        </member>
-        <member name="P:MigrationTools.Tools.StringManipulatorToolOptions.MaxStringLength">
-            <summary>
-            Max number of chars in a string. Applied last, and set to 1000000 by default.
-            </summary>
-            <default>1000000</default>
-        </member>
-        <member name="P:MigrationTools.Tools.StringManipulatorToolOptions.Manipulators">
-            <summary>
-            List of regex based string manipulations to apply to all string fields. Each regex replacement is applied in order and can be enabled or disabled.
-            </summary>
-            <default>{}</default>
-        </member>
-        <member name="T:MigrationTools.Tools.WorkItemTypeMappingTool">
-            <summary>
-            Used to process the String fields of a work item. This is useful for cleaning up data. It will limit fields to a max length and apply regex replacements based on what is configured. Each regex replacement is applied in order and can be enabled or disabled.
-            </summary>
-        </member>
-        <member name="P:MigrationTools.Tools.WorkItemTypeMappingToolOptions.Mappings">
-            <summary>
-            List of work item mappings. 
-            </summary>
-            <default>{}</default>
-        </member>
         <member name="F:ThisAssembly.Git.IsDirty">
             <summary>
             Gets whether the current repository is dirty.
@@ -274,27 +274,27 @@
         </member>
         <member name="F:ThisAssembly.Git.Commit">
             <summary>
-            => @"9934b5e"
+            => @"2d1d59e"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Sha">
             <summary>
-            => @"9934b5e3aade0cbfdab2c38a95b02e7cc21c3564"
+            => @"2d1d59e90deb1a5756a2aebdc1ea68f0a186dea9"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.CommitDate">
             <summary>
-            => @"2024-08-19T13:29:09+01:00"
+            => @"2024-08-19T13:38:36+01:00"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commits">
             <summary>
-            => @"119"
+            => @"120"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Tag">
             <summary>
-            => @"v15.1.8-Preview.9-119-g9934b5e"
+            => @"v15.1.8-Preview.9-120-g2d1d59e"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseTag">
@@ -329,7 +329,7 @@
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Patch">
             <summary>
-            => @"127"
+            => @"128"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Label">

@@ -12,6 +12,7 @@ using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
 using MigrationTools.Processors;
 using Newtonsoft.Json;
+using MigrationTools.Processors.Infrastructure;
 
 namespace MigrationTools.Clients.AzureDevops.Rest.Processors
 {

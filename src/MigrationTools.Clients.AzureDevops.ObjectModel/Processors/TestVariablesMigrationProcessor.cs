@@ -5,9 +5,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.TestManagement.Client;
 using MigrationTools;
 using MigrationTools._EngineV1.Configuration;
-using MigrationTools._EngineV1.Processors;
+using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Tools;
-using MigrationTools.Processors.Infra;
+using MigrationTools.Processors.Infrastructure;
 using Microsoft.Extensions.Options;
 
 

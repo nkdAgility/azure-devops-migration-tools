@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using MigrationTools.DataContracts;
 using MigrationTools.Processors;
+using MigrationTools.Processors.Infrastructure;
 
 namespace MigrationTools.Enrichers
 {

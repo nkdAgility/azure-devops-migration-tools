@@ -2,6 +2,8 @@
 using MigrationTools.Enrichers;
 using MigrationTools.Processors;
 using MigrationTools._EngineV1.Configuration;
+using MigrationTools.Processors.Infrastructure;
+using MigrationTools.Processors.Infrastructure;
 
 namespace MigrationTools.Processors
 {

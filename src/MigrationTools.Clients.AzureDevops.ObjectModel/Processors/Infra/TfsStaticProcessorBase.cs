@@ -5,10 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MigrationTools;
+using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Tools;
-using VstsSyncMigrator._EngineV1.Processors;
 
-namespace MigrationTools.Processors.Infra
+
+namespace MigrationTools.Processors.Infrastructure
 {
     public abstract class TfsStaticProcessorBase : StaticProcessorBase
     {

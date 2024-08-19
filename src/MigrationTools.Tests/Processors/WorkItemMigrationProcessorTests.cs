@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools.Endpoints;
+using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Tests;
 
 namespace MigrationTools.Processors.Tests

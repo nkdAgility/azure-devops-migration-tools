@@ -10,6 +10,7 @@ using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
 using MigrationTools.Options;
 using MigrationTools.Processors;
+using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Tools;
 using Serilog;
 

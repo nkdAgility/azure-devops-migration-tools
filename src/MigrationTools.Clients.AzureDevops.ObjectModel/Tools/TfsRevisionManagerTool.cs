@@ -12,6 +12,7 @@ using MigrationTools.DataContracts;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
 using MigrationTools.Processors;
+using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Tools.Infra;
 using Newtonsoft.Json;
 

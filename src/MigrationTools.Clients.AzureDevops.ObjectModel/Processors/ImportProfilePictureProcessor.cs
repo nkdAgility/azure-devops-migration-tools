@@ -11,9 +11,9 @@ using Microsoft.TeamFoundation.Framework.Client;
 using Microsoft.TeamFoundation.Framework.Common;
 using MigrationTools;
 using MigrationTools._EngineV1.Configuration;
-using MigrationTools.Processors.Infra;
+using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Tools;
-using VstsSyncMigrator._EngineV1.Processors;
+
 
 namespace MigrationTools.Processors
 {

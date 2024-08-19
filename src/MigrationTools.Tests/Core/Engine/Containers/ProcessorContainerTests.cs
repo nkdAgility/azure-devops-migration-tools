@@ -7,6 +7,7 @@ using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Containers;
 using MigrationTools.Processors;
 using MigrationTools.Tests;
+using MigrationTools.Processors.Infrastructure;
 
 namespace MigrationTools.Engine.Containers.Tests
 {

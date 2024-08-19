@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace MigrationTools.Processors.Infra
+namespace MigrationTools.Processors.Infrastructure
 {
     [Serializable]
     internal class ConfigException : Exception

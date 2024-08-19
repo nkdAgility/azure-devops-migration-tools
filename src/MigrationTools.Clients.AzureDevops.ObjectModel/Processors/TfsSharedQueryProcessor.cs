@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
+using MigrationTools.Processors.Infrastructure;
 
 namespace MigrationTools.Processors
 {

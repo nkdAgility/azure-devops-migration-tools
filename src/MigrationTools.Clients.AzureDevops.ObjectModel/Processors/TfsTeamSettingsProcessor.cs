@@ -11,6 +11,7 @@ using Microsoft.TeamFoundation.Work.WebApi;
 using Microsoft.VisualStudio.Services.WebApi;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
+using MigrationTools.Processors.Infrastructure;
 
 namespace MigrationTools.Processors
 {

@@ -18,6 +18,7 @@ using MigrationTools.ConsoleDataGenerator.ReferenceData;
 using Microsoft.VisualStudio.Services.Common;
 using MigrationTools.Tools.Infra;
 using Microsoft.Extensions.Configuration;
+using MigrationTools.Processors.Infrastructure;
 
 namespace MigrationTools.ConsoleDataGenerator;
 class Program
@@ -56,10 +57,10 @@ class Program
 
         List<ClassData> classDataList = new List<ClassData>();
         // V1
-        classDataList.AddRange(cdLoader.GetClassData(newTypes, newTypes, typeof(MigrationTools._EngineV1.Containers.IOldProcessor), "v1", "Processors", true, "Config"));
+        classDataList.AddRange(cdLoader.GetClassData(newTypes, newTypes, typeof(IOldProcessor), "v1", "Processors", true, "Config"));
         classDataList.AddRange(cdLoader.GetClassData(newTypes, newTypes, typeof(IFieldMapConfig), "v1", "FieldMaps", false));
         // V2
-        classDataList.AddRange(cdLoader.GetClassData(newTypes, newTypes, typeof(MigrationTools.Processors.IProcessor), "v2", "Processors"));
+        classDataList.AddRange(cdLoader.GetClassData(newTypes, newTypes, typeof(IProcessor), "v2", "Processors"));
         classDataList.AddRange(cdLoader.GetClassData(newTypes, newTypes, typeof(IProcessorEnricher), "v2", "ProcessorEnrichers"));
        
         classDataList.AddRange(cdLoader.GetClassData(newTypes, newTypes, typeof(IFieldMapConfig), "v2", "FieldMaps", false));

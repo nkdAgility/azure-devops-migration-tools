@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using MigrationTools.DataContracts;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
+using MigrationTools.Processors.Infrastructure;
 
 namespace MigrationTools.Processors
 {

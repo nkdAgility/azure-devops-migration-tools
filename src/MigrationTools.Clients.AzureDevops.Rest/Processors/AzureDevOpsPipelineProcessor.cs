@@ -8,6 +8,7 @@ using MigrationTools.DataContracts;
 using MigrationTools.DataContracts.Pipelines;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
+using MigrationTools.Processors.Infrastructure;
 
 namespace MigrationTools.Processors
 {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using MigrationTools.Processors.Infrastructure;
 
 namespace MigrationTools.Processors
 {

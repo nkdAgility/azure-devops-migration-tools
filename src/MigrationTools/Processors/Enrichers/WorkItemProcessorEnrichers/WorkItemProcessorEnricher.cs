@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using MigrationTools.DataContracts;
 using MigrationTools.Processors;
+using MigrationTools.Processors.Infrastructure;
 
 namespace MigrationTools.Enrichers
 {

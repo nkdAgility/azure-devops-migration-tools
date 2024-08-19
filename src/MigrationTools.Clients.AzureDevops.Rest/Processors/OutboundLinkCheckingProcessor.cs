@@ -9,6 +9,7 @@ using MigrationTools.DataContracts.WorkItems;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
 using MigrationTools.Processors;
+using MigrationTools.Processors.Infrastructure;
 
 namespace MigrationTools.Clients.AzureDevops.Rest.Processors
 {

@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
 using MigrationTools.Processors;
+using MigrationTools.Processors.Infrastructure;
 
 namespace MigrationTools.Tools
 {

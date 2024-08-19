@@ -3,7 +3,7 @@ using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Enrichers;
 using MigrationTools.Options;
 
-namespace MigrationTools.Processors
+namespace MigrationTools.Processors.Infrastructure
 {
     public interface IProcessorOptions : IProcessorConfig, IOldOptions
     {

@@ -7,7 +7,7 @@ using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
 
-namespace MigrationTools.Processors
+namespace MigrationTools.Processors.Infrastructure
 {
     public abstract class Processor : IProcessor
     {

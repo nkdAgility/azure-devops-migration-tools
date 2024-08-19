@@ -10,7 +10,7 @@ using MigrationTools.Enrichers;
 using MigrationTools.Processors;
 using MigrationTools.Tools;
 
-namespace MigrationTools._EngineV1.Processors
+namespace MigrationTools.Processors.Infrastructure
 {
     public abstract class MigrationProcessorBase : IOldProcessor
     {

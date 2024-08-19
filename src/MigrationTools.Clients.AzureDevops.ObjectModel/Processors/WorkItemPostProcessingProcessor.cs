@@ -10,11 +10,11 @@ using MigrationTools._EngineV1.Clients;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Configuration.Processing;
 using MigrationTools._EngineV1.DataContracts;
-using MigrationTools._EngineV1.Processors;
+
 using MigrationTools.DataContracts;
 using Microsoft.Extensions.Options;
 using MigrationTools.Tools;
-using MigrationTools.Processors.Infra;
+using MigrationTools.Processors.Infrastructure;
 
 namespace MigrationTools.Processors
 {

@@ -15,6 +15,7 @@ using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools.DataContracts;
 using MigrationTools.Processors;
+using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Tools.Infra;
 
 namespace MigrationTools.Tools

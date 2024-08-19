@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using MigrationTools.Enrichers;
 using MigrationTools.Processors;
+using MigrationTools.Processors.Infrastructure;
 
 namespace MigrationTools._EngineV1.Configuration.Processing
 {

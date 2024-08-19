@@ -2,10 +2,11 @@
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
 using MigrationTools.Processors;
+using MigrationTools.Processors.Infrastructure;
 
 namespace MigrationTools.Engine.Containers.Tests
 {
-    public class SimpleProcessorMock : _EngineV1.Containers.IOldProcessor, MigrationTools.Processors.IProcessor
+    public class SimpleProcessorMock : IOldProcessor, IProcessor
     {
         public string Name => "TestSimpleContext";
 
