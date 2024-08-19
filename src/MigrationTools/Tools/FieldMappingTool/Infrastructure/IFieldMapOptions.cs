@@ -1,14 +1,12 @@
-﻿using MigrationTools.Options;
+﻿using System.Collections.Generic;
+using MigrationTools.Options;
 using Newtonsoft.Json;
 
 namespace MigrationTools.Tools.Infrastructure
 {
-    public interface IFieldMapOptions
+    public interface IFieldMapOptions : IOptions
     {
-        string WorkItemTypeName { get; set; }
-
-        [JsonIgnore]
-        string FieldMap { get; }
+        List<string> ApplyTo { get; set; }
 
         void SetExampleConfigDefaults();
 

@@ -185,6 +185,11 @@
             <status>ready</status>
             <processingtarget>Work Item Field</processingtarget>
         </member>
+        <member name="P:MigrationTools.Tools.Infrastructure.FieldMapOptions.Enabled">
+            <summary>
+            If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.
+            </summary>
+        </member>
         <member name="M:MigrationTools.Tools.Infrastructure.EmbededImagesRepairToolBase`1.FixEmbededImages(MigrationTools.DataContracts.WorkItemData,System.String,System.String,System.String)">
             from https://gist.github.com/pietergheysens/792ed505f09557e77ddfc1b83531e4fb
         </member>
@@ -274,27 +279,27 @@
         </member>
         <member name="F:ThisAssembly.Git.Commit">
             <summary>
-            => @"d87d227"
+            => @"d7406e1"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Sha">
             <summary>
-            => @"d87d227204d6c148894519d9ba3b278ae28e07fb"
+            => @"d7406e10e2b9d09e8de81a7c8b46140b26729d28"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.CommitDate">
             <summary>
-            => @"2024-08-19T15:04:29+01:00"
+            => @"2024-08-19T15:20:41+01:00"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commits">
             <summary>
-            => @"126"
+            => @"127"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Tag">
             <summary>
-            => @"v15.1.8-Preview.9-126-gd87d227"
+            => @"v15.1.8-Preview.9-127-gd7406e1"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseTag">
@@ -329,7 +334,7 @@
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Patch">
             <summary>
-            => @"134"
+            => @"135"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Label">

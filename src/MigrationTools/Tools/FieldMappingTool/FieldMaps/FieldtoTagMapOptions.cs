@@ -9,19 +9,12 @@ namespace MigrationTools.Tools
     /// </summary>
     /// <status>ready</status>
     /// <processingtarget>Work Item Field</processingtarget>
-    public class FieldtoTagMapOptions : IFieldMapOptions
+    public class FieldtoTagMapOptions : FieldMapOptions
     {
         public string WorkItemTypeName { get; set; }
         public string sourceField { get; set; }
         public string formatExpression { get; set; }
 
-        public string FieldMap
-        {
-            get
-            {
-                return "FieldToTagFieldMap";
-            }
-        }
 
         public void SetExampleConfigDefaults()
         {

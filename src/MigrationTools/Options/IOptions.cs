@@ -19,7 +19,7 @@ namespace MigrationTools.Options
     public interface IOptions
     {
         [JsonIgnore]
-        public string OptionsFor { get; }
+        public string OptionFor { get; }
         [JsonIgnore]
         public string ConfigurationSectionName { get; }
 

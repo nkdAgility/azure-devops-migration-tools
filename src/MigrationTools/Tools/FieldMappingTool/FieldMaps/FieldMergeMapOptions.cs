@@ -8,20 +8,12 @@ namespace MigrationTools.Tools
     /// </summary>
     /// <status>ready</status>
     /// <processingtarget>Work Item Field</processingtarget>
-    public class FieldMergeMapOptions : IFieldMapOptions
+    public class FieldMergeMapOptions : FieldMapOptions
     {
         public string WorkItemTypeName { get; set; }
         public List<string> sourceFields { get; set; }
         public string targetField { get; set; }
         public string formatExpression { get; set; }
-
-        public string FieldMap
-        {
-            get
-            {
-                return "FieldMergeMap";
-            }
-        }
 
         public void SetExampleConfigDefaults()
         {

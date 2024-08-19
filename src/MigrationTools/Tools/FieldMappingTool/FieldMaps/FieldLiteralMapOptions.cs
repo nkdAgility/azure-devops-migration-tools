@@ -7,9 +7,8 @@ namespace MigrationTools.Tools
     /// </summary>
     /// <status>ready</status>
     /// <processingtarget>Work Item Field</processingtarget>
-    public class FieldLiteralMapOptions : IFieldMapOptions
+    public class FieldLiteralMapOptions : FieldMapOptions
     {
-        public string FieldMap => "FieldLiteralMap";
 
         public string WorkItemTypeName { get; set; }
 

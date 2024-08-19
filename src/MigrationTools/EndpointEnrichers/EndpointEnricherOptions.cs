@@ -6,9 +6,9 @@ namespace MigrationTools.EndpointEnrichers
     public abstract class EndpointEnricherOptions : IEndpointEnricherOptions
     {
         [JsonIgnore]
-        public virtual string ConfigurationSectionName => $"MigrationTools:EndpointEnricherDefaults:{OptionsFor}";
+        public virtual string ConfigurationSectionName => $"MigrationTools:EndpointEnricherDefaults:{OptionFor}";
         [JsonIgnore]
-        public virtual string OptionsFor => $"{GetType().Name.Replace("Options", "")}";
+        public virtual string OptionFor => $"{GetType().Name.Replace("Options", "")}";
 
         [JsonProperty(Order = -2)]
         public bool Enabled { get; set; }

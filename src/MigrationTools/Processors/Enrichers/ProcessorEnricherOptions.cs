@@ -6,9 +6,9 @@ namespace MigrationTools.Enrichers
     public abstract class ProcessorEnricherOptions : IProcessorEnricherOptions
     {
         [JsonIgnore]
-        public virtual string ConfigurationSectionName => $"MigrationTools:ProcessorEnricherDefaults:{OptionsFor}";
+        public virtual string ConfigurationSectionName => $"MigrationTools:ProcessorEnricherDefaults:{OptionFor}";
         [JsonIgnore]
-        public virtual string OptionsFor => $"{GetType().Name.Replace("Options", "")}";
+        public virtual string OptionFor => $"{GetType().Name.Replace("Options", "")}";
 
         /// <summary>
         /// If enabled this will run this migrator

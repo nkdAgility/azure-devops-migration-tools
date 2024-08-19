@@ -6,21 +6,13 @@ namespace MigrationTools.Tools
     /// </summary>
     /// <status>ready</status>
     /// <processingtarget>Work Item Field</processingtarget>
-    public class RegexFieldMapOptions : IFieldMapOptions
+    public class RegexFieldMapOptions : FieldMapOptions
     {
         public string WorkItemTypeName { get; set; }
         public string sourceField { get; set; }
         public string targetField { get; set; }
         public string pattern { get; set; }
         public string replacement { get; set; }
-
-        public string FieldMap
-        {
-            get
-            {
-                return "RegexFieldMap";
-            }
-        }
 
         public void SetExampleConfigDefaults()
         {

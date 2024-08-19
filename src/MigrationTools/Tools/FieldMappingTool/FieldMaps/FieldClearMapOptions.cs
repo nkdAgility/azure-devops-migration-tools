@@ -7,18 +7,10 @@ namespace MigrationTools.Tools
     /// </summary>
     /// <status>ready</status>
     /// <processingtarget>Work Item</processingtarget>
-    public class FieldClearMapOptions : IFieldMapOptions
+    public class FieldClearMapOptions : FieldMapOptions
     {
         public string WorkItemTypeName { get; set; }
         public string targetField { get; set; }
-
-        public string FieldMap
-        {
-            get
-            {
-                return "FieldClearMap";
-            }
-        }
 
         public void SetExampleConfigDefaults()
         {

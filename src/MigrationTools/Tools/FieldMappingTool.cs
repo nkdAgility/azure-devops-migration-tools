@@ -26,13 +26,13 @@ namespace MigrationTools.Tools
             {
                 foreach (IFieldMapOptions fieldmapConfig in Options.FieldMaps)
                 {
-                    Log.LogInformation("FieldMappingTool: Adding FieldMap {FieldMapName} for {WorkItemTypeName}", fieldmapConfig.FieldMap, fieldmapConfig.WorkItemTypeName);
-                    string typePattern = $"MigrationTools.Sinks.*.FieldMaps.{fieldmapConfig.FieldMap}";
+                    Log.LogInformation("FieldMappingTool: Adding FieldMap {FieldMapName} for {WorkItemTypeName}", fieldmapConfig.OptionFor, string.Join(", ", fieldmapConfig.ApplyTo));
+                    string typePattern = $"MigrationTools.Sinks.*.FieldMaps.{fieldmapConfig.ApplyTo}";
 
                     Type type = AppDomain.CurrentDomain.GetAssemblies()
                              .Where(a => !a.IsDynamic)
                              .SelectMany(a => a.GetTypes())
-                             .FirstOrDefault(t => t.Name.Equals(fieldmapConfig.FieldMap) || t.FullName.Equals(typePattern));
+                             .FirstOrDefault(t => t.Name.Equals(fieldmapConfig.ApplyTo) || t.FullName.Equals(typePattern));
 
                     if (type == null)
                     {
@@ -41,7 +41,10 @@ namespace MigrationTools.Tools
                     }
                     IFieldMap fm = (IFieldMap)Services.GetRequiredService(type);
                     fm.Configure(fieldmapConfig);
-                    AddFieldMap(fieldmapConfig.WorkItemTypeName, fm);
+                    foreach (string workItemTypeName in fieldmapConfig.ApplyTo)
+                    {
+                        AddFieldMap(workItemTypeName, fm);
+                    }
                 }
             }
         }

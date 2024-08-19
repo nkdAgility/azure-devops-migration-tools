@@ -2,6 +2,7 @@
 using System;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 using MigrationTools.Tools.Infrastructure;
+using MigrationTools.Tools;
 
 namespace MigrationTools.Clients.AzureDevops.Rest.FieldMaps
 {

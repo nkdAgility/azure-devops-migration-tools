@@ -8,19 +8,11 @@ namespace MigrationTools.Tools
     /// </summary>
     /// <status>ready</status>
     /// <processingtarget>Work Item Field</processingtarget>
-    public class MultiValueConditionalMapOptions : IFieldMapOptions
+    public class MultiValueConditionalMapOptions : FieldMapOptions
     {
         public string WorkItemTypeName { get; set; }
         public Dictionary<string, string> sourceFieldsAndValues { get; set; }
         public Dictionary<string, string> targetFieldsAndValues { get; set; }
-
-        public string FieldMap
-        {
-            get
-            {
-                return "MultiValueConditionalMap";
-            }
-        }
 
         public void SetExampleConfigDefaults()
         {

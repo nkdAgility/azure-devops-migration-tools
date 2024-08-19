@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
@@ -35,7 +36,7 @@ namespace MigrationTools.Engine.Containers.Tests
 
             var testSimple = new SimpleFieldMapConfigMock
             {
-                WorkItemTypeName = "*"
+                ApplyTo = new List<string> { "*" },
             };
             config.Value.FieldMaps.Add(testSimple);
 

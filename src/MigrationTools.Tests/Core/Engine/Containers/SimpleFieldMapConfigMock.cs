@@ -3,18 +3,8 @@ using MigrationTools.Tools.Infrastructure;
 
 namespace MigrationTools.Engine.Containers.Tests
 {
-    public class SimpleFieldMapConfigMock : IFieldMapOptions
+    public class SimpleFieldMapConfigMock : FieldMapOptions
     {
-        public string WorkItemTypeName { get; set; }
-
-        public string FieldMap
-        {
-            get
-            {
-                return "SimpleFieldMapMock";
-            }
-        }
-
         public void SetExampleConfigDefaults()
         {
             throw new System.NotImplementedException();
