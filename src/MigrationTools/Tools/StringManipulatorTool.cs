@@ -8,13 +8,14 @@ using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
 using MigrationTools.Processors;
 using MigrationTools.Processors.Infrastructure;
+using MigrationTools.Tools.Infrastructure;
 
 namespace MigrationTools.Tools
 {
     /// <summary>
     /// Used to process the String fields of a work item. This is useful for cleaning up data. It will limit fields to a max length and apply regex replacements based on what is configured. Each regex replacement is applied in order and can be enabled or disabled.
     /// </summary>
-    public class StringManipulatorTool : Infra.Tool<StringManipulatorToolOptions>
+    public class StringManipulatorTool : Tool<StringManipulatorToolOptions>
     {
 
         public StringManipulatorTool(IOptions<StringManipulatorToolOptions> options, IServiceProvider services, ILogger<StringManipulatorTool> logger, ITelemetryLogger telemetryLogger)

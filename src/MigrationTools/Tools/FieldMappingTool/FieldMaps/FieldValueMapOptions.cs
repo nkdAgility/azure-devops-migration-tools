@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using MigrationTools.Tools.Infrastructure;
 
-namespace MigrationTools._EngineV1.Configuration.FieldMap
+namespace MigrationTools.Tools
 {
     /// <summary>
     /// Need to map not just the field but also values? This is the default value mapper.

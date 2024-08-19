@@ -1,8 +1,9 @@
 ﻿using System;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools.DataContracts;
+using MigrationTools.Tools.Infrastructure;
 
-namespace MigrationTools._EngineV1.Containers
+namespace MigrationTools.Tools.Infrastructure
 {
     public interface IFieldMap
     {

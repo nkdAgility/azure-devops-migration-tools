@@ -11,11 +11,11 @@ using MigrationTools._EngineV1.Containers;
 using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
 using MigrationTools.Processors;
-using MigrationTools.Tools.Infra;
+using MigrationTools.Tools.Infrastructure;
 
 namespace MigrationTools.Tools
 {
-    public class FieldMappingTool : Infra.Tool<FieldMappingToolOptions>
+    public class FieldMappingTool : Tool<FieldMappingToolOptions>
     {
 
         private Dictionary<string, List<IFieldMap>> fieldMapps = new Dictionary<string, List<IFieldMap>>();

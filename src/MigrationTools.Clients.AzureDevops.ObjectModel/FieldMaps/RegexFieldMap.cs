@@ -3,8 +3,9 @@ using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools._EngineV1.Configuration;
-using MigrationTools._EngineV1.Configuration.FieldMap;
+using MigrationTools.Tools.Infrastructure;
 using MigrationTools.DataContracts;
+using MigrationTools.Tools;
 
 namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
 {

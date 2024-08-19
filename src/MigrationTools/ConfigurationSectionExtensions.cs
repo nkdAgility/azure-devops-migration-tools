@@ -9,7 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Enrichers;
 using MigrationTools.Options;
-using MigrationTools.Tools.Infra;
+using MigrationTools.Tools.Infrastructure;
 using Serilog;
 using static System.Collections.Specialized.BitVector32;
 

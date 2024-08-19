@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace MigrationTools.Tools.Infra
+namespace MigrationTools.Tools.Infrastructure
 {
     public class ITool
     {

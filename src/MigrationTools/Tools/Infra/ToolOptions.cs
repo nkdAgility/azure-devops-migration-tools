@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Newtonsoft.Json;
 
-namespace MigrationTools.Tools.Infra
+namespace MigrationTools.Tools.Infrastructure
 {
     public abstract class ToolOptions : IToolOptions
     {

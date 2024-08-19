@@ -1,7 +1,8 @@
 ﻿using System;
 using MigrationTools.Options;
+using MigrationTools.Tools.Infrastructure;
 
-namespace MigrationTools._EngineV1.Configuration.FieldMap
+namespace MigrationTools.Tools
 {
     /// <summary>
     /// Want to take a field and convert its value to a tag? Done...

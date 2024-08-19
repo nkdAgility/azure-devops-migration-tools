@@ -1,7 +1,7 @@
 ﻿using MigrationTools.Options;
 using Newtonsoft.Json;
 
-namespace MigrationTools._EngineV1.Configuration
+namespace MigrationTools.Tools.Infrastructure
 {
     public interface IFieldMapOptions
     {

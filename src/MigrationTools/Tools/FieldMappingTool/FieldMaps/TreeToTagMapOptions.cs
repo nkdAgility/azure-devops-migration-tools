@@ -1,4 +1,6 @@
-﻿namespace MigrationTools._EngineV1.Configuration.FieldMap
+﻿using MigrationTools.Tools.Infrastructure;
+
+namespace MigrationTools.Tools
 {
     /// <summary>
     /// Need to clear out those nasty Area tree hierarchies? This creates Tags for each node in the Area Path...

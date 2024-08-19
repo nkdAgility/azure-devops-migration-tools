@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using MigrationTools.Tools.Infrastructure;
 
-namespace MigrationTools._EngineV1.Configuration.FieldMap
+namespace MigrationTools.Tools
 {
     /// <summary>
     /// Ever wanted to merge two or three fields? This mapping will let you do just that.

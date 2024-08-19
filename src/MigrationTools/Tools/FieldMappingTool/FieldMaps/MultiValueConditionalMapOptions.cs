@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using MigrationTools.Tools.Infrastructure;
 
-namespace MigrationTools._EngineV1.Configuration.FieldMap
+namespace MigrationTools.Tools
 {
     /// <summary>
     /// ??? If you know how to use this please send a PR :)

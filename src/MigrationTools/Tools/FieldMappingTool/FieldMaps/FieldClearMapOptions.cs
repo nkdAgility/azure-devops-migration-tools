@@ -1,4 +1,6 @@
-﻿namespace MigrationTools._EngineV1.Configuration.FieldMap
+﻿using MigrationTools.Tools.Infrastructure;
+
+namespace MigrationTools.Tools
 {
     /// <summary>
     /// Allows you to set an already populated field to Null. This will only work with fields that support null.

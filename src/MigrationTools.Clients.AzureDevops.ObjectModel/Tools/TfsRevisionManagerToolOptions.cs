@@ -1,6 +1,6 @@
 ﻿using System;
 using MigrationTools.Enrichers;
-using MigrationTools.Tools.Infra;
+using MigrationTools.Tools.Infrastructure;
 
 namespace MigrationTools.Tools
 {

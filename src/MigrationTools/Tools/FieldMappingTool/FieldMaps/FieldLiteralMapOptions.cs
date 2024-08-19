@@ -1,4 +1,6 @@
-﻿namespace MigrationTools._EngineV1.Configuration.FieldMap
+﻿using MigrationTools.Tools.Infrastructure;
+
+namespace MigrationTools.Tools
 {
     /// <summary>
     /// Sets a field on the `target` to b a specific value.

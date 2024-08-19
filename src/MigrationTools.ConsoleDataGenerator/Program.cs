@@ -16,7 +16,7 @@ using MigrationTools.Options;
 using System.Text;
 using MigrationTools.ConsoleDataGenerator.ReferenceData;
 using Microsoft.VisualStudio.Services.Common;
-using MigrationTools.Tools.Infra;
+using MigrationTools.Tools.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using MigrationTools.Processors.Infrastructure;
 

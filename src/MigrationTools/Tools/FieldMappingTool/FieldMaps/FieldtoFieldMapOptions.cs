@@ -1,5 +1,7 @@
 ﻿
-namespace MigrationTools._EngineV1.Configuration.FieldMap
+using MigrationTools.Tools.Infrastructure;
+
+namespace MigrationTools.Tools
 {
     /// <summary>
     /// Just want to map one field to another? This is the one for you.

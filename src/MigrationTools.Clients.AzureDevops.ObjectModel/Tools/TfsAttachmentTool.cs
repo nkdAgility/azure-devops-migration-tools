@@ -13,7 +13,7 @@ using MigrationTools.DataContracts;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
 using MigrationTools.Processors;
-using MigrationTools.Tools.Infra;
+using MigrationTools.Tools.Infrastructure;
 using Serilog;
 
 namespace MigrationTools.Tools

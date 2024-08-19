@@ -5,7 +5,7 @@ using Microsoft.Extensions.Options;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Enrichers;
 using MigrationTools.Options;
-using MigrationTools.Tools.Infra;
+using MigrationTools.Tools.Infrastructure;
 
 namespace MigrationTools.Tools
 {

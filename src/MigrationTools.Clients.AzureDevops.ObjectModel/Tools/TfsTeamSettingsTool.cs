@@ -24,7 +24,7 @@ using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
 using MigrationTools.Processors;
 using MigrationTools.Processors.Infrastructure;
-using MigrationTools.Tools.Infra;
+using MigrationTools.Tools.Infrastructure;
 
 namespace MigrationTools.Tools
 {

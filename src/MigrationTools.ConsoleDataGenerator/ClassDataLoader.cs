@@ -11,6 +11,7 @@ using Newtonsoft.Json.Linq;
 using MigrationTools;
 using System.Configuration;
 using Newtonsoft.Json;
+using MigrationTools.Tools.Infrastructure;
 
 namespace MigrationTools.ConsoleDataGenerator
 {

@@ -4,7 +4,7 @@ using System.Text;
 using MigrationTools.Options;
 using Newtonsoft.Json;
 
-namespace MigrationTools.Tools.Infra
+namespace MigrationTools.Tools.Infrastructure
 {
     public interface IToolOptions : IOptions
     {

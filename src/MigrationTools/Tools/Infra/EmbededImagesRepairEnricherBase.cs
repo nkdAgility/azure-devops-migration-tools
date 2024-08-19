@@ -9,7 +9,7 @@ using Microsoft.Extensions.Options;
 using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
 
-namespace MigrationTools.Tools.Infra
+namespace MigrationTools.Tools.Infrastructure
 {
     public abstract class EmbededImagesRepairToolBase<ToolOptions> : Tool<ToolOptions> where ToolOptions : class, IToolOptions, new()
     {

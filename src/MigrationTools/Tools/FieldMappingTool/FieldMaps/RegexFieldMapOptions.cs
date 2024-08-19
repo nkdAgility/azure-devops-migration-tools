@@ -1,4 +1,5 @@
-﻿namespace MigrationTools._EngineV1.Configuration.FieldMap
+﻿using MigrationTools.Tools.Infrastructure;
+namespace MigrationTools.Tools
 {
     /// <summary>
     ///  I just need that bit of a field... need to send "2016.2" to two fields, one for year and one for release? Done.

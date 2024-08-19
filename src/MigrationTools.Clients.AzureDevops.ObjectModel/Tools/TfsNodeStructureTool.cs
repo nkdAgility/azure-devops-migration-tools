@@ -17,7 +17,7 @@ using MigrationTools.Enrichers;
 using MigrationTools.FieldMaps;
 using MigrationTools.Processors;
 using MigrationTools.Processors.Infrastructure;
-using MigrationTools.Tools.Infra;
+using MigrationTools.Tools.Infrastructure;
 using Newtonsoft.Json;
 using Serilog.Context;
 using Serilog.Events;

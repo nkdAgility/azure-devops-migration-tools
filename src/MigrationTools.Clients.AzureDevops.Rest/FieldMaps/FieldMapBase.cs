@@ -4,6 +4,7 @@ using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Containers;
 using MigrationTools.DataContracts;
+using MigrationTools.Tools.Infrastructure;
 using Serilog;
 
 namespace MigrationTools.Clients.AzureDevops.Rest.FieldMaps

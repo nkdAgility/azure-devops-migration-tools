@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using MigrationTools.Tools.Infrastructure;
 
-namespace MigrationTools._EngineV1.Configuration.FieldMap
+namespace MigrationTools.Tools
 {
     /// <summary>
     /// Want to setup a bunch of field maps in a single go. Use this shortcut!

@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
 using MigrationTools.Processors;
+using MigrationTools.Tools.Infrastructure;
 using static Microsoft.VisualStudio.Services.Graph.GraphResourceIds.Users;
 
 namespace MigrationTools.Tools
@@ -14,7 +15,7 @@ namespace MigrationTools.Tools
     /// <summary>
     /// Used to process the String fields of a work item. This is useful for cleaning up data. It will limit fields to a max length and apply regex replacements based on what is configured. Each regex replacement is applied in order and can be enabled or disabled.
     /// </summary>
-    public class WorkItemTypeMappingTool : Infra.Tool<WorkItemTypeMappingToolOptions>
+    public class WorkItemTypeMappingTool : Tool<WorkItemTypeMappingToolOptions>
     {
         public Dictionary<string, string> Mappings { get; private set; }
 

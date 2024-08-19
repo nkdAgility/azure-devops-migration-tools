@@ -2,6 +2,7 @@
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Containers;
 using MigrationTools.DataContracts;
+using MigrationTools.Tools.Infrastructure;
 
 namespace MigrationTools.Engine.Containers.Tests
 {
