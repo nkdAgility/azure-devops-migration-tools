@@ -55,7 +55,6 @@
 
   <ItemGroup>
     <Folder Include="Processors\Infrastructure\" />
-    <Folder Include="_EngineV1\Configuration\Processing\" />
   </ItemGroup>
 
 </Project>
