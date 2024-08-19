@@ -10,14 +10,18 @@ namespace MigrationTools.Options
         /// </summary>
         public string RefName { get; set; }
 
-        [JsonIgnore]
-        Type ToConfigure { get; }
+        //[JsonIgnore]
+        //Type ToConfigure { get; }
 
-        void SetDefaults();
+        //void SetDefaults();
     }
 
     public interface IOptions
     {
+        [JsonIgnore]
+        public string OptionsFor { get; }
+        [JsonIgnore]
+        public string ConfigurationSectionName { get; }
 
     }
 }

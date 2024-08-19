@@ -97,7 +97,7 @@ namespace MigrationTools.ConsoleDataGenerator
                 data.OptionsClassName = typeOption.Name;
                 data.OptionsClassFile = codeFinder.FindCodeFile(typeOption);
                 object targetItem = null;
-                var ConfigurationSectionName = typeOption.GetField("ConfigurationSectionName")?.GetRawConstantValue().ToString();
+                var ConfigurationSectionName = ((IOptions)typeOption).ConfigurationSectionName;
                 if (!string.IsNullOrEmpty(ConfigurationSectionName))
                 {
                     Console.WriteLine("Processing as ConfigurationSectionName");
@@ -106,17 +106,10 @@ namespace MigrationTools.ConsoleDataGenerator
                     section.Bind(targetItem);
                     data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "default", SampleFor = data.OptionsClassFullName, Code = ConvertSectionWithPathToJson(configuration, section).Trim() } );
                 }
-                if (typeOption.GetInterfaces().Contains(typeof(IProcessorConfig)))
-                {
-                    Console.WriteLine("Processing as IProcessorConfig");
-                    var options = (IProcessorConfig)Activator.CreateInstance(typeOption);
-                    targetItem = options;
-                }
-                if (typeOption.GetInterfaces().Contains(typeof(IOldOptions)))
+                if (typeOption.GetInterfaces().Contains(typeof(IOptions)))
                 {
                     Console.WriteLine("Processing as IOptions");
                     var options = (IOldOptions)Activator.CreateInstance(typeOption);
-                    options.SetDefaults();
                     targetItem = options;
                 }
                 if (typeOption.GetInterfaces().Contains(typeof(IFieldMapConfig)))

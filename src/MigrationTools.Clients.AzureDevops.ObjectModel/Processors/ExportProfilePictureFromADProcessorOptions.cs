@@ -4,12 +4,9 @@ using MigrationTools.Enrichers;
 
 namespace MigrationTools.Processors
 {
-    public class ExportProfilePictureFromADProcessorOptions : IProcessorConfig
+    public class ExportProfilePictureFromADProcessorOptions : ProcessorOptions
     {
-        /// <summary>
-        /// A list of enrichers that can augment the proccessing of the data
-        /// </summary>
-        public List<IProcessorEnricher> Enrichers { get; set; }
+
 
         /// <summary>
         /// The source domain where the pictures should be exported. 
@@ -35,19 +32,5 @@ namespace MigrationTools.Processors
         /// <default>String.Empty</default>
         public string PictureEmpIDFormat { get; set; }
 
-        /// <inheritdoc />
-        public bool Enabled { get; set; }
-
-        /// <inheritdoc />
-        public string Processor
-        {
-            get { return "ExportProfilePictureFromADProcessor"; }
-        }
-
-        /// <inheritdoc />
-        public bool IsProcessorCompatible(IReadOnlyList<IProcessorConfig> otherProcessors)
-        {
-            return true;
-        }
     }
 }

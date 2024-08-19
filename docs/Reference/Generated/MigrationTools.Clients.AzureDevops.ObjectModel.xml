@@ -4,11 +4,6 @@
         <name>MigrationTools.Clients.AzureDevops.ObjectModel</name>
     </assembly>
     <members>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationProcessorOptions.Enrichers">
-            <summary>
-            A list of enrichers that can augment the proccessing of the data
-            </summary>
-        </member>
         <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationProcessorOptions.OnlyElementsWithTag">
             <summary>
             The tag name that is present on all elements that must be migrated. If this option isn't present this processor will migrate all.
@@ -33,24 +28,17 @@
             </summary>
             <default>0</default>
         </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationProcessorOptions.Processor">
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationProcessorOptions.RemoveInvalidTestSuiteLinks">
             <summary>
             Indicates whether the configuration for node structure transformation should be taken from the common enricher configs. Otherwise the configuration elements below are used
             </summary>
             <default>false</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationProcessorOptions.RemoveInvalidTestSuiteLinks">
             <summary>
             Remove Invalid Links, see https://github.com/nkdAgility/azure-devops-migration-tools/issues/178
             </summary>
         </member>
         <member name="M:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationProcessorOptions.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
             <inheritdoc />
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemBulkEditProcessorOptions.Enrichers">
-            <summary>
-            A list of enrichers that can augment the proccessing of the data
-            </summary>
         </member>
         <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemBulkEditProcessorOptions.WIQLQuery">
             <summary>
@@ -84,9 +72,6 @@
             </summary>
             <default>5</default>
         </member>
-        <member name="M:MigrationTools._EngineV1.Configuration.Processing.WorkItemBulkEditProcessorOptions.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
-            <inheritdoc />
-        </member>
         <member name="T:MigrationTools.Processors.CreateTeamFolders">
             <summary>
             Creates folders in Sared Queries for each Team
@@ -100,11 +85,6 @@
             </summary>
             <status>alpha</status>
             <processingtarget>Profiles</processingtarget>
-        </member>
-        <member name="P:MigrationTools.Processors.ExportProfilePictureFromADProcessorOptions.Enrichers">
-            <summary>
-            A list of enrichers that can augment the proccessing of the data
-            </summary>
         </member>
         <member name="P:MigrationTools.Processors.ExportProfilePictureFromADProcessorOptions.Domain">
             <summary>
@@ -130,15 +110,6 @@
             </summary>
             <default>String.Empty</default>
         </member>
-        <member name="P:MigrationTools.Processors.ExportProfilePictureFromADProcessorOptions.Enabled">
-            <inheritdoc />
-        </member>
-        <member name="P:MigrationTools.Processors.ExportProfilePictureFromADProcessorOptions.Processor">
-            <inheritdoc />
-        </member>
-        <member name="M:MigrationTools.Processors.ExportProfilePictureFromADProcessorOptions.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
-            <inheritdoc />
-        </member>
         <member name="T:MigrationTools.Processors.ExportUsersForMappingProcessor">
             <summary>
             ExportUsersForMappingContext is a tool used to create a starter mapping file for users between the source and target systems.
@@ -147,27 +118,11 @@
             <status>ready</status>
             <processingtarget>Work Items</processingtarget>
         </member>
-        <member name="P:MigrationTools.Processors.ExportUsersForMappingProcessorOptions.Enrichers">
-            <summary>
-            A list of enrichers that can augment the proccessing of the data
-            </summary>
-        </member>
         <!-- Badly formed XML comment ignored for member "P:MigrationTools.Processors.ExportUsersForMappingProcessorOptions.OnlyListUsersInWorkItems" -->
-        <member name="M:MigrationTools.Processors.ExportUsersForMappingProcessorOptions.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
-            <inheritdoc />
-        </member>
         <member name="T:MigrationTools.Processors.FakeProcessor">
             <summary>
             Note: this is only for internal usage. Don't use this in your configurations.
             </summary>
-        </member>
-        <member name="P:MigrationTools.Processors.FixGitCommitLinksProcessorOptions.Enrichers">
-            <summary>
-            A list of enrichers that can augment the proccessing of the data
-            </summary>
-        </member>
-        <member name="M:MigrationTools.Processors.FixGitCommitLinksProcessorOptions.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
-            <inheritdoc />
         </member>
         <member name="T:MigrationTools.Processors.ImportProfilePictureProcessor">
             <summary>
@@ -176,40 +131,12 @@
             <status>alpha</status>
             <processingtarget>Profiles</processingtarget>
         </member>
-        <member name="P:MigrationTools.Processors.ImportProfilePictureProcessorOptions.Enabled">
-            <inheritdoc />
-        </member>
-        <member name="P:MigrationTools.Processors.ImportProfilePictureProcessorOptions.Enrichers">
-            <summary>
-            A list of enrichers that can augment the proccessing of the data
-            </summary>
-        </member>
-        <member name="P:MigrationTools.Processors.ImportProfilePictureProcessorOptions.Processor">
-            <inheritdoc />
-        </member>
-        <member name="M:MigrationTools.Processors.ImportProfilePictureProcessorOptions.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
-            <inheritdoc />
-        </member>
         <member name="T:MigrationTools.Processors.TestConfigurationsMigrationProcessor">
             <summary>
             This processor can migrate `test configuration`. This should be run before `LinkMigrationConfig`.
             </summary>
             <status>Beta</status>
             <processingtarget>Suites &amp; Plans</processingtarget>
-        </member>
-        <member name="P:MigrationTools.Processors.TestConfigurationsMigrationProcessorOptions.Enabled">
-            <inheritdoc />
-        </member>
-        <member name="P:MigrationTools.Processors.TestConfigurationsMigrationProcessorOptions.Enrichers">
-            <summary>
-            A list of enrichers that can augment the proccessing of the data
-            </summary>
-        </member>
-        <member name="P:MigrationTools.Processors.TestConfigurationsMigrationProcessorOptions.Processor">
-            <inheritdoc />
-        </member>
-        <member name="M:MigrationTools.Processors.TestConfigurationsMigrationProcessorOptions.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
-            <inheritdoc />
         </member>
         <member name="T:MigrationTools.Processors.TestPlansAndSuitesMigrationProcessor">
             <summary>
@@ -372,14 +299,6 @@
             <status>ready</status>
             <processingtarget>WorkItem</processingtarget>
         </member>
-        <member name="P:MigrationTools.Processors.WorkItemDeleteProcessorOptions.Enrichers">
-            <summary>
-            A list of enrichers that can augment the proccessing of the data
-            </summary>
-        </member>
-        <member name="M:MigrationTools.Processors.WorkItemDeleteProcessorOptions.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
-            <inheritdoc />
-        </member>
         <member name="T:MigrationTools.Processors.WorkItemMigrationProcessor">
             <summary>
             WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links, and Attachments.
@@ -387,11 +306,6 @@
             </summary>
             <status>ready</status>
             <processingtarget>Work Items</processingtarget>
-        </member>
-        <member name="P:MigrationTools.Processors.WorkItemMigrationProcessorOptions.Enrichers">
-            <summary>
-            A list of enrichers that can augment the proccessing of the data
-            </summary>
         </member>
         <member name="P:MigrationTools.Processors.WorkItemMigrationProcessorOptions.UpdateCreatedDate">
             <summary>
@@ -414,18 +328,6 @@
             A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)
             </summary>
             <default>SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [[System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc</default>
-        </member>
-        <member name="P:MigrationTools.Processors.WorkItemMigrationProcessorOptions.Enabled">
-            <summary>
-            If enabled then the processor will run
-            </summary>
-            <default>false</default>
-        </member>
-        <member name="P:MigrationTools.Processors.WorkItemMigrationProcessorOptions.Processor">
-            <summary>
-            Name used to identify this processor
-            </summary>
-            <default>?</default>
         </member>
         <member name="P:MigrationTools.Processors.WorkItemMigrationProcessorOptions.FixHtmlAttachmentLinks">
             <summary>
@@ -490,9 +392,6 @@
             When set to true, this setting will skip a revision if the source area has not been migrated, has been deleted or is somehow invalid, etc.
             </summary>
         </member>
-        <member name="M:MigrationTools.Processors.WorkItemMigrationProcessorOptions.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
-            <inheritdoc />
-        </member>
         <member name="M:MigrationTools.Processors.WorkItemMigrationProcessorOptions.#ctor">
             <summary>
             Creates a new workitemmigrationconfig with default values
@@ -510,17 +409,6 @@
             A list of work items to import
             </summary>
             <default>[]</default>
-        </member>
-        <member name="P:MigrationTools.Processors.WorkItemPostProcessingProcessorOptions.Enabled">
-            <inheritdoc />
-        </member>
-        <member name="P:MigrationTools.Processors.WorkItemPostProcessingProcessorOptions.Processor">
-            <inheritdoc />
-        </member>
-        <member name="P:MigrationTools.Processors.WorkItemPostProcessingProcessorOptions.Enrichers">
-            <summary>
-            A list of enrichers that can augment the proccessing of the data
-            </summary>
         </member>
         <member name="P:MigrationTools.Processors.WorkItemPostProcessingProcessorOptions.WIQLQuery">
             <summary>
@@ -548,9 +436,6 @@
             </summary>
             <default>5</default>
         </member>
-        <member name="M:MigrationTools.Processors.WorkItemPostProcessingProcessorOptions.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
-            <inheritdoc />
-        </member>
         <member name="T:MigrationTools.Processors.WorkItemUpdateAreasAsTagsProcessor">
             <summary>
             A common issue with older *TFS/Azure DevOps* instances is the proliferation of `Area Paths`. With the use of `Area Path` for `Teams` and the addition of the `Node Name` column option these extensive tag hierarchies should instad be moved to tags.
@@ -563,15 +448,6 @@
             This is a required parameter. That define the root path of the iteration. To get the full path use `\` 
             </summary>
             <default>\</default>
-        </member>
-        <member name="P:MigrationTools.Processors.WorkItemUpdateAreasAsTagsProcessorOptions.Enabled">
-            <inheritdoc />
-        </member>
-        <member name="P:MigrationTools.Processors.WorkItemUpdateAreasAsTagsProcessorOptions.Processor">
-            <inheritdoc />
-        </member>
-        <member name="M:MigrationTools.Processors.WorkItemUpdateAreasAsTagsProcessorOptions.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
-            <inheritdoc />
         </member>
         <member name="P:MigrationTools.Tools.TfsAttachmentToolOptions.ExportBasePath">
             <summary>

@@ -4,7 +4,7 @@ using MigrationTools.Enrichers;
 
 namespace MigrationTools.Processors
 {
-    public class TestVariablesMigrationProcessorOptions : IProcessorConfig
+    public class TestVariablesMigrationProcessorOptions : ProcessorOptions
     {
         /// <inheritdoc />
         public bool Enabled { get; set; }

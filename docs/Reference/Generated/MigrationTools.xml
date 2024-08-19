@@ -123,6 +123,11 @@
             <remarks>From https://stackoverflow.com/a/9446045/1317161</remarks>
             <returns>Image format</returns>
         </member>
+        <member name="P:MigrationTools.Tools.Infra.ToolOptions.Enabled">
+            <summary>
+            If set to `true` then the processor will run. Set to `false` and the processor will not run.
+            </summary>
+        </member>
         <member name="T:MigrationTools.Tools.StringManipulatorTool">
             <summary>
             Used to process the String fields of a work item. This is useful for cleaning up data. It will limit fields to a max length and apply regex replacements based on what is configured. Each regex replacement is applied in order and can be enabled or disabled.
@@ -347,27 +352,27 @@
         </member>
         <member name="F:ThisAssembly.Git.Commit">
             <summary>
-            => @"58da142"
+            => @"0ab81d0"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Sha">
             <summary>
-            => @"58da142acdef2ea6af58be657f1a37dee48c3cf2"
+            => @"0ab81d0eb8b4f5ff87afbcb9d0d90ba6edca7419"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.CommitDate">
             <summary>
-            => @"2024-08-19T09:16:15+01:00"
+            => @"2024-08-19T12:16:06+01:00"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commits">
             <summary>
-            => @"114"
+            => @"115"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Tag">
             <summary>
-            => @"v15.1.8-Preview.9-114-g58da142"
+            => @"v15.1.8-Preview.9-115-g0ab81d0"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseTag">
@@ -402,7 +407,7 @@
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Patch">
             <summary>
-            => @"122"
+            => @"123"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Label">

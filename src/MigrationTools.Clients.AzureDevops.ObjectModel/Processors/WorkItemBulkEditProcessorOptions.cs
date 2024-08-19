@@ -4,21 +4,10 @@ using MigrationTools.Processors;
 
 namespace MigrationTools._EngineV1.Configuration.Processing
 {
-    public class WorkItemBulkEditProcessorOptions : IWorkItemProcessorConfig
+    public class WorkItemBulkEditProcessorOptions : ProcessorOptions, IWorkItemProcessorConfig
     {
         public bool WhatIf { get; set; }
 
-        public bool Enabled { get; set; }
-
-        /// <summary>
-        /// A list of enrichers that can augment the proccessing of the data
-        /// </summary>
-        public List<IProcessorEnricher> Enrichers { get; set; }
-
-        public string Processor
-        {
-            get { return typeof(WorkItemBulkEditProcessor).Name; }
-        }
 
         /// <summary>
         /// A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)
@@ -53,11 +42,6 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         /// <default>5</default>
         public int WorkItemCreateRetryLimit { get; set; }
 
-        /// <inheritdoc />
-        public bool IsProcessorCompatible(IReadOnlyList<IProcessorConfig> otherProcessors)
-        {
-            return true;
-        }
 
         public WorkItemBulkEditProcessorOptions()
         {

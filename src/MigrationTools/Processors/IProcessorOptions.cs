@@ -22,6 +22,6 @@ namespace MigrationTools.Processors
         /// </summary>
         List<IProcessorEnricherOptions> ProcessorEnrichers { get; set; }
 
-        IProcessorOptions GetDefault();
+        IProcessorOptions GetSample();
     }
 }

@@ -38,7 +38,8 @@ namespace MigrationTools.Enrichers
             {
                 foreach (IProcessorEnricherOptions item in enrichers)
                 {
-                    var pe = (WorkItemProcessorEnricher)Services.GetRequiredService(item.ToConfigure);
+                    var peType = AppDomain.CurrentDomain.GetMigrationToolsTypes().WithNameString(item.GetType().Name.Replace("Options", ""));
+                    var pe = (WorkItemProcessorEnricher)Services.GetRequiredService(peType);
                     Add(pe);
                     Log.LogInformation("Loading Processor Enricher: {ProcessorEnricherName} {ProcessorEnricherEnabled}", pe.GetType().Name, item.Enabled);
                 }

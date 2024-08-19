@@ -4,16 +4,8 @@ using MigrationTools.Processors;
 
 namespace MigrationTools._EngineV1.Configuration.Processing
 {
-    public class TestPlansAndSuitesMigrationProcessorOptions : IProcessorConfig
+    public class TestPlansAndSuitesMigrationProcessorOptions : ProcessorOptions
     {
-
-        public bool Enabled { get; set; }
-
-        /// <summary>
-        /// A list of enrichers that can augment the proccessing of the data
-        /// </summary>
-        public List<IProcessorEnricher> Enrichers { get; set; }
-
         /// <summary>
         /// The tag name that is present on all elements that must be migrated. If this option isn't present this processor will migrate all.
         /// </summary>
@@ -42,11 +34,6 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         /// Indicates whether the configuration for node structure transformation should be taken from the common enricher configs. Otherwise the configuration elements below are used
         /// </summary>
         /// <default>false</default>
-
-        public string Processor
-        {
-            get { return typeof(TestPlansAndSuitesMigrationProcessor).Name; }
-        }
 
         /// <summary>
         /// Remove Invalid Links, see https://github.com/nkdAgility/azure-devops-migration-tools/issues/178

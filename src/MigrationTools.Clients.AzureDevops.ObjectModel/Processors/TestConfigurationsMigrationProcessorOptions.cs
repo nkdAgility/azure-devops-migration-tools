@@ -5,26 +5,8 @@ using MigrationTools.Processors;
 
 namespace MigrationTools.Processors
 {
-    public class TestConfigurationsMigrationProcessorOptions : IProcessorConfig
+    public class TestConfigurationsMigrationProcessorOptions : ProcessorOptions
     {
-        /// <inheritdoc />
-        public bool Enabled { get; set; }
 
-        /// <summary>
-        /// A list of enrichers that can augment the proccessing of the data
-        /// </summary>
-        public List<IProcessorEnricher> Enrichers { get; set; }
-
-        /// <inheritdoc />
-        public string Processor
-        {
-            get { return typeof(TestConfigurationsMigrationProcessor).Name; }
-        }
-
-        /// <inheritdoc />
-        public bool IsProcessorCompatible(IReadOnlyList<IProcessorConfig> otherProcessors)
-        {
-            return true;
-        }
     }
 }

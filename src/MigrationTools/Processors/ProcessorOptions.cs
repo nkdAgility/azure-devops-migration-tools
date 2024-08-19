@@ -7,6 +7,8 @@ namespace MigrationTools.Processors
 {
     public abstract class ProcessorOptions : IProcessorOptions
     {
+        public virtual string ConfigurationSectionName => $"MigrationTools:ProcessorDefaults:{Processor}";
+        public virtual string Processor => $"{GetType().Name.Replace("Options", "")}";
         /// <summary>
         /// If set to `true` then the processor will run. Set to `false` and the processor will not run.
         /// </summary>
@@ -17,11 +19,6 @@ namespace MigrationTools.Processors
         /// </summary>
         public List<IProcessorEnricher> Enrichers { get; set; }
 
-
-        [Obsolete("Avoid using! V1 Architecture")]
-        public string Processor => ToConfigure.Name;
-
-
         /// <summary>
         /// List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.
         /// </summary>
@@ -30,20 +27,20 @@ namespace MigrationTools.Processors
         public string SourceName { get; set; }
         public string TargetName { get; set; }
 
-        public abstract Type ToConfigure { get; }
-
         /// <summary>
         /// `Refname` will be used in the future to allow for using named Options without the need to copy all of the options.
         /// </summary>
         public string RefName { get; set; }
 
-        public abstract IProcessorOptions GetDefault();
+        public IProcessorOptions GetSample()
+        {
+            throw new NotImplementedException();
+            return null; 
+        }
 
         public bool IsProcessorCompatible(IReadOnlyList<IProcessorConfig> otherProcessors)
         {
             return true;
         }
-
-        public abstract void SetDefaults();
     }
 }

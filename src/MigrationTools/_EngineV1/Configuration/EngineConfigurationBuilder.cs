@@ -335,7 +335,6 @@ namespace MigrationTools._EngineV1.Configuration
             foreach (Type type in types)
             {
                 TInterfaceToFind option = (TInterfaceToFind)Activator.CreateInstance(type);
-                option.SetDefaults();
                 output.Add(option);
             }
             return output;

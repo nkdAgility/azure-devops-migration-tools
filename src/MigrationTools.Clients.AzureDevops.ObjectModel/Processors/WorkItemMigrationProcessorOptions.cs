@@ -6,14 +6,9 @@ using MigrationTools._EngineV1.Configuration;
 namespace MigrationTools.Processors
 {
 
-    public class WorkItemMigrationProcessorOptions : IWorkItemProcessorConfig
+    public class WorkItemMigrationProcessorOptions : ProcessorOptions,  IWorkItemProcessorConfig
     {
-        public const string ConfigurationSectionName = "MigrationTools:ProcessorDefaults:WorkItemMigrationProcessor";
 
-        /// <summary>
-        /// A list of enrichers that can augment the proccessing of the data
-        /// </summary>
-        public List<IProcessorEnricher> Enrichers { get; set; }
 
         /// <summary>
         /// If this is enabled the creation process on the target project will create the items with the original creation date.
@@ -36,18 +31,6 @@ namespace MigrationTools.Processors
         /// </summary>
         /// <default>SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [[System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc</default>
         public string WIQLQuery { get; set; }
-
-        /// <summary>
-        /// If enabled then the processor will run
-        /// </summary>
-        /// <default>false</default>
-        public bool Enabled { get; set; }
-
-        /// <summary>
-        /// Name used to identify this processor
-        /// </summary>
-        /// <default>?</default>
-        public string Processor => typeof(WorkItemMigrationProcessor).Name;
 
         /// <summary>
         /// **beta** If enabled this will fix any image attachments URL's, work item mention URL's or user mentions in the HTML
@@ -112,11 +95,6 @@ namespace MigrationTools.Processors
         /// </summary>
         public bool SkipRevisionWithInvalidAreaPath { get; set; }
 
-        /// <inheritdoc />
-        public bool IsProcessorCompatible(IReadOnlyList<IProcessorConfig> otherProcessors)
-        {
-            return true;
-        }
 
         /// <summary>
         /// Creates a new workitemmigrationconfig with default values

@@ -5,19 +5,9 @@ using MigrationTools._EngineV1.Configuration;
 
 namespace MigrationTools.Processors
 {
-    public class WorkItemDeleteProcessorOptions : IWorkItemProcessorConfig
+    public class WorkItemDeleteProcessorOptions : ProcessorOptions, IWorkItemProcessorConfig
     {
-        public bool Enabled { get; set; }
 
-        /// <summary>
-        /// A list of enrichers that can augment the proccessing of the data
-        /// </summary>
-        public List<IProcessorEnricher> Enrichers { get; set; }
-
-        public string Processor
-        {
-            get { return typeof(WorkItemDeleteProcessor).Name; }
-        }
 
         public WorkItemDeleteProcessorOptions()
         {
@@ -31,10 +21,5 @@ namespace MigrationTools.Processors
         public bool PauseAfterEachWorkItem { get; set; }
         public int WorkItemCreateRetryLimit { get; set; }
 
-        /// <inheritdoc />
-        public bool IsProcessorCompatible(IReadOnlyList<IProcessorConfig> otherProcessors)
-        {
-            return true;
-        }
     }
 }

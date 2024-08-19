@@ -1,11 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Newtonsoft.Json;
 
 namespace MigrationTools.Tools.Infra
 {
     public abstract class ToolOptions : IToolOptions
     {
+        [JsonIgnore]
+        public virtual string ConfigurationSectionName => $"MigrationTools:ProcessorDefaults:{OptionsFor}";
+        [JsonIgnore]
+        public virtual string OptionsFor => $"{GetType().Name.Replace("Options", "")}";
+        /// <summary>
+        /// If set to `true` then the processor will run. Set to `false` and the processor will not run.
+        /// </summary>
+
         public bool Enabled { get; set; }
+
     }
 }

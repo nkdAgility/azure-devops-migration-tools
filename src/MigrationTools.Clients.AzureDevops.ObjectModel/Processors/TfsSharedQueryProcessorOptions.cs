@@ -26,17 +26,5 @@ namespace MigrationTools.Processors
         /// </summary>
         public Dictionary<string, string> SourceToTargetFieldMappings { get; set; }
 
-        public override Type ToConfigure => typeof(TfsSharedQueryProcessor);
-
-        public override IProcessorOptions GetDefault()
-        {
-            return this;
-        }
-
-        public override void SetDefaults()
-        {
-            SourceName = "sourceName";
-            TargetName = "targetName";
-        }
     }
 }
