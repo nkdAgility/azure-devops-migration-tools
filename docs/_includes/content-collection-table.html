@@ -11,7 +11,7 @@
 <tbody class="table-group-divider">
 {% assign collection = site.collections | where: "label", include.collection | first %}
 {% if collection != null %} 
-  {% assign items = collection.docs | where: "typeName", include.typeName | where: "architecture", include.architecture %} 
+  {% assign items = collection.docs | where: "typeName", include.typeName %} 
       {% for item in items %}
       <tr>
         <td scope="row"><a href="{{ site.baseurl }}{{ item.url }}">{{item.className}}</a></td>
