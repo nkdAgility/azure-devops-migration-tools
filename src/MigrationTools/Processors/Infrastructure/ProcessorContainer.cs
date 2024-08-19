@@ -21,15 +21,15 @@ namespace MigrationTools.Processors
         private ILogger<ProcessorContainer> _logger;
         private ProcessorContainerOptions _Options;
 
-        private readonly Lazy<List<_EngineV1.Containers.IProcessor>> _processorsLazy;
+        private readonly Lazy<List<_EngineV1.Containers.IOldProcessor>> _processorsLazy;
 
         public int Count { get { return _processorsLazy.Value.Count; } }
 
-        public ReadOnlyCollection<_EngineV1.Containers.IProcessor> Processors
+        public ReadOnlyCollection<_EngineV1.Containers.IOldProcessor> Processors
         {
             get
             {
-                return new ReadOnlyCollection<_EngineV1.Containers.IProcessor>(_processorsLazy.Value);
+                return new ReadOnlyCollection<_EngineV1.Containers.IOldProcessor>(_processorsLazy.Value);
             }
         }
 
@@ -40,17 +40,17 @@ namespace MigrationTools.Processors
             _logger = logger;
             _Options = options.Value;
             // Initialize the lazy processor list
-            _processorsLazy = new Lazy<List<_EngineV1.Containers.IProcessor>>(() => LoadProcessorsfromOptions(_Options));
+            _processorsLazy = new Lazy<List<_EngineV1.Containers.IOldProcessor>>(() => LoadProcessorsfromOptions(_Options));
         }
 
-        private List<_EngineV1.Containers.IProcessor> LoadProcessorsfromOptions(ProcessorContainerOptions options)
+        private List<_EngineV1.Containers.IOldProcessor> LoadProcessorsfromOptions(ProcessorContainerOptions options)
         {
-            var processors = new List<_EngineV1.Containers.IProcessor>();
+            var processors = new List<_EngineV1.Containers.IOldProcessor>();
             if (options.Processors != null)
             {
                 var enabledProcessors = options.Processors.Where(x => x.Enabled).ToList();
                 _logger.LogInformation("ProcessorContainer: Of {ProcessorCount} configured Processors only {EnabledProcessorCount} are enabled", options.Processors.Count, enabledProcessors.Count);
-                var allTypes = AppDomain.CurrentDomain.GetMigrationToolsTypes().WithInterface<_EngineV1.Containers.IProcessor>().ToList();
+                var allTypes = AppDomain.CurrentDomain.GetMigrationToolsTypes().WithInterface<_EngineV1.Containers.IOldProcessor>().ToList();
 
                 foreach (IProcessorConfig processorConfig in enabledProcessors)
                 {
@@ -67,7 +67,7 @@ namespace MigrationTools.Processors
                             _logger.LogError("Type " + processorConfig.Processor + " not found.", processorConfig.Processor);
                             throw new Exception("Type " + processorConfig.Processor + " not found.");
                         }
-                        _EngineV1.Containers.IProcessor pc = (_EngineV1.Containers.IProcessor)ActivatorUtilities.CreateInstance(_services, type);
+                        _EngineV1.Containers.IOldProcessor pc = (_EngineV1.Containers.IOldProcessor)ActivatorUtilities.CreateInstance(_services, type);
                         processors.Add(pc);
                     }
                     else

@@ -5,7 +5,7 @@ using MigrationTools.Processors;
 
 namespace MigrationTools._EngineV1.Containers
 {
-    public interface IProcessor
+    public interface IOldProcessor
     {
         string Name { get; }
         ProcessingStatus Status { get; }

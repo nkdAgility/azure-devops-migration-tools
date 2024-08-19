@@ -88,7 +88,7 @@ namespace MigrationTools
 
 
             _logger.LogInformation("Beginning run of {ProcessorCount} processors", Processors.Count.ToString());
-            foreach (_EngineV1.Containers.IProcessor process in Processors.Processors)
+            foreach (_EngineV1.Containers.IOldProcessor process in Processors.Processors)
             {
                 _logger.LogInformation("Processor: {ProcessorName}", process.Name);
                 Stopwatch processorTimer = Stopwatch.StartNew();

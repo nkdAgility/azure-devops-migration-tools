@@ -56,7 +56,7 @@ class Program
 
         List<ClassData> classDataList = new List<ClassData>();
         // V1
-        classDataList.AddRange(cdLoader.GetClassData(newTypes, newTypes, typeof(MigrationTools._EngineV1.Containers.IProcessor), "v1", "Processors", true, "Config"));
+        classDataList.AddRange(cdLoader.GetClassData(newTypes, newTypes, typeof(MigrationTools._EngineV1.Containers.IOldProcessor), "v1", "Processors", true, "Config"));
         classDataList.AddRange(cdLoader.GetClassData(newTypes, newTypes, typeof(IFieldMapConfig), "v1", "FieldMaps", false));
         // V2
         classDataList.AddRange(cdLoader.GetClassData(newTypes, newTypes, typeof(MigrationTools.Processors.IProcessor), "v2", "Processors"));

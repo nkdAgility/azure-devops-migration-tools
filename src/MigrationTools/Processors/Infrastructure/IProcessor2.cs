@@ -1,9 +1,10 @@
-﻿using MigrationTools.Endpoints;
+﻿using MigrationTools._EngineV1.Containers;
+using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
 
 namespace MigrationTools.Processors
 {
-    public interface IProcessor : _EngineV1.Containers.IProcessor
+    public interface IProcessor : IOldProcessor
     {
         IEndpoint Source { get; }
         IEndpoint Target { get; }

@@ -5,13 +5,14 @@ using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MigrationTools._EngineV1.Configuration;
+using MigrationTools._EngineV1.Containers;
 using MigrationTools.Enrichers;
 using MigrationTools.Processors;
 using MigrationTools.Tools;
 
 namespace MigrationTools._EngineV1.Processors
 {
-    public abstract class MigrationProcessorBase : Containers.IProcessor
+    public abstract class MigrationProcessorBase : IOldProcessor
     {
         public StaticTools StaticEnrichers { get; private set; }
 

@@ -9,7 +9,7 @@ using MigrationTools.Tools;
 
 namespace VstsSyncMigrator._EngineV1.Processors
 {
-    public abstract class StaticProcessorBase : MigrationTools._EngineV1.Containers.IProcessor
+    public abstract class StaticProcessorBase : MigrationTools._EngineV1.Containers.IOldProcessor
     {
         protected IMigrationEngine Engine { get; }
         protected IServiceProvider Services { get; }
