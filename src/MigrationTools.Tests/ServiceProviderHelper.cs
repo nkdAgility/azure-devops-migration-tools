@@ -43,6 +43,7 @@ namespace MigrationTools.Tests
             services.AddSingleton<IMigrationToolVersionInfo, FakeMigrationToolVersionInfo>();
             services.AddSingleton<IMigrationToolVersion, FakeMigrationToolVersion>();
             services.AddTransient<SimpleFieldMapMock>();
+            services.AddTransient<SimpleFieldMapMockOptions>();
             services.AddTransient<SimpleProcessorMock>();
 
             return services;

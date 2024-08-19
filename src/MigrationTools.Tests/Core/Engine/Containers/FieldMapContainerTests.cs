@@ -34,7 +34,7 @@ namespace MigrationTools.Engine.Containers.Tests
 
             Assert.AreEqual(0, config.Value.FieldMaps.Count);
 
-            var testSimple = new SimpleFieldMapConfigMock
+            var testSimple = new SimpleFieldMapMockOptions
             {
                 ApplyTo = new List<string> { "*" },
             };

@@ -3,7 +3,7 @@ using MigrationTools.Tools.Infrastructure;
 
 namespace MigrationTools.Engine.Containers.Tests
 {
-    public class SimpleFieldMapConfigMock : FieldMapOptions
+    public class SimpleFieldMapMockOptions : FieldMapOptions
     {
         public void SetExampleConfigDefaults()
         {

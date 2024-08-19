@@ -5,7 +5,7 @@ using MigrationTools.Processors.Infrastructure;
 
 namespace MigrationTools.Engine.Containers.Tests
 {
-    public class SimpleProcessorConfigMock : ProcessorOptions
+    public class SimpleProcessorMockOptions : ProcessorOptions
     {
 
     }

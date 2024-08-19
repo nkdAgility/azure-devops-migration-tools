@@ -31,7 +31,7 @@ namespace MigrationTools.Engine.Containers.Tests
         public void ProcessorContainerTest()
         {
             var config = CreateProcessorContainerOptions();
-            var testSimple = new SimpleProcessorConfigMock();
+            var testSimple = new SimpleProcessorMockOptions();
 
             Assert.AreEqual(0, config.Value.Processors.Count);
 
