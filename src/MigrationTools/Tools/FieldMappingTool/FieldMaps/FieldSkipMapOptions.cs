@@ -5,7 +5,7 @@
     /// </summary>
     /// <status>ready</status>
     /// <processingtarget>Work Item</processingtarget>
-    public class FieldSkipMapOptions : IFieldMapConfig
+    public class FieldSkipMapOptions : IFieldMapOptions
     {
         public string WorkItemTypeName { get; set; }
         public string targetField { get; set; }

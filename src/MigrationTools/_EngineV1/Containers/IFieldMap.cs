@@ -10,7 +10,7 @@ namespace MigrationTools._EngineV1.Containers
         string MappingDisplayName { get; }
 
         [Obsolete]
-        void Configure(IFieldMapConfig config);
+        void Configure(IFieldMapOptions config);
 
         void Execute(WorkItemData source, WorkItemData target);
     }

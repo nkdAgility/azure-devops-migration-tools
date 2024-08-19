@@ -11,7 +11,7 @@ namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
 {
     public abstract class FieldMapBase : IFieldMap
     {
-        protected IFieldMapConfig _Config;
+        protected IFieldMapOptions _Config;
         protected ITelemetryLogger Telemetry;
 
         public FieldMapBase(ILogger<FieldMapBase> logger, ITelemetryLogger telemetryLogger)
@@ -20,7 +20,7 @@ namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
             Telemetry = telemetryLogger;
         }
 
-        public virtual void Configure(IFieldMapConfig config)
+        public virtual void Configure(IFieldMapOptions config)
         {
             _Config = config;
         }

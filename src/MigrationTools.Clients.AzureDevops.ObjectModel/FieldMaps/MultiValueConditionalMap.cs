@@ -15,7 +15,7 @@ namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
         public override string MappingDisplayName => string.Empty;
         private MultiValueConditionalMapOptions Config { get { return (MultiValueConditionalMapOptions)_Config; } }
 
-        public override void Configure(IFieldMapConfig config)
+        public override void Configure(IFieldMapOptions config)
         {
             base.Configure(config);
         }

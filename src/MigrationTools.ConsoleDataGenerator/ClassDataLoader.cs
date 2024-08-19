@@ -112,10 +112,10 @@ namespace MigrationTools.ConsoleDataGenerator
                     var options = (IOldOptions)Activator.CreateInstance(typeOption);
                     targetItem = options;
                 }
-                if (typeOption.GetInterfaces().Contains(typeof(IFieldMapConfig)))
+                if (typeOption.GetInterfaces().Contains(typeof(IFieldMapOptions)))
                 {
                     Console.WriteLine("Processing as IFieldMapConfig");
-                    var options = (IFieldMapConfig)Activator.CreateInstance(typeOption);
+                    var options = (IFieldMapOptions)Activator.CreateInstance(typeOption);
                     options.SetExampleConfigDefaults();
                     targetItem = options;
                 }

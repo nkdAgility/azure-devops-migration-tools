@@ -7,7 +7,7 @@ namespace MigrationTools._EngineV1.Configuration.FieldMap
     /// </summary>
     /// <status>ready</status>
     /// <processingtarget>Work Item Field</processingtarget>
-    public class FieldValueMapOptions : IFieldMapConfig
+    public class FieldValueMapOptions : IFieldMapOptions
     {
         public string WorkItemTypeName { get; set; }
         public string sourceField { get; set; }

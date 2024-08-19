@@ -5,7 +5,7 @@
     /// </summary>
     /// <status>ready</status>
     /// <processingtarget>Work Item Field</processingtarget>
-    public class RegexFieldMapOptions : IFieldMapConfig
+    public class RegexFieldMapOptions : IFieldMapOptions
     {
         public string WorkItemTypeName { get; set; }
         public string sourceField { get; set; }

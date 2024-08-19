@@ -24,7 +24,7 @@ namespace MigrationTools.Tools
         {
             if (Options.FieldMaps != null)
             {
-                foreach (IFieldMapConfig fieldmapConfig in Options.FieldMaps)
+                foreach (IFieldMapOptions fieldmapConfig in Options.FieldMaps)
                 {
                     Log.LogInformation("FieldMappingTool: Adding FieldMap {FieldMapName} for {WorkItemTypeName}", fieldmapConfig.FieldMap, fieldmapConfig.WorkItemTypeName);
                     string typePattern = $"MigrationTools.Sinks.*.FieldMaps.{fieldmapConfig.FieldMap}";

@@ -9,7 +9,7 @@ namespace MigrationTools.Clients.AzureDevops.Rest.FieldMaps
     {
         private FieldtoTagMapOptions Config { get { return (FieldtoTagMapOptions)_Config; } }
 
-        public override void Configure(IFieldMapConfig config)
+        public override void Configure(IFieldMapOptions config)
         {
             base.Configure(config);
         }

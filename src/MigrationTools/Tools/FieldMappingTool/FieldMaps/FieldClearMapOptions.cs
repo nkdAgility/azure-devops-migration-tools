@@ -5,7 +5,7 @@
     /// </summary>
     /// <status>ready</status>
     /// <processingtarget>Work Item</processingtarget>
-    public class FieldClearMapOptions : IFieldMapConfig
+    public class FieldClearMapOptions : IFieldMapOptions
     {
         public string WorkItemTypeName { get; set; }
         public string targetField { get; set; }

@@ -5,7 +5,7 @@
     /// </summary>
     /// <status>ready</status>
     /// <processingtarget>Work Item Field</processingtarget>
-    public class FieldValuetoTagMapOptions : IFieldMapConfig
+    public class FieldValuetoTagMapOptions : IFieldMapOptions
     {
         public string WorkItemTypeName { get; set; }
         public string sourceField { get; set; }

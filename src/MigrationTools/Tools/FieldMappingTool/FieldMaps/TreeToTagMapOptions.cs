@@ -5,7 +5,7 @@
     /// </summary>
     /// <status>ready</status>
     /// <processingtarget>Work Item Field</processingtarget>
-    public class TreeToTagMapOptions : IFieldMapConfig
+    public class TreeToTagMapOptions : IFieldMapOptions
     {
         public string WorkItemTypeName { get; set; }
         public int toSkip { get; set; }

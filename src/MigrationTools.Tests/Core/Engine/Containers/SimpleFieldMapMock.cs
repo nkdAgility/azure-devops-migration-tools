@@ -7,9 +7,9 @@ namespace MigrationTools.Engine.Containers.Tests
 {
     public class SimpleFieldMapMock : IFieldMap
     {
-        protected IFieldMapConfig _Config;
+        protected IFieldMapOptions _Config;
 
-        public virtual void Configure(IFieldMapConfig config)
+        public virtual void Configure(IFieldMapOptions config)
         {
             _Config = config;
         }

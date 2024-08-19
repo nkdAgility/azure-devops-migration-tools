@@ -13,7 +13,7 @@ namespace MigrationTools.Tools
     {
         public const string ConfigurationSectionName = "MigrationTools:CommonTools:FieldMappingTool";
 
-        public List<IFieldMapConfig> FieldMaps { get; set; } = new List<IFieldMapConfig>();
+        public List<IFieldMapOptions> FieldMaps { get; set; } = new List<IFieldMapOptions>();
 
 
         public class ConfigureOptions : IConfigureOptions<FieldMappingToolOptions>
@@ -31,11 +31,11 @@ namespace MigrationTools.Tools
                 {
                     case MigrationConfigSchema.v160:
                         _configuration.GetSection(ConfigurationSectionName).Bind(options);
-                        options.FieldMaps = _configuration.GetSection(ConfigurationSectionName + ":FieldMaps")?.ToMigrationToolsList(child => child.GetMigrationToolsOption<IFieldMapConfig>("FieldMapType"));
+                        options.FieldMaps = _configuration.GetSection(ConfigurationSectionName + ":FieldMaps")?.ToMigrationToolsList(child => child.GetMigrationToolsOption<IFieldMapOptions>("FieldMapType"));
                         break;
                     case MigrationConfigSchema.v1:
                         options.Enabled = true;
-                        options.FieldMaps = _configuration.GetSection("FieldMaps")?.ToMigrationToolsList(child => child.GetMigrationToolsOption<IFieldMapConfig>("$type"));
+                        options.FieldMaps = _configuration.GetSection("FieldMaps")?.ToMigrationToolsList(child => child.GetMigrationToolsOption<IFieldMapOptions>("$type"));
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();

@@ -10,9 +10,9 @@ namespace MigrationTools.Clients.AzureDevops.Rest.FieldMaps
 {
     public abstract class FieldMapBase : IFieldMap
     {
-        protected IFieldMapConfig _Config;
+        protected IFieldMapOptions _Config;
 
-        public virtual void Configure(IFieldMapConfig config)
+        public virtual void Configure(IFieldMapOptions config)
         {
             _Config = config;
         }

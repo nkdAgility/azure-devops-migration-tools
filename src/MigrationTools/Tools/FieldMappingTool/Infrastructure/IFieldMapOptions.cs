@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace MigrationTools._EngineV1.Configuration
 {
-    public interface IFieldMapConfig
+    public interface IFieldMapOptions
     {
         string WorkItemTypeName { get; set; }
 

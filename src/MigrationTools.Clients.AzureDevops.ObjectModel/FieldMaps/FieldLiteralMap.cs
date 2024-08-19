@@ -14,7 +14,7 @@ namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
 
         private FieldLiteralMapOptions Config { get { return (FieldLiteralMapOptions)_Config; } }
 
-        public override void Configure(IFieldMapConfig config)
+        public override void Configure(IFieldMapOptions config)
         {
             base.Configure(config);
 

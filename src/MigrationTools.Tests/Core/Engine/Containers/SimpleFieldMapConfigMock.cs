@@ -2,7 +2,7 @@
 
 namespace MigrationTools.Engine.Containers.Tests
 {
-    public class SimpleFieldMapConfigMock : IFieldMapConfig
+    public class SimpleFieldMapConfigMock : IFieldMapOptions
     {
         public string WorkItemTypeName { get; set; }
 
