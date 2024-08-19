@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using MigrationTools.Enrichers;
+using MigrationTools.Options;
 using Newtonsoft.Json;
 
 namespace MigrationTools._EngineV1.Configuration
 {
-    public interface IProcessorConfig
+    public interface IProcessorConfig : IOptions
     {
         /// <summary>
         /// Active the processor if it true.
@@ -12,8 +13,6 @@ namespace MigrationTools._EngineV1.Configuration
         [JsonProperty(Order = -200)]
         bool Enabled { get; set; }
 
-        [JsonIgnore]
-        string Processor { get; }
         List<IProcessorEnricher> Enrichers { get; set; }
 
         /// <summary>

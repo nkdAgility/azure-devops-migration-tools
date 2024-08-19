@@ -2,18 +2,13 @@
 optionsClassName: WorkItemTypeMappingToolOptions
 optionsClassFullName: MigrationTools.Tools.WorkItemTypeMappingToolOptions
 configurationSamples:
-- name: default
+- name: defaults
   description: 
   code: >-
     {
       "MigrationTools": {
-        "CommonTools": {
-          "WorkItemTypeMappingTool": {
-            "Enabled": "False",
-            "Mappings": {
-              "Source Work Item Type Name": "Target Work Item Type Name"
-            }
-          }
+        "ProcessorDefaults": {
+          "WorkItemTypeMappingTool": {}
         }
       }
     }
@@ -23,11 +18,7 @@ configurationSamples:
   code: >-
     {
       "$type": "WorkItemTypeMappingToolOptions",
-      "Mappings": {
-        "$type": "Dictionary`2",
-        "Source Work Item Type Name": "Target Work Item Type Name"
-      },
-      "Enabled": false
+      "Mappings": null
     }
   sampleFor: MigrationTools.Tools.WorkItemTypeMappingToolOptions
 description: Used to process the String fields of a work item. This is useful for cleaning up data. It will limit fields to a max length and apply regex replacements based on what is configured. Each regex replacement is applied in order and can be enabled or disabled.
@@ -35,10 +26,6 @@ className: WorkItemTypeMappingTool
 typeName: Tools
 architecture: v1
 options:
-- parameterName: Enabled
-  type: Boolean
-  description: missng XML code comments
-  defaultValue: missng XML code comments
 - parameterName: Mappings
   type: Dictionary
   description: List of work item mappings.

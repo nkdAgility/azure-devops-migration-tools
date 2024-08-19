@@ -7,8 +7,8 @@ namespace MigrationTools.Processors.Infrastructure
 {
     public abstract class ProcessorOptions : IProcessorOptions
     {
-        public virtual string ConfigurationSectionName => $"MigrationTools:ProcessorDefaults:{Processor}";
-        public virtual string Processor => $"{GetType().Name.Replace("Options", "")}";
+        public virtual string ConfigurationSectionName => $"MigrationTools:ProcessorDefaults:{OptionFor}";
+        public string OptionFor => $"{GetType().Name.Replace("Options", "")}";
         /// <summary>
         /// If set to `true` then the processor will run. Set to `false` and the processor will not run.
         /// </summary>

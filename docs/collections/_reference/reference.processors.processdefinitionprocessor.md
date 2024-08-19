@@ -2,23 +2,27 @@
 optionsClassName: ProcessDefinitionProcessorOptions
 optionsClassFullName: MigrationTools.Processors.ProcessDefinitionProcessorOptions
 configurationSamples:
+- name: defaults
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "ProcessorDefaults": {
+          "ProcessDefinitionProcessor": {}
+        }
+      }
+    }
+  sampleFor: MigrationTools.Processors.ProcessDefinitionProcessorOptions
 - name: Classic
   description: 
   code: >-
     {
       "$type": "ProcessDefinitionProcessorOptions",
       "Enabled": false,
-      "Processes": {
-        "$type": "Dictionary`2",
-        "*": [
-          "*"
-        ]
-      },
-      "ProcessMaps": {
-        "$type": "Dictionary`2"
-      },
-      "UpdateProcessDetails": true,
-      "MaxDegreeOfParallelism": 1,
+      "Processes": null,
+      "ProcessMaps": null,
+      "UpdateProcessDetails": false,
+      "MaxDegreeOfParallelism": 0,
       "Enrichers": null,
       "ProcessorEnrichers": null,
       "SourceName": null,

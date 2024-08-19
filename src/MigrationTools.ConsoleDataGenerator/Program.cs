@@ -57,17 +57,20 @@ class Program
 
         List<ClassData> classDataList = new List<ClassData>();
         // V1
-        classDataList.AddRange(cdLoader.GetClassData(newTypes, newTypes, typeof(IOldProcessor), "v1", "Processors", true, "Config"));
-        classDataList.AddRange(cdLoader.GetClassData(newTypes, newTypes, typeof(IFieldMapOptions), "v1", "FieldMaps", false));
+        classDataList.AddRange(cdLoader.GetClassData(newTypes, newTypes, typeof(IOldProcessor), "v1", "Processors", true));
+        
         // V2
         classDataList.AddRange(cdLoader.GetClassData(newTypes, newTypes, typeof(IProcessor), "v2", "Processors"));
         classDataList.AddRange(cdLoader.GetClassData(newTypes, newTypes, typeof(IProcessorEnricher), "v2", "ProcessorEnrichers"));
        
-        classDataList.AddRange(cdLoader.GetClassData(newTypes, newTypes, typeof(IFieldMapOptions), "v2", "FieldMaps", false));
+        
         classDataList.AddRange(cdLoader.GetClassData(newTypes, newTypes, typeof(IEndpoint), "v2", "Endpoints"));
         classDataList.AddRange(cdLoader.GetClassData(newTypes, newTypes, typeof(IEndpointEnricher), "v2", "EndpointEnrichers"));
 
         classDataList.AddRange(cdLoader.GetClassData(newTypes, newTypes, typeof(ITool), "v1", "Tools"));
+
+        classDataList.AddRange(cdLoader.GetClassData(newTypes, newTypes, typeof(IFieldMapOptions), "v2", "FieldMaps", false));
+        classDataList.AddRange(cdLoader.GetClassData(newTypes, newTypes, typeof(IFieldMapOptions), "v1", "FieldMaps", false));
 
         Console.WriteLine("-----------");
         Console.WriteLine("Output");

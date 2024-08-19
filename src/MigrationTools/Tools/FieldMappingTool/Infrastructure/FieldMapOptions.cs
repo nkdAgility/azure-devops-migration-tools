@@ -18,10 +18,5 @@ namespace MigrationTools.Tools.Infrastructure
 
         public bool Enabled { get; set; }
         public List<string> ApplyTo { get; set; }
-
-        public void SetExampleConfigDefaults()
-        {
-            throw new NotImplementedException();
-        }
     }
 }

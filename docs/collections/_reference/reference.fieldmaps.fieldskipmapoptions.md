@@ -1,0 +1,76 @@
+---
+optionsClassName: FieldSkipMapOptions
+optionsClassFullName: MigrationTools.Tools.FieldSkipMapOptions
+configurationSamples:
+- name: defaults
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "FieldMappingTool": {
+            "FieldDefaults": {
+              "FieldSkipMap": {}
+            }
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.FieldSkipMapOptions
+- name: Classic
+  description: 
+  code: >-
+    {
+      "$type": "FieldSkipMapOptions",
+      "WorkItemTypeName": null,
+      "targetField": null,
+      "Enabled": false,
+      "ApplyTo": null
+    }
+  sampleFor: MigrationTools.Tools.FieldSkipMapOptions
+description: Allows you to skip populating an existing field. Value in target with be reset to its OriginalValue.
+className: FieldSkipMapOptions
+typeName: FieldMaps
+architecture: v1
+options:
+- parameterName: ApplyTo
+  type: List
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: Enabled
+  type: Boolean
+  description: If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.
+  defaultValue: missng XML code comments
+- parameterName: targetField
+  type: String
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: WorkItemTypeName
+  type: String
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+status: ready
+processingTarget: Work Item
+classFile: /src/MigrationTools/Tools/FieldMappingTool/FieldMaps/FieldSkipMapOptions.cs
+optionsClassFile: /src/MigrationTools/Tools/FieldMappingTool/FieldMaps/FieldSkipMapOptions.cs
+
+redirectFrom:
+- /Reference/v1/FieldMaps/FieldSkipMapOptions/
+layout: reference
+toc: true
+permalink: /Reference/FieldMaps/FieldSkipMapOptions/
+title: FieldSkipMapOptions
+categories:
+- FieldMaps
+- v1
+topics:
+- topic: notes
+  path: /FieldMaps/FieldSkipMapOptions-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: /FieldMaps/FieldSkipMapOptions-introduction.md
+  exists: false
+  markdown: ''
+
+---

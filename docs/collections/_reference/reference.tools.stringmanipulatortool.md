@@ -2,25 +2,13 @@
 optionsClassName: StringManipulatorToolOptions
 optionsClassFullName: MigrationTools.Tools.StringManipulatorToolOptions
 configurationSamples:
-- name: default
+- name: defaults
   description: 
   code: >-
     {
       "MigrationTools": {
-        "CommonTools": {
-          "StringManipulatorTool": {
-            "Enabled": "True",
-            "Manipulators": {
-              "0": {
-                "$type": "RegexStringManipulator",
-                "Description": "Remove invalid characters from the end of the string",
-                "Enabled": "True",
-                "Pattern": "[^( -~)\n\r\t]+",
-                "Replacement": ""
-              }
-            },
-            "MaxStringLength": "1000000"
-          }
+        "ProcessorDefaults": {
+          "StringManipulatorTool": {}
         }
       }
     }
@@ -30,17 +18,8 @@ configurationSamples:
   code: >-
     {
       "$type": "StringManipulatorToolOptions",
-      "MaxStringLength": 1000000,
-      "Manipulators": [
-        {
-          "$type": "RegexStringManipulator",
-          "Enabled": true,
-          "Pattern": "[^( -~)\n\r\t]+",
-          "Replacement": "",
-          "Description": "Remove invalid characters from the end of the string"
-        }
-      ],
-      "Enabled": true
+      "MaxStringLength": 0,
+      "Manipulators": null
     }
   sampleFor: MigrationTools.Tools.StringManipulatorToolOptions
 description: Used to process the String fields of a work item. This is useful for cleaning up data. It will limit fields to a max length and apply regex replacements based on what is configured. Each regex replacement is applied in order and can be enabled or disabled.
@@ -48,10 +27,6 @@ className: StringManipulatorTool
 typeName: Tools
 architecture: v1
 options:
-- parameterName: Enabled
-  type: Boolean
-  description: missng XML code comments
-  defaultValue: missng XML code comments
 - parameterName: Manipulators
   type: List
   description: List of regex based string manipulations to apply to all string fields. Each regex replacement is applied in order and can be enabled or disabled.

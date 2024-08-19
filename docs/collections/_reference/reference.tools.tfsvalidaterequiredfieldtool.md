@@ -2,12 +2,12 @@
 optionsClassName: TfsValidateRequiredFieldToolOptions
 optionsClassFullName: MigrationTools.Tools.TfsValidateRequiredFieldToolOptions
 configurationSamples:
-- name: default
+- name: defaults
   description: 
   code: >-
     {
       "MigrationTools": {
-        "CommonTools": {
+        "ProcessorDefaults": {
           "TfsValidateRequiredFieldTool": {}
         }
       }
@@ -17,19 +17,14 @@ configurationSamples:
   description: 
   code: >-
     {
-      "$type": "TfsValidateRequiredFieldToolOptions",
-      "Enabled": false
+      "$type": "TfsValidateRequiredFieldToolOptions"
     }
   sampleFor: MigrationTools.Tools.TfsValidateRequiredFieldToolOptions
 description: missng XML code comments
 className: TfsValidateRequiredFieldTool
 typeName: Tools
 architecture: v1
-options:
-- parameterName: Enabled
-  type: Boolean
-  description: missng XML code comments
-  defaultValue: missng XML code comments
+options: []
 status: missng XML code comments
 processingTarget: missng XML code comments
 classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Tools/TfsValidateRequiredFieldTool.cs

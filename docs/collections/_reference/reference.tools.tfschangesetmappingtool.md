@@ -2,16 +2,13 @@
 optionsClassName: TfsChangeSetMappingToolOptions
 optionsClassFullName: MigrationTools.Tools.TfsChangeSetMappingToolOptions
 configurationSamples:
-- name: default
+- name: defaults
   description: 
   code: >-
     {
       "MigrationTools": {
-        "CommonTools": {
-          "TfsChangeSetMappingTool": {
-            "Enabled": "False",
-            "File": ""
-          }
+        "ProcessorDefaults": {
+          "TfsChangeSetMappingTool": {}
         }
       }
     }
@@ -21,8 +18,7 @@ configurationSamples:
   code: >-
     {
       "$type": "TfsChangeSetMappingToolOptions",
-      "ChangeSetMappingFile": null,
-      "Enabled": false
+      "ChangeSetMappingFile": null
     }
   sampleFor: MigrationTools.Tools.TfsChangeSetMappingToolOptions
 description: missng XML code comments
@@ -32,10 +28,6 @@ architecture: v1
 options:
 - parameterName: ChangeSetMappingFile
   type: String
-  description: missng XML code comments
-  defaultValue: missng XML code comments
-- parameterName: Enabled
-  type: Boolean
   description: missng XML code comments
   defaultValue: missng XML code comments
 status: missng XML code comments

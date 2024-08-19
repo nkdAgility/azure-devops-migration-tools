@@ -2,15 +2,26 @@
 optionsClassName: WorkItemTrackingProcessorOptions
 optionsClassFullName: MigrationTools.Processors.WorkItemTrackingProcessorOptions
 configurationSamples:
+- name: defaults
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "ProcessorDefaults": {
+          "WorkItemTrackingProcessor": {}
+        }
+      }
+    }
+  sampleFor: MigrationTools.Processors.WorkItemTrackingProcessorOptions
 - name: Classic
   description: 
   code: >-
     {
       "$type": "WorkItemTrackingProcessorOptions",
-      "Enabled": true,
-      "ReplayRevisions": true,
+      "Enabled": false,
+      "ReplayRevisions": false,
       "CollapseRevisions": false,
-      "WorkItemCreateRetryLimit": 5,
+      "WorkItemCreateRetryLimit": 0,
       "Enrichers": null,
       "ProcessorEnrichers": null,
       "SourceName": null,
@@ -60,8 +71,8 @@ options:
   defaultValue: missng XML code comments
 status: missng XML code comments
 processingTarget: missng XML code comments
-classFile: /src/MigrationTools/Processors/WorkItemProcessor/WorkItemTrackingProcessor.cs
-optionsClassFile: /src/MigrationTools/Processors/WorkItemProcessor/WorkItemTrackingProcessorOptions.cs
+classFile: /src/MigrationTools/Processors/WorkItemTrackingProcessor.cs
+optionsClassFile: /src/MigrationTools/Processors/WorkItemTrackingProcessorOptions.cs
 
 redirectFrom:
 - /Reference/v2/Processors/WorkItemTrackingProcessorOptions/

@@ -56,16 +56,16 @@ namespace MigrationTools.Processors.Infrastructure
                 {
                     if (processorConfig.IsProcessorCompatible(enabledProcessors))
                     {
-                        _logger.LogInformation("ProcessorContainer: Adding Processor {ProcessorName}", processorConfig.Processor);
+                        _logger.LogInformation("ProcessorContainer: Adding Processor {ProcessorName}", processorConfig.OptionFor);
 
 
                         Type type = allTypes
-                              .FirstOrDefault(t => t.Name.Equals(processorConfig.Processor));
+                              .FirstOrDefault(t => t.Name.Equals(processorConfig.OptionFor));
 
                         if (type == null)
                         {
-                            _logger.LogError("Type " + processorConfig.Processor + " not found.", processorConfig.Processor);
-                            throw new Exception("Type " + processorConfig.Processor + " not found.");
+                            _logger.LogError("Type " + processorConfig.OptionFor + " not found.", processorConfig.OptionFor);
+                            throw new Exception("Type " + processorConfig.OptionFor + " not found.");
                         }
                         IOldProcessor pc = (IOldProcessor)ActivatorUtilities.CreateInstance(_services, type);
                         processors.Add(pc);
@@ -73,8 +73,8 @@ namespace MigrationTools.Processors.Infrastructure
                     else
                     {
                         var message = "ProcessorContainer: Cannot add Processor {ProcessorName}. Processor is not compatible with other enabled processors in configuration.";
-                        _logger.LogError(message, processorConfig.Processor);
-                        throw new InvalidOperationException(string.Format(message, processorConfig.Processor, "ProcessorContainer"));
+                        _logger.LogError(message, processorConfig.OptionFor);
+                        throw new InvalidOperationException(string.Format(message, processorConfig.OptionFor, "ProcessorContainer"));
                     }
                 }
             }

@@ -1,24 +1,13 @@
 optionsClassName: TfsNodeStructureToolOptions
 optionsClassFullName: MigrationTools.Tools.TfsNodeStructureToolOptions
 configurationSamples:
-- name: default
+- name: defaults
   description: 
   code: >-
     {
       "MigrationTools": {
-        "CommonTools": {
-          "TfsNodeStructureTool": {
-            "AreaMaps": {
-              "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1"
-            },
-            "Enabled": "True",
-            "IterationMaps": {
-              "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1"
-            },
-            "NodeBasePaths": {},
-            "ReplicateAllExistingNodes": "True",
-            "ShouldCreateMissingRevisionPaths": "True"
-          }
+        "ProcessorDefaults": {
+          "TfsNodeStructureTool": {}
         }
       }
     }
@@ -29,17 +18,10 @@ configurationSamples:
     {
       "$type": "TfsNodeStructureToolOptions",
       "NodeBasePaths": null,
-      "AreaMaps": {
-        "$type": "Dictionary`2",
-        "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1"
-      },
-      "IterationMaps": {
-        "$type": "Dictionary`2",
-        "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1"
-      },
-      "ShouldCreateMissingRevisionPaths": true,
-      "ReplicateAllExistingNodes": true,
-      "Enabled": true
+      "AreaMaps": null,
+      "IterationMaps": null,
+      "ShouldCreateMissingRevisionPaths": false,
+      "ReplicateAllExistingNodes": false
     }
   sampleFor: MigrationTools.Tools.TfsNodeStructureToolOptions
 description: The TfsNodeStructureToolEnricher is used to create missing nodes in the target project. To configure it add a `TfsNodeStructureToolOptions` section to `CommonEnrichersConfig` in the config file. Otherwise defaults will be applied.
@@ -51,10 +33,6 @@ options:
   type: Dictionary
   description: Remapping rules for area paths, implemented with regular expressions. The rules apply with a higher priority than the `PrefixProjectToNodes`, that is, if no rule matches the path and the `PrefixProjectToNodes` option is enabled, then the old `PrefixProjectToNodes` behavior is applied.
   defaultValue: '{}'
-- parameterName: Enabled
-  type: Boolean
-  description: missng XML code comments
-  defaultValue: missng XML code comments
 - parameterName: IterationMaps
   type: Dictionary
   description: Remapping rules for iteration paths, implemented with regular expressions. The rules apply with a higher priority than the `PrefixProjectToNodes`, that is, if no rule matches the path and the `PrefixProjectToNodes` option is enabled, then the old `PrefixProjectToNodes` behavior is applied.

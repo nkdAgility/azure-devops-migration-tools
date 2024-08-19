@@ -1,0 +1,64 @@
+optionsClassName: FieldMergeMapOptions
+optionsClassFullName: MigrationTools.Tools.FieldMergeMapOptions
+configurationSamples:
+- name: defaults
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "FieldMappingTool": {
+            "FieldDefaults": {
+              "FieldMergeMap": {}
+            }
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.FieldMergeMapOptions
+- name: Classic
+  description: 
+  code: >-
+    {
+      "$type": "FieldMergeMapOptions",
+      "WorkItemTypeName": null,
+      "sourceFields": null,
+      "targetField": null,
+      "formatExpression": null,
+      "Enabled": false,
+      "ApplyTo": null
+    }
+  sampleFor: MigrationTools.Tools.FieldMergeMapOptions
+description: Ever wanted to merge two or three fields? This mapping will let you do just that.
+className: FieldMergeMapOptions
+typeName: FieldMaps
+architecture: v1
+options:
+- parameterName: ApplyTo
+  type: List
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: Enabled
+  type: Boolean
+  description: If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.
+  defaultValue: missng XML code comments
+- parameterName: formatExpression
+  type: String
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: sourceFields
+  type: List
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: targetField
+  type: String
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: WorkItemTypeName
+  type: String
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+status: ready
+processingTarget: Work Item Field
+classFile: /src/MigrationTools/Tools/FieldMappingTool/FieldMaps/FieldMergeMapOptions.cs
+optionsClassFile: /src/MigrationTools/Tools/FieldMappingTool/FieldMaps/FieldMergeMapOptions.cs

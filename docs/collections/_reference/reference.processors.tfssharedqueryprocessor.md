@@ -2,6 +2,17 @@
 optionsClassName: TfsSharedQueryProcessorOptions
 optionsClassFullName: MigrationTools.Processors.TfsSharedQueryProcessorOptions
 configurationSamples:
+- name: defaults
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "ProcessorDefaults": {
+          "TfsSharedQueryProcessor": {}
+        }
+      }
+    }
+  sampleFor: MigrationTools.Processors.TfsSharedQueryProcessorOptions
 - name: Classic
   description: 
   code: >-
@@ -13,8 +24,8 @@ configurationSamples:
       "SourceToTargetFieldMappings": null,
       "Enrichers": null,
       "ProcessorEnrichers": null,
-      "SourceName": "sourceName",
-      "TargetName": "targetName"
+      "SourceName": null,
+      "TargetName": null
     }
   sampleFor: MigrationTools.Processors.TfsSharedQueryProcessorOptions
 description: The TfsSharedQueryProcessor enabled you to migrate queries from one locatio nto another.

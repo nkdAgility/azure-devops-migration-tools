@@ -28,28 +28,6 @@ namespace MigrationTools.ConsoleDataGenerator
             this.configuration = configuration;
         }
 
-        [Obsolete("Please use GetClassData instead")]
-        public ClassGroup GetClassGroup(List<Type> targetTypes, List<Type> allTypes, Type type, string apiVersion, string dataTypeName, bool findConfig = true, string configEnd = "Options")
-        {
-            Console.WriteLine();
-            Console.WriteLine($"ClassDataLoader::BuildJekyllDataFile:: {dataTypeName}");
-            ClassGroup data = new ClassGroup();
-            data.Name = dataTypeName;
-            var founds = targetTypes.Where(t => type.IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface && t.IsPublic).OrderBy(t => t.Name).ToList();
-            Console.WriteLine($"ClassDataLoader::BuildJekyllDataFile:: ----------- Found {founds.Count}");
-
-            // Each File
-            foreach (var item in founds)
-            {
-                DataItem dataItem = new DataItem();
-
-                Console.WriteLine($"ClassDataLoader::BuildJekyllDataFile::-PROCESS {item.Name}");
-                dataItem.classData = CreateClassData(targetTypes, allTypes, apiVersion, dataTypeName, item, findConfig, configEnd);
-            }
-            Console.WriteLine("ClassDataLoader::BuildJekyllDataFile:: -----------");
-            return data;
-        }
-
         public List<ClassData> GetClassData(List<Type> targetTypes, List<Type> allTypes, Type type, string apiVersion, string dataTypeName, bool findConfig = true, string configEnd = "Options")
         {
             Console.WriteLine();
@@ -61,13 +39,13 @@ namespace MigrationTools.ConsoleDataGenerator
             foreach (var item in founds)
             {
                 Console.WriteLine($"ClassDataLoader::populateClassData::-PROCESS {item.Name}");
-                data.Add(CreateClassData(targetTypes, allTypes, apiVersion, dataTypeName, item, findConfig, configEnd));
+                data.Add(CreateClassData(targetTypes, allTypes, type, apiVersion, dataTypeName, item, findConfig, configEnd));
             }
             Console.WriteLine("ClassDataLoader::populateClassData:: -----------");
             return data;
         }
 
-        private ClassData CreateClassData(List<Type> targetTypes, List<Type> allTypes, string apiVersion, string dataTypeName, Type item, bool findConfig = true, string configEnd = "Options")
+        private ClassData CreateClassData(List<Type> targetTypes, List<Type> allTypes, Type type, string apiVersion, string dataTypeName, Type item, bool findConfig = true, string configEnd = "Options")
         {
             Type typeOption = item;
             string objectName = item.Name;
@@ -98,26 +76,20 @@ namespace MigrationTools.ConsoleDataGenerator
                 data.OptionsClassName = typeOption.Name;
                 data.OptionsClassFile = codeFinder.FindCodeFile(typeOption);
                 object targetItem = null;
-                var ConfigurationSectionName = ((IOptions)typeOption).ConfigurationSectionName;
+                var instanceOfOptions = Activator.CreateInstance(typeOption);
+                var ConfigurationSectionName = (string)typeOption.GetProperty("ConfigurationSectionName")?.GetValue(instanceOfOptions);
                 if (!string.IsNullOrEmpty(ConfigurationSectionName))
                 {
                     Console.WriteLine("Processing as ConfigurationSectionName");
                     var section = configuration.GetSection(ConfigurationSectionName);
-                    targetItem = (IOptions)Activator.CreateInstance(typeOption);
+                    targetItem = (IOptions)instanceOfOptions;
                     section.Bind(targetItem);
-                    data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "default", SampleFor = data.OptionsClassFullName, Code = ConvertSectionWithPathToJson(configuration, section).Trim() } );
+                    data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "defaults", SampleFor = data.OptionsClassFullName, Code = ConvertSectionWithPathToJson(configuration, section).Trim() } );
                 }
                 if (typeOption.GetInterfaces().Contains(typeof(IOptions)))
                 {
                     Console.WriteLine("Processing as IOptions");
-                    var options = (IOldOptions)Activator.CreateInstance(typeOption);
-                    targetItem = options;
-                }
-                if (typeOption.GetInterfaces().Contains(typeof(IFieldMapOptions)))
-                {
-                    Console.WriteLine("Processing as IFieldMapConfig");
-                    var options = (IFieldMapOptions)Activator.CreateInstance(typeOption);
-                    options.SetExampleConfigDefaults();
+                    var options = (IOptions)instanceOfOptions;
                     targetItem = options;
                 }
                 if (targetItem != null)

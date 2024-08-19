@@ -1,21 +1,32 @@
 optionsClassName: TfsTeamSettingsProcessorOptions
 optionsClassFullName: MigrationTools.Processors.TfsTeamSettingsProcessorOptions
 configurationSamples:
+- name: defaults
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "ProcessorDefaults": {
+          "TfsTeamSettingsProcessor": {}
+        }
+      }
+    }
+  sampleFor: MigrationTools.Processors.TfsTeamSettingsProcessorOptions
 - name: Classic
   description: 
   code: >-
     {
       "$type": "TfsTeamSettingsProcessorOptions",
       "Enabled": false,
-      "MigrateTeamSettings": true,
-      "UpdateTeamSettings": true,
+      "MigrateTeamSettings": false,
+      "UpdateTeamSettings": false,
       "PrefixProjectToNodes": false,
       "MigrateTeamCapacities": false,
       "Teams": null,
       "Enrichers": null,
       "ProcessorEnrichers": null,
-      "SourceName": "sourceName",
-      "TargetName": "targetName"
+      "SourceName": null,
+      "TargetName": null
     }
   sampleFor: MigrationTools.Processors.TfsTeamSettingsProcessorOptions
 description: Native TFS Processor, does not work with any other Endpoints.

@@ -1,17 +1,13 @@
 optionsClassName: TfsWorkItemLinkToolOptions
 optionsClassFullName: MigrationTools.Tools.TfsWorkItemLinkToolOptions
 configurationSamples:
-- name: default
+- name: defaults
   description: 
   code: >-
     {
       "MigrationTools": {
-        "CommonTools": {
-          "TfsWorkItemLinkTool": {
-            "Enabled": "True",
-            "FilterIfLinkCountMatches": "True",
-            "SaveAfterEachLinkIsAdded": "False"
-          }
+        "ProcessorDefaults": {
+          "TfsWorkItemLinkTool": {}
         }
       }
     }
@@ -21,9 +17,8 @@ configurationSamples:
   code: >-
     {
       "$type": "TfsWorkItemLinkToolOptions",
-      "FilterIfLinkCountMatches": true,
-      "SaveAfterEachLinkIsAdded": false,
-      "Enabled": true
+      "FilterIfLinkCountMatches": false,
+      "SaveAfterEachLinkIsAdded": false
     }
   sampleFor: MigrationTools.Tools.TfsWorkItemLinkToolOptions
 description: missng XML code comments
@@ -31,10 +26,6 @@ className: TfsWorkItemLinkTool
 typeName: Tools
 architecture: v1
 options:
-- parameterName: Enabled
-  type: Boolean
-  description: missng XML code comments
-  defaultValue: missng XML code comments
 - parameterName: FilterIfLinkCountMatches
   type: Boolean
   description: Skip validating links if the number of links in the source and the target matches!

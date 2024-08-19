@@ -1,36 +1,19 @@
 ---
-optionsClassName: FakeProcessorConfig
-optionsClassFullName: MigrationTools._EngineV1.Configuration.Processing.FakeProcessorConfig
-configurationSamples:
-- name: Classic
-  description: 
-  code: >-
-    {
-      "$type": "FakeProcessorConfig",
-      "Enabled": false,
-      "Enrichers": null
-    }
-  sampleFor: MigrationTools._EngineV1.Configuration.Processing.FakeProcessorConfig
+optionsClassName: 
+optionsClassFullName: 
+configurationSamples: []
 description: "Note: this is only for internal usage. Don't use this in your configurations."
 className: FakeProcessor
 typeName: Processors
 architecture: v1
-options:
-- parameterName: Enabled
-  type: Boolean
-  description: missng XML code comments
-  defaultValue: missng XML code comments
-- parameterName: Enrichers
-  type: List
-  description: A list of enrichers that can augment the proccessing of the data
-  defaultValue: missng XML code comments
+options: []
 status: missng XML code comments
 processingTarget: missng XML code comments
 classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/FakeProcessor.cs
-optionsClassFile: /src/MigrationTools/_EngineV1/Configuration/Processing/FakeProcessorConfig.cs
+optionsClassFile: 
 
 redirectFrom:
-- /Reference/v1/Processors/FakeProcessorConfig/
+- /Reference/v1/Processors//
 layout: reference
 toc: true
 permalink: /Reference/Processors/FakeProcessor/

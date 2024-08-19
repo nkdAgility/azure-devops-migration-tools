@@ -2,12 +2,23 @@
 optionsClassName: PauseAfterEachItemOptions
 optionsClassFullName: MigrationTools.Enrichers.PauseAfterEachItemOptions
 configurationSamples:
+- name: defaults
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "ProcessorEnricherDefaults": {
+          "PauseAfterEachItem": {}
+        }
+      }
+    }
+  sampleFor: MigrationTools.Enrichers.PauseAfterEachItemOptions
 - name: Classic
   description: 
   code: >-
     {
       "$type": "PauseAfterEachItemOptions",
-      "Enabled": true
+      "Enabled": false
     }
   sampleFor: MigrationTools.Enrichers.PauseAfterEachItemOptions
 description: missng XML code comments
@@ -25,8 +36,8 @@ options:
   defaultValue: missng XML code comments
 status: missng XML code comments
 processingTarget: missng XML code comments
-classFile: /src/MigrationTools/ProcessorEnrichers/PauseAfterEachItem.cs
-optionsClassFile: /src/MigrationTools/ProcessorEnrichers/PauseAfterEachItemOptions.cs
+classFile: /src/MigrationTools/Processors/Enrichers/PauseAfterEachItem.cs
+optionsClassFile: /src/MigrationTools/Processors/Enrichers/PauseAfterEachItemOptions.cs
 
 redirectFrom:
 - /Reference/v2/ProcessorEnrichers/PauseAfterEachItemOptions/

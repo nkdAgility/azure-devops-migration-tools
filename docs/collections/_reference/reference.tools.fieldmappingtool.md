@@ -2,16 +2,13 @@
 optionsClassName: FieldMappingToolOptions
 optionsClassFullName: MigrationTools.Tools.FieldMappingToolOptions
 configurationSamples:
-- name: default
+- name: defaults
   description: 
   code: >-
     {
       "MigrationTools": {
-        "CommonTools": {
-          "FieldMappingTool": {
-            "Enabled": "False",
-            "FieldMaps": ""
-          }
+        "ProcessorDefaults": {
+          "FieldMappingTool": {}
         }
       }
     }
@@ -21,8 +18,7 @@ configurationSamples:
   code: >-
     {
       "$type": "FieldMappingToolOptions",
-      "FieldMaps": [],
-      "Enabled": false
+      "FieldMaps": []
     }
   sampleFor: MigrationTools.Tools.FieldMappingToolOptions
 description: missng XML code comments
@@ -30,10 +26,6 @@ className: FieldMappingTool
 typeName: Tools
 architecture: v1
 options:
-- parameterName: Enabled
-  type: Boolean
-  description: missng XML code comments
-  defaultValue: missng XML code comments
 - parameterName: FieldMaps
   type: List
   description: missng XML code comments

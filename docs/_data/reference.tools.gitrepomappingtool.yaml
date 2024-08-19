@@ -1,18 +1,13 @@
 optionsClassName: GitRepoMappingToolOptions
 optionsClassFullName: MigrationTools.Tools.GitRepoMappingToolOptions
 configurationSamples:
-- name: default
+- name: defaults
   description: 
   code: >-
     {
       "MigrationTools": {
-        "CommonTools": {
-          "GitRepoMappingTool": {
-            "Enabled": "True",
-            "Mappings": {
-              "Source Repo Name": "Target Repo Name"
-            }
-          }
+        "ProcessorDefaults": {
+          "GitRepoMappingTool": {}
         }
       }
     }
@@ -22,11 +17,7 @@ configurationSamples:
   code: >-
     {
       "$type": "GitRepoMappingToolOptions",
-      "Mappings": {
-        "$type": "Dictionary`2",
-        "Source Repo Name": "Target Repo Name"
-      },
-      "Enabled": true
+      "Mappings": null
     }
   sampleFor: MigrationTools.Tools.GitRepoMappingToolOptions
 description: Used to process the String fields of a work item. This is useful for cleaning up data. It will limit fields to a max length and apply regex replacements based on what is configured. Each regex replacement is applied in order and can be enabled or disabled.
@@ -34,10 +25,6 @@ className: GitRepoMappingTool
 typeName: Tools
 architecture: v1
 options:
-- parameterName: Enabled
-  type: Boolean
-  description: missng XML code comments
-  defaultValue: missng XML code comments
 - parameterName: Mappings
   type: Dictionary
   description: List of work item mappings.

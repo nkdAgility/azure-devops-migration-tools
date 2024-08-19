@@ -1,19 +1,71 @@
 ---
-optionsClassName: 
-optionsClassFullName: 
-configurationSamples: []
+optionsClassName: WorkItemUpdateAreasAsTagsProcessorOptions
+optionsClassFullName: MigrationTools.Processors.WorkItemUpdateAreasAsTagsProcessorOptions
+configurationSamples:
+- name: defaults
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "ProcessorDefaults": {
+          "WorkItemUpdateAreasAsTagsProcessor": {}
+        }
+      }
+    }
+  sampleFor: MigrationTools.Processors.WorkItemUpdateAreasAsTagsProcessorOptions
+- name: Classic
+  description: 
+  code: >-
+    {
+      "$type": "WorkItemUpdateAreasAsTagsProcessorOptions",
+      "Enabled": false,
+      "AreaIterationPath": null,
+      "Enrichers": null,
+      "ProcessorEnrichers": null,
+      "SourceName": null,
+      "TargetName": null
+    }
+  sampleFor: MigrationTools.Processors.WorkItemUpdateAreasAsTagsProcessorOptions
 description: A common issue with older *TFS/Azure DevOps* instances is the proliferation of `Area Paths`. With the use of `Area Path` for `Teams` and the addition of the `Node Name` column option these extensive tag hierarchies should instad be moved to tags.
 className: WorkItemUpdateAreasAsTagsProcessor
 typeName: Processors
 architecture: v1
-options: []
+options:
+- parameterName: AreaIterationPath
+  type: String
+  description: This is a required parameter. That define the root path of the iteration. To get the full path use `\`
+  defaultValue: '\'
+- parameterName: Enabled
+  type: Boolean
+  description: If set to `true` then the processor will run. Set to `false` and the processor will not run.
+  defaultValue: missng XML code comments
+- parameterName: Enrichers
+  type: List
+  description: A list of enrichers that can augment the proccessing of the data
+  defaultValue: missng XML code comments
+- parameterName: ProcessorEnrichers
+  type: List
+  description: List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.
+  defaultValue: missng XML code comments
+- parameterName: RefName
+  type: String
+  description: '`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.'
+  defaultValue: missng XML code comments
+- parameterName: SourceName
+  type: String
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: TargetName
+  type: String
+  description: missng XML code comments
+  defaultValue: missng XML code comments
 status: Beta
 processingTarget: Work Item
 classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/WorkItemUpdateAreasAsTagsProcessor.cs
-optionsClassFile: 
+optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/WorkItemUpdateAreasAsTagsProcessorOptions.cs
 
 redirectFrom:
-- /Reference/v1/Processors//
+- /Reference/v1/Processors/WorkItemUpdateAreasAsTagsProcessorOptions/
 layout: reference
 toc: true
 permalink: /Reference/Processors/WorkItemUpdateAreasAsTagsProcessor/

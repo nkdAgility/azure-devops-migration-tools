@@ -2,17 +2,13 @@
 optionsClassName: TfsRevisionManagerToolOptions
 optionsClassFullName: MigrationTools.Tools.TfsRevisionManagerToolOptions
 configurationSamples:
-- name: default
+- name: defaults
   description: 
   code: >-
     {
       "MigrationTools": {
-        "CommonTools": {
-          "TfsRevisionManagerTool": {
-            "Enabled": "True",
-            "MaxRevisions": "0",
-            "ReplayRevisions": "True"
-          }
+        "ProcessorDefaults": {
+          "TfsRevisionManagerTool": {}
         }
       }
     }
@@ -22,9 +18,8 @@ configurationSamples:
   code: >-
     {
       "$type": "TfsRevisionManagerToolOptions",
-      "ReplayRevisions": true,
-      "MaxRevisions": 0,
-      "Enabled": true
+      "ReplayRevisions": false,
+      "MaxRevisions": 0
     }
   sampleFor: MigrationTools.Tools.TfsRevisionManagerToolOptions
 description: The TfsRevisionManagerTool manipulates the revisions of a work item to reduce the number of revisions that are migrated.
@@ -32,10 +27,6 @@ className: TfsRevisionManagerTool
 typeName: Tools
 architecture: v1
 options:
-- parameterName: Enabled
-  type: Boolean
-  description: missng XML code comments
-  defaultValue: missng XML code comments
 - parameterName: MaxRevisions
   type: Int32
   description: Sets the maximum number of revisions that will be migrated. "First + Last N = Max". If this was set to 5 and there were 10 revisions you would get the first 1 (creation) and the latest 4 migrated.

@@ -1,19 +1,13 @@
 optionsClassName: TfsTeamSettingsToolOptions
 optionsClassFullName: MigrationTools.Tools.TfsTeamSettingsToolOptions
 configurationSamples:
-- name: default
+- name: defaults
   description: 
   code: >-
     {
       "MigrationTools": {
-        "CommonTools": {
-          "TfsTeamSettingsTool": {
-            "Enabled": "True",
-            "MigrateTeamCapacities": "True",
-            "MigrateTeamSettings": "True",
-            "Teams": {},
-            "UpdateTeamSettings": "True"
-          }
+        "ProcessorDefaults": {
+          "TfsTeamSettingsTool": {}
         }
       }
     }
@@ -23,11 +17,10 @@ configurationSamples:
   code: >-
     {
       "$type": "TfsTeamSettingsToolOptions",
-      "MigrateTeamSettings": true,
-      "UpdateTeamSettings": true,
-      "MigrateTeamCapacities": true,
-      "Teams": null,
-      "Enabled": true
+      "MigrateTeamSettings": false,
+      "UpdateTeamSettings": false,
+      "MigrateTeamCapacities": false,
+      "Teams": null
     }
   sampleFor: MigrationTools.Tools.TfsTeamSettingsToolOptions
 description: The TfsUserMappingTool is used to map users from the source to the target system. Run it with the ExportUsersForMappingContext to create a mapping file then with WorkItemMigrationContext to use the mapping file to update the users in the target system as you migrate the work items.
@@ -35,10 +28,6 @@ className: TfsTeamSettingsTool
 typeName: Tools
 architecture: v1
 options:
-- parameterName: Enabled
-  type: Boolean
-  description: missng XML code comments
-  defaultValue: missng XML code comments
 - parameterName: MigrateTeamCapacities
   type: Boolean
   description: 'Migrate original team member capacities after their creation on the target team project. Note: It will only migrate team member capacity if the team member with same display name exists on the target collection otherwise it will be ignored.'

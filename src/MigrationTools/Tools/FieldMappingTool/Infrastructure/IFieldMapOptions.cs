@@ -8,7 +8,5 @@ namespace MigrationTools.Tools.Infrastructure
     {
         List<string> ApplyTo { get; set; }
 
-        void SetExampleConfigDefaults();
-
     }
 }

@@ -2,6 +2,17 @@
 optionsClassName: AzureDevOpsPipelineProcessorOptions
 optionsClassFullName: MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions
 configurationSamples:
+- name: defaults
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "ProcessorDefaults": {
+          "AzureDevOpsPipelineProcessor": {}
+        }
+      }
+    }
+  sampleFor: MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions
 - name: Classic
   description: 
   code: >-
