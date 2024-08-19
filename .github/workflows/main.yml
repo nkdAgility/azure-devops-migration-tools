@@ -536,7 +536,7 @@ jobs:
           password: ${{ secrets.NKDAGILITY_LEARN_SFTP }}
           port: 2222
           # If true, outputs the results of the upload, without actually uploading.
-          dry-run: ${{ (needs.Setup.outputs.nkdAgility_Ring) == 'Canary' }}
+          #dry-run: ${{ (needs.Setup.outputs.nkdAgility_Ring) == 'Canary' }}
           # A list of folders to upload in the format of `folder/ => upload_folder/`
           uploads: | 
               ./_site/ => ${{needs.Setup.outputs.nkdAgility_DocsDeployFolder}}
