@@ -119,8 +119,8 @@ jobs:
                 default {
                     $Ring = "Canary";
                     $WingetApplicationId = "nkdagility.azure-devops-migration-tools.Canary";
-                    $docs_deploy_folder = "./azure-devops-migration-tools/canary/" + ${{ github.ref_name }}
-                    $docs_baseURL = "/learn/azure-devops-migration-tools/canary/" + ${{ github.ref_name }}
+                    $docs_deploy_folder = "./azure-devops-migration-tools/canary/" + "${{ github.ref_name }}"
+                    $docs_baseURL = "/learn/azure-devops-migration-tools/canary/" + "${{ github.ref_name }}"
                     $RunRelease = 'false'
                 }
             }
