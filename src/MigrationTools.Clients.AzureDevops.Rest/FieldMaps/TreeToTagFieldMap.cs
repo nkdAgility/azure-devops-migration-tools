@@ -7,7 +7,7 @@ namespace MigrationTools.Clients.AzureDevops.Rest.FieldMaps
 {
     public class TreeToTagFieldMap : FieldMapBase
     {
-        private TreeToTagMapConfig Config { get { return (TreeToTagMapConfig)_Config; } }
+        private TreeToTagMapOptions Config { get { return (TreeToTagMapOptions)_Config; } }
 
         public override void Configure(IFieldMapConfig config)
         {

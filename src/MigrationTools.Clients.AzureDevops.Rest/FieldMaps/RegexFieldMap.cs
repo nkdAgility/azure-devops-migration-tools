@@ -7,7 +7,7 @@ namespace MigrationTools.Clients.AzureDevops.Rest.FieldMaps
 {
     public class RegexFieldMap : FieldMapBase
     {
-        private RegexFieldMapConfig Config { get { return (RegexFieldMapConfig)_Config; } }
+        private RegexFieldMapOptions Config { get { return (RegexFieldMapOptions)_Config; } }
 
         public override void Configure(IFieldMapConfig config)
         {

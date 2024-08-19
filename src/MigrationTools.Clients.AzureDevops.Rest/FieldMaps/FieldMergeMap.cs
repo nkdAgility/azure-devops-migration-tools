@@ -7,7 +7,7 @@ namespace MigrationTools.Clients.AzureDevops.Rest.FieldMaps
 {
     public class FieldMergeMap : FieldMapBase
     {
-        private FieldMergeMapConfig Config { get { return (FieldMergeMapConfig)_Config; } }
+        private FieldMergeMapOptions Config { get { return (FieldMergeMapOptions)_Config; } }
 
         public override void Configure(IFieldMapConfig config)
         {

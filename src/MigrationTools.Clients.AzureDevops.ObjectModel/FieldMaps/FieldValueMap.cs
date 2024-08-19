@@ -13,7 +13,7 @@ namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
         {
         }
 
-        private FieldValueMapConfig Config { get { return (FieldValueMapConfig)_Config; } }
+        private FieldValueMapOptions Config { get { return (FieldValueMapOptions)_Config; } }
 
         public override string MappingDisplayName => $"{Config.sourceField} {Config.targetField}";
 

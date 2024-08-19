@@ -16,13 +16,13 @@
   },
   "FieldMaps": [
     {
-      "ObjectType": "VstsSyncMigrator.Engine.Configuration.FieldMap.FieldtoTagMapConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.FieldMap.FieldtoTagMapOptions",
       "WorkItemTypeName": "*",
       "sourceField": "System.State",
       "formatExpression": "OriginalState:{0}"
     },
     {
-      "ObjectType": "VstsSyncMigrator.Engine.Configuration.FieldMap.FieldValueMapConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.FieldMap.FieldValueMapOptions",
       "WorkItemTypeName": "*",
       "sourceField": "System.State",
       "targetField": "System.State",
@@ -36,19 +36,19 @@
       }
     },
     {
-      "ObjectType": "VstsSyncMigrator.Engine.Configuration.FieldMap.FieldtoTagMapConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.FieldMap.FieldtoTagMapOptions",
       "WorkItemTypeName": "*",
       "sourceField": "Microsoft.VSTS.Common.BusinessValue",
       "formatExpression": "BV:{0}"
     },
     {
-      "ObjectType": "VstsSyncMigrator.Engine.Configuration.FieldMap.FieldtoFieldMapConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.FieldMap.FieldtoFieldMapOptions",
       "WorkItemTypeName": "*",
       "sourceField": "Microsoft.VSTS.Common.BacklogPriority",
       "targetField": "Microsoft.VSTS.Common.StackRank"
     },
     {
-      "ObjectType": "VstsSyncMigrator.Engine.Configuration.FieldMap.FieldtoFieldMapConfig",
+      "ObjectType": "VstsSyncMigrator.Engine.Configuration.FieldMap.FieldtoFieldMapOptions",
       "WorkItemTypeName": "*",
       "sourceField": "Microsoft.VSTS.Scheduling.Effort",
       "targetField": "Microsoft.VSTS.Scheduling.StoryPoints"

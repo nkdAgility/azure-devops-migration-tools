@@ -5,7 +5,7 @@
     /// </summary>
     /// <status>ready</status>
     /// <processingtarget>Work Item Field</processingtarget>
-    public class FieldLiteralMapConfig : IFieldMapConfig
+    public class FieldLiteralMapOptions : IFieldMapConfig
     {
         public string FieldMap => "FieldLiteralMap";
 

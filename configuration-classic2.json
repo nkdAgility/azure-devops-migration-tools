@@ -14,7 +14,7 @@
       "Enabled": true,
       "WorkItemFieldMaps": [
         {
-          "$type": "MultiValueConditionalMapConfig",
+          "$type": "MultiValueConditionalMapOptions",
           "WorkItemTypeName": "*",
           "sourceFieldsAndValues": {
             "Field1": "Value1",
@@ -26,12 +26,12 @@
           }
         },
         {
-          "$type": "FieldSkipMapConfig",
+          "$type": "FieldSkipMapOptions",
           "WorkItemTypeName": "*",
           "targetField": "TfsMigrationTool.ReflectedWorkItemId"
         },
         {
-          "$type": "FieldValueMapConfig",
+          "$type": "FieldValueMapOptions",
           "WorkItemTypeName": "*",
           "sourceField": "System.State",
           "targetField": "System.State",
@@ -47,13 +47,13 @@
           }
         },
         {
-          "$type": "FieldtoFieldMapConfig",
+          "$type": "FieldtoFieldMapOptions",
           "WorkItemTypeName": "*",
           "sourceField": "Microsoft.VSTS.Common.BacklogPriority",
           "targetField": "Microsoft.VSTS.Common.StackRank"
         },
         {
-          "$type": "FieldtoFieldMultiMapConfig",
+          "$type": "FieldtoFieldMultiMapOptions",
           "WorkItemTypeName": "*",
           "SourceToTargetMappings": {
             "SourceField1": "TargetField1",
@@ -61,13 +61,13 @@
           }
         },
         {
-          "$type": "FieldtoTagMapConfig",
+          "$type": "FieldtoTagMapOptions",
           "WorkItemTypeName": "*",
           "sourceField": "System.State",
           "formatExpression": "ScrumState:{0}"
         },
         {
-          "$type": "FieldMergeMapConfig",
+          "$type": "FieldMergeMapOptions",
           "WorkItemTypeName": "*",
           "sourceField1": "System.Description",
           "sourceField2": "Microsoft.VSTS.Common.AcceptanceCriteria",
@@ -76,7 +76,7 @@
           "doneMatch": "##DONE##"
         },
         {
-          "$type": "RegexFieldMapConfig",
+          "$type": "RegexFieldMapOptions",
           "WorkItemTypeName": "*",
           "sourceField": "COMPANY.PRODUCT.Release",
           "targetField": "COMPANY.DEVISION.MinorReleaseVersion",
@@ -84,14 +84,14 @@
           "replacement": "$1"
         },
         {
-          "$type": "FieldValuetoTagMapConfig",
+          "$type": "FieldValuetoTagMapOptions",
           "WorkItemTypeName": "*",
           "sourceField": "Microsoft.VSTS.CMMI.Blocked",
           "pattern": "Yes",
           "formatExpression": "{0}"
         },
         {
-          "$type": "TreeToTagMapConfig",
+          "$type": "TreeToTagMapOptions",
           "WorkItemTypeName": "*",
           "toSkip": 3,
           "timeTravel": 1

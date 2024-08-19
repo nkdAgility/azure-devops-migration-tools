@@ -15,7 +15,7 @@ namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
         }
 
         public override string MappingDisplayName => buildMappingDisplayName();
-        private FieldMergeMapConfig Config { get { return (FieldMergeMapConfig)_Config; } }
+        private FieldMergeMapOptions Config { get { return (FieldMergeMapOptions)_Config; } }
 
         public override void Configure(IFieldMapConfig config)
         {

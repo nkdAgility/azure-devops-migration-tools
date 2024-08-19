@@ -13,7 +13,7 @@ namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
         {
         }
 
-        private TreeToTagMapConfig Config { get { return (TreeToTagMapConfig)_Config; } }
+        private TreeToTagMapOptions Config { get { return (TreeToTagMapOptions)_Config; } }
 
         public override void Configure(IFieldMapConfig config)
         {

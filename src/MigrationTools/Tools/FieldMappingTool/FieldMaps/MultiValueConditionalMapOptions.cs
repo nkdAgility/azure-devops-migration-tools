@@ -7,7 +7,7 @@ namespace MigrationTools._EngineV1.Configuration.FieldMap
     /// </summary>
     /// <status>ready</status>
     /// <processingtarget>Work Item Field</processingtarget>
-    public class MultiValueConditionalMapConfig : IFieldMapConfig
+    public class MultiValueConditionalMapOptions : IFieldMapConfig
     {
         public string WorkItemTypeName { get; set; }
         public Dictionary<string, string> sourceFieldsAndValues { get; set; }

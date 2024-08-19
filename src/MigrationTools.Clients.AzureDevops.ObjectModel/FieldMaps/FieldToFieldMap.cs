@@ -12,7 +12,7 @@ namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
         }
 
         public override string MappingDisplayName => $"{Config.sourceField} {Config.targetField}";
-        private FieldtoFieldMapConfig Config { get { return (FieldtoFieldMapConfig)_Config; } }
+        private FieldtoFieldMapOptions Config { get { return (FieldtoFieldMapOptions)_Config; } }
 
         public override void Configure(IFieldMapConfig config)
         {

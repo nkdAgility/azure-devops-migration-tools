@@ -7,7 +7,7 @@ namespace MigrationTools.Clients.AzureDevops.Rest.FieldMaps
 {
     public class FieldLiteralMap : FieldMapBase
     {
-        private FieldLiteralMapConfig Config { get { return (FieldLiteralMapConfig)_Config; } }
+        private FieldLiteralMapOptions Config { get { return (FieldLiteralMapOptions)_Config; } }
 
         public override void Configure(IFieldMapConfig config)
         {

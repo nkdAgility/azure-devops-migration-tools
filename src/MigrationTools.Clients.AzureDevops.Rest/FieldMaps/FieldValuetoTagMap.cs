@@ -7,7 +7,7 @@ namespace MigrationTools.Clients.AzureDevops.Rest.FieldMaps
 {
     public class FieldValuetoTagMap : FieldMapBase
     {
-        private FieldValuetoTagMapConfig Config { get { return (FieldValuetoTagMapConfig)_Config; } }
+        private FieldValuetoTagMapOptions Config { get { return (FieldValuetoTagMapOptions)_Config; } }
 
         public override void Configure(IFieldMapConfig config)
         {

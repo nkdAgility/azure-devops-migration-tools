@@ -7,7 +7,7 @@ namespace MigrationTools.Clients.AzureDevops.Rest.FieldMaps
 {
     public class FieldToFieldMap : FieldMapBase
     {
-        private FieldtoFieldMapConfig Config { get { return (FieldtoFieldMapConfig)_Config; } }
+        private FieldtoFieldMapOptions Config { get { return (FieldtoFieldMapOptions)_Config; } }
 
         public override void Configure(IFieldMapConfig config)
         {

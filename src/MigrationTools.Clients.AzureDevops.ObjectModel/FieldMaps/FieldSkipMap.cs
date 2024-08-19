@@ -12,7 +12,7 @@ namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
         }
 
         public override string MappingDisplayName => $"{Config.targetField}";
-        private FieldSkipMapConfig Config { get { return (FieldSkipMapConfig)_Config; } }
+        private FieldSkipMapOptions Config { get { return (FieldSkipMapOptions)_Config; } }
 
         internal override void InternalExecute(WorkItem source, WorkItem target)
         {

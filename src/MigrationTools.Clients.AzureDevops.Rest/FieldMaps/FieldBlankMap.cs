@@ -7,7 +7,7 @@ namespace MigrationTools.Clients.AzureDevops.Rest.FieldMaps
 {
     public class FieldSkipMap : FieldMapBase
     {
-        private FieldSkipMapConfig Config { get { return (FieldSkipMapConfig)_Config; } }
+        private FieldSkipMapOptions Config { get { return (FieldSkipMapOptions)_Config; } }
 
         public override string MappingDisplayName => $"{Config.targetField}";
 

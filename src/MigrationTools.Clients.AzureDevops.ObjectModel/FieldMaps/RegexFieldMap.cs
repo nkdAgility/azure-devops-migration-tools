@@ -15,7 +15,7 @@ namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
         }
 
         public override string MappingDisplayName => $"{Config.sourceField} {Config.targetField}";
-        private RegexFieldMapConfig Config { get { return (RegexFieldMapConfig)_Config; } }
+        private RegexFieldMapOptions Config { get { return (RegexFieldMapOptions)_Config; } }
 
         public override void Configure(IFieldMapConfig config)
         {

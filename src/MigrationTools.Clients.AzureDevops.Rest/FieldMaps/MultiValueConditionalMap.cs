@@ -7,7 +7,7 @@ namespace MigrationTools.Clients.AzureDevops.Rest.FieldMaps
 {
     public class MultiValueConditionalMap : FieldMapBase
     {
-        private MultiValueConditionalMapConfig Config { get { return (MultiValueConditionalMapConfig)_Config; } }
+        private MultiValueConditionalMapOptions Config { get { return (MultiValueConditionalMapOptions)_Config; } }
 
         public override void Configure(IFieldMapConfig config)
         {
