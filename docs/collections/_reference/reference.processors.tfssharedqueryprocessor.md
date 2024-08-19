@@ -31,7 +31,7 @@ configurationSamples:
 description: The TfsSharedQueryProcessor enabled you to migrate queries from one locatio nto another.
 className: TfsSharedQueryProcessor
 typeName: Processors
-architecture: v2
+architecture: 
 options:
 - parameterName: Enabled
   type: Boolean
@@ -75,14 +75,14 @@ classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/TfsSha
 optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/TfsSharedQueryProcessorOptions.cs
 
 redirectFrom:
-- /Reference/v2/Processors/TfsSharedQueryProcessorOptions/
+- /Reference/Processors/TfsSharedQueryProcessorOptions/
 layout: reference
 toc: true
 permalink: /Reference/Processors/TfsSharedQueryProcessor/
 title: TfsSharedQueryProcessor
 categories:
 - Processors
-- v2
+- 
 topics:
 - topic: notes
   path: /Processors/TfsSharedQueryProcessor-notes.md

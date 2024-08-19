@@ -35,7 +35,7 @@ configurationSamples:
 description: Azure DevOps Processor that migrates Taskgroups, Build- and Release Pipelines.
 className: AzureDevOpsPipelineProcessor
 typeName: Processors
-architecture: v2
+architecture: 
 options:
 - parameterName: BuildPipelines
   type: List

@@ -27,7 +27,7 @@ configurationSamples:
 description: The TfsUserMappingTool is used to map users from the source to the target system. Run it with the ExportUsersForMappingContext to create a mapping file then with WorkItemMigrationContext to use the mapping file to update the users in the target system as you migrate the work items.
 className: TfsTeamSettingsTool
 typeName: Tools
-architecture: v1
+architecture: 
 options:
 - parameterName: MigrateTeamCapacities
   type: Boolean
@@ -51,14 +51,14 @@ classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Tools/TfsTeamSett
 optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Tools/TfsTeamSettingsToolOptions.cs
 
 redirectFrom:
-- /Reference/v1/Tools/TfsTeamSettingsToolOptions/
+- /Reference/Tools/TfsTeamSettingsToolOptions/
 layout: reference
 toc: true
 permalink: /Reference/Tools/TfsTeamSettingsTool/
 title: TfsTeamSettingsTool
 categories:
 - Tools
-- v1
+- 
 topics:
 - topic: notes
   path: /Tools/TfsTeamSettingsTool-notes.md

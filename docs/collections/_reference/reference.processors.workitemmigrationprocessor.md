@@ -41,7 +41,7 @@ configurationSamples:
 description: WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links, and Attachments. Use `WorkItemMigrationConfig` to configure.
 className: WorkItemMigrationProcessor
 typeName: Processors
-architecture: v1
+architecture: 
 options:
 - parameterName: AttachRevisionHistory
   type: Boolean
@@ -125,14 +125,14 @@ classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/WorkIt
 optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/WorkItemMigrationProcessorOptions.cs
 
 redirectFrom:
-- /Reference/v1/Processors/WorkItemMigrationProcessorOptions/
+- /Reference/Processors/WorkItemMigrationProcessorOptions/
 layout: reference
 toc: true
 permalink: /Reference/Processors/WorkItemMigrationProcessor/
 title: WorkItemMigrationProcessor
 categories:
 - Processors
-- v1
+- 
 topics:
 - topic: notes
   path: /Processors/WorkItemMigrationProcessor-notes.md

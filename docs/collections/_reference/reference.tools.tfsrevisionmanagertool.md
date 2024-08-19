@@ -25,7 +25,7 @@ configurationSamples:
 description: The TfsRevisionManagerTool manipulates the revisions of a work item to reduce the number of revisions that are migrated.
 className: TfsRevisionManagerTool
 typeName: Tools
-architecture: v1
+architecture: 
 options:
 - parameterName: MaxRevisions
   type: Int32
@@ -41,14 +41,14 @@ classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Tools/TfsRevision
 optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Tools/TfsRevisionManagerToolOptions.cs
 
 redirectFrom:
-- /Reference/v1/Tools/TfsRevisionManagerToolOptions/
+- /Reference/Tools/TfsRevisionManagerToolOptions/
 layout: reference
 toc: true
 permalink: /Reference/Tools/TfsRevisionManagerTool/
 title: TfsRevisionManagerTool
 categories:
 - Tools
-- v1
+- 
 topics:
 - topic: notes
   path: /Tools/TfsRevisionManagerTool-notes.md

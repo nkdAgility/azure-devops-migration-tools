@@ -31,7 +31,7 @@ configurationSamples:
 description: Process definition processor used to keep processes between two orgs in sync
 className: ProcessDefinitionProcessor
 typeName: Processors
-architecture: v2
+architecture: 
 options:
 - parameterName: Enabled
   type: Boolean

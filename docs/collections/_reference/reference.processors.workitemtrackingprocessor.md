@@ -31,7 +31,7 @@ configurationSamples:
 description: This processor is intended, with the aid of [ProcessorEnrichers](../ProcessorEnrichers/index.md), to allow the migration of Work Items between two [Endpoints](../Endpoints/index.md).
 className: WorkItemTrackingProcessor
 typeName: Processors
-architecture: v2
+architecture: 
 options:
 - parameterName: CollapseRevisions
   type: Boolean
@@ -75,14 +75,14 @@ classFile: /src/MigrationTools/Processors/WorkItemTrackingProcessor.cs
 optionsClassFile: /src/MigrationTools/Processors/WorkItemTrackingProcessorOptions.cs
 
 redirectFrom:
-- /Reference/v2/Processors/WorkItemTrackingProcessorOptions/
+- /Reference/Processors/WorkItemTrackingProcessorOptions/
 layout: reference
 toc: true
 permalink: /Reference/Processors/WorkItemTrackingProcessor/
 title: WorkItemTrackingProcessor
 categories:
 - Processors
-- v2
+- 
 topics:
 - topic: notes
   path: /Processors/WorkItemTrackingProcessor-notes.md

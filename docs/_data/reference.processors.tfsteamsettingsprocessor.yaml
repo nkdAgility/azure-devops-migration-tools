@@ -32,7 +32,7 @@ configurationSamples:
 description: Native TFS Processor, does not work with any other Endpoints.
 className: TfsTeamSettingsProcessor
 typeName: Processors
-architecture: v2
+architecture: 
 options:
 - parameterName: Enabled
   type: Boolean

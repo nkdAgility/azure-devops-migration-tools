@@ -129,7 +129,7 @@
             <status>ready</status>
             <processingtarget>Work Item</processingtarget>
         </member>
-        <member name="T:MigrationTools.Tools.FieldtoFieldMapOptions">
+        <member name="T:MigrationTools.Tools.FieldToFieldMapOptions">
             <summary>
             Just want to map one field to another? This is the one for you.
             </summary>
@@ -143,7 +143,7 @@
             <status>ready</status>
             <processingtarget>Work Item Field</processingtarget>
         </member>
-        <member name="T:MigrationTools.Tools.FieldtoTagMapOptions">
+        <member name="T:MigrationTools.Tools.FieldToTagFieldMapOptions">
             <summary>
             Want to take a field and convert its value to a tag? Done...
             </summary>
@@ -178,7 +178,7 @@
             <status>ready</status>
             <processingtarget>Work Item Field</processingtarget>
         </member>
-        <member name="T:MigrationTools.Tools.TreeToTagMapOptions">
+        <member name="T:MigrationTools.Tools.TreeToTagFieldMapOptions">
             <summary>
             Need to clear out those nasty Area tree hierarchies? This creates Tags for each node in the Area Path...
             </summary>
@@ -279,27 +279,27 @@
         </member>
         <member name="F:ThisAssembly.Git.Commit">
             <summary>
-            => @"2c1a6e6"
+            => @"93c75a3"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Sha">
             <summary>
-            => @"2c1a6e616133abcfd770bf34ac958eb46ffcd977"
+            => @"93c75a3d20f49d82c03b10b6f1c34bd3b7ca4548"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.CommitDate">
             <summary>
-            => @"2024-08-19T15:39:29+01:00"
+            => @"2024-08-19T16:20:18+01:00"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commits">
             <summary>
-            => @"130"
+            => @"131"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Tag">
             <summary>
-            => @"v15.1.8-Preview.9-130-g2c1a6e6"
+            => @"v15.1.8-Preview.9-131-g93c75a3"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseTag">
@@ -334,7 +334,7 @@
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Patch">
             <summary>
-            => @"138"
+            => @"139"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Label">

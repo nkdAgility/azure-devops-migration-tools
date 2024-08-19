@@ -1,0 +1,64 @@
+optionsClassName: FieldMergeMapOptions
+optionsClassFullName: MigrationTools.Tools.FieldMergeMapOptions
+configurationSamples:
+- name: defaults
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "FieldMappingTool": {
+            "FieldDefaults": {
+              "FieldMergeMap": {}
+            }
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.FieldMergeMapOptions
+- name: Classic
+  description: 
+  code: >-
+    {
+      "$type": "FieldMergeMapOptions",
+      "WorkItemTypeName": null,
+      "sourceFields": null,
+      "targetField": null,
+      "formatExpression": null,
+      "Enabled": false,
+      "ApplyTo": null
+    }
+  sampleFor: MigrationTools.Tools.FieldMergeMapOptions
+description: missng XML code comments
+className: FieldMergeMap
+typeName: FieldMaps
+architecture: 
+options:
+- parameterName: ApplyTo
+  type: List
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: Enabled
+  type: Boolean
+  description: If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.
+  defaultValue: missng XML code comments
+- parameterName: formatExpression
+  type: String
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: sourceFields
+  type: List
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: targetField
+  type: String
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: WorkItemTypeName
+  type: String
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+status: missng XML code comments
+processingTarget: missng XML code comments
+classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Tools/FieldMappingTool/FieldMaps/FieldMergeMap.cs
+optionsClassFile: /src/MigrationTools/Tools/FieldMappingTool/FieldMaps/FieldMergeMapOptions.cs

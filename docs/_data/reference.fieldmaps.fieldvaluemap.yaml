@@ -1,0 +1,69 @@
+optionsClassName: FieldValueMapOptions
+optionsClassFullName: MigrationTools.Tools.FieldValueMapOptions
+configurationSamples:
+- name: defaults
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "FieldMappingTool": {
+            "FieldDefaults": {
+              "FieldValueMap": {}
+            }
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.FieldValueMapOptions
+- name: Classic
+  description: 
+  code: >-
+    {
+      "$type": "FieldValueMapOptions",
+      "WorkItemTypeName": null,
+      "sourceField": null,
+      "targetField": null,
+      "defaultValue": null,
+      "valueMapping": null,
+      "Enabled": false,
+      "ApplyTo": null
+    }
+  sampleFor: MigrationTools.Tools.FieldValueMapOptions
+description: missng XML code comments
+className: FieldValueMap
+typeName: FieldMaps
+architecture: 
+options:
+- parameterName: ApplyTo
+  type: List
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: defaultValue
+  type: String
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: Enabled
+  type: Boolean
+  description: If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.
+  defaultValue: missng XML code comments
+- parameterName: sourceField
+  type: String
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: targetField
+  type: String
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: valueMapping
+  type: Dictionary
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: WorkItemTypeName
+  type: String
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+status: missng XML code comments
+processingTarget: missng XML code comments
+classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Tools/FieldMappingTool/FieldMaps/FieldValueMap.cs
+optionsClassFile: /src/MigrationTools/Tools/FieldMappingTool/FieldMaps/FieldValueMapOptions.cs

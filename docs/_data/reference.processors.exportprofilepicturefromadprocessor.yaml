@@ -31,7 +31,7 @@ configurationSamples:
 description: Downloads corporate images and updates TFS/Azure DevOps profiles
 className: ExportProfilePictureFromADProcessor
 typeName: Processors
-architecture: v1
+architecture: 
 options:
 - parameterName: Domain
   type: String

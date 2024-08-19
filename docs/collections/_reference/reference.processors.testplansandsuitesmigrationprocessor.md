@@ -34,7 +34,7 @@ configurationSamples:
 description: Rebuilds Suits and plans for Test Cases migrated using the WorkItemMigration
 className: TestPlansAndSuitesMigrationProcessor
 typeName: Processors
-architecture: v1
+architecture: 
 options:
 - parameterName: Enabled
   type: Boolean
@@ -90,14 +90,14 @@ classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/TestPl
 optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/TestPlansAndSuitesMigrationProcessorOptions.cs
 
 redirectFrom:
-- /Reference/v1/Processors/TestPlansAndSuitesMigrationProcessorOptions/
+- /Reference/Processors/TestPlansAndSuitesMigrationProcessorOptions/
 layout: reference
 toc: true
 permalink: /Reference/Processors/TestPlansAndSuitesMigrationProcessor/
 title: TestPlansAndSuitesMigrationProcessor
 categories:
 - Processors
-- v1
+- 
 topics:
 - topic: notes
   path: /Processors/TestPlansAndSuitesMigrationProcessor-notes.md

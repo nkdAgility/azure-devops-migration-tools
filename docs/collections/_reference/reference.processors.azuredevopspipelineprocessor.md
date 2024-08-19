@@ -36,7 +36,7 @@ configurationSamples:
 description: Azure DevOps Processor that migrates Taskgroups, Build- and Release Pipelines.
 className: AzureDevOpsPipelineProcessor
 typeName: Processors
-architecture: v2
+architecture: 
 options:
 - parameterName: BuildPipelines
   type: List
@@ -100,14 +100,14 @@ classFile: /src/MigrationTools.Clients.AzureDevops.Rest/Processors/AzureDevOpsPi
 optionsClassFile: /src/MigrationTools.Clients.AzureDevops.Rest/Processors/AzureDevOpsPipelineProcessorOptions.cs
 
 redirectFrom:
-- /Reference/v2/Processors/AzureDevOpsPipelineProcessorOptions/
+- /Reference/Processors/AzureDevOpsPipelineProcessorOptions/
 layout: reference
 toc: true
 permalink: /Reference/Processors/AzureDevOpsPipelineProcessor/
 title: AzureDevOpsPipelineProcessor
 categories:
 - Processors
-- v2
+- 
 topics:
 - topic: notes
   path: /Processors/AzureDevOpsPipelineProcessor-notes.md

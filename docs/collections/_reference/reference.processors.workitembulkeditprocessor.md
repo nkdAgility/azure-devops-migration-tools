@@ -34,7 +34,7 @@ configurationSamples:
 description: This processor allows you to make changes in place where we load from teh Target and update the Target. This is used for bulk updates with the most common reason being a process template change.
 className: WorkItemBulkEditProcessor
 typeName: Processors
-architecture: v1
+architecture: 
 options:
 - parameterName: Enabled
   type: Boolean
@@ -90,14 +90,14 @@ classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/WorkIt
 optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/WorkItemBulkEditProcessorOptions.cs
 
 redirectFrom:
-- /Reference/v1/Processors/WorkItemBulkEditProcessorOptions/
+- /Reference/Processors/WorkItemBulkEditProcessorOptions/
 layout: reference
 toc: true
 permalink: /Reference/Processors/WorkItemBulkEditProcessor/
 title: WorkItemBulkEditProcessor
 categories:
 - Processors
-- v1
+- 
 topics:
 - topic: notes
   path: /Processors/WorkItemBulkEditProcessor-notes.md

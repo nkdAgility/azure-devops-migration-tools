@@ -30,7 +30,7 @@ configurationSamples:
 description: ExportUsersForMappingContext is a tool used to create a starter mapping file for users between the source and target systems. Use `ExportUsersForMappingConfig` to configure.
 className: ExportUsersForMappingProcessor
 typeName: Processors
-architecture: v1
+architecture: 
 options:
 - parameterName: Enabled
   type: Boolean
@@ -70,14 +70,14 @@ classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/Export
 optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/ExportUsersForMappingProcessorOptions.cs
 
 redirectFrom:
-- /Reference/v1/Processors/ExportUsersForMappingProcessorOptions/
+- /Reference/Processors/ExportUsersForMappingProcessorOptions/
 layout: reference
 toc: true
 permalink: /Reference/Processors/ExportUsersForMappingProcessor/
 title: ExportUsersForMappingProcessor
 categories:
 - Processors
-- v1
+- 
 topics:
 - topic: notes
   path: /Processors/ExportUsersForMappingProcessor-notes.md

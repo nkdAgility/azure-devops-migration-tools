@@ -25,7 +25,7 @@ configurationSamples:
 description: missng XML code comments
 className: TfsAttachmentTool
 typeName: Tools
-architecture: v1
+architecture: 
 options:
 - parameterName: ExportBasePath
   type: String
@@ -41,14 +41,14 @@ classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Tools/TfsAttachme
 optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Tools/TfsAttachmentToolOptions.cs
 
 redirectFrom:
-- /Reference/v1/Tools/TfsAttachmentToolOptions/
+- /Reference/Tools/TfsAttachmentToolOptions/
 layout: reference
 toc: true
 permalink: /Reference/Tools/TfsAttachmentTool/
 title: TfsAttachmentTool
 categories:
 - Tools
-- v1
+- 
 topics:
 - topic: notes
   path: /Tools/TfsAttachmentTool-notes.md

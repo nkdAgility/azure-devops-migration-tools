@@ -29,7 +29,7 @@ configurationSamples:
 description: ExportUsersForMappingContext is a tool used to create a starter mapping file for users between the source and target systems. Use `ExportUsersForMappingConfig` to configure.
 className: ExportUsersForMappingProcessor
 typeName: Processors
-architecture: v1
+architecture: 
 options:
 - parameterName: Enabled
   type: Boolean

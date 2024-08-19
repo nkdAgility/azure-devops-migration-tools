@@ -23,7 +23,7 @@ configurationSamples:
 description: missng XML code comments
 className: TfsValidateRequiredFieldTool
 typeName: Tools
-architecture: v1
+architecture: 
 options: []
 status: missng XML code comments
 processingTarget: missng XML code comments
@@ -31,14 +31,14 @@ classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Tools/TfsValidate
 optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Tools/TfsValidateRequiredFieldToolOptions.cs
 
 redirectFrom:
-- /Reference/v1/Tools/TfsValidateRequiredFieldToolOptions/
+- /Reference/Tools/TfsValidateRequiredFieldToolOptions/
 layout: reference
 toc: true
 permalink: /Reference/Tools/TfsValidateRequiredFieldTool/
 title: TfsValidateRequiredFieldTool
 categories:
 - Tools
-- v1
+- 
 topics:
 - topic: notes
   path: /Tools/TfsValidateRequiredFieldTool-notes.md

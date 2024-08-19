@@ -40,7 +40,7 @@ configurationSamples:
 description: WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links, and Attachments. Use `WorkItemMigrationConfig` to configure.
 className: WorkItemMigrationProcessor
 typeName: Processors
-architecture: v1
+architecture: 
 options:
 - parameterName: AttachRevisionHistory
   type: Boolean

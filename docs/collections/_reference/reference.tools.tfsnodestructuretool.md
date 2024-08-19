@@ -28,7 +28,7 @@ configurationSamples:
 description: The TfsNodeStructureToolEnricher is used to create missing nodes in the target project. To configure it add a `TfsNodeStructureToolOptions` section to `CommonEnrichersConfig` in the config file. Otherwise defaults will be applied.
 className: TfsNodeStructureTool
 typeName: Tools
-architecture: v1
+architecture: 
 options:
 - parameterName: AreaMaps
   type: Dictionary
@@ -56,14 +56,14 @@ classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Tools/TfsNodeStru
 optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Tools/TfsNodeStructureToolOptions.cs
 
 redirectFrom:
-- /Reference/v1/Tools/TfsNodeStructureToolOptions/
+- /Reference/Tools/TfsNodeStructureToolOptions/
 layout: reference
 toc: true
 permalink: /Reference/Tools/TfsNodeStructureTool/
 title: TfsNodeStructureTool
 categories:
 - Tools
-- v1
+- 
 topics:
 - topic: notes
   path: /Tools/TfsNodeStructureTool-notes.md

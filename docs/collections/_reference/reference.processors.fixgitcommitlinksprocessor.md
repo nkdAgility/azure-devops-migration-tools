@@ -30,7 +30,7 @@ configurationSamples:
 description: missng XML code comments
 className: FixGitCommitLinksProcessor
 typeName: Processors
-architecture: v1
+architecture: 
 options:
 - parameterName: Enabled
   type: Boolean
@@ -70,14 +70,14 @@ classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/FixGit
 optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/FixGitCommitLinksProcessorOptions.cs
 
 redirectFrom:
-- /Reference/v1/Processors/FixGitCommitLinksProcessorOptions/
+- /Reference/Processors/FixGitCommitLinksProcessorOptions/
 layout: reference
 toc: true
 permalink: /Reference/Processors/FixGitCommitLinksProcessor/
 title: FixGitCommitLinksProcessor
 categories:
 - Processors
-- v1
+- 
 topics:
 - topic: notes
   path: /Processors/FixGitCommitLinksProcessor-notes.md

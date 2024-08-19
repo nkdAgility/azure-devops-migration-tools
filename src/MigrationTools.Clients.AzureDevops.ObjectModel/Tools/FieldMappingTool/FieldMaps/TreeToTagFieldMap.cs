@@ -14,7 +14,7 @@ namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
         {
         }
 
-        private TreeToTagMapOptions Config { get { return (TreeToTagMapOptions)_Config; } }
+        private TreeToTagFieldMapOptions Config { get { return (TreeToTagFieldMapOptions)_Config; } }
 
         public override void Configure(IFieldMapOptions config)
         {

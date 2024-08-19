@@ -7,7 +7,7 @@ namespace MigrationTools.Tools
     /// </summary>
     /// <status>ready</status>
     /// <processingtarget>Work Item Field</processingtarget>
-    public class TreeToTagMapOptions : FieldMapOptions
+    public class TreeToTagFieldMapOptions : FieldMapOptions
     {
         public string WorkItemTypeName { get; set; }
         public int toSkip { get; set; }

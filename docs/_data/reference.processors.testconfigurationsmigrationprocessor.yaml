@@ -27,7 +27,7 @@ configurationSamples:
 description: This processor can migrate `test configuration`. This should be run before `LinkMigrationConfig`.
 className: TestConfigurationsMigrationProcessor
 typeName: Processors
-architecture: v1
+architecture: 
 options:
 - parameterName: Enabled
   type: Boolean

@@ -33,7 +33,7 @@ configurationSamples:
 description: Native TFS Processor, does not work with any other Endpoints.
 className: TfsTeamSettingsProcessor
 typeName: Processors
-architecture: v2
+architecture: 
 options:
 - parameterName: Enabled
   type: Boolean
@@ -85,14 +85,14 @@ classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/TfsTea
 optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/TfsTeamSettingsProcessorOptions.cs
 
 redirectFrom:
-- /Reference/v2/Processors/TfsTeamSettingsProcessorOptions/
+- /Reference/Processors/TfsTeamSettingsProcessorOptions/
 layout: reference
 toc: true
 permalink: /Reference/Processors/TfsTeamSettingsProcessor/
 title: TfsTeamSettingsProcessor
 categories:
 - Processors
-- v2
+- 
 topics:
 - topic: notes
   path: /Processors/TfsTeamSettingsProcessor-notes.md

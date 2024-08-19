@@ -24,7 +24,7 @@ configurationSamples:
 description: missng XML code comments
 className: TfsWorkItemLinkTool
 typeName: Tools
-architecture: v1
+architecture: 
 options:
 - parameterName: FilterIfLinkCountMatches
   type: Boolean

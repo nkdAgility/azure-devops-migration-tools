@@ -32,7 +32,7 @@ configurationSamples:
 description: Process definition processor used to keep processes between two orgs in sync
 className: ProcessDefinitionProcessor
 typeName: Processors
-architecture: v2
+architecture: 
 options:
 - parameterName: Enabled
   type: Boolean
@@ -80,14 +80,14 @@ classFile: /src/MigrationTools.Clients.AzureDevops.Rest/Processors/ProcessDefini
 optionsClassFile: /src/MigrationTools.Clients.AzureDevops.Rest/Processors/ProcessDefinitionProcessorOptions.cs
 
 redirectFrom:
-- /Reference/v2/Processors/ProcessDefinitionProcessorOptions/
+- /Reference/Processors/ProcessDefinitionProcessorOptions/
 layout: reference
 toc: true
 permalink: /Reference/Processors/ProcessDefinitionProcessor/
 title: ProcessDefinitionProcessor
 categories:
 - Processors
-- v2
+- 
 topics:
 - topic: notes
   path: /Processors/ProcessDefinitionProcessor-notes.md

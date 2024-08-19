@@ -23,7 +23,7 @@ configurationSamples:
 description: missng XML code comments
 className: TfsGitRepositoryTool
 typeName: Tools
-architecture: v1
+architecture: 
 options: []
 status: missng XML code comments
 processingTarget: missng XML code comments
@@ -31,14 +31,14 @@ classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Tools/TfsGitRepos
 optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Tools/TfsGitRepositoryToolOptions.cs
 
 redirectFrom:
-- /Reference/v1/Tools/TfsGitRepositoryToolOptions/
+- /Reference/Tools/TfsGitRepositoryToolOptions/
 layout: reference
 toc: true
 permalink: /Reference/Tools/TfsGitRepositoryTool/
 title: TfsGitRepositoryTool
 categories:
 - Tools
-- v1
+- 
 topics:
 - topic: notes
   path: /Tools/TfsGitRepositoryTool-notes.md

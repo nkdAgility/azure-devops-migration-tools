@@ -23,7 +23,7 @@ configurationSamples:
 description: missng XML code comments
 className: TfsWorkItemEmbededLinkTool
 typeName: Tools
-architecture: v1
+architecture: 
 options: []
 status: missng XML code comments
 processingTarget: missng XML code comments
@@ -31,14 +31,14 @@ classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Tools/TfsWorkItem
 optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Tools/TfsWorkItemEmbededLinkToolOptions.cs
 
 redirectFrom:
-- /Reference/v1/Tools/TfsWorkItemEmbededLinkToolOptions/
+- /Reference/Tools/TfsWorkItemEmbededLinkToolOptions/
 layout: reference
 toc: true
 permalink: /Reference/Tools/TfsWorkItemEmbededLinkTool/
 title: TfsWorkItemEmbededLinkTool
 categories:
 - Tools
-- v1
+- 
 topics:
 - topic: notes
   path: /Tools/TfsWorkItemEmbededLinkTool-notes.md

@@ -28,7 +28,7 @@ configurationSamples:
 description: Downloads corporate images and updates TFS/Azure DevOps profiles
 className: ImportProfilePictureProcessor
 typeName: Processors
-architecture: v1
+architecture: 
 options:
 - parameterName: Enabled
   type: Boolean
@@ -60,14 +60,14 @@ classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/Import
 optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/ImportProfilePictureProcessorOptions.cs
 
 redirectFrom:
-- /Reference/v1/Processors/ImportProfilePictureProcessorOptions/
+- /Reference/Processors/ImportProfilePictureProcessorOptions/
 layout: reference
 toc: true
 permalink: /Reference/Processors/ImportProfilePictureProcessor/
 title: ImportProfilePictureProcessor
 categories:
 - Processors
-- v1
+- 
 topics:
 - topic: notes
   path: /Processors/ImportProfilePictureProcessor-notes.md

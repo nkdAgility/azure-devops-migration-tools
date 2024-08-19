@@ -33,7 +33,7 @@ configurationSamples:
 description: The `WorkItemDelete` processor allows you to delete any amount of work items that meet the query. **DANGER:** This is not a recoverable action and should be use with extream caution.
 className: WorkItemDeleteProcessor
 typeName: Processors
-architecture: v1
+architecture: 
 options:
 - parameterName: Enabled
   type: Boolean
@@ -85,14 +85,14 @@ classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/WorkIt
 optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/WorkItemDeleteProcessorOptions.cs
 
 redirectFrom:
-- /Reference/v1/Processors/WorkItemDeleteProcessorOptions/
+- /Reference/Processors/WorkItemDeleteProcessorOptions/
 layout: reference
 toc: true
 permalink: /Reference/Processors/WorkItemDeleteProcessor/
 title: WorkItemDeleteProcessor
 categories:
 - Processors
-- v1
+- 
 topics:
 - topic: notes
   path: /Processors/WorkItemDeleteProcessor-notes.md

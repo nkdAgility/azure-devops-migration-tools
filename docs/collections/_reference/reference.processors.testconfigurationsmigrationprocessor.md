@@ -28,7 +28,7 @@ configurationSamples:
 description: This processor can migrate `test configuration`. This should be run before `LinkMigrationConfig`.
 className: TestConfigurationsMigrationProcessor
 typeName: Processors
-architecture: v1
+architecture: 
 options:
 - parameterName: Enabled
   type: Boolean
@@ -60,14 +60,14 @@ classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/TestCo
 optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/TestConfigurationsMigrationProcessorOptions.cs
 
 redirectFrom:
-- /Reference/v1/Processors/TestConfigurationsMigrationProcessorOptions/
+- /Reference/Processors/TestConfigurationsMigrationProcessorOptions/
 layout: reference
 toc: true
 permalink: /Reference/Processors/TestConfigurationsMigrationProcessor/
 title: TestConfigurationsMigrationProcessor
 categories:
 - Processors
-- v1
+- 
 topics:
 - topic: notes
   path: /Processors/TestConfigurationsMigrationProcessor-notes.md

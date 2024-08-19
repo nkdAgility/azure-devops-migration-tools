@@ -27,7 +27,7 @@ configurationSamples:
 description: The TfsNodeStructureToolEnricher is used to create missing nodes in the target project. To configure it add a `TfsNodeStructureToolOptions` section to `CommonEnrichersConfig` in the config file. Otherwise defaults will be applied.
 className: TfsNodeStructureTool
 typeName: Tools
-architecture: v1
+architecture: 
 options:
 - parameterName: AreaMaps
   type: Dictionary

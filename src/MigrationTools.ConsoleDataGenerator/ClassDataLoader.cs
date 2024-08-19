@@ -12,6 +12,7 @@ using MigrationTools;
 using System.Configuration;
 using Newtonsoft.Json;
 using MigrationTools.Tools.Infrastructure;
+using System.Security.AccessControl;
 
 namespace MigrationTools.ConsoleDataGenerator
 {
@@ -44,6 +45,67 @@ namespace MigrationTools.ConsoleDataGenerator
             Console.WriteLine("ClassDataLoader::populateClassData:: -----------");
             return data;
         }
+
+        public List<ClassData> GetClassDataFromOptions<TOptionsInterface>(List<Type> allTypes, string dataTypeName)
+            where TOptionsInterface : IOptions
+        {
+            Console.WriteLine();
+            Console.WriteLine($"ClassDataLoader::GetOptionsData:: {dataTypeName}");
+            List<ClassData> data = new List<ClassData>();
+            var founds = allTypes.Where(t => typeof(TOptionsInterface).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface && t.IsPublic).OrderBy(t => t.Name).ToList();
+            Console.WriteLine($"ClassDataLoader::GetOptionsData:: ----------- Found {founds.Count}");
+            // Each File
+            foreach (var item in founds)
+            {
+                Console.WriteLine($"ClassDataLoader::CreateClassDataFromOptions::-PROCESS {item.Name}");
+                data.Add(CreateClassDataFromOptions<TOptionsInterface>(allTypes, dataTypeName, item));
+            }
+            Console.WriteLine("ClassDataLoader::GetOptionsData:: -----------");
+            return data;
+        }
+
+        private ClassData CreateClassDataFromOptions<TOptionsInterface>(List<Type> allTypes, string dataTypeName, Type optionInFocus)
+            where TOptionsInterface : IOptions
+        {
+            TOptionsInterface instanceOfOption = (TOptionsInterface)Activator.CreateInstance(optionInFocus);
+            string targetOfOption = instanceOfOption.OptionFor;
+            var typeOftargetOfOption = allTypes.Where(t => t.Name == targetOfOption && !t.IsAbstract && !t.IsInterface).SingleOrDefault();
+
+            ClassData data = new ClassData();
+            data.ClassName = typeOftargetOfOption.Name;
+            data.ClassFile = codeFinder.FindCodeFile(typeOftargetOfOption);
+            data.TypeName = dataTypeName;
+            data.Description = codeDocs.GetTypeData(typeOftargetOfOption);
+            data.Status = codeDocs.GetTypeData(typeOftargetOfOption, "status");
+            data.ProcessingTarget = codeDocs.GetTypeData(typeOftargetOfOption, "processingtarget");
+
+
+            if (optionInFocus != null)
+            {
+                data.OptionsClassFullName = optionInFocus.FullName;
+                data.OptionsClassName = optionInFocus.Name;
+                data.OptionsClassFile = codeFinder.FindCodeFile(optionInFocus);
+                var ConfigurationSectionName = (string)optionInFocus.GetProperty("ConfigurationSectionName")?.GetValue(instanceOfOption);
+                if (!string.IsNullOrEmpty(ConfigurationSectionName))
+                {
+                    Console.WriteLine("Processing as ConfigurationSectionName");
+                    var section = configuration.GetSection(ConfigurationSectionName);
+                    section.Bind(instanceOfOption);
+                    data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "defaults", SampleFor = data.OptionsClassFullName, Code = ConvertSectionWithPathToJson(configuration, section).Trim() });
+                }
+
+                    Console.WriteLine("targetItem");
+                    JObject joptions = (JObject)JToken.FromObject(instanceOfOption);
+                    data.Options = populateOptions(instanceOfOption, joptions);
+                    data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "Classic", SampleFor = data.OptionsClassFullName, Code = saveData.SeraliseDataToJson(instanceOfOption).Trim() });
+            }
+            else
+            {
+
+            }
+            return data;
+        }
+
 
         private ClassData CreateClassData(List<Type> targetTypes, List<Type> allTypes, Type type, string apiVersion, string dataTypeName, Type item, bool findConfig = true, string configEnd = "Options")
         {

@@ -29,7 +29,7 @@ configurationSamples:
 description: This processor can migrate test variables that are defined in the test plans / suites. This must run before `TestPlansAndSuitesMigrationConfig`.
 className: TestVariablesMigrationProcessor
 typeName: Processors
-architecture: v1
+architecture: 
 options:
 - parameterName: Enabled
   type: Boolean
@@ -65,14 +65,14 @@ classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/TestVa
 optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/TestVariablesMigrationProcessorOptions.cs
 
 redirectFrom:
-- /Reference/v1/Processors/TestVariablesMigrationProcessorOptions/
+- /Reference/Processors/TestVariablesMigrationProcessorOptions/
 layout: reference
 toc: true
 permalink: /Reference/Processors/TestVariablesMigrationProcessor/
 title: TestVariablesMigrationProcessor
 categories:
 - Processors
-- v1
+- 
 topics:
 - topic: notes
   path: /Processors/TestVariablesMigrationProcessor-notes.md

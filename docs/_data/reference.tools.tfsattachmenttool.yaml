@@ -24,7 +24,7 @@ configurationSamples:
 description: missng XML code comments
 className: TfsAttachmentTool
 typeName: Tools
-architecture: v1
+architecture: 
 options:
 - parameterName: ExportBasePath
   type: String

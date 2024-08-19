@@ -27,7 +27,7 @@ configurationSamples:
 description: Downloads corporate images and updates TFS/Azure DevOps profiles
 className: ImportProfilePictureProcessor
 typeName: Processors
-architecture: v1
+architecture: 
 options:
 - parameterName: Enabled
   type: Boolean

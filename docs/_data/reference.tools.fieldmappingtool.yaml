@@ -23,7 +23,7 @@ configurationSamples:
 description: missng XML code comments
 className: FieldMappingTool
 typeName: Tools
-architecture: v1
+architecture: 
 options:
 - parameterName: FieldMaps
   type: List

@@ -24,7 +24,7 @@ configurationSamples:
 description: Used to process the String fields of a work item. This is useful for cleaning up data. It will limit fields to a max length and apply regex replacements based on what is configured. Each regex replacement is applied in order and can be enabled or disabled.
 className: StringManipulatorTool
 typeName: Tools
-architecture: v1
+architecture: 
 options:
 - parameterName: Manipulators
   type: List

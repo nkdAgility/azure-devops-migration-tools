@@ -32,7 +32,7 @@ configurationSamples:
 description: Downloads corporate images and updates TFS/Azure DevOps profiles
 className: ExportProfilePictureFromADProcessor
 typeName: Processors
-architecture: v1
+architecture: 
 options:
 - parameterName: Domain
   type: String
@@ -80,14 +80,14 @@ classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/Export
 optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/ExportProfilePictureFromADProcessorOptions.cs
 
 redirectFrom:
-- /Reference/v1/Processors/ExportProfilePictureFromADProcessorOptions/
+- /Reference/Processors/ExportProfilePictureFromADProcessorOptions/
 layout: reference
 toc: true
 permalink: /Reference/Processors/ExportProfilePictureFromADProcessor/
 title: ExportProfilePictureFromADProcessor
 categories:
 - Processors
-- v1
+- 
 topics:
 - topic: notes
   path: /Processors/ExportProfilePictureFromADProcessor-notes.md

@@ -30,7 +30,7 @@ configurationSamples:
 description: The TfsSharedQueryProcessor enabled you to migrate queries from one locatio nto another.
 className: TfsSharedQueryProcessor
 typeName: Processors
-architecture: v2
+architecture: 
 options:
 - parameterName: Enabled
   type: Boolean

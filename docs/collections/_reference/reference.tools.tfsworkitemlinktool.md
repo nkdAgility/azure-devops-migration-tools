@@ -25,7 +25,7 @@ configurationSamples:
 description: missng XML code comments
 className: TfsWorkItemLinkTool
 typeName: Tools
-architecture: v1
+architecture: 
 options:
 - parameterName: FilterIfLinkCountMatches
   type: Boolean
@@ -41,14 +41,14 @@ classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Tools/TfsWorkItem
 optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Tools/TfsWorkItemLinkToolOptions.cs
 
 redirectFrom:
-- /Reference/v1/Tools/TfsWorkItemLinkToolOptions/
+- /Reference/Tools/TfsWorkItemLinkToolOptions/
 layout: reference
 toc: true
 permalink: /Reference/Tools/TfsWorkItemLinkTool/
 title: TfsWorkItemLinkTool
 categories:
 - Tools
-- v1
+- 
 topics:
 - topic: notes
   path: /Tools/TfsWorkItemLinkTool-notes.md

@@ -1,0 +1,76 @@
+---
+optionsClassName: FieldtoFieldMultiMapOptions
+optionsClassFullName: MigrationTools.Tools.FieldtoFieldMultiMapOptions
+configurationSamples:
+- name: defaults
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "FieldMappingTool": {
+            "FieldDefaults": {
+              "FieldtoFieldMultiMap": {}
+            }
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.FieldtoFieldMultiMapOptions
+- name: Classic
+  description: 
+  code: >-
+    {
+      "$type": "FieldtoFieldMultiMapOptions",
+      "WorkItemTypeName": null,
+      "SourceToTargetMappings": null,
+      "Enabled": false,
+      "ApplyTo": null
+    }
+  sampleFor: MigrationTools.Tools.FieldtoFieldMultiMapOptions
+description: missng XML code comments
+className: FieldtoFieldMultiMap
+typeName: FieldMaps
+architecture: 
+options:
+- parameterName: ApplyTo
+  type: List
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: Enabled
+  type: Boolean
+  description: If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.
+  defaultValue: missng XML code comments
+- parameterName: SourceToTargetMappings
+  type: Dictionary
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: WorkItemTypeName
+  type: String
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+status: missng XML code comments
+processingTarget: missng XML code comments
+classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Tools/FieldMappingTool/FieldMaps/FieldtoFieldMultiMap.cs
+optionsClassFile: /src/MigrationTools/Tools/FieldMappingTool/FieldMaps/FieldtoFieldMultiMapOptions.cs
+
+redirectFrom:
+- /Reference/FieldMaps/FieldtoFieldMultiMapOptions/
+layout: reference
+toc: true
+permalink: /Reference/FieldMaps/FieldtoFieldMultiMap/
+title: FieldtoFieldMultiMap
+categories:
+- FieldMaps
+- 
+topics:
+- topic: notes
+  path: /FieldMaps/FieldtoFieldMultiMap-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: /FieldMaps/FieldtoFieldMultiMap-introduction.md
+  exists: false
+  markdown: ''
+
+---

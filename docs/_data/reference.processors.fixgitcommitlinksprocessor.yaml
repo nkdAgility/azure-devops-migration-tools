@@ -29,7 +29,7 @@ configurationSamples:
 description: missng XML code comments
 className: FixGitCommitLinksProcessor
 typeName: Processors
-architecture: v1
+architecture: 
 options:
 - parameterName: Enabled
   type: Boolean

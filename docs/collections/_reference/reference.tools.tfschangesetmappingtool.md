@@ -24,7 +24,7 @@ configurationSamples:
 description: missng XML code comments
 className: TfsChangeSetMappingTool
 typeName: Tools
-architecture: v1
+architecture: 
 options:
 - parameterName: ChangeSetMappingFile
   type: String
@@ -36,14 +36,14 @@ classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Tools/TfsChangeSe
 optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Tools/TfsChangeSetMappingToolOptions.cs
 
 redirectFrom:
-- /Reference/v1/Tools/TfsChangeSetMappingToolOptions/
+- /Reference/Tools/TfsChangeSetMappingToolOptions/
 layout: reference
 toc: true
 permalink: /Reference/Tools/TfsChangeSetMappingTool/
 title: TfsChangeSetMappingTool
 categories:
 - Tools
-- v1
+- 
 topics:
 - topic: notes
   path: /Tools/TfsChangeSetMappingTool-notes.md

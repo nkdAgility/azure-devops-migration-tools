@@ -23,7 +23,7 @@ configurationSamples:
 description: missng XML code comments
 className: TfsChangeSetMappingTool
 typeName: Tools
-architecture: v1
+architecture: 
 options:
 - parameterName: ChangeSetMappingFile
   type: String

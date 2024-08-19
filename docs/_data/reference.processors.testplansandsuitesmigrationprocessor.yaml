@@ -33,7 +33,7 @@ configurationSamples:
 description: Rebuilds Suits and plans for Test Cases migrated using the WorkItemMigration
 className: TestPlansAndSuitesMigrationProcessor
 typeName: Processors
-architecture: v1
+architecture: 
 options:
 - parameterName: Enabled
   type: Boolean
