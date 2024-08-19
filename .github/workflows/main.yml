@@ -93,9 +93,10 @@ jobs:
             # Get Branch Name
             Write-Output "::group::Get Branch Name"
             Write-Output "-------------------------------------------"
-            $branchName = "${{ github.head_ref || github.ref_name }}" 
+            $branchName = "${{ github.head_ref || github.ref_name }}"
             Write-Output "We are running on: $branchName!"
-            return -1
+            $branchSafeName = $branchName.Replace("/", "-")
+            Write-Output "branchSafeName: $branchSafeName!"
             Write-Output "-------------------------------------------"
             Write-Output "::endgroup::"
             # Ring Setup
@@ -127,8 +128,8 @@ jobs:
                 default {
                     $Ring = "Canary";
                     $WingetApplicationId = "nkdagility.azure-devops-migration-tools.Canary";
-                    $docs_deploy_folder = "./azure-devops-migration-tools/canary/" + "${{ github.ref_name }}"
-                    $docs_baseURL = "/learn/azure-devops-migration-tools/canary/" + "${{ github.ref_name }}"
+                    $docs_deploy_folder = "./azure-devops-migration-tools/canary/$branchSafeName"
+                    $docs_baseURL = "/learn/azure-devops-migration-tools/canary/$branchSafeName"
                     $RunRelease = 'false'
                 }
             }
