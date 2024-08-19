@@ -90,6 +90,14 @@ jobs:
       env:
          GH_TOKEN: ${{ steps.app-token.outputs.token }}
       run: |
+            # Get Branch Name
+            Write-Output "::group::Get Branch Name"
+            Write-Output "-------------------------------------------"
+            $branchName = "${{ github.head_ref || github.ref_name }}" 
+            Write-Output "We are running on: $branchName!"
+            return -1
+            Write-Output "-------------------------------------------"
+            Write-Output "::endgroup::"
             # Ring Setup
             Write-Output "::group::Ring Control Setup"
             Write-Output "-------------------------------------------"
