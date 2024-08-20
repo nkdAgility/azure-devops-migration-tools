@@ -1,6 +1,28 @@
 optionsClassName: TfsSharedQueryProcessorOptions
 optionsClassFullName: MigrationTools.Processors.TfsSharedQueryProcessorOptions
 configurationSamples:
+- name: confinguration.json
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "Processors": [
+          {
+            "ProcessorType": "TfsSharedQueryProcessor",
+            "Enabled": false,
+            "PrefixProjectToNodes": false,
+            "SharedFolderName": "Shared Queries",
+            "SourceToTargetFieldMappings": null,
+            "Enrichers": null,
+            "ProcessorEnrichers": null,
+            "SourceName": null,
+            "TargetName": null,
+            "RefName": null
+          }
+        ]
+      }
+    }
+  sampleFor: MigrationTools.Processors.TfsSharedQueryProcessorOptions
 - name: defaults
   description: 
   code: >-

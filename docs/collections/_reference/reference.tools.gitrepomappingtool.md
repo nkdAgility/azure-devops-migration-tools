@@ -2,6 +2,21 @@
 optionsClassName: GitRepoMappingToolOptions
 optionsClassFullName: MigrationTools.Tools.GitRepoMappingToolOptions
 configurationSamples:
+- name: confinguration.json
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "GitRepoMappingTool": {
+            "Mappings": {
+              "Source Repo Name": "Target Repo Name"
+            }
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.GitRepoMappingToolOptions
 - name: defaults
   description: 
   code: >-

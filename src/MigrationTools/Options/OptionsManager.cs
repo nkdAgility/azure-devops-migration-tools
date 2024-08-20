@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -29,6 +30,26 @@ namespace MigrationTools.Options
                 specificOptionsManagerType
             );
             return optionsManagerInstance;
+        }
+
+        public static string CreateNewConfigurationJson(IOptions iOption, bool isCollection = false)
+        {
+            Type optionsManagerType = typeof(OptionsManager<>).MakeGenericType(iOption.GetType());
+
+            // Create an instance of OptionsManager<T>
+            object optionsManagerInstance = Activator.CreateInstance(optionsManagerType);
+
+            // Get the method information for CreateNewConfigurationJson
+            MethodInfo createMethod = optionsManagerType.GetMethod("CreateNewConfigurationJson");
+
+            // Prepare parameters for the method
+            object[] parameters = { iOption, isCollection };
+
+            // Invoke the method dynamically
+            string result = (string)createMethod.Invoke(optionsManagerInstance, parameters);
+
+            // Output the result
+            return result;
         }
 
         public static OptionsConfiguration GetOptionsConfiguration(Type option)
@@ -96,7 +117,7 @@ namespace MigrationTools.Options
                     var collectionArray = (JArray)currentSection[pathParts[i]];
 
                     // Check if the object already exists in the collection
-                    var existingItem = collectionArray.FirstOrDefault(p => p[options.ConfigurationCollectionObjectName]?.ToString() == options.ConfigurationOptionFor);
+                    var existingItem = collectionArray.FirstOrDefault(p => p[options.ConfigurationObjectName]?.ToString() == options.ConfigurationOptionFor);
 
                     if (existingItem != null)
                     {
@@ -108,7 +129,7 @@ namespace MigrationTools.Options
                     {
                         // Add the new item to the collection
                         var newItem = JObject.FromObject(options);
-                        newItem[options.ConfigurationCollectionObjectName] = options.ConfigurationOptionFor;
+                        newItem[options.ConfigurationObjectName] = options.ConfigurationOptionFor;
                         collectionArray.Add(newItem);
                     }
                 }
@@ -201,7 +222,7 @@ namespace MigrationTools.Options
                     // Add the options object as part of the collection
                     var collectionArray = (JArray)currentSection[pathParts[i]];
                     var optionsObject = JObject.FromObject(options);
-                    optionsObject[options.ConfigurationCollectionObjectName] = options.ConfigurationOptionFor;
+                    optionsObject.AddFirst(new JProperty(options.ConfigurationObjectName, options.ConfigurationOptionFor));
                     collectionArray.Add(optionsObject);
                 }
                 else
@@ -232,7 +253,7 @@ namespace MigrationTools.Options
             OptionsConfiguration oc = new OptionsConfiguration();
             oc.SectionPath = options.ConfigurationSectionPath;
             oc.CollectionPath = options.ConfigurationCollectionPath;
-            oc.CollectionObjectName = options.ConfigurationCollectionObjectName;
+            oc.CollectionObjectName = options.ConfigurationObjectName;
             oc.OptionFor = options.ConfigurationOptionFor;
             return oc;
         }

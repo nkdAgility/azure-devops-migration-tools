@@ -2,6 +2,19 @@
 optionsClassName: TfsChangeSetMappingToolOptions
 optionsClassFullName: MigrationTools.Tools.TfsChangeSetMappingToolOptions
 configurationSamples:
+- name: confinguration.json
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "TfsChangeSetMappingTool": {
+            "ChangeSetMappingFile": null
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.TfsChangeSetMappingToolOptions
 - name: defaults
   description: 
   code: >-

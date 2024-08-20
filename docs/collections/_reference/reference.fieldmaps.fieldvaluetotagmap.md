@@ -2,6 +2,31 @@
 optionsClassName: FieldValuetoTagMapOptions
 optionsClassFullName: MigrationTools.Tools.FieldValuetoTagMapOptions
 configurationSamples:
+- name: confinguration.json
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "FieldMappingTool": {
+            "FieldMaps": [
+              {
+                "FieldMapType": "FieldValuetoTagMap",
+                "Enabled": false,
+                "sourceField": "Microsoft.VSTS.CMMI.Blocked",
+                "pattern": "Yes",
+                "formatExpression": "{0}",
+                "ConfigurationCollectionItemPath": "MigrationTools:CommonTools:FieldMappingTool:FieldMaps:*:FieldValuetoTagMap",
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.FieldValuetoTagMapOptions
 - name: defaults
   description: 
   code: >-
@@ -30,10 +55,10 @@ configurationSamples:
     {
       "$type": "FieldValuetoTagMapOptions",
       "Enabled": false,
-      "WorkItemTypeName": null,
       "sourceField": "Microsoft.VSTS.CMMI.Blocked",
       "pattern": "Yes",
       "formatExpression": "{0}",
+      "ConfigurationCollectionItemPath": "MigrationTools:CommonTools:FieldMappingTool:FieldMaps:*:FieldValuetoTagMap",
       "ApplyTo": [
         "SomeWorkItemType"
       ]
@@ -46,6 +71,10 @@ architecture:
 options:
 - parameterName: ApplyTo
   type: List
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: ConfigurationCollectionItemPath
+  type: String
   description: missng XML code comments
   defaultValue: missng XML code comments
 - parameterName: Enabled
@@ -61,10 +90,6 @@ options:
   description: missng XML code comments
   defaultValue: missng XML code comments
 - parameterName: sourceField
-  type: String
-  description: missng XML code comments
-  defaultValue: missng XML code comments
-- parameterName: WorkItemTypeName
   type: String
   description: missng XML code comments
   defaultValue: missng XML code comments

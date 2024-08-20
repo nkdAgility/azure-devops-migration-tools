@@ -1,6 +1,19 @@
 optionsClassName: FieldMappingToolOptions
 optionsClassFullName: MigrationTools.Tools.FieldMappingToolOptions
 configurationSamples:
+- name: confinguration.json
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "FieldMappingTool": {
+            "FieldMaps": []
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.FieldMappingToolOptions
 - name: defaults
   description: 
   code: >-

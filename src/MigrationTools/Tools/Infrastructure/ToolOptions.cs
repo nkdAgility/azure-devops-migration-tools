@@ -10,9 +10,9 @@ namespace MigrationTools.Tools.Infrastructure
         [JsonIgnore]
         public virtual string ConfigurationSectionPath => $"MigrationTools:CommonTools:{ConfigurationOptionFor}";
         [JsonIgnore]
-        public string ConfigurationCollectionPath => $"*:{ConfigurationOptionFor}";
+        public string ConfigurationCollectionPath => null;
         [JsonIgnore]
-        public string ConfigurationCollectionObjectName => $"ToolType";
+        public string ConfigurationObjectName => $"ToolType";
         [JsonIgnore]
         public virtual string ConfigurationOptionFor => $"{GetType().Name.Replace("Options", "")}";
 

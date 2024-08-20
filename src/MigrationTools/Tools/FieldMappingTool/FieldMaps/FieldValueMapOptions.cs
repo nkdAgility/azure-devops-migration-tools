@@ -10,7 +10,6 @@ namespace MigrationTools.Tools
     /// <processingtarget>Work Item Field</processingtarget>
     public class FieldValueMapOptions : FieldMapOptions
     {
-        public string WorkItemTypeName { get; set; }
         public string sourceField { get; set; }
         public string targetField { get; set; }
         public string defaultValue { get; set; }
@@ -18,7 +17,7 @@ namespace MigrationTools.Tools
 
         public void SetExampleConfigDefaults()
         {
-            WorkItemTypeName = "*";
+            ApplyTo = new List<string>() { "*" };
             sourceField = "System.Status";
             targetField = "System.Status";
             defaultValue = "New";

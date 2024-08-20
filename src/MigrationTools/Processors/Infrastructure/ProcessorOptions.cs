@@ -11,7 +11,7 @@ namespace MigrationTools.Processors.Infrastructure
     {
         public string ConfigurationSectionPath => $"MigrationTools:ProcessorDefaults:{ConfigurationOptionFor}";
         public string ConfigurationCollectionPath => $"MigrationTools:Processors";
-        public string ConfigurationCollectionObjectName => $"ProcessorType";
+        public string ConfigurationObjectName => $"ProcessorType";
         public string ConfigurationOptionFor => $"{GetType().Name.Replace("Options", "")}";
 
         /// <summary>

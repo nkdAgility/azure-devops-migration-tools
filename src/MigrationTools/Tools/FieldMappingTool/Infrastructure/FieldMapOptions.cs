@@ -10,9 +10,9 @@ namespace MigrationTools.Tools.Infrastructure
     {
 
         public virtual string ConfigurationSectionPath => $"MigrationTools:CommonTools:FieldMappingTool:FieldMapDefaults:{ConfigurationOptionFor}";
-
-        public virtual string ConfigurationCollectionPath => $"MigrationTools:CommonTools:FieldMappingTool:FieldMaps:*:{ConfigurationOptionFor}";
-        public virtual string ConfigurationCollectionObjectName => $"FieldMapType";
+        public virtual string ConfigurationCollectionPath => $"MigrationTools:CommonTools:FieldMappingTool:FieldMaps";
+        public virtual string ConfigurationCollectionItemPath => $"MigrationTools:CommonTools:FieldMappingTool:FieldMaps:*:{ConfigurationOptionFor}";
+        public virtual string ConfigurationObjectName => $"FieldMapType";
 
         public virtual string ConfigurationOptionFor => $"{GetType().Name.Replace("Options", "")}";
         /// <summary>

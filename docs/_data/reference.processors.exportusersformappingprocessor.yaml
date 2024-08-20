@@ -1,6 +1,27 @@
 optionsClassName: ExportUsersForMappingProcessorOptions
 optionsClassFullName: MigrationTools.Processors.ExportUsersForMappingProcessorOptions
 configurationSamples:
+- name: confinguration.json
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "Processors": [
+          {
+            "ProcessorType": "ExportUsersForMappingProcessor",
+            "Enabled": false,
+            "WIQLQuery": null,
+            "OnlyListUsersInWorkItems": true,
+            "Enrichers": null,
+            "ProcessorEnrichers": null,
+            "SourceName": null,
+            "TargetName": null,
+            "RefName": null
+          }
+        ]
+      }
+    }
+  sampleFor: MigrationTools.Processors.ExportUsersForMappingProcessorOptions
 - name: defaults
   description: 
   code: >-

@@ -2,6 +2,17 @@
 optionsClassName: TfsGitRepositoryToolOptions
 optionsClassFullName: MigrationTools.Tools.TfsGitRepositoryToolOptions
 configurationSamples:
+- name: confinguration.json
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "TfsGitRepositoryTool": {}
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.TfsGitRepositoryToolOptions
 - name: defaults
   description: 
   code: >-

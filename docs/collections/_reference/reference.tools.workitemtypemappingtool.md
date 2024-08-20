@@ -2,6 +2,21 @@
 optionsClassName: WorkItemTypeMappingToolOptions
 optionsClassFullName: MigrationTools.Tools.WorkItemTypeMappingToolOptions
 configurationSamples:
+- name: confinguration.json
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "WorkItemTypeMappingTool": {
+            "Mappings": {
+              "Source Work Item Type Name": "Target Work Item Type Name"
+            }
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.WorkItemTypeMappingToolOptions
 - name: defaults
   description: 
   code: >-

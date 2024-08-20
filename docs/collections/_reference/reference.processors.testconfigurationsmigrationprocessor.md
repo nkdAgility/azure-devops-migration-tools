@@ -2,6 +2,25 @@
 optionsClassName: TestConfigurationsMigrationProcessorOptions
 optionsClassFullName: MigrationTools.Processors.TestConfigurationsMigrationProcessorOptions
 configurationSamples:
+- name: confinguration.json
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "Processors": [
+          {
+            "ProcessorType": "TestConfigurationsMigrationProcessor",
+            "Enabled": false,
+            "Enrichers": null,
+            "ProcessorEnrichers": null,
+            "SourceName": null,
+            "TargetName": null,
+            "RefName": null
+          }
+        ]
+      }
+    }
+  sampleFor: MigrationTools.Processors.TestConfigurationsMigrationProcessorOptions
 - name: defaults
   description: 
   code: >-

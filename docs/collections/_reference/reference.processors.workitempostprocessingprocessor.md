@@ -2,6 +2,30 @@
 optionsClassName: WorkItemPostProcessingProcessorOptions
 optionsClassFullName: MigrationTools.Processors.WorkItemPostProcessingProcessorOptions
 configurationSamples:
+- name: confinguration.json
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "Processors": [
+          {
+            "ProcessorType": "WorkItemPostProcessingProcessor",
+            "Enabled": false,
+            "WorkItemIDs": null,
+            "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [@ReflectedWorkItemIdFieldName] = ''  AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
+            "FilterWorkItemsThatAlreadyExistInTarget": false,
+            "PauseAfterEachWorkItem": false,
+            "WorkItemCreateRetryLimit": 0,
+            "Enrichers": null,
+            "ProcessorEnrichers": null,
+            "SourceName": null,
+            "TargetName": null,
+            "RefName": null
+          }
+        ]
+      }
+    }
+  sampleFor: MigrationTools.Processors.WorkItemPostProcessingProcessorOptions
 - name: defaults
   description: 
   code: >-

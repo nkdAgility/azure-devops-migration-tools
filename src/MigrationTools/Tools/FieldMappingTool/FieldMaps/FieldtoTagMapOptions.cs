@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using MigrationTools.Options;
 using MigrationTools.Tools.Infrastructure;
 
@@ -11,14 +12,13 @@ namespace MigrationTools.Tools
     /// <processingtarget>Work Item Field</processingtarget>
     public class FieldToTagFieldMapOptions : FieldMapOptions
     {
-        public string WorkItemTypeName { get; set; }
         public string sourceField { get; set; }
         public string formatExpression { get; set; }
 
 
         public void SetExampleConfigDefaults()
         {
-            WorkItemTypeName = "*";
+            ApplyTo = new List<string>() { "*" };
             sourceField = "Custom.ProjectName";
             formatExpression = "Project: {0}";
         }

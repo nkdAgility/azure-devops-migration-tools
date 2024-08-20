@@ -1,6 +1,22 @@
 optionsClassName: TfsTeamSettingsToolOptions
 optionsClassFullName: MigrationTools.Tools.TfsTeamSettingsToolOptions
 configurationSamples:
+- name: confinguration.json
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "TfsTeamSettingsTool": {
+            "MigrateTeamSettings": true,
+            "UpdateTeamSettings": true,
+            "MigrateTeamCapacities": true,
+            "Teams": null
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.TfsTeamSettingsToolOptions
 - name: defaults
   description: 
   code: >-

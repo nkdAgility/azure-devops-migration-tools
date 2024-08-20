@@ -2,6 +2,32 @@
 optionsClassName: RegexFieldMapOptions
 optionsClassFullName: MigrationTools.Tools.RegexFieldMapOptions
 configurationSamples:
+- name: confinguration.json
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "FieldMappingTool": {
+            "FieldMaps": [
+              {
+                "FieldMapType": "RegexFieldMap",
+                "Enabled": false,
+                "sourceField": "COMPANY.PRODUCT.Release",
+                "targetField": "COMPANY.DEVISION.MinorReleaseVersion",
+                "pattern": "PRODUCT \\d{4}.(\\d{1})",
+                "replacement": "$1",
+                "ConfigurationCollectionItemPath": "MigrationTools:CommonTools:FieldMappingTool:FieldMaps:*:RegexFieldMap",
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.RegexFieldMapOptions
 - name: defaults
   description: 
   code: >-
@@ -31,11 +57,11 @@ configurationSamples:
     {
       "$type": "RegexFieldMapOptions",
       "Enabled": false,
-      "WorkItemTypeName": null,
       "sourceField": "COMPANY.PRODUCT.Release",
       "targetField": "COMPANY.DEVISION.MinorReleaseVersion",
       "pattern": "PRODUCT \\d{4}.(\\d{1})",
       "replacement": "$1",
+      "ConfigurationCollectionItemPath": "MigrationTools:CommonTools:FieldMappingTool:FieldMaps:*:RegexFieldMap",
       "ApplyTo": [
         "SomeWorkItemType"
       ]
@@ -48,6 +74,10 @@ architecture:
 options:
 - parameterName: ApplyTo
   type: List
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: ConfigurationCollectionItemPath
+  type: String
   description: missng XML code comments
   defaultValue: missng XML code comments
 - parameterName: Enabled
@@ -67,10 +97,6 @@ options:
   description: missng XML code comments
   defaultValue: missng XML code comments
 - parameterName: targetField
-  type: String
-  description: missng XML code comments
-  defaultValue: missng XML code comments
-- parameterName: WorkItemTypeName
   type: String
   description: missng XML code comments
   defaultValue: missng XML code comments

@@ -6,8 +6,8 @@ namespace MigrationTools.Enrichers
     public abstract class ProcessorEnricherOptions : IProcessorEnricherOptions
     {
         public virtual string ConfigurationSectionPath => $"MigrationTools:ProcessorEnricherDefaults:{ConfigurationOptionFor}";
-        public virtual string ConfigurationCollectionPath => $"MigrationTools:Processors:*:Enrichers:*:{ConfigurationOptionFor}";
-        public virtual string ConfigurationCollectionObjectName => $"ProcessorEnricherType";
+        public virtual string ConfigurationCollectionPath => $"MigrationTools:Processors:*:Enrichers";
+        public virtual string ConfigurationObjectName => $"ProcessorEnricherType";
         public virtual string ConfigurationOptionFor => $"{GetType().Name.Replace("Options", "")}";
 
         /// <summary>

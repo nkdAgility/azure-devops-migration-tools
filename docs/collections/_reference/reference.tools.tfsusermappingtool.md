@@ -2,6 +2,27 @@
 optionsClassName: TfsUserMappingToolOptions
 optionsClassFullName: MigrationTools.Tools.TfsUserMappingToolOptions
 configurationSamples:
+- name: confinguration.json
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "TfsUserMappingTool": {
+            "IdentityFieldsToCheck": [
+              "System.AssignedTo",
+              "System.ChangedBy",
+              "System.CreatedBy",
+              "Microsoft.VSTS.Common.ActivatedBy",
+              "Microsoft.VSTS.Common.ResolvedBy",
+              "Microsoft.VSTS.Common.ClosedBy"
+            ],
+            "UserMappingFile": "C:\\temp\\userExport.json"
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.TfsUserMappingToolOptions
 - name: defaults
   description: 
   code: >-

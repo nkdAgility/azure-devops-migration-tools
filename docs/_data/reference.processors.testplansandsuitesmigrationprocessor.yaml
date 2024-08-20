@@ -1,6 +1,31 @@
 optionsClassName: TestPlansAndSuitesMigrationProcessorOptions
 optionsClassFullName: MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationProcessorOptions
 configurationSamples:
+- name: confinguration.json
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "Processors": [
+          {
+            "ProcessorType": "TestPlansAndSuitesMigrationProcessor",
+            "Enabled": false,
+            "OnlyElementsWithTag": null,
+            "TestPlanQuery": null,
+            "RemoveAllLinks": false,
+            "MigrationDelay": 0,
+            "RemoveInvalidTestSuiteLinks": false,
+            "FilterCompleted": false,
+            "Enrichers": null,
+            "ProcessorEnrichers": null,
+            "SourceName": null,
+            "TargetName": null,
+            "RefName": null
+          }
+        ]
+      }
+    }
+  sampleFor: MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationProcessorOptions
 - name: defaults
   description: 
   code: >-

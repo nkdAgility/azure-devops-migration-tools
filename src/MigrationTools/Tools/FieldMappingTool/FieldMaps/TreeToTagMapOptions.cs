@@ -1,4 +1,5 @@
-﻿using MigrationTools.Tools.Infrastructure;
+﻿using System.Collections.Generic;
+using MigrationTools.Tools.Infrastructure;
 
 namespace MigrationTools.Tools
 {
@@ -9,13 +10,12 @@ namespace MigrationTools.Tools
     /// <processingtarget>Work Item Field</processingtarget>
     public class TreeToTagFieldMapOptions : FieldMapOptions
     {
-        public string WorkItemTypeName { get; set; }
         public int toSkip { get; set; }
         public int timeTravel { get; set; }
 
         public void SetExampleConfigDefaults()
         {
-            WorkItemTypeName = "*";
+            ApplyTo = new List<string>() { "*" };
             toSkip = 2;
             timeTravel = 0;
         }

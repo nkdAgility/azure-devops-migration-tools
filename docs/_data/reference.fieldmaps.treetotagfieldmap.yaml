@@ -1,6 +1,28 @@
 optionsClassName: TreeToTagFieldMapOptions
 optionsClassFullName: MigrationTools.Tools.TreeToTagFieldMapOptions
 configurationSamples:
+- name: confinguration.json
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "FieldMappingTool": {
+            "FieldMaps": [
+              {
+                "FieldMapType": "TreeToTagFieldMap",
+                "Enabled": false,
+                "toSkip": 0,
+                "timeTravel": 0,
+                "ConfigurationCollectionItemPath": "MigrationTools:CommonTools:FieldMappingTool:FieldMaps:*:TreeToTagFieldMap",
+                "ApplyTo": null
+              }
+            ]
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.TreeToTagFieldMapOptions
 - name: defaults
   description: 
   code: >-
@@ -22,9 +44,9 @@ configurationSamples:
     {
       "$type": "TreeToTagFieldMapOptions",
       "Enabled": false,
-      "WorkItemTypeName": null,
       "toSkip": 0,
       "timeTravel": 0,
+      "ConfigurationCollectionItemPath": "MigrationTools:CommonTools:FieldMappingTool:FieldMaps:*:TreeToTagFieldMap",
       "ApplyTo": null
     }
   sampleFor: MigrationTools.Tools.TreeToTagFieldMapOptions
@@ -37,6 +59,10 @@ options:
   type: List
   description: missng XML code comments
   defaultValue: missng XML code comments
+- parameterName: ConfigurationCollectionItemPath
+  type: String
+  description: missng XML code comments
+  defaultValue: missng XML code comments
 - parameterName: Enabled
   type: Boolean
   description: If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.
@@ -47,10 +73,6 @@ options:
   defaultValue: missng XML code comments
 - parameterName: toSkip
   type: Int32
-  description: missng XML code comments
-  defaultValue: missng XML code comments
-- parameterName: WorkItemTypeName
-  type: String
   description: missng XML code comments
   defaultValue: missng XML code comments
 status: missng XML code comments

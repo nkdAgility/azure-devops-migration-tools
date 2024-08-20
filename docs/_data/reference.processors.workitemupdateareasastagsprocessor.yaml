@@ -1,6 +1,26 @@
 optionsClassName: WorkItemUpdateAreasAsTagsProcessorOptions
 optionsClassFullName: MigrationTools.Processors.WorkItemUpdateAreasAsTagsProcessorOptions
 configurationSamples:
+- name: confinguration.json
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "Processors": [
+          {
+            "ProcessorType": "WorkItemUpdateAreasAsTagsProcessor",
+            "Enabled": false,
+            "AreaIterationPath": null,
+            "Enrichers": null,
+            "ProcessorEnrichers": null,
+            "SourceName": null,
+            "TargetName": null,
+            "RefName": null
+          }
+        ]
+      }
+    }
+  sampleFor: MigrationTools.Processors.WorkItemUpdateAreasAsTagsProcessorOptions
 - name: defaults
   description: 
   code: >-

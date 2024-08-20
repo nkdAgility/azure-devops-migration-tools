@@ -1,4 +1,5 @@
-﻿using MigrationTools.Tools.Infrastructure;
+﻿using System.Collections.Generic;
+using MigrationTools.Tools.Infrastructure;
 
 namespace MigrationTools.Tools
 {
@@ -9,12 +10,11 @@ namespace MigrationTools.Tools
     /// <processingtarget>Work Item</processingtarget>
     public class FieldClearMapOptions : FieldMapOptions
     {
-        public string WorkItemTypeName { get; set; }
         public string targetField { get; set; }
 
         public void SetExampleConfigDefaults()
         {
-            WorkItemTypeName = "*";
+            ApplyTo = new List<string>() { "*" };
             targetField = "System.Description";
         }
     }

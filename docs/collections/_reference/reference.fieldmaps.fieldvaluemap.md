@@ -2,6 +2,34 @@
 optionsClassName: FieldValueMapOptions
 optionsClassFullName: MigrationTools.Tools.FieldValueMapOptions
 configurationSamples:
+- name: confinguration.json
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "FieldMappingTool": {
+            "FieldMaps": [
+              {
+                "FieldMapType": "FieldValueMap",
+                "Enabled": false,
+                "sourceField": "System.State",
+                "targetField": "System.State",
+                "defaultValue": "StateB",
+                "valueMapping": {
+                  "StateA": "StateB"
+                },
+                "ConfigurationCollectionItemPath": "MigrationTools:CommonTools:FieldMappingTool:FieldMaps:*:FieldValueMap",
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.FieldValueMapOptions
 - name: defaults
   description: 
   code: >-
@@ -33,7 +61,6 @@ configurationSamples:
     {
       "$type": "FieldValueMapOptions",
       "Enabled": false,
-      "WorkItemTypeName": null,
       "sourceField": "System.State",
       "targetField": "System.State",
       "defaultValue": "StateB",
@@ -41,6 +68,7 @@ configurationSamples:
         "$type": "Dictionary`2",
         "StateA": "StateB"
       },
+      "ConfigurationCollectionItemPath": "MigrationTools:CommonTools:FieldMappingTool:FieldMaps:*:FieldValueMap",
       "ApplyTo": [
         "SomeWorkItemType"
       ]
@@ -53,6 +81,10 @@ architecture:
 options:
 - parameterName: ApplyTo
   type: List
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: ConfigurationCollectionItemPath
+  type: String
   description: missng XML code comments
   defaultValue: missng XML code comments
 - parameterName: defaultValue
@@ -73,10 +105,6 @@ options:
   defaultValue: missng XML code comments
 - parameterName: valueMapping
   type: Dictionary
-  description: missng XML code comments
-  defaultValue: missng XML code comments
-- parameterName: WorkItemTypeName
-  type: String
   description: missng XML code comments
   defaultValue: missng XML code comments
 status: missng XML code comments

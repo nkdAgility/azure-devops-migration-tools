@@ -1,6 +1,31 @@
 optionsClassName: KeepOutboundLinkTargetProcessorOptions
 optionsClassFullName: MigrationTools.Clients.AzureDevops.Rest.Processors.KeepOutboundLinkTargetProcessorOptions
 configurationSamples:
+- name: confinguration.json
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "Processors": [
+          {
+            "ProcessorType": "KeepOutboundLinkTargetProcessor",
+            "Enabled": false,
+            "WIQLQuery": "Select [System.Id] From WorkItems Where [System.TeamProject] = @project and not [System.WorkItemType] contains 'Test Suite, Test Plan,Shared Steps,Shared Parameter,Feedback Request'",
+            "TargetLinksToKeepOrganization": "https://dev.azure.com/nkdagility",
+            "TargetLinksToKeepProject": "f9c0db16-7c8d-43a6-9bf0-530c49c18598",
+            "CleanupFileName": "c:/temp/OutboundLinkTargets.bat",
+            "PrependCommand": "start",
+            "DryRun": true,
+            "Enrichers": null,
+            "ProcessorEnrichers": null,
+            "SourceName": null,
+            "TargetName": null,
+            "RefName": null
+          }
+        ]
+      }
+    }
+  sampleFor: MigrationTools.Clients.AzureDevops.Rest.Processors.KeepOutboundLinkTargetProcessorOptions
 - name: defaults
   description: 
   code: >-
@@ -20,7 +45,7 @@ configurationSamples:
       "Enabled": false,
       "WIQLQuery": "Select [System.Id] From WorkItems Where [System.TeamProject] = @project and not [System.WorkItemType] contains 'Test Suite, Test Plan,Shared Steps,Shared Parameter,Feedback Request'",
       "TargetLinksToKeepOrganization": "https://dev.azure.com/nkdagility",
-      "TargetLinksToKeepProject": "a65e6ce0-9732-4207-897a-d281e217cb97",
+      "TargetLinksToKeepProject": "f9c0db16-7c8d-43a6-9bf0-530c49c18598",
       "CleanupFileName": "c:/temp/OutboundLinkTargets.bat",
       "PrependCommand": "start",
       "DryRun": true,

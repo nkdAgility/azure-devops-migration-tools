@@ -2,6 +2,34 @@
 optionsClassName: FieldMergeMapOptions
 optionsClassFullName: MigrationTools.Tools.FieldMergeMapOptions
 configurationSamples:
+- name: confinguration.json
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "FieldMappingTool": {
+            "FieldMaps": [
+              {
+                "FieldMapType": "FieldMergeMap",
+                "Enabled": false,
+                "sourceFields": [
+                  "System.Description",
+                  "Microsoft.VSTS.Common.AcceptanceCriteria"
+                ],
+                "targetField": "System.Description",
+                "formatExpression": "{0} <br/><br/><h3>Acceptance Criteria</h3>{1}",
+                "ConfigurationCollectionItemPath": "MigrationTools:CommonTools:FieldMappingTool:FieldMaps:*:FieldMergeMap",
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.FieldMergeMapOptions
 - name: defaults
   description: 
   code: >-
@@ -39,6 +67,7 @@ configurationSamples:
       ],
       "targetField": "System.Description",
       "formatExpression": "{0} <br/><br/><h3>Acceptance Criteria</h3>{1}",
+      "ConfigurationCollectionItemPath": "MigrationTools:CommonTools:FieldMappingTool:FieldMaps:*:FieldMergeMap",
       "ApplyTo": [
         "SomeWorkItemType"
       ]
@@ -51,6 +80,10 @@ architecture:
 options:
 - parameterName: ApplyTo
   type: List
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: ConfigurationCollectionItemPath
+  type: String
   description: missng XML code comments
   defaultValue: missng XML code comments
 - parameterName: Enabled

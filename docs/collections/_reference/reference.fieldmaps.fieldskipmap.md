@@ -2,6 +2,29 @@
 optionsClassName: FieldSkipMapOptions
 optionsClassFullName: MigrationTools.Tools.FieldSkipMapOptions
 configurationSamples:
+- name: confinguration.json
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "FieldMappingTool": {
+            "FieldMaps": [
+              {
+                "FieldMapType": "FieldSkipMap",
+                "Enabled": false,
+                "targetField": "Custom.ReflectedWorkItemId",
+                "ConfigurationCollectionItemPath": "MigrationTools:CommonTools:FieldMappingTool:FieldMaps:*:FieldSkipMap",
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.FieldSkipMapOptions
 - name: defaults
   description: 
   code: >-
@@ -28,8 +51,8 @@ configurationSamples:
     {
       "$type": "FieldSkipMapOptions",
       "Enabled": false,
-      "WorkItemTypeName": null,
       "targetField": "Custom.ReflectedWorkItemId",
+      "ConfigurationCollectionItemPath": "MigrationTools:CommonTools:FieldMappingTool:FieldMaps:*:FieldSkipMap",
       "ApplyTo": [
         "SomeWorkItemType"
       ]
@@ -44,15 +67,15 @@ options:
   type: List
   description: missng XML code comments
   defaultValue: missng XML code comments
+- parameterName: ConfigurationCollectionItemPath
+  type: String
+  description: missng XML code comments
+  defaultValue: missng XML code comments
 - parameterName: Enabled
   type: Boolean
   description: If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.
   defaultValue: missng XML code comments
 - parameterName: targetField
-  type: String
-  description: missng XML code comments
-  defaultValue: missng XML code comments
-- parameterName: WorkItemTypeName
   type: String
   description: missng XML code comments
   defaultValue: missng XML code comments

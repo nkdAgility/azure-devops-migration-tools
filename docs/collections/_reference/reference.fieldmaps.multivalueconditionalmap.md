@@ -2,6 +2,36 @@
 optionsClassName: MultiValueConditionalMapOptions
 optionsClassFullName: MigrationTools.Tools.MultiValueConditionalMapOptions
 configurationSamples:
+- name: confinguration.json
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "FieldMappingTool": {
+            "FieldMaps": [
+              {
+                "FieldMapType": "MultiValueConditionalMap",
+                "Enabled": false,
+                "sourceFieldsAndValues": {
+                  "Field1": "Value1",
+                  "Field2": "Value2"
+                },
+                "targetFieldsAndValues": {
+                  "Field1": "Value1",
+                  "Field2": "Value2"
+                },
+                "ConfigurationCollectionItemPath": "MigrationTools:CommonTools:FieldMappingTool:FieldMaps:*:MultiValueConditionalMap",
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.MultiValueConditionalMapOptions
 - name: defaults
   description: 
   code: >-
@@ -35,7 +65,6 @@ configurationSamples:
     {
       "$type": "MultiValueConditionalMapOptions",
       "Enabled": false,
-      "WorkItemTypeName": null,
       "sourceFieldsAndValues": {
         "$type": "Dictionary`2",
         "Field1": "Value1",
@@ -46,6 +75,7 @@ configurationSamples:
         "Field1": "Value1",
         "Field2": "Value2"
       },
+      "ConfigurationCollectionItemPath": "MigrationTools:CommonTools:FieldMappingTool:FieldMaps:*:MultiValueConditionalMap",
       "ApplyTo": [
         "SomeWorkItemType"
       ]
@@ -60,6 +90,10 @@ options:
   type: List
   description: missng XML code comments
   defaultValue: missng XML code comments
+- parameterName: ConfigurationCollectionItemPath
+  type: String
+  description: missng XML code comments
+  defaultValue: missng XML code comments
 - parameterName: Enabled
   type: Boolean
   description: If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.
@@ -70,10 +104,6 @@ options:
   defaultValue: missng XML code comments
 - parameterName: targetFieldsAndValues
   type: Dictionary
-  description: missng XML code comments
-  defaultValue: missng XML code comments
-- parameterName: WorkItemTypeName
-  type: String
   description: missng XML code comments
   defaultValue: missng XML code comments
 status: missng XML code comments

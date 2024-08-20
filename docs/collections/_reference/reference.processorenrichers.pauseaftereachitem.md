@@ -2,6 +2,25 @@
 optionsClassName: PauseAfterEachItemOptions
 optionsClassFullName: MigrationTools.Enrichers.PauseAfterEachItemOptions
 configurationSamples:
+- name: confinguration.json
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "Processors": {
+          "*": {
+            "Enrichers": [
+              {
+                "ProcessorEnricherType": "PauseAfterEachItem",
+                "Enabled": false,
+                "RefName": null
+              }
+            ]
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Enrichers.PauseAfterEachItemOptions
 - name: defaults
   description: 
   code: >-

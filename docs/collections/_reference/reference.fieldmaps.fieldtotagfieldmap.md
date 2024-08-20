@@ -2,6 +2,28 @@
 optionsClassName: FieldToTagFieldMapOptions
 optionsClassFullName: MigrationTools.Tools.FieldToTagFieldMapOptions
 configurationSamples:
+- name: confinguration.json
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "FieldMappingTool": {
+            "FieldMaps": [
+              {
+                "FieldMapType": "FieldToTagFieldMap",
+                "Enabled": false,
+                "sourceField": null,
+                "formatExpression": null,
+                "ConfigurationCollectionItemPath": "MigrationTools:CommonTools:FieldMappingTool:FieldMaps:*:FieldToTagFieldMap",
+                "ApplyTo": null
+              }
+            ]
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.FieldToTagFieldMapOptions
 - name: defaults
   description: 
   code: >-
@@ -23,9 +45,9 @@ configurationSamples:
     {
       "$type": "FieldToTagFieldMapOptions",
       "Enabled": false,
-      "WorkItemTypeName": null,
       "sourceField": null,
       "formatExpression": null,
+      "ConfigurationCollectionItemPath": "MigrationTools:CommonTools:FieldMappingTool:FieldMaps:*:FieldToTagFieldMap",
       "ApplyTo": null
     }
   sampleFor: MigrationTools.Tools.FieldToTagFieldMapOptions
@@ -38,6 +60,10 @@ options:
   type: List
   description: missng XML code comments
   defaultValue: missng XML code comments
+- parameterName: ConfigurationCollectionItemPath
+  type: String
+  description: missng XML code comments
+  defaultValue: missng XML code comments
 - parameterName: Enabled
   type: Boolean
   description: If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.
@@ -47,10 +73,6 @@ options:
   description: missng XML code comments
   defaultValue: missng XML code comments
 - parameterName: sourceField
-  type: String
-  description: missng XML code comments
-  defaultValue: missng XML code comments
-- parameterName: WorkItemTypeName
   type: String
   description: missng XML code comments
   defaultValue: missng XML code comments

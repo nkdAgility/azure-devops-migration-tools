@@ -2,6 +2,38 @@
 optionsClassName: WorkItemMigrationProcessorOptions
 optionsClassFullName: MigrationTools.Processors.WorkItemMigrationProcessorOptions
 configurationSamples:
+- name: confinguration.json
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "Processors": [
+          {
+            "ProcessorType": "WorkItemMigrationProcessor",
+            "Enabled": false,
+            "UpdateCreatedDate": true,
+            "UpdateCreatedBy": true,
+            "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
+            "FixHtmlAttachmentLinks": true,
+            "WorkItemCreateRetryLimit": 5,
+            "FilterWorkItemsThatAlreadyExistInTarget": false,
+            "PauseAfterEachWorkItem": false,
+            "AttachRevisionHistory": false,
+            "GenerateMigrationComment": true,
+            "WorkItemIDs": null,
+            "MaxGracefulFailures": 0,
+            "SkipRevisionWithInvalidIterationPath": false,
+            "SkipRevisionWithInvalidAreaPath": false,
+            "Enrichers": null,
+            "ProcessorEnrichers": null,
+            "SourceName": null,
+            "TargetName": null,
+            "RefName": null
+          }
+        ]
+      }
+    }
+  sampleFor: MigrationTools.Processors.WorkItemMigrationProcessorOptions
 - name: defaults
   description: 
   code: >-

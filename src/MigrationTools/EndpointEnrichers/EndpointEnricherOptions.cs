@@ -7,7 +7,7 @@ namespace MigrationTools.EndpointEnrichers
     {
         public virtual string ConfigurationSectionPath => $"MigrationTools:EndpointEnricherDefaults:{ConfigurationOptionFor}";
         public string ConfigurationCollectionPath => $"MigrationTools:Endpoints:*:Enrichers:*:{ConfigurationOptionFor}";
-        public virtual string ConfigurationCollectionObjectName => $"EndpointEnricherType";
+        public virtual string ConfigurationObjectName => $"EndpointEnricherType";
         public virtual string ConfigurationOptionFor => $"{GetType().Name.Replace("Options", "")}";
 
         

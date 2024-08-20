@@ -2,6 +2,27 @@
 optionsClassName: FieldClearMapOptions
 optionsClassFullName: MigrationTools.Tools.FieldClearMapOptions
 configurationSamples:
+- name: confinguration.json
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "FieldMappingTool": {
+            "FieldMaps": [
+              {
+                "FieldMapType": "FieldClearMap",
+                "Enabled": false,
+                "targetField": null,
+                "ConfigurationCollectionItemPath": "MigrationTools:CommonTools:FieldMappingTool:FieldMaps:*:FieldClearMap",
+                "ApplyTo": null
+              }
+            ]
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.FieldClearMapOptions
 - name: defaults
   description: 
   code: >-
@@ -23,8 +44,8 @@ configurationSamples:
     {
       "$type": "FieldClearMapOptions",
       "Enabled": false,
-      "WorkItemTypeName": null,
       "targetField": null,
+      "ConfigurationCollectionItemPath": "MigrationTools:CommonTools:FieldMappingTool:FieldMaps:*:FieldClearMap",
       "ApplyTo": null
     }
   sampleFor: MigrationTools.Tools.FieldClearMapOptions
@@ -37,15 +58,15 @@ options:
   type: List
   description: missng XML code comments
   defaultValue: missng XML code comments
+- parameterName: ConfigurationCollectionItemPath
+  type: String
+  description: missng XML code comments
+  defaultValue: missng XML code comments
 - parameterName: Enabled
   type: Boolean
   description: If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.
   defaultValue: missng XML code comments
 - parameterName: targetField
-  type: String
-  description: missng XML code comments
-  defaultValue: missng XML code comments
-- parameterName: WorkItemTypeName
   type: String
   description: missng XML code comments
   defaultValue: missng XML code comments

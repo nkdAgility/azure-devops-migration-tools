@@ -1,4 +1,5 @@
 ﻿
+using System.Collections.Generic;
 using MigrationTools.Tools.Infrastructure;
 
 namespace MigrationTools.Tools
@@ -10,14 +11,13 @@ namespace MigrationTools.Tools
     /// <processingtarget>Work Item Field</processingtarget>
     public class FieldToFieldMapOptions : FieldMapOptions
     {
-        public string WorkItemTypeName { get; set; }
         public string sourceField { get; set; }
         public string targetField { get; set; }
         public string defaultValue { get; set; }
 
         public void SetExampleConfigDefaults()
         {
-            WorkItemTypeName = "*";
+            ApplyTo = new List<string>() { "*" };
             sourceField = "System.StackRank";
             targetField = "System.Rank";
             defaultValue = "1000";

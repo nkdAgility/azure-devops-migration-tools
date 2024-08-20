@@ -10,12 +10,11 @@ namespace MigrationTools.Tools
     /// <processingtarget>Work Item Field</processingtarget>
     public class FieldToFieldMultiMapOptions : FieldMapOptions
     {
-        public string WorkItemTypeName { get; set; }
         public Dictionary<string, string> SourceToTargetMappings { get; set; }
 
         public void SetExampleConfigDefaults()
         {
-            WorkItemTypeName = "*";
+            ApplyTo = new List<string>() { "*" };
             SourceToTargetMappings = new Dictionary<string, string>
             {
                 { "Custom.Field1", "Custom.Field4" },

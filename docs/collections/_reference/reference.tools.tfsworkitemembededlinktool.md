@@ -2,6 +2,17 @@
 optionsClassName: TfsWorkItemEmbededLinkToolOptions
 optionsClassFullName: MigrationTools.Tools.TfsWorkItemEmbededLinkToolOptions
 configurationSamples:
+- name: confinguration.json
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "TfsWorkItemEmbededLinkTool": {}
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.TfsWorkItemEmbededLinkToolOptions
 - name: defaults
   description: 
   code: >-

@@ -10,13 +10,12 @@ namespace MigrationTools.Tools
     /// <processingtarget>Work Item Field</processingtarget>
     public class MultiValueConditionalMapOptions : FieldMapOptions
     {
-        public string WorkItemTypeName { get; set; }
         public Dictionary<string, string> sourceFieldsAndValues { get; set; }
         public Dictionary<string, string> targetFieldsAndValues { get; set; }
 
         public void SetExampleConfigDefaults()
         {
-            WorkItemTypeName = "*";
+            ApplyTo = new List<string>() { "*" };
             sourceFieldsAndValues = new Dictionary<string, string>
             {
                 { "Something", "SomethingElse" }

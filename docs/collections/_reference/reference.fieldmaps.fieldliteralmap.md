@@ -2,6 +2,28 @@
 optionsClassName: FieldLiteralMapOptions
 optionsClassFullName: MigrationTools.Tools.FieldLiteralMapOptions
 configurationSamples:
+- name: confinguration.json
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "FieldMappingTool": {
+            "FieldMaps": [
+              {
+                "FieldMapType": "FieldLiteralMap",
+                "Enabled": false,
+                "targetField": null,
+                "value": null,
+                "ConfigurationCollectionItemPath": "MigrationTools:CommonTools:FieldMappingTool:FieldMaps:*:FieldLiteralMap",
+                "ApplyTo": null
+              }
+            ]
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.FieldLiteralMapOptions
 - name: defaults
   description: 
   code: >-
@@ -23,9 +45,9 @@ configurationSamples:
     {
       "$type": "FieldLiteralMapOptions",
       "Enabled": false,
-      "WorkItemTypeName": null,
       "targetField": null,
       "value": null,
+      "ConfigurationCollectionItemPath": "MigrationTools:CommonTools:FieldMappingTool:FieldMaps:*:FieldLiteralMap",
       "ApplyTo": null
     }
   sampleFor: MigrationTools.Tools.FieldLiteralMapOptions
@@ -38,6 +60,10 @@ options:
   type: List
   description: missng XML code comments
   defaultValue: missng XML code comments
+- parameterName: ConfigurationCollectionItemPath
+  type: String
+  description: missng XML code comments
+  defaultValue: missng XML code comments
 - parameterName: Enabled
   type: Boolean
   description: If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.
@@ -47,10 +73,6 @@ options:
   description: missng XML code comments
   defaultValue: missng XML code comments
 - parameterName: value
-  type: String
-  description: missng XML code comments
-  defaultValue: missng XML code comments
-- parameterName: WorkItemTypeName
   type: String
   description: missng XML code comments
   defaultValue: missng XML code comments

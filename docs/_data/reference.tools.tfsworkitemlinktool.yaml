@@ -1,6 +1,20 @@
 optionsClassName: TfsWorkItemLinkToolOptions
 optionsClassFullName: MigrationTools.Tools.TfsWorkItemLinkToolOptions
 configurationSamples:
+- name: confinguration.json
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "TfsWorkItemLinkTool": {
+            "FilterIfLinkCountMatches": true,
+            "SaveAfterEachLinkIsAdded": false
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.TfsWorkItemLinkToolOptions
 - name: defaults
   description: 
   code: >-

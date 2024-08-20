@@ -25,13 +25,16 @@ namespace MigrationTools.Options
         [JsonIgnore]
         public string ConfigurationCollectionPath { get; }
         [JsonIgnore]
-        public string ConfigurationCollectionObjectName { get; }
+        public string ConfigurationObjectName { get; }
 
         /// <summary>
         /// Will be used if enabled
         /// </summary>
         [JsonProperty(Order = -2)]
         bool Enabled { get; set; }
+
+        //public void SetExampleConfigSimple();
+        //public void SetExampleConfigFull();
 
     }
 }

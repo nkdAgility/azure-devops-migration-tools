@@ -1,4 +1,5 @@
-﻿using MigrationTools.Tools.Infrastructure;
+﻿using System.Collections.Generic;
+using MigrationTools.Tools.Infrastructure;
 namespace MigrationTools.Tools
 {
     /// <summary>
@@ -8,7 +9,6 @@ namespace MigrationTools.Tools
     /// <processingtarget>Work Item Field</processingtarget>
     public class RegexFieldMapOptions : FieldMapOptions
     {
-        public string WorkItemTypeName { get; set; }
         public string sourceField { get; set; }
         public string targetField { get; set; }
         public string pattern { get; set; }
@@ -16,7 +16,7 @@ namespace MigrationTools.Tools
 
         public void SetExampleConfigDefaults()
         {
-            WorkItemTypeName = "*";
+            ApplyTo = new List<string>() { "*" };
             sourceField = "Custom.MyVersion";
             targetField = "Custom.MyVersionYearOnly";
             pattern = "([0-9]{4})";

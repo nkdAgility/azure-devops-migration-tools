@@ -1,6 +1,27 @@
 optionsClassName: TfsNodeStructureToolOptions
 optionsClassFullName: MigrationTools.Tools.TfsNodeStructureToolOptions
 configurationSamples:
+- name: confinguration.json
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "TfsNodeStructureTool": {
+            "NodeBasePaths": null,
+            "AreaMaps": {
+              "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1"
+            },
+            "IterationMaps": {
+              "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1"
+            },
+            "ShouldCreateMissingRevisionPaths": true,
+            "ReplicateAllExistingNodes": true
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.TfsNodeStructureToolOptions
 - name: defaults
   description: 
   code: >-

@@ -1,6 +1,33 @@
 optionsClassName: AzureDevOpsPipelineProcessorOptions
 optionsClassFullName: MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions
 configurationSamples:
+- name: confinguration.json
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "Processors": [
+          {
+            "ProcessorType": "AzureDevOpsPipelineProcessor",
+            "Enabled": false,
+            "MigrateBuildPipelines": true,
+            "MigrateReleasePipelines": true,
+            "MigrateTaskGroups": true,
+            "MigrateVariableGroups": true,
+            "MigrateServiceConnections": true,
+            "BuildPipelines": null,
+            "ReleasePipelines": null,
+            "RepositoryNameMaps": null,
+            "Enrichers": null,
+            "ProcessorEnrichers": null,
+            "SourceName": "sourceName",
+            "TargetName": "targetName",
+            "RefName": null
+          }
+        ]
+      }
+    }
+  sampleFor: MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions
 - name: defaults
   description: 
   code: >-

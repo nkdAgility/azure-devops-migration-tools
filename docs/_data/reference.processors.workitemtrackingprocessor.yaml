@@ -1,6 +1,28 @@
 optionsClassName: WorkItemTrackingProcessorOptions
 optionsClassFullName: MigrationTools.Processors.WorkItemTrackingProcessorOptions
 configurationSamples:
+- name: confinguration.json
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "Processors": [
+          {
+            "ProcessorType": "WorkItemTrackingProcessor",
+            "Enabled": false,
+            "ReplayRevisions": false,
+            "CollapseRevisions": false,
+            "WorkItemCreateRetryLimit": 0,
+            "Enrichers": null,
+            "ProcessorEnrichers": null,
+            "SourceName": null,
+            "TargetName": null,
+            "RefName": null
+          }
+        ]
+      }
+    }
+  sampleFor: MigrationTools.Processors.WorkItemTrackingProcessorOptions
 - name: defaults
   description: 
   code: >-

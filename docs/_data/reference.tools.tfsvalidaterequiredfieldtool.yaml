@@ -1,6 +1,17 @@
 optionsClassName: TfsValidateRequiredFieldToolOptions
 optionsClassFullName: MigrationTools.Tools.TfsValidateRequiredFieldToolOptions
 configurationSamples:
+- name: confinguration.json
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "TfsValidateRequiredFieldTool": {}
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.TfsValidateRequiredFieldToolOptions
 - name: defaults
   description: 
   code: >-

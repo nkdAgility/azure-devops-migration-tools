@@ -1,6 +1,27 @@
 optionsClassName: StringManipulatorToolOptions
 optionsClassFullName: MigrationTools.Tools.StringManipulatorToolOptions
 configurationSamples:
+- name: confinguration.json
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "StringManipulatorTool": {
+            "MaxStringLength": 1000000,
+            "Manipulators": [
+              {
+                "Enabled": true,
+                "Pattern": "[^( -~)\n\r\t]+",
+                "Replacement": "",
+                "Description": "Remove invalid characters from the end of the string"
+              }
+            ]
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.StringManipulatorToolOptions
 - name: defaults
   description: 
   code: >-

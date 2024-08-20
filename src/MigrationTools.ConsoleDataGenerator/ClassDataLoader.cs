@@ -14,6 +14,7 @@ using Newtonsoft.Json;
 using MigrationTools.Tools.Infrastructure;
 using System.Security.AccessControl;
 using Microsoft.Extensions.Options;
+using MigrationTools.Processors;
 
 namespace MigrationTools.ConsoleDataGenerator
 {
@@ -92,10 +93,10 @@ namespace MigrationTools.ConsoleDataGenerator
             data.Status = codeDocs.GetTypeData(typeOftargetOfOption, "status");
             data.ProcessingTarget = codeDocs.GetTypeData(typeOftargetOfOption, "processingtarget");
 
-
             if (optionInFocus != null)
             {
                 TOptionsInterface instanceOfOption = (TOptionsInterface)Activator.CreateInstance(optionInFocus);
+
                 data.OptionsClassFullName = optionInFocus.FullName;
                 data.OptionsClassName = optionInFocus.Name;
                 data.OptionsClassFile = codeFinder.FindCodeFile(optionInFocus);
@@ -104,14 +105,12 @@ namespace MigrationTools.ConsoleDataGenerator
                     Console.WriteLine("Processing as ConfigurationSectionName");
                     var section = configuration.GetSection(oConfig.SectionPath);
                     section.Bind(instanceOfOption);
-                    data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "defaults", SampleFor = data.OptionsClassFullName, Code = ConvertSectionWithPathToJson(configuration, section).Trim() });
-                }
 
-                dynamic man = OptionsManager.GetOptionsManager(optionInFocus);
-                var o = man.LoadAll("appsettings.json");
-                if (o.Count > 0)
-                {
-                    Console.WriteLine("Found stuff");
+                    string jsonCollection = Options.OptionsManager.CreateNewConfigurationJson(instanceOfOption, !string.IsNullOrEmpty(instanceOfOption.ConfigurationCollectionPath));
+
+                    data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "confinguration.json", SampleFor = data.OptionsClassFullName, Code = jsonCollection });
+                    data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "defaults", SampleFor = data.OptionsClassFullName, Code = ConvertSectionWithPathToJson(configuration, section).Trim() });
+
                 }
 
                 Console.WriteLine("targetItem");

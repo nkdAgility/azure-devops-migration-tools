@@ -8,7 +8,7 @@ namespace MigrationTools.Endpoints
     {
         public virtual string ConfigurationSectionPath => $"MigrationTools:EndpointDefaults:{ConfigurationOptionFor}";
         public string ConfigurationCollectionPath => $"MigrationTools:Endpoints:*:{ConfigurationOptionFor}";
-        public virtual string ConfigurationCollectionObjectName => $"EndpointType";
+        public virtual string ConfigurationObjectName => $"EndpointType";
 
         public string ConfigurationOptionFor => $"{GetType().Name.Replace("Options", "")}";
 

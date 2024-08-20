@@ -1,4 +1,5 @@
-﻿using MigrationTools.Tools.Infrastructure;
+﻿using System.Collections.Generic;
+using MigrationTools.Tools.Infrastructure;
 namespace MigrationTools.Tools
 {
     /// <summary>
@@ -8,14 +9,13 @@ namespace MigrationTools.Tools
     /// <processingtarget>Work Item Field</processingtarget>
     public class FieldValuetoTagMapOptions : FieldMapOptions
     {
-        public string WorkItemTypeName { get; set; }
         public string sourceField { get; set; }
         public string pattern { get; set; }
         public string formatExpression { get; set; }
 
         public void SetExampleConfigDefaults()
         {
-            WorkItemTypeName = "*";
+            ApplyTo = new List<string>() { "*" };
             sourceField = "System.Status";
             pattern = "(Active|Resolved)";
             formatExpression = "Status: {0}";
