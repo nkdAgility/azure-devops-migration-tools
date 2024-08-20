@@ -12,14 +12,12 @@ configurationSamples:
             "FieldMaps": [
               {
                 "FieldMapType": "FieldValueMap",
-                "Enabled": false,
                 "sourceField": "System.State",
                 "targetField": "System.State",
                 "defaultValue": "StateB",
                 "valueMapping": {
                   "StateA": "StateB"
                 },
-                "ConfigurationCollectionItemPath": "MigrationTools:CommonTools:FieldMappingTool:FieldMaps:*:FieldValueMap",
                 "ApplyTo": [
                   "SomeWorkItemType"
                 ]
@@ -60,7 +58,6 @@ configurationSamples:
   code: >-
     {
       "$type": "FieldValueMapOptions",
-      "Enabled": false,
       "sourceField": "System.State",
       "targetField": "System.State",
       "defaultValue": "StateB",
@@ -68,7 +65,6 @@ configurationSamples:
         "$type": "Dictionary`2",
         "StateA": "StateB"
       },
-      "ConfigurationCollectionItemPath": "MigrationTools:CommonTools:FieldMappingTool:FieldMaps:*:FieldValueMap",
       "ApplyTo": [
         "SomeWorkItemType"
       ]
@@ -83,17 +79,9 @@ options:
   type: List
   description: missng XML code comments
   defaultValue: missng XML code comments
-- parameterName: ConfigurationCollectionItemPath
-  type: String
-  description: missng XML code comments
-  defaultValue: missng XML code comments
 - parameterName: defaultValue
   type: String
   description: missng XML code comments
-  defaultValue: missng XML code comments
-- parameterName: Enabled
-  type: Boolean
-  description: If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.
   defaultValue: missng XML code comments
 - parameterName: sourceField
   type: String

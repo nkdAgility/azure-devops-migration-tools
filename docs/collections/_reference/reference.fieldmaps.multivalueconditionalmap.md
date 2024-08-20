@@ -12,7 +12,6 @@ configurationSamples:
             "FieldMaps": [
               {
                 "FieldMapType": "MultiValueConditionalMap",
-                "Enabled": false,
                 "sourceFieldsAndValues": {
                   "Field1": "Value1",
                   "Field2": "Value2"
@@ -21,7 +20,6 @@ configurationSamples:
                   "Field1": "Value1",
                   "Field2": "Value2"
                 },
-                "ConfigurationCollectionItemPath": "MigrationTools:CommonTools:FieldMappingTool:FieldMaps:*:MultiValueConditionalMap",
                 "ApplyTo": [
                   "SomeWorkItemType"
                 ]
@@ -64,7 +62,6 @@ configurationSamples:
   code: >-
     {
       "$type": "MultiValueConditionalMapOptions",
-      "Enabled": false,
       "sourceFieldsAndValues": {
         "$type": "Dictionary`2",
         "Field1": "Value1",
@@ -75,7 +72,6 @@ configurationSamples:
         "Field1": "Value1",
         "Field2": "Value2"
       },
-      "ConfigurationCollectionItemPath": "MigrationTools:CommonTools:FieldMappingTool:FieldMaps:*:MultiValueConditionalMap",
       "ApplyTo": [
         "SomeWorkItemType"
       ]
@@ -89,14 +85,6 @@ options:
 - parameterName: ApplyTo
   type: List
   description: missng XML code comments
-  defaultValue: missng XML code comments
-- parameterName: ConfigurationCollectionItemPath
-  type: String
-  description: missng XML code comments
-  defaultValue: missng XML code comments
-- parameterName: Enabled
-  type: Boolean
-  description: If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.
   defaultValue: missng XML code comments
 - parameterName: sourceFieldsAndValues
   type: Dictionary

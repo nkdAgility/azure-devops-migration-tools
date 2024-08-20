@@ -12,11 +12,9 @@ configurationSamples:
             "FieldMaps": [
               {
                 "FieldMapType": "TreeToTagFieldMap",
-                "Enabled": false,
                 "toSkip": 0,
                 "timeTravel": 0,
-                "ConfigurationCollectionItemPath": "MigrationTools:CommonTools:FieldMappingTool:FieldMaps:*:TreeToTagFieldMap",
-                "ApplyTo": null
+                "ApplyTo": []
               }
             ]
           }
@@ -44,11 +42,9 @@ configurationSamples:
   code: >-
     {
       "$type": "TreeToTagFieldMapOptions",
-      "Enabled": false,
       "toSkip": 0,
       "timeTravel": 0,
-      "ConfigurationCollectionItemPath": "MigrationTools:CommonTools:FieldMappingTool:FieldMaps:*:TreeToTagFieldMap",
-      "ApplyTo": null
+      "ApplyTo": []
     }
   sampleFor: MigrationTools.Tools.TreeToTagFieldMapOptions
 description: missng XML code comments
@@ -59,14 +55,6 @@ options:
 - parameterName: ApplyTo
   type: List
   description: missng XML code comments
-  defaultValue: missng XML code comments
-- parameterName: ConfigurationCollectionItemPath
-  type: String
-  description: missng XML code comments
-  defaultValue: missng XML code comments
-- parameterName: Enabled
-  type: Boolean
-  description: If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.
   defaultValue: missng XML code comments
 - parameterName: timeTravel
   type: Int32

@@ -12,11 +12,9 @@ configurationSamples:
             "FieldMaps": [
               {
                 "FieldMapType": "FieldValuetoTagMap",
-                "Enabled": false,
                 "sourceField": "Microsoft.VSTS.CMMI.Blocked",
                 "pattern": "Yes",
                 "formatExpression": "{0}",
-                "ConfigurationCollectionItemPath": "MigrationTools:CommonTools:FieldMappingTool:FieldMaps:*:FieldValuetoTagMap",
                 "ApplyTo": [
                   "SomeWorkItemType"
                 ]
@@ -54,11 +52,9 @@ configurationSamples:
   code: >-
     {
       "$type": "FieldValuetoTagMapOptions",
-      "Enabled": false,
       "sourceField": "Microsoft.VSTS.CMMI.Blocked",
       "pattern": "Yes",
       "formatExpression": "{0}",
-      "ConfigurationCollectionItemPath": "MigrationTools:CommonTools:FieldMappingTool:FieldMaps:*:FieldValuetoTagMap",
       "ApplyTo": [
         "SomeWorkItemType"
       ]
@@ -72,14 +68,6 @@ options:
 - parameterName: ApplyTo
   type: List
   description: missng XML code comments
-  defaultValue: missng XML code comments
-- parameterName: ConfigurationCollectionItemPath
-  type: String
-  description: missng XML code comments
-  defaultValue: missng XML code comments
-- parameterName: Enabled
-  type: Boolean
-  description: If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.
   defaultValue: missng XML code comments
 - parameterName: formatExpression
   type: String

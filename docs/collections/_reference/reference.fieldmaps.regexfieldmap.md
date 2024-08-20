@@ -12,12 +12,10 @@ configurationSamples:
             "FieldMaps": [
               {
                 "FieldMapType": "RegexFieldMap",
-                "Enabled": false,
                 "sourceField": "COMPANY.PRODUCT.Release",
                 "targetField": "COMPANY.DEVISION.MinorReleaseVersion",
                 "pattern": "PRODUCT \\d{4}.(\\d{1})",
                 "replacement": "$1",
-                "ConfigurationCollectionItemPath": "MigrationTools:CommonTools:FieldMappingTool:FieldMaps:*:RegexFieldMap",
                 "ApplyTo": [
                   "SomeWorkItemType"
                 ]
@@ -56,12 +54,10 @@ configurationSamples:
   code: >-
     {
       "$type": "RegexFieldMapOptions",
-      "Enabled": false,
       "sourceField": "COMPANY.PRODUCT.Release",
       "targetField": "COMPANY.DEVISION.MinorReleaseVersion",
       "pattern": "PRODUCT \\d{4}.(\\d{1})",
       "replacement": "$1",
-      "ConfigurationCollectionItemPath": "MigrationTools:CommonTools:FieldMappingTool:FieldMaps:*:RegexFieldMap",
       "ApplyTo": [
         "SomeWorkItemType"
       ]
@@ -75,14 +71,6 @@ options:
 - parameterName: ApplyTo
   type: List
   description: missng XML code comments
-  defaultValue: missng XML code comments
-- parameterName: ConfigurationCollectionItemPath
-  type: String
-  description: missng XML code comments
-  defaultValue: missng XML code comments
-- parameterName: Enabled
-  type: Boolean
-  description: If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.
   defaultValue: missng XML code comments
 - parameterName: pattern
   type: String

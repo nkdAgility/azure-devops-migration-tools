@@ -12,12 +12,10 @@ configurationSamples:
             "FieldMaps": [
               {
                 "FieldMapType": "FieldToFieldMultiMap",
-                "Enabled": false,
                 "SourceToTargetMappings": {
                   "SourceField1": "TargetField1",
                   "SourceField2": "TargetField2"
                 },
-                "ConfigurationCollectionItemPath": "MigrationTools:CommonTools:FieldMappingTool:FieldMaps:*:FieldToFieldMultiMap",
                 "ApplyTo": [
                   "SomeWorkItemType",
                   "SomeOtherWorkItemType"
@@ -58,13 +56,11 @@ configurationSamples:
   code: >-
     {
       "$type": "FieldToFieldMultiMapOptions",
-      "Enabled": false,
       "SourceToTargetMappings": {
         "$type": "Dictionary`2",
         "SourceField1": "TargetField1",
         "SourceField2": "TargetField2"
       },
-      "ConfigurationCollectionItemPath": "MigrationTools:CommonTools:FieldMappingTool:FieldMaps:*:FieldToFieldMultiMap",
       "ApplyTo": [
         "SomeWorkItemType",
         "SomeOtherWorkItemType"
@@ -79,14 +75,6 @@ options:
 - parameterName: ApplyTo
   type: List
   description: missng XML code comments
-  defaultValue: missng XML code comments
-- parameterName: ConfigurationCollectionItemPath
-  type: String
-  description: missng XML code comments
-  defaultValue: missng XML code comments
-- parameterName: Enabled
-  type: Boolean
-  description: If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.
   defaultValue: missng XML code comments
 - parameterName: SourceToTargetMappings
   type: Dictionary

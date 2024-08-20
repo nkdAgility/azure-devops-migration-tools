@@ -11,11 +11,11 @@ configurationSamples:
             "FieldMaps": [
               {
                 "FieldMapType": "FieldToTagFieldMap",
-                "Enabled": false,
                 "sourceField": null,
-                "formatExpression": null,
-                "ConfigurationCollectionItemPath": "MigrationTools:CommonTools:FieldMappingTool:FieldMaps:*:FieldToTagFieldMap",
-                "ApplyTo": null
+                "formatExpression": "{0} <br/><br/><h3>Acceptance Criteria</h3>{1}",
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ]
               }
             ]
           }
@@ -31,7 +31,17 @@ configurationSamples:
         "CommonTools": {
           "FieldMappingTool": {
             "FieldMapDefaults": {
-              "FieldToTagFieldMap": []
+              "FieldToTagFieldMap": {
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "formatExpression": "{0} <br/><br/><h3>Acceptance Criteria</h3>{1}",
+                "sourceFields": [
+                  "System.Description",
+                  "Microsoft.VSTS.Common.AcceptanceCriteria"
+                ],
+                "targetField": "System.Description"
+              }
             }
           }
         }
@@ -43,11 +53,11 @@ configurationSamples:
   code: >-
     {
       "$type": "FieldToTagFieldMapOptions",
-      "Enabled": false,
       "sourceField": null,
-      "formatExpression": null,
-      "ConfigurationCollectionItemPath": "MigrationTools:CommonTools:FieldMappingTool:FieldMaps:*:FieldToTagFieldMap",
-      "ApplyTo": null
+      "formatExpression": "{0} <br/><br/><h3>Acceptance Criteria</h3>{1}",
+      "ApplyTo": [
+        "SomeWorkItemType"
+      ]
     }
   sampleFor: MigrationTools.Tools.FieldToTagFieldMapOptions
 description: missng XML code comments
@@ -58,14 +68,6 @@ options:
 - parameterName: ApplyTo
   type: List
   description: missng XML code comments
-  defaultValue: missng XML code comments
-- parameterName: ConfigurationCollectionItemPath
-  type: String
-  description: missng XML code comments
-  defaultValue: missng XML code comments
-- parameterName: Enabled
-  type: Boolean
-  description: If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.
   defaultValue: missng XML code comments
 - parameterName: formatExpression
   type: String

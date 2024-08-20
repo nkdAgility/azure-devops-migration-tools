@@ -12,11 +12,9 @@ configurationSamples:
             "FieldMaps": [
               {
                 "FieldMapType": "FieldToFieldMap",
-                "Enabled": false,
                 "sourceField": "Microsoft.VSTS.Common.BacklogPriority",
                 "targetField": "Microsoft.VSTS.Common.StackRank",
                 "defaultValue": "42",
-                "ConfigurationCollectionItemPath": "MigrationTools:CommonTools:FieldMappingTool:FieldMaps:*:FieldToFieldMap",
                 "ApplyTo": [
                   "SomeWorkItemType"
                 ]
@@ -54,11 +52,9 @@ configurationSamples:
   code: >-
     {
       "$type": "FieldToFieldMapOptions",
-      "Enabled": false,
       "sourceField": "Microsoft.VSTS.Common.BacklogPriority",
       "targetField": "Microsoft.VSTS.Common.StackRank",
       "defaultValue": "42",
-      "ConfigurationCollectionItemPath": "MigrationTools:CommonTools:FieldMappingTool:FieldMaps:*:FieldToFieldMap",
       "ApplyTo": [
         "SomeWorkItemType"
       ]
@@ -73,17 +69,9 @@ options:
   type: List
   description: missng XML code comments
   defaultValue: missng XML code comments
-- parameterName: ConfigurationCollectionItemPath
-  type: String
-  description: missng XML code comments
-  defaultValue: missng XML code comments
 - parameterName: defaultValue
   type: String
   description: missng XML code comments
-  defaultValue: missng XML code comments
-- parameterName: Enabled
-  type: Boolean
-  description: If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.
   defaultValue: missng XML code comments
 - parameterName: sourceField
   type: String
