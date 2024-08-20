@@ -17,7 +17,7 @@ namespace MigrationTools.Tools.Infrastructure
         public virtual string ConfigurationOptionFor => $"{GetType().Name.Replace("Options", "")}";
 
         /// <summary>
-        /// If set to `true` then the processor will run. Set to `false` and the processor will not run.
+        /// If set to `true` then the tool will run. Set to `false` and the processor will not run.
         /// </summary>
 
         public bool Enabled { get; set; }

@@ -8,7 +8,6 @@ namespace MigrationTools.Tools.Infrastructure
 {
     public interface IToolOptions : IOptions
     {
-        [JsonIgnore]
         bool Enabled { get; set; }
     }
 }
