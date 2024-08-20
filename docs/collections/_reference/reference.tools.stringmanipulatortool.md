@@ -9,6 +9,7 @@ configurationSamples:
       "MigrationTools": {
         "CommonTools": {
           "StringManipulatorTool": {
+            "Enabled": true,
             "MaxStringLength": 1000000,
             "Manipulators": [
               {
@@ -51,6 +52,7 @@ configurationSamples:
   code: >-
     {
       "$type": "StringManipulatorToolOptions",
+      "Enabled": true,
       "MaxStringLength": 1000000,
       "Manipulators": [
         {
@@ -68,6 +70,10 @@ className: StringManipulatorTool
 typeName: Tools
 architecture: 
 options:
+- parameterName: Enabled
+  type: Boolean
+  description: If set to `true` then the tool will run. Set to `false` and the processor will not run.
+  defaultValue: missng XML code comments
 - parameterName: Manipulators
   type: List
   description: List of regex based string manipulations to apply to all string fields. Each regex replacement is applied in order and can be enabled or disabled.

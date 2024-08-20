@@ -8,6 +8,7 @@ configurationSamples:
       "MigrationTools": {
         "CommonTools": {
           "TfsTeamSettingsTool": {
+            "Enabled": true,
             "MigrateTeamSettings": true,
             "UpdateTeamSettings": true,
             "MigrateTeamCapacities": true,
@@ -39,6 +40,7 @@ configurationSamples:
   code: >-
     {
       "$type": "TfsTeamSettingsToolOptions",
+      "Enabled": true,
       "MigrateTeamSettings": true,
       "UpdateTeamSettings": true,
       "MigrateTeamCapacities": true,
@@ -50,6 +52,10 @@ className: TfsTeamSettingsTool
 typeName: Tools
 architecture: 
 options:
+- parameterName: Enabled
+  type: Boolean
+  description: If set to `true` then the tool will run. Set to `false` and the processor will not run.
+  defaultValue: missng XML code comments
 - parameterName: MigrateTeamCapacities
   type: Boolean
   description: 'Migrate original team member capacities after their creation on the target team project. Note: It will only migrate team member capacity if the team member with same display name exists on the target collection otherwise it will be ignored.'

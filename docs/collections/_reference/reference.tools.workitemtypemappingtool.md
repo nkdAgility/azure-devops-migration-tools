@@ -9,6 +9,7 @@ configurationSamples:
       "MigrationTools": {
         "CommonTools": {
           "WorkItemTypeMappingTool": {
+            "Enabled": false,
             "Mappings": {
               "Source Work Item Type Name": "Target Work Item Type Name"
             }
@@ -38,6 +39,7 @@ configurationSamples:
   code: >-
     {
       "$type": "WorkItemTypeMappingToolOptions",
+      "Enabled": false,
       "Mappings": {
         "$type": "Dictionary`2",
         "Source Work Item Type Name": "Target Work Item Type Name"
@@ -49,6 +51,10 @@ className: WorkItemTypeMappingTool
 typeName: Tools
 architecture: 
 options:
+- parameterName: Enabled
+  type: Boolean
+  description: If set to `true` then the tool will run. Set to `false` and the processor will not run.
+  defaultValue: missng XML code comments
 - parameterName: Mappings
   type: Dictionary
   description: List of work item mappings.

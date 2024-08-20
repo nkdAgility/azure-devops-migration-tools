@@ -9,6 +9,7 @@ configurationSamples:
       "MigrationTools": {
         "CommonTools": {
           "TfsChangeSetMappingTool": {
+            "Enabled": false,
             "ChangeSetMappingFile": null
           }
         }
@@ -34,6 +35,7 @@ configurationSamples:
   code: >-
     {
       "$type": "TfsChangeSetMappingToolOptions",
+      "Enabled": false,
       "ChangeSetMappingFile": null
     }
   sampleFor: MigrationTools.Tools.TfsChangeSetMappingToolOptions
@@ -45,6 +47,10 @@ options:
 - parameterName: ChangeSetMappingFile
   type: String
   description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: Enabled
+  type: Boolean
+  description: If set to `true` then the tool will run. Set to `false` and the processor will not run.
   defaultValue: missng XML code comments
 status: missng XML code comments
 processingTarget: missng XML code comments

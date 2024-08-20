@@ -9,6 +9,7 @@ configurationSamples:
       "MigrationTools": {
         "CommonTools": {
           "TfsWorkItemLinkTool": {
+            "Enabled": true,
             "FilterIfLinkCountMatches": true,
             "SaveAfterEachLinkIsAdded": false
           }
@@ -36,6 +37,7 @@ configurationSamples:
   code: >-
     {
       "$type": "TfsWorkItemLinkToolOptions",
+      "Enabled": true,
       "FilterIfLinkCountMatches": true,
       "SaveAfterEachLinkIsAdded": false
     }
@@ -45,6 +47,10 @@ className: TfsWorkItemLinkTool
 typeName: Tools
 architecture: 
 options:
+- parameterName: Enabled
+  type: Boolean
+  description: If set to `true` then the tool will run. Set to `false` and the processor will not run.
+  defaultValue: missng XML code comments
 - parameterName: FilterIfLinkCountMatches
   type: Boolean
   description: Skip validating links if the number of links in the source and the target matches!

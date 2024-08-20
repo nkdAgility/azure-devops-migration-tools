@@ -9,6 +9,7 @@ configurationSamples:
       "MigrationTools": {
         "CommonTools": {
           "TfsRevisionManagerTool": {
+            "Enabled": true,
             "ReplayRevisions": true,
             "MaxRevisions": 0
           }
@@ -36,6 +37,7 @@ configurationSamples:
   code: >-
     {
       "$type": "TfsRevisionManagerToolOptions",
+      "Enabled": true,
       "ReplayRevisions": true,
       "MaxRevisions": 0
     }
@@ -45,6 +47,10 @@ className: TfsRevisionManagerTool
 typeName: Tools
 architecture: 
 options:
+- parameterName: Enabled
+  type: Boolean
+  description: If set to `true` then the tool will run. Set to `false` and the processor will not run.
+  defaultValue: missng XML code comments
 - parameterName: MaxRevisions
   type: Int32
   description: Sets the maximum number of revisions that will be migrated. "First + Last N = Max". If this was set to 5 and there were 10 revisions you would get the first 1 (creation) and the latest 4 migrated.

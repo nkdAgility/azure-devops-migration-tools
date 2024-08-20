@@ -8,7 +8,9 @@ configurationSamples:
     {
       "MigrationTools": {
         "CommonTools": {
-          "TfsGitRepositoryTool": {}
+          "TfsGitRepositoryTool": {
+            "Enabled": false
+          }
         }
       }
     }
@@ -28,14 +30,19 @@ configurationSamples:
   description: 
   code: >-
     {
-      "$type": "TfsGitRepositoryToolOptions"
+      "$type": "TfsGitRepositoryToolOptions",
+      "Enabled": false
     }
   sampleFor: MigrationTools.Tools.TfsGitRepositoryToolOptions
 description: missng XML code comments
 className: TfsGitRepositoryTool
 typeName: Tools
 architecture: 
-options: []
+options:
+- parameterName: Enabled
+  type: Boolean
+  description: If set to `true` then the tool will run. Set to `false` and the processor will not run.
+  defaultValue: missng XML code comments
 status: missng XML code comments
 processingTarget: missng XML code comments
 classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Tools/TfsGitRepositoryTool.cs

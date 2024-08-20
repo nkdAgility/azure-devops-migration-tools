@@ -9,6 +9,7 @@ configurationSamples:
       "MigrationTools": {
         "CommonTools": {
           "FieldMappingTool": {
+            "Enabled": false,
             "FieldMaps": []
           }
         }
@@ -126,6 +127,7 @@ configurationSamples:
   code: >-
     {
       "$type": "FieldMappingToolOptions",
+      "Enabled": false,
       "FieldMaps": []
     }
   sampleFor: MigrationTools.Tools.FieldMappingToolOptions
@@ -134,6 +136,10 @@ className: FieldMappingTool
 typeName: Tools
 architecture: 
 options:
+- parameterName: Enabled
+  type: Boolean
+  description: If set to `true` then the tool will run. Set to `false` and the processor will not run.
+  defaultValue: missng XML code comments
 - parameterName: FieldMaps
   type: List
   description: missng XML code comments

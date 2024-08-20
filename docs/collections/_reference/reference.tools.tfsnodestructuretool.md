@@ -9,6 +9,7 @@ configurationSamples:
       "MigrationTools": {
         "CommonTools": {
           "TfsNodeStructureTool": {
+            "Enabled": true,
             "NodeBasePaths": null,
             "AreaMaps": {
               "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1"
@@ -50,6 +51,7 @@ configurationSamples:
   code: >-
     {
       "$type": "TfsNodeStructureToolOptions",
+      "Enabled": true,
       "NodeBasePaths": null,
       "AreaMaps": {
         "$type": "Dictionary`2",
@@ -72,6 +74,10 @@ options:
   type: Dictionary
   description: Remapping rules for area paths, implemented with regular expressions. The rules apply with a higher priority than the `PrefixProjectToNodes`, that is, if no rule matches the path and the `PrefixProjectToNodes` option is enabled, then the old `PrefixProjectToNodes` behavior is applied.
   defaultValue: '{}'
+- parameterName: Enabled
+  type: Boolean
+  description: If set to `true` then the tool will run. Set to `false` and the processor will not run.
+  defaultValue: missng XML code comments
 - parameterName: IterationMaps
   type: Dictionary
   description: Remapping rules for iteration paths, implemented with regular expressions. The rules apply with a higher priority than the `PrefixProjectToNodes`, that is, if no rule matches the path and the `PrefixProjectToNodes` option is enabled, then the old `PrefixProjectToNodes` behavior is applied.

@@ -9,6 +9,7 @@ configurationSamples:
       "MigrationTools": {
         "CommonTools": {
           "TfsAttachmentTool": {
+            "Enabled": true,
             "ExportBasePath": "c:\\temp\\WorkItemAttachmentExport",
             "MaxAttachmentSize": 480000000
           }
@@ -37,6 +38,7 @@ configurationSamples:
   code: >-
     {
       "$type": "TfsAttachmentToolOptions",
+      "Enabled": true,
       "ExportBasePath": "c:\\temp\\WorkItemAttachmentExport",
       "MaxAttachmentSize": 480000000
     }
@@ -46,6 +48,10 @@ className: TfsAttachmentTool
 typeName: Tools
 architecture: 
 options:
+- parameterName: Enabled
+  type: Boolean
+  description: If set to `true` then the tool will run. Set to `false` and the processor will not run.
+  defaultValue: missng XML code comments
 - parameterName: ExportBasePath
   type: String
   description: '`AttachmentMigration` is set to true then you need to specify a working path for attachments to be saved locally.'

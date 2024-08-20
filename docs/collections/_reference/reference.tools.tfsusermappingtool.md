@@ -9,6 +9,7 @@ configurationSamples:
       "MigrationTools": {
         "CommonTools": {
           "TfsUserMappingTool": {
+            "Enabled": false,
             "IdentityFieldsToCheck": [
               "System.AssignedTo",
               "System.ChangedBy",
@@ -50,6 +51,7 @@ configurationSamples:
   code: >-
     {
       "$type": "TfsUserMappingToolOptions",
+      "Enabled": false,
       "IdentityFieldsToCheck": [
         "System.AssignedTo",
         "System.ChangedBy",
@@ -66,6 +68,10 @@ className: TfsUserMappingTool
 typeName: Tools
 architecture: 
 options:
+- parameterName: Enabled
+  type: Boolean
+  description: If set to `true` then the tool will run. Set to `false` and the processor will not run.
+  defaultValue: missng XML code comments
 - parameterName: IdentityFieldsToCheck
   type: List
   description: This is a list of the Identiy fields in the Source to check for user mapping purposes. You should list all identiy fields that you wan to map.

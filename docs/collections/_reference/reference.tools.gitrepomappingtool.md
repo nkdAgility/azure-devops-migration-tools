@@ -9,6 +9,7 @@ configurationSamples:
       "MigrationTools": {
         "CommonTools": {
           "GitRepoMappingTool": {
+            "Enabled": true,
             "Mappings": {
               "Source Repo Name": "Target Repo Name"
             }
@@ -38,6 +39,7 @@ configurationSamples:
   code: >-
     {
       "$type": "GitRepoMappingToolOptions",
+      "Enabled": true,
       "Mappings": {
         "$type": "Dictionary`2",
         "Source Repo Name": "Target Repo Name"
@@ -49,6 +51,10 @@ className: GitRepoMappingTool
 typeName: Tools
 architecture: 
 options:
+- parameterName: Enabled
+  type: Boolean
+  description: If set to `true` then the tool will run. Set to `false` and the processor will not run.
+  defaultValue: missng XML code comments
 - parameterName: Mappings
   type: Dictionary
   description: List of work item mappings.

@@ -208,7 +208,7 @@
         </member>
         <member name="P:MigrationTools.Tools.Infrastructure.ToolOptions.Enabled">
             <summary>
-            If set to `true` then the processor will run. Set to `false` and the processor will not run.
+            If set to `true` then the tool will run. Set to `false` and the processor will not run.
             </summary>
         </member>
         <member name="T:MigrationTools.Tools.GitRepoMappingTool">
@@ -269,7 +269,7 @@
         </member>
         <member name="F:ThisAssembly.Git.IsDirtyString">
             <summary>
-            => @"true"
+            => @"false"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.RepositoryUrl">
@@ -284,27 +284,27 @@
         </member>
         <member name="F:ThisAssembly.Git.Commit">
             <summary>
-            => @"135efcc7"
+            => @"c168069b"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Sha">
             <summary>
-            => @"135efcc7b38ddb8b719d457531bfe18db9aeed77"
+            => @"c168069bcba6f394d92ac069cec45d13dfb24625"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.CommitDate">
             <summary>
-            => @"2024-08-20T22:09:53+01:00"
+            => @"2024-08-20T22:15:10+01:00"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commits">
             <summary>
-            => @"144"
+            => @"146"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Tag">
             <summary>
-            => @"v15.1.8-Preview.9-144-g135efcc7"
+            => @"v15.1.8-Preview.9-146-gc168069b"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseTag">
@@ -339,7 +339,7 @@
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Patch">
             <summary>
-            => @"152"
+            => @"154"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Label">
