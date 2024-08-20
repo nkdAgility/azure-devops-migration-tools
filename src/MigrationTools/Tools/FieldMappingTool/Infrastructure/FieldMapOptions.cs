@@ -8,10 +8,13 @@ namespace MigrationTools.Tools.Infrastructure
 {
     public abstract class FieldMapOptions : IFieldMapOptions
     {
-        [JsonIgnore]
-        public virtual string ConfigurationSectionName => $"MigrationTools:CommonTools:FieldMappingTool:FieldMapDefaults:{OptionFor}";
-        [JsonIgnore]
-        public virtual string OptionFor => $"{GetType().Name.Replace("Options", "")}";
+
+        public virtual string ConfigurationSectionPath => $"MigrationTools:CommonTools:FieldMappingTool:FieldMapDefaults:{ConfigurationOptionFor}";
+
+        public virtual string ConfigurationCollectionPath => $"MigrationTools:CommonTools:FieldMappingTool:FieldMaps:*:{ConfigurationOptionFor}";
+        public virtual string ConfigurationCollectionObjectName => $"FieldMapType";
+
+        public virtual string ConfigurationOptionFor => $"{GetType().Name.Replace("Options", "")}";
         /// <summary>
         /// If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.
         /// </summary>

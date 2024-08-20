@@ -8,9 +8,14 @@ namespace MigrationTools.Tools.Infrastructure
     public abstract class ToolOptions : IToolOptions
     {
         [JsonIgnore]
-        public virtual string ConfigurationSectionName => $"MigrationTools:ProcessorDefaults:{OptionFor}";
+        public virtual string ConfigurationSectionPath => $"MigrationTools:CommonTools:{ConfigurationOptionFor}";
         [JsonIgnore]
-        public virtual string OptionFor => $"{GetType().Name.Replace("Options", "")}";
+        public string ConfigurationCollectionPath => $"*:{ConfigurationOptionFor}";
+        [JsonIgnore]
+        public string ConfigurationCollectionObjectName => $"ToolType";
+        [JsonIgnore]
+        public virtual string ConfigurationOptionFor => $"{GetType().Name.Replace("Options", "")}";
+
         /// <summary>
         /// If set to `true` then the processor will run. Set to `false` and the processor will not run.
         /// </summary>

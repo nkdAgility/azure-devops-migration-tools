@@ -5,10 +5,10 @@ namespace MigrationTools.Enrichers
 {
     public abstract class ProcessorEnricherOptions : IProcessorEnricherOptions
     {
-        [JsonIgnore]
-        public virtual string ConfigurationSectionName => $"MigrationTools:ProcessorEnricherDefaults:{OptionFor}";
-        [JsonIgnore]
-        public virtual string OptionFor => $"{GetType().Name.Replace("Options", "")}";
+        public virtual string ConfigurationSectionPath => $"MigrationTools:ProcessorEnricherDefaults:{ConfigurationOptionFor}";
+        public virtual string ConfigurationCollectionPath => $"MigrationTools:Processors:*:Enrichers:*:{ConfigurationOptionFor}";
+        public virtual string ConfigurationCollectionObjectName => $"ProcessorEnricherType";
+        public virtual string ConfigurationOptionFor => $"{GetType().Name.Replace("Options", "")}";
 
         /// <summary>
         /// If enabled this will run this migrator
@@ -21,5 +21,6 @@ namespace MigrationTools.Enrichers
         /// </summary>
         public string RefName { get; set; }
 
+        
     }
 }

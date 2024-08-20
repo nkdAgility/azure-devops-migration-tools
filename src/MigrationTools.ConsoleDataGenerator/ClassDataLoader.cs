@@ -13,6 +13,7 @@ using System.Configuration;
 using Newtonsoft.Json;
 using MigrationTools.Tools.Infrastructure;
 using System.Security.AccessControl;
+using Microsoft.Extensions.Options;
 
 namespace MigrationTools.ConsoleDataGenerator
 {
@@ -62,11 +63,12 @@ namespace MigrationTools.ConsoleDataGenerator
                 if (itemData != null)
                 {
                     data.Add(itemData);
-                } else
+                }
+                else
                 {
                     Console.WriteLine($"BOOM::CreateClassDataFromOptions");
                 }
-                
+
             }
             Console.WriteLine("ClassDataLoader::GetOptionsData:: -----------");
             return data;
@@ -76,7 +78,7 @@ namespace MigrationTools.ConsoleDataGenerator
             where TOptionsInterface : IOptions
         {
             TOptionsInterface instanceOfOption = (TOptionsInterface)Activator.CreateInstance(optionInFocus);
-            string targetOfOption = instanceOfOption.OptionFor;
+            string targetOfOption = instanceOfOption.ConfigurationOptionFor;
             var typeOftargetOfOption = allTypes.Where(t => t.Name == targetOfOption && !t.IsAbstract && !t.IsInterface).SingleOrDefault();
             if (typeOftargetOfOption == null)
             {
@@ -98,6 +100,15 @@ namespace MigrationTools.ConsoleDataGenerator
                 data.OptionsClassName = optionInFocus.Name;
                 data.OptionsClassFile = codeFinder.FindCodeFile(optionInFocus);
                 var ConfigurationSectionName = (string)optionInFocus.GetProperty("ConfigurationSectionName")?.GetValue(instanceOfOption);
+                var ConfigurationSectionListName = (string)optionInFocus.GetProperty("ConfigurationSectionListName")?.GetValue(instanceOfOption);
+                if (instanceOfOption is ToolOptions)
+                {
+                    dynamic man = OptionsManager.GetOptionsManager(optionInFocus, "appsettings.json", ConfigurationSectionName, optionInFocus.Name, "sectionListPath", "objectTypeFieldName");
+
+                    var o= man.LoadFromSectionPath();
+
+                    Console.WriteLine("Is Tool Options");
+                }
                 if (!string.IsNullOrEmpty(ConfigurationSectionName))
                 {
                     Console.WriteLine("Processing as ConfigurationSectionName");
@@ -106,10 +117,10 @@ namespace MigrationTools.ConsoleDataGenerator
                     data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "defaults", SampleFor = data.OptionsClassFullName, Code = ConvertSectionWithPathToJson(configuration, section).Trim() });
                 }
 
-                    Console.WriteLine("targetItem");
-                    JObject joptions = (JObject)JToken.FromObject(instanceOfOption);
-                    data.Options = populateOptions(instanceOfOption, joptions);
-                    data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "Classic", SampleFor = data.OptionsClassFullName, Code = saveData.SeraliseDataToJson(instanceOfOption).Trim() });
+                Console.WriteLine("targetItem");
+                JObject joptions = (JObject)JToken.FromObject(instanceOfOption);
+                data.Options = populateOptions(instanceOfOption, joptions);
+                data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "Classic", SampleFor = data.OptionsClassFullName, Code = saveData.SeraliseDataToJson(instanceOfOption).Trim() });
             }
             else
             {
@@ -158,7 +169,7 @@ namespace MigrationTools.ConsoleDataGenerator
                     var section = configuration.GetSection(ConfigurationSectionName);
                     targetItem = (IOptions)instanceOfOptions;
                     section.Bind(targetItem);
-                    data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "defaults", SampleFor = data.OptionsClassFullName, Code = ConvertSectionWithPathToJson(configuration, section).Trim() } );
+                    data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "defaults", SampleFor = data.OptionsClassFullName, Code = ConvertSectionWithPathToJson(configuration, section).Trim() });
                 }
                 if (typeOption.GetInterfaces().Contains(typeof(IOptions)))
                 {
@@ -200,6 +211,25 @@ namespace MigrationTools.ConsoleDataGenerator
                 }
             }
             return options;
+        }
+
+        static JObject ConvertSectionToJson2(IConfigurationSection section)
+        {
+            var jObject = new JObject();
+
+            foreach (var child in section.GetChildren())
+            {
+                if (child.GetChildren().Any()) // Check if the child has its own children
+                {
+                    jObject[child.Key] = ConvertSectionToJson2(child);
+                }
+                else
+                {
+                    jObject[child.Key] = child.Value;
+                }
+            }
+
+            return jObject;
         }
 
         static string ConvertSectionWithPathToJson(IConfiguration configuration, IConfigurationSection section)

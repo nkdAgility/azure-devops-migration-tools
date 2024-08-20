@@ -40,11 +40,6 @@
             </summary>
             <returns>bool</returns>
         </member>
-        <member name="P:MigrationTools.Enrichers.IEnricherOptions.Enabled">
-            <summary>
-            Active the enricher if it true.
-            </summary>
-        </member>
         <member name="P:MigrationTools.Enrichers.ProcessorEnricherOptions.Enabled">
             <summary>
             If enabled this will run this migrator
@@ -59,6 +54,11 @@
         <member name="P:MigrationTools.Options.IOldOptions.RefName">
             <summary>
             If you set a `RefName` then this configration will be added to a Catalog of configurations that can be refernced using tha `RefName` so tha tyou dont have to keep adding the ame items with the same configuration.
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Options.IOptions.Enabled">
+            <summary>
+            Will be used if enabled
             </summary>
         </member>
         <member name="P:MigrationTools.Processors.Infrastructure.IProcessorOptions.SourceName">
@@ -279,27 +279,27 @@
         </member>
         <member name="F:ThisAssembly.Git.Commit">
             <summary>
-            => @"575839d5"
+            => @"9a413598"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Sha">
             <summary>
-            => @"575839d5ccd773d7fe882aa0d5a3cd0154910a5c"
+            => @"9a4135980dffe17fd2a42bcb1dcf3980f3b0e0a0"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.CommitDate">
             <summary>
-            => @"2024-08-20T08:43:12+01:00"
+            => @"2024-08-20T09:42:01+01:00"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commits">
             <summary>
-            => @"138"
+            => @"139"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Tag">
             <summary>
-            => @"v15.1.8-Preview.9-138-g575839d5"
+            => @"v15.1.8-Preview.9-139-g9a413598"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseTag">
@@ -334,7 +334,7 @@
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Patch">
             <summary>
-            => @"146"
+            => @"147"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Label">

@@ -11,8 +11,6 @@ namespace MigrationTools.Tools
 {
     public class FieldMappingToolOptions : ToolOptions
     {
-        public const string ConfigurationSectionName = "MigrationTools:CommonTools:FieldMappingTool";
-
         public List<IFieldMapOptions> FieldMaps { get; set; } = new List<IFieldMapOptions>();
 
 
@@ -30,8 +28,8 @@ namespace MigrationTools.Tools
                 switch (VersionOptions.ConfigureOptions.GetMigrationConfigVersion(_configuration).schema)
                 {
                     case MigrationConfigSchema.v160:
-                        _configuration.GetSection(ConfigurationSectionName).Bind(options);
-                        options.FieldMaps = _configuration.GetSection(ConfigurationSectionName + ":FieldMaps")?.ToMigrationToolsList(child => child.GetMigrationToolsOption<IFieldMapOptions>("FieldMapType"));
+                        _configuration.GetSection(options.ConfigurationSectionPath).Bind(options);
+                        options.FieldMaps = _configuration.GetSection(options.ConfigurationSectionPath + ":FieldMaps")?.ToMigrationToolsList(child => child.GetMigrationToolsOption<IFieldMapOptions>("FieldMapType"));
                         break;
                     case MigrationConfigSchema.v1:
                         options.Enabled = true;

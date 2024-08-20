@@ -19,9 +19,19 @@ namespace MigrationTools.Options
     public interface IOptions
     {
         [JsonIgnore]
-        public string OptionFor { get; }
+        public string ConfigurationOptionFor { get; }
         [JsonIgnore]
-        public string ConfigurationSectionName { get; }
+        public string ConfigurationSectionPath { get; }
+        [JsonIgnore]
+        public string ConfigurationCollectionPath { get; }
+        [JsonIgnore]
+        public string ConfigurationCollectionObjectName { get; }
+
+        /// <summary>
+        /// Will be used if enabled
+        /// </summary>
+        [JsonProperty(Order = -2)]
+        bool Enabled { get; set; }
 
     }
 }
