@@ -10,7 +10,7 @@ configurationSamples:
         "CommonTools": {
           "FieldMappingTool": {
             "FieldMapDefaults": {
-              "FieldLiteralMap": {}
+              "FieldLiteralMap": []
             }
           }
         }
@@ -22,10 +22,10 @@ configurationSamples:
   code: >-
     {
       "$type": "FieldLiteralMapOptions",
+      "Enabled": false,
       "WorkItemTypeName": null,
       "targetField": null,
       "value": null,
-      "Enabled": false,
       "ApplyTo": null
     }
   sampleFor: MigrationTools.Tools.FieldLiteralMapOptions

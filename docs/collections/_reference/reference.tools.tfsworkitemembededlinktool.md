@@ -7,8 +7,10 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "ProcessorDefaults": {
-          "TfsWorkItemEmbededLinkTool": {}
+        "CommonTools": {
+          "TfsWorkItemEmbededLinkTool": {
+            "Enabled": "True"
+          }
         }
       }
     }

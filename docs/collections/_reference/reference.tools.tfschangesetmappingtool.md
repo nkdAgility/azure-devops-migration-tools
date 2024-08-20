@@ -7,8 +7,11 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "ProcessorDefaults": {
-          "TfsChangeSetMappingTool": {}
+        "CommonTools": {
+          "TfsChangeSetMappingTool": {
+            "Enabled": "False",
+            "File": ""
+          }
         }
       }
     }

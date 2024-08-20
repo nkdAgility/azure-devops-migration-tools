@@ -10,15 +10,15 @@ configurationSamples:
           "FieldMappingTool": {
             "FieldMapDefaults": {
               "FieldMergeMap": {
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
                 "formatExpression": "{0} <br/><br/><h3>Acceptance Criteria</h3>{1}",
-                "sourceFields": {
-                  "0": "System.Description",
-                  "1": "Microsoft.VSTS.Common.AcceptanceCriteria"
-                },
-                "targetField": "System.Description",
-                "WorkItemTypes": {
-                  "0": "SomeWorkItemType"
-                }
+                "sourceFields": [
+                  "System.Description",
+                  "Microsoft.VSTS.Common.AcceptanceCriteria"
+                ],
+                "targetField": "System.Description"
               }
             }
           }
@@ -31,15 +31,16 @@ configurationSamples:
   code: >-
     {
       "$type": "FieldMergeMapOptions",
-      "WorkItemTypeName": null,
+      "Enabled": false,
       "sourceFields": [
         "System.Description",
         "Microsoft.VSTS.Common.AcceptanceCriteria"
       ],
       "targetField": "System.Description",
       "formatExpression": "{0} <br/><br/><h3>Acceptance Criteria</h3>{1}",
-      "Enabled": false,
-      "ApplyTo": null
+      "ApplyTo": [
+        "SomeWorkItemType"
+      ]
     }
   sampleFor: MigrationTools.Tools.FieldMergeMapOptions
 description: missng XML code comments
@@ -64,10 +65,6 @@ options:
   description: missng XML code comments
   defaultValue: missng XML code comments
 - parameterName: targetField
-  type: String
-  description: missng XML code comments
-  defaultValue: missng XML code comments
-- parameterName: WorkItemTypeName
   type: String
   description: missng XML code comments
   defaultValue: missng XML code comments

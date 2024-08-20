@@ -10,7 +10,7 @@ configurationSamples:
         "CommonTools": {
           "FieldMappingTool": {
             "FieldMapDefaults": {
-              "FieldClearMap": {}
+              "FieldClearMap": []
             }
           }
         }
@@ -22,9 +22,9 @@ configurationSamples:
   code: >-
     {
       "$type": "FieldClearMapOptions",
+      "Enabled": false,
       "WorkItemTypeName": null,
       "targetField": null,
-      "Enabled": false,
       "ApplyTo": null
     }
   sampleFor: MigrationTools.Tools.FieldClearMapOptions

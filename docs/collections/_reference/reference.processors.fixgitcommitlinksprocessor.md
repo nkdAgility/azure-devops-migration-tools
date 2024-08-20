@@ -8,7 +8,7 @@ configurationSamples:
     {
       "MigrationTools": {
         "ProcessorDefaults": {
-          "FixGitCommitLinksProcessor": {}
+          "FixGitCommitLinksProcessor": []
         }
       }
     }

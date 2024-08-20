@@ -8,7 +8,7 @@ configurationSamples:
     {
       "MigrationTools": {
         "ProcessorDefaults": {
-          "TestPlansAndSuitesMigrationProcessor": {}
+          "TestPlansAndSuitesMigrationProcessor": []
         }
       }
     }

@@ -11,13 +11,13 @@ configurationSamples:
           "FieldMappingTool": {
             "FieldMapDefaults": {
               "FieldToFieldMultiMap": {
+                "ApplyTo": [
+                  "SomeWorkItemType",
+                  "SomeOtherWorkItemType"
+                ],
                 "SourceToTargetMappings": {
                   "SourceField1": "TargetField1",
                   "SourceField2": "TargetField2"
-                },
-                "WorkItemTypes": {
-                  "0": "SomeWorkItemType",
-                  "1": "SomeOtherWorkItemType"
                 }
               }
             }
@@ -31,14 +31,17 @@ configurationSamples:
   code: >-
     {
       "$type": "FieldToFieldMultiMapOptions",
+      "Enabled": false,
       "WorkItemTypeName": null,
       "SourceToTargetMappings": {
         "$type": "Dictionary`2",
         "SourceField1": "TargetField1",
         "SourceField2": "TargetField2"
       },
-      "Enabled": false,
-      "ApplyTo": null
+      "ApplyTo": [
+        "SomeWorkItemType",
+        "SomeOtherWorkItemType"
+      ]
     }
   sampleFor: MigrationTools.Tools.FieldToFieldMultiMapOptions
 description: missng XML code comments

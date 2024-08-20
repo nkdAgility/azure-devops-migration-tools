@@ -11,12 +11,12 @@ configurationSamples:
           "FieldMappingTool": {
             "FieldMapDefaults": {
               "FieldValuetoTagMap": {
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
                 "formatExpression": "{0}",
                 "pattern": "Yes",
-                "sourceField": "Microsoft.VSTS.CMMI.Blocked",
-                "WorkItemTypes": {
-                  "0": "SomeWorkItemType"
-                }
+                "sourceField": "Microsoft.VSTS.CMMI.Blocked"
               }
             }
           }
@@ -29,12 +29,14 @@ configurationSamples:
   code: >-
     {
       "$type": "FieldValuetoTagMapOptions",
+      "Enabled": false,
       "WorkItemTypeName": null,
       "sourceField": "Microsoft.VSTS.CMMI.Blocked",
       "pattern": "Yes",
       "formatExpression": "{0}",
-      "Enabled": false,
-      "ApplyTo": null
+      "ApplyTo": [
+        "SomeWorkItemType"
+      ]
     }
   sampleFor: MigrationTools.Tools.FieldValuetoTagMapOptions
 description: missng XML code comments

@@ -7,8 +7,8 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "ProcessorDefaults": {
-          "TfsGitRepositoryTool": {}
+        "CommonTools": {
+          "TfsGitRepositoryTool": []
         }
       }
     }

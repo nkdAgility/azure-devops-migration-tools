@@ -7,7 +7,7 @@ configurationSamples:
     {
       "MigrationTools": {
         "ProcessorDefaults": {
-          "TestConfigurationsMigrationProcessor": {}
+          "TestConfigurationsMigrationProcessor": []
         }
       }
     }

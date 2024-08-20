@@ -10,7 +10,7 @@ configurationSamples:
         "CommonTools": {
           "FieldMappingTool": {
             "FieldMapDefaults": {
-              "FieldToTagFieldMap": {}
+              "FieldToTagFieldMap": []
             }
           }
         }
@@ -22,10 +22,10 @@ configurationSamples:
   code: >-
     {
       "$type": "FieldToTagFieldMapOptions",
+      "Enabled": false,
       "WorkItemTypeName": null,
       "sourceField": null,
       "formatExpression": null,
-      "Enabled": false,
       "ApplyTo": null
     }
   sampleFor: MigrationTools.Tools.FieldToTagFieldMapOptions

@@ -11,12 +11,12 @@ configurationSamples:
           "FieldMappingTool": {
             "FieldMapDefaults": {
               "FieldToFieldMap": {
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
                 "defaultValue": "42",
                 "sourceField": "Microsoft.VSTS.Common.BacklogPriority",
-                "targetField": "Microsoft.VSTS.Common.StackRank",
-                "WorkItemTypes": {
-                  "0": "SomeWorkItemType"
-                }
+                "targetField": "Microsoft.VSTS.Common.StackRank"
               }
             }
           }
@@ -29,12 +29,14 @@ configurationSamples:
   code: >-
     {
       "$type": "FieldToFieldMapOptions",
+      "Enabled": false,
       "WorkItemTypeName": null,
       "sourceField": "Microsoft.VSTS.Common.BacklogPriority",
       "targetField": "Microsoft.VSTS.Common.StackRank",
       "defaultValue": "42",
-      "Enabled": false,
-      "ApplyTo": null
+      "ApplyTo": [
+        "SomeWorkItemType"
+      ]
     }
   sampleFor: MigrationTools.Tools.FieldToFieldMapOptions
 description: missng XML code comments

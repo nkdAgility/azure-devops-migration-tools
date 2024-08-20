@@ -10,7 +10,7 @@ configurationSamples:
         "CommonTools": {
           "FieldMappingTool": {
             "FieldMapDefaults": {
-              "TreeToTagFieldMap": {}
+              "TreeToTagFieldMap": []
             }
           }
         }
@@ -22,10 +22,10 @@ configurationSamples:
   code: >-
     {
       "$type": "TreeToTagFieldMapOptions",
+      "Enabled": false,
       "WorkItemTypeName": null,
       "toSkip": 0,
       "timeTravel": 0,
-      "Enabled": false,
       "ApplyTo": null
     }
   sampleFor: MigrationTools.Tools.TreeToTagFieldMapOptions

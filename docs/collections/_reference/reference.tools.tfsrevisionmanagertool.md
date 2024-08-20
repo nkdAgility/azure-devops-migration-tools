@@ -7,8 +7,12 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "ProcessorDefaults": {
-          "TfsRevisionManagerTool": {}
+        "CommonTools": {
+          "TfsRevisionManagerTool": {
+            "Enabled": "True",
+            "MaxRevisions": "0",
+            "ReplayRevisions": "True"
+          }
         }
       }
     }
@@ -18,7 +22,7 @@ configurationSamples:
   code: >-
     {
       "$type": "TfsRevisionManagerToolOptions",
-      "ReplayRevisions": false,
+      "ReplayRevisions": true,
       "MaxRevisions": 0
     }
   sampleFor: MigrationTools.Tools.TfsRevisionManagerToolOptions

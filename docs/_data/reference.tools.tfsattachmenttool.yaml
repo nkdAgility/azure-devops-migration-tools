@@ -6,8 +6,13 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "ProcessorDefaults": {
-          "TfsAttachmentTool": {}
+        "CommonTools": {
+          "TfsAttachmentTool": {
+            "Enabled": "True",
+            "ExportBasePath": "c:\\temp\\WorkItemAttachmentExport",
+            "MaxAttachmentSize": "480000000",
+            "RefName": "TfsAttachmentTool"
+          }
         }
       }
     }
@@ -17,8 +22,8 @@ configurationSamples:
   code: >-
     {
       "$type": "TfsAttachmentToolOptions",
-      "ExportBasePath": null,
-      "MaxAttachmentSize": 0
+      "ExportBasePath": "c:\\temp\\WorkItemAttachmentExport",
+      "MaxAttachmentSize": 480000000
     }
   sampleFor: MigrationTools.Tools.TfsAttachmentToolOptions
 description: missng XML code comments

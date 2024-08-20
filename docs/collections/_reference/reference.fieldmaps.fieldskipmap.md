@@ -11,10 +11,10 @@ configurationSamples:
           "FieldMappingTool": {
             "FieldMapDefaults": {
               "FieldSkipMap": {
-                "targetField": "TfsMigrationTool.ReflectedWorkItemId",
-                "WorkItemTypes": {
-                  "0": "SomeWorkItemType"
-                }
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "targetField": "Custom.ReflectedWorkItemId"
               }
             }
           }
@@ -27,10 +27,12 @@ configurationSamples:
   code: >-
     {
       "$type": "FieldSkipMapOptions",
-      "WorkItemTypeName": null,
-      "targetField": "TfsMigrationTool.ReflectedWorkItemId",
       "Enabled": false,
-      "ApplyTo": null
+      "WorkItemTypeName": null,
+      "targetField": "Custom.ReflectedWorkItemId",
+      "ApplyTo": [
+        "SomeWorkItemType"
+      ]
     }
   sampleFor: MigrationTools.Tools.FieldSkipMapOptions
 description: missng XML code comments

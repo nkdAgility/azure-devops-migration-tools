@@ -7,8 +7,14 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "ProcessorDefaults": {
-          "TfsTeamSettingsTool": {}
+        "CommonTools": {
+          "TfsTeamSettingsTool": {
+            "Enabled": "True",
+            "MigrateTeamCapacities": "True",
+            "MigrateTeamSettings": "True",
+            "Teams": null,
+            "UpdateTeamSettings": "True"
+          }
         }
       }
     }
@@ -18,9 +24,9 @@ configurationSamples:
   code: >-
     {
       "$type": "TfsTeamSettingsToolOptions",
-      "MigrateTeamSettings": false,
-      "UpdateTeamSettings": false,
-      "MigrateTeamCapacities": false,
+      "MigrateTeamSettings": true,
+      "UpdateTeamSettings": true,
+      "MigrateTeamCapacities": true,
       "Teams": null
     }
   sampleFor: MigrationTools.Tools.TfsTeamSettingsToolOptions

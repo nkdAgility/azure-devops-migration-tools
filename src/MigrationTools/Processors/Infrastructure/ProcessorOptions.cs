@@ -1,16 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.Options;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Enrichers;
+using MigrationTools.Options;
 
 namespace MigrationTools.Processors.Infrastructure
 {
     public abstract class ProcessorOptions : IProcessorOptions
     {
-        public virtual string ConfigurationSectionPath => $"MigrationTools:ProcessorDefaults:{ConfigurationOptionFor}";
-        public virtual string ConfigurationCollectionPath => $"MigrationTools:Processors";
+        public string ConfigurationSectionPath => $"MigrationTools:ProcessorDefaults:{ConfigurationOptionFor}";
+        public string ConfigurationCollectionPath => $"MigrationTools:Processors";
         public string ConfigurationCollectionObjectName => $"ProcessorType";
         public string ConfigurationOptionFor => $"{GetType().Name.Replace("Options", "")}";
+
         /// <summary>
         /// If set to `true` then the processor will run. Set to `false` and the processor will not run.
         /// </summary>

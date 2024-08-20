@@ -7,8 +7,19 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "ProcessorDefaults": {
-          "TfsUserMappingTool": {}
+        "CommonTools": {
+          "TfsUserMappingTool": {
+            "Enabled": "False",
+            "IdentityFieldsToCheck": [
+              "System.AssignedTo",
+              "System.ChangedBy",
+              "System.CreatedBy",
+              "Microsoft.VSTS.Common.ActivatedBy",
+              "Microsoft.VSTS.Common.ResolvedBy",
+              "Microsoft.VSTS.Common.ClosedBy"
+            ],
+            "UserMappingFile": "C:\\temp\\userExport.json"
+          }
         }
       }
     }
@@ -18,8 +29,15 @@ configurationSamples:
   code: >-
     {
       "$type": "TfsUserMappingToolOptions",
-      "IdentityFieldsToCheck": null,
-      "UserMappingFile": null
+      "IdentityFieldsToCheck": [
+        "System.AssignedTo",
+        "System.ChangedBy",
+        "System.CreatedBy",
+        "Microsoft.VSTS.Common.ActivatedBy",
+        "Microsoft.VSTS.Common.ResolvedBy",
+        "Microsoft.VSTS.Common.ClosedBy"
+      ],
+      "UserMappingFile": "C:\\temp\\userExport.json"
     }
   sampleFor: MigrationTools.Tools.TfsUserMappingToolOptions
 description: The TfsUserMappingTool is used to map users from the source to the target system. Run it with the ExportUsersForMappingContext to create a mapping file then with WorkItemMigrationContext to use the mapping file to update the users in the target system as you migrate the work items.

@@ -8,7 +8,7 @@ configurationSamples:
     {
       "MigrationTools": {
         "EndpointDefaults": {
-          "TfsEndpoint": {}
+          "TfsEndpoint": []
         }
       }
     }
@@ -20,6 +20,7 @@ configurationSamples:
       "$type": "TfsEndpointOptions",
       "Organisation": null,
       "Project": null,
+      "Enabled": false,
       "AuthenticationMode": "AccessToken",
       "AccessToken": null,
       "ReflectedWorkItemIdField": null,
@@ -39,6 +40,10 @@ options:
   defaultValue: missng XML code comments
 - parameterName: AuthenticationMode
   type: AuthenticationMode
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: Enabled
+  type: Boolean
   description: missng XML code comments
   defaultValue: missng XML code comments
 - parameterName: EndpointEnrichers

@@ -10,14 +10,13 @@ namespace MigrationTools.Tools
     /// <processingtarget>Work Item Field</processingtarget>
     public class FieldMergeMapOptions : FieldMapOptions
     {
-        public string WorkItemTypeName { get; set; }
         public List<string> sourceFields { get; set; }
         public string targetField { get; set; }
         public string formatExpression { get; set; }
 
         public void SetExampleConfigDefaults()
         {
-            WorkItemTypeName= "*";
+            ApplyTo = new List<string> { "System.Title" };
             sourceFields = new List<string>
             {
                 "System.Description",

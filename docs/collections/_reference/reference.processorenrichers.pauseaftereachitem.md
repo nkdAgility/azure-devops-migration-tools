@@ -8,7 +8,7 @@ configurationSamples:
     {
       "MigrationTools": {
         "ProcessorEnricherDefaults": {
-          "PauseAfterEachItem": {}
+          "PauseAfterEachItem": []
         }
       }
     }

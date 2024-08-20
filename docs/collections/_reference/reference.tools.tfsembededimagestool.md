@@ -7,8 +7,10 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "ProcessorDefaults": {
-          "TfsEmbededImagesTool": {}
+        "CommonTools": {
+          "TfsEmbededImagesTool": {
+            "Enabled": "True"
+          }
         }
       }
     }

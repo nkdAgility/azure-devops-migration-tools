@@ -6,8 +6,20 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "ProcessorDefaults": {
-          "StringManipulatorTool": {}
+        "CommonTools": {
+          "StringManipulatorTool": {
+            "Enabled": "True",
+            "Manipulators": [
+              {
+                "$type": "RegexStringManipulator",
+                "Description": "Remove invalid characters from the end of the string",
+                "Enabled": "True",
+                "Pattern": "[^( -~)\n\r\t]+",
+                "Replacement": ""
+              }
+            ],
+            "MaxStringLength": "1000000"
+          }
         }
       }
     }
@@ -17,8 +29,16 @@ configurationSamples:
   code: >-
     {
       "$type": "StringManipulatorToolOptions",
-      "MaxStringLength": 0,
-      "Manipulators": null
+      "MaxStringLength": 1000000,
+      "Manipulators": [
+        {
+          "$type": "RegexStringManipulator",
+          "Enabled": true,
+          "Pattern": "[^( -~)\n\r\t]+",
+          "Replacement": "",
+          "Description": "Remove invalid characters from the end of the string"
+        }
+      ]
     }
   sampleFor: MigrationTools.Tools.StringManipulatorToolOptions
 description: Used to process the String fields of a work item. This is useful for cleaning up data. It will limit fields to a max length and apply regex replacements based on what is configured. Each regex replacement is applied in order and can be enabled or disabled.

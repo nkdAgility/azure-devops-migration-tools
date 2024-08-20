@@ -77,12 +77,11 @@ namespace MigrationTools.ConsoleDataGenerator
         private ClassData CreateClassDataFromOptions<TOptionsInterface>(List<Type> allTypes, string dataTypeName, Type optionInFocus)
             where TOptionsInterface : IOptions
         {
-            TOptionsInterface instanceOfOption = (TOptionsInterface)Activator.CreateInstance(optionInFocus);
-            string targetOfOption = instanceOfOption.ConfigurationOptionFor;
-            var typeOftargetOfOption = allTypes.Where(t => t.Name == targetOfOption && !t.IsAbstract && !t.IsInterface).SingleOrDefault();
+           var oConfig =  OptionsManager.GetOptionsConfiguration(optionInFocus);
+            var typeOftargetOfOption = allTypes.Where(t => t.Name == oConfig.OptionFor && !t.IsAbstract && !t.IsInterface).SingleOrDefault();
             if (typeOftargetOfOption == null)
             {
-                Console.WriteLine($"ClassDataLoader::CreateClassDataFromOptions:: {optionInFocus.Name} - {targetOfOption} not found");
+                Console.WriteLine($"ClassDataLoader::CreateClassDataFromOptions:: {optionInFocus.Name} - {oConfig.OptionFor} not found");
                 return null;
             }
             ClassData data = new ClassData();
@@ -96,25 +95,23 @@ namespace MigrationTools.ConsoleDataGenerator
 
             if (optionInFocus != null)
             {
+                TOptionsInterface instanceOfOption = (TOptionsInterface)Activator.CreateInstance(optionInFocus);
                 data.OptionsClassFullName = optionInFocus.FullName;
                 data.OptionsClassName = optionInFocus.Name;
                 data.OptionsClassFile = codeFinder.FindCodeFile(optionInFocus);
-                var ConfigurationSectionName = (string)optionInFocus.GetProperty("ConfigurationSectionName")?.GetValue(instanceOfOption);
-                var ConfigurationSectionListName = (string)optionInFocus.GetProperty("ConfigurationSectionListName")?.GetValue(instanceOfOption);
-                if (instanceOfOption is ToolOptions)
-                {
-                    dynamic man = OptionsManager.GetOptionsManager(optionInFocus, "appsettings.json", ConfigurationSectionName, optionInFocus.Name, "sectionListPath", "objectTypeFieldName");
-
-                    var o= man.LoadFromSectionPath();
-
-                    Console.WriteLine("Is Tool Options");
-                }
-                if (!string.IsNullOrEmpty(ConfigurationSectionName))
+                if (!string.IsNullOrEmpty(oConfig.SectionPath))
                 {
                     Console.WriteLine("Processing as ConfigurationSectionName");
-                    var section = configuration.GetSection(ConfigurationSectionName);
+                    var section = configuration.GetSection(oConfig.SectionPath);
                     section.Bind(instanceOfOption);
                     data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "defaults", SampleFor = data.OptionsClassFullName, Code = ConvertSectionWithPathToJson(configuration, section).Trim() });
+                }
+
+                dynamic man = OptionsManager.GetOptionsManager(optionInFocus);
+                var o = man.LoadAll("appsettings.json");
+                if (o.Count > 0)
+                {
+                    Console.WriteLine("Found stuff");
                 }
 
                 Console.WriteLine("targetItem");
@@ -213,25 +210,6 @@ namespace MigrationTools.ConsoleDataGenerator
             return options;
         }
 
-        static JObject ConvertSectionToJson2(IConfigurationSection section)
-        {
-            var jObject = new JObject();
-
-            foreach (var child in section.GetChildren())
-            {
-                if (child.GetChildren().Any()) // Check if the child has its own children
-                {
-                    jObject[child.Key] = ConvertSectionToJson2(child);
-                }
-                else
-                {
-                    jObject[child.Key] = child.Value;
-                }
-            }
-
-            return jObject;
-        }
-
         static string ConvertSectionWithPathToJson(IConfiguration configuration, IConfigurationSection section)
         {
             var pathSegments = section.Path.Split(':');
@@ -244,49 +222,70 @@ namespace MigrationTools.ConsoleDataGenerator
                 string key = pathSegments[i];
                 IConfigurationSection currentSection = configuration.GetSection(string.Join(':', pathSegments, 0, i + 1));
 
-                JObject parentObject = new JObject();
-
-                if (i == pathSegments.Length - 1)
+                if (i < pathSegments.Length - 1)
                 {
-                    // We are at the target section, so only serialize this section
-                    foreach (var child in currentSection.GetChildren())
+                    // Create nested objects for intermediate segments
+                    if (currentObject[key] == null)
                     {
-                        if (child.Value != null)
-                        {
-                            parentObject[child.Key] = child.Value;
-                        }
-                        else
-                        {
-                            parentObject[child.Key] = ConvertSectionToJson(child);
-                        }
+                        currentObject[key] = new JObject();
                     }
+                    currentObject = (JObject)currentObject[key];
                 }
-
-                currentObject[key] = parentObject;
-                currentObject = parentObject;
+                else
+                {
+                    // We are at the target section, serialize its children
+                    JToken sectionObject = ConvertSectionToJson(currentSection);
+                    currentObject[key] = sectionObject;
+                }
             }
 
             return root.ToString(Formatting.Indented);
         }
 
-        static JObject ConvertSectionToJson(IConfigurationSection section)
+        static JToken ConvertSectionToJson(IConfigurationSection section)
         {
-            var jObject = new JObject();
-
-            foreach (var child in section.GetChildren())
+            // Check if all children are numbers to identify arrays
+            var children = section.GetChildren().ToList();
+            if (children.All(c => int.TryParse(c.Key, out _)))
             {
-                if (child.Value != null)
+                // Treat it as an array
+                JArray array = new JArray();
+                foreach (var child in children)
                 {
-                    jObject[child.Key] = child.Value;
+                    if (child.GetChildren().Any())
+                    {
+                        // Add nested objects to the array
+                        array.Add(ConvertSectionToJson(child));
+                    }
+                    else
+                    {
+                        // Add values to the array
+                        array.Add(child.Value);
+                    }
                 }
-                else
-                {
-                    jObject[child.Key] = ConvertSectionToJson(child);
-                }
+                return array;
             }
-
-            return jObject;
+            else
+            {
+                // Treat it as an object
+                JObject obj = new JObject();
+                foreach (var child in children)
+                {
+                    if (child.GetChildren().Any())
+                    {
+                        // Recursively process nested objects
+                        obj[child.Key] = ConvertSectionToJson(child);
+                    }
+                    else
+                    {
+                        // Add values to the object
+                        obj[child.Key] = child.Value;
+                    }
+                }
+                return obj;
+            }
         }
+
 
     }
 }

@@ -7,8 +7,12 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "ProcessorDefaults": {
-          "TfsWorkItemLinkTool": {}
+        "CommonTools": {
+          "TfsWorkItemLinkTool": {
+            "Enabled": "True",
+            "FilterIfLinkCountMatches": "True",
+            "SaveAfterEachLinkIsAdded": "False"
+          }
         }
       }
     }
@@ -18,7 +22,7 @@ configurationSamples:
   code: >-
     {
       "$type": "TfsWorkItemLinkToolOptions",
-      "FilterIfLinkCountMatches": false,
+      "FilterIfLinkCountMatches": true,
       "SaveAfterEachLinkIsAdded": false
     }
   sampleFor: MigrationTools.Tools.TfsWorkItemLinkToolOptions
