@@ -8,8 +8,16 @@ configurationSamples:
       "MigrationTools": {
         "CommonTools": {
           "FieldMappingTool": {
-            "FieldDefaults": {
-              "RegexFieldMap": {}
+            "FieldMapDefaults": {
+              "RegexFieldMap": {
+                "pattern": "PRODUCT \\d{4}.(\\d{1})",
+                "replacement": "$1",
+                "sourceField": "COMPANY.PRODUCT.Release",
+                "targetField": "COMPANY.DEVISION.MinorReleaseVersion",
+                "WorkItemTypes": {
+                  "0": "SomeWorkItemType"
+                }
+              }
             }
           }
         }
@@ -22,10 +30,10 @@ configurationSamples:
     {
       "$type": "RegexFieldMapOptions",
       "WorkItemTypeName": null,
-      "sourceField": null,
-      "targetField": null,
-      "pattern": null,
-      "replacement": null,
+      "sourceField": "COMPANY.PRODUCT.Release",
+      "targetField": "COMPANY.DEVISION.MinorReleaseVersion",
+      "pattern": "PRODUCT \\d{4}.(\\d{1})",
+      "replacement": "$1",
       "Enabled": false,
       "ApplyTo": null
     }

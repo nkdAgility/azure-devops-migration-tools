@@ -9,8 +9,20 @@ configurationSamples:
       "MigrationTools": {
         "CommonTools": {
           "FieldMappingTool": {
-            "FieldDefaults": {
-              "MultiValueConditionalMap": {}
+            "FieldMapDefaults": {
+              "MultiValueConditionalMap": {
+                "sourceFieldsAndValues": {
+                  "Field1": "Value1",
+                  "Field2": "Value2"
+                },
+                "targetFieldsAndValues": {
+                  "Field1": "Value1",
+                  "Field2": "Value2"
+                },
+                "WorkItemTypes": {
+                  "0": "SomeWorkItemType"
+                }
+              }
             }
           }
         }
@@ -23,8 +35,16 @@ configurationSamples:
     {
       "$type": "MultiValueConditionalMapOptions",
       "WorkItemTypeName": null,
-      "sourceFieldsAndValues": null,
-      "targetFieldsAndValues": null,
+      "sourceFieldsAndValues": {
+        "$type": "Dictionary`2",
+        "Field1": "Value1",
+        "Field2": "Value2"
+      },
+      "targetFieldsAndValues": {
+        "$type": "Dictionary`2",
+        "Field1": "Value1",
+        "Field2": "Value2"
+      },
       "Enabled": false,
       "ApplyTo": null
     }

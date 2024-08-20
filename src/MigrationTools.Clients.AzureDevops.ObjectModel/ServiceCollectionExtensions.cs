@@ -106,7 +106,7 @@ namespace MigrationTools
             context.AddTransient< FieldLiteralMap>();
             context.AddTransient< FieldMergeMap>();
             context.AddTransient< FieldToFieldMap>();
-            context.AddTransient< FieldtoFieldMultiMap>();
+            context.AddTransient< FieldToFieldMultiMap>();
             context.AddTransient< FieldToTagFieldMap>();
             context.AddTransient< FieldValuetoTagMap>();
             context.AddTransient< FieldToFieldMap>();

@@ -8,8 +8,15 @@ configurationSamples:
       "MigrationTools": {
         "CommonTools": {
           "FieldMappingTool": {
-            "FieldDefaults": {
-              "FieldValuetoTagMap": {}
+            "FieldMapDefaults": {
+              "FieldValuetoTagMap": {
+                "formatExpression": "{0}",
+                "pattern": "Yes",
+                "sourceField": "Microsoft.VSTS.CMMI.Blocked",
+                "WorkItemTypes": {
+                  "0": "SomeWorkItemType"
+                }
+              }
             }
           }
         }
@@ -22,9 +29,9 @@ configurationSamples:
     {
       "$type": "FieldValuetoTagMapOptions",
       "WorkItemTypeName": null,
-      "sourceField": null,
-      "pattern": null,
-      "formatExpression": null,
+      "sourceField": "Microsoft.VSTS.CMMI.Blocked",
+      "pattern": "Yes",
+      "formatExpression": "{0}",
       "Enabled": false,
       "ApplyTo": null
     }

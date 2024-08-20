@@ -1,6 +1,6 @@
 ---
-optionsClassName: FieldtoFieldMultiMapOptions
-optionsClassFullName: MigrationTools.Tools.FieldtoFieldMultiMapOptions
+optionsClassName: FieldToFieldMultiMapOptions
+optionsClassFullName: MigrationTools.Tools.FieldToFieldMultiMapOptions
 configurationSamples:
 - name: defaults
   description: 
@@ -9,27 +9,40 @@ configurationSamples:
       "MigrationTools": {
         "CommonTools": {
           "FieldMappingTool": {
-            "FieldDefaults": {
-              "FieldtoFieldMultiMap": {}
+            "FieldMapDefaults": {
+              "FieldToFieldMultiMap": {
+                "SourceToTargetMappings": {
+                  "SourceField1": "TargetField1",
+                  "SourceField2": "TargetField2"
+                },
+                "WorkItemTypes": {
+                  "0": "SomeWorkItemType",
+                  "1": "SomeOtherWorkItemType"
+                }
+              }
             }
           }
         }
       }
     }
-  sampleFor: MigrationTools.Tools.FieldtoFieldMultiMapOptions
+  sampleFor: MigrationTools.Tools.FieldToFieldMultiMapOptions
 - name: Classic
   description: 
   code: >-
     {
-      "$type": "FieldtoFieldMultiMapOptions",
+      "$type": "FieldToFieldMultiMapOptions",
       "WorkItemTypeName": null,
-      "SourceToTargetMappings": null,
+      "SourceToTargetMappings": {
+        "$type": "Dictionary`2",
+        "SourceField1": "TargetField1",
+        "SourceField2": "TargetField2"
+      },
       "Enabled": false,
       "ApplyTo": null
     }
-  sampleFor: MigrationTools.Tools.FieldtoFieldMultiMapOptions
+  sampleFor: MigrationTools.Tools.FieldToFieldMultiMapOptions
 description: missng XML code comments
-className: FieldtoFieldMultiMap
+className: FieldToFieldMultiMap
 typeName: FieldMaps
 architecture: 
 options:
@@ -55,21 +68,21 @@ classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Tools/FieldMappin
 optionsClassFile: /src/MigrationTools/Tools/FieldMappingTool/FieldMaps/FieldtoFieldMultiMapOptions.cs
 
 redirectFrom:
-- /Reference/FieldMaps/FieldtoFieldMultiMapOptions/
+- /Reference/FieldMaps/FieldToFieldMultiMapOptions/
 layout: reference
 toc: true
-permalink: /Reference/FieldMaps/FieldtoFieldMultiMap/
-title: FieldtoFieldMultiMap
+permalink: /Reference/FieldMaps/FieldToFieldMultiMap/
+title: FieldToFieldMultiMap
 categories:
 - FieldMaps
 - 
 topics:
 - topic: notes
-  path: /FieldMaps/FieldtoFieldMultiMap-notes.md
+  path: /FieldMaps/FieldToFieldMultiMap-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /FieldMaps/FieldtoFieldMultiMap-introduction.md
+  path: /FieldMaps/FieldToFieldMultiMap-introduction.md
   exists: false
   markdown: ''
 

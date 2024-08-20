@@ -136,7 +136,7 @@
             <status>ready</status>
             <processingtarget>Work Item Field</processingtarget>
         </member>
-        <member name="T:MigrationTools.Tools.FieldtoFieldMultiMapOptions">
+        <member name="T:MigrationTools.Tools.FieldToFieldMultiMapOptions">
             <summary>
             Want to setup a bunch of field maps in a single go. Use this shortcut!
             </summary>
@@ -279,27 +279,27 @@
         </member>
         <member name="F:ThisAssembly.Git.Commit">
             <summary>
-            => @"9d991a9"
+            => @"575839d5"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Sha">
             <summary>
-            => @"9d991a98e310d6629690659cf0516a70a16afe8a"
+            => @"575839d5ccd773d7fe882aa0d5a3cd0154910a5c"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.CommitDate">
             <summary>
-            => @"2024-08-19T17:26:38+01:00"
+            => @"2024-08-20T08:43:12+01:00"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commits">
             <summary>
-            => @"135"
+            => @"138"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Tag">
             <summary>
-            => @"v15.1.8-Preview.9-135-g9d991a9"
+            => @"v15.1.8-Preview.9-138-g575839d5"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseTag">
@@ -334,7 +334,7 @@
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Patch">
             <summary>
-            => @"143"
+            => @"146"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Label">

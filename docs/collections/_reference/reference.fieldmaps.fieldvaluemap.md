@@ -9,8 +9,18 @@ configurationSamples:
       "MigrationTools": {
         "CommonTools": {
           "FieldMappingTool": {
-            "FieldDefaults": {
-              "FieldValueMap": {}
+            "FieldMapDefaults": {
+              "FieldValueMap": {
+                "defaultValue": "StateB",
+                "sourceField": "System.State",
+                "targetField": "System.State",
+                "valueMapping": {
+                  "StateA": "StateB"
+                },
+                "WorkItemTypes": {
+                  "0": "SomeWorkItemType"
+                }
+              }
             }
           }
         }
@@ -23,10 +33,13 @@ configurationSamples:
     {
       "$type": "FieldValueMapOptions",
       "WorkItemTypeName": null,
-      "sourceField": null,
-      "targetField": null,
-      "defaultValue": null,
-      "valueMapping": null,
+      "sourceField": "System.State",
+      "targetField": "System.State",
+      "defaultValue": "StateB",
+      "valueMapping": {
+        "$type": "Dictionary`2",
+        "StateA": "StateB"
+      },
       "Enabled": false,
       "ApplyTo": null
     }

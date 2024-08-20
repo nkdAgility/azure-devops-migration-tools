@@ -9,8 +9,18 @@ configurationSamples:
       "MigrationTools": {
         "CommonTools": {
           "FieldMappingTool": {
-            "FieldDefaults": {
-              "FieldMergeMap": {}
+            "FieldMapDefaults": {
+              "FieldMergeMap": {
+                "formatExpression": "{0} <br/><br/><h3>Acceptance Criteria</h3>{1}",
+                "sourceFields": {
+                  "0": "System.Description",
+                  "1": "Microsoft.VSTS.Common.AcceptanceCriteria"
+                },
+                "targetField": "System.Description",
+                "WorkItemTypes": {
+                  "0": "SomeWorkItemType"
+                }
+              }
             }
           }
         }
@@ -23,9 +33,12 @@ configurationSamples:
     {
       "$type": "FieldMergeMapOptions",
       "WorkItemTypeName": null,
-      "sourceFields": null,
-      "targetField": null,
-      "formatExpression": null,
+      "sourceFields": [
+        "System.Description",
+        "Microsoft.VSTS.Common.AcceptanceCriteria"
+      ],
+      "targetField": "System.Description",
+      "formatExpression": "{0} <br/><br/><h3>Acceptance Criteria</h3>{1}",
       "Enabled": false,
       "ApplyTo": null
     }

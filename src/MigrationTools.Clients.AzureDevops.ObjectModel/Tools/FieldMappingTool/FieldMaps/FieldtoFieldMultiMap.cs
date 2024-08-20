@@ -7,14 +7,14 @@ using MigrationTools.Tools.Infrastructure;
 
 namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
 {
-    public class FieldtoFieldMultiMap : FieldMapBase
+    public class FieldToFieldMultiMap : FieldMapBase
     {
-        public FieldtoFieldMultiMap(ILogger<FieldtoFieldMultiMap> logger, ITelemetryLogger telemetryLogger) : base(logger, telemetryLogger)
+        public FieldToFieldMultiMap(ILogger<FieldToFieldMultiMap> logger, ITelemetryLogger telemetryLogger) : base(logger, telemetryLogger)
         {
         }
 
         public override string MappingDisplayName => string.Empty;
-        private FieldtoFieldMultiMapOptions Config { get { return (FieldtoFieldMultiMapOptions)_Config; } }
+        private FieldToFieldMultiMapOptions Config { get { return (FieldToFieldMultiMapOptions)_Config; } }
 
         public override void Configure(IFieldMapOptions config)
         {

@@ -9,8 +9,13 @@ configurationSamples:
       "MigrationTools": {
         "CommonTools": {
           "FieldMappingTool": {
-            "FieldDefaults": {
-              "FieldSkipMap": {}
+            "FieldMapDefaults": {
+              "FieldSkipMap": {
+                "targetField": "TfsMigrationTool.ReflectedWorkItemId",
+                "WorkItemTypes": {
+                  "0": "SomeWorkItemType"
+                }
+              }
             }
           }
         }
@@ -23,7 +28,7 @@ configurationSamples:
     {
       "$type": "FieldSkipMapOptions",
       "WorkItemTypeName": null,
-      "targetField": null,
+      "targetField": "TfsMigrationTool.ReflectedWorkItemId",
       "Enabled": false,
       "ApplyTo": null
     }

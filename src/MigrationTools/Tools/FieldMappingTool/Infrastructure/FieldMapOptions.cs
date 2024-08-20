@@ -9,7 +9,7 @@ namespace MigrationTools.Tools.Infrastructure
     public abstract class FieldMapOptions : IFieldMapOptions
     {
         [JsonIgnore]
-        public virtual string ConfigurationSectionName => $"MigrationTools:CommonTools:FieldMappingTool:FieldDefaults:{OptionFor}";
+        public virtual string ConfigurationSectionName => $"MigrationTools:CommonTools:FieldMappingTool:FieldMapDefaults:{OptionFor}";
         [JsonIgnore]
         public virtual string OptionFor => $"{GetType().Name.Replace("Options", "")}";
         /// <summary>

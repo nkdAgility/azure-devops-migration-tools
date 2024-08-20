@@ -9,7 +9,7 @@ configurationSamples:
       "MigrationTools": {
         "CommonTools": {
           "FieldMappingTool": {
-            "FieldDefaults": {
+            "FieldMapDefaults": {
               "FieldToTagFieldMap": {}
             }
           }

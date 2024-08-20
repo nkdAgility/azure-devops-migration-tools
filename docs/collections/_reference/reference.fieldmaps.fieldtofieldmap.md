@@ -9,8 +9,15 @@ configurationSamples:
       "MigrationTools": {
         "CommonTools": {
           "FieldMappingTool": {
-            "FieldDefaults": {
-              "FieldToFieldMap": {}
+            "FieldMapDefaults": {
+              "FieldToFieldMap": {
+                "defaultValue": "42",
+                "sourceField": "Microsoft.VSTS.Common.BacklogPriority",
+                "targetField": "Microsoft.VSTS.Common.StackRank",
+                "WorkItemTypes": {
+                  "0": "SomeWorkItemType"
+                }
+              }
             }
           }
         }
@@ -23,9 +30,9 @@ configurationSamples:
     {
       "$type": "FieldToFieldMapOptions",
       "WorkItemTypeName": null,
-      "sourceField": null,
-      "targetField": null,
-      "defaultValue": null,
+      "sourceField": "Microsoft.VSTS.Common.BacklogPriority",
+      "targetField": "Microsoft.VSTS.Common.StackRank",
+      "defaultValue": "42",
       "Enabled": false,
       "ApplyTo": null
     }

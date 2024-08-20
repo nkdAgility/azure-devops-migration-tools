@@ -8,7 +8,7 @@ namespace MigrationTools.Tools
     /// </summary>
     /// <status>ready</status>
     /// <processingtarget>Work Item Field</processingtarget>
-    public class FieldtoFieldMultiMapOptions : FieldMapOptions
+    public class FieldToFieldMultiMapOptions : FieldMapOptions
     {
         public string WorkItemTypeName { get; set; }
         public Dictionary<string, string> SourceToTargetMappings { get; set; }
